@@ -86,70 +86,43 @@ Covering classes with type set:
 ** Static information:
 
 ------------------------------------------------------------
-Covering classes:
+Mapping between sites and the covering classes they belong to:
 ------------------------------------------------------------
 ------------------------------------------------------------
-Side effects action:
+Sites that may/must occurs side-effects:
 ------------------------------------------------------------
 ------------------------------------------------------------
-Modification sites (will be removed):
+Set of rules that may modify a given site (excluding created agents):
 ------------------------------------------------------------
 ------------------------------------------------------------
-Test sites (will be removed):
+Set of rules that may test a given site:
 ------------------------------------------------------------
 ------------------------------------------------------------
-Test and modification sites (will be removed):
-------------------------------------------------------------
-------------------------------------------------------------
-Creation sites (will be removed):
-------------------------------------------------------------
-------------------------------------------------------------
-Modification sites without creation:
-------------------------------------------------------------
-------------------------------------------------------------
-Test and modification sites without creation (will be removed):
+Set of rules that may test and modify a given site (excluding created agents):
 ------------------------------------------------------------
 
 ** Dynamic information:
 
 ------------------------------------------------------------
-Contact map with state (there is no lhs binding):
+(Syntactic) Contact map (only considering rhs) and initital state:
+------------------------------------------------------------
+Sites are annotated with the id of binding type:
+
+------------------------------------------------------------
+List of rules to awake when the state of a site is modified and tested:
 ------------------------------------------------------------
 
 ------------------------------------------------------------
-Update function before adding the side effects rules:
+* Rules in the working list:
 ------------------------------------------------------------
-
-------------------------------------------------------------
-Update function after discovered binding sites, adding the side effects rules:
-------------------------------------------------------------
-half_break side effect (will be removed):
-remove side effect (will be removed):
-half break and remove side effect (will be removed):
-update function:
-
-------------------------------------------------------------
-* Working list:
-------------------------------------------------------------
-- Working list update (will be removed):
-- Working list creation (will be removed):
-agent_type_1:
--List of rule_id in working list of creation:
-0 
-agent_type_2:
--List of rule_id in working list of creation:
-1 
-- Working list update and creation:
+- Working list creation:
+0 1 
 
 ------------------------------------------------------------
 * Covering classes with new index :
 ------------------------------------------------------------
 - A map of covering classes with test rules:
 - A map of covering classes with creation rules:
-- A map of covering classes with modification rules (without creation rules):
-- Bdu test rules:
-- Bdu creation rules:
-- A map of modification rules:
 
 ------------------------------------------------------------
 * Fixpoint iteration :

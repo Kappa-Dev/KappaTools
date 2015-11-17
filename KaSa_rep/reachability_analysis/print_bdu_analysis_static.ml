@@ -33,7 +33,7 @@ let print_covering_classes_id_aux parameter error result =
       then
         begin
           let _ =
-            fprintf parameter.log "agent_type:%i@site_type:%i" x y
+            fprintf parameter.log "agent_type:%i:site_type:%i" x y
           in
           let _ = List.fold_left
             (fun bool x ->
@@ -48,19 +48,20 @@ let print_covering_classes_id_aux parameter error result =
           fprintf stdout "\n"
         end
       else ();
-      List.iter
-        (fun id ->
-          fprintf parameter.log
-            "agent_type:%i@site_type:%i:covering_class_id:%i\n"
-            x y id
-        ) l2
+      let _ =
+        fprintf parameter.log 
+          "agent_type:%i:site_type:%i@list of covering_class_id:\n"
+          x y
+      in
+      List.iter (fun id -> fprintf parameter.log "covering_class_id:%i\n" id)
+        l2
     ) result
 
 let print_covering_classes_id parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
     "\n------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
-    "Covering classes:\n";
+    "Mapping between sites and the covering classes they belong to:\n";
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   let error =
@@ -81,7 +82,7 @@ let print_half_break_effect parameter error result =
       then
         begin
           let _ =
-            fprintf parameter.log "agent_type:%i@site_type:%i" x y
+            fprintf parameter.log "agent_type:%i:site_type:%i" x y
           in
           let _ = List.fold_left
             (fun bool x ->
@@ -96,12 +97,13 @@ let print_half_break_effect parameter error result =
           fprintf stdout "\n"
         end
       else ();
-      List.iter
-        (fun (r, s) ->
-          fprintf parameter.log
-            "agent_type:%i@site_type:%i:(rule_id:%i * state:%i)\n"
-            x y r s
-        ) l2
+      let _ =
+        fprintf parameter.log 
+          "agent_type:%i:site_type:%i@list of pair (rule_id, binding state):\n"
+          x y
+      in
+      List.iter (fun (r, s) -> fprintf parameter.log "(rule_id:%i * state:%i)\n"
+        r s) l2
     ) result
 
 let print_remove_effect parameter error result =
@@ -111,7 +113,7 @@ let print_remove_effect parameter error result =
       then
         begin
           let _ =
-            fprintf parameter.log "agent_type:%i@site_type:%i" x y
+            fprintf parameter.log "agent_type:%i:site_type:%i" x y
           in
           let _ = List.fold_left
             (fun bool x ->
@@ -126,12 +128,13 @@ let print_remove_effect parameter error result =
           fprintf stdout "\n"
         end
       else ();
-      List.iter
-        (fun r ->
-          fprintf parameter.log
-            "agent_type:%i@site_type:%i:(rule_id:%i * state:no_information)\n"
-            x y r
-        ) l2
+      let _ =
+        fprintf parameter.log 
+          "agent_type:%i:site_type:%i@list of pair (rule_id, binding state):\n"
+          x y
+      in
+      List.iter (fun r -> fprintf parameter.log "(rule_id:%i * state:no_information)\n"
+        r) l2
     ) result
 
 let print_side_effects_aux parameter error result =
@@ -151,7 +154,7 @@ let print_side_effects parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter) 
-    "Side effects action:\n";
+    "Sites that may/must occurs side-effects:\n";
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   let error =
@@ -172,7 +175,7 @@ let print_modification_sites_aux parameter error result =
       then
         begin
           let _ =
-            fprintf parameter.log "agent_type:%i@site_type:%i" x y
+            fprintf parameter.log "agent_type:%i:site_type:%i" x y
           in
           let _ = List.fold_left
             (fun bool x ->
@@ -187,19 +190,20 @@ let print_modification_sites_aux parameter error result =
           fprintf stdout "\n"
         end
       else ();
+      let _ =
+        fprintf parameter.log "agent_type:%i:site_type:%i@set of rule_id:\n" x y
+      in
       Site_map_and_set.Set.iter
-        (fun r ->
-          fprintf parameter.log
-            "agent_type:%i@site_type:%i:rule_id:%i\n"
-            x y r
+        (fun rule_id ->
+          fprintf parameter.log "rule_id:%i\n" rule_id
         ) s2
-     ) result
+    ) result
 
 let print_modification_sites parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
-    "Modification sites (will be removed):\n";
+    "Set of rules that may modify a given site (excluding created agents):\n";
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   let error =
@@ -217,7 +221,7 @@ let print_test_sites parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
-    "Test sites (will be removed):\n";
+    "Set of rules that may test a given site:\n";
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   let error =
@@ -235,7 +239,7 @@ let print_test_modification_sites parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
-    "Test and modification sites (will be removed):\n";
+    "Set of rules that may test and modify a given site (excluding created agents):\n";
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   let error =
@@ -249,7 +253,7 @@ let print_test_modification_sites parameter error result =
 (************************************************************************************)
 (*creation*)
 
-let print_creation_sites parameter error result =
+(*let print_creation_sites parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
@@ -262,12 +266,12 @@ let print_creation_sites parameter error result =
       error 
       result
   in
-  error
+  error*)
 
 (************************************************************************************)
 (*test/modification without creation*)
 
-let print_modification_sites_without_creation parameter error result =
+(*let print_modification_sites_without_creation parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
@@ -280,9 +284,9 @@ let print_modification_sites_without_creation parameter error result =
       error 
       result
   in
-  error
+  error*)
 
-let print_test_modification_without_creation parameter error result =
+(*let print_test_modification_without_creation parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
@@ -295,7 +299,7 @@ let print_test_modification_without_creation parameter error result =
       error
       result;
   in
-  error
+  error*)
 
 (************************************************************************************)
 (*main print*)
@@ -340,22 +344,22 @@ let print_result_static parameter error result =
       error 
       result.store_test_modification_sites
   in
-  let _ =
+  (*let _ =
     print_creation_sites
       parameter
       error
       result.store_creation_sites
-  in
-  let _ =
+  in*)
+  (*let _ =
     print_modification_sites_without_creation
       parameter
       error
       result.store_modification_sites_without_creation
-  in
-  let _ = 
+  in*)
+  (*let _ = 
     print_test_modification_without_creation
       parameter
       error
       result.store_test_modification_without_creation
-  in
+  in*)
   error

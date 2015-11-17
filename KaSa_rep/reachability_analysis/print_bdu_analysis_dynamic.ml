@@ -59,9 +59,11 @@ let print_contact_map parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
     "\n------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
-    "Contact map with state (there is no lhs binding):\n";
+    "(Syntactic) Contact map (only considering rhs) and initital state:\n";
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "Sites are annotated with the id of binding type:\n";
   let error =
     print_contact_map_aux
       parameter
@@ -73,15 +75,15 @@ let print_contact_map parameter error result =
 (************************************************************************************)
 (*update function [before] adding rule with side effects*)
 
-let print_covering_classes_modification_aux parameter error result =
+(*let print_covering_classes_modification_aux parameter error result =
   Int2Map_CV_Modif.Map.iter
-    ( fun (x, y, z) (l1, l2) ->
+    ( fun (x, y, z) (l1, s2) ->
       if l1 <> []
       then
         begin
           let _ =
             fprintf parameter.log
-              "agent_type:%i@site_type:%i:covering_class_id:%i" x y z
+              "agent_type:%i:covering_class_id:%i" x z
           in
           let _ = List.fold_left
             (fun bool x ->
@@ -95,19 +97,74 @@ let print_covering_classes_modification_aux parameter error result =
           fprintf stdout "\n"
         end
       else ();
+      let _ =
+        fprintf parameter.log
+          "agent_type:%i:site_type:%i:covering_class_id:%i:@set of rule_id:\n" x y z
+      in
       Site_map_and_set.Set.iter
-        (fun r ->
-          fprintf parameter.log
-            "agent_type:%i@site_type:%i:covering_class_id:%i:rule_id:%i\n"
-            x y z r
-        ) l2
+        (fun rule_id ->
+          fprintf parameter.log "rule_id:%i\n" rule_id
+        ) s2
+    ) result*)
+
+(*TODO*)
+(*Site_map_and_set.Set.iter
+  (fun r ->
+  fprintf parameter.log
+  "agent_type:%i@site_type:%i:covering_class_id:%i:rule_id:%i\n"
+  x y z r
+  ) l2
+  ) result*)
+
+(*let print_covering_classes_modification parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "\n------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "List of rules to awake when the state of a site is modified and tested:\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  print_covering_classes_modification_aux
+    parameter
+    error
+    result*)
+
+let print_covering_classes_modification_aux parameter error result =
+  Int2Map_CV_Modif.Map.iter
+    ( fun (x, y) (l1, s2) ->
+      if l1 <> []
+      then
+        begin
+          let _ =
+            fprintf parameter.log
+              "agent_type:%i:covering_class_id:%i" x y
+          in
+          let _ = List.fold_left
+            (fun bool x ->
+              (if bool
+               then
+                  fprintf parameter.log ", ");
+              fprintf parameter.log "agent_type:%i" x;
+              true
+            ) false l1
+          in
+          fprintf stdout "\n"
+        end
+      else ();
+      let _ =
+        fprintf parameter.log
+          "agent_type:%i:covering_class_id:%i:@set of rule_id:\n" x y
+      in
+      Site_map_and_set.Set.iter
+        (fun rule_id ->
+          fprintf parameter.log "rule_id:%i\n" rule_id
+        ) s2
     ) result
 
 let print_covering_classes_modification parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
     "\n------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
-    "Update function before adding the side effects rules:\n";
+    "List of rules to awake when the state of a site is modified and tested:\n";
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   print_covering_classes_modification_aux
@@ -118,7 +175,7 @@ let print_covering_classes_modification parameter error result =
 (************************************************************************************)
 (*update function [after] adding rule with side effect when discovered the binding*)
 
-let print_update_set_aux parameter error result =
+(*let print_update_set_aux parameter error result =
   Int2Map_CV_Modif.Map.iter
     ( fun (x, y, z) (l1, s2) ->
       if l1 <> []
@@ -126,7 +183,7 @@ let print_update_set_aux parameter error result =
         begin
           let _ =
             fprintf parameter.log
-              "agent_type:%i@site_type:%i:covering_class_id:%i" x y z
+              "agent_type:%i:covering_class_id:%i" x z
           in
           let _ = List.fold_left
             (fun bool x ->
@@ -140,15 +197,26 @@ let print_update_set_aux parameter error result =
           fprintf stdout "\n"
         end
       else ();
+      let _ =
+        fprintf parameter.log
+          "agent_type:%i:site_type:%i:covering_class_id:%i:\n" x y z
+      in
       Site_map_and_set.Set.iter
-        (fun r ->
-          fprintf parameter.log
-            "agent_type:%i@site_type:%i:covering_class_id:%i:rule_id:%i\n"
-            x y z r
+        (fun rule_id ->
+          fprintf parameter.log "rule_id:%i\n" rule_id
         ) s2
-    ) result
+    ) result*)
 
-let print_binding_update_aux parameter error result =
+(*TODO: do not use site_type, only agent_type, cv_id and a set of rule_id*)
+(*Site_map_and_set.Set.iter
+  (fun r ->
+  fprintf parameter.log
+  "agent_type:%i@site_type:%i:covering_class_id:%i:rule_id:%i\n"
+  x y z r
+  ) s2
+  ) result*)
+
+(*let print_binding_update_aux parameter error result =
   let result_hb,
     result_remove,
     result_hb_remove,
@@ -176,28 +244,31 @@ let print_binding_update_aux parameter error result =
       error
       result_hb_remove
   in
-  fprintf stdout "update function:\n";
+  fprintf stdout "New update function:\n";
   print_update_set_aux
     parameter
     error
-    result_update_aux
+    result_update_aux*)
 
-let print_binding_update parameter error result =
+(*let print_binding_update parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
     "\n------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
-    "Update function after discovered binding sites, adding the side effects rules:\n";
+    "Some potential binding type has been discovered list of rules that may break this bond:\n";
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   print_binding_update_aux
     parameter
     error
-    result
+    result*)
   
 (************************************************************************************)
 (*working list*)
 
-let print_wl_creation parameter error result =
+let print_wl_creation parameter result =
+  IntWL.print_wl parameter result
+    
+(*let print_wl_creation parameter error result =
   AgentMap.print error
     (fun error parameter wl ->
       let _ =
@@ -226,7 +297,7 @@ let print_wl_creation_update parameter error result =
 	IntWL.print_wl parameter wl
       in
       error
-    ) parameter result
+    ) parameter result*)
 
 (************************************************************************************)
 (*main print*)
@@ -240,48 +311,62 @@ let print_result_dynamic parameter error result =
       error 
       result.store_contact_map
   in
+  (*let _ =
+    print_covering_classes_modification
+      parameter
+      error
+      result.store_covering_classes_modification_update
+  in*)
+  (*TEST*)
   let _ =
     print_covering_classes_modification
       parameter
       error
       result.store_covering_classes_modification_update
   in
-  let _ =
+  (*let _ =
     print_binding_update 
       parameter
       error
       result.store_update
-  in
+  in*)
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
-      "* Working list:\n";
+      "* Rules in the working list:\n";
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
   in
   let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "- Working list creation:\n";
+    print_wl_creation
+      parameter
+      result.store_wl_creation
+  in
+  (*let _ =
     let _ =
       fprintf (Remanent_parameters.get_log parameter)
-        "- Working list update (will be removed):\n";
+        "- List of rules to wake up when the potential site of a covering class change:\n";
       print_wl_update
         parameter
         error 
         result.store_wl_update 
-    in
-    let _ =
+    in*)
+    (*let _ =
       fprintf (Remanent_parameters.get_log parameter)
         "- Working list creation (will be removed):\n";
       print_wl_creation
         parameter
         error
         result.store_wl_creation 
-    in
-    fprintf (Remanent_parameters.get_log parameter)
+    in*)
+    (*fprintf (Remanent_parameters.get_log parameter)
       "- Working list update and creation:\n";
     print_wl_creation_update
       parameter
       error
       result.store_wl_creation_update
-  in
+  in*)
   error

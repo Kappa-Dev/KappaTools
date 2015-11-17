@@ -41,23 +41,19 @@ let trace = false
 
 (*map (agent_type_cv, covering_class_id) -> rule_id list of modified sites*)
 
-let store_covering_classes_modification_update_aux parameter error agent_type_cv
-    site_type_cv covering_class_id store_test_modification_without_creation store_result =
+(*let store_covering_classes_modification_update_aux parameter error agent_type_cv
+    site_type_cv covering_class_id store_test_modification_sites store_result =
   let add_link (agent_type_cv, site_type_cv, cv_id) rule_id store_result =
     (*searching in the result whether or not those signatures are already inside*)
     let (l, old) =
       Int2Map_CV_Modif.Map.find_default
 	([], Site_map_and_set.Set.empty)
 	(agent_type_cv, site_type_cv, cv_id) store_result in
-    let current_set =
-      Site_map_and_set.Set.add rule_id old
-    in
-    let new_set =
-      Site_map_and_set.Set.union current_set old
-    in
+    let current_set = Site_map_and_set.Set.add rule_id old in
+    let new_set = Site_map_and_set.Set.union current_set old in
     let result =
       Int2Map_CV_Modif.Map.add (agent_type_cv, site_type_cv, cv_id)
-			       (l, new_set) store_result
+	(l, new_set) store_result
     in
     error, result
   in
@@ -67,7 +63,7 @@ let store_covering_classes_modification_update_aux parameter error agent_type_cv
      agent_type:0@site_type:0:rule_id:1]
     - covering class:
     [agent_type:0@site_type:0:covering_class_id:0]
-    - map each covering class to the list of rule that may modify the view of
+    - map each covering class to the list of rule that may modify and test the view of
     covering class.
     - result:
     [agent_type:0@site_type:0:covering_class_id:0:rule_id:2;
@@ -88,13 +84,42 @@ let store_covering_classes_modification_update_aux parameter error agent_type_cv
           else
             error, store_current_result
         ) s2 store_result
-      ) store_test_modification_without_creation store_result
+      ) store_test_modification_sites store_result
+  in error, result*)
+
+let store_covering_classes_modification_update_aux parameter error agent_type_cv
+    covering_class_id store_test_modification_sites store_result =
+  let add_link (agent_type, cv_id) rule_id store_result =
+    let (l, old) =
+      Int2Map_CV_Modif.Map.find_default ([], Site_map_and_set.Set.empty)
+	(agent_type, cv_id) store_result in
+    let current_set = Site_map_and_set.Set.add rule_id old in
+    let new_set = Site_map_and_set.Set.union current_set old in
+    let result =
+      Int2Map_CV_Modif.Map.add (agent_type, cv_id) (l, new_set) store_result
+    in
+    error, result
+  in
+  let error, result =
+    Int2Map_Modif.Map.fold
+      (fun (agent_type, site_type) (m1, s2) store_result ->
+        Site_map_and_set.Set.fold (fun rule_id (error, store_current_result) ->
+          if compare agent_type_cv agent_type = 0
+          then
+            let error, result =
+              add_link (agent_type_cv, covering_class_id) rule_id store_current_result
+            in
+            error, result
+          else
+            error, store_current_result
+        ) s2 store_result
+      ) store_test_modification_sites store_result
   in error, result
     
 (************************************************************************************)
 
-let store_covering_classes_modification_update parameter error
-    store_test_modification_without_creation
+(*let store_covering_classes_modification_update parameter error
+    store_test_modification_sites
     store_covering_classes_id =
   let error, store_result =
     Int2Map_CV.Map.fold
@@ -107,7 +132,34 @@ let store_covering_classes_modification_update parameter error
               agent_type_cv
               site_type_cv
               cv_id
-              store_test_modification_without_creation
+              store_test_modification_sites
+              store_current_result
+          in
+          error, result
+        ) store_result l2
+      (*REMARK: when it is folding inside a list, start with empty result,
+        because the add_link function has already called the old result.*)
+      ) store_covering_classes_id (error, Int2Map_CV_Modif.Map.empty)
+  in
+  let store_result =
+    Int2Map_CV_Modif.Map.map (fun (l, x) -> List.rev l, x) store_result
+  in
+  error, store_result*)
+
+let store_covering_classes_modification_update parameter error
+    store_test_modification_sites
+    store_covering_classes_id =
+  let error, store_result =
+    Int2Map_CV.Map.fold
+      (fun (agent_type_cv, site_type_cv) (l1, l2) store_result ->
+        List.fold_left (fun store_current_result cv_id ->
+          let error, result =
+            store_covering_classes_modification_update_aux
+              parameter
+              error
+              agent_type_cv
+              cv_id
+              store_test_modification_sites
               store_current_result
           in
           error, result
@@ -125,7 +177,9 @@ let store_covering_classes_modification_update parameter error
 (*update function when discover a binding site. Added rule_id of side
   effect into the above update function.*)
 
-let binding_hb_effect_aux parameter error agent_type_1 site_type_1
+(*TODO*)
+
+(*let binding_hb_effect_aux parameter error agent_type_1 site_type_1
     state_1 agent_type_2 site_type_2 store_half_break
     store_covering_classes_modification_update store_result =
   let add_link (agent_type, site_type, cv_id) rule_id_effect store_result =
@@ -172,12 +226,12 @@ let binding_hb_effect_aux parameter error agent_type_1 site_type_1
             ) m2 store_result
         ) store_covering_classes_modification_update (error, store_current_result)
       ) store_result l2
-    ) store_half_break store_result
+    ) store_half_break store_result*)
 
 (************************************************************************************)
 (*TODO*)
 
-let binding_remove_effect_aux parameter error agent_type_1 site_type_1 agent_type_2
+(*let binding_remove_effect_aux parameter error agent_type_1 site_type_1 agent_type_2
     site_type_2 store_remove_effect store_covering_classes_modification_update
     store_result =
   let add_link (agent_type, site_type, cv_id) rule_id_effect store_result =
@@ -222,14 +276,14 @@ let binding_remove_effect_aux parameter error agent_type_1 site_type_1 agent_typ
               ) m2 store_result
           ) store_covering_classes_modification_update (error, store_current_result)
       ) store_result l2
-    ) store_remove_effect store_result
+    ) store_remove_effect store_result*)
 
 (************************************************************************************)
 (*update function*)
 
 (*there is no side effect*)
  
-let store_update_without_side_effects parameter error
+(*let store_update_without_side_effects parameter error
     store_covering_classes_modification_update
     store_contact_map =
   Int2Map_CM_state.Map.fold
@@ -247,12 +301,12 @@ let store_update_without_side_effects parameter error
     ((error, Int2Map_CV_Modif.Map.empty),
      (error, Int2Map_CV_Modif.Map.empty),
      Int2Map_CV_Modif.Map.empty,
-     Int2Map_CV_Modif.Map.empty)
+     Int2Map_CV_Modif.Map.empty)*)
     
 (************************************************************************************)
 (*there is only half break effect*)
 
-let store_binding_half_break parameter error
+(*let store_binding_half_break parameter error
     store_covering_classes_modification_update
     store_half_break
     store_contact_map =
@@ -294,12 +348,12 @@ let store_binding_half_break parameter error
      (error, Int2Map_CV_Modif.Map.empty),
      Int2Map_CV_Modif.Map.empty,
      Int2Map_CV_Modif.Map.empty
-    )
+    )*)
 
 (************************************************************************************)    
 (*there is only remove effect*)
 
-let store_binding_remove parameter error
+(*let store_binding_remove parameter error
     store_covering_classes_modification_update
     store_remove_effect
     store_contact_map =
@@ -339,12 +393,12 @@ let store_binding_remove parameter error
      (error, Int2Map_CV_Modif.Map.empty),
      Int2Map_CV_Modif.Map.empty,
      Int2Map_CV_Modif.Map.empty
-     )
+    )*)
  
 (************************************************************************************)
 (*main*)
     
-let store_binding_update parameter error 
+(*let store_binding_update parameter error 
     store_covering_classes_modification_update
     store_side_effects
     store_contact_map =
@@ -486,4 +540,4 @@ let store_binding_update parameter error
    store_result_remove,
    store_result_hb_remove,
    store_result_update_aux
-  )
+  )*)

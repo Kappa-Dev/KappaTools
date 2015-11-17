@@ -104,13 +104,13 @@ let print_remanent_modif parameter error result =
 
 (************************************************************************************)
 
-let print_remanent_modif_opt parameter error result =
+(*let print_remanent_modif_opt parameter error result =
   AgentMap.print error (fun error parameter pair_list ->
     let _ =
       print_pair_list pair_list
     in
     error
-  ) parameter result
+  ) parameter result*)
 
 (************************************************************************************)
 (*main print*)
@@ -151,18 +151,18 @@ let print_bdu_build parameter error result =
   in
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
-      "- Modification rule with new index (with creation rules):\n";
+      "- Modification rule with new index (excluding created agents):\n";
     print_remanent_modif
       parameter
       error
       result.store_remanent_modif
   in
-  let _ =
+  (*let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "- Modification rule with new index (without creation rules):\n";
     print_remanent_modif_opt
       parameter
       error
       result.store_remanent_modif_opt
-  in
+  in*)
   error

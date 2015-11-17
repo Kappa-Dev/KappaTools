@@ -174,29 +174,15 @@ site_type:1
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
 site_type:1
 site_type:2
-Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
-site_type:1
-site_type:2
-Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
-site_type:1
-site_type:2
 agent_type:1:
 Potential dependencies between sites:Number of covering classes:2
 Potential dependencies between sites:Covering_class_id:0:
 site_type:1
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
 site_type:1
-Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
-site_type:1
-Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
-site_type:1
 Potential dependencies between sites:Covering_class_id:1:
 site_type:0
 Potential dependencies between sites:New-index:Covering_class_id:1:class_id:0:
-site_type:1
-Potential dependencies between sites:New-index:TEST:Covering_class_id:1:class_id:0:
-site_type:1
-Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:1:class_id:0:
 site_type:1
 agent_type:2:
 Potential dependencies between sites:Number of covering classes:1
@@ -204,38 +190,38 @@ Potential dependencies between sites:Covering_class_id:0:
 site_type:0
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
 site_type:1
-Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
-site_type:1
-Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
-site_type:1
 ------------------------------------------------------
 Covering classes with type set:
 agent_type:0:
 Potential dependencies between sites:Covering_class_id:0
 site_type:0
 site_type:1
-Potential dependencies between sites:Map-functions:Covering_class_id:0
-Map1:site_type:0:site_type':1
-Map1:site_type:1:site_type':2
-Map2:site_type':1:site_type:0
-Map2:site_type':2:site_type:1
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+Global:site_type:0  => Local:site_type':1
+Global:site_type:1  => Local:site_type':2
+Local:site_type':1  => Global:site_type:0
+Local:site_type':2  => Global:site_type:1
 agent_type:1:
 Potential dependencies between sites:Covering_class_id:1
 site_type:0
 Potential dependencies between sites:Covering_class_id:0
 site_type:1
-Potential dependencies between sites:Map-functions:Covering_class_id:1
-Map1:site_type:0:site_type':1
-Map2:site_type':1:site_type:0
-Potential dependencies between sites:Map-functions:Covering_class_id:0
-Map1:site_type:1:site_type':1
-Map2:site_type':1:site_type:1
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:1
+Global:site_type:0  => Local:site_type':1
+Local:site_type':1  => Global:site_type:0
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+Global:site_type:1  => Local:site_type':1
+Local:site_type':1  => Global:site_type:1
 agent_type:2:
 Potential dependencies between sites:Covering_class_id:0
 site_type:0
-Potential dependencies between sites:Map-functions:Covering_class_id:0
-Map1:site_type:0:site_type':1
-Map2:site_type':1:site_type:0
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+Global:site_type:0  => Local:site_type':1
+Local:site_type':1  => Global:site_type:0
 ============================================================
 * BDU Analysis:
 ============================================================
@@ -243,182 +229,106 @@ Map2:site_type':1:site_type:0
 ** Static information:
 
 ------------------------------------------------------------
-Covering classes:
+Mapping between sites and the covering classes they belong to:
 ------------------------------------------------------------
-agent_type:0@site_type:0:covering_class_id:0
-agent_type:0@site_type:1:covering_class_id:0
-agent_type:1@site_type:0:covering_class_id:1
-agent_type:1@site_type:1:covering_class_id:0
-agent_type:2@site_type:0:covering_class_id:0
+agent_type:0:site_type:0@list of covering_class_id:
+covering_class_id:0
+agent_type:0:site_type:1@list of covering_class_id:
+covering_class_id:0
+agent_type:1:site_type:0@list of covering_class_id:
+covering_class_id:1
+agent_type:1:site_type:1@list of covering_class_id:
+covering_class_id:0
+agent_type:2:site_type:0@list of covering_class_id:
+covering_class_id:0
 ------------------------------------------------------------
-Side effects action:
-------------------------------------------------------------
-------------------------------------------------------------
-Modification sites (will be removed):
-------------------------------------------------------------
-agent_type:0@site_type:0:rule_id:0
-agent_type:0@site_type:1:rule_id:0
-agent_type:1@site_type:0:rule_id:0
-agent_type:1@site_type:1:rule_id:1
-agent_type:2@site_type:0:rule_id:1
-------------------------------------------------------------
-Test sites (will be removed):
-------------------------------------------------------------
-agent_type:0@site_type:0:rule_id:0
-agent_type:0@site_type:1:rule_id:0
-agent_type:1@site_type:0:rule_id:0
-agent_type:1@site_type:1:rule_id:1
-agent_type:2@site_type:0:rule_id:1
-------------------------------------------------------------
-Test and modification sites (will be removed):
-------------------------------------------------------------
-agent_type:0@site_type:0:rule_id:0
-agent_type:0@site_type:1:rule_id:0
-agent_type:1@site_type:0:rule_id:0
-agent_type:1@site_type:1:rule_id:1
-agent_type:2@site_type:0:rule_id:1
-agent_type:0@site_type:0:rule_id:0
-agent_type:0@site_type:1:rule_id:0
-agent_type:1@site_type:0:rule_id:0
-agent_type:1@site_type:1:rule_id:1
-agent_type:2@site_type:0:rule_id:1
-------------------------------------------------------------
-Creation sites (will be removed):
+Sites that may/must occurs side-effects:
 ------------------------------------------------------------
 ------------------------------------------------------------
-Modification sites without creation:
+Set of rules that may modify a given site (excluding created agents):
 ------------------------------------------------------------
-agent_type:0@site_type:0:rule_id:0
-agent_type:0@site_type:1:rule_id:0
-agent_type:1@site_type:0:rule_id:0
-agent_type:1@site_type:1:rule_id:1
-agent_type:2@site_type:0:rule_id:1
+agent_type:0:site_type:0@set of rule_id:
+rule_id:0
+agent_type:0:site_type:1@set of rule_id:
+rule_id:0
+agent_type:1:site_type:0@set of rule_id:
+rule_id:0
+agent_type:1:site_type:1@set of rule_id:
+rule_id:1
+agent_type:2:site_type:0@set of rule_id:
+rule_id:1
 ------------------------------------------------------------
-Test and modification sites without creation (will be removed):
+Set of rules that may test a given site:
 ------------------------------------------------------------
-agent_type:0@site_type:0:rule_id:0
-agent_type:0@site_type:1:rule_id:0
-agent_type:1@site_type:0:rule_id:0
-agent_type:1@site_type:1:rule_id:1
-agent_type:2@site_type:0:rule_id:1
-agent_type:0@site_type:0:rule_id:0
-agent_type:0@site_type:1:rule_id:0
-agent_type:1@site_type:0:rule_id:0
-agent_type:1@site_type:1:rule_id:1
-agent_type:2@site_type:0:rule_id:1
+agent_type:0:site_type:0@set of rule_id:
+rule_id:0
+agent_type:0:site_type:1@set of rule_id:
+rule_id:0
+agent_type:1:site_type:0@set of rule_id:
+rule_id:0
+agent_type:1:site_type:1@set of rule_id:
+rule_id:1
+agent_type:2:site_type:0@set of rule_id:
+rule_id:1
+------------------------------------------------------------
+Set of rules that may test and modify a given site (excluding created agents):
+------------------------------------------------------------
+agent_type:0:site_type:0@set of rule_id:
+rule_id:0
+agent_type:0:site_type:1@set of rule_id:
+rule_id:0
+agent_type:1:site_type:0@set of rule_id:
+rule_id:0
+agent_type:1:site_type:1@set of rule_id:
+rule_id:1
+agent_type:2:site_type:0@set of rule_id:
+rule_id:1
 
 ** Dynamic information:
 
 ------------------------------------------------------------
-Contact map with state (there is no lhs binding):
+(Syntactic) Contact map (only considering rhs) and initital state:
 ------------------------------------------------------------
+Sites are annotated with the id of binding type:
 agent_type:0@site_type:1:state:1--agent_type':1@site_type':0:state':1
 agent_type:1@site_type:0:state:1--agent_type':0@site_type':1:state':1
 agent_type:1@site_type:1:state:1--agent_type':2@site_type':0:state':1
 agent_type:2@site_type:0:state:1--agent_type':1@site_type':1:state':1
 
 ------------------------------------------------------------
-Update function before adding the side effects rules:
+List of rules to awake when the state of a site is modified and tested:
 ------------------------------------------------------------
-agent_type:0@site_type:0:covering_class_id:0:rule_id:0
-agent_type:0@site_type:1:covering_class_id:0:rule_id:0
-agent_type:1@site_type:0:covering_class_id:1:rule_id:0
-agent_type:1@site_type:1:covering_class_id:0:rule_id:1
-agent_type:2@site_type:0:covering_class_id:0:rule_id:1
+agent_type:0:covering_class_id:0:@set of rule_id:
+rule_id:0
+agent_type:1:covering_class_id:0:@set of rule_id:
+rule_id:0
+rule_id:1
+agent_type:1:covering_class_id:1:@set of rule_id:
+rule_id:0
+rule_id:1
+agent_type:2:covering_class_id:0:@set of rule_id:
+rule_id:1
 
 ------------------------------------------------------------
-Update function after discovered binding sites, adding the side effects rules:
+* Rules in the working list:
 ------------------------------------------------------------
-half_break side effect (will be removed):
-remove side effect (will be removed):
-half break and remove side effect (will be removed):
-update function:
-agent_type:0@site_type:0:covering_class_id:0:rule_id:0
-agent_type:0@site_type:1:covering_class_id:0:rule_id:0
-agent_type:1@site_type:0:covering_class_id:1:rule_id:0
-agent_type:1@site_type:1:covering_class_id:0:rule_id:1
-agent_type:2@site_type:0:covering_class_id:0:rule_id:1
+- Working list creation:
 
-------------------------------------------------------------
-* Working list:
-------------------------------------------------------------
-- Working list update (will be removed):
-agent_type_0:
-- List of rule_id in working list of update function:
-0 0 
-agent_type_1:
-- List of rule_id in working list of update function:
-0 1 
-agent_type_2:
-- List of rule_id in working list of update function:
-1 
-- Working list creation (will be removed):
-- Working list update and creation:
-agent_type_0:
--List of rule_id in working list of creation_update:
-0 0 
-agent_type_1:
--List of rule_id in working list of creation_update:
-0 1 
-agent_type_2:
--List of rule_id in working list of creation_update:
-1 
 
 ------------------------------------------------------------
 * Covering classes with new index :
 ------------------------------------------------------------
 - A map of covering classes with test rules:
-agent_type:0:rule_id:0@covering_class_id:0:site_type':2:state:0
-agent_type:0:rule_id:0@covering_class_id:0:site_type':1:state:0
-agent_type:1:rule_id:0@covering_class_id:1:site_type':1:state:0
-agent_type:1:rule_id:1@covering_class_id:0:site_type':2:state:0
-agent_type:2:rule_id:1@covering_class_id:1:site_type':1:state:0
+agent_type:0:rule_id:0@list of triple:
+covering_class_id:0:site_type':2:state:0
+covering_class_id:0:site_type':1:state:0
+agent_type:1:rule_id:0@list of triple:
+covering_class_id:1:site_type':1:state:0
+agent_type:1:rule_id:1@list of triple:
+covering_class_id:0:site_type':2:state:0
+agent_type:2:rule_id:1@list of triple:
+covering_class_id:1:site_type':1:state:0
 - A map of covering classes with creation rules:
-- A map of covering classes with modification rules (without creation rules):
-- Bdu test rules:
-agent_type_0:
-rule_id:0
-agent_type_0: if(mvbdu_id:7) x1 < 0 then 
-agent_type_0:  false
-agent_type_0: else 
-agent_type_0:  if(mvbdu_id:6) x1 < 1 then 
-agent_type_0:   if(mvbdu_id:5) x2 < 0 then 
-agent_type_0:    false
-agent_type_0:   else 
-agent_type_0:    if(mvbdu_id:4) x2 < 1 then 
-agent_type_0:     true
-agent_type_0:    else 
-agent_type_0:     false
-agent_type_0:  else 
-agent_type_0:   false
-agent_type_1:
-rule_id:0
-agent_type_1: if(mvbdu_id:3) x1 < 0 then 
-agent_type_1:  false
-agent_type_1: else 
-agent_type_1:  if(mvbdu_id:2) x1 < 1 then 
-agent_type_1:   true
-agent_type_1:  else 
-agent_type_1:   false
-rule_id:1
-agent_type_1: if(mvbdu_id:3) x2 < 0 then 
-agent_type_1:  false
-agent_type_1: else 
-agent_type_1:  if(mvbdu_id:2) x2 < 1 then 
-agent_type_1:   true
-agent_type_1:  else 
-agent_type_1:   false
-agent_type_2:
-rule_id:1
-agent_type_2: if(mvbdu_id:3) x1 < 0 then 
-agent_type_2:  false
-agent_type_2: else 
-agent_type_2:  if(mvbdu_id:2) x1 < 1 then 
-agent_type_2:   true
-agent_type_2:  else 
-agent_type_2:   false
-- Bdu creation rules:
-- A map of modification rules:
 
 ------------------------------------------------------------
 * Fixpoint iteration :

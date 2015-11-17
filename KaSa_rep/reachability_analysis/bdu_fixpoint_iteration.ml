@@ -92,8 +92,7 @@ let compute_update parameter error rule_id handler bdu_test modif_list bdu_creat
 (*store the product of [|bdu_creation * bdu_test * modif_list|], rule_id is
   an index, nrules is the length of this array. *)
 
-let collect_bdu_creation_array parameter error handler_sig 
-    store_creation_bdu =
+let collect_bdu_creation_array parameter error handler_sig store_creation_bdu =
   let error, init = AgentMap.create parameter error 0 in
   let error, (handler, bdu_init) = bdu_init parameter error in
   (*create an empty array*)
@@ -154,7 +153,6 @@ let collect_bdu_creation_array parameter error handler_sig
 (************************************************************************************)
 (*store bdu_test in an array, index of this array is rule_id of test
   rules. The lenght of this array is the number of rules.*)
-(*FIXME*)
 
 let collect_bdu_test_array parameter error handler_sig store_test_bdu =
   let error, init = AgentMap.create parameter error 0 in
@@ -273,3 +271,5 @@ let collect_bdu_test_array parameter error handler_sig store_test_bdu =
       in
       error, store_result
     ) store_creation_bdu store_test_bdu store_result*)
+
+(************************************************************************************)

@@ -79,7 +79,7 @@ let collect_remanent_creation_map parameter error store_remanent_creation =
 (*************************************************************************************)
 (*collect remanent modification as a map function without creation rules*)
 
-let collect_remanent_modif_opt_map parameter error store_remanent_modif_opt =
+(*let collect_remanent_modif_opt_map parameter error store_remanent_modif_opt =
   let add_link (agent_type, rule_id) triple_list store_result =
     let (l, old) =
       Map_modif_creation.Map.find_default ([], []) (agent_type, rule_id) store_result
@@ -103,7 +103,7 @@ let collect_remanent_modif_opt_map parameter error store_remanent_modif_opt =
           ) (error, store_result) l
       in
       error, map          
-    ) store_remanent_modif_opt Map_modif_creation.Map.empty
+    ) store_remanent_modif_opt Map_modif_creation.Map.empty*)
 
 (*************************************************************************************)
 (* Build BDU test, creation and a list of modification rules*)
@@ -248,7 +248,7 @@ let collect_creation_bdu parameter error store_creation_map =
 (*************************************************************************************)
 (*list of modification rules*)
 
-let collect_modif_list_map parameter error store_modif_opt_map =
+let collect_modif_list_map parameter error store_modif_map =
   (*let error, (handler, bdu_init) = bdu_init parameter error in*)
   let add_link (agent_type, rule_id) list store_result =
     let (l, old) =
@@ -282,5 +282,5 @@ let collect_modif_list_map parameter error store_modif_opt_map =
       add_link (agent_type, rule_id) list store_result
     in
     error, store_result
-  ) store_modif_opt_map (error, Map_modif_list.Map.empty)
+  ) store_modif_map (error, Map_modif_list.Map.empty)
 

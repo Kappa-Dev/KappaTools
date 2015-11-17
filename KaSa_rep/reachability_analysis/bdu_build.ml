@@ -236,7 +236,7 @@ let collect_creation_restriction parameter error rule_id rule store_remanent_tri
     ) store_remanent_triple store_result
 
 (************************************************************************************)
-(*modification rule with creation rules-REMOVE*)
+(*modification rule with creation rules*)
 
 let collect_modif_restriction parameter error rule_id rule store_remanent_triple
     store_result =
@@ -311,7 +311,7 @@ let collect_modif_restriction parameter error rule_id rule store_remanent_triple
 (************************************************************************************)
 (*modification rules without creation rules*)
 
-let collect_modif_opt_restriction parameter error rule_id rule store_remanent_triple
+(*let collect_modif_opt_restriction parameter error rule_id rule store_remanent_triple
     store_creation_restriction store_result =
   let error, init = AgentMap.create parameter error 0 in
   AgentMap.fold2_common parameter error 
@@ -397,4 +397,4 @@ let collect_modif_opt_restriction parameter error rule_id rule store_remanent_tr
             store_result
         in
         error, store_result
-    ) rule.diff_direct store_remanent_triple store_result
+    ) rule.diff_direct store_remanent_triple store_result*)

@@ -133,18 +133,18 @@ let print_map_functions l l' =
     | [], [] | _, [] | [], _ -> ()
     | id :: tl, h :: tl' ->
       Printf.fprintf stdout
-        "Potential dependencies between sites:Map-functions:Covering_class_id:%i\n" id; 
+        "Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):\nCovering_class_id:%i\n" id; 
       let (map1, map2) = h in
       let () =
         Site_map_and_set.Map.iter
           (fun site site_new ->
-            Printf.fprintf stdout "Map1:site_type:%i:site_type':%i\n" site site_new
+            Printf.fprintf stdout "Global:site_type:%i  => Local:site_type':%i\n" site site_new
           ) map1
       in
       let () =
         Site_map_and_set.Map.iter
           (fun site_new site ->
-            Printf.fprintf stdout "Map2:site_type':%i:site_type:%i\n" site_new site
+            Printf.fprintf stdout "Local:site_type':%i  => Global:site_type:%i\n" site_new site
           ) map2
       in
       ();

@@ -107,8 +107,8 @@ module type Map =
     val split_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * ('a t * 'a option * 'a t)
     val update_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error  -> 'a t -> 'a t -> 'error * 'a t    
     val map2_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('parameters -> 'error -> 'a -> 'error * 'a) -> ('parameters -> 'error -> 'a -> 'error  * 'a) -> ('parameters -> 'error -> 'a -> 'a -> 'error * 'a) -> 'a t -> 'a t -> 'error * 'a t 
-    val map2z_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('parameters -> 'error -> 'a -> 'a -> 'error * 'a) -> 'a t -> 'a t -> 'error * 'a t																																			      
-     val fold2z_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('parameters -> 'error -> elt -> 'a  -> 'b  -> 'c  -> ('error * 'c)) -> 'a t -> 'b t -> 'c -> 'error * 'c 
+    val map2z_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('parameters -> 'error -> 'a -> 'a -> 'error * 'a) -> 'a t -> 'a t -> 'error * 'a t
+    val fold2z_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('parameters -> 'error -> elt -> 'a  -> 'b  -> 'c  -> ('error * 'c)) -> 'a t -> 'b t -> 'c -> 'error * 'c 
      val fold2_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error ->
 			  ('parameters -> 'error -> elt -> 'a   -> 'c  -> 'error * 'c) ->
 			  ('parameters -> 'error -> elt -> 'b  ->  'c  -> 'error * 'c) ->
@@ -122,8 +122,7 @@ module type Map =
     val merge_with_logs : ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t
     val union_with_logs : ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t
     val fold_restriction_with_logs:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a -> ('error * 'b) -> ('error* 'b)) -> set -> 'a t -> 'b -> 'error * 'b 
- 																					
-																									     
+										     
     val iter: (elt -> 'a -> unit) -> 'a t -> unit
     val fold: (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
     val monadic_fold2:

@@ -57,7 +57,7 @@ let print_new_index_dic parameter error elt_id store_index =
 (*------------------------------------------------------------------------------*)
 (*print test with new index*)
 
-let print_test_new_index_dic parameter error elt_id store_test =
+let print_test_new_index_dic parameter error elt_id store_test =(*REMOVE*)
   Dictionary_of_Covering_class.print
     parameter
     error
@@ -73,7 +73,7 @@ let print_test_new_index_dic parameter error elt_id store_test =
 (*------------------------------------------------------------------------------*)
 (*print modified site (action) with new index*)
 
-let print_modified_dic parameter error elt_id store_modif =
+let print_modified_dic parameter error elt_id store_modif =(*REMOVE*)
   Dictionary_of_Modified_class.print
     parameter
     error
@@ -102,26 +102,28 @@ let print_dic_and_new_index parameter error store_index store_test store_modif s
           print_site_list list
         in
         (*print new_index for covering class*)
-        let _ = print_new_index_dic
+        print_new_index_dic
           parameter
           error 
           elt_id 
           store_index 
-        in
-        (*print site that is tested with its new_index*)
-        let _ = print_test_new_index_dic
-          parameter 
-          error 
-          elt_id
-          store_test 
-        in
-        (*print site that is modified with its new_index*)
-        print_modified_dic 
-          parameter
-          error 
-          elt_id 
-          store_modif
-        in error)
+      in
+      (*REMOVE*)
+      (*print site that is tested with its new_index*)
+      (*let _ = print_test_new_index_dic
+        parameter 
+        error 
+        elt_id
+        store_test 
+        in*)
+      (*print site that is modified with its new_index*)
+      (*print_modified_dic 
+        parameter
+        error 
+        elt_id 
+        store_modif
+        in*)
+      error)
     store_dic
 
 (*------------------------------------------------------------------------------*)

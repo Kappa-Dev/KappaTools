@@ -30,10 +30,14 @@ let print_remanent_test_map parameter error result =
       if l1 <> []
       then ()
       else ();
+      let _ =
+        fprintf parameter.log
+          "agent_type:%i:rule_id:%i@list of triple:\n" agent_type rule_id
+      in
       List.iter (fun (id, site, state) ->
         fprintf parameter.log 
-          "agent_type:%i:rule_id:%i@covering_class_id:%i:site_type':%i:state:%i\n"
-          agent_type rule_id id site state
+          "covering_class_id:%i:site_type':%i:state:%i\n"
+          id site state
       ) l2
     ) result
 
@@ -45,16 +49,20 @@ let print_remanent_creation_map parameter error result =
       if l1 <> []
       then ()
       else ();
+      let _ =
+        fprintf parameter.log
+          "agent_type:%i:rule_id:%i@list of triple:\n" agent_type rule_id
+      in
       List.iter (fun (id, site, state) ->
         fprintf parameter.log 
-          "agent_type:%i:rule_id:%i@covering_class_id:%i:site_type':%i:state:%i\n"
-          agent_type rule_id id site state
+          "covering_class_id:%i:site_type':%i:state:%i\n"
+          id site state
       ) l2
     ) result
 
 (************************************************************************************)
 
-let print_remanent_modif_opt_map parameter error result =
+(*let print_remanent_modif_opt_map parameter error result =
    Map_modif_creation.Map.iter
       (fun (agent_type, rule_id) (l1, l2) ->
         if l1 <> []
@@ -65,7 +73,7 @@ let print_remanent_modif_opt_map parameter error result =
             "agent_type:%i:rule_id:%i@covering_class_id:%i:site_type':%i:state:%i\n"
             agent_type rule_id id site state
         ) l2
-      ) result
+      ) result*)
 
 (************************************************************************************)
 
@@ -73,20 +81,21 @@ let print_bdu parameter error bdu =
   Boolean_mvbdu.print_boolean_mvbdu error
     (Remanent_parameters.update_prefix parameter "") bdu
     
-let print_test_bdu_map parameter error result =
+(*let print_test_bdu_map parameter error result =
   Map_test_bdu.Map.iter
     (fun (agent_type, rule_id) (l1, l2) ->
       if l1 <> []
       then ()
       else ();
+      let _ =
+        fprintf parameter.log "agent_type:%i:rule_id:%i@list of bdu_test:\n"
+          agent_type rule_id
+      in
       List.iter (fun (handler, bdu) ->
-        fprintf parameter.log 
-          "agent_type:%i:rule_id:%i\n"
-          agent_type rule_id;
         let _ = print_bdu parameter error bdu in
         ()
       ) l2
-    ) result
+    ) result*)
 
 let print_test_bdu parameter error result =
   AgentMap.print error
@@ -105,7 +114,7 @@ let print_test_bdu parameter error result =
 
 (************************************************************************************)
 
-let print_creation_bdu_map parameter error result =
+(*let print_creation_bdu_map parameter error result =
   Map_creation_bdu.Map.iter
     (fun (agent_type, rule_id) (l1, l2) ->
       if l1 <> []
@@ -118,7 +127,7 @@ let print_creation_bdu_map parameter error result =
         let _ = print_bdu parameter error bdu in
         ()
       ) l2
-    ) result
+    ) result*)
 
 let print_creation_bdu parameter error result =
   AgentMap.print error
@@ -137,7 +146,7 @@ let print_creation_bdu parameter error result =
 
 (************************************************************************************)
 
-let print_modif_list_map parameter error result =
+(*let print_modif_list_map parameter error result =
   Map_modif_list.Map.iter
     (fun (agent_type, rule_id) (l1, l2) ->
       if l1 <> []
@@ -148,7 +157,7 @@ let print_modif_list_map parameter error result =
             "agent_type:%i:rule_id:%i:site_type:%i\n"
             agent_type rule_id site;
       ) l2
-    ) result
+    ) result*)
 
 (************************************************************************************)
 (*main print*)
@@ -178,16 +187,17 @@ let print_bdu_build_map parameter error result =
       error
       result.store_remanent_creation_map
   in
-  let _ =
+  (*let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "- A map of covering classes with modification rules (without creation rules):\n";
     print_remanent_modif_opt_map
       parameter
       error
       result.store_remanent_modif_opt_map
-  in
+  in*)
   (*-----------------------------------------------------------------*)
   (*print bdu*)
+  (*REMOVE*)
   (*let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "- Map of Bdu test rules:\n";
@@ -204,28 +214,30 @@ let print_bdu_build_map parameter error result =
       error
       result.store_creation_bdu_map
   in*)
-  let _ =
+  (*-----------------------------------------------------------------*)
+  (*NOTE:print if one wants to test*)
+  (*let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "- Bdu test rules:\n";
     print_test_bdu
       parameter
       error
       result.store_test_bdu
-  in
-  let _ =
+  in*)
+  (*let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "- Bdu creation rules:\n";
     print_creation_bdu
       parameter
       error
       result.store_creation_bdu
-  in
-  let _ =
+  in*)
+  (*let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "- A map of modification rules:\n";
     print_modif_list_map
       parameter
       error
       result.store_modif_list_map
-  in
+  in*)
   error
