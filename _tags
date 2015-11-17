@@ -1,5 +1,6 @@
 "cflow" : include
 "dataStructures" : include
+<term/*.ml{,i}> : warn_A
 "term" : include
 "grammar" : include
 "pattern" : include

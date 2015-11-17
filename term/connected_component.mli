@@ -34,12 +34,18 @@ end
 
 val begin_new : Env.t -> work
 (** Starts creation *)
-val new_node : work -> int (** node_type *) -> (ContentAgent.t*work)
+
+val new_node : work -> int -> (ContentAgent.t*work)
+(** [new_node wk node_type] *)
+
 val new_link :
-  work -> (ContentAgent.t * int) (** node * site id *) -> (ContentAgent.t * int) -> work
+  work -> (ContentAgent.t * int) -> (ContentAgent.t * int) -> work
+(** [new_link wk (node, site_id) (node', site_id')] *)
+
 val new_free : work -> (ContentAgent.t * int) -> work
 val new_internal_state : work -> (ContentAgent.t * int) -> int -> work
 (** [new_link_type work (node,site) type] *)
+
 val finish_new : ?origin:Operator.rev_dep -> work -> (Env.t*Renaming.t*t)
 
 (** {6 Use a connected component } *)
@@ -47,6 +53,7 @@ val finish_new : ?origin:Operator.rev_dep -> work -> (Env.t*Renaming.t*t)
 val is_equal_canonicals : t -> t -> bool
 val print : ?sigs:Signature.s -> bool -> Format.formatter -> t -> unit
 (** [print ~sigs print_id form cc] *)
+
 val print_dot : Signature.s -> Format.formatter -> t -> unit
 
 module Matching : sig
@@ -59,9 +66,11 @@ module Matching : sig
   val observables_from_free :
     Env.t -> Edges.t -> int -> int -> int -> ((cc * int) list * Operator.DepSet.t)
   (** [observables_from_free domain graph sort agent site] *)
+
   val observables_from_internal :
     Env.t -> Edges.t -> int -> int -> int -> int -> ((cc * int) list * Operator.DepSet.t)
   (** [observables_from_internal domain graph sort agent site internal_state] *)
+
   val observables_from_link :
     Env.t -> Edges.t -> int -> int -> int -> int -> int -> int ->
     ((cc * int) list * Operator.DepSet.t)

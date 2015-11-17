@@ -48,6 +48,10 @@ val rename_abstract_action :
 val rename_abstract_event :
   Connected_component.work -> int ->
   Connected_component.cc -> Renaming.t -> abstract event -> abstract event
+val rename_abstract_side_effect:
+  Connected_component.work -> int -> Connected_component.cc -> Renaming.t ->
+  (Agent_place.t * 'a) * Agent_place.t binding_state ->
+  (Agent_place.t * 'a) * Agent_place.t binding_state
 val concretize_test : (Agent_place.t -> int) -> abstract test -> concrete test
 val concretize_action : (Agent_place.t -> int) -> abstract action -> concrete action
 val concretize_event : (Agent_place.t -> int) -> abstract event -> concrete event

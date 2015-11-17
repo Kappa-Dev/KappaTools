@@ -33,7 +33,7 @@ type transition = {
 type point = {
   content: cc;
   is_obs_of: Operator.DepSet.t option;
-  fathers: int (** t.id *) list;
+  fathers: int (* t.id *) list;
   sons: transition list;
 }
 
@@ -323,11 +323,8 @@ module Env : sig
   val navigate :
     t -> (nav_port*arrow) list -> (int * Renaming.t list * point) option
   val get : t -> int -> point
-  val check_vitality : t -> unit
-  val cc_map : t -> cc IntMap.t
   val add_point : int -> point -> t -> t
   val to_work : t -> work
-  val fresh_id : t -> int
   val nb_ag : t -> int
   val print : Format.formatter -> t -> unit
   val print_dot : Format.formatter -> t -> unit
@@ -360,11 +357,6 @@ let empty sigs =
 
 let check_vitality env = assert (env.used_by_a_begin_new = false)
 
-let cc_map env = IntMap.fold (fun i x out ->
-			      match x.is_obs_of with
-			      | Some _ -> IntMap.add i x.content out
-			      | None -> out)
-			     env.domain IntMap.empty
 let print f env =
   Format.fprintf
     f "@[<v>%a@]"
@@ -632,7 +624,10 @@ let remove_cycle_edges complete_domain_with obs_id dst env free_id cc =
 	 complete_domain_with obs_id dst env' (succ f_id)
 			      cc' e (identity_injection cc) in
        aux (pack,ans::out) q
-    | l -> assert (l = []); acc in
+    | [] -> acc
+    | (((Existing _,_),ToNode(Fresh _,_)) |
+       ((Existing _,_),(ToInternal _ | ToNothing)) |
+       ((Fresh _,_),_))::_ -> assert false in
   aux ((free_id,env),[]) (compute_cycle_edges cc)
 
 let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
@@ -787,7 +782,7 @@ let begin_new env = Env.to_work env
 
 let finish_new ?origin wk =
   let () = check_dangling wk in
-  (** rebuild env **)
+  (* rebuild env *)
   let () =
     Tools.iteri
       (fun i ->
