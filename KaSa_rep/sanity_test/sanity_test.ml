@@ -133,12 +133,9 @@ let main () =
 	       | Some i -> Printf.fprintf stderr "KO %i \n" i
   in					
   let _ = Exception.print parameters error  in 
-  ()
-    
-(*let main () =
   let error = Exception.empty_error_handler in    
   let error,parameters,files  = Get_option.get_option error in 
-  let _ = Counting_test.test_counting_procedure parameters in
+  (* let _ = Counting_test.test_counting_procedure parameters in*)
   let remanent,bdu_test_list = Mvbdu_test.bdu_test (remanent parameters) parameters in 
   (*testing from bdu_test_list*)
   let _ =
@@ -147,7 +144,7 @@ let main () =
       remanent 
       bdu_test_list
   in 
-  ()*)
+  ()
 
     (*let _ = main ()*)
  
