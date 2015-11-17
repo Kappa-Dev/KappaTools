@@ -20,9 +20,10 @@ type t = Edge.t Int2Map.t * int Int2Map.t * int IntMap.t
 
 let empty = (Int2Map.empty, Int2Map.empty, IntMap.empty)
 
-let add_free ty ag s (connect,state,sort) =
-  (Int2Map.add (ag,s) Edge.ToFree connect,state,
-   (* !HACK! *) if s = 0 then IntMap.add ag ty sort else sort)
+let add_agent ty ag (connect,state,sort) =
+  (connect,state,IntMap.add ag ty sort)
+let add_free ag s (connect,state,sort) =
+  (Int2Map.add (ag,s) Edge.ToFree connect,state,sort)
 let add_internal ag s i (connect,state,sort) =
   (connect,Int2Map.add (ag,s) i state,sort)
 
@@ -32,10 +33,11 @@ let add_link ty ag s ty' ag' s' (connect,state,sort) =
    state,sort)
 
 let remove ag s (connect,state,sort) = function
-  | Edge.ToFree -> (Int2Map.remove (ag,s) connect,state,
-		    (* !HACK! *) if s = 0 then IntMap.remove ag sort else sort)
+  | Edge.ToFree -> (Int2Map.remove (ag,s) connect,state,sort)
   | Edge.Link (_,ag',s') ->
      (Int2Map.remove (ag,s) (Int2Map.remove (ag',s') connect),state,sort)
+let remove_agent ag (connect,state,sort) =
+  (connect,state,IntMap.remove ag sort)
 let remove_free ag s t = remove ag s t Edge.ToFree
 let remove_internal ag s (connect,state,sort) =
   match Int2Map.pop (ag,s) state with
@@ -45,6 +47,7 @@ let remove_internal ag s (connect,state,sort) =
 		 " has no internal state to remove in the current graph.")
 let remove_link ag s ag' s' t = remove ag s t (Edge.Link (-1,ag',s'))
 
+let is_agent ag (_,_,s) = IntMap.mem ag s
 let is_free ag s (t,_,_) =
   match Int2Map.find_default Edge.dummy_link (ag,s) t with
   | Edge.ToFree -> true

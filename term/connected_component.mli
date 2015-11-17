@@ -63,6 +63,10 @@ module Matching : sig
   val get : (ContentAgent.t * int) -> t -> int
   val reconstruct : Edges.t -> t -> int -> cc -> int -> t option
 
+  val observables_from_agent :
+    Env.t -> Edges.t -> int -> int -> ((cc * int) list * Operator.DepSet.t)
+  (** [observables_from_free domain graph sort agent] *)
+
   val observables_from_free :
     Env.t -> Edges.t -> int -> int -> int -> ((cc * int) list * Operator.DepSet.t)
   (** [observables_from_free domain graph sort agent site] *)

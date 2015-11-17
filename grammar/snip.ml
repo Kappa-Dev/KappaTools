@@ -4,23 +4,24 @@ type switching =
   | Linked of int Location.annot | Freed | Maintained | Erased
 
 type rule_internal =
-    I_ANY
+  | I_ANY
   | I_ANY_CHANGED of int
   | I_ANY_ERASED
   | I_VAL_CHANGED of int * int
   | I_VAL_ERASED of int
 type rule_link =
-    L_ANY of switching
+  | L_ANY of switching
   | L_FREE of switching
   | L_SOME of switching
   | L_TYPE of int * int * switching (** ty_id,p_id,switch *)
   | L_VAL of int Location.annot * switching
 type rule_agent =
-    { ra_type: int;
-      ra_ports: rule_link array;
-      ra_ints: rule_internal array;
-      ra_syntax: (rule_link array * rule_internal array) option;
-    }
+  { ra_type: int;
+    ra_erased: bool;
+    ra_ports: rule_link array;
+    ra_ints: rule_internal array;
+    ra_syntax: (rule_link array * rule_internal array) option;
+  }
 
 let print_rule_internal sigs ag_ty site f = function
   | I_ANY -> ()
@@ -151,7 +152,7 @@ let annotate_dropped_agent sigs ((agent_name, _ as ag_ty),intf) =
        | (Ast.LNK_VALUE i, pos) -> ports.(p_id) <- L_VAL ((i,pos),Erased)
        | (Ast.FREE, _) -> ports.(p_id) <- L_FREE Erased
       ) intf in
-  { ra_type = ag_id; ra_ports = ports; ra_ints = internals;
+  { ra_type = ag_id; ra_ports = ports; ra_ints = internals; ra_erased = true;
     ra_syntax = Some (Array.copy ports, Array.copy internals);}
 
 let annotate_created_agent id sigs ((agent_name, pos as ag_ty),intf) =
@@ -307,7 +308,7 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
        let p_id = Signature.num_of_site ~agent_name p_na sign in
        let () = register_internal_modif p_id [] p in
        register_port_modif p_id (Location.dummy_annot Ast.LNK_ANY) p) rp_r in
-  { ra_type = ag_id; ra_ports = ports; ra_ints = internals;
+  { ra_type = ag_id; ra_ports = ports; ra_ints = internals; ra_erased = false;
     ra_syntax = Some (Array.copy ports, Array.copy internals);}
 
 let rec annotate_lhs_with_diff sigs acc lhs rhs =
@@ -404,7 +405,7 @@ let find_implicit_infos sigs contact_map ags =
 	 (fun (free_id,ports,ags,cor) ->
 	  (free_id,
 	   {ra_type = ag.ra_type; ra_ports = ports; ra_ints = ag.ra_ints;
-	    ra_syntax = ag.ra_syntax}::ags,
+	    ra_erased = ag.ra_erased; ra_syntax = ag.ra_syntax}::ags,
 	   cor)
 	 )
 	 (aux_one ag_tail ag.ra_type max_id ag.ra_ports 0)
@@ -420,7 +421,7 @@ let complete_with_candidate ag id todo p_id p_switch =
 	  let ports' = Array.copy ag.ra_ports in
 	  let () = ports'.(i) <- L_VAL (Location.dummy_annot id,p_switch) in
 	  ({ ra_type = ag.ra_type; ra_ports = ports'; ra_ints = ag.ra_ints;
-	     ra_syntax = ag.ra_syntax;}, todo)
+	     ra_erased = ag.ra_erased; ra_syntax = ag.ra_syntax;}, todo)
 	  :: acc
        | L_VAL ((k,_),s) when k > id ->
 	  begin
@@ -432,7 +433,7 @@ let complete_with_candidate ag id todo p_id p_switch =
 	       let ports' = Array.copy ag.ra_ports in
 	       let () = ports'.(i) <- L_VAL (Location.dummy_annot id,s) in
 	       ({ ra_type = ag.ra_type; ra_ports = ports'; ra_ints = ag.ra_ints;
-		  ra_syntax = ag.ra_syntax;},
+		  ra_erased = ag.ra_erased; ra_syntax = ag.ra_syntax;},
 		todo') :: acc
 	    |_ -> acc
 	  end
@@ -447,7 +448,7 @@ let new_agent_with_one_link sigs ty_id port link switch =
   let internals = Array.make arity I_ANY in
   let () = ports.(port) <- L_VAL (Location.dummy_annot link,switch) in
   { ra_type = ty_id; ra_ports = ports; ra_ints = internals;
-    ra_syntax = None;}
+    ra_erased = false; ra_syntax = None;}
 
 let rec add_one_implicit_info sigs id ((ty_id,port),s as info) todo = function
   | [] -> [[new_agent_with_one_link sigs ty_id port id s],todo]
@@ -583,7 +584,7 @@ let add_extra_side_effects side_effects place refined =
 (* Deals with tests, erasure internal state change and release (but
 not binding)*)
 let make_instantiation
-      place links (tests,(actions,side_sites,side_effects)) ref_ports =
+      place links (tests,(actions,side_sites,side_effects)) ref_ports is_erased =
   function
   | None ->
      (tests,
@@ -592,11 +593,9 @@ let make_instantiation
      let rec aux site_id tests actions side_sites side_effects links =
        if site_id < 0
        then (Instantiation.Is_Here place :: tests,
-	     ((match ports.(0) with
-	       | L_FREE Erased ->
-		  Instantiation.Remove place :: actions
-	       | L_FREE (Maintained | Linked _ | Freed)
-	       | L_ANY _ | L_SOME _ | L_TYPE _ | L_VAL _ -> actions),
+	     ((if is_erased
+	       then Instantiation.Remove place :: actions
+	       else actions),
 	      side_sites,side_effects))
        else
 	 let tests',actions' =
@@ -657,8 +656,8 @@ let make_instantiation
 	 aux (pred site_id) tests'' actions'' side_sites' side_effects' links' in
      aux (pred (Array.length ports)) tests actions side_sites side_effects links
 
-let rec add_agents_in_cc sigs id wk registered_links transf links_transf
-			 instantiations remains =
+let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
+			 links_transf instantiations remains =
   function
   | [] ->
      begin match IntMap.root registered_links with
@@ -668,12 +667,16 @@ let rec add_agents_in_cc sigs id wk registered_links transf links_transf
   | ag :: ag_l ->
      let (node,wk) = Connected_component.new_node wk ag.ra_type in
      let place = Agent_place.Existing (node,id) in
+     let transf' =
+       if ag.ra_erased
+       then Primitives.Transformation.Agent place::removed,added
+       else transf in
      let rec handle_ports wk r_l c_l (removed,added) l_t re acc site_id =
        if site_id = Array.length ag.ra_ports
        then
 	 let instantiations' =
 	   make_instantiation
-	     place c_l instantiations ag.ra_ports ag.ra_syntax in
+	     place c_l instantiations ag.ra_ports ag.ra_erased ag.ra_syntax in
 	 add_agents_in_cc
 	   sigs id wk r_l (removed,added) l_t instantiations' re acc
        else
@@ -767,7 +770,7 @@ let rec add_agents_in_cc sigs id wk registered_links transf links_transf
 		       handle_ports
 			 wk' r_l' c_l transf' l_t' re' (n::acc) (succ site_id)
 		    | _, _ -> link_occurence_failure i pos
-     in handle_ports wk registered_links IntMap.empty transf links_transf remains ag_l 0
+     in handle_ports wk registered_links IntMap.empty transf' links_transf remains ag_l 0
 
 let rec complete_with_creation
 	  sigs (removed,added) links_transf create_actions actions fresh =
@@ -822,7 +825,8 @@ let rec complete_with_creation
 		let l_t' = IntMap.add i ((place,site_id),true) l_t in
 		(added',actions,l_t') in
 	 handle_ports added'' l_t' actions' (point::intf) (succ site_id) in
-     handle_ports added links_transf actions [] 0
+     handle_ports
+       (Primitives.Transformation.Agent place::added) links_transf actions [] 0
 
 let incr_origin = function
   | ( Operator.ALG _ | Operator.PERT _  as x) -> x
@@ -845,7 +849,8 @@ let connected_components_of_mixture created (env,origin) mix =
 		       Instantiation.Bind (x,y) :: acs
 		    | (Primitives.Transformation.Freed _ |
 		       Primitives.Transformation.PositiveInternalized _ |
-		       Primitives.Transformation.NegativeInternalized _) -> acs)
+		       Primitives.Transformation.NegativeInternalized _ |
+		       Primitives.Transformation.Agent _) -> acs)
 	   actions added in
        let transformations' = (List.rev removed, List.rev added) in
        let actions'',transformations'' =

@@ -106,12 +106,22 @@ let deal_transformation is_add domain to_explore_unaries inj2graph edges roots t
     (*inj: inj2graph', graph: edges', obs: delta_roots
 NB inj should not change if [is_add] is false*)
     match transf with
+    | Primitives.Transformation.Agent n ->
+       let ty, id, inj2graph' = from_place inj2graph n in (*(A,23,phi)*)
+       let edges' =
+	 if is_add then Edges.add_agent ty id edges
+	 else Edges.remove_agent id edges in
+       let new_obs =
+	 Connected_component.Matching.observables_from_agent
+	   domain (if is_add then edges' else edges) ty id in (*this hack should disappear when chekcing O\H only*)
+       (inj2graph',edges',new_obs)
     | Primitives.Transformation.Freed (n,s) -> (*(n,s)-bottom*)
        let ty, id, inj2graph' = from_place inj2graph n in (*(A,23,phi)*)
        let edges' =
-	 if is_add then Edges.add_free ty id s edges
+	 if is_add then Edges.add_free id s edges
 	 else Edges.remove_free id s edges in
        let new_obs =
+	 if s = 0 then [],Operator.DepSet.empty else
 	 Connected_component.Matching.observables_from_free
 	   domain (if is_add then edges' else edges) ty id s in (*this hack should disappear when chekcing O\H only*)
        (inj2graph',edges',new_obs)
@@ -163,6 +173,7 @@ NB inj should not change if [is_add] is false*)
     else
       match transf with
       | (Primitives.Transformation.Freed _ |
+	 Primitives.Transformation.Agent _ |
 	 Primitives.Transformation.PositiveInternalized _) -> to_explore_unaries
       | Primitives.Transformation.NegativeInternalized _ -> assert false
       | Primitives.Transformation.Linked ((n,_),(n',_)) ->

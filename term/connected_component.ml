@@ -863,13 +863,14 @@ module NodeSetMap = SetMap.Make(ContentAgent)
 module NodeMap = NodeSetMap.Map
 
 let check_edge graph = function
+  | ((Fresh (_,id),0),ToNothing) -> Edges.is_agent id graph
   | ((Fresh (_,id),site),ToNothing) -> Edges.is_free id site graph
   | ((Fresh (_,id),site),ToInternal i) -> Edges.is_internal i id site graph
   | ((Fresh (_,id),site),ToNode (Existing id',site')) ->
      Edges.link_exists id site id' site' graph
   | ((Fresh (_,id),site),ToNode (Fresh (_,id'),site')) ->
      Edges.link_exists id site id' site' graph
-  | ((Existing id,site),ToNothing) -> Edges.is_free id site graph
+  | ((Existing id,site),ToNothing) -> assert (site <> 0); Edges.is_free id site graph
   | ((Existing id,site),ToInternal i) -> Edges.is_internal i id site graph
   | ((Existing id,site),ToNode (Existing id',site')) ->
      Edges.link_exists id site id' site' graph
@@ -986,10 +987,9 @@ module Matching = struct
 	     (Mods.Int2Set.empty,([],Operator.DepSet.empty)) injs
     else ([],Operator.DepSet.empty)
 
+  let observables_from_agent domain graph ty node_id =
+      from_edge domain graph [(Fresh (ty,node_id),0),ToNothing]
   let observables_from_free domain graph ty node_id site =
-    if site = 0 then
-      from_edge domain graph [(Fresh (ty,node_id),site),ToNothing]
-    else
       from_edge domain graph [(Fresh (ty,node_id),0),ToNothing;
 			      (Existing node_id,site),ToNothing]
   let observables_from_internal domain graph ty node_id site id =

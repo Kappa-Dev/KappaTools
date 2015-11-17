@@ -1,7 +1,8 @@
 module Transformation =
   struct
     type t =
-	Freed of Agent_place.t * int
+      | Agent of Agent_place.t
+      | Freed of Agent_place.t * int
       | Linked of (Agent_place.t * int) * (Agent_place.t * int)
       | PositiveInternalized of Agent_place.t * int * int
       | NegativeInternalized of Agent_place.t * int
@@ -20,8 +21,13 @@ module Transformation =
       | NegativeInternalized (p,s) as x ->
 	 let p' = Agent_place.rename wk id cc inj p in
 	 if p == p' then x else NegativeInternalized (p',s)
+      | Agent p as x ->
+	 let p' = Agent_place.rename wk id cc inj p in
+	 if p == p' then x else Agent p'
 
     let print ?sigs f = function
+      | Agent p ->
+	 Format.fprintf f "@[%a@]" (Agent_place.print ?sigs) p
       | Freed (p,s) ->
 	 Format.fprintf
 	   f "@[%a.%a = %t@]" (Agent_place.print ?sigs) p
