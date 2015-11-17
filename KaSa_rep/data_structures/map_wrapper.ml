@@ -43,26 +43,29 @@ module type Map_with_logs =
     type elt
     type set
     type +'a t
-
+	     
     val empty: 'a t
     val is_empty: 'a t -> bool
-    val find_option:  Remanent_parameters_sig.parameters -> Exception.method_handler -> elt -> 'a t -> Exception.method_handler * 'a option
-    val find_default:  Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> elt -> 'a t -> Exception.method_handler * 'a
-    val add: Remanent_parameters_sig.parameters -> Exception.method_handler -> elt -> 'a -> 'a t -> Exception.method_handler * 'a t
-    val remove: Remanent_parameters_sig.parameters -> Exception.method_handler -> elt -> 'a t -> Exception.method_handler * 'a t
-    val update: Remanent_parameters_sig.parameters -> Exception.method_handler  -> 'a t -> 'a t -> Exception.method_handler * 'a t    
-    val map2:  Remanent_parameters_sig.parameters -> Exception.method_handler -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> Exception.method_handler * 'a) -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> Exception.method_handler *  'a) -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'a -> Exception.method_handler * 'a) -> 'a t -> 'a t -> Exception.method_handler * 'a t
-    val map2z:  Remanent_parameters_sig.parameters -> Exception.method_handler -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'a -> Exception.method_handler * 'a) -> 'a t -> 'a t -> Exception.method_handler * 'a t 
-    val fold2z: Remanent_parameters_sig.parameters -> Exception.method_handler -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt -> 'a  -> 'b  -> 'c   -> (Exception.method_handler * 'c)) -> 'a t -> 'b t -> 'c -> Exception.method_handler * 'c 
-    val fold2:  Remanent_parameters_sig.parameters -> Exception.method_handler -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt -> 'a   -> 'c  -> Exception.method_handler * 'c) -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt -> 'b  ->  'c  -> Exception.method_handler * 'c) -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt -> 'a -> 'b  -> 'c  -> Exception.method_handler * 'c) ->  'a t -> 'b t -> 'c -> Exception.method_handler * 'c 
+    val min_elt: (elt -> 'a -> bool) -> 'a t -> elt option
+    val find_option:  Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'a t -> Exception.method_handler  * 'a option
+    val find_default:  Remanent_parameters_sig.parameters -> Exception.method_handler  -> 'a -> elt -> 'a t -> Exception.method_handler  * 'a
+    val find_default_without_logs: Remanent_parameters_sig.parameters -> Exception.method_handler  -> 'a -> elt -> 'a t -> Exception.method_handler  * 'a
+    val find_option_without_logs: Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'a t -> Exception.method_handler  * 'a option
+    val add: Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'a -> 'a t -> Exception.method_handler  * 'a t
+    val remove: Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'a t -> Exception.method_handler  * 'a t
+    val update: Remanent_parameters_sig.parameters -> Exception.method_handler   -> 'a t -> 'a t -> Exception.method_handler  * 'a t    
+    val map2:  Remanent_parameters_sig.parameters -> Exception.method_handler  -> (Remanent_parameters_sig.parameters -> Exception.method_handler  -> 'a -> Exception.method_handler  * 'a) -> (Remanent_parameters_sig.parameters -> Exception.method_handler  -> 'a -> Exception.method_handler  *  'a) -> (Remanent_parameters_sig.parameters -> Exception.method_handler  -> 'a -> 'a -> Exception.method_handler  * 'a) -> 'a t -> 'a t -> Exception.method_handler  * 'a t
+    val map2z:  Remanent_parameters_sig.parameters -> Exception.method_handler  -> (Remanent_parameters_sig.parameters -> Exception.method_handler  -> 'a -> 'a -> Exception.method_handler  * 'a) -> 'a t -> 'a t -> Exception.method_handler  * 'a t 
+    val fold2z: Remanent_parameters_sig.parameters -> Exception.method_handler  -> (Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'a  -> 'b  -> 'c   -> (Exception.method_handler  * 'c)) -> 'a t -> 'b t -> 'c -> Exception.method_handler  * 'c 
+    val fold2:  Remanent_parameters_sig.parameters -> Exception.method_handler  -> (Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'a   -> 'c  -> Exception.method_handler  * 'c) -> (Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'b  ->  'c  -> Exception.method_handler  * 'c) -> (Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'a -> 'b  -> 'c  -> Exception.method_handler  * 'c) ->  'a t -> 'b t -> 'c -> Exception.method_handler  * 'c 
   
-    val fold2_sparse:  Remanent_parameters_sig.parameters -> Exception.method_handler -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt -> 'a  -> 'b  -> 'c  -> (Exception.method_handler * 'c)) ->  'a t -> 'b t -> 'c -> Exception.method_handler * 'c
-    val iter2_sparse:  Remanent_parameters_sig.parameters -> Exception.method_handler -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt -> 'a  -> 'b  -> Exception.method_handler)->  'a t -> 'b t -> Exception.method_handler 
-    val diff:  Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a t -> 'a t -> Exception.method_handler * 'a t * 'a t 
-    val diff_pred:  Remanent_parameters_sig.parameters -> Exception.method_handler -> ('a -> 'a -> bool) -> 'a t -> 'a t -> Exception.method_handler * 'a t * 'a t 
-    val merge: Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a t -> 'a t -> Exception.method_handler * 'a t
-    val union: Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a t -> 'a t -> Exception.method_handler * 'a t
-    val fold_restriction: Remanent_parameters_sig.parameters -> Exception.method_handler -> (elt -> 'a -> (Exception.method_handler * 'b) -> (Exception.method_handler* 'b)) -> set -> 'a t -> 'b -> Exception.method_handler * 'b 																       
+    val fold2_sparse:  Remanent_parameters_sig.parameters -> Exception.method_handler  -> (Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'a  -> 'b  -> 'c  -> (Exception.method_handler  * 'c)) ->  'a t -> 'b t -> 'c -> Exception.method_handler  * 'c
+    val iter2_sparse:  Remanent_parameters_sig.parameters -> Exception.method_handler  -> (Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'a  -> 'b  -> Exception.method_handler )->  'a t -> 'b t -> Exception.method_handler  
+    val diff:  Remanent_parameters_sig.parameters -> Exception.method_handler  -> 'a t -> 'a t -> Exception.method_handler  * 'a t * 'a t 
+    val diff_pred:  Remanent_parameters_sig.parameters -> Exception.method_handler  -> ('a -> 'a -> bool) -> 'a t -> 'a t -> Exception.method_handler  * 'a t * 'a t 
+    val merge: Remanent_parameters_sig.parameters -> Exception.method_handler  -> 'a t -> 'a t -> Exception.method_handler  * 'a t
+    val union: Remanent_parameters_sig.parameters -> Exception.method_handler  -> 'a t -> 'a t -> Exception.method_handler  * 'a t
+    val fold_restriction: Remanent_parameters_sig.parameters -> Exception.method_handler  -> (elt -> 'a -> (Exception.method_handler  * 'b) -> (Exception.method_handler * 'b)) -> set -> 'a t -> 'b -> Exception.method_handler  * 'b 																       
 								   
     val iter: (elt -> 'a -> unit) -> 'a t -> unit
     val fold: (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
@@ -72,6 +75,7 @@ module type Map_with_logs =
     val compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
     val equal: ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
     val bindings : 'a t -> (elt * 'a) list
+   
   end
 
 module type S_with_logs = sig
@@ -126,8 +130,11 @@ module Make(S_both:(SetMap.S)): S_with_logs with type elt = S_both.elt and type 
 	 
 	  let empty = S_both.Map.empty
 	  let is_empty = S_both.Map.is_empty
+	  let min_elt = S_both.Map.min_elt 
 	  let find_option a b c d = lift S_both.Map.find_option_with_logs a b c d 
 	  let find_default a b c d = lift S_both.Map.find_default_with_logs a b c d 
+	  let find_option_without_logs a b c d = b,S_both.Map.find_option c d  
+	  let find_default_without_logs a b c d e = b,S_both.Map.find_default c d e
 	  let add a b c d = lift S_both.Map.add_with_logs a b c d
 	  let remove a b c d = lift S_both.Map.remove_with_logs a b c d
 	  let update a b c = lift S_both.Map.update_with_logs a b c 

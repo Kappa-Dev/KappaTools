@@ -17,10 +17,12 @@ module D = Counting_engine.Count(Counting_algebrae.Counting)
 
 
 let f parameters dual dual_and_self interface_of_brick init = 
+  let error_handler,kappa_handler = List_tokens.empty_handler parameters Exception.empty_error_handler in 
   let _ = 
     C.count  
       parameters 
-      Exception.empty_error_handler 
+      Exception.empty_error_handler
+      kappa_handler
       {Counting_engine.print_hole=(fun log -> Printf.fprintf log "%d");
        Counting_engine.dual = dual ; 
        Counting_engine.dual_and_self = dual_and_self ;
@@ -31,7 +33,8 @@ let f parameters dual dual_and_self interface_of_brick init =
   let _ = 
     D.count  
       parameters 
-      Exception.empty_error_handler 
+      Exception.empty_error_handler
+      kappa_handler 
       {Counting_engine.print_hole=(fun log -> Printf.fprintf log "%d");
        Counting_engine.dual = dual ; 
        Counting_engine.dual_and_self = dual_and_self ;
