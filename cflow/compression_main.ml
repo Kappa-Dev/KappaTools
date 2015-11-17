@@ -398,28 +398,32 @@ let compress_and_print logger env log_info step_list =
                             match 
                               list
                             with 
-                              | None -> 
+                              | [] -> 
                                 error,strong_compression_faillure+1,strongly_compressed_story_array,None
-                              | Some list -> 
-                                let grid = D.S.PH.B.PB.CI.Po.K.build_grid (List.rev_map (fun (x,y) -> x,y,dummy_weak) (List.rev list)) false handler in
-                                let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
-                                let error,graph = D.graph_of_grid parameter handler error grid in 
-                                let error,prehash = D.prehash parameter handler error graph in 
-                                let log_info = D.S.PH.B.PB.CI.Po.K.P.set_canonicalisation log_info in 
-                                let info = 
-                                  match info 
-                                  with 
-                                  | None -> None 
-                                  | Some info -> 
-                                    let info = 
-                                      {info with Mods.story_id = counter }
-                                        in 
-                                    let info = Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy log_info)  info 
-                                    in 
-                                    Some info
-                                in 
-                                error,strong_compression_faillure,(prehash,[grid,graph,None,[](* TO DO PROVIDE TRACE, IN CASE OF FURTHER COMPRESSION *),list_info])::strongly_compressed_story_array,info
-                          in 
+                              | _ -> 
+				 List.fold_left
+				   (fun (error,strong_compression_faillure,strongly_compressed_story_array,info) list -> 
+				    let grid = D.S.PH.B.PB.CI.Po.K.build_grid (List.rev_map (fun (x,y) -> x,y,dummy_weak) (List.rev list)) false handler in
+				    let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
+				    let error,graph = D.graph_of_grid parameter handler error grid in 
+				    let error,prehash = D.prehash parameter handler error graph in 
+				    let log_info = D.S.PH.B.PB.CI.Po.K.P.set_canonicalisation log_info in 
+				    let info = 
+				      match info 
+				      with 
+				      | None -> None 
+				      | Some info -> 
+					     let info = 
+					       {info with Mods.story_id = counter }
+                                             in 
+					     let info = Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy log_info)  info 
+					     in 
+					     Some info
+				    in 
+				    error,strong_compression_faillure,(prehash,[grid,graph,None,[](* TO DO PROVIDE TRACE, IN CASE OF FURTHER COMPRESSION *),list_info])::strongly_compressed_story_array,info)
+				   (error,strong_compression_faillure,strongly_compressed_story_array,info)
+				   list 
+			  in 
                           let error,log_info,blackboard = D.S.PH.B.reset_init parameter handler error log_info blackboard in 
                           let tick = Mods.tick_stories logger n_stories tick in
                           error,counter+1,tick,blackboard,strong_compression_faillure,strongly_compressed_story_array)

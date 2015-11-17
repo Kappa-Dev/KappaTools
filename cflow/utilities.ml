@@ -141,7 +141,7 @@ let export_musical_grid_to_xls = D.S.PH.B.export_blackboard_to_xls
 let print_musical_grid = D.S.PH.B.print_blackboard 
 
 
-let from_none_to_weak parameter handler log_info logger (error,counter,tick,blackboard,weakly_compressed_story_array,weakly_compression_faillure) ((*(event_id_list,list_order,event_list),*)step_list,list_info) = 
+let from_none_to_weak parameter handler log_info logger ((error,counter,tick,blackboard,weakly_compressed_story_array,weakly_compression_faillure):(D.canonical_form,D.S.PH.B.PB.CI.Po.K.P.log_info) remanent) ((*(event_id_list,list_order,event_list),*)step_list,list_info) = 
   let info = List.hd list_info in 
   let event_list = step_list in 
   let error,log_info,blackboard_tmp,list_order = 
@@ -179,32 +179,36 @@ let from_none_to_weak parameter handler log_info logger (error,counter,tick,blac
     match 
       list
     with 
-    | None -> 
+    | [] -> 
        error,weakly_compressed_story_array,weakly_compression_faillure+1,None
-    | Some list -> 
-         let weak_event_list = D.S.translate_result list in 
-         let weak_event_list = D.S.PH.B.PB.CI.Po.K.clean_events weak_event_list in 
-         let grid = D.S.PH.B.PB.CI.Po.K.build_grid (List.rev_map (fun (x,y) -> x,y,dummy_weak) (List.rev list)) false handler in
-         let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
-         let error,graph = D.graph_of_grid parameter handler error grid in 
-         let error,prehash = D.prehash parameter handler error graph in 
-         let log_info = D.S.PH.B.PB.CI.Po.K.P.set_canonicalisation log_info in 
-         let info = 
-           match info 
-           with 
-           | None -> None 
-           | Some info -> 
-              let info = 
+    | _ ->  
+       List.fold_left
+	 (fun (error,weakly_compressed_story_array,weakly_compression_faillure,info) list -> 
+	  let weak_event_list = D.S.translate_result list in 
+          let weak_event_list = D.S.PH.B.PB.CI.Po.K.clean_events weak_event_list in 
+          let grid = D.S.PH.B.PB.CI.Po.K.build_grid (List.rev_map (fun (x,y) -> x,y,dummy_weak) (List.rev list)) false handler in
+          let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
+          let error,graph = D.graph_of_grid parameter handler error grid in 
+          let error,prehash = D.prehash parameter handler error graph in 
+          let log_info = D.S.PH.B.PB.CI.Po.K.P.set_canonicalisation log_info in 
+          let info = 
+            match info 
+            with 
+            | None -> None 
+            | Some info -> 
+               let info = 
                 {info with Mods.story_id = counter }
-              in 
-              let info = Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy log_info)  info 
-              in 
-              Some info
-         in 
-         error,(prehash,[grid,graph,None,weak_event_list,list_info])::weakly_compressed_story_array,weakly_compression_faillure,info
+               in 
+               let info = Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy log_info)  info 
+               in 
+               Some info
+          in 
+          error,(prehash,[grid,graph,None,weak_event_list,list_info])::weakly_compressed_story_array,weakly_compression_faillure,info)
+	 (error,weakly_compressed_story_array,weakly_compression_faillure,info)
+	 list 
   in 
   let error,log_info,blackboard = D.S.PH.B.reset_init parameter handler error log_info blackboard in 
-  error,counter,tick,blackboard,weakly_compressed_story_array,weakly_compression_faillure
+  ((error,counter,tick,blackboard,weakly_compressed_story_array,weakly_compression_faillure):(D.canonical_form,D.S.PH.B.PB.CI.Po.K.P.log_info) remanent)
 
 let convert_trace_into_grid_while_trusting_side_effects trace handler = 
   let refined_list = 

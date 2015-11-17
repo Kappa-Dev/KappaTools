@@ -24,7 +24,7 @@ module type Solver =
   (sig 
     module PH:Propagation_heuristics.Blackboard_with_heuristic
 
-    val compress: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.update_order list -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard * PH.B.assign_result * PH.B.result option) PH.B.PB.CI.Po.K.H.with_handler
+    val compress: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.update_order list -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard * PH.B.assign_result  * PH.B.result list) PH.B.PB.CI.Po.K.H.with_handler
       
     val detect_independent_events: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.B.PB.step_id list -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.P.log_info * PH.B.PB.step_id list) PH.B.PB.CI.Po.K.H.with_handler
 
@@ -123,11 +123,26 @@ struct
   let empty_choice_list = 
     {stack=[];current=[]}
 	  
-  let rec iter parameter handler error log_info blackboard choice_list = 
+  let rec iter parameter handler error log_info blackboard choice_list story_list  = 
     let error,bool = PH.B.is_maximal_solution parameter handler error blackboard in
     if bool 
     then 
-      error,log_info,blackboard,PH.B.success 
+      (* SUCCESS *)
+      let error,list = 
+          PH.B.translate_blackboard parameter handler error blackboard 
+      in
+      let story_list = list::story_list in
+      if PH.B.PB.CI.Po.K.H.get_all_stories_per_obs parameter
+      then 
+	let error,log_info,blackboard,choice_list = backtrack parameter handler error log_info blackboard choice_list in 
+	begin 
+          match choice_list 
+          with 
+          | Some choice_list -> iter parameter handler error log_info blackboard choice_list story_list 
+          | None -> error,log_info,blackboard,story_list
+	end
+      else
+	error,log_info,blackboard,story_list 
     else
       let error,choice_list = 
         if no_more_choice choice_list 
@@ -146,12 +161,12 @@ struct
         begin 
           match choice_list 
           with 
-            | Some choice_list -> iter parameter handler error log_info blackboard choice_list 
-            | None -> error,log_info,blackboard,PH.B.fail
+            | Some choice_list -> iter parameter handler error log_info blackboard choice_list story_list 
+            | None -> error,log_info,blackboard,story_list
         end
       else 
-        iter parameter handler error log_info blackboard (branch_choice_list choice_list)
-        
+        iter parameter handler error log_info blackboard (branch_choice_list choice_list) story_list 
+            
   let detect_independent_events parameter handler error log_info blackboard list_eid = 
     let error,log_info,blackboard,events_to_keep = PH.B.cut parameter handler error log_info blackboard list_eid  in 
     error,log_info,events_to_keep 
@@ -225,9 +240,9 @@ struct
         Format.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err
 		       "After observable propagation  %i @." (PH.B.get_n_unresolved_events blackboard)
     in
-    let error,log_info,blackboard,output = iter parameter handler error log_info blackboard empty_choice_list 
+    let error,log_info,blackboard,story_list = iter parameter handler error log_info blackboard empty_choice_list [] 
     in 
-    let error,list = 
+  (*  let error,list = 
       if PH.B.is_failed output 
       then error,None 
       else 
@@ -235,8 +250,15 @@ struct
           PH.B.translate_blackboard parameter handler error blackboard 
         in 
         error,Some list 
+    in *)
+    let output =
+      match
+	story_list
+      with
+	[] -> PH.B.fail
+      | _ -> PH.B.success
     in 
-    error,log_info,blackboard,output,list 
+    error,log_info,blackboard,output,story_list 
 
 
 end 

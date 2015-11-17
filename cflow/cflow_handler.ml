@@ -29,7 +29,8 @@ module type Cflow_handler =
           priorities_weak: Priority.priorities ;
           priorities_strong : Priority.priorities ;
           priorities_causal : Priority.priorities ;
-          out_channel_err : Format.formatter ;
+	  compute_all_stories : bool ; 
+	  out_channel_err : Format.formatter ;
           out_channel_profiling : Format.formatter ;
           out_channel : Format.formatter
         } (*a struct which contains parameterizable options*)
@@ -41,6 +42,8 @@ module type Cflow_handler =
         }
     type 'a with_handler = parameter -> handler -> error_channel -> 'a
 
+    val set_first_story_per_obs: parameter -> parameter  
+    val set_all_stories_per_obs: parameter -> parameter 
     val build_parameter: unit -> parameter
     val string_of_exn: exn -> string option
     val error_init: error_channel
@@ -53,6 +56,7 @@ module type Cflow_handler =
     val set_compression_strong: parameter -> parameter
     val set_compression_none: parameter -> parameter
     val get_priorities: parameter -> Priority.priorities option
+    val get_all_stories_per_obs: parameter -> bool 
 end
 
 
@@ -66,7 +70,8 @@ module Cflow_handler =
           priorities_weak: Priority.priorities ;
           priorities_strong : Priority.priorities ;
           priorities_causal: Priority.priorities ;
-          out_channel_err : Format.formatter;
+	  compute_all_stories : bool ; 
+	  out_channel_err : Format.formatter;
           out_channel_profiling: Format.formatter;
           out_channel : Format.formatter
         }
@@ -78,6 +83,7 @@ module Cflow_handler =
         priorities_weak = Priority.weak ;
         priorities_strong = Priority.strong2 ;
         priorities_causal = Priority.causal ;
+	compute_all_stories = false ; 
         out_channel = Format.err_formatter ;
         out_channel_err = Format.err_formatter ;
         out_channel_profiling = Format.formatter_of_out_channel channel ;
@@ -161,5 +167,17 @@ module Cflow_handler =
       | Some Parameter.Weak -> Some parameter.priorities_weak
       | Some Parameter.Strong -> Some parameter.priorities_strong
       | Some Parameter.Causal -> Some parameter.priorities_causal
-  end:Cflow_handler
-  )
+
+   let set_first_story_per_obs parameter =
+     {
+       parameter
+     with compute_all_stories = false }
+      
+   let set_all_stories_per_obs parameter =
+      {
+	parameter
+      with compute_all_stories = true }
+
+   let get_all_stories_per_obs parameter = parameter.compute_all_stories 
+	
+   end:Cflow_handler)

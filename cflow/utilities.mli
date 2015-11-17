@@ -122,10 +122,10 @@ val from_none_to_weak_with_tick:
   D.S.PH.B.PB.CI.Po.K.P.log_info ->
   Format.formatter ->
   int ->
-  ('a,'b) remanent ->
+  (D.canonical_form,D.S.PH.B.PB.CI.Po.K.P.log_info) remanent ->
   D.S.PH.B.PB.CI.Po.K.refined_step list
-  * 'b Mods.simulation_info option list ->
-  ('a,'b) remanent
+  * D.S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list ->
+  (D.canonical_form,D.S.PH.B.PB.CI.Po.K.P.log_info) remanent
     
 val from_none_to_weak_with_tick_ext:
        D.S.PH.B.PB.CI.Po.K.H.parameter ->
@@ -133,8 +133,8 @@ val from_none_to_weak_with_tick_ext:
            D.S.PH.B.PB.CI.Po.K.P.log_info ->
            Format.formatter ->
            int ->
-           ('a,'b) remanent ->
-	   'd * 'e * 'f * D.S.PH.B.PB.CI.Po.K.refined_step list  * 'b Mods.simulation_info option list ->
-           ('a,'b) remanent
+           (D.canonical_form,D.S.PH.B.PB.CI.Po.K.P.log_info) remanent ->
+	   'd * 'e * 'f * D.S.PH.B.PB.CI.Po.K.refined_step list  * D.S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list ->
+           (D.canonical_form,D.S.PH.B.PB.CI.Po.K.P.log_info) remanent
 	     
 		      
