@@ -15,7 +15,6 @@
 open Bdu_analysis_type
 open Int_storage
 open Cckappa_sig
-open Bdu_creation
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Contact Map") message exn
@@ -63,7 +62,7 @@ let compute_contact_map parameter error handler rule =
               let error, store_result =
                 Site_map_and_set.Map.fold
                   (fun site_lhs port (error, store_result) ->
-                    let state_lhs = int_of_port port in
+                    let state_lhs = port.site_state.min in
                     if Int2Map_CM_state.Map.mem (agent_type, site_lhs, state_lhs)
                       store_result
                     then 
