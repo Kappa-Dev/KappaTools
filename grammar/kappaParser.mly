@@ -1,6 +1,4 @@
 %{
-  open Mods
-
   let add_pos x =
     (x,Location.of_pos (Parsing.symbol_start_pos ()) (Parsing.symbol_end_pos ()))
   let rhs_pos i =
@@ -120,7 +118,9 @@ instruction:
 			   match effect with
 			   | (Ast.CFLOWLABEL _ | Ast.CFLOWMIX _
 			      | Ast.FLUX _ | Ast.FLUXOFF _) -> true
-			   | _ -> false
+			   | (Ast.STOP _ | Ast.INTRO _ | Ast.DELETE _
+			     | Ast.UPDATE _ | Ast.UPDATE_TOK _ | Ast.PRINT _
+			     | Ast.SNAPSHOT _ | Ast.PLOTENTRY) -> false
 			  ) mod_expr_list
 		     then
 		       ExceptionDefn.warning
@@ -297,7 +297,7 @@ rule_expression:
 		     | (None,Ast.LRAR | Some _,Ast.RAR) ->
 			raise (ExceptionDefn.Malformed_Decl
 				 ("Malformed bi-directional rule expression",pos))
-		     | _ -> ()
+		     | ((None | Some _),(Ast.LRAR|Ast.RAR)) -> ()
 		   in
 		   let lhs,token_l = $2 and rhs,token_r = $4 in
 		   ($1,({Ast.lhs=lhs; Ast.rm_token = token_l; Ast.arrow=$3;

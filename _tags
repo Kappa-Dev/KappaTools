@@ -1,6 +1,6 @@
 "cflow" : include
 "dataStructures" : include
-<{term,simulation,siteGraphs,main}/*.ml{,i}> : warn_A
+<{term,grammar,simulation,siteGraphs,Error,main}/*.ml{,i}> : warn_A
 "term" : include
 "grammar" : include
 "simulation" : include

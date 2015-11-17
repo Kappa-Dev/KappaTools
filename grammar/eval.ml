@@ -384,7 +384,7 @@ let pert_of_result
 let init_graph_of_result algs tokens has_tracking contact_map counter env domain res =
   let domain',init_state =
     List.fold_left
-      (fun (domain,state) (opt_vol,init_t,_) -> (*TODO dealing with volumes*)
+      (fun (domain,state) (_opt_vol,init_t,_) -> (*TODO dealing with volumes*)
        match init_t with
        | INIT_MIX (alg, (ast,mix_pos)) ->
 	  let (domain',alg') =

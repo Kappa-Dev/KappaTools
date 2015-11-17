@@ -21,7 +21,6 @@ type rule_agent =
       ra_ints: rule_internal array;
       ra_syntax: (rule_link array * rule_internal array) option;
     }
-type rule_mixture = rule_agent list
 
 let print_rule_internal sigs ag_ty site f = function
   | I_ANY -> ()
@@ -362,17 +361,6 @@ let ports_from_contact_map sigs contact_map ty_id p_id =
 	    (ty_id,Signature.id_of_site (Location.dummy_annot ty_na)
 					(Location.dummy_annot p_na) sigs))
 	   cand
-
-let internals_from_contact_map sigs contact_map ty_id p_id =
-  let sign = Signature.get sigs ty_id in
-  let ty_na = Format.asprintf "%a" (Signature.print_agent sigs) ty_id in
-  let p_na = Format.asprintf "%a" (Signature.print_site sigs ty_id) p_id in
-  let cand = fst (Export_to_KaSim.String2Map.find_default
-		    ([],[]) (ty_na,p_na) contact_map) in
-  List.map
-    (fun i_na ->
-     Signature.num_of_internal_state p_id (Location.dummy_annot i_na) sign)
-    cand
 
 let find_implicit_infos sigs contact_map ags =
   let max_s m = function
