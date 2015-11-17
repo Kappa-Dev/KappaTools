@@ -28,39 +28,38 @@ module Count =
     struct      
       
       module Puzzle_hole_map_and_set = 
-        SetMap.Make
+        Map_wrapper.Make (SetMap.Make
           (struct 
             type t = E.puzzle_hole 
             let compare = compare 
-           end)  
+           end))
           
-      type hole_multiset = int Puzzle_hole_map_and_set.map
+      type hole_multiset = int Puzzle_hole_map_and_set.Map.t
           
       module Interfaces = 
-        (SetMap.Make
+        Map_wrapper.Make (SetMap.Make
            (struct 
              type t = hole_multiset * hole_multiset  
              let compare = compare 
-            end):SetMap.Set_and_Map 
-         with type elt = hole_multiset * hole_multiset  
-         and type key = hole_multiset * hole_multiset) 
+            end)) (*:SetMap.S 
+         with type elt = hole_multiset * hole_multiset)*)
           
       type dependence_graph = 
           {dependences:(hole_multiset*hole_multiset) list Puzzle_hole_map_and_set.Map.t;
-           interfaces:Interfaces.set}
+           interfaces:Interfaces.Set.t}
             
       type induction_state =
           {error_handler:Exception.method_handler;
            dependence_graph:dependence_graph;
            to_visit: (E.puzzle_hole*E.abstract_species_set*Puzzle_hole_map_and_set.Set.t*hole_multiset) list;
-           species: (E.abstract_species_set*Puzzle_hole_map_and_set.set) Interfaces.map}
+           species: (E.abstract_species_set*Puzzle_hole_map_and_set.Set.t) Interfaces.Map.t}
             
       let print_handler error_handler kappa_handler hole_handler = 
         {
           Counting_print.iter_map1=Puzzle_hole_map_and_set.Map.iter;
           Counting_print.iter_map2=Interfaces.Map.iter;
           Counting_print.iter_map3=Puzzle_hole_map_and_set.Map.iter;
-          Counting_print.iter_set=Puzzle_hole_map_and_set.Map.iter;
+          Counting_print.iter_set=Puzzle_hole_map_and_set.Set.iter;
           Counting_print.iter_set2=Interfaces.Set.iter;              
           Counting_print.dependences=(fun a -> a.dependences);
           Counting_print.dependence_graph=(fun a -> a.dependence_graph);
@@ -94,7 +93,7 @@ module Count =
       let add_species parameters error_handler hole_handler species holeset interface interface_map = 
         let (old,old_holeset) = 
           Interfaces.Map.find_default
-	    (E.nil,Puzzle_hole_map_and_set.empty_set) interface interface_map in
+	    (E.nil,Puzzle_hole_map_and_set.Set.empty) interface interface_map in
 
         let new_species = E.sum old species in 
         let error_handler,new_hole_set = Puzzle_hole_map_and_set.Set.union parameters error_handler old_holeset holeset in 
