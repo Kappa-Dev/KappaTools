@@ -166,6 +166,8 @@ module type S = sig
     module Map : Map with type elt = elt and type set = Set.t
   end
 
+exception DeadCodeIsNotDead
+
 module Make(Ord:OrderedType): S with type elt = Ord.t =
   struct
     type elt = Ord.t
@@ -206,66 +208,20 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  | Private.Empty -> 0
 	  | Private.Node(left,_,right,_) -> cardinal left + 1 + cardinal right
 
-       (* let balance_with_logs warn parameters error left value right =
-	  let height_left = height left in
-	  let height_right = height right in
-	  if height_left > height_right + 2 then begin
-              match left with
-              | Private.Empty ->
-		   let error = warn parameters error "setMap.ml" (Some "Set.balance,line 91") (invalid_arg "Set_and_map.Set.balance") in
-		   error,empty
-              | Private.Node(leftleft,leftvalue,leftright,_) ->
-		 if height leftleft >= height leftright then
-		   error,node leftleft leftvalue (node leftright value right)
-		 else begin
-		     match leftright with
-                     | Private.Empty ->
-			let error = warn parameters error "setMap.ml" (Some "Set.balance,line 221") (invalid_arg "Set_and_Map.Set.balance") in
-			error,empty
-                     | Private.Node(leftrightleft,leftrightvalue,leftrightright,_) ->
-			(error,
-			 node
-			   (node leftleft leftvalue leftrightleft)
-			   leftrightvalue
-			   (node leftrightright value right))
-		   end
-	    end else if height_right > height_left + 2 then begin
-              match right with
-              | Private.Empty ->
-		 let error = warn parameters error "setMap.ml" (Some  "balance_set,line 233") (invalid_arg "Set_and_Map.Set.balance") in
-		 error,empty
-              | Private.Node (rightleft,rightvalue,rightright,_) ->
-		 if height rightright >= height rightleft then
-		   error,node (node left value rightleft) rightvalue rightright
-		 else begin
-              match rightleft with
-              | Private.Empty ->
-		 let error = warn parameters error "setMap.ml"
-				  (Some "balance_set,line 242") (invalid_arg "Set_and_Map.Set.balance") in
-		 error,empty
-              | Private.Node(rightleftleft,rightleftvalue,rightleftright,_) ->
-                 error,node
-                      (node left value rightleftleft)
-                      rightleftvalue (node rightleftright rightvalue rightright)
-		   end
-	    end
-	  else
-            error,node left value right*)
-
 	let balance left value right =
 	  let height_left = height left in
 	  let height_right = height right in
 	  if height_left > height_right + 2 then
             match left with
             | Private.Empty ->
-	       assert false (* height_left > height_right + 2 >= 2 *)
+	       raise DeadCodeIsNotDead (* height_left > height_right + 2 >= 2 *)
             | Private.Node(leftleft,leftvalue,leftright,_) ->
 	       if height leftleft >= height leftright then
 		 node leftleft leftvalue (node leftright value right)
 	       else
 		 match leftright with
                  | Private.Empty ->
-		    assert false (* 0 <= height leftleft < height leftright *)
+		    raise DeadCodeIsNotDead (* 0 <= height leftleft < height leftright *)
                  | Private.Node(leftrightleft,leftrightvalue,leftrightright,_) ->
 		    node
 		      (node leftleft leftvalue leftrightleft)
@@ -274,14 +230,14 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  else if height_right > height_left + 2 then
             match right with
             | Private.Empty ->
-	       assert false (* height_right > height_left + 2 >= 2 *)
+	       raise DeadCodeIsNotDead (* height_right > height_left + 2 >= 2 *)
             | Private.Node(rightleft,rightvalue,rightright,_) ->
 	       if height rightright >= height rightleft then
 		 node (node left value rightleft) rightvalue rightright
 	       else
 		 match rightleft with
                  | Private.Empty ->
-		    assert false (* 0 <= height rightright < height rightleft *)
+		    raise DeadCodeIsNotDead (* 0 <= height rightright < height rightleft *)
                  | Private.Node(rightleftleft,rightleftvalue,rightleftright,_) ->
 		    node
 		      (node left value rightleftleft)
@@ -290,14 +246,11 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  else node left value right
 
 	let balance_with_logs warn parameters error left value right =
-	  try
-	     error,balance left value right
-	  with
-	    assert_faillure ->
+	  try error,balance left value right
+	  with DeadCodeIsNotDead ->
 	    let error = warn parameters error "setMap.ml" (Some "Set.balance,line 295, Set invariant is broken, keep on with unbalanced set") (invalid_arg "Set_and_Map.SET.balance")
-	    in error,node left value right 
+	    in error,node left value right
 
-		       
 	let rec add x = function
 	  | Private.Empty -> singleton x
 	  | Private.Node(l, v, r, _) as t ->
@@ -812,14 +765,14 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  if height_left > height_right + 2 then
 	    match left with
             | Private.Empty ->
-	       assert false (* height_left > height_right + 2 >= 2 *)
+	       raise DeadCodeIsNotDead (* height_left > height_right + 2 >= 2 *)
             | Private.Node (left0,key0,data0,right0,_,_) ->
                if height left0 >= height right0 then
 		 node left0 key0 data0 (node right0 key data right)
                else
 		 match right0 with
 		 | Private.Empty ->
-		    assert false (* 0 <= height left0 < height right0 *)
+		    raise DeadCodeIsNotDead (* 0 <= height left0 < height right0 *)
 		 | Private.Node (left1,key1,data1,right1,_,_) ->
                     node (node left0 key0 data0 left1)
 			 key1 data1
@@ -828,14 +781,14 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
             if height_right > height_left + 2 then
               match right with
               | Private.Empty ->
-		 assert false (* height_right > height_left + 2 >= 2 *)
+		 raise DeadCodeIsNotDead (* height_right > height_left + 2 >= 2 *)
               | Private.Node (left0,key0,data0,right0,_,_) ->
 		 if height right0 >= height left0 then
 		   node (node left key data left0) key0 data0 right0
 		 else
 		   match left0 with
 		   | Private.Empty ->
-		      assert false (* 0 <= height right0 < height left0 *)
+		      raise DeadCodeIsNotDead (* 0 <= height right0 < height left0 *)
 		   | Private.Node (left1,key1,data1,right1,_,_) ->
                       node (node left key data left1)
 			   key1 data1
@@ -883,10 +836,8 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
             else error,node left key data right*)
 
 	let balance_with_logs warn parameters error left key data right =
-	  try
-	     error,balance left key data right
-	  with
-	    assert_faillure ->
+	  try error,balance left key data right
+	  with DeadCodeIsNotDead ->
 	    let error = warn parameters error "setMap.ml" (Some "Map.balance,line 891, Map invariant is broken, keep on with unbalanced map") (invalid_arg "Set_and_Map.Map.balance")
 	    in error,node left key data right 
 
@@ -992,7 +943,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 
 	let rec join left key value right =
 	  match balance left key value right with
-          | Private.Empty -> assert false (* By case analysis *)
+          | Private.Empty -> raise DeadCodeIsNotDead (* By case analysis *)
           | Private.Node (left2,key2,data2,right2,_,_) as map2 ->
              let h = height left2 - height right2 in
              if h > 2 || h< -2 then join left2 key2 data2 right2 else map2
