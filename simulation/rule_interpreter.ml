@@ -110,7 +110,7 @@ NB inj should not change if [is_add] is false*)
        let ty, id, inj2graph' = from_place inj2graph n in (*(A,23,phi)*)
        let edges' =
 	 if is_add then Edges.add_agent ty id edges
-	 else Edges.remove_agent id edges in
+	 else Edges.remove_agent ty id edges in
        let new_obs =
 	 Connected_component.Matching.observables_from_agent
 	   domain (if is_add then edges' else edges) ty id in (*this hack should disappear when chekcing O\H only*)

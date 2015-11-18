@@ -17,13 +17,13 @@ val add_link : int -> int -> int -> int -> int -> int -> t -> t
 (** [add_link sort_ag1 ag1 s1 sort_ag2 ag2 s2 t] *)
 
 
-val remove_agent : int -> t -> t
+val remove_agent : int -> int -> t -> t
 val remove_free : int -> int -> t -> t
 val remove_internal : int -> int -> t -> (t * int)
 val remove_link : int -> int -> int -> int -> t -> t
 
-val is_agent : int -> t -> bool
-(** [is_free agent graph] *)
+val is_agent : int -> int -> t -> bool
+(** [is_free agent_type agent graph] *)
 
 val is_free : int -> int -> t -> bool
 (** [is_free agent site graph] *)

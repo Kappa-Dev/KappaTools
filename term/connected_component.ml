@@ -863,7 +863,7 @@ module NodeSetMap = SetMap.Make(ContentAgent)
 module NodeMap = NodeSetMap.Map
 
 let check_edge graph = function
-  | ((Fresh (_,id),0),ToNothing) -> Edges.is_agent id graph
+  | ((Fresh (ty,id),0),ToNothing) -> Edges.is_agent ty id graph
   | ((Fresh (_,id),site),ToNothing) -> Edges.is_free id site graph
   | ((Fresh (_,id),site),ToInternal i) -> Edges.is_internal i id site graph
   | ((Fresh (_,id),site),ToNode (Existing id',site')) ->
