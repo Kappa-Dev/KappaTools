@@ -32,7 +32,6 @@ type grid =
       link (1) or internal state (0) *)
       pid_to_init: (int*int*int,int) Hashtbl.t ;
       obs: int list ;
-      weak_list: int list ;
       init_tbl: (int,Mods.IntSet.t) Hashtbl.t;(*decreasing*)
       init_to_eidmax: (int,int) Hashtbl.t;
     }
@@ -89,7 +88,6 @@ let empty_grid () =
     flow = Hashtbl.create !Parameter.defaultExtArraySize ;
     pid_to_init = Hashtbl.create !Parameter.defaultExtArraySize ;
     obs = [] ;
-    weak_list = [] ;
     init_tbl = Hashtbl.create !Parameter.defaultExtArraySize ;
     init_to_eidmax = Hashtbl.create !Parameter.defaultExtArraySize
   }
@@ -188,8 +186,7 @@ let push (a:atom) (att:atom list) =
 
 (**side_effect Int2Set.t: pairs (agents,ports) that have been freed as a side effect --via a DEL or a FREE action*)
 (*NB no internal state modif as side effect*)
-let store_is_weak is_weak eid grid =
-  if is_weak then {grid with weak_list = eid::(grid.weak_list)} else grid
+
 
 (*let impact is_link c =
   if is_link then
@@ -257,24 +254,21 @@ let add_tests grid event_number kind tests =
   in aux grid tests
 
 let record (kind,(tests,(actions,_,side_effects)))
-	   is_weak event_number env grid =
-  let grid = store_is_weak is_weak event_number grid in
+	   event_number env grid =
   let grid = add_tests grid event_number kind tests in
   let grid = add_actions env grid event_number kind actions in
   List.fold_left
     (fun grid site -> add site true atom_modified grid event_number kind) grid side_effects
 
-let record_obs (kind,tests,_) side_effects is_weak event_number grid =
+let record_obs (kind,tests,_) side_effects event_number grid =
   let grid = add_obs_eid event_number grid in
-  let grid = store_is_weak is_weak event_number grid in
   let grid = add_tests grid event_number kind tests in
   List.fold_left
     (fun grid site -> add site true atom_modified grid event_number kind) grid side_effects
 
-let record_init (lbl,actions) is_weak event_number env grid =
+let record_init (lbl,actions) event_number env grid =
   (* if !Parameter.showIntroEvents then *)
   (*adding tests*)
-  let grid = store_is_weak is_weak event_number grid in
   add_actions env grid event_number (INIT lbl)  actions
 
 let add_pred eid atom config =
@@ -427,11 +421,8 @@ let enrich_grid err_fmt config_closure grid =
   let to_keep i = IntSet.mem i keep_l in
   let ids = ids_of_grid grid  in
   let config = config_of_grid ids grid in
-  let max_key = List.fold_left max 0 grid.weak_list  in
+  let max_key = List.fold_left max 0 grid.obs  in
   let tbl = Graph_closure.A.make (max_key+1) false in
-  let () =
-    List.iter (fun i -> Graph_closure.A.set tbl i true) grid.weak_list in
-  let weak_fun i = try Graph_closure.A.get tbl i with _ -> false in
   let init_fun i =
     try
       List.rev (Mods.IntSet.elements (Mods.IntSet.remove
@@ -442,7 +433,7 @@ let enrich_grid err_fmt config_closure grid =
     with Not_found -> 0 in
   let prec_star = prec_star_of_config
 		    err_fmt config_closure config.prec_1 to_keep
-		    init_to_eid_max weak_fun init_fun in
+		    init_to_eid_max (fun _ -> true)  init_fun in
   let depth_of_event,depth = depth_and_size_of_event config in
   {
     config = config ;

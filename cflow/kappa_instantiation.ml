@@ -76,7 +76,7 @@ sig
     P.log_info -> refined_obs  -> refined_step list -> P.log_info * refined_step list
 
   val build_grid:
-    (refined_step * Instantiation.concrete Instantiation.site list * bool)  list -> bool ->
+    (refined_step * Instantiation.concrete Instantiation.site list)  list -> bool ->
     H.handler -> Causal.grid
   val print_side_effect: Format.formatter -> side_effect -> unit
   val side_effect_of_list: Instantiation.concrete Instantiation.site list -> side_effect
@@ -301,7 +301,7 @@ module Cflow_linker =
     let grid = Causal.empty_grid () in
     let grid,_,_,_ =
       List.fold_left
-        (fun (grid,side_effect,counter,subs) (k,side,is_weak) ->
+        (fun (grid,side_effect,counter,subs) (k,side) ->
 	 let maybe_side_effect =
 	   if bool then fun se -> se
 	   else fun _ -> List.rev_append side_effect side in
@@ -313,14 +313,14 @@ module Cflow_linker =
             let kasim_side_effect = maybe_side_effect kappa_side in
             Causal.record
 	      (id,(tests,(actions,side_effects,kasim_side_effect)))
-	      is_weak counter env grid,
+	      counter env grid,
             empty_set,counter+1,Mods.IntMap.empty
          | Obs (id,tests,info) ->
 	    let tests' =
 	      Tools.list_smart_map
 		(PI.subst_map_agent_in_concrete_test translate) tests in
 	    Causal.record_obs
-	      (id,tests',info) side_effect is_weak counter grid,
+	      (id,tests',info) side_effect counter grid,
 	    maybe_side_effect empty_set,counter+1,Mods.IntMap.empty
          | Subs (a,b) ->
             grid, side_effect, counter, Mods.IntMap.add a b subs
@@ -329,7 +329,7 @@ module Cflow_linker =
 	      Tools.list_smart_map
 		(PI.subst_map_agent_in_concrete_action translate) actions in
             Causal.record_init (creation_of_actions snd actions',actions')
-			       is_weak counter env grid,
+			       counter env grid,
 	    side_effect,counter+1,Mods.IntMap.empty
          | Dummy _ ->
             grid, maybe_side_effect empty_set, counter, subs

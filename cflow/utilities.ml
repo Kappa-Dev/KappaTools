@@ -42,15 +42,17 @@ type transitive_closure_config = Graph_closure.config
 (* dag: internal representation for cflows *)
 type dag = D.graph
 (* cannonical form for cflows (completely capture isomorphisms) *)
-type dag_connonical_form = D.canonical_form
+type dag_canonical_form = D.canonical_form
 (* prehashform for cflows, if two cflows are isomorphic, they have the same prehash form *) 
 type dag_prehash = D.prehash 
 
 (* I need to investigate further, what I know is that:
-   for each hash, there is a list of stories having this hash, for each one, we have the grid, the dag, I do not remember the three following components, and then a list of timestamp that indicated when the observables have been hit *) 
-type ('a,'b) story_list =
-  dag_prehash * (cflow_grid * dag  * 'a option * refined_trace * 'b Mods.simulation_info option list) list
-			     
+   for each hash, there is a list of stories having this hash, for each one, we have the grid, the dag, the canonical form (if any), and then a list of timestamp that indicated when the observables have been hit *) 
+type story_list =
+  dag_prehash * (cflow_grid * dag  * dag_canonical_form option * refined_trace * profiling_info Mods.simulation_info option list) list
+	
+type story_table =  error_log * int * (bool * int * int) * D.S.PH.B.blackboard * story_list list * int
+		     
 type observable_hit = 
   {
     list_of_actions: D.S.PH.update_order list ;
@@ -61,7 +63,6 @@ let get_event_list_from_observable_hit a = a.list_of_events
 let get_runtime_info_from_observable_hit a = a.runtime_info 
 let get_list_order a = a.list_of_actions 
 
-type ('a,'b) remanent =  error_log * int * (bool * int * int) * D.S.PH.B.blackboard * (('a,'b) story_list) list * int
 
 module Profiling = D.S.PH.B.PB.CI.Po.K.P
 		     
@@ -78,18 +79,6 @@ let remove_pseudo_inverse_events a b c d =
   let a,b,c = D.S.PH.B.PB.CI.cut a b c d in
   a,(remove_weak_events_annotation b,c)
 	    
-(*let remove_pseudo_inverse_events_and_tag_weak_events a b c d = 
-  let a,b,c = D.S.PH.B.PB.CI.cut a b c d in 
-  a,(b,c)
-
-let tag_weak_events a b c d = 
-  let a,b,c = D.S.PH.B.PB.CI.do_not_cut a b c d in 
-  a,b
-*)
-
-
-
-
 let extract_observable_hits_from_musical_notation a b c d = 
   let error,l = D.S.PH.forced_events a b c d in 
   error,
@@ -127,8 +116,6 @@ let causal_prefix_of_an_observable_hit string parameter handler error log_info b
   let error,list_eid,_ = D.S.translate parameter handler error blackboard event_id_list in 
   error,list_eid 
 
-  
-
 let print_trace parameter handler =
       Format.fprintf
 	parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel "@[<v>%a@]@."
@@ -140,7 +127,7 @@ let export_musical_grid_to_xls = D.S.PH.B.export_blackboard_to_xls
 let print_musical_grid = D.S.PH.B.print_blackboard 
 
 
-let from_none_to_weak parameter handler log_info logger ((error,counter,tick,blackboard,weakly_compressed_story_array,weakly_compression_faillure):(D.canonical_form,D.S.PH.B.PB.CI.Po.K.P.log_info) remanent) ((*(event_id_list,list_order,event_list),*)step_list,list_info) = 
+let from_none_to_weak parameter handler log_info logger (error,counter,tick,blackboard,weakly_compressed_story_array,weakly_compression_faillure) (step_list,list_info) = 
   let info = List.hd list_info in 
   let event_list = step_list in 
   let error,log_info,blackboard_tmp,list_order = 
@@ -185,7 +172,7 @@ let from_none_to_weak parameter handler log_info logger ((error,counter,tick,bla
 	 (fun (error,weakly_compressed_story_array,weakly_compression_faillure,info) list -> 
 	  let weak_event_list = D.S.translate_result list in 
           let weak_event_list = D.S.PH.B.PB.CI.Po.K.clean_events weak_event_list in 
-          let grid = D.S.PH.B.PB.CI.Po.K.build_grid (List.rev_map (fun (x,y) -> x,y,dummy_weak) (List.rev list)) false handler in
+          let grid = D.S.PH.B.PB.CI.Po.K.build_grid list false handler in
           let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
           let error,graph = D.graph_of_grid parameter handler error grid in 
           let error,prehash = D.prehash parameter handler error graph in 
@@ -207,11 +194,11 @@ let from_none_to_weak parameter handler log_info logger ((error,counter,tick,bla
 	 list 
   in 
   let error,log_info,blackboard = D.S.PH.B.reset_init parameter handler error log_info blackboard in 
-  ((error,counter,tick,blackboard,weakly_compressed_story_array,weakly_compression_faillure):(D.canonical_form,D.S.PH.B.PB.CI.Po.K.P.log_info) remanent)
+  (error,counter,tick,blackboard,weakly_compressed_story_array,weakly_compression_faillure)
 
 let convert_trace_into_grid_while_trusting_side_effects trace handler = 
   let refined_list = 
-    List.rev_map (fun (x) -> (x,[],dummy_weak)) (List.rev trace)
+    List.rev_map (fun x -> (x,[])) (List.rev trace)
   in 
   D.S.PH.B.PB.CI.Po.K.build_grid refined_list true handler 
     

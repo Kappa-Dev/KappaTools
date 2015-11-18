@@ -37,19 +37,19 @@ type transitive_closure_config = Graph_closure.config
 (* dag: internal representation for cflows *)
 type dag = D.graph
 (* cannonical form for cflows (completely capture isomorphisms) *)
-type dag_connonical_form = D.canonical_form
+type dag_canonical_form = D.canonical_form
 (* prehashform for cflows, if two cflows are isomorphic, they have the same prehash form *) 
 type dag_prehash = D.prehash 
 
 (* I need to investigate further, what I know is that:
-   for each hash, there is a list of stories having this hash, for each one, we have the grid, the dag, I do not know what is the optional component, the compressed trace, then a list of timestamp that indicated when the observables have been hit *) 
-type ('a,'b) story_list =
-  dag_prehash * (cflow_grid * dag  * 'a option * refined_trace * 'b Mods.simulation_info option list) list
+   for each hash, there is a list of stories having this hash, for each one, we have the grid, the dag, then the canonical form, if it has been computed already, the compressed trace, then a list of timestamp that indicated when the observables have been hit *) 
+type story_list =
+  dag_prehash * (cflow_grid * dag  * dag_canonical_form  option * refined_trace * profiling_info Mods.simulation_info option list) list
 			     
 		      
 type observable_hit 
 			
-type ('a,'b) remanent =  error_log * int * (bool * int * int) * D.S.PH.B.blackboard * (('a,'b) story_list) list * int
+type story_table =  error_log * int * (bool * int * int) * D.S.PH.B.blackboard * story_list list * int
 
 (** error_init is an empty log of errors *)
 val error_init: D.S.PH.B.PB.CI.Po.K.H.error_channel
@@ -59,7 +59,7 @@ val error_init: D.S.PH.B.PB.CI.Po.K.H.error_channel
 (** Trace local simplification *)		  
 (** split_init split init event agent-wise *)
 val split_init: refined_trace -> refined_trace
-				   
+			   
 (** disambiguate ensures that agent id are used only once along traces *)
 val disambiguate: refined_trace -> refined_trace
 				     
@@ -75,10 +75,6 @@ val cut: parameter -> kappa_handler -> error_log -> refined_trace -> error_log *
 (** remove_pseudo_inverse_events removes pseudo inverse events *)
 val remove_pseudo_inverse_events: parameter -> kappa_handler -> error_log -> refined_trace -> error_log * (refined_trace * int)
 
-(*val remove_pseudo_inverse_events_and_tag_weak_events:  parameter -> kappa_handler -> error_log -> refined_trace -> error_log * (refined_trace_with_weak_events * int)
-val tag_weak_events: parameter -> kappa_handler -> error_log -> refined_trace -> error_log * (refined_trace_with_weak_events)
-val remove_weak_events_annotation: refined_trace_with_weak_events -> refined_trace 
-*)
 
 (** causal flows *)
 val convert_trace_into_grid_while_trusting_side_effects: refined_trace -> kappa_handler -> cflow_grid 
@@ -103,7 +99,6 @@ val get_list_order: observable_hit -> D.S.PH.update_order list
 val causal_prefix_of_an_observable_hit: string -> parameter -> kappa_handler -> error_log -> profiling_info -> musical_grid -> enriched_cflow_grid -> observable_hit -> error_log * refined_trace (* (*D.S.PH.B.result*) refined_trace *)
 
 
-    
 
 
 																						      
@@ -120,21 +115,18 @@ val from_none_to_weak_with_tick:
   D.S.PH.B.PB.CI.Po.K.H.parameter ->
   D.S.PH.B.PB.CI.Po.K.H.handler ->
   D.S.PH.B.PB.CI.Po.K.P.log_info ->
-  Format.formatter ->
-  int ->
-  (D.canonical_form,D.S.PH.B.PB.CI.Po.K.P.log_info) remanent ->
+  Format.formatter ->  int -> story_table  ->
   D.S.PH.B.PB.CI.Po.K.refined_step list
   * D.S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list ->
-  (D.canonical_form,D.S.PH.B.PB.CI.Po.K.P.log_info) remanent
+  story_table 
     
 val from_none_to_weak_with_tick_ext:
        D.S.PH.B.PB.CI.Po.K.H.parameter ->
            D.S.PH.B.PB.CI.Po.K.H.handler ->
            D.S.PH.B.PB.CI.Po.K.P.log_info ->
            Format.formatter ->
-           int ->
-           (D.canonical_form,D.S.PH.B.PB.CI.Po.K.P.log_info) remanent ->
+           int -> story_table ->
 	   'd * 'e * 'f * D.S.PH.B.PB.CI.Po.K.refined_step list  * D.S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list ->
-           (D.canonical_form,D.S.PH.B.PB.CI.Po.K.P.log_info) remanent
+           story_table 
 	     
 		      

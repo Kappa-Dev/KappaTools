@@ -27,7 +27,6 @@ type grid =
       link (1) or internal state (0) *)
       pid_to_init: (int*int*int,int) Hashtbl.t ;
       obs: int list ;
-      weak_list: int list ;
       init_tbl: (int,Mods.IntSet.t) Hashtbl.t;(*decreasing*)
       init_to_eidmax: (int,int) Hashtbl.t;
     }
@@ -51,17 +50,15 @@ val empty_grid : unit -> grid
 
 val record :
   (event_kind *
-     Instantiation.concrete Instantiation.event) ->
-  bool -> int -> Environment.t -> grid -> grid
+     Instantiation.concrete Instantiation.event) -> int -> Environment.t -> grid -> grid
 val record_obs :
   (event_kind *
      Instantiation.concrete Instantiation.test list
    * unit Mods.simulation_info) ->
-  Instantiation.concrete Instantiation.site list ->
-  bool -> int -> grid -> grid
+  Instantiation.concrete Instantiation.site list -> int -> grid -> grid
 val record_init :
   int list * Instantiation.concrete Instantiation.action list ->
-  bool -> int -> Environment.t -> grid -> grid
+  int -> Environment.t -> grid -> grid
 
 val cut : (int * int * int) list -> grid -> config
 val enrich_grid :

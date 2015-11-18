@@ -226,9 +226,9 @@ let compress_and_print logger env log_info step_list =
                   let refined_list = 
                     if cut && Parameter.do_detect_separable_components 
                     then 
-                      (List.rev_map (fun x -> (x,[],(*bool*) dummy_weak)) (List.rev trace_without_pseudo_inverse_events))
+                      (List.rev_map (fun x -> (x,[])) (List.rev trace_without_pseudo_inverse_events))
                     else 
-                      (List.rev_map (fun x -> (x,[],dummy_weak)) (List.rev trace_without_pseudo_inverse_events))
+                      (List.rev_map (fun x -> (x,[])) (List.rev trace_without_pseudo_inverse_events))
                   in 
 		  let grid = D.S.PH.B.PB.CI.Po.K.build_grid refined_list true handler in
                   let enriched_grid = Causal.enrich_grid logger Graph_closure.config_intermediary grid in 
@@ -250,7 +250,7 @@ let compress_and_print logger env log_info step_list =
 		    store_uncompressed_stories || not cut
 		  then
 		    let error,event_list,result_wo_compression = D.S.translate parameter handler error blackboard_cflow event_id_list in 
-                    let grid = D.S.PH.B.PB.CI.Po.K.build_grid (List.rev_map (fun (x,y) -> x,y,dummy_weak) (List.rev result_wo_compression)) true handler in
+                    let grid = D.S.PH.B.PB.CI.Po.K.build_grid result_wo_compression true handler in
                     let error,graph = D.graph_of_grid parameter handler error grid in
                     let error,prehash = D.prehash parameter handler error graph in
 		    let tick = Mods.tick_stories logger n_stories tick in
@@ -399,7 +399,7 @@ let compress_and_print logger env log_info step_list =
                               | _ -> 
 				 List.fold_left
 				   (fun (error,strong_compression_faillure,strongly_compressed_story_array,info) list -> 
-				    let grid = D.S.PH.B.PB.CI.Po.K.build_grid (List.rev_map (fun (x,y) -> x,y,dummy_weak) (List.rev list)) false handler in
+				    let grid = D.S.PH.B.PB.CI.Po.K.build_grid list false handler in
 				    let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
 				    let error,graph = D.graph_of_grid parameter handler error grid in 
 				    let error,prehash = D.prehash parameter handler error graph in 
