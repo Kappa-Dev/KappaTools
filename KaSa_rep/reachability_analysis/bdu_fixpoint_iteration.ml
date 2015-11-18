@@ -89,86 +89,29 @@ let compute_update parameter error rule_id handler bdu_test modif_list bdu_creat
   error, bdu_remanent_array
 
 (************************************************************************************)
-(*store the product of [|bdu_creation * bdu_test * modif_list|], rule_id is
-  an index, nrules is the length of this array. *)
 
-let collect_bdu_creation_array parameter error handler_sig store_creation_bdu =
-  let error, init = AgentMap.create parameter error 0 in
-  let error, (handler, bdu_init) = bdu_init parameter error in
-  (*create an empty array*)
-  let nrules = Handler.nrules parameter error handler_sig in
-  let store_array = Array.make nrules bdu_init in
-  (*get rule_id in creation_map*)
-  let error, store_result =
-   AgentMap.fold parameter error
-     (fun parameter error agent_type l store_result ->
-         let error, result_array =
-           List.fold_left (fun (error, current_array) (rule_id, bdu_creation) ->
-             current_array.(rule_id) <- bdu_creation;
-             error, current_array
-           ) (error, store_array) l
-         in
-         (*--------------------------------------------------------------------------*)
-         (*store*)
-         let error, old_array =
-           match AgentMap.unsafe_get parameter error agent_type store_result with
-           | error, None -> error, [||]
-           | error, Some a -> error, a
-         in
-         let new_array = Array.append result_array old_array in
-         (*--------------------------------------------------------------------------*)
-         (*store*)
-         let error, store_result =
-           AgentMap.set
-             parameter
-             error
-             agent_type
-             new_array
-             store_result
-         in
-         error, store_result
-     ) store_creation_bdu init
+(*let fixpoint_aux parameter error wl_creation store_bdu_creation_array =
+  (*iterate function over working list and the result of bdu_update*)
+  let rec aux acc_wl (error, bdu_remanent_array) =
+    (*if there is no working list*)
+    if IntWL.is_empty acc_wl
+    then 
+      (*return the result*)
+      error, bdu_remanent_array
+    else
+      (*pop the first elemenent (rule_id) in this working list out*)
+      let error, (rule_id_op, wl_tl) =
+        IntWL.pop parameter error acc_wl
+      in
+      match rule_id_op with
+      | None -> error, bdu_remanent_array
+      | Some rule_id ->
+        (*get bdu_creation from this rule_id inside the bdu_creation array*)
+        
+
+
+
+
+
   in
-  error, store_result
-
-(************************************************************************************)
-(*store bdu_test in an array, index of this array is rule_id of test
-  rules. The lenght of this array is the number of rules.*)
-
-let collect_bdu_test_array parameter error handler_sig store_test_bdu =
-  let error, init = AgentMap.create parameter error 0 in
-  let error, (handler, bdu_init) = bdu_init parameter error in
-  (*create an empty array*)
-  let nrules = Handler.nrules parameter error handler_sig in
-  let store_array = Array.make nrules bdu_init in
-  (*get rule_id in creation_map*)
-  let error, store_result =
-   AgentMap.fold parameter error
-     (fun parameter error agent_type l store_result ->
-         let error, result_array =
-           List.fold_left (fun (error, current_array) (rule_id, bdu_test) ->
-             current_array.(rule_id) <- bdu_test;
-             error, current_array
-           ) (error, store_array) l
-         in
-         (*--------------------------------------------------------------------------*)
-        (*store*)
-         let error, old_array =
-           match AgentMap.unsafe_get parameter error agent_type store_result with
-           | error, None -> error, [||]
-           | error, Some a -> error, a
-         in
-         let new_array = Array.append result_array old_array in
-         (*--------------------------------------------------------------------------*)
-         let error, store_result =
-           AgentMap.set
-             parameter
-             error
-             agent_type
-             new_array
-             store_result
-         in
-         error, store_result
-     ) store_test_bdu init
-  in
-  error, store_result
+  aux wl_creation (error, [||])*)

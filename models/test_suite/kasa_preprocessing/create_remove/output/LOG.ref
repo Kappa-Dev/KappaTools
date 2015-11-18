@@ -121,13 +121,23 @@ List of rules to awake when the state of a site is modified and tested:
 ------------------------------------------------------------
 * Covering classes with new index :
 ------------------------------------------------------------
-- A map of covering classes with test rules:
-- A map of covering classes with creation rules:
+- A map of covering class with new index of site (per agent and rule_id) is tested:
+
 
 ------------------------------------------------------------
-* Fixpoint iteration :
+- A map of covering class with new index of site (per agent and rule_id) is created:
+
+
 ------------------------------------------------------------
-- An array of bdu_creation:
+- A map of covering class with new index of site (per agent and rule_id) is modified:
+
+
 ------------------------------------------------------------
-- An array of bdu_test:
+- A map of bdu when site (per agent and rule_id) is created:
+
+
+------------------------------------------------------------
+- A map of bdu when a site (per agent and rule_id) is tested:
+
+- A map of site (per agent and rule_id) is modified:
 execution finished without any exception

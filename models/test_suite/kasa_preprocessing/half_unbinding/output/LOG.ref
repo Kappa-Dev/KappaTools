@@ -205,58 +205,56 @@ rule_id:1
 ------------------------------------------------------------
 * Covering classes with new index :
 ------------------------------------------------------------
-- A map of covering classes with test rules:
+- A map of covering class with new index of site (per agent and rule_id) is tested:
+
 agent_type:0:rule_id:0@list of triple:
 covering_class_id:0:site_type':1:state:0
 agent_type:2:rule_id:1@list of triple:
 covering_class_id:0:site_type':1:state:0
-- A map of covering classes with creation rules:
+
+------------------------------------------------------------
+- A map of covering class with new index of site (per agent and rule_id) is created:
+
 agent_type:0:rule_id:1@list of triple:
 covering_class_id:0:site_type':1:state:0
 
 ------------------------------------------------------------
-* Fixpoint iteration :
+- A map of covering class with new index of site (per agent and rule_id) is modified:
+
+
 ------------------------------------------------------------
-- An array of bdu_creation:
-agent_type_0:
-index of this array:0
-agent_type_0: false
-index of this array:1
-agent_type_0: if(mvbdu_id:3) x1 < 0 then 
-agent_type_0:  false
-agent_type_0: else 
-agent_type_0:  if(mvbdu_id:2) x1 < 1 then 
-agent_type_0:   true
-agent_type_0:  else 
-agent_type_0:   false
+- A map of bdu when site (per agent and rule_id) is created:
+
+agent_type:0:rule_id:1
+agent_type_ if(mvbdu_id:3) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 1 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
+
+
 ------------------------------------------------------------
-- An array of bdu_test:
-agent_type_0:
-index of this array:0
-agent_type_0: if(mvbdu_id:3) x1 < 0 then 
-agent_type_0:  false
-agent_type_0: else 
-agent_type_0:  if(mvbdu_id:2) x1 < 1 then 
-agent_type_0:   true
-agent_type_0:  else 
-agent_type_0:   false
-index of this array:1
-agent_type_0: false
-agent_type_2:
-index of this array:0
-agent_type_2: if(mvbdu_id:3) x1 < 0 then 
-agent_type_2:  false
-agent_type_2: else 
-agent_type_2:  if(mvbdu_id:2) x1 < 1 then 
-agent_type_2:   true
-agent_type_2:  else 
-agent_type_2:   false
-index of this array:1
-agent_type_2: if(mvbdu_id:3) x1 < 0 then 
-agent_type_2:  false
-agent_type_2: else 
-agent_type_2:  if(mvbdu_id:2) x1 < 1 then 
-agent_type_2:   true
-agent_type_2:  else 
-agent_type_2:   false
+- A map of bdu when a site (per agent and rule_id) is tested:
+
+agent_type:0:rule_id:0
+agent_type_ if(mvbdu_id:3) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 1 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
+
+agent_type:2:rule_id:1
+agent_type_ if(mvbdu_id:3) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 1 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
+
+- A map of site (per agent and rule_id) is modified:
 execution finished without any exception

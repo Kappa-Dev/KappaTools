@@ -67,7 +67,7 @@ let print_bdu_fixpoint parameter error result =
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
   in
-  let _ =
+  (*let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "- An array of bdu_creation:\n";
     print_bdu_creation_array
@@ -84,5 +84,5 @@ let print_bdu_fixpoint parameter error result =
       parameter
       error
       result.store_bdu_test_array    
-  in
+  in*)
   error

@@ -166,7 +166,7 @@ let collect_creation_restriction parameter error rule_id rule store_remanent_tri
       List.fold_left (fun (error, store_result) (agent_id, agent_type) ->
         let error, agent = AgentMap.get parameter error agent_id rule.rule_rhs.views in
         match agent with
-        | None -> warn parameter error (Some "286") Exit store_result
+        | None -> warn parameter error (Some "168") Exit store_result
         | Some Ghost -> error, store_result
         | Some Agent agent ->
           if agent_type' = agent_type 
