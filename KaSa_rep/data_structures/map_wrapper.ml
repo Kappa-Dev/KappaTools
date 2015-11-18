@@ -51,8 +51,13 @@ module type Map_with_logs =
     val find_default:  Remanent_parameters_sig.parameters -> Exception.method_handler  -> 'a -> elt -> 'a t -> Exception.method_handler  * 'a
     val find_default_without_logs: Remanent_parameters_sig.parameters -> Exception.method_handler  -> 'a -> elt -> 'a t -> Exception.method_handler  * 'a
     val find_option_without_logs: Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'a t -> Exception.method_handler  * 'a option
+																		   
     val add: Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'a -> 'a t -> Exception.method_handler  * 'a t
+    val overwrite: Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'a -> 'a t -> Exception.method_handler  * 'a t
+    val add_or_overwrite:  Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'a -> 'a t -> Exception.method_handler  * 'a t
     val remove: Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'a t -> Exception.method_handler  * 'a t
+    val remove_or_not: 	Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'a t -> Exception.method_handler  * 'a t							       																		   
+
     val update: Remanent_parameters_sig.parameters -> Exception.method_handler   -> 'a t -> 'a t -> Exception.method_handler  * 'a t    
     val map2:  Remanent_parameters_sig.parameters -> Exception.method_handler  -> (Remanent_parameters_sig.parameters -> Exception.method_handler  -> 'a -> Exception.method_handler  * 'a) -> (Remanent_parameters_sig.parameters -> Exception.method_handler  -> 'a -> Exception.method_handler  *  'a) -> (Remanent_parameters_sig.parameters -> Exception.method_handler  -> 'a -> 'a -> Exception.method_handler  * 'a) -> 'a t -> 'a t -> Exception.method_handler  * 'a t
     val map2z:  Remanent_parameters_sig.parameters -> Exception.method_handler  -> (Remanent_parameters_sig.parameters -> Exception.method_handler  -> 'a -> 'a -> Exception.method_handler  * 'a) -> 'a t -> 'a t -> Exception.method_handler  * 'a t 
@@ -136,7 +141,23 @@ module Make(S_both:(SetMap.S)): S_with_logs with type elt = S_both.elt and type 
 	  let find_option_without_logs a b c d = b,S_both.Map.find_option c d  
 	  let find_default_without_logs a b c d e = b,S_both.Map.find_default c d e
 	  let add a b c d = lift S_both.Map.add_with_logs a b c d
+	  let overwrite parameter error c d e =
+	    let error, bool, map = lift S_both.Map.add_while_testing_freshness parameter error c d e in
+	    if bool
+	    then
+	      Exception.warn parameter error (Some "Map_wrapper.ml") (Some (__LOC__^": attempt to overwrite an association that does not exist")) (failwith "Attempt to overwrite an association that does not exist") (fun () -> map)
+	    else
+	      error, map 
+	  let add_or_overwrite a b c d e =
+	    let error, _, map = lift S_both.Map.add_while_testing_freshness a b c d e in
+	    error, map
+		     
 	  let remove a b c d = lift S_both.Map.remove_with_logs a b c d
+	  let remove_or_not a b c d =
+	    let error, _, map = lift S_both.Map.remove_while_testing_existence a b c d in
+	    error,map
+						       
+		    
 	  let update a b c = lift S_both.Map.update_with_logs a b c 
 	  let map2 a b c = lift S_both.Map.map2_with_logs a b c 
 	  let map2z a b c = lift S_both.Map.map2z_with_logs a b c 

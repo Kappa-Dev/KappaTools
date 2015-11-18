@@ -20,10 +20,12 @@ module type Set =
 
     val add: elt -> t -> t
     val add_with_logs:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * t 
-																				   
     val remove: elt -> t -> t
-    val remove_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * t 			      
-   
+    val add_while_testing_freshness: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * bool * t
+    val remove_while_testing_existence: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * bool * t
+    val remove_with_logs: ('parameters -> 'error -> string -> string option  -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * t 			      
+
+    																		 
     val split: elt -> t -> (t * bool * t)
     val union: t -> t -> t
     val inter: t -> t -> t
@@ -74,6 +76,11 @@ module type Map =
 
     val add: elt -> 'a -> 'a t -> 'a t
     val remove: elt -> 'a t -> 'a t
+    val add_while_testing_freshness: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a -> 'a t -> 'error * bool * 'a t
+    val remove_while_testing_existence: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * bool * 'a t
+ 
+
+   
     val pop: elt -> 'a t -> ('a option * 'a t)
     val merge: 'a t -> 'a t -> 'a t
     val min_elt: (elt -> 'a -> bool) -> 'a t -> elt option
@@ -88,7 +95,7 @@ module type Map =
     val diff_pred: ('a -> 'a -> bool) -> 'a t -> 'a t -> 'a t * 'a t
     val add_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a -> 'a t -> 'error * 'a t
     val remove_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * 'a t
-
+													     
     
     val join_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> elt -> 'a -> 'a t -> 'error * 'a t
     val split_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * ('a t * 'a option * 'a t)

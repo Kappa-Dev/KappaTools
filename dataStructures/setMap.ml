@@ -36,6 +36,8 @@ module type Set =
     val add: elt -> t -> t
     val add_with_logs:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * t 
     val remove: elt -> t -> t
+    val add_while_testing_freshness: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * bool * t
+    val remove_while_testing_existence: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * bool * t
     val remove_with_logs: ('parameters -> 'error -> string -> string option  -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * t 			      
     val split: elt -> t -> (t * bool * t)
     val union: t -> t -> t
@@ -88,6 +90,9 @@ module type Map =
 
     val add: elt -> 'a -> 'a t -> 'a t
     val remove: elt -> 'a t -> 'a t
+    val add_while_testing_freshness: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a -> 'a t -> 'error * bool * 'a t
+    val remove_while_testing_existence: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * bool * 'a t
+ 
     val pop: elt -> 'a t -> ('a option * 'a t)
     val merge: 'a t -> 'a t -> 'a t
     val min_elt: (elt -> 'a -> bool) -> 'a t -> elt option
@@ -260,7 +265,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	       then let o = add x l in if o == l then t else balance o v r
 	       else let o = add x r in if o == r then t else balance l v o
 
-	let rec add_with_logs warn parameters error new_value set =
+(*	let rec add_with_logs warn parameters error new_value set =
 	  match set with
           | Private.Empty -> error,singleton new_value
           | Private.Node(left,value_set,right,_) ->
@@ -271,8 +276,33 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
             balance_with_logs warn parameters error' left' value_set right
           else
             let error', right' = add_with_logs warn parameters error new_value right in
-            balance_with_logs warn parameters error' left value_set right'
+            balance_with_logs warn parameters error' left value_set right'*)
 
+	let rec add_while_testing_freshness warn parameters error new_value set =
+	  match set with
+          | Private.Empty -> error, true, singleton new_value
+          | Private.Node(left,value_set,right,_) ->
+          let c = Ord.compare new_value value_set in
+          if c = 0 then error,false,set
+          else if c<0 then
+            let error, bool, left' = add_while_testing_freshness warn parameters error new_value left in
+            let error, set = balance_with_logs warn parameters error left' value_set right in
+	    error,bool,set 
+          else
+            let error, bool, right'  = add_while_testing_freshness warn parameters error new_value right in
+            let error, set = balance_with_logs warn parameters error left value_set right' in
+	    error, bool, set  
+
+	let add_with_logs warn parameters error new_value set =
+	  let error, bool, set = add_while_testing_freshness warn parameters error new_value set in
+	  let error =
+	    if bool then 
+	      warn parameters error "setMap.ml" (Some ("__LOC__"^" an already elt has been added to a set")) (invalid_arg "Set_and_Map.SET.add")
+	    else
+	      error
+	  in 
+	  error, set
+			
 	let rec join left value right =
 	  match left,right with
           | Private.Empty,_ -> add value right
@@ -408,19 +438,49 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	       let right' = remove value right in
 	       if right == right' then set else balance left value_set right'
 
-	let rec remove_with_logs warn parameters error value set =
-	  match set with
-	  | Private.Empty -> error,empty
-          | Private.Node(left,value_set,right,_) ->
+	let rec remove_while_testing_existence warn parameters error value = function
+          | Private.Empty as set -> error, false, set
+          | Private.Node(left,value_set,right,_) as set ->
              let c = Ord.compare value value_set in
-             if c = 0 then merge_with_logs warn parameters error left right
-	     else if c < 0 then
-            let error, left' = remove_with_logs warn parameters error value left in
-            balance_with_logs warn parameters error left' value_set right
-          else
-            let error, right' = remove_with_logs warn parameters error value right in
-            balance_with_logs warn parameters error left value_set right'								    
-
+             if c = 0 then
+	       let error,set = merge_with_logs warn parameters error left right in
+	       error, true, set 
+             else if c < 0 then
+	       let error, bool, left' = remove_while_testing_existence warn parameters error value left in
+	       if left == left' then
+		 let error =
+		   if bool
+		   then
+		     warn parameters error "setMap.ml" (Some __LOC__) (failwith "Invariant is broken")
+		   else error
+		 in
+		 error, bool, set 
+	       else
+		 let error,set = balance_with_logs warn parameters error left' value_set right in
+		 error, bool, set 
+             else
+	       let error, bool, right' = remove_while_testing_existence warn parameters error value right in
+	       if right == right' then
+		 let error =
+		   if bool
+		   then
+		     warn parameters error "setMap.ml" (Some __LOC__) Not_found
+		   else error
+		 in 
+		 error, bool, set
+	       else 
+		 let error,set = balance_with_logs warn parameters error left value_set right' in
+		 error, bool, set  
+			
+	let rec remove_with_logs warn parameters error value set =
+	  let error, bool, set = remove_while_testing_existence warn parameters error value set in
+	  if bool
+	  then
+	    error,set 
+	  else 
+	    warn parameters error "setMap.ml" (Some (__LOC__^"Attempt to remove an elt that does not exist")) Not_found,
+	    set
+	      
 	let rec split split_value set =
 	  match set with
           | Private.Empty -> (empty,false,empty)
@@ -691,9 +751,9 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  | Private.Empty -> None
 	  | Private.Node(_,v,Private.Empty,_) -> Some v
 	  | Private.Node(_,_,right,_) -> max_elt right
-	let choose = (* function
+	let choose = function
 	  | Private.Empty -> None
-	  | Private.Node (_,v,_,_) -> Some v *) min_elt
+	  | Private.Node (_,v,_,_) -> Some v 
 						  
 (*	let add = Lift_error_logs.lift_generic_binary_for_KaSim add_with_logs 
 	let split = Lift_error_logs.lift_generic_binary_for_KaSim split_with_logs 					 
@@ -795,46 +855,6 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 			   (node right1 key0 data0 right0)
             else node left key data right
 
-(*	let balance_with_logs warn parameter error left key data right =
-	  let height_left = height left in
-	  let height_right = height right in
-	  if height_left > height_right + 2 then
-	    match left with
-            | Private.Empty ->
-	       let error = warn parameter error "setMap.ml" (Some "Map.balance_with_logs,line 845") (invalid_arg "Map.balance_map") in
-	       error,empty (* Height_left > height_right + 2 >= 2 *)
-            | Private.Node (left0,key0,data0,right0,_,_) ->
-               if height left0 >= height right0 then
-		 error,node left0 key0 data0 (node right0 key data right)
-               else
-		 match right0 with
-		 | Private.Empty ->
-		    let error = warn parameter error "setMap.ml" (Some "Map.balance_with_logs,line 853") (invalid_arg "Map.balance_map") in
-		    error,empty  (* 0 <= height left0 < height right0 *)
-		 | Private.Node (left1,key1,data1,right1,_,_) ->
-                    error,node (node left0 key0 data0 left1)
-			 key1 data1
-			 (node right1 key data right)
-	  else
-            if height_right > height_left + 2 then
-              match right with
-              | Private.Empty ->
-		  let error = warn parameter error "setMap.ml" (Some "Map.balance_with_logs,line 853") (invalid_arg "Map.balance_map") in
-		  error,empty (* height_left > height_right + 2 >= 2 *)			  
-              | Private.Node (left0,key0,data0,right0,_,_) ->
-		 if height right0 >= height left0 then
-		   error,node (node left key data left0) key0 data0 right0
-		 else
-		   match left0 with
-		   | Private.Empty ->
-		      let error = warn parameter error "setMap.ml" (Some "Map.balance_with_logs,line 853") (invalid_arg "Map.balance_map") in
-		      error,empty (* height_left > height_right + 2 >= 2 *)			  
-		   | Private.Node (left1,key1,data1,right1,_,_) ->
-                      error,node (node left key data left1)
-			   key1 data1
-			   (node right1 key0 data0 right0)
-            else error,node left key data right*)
-
 	let balance_with_logs warn parameters error left key data right =
 	  try error,balance left key data right
 	  with DeadCodeIsNotDead loc ->
@@ -851,19 +871,31 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	       balance (add key data left) key_map data_map right
              else balance left key_map data_map (add key data right)
 
-	let rec add_with_logs warn parameter error key data = function
+	let rec add_while_testing_freshness warn parameter error key data = function
 	  | Private.Empty ->
-	     error,node empty key data empty
+	     error, true, node empty key data empty
 	  | Private.Node (left,key_map,data_map,right,_,_) ->
              let cmp = Ord.compare key key_map in
-             if cmp = 0 then error,node left key_map data right
+             if cmp = 0 then error, false, node left key_map data right
              else if cmp < 0 then
-	       let error, left' = add_with_logs warn parameter error  key data left in 
-	       balance_with_logs warn parameter error left' key_map data_map right
+	       let error, bool, left' = add_while_testing_freshness warn parameter error  key data left in 
+	       let error, map = balance_with_logs warn parameter error left' key_map data_map right in
+	       error, bool, map 
              else
-	       let error, right' = add_with_logs warn parameter error key data right in 
-	       balance_with_logs warn parameter error left key_map data_map right'
+	       let error, bool, right' = add_while_testing_freshness warn parameter error key data right in 
+	       let error, map = balance_with_logs warn parameter error left key_map data_map right' in
+	       error, bool, map 
 		       
+	let add_with_logs warn parameter error key data map =
+	  let error, bool, map = add_while_testing_freshness warn parameter error key data map in
+	  if bool
+	  then
+	    error, map
+	  else
+	    warn parameter error "setMap.ml " (Some (__LOC__^"Attempt to add an association over a former one in a map")) (invalid_arg "Set_and_Map.Map.add"),
+	    map 
+		 
+				 
 	let rec extract_min_binding map key data map' =
 	  match map with
 	  | Private.Empty -> (key,data),map'
@@ -900,7 +932,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		  extract_min_binding_with_logs warn parameters error left2 key2 data2 right2 in
 		balance_with_logs warn parameters error map1 key3 data3 left'
 			
-	let rec remove key = function
+	let rec remove key = function  
 	  | Private.Empty -> empty
 	  | Private.Node (left,key_map,data,right,_,_) ->
              let cmp = Ord.compare key key_map in
@@ -908,24 +940,59 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              else if cmp < 0 then balance (remove key left) key_map data right
              else balance left key_map data (remove key right)
 
-	let rec remove_with_logs warn parameters error key map = 
+	let rec remove_while_testing_existence warn parameters error key map = 
 	  match map with 
 	  | Private.Empty ->
-	       let error = warn parameters error "setMap.ml" (Some "Map.remove_map,line 932") (failwith "Try to remove an association of an unknown key") in
-	       error,empty
+	       error, false, empty
 	  | Private.Node (left,key_map,data,right,_,_) ->
              let cmp = compare key key_map in 
 	     if cmp = 0 
-	     then merge_with_logs warn parameters error left right
+	     then let error, map = merge_with_logs warn parameters error left right in
+		  error, true, map 
 	     else if cmp < 0 
 	     then 
-	       let error, left' = remove_with_logs warn parameters error key left in 
-	       balance_with_logs warn parameters error left' key_map data right
+	       let error, bool, left' = remove_while_testing_existence warn parameters error key left in 
+	       begin
+		 if left' == left
+		 then
+		   let error = 
+		     if bool
+		     then
+		       warn parameters error "setMap.ml" (Some __LOC__) (failwith "Invariant is broken")
+		     else
+		       error
+		   in 
+		   error, bool, map 
+		 else
+		   let error, map = balance_with_logs warn parameters error left' key_map data right in
+		   error, bool, map
+	       end
 	     else 
-	       let error, right' = remove_with_logs warn parameters error key right in 
-	       balance_with_logs warn parameters error left key_map data right'
-			  
-			  
+	       let error, bool, right' = remove_while_testing_existence warn parameters error key right in 
+	       begin
+		 if right' == right
+		 then
+		   let error =
+		     if bool
+		     then
+		       warn parameters error "setMap.ml" (Some __LOC__) (failwith "Invariant is broken")
+		     else
+		       error
+		   in
+		   error, bool, map
+		 else
+		   let error, map = balance_with_logs warn parameters error left key_map data right' in
+		   error, bool, map
+	       end
+		 
+	let remove_with_logs warn parameters error key map =
+	  let error, bool,  map = remove_while_testing_existence warn parameters error key map in
+	  if bool
+	  then 
+	    error, map 
+	  else
+	    warn parameters error "setMap.ml" (Some (__LOC__^"Try to remove an association that is not defined in Map.remove")) (failwith "Try to remove an association that is not defined in Map.remove"),
+	    map 
 	let rec pop x = function
 	  | Private.Empty as m -> (None, m)
 	  | Private.Node(l, v, d, r, _,_) as m ->
