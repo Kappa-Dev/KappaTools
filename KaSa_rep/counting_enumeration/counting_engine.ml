@@ -101,7 +101,9 @@ module Count =
         let error_handler,interface_other = Puzzle_hole_map_and_set.Map.add parameters error_handler hole 1 Puzzle_hole_map_and_set.Map.empty in 
         let error_handler,k = Interfaces.Map.find_option parameters error_handler (interface_other,self) species in   
         match k with 
-          | None -> error_handler,state,(E.nil,Puzzle_hole_map_and_set.Set.empty)
+        | None ->
+	   let error_handler,state = Exception.warn parameters state.error_handler (Some "Counting_enumeration") (Some "line 105, unknown interface in remove_species") Exit (fun () -> state) in 
+	   error_handler,state,(E.nil,Puzzle_hole_map_and_set.Set.empty)
           | Some k -> 
             let error_handler,species = 
               Interfaces.Map.remove parameters error_handler (interface_other,self) species 
