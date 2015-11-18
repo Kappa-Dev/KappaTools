@@ -4,7 +4,7 @@
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    * 
    * Creation: 01/10/2010
-   * Last modification: 14/10/2010
+   * Last modification: 18/11/2015
    * * 
    * A generic module to count or enumerate the shapes that we can do with puzzle pieces 
    *  
@@ -41,8 +41,7 @@ module Count =
            (struct 
              type t = hole_multiset * hole_multiset  
              let compare = compare 
-            end)) (*:SetMap.S 
-         with type elt = hole_multiset * hole_multiset)*)
+            end))
           
       type dependence_graph = 
           {dependences:(hole_multiset*hole_multiset) list Puzzle_hole_map_and_set.Map.t;
@@ -319,7 +318,7 @@ module Count =
                                     | error_handler,Some (abstract_species_set,hole_set) -> 
                                       begin 
                                         if Puzzle_hole_map_and_set.Set.mem hole hole_set 
-                                          or Puzzle_hole_map_and_set.Set.mem dual forbidden  
+                                         || Puzzle_hole_map_and_set.Set.mem dual forbidden  
                                         then 
                                           infinite_state parameters error_handler  
                                         else 
