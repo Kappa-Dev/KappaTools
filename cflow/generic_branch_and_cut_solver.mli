@@ -8,7 +8,7 @@ module type Solver =
 
     val filter: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.B.PB.step_id list -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
 
-    val sub: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.B.PB.CI.Po.K.refined_step list -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
+    val sub: (PH.B.PB.CI.Po.K.P.log_info -> (*PH.B.blackboard ->*) PH.B.PB.CI.Po.K.refined_step list -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
 
     val clean: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
 

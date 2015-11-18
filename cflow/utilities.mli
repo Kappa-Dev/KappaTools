@@ -23,6 +23,7 @@ type error_log = D.S.PH.B.PB.CI.Po.K.H.error_channel
 type parameter = D.S.PH.B.PB.CI.Po.K.H.parameter 
 type kappa_handler = D.S.PH.B.PB.CI.Po.K.H.handler 
 type profiling_info = D.S.PH.B.PB.CI.Po.K.P.log_info
+type progress_bar = bool * int * int 
 
 type refined_trace = D.S.PH.B.PB.CI.Po.K.refined_step list
 type refined_trace_with_side_effect = (D.S.PH.B.PB.CI.Po.K.refined_step * D.S.PH.B.PB.CI.Po.K.side_effect) list
@@ -49,7 +50,13 @@ type story_list =
 		      
 type observable_hit 
 			
-type story_table =  error_log * int * (bool * int * int) * D.S.PH.B.blackboard * story_list list * int
+type story_table (*=*)  
+(*  { 
+    story_counter:int;
+    progress_bar:progress_bar;
+    blackboard:musical_grid;
+    story_list: story_list list;
+    faillure:int}*)
 
 (** error_init is an empty log of errors *)
 val error_init: D.S.PH.B.PB.CI.Po.K.H.error_channel
@@ -96,12 +103,22 @@ val get_event_list_from_observable_hit: observable_hit -> step_id list
 val get_runtime_info_from_observable_hit: observable_hit -> unit  Mods.simulation_info option
 val get_list_order: observable_hit -> D.S.PH.update_order list
 
-val causal_prefix_of_an_observable_hit: string -> parameter -> kappa_handler -> error_log -> profiling_info -> musical_grid -> enriched_cflow_grid -> observable_hit -> error_log * refined_trace (* (*D.S.PH.B.result*) refined_trace *)
+val causal_prefix_of_an_observable_hit: string -> parameter -> kappa_handler -> error_log -> profiling_info -> musical_grid -> enriched_cflow_grid -> observable_hit -> error_log * refined_trace 
 
+val empty_story_table_with_tick: Format.formatter -> (*musical_grid ->*) int -> story_table 
+val empty_story_table: (*musical_grid ->*) int -> story_table 
+val tick: Format.formatter -> story_table -> story_table 
+val inc_counter: story_table -> story_table 
+val get_counter: story_table -> int 		
+val get_stories: story_table -> story_list list 
+val count_faillure: story_table -> int 
 
+val store_trace_gen: bool -> parameter -> kappa_handler -> error_log ->  profiling_info Mods.simulation_info option -> profiling_info  -> refined_trace_with_side_effect -> refined_trace -> story_table -> error_log * story_table *  profiling_info Mods.simulation_info option 
 
+(** put together the stories having the same canonic form *) 
+val flatten_story_table: parameter -> kappa_handler -> error_log -> story_table -> error_log * story_table 
 
-																						      
+val count_stories: story_table -> int  																				      
 (** Print utilities *)													    
 val print_trace: parameter -> kappa_handler -> refined_trace -> unit  
 		
@@ -115,18 +132,18 @@ val from_none_to_weak_with_tick:
   D.S.PH.B.PB.CI.Po.K.H.parameter ->
   D.S.PH.B.PB.CI.Po.K.H.handler ->
   D.S.PH.B.PB.CI.Po.K.P.log_info ->
-  Format.formatter ->  int -> story_table  ->
+  Format.formatter ->  int -> (error_log * story_table)  ->
   D.S.PH.B.PB.CI.Po.K.refined_step list
   * D.S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list ->
-  story_table 
+  (error_log * story_table)
     
 val from_none_to_weak_with_tick_ext:
        D.S.PH.B.PB.CI.Po.K.H.parameter ->
            D.S.PH.B.PB.CI.Po.K.H.handler ->
            D.S.PH.B.PB.CI.Po.K.P.log_info ->
            Format.formatter ->
-           int -> story_table ->
+           int -> (error_log * story_table) ->
 	   'd * 'e * 'f * D.S.PH.B.PB.CI.Po.K.refined_step list  * D.S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list ->
-           story_table 
+           (error_log * story_table )
 	     
 		      

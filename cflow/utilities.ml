@@ -26,6 +26,7 @@ type error_log =  D.S.PH.B.PB.CI.Po.K.H.error_channel
 type parameter =  D.S.PH.B.PB.CI.Po.K.H.parameter
 type kappa_handler = D.S.PH.B.PB.CI.Po.K.H.handler 
 type profiling_info = D.S.PH.B.PB.CI.Po.K.P.log_info
+type progress_bar = bool * int * int 
 		       
 type refined_trace = D.S.PH.B.PB.CI.Po.K.refined_step list
 type refined_trace_with_weak_events = (D.S.PH.B.PB.CI.Po.K.refined_step * bool) list
@@ -51,8 +52,14 @@ type dag_prehash = D.prehash
 type story_list =
   dag_prehash * (cflow_grid * dag  * dag_canonical_form option * refined_trace * profiling_info Mods.simulation_info option list) list
 	
-type story_table =  error_log * int * (bool * int * int) * D.S.PH.B.blackboard * story_list list * int
-		     
+type story_table =  
+  { 
+    n_stories: int;
+    story_counter:int;
+    progress_bar:progress_bar option;
+    story_list: story_list list;
+    faillure:int}
+
 type observable_hit = 
   {
     list_of_actions: D.S.PH.update_order list ;
@@ -127,22 +134,107 @@ let export_musical_grid_to_xls = D.S.PH.B.export_blackboard_to_xls
 let print_musical_grid = D.S.PH.B.print_blackboard 
 
 
-let from_none_to_weak parameter handler log_info logger (error,counter,tick,blackboard,weakly_compressed_story_array,weakly_compression_faillure) (step_list,list_info) = 
+let empty_story_table (*blackboard*) n = 
+  { 
+    n_stories = n ;
+    story_counter=1;
+(*    blackboard=blackboard;*)
+    progress_bar=None;
+    story_list=[];
+    faillure=0
+  }
+let empty_story_table_with_tick logger (*blackboard*) n = 
+  {(empty_story_table (*blackboard*) n) with 
+    progress_bar = 
+      Some (  
+      if n > 0 
+      then Mods.tick_stories logger n (false,0,0) 
+      else (false,0,0))
+  }
+
+let tick logger story_list = 
+  match 
+    story_list.progress_bar
+  with 
+  | None -> story_list
+  | Some bar -> 
+    { 
+    story_list 
+    with 
+      progress_bar = Some (Mods.tick_stories logger story_list.n_stories bar)
+  }
+
+let get_counter story_list = story_list.story_counter 
+let get_stories story_list = story_list.story_list 
+let count_faillure story_list = story_list.faillure 
+let inc_counter story_list =
+  {
+    story_list with 
+      story_counter = succ story_list.story_counter
+  }
+let inc_faillure story_list = 
+  {
+    story_list with 
+      faillure = succ story_list.faillure
+  }
+
+let store_trace_gen bool (parameter:parameter) (handler:kappa_handler) (error:error_log) obs_info  computation_info trace trace2 (story_table:story_table) = 
+  let grid = D.S.PH.B.PB.CI.Po.K.build_grid trace bool  handler in
+  let computation_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  computation_info in 
+  let error,graph = D.graph_of_grid parameter handler error grid in 
+  let error,prehash = D.prehash parameter handler error graph in 
+  let computation_info = D.S.PH.B.PB.CI.Po.K.P.set_canonicalisation computation_info in 
+  let story_info = 
+    match obs_info 
+    with 
+    | None -> None 
+    | Some info -> 
+      let info = Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy computation_info)  info 
+       in 
+       Some info
+  in 
+  let story_table = 
+    {
+      story_table
+     with
+       story_list = (prehash,[grid,graph,None,trace2,[story_info]])::story_table.story_list
+    }
+  in 
+  error,story_table,story_info 
+
+let flatten_story_table parameter handler error story_table = 
+  let error,list = 
+    D.hash_list parameter handler error 
+      (List.rev story_table.story_list)
+  in 
+  error,
+  {story_table
+   with 
+     story_list = list}
+
+let count_stories story_table = 
+  List.fold_left 
+    (fun n l -> n + List.length (snd l))
+    0 
+    story_table.story_list 
+        
+
+let from_none_to_weak parameter handler log_info logger (error,story_list) (step_list,list_info) = 
   let info = List.hd list_info in 
   let event_list = step_list in 
-  let error,log_info,blackboard_tmp,list_order = 
-    let error,log_info,blackboard_tmp = D.S.sub parameter handler error log_info blackboard event_list in 
-    let error,list = D.S.PH.forced_events parameter handler error blackboard_tmp in 
+  let error,log_info,blackboard,list_order = 
+    let error,log_info,blackboard = D.S.sub parameter handler error log_info event_list in 
+    let error,list = D.S.PH.forced_events parameter handler error blackboard in 
     let list_order = 
       match list 
       with 
       | (list_order,_,_)::q -> list_order 
       | _ -> [] 
     in 
-    error,log_info,blackboard_tmp,list_order
+    error,log_info,blackboard,list_order
   in 
-  let error,log_info,blackboard_tmp,output,list = 
-    D.S.compress parameter handler error log_info blackboard_tmp list_order 
+  let error,log_info,blackboard,output,list = 
+    D.S.compress parameter handler error log_info blackboard list_order 
   in
   let log_info = D.S.PH.B.PB.CI.Po.K.P.set_story_research_time log_info in 
   let error = 
@@ -161,40 +253,23 @@ let from_none_to_weak parameter handler log_info logger (error,counter,tick,blac
     else 
       error
   in 
-  let error,weakly_compressed_story_array,weakly_compression_faillure,info = 
+  let error,story_list,info = 
     match 
       list
     with 
     | [] -> 
-       error,weakly_compressed_story_array,weakly_compression_faillure+1,None
+       error,inc_faillure story_list,None 
     | _ ->  
        List.fold_left
-	 (fun (error,weakly_compressed_story_array,weakly_compression_faillure,info) list -> 
+	 (fun (error,story_list,info) list -> 
 	  let weak_event_list = D.S.translate_result list in 
           let weak_event_list = D.S.PH.B.PB.CI.Po.K.clean_events weak_event_list in 
-          let grid = D.S.PH.B.PB.CI.Po.K.build_grid list false handler in
-          let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
-          let error,graph = D.graph_of_grid parameter handler error grid in 
-          let error,prehash = D.prehash parameter handler error graph in 
-          let log_info = D.S.PH.B.PB.CI.Po.K.P.set_canonicalisation log_info in 
-          let info = 
-            match info 
-            with 
-            | None -> None 
-            | Some info -> 
-               let info = 
-                {info with Mods.story_id = counter }
-               in 
-               let info = Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy log_info)  info 
-               in 
-               Some info
-          in 
-          error,(prehash,[grid,graph,None,weak_event_list,list_info])::weakly_compressed_story_array,weakly_compression_faillure,info)
-	 (error,weakly_compressed_story_array,weakly_compression_faillure,info)
+	  store_trace_gen false parameter handler error info log_info  list weak_event_list story_list )
+	 (error,story_list,info)
 	 list 
   in 
-  let error,log_info,blackboard = D.S.PH.B.reset_init parameter handler error log_info blackboard in 
-  (error,counter,tick,blackboard,weakly_compressed_story_array,weakly_compression_faillure)
+(*  let error,log_info,blackboard = D.S.PH.B.reset_init parameter handler error log_info blackboard_tmp in *)
+  error,story_list
 
 let convert_trace_into_grid_while_trusting_side_effects trace handler = 
   let refined_list = 
@@ -210,12 +285,14 @@ let enrich_small_grid_with_transitive_closure f = Causal.enrich_grid f Graph_clo
 let enrich_std_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closure.config_std
 					    
 let from_none_to_weak_with_tick parameter handler log_info logger n_stories x y =
-  let error,counter,tick,blackboard,w1,w2 = from_none_to_weak parameter handler log_info logger x y in
-  let tick = Mods.tick_stories logger n_stories tick in 
-  error,counter+1,tick,blackboard,w1,w2
+  let error,story_list = from_none_to_weak parameter handler log_info logger x y in
+  let story_list = tick logger story_list in 
+  let story_list = inc_counter story_list in 
+  error,story_list 
 
 let from_none_to_weak_with_tick_ext parameter handler log_info logger n_stories x (_,_,_,z,t) =
-  let error,counter,tick,blackboard,w1,w2 = from_none_to_weak parameter handler log_info logger x (z,t) in
-  let tick = Mods.tick_stories logger n_stories tick in 
-  error,counter+1,tick,blackboard,w1,w2
+  let error,story_list = from_none_to_weak parameter handler log_info logger x (z,t) in
+  let tick = tick logger story_list in 
+  let story_list = inc_counter story_list in 
+  error,story_list 
 				       

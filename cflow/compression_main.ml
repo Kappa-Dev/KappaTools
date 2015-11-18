@@ -159,7 +159,7 @@ let compress_and_print logger env log_info step_list =
 	      Format.fprintf logger "\t - computing causal past of each observed events (%i)@." n_stories 
 	    in
 	    (* Partial order reduction: generation of uncompressed stories *)
-	    let error,_,_,_,causal_story_array,causal_story_faillure = 
+	    let error,causal_story_list = 
               let () = 
                 if debug_mode
                 then 
@@ -192,15 +192,9 @@ let compress_and_print logger env log_info step_list =
 		        "causal & weak flow compression") 
 		    n_stories 
 	      in
-	      
-	      let tick = 
-                if n_stories > 0 
-                then Mods.tick_stories logger n_stories (false,0,0) 
-                else (false,0,0)
-              in
+	      let story_list = U.empty_story_table_with_tick logger n_stories in 
               List.fold_left 
-                (fun (error,counter,tick,blackboard,causal_story_array,causal_story_faillure) observable_id
- -> 
+                (fun (error,story_list) observable_id -> 
                   let () = 
                     if debug_mode
                     then 
@@ -229,7 +223,7 @@ let compress_and_print logger env log_info step_list =
                       (List.rev_map (fun x -> (x,[])) (List.rev trace_without_pseudo_inverse_events))
                     else 
                       (List.rev_map (fun x -> (x,[])) (List.rev trace_without_pseudo_inverse_events))
-                  in 
+                  in 		  
 		  let grid = D.S.PH.B.PB.CI.Po.K.build_grid refined_list true handler in
                   let enriched_grid = Causal.enrich_grid logger Graph_closure.config_intermediary grid in 
                   let event_id_list_rev = ((eid+1)::(enriched_grid.Causal.prec_star.(eid+1))) in 
@@ -240,7 +234,7 @@ let compress_and_print logger env log_info step_list =
                     | None -> None 
                     | Some info -> 
 		       let info = 
-                         {info with Mods.story_id = counter }
+                         {info with Mods.story_id = U.get_counter story_list}
 		       in 
 		       let info = Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy log_info)  info 
 		       in 
@@ -250,117 +244,101 @@ let compress_and_print logger env log_info step_list =
 		    store_uncompressed_stories || not cut
 		  then
 		    let error,event_list,result_wo_compression = D.S.translate parameter handler error blackboard_cflow event_id_list in 
-                    let grid = D.S.PH.B.PB.CI.Po.K.build_grid result_wo_compression true handler in
-                    let error,graph = D.graph_of_grid parameter handler error grid in
-                    let error,prehash = D.prehash parameter handler error graph in
-		    let tick = Mods.tick_stories logger n_stories tick in
-                    let causal_story_array =
-		      (prehash,[grid,graph,None,event_list,[info]])::causal_story_array in 
-                    error,counter+1,tick,blackboard,causal_story_array,causal_story_faillure
+		    let error,causal_story_array,log_info = 
+		      U.store_trace_gen true parameter handler error info log_info result_wo_compression event_list  story_list 
+		    in 
+		    let causal_story_array = U.tick logger causal_story_array in 
+		    let causal_story_array = U.inc_counter causal_story_array in 
+		    error,causal_story_array  
 		  else
 		    U.from_none_to_weak_with_tick  parameter handler log_info logger n_stories
-		      (error,counter,tick,blackboard,causal_story_array,causal_story_faillure)
+		      (error,story_list)
 		      (trace_before_compression,[info])
 		)
-                (error,1,tick,blackboard,[],0) 
+                (error,story_list)
                 (List.rev list)
             in 
-	    let error,causal_story_array = 
-              D.hash_list parameter handler error 
-                (List.rev causal_story_array) 
-            in 
-            let n_stories = 
-              List.fold_left 
-                (fun n l -> n + List.length (snd l))
-                0 
-                causal_story_array
-            in 
-            error,log_info,causal_story_array,causal_story_faillure,n_stories,blackboard
+	    let error,causal_story_list = 
+              U.flatten_story_table  parameter handler error causal_story_list 
+	    in 
+            let n_stories = U.count_stories causal_story_list 
+	    in 
+            error,log_info,causal_story_list 
           in
 
-	  let error,log_info,causal,_,_,_ = 
+	  let error,log_info,causal_table = 
             if causal_trace_on 
             then 
               deal_with error false log_info 
             else 
-              let error,log_info,blackboard = D.S.PH.B.import parameter handler error log_info [] in 
-              error,log_info,[],0,0,blackboard 
+	      error,log_info,U.empty_story_table 0  
           in 
-          let error,log_info,causal_story_array,causal_story_faillure,n_stories,blackboard = 
+          let error,log_info,causal_story_table = 
             if weak_compression_on || strong_compression_on 
             then 
               deal_with error true log_info 
             else
-               let error,log_info,blackboard = D.S.PH.B.import parameter handler error log_info [] in 
-              error,log_info,[],0,0,blackboard 
+              error,log_info,U.empty_story_table 0 
           in 
-          let _ = Priority.n_story := 1 in 
+(*          let _ = Priority.n_story := 1 in*) 
           let _ = print_newline () in 
           let _ = print_newline () in 
-          let error,weakly_compression_faillure,weakly_compressed_story_array = 
+	  let n_causal_stories = U.count_stories causal_story_table in 
+          let error,weakly_story_table =
             if weak_compression_on || strong_compression_on 
             then 
               if
 		store_uncompressed_stories
 	      then
 		begin 
-                  let () = Format.fprintf logger "\t - weak flow compression (%i)@." n_stories in
+                  let () = Format.fprintf logger "\t - weak flow compression (%i)@." n_causal_stories in 
                   let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_weak parameter in 
-                  let tick = 
-                    if n_stories > 0 
-                    then Mods.tick_stories logger n_stories (false,0,0) 
-                    else (false,0,0)
-                  in 
-                  let error,_,_,_,weakly_compressed_story_array,weakly_compression_faillure = 
+                  let weak_stories_table =  U.empty_story_table_with_tick logger n_causal_stories in 
+                  let error,weakly_story_table = 
                     List.fold_left 
                       (fun x (_,a) ->
                        List.fold_left 
-                         (U.from_none_to_weak_with_tick_ext parameter handler log_info logger n_stories)
+                         (U.from_none_to_weak_with_tick_ext parameter handler log_info logger n_causal_stories)
 			 x
 			 a)
-                    (error,1,tick,blackboard,[],0) 
-                    (List.rev causal_story_array)
+                    (error,weak_stories_table)
+                    (List.rev (U.get_stories causal_story_table))
                   in 
-	          let error,weakly_compressed_story_array = D.hash_list parameter handler error   (List.rev weakly_compressed_story_array) in
-                  error,weakly_compression_faillure,weakly_compressed_story_array
+	          let error,weakly_story_table = U.flatten_story_table  parameter handler error weakly_story_table in
+                  error,weakly_story_table
 		end
 	      else
-		error,causal_story_faillure,causal_story_array
+		error,causal_story_table
             else 
-              error,0,[]
+              error,U.empty_story_table 0
           in 
-          let n_stories = 
-            List.fold_left 
-              (fun n l -> n + List.length (snd l))
-              0 
-              weakly_compressed_story_array
-          in 
+          let n_weak_stories = U.count_stories weakly_story_table in 
           let _ = print_newline () in 
-          let _ = 
+          let n_fail = U.count_faillure weakly_story_table in 
+	  let _ = 
             match 
-              weakly_compression_faillure 
+              n_fail 
             with 
             | 0 -> ()
             | 1 -> Format.fprintf logger "@.\t 1 weak compression has failed@."
-            | _ -> Format.fprintf logger "@.\t %i weak compressions have failed@."
-				  weakly_compression_faillure
+            | n -> Format.fprintf logger "@.\t %i weak compressions have failed@." n_fail 
           in
           let error,strong_compression_faillure,strongly_compressed_story_array = 
             if strong_compression_on 
             then 
               begin 
                 let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_strong parameter in 
-                let () = Format.fprintf logger "\t - strong flow compression (%i)@." n_stories in
+                let () = Format.fprintf logger "\t - strong flow compression (%i)@." n_weak_stories in
                 let tick = 
-                  if n_stories > 0 
-                  then Mods.tick_stories logger n_stories (false,0,0)
+                  if n_weak_stories > 0 
+                  then Mods.tick_stories logger n_weak_stories (false,0,0)
                   else (false,0,0)
                 in 
-                let error,_,_,_,strong_compression_faillure,strongly_compressed_story_array = 
+                let error,_,_(*,_*),strong_compression_faillure,strongly_compressed_story_array = 
                   List.fold_left 
-                    (fun (error,counter,tick,blackboard,strong_compression_faillure,strongly_compressed_story_array) (_,a) ->
+                    (fun (error,counter,tick,(*blackboard,*)strong_compression_faillure,strongly_compressed_story_array) (_,a) ->
                       List.fold_left 
-                        (fun (error,counter,tick,blackboard,strong_compression_faillure,strongly_compressed_story_array) (_,grid,graph,refined_event_list,list_info) -> 
+                        (fun (error,counter,tick,(*blackboard,*)strong_compression_faillure,strongly_compressed_story_array) (_,grid,graph,refined_event_list,list_info) -> 
                           let info = List.hd list_info in 
                           let error,log_info,blackboard_tmp = D.S.PH.B.import parameter handler error log_info refined_event_list in 
                           let error,list = D.S.PH.forced_events parameter handler error blackboard_tmp in     
@@ -420,12 +398,12 @@ let compress_and_print logger env log_info step_list =
 				   (error,strong_compression_faillure,strongly_compressed_story_array,info)
 				   list 
 			  in 
-                          let error,log_info,blackboard = D.S.PH.B.reset_init parameter handler error log_info blackboard in 
-                          let tick = Mods.tick_stories logger n_stories tick in
-                          error,counter+1,tick,blackboard,strong_compression_faillure,strongly_compressed_story_array)
-                        (error,counter,tick,blackboard,strong_compression_faillure,strongly_compressed_story_array) a) 
-                    (error,1,tick,blackboard,0,[]) 
-                    (List.rev weakly_compressed_story_array)
+(*                          let error,log_info,blackboard = D.S.PH.B.reset_init parameter handler error log_info blackboard in *)
+                          let tick = Mods.tick_stories logger n_weak_stories tick in
+                          error,counter+1,tick,(*blackboard,*)strong_compression_faillure,strongly_compressed_story_array)
+                        (error,counter,tick,(*blackboard,*)strong_compression_faillure,strongly_compressed_story_array) a) 
+                    (error,1,tick,(*blackboard,*)0,[]) 
+                    (List.rev (U.get_stories weakly_story_table))
                 in 
 	        let error,strongly_compressed_story_array = D.hash_list parameter handler error   (List.rev strongly_compressed_story_array) in
                 error,strong_compression_faillure,strongly_compressed_story_array 
@@ -448,7 +426,10 @@ let compress_and_print logger env log_info step_list =
               (D.S.PH.B.PB.CI.Po.K.H.dump_error parameter handler error)
               error
           in 
-          causal,causal_story_array,weakly_compressed_story_array,strongly_compressed_story_array
+          U.get_stories causal_table,
+	  U.get_stories causal_story_table,
+	  U.get_stories weakly_story_table,
+	  (*U.get_stories*) strongly_compressed_story_array
         end 
   in 
   let () =
