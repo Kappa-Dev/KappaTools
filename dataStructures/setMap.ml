@@ -166,7 +166,7 @@ module type S = sig
     module Map : Map with type elt = elt and type set = Set.t
   end
 
-exception DeadCodeIsNotDead
+exception DeadCodeIsNotDead of string
 
 module Make(Ord:OrderedType): S with type elt = Ord.t =
   struct
@@ -214,14 +214,14 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  if height_left > height_right + 2 then
             match left with
             | Private.Empty ->
-	       raise DeadCodeIsNotDead (* height_left > height_right + 2 >= 2 *)
+	       raise (DeadCodeIsNotDead __LOC__) (* height_left > height_right + 2 >= 2 *)
             | Private.Node(leftleft,leftvalue,leftright,_) ->
 	       if height leftleft >= height leftright then
 		 node leftleft leftvalue (node leftright value right)
 	       else
 		 match leftright with
                  | Private.Empty ->
-		    raise DeadCodeIsNotDead (* 0 <= height leftleft < height leftright *)
+		    raise (DeadCodeIsNotDead __LOC__) (* 0 <= height leftleft < height leftright *)
                  | Private.Node(leftrightleft,leftrightvalue,leftrightright,_) ->
 		    node
 		      (node leftleft leftvalue leftrightleft)
@@ -230,14 +230,14 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  else if height_right > height_left + 2 then
             match right with
             | Private.Empty ->
-	       raise DeadCodeIsNotDead (* height_right > height_left + 2 >= 2 *)
+	       raise (DeadCodeIsNotDead __LOC__) (* height_right > height_left + 2 >= 2 *)
             | Private.Node(rightleft,rightvalue,rightright,_) ->
 	       if height rightright >= height rightleft then
 		 node (node left value rightleft) rightvalue rightright
 	       else
 		 match rightleft with
                  | Private.Empty ->
-		    raise DeadCodeIsNotDead (* 0 <= height rightright < height rightleft *)
+		    raise (DeadCodeIsNotDead __LOC__) (* 0 <= height rightright < height rightleft *)
                  | Private.Node(rightleftleft,rightleftvalue,rightleftright,_) ->
 		    node
 		      (node left value rightleftleft)
@@ -247,8 +247,8 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 
 	let balance_with_logs warn parameters error left value right =
 	  try error,balance left value right
-	  with DeadCodeIsNotDead ->
-	    let error = warn parameters error "setMap.ml" (Some "Set.balance,line 295, Set invariant is broken, keep on with unbalanced set") (invalid_arg "Set_and_Map.SET.balance")
+	  with DeadCodeIsNotDead loc ->
+	    let error = warn parameters error "setMap.ml" (Some (loc^" Set invariant is broken, keep on with unbalanced set")) (invalid_arg "Set_and_Map.SET.balance")
 	    in error,node left value right
 
 	let rec add x = function
@@ -368,7 +368,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  match set1,set2 with 
           | Private.Empty,_ -> error,set2 
           | _,Private.Empty -> error,set1 
-          | _ -> 
+          | Private.Node _, Private.Node _ ->
              let error,left2 =remove_min_elt_with_logs warn parameters error set2 in
 	     let error,elt_opt = min_elt_with_logs warn parameters error set2 in 
              match
@@ -523,7 +523,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  | _,Private.Empty -> error,empty
 	  | Private.Node(left1,value1,right1,_),_ ->
 	     let mh',triple2 = split_with_logs warn parameters error value1 set2 in  
-	     suture_with_logs warn parameters error (left1,value1,right1) triple2 inter_with_logs 
+	     suture_with_logs warn parameters mh' (left1,value1,right1) triple2 inter_with_logs
 		    
 	let rec diff set1 set2 =
 	  match set1,set2 with
@@ -601,10 +601,10 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
                  begin
                    if p value 
                    then   
-                     let a,b = add_with_logs warn parameters error value t
+                     let a,b = add_with_logs warn parameters rh value t
                      in a,b,f
                    else 
-                     let a,c = add_with_logs warn parameters error value f in 
+                     let a,c = add_with_logs warn parameters rh value f in
                      a,t,c
                  end  
                  left) 
@@ -765,14 +765,14 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  if height_left > height_right + 2 then
 	    match left with
             | Private.Empty ->
-	       raise DeadCodeIsNotDead (* height_left > height_right + 2 >= 2 *)
+	       raise (DeadCodeIsNotDead __LOC__) (* height_left > height_right + 2 >= 2 *)
             | Private.Node (left0,key0,data0,right0,_,_) ->
                if height left0 >= height right0 then
 		 node left0 key0 data0 (node right0 key data right)
                else
 		 match right0 with
 		 | Private.Empty ->
-		    raise DeadCodeIsNotDead (* 0 <= height left0 < height right0 *)
+		    raise (DeadCodeIsNotDead __LOC__) (* 0 <= height left0 < height right0 *)
 		 | Private.Node (left1,key1,data1,right1,_,_) ->
                     node (node left0 key0 data0 left1)
 			 key1 data1
@@ -781,14 +781,14 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
             if height_right > height_left + 2 then
               match right with
               | Private.Empty ->
-		 raise DeadCodeIsNotDead (* height_right > height_left + 2 >= 2 *)
+		 raise (DeadCodeIsNotDead __LOC__) (* height_right > height_left + 2 >= 2 *)
               | Private.Node (left0,key0,data0,right0,_,_) ->
 		 if height right0 >= height left0 then
 		   node (node left key data left0) key0 data0 right0
 		 else
 		   match left0 with
 		   | Private.Empty ->
-		      raise DeadCodeIsNotDead (* 0 <= height right0 < height left0 *)
+		      raise (DeadCodeIsNotDead __LOC__) (* 0 <= height right0 < height left0 *)
 		   | Private.Node (left1,key1,data1,right1,_,_) ->
                       node (node left key data left1)
 			   key1 data1
@@ -837,8 +837,8 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 
 	let balance_with_logs warn parameters error left key data right =
 	  try error,balance left key data right
-	  with DeadCodeIsNotDead ->
-	    let error = warn parameters error "setMap.ml" (Some "Map.balance,line 891, Map invariant is broken, keep on with unbalanced map") (invalid_arg "Set_and_Map.Map.balance")
+	  with DeadCodeIsNotDead loc ->
+	    let error = warn parameters error "setMap.ml" (Some (loc^" Map invariant is broken, keep on with unbalanced map")) (invalid_arg "Set_and_Map.Map.balance")
 	    in error,node left key data right 
 
 			    
@@ -943,7 +943,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 
 	let rec join left key value right =
 	  match balance left key value right with
-          | Private.Empty -> raise DeadCodeIsNotDead (* By case analysis *)
+          | Private.Empty -> raise (DeadCodeIsNotDead __LOC__) (* By case analysis *)
           | Private.Node (left2,key2,data2,right2,_,_) as map2 ->
              let h = height left2 - height right2 in
              if h > 2 || h< -2 then join left2 key2 data2 right2 else map2
@@ -1217,8 +1217,8 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  with
 	  | Private.Empty -> errors,empty
 	  | Private.Node(left,key,data,right,_,_) ->
-	     let error,left' = map_with_logs warn parameters errors f left in
-	     let error,data' = f parameters errors data in
+	     let errors,left' = map_with_logs warn parameters errors f left in
+	     let errors,data' = f parameters errors data in
 	     let error,right' = map_with_logs warn parameters errors f right in 
 	     error,node left' key data' right' 
 			   
@@ -1241,8 +1241,8 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	       | Private.Node (_) -> map_with_logs warn parameters errors g map2 	
 	      end
           | Private.Node(left1,key1,data1,right1,_,_) -> 
-             let error,(left2,data2,right2) = split_with_logs warn parameters errors key1 map2 in 
-             let error, left' = map2_with_logs warn parameters errors f g h left1 left2 in 
+             let errors,(left2,data2,right2) = split_with_logs warn parameters errors key1 map2 in
+             let errors, left' = map2_with_logs warn parameters errors f g h left1 left2 in
              let error, right' = map2_with_logs warn parameters errors f g h right1 right2 in 
 	     let error, data' =
 	       begin
