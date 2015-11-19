@@ -41,10 +41,10 @@ let trace = false
 
 let collect_modification_sites parameter error rule_id diff_direct store_result =
   (*from a pair of Map (agent_type, site) -> rule_id :: old_result)*)
-  let add_link (agent_type, site_type) rule_id store_result =
+  let add_link (agent_id, agent_type, site_type) rule_id store_result =
     let (l, old) =
       Int2Map_Modif.Map.find_default
-	([], Site_map_and_set.Set.empty) (agent_type, site_type) store_result in
+	([], Site_map_and_set.Set.empty) (agent_id, agent_type, site_type) store_result in
     let current_set =
       Site_map_and_set.Set.add rule_id old
     in
@@ -52,7 +52,7 @@ let collect_modification_sites parameter error rule_id diff_direct store_result 
       Site_map_and_set.Set.union current_set old
     in
     error,
-    Int2Map_Modif.Map.add (agent_type, site_type) (l, new_set) store_result
+    Int2Map_Modif.Map.add (agent_id, agent_type, site_type) (l, new_set) store_result
   in
   let error, store_result =
     AgentMap.fold parameter error
@@ -66,7 +66,7 @@ let collect_modification_sites parameter error rule_id diff_direct store_result 
             Site_map_and_set.Map.fold
               (fun site_type _ (error, store_result) ->
                 let error, store_result =
-                  add_link (agent_type, site_type) rule_id store_result
+                  add_link (agent_id, agent_type, site_type) rule_id store_result
                 in
                 error, store_result
               ) agent_modif.agent_interface (error, store_result)
@@ -84,14 +84,14 @@ let collect_modification_sites parameter error rule_id diff_direct store_result 
 
 let collect_test_sites parameter error rule_id viewslhs 
     store_result =
-  let add_link (agent_type, site_type) rule_id store_result =
+  let add_link (agent_id, agent_type, site_type) rule_id store_result =
     let (l, old) =
-      Int2Map_Modif.Map.find_default
-	([], Site_map_and_set.Set.empty) (agent_type, site_type) store_result in
+      Int2Map_Modif.Map.find_default ([], Site_map_and_set.Set.empty)
+        (agent_id, agent_type, site_type) store_result in
     let current_set = Site_map_and_set.Set.add rule_id old in
     let new_set = Site_map_and_set.Set.union current_set old  in
     let result =
-      Int2Map_Modif.Map.add (agent_type, site_type) (l, new_set) store_result
+      Int2Map_Modif.Map.add (agent_id, agent_type, site_type) (l, new_set) store_result
     in
     error, result
   in
@@ -106,7 +106,7 @@ let collect_test_sites parameter error rule_id viewslhs
            Site_map_and_set.Map.fold
              (fun site_type _ (error, store_result) ->
                let error, store_result_test =
-                 add_link (agent_type, site_type) rule_id store_result
+                 add_link (agent_id, agent_type, site_type) rule_id store_result
                in
                error, store_result_test
              ) agent.agent_interface (error, store_result)
@@ -129,12 +129,12 @@ test: agent_type:0:site_type:0:[4;5;6;7]
 
 let collect_test_modification_sites
     parameter error store_modification_map store_test_map store_result =
-  let add_link (agent_type, site_type) rule_id_set store_result =
+  let add_link (agent_id, agent_type, site_type) rule_id_set store_result =
     let (l, old) =
       Int2Map_Modif.Map.find_default
-	([], Site_map_and_set.Set.empty) (agent_type, site_type) store_result in
+	([], Site_map_and_set.Set.empty) (agent_id, agent_type, site_type) store_result in
     let result =
-      Int2Map_Modif.Map.add (agent_type, site_type) (l, rule_id_set) store_result
+      Int2Map_Modif.Map.add (agent_id, agent_type, site_type) (l, rule_id_set) store_result
     in
     error, result
   in  
@@ -145,24 +145,24 @@ let collect_test_modification_sites
     )
     parameter error
     (*exists in 'a t*)
-    (fun parameter error (agent_type, site_type) (l1, s1) store_result ->
+    (fun parameter error (agent_id, agent_type, site_type) (l1, s1) store_result ->
       let error, store_result =
-        add_link (agent_type, site_type) s1 store_result
+        add_link (agent_id, agent_type, site_type) s1 store_result
       in
       error, store_result
     )
     (*exists in 'b t*)
-    (fun parameter error (agent_type, site_type) (l2, s2) store_result ->
+    (fun parameter error (agent_id, agent_type, site_type) (l2, s2) store_result ->
       let error, store_result =
-        add_link (agent_type, site_type) s2 store_result
+        add_link (agent_id, agent_type, site_type) s2 store_result
       in
       error, store_result
     )
     (*exists in both*)
-    (fun parameter error (agent_type, site_type) (l1, s1) (l2, s2) store_result ->
+    (fun parameter error (agent_id, agent_type, site_type) (l1, s1) (l2, s2) store_result ->
       let union = Site_map_and_set.Set.union s1 s2 in
       let error, store_result =
-        add_link (agent_type, site_type) union store_result
+        add_link (agent_id, agent_type, site_type) union store_result
       in
       error, store_result
     ) store_modification_map store_test_map store_result

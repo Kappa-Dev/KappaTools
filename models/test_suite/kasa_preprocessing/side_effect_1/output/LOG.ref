@@ -366,40 +366,45 @@ agent_type:0:site_type:1@list of pair (rule_id, binding state):
 ------------------------------------------------------------
 Set of rules that may modify a given site (excluding created agents):
 ------------------------------------------------------------
-agent_type:0:site_type:0@set of rule_id:
+agent_id:0:agent_type:0:site_type:0@set of rule_id:
 rule_id:1
-agent_type:1:site_type:0@set of rule_id:
+agent_id:1:agent_type:1:site_type:0@set of rule_id:
 rule_id:1
+agent_id:2:agent_type:1:site_type:0@set of rule_id:
 rule_id:2
-agent_type:2:site_type:0@set of rule_id:
+agent_id:2:agent_type:2:site_type:0@set of rule_id:
 rule_id:3
 ------------------------------------------------------------
 Set of rules that may test a given site:
 ------------------------------------------------------------
-agent_type:0:site_type:0@set of rule_id:
+agent_id:0:agent_type:0:site_type:0@set of rule_id:
 rule_id:0
 rule_id:1
 rule_id:2
-agent_type:0:site_type:1@set of rule_id:
+agent_id:0:agent_type:0:site_type:1@set of rule_id:
 rule_id:3
-agent_type:1:site_type:0@set of rule_id:
+agent_id:1:agent_type:1:site_type:0@set of rule_id:
 rule_id:1
 rule_id:2
-agent_type:2:site_type:0@set of rule_id:
+agent_id:1:agent_type:2:site_type:0@set of rule_id:
 rule_id:3
 ------------------------------------------------------------
 Set of rules that may test and modify a given site (excluding created agents):
 ------------------------------------------------------------
-agent_type:0:site_type:0@set of rule_id:
+agent_id:0:agent_type:0:site_type:0@set of rule_id:
 rule_id:0
 rule_id:1
 rule_id:2
-agent_type:0:site_type:1@set of rule_id:
+agent_id:0:agent_type:0:site_type:1@set of rule_id:
 rule_id:3
-agent_type:1:site_type:0@set of rule_id:
+agent_id:1:agent_type:1:site_type:0@set of rule_id:
 rule_id:1
 rule_id:2
-agent_type:2:site_type:0@set of rule_id:
+agent_id:1:agent_type:2:site_type:0@set of rule_id:
+rule_id:3
+agent_id:2:agent_type:1:site_type:0@set of rule_id:
+rule_id:2
+agent_id:2:agent_type:2:site_type:0@set of rule_id:
 rule_id:3
 
 ** Dynamic information:
@@ -414,20 +419,24 @@ agent_type:1@site_type:0:state:1--agent_type':0@site_type':0:state':1
 ------------------------------------------------------------
 List of rules to awake when the state of a site is modified and tested:
 ------------------------------------------------------------
-agent_type:0:covering_class_id:0:@set of rule_id:
+agent_id:0:agent_type:0:covering_class_id:0:@set of rule_id:
 rule_id:0
 rule_id:1
 rule_id:2
 rule_id:3
-agent_type:0:covering_class_id:1:@set of rule_id:
+agent_id:0:agent_type:0:covering_class_id:1:@set of rule_id:
 rule_id:0
 rule_id:1
 rule_id:2
 rule_id:3
-agent_type:1:covering_class_id:0:@set of rule_id:
+agent_id:1:agent_type:1:covering_class_id:0:@set of rule_id:
 rule_id:1
 rule_id:2
-agent_type:2:covering_class_id:0:@set of rule_id:
+agent_id:1:agent_type:2:covering_class_id:0:@set of rule_id:
+rule_id:3
+agent_id:2:agent_type:1:covering_class_id:0:@set of rule_id:
+rule_id:2
+agent_id:2:agent_type:2:covering_class_id:0:@set of rule_id:
 rule_id:3
 
 ------------------------------------------------------------
@@ -439,47 +448,47 @@ rule_id:3
 ------------------------------------------------------------
 * Covering classes with new index :
 ------------------------------------------------------------
-- A map of covering class with new index of site (per agent and rule_id) is tested:
+- Valuations of the views that are tested (per rule, agent and covering class):
 
-agent_type:0:rule_id:0@list of triple:
-covering_class_id:1:site_type':1:state:1
-agent_type:0:rule_id:1@list of triple:
-covering_class_id:1:site_type':1:state:1
-agent_type:0:rule_id:2@list of triple:
-covering_class_id:1:site_type':1:state:1
-agent_type:0:rule_id:3@list of triple:
-covering_class_id:0:site_type':1:state:1
-agent_type:1:rule_id:1@list of triple:
-covering_class_id:0:site_type':1:state:1
-agent_type:1:rule_id:2@list of triple:
-covering_class_id:0:site_type':1:state:1
-agent_type:2:rule_id:3@list of triple:
-covering_class_id:0:site_type':1:state:1
-
-------------------------------------------------------------
-- A map of covering class with new index of site (per agent and rule_id) is created:
-
-agent_type:1:rule_id:2@list of triple:
-covering_class_id:0:site_type':1:state:0
-agent_type:2:rule_id:3@list of triple:
-covering_class_id:0:site_type':1:state:0
+agent_id:0:agent_type:0:rule_id:0:covering_class_id:0@list of pair:
+site_type':1:state:1
+agent_id:0:agent_type:0:rule_id:1:covering_class_id:0@list of pair:
+site_type':1:state:1
+agent_id:0:agent_type:0:rule_id:2:covering_class_id:0@list of pair:
+site_type':1:state:1
+agent_id:0:agent_type:0:rule_id:3:covering_class_id:0@list of pair:
+site_type':1:state:1
+agent_id:1:agent_type:1:rule_id:1:covering_class_id:0@list of pair:
+site_type':1:state:1
+agent_id:1:agent_type:1:rule_id:2:covering_class_id:0@list of pair:
+site_type':1:state:1
+agent_id:1:agent_type:2:rule_id:3:covering_class_id:0@list of pair:
+site_type':1:state:1
 
 ------------------------------------------------------------
-- A map of covering class with new index of site (per agent and rule_id) is modified:
+- Valuations of the views that are created (per rule, agent and covering class):
 
-agent_type:0:rule_id:1@list of triple:
-covering_class_id:1:site_type':1:state:0
-agent_type:1:rule_id:1@list of triple:
-covering_class_id:0:site_type':1:state:0
-agent_type:1:rule_id:2@list of triple:
-covering_class_id:0:site_type':1:state:0
-agent_type:2:rule_id:3@list of triple:
-covering_class_id:0:site_type':1:state:0
+agent_type:1:rule_id:2:covering_class_id:0@list of pair:
+site_type':1:state:0
+agent_type:2:rule_id:3:covering_class_id:0@list of pair:
+site_type':1:state:0
 
 ------------------------------------------------------------
-- A map of bdu when site (per agent and rule_id) is created:
+- Update of the views due to modification (per rule, agent and covering class):
 
-agent_type:1:rule_id:2
+agent_id:0:agent_type:0:rule_id:1:covering_class_id:0@list of triple:
+site_type':1:state:0
+agent_id:1:agent_type:1:rule_id:1:covering_class_id:0@list of triple:
+site_type':1:state:0
+agent_id:2:agent_type:1:rule_id:2:covering_class_id:0@list of triple:
+site_type':1:state:0
+agent_id:2:agent_type:2:rule_id:3:covering_class_id:0@list of triple:
+site_type':1:state:0
+
+------------------------------------------------------------
+- Bdu for the valuations of the views that are created (per rule, agent and covering class):
+
+agent_type:1:rule_id:2:covering_class_id:0
 agent_type_ if(mvbdu_id:3) x1 < 0 then 
 agent_type_  false
 agent_type_ else 
@@ -488,7 +497,7 @@ agent_type_   true
 agent_type_  else 
 agent_type_   false
 
-agent_type:2:rule_id:3
+agent_type:2:rule_id:3:covering_class_id:0
 agent_type_ if(mvbdu_id:3) x1 < 0 then 
 agent_type_  false
 agent_type_ else 
@@ -499,9 +508,9 @@ agent_type_   false
 
 
 ------------------------------------------------------------
-- A map of bdu when a site (per agent and rule_id) is tested:
+- Bdu for the valuations of the views that are tested (per rule, agent and covering class):
 
-agent_type:0:rule_id:0
+agent_id:0:agent_type:0:rule_id:0:covering_class_id:0
 agent_type_ if(mvbdu_id:3) x1 < 1 then 
 agent_type_  false
 agent_type_ else 
@@ -510,7 +519,7 @@ agent_type_   true
 agent_type_  else 
 agent_type_   false
 
-agent_type:0:rule_id:1
+agent_id:0:agent_type:0:rule_id:1:covering_class_id:0
 agent_type_ if(mvbdu_id:3) x1 < 1 then 
 agent_type_  false
 agent_type_ else 
@@ -519,7 +528,7 @@ agent_type_   true
 agent_type_  else 
 agent_type_   false
 
-agent_type:0:rule_id:2
+agent_id:0:agent_type:0:rule_id:2:covering_class_id:0
 agent_type_ if(mvbdu_id:3) x1 < 1 then 
 agent_type_  false
 agent_type_ else 
@@ -528,7 +537,7 @@ agent_type_   true
 agent_type_  else 
 agent_type_   false
 
-agent_type:0:rule_id:3
+agent_id:0:agent_type:0:rule_id:3:covering_class_id:0
 agent_type_ if(mvbdu_id:3) x1 < 1 then 
 agent_type_  false
 agent_type_ else 
@@ -537,7 +546,7 @@ agent_type_   true
 agent_type_  else 
 agent_type_   false
 
-agent_type:1:rule_id:1
+agent_id:1:agent_type:1:rule_id:1:covering_class_id:0
 agent_type_ if(mvbdu_id:3) x1 < 1 then 
 agent_type_  false
 agent_type_ else 
@@ -546,7 +555,7 @@ agent_type_   true
 agent_type_  else 
 agent_type_   false
 
-agent_type:1:rule_id:2
+agent_id:1:agent_type:1:rule_id:2:covering_class_id:0
 agent_type_ if(mvbdu_id:3) x1 < 1 then 
 agent_type_  false
 agent_type_ else 
@@ -555,7 +564,7 @@ agent_type_   true
 agent_type_  else 
 agent_type_   false
 
-agent_type:2:rule_id:3
+agent_id:1:agent_type:2:rule_id:3:covering_class_id:0
 agent_type_ if(mvbdu_id:3) x1 < 1 then 
 agent_type_  false
 agent_type_ else 
@@ -564,13 +573,13 @@ agent_type_   true
 agent_type_  else 
 agent_type_   false
 
-- A map of site (per agent and rule_id) is modified:
-agent_type:0:rule_id:1
+- List for update of the views due to modification (per rule, agent and covering class):
+agent_id:0:agent_type:0:rule_id:1:covering_class_id:0
 site_type:1
-agent_type:1:rule_id:1
+agent_id:1:agent_type:1:rule_id:1:covering_class_id:0
 site_type:1
-agent_type:1:rule_id:2
+agent_id:2:agent_type:1:rule_id:2:covering_class_id:0
 site_type:1
-agent_type:2:rule_id:3
+agent_id:2:agent_type:2:rule_id:3:covering_class_id:0
 site_type:1
 execution finished without any exception

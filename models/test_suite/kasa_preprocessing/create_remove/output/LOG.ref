@@ -121,23 +121,23 @@ List of rules to awake when the state of a site is modified and tested:
 ------------------------------------------------------------
 * Covering classes with new index :
 ------------------------------------------------------------
-- A map of covering class with new index of site (per agent and rule_id) is tested:
+- Valuations of the views that are tested (per rule, agent and covering class):
 
 
 ------------------------------------------------------------
-- A map of covering class with new index of site (per agent and rule_id) is created:
+- Valuations of the views that are created (per rule, agent and covering class):
 
 
 ------------------------------------------------------------
-- A map of covering class with new index of site (per agent and rule_id) is modified:
+- Update of the views due to modification (per rule, agent and covering class):
 
 
 ------------------------------------------------------------
-- A map of bdu when site (per agent and rule_id) is created:
+- Bdu for the valuations of the views that are created (per rule, agent and covering class):
 
 
 ------------------------------------------------------------
-- A map of bdu when a site (per agent and rule_id) is tested:
+- Bdu for the valuations of the views that are tested (per rule, agent and covering class):
 
-- A map of site (per agent and rule_id) is modified:
+- List for update of the views due to modification (per rule, agent and covering class):
 execution finished without any exception

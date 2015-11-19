@@ -54,8 +54,8 @@ module Int2Map_CM_state =
 module Int2Map_Modif =
   SetMap.Make (
     struct
-      (*agent_type, site*)
-      type t = int * int
+      (*agent_id, agent_type, site*)
+      type t = int * int * int
       let compare = compare
     end)
 
@@ -84,8 +84,8 @@ module Int2Map_Remove_effect =
 module Int2Map_CV_Modif = 
   SetMap.Make (
     struct
-      (*agent_type, covering_class_id*)
-      type t = int * int
+      (*agent_id, agent_type, covering_class_id*)
+      type t = int * int * int
       let compare = compare
     end)
 
@@ -95,21 +95,21 @@ module Int2Map_CV_Modif =
 module Map_test =
   SetMap.Make (
     struct
-      type t = int * int
+      type t = int * int * int * int
       let compare = compare
     end)
 
 module Map_creation =
   SetMap.Make (
     struct
-      type t = int * int
+      type t = int * int * int
       let compare = compare
     end)
 
 module Map_modif =
   SetMap.Make (
     struct
-      type t = int * int
+      type t = int * int * int * int
       let compare = compare
     end)
 
@@ -119,18 +119,28 @@ module Map_modif =
 module Map_test_bdu =
   SetMap.Make (
     struct
-      type t = int * int
+      type t = int * int * int * int
       let compare = compare
     end)
 
 module Map_creation_bdu =
   SetMap.Make (
     struct
-      type t = int * int
+      type t = int * int * int
       let compare = compare
     end)
 
 module Map_modif_list =
+  SetMap.Make (
+    struct
+      type t = int * int * int * int
+      let compare = compare
+    end)
+
+(************************************************************************************)
+(*fixpoint map*)
+
+module Map_bdu_update =
   SetMap.Make (
     struct
       type t = int * int
@@ -180,9 +190,9 @@ type bdu_analysis_dynamic =
 type bdu_build =
   {
     store_remanent_triple    : ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;
-    store_remanent_test      : (int * (int * int * int) list) list AgentMap.t;
-    store_remanent_creation  : (int * (int * int * int) list) list AgentMap.t;
-    store_remanent_modif     : (int * (int * int * int) list) list AgentMap.t;
+    store_remanent_test      : (int * int * int * (int * int) list) list AgentMap.t;
+    store_remanent_creation  : (int * int * (int * int) list) list AgentMap.t;
+    store_remanent_modif     : (int * int * int * (int * int) list) list AgentMap.t;
   }
 
 (************************************************************************************)
@@ -190,28 +200,21 @@ type bdu_build =
 
 type bdu_build_map =
   {
-    store_remanent_test_map     : (int list * (int * int * int) list) Map_test.Map.t;
-    store_remanent_creation_map : (int list * (int * int * int) list) Map_creation.Map.t;
-    store_remanent_modif_map : (int list * (int * int * int) list) Map_modif.Map.t;
-    (*REMOVE*)
-    (*store_test_bdu              : (int * bool Mvbdu_sig.mvbdu) list AgentMap.t;
-    store_creation_bdu          : (int * bool Mvbdu_sig.mvbdu) list AgentMap.t;*)
-    (*USE*)
-    store_creation_bdu_map      : (int list * bool Mvbdu_sig.mvbdu list) 
-      Map_creation_bdu.Map.t;
-    store_test_bdu_map          : (int list * bool Mvbdu_sig.mvbdu list) 
-      Map_test_bdu.Map.t;
+    store_remanent_test_map     : (int list * (int * int) list) Map_test.Map.t;
+    store_remanent_creation_map : (int list * (int * int) list) Map_creation.Map.t;
+    store_remanent_modif_map    : (int list * (int * int) list) Map_modif.Map.t;
+    store_creation_bdu_map      : (int list * bool Mvbdu_sig.mvbdu) Map_creation_bdu.Map.t;
+    store_test_bdu_map          : (int list * bool Mvbdu_sig.mvbdu) Map_test_bdu.Map.t;
     store_modif_list_map        : (int list * int list) Map_modif_list.Map.t
   }
 
 (************************************************************************************)
 (*fixpoint*)
 
-(*type bdu_fixpoint =
+type bdu_fixpoint =
   {
-    store_bdu_creation_array      : bool Mvbdu_sig.mvbdu array AgentMap.t;
-    store_bdu_test_array          : bool Mvbdu_sig.mvbdu array AgentMap.t;
-  }*)
+    store_bdu_update_array : (int list * bool Mvbdu_sig.mvbdu list) Map_bdu_update.Map.t;
+  }
 
 (************************************************************************************)
 (*main*)

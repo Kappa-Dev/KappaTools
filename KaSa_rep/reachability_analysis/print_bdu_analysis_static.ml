@@ -170,19 +170,19 @@ let print_side_effects parameter error result =
 
 let print_modification_sites_aux parameter error result =
   Int2Map_Modif.Map.iter
-    ( fun (x, y) (l1, s2) ->
+    ( fun (x, y, z) (l1, s2) ->
       if l1 <> []
       then
         begin
           let _ =
-            fprintf parameter.log "agent_type:%i:site_type:%i" x y
+            fprintf parameter.log "agent_id:%i:agent_type:%i:site_type:%i" x y z
           in
           let _ = List.fold_left
             (fun bool x ->
               (if bool
                then
                   fprintf parameter.log ", ");
-              fprintf parameter.log "agent_type:%i" x;
+              fprintf parameter.log "agent_id:%i" x;
               true
             ) false l1
             
@@ -191,7 +191,8 @@ let print_modification_sites_aux parameter error result =
         end
       else ();
       let _ =
-        fprintf parameter.log "agent_type:%i:site_type:%i@set of rule_id:\n" x y
+        fprintf parameter.log 
+          "agent_id:%i:agent_type:%i:site_type:%i@set of rule_id:\n" x y z
       in
       Site_map_and_set.Set.iter
         (fun rule_id ->

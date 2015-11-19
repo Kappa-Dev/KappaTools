@@ -24,20 +24,20 @@ let trace = false
 
 (************************************************************************************)
 
-let print_remanent_test_map parameter error result =
+let print_remanent_test_map parameter error result = (*TODO*)
   Map_test.Map.iter
-    (fun (agent_type, rule_id) (l1, l2) ->
+    (fun (agent_id, agent_type, rule_id, cv_id) (l1, l2) ->
       if l1 <> []
       then ()
       else ();
       let _ =
         fprintf parameter.log
-          "agent_type:%i:rule_id:%i@list of triple:\n" agent_type rule_id
+          "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i@list of pair:\n" 
+          agent_id agent_type rule_id cv_id
       in
-      List.iter (fun (id, site, state) ->
+      List.iter (fun (site, state) ->
         fprintf parameter.log 
-          "covering_class_id:%i:site_type':%i:state:%i\n"
-          id site state
+          "site_type':%i:state:%i\n" site state
       ) l2
     ) result
 
@@ -45,18 +45,17 @@ let print_remanent_test_map parameter error result =
 
 let print_remanent_creation_map parameter error result =
   Map_creation.Map.iter
-    (fun (agent_type, rule_id) (l1, l2) ->
+    (fun (agent_type, rule_id, cv_id) (l1, l2) ->
       if l1 <> []
       then ()
       else ();
       let _ =
         fprintf parameter.log
-          "agent_type:%i:rule_id:%i@list of triple:\n" agent_type rule_id
+          "agent_type:%i:rule_id:%i:covering_class_id:%i@list of pair:\n" 
+          agent_type rule_id cv_id
       in
-      List.iter (fun (id, site, state) ->
-        fprintf parameter.log 
-          "covering_class_id:%i:site_type':%i:state:%i\n"
-          id site state
+      List.iter (fun (site, state) ->
+        fprintf parameter.log "site_type':%i:state:%i\n" site state
       ) l2
     ) result
 
@@ -64,106 +63,71 @@ let print_remanent_creation_map parameter error result =
 
 let print_remanent_modif_map parameter error result =
   Map_modif.Map.iter
-    (fun (agent_type, rule_id) (l1, l2) ->
+    (fun (agent_id, agent_type, rule_id, cv_id) (l1, l2) ->
       if l1 <> []
       then ()
       else ();
       let _ =
         fprintf parameter.log
-          "agent_type:%i:rule_id:%i@list of triple:\n" agent_type rule_id
+          "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i@list of triple:\n"
+          agent_id agent_type rule_id cv_id
       in
-      List.iter (fun (id, site, state) ->
-        fprintf parameter.log 
-          "covering_class_id:%i:site_type':%i:state:%i\n"
-          id site state
+      List.iter (fun (site, state) ->
+        fprintf parameter.log "site_type':%i:state:%i\n" site state
       ) l2
     ) result
 
-
+(************************************************************************************)
+(*BDU*)
 (************************************************************************************)
 
 let print_bdu parameter error bdu =
   Boolean_mvbdu.print_boolean_mvbdu error
     (Remanent_parameters.update_prefix parameter "") bdu
 
-let print_test_bdu parameter error result =
-  AgentMap.print error
-    (fun error parameter l ->
-      let _ =
-        List.iter (fun (rule_id, bdu_test) ->
-          fprintf stdout "rule_id:%i\n" rule_id;
-          let _ =
-            print_bdu parameter error bdu_test
-          in
-          ()
-        ) l
-      in
-      error
-    ) parameter result
-
 let print_test_bdu_map parameter error result =
   Map_test_bdu.Map.iter
-    (fun (agent_type, rule_id) (l1, l2) ->
+    (fun (agent_id, agent_type, rule_id, cv_id) (l1, bdu_test) ->
       if l1 <> []
       then ()
       else ();
       let _ =
-        fprintf parameter.log "agent_type:%i:rule_id:%i\n" agent_type rule_id
+        fprintf parameter.log
+          "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i\n"
+          agent_id agent_type rule_id cv_id
       in
-      List.iter (fun bdu ->
-        let _ = 
-          let _ = print_bdu parameter error bdu in
-          fprintf parameter.log "\n"
-        in
-        ()
-      ) l2
+      let _ = print_bdu parameter error bdu_test in
+      fprintf parameter.log "\n"        
     ) result
 
 (************************************************************************************)
 
-let print_creation_bdu parameter error result =
-  AgentMap.print error
-    (fun error parameter l ->
-      let _ =
-        List.iter (fun (rule_id, bdu_creation) ->
-          fprintf stdout "rule_id:%i\n" rule_id;
-          let _ =
-            print_bdu parameter error bdu_creation
-          in
-          ()
-        ) l
-      in
-      error
-    ) parameter result
-
 let print_creation_bdu_map parameter error result =
   Map_creation_bdu.Map.iter
-    (fun (agent_type, rule_id) (l1, l2) ->
+    (fun (agent_type, rule_id, cv_id) (l1, bdu_creation) ->
       if l1 <> []
       then ()
       else ();
       let _ =
-        fprintf parameter.log "agent_type:%i:rule_id:%i\n" agent_type rule_id
+        fprintf parameter.log "agent_type:%i:rule_id:%i:covering_class_id:%i\n"
+          agent_type rule_id cv_id
       in
-      List.iter (fun bdu ->
-        let _ = 
-          let _ = print_bdu parameter error bdu in
-          fprintf parameter.log "\n"
-        in
-        ()
-      ) l2
+      let _ = print_bdu parameter error bdu_creation in
+      fprintf parameter.log "\n"
     ) result
 
 (************************************************************************************)
 
 let print_modif_list_map parameter error result =
   Map_modif_list.Map.iter
-    (fun (agent_type, rule_id) (l1, l2) ->
+    (fun (agent_id, agent_type, rule_id, cv_id) (l1, l2) ->
       if l1 <> []
       then ()
       else ();
       let _ =
-        fprintf parameter.log "agent_type:%i:rule_id:%i\n" agent_type rule_id
+        fprintf parameter.log 
+          "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i\n"
+          agent_id agent_type rule_id cv_id
       in
       List.iter (fun site ->
           fprintf parameter.log "site_type:%i\n" site;
@@ -184,7 +148,7 @@ let print_bdu_build_map parameter error result =
   in
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
-      "- A map of covering class with new index of site (per agent and rule_id) is tested:\n\n";
+      "- Valuations of the views that are tested (per rule, agent and covering class):\n\n";
     print_remanent_test_map
       parameter
       error
@@ -194,7 +158,7 @@ let print_bdu_build_map parameter error result =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
-      "- A map of covering class with new index of site (per agent and rule_id) is created:\n\n";
+      "- Valuations of the views that are created (per rule, agent and covering class):\n\n";
     print_remanent_creation_map
       parameter
       error
@@ -204,7 +168,7 @@ let print_bdu_build_map parameter error result =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
-      "- A map of covering class with new index of site (per agent and rule_id) is modified:\n\n";
+      "- Update of the views due to modification (per rule, agent and covering class):\n\n";
     print_remanent_modif_map
       parameter
       error
@@ -215,7 +179,7 @@ let print_bdu_build_map parameter error result =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
-      "- A map of bdu when site (per agent and rule_id) is created:\n\n";
+      "- Bdu for the valuations of the views that are created (per rule, agent and covering class):\n\n";
     print_creation_bdu_map
       parameter
       error
@@ -226,7 +190,7 @@ let print_bdu_build_map parameter error result =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
-      "- A map of bdu when a site (per agent and rule_id) is tested:\n\n";
+      "- Bdu for the valuations of the views that are tested (per rule, agent and covering class):\n\n";
     print_test_bdu_map
       parameter
       error
@@ -234,7 +198,7 @@ let print_bdu_build_map parameter error result =
   in
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
-      "- A map of site (per agent and rule_id) is modified:\n";
+      "- List for update of the views due to modification (per rule, agent and covering class):\n";
     print_modif_list_map
       parameter
       error

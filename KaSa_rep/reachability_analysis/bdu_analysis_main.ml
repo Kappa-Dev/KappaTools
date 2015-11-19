@@ -271,30 +271,24 @@ let scan_rule_bdu_build_map parameter error rule_id rule
 (************************************************************************************)
 (*scan rule fixpoint*)
 
-(*let scan_rule_fixpoint parameter error handler
-    store_creation_bdu
-    store_test_bdu
-    store_result =
-  let error, store_bdu_creation_array =
-    collect_bdu_creation_array
+(*let scan_rule_fixpoint parameter error store_wl_creation 
+    store_creation_bdu_map
+    store_bdu_test_map
+    store_modif_list_map
+    =
+  let error, store_bdu_update_array =
+    collect_bdu_update_array
       parameter
       error
-      handler
-      store_creation_bdu
-  in
-  (*-------------------------------------------------------------------------------*)
-  let error, store_bdu_test_array =
-    collect_bdu_test_array
-      parameter
-      error
-      handler
-      store_test_bdu
+      store_wl_creation
+      store_creation_bdu_map
+      store_bdu_test_map
+      store_modif_list_map
   in
   (*-------------------------------------------------------------------------------*)
   error, 
   {
-    store_bdu_creation_array      = store_bdu_creation_array;
-    store_bdu_test_array          = store_bdu_test_array;
+    store_bdu_update_array = store_bdu_update_array;
   }*)
   
 (************************************************************************************)
@@ -350,14 +344,14 @@ let scan_rule parameter error handler rule_id rule store_covering_classes
       store_result.store_bdu_build_map
   in
   (*-------------------------------------------------------------------------------*)
-  (*let error, store_bdu_fixpoint =
+(*  let error, store_bdu_fixpoint =
     scan_rule_fixpoint
       parameter
       error
-      handler
-      store_bdu_build_map.store_creation_bdu
-      store_bdu_build_map.store_test_bdu
-      store_result.store_bdu_fixpoint
+      store_bdu_analysis_dynamic.store_wl_creation
+      store_bdu_build_map.store_creation_bdu_map
+      store_bdu_build_map.store_test_bdu_map
+      store_bdu_build_map.store_modif_list_map
   in*)
   (*------------------------------------------------------------------------------*)
   (*store*)
@@ -454,16 +448,14 @@ let init_bdu_build_map parameter error =
 (************************************************************************************)
 (*init of bdu fixpoint*)
 
-(*let init_bdu_fixpoint parameter error =
-  let error, init_bdu_creation_array = AgentMap.create parameter error 0 in
-  let error, init_bdu_test_array     = AgentMap.create parameter error 0 in
+let init_bdu_fixpoint parameter error =
+  let init_bdu_update_array = Map_bdu_update.Map.empty in
   let init_bdu_fixpoint =
     {
-      store_bdu_creation_array = init_bdu_creation_array;
-      store_bdu_test_array     = init_bdu_test_array;
+      store_bdu_update_array = init_bdu_update_array;
     }
   in
-  error, init_bdu_fixpoint*)
+  error, init_bdu_fixpoint
 
 (************************************************************************************)
 (*rules*)

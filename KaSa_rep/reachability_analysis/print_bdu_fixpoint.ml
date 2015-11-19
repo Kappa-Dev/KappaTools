@@ -15,6 +15,7 @@
 open Printf
 open Bdu_analysis_type
 open Print_bdu_build_map
+open Remanent_parameters_sig
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "BDU creation") message exn (fun () -> default)  
@@ -23,38 +24,23 @@ let trace = false
 
 (************************************************************************************)
 
-let print_bdu_creation_array parameter error result =
-  AgentMap.print error
-    (fun error parameter array ->
+let print_bdu_update_array parameter error result =
+  Map_bdu_update.Map.iter (fun (agent_type, rule_id) (l1, l2) ->
+    if l1 <> []
+    then ()
+    else ();
+    let _ =
+      fprintf parameter.log "agent_type:%i:rule_id:%i\n" agent_type rule_id
+    in
+    List.iter (fun bdu_creation ->
       let _ =
-        Array.iteri (fun index bdu_creation ->
-          let _ =
-            fprintf stdout "index of this array:%i\n" index;
-            print_bdu parameter error bdu_creation
-          in
-          ()
-        ) array
+        let _ = print_bdu parameter error bdu_creation in
+        fprintf parameter.log "\n"
       in
-      error
-    ) parameter result
-
-(************************************************************************************)
-
-let print_bdu_test_array parameter error result =
-  AgentMap.print error
-    (fun error parameter array ->
-      let _ =
-        Array.iteri (fun index bdu_test ->
-          let _ =
-            fprintf stdout "index of this array:%i\n" index;
-            print_bdu parameter error bdu_test
-          in
-          ()
-        ) array
-      in
-      error
-    ) parameter result
-
+      ()
+    ) l2
+  ) result
+    
 (************************************************************************************)
 (*main print*)
 
@@ -67,15 +53,15 @@ let print_bdu_fixpoint parameter error result =
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
   in
-  (*let _ =
+  let _ =
     fprintf (Remanent_parameters.get_log parameter)
-      "- An array of bdu_creation:\n";
-    print_bdu_creation_array
+      "- An array of bdu views :\n";
+    print_bdu_update_array
       parameter
       error
-      result.store_bdu_creation_array    
+      result.store_bdu_update_array    
   in
-  let _ =
+  (*let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)

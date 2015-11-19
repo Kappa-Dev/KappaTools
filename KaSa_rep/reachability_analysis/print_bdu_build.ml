@@ -48,45 +48,61 @@ let print_remanent_triple parameter error result =
 (************************************************************************************)
 (*restriction of test rules*)
 
-let print_list l =
+let print_pair_list parameter l =
   let rec aux acc =
     match acc with
     | [] -> []
-    | (id, site, state) :: tl ->
-      fprintf stdout "covering_class_id:%i:site_type':%i:state:%i\n" 
-        id site state;
+    | (site, state) :: tl ->
+      fprintf parameter.log "site_type':%i:state:%i\n" site state;
       aux tl
   in aux l
 
-let print_pair_list p =
+let print_four_list parameter l =
   let rec aux acc =
     match acc with
     | [] -> []
-    | (rule_id, l) :: tl ->
+    | (agent_id, rule_id, cv_id, l) :: tl ->
       let _ = 
-        fprintf stdout "rule_id:%i:\n" rule_id
+        fprintf parameter.log
+          "agent_id:%i:rule_id:%i:covering_class_id:%i\n"
+          agent_id rule_id cv_id
       in
-      let _ = print_list l in
+      let _ = print_pair_list parameter l in
       aux tl
   in
-  aux p
+  aux l
 
 let print_remanent_test parameter error result =
   AgentMap.print error
-    (fun error parameter pair_list ->
+    (fun error parameter four_list ->
       let _ =
-        print_pair_list pair_list
+        print_four_list parameter four_list
       in
       error
     ) parameter result
 
 (************************************************************************************)
 
+let print_triple_list parameter l =
+  let rec aux acc =
+    match acc with
+    | [] -> []
+    | (rule_id, cv_id, l) :: tl ->
+      let _ = 
+        fprintf parameter.log
+          "rule_id:%i:covering_class_id:%i\n"
+          rule_id cv_id
+      in
+      let _ = print_pair_list parameter l in
+      aux tl
+  in
+  aux l
+
 let print_remanent_creation parameter error result =
   AgentMap.print error
-    (fun error parameter pair_list ->
+    (fun error parameter triple_list ->
       let _ =
-        print_pair_list pair_list
+        print_triple_list parameter triple_list
       in
       error
     ) parameter result
@@ -95,9 +111,9 @@ let print_remanent_creation parameter error result =
 
 let print_remanent_modif parameter error result =
   AgentMap.print error
-    (fun error parameter pair_list ->
+    (fun error parameter four_list ->
       let _ =
-        print_pair_list pair_list
+        print_four_list parameter four_list
       in
       error
     ) parameter result

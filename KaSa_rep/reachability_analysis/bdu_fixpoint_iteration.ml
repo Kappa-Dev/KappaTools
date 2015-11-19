@@ -22,6 +22,7 @@ open Site_map_and_set
 open Covering_classes_type
 open Bdu_build_common
 open Bdu_structure
+open Fifo
 
 (************************************************************************************)
 (*fixpoint iteration function*)
@@ -52,6 +53,7 @@ let is_belong bdu bdu_init =
   then true
   else false
     
+(*FIXME: where is f*)
 let comp_is_enable parameter error handler bdu_init bdu_test bdu_creation =
   let error, handler, bdu_X =
     f parameter error bdu_test
@@ -66,8 +68,7 @@ let comp_is_enable parameter error handler bdu_init bdu_test bdu_creation =
 (************************************************************************************)
 (*update bdu*)
 
-let compute_update parameter error rule_id handler bdu_test modif_list bdu_creation
-    bdu_remanent_array =
+let compute_update parameter error handler bdu_test list_a bdu_creation =
   let error, handler, bdu_inter_test_creation =
     f parameter error bdu_test
       (boolean_mvbdu_and parameter handler error parameter bdu_test) bdu_creation
@@ -75,43 +76,106 @@ let compute_update parameter error rule_id handler bdu_test modif_list bdu_creat
   let error, handler, bdu_assigment =
     f parameter error bdu_inter_test_creation
       (redefine parameter error parameter handler bdu_inter_test_creation)
-      modif_list
+      list_a
   in
   let error, handler, bdu_update =
     f parameter error bdu_assigment
       (boolean_mvbdu_or parameter handler error parameter bdu_assigment)
       bdu_creation
   in
-  let bdu_remanent_array =
+  error, bdu_update
+  (*let bdu_remanent_array =
     bdu_remanent_array.(rule_id) <- bdu_update;
     bdu_remanent_array
   in
-  error, bdu_remanent_array
+  error, bdu_remanent_array*)
 
 (************************************************************************************)
 
-(*let fixpoint_aux parameter error wl_creation store_bdu_creation_array =
+(*let collect_bdu_update_array parameter error
+    wl_creation 
+    store_bdu_creation_map
+    store_bdu_test_map
+    store_modif_list_map
+    =
+  let add_link (agent_type, rule_id) bdu_remanent store_result =
+    let (l, old) =
+      Map_bdu_update.Map.find_default ([], []) (agent_type, rule_id) store_result
+    in
+    let result_map =
+      Map_bdu_update.Map.add (agent_type, rule_id) (l, bdu_remanent :: []) 
+        store_result
+    in
+    error, result_map
+  in
+  let error, (handler, bdu_init) = bdu_init parameter error in
   (*iterate function over working list and the result of bdu_update*)
-  let rec aux acc_wl (error, bdu_remanent_array) =
+  let rec aux acc_wl (error, bdu_update_map) =
     (*if there is no working list*)
     if IntWL.is_empty acc_wl
     then 
-      (*return the result*)
-      error, bdu_remanent_array
+      error, bdu_update_map
     else
       (*pop the first elemenent (rule_id) in this working list out*)
       let error, (rule_id_op, wl_tl) =
         IntWL.pop parameter error acc_wl
       in
       match rule_id_op with
-      | None -> error, bdu_remanent_array
+      | None -> error, bdu_update_map
       | Some rule_id ->
-        (*get bdu_creation from this rule_id inside the bdu_creation array*)
-        
-
-
-
-
-
+        (*get bdu_creation from this rule_id inside the bdu_creation_map*)
+        if Map_creation_bdu.Map.is_empty store_bdu_creation_map &&
+          Map_test_bdu.Map.is_empty store_bdu_test_map &&
+          Map_modif_list.Map.is_empty store_modif_list_map
+        then error, bdu_update_map (*waring*)
+        else
+          begin
+            Map_creation_bdu.Map.fold (fun (agent_type, rule_id_creation)
+              (l1, bdu_creation) (error, store_result_map1) ->
+                Map_test_bdu.Map.fold (fun (agent_type_test, rule_id_test)
+                  (l2, bdu_test) (error, store_result_map2) ->
+                    Map_modif_list.Map.fold (fun (agent_type_modif, rule_id_modif)
+                      (l3, list_a) (error, store_result_map3) ->
+                        if rule_id = rule_id_creation
+                        then
+                          begin
+                            (*build a list of type List_sig.list for modif_list*)
+                            (*check the enable rule*)
+                            let error, is_enable =
+                              comp_is_enable
+                                parameter
+                                error
+                                handler
+                                bdu_init
+                                bdu_test
+                                bdu_creation
+                            in
+                            (*is not enable*)
+                            if is_enable
+                            then
+                              (*update bdu*)
+                              let error, bdu_update =
+                                compute_update
+                                  parameter
+                                  error
+                                  handler
+                                  bdu_test
+                                  list_a
+                                  bdu_creation                            
+                              in
+                              let error, result_map =
+                                add_link (agent_type, rule_id) bdu_update store_result_map3
+                              in
+                              aux wl_tl (error, result_map)
+                            else
+                              (*continue with old_result*)
+                              aux wl_tl (error, store_result_map3)                          
+                          end
+                        else
+                          aux wl_tl (error, store_result_map1)
+                    ) store_modif_list_map (error, store_result_map2) (*FIXME*)
+                ) store_bdu_test_map (error, store_result_map1)
+            ) store_bdu_creation_map (error, bdu_update_map)
+          end
   in
-  aux wl_creation (error, [||])*)
+  aux wl_creation (error, Map_bdu_update.Map.empty)*)
