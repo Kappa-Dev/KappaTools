@@ -144,6 +144,4 @@ List of rules to awake when the state of a site is modified and tested:
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
-agent_type_ false
-
 execution finished without any exception

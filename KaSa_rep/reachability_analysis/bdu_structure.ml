@@ -188,24 +188,24 @@ let collect_creation_bdu_map parameter error store_creation_map =
 
 let collect_modif_list_map parameter error store_modif_map =
   (*let error, (handler, bdu_init) = bdu_init parameter error in*)
-  let add_link (agent_id, agent_type, rule_id, cv_id) list store_result =
+  let add_link (agent_id, agent_type, rule_id, cv_id) pair_list store_result =
     let (l, old) =
       Map_modif_list.Map.find_default ([], []) 
         (agent_id, agent_type, rule_id, cv_id) store_result
     in
     let result_map =
       Map_modif_list.Map.add (agent_id, agent_type, rule_id, cv_id)
-        (l, list) store_result (*NOTE: get only a list of each rule*)
+        (l, pair_list) store_result (*NOTE: get only a list of each rule*)
     in
     error, result_map
   in
   Map_modif.Map.fold (fun (agent_id, agent_type, rule_id, cv_id)
     (l1, l2) (error, store_result) ->
     (*return a list of a pair (site, state) *)
-    let error, list =
+    let error, pair_list =
       List.fold_left (fun (error, current_list) (site, state) ->
-        let list = site :: current_list in
-        error, list
+        let pair_list = (site, state) :: current_list in
+        error, pair_list
       ) (error, []) l2
     in
     (*build hanlder and list_a from modification list*)
@@ -219,7 +219,7 @@ let collect_modif_list_map parameter error store_modif_map =
     in*)
     (*store handler, bdu_test in a map with (agent_type, rule_id) *)
     let error, store_result =
-      add_link (agent_id, agent_type, rule_id, cv_id) list store_result
+      add_link (agent_id, agent_type, rule_id, cv_id) pair_list store_result
     in
     error, store_result
   ) store_modif_map (error, Map_modif_list.Map.empty)

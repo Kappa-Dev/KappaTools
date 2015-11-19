@@ -24,7 +24,7 @@ let trace = false
 
 (************************************************************************************)
 
-(*let print_bdu_update_map parameter error result =
+let print_bdu_update_map parameter error result =
   Map_bdu_update.Map.iter (fun (agent_type, cv_id) (l1, l2) ->
     if l1 <> []
     then ()
@@ -39,11 +39,11 @@ let trace = false
       in
       ()
     ) l2
-  ) result*)
+  ) result
 
-let print_bdu_update_map parameter error result =
+(*let print_bdu_update_map parameter error result =
   let _ = print_bdu parameter error result in
-    fprintf parameter.log "\n"
+  fprintf parameter.log "\n"*)
     
 (************************************************************************************)
 (*main print*)

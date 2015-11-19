@@ -260,6 +260,8 @@ let scan_rule_fixpoint parameter error rule store_wl_creation
     store_bdu_test_map
     store_remanent_creation
     store_creation_bdu_map
+    store_remanent_modif
+    store_modif_list_map
     store_result
     =
   let error, store_bdu_update_map =
@@ -272,6 +274,8 @@ let scan_rule_fixpoint parameter error rule store_wl_creation
       store_bdu_test_map
       store_remanent_creation
       store_creation_bdu_map
+      store_remanent_modif
+      store_modif_list_map
       store_result.store_bdu_update_map
   in
   (*-------------------------------------------------------------------------------*)
@@ -343,6 +347,8 @@ let scan_rule parameter error handler rule_id rule store_covering_classes
       store_bdu_build_map.store_test_bdu_map
       store_bdu_build.store_remanent_creation
       store_bdu_build_map.store_creation_bdu_map
+      store_bdu_build.store_remanent_modif
+      store_bdu_build_map.store_modif_list_map
       store_result.store_bdu_fixpoint
   in
   (*------------------------------------------------------------------------------*)
@@ -437,9 +443,9 @@ let init_bdu_build_map parameter error =
 (*init of bdu fixpoint*)
 
 let init_bdu_fixpoint parameter error = (*TODO*)
-  let error, (handler, bdu_init) = Bdu_build_common.bdu_init parameter error in
-  (*let init_bdu_update_map = Map_bdu_update.Map.empty in*)
-  let init_bdu_update_map = bdu_init in
+  (*let error, (handler, bdu_init) = Bdu_build_common.bdu_init parameter error in*)
+  let init_bdu_update_map = Map_bdu_update.Map.empty in
+  (*let init_bdu_update_map = bdu_init in*)
   let init_bdu_fixpoint =
     {
       store_bdu_update_map = init_bdu_update_map;

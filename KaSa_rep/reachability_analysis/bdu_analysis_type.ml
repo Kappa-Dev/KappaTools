@@ -205,7 +205,7 @@ type bdu_build_map =
     store_remanent_modif_map    : (int list * (int * int) list) Map_modif.Map.t;
     store_creation_bdu_map      : (int list * bool Mvbdu_sig.mvbdu) Map_creation_bdu.Map.t;
     store_test_bdu_map          : (int list * bool Mvbdu_sig.mvbdu) Map_test_bdu.Map.t;
-    store_modif_list_map        : (int list * int list) Map_modif_list.Map.t
+    store_modif_list_map        : (int list * (int * int) list) Map_modif_list.Map.t
   }
 
 (************************************************************************************)
@@ -213,8 +213,7 @@ type bdu_build_map =
 
 type bdu_fixpoint =
   {
-    (*store_bdu_update_map : (int list * bool Mvbdu_sig.mvbdu) Map_bdu_update.Map.t ;*)
-    store_bdu_update_map : bool Mvbdu_sig.mvbdu;
+    store_bdu_update_map : (int list * bool Mvbdu_sig.mvbdu list) Map_bdu_update.Map.t;
   }
 
 (************************************************************************************)

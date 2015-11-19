@@ -129,8 +129,8 @@ let print_modif_list_map parameter error result =
           "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i\n"
           agent_id agent_type rule_id cv_id
       in
-      List.iter (fun site ->
-          fprintf parameter.log "site_type:%i\n" site;
+      List.iter (fun (site, state) ->
+          fprintf parameter.log "site_type:%i:state:%i\n" site state;
       ) l2
     ) result
 
