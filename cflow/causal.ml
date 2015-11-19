@@ -161,10 +161,8 @@ let is_empty_grid grid = (Hashtbl.length grid.flow = 0)
 
 let grid_add quark eid (attribute:attribute) grid =
   let () =
-    try
-      let _ = Hashtbl.find grid.flow quark in ()
-    with _ -> Hashtbl.add grid.pid_to_init quark eid
-  in
+    if not (Hashtbl.mem grid.flow quark)
+    then Hashtbl.add grid.pid_to_init quark eid in
   Hashtbl.replace grid.flow quark attribute ;
   grid
 
@@ -224,7 +222,7 @@ let add_actions env grid event_number kind actions =
       | Instantiation.Remove (_,na as ag)) :: q ->
        let sigs = Environment.signatures env in
        let ag_intf = Signature.get sigs na in
-       let grid = add (ag,0) true atom_modified grid event_number kind in 
+       let grid = add (ag,-1) true atom_modified grid event_number kind in
        let grid =
 	 Signature.fold
 	   (fun site _ grid ->
@@ -241,7 +239,7 @@ let add_tests grid event_number kind tests =
   let rec aux grid = function
     | [] -> grid
     | Instantiation.Is_Here ag :: q ->
-       aux (add (ag,0) true atom_tested grid event_number kind) q
+       aux (add (ag,-1) true atom_tested grid event_number kind) q
     | Instantiation.Has_Internal (site,_) :: q ->
        aux (add site false atom_tested grid event_number kind) q
     | (Instantiation.Is_Free site
