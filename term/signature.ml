@@ -52,10 +52,7 @@ let create_t ast_intf =
 	   Ast.LNK_TYPE _ | Ast.LNK_VALUE _), pos) ->
 	  raise (ExceptionDefn.Malformed_Decl
 		("Link status inside a definition of signature", pos))
-      ) ({Ast.port_nme =Location.dummy_annot "_";
-	  Ast.port_int=[];
-	  Ast.port_lnk =Location.dummy_annot Ast.FREE;}
-	 :: ast_intf))
+      ) ast_intf)
 
 let print_one f sign =
   Format.fprintf
@@ -63,17 +60,15 @@ let print_one f sign =
     (NamedDecls.print
        ~sep:(fun f -> Format.fprintf f ",@,")
        (fun _ name f ints ->
-	if name = "_" then ()
-	else
-	  let pp_int f =
-	    match ints with
-	    | None -> ()
-	    | Some nd ->
-	       NamedDecls.print
-		 ~sep:(fun _ -> ())
-		 (fun _ na f () -> Format.fprintf f "~%s" na) f nd
-	  in
-	  Format.fprintf f "%s%t" name pp_int))
+	let pp_int f =
+	  match ints with
+	  | None -> ()
+	  | Some nd ->
+	     NamedDecls.print
+	       ~sep:(fun _ -> ())
+	       (fun _ na f () -> Format.fprintf f "~%s" na) f nd
+	in
+	Format.fprintf f "%s%t" name pp_int))
     sign
 
 type s = t NamedDecls.t

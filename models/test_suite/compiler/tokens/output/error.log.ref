@@ -4,7 +4,7 @@ _____(1)
 
 Environment:
   Signatures:
-    A(,x)
+    A(x)
   Tokens: tt
   Alg_expr:
     

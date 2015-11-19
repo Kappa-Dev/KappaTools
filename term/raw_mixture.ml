@@ -17,7 +17,7 @@ let print_intf with_link sigs ag_ty f (ports,ints) =
 		 ints.(i) (if with_link then print_link else (fun _ _ -> ()))
 			  ports.(i) in
       aux false (succ i) in
-  aux true 1
+  aux true 0
 
 let print_agent with_link sigs f ag =
   Format.fprintf f "%a(@[<h>%a@])" (Signature.print_agent sigs) ag.a_type

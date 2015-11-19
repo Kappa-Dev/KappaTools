@@ -25,7 +25,7 @@ let print_site ?sigs place f site =
      Connected_component.ContentAgent.print_site ?sigs n f site
   | Fresh (ty,_) ->
      match sigs with
-     | None -> Format.pp_print_int f ty
+     | None -> Format.pp_print_int f site
      | Some sigs -> Signature.print_site sigs ty f site
 
 let print_internal ?sigs place site f id =
@@ -34,7 +34,7 @@ let print_internal ?sigs place site f id =
      Connected_component.ContentAgent.print_internal ?sigs n site f id
   | Fresh (ty,_) ->
      match sigs with
-     | None -> Format.pp_print_int f id
+     | None -> Format.fprintf f "%i~%i" site id
      | Some sigs ->
 	Signature.print_site_internal_state sigs ty site f (Some id)
 

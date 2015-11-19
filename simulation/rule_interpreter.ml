@@ -121,7 +121,6 @@ NB inj should not change if [is_add] is false*)
 	 if is_add then Edges.add_free id s edges
 	 else Edges.remove_free id s edges in
        let new_obs =
-	 if s = 0 then [],Operator.DepSet.empty else
 	 Connected_component.Matching.observables_from_free
 	   domain (if is_add then edges' else edges) ty id s in (*this hack should disappear when chekcing O\H only*)
        (inj2graph',edges',new_obs)

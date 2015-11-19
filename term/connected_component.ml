@@ -40,6 +40,7 @@ type point = {
 type work = {
   sigs: Signature.s;
   cc_env: point IntMap.t;
+  cc_single_ag: (cc * Operator.DepSet.t) IntMap.t;
   reserved_id: int list array;
   used_id: int list array;
   free_id: int;
@@ -89,6 +90,10 @@ let raw_find_ty tys id =
 
 let find_ty cc id = raw_find_ty cc.nodes_by_type id
 
+let add_origin deps = function
+  | None -> deps
+  | Some x -> Operator.DepSet.add x deps
+
 (** Errors *)
 let already_specified ?sigs x i =
   ExceptionDefn.Malformed_Decl
@@ -113,9 +118,15 @@ let print_node_id sigs f = function
   | Fresh (ty,id) ->
      Format.fprintf f "!%a-%i" (Signature.print_agent sigs) ty id
 
-let print_node_site sigs cc n =
-  Signature.print_site
-    sigs (match n with Existing id -> find_ty cc id | Fresh (ty,_) -> ty)
+let print_node_site ?source sigs cc n =
+  let ty =
+    match n with
+    | Fresh (ty,_) -> ty
+    | Existing id ->
+       match source with
+       | Some (Fresh (ty,id')) when id = id' -> ty
+       | (None | Some (Fresh _ | Existing _)) -> find_ty cc id in
+  Signature.print_site sigs ty
 
 let print_node_internal sigs cc n =
   Signature.print_site_internal_state
@@ -129,7 +140,7 @@ let print_edge sigs cc f = function
      Format.fprintf f "-%a_%a-%a_%a->" (print_node_id sigs) source
 		    (print_node_site sigs cc source) site
 		    (print_node_id sigs) id
-		    (print_node_site sigs cc id) port
+		    (print_node_site ~source sigs cc id) port
   | (source,site), ToInternal i ->
      Format.fprintf f "-%a_%a->" (print_node_id sigs) source
 		    (print_node_internal sigs cc source site) (Some i)
@@ -147,79 +158,85 @@ let find_root cc =
 
 (*turns a cc into a path(:list) in the domain*)
 let to_navigation (full:bool) cc =
-  let rec build_for out don = function
+  let rec build_for (_,out as acc) don = function
     | [] -> List.rev out
     | h ::  t ->
-       let out_ints =
-	 if full then
+       let first_ints,out_ints =
 	   Tools.array_fold_lefti
-	     (fun i acc v ->
-	      if v < 0 then acc else ((Existing h,i),ToInternal v)::acc)
-	     out (IntMap.find_default [||] h cc.internals)
-	 else out 
+	     (fun i (first,out as acc) v ->
+	      if (full || first) && v >= 0 then
+		(false,
+		 (((if first then Fresh (find_ty cc h,h) else Existing h),i),
+		  ToInternal v)::out)
+	      else acc)
+	     acc (IntMap.find_default [||] h cc.internals)
        in
-       let news,out_lnk,todo =
+       let first_lnk,out'',todo =
 	 Tools.array_fold_lefti
-	   (fun i (news,ans,re as acc) ->
+	   (fun i (first,ans,re as acc) ->
 	    function
 	    | UnSpec -> acc
 	    | Free ->
-	       if full && i > 0
-	       then (news,((Existing h,i),ToNothing)::ans,re)
+	       if full || first
+	       then (false,
+		     (((if first then Fresh (find_ty cc h,h) else Existing h),i),
+		      ToNothing)::ans,re)
 	       else acc
 	    | Link (n,l) ->
 	       if List.mem n don then acc
 	       else if n = h || List.mem n re
 	       then
-		 if full then (news,((Existing h,i),ToNode (Existing n,l))::ans ,re)
+		 if full
+		 then (false,
+		       (((if first then Fresh (find_ty cc h,h) else Existing h),i),
+			ToNode (Existing n,l))::ans ,re)
 		 else acc
 	       else
-		 ((Existing h,i),(n,l))::news, ans, n::re)
-	   ([],[],t) (IntMap.find_default [||] h cc.links) in
-       let out' =
+		 (false,(((if first then Fresh (find_ty cc h,h) else Existing h),i),
+			 ToNode(Fresh(find_ty cc n,n),l))::ans, n::re))
+	   (first_ints,out_ints,t) (IntMap.find_default [||] h cc.links) in
+(*       let out' =
 	 List.fold_left (fun acc (x,(n,s)) ->
-			 (x,ToNode(Fresh(find_ty cc n,n),s))::acc) out_ints
+			 (x,)::acc) out_ints
 			(List.sort (fun (_,(a,_)) (_,(b,_)) ->
 				    Mods.int_compare a b) news) in
-       let out'' = List.rev_append out_lnk out' in
-       build_for out'' (h::don) todo 
+       let out'' = List.rev_append out_lnk out' in*)
+       build_for (first_lnk,out'') (h::don) todo
   in
   match find_root cc with
   | None -> [] (*empty path for x0*)
-  | Some (i,x) -> (*(ag_sort,ag_id)*)
-     build_for [(Fresh (i,x),0),ToNothing] (*wip*) [] (*already_done*) [x] (*todo*)
+  | Some (_,x) -> (*(ag_sort,ag_id)*)
+     build_for (true,[]) (*wip*) [] (*already_done*) [x] (*todo*)
 
 let print ?sigs with_id f cc =
   let print_intf (_,_,ag_i as ag) link_ids internals neigh =
     snd
       (Tools.array_fold_lefti
 	 (fun p (not_empty,(free,link_ids as out)) el ->
-	  if p = 0 then (not_empty, out)
-	  else
-	    let () =
-	      if internals.(p) >= 0
-	      then Format.fprintf f "%t%a"
-				  (if not_empty then Pp.comma else Pp.empty)
-				  (ContentAgent.print_internal ?sigs ag p) internals.(p)
-	      else
-		if  el <> UnSpec then
-		  Format.fprintf f "%t%a"
-				 (if not_empty then Pp.comma else Pp.empty)
-				 (ContentAgent.print_site ?sigs ag) p in
-	    match el with
-	    | UnSpec ->
-	       if internals.(p) >= 0
-	       then let () = Format.fprintf f "?" in (true,out)
-	       else (not_empty,out)
-	    | Free -> true,out
-	    | Link (dst_a,dst_p) ->
-	       let i,out' =
-		 match Int2Map.find_option (dst_a,dst_p) link_ids with
-		 | Some x -> (x, out)
-		 | None ->
-		   (free,(succ free, Int2Map.add (ag_i,p) free link_ids)) in
-	       let () = Format.fprintf f "!%i" i in
-	       true,out') (false,link_ids) neigh) in
+	  let () =
+	    if internals.(p) >= 0
+	    then Format.fprintf f "%t%a"
+				(if not_empty then Pp.comma else Pp.empty)
+				(ContentAgent.print_internal ?sigs ag p) internals.(p)
+	    else
+	      if  el <> UnSpec then
+		Format.fprintf f "%t%a"
+			       (if not_empty then Pp.comma else Pp.empty)
+			       (ContentAgent.print_site ?sigs ag) p in
+	  match el with
+	  | UnSpec ->
+	     if internals.(p) >= 0
+	     then let () = Format.fprintf f "?" in (true,out)
+	     else (not_empty,out)
+	  | Free -> true,out
+	  | Link (dst_a,dst_p) ->
+	     let i,out' =
+	       match Int2Map.find_option (dst_a,dst_p) link_ids with
+	       | Some x -> (x, out)
+	       | None ->
+		  (free,(succ free, Int2Map.add (ag_i,p) free link_ids)) in
+	     let () = Format.fprintf f "!%i" i in
+	     true,out') (false,link_ids) neigh) in
   let () = Format.pp_open_box f 2 in
   let () = if with_id then Format.fprintf f "/*cc%i*/@ " cc.id in
   let (_,_) =
@@ -241,19 +258,16 @@ let print_dot sigs f cc =
     | UnSpec -> ()
     | Free ->
        let n = (cc.id,find_ty cc x,x) in
-       if i <> 0 then
-	 let () = Format.fprintf
-		    f "@[%a@ [label=\"%t\",@ height=\".1\",@ width=\".1\""
-		    (ContentAgent.print_site ?sigs:None n) i Pp.bottom in
-	 let () =
-	   Format.fprintf f ",@ margin=\".05,.02\",@ fontsize=\"11\"];@]@," in
-	 let () = Format.fprintf
-		    f "@[<b>%a ->@ %a@ @[[headlabel=\"%a\",@ weight=\"25\""
-		    (ContentAgent.print_site ?sigs:None n) i (ContentAgent.print ?sigs:None) n
-		    (ContentAgent.print_site ~sigs n) i in
-	 Format.fprintf f",@ arrowhead=\"odot\",@ minlen=\".1\"]@];@]@,"
-       else Format.fprintf f "@[%a [label=\"%a\"]@];@,"
-			   (ContentAgent.print ?sigs:None) n (ContentAgent.print ~sigs) n
+       let () = Format.fprintf
+		  f "@[%a@ [label=\"%t\",@ height=\".1\",@ width=\".1\""
+		  (ContentAgent.print_site ?sigs:None n) i Pp.bottom in
+       let () =
+	 Format.fprintf f ",@ margin=\".05,.02\",@ fontsize=\"11\"];@]@," in
+       let () = Format.fprintf
+		  f "@[<b>%a ->@ %a@ @[[headlabel=\"%a\",@ weight=\"25\""
+		  (ContentAgent.print_site ?sigs:None n) i (ContentAgent.print ?sigs:None) n
+		  (ContentAgent.print_site ~sigs n) i in
+       Format.fprintf f",@ arrowhead=\"odot\",@ minlen=\".1\"]@];@]@,"
     | Link (y,j) ->
        let n = (cc.id,find_ty cc x,x) in
        let n' = (cc.id,find_ty cc y,y) in
@@ -277,13 +291,22 @@ let print_dot sigs f cc =
 	Format.fprintf f ",@ margin=\".05,.02\",@ fontsize=\"11\"];@]@," in
       let () = Format.fprintf
 		 f "@[<b>%ai ->@ %a@ @[[headlabel=\"%a\",@ weight=25"
-		 (ContentAgent.print_site ?sigs:None n) i (ContentAgent.print ?sigs:None) n
+		 (ContentAgent.print_site ?sigs:None n) i
+		 (ContentAgent.print ?sigs:None) n
 		 (ContentAgent.print_site ~sigs n) i in
       Format.fprintf f ",@ arrowhead=\"odot\",@ minlen=\".1\"]@];@]@," in
   let pp_slot pp_el f (x,a) =
     Pp.array (fun _ -> ()) (pp_el x) f a in
   Format.fprintf
-    f "@[<v>subgraph %i {@,%a%a}@]" cc.id
+    f "@[<v>subgraph %i {@,%a%a%a}@]" cc.id
+    (Pp.array (fun f -> Format.pp_print_cut f ())
+	      (fun _ -> Pp.list (fun f -> Format.pp_print_cut f ())
+				(fun f x ->
+				 let n = (cc.id,find_ty cc x,x) in
+				 Format.fprintf f "@[%a [label=\"%a\"]@];@,"
+						(ContentAgent.print ?sigs:None) n
+						(ContentAgent.print ~sigs) n)))
+    cc.nodes_by_type
     (Pp.set ~trailing:(fun f -> Format.pp_print_cut f ())
 	    IntMap.bindings (fun f -> Format.pp_print_cut f ())
 	    (pp_slot pp_one_node)) cc.links
@@ -316,7 +339,9 @@ let print_point_dot sigs f (id,point) =
 module Env : sig
   type t
 
-  val fresh : Signature.s -> int list array -> int -> point IntMap.t -> t
+  val fresh :
+    Signature.s -> int list array -> int -> point IntMap.t ->
+    (cc * Operator.DepSet.t) IntMap.t -> t
   val empty : Signature.s -> t
   val sigs : t -> Signature.s
   val find : t -> cc -> (int * Renaming.t list * point) option
@@ -324,6 +349,8 @@ module Env : sig
     t -> (nav_port*arrow) list -> (int * Renaming.t list * point) option
   val get : t -> int -> point
   val add_point : int -> point -> t -> t
+  val add_single_agent : int -> cc -> Operator.rev_dep option -> t -> cc * t
+  val get_single_agent : int -> t -> (cc * Operator.DepSet.t) option
   val to_work : t -> work
   val nb_ag : t -> int
   val print : Format.formatter -> t -> unit
@@ -334,15 +361,17 @@ end = struct
     id_by_type: int list array;
     nb_id: int;
     domain: point IntMap.t;
+    single_agent_points: (cc*Operator.DepSet.t) IntMap.t;
     mutable used_by_a_begin_new: bool;
   }
 
-let fresh sigs id_by_type nb_id domain =
+let fresh sigs id_by_type nb_id domain single_agent_points =
   {
     sig_decl = sigs;
     id_by_type = id_by_type;
     nb_id = nb_id;
     domain = domain;
+    single_agent_points = single_agent_points;
     used_by_a_begin_new = false;
   }
 
@@ -353,13 +382,20 @@ let empty sigs =
 		  links = IntMap.empty; internals = IntMap.empty;} in
   let empty_point =
     {content = empty_cc; is_obs_of = None; fathers = []; sons = [];} in
-  fresh sigs nbt' 1 (IntMap.add 0 empty_point IntMap.empty)
+  fresh sigs nbt' 1 (IntMap.add 0 empty_point IntMap.empty) IntMap.empty
 
 let check_vitality env = assert (env.used_by_a_begin_new = false)
 
 let print f env =
   Format.fprintf
-    f "@[<v>%a@]"
+    f "@[<v>%a%a@]"
+    (Pp.set IntMap.bindings Pp.space ~trailing:Pp.space
+	    (fun f (_,(cc,deps)) ->
+	     Format.fprintf f "@[<h>%a@] @[[%a]@]"
+			    (print ~sigs:env.sig_decl true) cc
+			    (Pp.set Operator.DepSet.elements Pp.space Operator.print_rev_dep)
+			    deps))
+    env.single_agent_points
     (Pp.set IntMap.bindings Pp.space
 	    (fun f (_,p) ->
 	     Format.fprintf f "@[<hov 2>(%a)@ -> @[<h>%a@]@ %t-> @[(%a)@]@]"
@@ -393,8 +429,26 @@ let add_point id el env =
     id_by_type = env.id_by_type;
     nb_id = env.nb_id;
     domain = IntMap.add id el env.domain;
+    single_agent_points = env.single_agent_points;
     used_by_a_begin_new = false;
   }
+
+let add_single_agent ty cc origin env =
+  let (cc',deps) =
+    IntMap.find_default (cc,Operator.DepSet.empty) ty env.single_agent_points in
+  cc',
+  {
+    sig_decl = env.sig_decl;
+    id_by_type = env.id_by_type;
+    nb_id = env.nb_id;
+    domain = env.domain;
+    single_agent_points =
+      IntMap.add ty (cc', add_origin deps origin) env.single_agent_points;
+    used_by_a_begin_new = false;
+  }
+
+let get_single_agent ty env =
+  IntMap.find_option ty env.single_agent_points
 
 let get env cc_id =
   match IntMap.find_option cc_id env.domain with
@@ -402,9 +456,11 @@ let get env cc_id =
   | None -> raise Not_found
 
 let fresh_id env =
+  let max_id_single =
+    IntMap.fold (fun _ (cc,_) x -> max x cc.id) env.single_agent_points 0 in
   match IntMap.max_key env.domain with
-  | Some i -> succ i
-  | None -> 0
+  | Some i -> succ (max max_id_single i)
+  | None -> max_id_single
 
 let sigs env = env.sig_decl
 
@@ -414,6 +470,7 @@ let to_work env =
   {
     sigs = env.sig_decl;
     cc_env = env.domain;
+    cc_single_ag = env.single_agent_points;
     reserved_id = env.id_by_type;
     used_id = Array.make (Array.length env.id_by_type) [];
     free_id = env.nb_id;
@@ -533,20 +590,15 @@ let propagate_add_obs obs_id env cc_id =
 
 exception Found
 
-let update_cc cc_id cc ag_id links internals =
-  { id = cc_id;
-    nodes_by_type = cc.nodes_by_type;
-    internals = IntMap.add ag_id internals cc.internals;
-    links = IntMap.add ag_id links cc.links;}
-
-let remove_ag_cc cc_id cc ag_id =
+let remove_ag_cc inj2cc cc_id cc ag_id =
   let ty = find_ty cc ag_id in
   match cc.nodes_by_type.(ty) with
   | [] -> assert false
-  | max :: tail ->
-     let to_subst =
-       Renaming.cyclic_permutation_from_identity
-	 max ag_id (identity_injection cc) max tail in
+  | max :: tail as list ->
+     let cycle =
+       Renaming.cyclic_permutation_from_list
+	 ~stop_at:ag_id list in
+     let to_subst = Renaming.compose inj2cc cycle in
      let new_nbt =
        Array.mapi (fun i l -> if i = ty then tail else l) cc.nodes_by_type in
      if Renaming.is_identity to_subst then
@@ -562,7 +614,7 @@ let remove_ag_cc cc_id cc ag_id =
 	      if s = max || s = d then map else
 		let tmp = IntMap.find_default [||] max map in
 		let map' = IntMap.add max (IntMap.find_default [||] s map) map in
-		IntMap.add s tmp map') (Renaming.to_list to_subst) map in
+		IntMap.add s tmp map') (Renaming.to_list cycle) map in
 	 IntMap.remove max map' in
        let new_ints = swip cc.internals in
        let prelinks = swip cc.links in
@@ -571,10 +623,22 @@ let remove_ag_cc cc_id cc ag_id =
 	   (fun a -> Array.map (function
 				 | (UnSpec | Free) as x -> x
 				 | Link (n,s) as x ->
-				    try Link (Renaming.apply to_subst n,s)
-				    with Not_found -> x) a) prelinks in
+				    try Link (Renaming.apply cycle n,s)
+				    with Renaming.Undefined -> x) a) prelinks in
        { id = cc_id; nodes_by_type = new_nbt;
 	 links = new_links; internals = new_ints;},to_subst
+
+let update_cc inj2cc cc_id cc ag_id links internals =
+  if
+    Array.fold_left
+      (fun x -> function UnSpec -> x | (Free | Link _) -> false) true links
+    && Array.fold_left (fun x i -> x && i < 0) true internals
+  then true,remove_ag_cc inj2cc cc_id cc ag_id
+  else
+    false,({ id = cc_id;
+      nodes_by_type = cc.nodes_by_type;
+      internals = IntMap.add ag_id internals cc.internals;
+      links = IntMap.add ag_id links cc.links;}, inj2cc)
 
 let compute_cycle_edges cc =
   let rec aux don acc path ag_id =
@@ -609,20 +673,35 @@ let compute_cycle_edges cc =
 
 let remove_cycle_edges complete_domain_with obs_id dst env free_id cc =
   let rec aux ((f_id,env'),out as acc) = function
-    | ((Existing n,i),ToNode(Existing n',i') as e) :: q ->
+    | ((Existing n,i),ToNode(Existing n',i')) :: q ->
        let links = IntMap.find_default [||] n cc.links in
        let int = IntMap.find_default [||] n cc.internals in
        let links' = Array.copy links in
        let () = links'.(i) <- UnSpec in
-       let cc_tmp = update_cc f_id cc n links' int in
-       let links_dst = IntMap.find_default [||] n' cc_tmp.links in
-       let int_dst = IntMap.find_default [||] n' cc_tmp.internals in
+       let has_removed,(cc_tmp,inj2cc) =
+	 update_cc (identity_injection cc) f_id cc n links' int in
+       let new_n' = Renaming.apply inj2cc n' in
+       let links_dst = IntMap.find_default [||] new_n' cc_tmp.links in
+       let int_dst = IntMap.find_default [||] new_n' cc_tmp.internals in
        let links_dst' = Array.copy links_dst in
        let () = links_dst'.(i') <- UnSpec in
-       let cc' = update_cc f_id cc_tmp n' links_dst' int_dst in
+       let has_removed',(cc',inj2cc') =
+	 update_cc inj2cc f_id cc_tmp new_n' links_dst' int_dst in
+       let e' =
+	 if n = n' && has_removed'
+	 then
+	   (Fresh (find_ty cc n,Renaming.apply inj2cc' n),i),
+	   ToNode (Existing (Renaming.apply inj2cc' n),i')
+	 else
+	   ((if has_removed
+	     then Fresh (find_ty cc n,Renaming.apply inj2cc' n)
+	     else Existing (Renaming.apply inj2cc' n)),i),
+	   ToNode ((if has_removed'
+		    then Fresh (find_ty cc n',Renaming.apply inj2cc' n')
+		    else Existing (Renaming.apply inj2cc' n')),i') in
        let pack,ans =
 	 complete_domain_with obs_id dst env' (succ f_id)
-			      cc' e (identity_injection cc) in
+			      cc' e' inj2cc' in
        aux (pack,ans::out) q
     | [] -> acc
     | (((Existing _,_),ToNode(Fresh _,_)) |
@@ -636,7 +715,7 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
       let () = Array.iter (fun el -> if el >= 0 then raise Found) internals in
       let () =
 	Array.iteri
-	  (fun i el -> if i>0 && i<>lp && el<>UnSpec then raise Found) links in
+	  (fun i el -> if i<>lp && el<>UnSpec then raise Found) links in
       true
     with Found -> false in
   let remove_one_internal acc ag_id links internals =
@@ -645,10 +724,15 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
        if el >= 0 then
 	 let int' = Array.copy internals in
 	 let () = int'.(i) <- -1 in
+	 let has_removed,(cc',inj2cc') =
+	   update_cc (identity_injection cc) f_id cc ag_id links int' in
 	 let pack,ans =
 	   complete_domain_with
-	     obs_id dst env' (succ f_id) (update_cc f_id cc ag_id links int')
-	     ((Existing ag_id,i),ToInternal el) (identity_injection cc) in
+	     obs_id dst env' (succ f_id) cc'
+	     (((if has_removed
+		then Fresh (find_ty cc ag_id, Renaming.apply inj2cc' ag_id)
+		else Existing (Renaming.apply inj2cc' ag_id)),i),ToInternal el)
+	     inj2cc' in
 	 (pack,ans::out)
        else acc)
       acc internals in
@@ -658,41 +742,41 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
        function
        | UnSpec -> acc
        | Free ->
-	  if i = 0 then acc else
-	    let links' = Array.copy links in
-	    let () = links'.(i) <- UnSpec in
-	    let pack,ans =
-	      complete_domain_with
-		obs_id dst env' (succ f_id)
-		(update_cc f_id cc ag_id links' internals)
-		((Existing ag_id,i),ToNothing) (identity_injection cc) in
-	    (pack,ans::out)
+	  let links' = Array.copy links in
+	  let () = links'.(i) <- UnSpec in
+	  let has_removed,(cc',inj2cc') =
+	    update_cc (identity_injection cc) f_id cc ag_id links' internals in
+	  let pack,ans =
+	    complete_domain_with
+	      obs_id dst env' (succ f_id) cc'
+	      (((if has_removed
+		 then Fresh (find_ty cc ag_id,Renaming.apply inj2cc' ag_id)
+		 else Existing (Renaming.apply inj2cc' ag_id)),i),ToNothing)
+		 inj2cc' in
+	  (pack,ans::out)
        | Link (n',i') ->
 	  if not (agent_is_removable i links internals) then acc else
 	    let links_dst = IntMap.find_default [||] n' cc.links in
 	    let int_dst = IntMap.find_default [||] n' cc.internals in
 	    let links_dst' = Array.copy links_dst in
 	    let () = links_dst'.(i') <- UnSpec in
-	    let cc',inj2cc' =
-	      remove_ag_cc f_id (update_cc f_id cc n' links_dst' int_dst)
-			   ag_id in
+	    let has_removed,(cc',inj2cc') =
+	      update_cc (identity_injection cc) f_id cc n' links_dst' int_dst in
+	    let cc'',inj2cc'' =
+	      remove_ag_cc inj2cc' f_id cc' (Renaming.apply inj2cc' ag_id) in
 	    let pack,ans =
 	      complete_domain_with
-		obs_id dst env' (succ f_id) cc'
-		((Existing (Renaming.apply inj2cc' n'),i'),
+		obs_id dst env' (succ f_id) cc''
+		(((if has_removed
+		   then Fresh (find_ty cc n',Renaming.apply inj2cc'' n')
+		   else Existing (Renaming.apply inj2cc'' n')),i'),
 		 ToNode
-		   (Fresh(find_ty cc ag_id,Renaming.apply inj2cc' ag_id),i))
-		inj2cc' in
+		   (Fresh(find_ty cc ag_id,Renaming.apply inj2cc'' ag_id),i))
+		inj2cc'' in
 	    (pack,ans::out))
       (remove_one_internal acc ag_id links internals) links in
-  let remove_or_remove_one ((f_id,env'),out as acc) ag_id links internals =
-    if agent_is_removable 0 links internals then
-      let pack,ans =
-	complete_domain_with
-	  obs_id dst env' (succ f_id) (fst (remove_ag_cc f_id cc ag_id))
-	  ((Fresh(find_ty cc ag_id,ag_id),0),ToNothing) (identity_injection cc) in
-      (pack,ans::out)
-    else remove_one_frontier acc ag_id links internals in
+  let remove_or_remove_one acc ag_id links internals =
+    remove_one_frontier acc ag_id links internals in
   IntMap.fold (fun i links acc ->
 	       remove_or_remove_one acc i links (IntMap.find_default [||] i cc.internals))
 	      cc.links
@@ -707,10 +791,6 @@ let rename_edge inj2cc = function
      ((rename_nav_place inj2cc x,i),a)
   | ((x,i),ToNode (y,j)) ->
 	   ((rename_nav_place inj2cc x,i),ToNode (rename_nav_place inj2cc y,j))
-
-let add_origin deps = function
-  | None -> deps
-  | Some x -> Operator.DepSet.add x deps
 
 let rec complete_domain_with obs_id dst env free_id cc edge inj_dst2cc =
   let rec new_son inj_cc2found = function
@@ -747,24 +827,32 @@ and add_new_point ~origin obs_id env free_id sons cc =
   ((free_id'',completed),cc.id)
 
 let add_domain ?origin env cc =
-  let known_cc = Env.find env cc in
-  match known_cc with
-  | Some (id,inj,point) ->
-     (match point.is_obs_of with
-      | Some deps ->
-	 let point' =
-	   { point with
-	     is_obs_of = Some (add_origin deps origin)} in
-	 Env.add_point id point' env
-      | None ->
-	 let point' =
-	   { point with
-	     is_obs_of = Some (add_origin Operator.DepSet.empty origin)} in
-	propagate_add_obs id (Env.add_point id point' env) id),
-     List.hd inj,point.content
-  | None ->
-     let (_,env'),_ = add_new_point ~origin cc.id env (succ cc.id) [] cc in
-     (env',identity_injection cc, cc)
+  let nav = to_navigation true cc in
+  if nav = [] then
+    match find_root cc with
+    | None -> assert false
+    | Some (ty,_) ->
+       let cc',env' = Env.add_single_agent ty cc origin env in
+       env',identity_injection cc',cc'
+  else
+    let known_cc = Env.navigate env nav in
+    match known_cc with
+    | Some (id,inj,point) ->
+       (match point.is_obs_of with
+	| Some deps ->
+	   let point' =
+	     { point with
+	       is_obs_of = Some (add_origin deps origin)} in
+	   Env.add_point id point' env
+	| None ->
+	   let point' =
+	     { point with
+	       is_obs_of = Some (add_origin Operator.DepSet.empty origin)} in
+	   propagate_add_obs id (Env.add_point id point' env) id),
+       List.hd inj,point.content
+    | None ->
+       let (_,env'),_ = add_new_point ~origin cc.id env (succ cc.id) [] cc in
+       (env',identity_injection cc, cc)
 
 (** Operation to create cc *)
 let check_dangling wk =
@@ -791,7 +879,8 @@ let finish_new ?origin wk =
   let cc_candidate =
     { id = wk.cc_id; nodes_by_type = wk.used_id;
       links = wk.cc_links; internals = wk.cc_internals; } in
-  let env = Env.fresh wk.sigs wk.reserved_id wk.free_id wk.cc_env in
+  let env =
+    Env.fresh wk.sigs wk.reserved_id wk.free_id wk.cc_env wk.cc_single_ag in
   add_domain ?origin env cc_candidate
 
 
@@ -839,38 +928,35 @@ let new_node wk type_id =
      let () = wk.reserved_id.(type_id) <- t in
      let node = (wk.cc_id,type_id,h) in
      (node,
-      new_free
-	{ wk with
-	  dangling = if IntMap.is_empty wk.cc_links then 0 else h;
-	  cc_links = IntMap.add h (Array.make arity UnSpec) wk.cc_links;
-	  cc_internals = IntMap.add h (Array.make arity (-1)) wk.cc_internals;
-	} (node,0))
+      { wk with
+	dangling = if IntMap.is_empty wk.cc_links then 0 else h;
+	cc_links = IntMap.add h (Array.make arity UnSpec) wk.cc_links;
+	cc_internals = IntMap.add h (Array.make arity (-1)) wk.cc_internals;
+      })
   | [] ->
      let () = wk.used_id.(type_id) <- wk.free_id :: wk.used_id.(type_id) in
      let node = (wk.cc_id, type_id, wk.free_id) in
      (node,
-      new_free
-	{ wk with
-	  free_id = succ wk.free_id;
-	  dangling = if IntMap.is_empty wk.cc_links then 0 else wk.free_id;
-	  cc_links =
-	    IntMap.add wk.free_id (Array.make arity UnSpec) wk.cc_links;
-	  cc_internals =
-	    IntMap.add wk.free_id (Array.make arity (-1)) wk.cc_internals;
-	} (node,0))
+      { wk with
+	free_id = succ wk.free_id;
+	dangling = if IntMap.is_empty wk.cc_links then 0 else wk.free_id;
+	cc_links =
+	  IntMap.add wk.free_id (Array.make arity UnSpec) wk.cc_links;
+	cc_internals =
+	  IntMap.add wk.free_id (Array.make arity (-1)) wk.cc_internals;
+      })
 
 module NodeSetMap = SetMap.Make(ContentAgent)
 module NodeMap = NodeSetMap.Map
 
 let check_edge graph = function
-  | ((Fresh (ty,id),0),ToNothing) -> Edges.is_agent ty id graph
   | ((Fresh (_,id),site),ToNothing) -> Edges.is_free id site graph
   | ((Fresh (_,id),site),ToInternal i) -> Edges.is_internal i id site graph
   | ((Fresh (_,id),site),ToNode (Existing id',site')) ->
      Edges.link_exists id site id' site' graph
   | ((Fresh (_,id),site),ToNode (Fresh (_,id'),site')) ->
      Edges.link_exists id site id' site' graph
-  | ((Existing id,site),ToNothing) -> assert (site <> 0); Edges.is_free id site graph
+  | ((Existing id,site),ToNothing) -> Edges.is_free id site graph
   | ((Existing id,site),ToInternal i) -> Edges.is_internal i id site graph
   | ((Existing id,site),ToNode (Existing id',site')) ->
      Edges.link_exists id site id' site' graph
@@ -878,21 +964,28 @@ let check_edge graph = function
      Edges.link_exists id site id' site' graph
 
 (*inj is the partial injection built so far: inj:abs->concrete*)
-let injection_for_one_more_edge inj graph = function
-  | ((Fresh _,_),_) -> None
-  | ((Existing id,site),ToNothing) ->
-     if Edges.is_free (Renaming.apply inj id) site graph then Some inj else None
-  | ((Existing id,site),ToInternal i) ->
-     if Edges.is_internal i (Renaming.apply inj id) site graph
-     then Some inj else None
-  | ((Existing id,site),ToNode (Existing id',site')) ->
-     if Edges.link_exists (Renaming.apply inj id) site
-			  (Renaming.apply inj id') site' graph
-     then Some inj else None
-  | ((Existing id,site),ToNode (Fresh (ty,id'),site')) ->
-     match Edges.exists_fresh (Renaming.apply inj id) site ty site' graph with
+let dst_is_okay inj' graph root site = function
+  | ToNothing ->
+     if Edges.is_free root site graph then Some inj' else None
+  | ToInternal i ->
+     if Edges.is_internal i root site graph then Some inj' else None
+  | ToNode (Existing id',site') ->
+     if Edges.link_exists root site
+			  (Renaming.apply inj' id') site' graph
+     then Some inj' else None
+  | ToNode (Fresh (ty,id'),site') ->
+     match Edges.exists_fresh root site ty site' graph with
      | None -> None
-     | Some node -> Some (Renaming.add id' node inj)
+     | Some node -> Some (Renaming.add id' node inj')
+let injection_for_one_more_edge ?root inj graph = function
+  | ((Fresh (_,id),site),dst) ->
+     begin match root with
+	   | None -> None
+	   | Some root ->
+	      dst_is_okay (Renaming.add id root inj) graph root site dst
+     end
+  | ((Existing id,site),dst) ->
+     dst_is_okay inj graph (Renaming.apply inj id) site dst
 
 module Matching = struct
   type t = int NodeMap.t IntMap.t * IntSet.t
@@ -924,23 +1017,25 @@ module Matching = struct
 	   Some (NodeMap.add (cc.id,find_ty cc src,src) dst acc, IntSet.add dst co))
 
   let reconstruct graph inj id cc root =
-    match find_root cc with
-    | None -> Some inj
-    | Some (_,node) ->
-       let rename = Renaming.add node root Renaming.empty in
-       let full_rename =
+    let _,full_rename =
+      match to_navigation false cc with
+      | _::_ as nav ->
 	 List.fold_left
-           (fun inj_op nav ->
+           (fun (root,inj_op) nav ->
             match inj_op with
-            | None -> None
-            | Some inj -> injection_for_one_more_edge inj graph nav)
-           (Some rename) (List.tl (to_navigation false cc)) in
-       match full_rename with
-       | None -> failwith "Matching.reconstruct error"
-       | Some rename ->
-          match from_renaming cc rename (Some (NodeMap.empty, snd inj)) with
-          | None -> None
-          | Some (inj',co) -> Some (IntMap.add id inj' (fst inj),co)
+            | None -> None,None
+            | Some inj ->
+	       None,injection_for_one_more_edge ?root inj graph nav)
+           (Some root,Some Renaming.empty) nav
+      | [] -> match find_root cc with
+	      | None -> failwith "Matching.reconstruct cc error"
+	      | Some (_,id) -> None, Some (Renaming.add id root Renaming.empty) in
+    match full_rename with
+    | None -> failwith "Matching.reconstruct renaming error"
+    | Some rename ->
+       match from_renaming cc rename (Some (NodeMap.empty, snd inj)) with
+       | None -> None
+       | Some (inj',co) -> Some (IntMap.add id inj' (fst inj),co)
 
   let get (node,id) (t,_) =
     match NodeMap.find_option node (IntMap.find_default NodeMap.empty id t) with
@@ -988,17 +1083,19 @@ module Matching = struct
     else ([],Operator.DepSet.empty)
 
   let observables_from_agent domain graph ty node_id =
-      from_edge domain graph [(Fresh (ty,node_id),0),ToNothing]
+    if Edges.is_agent ty node_id graph
+    then match Env.get_single_agent ty domain with
+	 | Some (cc,deps) -> ([cc,node_id],deps)
+	 | None -> ([],Operator.DepSet.empty)
+    else ([],Operator.DepSet.empty)
+
   let observables_from_free domain graph ty node_id site =
-      from_edge domain graph [(Fresh (ty,node_id),0),ToNothing;
-			      (Existing node_id,site),ToNothing]
+      from_edge domain graph [(Fresh (ty,node_id),site),ToNothing]
   let observables_from_internal domain graph ty node_id site id =
-    from_edge domain graph [(Fresh (ty,node_id),0),ToNothing;
-			    (Existing node_id,site),ToInternal id]
+    from_edge domain graph [(Fresh (ty,node_id),site),ToInternal id]
   let observables_from_link domain graph ty n_id site  ty' n_id' site' =
     from_edge
-      domain graph [(Fresh (ty,n_id),0),ToNothing;
-		    (Existing n_id,site),ToNode (Fresh (ty',n_id'),site')]
+      domain graph [(Fresh (ty,n_id),site),ToNode (Fresh (ty',n_id'),site')]
 end
 
 let compare_canonicals cc cc' = Mods.int_compare cc.id cc'.id

@@ -4,9 +4,12 @@ exception Undefined
 exception NotBijective
 exception Clashing
 
-type t = {sigma:int IntMap.t ; is_identity:bool} 
+type t = {sigma:int IntMap.t ; is_identity:bool}
 
-let empty = {sigma = IntMap.empty ; is_identity=true} 
+let empty = {sigma = IntMap.empty ; is_identity=true}
+let identity l =
+  {sigma = List.fold_left (fun out x -> IntMap.add x x out) IntMap.empty l;
+   is_identity = true}
 let is_identity i = i.is_identity
 
 let to_list i = IntMap.bindings i.sigma
@@ -22,11 +25,13 @@ let rec cyclic_permutation_from_identity max id subst pre = function
   | [] -> assert false
   | h :: t ->
      cyclic_permutation_from_identity max id (unsafe_add pre h subst) h t
+let cyclic_permutation_from_list ~stop_at = function
+  | [] -> failwith "Renaming.cyclic_permutation_from_list"
+  | h :: t ->
+     cyclic_permutation_from_identity h stop_at empty h t
 
 let mem x i = IntMap.mem x i.sigma
-let fold f i = IntMap.fold f i.sigma 
-
-let identity l = {sigma = List.fold_left (fun out x -> IntMap.add x x out) IntMap.empty l ; is_identity = true}
+let fold f i = IntMap.fold f i.sigma
 
 let apply i x =
         let app () = match IntMap.find_option x i.sigma with

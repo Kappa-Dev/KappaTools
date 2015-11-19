@@ -58,8 +58,7 @@ let print_rule_link f = function
 let print_rule_intf sigs ag_ty f (ports,ints) =
   let rec aux empty i =
     if i < Array.length ports then
-      if (ports.(i) <> L_ANY Maintained || ints.(i) <> I_ANY)
-	 && (i <> 0 || ports.(i) <> L_FREE Maintained) then
+      if (ports.(i) <> L_ANY Maintained || ints.(i) <> I_ANY) then
 	let () = Format.fprintf
 		   f "%t%a%a%a" (if empty then Pp.empty else Pp.comma)
 		   (Signature.print_site sigs ag_ty) i
@@ -103,7 +102,7 @@ let annotate_dropped_agent sigs ((agent_name, _ as ag_ty),intf) =
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
   let ports =
-    Array.init arity (fun i -> if i = 0 then L_FREE Erased else L_ANY Erased) in
+    Array.init arity (fun i -> L_ANY Erased) in
   let internals =
     Array.init arity
                (fun i ->
@@ -195,7 +194,7 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
   let arity = Signature.arity sigs ag_id in
   let ports =
     Array.init
-      arity (fun i -> if i = 0 then L_FREE Maintained else L_ANY Maintained) in
+      arity (fun i -> L_ANY Maintained) in
   let internals = Array.make arity I_ANY in
   let register_port_modif p_id lnk1 p' =
     match lnk1,p'.Ast.port_lnk with
@@ -444,7 +443,7 @@ let new_agent_with_one_link sigs ty_id port link switch =
   let arity = Signature.arity sigs ty_id in
   let ports =
     Array.init
-      arity (fun i -> if i = 0 then L_FREE Maintained else L_ANY Maintained) in
+      arity (fun i -> L_ANY Maintained) in
   let internals = Array.make arity I_ANY in
   let () = ports.(port) <- L_VAL (Location.dummy_annot link,switch) in
   { ra_type = ty_id; ra_ports = ports; ra_ints = internals;
@@ -627,8 +626,7 @@ let make_instantiation
 	      side_effects',
 	      links
 	   | L_FREE s ->
-	      (if site_id = 0 then tests'
-	       else Instantiation.Is_Free (place,site_id) :: tests'),
+	      (Instantiation.Is_Free (place,site_id) :: tests'),
 	      add_instantiation_free actions' place site_id s,side_sites,
 	      side_effects, links
 	   | L_SOME s ->
@@ -703,8 +701,7 @@ let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
 	 | L_ANY Maintained ->
 	    handle_ports wk' r_l c_l transf l_t re acc (succ site_id)
 	 | L_FREE s ->
-	    let wk'' = if site_id = 0 then wk'
-		       else Connected_component.new_free wk' (node,site_id) in
+	    let wk'' = Connected_component.new_free wk' (node,site_id) in
 	    let transf',l_t' =
 	      define_full_transformation sigs transf l_t place site_id None s in
 	    handle_ports
@@ -786,7 +783,7 @@ let rec complete_with_creation
      let rec handle_ports added l_t actions intf site_id =
        if site_id = Array.length ag.Raw_mixture.a_ports then
 	 let create_actions' =
-	   Instantiation.Create (place,List.tl @@ List.rev intf)
+	   Instantiation.Create (place,List.rev intf)
 	   :: create_actions in
 	 complete_with_creation
 	   sigs (removed,added) l_t create_actions' actions (succ fresh) ag_l
@@ -801,8 +798,7 @@ let rec complete_with_creation
 	   match ag.Raw_mixture.a_ports.(site_id) with
 	   | Raw_mixture.FREE ->
 	      Primitives.Transformation.Freed (place,site_id)::added',
-	      (if site_id = 0 then actions
-	       else Instantiation.Free (place,site_id) :: actions),
+	      (Instantiation.Free (place,site_id) :: actions),
 	      l_t
 	   | Raw_mixture.VAL i ->
 	      match IntMap.pop i l_t with

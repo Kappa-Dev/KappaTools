@@ -8,7 +8,7 @@ val empty : t
 val is_identity : t -> bool
 val identity : int list -> t
 (** very specific use case for Cnnected_component.remove_ag_cc *)
-val cyclic_permutation_from_identity : int -> int -> t -> int -> int list -> t
+val cyclic_permutation_from_list : stop_at:int -> int list -> t
 
 (** @raise Clashing in debug mode *)
 val add : int -> int -> t -> t
