@@ -17,12 +17,14 @@
 %var: 'k_deam' 0
 %var: 'k_SSB' 0
 
-'5mc Deamination' DNA(base~C?, meth~true) -> DNA(meth~false, base~T?, base_state~damaged, init~damaged) @ 'k_deam'
-'C Deamination' DNA(base~C?, meth~false) -> DNA(meth~true, base~U?, base_state~damaged, init~damaged) @ 'k_deam'
+'5mc Deamination' DNA(meth~true , base~C?, base_state?       , init?) -> \
+                  DNA(meth~false, base~T?, base_state~damaged, init~damaged) @ 'k_deam'
+'C Deamination' DNA(meth~false, base~C?, base_state?       , init?) -> \
+                DNA(meth~true , base~U?, base_state~damaged, init~damaged) @ 'k_deam'
 
 ## Generates a one nt gap
-'SSB' DNA(e3~lig!1),DNA(e5~lig!1,base?,e3!2),DNA(e5!2) -> \
-    DNA(e3~P!1),DNA(e5~NA!1,base~AP?,base_state~gapped,init~damaged,e3~NA!2),DNA(e5~P!2) @ 'k_SSB'
+'SSB' DNA(e3~lig!1),DNA(e5~lig!1,base?   ,base_state      ?,init?       ,e3   !2),DNA(e5!2) -> \
+      DNA(e3~P  !1),DNA(e5~NA !1,base~AP?,base_state~gapped,init~damaged,e3~NA!2),DNA(e5~P!2) @ 'k_SSB'
 
 
 %var: 'deam_percent' 2 / 100
