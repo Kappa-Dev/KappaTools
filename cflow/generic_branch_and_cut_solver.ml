@@ -122,7 +122,29 @@ struct
 
   let empty_choice_list = 
     {stack=[];current=[]}
-		       
+
+  let rec sublist l l' =
+    match l,l'
+    with
+    | [],_ -> true
+    | _,[] -> false
+    | h::t,h'::t' when h=h' -> sublist t t'  
+    | _,h'::t' -> sublist l t' 
+
+  let sort_stories_according_to_length l =
+    List.rev_map fst (List.sort (fun (_,a) (_,b) -> compare b a) (List.rev_map (fun a -> (a,List.length a)) l))
+      
+  let filter_out_non_minimal_story l =
+    let rec aux to_visit goodones =
+      match
+	to_visit
+      with
+      | [] -> List.rev goodones
+      | h::t ->
+	 aux (List.filter (fun story -> not (sublist h story)) t)
+	     (h::(List.filter (fun story -> not (sublist h story)) goodones))
+    in aux (sort_stories_according_to_length l) []
+      
   let rec iter parameter handler error log_info blackboard choice_list story_list = 
     let error,bool = PH.B.is_maximal_solution parameter handler error blackboard in
     if bool 
@@ -265,7 +287,7 @@ struct
 	[] -> PH.B.fail
       | _ -> PH.B.success
     in 
-    error,log_info,blackboard,output,story_list 
+    error,log_info,blackboard,output,filter_out_non_minimal_story (List.rev story_list) 
 
 
 end 
