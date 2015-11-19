@@ -145,7 +145,7 @@ module Make(S_both:(SetMap.S)): S_with_logs with type elt = S_both.elt and type 
 	    let error, bool, map = lift S_both.Map.add_while_testing_freshness parameter error c d e in
 	    if bool
 	    then
-	      Exception.warn parameter error (Some "Map_wrapper.ml") (Some (__LOC__^": attempt to overwrite an association that does not exist")) (failwith "Attempt to overwrite an association that does not exist") (fun () -> map)
+	      Exception.warn parameter error (Some "Map_wrapper.ml") (Some ("Map_wrapper line 148"^": attempt to overwrite an association that does not exist")) (failwith "Attempt to overwrite an association that does not exist") (fun () -> map)
 	    else
 	      error, map 
 	  let add_or_overwrite a b c d e =
