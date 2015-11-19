@@ -122,19 +122,8 @@ struct
 
   let empty_choice_list = 
     {stack=[];current=[]}
-
-  let update_first_story old newone =
-    match
-      old
-    with None -> Some newone
-       | _ -> old
-
-  let is_first_story old newone =
-    match old
-    with None -> false
-       | Some l -> l=newone
 		       
-  let rec iter parameter handler error log_info blackboard choice_list story_list  first_story = 
+  let rec iter parameter handler error log_info blackboard choice_list story_list (* first_story *) = 
     let error,bool = PH.B.is_maximal_solution parameter handler error blackboard in
     if bool 
     then 
@@ -145,21 +134,22 @@ struct
        if PH.B.PB.CI.Po.K.H.get_all_stories_per_obs parameter
        then
 	 begin 
-	 if is_first_story first_story list
-	 then
-	   error,log_info,blackboard,story_list
-	 else 
 	   let story_list = list::story_list in	   
-	   let error,log_info,blackboard,choice_list = backtrack parameter handler error log_info blackboard choice_list in 
+	   let choice_list =
+	     match choice_list.stack
+	     with [] -> choice_list
+		| t::q -> { current=t;stack=q}
+	   in 
+	   let error,log_info,blackboard,choice_list = backtrack parameter handler error log_info blackboard choice_list in 	  
 	   begin 
              match choice_list 
              with 
-             | Some choice_list -> iter parameter handler error log_info blackboard choice_list story_list (update_first_story first_story list) 
+             | Some choice_list -> iter parameter handler error log_info blackboard choice_list story_list (*(update_first_story first_story list)*)
              | None -> error,log_info,blackboard,story_list
 	   end
 	 end 
-      else
-	error,log_info,blackboard,[list] 
+       else
+	 error,log_info,blackboard,[list] 
     else
       let error,choice_list = 
         if no_more_choice choice_list 
@@ -178,11 +168,11 @@ struct
         begin 
           match choice_list 
           with 
-            | Some choice_list -> iter parameter handler error log_info blackboard choice_list story_list first_story 
+          | Some choice_list -> iter parameter handler error log_info blackboard choice_list story_list  
             | None -> error,log_info,blackboard,story_list
         end
       else 
-        iter parameter handler error log_info blackboard (branch_choice_list choice_list) story_list first_story 
+        iter parameter handler error log_info blackboard (branch_choice_list choice_list) story_list  
             
   let detect_independent_events parameter handler error log_info blackboard list_eid = 
     let error,log_info,blackboard,events_to_keep = PH.B.cut parameter handler error log_info blackboard list_eid  in 
@@ -257,17 +247,8 @@ struct
         Format.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err
 		       "After observable propagation  %i @." (PH.B.get_n_unresolved_events blackboard)
     in
-    let error,log_info,blackboard,story_list = iter parameter handler error log_info blackboard empty_choice_list [] None 
+    let error,log_info,blackboard,story_list = iter parameter handler error log_info blackboard empty_choice_list [] 
     in 
-  (*  let error,list = 
-      if PH.B.is_failed output 
-      then error,None 
-      else 
-        let error,list = 
-          PH.B.translate_blackboard parameter handler error blackboard 
-        in 
-        error,Some list 
-    in *)
     let output =
       match
 	story_list
