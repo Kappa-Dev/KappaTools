@@ -23,6 +23,7 @@ open Covering_classes_type
 open Bdu_build_common
 open Bdu_structure
 open Fifo
+open Printf
 
 (************************************************************************************)
 (*fixpoint iteration function*)
@@ -53,7 +54,6 @@ let is_belong bdu bdu_init =
   then true
   else false
     
-(*FIXME: where is f*)
 let comp_is_enable parameter error handler bdu_init bdu_test bdu_creation =
   let error, handler, bdu_X =
     f parameter error bdu_test
@@ -68,29 +68,141 @@ let comp_is_enable parameter error handler bdu_init bdu_test bdu_creation =
 (************************************************************************************)
 (*update bdu*)
 
-let compute_update parameter error handler bdu_test list_a bdu_creation =
-  let error, handler, bdu_inter_test_creation =
+let compute_update parameter error handler bdu_test list_a bdu_X =
+  (*intersection of X and bdu_test*)
+  let error, handler, bdu_inter_test_X =
     f parameter error bdu_test
-      (boolean_mvbdu_and parameter handler error parameter bdu_test) bdu_creation
+      (boolean_mvbdu_and parameter handler error parameter bdu_test) bdu_X
   in
+  (*redefine with a list of modification*)
   let error, handler, bdu_assigment =
-    f parameter error bdu_inter_test_creation
-      (redefine parameter error parameter handler bdu_inter_test_creation)
-      list_a
+    f parameter error bdu_inter_test_X
+      (redefine parameter error parameter handler bdu_inter_test_X) list_a
   in
+  (*union with bdu_X*)
   let error, handler, bdu_update =
     f parameter error bdu_assigment
-      (boolean_mvbdu_or parameter handler error parameter bdu_assigment)
-      bdu_creation
+      (boolean_mvbdu_or parameter handler error parameter bdu_assigment) bdu_X
   in
   error, bdu_update
-  (*let bdu_remanent_array =
-    bdu_remanent_array.(rule_id) <- bdu_update;
-    bdu_remanent_array
-  in
-  error, bdu_remanent_array*)
 
 (************************************************************************************)
+(*fixpoint*)
+
+let collect_bdu_update_map parameter error rule wl_creation 
+    store_remanent_test
+    store_test_bdu_map
+    store_remanent_creation
+    store_creation_bdu_map
+    store_result
+    =
+  let error, (handler, bdu_init) = bdu_init parameter error in
+  let add_link (agent_type, cv_id) bdu_update store_result =
+    let (l, old) =
+      Map_bdu_update.Map.find_default ([], bdu_init) (agent_type, cv_id) store_result
+    in
+    let result_map = (*FIXME: list or bdu_init ? *)
+      Map_bdu_update.Map.add (agent_type, cv_id) (l, bdu_update) 
+        store_result
+    in
+    error, result_map
+  in  
+  (*iterate function over working list*)
+  let rec aux acc_wl (error, bdu_update_map) =
+    if IntWL.is_empty acc_wl
+    then
+      error, bdu_update_map
+    else
+      (*pop the first element (rule_id) in this working list*)
+      let error, (rule_id_op, wl_tl) =
+        IntWL.pop parameter error acc_wl
+      in
+      match rule_id_op with
+      | None -> error, bdu_update_map
+      | Some rule_id ->
+        (*--------------------------------------------------------------------*)
+        (*get the local view that is tested for this rule_id with new indexes*)
+        let error, bdu_test =
+          (*take a global view *)
+          AgentMap.fold parameter error
+            (fun parameter error agent_id agent store_bdu_result ->
+              match agent with
+              | Ghost -> error, store_bdu_result (*if it is a ghost agent?*)
+              | Agent agent ->
+                let agent_type = agent.agent_name in
+                (*get the local view: (agent_id, rule_id, cv_id, pair_list)list *)
+                let error, get_test_list =
+                  match 
+                    AgentMap.unsafe_get parameter error agent_type store_remanent_test 
+                  with
+                  | error, None -> error, []
+                  | error, Some l -> error, l
+                in
+                (*match the rule_id, if yes, then return the bdu_test,if
+                  not continue to the rest of the list*)
+                let error, bdu_test =
+                  List.fold_left (fun (error, bdu_result) (agent_id, rule_id', cv_id, _) ->
+                    if rule_id = rule_id'
+                    then
+                      (*return the bdu_test*)
+                      let (l, bdu_test) =
+                        Map_test_bdu.Map.find_default ([], bdu_init)
+                          (agent_id, agent_type, rule_id, cv_id) store_test_bdu_map
+                      in
+                      error, bdu_test
+                    else
+                    (*return the result*)
+                      error, bdu_result
+                  ) (error, store_bdu_result) get_test_list
+                in
+                error, bdu_test
+            ) rule.rule_lhs.views bdu_init (*TODO*)
+        in
+        (*--------------------------------------------------------------------*)
+        (*get the local view that is created for this rule_id with new_indexes*)
+        let error, bdu_creation =
+          (*take a global view*)
+          List.fold_left (fun (error, store_bdu_result) (agent_id, agent_type) ->
+            let error, agent = AgentMap.get parameter error agent_id rule.rule_rhs.views in
+            match agent with
+            | None -> warn parameter error (Some "line 163") Exit store_bdu_result
+            | Some Ghost -> error, store_bdu_result
+            | Some Agent agent ->
+              (*get the local view (rule_id, cv_id, pair_list) list*)
+              let error, get_creation_list =
+                match
+                  AgentMap.unsafe_get parameter error agent_type store_remanent_creation
+                with
+                | error, None -> error, []
+                | error, Some l -> error, l
+
+              in
+              (*match rule_id with rule_id', if yes then creation
+                bdu_creation, if not continue to the rest of this list*)
+              let error, bdu_creation =
+                List.fold_left (fun (error, store_result) (rule_id', cv_id, _) ->
+                  if rule_id = rule_id'
+                  then 
+                    let (l, bdu_creation) =
+                      Map_creation_bdu.Map.find_default ([], bdu_init)
+                        (agent_type, rule_id, cv_id) store_creation_bdu_map
+                    in
+                    error, bdu_creation
+                  else
+                    error, store_result
+                ) (error, store_bdu_result) get_creation_list
+              in
+              error, bdu_creation
+          ) (error, bdu_update_map) (*bdu_init*) rule.actions.creation
+        in
+        (*--------------------------------------------------------------------*)
+        (*TODO:continue to the rest of this working list*)
+        aux wl_tl (error, bdu_creation)
+  in
+  aux wl_creation (error, store_result)
+  
+
+
 
 (*let collect_bdu_update_array parameter error
     wl_creation 

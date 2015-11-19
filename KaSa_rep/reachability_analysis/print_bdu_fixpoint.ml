@@ -24,13 +24,13 @@ let trace = false
 
 (************************************************************************************)
 
-let print_bdu_update_array parameter error result =
-  Map_bdu_update.Map.iter (fun (agent_type, rule_id) (l1, l2) ->
+(*let print_bdu_update_map parameter error result =
+  Map_bdu_update.Map.iter (fun (agent_type, cv_id) (l1, l2) ->
     if l1 <> []
     then ()
     else ();
     let _ =
-      fprintf parameter.log "agent_type:%i:rule_id:%i\n" agent_type rule_id
+      fprintf parameter.log "agent_type:%i:cv_id:%i\n" agent_type cv_id
     in
     List.iter (fun bdu_creation ->
       let _ =
@@ -39,7 +39,11 @@ let print_bdu_update_array parameter error result =
       in
       ()
     ) l2
-  ) result
+  ) result*)
+
+let print_bdu_update_map parameter error result =
+  let _ = print_bdu parameter error result in
+    fprintf parameter.log "\n"
     
 (************************************************************************************)
 (*main print*)
@@ -54,12 +58,10 @@ let print_bdu_fixpoint parameter error result =
       "------------------------------------------------------------\n";
   in
   let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "- An array of bdu views :\n";
-    print_bdu_update_array
+    print_bdu_update_map
       parameter
       error
-      result.store_bdu_update_array    
+      result.store_bdu_update_map    
   in
   (*let _ =
     fprintf (Remanent_parameters.get_log parameter)

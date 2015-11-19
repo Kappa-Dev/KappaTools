@@ -237,7 +237,7 @@ rule_id:2
 
 
 ------------------------------------------------------------
-* Covering classes with new index :
+* Covering classes with new indexes :
 ------------------------------------------------------------
 - Valuations of the views that are tested (per rule, agent and covering class):
 
@@ -324,4 +324,10 @@ agent_id:0:agent_type:0:rule_id:0:covering_class_id:0
 site_type:2
 agent_id:0:agent_type:0:rule_id:1:covering_class_id:0
 site_type:2
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+agent_type_ false
+
 execution finished without any exception

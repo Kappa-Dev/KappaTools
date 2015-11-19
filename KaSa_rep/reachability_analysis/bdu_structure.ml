@@ -23,7 +23,7 @@ let warn parameters mh message exn default =
 let trace = false
 
 (*************************************************************************************)
-(*collect remanent test as a map function*)
+(*Valuations of the views that are tested (per rule, agent and covering class)*)
 
 let collect_remanent_test_map parameter error store_remanent_test =
   let add_link (agent_id, agent_type, rule_id, cv_id) pair_list store_result =
@@ -48,7 +48,7 @@ let collect_remanent_test_map parameter error store_remanent_test =
     ) store_remanent_test Map_test.Map.empty
 
 (*************************************************************************************)
-(*collect remanent creation as a map function*)
+(*Valuations of the views that are created (per rule, agent and covering class)*)
 
 let collect_remanent_creation_map parameter error store_remanent_creation =
   let add_link (agent_type, rule_id, cv_id) pair_list store_result =
@@ -77,7 +77,7 @@ let collect_remanent_creation_map parameter error store_remanent_creation =
     ) store_remanent_creation Map_creation.Map.empty
 
 (*************************************************************************************)
-(*collect remanent modification as a map function*)
+(*Update of the views due to modification (per rule, agent and covering class) *)
 
 let collect_remanent_modif_map parameter error store_remanent_modif =
   let add_link (agent_id, agent_type, rule_id, cv_id) pair_list store_result =
@@ -107,8 +107,12 @@ let collect_remanent_modif_map parameter error store_remanent_modif =
     ) store_remanent_modif Map_modif.Map.empty
 
 (*************************************************************************************)
-(* Build BDU test, creation and a list of modification rules*)
+(* Build BDU*)
 (*************************************************************************************)
+
+(*************************************************************************************)
+(*Bdu for the valuations of the views that are created (per rule, agent and
+  covering class)*)
 
 let collect_test_bdu_map parameter error store_test_map =
   let error, (handler, bdu_init) = bdu_init parameter error in
@@ -119,7 +123,7 @@ let collect_test_bdu_map parameter error store_test_map =
     in
     let result_map =
       Map_test_bdu.Map.add (agent_id, agent_type, rule_id, cv_id)
-        (l, bdu) store_result (*FIXME: only take one rule*)
+        (l, bdu) store_result (*NOTE: each rule*)
     in
     error, result_map
   in
@@ -145,7 +149,8 @@ let collect_test_bdu_map parameter error store_test_map =
 
 
 (*************************************************************************************)
-(*build bdu for creation rules*)
+(*Bdu for the valuations of the views that are tested (per rule, agent and
+  covering class)*)
 
 let collect_creation_bdu_map parameter error store_creation_map =
   let error, (handler, bdu_init) = bdu_init parameter error in
@@ -154,7 +159,7 @@ let collect_creation_bdu_map parameter error store_creation_map =
       Map_creation_bdu.Map.find_default ([], bdu_init)
         (agent_type, rule_id, cv_id) store_result
     in
-    let result_map = (*FIXME: get only creation of a rule*)
+    let result_map = (*NOTE: get only a bdu_creation of each rule*)
       Map_creation_bdu.Map.add (agent_type, rule_id, cv_id) (l, bdu) store_result
     in
     error, result_map
@@ -179,7 +184,7 @@ let collect_creation_bdu_map parameter error store_creation_map =
   ) store_creation_map (error, Map_creation_bdu.Map.empty)
 
 (*************************************************************************************)
-(*list of modification rules*)
+(*Update list of the views due to modification (per rule, agent and covering class)*)
 
 let collect_modif_list_map parameter error store_modif_map =
   (*let error, (handler, bdu_init) = bdu_init parameter error in*)
@@ -190,7 +195,7 @@ let collect_modif_list_map parameter error store_modif_map =
     in
     let result_map =
       Map_modif_list.Map.add (agent_id, agent_type, rule_id, cv_id)
-        (l, list) store_result (*FIXME: get only list at one rule*)
+        (l, list) store_result (*NOTE: get only a list of each rule*)
     in
     error, result_map
   in

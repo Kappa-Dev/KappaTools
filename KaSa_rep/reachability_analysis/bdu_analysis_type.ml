@@ -90,7 +90,7 @@ module Int2Map_CV_Modif =
     end)
 
 (************************************************************************************)
-(*module type for bdu structure*)
+(*local information of test, creation and modification with new indexes*)
 
 module Map_test =
   SetMap.Make (
@@ -213,7 +213,8 @@ type bdu_build_map =
 
 type bdu_fixpoint =
   {
-    store_bdu_update_array : (int list * bool Mvbdu_sig.mvbdu list) Map_bdu_update.Map.t;
+    (*store_bdu_update_map : (int list * bool Mvbdu_sig.mvbdu) Map_bdu_update.Map.t ;*)
+    store_bdu_update_map : bool Mvbdu_sig.mvbdu;
   }
 
 (************************************************************************************)
@@ -225,5 +226,5 @@ type bdu_analysic =
       store_bdu_analysis_dynamic : bdu_analysis_dynamic;
       store_bdu_build            : bdu_build;
       store_bdu_build_map        : bdu_build_map;
-      (*store_bdu_fixpoint         : bdu_fixpoint*)
+      store_bdu_fixpoint         : bdu_fixpoint
     }

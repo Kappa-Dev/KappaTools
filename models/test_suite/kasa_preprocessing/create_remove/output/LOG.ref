@@ -119,7 +119,7 @@ List of rules to awake when the state of a site is modified and tested:
 0 1 
 
 ------------------------------------------------------------
-* Covering classes with new index :
+* Covering classes with new indexes :
 ------------------------------------------------------------
 - Valuations of the views that are tested (per rule, agent and covering class):
 
@@ -140,4 +140,10 @@ List of rules to awake when the state of a site is modified and tested:
 - Bdu for the valuations of the views that are tested (per rule, agent and covering class):
 
 - List for update of the views due to modification (per rule, agent and covering class):
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+agent_type_ false
+
 execution finished without any exception

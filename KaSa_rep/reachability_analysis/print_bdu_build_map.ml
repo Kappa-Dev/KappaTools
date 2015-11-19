@@ -24,7 +24,7 @@ let trace = false
 
 (************************************************************************************)
 
-let print_remanent_test_map parameter error result = (*TODO*)
+let print_remanent_test_map parameter error result =
   Map_test.Map.iter
     (fun (agent_id, agent_type, rule_id, cv_id) (l1, l2) ->
       if l1 <> []
@@ -142,7 +142,7 @@ let print_bdu_build_map parameter error result =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
-      "* Covering classes with new index :\n";
+      "* Covering classes with new indexes :\n";
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
   in
