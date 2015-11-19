@@ -138,7 +138,7 @@ struct
 	   let error,() =
 	     match choice_list.current
 	     with
-	     | _::_,_ ->
+	     | _::_ ->
 		let error_list,error = PH.B.PB.CI.Po.K.H.create_error parameter handler error (Some "generic_branch_and_cut_solver.ml") None (Some "iter") (Some "__LOC__") (Some "In case of success, the current list of choices should be empty") (failwith "In case of success, the current list of choices should be empty")
 		in 
 		PH.B.PB.CI.Po.K.H.raise_error parameter handler error_list error ()
