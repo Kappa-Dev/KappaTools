@@ -123,7 +123,7 @@ struct
   let empty_choice_list = 
     {stack=[];current=[]}
 		       
-  let rec iter parameter handler error log_info blackboard choice_list story_list (* first_story *) = 
+  let rec iter parameter handler error log_info blackboard choice_list story_list = 
     let error,bool = PH.B.is_maximal_solution parameter handler error blackboard in
     if bool 
     then 
@@ -135,7 +135,16 @@ struct
        then
 	 begin 
 	   let story_list = list::story_list in	   
-	   let choice_list =
+	   let error,() =
+	     match choice_list.current
+	     with
+	     | _::_,_ ->
+		let error_list,error = PH.B.PB.CI.Po.K.H.create_error parameter handler error (Some "generic_branch_and_cut_solver.ml") None (Some "iter") (Some "__LOC__") (Some "In case of success, the current list of choices should be empty") (failwith "In case of success, the current list of choices should be empty")
+		in 
+		PH.B.PB.CI.Po.K.H.raise_error parameter handler error_list error ()
+	     | _ -> error,()
+	   in 
+           let choice_list =
 	     match choice_list.stack
 	     with [] -> choice_list
 		| t::q -> { current=t;stack=q}
