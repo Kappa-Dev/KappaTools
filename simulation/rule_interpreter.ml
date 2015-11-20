@@ -219,6 +219,13 @@ let store_obs edges roots obs acc = function
 	with Not_found -> acc)
        acc obs
 
+let exists_root_of_unary_ccs unary_ccs roots =
+  not @@
+    Connected_component.Set.for_all
+      (fun cc ->
+       ValMap.is_empty (Connected_component.Map.find_default ValMap.empty cc roots))
+      unary_ccs
+
 let potential_root_of_unary_ccs unary_ccs roots i =
   let ccs =
     Connected_component.Set.filter
@@ -254,22 +261,29 @@ let update_edges counter domain unary_ccs inj_nodes state event_kind rule =
        match new_obs with [] -> all_nobs | l -> l::all_nobs))
       (aux,[],[])
       rule.Primitives.inserted (*statically defined edges*) in
-  let unary_pack =
-    List.fold_left
-      (List.fold_left
-	 (fun (unary_cands,_ as acc) (cc,root) ->
-	  if Connected_component.Set.mem cc unary_ccs then
-	    (root,[(Connected_component.Set.singleton cc,root),Edges.empty_path])::unary_cands,false
-	  else acc)) (unary_cands,no_unary) all_new_obs in
   let unary_cands',no_unary' =
-    List.fold_left
-      (fun (unary_cands,_ as acc) id ->
-       match
-	 Edges.pathes_of_interrest
-	   (potential_root_of_unary_ccs unary_ccs roots')
-	   state.edges id Edges.empty_path with
-       | [] -> acc
-       | l -> (id,l) :: unary_cands,false) unary_pack unaries_to_explore in
+    if Connected_component.Set.is_empty unary_ccs
+    then (unary_cands,no_unary)
+    else
+      let unary_pack =
+	List.fold_left
+	  (List.fold_left
+	     (fun (unary_cands,_ as acc) (cc,root) ->
+	      if Connected_component.Set.mem cc unary_ccs then
+		(root,[(Connected_component.Set.singleton cc,root),
+		       Edges.empty_path])::unary_cands,false
+	      else acc)) (unary_cands,no_unary) all_new_obs in
+      if exists_root_of_unary_ccs unary_ccs roots'
+      then
+	List.fold_left
+	  (fun (unary_cands,_ as acc) id ->
+	   match
+	     Edges.pathes_of_interrest
+	       (potential_root_of_unary_ccs unary_ccs roots')
+	       state.edges id Edges.empty_path with
+	   | [] -> acc
+	   | l -> (id,l) :: unary_cands,false) unary_pack unaries_to_explore
+      else unary_pack in
   (*Store event*)
   let story_machinery' =
     store_event
