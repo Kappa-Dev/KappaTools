@@ -373,29 +373,29 @@ let rec bool_map f error alg =
     let error,m2' = alg_map f error m2 in 
     error,Ast.COMPARE_OP(Operator.DIFF,(m1',pos1),(m2',pos2))
 
-let rec modif_map f error alg = 
+let rec modif_map f_forbidding_question_marks f_allowing_question_marks error alg = 
   match 
     alg 
   with 
   | Ast.INTRO (alg,(mixture,pos)) ->
-    let error,alg' = (map_with_pos alg_map) f error alg in
-    let error,mixture' = f error mixture in 
+    let error,alg' = (map_with_pos alg_map) f_allowing_question_marks error alg in
+    let error,mixture' = f_forbidding_question_marks error mixture in 
     error,Ast.INTRO(alg',(mixture',pos))
   | Ast.DELETE (alg,(mixture,pos)) ->
-    let error,alg' = (map_with_pos alg_map) f error alg in
-    let error,mixture' = f error mixture in 
+    let error,alg' = (map_with_pos alg_map) f_allowing_question_marks error alg in
+    let error,mixture' = f_allowing_question_marks error mixture in 
     error,Ast.DELETE(alg',(mixture',pos))
   | Ast.UPDATE (pos,alg) -> 
-    let error,alg' = (map_with_pos alg_map) f error alg in 
+    let error,alg' = (map_with_pos alg_map) f_allowing_question_marks error alg in 
     error,Ast.UPDATE (pos,alg')
    | Ast.UPDATE_TOK (pos,alg) -> 
-    let error,alg' = (map_with_pos alg_map) f error alg in 
+    let error,alg' = (map_with_pos alg_map) f_allowing_question_marks error alg in 
     error,Ast.UPDATE_TOK (pos,alg')
    | Ast.STOP (list,pos) -> 
      let error,list' = 
        List.fold_left 
 	 (fun (error,list) elt -> 
-	   let error,elt' = (map_with_pos print_expr_map) f error elt in 
+	   let error,elt' = (map_with_pos print_expr_map) f_allowing_question_marks error elt in 
 	   error,elt'::list)
 	 (error,[]) (List.rev list)
      in 
@@ -404,7 +404,7 @@ let rec modif_map f error alg =
         let error,list' = 
 	  List.fold_left 
 	    (fun (error,list) elt -> 
-	      let error,elt' = (map_with_pos print_expr_map)  f error elt in 
+	      let error,elt' = (map_with_pos print_expr_map)  f_allowing_question_marks error elt in 
 	   error,elt'::list)
 	 (error,[]) (List.rev list)
      in 
@@ -413,14 +413,14 @@ let rec modif_map f error alg =
      let error,list1' = 
        List.fold_left 
 	 (fun (error,list) elt -> 
-	   let error,elt' = (map_with_pos print_expr_map) f error elt in 
+	   let error,elt' = (map_with_pos print_expr_map) f_allowing_question_marks error elt in 
 	   error,elt'::list)
 	 (error,[]) (List.rev list1)
      in 
      let error,list2' = 
        List.fold_left 
 	 (fun (error,list) elt -> 
-	   let error,elt' = (map_with_pos print_expr_map) f error elt in 
+	   let error,elt' = (map_with_pos print_expr_map) f_allowing_question_marks error elt in 
 	   error,elt'::list)
 	 (error,[]) (List.rev list2)
      in 
@@ -428,13 +428,13 @@ let rec modif_map f error alg =
    | Ast.PLOTENTRY -> error,Ast.PLOTENTRY
    | Ast.CFLOWLABEL (a,b) -> error,Ast.CFLOWLABEL(a,b)
    | Ast.CFLOWMIX (a,(mix,pos)) ->
-      let error,mix' = f error mix in
+      let error,mix' = f_allowing_question_marks error mix in
       error,Ast.CFLOWMIX(a,(mix',pos))
    | Ast.FLUX(list,pos) -> 
      let error,list' = 
        List.fold_left 
 	 (fun (error,list) elt -> 
-	   let error,elt' = (map_with_pos print_expr_map) f error elt in 
+	   let error,elt' = (map_with_pos print_expr_map) f_allowing_question_marks error elt in 
 	   error,elt'::list)
 	 (error,[]) (List.rev list)
      in 
@@ -443,7 +443,7 @@ let rec modif_map f error alg =
      let error,list' = 
        List.fold_left 
 	 (fun (error,list) elt -> 
-	   let error,elt' = (map_with_pos print_expr_map) f error elt in 
+	   let error,elt' = (map_with_pos print_expr_map) f_allowing_question_marks error elt in 
 	   error,elt'::list)
 	 (error,[]) (List.rev list)
      in 

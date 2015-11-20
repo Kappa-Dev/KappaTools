@@ -224,7 +224,7 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
               let error,(bool,output) = Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Internal port.Ckappa_sig.port_nme) () Misc_sa.const_unit site_dic in
               let error,site_name = 
                 match bool,output with
-                  | _ , None  | true, _  -> warn parameters error (Some ("line 166"^agent.Ckappa_sig.ag_nme^" "^port.Ckappa_sig.port_nme)) Exit 0
+                  | _ , None  | true, _  -> warn parameters error (Some (__LOC__^agent.Ckappa_sig.ag_nme^" "^port.Ckappa_sig.port_nme)) Exit 0
                   | _ , Some (i,_,_,_) ->  
                 error,i
               in 
@@ -269,7 +269,7 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
                        let error,state_dic = 
 			 Misc_sa.unsome 
 			   (Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get parameters error (agent_name,site_name) handler.Cckappa_sig.states_dic)
-			   (fun error -> warn parameters error (Some "line 240") Exit (Cckappa_sig.Dictionary_of_States.init ()))
+			   (fun error -> warn parameters error (Some __LOC__) Exit (Cckappa_sig.Dictionary_of_States.init ()))
                        in                    
                        let error,max = Cckappa_sig.Dictionary_of_States.last_entry parameters error state_dic in 
                        let c_interface =
@@ -310,7 +310,7 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
                 let error,(bool,output) = Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Binding port.Ckappa_sig.port_nme) () Misc_sa.const_unit site_dic in
                 let error,site_name = 
                   match bool,output with
-                    | _ , None  | true, _  -> warn parameters error (Some "line 228") Exit 0
+                    | _ , None  | true, _  -> warn parameters error (Some (__LOC__^","^(Location.to_string pos)^", this site cannot be bound, "^agent.Ckappa_sig.ag_nme^" "^port.Ckappa_sig.port_nme)) Exit 0
                     | _ , Some (i,_,_,_) ->  
                   error,i
                 in
@@ -338,7 +338,7 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
                let error,(bool,output) = Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Binding port.Ckappa_sig.port_nme) () Misc_sa.const_unit site_dic in
                let error,site_name = 
                  match bool,output with
-                  | _ , None  | true, _  -> warn parameters error (Some "line 264") Exit 0
+                 | _ , None  | true, _  -> warn parameters error (Some (__LOC__^","^(Location.to_string pos)^", this site cannot be bound, "^agent.Ckappa_sig.ag_nme^" "^port.Ckappa_sig.port_nme)) Exit 0						
                   | _ , Some (i,_,_,_) ->  
                  error,i
                in  
@@ -554,7 +554,7 @@ let translate_mixture parameters error handler mixture =
 	  let error,agent =
 	    match agent
 	    with
-	    | None | Some Cckappa_sig.Ghost -> warn parameters error (Some "line 555, question marks should not appear on the rhs") Exit (Cckappa_sig.Ghost)  
+	    | None | Some Cckappa_sig.Ghost -> warn parameters error (Some (__LOC__^", question marks should not appear on the rhs or in introduction")) Exit (Cckappa_sig.Ghost)  
  	    | Some Cckappa_sig.Agent ag ->
 	       let interface = Cckappa_sig.Site_map_and_set.Map.remove s ag.Cckappa_sig.agent_interface in
 	       error,Cckappa_sig.Agent {ag with Cckappa_sig.agent_interface = interface}
@@ -791,18 +791,22 @@ let translate_mixture parameters error handler mixture =
                {rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.actions 
                  with Cckappa_sig.remove = removal_actions}}}
         
-let lift f handler = 
+let lift_forbidding_question_marks parameters handler = 
   (fun error x ->
-   let a,b,c = f error handler  x
+   let a,b,c = translate_mixture parameters error handler  x
    in a,b)
-
+    
+let lift_allowing_question_marks parameters handler =
+  (fun error x ->
+   let a,b,c = translate_mixture parameters error handler x in
+   clean_question_marks parameters a c b) 
 
 let translate_init parameters error handler init =  
    let (a,init_t,c) = init in
    match 
      init_t
    with Ast.INIT_MIX((alg,pos),(mixture,_pos')) -> 
-     let error,c_alg = Prepreprocess.alg_map (lift (translate_mixture parameters) handler) error alg in 
+     let error,c_alg = Prepreprocess.alg_map (lift_allowing_question_marks parameters handler) error alg in 
      let error,c_mixture,_ = translate_mixture parameters error handler mixture in 
    error,
    {Cckappa_sig.e_init_factor = alg ; 
@@ -818,12 +822,7 @@ let translate_init parameters error handler init =
 let alg_with_pos_map = Prepreprocess.map_with_pos Prepreprocess.alg_map
 
 let translate_var parameters error handler (a,b) =
-  let f error x =
-    let error,mixture,questionmarks = translate_mixture parameters error handler  x in
-    let error,mixture = clean_question_marks parameters error questionmarks mixture in
-    error,mixture
-  in 
-  let error,b' = alg_with_pos_map f				  error b in 
+  let error,b' = alg_with_pos_map (lift_allowing_question_marks parameters handler) error b in 
    let error,a_dot = Tools_kasa.make_id_compatible_with_dot_format parameters error (fst a) in 
    error,
 	  {
@@ -834,7 +833,7 @@ let translate_var parameters error handler (a,b) =
    
 
  let translate_obs parameters error handler (a,b) = 
-   let error,a' = Prepreprocess.alg_map (lift (translate_mixture parameters) handler) error a in 
+   let error,a' = Prepreprocess.alg_map (lift_allowing_question_marks parameters handler) error a in 
    error,(a',b)
      
  let bool_with_pos_map = Prepreprocess.map_with_pos Prepreprocess.bool_map
@@ -842,15 +841,15 @@ let translate_var parameters error handler (a,b) =
  let bool_with_pos_with_option_map = Prepreprocess.with_option_map bool_with_pos_map
 
  let translate_perturb parameters error handler ((bool1,modif,bool2),pos2) = 
-   let error,bool1' = bool_with_pos_map (lift (translate_mixture parameters) handler) error bool1 in 
+   let error,bool1' = bool_with_pos_map (lift_allowing_question_marks parameters handler) error bool1 in 
    let error,modif' = 
      List.fold_left 
        (fun (error,l) elt -> 
-	 let error,elt' = Prepreprocess.modif_map (lift (translate_mixture parameters) handler) error elt in 
+	let error,elt' = Prepreprocess.modif_map (lift_forbidding_question_marks parameters handler) (lift_allowing_question_marks parameters handler) error elt in 
 	 error,elt'::l)
        (error,[]) (List.rev modif) 
    in 
-   let error,bool2' = bool_with_pos_with_option_map (lift (translate_mixture parameters) handler) error bool2 in 
+   let error,bool2' = bool_with_pos_with_option_map (lift_allowing_question_marks parameters handler) error bool2 in 
    error,((bool1',modif',bool2'),pos2)
 
  let translate_c_compil parameters error handler compil = 
