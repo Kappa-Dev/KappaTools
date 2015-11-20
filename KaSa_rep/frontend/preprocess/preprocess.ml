@@ -224,7 +224,7 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
               let error,(bool,output) = Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Internal port.Ckappa_sig.port_nme) () Misc_sa.const_unit site_dic in
               let error,site_name = 
                 match bool,output with
-                  | _ , None  | true, _  -> warn parameters error (Some (__LOC__^agent.Ckappa_sig.ag_nme^" "^port.Ckappa_sig.port_nme)) Exit 0
+                  | _ , None  | true, _  -> warn parameters error (Some ("Preprocess line 227"^agent.Ckappa_sig.ag_nme^" "^port.Ckappa_sig.port_nme)) Exit 0
                   | _ , Some (i,_,_,_) ->  
                 error,i
               in 
@@ -269,7 +269,7 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
                        let error,state_dic = 
 			 Misc_sa.unsome 
 			   (Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get parameters error (agent_name,site_name) handler.Cckappa_sig.states_dic)
-			   (fun error -> warn parameters error (Some __LOC__) Exit (Cckappa_sig.Dictionary_of_States.init ()))
+			   (fun error -> warn parameters error (Some "Preprocess line 272") Exit (Cckappa_sig.Dictionary_of_States.init ()))
                        in                    
                        let error,max = Cckappa_sig.Dictionary_of_States.last_entry parameters error state_dic in 
                        let c_interface =
@@ -310,7 +310,7 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
                 let error,(bool,output) = Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Binding port.Ckappa_sig.port_nme) () Misc_sa.const_unit site_dic in
                 let error,site_name = 
                   match bool,output with
-                    | _ , None  | true, _  -> warn parameters error (Some (__LOC__^","^(Location.to_string pos)^", this site cannot be bound, "^agent.Ckappa_sig.ag_nme^" "^port.Ckappa_sig.port_nme)) Exit 0
+                    | _ , None  | true, _  -> warn parameters error (Some ("Preprocess line 313"^","^(Location.to_string pos)^", this site cannot be bound, "^agent.Ckappa_sig.ag_nme^" "^port.Ckappa_sig.port_nme)) Exit 0
                     | _ , Some (i,_,_,_) ->  
                   error,i
                 in
@@ -338,7 +338,7 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
                let error,(bool,output) = Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Binding port.Ckappa_sig.port_nme) () Misc_sa.const_unit site_dic in
                let error,site_name = 
                  match bool,output with
-                 | _ , None  | true, _  -> warn parameters error (Some (__LOC__^","^(Location.to_string pos)^", this site cannot be bound, "^agent.Ckappa_sig.ag_nme^" "^port.Ckappa_sig.port_nme)) Exit 0						
+                 | _ , None  | true, _  -> warn parameters error (Some ("Preprocess line 341"^","^(Location.to_string pos)^", this site cannot be bound, "^agent.Ckappa_sig.ag_nme^" "^port.Ckappa_sig.port_nme)) Exit 0						
                   | _ , Some (i,_,_,_) ->  
                  error,i
                in  
@@ -554,7 +554,7 @@ let translate_mixture parameters error handler mixture =
 	  let error,agent =
 	    match agent
 	    with
-	    | None | Some Cckappa_sig.Ghost -> warn parameters error (Some (__LOC__^", question marks should not appear on the rhs or in introduction")) Exit (Cckappa_sig.Ghost)  
+	    | None | Some Cckappa_sig.Ghost -> warn parameters error (Some ("Preprocess line 557"^", question marks should not appear on the rhs or in introduction")) Exit (Cckappa_sig.Ghost)  
  	    | Some Cckappa_sig.Agent ag ->
 	       let interface = Cckappa_sig.Site_map_and_set.Map.remove s ag.Cckappa_sig.agent_interface in
 	       error,Cckappa_sig.Agent {ag with Cckappa_sig.agent_interface = interface}

@@ -166,8 +166,9 @@ let print_side_effects parameter error result =
   error
 
 (************************************************************************************)
-(*modification sites*)
+(*update of the views due to modification*)
 
+(*with agent_id*)
 let print_modification_sites_aux parameter error result =
   Int2Map_Modif.Map.iter
     ( fun (x, y, z) (l1, s2) ->
@@ -215,9 +216,58 @@ let print_modification_sites parameter error result =
   in
   error
 
-(************************************************************************************)
-(*test sites*)
+(*without agent_id*)
+let print_modification_map_aux parameter error result =
+  Int2Map_Test_Modif.Map.iter
+    ( fun (x, y) (l1, s2) ->
+      if l1 <> []
+      then
+        begin
+          let _ =
+            fprintf parameter.log "agent_type:%i:site_type:%i" x y
+          in
+          let _ = List.fold_left
+            (fun bool x ->
+              (if bool
+               then
+                  fprintf parameter.log ", ");
+              fprintf parameter.log "agent_type:%i" x;
+              true
+            ) false l1
+            
+          in
+          fprintf stdout "\n"
+        end
+      else ();
+      let _ =
+        fprintf parameter.log 
+          "agent_type:%i:site_type:%i@set of rule_id:\n" x y
+      in
+      Site_map_and_set.Set.iter
+        (fun rule_id ->
+          fprintf parameter.log "rule_id:%i\n" rule_id
+        ) s2
+    ) result
 
+let print_modification_map parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "Set of rules that may modify a given site (excluding created agents, without agent_id):\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  let error =
+    print_modification_map_aux
+      parameter
+      error
+      result
+  in
+  error
+
+(************************************************************************************)
+(*valuation of the views that are tested*)
+
+(*with agent_id*)
 let print_test_sites parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
@@ -231,11 +281,28 @@ let print_test_sites parameter error result =
       error
       result
   in
-  error  
+  error
+
+(*without agent_id*)
+let print_test_map parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "Set of rules that may test a given site (without agent_id):\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  let error =
+    print_modification_map_aux 
+      parameter
+      error
+      result
+  in
+  error
 
 (************************************************************************************)
-(*test and modification*)
+(*update and valuations of the views that are tested and modified.*)
 
+(*with agent_id*)
 let print_test_modification_sites parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
@@ -245,6 +312,23 @@ let print_test_modification_sites parameter error result =
     "------------------------------------------------------------\n";
   let error =
     print_modification_sites_aux
+      parameter
+      error
+      result
+  in
+  error
+
+(*without agent_id*)
+
+let print_test_modification_map parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "Set of rules that may test and modify a given site (excluding created agents, without agent_id):\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  let error =
+    print_modification_map_aux
       parameter
       error
       result
@@ -293,5 +377,23 @@ let print_result_static parameter error result =
       parameter
       error 
       result.store_test_modification_sites
+  in
+  let _ =
+    print_modification_map
+      parameter
+      error 
+      result.store_modif_map
+  in
+  let _ =
+    print_test_map
+      parameter
+      error 
+      result.store_test_map
+  in
+  let _ =
+    print_test_modification_map
+      parameter
+      error 
+      result.store_test_modif_map
   in
   error

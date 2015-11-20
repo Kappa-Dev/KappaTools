@@ -97,11 +97,6 @@ let site_occurence_failure ag_na (na,pos) =
 	      "' is problematic! Either Sanity.mixture is"^
 		"broken or you don't use it!",pos))
 
-let not_enough_specified agent_name (na,pos) =
-  raise (ExceptionDefn.Malformed_Decl
-	   ("The link status of agent '"^agent_name^"', site '"^na
-	    ^"' on the right hand side is underspecified",pos))
-
 let annotate_dropped_agent sigs ((agent_name, _ as ag_ty),intf) =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
@@ -184,9 +179,8 @@ let annotate_created_agent id sigs ((agent_name, pos as ag_ty),intf) =
 	      Some (Signature.num_of_internal_state p_id va sign)
 	 | _ :: (_, pos) :: _ -> internal_state_failure pos in
        match p.Ast.port_lnk with
-       | (Ast.LNK_ANY, _) -> ()
-       | ((Ast.LNK_SOME, _) | (Ast.LNK_TYPE _,_)) ->
-	  not_enough_specified agent_name p_na
+       | ((Ast.LNK_ANY, _) | (Ast.LNK_SOME, _) | (Ast.LNK_TYPE _,_)) ->
+	  site_occurence_failure agent_name p_na
        | (Ast.LNK_VALUE i, _) ->  ports.(p_id) <- Raw_mixture.VAL i
        | (Ast.FREE, _) -> ()
       ) intf in
@@ -211,7 +205,7 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
 	 when dst_p'' = dst_p' && dst_ty'' = dst_ty' ->
        ports.(p_id) <- build_l_type sigs dst_ty dst_p Maintained
     | _, (Ast.LNK_ANY,_ | Ast.LNK_SOME,_ | Ast.LNK_TYPE _,_) ->
-       not_enough_specified agent_name p'.Ast.port_nme
+       site_occurence_failure agent_name p'.Ast.port_nme
     | (Ast.LNK_ANY,_), (Ast.FREE,_) -> ports.(p_id) <- L_ANY Freed
     | (Ast.LNK_SOME,_), (Ast.FREE,_) ->
        let (na,pos) = p'.Ast.port_nme in
@@ -292,7 +286,7 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
       List.partition (fun p -> String.compare (fst p.Ast.port_nme) na = 0) rp in
     match p' with
     | [p'] -> (p',r)
-    | [] -> not_enough_specified agent_name (na,pos)
+    | [] -> site_occurence_failure agent_name (na,pos)
     | _ :: _ -> site_occurence_failure agent_name (na,pos) in
   let rp_r =
     List.fold_left
@@ -316,29 +310,11 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
   { ra_type = ag_id; ra_ports = ports; ra_ints = internals;
     ra_syntax = Some (Array.copy ports, Array.copy internals);}
 
-let no_more_site_on_right left right =
-  List.for_all
-    (fun p ->
-     List.exists (fun p' -> fst p.Ast.port_nme = fst p'.Ast.port_nme) left
-     || let () =
-	  ExceptionDefn.warning
-	    ~pos:(snd p.Ast.port_nme)
-	   (fun f ->
-	    Format.fprintf
-	      f "@[Site@ '%s'@ was@ not@ mentionned in@ the@ left-hand@ side."
-	      (fst p.Ast.port_nme);
-	    Format.fprintf
-	      f "This@ agent@ and@ the@ following@ will@ be@ removed@ and@ ";
-	    Format.fprintf
-	      f "recreated@ (probably@ causing@ side@ effects).@]")
-	in false)
-    right
-
 let rec annotate_lhs_with_diff sigs acc lhs rhs =
   match lhs,rhs with
   | ((lag_na,_ as ag_ty),lag_p)::lt, ((rag_na,_),rag_p)::rt
        when String.compare lag_na rag_na = 0 &&
-	      no_more_site_on_right lag_p rag_p ->
+	      Ast.no_more_site_on_right false lag_p rag_p ->
      annotate_lhs_with_diff
        sigs (annotate_agent_with_diff sigs ag_ty lag_p rag_p::acc) lt rt
   | erased, added ->

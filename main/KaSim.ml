@@ -198,10 +198,12 @@ let () =
       Counter.print_efficiency Format.std_formatter counter ;
   with
   | ExceptionDefn.Malformed_Decl er ->
+     let () = ExceptionDefn.flush_warning Format.err_formatter in
      let () = close_desc None in
      let () = Pp.error Format.pp_print_string er in
      exit 2
   | ExceptionDefn.Internal_Error er ->
+     let () = ExceptionDefn.flush_warning Format.err_formatter in
      let () = close_desc None in
      let () =
        Pp.error
@@ -209,16 +211,19 @@ let () =
 	 er in
      exit 2
   | Invalid_argument msg ->
+     let () = ExceptionDefn.flush_warning Format.err_formatter in
      let () = close_desc None in
      let s = "" (*Printexc.get_backtrace()*) in
      let () = Format.eprintf "@.@[<v>***Runtime error %s***@,%s@]@." msg s in
     exit 2
   | ExceptionDefn.UserInterrupted f ->
+     let () = ExceptionDefn.flush_warning Format.err_formatter in
      let () = close_desc None in
      let msg = f 0. 0 in
      let () =Format.eprintf "@.***Interrupted by user: %s***@." msg in
-     exit 2
+     exit 1
   | Sys_error msg ->
+     let () = ExceptionDefn.flush_warning Format.err_formatter in
      let () = close_desc None in
      let () = Format.eprintf "%s@." msg in
      exit 2

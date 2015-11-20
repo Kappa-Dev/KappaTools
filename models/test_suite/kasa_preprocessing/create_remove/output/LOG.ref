@@ -100,6 +100,15 @@ Set of rules that may test a given site:
 ------------------------------------------------------------
 Set of rules that may test and modify a given site (excluding created agents):
 ------------------------------------------------------------
+------------------------------------------------------------
+Set of rules that may modify a given site (excluding created agents, without agent_id):
+------------------------------------------------------------
+------------------------------------------------------------
+Set of rules that may test a given site (without agent_id):
+------------------------------------------------------------
+------------------------------------------------------------
+Set of rules that may test and modify a given site (excluding created agents, without agent_id):
+------------------------------------------------------------
 
 ** Dynamic information:
 

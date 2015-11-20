@@ -40,7 +40,7 @@ let trace = false
 *)
 
 let collect_modification_sites parameter error rule_id diff_direct store_result =
-  (*from a pair of Map (agent_type, site) -> rule_id :: old_result)*)
+  (*from a pair of Map (agent_id, agent_type, site) -> rule_id :: old_result)*)
   let add_link (agent_id, agent_type, site_type) rule_id store_result =
     let (l, old) =
       Int2Map_Modif.Map.find_default
@@ -78,6 +78,30 @@ let collect_modification_sites parameter error rule_id diff_direct store_result 
     Int2Map_Modif.Map.map (fun (l, x) -> List.rev l, x) store_result
   in
   error, store_result
+
+(*update of the views due to modification without agent_id*)
+
+let collect_modif_map parameter error store_modification_sites store_result =
+  let add_link (agent_type, site_type) set_rule_id store_result =
+    let (l, old) =
+      Int2Map_Test_Modif.Map.find_default
+        ([], Site_map_and_set.Set.empty) (agent_type, site_type) store_result
+    in
+    let new_set =
+      Site_map_and_set.Set.union set_rule_id old
+    in
+    let result =
+      Int2Map_Test_Modif.Map.add (agent_type, site_type) (l, new_set) store_result
+    in
+    error, result
+  in
+  Int2Map_Modif.Map.fold
+    (fun (agent_id, agent_type, site_type) (l1, s1) (error, store_result) ->
+      let error, store_result =
+        add_link (agent_type, site_type) s1 store_result
+      in
+      error, store_result
+    ) store_modification_sites (error, store_result)
 
 (************************************************************************************)
 (*collect a set of rule_id of test rule and modification *)
@@ -118,6 +142,30 @@ let collect_test_sites parameter error rule_id viewslhs
     Int2Map_Modif.Map.map (fun (l, x) -> List.rev l, x) store_result
   in
   error, store_result
+
+(*valuations of the views that are created without agent_id*)
+
+let collect_test_map parameter error store_test_sites store_result =
+  let add_link (agent_type, site_type) set_rule_id store_result =
+    let (l, old) =
+      Int2Map_Test_Modif.Map.find_default
+        ([], Site_map_and_set.Set.empty) (agent_type, site_type) store_result
+    in
+    let new_set =
+      Site_map_and_set.Set.union set_rule_id old
+    in
+    let result =
+      Int2Map_Test_Modif.Map.add (agent_type, site_type) (l, new_set) store_result
+    in
+    error, result
+  in
+  Int2Map_Modif.Map.fold
+    (fun (agent_id, agent_type, site_type) (l1, s1) (error, store_result) ->
+      let error, store_result =
+        add_link (agent_type, site_type) s1 store_result
+      in
+      error, store_result
+    ) store_test_sites (error, store_result)
 
 (************************************************************************************)
 (*TODO: modification and test rule that has rule_id union together.
@@ -166,6 +214,31 @@ let collect_test_modification_sites
       in
       error, store_result
     ) store_modification_map store_test_map store_result
+
+(*valuations of the views that are created without agent_id*)
+
+let collect_test_modif_map parameter error store_test_modification_sites store_result =
+  let add_link (agent_type, site_type) set_rule_id store_result =
+    let (l, old) =
+      Int2Map_Test_Modif.Map.find_default
+        ([], Site_map_and_set.Set.empty) (agent_type, site_type) store_result
+    in
+    let new_set =
+      Site_map_and_set.Set.union set_rule_id old
+    in
+    let result =
+      Int2Map_Test_Modif.Map.add (agent_type, site_type) (l, new_set) store_result
+    in
+    error, result
+  in
+  Int2Map_Modif.Map.fold
+    (fun (agent_id, agent_type, site_type) (l1, s1) (error, store_result) ->
+      let error, store_result =
+        add_link (agent_type, site_type) s1 store_result
+      in
+      error, store_result
+    ) store_test_modification_sites (error, store_result)
+
 
 (************************************************************************************)
 (*a pair (agent_type_cv, site_cv) in covering classes

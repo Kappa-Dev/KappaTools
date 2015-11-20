@@ -219,14 +219,14 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  if height_left > height_right + 2 then
             match left with
             | Private.Empty ->
-	       raise (DeadCodeIsNotDead __LOC__) (* height_left > height_right + 2 >= 2 *)
+	       raise (DeadCodeIsNotDead "SetMap line 222") (* height_left > height_right + 2 >= 2 *)
             | Private.Node(leftleft,leftvalue,leftright,_) ->
 	       if height leftleft >= height leftright then
 		 node leftleft leftvalue (node leftright value right)
 	       else
 		 match leftright with
                  | Private.Empty ->
-		    raise (DeadCodeIsNotDead __LOC__) (* 0 <= height leftleft < height leftright *)
+		    raise (DeadCodeIsNotDead "SetMap line 229") (* 0 <= height leftleft < height leftright *)
                  | Private.Node(leftrightleft,leftrightvalue,leftrightright,_) ->
 		    node
 		      (node leftleft leftvalue leftrightleft)
@@ -235,14 +235,14 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  else if height_right > height_left + 2 then
             match right with
             | Private.Empty ->
-	       raise (DeadCodeIsNotDead __LOC__) (* height_right > height_left + 2 >= 2 *)
+	       raise (DeadCodeIsNotDead "SetMap line 238") (* height_right > height_left + 2 >= 2 *)
             | Private.Node(rightleft,rightvalue,rightright,_) ->
 	       if height rightright >= height rightleft then
 		 node (node left value rightleft) rightvalue rightright
 	       else
 		 match rightleft with
                  | Private.Empty ->
-		    raise (DeadCodeIsNotDead __LOC__) (* 0 <= height rightright < height rightleft *)
+		    raise (DeadCodeIsNotDead "SetMap line 245") (* 0 <= height rightright < height rightleft *)
                  | Private.Node(rightleftleft,rightleftvalue,rightleftright,_) ->
 		    node
 		      (node left value rightleftleft)
@@ -297,7 +297,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  let error, bool, set = add_while_testing_freshness warn parameters error new_value set in
 	  let error =
 	    if bool then 
-	      warn parameters error "setMap.ml" (Some ("__LOC__"^" an already elt has been added to a set")) (invalid_arg "Set_and_Map.SET.add")
+	      warn parameters error "setMap.ml" (Some ("SetMap line 300"^" an already elt has been added to a set")) (invalid_arg "Set_and_Map.SET.add")
 	    else
 	      error
 	  in 
@@ -451,7 +451,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		 let error =
 		   if bool
 		   then
-		     warn parameters error "setMap.ml" (Some __LOC__) (failwith "Invariant is broken")
+		     warn parameters error "setMap.ml" (Some "SetMap line 454") (failwith "Invariant is broken")
 		   else error
 		 in
 		 error, bool, set 
@@ -464,7 +464,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		 let error =
 		   if bool
 		   then
-		     warn parameters error "setMap.ml" (Some __LOC__) Not_found
+		     warn parameters error "setMap.ml" (Some "SetMap line 467") Not_found
 		   else error
 		 in 
 		 error, bool, set
@@ -478,7 +478,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  then
 	    error,set 
 	  else 
-	    warn parameters error "setMap.ml" (Some (__LOC__^"Attempt to remove an elt that does not exist")) Not_found,
+	    warn parameters error "setMap.ml" (Some ("SetMap line 481"^"Attempt to remove an elt that does not exist")) Not_found,
 	    set
 	      
 	let rec split split_value set =
@@ -825,14 +825,14 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  if height_left > height_right + 2 then
 	    match left with
             | Private.Empty ->
-	       raise (DeadCodeIsNotDead __LOC__) (* height_left > height_right + 2 >= 2 *)
+	       raise (DeadCodeIsNotDead "SetMap line 828") (* height_left > height_right + 2 >= 2 *)
             | Private.Node (left0,key0,data0,right0,_,_) ->
                if height left0 >= height right0 then
 		 node left0 key0 data0 (node right0 key data right)
                else
 		 match right0 with
 		 | Private.Empty ->
-		    raise (DeadCodeIsNotDead __LOC__) (* 0 <= height left0 < height right0 *)
+		    raise (DeadCodeIsNotDead "SetMap line 835") (* 0 <= height left0 < height right0 *)
 		 | Private.Node (left1,key1,data1,right1,_,_) ->
                     node (node left0 key0 data0 left1)
 			 key1 data1
@@ -841,14 +841,14 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
             if height_right > height_left + 2 then
               match right with
               | Private.Empty ->
-		 raise (DeadCodeIsNotDead __LOC__) (* height_right > height_left + 2 >= 2 *)
+		 raise (DeadCodeIsNotDead "SetMap line 844") (* height_right > height_left + 2 >= 2 *)
               | Private.Node (left0,key0,data0,right0,_,_) ->
 		 if height right0 >= height left0 then
 		   node (node left key data left0) key0 data0 right0
 		 else
 		   match left0 with
 		   | Private.Empty ->
-		      raise (DeadCodeIsNotDead __LOC__) (* 0 <= height right0 < height left0 *)
+		      raise (DeadCodeIsNotDead "SetMap line 851") (* 0 <= height right0 < height left0 *)
 		   | Private.Node (left1,key1,data1,right1,_,_) ->
                       node (node left key data left1)
 			   key1 data1
@@ -892,7 +892,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  then
 	    error, map
 	  else
-	    warn parameter error "setMap.ml " (Some (__LOC__^"Attempt to add an association over a former one in a map")) (invalid_arg "Set_and_Map.Map.add"),
+	    warn parameter error "setMap.ml " (Some ("SetMap line 895"^"Attempt to add an association over a former one in a map")) (invalid_arg "Set_and_Map.Map.add"),
 	    map 
 		 
 				 
@@ -958,7 +958,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		   let error = 
 		     if bool
 		     then
-		       warn parameters error "setMap.ml" (Some __LOC__) (failwith "Invariant is broken")
+		       warn parameters error "setMap.ml" (Some "SetMap line 961") (failwith "Invariant is broken")
 		     else
 		       error
 		   in 
@@ -975,7 +975,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		   let error =
 		     if bool
 		     then
-		       warn parameters error "setMap.ml" (Some __LOC__) (failwith "Invariant is broken")
+		       warn parameters error "setMap.ml" (Some "SetMap line 978") (failwith "Invariant is broken")
 		     else
 		       error
 		   in
@@ -991,7 +991,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  then 
 	    error, map 
 	  else
-	    warn parameters error "setMap.ml" (Some (__LOC__^"Try to remove an association that is not defined in Map.remove")) (failwith "Try to remove an association that is not defined in Map.remove"),
+	    warn parameters error "setMap.ml" (Some ("SetMap line 994"^"Try to remove an association that is not defined in Map.remove")) (failwith "Try to remove an association that is not defined in Map.remove"),
 	    map 
 	let rec pop x = function
 	  | Private.Empty as m -> (None, m)
@@ -1010,7 +1010,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 
 	let rec join left key value right =
 	  match balance left key value right with
-          | Private.Empty -> raise (DeadCodeIsNotDead __LOC__) (* By case analysis *)
+          | Private.Empty -> raise (DeadCodeIsNotDead "SetMap line 1013") (* By case analysis *)
           | Private.Node (left2,key2,data2,right2,_,_) as map2 ->
              let h = height left2 - height right2 in
              if h > 2 || h< -2 then join left2 key2 data2 right2 else map2
