@@ -2,7 +2,7 @@
   * utilities.mli  
   *
   * Creation:                      <2015-08-10 09:21:53 feret>
-  * Last modification: Time-stamp: <2015-11-20 10:13:00 feret>
+  * Last modification: Time-stamp: <2015-11-20 10:36:07 feret>
   * 
   * Causal flow compression: a module for KaSim 
   * Jerome Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -20,15 +20,16 @@
 
 module D:Dag.Dag
 	   
-type error_log = D.S.PH.B.PB.CI.Po.K.H.error_channel
+type error_log = D.S.PH.B.PB.CI.Po.K.H.error list 
 type parameter = D.S.PH.B.PB.CI.Po.K.H.parameter 
 type kappa_handler = D.S.PH.B.PB.CI.Po.K.H.handler 
-type profiling_info = D.S.PH.B.PB.CI.Po.K.P.log_info
-type progress_bar = bool * int * int 
+type profiling_info = D.S.PH.B.PB.CI.Po.K.P.log_info 
+type progress_bar 
 
 type refined_trace = D.S.PH.B.PB.CI.Po.K.refined_step list
 type refined_trace_with_side_effect = (D.S.PH.B.PB.CI.Po.K.refined_step * D.S.PH.B.PB.CI.Po.K.side_effect) list
-type refined_trace_with_weak_events = (D.S.PH.B.PB.CI.Po.K.refined_step * bool) list
+
+
 type step_id = D.S.PH.B.PB.step_id 
 type cflow_grid = Causal.grid  
 type enriched_cflow_grid = Causal.enriched_grid 
@@ -50,14 +51,11 @@ type story_list =
 			     
 		      
 type observable_hit 
-			
-type story_table (*=*)  
-(*  { 
-    story_counter:int;
-    progress_bar:progress_bar;
-    blackboard:musical_grid;
-    story_list: story_list list;
-    faillure:int}*)
+val get_event_list_from_observable_hit: observable_hit -> step_id list     
+val get_runtime_info_from_observable_hit: observable_hit -> unit  Mods.simulation_info option
+val get_list_order: observable_hit -> D.S.PH.update_order list			
+
+type story_table  
 
 (** error_init is an empty log of errors *)
 val error_init: D.S.PH.B.PB.CI.Po.K.H.error_channel
@@ -67,6 +65,7 @@ val error_init: D.S.PH.B.PB.CI.Po.K.H.error_channel
 (** Trace local simplification *)		  
 
 val remove_events_after_last_obs: refined_trace -> refined_trace
+
 (** split_init split init event agent-wise *)
 val split_init: refined_trace -> refined_trace
 			   
@@ -93,35 +92,31 @@ val enrich_big_grid_with_transitive_closure: Format.formatter -> cflow_grid -> e
 val enrich_small_grid_with_transitive_closure: Format.formatter -> cflow_grid -> enriched_cflow_grid 
 val enrich_std_grid_with_transitive_closure: Format.formatter -> cflow_grid -> enriched_cflow_grid 
 										   
-(** Musical processing *)
-val convert_trace_into_musical_notation: parameter -> kappa_handler -> error_log -> profiling_info -> refined_trace -> error_log * profiling_info * musical_grid
 
- 
-											     
+(** Musical processing *)
+val convert_trace_into_musical_notation: parameter -> kappa_handler -> error_log -> profiling_info -> refined_trace -> error_log * profiling_info * musical_grid											     
 val extract_observable_hits_from_musical_notation: parameter -> kappa_handler -> error_log ->  musical_grid -> error_log * observable_hit list 
 val extract_observable_hit_from_musical_notation: string -> parameter -> kappa_handler -> error_log ->  musical_grid -> error_log * observable_hit  
-
-
-val get_event_list_from_observable_hit: observable_hit -> step_id list     
-val get_runtime_info_from_observable_hit: observable_hit -> unit  Mods.simulation_info option
-val get_list_order: observable_hit -> D.S.PH.update_order list
-
 val causal_prefix_of_an_observable_hit: string -> parameter -> kappa_handler -> error_log -> profiling_info -> musical_grid -> enriched_cflow_grid -> observable_hit -> error_log * refined_trace 
 
-val empty_story_table_with_tick: Format.formatter -> (*musical_grid ->*) int -> story_table 
-val empty_story_table: (*musical_grid ->*) int -> story_table 
+
+(** Story table *)
+val empty_story_table_with_tick: Format.formatter -> int -> story_table 
+val empty_story_table: int -> story_table 
 val tick: Format.formatter -> story_table -> story_table 
 val inc_counter: story_table -> story_table 
 val get_counter: story_table -> int 		
 val get_stories: story_table -> story_list list 
 val count_faillure: story_table -> int 
+val count_stories: story_table -> int 
 
-val store_trace_gen: bool -> parameter -> kappa_handler -> error_log ->  profiling_info Mods.simulation_info option -> profiling_info  -> refined_trace_with_side_effect -> refined_trace -> story_table -> error_log * story_table *  profiling_info Mods.simulation_info option 
+val store_trace_while_trusting_side_effects: parameter -> kappa_handler -> error_log ->  profiling_info Mods.simulation_info option -> profiling_info  -> refined_trace_with_side_effect -> refined_trace -> story_table -> error_log * story_table *  profiling_info Mods.simulation_info option 
+val store_trace_while_rebuilding_side_effects: parameter -> kappa_handler -> error_log ->  profiling_info Mods.simulation_info option -> profiling_info  -> refined_trace_with_side_effect -> refined_trace -> story_table -> error_log * story_table *  profiling_info Mods.simulation_info option 
 
 (** put together the stories having the same canonic form *) 
 val flatten_story_table: parameter -> kappa_handler -> error_log -> story_table -> error_log * story_table 
 
-val count_stories: story_table -> int  																				      
+ 																				      
 (** Print utilities *)													    
 val print_trace: parameter -> kappa_handler -> refined_trace -> unit  
 		

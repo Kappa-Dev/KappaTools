@@ -2,7 +2,7 @@
  * utilities.ml 
  *      
  * Creation:                      <2015-03-28 feret>
- * Last modification: Time-stamp: <2015-11-20 10:03:41 feret>
+ * Last modification: Time-stamp: <2015-11-20 10:30:55 feret>
  * 
  * API for causal compression
  * Jerome Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -24,11 +24,23 @@ type profiling_info = D.S.PH.B.PB.CI.Po.K.P.log_info
 type progress_bar = bool * int * int 
 		       
 type refined_trace = D.S.PH.B.PB.CI.Po.K.refined_step list
-type refined_trace_with_weak_events = (D.S.PH.B.PB.CI.Po.K.refined_step * bool) list
 type step_with_side_effects = D.S.PH.B.PB.CI.Po.K.refined_step * D.S.PH.B.PB.CI.Po.K.side_effect										
 type refined_trace_with_side_effect = step_with_side_effects list
 type step_id = D.S.PH.B.PB.step_id
 
+(** operations over traces *) 
+let split_init = D.S.PH.B.PB.CI.Po.K.split_init
+let disambiguate = D.S.PH.B.PB.CI.Po.K.disambiguate
+let fill_siphon = D.S.PH.B.PB.CI.Po.K.fill_siphon 
+let cut = D.S.PH.B.PB.CI.Po.cut
+let remove_events_after_last_obs = List_utilities.remove_suffix_after_last_occurrence  D.S.PH.B.PB.CI.Po.K.is_obs_of_refined_step 
+
+let remove_weak_events_annotation l = 
+  List.rev_map fst (List.rev l) 
+
+let remove_pseudo_inverse_events a b c d =
+  let a,b,c = D.S.PH.B.PB.CI.cut a b c d in
+  a,(remove_weak_events_annotation b,c)
 		 
 type cflow_grid = Causal.grid  
 type enriched_cflow_grid = Causal.enriched_grid
@@ -46,6 +58,8 @@ type dag_prehash = D.prehash
    for each hash, there is a list of stories having this hash, for each one, we have the grid, the dag, the canonical form (if any), and then a list of timestamp that indicated when the observables have been hit *) 
 type story_list =
   dag_prehash * (cflow_grid * dag  * dag_canonical_form option * refined_trace * profiling_info Mods.simulation_info option list) list
+
+
 	
 type story_table =  
   { 
@@ -65,23 +79,10 @@ let get_event_list_from_observable_hit a = a.list_of_events
 let get_runtime_info_from_observable_hit a = a.runtime_info 
 let get_list_order a = a.list_of_actions 
 
-
 module Profiling = D.S.PH.B.PB.CI.Po.K.P
 
 		     
 let error_init = D.S.PH.B.PB.CI.Po.K.H.error_init
-let split_init = D.S.PH.B.PB.CI.Po.K.split_init
-let disambiguate = D.S.PH.B.PB.CI.Po.K.disambiguate
-let fill_siphon = D.S.PH.B.PB.CI.Po.K.fill_siphon 
-let cut = D.S.PH.B.PB.CI.Po.cut
-let remove_events_after_last_obs = List_utilities.remove_suffix_after_last_occurrence  D.S.PH.B.PB.CI.Po.K.is_obs_of_refined_step 
-
-let remove_weak_events_annotation l = 
-  List.rev_map fst (List.rev l) 
-
-let remove_pseudo_inverse_events a b c d =
-  let a,b,c = D.S.PH.B.PB.CI.cut a b c d in
-  a,(remove_weak_events_annotation b,c)
 	    
 let extract_observable_hits_from_musical_notation a b c d = 
   let error,l = D.S.PH.forced_events a b c d in 
@@ -198,6 +199,9 @@ let store_trace_gen bool (parameter:parameter) (handler:kappa_handler) (error:er
     }
   in 
   error,story_table,story_info 
+
+let store_trace_while_trusting_side_effects = store_trace_gen true
+let store_trace_while_rebuilding_side_effects = store_trace_gen false 
 
 let flatten_story_table parameter handler error story_table = 
   let error,list = 

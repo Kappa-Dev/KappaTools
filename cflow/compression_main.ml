@@ -2,7 +2,7 @@
   * compression_main.ml 
   *
   * Creation:                      <2011-10-19 16:52:55 feret>
-  * Last modification: Time-stamp: <2015-11-20 10:17:55 feret> 
+  * Last modification: Time-stamp: <2015-11-20 10:31:18 feret> 
   * 
   * Causal flow compression: a module for KaSim 
   * Jerome Feret, projet Antique, INRIA Paris-Rocquencourt
@@ -246,7 +246,7 @@ let compress_and_print logger env log_info step_list =
 		  then
 		    let error,event_list,result_wo_compression = D.S.translate parameter handler error blackboard_cflow event_id_list in 
 		    let error,causal_story_array,log_info = 
-		      U.store_trace_gen true parameter handler error info log_info result_wo_compression event_list  story_list 
+		      U.store_trace_while_trusting_side_effects parameter handler error info log_info result_wo_compression event_list  story_list 
 		    in 
 		    let causal_story_array = U.tick logger causal_story_array in 
 		    let causal_story_array = U.inc_counter causal_story_array in 
