@@ -134,6 +134,25 @@ type ('agent,'mixture,'rule) compil =
 	(str_pos * float * str_pos) list
     }
 
+let no_more_site_on_right warning left right =
+  List.for_all
+    (fun p ->
+     List.exists (fun p' -> fst p.port_nme = fst p'.port_nme) left
+     || let () =
+	  if warning then
+	    ExceptionDefn.warning
+	      ~pos:(snd p.port_nme)
+	      (fun f ->
+		Format.fprintf
+		  f "@[Site@ '%s'@ was@ not@ mentionned in@ the@ left-hand@ side."
+		  (fst p.port_nme);
+		Format.fprintf
+		  f "This@ agent@ and@ the@ following@ will@ be@ removed@ and@ ";
+		Format.fprintf
+		  f "recreated@ (probably@ causing@ side@ effects).@]")
+	in false)
+    right
+
 let result:(agent,mixture,rule) compil ref =
   ref {
     variables      = [];
