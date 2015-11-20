@@ -35,7 +35,7 @@ let options =
 	  "--no-compute-ODE-flow-of-information";
 	  "--no-compute-stochastic-flow-of-information";
 	  "--no-compute-reachability-analysis";
-	],[]),"reset everything",["0_Actions"],Normal;
+	],[]),"launch nothing",["0_Actions"],Normal;
 
       "--compute-contact-map",
       Bool Config.do_contact_map, 
