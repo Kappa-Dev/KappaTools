@@ -2,7 +2,7 @@
   * utilities.mli  
   *
   * Creation:                      <2015-08-10 09:21:53 feret>
-  * Last modification: Time-stamp: <2015-11-20 10:36:07 feret>
+  * Last modification: Time-stamp: <2015-11-20 21:39:37 feret>
   * 
   * Causal flow compression: a module for KaSim 
   * Jerome Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -14,7 +14,7 @@
   * * 
   * Some functionalities for story compression
   *  
-  * Copyright 2011,2012,2013 Institut National de Recherche en Informatique 
+  * Copyright 2011,2012,2013,2014,2015 Institut National de Recherche en Informatique 
   * et en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
@@ -109,9 +109,10 @@ val get_counter: story_table -> int
 val get_stories: story_table -> story_list list 
 val count_faillure: story_table -> int 
 val count_stories: story_table -> int 
+val inc_faillure: story_table -> story_table 
 
-val store_trace_while_trusting_side_effects: parameter -> kappa_handler -> error_log ->  profiling_info Mods.simulation_info option -> profiling_info  -> refined_trace_with_side_effect -> refined_trace -> story_table -> error_log * story_table *  profiling_info Mods.simulation_info option 
-val store_trace_while_rebuilding_side_effects: parameter -> kappa_handler -> error_log ->  profiling_info Mods.simulation_info option -> profiling_info  -> refined_trace_with_side_effect -> refined_trace -> story_table -> error_log * story_table *  profiling_info Mods.simulation_info option 
+val store_trace_while_trusting_side_effects: parameter -> kappa_handler -> error_log ->  profiling_info Mods.simulation_info option list -> profiling_info  -> refined_trace_with_side_effect -> refined_trace -> story_table -> error_log * story_table *  profiling_info 
+val store_trace_while_rebuilding_side_effects: parameter -> kappa_handler -> error_log ->  profiling_info Mods.simulation_info option list -> profiling_info  -> refined_trace_with_side_effect -> refined_trace -> story_table -> error_log * story_table *  profiling_info 
 
 (** put together the stories having the same canonic form *) 
 val flatten_story_table: parameter -> kappa_handler -> error_log -> story_table -> error_log * story_table 
@@ -119,7 +120,6 @@ val flatten_story_table: parameter -> kappa_handler -> error_log -> story_table 
  																				      
 (** Print utilities *)													    
 val print_trace: parameter -> kappa_handler -> refined_trace -> unit  
-		
 val export_musical_grid_to_xls: parameter -> kappa_handler -> error_log  -> string -> int -> int -> musical_grid  -> error_log				
 val print_musical_grid: parameter -> kappa_handler -> error_log  -> musical_grid  -> error_log					   
 

@@ -2,7 +2,7 @@
  * utilities.ml 
  *      
  * Creation:                      <2015-03-28 feret>
- * Last modification: Time-stamp: <2015-11-20 10:30:55 feret>
+ * Last modification: Time-stamp: <2015-11-20 21:41:49 feret>
  * 
  * API for causal compression
  * Jerome Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -13,7 +13,6 @@
  * GNU Library General Public License *)
 
 let debug_mode = false
-let dummy_weak = false
 		   
 module D=Dag.Dag
 
@@ -165,6 +164,10 @@ let tick logger story_list =
 let get_counter story_list = story_list.story_counter 
 let get_stories story_list = story_list.story_list 
 let count_faillure story_list = story_list.faillure 
+let inc_faillure story_list = 
+  { story_list
+    with 
+      faillure = story_list.faillure + 1}
 let inc_counter story_list =
   {
     story_list with 
@@ -176,6 +179,7 @@ let inc_faillure story_list =
       faillure = succ story_list.faillure
   }
 
+
 let store_trace_gen bool (parameter:parameter) (handler:kappa_handler) (error:error_log) obs_info  computation_info trace trace2 (story_table:story_table) = 
   let grid = D.S.PH.B.PB.CI.Po.K.build_grid trace bool  handler in
   let computation_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  computation_info in 
@@ -183,22 +187,23 @@ let store_trace_gen bool (parameter:parameter) (handler:kappa_handler) (error:er
   let error,prehash = D.prehash parameter handler error graph in 
   let computation_info = D.S.PH.B.PB.CI.Po.K.P.set_canonicalisation computation_info in 
   let story_info = 
-    match obs_info 
-    with 
-    | None -> None 
-    | Some info -> 
-      let info = Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy computation_info)  info 
-       in 
-       Some info
+    List.map 
+      (fun info -> 
+	match info  
+	with 
+	| None -> None 
+	| Some info -> 
+	  Some (Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy computation_info) info))
+      obs_info 
   in 
   let story_table = 
     {
       story_table
      with
-       story_list = (prehash,[grid,graph,None,trace2,[story_info]])::story_table.story_list
+       story_list = (prehash,[grid,graph,None,trace2,story_info])::story_table.story_list
     }
   in 
-  error,story_table,story_info 
+  error,story_table,computation_info 
 
 let store_trace_while_trusting_side_effects = store_trace_gen true
 let store_trace_while_rebuilding_side_effects = store_trace_gen false 
@@ -221,7 +226,6 @@ let count_stories story_table =
         
 
 let from_none_to_weak parameter handler log_info logger (error,story_list) (step_list,list_info) = 
-  let info = List.hd list_info in 
   let event_list = step_list in 
   let error,log_info,blackboard,list_order = 
     let error,log_info,blackboard = D.S.sub parameter handler error log_info event_list in 
@@ -259,14 +263,16 @@ let from_none_to_weak parameter handler log_info logger (error,story_list) (step
       list
     with 
     | [] -> 
-       error,inc_faillure story_list,None 
+       error,inc_faillure story_list,log_info
     | _ ->  
        List.fold_left
 	 (fun (error,story_list,info) list -> 
 	  let weak_event_list = D.S.translate_result list in 
           let weak_event_list = D.S.PH.B.PB.CI.Po.K.clean_events weak_event_list in 
-	  store_trace_gen false parameter handler error info log_info  list weak_event_list story_list )
-	 (error,story_list,info)
+	  store_trace_gen false parameter handler error list_info 
+	    log_info  
+	    list weak_event_list story_list )
+	 (error,story_list,log_info)
 	 list 
   in 
 (*  let error,log_info,blackboard = D.S.PH.B.reset_init parameter handler error log_info blackboard_tmp in *)
