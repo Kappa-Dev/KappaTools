@@ -24,10 +24,10 @@ ____________________________________________________________
 	 - blackboard generation
 	 - computing causal past of each observed events (32)
 Stats:
- number of step   : 1134
+ number of step   : 1131
  longest story    : 96
- average length   : 49.1666666667
- geometric mean   : 56.4343276148
+ average length   : 48.6736842105
+ geometric mean   : 55.8690197553
 
 	 - causal & weak flow compression (32)
 

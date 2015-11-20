@@ -58,6 +58,7 @@ let scan_rule_static parameter error handler rule_id rule covering_classes
       store_result.store_side_effects
   in 
   (*-------------------------------------------------------------------------------*)
+  (*update of the views due to modification with agent_id*)
   let error, store_modification_sites =
     collect_modification_sites
       parameter
@@ -67,7 +68,7 @@ let scan_rule_static parameter error handler rule_id rule covering_classes
       store_result.store_modification_sites
   in
   (*-------------------------------------------------------------------------------*)
-  (*test*)
+  (*valuations of the views that are tested with agent_id*)
   let error, store_test_sites =
     collect_test_sites
       parameter
@@ -77,7 +78,7 @@ let scan_rule_static parameter error handler rule_id rule covering_classes
       store_result.store_test_sites
   in
   (*-------------------------------------------------------------------------------*)
-  (*test and modification*)
+  (*valuations and update of the views that are tested and modification with agent_id*)
   let error, store_test_modification_sites =
     collect_test_modification_sites
       parameter
@@ -87,13 +88,44 @@ let scan_rule_static parameter error handler rule_id rule covering_classes
       store_result.store_test_modification_sites
   in
   (*-------------------------------------------------------------------------------*)
+  (*update of the views due to modification without agent_id*)
+  let error, store_modif_map =
+    collect_modif_map
+      parameter
+      error
+      store_modification_sites
+      store_result.store_modif_map
+  in
+  (*-------------------------------------------------------------------------------*)
+  (*valuations of the views that are tested without agent_id*)
+  let error, store_test_map =
+    collect_test_map
+      parameter
+      error
+      store_test_sites
+      store_result.store_test_map
+  in
+  (*-------------------------------------------------------------------------------*)
+  (*valuations and update of the views that are tested and modification
+    without agent_id*)
+  let error, store_test_modif_map =
+    collect_test_modif_map
+      parameter
+      error
+      store_test_modification_sites
+      store_result.store_test_modif_map
+  in
+  (*-------------------------------------------------------------------------------*)
   error, 
   {
-    store_covering_classes_id                  = store_covering_classes_id;
-    store_side_effects                         = store_side_effects;
-    store_modification_sites                   = store_modification_sites;
-    store_test_sites                           = store_test_sites;
-    store_test_modification_sites              = store_test_modification_sites;
+    store_covering_classes_id     = store_covering_classes_id;
+    store_side_effects            = store_side_effects;
+    store_modification_sites      = store_modification_sites;
+    store_test_sites              = store_test_sites;
+    store_test_modification_sites = store_test_modification_sites;
+    store_modif_map               = store_modif_map;
+    store_test_map                = store_test_map;
+    store_test_modif_map          = store_test_modif_map;
   }
 
 (************************************************************************************)
@@ -366,12 +398,15 @@ let scan_rule parameter error handler rule_id rule store_covering_classes
 (*intitial state of static analysis*)
 
 let init_bdu_analysis_static =
-  let init_covering_classes_id     = Int2Map_CV.Map.empty in
-  let init_half_break              = Int2Map_HalfBreak_effect.Map.empty  in
-  let init_remove                  = Int2Map_Remove_effect.Map.empty  in
-  let init_modification            = Int2Map_Modif.Map.empty in
-  let init_test                    = Int2Map_Modif.Map.empty in
-  let init_test_modification       = Int2Map_Modif.Map.empty in
+  let init_covering_classes_id = Int2Map_CV.Map.empty in
+  let init_half_break          = Int2Map_HalfBreak_effect.Map.empty  in
+  let init_remove              = Int2Map_Remove_effect.Map.empty  in
+  let init_modification        = Int2Map_Modif.Map.empty in
+  let init_test                = Int2Map_Modif.Map.empty in
+  let init_test_modification   = Int2Map_Modif.Map.empty in
+  let init_modif_map           = Int2Map_Test_Modif.Map.empty in
+  let init_test_map            = Int2Map_Test_Modif.Map.empty in
+  let init_test_modif_map      = Int2Map_Test_Modif.Map.empty in
   let init_bdu_analysis_static =
     {
       store_covering_classes_id     = init_covering_classes_id;
@@ -379,6 +414,9 @@ let init_bdu_analysis_static =
       store_modification_sites      = init_modification;
       store_test_sites              = init_test;
       store_test_modification_sites = init_test_modification;
+      store_modif_map               = init_modif_map;
+      store_test_map                = init_test_map;
+      store_test_modif_map          = init_test_modif_map;
     }
   in
   init_bdu_analysis_static
@@ -443,9 +481,7 @@ let init_bdu_build_map parameter error =
 (*init of bdu fixpoint*)
 
 let init_bdu_fixpoint parameter error = (*TODO*)
-  (*let error, (handler, bdu_init) = Bdu_build_common.bdu_init parameter error in*)
   let init_bdu_update_map = Map_bdu_update.Map.empty in
-  (*let init_bdu_update_map = bdu_init in*)
   let init_bdu_fixpoint =
     {
       store_bdu_update_map = init_bdu_update_map;

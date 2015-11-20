@@ -180,6 +180,26 @@ agent_id:0:agent_type:2:site_type:0@set of rule_id:
 rule_id:1
 agent_id:1:agent_type:0:site_type:0@set of rule_id:
 rule_id:1
+------------------------------------------------------------
+Set of rules that may modify a given site (excluding created agents, without agent_id):
+------------------------------------------------------------
+agent_type:0:site_type:0@set of rule_id:
+rule_id:1
+------------------------------------------------------------
+Set of rules that may test a given site (without agent_id):
+------------------------------------------------------------
+agent_type:0:site_type:0@set of rule_id:
+rule_id:0
+agent_type:2:site_type:0@set of rule_id:
+rule_id:1
+------------------------------------------------------------
+Set of rules that may test and modify a given site (excluding created agents, without agent_id):
+------------------------------------------------------------
+agent_type:0:site_type:0@set of rule_id:
+rule_id:0
+rule_id:1
+agent_type:2:site_type:0@set of rule_id:
+rule_id:1
 
 ** Dynamic information:
 
@@ -263,13 +283,4 @@ agent_type_   false
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
-agent_type:2:cv_id:0
-agent_type_ if(mvbdu_id:5) x1 < 0 then 
-agent_type_  false
-agent_type_ else 
-agent_type_  if(mvbdu_id:4) x1 < 1 then 
-agent_type_   true
-agent_type_  else 
-agent_type_   false
-
 execution finished without any exception

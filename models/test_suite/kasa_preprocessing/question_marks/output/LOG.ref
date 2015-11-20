@@ -413,6 +413,43 @@ rule_id:6
 agent_id:1:agent_type:0:site_type:1@set of rule_id:
 rule_id:2
 rule_id:6
+------------------------------------------------------------
+Set of rules that may modify a given site (excluding created agents, without agent_id):
+------------------------------------------------------------
+agent_type:0:site_type:0@set of rule_id:
+rule_id:0
+rule_id:4
+agent_type:0:site_type:1@set of rule_id:
+rule_id:1
+rule_id:2
+rule_id:3
+rule_id:6
+------------------------------------------------------------
+Set of rules that may test a given site (without agent_id):
+------------------------------------------------------------
+agent_type:0:site_type:0@set of rule_id:
+rule_id:0
+rule_id:3
+rule_id:4
+agent_type:0:site_type:1@set of rule_id:
+rule_id:1
+rule_id:2
+rule_id:3
+rule_id:4
+rule_id:6
+------------------------------------------------------------
+Set of rules that may test and modify a given site (excluding created agents, without agent_id):
+------------------------------------------------------------
+agent_type:0:site_type:0@set of rule_id:
+rule_id:0
+rule_id:3
+rule_id:4
+agent_type:0:site_type:1@set of rule_id:
+rule_id:1
+rule_id:2
+rule_id:3
+rule_id:4
+rule_id:6
 
 ** Dynamic information:
 

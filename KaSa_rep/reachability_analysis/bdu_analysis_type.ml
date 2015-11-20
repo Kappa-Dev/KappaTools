@@ -21,46 +21,12 @@ let warn parameters mh message exn default =
 
 let local_trace = false
 
-(************************************************************************************)
-(*module type*)
-
 module AgentMap = Quick_Nearly_inf_Imperatif
 
-(*module of covering classes*)
+(************************************************************************************)
+(*static information*)
 
-module Int2Map_CV =
-  SetMap.Make (
-    struct
-      (*agent_type, site*)
-      type t = int * int
-      let compare = compare
-    end)
-
-(*------------------------------------------------------------------------------*)
-(*module type of contact map with state*)
-
-module Int2Map_CM_state =
-  SetMap.Make (
-    struct
-      (*agent_type, site, state*)
-      type t = int * int * int
-      let compare = compare
-    end
-  )
-
-(*------------------------------------------------------------------------------*)
-(*module type of modification site*)
-
-module Int2Map_Modif =
-  SetMap.Make (
-    struct
-      (*agent_id, agent_type, site*)
-      type t = int * int * int
-      let compare = compare
-    end)
-
-(*------------------------------------------------------------------------------*)
-(*half break side effect module*)
+(*half break side effect*)
 
 module Int2Map_HalfBreak_effect =
   SetMap.Make (
@@ -78,8 +44,51 @@ module Int2Map_Remove_effect =
       let compare = compare
     end)
 
-(*------------------------------------------------------------------------------*)
-(*update function of covering classes and modification sites*)
+(*views that are tested and modified with agent_id*)
+
+module Int2Map_Modif =
+  SetMap.Make (
+    struct
+      (*agent_id, agent_type, site*)
+      type t = int * int * int
+      let compare = compare
+    end)
+
+(*views that are tested and modified without agent_id*)
+
+module Int2Map_Test_Modif =
+  SetMap.Make (
+    struct
+      (*agent_type, site*)
+      type t = int * int
+      let compare = compare
+    end)
+
+(************************************************************************************)
+(*dynamic information*)
+
+(*dynamic contact map*)
+
+module Int2Map_CV =
+  SetMap.Make (
+    struct
+      (*agent_type, site*)
+      type t = int * int
+      let compare = compare
+    end)
+
+(*syntactic contact map*)
+
+module Int2Map_CM_state = 
+  SetMap.Make (
+    struct
+      (*agent_type, site, state*)
+      type t = int * int * int
+      let compare = compare
+    end
+  )
+
+(*list of rules to awake when the state of a site is modified and tested*)
 
 module Int2Map_CV_Modif = 
   SetMap.Make (
@@ -89,8 +98,10 @@ module Int2Map_CV_Modif =
       let compare = compare
     end)
 
+
 (************************************************************************************)
-(*local information of test, creation and modification with new indexes*)
+(*type bdu_build_map:
+  local information of views that are tested, created and modified with new indexes*)
 
 module Map_test =
   SetMap.Make (
@@ -113,8 +124,7 @@ module Map_modif =
       let compare = compare
     end)
 
-(************************************************************************************)
-(*type map for bdu*)
+(*bdu*)
 
 module Map_test_bdu =
   SetMap.Make (
@@ -138,7 +148,7 @@ module Map_modif_list =
     end)
 
 (************************************************************************************)
-(*fixpoint map*)
+(*fixpoint iteration*)
 
 module Map_bdu_update =
   SetMap.Make (
@@ -161,16 +171,22 @@ type bdu_analysis_static =
   {
     store_covering_classes_id : (int list * int list) Int2Map_CV.Map.t;
     store_side_effects        : half_break_action * remove_action;
+    (* views that are tested and modificated with agent_id*)
     store_modification_sites  :
       (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t;
     store_test_sites :
       (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t;
     store_test_modification_sites :
       (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t;
+    (*views that are tested and modificated without agent_id, will be used in
+      update function*)
+    store_modif_map      : (int list * Site_map_and_set.Set.t) Int2Map_Test_Modif.Map.t;
+    store_test_map       : (int list * Site_map_and_set.Set.t) Int2Map_Test_Modif.Map.t;
+    store_test_modif_map : (int list * Site_map_and_set.Set.t) Int2Map_Test_Modif.Map.t;
   }
 
 (************************************************************************************)
-(*dynamic*)
+(*dynamic information*)
 
 type wl_int = IntWL.WSetMap.elt list * IntWL.WSetMap.elt list * IntWL.WSetMap.Set.t
 
@@ -185,7 +201,7 @@ type bdu_analysis_dynamic =
   }
 
 (************************************************************************************)
-(*build covering classes with new index*)
+(*build covering classes with new indexes*)
 
 type bdu_build =
   {
