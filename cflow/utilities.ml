@@ -1,21 +1,16 @@
 (**
-  * utilities.ml  
-  *
-  * Causal flow compression: a module for KaSim 
-  * Jerome Feret, projet Abstraction, INRIA Paris-Rocquencourt
-  * Jean Krivine, Université Paris-Diderot, CNRS 
-  * 
-  * KaSim
-  * Jean Krivine, Universite Paris-Diderot, CNRS 
-  *  
-  * Creation: 10/08/2015
-  * Last modification: 10/08/2015
-  * * 
-  * Some functionalities for story compression
-  *  
-  * Copyright 2011,2012,2013 Institut National de Recherche en Informatique 
-  * et en Automatique.  All rights reserved.  This file is distributed     
-  * under the terms of the GNU Library General Public License *)
+ * utilities.ml 
+ *      
+ * Creation:                      <2015-03-28 feret>
+ * Last modification: Time-stamp: <2015-11-20 10:03:41 feret>
+ * 
+ * API for causal compression
+ * Jerome Feret, projet Abstraction, INRIA Paris-Rocquencourt
+ * Jean Krivine, Université Paris-Diderot, CNRS   
+ *  
+ * Copyright 2015 Institut National de Recherche en Informatique  * et en Automatique.  All rights reserved.  
+ * This file is distributed under the terms of the 
+ * GNU Library General Public License *)
 
 let debug_mode = false
 let dummy_weak = false
@@ -72,12 +67,14 @@ let get_list_order a = a.list_of_actions
 
 
 module Profiling = D.S.PH.B.PB.CI.Po.K.P
+
 		     
 let error_init = D.S.PH.B.PB.CI.Po.K.H.error_init
 let split_init = D.S.PH.B.PB.CI.Po.K.split_init
 let disambiguate = D.S.PH.B.PB.CI.Po.K.disambiguate
 let fill_siphon = D.S.PH.B.PB.CI.Po.K.fill_siphon 
 let cut = D.S.PH.B.PB.CI.Po.cut
+let remove_events_after_last_obs = List_utilities.remove_suffix_after_last_occurrence  D.S.PH.B.PB.CI.Po.K.is_obs_of_refined_step 
 
 let remove_weak_events_annotation l = 
   List.rev_map fst (List.rev l) 

@@ -1,6 +1,9 @@
 (**
   * compression_main.ml 
   *
+  * Creation:                      <2011-10-19 16:52:55 feret>
+  * Last modification: Time-stamp: <2015-11-20 10:17:55 feret> 
+  * 
   * Causal flow compression: a module for KaSim 
   * Jerome Feret, projet Antique, INRIA Paris-Rocquencourt
   * Jean Krivine, Université Paris-Diderot, CNRS 
@@ -8,9 +11,6 @@
   * KaSim
   * Jean Krivine, Universite Paris-Diderot, CNRS 
   *  
-  * Creation: 19/10/2011
-  * Last modification: 10/11/2015
-  * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
   *  
@@ -68,6 +68,7 @@ let compress_and_print logger env log_info step_list =
     else
       begin (* causal compression *)
         let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_none parameter in
+	let step_list = U.remove_events_after_last_obs step_list in 
         if not @@ List.exists D.S.PH.B.PB.CI.Po.K.is_obs_of_refined_step step_list
         then
           let () = Debug.tag logger "+ No causal flow found" in

@@ -1,15 +1,16 @@
 (**
   * utilities.mli  
   *
+  * Creation:                      <2015-08-10 09:21:53 feret>
+  * Last modification: Time-stamp: <2015-11-20 10:13:00 feret>
+  * 
   * Causal flow compression: a module for KaSim 
   * Jerome Feret, projet Abstraction, INRIA Paris-Rocquencourt
   * Jean Krivine, Université Paris-Diderot, CNRS 
-  * 
+  *
   * KaSim
   * Jean Krivine, Universite Paris-Diderot, CNRS 
   *  
-  * Creation: 10/08/2015
-  * Last modification: 10/08/2015
   * * 
   * Some functionalities for story compression
   *  
@@ -64,6 +65,8 @@ val error_init: D.S.PH.B.PB.CI.Po.K.H.error_channel
 
 
 (** Trace local simplification *)		  
+
+val remove_events_after_last_obs: refined_trace -> refined_trace
 (** split_init split init event agent-wise *)
 val split_init: refined_trace -> refined_trace
 			   

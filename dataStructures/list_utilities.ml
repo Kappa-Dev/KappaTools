@@ -1,11 +1,10 @@
-
 (**
    * list_utilities.ml
    * openkappa
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
-   * 
+é   * 
    * Creation:                      <2015-11-20 09:21:53 feret>
-   * Last modification: Time-stamp: <2015-11-20 09:30:32 feret>
+   * Last modification: Time-stamp: <2015-11-20 09:59:55 feret>
    * * 
    * This library provides primitives to deal with storage functions
    *  
@@ -13,7 +12,7 @@
    * en Automatique.  All rights reserved.  This file is distributed     
    *  under the terms of the GNU Library General Public License *)
 
-let aux p list = 
+let remove_suffix_after_last_occurrence p list = 
   let rec aux list buffer output = 
     match 
       list
