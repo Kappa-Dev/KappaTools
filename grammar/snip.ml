@@ -184,8 +184,7 @@ let annotate_created_agent id sigs ((agent_name, pos as ag_ty),intf) =
 	      Some (Signature.num_of_internal_state p_id va sign)
 	 | _ :: (_, pos) :: _ -> internal_state_failure pos in
        match p.Ast.port_lnk with
-       | (Ast.LNK_ANY, _) -> ()
-       | ((Ast.LNK_SOME, _) | (Ast.LNK_TYPE _,_)) ->
+       | ((Ast.LNK_ANY, _) | (Ast.LNK_SOME, _) | (Ast.LNK_TYPE _,_)) ->
 	  not_enough_specified agent_name p_na
        | (Ast.LNK_VALUE i, _) ->  ports.(p_id) <- Raw_mixture.VAL i
        | (Ast.FREE, _) -> ()
