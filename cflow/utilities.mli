@@ -65,7 +65,7 @@ type story_list =
 type observable_hit 
 val get_event_list_from_observable_hit: observable_hit -> step_id list     
 val get_runtime_info_from_observable_hit: observable_hit -> unit  Mods.simulation_info option
-val get_list_order: observable_hit -> D.S.PH.update_order list  (* try to hide this *)			
+			
 
 type story_table  
 
@@ -111,10 +111,9 @@ val causal_prefix_of_an_observable_hit: string -> parameter -> kappa_handler -> 
 (** Story table *)
 
 (** the int argument is the number of stories to compress, it is used for setting the progress bar *)
-val empty_story_table_with_tick: Format.formatter -> int -> story_table 
-val empty_story_table: unit -> story_table 
-val tick: Format.formatter -> story_table -> story_table (* try to hide this *)
-val inc_counter: story_table -> story_table              (* try to hide this *)
+val empty_story_table_with_progress_bar: Format.formatter -> int -> story_table 
+val empty_story_table: unit -> story_table
+		       
 val get_counter: story_table -> int 		         (* try to hide this *)
 val get_stories: story_table -> story_list list 
 val count_faillure: story_table -> int 
@@ -123,6 +122,8 @@ val inc_faillure: story_table -> story_table             (* try to hide this *)
 
 val store_trace_while_trusting_side_effects: parameter -> kappa_handler -> error_log ->  profiling_info Mods.simulation_info list -> profiling_info  -> trace_with_side_effect -> trace -> story_table -> error_log * story_table *  profiling_info 
 val store_trace_while_rebuilding_side_effects: parameter -> kappa_handler -> error_log ->  profiling_info Mods.simulation_info list -> profiling_info  -> trace_with_side_effect -> trace -> story_table -> error_log * story_table *  profiling_info 
+val store_trace_while_trusting_side_effects_with_progress_bar: parameter -> kappa_handler -> error_log ->  profiling_info Mods.simulation_info list -> profiling_info  -> trace_with_side_effect -> trace -> story_table -> error_log * story_table *  profiling_info 
+val store_trace_while_rebuilding_side_effects_with_progress_bar: parameter -> kappa_handler -> error_log ->  profiling_info Mods.simulation_info list -> profiling_info  -> trace_with_side_effect -> trace -> story_table -> error_log * story_table *  profiling_info 
 
 (** put together the stories having the same canonic form *) 
 val flatten_story_table: parameter -> kappa_handler -> error_log -> story_table -> error_log * story_table 
@@ -136,9 +137,9 @@ val print_musical_grid: parameter -> kappa_handler -> error_log  -> musical_grid
 
 										       
 
-val from_none_to_weak_with_tick:
+val from_none_to_weak_with_progress_bar:
   parameter -> kappa_handler -> profiling_info -> Format.formatter -> (error_log * story_table) -> pretrace * profiling_info Mods.simulation_info list -> (error_log * story_table)
 																			          
 		      
-val from_none_to_weak_with_tick_ext:
+val from_none_to_weak_with_progress_bar_ext:
   parameter -> kappa_handler -> profiling_info -> Format.formatter -> (error_log * story_table) -> cflow_grid * dag * canonical_form option * pretrace * profiling_info Mods.simulation_info list -> (error_log * story_table)

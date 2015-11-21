@@ -109,7 +109,7 @@ type story_table =
   { 
     n_stories: int;
     story_counter:int;
-    progress_bar:progress_bar option;
+    progress_bar:(Format.formatter * progress_bar) option;
     story_list: story_list list;
     faillure:int}
 
@@ -180,26 +180,26 @@ let empty_story_table ()  =
     story_list=[];
     faillure=0
   }
-let empty_story_table_with_tick logger n = 
+let empty_story_table_with_progress_bar logger n = 
   {(empty_story_table ()) with
     n_stories = n ;
     progress_bar = 
-      Some (  
+      Some (logger,   
       if n > 0 
       then Mods.tick_stories logger n (false,0,0) 
       else (false,0,0))
   }
 
-let tick logger story_list = 
+let tick story_list = 
   match 
     story_list.progress_bar
   with 
   | None -> story_list
-  | Some bar -> 
+  | Some (logger,bar) -> 
     { 
     story_list 
     with 
-      progress_bar = Some (Mods.tick_stories logger story_list.n_stories bar)
+      progress_bar = Some (logger,Mods.tick_stories logger story_list.n_stories bar)
   }
 
 let get_counter story_list = story_list.story_counter 
@@ -229,12 +229,7 @@ let store_trace_gen bool (parameter:parameter) (handler:kappa_handler) (error:er
   let computation_info = D.S.PH.B.PB.CI.Po.K.P.set_canonicalisation computation_info in 
   let story_info = 
     List.map 
-      (fun info -> 
-(*	match info  
-	with 
-	| None -> None 
-	| Some info -> *)
-       (*Some*) (Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy computation_info) info))
+      (Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy computation_info))
       obs_info 
   in 
   let story_table = 
@@ -248,7 +243,17 @@ let store_trace_gen bool (parameter:parameter) (handler:kappa_handler) (error:er
 
 let store_trace_while_trusting_side_effects = store_trace_gen true
 let store_trace_while_rebuilding_side_effects = store_trace_gen false 
-
+let lift_with_tick f =
+  (fun parameter handler error obs_info comp_info trace trace2 story_table ->
+   let error,story_table,comp_info = f parameter handler error obs_info comp_info trace trace2 story_table in
+   let story_table = tick story_table in 
+   let story_table= inc_counter story_table in
+   error,story_table,comp_info)
+    
+let store_trace_while_trusting_side_effects_with_progress_bar = lift_with_tick store_trace_while_trusting_side_effects
+let store_trace_while_rebuilding_side_effects_with_progress_bar = lift_with_tick store_trace_while_rebuilding_side_effects
+    
+   
 let flatten_story_table parameter handler error story_table = 
   let error,list = 
     D.hash_list parameter handler error 
@@ -332,12 +337,13 @@ let enrich_big_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closu
 let enrich_small_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closure.config_intermediary
 let enrich_std_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closure.config_std
 					    
-let from_none_to_weak_with_tick (parameter:parameter) (handler:kappa_handler) (log_info:profiling_info) (logger:Format.formatter) (x:error_log * story_table)  (y:pretrace * profiling_info Mods.simulation_info list)  =
+let from_none_to_weak_with_progress_bar (parameter:parameter) (handler:kappa_handler) (log_info:profiling_info) (logger:Format.formatter) (x:error_log * story_table)  (y:pretrace * profiling_info Mods.simulation_info list)  =
   let error,story_list = from_none_to_weak parameter handler log_info logger x y in
-  let story_list = tick logger story_list in 
+  let story_list = tick story_list in 
   let story_list = inc_counter story_list in 
   error,story_list 
 
 
-let from_none_to_weak_with_tick_ext (parameter:parameter) (handler:kappa_handler) (log_info:profiling_info) (logger:Format.formatter) (x:error_log * story_table)  (_,_,_,y,t)  =
-  from_none_to_weak_with_tick parameter handler log_info logger x (y,t)
+let from_none_to_weak_with_progress_bar_ext (parameter:parameter) (handler:kappa_handler) (log_info:profiling_info) (logger:Format.formatter) (x:error_log * story_table)  (_,_,_,y,t)  =
+  from_none_to_weak_with_progress_bar parameter handler log_info logger x (y,t)
+

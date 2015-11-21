@@ -175,7 +175,7 @@ let compress_and_print logger env log_info step_list =
 		        "causal & weak flow compression") 
 		    n_stories 
 	      in
-	      let story_list = U.empty_story_table_with_tick logger n_stories in 
+	      let story_list = U.empty_story_table_with_progress_bar logger n_stories in 
               List.fold_left 
                 (fun (error,story_list) observable_id -> 
 		 let log_info = D.S.PH.B.PB.CI.Po.K.P.reset_log log_info in 
@@ -223,13 +223,11 @@ let compress_and_print logger env log_info step_list =
 		  then
 		    let error,event_list,result_wo_compression = D.S.translate parameter handler error blackboard_cflow event_id_list in 
 		    let error,causal_story_array,log_info = 
-		      U.store_trace_while_trusting_side_effects parameter handler error info log_info result_wo_compression event_list  story_list 
+		      U.store_trace_while_trusting_side_effects_with_progress_bar parameter handler error info log_info result_wo_compression event_list  story_list 
 		    in 
-		    let causal_story_array = U.tick logger causal_story_array in 
-		    let causal_story_array = U.inc_counter causal_story_array in 
 		    error,causal_story_array  
 		  else
-		    U.from_none_to_weak_with_tick  parameter handler log_info logger (error,story_list) (trace_before_compression,info)
+		    U.from_none_to_weak_with_progress_bar  parameter handler log_info logger (error,story_list) (trace_before_compression,info)
 		)
                 (error,story_list)
                 (List.rev list)
@@ -268,12 +266,12 @@ let compress_and_print logger env log_info step_list =
 		begin 
                   let () = Format.fprintf logger "\t - weak flow compression (%i)@." n_causal_stories in 
                   let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_weak parameter in 
-                  let weak_stories_table =  U.empty_story_table_with_tick logger n_causal_stories in 
+                  let weak_stories_table =  U.empty_story_table_with_progress_bar logger n_causal_stories in 
                   let error,weakly_story_table = 
                     List.fold_left 
                       (fun x (_,a) ->
                        List.fold_left 
-                         (U.from_none_to_weak_with_tick_ext parameter handler log_info logger)
+                         (U.from_none_to_weak_with_progress_bar_ext parameter handler log_info logger)
 			 x
 			 a)
                     (error,weak_stories_table)
@@ -304,7 +302,7 @@ let compress_and_print logger env log_info step_list =
               begin 
                 let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_strong parameter in 
                 let () = Format.fprintf logger "\t - strong flow compression (%i)@." n_weak_stories in
-		let strong_story_table = U.empty_story_table_with_tick logger n_weak_stories in 
+		let strong_story_table = U.empty_story_table_with_progress_bar logger n_weak_stories in 
                 let (error,strong_story_table,log_info) = 
                   List.fold_left 
                     (fun (error,strong_story_table,log_info) (_,a) -> 
@@ -350,13 +348,11 @@ let compress_and_print logger env log_info step_list =
 				     let strong_event_list = D.S.translate_result list in 
 				     let strong_event_list = D.S.PH.B.PB.CI.Po.K.clean_events strong_event_list in 
 				     let list_info = List.map (Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy log_info)) list_info in  
-				     U.store_trace_while_rebuilding_side_effects parameter handler error list_info log_info list strong_event_list strong_story_table)
+				     U.store_trace_while_rebuilding_side_effects_with_progress_bar parameter handler error list_info log_info list strong_event_list strong_story_table) (* TO DO, there will be one tick per story altough there should be one tick per list of stories *)
 				   (error,strong_story_table,log_info)
 				   list 
 			  in 
-			  let strong_story_table =  U.tick logger strong_story_table in 
-			  let strong_story_table =  U.inc_counter strong_story_table  in 
-                          
+	             
 			  error,strong_story_table,log_info)
 			(error,strong_story_table,log_info) 
 			a)
