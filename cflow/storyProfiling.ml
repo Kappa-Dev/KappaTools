@@ -58,7 +58,6 @@ module type StoryStats =
     val ellapsed_global_time: log_info -> float
     val ellapsed_time: log_info -> float
     val init_log_info: unit -> log_info 
-      
     val tick: log_info -> bool * log_info 
 
   end

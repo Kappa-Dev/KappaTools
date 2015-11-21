@@ -67,7 +67,7 @@ val enrich_grid :
 val debug_print_grid : Format.formatter -> grid -> unit
 val pretty_print :
   Format.formatter -> Environment.t -> Graph_closure.config -> string ->
-  string -> (grid * 'a Mods.simulation_info option list) list -> unit
+  string -> (grid * 'a Mods.simulation_info list) list -> unit
 (** [pretty_print err_fmt env config_closure compression_type label story_list
                   state env] *)
 val print_stat :

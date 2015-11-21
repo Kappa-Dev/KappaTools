@@ -47,6 +47,8 @@ let dummy_weak = false
 
 let compress_and_print logger env log_info step_list =
   let parameter = D.S.PH.B.PB.CI.Po.K.H.build_parameter () in
+  let parameter = D.S.PH.B.PB.CI.Po.K.H.set_log_step parameter log_step in
+  let parameter = D.S.PH.B.PB.CI.Po.K.H.set_debugging_mode parameter debug_mode in 
   let parameter =
     if get_all_stories
     then D.S.PH.B.PB.CI.Po.K.H.set_all_stories_per_obs parameter 
@@ -95,49 +97,29 @@ let compress_and_print logger env log_info step_list =
             if debug_mode then
 	      U.print_trace parameter handler refined_event_list_wo_siphon
 	  in
-	  let refined_event_list_cut,int =
+	  let error,log_info,refined_event_list_cut =
             if (weak_compression_on || strong_compression_on)
-	       && Parameter.do_global_cut then
-              let () =
-                if log_step then
-                  Debug.tag logger "\t - cutting concurrent events" in
-              let error,(refined_event_list_cut,int) =
-		U.cut parameter handler error refined_event_list_wo_siphon in
-	      let () =
-		if debug_mode then
-		  U.print_trace parameter handler refined_event_list_cut in
-              refined_event_list_cut,int
-            else refined_event_list_wo_siphon,0
+	       && Parameter.do_global_cut
+	    then
+              U.cut parameter handler log_info error refined_event_list_wo_siphon 
+	    else
+	      error,log_info,refined_event_list_wo_siphon
           in
           
           let deal_with error cut log_info = 
-            let refined_event_list_without_pseudo_inverse,int_pseudo_inverse = 
+            let error,log_info,refined_event_list_without_pseudo_inverse = 
               if cut && Parameter.cut_pseudo_inverse_event 
-              then 
-                begin 
-                  let _ = 
-                    if log_step
-                    then 
-                      Debug.tag logger "\t - detecting pseudo inverse events" 
-                  in 
-                  let error,(refined_event_list_without_pseudo_inverse,int_pseudo_inverse)  = U.remove_pseudo_inverse_events parameter handler error refined_event_list_cut  in
-		  let () =
-		    if debug_mode then
-		      U.print_trace parameter handler refined_event_list_without_pseudo_inverse
-		  in
-                  refined_event_list_without_pseudo_inverse,int_pseudo_inverse 
-                end
-              else 
-                refined_event_list,0				      
+              then
+		U.remove_pseudo_inverse_events parameter handler log_info error refined_event_list_cut  
+	      else 
+                error,log_info,refined_event_list				      
             in 
             let () = 
               if log_step 
               then 
                 Debug.tag logger "\t - blackboard generation"
             in 
-            let error,log_info,blackboard = U.convert_trace_into_musical_notation parameter handler error log_info refined_event_list_without_pseudo_inverse in 
-            let log_info = U.D.S.PH.B.PB.CI.Po.K.P.set_global_cut int log_info in 
-            let log_info = U.D.S.PH.B.PB.CI.Po.K.P.set_pseudo_inv int_pseudo_inverse log_info in 
+            let error,log_info,blackboard = U.convert_trace_into_musical_notation parameter handler error log_info refined_event_list_without_pseudo_inverse in           
             let () = 
               if debug_mode && log_step  
               then 
@@ -159,7 +141,7 @@ let compress_and_print logger env log_info step_list =
 	      then 
 	      Format.fprintf logger "\t - computing causal past of each observed events (%i)@." n_stories 
 	    in
-	    (* Partial order reduction: generation of uncompressed stories *)
+	    (* generation of uncompressed stories *)
 	    let error,causal_story_list = 
               let () = 
                 if debug_mode
@@ -196,18 +178,19 @@ let compress_and_print logger env log_info step_list =
 	      let story_list = U.empty_story_table_with_tick logger n_stories in 
               List.fold_left 
                 (fun (error,story_list) observable_id -> 
-                  let () = 
+		 let log_info = D.S.PH.B.PB.CI.Po.K.P.reset_log log_info in 
+		 let () = 
                     if debug_mode
                     then 
                       Debug.tag logger "\t\t * causal compression "
                   in 
 		  let error,trace_before_compression = U.causal_prefix_of_an_observable_hit "compression_main, line 2014" parameter handler error log_info blackboard enriched_grid observable_id in 
-                  let error,(trace_without_pseudo_inverse_events,int_pseudo_inverse)  = 
+                  let error,log_info,trace_without_pseudo_inverse_events = 
                     if cut 
                     then 
-                      U.remove_pseudo_inverse_events  parameter handler error trace_before_compression
+		      U.remove_pseudo_inverse_events (D.S.PH.B.PB.CI.Po.K.H.set_log_step parameter false) handler log_info error trace_before_compression  
                     else 
-                      error,(trace_before_compression,0)
+                      error,log_info,trace_before_compression
                   in 
                   let error,log_info,blackboard_cflow = U.convert_trace_into_musical_notation parameter handler error log_info trace_without_pseudo_inverse_events in 
                   let error,observable_hit = U.extract_observable_hit_from_musical_notation "compression_main.ml, line 214, " parameter handler error blackboard_cflow in 
@@ -218,43 +201,35 @@ let compress_and_print logger env log_info step_list =
                     | _ -> failwith "wrong list, compression_main, 325" 
                   in 
 
-                  let refined_list = 
-                    if cut && Parameter.do_detect_separable_components 
-                    then 
-                      (List.rev_map (fun x -> (x,[])) (List.rev trace_without_pseudo_inverse_events))
-                    else 
-                      (List.rev_map (fun x -> (x,[])) (List.rev trace_without_pseudo_inverse_events))
-                  in 		  
-		  let grid = D.S.PH.B.PB.CI.Po.K.build_grid refined_list true handler in
+                  let refined_list = List.rev_map (fun x -> (x,[])) (List.rev trace_without_pseudo_inverse_events) in 
+                  let grid = D.S.PH.B.PB.CI.Po.K.build_grid refined_list true handler in
                   let enriched_grid = Causal.enrich_grid logger Graph_closure.config_intermediary grid in 
                   let event_id_list_rev = ((eid+1)::(enriched_grid.Causal.prec_star.(eid+1))) in 
                   let event_id_list = List.rev_map pred (event_id_list_rev) in 
 		  let info = 
                     match U.get_runtime_info_from_observable_hit observable_hit 
                     with 
-                    | None -> None 
+                    | None -> []
                     | Some info -> 
 		       let info = 
                          {info with Mods.story_id = U.get_counter story_list}
 		       in 
-		       let info = Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy log_info)  info 
+		       let info = Mods.update_profiling_info log_info  info 
 		       in 
-                       Some info
+                       [info]
                   in
 		  if
 		    store_uncompressed_stories || not cut
 		  then
 		    let error,event_list,result_wo_compression = D.S.translate parameter handler error blackboard_cflow event_id_list in 
 		    let error,causal_story_array,log_info = 
-		      U.store_trace_while_trusting_side_effects parameter handler error [info] log_info result_wo_compression event_list  story_list 
+		      U.store_trace_while_trusting_side_effects parameter handler error info log_info result_wo_compression event_list  story_list 
 		    in 
 		    let causal_story_array = U.tick logger causal_story_array in 
 		    let causal_story_array = U.inc_counter causal_story_array in 
 		    error,causal_story_array  
 		  else
-		    U.from_none_to_weak_with_tick  parameter handler log_info logger n_stories
-		      (error,story_list)
-		      (trace_before_compression,[info])
+		    U.from_none_to_weak_with_tick  parameter handler log_info logger (error,story_list) (trace_before_compression,info)
 		)
                 (error,story_list)
                 (List.rev list)
@@ -272,14 +247,14 @@ let compress_and_print logger env log_info step_list =
             then 
               deal_with error false log_info 
             else 
-	      error,log_info,U.empty_story_table 0  
+	      error,log_info,U.empty_story_table ()
           in 
           let error,log_info,causal_story_table = 
             if weak_compression_on || strong_compression_on 
             then 
               deal_with error true log_info 
             else
-              error,log_info,U.empty_story_table 0 
+              error,log_info,U.empty_story_table ()
           in 
           let _ = print_newline () in 
           let _ = print_newline () in 
@@ -298,7 +273,7 @@ let compress_and_print logger env log_info step_list =
                     List.fold_left 
                       (fun x (_,a) ->
                        List.fold_left 
-                         (U.from_none_to_weak_with_tick_ext parameter handler log_info logger n_causal_stories)
+                         (U.from_none_to_weak_with_tick_ext parameter handler log_info logger)
 			 x
 			 a)
                     (error,weak_stories_table)
@@ -310,7 +285,7 @@ let compress_and_print logger env log_info step_list =
 	      else
 		error,causal_story_table
             else 
-              error,U.empty_story_table 0
+              error,U.empty_story_table ()
           in 
           let n_weak_stories = U.count_stories weakly_story_table in 
           let _ = print_newline () in 
@@ -374,14 +349,7 @@ let compress_and_print logger env log_info step_list =
 				   (fun (error,strong_story_table,log_info) list -> 
 				     let strong_event_list = D.S.translate_result list in 
 				     let strong_event_list = D.S.PH.B.PB.CI.Po.K.clean_events strong_event_list in 
-				     let list_info = 
-				       List.map (fun info -> 
-					 match info 
-					 with 
-					   None -> None 
-					 | Some info -> Some (Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy log_info)  info)) 
-					 list_info
-				     in  
+				     let list_info = List.map (Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy log_info)) list_info in  
 				     U.store_trace_while_rebuilding_side_effects parameter handler error list_info log_info list strong_event_list strong_story_table)
 				   (error,strong_story_table,log_info)
 				   list 
@@ -398,7 +366,7 @@ let compress_and_print logger env log_info step_list =
 	        U.flatten_story_table parameter handler error strong_story_table 
 	      end
             else 
-              error,U.empty_story_table 0
+              error,U.empty_story_table ()
           in 
 	  let n_strong_stories = U.count_stories strong_story_table in 
           let _ = 

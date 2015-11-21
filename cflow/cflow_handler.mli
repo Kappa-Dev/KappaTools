@@ -11,7 +11,10 @@ module type Cflow_handler =
 	  compute_all_stories : bool ; 
 	  out_channel_err : Format.formatter ;
           out_channel_profiling : Format.formatter ;
-          out_channel : Format.formatter
+          out_channel : Format.formatter ;
+	  log_step : bool ;
+	  debug_mode : bool ;
+	  log_step_channel: Format.formatter 
         } (*a struct which contains parameterizable options*)
     type error
     type error_channel = error list (*a list which contains the errors so far*)
@@ -35,7 +38,18 @@ module type Cflow_handler =
     val set_compression_strong: parameter -> parameter
     val set_compression_none: parameter -> parameter
     val get_priorities: parameter -> Priority.priorities option
-    val get_all_stories_per_obs: parameter -> bool 
+    val get_all_stories_per_obs: parameter -> bool
+    val set_log_step: parameter -> bool -> parameter
+    val get_log_step: parameter -> bool
+    val set_debugging_mode: parameter -> bool -> parameter
+    val get_debugging_mode: parameter -> bool
+    val get_logger: parameter -> Format.formatter
+    val set_logger: parameter -> Format.formatter -> parameter
+    val get_out_channel: parameter -> Format.formatter
+    val set_out_channel: parameter -> Format.formatter -> parameter
+    val get_debugging_channel: parameter -> Format.formatter
+    val set_debugging_channel: parameter -> Format.formatter -> parameter
+
 end
 
 module Cflow_handler:Cflow_handler

@@ -21,25 +21,68 @@ type parameter =  D.S.PH.B.PB.CI.Po.K.H.parameter
 type kappa_handler = D.S.PH.B.PB.CI.Po.K.H.handler 
 type profiling_info = D.S.PH.B.PB.CI.Po.K.P.log_info
 type progress_bar = bool * int * int 
-		       
-type refined_trace = D.S.PH.B.PB.CI.Po.K.refined_step list
+
+type step = D.S.PH.B.PB.CI.Po.K.refined_step				   
+type pretrace = step list
+type trace = step list 
 type step_with_side_effects = D.S.PH.B.PB.CI.Po.K.refined_step * D.S.PH.B.PB.CI.Po.K.side_effect										
-type refined_trace_with_side_effect = step_with_side_effects list
+type trace_with_side_effect = step_with_side_effects list
 type step_id = D.S.PH.B.PB.step_id
 
 (** operations over traces *) 
 let split_init = D.S.PH.B.PB.CI.Po.K.split_init
 let disambiguate = D.S.PH.B.PB.CI.Po.K.disambiguate
-let fill_siphon = D.S.PH.B.PB.CI.Po.K.fill_siphon 
-let cut = D.S.PH.B.PB.CI.Po.cut
+let fill_siphon = D.S.PH.B.PB.CI.Po.K.fill_siphon
+
+let get_log_step = D.S.PH.B.PB.CI.Po.K.H.get_log_step
+let get_gebugging_mode = D.S.PH.B.PB.CI.Po.K.H.get_debugging_mode
+let get_logger = D.S.PH.B.PB.CI.Po.K.H.get_logger
+
+let print_trace parameter handler =
+      Format.fprintf
+	(D.S.PH.B.PB.CI.Po.K.H.get_out_channel parameter)
+	"@[<v>%a@]@."
+	(Pp.list Pp.space (D.S.PH.B.PB.CI.Po.K.print_refined_step ~handler))
+
+let transform_trace_gen f log_message debug_message log =
+  (fun parameters kappa_handler profiling_info error trace ->
+   let () =
+     if
+       D.S.PH.B.PB.CI.Po.K.H.get_log_step parameters
+     then
+       Debug.tag (D.S.PH.B.PB.CI.Po.K.H.get_logger parameters) log_message
+   in
+   let error,(trace',n) = f parameters kappa_handler error trace in
+   let () =
+     if
+       D.S.PH.B.PB.CI.Po.K.H.get_debugging_mode parameters
+     then
+       let _ = Debug.tag (D.S.PH.B.PB.CI.Po.K.H.get_debugging_channel parameters) debug_message in 
+       print_trace parameters kappa_handler trace'
+   in
+   let profiling_info = log n profiling_info in 
+   error,profiling_info,trace')
+			  
+let cut =
+  transform_trace_gen
+    D.S.PH.B.PB.CI.Po.cut
+    "\t - cutting concurrent events"
+    "Trace after having removed concurrent events:\n"
+    D.S.PH.B.PB.CI.Po.K.P.set_global_cut  
+			 
 let remove_events_after_last_obs = List_utilities.remove_suffix_after_last_occurrence  D.S.PH.B.PB.CI.Po.K.is_obs_of_refined_step 
 
 let remove_weak_events_annotation l = 
   List.rev_map fst (List.rev l) 
 
-let remove_pseudo_inverse_events a b c d =
-  let a,b,c = D.S.PH.B.PB.CI.cut a b c d in
-  a,(remove_weak_events_annotation b,c)
+let remove_pseudo_inverse_events =
+  transform_trace_gen
+    D.S.PH.B.PB.CI.cut
+    "\t - detecting pseudo inverse events"
+    "Trace after having removed pseudo inverse events:\n"
+    D.S.PH.B.PB.CI.Po.K.P.set_pseudo_inv
+						
+  
 		 
 type cflow_grid = Causal.grid  
 type enriched_cflow_grid = Causal.enriched_grid
@@ -49,16 +92,18 @@ type transitive_closure_config = Graph_closure.config
 (* dag: internal representation for cflows *)
 type dag = D.graph
 (* cannonical form for cflows (completely capture isomorphisms) *)
-type dag_canonical_form = D.canonical_form
+type canonical_form = D.canonical_form
 (* prehashform for cflows, if two cflows are isomorphic, they have the same prehash form *) 
-type dag_prehash = D.prehash 
+type hash = D.prehash 
 
-(* I need to investigate further, what I know is that:
-   for each hash, there is a list of stories having this hash, for each one, we have the grid, the dag, the canonical form (if any), and then a list of timestamp that indicated when the observables have been hit *) 
+(** For each hash form, the list of stories with that hash. 
+    For each such stories: the grid and the graph.
+    If necessessary the cannonical form.
+    The pretrace (to apply further compression later on) 
+    Some information about the corresponding observable hits *)	       
 type story_list =
-  dag_prehash * (cflow_grid * dag  * dag_canonical_form option * refined_trace * profiling_info Mods.simulation_info option list) list
-
-
+  hash * (cflow_grid * dag  * canonical_form option * pretrace * profiling_info Mods.simulation_info list) list
+		
 	
 type story_table =  
   { 
@@ -120,10 +165,6 @@ let causal_prefix_of_an_observable_hit string parameter handler error log_info b
   let error,list_eid,_ = D.S.translate parameter handler error blackboard event_id_list in 
   error,list_eid 
 
-let print_trace parameter handler =
-      Format.fprintf
-	parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel "@[<v>%a@]@."
-	(Pp.list Pp.space (D.S.PH.B.PB.CI.Po.K.print_refined_step ~handler))
 
 
 let export_musical_grid_to_xls = D.S.PH.B.export_blackboard_to_xls
@@ -131,17 +172,17 @@ let export_musical_grid_to_xls = D.S.PH.B.export_blackboard_to_xls
 let print_musical_grid = D.S.PH.B.print_blackboard 
 
 
-let empty_story_table (*blackboard*) n = 
+let empty_story_table ()  = 
   { 
-    n_stories = n ;
+    n_stories = 0 ;
     story_counter=1;
-(*    blackboard=blackboard;*)
     progress_bar=None;
     story_list=[];
     faillure=0
   }
-let empty_story_table_with_tick logger (*blackboard*) n = 
-  {(empty_story_table (*blackboard*) n) with 
+let empty_story_table_with_tick logger n = 
+  {(empty_story_table ()) with
+    n_stories = n ;
     progress_bar = 
       Some (  
       if n > 0 
@@ -189,11 +230,11 @@ let store_trace_gen bool (parameter:parameter) (handler:kappa_handler) (error:er
   let story_info = 
     List.map 
       (fun info -> 
-	match info  
+(*	match info  
 	with 
 	| None -> None 
-	| Some info -> 
-	  Some (Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy computation_info) info))
+	| Some info -> *)
+       (*Some*) (Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy computation_info) info))
       obs_info 
   in 
   let story_table = 
@@ -291,15 +332,12 @@ let enrich_big_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closu
 let enrich_small_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closure.config_intermediary
 let enrich_std_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closure.config_std
 					    
-let from_none_to_weak_with_tick parameter handler log_info logger n_stories x y =
+let from_none_to_weak_with_tick (parameter:parameter) (handler:kappa_handler) (log_info:profiling_info) (logger:Format.formatter) (x:error_log * story_table)  (y:pretrace * profiling_info Mods.simulation_info list)  =
   let error,story_list = from_none_to_weak parameter handler log_info logger x y in
   let story_list = tick logger story_list in 
   let story_list = inc_counter story_list in 
   error,story_list 
 
-let from_none_to_weak_with_tick_ext parameter handler log_info logger n_stories x (_,_,_,z,t) =
-  let error,story_list = from_none_to_weak parameter handler log_info logger x (z,t) in
-  let tick = tick logger story_list in 
-  let story_list = inc_counter story_list in 
-  error,story_list 
-				       
+
+let from_none_to_weak_with_tick_ext (parameter:parameter) (handler:kappa_handler) (log_info:profiling_info) (logger:Format.formatter) (x:error_log * story_table)  (_,_,_,y,t)  =
+  from_none_to_weak_with_tick parameter handler log_info logger x (y,t)

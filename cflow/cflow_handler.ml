@@ -1,6 +1,9 @@
 (**
   * cflow_handler.ml
   *
+  * Creation:                      <2013-08-02 feret>
+  * Last modification: Time-stamp: <2015-11-20 21:39:37 feret>
+  *
   * Causal flow compression: a module for KaSim
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   * Jean Krivine, Université Paris-Diderot, CNRS
@@ -8,8 +11,6 @@
   * KaSim
   * Jean Krivine, Université Paris Diderot, CNRS
   *
-  * Creation: 29/08/2011
-  * Last modification: 02/08/2013
   * *
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation
@@ -21,7 +22,7 @@
 
 module type Cflow_handler =
   sig
-    type parameter  =
+    type parameter  = (*try to hide type definition *)
         {
           cache_size : int option ;
           current_compression_mode: Parameter.current_compression_mode option;
@@ -32,7 +33,10 @@ module type Cflow_handler =
 	  compute_all_stories : bool ; 
 	  out_channel_err : Format.formatter ;
           out_channel_profiling : Format.formatter ;
-          out_channel : Format.formatter
+          out_channel : Format.formatter ;
+	  log_step : bool ;
+	  debug_mode : bool ;
+	  log_step_channel : Format.formatter 
         } (*a struct which contains parameterizable options*)
     type error
     type error_channel = error list (*a list which contains the errors so far*)
@@ -56,7 +60,17 @@ module type Cflow_handler =
     val set_compression_strong: parameter -> parameter
     val set_compression_none: parameter -> parameter
     val get_priorities: parameter -> Priority.priorities option
-    val get_all_stories_per_obs: parameter -> bool 
+    val get_all_stories_per_obs: parameter -> bool
+    val set_log_step: parameter -> bool -> parameter
+    val get_log_step: parameter -> bool
+    val set_debugging_mode: parameter -> bool -> parameter
+    val get_debugging_mode: parameter -> bool
+    val get_logger: parameter -> Format.formatter 
+    val set_logger: parameter -> Format.formatter -> parameter
+    val get_out_channel: parameter -> Format.formatter
+    val set_out_channel: parameter -> Format.formatter -> parameter
+    val get_debugging_channel: parameter -> Format.formatter
+    val set_debugging_channel: parameter -> Format.formatter -> parameter
 end
 
 
@@ -73,7 +87,10 @@ module Cflow_handler =
 	  compute_all_stories : bool ; 
 	  out_channel_err : Format.formatter;
           out_channel_profiling: Format.formatter;
-          out_channel : Format.formatter
+          out_channel : Format.formatter;
+	  log_step: bool ;
+	  debug_mode: bool ;
+	  log_step_channel : Format.formatter 
         }
 
     let build_parameter () =
@@ -89,6 +106,9 @@ module Cflow_handler =
         out_channel_profiling = Format.formatter_of_out_channel channel ;
         compression_mode = Parameter.get_compression_mode () ;
         cache_size = Parameter.get_cache_size () ;
+	debug_mode = false ;
+	log_step = true ;
+	log_step_channel = Format.std_formatter 
       }
 
     let set_compression_weak p =
@@ -179,5 +199,20 @@ module Cflow_handler =
       with compute_all_stories = true }
 
    let get_all_stories_per_obs parameter = parameter.compute_all_stories 
-	
-   end:Cflow_handler)
+
+   let get_debugging_mode parameter = parameter.debug_mode
+
+   let set_debugging_mode parameter bool= {parameter with debug_mode = bool }
+
+   let get_log_step parameter = parameter.log_step
+   let set_log_step parameter bool = {parameter with log_step = bool}
+
+   let get_logger parameter = parameter.log_step_channel
+   let set_logger parameter fmt = {parameter with log_step_channel = fmt}
+   let get_out_channel parameter = parameter.out_channel
+   let set_out_channel parameter fmt = {parameter with out_channel = fmt}				  
+   let get_debugging_channel parameter = parameter.out_channel_err
+   let set_debugging_channel parameter fmt = {parameter with out_channel_err = fmt }
+					       
+end:Cflow_handler)
+    

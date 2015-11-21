@@ -301,11 +301,4 @@ let update_profiling_info a info =
     story_event = info.story_event ;
     profiling_info = a}
 
-let compare_profiling_info info1 info2 = 
-  match info1,info2
-  with 
-    | None,None -> 0
-    | None,Some _ -> -1
-    | Some _,None -> +1
-    | Some info1,Some info2 -> 
-      compare info1.story_id info2.story_id 
+let compare_profiling_info info1 info2 = compare info1.story_id info2.story_id 

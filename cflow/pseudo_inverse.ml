@@ -26,9 +26,9 @@
      module A:LargeArray.GenArray 
 
      val cut:
-       (Po.K.refined_step list -> Po.K.H.error_channel * ((Po.K.refined_step*bool) list) * int) Po.K.H.with_handler
-     val do_not_cut:
-       (Po.K.refined_step list -> Po.K.H.error_channel * ((Po.K.refined_step*bool) list) * int) Po.K.H.with_handler
+       (Po.K.refined_step list -> Po.K.H.error_channel * ( (Po.K.refined_step list) * int)) Po.K.H.with_handler
+  (*   val do_not_cut:
+       (Po.K.refined_step list -> Po.K.H.error_channel * (Po.K.refined_step list) * int) Po.K.H.with_handler*)
    end
 
  module Pseudo_inv = 
@@ -330,7 +330,6 @@
             then error,Some (eida,eidb)
             else error,None
 
-(*      let check _ _ error _ = error,None *)
 
       let pop parameter handler error blackboard eid = 
         let predicate_list = A.get blackboard.predicates_of_event eid in 
@@ -462,89 +461,68 @@
          (fun ((a,_),b) map ->
           let pid = Bound_site(a,b) in add_state pid (false,Some Free) map)
          unambiguous_side_effects merged_map in
-     let is_strong_action,pid_list = 
+     let pid_list = 
        PredicateMap.fold
-         (fun pid (test,action) (bool,list) -> 
-           bool 
-           (*or (test=(Some Undefined)) *)
-           ||
-             (match action
-              with 
-                None -> false
-              | Some action ->
-		 match PredicateMap.find_option pid blackboard.init_state with
-		 | Some x -> not (x = action) || action = Undefined
-		 | None -> false),
-             match action 
-             with 
-             | None | Some Undefined -> list 
-             | Some (Present | Free | Internal_state_is _ | Bound_to _) -> pid::list)
-         merged_map (false,[])
-     in 
-     let is_strong_action = 
-       if is_create_action then true 
-       else is_strong_action
+         (fun pid (test,action) list -> 
+          match action 
+          with 
+          | None | Some Undefined -> list 
+          | Some (Present | Free | Internal_state_is _ | Bound_to _) -> pid::list)
+         merged_map []
      in 
      let nsid = blackboard.nsteps + 1 in 
      let _ = A.set blackboard.event nsid (Some step) in 
      let n_modifications,pre_steps_by_column,init_state,list  = 
        PredicateMap.fold 
-         (fun id (test,action) (n_modifications,map,init_state,(*init_event,*)list) -> 
-           begin 
-             let init_state =
-               match 
-                 action
-               with 
-               | None -> init_state
-               | Some action -> 
-                   begin 
-                     if PredicateMap.mem id init_state then init_state
-		     else PredicateMap.add id action init_state
-                   end
-             in 
-             let old_list =
-                 PredicateMap.find_default [-1,Undefined,false] id map in
-             let old_value = 
-               match 
-                 old_list
-               with 
-               | (_,v,_)::_ -> v
-               | [] -> Undefined 
-             in 
-             let new_value = 
-               match action 
-               with 
-                | None -> old_value 
-                | Some i -> i 
-             in 
-             let n_modifications,bool_action = 
-               match action
-               with 
-               | None -> n_modifications,false
-               | Some _ -> (n_modifications+1),true 
-             in 
-             n_modifications,
-             PredicateMap.add id ((nsid,new_value,bool_action)::old_list) map,
-             init_state,
-             (id,new_value)::list
-           end)
+         (fun id (test,action) (n_modifications,map,init_state,list) -> 
+          begin 
+            let init_state =
+              match 
+                action
+              with 
+              | None -> init_state
+              | Some action -> 
+                 begin 
+                   if PredicateMap.mem id init_state then init_state
+		   else PredicateMap.add id action init_state
+                 end
+            in 
+            let old_list =
+              PredicateMap.find_default [-1,Undefined,false] id map in
+            let old_value = 
+              match 
+                old_list
+              with 
+              | (_,v,_)::_ -> v
+              | [] -> Undefined 
+            in 
+            let new_value = 
+              match action 
+              with 
+              | None -> old_value 
+              | Some i -> i 
+            in 
+            let n_modifications,bool_action = 
+              match action
+              with 
+              | None -> n_modifications,false
+              | Some _ -> (n_modifications+1),true 
+            in 
+            n_modifications,
+            PredicateMap.add id ((nsid,new_value,bool_action)::old_list) map,
+            init_state,
+            (id,new_value)::list
+          end)
          merged_map
          (0,blackboard.steps_by_column,blackboard.init_state,[])
      in 
-    let _ = 
+     let _ = 
       if is_remove_action 
       then 
         let _ = A.set blackboard.is_remove_action nsid true in () 
     in 
     let _ = A.set blackboard.predicates_of_event nsid (List.rev_map fst (List.rev list)) in 
     let _ = A.set blackboard.modified_predicates_of_event nsid n_modifications in 
-    let blackboard = 
-      if is_strong_action 
-      then 
-        blackboard 
-      else 
-        {blackboard with weak_actions = nsid::blackboard.weak_actions}
-    in 
     let blackboard = 
       { 
         blackboard with 
@@ -578,26 +556,20 @@
         list 
     in 
     let list = 
-      let rec aux k list list_weak = 
+      let rec aux k list = 
         if k=(-1) 
         then list
         else 
-          let list_weak,bool = 
-            match list_weak 
-            with 
-              t::q -> if t=k then q,true else list_weak,false
-            | [] -> [],false
-          in 
           match A.get blackboard.event k 
           with 
             | Some a -> 
-              aux (k-1) ((a,bool)::list) list_weak 
-            | None -> aux (k-1) list list_weak
-      in aux (blackboard.nsteps) [] blackboard.weak_actions
+              aux (k-1) (a::list) 
+            | None -> aux (k-1) list 
+      in aux (blackboard.nsteps) [] 
     in 
-    error,list,n_cut
+    error,(list,n_cut)
     
-  let do_not_cut parameter handler error list = 
+ (* let do_not_cut parameter handler error list = 
     let n = List.length list in 
     let blackboard = init_blackboard n in 
     let error,blackboard,n_cut = 
@@ -609,22 +581,16 @@
         list 
     in 
     let list = 
-      let rec aux k list list_weak = 
+      let rec aux k list = 
         if k=(-1) 
         then list
         else 
-          let list_weak,bool = 
-            match list_weak 
-            with 
-              t::q -> if t=k then q,true else list_weak,false
-            | [] -> [],false
-          in 
           match A.get blackboard.event k 
           with 
             | Some a -> 
-              aux (k-1) ((a,bool)::list) list_weak 
-            | None -> aux (k-1) list list_weak
-      in aux (blackboard.nsteps) [] blackboard.weak_actions
+              aux (k-1) (a::list) 
+            | None -> aux (k-1) list 
+      in aux (blackboard.nsteps) [] 
     in 
-    error,list,n_cut
+    error,list,n_cut*)
     end:Cut_pseudo_inverse)

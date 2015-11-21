@@ -39,10 +39,10 @@ module type Dag =
     val print_graph: (graph -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler
 
     val hash_list:
-      ((prehash * (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list) list) list -> S.PH.B.PB.CI.Po.K.H.error_channel * (prehash * (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list  * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option  list) list) list) S.PH.B.PB.CI.Po.K.H.with_handler
+      ((prehash * (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list) list -> S.PH.B.PB.CI.Po.K.H.error_channel * (prehash * (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list  * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list) list) S.PH.B.PB.CI.Po.K.H.with_handler
 
     val sort_list:
-      (prehash * (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list ) list) list -> (Causal.grid * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list) list
+      (prehash * (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list ) list) list -> (Causal.grid * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list
   end
 
 

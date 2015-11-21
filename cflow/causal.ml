@@ -636,12 +636,10 @@ let pretty_print err_fmt env config_closure compression_type label story_list =
       (fun cpt (enriched_config,stories) ->
        let av_t,ids,n =
 	 List.fold_left
-	   (fun (av_t,ids,n) info_opt ->
-	    match info_opt with
-	    | Some info ->
-               (av_t +. info.story_time,info.story_id::ids,n+1)
-	    | None -> invalid_arg "Causal.pretty_print"
-	   )(0.,[],0) (List.rev stories)
+	   (fun (av_t,ids,n) info ->
+	    (av_t +. info.story_time,info.story_id::ids,n+1)
+	   )
+	   (0.,[],0) (List.rev stories)
        in
        let profiling desc =
 	 Format.fprintf
@@ -680,14 +678,11 @@ let pretty_print err_fmt env config_closure compression_type label story_list =
 		 let depth = enriched_config.depth in
 		 let size = enriched_config.size in
 		 List.iter
-		   (fun story ->
-		    match story with
-		    | None -> invalid_arg "Causal.pretty_print"
-		    | Some info ->
-		       let time = info.story_time in
-		       let event = info.story_event in
-		       Format.fprintf f "%i\t%i\t%E\t%i\t%i\t@,"
-				      cpt event time depth size
+		   (fun info  ->
+		    let time = info.story_time in
+		    let event = info.story_event in
+		    Format.fprintf f "%i\t%i\t%E\t%i\t%i\t@,"
+				   cpt event time depth size
 		   ) story) form story_list in
      Format.fprintf form "@]@?")
 
