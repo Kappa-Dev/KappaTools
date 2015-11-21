@@ -24,30 +24,25 @@ let trace = false
 (*---------------------------------------------------------------------------------*)
 (*common function for building bdu from a list of pair (site, state)*)
 
-let f parameter error a' x y =
-  match x y with
+let f parameter x y =
+    match x y  with
     | error, (handler, Some a) -> error, handler, a
     | error, (handler, None) ->
       let error, a =
-        Exception.warn parameter error (Some "") (Some "") Exit (fun _ -> a')
+        Exception.warn parameter error (Some "") (Some "") Exit (fun _ -> raise Exit)
       in error, handler, a
   
-let build_bdu parameter error pair_list =
-  (*build bdu for this list*)
-  let remanent_bdu = Sanity_test.remanent parameter in
+let build_bdu parameter handler error pair_list =
+  (*  let remanent_bdu = Boolean_mvbdu.init_remanent parameter error in *)
   (*  let error        = remanent_bdu.Sanity_test_sig.error in*)
-  let allocate     = remanent_bdu.Sanity_test_sig.allocate_mvbdu in
+  (*  let allocate     = Boolean_mvbdu.allocate in*)
   (*'b: memo_tables; 'a: mvbdu_dic; 'c: list_dic*)
-  let (handler: ('b, 'a, 'c, bool, int) Memo_sig.handler) =
-    remanent_bdu.Sanity_test_sig.mvbdu_handler
-  in
-  let a_val = Leaf true in
-  let b_val = Leaf false in
+  (*  let handler,a_val = Boolean_mvbdu.boolean_mvbdu_constant_true parameter handler in*)
   (*build bdu from a_val: 
     a',a'_id: output of build_already_compressed_cell;
     a'', a''_id: output of compress_node
   *)
-  let error, handler, a', a'_id, a'', a''_id =
+ (* let error, handler, a', a'_id, a'', a''_id =
     Mvbdu_test.build_without_and_with_compressing
       allocate
       error
@@ -63,10 +58,16 @@ let build_bdu parameter error pair_list =
       handler
       b_val
       b_val
-  in
+  in*)
   (*---------------------------------------------------------------------------*)    
   (*build bdu_list from a list of pair [site, state] computed above in cv*)
-  let error, (handler, list_a) =
+  let error, handler,mvbdu_true =
+    f parameter 
+      (Boolean_mvbdu.boolean_mvbdu_true parameter handler error)
+      parameter
+  in 
+  
+  let handler, (error, list_a) =
     List_algebra.build_list
       (Boolean_mvbdu.list_allocate parameter)
       error
@@ -76,30 +77,20 @@ let build_bdu parameter error pair_list =
   in
   (*compute redefine in a list_a, a': mvbdu_input*)
   let error, handler, mvbdu =
-    f parameter error a' 
-      (Boolean_mvbdu.redefine parameter error parameter handler a') list_a
+    f
+      parameter 
+      (Boolean_mvbdu.redefine
+	 parameter
+	 handler
+	 parameter
+	 error
+	 mvbdu_true)
+	 list_a
+     
+		
   in
   (*---------------------------------------------------------------------------*)
   (*return redefine*)
   error, (handler, mvbdu)
 
-(************************************************************************************)    
-(*build initial bdu: false branch*)
 
-let bdu_init parameter error =
-  let remanent_bdu = Sanity_test.remanent parameter in
-  (*  let error        = remanent_bdu.Sanity_test_sig.error in*)
-  let allocate     = remanent_bdu.Sanity_test_sig.allocate_mvbdu in
-  let (handler: ('b, 'a, 'c, bool, int) Memo_sig.handler) =
-    remanent_bdu.Sanity_test_sig.mvbdu_handler
-  in
-  let a_val = Mvbdu_sig.Leaf false in
-  let error, handler, a', a'_id, a'', a''_id =
-    Mvbdu_test.build_without_and_with_compressing
-      allocate
-      error
-      handler
-      a_val
-      a_val
-  in
-  error, (handler, a')

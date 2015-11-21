@@ -13,7 +13,7 @@
     * under the terms of the GNU Library General Public License *)
 
 
-let sanity_check = true
+let sanity_check = false
 let test_workbench = false 
     
 let invalid_arg parameters mh message exn value = 

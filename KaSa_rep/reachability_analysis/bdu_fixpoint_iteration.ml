@@ -48,18 +48,22 @@ open Printf
 (************************************************************************************)
 (*is enable rule*)
 
-let is_belong bdu bdu_init =
-  let is_eq = Mvbdu_sanity.safety_equal_mvbdu bdu bdu_init in
+let is_belong bdu bdu_init = true (* to fill *) 
+ (* let is_eq = Mvbdu_sanity.safety_equal_mvbdu bdu bdu_init in
   if is_eq
   then true
-  else false
+  else false*)
     
-let comp_is_enable parameter error handler bdu_init bdu_test bdu_X =
+let comp_is_enable parameter error handler bdu_test bdu_X =
+  let error,handler, bdu_false =
+    f parameter
+      (boolean_mvbdu_false parameter handler error) parameter
+  in 
   let error, handler, bdu_result =
-    f parameter error bdu_test
+    f parameter 
       (boolean_mvbdu_and parameter handler error parameter bdu_test) bdu_X
   in
-  if not (is_belong bdu_X bdu_init)
+  if not (is_belong bdu_X bdu_false)
   then
     error, true
   else
@@ -73,22 +77,22 @@ let comp_is_enable parameter error handler bdu_init bdu_test bdu_X =
 let compute_update parameter error handler bdu_test list_a bdu_creation bdu_X =
   (*union bdu_X with bdu_creation*)
   let error, handler, bdu_X1 = 
-    f parameter error bdu_X
+    f parameter 
       (boolean_mvbdu_or parameter handler error parameter bdu_X) bdu_creation
   in
   (*intersection of X and bdu_test*)
   let error, handler, bdu_inter_test_X =
-    f parameter error bdu_test
+    f parameter 
       (boolean_mvbdu_and parameter handler error parameter bdu_test) bdu_X
   in
   (*redefine with a list of modification*)
   let error, handler, bdu_assigment =
-    f parameter error bdu_inter_test_X
+    f parameter 
       (redefine parameter error parameter handler bdu_inter_test_X) list_a
   in
   (*union with bdu_X*)
   let error, handler, bdu_update =
-    f parameter error bdu_assigment
+    f parameter 
       (boolean_mvbdu_or parameter handler error parameter bdu_assigment) bdu_X1
   in
   error, bdu_update
@@ -110,7 +114,7 @@ let compute_update parameter error handler bdu_test list_a bdu_creation bdu_X =
 (************************************************************************************)
 (*fixpoint*)
 
-let collect_bdu_update_map parameter error rule wl_creation 
+let collect_bdu_update_map parameter handler error rule wl_creation 
     store_remanent_test
     store_test_bdu_map
     store_remanent_creation
@@ -119,10 +123,17 @@ let collect_bdu_update_map parameter error rule wl_creation
     store_modif_list_map
     store_result
     =
-  let error, (handler, bdu_init) = bdu_init parameter error in
-  let add_link (agent_type, cv_id) bdu_update store_result =
+    let error,handler, bdu_false =
+      f parameter
+	(boolean_mvbdu_false parameter handler error) parameter
+    in
+    (*  let error, (handler, bdu_init) = bdu_init parameter error in*)
+    let add_link (agent_type, cv_id) bdu_update store_result =
     let (l, old) =
-      Map_bdu_update.Map.find_default ([], []) (agent_type, cv_id) store_result
+      match
+	Map_bdu_update.Map.find_option  (agent_type, cv_id) store_result
+      with Some (l,old) -> l,old
+	 | None -> [],[]
     in
     let result_map = (*FIXME: list or bdu_init ? *)
       Map_bdu_update.Map.add (agent_type, cv_id) (l, bdu_update :: []) 
@@ -171,17 +182,20 @@ let collect_bdu_update_map parameter error rule wl_creation
                         then
                           (*return the bdu_test*)
                           let (l, bdu_test) =
-                            Map_test_bdu.Map.find_default ([], bdu_init)
-                              (agent_id, agent_type, rule_id, cv_id) store_test_bdu_map
-                          in
-                          error, (cv_id, bdu_test)
+                              Map_test_bdu.Map.find_default ([],bdu_false)
+				(agent_id, agent_type, rule_id, cv_id) store_test_bdu_map
+			  in
+                          error, (cv_id,bdu_test)
                         else
                           error, (cv_id, bdu_result)
                       end
-                  ) (error, (id, store_bdu_result)) get_test_list
+				 )
+				 (error, (id, store_bdu_result))
+				 get_test_list
                 in
+				    
                 error, (agent_type, cv_id, bdu_test)
-            ) rule.rule_lhs.views (0, 0, bdu_init)
+            ) rule.rule_lhs.views (0, 0, bdu_false)
         in
         (*--------------------------------------------------------------------*)
         (*get the local view that is created for this rule_id with new_indexes*)
@@ -210,8 +224,12 @@ let collect_bdu_update_map parameter error rule wl_creation
                     if rule_id = rule_id'
                     then 
                       let (l, bdu_creation) =
-                        Map_creation_bdu.Map.find_default ([], bdu_init)
-                          (agent_type, rule_id, cv_id) store_creation_bdu_map
+			match
+			  Map_creation_bdu.Map.find_option 
+                            (agent_type, rule_id, cv_id) store_creation_bdu_map
+			with
+			  None -> failwith "3 bdu fixpoint iteration"
+			| Some (a,b) -> a,b
                       in
                       error, bdu_creation
                     else
@@ -220,7 +238,9 @@ let collect_bdu_update_map parameter error rule wl_creation
                 ) (error, store_bdu_result) get_creation_list
               in
               error, bdu_creation
-          ) (error, bdu_init) rule.actions.creation
+			 )
+			 (error, bdu_false)
+			 rule.actions.creation
         in
         (*--------------------------------------------------------------------*)
         (*get the local update view due to modification for this rule_id
@@ -228,39 +248,39 @@ let collect_bdu_update_map parameter error rule wl_creation
         let error, modif_list =
           (*take a global view*)
           AgentMap.fold parameter error
-            (fun parameter error agent_id agent_modif store_result ->
-              begin
-                if Site_map_and_set.Map.is_empty agent_modif.agent_interface
-                then error, store_result
-                else               
-                  let agent_type = agent_modif.agent_name in
-                  (*get the local update view (agent_id, rule_id, cv_id, pair_list) list*)
-                  let error, get_modif_list = (*use agent_id*)
-                    match
-                      AgentMap.unsafe_get parameter error agent_type store_remanent_modif
-                    with
-                    | error, None -> error, []
-                    | error, Some l -> error, l
-                  in
-                  let error, modif_list =
-                    List.fold_left (fun (error, store_result)
-                      (agent_id, rule_id', cv_id, _) ->
-                        begin
-                          if rule_id = rule_id'
-                          then
-                            let (l, modif_list) =
-                              Map_modif_list.Map.find_default ([], [])
-                                (agent_id, agent_type, rule_id, cv_id) store_modif_list_map
-                            in
-                            error, modif_list
-                          else
-                            error, store_result
-                        end
-                    ) (error, store_result) get_modif_list
-                  in
-                  error, modif_list
-              end
-            ) rule.diff_direct []
+			(fun parameter error agent_id agent_modif store_result ->
+			 begin
+			   if Site_map_and_set.Map.is_empty agent_modif.agent_interface
+			   then error, store_result
+			   else               
+			     let agent_type = agent_modif.agent_name in
+			     (*get the local update view (agent_id, rule_id, cv_id, pair_list) list*)
+			     let error, get_modif_list = (*use agent_id*)
+			       match
+				 AgentMap.unsafe_get parameter error agent_type store_remanent_modif
+			       with
+			       | error, None -> error, []
+			       | error, Some l -> error, l
+			     in
+			     let error, modif_list =
+			       List.fold_left (fun (error, store_result)
+						   (agent_id, rule_id', cv_id, _) ->
+					       begin
+						 if rule_id = rule_id'
+						 then
+						   let (l, modif_list) =
+						     Map_modif_list.Map.find_default ([], [])
+										     (agent_id, agent_type, rule_id, cv_id) store_modif_list_map
+						   in
+						   error, modif_list
+						 else
+						   error, store_result
+					       end
+					      ) (error, store_result) get_modif_list
+			     in
+			     error, modif_list
+			 end
+			) rule.diff_direct []
         in
         (*build List_sig.list*)
         let error, (handler, list_a) =
@@ -272,14 +292,13 @@ let collect_bdu_update_map parameter error rule wl_creation
             modif_list
         in
         (*--------------------------------------------------------------------*)
-        (*test the enable rule of the view that is tested with bdu_X*)
-        let error, is_enable =
+        (*test the enable rule of the view that is tested with bdu_X*)	
+	let error, is_enable =
           comp_is_enable
             parameter
             error
             handler
-            bdu_init
-            bdu_test
+	    bdu_test 	   
             bdu_X
         in
         begin
@@ -292,8 +311,8 @@ let collect_bdu_update_map parameter error rule wl_creation
                 parameter
                 error
                 handler
-                bdu_test
-                list_a
+		bdu_test
+		list_a
                 bdu_creation
                 bdu_X
             in
@@ -317,4 +336,4 @@ let collect_bdu_update_map parameter error rule wl_creation
             aux wl_tl bdu_X (error, store_bdu_update_map)
         end
   in
-  aux wl_creation bdu_init (error, store_result) (*start from bdu_init*)
+  aux wl_creation bdu_false (error, store_result) (*start from bdu_init*)

@@ -114,12 +114,16 @@ let collect_remanent_modif_map parameter error store_remanent_modif =
 (*Bdu for the valuations of the views that are created (per rule, agent and
   covering class)*)
 
-let collect_test_bdu_map parameter error store_test_map =
-  let error, (handler, bdu_init) = bdu_init parameter error in
+let collect_test_bdu_map parameter handler error store_test_map =
+  (* let error, (handler, bdu_init) = bdu_init parameter error in*)
+  let error,handler, bdu_false =
+    f parameter
+      (Boolean_mvbdu.boolean_mvbdu_false parameter handler error) parameter
+  in 
   let add_link (agent_id, agent_type, rule_id, cv_id) bdu store_result =
-    let (l, old) =
-      Map_test_bdu.Map.find_default ([], bdu_init)
-        (agent_id, agent_type, rule_id, cv_id) store_result
+    let (l,old) =
+	Map_test_bdu.Map.find_default ([],bdu_false)
+          (agent_id, agent_type, rule_id, cv_id) store_result
     in
     let result_map =
       Map_test_bdu.Map.add (agent_id, agent_type, rule_id, cv_id)
@@ -138,7 +142,7 @@ let collect_test_bdu_map parameter error store_test_map =
     in
     (*build bdu test from this pair_list*)
     let error, (handler, bdu_test) =
-      build_bdu parameter error pair_list
+      build_bdu parameter handler error pair_list
     in
     (*store handler, bdu_test in a map with (agent_type, rule_id) *)
     let error, store_result =
@@ -152,12 +156,16 @@ let collect_test_bdu_map parameter error store_test_map =
 (*Bdu for the valuations of the views that are tested (per rule, agent and
   covering class)*)
 
-let collect_creation_bdu_map parameter error store_creation_map =
-  let error, (handler, bdu_init) = bdu_init parameter error in
+let collect_creation_bdu_map parameter handler error store_creation_map =
+  (* let error, (handler, bdu_init) = bdu_init parameter error in*)
+  let error,handler, bdu_false =
+    f parameter
+      (Boolean_mvbdu.boolean_mvbdu_false parameter handler error) parameter
+  in 
   let add_link (agent_type, rule_id, cv_id) bdu store_result =
     let (l, old) =
-      Map_creation_bdu.Map.find_default ([], bdu_init)
-        (agent_type, rule_id, cv_id) store_result
+      Map_creation_bdu.Map.find_default ([],bdu_false)
+					(agent_type, rule_id, cv_id) store_result
     in
     let result_map = (*NOTE: get only a bdu_creation of each rule*)
       Map_creation_bdu.Map.add (agent_type, rule_id, cv_id) (l, bdu) store_result
@@ -174,7 +182,7 @@ let collect_creation_bdu_map parameter error store_creation_map =
     in
     (*build bdu test from this pair_list*)
     let error, (handler, bdu_creation) =
-      build_bdu parameter error pair_list
+      build_bdu parameter handler error pair_list
     in
     (*store handler, bdu_test in a map with (agent_type, rule_id) *)
     let error, store_result =

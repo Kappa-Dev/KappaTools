@@ -126,7 +126,7 @@ let main () =
       error, None 
   in
   (*BDU of fixpoint iteration function*)
-  let error,bdu_analysic = 
+  let error,handler_bdu, bdu_analysic = 
     if Remanent_parameters.get_do_reachability_analysis parameters
     then
       let _ = Format.printf "Reachability analysis...@." in 
@@ -140,11 +140,11 @@ let main () =
       let error, covering_classes =
         Covering_classes_main.covering_classes parameters_cv error handler c_compil
        in
-       let error, dep =
-	 Bdu_analysis_main.bdu_main parameters_cv error handler covering_classes c_compil 
-       in error,Some dep
+       let error, handler_bdu, dep =
+	 Bdu_analysis_main.bdu_main parameters_cv  error handler covering_classes c_compil 
+       in error,Some handler_bdu, Some dep
     else 
-      error,None 
+      error,None,None 
   in
   (*BDU range*)
   (*let _ = Range_bdu.main in*)
