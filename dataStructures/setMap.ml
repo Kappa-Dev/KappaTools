@@ -1499,3 +1499,71 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	    find (Random.int (size m)) m
       end
   end
+    
+module type Projection = sig
+    type elt_a
+    type elt_b
+    type 'a map_a
+    type 'a map_b
+    val proj: (elt_a -> elt_b) -> 'a -> ('a -> 'a -> 'a) -> 'a map_a -> 'a map_b
+  end
+			   
+module Proj(A:S)(B:S) = 
+	   struct
+	     module MA=A.Map
+	     module MB=B.Map
+	     type elt_a = MA.elt
+	     type elt_b = MB.elt
+	     type 'a map_a = 'a MA.t
+	     type 'a map_b = 'a MB.t 
+		 	 
+	     let proj f identity_elt merge map =
+	       MA.fold
+		 (fun key_a data_a map_b ->
+		  let key_b = f key_a in
+		  MB.add key_b (merge data_a (MB.find_default identity_elt key_b map_b)) map_b)
+		 map
+		 MB.empty
+		 
+	   end
+
+	     
+
+(* todo: add the following  test to the sanity tests *)
+(*
+(* for instance, the following code: *)
+
+module IntMap = Make(struct type t = int let compare = compare end)
+module P = Proj(IntMap)(IntMap)
+
+	       
+let f = List.fold_left
+	  (fun map (a,b) -> IntMap.Map.add a b map)
+	  IntMap.Map.empty
+	  [1,[2;3];2,[3;4];5,[6;7];8,[12;13]] 
+
+let g = P.proj (fun i -> i mod 2) [] (List.append) f
+
+let dump (s:string) f =
+  let _ = Printf.fprintf stderr "%s: \n" s in 
+  let _ = IntMap.Map.iter
+	    (fun a l ->
+	     let _ = Printf.fprintf stderr "  %i:" a in
+	     let _ = List.iter (Printf.fprintf stderr "%i,") l in
+	     let _ = Printf.fprintf stderr "\n" in ())
+	    f in
+  ()
+let _ = dump "f" f
+let _ = dump "g" g 
+	  
+(*should dump: 
+
+f: 
+  1:2,3,
+  2:3,4,
+  5:6,7,
+  8:12,13,
+g: 
+  0:12,13,3,4,
+  1:6,7,2,3,
+ *)*)
