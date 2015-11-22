@@ -34,10 +34,14 @@ done
 	 Done
 ____________________________________________________________
 ############################################################
+	 - removing events occurring after the last observable:
+ (-1 events)
 + Producing causal compressions
-	 - refining events
-	 - detecting siphons
-	 - cutting concurrent events
+	 - splitting initial events (+1000 events)
+	 - renaming agents to avoid conflicts after event removals (no change)
+	 - detecting siphons (+324 events)
+	 - renaming agents to avoid conflicts after event removals (no change)
+	 - cutting concurrent events (-11575 events)
 	 - blackboard generation
 	 - computing causal past of each observed events (626)
 Stats:
@@ -50,7 +54,7 @@ Stats:
 
 ____________________________________________________________
 ############################################################
-	 - detecting pseudo inverse events
+	 - detecting pseudo inverse events (no change)
 	 - blackboard generation
 	 - computing causal past of each observed events (626)
 

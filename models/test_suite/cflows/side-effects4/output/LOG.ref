@@ -17,6 +17,8 @@ done
 	 Done
 ____________________________________________________________
 ############################################################
+	 - removing events occurring after the last observable:
+ (-36 events)
 + No causal flow found
 + Pretty printing 0 flow
 + Pretty printing 0 weakly compressed flow

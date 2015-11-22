@@ -43,8 +43,9 @@ let th_of_int n =
   | 3 -> (string_of_int n)^"rd"
   | _ -> (string_of_int n)^"th"
 
-let dummy_weak = false
-
+let always = (fun _ -> true)
+let do_not_log parameter = (D.S.PH.B.PB.CI.Po.K.H.set_log_step parameter false)
+			     
 let compress_and_print logger env log_info step_list =
   let parameter = D.S.PH.B.PB.CI.Po.K.H.build_parameter () in
   let parameter = D.S.PH.B.PB.CI.Po.K.H.set_log_step parameter log_step in
@@ -58,6 +59,7 @@ let compress_and_print logger env log_info step_list =
   let causal_trace_on = Parameter.get_causal_trace mode in
   let weak_compression_on = Parameter.get_weak_compression mode in
   let strong_compression_on = Parameter.get_strong_compression mode in
+  let error = U.error_init in       
   let handler =
     {
       D.S.PH.B.PB.CI.Po.K.H.env = env ;
@@ -70,7 +72,7 @@ let compress_and_print logger env log_info step_list =
     else
       begin (* causal compression *)
         let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_none parameter in
-	let step_list = U.remove_events_after_last_obs step_list in 
+	let error,log_info,step_list = U.remove_events_after_last_obs parameter always handler log_info error step_list in 
         if not @@ List.exists D.S.PH.B.PB.CI.Po.K.is_obs_of_refined_step step_list
         then
           let () = Debug.tag logger "+ No causal flow found" in
@@ -81,19 +83,17 @@ let compress_and_print logger env log_info step_list =
             then Debug.tag logger "+ Producing causal compressions"
             else Debug.tag logger "+ Producing causal traces"
           in
-          let error = U.error_init in
-          let refined_event_list = U.disambiguate (U.split_init step_list) in
-          let () = if log_step then Debug.tag logger"\t - refining events" in
-	  let refined_event_list_wo_siphon =
+	  let error,log_info,step_list_with_more_init = U.split_init parameter  always handler log_info error step_list in 
+          let error,log_info,refined_event_list = U.disambiguate parameter always handler log_info error step_list_with_more_init in
+	  let error,log_info,refined_event_list_wo_siphon =
 	    if Graph_closure.ignore_flow_from_outgoing_siphon
 	    then
-	      let () =
-		if log_step then Debug.tag logger"\t - detecting siphons"
-	      in
-	      U.disambiguate (U.fill_siphon refined_event_list) 
-            else refined_event_list
+	      let error,log_info,step_list = U.fill_siphon parameter always handler log_info error refined_event_list in
+	      U.disambiguate parameter always handler log_info error step_list
+	    else
+	      error,log_info,refined_event_list 
 	  in
-          let () =
+	  let () =
             if debug_mode then
 	      U.print_trace parameter handler refined_event_list_wo_siphon
 	  in
@@ -101,7 +101,7 @@ let compress_and_print logger env log_info step_list =
             if (weak_compression_on || strong_compression_on)
 	       && Parameter.do_global_cut
 	    then
-              U.cut parameter handler log_info error refined_event_list_wo_siphon 
+              U.cut parameter always handler log_info error refined_event_list_wo_siphon 
 	    else
 	      error,log_info,refined_event_list_wo_siphon
           in
@@ -110,7 +110,7 @@ let compress_and_print logger env log_info step_list =
             let error,log_info,refined_event_list_without_pseudo_inverse = 
               if cut && Parameter.cut_pseudo_inverse_event 
               then
-		U.remove_pseudo_inverse_events parameter handler log_info error refined_event_list_cut  
+		U.remove_pseudo_inverse_events parameter always handler log_info error refined_event_list_cut  
 	      else 
                 error,log_info,refined_event_list				      
             in 
@@ -188,7 +188,7 @@ let compress_and_print logger env log_info step_list =
                   let error,log_info,trace_without_pseudo_inverse_events = 
                     if cut 
                     then 
-		      U.remove_pseudo_inverse_events (D.S.PH.B.PB.CI.Po.K.H.set_log_step parameter false) handler log_info error trace_before_compression  
+		      U.remove_pseudo_inverse_events (do_not_log parameter) always handler log_info error trace_before_compression  
                     else 
                       error,log_info,trace_before_compression
                   in 
@@ -234,8 +234,6 @@ let compress_and_print logger env log_info step_list =
             in 
 	    let error,causal_story_list = 
               U.flatten_story_table  parameter handler error causal_story_list 
-	    in 
-            let n_stories = U.count_stories causal_story_list 
 	    in 
             error,log_info,causal_story_list 
           in
@@ -364,8 +362,7 @@ let compress_and_print logger env log_info step_list =
             else 
               error,U.empty_story_table ()
           in 
-	  let n_strong_stories = U.count_stories strong_story_table in 
-          let _ = 
+	  let _ = 
             match 
               U.count_faillure strong_story_table 
             with 

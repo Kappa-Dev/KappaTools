@@ -73,25 +73,25 @@ type story_table
 val error_init: D.S.PH.B.PB.CI.Po.K.H.error_channel
 
 (** Trace local simplification *)		  
-val remove_events_after_last_obs: trace -> trace
-
+val remove_events_after_last_obs: parameter -> (parameter -> bool) -> kappa_handler -> profiling_info -> error_log -> trace -> error_log * profiling_info * trace 
+		
 (** split_init split init event agent-wise *)
-val split_init: trace -> trace
+val split_init: parameter -> (parameter -> bool) -> kappa_handler -> profiling_info -> error_log -> trace -> error_log * profiling_info * trace 
 			   
 (** disambiguate ensures that agent id are used only once along traces *)
-val disambiguate: trace -> trace (* try to hide this *)
+val disambiguate: parameter -> (parameter -> bool) -> kappa_handler -> profiling_info -> error_log -> trace -> error_log * profiling_info * trace (* try to hide this *)
 				     
 (** fill_siphon adds spurious init event, to break causal dependences; 
     Currently, it insert init event when an agent return to its initial state; 
     other heuristic may be considered;
     The output has to be  disanbiguated, otherwise it is useless (compression will remove the ficitious init events *)
-val fill_siphon: trace -> trace
-
+val fill_siphon: parameter -> (parameter -> bool) -> kappa_handler -> profiling_info -> error_log -> trace -> error_log * profiling_info * trace
+																	     
 (** cut performs partial order reduction and remove orthogonal events *)
-val cut: parameter -> kappa_handler -> profiling_info -> error_log -> trace -> error_log * profiling_info * trace 
+val cut: parameter -> (parameter -> bool) -> kappa_handler -> profiling_info -> error_log -> trace -> error_log * profiling_info * trace 
 
 (** remove_pseudo_inverse_events removes pseudo inverse events *)
-val remove_pseudo_inverse_events: parameter -> kappa_handler -> profiling_info -> error_log -> trace -> error_log * profiling_info * trace 
+val remove_pseudo_inverse_events: parameter -> (parameter -> bool) -> kappa_handler -> profiling_info -> error_log -> trace -> error_log * profiling_info * trace 
 
 (** causal flows *)
 val convert_trace_into_grid_while_trusting_side_effects: trace -> kappa_handler -> cflow_grid 

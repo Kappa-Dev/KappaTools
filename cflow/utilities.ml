@@ -29,56 +29,103 @@ type step_with_side_effects = D.S.PH.B.PB.CI.Po.K.refined_step * D.S.PH.B.PB.CI.
 type trace_with_side_effect = step_with_side_effects list
 type step_id = D.S.PH.B.PB.step_id
 
-(** operations over traces *) 
-let split_init = D.S.PH.B.PB.CI.Po.K.split_init
-let disambiguate = D.S.PH.B.PB.CI.Po.K.disambiguate
-let fill_siphon = D.S.PH.B.PB.CI.Po.K.fill_siphon
+
+
 
 let get_log_step = D.S.PH.B.PB.CI.Po.K.H.get_log_step
 let get_gebugging_mode = D.S.PH.B.PB.CI.Po.K.H.get_debugging_mode
 let get_logger = D.S.PH.B.PB.CI.Po.K.H.get_logger
-
+let dummy_log = fun p -> p
+			   
 let print_trace parameter handler =
       Format.fprintf
 	(D.S.PH.B.PB.CI.Po.K.H.get_out_channel parameter)
 	"@[<v>%a@]@."
 	(Pp.list Pp.space (D.S.PH.B.PB.CI.Po.K.print_refined_step ~handler))
 
+(** operations over traces *) 
+
+	
 let transform_trace_gen f log_message debug_message log =
-  (fun parameters kappa_handler profiling_info error trace ->
-   let () =
-     if
-       D.S.PH.B.PB.CI.Po.K.H.get_log_step parameters
-     then
-       Debug.tag (D.S.PH.B.PB.CI.Po.K.H.get_logger parameters) log_message
-   in
-   let error,(trace',n) = f parameters kappa_handler error trace in
-   let () =
-     if
-       D.S.PH.B.PB.CI.Po.K.H.get_debugging_mode parameters
-     then
-       let _ = Debug.tag (D.S.PH.B.PB.CI.Po.K.H.get_debugging_channel parameters) debug_message in 
-       print_trace parameters kappa_handler trace'
-   in
-   let profiling_info = log n profiling_info in 
-   error,profiling_info,trace')
-			  
+  (fun parameters p kappa_handler profiling_info error trace ->
+   if p parameters
+   then 
+     let bool =
+       if
+	 D.S.PH.B.PB.CI.Po.K.H.get_log_step parameters
+       then
+	 match log_message
+	 with
+	 | Some log_message ->
+	    let () = Debug.tag_begin_n (D.S.PH.B.PB.CI.Po.K.H.get_logger parameters) log_message in
+	    true
+	 | None -> false
+       else
+	 false 
+     in
+     let error,(trace',n) = f parameters kappa_handler error trace in
+     let () =
+       if
+	 bool
+       then
+	 Debug.tag_end_n (D.S.PH.B.PB.CI.Po.K.H.get_logger parameters) n
+     in 
+     let () =
+       if
+	 D.S.PH.B.PB.CI.Po.K.H.get_debugging_mode parameters
+       then
+	 let _ = Debug.tag (D.S.PH.B.PB.CI.Po.K.H.get_debugging_channel parameters) debug_message in 
+	 print_trace parameters kappa_handler trace'
+     in
+     let profiling_info = log n profiling_info  in 
+     error,profiling_info,trace'
+   else
+     error,profiling_info,trace)
+
+let monadic_lift f = (fun _ _ e t ->
+		      let t' = f t in
+		      e,(f t,List.length t - List.length t'))
+let dummy_profiling = (fun _ p -> p)
+			
+let split_init =
+  transform_trace_gen
+    (monadic_lift D.S.PH.B.PB.CI.Po.K.split_init)
+    (Some "\t - splitting initial events")
+    "Trace after having split initial events:\n"
+    dummy_profiling
+
+let disambiguate =
+  transform_trace_gen
+    (monadic_lift D.S.PH.B.PB.CI.Po.K.disambiguate)
+    (Some "\t - renaming agents to avoid conflicts after event removals")
+    "Trace after having renames agents:\n"
+    dummy_profiling
+    
 let cut =
   transform_trace_gen
     D.S.PH.B.PB.CI.Po.cut
-    "\t - cutting concurrent events"
+    (Some "\t - cutting concurrent events")
     "Trace after having removed concurrent events:\n"
-    D.S.PH.B.PB.CI.Po.K.P.set_global_cut  
-			 
-let remove_events_after_last_obs = List_utilities.remove_suffix_after_last_occurrence  D.S.PH.B.PB.CI.Po.K.is_obs_of_refined_step 
+    D.S.PH.B.PB.CI.Po.K.P.set_global_cut
+    
+let fill_siphon =
+  transform_trace_gen
+    (monadic_lift D.S.PH.B.PB.CI.Po.K.fill_siphon)
+    (Some "\t - detecting siphons")
+    "Trace after having detected siphons:\n"
+    dummy_profiling
 
-let remove_weak_events_annotation l = 
-  List.rev_map fst (List.rev l) 
+let remove_events_after_last_obs =
+  transform_trace_gen
+    (monadic_lift ((List_utilities.remove_suffix_after_last_occurrence D.S.PH.B.PB.CI.Po.K.is_obs_of_refined_step)))
+    (Some "\t - removing events occurring after the last observable:\n")
+    "Trace after having removed the events after the last observable"
+    dummy_profiling
 
 let remove_pseudo_inverse_events =
   transform_trace_gen
     D.S.PH.B.PB.CI.cut
-    "\t - detecting pseudo inverse events"
+    (Some "\t - detecting pseudo inverse events")
     "Trace after having removed pseudo inverse events:\n"
     D.S.PH.B.PB.CI.Po.K.P.set_pseudo_inv
 						

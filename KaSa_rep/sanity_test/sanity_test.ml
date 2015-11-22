@@ -107,7 +107,8 @@ module LLI = Map_wrapper.Make(SetMap.Make (struct type t = int let compare = com
 					   
 let main () =
   let error = Exception.empty_error_handler in
-  let error,parameters,files= Get_option.get_option error in
+  let parameters = Remanent_parameters.get_parameters () in
+			       
   let m = LI.Map.empty in
   let m = I.Map.add 2 3 m in
   let error,i = LI.Map.find_option parameters error 2 m in 
