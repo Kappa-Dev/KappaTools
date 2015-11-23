@@ -144,7 +144,9 @@ let get_parameters () =
       } ;
     Remanent_parameters_sig.log    = !Config.log ;
     Remanent_parameters_sig.formatter = !Config.formatter ;    
-  } 
+  }
+
+let dummy_parameters = get_parameters ()
     
 let get_btype_sep_symbol_1         symbol = symbol.Remanent_parameters_sig.btype_sep 
 let get_bound_symbol_1             symbol = symbol.Remanent_parameters_sig.bound 
