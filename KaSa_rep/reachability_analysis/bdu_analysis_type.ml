@@ -239,8 +239,8 @@ type bdu_build_map =
 
 type bdu_fixpoint =
   {
+    store_test_has_bond_rhs : Map_site_address.Set.t AgentMap.t;
     store_bdu_update_map    : (int list * bool Mvbdu_sig.mvbdu list) Map_bdu_update.Map.t;
-    store_test_has_bond_rhs : Map_site_address.Set.t AgentMap.t    
   }
 
 (************************************************************************************)

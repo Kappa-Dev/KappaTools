@@ -88,6 +88,8 @@ let print_bdu_fixpoint parameter error result =
       result.store_test_has_bond_rhs
   in
   let _ =
+  fprintf (Remanent_parameters.get_log parameter)
+    "** Fixpoint iteration function:\n";
     print_bdu_update_map
       parameter
       error

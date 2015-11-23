@@ -301,6 +301,16 @@ let scan_rule_fixpoint parameter handler error
     store_modif_list_map
     store_result
     =
+  (*-------------------------------------------------------------------------------*)
+  (*TODO*)
+  let error, store_test_has_bond_rhs =
+    store_test_has_bond_rhs
+      parameter
+      error
+      rule_id
+      rule
+      store_result.store_test_has_bond_rhs
+  in
   let error, store_bdu_update_map =
     collect_bdu_update_map
       parameter
@@ -314,23 +324,14 @@ let scan_rule_fixpoint parameter handler error
       store_creation_bdu_map
       store_remanent_modif
       store_modif_list_map
+      store_test_has_bond_rhs
       store_result.store_bdu_update_map
-  in
-  (*-------------------------------------------------------------------------------*)
-  (*TODO*)
-  let error, store_test_has_bond_rhs =
-    store_test_has_bond_rhs
-      parameter
-      error
-      rule_id
-      rule
-      store_result.store_test_has_bond_rhs
   in
   (*-------------------------------------------------------------------------------*)
   error, 
   {
+    store_test_has_bond_rhs = store_test_has_bond_rhs;
     store_bdu_update_map    = store_bdu_update_map;
-    store_test_has_bond_rhs = store_test_has_bond_rhs
   }
   
 (************************************************************************************)
@@ -505,8 +506,8 @@ let init_bdu_fixpoint parameter error = (*TODO*)
   let error, init_test_has_bond_rhs = AgentMap.create parameter error 0 in
   let init_bdu_fixpoint =
     {
+      store_test_has_bond_rhs = init_test_has_bond_rhs;
       store_bdu_update_map    = init_bdu_update_map;
-      store_test_has_bond_rhs = init_test_has_bond_rhs
     }
   in
   error, init_bdu_fixpoint

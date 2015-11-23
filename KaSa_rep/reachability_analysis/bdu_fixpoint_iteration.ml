@@ -143,6 +143,7 @@ let collect_bdu_update_map parameter handler error rule wl_creation
     store_creation_bdu_map
     store_remanent_modif
     store_modif_list_map
+    store_test_has_bond_rhs
     store_result
     =
     let error,handler, bdu_false =
@@ -176,47 +177,6 @@ let collect_bdu_update_map parameter handler error rule wl_creation
       match rule_id_op with
       | None -> error, store_bdu_update_map
       | Some rule_id ->
-        (*--------------------------------------------------------------------*)
-        (*get the local view that is tested for this rule_id with new indexes*)
-        let error, (agent_type_test, cv_id_test, bdu_test) =
-          (*take a global view *)
-          AgentMap.fold parameter error
-            (fun parameter error agent_id agent (ag, id, store_bdu_result) ->
-              match agent with
-              | Ghost -> error, (ag, id, store_bdu_result)
-              | Agent agent ->
-                let agent_type = agent.agent_name in
-                (*TEST*)
-                
-                (*get the local view: (agent_id, rule_id, cv_id, pair_list)list *)
-                let error, get_test_list =
-                  match
-                    AgentMap.unsafe_get parameter error agent_type store_remanent_test 
-                  with
-                  | error, None -> error, []
-                  | error, Some l -> error, l
-                in
-                let error, (cv_id, bdu_test) =
-                  List.fold_left (fun (error, (cv_id, bdu_result))
-                    (agent_id, rule_id', cv_id, _) ->
-                      begin
-                        if rule_id = rule_id'
-                        then
-                          let (l, bdu_test) =
-                            Map_test_bdu.Map.find_default ([],bdu_false)
-			      (agent_id, agent_type, rule_id, cv_id) store_test_bdu_map
-			  in
-                          error, (cv_id,bdu_test)
-                        else
-                          error, (cv_id, bdu_result)
-                      end
-		  )
-		    (error, (id, store_bdu_result))
-		    get_test_list
-                in		
-                error, (agent_type, cv_id, bdu_test)
-            ) rule.rule_lhs.views (0, 0, bdu_false)
-        in
         (*--------------------------------------------------------------------*)
         (*get the local view that is created for this rule_id with new_indexes*)
         let error, bdu_creation =
@@ -309,48 +269,90 @@ let collect_bdu_update_map parameter handler error rule wl_creation
             modif_list
         in
         (*--------------------------------------------------------------------*)
-        (*test the enable rule of the view that is tested with bdu_X*)	
-	let error, is_enable =
-          comp_is_enable
-            parameter
-            error
-            handler
-	    bdu_test 	   
-            bdu_X
+        (*get the local view that is tested for this rule_id with new indexes*)
+        let error, store_result_bdu_update_map =
+          (*take a global view *)
+          AgentMap.fold parameter error
+            (fun parameter error agent_id agent store_bdu_result ->
+              match agent with
+              | Ghost -> error, store_bdu_result
+              | Agent agent ->
+                let agent_type = agent.agent_name in
+                (*--------------------------------------------------------------------*)
+                (*get the local view: (agent_id, rule_id, cv_id, pair_list)list *)
+                let error, get_test_list =
+                  match
+                    AgentMap.unsafe_get parameter error agent_type store_remanent_test 
+                  with
+                  | error, None -> error, []
+                  | error, Some l -> error, l
+                in
+                (*get bdu_test and cv_id of its*)
+                let error, (cv_id, bdu_test) =
+                  List.fold_left (fun (error, (cv_id, bdu_result))
+                    (agent_id, rule_id', cv_id, _) ->
+                      begin
+                        if rule_id = rule_id'
+                        then
+                          let (l, bdu_test) =
+                            Map_test_bdu.Map.find_default ([],bdu_false)
+			      (agent_id, agent_type, rule_id, cv_id) store_test_bdu_map
+			  in
+                          error, (cv_id, bdu_test)
+                        else
+                          error, (cv_id, bdu_result)
+                      end
+		  )
+		    (error, (0, bdu_false)) get_test_list
+                in	
+                (*--------------------------------------------------------------------*)
+                (*TODO:get a set of binding site_address of agent_type*)
+                let error, result_bdu_update_map =
+                  match
+                    AgentMap.unsafe_get parameter error agent_type store_test_has_bond_rhs
+                  with
+                  | error, None ->
+                  (*if it is an empty set, then it is in the case that no
+                    bond is discovered, add update(c) into working list*)
+                    (*check enable*)
+                    let error, is_enable =
+                      comp_is_enable
+                        parameter
+                        error
+                        handler
+	                bdu_test 	   
+                        bdu_X
+                    in
+                    begin
+                      if is_enable
+                      then
+                        let error, bdu_update =
+                          compute_update
+                            parameter
+                            error
+                            handler
+		            bdu_test
+		            list_a
+                            bdu_creation
+                            bdu_X
+                        in
+                        let error, store_new_bdu_update_map =
+                          add_link (agent_type, cv_id) bdu_update store_bdu_result
+                        in
+                        (*TODO: add update(c) into wl_tl*)
+                        aux wl_tl bdu_update (error, store_new_bdu_update_map)
+                      else
+                        (*continue with the result and the tail of working list*)
+                        aux wl_tl bdu_X (error, store_bdu_result)
+                    end
+                  | error, Some s ->(*TODO*)
+                   (*if there is some bonds are discovered, then check with
+                     side_effects*)
+                    aux wl_tl bdu_X (error, store_bdu_result)
+                in 
+               	error, result_bdu_update_map                
+            ) rule.rule_lhs.views store_bdu_update_map
         in
-        begin
-          if is_enable
-          then
-            (*--------------------------------------------------------------------*)
-            (*discover a new view, update bdu for this view*)
-            let error, bdu_update =
-              compute_update
-                parameter
-                error
-                handler
-		bdu_test
-		list_a
-                bdu_creation
-                bdu_X
-            in
-            (*do step 3: add update(c) in the working list*)
-            
-
-            
-            (*-----------------------------------------------------------------------*)
-            (*store bdu_update inside map of the views that is tested (per agent, cv)*)
-            let error, store_new_bdu_update_map =
-              add_link (agent_type_test, cv_id_test) bdu_update store_bdu_update_map
-            in
-            (*--------------------------------------------------------------------*)
-            (*TODO: continue in the new working list when added update_function and/or
-              discover binding side.
-              continue with the tail of working list with this update*)
-            aux wl_tl bdu_update (error, store_new_bdu_update_map)
-          (*--------------------------------------------------------------------*)
-          else
-            (*continue with the result*)
-            aux wl_tl bdu_X (error, store_bdu_update_map)
-        end
+        error, store_result_bdu_update_map
   in
-  aux wl_creation bdu_false (error, store_result) (*start from bdu_init*)
+  aux wl_creation bdu_false (error, store_result)

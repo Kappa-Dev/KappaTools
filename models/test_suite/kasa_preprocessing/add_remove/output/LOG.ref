@@ -406,4 +406,5 @@ site_type:1:state:0
 * Fixpoint iteration :
 ------------------------------------------------------------
 ** Valuation of the views that are tested, encounter sites that are bond on the rhs for the first time:
+** Fixpoint iteration function:
 execution finished without any exception
