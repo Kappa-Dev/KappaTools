@@ -587,32 +587,23 @@ let js_of_grid env enriched_grid f =
   let () = Format.fprintf f ".scale(initialScale)@,.event(svg);@," in
   Format.fprintf f "svg.attr('height', g.graph().height * initialScale + 40);"
 
-let html_of_grid profiling compression_type cpt env enriched_grid f =
+let html_of_grid profiling compression_type cpt env enriched_grid =
   let title f = Format.fprintf
 		  f "%s compressed story number %i" compression_type cpt in
-  let dependency f t =
-    Format.fprintf f "<script src=\"%s\" charset=\"utf-8\"></script>@," t in
-
-  let () = Format.fprintf f "@[<v><!doctype html>@,@,<html>@," in
-  let () = Format.fprintf f "@[<v 2><head>@,<meta charset=\"utf-8\">@," in
-  let () = Format.fprintf f "<title>%t</title>@," title in
-  let () = dependency f "http://d3js.org/d3.v3.min.js" in
-  let () =
-    dependency
-      f "http://cpettitt.github.io/project/dagre-d3/latest/dagre-d3.min.js" in
-  let () = Format.fprintf f "@[<v 2><style>@," in
-  let () = Format.fprintf f ".node rect {stroke: #333; fill: #fff;}@," in
-  let () = Format.fprintf
-	     f ".edgePath path {stroke: #333; fill: #333; stroke-width: 1.5px;}" in
-  let () = Format.fprintf f "@]@,</style>" in
-  let () = Format.fprintf f "@]@,</head>@," in
-  let () = Format.fprintf f "@[<v 2><body>@,<h1>%t</h1>@," title in
-  let () = Format.fprintf f "<svg width=960 height=600><g/></svg>@," in
-  let () = Format.fprintf f "<p>@[%t@]</p>@," profiling in
-  let () = Format.fprintf
-	     f "@[<v 2><script>@,%t@]@,</script>"
-	     (js_of_grid env enriched_grid) in
-  Format.fprintf f "@]@,</body>@,</html>@]@."
+  Pp_html.graph_page
+    title ["http://d3js.org/d3.v3.min.js";
+	   "http://cpettitt.github.io/project/dagre-d3/latest/dagre-d3.min.js"]
+    (fun f ->
+     let () = Format.fprintf f "@[<v 2><style>@," in
+     let () = Format.fprintf f ".node rect {stroke: #333; fill: #fff;}@," in
+     let () = Format.fprintf
+		f ".edgePath path {stroke: #333; fill: #333; stroke-width: 1.5px;}" in
+     Format.fprintf f "@]@,</style>")
+    (fun f ->
+     let () = Format.fprintf f "<p>@[%t@]</p>@," profiling in
+     Format.fprintf
+       f "@[<v 2><script>@,%t@]@,</script>"
+       (js_of_grid env enriched_grid))
 
 (*story_list:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...] et sim_info:{with story_id:int story_time: float ; story_event: int}*)
 let pretty_print err_fmt env config_closure compression_type label story_list =
