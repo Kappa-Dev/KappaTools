@@ -132,7 +132,7 @@ let scan_rule_static parameter error handler rule_id rule covering_classes
 (*dynamic analysis*)
 
 let scan_rule_dynamic parameter error handler rule_id rule 
-    store_test_modification_sites
+    store_test_modification_map
     store_covering_classes_id
     store_result =
   (*------------------------------------------------------------------------------*)
@@ -151,7 +151,7 @@ let scan_rule_dynamic parameter error handler rule_id rule
     store_covering_classes_modification_update
       parameter
       error
-      store_test_modification_sites
+      store_test_modification_map
       store_covering_classes_id
   in
   (*------------------------------------------------------------------------------*)
@@ -289,7 +289,10 @@ let scan_rule_bdu_build_map parameter handler error xrule_id rule
 (************************************************************************************)
 (*scan rule fixpoint*)
 
-let scan_rule_fixpoint parameter handler error rule store_wl_creation 
+let scan_rule_fixpoint parameter handler error 
+    rule_id
+    rule 
+    store_wl_creation 
     store_remanent_test
     store_bdu_test_map
     store_remanent_creation
@@ -314,9 +317,20 @@ let scan_rule_fixpoint parameter handler error rule store_wl_creation
       store_result.store_bdu_update_map
   in
   (*-------------------------------------------------------------------------------*)
+  (*TODO*)
+  let error, store_test_has_bond_rhs =
+    store_test_has_bond_rhs
+      parameter
+      error
+      rule_id
+      rule
+      store_result.store_test_has_bond_rhs
+  in
+  (*-------------------------------------------------------------------------------*)
   error, 
   {
-    store_bdu_update_map = store_bdu_update_map;
+    store_bdu_update_map    = store_bdu_update_map;
+    store_test_has_bond_rhs = store_test_has_bond_rhs
   }
   
 (************************************************************************************)
@@ -344,7 +358,7 @@ let scan_rule parameter handler_bdu error handler_kappa rule_id rule store_cover
       handler_kappa
       rule_id
       rule 
-      store_bdu_analysis_static.store_test_modification_sites
+      store_bdu_analysis_static.store_test_modif_map
       store_bdu_analysis_static.store_covering_classes_id
       store_result.store_bdu_analysis_dynamic
   in
@@ -376,8 +390,9 @@ let scan_rule parameter handler_bdu error handler_kappa rule_id rule store_cover
   let error, store_bdu_fixpoint =
     scan_rule_fixpoint
       parameter
-      handler_bdu 
+      handler_bdu
       error
+      rule_id
       rule
       store_bdu_analysis_dynamic.store_wl_creation
       store_bdu_build.store_remanent_test
@@ -486,10 +501,12 @@ let init_bdu_build_map parameter error =
 (*init of bdu fixpoint*)
 
 let init_bdu_fixpoint parameter error = (*TODO*)
-  let init_bdu_update_map = Map_bdu_update.Map.empty in
+  let init_bdu_update_map           = Map_bdu_update.Map.empty in
+  let error, init_test_has_bond_rhs = AgentMap.create parameter error 0 in
   let init_bdu_fixpoint =
     {
-      store_bdu_update_map = init_bdu_update_map;
+      store_bdu_update_map    = init_bdu_update_map;
+      store_test_has_bond_rhs = init_test_has_bond_rhs
     }
   in
   error, init_bdu_fixpoint

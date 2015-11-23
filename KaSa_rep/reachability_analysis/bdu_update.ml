@@ -42,51 +42,42 @@ let trace = false
 *)
 
 let store_covering_classes_modification_update_aux parameter error agent_type_cv
-    covering_class_id store_test_modification_sites store_result =
-  let add_link (agent_id, agent_type, cv_id) rule_id store_result =
+    site_type_cv cv_id store_test_modification_map store_result =
+  let add_link (agent_type, cv_id) rule_id_set store_result =
     let (l, old) =
       Int2Map_CV_Modif.Map.find_default ([], Site_map_and_set.Set.empty)
-	(agent_id, agent_type, cv_id) store_result in
-    let current_set = Site_map_and_set.Set.add rule_id old in
-    let new_set = Site_map_and_set.Set.union current_set old in
+	(agent_type, cv_id) store_result in
+    let new_set = Site_map_and_set.Set.union rule_id_set old in
     let result =
-      Int2Map_CV_Modif.Map.add (agent_id, agent_type, cv_id) (l, new_set) store_result
+      Int2Map_CV_Modif.Map.add (agent_type, cv_id) (l, new_set) store_result
     in
     error, result
   in
+  let (l1, s2) = Int2Map_Test_Modif.Map.find_default ([], Site_map_and_set.Set.empty)
+    (agent_type_cv, site_type_cv) store_test_modification_map
+  in
   let error, result =
-    Int2Map_Modif.Map.fold
-      (fun (agent_id, agent_type, site_type) (m1, s2) store_result ->
-        Site_map_and_set.Set.fold (fun rule_id (error, store_current_result) ->
-          if compare agent_type_cv agent_type = 0
-          then
-            let error, result =
-              add_link (agent_id, agent_type_cv, covering_class_id)
-                rule_id store_current_result
-            in
-            error, result
-          else
-            error, store_current_result
-        ) s2 store_result
-      ) store_test_modification_sites store_result
-  in error, result
+    add_link (agent_type_cv, cv_id) s2 store_result
+  in
+  error, result
     
 (************************************************************************************)
 
 let store_covering_classes_modification_update parameter error
-    store_test_modification_sites
+    store_test_modification_map
     store_covering_classes_id =
   let error, store_result =
     Int2Map_CV.Map.fold
       (fun (agent_type_cv, site_type_cv) (l1, l2) store_result ->
-        List.fold_left (fun store_current_result cv_id ->
+        List.fold_left (fun (error, store_current_result) cv_id ->
           let error, result =
             store_covering_classes_modification_update_aux
               parameter
               error
               agent_type_cv
+              site_type_cv
               cv_id
-              store_test_modification_sites
+              store_test_modification_map
               store_current_result
           in
           error, result

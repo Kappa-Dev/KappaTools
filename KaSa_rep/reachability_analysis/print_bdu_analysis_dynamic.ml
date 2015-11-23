@@ -76,20 +76,20 @@ let print_contact_map parameter error result =
 
 let print_covering_classes_modification_aux parameter error result =
   Int2Map_CV_Modif.Map.iter
-    ( fun (x, y, z) (l1, s2) ->
+    ( fun (x, y) (l1, s2) ->
       if l1 <> []
       then
         begin
           let _ =
             fprintf parameter.log
-              "agent_id:%iagent_type:%i:covering_class_id:%i" x y z
+              "agent_type:%i:covering_class_id:%i" x y
           in
           let _ = List.fold_left
             (fun bool x ->
               (if bool
                then
                   fprintf parameter.log ", ");
-              fprintf parameter.log "agent_id:%i" x;
+              fprintf parameter.log "agent_type:%i" x;
               true
             ) false l1
           in
@@ -98,7 +98,7 @@ let print_covering_classes_modification_aux parameter error result =
       else ();
       let _ =
         fprintf parameter.log
-          "agent_id:%i:agent_type:%i:covering_class_id:%i:@set of rule_id:\n" x y z
+          "agent_type:%i:covering_class_id:%i:@set of rule_id:\n" x y
       in
       Site_map_and_set.Set.iter
         (fun rule_id ->

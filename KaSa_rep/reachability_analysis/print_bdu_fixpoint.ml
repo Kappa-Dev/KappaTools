@@ -16,6 +16,7 @@ open Printf
 open Bdu_analysis_type
 open Print_bdu_build_map
 open Remanent_parameters_sig
+open Cckappa_sig
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "BDU creation") message exn (fun () -> default)  
@@ -44,7 +45,28 @@ let print_bdu_update_map parameter error result =
 (*let print_bdu_update_map parameter error result =
   let _ = print_bdu parameter error result in
   fprintf parameter.log "\n"*)
-    
+ 
+(************************************************************************************)
+
+let print_test_bonds parameter error result =
+  AgentMap.print error
+    (fun error parameter set ->
+      let _ =
+        Map_site_address.Set.iter (fun (site_add1, site_add2) ->
+          fprintf parameter.log 
+            "{agent_id:%i; agent_type:%i; site_type:%i} -- "
+            site_add1.Cckappa_sig.agent_index site_add1.Cckappa_sig.agent_type 
+            site_add1.Cckappa_sig.site;
+          fprintf parameter.log 
+            "{agent_id:%i; agent_type:%i; site_type:%i} \n"
+            site_add2.Cckappa_sig.agent_index site_add2.Cckappa_sig.agent_type 
+            site_add2.Cckappa_sig.site
+        ) set
+      in
+      error
+    ) parameter result
+
+
 (************************************************************************************)
 (*main print*)
 
@@ -56,6 +78,14 @@ let print_bdu_fixpoint parameter error result =
       "* Fixpoint iteration :\n";
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
+  in
+  let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "** Valuation of the views that are tested, encounter sites that are bond on the rhs for the first time:\n";
+    print_test_bonds
+      parameter
+      error
+      result.store_test_has_bond_rhs
   in
   let _ =
     print_bdu_update_map

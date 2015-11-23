@@ -206,7 +206,7 @@ Sites are annotated with the id of binding type:
 ------------------------------------------------------------
 List of rules to awake when the state of a site is modified and tested:
 ------------------------------------------------------------
-agent_id:0:agent_type:0:covering_class_id:0:@set of rule_id:
+agent_type:0:covering_class_id:0:@set of rule_id:
 rule_id:0
 rule_id:1
 rule_id:2
@@ -295,4 +295,5 @@ site_type:2:state:1
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
+** Valuation of the views that are tested, encounter sites that are bond on the rhs for the first time:
 execution finished without any exception
