@@ -94,7 +94,7 @@ module Int2Map_CV_Modif =
   SetMap.Make (
     struct
       (*agent_id, agent_type, covering_class_id*)
-      type t = int * int * int
+      type t = int * int
       let compare = compare
     end)
 
@@ -156,6 +156,16 @@ module Map_bdu_update =
       type t = int * int
       let compare = compare
     end)
+
+(*build a pair of site_address map*)
+
+module Map_site_address =
+  SetMap.Make (
+    struct
+      type t = site_address * site_address
+      let compare = compare
+    end
+  )
 
 (************************************************************************************)
 (*static information*)
@@ -229,7 +239,8 @@ type bdu_build_map =
 
 type bdu_fixpoint =
   {
-    store_bdu_update_map : (int list * bool Mvbdu_sig.mvbdu list) Map_bdu_update.Map.t;
+    store_test_has_bond_rhs : Map_site_address.Set.t AgentMap.t;
+    store_bdu_update_map    : (int list * bool Mvbdu_sig.mvbdu list) Map_bdu_update.Map.t;
   }
 
 (************************************************************************************)

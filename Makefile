@@ -57,7 +57,7 @@ JaSim.byte: $(filter-out _build/,$(wildcard */*.ml*))
 	$@
 
 js/JaSim.js: JaSim.byte
-	js_of_ocaml "+weak.js" _build/js/$< -o $@
+	js_of_ocaml "+weak.js" "+nat.js" _build/js/$< -o $@
 
 bin/%: %.native Makefile
 	[ -d bin ] || mkdir bin && cp $< $@

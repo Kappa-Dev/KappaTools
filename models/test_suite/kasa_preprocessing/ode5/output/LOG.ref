@@ -778,34 +778,26 @@ agent_type:3@site_type:2:state:1--agent_type':0@site_type':4:state':1
 ------------------------------------------------------------
 List of rules to awake when the state of a site is modified and tested:
 ------------------------------------------------------------
-agent_id:0:agent_type:0:covering_class_id:0:@set of rule_id:
+agent_type:0:covering_class_id:0:@set of rule_id:
 rule_id:0
 rule_id:1
-agent_id:0:agent_type:0:covering_class_id:1:@set of rule_id:
-rule_id:0
+rule_id:4
+agent_type:0:covering_class_id:1:@set of rule_id:
 rule_id:1
-agent_id:0:agent_type:0:covering_class_id:2:@set of rule_id:
+rule_id:4
+agent_type:0:covering_class_id:2:@set of rule_id:
 rule_id:0
-rule_id:1
-agent_id:0:agent_type:1:covering_class_id:0:@set of rule_id:
+rule_id:4
+agent_type:1:covering_class_id:0:@set of rule_id:
+rule_id:0
 rule_id:2
-agent_id:0:agent_type:2:covering_class_id:0:@set of rule_id:
-rule_id:3
-agent_id:0:agent_type:3:covering_class_id:0:@set of rule_id:
-rule_id:4
-agent_id:1:agent_type:0:covering_class_id:0:@set of rule_id:
-rule_id:4
-agent_id:1:agent_type:0:covering_class_id:1:@set of rule_id:
-rule_id:4
-agent_id:1:agent_type:0:covering_class_id:2:@set of rule_id:
-rule_id:4
-agent_id:1:agent_type:1:covering_class_id:0:@set of rule_id:
-rule_id:0
-agent_id:1:agent_type:2:covering_class_id:0:@set of rule_id:
+agent_type:2:covering_class_id:0:@set of rule_id:
 rule_id:1
-agent_id:1:agent_type:3:covering_class_id:0:@set of rule_id:
+rule_id:3
+agent_type:3:covering_class_id:0:@set of rule_id:
 rule_id:2
 rule_id:3
+rule_id:4
 
 ------------------------------------------------------------
 * Rules in the working list:
@@ -1017,4 +1009,20 @@ site_type:2:state:1
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
+** Valuation of the views that are tested, encounter sites that are bond on the rhs for the first time:
+agent_type_0:
+{agent_id:0; agent_type:0; site_type:2} -- {agent_id:1; agent_type:1; site_type:0} 
+{agent_id:0; agent_type:0; site_type:3} -- {agent_id:1; agent_type:2; site_type:0} 
+{agent_id:1; agent_type:0; site_type:4} -- {agent_id:0; agent_type:3; site_type:2} 
+agent_type_1:
+{agent_id:0; agent_type:1; site_type:1} -- {agent_id:1; agent_type:3; site_type:0} 
+{agent_id:1; agent_type:1; site_type:0} -- {agent_id:0; agent_type:0; site_type:2} 
+agent_type_2:
+{agent_id:0; agent_type:2; site_type:1} -- {agent_id:1; agent_type:3; site_type:1} 
+{agent_id:1; agent_type:2; site_type:0} -- {agent_id:0; agent_type:0; site_type:3} 
+agent_type_3:
+{agent_id:0; agent_type:3; site_type:2} -- {agent_id:1; agent_type:0; site_type:4} 
+{agent_id:1; agent_type:3; site_type:0} -- {agent_id:0; agent_type:1; site_type:1} 
+{agent_id:1; agent_type:3; site_type:1} -- {agent_id:0; agent_type:2; site_type:1} 
+** Fixpoint iteration function:
 execution finished without any exception

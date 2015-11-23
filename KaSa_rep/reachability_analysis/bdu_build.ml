@@ -75,7 +75,8 @@ let collect_remanent_triple parameter error store_remanent store_result =
       let error, store_result =
         AgentMap.set
           parameter
-          error agent_type
+          error 
+          agent_type
           (List.rev triple_list)
           store_result
       in
