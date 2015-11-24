@@ -110,7 +110,7 @@ clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch clean_doc
 check: bin/sanity_test
 	@+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite all
 
-build-tests:
+build-tests: bin/sanity_test
 	@+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite build
 
 temp-clean-for-ignorant-that-clean-must-be-done-before-fetch:
