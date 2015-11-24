@@ -142,11 +142,11 @@ let print_bdu_build_map parameter error result =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
-      "* Covering classes with new indexes :\n";
+      "* Bdu of covering classes with new indexes :\n";
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
   in
-  let _ =
+  (*let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "- Valuations of the views that are tested (per rule, agent and covering class):\n\n";
     print_remanent_test_map
@@ -173,7 +173,7 @@ let print_bdu_build_map parameter error result =
       parameter
       error
       result.store_remanent_modif_map
-  in
+  in*)
   (*-----------------------------------------------------------------*)
   let _ =
     fprintf (Remanent_parameters.get_log parameter)

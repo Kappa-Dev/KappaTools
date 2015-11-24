@@ -217,8 +217,13 @@ rule_id:1
 
 
 ------------------------------------------------------------
-* Covering classes with new indexes :
+* Covering classes with new indexes:
 ------------------------------------------------------------
+- Covering classes triple (id, list, set):
+agent_type_0:
+Covering_class_id:0
+site_type:0
+site_type:1
 - Valuations of the views that are tested (per rule, agent and covering class):
 
 agent_id:0:agent_type:0:rule_id:0:covering_class_id:0@list of pair:
@@ -234,11 +239,15 @@ site_type':2:state:0
 ------------------------------------------------------------
 - Update of the views due to modification (per rule, agent and covering class):
 
-agent_id:0:agent_type:0:rule_id:0:covering_class_id:0@list of triple:
+agent_id:0:agent_type:0:rule_id:0:covering_class_id:0@list of pair:
 site_type':2:state:1
 site_type':1:state:1
-agent_id:0:agent_type:0:rule_id:1:covering_class_id:0@list of triple:
+agent_id:0:agent_type:0:rule_id:1:covering_class_id:0@list of pair:
 site_type':2:state:1
+
+------------------------------------------------------------
+* Bdu of covering classes with new indexes :
+------------------------------------------------------------
 
 ------------------------------------------------------------
 - Bdu for the valuations of the views that are created (per rule, agent and covering class):

@@ -48,12 +48,12 @@ let print_result parameter error result =
   in
   (*------------------------------------------------------------------------------*)
   (*print if one would like to test*)
-  (*let _ =
+  let _ =
     print_bdu_build
       parameter
       error
       result.store_bdu_build
-  in*)
+  in
   (*------------------------------------------------------------------------------*)
   let _ =
     print_bdu_build_map

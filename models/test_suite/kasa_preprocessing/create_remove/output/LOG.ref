@@ -128,8 +128,9 @@ List of rules to awake when the state of a site is modified and tested:
 0 1 
 
 ------------------------------------------------------------
-* Covering classes with new indexes :
+* Covering classes with new indexes:
 ------------------------------------------------------------
+- Covering classes triple (id, list, set):
 - Valuations of the views that are tested (per rule, agent and covering class):
 
 
@@ -140,6 +141,10 @@ List of rules to awake when the state of a site is modified and tested:
 ------------------------------------------------------------
 - Update of the views due to modification (per rule, agent and covering class):
 
+
+------------------------------------------------------------
+* Bdu of covering classes with new indexes :
+------------------------------------------------------------
 
 ------------------------------------------------------------
 - Bdu for the valuations of the views that are created (per rule, agent and covering class):

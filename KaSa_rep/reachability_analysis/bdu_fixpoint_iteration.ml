@@ -25,6 +25,11 @@ open Bdu_structure
 open Fifo
 open Printf
 
+let warn parameters mh message exn default = 
+     Exception.warn parameters mh (Some "Bdu_fixpoint_iteration") message exn (fun () -> default) 
+
+let local_trace = false
+
 (************************************************************************************)
 (*is enable rule*)
 
@@ -169,12 +174,11 @@ let add_update_to_wl parameter error store_covering_classes_modification_update 
 (*fixpoint*)
 
 let collect_bdu_update_map parameter handler error 
-    rule wl_creation 
-    store_remanent_test
+    rule 
+    wl_creation
+    store_remanent_triple
     store_test_bdu_map
-    store_remanent_creation
     store_creation_bdu_map
-    store_remanent_modif
     store_modif_list_map
     store_test_has_bond_rhs
     store_covering_classes_modification_update
@@ -184,7 +188,6 @@ let collect_bdu_update_map parameter handler error
     f parameter
       (boolean_mvbdu_false parameter handler error) parameter
   in
-  (*  let error, (handler, bdu_init) = bdu_init parameter error in*)
   let add_link (agent_type, cv_id) bdu_update store_result =
     let (l, old) =
       match
@@ -193,7 +196,7 @@ let collect_bdu_update_map parameter handler error
       | None -> [],[]
     in
     let result_map = (*FIXME: list or bdu_init ? *)
-      Map_bdu_update.Map.add (agent_type, cv_id) (l, bdu_update :: []) 
+      Map_bdu_update.Map.add (agent_type, cv_id) (l, bdu_update :: old) 
         store_result
     in
     error, result_map
@@ -221,84 +224,56 @@ let collect_bdu_update_map parameter handler error
             | None -> warn parameter error (Some "line 163") Exit store_bdu_result
             | Some Ghost -> error, store_bdu_result
             | Some Agent agent ->
-              (*get the local view (rule_id, cv_id, pair_list) list*)
-              let error, get_creation_list =
-                match
-                  AgentMap.unsafe_get parameter error agent_type store_remanent_creation
+              let error, triple_list =
+                match 
+                  AgentMap.unsafe_get parameter error agent_type store_remanent_triple
                 with
                 | error, None -> error, []
                 | error, Some l -> error, l
               in
               let error, bdu_creation =
-                List.fold_left (fun (error, store_result) (rule_id', cv_id, _) ->
-                  begin
-                    if rule_id = rule_id'
-                    then 
-                      let (l, bdu_creation) =
-			match
-			  Map_creation_bdu.Map.find_option 
-                            (agent_type, rule_id, cv_id) store_creation_bdu_map
-			with
-			  None -> failwith "3 bdu fixpoint iteration"
-			| Some (a,b) -> a,b
-                      in
-                      (*let _ =
-                        fprintf stdout "BDU_Creation\n";
-                        Print_bdu_build_map.print_bdu parameter error bdu_creation
-                      in*)
-                      error, bdu_creation
-                    else
-                      (*let _ = fprintf stdout "NOrule_id:%i:rule_id':%i\n"  rule_id rule_id'
-                      in*)
-                      error, store_result
-                  end
-                ) (error, store_bdu_result) get_creation_list
+                List.fold_left (fun _ (cv_id, _, _) ->
+                  let (l, bdu_creation) =
+		    match
+		      Map_creation_bdu.Map.find_option 
+                        (agent_type, rule_id, cv_id) store_creation_bdu_map
+		    with
+		      None -> (*failwith "3 bdu fixpoint iteration"*) ([], bdu_false)
+		    | Some (a,b) -> a,b
+                  in
+                  error, bdu_creation                  
+                ) (error, bdu_false) triple_list
               in
               error, bdu_creation
-	  )
+          )
 	    (error, bdu_false)
 	    rule.actions.creation
-        in
-    
+        in    
         (*--------------------------------------------------------------------*)
         (*get the local update view due to modification for this rule_id
           with new indexes*)
         let error, modif_list =
           (*take a global view*)
-          AgentMap.fold parameter error
-	    (fun parameter error agent_id agent_modif store_result ->
+          AgentMap.fold2_common parameter error
+	    (fun parameter error agent_id agent_modif triple_list store_result ->
 	      begin
 		if Site_map_and_set.Map.is_empty agent_modif.agent_interface
 		then error, store_result
 		else               
 		  let agent_type = agent_modif.agent_name in
 		  (*get the local update view (agent_id, rule_id, cv_id, pair_list) list*)
-		  let error, get_modif_list =
-		    match
-		      AgentMap.unsafe_get parameter error agent_type store_remanent_modif
-		    with
-		    | error, None -> error, []
-		    | error, Some l -> error, l
-		  in
-		  let error, modif_list =
-		    List.fold_left (fun (error, store_result)
-		      (agent_id, rule_id', cv_id, _) ->
-			begin
-			  if rule_id = rule_id'
-			  then
-			    let (l, modif_list) =
-			      Map_modif_list.Map.find_default ([], [])
-				(agent_id, agent_type, rule_id, cv_id) store_modif_list_map
-			    in
-			    error, modif_list
-			  else
-			    error, store_result
-			end
-		    ) (error, store_result) get_modif_list
-		  in
-		  error, modif_list
-	      end
-	    ) rule.diff_direct []
+                  let error, modif_list =
+                    List.fold_left (fun _ (cv_id, _, _) ->
+                      let (l, modif_list) =
+			Map_modif_list.Map.find_default ([], [])
+			  (agent_id, agent_type, rule_id, cv_id) store_modif_list_map
+		      in
+		      error, modif_list
+                    ) (error, []) triple_list
+                  in
+                  error, modif_list
+              end
+	    ) rule.diff_direct store_remanent_triple []
         in
         let error, (handler, list_a) =
           List_algebra.build_list
@@ -319,31 +294,21 @@ let collect_bdu_update_map parameter handler error
               | Agent agent ->
                 let agent_type = agent.agent_name in
                 (*--------------------------------------------------------------------*)
-                (*get the local view: (agent_id, rule_id, cv_id, pair_list)list *)
-                let error, get_test_list =
-                  match
-                    AgentMap.unsafe_get parameter error agent_type store_remanent_test 
+                let error, triple_list =
+                  match 
+                    AgentMap.unsafe_get parameter error agent_type store_remanent_triple
                   with
                   | error, None -> error, []
                   | error, Some l -> error, l
                 in
-                (*get bdu_test and cv_id*)
                 let error, (cv_id, bdu_test) =
-                  List.fold_left (fun (error, (cv_id, bdu_result))
-                    (agent_id, rule_id', cv_id, _) ->
-                      begin
-                        if rule_id = rule_id'
-                        then
-                          let (l, bdu_test) =
-                            Map_test_bdu.Map.find_default ([],bdu_false)
-			      (agent_id, agent_type, rule_id, cv_id) store_test_bdu_map
-			  in
-                          error, (cv_id, bdu_test)
-                        else
-                          error, (cv_id, bdu_result)
-                      end
-		  )
-		    (error, (0, bdu_false)) get_test_list
+                  List.fold_left (fun _ (cv_id, _, _) ->
+                    let (l, bdu_test) =
+                      Map_test_bdu.Map.find_default ([],bdu_false)
+		        (agent_id, agent_type, rule_id, cv_id) store_test_bdu_map
+		    in
+                    error, (cv_id, bdu_test)
+                  ) (error, (0, bdu_false)) triple_list
                 in
                 (*--------------------------------------------------------------------*)
                 (*TODO:get a set of binding site_address of agent_type*)
@@ -455,60 +420,3 @@ let collect_bdu_update_map parameter handler error
         error, store_result_bdu_update_map
   in
   aux wl_creation bdu_false (error, store_result)
-
-
-(*
-  (*--------------------------------------------------------------------*)
-  (*TODO:get a set of binding site_address of agent_type*)
-  let error, result_bdu_update_map =
-                  (* match
-  AgentMap.unsafe_get parameter error agent_type store_test_has_bond_rhs
-  with
-  | error, None ->
-                    (*if it is an empty set, then it is in the case that no
-  bond is discovered, add update(c) into working list*)
-                    (*check enable*)
-  let error, is_enable =
-  comp_is_enable
-  parameter
-  error
-  handler
-  bdu_test 	   
-  bdu_X
-  in
-  begin
-  if is_enable
-  then
-  let error, bdu_update =
-  compute_update
-  parameter
-  error
-  handler
-  bdu_test
-  list_a
-  bdu_creation
-  bdu_X
-  in
-  let error, store_new_bdu_update_map =
-  add_link (agent_type, cv_id) bdu_update store_bdu_result
-  in
-  (*TODO: add update(c) into wl_tl*)
-  aux wl_tl bdu_update (error, store_new_bdu_update_map)
-  else
-                        (*continue with the result and the tail of working list*)
-  aux wl_tl bdu_X (error, store_bdu_result)
-  end
-  | error, Some s ->(*TODO*)
-  (*if there is some bonds are discovered, then check with
-  side_effects*)
-  aux wl_tl bdu_X (error, store_bdu_result)
-  in *)
-  aux wl_tl bdu_X (error, store_bdu_result)
-  in
-  error, result_bdu_update_map                
-  ) rule.rule_lhs.views store_bdu_update_map
-  in
-  error, store_result_bdu_update_map
-  in
-  aux wl_creation bdu_false (error, store_result)
-*)

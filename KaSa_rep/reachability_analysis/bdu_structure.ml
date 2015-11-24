@@ -25,7 +25,7 @@ let trace = false
 (*************************************************************************************)
 (*Valuations of the views that are tested (per rule, agent and covering class)*)
 
-let collect_remanent_test_map parameter error store_remanent_test =
+(*let collect_remanent_test_map parameter error store_remanent_test =
   let add_link (agent_id, agent_type, rule_id, cv_id) pair_list store_result =
     let (l, old) =
       Map_test.Map.find_default ([], []) (agent_id, agent_type, rule_id, cv_id) store_result
@@ -45,12 +45,12 @@ let collect_remanent_test_map parameter error store_remanent_test =
         in
         error, map
       ) (error, store_result) l
-    ) store_remanent_test Map_test.Map.empty
+    ) store_remanent_test Map_test.Map.empty*)
 
 (*************************************************************************************)
 (*Valuations of the views that are created (per rule, agent and covering class)*)
 
-let collect_remanent_creation_map parameter error store_remanent_creation =
+(*let collect_remanent_creation_map parameter error store_remanent_creation =
   let add_link (agent_type, rule_id, cv_id) pair_list store_result =
     let (l, old) =
       Map_creation.Map.find_default ([], []) (agent_type, rule_id, cv_id) store_result
@@ -74,12 +74,12 @@ let collect_remanent_creation_map parameter error store_remanent_creation =
           ) (error, store_result) l
       in
       error, map          
-    ) store_remanent_creation Map_creation.Map.empty
+    ) store_remanent_creation Map_creation.Map.empty*)
 
 (*************************************************************************************)
 (*Update of the views due to modification (per rule, agent and covering class) *)
 
-let collect_remanent_modif_map parameter error store_remanent_modif =
+(*let collect_remanent_modif_map parameter error store_remanent_modif =
   let add_link (agent_id, agent_type, rule_id, cv_id) pair_list store_result =
     let (l, old) =
       Map_modif.Map.find_default ([], []) 
@@ -104,7 +104,7 @@ let collect_remanent_modif_map parameter error store_remanent_modif =
           ) (error, store_result) l
       in
       error, map          
-    ) store_remanent_modif Map_modif.Map.empty
+    ) store_remanent_modif Map_modif.Map.empty*)
 
 (*************************************************************************************)
 (* Build BDU*)
