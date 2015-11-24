@@ -2,19 +2,19 @@ open Operator
 
 type str_pos = string * Tools.pos
 
-type link =
-  | LNK_VALUE of int
+type ('a,'annot) link =
+  | LNK_VALUE of int * 'annot
   | FREE
   | LNK_ANY
   | LNK_SOME
-  | LNK_TYPE of string Location.annot (* port *)
-    * string Location.annot (*agent_type*)
+  | LNK_TYPE of 'a (* port *)
+    * 'a (*agent_type*)
 
 type internal = string Location.annot list
 
 type port = {port_nme:string Location.annot;
 	     port_int:internal;
-	     port_lnk:link Location.annot;}
+	     port_lnk:(string Location.annot,unit) link Location.annot;}
 
 type agent = (string Location.annot * port list)
 

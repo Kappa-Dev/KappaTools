@@ -26,7 +26,7 @@ let mixture_part is_creation sigs mix acc =
 	not_enough_specified agent_name port_name
       else acc
     | Ast.FREE,_ -> acc
-    | Ast.LNK_VALUE i, pos ->
+    | Ast.LNK_VALUE (i,()), pos ->
        if Mods.IntSet.mem i two then
 	 raise (ExceptionDefn.Malformed_Decl
 		  ("This is the third occurence of link '"^string_of_int i

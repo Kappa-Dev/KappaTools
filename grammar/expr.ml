@@ -5,7 +5,7 @@ let print_ast_link f = function
   | Ast.LNK_TYPE ((p,_), (a,_)) -> Format.fprintf f "!%s.%s" p a
   | Ast.LNK_ANY -> Format.fprintf f "?"
   | Ast.LNK_SOME -> Format.fprintf f "!_"
-  | Ast.LNK_VALUE i -> Format.fprintf f "!%i" i
+  | Ast.LNK_VALUE (i,()) -> Format.fprintf f "!%i" i
 
 let print_ast_internal f l =
   Pp.list Pp.empty (fun f (x,_) -> Format.fprintf f "~%s" x) f l

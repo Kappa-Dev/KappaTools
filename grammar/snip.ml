@@ -19,6 +19,7 @@ type rule_agent =
   { ra_type: int;
     ra_erased: bool;
     ra_ports: rule_link array;
+    (*    ra_ports: ((int,int*int) Ast.link Location.annot * switching Location.annot) array;*)
     ra_ints: rule_internal array;
     ra_syntax: (rule_link array * rule_internal array) option;
   }
@@ -101,8 +102,7 @@ let annotate_dropped_agent sigs ((agent_name, _ as ag_ty),intf) =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
-  let ports =
-    Array.init arity (fun i -> L_ANY Erased) in
+  let ports = Array.make arity (L_ANY Erased) in
   let internals =
     Array.init arity
                (fun i ->
@@ -148,7 +148,7 @@ let annotate_dropped_agent sigs ((agent_name, _ as ag_ty),intf) =
 		 f "breaking a semi-link on site '%s' will induce a side effect"
 		 na) in
 	  ports.(p_id) <- build_l_type sigs dst_ty dst_p Erased
-       | (Ast.LNK_VALUE i, pos) -> ports.(p_id) <- L_VAL ((i,pos),Erased)
+       | (Ast.LNK_VALUE (i,()), pos) -> ports.(p_id) <- L_VAL ((i,pos),Erased)
        | (Ast.FREE, _) -> ports.(p_id) <- L_FREE Erased
       ) intf in
   { ra_type = ag_id; ra_ports = ports; ra_ints = internals; ra_erased = true;
@@ -181,7 +181,7 @@ let annotate_created_agent id sigs ((agent_name, pos as ag_ty),intf) =
        match p.Ast.port_lnk with
        | ((Ast.LNK_ANY, _) | (Ast.LNK_SOME, _) | (Ast.LNK_TYPE _,_)) ->
 	  site_occurence_failure agent_name p_na
-       | (Ast.LNK_VALUE i, _) ->  ports.(p_id) <- Raw_mixture.VAL i
+       | (Ast.LNK_VALUE (i,()), _) ->  ports.(p_id) <- Raw_mixture.VAL i
        | (Ast.FREE, _) -> ()
       ) intf in
   ({ Raw_mixture.a_id = id; Raw_mixture.a_type = ag_id;
@@ -192,9 +192,7 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
-  let ports =
-    Array.init
-      arity (fun i -> L_ANY Maintained) in
+  let ports = Array.make arity (L_ANY Maintained) in
   let internals = Array.make arity I_ANY in
   let register_port_modif p_id lnk1 p' =
     match lnk1,p'.Ast.port_lnk with
@@ -228,11 +226,11 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
 	      na) in
        ports.(p_id) <- build_l_type sigs dst_ty dst_p Freed
     | (Ast.FREE,_), (Ast.FREE,_) -> ports.(p_id) <- L_FREE Maintained
-    | (Ast.LNK_VALUE i,pos), (Ast.FREE,_) ->
+    | (Ast.LNK_VALUE (i,()),pos), (Ast.FREE,_) ->
        ports.(p_id) <- L_VAL ((i,pos),Freed)
-    | (Ast.LNK_ANY,_), (Ast.LNK_VALUE i,pos) ->
+    | (Ast.LNK_ANY,_), (Ast.LNK_VALUE (i,()),pos) ->
        ports.(p_id) <- L_ANY (Linked (i,pos))
-    | (Ast.LNK_SOME,_), (Ast.LNK_VALUE i,pos') ->
+    | (Ast.LNK_SOME,_), (Ast.LNK_VALUE (i,()),pos') ->
        let (na,pos) = p'.Ast.port_nme in
        let () =
 	 ExceptionDefn.warning
@@ -242,7 +240,7 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
 	      f "breaking a semi-link on site '%s' will induce a side effect"
 	      na) in
        ports.(p_id) <- L_SOME (Linked (i,pos'))
-    | (Ast.LNK_TYPE (dst_p,dst_ty),_), (Ast.LNK_VALUE i,pos') ->
+    | (Ast.LNK_TYPE (dst_p,dst_ty),_), (Ast.LNK_VALUE (i,()),pos') ->
        let (na,pos) = p'.Ast.port_nme in
        let () =
 	 ExceptionDefn.warning
@@ -252,9 +250,9 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
 	      f "breaking a semi-link on site '%s' will induce a side effect"
 	      na) in
        ports.(p_id) <- build_l_type sigs dst_ty dst_p (Linked (i,pos'))
-    | (Ast.FREE,_), (Ast.LNK_VALUE i,pos) ->
+    | (Ast.FREE,_), (Ast.LNK_VALUE (i,()),pos) ->
        ports.(p_id) <- L_FREE (Linked (i,pos))
-    | (Ast.LNK_VALUE i,pos_i), (Ast.LNK_VALUE j,pos_j) ->
+    | (Ast.LNK_VALUE (i,()),pos_i), (Ast.LNK_VALUE (j,()),pos_j) ->
        ports.(p_id) <- L_VAL ((i,pos_i),Linked (j,pos_j)) in
   let register_internal_modif p_id int1 p' =
     match int1,p'.Ast.port_int with
@@ -441,9 +439,7 @@ let complete_with_candidate ag id todo p_id p_switch =
 
 let new_agent_with_one_link sigs ty_id port link switch =
   let arity = Signature.arity sigs ty_id in
-  let ports =
-    Array.init
-      arity (fun i -> L_ANY Maintained) in
+  let ports = Array.make arity (L_ANY Maintained) in
   let internals = Array.make arity I_ANY in
   let () = ports.(port) <- L_VAL (Location.dummy_annot link,switch) in
   { ra_type = ty_id; ra_ports = ports; ra_ints = internals;

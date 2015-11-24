@@ -420,7 +420,7 @@ internal_state:
 
 link_state:
   /*empty*/ {add_pos Ast.FREE}
-    | KAPPA_LNK INT {(Ast.LNK_VALUE $2,rhs_pos 2)}
+    | KAPPA_LNK INT {(Ast.LNK_VALUE ($2,()),rhs_pos 2)}
     | KAPPA_LNK KAPPA_SEMI {(Ast.LNK_SOME,rhs_pos 2)}
     | KAPPA_LNK ID DOT ID {add_pos (Ast.LNK_TYPE
 				      (($2,rhs_pos 2),($4,rhs_pos 4)))}

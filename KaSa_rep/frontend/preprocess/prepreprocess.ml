@@ -87,7 +87,7 @@ let rec scan_interface parameters k agent interface remanent =
         let remanent = error,a in 
 	scan_interface parameters k agent interface 
           ((match port.Ast.port_lnk with 
-            | Ast.LNK_VALUE (i),_ -> 
+            | Ast.LNK_VALUE (i,()),_ -> 
                   add_entry parameters i agent (fst port.Ast.port_nme) k remanent
             | _ -> remanent),set)
               
@@ -116,7 +116,7 @@ let collect_binding_label parameters mixture f k remanent =
 
 let translate_lnk_state parameters lnk_state remanent = 
     match lnk_state with 
-     | Ast.LNK_VALUE (id),position ->  
+     | Ast.LNK_VALUE (id,()),position ->  
        begin 
 	 let error,remanent = remanent in 
 	 let error,(triple,map) = pop_entry parameters error id remanent  in 
