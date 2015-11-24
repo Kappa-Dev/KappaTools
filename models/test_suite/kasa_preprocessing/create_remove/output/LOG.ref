@@ -130,7 +130,6 @@ List of rules to awake when the state of a site is modified and tested:
 ------------------------------------------------------------
 * Covering classes with new indexes:
 ------------------------------------------------------------
-- Covering classes triple (id, list, set):
 - Valuations of the views that are tested (per rule, agent and covering class):
 
 
@@ -159,6 +158,5 @@ List of rules to awake when the state of a site is modified and tested:
 * Fixpoint iteration :
 ------------------------------------------------------------
 ** Valuation of the views that are tested, encounter sites that are bond on the rhs for the first time:
-rule_id:0
 ** Fixpoint iteration function:
 execution finished without any exception

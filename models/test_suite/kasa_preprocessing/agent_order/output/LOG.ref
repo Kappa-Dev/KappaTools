@@ -282,13 +282,6 @@ rule_id:1
 ------------------------------------------------------------
 * Covering classes with new indexes:
 ------------------------------------------------------------
-- Covering classes triple (id, list, set):
-agent_type_0:
-Covering_class_id:0
-site_type:0
-agent_type_1:
-Covering_class_id:0
-site_type:0
 - Valuations of the views that are tested (per rule, agent and covering class):
 
 agent_id:0:agent_type:0:rule_id:0:covering_class_id:0@list of pair:
@@ -391,7 +384,9 @@ site_type:1:state:1
 * Fixpoint iteration :
 ------------------------------------------------------------
 ** Valuation of the views that are tested, encounter sites that are bond on the rhs for the first time:
-rule_id:0
+agent_type:0:rule_id:0
+{agent_id:0; agent_type:0; site_type:0} -- {agent_id:1; agent_type:1; site_type:0} 
+agent_type:1:rule_id:0
 {agent_id:1; agent_type:1; site_type:0} -- {agent_id:0; agent_type:0; site_type:0} 
 ** Fixpoint iteration function:
 execution finished without any exception
