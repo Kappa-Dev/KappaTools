@@ -141,7 +141,7 @@ let do_it env domain counter graph state modification =
   | Primitives.FLUXOFF s ->
      let file = Format.asprintf "@[<h>%a@]" print_expr_val s in
      let (these,others) = List.partition (fun (x,_) -> x = file) state.flux in
-     let () = List.iter (Outputs.dot_of_flux env) these in
+     let () = List.iter (Outputs.output_flux env) these in
      (false, graph, {state with flux = others})
 
 let perturbate env domain counter graph state =
@@ -331,7 +331,7 @@ let finalize form env counter graph state =
 	    Format.fprintf
 	      f "Tracking FLUX into \"%s\" was not stopped before end of simulation"
 	      file) in
-       Outputs.dot_of_flux env e) state.flux in
+       Outputs.output_flux env e) state.flux in
   let () = ExceptionDefn.flush_warning form in
   Rule_interpreter.generate_stories form env graph
 
