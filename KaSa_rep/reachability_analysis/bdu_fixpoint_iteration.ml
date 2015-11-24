@@ -135,6 +135,19 @@ let compute_update parameter error handler bdu_test list_a bdu_creation bdu_X =
     ) rule.rule_lhs.views rule.rule_rhs.bonds store_result*)
 
 let store_test_has_bond_rhs parameter error rule_id rule store_result =
+  let add_link (agent_type, rule_id) set store_result =
+    let (l, old) =
+      match
+	Map_test_bond.Map.find_option (agent_type, rule_id) store_result
+      with Some (l,old) -> l, old
+      | None -> [], Map_site_address.Set.empty
+    in
+    let new_set = Map_site_address.Set.union set old in
+    let result_map = 
+      Map_test_bond.Map.add (agent_type, rule_id) (l, new_set) store_result
+    in
+    error, result_map
+  in
   AgentMap.fold2_common parameter error
     (fun parameter error agent_id agent site_add_map store_result ->
       match agent with
@@ -151,7 +164,10 @@ let store_test_has_bond_rhs parameter error rule_id rule store_result =
                 error, Map_site_address.Set.add (site_add1, site_add2) set
             ) site_add_map (error, Map_site_address.Set.empty)
         in
-        error, (rule_id, set)
+        let error, store_result =
+          add_link (agent_type, rule_id) set store_result
+        in
+        error, store_result
     ) rule.rule_lhs.views rule.rule_rhs.bonds store_result
 
 (*write a function add update(c) into working list*)
@@ -172,6 +188,34 @@ let add_update_to_wl parameter error store_covering_classes_modification_update 
 
 (************************************************************************************)
 (*fixpoint*)
+
+(*Testing*)
+open Print_bdu_build_map
+open Remanent_parameters_sig
+
+let print_list rule_id l = 
+  let rec aux acc =
+    match acc with
+    | [] -> []
+    | (site, state) :: tl -> 
+      fprintf stdout "rule_id:%i:site:%i:state:%i\n" rule_id site state; aux tl
+  in
+  aux l
+
+let print_set parameter set =
+  if Map_site_address.Set.is_empty set
+  then fprintf stdout "empty\n"
+  else
+  Map_site_address.Set.iter (fun (site_add1, site_add2) ->
+    fprintf parameter.log 
+      "{agent_id:%i; agent_type:%i; site_type:%i} -- "
+      site_add1.Cckappa_sig.agent_index site_add1.Cckappa_sig.agent_type 
+      site_add1.Cckappa_sig.site;
+    fprintf parameter.log 
+      "{agent_id:%i; agent_type:%i; site_type:%i} \n"
+      site_add2.Cckappa_sig.agent_index site_add2.Cckappa_sig.agent_type 
+      site_add2.Cckappa_sig.site
+  ) set
 
 let collect_bdu_update_map parameter handler error 
     rule 
@@ -215,15 +259,18 @@ let collect_bdu_update_map parameter handler error
       | None -> error, store_bdu_update_map
       | Some rule_id ->
         (*--------------------------------------------------------------------*)
-        (*get the local view that is created for this rule_id with new_indexes*)
-        let error, bdu_creation =
+        (*get bdu of local view that is created for this rule_id with new_indexes*)
+        let error, (cv_id_creation, bdu_creation) =
           (*take a global view*)
-          List.fold_left (fun (error, store_bdu_result) (agent_id, agent_type) ->
+          List.fold_left (fun (error, (cv_id, store_bdu_result))
+            (agent_id, agent_type) ->
             let error, agent = AgentMap.get parameter error agent_id rule.rule_rhs.views in
             match agent with
-            | None -> warn parameter error (Some "line 163") Exit store_bdu_result
-            | Some Ghost -> error, store_bdu_result
+            | None -> warn parameter error (Some "line 163") Exit
+              (cv_id, store_bdu_result)
+            | Some Ghost -> error, (cv_id, store_bdu_result)
             | Some Agent agent ->
+              (*covering classes*)
               let error, triple_list =
                 match 
                   AgentMap.unsafe_get parameter error agent_type store_remanent_triple
@@ -231,24 +278,28 @@ let collect_bdu_update_map parameter handler error
                 | error, None -> error, []
                 | error, Some l -> error, l
               in
-              let error, bdu_creation =
+              let error, (cv_id, bdu_creation) =
                 List.fold_left (fun _ (cv_id, _, _) ->
                   let (l, bdu_creation) =
 		    match
-		      Map_creation_bdu.Map.find_option 
+		      Map_creation_bdu.Map.find_option
                         (agent_type, rule_id, cv_id) store_creation_bdu_map
 		    with
 		      None -> (*failwith "3 bdu fixpoint iteration"*) ([], bdu_false)
 		    | Some (a,b) -> a,b
                   in
-                  error, bdu_creation                  
-                ) (error, bdu_false) triple_list
+                  error, (cv_id, bdu_creation)
+                ) (error, (cv_id, store_bdu_result)) triple_list
               in
-              error, bdu_creation
-          )
-	    (error, bdu_false)
-	    rule.actions.creation
-        in    
+              error, (cv_id, bdu_creation)
+          ) (error, (0, bdu_false)) rule.actions.creation
+        in
+        (*let _ =
+          fprintf stdout
+          "BDU_creation:rule_id:%i:cv_id:%i:\n"
+          agent_type_creation rule_id cv_id_creation;
+          print_bdu parameter error bdu_creation 
+        in*)
         (*--------------------------------------------------------------------*)
         (*get the local update view due to modification for this rule_id
           with new indexes*)
@@ -261,7 +312,6 @@ let collect_bdu_update_map parameter handler error
 		then error, store_result
 		else               
 		  let agent_type = agent_modif.agent_name in
-		  (*get the local update view (agent_id, rule_id, cv_id, pair_list) list*)
                   let error, modif_list =
                     List.fold_left (fun _ (cv_id, _, _) ->
                       let (l, modif_list) =
@@ -269,7 +319,7 @@ let collect_bdu_update_map parameter handler error
 			  (agent_id, agent_type, rule_id, cv_id) store_modif_list_map
 		      in
 		      error, modif_list
-                    ) (error, []) triple_list
+                    ) (error, store_result) triple_list
                   in
                   error, modif_list
               end
@@ -287,13 +337,14 @@ let collect_bdu_update_map parameter handler error
         (*get the local view that is tested for this rule_id with new indexes*)
         let error, store_result_bdu_update_map =
           (*take a global view *)
-          AgentMap.fold2_common parameter error
-            (fun parameter error agent_id agent site_add_map store_bdu_result ->
+          AgentMap.fold parameter error
+            (fun parameter error agent_id agent store_bdu_result ->
               match agent with
               | Ghost -> error, store_bdu_result
               | Agent agent ->
                 let agent_type = agent.agent_name in
                 (*--------------------------------------------------------------------*)
+                (*covering classes*)
                 let error, triple_list =
                   match 
                     AgentMap.unsafe_get parameter error agent_type store_remanent_triple
@@ -304,7 +355,7 @@ let collect_bdu_update_map parameter handler error
                 let error, (cv_id, bdu_test) =
                   List.fold_left (fun _ (cv_id, _, _) ->
                     let (l, bdu_test) =
-                      Map_test_bdu.Map.find_default ([],bdu_false)
+                      Map_test_bdu.Map.find_default ([], bdu_false)
 		        (agent_id, agent_type, rule_id, cv_id) store_test_bdu_map
 		    in
                     error, (cv_id, bdu_test)
@@ -313,18 +364,16 @@ let collect_bdu_update_map parameter handler error
                 (*--------------------------------------------------------------------*)
                 (*TODO:get a set of binding site_address of agent_type*)
                 let error, result_bdu_update_map =
-                  (*get a set of bond on rhs at each rule*)
-                  let error, bond_rhs_set =
-                    Site_map_and_set.Map.fold
-                      (fun site site_add2 (error, set) ->
-                        let site_add1 = Cckappa_sig.build_address agent_id agent_type site in
-                        if Map_site_address.Set.mem (site_add1, site_add2) set
-                        then error, set
-                        else
-                          error, Map_site_address.Set.add (site_add1, site_add2) set
-                      ) site_add_map (error, Map_site_address.Set.empty)
+                  (*search (agent_type, rule_id) in the set of bond_rhs*)
+                  let (l, bond_rhs_set) =
+                    Map_test_bond.Map.find_default ([], Map_site_address.Set.empty)
+                      (agent_type, rule_id) store_test_has_bond_rhs
                   in
-                  (*first check the enable condition for this rule*)
+                  (*let _ =
+                    fprintf stdout "PRINT_SET\n";
+                    print_set parameter bond_rhs_set
+                  in*)
+                  (*first check the enable condition of this rule*)
                   let error, is_enable =
                     comp_is_enable
                       parameter
@@ -336,9 +385,6 @@ let collect_bdu_update_map parameter handler error
                   begin
                     if is_enable
                     then
-                      (*let _ =
-                        fprintf stdout "YES Enable\n"
-                      in*)
                       (*check if the set of bond on the rhs is empty?
                         if it is empty, there is no bond on rhs else
                         discover a bond on the rhs.*)
@@ -368,15 +414,8 @@ let collect_bdu_update_map parameter handler error
                               store_covering_classes_modification_update
                               wl_tl
                           in
-                          (*let _ =
-                            fprintf stdout "YES\n";
-                            IntWL.print_wl parameter new_wl_tl_update
-                          in*)
                           aux new_wl_tl_update bdu_update (error, store_new_bdu_update_map)
                         else
-                          (*let _ =
-                            fprintf stdout "NO\n"
-                          in*)
                           (*discover a bond on the rhs*)
                           (*compute bdu_update*)
                           let error, bdu_update =
@@ -401,21 +440,12 @@ let collect_bdu_update_map parameter handler error
                           aux wl_tl bdu_update (error, store_new_bdu_update_map)
                       end
                     else
-                      (*let _ =
-                        fprintf stdout "NOT enable\n";
-                        IntWL.print_wl parameter wl_tl;
-                        Print_bdu_build_map.print_bdu parameter error bdu_test;
-                        fprintf stdout "Creation:\n" ;
-                        Print_bdu_build_map.print_bdu parameter error bdu_creation;
-                        fprintf stdout "Bdu_X\n";
-                        Print_bdu_build_map.print_bdu parameter error bdu_X
-                      in*)
                       (*continue with the tail of working list and the result*)
                       aux wl_tl bdu_X (error, store_bdu_result)
                   end
                 in
                	error, result_bdu_update_map                
-            ) rule.rule_lhs.views rule.rule_rhs.bonds store_bdu_update_map
+            ) rule.rule_lhs.views store_bdu_update_map
         in
         error, store_result_bdu_update_map
   in

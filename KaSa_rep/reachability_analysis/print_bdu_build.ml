@@ -48,7 +48,7 @@ let print_remanent_triple parameter error result =
 (************************************************************************************)
 (*restriction of test rules*)
 
-let print_pair_list parameter l =
+(*let print_pair_list parameter l =
   let rec aux acc =
     match acc with
     | [] -> []
@@ -79,9 +79,8 @@ let print_remanent_test parameter error result =
         print_four_list parameter four_list
       in
       error
-    ) parameter result
+    ) parameter result*)
 
-(*TEST*)
 let print_remanent_test_map parameter error result =
   Map_test.Map.iter (fun (agent_id, agent_type, rule_id, cv_id) (l1, l2) ->
     if l1 <> []
@@ -101,7 +100,7 @@ let print_remanent_test_map parameter error result =
 
 (************************************************************************************)
 
-let print_triple_list parameter l =
+(*let print_triple_list parameter l =
   let rec aux acc =
     match acc with
     | [] -> []
@@ -123,7 +122,7 @@ let print_remanent_creation parameter error result =
         print_triple_list parameter triple_list
       in
       error
-    ) parameter result
+    ) parameter result*)
 
 let print_remanent_creation_map parameter error result =
   Map_creation.Map.iter (fun (agent_type, rule_id, cv_id) (l1, l2) ->
@@ -174,23 +173,15 @@ let print_bdu_build parameter error result =
       "------------------------------------------------------------\n";
   in
   (*------------------------------------------------------------------------------*)
-  let _ =
+  (*let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "- Covering classes triple (id, list, set):\n";
     print_remanent_triple
       parameter
       error
       result.store_remanent_triple
-  in
-  (*------------------------------------------------------------------------------*)
-  (*let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "- Test rule with new index:\n";
-    print_remanent_test
-      parameter
-      error
-      result.store_remanent_test
   in*)
+  (*------------------------------------------------------------------------------*)
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "- Valuations of the views that are tested (per rule, agent and covering class):\n\n";

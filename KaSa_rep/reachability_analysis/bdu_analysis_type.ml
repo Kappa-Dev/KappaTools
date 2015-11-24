@@ -164,8 +164,14 @@ module Map_site_address =
     struct
       type t = site_address * site_address
       let compare = compare
-    end
-  )
+    end)
+
+module Map_test_bond =
+  SetMap.Make (
+    struct
+      type t = int * int
+      let compare = compare
+    end)
 
 (************************************************************************************)
 (*static information*)
@@ -202,7 +208,7 @@ type wl_int = IntWL.WSetMap.elt list * IntWL.WSetMap.elt list * IntWL.WSetMap.Se
 
 type bdu_analysis_dynamic =
   {
-    store_contact_map      : 
+    store_contact_map : 
     (*TODO: combine contact map and modification update into a product type*)
     (int list * (int * int * int) list) Int2Map_CM_state.Map.t;
     store_covering_classes_modification_update : (*update(c)*)
@@ -215,13 +221,9 @@ type bdu_analysis_dynamic =
 
 type bdu_build =
   {
-    store_remanent_triple    : ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;
-    (*store_remanent_test      : (int * int * int * (int * int) list) list AgentMap.t;*)
-    (*TEST*)
+    store_remanent_triple       : ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;
     store_remanent_test_map     : (int list * (int * int) list) Map_test.Map.t;
-    (*store_remanent_creation  : (int * int * (int * int) list) list AgentMap.t;*)
-    store_remanent_creation_map  : (int list * (int * int) list) Map_creation.Map.t;
-    (*store_remanent_modif     : (int * int * int * (int * int) list) list AgentMap.t;*)
+    store_remanent_creation_map : (int list * (int * int) list) Map_creation.Map.t;
     store_remanent_modif_map    : (int list * (int * int) list) Map_modif.Map.t;
   }
 
@@ -230,9 +232,6 @@ type bdu_build =
 
 type bdu_build_map =
   {
-    (*store_remanent_test_map     : (int list * (int * int) list) Map_test.Map.t;
-    store_remanent_creation_map : (int list * (int * int) list) Map_creation.Map.t;
-    store_remanent_modif_map    : (int list * (int * int) list) Map_modif.Map.t;*)
     store_creation_bdu_map      : (int list * bool Mvbdu_sig.mvbdu) Map_creation_bdu.Map.t;
     store_test_bdu_map          : (int list * bool Mvbdu_sig.mvbdu) Map_test_bdu.Map.t;
     store_modif_list_map        : (int list * (int * int) list) Map_modif_list.Map.t
@@ -243,7 +242,7 @@ type bdu_build_map =
 
 type bdu_fixpoint =
   {
-    store_test_has_bond_rhs : (int * Map_site_address.Set.t);
+    store_test_has_bond_rhs : (int list * Map_site_address.Set.t) Map_test_bond.Map.t;
     store_bdu_update_map    : (int list * bool Mvbdu_sig.mvbdu list) Map_bdu_update.Map.t;
   }
 
