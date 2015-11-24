@@ -35,7 +35,7 @@ end
 module WlMake (Ord: OrderedType with type t = int) =
     (struct
         
-	module WSetMap = SetMap.Make (Ord)
+	module WSetMap = Map_wrapper.Make (SetMap.Make (Ord))
 	module WSet = WSetMap.Set
 
         type elt = Ord.t
@@ -53,8 +53,9 @@ module WlMake (Ord: OrderedType with type t = int) =
         then
           error, x
         else
-          let add_elt = WSet.add e pool in
-          error, ((e :: in_list), out_list, add_elt)
+          let error',add_elt = WSet.add parameter error e pool in
+	  let error = Exception.check warn parameter error error' (Some "line 62, push") Exit in 
+	  error, ((e :: in_list), out_list, add_elt)
    
       let fold_left f acc x =
         let in_list, out_list, _ = x in
@@ -82,12 +83,12 @@ module WlMake (Ord: OrderedType with type t = int) =
             match out_list with
             | [] -> pop parameter error ([], (List.rev in_list), pool)
             | h :: tl ->
-              let remove_elt = WSet.remove h pool in
+              let error,remove_elt = WSet.remove parameter error h pool in
               error, ((Some h), (in_list, tl, remove_elt))
           end
             
      (*for debug*)
-     (*let rec pop parameter error x =
+   (*  let rec pop parameter error x =
        let in_list, out_list, pool = x in
        if is_empty x
        then
@@ -101,7 +102,7 @@ module WlMake (Ord: OrderedType with type t = int) =
        "BEFORE REMOVE %i " h in 
        let _ =  WSet.iter (fun i ->
        Printf.fprintf (Remanent_parameters.get_log parameter) "%i " i) pool in
-       let remove_elt = WSet.remove h pool in
+       let error,remove_elt = WSet.remove parameter error h pool in
        let _ =  WSet.iter (fun i ->
        Printf.fprintf (Remanent_parameters.get_log parameter) "%i " i) remove_elt
        in

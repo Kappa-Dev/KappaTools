@@ -171,3 +171,10 @@ let print_errors_light_for_kasim parameters handlers =
 let wrap = (fun parameters error string string_opt exn -> fst (warn parameters error (Some string) string_opt exn (fun  () -> ())))
 	      
 let lift_error_logs_for_KaSa f = f (fun parameters error string string_opt exn -> fst (warn parameters error (Some string) string_opt exn (fun  () -> ())))
+
+let check warn parameter error error' s exn =
+  if error==error'
+  then error
+  else
+    let error,() = warn parameter error' s exn () in
+    error

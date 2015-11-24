@@ -253,7 +253,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	let balance_with_logs warn parameters error left value right =
 	  try error,balance left value right
 	  with DeadCodeIsNotDead loc ->
-	    let error = warn parameters error "setMap.ml" (Some (loc^" Set invariant is broken, keep on with unbalanced set")) (invalid_arg "Set_and_Map.SET.balance")
+	    let error = warn parameters error "setMap.ml" (Some (loc^" Set invariant is broken, keep on with unbalanced set")) (Failure "Set_and_Map.SET.balance")
 	    in error,node left value right
 
 	let rec add x = function
@@ -296,11 +296,11 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	let add_with_logs warn parameters error new_value set =
 	  let error, bool, set = add_while_testing_freshness warn parameters error new_value set in
 	  let error =
-	    if bool then 
-	      warn parameters error "setMap.ml" (Some ("SetMap line 300"^" an already elt has been added to a set")) (invalid_arg "Set_and_Map.SET.add")
-	    else
+	    if bool then
 	      error
-	  in 
+	    else 
+	      warn parameters error "setMap.ml" (Some ("SetMap line 300"^" an already elt has been added to a set")) (Failure "Set_and_Map.SET.add")
+	    in 
 	  error, set
 			
 	let rec join left value right =
@@ -858,7 +858,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	let balance_with_logs warn parameters error left key data right =
 	  try error,balance left key data right
 	  with DeadCodeIsNotDead loc ->
-	    let error = warn parameters error "setMap.ml" (Some (loc^" Map invariant is broken, keep on with unbalanced map")) (invalid_arg "Set_and_Map.Map.balance")
+	    let error = warn parameters error "setMap.ml" (Some (loc^" Map invariant is broken, keep on with unbalanced map")) (Failure "Set_and_Map.Map.balance")
 	    in error,node left key data right 
 
 			    
@@ -892,7 +892,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  then
 	    error, map
 	  else
-	    warn parameter error "setMap.ml " (Some ("SetMap line 895"^"Attempt to add an association over a former one in a map")) (invalid_arg "Set_and_Map.Map.add"),
+	    warn parameter error "setMap.ml " (Some ("SetMap line 895"^"Attempt to add an association over a former one in a map")) (Failure "Set_and_Map.Map.add"),
 	    map 
 		 
 				 
