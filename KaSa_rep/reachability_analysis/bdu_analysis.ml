@@ -506,13 +506,17 @@ let fixpoint parameter error
       let store_rule_array, store_bdu_array = store_pair_array in
       let error, (store_rule_array, store_bdu_array) =
         collect_pair_array
-          parameter error
-          agent_type handler_sig 
-          rule_id rule 
-              handler bdu_init 
-                bdu_creation
-                store_rule_array 
-                store_bdu_array
+          parameter 
+          error
+          agent_type
+          handler_sig 
+          rule_id 
+          rule 
+          handler
+          bdu_init 
+          bdu_creation
+          store_rule_array 
+          store_bdu_array
       in
       (*get rule_array to be used in the iteration*)
       let error, old_rule_array = 
@@ -532,14 +536,16 @@ let fixpoint parameter error
       (*call iteration function*)
       let error, bdu_iterate_array =
         fixpoint_aux
-          parameter error
+          parameter 
+          error
           agent_type
           rule
-            handler bdu_init
-              old_rule_array
-              wl
-              succ_list
-              store_bdu_array
+          handler
+          bdu_init
+          old_rule_array
+          wl
+          succ_list
+          store_bdu_array
       in
       (*set*)
       let error, store_bdu_array =

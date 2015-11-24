@@ -48,7 +48,7 @@ let print_bdu_update_map parameter error result =
  
 (************************************************************************************)
 
-let print_test_bonds parameter error result =
+(*let print_test_bonds parameter error result =
   AgentMap.print error
     (fun error parameter set ->
       let _ =
@@ -64,7 +64,20 @@ let print_test_bonds parameter error result =
         ) set
       in
       error
-    ) parameter result
+    ) parameter result*)
+
+let print_test_bonds parameter error (rule_id, result) =
+  fprintf stdout "rule_id:%i\n" rule_id;
+  Map_site_address.Set.iter (fun (site_add1, site_add2) ->
+    fprintf parameter.log 
+      "{agent_id:%i; agent_type:%i; site_type:%i} -- "
+      site_add1.Cckappa_sig.agent_index site_add1.Cckappa_sig.agent_type 
+      site_add1.Cckappa_sig.site;
+    fprintf parameter.log 
+      "{agent_id:%i; agent_type:%i; site_type:%i} \n"
+      site_add2.Cckappa_sig.agent_index site_add2.Cckappa_sig.agent_type 
+      site_add2.Cckappa_sig.site
+  ) result
 
 
 (************************************************************************************)

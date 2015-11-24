@@ -205,7 +205,7 @@ type bdu_analysis_dynamic =
     store_contact_map      : 
     (*TODO: combine contact map and modification update into a product type*)
     (int list * (int * int * int) list) Int2Map_CM_state.Map.t;
-    store_covering_classes_modification_update :
+    store_covering_classes_modification_update : (*update(c)*)
       (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;
     store_wl_creation : wl_int;
   }
@@ -239,7 +239,7 @@ type bdu_build_map =
 
 type bdu_fixpoint =
   {
-    store_test_has_bond_rhs : Map_site_address.Set.t AgentMap.t;
+    store_test_has_bond_rhs : (int * Map_site_address.Set.t);
     store_bdu_update_map    : (int list * bool Mvbdu_sig.mvbdu list) Map_bdu_update.Map.t;
   }
 

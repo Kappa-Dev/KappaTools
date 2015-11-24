@@ -299,6 +299,7 @@ let scan_rule_fixpoint parameter handler error
     store_creation_bdu_map
     store_remanent_modif
     store_modif_list_map
+    store_covering_classes_modification_update
     store_result
     =
   (*-------------------------------------------------------------------------------*)
@@ -325,6 +326,7 @@ let scan_rule_fixpoint parameter handler error
       store_remanent_modif
       store_modif_list_map
       store_test_has_bond_rhs
+      store_covering_classes_modification_update
       store_result.store_bdu_update_map
   in
   (*-------------------------------------------------------------------------------*)
@@ -402,6 +404,7 @@ let scan_rule parameter handler_bdu error handler_kappa rule_id rule store_cover
       store_bdu_build_map.store_creation_bdu_map
       store_bdu_build.store_remanent_modif
       store_bdu_build_map.store_modif_list_map
+      store_bdu_analysis_dynamic.store_covering_classes_modification_update
       store_result.store_bdu_fixpoint
   in
   (*------------------------------------------------------------------------------*)
@@ -503,7 +506,8 @@ let init_bdu_build_map parameter error =
 
 let init_bdu_fixpoint parameter error = (*TODO*)
   let init_bdu_update_map           = Map_bdu_update.Map.empty in
-  let error, init_test_has_bond_rhs = AgentMap.create parameter error 0 in
+  (*let error, init_test_has_bond_rhs = AgentMap.create parameter error 0 in*)
+  let init_test_has_bond_rhs = (0, Map_site_address.Set.empty) in
   let init_bdu_fixpoint =
     {
       store_test_has_bond_rhs = init_test_has_bond_rhs;
