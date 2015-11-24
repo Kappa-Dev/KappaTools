@@ -67,7 +67,8 @@ let store_pointer_backward parameter error id pointer_backward covering_class =
         pointer_backward
     in
     (*add the current set of elt into the old set*)
-    let new_id_set = Set.add id old_id_set in
+    let error',new_id_set = Set.add parameter error id old_id_set in
+    let error = Exception.check warn parameter error error' (Some "line 71") Exit in 
     (*store the result into pointer backward*)
     Nearly_inf_Imperatif.set
       parameter
@@ -239,11 +240,12 @@ let clean_classes parameter error covering_classes modified_map =
               in
               (*-------------------------------------------------------------------*)
               (* intersection of two sets *)
-              let potential_superset =
-                Site_map_and_set.Set.inter
+              let error',potential_superset =
+                Site_map_and_set.Set.inter parameter error 
                   potential_supersets
                   potential_supersets'
               in
+	      let error = Exception.check warn parameter error error' (Some "line 71") Exit in 
               if is_empty_set potential_superset
               then
                 let error, result_covering_dic =

@@ -68,11 +68,14 @@ let eq_classes_map parameter error a =
       (*find the parent of the union*)
       let rep = findSet k a in
       (*check if inside classes has already has this parent*)
-      let get_rep =
-        Cckappa_sig.Site_map_and_set.Map.find_default [] rep classes in
+      let error',get_rep =
+        Cckappa_sig.Site_map_and_set.Map.find_default parameter error [] rep classes in
+      let error = Exception.check warn parameter error error' (Some "line 73") Exit in 
       (*store the result inside classes*)
-      let classes =
-	Cckappa_sig.Site_map_and_set.Map.add
+      let error,classes =
+	Cckappa_sig.Site_map_and_set.Map.add_or_overwrite
+	  parameter
+	  error 
           rep
 	  (k :: get_rep)
 	  classes

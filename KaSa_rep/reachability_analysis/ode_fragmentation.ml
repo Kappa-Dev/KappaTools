@@ -121,7 +121,7 @@ let anchor_set parameter error agent_type store_sites_anchor1 store_sites_anchor
       agent_type
       store_sites_anchor2
   in
-  SiteSet.Set.union anchor_set1 anchor_set2
+  SiteSet.Set.union parameter error anchor_set1 anchor_set2
 
 (*------------------------------------------------------------------------------*)
 (* A set of anchors site (combine two cases) fold*)
@@ -131,19 +131,22 @@ let get_anchor_common parameter error store_sites_anchor =
      parameter
      error
      (fun parameter error agent_type site_set old_set ->
-      let set =
         SiteSet.Set.union
-           site_set
-           old_set
-       in error, set)
+	  parameter
+	  error 
+          site_set
+          old_set
+      )
      store_sites_anchor
      SiteSet.Set.empty
 
 let fold_anchor_set parameter error store_sites_anchor_set1 store_sites_anchor_set2 =
   let error, anchor_set1 = get_anchor_common parameter error store_sites_anchor_set1 in
   let error, anchor_set2 = get_anchor_common parameter error store_sites_anchor_set2 in
-  let anchor_set =
+  let error,anchor_set =
     SiteSet.Set.union
+      parameter
+      error
       anchor_set1
       anchor_set2
   in anchor_set
@@ -175,11 +178,11 @@ let collect_sites_modified_set parameter error rule handler store_sites_modified
                 (Ckappa_sig.Dictionary_of_sites.init()))
 	  in
           (*get a pair of (site_set, value)*)
-          let pair_site =
+          let pair_site, error  =
             SiteSet.Map.fold (fun site _ (current_set, error) ->
               (*get a set of site*)
-              let set =
-                SiteSet.Set.add site current_set in
+              let error,set =
+                SiteSet.Set.add parameter error site current_set in
               (*get value*)
               let error, (value, _, _) =
 	        Misc_sa.unsome
@@ -212,7 +215,7 @@ let collect_sites_modified_set parameter error rule handler store_sites_modified
               parameter
               error
               agent_type
-              (fst pair_site)
+              pair_site
               store_sites_modified_set
           in
           error, store_sites_modified_set
@@ -245,14 +248,16 @@ let collect_store_bond_set_each_rule parameter error bond_lhs
       | Some s -> s
   in
   (*get a set of site that are bond*)
-  let sites_bond_set =
-    SiteSet.Map.fold
-      (fun site _ current_set ->
+  let error,sites_bond_set =
+    SiteSet.Map.fold   
+      (fun site _ (error,current_set) ->
           SiteSet.Set.add
-            site
+            parameter
+	    error
+	    site
             current_set)
       site_address
-      SiteSet.Set.empty
+      (error,SiteSet.Set.empty)
   in
   (*store*)
   let error, store_sites_bond_set =
@@ -281,14 +286,14 @@ let collect_store_bond_set parameter error bond_lhs site_address store_sites_bon
       | Some s -> s
   in
   (*get a set of site that are bond*)
-  let sites_bond_set =
+  let error,sites_bond_set =
     SiteSet.Map.fold
-      (fun site _ current_set ->
-       SiteSet.Set.add
+      (fun site _ (error,current_set) ->
+       SiteSet.Set.add parameter error
          site
          current_set)
       site_address
-      SiteSet.Set.empty
+      (error,SiteSet.Set.empty)
   in
   (*get old*)
   let old_set =
@@ -298,8 +303,8 @@ let collect_store_bond_set parameter error bond_lhs site_address store_sites_bon
       agent_type
       store_sites_bond_set
   in
-  let result_set =
-    SiteSet.Set.union
+  let error, result_set =
+    SiteSet.Set.union parameter error 
       sites_bond_set
       old_set
   in
@@ -497,7 +502,7 @@ let collect_sites_anchor_set parameter error get_rule
               store_sites_lhs
           in
           (*get a set of anchor sites from the first case and second case*)
-          let anchor_set =
+          let error, anchor_set =
             anchor_set
               parameter
               error
@@ -580,8 +585,10 @@ let collect_sites_anchor_set parameter error get_rule
                 | Some s -> s
             in
             (*do the union of two set*)
-            let final_anchor_set =
+            let error,final_anchor_set =
               SiteSet.Set.union
+		parameter
+		error 
                 get_anchor_set1
                 get_anchor_set2
             in
@@ -689,7 +696,7 @@ let collect_internal_flow parameter error get_rule
               agent_type
               store_sites_modified_set
           in
-          let anchor_set =
+          let error,anchor_set =
             anchor_set
               parameter
               error

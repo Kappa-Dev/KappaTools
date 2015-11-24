@@ -63,11 +63,11 @@ type 'state port =
     site_state    : 'state
   }
 
-module Site_map_and_set = SetMap.Make
+module Site_map_and_set = Map_wrapper.Make(SetMap.Make 
   (struct
     type t      = site_name
     let compare = compare
-   end)
+   end))
 
 type 'state interface = 'state port Site_map_and_set.Map.t
                                                                            
@@ -124,11 +124,11 @@ let build_address k agent site =
     agent_type  = agent
   }
   
-module Address_map_and_set = SetMap.Make
+module Address_map_and_set = Map_wrapper.Make( SetMap.Make
   (struct
     type t = site_address
     let compare = compare
-   end)
+   end))
  
 type agent = 
    | Ghost

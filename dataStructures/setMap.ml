@@ -46,7 +46,9 @@ module type Set =
     (** [minus a b] contains elements of [a] that are not in [b] *)
     val diff: t -> t -> t
     (** [diff a b] = [minus (union a b) (inter a b)] *)
+    val minus_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t
     val union_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t 
+    val disjoint_union_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t 																	      
     val inter_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t
     val diff_with_logs:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t
   (*  val split_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * ( t * bool * t)*)
@@ -302,7 +304,11 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	      warn parameters error "setMap.ml" (Some ("SetMap line 300"^" an already elt has been added to a set")) (Failure "Set_and_Map.SET.add")
 	    in 
 	  error, set
-			
+
+	let add_even_if_it_exists warn parameters error new_value set =
+	  let error,bool,set = add_while_testing_freshness warn parameters error new_value set in
+	  error,set
+		  
 	let rec join left value right =
 	  match left,right with
           | Private.Empty,_ -> add value right
@@ -517,30 +523,33 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		 let right' = union right1 right2 in
 		 join left' value2 right'
 
-	let rec union_with_logs warn parameters error set1 set2 = 
+	let rec union_gen add_gen warn parameters error set1 set2 = 
 	  match set1,set2 with 
 	  | Private.Empty,_ -> error,set2 
           | _,Private.Empty -> error,set1   
 	  | Private.Node(left1,value1,right1,height1),Private.Node(left2,value2,right2,height2) -> 
 	     if height1 > height2 then 
-               if height2 = 1 then add_with_logs warn parameters error value2 set1 
+               if height2 = 1 then add_gen warn parameters error value2 set1 
 	       else
 		 begin 
 		   let error,(left2,_,right2) = split_with_logs warn parameters error value1 set2 in
-		   let error,left' = union_with_logs warn parameters error left1 left2 in 
-		   let error, right' = union_with_logs warn parameters error right1 right2 in 
+		   let error,left' = union_gen add_gen warn parameters error left1 left2 in 
+		   let error, right' = union_gen add_gen warn parameters error right1 right2 in 
 		   join_with_logs warn parameters error left' value1 right'
 		 end  
 	     else 
-	       if height1 = 1 then add_with_logs warn parameters error value1 set2 
+	       if height1 = 1 then add_gen warn parameters error value1 set2 
 	       else
 		 begin 
 		   let error,(left1,_,right1) = split_with_logs warn parameters error value2 set1 in
-		   let error,left' = union_with_logs warn parameters error left1 left2 in 
-		   let error,right' = union_with_logs warn parameters error right1 right2 in  
+		   let error,left' = union_gen add_gen warn parameters error left1 left2 in 
+		   let error,right' = union_gen add_gen warn parameters error right1 right2 in  
 		   join_with_logs warn parameters error left' value2 right'
 		 end
-		   
+
+	let union_with_logs w p e s s' = union_gen add_even_if_it_exists w p e s s'
+	let disjoint_union_with_logs w p e s s' = union_gen add_with_logs w p e s s'
+						 
 	let suture (left1,value1,right1) (left2,bool,right2) f =
 	  let left' = f left1 left2 in
 	  let right' = f right1 right2 in

@@ -102,8 +102,9 @@ let add_bond parameters error i id_agent agent site id_agent' agent' site' bond_
     | _,None -> error,Cckappa_sig.Site_map_and_set.Map.empty
     | _,Some i -> error,i 
   in 
-  let updated = Cckappa_sig.Site_map_and_set.Map.add site {Cckappa_sig.agent_index = id_agent' ; Cckappa_sig.agent_type = agent' ; Cckappa_sig.site = site'} old in 
-    Int_storage.Quick_Nearly_inf_Imperatif.set parameters error id_agent updated bond_list
+  let error',updated = Cckappa_sig.Site_map_and_set.Map.add parameters error site {Cckappa_sig.agent_index = id_agent' ; Cckappa_sig.agent_type = agent' ; Cckappa_sig.site = site'} old in
+  let error = Exception.check warn parameters error error' (Some "line 106, add_bond") Exit  in 
+  Int_storage.Quick_Nearly_inf_Imperatif.set parameters error id_agent updated bond_list
   
 let translate_agent_sig parameters error handler agent kasim_id = 
   let error,(bool,output) = Ckappa_sig.Dictionary_of_agents.allocate_bool parameters error Misc_sa.compare_unit agent.Ckappa_sig.ag_nme () Misc_sa.const_unit handler.Cckappa_sig.agents_dic in  
@@ -153,14 +154,20 @@ let translate_agent_sig parameters error handler agent kasim_id =
                       error,internal::internal_list)
                     (error,[]) list
               in
-                error,Cckappa_sig.Site_map_and_set.Map.add
-                    site_name 
+	      let error',c_interface = 
+                Cckappa_sig.Site_map_and_set.Map.add
+		  parameters
+		  error 
+		  site_name 
                     { 
                       Cckappa_sig.site_name = site_name ;
                       Cckappa_sig.site_position = Location.dummy ; (*port.Ckappa_sig.port_pos ;*)
                       Cckappa_sig.site_state = internal_list ;
                       Cckappa_sig.site_free = port.Ckappa_sig.port_free 
                     } c_interface
+	      in
+	      let error = Exception.check warn parameters error error' (Some "line 170, translate_agent_sig") Exit  in 
+	      error,c_interface 
         in 
         let error,c_interface =
           match port.Ckappa_sig.port_lnk with 
@@ -170,9 +177,10 @@ let translate_agent_sig parameters error handler agent kasim_id =
               let error,(bool,output) = Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Binding port.Ckappa_sig.port_nme) () Misc_sa.const_unit site_dic in
                 match bool,output with
                   | _ , None  | true, _  -> error,c_interface 
-                  | _ , Some (site_name,_,_,_) ->  
-                        error,Cckappa_sig.Site_map_and_set.Map.add
-                            site_name 
+                  | _ , Some (site_name,_,_,_) ->
+		     let error',c_interface =
+                       Cckappa_sig.Site_map_and_set.Map.add
+                            parameters error site_name 
                             { 
                                Cckappa_sig.site_name = site_name ;
                                Cckappa_sig.site_position = Location.dummy ;
@@ -180,6 +188,10 @@ let translate_agent_sig parameters error handler agent kasim_id =
                                Cckappa_sig.site_free = port.Ckappa_sig.port_free
                             }
                             c_interface
+		     in
+		     let error = Exception.check warn parameters error error' (Some "line 192") Exit  in
+		     error,c_interface 
+	   
               end
           | Ckappa_sig.LNK_SOME pos -> warn parameters error (Some "line 124") Exit c_interface 
           | Ckappa_sig.LNK_VALUE (i,agent',site',id_agent',pos) ->
@@ -239,20 +251,24 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
                   | _ , None  | true, _  -> warn parameters error (Some "line 184") Exit 0
                   | _ , Some (i,_,_,_) ->  
                 error,i
-              in 
-              error,
-	      Cckappa_sig.Site_map_and_set.Map.add
-                site_name 
-                {
-		  Cckappa_sig.site_name = site_name ;
-                  Cckappa_sig.site_position = Location.dummy ;
-                  Cckappa_sig.site_free = None ; 
-                  Cckappa_sig.site_state = 
-                    {
-                      Cckappa_sig.min = (internal:int) ; 
-                      Cckappa_sig.max = internal
-                    };
-                } c_interface 
+              in
+	      let error',c_interface =
+		Cckappa_sig.Site_map_and_set.Map.add
+		  parameters
+		  error
+                  site_name 
+                  {
+		    Cckappa_sig.site_name = site_name ;
+                    Cckappa_sig.site_position = Location.dummy ;
+                    Cckappa_sig.site_free = None ; 
+                    Cckappa_sig.site_state = 
+                      {
+			Cckappa_sig.min = (internal:int) ; 
+			Cckappa_sig.max = internal
+                      };
+                  } c_interface in
+	      let error = Exception.check warn parameters error error' (Some "line 192") Exit  in
+	      error,c_interface 
             | _ -> warn parameters error (Some "line 199") Exit c_interface
         in 
         let error,(c_interface,bond_list,question_marks) =
@@ -272,8 +288,10 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
 			   (fun error -> warn parameters error (Some "Preprocess line 272") Exit (Cckappa_sig.Dictionary_of_States.init ()))
                        in                    
                        let error,max = Cckappa_sig.Dictionary_of_States.last_entry parameters error state_dic in 
-                       let c_interface =
+                       let error',c_interface =
 			 Cckappa_sig.Site_map_and_set.Map.add
+			   parameters
+			   error
 			   site_name 
 			   { 
                              Cckappa_sig.site_name = site_name ;
@@ -283,7 +301,8 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
 			   } 
 			   c_interface 
                        in
-                       error,(c_interface,bond_list,(k,site_name)::question_marks)
+		       let error = Exception.check warn parameters error error' (Some "line 192") Exit  in
+		       error,(c_interface,bond_list,(k,site_name)::question_marks)
 		end 
               end
 	     | Ckappa_sig.FREE ->     
@@ -292,18 +311,21 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
                 match bool,output with
                   | _ , None  | true, _  -> error,(c_interface,bond_list,question_marks) 
                   | _ , Some (site_name,_,_,_) ->  
-                     let c_interface =
-                        Cckappa_sig.Site_map_and_set.Map.add
-                            site_name 
+                     let error',c_interface =
+                       Cckappa_sig.Site_map_and_set.Map.add
+                         parameters
+			 error
+			 site_name 
                             {			       
-                               Cckappa_sig.site_name = site_name ;
-                               Cckappa_sig.site_position = Location.dummy ;
-                               Cckappa_sig.site_free = port.Ckappa_sig.port_free ; 
-                               Cckappa_sig.site_state = {Cckappa_sig.min = 0 ; Cckappa_sig.max = 0 } 
-                              }
+                              Cckappa_sig.site_name = site_name ;
+                              Cckappa_sig.site_position = Location.dummy ;
+                              Cckappa_sig.site_free = port.Ckappa_sig.port_free ; 
+                              Cckappa_sig.site_state = {Cckappa_sig.min = 0 ; Cckappa_sig.max = 0 } 
+                            }
                             c_interface
-                     in 
-                      error,(c_interface,bond_list,question_marks)
+                     in
+		     let error = Exception.check warn parameters error error' (Some "line 192") Exit  in
+		     error,(c_interface,bond_list,question_marks)
               end
           | Ckappa_sig.LNK_SOME pos -> 
               begin
@@ -320,9 +342,11 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
                     (fun error -> warn parameters error (Some "line 240") Exit (Cckappa_sig.Dictionary_of_States.init ()))
                 in                    
                 let error,max = Cckappa_sig.Dictionary_of_States.last_entry parameters error state_dic in 
-                let c_interface =
+                let error',c_interface =
                     Cckappa_sig.Site_map_and_set.Map.add
-                      site_name 
+                      parameters
+		      error
+		      site_name 
                       { 
                         Cckappa_sig.site_name = site_name ;
                         Cckappa_sig.site_free = port.Ckappa_sig.port_free; 
@@ -330,8 +354,9 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
                         Cckappa_sig.site_state = {Cckappa_sig.min = min 1 max; Cckappa_sig.max = max}
                       } 
                       c_interface 
-                in 
-                 error,(c_interface,bond_list,question_marks) 
+                in
+		let error = Exception.check warn parameters error error' (Some "line 192") Exit  in
+		error,(c_interface,bond_list,question_marks) 
             end
           | Ckappa_sig.LNK_VALUE (id_agent',agent',site',i,pos) ->
              begin
@@ -375,17 +400,23 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
                    | _ , None | true, _ -> 
                      warn parameters error (Some "line 308") Exit c_interface  
                    | _ ,Some (i,_,_,_) -> 
-                     error,Cckappa_sig.Site_map_and_set.Map.add
-                      site_name 
-                      { 
-                        Cckappa_sig.site_free = port.Ckappa_sig.port_free; 
-                        Cckappa_sig.site_name = site_name ;
-                        Cckappa_sig.site_position = Location.dummy ;
-                        Cckappa_sig.site_state = {Cckappa_sig.min = i; Cckappa_sig.max = i}
-                      } 
-                      c_interface 
-               in 
-                error,(c_interface,bond_list,question_marks)
+                      let error',c_interface =
+			Cckappa_sig.Site_map_and_set.Map.add
+			  parameters
+			  error 
+			  site_name 
+			  { 
+                            Cckappa_sig.site_free = port.Ckappa_sig.port_free; 
+                            Cckappa_sig.site_name = site_name ;
+                            Cckappa_sig.site_position = Location.dummy ;
+                            Cckappa_sig.site_state = {Cckappa_sig.min = i; Cckappa_sig.max = i}
+			  } 
+			  c_interface 
+		      in
+		      let error = Exception.check warn parameters error error' (Some "line 416") Exit in
+		      error,c_interface 
+	       in
+	       error,(c_interface,bond_list,question_marks)			      
              end
            | Ckappa_sig.LNK_TYPE (agent',site')  ->                          
              begin
@@ -429,16 +460,23 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
                  match bool,output with
                    | _ , None | true, _ -> warn parameters error (Some "line 369") Exit c_interface  
                    | _ ,Some (i,_,_,_) -> 
-                     error,Cckappa_sig.Site_map_and_set.Map.add
-                      site_name 
-                      { 
-                        Cckappa_sig.site_free = port.Ckappa_sig.port_free; 
-                        Cckappa_sig.site_name = site_name ;
-                        Cckappa_sig.site_position = Location.dummy ;
-                        Cckappa_sig.site_state = {Cckappa_sig.min = i; Cckappa_sig.max = i}
-                      } 
-                      c_interface 
-               in error,(c_interface,bond_list,question_marks)
+		      let error',c_interface = 
+			Cckappa_sig.Site_map_and_set.Map.add
+			  parameters
+			  error
+			  site_name 
+			  { 
+                            Cckappa_sig.site_free = port.Ckappa_sig.port_free; 
+                            Cckappa_sig.site_name = site_name ;
+                            Cckappa_sig.site_position = Location.dummy ;
+                            Cckappa_sig.site_state = {Cckappa_sig.min = i; Cckappa_sig.max = i}
+			  } 
+			  c_interface
+		      in
+		      let error = Exception.check warn parameters error error' (Some "line 192") Exit  in
+		      error,c_interface
+	       in 
+               error,(c_interface,bond_list,question_marks)
              end
              
         in aux interface error bond_list c_interface question_marks 
@@ -502,39 +540,58 @@ let translate_mixture parameters error handler mixture =
  let set_bound_sites parameters error k ag set = 
    Cckappa_sig.Site_map_and_set.Map.fold
      (fun site state (error,set) -> 
-      error,if state.Cckappa_sig.site_free = Some true 
-            then set 
-            else Cckappa_sig.Address_map_and_set.Set.add
-		   {
-		     Cckappa_sig.agent_index = k;
-		     Cckappa_sig.agent_type = ag.Cckappa_sig.agent_name;
-		     Cckappa_sig.site = site}
-		   set)
+      if state.Cckappa_sig.site_free = Some true 
+            then error,set 
+            else
+	      let error',set = 
+		Cckappa_sig.Address_map_and_set.Set.add
+		  parameters
+		  error 
+		  {
+		    Cckappa_sig.agent_index = k;
+		    Cckappa_sig.agent_type = ag.Cckappa_sig.agent_name;
+		    Cckappa_sig.site = site}
+		  set
+	      in
+     	      let error = Exception.check warn parameters error error' (Some "line 192") Exit  in
+	      error,set)
      ag.Cckappa_sig.agent_interface
      (error,set)
 
  let set_released_sites parameters error k ag ag' set = 
-   Cckappa_sig.Site_map_and_set.Map.monadic_fold2 parameters error
-     (fun _parameters error site state state' set ->
-       error,if state.Cckappa_sig.site_free  = state'.Cckappa_sig.site_free
-       || state.Cckappa_sig.site_free = Some true
-       then set
-       else Cckappa_sig.Address_map_and_set.Set.add
-         {
-           Cckappa_sig.agent_index = k;
-           Cckappa_sig.agent_type = ag.Cckappa_sig.agent_name;
-           Cckappa_sig.site = site} set)
+   Cckappa_sig.Site_map_and_set.Map.fold2 parameters error
      (fun parameters error site state _ ->
       warn parameters error (Some "line 514") Exit set)
-     (fun _parameters error site state set ->
-      error,if state.Cckappa_sig.site_free = Some true
+     (fun parameters error site state set ->
+      if state.Cckappa_sig.site_free = Some true
        then 
-	 Cckappa_sig.Address_map_and_set.Set.add
-           {
-             Cckappa_sig.agent_index = k;
-             Cckappa_sig.agent_type = ag.Cckappa_sig.agent_name;
-             Cckappa_sig.site = site} set
-       else set)
+	 let error',set =
+	   Cckappa_sig.Address_map_and_set.Set.add
+	     parameters error 
+	     {
+               Cckappa_sig.agent_index = k;
+               Cckappa_sig.agent_type = ag.Cckappa_sig.agent_name;
+               Cckappa_sig.site = site} set
+	 in
+	 let error = Exception.check warn parameters error error' (Some "line 576") Exit  in
+	 error,set
+       else error,set)
+     (fun parameters error site state state' set ->
+       if state.Cckappa_sig.site_free  = state'.Cckappa_sig.site_free
+       || state.Cckappa_sig.site_free = Some true
+       then error,set
+       else
+	 let error',set =
+	   Cckappa_sig.Address_map_and_set.Set.add
+	      parameters
+	      error 
+              {
+		Cckappa_sig.agent_index = k;
+		Cckappa_sig.agent_type = ag.Cckappa_sig.agent_name;
+		Cckappa_sig.site = site} set
+	 in
+	 let error = Exception.check warn parameters error error' (Some "line 593") Exit in
+	 error,set)    
      ag.Cckappa_sig.agent_interface ag'.Cckappa_sig.agent_interface set
 
  let equ_port s1 s2 = 
@@ -556,7 +613,8 @@ let translate_mixture parameters error handler mixture =
 	    with
 	    | None | Some Cckappa_sig.Ghost -> warn parameters error (Some ("Preprocess line 557"^", question marks should not appear on the rhs or in introduction")) Exit (Cckappa_sig.Ghost)  
  	    | Some Cckappa_sig.Agent ag ->
-	       let interface = Cckappa_sig.Site_map_and_set.Map.remove s ag.Cckappa_sig.agent_interface in
+	       let error',interface = Cckappa_sig.Site_map_and_set.Map.remove parameters error s ag.Cckappa_sig.agent_interface in
+	       let error = Exception.check warn parameters error error' (Some "line 617") Exit in 
 	       error,Cckappa_sig.Agent {ag with Cckappa_sig.agent_interface = interface}
 	  in 
           let error,views = Int_storage.Quick_Nearly_inf_Imperatif.set parameters error k agent views in 
@@ -661,8 +719,9 @@ let translate_mixture parameters error handler mixture =
              end 
            | Some Cckappa_sig.Agent lagk,Some Cckappa_sig.Agent ragk -> 
              let agent_type = lagk.Cckappa_sig.agent_name in 
-             let ldiff,rdiff = Cckappa_sig.Site_map_and_set.Map.diff_pred equ_port lagk.Cckappa_sig.agent_interface ragk.Cckappa_sig.agent_interface in 
-             let error,lbondk = Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get parameters error k c_rule_lhs.Cckappa_sig.bonds in  
+             let error',ldiff,rdiff = Cckappa_sig.Site_map_and_set.Map.diff_pred parameters error equ_port lagk.Cckappa_sig.agent_interface ragk.Cckappa_sig.agent_interface in 
+	     let error = Exception.check warn parameters error error' (Some "line 617") Exit in 
+	     let error,lbondk = Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get parameters error k c_rule_lhs.Cckappa_sig.bonds in  
              let error,rbondk = Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get parameters error k c_rule_rhs.Cckappa_sig.bonds in  
              let lbondk = 
                  match lbondk with 
@@ -683,15 +742,15 @@ let translate_mixture parameters error handler mixture =
            | None,_ | _,None -> 
              (print_int k;print_newline ();warn parameters error (Some "line 542") Exit (direct,reverse,actions,half_release_set,0,Cckappa_sig.Site_map_and_set.Map.empty,Cckappa_sig.Site_map_and_set.Map.empty))
          in 
-         let bond_l,bond_r = Cckappa_sig.Site_map_and_set.Map.diff lbondk rbondk in 
+         let error',bond_l,bond_r = Cckappa_sig.Site_map_and_set.Map.diff parameters error lbondk rbondk in
+	 let error = Exception.check warn parameters error error' (Some "line 746") Exit in 
          let release = actions.Cckappa_sig.release in 
          let error,(full_release_set,release) = 
            Cckappa_sig.Site_map_and_set.Map.fold
              (fun site target (error,(full_release_set,release)) -> 
                     let source = Cckappa_sig.build_address k agent_type site in 
-                    let full_release_set =
-                      Cckappa_sig.Address_map_and_set.Set.add source full_release_set
-                    in   
+                    let error',full_release_set = Cckappa_sig.Address_map_and_set.Set.add parameters error source full_release_set in 
+		    let error = Exception.check warn parameters error error' (Some "line 753") Exit in 
                     let release = 
                       if compare source target < 0 
                       then (source,target)::release
@@ -720,8 +779,8 @@ let translate_mixture parameters error handler mixture =
        end
    in 
    let error,(direct,reverse,actions,half_release_set,full_release_set) = aux_agent 0 (error,(direct,reverse,actions,half_release_set,full_release_set)) in
-   let half_release_set =
-     Cckappa_sig.Address_map_and_set.Set.minus half_release_set full_release_set in
+   let error',half_release_set = Cckappa_sig.Address_map_and_set.Set.minus parameters error half_release_set full_release_set in
+   let error = Exception.check warn parameters error error' (Some "line 753") Exit in                  
    let list = Cckappa_sig.Address_map_and_set.Set.elements half_release_set in
    let error,list = 
      List.fold_left 
@@ -732,11 +791,13 @@ let translate_mixture parameters error handler mixture =
          | None | Some Cckappa_sig.Ghost -> warn parameters error (Some "line 623") Exit ((add,None)::list)
          | Some (Cckappa_sig.Agent ag) ->
             let interface = ag.Cckappa_sig.agent_interface in
-	    match Cckappa_sig.Site_map_and_set.Map.find_option add.Cckappa_sig.site interface with
-	    | None ->  Exception.warn parameters error
+	    match Cckappa_sig.Site_map_and_set.Map.find_option parameters error add.Cckappa_sig.site interface with
+	    | error,None ->  Exception.warn parameters error
 				      (Some "Preprocess") (Some "find_map, line 405")
 				      Not_found (fun () -> (add,None)::list)
-            | Some state -> error,(add,Some state.Cckappa_sig.site_state)::list)
+            | error',Some state ->
+	       Exception.check warn parameters error error' (Some "line 799") Exit,
+	       (add,Some state.Cckappa_sig.site_state)::list)
        (error,[])
        (List.rev list) 
    in 

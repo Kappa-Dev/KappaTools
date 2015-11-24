@@ -11,8 +11,10 @@ module type Set_with_logs =
    
     val add: Remanent_parameters_sig.parameters -> Exception.method_handler -> elt -> t -> Exception.method_handler * t 
     val remove:  Remanent_parameters_sig.parameters -> Exception.method_handler -> elt -> t -> Exception.method_handler * t 			      
-   
+
+    val minus: Remanent_parameters_sig.parameters -> Exception.method_handler -> t -> t -> Exception.method_handler * t 
     val union: Remanent_parameters_sig.parameters -> Exception.method_handler -> t -> t -> Exception.method_handler * t 
+    val disjoint_union: Remanent_parameters_sig.parameters -> Exception.method_handler -> t -> t -> Exception.method_handler  * t   
     val inter: Remanent_parameters_sig.parameters -> Exception.method_handler -> t -> t -> Exception.method_handler * t
     val diff:  Remanent_parameters_sig.parameters -> Exception.method_handler -> t -> t -> Exception.method_handler * t
     val cardinal: t -> int
@@ -47,6 +49,7 @@ module type Map_with_logs =
     val empty: 'a t
     val is_empty: 'a t -> bool
     val min_elt: (elt -> 'a -> bool) -> 'a t -> elt option
+    val mem: (elt -> 'a t -> bool)
     val find_option:  Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'a t -> Exception.method_handler  * 'a option
     val find_default:  Remanent_parameters_sig.parameters -> Exception.method_handler  -> 'a -> elt -> 'a t -> Exception.method_handler  * 'a
     val find_default_without_logs: Remanent_parameters_sig.parameters -> Exception.method_handler  -> 'a -> elt -> 'a t -> Exception.method_handler  * 'a
@@ -107,8 +110,10 @@ module Make(S_both:(SetMap.S)): S_with_logs with type elt = S_both.elt and type 
 	  let add = lift S_both.Set.add_with_logs 
 	  let remove = lift S_both.Set.remove_with_logs
 	  let union = lift S_both.Set.union_with_logs
+	  let disjoint_union = lift S_both.Set.disjoint_union_with_logs 
 	  let inter = lift S_both.Set.inter_with_logs
 	  let diff = lift S_both.Set.diff_with_logs
+	  let minus = lift S_both.Set.minus_with_logs 
 	  let cardinal = S_both.Set.cardinal
 	  let mem = S_both.Set.mem
 	  let exists = S_both.Set.exists
@@ -136,6 +141,7 @@ module Make(S_both:(SetMap.S)): S_with_logs with type elt = S_both.elt and type 
 	  let empty = S_both.Map.empty
 	  let is_empty = S_both.Map.is_empty
 	  let min_elt = S_both.Map.min_elt 
+	  let mem = S_both.Map.mem
 	  let find_option a b c d = lift S_both.Map.find_option_with_logs a b c d 
 	  let find_default a b c d = lift S_both.Map.find_default_with_logs a b c d 
 	  let find_option_without_logs a b c d = b,S_both.Map.find_option c d  

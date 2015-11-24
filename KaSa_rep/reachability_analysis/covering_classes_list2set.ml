@@ -37,45 +37,54 @@ let trace = false
 *)
 
 let new_index_pair_map parameter error l =
-  let rec aux acc k map1 map2 =
+  let rec aux acc k map1 map2 error =
     match acc with
     | [] -> error, (map1, map2)
     | h :: tl ->
-      let map1 = Map.add h k map1 in
-      let map2 = Map.add k h map2 in
-      aux tl (k+1) map1 map2
-  in aux l 1 Map.empty Map.empty
+      let error,map1 = Map.add parameter error h k map1 in
+      let error,map2 = Map.add parameter error k h map2 in
+      aux tl (k+1) map1 map2 error 
+  in
+  let error',(map1,map2) = aux l 1 Map.empty Map.empty error in
+  let error = Exception.check warn parameter error error' (Some "line 49") Exit in
+  error,(map1,map2)
+ 
 
 (************************************************************************************)
 (*convert a list to a set*)
 
 let list2set parameter error list =
-  List.fold_left (fun (error, current_set) elt ->
-    let add_set =
-      Set.add elt current_set
-    in
-    error, add_set
-  ) (error, Set.empty) list
+  let error',list =
+    List.fold_left
+      (fun (error, current_set) elt ->
+       let error, add_set =
+	 Set.add parameter error elt current_set
+       in
+       error, add_set
+      ) (error, Set.empty) list
+  in
+  let error = Exception.check warn parameter error error' (Some "line 66") Exit in
+  error,list 
 
 (************************************************************************************)
 
 let collect_remanent_list2set parameter error store_remanent store_result =
-  AgentMap.fold parameter error
-    (fun parameter error agent_type remanent store_result ->
-      (*-------------------------------------------------------------------------*)
-      (*get covering classes dictionary*)
-      let store_dic = remanent.store_dic in
-      let error, (id_list, site_set_list) =
-        Dictionary_of_Covering_class.fold
-          (fun list _ index (error, (index_list, current_list)) ->
-            let error, list2set =
-              list2set parameter error list
-            in
-            let list_set = list2set :: current_list in
-            let list_index = index :: index_list in
-            error, (List.rev list_index, List.rev list_set)
-          ) store_dic (error, ([], []))
-      in
+  AgentMap.fold parameter error 
+    (fun paramter error agent_type remanent store_result ->
+     (*-------------------------------------------------------------------------*)
+     (*get covering classes dictionary*)
+     let store_dic = remanent.store_dic in
+     let error, (id_list, site_set_list) =
+       Dictionary_of_Covering_class.fold
+	 (fun list _ index (error, (index_list, current_list)) ->
+	  let error, list2set =
+	    list2set parameter error list
+	  in
+	  let list_set = list2set :: current_list in
+	  let list_index = index :: index_list in
+	  error, (List.rev list_index, List.rev list_set)
+	 ) store_dic (error, ([], []))
+		 in
       (*-------------------------------------------------------------------------*)
       (*store a mapping function from a list of covering class into a list
       of new index and a pair of map*)

@@ -108,14 +108,16 @@ let collect_half_break parameter error handler store_half_break half_break =
         | Some s -> s
     in
     (*new set*)
-    let set =
-      add_set
+    let error,set =
+      add_set parameter error 
         site
         old_set
     in
-    let new_set =
+    let error,new_set =
       Site_map_and_set.Set.union
-        set
+	parameter
+	error 
+	set
         old_set
     in
     (*store*)
@@ -155,15 +157,17 @@ let collect_know_binding error store_unbinding release =
 
 (*collect document site*)
 let collect_document_site parameter error index agent agent_type store_doc =
-  let site_map =
+  let error,site_map =
     Site_map_and_set.Map.fold
-      (fun site _ current_map ->
+      (fun site _ (error,current_map) ->
        Site_map_and_set.Map.add
+	 parameter
+	 error 
          site
          (index, agent_type, site)
          current_map
       )
-      agent.agent_interface empty_map
+      agent.agent_interface (error,empty_map)
   in
   let error, old =
     AgentMap.unsafe_get
@@ -177,8 +181,10 @@ let collect_document_site parameter error index agent agent_type store_doc =
       | None -> empty_map
       | Some m -> m
   in
-  let final_map =
+  let error,final_map =
     Site_map_and_set.Map.union
+      parameter
+      error
       old_map
       site_map  
   in
@@ -193,15 +199,15 @@ let collect_document_site parameter error index agent agent_type store_doc =
 (*collect undocument site*)
 
 let collect_undocument_site parameter error index agent_type list_undoc store_undoc =
-  let undoc_map =
-    List.fold_left (fun current_map site ->
-      let site_map =
-        Site_map_and_set.Map.add
+  let error,undoc_map =
+    List.fold_left (fun (error,current_map) site ->
+      let error,site_map =
+        Site_map_and_set.Map.add parameter error 
           site
           (index, agent_type, site)
           current_map
-      in site_map
-    ) empty_map list_undoc
+      in error,site_map
+    ) (error,empty_map) list_undoc
   in
   let error, old = 
     AgentMap.unsafe_get
@@ -215,8 +221,10 @@ let collect_undocument_site parameter error index agent_type list_undoc store_un
       | None -> empty_map
       | Some m -> m
   in
-  let final_map =
+  let error, final_map =
     Site_map_and_set.Map.union
+      parameter
+      error 
       old_map
       undoc_map in
   AgentMap.set

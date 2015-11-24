@@ -11,10 +11,12 @@ module type Set_with_logs =
    
     val add: Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> t -> Exception.method_handler  * t 
     val remove:  Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> t -> Exception.method_handler  * t 			      
-   
-    val union: Remanent_parameters_sig.parameters -> Exception.method_handler  -> t -> t -> Exception.method_handler  * t 
-    val inter: Remanent_parameters_sig.parameters -> Exception.method_handler  -> t -> t -> Exception.method_handler  * t
-    val diff:  Remanent_parameters_sig.parameters -> Exception.method_handler  -> t -> t -> Exception.method_handler  * t
+
+    val minus: Remanent_parameters_sig.parameters -> Exception.method_handler -> t -> t -> Exception.method_handler  * t
+    val union: Remanent_parameters_sig.parameters -> Exception.method_handler -> t -> t -> Exception.method_handler  * t 
+    val disjoint_union: Remanent_parameters_sig.parameters -> Exception.method_handler -> t -> t -> Exception.method_handler  * t 
+    val inter: Remanent_parameters_sig.parameters -> Exception.method_handler -> t -> t -> Exception.method_handler  * t
+    val diff:  Remanent_parameters_sig.parameters -> Exception.method_handler -> t -> t -> Exception.method_handler  * t
     val cardinal: t -> int
 
     val mem: elt -> t -> bool
@@ -47,6 +49,7 @@ module type Map_with_logs =
     val empty: 'a t
     val is_empty: 'a t -> bool
     val min_elt: (elt -> 'a -> bool) -> 'a t -> elt option
+    val mem: elt -> 'a t -> bool 			      
     val find_option:  Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'a t -> Exception.method_handler  * 'a option
     val find_default:  Remanent_parameters_sig.parameters -> Exception.method_handler  -> 'a -> elt -> 'a t -> Exception.method_handler  * 'a
     val find_default_without_logs: Remanent_parameters_sig.parameters -> Exception.method_handler  -> 'a -> elt -> 'a t -> Exception.method_handler  * 'a

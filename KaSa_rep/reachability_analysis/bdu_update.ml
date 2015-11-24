@@ -47,7 +47,8 @@ let store_covering_classes_modification_update_aux parameter error agent_type_cv
     let (l, old) =
       Int2Map_CV_Modif.Map.find_default ([], Site_map_and_set.Set.empty)
 	(agent_type, cv_id) store_result in
-    let new_set = Site_map_and_set.Set.union rule_id_set old in
+    let error',new_set = Site_map_and_set.Set.union parameter error rule_id_set old in
+    let error = Exception.check warn parameter error error' (Some "line 51") Exit in    
     let result =
       Int2Map_CV_Modif.Map.add (agent_type, cv_id) (l, new_set) store_result
     in

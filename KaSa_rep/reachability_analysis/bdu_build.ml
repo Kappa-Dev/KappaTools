@@ -32,25 +32,35 @@ open Bdu_build_common
   map2 (from 1->0, 2->1)
   }
 *)
-
+let warn parameters mh message exn default = 
+     Exception.warn parameters mh (Some "Bdu_build") message exn (fun () -> default) 
+  
+       
 let new_index_pair_map parameter error l =
-  let rec aux acc k map1 map2 =
+  let rec aux acc k map1 map2 error =
     match acc with
     | [] -> error, (map1, map2)
     | h :: tl ->
-      let map1 = Map.add h k map1 in
-      let map2 = Map.add k h map2 in
-      aux tl (k+1) map1 map2
-  in aux l 1 Map.empty Map.empty
+      let error,map1 = Map.add parameter error h k map1 in
+      let error,map2 = Map.add parameter error k h map2 in   
+      aux tl (k+1) map1 map2 error
+  in
+  let error',(map1,map2) = aux l 1 Map.empty Map.empty error in
+  let error = Exception.check warn parameter error error' (Some "line 49") Exit in
+  error,(map1,map2)
 
 (************************************************************************************)
 (*convert a list to a set*)
 
 let list2set parameter error list =
-  error,List.fold_left (fun current_set elt ->
-      Set.add elt current_set
-  ) Set.empty list
-
+  let error',set =
+    List.fold_left (fun (error,current_set) elt ->
+		    Set.add parameter error elt current_set
+		   ) (error,Set.empty) list
+  in
+  let error = Exception.check warn parameter error error' (Some "line 61") Exit in
+  error,set
+	  
 (************************************************************************************)
 (* From each covering class, with their new index for sites, build 
    (bdu_test, bdu_creation and list of modification).
@@ -104,14 +114,14 @@ let collect_test_restriction parameter error rule_id rule store_remanent_triple
             new_index_pair_map parameter error list
           in
           (*-----------------------------------------------------------------*)
-          let error, map_res =
-            Site_map_and_set.Map.monadic_fold_restriction parameter error
-              (fun parameter error site port store_result ->
+          let error', map_res =
+            Site_map_and_set.Map.fold_restriction parameter error
+              (fun site port (error,store_result) ->
                 let state = port.site_state.min in
-                let site' = Site_map_and_set.Map.find_default
+                let error,site' = Site_map_and_set.Map.find_default parameter error 
                   0 site map_new_index_forward in
-                let map_res =
-                  Site_map_and_set.Map.add
+                let error,map_res =
+                  Site_map_and_set.Map.add parameter error 
                     site'
                     state
                     store_result
@@ -119,6 +129,7 @@ let collect_test_restriction parameter error rule_id rule store_remanent_triple
                 error, map_res
               ) set agent.agent_interface Site_map_and_set.Map.empty
           in
+	  let error = Exception.check warn parameter error error' (Some "line 132") Exit in
           (*error, ((cv_id, map_res) :: current_list)*)
           error, (cv_id, (map_res :: current_list))
         ) (error, (0, [])) triple_list
@@ -183,21 +194,27 @@ let collect_creation_restriction parameter error rule_id rule store_remanent_tri
                   new_index_pair_map parameter error list
                 in
                 (*-----------------------------------------------------------------*)
-                let error, map_res =
-                  Site_map_and_set.Map.monadic_fold_restriction parameter error
-                    (fun parameter error site port store_result ->
+                let error', map_res =
+                  Site_map_and_set.Map.fold_restriction parameter error
+                    (fun site port (error,store_result) ->
                       let state = port.site_state.min in
-                      let site' = Site_map_and_set.Map.find_default
-                        0 site map_new_index_forward in
-                      let map_res =
+                      let error,site' = Site_map_and_set.Map.find_default
+                        parameter error 0 site map_new_index_forward in
+                      let error,map_res =
                         Site_map_and_set.Map.add
-                          site'
+                          parameter
+			  error
+			  site'
                           state
                           store_result
                       in
                       error, map_res
-                    ) set agent.agent_interface Site_map_and_set.Map.empty
+                    )
+		    set
+		    agent.agent_interface
+		    Site_map_and_set.Map.empty
                 in
+		let error = Exception.check warn parameter error error' (Some "line 212") Exit in
                 error, (cv_id, (map_res :: current_list))
               ) (error, (0, [])) triple_list
             in
@@ -258,14 +275,14 @@ let collect_modif_restriction parameter error rule_id rule store_remanent_triple
               new_index_pair_map parameter error list
             in
             (*-----------------------------------------------------------------*)
-            let error, map_res =
-              Site_map_and_set.Map.monadic_fold_restriction parameter error
-                (fun parameter error site port store_result ->
+            let error', map_res =
+              Site_map_and_set.Map.fold_restriction parameter error
+                (fun site port (error,store_result) ->
                   let state = port.site_state.min in
-                  let site' = Site_map_and_set.Map.find_default
+                  let error,site' = Site_map_and_set.Map.find_default parameter error 
                     0 site map_new_index_forward in
-                  let map_res =
-                    Site_map_and_set.Map.add
+                  let error,map_res =
+                    Site_map_and_set.Map.add parameter error 
                       site'
                       state
                       store_result
@@ -273,6 +290,7 @@ let collect_modif_restriction parameter error rule_id rule store_remanent_triple
                   error, map_res
                 ) set agent_modif.agent_interface Site_map_and_set.Map.empty
             in
+	    let error = Exception.check warn parameter error error' (Some "line 293") Exit in        
             error, (cv_id, (map_res :: current_list))
           ) (error, (0, [])) triple_list
         in

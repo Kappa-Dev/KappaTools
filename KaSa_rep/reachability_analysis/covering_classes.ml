@@ -22,7 +22,10 @@ let warn parameters mh message exn default =
                  (fun () -> default)                
 
 let trace = false
-
+let warn parameters mh message exn default = 
+     Exception.warn parameters mh (Some "Covering_classes") message exn (fun () -> default) 
+  
+	      
 (************************************************************************************)   
 (*RULE*)
 
@@ -37,19 +40,22 @@ let collect_modified_map parameter error diff_reverse store_modified_map =
       then error, store_modified_map
       else
         let agent_type = site_modif.agent_name in
-        let store_site =
+        let error',store_site =
           Map.fold
-            (fun site port current_map ->
+            (fun site port (error,current_map) ->
               (*store site map*)
-              let site_map =
+              let error,site_map =
                 Map.add
+		  parameter
+		  error 
                   site
                   site
                   current_map
               in
-              site_map)
-            site_modif.agent_interface Map.empty
+              error,site_map)
+            site_modif.agent_interface (error,Map.empty)
         in
+	let error = Exception.check warn parameter error error' (Some "line 58") Exit in 
         (*compute site_map*)
         let error, old_map =
           match
@@ -63,12 +69,12 @@ let collect_modified_map parameter error diff_reverse store_modified_map =
             | error, Some m -> error, m
         in
         (*store*)
-        let final_map =
-          Map.union
+        let error,final_map =
+          Map.union parameter error 
             old_map
             store_site
         in
-        let error, store_modified_map =
+        let error', store_modified_map =
           AgentMap.set
             parameter
             error
@@ -76,6 +82,8 @@ let collect_modified_map parameter error diff_reverse store_modified_map =
             final_map
             store_modified_map
         in
+	let error = Exception.check warn parameter error error' (Some "line 85") Exit in
+ 
         error, store_modified_map
     ) diff_reverse
     store_modified_map

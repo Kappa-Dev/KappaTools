@@ -41,18 +41,16 @@ let trace = false
 
 let collect_modification_sites parameter error rule_id diff_direct store_result =
   (*from a pair of Map (agent_id, agent_type, site) -> rule_id :: old_result)*)
-  let add_link (agent_id, agent_type, site_type) rule_id store_result =
-    let (l, old) =
+  let add_link error (agent_id, agent_type, site_type) rule_id store_result =
+    let l, old =
       Int2Map_Modif.Map.find_default
 	([], Site_map_and_set.Set.empty) (agent_id, agent_type, site_type) store_result in
-    let current_set =
-      Site_map_and_set.Set.add rule_id old
+    let error',current_set =
+      Site_map_and_set.Set.add parameter error rule_id old
     in
-    let new_set =
-      Site_map_and_set.Set.union current_set old
-    in
+    let error = Exception.check warn parameter error error' (Some "line 51") Exit in 
     error,
-    Int2Map_Modif.Map.add (agent_id, agent_type, site_type) (l, new_set) store_result
+    Int2Map_Modif.Map.add (agent_id, agent_type, site_type) (l, current_set) store_result
   in
   let error, store_result =
     AgentMap.fold parameter error
@@ -66,7 +64,7 @@ let collect_modification_sites parameter error rule_id diff_direct store_result 
             Site_map_and_set.Map.fold
               (fun site_type _ (error, store_result) ->
                 let error, store_result =
-                  add_link (agent_id, agent_type, site_type) rule_id store_result
+                  add_link error (agent_id, agent_type, site_type) rule_id store_result
                 in
                 error, store_result
               ) agent_modif.agent_interface (error, store_result)
@@ -87,9 +85,10 @@ let collect_modif_map parameter error store_modification_sites store_result =
       Int2Map_Test_Modif.Map.find_default
         ([], Site_map_and_set.Set.empty) (agent_type, site_type) store_result
     in
-    let new_set =
-      Site_map_and_set.Set.union set_rule_id old
+    let error',new_set =
+      Site_map_and_set.Set.union parameter error set_rule_id old
     in
+    let error = Exception.check warn parameter error error' (Some "line 51") Exit in   
     let result =
       Int2Map_Test_Modif.Map.add (agent_type, site_type) (l, new_set) store_result
     in
@@ -112,8 +111,8 @@ let collect_test_sites parameter error rule_id viewslhs
     let (l, old) =
       Int2Map_Modif.Map.find_default ([], Site_map_and_set.Set.empty)
         (agent_id, agent_type, site_type) store_result in
-    let current_set = Site_map_and_set.Set.add rule_id old in
-    let new_set = Site_map_and_set.Set.union current_set old  in
+    let error',new_set = Site_map_and_set.Set.add parameter error rule_id old in
+    let error = Exception.check warn parameter error error' (Some "line 115") Exit in    
     let result =
       Int2Map_Modif.Map.add (agent_id, agent_type, site_type) (l, new_set) store_result
     in
@@ -151,9 +150,10 @@ let collect_test_map parameter error store_test_sites store_result =
       Int2Map_Test_Modif.Map.find_default
         ([], Site_map_and_set.Set.empty) (agent_type, site_type) store_result
     in
-    let new_set =
-      Site_map_and_set.Set.union set_rule_id old
+    let error',new_set =
+      Site_map_and_set.Set.union parameter error set_rule_id old
     in
+    let error = Exception.check warn parameter error error' (Some "line 156") Exit in    
     let result =
       Int2Map_Test_Modif.Map.add (agent_type, site_type) (l, new_set) store_result
     in
@@ -177,7 +177,7 @@ test: agent_type:0:site_type:0:[4;5;6;7]
 
 let collect_test_modification_sites
     parameter error store_modification_map store_test_map store_result =
-  let add_link (agent_id, agent_type, site_type) rule_id_set store_result =
+  let add_link error (agent_id, agent_type, site_type) rule_id_set store_result =
     let (l, old) =
       Int2Map_Modif.Map.find_default
 	([], Site_map_and_set.Set.empty) (agent_id, agent_type, site_type) store_result in
@@ -195,22 +195,23 @@ let collect_test_modification_sites
     (*exists in 'a t*)
     (fun parameter error (agent_id, agent_type, site_type) (l1, s1) store_result ->
       let error, store_result =
-        add_link (agent_id, agent_type, site_type) s1 store_result
+        add_link error (agent_id, agent_type, site_type) s1 store_result
       in
       error, store_result
     )
     (*exists in 'b t*)
     (fun parameter error (agent_id, agent_type, site_type) (l2, s2) store_result ->
       let error, store_result =
-        add_link (agent_id, agent_type, site_type) s2 store_result
+        add_link error (agent_id, agent_type, site_type) s2 store_result
       in
       error, store_result
     )
     (*exists in both*)
     (fun parameter error (agent_id, agent_type, site_type) (l1, s1) (l2, s2) store_result ->
-      let union = Site_map_and_set.Set.union s1 s2 in
+      let error',union = Site_map_and_set.Set.union parameter error s1 s2 in
+      let error = Exception.check warn parameter error error' (Some "line 212") Exit in   
       let error, store_result =
-        add_link (agent_id, agent_type, site_type) union store_result
+        add_link error (agent_id, agent_type, site_type) union store_result
       in
       error, store_result
     ) store_modification_map store_test_map store_result
@@ -223,9 +224,10 @@ let collect_test_modif_map parameter error store_test_modification_sites store_r
       Int2Map_Test_Modif.Map.find_default
         ([], Site_map_and_set.Set.empty) (agent_type, site_type) store_result
     in
-    let new_set =
-      Site_map_and_set.Set.union set_rule_id old
+    let error',new_set =
+      Site_map_and_set.Set.union parameter error set_rule_id old
     in
+    let error = Exception.check warn parameter error error' (Some "line 230") Exit in   
     let result =
       Int2Map_Test_Modif.Map.add (agent_type, site_type) (l, new_set) store_result
     in

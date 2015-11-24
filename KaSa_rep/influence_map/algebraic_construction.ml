@@ -70,7 +70,7 @@ let check parameters error handler mixture1 mixture2 (i,j) =
 		let error,bool = 
 		  try
 		    let error = 
-		      Cckappa_sig.Site_map_and_set.Map.monadic_iter2_sparse
+		      Cckappa_sig.Site_map_and_set.Map.iter2_sparse
 			parameters error
 			(fun _ error _ port1 port2 ->
 			 let range1 = port1.Cckappa_sig.site_state in
@@ -89,7 +89,7 @@ let check parameters error handler mixture1 mixture2 (i,j) =
 		  try
 		    let error,(to_do,already_done)
 		      =
-		      Cckappa_sig.Site_map_and_set.Map.monadic_fold2_sparse parameters error 
+		      Cckappa_sig.Site_map_and_set.Map.fold2_sparse parameters error 
 			(fun _ error _ port1 port2 (to_do,already_done) ->
 			 if port1.Cckappa_sig.site = port2.Cckappa_sig.site
 			 then
