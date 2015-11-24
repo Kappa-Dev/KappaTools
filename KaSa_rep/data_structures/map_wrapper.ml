@@ -187,3 +187,58 @@ module Make(S_both:(SetMap.S)): S_with_logs with type elt = S_both.elt and type 
 	end:Map_with_logs with type elt = S_both.elt and type 'a t = 'a S_both.Map.t and type set = S_both.Set.t and type set = Set.t)	 
     end)
 							    
+module type Projection = sig
+  
+    type elt_a
+    type elt_b
+    type 'a map_a
+    type 'a map_b
+    val monadic_proj: (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt_a -> Exception.method_handler * elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'a -> Exception.method_handler * 'a) -> 'a map_a -> Exception.method_handler * 'a map_b
+    val proj: (elt_a -> elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> ('a -> 'a -> 'a) -> 'a map_a -> Exception.method_handler * 'a map_b
+  end
+			   
+module Proj(A:S_with_logs)(B:S_with_logs) = 
+	   (struct
+	     module MA=A.Map
+	     module MB=B.Map
+	     type elt_a = MA.elt
+	     type elt_b = MB.elt
+	     type 'a map_a = 'a MA.t
+	     type 'a map_b = 'a MB.t 
+		 	 
+	     let proj f parameter error identity_elt merge map =
+	       MA.fold		 
+		 (fun key_a data_a (error,map_b) ->
+		  let key_b = f key_a in
+		  match
+		    MB.find_option_without_logs parameter error key_b map_b 
+		  with
+		  | error,None -> MB.add parameter error key_b (merge identity_elt data_a) map_b
+		  | error,Some old -> MB.overwrite parameter error key_b (merge old data_a) map_b
+		 )
+		 map 
+		 (error,MB.empty)
+
+	     let monadic_proj f parameter error identity_elt merge map =
+	        MA.fold		 
+		 (fun key_a data_a (error,map_b) ->
+		  let error,key_b = f parameter error key_a in
+		  match
+		    MB.find_option_without_logs parameter error key_b map_b 
+		  with
+		  | error,None ->
+		     let error,data' = merge parameter error identity_elt data_a in
+		     MB.add parameter error key_b data' map_b
+		  | error,Some old ->
+		     let error,data' = merge parameter error identity_elt data_a in
+		     MB.overwrite parameter error key_b data' map_b
+		 )
+		 map 
+		 (error,MB.empty)
+		 
+		 end: Projection
+	       with type elt_a = A.elt
+		and type elt_b = B.elt
+		and type 'a map_a = 'a A.Map.t
+		and type 'a map_b = 'a B.Map.t )
+	     

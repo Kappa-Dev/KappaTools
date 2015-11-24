@@ -95,3 +95,18 @@ module Make(S_both:SetMap.S): S_with_logs
 	and type Map.elt = S_both.elt
 	and type Set.elt = S_both.elt
 							    
+module type Projection = sig
+  
+    type elt_a
+    type elt_b
+    type 'a map_a
+    type 'a map_b
+    val monadic_proj: (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt_a -> Exception.method_handler * elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'a -> Exception.method_handler * 'a) -> 'a map_a -> Exception.method_handler * 'a map_b
+    val proj: (elt_a -> elt_b) -> Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> ('a -> 'a -> 'a) -> 'a map_a -> Exception.method_handler * 'a map_b
+  end
+
+module Proj(A:S_with_logs)(B:S_with_logs) : Projection
+       with type elt_a = A.elt
+	and type elt_b = B.elt
+	and type 'a map_a = 'a A.Map.t
+	and type 'a map_b = 'a B.Map.t 

@@ -1530,7 +1530,7 @@ module Proj(A:S)(B:S) =
 	       MA.fold
 		 (fun key_a data_a map_b ->
 		  let key_b = f key_a in
-		  MB.add key_b (merge data_a (MB.find_default identity_elt key_b map_b)) map_b)
+		  MB.add key_b (merge (MB.find_default identity_elt key_b map_b) data_a) map_b)
 		 map
 		 MB.empty
 		 
@@ -1539,7 +1539,8 @@ module Proj(A:S)(B:S) =
 	     
 
 (* todo: add the following  test to the sanity tests *)
-(*
+
+(*	     
 (* for instance, the following code: *)
 
 module IntMap = Make(struct type t = int let compare = compare end)
@@ -1551,8 +1552,13 @@ let f = List.fold_left
 	  IntMap.Map.empty
 	  [1,[2;3];2,[3;4];5,[6;7];8,[12;13]] 
 
+(* bad implementation (quadratic time complexity) *)
 let g = P.proj (fun i -> i mod 2) [] (List.append) f
 
+(* good implementation (linear time complexity)*)
+let g' = IntMap.Map.map List.rev (P.proj (fun i -> i mod 2) [] (fun x y -> List.append (List.rev y) x) f)
+
+		      
 let dump (s:string) f =
   let _ = Printf.fprintf stderr "%s: \n" s in 
   let _ = IntMap.Map.iter
@@ -1564,8 +1570,10 @@ let dump (s:string) f =
   ()
 let _ = dump "f" f
 let _ = dump "g" g 
-	  
-(*should dump: 
+let _ = dump "g'" g'
+	    
+	     (* should dump: *)
+(*	     
 
 f: 
   1:2,3,
@@ -1573,6 +1581,7 @@ f:
   5:6,7,
   8:12,13,
 g: 
-  0:12,13,3,4,
-  1:6,7,2,3,
- *)*)
+  0:3,4,12,13,
+  1:2,3,6,7,
+ *)
+ *)
