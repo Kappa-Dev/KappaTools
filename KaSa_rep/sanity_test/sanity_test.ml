@@ -18,8 +18,7 @@ let test remanent p s1 =
     match report with 
       | Some s2 -> Printf.fprintf remanent.Sanity_test_sig.output "%s: %s\n" s1 s2 
       | None ->
-        if bool
-        then Printf.fprintf remanent.Sanity_test_sig.output "%s: %s\n" 
+        Printf.fprintf remanent.Sanity_test_sig.output "%s: %s\n" 
           s1 
           (if bool then "ok" else "FAIL!")
   in remanent
@@ -108,44 +107,22 @@ module LLI = Map_wrapper.Make(SetMap.Make (struct type t = int let compare = com
 let main () =
   let error = Exception.empty_error_handler in
   let parameters = Remanent_parameters.get_parameters () in
-			       
-  let m = LI.Map.empty in
-  let m = I.Map.add 2 3 m in
-  let error,i = LI.Map.find_option parameters error 2 m in 
-  let _ =
-    match i with None -> Printf.fprintf stderr "KO\n"
-	       | Some i -> Printf.fprintf stderr "OK %i \n" i
-  in
-  let error,i = LI.Map.find_option parameters error 3 m in 
-  let _ =
-    match i with None -> Printf.fprintf stderr "OK\n"
-	       | Some i -> Printf.fprintf stderr "KO %i \n" i
-  in
-  let m' = LLI.Map.empty in
-  let error,m' = LLI.Map.add parameters error 2 3 m' in
-  let error,i = LLI.Map.find_option parameters error 2 m' in 
-  let _ =
-    match i with None -> Printf.fprintf stderr "KO\n"
-	       | Some i -> Printf.fprintf stderr "OK %i \n" i
-  in
-  let error,i = LLI.Map.find_option parameters error 3 m' in 
-  let _ =
-    match i with None -> Printf.fprintf stderr "OK\n"
-	       | Some i -> Printf.fprintf stderr "KO %i \n" i
-  in					
   let _ = Exception.print parameters error  in 
-  let error = Exception.empty_error_handler in    
-  let error,parameters,files  = Get_option.get_option error in 
-  (* let _ = Counting_test.test_counting_procedure parameters in*)
-  let remanent,bdu_test_list = Mvbdu_test.bdu_test (remanent parameters) parameters in 
-  (*testing from bdu_test_list*)
-  let _ =
-    List.fold_left 
-      (fun remanent (s,p) -> test remanent p s)
-      remanent 
-      bdu_test_list
-  in 
-  ()
+  let counting_test_list = Counting_test.test_counting_procedure parameters in
+  let remanent_bdd,bdu_test_list = Mvbdu_test.bdu_test (remanent parameters) parameters in 
+  let map_test_list = Map_test.map_test (remanent parameters) parameters in 
+  let _  =
+    List.fold_left
+      (
+	List.fold_left 
+	  (fun remanent (s,p) -> test remanent p s))
+      remanent_bdd
+      [bdu_test_list;
+       map_test_list;
+       counting_test_list] 
+  in
+  let _ = Printf.fprintf stdout "END SANITY\n" in 
+  () 
 
-    let _ = main ()
+let _ = main ()
  

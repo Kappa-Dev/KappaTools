@@ -206,4 +206,4 @@ module Counting =
       
     let square a = Int_inf.bi_n_n_plus_1_divided_by_2 a
       
-   end:Enumeration with type puzzle_hole = int and type brick = int )
+   end:Enumeration with type puzzle_hole = int and type brick = int   )

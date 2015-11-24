@@ -18,7 +18,7 @@ module D = Counting_engine.Count(Counting_algebrae.Counting)
 
 let f parameters dual dual_and_self interface_of_brick init = 
   let error_handler,kappa_handler = List_tokens.empty_handler parameters Exception.empty_error_handler in 
-  let _ = 
+  let i = 
     C.count  
       parameters 
       Exception.empty_error_handler
@@ -30,8 +30,8 @@ let f parameters dual dual_and_self interface_of_brick init =
        C.print_handler 
       init
   in 
-  let _ = 
-    D.count  
+  let j = 
+	D.count  
       parameters 
       Exception.empty_error_handler
       kappa_handler 
@@ -41,8 +41,9 @@ let f parameters dual dual_and_self interface_of_brick init =
        Counting_engine.interface_of_brick = interface_of_brick}
       D.print_handler
       init
-  in ()
-
+  in Counting_algebrae.Explicit_enumeration.size_of_abstract_species_set i,
+     Counting_algebrae.Counting.size_of_abstract_species_set j
+									 
 let test_counting_procedure parameters = 
   let dual error x = 
     error,
@@ -79,8 +80,7 @@ let test_counting_procedure parameters =
   in    
   let init = [2,0;4,1;5,2;2,3;2,4] in 
   let _ = Printf.fprintf stdout "\n\nFirst test\n\n" in 
-  let _ = f parameters dual dual_and_self interface_of_brick init in    
-  
+  let n = f parameters dual dual_and_self interface_of_brick init in    
   let dual error x = 
     error,if x =1 then [2] else if x =2 then [1] else []
   in 
@@ -94,6 +94,10 @@ let test_counting_procedure parameters =
   let init = [1,1;1,2] in 
   
   let _ = Printf.fprintf stdout "\n\nSecond test\n\n" in 
-  let _ = f parameters dual dual_and_self interface_of_brick init in 
-  ()
+  let m = f parameters dual dual_and_self interface_of_brick init in 
+  ["Counting0",(fun x -> x, Int_inf.equal (fst n) (snd n), None) ;
+   "Counting1",(fun x -> x, Int_inf.equal (fst n) (Int_inf.Int (Big_int.big_int_of_int 41)), None);
+   "Counting2",(fun x -> x, Int_inf.equal (fst m) (snd m), None);
+   "Counting3",(fun x -> x, Int_inf.equal (fst m) (Int_inf.Infinity), None)
+  ]
   

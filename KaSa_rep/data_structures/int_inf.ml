@@ -15,7 +15,14 @@
 
 type 'a intinf = Int of 'a | Infinity  
 
-
+let equal a b =
+  match
+    a,b
+  with
+  | Infinity,Infinity -> true
+  | Infinity,_ | _,Infinity -> false
+  | Int a,Int b -> Big_int.eq_big_int a b
+				 
 let f_gen_zeroary f = 
 	Int (f ())
 	
@@ -36,8 +43,8 @@ type bi_intinf = Big_int.big_int intinf
 let bi_add = f_gen_binary Big_int.add_big_int
 let bi_mult = f_gen_binary Big_int.mult_big_int
   
-let big_zero = Big_int.big_int_of_int 0 
-let big_two = Big_int.big_int_of_int 2 
+let big_zero = Big_int.zero_big_int
+let big_two = Big_int.unit_big_int 
 
 let infty = Infinity
 let bi_one = Int (Big_int.big_int_of_int 1)  

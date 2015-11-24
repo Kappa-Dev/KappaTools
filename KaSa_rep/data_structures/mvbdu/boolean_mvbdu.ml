@@ -453,7 +453,7 @@ let boolean_constant_bi_false parameters =
    Mvbdu_algebra.generic_binary 
      (mvbdu_allocate parameters)
      (Mvbdu_algebra.not_recursive_binary
-        (fun error x y -> error,Mvbdu_sig.Leaf true, None)
+        (fun error x y -> error,Mvbdu_sig.Leaf false, None)
         (fun parameters error -> 
           let g (x:bool) =  
             Exception.warn parameters error (Some "Boolean_mvbdu")

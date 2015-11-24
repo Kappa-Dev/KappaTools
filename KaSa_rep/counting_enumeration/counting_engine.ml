@@ -358,5 +358,5 @@ module Count =
         let _ = trace_state "\nFinal state\n" " " print_handler final_state in
         let sol = conclude final_state in 
         let _ = E.print error_handler kappa_handler stdout hole_handler.print_hole sol in 
-        () 
+        sol  
     end)
