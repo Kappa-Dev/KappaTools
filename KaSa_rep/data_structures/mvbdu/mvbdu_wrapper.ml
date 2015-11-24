@@ -1,13 +1,16 @@
+
+
 module type Mvbdu =
   sig
     type handler 
     type mvbdu
     type list
-     type 'output constant = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> Exception.method_handler * handler * 'output
+    type 'output constant = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> Exception.method_handler * handler * 'output
     type ('input,'output) unary =  Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input -> Exception.method_handler * handler * 'output
     type ('input1,'input2,'output) binary = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input1 -> 'input2 -> Exception.method_handler * handler * 'output
   
     val init: Remanent_parameters_sig.parameters -> Exception.method_handler -> Exception.method_handler * handler 
+    val is_init: unit -> bool 
     val equal: mvbdu -> mvbdu -> bool 
     val equal_with_logs: (mvbdu,mvbdu,bool) binary
     val mvbdu_false: mvbdu constant
@@ -36,11 +39,12 @@ module type Mvbdu =
   end
 
 
-module type Internalize_mvbdu =
+module type Internalized_mvbdu =
   sig
-    type handler 
     type mvbdu
     type list
+    val init: Remanent_parameters_sig.parameters -> unit  
+    val is_init: unit -> bool 
     val equal: mvbdu -> mvbdu -> bool 
     val mvbdu_false: mvbdu
     val mvbdu_true:  mvbdu 
@@ -64,7 +68,7 @@ module type Internalize_mvbdu =
     val mvbdu_snd:  mvbdu -> mvbdu -> mvbdu 
     val mvbdu_nfst:  mvbdu -> mvbdu -> mvbdu 
     val mvbdu_nsnd:  mvbdu -> mvbdu -> mvbdu 
-    val mvbdu_redefine:  mvbdu -> mvbdu -> mvbdu
+    val mvbdu_redefine:  mvbdu -> list -> mvbdu
   end
 
 module Mvbdu = 
@@ -76,22 +80,25 @@ module Mvbdu =
     type ('input,'output) unary =  Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input -> Exception.method_handler * handler * 'output
     type ('input1,'input2,'output) binary = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input1 -> 'input2 -> Exception.method_handler * handler * 'output
 
-    let init = 
+    let init,is_init = 
       let used = ref None in 
-      let closure parameter error = 
+      let init parameter error = 
 	match 
 	  !used 
 	with 
 	| Some a -> 
-	  Exception.warn parameter error (Some "Mvbdu_wrapper.ml") (Some "MVBDU should be initialised once only")  Exit (fun _ -> a)  
+	  Exception.warn parameter error (Some "Mvbdu_wrapper.ml") (Some "MVBDU should be initialised once only")  Exit (fun _ -> a)
     	| None -> 
 	  begin
 	    let error,handler = Boolean_mvbdu.init_remanent parameter error in 
 	    let () = used := Some handler in 
 	    error,handler 
 	  end
-      in closure
-
+      in
+      let is_init () = !used != None 
+      in
+      init,is_init
+	      
     let equal = Mvbdu_core.mvbdu_equal 
     let equal_with_logs p h e a b = e,h,equal a b 
     let lift0 string f parameters handler error = 
@@ -143,8 +150,7 @@ module Mvbdu =
 
     let mvbdu_id parameters handler error a = error, handler, a
 
-    let mvbdu_unary_true parameters handler error _ = 
-      mvbdu_true parameters handler error 
+    let mvbdu_unary_true parameters handler error _ =  mvbdu_true parameters handler error 
     let mvbdu_unary_false parameters handler error _ = mvbdu_false parameters handler error 
 
     let mvbdu_and = lift2 "line_86, bdd_and" Boolean_mvbdu.boolean_mvbdu_and 
@@ -169,9 +175,9 @@ module Mvbdu =
 module Internalize(M:Mvbdu) = 
   (struct 
     module Mvbdu = M 
-    type mvbdu = bool Mvbdu_sig.mvbdu
-    type list = int List_sig.list
-
+    type mvbdu = Mvbdu.mvbdu
+    type list = Mvbdu.list 
+    type handler = Mvbdu.handler 
     let handler = ref None 
     let parameter = ref (Remanent_parameters.get_parameters ())
 
@@ -205,7 +211,7 @@ module Internalize(M:Mvbdu) =
 	begin
 	  match !handler with 
 	  | None -> failwith "unrecoverable errors in bdu get_handler" 
-	  | Some h -> error,h
+	  | Some h -> error',h
 	end
       | Some h -> error,h
     let lift_const s f = 
@@ -214,8 +220,156 @@ module Internalize(M:Mvbdu) =
       let error',handler,mvbdu = f !parameter handler error' in 
       let _ = check s error error' handler in 
       mvbdu 
-    let mvbdu_true = lift_const "line 217, mvbdu_true" M.mvbdu_true 
-   end:Internalize_mvbdu)
+    let mvbdu_true = lift_const "line 218, mvbdu_true" M.mvbdu_true
+    let mvbdu_false = lift_const "line 219, mvbdu_false" M.mvbdu_false
 
-let main () = () 
-let _ = main () 
+    let lift_unary s f x =
+      let error = Exception.empty_error_handler in 
+      let error',handler = get_handler s error in 
+      let error',handler,mvbdu = f !parameter handler error' x in 
+      let _ = check s error error' handler in 
+      mvbdu
+
+    let mvbdu_id = lift_unary "line 228, mvbdu_id" M.mvbdu_id
+    let mvbdu_not = lift_unary "line 229, mvbdu_not" M.mvbdu_not
+
+    let mvbdu_unary_true _ = mvbdu_true
+    let mvbdu_unary_false _ = mvbdu_false
+    let mvbdu_bi_true _ _ = mvbdu_true
+    let mvbdu_bi_false _ _ = mvbdu_false
+				
+    let lift_binary s f x y =
+      let error = Exception.empty_error_handler in 
+      let error',handler = get_handler s error in 
+      let error',handler,mvbdu = f !parameter handler error' x y in 
+      let _ = check s error error' handler in 
+      mvbdu
+    let lift_binary' s f x y =
+      let error = Exception.empty_error_handler in 
+      let error',handler = get_handler s error in 
+      let error',handler,mvbdu = f !parameter handler error' x y in 
+      let _ = check s error error' handler in 
+      mvbdu
+    let mvbdu_and = lift_binary "line 243, mvbdu_and" M.mvbdu_and
+    let mvbdu_or  = lift_binary "line 244, mvbdu_or" M.mvbdu_or
+    let mvbdu_nand = lift_binary "line 245, mvbdu_nand" M.mvbdu_nand
+    let mvbdu_nor = lift_binary "line 246, mvbdu_nor" M.mvbdu_nor
+    let mvbdu_snd _ b = b			  
+    let mvbdu_nsnd _ b = mvbdu_not b				
+    let mvbdu_fst a _ = a
+    let mvbdu_nfst a _ = mvbdu_not a
+    let mvbdu_xor = lift_binary "line 251, mvbdu_xor" M.mvbdu_xor
+    let mvbdu_nor = lift_binary "line 252, mvbdu_nor" M.mvbdu_nor
+    let mvbdu_imply = lift_binary "line 253, mvbdu_imply" M.mvbdu_imply
+    let mvbdu_nimply = lift_binary "line 254, mvbdu_nimply" M.mvbdu_nimply
+    let mvbdu_rev_imply = lift_binary "line 255, mvbdu_imply" M.mvbdu_rev_imply
+    let mvbdu_nrev_imply = lift_binary "line 256, mvbdu_nrev_imply" M.mvbdu_nrev_imply
+    let mvbdu_equiv = lift_binary "line 256, mvbdu_nrev_imply" M.mvbdu_equiv
+			       
+				       
+    let mvbdu_redefine = lift_binary "line 258, mvbdu_redefine" M.mvbdu_redefine
+							    
+   end:Internalized_mvbdu)
+
+module Optimize(M:Mvbdu) =
+	 (struct
+	     module Mvbdu = M
+	     type handler = Mvbdu.handler 	      
+	     type mvbdu = Mvbdu.mvbdu
+	     type list = Mvbdu.list 
+	     type 'output constant = 'output Mvbdu.constant
+	     type ('input,'output) unary =  ('input,'output) Mvbdu.unary
+	     type ('input1,'input2,'output) binary = ('input1,'input2,'output) Mvbdu.binary
+										
+  
+	     let init = Mvbdu.init
+	     let is_init = Mvbdu.is_init 
+	     let equal = Mvbdu.equal
+	     let equal_with_logs = Mvbdu.equal_with_logs
+	     let mvbdu_nand  = Mvbdu.mvbdu_nand 
+	     let mvbdu_not parameters handler error a = mvbdu_nand parameters handler error a a					       	      
+	     let mvbdu_id = Mvbdu.mvbdu_id
+	     let mvbdu_true = Mvbdu.mvbdu_true
+	     let mvbdu_false = Mvbdu.mvbdu_false 
+	     let mvbdu_unary_true parameters handler error a =
+	       let error,handler,nota = mvbdu_not parameters handler error a in
+	       mvbdu_nand parameters handler error a nota
+	     let mvbdu_unary_false parameters handler error a =
+	       let error,handler,mvtrue = mvbdu_unary_true parameters handler error a in
+	       mvbdu_not parameters handler error mvtrue
+	     let mvbdu_and parameters handler error a b =
+	       let error,handler,ab = mvbdu_nand parameters handler error a b in
+	       mvbdu_not parameters handler error ab
+	     let mvbdu_or parameters handler error a b =
+	       let error,handler,na = mvbdu_not parameters handler error a in
+	       let error,handler,nb = mvbdu_not parameters handler error b in
+	       mvbdu_nand parameters handler error na nb 
+	     let mvbdu_imply parameters handler error a b =
+	       let error,handler,notb = mvbdu_not parameters handler error b in
+	       mvbdu_nand parameters handler error a notb
+	     let mvbdu_rev_imply parameters handler error a b =
+	       let error,handler,nota = mvbdu_not parameters handler error a in
+	       mvbdu_nand parameters handler error nota b
+	     let mvbdu_nor parameters handler error a b =
+	       let error,handler,bddor = mvbdu_or parameters handler error a b in
+	       mvbdu_not parameters handler error bddor 
+	     let mvbdu_equiv parameters handler error a b =
+	       let error,handler,direct = mvbdu_imply parameters handler error a b in
+	       let error,handler,indirect = mvbdu_imply parameters handler error b a in
+	       mvbdu_and parameters handler error direct indirect
+	     let mvbdu_xor parameters handler error a b =
+	       let error,handler,equiv = mvbdu_equiv parameters handler error a b in
+	       mvbdu_not parameters handler error equiv
+	     let mvbdu_nimply parameters handler error a b =
+	       let error,handler,imply = mvbdu_imply parameters handler error a b in
+	       mvbdu_not parameters handler error imply
+	     let mvbdu_nrev_imply parameters handler error a b = mvbdu_nimply parameters handler error b a
+	     let mvbdu_bi_true parameters handler error a _ = M.mvbdu_unary_true parameters handler error a
+	     let mvbdu_bi_false parameters handler error a _ = M.mvbdu_unary_false parameters handler error a
+	     let mvbdu_fst = M.mvbdu_fst
+	     let mvbdu_snd = M.mvbdu_snd 
+	     let mvbdu_nfst parameters handler error a _ = mvbdu_not parameters handler error a 
+	     let mvbdu_nsnd parameters handler error _ a = mvbdu_not parameters handler error a						  
+	     let mvbdu_redefine = M.mvbdu_redefine
+	   end:Mvbdu)
+
+module Optimize'(M:Internalized_mvbdu) =
+	 (struct
+	     module Mvbdu = M
+			      
+	     type mvbdu = Mvbdu.mvbdu
+	     type list = Mvbdu.list 
+	    
+	     let init = Mvbdu.init
+	     let is_init = Mvbdu.is_init 
+	     let equal = Mvbdu.equal
+	     let mvbdu_nand a = Mvbdu.mvbdu_nand a 
+	     let mvbdu_not a = mvbdu_nand  a a					       	      
+	     let mvbdu_id = Mvbdu.mvbdu_id
+	     let mvbdu_true = Mvbdu.mvbdu_true
+	     let mvbdu_false = Mvbdu.mvbdu_false 
+	     let mvbdu_unary_true a = mvbdu_nand a (mvbdu_not a)
+	     let mvbdu_unary_false a = mvbdu_not (mvbdu_unary_true a) 
+	     let mvbdu_and a b = mvbdu_not (mvbdu_nand a b) 
+	     let mvbdu_or a b = mvbdu_nand (mvbdu_not a) (mvbdu_not b)
+	     let mvbdu_imply a b = mvbdu_nand a (mvbdu_not a)
+	     let mvbdu_rev_imply a b = mvbdu_imply b a 
+	     let mvbdu_nor a b = mvbdu_not (mvbdu_or a b)
+	     let mvbdu_equiv a b = mvbdu_and (mvbdu_imply a b) (mvbdu_imply b a)
+	     let mvbdu_xor a b = mvbdu_not (mvbdu_equiv a b)
+	     let mvbdu_nimply a b = mvbdu_not (mvbdu_imply a b)
+	     let mvbdu_nrev_imply a b = mvbdu_nimply b a
+	     let mvbdu_bi_true _ _ = M.mvbdu_true 
+	     let mvbdu_bi_false _ _ = M.mvbdu_false 
+	     let mvbdu_fst a _ = a
+	     let mvbdu_snd _ b = b			      
+	     let mvbdu_nfst a _ = mvbdu_not a 
+	     let mvbdu_nsnd _ a = mvbdu_not a						  
+	     let mvbdu_redefine = M.mvbdu_redefine
+	   end:Internalized_mvbdu)
+
+module IntMvbdu = Internalize(Mvbdu)
+module Optimized_Mvbdu = Optimize(Mvbdu)
+module Optimized_IntMvbdu = Optimize'(IntMvbdu)
+				     
+

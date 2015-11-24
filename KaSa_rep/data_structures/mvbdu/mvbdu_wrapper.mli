@@ -36,11 +36,11 @@ module type Mvbdu =
     val mvbdu_redefine: (mvbdu,list,mvbdu) binary 
   end
   
-module type Internalize_mvbdu =
+module type Internalized_mvbdu =
   sig
     type mvbdu
     type list
-    val init: unit -> unit 
+    val init: Remanent_parameters_sig.parameters -> unit 
     val is_init: unit -> bool 
     val equal: mvbdu -> mvbdu -> bool 
     val mvbdu_false: mvbdu
@@ -65,5 +65,12 @@ module type Internalize_mvbdu =
     val mvbdu_snd:  mvbdu -> mvbdu -> mvbdu 
     val mvbdu_nfst:  mvbdu -> mvbdu -> mvbdu 
     val mvbdu_nsnd:  mvbdu -> mvbdu -> mvbdu 
-    val mvbdu_redefine:  mvbdu -> mvbdu -> mvbdu
+    val mvbdu_redefine:  mvbdu -> list -> mvbdu
   end
+
+module Mvbdu:Mvbdu
+module IntMvbdu:Internalized_mvbdu
+module Optimized_Mvbdu:Mvbdu
+module Optimized_IntMvbdu:Internalized_mvbdu
+
+
