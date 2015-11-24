@@ -421,8 +421,6 @@ let enrich_grid err_fmt config_closure grid =
   let to_keep i = IntSet.mem i keep_l in
   let ids = ids_of_grid grid  in
   let config = config_of_grid ids grid in
-  let max_key = List.fold_left max 0 grid.obs  in
-  let tbl = Graph_closure.A.make (max_key+1) false in
   let init_fun i =
     try
       List.rev (Mods.IntSet.elements (Mods.IntSet.remove

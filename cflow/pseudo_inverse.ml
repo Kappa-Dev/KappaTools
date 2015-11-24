@@ -461,15 +461,6 @@
          (fun ((a,_),b) map ->
           let pid = Bound_site(a,b) in add_state pid (false,Some Free) map)
          unambiguous_side_effects merged_map in
-     let pid_list = 
-       PredicateMap.fold
-         (fun pid (test,action) list -> 
-          match action 
-          with 
-          | None | Some Undefined -> list 
-          | Some (Present | Free | Internal_state_is _ | Bound_to _) -> pid::list)
-         merged_map []
-     in 
      let nsid = blackboard.nsteps + 1 in 
      let _ = A.set blackboard.event nsid (Some step) in 
      let n_modifications,pre_steps_by_column,init_state,list  = 
@@ -569,28 +560,4 @@
     in 
     error,(list,n_cut)
     
- (* let do_not_cut parameter handler error list = 
-    let n = List.length list in 
-    let blackboard = init_blackboard n in 
-    let error,blackboard,n_cut = 
-      List.fold_left 
-        (fun (error,blackboard,n_cut) step ->  
-          let error,blackboard = add_step parameter handler error step blackboard in 
-          error,blackboard,n_cut)
-        (error,blackboard,0)
-        list 
-    in 
-    let list = 
-      let rec aux k list = 
-        if k=(-1) 
-        then list
-        else 
-          match A.get blackboard.event k 
-          with 
-            | Some a -> 
-              aux (k-1) (a::list) 
-            | None -> aux (k-1) list 
-      in aux (blackboard.nsteps) [] 
-    in 
-    error,list,n_cut*)
     end:Cut_pseudo_inverse)
