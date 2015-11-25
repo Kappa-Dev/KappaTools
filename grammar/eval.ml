@@ -13,7 +13,7 @@ let name_and_purify_rule (id,acc) (label_opt,(r,r_pos)) =
   let id',(label,_ as label_pos) = match label_opt with
     | None ->
        succ id, Location.dummy_annot
-		  (Format.asprintf "r%i: %a" id Expr.print_ast_rule r)
+		  (Format.asprintf "r%i: %a" id Ast.print_ast_rule r)
     | Some (lab,pos) -> id,(lab,pos) in
   let acc',k_def =
     if Expr.ast_alg_has_mix r.k_def then
@@ -432,7 +432,7 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 	       raise (ExceptionDefn.Malformed_Decl
 			(Format.asprintf
 			   "initial mixture %a is partially defined"
-			   Expr.print_ast_mix ast,mix_pos)) in
+			   Ast.print_ast_mix ast,mix_pos)) in
 	  domain'',state'
        | INIT_TOK (alg, (tk_nme,pos_tk)) ->
 	  let fake_rule =

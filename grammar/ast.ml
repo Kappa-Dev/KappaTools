@@ -190,3 +190,89 @@ let init_compil () =
   in
   res:={patterns=l_pat ; signatures=l_sig ; rules=l_rul ; init = l_ini ; observables = l_obs}
 *)
+
+let print_link pr_type pr_annot f = function
+  | FREE -> ()
+  | LNK_TYPE (p, a) -> Format.fprintf f "!%a.%a" pr_type p pr_type a
+  | LNK_ANY -> Format.fprintf f "?"
+  | LNK_SOME -> Format.fprintf f "!_"
+  | LNK_VALUE (i,a) -> Format.fprintf f "!%i%a" i pr_annot a
+
+let print_ast_link =
+  print_link (fun f (x,_) -> Format.pp_print_string f x) (fun _ () -> ())
+let print_ast_internal f l =
+  Pp.list Pp.empty (fun f (x,_) -> Format.fprintf f "~%s" x) f l
+
+let print_ast_port f p =
+  Format.fprintf f "%s%a%a" (fst p.port_nme)
+		 print_ast_internal p.port_int
+		 print_ast_link (fst p.port_lnk)
+
+let print_ast_agent f ((ag_na,_),l) =
+  Format.fprintf f "%s(%a)" ag_na
+		 (Pp.list (fun f -> Format.fprintf f ",") print_ast_port) l
+
+let print_ast_mix f m = Pp.list Pp.comma print_ast_agent f m
+
+let rec print_ast_alg f = function
+  | EMAX -> Format.fprintf f "[Emax]"
+  | PLOTNUM -> Format.fprintf f "[p]"
+  | TMAX -> Format.fprintf f "[Tmax]"
+  | CONST n -> Nbr.print f n
+  | OBS_VAR lab -> Format.fprintf f "'%s'" lab
+  | KAPPA_INSTANCE ast ->
+     Format.fprintf f "|%a|" print_ast_mix ast
+  | TOKEN_ID tk -> Format.fprintf f "|%s|" tk
+  | STATE_ALG_OP op -> Operator.print_state_alg_op f op
+  | BIN_ALG_OP (op, (a,_), (b,_)) ->
+     Format.fprintf f "(%a %a %a)"
+		    print_ast_alg a Operator.print_bin_alg_op op print_ast_alg b
+  |UN_ALG_OP (op, (a,_)) ->
+    Format.fprintf f "(%a %a)" Operator.print_un_alg_op op print_ast_alg a
+
+let print_tok f ((nb,_),(n,_)) = Format.fprintf f "%a:%s" print_ast_alg nb n
+let print_one_size tk f mix =
+  Format.fprintf
+    f "%a%t%a" print_ast_mix mix
+    (fun f -> match tk with [] -> () | _::_ -> Format.pp_print_string f " | ")
+    (Pp.list (fun f -> Format.pp_print_string f " + ") print_tok) tk
+let print_arrow f = function
+  | RAR -> Format.pp_print_string f "->"
+  | LRAR -> Format.pp_print_string f "<->"
+let print_raw_rate op f (def,_) =
+  Format.fprintf
+    f "%a%t" print_ast_alg def
+    (fun f ->
+     match op with None -> ()
+		 | Some (d,_) -> Format.fprintf f ", %a" print_ast_alg d)
+let print_rates un op f def =
+  Format.fprintf
+    f "%a%t" (print_raw_rate op) def
+    (fun f ->
+     match un with None -> ()
+		 | Some (d,o) -> Format.fprintf f " (%a)" (print_raw_rate o) d)
+let print_ast_rule f r =
+  Format.fprintf
+    f "@[<h>%a %a %a @@ %a@]"
+    (print_one_size r.rm_token) r.lhs
+    print_arrow r.arrow
+    (print_one_size r.add_token) r.rhs
+    (print_rates r.k_un r.k_op) r.k_def
+let print_ast_rule_no_rate ~reverse f r =
+    Format.fprintf
+    f "@[<h>%a -> %a@]"
+    (print_one_size r.rm_token) (if reverse then r.rhs else r.lhs)
+    (print_one_size r.add_token) (if reverse then r.lhs else r.rhs)
+
+let rec print_bool p_alg f = function
+  | TRUE -> Format.fprintf f "[true]"
+  | FALSE -> Format.fprintf f "[false]"
+  | BOOL_OP (op,(a,_), (b,_)) ->
+     Format.fprintf f "(%a %a %a)" (print_bool p_alg) a
+		    Operator.print_bool_op op (print_bool p_alg) b
+  | COMPARE_OP (op,(a,_), (b,_)) ->
+     Format.fprintf f "(%a %a %a)"
+		    p_alg a Operator.print_compare_op op p_alg b
+
+let print_ast_bool = print_bool print_ast_alg
+

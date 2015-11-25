@@ -135,14 +135,14 @@ let modification ?env f m =
 let perturbation ?env f pert =
   let aux f =
     Format.fprintf f "%a do %a"
-		   (Expr.print_bool (alg_expr ?env)) pert.Primitives.precondition
+		   (Ast.print_bool (alg_expr ?env)) pert.Primitives.precondition
 		   (Pp.list Pp.colon (modification ?env)) pert.Primitives.effect
   in
   match pert.Primitives.abort with
   | None -> Format.fprintf f "%%mod: %t" aux
   | Some ab ->
      Format.fprintf f "%%mod: repeat %t until %a" aux
-		    (Expr.print_bool (alg_expr ?env)) ab
+		    (Ast.print_bool (alg_expr ?env)) ab
 
 let env f env =
   Environment.print (fun env -> alg_expr ~env) (fun env -> elementary_rule ~env)

@@ -74,11 +74,11 @@ let print_ast_rule ?env f i =
        if i < 0 then
 	 match env.ast_rules.(pred (~- i)) with
 	 | (Some (na,_),_) -> Format.pp_print_string f (Ast.flip_label na)
-	 | (None,(r,_)) -> Expr.print_ast_rule_no_rate ~reverse:true f r
+	 | (None,(r,_)) -> Ast.print_ast_rule_no_rate ~reverse:true f r
        else
 	 match env.ast_rules.(pred i) with
 	 | (Some (na,_),_) -> Format.pp_print_string f na
-	 | (None,(r,_)) -> Expr.print_ast_rule_no_rate ~reverse:false f r
+	 | (None,(r,_)) -> Ast.print_ast_rule_no_rate ~reverse:false f r
 
 let print_agent ?env f i =
   match env with

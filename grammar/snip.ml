@@ -9,19 +9,13 @@ type rule_internal =
   | I_ANY_ERASED
   | I_VAL_CHANGED of int * int
   | I_VAL_ERASED of int
-type rule_link =
-  | L_ANY of switching
-  | L_FREE of switching
-  | L_SOME of switching
-  | L_TYPE of int * int * switching (** ty_id,p_id,switch *)
-  | L_VAL of int Location.annot * switching
 type rule_agent =
   { ra_type: int;
     ra_erased: bool;
-    ra_ports: rule_link array;
-    (*    ra_ports: ((int,int*int) Ast.link Location.annot * switching Location.annot) array;*)
+    ra_ports: ((int,int*int) Ast.link Location.annot * switching) array;
     ra_ints: rule_internal array;
-    ra_syntax: (rule_link array * rule_internal array) option;
+    ra_syntax: (((int,int*int) Ast.link Location.annot * switching) array *
+		  rule_internal array) option;
   }
 
 let print_rule_internal sigs ag_ty site f = function
@@ -46,20 +40,22 @@ let print_switching f = function
   | Maintained -> ()
   | Erased -> Format.fprintf f "--"
 
-let print_rule_link f = function
-  | L_ANY s ->
-     Format.fprintf f "?%a" print_switching s
-  | L_FREE s -> Format.fprintf f "%a" print_switching s
-  | L_SOME s -> Format.fprintf f "!_%a" print_switching s
-  | L_TYPE (ag,p,s) -> Format.fprintf f "!%i.%i%a"
-				      p ag
-				      print_switching s
-  | L_VAL ((i,_),s) -> Format.fprintf f "!%i%a" i print_switching s
+let print_rule_link f ((e,_),s) =
+  Format.fprintf
+    f "%a%a"
+    (Ast.print_link Format.pp_print_int
+		    (fun f (s,a) -> Format.fprintf f "(* %i.%i *)"s a))
+    e
+    print_switching s
 
 let print_rule_intf sigs ag_ty f (ports,ints) =
   let rec aux empty i =
     if i < Array.length ports then
-      if (ports.(i) <> L_ANY Maintained || ints.(i) <> I_ANY) then
+      if (match ports.(i) with
+	  | (Ast.LNK_ANY, _), Maintained -> false
+	  | ((Ast.LNK_ANY, _), (Erased | Freed | Linked _) |
+	     ((Ast.LNK_SOME | Ast.FREE | Ast.LNK_TYPE _ | Ast.LNK_VALUE _),_), _)->
+	     ints.(i) <> I_ANY) then
 	let () = Format.fprintf
 		   f "%t%a%a%a" (if empty then Pp.empty else Pp.comma)
 		   (Signature.print_site sigs ag_ty) i
@@ -76,10 +72,10 @@ let print_rule_agent sigs f ag =
 let print_rule_mixture sigs f mix =
   Pp.list Pp.comma (print_rule_agent sigs) f mix
 
-let build_l_type sigs dst_ty dst_p switch =
+let build_l_type sigs pos dst_ty dst_p switch =
   let ty_id = Signature.num_of_agent dst_ty sigs in
   let p_id = Signature.id_of_site dst_ty dst_p sigs in
-  L_TYPE (ty_id,p_id,switch)
+  ((Ast.LNK_TYPE (p_id,ty_id),pos),switch)
 
 let link_occurence_failure key pos =
   raise (ExceptionDefn.Internal_Error
@@ -102,7 +98,7 @@ let annotate_dropped_agent sigs ((agent_name, _ as ag_ty),intf) =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
-  let ports = Array.make arity (L_ANY Erased) in
+  let ports = Array.make arity (Location.dummy_annot Ast.LNK_ANY, Erased) in
   let internals =
     Array.init arity
                (fun i ->
@@ -114,7 +110,7 @@ let annotate_dropped_agent sigs ((agent_name, _ as ag_ty),intf) =
        let p_na = p.Ast.port_nme in
        let p_id = Signature.num_of_site ~agent_name p_na sign in
        let () =
-	 if ports.(p_id) <> L_ANY Erased ||
+	 if ports.(p_id) <> (Location.dummy_annot Ast.LNK_ANY, Erased) ||
 	      match Signature.default_internal_state ag_id p_id sigs with
 	      | None -> internals.(p_id) <> I_ANY
 	      | Some _ -> internals.(p_id) <> I_ANY_ERASED
@@ -127,8 +123,8 @@ let annotate_dropped_agent sigs ((agent_name, _ as ag_ty),intf) =
 	      I_VAL_ERASED (Signature.num_of_internal_state p_id va sign)
 	 | _ :: (_, pos) :: _ -> internal_state_failure pos in
        match p.Ast.port_lnk with
-       | (Ast.LNK_ANY, _) -> ports.(p_id) <- L_ANY Erased
-       | (Ast.LNK_SOME, _) ->
+       | (Ast.LNK_ANY, pos) -> ports.(p_id) <- ((Ast.LNK_ANY,pos), Erased)
+       | (Ast.LNK_SOME, pos_lnk) ->
 	  let (na,pos) = p.Ast.port_nme in
 	  let () =
 	    ExceptionDefn.warning
@@ -137,8 +133,8 @@ let annotate_dropped_agent sigs ((agent_name, _ as ag_ty),intf) =
 	       Format.fprintf
 		 f "breaking a semi-link on site '%s' will induce a side effect"
 		 na) in
-	  ports.(p_id) <- L_SOME Erased
-       | (Ast.LNK_TYPE (dst_p, dst_ty),_) ->
+	  ports.(p_id) <- ((Ast.LNK_SOME,pos_lnk), Erased)
+       | (Ast.LNK_TYPE (dst_p, dst_ty),pos_lnk) ->
 	  let (na,pos) = p.Ast.port_nme in
 	  let () =
 	    ExceptionDefn.warning
@@ -147,9 +143,10 @@ let annotate_dropped_agent sigs ((agent_name, _ as ag_ty),intf) =
 	       Format.fprintf
 		 f "breaking a semi-link on site '%s' will induce a side effect"
 		 na) in
-	  ports.(p_id) <- build_l_type sigs dst_ty dst_p Erased
-       | (Ast.LNK_VALUE (i,()), pos) -> ports.(p_id) <- L_VAL ((i,pos),Erased)
-       | (Ast.FREE, _) -> ports.(p_id) <- L_FREE Erased
+	  ports.(p_id) <- build_l_type sigs pos_lnk dst_ty dst_p Erased
+       | (Ast.LNK_VALUE (i,()), pos) ->
+	  ports.(p_id) <- ((Ast.LNK_VALUE (i,(-1,-1)),pos),Erased)
+       | (Ast.FREE, pos) -> ports.(p_id) <- (Ast.FREE,pos), Erased
       ) intf in
   { ra_type = ag_id; ra_ports = ports; ra_ints = internals; ra_erased = true;
     ra_syntax = Some (Array.copy ports, Array.copy internals);}
@@ -192,20 +189,21 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
-  let ports = Array.make arity (L_ANY Maintained) in
+  let ports = Array.make arity (Location.dummy_annot Ast.LNK_ANY, Maintained) in
   let internals = Array.make arity I_ANY in
   let register_port_modif p_id lnk1 p' =
     match lnk1,p'.Ast.port_lnk with
     | (Ast.LNK_ANY,_), (Ast.LNK_ANY,_) -> ()
-    | (Ast.LNK_SOME,_), (Ast.LNK_SOME,_) -> ports.(p_id) <- L_SOME Maintained
-    | (Ast.LNK_TYPE ((dst_p'',_ as dst_p),(dst_ty'',_ as dst_ty)),_),
+    | (Ast.LNK_SOME,pos), (Ast.LNK_SOME,_) ->
+       ports.(p_id) <- ((Ast.LNK_SOME,pos), Maintained)
+    | (Ast.LNK_TYPE ((dst_p'',_ as dst_p),(dst_ty'',_ as dst_ty)),pos),
       (Ast.LNK_TYPE ((dst_p',_),(dst_ty',_)),_)
 	 when dst_p'' = dst_p' && dst_ty'' = dst_ty' ->
-       ports.(p_id) <- build_l_type sigs dst_ty dst_p Maintained
+       ports.(p_id) <- build_l_type sigs pos dst_ty dst_p Maintained
     | _, (Ast.LNK_ANY,_ | Ast.LNK_SOME,_ | Ast.LNK_TYPE _,_) ->
        site_occurence_failure agent_name p'.Ast.port_nme
-    | (Ast.LNK_ANY,_), (Ast.FREE,_) -> ports.(p_id) <- L_ANY Freed
-    | (Ast.LNK_SOME,_), (Ast.FREE,_) ->
+    | (Ast.LNK_ANY,pos), (Ast.FREE,_) -> ports.(p_id) <- ((Ast.LNK_ANY,pos), Freed)
+    | (Ast.LNK_SOME,pos_lnk), (Ast.FREE,_) ->
        let (na,pos) = p'.Ast.port_nme in
        let () =
 	 ExceptionDefn.warning
@@ -214,8 +212,8 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
 	    Format.fprintf
 	      f "breaking a semi-link on site '%s' will induce a side effect"
 	      na) in
-       ports.(p_id) <- L_SOME Freed
-    | (Ast.LNK_TYPE (dst_p,dst_ty),_), (Ast.FREE,_) ->
+       ports.(p_id) <- ((Ast.LNK_SOME,pos_lnk), Freed)
+    | (Ast.LNK_TYPE (dst_p,dst_ty),pos_lnk), (Ast.FREE,_) ->
        let (na,pos) = p'.Ast.port_nme in
        let () =
 	 ExceptionDefn.warning
@@ -224,13 +222,14 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
 	    Format.fprintf
 	      f "breaking a semi-link on site '%s' will induce a side effect"
 	      na) in
-       ports.(p_id) <- build_l_type sigs dst_ty dst_p Freed
-    | (Ast.FREE,_), (Ast.FREE,_) -> ports.(p_id) <- L_FREE Maintained
+       ports.(p_id) <- build_l_type sigs pos_lnk dst_ty dst_p Freed
+    | (Ast.FREE,pos), (Ast.FREE,_) ->
+       ports.(p_id) <- ((Ast.FREE,pos), Maintained)
     | (Ast.LNK_VALUE (i,()),pos), (Ast.FREE,_) ->
-       ports.(p_id) <- L_VAL ((i,pos),Freed)
-    | (Ast.LNK_ANY,_), (Ast.LNK_VALUE (i,()),pos) ->
-       ports.(p_id) <- L_ANY (Linked (i,pos))
-    | (Ast.LNK_SOME,_), (Ast.LNK_VALUE (i,()),pos') ->
+       ports.(p_id) <- ((Ast.LNK_VALUE (i,(-1,-1)),pos),Freed)
+    | (Ast.LNK_ANY,pos_lnk), (Ast.LNK_VALUE (i,()),pos) ->
+       ports.(p_id) <- ((Ast.LNK_ANY,pos_lnk), Linked (i,pos))
+    | (Ast.LNK_SOME,pos_lnk), (Ast.LNK_VALUE (i,()),pos') ->
        let (na,pos) = p'.Ast.port_nme in
        let () =
 	 ExceptionDefn.warning
@@ -239,8 +238,8 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
 	    Format.fprintf
 	      f "breaking a semi-link on site '%s' will induce a side effect"
 	      na) in
-       ports.(p_id) <- L_SOME (Linked (i,pos'))
-    | (Ast.LNK_TYPE (dst_p,dst_ty),_), (Ast.LNK_VALUE (i,()),pos') ->
+       ports.(p_id) <- ((Ast.LNK_SOME,pos_lnk), Linked (i,pos'))
+    | (Ast.LNK_TYPE (dst_p,dst_ty),pos_lnk), (Ast.LNK_VALUE (i,()),pos') ->
        let (na,pos) = p'.Ast.port_nme in
        let () =
 	 ExceptionDefn.warning
@@ -249,11 +248,11 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
 	    Format.fprintf
 	      f "breaking a semi-link on site '%s' will induce a side effect"
 	      na) in
-       ports.(p_id) <- build_l_type sigs dst_ty dst_p (Linked (i,pos'))
-    | (Ast.FREE,_), (Ast.LNK_VALUE (i,()),pos) ->
-       ports.(p_id) <- L_FREE (Linked (i,pos))
+       ports.(p_id) <- build_l_type sigs pos_lnk dst_ty dst_p (Linked (i,pos'))
+    | (Ast.FREE,pos_lnk), (Ast.LNK_VALUE (i,()),pos) ->
+       ports.(p_id) <- ((Ast.FREE,pos_lnk), Linked (i,pos))
     | (Ast.LNK_VALUE (i,()),pos_i), (Ast.LNK_VALUE (j,()),pos_j) ->
-       ports.(p_id) <- L_VAL ((i,pos_i),Linked (j,pos_j)) in
+       ports.(p_id) <- ((Ast.LNK_VALUE (i,(-1,-1)),pos_i),Linked (j,pos_j)) in
   let register_internal_modif p_id int1 p' =
     match int1,p'.Ast.port_int with
     | [], [] -> ()
@@ -292,7 +291,8 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
        let p_na = p.Ast.port_nme in
        let p_id = Signature.num_of_site ~agent_name p_na sign in
        let () =
-	 if ports.(p_id) <> L_ANY Maintained || internals.(p_id) <> I_ANY
+	 if ports.(p_id) <> (Location.dummy_annot Ast.LNK_ANY, Maintained)
+	    || internals.(p_id) <> I_ANY
 	 then site_occurence_failure agent_name p_na in
        let p',rp' = find_in_rp p_na rp in
        let () = register_port_modif p_id p.Ast.port_lnk p' in
@@ -351,47 +351,55 @@ let find_implicit_infos sigs contact_map ags =
     then List.map (fun (f,a,c) -> (f,ports,a,c)) (aux_ags max_id ag_tail)
     else
      match ports.(i) with
-     | L_TYPE (a,p,s) ->
+     | (Ast.LNK_TYPE (a,p),_),s ->
 	List.map (fun (free_id,ports,ags,cor) ->
 		  let () =
-		    ports.(i) <- L_VAL (Location.dummy_annot free_id,old_switch free_id s) in
+		    ports.(i) <-
+		      (Location.dummy_annot (Ast.LNK_VALUE (free_id,(-1,-1))),
+		       old_switch free_id s) in
 		  (succ free_id, ports, ags, (free_id,(a,p),new_switch free_id s)::cor))
 		 (aux_one ag_tail ty_id (max_s max_id s) ports (succ i))
-     | L_SOME s ->
+     | (Ast.LNK_SOME,_), s ->
 	Tools.list_map_flatten
 	  (fun (free_id,ports,ags,cor) ->
 	   List.map (fun x ->
 		     let ports' = Array.copy ports in
 		     let () =
-		       ports'.(i) <- L_VAL (Location.dummy_annot free_id,old_switch free_id s) in
+		       ports'.(i) <-
+			 (Location.dummy_annot (Ast.LNK_VALUE (free_id,(-1,-1))),
+			  old_switch free_id s) in
 		     (succ free_id, ports', ags, (free_id,x,new_switch free_id s)::cor))
 		    (ports_from_contact_map sigs contact_map ty_id i))
 	  (aux_one ag_tail ty_id (max_s max_id s) ports (succ i))
-     | L_VAL ((j,_),s) ->
+     | (Ast.LNK_VALUE (j,_),_),s ->
 	  aux_one ag_tail ty_id (max_s (max j max_id) s) ports (succ i)
-     | L_FREE Maintained ->
+     | (Ast.FREE, pos), Maintained ->
 	let () = (* Do not make test is being free is the only possibility *)
 	  match ports_from_contact_map sigs contact_map ty_id i with
-	  | [] -> ports.(i) <- L_ANY Maintained
+	  | [] -> ports.(i) <- (Ast.LNK_ANY,pos), Maintained
 	  | _ :: _ -> () in
 	aux_one ag_tail ty_id max_id ports (succ i)
-     | L_FREE (Erased | Linked _ | Freed as s) -> aux_one ag_tail ty_id (max_s max_id s) ports (succ i)
-     | L_ANY Maintained -> aux_one ag_tail ty_id max_id ports (succ i)
-     | L_ANY (Erased | Linked _ | Freed as s) ->
+     | (Ast.FREE, _), (Erased | Linked _ | Freed as s) -> aux_one ag_tail ty_id (max_s max_id s) ports (succ i)
+     | (Ast.LNK_ANY,_), Maintained -> aux_one ag_tail ty_id max_id ports (succ i)
+     | (Ast.LNK_ANY,pos), (Erased | Linked _ | Freed as s) ->
 	match ports_from_contact_map sigs contact_map ty_id i with
 	| [] when s = Freed ->
 	   (* Do not make test is being free is the only possibility *)
-	   let () = ports.(i) <- L_ANY Maintained in
+	   let () = ports.(i) <- (Ast.LNK_ANY,pos), Maintained in
 	   aux_one ag_tail ty_id max_id ports (succ i)
 	| pfcm ->
 	   Tools.list_map_flatten
 	     (fun (free_id,ports,ags,cor) ->
-	      let () = ports.(i) <- L_FREE (if s = Freed then Maintained else s) in
+	      let () = ports.(i) <-
+			 (Location.dummy_annot Ast.FREE,
+			  if s = Freed then Maintained else s) in
 	      (free_id, ports, ags, cor) ::
 		List.map (fun x ->
 			  let ports' = Array.copy ports in
 			  let () =
-			    ports'.(i) <- L_VAL (Location.dummy_annot free_id,old_switch free_id s) in
+			    ports'.(i) <-
+			      (Location.dummy_annot (Ast.LNK_VALUE (free_id,(-1,-1))),
+			       old_switch free_id s) in
 			  (succ free_id, ports', ags, (free_id,x,new_switch free_id s)::cor))
 			 pfcm)
 	     (aux_one ag_tail ty_id (max_s max_id s) ports (succ i))
@@ -413,14 +421,15 @@ let complete_with_candidate ag id todo p_id p_switch =
     (fun i acc port ->
      if i <> p_id then acc else
        match port with
-       | L_ANY s ->
+       | (Ast.LNK_ANY,_), s ->
 	  assert (s = Maintained);
 	  let ports' = Array.copy ag.ra_ports in
-	  let () = ports'.(i) <- L_VAL (Location.dummy_annot id,p_switch) in
+	  let () = ports'.(i) <-
+		     (Location.dummy_annot (Ast.LNK_VALUE (id,(-1,-1))),p_switch) in
 	  ({ ra_type = ag.ra_type; ra_ports = ports'; ra_ints = ag.ra_ints;
 	     ra_erased = ag.ra_erased; ra_syntax = ag.ra_syntax;}, todo)
 	  :: acc
-       | L_VAL ((k,_),s) when k > id ->
+       | (Ast.LNK_VALUE (k,_),_),s when k > id ->
 	  begin
 	    match
 	      List.partition
@@ -428,20 +437,22 @@ let complete_with_candidate ag id todo p_id p_switch =
 		 j=k && i=p' && a'= ag.ra_type && sw' = p_switch) todo with
 	    | [ _ ], todo' ->
 	       let ports' = Array.copy ag.ra_ports in
-	       let () = ports'.(i) <- L_VAL (Location.dummy_annot id,s) in
+	       let () = ports'.(i) <-
+			  (Location.dummy_annot (Ast.LNK_VALUE (id,(-1,-1))),s) in
 	       ({ ra_type = ag.ra_type; ra_ports = ports'; ra_ints = ag.ra_ints;
 		  ra_erased = ag.ra_erased; ra_syntax = ag.ra_syntax;},
 		todo') :: acc
 	    |_ -> acc
 	  end
-       | (L_VAL _ | L_TYPE _ | L_FREE _ | L_SOME _) -> acc
+       | ((Ast.LNK_VALUE _ | Ast.LNK_TYPE _ | Ast.FREE | Ast.LNK_SOME),_), _ -> acc
     ) [] ag.ra_ports
 
 let new_agent_with_one_link sigs ty_id port link switch =
   let arity = Signature.arity sigs ty_id in
-  let ports = Array.make arity (L_ANY Maintained) in
+  let ports = Array.make arity (Location.dummy_annot Ast.LNK_ANY, Maintained) in
   let internals = Array.make arity I_ANY in
-  let () = ports.(port) <- L_VAL (Location.dummy_annot link,switch) in
+  let () = ports.(port) <-
+	     (Location.dummy_annot (Ast.LNK_VALUE (link,(-1,-1))),switch) in
   { ra_type = ty_id; ra_ports = ports; ra_ints = internals;
     ra_erased = false; ra_syntax = None;}
 
@@ -467,8 +478,9 @@ let add_implicit_infos sigs l =
   in aux [] l
 
 let is_linked_on_port me i id = function
-  | L_VAL ((j,_),_) when i = j -> id <> me
-  | (L_VAL _ | L_FREE _ | L_TYPE _ | L_ANY _ | L_SOME _) -> false
+  | (Ast.LNK_VALUE (j,_),_),_ when i = j -> id <> me
+  | ((Ast.LNK_VALUE _ | Ast.FREE | Ast.LNK_TYPE _ |
+      Ast.LNK_ANY | Ast.LNK_SOME),_),_ -> false
 
 let is_linked_on i ag =
   Tools.array_filter (is_linked_on_port (-1) i) ag.ra_ports <> []
@@ -564,9 +576,9 @@ let add_side_site side_sites bt pl s = function
   | (Freed | Linked _ | Erased) -> ((pl,s),bt)::side_sites
   | Maintained -> side_sites
 let add_freed_side_effect side_effects pl s = function
-  | L_VAL (_,Freed) -> (pl,s)::side_effects
-  | L_VAL (_,(Maintained | Erased | Linked _))
-  | L_FREE _ | L_ANY _ | L_SOME _ | L_TYPE _ -> side_effects
+  | (Ast.LNK_VALUE _,_),Freed -> (pl,s)::side_effects
+  | (Ast.LNK_VALUE _,_),(Maintained | Erased | Linked _)
+  | ((Ast.FREE | Ast.LNK_ANY | Ast.LNK_SOME | Ast.LNK_TYPE _),_),_ -> side_effects
 let add_extra_side_effects side_effects place refined =
   let rec aux side_effects site_id =
     if site_id < 0 then side_effects
@@ -609,7 +621,7 @@ let make_instantiation
 	      actions in
 	 let tests'',actions'',side_sites',side_effects',links' =
 	   match ports.(site_id) with
-	   | L_ANY s ->
+	   | (Ast.LNK_ANY,_), s ->
 	      let side_effects' =
 		match s with
 		| Maintained ->
@@ -621,17 +633,17 @@ let make_instantiation
 			    place site_id s,
 	      side_effects',
 	      links
-	   | L_FREE s ->
+	   | (Ast.FREE,_), s ->
 	      (Instantiation.Is_Free (place,site_id) :: tests'),
 	      add_instantiation_free actions' place site_id s,side_sites,
 	      side_effects, links
-	   | L_SOME s ->
+	   | (Ast.LNK_SOME,_), s ->
 	      Instantiation.Is_Bound (place,site_id) :: tests',
 	      add_instantiation_free actions' place site_id s,
 	      add_side_site side_sites Instantiation.BOUND
 			    place site_id s,
 	      side_effects, links
-	   | L_TYPE (a,b,s) ->
+	   | (Ast.LNK_TYPE (a,b),_),s ->
 	      Instantiation.Has_Binding_type ((place,site_id),(a,b))
 	      :: tests',
 	      add_instantiation_free actions' place site_id s,
@@ -639,7 +651,7 @@ let make_instantiation
 		side_sites (Instantiation.BOUND_TYPE (a,b))
 			    place site_id s,
 	      side_effects, links
-	   | L_VAL ((i,_),s) ->
+	   | (Ast.LNK_VALUE (i,_),_),s ->
 	      match IntMap.find_option i links with
 	      | Some x -> x :: tests',
 		add_instantiation_free actions' place site_id s,
@@ -694,19 +706,20 @@ let rec add_agents_in_cc sigs id wk registered_links (removed,added as transf)
 	      Connected_component.new_internal_state wk (node,site_id) i
 	 in
 	 match ag.ra_ports.(site_id) with
-	 | L_ANY Maintained ->
+	 | (Ast.LNK_ANY,_), Maintained ->
 	    handle_ports wk' r_l c_l transf l_t re acc (succ site_id)
-	 | L_FREE s ->
+	 | (Ast.FREE,_), s ->
 	    let wk'' = Connected_component.new_free wk' (node,site_id) in
 	    let transf',l_t' =
 	      define_full_transformation sigs transf l_t place site_id None s in
 	    handle_ports
 	      wk'' r_l c_l transf' l_t' re acc (succ site_id)
-	 | (L_SOME _ | L_TYPE _ | L_ANY ( Erased | Linked _ | Freed))->
+	 | ((Ast.LNK_SOME | Ast.LNK_TYPE _),_),_
+	 | ((Ast.LNK_ANY,_), ( Erased | Linked _ | Freed))->
 	    raise (ExceptionDefn.Internal_Error
 		     (Location.dummy_annot
 			"Try to create the connected components of an ambiguous mixture."))
-	 | L_VAL ((i,pos),s) ->
+	 | (Ast.LNK_VALUE (i,_),pos),s ->
 	    match IntMap.find_option i r_l with
 	    | Some (node',site' as dst) ->
 	      let dst_place = Agent_place.Existing (node',id),site' in
