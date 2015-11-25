@@ -1,0 +1,49 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa abc.ka --debugging-mode --output-directory output
+#
+#This file contains the description of the influence map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+digraph G{ 
+node [shape=box, style=filled, fillcolor=lightskyblue];
+"a.b" ; 
+"a.b_op" ; 
+"ab.c" ; 
+"mod x1" ; 
+"a.c" ; 
+"mod x2" ; 
+node [shape=ellipse, style=filled, fillcolor=palegreen3];
+"on_rate" ; 
+"off_rate" ; 
+"mod_rate" ; 
+"AB" ; 
+"Cuu" ; 
+"Cpu" ; 
+"Cpp" ; 
+"n_ab" ; 
+"n_c" ; 
+edge [color=green, arrowhead=normal];
+"a.b" -> "a.b_op"[label ="[0->0];[1->1]"] ; 
+"a.b" -> "ab.c"[label ="[0->0]"] ; 
+"a.b" -> "AB"[label ="[0->0]"] ; 
+"a.b_op" -> "a.b"[label ="[0->0];[1->1]"] ; 
+"a.b_op" -> "a.c"[label ="[0->0]"] ; 
+"a.b_op" -> "mod x2"[label ="[0->0]"] ; 
+"ab.c" -> "mod x1"[label ="[0->1];[1->0]"] ; 
+"mod x1" -> "ab.c"[label ="[1->0]"] ; 
+"mod x1" -> "a.c"[label ="[0->1];[1->0]"] ; 
+"mod x1" -> "mod x2"[label ="[0->1]"] ; 
+"mod x1" -> "Cpu"[label ="[0->0]"] ; 
+"mod x1" -> "Cpp"[label ="[0->0]"] ; 
+"a.c" -> "mod x2"[label ="[0->0];[1->1]"] ; 
+"mod x2" -> "a.c"[label ="[0->0]"] ; 
+"mod x2" -> "Cpp"[label ="[1->0]"] ; 
+edge [color=red, arrowhead=tee];
+"a.b" -> "a.c"[label ="[0->0]"] ; 
+"a.b" -> "mod x2"[label ="[0->0]"] ; 
+"a.b_op" -> "ab.c"[label ="[0->0]"] ; 
+"a.b_op" -> "AB"[label ="[0->0]"] ; 
+"mod x1" -> "Cuu"[label ="[0->0]"] ; 
+"mod x2" -> "Cpu"[label ="[1->0]"] ; 
+}
