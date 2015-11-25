@@ -117,7 +117,7 @@ let scan_mixture_in_var bool parameter error handler var_id mixture quarks =
         match agent 
         with 
         | Cckappa_sig.Ghost -> error,(agent_var,site_var)
-        | Cckappa_sig.Agent agent -> 
+	| Cckappa_sig.Dead_agent (agent,_,_) | Cckappa_sig.Agent agent -> 
           let error,kasim_id = Quark_type.Labels.label_of_int parameter error agent.Cckappa_sig.agent_kasim_id in 
           let agent_type = agent.Cckappa_sig.agent_name in 
           let error,agent_var = add_var parameter error var_id kasim_id agent_type agent_var in
@@ -194,7 +194,7 @@ let scan_rule parameter error handler rule_id rule quarks =
          (fun parameter error agent_id agent (agent_test,site_test) -> 
             match agent with 
               | Cckappa_sig.Ghost -> error,(agent_test,site_test)
-              | Cckappa_sig.Agent agent -> 
+	      | Cckappa_sig.Dead_agent (agent,_,_) | Cckappa_sig.Agent agent -> 
                   let error,kasim_id = Quark_type.Labels.label_of_int parameter error agent.Cckappa_sig.agent_kasim_id in 
                   let agent_type = agent.Cckappa_sig.agent_name in 
                   let error,agent_test = add_agent parameter error rule_id kasim_id agent_type agent_test in 
@@ -228,7 +228,7 @@ let scan_rule parameter error handler rule_id rule quarks =
               match agent with 
                | None -> warn parameter error (Some "line 111") Exit agent_modif_plus  
                | Some Cckappa_sig.Ghost -> error,agent_modif_plus
-               | Some Cckappa_sig.Agent agent ->   
+	       | Some Cckappa_sig.Dead_agent (agent,_,_) | Some Cckappa_sig.Agent agent ->   
                    let error,kasim_id = Quark_type.Labels.label_of_int parameter error (agent.Cckappa_sig.agent_kasim_id) in 
                      add_agent parameter error rule_id kasim_id agent_type agent_modif_plus)
         (error,agent_modif_plus)

@@ -59,6 +59,7 @@ let check parameters error handler mixture1 mixture2 (i,j) =
 	   match ag1,ag2
 	   with 
 	   | Cckappa_sig.Ghost,_| _,Cckappa_sig.Ghost -> warn parameters error (Some "Should not scan ghost agents...") Exit (true,(to_do,already_done))
+	   | Cckappa_sig.Dead_agent _,_ | _,Cckappa_sig.Dead_agent _ -> error,(false,([],(Quark_type.IntSetMap.Map.empty,Quark_type.IntSetMap.Map.empty)))
 	   | Cckappa_sig.Agent ag1 , Cckappa_sig.Agent ag2 ->
 	      begin 
 		let bonds1 =

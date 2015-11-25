@@ -133,7 +133,8 @@ module Address_map_and_set = Map_wrapper.Make( SetMap.Make
 type agent = 
    | Ghost
    | Agent of state_index interval interface proper_agent                               
-
+   | Dead_agent of state_index interval interface proper_agent * (site_name * (string, unit) Ckappa_sig.site_type) list  * (site_name * Ckappa_sig.link) list 
+			  
 type agent_sig = state_index list interface proper_agent 
  
 type views = agent Int_storage.Quick_Nearly_inf_Imperatif.t 

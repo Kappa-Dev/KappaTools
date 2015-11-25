@@ -22,7 +22,30 @@ let string_of_port port = "[state_min:"^(string_of_int port.Cckappa_sig.site_sta
 
 let print_agent parameters error handler agent =
      match agent with 
-    | Cckappa_sig.Agent agent -> 
+     | Cckappa_sig.Dead_agent (agent,l,l') ->
+	let parameters = Remanent_parameters.update_prefix parameters ("agent_type_"^(string_of_int agent.Cckappa_sig.agent_name)^":") in
+	let error =
+	  Cckappa_sig.Site_map_and_set.Map.fold
+            (fun a b error ->  
+             let () = Printf.fprintf (Remanent_parameters.get_log parameters) "%ssite_type_%i->state:%s\n" (Remanent_parameters.get_prefix parameters) a (string_of_port b)  in 
+             error)
+            agent.Cckappa_sig.agent_interface
+            error in
+	let error = List.fold_left
+		  (fun error (s,_) -> let () = Printf.fprintf (Remanent_parameters.get_log parameters) "%sdead site type %i\n" (Remanent_parameters.get_prefix parameters) s in error)
+		  error
+		  l
+	in
+	let error =
+	  List.fold_left
+	    (fun error (s,_) ->
+	     let () = Printf.fprintf (Remanent_parameters.get_log parameters) "%sdead site type %i\n" (Remanent_parameters.get_prefix parameters) s in
+	     error)
+	    error
+	    l'
+	in
+	error 
+     | Cckappa_sig.Agent agent -> 
        let parameters = Remanent_parameters.update_prefix parameters ("agent_type_"^(string_of_int agent.Cckappa_sig.agent_name)^":") in
        Cckappa_sig.Site_map_and_set.Map.fold
          (fun a b error ->  

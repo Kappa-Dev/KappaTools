@@ -57,7 +57,7 @@ let compute_contact_map parameter error handler rule =
           (fun parameter error agent_id agent store_result ->
             match agent with
             | Ghost -> error, store_result
-            | Agent agent ->
+            | Dead_agent (agent,_,_) | Agent agent ->
               let agent_type = agent.agent_name in
               let error, store_result =
                 Site_map_and_set.Map.fold

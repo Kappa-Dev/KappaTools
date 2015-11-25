@@ -31,6 +31,7 @@ let collect_wl_creation parameter error rule_id rule store_result =
     match agent with
       | None -> warn parameter error (Some "line 131") Exit store_result
       | Some Ghost -> error, store_result
+      | Some Dead_agent (agent,_,_) 
       | Some Agent agent ->
 	let error, wl = IntWL.push parameter error rule_id store_result in
         error, wl

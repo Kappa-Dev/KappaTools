@@ -114,6 +114,7 @@ let collect_test_restriction_map parameter error rule_id rule store_remanent_tri
     (fun parameter error agent_id agent triple_list store_result ->
       match agent with
       | Ghost -> error, store_result
+      | Dead_agent (agent,_,_) 		  
       | Agent agent ->
         let agent_type = agent.agent_name in
         (*-----------------------------------------------------------------*)
@@ -185,8 +186,8 @@ let collect_creation_restriction_map parameter error rule_id rule store_remanent
       List.fold_left (fun (error, store_result) (agent_id, agent_type) ->
         let error, agent = AgentMap.get parameter error agent_id rule.rule_rhs.views in
         match agent with
-        | None -> warn parameter error (Some "168") Exit store_result
-        | Some Ghost -> error, store_result
+        | Some Dead_agent _ | None -> warn parameter error (Some "168") Exit store_result
+	| Some Ghost -> error, store_result
         | Some Agent agent ->
           if agent_type' = agent_type 
           then
