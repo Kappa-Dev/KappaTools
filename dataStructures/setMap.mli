@@ -213,3 +213,15 @@ g:
  *)
 																       
 																       
+
+module type Projection2 = sig
+    type elt_a
+    type elt_b
+    type elt_c
+    type 'a map_a
+    type 'a map_b
+    type 'a map_c
+    val proj2: (elt_a -> elt_b) -> (elt_a -> elt_c) -> 'a -> ('a -> 'a -> 'a) -> 'a map_a -> 'a map_c map_b
+  end
+
+module Proj2(A:S)(B:S)(C:S): Projection2 with type elt_a = A.elt and type elt_b = B.elt and type 'a map_a = 'a A.Map.t and type 'a map_b = 'a B.Map.t and type elt_c = C.elt and type 'a map_c = 'a C.Map.t

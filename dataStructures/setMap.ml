@@ -1585,3 +1585,46 @@ g:
   1:2,3,6,7,
  *)
  *)
+
+module type Projection2 = sig
+    type elt_a
+    type elt_b
+    type elt_c
+    type 'a map_a
+    type 'a map_b
+    type 'a map_c
+    val proj2: (elt_a -> elt_b) -> (elt_a -> elt_c) -> 'a -> ('a -> 'a -> 'a) -> 'a map_a -> 'a map_c map_b
+  end
+
+module Proj2(A:S)(B:S)(C:S) = 
+	   struct
+	     module MA=A.Map
+	     module MB=B.Map
+	     module MC=C.Map
+	     type elt_a = MA.elt
+	     type elt_b = MB.elt
+	     type elt_c = MC.elt
+	     type 'a map_a = 'a MA.t
+	     type 'a map_b = 'a MB.t 
+	     type 'a map_c = 'a MC.t 
+
+	     let proj2 f g identity_elt merge map =
+	       MA.fold
+		 (fun key_a data_a map_b ->
+		  let key_b = f key_a in
+		  let key_c = g key_a in 
+		  let submap = MB.find_default MC.empty key_b map_b in 
+		  let submap = 
+		    MC.add 
+		      key_c 
+		      (merge 
+			 (MC.find_default 
+			    identity_elt 
+			    key_c 
+			    submap) data_a) 
+		      submap 
+		  in 
+		  MB.add key_b submap map_b)
+		 map
+		 MB.empty
+	   end
