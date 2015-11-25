@@ -1,4 +1,1 @@
-File "side-effects.ka", line 6, characters 12-13:
-Warning: breaking a semi-link on site 'x' will induce a side effect
-File "side-effects.ka", line 7, characters 12-13:
-Warning: breaking a semi-link on site 'x' will induce a side effect
+README: 2: README: /home/feret/KaSim/bin/KaSim: not found

@@ -47,8 +47,8 @@ module type Internalized_mvbdu =
     val init: Remanent_parameters_sig.parameters -> unit 
     val is_init: unit -> bool 
     val equal: mvbdu -> mvbdu -> bool 
-    val mvbdu_false: mvbdu
-    val mvbdu_true:  mvbdu 
+    val mvbdu_false: unit -> mvbdu
+    val mvbdu_true:  unit -> mvbdu 
     val mvbdu_not: mvbdu -> mvbdu 
     val mvbdu_id:  mvbdu -> mvbdu 
     val mvbdu_unary_true: mvbdu -> mvbdu

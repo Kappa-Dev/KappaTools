@@ -1,8 +1,1 @@
-File "link_swapping_strong3.ka", line 6, characters 40-41:
-Warning: rule induces a link permutation on site 'y' of agent 'A'
-File "link_swapping_strong3.ka", line 6, characters 15-16:
-Warning: rule induces a link permutation on site 'x' of agent 'A'
-File "link_swapping_strong3.ka", line 6, characters 44-45:
-Warning: rule induces a link permutation on site 'x' of agent 'A'
-File "link_swapping_strong3.ka", line 6, characters 19-20:
-Warning: rule induces a link permutation on site 'y' of agent 'A'
+README: 2: README: /home/feret/KaSim/bin/KaSim: not found

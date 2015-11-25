@@ -716,10 +716,333 @@ let bdu_test remanent parameters =
       handler
       (Remanent_parameters.update_prefix parameters "Memoization tables:")
   in 
+  let handler_0 = handler in 
+
+  (* WRAPPED MVBDU ORIGINAL *)
+  let b0 = Mvbdu_wrapper.Mvbdu.is_init () in 
+  let error', handler = Mvbdu_wrapper.Mvbdu.init parameters error in 
+  let b1 = Mvbdu_wrapper.Mvbdu.is_init () in 
+  let error'',handler = Mvbdu_wrapper.Mvbdu.init parameters error' in 
+  let b2,b3 = error==error',error'==error'' in 
+  let error = error'' in 
+  let error,handler,bmvbdu_true0' = Mvbdu_wrapper.Mvbdu.mvbdu_true parameters handler error in 
+  let error, handler, bmvbdu_false0' = Mvbdu_wrapper.Mvbdu.mvbdu_false parameters handler error in 
+  let error, handler, bmvbdu_true1' = Mvbdu_wrapper.Mvbdu.mvbdu_unary_true parameters handler error bmvbdu_true0' in
+  let error, handler, bmvbdu_true2' = Mvbdu_wrapper.Mvbdu.mvbdu_unary_true parameters handler error bmvbdu_false0' in 
+  let error,handler,bmvbdu_false1' = Mvbdu_wrapper.Mvbdu.mvbdu_unary_false parameters handler error bmvbdu_true0' in 
+  let error,handler,bmvbdu_false2' = Mvbdu_wrapper.Mvbdu.mvbdu_unary_false parameters handler error bmvbdu_false0' in 
+  let error,handler,bmvbdu_false3' = Mvbdu_wrapper.Mvbdu.mvbdu_or parameters handler error bmvbdu_false0' bmvbdu_false0' in 
+  let error,handler,bmvbdu_true3' = Mvbdu_wrapper.Mvbdu.mvbdu_or parameters handler error bmvbdu_false0' bmvbdu_true0' in
+  let error,handler,bmvbdu_true4' = Mvbdu_wrapper.Mvbdu.mvbdu_or parameters handler error bmvbdu_true0' bmvbdu_true0' in
+  let error,handler,bmvbdu_true5' = Mvbdu_wrapper.Mvbdu.mvbdu_or parameters handler error bmvbdu_true0' bmvbdu_false0' in
+  let error,handler,bmvbdu_false4' = Mvbdu_wrapper.Mvbdu.mvbdu_and parameters handler error bmvbdu_false0' bmvbdu_false0' in 
+  let error,handler,bmvbdu_false5' = Mvbdu_wrapper.Mvbdu.mvbdu_and parameters handler error bmvbdu_false0' bmvbdu_true0' in
+  let error,handler,bmvbdu_true6' = Mvbdu_wrapper.Mvbdu.mvbdu_and parameters handler error bmvbdu_true0' bmvbdu_true0' in
+  let error,handler,bmvbdu_false6' = Mvbdu_wrapper.Mvbdu.mvbdu_and parameters handler error bmvbdu_true0' bmvbdu_false0' in
+  let error,handler,bmvbdu_false7' = Mvbdu_wrapper.Mvbdu.mvbdu_xor parameters handler error bmvbdu_false0' bmvbdu_false0' in 
+  let error,handler,bmvbdu_true7' = Mvbdu_wrapper.Mvbdu.mvbdu_xor parameters handler error bmvbdu_false0' bmvbdu_true0' in
+  let error,handler,bmvbdu_false8' = Mvbdu_wrapper.Mvbdu.mvbdu_xor parameters handler error bmvbdu_true0' bmvbdu_true0' in
+  let error,handler,bmvbdu_true8' = Mvbdu_wrapper.Mvbdu.mvbdu_xor parameters handler error bmvbdu_true0' bmvbdu_false0' in
+  let error,handler,bmvbdu_true9' = Mvbdu_wrapper.Mvbdu.mvbdu_nand parameters handler error bmvbdu_false0' bmvbdu_false0' in 
+  let error,handler,bmvbdu_true10' = Mvbdu_wrapper.Mvbdu.mvbdu_nand parameters handler error bmvbdu_false0' bmvbdu_true0' in
+  let error,handler,bmvbdu_false9' = Mvbdu_wrapper.Mvbdu.mvbdu_nand parameters handler error bmvbdu_true0' bmvbdu_true0' in
+  let error,handler,bmvbdu_true11' = Mvbdu_wrapper.Mvbdu.mvbdu_nand parameters handler error bmvbdu_true0' bmvbdu_false0' in
+  let error,handler,bmvbdu_true12' = Mvbdu_wrapper.Mvbdu.mvbdu_nsnd parameters handler error bmvbdu_false0' bmvbdu_false0' in 
+  let error,handler,bmvbdu_false10' = Mvbdu_wrapper.Mvbdu.mvbdu_nsnd parameters handler error bmvbdu_false0' bmvbdu_true0' in
+  let error,handler,bmvbdu_false11' = Mvbdu_wrapper.Mvbdu.mvbdu_nsnd parameters handler error bmvbdu_true0' bmvbdu_true0' in
+  let error,handler,bmvbdu_true13' = Mvbdu_wrapper.Mvbdu.mvbdu_nsnd parameters handler error bmvbdu_true0' bmvbdu_false0' in
+  let error,handler,bmvbdu_true14' = Mvbdu_wrapper.Mvbdu.mvbdu_nfst parameters handler error bmvbdu_false0' bmvbdu_false0' in 
+  let error,handler,bmvbdu_true15' = Mvbdu_wrapper.Mvbdu.mvbdu_nfst parameters handler error bmvbdu_false0' bmvbdu_true0' in
+  let error,handler,bmvbdu_false12' = Mvbdu_wrapper.Mvbdu.mvbdu_nfst parameters handler error bmvbdu_true0' bmvbdu_true0' in
+  let error,handler,bmvbdu_false13' = Mvbdu_wrapper.Mvbdu.mvbdu_nfst parameters handler error bmvbdu_true0' bmvbdu_false0' in
+  let error,handler,bmvbdu_false14' = Mvbdu_wrapper.Mvbdu.mvbdu_snd parameters handler error bmvbdu_false0' bmvbdu_false0' in 
+  let error,handler,bmvbdu_true16' = Mvbdu_wrapper.Mvbdu.mvbdu_snd parameters handler error bmvbdu_false0' bmvbdu_true0' in
+  let error,handler,bmvbdu_true17' = Mvbdu_wrapper.Mvbdu.mvbdu_snd parameters handler error bmvbdu_true0' bmvbdu_true0' in
+  let error,handler,bmvbdu_false15' = Mvbdu_wrapper.Mvbdu.mvbdu_snd parameters handler error bmvbdu_true0' bmvbdu_false0' in
+  let error,handler,bmvbdu_false16' = Mvbdu_wrapper.Mvbdu.mvbdu_fst parameters handler error bmvbdu_false0' bmvbdu_false0' in 
+  let error,handler,bmvbdu_false17' = Mvbdu_wrapper.Mvbdu.mvbdu_fst parameters handler error bmvbdu_false0' bmvbdu_true0' in
+  let error,handler,bmvbdu_true18' = Mvbdu_wrapper.Mvbdu.mvbdu_fst parameters handler error bmvbdu_true0' bmvbdu_true0' in
+  let error,handler,bmvbdu_true19' = Mvbdu_wrapper.Mvbdu.mvbdu_fst parameters handler error bmvbdu_true0' bmvbdu_false0' in
+  let error,handler,bmvbdu_true20' = Mvbdu_wrapper.Mvbdu.mvbdu_nor parameters handler error bmvbdu_false0' bmvbdu_false0' in 
+  let error,handler,bmvbdu_false18' = Mvbdu_wrapper.Mvbdu.mvbdu_nor parameters handler error bmvbdu_false0' bmvbdu_true0' in
+  let error,handler,bmvbdu_false19' = Mvbdu_wrapper.Mvbdu.mvbdu_nor parameters handler error bmvbdu_true0' bmvbdu_true0' in
+  let error,handler,bmvbdu_false20' = Mvbdu_wrapper.Mvbdu.mvbdu_nor parameters handler error bmvbdu_true0' bmvbdu_false0' in
+  let error,handler,bmvbdu_false21' = Mvbdu_wrapper.Mvbdu.mvbdu_bi_false parameters handler error bmvbdu_false0' bmvbdu_false0' in 
+  let error,handler,bmvbdu_false22' = Mvbdu_wrapper.Mvbdu.mvbdu_bi_false parameters handler error bmvbdu_false0' bmvbdu_true0' in
+  let error,handler,bmvbdu_false23' = Mvbdu_wrapper.Mvbdu.mvbdu_bi_false parameters handler error bmvbdu_true0' bmvbdu_true0' in
+  let error,handler,bmvbdu_false24' = Mvbdu_wrapper.Mvbdu.mvbdu_bi_false parameters handler error bmvbdu_true0' bmvbdu_false0' in
+  let error,handler,bmvbdu_true21' = Mvbdu_wrapper.Mvbdu.mvbdu_bi_true parameters handler error bmvbdu_false0' bmvbdu_false0' in 
+  let error,handler,bmvbdu_true22' = Mvbdu_wrapper.Mvbdu.mvbdu_bi_true parameters handler error bmvbdu_false0' bmvbdu_true0' in
+  let error,handler,bmvbdu_true23' = Mvbdu_wrapper.Mvbdu.mvbdu_bi_true parameters handler error bmvbdu_true0' bmvbdu_true0' in
+  let error,handler,bmvbdu_true24' = Mvbdu_wrapper.Mvbdu.mvbdu_bi_true parameters handler error bmvbdu_true0' bmvbdu_false0' in
+  let error,handler,bmvbdu_true25' = Mvbdu_wrapper.Mvbdu.mvbdu_imply parameters handler error bmvbdu_false0' bmvbdu_false0' in 
+  let error,handler,bmvbdu_true26' = Mvbdu_wrapper.Mvbdu.mvbdu_imply parameters handler error bmvbdu_false0' bmvbdu_true0' in
+  let error,handler,bmvbdu_true27' = Mvbdu_wrapper.Mvbdu.mvbdu_imply parameters handler error bmvbdu_true0' bmvbdu_true0' in
+  let error,handler,bmvbdu_false25' = Mvbdu_wrapper.Mvbdu.mvbdu_imply parameters handler error bmvbdu_true0' bmvbdu_false0' in
+  let error,handler,bmvbdu_true28' = Mvbdu_wrapper.Mvbdu.mvbdu_rev_imply parameters handler error bmvbdu_false0' bmvbdu_false0' in 
+  let error,handler,bmvbdu_false26' = Mvbdu_wrapper.Mvbdu.mvbdu_rev_imply parameters handler error bmvbdu_false0' bmvbdu_true0' in
+  let error,handler,bmvbdu_true29' = Mvbdu_wrapper.Mvbdu.mvbdu_rev_imply parameters handler error bmvbdu_true0' bmvbdu_true0' in
+  let error,handler,bmvbdu_true30' = Mvbdu_wrapper.Mvbdu.mvbdu_rev_imply parameters handler error bmvbdu_true0' bmvbdu_false0' in
+  let error,handler,bmvbdu_false27' = Mvbdu_wrapper.Mvbdu.mvbdu_nimply parameters handler error bmvbdu_false0' bmvbdu_false0' in 
+  let error,handler,bmvbdu_false28' = Mvbdu_wrapper.Mvbdu.mvbdu_nimply parameters handler error bmvbdu_false0' bmvbdu_true0' in
+  let error,handler,bmvbdu_false29' = Mvbdu_wrapper.Mvbdu.mvbdu_nimply parameters handler error bmvbdu_true0' bmvbdu_true0' in 
+  let error,handler,bmvbdu_true31' = Mvbdu_wrapper.Mvbdu.mvbdu_nimply parameters handler error bmvbdu_true0' bmvbdu_false0' in
+  let error,handler,bmvbdu_false30' = Mvbdu_wrapper.Mvbdu.mvbdu_nrev_imply parameters handler error bmvbdu_false0' bmvbdu_false0' in 
+  let error,handler,bmvbdu_true32' = Mvbdu_wrapper.Mvbdu.mvbdu_nrev_imply parameters handler error bmvbdu_false0' bmvbdu_true0' in
+  let error,handler,bmvbdu_false31' = Mvbdu_wrapper.Mvbdu.mvbdu_nrev_imply parameters handler error bmvbdu_true0' bmvbdu_true0' in
+  let error,handler,bmvbdu_false32' = Mvbdu_wrapper.Mvbdu.mvbdu_nrev_imply parameters handler error bmvbdu_true0' bmvbdu_false0' in
+  let list = [4,1; 2,2; 1,3] in 
+  let list' = [2,2; 4,1; 1,3] in 
+  let error,handler,list__a = Mvbdu_wrapper.Mvbdu.build_list parameters handler error list in 
+  let error,handler,list__c = Mvbdu_wrapper.Mvbdu.build_reverse_sorted_list parameters handler error list in 
+  let error,handler,list__a' =Mvbdu_wrapper.Mvbdu.build_list parameters handler error list' in 
+  let error,handler,list__b' = Mvbdu_wrapper.Mvbdu.build_sorted_list parameters handler error list' in 
+  let error,handler,mvbdu = Mvbdu_wrapper.Mvbdu.mvbdu_redefine parameters handler error bmvbdu_true0' list__a in 
+
+ (* WRAPPED MVBDU OPTIMIZED *)
+  let b0' = Mvbdu_wrapper.Optimized_Mvbdu.is_init () in 
+  let error_', handler = Mvbdu_wrapper.Optimized_Mvbdu.init parameters error in 
+  let b1' = Mvbdu_wrapper.Optimized_Mvbdu.is_init () in 
+  let error_'',handler = Mvbdu_wrapper.Optimized_Mvbdu.init parameters error_' in 
+  let b2',b3' = error==error_',error_'==error_'' in 
+  let error = error_'' in 
+  let error,handler,bmvbdu_true0'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_true parameters handler error in 
+  let error, handler, bmvbdu_false0'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_false parameters handler error in 
+  let error, handler, bmvbdu_true1'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_unary_true parameters handler error bmvbdu_true0'' in
+  let error, handler, bmvbdu_true2'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_unary_true parameters handler error bmvbdu_false0'' in 
+  let error,handler,bmvbdu_false1'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_unary_false parameters handler error bmvbdu_true0'' in 
+  let error,handler,bmvbdu_false2'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_unary_false parameters handler error bmvbdu_false0'' in 
+  let error,handler,bmvbdu_false3'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_or parameters handler error bmvbdu_false0'' bmvbdu_false0'' in 
+  let error,handler,bmvbdu_true3'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_or parameters handler error bmvbdu_false0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_true4'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_or parameters handler error bmvbdu_true0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_true5'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_or parameters handler error bmvbdu_true0'' bmvbdu_false0'' in
+  let error,handler,bmvbdu_false4'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_and parameters handler error bmvbdu_false0'' bmvbdu_false0'' in 
+  let error,handler,bmvbdu_false5'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_and parameters handler error bmvbdu_false0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_true6'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_and parameters handler error bmvbdu_true0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_false6'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_and parameters handler error bmvbdu_true0'' bmvbdu_false0'' in
+  let error,handler,bmvbdu_false7'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_xor parameters handler error bmvbdu_false0'' bmvbdu_false0'' in 
+  let error,handler,bmvbdu_true7'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_xor parameters handler error bmvbdu_false0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_false8'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_xor parameters handler error bmvbdu_true0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_true8'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_xor parameters handler error bmvbdu_true0'' bmvbdu_false0'' in
+  let error,handler,bmvbdu_true9'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_nand parameters handler error bmvbdu_false0'' bmvbdu_false0'' in 
+  let error,handler,bmvbdu_true10'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_nand parameters handler error bmvbdu_false0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_false9'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_nand parameters handler error bmvbdu_true0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_true11'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_nand parameters handler error bmvbdu_true0'' bmvbdu_false0'' in
+  let error,handler,bmvbdu_true12'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_nsnd parameters handler error bmvbdu_false0'' bmvbdu_false0'' in 
+  let error,handler,bmvbdu_false10'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_nsnd parameters handler error bmvbdu_false0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_false11'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_nsnd parameters handler error bmvbdu_true0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_true13'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_nsnd parameters handler error bmvbdu_true0'' bmvbdu_false0'' in
+  let error,handler,bmvbdu_true14'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_nfst parameters handler error bmvbdu_false0'' bmvbdu_false0'' in 
+  let error,handler,bmvbdu_true15'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_nfst parameters handler error bmvbdu_false0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_false12'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_nfst parameters handler error bmvbdu_true0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_false13'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_nfst parameters handler error bmvbdu_true0'' bmvbdu_false0'' in
+  let error,handler,bmvbdu_false14'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_snd parameters handler error bmvbdu_false0'' bmvbdu_false0'' in 
+  let error,handler,bmvbdu_true16'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_snd parameters handler error bmvbdu_false0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_true17'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_snd parameters handler error bmvbdu_true0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_false15'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_snd parameters handler error bmvbdu_true0'' bmvbdu_false0'' in
+  let error,handler,bmvbdu_false16'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_fst parameters handler error bmvbdu_false0'' bmvbdu_false0'' in 
+  let error,handler,bmvbdu_false17'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_fst parameters handler error bmvbdu_false0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_true18'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_fst parameters handler error bmvbdu_true0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_true19'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_fst parameters handler error bmvbdu_true0'' bmvbdu_false0'' in
+  let error,handler,bmvbdu_true20'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_nor parameters handler error bmvbdu_false0'' bmvbdu_false0'' in 
+  let error,handler,bmvbdu_false18'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_nor parameters handler error bmvbdu_false0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_false19'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_nor parameters handler error bmvbdu_true0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_false20'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_nor parameters handler error bmvbdu_true0'' bmvbdu_false0'' in
+  let error,handler,bmvbdu_false21'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_bi_false parameters handler error bmvbdu_false0'' bmvbdu_false0'' in 
+  let error,handler,bmvbdu_false22'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_bi_false parameters handler error bmvbdu_false0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_false23'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_bi_false parameters handler error bmvbdu_true0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_false24'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_bi_false parameters handler error bmvbdu_true0'' bmvbdu_false0'' in
+  let error,handler,bmvbdu_true21'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_bi_true parameters handler error bmvbdu_false0'' bmvbdu_false0'' in 
+  let error,handler,bmvbdu_true22'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_bi_true parameters handler error bmvbdu_false0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_true23'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_bi_true parameters handler error bmvbdu_true0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_true24'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_bi_true parameters handler error bmvbdu_true0'' bmvbdu_false0'' in
+  let error,handler,bmvbdu_true25'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_imply parameters handler error bmvbdu_false0'' bmvbdu_false0'' in 
+  let error,handler,bmvbdu_true26'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_imply parameters handler error bmvbdu_false0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_true27'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_imply parameters handler error bmvbdu_true0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_false25'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_imply parameters handler error bmvbdu_true0'' bmvbdu_false0'' in
+  let error,handler,bmvbdu_true28'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_rev_imply parameters handler error bmvbdu_false0'' bmvbdu_false0'' in 
+  let error,handler,bmvbdu_false26'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_rev_imply parameters handler error bmvbdu_false0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_true29'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_rev_imply parameters handler error bmvbdu_true0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_true30'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_rev_imply parameters handler error bmvbdu_true0'' bmvbdu_false0'' in
+  let error,handler,bmvbdu_false27'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_nimply parameters handler error bmvbdu_false0'' bmvbdu_false0'' in 
+  let error,handler,bmvbdu_false28'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_nimply parameters handler error bmvbdu_false0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_false29'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_nimply parameters handler error bmvbdu_true0'' bmvbdu_true0'' in 
+  let error,handler,bmvbdu_true31'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_nimply parameters handler error bmvbdu_true0'' bmvbdu_false0'' in
+  let error,handler,bmvbdu_false30'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_nrev_imply parameters handler error bmvbdu_false0'' bmvbdu_false0'' in 
+  let error,handler,bmvbdu_true32'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_nrev_imply parameters handler error bmvbdu_false0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_false31'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_nrev_imply parameters handler error bmvbdu_true0'' bmvbdu_true0'' in
+  let error,handler,bmvbdu_false32'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_nrev_imply parameters handler error bmvbdu_true0'' bmvbdu_false0'' in
+  let list = [4,1; 2,2; 1,3] in 
+  let list' = [2,2; 4,1; 1,3] in 
+  let error,handler,list___a = Mvbdu_wrapper.Optimized_Mvbdu.build_list parameters handler error list in 
+  let error,handler,list___b = Mvbdu_wrapper.Optimized_Mvbdu.build_sorted_list parameters handler error list in 
+  let error,handler,list___c = Mvbdu_wrapper.Optimized_Mvbdu.build_reverse_sorted_list parameters handler error list in 
+  let error,handler,list___a' =Mvbdu_wrapper.Optimized_Mvbdu.build_list parameters handler error list' in 
+  let error,handler,list___b' =Mvbdu_wrapper.Optimized_Mvbdu.build_sorted_list parameters handler error list' in 
+  let error,handler,list___c' = Mvbdu_wrapper.Optimized_Mvbdu.build_reverse_sorted_list parameters handler error list' in 
+  let error,handler,mvbdu = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_redefine parameters handler error bmvbdu_true0'' list___a in 
+
+ (* WRAPPED MVBDU INTERNALIZED *)
+  let b0'' = Mvbdu_wrapper.IntMvbdu.is_init () in 
+  let () = Mvbdu_wrapper.IntMvbdu.init parameters in 
+  let b1'' = Mvbdu_wrapper.IntMvbdu.is_init () in 
+  let () = Mvbdu_wrapper.IntMvbdu.init parameters in 
+  let bmvbdu_true0''' = Mvbdu_wrapper.IntMvbdu.mvbdu_true () in 
+  let bmvbdu_false0''' = Mvbdu_wrapper.IntMvbdu.mvbdu_false () in 
+  let bmvbdu_true1''' = Mvbdu_wrapper.IntMvbdu.mvbdu_unary_true bmvbdu_true0''' in
+  let bmvbdu_true2''' = Mvbdu_wrapper.IntMvbdu.mvbdu_unary_true bmvbdu_false0''' in 
+  let bmvbdu_false1''' = Mvbdu_wrapper.IntMvbdu.mvbdu_unary_false bmvbdu_true0''' in 
+  let bmvbdu_false2''' = Mvbdu_wrapper.IntMvbdu.mvbdu_unary_false bmvbdu_false0''' in 
+  let bmvbdu_false3''' = Mvbdu_wrapper.IntMvbdu.mvbdu_or bmvbdu_false0''' bmvbdu_false0''' in 
+  let bmvbdu_true3''' = Mvbdu_wrapper.IntMvbdu.mvbdu_or bmvbdu_false0''' bmvbdu_true0''' in
+  let bmvbdu_true4''' = Mvbdu_wrapper.IntMvbdu.mvbdu_or bmvbdu_true0''' bmvbdu_true0''' in
+  let bmvbdu_true5''' = Mvbdu_wrapper.IntMvbdu.mvbdu_or bmvbdu_true0''' bmvbdu_false0''' in
+  let bmvbdu_false4''' = Mvbdu_wrapper.IntMvbdu.mvbdu_and bmvbdu_false0''' bmvbdu_false0''' in 
+  let bmvbdu_false5''' = Mvbdu_wrapper.IntMvbdu.mvbdu_and bmvbdu_false0''' bmvbdu_true0''' in
+  let bmvbdu_true6''' = Mvbdu_wrapper.IntMvbdu.mvbdu_and bmvbdu_true0''' bmvbdu_true0''' in
+  let bmvbdu_false6''' = Mvbdu_wrapper.IntMvbdu.mvbdu_and bmvbdu_true0''' bmvbdu_false0''' in
+  let bmvbdu_false7''' = Mvbdu_wrapper.IntMvbdu.mvbdu_xor bmvbdu_false0''' bmvbdu_false0''' in 
+  let bmvbdu_true7''' = Mvbdu_wrapper.IntMvbdu.mvbdu_xor bmvbdu_false0''' bmvbdu_true0''' in
+  let bmvbdu_false8''' = Mvbdu_wrapper.IntMvbdu.mvbdu_xor bmvbdu_true0''' bmvbdu_true0''' in
+  let bmvbdu_true8''' = Mvbdu_wrapper.IntMvbdu.mvbdu_xor bmvbdu_true0''' bmvbdu_false0''' in
+  let bmvbdu_true9''' = Mvbdu_wrapper.IntMvbdu.mvbdu_nand bmvbdu_false0''' bmvbdu_false0''' in 
+  let bmvbdu_true10''' = Mvbdu_wrapper.IntMvbdu.mvbdu_nand bmvbdu_false0''' bmvbdu_true0''' in
+  let bmvbdu_false9''' = Mvbdu_wrapper.IntMvbdu.mvbdu_nand bmvbdu_true0''' bmvbdu_true0''' in
+  let bmvbdu_true11''' = Mvbdu_wrapper.IntMvbdu.mvbdu_nand bmvbdu_true0''' bmvbdu_false0''' in
+  let bmvbdu_true12''' = Mvbdu_wrapper.IntMvbdu.mvbdu_nsnd bmvbdu_false0''' bmvbdu_false0''' in 
+  let bmvbdu_false10''' = Mvbdu_wrapper.IntMvbdu.mvbdu_nsnd bmvbdu_false0''' bmvbdu_true0''' in
+  let bmvbdu_false11''' = Mvbdu_wrapper.IntMvbdu.mvbdu_nsnd bmvbdu_true0''' bmvbdu_true0''' in
+  let bmvbdu_true13''' = Mvbdu_wrapper.IntMvbdu.mvbdu_nsnd bmvbdu_true0''' bmvbdu_false0''' in
+  let bmvbdu_true14''' = Mvbdu_wrapper.IntMvbdu.mvbdu_nfst bmvbdu_false0''' bmvbdu_false0''' in 
+  let bmvbdu_true15''' = Mvbdu_wrapper.IntMvbdu.mvbdu_nfst bmvbdu_false0''' bmvbdu_true0''' in
+  let bmvbdu_false12''' = Mvbdu_wrapper.IntMvbdu.mvbdu_nfst bmvbdu_true0''' bmvbdu_true0''' in
+  let bmvbdu_false13''' = Mvbdu_wrapper.IntMvbdu.mvbdu_nfst bmvbdu_true0''' bmvbdu_false0''' in
+  let bmvbdu_false14''' = Mvbdu_wrapper.IntMvbdu.mvbdu_snd bmvbdu_false0''' bmvbdu_false0''' in 
+  let bmvbdu_true16''' = Mvbdu_wrapper.IntMvbdu.mvbdu_snd bmvbdu_false0''' bmvbdu_true0''' in
+  let bmvbdu_true17''' = Mvbdu_wrapper.IntMvbdu.mvbdu_snd bmvbdu_true0''' bmvbdu_true0''' in
+  let bmvbdu_false15''' = Mvbdu_wrapper.IntMvbdu.mvbdu_snd bmvbdu_true0''' bmvbdu_false0''' in
+  let bmvbdu_false16''' = Mvbdu_wrapper.IntMvbdu.mvbdu_fst bmvbdu_false0''' bmvbdu_false0''' in 
+  let bmvbdu_false17''' = Mvbdu_wrapper.IntMvbdu.mvbdu_fst bmvbdu_false0''' bmvbdu_true0''' in
+  let bmvbdu_true18''' = Mvbdu_wrapper.IntMvbdu.mvbdu_fst bmvbdu_true0''' bmvbdu_true0''' in
+  let bmvbdu_true19''' = Mvbdu_wrapper.IntMvbdu.mvbdu_fst bmvbdu_true0''' bmvbdu_false0''' in
+  let bmvbdu_true20''' = Mvbdu_wrapper.IntMvbdu.mvbdu_nor bmvbdu_false0''' bmvbdu_false0''' in 
+  let bmvbdu_false18''' = Mvbdu_wrapper.IntMvbdu.mvbdu_nor bmvbdu_false0''' bmvbdu_true0''' in
+  let bmvbdu_false19''' = Mvbdu_wrapper.IntMvbdu.mvbdu_nor bmvbdu_true0''' bmvbdu_true0''' in
+  let bmvbdu_false20''' = Mvbdu_wrapper.IntMvbdu.mvbdu_nor bmvbdu_true0''' bmvbdu_false0''' in
+  let bmvbdu_false21''' = Mvbdu_wrapper.IntMvbdu.mvbdu_bi_false bmvbdu_false0''' bmvbdu_false0''' in 
+  let bmvbdu_false22''' = Mvbdu_wrapper.IntMvbdu.mvbdu_bi_false bmvbdu_false0''' bmvbdu_true0''' in
+  let bmvbdu_false23''' = Mvbdu_wrapper.IntMvbdu.mvbdu_bi_false bmvbdu_true0''' bmvbdu_true0''' in
+  let bmvbdu_false24''' = Mvbdu_wrapper.IntMvbdu.mvbdu_bi_false bmvbdu_true0''' bmvbdu_false0''' in
+  let bmvbdu_true21''' = Mvbdu_wrapper.IntMvbdu.mvbdu_bi_true bmvbdu_false0''' bmvbdu_false0''' in 
+  let bmvbdu_true22''' = Mvbdu_wrapper.IntMvbdu.mvbdu_bi_true bmvbdu_false0''' bmvbdu_true0''' in
+  let bmvbdu_true23''' = Mvbdu_wrapper.IntMvbdu.mvbdu_bi_true bmvbdu_true0''' bmvbdu_true0''' in
+  let bmvbdu_true24''' = Mvbdu_wrapper.IntMvbdu.mvbdu_bi_true bmvbdu_true0''' bmvbdu_false0''' in
+  let bmvbdu_true25''' = Mvbdu_wrapper.IntMvbdu.mvbdu_imply bmvbdu_false0''' bmvbdu_false0''' in 
+  let bmvbdu_true26''' = Mvbdu_wrapper.IntMvbdu.mvbdu_imply bmvbdu_false0''' bmvbdu_true0''' in
+  let bmvbdu_true27''' = Mvbdu_wrapper.IntMvbdu.mvbdu_imply bmvbdu_true0''' bmvbdu_true0''' in
+  let bmvbdu_false25''' = Mvbdu_wrapper.IntMvbdu.mvbdu_imply bmvbdu_true0''' bmvbdu_false0''' in
+  let bmvbdu_true28''' = Mvbdu_wrapper.IntMvbdu.mvbdu_rev_imply bmvbdu_false0''' bmvbdu_false0''' in 
+  let bmvbdu_false26''' = Mvbdu_wrapper.IntMvbdu.mvbdu_rev_imply bmvbdu_false0''' bmvbdu_true0''' in
+  let bmvbdu_true29''' = Mvbdu_wrapper.IntMvbdu.mvbdu_rev_imply bmvbdu_true0''' bmvbdu_true0''' in
+  let bmvbdu_true30''' = Mvbdu_wrapper.IntMvbdu.mvbdu_rev_imply bmvbdu_true0''' bmvbdu_false0''' in
+  let bmvbdu_false27''' = Mvbdu_wrapper.IntMvbdu.mvbdu_nimply bmvbdu_false0''' bmvbdu_false0''' in 
+  let bmvbdu_false28''' = Mvbdu_wrapper.IntMvbdu.mvbdu_nimply bmvbdu_false0''' bmvbdu_true0''' in
+  let bmvbdu_false29''' = Mvbdu_wrapper.IntMvbdu.mvbdu_nimply bmvbdu_true0''' bmvbdu_true0''' in 
+  let bmvbdu_true31''' = Mvbdu_wrapper.IntMvbdu.mvbdu_nimply bmvbdu_true0''' bmvbdu_false0''' in
+  let bmvbdu_false30''' = Mvbdu_wrapper.IntMvbdu.mvbdu_nrev_imply bmvbdu_false0''' bmvbdu_false0''' in 
+  let bmvbdu_true32''' = Mvbdu_wrapper.IntMvbdu.mvbdu_nrev_imply bmvbdu_false0''' bmvbdu_true0''' in
+  let bmvbdu_false31''' = Mvbdu_wrapper.IntMvbdu.mvbdu_nrev_imply bmvbdu_true0''' bmvbdu_true0''' in
+  let bmvbdu_false32''' = Mvbdu_wrapper.IntMvbdu.mvbdu_nrev_imply bmvbdu_true0''' bmvbdu_false0''' in
+  let list = [4,1; 2,2; 1,3] in 
+  let list' = [2,2; 4,1; 1,3] in 
+  let list____a = Mvbdu_wrapper.IntMvbdu.build_list list in 
+  let list____c = Mvbdu_wrapper.IntMvbdu.build_reverse_sorted_list list in 
+  let list____a' =Mvbdu_wrapper.IntMvbdu.build_list list' in 
+  let _ = Mvbdu_wrapper.IntMvbdu.mvbdu_redefine bmvbdu_true0''' list____a in 
+
+ (* WRAPPED MVBDU INTERNALISED & OPTIMIZED *)
+  let b0''' = Mvbdu_wrapper.Optimized_IntMvbdu.is_init () in 
+  let () = Mvbdu_wrapper.Optimized_IntMvbdu.init parameters in 
+  let b1''' = Mvbdu_wrapper.Optimized_IntMvbdu.is_init () in 
+  let () = Mvbdu_wrapper.Optimized_IntMvbdu.init parameters in 
+  let bmvbdu_true0'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_true () in 
+  let bmvbdu_false0'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_false () in 
+  let bmvbdu_true1'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_unary_true bmvbdu_true0'''' in
+  let bmvbdu_true2'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_unary_true bmvbdu_false0'''' in 
+  let bmvbdu_false1'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_unary_false bmvbdu_true0'''' in 
+  let bmvbdu_false2'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_unary_false bmvbdu_false0'''' in 
+  let bmvbdu_false3'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_or bmvbdu_false0'''' bmvbdu_false0'''' in 
+  let bmvbdu_true3'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_or bmvbdu_false0'''' bmvbdu_true0'''' in
+  let bmvbdu_true4'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_or bmvbdu_true0'''' bmvbdu_true0'''' in
+  let bmvbdu_true5'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_or bmvbdu_true0'''' bmvbdu_false0'''' in
+  let bmvbdu_false4'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_and bmvbdu_false0'''' bmvbdu_false0'''' in 
+  let bmvbdu_false5'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_and bmvbdu_false0'''' bmvbdu_true0'''' in
+  let bmvbdu_true6'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_and bmvbdu_true0'''' bmvbdu_true0'''' in
+  let bmvbdu_false6'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_and bmvbdu_true0'''' bmvbdu_false0'''' in
+  let bmvbdu_false7'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_xor bmvbdu_false0'''' bmvbdu_false0'''' in 
+  let bmvbdu_true7'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_xor bmvbdu_false0'''' bmvbdu_true0'''' in
+  let bmvbdu_false8'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_xor bmvbdu_true0'''' bmvbdu_true0'''' in
+  let bmvbdu_true8'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_xor bmvbdu_true0'''' bmvbdu_false0'''' in
+  let bmvbdu_true9'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_nand bmvbdu_false0'''' bmvbdu_false0'''' in 
+  let bmvbdu_true10'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_nand bmvbdu_false0'''' bmvbdu_true0'''' in
+  let bmvbdu_false9'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_nand bmvbdu_true0'''' bmvbdu_true0'''' in
+  let bmvbdu_true11'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_nand bmvbdu_true0'''' bmvbdu_false0'''' in
+  let bmvbdu_true12'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_nsnd bmvbdu_false0'''' bmvbdu_false0'''' in 
+  let bmvbdu_false10'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_nsnd bmvbdu_false0'''' bmvbdu_true0'''' in
+  let bmvbdu_false11'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_nsnd bmvbdu_true0'''' bmvbdu_true0'''' in
+  let bmvbdu_true13'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_nsnd bmvbdu_true0'''' bmvbdu_false0'''' in
+  let bmvbdu_true14'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_nfst bmvbdu_false0'''' bmvbdu_false0'''' in 
+  let bmvbdu_true15'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_nfst bmvbdu_false0'''' bmvbdu_true0'''' in
+  let bmvbdu_false12'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_nfst bmvbdu_true0'''' bmvbdu_true0'''' in
+  let bmvbdu_false13'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_nfst bmvbdu_true0'''' bmvbdu_false0'''' in
+  let bmvbdu_false14'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_snd bmvbdu_false0'''' bmvbdu_false0'''' in 
+  let bmvbdu_true16'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_snd bmvbdu_false0'''' bmvbdu_true0'''' in
+  let bmvbdu_true17'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_snd bmvbdu_true0'''' bmvbdu_true0'''' in
+  let bmvbdu_false15'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_snd bmvbdu_true0'''' bmvbdu_false0'''' in
+  let bmvbdu_false16'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_fst bmvbdu_false0'''' bmvbdu_false0'''' in 
+  let bmvbdu_false17'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_fst bmvbdu_false0'''' bmvbdu_true0'''' in
+  let bmvbdu_true18'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_fst bmvbdu_true0'''' bmvbdu_true0'''' in
+  let bmvbdu_true19'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_fst bmvbdu_true0'''' bmvbdu_false0'''' in
+  let bmvbdu_true20'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_nor bmvbdu_false0'''' bmvbdu_false0'''' in 
+  let bmvbdu_false18'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_nor bmvbdu_false0'''' bmvbdu_true0'''' in
+  let bmvbdu_false19'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_nor bmvbdu_true0'''' bmvbdu_true0'''' in
+  let bmvbdu_false20'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_nor bmvbdu_true0'''' bmvbdu_false0'''' in
+  let bmvbdu_false21'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_bi_false bmvbdu_false0'''' bmvbdu_false0'''' in 
+  let bmvbdu_false22'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_bi_false bmvbdu_false0'''' bmvbdu_true0'''' in
+  let bmvbdu_false23'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_bi_false bmvbdu_true0'''' bmvbdu_true0'''' in
+  let bmvbdu_false24'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_bi_false bmvbdu_true0'''' bmvbdu_false0'''' in
+  let bmvbdu_true21'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_bi_true bmvbdu_false0'''' bmvbdu_false0'''' in 
+  let bmvbdu_true22'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_bi_true bmvbdu_false0'''' bmvbdu_true0'''' in
+  let bmvbdu_true23'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_bi_true bmvbdu_true0'''' bmvbdu_true0'''' in
+  let bmvbdu_true24'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_bi_true bmvbdu_true0'''' bmvbdu_false0'''' in
+  let bmvbdu_true25'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_imply bmvbdu_false0'''' bmvbdu_false0'''' in 
+  let bmvbdu_true26'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_imply bmvbdu_false0'''' bmvbdu_true0'''' in
+  let bmvbdu_true27'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_imply bmvbdu_true0'''' bmvbdu_true0'''' in
+  let bmvbdu_false25'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_imply bmvbdu_true0'''' bmvbdu_false0'''' in
+  let bmvbdu_true28'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_rev_imply bmvbdu_false0'''' bmvbdu_false0'''' in 
+  let bmvbdu_false26'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_rev_imply bmvbdu_false0'''' bmvbdu_true0'''' in
+  let bmvbdu_true29'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_rev_imply bmvbdu_true0'''' bmvbdu_true0'''' in
+  let bmvbdu_true30'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_rev_imply bmvbdu_true0'''' bmvbdu_false0'''' in
+  let bmvbdu_false27'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_nimply bmvbdu_false0'''' bmvbdu_false0'''' in 
+  let bmvbdu_false28'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_nimply bmvbdu_false0'''' bmvbdu_true0'''' in
+  let bmvbdu_false29'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_nimply bmvbdu_true0'''' bmvbdu_true0'''' in 
+  let bmvbdu_true31'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_nimply bmvbdu_true0'''' bmvbdu_false0'''' in
+  let bmvbdu_false30'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_nrev_imply bmvbdu_false0'''' bmvbdu_false0'''' in 
+  let bmvbdu_true32'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_nrev_imply bmvbdu_false0'''' bmvbdu_true0'''' in
+  let bmvbdu_false31'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_nrev_imply bmvbdu_true0'''' bmvbdu_true0'''' in
+  let bmvbdu_false32'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_nrev_imply bmvbdu_true0'''' bmvbdu_false0'''' in
+  let list = [4,1; 2,2; 1,3] in 
+  let list' = [2,2; 4,1; 1,3] in 
+  let list_____a = Mvbdu_wrapper.Optimized_IntMvbdu.build_list list in 
+  let list_____c = Mvbdu_wrapper.Optimized_IntMvbdu.build_reverse_sorted_list list in 
+  let list_____a' =Mvbdu_wrapper.Optimized_IntMvbdu.build_list list' in 
+  let _ = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_redefine bmvbdu_true0'''' list_____a in 
+
+
   {
     remanent with 
       Sanity_test_sig.error = error ; 
-      Sanity_test_sig.mvbdu_handler = handler
+      Sanity_test_sig.mvbdu_handler = handler_0
   },
   ("Mvbdu.001",fun remanent ->
     let b = Mvbdu_core.mvbdu_equal f'' c'' in
@@ -883,9 +1206,148 @@ let bdu_test remanent parameters =
         "true30",bmvbdu_true30; 
         "true31",bmvbdu_true31;
         "true32",bmvbdu_true32;
-        "true33",bmvbdu_true33;  
-       ])@
-    (List.map (fun (a,b) -> a, (fun remanent -> remanent, b == bmvbdu_false0, None))  
+        "true33",bmvbdu_true33])@
+  (List.map (fun (a,b) -> a,(fun remanent -> remanent, b == bmvbdu_true0', None))      
+     [	"true00'",bmvbdu_true0';
+        "true01'",bmvbdu_true1';
+        "true02'",bmvbdu_true2';
+        "true03'",bmvbdu_true3';
+        "true04'",bmvbdu_true4';
+        "true05'",bmvbdu_true5';
+        "true06'",bmvbdu_true6';
+        "true07'",bmvbdu_true7';
+        "true08'",bmvbdu_true8';
+        "true09'",bmvbdu_true9';
+        "true10'",bmvbdu_true10';
+        "true11'",bmvbdu_true11';
+        "true12'",bmvbdu_true12';
+        "true13'",bmvbdu_true13';
+        "true14'",bmvbdu_true14';
+        "true15'",bmvbdu_true15';
+        "true16'",bmvbdu_true16';
+        "true17'",bmvbdu_true17';
+        "true18'",bmvbdu_true18';
+        "true19'",bmvbdu_true19';
+        "true20'",bmvbdu_true20'; 
+        "true21'",bmvbdu_true21';
+        "true22'",bmvbdu_true22';
+        "true23'",bmvbdu_true23';
+        "true24'",bmvbdu_true24';
+        "true25'",bmvbdu_true25';
+        "true26'",bmvbdu_true26';
+        "true27'",bmvbdu_true27';
+        "true28'",bmvbdu_true28';
+        "true29'",bmvbdu_true29';
+        "true30'",bmvbdu_true30'; 
+        "true31'",bmvbdu_true31';
+        "true32'",bmvbdu_true32';
+  ])@
+     (List.map (fun (a,b) -> a,(fun remanent -> remanent, b == bmvbdu_true0'', None))      
+     [	"true00''",bmvbdu_true0'';
+        "true01''",bmvbdu_true1'';
+        "true02''",bmvbdu_true2'';
+        "true03''",bmvbdu_true3'';
+        "true04''",bmvbdu_true4'';
+        "true05''",bmvbdu_true5'';
+        "true06''",bmvbdu_true6'';
+        "true07''",bmvbdu_true7'';
+        "true08''",bmvbdu_true8'';
+        "true09''",bmvbdu_true9'';
+        "true10''",bmvbdu_true10'';
+        "true11''",bmvbdu_true11'';
+        "true12''",bmvbdu_true12'';
+        "true13''",bmvbdu_true13'';
+        "true14''",bmvbdu_true14'';
+        "true15''",bmvbdu_true15'';
+        "true16''",bmvbdu_true16'';
+        "true17''",bmvbdu_true17'';
+        "true18''",bmvbdu_true18'';
+        "true19''",bmvbdu_true19'';
+        "true20''",bmvbdu_true20''; 
+        "true21''",bmvbdu_true21'';
+        "true22''",bmvbdu_true22'';
+        "true23''",bmvbdu_true23'';
+        "true24''",bmvbdu_true24'';
+        "true25''",bmvbdu_true25'';
+        "true26''",bmvbdu_true26'';
+        "true27''",bmvbdu_true27'';
+        "true28''",bmvbdu_true28'';
+        "true29''",bmvbdu_true29'';
+        "true30''",bmvbdu_true30''; 
+        "true31''",bmvbdu_true31'';
+        "true32''",bmvbdu_true32'';
+  ])@
+    (List.map (fun (a,b) -> a,(fun remanent -> remanent, b == bmvbdu_true0''', None))      
+     [	"true00'''",bmvbdu_true0''';
+        "true01'''",bmvbdu_true1''';
+        "true02'''",bmvbdu_true2''';
+        "true03'''",bmvbdu_true3''';
+        "true04'''",bmvbdu_true4''';
+        "true05'''",bmvbdu_true5''';
+        "true06'''",bmvbdu_true6''';
+        "true07'''",bmvbdu_true7''';
+        "true08'''",bmvbdu_true8''';
+        "true09'''",bmvbdu_true9''';
+        "true10'''",bmvbdu_true10''';
+        "true11'''",bmvbdu_true11''';
+        "true12'''",bmvbdu_true12''';
+        "true13'''",bmvbdu_true13''';
+        "true14'''",bmvbdu_true14''';
+        "true15'''",bmvbdu_true15''';
+        "true16'''",bmvbdu_true16''';
+        "true17'''",bmvbdu_true17''';
+        "true18'''",bmvbdu_true18''';
+        "true19'''",bmvbdu_true19''';
+        "true20'''",bmvbdu_true20'''; 
+        "true21'''",bmvbdu_true21''';
+        "true22'''",bmvbdu_true22''';
+        "true23'''",bmvbdu_true23''';
+        "true24'''",bmvbdu_true24''';
+        "true25'''",bmvbdu_true25''';
+        "true26'''",bmvbdu_true26''';
+        "true27'''",bmvbdu_true27''';
+        "true28'''",bmvbdu_true28''';
+        "true29'''",bmvbdu_true29''';
+        "true30'''",bmvbdu_true30'''; 
+        "true31'''",bmvbdu_true31''';
+        "true32'''",bmvbdu_true32''';
+  ])@
+    (List.map (fun (a,b) -> a,(fun remanent -> remanent, b == bmvbdu_true0'''', None))      
+     [	"true00''''",bmvbdu_true0'''';
+        "true01''''",bmvbdu_true1'''';
+        "true02''''",bmvbdu_true2'''';
+        "true03''''",bmvbdu_true3'''';
+        "true04''''",bmvbdu_true4'''';
+        "true05''''",bmvbdu_true5'''';
+        "true06''''",bmvbdu_true6'''';
+        "true07''''",bmvbdu_true7'''';
+        "true08''''",bmvbdu_true8'''';
+        "true09''''",bmvbdu_true9'''';
+        "true10''''",bmvbdu_true10'''';
+        "true11''''",bmvbdu_true11'''';
+        "true12''''",bmvbdu_true12'''';
+        "true13''''",bmvbdu_true13'''';
+        "true14''''",bmvbdu_true14'''';
+        "true15''''",bmvbdu_true15'''';
+        "true16''''",bmvbdu_true16'''';
+        "true17''''",bmvbdu_true17'''';
+        "true18''''",bmvbdu_true18'''';
+        "true19''''",bmvbdu_true19'''';
+        "true20''''",bmvbdu_true20''''; 
+        "true21''''",bmvbdu_true21'''';
+        "true22''''",bmvbdu_true22'''';
+        "true23''''",bmvbdu_true23'''';
+        "true24''''",bmvbdu_true24'''';
+        "true25''''",bmvbdu_true25'''';
+        "true26''''",bmvbdu_true26'''';
+        "true27''''",bmvbdu_true27'''';
+        "true28''''",bmvbdu_true28'''';
+        "true29''''",bmvbdu_true29'''';
+        "true30''''",bmvbdu_true30''''; 
+        "true31''''",bmvbdu_true31'''';
+        "true32''''",bmvbdu_true32'''';
+  ])@ 
+    (List.map (fun (a,b) -> a, (fun remanent -> remanent, b == bmvbdu_false0, None))
        ["false00",bmvbdu_false0;
         "false01",bmvbdu_false1;
         "false02",bmvbdu_false2;
@@ -918,7 +1380,164 @@ let bdu_test remanent parameters =
         "false29",bmvbdu_false29;
         "false30",bmvbdu_false30;
         "false31",bmvbdu_false31;
-        "false32",bmvbdu_false32
+        "false32",bmvbdu_false32;])@
+     (List.map (fun (a,b) -> a, (fun remanent -> remanent, b == bmvbdu_false0', None))   
+	[
+	  "false00'",bmvbdu_false0';
+        "false01'",bmvbdu_false1';
+        "false02'",bmvbdu_false2';
+        "false03'",bmvbdu_false3';
+        "false04'",bmvbdu_false4';
+        "false05'",bmvbdu_false5';
+        "false06'",bmvbdu_false6';
+        "false07'",bmvbdu_false7';
+        "false08'",bmvbdu_false8';
+        "false09'",bmvbdu_false9';
+        "false10'",bmvbdu_false10';
+        "false11'",bmvbdu_false11';
+        "false12'",bmvbdu_false12';
+        "false13'",bmvbdu_false13';
+        "false14'",bmvbdu_false14';
+        "false15'",bmvbdu_false15';
+        "false16'",bmvbdu_false16';
+        "false17'",bmvbdu_false17';
+        "false18'",bmvbdu_false18';
+        "false19'",bmvbdu_false19';
+        "false20'",bmvbdu_false20';
+        "false21'",bmvbdu_false21';
+        "false22'",bmvbdu_false22';
+        "false23'",bmvbdu_false23';
+        "false24'",bmvbdu_false24';
+        "false25'",bmvbdu_false25';
+        "false26'",bmvbdu_false26';
+        "false27'",bmvbdu_false27';
+        "false28'",bmvbdu_false28';
+        "false29'",bmvbdu_false29';
+        "false30'",bmvbdu_false30';
+        "false31'",bmvbdu_false31';
+        "false32'",bmvbdu_false32'
+     ])@
+    (List.map (fun (a,b) -> a, (fun remanent -> remanent, b == bmvbdu_false0'', None))   
+	[
+	  "false00''",bmvbdu_false0'';
+        "false01''",bmvbdu_false1'';
+        "false02''",bmvbdu_false2'';
+        "false03''",bmvbdu_false3'';
+        "false04''",bmvbdu_false4'';
+        "false05''",bmvbdu_false5'';
+        "false06''",bmvbdu_false6'';
+        "false07''",bmvbdu_false7'';
+        "false08''",bmvbdu_false8'';
+        "false09''",bmvbdu_false9'';
+        "false10''",bmvbdu_false10'';
+        "false11''",bmvbdu_false11'';
+        "false12''",bmvbdu_false12'';
+        "false13''",bmvbdu_false13'';
+        "false14''",bmvbdu_false14'';
+        "false15''",bmvbdu_false15'';
+        "false16''",bmvbdu_false16'';
+        "false17''",bmvbdu_false17'';
+        "false18''",bmvbdu_false18'';
+        "false19''",bmvbdu_false19'';
+        "false20''",bmvbdu_false20'';
+        "false21''",bmvbdu_false21'';
+        "false22''",bmvbdu_false22'';
+        "false23''",bmvbdu_false23'';
+        "false24''",bmvbdu_false24'';
+        "false25''",bmvbdu_false25'';
+        "false26''",bmvbdu_false26'';
+        "false27''",bmvbdu_false27'';
+        "false28''",bmvbdu_false28'';
+        "false29''",bmvbdu_false29'';
+        "false30''",bmvbdu_false30'';
+        "false31''",bmvbdu_false31'';
+        "false32''",bmvbdu_false32''
+     ])@
+      (List.map (fun (a,b) -> a, (fun remanent -> remanent, b == bmvbdu_false0''', None))   
+	[
+	  "false00'''",bmvbdu_false0''';
+        "false01'''",bmvbdu_false1''';
+        "false02'''",bmvbdu_false2''';
+        "false03'''",bmvbdu_false3''';
+        "false04'''",bmvbdu_false4''';
+        "false05'''",bmvbdu_false5''';
+        "false06'''",bmvbdu_false6''';
+        "false07'''",bmvbdu_false7''';
+        "false08'''",bmvbdu_false8''';
+        "false09'''",bmvbdu_false9''';
+        "false10'''",bmvbdu_false10''';
+        "false11'''",bmvbdu_false11''';
+        "false12'''",bmvbdu_false12''';
+        "false13'''",bmvbdu_false13''';
+        "false14'''",bmvbdu_false14''';
+        "false15'''",bmvbdu_false15''';
+        "false16'''",bmvbdu_false16''';
+        "false17'''",bmvbdu_false17''';
+        "false18'''",bmvbdu_false18''';
+        "false19'''",bmvbdu_false19''';
+        "false20'''",bmvbdu_false20''';
+        "false21'''",bmvbdu_false21''';
+        "false22'''",bmvbdu_false22''';
+        "false23'''",bmvbdu_false23''';
+        "false24'''",bmvbdu_false24''';
+        "false25'''",bmvbdu_false25''';
+        "false26'''",bmvbdu_false26''';
+        "false27'''",bmvbdu_false27''';
+        "false28'''",bmvbdu_false28''';
+        "false29'''",bmvbdu_false29''';
+        "false30'''",bmvbdu_false30''';
+        "false31'''",bmvbdu_false31''';
+        "false32'''",bmvbdu_false32'''
+     ])@
+      (List.map (fun (a,b) -> a, (fun remanent -> remanent, b == bmvbdu_false0'''', None))   
+	[
+	  "false00''''",bmvbdu_false0'''';
+        "false01''''",bmvbdu_false1'''';
+        "false02''''",bmvbdu_false2'''';
+        "false03''''",bmvbdu_false3'''';
+        "false04''''",bmvbdu_false4'''';
+        "false05''''",bmvbdu_false5'''';
+        "false06''''",bmvbdu_false6'''';
+        "false07''''",bmvbdu_false7'''';
+        "false08''''",bmvbdu_false8'''';
+        "false09''''",bmvbdu_false9'''';
+        "false10''''",bmvbdu_false10'''';
+        "false11''''",bmvbdu_false11'''';
+        "false12''''",bmvbdu_false12'''';
+        "false13''''",bmvbdu_false13'''';
+        "false14''''",bmvbdu_false14'''';
+        "false15''''",bmvbdu_false15'''';
+        "false16''''",bmvbdu_false16'''';
+        "false17''''",bmvbdu_false17'''';
+        "false18''''",bmvbdu_false18'''';
+        "false19''''",bmvbdu_false19'''';
+        "false20''''",bmvbdu_false20'''';
+        "false21''''",bmvbdu_false21'''';
+        "false22''''",bmvbdu_false22'''';
+        "false23''''",bmvbdu_false23'''';
+        "false24''''",bmvbdu_false24'''';
+        "false25''''",bmvbdu_false25'''';
+        "false26''''",bmvbdu_false26'''';
+        "false27''''",bmvbdu_false27'''';
+        "false28''''",bmvbdu_false28'''';
+        "false29''''",bmvbdu_false29'''';
+        "false30''''",bmvbdu_false30'''';
+        "false31''''",bmvbdu_false31'''';
+        "false32''''",bmvbdu_false32''''
+     ])@
+    (List.map (fun (a,s) -> a,(fun remanent -> remanent,s,None))
+       ["Non initialisation detection (MVBDU)",not b0;
+	"Initialisation (MVBDU)",b1;
+	"Initialisation detection (MVBDU)",b2;
+	"Refuse to reinitialise (MVBDU)",not b3;
+	"Non initialisation detection (MVBDU)",not b0';
+	"Initialisation (MVBDU)",b1';
+	"Initialisation detection (MVBDU)",b2';
+	"Refuse to reinitialise (MVBDU)",not b3';
+	"Non initialisation detection (MVBDU)",not b0'';
+	"Initialisation detection (MVBDU)",b1'';
+	"Non initialisation detection (MVBDU)",not b0''';
+	"Initialisation detection (MVBDU)",b1''';       
        ])@
     (List.map (fun (a,b,c) -> a, fun remanent -> List_sanity.test remanent c b) 
        [         
@@ -932,4 +1551,29 @@ let bdu_test remanent parameters =
     (List.map (fun (a,b) -> a, (fun remanent -> remanent, b == list_a, None))  
        ["List.007",list_a;
         "List.008",list_c;
-        "List.009",list_a'])
+        "List.009",list_a';
+       ])@
+    (List.map (fun (a,b) -> a, (fun remanent -> remanent, b == list__a, None))  
+       ["List.010",list__a;
+        "List.011",list__c;
+        "List.012",list__a';
+       ])
+    @
+    (List.map (fun (a,b) -> a, (fun remanent -> remanent, b == list___a, None))  
+       ["List.013",list___a;
+        "List.014",list___c;
+        "List.015",list___a';
+       ])
+    @
+    (List.map (fun (a,b) -> a, (fun remanent -> remanent, b == list____a, None))  
+       ["List.016",list____a;
+        "List.017",list____c;
+        "List.018",list____a';
+       ])
+  @
+    (List.map (fun (a,b) -> a, (fun remanent -> remanent, b == list_____a, None))  
+       ["List.019",list_____a;
+        "List.020",list_____c;
+        "List.021",list_____a';
+       ])
+

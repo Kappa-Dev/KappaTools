@@ -50,8 +50,8 @@ module type Internalized_mvbdu =
     val init: Remanent_parameters_sig.parameters -> unit  
     val is_init: unit -> bool 
     val equal: mvbdu -> mvbdu -> bool 
-    val mvbdu_false: mvbdu
-    val mvbdu_true:  mvbdu 
+    val mvbdu_false: unit -> mvbdu
+    val mvbdu_true:  unit -> mvbdu 
     val mvbdu_not: mvbdu -> mvbdu 
     val mvbdu_id:  mvbdu -> mvbdu 
     val mvbdu_unary_true: mvbdu -> mvbdu
@@ -250,8 +250,8 @@ module Internalize(M:Mvbdu) =
       let error',handler,mvbdu = f !parameter handler error' in 
       let _ = check s error error' handler in 
       mvbdu 
-    let mvbdu_true = lift_const "line 218, mvbdu_true" M.mvbdu_true
-    let mvbdu_false = lift_const "line 219, mvbdu_false" M.mvbdu_false
+    let mvbdu_true ()  = lift_const "line 218, mvbdu_true" M.mvbdu_true
+    let mvbdu_false () = lift_const "line 219, mvbdu_false" M.mvbdu_false
 
     let lift_unary s f x =
       let error = Exception.empty_error_handler in 
@@ -265,10 +265,10 @@ module Internalize(M:Mvbdu) =
     let mvbdu_id = lift_unary "line 228, mvbdu_id" M.mvbdu_id
     let mvbdu_not = lift_unary "line 229, mvbdu_not" M.mvbdu_not
 
-    let mvbdu_unary_true _ = mvbdu_true
-    let mvbdu_unary_false _ = mvbdu_false
-    let mvbdu_bi_true _ _ = mvbdu_true
-    let mvbdu_bi_false _ _ = mvbdu_false
+    let mvbdu_unary_true _ = mvbdu_true ()
+    let mvbdu_unary_false _ = mvbdu_false ()
+    let mvbdu_bi_true _ _ = mvbdu_true () 
+    let mvbdu_bi_false _ _ = mvbdu_false ()
 				
     let lift_binary s f x y =
       let error = Exception.empty_error_handler in 
@@ -392,15 +392,15 @@ module Optimize'(M:Internalized_mvbdu) =
 	     let mvbdu_unary_false a = mvbdu_not (mvbdu_unary_true a) 
 	     let mvbdu_and a b = mvbdu_not (mvbdu_nand a b) 
 	     let mvbdu_or a b = mvbdu_nand (mvbdu_not a) (mvbdu_not b)
-	     let mvbdu_imply a b = mvbdu_nand a (mvbdu_not a)
+	     let mvbdu_imply a b = mvbdu_nand a (mvbdu_not b)
 	     let mvbdu_rev_imply a b = mvbdu_imply b a 
 	     let mvbdu_nor a b = mvbdu_not (mvbdu_or a b)
 	     let mvbdu_equiv a b = mvbdu_and (mvbdu_imply a b) (mvbdu_imply b a)
 	     let mvbdu_xor a b = mvbdu_not (mvbdu_equiv a b)
 	     let mvbdu_nimply a b = mvbdu_not (mvbdu_imply a b)
 	     let mvbdu_nrev_imply a b = mvbdu_nimply b a
-	     let mvbdu_bi_true _ _ = M.mvbdu_true 
-	     let mvbdu_bi_false _ _ = M.mvbdu_false 
+	     let mvbdu_bi_true _ _ = M.mvbdu_true () 
+	     let mvbdu_bi_false _ _ = M.mvbdu_false () 
 	     let mvbdu_fst a _ = a
 	     let mvbdu_snd _ b = b			      
 	     let mvbdu_nfst a _ = mvbdu_not a 
