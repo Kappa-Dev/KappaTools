@@ -37,6 +37,7 @@ module type Mvbdu =
     val build_list: ((int * int) list,hconsed_list) unary  
     val build_sorted_list: ((int * int) list,hconsed_list) unary
     val build_reverse_sorted_list: ((int * int) list,hconsed_list) unary
+    val print: out_channel -> string -> mvbdu -> unit 
 end
   
 module type Internalized_mvbdu =
@@ -72,6 +73,7 @@ module type Internalized_mvbdu =
     val build_list: (int * int) list ->  hconsed_list 
     val build_sorted_list: (int * int) list -> hconsed_list
     val build_reverse_sorted_list: (int * int) list -> hconsed_list
+    val print: out_channel -> string -> mvbdu -> unit 
   end
 
 module type Nul = 
