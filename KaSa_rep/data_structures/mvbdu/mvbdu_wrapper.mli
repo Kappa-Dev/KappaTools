@@ -1,8 +1,8 @@
 module type Mvbdu =
   sig
-    type handler 
+    type handler = (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.list_dic,bool,int) Memo_sig.handler
     type mvbdu
-    type list
+    type hconsed_list
     type 'output constant = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> Exception.method_handler * handler * 'output
     type ('input,'output) unary =  Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input -> Exception.method_handler * handler * 'output
     type ('input1,'input2,'output) binary = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input1 -> 'input2 -> Exception.method_handler * handler * 'output
@@ -33,13 +33,16 @@ module type Mvbdu =
     val mvbdu_snd: (mvbdu,mvbdu,mvbdu) binary 
     val mvbdu_nfst: (mvbdu,mvbdu,mvbdu) binary 
     val mvbdu_nsnd: (mvbdu,mvbdu,mvbdu) binary 
-    val mvbdu_redefine: (mvbdu,list,mvbdu) binary 
-  end
+    val mvbdu_redefine: (mvbdu,hconsed_list,mvbdu) binary 
+    val build_list: ((int * int) list,hconsed_list) unary  
+    val build_sorted_list: ((int * int) list,hconsed_list) unary
+    val build_reverse_sorted_list: ((int * int) list,hconsed_list) unary
+end
   
 module type Internalized_mvbdu =
   sig
     type mvbdu
-    type list
+    type hconsed_list
     val init: Remanent_parameters_sig.parameters -> unit 
     val is_init: unit -> bool 
     val equal: mvbdu -> mvbdu -> bool 
@@ -65,9 +68,16 @@ module type Internalized_mvbdu =
     val mvbdu_snd:  mvbdu -> mvbdu -> mvbdu 
     val mvbdu_nfst:  mvbdu -> mvbdu -> mvbdu 
     val mvbdu_nsnd:  mvbdu -> mvbdu -> mvbdu 
-    val mvbdu_redefine:  mvbdu -> list -> mvbdu
+    val mvbdu_redefine:  mvbdu -> hconsed_list -> mvbdu
+    val build_list: (int * int) list ->  hconsed_list 
+    val build_sorted_list: (int * int) list -> hconsed_list
+    val build_reverse_sorted_list: (int * int) list -> hconsed_list
   end
 
+module type Nul = 
+  sig 
+  end
+module Make (M:Nul): Mvbdu 
 module Mvbdu:Mvbdu
 module IntMvbdu:Internalized_mvbdu
 module Optimized_Mvbdu:Mvbdu
