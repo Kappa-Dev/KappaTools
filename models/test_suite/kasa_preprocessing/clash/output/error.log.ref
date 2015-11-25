@@ -1,1 +1,2 @@
-README: 2: README: /home/feret/KaSim/bin/KaSim: not found
+File "clash.ka", line 6, characters 26-27:
+Warning: breaking a semi-link on site 'x' will induce a side effect

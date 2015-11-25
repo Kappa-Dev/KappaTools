@@ -1,0 +1,61 @@
++ Command line is: 'KaSim' '-i' 'cube.ka' '-seed' '240056667' '-e' '30000' '-d' 'output'
+Parsing cube.ka...
+done
++ Initialized random number generator with seed 240056667
++ Building initial simulation conditions...
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -sanity checks
+	 -KaSa tools initialization
++ Compute the contact map
+	 -variable declarations
+	 -rules
+	 -observables
+	 -perturbations
+	 -initial conditions
+	 Done
+____________________________________________________________
+############################################################
+	 - removing events occurring after the last observable:
+ (no change)
++ Producing causal compressions
+	 - splitting initial events (no change)
+	 - renaming agents to avoid conflicts after event removals (no change)
+	 - detecting siphons (no change)
+	 - renaming agents to avoid conflicts after event removals (no change)
+	 - cutting concurrent events (-17238 events)
+	 - blackboard generation
+	 - computing causal past of each observed events (5970)
+Stats:
+ number of step   : 45971
+ longest story    : 7
+ average length   : 2.370558799
+ geometric mean   : 2.87590142521
+
+	 - causal & weak flow compression (5970)
+
+____________________________________________________________
+############################################################
+	 - detecting pseudo inverse events (no change)
+	 - blackboard generation
+	 - computing causal past of each observed events (5970)
+
+____________________________________________________________
+############################################################
+Stats:
+ number of step   : 28733
+ longest story    : 7
+ average length   : 3.81273031826
+ geometric mean   : 4.13851461065
+
+	 - causal & weak flow compression (5970)
+
+____________________________________________________________
+############################################################
+
+
+
++ Pretty printing 2 flows
++ Pretty printing 1 weakly compressed flow
+Simulation ended

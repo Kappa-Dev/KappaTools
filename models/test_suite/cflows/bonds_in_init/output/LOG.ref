@@ -1,0 +1,63 @@
++ Command line is: 'KaSim' '-i' 'bonds_in_init.ka' '-t' '40' '-seed' '611463625' '-d' 'output'
+Parsing bonds_in_init.ka...
+done
++ Initialized random number generator with seed 611463625
++ Building initial simulation conditions...
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -sanity checks
+	 -KaSa tools initialization
++ Compute the contact map
+	 -variable declarations
+	 -rules
+	 -observables
+	 -perturbations
+	 -initial conditions
+	 Done
+____________________________________________________________
+############################################################
+	 - removing events occurring after the last observable:
+ (-534 events)
++ Producing causal compressions
+	 - splitting initial events (+30 events)
+	 - renaming agents to avoid conflicts after event removals (no change)
+	 - detecting siphons (+3 events)
+	 - renaming agents to avoid conflicts after event removals (no change)
+	 - cutting concurrent events (-101 events)
+	 - blackboard generation
+	 - computing causal past of each observed events (10)
+Stats:
+ number of step   : 206
+ longest story    : 94
+ average length   : 27.0857142857
+ geometric mean   : 36.7023549264
+
+	 - causal & weak flow compression (10)
+
+____________________________________________________________
+############################################################
+	 - detecting pseudo inverse events (-14 events)
+	 - blackboard generation
+	 - computing causal past of each observed events (10)
+Stats:
+ number of step   : 94
+ longest story    : 17
+ average length   : 6.54545454545
+ geometric mean   : 8.74902591981
+
+	 - causal & weak flow compression (10)
+
+____________________________________________________________
+############################################################
+
+
+
+	 - strong flow compression (2)
+
+____________________________________________________________
+############################################################
++ Pretty printing 7 flows
++ Pretty printing 2 weakly compressed flows
++ Pretty printing 1 strongly compressed flow
+Simulation ended

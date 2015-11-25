@@ -1,1 +1,2 @@
-README: 2: README: /home/feret/KaSim/bin/KaSim: not found
+File "weak_events.ka", line 11, characters 7-8:
+Warning: breaking a semi-link on site 'x' will induce a side effect

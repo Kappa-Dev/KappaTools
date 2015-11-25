@@ -1,0 +1,53 @@
++ Command line is: 'KaSim' '-i' 'link_passing_strong3.ka' '-seed' '611463625' '-e' '280' '-d' 'output'
+Parsing link_passing_strong3.ka...
+done
++ Initialized random number generator with seed 611463625
++ Building initial simulation conditions...
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -sanity checks
+	 -KaSa tools initialization
++ Compute the contact map
+	 -variable declarations
+	 -rules
+	 -observables
+	 -perturbations
+	 -initial conditions
+	 Done
+____________________________________________________________
+############################################################
+	 - removing events occurring after the last observable:
+ (no change)
++ Producing causal compressions
+	 - splitting initial events (no change)
+	 - renaming agents to avoid conflicts after event removals (no change)
+	 - detecting siphons (+63 events)
+	 - renaming agents to avoid conflicts after event removals (no change)
+	 - cutting concurrent events (-9 events)
+	 - detecting pseudo inverse events (no change)
+	 - blackboard generation
+	 - computing causal past of each observed events (66)
+
+____________________________________________________________
+############################################################
+Stats:
+ number of step   : 421
+ longest story    : 343
+ average length   : 172.333333333
+ geometric mean   : 199.488436666
+
+	 - causal & weak flow compression (66)
+
+____________________________________________________________
+############################################################
+
+
+
+	 - strong flow compression (16)
+
+____________________________________________________________
+############################################################
++ Pretty printing 16 weakly compressed flows
++ Pretty printing 1 strongly compressed flow
+Simulation ended

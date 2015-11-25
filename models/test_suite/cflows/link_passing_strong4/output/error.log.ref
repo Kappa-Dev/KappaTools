@@ -1,1 +1,8 @@
-README: 2: README: /home/feret/KaSim/bin/KaSim: not found
+File "link_passing_strong4.ka", line 6, characters 13-14:
+Warning: rule induces a link permutation on site 'x' of agent 'K'
+File "link_passing_strong4.ka", line 7, characters 13-14:
+Warning: rule induces a link permutation on site 'x' of agent 'K'
+File "link_passing_strong4.ka", line 8, characters 13-14:
+Warning: rule induces a link permutation on site 'x' of agent 'K'
+File "link_passing_strong4.ka", line 9, characters 13-14:
+Warning: rule induces a link permutation on site 'x' of agent 'K'

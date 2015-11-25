@@ -1,0 +1,54 @@
++ Command line is: 'KaSim' '-i' 'link_swapping_strong3.ka' '-seed' '924556145' '-e' '30' '-d' 'output'
+Parsing link_swapping_strong3.ka...
+done
++ Initialized random number generator with seed 924556145
++ Building initial simulation conditions...
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -sanity checks
+	 -KaSa tools initialization
++ Compute the contact map
+	 -variable declarations
+	 -rules
+	 -observables
+	 -perturbations
+	 -initial conditions
+	 Done
+____________________________________________________________
+############################################################
+	 - removing events occurring after the last observable:
+ (-2 events)
++ Producing causal compressions
+	 - splitting initial events (no change)
+	 - renaming agents to avoid conflicts after event removals (no change)
+	 - detecting siphons (+3 events)
+	 - renaming agents to avoid conflicts after event removals (no change)
+	 - cutting concurrent events (-7 events)
+	 - detecting pseudo inverse events (no change)
+	 - blackboard generation
+	 - computing causal past of each observed events (12)
+Stats:
+ number of step   : 45
+ longest story    : 11
+ average length   : 7.
+ geometric mean   : 7.54983443527
+
+	 - causal & weak flow compression (12)
+
+____________________________________________________________
+############################################################
+
+
+
+	 - strong flow compression (1)
+
+____________________________________________________________
+############################################################
++ Pretty printing 1 weakly compressed flow
++ Pretty printing 1 strongly compressed flow
+Simulation ended (eff.: 0.833333, detail below)
+	Valid embedding but no longer unary when required: 0.000000
+	Valid embedding but not binary when required: 0.000000
+	Clashing instance: 1.000000
+	Perturbation interrupting time advance: 0.000000

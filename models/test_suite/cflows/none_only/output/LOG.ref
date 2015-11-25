@@ -1,0 +1,43 @@
++ Command line is: 'KaSim' 'none_only.ka' '-seed' '627933151' '-e' '1000' '-d' 'output' '-p' '50'
+Parsing none_only.ka...
+done
++ Initialized random number generator with seed 627933151
++ Building initial simulation conditions...
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -sanity checks
+	 -KaSa tools initialization
++ Compute the contact map
+	 -variable declarations
+	 -rules
+	 -observables
+	 -perturbations
+	 -initial conditions
+	 Done
+____________________________________________________________
+############################################################
+	 - removing events occurring after the last observable:
+ (-857 events)
++ Producing causal traces
+	 - splitting initial events (+10 events)
+	 - renaming agents to avoid conflicts after event removals (no change)
+	 - detecting siphons (+29 events)
+	 - renaming agents to avoid conflicts after event removals (no change)
+	 - blackboard generation
+	 - computing causal past of each observed events (10)
+Stats:
+ number of step   : 10174
+ longest story    : 95
+ average length   : 35.660130719
+ geometric mean   : 43.712070393
+
+	 - causal & weak flow compression (10)
+
+____________________________________________________________
+############################################################
+
+
+
++ Pretty printing 10 flows
+Simulation ended

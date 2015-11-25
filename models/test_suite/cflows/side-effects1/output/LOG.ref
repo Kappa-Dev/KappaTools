@@ -1,0 +1,58 @@
++ Command line is: 'KaSim' '-i' 'side-effects.ka' '-seed' '924556145' '-e' '10000' '-d' 'output'
+Parsing side-effects.ka...
+done
++ Initialized random number generator with seed 924556145
++ Building initial simulation conditions...
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -sanity checks
+	 -KaSa tools initialization
++ Compute the contact map
+	 -variable declarations
+	 -rules
+	 -observables
+	 -perturbations
+	 -initial conditions
+	 Done
+____________________________________________________________
+############################################################
+	 - removing events occurring after the last observable:
+ (-9987 events)
++ Producing causal compressions
+	 - splitting initial events (+2 events)
+	 - renaming agents to avoid conflicts after event removals (no change)
+	 - detecting siphons (no change)
+	 - renaming agents to avoid conflicts after event removals (no change)
+	 - cutting concurrent events (-7 events)
+	 - blackboard generation
+	 - computing causal past of each observed events (8)
+Stats:
+ number of step   : 26
+ longest story    : 4
+ average length   : 3.
+ geometric mean   : 3.26990943182
+
+	 - causal & weak flow compression (8)
+
+____________________________________________________________
+############################################################
+	 - detecting pseudo inverse events (no change)
+	 - blackboard generation
+	 - computing causal past of each observed events (8)
+Stats:
+ number of step   : 19
+ longest story    : 4
+ average length   : 3.4
+ geometric mean   : 3.60555127546
+
+	 - causal & weak flow compression (8)
+
+____________________________________________________________
+############################################################
+
+
+
++ Pretty printing 2 flows
++ Pretty printing 2 weakly compressed flows
+Simulation ended

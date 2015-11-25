@@ -1,0 +1,25 @@
++ Command line is: 'KaSim' '-i' 'side-effects.ka' '-e' '25' '-seed' '253329392' '-d' 'output'
+Parsing side-effects.ka...
+done
++ Initialized random number generator with seed 253329392
++ Building initial simulation conditions...
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -sanity checks
+	 -KaSa tools initialization
++ Compute the contact map
+	 -variable declarations
+	 -rules
+	 -observables
+	 -perturbations
+	 -initial conditions
+	 Done
+____________________________________________________________
+############################################################
+	 - removing events occurring after the last observable:
+ (-36 events)
++ No causal flow found
++ Pretty printing 0 flow
++ Pretty printing 0 weakly compressed flow
+Simulation ended

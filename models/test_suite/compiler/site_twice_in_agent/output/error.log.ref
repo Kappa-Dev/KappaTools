@@ -1,4 +1,10 @@
-README: 2: README: /home/feret/KaSim/bin/KaSim: not found
-README: 3: README: /home/feret/KaSim/bin/KaSim: not found
-README: 4: README: /home/feret/KaSim/bin/KaSim: not found
-README: 5: README: /home/feret/KaSim/bin/KaSim: not found
+File "lhs.ka", line 3, characters 15-16:
+Site 'x' occurs more than once in this agent 'A'
+File "rhs.ka", line 3, characters 0-32:
+Warning: Rule has no kinetics. Default rate of 0.0 is assumed.
+File "rhs.ka", line 3, characters 21-22:
+Site 'x' occurs more than once in this agent 'A'
+File "internal.ka", line 3, characters 16-17:
+Site 'x' occurs more than once in this agent 'A'
+File "remove.ka", line 3, characters 15-16:
+Site 'x' occurs more than once in this agent 'A'

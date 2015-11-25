@@ -1,0 +1,63 @@
++ Command line is: 'KaSim' '-i' 'processive.ka' '-seed' '240056667' '-e' '30000' '-d' 'output'
+Parsing processive.ka...
+done
++ Initialized random number generator with seed 240056667
++ Building initial simulation conditions...
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -sanity checks
+	 -KaSa tools initialization
++ Compute the contact map
+	 -variable declarations
+	 -rules
+	 -observables
+	 -perturbations
+	 -initial conditions
+	 Done
+____________________________________________________________
+############################################################
+	 - removing events occurring after the last observable:
+ (-29721 events)
++ Producing causal compressions
+	 - splitting initial events (no change)
+	 - renaming agents to avoid conflicts after event removals (no change)
+	 - detecting siphons (+43 events)
+	 - renaming agents to avoid conflicts after event removals (no change)
+	 - cutting concurrent events (-268 events)
+	 - blackboard generation
+	 - computing causal past of each observed events (10)
+Stats:
+ number of step   : 310
+ longest story    : 52
+ average length   : 9.59515570934
+ geometric mean   : 11.7698518157
+
+	 - causal & weak flow compression (10)
+
+____________________________________________________________
+############################################################
+	 - detecting pseudo inverse events (-6 events)
+	 - blackboard generation
+	 - computing causal past of each observed events (10)
+Stats:
+ number of step   : 79
+ longest story    : 8
+ average length   : 6.5
+ geometric mean   : 6.67083203206
+
+	 - causal & weak flow compression (10)
+
+____________________________________________________________
+############################################################
+
+
+
+	 - strong flow compression (3)
+
+____________________________________________________________
+############################################################
++ Pretty printing 8 flows
++ Pretty printing 3 weakly compressed flows
++ Pretty printing 1 strongly compressed flow
+Simulation ended

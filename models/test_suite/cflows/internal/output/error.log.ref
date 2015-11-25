@@ -1,1 +1,8 @@
-README: 2: README: /home/feret/KaSim/bin/KaSim: not found
+File "internal.ka", line 8, characters 10-11:
+Warning: internal state of site 'x' of agent 'A' is modified although it is left unpecified in the left hand side
+File "internal.ka", line 9, characters 10-11:
+Warning: internal state of site 'x' of agent 'A' is modified although it is left unpecified in the left hand side
+File "internal.ka", line 10, characters 10-11:
+Warning: internal state of site 'x' of agent 'A' is modified although it is left unpecified in the left hand side
+File "internal.ka", line 11, characters 10-11:
+Warning: internal state of site 'x' of agent 'A' is modified although it is left unpecified in the left hand side
