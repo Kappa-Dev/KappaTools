@@ -396,5 +396,8 @@ site_type:2:state:1
 * Fixpoint iteration :
 ------------------------------------------------------------
 ** Discovered sites that are bond on the rhs for the first time:
+** triple test:
+modif list:agent_id:0
+site:2:state:1
 ** Fixpoint iteration function:
 execution finished without any exception

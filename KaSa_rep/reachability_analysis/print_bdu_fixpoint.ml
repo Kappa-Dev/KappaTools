@@ -65,6 +65,29 @@ let print_bdu_update_map parameter error result =
     ) l2
   ) result
 
+let print_list l =
+  let rec aux acc =
+    match acc with
+    | [] -> []
+    | (site, state) :: tl -> fprintf stdout "site:%i:state:%i\n" site state; aux tl
+  in aux l
+
+let print_triple_test parameter error result =
+  let (l, l') = result in
+  let _ = 
+    Map_creation_bdu_ag.Map.iter (fun agent_type (l1, bdu_creation) ->
+      if l1 <> [] then () else ();
+      fprintf parameter.log "bdu_creation\nagent_type:%i:\n" agent_type;
+      Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_creation
+    ) l
+  in
+  Map_modif_ag.Map.iter (fun agent_id (l1, modif_list) ->
+    if l1 <> [] then () else ();
+    fprintf parameter.log "modif list:agent_id:%i\n" agent_id;
+    let _ = print_list modif_list in
+    ()
+  ) l'
+  
 (************************************************************************************)
 (*main print*)
 
@@ -84,6 +107,14 @@ let print_bdu_fixpoint parameter error result =
       parameter
       error
       result.store_test_has_bond_rhs
+  in
+  let _ =
+  fprintf (Remanent_parameters.get_log parameter)
+    "** triple test:\n";
+    print_triple_test
+      parameter
+      error
+      result.store_triple_test
   in
   let _ =
   fprintf (Remanent_parameters.get_log parameter)

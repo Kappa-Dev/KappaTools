@@ -128,6 +128,13 @@ module Map_final_creation_bdu =
 module Project2bdu_creation =
   SetMap.Proj (Map_creation_bdu)(Map_final_creation_bdu)
 
+module Map_creation_bdu_ag =
+  SetMap.Make (
+    struct
+      type t = int (*agent_type*)
+      let compare = compare
+    end)
+
 (*Test rule*)
 module Map_test =
   SetMap.Make (
@@ -176,6 +183,14 @@ module Map_final_modif_list =
       type t = int
       let compare = compare
     end)
+
+module Map_modif_ag =
+  SetMap.Make (
+    struct
+      type t = int
+      let compare = compare
+    end)
+
 
 module Project2bdu_modif =
   SetMap.Proj (Map_modif_list)(Map_final_modif_list)
@@ -287,6 +302,8 @@ type bdu_fixpoint =
   {
     store_test_has_bond_rhs : (int list * Map_site_address.Set.t) Map_test_bond.Map.t;
     store_bdu_update_map    : (int list * Mvbdu_wrapper.Mvbdu.mvbdu list) Map_bdu_update.Map.t;
+    store_triple_test : ((int list * Mvbdu_wrapper.Mvbdu.mvbdu) Map_creation_bdu_ag.Map.t *
+                           (int list * (int * int) list) Map_modif_ag.Map.t) (*REMOVE*)
   }
 
 (************************************************************************************)

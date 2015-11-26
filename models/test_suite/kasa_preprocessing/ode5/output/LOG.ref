@@ -1289,5 +1289,10 @@ rule_id:3
 {agent_id:1; agent_type:3; site_type:1} -- {agent_id:0; agent_type:2; site_type:1} 
 rule_id:4
 {agent_id:1; agent_type:0; site_type:4} -- {agent_id:0; agent_type:3; site_type:2} 
+** triple test:
+modif list:agent_id:0
+site:1:state:1
+modif list:agent_id:1
+site:2:state:1
 ** Fixpoint iteration function:
 execution finished without any exception

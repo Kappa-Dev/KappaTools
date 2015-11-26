@@ -59,7 +59,7 @@ let collect_test_bdu_map parameter handler error store_test_map =
   let error, store_result =
     Map_test.Map.fold (fun (agent_id, agent_type, rule_id, cv_id)
       (l1, l2) (error, store_result) ->
-    (*return a list of a pair (site, state) *)
+        (*return a list of a pair (site, state) *)
         let error, pair_list =
           List.fold_left (fun (error, current_list) (site, state) ->
             let pair_list = (site, state) :: current_list in
@@ -78,9 +78,9 @@ let collect_test_bdu_map parameter handler error store_test_map =
         error, store_result
     ) store_test_map (error, Map_test_bdu.Map.empty)
   in
-  let store_reusult =
+  (*let store_result =
     Map_test_bdu.Map.map (fun (l, x) -> List.rev, x) store_result
-  in
+  in*)
   error, store_result
 
 (*projection with (rule_id) *)
