@@ -33,9 +33,10 @@ let check_freshness parameters error str id id_set =
     
   
 let add_entry parameters id agent site index (error,map) =
-  let old_list =
-    Ckappa_sig.Int_Set_and_Map.Map.find_default [] id map in
-  error,Ckappa_sig.Int_Set_and_Map.Map.add id ((agent,site,index)::old_list) map
+  let error,old_list = 
+    Ckappa_sig.Int_Set_and_Map.Map.find_default_without_logs parameters error [] id map (* this is a partial map which stores the occurrences of binding labels *)
+  in 
+  Ckappa_sig.Int_Set_and_Map.Map.add_or_overwrite parameters error id ((agent,site,index)::old_list) map 
 
 let rev_ast = List.rev 
 (*mixture = 
@@ -48,25 +49,33 @@ let rev_ast = List.rev
   in aux mixture []*)
   
 let pop_entry parameters error id (map,set) =
+  let error,list =  Ckappa_sig.Int_Set_and_Map.Map.find_option parameters error id map in 	
   if Ckappa_sig.Int_Set_and_Map.Set.mem id set 
-  then 
-    match Ckappa_sig.Int_Set_and_Map.Map.find_option id map 
-    with 
-    | Some [a] -> warn parameters error (Some "line 55, dandling bond detected\n") Exit (None,(Ckappa_sig.Int_Set_and_Map.Map.remove id map))
-    | Some [] | None ->  warn parameters error (Some "line 56, internal bug, link id is ignored") Exit (None,map) 
-    | Some (h::t) -> warn parameters error (Some "line 57, internal bug, link id is ignored") Exit (None,(Ckappa_sig.Int_Set_and_Map.Map.add id t map))
+  then
+    match list with       
+    | Some [a] ->
+       let error,map = Ckappa_sig.Int_Set_and_Map.Map.remove parameters error id map in
+       warn parameters error (Some "line 55, dandling bond detected\n") Exit (None,map)
+    | Some [] ->  warn parameters error (Some "line 56, internal bug, link id is ignored") Exit (None,map) 
+    | Some (h::t) ->
+       let error,map = Ckappa_sig.Int_Set_and_Map.Map.overwrite parameters error id t map in
+       warn parameters error (Some "line 57, internal bug, link id is ignored") Exit (None,map)
+    | None ->
+       warn parameters error (Some "line 58, internal bug, link id is ignored") Exit (None,map)
   else
-  match Ckappa_sig.Int_Set_and_Map.Map.find_option id map  with
-  | Some [a] ->
-     let map = Ckappa_sig.Int_Set_and_Map.Map.remove id map in
-     error,(Some a,map)
-  | Some [b;a] ->
-     let map = Ckappa_sig.Int_Set_and_Map.Map.add id [a] map in
-     error,(Some b,map)
-  | Some (h::t) ->
-     warn parameters error (Some "line 69, too many instances of a link identifier, ignore them") Exit (None,Ckappa_sig.Int_Set_and_Map.Map.add id t map)
-  | Some [] | None -> warn parameters error (Some "line 70, internal bug, link identifier") Exit (None,map)
-
+    match list with
+    | Some [a] ->
+       let error,map = Ckappa_sig.Int_Set_and_Map.Map.remove parameters error id map in
+       error,(Some a,map)
+    | Some [b;a] ->
+       let error,map = Ckappa_sig.Int_Set_and_Map.Map.overwrite parameters error id [a] map in
+       error,(Some b,map)
+    | Some (h::t) ->
+       let error,map = Ckappa_sig.Int_Set_and_Map.Map.overwrite parameters error id t map in 
+       warn parameters error (Some "line 69, too many instances of a link identifier, ignore them") Exit (None,map)
+    | Some [] -> warn parameters error (Some "line 70, internal bug, link identifier") Exit (None,map)
+    | None -> warn parameters error (Some "line 70, internal bug, link identifier") Exit (None,map)
+		      
 let rec scan_interface parameters k agent interface remanent = 
       match interface with 
       | [] -> remanent
@@ -97,8 +106,8 @@ let collect_binding_label parameters mixture f k remanent =
     (fun x l (error,(map,set)) -> 
      if (List.length l = 1)
       then 
-	let map = Ckappa_sig.Int_Set_and_Map.Map.remove x map in 
-	let set = Ckappa_sig.Int_Set_and_Map.Set.add x set in
+	let error,map = Ckappa_sig.Int_Set_and_Map.Map.remove parameters error x map in 
+	let error,set = Ckappa_sig.Int_Set_and_Map.Set.add parameters error x set in
 	warn parameters error (Some "line 100, dangling bond detected") Exit (map,set) 
       else 
 	(error,(map,set)))

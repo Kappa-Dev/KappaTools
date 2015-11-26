@@ -15,7 +15,7 @@
 let warn parameters mh message exn default = 
      Exception.warn parameters mh (Some "ckappa_sig") message exn (fun () -> default) 
   
-module Int_Set_and_Map = SetMap.Make (struct type t = int let compare = compare end) 
+module Int_Set_and_Map = Map_wrapper.Make(SetMap.Make (struct type t = int let compare = compare end))
 
 let local_trace = true 
 

@@ -60,8 +60,8 @@ let print_agent_var_map parameters error handler map =
 
 let print_string_map parameters error handler map =
   let error =
-    Quark_type.StringMap.Map.iter
-      (fun key im ->
+    Quark_type.StringMap.Map.fold
+      (fun key im error ->
        let error =
 	 Int_storage.Quick_Nearly_inf_Imperatif.iter 
           parameters
@@ -72,13 +72,14 @@ let print_string_map parameters error handler map =
            let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "\n" in
            error)
 	  im in
-       () )
+       error )
       map
+      error 
   in error
 let print_var_string_map parameters error handler map =
   let error =
-    Quark_type.StringMap.Map.iter
-      (fun key im ->
+    Quark_type.StringMap.Map.fold
+      (fun key im error ->
        let error =
 	 Int_storage.Quick_Nearly_inf_Imperatif.iter 
           parameters
@@ -89,8 +90,9 @@ let print_var_string_map parameters error handler map =
            let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "\n" in
            error)
 	  im in
-       () )
+       error)    
       map
+      error 
   in error 
 	  
 let print_agents parameters error handler quark = 
@@ -155,11 +157,11 @@ let print_sites parameter error handler quark =
 
 let print_dead_agents parameter error handler quark =
   let parameter_var = Remanent_parameters.update_prefix parameter "dead_agent**:" in 
-  let () = print_string_map parameter_var error handler quark.Quark_type.dead_agent in
+  let error = print_string_map parameter_var error handler quark.Quark_type.dead_agent in
   let parameter_var = Remanent_parameters.update_prefix parameter "dead_agent++**:" in 
-  let () = print_var_string_map parameter_var error handler quark.Quark_type.dead_agent_plus in
+  let error = print_var_string_map parameter_var error handler quark.Quark_type.dead_agent_plus in
   let parameter_plus = Remanent_parameters.update_prefix parameter "dead_agent--**:" in 
-  let () = print_var_string_map parameter_plus error handler quark.Quark_type.dead_agent_minus  in 
+  let error = print_var_string_map parameter_plus error handler quark.Quark_type.dead_agent_minus  in 
   error
     
 let print_quarks parameters  error handler quark = 
