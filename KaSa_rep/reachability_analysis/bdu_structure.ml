@@ -44,118 +44,184 @@ let build_bdu parameter handler error pair_list =
   covering class)*)
 
 let collect_test_bdu_map parameter handler error store_test_map =
-  let error, handler, bdu_false = Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error in
-  let add_link (agent_id, agent_type, rule_id, cv_id) bdu store_result =
+  (*store a list of (agent_id, agent_type, bdu) :: []; use this information for projection*)
+  let add_link (agent_id, agent_type, rule_id, cv_id) (ag_id, bdu) store_result =
     let (l,old) =
-	Map_test_bdu.Map.find_default ([], bdu_false)
+	Map_test_bdu.Map.find_default ([],[])
           (agent_id, agent_type, rule_id, cv_id) store_result
     in
     let result_map =
       Map_test_bdu.Map.add (agent_id, agent_type, rule_id, cv_id)
-        (l, bdu) store_result (*NOTE: each rule*)
+        (l, (ag_id, bdu) :: []) store_result (*NOTE: each rule*)
     in
     error, result_map
   in
-  Map_test.Map.fold (fun (agent_id, agent_type, rule_id, cv_id)
-    (l1, l2) (error, store_result) ->
+  let error, store_result =
+    Map_test.Map.fold (fun (agent_id, agent_type, rule_id, cv_id)
+      (l1, l2) (error, store_result) ->
     (*return a list of a pair (site, state) *)
-    let error, pair_list =
-      List.fold_left (fun (error, current_list) (site, state) ->
-        let pair_list = (site, state) :: current_list in
-        error, pair_list
-      ) (error, []) l2
-    in
-    (*build bdu test from this pair_list*)
-    let error, handler, bdu_test =
-      build_bdu parameter handler error pair_list
-    in
-    (*store handler, bdu_test in a map with (agent_type, rule_id) *)
-    let error, store_result =
-      add_link (agent_id, agent_type, rule_id, cv_id) bdu_test store_result
-    in
-    error, store_result
-  ) store_test_map (error, Map_test_bdu.Map.empty)
+        let error, pair_list =
+          List.fold_left (fun (error, current_list) (site, state) ->
+            let pair_list = (site, state) :: current_list in
+            error, pair_list
+          ) (error, []) l2
+        in
+        (*build bdu test from this pair_list*)
+        let error, handler, bdu_test =
+          build_bdu parameter handler error pair_list
+        in
+        (*store handler, bdu_test in a map with (agent_type, rule_id) *)
+        let error, store_result =
+          add_link (agent_id, agent_type, rule_id, cv_id) (agent_id, bdu_test)
+            store_result
+        in
+        error, store_result
+    ) store_test_map (error, Map_test_bdu.Map.empty)
+  in
+  let store_reusult =
+    Map_test_bdu.Map.map (fun (l, x) -> List.rev, x) store_result
+  in
+  error, store_result
+
+(*projection with (rule_id) *)
+
+let collect_final_test_bdu_map parameter handler error store_test_bdu_map =
+  Map_test_bdu.Map.fold
+    (fun (agent_id, agent_type, rule_id, cv_id) (l1, l2) (error, store_result) ->
+      let store_result =
+        Project2bdu_test.proj
+          (fun (agent_id, agent_type, rule_id, cv_id) -> rule_id)
+          ([], [])
+          (fun (l, x) (l', x') ->
+            List.concat [l; l'],
+            List.concat [x; x']
+          ) 
+          store_test_bdu_map          
+      in
+      let store_result =
+        Map_final_test_bdu.Map.map (fun (l, x) -> List.rev l, x) store_result
+      in
+      error, store_result
+    ) store_test_bdu_map (error, Map_final_test_bdu.Map.empty)
 
 (*************************************************************************************)
 (*Bdu for the valuations of the views that are tested (per rule, agent and
   covering class)*)
 
 let collect_creation_bdu_map parameter handler error store_creation_map =
-  let error, handler, bdu_false = Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error in
-  let add_link (agent_type, rule_id, cv_id) bdu store_result =
+   let add_link (agent_type, rule_id, cv_id) (ag, bdu) store_result =
     let (l, old) =
-      Map_creation_bdu.Map.find_default ([], bdu_false)
+      Map_creation_bdu.Map.find_default ([], [])
 	(agent_type, rule_id, cv_id) store_result
     in
     let result_map = (*NOTE: get only a bdu_creation of each rule*)
-      Map_creation_bdu.Map.add (agent_type, rule_id, cv_id) (l, bdu)
+      Map_creation_bdu.Map.add (agent_type, rule_id, cv_id) (l, (agent_type, bdu) :: [])
         store_result
     in
     error, result_map
   in
-  Map_creation.Map.fold (fun (agent_type, rule_id, cv_id) (l1, l2) (error, store_result) ->
+  let error, store_result =
+    Map_creation.Map.fold (fun (agent_type, rule_id, cv_id) (l1, l2) (error, store_result) ->
     (*return a list of a pair (site, state) *)
-    let error, pair_list =
-      List.fold_left (fun (error, current_list) (site, state) ->
-        let pair_list = (site, state) :: current_list in
-        error, pair_list
-      ) (error, []) l2
-    in
-    (*build bdu test from this pair_list*)
-    let error, handler, bdu_creation =
-      build_bdu parameter handler error pair_list
-    in
-    (*store handler, bdu_test in a map with (agent_type, rule_id) *)
-    let error, store_result =
-      add_link (agent_type, rule_id, cv_id) bdu_creation store_result
-    in
-    error, store_result
-  ) store_creation_map (error, Map_creation_bdu.Map.empty)
+      let error, pair_list =
+        List.fold_left (fun (error, current_list) (site, state) ->
+          let pair_list = (site, state) :: current_list in
+          error, pair_list
+        ) (error, []) l2
+      in
+      (*build bdu test from this pair_list*)
+      let error, handler, bdu_creation =
+        build_bdu parameter handler error pair_list
+      in
+      (*store handler, bdu_test in a map with (agent_type, rule_id) *)
+      let error, store_result =
+        add_link (agent_type, rule_id, cv_id) (agent_type, bdu_creation) store_result
+      in
+      error, store_result
+    ) store_creation_map (error, Map_creation_bdu.Map.empty)
+  in
+  let store_result =
+    Map_creation_bdu.Map.map (fun (l, x) -> List.rev l, x) store_result
+  in
+  error, store_result
 
-(*let collect_final_bdu_creation_map parameter handler error store_creation_bdu_map =
+(*projection with rule_id*)
+
+let collect_final_creation_bdu_map parameter handler error store_creation_bdu_map =
   Map_creation_bdu.Map.fold 
-    (fun (agent_type, rule_id, cv_id) (l1, bdu) (error, store_result) ->
-      (*mapi from (rule_id) -> (agent_type, bdu) *)
-      let mapi = Map_creation_bdu.Map.mapi
-        (fun (agent_type, rule_id, cv_id) (l1, bdu) -> (agent_type, bdu))
-        store_creation_bdu_map store_result
+    (fun (agent_type, rule_id, cv_id) (l1, pair_list) (error, store_result) ->
+      (**)
+      let store_result =
+        Project2bdu_creation.proj
+          (fun (agent_type, rule_id, cv_id) -> rule_id)
+          ([], [])
+          (fun (l, x) (l', x') -> (List.concat [l; l'], List.concat [x; x']))
+          store_creation_bdu_map 
       in
-      let proj = 
-        proj (fun (_, rule_id, _) -> rule_id) [] 
-          (fun x y  -> List.concat [x; y]) mapi
+      (*Map from Project_Map -> Map_final*)
+      let store_result =
+        Map_final_creation_bdu.Map.map (fun (l, x) -> List.rev l, x) store_result
       in
-      
-    ) store_creation_bdu_map (error, Map_final_creation_bdu.Map.empty)*)
-    
+      error, store_result
+    ) store_creation_bdu_map (error, Map_final_creation_bdu.Map.empty)
+
 (*************************************************************************************)
 (*Update list of the views due to modification (per rule, agent and covering class)*)
 
 let collect_modif_list_map parameter error store_modif_map =
-  let add_link (agent_id, agent_type, rule_id, cv_id) pair_list store_result =
+  let add_link (agent_id, agent_type, rule_id, cv_id) (ag_id, pair_list) store_result =
     let (l, old) =
       Map_modif_list.Map.find_default ([], []) 
         (agent_id, agent_type, rule_id, cv_id) store_result
     in
     let result_map =
       Map_modif_list.Map.add (agent_id, agent_type, rule_id, cv_id)
-        (l, pair_list) store_result (*NOTE: get only a list of each rule*)
+        (l, (ag_id, pair_list) :: []) store_result (*NOTE: get only a list of each rule*)
     in
     error, result_map
   in
-  Map_modif.Map.fold (fun (agent_id, agent_type, rule_id, cv_id)
-    (l1, l2) (error, store_result) ->
-    (*return a list of a pair (site, state) *)
-    let error, pair_list =
-      List.fold_left (fun (error, current_list) (site, state) ->
-        let pair_list = (site, state) :: current_list in
-        error, pair_list
-      ) (error, []) l2
-    in
-    let error, store_result =
-      add_link (agent_id, agent_type, rule_id, cv_id) pair_list store_result
-    in
-    error, store_result
-  ) store_modif_map (error, Map_modif_list.Map.empty)
+  let error, store_result =
+    Map_modif.Map.fold (fun (agent_id, agent_type, rule_id, cv_id)
+      (l1, l2) (error, store_result) ->
+        (*return a list of a pair (site, state) *)
+        let error, pair_list =
+          List.fold_left (fun (error, current_list) (site, state) ->
+            let pair_list = (site, state) :: current_list in
+            error, pair_list
+          ) (error, []) l2
+        in
+        let error, store_result =
+          add_link (agent_id, agent_type, rule_id, cv_id) 
+            (agent_id, pair_list) store_result
+        in
+        error, store_result
+    ) store_modif_map (error, Map_modif_list.Map.empty)
+  in
+  let store_result =
+    Map_modif_list.Map.map (fun (l, x) -> List.rev l, x) store_result
+  in
+  error, store_result
+
+(*projection with (rule_id) *)
+
+let collect_final_modif_list_map parameter handler error store_modif_list_map =
+  Map_modif_list.Map.fold
+    (fun (agent_id, agent_type, rule_id, cv_id) (l1, l2) (error, store_result) ->
+      let store_result =
+        Project2bdu_modif.proj
+          (fun (agent_id, agent_type, rule_id, cv_id) -> rule_id)
+          ([], [])
+          (fun (l, x) (l', x') ->
+            List.concat [l; l'],
+            List.concat [x; x']
+          ) 
+          store_modif_list_map          
+      in
+      let store_result =
+        Map_final_modif_list.Map.map (fun (l, x) -> List.rev l, x) store_result
+      in
+      error, store_result
+    ) store_modif_list_map (error, Map_final_modif_list.Map.empty)
 
 (*************************************************************************************)
 (*Valuations of the views that are tested (per rule, agent and covering class)*)

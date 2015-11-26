@@ -251,18 +251,16 @@ let collect_bdu_update_map parameter handler error
           List.fold_left (fun (error, (cv_id, store_bdu_result))
             (agent_id, agent_type) ->
             let error, agent = AgentMap.get parameter error agent_id rule.rule_rhs.views in
-            match agent with
-<<<<<<< 5b2da43f9d8d73f205bd81b8ad8d0625e157d4c6
+          match agent with
           | Some Dead_agent _ 
-=======
-	    | Some Unknown_agent _ | Some Dead_agent _ 
->>>>>>> More varieties of dead token propagated in KaSa.
-            | None -> warn parameter error (Some "line 163") Exit
-              (cv_id, store_bdu_result)
-            | Some Ghost -> error, (cv_id, store_bdu_result)
-            | Some Agent agent ->
+	  | Some Unknown_agent _ | Some Dead_agent _  ->
+          More varieties of dead token propagated in KaSa.
+          | None -> warn parameter error (Some "line 163") Exit
+          (cv_id, store_bdu_result)
+          | Some Ghost -> error, (cv_id, store_bdu_result)
+          | Some Agent agent ->
               (*covering classes*)
-              let error, triple_list =
+          let error, triple_list =
                 match 
                   AgentMap.unsafe_get parameter error agent_type store_remanent_triple
                 with
@@ -297,7 +295,8 @@ let collect_bdu_update_map parameter handler error
 		then error, store_result
 		else               
 		  let agent_type = agent_modif.agent_name in
-                  let error, modif_list =
+                  error, store_result
+                  (*let error, modif_list =
                     List.fold_left (fun _ (cv_id, _, _) ->
                       let (l, modif_list) =
 			Map_modif_list.Map.find_default ([], [])
@@ -306,7 +305,7 @@ let collect_bdu_update_map parameter handler error
 		      error, modif_list
                     ) (error, store_result) triple_list
                   in
-                  error, modif_list
+                  error, modif_list*)
               end
 	    ) rule.diff_direct store_remanent_triple []
         in
@@ -341,7 +340,7 @@ let collect_bdu_update_map parameter handler error
                   | error, None -> error, []
                   | error, Some l -> error, l
                 in
-                let error, (cv_id, bdu_test) =
+                (*let error, (cv_id, bdu_test) =
                   List.fold_left (fun _ (cv_id, _, _) ->
                     let (l, bdu_test) =
                       Map_test_bdu.Map.find_default ([], bdu_false)
@@ -349,7 +348,7 @@ let collect_bdu_update_map parameter handler error
 		    in
                     error, (cv_id, bdu_test)
                   ) (error, (0, bdu_false)) triple_list
-                in
+                in*)
                 (*--------------------------------------------------------------------*)
                 (*TODO:get a set of binding site_address of agent_type*)
                 let error, result_bdu_update_map =
@@ -359,7 +358,7 @@ let collect_bdu_update_map parameter handler error
                       rule_id store_test_has_bond_rhs
                   in
                   (*first check the enable condition of this rule*)
-                  let error, is_enable =
+                  (*let error, is_enable =
                     is_bdu_test_enable
                       parameter
                       handler
@@ -367,7 +366,7 @@ let collect_bdu_update_map parameter handler error
                       bdu_false
                       bdu_test
                       bdu_X
-                  in
+                  in*)
                   aux wl_tl bdu_X (error, store_bdu_result)
                   (*begin
                     if is_enable

@@ -196,9 +196,22 @@ rule_id:1
 
 
 ------------------------------------------------------------
+- Bdu for the valuations of the views that are created (per rule_id; projection function):
+
+
+------------------------------------------------------------
 - Bdu for the valuations of the views that are tested (per rule, agent and covering class):
 
+
+------------------------------------------------------------
+- Bdu for the valuations of the views that are tested (projection per rule):
+
+
+------------------------------------------------------------
 - List for update of the views due to modification (per rule, agent and covering class):
+
+------------------------------------------------------------
+- List for update of the views due to modification (projection per rule):
 
 ------------------------------------------------------------
 * Fixpoint iteration :

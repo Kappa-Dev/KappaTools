@@ -83,7 +83,7 @@ let print_remanent_modif_map parameter error result =
 
 let print_test_bdu_map parameter error result =
   Map_test_bdu.Map.iter
-    (fun (agent_id, agent_type, rule_id, cv_id) (l1, bdu_test) ->
+    (fun (agent_id, agent_type, rule_id, cv_id) (l1, l2) ->
       if l1 <> []
       then ()
       else ();
@@ -92,15 +92,29 @@ let print_test_bdu_map parameter error result =
           "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i\n"
           agent_id agent_type rule_id cv_id
       in
-      let _ = Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_test in
-      fprintf parameter.log "\n"        
+      List.iter (fun (_, bdu_test) ->
+        Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_test
+      ) l2
+    ) result
+
+let print_final_test_bdu_map parameter error result =
+  Map_final_test_bdu.Map.iter
+    (fun rule_id (l1, l2) ->
+      if l1 <> []
+      then ()
+      else ();
+      let _ = fprintf parameter.log "rule_id:%i\n" rule_id in
+      List.iter (fun (agent_id, bdu_creation) ->
+        let _ = fprintf parameter.log "agent_id:%i\n" agent_id in
+        Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_creation
+      ) l2
     ) result
 
 (************************************************************************************)
 
 let print_creation_bdu_map parameter error result =
   Map_creation_bdu.Map.iter
-    (fun (agent_type, rule_id, cv_id) (l1, bdu_creation) ->
+    (fun (agent_type, rule_id, cv_id) (l1,l2) ->
       if l1 <> []
       then ()
       else ();
@@ -108,20 +122,24 @@ let print_creation_bdu_map parameter error result =
         fprintf parameter.log "agent_type:%i:rule_id:%i:covering_class_id:%i\n"
           agent_type rule_id cv_id
       in
-      Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_creation
+      List.iter (fun (_, bdu_creation) ->
+        Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_creation
+      ) l2
     ) result
 
 (*projection*)
 
 let print_final_creation_bdu_map parameter error result =
   Map_final_creation_bdu.Map.iter
-    (fun rule_id (l1, bdu_creation) ->
+    (fun rule_id (l1, l2) ->
       if l1 <> []
       then ()
       else ();
       let _ = fprintf parameter.log "rule_id:%i\n" rule_id in
-      (*fprintf parameter.log "agent_type:%i:cv_id:%i\n" agent_type cv_id;*)
-      Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_creation
+      List.iter (fun (agent_type, bdu_creation) ->
+        let _ = fprintf parameter.log "agent_type:%i\n" agent_type in
+        Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_creation
+      ) l2
     ) result
 
 (************************************************************************************)
@@ -137,8 +155,27 @@ let print_modif_list_map parameter error result =
           "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i\n"
           agent_id agent_type rule_id cv_id
       in
-      List.iter (fun (site, state) ->
-          fprintf parameter.log "site_type:%i:state:%i\n" site state;
+      List.iter (fun (_, l) ->
+        List.iter (fun (site, state) ->
+          fprintf parameter.log "site_type:%i:state:%i\n" site state
+        ) l
+      ) l2
+    ) result
+
+(*projection*)
+
+let print_final_modif_list_map parameter error result =
+  Map_final_modif_list.Map.iter
+    (fun rule_id (l1, l2) ->
+      if l1 <> []
+      then ()
+      else ();
+      let _ = fprintf parameter.log "rule_id:%i\n" rule_id in
+      List.iter (fun (agent_id, l) ->
+        let _ = fprintf parameter.log "agent_id:%i:\n" agent_id in
+        List.iter (fun (site, state) ->
+          fprintf parameter.log "site_type:%i:state:%i\n" site state
+        ) l
       ) l2
     ) result
 
@@ -165,7 +202,7 @@ let print_bdu_build_map parameter error result =
       error
       result.store_creation_bdu_map
   in
-  (*let _ =
+  let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
@@ -173,8 +210,8 @@ let print_bdu_build_map parameter error result =
     print_final_creation_bdu_map
       parameter
       error
-      result.store_final_bdu_creation_map
-  in*)
+      result.store_final_creation_bdu_map
+  in
   (*-----------------------------------------------------------------*)
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
@@ -188,10 +225,32 @@ let print_bdu_build_map parameter error result =
   in
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
+      "\n------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter)
+      "- Bdu for the valuations of the views that are tested (projection per rule):\n\n";
+    print_final_test_bdu_map
+      parameter
+      error
+      result.store_final_test_bdu_map
+  in
+  let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "\n------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter)
       "- List for update of the views due to modification (per rule, agent and covering class):\n";
     print_modif_list_map
       parameter
       error
       result.store_modif_list_map
+  in
+  let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "\n------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter)
+      "- List for update of the views due to modification (projection per rule):\n";
+    print_final_modif_list_map
+      parameter
+      error
+      result.store_final_modif_list_map
   in
   error

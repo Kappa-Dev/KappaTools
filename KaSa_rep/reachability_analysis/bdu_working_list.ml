@@ -36,5 +36,5 @@ let collect_wl_creation parameter error rule_id rule store_result =
     | Some Agent agent ->
        let error, wl = IntWL.push parameter error rule_id store_result in
        error, wl
-		 ) (error, store_result) rule.actions.creation
+  ) (error, store_result) rule.actions.creation
 		 

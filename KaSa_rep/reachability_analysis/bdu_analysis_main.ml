@@ -215,7 +215,7 @@ let scan_rule_bdu_build parameter error rule_id rule covering_classes store_resu
   (*-------------------------------------------------------------------------------*)
   error, 
   {
-    store_remanent_triple    = store_remanent_triple;
+    store_remanent_triple        = store_remanent_triple;
     store_remanent_test_map      = store_remanent_test_map;
     store_remanent_creation_map  = store_remanent_creation_map;
     store_remanent_modif_map     = store_remanent_modif_map;
@@ -254,21 +254,39 @@ let scan_rule_bdu_build_map parameter handler_bdu error rule
       store_remanent_modif_map
   in
   (*-------------------------------------------------------------------------------*)
-  (*projection map*)
-  (*let error, store_final_bdu_creation_map =
-    collect_final_bdu_creation_map
+  (*TOD:projection map*)
+  let error, store_final_creation_bdu_map =
+    collect_final_creation_bdu_map
       parameter
       handler_bdu
       error
       store_creation_bdu_map
-  in*)
+  in
+  (*-------------------------------------------------------------------------------*)
+  let error, store_final_test_bdu_map =
+    collect_final_test_bdu_map
+      parameter
+      handler_bdu
+      error
+      store_test_bdu_map
+  in
+  (*-------------------------------------------------------------------------------*)
+  let error, store_final_modif_list_map =
+    collect_final_modif_list_map
+      parameter
+      handler_bdu
+      error
+      store_modif_list_map
+  in
   (*-------------------------------------------------------------------------------*)
   error, 
   {
     store_creation_bdu_map       = store_creation_bdu_map;
     store_test_bdu_map           = store_test_bdu_map;
     store_modif_list_map         = store_modif_list_map;
-    (*store_final_bdu_creation_map = store_final_bdu_creation_map*)
+    store_final_creation_bdu_map = store_final_creation_bdu_map;
+    store_final_test_bdu_map     = store_final_test_bdu_map;
+    store_final_modif_list_map   = store_final_modif_list_map;
   }
 
 (************************************************************************************)
@@ -463,13 +481,17 @@ let init_bdu_build_map parameter error =
   let init_creation_bdu_map = Map_creation_bdu.Map.empty in
   let init_test_bdu_map     = Map_test_bdu.Map.empty in
   let init_modif_list_map   = Map_modif_list.Map.empty in
-  let init_final_bdu_creation_map = Map_final_creation_bdu.Map.empty in
+  let init_final_creation_bdu_map = Map_final_creation_bdu.Map.empty in
+  let init_final_test_bdu_map     = Map_final_test_bdu.Map.empty in
+  let init_final_modif_list_map   = Map_final_modif_list.Map.empty in
   let init_bdu_build_map =
     {
       store_creation_bdu_map = init_creation_bdu_map;
       store_test_bdu_map     = init_test_bdu_map;
       store_modif_list_map   = init_modif_list_map;
-      (*store_final_bdu_creation_map = init_final_bdu_creation_map*)
+      store_final_creation_bdu_map = init_final_creation_bdu_map;
+      store_final_test_bdu_map     = init_final_test_bdu_map;
+      store_final_modif_list_map   = init_final_modif_list_map
     }
   in
   error, init_bdu_build_map

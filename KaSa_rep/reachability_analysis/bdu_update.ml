@@ -60,7 +60,11 @@ let store_covering_classes_modification_update_aux parameter error agent_type_cv
   let error, result =
     add_link (agent_type_cv, cv_id) s2 store_result
   in
-  error, result
+  (*Map this map*)
+  let store_result =
+    Int2Map_CV_Modif.Map.map (fun (l, x) -> List.rev l, x) result
+  in
+  error, store_result
     
 (************************************************************************************)
 
