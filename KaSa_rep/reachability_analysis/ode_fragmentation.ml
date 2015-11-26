@@ -436,8 +436,8 @@ let store_sites_lhs parameter error rule store_sites_lhs =
       error
       (fun parameter error agent_id agent store_sites_lhs ->
         match agent with
-       | Ghost -> error, store_sites_lhs
-       | Agent agent | Dead_agent (agent,_,_) ->
+       | Ghost | Unknown_agent _ -> error, store_sites_lhs
+       | Agent agent | Dead_agent (agent,_,_,_) ->
           let agent_type = agent.agent_name in
           let site_list =
             SiteSet.Map.fold
@@ -473,8 +473,8 @@ let collect_sites_anchor_set parameter error get_rule
     error
     (fun parameter error agent_id agent store_sites_anchor_set ->
       match agent with
-        | Ghost -> error, store_sites_anchor_set
-	| Dead_agent (agent,_,_) | Agent agent ->
+        | Unknown_agent _ | Ghost -> error, store_sites_anchor_set
+	| Dead_agent (agent,_,_,_) | Agent agent ->
           let agent_type = agent.agent_name in
           (*get a set of modified site in the rule lhs*)
           let modified_set =
@@ -686,8 +686,8 @@ let collect_internal_flow parameter error get_rule
     error
     (fun parameter error agent_id agent store_internal_flow ->
       match agent with
-        | Ghost -> error, store_internal_flow
-	| Dead_agent (agent,_,_)
+        | Unknown_agent _ | Ghost -> error, store_internal_flow
+	| Dead_agent (agent,_,_,_)
 	| Agent agent ->
           let agent_type = agent.agent_name in
           let modified_set =

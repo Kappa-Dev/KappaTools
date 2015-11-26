@@ -81,7 +81,7 @@ let rename_rule_rlhs handler error id_agent tab =
       (fun error -> warn handler error (Some "line 51") Exit Cckappa_sig.Ghost) 
   in 
     match agent with 
-    | Cckappa_sig.Ghost | Cckappa_sig.Dead_agent _ -> warn handler error (Some "line 51") Exit 0
+    | Cckappa_sig.Unknown_agent _ | Cckappa_sig.Ghost | Cckappa_sig.Dead_agent _ -> warn handler error (Some "line 51") Exit 0
     | Cckappa_sig.Agent ag -> error,ag.Cckappa_sig.agent_kasim_id 
   
 let rename_rule_rhs handler error id_agent rule = rename_rule_rlhs handler error id_agent rule.Cckappa_sig.rule_rhs.Cckappa_sig.views 
@@ -211,327 +211,336 @@ let translate_agent_sig parameters error handler agent kasim_id =
 
 let translate_view parameters error handler k kasim_id agent bond_list question_marks = 
   let error,(bool,output) = Ckappa_sig.Dictionary_of_agents.allocate_bool parameters error Misc_sa.compare_unit agent.Ckappa_sig.ag_nme () Misc_sa.const_unit handler.Cckappa_sig.agents_dic in  
-  let error,agent_name = 
-    match bool,output with
-      | _ , None  | true, _  -> warn parameters error (Some "line 143") Exit 0
-      | _ , Some (i,_,_,_) ->  
-          error,i
-  in 
-  let error,site_dic = 
-    match Int_storage.Nearly_inf_Imperatif.get parameters error agent_name handler.Cckappa_sig.sites with 
-      | error,None -> 
-          warn parameters error (Some "line 150") Exit (Ckappa_sig.Dictionary_of_sites.init ()) 
-      | error,Some i -> error,i 
-  in 
-  let error,c_interface = error, Cckappa_sig.Site_map_and_set.Map.empty in
-  let rec aux interface error bond_list c_interface question_marks dead_state_sites dead_link_sites =
-      match interface with 
-      | Ckappa_sig.EMPTY_INTF -> error,bond_list,c_interface,question_marks,dead_state_sites,dead_link_sites 
-      | Ckappa_sig.PORT_SEP(port,interface) ->
-        let error,(c_interface,dead_states_sites)  =
-          match port.Ckappa_sig.port_int with 
-            | [] -> error,(c_interface,dead_state_sites)
-            | [state] -> 
-	       begin 
-		 let error,(bool,output) = Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Internal port.Ckappa_sig.port_nme) () Misc_sa.const_unit site_dic in
-		 let error,site_name = 
-                   match bool,output with
-                   | _ , None  | true, _  -> warn parameters error (Some ("Preprocess line 227"^agent.Ckappa_sig.ag_nme^" "^port.Ckappa_sig.port_nme)) Exit 0
-                   | _ , Some (i,_,_,_) ->  
-                      error,i
-		 in 
-		 let error,state_dic = 
-                   Misc_sa.unsome 
-                     (Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get parameters error (agent_name,site_name) handler.Cckappa_sig.states_dic)
-                     (fun error -> warn parameters error (Some ("line 224"^agent.Ckappa_sig.ag_nme^" "^port.Ckappa_sig.port_nme)) Exit (Cckappa_sig.Dictionary_of_States.init ()))
-		 in 
-		 let error,(bool,output) = Cckappa_sig.Dictionary_of_States.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Internal state) () Misc_sa.const_unit state_dic in
-		    match bool,output with
-                    | _ , None  | true, _  ->
-				   let error',dead_state_list =
-				     Cckappa_sig.Site_map_and_set.Map.add parameters error site_name (Ckappa_sig.Internal state) dead_state_sites
-				   in 
-				   Exception.check warn parameters error error' (Some "line 254, a site even dead should occur only once in an interface") Exit,
-				   (c_interface,dead_state_sites)
-                   | _ , Some (internal,_,_,_) ->  
-		      let error',c_interface =
-			Cckappa_sig.Site_map_and_set.Map.add
-			  parameters
-			  error
-			  site_name 
-			  {
-			    Cckappa_sig.site_name = site_name ;
-			    Cckappa_sig.site_position = Location.dummy ;
-			    Cckappa_sig.site_free = None ; 
-			    Cckappa_sig.site_state = 
-			      {
-				Cckappa_sig.min = (internal:int) ; 
-				Cckappa_sig.max = internal
-			      };
-			  } c_interface in
-		      let error = Exception.check warn parameters error error' (Some "line 272, a site should occur only once in an interface") Exit  in
-		      error,(c_interface,dead_state_sites)
-	       end 
-            | _ -> warn parameters error (Some "line 199") Exit (c_interface,dead_state_sites)
-	in 
-        let error,(c_interface,bond_list,question_marks,dead_link_sites) =
-          match port.Ckappa_sig.port_lnk with 
-             | Ckappa_sig.LNK_ANY pos -> 
-              begin
-                let error,(bool,output) = Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Binding port.Ckappa_sig.port_nme) () Misc_sa.const_unit site_dic in
-		begin
-                  match bool,output with
-                  | true,_  -> error,(c_interface,bond_list,question_marks,dead_link_sites) (* OK if question marks in a site that is never bound *)
-		    | _,None  -> warn parameters error (Some "line 266") Exit (c_interface,bond_list,question_marks,dead_link_sites)
-		    | _ , Some (site_name,_,_,_) ->
-		       
-                       let error,state_dic = 
-			 Misc_sa.unsome 
-			   (Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get parameters error (agent_name,site_name) handler.Cckappa_sig.states_dic)
-			   (fun error -> warn parameters error (Some "Preprocess line 272") Exit (Cckappa_sig.Dictionary_of_States.init ()))
-                       in                    
-                       let error,max = Cckappa_sig.Dictionary_of_States.last_entry parameters error state_dic in 
-                       let error',c_interface =
-			 Cckappa_sig.Site_map_and_set.Map.add
-			   parameters
-			   error
-			   site_name 
-			   { 
-                             Cckappa_sig.site_name = site_name ;
-                             Cckappa_sig.site_free = port.Ckappa_sig.port_free; 
-                             Cckappa_sig.site_position = Location.dummy ;
-                             Cckappa_sig.site_state = {Cckappa_sig.min = min 0 max; Cckappa_sig.max = max}
-			   } 
-			   c_interface 
-                       in
-		       let error = Exception.check warn parameters error error' (Some "line 192") Exit  in
-		       error,(c_interface,bond_list,(k,site_name)::question_marks,dead_link_sites)
-		end 
-              end
-	     | Ckappa_sig.FREE ->     
-              begin
-              let error,(bool,output) = Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Binding port.Ckappa_sig.port_nme) () Misc_sa.const_unit site_dic in
-                match bool,output with
-                  | _ , None  | true, _  -> error,(c_interface,bond_list,question_marks,dead_link_sites) 
-                  | _ , Some (site_name,_,_,_) ->  
-                     let error',c_interface =
-                       Cckappa_sig.Site_map_and_set.Map.add
-                         parameters
-			 error
-			 site_name 
-                            {			       
+  match bool,output with
+  | _ , None ->
+     let error,ag = warn parameters error (Some "line 143") Exit (Cckappa_sig.Unknown_agent agent.Ckappa_sig.ag_nme) in
+     error,bond_list,question_marks,ag
+  | true,_ -> error, bond_list,question_marks,Cckappa_sig.Unknown_agent agent.Ckappa_sig.ag_nme 
+  | _ , Some (agent_name,_,_,_) ->  
+     begin   
+       let error,site_dic = 
+	 match Int_storage.Nearly_inf_Imperatif.get parameters error agent_name handler.Cckappa_sig.sites with 
+	 | error,None -> 
+            warn parameters error (Some "line 150") Exit (Ckappa_sig.Dictionary_of_sites.init ()) 
+	 | error,Some i -> error,i 
+       in 
+       let error,c_interface = error, Cckappa_sig.Site_map_and_set.Map.empty in
+       let rec aux interface error bond_list c_interface question_marks dead_sites dead_state_sites dead_link_sites =
+	 match interface with 
+	 | Ckappa_sig.EMPTY_INTF -> error,bond_list,c_interface,question_marks,dead_sites,dead_state_sites,dead_link_sites 
+	 | Ckappa_sig.PORT_SEP(port,interface) ->
+            let error,(c_interface,dead_sites,dead_states_sites)  =
+              match port.Ckappa_sig.port_int with 
+              | [] -> error,(c_interface,dead_sites,dead_state_sites)
+              | [state] -> 
+		 begin 
+		   let error,(bool,output) = Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Internal port.Ckappa_sig.port_nme) () Misc_sa.const_unit site_dic in
+		   match bool,output with
+		   | _, None -> warn parameters error (Some ("Preprocess line 227"^agent.Ckappa_sig.ag_nme^" "^port.Ckappa_sig.port_nme)) Exit (c_interface,dead_sites,dead_state_sites) 
+		   | true, _ ->
+		      let error,dead_sites = Cckappa_sig.KaSim_Site_map_and_set.Set.add parameters error (Ckappa_sig.Internal port.Ckappa_sig.port_nme) dead_sites in 
+		      error,(c_interface,dead_sites,dead_state_sites)
+		   | _,Some (site_name,_,_,_) ->
+		      begin 
+			let error,state_dic = 
+			  Misc_sa.unsome 
+			    (Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get parameters error (agent_name,site_name) handler.Cckappa_sig.states_dic)
+			    (fun error -> warn parameters error (Some ("line 224"^agent.Ckappa_sig.ag_nme^" "^port.Ckappa_sig.port_nme)) Exit (Cckappa_sig.Dictionary_of_States.init ()))
+			in 
+			let error,(bool,output) = Cckappa_sig.Dictionary_of_States.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Internal state) () Misc_sa.const_unit state_dic in
+			match bool,output with
+			| _ , None  | true, _  ->
+				       let error',dead_state_list =
+				       Cckappa_sig.Site_map_and_set.Map.add parameters error site_name (Ckappa_sig.Internal state) dead_state_sites
+				       in 
+				       Exception.check warn parameters error error' (Some "line 254, a site even dead should occur only once in an interface") Exit,
+				       (c_interface,dead_sites,dead_state_sites)
+			| _ , Some (internal,_,_,_) ->  
+			   let error',c_interface =
+			     Cckappa_sig.Site_map_and_set.Map.add
+			       parameters
+			       error
+			       site_name 
+			       {
+				 Cckappa_sig.site_name = site_name ;
+				 Cckappa_sig.site_position = Location.dummy ;
+				 Cckappa_sig.site_free = None ; 
+				 Cckappa_sig.site_state = 
+				   {
+				     Cckappa_sig.min = (internal:int) ; 
+				     Cckappa_sig.max = internal
+				   };
+			       } c_interface in
+			   let error = Exception.check warn parameters error error' (Some "line 272, a site should occur only once in an interface") Exit  in
+			   error,(c_interface,dead_sites,dead_state_sites)
+		      end 
+		 end 
+	      | _ -> warn parameters error (Some "line 199") Exit (c_interface,dead_sites,dead_state_sites)
+	    in 
+            let error,(c_interface,bond_list,question_marks,dead_sites,dead_link_sites) =
+              match port.Ckappa_sig.port_lnk with 
+              | Ckappa_sig.LNK_ANY pos -> 
+		 begin
+                   let error,(bool,output) = Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Binding port.Ckappa_sig.port_nme) () Misc_sa.const_unit site_dic in
+		   begin
+                     match bool,output with
+                     | true,_  -> error,(c_interface,bond_list,question_marks,dead_sites,dead_link_sites) (* OK if question marks in a site that is never bound *)
+		     | _,None  -> warn parameters error (Some "line 266") Exit (c_interface,bond_list,question_marks,dead_sites,dead_link_sites)
+		     | _ , Some (site_name,_,_,_) ->
+			
+			let error,state_dic = 
+			  Misc_sa.unsome 
+			    (Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get parameters error (agent_name,site_name) handler.Cckappa_sig.states_dic)
+			    (fun error -> warn parameters error (Some "Preprocess line 272") Exit (Cckappa_sig.Dictionary_of_States.init ()))
+			in                    
+			let error,max = Cckappa_sig.Dictionary_of_States.last_entry parameters error state_dic in 
+			let error',c_interface =
+			  Cckappa_sig.Site_map_and_set.Map.add
+			    parameters
+			    error
+			    site_name 
+			    { 
                               Cckappa_sig.site_name = site_name ;
+                              Cckappa_sig.site_free = port.Ckappa_sig.port_free; 
                               Cckappa_sig.site_position = Location.dummy ;
-                              Cckappa_sig.site_free = port.Ckappa_sig.port_free ; 
-                              Cckappa_sig.site_state = {Cckappa_sig.min = 0 ; Cckappa_sig.max = 0 } 
-                            }
-                            c_interface
-                     in
-		     let error = Exception.check warn parameters error error' (Some "line 192") Exit  in
-		     error,(c_interface,bond_list,question_marks,dead_link_sites)
-              end
-          | Ckappa_sig.LNK_SOME pos -> 
-              begin
-                let error,(bool,output) = Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Binding port.Ckappa_sig.port_nme) () Misc_sa.const_unit site_dic in
-		let error,site_name = 
-                  match bool,output with
-                  | _ , None  | true, _  -> warn parameters error (Some ("Preprocess line 333"^","^(Location.to_string pos)^", this site cannot be bound, "^agent.Ckappa_sig.ag_nme^" "^port.Ckappa_sig.port_nme)) Exit 0						
-                  | _ , Some (i,_,_,_) ->  
-                     error,i
-		in  
-		begin 
-		  match 
-                    (Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get parameters error (agent_name,site_name) handler.Cckappa_sig.states_dic)
-		  with 
-		  | error,None ->
-		     let error',dead_link_sites =
-		       Cckappa_sig.Site_map_and_set.Map.add parameters error site_name port.Ckappa_sig.port_lnk dead_link_sites
-		     in 
-		     Exception.check warn parameters error error' (Some "line 350, a site even dead should occur only once in an interface") Exit,
-		     (c_interface,bond_list,question_marks,dead_link_sites)
-		  | error,Some state_dic -> 
-		     let error,max = Cckappa_sig.Dictionary_of_States.last_entry parameters error state_dic in 
-		     if max = 0
-		     then
-		       let error',dead_link_sites =
-			 Cckappa_sig.Site_map_and_set.Map.add parameters error site_name port.Ckappa_sig.port_lnk dead_link_sites
-		       in 
-		       Exception.check warn parameters error error' (Some "line 357, a site even dead should occur only once in an interface") Exit,
-		       (c_interface,bond_list,question_marks,dead_link_sites)
-		     else 
-		       let error',c_interface =
-			 Cckappa_sig.Site_map_and_set.Map.add
-			   parameters
-			   error
-			   site_name 
-			   { 
-			     Cckappa_sig.site_name = site_name ;
-			     Cckappa_sig.site_free = port.Ckappa_sig.port_free; 
-			     Cckappa_sig.site_position = Location.dummy ;
-			     Cckappa_sig.site_state = {Cckappa_sig.min = min 1 max; Cckappa_sig.max = max}
-			   } 
-			   c_interface 
-		     in
-		     let error = Exception.check warn parameters error error' (Some "line 192") Exit  in
-		     error,(c_interface,bond_list,question_marks,dead_link_sites)
-		end 
-              end
-          | Ckappa_sig.LNK_VALUE (id_agent',agent',site',i,pos) ->
-             begin
-               let error,(bool,output) = Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Binding port.Ckappa_sig.port_nme) () Misc_sa.const_unit site_dic in
-               let error,site_name = 
-                 match bool,output with
-                 | _ , None  | true, _  -> warn parameters error (Some ("Preprocess line 341"^","^(Location.to_string pos)^", this site cannot be bound, "^agent.Ckappa_sig.ag_nme^" "^port.Ckappa_sig.port_nme)) Exit 0						
-                  | _ , Some (i,_,_,_) ->  
-                 error,i
-               in
-	       match
-		  (Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get parameters error (agent_name,site_name) handler.Cckappa_sig.states_dic)
-               with
-	       | error,None ->
-		    let error',dead_link_sites =
-			 Cckappa_sig.Site_map_and_set.Map.add parameters error site_name port.Ckappa_sig.port_lnk dead_link_sites
-		       in 
-		       Exception.check warn parameters error error' (Some "line 395, a site even dead should occur only once in an interface") Exit,
-		       (c_interface,bond_list,question_marks,dead_link_sites)		 
-	       | error,Some state_dic -> 
-		  begin
-		    let error,(bool,output) = Ckappa_sig.Dictionary_of_agents.allocate_bool parameters error Misc_sa.compare_unit agent' () Misc_sa.const_unit handler.Cckappa_sig.agents_dic in  
-		    let error,agent_name' = 
-                      match bool,output with
-                      | _ , None  | true, _  -> warn parameters error (Some "line 285") Exit 0
-                      | _ , Some (i,_,_,_) -> error,i
-		    in
-		    let error,site_dic' = 
-                      match Int_storage.Nearly_inf_Imperatif.get parameters error agent_name' handler.Cckappa_sig.sites with 
-                      | error,None -> 
-                         warn parameters error (Some "line 291") Exit (Ckappa_sig.Dictionary_of_sites.init ()) 
-                      | error,Some i -> 
-			 error,i 
-		    in 
-		    let error,(bool,output) = Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Binding site') () Misc_sa.const_unit site_dic' in
-		    let error,site_name' = 
-                      match bool,output with
-                      | _ , None  | true, _  -> warn parameters error (Some "line 298") Exit 0
-                      | _ , Some (i,_,_,_) ->  
-			 error,i
-		    in 
-		    let error,bond_list = add_bond parameters error i k agent_name site_name id_agent' agent_name' site_name' bond_list in
-		    let state = Cckappa_sig.Lnk_type (agent_name',site_name') in  
-		    let error,(bool,output) = Cckappa_sig.Dictionary_of_States.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Binding state) () Misc_sa.const_unit state_dic in
-		    let error,c_interface = 
-                      match bool,output with
-                      | _ , None | true, _ -> 
-				    warn parameters error (Some "line 308") Exit c_interface  
-                      | _ ,Some (i,_,_,_) -> 
-			 let error',c_interface =
-			   Cckappa_sig.Site_map_and_set.Map.add
-			     parameters
-			     error 
-			     site_name 
-			     { 
-                               Cckappa_sig.site_free = port.Ckappa_sig.port_free; 
-                               Cckappa_sig.site_name = site_name ;
-                               Cckappa_sig.site_position = Location.dummy ;
-                               Cckappa_sig.site_state = {Cckappa_sig.min = i; Cckappa_sig.max = i}
-			     } 
-			     c_interface 
-			 in
-			 let error = Exception.check warn parameters error error' (Some "line 416") Exit in
-			 error,c_interface 
-		    in
-		    error,(c_interface,bond_list,question_marks,dead_link_sites)			      
-		  end
-	     end 
-           | Ckappa_sig.LNK_TYPE (agent',site')  ->                          
-             begin
-               let error,(bool,output) = Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Binding port.Ckappa_sig.port_nme) () Misc_sa.const_unit site_dic in
-               let error,site_name = 
-                 match bool,output with
-                  | _ , None  | true, _  -> warn parameters error (Some "line 264") Exit 0
-                  | _ , Some (i,_,_,_) ->  
-                 error,i
-               in  
-               let error,(bool,output) = Ckappa_sig.Dictionary_of_agents.allocate_bool parameters error Misc_sa.compare_unit  (fst agent')  () Misc_sa.const_unit handler.Cckappa_sig.agents_dic in  
-               let error,agent_name' = 
-                 match bool,output with
-                   | _ , None  | true, _  -> 
-                     warn parameters error (Some "line 349") Exit 0
-                   | _ , Some (i,_,_,_) -> error,i
-               in
-               let error,site_dic' = 
-                 match Int_storage.Nearly_inf_Imperatif.get parameters error agent_name' handler.Cckappa_sig.sites with 
-                   | error,None -> 
-                        warn parameters error (Some "line 355") Exit (Ckappa_sig.Dictionary_of_sites.init ()) 
-                   | error,Some i -> error,i 
-               in 
-                let error,(bool,output) = Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Binding (fst site')) () Misc_sa.const_unit site_dic' in
-               let error,site_name' = 
-                 match bool,output with
-                   | _ , None  | true, _  -> 
-                     warn parameters error (Some "line 298") Exit 0
-                   | _ , Some (i,_,_,_) ->  
-                      error,i
-               in 
-               let state = Cckappa_sig.Lnk_type (agent_name',site_name') in  
-               let error,state_dic = 
-                 Misc_sa.unsome 
-                   (Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get parameters error (agent_name,site_name) handler.Cckappa_sig.states_dic)
-                   (fun error -> warn parameters error (Some ("line 394"^(string_of_int agent_name')^(string_of_int site_name'))) Exit (Cckappa_sig.Dictionary_of_States.init ()))
-               in 
-
-               let error,(bool,output) = Cckappa_sig.Dictionary_of_States.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Binding state) () Misc_sa.const_unit state_dic in
-               let error,c_interface = 
-                 match bool,output with
-                   | _ , None | true, _ -> warn parameters error (Some "line 369") Exit c_interface  
-                   | _ ,Some (i,_,_,_) -> 
-		      let error',c_interface = 
+                              Cckappa_sig.site_state = {Cckappa_sig.min = min 0 max; Cckappa_sig.max = max}
+			    } 
+			    c_interface 
+			in
+			let error = Exception.check warn parameters error error' (Some "line 192") Exit  in
+			error,(c_interface,bond_list,(k,site_name)::question_marks,dead_sites,dead_link_sites)
+		   end 
+		 end
+	      | Ckappa_sig.FREE ->     
+		 begin
+		   let error,(bool,output) = Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Binding port.Ckappa_sig.port_nme) () Misc_sa.const_unit site_dic in
+                   match bool,output with
+                   | _ , None  | true, _  -> error,(c_interface,bond_list,question_marks,dead_sites,dead_link_sites) 
+                   | _ , Some (site_name,_,_,_) ->  
+                      let error',c_interface =
 			Cckappa_sig.Site_map_and_set.Map.add
-			  parameters
+                          parameters
 			  error
 			  site_name 
-			  { 
-                            Cckappa_sig.site_free = port.Ckappa_sig.port_free; 
+                          {			       
                             Cckappa_sig.site_name = site_name ;
                             Cckappa_sig.site_position = Location.dummy ;
-                            Cckappa_sig.site_state = {Cckappa_sig.min = i; Cckappa_sig.max = i}
-			  } 
-			  c_interface
-		      in
+                            Cckappa_sig.site_free = port.Ckappa_sig.port_free ; 
+                            Cckappa_sig.site_state = {Cckappa_sig.min = 0 ; Cckappa_sig.max = 0 } 
+                          }
+                          c_interface
+                      in
 		      let error = Exception.check warn parameters error error' (Some "line 192") Exit  in
-		      error,c_interface
-	       in 
-               error,(c_interface,bond_list,question_marks,dead_link_sites)
-             end
-             
-        in aux interface error bond_list c_interface question_marks dead_state_sites dead_link_sites 
-  in
-  let deadstate = Cckappa_sig.Site_map_and_set.Map.empty in
-  let deadlink = Cckappa_sig.Site_map_and_set.Map.empty in
-  let error,bond_list,c_interface,question_marks,dead_state_sites,dead_link_sites = aux agent.Ckappa_sig.ag_intf error bond_list c_interface question_marks deadstate deadlink in  
- error,bond_list,question_marks, 
- if deadlink == dead_link_sites && deadstate==dead_state_sites						
- then Cckappa_sig.Agent 
-        {
-          Cckappa_sig.agent_kasim_id = kasim_id ;
-          Cckappa_sig.agent_name = agent_name ; 
-          Cckappa_sig.agent_interface = c_interface ; 
-          Cckappa_sig.agent_position = Location.dummy ;
-        }
- else
-   Cckappa_sig.Dead_agent
-     ( {
-          Cckappa_sig.agent_kasim_id = kasim_id ;
-          Cckappa_sig.agent_name = agent_name ; 
-          Cckappa_sig.agent_interface = c_interface ; 
-          Cckappa_sig.agent_position = Location.dummy ;
-       },
-       dead_state_sites,
-       dead_link_sites)
-  
+		      error,(c_interface,bond_list,question_marks,dead_sites,dead_link_sites)
+		 end
+              | Ckappa_sig.LNK_SOME pos -> 
+		 begin
+                   let error,(bool,output) = Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Binding port.Ckappa_sig.port_nme) () Misc_sa.const_unit site_dic in
+                   match bool,output with
+                   | _ , None ->  
+		      warn parameters error (Some ("Preprocess line 333"^","^(Location.to_string pos)^", this site cannot be bound, "^agent.Ckappa_sig.ag_nme^" "^port.Ckappa_sig.port_nme)) Exit (c_interface,bond_list,question_marks,dead_sites,dead_link_sites)
+		   | true, _  ->
+		      let error,dead_sites = Cckappa_sig.KaSim_Site_map_and_set.Set.add parameters error (Ckappa_sig.Binding port.Ckappa_sig.port_nme) dead_sites in 
+		      error,(c_interface,bond_list,question_marks,dead_sites,dead_link_sites)
+		   | _ , Some (site_name,_,_,_) ->  
+                      begin 
+			match 
+			  (Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get parameters error (agent_name,site_name) handler.Cckappa_sig.states_dic)
+			with 
+			| error,None ->
+			   let error',dead_link_sites =
+			     Cckappa_sig.Site_map_and_set.Map.add parameters error site_name port.Ckappa_sig.port_lnk dead_link_sites
+			   in 
+			   Exception.check warn parameters error error' (Some "line 350, a site even dead should occur only once in an interface") Exit,
+			   (c_interface,bond_list,question_marks,dead_sites,dead_link_sites)
+			| error,Some state_dic -> 
+			   let error,max = Cckappa_sig.Dictionary_of_States.last_entry parameters error state_dic in 
+			   if max = 0
+			   then
+			     let error',dead_link_sites =
+			       Cckappa_sig.Site_map_and_set.Map.add parameters error site_name port.Ckappa_sig.port_lnk dead_link_sites
+			     in 
+			     Exception.check warn parameters error error' (Some "line 357, a site even dead should occur only once in an interface") Exit,
+			     (c_interface,bond_list,question_marks,dead_sites,dead_link_sites)
+			   else 
+			     let error',c_interface =
+			       Cckappa_sig.Site_map_and_set.Map.add
+				 parameters
+				 error
+				 site_name 
+				 { 
+				   Cckappa_sig.site_name = site_name ;
+				   Cckappa_sig.site_free = port.Ckappa_sig.port_free; 
+				   Cckappa_sig.site_position = Location.dummy ;
+				   Cckappa_sig.site_state = {Cckappa_sig.min = min 1 max; Cckappa_sig.max = max}
+				 } 
+				 c_interface 
+			     in
+			     let error = Exception.check warn parameters error error' (Some "line 192") Exit  in
+			     error,(c_interface,bond_list,question_marks,dead_sites,dead_link_sites)
+		      end
+		 end 
+	      | Ckappa_sig.LNK_VALUE (id_agent',agent',site',i,pos) ->
+		 begin
+		   let error,(bool,output) = Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Binding port.Ckappa_sig.port_nme) () Misc_sa.const_unit site_dic in
+                   match bool,output with
+                   | _ , None  -> warn parameters error (Some ("Preprocess line 341"^","^(Location.to_string pos)^", this site cannot be bound, "^agent.Ckappa_sig.ag_nme^" "^port.Ckappa_sig.port_nme)) Exit (c_interface,bond_list,question_marks,dead_sites,dead_link_sites)						
+		   | true, _ ->
+		      let error,dead_sites = Cckappa_sig.KaSim_Site_map_and_set.Set.add parameters error (Ckappa_sig.Binding port.Ckappa_sig.port_nme) dead_sites in 
+		      error,(c_interface,bond_list,question_marks,dead_sites,dead_link_sites)
+		   | _ , Some (site_name,_,_,_) ->  
+                      begin 
+			match
+			  (Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get parameters error (agent_name,site_name) handler.Cckappa_sig.states_dic)
+			with
+			| error,None ->
+			   let error',dead_link_sites =
+			     Cckappa_sig.Site_map_and_set.Map.add parameters error site_name port.Ckappa_sig.port_lnk dead_link_sites
+			   in 
+			   Exception.check warn parameters error error' (Some "line 395, a site even dead should occur only once in an interface") Exit,
+			   (c_interface,bond_list,question_marks,dead_sites,dead_link_sites)		 
+			| error,Some state_dic -> 
+			   begin
+			     let error,(bool,output) = Ckappa_sig.Dictionary_of_agents.allocate_bool parameters error Misc_sa.compare_unit agent' () Misc_sa.const_unit handler.Cckappa_sig.agents_dic in  
+			     let error,agent_name' = 
+			       match bool,output with
+			       | _ , None  | true, _  -> warn parameters error (Some "line 285") Exit 0
+			       | _ , Some (i,_,_,_) -> error,i
+			     in
+			     let error,site_dic' = 
+			       match Int_storage.Nearly_inf_Imperatif.get parameters error agent_name' handler.Cckappa_sig.sites with 
+			       | error,None -> 
+				  warn parameters error (Some "line 291") Exit (Ckappa_sig.Dictionary_of_sites.init ()) 
+			       | error,Some i -> 
+				  error,i 
+			     in 
+			     let error,(bool,output) = Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Binding site') () Misc_sa.const_unit site_dic' in
+			     let error,site_name' = 
+			       match bool,output with
+			       | _ , None  | true, _  -> warn parameters error (Some "line 298") Exit 0
+			       | _ , Some (i,_,_,_) ->  
+				  error,i
+			     in 
+			     let error,bond_list = add_bond parameters error i k agent_name site_name id_agent' agent_name' site_name' bond_list in
+			     let state = Cckappa_sig.Lnk_type (agent_name',site_name') in  
+			     let error,(bool,output) = Cckappa_sig.Dictionary_of_States.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Binding state) () Misc_sa.const_unit state_dic in
+			     let error,c_interface = 
+			       match bool,output with
+			       | _ , None | true, _ -> 
+					     warn parameters error (Some "line 308") Exit c_interface  
+			       | _ ,Some (i,_,_,_) -> 
+				  let error',c_interface =
+				    Cckappa_sig.Site_map_and_set.Map.add
+				      parameters
+				      error 
+				      site_name 
+				      { 
+					Cckappa_sig.site_free = port.Ckappa_sig.port_free; 
+					Cckappa_sig.site_name = site_name ;
+					Cckappa_sig.site_position = Location.dummy ;
+					Cckappa_sig.site_state = {Cckappa_sig.min = i; Cckappa_sig.max = i}
+				      } 
+				      c_interface 
+				  in
+				  let error = Exception.check warn parameters error error' (Some "line 416") Exit in
+				  error,c_interface 
+			     in
+			     error,(c_interface,bond_list,question_marks,dead_sites,dead_link_sites)			      
+			   end
+		      end
+		 end   
+	      | Ckappa_sig.LNK_TYPE (agent',site')  ->                          
+		 begin
+		   let error,(bool,output) = Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Binding port.Ckappa_sig.port_nme) () Misc_sa.const_unit site_dic in
+		   let error,site_name = 
+                     match bool,output with
+                     | _ , None  | true, _  -> warn parameters error (Some "line 264") Exit 0
+                     | _ , Some (i,_,_,_) ->  
+			error,i
+		   in  
+		   let error,(bool,output) = Ckappa_sig.Dictionary_of_agents.allocate_bool parameters error Misc_sa.compare_unit  (fst agent')  () Misc_sa.const_unit handler.Cckappa_sig.agents_dic in  
+		   let error,agent_name' = 
+                     match bool,output with
+                     | _ , None  | true, _  -> 
+				    warn parameters error (Some "line 349") Exit 0
+                     | _ , Some (i,_,_,_) -> error,i
+		   in
+		   let error,site_dic' = 
+                     match Int_storage.Nearly_inf_Imperatif.get parameters error agent_name' handler.Cckappa_sig.sites with 
+                     | error,None -> 
+                        warn parameters error (Some "line 355") Exit (Ckappa_sig.Dictionary_of_sites.init ()) 
+                     | error,Some i -> error,i 
+		   in 
+                   let error,(bool,output) = Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Binding (fst site')) () Misc_sa.const_unit site_dic' in
+		   let error,site_name' = 
+                     match bool,output with
+                     | _ , None  | true, _  -> 
+				    warn parameters error (Some "line 298") Exit 0
+                     | _ , Some (i,_,_,_) ->  
+			error,i
+		   in 
+		   let state = Cckappa_sig.Lnk_type (agent_name',site_name') in  
+		   let error,state_dic = 
+                     Misc_sa.unsome 
+                       (Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get parameters error (agent_name,site_name) handler.Cckappa_sig.states_dic)
+                       (fun error -> warn parameters error (Some ("line 394"^(string_of_int agent_name')^(string_of_int site_name'))) Exit (Cckappa_sig.Dictionary_of_States.init ()))
+		   in 
+		   
+		   let error,(bool,output) = Cckappa_sig.Dictionary_of_States.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Binding state) () Misc_sa.const_unit state_dic in
+		   let error,c_interface = 
+                     match bool,output with
+                     | _ , None | true, _ -> warn parameters error (Some "line 369") Exit c_interface  
+                     | _ ,Some (i,_,_,_) -> 
+			let error',c_interface = 
+			  Cckappa_sig.Site_map_and_set.Map.add
+			    parameters
+			    error
+			    site_name 
+			    { 
+                              Cckappa_sig.site_free = port.Ckappa_sig.port_free; 
+                              Cckappa_sig.site_name = site_name ;
+                              Cckappa_sig.site_position = Location.dummy ;
+                              Cckappa_sig.site_state = {Cckappa_sig.min = i; Cckappa_sig.max = i}
+			    } 
+			    c_interface
+			in
+			let error = Exception.check warn parameters error error' (Some "line 192") Exit  in
+			error,c_interface
+		   in 
+		   error,(c_interface,bond_list,question_marks,dead_sites,dead_link_sites)
+		 end
+		   
+            in aux interface error bond_list c_interface question_marks dead_sites dead_state_sites dead_link_sites 
+       in
+       let deadsites =  Cckappa_sig.KaSim_Site_map_and_set.Set.empty in
+       let deadstate = Cckappa_sig.Site_map_and_set.Map.empty in
+       let deadlink = Cckappa_sig.Site_map_and_set.Map.empty in
+       let error,bond_list,c_interface,question_marks,dead_sites,dead_state_sites,dead_link_sites = aux agent.Ckappa_sig.ag_intf error bond_list c_interface question_marks deadsites deadstate deadlink in  
+       error,bond_list,question_marks, 
+       if deadlink == dead_link_sites && deadstate==dead_state_sites && deadsites == 	dead_sites				
+       then Cckappa_sig.Agent 
+              {
+		Cckappa_sig.agent_kasim_id = kasim_id ;
+		Cckappa_sig.agent_name = agent_name ; 
+		Cckappa_sig.agent_interface = c_interface ; 
+		Cckappa_sig.agent_position = Location.dummy ;
+              }
+       else
+	 Cckappa_sig.Dead_agent
+	   ( {
+               Cckappa_sig.agent_kasim_id = kasim_id ;
+               Cckappa_sig.agent_name = agent_name ; 
+               Cckappa_sig.agent_interface = c_interface ; 
+               Cckappa_sig.agent_position = Location.dummy ;
+	     },
+	     dead_sites,
+	     dead_state_sites,
+	     dead_link_sites)
+     end 
+
 let translate_mixture parameters error handler mixture = 
-  let size = length_mixture mixture in 
-  let rec aux mixture error k kasim_id bond_list questionmarks dot_list plus_list array = 
+	 let size = length_mixture mixture in 
+	 let rec aux mixture error k kasim_id bond_list questionmarks dot_list plus_list array = 
     match mixture with 
       | Ckappa_sig.EMPTY_MIX -> error,bond_list,questionmarks,dot_list,plus_list,array
       | Ckappa_sig.COMMA(agent,mixture) -> 
@@ -648,11 +657,11 @@ let translate_mixture parameters error handler mixture =
 	  let error,agent =
 	    match agent
 	    with
-	    | None | Some Cckappa_sig.Ghost -> warn parameters error (Some ("Preprocess line 557"^", question marks should not appear on the rhs or in introduction")) Exit (Cckappa_sig.Ghost)  
-	    | Some Cckappa_sig.Dead_agent (ag,l,l') ->
+	    | Some Cckappa_sig.Unknown_agent _ | None | Some Cckappa_sig.Ghost -> warn parameters error (Some ("Preprocess line 557"^", question marks should not appear on the rhs or in introduction")) Exit (Cckappa_sig.Ghost)  
+	    | Some Cckappa_sig.Dead_agent (ag,set,l,l') ->
 	       let error',interface = Cckappa_sig.Site_map_and_set.Map.remove parameters error s ag.Cckappa_sig.agent_interface in
 	       let error = Exception.check warn parameters error error' (Some "line 617") Exit in 
-	       error,Cckappa_sig.Dead_agent ({ag with Cckappa_sig.agent_interface = interface},l,l')
+	       error,Cckappa_sig.Dead_agent ({ag with Cckappa_sig.agent_interface = interface},set,l,l')
 	    | Some Cckappa_sig.Agent ag ->
 	       let error',interface = Cckappa_sig.Site_map_and_set.Map.remove parameters error s ag.Cckappa_sig.agent_interface in
 	       let error = Exception.check warn parameters error error' (Some "line 617") Exit in 
@@ -680,6 +689,7 @@ let translate_mixture parameters error handler mixture =
 	  with
 	  | None -> warn parameters error (Some "line 581, missing agent") Exit false
 	  | Some Cckappa_sig.Ghost -> error,true
+	  | Some Cckappa_sig.Unknown_agent _
 	  | Some Cckappa_sig.Dead_agent _ -> warn parameters error (Some "line 642, there should be no dead agent in rhs") Exit false 
 	  | Some Cckappa_sig.Agent _ -> error,false
 	in
@@ -708,35 +718,45 @@ let translate_mixture parameters error handler mixture =
          let error,rhsk = Int_storage.Quick_Nearly_inf_Imperatif.get parameters error k c_rule_rhs.Cckappa_sig.views in 
 	 let error,(direct,reverse,actions,half_release_set,agent_type,lbondk,rbondk,dead) = 
 	   match lhsk,rhsk with 
-	   | Some Cckappa_sig.Agent lagk, Some Cckappa_sig.Ghost
-	   | Some Cckappa_sig.Dead_agent (lagk,_,_), Some Cckappa_sig.Ghost -> (*suppression*)
-	      begin
-                let agent_type = lagk.Cckappa_sig.agent_name in 
-                let error,reverse = Int_storage.Quick_Nearly_inf_Imperatif.set parameters error k (Cckappa_sig.upgrade_some_interface lagk) reverse in
-                let error,lbondk = Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get parameters error k c_rule_lhs.Cckappa_sig.bonds in  
-                     let lbondk = 
-                       match lbondk with 
-                       | None ->  Cckappa_sig.Site_map_and_set.Map.empty
-                       | Some a -> a 
-                     in 
-                     let rbondk = Cckappa_sig.Site_map_and_set.Map.empty in
-                     let error,half_release_set = set_bound_sites parameters error k lagk half_release_set in  
-                     let actions =  
-                       {actions 
-                       with Cckappa_sig.remove = (k,clean_agent lagk,[])::actions.Cckappa_sig.remove} 
-                     in 
-                     error, (
+	   | Some Cckappa_sig.Unknown_agent _, Some Cckappa_sig.Ghost -> (* suppression of a dead agent *)
+	      error, (
                        direct,
                        reverse,
                        actions,
                        half_release_set,
-                       agent_type,
+                       None,
+                       Cckappa_sig.Site_map_and_set.Map.empty,
+		       Cckappa_sig.Site_map_and_set.Map.empty,
+		       true
+	     )		       
+	   | Some Cckappa_sig.Agent lagk, Some Cckappa_sig.Ghost
+	   | Some Cckappa_sig.Dead_agent (lagk,_,_,_), Some Cckappa_sig.Ghost -> (*suppression*)
+	      begin
+                let agent_type = lagk.Cckappa_sig.agent_name in 
+                let error,reverse = Int_storage.Quick_Nearly_inf_Imperatif.set parameters error k (Cckappa_sig.upgrade_some_interface lagk) reverse in
+                let error,lbondk = Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get parameters error k c_rule_lhs.Cckappa_sig.bonds in  
+                let lbondk = 
+                  match lbondk with 
+                  | None ->  Cckappa_sig.Site_map_and_set.Map.empty
+                  | Some a -> a 
+                in 
+                let rbondk = Cckappa_sig.Site_map_and_set.Map.empty in
+                let error,half_release_set = set_bound_sites parameters error k lagk half_release_set in  
+                let actions =  
+                  {actions 
+                  with Cckappa_sig.remove = (k,clean_agent lagk,[])::actions.Cckappa_sig.remove} 
+                in 
+                error, (
+                  direct,
+                  reverse,
+                  actions,
+                       half_release_set,
+                       Some agent_type,
                        lbondk,
                        rbondk,
 		       dead || (match lhsk with Some Cckappa_sig.Dead_agent _ -> true | _ -> false) 
-                     )
+                )
 	      end
-	  
 	   | Some Cckappa_sig.Ghost, Some Cckappa_sig.Agent ragk -> (*creation*)
 	      begin 
 		let agent_type = ragk.Cckappa_sig.agent_name in 
@@ -757,14 +777,14 @@ let translate_mixture parameters error handler mixture =
                   with Cckappa_sig.creation = (k,ragk.Cckappa_sig.agent_name)::actions.Cckappa_sig.creation
                   },
                   half_release_set,
-                  agent_type,
+                  Some agent_type,
                   lbondk, 
                   rbondk,
 		  dead
 		)
 	      end 
 	   | Some Cckappa_sig.Agent lagk,Some Cckappa_sig.Agent ragk 
-	   | Some Cckappa_sig.Dead_agent (lagk,_,_), Some Cckappa_sig.Agent ragk -> (* TO DO check what happen if one site is dead *)
+	   | Some Cckappa_sig.Dead_agent (lagk,_,_,_), Some Cckappa_sig.Agent ragk -> (* TO DO check what happen if one site is dead *)
 	      let agent_type = lagk.Cckappa_sig.agent_name in 
 	      let error',ldiff,rdiff = Cckappa_sig.Site_map_and_set.Map.diff_pred parameters error equ_port lagk.Cckappa_sig.agent_interface ragk.Cckappa_sig.agent_interface in 
 	      let error = Exception.check warn parameters error error' (Some "line 617") Exit in 
@@ -783,46 +803,56 @@ let translate_mixture parameters error handler mixture =
 	      let error,direct = Int_storage.Quick_Nearly_inf_Imperatif.set parameters error k (Cckappa_sig.upgrade_interface lagk rdiff) direct in 
 	      let error,reverse = Int_storage.Quick_Nearly_inf_Imperatif.set parameters error k (Cckappa_sig.upgrade_interface ragk ldiff) reverse in 
 	      let error,half_release_set = set_released_sites parameters error k lagk ragk half_release_set in                 
-	      error,(direct,reverse,actions,half_release_set,agent_type,lbondk,rbondk,
+	      error,(direct,reverse,actions,half_release_set,Some agent_type,lbondk,rbondk,
 		    dead || (match lhsk with Some Cckappa_sig.Dead_agent _ -> true | _ -> false))
+	   | Some Cckappa_sig.Unknown_agent _, _ 
+	   | _, Some Cckappa_sig.Unknown_agent _ 
 	   | Some Cckappa_sig.Ghost,Some Cckappa_sig.Ghost
 	   | _,Some Cckappa_sig.Dead_agent _ | None,_ | _,None -> 
-							 (print_int k;print_newline ();warn parameters error (Some "line 542") Exit (direct,reverse,actions,half_release_set,0,Cckappa_sig.Site_map_and_set.Map.empty,Cckappa_sig.Site_map_and_set.Map.empty,true))
+							 (print_int k;print_newline ();warn parameters error (Some "line 542") Exit (direct,reverse,actions,half_release_set,None,Cckappa_sig.Site_map_and_set.Map.empty,Cckappa_sig.Site_map_and_set.Map.empty,true))
          in 
          let error',bond_l,bond_r = Cckappa_sig.Site_map_and_set.Map.diff parameters error lbondk rbondk in
 	 let error = Exception.check warn parameters error error' (Some "line 746") Exit in 
          let release = actions.Cckappa_sig.release in 
-         let error,(full_release_set,release) = 
-	   Cckappa_sig.Site_map_and_set.Map.fold
-	     (fun site target (error,(full_release_set,release)) -> 
-                   let source = Cckappa_sig.build_address k agent_type site in 
-                   let error',full_release_set = Cckappa_sig.Address_map_and_set.Set.add parameters error source full_release_set in 
-		   let error = Exception.check warn parameters error error' (Some "line 753") Exit in 
-                   let release = 
-                     if compare source target < 0 
+         let error,(full_release_set,release) =
+	   match agent_type
+	   with
+	     None -> error,(full_release_set,release)
+	   | Some agent_type -> 
+	      Cckappa_sig.Site_map_and_set.Map.fold
+		(fun site target (error,(full_release_set,release)) -> 
+                 let source = Cckappa_sig.build_address k agent_type site in 
+                 let error',full_release_set = Cckappa_sig.Address_map_and_set.Set.add parameters error source full_release_set in 
+		 let error = Exception.check warn parameters error error' (Some "line 753") Exit in 
+                 let release = 
+                   if compare source target < 0 
                      then (source,target)::release
-                     else release
-                   in 
-                   (error,(full_release_set,release)))
-		  bond_l
-		  (error,(full_release_set,release))
-              in 
-              let bind = actions.Cckappa_sig.bind in 
-              let error,bind = 
-		Cckappa_sig.Site_map_and_set.Map.fold
-		  (fun site target (error,bind) -> 
-                   let source = Cckappa_sig.build_address k agent_type site in 
-                   let bind = 
-                     if compare source target < 0 
-                     then (source,target)::bind
-                     else bind
-                   in 
-                   (error,bind))
-		  bond_r
-		  (error,bind)
-              in 
-              let actions = {actions with Cckappa_sig.release = release ; Cckappa_sig.bind = bind } in  
-              aux_agent (k+1) (error,(direct,reverse,actions,half_release_set,full_release_set,dead))
+                   else release
+                 in 
+                 (error,(full_release_set,release)))
+		bond_l
+		(error,(full_release_set,release))
+         in 
+         let bind = actions.Cckappa_sig.bind in 
+         let error,bind = 
+	   match agent_type
+	   with
+	     None -> error,bind
+	   | Some agent_type -> 
+	      Cckappa_sig.Site_map_and_set.Map.fold
+		(fun site target (error,bind) -> 
+		 let source = Cckappa_sig.build_address k agent_type site in 
+		 let bind = 
+                   if compare source target < 0 
+                   then (source,target)::bind
+                   else bind
+		 in 
+		 (error,bind))
+		bond_r
+		(error,bind)
+         in 
+         let actions = {actions with Cckappa_sig.release = release ; Cckappa_sig.bind = bind } in  
+         aux_agent (k+1) (error,(direct,reverse,actions,half_release_set,full_release_set,dead))
        end
    in
    let error,(direct,reverse,actions,half_release_set,full_release_set,dead) = aux_agent 0 (error,(direct,reverse,actions,half_release_set,full_release_set,false)) in
@@ -836,7 +866,8 @@ let translate_mixture parameters error handler mixture =
          match ag 
          with 
          | None | Some Cckappa_sig.Ghost -> warn parameters error (Some "line 623") Exit ((add,None)::list)
-	 | Some (Cckappa_sig.Dead_agent (ag,_,l')) ->
+	 | Some (Cckappa_sig.Unknown_agent _) -> error,list 
+	 | Some (Cckappa_sig.Dead_agent (ag,_,_,l')) ->
             let interface = ag.Cckappa_sig.agent_interface in
 	    begin
 	      match Cckappa_sig.Site_map_and_set.Map.find_option_without_logs parameters error add.Cckappa_sig.site interface with

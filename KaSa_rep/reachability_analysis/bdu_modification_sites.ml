@@ -122,8 +122,8 @@ let collect_test_sites parameter error rule_id viewslhs
     AgentMap.fold parameter error
       (fun parameter error agent_id agent store_result ->
        match agent with
-       | Ghost -> error, store_result
-       | Dead_agent (agent,_,_)
+       | Unknown_agent _ | Ghost -> error, store_result
+       | Dead_agent (agent,_,_,_)
        | Agent agent ->
          let agent_type = agent.agent_name in
          let error, store_result_test =

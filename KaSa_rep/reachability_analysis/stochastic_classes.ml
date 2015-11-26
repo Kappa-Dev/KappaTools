@@ -87,8 +87,8 @@ let scan_rule parameter error handler rule classes =
 	in
 	match agent with
 	  | None
-	  | Some Cckappa_sig.Ghost -> error, stochastic_class_rhs
-	  | Some Cckappa_sig.Dead_agent (agent,_,_) | Some Cckappa_sig.Agent agent ->
+	  | Some Cckappa_sig.Unknown_agent _ | Some Cckappa_sig.Ghost -> error, stochastic_class_rhs
+	  | Some Cckappa_sig.Dead_agent (agent,_,_,_) | Some Cckappa_sig.Agent agent ->
              get_sites_list
                parameter
                error
@@ -105,8 +105,8 @@ let scan_rule parameter error handler rule classes =
       parameter error
       (fun parameter error agent_id agent stochastic_class ->
        match agent with
-       | Cckappa_sig.Ghost -> error, stochastic_class
-       | Cckappa_sig.Dead_agent (agent,_,_) | Cckappa_sig.Agent agent ->
+       | Cckappa_sig.Unknown_agent _  | Cckappa_sig.Ghost -> error, stochastic_class
+       | Cckappa_sig.Dead_agent (agent,_,_,_) | Cckappa_sig.Agent agent ->
 	  let agent_type = agent.Cckappa_sig.agent_name in
           get_sites_list
             parameter

@@ -127,8 +127,8 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
         then error, store_covering_classes
         else
           match agent with
-	  | Ghost -> error, store_covering_classes
-	  | Dead_agent (agent,_,_) 
+	  | Ghost | Unknown_agent _ -> error, store_covering_classes
+	  | Dead_agent (agent,_,_,_) 
 	  | Agent agent ->
               let agent_type = agent.agent_name in
               (*get a list of sites from an interface at each rule*)

@@ -1,11 +1,11 @@
 ############ TEST ACTIONS ##############
 
 #### Signatures
-%agent: A(x~u~p~q) 
-%agent: B(x~u~p~q)
-%agent: D(x~u~p~q)
-%agent: E(x~u~p~q)
-%agent: F(x~u~p~q)
+#%agent: A(x~u~p~q) 
+#%agent: B(x~u~p~q)
+#%agent: D(x~u~p~q)
+#%agent: E(x~u~p~q)
+#%agent: F(x~u~p~q)
 
 A(x~q),B(x~u) -> A(x~u),B(x~p) @1
 B(x~u) <-> B(x~p) @ 1,2

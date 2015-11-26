@@ -30,7 +30,12 @@ let print_site parameters site =
   match site with 
   | Ckappa_sig.Internal a -> Printf.fprintf (Remanent_parameters.get_log parameters) "%s%s(internal state)" (Remanent_parameters.get_prefix parameters) a
     | Ckappa_sig.Binding a -> Printf.fprintf (Remanent_parameters.get_log parameters) "%s%s(binding state)" (Remanent_parameters.get_prefix parameters) a 
-
+let string_of_site parameters site =
+  match site
+  with
+    | Ckappa_sig.Internal a -> a^"(internal state)"
+    | Ckappa_sig.Binding a -> a^"(binding state)"	
+					     
 let print_handler parameters error handler = 
   let log = (Remanent_parameters.get_log parameters) in 
   let _ = Printf.fprintf log "%s\n" (Remanent_parameters.get_prefix parameters) in

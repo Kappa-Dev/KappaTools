@@ -20,9 +20,17 @@ let local_trace = false
    
 let string_of_port port = "[state_min:"^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.min)^";state_max:"^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.max)^"]"
 
+let print_kasim_site x =
+  match
+    x
+  with () -> "" 
+																						
 let print_agent parameters error handler agent =
      match agent with 
-     | Cckappa_sig.Dead_agent (agent,l,l') ->
+     | Cckappa_sig.Unknown_agent s ->
+	let () = Printf.fprintf (Remanent_parameters.get_log parameters) "%sunknown_agent:%s\n" (Remanent_parameters.get_prefix parameters) s in
+	error 
+     | Cckappa_sig.Dead_agent (agent,s,l,l') ->
 	let parameters = Remanent_parameters.update_prefix parameters ("agent_type_"^(string_of_int agent.Cckappa_sig.agent_name)^":") in
 	let error =
 	  Cckappa_sig.Site_map_and_set.Map.fold
@@ -31,6 +39,14 @@ let print_agent parameters error handler agent =
              error)
             agent.Cckappa_sig.agent_interface
             error in
+	let error =
+	  Cckappa_sig.KaSim_Site_map_and_set.Set.fold
+	    (fun x error ->
+	     let () = Printf.fprintf (Remanent_parameters.get_log parameters) "%sUndefined site:%s\n" (Remanent_parameters.get_prefix parameters) (Print_handler.string_of_site parameters x) in
+	     error)
+	    s
+	    error
+	in 
 	let error =
 	  Cckappa_sig.Site_map_and_set.Map.fold
 	    (fun s _ error -> let () = Printf.fprintf (Remanent_parameters.get_log parameters) "%sdead site type %i\n" (Remanent_parameters.get_prefix parameters) s in error)

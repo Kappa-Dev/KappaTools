@@ -270,7 +270,7 @@ let scan_rules parameters a b =
       let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "Scan rules!\n" in ()  
   in 
     List.fold_left 
-      (fun remanent (_,((_,rule),_)) -> scan_mixture parameters (scan_mixture parameters remanent rule.Ckappa_sig.lhs) rule.Ckappa_sig.rhs)
+      (fun remanent (_,((_,rule),_)) -> scan_mixture parameters (*(scan_mixture parameters remanent rule.Ckappa_sig.lhs)*) remanent  rule.Ckappa_sig.rhs)
       a b
   
 let scan_compil parameters error compil =

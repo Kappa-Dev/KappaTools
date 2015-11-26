@@ -134,9 +134,8 @@ let store_test_has_bond_rhs parameter error rule_id rule store_result =
     (fun parameter error agent_id agent site_add_map store_result ->
       match agent with
       | Ghost -> error, store_result
-      | Dead_agent _ ->
-	warn parameter error
-          (Some "line 156, rhs should not have dead agents") Exit store_result
+      | Unknown_agent _ | Dead_agent _ ->
+	 warn parameter error (Some "line 156, rhs should not have dead agents") Exit store_result
       | Agent agent ->
         let agent_type = agent.agent_name in
         let error, set =
@@ -253,7 +252,11 @@ let collect_bdu_update_map parameter handler error
             (agent_id, agent_type) ->
             let error, agent = AgentMap.get parameter error agent_id rule.rule_rhs.views in
             match agent with
+<<<<<<< 5b2da43f9d8d73f205bd81b8ad8d0625e157d4c6
           | Some Dead_agent _ 
+=======
+	    | Some Unknown_agent _ | Some Dead_agent _ 
+>>>>>>> More varieties of dead token propagated in KaSa.
             | None -> warn parameter error (Some "line 163") Exit
               (cv_id, store_bdu_result)
             | Some Ghost -> error, (cv_id, store_bdu_result)
@@ -322,8 +325,8 @@ let collect_bdu_update_map parameter handler error
             (fun parameter error agent_id agent store_bdu_result ->
               match agent with
               | Ghost -> error, store_bdu_result
-              | Dead_agent (agent,_,_) ->
-                begin
+	      | Unknown_agent _ | Dead_agent _ ->
+		 begin
                    (*continue with the tail of working list and the result*)
                   aux wl_tl bdu_X (error, store_bdu_result)
                 end

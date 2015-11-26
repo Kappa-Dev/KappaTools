@@ -29,10 +29,12 @@ let collect_wl_creation parameter error rule_id rule store_result =
   List.fold_left (fun (error, store_result) (agent_id, agent_type) ->
     let error, agent = AgentMap.get parameter error agent_id rule.rule_rhs.views in
     match agent with
-      | None -> warn parameter error (Some "line 131") Exit store_result
-      | Some Ghost -> error, store_result
-      | Some Dead_agent (agent,_,_) 
-      | Some Agent agent ->
-	let error, wl = IntWL.push parameter error rule_id store_result in
-        error, wl
-  ) (error, store_result) rule.actions.creation
+    | Some Dead_agent _
+    | Some Unknown_agent _ 
+    | None -> warn parameter error (Some "line 131") Exit store_result
+    | Some Ghost -> error, store_result			     
+    | Some Agent agent ->
+       let error, wl = IntWL.push parameter error rule_id store_result in
+       error, wl
+		 ) (error, store_result) rule.actions.creation
+		 

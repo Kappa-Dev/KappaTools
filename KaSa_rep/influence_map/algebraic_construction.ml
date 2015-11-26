@@ -115,11 +115,13 @@ let check parameters error handler mixture1 mixture2 (i,j) =
 	   match ag1
 	   with 
 	   | Cckappa_sig.Ghost-> warn parameters error (Some "Should not scan ghost agents...") Exit (true,(to_do,already_done))
-	   | Cckappa_sig.Dead_agent (ag1,l11,l12) ->
+	   | Cckappa_sig.Unknown_agent _ -> raise (False error) 
+	   | Cckappa_sig.Dead_agent (ag1,_,l11,l12) ->
 	      begin
 		match ag2 with
+		| Cckappa_sig.Unknown_agent _ -> raise (False error)
 		| Cckappa_sig.Ghost -> warn parameters error (Some "Should not scan ghost agents...") Exit (true,(to_do,already_done))
-		| Cckappa_sig.Dead_agent (ag2,l21,l22) ->
+		| Cckappa_sig.Dead_agent (ag2,s2,l21,l22) ->
 		   begin
 		     let error,(bool,(to_do,already_done)) =
 		       deal_with error
@@ -162,8 +164,9 @@ let check parameters error handler mixture1 mixture2 (i,j) =
 	   | Cckappa_sig.Agent ag1 ->
 	       begin
 		match ag2 with
+		| Cckappa_sig.Unknown_agent _ -> raise (False error) 						       
 		| Cckappa_sig.Ghost -> warn parameters error (Some "Should not scan ghost agents...") Exit (true,(to_do,already_done))
-		| Cckappa_sig.Dead_agent (ag2,l21,l22) ->
+		| Cckappa_sig.Dead_agent (ag2,_,l21,l22) ->
 		   begin
 		     begin
 		        deal_with error

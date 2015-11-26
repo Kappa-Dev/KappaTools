@@ -116,8 +116,8 @@ let scan_mixture_in_var bool parameter error handler var_id mixture quarks =
       (fun parameter error agent_id agent (agent_var,site_var) -> 
         match agent 
         with 
-        | Cckappa_sig.Ghost -> error,(agent_var,site_var)
-	| Cckappa_sig.Dead_agent (agent,_,_) | Cckappa_sig.Agent agent -> 
+       	| Cckappa_sig.Unknown_agent _ | Cckappa_sig.Ghost -> error,(agent_var,site_var)
+	| Cckappa_sig.Dead_agent (agent,_,_,_) | Cckappa_sig.Agent agent -> 
           let error,kasim_id = Quark_type.Labels.label_of_int parameter error agent.Cckappa_sig.agent_kasim_id in 
           let agent_type = agent.Cckappa_sig.agent_name in 
           let error,agent_var = add_var parameter error var_id kasim_id agent_type agent_var in
@@ -192,33 +192,35 @@ let scan_rule parameter error handler rule_id rule quarks =
          parameter
          error 
          (fun parameter error agent_id agent (agent_test,site_test) -> 
-            match agent with 
-              | Cckappa_sig.Ghost -> error,(agent_test,site_test)
-	      | Cckappa_sig.Dead_agent (agent,_,_) | Cckappa_sig.Agent agent -> 
-                  let error,kasim_id = Quark_type.Labels.label_of_int parameter error agent.Cckappa_sig.agent_kasim_id in 
-                  let agent_type = agent.Cckappa_sig.agent_name in 
-                  let error,agent_test = add_agent parameter error rule_id kasim_id agent_type agent_test in 
-                  let error,site_test = 
-                       Cckappa_sig.Site_map_and_set.Map.fold
-                         (fun site port (error,site_test) -> 
-                             let interval = port.Cckappa_sig.site_state in 
-                             let max = interval.Cckappa_sig.max in 
-                             let rec aux k (error,site_test) = 
-                               if k>max 
-                               then
-                                 error,site_test
-                               else 
-                                 aux (k+1) (add_site parameter error rule_id kasim_id agent_type site k site_test) 
-                             in 
-                               aux interval.Cckappa_sig.min (error,site_test)
-                        )
-                       agent.Cckappa_sig.agent_interface 
-                       (error,site_test)
-                 in 
-                       error,(agent_test,site_test) 
+          match agent with
+	  | Cckappa_sig.Unknown_agent _ 
+          | Cckappa_sig.Ghost -> error,(agent_test,site_test)
+	  | Cckappa_sig.Dead_agent (agent,_,_,_)
+	  | Cckappa_sig.Agent agent -> 
+	     let error,kasim_id = Quark_type.Labels.label_of_int parameter error agent.Cckappa_sig.agent_kasim_id in 
+	     let agent_type = agent.Cckappa_sig.agent_name in 
+	     let error,agent_test = add_agent parameter error rule_id kasim_id agent_type agent_test in 
+	     let error,site_test = 
+	       Cckappa_sig.Site_map_and_set.Map.fold
+		 (fun site port (error,site_test) -> 
+		  let interval = port.Cckappa_sig.site_state in 
+		  let max = interval.Cckappa_sig.max in 
+		  let rec aux k (error,site_test) = 
+		    if k>max 
+		    then
+		      error,site_test
+		    else 
+		      aux (k+1) (add_site parameter error rule_id kasim_id agent_type site k site_test) 
+		  in 
+                  aux interval.Cckappa_sig.min (error,site_test)
+                 )
+                 agent.Cckappa_sig.agent_interface 
+                 (error,site_test)
+             in 
+             error,(agent_test,site_test) 
          )
-        viewslhs 
-        (agent_test,site_test)      
+         viewslhs 
+         (agent_test,site_test)      
     in 
     let _ = Misc_sa.trace parameter (fun () ->"CREATION\n") in 
     let error,agent_modif_plus = (*the agents that are created*)
@@ -227,8 +229,8 @@ let scan_rule parameter error handler rule_id rule quarks =
             let error,agent = Int_storage.Quick_Nearly_inf_Imperatif.get parameter error agent_id viewsrhs in 
               match agent with 
                | None -> warn parameter error (Some "line 111") Exit agent_modif_plus  
-               | Some Cckappa_sig.Ghost -> error,agent_modif_plus
-	       | Some Cckappa_sig.Dead_agent (agent,_,_) | Some Cckappa_sig.Agent agent ->   
+	       | Some Cckappa_sig.Unknown_agent _ | Some Cckappa_sig.Ghost -> error,agent_modif_plus
+	       | Some Cckappa_sig.Dead_agent (agent,_,_,_) | Some Cckappa_sig.Agent agent ->   
                    let error,kasim_id = Quark_type.Labels.label_of_int parameter error (agent.Cckappa_sig.agent_kasim_id) in 
                      add_agent parameter error rule_id kasim_id agent_type agent_modif_plus)
         (error,agent_modif_plus)
