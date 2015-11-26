@@ -25,27 +25,14 @@ let trace = false
 
 (************************************************************************************)
 
-(*let print_test_bonds parameter error (rule_id, result) =
-  fprintf stdout "rule_id:%i\n" rule_id;
-  Map_site_address.Set.iter (fun (site_add1, site_add2) ->
-    fprintf parameter.log 
-      "{agent_id:%i; agent_type:%i; site_type:%i} -- "
-      site_add1.Cckappa_sig.agent_index site_add1.Cckappa_sig.agent_type 
-      site_add1.Cckappa_sig.site;
-    fprintf parameter.log 
-      "{agent_id:%i; agent_type:%i; site_type:%i} \n"
-      site_add2.Cckappa_sig.agent_index site_add2.Cckappa_sig.agent_type 
-      site_add2.Cckappa_sig.site
-  ) result*)
-
 let print_test_bonds parameter error result =
-  Map_test_bond.Map.iter (fun (agent_type, rule_id) (l1, s2) ->
+  Map_test_bond.Map.iter (fun rule_id (l1, s2) ->
     if l1 <> []
     then ()
     else
       ();
     let _ =
-      fprintf parameter.log "agent_type:%i:rule_id:%i\n" agent_type rule_id
+      fprintf parameter.log "rule_id:%i\n" rule_id
     in
     Map_site_address.Set.iter (fun (site_add1, site_add2) ->
       fprintf parameter.log 
@@ -71,7 +58,7 @@ let print_bdu_update_map parameter error result =
     in
     List.iter (fun bdu_creation ->
       let _ =
-        let _ = print_bdu parameter error bdu_creation in
+        let _ = Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_creation in
         fprintf parameter.log "\n"
       in
       ()
@@ -92,7 +79,7 @@ let print_bdu_fixpoint parameter error result =
   in
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
-      "** Valuation of the views that are tested, encounter sites that are bond on the rhs for the first time:\n";
+      "** Discovered sites that are bond on the rhs for the first time:\n";
     print_test_bonds
       parameter
       error

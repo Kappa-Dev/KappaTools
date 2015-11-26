@@ -224,8 +224,8 @@ let scan_rule_bdu_build parameter error rule_id rule covering_classes store_resu
 
 (************************************************************************************)
 (*rule bdu build map*)
-(*REMOVE*)
-let scan_rule_bdu_build_map parameter handler error xrule_id rule 
+
+let scan_rule_bdu_build_map parameter handler_bdu error rule 
     store_remanent_test_map
     store_remanent_triple
     store_remanent_creation_map
@@ -235,7 +235,7 @@ let scan_rule_bdu_build_map parameter handler error xrule_id rule
   let error, store_creation_bdu_map =
     collect_creation_bdu_map
       parameter
-      handler
+      handler_bdu
       error
       store_remanent_creation_map
   in
@@ -243,7 +243,7 @@ let scan_rule_bdu_build_map parameter handler error xrule_id rule
   let error, store_test_bdu_map =
     collect_test_bdu_map
       parameter
-      handler 
+      handler_bdu
       error
       store_remanent_test_map
   in
@@ -255,17 +255,27 @@ let scan_rule_bdu_build_map parameter handler error xrule_id rule
       store_remanent_modif_map
   in
   (*-------------------------------------------------------------------------------*)
+  (*projection map*)
+  (*let error, store_final_bdu_creation_map =
+    collect_final_bdu_creation_map
+      parameter
+      handler_bdu
+      error
+      store_creation_bdu_map
+  in*)
+  (*-------------------------------------------------------------------------------*)
   error, 
   {
     store_creation_bdu_map       = store_creation_bdu_map;
     store_test_bdu_map           = store_test_bdu_map;
-    store_modif_list_map         = store_modif_list_map
+    store_modif_list_map         = store_modif_list_map;
+    (*store_final_bdu_creation_map = store_final_bdu_creation_map*)
   }
 
 (************************************************************************************)
 (*scan rule fixpoint*)
 
-let scan_rule_fixpoint parameter handler error rule_id 
+let scan_rule_fixpoint parameter handler_bdu error rule_id 
     rule
     store_wl_creation 
     store_remanent_triple
@@ -288,7 +298,7 @@ let scan_rule_fixpoint parameter handler error rule_id
   let error, store_bdu_update_map =
     collect_bdu_update_map
       parameter
-      handler
+      handler_bdu
       error
       rule
       store_wl_creation
@@ -352,7 +362,6 @@ let scan_rule parameter handler_bdu error handler_kappa rule_id rule store_cover
       parameter
       handler_bdu 
       error
-      rule_id
       rule
       store_bdu_build.store_remanent_test_map
       store_bdu_build.store_remanent_triple
@@ -455,11 +464,13 @@ let init_bdu_build_map parameter error =
   let init_creation_bdu_map = Map_creation_bdu.Map.empty in
   let init_test_bdu_map     = Map_test_bdu.Map.empty in
   let init_modif_list_map   = Map_modif_list.Map.empty in
+  let init_final_bdu_creation_map = Map_final_creation_bdu.Map.empty in
   let init_bdu_build_map =
     {
       store_creation_bdu_map = init_creation_bdu_map;
       store_test_bdu_map     = init_test_bdu_map;
-      store_modif_list_map   = init_modif_list_map
+      store_modif_list_map   = init_modif_list_map;
+      (*store_final_bdu_creation_map = init_final_bdu_creation_map*)
     }
   in
   error, init_bdu_build_map

@@ -15,7 +15,6 @@
 open Bdu_analysis_type
 open Cckappa_sig
 open Bdu_build
-open Bdu_build_common
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "BDU structure") message exn (fun () -> default)  
@@ -26,19 +25,29 @@ let trace = false
 (* Build BDU*)
 (*************************************************************************************)
 
+let build_bdu parameter handler error pair_list =
+  let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in
+  let error, handler, list_a =
+    Mvbdu_wrapper.Mvbdu.build_list
+      parameter
+      handler
+      error
+      pair_list
+  in
+  let error, handler, bdu_result =
+    Mvbdu_wrapper.Mvbdu.mvbdu_redefine parameter handler error bdu_true list_a
+  in
+  error, handler, bdu_result
+
 (*************************************************************************************)
 (*Bdu for the valuations of the views that are created (per rule, agent and
   covering class)*)
 
 let collect_test_bdu_map parameter handler error store_test_map =
-  (* let error, (handler, bdu_init) = bdu_init parameter error in*)
-  let error,handler, bdu_false =
-    f parameter
-      (Boolean_mvbdu.boolean_mvbdu_false parameter handler error) parameter
-  in 
+  let error, handler, bdu_false = Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error in
   let add_link (agent_id, agent_type, rule_id, cv_id) bdu store_result =
     let (l,old) =
-	Map_test_bdu.Map.find_default ([],bdu_false)
+	Map_test_bdu.Map.find_default ([], bdu_false)
           (agent_id, agent_type, rule_id, cv_id) store_result
     in
     let result_map =
@@ -57,7 +66,7 @@ let collect_test_bdu_map parameter handler error store_test_map =
       ) (error, []) l2
     in
     (*build bdu test from this pair_list*)
-    let error, (handler, bdu_test) =
+    let error, handler, bdu_test =
       build_bdu parameter handler error pair_list
     in
     (*store handler, bdu_test in a map with (agent_type, rule_id) *)
@@ -67,24 +76,20 @@ let collect_test_bdu_map parameter handler error store_test_map =
     error, store_result
   ) store_test_map (error, Map_test_bdu.Map.empty)
 
-
 (*************************************************************************************)
 (*Bdu for the valuations of the views that are tested (per rule, agent and
   covering class)*)
 
 let collect_creation_bdu_map parameter handler error store_creation_map =
-  (* let error, (handler, bdu_init) = bdu_init parameter error in*)
-  let error,handler, bdu_false =
-    f parameter
-      (Boolean_mvbdu.boolean_mvbdu_false parameter handler error) parameter
-  in 
+  let error, handler, bdu_false = Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error in
   let add_link (agent_type, rule_id, cv_id) bdu store_result =
     let (l, old) =
-      Map_creation_bdu.Map.find_default ([],bdu_false)
+      Map_creation_bdu.Map.find_default ([], bdu_false)
 	(agent_type, rule_id, cv_id) store_result
     in
     let result_map = (*NOTE: get only a bdu_creation of each rule*)
-      Map_creation_bdu.Map.add (agent_type, rule_id, cv_id) (l, bdu) store_result
+      Map_creation_bdu.Map.add (agent_type, rule_id, cv_id) (l, bdu)
+        store_result
     in
     error, result_map
   in
@@ -97,7 +102,7 @@ let collect_creation_bdu_map parameter handler error store_creation_map =
       ) (error, []) l2
     in
     (*build bdu test from this pair_list*)
-    let error, (handler, bdu_creation) =
+    let error, handler, bdu_creation =
       build_bdu parameter handler error pair_list
     in
     (*store handler, bdu_test in a map with (agent_type, rule_id) *)
@@ -107,6 +112,21 @@ let collect_creation_bdu_map parameter handler error store_creation_map =
     error, store_result
   ) store_creation_map (error, Map_creation_bdu.Map.empty)
 
+(*let collect_final_bdu_creation_map parameter handler error store_creation_bdu_map =
+  Map_creation_bdu.Map.fold 
+    (fun (agent_type, rule_id, cv_id) (l1, bdu) (error, store_result) ->
+      (*mapi from (rule_id) -> (agent_type, bdu) *)
+      let mapi = Map_creation_bdu.Map.mapi
+        (fun (agent_type, rule_id, cv_id) (l1, bdu) -> (agent_type, bdu))
+        store_creation_bdu_map store_result
+      in
+      let proj = 
+        proj (fun (_, rule_id, _) -> rule_id) [] 
+          (fun x y  -> List.concat [x; y]) mapi
+      in
+      
+    ) store_creation_bdu_map (error, Map_final_creation_bdu.Map.empty)*)
+    
 (*************************************************************************************)
 (*Update list of the views due to modification (per rule, agent and covering class)*)
 
