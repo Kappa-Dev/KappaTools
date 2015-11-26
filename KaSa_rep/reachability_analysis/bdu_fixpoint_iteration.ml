@@ -20,7 +20,6 @@ open Boolean_mvbdu
 open Memo_sig
 open Site_map_and_set
 open Covering_classes_type
-open Bdu_build_common
 open Bdu_structure
 open Fifo
 open Printf
@@ -136,7 +135,8 @@ let store_test_has_bond_rhs parameter error rule_id rule store_result =
       match agent with
       | Ghost -> error, store_result
       | Dead_agent _ ->
-	warn parameter error (Some "line 156, rhs should not have dead agents") Exit store_result
+	warn parameter error
+          (Some "line 156, rhs should not have dead agents") Exit store_result
       | Agent agent ->
         let agent_type = agent.agent_name in
         let error, set =

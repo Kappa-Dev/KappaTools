@@ -19,7 +19,6 @@ open Boolean_mvbdu
 open Memo_sig
 open Site_map_and_set
 open Covering_classes_type
-open Bdu_build_common
     
 (************************************************************************************)
 (*function mapping a list of covering class, return triple
@@ -57,8 +56,8 @@ let new_index_pair_map parameter error l =
 let list2set parameter error list =
   let error',set =
     List.fold_left (fun (error,current_set) elt ->
-		    Set.add parameter error elt current_set
-		   ) (error,Set.empty) list
+      Set.add parameter error elt current_set
+    ) (error,Set.empty) list
   in
   let error = Exception.check warn parameter error error' (Some "line 61") Exit in
   error,set

@@ -15,7 +15,6 @@
 open Cckappa_sig
 open Int_storage
 open Fifo
-open Bdu_build_common
 open Bdu_analysis_type
 open Print_bdu_analysis
 open Bdu_side_effects
