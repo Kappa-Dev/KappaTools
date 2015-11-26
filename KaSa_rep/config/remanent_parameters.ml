@@ -389,3 +389,21 @@ let open_influence_map_file parameters error =
   in 
     error,
     {parameters with Remanent_parameters_sig.log = channel}
+
+ let persistent_mode = false
+			 
+ let lexical_analysis_of_tested_only_patterns_is_required_by_the_influence_map parameter =
+     get_influence_map_accuracy_level parameter = Remanent_parameters_sig.Medium
+ let lexical_analysis_of_tested_only_patterns_is_required_by_the_persistent_mode  parameter =
+   persistent_mode
+ let lexical_analysis_of_tested_only_patterns_is_required_by_the_contact_map parameter =
+   match
+     get_contact_map_accuracy_level parameter with
+   | Remanent_parameters_sig.Medium | Remanent_parameters_sig.Low -> true
+   | Remanent_parameters_sig.None | Remanent_parameters_sig.High -> false
+								      
+ let lexical_analysis_of_tested_only_patterns parameter =
+   lexical_analysis_of_tested_only_patterns_is_required_by_the_persistent_mode  parameter 
+   || lexical_analysis_of_tested_only_patterns_is_required_by_the_contact_map parameter
+   || lexical_analysis_of_tested_only_patterns_is_required_by_the_influence_map parameter
+						   

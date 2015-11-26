@@ -28,4 +28,15 @@ subgraph cluster3 {
    3.1 [style = filled label = "y" shape =ellipse color = green size = "5"]
 label =  "D";  shape = rectangle; color = red 
 } ; 
+subgraph cluster4 {
+   4.0 [style = filled label = "x" shape =ellipse color = green size = "5"]
+   4.1 [style = filled label = "y" shape =ellipse color = green size = "5"]
+   4.2 [style = filled label = "z" shape =ellipse color = green size = "5"]
+label =  "E";  shape = rectangle; color = red 
+} ; 
+subgraph cluster5 {
+   5.0 [style = filled label = "x" shape =ellipse color = green size = "5"]
+   5.1 [style = filled label = "y" shape =ellipse color = green size = "5"]
+label =  "F";  shape = rectangle; color = red 
+} ; 
 }
