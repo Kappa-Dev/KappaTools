@@ -254,17 +254,19 @@ let check parameters error handler mixture1 mixture2 (i,j) =
   let error,ouput = add (i,j) error [] (Quark_type.IntSetMap.Map.empty,Quark_type.IntSetMap.Map.empty) in
   match ouput
   with
-     None -> warn parameters error (Some "Missing rule") Exit (raise Exit)
+     None -> warn parameters error (Some "Missing rule") Exit (false)
    | Some(todo,inj1,inj2) -> check_agent error [i,j] (inj1,inj2)
 		 
-		 
+exception Pass of Exception.method_handler 
+					 
 let filter_influence parameters error handler compilation map bool =
   let nrules = Handler.nrules parameters error handler in
   let get_var v =
     match snd (v.Cckappa_sig.e_variable) 
     with 
     | Ast.KAPPA_INSTANCE(mixture),_ -> error,mixture
-    | _ -> warn parameters error (Some "Composite observable") Exit (raise Exit)
+    | _ -> let error,() = warn parameters error (Some "Composite observable") Exit ()
+	   in raise (Pass error)
   in 
   let get_lhs r =
     r.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs
@@ -282,52 +284,62 @@ let filter_influence parameters error handler compilation map bool =
   in
   Quark_type.Int2SetMap.Map.fold
     (fun (a,b) couple (error,map') ->
-     let error,rule1 = Int_storage.Nearly_inf_Imperatif.get parameters error a compilation.Cckappa_sig.rules in
-     let error,r1 =
-       match rule1
-       with
-       | None -> warn parameters error (Some "Missing rule") Exit (raise Exit)
-       | Some r -> error,r
-     in
-     let error,mixt =
-       if
-	 b<nrules
-       then
-	 begin
-	 let error,rule2 = Int_storage.Nearly_inf_Imperatif.get parameters error b compilation.Cckappa_sig.rules in 
-	 match rule2 with
-	 | None -> warn parameters error (Some "Missing rule") Exit (raise Exit)
-	 | Some r -> error,get_lhs r 
+     try 
+       begin 
+	 let error,rule1 = Int_storage.Nearly_inf_Imperatif.get parameters error a compilation.Cckappa_sig.rules in
+	 let error,r1 =
+	   match rule1
+	   with
+	   | None ->
+	      let error,() = warn parameters error (Some "Missing rule") Exit ()
+	      in raise (Pass error)
+	   | Some r -> error,r
+	 in
+	 let error,mixt =
+	   if
+	     b<nrules
+	   then
+	     begin
+	       let error,rule2 = Int_storage.Nearly_inf_Imperatif.get parameters error b compilation.Cckappa_sig.rules in 
+	       match rule2 with
+	       | None ->
+		  let error,() = warn parameters error (Some ("Missing rule"^(string_of_int b))) Exit ()
+		  in raise (Pass error)
+	       | Some r -> error,get_lhs r 
+	     end
+	   else
+	     begin
+	       let error,var = Int_storage.Nearly_inf_Imperatif.get parameters error (b-nrules) compilation.Cckappa_sig.variables in
+	       match var with
+	       | None ->
+		  let error,() = warn parameters error (Some ("Missing var"^(string_of_int (b-nrules)))) Exit ()
+		  in raise (Pass error)
+	       | Some v -> get_var v
 	 end
-       else
-	 begin
-	   let error,var = Int_storage.Nearly_inf_Imperatif.get parameters error (b-nrules) compilation.Cckappa_sig.variables in
-	   match var with
-	   | None ->  warn parameters error (Some "Missing var") Exit (raise Exit)
-	   | Some v -> get_var v
-	 end
-     in 
-     let error,couple' =
-       try
+	 in 
 	 let error,couple' =
-	   Quark_type.Labels.filter_couple
-	     parameters
-	     error
-	     handler 
-	     (fun error a b  ->
-	      check_influence_rule_mixt error
-					r1
-					mixt
-					(a,b) )
-	     couple
+	   try
+	     let error,couple' =
+	       Quark_type.Labels.filter_couple
+		 parameters
+		 error
+		 handler 
+		 (fun error a b  ->
+		  check_influence_rule_mixt error
+					    r1
+					    mixt
+					    (a,b) )
+		 couple
 	 in
 	 error,couple'
-       with Exit -> error,couple
-     in 
-     if Quark_type.Labels.is_empty_couple couple'
-     then  error,map'
-     else error,Quark_type.Int2SetMap.Map.add (a,b) couple' map'
-    )
-    map 
-    (error,Quark_type.Int2SetMap.Map.empty)
-	      
+	   with Exit -> error,couple
+	 in 
+	 if Quark_type.Labels.is_empty_couple couple'
+	 then  error,map'
+	 else error,Quark_type.Int2SetMap.Map.add (a,b) couple' map'
+     end
+	 with Pass error -> (error,map')
+	)
+	map 
+	(error,Quark_type.Int2SetMap.Map.empty)
+	

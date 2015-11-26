@@ -29,28 +29,31 @@ type site_quark = (Cckappa_sig.agent_name*Cckappa_sig.site_name*int)
 
 module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif 
 module SiteMap = Int_storage.Extend (AgentMap)(Int_storage.Extend (AgentMap)(AgentMap))
-  
+module DeadSiteMap= Int_storage.Extend (AgentMap)(AgentMap)
 type agents_quarks = Labels.label_set Int_storage.Quick_Nearly_inf_Imperatif.t AgentMap.t  
 type sites_quarks = Labels.label_set Int_storage.Quick_Nearly_inf_Imperatif.t SiteMap.t 
   
 type quarks = 
   {
-    dead_agent_plus: Labels.label_set Int_storage.Quick_Nearly_inf_Imperatif.t  StringMap.Map.t ;
-    dead_sites_plus: Labels.label_set Int_storage.Quick_Nearly_inf_Imperatif.t  StringMap.Map.t AgentMap.t ;
-    dead_states_plus: sites_quarks ;
-    dead_agent_minus: Labels.label_set Int_storage.Quick_Nearly_inf_Imperatif.t  StringMap.Map.t ;
-    dead_sites_minus: Labels.label_set Int_storage.Quick_Nearly_inf_Imperatif.t StringMap.Map.t AgentMap.t ;
-    dead_states_minus: sites_quarks ;
-    agent_modif_plus:  agents_quarks ;
-    agent_modif_minus: agents_quarks ; 
-    agent_test: agents_quarks ;
-    agent_var_minus: agents_quarks ;
-    site_modif_minus: sites_quarks ;
-    site_test: sites_quarks ;  
-    site_var_minus: sites_quarks ; 
-    site_modif_plus: sites_quarks ;
-    agent_var_plus : agents_quarks ;
-    site_var_plus : sites_quarks ; 
+     dead_agent: Labels.label_set Int_storage.Quick_Nearly_inf_Imperatif.t  StringMap.Map.t ;
+     dead_sites: Labels.label_set Int_storage.Quick_Nearly_inf_Imperatif.t  Cckappa_sig.KaSim_Site_map_and_set.Map.t AgentMap.t ;
+     dead_states: Labels.label_set Int_storage.Quick_Nearly_inf_Imperatif.t  DeadSiteMap.t;
+     dead_agent_plus: Labels.label_set Int_storage.Quick_Nearly_inf_Imperatif.t  StringMap.Map.t ;
+     dead_sites_plus: Labels.label_set Int_storage.Quick_Nearly_inf_Imperatif.t  Cckappa_sig.KaSim_Site_map_and_set.Map.t AgentMap.t ;
+     dead_states_plus: Labels.label_set Int_storage.Quick_Nearly_inf_Imperatif.t  DeadSiteMap.t;
+     dead_agent_minus: Labels.label_set Int_storage.Quick_Nearly_inf_Imperatif.t  StringMap.Map.t ;
+     dead_sites_minus: Labels.label_set Int_storage.Quick_Nearly_inf_Imperatif.t  Cckappa_sig.KaSim_Site_map_and_set.Map.t AgentMap.t ;
+     dead_states_minus: Labels.label_set Int_storage.Quick_Nearly_inf_Imperatif.t  DeadSiteMap.t;
+     agent_modif_plus:  agents_quarks ;
+     agent_modif_minus: agents_quarks ; 
+     agent_test: agents_quarks ;
+     agent_var_minus: agents_quarks ;
+     site_modif_minus: sites_quarks ;
+     site_test: sites_quarks ;  
+     site_var_minus: sites_quarks ; 
+     site_modif_plus: sites_quarks ;
+     agent_var_plus : agents_quarks ;
+     site_var_plus : sites_quarks ; 
   }
 
 type influence_map = Labels.label_set_couple Int2SetMap.Map.t

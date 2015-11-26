@@ -276,6 +276,7 @@ Quarks:Rule 6
 Quarks:TEST
 Quarks:rule_id:6,agent_type:0
 Quarks:rule_id:6,agent_type:0,site_type:0,state:0
+Quarks:rule_id:6,agent_type:0,site_type:1
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -287,6 +288,7 @@ Quarks:Rule 7
 Quarks:TEST
 Quarks:rule_id:7,agent_type:0
 Quarks:rule_id:7,agent_type:0,site_type:0,state:0
+Quarks:rule_id:7,agent_type:0,site_type:1
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
@@ -308,6 +310,7 @@ Quarks:MODIFICATION-
 Quarks:Rule 9
 Quarks:TEST
 Quarks:rule_id:9,agent_type:3
+Quarks:rule_id:9,agent_type:3,site_type:0
 Quarks:CREATION
 Quarks:rule_id:9,agent_type:0
 Quarks:REMOVAL

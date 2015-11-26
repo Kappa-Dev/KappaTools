@@ -58,6 +58,41 @@ let print_agent_var_map parameters error handler map =
       map
   in error
 
+let print_string_map parameters error handler map =
+  let error =
+    Quark_type.StringMap.Map.iter
+      (fun key im ->
+       let error =
+	 Int_storage.Quick_Nearly_inf_Imperatif.iter 
+          parameters
+          error
+          (fun parameters error key' im' -> 
+           let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%sagent_type:%s,rule_id:%i->" (Remanent_parameters.get_prefix parameters) key key' in 
+           let _ = Quark_type.Labels.dump parameters error handler im' in 
+           let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "\n" in
+           error)
+	  im in
+       () )
+      map
+  in error
+let print_var_string_map parameters error handler map =
+  let error =
+    Quark_type.StringMap.Map.iter
+      (fun key im ->
+       let error =
+	 Int_storage.Quick_Nearly_inf_Imperatif.iter 
+          parameters
+          error
+          (fun parameters error key' im' -> 
+           let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%sagent_type:%s,var_id:%i->" (Remanent_parameters.get_prefix parameters) key key' in 
+           let _ = Quark_type.Labels.dump parameters error handler im' in 
+           let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "\n" in
+           error)
+	  im in
+       () )
+      map
+  in error 
+	  
 let print_agents parameters error handler quark = 
   let parameters_var = Remanent_parameters.update_prefix parameters "agent_var++**:" in 
   let error = print_agent_var_map parameters_var error handler quark.Quark_type.agent_var_plus in
@@ -69,7 +104,7 @@ let print_agents parameters error handler quark =
   let error = print_agent_map parameters_plus error handler quark.Quark_type.agent_modif_plus in
   let parameters_minus = Remanent_parameters.update_prefix parameters "agent_modif-:" in 
   let error = print_agent_map parameters_minus error handler quark.Quark_type.agent_modif_minus in
-    error 
+  error 
   
 let print_site_map parameter error handler map = 
      Quark_type.SiteMap.iter 
@@ -118,10 +153,20 @@ let print_sites parameter error handler quark =
   let error = print_site_map parameter_minus error handler quark.Quark_type.site_modif_minus in
     error 
 
+let print_dead_agents parameter error handler quark =
+  let parameter_var = Remanent_parameters.update_prefix parameter "dead_agent**:" in 
+  let () = print_string_map parameter_var error handler quark.Quark_type.dead_agent in
+  let parameter_var = Remanent_parameters.update_prefix parameter "dead_agent++**:" in 
+  let () = print_var_string_map parameter_var error handler quark.Quark_type.dead_agent_plus in
+  let parameter_plus = Remanent_parameters.update_prefix parameter "dead_agent--**:" in 
+  let () = print_var_string_map parameter_plus error handler quark.Quark_type.dead_agent_minus  in 
+  error
+    
 let print_quarks parameters  error handler quark = 
   let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "\nREMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.\n" in 
   let error = print_agents  parameters error handler quark in 
-  let error = print_sites parameters  error handler quark in 
+  let error = print_sites parameters  error handler quark in
+  let error = print_dead_agents parameters error handler quark in 
   error
   
 let print_maps parameters error handler compilation print_rule print_var get_label_of_rule get_label_of_var print_labels prefix suffix map =

@@ -211,5 +211,133 @@ let compute_influence_map parameters error handler quark_maps nrules =
       quark_maps.Quark_type.site_var_minus
       wake_up_map
   in
-  error,wake_up_map,inhibition_map  
+  let error,inhibition_map =
+    generic_add
+      (Quark_type.StringMap.Map.fold2_sparse_with_logs Exception.wrap)
+      false
+      true
+      parameters
+      error
+      handler
+      nrules
+      quark_maps.Quark_type.dead_agent
+      quark_maps.Quark_type.dead_agent_plus
+      inhibition_map 
+  in
+  let error,inhibition_map =
+    generic_add
+      (Quark_type.StringMap.Map.fold2_sparse_with_logs Exception.wrap)
+      false
+      true
+      parameters
+      error
+      handler
+      0
+      quark_maps.Quark_type.dead_agent
+      quark_maps.Quark_type.dead_agent
+      inhibition_map 
+  in
+  let error,wake_up_map =
+    generic_add
+      (Quark_type.StringMap.Map.fold2_sparse_with_logs Exception.wrap)
+      false
+      true
+      parameters
+      error
+      handler
+      nrules
+      quark_maps.Quark_type.dead_agent
+      quark_maps.Quark_type.dead_agent_minus
+      wake_up_map
+  in
+  let fold_site parameters error f  =
+    Quark_type.AgentMap.fold2_common
+      parameters
+      error
+      (fun parameters error _ a b   ->
+       Cckappa_sig.KaSim_Site_map_and_set.Map.fold2_sparse
+	 parameters error
+	 f
+         a
+         b )
+  in 
+   let error,inhibition_map =
+    generic_add
+      fold_site
+       false
+      true
+      parameters
+      error
+      handler
+      0
+      quark_maps.Quark_type.dead_sites
+      quark_maps.Quark_type.dead_sites
+      inhibition_map 
+   in
+   let error,inhibition_map =
+    generic_add
+      fold_site
+       false
+      true
+      parameters
+      error
+      handler
+      nrules
+      quark_maps.Quark_type.dead_sites
+      quark_maps.Quark_type.dead_sites_plus
+      inhibition_map 
+   in 
+  let error,wake_up_map =
+    generic_add
+      fold_site
+      false
+      true
+      parameters
+      error
+      handler
+      nrules
+      quark_maps.Quark_type.dead_sites
+      quark_maps.Quark_type.dead_sites_minus
+      wake_up_map
+  in
+   let error,inhibition_map =
+    generic_add
+      Quark_type.DeadSiteMap.fold2_common     
+      false
+      true
+      parameters
+      error
+      handler
+      0
+      quark_maps.Quark_type.dead_states
+      quark_maps.Quark_type.dead_states
+      inhibition_map 
+   in
+   let error,inhibition_map =
+     generic_add
+       Quark_type.DeadSiteMap.fold2_common     
+       false
+       true
+       parameters
+       error
+       handler
+       nrules
+       quark_maps.Quark_type.dead_states
+       quark_maps.Quark_type.dead_states_plus
+       inhibition_map 
+   in
+   let error,wake_up_map =
+    generic_add
+      Quark_type.DeadSiteMap.fold2_common
+      false
+      true
+      parameters
+      error
+      handler
+      nrules
+      quark_maps.Quark_type.dead_states
+      quark_maps.Quark_type.dead_states_minus
+      wake_up_map
+  in
+      error,wake_up_map,inhibition_map  
   
