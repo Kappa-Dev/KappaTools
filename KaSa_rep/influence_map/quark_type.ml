@@ -22,7 +22,8 @@ module Label = Influence_labels.Int_labels
 module Labels = Influence_labels.Extensive(Label)
 module IntSetMap = SetMap.Make (struct type t=int let compare = compare end)
 module Int2SetMap = SetMap.Make (struct type t = int*int let compare = compare end)
-  
+module StringMap = SetMap.Make (struct type t = string let compare = compare end)
+			       
 type agent_quark = Cckappa_sig.agent_name
 type site_quark = (Cckappa_sig.agent_name*Cckappa_sig.site_name*int)
 
@@ -34,6 +35,12 @@ type sites_quarks = Labels.label_set Int_storage.Quick_Nearly_inf_Imperatif.t Si
   
 type quarks = 
   {
+    dead_agent_plus: Labels.label_set Int_storage.Quick_Nearly_inf_Imperatif.t  StringMap.Map.t ;
+    dead_sites_plus: Labels.label_set Int_storage.Quick_Nearly_inf_Imperatif.t  StringMap.Map.t AgentMap.t ;
+    dead_states_plus: sites_quarks ;
+    dead_agent_minus: Labels.label_set Int_storage.Quick_Nearly_inf_Imperatif.t  StringMap.Map.t ;
+    dead_sites_minus: Labels.label_set Int_storage.Quick_Nearly_inf_Imperatif.t StringMap.Map.t AgentMap.t ;
+    dead_states_minus: sites_quarks ;
     agent_modif_plus:  agents_quarks ;
     agent_modif_minus: agents_quarks ; 
     agent_test: agents_quarks ;

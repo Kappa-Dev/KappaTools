@@ -213,9 +213,9 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
   let error,(bool,output) = Ckappa_sig.Dictionary_of_agents.allocate_bool parameters error Misc_sa.compare_unit agent.Ckappa_sig.ag_nme () Misc_sa.const_unit handler.Cckappa_sig.agents_dic in  
   match bool,output with
   | _ , None ->
-     let error,ag = warn parameters error (Some "line 143") Exit (Cckappa_sig.Unknown_agent agent.Ckappa_sig.ag_nme) in
+     let error,ag = warn parameters error (Some "line 143") Exit (Cckappa_sig.Unknown_agent (agent.Ckappa_sig.ag_nme,kasim_id)) in
      error,bond_list,question_marks,ag
-  | true,_ -> error, bond_list,question_marks,Cckappa_sig.Unknown_agent agent.Ckappa_sig.ag_nme 
+  | true,_ -> error, bond_list,question_marks,Cckappa_sig.Unknown_agent (agent.Ckappa_sig.ag_nme,kasim_id)
   | _ , Some (agent_name,_,_,_) ->  
      begin   
        let error,site_dic = 

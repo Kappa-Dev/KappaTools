@@ -27,7 +27,7 @@ let print_kasim_site x =
 																						
 let print_agent parameters error handler agent =
      match agent with 
-     | Cckappa_sig.Unknown_agent s ->
+     | Cckappa_sig.Unknown_agent (s,id) ->
 	let () = Printf.fprintf (Remanent_parameters.get_log parameters) "%sunknown_agent:%s\n" (Remanent_parameters.get_prefix parameters) s in
 	error 
      | Cckappa_sig.Dead_agent (agent,s,l,l') ->
