@@ -73,7 +73,8 @@ module type Map_with_logs =
     val fold_restriction: Remanent_parameters_sig.parameters -> Exception.method_handler  -> (elt -> 'a -> (Exception.method_handler  * 'b) -> (Exception.method_handler * 'b)) -> set -> 'a t -> 'b -> Exception.method_handler  * 'b 																       
 								   
     val iter: (elt -> 'a -> unit) -> 'a t -> unit
-    val fold: (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+    val iter2: Remanent_parameters_sig.parameters -> Exception.method_handler  ->  (Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'a  -> Exception.method_handler ) -> (Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'b  -> Exception.method_handler ) -> (Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'a  -> 'b  -> Exception.method_handler )->  'a t -> 'b t -> Exception.method_handler
+																								   val fold: (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
     val mapi: (elt -> 'a -> 'b) -> 'a t -> 'b t
     val map: ('a -> 'b) -> 'a t -> 'b t 
     val for_all: (elt -> 'a -> bool) -> 'a t -> bool

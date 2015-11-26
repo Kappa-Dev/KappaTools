@@ -76,6 +76,7 @@ module type Map_with_logs =
     val fold_restriction: Remanent_parameters_sig.parameters -> Exception.method_handler  -> (elt -> 'a -> (Exception.method_handler  * 'b) -> (Exception.method_handler * 'b)) -> set -> 'a t -> 'b -> Exception.method_handler  * 'b 																       
 								   
     val iter: (elt -> 'a -> unit) -> 'a t -> unit
+    val iter2: Remanent_parameters_sig.parameters -> Exception.method_handler  ->  (Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'a  -> Exception.method_handler ) -> (Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'b  -> Exception.method_handler ) -> (Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'a  -> 'b  -> Exception.method_handler )->  'a t -> 'b t -> Exception.method_handler
     val fold: (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
     val mapi: (elt -> 'a -> 'b) -> 'a t -> 'b t
     val map: ('a -> 'b) -> 'a t -> 'b t 
@@ -169,6 +170,16 @@ module Make(S_both:(SetMap.S)): S_with_logs with type elt = S_both.elt and type 
 	  let map2z a b c = lift S_both.Map.map2z_with_logs a b c 
 	  let fold2z a b c = lift S_both.Map.fold2z_with_logs a b c 
 	  let fold2 a b c = lift S_both.Map.fold2_with_logs a b c 
+	  let iter2 parameter error f g h mapf mapg =
+	    fst (S_both.Map.fold2_with_logs
+	      Exception.wrap
+	      parameter error
+	      (fun a b c d () -> f a b c d,())
+	      (fun a b c d () -> g a b c d,())
+	      (fun a b c d e () -> h a b c d e,())
+		 
+	      mapf mapg ())
+	      
 	  let fold2_sparse a b c = lift S_both.Map.fold2_sparse_with_logs a b c
 	  let iter2_sparse a b c = lift S_both.Map.iter2_sparse_with_logs a b c 
 	  let diff a b c = lift S_both.Map.diff_with_logs a b c 

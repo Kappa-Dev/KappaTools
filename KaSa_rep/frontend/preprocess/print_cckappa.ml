@@ -31,18 +31,19 @@ let print_agent parameters error handler agent =
              error)
             agent.Cckappa_sig.agent_interface
             error in
-	let error = List.fold_left
-		  (fun error (s,_) -> let () = Printf.fprintf (Remanent_parameters.get_log parameters) "%sdead site type %i\n" (Remanent_parameters.get_prefix parameters) s in error)
-		  error
-		  l
+	let error =
+	  Cckappa_sig.Site_map_and_set.Map.fold
+	    (fun s _ error -> let () = Printf.fprintf (Remanent_parameters.get_log parameters) "%sdead site type %i\n" (Remanent_parameters.get_prefix parameters) s in error)
+	    l
+	    error 
 	in
 	let error =
-	  List.fold_left
-	    (fun error (s,_) ->
+	  Cckappa_sig.Site_map_and_set.Map.fold
+	    (fun s _ error ->
 	     let () = Printf.fprintf (Remanent_parameters.get_log parameters) "%sdead site type %i\n" (Remanent_parameters.get_prefix parameters) s in
 	     error)
-	    error
 	    l'
+	    error
 	in
 	error 
      | Cckappa_sig.Agent agent -> 

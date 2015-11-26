@@ -48,7 +48,63 @@ let check parameters error handler mixture1 mixture2 (i,j) =
        let error,bonds2 = Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get parameters error h2 mixture2.Cckappa_sig.bonds in
        check_interface error view1 view2 bonds1 bonds2 t already_done 
      end
-  and check_interface error ag1 ag2 bonds1 bonds2 to_do already_done =
+  and deal_with error iter2 ag1 ag2 bonds1 bonds2 (to_do,already_done) =
+    let bonds1 =
+      match bonds1 with Some bonds1 -> bonds1 | None -> Cckappa_sig.Site_map_and_set.Map.empty
+    in 
+    let bonds2 =
+      match bonds2 with Some bonds2 -> bonds2 | None -> Cckappa_sig.Site_map_and_set.Map.empty
+    in 
+    let error,bool = 
+      try
+	let error = 
+	  iter2
+	    parameters error
+	    (fun _ error _ port1 port2 ->
+	     let range1 = port1.Cckappa_sig.site_state in
+	     let range2 = port2.Cckappa_sig.site_state in
+	     if not (range1.Cckappa_sig.max < range2.Cckappa_sig.min || range2.Cckappa_sig.max < range1.Cckappa_sig.min)
+	     then error
+	     else raise (False error))
+	    ag1.Cckappa_sig.agent_interface
+	    ag2.Cckappa_sig.agent_interface
+	in error,true
+      with
+	False error -> error,false
+    in
+    if bool 
+    then
+      try
+	let error,(to_do,already_done)
+	  =
+	  Cckappa_sig.Site_map_and_set.Map.fold2_sparse parameters error 
+							(fun _ error _ port1 port2 (to_do,already_done) ->
+							 if port1.Cckappa_sig.site = port2.Cckappa_sig.site
+							 then
+							   match
+							     add
+							       (port1.Cckappa_sig.agent_index,
+								port2.Cckappa_sig.agent_index)
+							       error
+							       to_do
+							       already_done
+							   with
+							   | error,None -> raise (False error)
+							   | error,Some (todo,inj1,inj2) -> (error,(todo,(inj1,inj2)))
+							 else
+							   raise (False error) 
+							)
+							bonds1
+							bonds2
+							(to_do,already_done)
+	in error,(true,(to_do,already_done))
+      with
+	False error -> error,(false,(to_do,already_done))
+    else
+      error,(bool,(to_do,already_done))
+
+
+    and check_interface error ag1 ag2 bonds1 bonds2 to_do already_done =
     let error,(bool,(to_do,already_done)) =
       match
 	ag1,ag2
@@ -56,66 +112,134 @@ let check parameters error handler mixture1 mixture2 (i,j) =
       | None,_ | _,None -> warn parameters error (Some ("Should not scan empty agents...")) Exit (true,(to_do,already_done))
       | Some ag1,Some ag2 ->
 	 begin
-	   match ag1,ag2
+	   match ag1
 	   with 
-	   | Cckappa_sig.Ghost,_| _,Cckappa_sig.Ghost -> warn parameters error (Some "Should not scan ghost agents...") Exit (true,(to_do,already_done))
-	   | Cckappa_sig.Dead_agent _,_ | _,Cckappa_sig.Dead_agent _ -> error,(false,([],(Quark_type.IntSetMap.Map.empty,Quark_type.IntSetMap.Map.empty)))
-	   | Cckappa_sig.Agent ag1 , Cckappa_sig.Agent ag2 ->
-	      begin 
-		let bonds1 =
-		  match bonds1 with Some bonds1 -> bonds1 | None -> Cckappa_sig.Site_map_and_set.Map.empty
-		in 
-		let bonds2 =
-		  match bonds2 with Some bonds2 -> bonds2 | None -> Cckappa_sig.Site_map_and_set.Map.empty
-		in 
-		let error,bool = 
-		  try
-		    let error = 
-		      Cckappa_sig.Site_map_and_set.Map.iter2_sparse
-			parameters error
-			(fun _ error _ port1 port2 ->
-			 let range1 = port1.Cckappa_sig.site_state in
-			 let range2 = port2.Cckappa_sig.site_state in
-			 if not (range1.Cckappa_sig.max < range2.Cckappa_sig.min || range2.Cckappa_sig.max < range1.Cckappa_sig.min)
-			 then error
-			 else raise (False error))
-			ag1.Cckappa_sig.agent_interface
-			ag2.Cckappa_sig.agent_interface
-		    in error,true
-		  with
-		    False error -> error,false
-		in
-		if bool 
-		then
-		  try
-		    let error,(to_do,already_done)
-		      =
-		      Cckappa_sig.Site_map_and_set.Map.fold2_sparse parameters error 
-			(fun _ error _ port1 port2 (to_do,already_done) ->
-			 if port1.Cckappa_sig.site = port2.Cckappa_sig.site
-			 then
-			   match
-			     add
-			       (port1.Cckappa_sig.agent_index,
-				port2.Cckappa_sig.agent_index)
-			       error
-			       to_do
-			       already_done
-			   with
-			   | error,None -> raise (False error)
-			   | error,Some (todo,inj1,inj2) -> (error,(todo,(inj1,inj2)))
-			 else
-			   raise (False error) 
-			)
-			bonds1
-			bonds2
-			(to_do,already_done)
-		    in error,(true,(to_do,already_done))
-		  with
-		    False error -> error,(false,(to_do,already_done))
-		else
-		  error,(bool,(to_do,already_done))
-	      end
+	   | Cckappa_sig.Ghost-> warn parameters error (Some "Should not scan ghost agents...") Exit (true,(to_do,already_done))
+	   | Cckappa_sig.Dead_agent (ag1,l11,l12) ->
+	      begin
+		match ag2 with
+		| Cckappa_sig.Ghost -> warn parameters error (Some "Should not scan ghost agents...") Exit (true,(to_do,already_done))
+		| Cckappa_sig.Dead_agent (ag2,l21,l22) ->
+		   begin
+		     let error,(bool,(to_do,already_done)) =
+		       deal_with error
+				 (fun parameter error ->
+				  Cckappa_sig.Site_map_and_set.Map.iter2
+				    parameter error 
+				    (fun parameter error site _ ->
+				     if Cckappa_sig.Site_map_and_set.Map.mem site l22 || Cckappa_sig.Site_map_and_set.Map.mem site l21
+				     then raise (False error)
+				     else error)
+				    (fun parameter error site _  ->
+				     if Cckappa_sig.Site_map_and_set.Map.mem site l12 || Cckappa_sig.Site_map_and_set.Map.mem site l22
+				     then raise (False error)
+				     else error))
+				 ag1
+				 ag2
+				 bonds1
+				 bonds2
+				 (to_do,already_done) in
+		     (* to do check consistency of dead sites *)									     
+ 				 error,(true,(to_do,already_done))
+		   end
+		| Cckappa_sig.Agent ag2 ->
+		    deal_with error
+				 (fun parameter error ->
+				  Cckappa_sig.Site_map_and_set.Map.iter2
+				    parameter error 
+				    (fun _ error _ _ -> error)
+				     (fun parameter error site _  ->
+				     if Cckappa_sig.Site_map_and_set.Map.mem site l11 || Cckappa_sig.Site_map_and_set.Map.mem site l12
+				     then raise (False error)
+				     else error))
+				 ag1
+				 ag2
+				 bonds1
+				 bonds2
+				 (to_do,already_done)
+				 
+	      end 
+	   | Cckappa_sig.Agent ag1 ->
+	       begin
+		match ag2 with
+		| Cckappa_sig.Ghost -> warn parameters error (Some "Should not scan ghost agents...") Exit (true,(to_do,already_done))
+		| Cckappa_sig.Dead_agent (ag2,l21,l22) ->
+		   begin
+		     begin
+		        deal_with error
+				 (fun parameter error ->
+				  Cckappa_sig.Site_map_and_set.Map.iter2
+				    parameter error 
+				    (fun parameter error site _ ->
+				     if Cckappa_sig.Site_map_and_set.Map.mem site l22 || Cckappa_sig.Site_map_and_set.Map.mem site l21
+				     then raise (False error)
+				     else error)
+				    (fun _ error _ _  -> error))
+				    ag1
+				    ag2
+				    bonds1
+				    bonds2
+				    (to_do,already_done)
+				  end
+		   end
+		| Cckappa_sig.Agent ag2 -> deal_with error Cckappa_sig.Site_map_and_set.Map.iter2_sparse ag1 ag2 bonds1 bonds2 (to_do,already_done)
+						     (*
+	     	   begin
+		     let bonds1 =
+		       match bonds1 with Some bonds1 -> bonds1 | None -> Cckappa_sig.Site_map_and_set.Map.empty
+		     in 
+		     let bonds2 =
+		       match bonds2 with Some bonds2 -> bonds2 | None -> Cckappa_sig.Site_map_and_set.Map.empty
+		     in 
+		     let error,bool = 
+		       try
+			 let error = 
+			   Cckappa_sig.Site_map_and_set.Map.iter2_sparse
+			     parameters error
+			     (fun _ error _ port1 port2 ->
+			      let range1 = port1.Cckappa_sig.site_state in
+			      let range2 = port2.Cckappa_sig.site_state in
+			      if not (range1.Cckappa_sig.max < range2.Cckappa_sig.min || range2.Cckappa_sig.max < range1.Cckappa_sig.min)
+			      then error
+			      else raise (False error))
+			     ag1.Cckappa_sig.agent_interface
+			     ag2.Cckappa_sig.agent_interface
+			 in error,true
+		       with
+			 False error -> error,false
+		     in
+		     if bool 
+		     then
+		       try
+			 let error,(to_do,already_done)
+			   =
+			   Cckappa_sig.Site_map_and_set.Map.fold2_sparse parameters error 
+									 (fun _ error _ port1 port2 (to_do,already_done) ->
+									  if port1.Cckappa_sig.site = port2.Cckappa_sig.site
+									  then
+									    match
+									      add
+										(port1.Cckappa_sig.agent_index,
+										 port2.Cckappa_sig.agent_index)
+										error
+										to_do
+										already_done
+									    with
+									    | error,None -> raise (False error)
+									    | error,Some (todo,inj1,inj2) -> (error,(todo,(inj1,inj2)))
+									  else
+									    raise (False error) 
+									 )
+									 bonds1
+									 bonds2
+									 (to_do,already_done)
+			 in error,(true,(to_do,already_done))
+		       with
+			 False error -> error,(false,(to_do,already_done))
+		     else
+		       error,(bool,(to_do,already_done))
+		   end*)
+	       end 
 	 end
     in
     if bool
