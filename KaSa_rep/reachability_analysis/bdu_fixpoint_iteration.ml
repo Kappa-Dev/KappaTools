@@ -307,7 +307,31 @@ let collect_bdu_update_map parameter handler error
         store_result
     in
     error, result_map
-  in  
+  in
+  (*let add_link (agent_type, cv_id) bdu_update store_result =
+    let error, (l, bdu_old) =
+      match
+	Map_bdu_update.Map.find_option (agent_type, cv_id) store_result
+      with
+        Some (l, old) -> error, (l, old)
+      | None -> error, ([], bdu_false)
+    in
+    (**)
+    let error, handler, bdu_union =
+      Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_update bdu_old
+    in
+    (*test if bdu_union = bdu_old*)
+    if Mvbdu_wrapper.Mvbdu.equal bdu_union bdu_old
+    then
+      (*then false, dont add bdu_update, store bdu_old*)
+      error, false, store_result
+    else
+    (*add bdu_update*)
+    let result_map =
+      Map_bdu_update.Map.add (agent_type, cv_id) (l, bdu_union) store_result
+    in
+    error, true, result_map
+  in*)
   let add_link_test agent_id bdu store_result =
     let (l,old_bdu) =
       Map_test_bdu_ag.Map.find_default ([], bdu_false) agent_id store_result
