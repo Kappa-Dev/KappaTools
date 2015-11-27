@@ -36,7 +36,8 @@ type trace = D.S.PH.B.PB.CI.Po.K.refined_step list
 (** when an event is played in a different context, the sites that are made free by side_effects *) 					      
 type trace_with_side_effect = (D.S.PH.B.PB.CI.Po.K.refined_step * D.S.PH.B.PB.CI.Po.K.side_effect) list
 
-
+val extend_trace_with_dummy_side_effects: trace -> trace_with_side_effect
+				      
 type step_id = D.S.PH.B.PB.step_id
 		 
 type cflow_grid = Causal.grid  

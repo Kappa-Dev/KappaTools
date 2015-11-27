@@ -194,18 +194,13 @@ let compress_and_print logger env log_info step_list =
                   in 
                   let error,log_info,blackboard_cflow = U.convert_trace_into_musical_notation parameter handler error log_info trace_without_pseudo_inverse_events in 
                   let error,observable_hit = U.extract_observable_hit_from_musical_notation "compression_main.ml, line 214, " parameter handler error blackboard_cflow in 
-		  let eid = 
-                    match U.get_event_list_from_observable_hit observable_hit 
-		    with 
-		    | [a] -> a 
-                    | _ -> failwith "wrong list, compression_main, 325" 
-                  in 
 
-                  let refined_list = List.rev_map (fun x -> (x,[])) (List.rev trace_without_pseudo_inverse_events) in 
+  let refined_list = List.rev_map (fun x -> (x,[])) (List.rev trace_without_pseudo_inverse_events) in 
                   let grid = D.S.PH.B.PB.CI.Po.K.build_grid refined_list true handler in
                   let enriched_grid = Causal.enrich_grid logger Graph_closure.config_intermediary grid in 
-                  let event_id_list_rev = ((eid+1)::(enriched_grid.Causal.prec_star.(eid+1))) in 
-                  let event_id_list = List.rev_map pred (event_id_list_rev) in 
+                
+
+		 
 		  let info = 
                     match U.get_runtime_info_from_observable_hit observable_hit 
                     with 
@@ -221,9 +216,10 @@ let compress_and_print logger env log_info step_list =
 		  if
 		    store_uncompressed_stories || not cut
 		  then
-		    let error,event_list,result_wo_compression = D.S.translate parameter handler error blackboard_cflow event_id_list in 
+		    let error,event_list = U.causal_prefix_of_an_observable_hit "" parameter handler error log_info blackboard_cflow enriched_grid observable_hit in 
+		    let event_list_with_side_effects = U.extend_trace_with_dummy_side_effects event_list in 
 		    let error,causal_story_array,log_info = 
-		      U.store_trace_while_trusting_side_effects_with_progress_bar parameter handler error info log_info result_wo_compression event_list  story_list 
+		      U.store_trace_while_trusting_side_effects_with_progress_bar parameter handler error info log_info event_list_with_side_effects  event_list story_list 
 		    in 
 		    error,causal_story_array  
 		  else
@@ -306,7 +302,7 @@ let compress_and_print logger env log_info step_list =
                     (fun (error,strong_story_table,log_info) (_,a) -> 
 		      List.fold_left 
                         (fun (error,strong_story_table,log_info) (_,_,_,refined_event_list,list_info) -> 
-                          let error,log_info,blackboard = D.S.PH.B.import parameter handler error log_info refined_event_list in 
+                          let error,log_info,blackboard = U.convert_trace_into_musical_notation parameter handler error log_info refined_event_list in 
                           let error,list = D.S.PH.forced_events parameter handler error blackboard in     
                           let list_order = 
                             match list 

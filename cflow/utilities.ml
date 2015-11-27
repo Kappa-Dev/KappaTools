@@ -36,6 +36,8 @@ let get_log_step = D.S.PH.B.PB.CI.Po.K.H.get_log_step
 let get_gebugging_mode = D.S.PH.B.PB.CI.Po.K.H.get_debugging_mode
 let get_logger = D.S.PH.B.PB.CI.Po.K.H.get_logger
 let dummy_log = fun p -> p
+
+let extend_trace_with_dummy_side_effects l = List.rev_map (fun a -> a,[]) (List.rev l)
 			   
 let print_trace parameter handler =
       Format.fprintf
