@@ -292,13 +292,6 @@ rule_expression:
 		     Location.of_pos (Parsing.rhs_start_pos 2)
 				     (Parsing.symbol_end_pos ()) in
 		   let (k2,k1,kback) = $6 in
-		   let _ =
-		     match kback,$3 with
-		     | (None,Ast.LRAR | Some _,Ast.RAR) ->
-			raise (ExceptionDefn.Malformed_Decl
-				 ("Malformed bi-directional rule expression",pos))
-		     | ((None | Some _),(Ast.LRAR|Ast.RAR)) -> ()
-		   in
 		   let lhs,token_l = $2 and rhs,token_r = $4 in
 		   ($1,({Ast.lhs=lhs; Ast.rm_token = token_l; Ast.arrow=$3;
 			 Ast.rhs=rhs; Ast.add_token = token_r;
