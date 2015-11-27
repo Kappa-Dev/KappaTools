@@ -412,10 +412,10 @@ module Optimize'(M:Internalized_mvbdu) =
 	     let print = M.print 
 	   end:Internalized_mvbdu)
 
-
-module Mvbdu = Make() 
-module IntMvbdu = Internalize(Make ())
-module Optimized_Mvbdu = Optimize(Make())
-module Optimized_IntMvbdu = Optimize'(Internalize(Make ()))
+module Vd = struct end
+module Mvbdu = Make(Vd)
+module IntMvbdu = Internalize(Make (Vd))
+module Optimized_Mvbdu = Optimize(Make(Vd))
+module Optimized_IntMvbdu = Optimize'(Internalize(Make (Vd)))
 				     
 
