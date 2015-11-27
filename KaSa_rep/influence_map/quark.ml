@@ -156,8 +156,8 @@ let add_dead_sites s parameters error rule_id agent_id agent_type site map =
     | error,Some x -> error,x
   in
   let error,old_site =
-     match  Cckappa_sig.KaSim_Site_map_and_set.Map.find_option parameters error site old_agent  
-     with 
+     match  Cckappa_sig.KaSim_Site_map_and_set.Map.find_option_without_logs parameters error site old_agent  
+     with (* this is a partial map, not associated key are implicitely associated to an empty map *)
       | error,None -> 
         Int_storage.Quick_Nearly_inf_Imperatif.create parameters error 0
       | error,Some x -> error,x
@@ -176,7 +176,7 @@ let add_dead_sites s parameters error rule_id agent_id agent_type site map =
     let error,new_site = 
        Int_storage.Quick_Nearly_inf_Imperatif.set parameters error rule_id new_label_set old_site
     in
-    let error,new_agent =  Cckappa_sig.KaSim_Site_map_and_set.Map.add parameters error site new_site old_agent in
+    let error,new_agent =  Cckappa_sig.KaSim_Site_map_and_set.Map.add_or_overwrite parameters error site new_site old_agent in
     Quark_type.AgentMap.set parameters error agent_type new_agent map 
 				 
 let scan_mixture_in_var bool parameter error handler var_id mixture quarks = 

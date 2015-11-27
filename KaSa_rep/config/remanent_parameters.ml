@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   * 
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <2015-10-02 13:42:11 feret>
+  * Last modification: Time-stamp: <2015-11-27 09:31:50 feret>
   * * 
   * Configuration parameters which are passed through functions computation
 
@@ -393,17 +393,19 @@ let open_influence_map_file parameters error =
  let persistent_mode = false
 			 
  let lexical_analysis_of_tested_only_patterns_is_required_by_the_influence_map parameter =
-     get_influence_map_accuracy_level parameter = Remanent_parameters_sig.Medium
+   (get_influence_map_accuracy_level parameter = Remanent_parameters_sig.Medium) && 
+     (get_do_influence_map parameter)
  let lexical_analysis_of_tested_only_patterns_is_required_by_the_persistent_mode  parameter =
    persistent_mode
  let lexical_analysis_of_tested_only_patterns_is_required_by_the_contact_map parameter =
-   match
-     get_contact_map_accuracy_level parameter with
+   (get_do_contact_map parameter) 
+   && (match get_contact_map_accuracy_level parameter with
    | Remanent_parameters_sig.Medium | Remanent_parameters_sig.Low -> true
-   | Remanent_parameters_sig.None | Remanent_parameters_sig.High -> false
+   | Remanent_parameters_sig.None | Remanent_parameters_sig.High -> false)
 								      
  let lexical_analysis_of_tested_only_patterns parameter =
    lexical_analysis_of_tested_only_patterns_is_required_by_the_persistent_mode  parameter 
    || lexical_analysis_of_tested_only_patterns_is_required_by_the_contact_map parameter
    || lexical_analysis_of_tested_only_patterns_is_required_by_the_influence_map parameter
-						   
+
+
