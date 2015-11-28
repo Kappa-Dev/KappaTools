@@ -318,20 +318,16 @@ let count_stories story_table =
     (fun n l -> n + List.length (snd l))
     0 
     story_table.story_list 
-        
 
-let from_none_to_weak parameter handler log_info logger (error,story_list) (step_list,list_info) = 
-  let event_list = step_list in 
-  let error,log_info,blackboard,list_order = 
-    let error,log_info,blackboard = D.S.sub parameter handler error log_info event_list in 
-    let error,list = D.S.PH.forced_events parameter handler error blackboard in 
-    let list_order = 
-      match list 
-      with 
-      | (list_order,_,_)::q -> list_order 
-      | _ -> [] 
-    in 
-    error,log_info,blackboard,list_order
+
+let compress logger parameter handler error log_info event_list =
+  let error,log_info,blackboard = D.S.PH.B.import parameter handler error log_info event_list in 
+  let error,list = D.S.PH.forced_events parameter handler error blackboard in     
+  let list_order = 
+    match list 
+    with 
+    | (list_order,_,_)::_ -> list_order
+    | _ -> []
   in 
   let error,log_info,blackboard,output,list = 
     D.S.compress parameter handler error log_info blackboard list_order 
@@ -352,7 +348,11 @@ let from_none_to_weak parameter handler log_info logger (error,story_list) (step
       error 
     else 
       error
-  in 
+  in error,log_info,list
+		      
+let from_none_to_weak parameter handler log_info logger (error,story_list) (step_list,list_info) = 
+  let event_list = step_list in 
+  let error,log_info,list = compress logger parameter handler error log_info step_list in 
   let error,story_list,info = 
     match 
       list
