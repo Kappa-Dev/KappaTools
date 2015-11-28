@@ -185,17 +185,8 @@ let compress_and_print logger env log_info step_list =
                       Debug.tag logger "\t\t * causal compression "
                   in 
 		  let error,trace_before_compression = U.causal_prefix_of_an_observable_hit "compression_main, line 2014" parameter handler error log_info blackboard enriched_grid observable_id in 
-                  let error,log_info,trace_without_pseudo_inverse_events = 
-                    if cut 
-                    then 
-		      U.remove_pseudo_inverse_events (do_not_log parameter) always handler log_info error trace_before_compression  
-                    else 
-                      error,log_info,trace_before_compression
-                  in 
-                  let error,log_info,blackboard_cflow = U.convert_trace_into_musical_notation parameter handler error log_info trace_without_pseudo_inverse_events in 
-                  let error,observable_hit = U.extract_observable_hit_from_musical_notation "compression_main.ml, line 214, " parameter handler error blackboard_cflow in 		 
-		  let info = 
-                    match U.get_runtime_info_from_observable_hit observable_hit 
+                  let info = 
+                    match U.get_runtime_info_from_observable_hit observable_id 
                     with 
                     | None -> []
                     | Some info -> 
@@ -209,9 +200,17 @@ let compress_and_print logger env log_info step_list =
 		  if
 		    store_uncompressed_stories || not cut
 		  then
-		    let refined_list = List.rev_map (fun x -> (x,[])) (List.rev trace_without_pseudo_inverse_events) in 
-                    let grid = D.S.PH.B.PB.CI.Po.K.build_grid refined_list true handler in
-                    let enriched_grid = Causal.enrich_grid logger Graph_closure.config_intermediary grid in 
+		    let error,log_info,trace_without_pseudo_inverse_events = 
+                      if cut 
+                      then 
+			U.remove_pseudo_inverse_events (do_not_log parameter) always handler log_info error trace_before_compression  
+                      else 
+			error,log_info,trace_before_compression
+                    in 
+                    let error,log_info,blackboard_cflow = U.convert_trace_into_musical_notation parameter handler error log_info trace_without_pseudo_inverse_events in 
+                    let error,observable_hit = U.extract_observable_hit_from_musical_notation "compression_main.ml, line 214, " parameter handler error blackboard_cflow in 		 
+		    let grid = U.convert_trace_into_grid_while_trusting_side_effects trace_without_pseudo_inverse_events handler in 
+                    let enriched_grid = U.enrich_small_grid_with_transitive_closure logger grid in 
 		    let error,event_list = U.causal_prefix_of_an_observable_hit "" parameter handler error log_info blackboard_cflow enriched_grid observable_hit in 
 		    let event_list_with_side_effects = U.extend_trace_with_dummy_side_effects event_list in 
 		    let error,causal_story_array,log_info = 
