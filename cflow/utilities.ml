@@ -239,6 +239,12 @@ let empty_story_table_with_progress_bar logger n =
       else (false,0,0))
   }
 
+let fold_story_list f (l:story_list) a =
+  List.fold_left
+    (fun a (_,_,_,y,t) -> f y t a)
+    a
+    (snd l) 
+    
 let tick story_list = 
   match 
     story_list.progress_bar
@@ -391,6 +397,9 @@ let from_none_to_weak_with_progress_bar (parameter:parameter) (handler:kappa_han
   let story_list = inc_counter story_list in 
   error,log_info,story_list
 
-let from_none_to_weak_with_progress_bar_ext (parameter:parameter) (handler:kappa_handler)  (logger:Format.formatter) (x:error_log * profiling_info * story_table)  (_,_,_,y,t)  =
+let from_none_to_weak_with_progress_bar_ext (parameter:parameter) (handler:kappa_handler)
+					    (logger:Format.formatter) (x:error_log * profiling_info * story_table)  (_,_,_,y,t)  =
   from_none_to_weak_with_progress_bar parameter handler logger x (y,t)
 
+let sort_story_list  = D.sort_list 
+let export_story_table x = sort_story_list (get_stories x)

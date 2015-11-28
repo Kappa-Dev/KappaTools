@@ -45,7 +45,10 @@ let th_of_int n =
 
 let always = (fun _ -> true)
 let do_not_log parameter = (D.S.PH.B.PB.CI.Po.K.H.set_log_step parameter false)
-			     
+
+let empty_story_table = U.empty_story_table () 
+let empty_compression = empty_story_table,empty_story_table,empty_story_table,empty_story_table
+										
 let compress_and_print logger env log_info step_list =
   let parameter = D.S.PH.B.PB.CI.Po.K.H.build_parameter () in
   let parameter = D.S.PH.B.PB.CI.Po.K.H.set_log_step parameter log_step in
@@ -68,7 +71,7 @@ let compress_and_print logger env log_info step_list =
     if (not causal_trace_on)
        && (not weak_compression_on)
        && (not strong_compression_on)
-    then [],[],[],[]
+    then empty_compression
     else
       begin (* causal compression *)
         let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_none parameter in
@@ -76,7 +79,7 @@ let compress_and_print logger env log_info step_list =
         if not @@ List.exists D.S.PH.B.PB.CI.Po.K.is_obs_of_refined_step step_list
         then
           let () = Debug.tag logger "+ No causal flow found" in
-          [],[],[],[]
+          empty_compression
         else
           let () =
             if (weak_compression_on || strong_compression_on)
@@ -257,13 +260,20 @@ let compress_and_print logger env log_info step_list =
                   let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_weak parameter in 
                   let weak_stories_table =  U.empty_story_table_with_progress_bar logger n_causal_stories in 
                   let error,log_info,weakly_story_table = 
-                    List.fold_left 
+		    List.fold_left
+		      (fun x y -> 
+		       U.fold_story_list
+			 (fun x y z -> U.from_none_to_weak_with_progress_bar parameter handler logger z (x,y)  )
+			 y x)
+
+		   (* List.fold_left 
                       (fun x (_,a) ->
                        List.fold_left 
                          (U.from_none_to_weak_with_progress_bar_ext parameter handler  logger)
 			 x
-			 a)
-                    (error,log_info,weak_stories_table)
+			 a)*)
+		    
+		      (error,log_info,weak_stories_table)
                     (List.rev (U.get_stories causal_story_table))
                   in 
 	          let error,weakly_story_table = U.flatten_story_table  parameter handler error weakly_story_table in
@@ -294,30 +304,31 @@ let compress_and_print logger env log_info step_list =
 		let strong_story_table = U.empty_story_table_with_progress_bar logger n_weak_stories in 
                 let (error,strong_story_table,log_info) = 
                   List.fold_left 
-                    (fun (error,strong_story_table,log_info) (_,a) -> 
-		      List.fold_left 
-                        (fun (error,strong_story_table,log_info) (_,_,_,refined_event_list,list_info) -> 
-                         let error,log_info,list = U.compress logger parameter handler error log_info refined_event_list in
-			  let error,strong_story_table,log_info = 
-                            match 
-                              list
-                            with 
-                              | [] -> 
-                                error,U.inc_faillure strong_story_table,log_info
-                              | _ -> 
-				 List.fold_left
-				   (fun (error,strong_story_table,log_info) list -> 
-				     let strong_event_list = D.S.translate_result list in 
-				     let strong_event_list = D.S.PH.B.PB.CI.Po.K.clean_events strong_event_list in 
+                    (fun (error,strong_story_table,log_info) a -> 
+		     U.fold_story_list
+		       (fun refined_event_list list_info (error,strong_story_table,log_info) -> 
+                        let error,log_info,list = U.compress logger parameter handler error log_info refined_event_list in
+			let error,strong_story_table,log_info = 
+                          match 
+                            list
+                          with 
+                          | [] -> 
+                             error,U.inc_faillure strong_story_table,log_info
+                          | _ -> 
+			     List.fold_left
+			       (fun (error,strong_story_table,log_info) list -> 
+				let strong_event_list = D.S.translate_result list in 
+				let strong_event_list = D.S.PH.B.PB.CI.Po.K.clean_events strong_event_list in 
 				     let list_info = List.map (Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy log_info)) list_info in  
 				     U.store_trace_while_rebuilding_side_effects_with_progress_bar parameter handler error list_info log_info list strong_event_list strong_story_table) (* TO DO, there will be one tick per story altough there should be one tick per list of stories *)
-				   (error,strong_story_table,log_info)
-				   list 
-			  in 
-	             
-			  error,strong_story_table,log_info)
-			(error,strong_story_table,log_info) 
-			a)
+			       (error,strong_story_table,log_info)
+			       list 
+			in 
+			
+			error,strong_story_table,log_info)
+		       a
+		       (error,strong_story_table,log_info) 
+		    )
 			(error,strong_story_table,log_info)
 		        (List.rev (U.get_stories weakly_story_table))
                 in 
@@ -339,20 +350,20 @@ let compress_and_print logger env log_info step_list =
               (D.S.PH.B.PB.CI.Po.K.H.dump_error parameter handler error)
               error
           in 
-          U.get_stories causal_table,
-	  U.get_stories causal_story_table,
-	  U.get_stories weakly_story_table,
-	  U.get_stories strong_story_table 
+	  causal_table,
+	  causal_story_table,
+	  weakly_story_table,
+	  strong_story_table 
         end 
   in 
   let () =
     if causal_trace_on then
       Causal.pretty_print logger env Graph_closure.config_std "" ""
-			  (D.sort_list causal) in
+			  (U.export_story_table causal) in
   let () =
     if weak_compression_on then
       Causal.pretty_print logger env Graph_closure.config_std "Weakly" "weakly "
-	(D.sort_list weak) in
+	(U.export_story_table weak) in
   if strong_compression_on then
     Causal.pretty_print logger env Graph_closure.config_std "Strongly" "strongly "
-      (D.sort_list strong)
+      (U.export_story_table strong)

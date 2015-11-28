@@ -25,6 +25,8 @@ type parameter = D.S.PH.B.PB.CI.Po.K.H.parameter
 type kappa_handler = D.S.PH.B.PB.CI.Po.K.H.handler 
 type profiling_info = D.S.PH.B.PB.CI.Po.K.P.log_info 
 
+
+(* to do, hide all kind of traces in a sum type *)
 (** a pretrace is a subsequence of events, they are not necessarily playable *)
 type pretrace = D.S.PH.B.PB.CI.Po.K.refined_step list
 
@@ -37,36 +39,39 @@ type trace_with_side_effect = (D.S.PH.B.PB.CI.Po.K.refined_step * D.S.PH.B.PB.CI
 val extend_trace_with_dummy_side_effects: trace -> trace_with_side_effect
 				      
 type step_id = D.S.PH.B.PB.step_id
-		 
 type cflow_grid = Causal.grid  
 type enriched_cflow_grid = Causal.enriched_grid 
-type musical_grid = D.S.PH.B.blackboard 
-type transitive_closure_config = Graph_closure.config
-				   
+
+(* to do, hide musical grid *)
+type musical_grid
+       
+type transitive_closure_config
+
 (** Comparison among stories *)
 (** three representations: dag -> hash -> canonical_form *)
 (** two isomorphic dags have the same hash *)
 (** two dags are isomorphic iff they have the same canonical form *)
 
-type dag = D.graph
-type canonical_form = D.canonical_form
-type hash = D.prehash 
+type dag 
+type canonical_form 
+type hash 
 
 (** For each hash form, the list of stories with that hash. 
     For each such stories: the grid and the graph.
     If necessessary the cannonical form.
     The pretrace (to apply further compression later on) 
     Some information about the corresponding observable hits *)	       
-type story_list =
-  hash * (cflow_grid * dag  * canonical_form option * pretrace * profiling_info Mods.simulation_info list) list
-			     
-		      
+
+(* to do, hide story list*)
+type story_list 
 type observable_hit 
+type story_table 
+
 val get_event_list_from_observable_hit: observable_hit -> step_id list     
 val get_runtime_info_from_observable_hit: observable_hit -> unit  Mods.simulation_info option
-			
 
-type story_table  
+(* to do, hide this function in a fold story list*)
+val fold_story_list: (pretrace -> profiling_info Mods.simulation_info list -> 'a -> 'a) -> story_list -> 'a -> 'a 
 
 (** error_init is an empty log of errors *)
 val error_init: D.S.PH.B.PB.CI.Po.K.H.error_channel
@@ -101,7 +106,7 @@ val enrich_std_grid_with_transitive_closure: Format.formatter -> cflow_grid -> e
 										   
 
 (** Musical processing *)
-val convert_trace_into_musical_notation: parameter -> kappa_handler -> error_log -> profiling_info -> pretrace -> error_log * profiling_info * musical_grid											     
+val convert_trace_into_musical_notation: parameter -> kappa_handler -> error_log -> profiling_info -> pretrace -> error_log * profiling_info * musical_grid
 val extract_observable_hits_from_musical_notation: parameter -> kappa_handler -> error_log ->  musical_grid -> error_log * observable_hit list 
 val extract_observable_hit_from_musical_notation: string -> parameter -> kappa_handler -> error_log ->  musical_grid -> error_log * observable_hit  
 val causal_prefix_of_an_observable_hit: string -> parameter -> kappa_handler -> error_log -> profiling_info -> musical_grid -> enriched_cflow_grid -> observable_hit -> error_log * trace 
@@ -135,11 +140,15 @@ val print_musical_grid: parameter -> kappa_handler -> error_log  -> musical_grid
 
 
 val compress: Format.formatter -> parameter -> kappa_handler -> error_log -> profiling_info -> trace -> error_log * profiling_info * trace_with_side_effect list 
-														     
-
+																			    
+val export_story_table: story_table ->  (Causal.grid * D.S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list
 val from_none_to_weak_with_progress_bar:
   parameter -> kappa_handler -> Format.formatter -> (error_log * profiling_info * story_table) -> pretrace * profiling_info Mods.simulation_info list -> (error_log * profiling_info * story_table)
 																			          
 		      
 val from_none_to_weak_with_progress_bar_ext:
   parameter -> kappa_handler -> Format.formatter -> (error_log * profiling_info * story_table) -> cflow_grid * dag * canonical_form option * pretrace * profiling_info Mods.simulation_info list -> (error_log * profiling_info * story_table )
+
+
+
+																								      
