@@ -25,8 +25,6 @@ type parameter = D.S.PH.B.PB.CI.Po.K.H.parameter
 type kappa_handler = D.S.PH.B.PB.CI.Po.K.H.handler 
 type profiling_info = D.S.PH.B.PB.CI.Po.K.P.log_info 
 
-type progress_bar 
-
 (** a pretrace is a subsequence of events, they are not necessarily playable *)
 type pretrace = D.S.PH.B.PB.CI.Po.K.refined_step list
 
@@ -136,11 +134,12 @@ val export_musical_grid_to_xls: parameter -> kappa_handler -> error_log  -> stri
 val print_musical_grid: parameter -> kappa_handler -> error_log  -> musical_grid  -> error_log					   
 
 
-										       
+val compress: Format.formatter -> parameter -> kappa_handler -> error_log -> profiling_info -> trace -> error_log * profiling_info * trace_with_side_effect list 
+														     
 
 val from_none_to_weak_with_progress_bar:
-  parameter -> kappa_handler -> profiling_info -> Format.formatter -> (error_log * story_table) -> pretrace * profiling_info Mods.simulation_info list -> (error_log * story_table)
+  parameter -> kappa_handler -> Format.formatter -> (error_log * profiling_info * story_table) -> pretrace * profiling_info Mods.simulation_info list -> (error_log * profiling_info * story_table)
 																			          
 		      
 val from_none_to_weak_with_progress_bar_ext:
-  parameter -> kappa_handler -> profiling_info -> Format.formatter -> (error_log * story_table) -> cflow_grid * dag * canonical_form option * pretrace * profiling_info Mods.simulation_info list -> (error_log * story_table)
+  parameter -> kappa_handler -> Format.formatter -> (error_log * profiling_info * story_table) -> cflow_grid * dag * canonical_form option * pretrace * profiling_info Mods.simulation_info list -> (error_log * profiling_info * story_table )

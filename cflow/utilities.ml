@@ -349,30 +349,29 @@ let compress logger parameter handler error log_info event_list =
     else 
       error
   in error,log_info,list
-		      
-let from_none_to_weak parameter handler log_info logger (error,story_list) (step_list,list_info) = 
-  let event_list = step_list in 
-  let error,log_info,list = compress logger parameter handler error log_info step_list in 
-  let error,story_list,info = 
+
+let store_compression_in_a_story_table parameter handler error list list_info  story_table log_info =
+  let error,story_list,log_info =
     match 
       list
     with 
     | [] -> 
-       error,inc_faillure story_list,log_info
+       error,inc_faillure story_table,log_info
     | _ ->  
        List.fold_left
 	 (fun (error,story_list,info) list -> 
-	  let weak_event_list = D.S.translate_result list in 
-          let weak_event_list = D.S.PH.B.PB.CI.Po.K.clean_events weak_event_list in 
-	  store_trace_gen false parameter handler error list_info 
-	    log_info  
-	    list weak_event_list story_list )
-	 (error,story_list,log_info)
+	  let event_list = D.S.translate_result list in 
+          let event_list = D.S.PH.B.PB.CI.Po.K.clean_events event_list in 
+	  store_trace_gen false parameter handler error list_info log_info list event_list story_list)
+	 (error,story_table,log_info)
 	 list 
   in 
-(*  let error,log_info,blackboard = D.S.PH.B.reset_init parameter handler error log_info blackboard_tmp in *)
-  error,story_list
-
+  error,log_info,story_list
+		      
+let from_none_to_weak parameter handler logger (error,log_info,story_list) (step_list,list_info) = 
+  let error,log_info,list = compress logger parameter handler error log_info step_list in 
+  store_compression_in_a_story_table parameter handler error list list_info story_list log_info
+  
 let convert_trace_into_grid_while_trusting_side_effects trace handler = 
   let refined_list = 
     List.rev_map (fun x -> (x,[])) (List.rev trace)
@@ -386,13 +385,12 @@ let enrich_big_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closu
 let enrich_small_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closure.config_intermediary
 let enrich_std_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closure.config_std
 					    
-let from_none_to_weak_with_progress_bar (parameter:parameter) (handler:kappa_handler) (log_info:profiling_info) (logger:Format.formatter) (x:error_log * story_table)  (y:pretrace * profiling_info Mods.simulation_info list)  =
-  let error,story_list = from_none_to_weak parameter handler log_info logger x y in
+let from_none_to_weak_with_progress_bar (parameter:parameter) (handler:kappa_handler) (logger:Format.formatter) (x:error_log * profiling_info * story_table)  (y:pretrace * profiling_info Mods.simulation_info list)  =
+  let error,log_info,story_list = from_none_to_weak parameter handler logger x y in
   let story_list = tick story_list in 
   let story_list = inc_counter story_list in 
-  error,story_list 
+  error,log_info,story_list
 
-
-let from_none_to_weak_with_progress_bar_ext (parameter:parameter) (handler:kappa_handler) (log_info:profiling_info) (logger:Format.formatter) (x:error_log * story_table)  (_,_,_,y,t)  =
-  from_none_to_weak_with_progress_bar parameter handler log_info logger x (y,t)
+let from_none_to_weak_with_progress_bar_ext (parameter:parameter) (handler:kappa_handler)  (logger:Format.formatter) (x:error_log * profiling_info * story_table)  (_,_,_,y,t)  =
+  from_none_to_weak_with_progress_bar parameter handler logger x (y,t)
 

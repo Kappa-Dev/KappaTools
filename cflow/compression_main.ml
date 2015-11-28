@@ -142,7 +142,7 @@ let compress_and_print logger env log_info step_list =
 	      Format.fprintf logger "\t - computing causal past of each observed events (%i)@." n_stories 
 	    in
 	    (* generation of uncompressed stories *)
-	    let error,causal_story_list = 
+	    let error,log_info,causal_story_list = 
               let () = 
                 if debug_mode
                 then 
@@ -177,7 +177,7 @@ let compress_and_print logger env log_info step_list =
 	      in
 	      let story_list = U.empty_story_table_with_progress_bar logger n_stories in 
               List.fold_left 
-                (fun (error,story_list) observable_id -> 
+                (fun (error,log_info,story_list) observable_id -> 
 		 let log_info = D.S.PH.B.PB.CI.Po.K.P.reset_log log_info in 
 		 let () = 
                     if debug_mode
@@ -216,11 +216,11 @@ let compress_and_print logger env log_info step_list =
 		    let error,causal_story_array,log_info = 
 		      U.store_trace_while_trusting_side_effects_with_progress_bar parameter handler error info log_info event_list_with_side_effects  event_list story_list 
 		    in 
-		    error,causal_story_array  
+		    error,log_info,causal_story_array  
 		  else
-		    U.from_none_to_weak_with_progress_bar  parameter handler log_info logger (error,story_list) (trace_before_compression,info)
+		    U.from_none_to_weak_with_progress_bar  parameter handler  logger (error,log_info,story_list) (trace_before_compression,info)
 		)
-                (error,story_list)
+                (error,log_info,story_list)
                 (List.rev list)
             in 
 	    let error,causal_story_list = 
@@ -256,14 +256,14 @@ let compress_and_print logger env log_info step_list =
                   let () = Format.fprintf logger "\t - weak flow compression (%i)@." n_causal_stories in 
                   let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_weak parameter in 
                   let weak_stories_table =  U.empty_story_table_with_progress_bar logger n_causal_stories in 
-                  let error,weakly_story_table = 
+                  let error,log_info,weakly_story_table = 
                     List.fold_left 
                       (fun x (_,a) ->
                        List.fold_left 
-                         (U.from_none_to_weak_with_progress_bar_ext parameter handler log_info logger)
+                         (U.from_none_to_weak_with_progress_bar_ext parameter handler  logger)
 			 x
 			 a)
-                    (error,weak_stories_table)
+                    (error,log_info,weak_stories_table)
                     (List.rev (U.get_stories causal_story_table))
                   in 
 	          let error,weakly_story_table = U.flatten_story_table  parameter handler error weakly_story_table in
@@ -297,35 +297,8 @@ let compress_and_print logger env log_info step_list =
                     (fun (error,strong_story_table,log_info) (_,a) -> 
 		      List.fold_left 
                         (fun (error,strong_story_table,log_info) (_,_,_,refined_event_list,list_info) -> 
-                          let error,log_info,blackboard = U.convert_trace_into_musical_notation parameter handler error log_info refined_event_list in 
-                          let error,list = D.S.PH.forced_events parameter handler error blackboard in     
-                          let list_order = 
-                            match list 
-                            with 
-                            | (list_order,_,_)::_ -> list_order
-			    | _ -> []
-                          in 
-                          let error,log_info,blackboard,output,list = 
-                            D.S.compress parameter handler error log_info blackboard list_order 
-                          in
-                          let log_info = D.S.PH.B.PB.CI.Po.K.P.set_story_research_time log_info in 
-                          let error = 
-                            if debug_mode
-                            then 
-                              let _ =  Debug.tag logger "\t\t * result"  in
-                              let _ =
-                                if D.S.PH.B.is_failed output 
-                                then 
-                                  let _ = Format.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err "Fail_to_compress" in  error
-                                else 
-                                  let _ = Format.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err "Succeed_to_compress" in 
-                                  error
-                              in 
-                              error 
-                            else 
-                              error
-                          in 
-                          let error,strong_story_table,log_info = 
+                         let error,log_info,list = U.compress logger parameter handler error log_info refined_event_list in
+			  let error,strong_story_table,log_info = 
                             match 
                               list
                             with 
