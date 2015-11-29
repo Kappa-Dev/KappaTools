@@ -72,7 +72,7 @@ let do_it env domain counter graph state modification =
       Nbr.iteri
 	(fun _ g ->
 	 fst (Rule_interpreter.force_rule
-		~get_alg domain
+		~get_alg env domain
 		(Environment.connected_components_of_unary_rules env)
 		counter g (Causal.PERT "pert") r))
 	graph n,state)
@@ -206,7 +206,7 @@ let one_rule _form dt stop env domain counter graph state =
     then Rule_interpreter.apply_unary_rule ~rule_id
     else Rule_interpreter.apply_rule ~rule_id in
   match apply_rule
-	  ~rule_id ~get_alg domain
+	  ~rule_id ~get_alg env domain
 	  (Environment.connected_components_of_unary_rules env)
 	  counter graph cause rule with
   | Rule_interpreter.Success graph' ->

@@ -1,0 +1,21 @@
++ Command line is: 'KaSim' '-e' '1000' '-seed' '226011309' '-o' 'data.svg' '-d' 'output' '-p' '100' 'activity.ka'
+Parsing activity.ka...
+done
++ Initialized random number generator with seed 226011309
++ Building initial simulation conditions...
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -sanity checks
+	 -KaSa tools initialization
+Some exceptions have been raised during the static analysis, please analyse your file with KaSa
++ Compute the contact map
+	 -variable declarations
+	 -rules
+	 -observables
+	 -perturbations
+	 -initial conditions
+	 Done
+____________________________________________________________
+############################################################
+Simulation ended

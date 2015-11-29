@@ -22,25 +22,23 @@ val value_bool :
 (** {6 Core} *)
 
 val apply_rule :
-  ?rule_id:int ->
-  get_alg:(int -> Alg_expr.t) -> Connected_component.Env.t
-  -> Connected_component.Set.t -> Mods.Counter.t
-  -> t -> Causal.event_kind -> Primitives.elementary_rule -> result
+  ?rule_id:int -> get_alg:(int -> Alg_expr.t) -> Environment.t ->
+  Connected_component.Env.t -> Connected_component.Set.t -> Mods.Counter.t ->
+  t -> Causal.event_kind -> Primitives.elementary_rule -> result
 (** Returns the graph obtained by applying the rule.
  [rule_id] is mandatory if the rula has an unary rate.*)
 
 val apply_unary_rule :
-  rule_id:int ->
-  get_alg:(int -> Alg_expr.t) -> Connected_component.Env.t
-  -> Connected_component.Set.t -> Mods.Counter.t
-  -> t -> Causal.event_kind -> Primitives.elementary_rule -> result
+  rule_id:int -> get_alg:(int -> Alg_expr.t) -> Environment.t ->
+  Connected_component.Env.t -> Connected_component.Set.t -> Mods.Counter.t ->
+  t -> Causal.event_kind -> Primitives.elementary_rule -> result
 (** Returns the graph obtained by applying the rule.
  [rule_id] is mandatory if the rula has an unary rate.*)
 
 val force_rule :
-  get_alg:(int -> Alg_expr.t) -> Connected_component.Env.t
-  -> Connected_component.Set.t -> Mods.Counter.t
-  -> t -> Causal.event_kind -> Primitives.elementary_rule ->
+  get_alg:(int -> Alg_expr.t) -> Environment.t ->
+  Connected_component.Env.t -> Connected_component.Set.t -> Mods.Counter.t ->
+  t -> Causal.event_kind -> Primitives.elementary_rule ->
   (t * Connected_component.Matching.t list option)
 (** Apply the rule for sure if it is possible. Try [apply_rule] but in
 case of null_event, it computes the exact injections of the left hand

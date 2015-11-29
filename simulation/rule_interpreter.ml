@@ -419,25 +419,32 @@ let update_outdated_activities ~get_alg store env counter state =
 	    state') state env in
   {state' with outdated_elements = (Operator.DepSet.empty,[],true) }
 
-let update_tokens ~get_alg counter state consumed injected =
-  let do_op op l =
-    List.iter
-      (fun (expr,i) ->
-       state.tokens.(i) <-
-	 op state.tokens.(i) (value_alg ~get_alg counter state expr))
-      l in
-  let () = do_op Nbr.sub consumed in do_op Nbr.add injected
+let update_tokens ~get_alg env counter state consumed injected =
+  let do_op op state l =
+    List.fold_left
+      (fun st (expr,i) ->
+	let () =
+	  st.tokens.(i) <-
+	    op st.tokens.(i) (value_alg ~get_alg counter st expr) in
+	let deps' = Environment.get_token_reverse_dependencies env i in
+	if Operator.DepSet.is_empty deps' then st
+	else
+	  let deps,unary_cands,no_unary = st.outdated_elements in
+	  { st with outdated_elements =
+	      (Operator.DepSet.union deps deps',unary_cands,no_unary) }
+      ) state l in
+  let state' = do_op Nbr.sub state consumed in do_op Nbr.add state' injected
 
 let transform_by_a_rule
-      ~get_alg domain unary_ccs counter state event_kind rule inj =
-  let () =
+      ~get_alg env domain unary_ccs counter state event_kind rule inj =
+  let state' =
     update_tokens
-      ~get_alg counter state rule.Primitives.consumed_tokens
+      ~get_alg env counter state rule.Primitives.consumed_tokens
       rule.Primitives.injected_tokens in
-  update_edges counter domain unary_ccs inj state event_kind rule
+  update_edges counter domain unary_ccs inj state' event_kind rule
 
 let apply_unary_rule
-      ~rule_id ~get_alg domain unary_ccs counter state event_kind rule =
+      ~rule_id ~get_alg env domain unary_ccs counter state event_kind rule =
   let root1,root2 =
     ValMap.random_val
       (Mods.IntMap.find_default ValMap.empty rule_id state.unary_candidates) in
@@ -479,10 +486,11 @@ let apply_unary_rule
      | Some inj ->
 	Success
 	  (transform_by_a_rule
-	     ~get_alg domain unary_ccs counter state' event_kind rule inj)
+	     ~get_alg env domain unary_ccs counter state' event_kind rule inj)
 
 
-let apply_rule ?rule_id ~get_alg domain unary_ccs counter state event_kind rule =
+let apply_rule
+    ?rule_id ~get_alg env domain unary_ccs counter state event_kind rule =
   let inj,roots =
     Tools.array_fold_left_mapi
       (fun id inj cc ->
@@ -501,7 +509,7 @@ let apply_rule ?rule_id ~get_alg domain unary_ccs counter state event_kind rule 
   | Some inj ->
      let out =
        transform_by_a_rule
-	 ~get_alg domain unary_ccs counter state event_kind rule inj
+	 ~get_alg env domain unary_ccs counter state event_kind rule inj
      in
      match rule.Primitives.unary_rate with
      | None -> Success out
@@ -523,7 +531,7 @@ let apply_rule ?rule_id ~get_alg domain unary_ccs counter state event_kind rule 
 	     let state' =
 	       {state with unary_candidates = cands; unary_pathes = pathes} in
 	     Success (transform_by_a_rule
-			~get_alg domain unary_ccs counter state'
+			~get_alg env domain unary_ccs counter state'
 			event_kind rule inj)
 	  | Some p ->
 	     let state' =
@@ -533,8 +541,9 @@ let apply_rule ?rule_id ~get_alg domain unary_ccs counter state event_kind rule 
 	     in Corrected state'
 	with Not_found -> Success out
 
-let force_rule ~get_alg domain unary_ccs counter state event_kind rule =
-  match apply_rule ~get_alg domain unary_ccs counter state event_kind rule with
+let force_rule
+    ~get_alg env domain unary_ccs counter state event_kind rule =
+  match apply_rule ~get_alg env domain unary_ccs counter state event_kind rule with
   | (Success out | Corrected out) -> out,None
   | Clash ->
      match all_injections
@@ -543,7 +552,7 @@ let force_rule ~get_alg domain unary_ccs counter state event_kind rule =
      | [] -> state,Some []
      | h :: t ->
 	(transform_by_a_rule
-	   ~get_alg domain unary_ccs counter state event_kind rule h),
+	   ~get_alg env domain unary_ccs counter state event_kind rule h),
 	Some t
 
 let print env f state =
