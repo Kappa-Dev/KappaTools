@@ -61,8 +61,10 @@ val cut: parameter -> (parameter -> bool) -> kappa_handler -> profiling_info -> 
 val remove_pseudo_inverse_events: parameter -> (parameter -> bool) -> kappa_handler -> profiling_info -> error_log -> trace -> error_log * profiling_info * trace 
 
 (** compress a trace with the level of abstraction defined in the argument parameter *)
-(* to do, provide functions for causal, weak, strong compression by embedding the update of the struct parameter *)											 val compress: Format.formatter -> parameter -> kappa_handler -> error_log -> profiling_info -> trace -> error_log * profiling_info * trace list 																			      
-(* story_list should be removed and embedded into story_table *)																	 type story_list 
+(* to do, provide functions for causal, weak, strong compression by embedding the update of the struct parameter *)
+val compress: Format.formatter -> parameter -> kappa_handler -> error_log -> profiling_info -> trace -> error_log * profiling_info * trace list 																			      
+(* story_list should be removed and embedded into story_table *)
+type story_list 
 val fold_story_list: (trace -> profiling_info Mods.simulation_info list -> 'a -> 'a) -> story_list -> 'a -> 'a
 
 type story_table 
