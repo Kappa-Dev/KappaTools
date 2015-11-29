@@ -279,9 +279,16 @@ let tick_stories f n_stories (init,last,counter) =
       done ;
       Format.pp_print_newline f ()
   in
-  let nc = (counter * !Parameter.progressBarSize) / n_stories in
-  let nl = (last * !Parameter.progressBarSize) / n_stories in
-  let n = nc - nl in
+  let n =
+    if n_stories <=0 && counter = 0
+    then !Parameter.progressBarSize
+    else if counter > n_stories
+    then 0
+    else 
+      let nc = (counter * !Parameter.progressBarSize) / n_stories in
+      let nl = (last * !Parameter.progressBarSize) / n_stories in
+      nc - nl
+  in
   let rec aux n =
     if n<=0 then ()
     else
