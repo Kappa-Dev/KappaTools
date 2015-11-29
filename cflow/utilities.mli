@@ -62,14 +62,10 @@ val remove_pseudo_inverse_events: parameter -> (parameter -> bool) -> kappa_hand
 
 (** compress a trace with the level of abstraction defined in the argument parameter *)
 (* to do, provide functions for causal, weak, strong compression by embedding the update of the struct parameter *)
-val compress: Format.formatter -> parameter -> kappa_handler -> error_log -> profiling_info -> trace -> error_log * profiling_info * trace list 																			      
-(* story_list should be removed and embedded into story_table *)
-type story_list 
-val fold_story_list: (trace -> profiling_info Mods.simulation_info list -> 'a -> 'a) -> story_list -> 'a -> 'a
-
+val compress: Format.formatter -> parameter -> kappa_handler -> error_log -> profiling_info -> trace -> error_log * profiling_info * trace list 																		      
 type story_table 
-(* to do provide function to compress all the stories in a table, at a tunable level of abstraction*)
-
+val fold_story_table_with_progress_bar: Format.formatter -> (trace -> profiling_info Mods.simulation_info list -> 'a -> 'a) -> story_table -> 'a -> 'a
+val fold_story_table_without_progress_bar: (trace -> profiling_info Mods.simulation_info list -> 'a -> 'a) -> story_table -> 'a -> 'a																	
 (** put together the stories having the same canonic form, this has do be done explicitely on the moment, I will improve this soon*)
 val flatten_story_table: parameter -> kappa_handler -> error_log -> story_table -> error_log * story_table 
 
@@ -112,36 +108,20 @@ val causal_prefix_of_an_observable_hit: string -> parameter -> kappa_handler -> 
 
 (** Story table *)
 
-
-(* to do, embedded all there information in fold_table *)
-(** the int argument is the number of stories to compress, it is used for setting the progress bar *)
-val empty_story_table_with_progress_bar: Format.formatter -> int -> story_table 
 val empty_story_table: unit -> story_table
-		       
-val get_counter: story_table -> int 		         (* try to hide this *)
-val get_stories: story_table -> story_list list 
-val count_faillure: story_table -> int 
+val get_counter: story_table -> int 		      
 val count_stories: story_table -> int 
-val inc_faillure: story_table -> story_table             (* try to hide this *)
 
 
 (** Store trace in story table *)
-(* The progress bar should be handler externally, or in the fold_table *)
-(* Information about the side efects are now enclosed in the trace *)
-				   
-val store_trace_while_trusting_side_effects_with_progress_bar: parameter -> kappa_handler -> error_log ->  profiling_info Mods.simulation_info list -> profiling_info  -> trace -> story_table -> error_log * story_table *  profiling_info 
-val store_trace_while_rebuilding_side_effects_with_progress_bar: parameter -> kappa_handler -> error_log ->  profiling_info Mods.simulation_info list -> profiling_info  -> trace -> story_table -> error_log * story_table *  profiling_info 
-
-
- 																				      
-													    
-
-
+(* to do, see I can remover one of the two now that the status of a trace is described by the mean of a sum type *)
+val store_trace_while_trusting_side_effects: parameter -> kappa_handler -> error_log ->  profiling_info Mods.simulation_info list -> profiling_info  -> trace -> story_table -> error_log * story_table *  profiling_info
+val store_trace_while_rebuilding_side_effects: parameter -> kappa_handler -> error_log ->  profiling_info Mods.simulation_info list -> profiling_info  -> trace -> story_table -> error_log * story_table *  profiling_info  
 
 
 val export_story_table: story_table ->  (Causal.grid * D.S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list
-val from_none_to_weak_with_progress_bar:
-  parameter -> kappa_handler -> Format.formatter -> (error_log * profiling_info * story_table) -> trace * profiling_info Mods.simulation_info list -> (error_log * profiling_info * story_table)
+val from_none_to_weak_with_progress_bar: parameter -> kappa_handler -> Format.formatter -> (error_log * profiling_info * story_table) -> trace * profiling_info Mods.simulation_info list -> (error_log * profiling_info * story_table)
 																			          
 
 
+val fold_left_with_progress_bar: Format.formatter -> ('a -> 'b -> 'a) -> 'a -> 'b list -> 'a 

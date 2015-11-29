@@ -41,7 +41,6 @@ let get_compressed_trace trace =
   with
   | Pretrace x -> List.rev_map (fun x -> x,[]) (List.rev x) 					     
   | Compressed_trace (_,x) -> x
-  
 					     
 let trace_of_pretrace x = Pretrace x 
 let get_log_step = D.S.PH.B.PB.CI.Po.K.H.get_log_step
@@ -153,8 +152,7 @@ let remove_pseudo_inverse_events =
     "Trace after having removed pseudo inverse events:\n"
     D.S.PH.B.PB.CI.Po.K.P.set_pseudo_inv
 						
-  
-		 
+  		 
 type cflow_grid = Causal.grid  
 type enriched_cflow_grid = Causal.enriched_grid
 type musical_grid =  D.S.PH.B.blackboard 
@@ -178,12 +176,16 @@ type story_list =
 	
 type story_table =  
   { 
-    n_stories: int;
     story_counter:int;
-    progress_bar:(Format.formatter * progress_bar) option;
     story_list: story_list list;
-    faillure:int}
-
+  }
+    
+let count_stories story_table = 
+  List.fold_left 
+    (fun n l -> n + List.length (snd l))
+    0 
+    story_table.story_list 
+    
 type observable_hit = 
   {
     list_of_actions: D.S.PH.update_order list ;
@@ -245,58 +247,54 @@ let print_musical_grid = D.S.PH.B.print_blackboard
 
 let empty_story_table ()  = 
   { 
-    n_stories = 0 ;
     story_counter=1;
-    progress_bar=None;
     story_list=[];
-    faillure=0
-  }
-let empty_story_table_with_progress_bar logger n = 
-  {(empty_story_table ()) with
-    n_stories = n ;
-    progress_bar = 
-      Some (logger,   
-      if n > 0 
-      then Mods.tick_stories logger n (false,0,0) 
-      else (false,0,0))
-  }
-
+  }  
+  
 let get_trace_of_story (_,_,_,y,_) = Pretrace y
 let get_info_of_story (_,_,_,_,t) = t
 let fold_story_list f (l:story_list) a =
   List.fold_left
     (fun a x -> f (get_trace_of_story x) (get_info_of_story x) a)
     a
-    (snd l) 
-    
-let tick story_list = 
+    (snd l)
+
+let tick_opt bar = 
   match 
-    story_list.progress_bar
+    bar
   with 
-  | None -> story_list
-  | Some (logger,bar) -> 
-    { 
-    story_list 
-    with 
-      progress_bar = Some (logger,Mods.tick_stories logger story_list.n_stories bar)
-  }
+  | None -> bar
+  | Some (logger,n,bar) -> Some (logger,n,Mods.tick_stories logger n bar)
+ 
+    
+let fold_story_table_gen logger f l a =
+  let n_stories_input = count_stories l in 
+  let progress_bar = 
+    match logger
+    with None -> None
+       | Some logger -> 
+	  Some (logger,n_stories_input,Mods.tick_stories logger n_stories_input (false,0,0))
+  in
+  let g story info (progress_bar,a) =
+    let a = f story info a in
+    let progress_bar = tick_opt progress_bar in
+    progress_bar,a
+  in
+  snd
+    (List.fold_left
+       (fun a x -> fold_story_list g x a)
+       (progress_bar,a) (List.rev l.story_list))
+
+let fold_story_table_with_progress_bar logger = fold_story_table_gen (Some logger) 
+let fold_story_table_without_progress_bar a b c = fold_story_table_gen None a b c 
+
 
 let get_counter story_list = story_list.story_counter 
 let get_stories story_list = story_list.story_list 
-let count_faillure story_list = story_list.faillure 
-let inc_faillure story_list = 
-  { story_list
-    with 
-      faillure = story_list.faillure + 1}
 let inc_counter story_list =
   {
     story_list with 
       story_counter = succ story_list.story_counter
-  }
-let inc_faillure story_list = 
-  {
-    story_list with 
-      faillure = succ story_list.faillure
   }
 
 
@@ -315,25 +313,28 @@ let store_trace_gen bool (parameter:parameter) (handler:kappa_handler) (error:er
   in 
   let story_table = 
     {
-      story_table
-     with
-       story_list = (prehash,[grid,graph,None,pretrace,story_info])::story_table.story_list
+       story_list = (prehash,[grid,graph,None,pretrace,story_info])::story_table.story_list ;
+       story_counter = story_table.story_counter +1 								       
     }
-  in 
+  in
   error,story_table,computation_info 
 
 let store_trace_while_trusting_side_effects = store_trace_gen true
 let store_trace_while_rebuilding_side_effects = store_trace_gen false 
-let lift_with_tick f =
-  (fun parameter handler error obs_info comp_info trace  story_table ->
-   let error,story_table,comp_info = f parameter handler error obs_info comp_info trace story_table in
-   let story_table = tick story_table in 
-   let story_table= inc_counter story_table in
-   error,story_table,comp_info)
-    
-let store_trace_while_trusting_side_effects_with_progress_bar = lift_with_tick store_trace_while_trusting_side_effects
-let store_trace_while_rebuilding_side_effects_with_progress_bar = lift_with_tick store_trace_while_rebuilding_side_effects
-    
+
+
+
+let fold_left_with_progress_bar logger f a l =
+  let n = List.length l in
+  let progress_bar = Mods.tick_stories logger n (false,0,0) in
+  snd
+    (List.fold_left
+       (fun (bar,a) x ->
+	let a = f a x in
+	let bar = Mods.tick_stories logger n bar in
+	(bar,a))
+       (progress_bar,a)
+       l)
    
 let flatten_story_table parameter handler error story_table = 
   let error,list = 
@@ -345,11 +346,7 @@ let flatten_story_table parameter handler error story_table =
    with 
      story_list = list}
 
-let count_stories story_table = 
-  List.fold_left 
-    (fun n l -> n + List.length (snd l))
-    0 
-    story_table.story_list 
+
 
 
 let compress logger parameter handler error log_info trace =
@@ -397,7 +394,7 @@ let store_compression_in_a_story_table parameter handler error list list_info  s
       list
     with 
     | [] -> 
-       error,inc_faillure story_table,log_info
+       error,story_table,log_info
     | _ ->  
        List.fold_left
 	 (fun (error,story_list,info) trace -> 
@@ -426,13 +423,8 @@ let enrich_std_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closu
 					    
 let from_none_to_weak_with_progress_bar (parameter:parameter) (handler:kappa_handler) (logger:Format.formatter) (x:error_log * profiling_info * story_table)  (y:trace * profiling_info Mods.simulation_info list)  =
   let error,log_info,story_list = from_none_to_weak parameter handler logger x y in
-  let story_list = tick story_list in 
-  let story_list = inc_counter story_list in 
   error,log_info,story_list
 
-let from_none_to_weak_with_progress_bar_ext (parameter:parameter) (handler:kappa_handler)
-					    (logger:Format.formatter) (x:error_log * profiling_info * story_table)  (_,_,_,y,t)  =
-  from_none_to_weak_with_progress_bar parameter handler logger x (y,t)
 
 let sort_story_list  = D.sort_list 
 let export_story_table x = sort_story_list (get_stories x)

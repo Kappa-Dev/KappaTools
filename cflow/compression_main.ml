@@ -179,8 +179,9 @@ let compress_and_print logger env log_info step_list =
 		        "causal & weak flow compression") 
 		    n_stories 
 	      in
-	      let story_list = U.empty_story_table_with_progress_bar logger n_stories in 
-              List.fold_left 
+	      let story_list = U.empty_story_table () in
+	      (*logger n_stories in *)
+              U.fold_left_with_progress_bar logger   
                 (fun (error,log_info,story_list) observable_id -> 
 		 let log_info = D.S.PH.B.PB.CI.Po.K.P.reset_log log_info in 
 		 let () = 
@@ -217,7 +218,7 @@ let compress_and_print logger env log_info step_list =
                     let enriched_grid = U.enrich_small_grid_with_transitive_closure logger grid in 
 		    let error,event_list = U.causal_prefix_of_an_observable_hit "" parameter handler error log_info blackboard_cflow enriched_grid observable_hit in 
 		    let error,causal_story_array,log_info = 
-		      U.store_trace_while_trusting_side_effects_with_progress_bar parameter handler error info log_info (*event_list_with_side_effects*)  event_list story_list 
+		      U.store_trace_while_trusting_side_effects parameter handler error info log_info (*event_list_with_side_effects*)  event_list story_list 
 		    in 
 		    error,log_info,causal_story_array  
 		  else
@@ -258,15 +259,12 @@ let compress_and_print logger env log_info step_list =
 		begin 
                   let () = Format.fprintf logger "\t - weak flow compression (%i)@." n_causal_stories in 
                   let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_weak parameter in 
-                  let weak_stories_table =  U.empty_story_table_with_progress_bar logger n_causal_stories in 
+                  let weak_stories_table =  U.empty_story_table () in 									   
                   let error,log_info,weakly_story_table = 
-		    List.fold_left
-		      (fun x y -> 
-		       U.fold_story_list
-			 (fun x y z -> U.from_none_to_weak_with_progress_bar parameter handler logger z (x,y)  )
-			 y x)		    
-		      (error,log_info,weak_stories_table)
-                    (List.rev (U.get_stories causal_story_table))
+		    U.fold_story_table_with_progress_bar logger
+			 (fun x y z -> U.from_none_to_weak_with_progress_bar parameter handler logger z (x,y))
+			 causal_story_table 
+			 (error,log_info,weak_stories_table)
                   in 
 	          let error,weakly_story_table = U.flatten_story_table  parameter handler error weakly_story_table in
                   error,weakly_story_table
@@ -278,7 +276,7 @@ let compress_and_print logger env log_info step_list =
           in 
           let n_weak_stories = U.count_stories weakly_story_table in 
           let _ = print_newline () in 
-          let n_fail = U.count_faillure weakly_story_table in 
+          let n_fail = 0 in (*broken, to do, repair *) 
 	  let _ = 
             match 
               n_fail 
@@ -293,35 +291,29 @@ let compress_and_print logger env log_info step_list =
               begin 
                 let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_strong parameter in 
                 let () = Format.fprintf logger "\t - strong flow compression (%i)@." n_weak_stories in
-		let strong_story_table = U.empty_story_table_with_progress_bar logger n_weak_stories in 
-                let (error,strong_story_table,log_info) = 
-                  List.fold_left 
-                    (fun (error,strong_story_table,log_info) a -> 
-		     U.fold_story_list
-		       (fun refined_event_list list_info (error,strong_story_table,log_info) -> 
+		let strong_story_table = U.empty_story_table () in 
+		let error,strong_story_table,log_info =
+		  U.fold_story_table_with_progress_bar logger 
+		      (fun refined_event_list list_info (error,strong_story_table,log_info) -> 
                         let error,log_info,list = U.compress logger parameter handler error log_info refined_event_list in
 			let error,strong_story_table,log_info = 
                           match 
                             list
                           with 
                           | [] -> 
-                             error,U.inc_faillure strong_story_table,log_info
+                             error,(*U.inc_faillure*) strong_story_table,log_info
                           | _ -> 
 			     List.fold_left
 			       (fun (error,strong_story_table,log_info) list -> 
 				let list_info = List.map (Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy log_info)) list_info in  
-				U.store_trace_while_rebuilding_side_effects_with_progress_bar parameter handler error list_info log_info list  strong_story_table) 
+				U.store_trace_while_rebuilding_side_effects parameter handler error list_info log_info list  strong_story_table) 
 			       (error,strong_story_table,log_info)
 			       list 
-			in 
-			
+			in 			
 			error,strong_story_table,log_info)
-		       a
-		       (error,strong_story_table,log_info) 
-		    )
-			(error,strong_story_table,log_info)
-		        (List.rev (U.get_stories weakly_story_table))
-                in 
+		      weakly_story_table 
+		      (error,strong_story_table,log_info)
+		in 	
 	        U.flatten_story_table parameter handler error strong_story_table 
 	      end
             else 
@@ -329,8 +321,8 @@ let compress_and_print logger env log_info step_list =
           in 
 	  let _ = 
             match 
-              U.count_faillure strong_story_table 
-            with 
+              0 (* broken to do, repair *)
+	    with 
             | 0 -> ()
             | 1 -> Format.fprintf logger "@.\t 1 strong compression has failed"
             | n -> Format.fprintf logger "@.\t %i strong compressions have failed" n
