@@ -10,9 +10,12 @@ Mods
 Tools
 Renaming
 Random_tree
+List_utilities
 
 Location
 Pp
+Pp_html
+Pp_svg
 Parameter
 Kappa_files
 Nbr
@@ -32,6 +35,8 @@ Kappa_printer
 
 Version
 Tk_version
+Lift_error_logs
+Map_wrapper
 Hash
 Dictionary
 Git_commit_info
