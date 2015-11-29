@@ -390,7 +390,7 @@ let update_outdated_activities ~get_alg store env counter state =
       (fun dep ->
        match dep with
 	| Operator.ALG j ->
-	   aux (Environment.get_reverse_dependencies env j)
+	   aux (Environment.get_alg_reverse_dependencies env j)
 	| Operator.PERT (-1) -> () (* TODO *)
 	| Operator.PERT _ -> assert false
 	| Operator.RULE i ->

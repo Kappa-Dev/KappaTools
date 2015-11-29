@@ -9,8 +9,10 @@ type t =
 
 (** depend in time, depend in event number, depend in given var *)
 val add_dep :
-  (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array) -> Operator.rev_dep ->
-  t Location.annot -> (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array)
+  (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array * Operator.DepSet.t array) ->
+  Operator.rev_dep ->
+  t Location.annot ->
+  (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array * Operator.DepSet.t array)
 val setup_alg_vars_rev_dep :
-  (string Location.annot * t Location.annot) array ->
-  (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array)
+  unit NamedDecls.t -> (string Location.annot * t Location.annot) array ->
+  (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array * Operator.DepSet.t array)

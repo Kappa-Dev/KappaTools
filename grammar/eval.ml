@@ -645,7 +645,7 @@ let initialize logger overwrite result =
   let domain',alg_a =
     compile_alg_vars tk_nd.NamedDecls.finder contact_map domain vars_nd in
   let alg_nd = NamedDecls.create alg_a in
-  let alg_deps = Alg_expr.setup_alg_vars_rev_dep alg_a in
+  let alg_deps = Alg_expr.setup_alg_vars_rev_dep tk_nd alg_a in
 
   Debug.tag logger "\t -rules";
   let (domain',alg_deps',compiled_rules,cc_unaries) =

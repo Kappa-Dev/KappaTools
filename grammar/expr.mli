@@ -38,5 +38,5 @@ val compile_bool :
   Connected_component.Env.t * Alg_expr.t Ast.bool_expr Location.annot
 
 val stops_of_bool_expr :
-  (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array) ->
+  (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array * Operator.DepSet.t array) ->
   Alg_expr.t Ast.bool_expr -> Nbr.t list

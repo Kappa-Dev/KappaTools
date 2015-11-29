@@ -4,7 +4,8 @@ type t
 
 val init :
   Signature.s -> unit NamedDecls.t -> Alg_expr.t Location.annot NamedDecls.t ->
-  (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array) ->
+  (Operator.DepSet.t * Operator.DepSet.t *
+     Operator.DepSet.t array * Operator.DepSet.t array) ->
   ((string Location.annot option * Ast.rule Location.annot) array *
      Primitives.elementary_rule NamedDecls.t *
        Connected_component.Set.t) ->
@@ -27,7 +28,8 @@ val map_observables : (Alg_expr.t -> 'a) -> t -> 'a array
 val fold_rules :
   (int -> 'a -> Primitives.elementary_rule -> 'a) -> 'a -> t -> 'a
 
-val get_reverse_dependencies : t -> int -> Operator.DepSet.t
+val get_alg_reverse_dependencies : t -> int -> Operator.DepSet.t
+val get_token_reverse_dependencies : t -> int -> Operator.DepSet.t
 val get_always_outdated : t -> Operator.DepSet.t
 
 val num_of_agent : string Location.annot -> t -> int

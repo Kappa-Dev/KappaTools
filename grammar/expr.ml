@@ -237,7 +237,7 @@ let rec compile_bool var_map tk_map contact_map domain = function
 	  | KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _),_), _ ->
 	(domain'',(Ast.COMPARE_OP (op,a',b'), pos))
 
-let rec has_time_dep (in_t,_,deps as vars_deps) = function
+let rec has_time_dep (in_t,_,_,deps as vars_deps) = function
   | (BIN_ALG_OP (_, a, b),_) ->
      has_time_dep vars_deps a||has_time_dep vars_deps b
   | (UN_ALG_OP (_, a),_) -> has_time_dep vars_deps a

@@ -8,15 +8,17 @@ type t = {
   cc_of_unaries : Connected_component.Set.t;
   perturbations : Primitives.perturbation array;
   need_update_each_loop : Operator.DepSet.t;
-  reverse_dependencies : Operator.DepSet.t array;
+  algs_reverse_dependencies : Operator.DepSet.t array;
+  tokens_reverse_dependencies : Operator.DepSet.t array;
   desc_table : (string,out_channel * Format.formatter) Hashtbl.t;
 }
 
-let init sigs tokens algs (deps_in_t,deps_in_e,rd)
+let init sigs tokens algs (deps_in_t,deps_in_e,tok_rd,alg_rd)
 	 (ast_rules,rules,cc_of_unaries) obs perts =
   { signatures = sigs; tokens = tokens; ast_rules = ast_rules;
     rules = rules; cc_of_unaries = cc_of_unaries; algs = algs;
-    observables = obs; perturbations = perts; reverse_dependencies = rd;
+    observables = obs; perturbations = perts; 
+    algs_reverse_dependencies = alg_rd; tokens_reverse_dependencies = tok_rd;
     need_update_each_loop = Operator.DepSet.union deps_in_t deps_in_e;
 
     desc_table = Hashtbl.create 2;
@@ -59,7 +61,8 @@ let nb_tokens env =
 let get_perturbation env i = env.perturbations.(i)
 let nb_perturbations env = Array.length env.perturbations
 
-let get_reverse_dependencies env i = env.reverse_dependencies.(i)
+let get_alg_reverse_dependencies env i = env.algs_reverse_dependencies.(i)
+let get_token_reverse_dependencies env i = env.tokens_reverse_dependencies.(i)
 let get_always_outdated env = env.need_update_each_loop
 
 let print_ast_rule ?env f i =
