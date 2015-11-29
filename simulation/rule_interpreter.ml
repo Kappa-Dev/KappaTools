@@ -81,24 +81,28 @@ let from_place (inj_nodes,inj_fresh,free_id as inj2graph) = function
        ty,free_id,(inj_nodes,Mods.IntMap.add id free_id inj_fresh,succ free_id)
 
 let all_injections ?excp edges roots cca =
+  snd @@
   Tools.array_fold_lefti
-    (fun id inj_list cc ->
-     ValMap.fold
+    (fun id (excp,inj_list) cc ->
+     let cands,excp' =
+       match excp with
+       | Some (cc',root)
+           when Connected_component.is_equal_canonicals cc cc' ->
+         ValMap.add root ValMap.empty,None
+       | (Some _ | None) ->
+         Connected_component.Map.find_default ValMap.empty cc roots,excp in
+     (excp',
+      ValMap.fold
        (fun root new_injs ->
-	List.fold_left
-	  (fun corrects inj ->
-	   match Connected_component.Matching.reconstruct
-		   edges inj id cc root with
-	   | None -> corrects
-	   | Some new_inj -> new_inj :: corrects)
-	new_injs inj_list)
-       (match excp with
-	| Some (cc',root)
-	     when Connected_component.is_equal_canonicals cc cc' ->
-	   ValMap.add root ValMap.empty
-	| (Some _ | None) ->
-	   Connected_component.Map.find_default ValMap.empty  cc roots) [])
-    [Connected_component.Matching.empty] cca
+        List.fold_left
+          (fun corrects inj ->
+           match Connected_component.Matching.reconstruct
+                   edges inj id cc root with
+           | None -> corrects
+           | Some new_inj -> new_inj :: corrects)
+          new_injs inj_list)
+       cands []))
+    (excp,[Connected_component.Matching.empty]) cca
 
 let deal_transformation is_add domain to_explore_unaries inj2graph edges roots transf =
   (*transf: abstract edge to be added or removed*)
