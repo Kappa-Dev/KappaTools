@@ -67,6 +67,7 @@ let compress_and_print logger env log_info step_list =
     {
       D.S.PH.B.PB.CI.Po.K.H.env = env ;
     } in
+  let step_list = U.trace_of_pretrace step_list in 
   let causal,trivial,weak,strong =
     if (not causal_trace_on)
        && (not weak_compression_on)
@@ -76,7 +77,7 @@ let compress_and_print logger env log_info step_list =
       begin (* causal compression *)
         let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_none parameter in
 	let error,log_info,step_list = U.remove_events_after_last_obs parameter always handler log_info error step_list in 
-        if not @@ List.exists D.S.PH.B.PB.CI.Po.K.is_obs_of_refined_step step_list
+        if not (U.has_obs step_list) 
         then
           let () = Debug.tag logger "+ No causal flow found" in
           empty_compression
@@ -215,9 +216,8 @@ let compress_and_print logger env log_info step_list =
 		    let grid = U.convert_trace_into_grid_while_trusting_side_effects trace_without_pseudo_inverse_events handler in 
                     let enriched_grid = U.enrich_small_grid_with_transitive_closure logger grid in 
 		    let error,event_list = U.causal_prefix_of_an_observable_hit "" parameter handler error log_info blackboard_cflow enriched_grid observable_hit in 
-		    let event_list_with_side_effects = U.extend_trace_with_dummy_side_effects event_list in 
 		    let error,causal_story_array,log_info = 
-		      U.store_trace_while_trusting_side_effects_with_progress_bar parameter handler error info log_info event_list_with_side_effects  event_list story_list 
+		      U.store_trace_while_trusting_side_effects_with_progress_bar parameter handler error info log_info (*event_list_with_side_effects*)  event_list story_list 
 		    in 
 		    error,log_info,causal_story_array  
 		  else
@@ -264,15 +264,7 @@ let compress_and_print logger env log_info step_list =
 		      (fun x y -> 
 		       U.fold_story_list
 			 (fun x y z -> U.from_none_to_weak_with_progress_bar parameter handler logger z (x,y)  )
-			 y x)
-
-		   (* List.fold_left 
-                      (fun x (_,a) ->
-                       List.fold_left 
-                         (U.from_none_to_weak_with_progress_bar_ext parameter handler  logger)
-			 x
-			 a)*)
-		    
+			 y x)		    
 		      (error,log_info,weak_stories_table)
                     (List.rev (U.get_stories causal_story_table))
                   in 
@@ -317,10 +309,8 @@ let compress_and_print logger env log_info step_list =
                           | _ -> 
 			     List.fold_left
 			       (fun (error,strong_story_table,log_info) list -> 
-				let strong_event_list = D.S.translate_result list in 
-				let strong_event_list = D.S.PH.B.PB.CI.Po.K.clean_events strong_event_list in 
-				     let list_info = List.map (Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy log_info)) list_info in  
-				     U.store_trace_while_rebuilding_side_effects_with_progress_bar parameter handler error list_info log_info list strong_event_list strong_story_table) (* TO DO, there will be one tick per story altough there should be one tick per list of stories *)
+				let list_info = List.map (Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy log_info)) list_info in  
+				U.store_trace_while_rebuilding_side_effects_with_progress_bar parameter handler error list_info log_info list  strong_story_table) 
 			       (error,strong_story_table,log_info)
 			       list 
 			in 

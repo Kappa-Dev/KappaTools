@@ -23,15 +23,27 @@ type profiling_info = D.S.PH.B.PB.CI.Po.K.P.log_info
 type progress_bar = bool * int * int 
 
 type step = D.S.PH.B.PB.CI.Po.K.refined_step				   
-type pretrace = step list
-type trace = step list 
 type step_with_side_effects = D.S.PH.B.PB.CI.Po.K.refined_step * D.S.PH.B.PB.CI.Po.K.side_effect										
-type trace_with_side_effect = step_with_side_effects list
 type step_id = D.S.PH.B.PB.step_id
 
+type trace =
+  | Pretrace of step list
+  | Compressed_trace of step list * step_with_side_effects list 
 
-
-
+let get_pretrace trace =
+  match
+    trace
+  with
+  | Pretrace x | Compressed_trace (x,_) -> x 
+let get_compressed_trace trace =
+  match
+    trace
+  with
+  | Pretrace x -> List.rev_map (fun x -> x,[]) (List.rev x) 					     
+  | Compressed_trace (_,x) -> x
+  
+					     
+let trace_of_pretrace x = Pretrace x 
 let get_log_step = D.S.PH.B.PB.CI.Po.K.H.get_log_step
 let get_gebugging_mode = D.S.PH.B.PB.CI.Po.K.H.get_debugging_mode
 let get_logger = D.S.PH.B.PB.CI.Po.K.H.get_logger
@@ -39,12 +51,21 @@ let dummy_log = fun p -> p
 
 let extend_trace_with_dummy_side_effects l = List.rev_map (fun a -> a,[]) (List.rev l)
 			   
-let print_trace parameter handler =
+let print_pretrace parameter handler =
       Format.fprintf
 	(D.S.PH.B.PB.CI.Po.K.H.get_out_channel parameter)
 	"@[<v>%a@]@."
 	(Pp.list Pp.space (D.S.PH.B.PB.CI.Po.K.print_refined_step ~handler))
 
+let print_trace parameter handler trace =
+  match
+    trace
+  with
+  | Pretrace x -> print_pretrace parameter handler x
+  | Compressed_trace (x,y) ->
+     let () = print_pretrace parameter handler x in
+     let () = () (* to do, print y*)
+     in () 
 (** operations over traces *) 
 
 	
@@ -65,7 +86,8 @@ let transform_trace_gen f log_message debug_message log =
        else
 	 false 
      in
-     let error,(trace',n) = f parameters kappa_handler error trace in
+     let pretrace = get_pretrace trace in 
+     let error,(pretrace',n) = f parameters kappa_handler error pretrace in
      let () =
        if
 	 bool
@@ -77,10 +99,10 @@ let transform_trace_gen f log_message debug_message log =
 	 D.S.PH.B.PB.CI.Po.K.H.get_debugging_mode parameters
        then
 	 let _ = Debug.tag (D.S.PH.B.PB.CI.Po.K.H.get_debugging_channel parameters) debug_message in 
-	 print_trace parameters kappa_handler trace'
+	 print_pretrace parameters kappa_handler pretrace'
      in
      let profiling_info = log n profiling_info  in 
-     error,profiling_info,trace'
+     error,profiling_info,Pretrace pretrace'
    else
      error,profiling_info,trace)
 
@@ -151,7 +173,7 @@ type hash = D.prehash
     The pretrace (to apply further compression later on) 
     Some information about the corresponding observable hits *)	       
 type story_list =
-  hash * (cflow_grid * dag  * canonical_form option * pretrace * profiling_info Mods.simulation_info list) list
+  hash * (cflow_grid * dag  * canonical_form option * step list  * profiling_info Mods.simulation_info list) list
 		
 	
 type story_table =  
@@ -212,7 +234,7 @@ let causal_prefix_of_an_observable_hit string parameter handler error log_info b
   let event_id_list_rev = ((eid+1)::(enriched_grid.Causal.prec_star.(eid+1))) in 
   let event_id_list = List.rev_map pred (event_id_list_rev) in 
   let error,list_eid,_ = D.S.translate parameter handler error blackboard event_id_list in 
-  error,list_eid 
+  error,trace_of_pretrace list_eid 
 
 
 
@@ -239,9 +261,11 @@ let empty_story_table_with_progress_bar logger n =
       else (false,0,0))
   }
 
+let get_trace_of_story (_,_,_,y,_) = Pretrace y
+let get_info_of_story (_,_,_,_,t) = t
 let fold_story_list f (l:story_list) a =
   List.fold_left
-    (fun a (_,_,_,y,t) -> f y t a)
+    (fun a x -> f (get_trace_of_story x) (get_info_of_story x) a)
     a
     (snd l) 
     
@@ -276,8 +300,10 @@ let inc_faillure story_list =
   }
 
 
-let store_trace_gen bool (parameter:parameter) (handler:kappa_handler) (error:error_log) obs_info  computation_info trace trace2 (story_table:story_table) = 
-  let grid = D.S.PH.B.PB.CI.Po.K.build_grid trace bool  handler in
+let store_trace_gen bool (parameter:parameter) (handler:kappa_handler) (error:error_log) obs_info  computation_info trace  (story_table:story_table) = 
+  let pretrace = get_pretrace trace in
+  let trace2 = get_compressed_trace trace in 
+  let grid = D.S.PH.B.PB.CI.Po.K.build_grid trace2 bool  handler in
   let computation_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  computation_info in 
   let error,graph = D.graph_of_grid parameter handler error grid in 
   let error,prehash = D.prehash parameter handler error graph in 
@@ -291,7 +317,7 @@ let store_trace_gen bool (parameter:parameter) (handler:kappa_handler) (error:er
     {
       story_table
      with
-       story_list = (prehash,[grid,graph,None,trace2,story_info])::story_table.story_list
+       story_list = (prehash,[grid,graph,None,pretrace,story_info])::story_table.story_list
     }
   in 
   error,story_table,computation_info 
@@ -299,8 +325,8 @@ let store_trace_gen bool (parameter:parameter) (handler:kappa_handler) (error:er
 let store_trace_while_trusting_side_effects = store_trace_gen true
 let store_trace_while_rebuilding_side_effects = store_trace_gen false 
 let lift_with_tick f =
-  (fun parameter handler error obs_info comp_info trace trace2 story_table ->
-   let error,story_table,comp_info = f parameter handler error obs_info comp_info trace trace2 story_table in
+  (fun parameter handler error obs_info comp_info trace  story_table ->
+   let error,story_table,comp_info = f parameter handler error obs_info comp_info trace story_table in
    let story_table = tick story_table in 
    let story_table= inc_counter story_table in
    error,story_table,comp_info)
@@ -326,7 +352,8 @@ let count_stories story_table =
     story_table.story_list 
 
 
-let compress logger parameter handler error log_info event_list =
+let compress logger parameter handler error log_info trace =
+  let event_list = get_pretrace trace in 
   let error,log_info,blackboard = D.S.PH.B.import parameter handler error log_info event_list in 
   let error,list = D.S.PH.forced_events parameter handler error blackboard in     
   let list_order = 
@@ -338,6 +365,14 @@ let compress logger parameter handler error log_info event_list =
   let error,log_info,blackboard,output,list = 
     D.S.compress parameter handler error log_info blackboard list_order 
   in
+  let list =
+    List.rev_map
+      (fun pretrace ->
+       let event_list = D.S.translate_result pretrace in 
+       let event_list = D.S.PH.B.PB.CI.Po.K.clean_events event_list in 
+       (Compressed_trace (event_list,pretrace)))
+      list
+  in 
   let log_info = D.S.PH.B.PB.CI.Po.K.P.set_story_research_time log_info in 
   let error = 
     if debug_mode
@@ -365,33 +400,31 @@ let store_compression_in_a_story_table parameter handler error list list_info  s
        error,inc_faillure story_table,log_info
     | _ ->  
        List.fold_left
-	 (fun (error,story_list,info) list -> 
-	  let event_list = D.S.translate_result list in 
-          let event_list = D.S.PH.B.PB.CI.Po.K.clean_events event_list in 
-	  store_trace_gen false parameter handler error list_info log_info list event_list story_list)
+	 (fun (error,story_list,info) trace -> 
+	  store_trace_gen false parameter handler error list_info log_info trace story_list)
 	 (error,story_table,log_info)
 	 list 
   in 
   error,log_info,story_list
 		      
-let from_none_to_weak parameter handler logger (error,log_info,story_list) (step_list,list_info) = 
-  let error,log_info,list = compress logger parameter handler error log_info step_list in 
+let from_none_to_weak parameter handler logger (error,log_info,story_list) (trace,list_info) =
+  let error,log_info,list = compress logger parameter handler error log_info trace in 
   store_compression_in_a_story_table parameter handler error list list_info story_list log_info
   
 let convert_trace_into_grid_while_trusting_side_effects trace handler = 
   let refined_list = 
-    List.rev_map (fun x -> (x,[])) (List.rev trace)
+    List.rev_map (fun x -> (x,[])) (List.rev (get_pretrace trace))
   in 
   D.S.PH.B.PB.CI.Po.K.build_grid refined_list true handler 
     
-let convert_trace_into_musical_notation = D.S.PH.B.import
+let convert_trace_into_musical_notation p h e info x = D.S.PH.B.import p h e info (get_pretrace x)
 
 let enrich_grid_with_transitive_closure = Causal.enrich_grid
 let enrich_big_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closure.config_init
 let enrich_small_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closure.config_intermediary
 let enrich_std_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closure.config_std
 					    
-let from_none_to_weak_with_progress_bar (parameter:parameter) (handler:kappa_handler) (logger:Format.formatter) (x:error_log * profiling_info * story_table)  (y:pretrace * profiling_info Mods.simulation_info list)  =
+let from_none_to_weak_with_progress_bar (parameter:parameter) (handler:kappa_handler) (logger:Format.formatter) (x:error_log * profiling_info * story_table)  (y:trace * profiling_info Mods.simulation_info list)  =
   let error,log_info,story_list = from_none_to_weak parameter handler logger x y in
   let story_list = tick story_list in 
   let story_list = inc_counter story_list in 
@@ -403,3 +436,5 @@ let from_none_to_weak_with_progress_bar_ext (parameter:parameter) (handler:kappa
 
 let sort_story_list  = D.sort_list 
 let export_story_table x = sort_story_list (get_stories x)
+let has_obs x = List.exists D.S.PH.B.PB.CI.Po.K.is_obs_of_refined_step (get_pretrace x)
+				   
