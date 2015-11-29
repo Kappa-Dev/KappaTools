@@ -41,7 +41,14 @@ let get_compressed_trace trace =
   with
   | Pretrace x -> List.rev_map (fun x -> x,[]) (List.rev x) 					     
   | Compressed_trace (_,x) -> x
-					     
+
+let is_compressed_trace trace =
+  match
+    trace
+  with
+  | Pretrace _ -> true
+  | Compressed_trace _ -> false
+			    
 let trace_of_pretrace x = Pretrace x 
 let get_log_step = D.S.PH.B.PB.CI.Po.K.H.get_log_step
 let get_gebugging_mode = D.S.PH.B.PB.CI.Po.K.H.get_debugging_mode
@@ -298,9 +305,10 @@ let inc_counter story_list =
   }
 
 
-let store_trace_gen bool (parameter:parameter) (handler:kappa_handler) (error:error_log) obs_info  computation_info trace  (story_table:story_table) = 
+let store_trace (parameter:parameter) (handler:kappa_handler) (error:error_log) obs_info  computation_info trace  (story_table:story_table) = 
   let pretrace = get_pretrace trace in
   let trace2 = get_compressed_trace trace in 
+  let bool = is_compressed_trace trace in 
   let grid = D.S.PH.B.PB.CI.Po.K.build_grid trace2 bool  handler in
   let computation_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  computation_info in 
   let error,graph = D.graph_of_grid parameter handler error grid in 
@@ -318,11 +326,6 @@ let store_trace_gen bool (parameter:parameter) (handler:kappa_handler) (error:er
     }
   in
   error,story_table,computation_info 
-
-let store_trace_while_trusting_side_effects = store_trace_gen true
-let store_trace_while_rebuilding_side_effects = store_trace_gen false 
-
-
 
 let fold_left_with_progress_bar logger f a l =
   let n = List.length l in
@@ -346,48 +349,67 @@ let flatten_story_table parameter handler error story_table =
    with 
      story_list = list}
 
-
+let always = (fun _ -> true) 
 
 
 let compress logger parameter handler error log_info trace =
-  let event_list = get_pretrace trace in 
-  let error,log_info,blackboard = D.S.PH.B.import parameter handler error log_info event_list in 
-  let error,list = D.S.PH.forced_events parameter handler error blackboard in     
-  let list_order = 
-    match list 
-    with 
-    | (list_order,_,_)::_ -> list_order
-    | _ -> []
-  in 
-  let error,log_info,blackboard,output,list = 
-    D.S.compress parameter handler error log_info blackboard list_order 
-  in
-  let list =
-    List.rev_map
-      (fun pretrace ->
-       let event_list = D.S.translate_result pretrace in 
-       let event_list = D.S.PH.B.PB.CI.Po.K.clean_events event_list in 
-       (Compressed_trace (event_list,pretrace)))
-      list
-  in 
-  let log_info = D.S.PH.B.PB.CI.Po.K.P.set_story_research_time log_info in 
-  let error = 
-    if debug_mode
-    then 
-      let _ =  Debug.tag logger "\t\t * result"  in
-      let _ =
-        if D.S.PH.B.is_failed output 
-        then 
-          let _ = Format.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err "Fail_to_compress" in  error
-        else 
-          let _ = Format.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err "Succeed_to_compress" in 
-          error
-      in 
+  match
+    parameter.D.S.PH.B.PB.CI.Po.K.H.current_compression_mode
+  with
+  | None -> error,log_info,[trace] 
+  | Some Parameter.Causal ->
+     let error,log_info,trace = cut parameter always handler log_info error trace
+     in error,log_info,[trace] 
+  | Some Parameter.Weak | Some Parameter.Strong -> 
+    let event_list = get_pretrace trace in 
+    let error,log_info,blackboard = D.S.PH.B.import parameter handler error log_info event_list in 
+    let error,list = D.S.PH.forced_events parameter handler error blackboard in     
+    let list_order = 
+      match list 
+      with 
+      | (list_order,_,_)::_ -> list_order
+      | _ -> []
+    in 
+    let error,log_info,blackboard,output,list = 
+      D.S.compress parameter handler error log_info blackboard list_order 
+    in
+    let list =
+      List.rev_map
+	(fun pretrace ->
+	 let event_list = D.S.translate_result pretrace in 
+	 let event_list = D.S.PH.B.PB.CI.Po.K.clean_events event_list in 
+	 (Compressed_trace (event_list,pretrace)))
+	list
+    in 
+    let log_info = D.S.PH.B.PB.CI.Po.K.P.set_story_research_time log_info in 
+    let error = 
+      if debug_mode
+      then 
+	let _ =  Debug.tag logger "\t\t * result"  in
+	let _ =
+          if D.S.PH.B.is_failed output 
+          then 
+            let _ = Format.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err "Fail_to_compress" in  error
+          else 
+            let _ = Format.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err "Succeed_to_compress" in 
+            error
+	in 
       error 
-    else 
-      error
-  in error,log_info,list
-
+      else 
+	error
+    in error,log_info,list
+			
+let set_compression_mode p x =
+  match
+    x
+  with
+  | Parameter.Causal -> D.S.PH.B.PB.CI.Po.K.H.set_compression_none p
+  | Parameter.Strong -> D.S.PH.B.PB.CI.Po.K.H.set_compression_strong p
+  | Parameter.Weak -> D.S.PH.B.PB.CI.Po.K.H.set_compression_weak p
+						       
+let strongly_compress logger parameter = compress logger (set_compression_mode parameter Parameter.Strong)
+let weakly_compress logger parameter = compress logger (set_compression_mode parameter Parameter.Weak)
+						
 let store_compression_in_a_story_table parameter handler error list list_info  story_table log_info =
   let error,story_list,log_info =
     match 
@@ -398,14 +420,15 @@ let store_compression_in_a_story_table parameter handler error list list_info  s
     | _ ->  
        List.fold_left
 	 (fun (error,story_list,info) trace -> 
-	  store_trace_gen false parameter handler error list_info log_info trace story_list)
+	  store_trace parameter handler error list_info log_info trace story_list)
 	 (error,story_table,log_info)
 	 list 
   in 
   error,log_info,story_list
-		      
+
+		   
 let from_none_to_weak parameter handler logger (error,log_info,story_list) (trace,list_info) =
-  let error,log_info,list = compress logger parameter handler error log_info trace in 
+  let error,log_info,list = weakly_compress logger parameter handler error log_info trace in 
   store_compression_in_a_story_table parameter handler error list list_info story_list log_info
   
 let convert_trace_into_grid_while_trusting_side_effects trace handler = 
@@ -421,11 +444,6 @@ let enrich_big_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closu
 let enrich_small_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closure.config_intermediary
 let enrich_std_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closure.config_std
 					    
-let from_none_to_weak_with_progress_bar (parameter:parameter) (handler:kappa_handler) (logger:Format.formatter) (x:error_log * profiling_info * story_table)  (y:trace * profiling_info Mods.simulation_info list)  =
-  let error,log_info,story_list = from_none_to_weak parameter handler logger x y in
-  error,log_info,story_list
-
-
 let sort_story_list  = D.sort_list 
 let export_story_table x = sort_story_list (get_stories x)
 let has_obs x = List.exists D.S.PH.B.PB.CI.Po.K.is_obs_of_refined_step (get_pretrace x)

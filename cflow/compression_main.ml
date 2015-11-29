@@ -195,9 +195,7 @@ let compress_and_print logger env log_info step_list =
                     with 
                     | None -> []
                     | Some info -> 
-		       let info = 
-                         {info with Mods.story_id = U.get_counter story_list}
-		       in 
+		       let info = {info with Mods.story_id = U.get_counter story_list} in 
 		       let info = Mods.update_profiling_info log_info  info 
 		       in 
                        [info]
@@ -217,12 +215,10 @@ let compress_and_print logger env log_info step_list =
 		    let grid = U.convert_trace_into_grid_while_trusting_side_effects trace_without_pseudo_inverse_events handler in 
                     let enriched_grid = U.enrich_small_grid_with_transitive_closure logger grid in 
 		    let error,event_list = U.causal_prefix_of_an_observable_hit "" parameter handler error log_info blackboard_cflow enriched_grid observable_hit in 
-		    let error,causal_story_array,log_info = 
-		      U.store_trace_while_trusting_side_effects parameter handler error info log_info (*event_list_with_side_effects*)  event_list story_list 
-		    in 
+		    let error,causal_story_array,log_info = U.store_trace parameter handler error info log_info  event_list story_list in 
 		    error,log_info,causal_story_array  
 		  else
-		    U.from_none_to_weak_with_progress_bar  parameter handler  logger (error,log_info,story_list) (trace_before_compression,info)
+		    U.from_none_to_weak  parameter handler  logger (error,log_info,story_list) (trace_before_compression,info)
 		)
                 (error,log_info,story_list)
                 (List.rev list)
@@ -262,7 +258,7 @@ let compress_and_print logger env log_info step_list =
                   let weak_stories_table =  U.empty_story_table () in 									   
                   let error,log_info,weakly_story_table = 
 		    U.fold_story_table_with_progress_bar logger
-			 (fun x y z -> U.from_none_to_weak_with_progress_bar parameter handler logger z (x,y))
+			 (fun x y z -> U.from_none_to_weak parameter handler logger z (x,y))
 			 causal_story_table 
 			 (error,log_info,weak_stories_table)
                   in 
@@ -306,7 +302,7 @@ let compress_and_print logger env log_info step_list =
 			     List.fold_left
 			       (fun (error,strong_story_table,log_info) list -> 
 				let list_info = List.map (Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy log_info)) list_info in  
-				U.store_trace_while_rebuilding_side_effects parameter handler error list_info log_info list  strong_story_table) 
+				U.store_trace parameter handler error list_info log_info list  strong_story_table) 
 			       (error,strong_story_table,log_info)
 			       list 
 			in 			

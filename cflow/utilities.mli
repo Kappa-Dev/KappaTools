@@ -61,8 +61,13 @@ val cut: parameter -> (parameter -> bool) -> kappa_handler -> profiling_info -> 
 val remove_pseudo_inverse_events: parameter -> (parameter -> bool) -> kappa_handler -> profiling_info -> error_log -> trace -> error_log * profiling_info * trace 
 
 (** compress a trace with the level of abstraction defined in the argument parameter *)
-(* to do, provide functions for causal, weak, strong compression by embedding the update of the struct parameter *)
-val compress: Format.formatter -> parameter -> kappa_handler -> error_log -> profiling_info -> trace -> error_log * profiling_info * trace list 																		      
+val compress: Format.formatter -> parameter -> kappa_handler -> error_log -> profiling_info -> trace -> error_log * profiling_info * trace list
+
+(** change the default level of oabstraction for compression (when used with compress) *) 
+val set_compression_mode: parameter -> Parameter.current_compression_mode -> parameter
+									       															         
+val weakly_compress:  Format.formatter -> parameter -> kappa_handler -> error_log -> profiling_info -> trace -> error_log * profiling_info * trace list
+val strongly_compress: Format.formatter -> parameter -> kappa_handler -> error_log -> profiling_info -> trace -> error_log * profiling_info * trace list																	   
 type story_table 
 val fold_story_table_with_progress_bar: Format.formatter -> (trace -> profiling_info Mods.simulation_info list -> 'a -> 'a) -> story_table -> 'a -> 'a
 val fold_story_table_without_progress_bar: (trace -> profiling_info Mods.simulation_info list -> 'a -> 'a) -> story_table -> 'a -> 'a																	
@@ -114,13 +119,12 @@ val count_stories: story_table -> int
 
 
 (** Store trace in story table *)
-(* to do, see I can remover one of the two now that the status of a trace is described by the mean of a sum type *)
-val store_trace_while_trusting_side_effects: parameter -> kappa_handler -> error_log ->  profiling_info Mods.simulation_info list -> profiling_info  -> trace -> story_table -> error_log * story_table *  profiling_info
-val store_trace_while_rebuilding_side_effects: parameter -> kappa_handler -> error_log ->  profiling_info Mods.simulation_info list -> profiling_info  -> trace -> story_table -> error_log * story_table *  profiling_info  
 
-
+val store_trace: parameter -> kappa_handler -> error_log ->  profiling_info Mods.simulation_info list -> profiling_info  -> trace -> story_table -> error_log * story_table *  profiling_info
 val export_story_table: story_table ->  (Causal.grid * D.S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list
-val from_none_to_weak_with_progress_bar: parameter -> kappa_handler -> Format.formatter -> (error_log * profiling_info * story_table) -> trace * profiling_info Mods.simulation_info list -> (error_log * profiling_info * story_table)
+
+(* This one will disapear soon*)
+val from_none_to_weak: parameter -> kappa_handler -> Format.formatter -> (error_log * profiling_info * story_table) -> trace * profiling_info Mods.simulation_info list -> (error_log * profiling_info * story_table)
 																			          
 
 
