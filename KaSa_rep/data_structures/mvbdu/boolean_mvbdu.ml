@@ -636,7 +636,11 @@ let print_boolean_mvbdu (error:Exception.method_handler) =
           parameters.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix
           (if a then "true" else "false")
       in error) 
-    (fun i -> "x" ^ (string_of_int i)) 
+    (fun i -> "x" ^ (string_of_int i))
+
+let (f:Exception.method_handler ->
+         Remanent_parameters_sig.parameters ->
+         bool Mvbdu_sig.mvbdu -> Exception.method_handler) = print_boolean_mvbdu
     
 let print_hash1 error parameters  =
   Hash_1.print error print_boolean_mvbdu parameters  

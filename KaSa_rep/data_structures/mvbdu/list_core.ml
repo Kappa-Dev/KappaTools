@@ -48,3 +48,27 @@ let update_dictionary handler dictionary =
     handler 
   else  
     {handler with Memo_sig.list_dictionary = dictionary}
+
+let rec print_list error print_empty string_of_var string_of_value (parameters:Remanent_parameters_sig.parameters) list = 
+  match list.List_sig.value with 
+    | List_sig.Empty -> print_empty error parameters 
+    | List_sig.Cons x ->
+       let parameters' = Remanent_parameters.update_prefix parameters " " in
+      let _ =
+        Printf.fprintf parameters.Remanent_parameters_sig.log
+          "%s (%d )%s=%s;\n"  
+          parameters.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix 
+          (id_of_list list)
+	  (string_of_var x.List_sig.variable)
+          (string_of_value x.List_sig.association)
+      in 
+      let error =
+        print_list
+          error
+	  print_empty
+	  string_of_var
+	  string_of_value
+	  parameters
+	  x.List_sig.tail 
+      in 
+      error 
