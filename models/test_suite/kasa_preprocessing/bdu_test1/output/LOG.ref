@@ -248,12 +248,12 @@ Id=7
      Leaf False 
 
 agent_id:0:agent_type:0:rule_id:1:covering_class_id:0
-Id=3
+Id=5
  Node(site_type:2<0)
   Id=1
    Leaf False 
 
-  Id=2
+  Id=4
    Node(site_type:2<1)
     Id=0
      Leaf True 
@@ -292,12 +292,12 @@ Id=7
 
 rule_id:1
 agent_id:0
-Id=3
+Id=5
  Node(site_type:2<0)
   Id=1
    Leaf False 
 
-  Id=2
+  Id=4
    Node(site_type:2<1)
     Id=0
      Leaf True 

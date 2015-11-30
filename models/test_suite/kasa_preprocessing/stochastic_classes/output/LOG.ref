@@ -819,12 +819,12 @@ Id=3
      Leaf False 
 
 agent_id:0:agent_type:4:rule_id:5:covering_class_id:0
-Id=3
+Id=5
  Node(site_type:1<1)
   Id=1
    Leaf False 
 
-  Id=2
+  Id=4
    Node(site_type:1<2)
     Id=0
      Leaf True 
@@ -911,12 +911,12 @@ Id=3
 
 rule_id:5
 agent_id:0
-Id=3
+Id=5
  Node(site_type:1<1)
   Id=1
    Leaf False 
 
-  Id=2
+  Id=4
    Node(site_type:1<2)
     Id=0
      Leaf True 
@@ -1014,20 +1014,4 @@ site_type:1:state:1
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
-agent_type:0:cv_id:0
-Id=1
- Leaf True 
-
-agent_type:2:cv_id:0
-Id=1
- Leaf True 
-
-agent_type:4:cv_id:0
-Id=1
- Leaf True 
-
-agent_type:5:cv_id:0
-Id=1
- Leaf True 
-
 execution finished without any exception

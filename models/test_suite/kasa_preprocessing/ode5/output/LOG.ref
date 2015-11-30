@@ -861,12 +861,12 @@ Id=7
      Leaf False 
 
 agent_id:0:agent_type:1:rule_id:2:covering_class_id:0
-Id=5
+Id=9
  Node(site_type:1<1)
   Id=1
    Leaf False 
 
-  Id=4
+  Id=8
    Node(site_type:1<2)
     Id=0
      Leaf True 
@@ -875,12 +875,12 @@ Id=5
      Leaf False 
 
 agent_id:0:agent_type:2:rule_id:3:covering_class_id:0
-Id=5
+Id=9
  Node(site_type:1<1)
   Id=1
    Leaf False 
 
-  Id=4
+  Id=8
    Node(site_type:1<2)
     Id=0
      Leaf True 
@@ -889,19 +889,19 @@ Id=5
      Leaf False 
 
 agent_id:0:agent_type:3:rule_id:4:covering_class_id:0
-Id=9
+Id=11
  Node(site_type:1<1)
   Id=1
    Leaf False 
 
-  Id=8
+  Id=10
    Node(site_type:1<2)
-    Id=7
+    Id=5
      Node(site_type:2<0)
       Id=1
        Leaf False 
 
-      Id=6
+      Id=4
        Node(site_type:2<1)
         Id=0
          Leaf True 
@@ -959,12 +959,12 @@ Id=3
      Leaf False 
 
 agent_id:1:agent_type:3:rule_id:3:covering_class_id:0
-Id=3
+Id=5
  Node(site_type:2<0)
   Id=1
    Leaf False 
 
-  Id=2
+  Id=4
    Node(site_type:2<1)
     Id=0
      Leaf True 
@@ -1023,12 +1023,12 @@ Id=3
 
 rule_id:3
 agent_id:1
-Id=3
+Id=5
  Node(site_type:2<0)
   Id=1
    Leaf False 
 
-  Id=2
+  Id=4
    Node(site_type:2<1)
     Id=0
      Leaf True 
