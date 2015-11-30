@@ -320,13 +320,9 @@ let scan_rule_bdu_build parameter handler_bdu error rule_id rule covering_classe
 let scan_rule_fixpoint parameter handler_bdu error rule_id 
     rule
     store_wl_creation 
-    store_remanent_triple
-    store_remanent_creation_map
-    store_remanent_modif_map
-    store_remanent_test_map
-    store_final_bdu_test_map
-    store_final_creation_bdu_map
-    store_final_modif_list_map
+    store_proj_bdu_creation_restriction_map
+    store_proj_modif_list_restriction_map
+    store_proj_bdu_test_restriction_map
     store_covering_classes_modification_update
     store_result
     =
@@ -347,13 +343,9 @@ let scan_rule_fixpoint parameter handler_bdu error rule_id
       error
       rule
       store_wl_creation
-      store_remanent_triple
-      store_remanent_creation_map
-      store_remanent_modif_map
-      store_remanent_test_map
-      store_final_bdu_test_map
-      store_final_creation_bdu_map
-      store_final_modif_list_map
+      store_proj_bdu_creation_restriction_map
+      store_proj_modif_list_restriction_map
+      store_proj_bdu_test_restriction_map
       store_test_has_bond_rhs
       store_covering_classes_modification_update
       (*store_result.store_bdu_update_map*)
@@ -431,7 +423,7 @@ let scan_rule parameter handler_bdu error handler_kappa rule_id rule store_cover
       store_result.store_bdu_build_map
   in*)
   (*-------------------------------------------------------------------------------*)
-  (*let error, store_bdu_fixpoint =
+  let error, store_bdu_fixpoint =
     scan_rule_fixpoint
       parameter
       handler_bdu
@@ -439,16 +431,12 @@ let scan_rule parameter handler_bdu error handler_kappa rule_id rule store_cover
       rule_id
       rule
       store_bdu_analysis_dynamic.store_wl_creation
-      store_bdu_build.store_remanent_triple
-      store_bdu_build.store_bdu_creation_restriction_map
-      store_bdu_build.store_modif_list_restriction_map
-      store_bdu_build.store_bdu_test_restriction_map
-      store_bdu_build_map.store_proj_bdu_test_restriction_map
-      store_bdu_build_map.store_proj_bdu_creation_restriction_map
-      store_bdu_build_map.store_proj_modif_list_restriction_map
+      store_bdu_build.store_proj_bdu_creation_restriction_map
+      store_bdu_build.store_proj_modif_list_restriction_map
+      store_bdu_build.store_proj_bdu_test_restriction_map
       store_bdu_analysis_dynamic.store_covering_classes_modification_update
       store_result.store_bdu_fixpoint
-  in*)
+  in
   (*------------------------------------------------------------------------------*)
   (*store*)
   error,
@@ -457,7 +445,7 @@ let scan_rule parameter handler_bdu error handler_kappa rule_id rule store_cover
     store_bdu_analysis_dynamic = store_bdu_analysis_dynamic;
     store_bdu_build            = store_bdu_build;
     (*store_bdu_build_map        = store_bdu_build_map;*)
-    (*store_bdu_fixpoint         = store_bdu_fixpoint*)
+    store_bdu_fixpoint         = store_bdu_fixpoint
   }
  
 (************************************************************************************)
@@ -573,14 +561,14 @@ let scan_rule_set parameter handler_bdu error handler_kappa store_covering_class
   let error, init_bdu_analysis_dynamic = init_bdu_analysis_dynamic parameter error in
   let error, init_bdu_build            = init_bdu_build parameter error in
   (*let error, init_bdu_build_map        = init_bdu_build_map parameter error in*)
-  (*let error, init_bdu_fixpoint         = init_bdu_fixpoint parameter error in*)
+  let error, init_bdu_fixpoint         = init_bdu_fixpoint parameter error in
   let init_bdu =
     {
       store_bdu_analysis_static  = init_bdu_analysis_static;
       store_bdu_analysis_dynamic = init_bdu_analysis_dynamic;
       store_bdu_build            = init_bdu_build;
       (*store_bdu_build_map        = init_bdu_build_map;*)
-      (*store_bdu_fixpoint         = init_bdu_fixpoint*)
+      store_bdu_fixpoint         = init_bdu_fixpoint
     }
   in
   (*------------------------------------------------------------------------------*)

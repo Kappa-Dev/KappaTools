@@ -204,17 +204,16 @@ let print_set parameter set =
 
 (*from rule_id get the bdu_creation, bdu_test, and modif_list*)
 
-let collect_product parameter handler error
-    rule_id
-    store_remanent_creation_map
-    store_final_creation_bdu_map
-    store_remanent_modif_map
-    store_final_modif_list_map
+let collect_bdu_creation_and_modif_list parameter error rule_id
+    (*    store_bdu_creation_restriction_map*)
+    store_proj_bdu_creation_restriction_map
+    (*store_modif_list_restriction_map*)
+    store_proj_modif_list_restriction_map
     =
-  let error, handler, bdu_false = Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error in
-  let add_link_creation agent_type bdu store_result =
+  (*let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in*)
+  (*let add_link_creation agent_type bdu store_result =
     let (l,old) =
-      Map_creation_bdu_ag.Map.find_default ([], bdu_false) agent_type store_result
+      Map_creation_bdu_ag.Map.find_default ([], bdu_true) agent_type store_result
     in
     let result_map =
       Map_creation_bdu_ag.Map.add agent_type (l, bdu) store_result
@@ -229,9 +228,24 @@ let collect_product parameter handler error
       Map_modif_ag.Map.add agent_id (l, pair_list) store_result
     in
     error, result_map
+  in*)
+  let error, bdu_creation_list =
+    match 
+      Map_final_creation_bdu.Map.find_option rule_id store_proj_bdu_creation_restriction_map
+    with
+    | None -> error, ([], [])
+    | Some (l, l') -> error, (l, l')
   in
-  let error, bdu_creation_map =
-    Map_creation.Map.fold (fun (agent_type, rule_id', cv_id) (l1, p_list)
+  let  error, (l, modif_list) = 
+    match
+      Map_final_modif_list.Map.find_option rule_id store_proj_modif_list_restriction_map
+    with
+    | None -> error, ([], [])
+    | Some (l, l') -> error, (l, l')
+  in
+  error, (bdu_creation_list, modif_list)
+
+  (*Map_creation.Map.fold (fun (agent_type, rule_id', cv_id) (l1, p_list)
       (error, bdu_result) ->
         (*use rule_id in working list to search for the bdu_creation*)
         let error, (l, get_pair_list) =
@@ -250,7 +264,7 @@ let collect_product parameter handler error
           ) (error, Map_creation_bdu_ag.Map.empty) get_pair_list
         in
         error, bdu_list
-    ) store_remanent_creation_map (error, Map_creation_bdu_ag.Map.empty)
+    ) store_bdu_creation_restriction_map (error, Map_creation_bdu_ag.Map.empty)
   in
   (*modif*)
   let error, modif_map =
@@ -274,25 +288,24 @@ let collect_product parameter handler error
         error, modif_list        
     ) store_remanent_modif_map (error, Map_modif_ag.Map.empty)
   in
-  error, (bdu_creation_map, modif_map)
+  error, (bdu_creation_map, modif_map)*)
   
 (*fixpoint iteration*)
 
 let collect_bdu_update_map parameter handler error 
     rule 
     wl_creation
-    store_remanent_triple
-    store_remanent_creation_map
-    store_remanent_modif_map
-    store_remanent_test_map
-    store_final_test_bdu_map
-    store_final_creation_bdu_map
-    store_final_modif_list_map
+    store_proj_bdu_creation_restriction_map
+    store_proj_modif_list_restriction_map
+    store_proj_bdu_test_restriction_map
     store_test_has_bond_rhs
     store_covering_classes_modification_update
     =
   let error, handler, bdu_false = 
     Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error 
+  in 
+  let error, handler, bdu_true = 
+    Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error 
   in 
   (*TODO, return a bool here*)
   (*let add_link (agent_type, cv_id) bdu_update store_result =
@@ -315,7 +328,7 @@ let collect_bdu_update_map parameter handler error
 	Map_bdu_update.Map.find_option (agent_type, cv_id) store_result
       with
         Some (l, old) -> error, (l, old)
-      | None -> error, ([], bdu_false)
+      | None -> error, ([], bdu_true)
     in
     (**)
     let error, handler, bdu_union =
@@ -335,7 +348,7 @@ let collect_bdu_update_map parameter handler error
   in
   let add_link_test agent_id bdu store_result =
     let (l,old_bdu) =
-      Map_test_bdu_ag.Map.find_default ([], bdu_false) agent_id store_result
+      Map_test_bdu_ag.Map.find_default ([], bdu_true) agent_id store_result
     in
     let result_map =
       Map_test_bdu_ag.Map.add agent_id (l, bdu) store_result
@@ -358,17 +371,19 @@ let collect_bdu_update_map parameter handler error
       | Some rule_id ->
         (*-----------------------------------------------------------------------*)
         (*compute bdu_creation, bdu_test and modif_list for this rule_id*)
-        let error, (bdu_creation_map, modif_list_map) =
-          collect_product
+        let error, (bdu_creation_list, modif_list) =
+          collect_bdu_creation_and_modif_list
             parameter
-            handler
             error
             rule_id
-            store_remanent_creation_map
-            store_final_creation_bdu_map
-            store_remanent_modif_map
-            store_final_modif_list_map
+            store_proj_bdu_creation_restriction_map
+            store_proj_modif_list_restriction_map
         in
+        aux wl_tl bdu_X (error, store_bdu_update_map)
+  in
+  aux wl_creation bdu_false (error, Map_bdu_update.Map.empty)
+
+
         (*-----------------------------------------------------------------------*)
         (*test for all covering class whether or not this bdu_test is
           satisfy in this covering class, if it is satisfy then do the
@@ -436,7 +451,7 @@ let collect_bdu_update_map parameter handler error
           
         in*)
 
-        let error, store_result_bdu_update_map =
+      (*  let error, store_result_bdu_update_map =
           Map_test.Map.fold (fun (agent_id, agent_type, rule_id', cv_id) (l1, p_list) 
             (error, store_result_map) ->
               let error, (l, get_pair_list) =
@@ -581,4 +596,4 @@ let collect_bdu_update_map parameter handler error
         in
         error, store_result_bdu_update_map
   in
-  aux wl_creation bdu_false (error, Map_bdu_update.Map.empty)
+  aux wl_creation bdu_false (error, Map_bdu_update.Map.empty)*)

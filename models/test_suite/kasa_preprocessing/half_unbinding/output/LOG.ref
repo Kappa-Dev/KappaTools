@@ -217,4 +217,10 @@ rule_id:1
 
 ------------------------------------------------------------
 - List for update of the views due to modification (projection per rule):
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+** Discovered sites that are bond on the rhs for the first time:
+** Fixpoint iteration function:
 execution finished without any exception

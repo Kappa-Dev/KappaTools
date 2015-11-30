@@ -335,5 +335,5 @@ type bdu_analysic =
       store_bdu_analysis_dynamic : bdu_analysis_dynamic;
       store_bdu_build            : bdu_build;
       (*store_bdu_build_map        : bdu_build_map;*)
-      (*store_bdu_fixpoint         : bdu_fixpoint*)
+      store_bdu_fixpoint         : bdu_fixpoint
     }
