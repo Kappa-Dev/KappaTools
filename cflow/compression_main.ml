@@ -218,8 +218,15 @@ let compress_and_print logger env log_info step_list =
 		    let error,causal_story_array,log_info = U.store_trace parameter handler error info log_info  event_list story_list in 
 		    error,log_info,causal_story_array  
 		  else
-		    U.from_none_to_weak  parameter handler  logger (error,log_info,story_list) (trace_before_compression,info)
-		)
+		    let error,log_info,list = U.weakly_compress logger parameter handler error log_info trace_before_compression in 
+		    let error,story_list,log_info =
+		      List.fold_left
+			(fun (error,story_list,log_info) trace -> 
+			 U.store_trace parameter handler error info log_info trace story_list)
+			(error,story_list,log_info)
+			list
+		    in error,log_info,story_list)
+		
                 (error,log_info,story_list)
                 (List.rev list)
             in 
@@ -257,10 +264,19 @@ let compress_and_print logger env log_info step_list =
                   let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_weak parameter in 
                   let weak_stories_table =  U.empty_story_table () in 									   
                   let error,log_info,weakly_story_table = 
-		    U.fold_story_table_with_progress_bar logger
-			 (fun x y z -> U.from_none_to_weak parameter handler logger z (x,y))
-			 causal_story_table 
-			 (error,log_info,weak_stories_table)
+		    U.fold_story_table_with_progress_bar
+		      logger
+		      (fun trace info (error,log_info,story_list) ->
+		       let error,log_info,list = U.weakly_compress logger parameter handler error log_info trace in 
+		       let error,story_list,log_info =
+			 List.fold_left
+			   (fun (error,story_list,log_info) trace -> 
+			    U.store_trace parameter handler error info log_info trace story_list)
+			   (error,story_list,log_info)
+			   list
+		       in error,log_info,story_list)
+		      causal_story_table 
+		      (error,log_info,weak_stories_table)
                   in 
 	          let error,weakly_story_table = U.flatten_story_table  parameter handler error weakly_story_table in
                   error,weakly_story_table

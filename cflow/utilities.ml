@@ -409,28 +409,7 @@ let set_compression_mode p x =
 						       
 let strongly_compress logger parameter = compress logger (set_compression_mode parameter Parameter.Strong)
 let weakly_compress logger parameter = compress logger (set_compression_mode parameter Parameter.Weak)
-						
-let store_compression_in_a_story_table parameter handler error list list_info  story_table log_info =
-  let error,story_list,log_info =
-    match 
-      list
-    with 
-    | [] -> 
-       error,story_table,log_info
-    | _ ->  
-       List.fold_left
-	 (fun (error,story_list,info) trace -> 
-	  store_trace parameter handler error list_info log_info trace story_list)
-	 (error,story_table,log_info)
-	 list 
-  in 
-  error,log_info,story_list
-
-		   
-let from_none_to_weak parameter handler logger (error,log_info,story_list) (trace,list_info) =
-  let error,log_info,list = weakly_compress logger parameter handler error log_info trace in 
-  store_compression_in_a_story_table parameter handler error list list_info story_list log_info
-  
+								  
 let convert_trace_into_grid_while_trusting_side_effects trace handler = 
   let refined_list = 
     List.rev_map (fun x -> (x,[])) (List.rev (get_pretrace trace))

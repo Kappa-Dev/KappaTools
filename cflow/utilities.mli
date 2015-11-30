@@ -21,6 +21,7 @@
 module D:Dag.Dag
 	   
 type error_log = D.S.PH.B.PB.CI.Po.K.H.error list 
+
 (** error_init is an empty log of errors *)
 val error_init: error_log 
 
@@ -123,9 +124,5 @@ val count_stories: story_table -> int
 val store_trace: parameter -> kappa_handler -> error_log ->  profiling_info Mods.simulation_info list -> profiling_info  -> trace -> story_table -> error_log * story_table *  profiling_info
 val export_story_table: story_table ->  (Causal.grid * D.S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list
 
-(* This one will disapear soon*)
-val from_none_to_weak: parameter -> kappa_handler -> Format.formatter -> (error_log * profiling_info * story_table) -> trace * profiling_info Mods.simulation_info list -> (error_log * profiling_info * story_table)
 																			          
-
-
 val fold_left_with_progress_bar: Format.formatter -> ('a -> 'b -> 'a) -> 'a -> 'b list -> 'a 
