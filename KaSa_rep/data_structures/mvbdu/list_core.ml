@@ -68,7 +68,7 @@ let rec print_list error print_empty string_of_var string_of_value (parameters:R
 	  print_empty
 	  string_of_var
 	  string_of_value
-	  parameters
+	  parameters'
 	  x.List_sig.tail 
       in 
       error 
