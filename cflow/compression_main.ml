@@ -32,7 +32,7 @@ let log_step = true
 let debug_mode = false
 let dump_profiling_info = true
 
-let store_uncompressed_stories = false
+let store_uncompressed_stories = true
 
 let get_all_stories = false (** false -> only the first story per observable hit; true -> all stories per obs hit *)
 			

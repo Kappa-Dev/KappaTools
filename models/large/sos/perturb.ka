@@ -1,8 +1,8 @@
 %def: "showIntroEvents" "true"
 %def: "displayCompression" "weak" "strong"
 
-%mod: [T]>5 do $TRACK 'sos recruited' [true]
-%mod: [T]>1 do $TRACK 'sos recruited' [false]
+%mod: [T]>1 do $TRACK 'sos recruited' [true]
+%mod: [T]>15 do $TRACK 'sos recruited' [false]
 #%mod: [T]>30.5 do $TRACK 'sos recruited' [true] 
 #%mod: [T]>31 do $TRACK 'sos recruited' [false]
 
