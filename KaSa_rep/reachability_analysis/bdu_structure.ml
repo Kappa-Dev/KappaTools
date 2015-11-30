@@ -14,7 +14,7 @@
 
 open Bdu_analysis_type
 open Cckappa_sig
-open Bdu_build
+(*open Bdu_build*)
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "BDU structure") message exn (fun () -> default)  

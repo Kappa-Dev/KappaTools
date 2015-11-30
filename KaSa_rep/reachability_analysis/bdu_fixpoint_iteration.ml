@@ -20,7 +20,8 @@ open Boolean_mvbdu
 open Memo_sig
 open Site_map_and_set
 open Covering_classes_type
-open Bdu_structure
+open Bdu_build
+(*open Bdu_structure*)
 open Fifo
 open Printf
 open Mvbdu_wrapper
@@ -294,7 +295,7 @@ let collect_bdu_update_map parameter handler error
     Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error 
   in 
   (*TODO, return a bool here*)
-  let add_link (agent_type, cv_id) bdu_update store_result =
+  (*let add_link (agent_type, cv_id) bdu_update store_result =
     let error, (l, old) =
       match
 	Map_bdu_update.Map.find_option (agent_type, cv_id) store_result
@@ -307,8 +308,8 @@ let collect_bdu_update_map parameter handler error
         store_result
     in
     error, result_map
-  in
-  (*let add_link (agent_type, cv_id) bdu_update store_result =
+  in*)
+  let add_link (agent_type, cv_id) bdu_update store_result =
     let error, (l, bdu_old) =
       match
 	Map_bdu_update.Map.find_option (agent_type, cv_id) store_result
@@ -331,7 +332,7 @@ let collect_bdu_update_map parameter handler error
       Map_bdu_update.Map.add (agent_type, cv_id) (l, bdu_union) store_result
     in
     error, true, result_map
-  in*)
+  in
   let add_link_test agent_id bdu store_result =
     let (l,old_bdu) =
       Map_test_bdu_ag.Map.find_default ([], bdu_false) agent_id store_result
@@ -369,6 +370,72 @@ let collect_bdu_update_map parameter handler error
             store_final_modif_list_map
         in
         (*-----------------------------------------------------------------------*)
+        (*test for all covering class whether or not this bdu_test is
+          satisfy in this covering class, if it is satisfy then do the
+          update, if not continue with the tail of this classs. In case it is
+          satisfied with the covering class, do the fold and then update*)
+        (*let bool =
+          Map_test.Map.for_all (fun (agent_id, agent_type, rule_id', cv_id)
+            (l1, pair_site_state_list) ->
+              (*do the test*)
+              let error, (_, get_pair_list) =
+                match 
+                  Map_final_test_bdu.Map.find_option rule_id store_final_test_bdu_map
+                with
+                | None -> error, ([], [])
+                | Some (l, l') -> error, (l, l')
+              in
+              (*-----------------------------------------------------------------------*)
+              (*build a map of bdu_test*)
+              let error, bdu_test_map =
+                List.fold_left (fun (error, store_result) (agent_id, bdu_test) ->
+                  let error, result =
+                    add_link_test agent_id bdu_test store_result
+                  in
+                  error, result
+                ) (error, Map_test_bdu_ag.Map.empty) get_pair_list
+              in
+              (*-----------------------------------------------------------------------*)
+              (*get bdu_creation*)
+              let error, (_, bdu_creation) =
+                match 
+                  Map_creation_bdu_ag.Map.find_option agent_type bdu_creation_map
+                with
+                | None -> error, ([], bdu_false)
+                | Some (l, bdu) -> error, (l, bdu)
+              in
+              (*-----------------------------------------------------------------------*)
+              (*get modif_list*)
+              let error, (_, modif_list) =
+                match
+                  Map_modif_ag.Map.find_option agent_id modif_list_map
+                with
+                | None -> error, ([], [])
+                | Some (l, l') -> error, (l, l')
+              in
+              (*build_list from modif_list*)
+              let error, handler, list_a =
+                Mvbdu_wrapper.Mvbdu.build_list
+                  parameter
+                  handler
+                  error
+                  modif_list
+              in
+              (*-----------------------------------------------------------------------*)
+              (*get bdu_test*)
+              let error, (_, bdu_test) =
+                match
+                  Map_test_bdu_ag.Map.find_option agent_id bdu_test_map
+                with
+                | None -> error, ([], bdu_false)
+                | Some (l, bdu) -> error, (l, bdu)                  
+              in
+
+
+          ) store_remanent_test_map
+          
+        in*)
+
         let error, store_result_bdu_update_map =
           Map_test.Map.fold (fun (agent_id, agent_type, rule_id', cv_id) (l1, p_list) 
             (error, store_result_map) ->
@@ -435,56 +502,72 @@ let collect_bdu_update_map parameter handler error
                   bdu_creation
                   bdu_X
               in
-              (*set of bond on the rhs rule*)
-              let (l, bond_rhs_set) =
-                Map_test_bond.Map.find_default ([], Map_site_address.Set.empty)
-                  rule_id store_test_has_bond_rhs
-              in
-              (*add update(c) into wl_tl*)
-              let error, new_wl =
-                add_update_to_wl
-                  parameter
-                  error
-                  store_covering_classes_modification_update
-                  wl_tl
-              in
               (*-----------------------------------------------------------------------*)
               begin
                 if Mvbdu_wrapper.Mvbdu.equal bdu_test bdu_false
                 then
+                  let _ = fprintf stdout "YES false\n" in
                   let error, store_result =
                     aux wl_tl bdu_X (error, store_result_map)
                   in
+                  let _ = 
+                    fprintf stdout "wl_tl:\n";
+                    IntWL.print_wl parameter wl_tl; 
+                    fprintf stdout "acc_tl:\n";
+                    IntWL.print_wl parameter acc_wl 
+                  in
                   error, store_result
                 else
-                  aux wl_tl bdu_X (error, store_result_map)
-                 (*-----------------------------------------------------------------------*)
+                  let _ = fprintf stdout "no \n" in
+                  (*-----------------------------------------------------------------------*)
                   (*bdu_test is not empty*)
-                    (*begin
+                  begin
                     (*test the intersection with bdu_creation*)
                     let error, handler, bdu_inter =
                       Mvbdu_wrapper.Mvbdu.mvbdu_and parameter handler error bdu_test bdu_X
                     in
                     if not (Mvbdu_wrapper.Mvbdu.equal bdu_inter bdu_false)
-                   
                       (*it is an enable rule*)
                       (*check if there is any bond on the rhs rule?*)
-                      (*-----------------------------------------------------------------*)
+                    (*-----------------------------------------------------------------*)
+                    then
+                      let _ = fprintf stdout "YES inter\n" in
                       begin
+                        (*TODO: same as add_link set of bond on the rhs rule*)
+                        let (l, bond_rhs_set) =
+                          Map_test_bond.Map.find_default ([], Map_site_address.Set.empty)
+                            rule_id store_test_has_bond_rhs
+                        in
                         if Map_site_address.Set.is_empty bond_rhs_set
                           (*there is no bond is discovered on the rhs*)
                         then
+                          let _ = fprintf stdout "YES bond\n" in
                           (*store the update new according to each (agent_type, cv_id)*)
-                          let error, store_new_bdu_update_map =
+                          let error, bool, store_new_bdu_update_map =
                             add_link (agent_type, cv_id) bdu_update store_result_map
                           in
                           (*TODO:check whether or not the bdu_update has been changed or not?
                             if it does not change then do not add the update(c) into wl;
                             otherwise add the update(c) into wl
                           *)
-                          
-                          
-                          aux new_wl bdu_update (error, store_new_bdu_update_map)
+                          begin
+                            if bool
+                            then
+                              let _ = fprintf stdout "YES\n" in
+                              (*add update(c) into wl_tl*)
+                              let error, new_wl =
+                                add_update_to_wl
+                                  parameter
+                                  error
+                                  store_covering_classes_modification_update
+                                  wl_tl
+                              in                              
+                              (*then add update(c) into wl_tl*)
+                              aux new_wl bdu_update (error, store_new_bdu_update_map)
+                            else
+                              (*continue with the old result*)
+                              aux wl_tl bdu_update (error, store_new_bdu_update_map)
+                          end
                         else
                           (*discovered bond on the rhs TODO*)
                           aux wl_tl bdu_X (error, store_result_map)
@@ -492,7 +575,7 @@ let collect_bdu_update_map parameter handler error
                     else
                       (*it is not an enable rule*)
                       aux wl_tl bdu_X (error, store_result_map)
-                  end*)
+                  end
               end
           ) store_remanent_test_map (error, store_bdu_update_map)
         in

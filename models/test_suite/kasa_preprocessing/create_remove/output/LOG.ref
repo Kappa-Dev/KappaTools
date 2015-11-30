@@ -130,28 +130,6 @@ List of rules to awake when the state of a site is modified and tested:
 ------------------------------------------------------------
 * Covering classes with new indexes:
 ------------------------------------------------------------
-- Valuations of the views that are tested (per rule, agent and covering class):
-
-
-------------------------------------------------------------
-- Valuations of the views that are created (per rule, agent and covering class):
-
-
-------------------------------------------------------------
-- Update of the views due to modification (per rule, agent and covering class):
-
-
-------------------------------------------------------------
-* Bdu of covering classes with new indexes :
-------------------------------------------------------------
-
-------------------------------------------------------------
-- Bdu for the valuations of the views that are created (per rule, agent and covering class):
-
-
-------------------------------------------------------------
-- Bdu for the valuations of the views that are created (per rule_id; projection function):
-
 
 ------------------------------------------------------------
 - Bdu for the valuations of the views that are tested (per rule, agent and covering class):
@@ -162,14 +140,16 @@ List of rules to awake when the state of a site is modified and tested:
 
 
 ------------------------------------------------------------
+- Bdu for the valuations of the views that are created (per rule, agent and covering class):
+
+
+------------------------------------------------------------
+- Bdu for the valuations of the views that are created (per rule_id; projection function):
+
+
+------------------------------------------------------------
 - List for update of the views due to modification (per rule, agent and covering class):
 
 ------------------------------------------------------------
 - List for update of the views due to modification (projection per rule):
-
-------------------------------------------------------------
-* Fixpoint iteration :
-------------------------------------------------------------
-** Discovered sites that are bond on the rhs for the first time:
-** Fixpoint iteration function:
 execution finished without any exception

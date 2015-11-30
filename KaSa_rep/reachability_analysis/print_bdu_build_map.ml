@@ -182,7 +182,7 @@ let print_final_modif_list_map parameter error result =
 (************************************************************************************)
 (*main print*)
 
-let print_bdu_build_map parameter error result =
+(*let print_bdu_build_map parameter error result =
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
@@ -253,4 +253,4 @@ let print_bdu_build_map parameter error result =
       error
       result.store_final_modif_list_map
   in
-  error
+  error*)

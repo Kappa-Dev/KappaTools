@@ -97,7 +97,7 @@ let collect_remanent_triple parameter error store_remanent store_result =
 (************************************************************************************)
 (*test rule*)
 
-let collect_test_restriction_map parameter error rule_id rule store_remanent_triple
+(*let collect_test_restriction_map parameter error rule_id rule store_remanent_triple
     store_result =
   let add_link (agent_id, agent_type, rule_id, cv_id) pair_list store_result =
     let (l, old) =
@@ -163,20 +163,128 @@ let collect_test_restriction_map parameter error rule_id rule store_remanent_tri
           add_link (agent_id, agent_type, rule_id, cv_id) pair_list store_result
         in
         error, store_result
+    ) rule.rule_lhs.views store_remanent_triple store_result*)
+
+let build_bdu parameter handler error pair_list =
+  let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in
+  let error, handler, list_a =
+    Mvbdu_wrapper.Mvbdu.build_list
+      parameter
+      handler
+      error
+      pair_list
+  in
+  let error, handler, bdu_result =
+    Mvbdu_wrapper.Mvbdu.mvbdu_redefine parameter handler error bdu_true list_a
+  in
+  error, handler, bdu_result
+
+let collect_bdu_test_restriction_map parameter handler error rule_id rule 
+    store_remanent_triple store_result =
+  let add_link (agent_id, agent_type, rule_id, cv_id) (ag_id, bdu) store_result =
+    let (l, old) =
+      Map_test_bdu.Map.find_default ([], [])
+        (agent_id, agent_type, rule_id, cv_id) store_result
+    in
+    let result_map =
+      Map_test_bdu.Map.add (agent_id, agent_type, rule_id, cv_id)
+        (l, (ag_id, bdu) :: []) store_result
+    in
+    error, result_map
+  in
+  AgentMap.fold2_common parameter error
+    (fun parameter error agent_id agent triple_list store_result ->
+      match agent with
+      | Unknown_agent _ | Ghost -> error, store_result
+      | Dead_agent (agent,_,_,_) 		  
+      | Agent agent ->
+        let agent_type = agent.agent_name in
+        (*-----------------------------------------------------------------*)
+        (*get map restriction from covering classes*)
+        let error, (cv_id, get_pair_list) =
+        List.fold_left (fun (error, (_, current_list)) (cv_id, list, set) ->
+          (*-----------------------------------------------------------------*)
+          (*new index for site type in covering class*)
+          let error, (map_new_index_forward, _) =
+            new_index_pair_map parameter error list
+          in
+          (*-----------------------------------------------------------------*)
+          let error', map_res =
+            Site_map_and_set.Map.fold_restriction parameter error
+              (fun site port (error,store_result) ->
+                let state = port.site_state.min in
+                let error,site' = Site_map_and_set.Map.find_default parameter error 
+                  0 site map_new_index_forward in
+                let error,map_res =
+                  Site_map_and_set.Map.add parameter error 
+                    site'
+                    state
+                    store_result
+                in
+                error, map_res
+              ) set agent.agent_interface Site_map_and_set.Map.empty
+          in
+	  let error = Exception.check warn parameter error error' (Some "line 132") Exit in
+          error, (cv_id, (map_res :: current_list))
+        ) (error, (0, [])) triple_list
+        in
+        (*-----------------------------------------------------------------*)
+        let error, pair_list =
+          List.fold_left 
+            (fun (error, current_list) map_res ->
+              let error, pair_list =
+                Site_map_and_set.Map.fold
+                  (fun site' state (error, current_list) ->
+                    let pair_list = (site', state) :: current_list in
+                    error, pair_list
+                  ) map_res (error, [])
+              in
+              error, List.concat [pair_list; current_list]
+            ) (error, []) get_pair_list
+        in
+        (*build bdu_test*)
+        let error, handler, bdu_test =
+          build_bdu parameter handler error pair_list
+        in
+        let error, store_result =
+          add_link (agent_id, agent_type, rule_id, cv_id) (agent_id, bdu_test) store_result
+        in
+        error, store_result
     ) rule.rule_lhs.views store_remanent_triple store_result
+
+(*projection with (rule_id) *)
+
+let collect_proj_bdu_test_restriction_map 
+    parameter handler error store_bdu_test_restriction_map =
+  Map_test_bdu.Map.fold
+    (fun (agent_id, agent_type, rule_id, cv_id) (l1, l2) (error, store_result) ->
+      let store_result =
+        Project2bdu_test.proj
+          (fun (agent_id, agent_type, rule_id, cv_id) -> rule_id)
+          ([], [])
+          (fun (l, x) (l', x') ->
+            List.concat [l; l'],
+            List.concat [x; x']
+          ) 
+          store_bdu_test_restriction_map          
+      in
+      let store_result =
+        Map_final_test_bdu.Map.map (fun (l, x) -> List.rev l, x) store_result
+      in
+      error, store_result
+    ) store_bdu_test_restriction_map (error, Map_final_test_bdu.Map.empty)
 
 (************************************************************************************)
 (*creation rules*)
 
-let collect_creation_restriction_map parameter error rule_id rule store_remanent_triple
-  store_result   =
- let add_link (agent_type, rule_id, cv_id) pair_list store_result =
+let collect_bdu_creation_restriction_map parameter handler error rule_id rule store_remanent_triple store_result   =
+ let add_link (agent_type, rule_id, cv_id) (ag, bdu) store_result =
     let (l, old) =
-      Map_creation.Map.find_default ([], []) (agent_type, rule_id, cv_id) store_result
+      Map_creation_bdu.Map.find_default ([], []) (agent_type, rule_id, cv_id) store_result
     in
     let result_map =
-      Map_creation.Map.add (agent_type, rule_id, cv_id)
-        (l, List.concat [pair_list; old]) store_result
+      Map_creation_bdu.Map.add (agent_type, rule_id, cv_id)
+        (l, (agent_type, bdu) :: []) store_result
     in
     error, result_map
   in
@@ -185,7 +293,8 @@ let collect_creation_restriction_map parameter error rule_id rule store_remanent
       List.fold_left (fun (error, store_result) (agent_id, agent_type) ->
         let error, agent = AgentMap.get parameter error agent_id rule.rule_rhs.views in
         match agent with
-	| Some Unknown_agent _ | Some Dead_agent _ | None -> warn parameter error (Some "168") Exit store_result
+	| Some Unknown_agent _ | Some Dead_agent _ 
+        | None -> warn parameter error (Some "168") Exit store_result
 	| Some Ghost -> error, store_result
         | Some Agent agent ->
           if agent_type' = agent_type 
@@ -240,27 +349,52 @@ let collect_creation_restriction_map parameter error rule_id rule store_remanent
                   error, (List.concat [pair_list; current_list])
                 ) (error, []) get_pair_list
             in
+            (*store bdu_creation*)
+            let error, handler, bdu_creation =
+              build_bdu parameter handler error pair_list
+            in
             let error, store_result =
-              add_link (agent_type, rule_id, cv_id) pair_list store_result
+              add_link (agent_type, rule_id, cv_id) (agent_type, bdu_creation) store_result
             in
             error, store_result
           else error, store_result
       ) (error, store_result) rule.actions.creation
     ) store_remanent_triple store_result
 
+(*projection with rule_id*)
+
+let collect_proj_bdu_creation_restriction_map
+    parameter handler error store_bdu_creation_restriction_map =
+  Map_creation_bdu.Map.fold 
+    (fun (agent_type, rule_id, cv_id) (l1, pair_list) (error, store_result) ->
+      (**)
+      let store_result =
+        Project2bdu_creation.proj
+          (fun (agent_type, rule_id, cv_id) -> rule_id)
+          ([], [])
+          (fun (l, x) (l', x') -> (List.concat [l; l'], List.concat [x; x']))
+          store_bdu_creation_restriction_map 
+      in
+      (*Map from Project_Map -> Map_final*)
+      let store_result =
+        Map_final_creation_bdu.Map.map (fun (l, x) -> List.rev l, x) store_result
+      in
+      error, store_result
+    ) store_bdu_creation_restriction_map (error, Map_final_creation_bdu.Map.empty)
+
 (************************************************************************************)
 (*modification rule with creation rules*)
 
-let collect_modif_restriction_map parameter error rule_id rule store_remanent_triple
-    store_result =
-  let add_link (agent_id, agent_type, rule_id, cv_id) pair_list store_result =
+let collect_modif_list_restriction_map
+    parameter error rule_id rule store_remanent_triple store_result =
+  let add_link (agent_id, agent_type, rule_id, cv_id) (ag_id, pair_list) store_result =
     let (l, old) =
-      Map_modif.Map.find_default ([], []) 
+      Map_modif_list.Map.find_default ([], []) 
         (agent_id, agent_type, rule_id, cv_id) store_result
     in
     let result_map =
-      Map_modif.Map.add (agent_id, agent_type, rule_id, cv_id)
-        (l, List.concat [pair_list; old]) store_result
+      Map_modif_list.Map.add (agent_id, agent_type, rule_id, cv_id)
+        (l,(ag_id, pair_list) :: []) store_result
     in
     error, result_map
   in
@@ -316,13 +450,35 @@ let collect_modif_restriction_map parameter error rule_id rule store_remanent_tr
               (*FIXME: put agent_id inside?*)
               error, (List.concat [pair_list; current_list])
             ) (error, []) get_pair_list
-        in       
+        in
         (*-----------------------------------------------------------------*)
         let error, store_result =
-          add_link (agent_id, agent_type, rule_id, cv_id) pair_list store_result
+          add_link (agent_id, agent_type, rule_id, cv_id) (agent_id, pair_list) store_result
         in
         error, store_result
     ) rule.diff_direct store_remanent_triple store_result
+
+(*projection with (rule_id) *)
+
+let collect_proj_modif_list_restriction_map
+    parameter error store_modif_list_restriction_map =
+  Map_modif_list.Map.fold
+    (fun (agent_id, agent_type, rule_id, cv_id) (l1, l2) (error, store_result) ->
+      let store_result =
+        Project2bdu_modif.proj
+          (fun (agent_id, agent_type, rule_id, cv_id) -> rule_id)
+          ([], [])
+          (fun (l, x) (l', x') ->
+            List.concat [l; l'],
+            List.concat [x; x']
+          ) 
+          store_modif_list_restriction_map          
+      in
+      let store_result =
+        Map_final_modif_list.Map.map (fun (l, x) -> List.rev l, x) store_result
+      in
+      error, store_result
+    ) store_modif_list_restriction_map (error, Map_final_modif_list.Map.empty)
 
 (************************************************************************************)
 (*DELETE LATER*)

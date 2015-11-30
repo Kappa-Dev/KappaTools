@@ -49,21 +49,24 @@ let print_test_bonds parameter error result =
 (************************************************************************************)
 
 let print_bdu_update_map parameter error result =
-  Map_bdu_update.Map.iter (fun (agent_type, cv_id) (l1, l2) ->
+  Map_bdu_update.Map.iter (fun (agent_type, cv_id) (l1, bdu_update) ->
     if l1 <> []
     then ()
     else ();
     let _ =
       fprintf parameter.log "agent_type:%i:cv_id:%i\n" agent_type cv_id
     in
-    List.iter (fun bdu_update ->
+    Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_update
+  ) result
+    
+    (*List.iter (fun bdu_update ->
       let _ =
         let _ = Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_update in
         fprintf parameter.log "\n"
       in
       ()
     ) l2
-  ) result
+  ) result*)
 
 (*let print_list l =
   let rec aux acc =

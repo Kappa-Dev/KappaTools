@@ -621,177 +621,6 @@ rule_id:2
 ------------------------------------------------------------
 * Covering classes with new indexes:
 ------------------------------------------------------------
-- Valuations of the views that are tested (per rule, agent and covering class):
-
-agent_id:0:agent_type:0:rule_id:0:covering_class_id:0@list of pair:
-site_type':2:state:0
-site_type':1:state:1
-agent_id:0:agent_type:0:rule_id:3:covering_class_id:0@list of pair:
-site_type':1:state:0
-agent_id:0:agent_type:0:rule_id:4:covering_class_id:0@list of pair:
-site_type':1:state:2
-agent_id:0:agent_type:0:rule_id:5:covering_class_id:0@list of pair:
-site_type':1:state:0
-agent_id:0:agent_type:0:rule_id:6:covering_class_id:0@list of pair:
-site_type':1:state:0
-agent_id:0:agent_type:0:rule_id:7:covering_class_id:0@list of pair:
-site_type':1:state:0
-agent_id:0:agent_type:1:rule_id:1:covering_class_id:0@list of pair:
-site_type':1:state:0
-agent_id:0:agent_type:1:rule_id:2:covering_class_id:0@list of pair:
-site_type':1:state:1
-agent_id:0:agent_type:2:rule_id:8:covering_class_id:0@list of pair:
-agent_id:0:agent_type:3:rule_id:9:covering_class_id:0@list of pair:
-agent_id:1:agent_type:1:rule_id:0:covering_class_id:0@list of pair:
-site_type':1:state:0
-
-------------------------------------------------------------
-- Valuations of the views that are created (per rule, agent and covering class):
-
-agent_type:0:rule_id:8:covering_class_id:0@list of pair:
-site_type':2:state:0
-site_type':1:state:0
-agent_type:0:rule_id:9:covering_class_id:0@list of pair:
-site_type':2:state:0
-site_type':1:state:0
-
-------------------------------------------------------------
-- Update of the views due to modification (per rule, agent and covering class):
-
-agent_id:0:agent_type:0:rule_id:0:covering_class_id:0@list of pair:
-site_type':1:state:0
-agent_id:0:agent_type:0:rule_id:3:covering_class_id:0@list of pair:
-site_type':1:state:2
-agent_id:0:agent_type:0:rule_id:4:covering_class_id:0@list of pair:
-site_type':1:state:0
-agent_id:0:agent_type:0:rule_id:5:covering_class_id:0@list of pair:
-site_type':1:state:2
-agent_id:0:agent_type:0:rule_id:6:covering_class_id:0@list of pair:
-site_type':2:state:0
-site_type':1:state:2
-agent_id:0:agent_type:0:rule_id:7:covering_class_id:0@list of pair:
-site_type':2:state:0
-site_type':1:state:2
-agent_id:0:agent_type:1:rule_id:1:covering_class_id:0@list of pair:
-site_type':1:state:1
-agent_id:0:agent_type:1:rule_id:2:covering_class_id:0@list of pair:
-site_type':1:state:0
-agent_id:1:agent_type:0:rule_id:8:covering_class_id:0@list of pair:
-site_type':1:state:0
-agent_id:1:agent_type:0:rule_id:9:covering_class_id:0@list of pair:
-site_type':1:state:0
-agent_id:1:agent_type:1:rule_id:0:covering_class_id:0@list of pair:
-site_type':1:state:1
-
-------------------------------------------------------------
-* Bdu of covering classes with new indexes :
-------------------------------------------------------------
-
-------------------------------------------------------------
-- Bdu for the valuations of the views that are created (per rule, agent and covering class):
-
-agent_type:0:rule_id:8:covering_class_id:0
-Id=7
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=6
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
-agent_type:0:rule_id:9:covering_class_id:0
-Id=7
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=6
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
-
-------------------------------------------------------------
-- Bdu for the valuations of the views that are created (per rule_id; projection function):
-
-rule_id:8
-agent_type:0
-Id=7
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=6
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
-rule_id:9
-agent_type:0
-Id=7
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=6
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
 
 ------------------------------------------------------------
 - Bdu for the valuations of the views that are tested (per rule, agent and covering class):
@@ -1100,6 +929,112 @@ Id=0
 
 
 ------------------------------------------------------------
+- Bdu for the valuations of the views that are created (per rule, agent and covering class):
+
+agent_type:0:rule_id:8:covering_class_id:0
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_type:0:rule_id:9:covering_class_id:0
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+
+------------------------------------------------------------
+- Bdu for the valuations of the views that are created (per rule_id; projection function):
+
+rule_id:8
+agent_type:0
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:9
+agent_type:0
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+
+------------------------------------------------------------
 - List for update of the views due to modification (per rule, agent and covering class):
 agent_id:0:agent_type:0:rule_id:0:covering_class_id:0
 site_type:1:state:0
@@ -1110,11 +1045,11 @@ site_type:1:state:0
 agent_id:0:agent_type:0:rule_id:5:covering_class_id:0
 site_type:1:state:2
 agent_id:0:agent_type:0:rule_id:6:covering_class_id:0
-site_type:1:state:2
 site_type:2:state:0
+site_type:1:state:2
 agent_id:0:agent_type:0:rule_id:7:covering_class_id:0
-site_type:1:state:2
 site_type:2:state:0
+site_type:1:state:2
 agent_id:0:agent_type:1:rule_id:1:covering_class_id:0
 site_type:1:state:1
 agent_id:0:agent_type:1:rule_id:2:covering_class_id:0
@@ -1150,22 +1085,16 @@ agent_id:0:
 site_type:1:state:2
 rule_id:6
 agent_id:0:
-site_type:1:state:2
 site_type:2:state:0
+site_type:1:state:2
 rule_id:7
 agent_id:0:
-site_type:1:state:2
 site_type:2:state:0
+site_type:1:state:2
 rule_id:8
 agent_id:1:
 site_type:1:state:0
 rule_id:9
 agent_id:1:
 site_type:1:state:0
-
-------------------------------------------------------------
-* Fixpoint iteration :
-------------------------------------------------------------
-** Discovered sites that are bond on the rhs for the first time:
-** Fixpoint iteration function:
 execution finished without any exception
