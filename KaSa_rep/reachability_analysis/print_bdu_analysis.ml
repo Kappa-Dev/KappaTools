@@ -19,8 +19,7 @@ open Remanent_parameters_sig
 open Bdu_analysis_type
 open Print_bdu_analysis_static
 open Print_bdu_analysis_dynamic
-open Print_bdu_build (*REMOVE*)
-open Print_bdu_build_map
+open Print_bdu_build
 open Print_bdu_fixpoint
 
 let warn parameters mh message exn default =

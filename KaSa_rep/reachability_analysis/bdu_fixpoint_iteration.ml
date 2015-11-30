@@ -174,7 +174,6 @@ let add_update_to_wl parameter error store_covering_classes_modification_update 
 (*fixpoint*)
 
 (*Testing*)
-open Print_bdu_build_map
 open Remanent_parameters_sig
 
 let print_list rule_id l = 

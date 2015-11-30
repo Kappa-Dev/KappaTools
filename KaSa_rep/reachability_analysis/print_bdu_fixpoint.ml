@@ -14,7 +14,6 @@
 
 open Printf
 open Bdu_analysis_type
-open Print_bdu_build_map
 open Remanent_parameters_sig
 open Cckappa_sig
 
