@@ -37,6 +37,7 @@ Stats:
 
 ____________________________________________________________
 ############################################################
+
 	 - detecting pseudo inverse events (no change)
 	 - blackboard generation
 	 - computing causal past of each observed events (32)
@@ -50,6 +51,7 @@ Stats:
 
 ____________________________________________________________
 ############################################################
+
 
 
 	 - weak flow compression (2)
