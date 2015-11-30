@@ -2,7 +2,7 @@
   * utilities.mli  
   *
   * Creation:                      <2015-08-10 09:21:53 feret>
-  * Last modification: Time-stamp: <2015-11-20 21:39:37 feret>
+  * Last modification: Time-stamp: <2015-11-30 09:26:26 feret>
   * 
   * Causal flow compression: a module for KaSim 
   * Jerome Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -70,8 +70,8 @@ val set_compression_mode: parameter -> Parameter.current_compression_mode -> par
 val weakly_compress:  Format.formatter -> parameter -> kappa_handler -> error_log -> profiling_info -> trace -> error_log * profiling_info * trace list
 val strongly_compress: Format.formatter -> parameter -> kappa_handler -> error_log -> profiling_info -> trace -> error_log * profiling_info * trace list																	   
 type story_table 
-val fold_story_table_with_progress_bar: Format.formatter -> (trace -> profiling_info Mods.simulation_info list -> 'a -> 'a) -> story_table -> 'a -> 'a
-val fold_story_table_without_progress_bar: (trace -> profiling_info Mods.simulation_info list -> 'a -> 'a) -> story_table -> 'a -> 'a																	
+val fold_story_table_with_progress_bar: Format.formatter -> string -> (trace -> profiling_info Mods.simulation_info list -> 'a -> 'a) -> story_table -> 'a -> 'a
+val fold_story_table_without_progress_bar: Format.formatter -> string -> (trace -> profiling_info Mods.simulation_info list -> 'a -> 'a) -> story_table -> 'a -> 'a																	
 (** put together the stories having the same canonic form, this has do be done explicitely on the moment, I will improve this soon*)
 val flatten_story_table: parameter -> kappa_handler -> error_log -> story_table -> error_log * story_table 
 
@@ -125,4 +125,4 @@ val store_trace: parameter -> kappa_handler -> error_log ->  profiling_info Mods
 val export_story_table: story_table ->  (Causal.grid * D.S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list
 
 																			          
-val fold_left_with_progress_bar: Format.formatter -> ('a -> 'b -> 'a) -> 'a -> 'b list -> 'a 
+val fold_left_with_progress_bar: Format.formatter -> string -> ('a -> 'b -> 'a) -> 'a -> 'b list -> 'a 

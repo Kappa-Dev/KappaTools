@@ -141,14 +141,15 @@ let closure err_fmt config prec is_obs init_to_eidmax weak_events init =
         M.fold (ignore_fst (S.fold (ignore_fst succ))) prec 0 in
       Format.fprintf err_fmt "@.\t\tTransitive closure (%i nodes, %i edges)@."
 		     max_index n_edges in
-  let do_tick,tick =
+  let do_tick,tick,close_tick =
     if max_index > 300 && config.do_tick
     then
       let tick = Mods.tick_stories err_fmt max_index (false,0,0) in
       let f = Mods.tick_stories err_fmt max_index in
-      f,tick
+      let close = Format.pp_print_newline err_fmt in 	  
+      f,tick,close
     else
-      (fun x -> x),(false,0,0)
+      (fun x -> x),(false,0,0),(fun () -> ())
   in
   let s_pred_star = A.make (max_index+1) ([],0) in
   let clean,max_succ(*,redirect,cut_event*) = 
@@ -238,6 +239,7 @@ let closure err_fmt config prec is_obs init_to_eidmax weak_events init =
         end)
       prec tick 
   in 
+  let _ = close_tick () in 
   s_pred_star 
 
 let neighbor_non_direct_descendant sons prec =

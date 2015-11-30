@@ -2,7 +2,7 @@
   * compression_main.ml 
   *
   * Creation:                      <2011-10-19 16:52:55 feret>
-  * Last modification: Time-stamp: <2015-11-20 21:59:26 feret> 
+  * Last modification: Time-stamp: <2015-11-30 09:46:03 feret> 
   * 
   * Causal flow compression: a module for KaSim 
   * Jerome Feret, projet Antique, INRIA Paris-Rocquencourt
@@ -180,7 +180,7 @@ let compress_and_print logger env log_info step_list =
 	      in
 	      let story_list = U.empty_story_table () in
 	      (*logger n_stories in *)
-              U.fold_left_with_progress_bar logger   
+              U.fold_left_with_progress_bar logger "causal compression"  
                 (fun (error,log_info,story_list) observable_id -> 
 		 let log_info = D.S.PH.B.PB.CI.Po.K.P.reset_log log_info in 
 		 let () = 
@@ -261,10 +261,11 @@ let compress_and_print logger env log_info step_list =
 		begin 
                   let () = Format.fprintf logger "\t - weak flow compression (%i)@." n_causal_stories in 
                   let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_weak parameter in 
-                  let weak_stories_table =  U.empty_story_table () in 									   
+                  let weak_stories_table =  U.empty_story_table () in 		
                   let error,log_info,weakly_story_table = 
 		    U.fold_story_table_with_progress_bar
 		      logger
+		      "weak compression" 
 		      (fun trace info (error,log_info,story_list) ->
 		       let error,log_info,list = U.weakly_compress logger parameter handler error log_info trace in 
 		       let error,story_list,log_info =
@@ -286,16 +287,6 @@ let compress_and_print logger env log_info step_list =
               error,U.empty_story_table ()
           in 
           let n_weak_stories = U.count_stories weakly_story_table in 
-          let _ = print_newline () in 
-          let n_fail = 0 in (*broken, to do, repair *) 
-	  let _ = 
-            match 
-              n_fail 
-            with 
-            | 0 -> ()
-            | 1 -> Format.fprintf logger "@.\t 1 weak compression has failed@."
-            | n -> Format.fprintf logger "@.\t %i weak compressions have failed@." n_fail 
-          in
           let error,strong_story_table = 
             if strong_compression_on 
             then 
@@ -305,14 +296,15 @@ let compress_and_print logger env log_info step_list =
 		let strong_story_table = U.empty_story_table () in 
 		let error,strong_story_table,log_info =
 		  U.fold_story_table_with_progress_bar logger 
-		      (fun refined_event_list list_info (error,strong_story_table,log_info) -> 
+		      "strong_compression" 
+		    (fun refined_event_list list_info (error,strong_story_table,log_info) -> 
                         let error,log_info,list = U.compress logger parameter handler error log_info refined_event_list in
 			let error,strong_story_table,log_info = 
                           match 
                             list
                           with 
                           | [] -> 
-                             error,(*U.inc_faillure*) strong_story_table,log_info
+                             error,strong_story_table,log_info
                           | _ -> 
 			     List.fold_left
 			       (fun (error,strong_story_table,log_info) list -> 
@@ -329,14 +321,6 @@ let compress_and_print logger env log_info step_list =
 	      end
             else 
               error,U.empty_story_table ()
-          in 
-	  let _ = 
-            match 
-              0 (* broken to do, repair *)
-	    with 
-            | 0 -> ()
-            | 1 -> Format.fprintf logger "@.\t 1 strong compression has failed"
-            | n -> Format.fprintf logger "@.\t %i strong compressions have failed" n
           in 
 	  let _ =
             List.iter 

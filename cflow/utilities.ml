@@ -2,7 +2,7 @@
  * utilities.ml 
  *      
  * Creation:                      <2015-03-28 feret>
- * Last modification: Time-stamp: <2015-11-20 21:41:49 feret>
+ * Last modification: Time-stamp: <2015-11-30 09:43:03 feret>
  * 
  * API for causal compression
  * Jerome Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -272,9 +272,29 @@ let tick_opt bar =
   with 
   | None -> bar
   | Some (logger,n,bar) -> Some (logger,n,Mods.tick_stories logger n bar)
+
+let close_progress_bar_opt logger = 
+  match 
+    logger 
+  with 
+  | None -> ()
+  | Some logger -> Format.pp_print_newline logger () 
+
  
+let print_fails logger s n =
+  match 
+    n 
+  with 
+  | 0 -> ()
+  | 1 -> Format.fprintf logger "@.\t 1 %s has failed@." s
+  | _ -> Format.fprintf logger "@.\t %i %ss have failed@." n s 
+ 
+let inc_fails a a' b = 
+  if a==a'
+  then succ b
+  else b 
     
-let fold_story_table_gen logger f l a =
+let fold_story_table_gen logger logger_fail s f l a =
   let n_stories_input = count_stories l in 
   let progress_bar = 
     match logger
@@ -282,18 +302,23 @@ let fold_story_table_gen logger f l a =
        | Some logger -> 
 	  Some (logger,n_stories_input,Mods.tick_stories logger n_stories_input (false,0,0))
   in
-  let g story info (progress_bar,a) =
-    let a = f story info a in
+  let g story info (progress_bar,a,n_fails) =
+    let a' = f story info a in
     let progress_bar = tick_opt progress_bar in
-    progress_bar,a
+    let n_fails = inc_fails a a' n_fails in 
+    progress_bar,a',n_fails 
   in
-  snd
+  let _,a,n_fails =     
     (List.fold_left
        (fun a x -> fold_story_list g x a)
-       (progress_bar,a) (List.rev l.story_list))
+       (progress_bar,a,0) (List.rev l.story_list))
+  in 
+  let () = close_progress_bar_opt logger in 
+  let () = print_fails logger_fail  s n_fails in 
+  a 
 
-let fold_story_table_with_progress_bar logger = fold_story_table_gen (Some logger) 
-let fold_story_table_without_progress_bar a b c = fold_story_table_gen None a b c 
+let fold_story_table_with_progress_bar logger = fold_story_table_gen (Some logger) logger 
+let fold_story_table_without_progress_bar a = fold_story_table_gen None a
 
 
 let get_counter story_list = story_list.story_counter 
@@ -327,17 +352,22 @@ let store_trace (parameter:parameter) (handler:kappa_handler) (error:error_log) 
   in
   error,story_table,computation_info 
 
-let fold_left_with_progress_bar logger f a l =
+let fold_left_with_progress_bar logger string f a l =
   let n = List.length l in
   let progress_bar = Mods.tick_stories logger n (false,0,0) in
-  snd
+  let _,a,n_fail = 
     (List.fold_left
-       (fun (bar,a) x ->
-	let a = f a x in
+       (fun (bar,a,n_fail) x ->
+	let a' = f a x in
 	let bar = Mods.tick_stories logger n bar in
-	(bar,a))
-       (progress_bar,a)
+	let n_fail = inc_fails a a' n_fail in 
+	(bar,a',n_fail))
+       (progress_bar,a,0)
        l)
+  in 
+  let () = close_progress_bar_opt (Some logger) in 
+  let () = print_fails logger string n_fail in 
+  a 
    
 let flatten_story_table parameter handler error story_table = 
   let error,list = 
