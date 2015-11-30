@@ -103,13 +103,6 @@ module Int2Map_CV_Modif =
 (*type bdu_build_map:
   local information of views that are tested, created and modified with new indexes*)
 
-module Map_creation =
-  SetMap.Make (
-    struct
-      type t = int * int * int
-      let compare = compare
-    end)
-
 module Map_creation_bdu =
   SetMap.Make (
     struct
@@ -132,14 +125,6 @@ module Map_creation_bdu_ag =
   SetMap.Make (
     struct
       type t = int (*agent_type*)
-      let compare = compare
-    end)
-
-(*Test rule*)
-module Map_test =
-  SetMap.Make (
-    struct
-      type t = int * int * int * int
       let compare = compare
     end)
 
@@ -169,13 +154,6 @@ module Map_test_bdu_ag =
     end)
 
 (*modification*)
-
-module Map_modif =
-  SetMap.Make (
-    struct
-      type t = int * int * int * int
-      let compare = compare
-    end)
 
 module Map_modif_list =
   SetMap.Make (
@@ -277,9 +255,6 @@ type bdu_analysis_dynamic =
 type bdu_build =
   {
     store_remanent_triple       : ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;
-    (*store_remanent_test_map     : (int list * (int * int) list) Map_test.Map.t;
-    store_remanent_creation_map : (int list * (int * int) list) Map_creation.Map.t;
-    store_remanent_modif_map    : (int list * (int * int) list) Map_modif.Map.t;*)
     store_bdu_test_restriction_map     :
       (int list * (int * Mvbdu_wrapper.Mvbdu.mvbdu) list) Map_test_bdu.Map.t;
     store_proj_bdu_test_restriction_map :
@@ -293,26 +268,6 @@ type bdu_build =
     store_proj_modif_list_restriction_map :
       (int list * (int * (int * int) list) list) Map_final_modif_list.Map.t
   }
-
-(************************************************************************************)
-(*build covering classes in map and bdu with new indexes for site_type*)
-
-(*type bdu_build_map =
-  {
-    store_creation_bdu_map : 
-    (int list * (int * Mvbdu_wrapper.Mvbdu.mvbdu) list) Map_creation_bdu.Map.t;
-    store_test_bdu_map     :
-      (int list * (int * Mvbdu_wrapper.Mvbdu.mvbdu) list) Map_test_bdu.Map.t;
-    store_modif_list_map   :
-      (int list * (int * (int * int) list) list) Map_modif_list.Map.t;
-    (*projection map of creation with rule_id*)
-    store_final_creation_bdu_map :
-      (int list * (int * Mvbdu_wrapper.Mvbdu.mvbdu) list) Map_final_creation_bdu.Map.t;
-    store_final_test_bdu_map :
-      (int list * (int * Mvbdu_wrapper.Mvbdu.mvbdu) list) Map_final_test_bdu.Map.t;
-    store_final_modif_list_map :
-      (int list * (int * (int * int) list) list) Map_final_modif_list.Map.t
-  }*)
 
 (************************************************************************************)
 (*fixpoint*)
@@ -334,6 +289,5 @@ type bdu_analysic =
       store_bdu_analysis_static  : bdu_analysis_static;
       store_bdu_analysis_dynamic : bdu_analysis_dynamic;
       store_bdu_build            : bdu_build;
-      (*store_bdu_build_map        : bdu_build_map;*)
       store_bdu_fixpoint         : bdu_fixpoint
     }

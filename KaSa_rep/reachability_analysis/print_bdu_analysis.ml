@@ -55,13 +55,6 @@ let print_result parameter error result =
       result.store_bdu_build
   in
   (*------------------------------------------------------------------------------*)
-  (*let _ =
-    print_bdu_build_map
-      parameter
-      error
-      result.store_bdu_build_map
-  in*)
-  (*------------------------------------------------------------------------------*)
   let _ =
     print_bdu_fixpoint
       parameter

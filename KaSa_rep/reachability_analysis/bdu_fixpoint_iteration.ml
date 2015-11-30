@@ -21,7 +21,6 @@ open Memo_sig
 open Site_map_and_set
 open Covering_classes_type
 open Bdu_build
-(*open Bdu_structure*)
 open Fifo
 open Printf
 open Mvbdu_wrapper
@@ -205,9 +204,7 @@ let print_set parameter set =
 (*from rule_id get the bdu_creation, bdu_test, and modif_list*)
 
 let collect_bdu_creation_and_modif_list parameter error rule_id
-    (*    store_bdu_creation_restriction_map*)
     store_proj_bdu_creation_restriction_map
-    (*store_modif_list_restriction_map*)
     store_proj_modif_list_restriction_map
     =
   (*let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in*)
