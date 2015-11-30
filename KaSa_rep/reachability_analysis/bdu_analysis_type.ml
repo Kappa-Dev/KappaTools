@@ -254,19 +254,19 @@ type bdu_analysis_dynamic =
 
 type bdu_build =
   {
-    store_remanent_triple       : ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;
+    store_remanent_triple: ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;
     store_bdu_test_restriction_map     :
-      (int list * (int * Mvbdu_wrapper.Mvbdu.mvbdu) list) Map_test_bdu.Map.t;
+      (int list * (int * Mvbdu_wrapper.Mvbdu.mvbdu)) Map_test_bdu.Map.t;
     store_proj_bdu_test_restriction_map :
-      (int list * (int * Mvbdu_wrapper.Mvbdu.mvbdu) list) Map_final_test_bdu.Map.t;
+      (int list * (int * Mvbdu_wrapper.Mvbdu.mvbdu)) Map_final_test_bdu.Map.t;
     store_bdu_creation_restriction_map :
-      (int list * (int * Mvbdu_wrapper.Mvbdu.mvbdu) list) Map_creation_bdu.Map.t;
+      (int list * (int * Mvbdu_wrapper.Mvbdu.mvbdu)) Map_creation_bdu.Map.t;
     store_proj_bdu_creation_restriction_map :
-      (int list * (int * Mvbdu_wrapper.Mvbdu.mvbdu) list) Map_final_creation_bdu.Map.t;
+      (int list * (int * Mvbdu_wrapper.Mvbdu.mvbdu)) Map_final_creation_bdu.Map.t;
     store_modif_list_restriction_map :
-      (int list * (int * (int * int) list) list) Map_modif_list.Map.t;
+      (int list * (int * (int * int) list)) Map_modif_list.Map.t;
     store_proj_modif_list_restriction_map :
-      (int list * (int * (int * int) list) list) Map_final_modif_list.Map.t
+      (int list * (int * (int * int) list)) Map_final_modif_list.Map.t
   }
 
 (************************************************************************************)

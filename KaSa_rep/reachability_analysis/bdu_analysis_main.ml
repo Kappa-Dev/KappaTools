@@ -254,6 +254,7 @@ let scan_rule_fixpoint parameter handler_bdu error rule_id
     store_proj_bdu_creation_restriction_map
     store_proj_modif_list_restriction_map
     store_proj_bdu_test_restriction_map
+    store_bdu_test_restriction_map
     store_covering_classes_modification_update
     store_result
     =
@@ -277,6 +278,7 @@ let scan_rule_fixpoint parameter handler_bdu error rule_id
       store_proj_bdu_creation_restriction_map
       store_proj_modif_list_restriction_map
       store_proj_bdu_test_restriction_map
+      store_bdu_test_restriction_map
       store_test_has_bond_rhs
       store_covering_classes_modification_update
   in
@@ -350,6 +352,7 @@ let scan_rule parameter handler_bdu error handler_kappa rule_id rule store_cover
       store_bdu_build.store_proj_bdu_creation_restriction_map
       store_bdu_build.store_proj_modif_list_restriction_map
       store_bdu_build.store_proj_bdu_test_restriction_map
+      store_bdu_build.store_bdu_test_restriction_map
       store_bdu_analysis_dynamic.store_covering_classes_modification_update
       store_result.store_bdu_fixpoint
   in

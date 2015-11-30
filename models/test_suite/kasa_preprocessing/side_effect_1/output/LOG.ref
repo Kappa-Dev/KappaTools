@@ -600,20 +600,6 @@ Id=3
      Leaf False 
 
 rule_id:1
-agent_id:0
-Id=3
- Node(site_type:1<1)
-  Id=1
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
 agent_id:1
 Id=3
  Node(site_type:1<1)
@@ -629,20 +615,6 @@ Id=3
      Leaf False 
 
 rule_id:2
-agent_id:0
-Id=3
- Node(site_type:1<1)
-  Id=1
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
 agent_id:1
 Id=3
  Node(site_type:1<1)
@@ -658,20 +630,6 @@ Id=3
      Leaf False 
 
 rule_id:3
-agent_id:0
-Id=3
- Node(site_type:1<1)
-  Id=1
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
 agent_id:1
 Id=3
  Node(site_type:1<1)
@@ -767,8 +725,6 @@ site_type:1:state:0
 ------------------------------------------------------------
 - List for update of the views due to modification (projection per rule):
 rule_id:1
-agent_id:0:
-site_type:1:state:0
 agent_id:1:
 site_type:1:state:0
 rule_id:2
@@ -781,6 +737,4 @@ site_type:1:state:0
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
-** Discovered sites that are bond on the rhs for the first time:
-** Fixpoint iteration function:
 execution finished without any exception

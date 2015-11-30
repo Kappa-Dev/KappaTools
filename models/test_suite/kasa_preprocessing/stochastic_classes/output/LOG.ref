@@ -1014,6 +1014,20 @@ site_type:1:state:1
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
-** Discovered sites that are bond on the rhs for the first time:
-** Fixpoint iteration function:
+agent_type:0:cv_id:0
+Id=1
+ Leaf True 
+
+agent_type:2:cv_id:0
+Id=1
+ Leaf True 
+
+agent_type:4:cv_id:0
+Id=1
+ Leaf True 
+
+agent_type:5:cv_id:0
+Id=1
+ Leaf True 
+
 execution finished without any exception

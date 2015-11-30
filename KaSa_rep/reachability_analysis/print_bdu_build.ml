@@ -46,124 +46,10 @@ let print_remanent_triple parameter error result =
     ) parameter result
 
 (************************************************************************************)
-(*restriction of test rules*)
-
-(*let print_pair_list parameter l =
-  let rec aux acc =
-    match acc with
-    | [] -> []
-    | (site, state) :: tl ->
-      fprintf parameter.log "site_type':%i:state:%i\n" site state;
-      aux tl
-  in aux l
-
-let print_four_list parameter l =
-  let rec aux acc =
-    match acc with
-    | [] -> []
-    | (agent_id, rule_id, cv_id, l) :: tl ->
-      let _ = 
-        fprintf parameter.log
-          "agent_id:%i:rule_id:%i:covering_class_id:%i\n"
-          agent_id rule_id cv_id
-      in
-      let _ = print_pair_list parameter l in
-      aux tl
-  in
-  aux l
-
-let print_remanent_test parameter error result =
-  AgentMap.print error
-    (fun error parameter four_list ->
-      let _ =
-        print_four_list parameter four_list
-      in
-      error
-    ) parameter result*)
-
-(*let print_remanent_test_map parameter error result =
-  Map_test.Map.iter (fun (agent_id, agent_type, rule_id, cv_id) (l1, l2) ->
-    if l1 <> []
-    then ()
-    else
-      ();
-    let _ =
-      fprintf parameter.log
-        "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i@list of pair:\n" 
-        agent_id agent_type rule_id cv_id
-    in
-    List.iter (fun (site, state) ->
-      fprintf parameter.log 
-        "site_type':%i:state:%i\n" site state
-    ) l2
-  ) result*)
-
-(************************************************************************************)
-
-(*let print_triple_list parameter l =
-  let rec aux acc =
-    match acc with
-    | [] -> []
-    | (rule_id, cv_id, l) :: tl ->
-      let _ = 
-        fprintf parameter.log
-          "rule_id:%i:covering_class_id:%i\n"
-          rule_id cv_id
-      in
-      let _ = print_pair_list parameter l in
-      aux tl
-  in
-  aux l
-
-let print_remanent_creation parameter error result =
-  AgentMap.print error
-    (fun error parameter triple_list ->
-      let _ =
-        print_triple_list parameter triple_list
-      in
-      error
-    ) parameter result*)
-
-(*let print_remanent_creation_map parameter error result =
-  Map_creation.Map.iter (fun (agent_type, rule_id, cv_id) (l1, l2) ->
-    if l1 <> []
-    then ()
-    else
-      ();
-    let _ =
-      fprintf parameter.log
-        "agent_type:%i:rule_id:%i:covering_class_id:%i@list of pair:\n" 
-        agent_type rule_id cv_id
-    in
-    List.iter (fun (site, state) ->
-      fprintf parameter.log 
-        "site_type':%i:state:%i\n" site state
-    ) l2
-  ) result*)
-
-(************************************************************************************)
-
-(*let print_remanent_modif_map parameter error result =
-  Map_modif.Map.iter (fun (agent_id, agent_type, rule_id, cv_id) (l1, l2) ->
-    if l1 <> []
-    then ()
-    else
-      ();
-    let _ =
-      fprintf parameter.log
-        "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i@list of pair:\n" 
-        agent_id agent_type rule_id cv_id
-    in
-    List.iter (fun (site, state) ->
-      fprintf parameter.log 
-        "site_type':%i:state:%i\n" site state
-    ) l2
-  ) result
-  *)
 
 let print_test_bdu_map parameter error result =
   Map_test_bdu.Map.iter
-    (fun (agent_id, agent_type, rule_id, cv_id) (l1, l2) ->
+    (fun (agent_id, agent_type, rule_id, cv_id) (l1, (_, bdu_test)) ->
       if l1 <> []
       then ()
       else ();
@@ -172,29 +58,25 @@ let print_test_bdu_map parameter error result =
           "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i\n"
           agent_id agent_type rule_id cv_id
       in
-      List.iter (fun (_, bdu_test) ->
-        Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_test
-      ) l2
+      Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_test
     ) result
 
 let print_proj_test_bdu_map parameter error result =
   Map_final_test_bdu.Map.iter
-    (fun rule_id (l1, l2) ->
+    (fun rule_id (l1, (agent_id, bdu_test)) ->
       if l1 <> []
       then ()
       else ();
       let _ = fprintf parameter.log "rule_id:%i\n" rule_id in
-      List.iter (fun (agent_id, bdu_creation) ->
-        let _ = fprintf parameter.log "agent_id:%i\n" agent_id in
-        Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_creation
-      ) l2
+      let _ = fprintf parameter.log "agent_id:%i\n" agent_id in
+      Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_test
     ) result
 
 (************************************************************************************)
 
 let print_creation_bdu_map parameter error result =
   Map_creation_bdu.Map.iter
-    (fun (agent_type, rule_id, cv_id) (l1,l2) ->
+    (fun (agent_type, rule_id, cv_id) (l1, (_, bdu_creation)) ->
       if l1 <> []
       then ()
       else ();
@@ -202,31 +84,25 @@ let print_creation_bdu_map parameter error result =
         fprintf parameter.log "agent_type:%i:rule_id:%i:covering_class_id:%i\n"
           agent_type rule_id cv_id
       in
-      List.iter (fun (_, bdu_creation) ->
-        Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_creation
-      ) l2
+      Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_creation
     ) result
-
-(*projection*)
 
 let print_proj_creation_bdu_map parameter error result =
   Map_final_creation_bdu.Map.iter
-    (fun rule_id (l1, l2) ->
+    (fun rule_id (l1, (agent_type, bdu_creation)) ->
       if l1 <> []
       then ()
       else ();
       let _ = fprintf parameter.log "rule_id:%i\n" rule_id in
-      List.iter (fun (agent_type, bdu_creation) ->
-        let _ = fprintf parameter.log "agent_type:%i\n" agent_type in
-        Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_creation
-      ) l2
+      let _ = fprintf parameter.log "agent_type:%i\n" agent_type in
+      Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_creation
     ) result
 
 (************************************************************************************)
 
 let print_modif_list_map parameter error result =
   Map_modif_list.Map.iter
-    (fun (agent_id, agent_type, rule_id, cv_id) (l1, l2) ->
+    (fun (agent_id, agent_type, rule_id, cv_id) (l1, (_, l2)) ->
       if l1 <> []
       then ()
       else ();
@@ -235,10 +111,8 @@ let print_modif_list_map parameter error result =
           "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i\n"
           agent_id agent_type rule_id cv_id
       in
-      List.iter (fun (_, l) ->
-        List.iter (fun (site, state) ->
-          fprintf parameter.log "site_type:%i:state:%i\n" site state
-        ) l
+      List.iter (fun (site, state) ->
+        fprintf parameter.log "site_type:%i:state:%i\n" site state
       ) l2
     ) result
 
@@ -246,16 +120,14 @@ let print_modif_list_map parameter error result =
 
 let print_proj_modif_list_map parameter error result =
   Map_final_modif_list.Map.iter
-    (fun rule_id (l1, l2) ->
+    (fun rule_id (l1, (agent_id, l2)) ->
       if l1 <> []
       then ()
       else ();
       let _ = fprintf parameter.log "rule_id:%i\n" rule_id in
-      List.iter (fun (agent_id, l) ->
-        let _ = fprintf parameter.log "agent_id:%i:\n" agent_id in
-        List.iter (fun (site, state) ->
+      let _ = fprintf parameter.log "agent_id:%i:\n" agent_id in
+      List.iter (fun (site, state) ->
           fprintf parameter.log "site_type:%i:state:%i\n" site state
-        ) l
       ) l2
     ) result
 
@@ -271,46 +143,6 @@ let print_bdu_build parameter error result =
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
   in
-  (*------------------------------------------------------------------------------*)
-  (*let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "- Covering classes triple (id, list, set):\n";
-    print_remanent_triple
-      parameter
-      error
-      result.store_remanent_triple
-  in*)
-  (*------------------------------------------------------------------------------*)
-  (*let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "- Valuations of the views that are tested (per rule, agent and covering class):\n\n";
-    print_remanent_test_map
-      parameter
-      error
-      result.store_remanent_test_map
-  in*)
-  (*------------------------------------------------------------------------------*)
-  (*let _ =
-   fprintf (Remanent_parameters.get_log parameter)
-      "\n------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "- Valuations of the views that are created (per rule, agent and covering class):\n\n";
-    print_remanent_creation_map
-      parameter
-      error
-      result.store_remanent_creation_map
-  in*)
-  (*------------------------------------------------------------------------------*)
-  (*let _ =
-   fprintf (Remanent_parameters.get_log parameter)
-      "\n------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "- Update of the views due to modification (per rule, agent and covering class):\n\n";
-    print_remanent_modif_map
-      parameter
-      error
-      result.store_remanent_modif_map
-  in*)
   let _ =
      fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
