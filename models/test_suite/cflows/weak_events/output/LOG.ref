@@ -33,7 +33,7 @@ Stats:
  average length   : 48.6736842105
  geometric mean   : 55.8690197553
 
-	 - causal & weak flow compression (32)
+	 - causal flow compression (32)
 
 ____________________________________________________________
 ############################################################
@@ -46,12 +46,16 @@ Stats:
  average length   : 3.
  geometric mean   : 3.
 
-	 - causal & weak flow compression (32)
+	 - causal flow compression (32)
 
 ____________________________________________________________
 ############################################################
 
 
+	 - weak flow compression (2)
+
+____________________________________________________________
+############################################################
 
 + Pretty printing 32 flows
 + Pretty printing 2 weakly compressed flows

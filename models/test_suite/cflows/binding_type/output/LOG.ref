@@ -37,12 +37,16 @@ Stats:
  average length   : 4.
  geometric mean   : 4.
 
-	 - causal & weak flow compression (100)
+	 - causal flow compression (100)
 
 ____________________________________________________________
 ############################################################
 
 
+	 - weak flow compression (1)
+
+____________________________________________________________
+############################################################
 
 + Pretty printing 1 weakly compressed flow
 Simulation ended

@@ -5,7 +5,7 @@ digraph G{
 { rank = same ; "0" [shape=plaintext] ;
 node_1 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 node_2 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
-node_24 [label="Intro D", shape=house, style=filled, fillcolor=green] ;
+node_25 [label="Intro D", shape=house, style=filled, fillcolor=green] ;
 }
 { rank = same ; "1" [shape=plaintext] ;
 node_3 [label="A(x) -> B(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
@@ -29,7 +29,7 @@ node_23 [label="B(x) -> C(x)", shape=invhouse, style=filled, fillcolor = lightbl
 }
 { rank = same ; "6" [shape=plaintext] ;
 node_9 [label="C(x) -> A(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_25 [label="C(x) -> A(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_24 [label="C(x) -> A(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "7" [shape=plaintext] ;
 node_10 [label="A(x) -> B(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
@@ -110,14 +110,14 @@ node_18 -> node_20
 node_19 -> node_21
 node_21 -> node_22
 node_20 -> node_23
-node_23 -> node_25
+node_23 -> node_24
 node_22 -> node_26
-node_25 -> node_26
+node_24 -> node_26
 node_22 -> node_27
 node_24 -> node_27
 node_25 -> node_27
 node_26 -> node_27
-node_24 -> node_28
+node_25 -> node_28
 node_27 -> node_28
 }
 /*
