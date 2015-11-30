@@ -96,7 +96,7 @@ val print_musical_grid: parameter -> kappa_handler -> error_log  -> musical_grid
 
 
 (** causal flows *)
-val convert_trace_into_grid_while_trusting_side_effects: trace -> kappa_handler -> cflow_grid 
+val convert_trace_into_grid: trace -> kappa_handler -> cflow_grid 
 
 (** compute transitive closure with different parameters (progress_bar, gc) *)
 (* change the names to more explicit ones *)

@@ -410,11 +410,9 @@ let set_compression_mode p x =
 let strongly_compress logger parameter = compress logger (set_compression_mode parameter Parameter.Strong)
 let weakly_compress logger parameter = compress logger (set_compression_mode parameter Parameter.Weak)
 								  
-let convert_trace_into_grid_while_trusting_side_effects trace handler = 
-  let refined_list = 
-    List.rev_map (fun x -> (x,[])) (List.rev (get_pretrace trace))
-  in 
-  D.S.PH.B.PB.CI.Po.K.build_grid refined_list true handler 
+let convert_trace_into_grid trace handler = 
+    let event_list = get_compressed_trace trace in
+    D.S.PH.B.PB.CI.Po.K.build_grid event_list ((*not*) (is_compressed_trace trace)) handler 
     
 let convert_trace_into_musical_notation p h e info x = D.S.PH.B.import p h e info (get_pretrace x)
 

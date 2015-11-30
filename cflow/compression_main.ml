@@ -153,9 +153,8 @@ let compress_and_print logger env log_info step_list =
                   Debug.tag logger "\t\t * causal compression "
               in 
               let log_info = U.D.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
-
 	      (* We use the grid to get the causal precedence (pred* ) of each observable *)
-	      let grid = U.convert_trace_into_grid_while_trusting_side_effects refined_event_list_without_pseudo_inverse handler in
+	      let grid = U.convert_trace_into_grid refined_event_list_without_pseudo_inverse handler in
               let enriched_grid =
 		if cut
 		then
@@ -212,7 +211,7 @@ let compress_and_print logger env log_info step_list =
                     in 
                     let error,log_info,blackboard_cflow = U.convert_trace_into_musical_notation parameter handler error log_info trace_without_pseudo_inverse_events in 
                     let error,observable_hit = U.extract_observable_hit_from_musical_notation "compression_main.ml, line 214, " parameter handler error blackboard_cflow in 		 
-		    let grid = U.convert_trace_into_grid_while_trusting_side_effects trace_without_pseudo_inverse_events handler in 
+		    let grid = U.convert_trace_into_grid trace_without_pseudo_inverse_events handler in 
                     let enriched_grid = U.enrich_small_grid_with_transitive_closure logger grid in 
 		    let error,event_list = U.causal_prefix_of_an_observable_hit "" parameter handler error log_info blackboard_cflow enriched_grid observable_hit in 
 		    let error,causal_story_array,log_info = U.store_trace parameter handler error info log_info  event_list story_list in 
