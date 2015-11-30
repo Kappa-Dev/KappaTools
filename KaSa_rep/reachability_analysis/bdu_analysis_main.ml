@@ -268,7 +268,7 @@ let scan_rule_fixpoint parameter handler_bdu error rule_id
       rule
       store_result.store_test_has_bond_rhs
   in
-  let error, handler_bdu, store_bdu_update_map =
+  let error, (handler_bdu, store_bdu_update_map) =
     collect_bdu_update_map
       parameter
       handler_bdu
