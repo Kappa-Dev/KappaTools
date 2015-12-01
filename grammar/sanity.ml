@@ -21,7 +21,14 @@ let not_enough_specified agent_name (na,pos) =
 *)
 let mixture_part is_creation sigs mix acc =
   let check_a_link agent_name port_name (one,two as acc) = function
-    | (Ast.LNK_TYPE _ | Ast.LNK_SOME | Ast.LNK_ANY),_ ->
+    | Ast.LNK_TYPE (s,a), _ ->
+      let ag_id = Signature.num_of_agent a sigs in
+      let si = Signature.get sigs ag_id in
+      let _ = Signature.num_of_site ~agent_name s si in
+      if is_creation then
+	not_enough_specified agent_name port_name
+      else acc
+    | (Ast.LNK_SOME | Ast.LNK_ANY),_ ->
       if is_creation then
 	not_enough_specified agent_name port_name
       else acc

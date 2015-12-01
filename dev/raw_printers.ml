@@ -1,5 +1,5 @@
 let print_alg = Kappa_printer.alg_expr ?env:None
-let print_bool = Expr.print_bool print_alg
+let print_bool = Ast.print_bool print_alg
 let print_cc = Connected_component.print ?sigs:None true
 let print_place = Agent_place.print ?sigs:None
 let print_transformation = Primitives.Transformation.print ?sigs:None
