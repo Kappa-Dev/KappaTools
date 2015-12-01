@@ -153,4 +153,3 @@ val print_bool :
   Format.formatter -> 'a bool_expr -> unit
 val print_ast_bool :
   Format.formatter -> mixture ast_alg_expr bool_expr -> unit
-
