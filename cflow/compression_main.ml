@@ -20,12 +20,13 @@
 
 module U = Utilities 
 module D = U.D
-
-type secret_log_info = U.D.S.PH.B.PB.CI.Po.K.P.log_info
-type secret_step = D.S.PH.B.PB.CI.Po.K.refined_step
-let init_secret_log_info = U.D.S.PH.B.PB.CI.Po.K.P.init_log_info
-let secret_store_event = D.S.PH.B.PB.CI.Po.K.store_event
-let secret_store_obs = D.S.PH.B.PB.CI.Po.K.store_obs
+module S = U.S
+	     
+type secret_log_info = U.S.PH.B.PB.CI.Po.K.P.log_info
+type secret_step = S.PH.B.PB.CI.Po.K.refined_step
+let init_secret_log_info = U.S.PH.B.PB.CI.Po.K.P.init_log_info
+let secret_store_event = S.PH.B.PB.CI.Po.K.store_event
+let secret_store_obs = S.PH.B.PB.CI.Po.K.store_obs
 
 let old_version = false
 let log_step = true
@@ -44,26 +45,26 @@ let th_of_int n =
   | _ -> (string_of_int n)^"th"
 
 let always = (fun _ -> true)
-let do_not_log parameter = (D.S.PH.B.PB.CI.Po.K.H.set_log_step parameter false)
+let do_not_log parameter = (S.PH.B.PB.CI.Po.K.H.set_log_step parameter false)
 
 										
 let compress_and_print logger env log_info step_list =
-  let parameter = D.S.PH.B.PB.CI.Po.K.H.build_parameter () in
-  let parameter = D.S.PH.B.PB.CI.Po.K.H.set_log_step parameter log_step in
-  let parameter = D.S.PH.B.PB.CI.Po.K.H.set_debugging_mode parameter debug_mode in 
+  let parameter = S.PH.B.PB.CI.Po.K.H.build_parameter () in
+  let parameter = S.PH.B.PB.CI.Po.K.H.set_log_step parameter log_step in
+  let parameter = S.PH.B.PB.CI.Po.K.H.set_debugging_mode parameter debug_mode in 
   let parameter =
     if get_all_stories
-    then D.S.PH.B.PB.CI.Po.K.H.set_all_stories_per_obs parameter 
+    then S.PH.B.PB.CI.Po.K.H.set_all_stories_per_obs parameter 
     else parameter 
   in 
-  let mode = parameter.D.S.PH.B.PB.CI.Po.K.H.compression_mode in
+  let mode = parameter.S.PH.B.PB.CI.Po.K.H.compression_mode in
   let causal_trace_on = Parameter.get_causal_trace mode in
   let weak_compression_on = Parameter.get_weak_compression mode in
   let strong_compression_on = Parameter.get_strong_compression mode in
   let error = U.error_init in       
   let handler =
     {
-      D.S.PH.B.PB.CI.Po.K.H.env = env ;
+      S.PH.B.PB.CI.Po.K.H.env = env ;
     } in
   let error,table1 = U.create_story_table parameter handler error in
   let error,table2 = U.create_story_table parameter handler error in
@@ -78,7 +79,7 @@ let compress_and_print logger env log_info step_list =
     then empty_compression
     else
       begin (* causal compression *)
-        let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_none parameter in
+        let parameter = S.PH.B.PB.CI.Po.K.H.set_compression_none parameter in
 	let error,log_info,step_list = U.remove_events_after_last_obs parameter always handler log_info error step_list in 
         if not (U.has_obs step_list) 
         then
@@ -155,7 +156,7 @@ let compress_and_print logger env log_info step_list =
                 then 
                   Debug.tag logger "\t\t * causal compression "
               in 
-              let log_info = U.D.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
+              let log_info = U.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
 	      (* We use the grid to get the causal precedence (pred* ) of each observable *)
 	      let grid = U.convert_trace_into_grid refined_event_list_without_pseudo_inverse handler in
               let enriched_grid =
@@ -185,7 +186,7 @@ let compress_and_print logger env log_info step_list =
 	      (*logger n_stories in *)
               U.fold_left_with_progress_bar logger "causal compression"  
                 (fun (error,log_info,story_list) observable_id -> 
-		 let log_info = D.S.PH.B.PB.CI.Po.K.P.reset_log log_info in 
+		 let log_info = S.PH.B.PB.CI.Po.K.P.reset_log log_info in 
 		 let () = 
                     if debug_mode
                     then 
@@ -265,7 +266,7 @@ let compress_and_print logger env log_info step_list =
 	      then
 		begin 
                   let () = Format.fprintf logger "\t - weak flow compression (%i)@." n_causal_stories in 
-                  let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_weak parameter in 
+                  let parameter = S.PH.B.PB.CI.Po.K.H.set_compression_weak parameter in 
                   let error,weak_stories_table =  U.create_story_table parameter handler error in 		
                   let error,log_info,weakly_story_table = 
 		    U.fold_story_table_with_progress_bar
@@ -296,7 +297,7 @@ let compress_and_print logger env log_info step_list =
             if strong_compression_on 
             then 
               begin 
-                let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_strong parameter in 
+                let parameter = S.PH.B.PB.CI.Po.K.H.set_compression_strong parameter in 
                 let () = Format.fprintf logger "\t - strong flow compression (%i)@." n_weak_stories in
 		let error,strong_story_table = U.create_story_table parameter handler error in 
 		let error,strong_story_table,log_info =
@@ -313,7 +314,7 @@ let compress_and_print logger env log_info step_list =
                           | _ -> 
 			     List.fold_left
 			       (fun (error,strong_story_table,log_info) list -> 
-				let list_info = List.map (Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy log_info)) list_info in  
+				let list_info = List.map (Mods.update_profiling_info (S.PH.B.PB.CI.Po.K.P.copy log_info)) list_info in  
 				U.store_trace parameter handler error list_info log_info list  strong_story_table) 
 			       (error,strong_story_table,log_info)
 			       list 
@@ -356,7 +357,7 @@ let compress_and_print logger env log_info step_list =
       error 
   in
   let _ =
-    Exception.print_for_KaSim (D.S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error
+    Exception.print_for_KaSim (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error
   in
   ()
     

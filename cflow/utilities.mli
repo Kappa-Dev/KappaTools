@@ -18,16 +18,17 @@
   * et en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
-module D:Dag.Dag
+module D:Dag.StoryTable
+module S:Generic_branch_and_cut_solver.Solver
 	   
 type error_log = Exception.method_handler 
 
 (** error_init is an empty log of errors *)
 val error_init: error_log 
 
-type parameter = D.S.PH.B.PB.CI.Po.K.H.parameter 
-type kappa_handler = D.S.PH.B.PB.CI.Po.K.H.handler 
-type profiling_info = D.S.PH.B.PB.CI.Po.K.P.log_info 
+type parameter = S.PH.B.PB.CI.Po.K.H.parameter 
+type kappa_handler = S.PH.B.PB.CI.Po.K.H.handler 
+type profiling_info = S.PH.B.PB.CI.Po.K.P.log_info 
 		    
 (** traces *)			
 type trace 
@@ -37,7 +38,7 @@ val print_trace: parameter -> kappa_handler -> trace -> unit
 (** check wether there is an observable in a trace *)
 val has_obs: trace -> bool 																								             
 (** convert a list of refined step into a trace *)
-val trace_of_pretrace: D.S.PH.B.PB.CI.Po.K.refined_step list -> trace   
+val trace_of_pretrace: S.PH.B.PB.CI.Po.K.refined_step list -> trace   
 
 (** remove the events after the last observable *)
 val remove_events_after_last_obs: parameter -> (parameter -> bool) -> kappa_handler -> profiling_info -> error_log -> trace -> error_log * profiling_info * trace 
@@ -76,7 +77,7 @@ val fold_story_table_without_progress_bar: Format.formatter -> string -> (trace 
 val flatten_story_table: parameter -> kappa_handler -> error_log -> story_table -> error_log * story_table 
 
        
-type step_id = D.S.PH.B.PB.step_id
+type step_id = S.PH.B.PB.step_id
 type observable_hit 
 val get_event_list_from_observable_hit: observable_hit -> step_id list     
 val get_runtime_info_from_observable_hit: observable_hit -> unit  Mods.simulation_info option
@@ -122,7 +123,7 @@ val count_stories: story_table -> int
 (** Store trace in story table *)
 
 val store_trace: parameter -> kappa_handler -> error_log ->  profiling_info Mods.simulation_info list -> profiling_info  -> trace -> story_table -> error_log * story_table *  profiling_info
-val export_story_table: parameter -> kappa_handler -> error_log -> story_table -> error_log * (Causal.grid * D.S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list
+val export_story_table: parameter -> kappa_handler -> error_log -> story_table -> error_log * (Causal.grid * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list
 
 																			          
 val fold_left_with_progress_bar: Format.formatter -> string -> ('a -> 'b -> 'a) -> 'a -> 'b list -> 'a 
