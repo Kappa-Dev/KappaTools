@@ -39,6 +39,7 @@ module type Dag =
     val print_canonical_form: (canonical_form -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler
     val print_graph: (graph -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler
 
+    val rev: table -> table 
     val insert: 
       (Causal.grid ->
        graph ->
@@ -50,6 +51,10 @@ module type Dag =
 
     val sort_list:
       (table -> S.PH.B.PB.CI.Po.K.H.error_channel * (Causal.grid * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list) S.PH.B.PB.CI.Po.K.H.with_handler 
+    val count_stories: table -> int 
+    val empty_table: (S.PH.B.PB.CI.Po.K.H.error_channel * table) S.PH.B.PB.CI.Po.K.H.with_handler 
+
+    val fold_story_list: ((S.PH.B.PB.CI.Po.K.refined_step list  -> S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list -> 'a -> 'a) -> table -> 'a -> S.PH.B.PB.CI.Po.K.H.error_channel * 'a) S.PH.B.PB.CI.Po.K.H.with_handler 
   end
 
 
@@ -621,10 +626,11 @@ module Dag =
 			   
 
       type outer_tree = 
-	| Outer_node of (outer_tree PreHashMap.t * story_id option)
-	| Outer_leave of (prehash_elt list * story_id)
-	| To_inner of (outer_tree PreHashMap.t * inner_tree)
-				     
+      | Empty
+      | Outer_node of (outer_tree PreHashMap.t * story_id option)
+      | Outer_leave of (prehash_elt list * story_id)
+      | To_inner of (outer_tree PreHashMap.t * inner_tree)
+	  
       type table =
 	{
 	  tree: outer_tree;
@@ -632,6 +638,13 @@ module Dag =
 	  fresh_id: story_id 
 	}
 	
+
+      let empty_table parameters _ error= 
+	let _,array =  Int_storage.Nearly_inf_Imperatif.create (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameters) (Exception.empty_error_handler) 0 in (* to do plug errors *)
+	error,{
+	  tree= Empty; 
+	  array= array;
+	  fresh_id= 0 }
 
       let get_cannonical_form parameter handler error id table =
 	let _,assoc = (* to do plug errors *)
@@ -941,4 +954,17 @@ module Dag =
 	       (fun parameter error _ (a,b,c,d,e) l -> error,(a,e)::l)
 	       table.array 
 	       [])
+      let rev a = a 
+      let count_stories table = table.fresh_id
+
+      let fold_story_list parameter handler error f table a =  
+	error,	
+	snd (Int_storage.Nearly_inf_Imperatif.fold 
+	       (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter)
+	       (Exception.empty_error_handler)
+	       (fun parameter error _ (_,_,_,d,e) a -> error,
+		 f d e a)
+	       table.array 
+	       a)
+	
     end:Dag)
