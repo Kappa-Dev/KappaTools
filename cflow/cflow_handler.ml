@@ -39,24 +39,16 @@ module type Cflow_handler =
 	  log_step_channel : Format.formatter ;
 	  kasa : Remanent_parameters_sig.parameters ;
         } (*a struct which contains parameterizable options*)
-    type error
-    type error_channel = error list (*a list which contains the errors so far*)
     type handler =   (*handler to interpret abstract values*)
         {
           env: Environment.t ;
         }
-    type 'a with_handler = parameter -> handler -> error_channel -> 'a
+    type 'a with_handler = parameter -> handler -> Exception.method_handler -> 'a
 
     val set_first_story_per_obs: parameter -> parameter  
     val set_all_stories_per_obs: parameter -> parameter 
     val build_parameter: unit -> parameter
     val string_of_exn: exn -> string option
-    val error_init: error_channel
-    val create_error:
-      (string option -> string option -> string option -> string option -> string option -> exn -> error_channel * error) with_handler
-    val add_error: (error -> error_channel) with_handler
-    val raise_error:  (error -> 'a -> error_channel * 'a) with_handler
-    val dump_error: (error -> unit) with_handler
     val set_compression_weak: parameter -> parameter
     val set_compression_strong: parameter -> parameter
     val set_compression_none: parameter -> parameter
@@ -123,67 +115,16 @@ module Cflow_handler =
       {p with current_compression_mode = Some Parameter.Causal}
 
 
-    type error =
-        {
-          caml_file: string option;
-          caml_module: string option;
-          caml_function: string option;
-          caml_line: string option;
-          error_message: string option;
-          exn: exn
-        }
-
-    type error_channel = error list
+   
     type handler =
         {
           env: Environment.t ;
         }
 
-    type 'a with_handler = parameter -> handler -> error_channel -> 'a
+    type 'a with_handler = parameter -> handler -> Exception.method_handler -> 'a
 
-    let error_init = []
-    let create_error parameter handler error file modu fun_name line message exn =
-      error,
-      {
-        caml_file=file;
-        caml_function=fun_name;
-        caml_module=modu;
-        caml_line=line;
-        error_message=message;
-        exn=exn
-      }
-
-    let add_error parameter handler error_list error =
-      error::error_list
-
+   
     let string_of_exn x = Some ""
-
-    let dump_error parameter handler error_list error  =
-      let log = parameter.out_channel_err in
-      let f prefix suffix mes =
-        match mes with
-        | None -> ()
-        | Some mes ->
-           Format.fprintf log "%s%s%s" prefix mes suffix
-      in
-      let g s = Format.fprintf log "%s" s in
-      let _ = g "Internal Error\n" in
-      let _ = f "File: " "\n" error.caml_file in
-      let _ = f "Line: " "\n" error.caml_line in
-      let _ = f "message: " "\n" error.error_message in
-      let _ = f "function: " "\n" error.caml_function in
-      let _ = f "module: " "\n" error.caml_module in
-      let _ = f "error " "has been raised\n%!" (string_of_exn error.exn) in
-      ()
-
-    let raise_error parameter handler error_list error def =
-      if Parameter.interrupt_on_exception
-      then
-        let () = dump_error parameter handler error_list error in
-        raise error.exn
-      else
-        let error_list = add_error parameter handler error_list error in
-        error_list,def
 
     let get_priorities parameter =
       match parameter.current_compression_mode with

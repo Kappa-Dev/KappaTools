@@ -26,9 +26,7 @@
      module A:LargeArray.GenArray 
 
      val cut:
-       (Po.K.refined_step list -> Po.K.H.error_channel * ( (Po.K.refined_step list) * int)) Po.K.H.with_handler
-  (*   val do_not_cut:
-       (Po.K.refined_step list -> Po.K.H.error_channel * (Po.K.refined_step list) * int) Po.K.H.with_handler*)
+       (Po.K.refined_step list -> Exception.method_handler * ( (Po.K.refined_step list) * int)) Po.K.H.with_handler
    end
 
  module Pseudo_inv = 

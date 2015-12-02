@@ -28,18 +28,18 @@ module type Dag =
     type prehash
     type canonical_form 
        
-    val graph_of_grid: (Causal.grid -> S.PH.B.PB.CI.Po.K.H.error_channel * graph) S.PH.B.PB.CI.Po.K.H.with_handler
-    val graph_of_config: (Causal.config -> S.PH.B.PB.CI.Po.K.H.error_channel * graph) S.PH.B.PB.CI.Po.K.H.with_handler
-    val dot_of_graph: (graph -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler
-    val prehash: (graph -> S.PH.B.PB.CI.Po.K.H.error_channel * prehash) S.PH.B.PB.CI.Po.K.H.with_handler
-    val canonicalize: (graph -> S.PH.B.PB.CI.Po.K.H.error_channel * canonical_form) S.PH.B.PB.CI.Po.K.H.with_handler
+    val graph_of_grid: (Causal.grid -> Exception.method_handler * graph) S.PH.B.PB.CI.Po.K.H.with_handler
+    val graph_of_config: (Causal.config -> Exception.method_handler * graph) S.PH.B.PB.CI.Po.K.H.with_handler
+    val dot_of_graph: (graph -> Exception.method_handler) S.PH.B.PB.CI.Po.K.H.with_handler
+    val prehash: (graph -> Exception.method_handler * prehash) S.PH.B.PB.CI.Po.K.H.with_handler
+    val canonicalize: (graph -> Exception.method_handler * canonical_form) S.PH.B.PB.CI.Po.K.H.with_handler
       
-    val print_prehash: (prehash -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler
-    val print_canonical_form: (canonical_form -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler
-    val print_graph: (graph -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler
+    val print_prehash: (prehash -> Exception.method_handler) S.PH.B.PB.CI.Po.K.H.with_handler
+    val print_canonical_form: (canonical_form -> Exception.method_handler) S.PH.B.PB.CI.Po.K.H.with_handler
+    val print_graph: (graph -> Exception.method_handler) S.PH.B.PB.CI.Po.K.H.with_handler
 
     val hash_list:
-      ((prehash * (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list) list -> S.PH.B.PB.CI.Po.K.H.error_channel * (prehash * (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list  * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list) list) S.PH.B.PB.CI.Po.K.H.with_handler
+      ((prehash * (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list) list -> Exception.method_handler * (prehash * (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list  * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list) list) S.PH.B.PB.CI.Po.K.H.with_handler
 
     val sort_list:
       (prehash * (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list ) list) list -> (Causal.grid * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list

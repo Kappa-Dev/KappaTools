@@ -16,7 +16,7 @@ let debug_mode = false
 		   
 module D=Dag.Dag
 
-type error_log =  D.S.PH.B.PB.CI.Po.K.H.error_channel
+type error_log =  Exception.method_handler 
 type parameter =  D.S.PH.B.PB.CI.Po.K.H.parameter
 type kappa_handler = D.S.PH.B.PB.CI.Po.K.H.handler 
 type profiling_info = D.S.PH.B.PB.CI.Po.K.P.log_info
@@ -206,7 +206,7 @@ let get_list_order a = a.list_of_actions
 module Profiling = D.S.PH.B.PB.CI.Po.K.P
 
 		     
-let error_init = D.S.PH.B.PB.CI.Po.K.H.error_init
+let error_init = Exception.empty_error_handler 
 	    
 let extract_observable_hits_from_musical_notation a b c d = 
   let error,l = D.S.PH.forced_events a b c d in 

@@ -24,17 +24,17 @@ module type Solver =
   (sig 
     module PH:Propagation_heuristics.Blackboard_with_heuristic
 
-    val compress: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.update_order list -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard * PH.B.assign_result  * PH.B.result list) PH.B.PB.CI.Po.K.H.with_handler
+    val compress: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.update_order list -> Exception.method_handler * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard * PH.B.assign_result  * PH.B.result list) PH.B.PB.CI.Po.K.H.with_handler
       
-    val detect_independent_events: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.B.PB.step_id list -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.P.log_info * PH.B.PB.step_id list) PH.B.PB.CI.Po.K.H.with_handler
+    val detect_independent_events: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.B.PB.step_id list -> Exception.method_handler * PH.B.PB.CI.Po.K.P.log_info * PH.B.PB.step_id list) PH.B.PB.CI.Po.K.H.with_handler
 
-    val filter: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.B.PB.step_id list -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
+    val filter: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.B.PB.step_id list -> Exception.method_handler * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
 
-    val sub: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.PB.CI.Po.K.refined_step list -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
+    val sub: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.PB.CI.Po.K.refined_step list -> Exception.method_handler * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
 
-    val clean: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
+    val clean: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> Exception.method_handler * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
 
-    val translate: (PH.B.blackboard -> PH.B.PB.step_id list -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.refined_step list * PH.B.result) PH.B.PB.CI.Po.K.H.with_handler 
+    val translate: (PH.B.blackboard -> PH.B.PB.step_id list -> Exception.method_handler * PH.B.PB.CI.Po.K.refined_step list * PH.B.result) PH.B.PB.CI.Po.K.H.with_handler 
     val translate_result: PH.B.result -> PH.B.PB.CI.Po.K.refined_step list 
 
    end)
@@ -44,7 +44,11 @@ module Solver =
 struct 
   module PH= Propagation_heuristics.Propagation_heuristic 
 (*Blackboard_with_heuristic*)
-    
+
+  let warn parameter error option exn default = 
+       Exception.warn (PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error (Some "generic_branch_and_cut_solver.ml") option exn (fun () -> default)
+
+	       
   let combine_output o1 o2 = 
     if PH.B.is_ignored o2 then o1 else o2 
       
@@ -90,9 +94,8 @@ struct
     match stack.current
     with 
       | t::q -> error,(t,{stack with current=q})
-      | [] -> 
-        let error_list,error = PH.B.PB.CI.Po.K.H.create_error parameter handler error (Some "generic_branch_and_cut_solver.ml") None (Some "cut_choice_list") (Some "107") (Some "Empty choice stack") (failwith "Empty choice list in pop_next_choice") in 
-        PH.B.PB.CI.Po.K.H.raise_error parameter handler error_list error (PH.dummy_update_order,stack)
+      | [] ->
+	 warn parameter error (Some "cut_choice_list, line 107, Empty choice stack") (Failure "Empty choice list in pop_next_choice") (PH.dummy_update_order,stack)
 
   let no_more_choice stack = 
     match stack.current
@@ -160,9 +163,7 @@ struct
 	   let error,() =
 	     if choice_list.current <> [] 
 	     then 
-		let error_list,error = PH.B.PB.CI.Po.K.H.create_error parameter handler error (Some "generic_branch_and_cut_solver.ml") None (Some "iter") (Some "__LOC__") (Some "In case of success, the current list of choices should be empty") (failwith "In case of success, the current list of choices should be empty")
-		in 
-		PH.B.PB.CI.Po.K.H.raise_error parameter handler error_list error ()
+		warn parameter error (Some "iter, line 166, In case of success, the current list of choices should be empty") (Failure "In case of success, the current list of choices should be empty") ()
 	     else 
 	       error,()
 	   in 

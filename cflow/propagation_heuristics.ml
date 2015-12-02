@@ -32,12 +32,12 @@ module type Blackboard_with_heuristic =
     
     val dummy_update_order: update_order
      (** heuristics *)
-    val forced_events: (B.blackboard -> B.PB.CI.Po.K.H.error_channel * (update_order list * B.PB.step_id list * unit Mods.simulation_info option) list) B.PB.CI.Po.K.H.with_handler 
-    val forbidden_events: (B.PB.step_id list -> B.PB.CI.Po.K.H.error_channel * update_order list) B.PB.CI.Po.K.H.with_handler 
-    val next_choice: (B.blackboard -> B.PB.CI.Po.K.H.error_channel * update_order list) B.PB.CI.Po.K.H.with_handler 
-    val apply_instruction: (B.PB.CI.Po.K.P.log_info -> B.blackboard -> update_order -> update_order list -> propagation_check list -> B.PB.CI.Po.K.H.error_channel * B.PB.CI.Po.K.P.log_info * B.blackboard * update_order list * propagation_check list * B.assign_result) B.PB.CI.Po.K.H.with_handler 
+    val forced_events: (B.blackboard -> Exception.method_handler * (update_order list * B.PB.step_id list * unit Mods.simulation_info option) list) B.PB.CI.Po.K.H.with_handler 
+    val forbidden_events: (B.PB.step_id list -> Exception.method_handler * update_order list) B.PB.CI.Po.K.H.with_handler 
+    val next_choice: (B.blackboard -> Exception.method_handler * update_order list) B.PB.CI.Po.K.H.with_handler 
+    val apply_instruction: (B.PB.CI.Po.K.P.log_info -> B.blackboard -> update_order -> update_order list -> propagation_check list -> Exception.method_handler * B.PB.CI.Po.K.P.log_info * B.blackboard * update_order list * propagation_check list * B.assign_result) B.PB.CI.Po.K.H.with_handler 
 
-    val propagate: (B.PB.CI.Po.K.P.log_info ->B.blackboard -> propagation_check -> update_order list -> propagation_check list -> B.PB.CI.Po.K.H.error_channel * B.PB.CI.Po.K.P.log_info * B.blackboard * update_order list * propagation_check list * B.assign_result) B.PB.CI.Po.K.H.with_handler
+    val propagate: (B.PB.CI.Po.K.P.log_info ->B.blackboard -> propagation_check -> update_order list -> propagation_check list -> Exception.method_handler * B.PB.CI.Po.K.P.log_info * B.blackboard * update_order list * propagation_check list * B.assign_result) B.PB.CI.Po.K.H.with_handler
    
   end 
 
@@ -45,6 +45,9 @@ module Propagation_heuristic =
   (struct 
 
     module B=(Blackboard.Blackboard:Blackboard.Blackboard) 
+
+    let warn parameter error option exn default = 
+       Exception.warn (B.PB.CI.Po.K.H.get_kasa_parameters parameter) error (Some "propagation_heuristic.ml") option exn (fun () -> default)
 
     type update_order = 
       | Keep_event of B.PB.step_id
@@ -55,7 +58,8 @@ module Propagation_heuristic =
       | Skip 
 
     let dummy_update_order = Skip 
-
+			       
+			       
     type propagation_check = 
       | Propagate_up of B.event_case_address
       | Propagate_down of B.event_case_address
@@ -141,8 +145,7 @@ module Propagation_heuristic =
            with 
            | Some x -> error,x.Priority.max_level
            | None -> 
-             let error_list,error = B.PB.CI.Po.K.H.create_error parameter handler error (Some "propagation_heuristic.ml") None (Some "next_choice") (Some "145") (Some "Compression mode has to been selected") (failwith "Compression mode has not been selected") in 
-          B.PB.CI.Po.K.H.raise_error parameter handler error_list error Priority.zero
+             warn parameter error (Some "next_choice, line 145, Compression mode has to been selected") (Failure "Compression mode has not been selected") Priority.zero
       in 
       let n_p_id = B.get_npredicate_id blackboard in 
       let error,list  = 
@@ -219,9 +222,8 @@ module Propagation_heuristic =
                   begin 
                       (* The blackboard is inconsistent: *)
                       (* Pointers should not point to removed events.*)
-                    let error,unit = 
-                      let error_list,error = B.PB.CI.Po.K.H.create_error parameter handler error (Some "propagation_heuristic.ml") None (Some "propagate_down") (Some "154") (Some "inconsistent pointers in blackboard") (failwith "inconsistent pointers in blackboard") in 
-                      B.PB.CI.Po.K.H.raise_error parameter handler error_list error () 
+                    let error,() = 
+                      warn parameter error (Some "propagate_down, line 154, inconsistent pointers in blackboard") (Failure "inconsistent pointers in blackboard") () 
                     in 
                     error,
                     log_info,

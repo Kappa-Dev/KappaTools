@@ -40,8 +40,8 @@ sig
   type pre_blackboard  (*blackboard during its construction*)
 
   val weakening: predicate_value -> predicate_value list 
-  val conj: (predicate_value -> predicate_value -> CI.Po.K.H.error_channel * predicate_value) CI.Po.K.H.with_handler
-  val disjunction: (predicate_value -> predicate_value -> CI.Po.K.H.error_channel * predicate_value) CI.Po.K.H.with_handler  
+  val conj: (predicate_value -> predicate_value -> Exception.method_handler * predicate_value) CI.Po.K.H.with_handler
+  val disjunction: (predicate_value -> predicate_value -> Exception.method_handler * predicate_value) CI.Po.K.H.with_handler  
  
   val defined: predicate_value
   val undefined: predicate_value 
@@ -53,26 +53,26 @@ sig
   val strictly_more_refined: predicate_value -> predicate_value -> bool 
   val get_pre_column_map_inv: pre_blackboard -> predicate_info A.t
   (** generation*)
-  val init:  ((*CI.Po.K.P.log_info ->*) CI.Po.K.H.error_channel * pre_blackboard) CI.Po.K.H.with_handler 
-  val add_step: (CI.Po.K.P.log_info -> CI.Po.K.refined_step -> pre_blackboard -> step_id -> CI.Po.K.H.error_channel * CI.Po.K.P.log_info * pre_blackboard * step_id) CI.Po.K.H.with_handler
-  val add_step_up_to_iso: (CI.Po.K.P.log_info -> CI.Po.K.refined_step -> pre_blackboard -> step_id -> CI.Po.K.H.error_channel * CI.Po.K.P.log_info * pre_blackboard * step_id) CI.Po.K.H.with_handler
-  val finalize: (CI.Po.K.P.log_info -> pre_blackboard -> CI.Po.K.H.error_channel * CI.Po.K.P.log_info * pre_blackboard) CI.Po.K.H.with_handler 
+  val init:  ((*CI.Po.K.P.log_info ->*) Exception.method_handler * pre_blackboard) CI.Po.K.H.with_handler 
+  val add_step: (CI.Po.K.P.log_info -> CI.Po.K.refined_step -> pre_blackboard -> step_id -> Exception.method_handler * CI.Po.K.P.log_info * pre_blackboard * step_id) CI.Po.K.H.with_handler
+  val add_step_up_to_iso: (CI.Po.K.P.log_info -> CI.Po.K.refined_step -> pre_blackboard -> step_id -> Exception.method_handler * CI.Po.K.P.log_info * pre_blackboard * step_id) CI.Po.K.H.with_handler
+  val finalize: (CI.Po.K.P.log_info -> pre_blackboard -> Exception.method_handler * CI.Po.K.P.log_info * pre_blackboard) CI.Po.K.H.with_handler 
 
   (**pretty printing*)
   val string_of_predicate_value: predicate_value -> string 
   val print_predicate_value: Format.formatter ->  predicate_value -> unit
-  val print_preblackboard: (pre_blackboard -> CI.Po.K.H.error_channel) CI.Po.K.H.with_handler  
+  val print_preblackboard: (pre_blackboard -> Exception.method_handler) CI.Po.K.H.with_handler  
 
   (**interface*)
-  val n_events: (pre_blackboard -> CI.Po.K.H.error_channel * int) CI.Po.K.H.with_handler 
-  val n_predicates: (pre_blackboard -> CI.Po.K.H.error_channel * int) CI.Po.K.H.with_handler 
-  val n_events_per_predicate: (pre_blackboard -> predicate_id -> CI.Po.K.H.error_channel * int) CI.Po.K.H.with_handler 
-  val event_list_of_predicate: (pre_blackboard -> predicate_id -> CI.Po.K.H.error_channel * (int * int * predicate_value * predicate_value ) list) CI.Po.K.H.with_handler 
-  val mandatory_events: (pre_blackboard -> CI.Po.K.H.error_channel * ((int list * unit Mods.simulation_info option) list)) CI.Po.K.H.with_handler 
-  val get_pre_event: (pre_blackboard -> CI.Po.K.H.error_channel * CI.Po.K.refined_step A.t) CI.Po.K.H.with_handler 
-  val get_side_effect: (pre_blackboard -> CI.Po.K.H.error_channel * CI.Po.K.side_effect A.t) CI.Po.K.H.with_handler 
-  val get_fictitious_observable: (pre_blackboard -> CI.Po.K.H.error_channel * int option) CI.Po.K.H.with_handler 
-  val get_level_of_event: (pre_blackboard -> step_id -> CI.Po.K.H.error_channel * Priority.level) CI.Po.K.H.with_handler 
+  val n_events: (pre_blackboard -> Exception.method_handler * int) CI.Po.K.H.with_handler 
+  val n_predicates: (pre_blackboard -> Exception.method_handler * int) CI.Po.K.H.with_handler 
+  val n_events_per_predicate: (pre_blackboard -> predicate_id -> Exception.method_handler * int) CI.Po.K.H.with_handler 
+  val event_list_of_predicate: (pre_blackboard -> predicate_id -> Exception.method_handler * (int * int * predicate_value * predicate_value ) list) CI.Po.K.H.with_handler 
+  val mandatory_events: (pre_blackboard -> Exception.method_handler * ((int list * unit Mods.simulation_info option) list)) CI.Po.K.H.with_handler 
+  val get_pre_event: (pre_blackboard -> Exception.method_handler * CI.Po.K.refined_step A.t) CI.Po.K.H.with_handler 
+  val get_side_effect: (pre_blackboard -> Exception.method_handler * CI.Po.K.side_effect A.t) CI.Po.K.H.with_handler 
+  val get_fictitious_observable: (pre_blackboard -> Exception.method_handler * int option) CI.Po.K.H.with_handler 
+  val get_level_of_event: (pre_blackboard -> step_id -> Exception.method_handler * Priority.level) CI.Po.K.H.with_handler 
   val levels: pre_blackboard -> Priority.level A.t
   val print_predicate_info: Format.formatter -> predicate_info -> unit
 end
@@ -81,10 +81,13 @@ module Preblackboard =
   (struct 
 
      (** Useful modules *)
-     module H = Cflow_handler.Cflow_handler
+
      module A = Mods.DynArray
      module CI = Pseudo_inverse.Pseudo_inv
 
+     let warn parameter error option exn default = 
+       Exception.warn (CI.Po.K.H.get_kasa_parameters parameter) error (Some "blackboard_generation.ml") option exn (fun () -> default)
+		      
      (** blackboard matrix*) 
 
      type step_id = int       (** global id of an event *)
@@ -375,9 +378,8 @@ module Preblackboard =
            else 
              if strictly_more_refined y x then error,y 
              else 
-               let error_list,error = CI.Po.K.H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "conj") (Some "323") (Some "Arguments have no greatest lower bound") (failwith "Arguments have no greatest lower bound")  in 
-               CI.Po.K.H.raise_error parameter handler error_list error Undefined  
-                 
+               warn parameter error (Some "conj, line 378, Arguments have no greatest lower bound") (Failure "Arguments have no greatest lower bound") Undefined
+			      
          let compatible x y = 
            x=y || more_refined x y || more_refined y x
            
@@ -426,54 +428,52 @@ module Preblackboard =
              error,blackboard 
            with 
                Not_found ->
-                 let error_list,error = 
-                   CI.Po.K.H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "bind") (Some "375") (Some "Out of bound access") (failwith "bind") in 
-                 CI.Po.K.H.raise_error parameter handler error_list error blackboard 
-         and 
+	     warn parameter error (Some "bind, line 428, Out of bound access")  (Failure "bind") blackboard
+		   and 
              allocate parameter handler error blackboard predicate  = 
-           let ag_id = agent_id_of_predicate predicate in 
-           let map = blackboard.pre_column_map in 
-           let map_inv = blackboard.pre_column_map_inv in 
-           match PredicateMap.find_option predicate map with
-           | Some sid -> error,blackboard,sid
-	   | None ->
-               let sid'= blackboard.pre_ncolumn + 1 in 
-               let map' = PredicateMap.add predicate sid' map in 
-               let _  = A.set map_inv sid' predicate in 
-               let map_inv' = map_inv in 
-               let _ = A.set blackboard.history_of_predicate_values_to_predicate_id sid' (C.create parameter.CI.Po.K.H.cache_size) in 
-               let blackboard = 
-                 {blackboard 
+             let ag_id = agent_id_of_predicate predicate in 
+             let map = blackboard.pre_column_map in 
+             let map_inv = blackboard.pre_column_map_inv in 
+             match PredicateMap.find_option predicate map with
+             | Some sid -> error,blackboard,sid
+	     | None ->
+		let sid'= blackboard.pre_ncolumn + 1 in 
+		let map' = PredicateMap.add predicate sid' map in 
+		let _  = A.set map_inv sid' predicate in 
+		let map_inv' = map_inv in 
+		let _ = A.set blackboard.history_of_predicate_values_to_predicate_id sid' (C.create parameter.CI.Po.K.H.cache_size) in 
+		let blackboard = 
+                  {blackboard 
                   with 
                     pre_ncolumn = sid' ; 
                     pre_column_map = map' ;
                     pre_column_map_inv = map_inv' 
-                 }
-               in 
-               let error,blackboard = 
-                 match ag_id 
-                 with 
-                   | None -> 
+                  }
+		in 
+		let error,blackboard = 
+                  match ag_id 
+                  with 
+                  | None -> 
                      error, blackboard 
-                   | Some ag_id -> 
+                  | Some ag_id -> 
                      bind parameter handler error blackboard predicate sid' ag_id 
-               in 
-               error,blackboard,sid' 
-
+		in 
+		error,blackboard,sid' 
+				   
          let create_agent _parameter _handler error blackboard agent_name agent_id  = 
            let old_list = 
              try 
                A.get blackboard.history_of_agent_ids_of_type agent_name 
              with 
                Not_found -> 
-                 []
+               []
            in 
            let new_list = agent_id::old_list in 
            let _ = A.set blackboard.history_of_agent_ids_of_type agent_name new_list in 
            error,blackboard 
-
-
-                 
+		   
+		   
+                   
          let free_agent parameter handler error blackboard agent_id = 
            let error,blackboard,predicate_id = 
              allocate parameter handler error blackboard (Here agent_id)  in 
@@ -482,9 +482,7 @@ module Preblackboard =
                error,A.get blackboard.predicate_id_list_related_to_predicate_id predicate_id
              with 
                | _ -> 
-                 let error_list,error = 
-                   CI.Po.K.H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "free_agent") (Some "418") (Some "Try to free an unexisting agent") (failwith "free_agent") in 
-                 CI.Po.K.H.raise_error parameter handler error_list error PredicateidSet.empty 
+                  warn parameter error (Some "free_agent, line 485, Try to free an unexisting agent") (Failure "free_agent")  PredicateidSet.empty 
            in 
            let map = 
              PredicateidSet.fold 
@@ -735,9 +733,8 @@ module Preblackboard =
              error,A.get blackboard.pre_level_of_event eid 
            with 
              Not_found -> 
-               let error_list,error = CI.Po.K.H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "conj") (Some "323") (Some "Arguments have no greatest lower bound") (failwith "Arguments have no greatest lower bound")  in 
-               CI.Po.K.H.raise_error parameter handler error_list error Priority.default 
-
+             warn parameter error (Some "get_level_of_event, line 736") (Failure "UNknown event") Priority.default
+		  
          let init_fictitious_action log_info error predicate_id blackboard = 
            let nsid = blackboard.pre_nsteps+1 in 
            let log_info = CI.Po.K.P.inc_n_side_events log_info in 
@@ -777,10 +774,8 @@ module Preblackboard =
            with 
              | Defined | Counter _ | Internal_state_is _ | Undefined | Pointer_to_agent _ 
              | Present | Bound | Bound_to_type _ | Unknown -> 
-               let error,error_list = 
-                 CI.Po.K.H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "side_effects") (Some "602") (Some "Illegal state for a side-effects") (failwith "Blackboard_generation.side_effect") in 
-               CI.Po.K.H.raise_error parameter handler error error_list []
-             | Free -> 
+						    warn parameter error  (Some "side_effects, line 602, Illegal state for a side-effects") (Failure "Blackboard_generation.side_effect") []
+	     | Free -> 
                error,[predicate_target_id,None,(Free,Unknown)]
              | Bound_to (pid,ag,ag_na,sname) -> 
                error,[predicate_target_id,None,(s,Unknown);
@@ -794,10 +789,8 @@ module Preblackboard =
              | Instantiation.BOUND_TYPE bt ->
 		error,Bound_to_type (CI.Po.K.agent_name_of_binding_type bt,CI.Po.K.site_name_of_binding_type bt)
              | Instantiation.BOUND_to _ ->
-		let error_list,error =
-                  CI.Po.K.H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "predicate_value_of_binding_state") (Some "620") (Some "Illegal binding state in predicate_value_of_binding_state") (failwith "predicate_value_of_binding_state") in
-		CI.Po.K.H.raise_error parameter handler error_list error Unknown
-                 
+		warn parameter error (Some "predicate_value_of_binding_state, line 794, Illegal binding state in predicate_value_of_binding_state") (Failure "predicate_value_of_binding_state") Unknown
+	         
          let potential_target error parameter handler blackboard site binding_state =
            let agent_id = CI.Po.K.agent_id_of_site site in 
            let site_name = CI.Po.K.site_name_of_site site in 
@@ -2693,17 +2686,15 @@ according to the corresponding substitution *)
              error,snd (A.get blackboard.pre_steps_by_column predicate_id) 
            with 
              | _ -> 
-               let error_list,error = CI.Po.K.H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "event_list_of_predicate") (Some "881") (Some "Unknown predicate id") (failwith "event_list_of_predicate") in 
-               CI.Po.K.H.raise_error parameter handler error_list error []
-                 
+		warn parameter error (Some "event_list_of_predicate, line 2690, Unknown predicate id")  (Failure "event_list_of_predicate") []
+	         
          let n_events_per_predicate parameter handler error blackboard predicate_id = 
            try 
              error,fst (A.get blackboard.pre_steps_by_column predicate_id) 
            with 
              | _ -> 
-               let error_list,error = CI.Po.K.H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "n_events_per_predicate") (Some "889") (Some "Unknown predicate id") (failwith "n_events_per_predicate") in 
-               CI.Po.K.H.raise_error parameter handler error_list error 0
-                 
+		warn parameter error  (Some "n_events_per_predicate, line 2696, Unknown predicate id") (Failure "n_events_per_predicate") 0
+	         
          let n_events _parameter _handler error blackboard = 
            error,blackboard.pre_nsteps+1 
              

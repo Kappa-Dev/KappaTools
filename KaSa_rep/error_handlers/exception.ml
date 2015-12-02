@@ -131,34 +131,39 @@ let warn parameters =
   if Remanent_parameters.get_unsafe parameters 
   then unsafe_warn parameters 
   else safe_warn parameters 
-      
+
+let print_for_KaSim parameters handlers =
+  let parameters = Remanent_parameters.update_prefix parameters "error: " in   
+  let _ = 
+    List.iter 
+      (fun caught -> 
+       let stringlist = (Remanent_parameters.get_prefix parameters)::(stringlist_of_caught caught []) in 
+       let _ = List.iter (Printf.fprintf (Remanent_parameters.get_log parameters) "%s") stringlist in 
+       let _ = Printf.fprintf  (Remanent_parameters.get_log parameters) "\n" in 
+       ())
+      (List.rev (handlers.mh_caught_error_list))
+  in 
+  let _ = 
+    List.iter 
+      (fun uncaught -> 
+       let stringlist =  (Remanent_parameters.get_prefix parameters)::(stringlist_of_uncaught uncaught []) in 
+       let _ = List.iter (Printf.fprintf (Remanent_parameters.get_log parameters) "%s") stringlist in 
+       let _ = Printf.fprintf  (Remanent_parameters.get_log parameters) "\n" in 
+       ())
+      (List.rev (handlers.mh_uncaught_error_list))
+  in 
+  ()
+    
 let print parameters handlers =
   if handlers.mh_caught_error_list = [] && handlers.mh_uncaught_error_list = [] 
   then 
     Printf.fprintf (Remanent_parameters.get_log parameters) "%sexecution finished without any exception\n" (Remanent_parameters.get_prefix parameters)
   else 
     let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%sSome exceptions have been raised\n" (Remanent_parameters.get_prefix parameters) in 
-    let parameters = Remanent_parameters.update_prefix parameters "error: " in   
-    let _ = 
-      List.iter 
-        (fun caught -> 
-            let stringlist = (Remanent_parameters.get_prefix parameters)::(stringlist_of_caught caught []) in 
-            let _ = List.iter (Printf.fprintf (Remanent_parameters.get_log parameters) "%s") stringlist in 
-            let _ = Printf.fprintf  (Remanent_parameters.get_log parameters) "\n" in 
-            ())
-        (List.rev (handlers.mh_caught_error_list))
-    in 
-    let _ = 
-      List.iter 
-        (fun uncaught -> 
-            let stringlist =  (Remanent_parameters.get_prefix parameters)::(stringlist_of_uncaught uncaught []) in 
-            let _ = List.iter (Printf.fprintf (Remanent_parameters.get_log parameters) "%s") stringlist in 
-            let _ = Printf.fprintf  (Remanent_parameters.get_log parameters) "\n" in 
-            ())
-        (List.rev (handlers.mh_uncaught_error_list))
-    in 
-      ()
+    print_for_KaSim parameters handlers
+		    
 
+	
 let print_errors_light_for_kasim parameters handlers =
   if handlers.mh_caught_error_list = [] && handlers.mh_uncaught_error_list = [] 
   then () 

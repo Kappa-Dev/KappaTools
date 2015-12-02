@@ -323,10 +323,8 @@ let compress_and_print logger env log_info step_list =
               error,U.empty_story_table ()
           in 
 	  let _ =
-            List.iter 
-              (D.S.PH.B.PB.CI.Po.K.H.dump_error parameter handler error)
-              error
-          in 
+            Exception.print_for_KaSim (D.S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error
+	  in 
 	  causal_table,
 	  causal_story_table,
 	  weakly_story_table,

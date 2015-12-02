@@ -22,7 +22,7 @@
    sig
      module K:Kappa_instantiation.Cflow_signature
 
-     val cut: (K.refined_step list -> K.H.error_channel * (K.refined_step list * int )) K.H.with_handler 
+     val cut: (K.refined_step list -> Exception.method_handler * (K.refined_step list * int )) K.H.with_handler 
    end
 
  module Po_cut = 

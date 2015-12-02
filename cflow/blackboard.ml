@@ -57,49 +57,49 @@ sig
   val get_last_linked_event: blackboard -> PB.predicate_id -> int option 
   val get_stack_depth: blackboard -> int 
   val case_address_of_case_event_address : event_case_address -> case_address 
-  val predicate_value_of_case_value: (case_value -> PB.CI.Po.K.H.error_channel * PB.predicate_value) PB.CI.Po.K.H.with_handler 
-  val follow_pointer_up: (blackboard -> event_case_address -> PB.CI.Po.K.H.error_channel * event_case_address) PB.CI.Po.K.H.with_handler 
-  val follow_pointer_down: (blackboard -> event_case_address -> PB.CI.Po.K.H.error_channel * event_case_address) PB.CI.Po.K.H.with_handler 
-  val is_boundary: (blackboard -> event_case_address -> PB.CI.Po.K.H.error_channel * bool) PB.CI.Po.K.H.with_handler  
+  val predicate_value_of_case_value: (case_value -> Exception.method_handler * PB.predicate_value) PB.CI.Po.K.H.with_handler 
+  val follow_pointer_up: (blackboard -> event_case_address -> Exception.method_handler * event_case_address) PB.CI.Po.K.H.with_handler 
+  val follow_pointer_down: (blackboard -> event_case_address -> Exception.method_handler * event_case_address) PB.CI.Po.K.H.with_handler 
+  val is_boundary: (blackboard -> event_case_address -> Exception.method_handler * bool) PB.CI.Po.K.H.with_handler  
 
   val build_event_case_address: PB.predicate_id -> pointer -> event_case_address  
-  val exist_case: (blackboard -> event_case_address -> PB.CI.Po.K.H.error_channel * bool option) PB.CI.Po.K.H.with_handler   
-  val get_static: (blackboard -> event_case_address -> PB.CI.Po.K.H.error_channel * (PB.step_short_id * PB.step_id * PB.predicate_value * PB.predicate_value)) PB.CI.Po.K.H.with_handler 
+  val exist_case: (blackboard -> event_case_address -> Exception.method_handler * bool option) PB.CI.Po.K.H.with_handler   
+  val get_static: (blackboard -> event_case_address -> Exception.method_handler * (PB.step_short_id * PB.step_id * PB.predicate_value * PB.predicate_value)) PB.CI.Po.K.H.with_handler 
             
-  val set: (case_address -> case_value -> blackboard  -> PB.CI.Po.K.H.error_channel * blackboard) PB.CI.Po.K.H.with_handler 
-  val get: (case_address -> blackboard -> PB.CI.Po.K.H.error_channel * case_value) PB.CI.Po.K.H.with_handler 
-  val dec: (case_address -> blackboard -> PB.CI.Po.K.H.error_channel * blackboard) PB.CI.Po.K.H.with_handler
-  val overwrite: (case_address -> case_value -> blackboard -> PB.CI.Po.K.H.error_channel * blackboard) PB.CI.Po.K.H.with_handler  
-  val refine: (case_address -> case_value -> blackboard -> PB.CI.Po.K.H.error_channel * blackboard * assign_result) PB.CI.Po.K.H.with_handler  
-  val branch: (PB.CI.Po.K.P.log_info -> blackboard -> PB.CI.Po.K.H.error_channel * PB.CI.Po.K.P.log_info * blackboard) PB.CI.Po.K.H.with_handler 
-  val reset_last_branching: (PB.CI.Po.K.P.log_info -> blackboard -> PB.CI.Po.K.H.error_channel * PB.CI.Po.K.P.log_info * blackboard ) PB.CI.Po.K.H.with_handler 
-  val reset_init: (PB.CI.Po.K.P.log_info -> blackboard -> PB.CI.Po.K.H.error_channel * PB.CI.Po.K.P.log_info * blackboard) PB.CI.Po.K.H.with_handler 
+  val set: (case_address -> case_value -> blackboard  -> Exception.method_handler * blackboard) PB.CI.Po.K.H.with_handler 
+  val get: (case_address -> blackboard -> Exception.method_handler * case_value) PB.CI.Po.K.H.with_handler 
+  val dec: (case_address -> blackboard -> Exception.method_handler * blackboard) PB.CI.Po.K.H.with_handler
+  val overwrite: (case_address -> case_value -> blackboard -> Exception.method_handler * blackboard) PB.CI.Po.K.H.with_handler  
+  val refine: (case_address -> case_value -> blackboard -> Exception.method_handler * blackboard * assign_result) PB.CI.Po.K.H.with_handler  
+  val branch: (PB.CI.Po.K.P.log_info -> blackboard -> Exception.method_handler * PB.CI.Po.K.P.log_info * blackboard) PB.CI.Po.K.H.with_handler 
+  val reset_last_branching: (PB.CI.Po.K.P.log_info -> blackboard -> Exception.method_handler * PB.CI.Po.K.P.log_info * blackboard ) PB.CI.Po.K.H.with_handler 
+  val reset_init: (PB.CI.Po.K.P.log_info -> blackboard -> Exception.method_handler * PB.CI.Po.K.P.log_info * blackboard) PB.CI.Po.K.H.with_handler 
 
   (** initialisation*)
-  val import:  (PB.CI.Po.K.P.log_info -> PB.CI.Po.K.refined_step list -> PB.CI.Po.K.H.error_channel * PB.CI.Po.K.P.log_info * blackboard) PB.CI.Po.K.H.with_handler 
+  val import:  (PB.CI.Po.K.P.log_info -> PB.CI.Po.K.refined_step list -> Exception.method_handler * PB.CI.Po.K.P.log_info * blackboard) PB.CI.Po.K.H.with_handler 
 
 
   (** output result*)
   type result = (PB.CI.Po.K.refined_step * PB.CI.Po.K.side_effect) list  
      
   (** iteration*)
-  val is_maximal_solution: (blackboard -> PB.CI.Po.K.H.error_channel * bool) PB.CI.Po.K.H.with_handler 
+  val is_maximal_solution: (blackboard -> Exception.method_handler * bool) PB.CI.Po.K.H.with_handler 
 
   (** exporting result*)
-  val translate_blackboard: (blackboard -> PB.CI.Po.K.H.error_channel * result) PB.CI.Po.K.H.with_handler 
+  val translate_blackboard: (blackboard -> Exception.method_handler * result) PB.CI.Po.K.H.with_handler 
 
   (**pretty printing*)
-  val print_blackboard:(blackboard -> PB.CI.Po.K.H.error_channel) PB.CI.Po.K.H.with_handler 
-  val export_blackboard_to_xls: (string -> int -> int -> blackboard -> PB.CI.Po.K.H.error_channel) PB.CI.Po.K.H.with_handler 
-  val print_event_case_address:(blackboard ->  event_case_address -> PB.CI.Po.K.H.error_channel) PB.CI.Po.K.H.with_handler 
-  val print_stack: (blackboard -> PB.CI.Po.K.H.error_channel) PB.CI.Po.K.H.with_handler 
+  val print_blackboard:(blackboard -> Exception.method_handler) PB.CI.Po.K.H.with_handler 
+  val export_blackboard_to_xls: (string -> int -> int -> blackboard -> Exception.method_handler) PB.CI.Po.K.H.with_handler 
+  val print_event_case_address:(blackboard ->  event_case_address -> Exception.method_handler) PB.CI.Po.K.H.with_handler 
+  val print_stack: (blackboard -> Exception.method_handler) PB.CI.Po.K.H.with_handler 
   val exist: event_case_address -> case_address 
   val boolean: bool option -> case_value 
   val pointer_to_previous: event_case_address -> case_address 
   val pointer_to_next: event_case_address -> case_address 
   val pointer: event_case_address -> case_value 
   val value_after: event_case_address -> case_address 
-  val case_list_of_eid: (blackboard -> PB.step_id -> PB.CI.Po.K.H.error_channel * event_case_address list) PB.CI.Po.K.H.with_handler 
+  val case_list_of_eid: (blackboard -> PB.step_id -> Exception.method_handler * event_case_address list) PB.CI.Po.K.H.with_handler 
   val state: PB.predicate_value -> case_value 
   val is_exist_event: PB.step_id -> case_address 
   val n_unresolved_events_at_level: Priority.level -> case_address
@@ -108,10 +108,9 @@ sig
   val n_unresolved_events_in_column: event_case_address -> case_address 
   val forced_events: blackboard -> (PB.step_id list * unit Mods.simulation_info option) list 
   val side_effect_of_event: blackboard -> PB.step_id -> PB.CI.Po.K.side_effect
-(*  val cut_predicate_id: (blackboard -> PB.predicate_id -> PB.CI.Po.K.H.error_channel *   blackboard) PB.CI.Po.K.H.with_handler *)
-  val cut: (PB.CI.Po.K.P.log_info -> blackboard -> PB.step_id list -> PB.CI.Po.K.H.error_channel * PB.CI.Po.K.P.log_info * blackboard * PB.step_id list) PB.CI.Po.K.H.with_handler 
+  val cut: (PB.CI.Po.K.P.log_info -> blackboard -> PB.step_id list -> Exception.method_handler * PB.CI.Po.K.P.log_info * blackboard * PB.step_id list) PB.CI.Po.K.H.with_handler 
   val tick: PB.CI.Po.K.P.log_info -> bool * PB.CI.Po.K.P.log_info (* to do: move to the module PB.CI.Po.K.P*)
-  val level_of_event: (blackboard -> PB.step_id -> PB.CI.Po.K.H.error_channel * Priority.level) PB.CI.Po.K.H.with_handler 
+  val level_of_event: (blackboard -> PB.step_id -> Exception.method_handler * Priority.level) PB.CI.Po.K.H.with_handler 
 end
 
 module Blackboard = 
@@ -122,7 +121,10 @@ module Blackboard =
     type assign_result = Fail | Success | Ignore 
     type pointer = PB.step_short_id 
         
-   
+    let warn parameter error option exn default = 
+       Exception.warn (PB.CI.Po.K.H.get_kasa_parameters parameter) error (Some "blackboard.ml") option exn (fun () -> default)
+
+		     
     let success = Success
     let ignore = Ignore
     let fail = Fail 
@@ -231,8 +233,7 @@ module Blackboard =
         | State x -> error,x 
         | _ ->    
           let _ = print_case_value parameter case_value in 
-          let error_list,error = PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "predicate_value_of_case_value") (Some "226") (Some "wrong kinf of case_value in predicate_value_of_case_value") (failwith "predicate_value_of_case_value") in 
-          PB.CI.Po.K.H.raise_error parameter handler error_list error PB.unknown
+	  warn parameter error (Some "predicate_value_of_case_value, line 226, wrong kinf of case_value in predicate_value_of_case_value") (Failure "predicate_value_of_case_value") PB.unknown  
 
     type assignment = (case_address * case_value) 
         
@@ -249,9 +250,8 @@ module Blackboard =
         | State x,State y -> error,p x y 
         | Boolean x,Boolean y -> error,p2 x y
         | _,_  ->  
-          let error_list,error = PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some string) (Some "246") (Some "Counters and/or Pointers should not be compared") (failwith "strictly_more_refined") in 
-          PB.CI.Po.K.H.raise_error parameter handler error_list error false
-            
+           warn  parameter error (Some (string^" line 254, Counters and/or Pointers should not be compared")) (Failure (string^" Comparison between pointers and counters")) false
+		 
     let strictly_more_refined = g PB.strictly_more_refined bool_strictly_more_refined "strictly_more_refined"
       
     type case_info_static  = 
@@ -370,8 +370,7 @@ module Blackboard =
          error,PB.A.get blackboard.level_of_event eid 
        with 
          Not_found -> 
-           let error_list,error = PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "level_of_event") (Some "373") (Some "Unknown event id") (failwith "Unknown event id")  in 
-           PB.CI.Po.K.H.raise_error parameter handler error_list error Priority.default 
+         warn parameter error (Some "level_of_event, line 373, Unknown event id") (Failure "Unknown event id") Priority.default 
              
      let get_event blackboard k = PB.A.get blackboard.event k 
      let get_n_eid blackboard = blackboard.n_eid 
@@ -384,9 +383,7 @@ module Blackboard =
          error,PB.A.get blackboard.event_case_list eid 
        with 
          | _ -> 
-           let error_list,error = PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "case_list_of_eid") (Some "366") (Some "Out of bound") (failwith "Dereferencing null pointer")
-           in 
-           PB.CI.Po.K.H.raise_error parameter handler error_list error [] 
+           warn  parameter error (Some "case_list_of_eid, line 366, Out of bound") (Failure "Dereferencing null pointer") []
 
      let get_case parameter handler error case_address blackboard = 
        try 
@@ -395,9 +392,7 @@ module Blackboard =
              (case_address.row_short_event_id) 
        with 
          | _ -> 
-           let error_list,error = PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "get_case") (Some "377") (Some "Dereferencing null pointer") (failwith "Dereferencing null pointer")
-           in 
-           PB.CI.Po.K.H.raise_error parameter handler error_list error dummy_case_info 
+           warn parameter error (Some "get_case, line 377, Dereferencing null pointer") (Failure "Dereferencing null pointer") dummy_case_info 
 
      let get_static parameter handler error blackboard address = 
        let error,case = get_case parameter handler error address blackboard in 
@@ -685,9 +680,7 @@ module Blackboard =
            with 
            | Some x -> error,x.Priority.max_level
            | None -> 
-             let error_list,error = PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "import") (Some "694") (Some "Compression mode has to been selected") (failwith "Compression mode has not been selected") in 
-          PB.CI.Po.K.H.raise_error parameter handler error_list error Priority.zero
-
+             warn parameter error (Some "import, line 694, Compression mode has to been selected") (Failure "Compression mode has not been selected") Priority.zero
          in 
          aux priority_max Priority.LevelMap.empty
        in 
@@ -826,10 +819,7 @@ module Blackboard =
          in error,blackboard 
        with 
          | _ -> 
-           let error_list,error = PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set_case") (Some "680") (Some "Dereferencing null pointer") (failwith "Dereferencing null pointer")
-           in 
-           PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard
-
+           warn parameter error (Some "set_case, line 822, Dereferencing null pointer") (Failure "Dereferencing null pointer") blackboard 
 
      let set parameter handler error case_address case_value blackboard = 
        match 
@@ -849,17 +839,11 @@ module Blackboard =
                      error,blackboard 
 		   | None ->
                        begin
-                         let error_list,error = 
-                           PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "698") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
-                         in 
-                         PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard 
+                         warn parameter error (Some "set, line 842, Incompatible address and value in function set") (Failure"Incompatible address and value in function Blackboard.set") blackboard
                        end 
                  end
                | _ -> 
-                 let error_list,error = 
-                   PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "698") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
-                 in 
-                 PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard 
+                  warn parameter error (Some "set, line 846, Incompatible address and value in function set") (Failure "Incompatible address and value in function Blackboard.set") blackboard 
            end 
        | N_unresolved_events_in_column int -> 
            begin 
@@ -869,10 +853,7 @@ module Blackboard =
                  let _ = PB.A.set blackboard.weigth_of_predicate_id int int2 in 
                  error,blackboard 
                | _ -> 
-                 let error_list,error = 
-                   PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "698") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
-                 in 
-                 PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard 
+		  warn parameter error (Some "set, line 856, Incompatible address and value in function set") (Failure "Incompatible address and value in function Blackboard.set") blackboard 
            end 
          | Pointer_to_next case_address -> 
               begin 
@@ -883,11 +864,8 @@ module Blackboard =
                     let case_value = {old with dynamic = {old.dynamic with pointer_next = int2}} in 
                     let error,blackboard = set_case parameter handler error case_address case_value blackboard in 
                     error,blackboard 
-                  | _ -> 
-                    let error_list,error = 
-                   PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "713") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
-                 in 
-                 PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard 
+                  | _ ->
+		     warn parameter error (Some "set, line 868, Incompatible address and value in function set") (Failure "Incompatible address and value in function Blackboard.set") blackboard 
               end 
          | Value_after case_address -> 
            begin 
@@ -899,16 +877,12 @@ module Blackboard =
                  let error,blackboard = set_case parameter handler error case_address case_value blackboard in 
                  error,blackboard 
                | _ -> 
-                 let error_list,error = 
-                   PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "728") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
-                 in 
-                 PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard 
+             	  warn parameter error (Some "set, line 880, set should not be called with value_after") (Failure "Incompatible address and value in function Blackboard.set") blackboard 
+           
            end 
-         | Value_before case_address -> 
-           let error_list,error = 
-             PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "734") (Some "Blackboard.set should not be called with value_before") (failwith "Incompatible address in function Blackboard.set")
-           in 
-           PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard 
+         | Value_before case_address ->
+	    warn parameter error (Some "set, line 884, set should not be called with value_before") (Failure "Incompatible address and value in function Blackboard.set") blackboard 
+		 
          | Pointer_to_previous case_address -> 
                begin 
                 match case_value
@@ -919,11 +893,8 @@ module Blackboard =
                     let error,blackboard = set_case parameter handler error case_address case_value blackboard in 
                     error,blackboard 
                   | _ -> 
-                    let error_list,error = 
-                   PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "748") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
-                 in 
-                 PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard 
-              end 
+                     warn parameter error (Some "set, line 896, Incompatible address and value in function set") (Failure "Incompatible address and value in function Blackboard.set") blackboard 
+	       end
          | N_unresolved_events -> 
            begin 
              match case_value
@@ -931,11 +902,9 @@ module Blackboard =
                | Counter int -> 
                  error,{blackboard with n_unresolved_events = int}
                | _ -> 
-                 let error_list,error = 
-                   PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "760") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
-                 in 
-                 PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard 
-           end 
+		      warn parameter error (Some "set, line 905, Incompatible address and value in function set") (Failure "Incompatible address and value in function Blackboard.set") blackboard 
+
+	   end 
          | N_unresolved_events_at_level level  -> 
            begin 
              match case_value
@@ -945,10 +914,7 @@ module Blackboard =
                         with n_unresolved_events_by_level = 
                      Priority.LevelMap.add level int blackboard.n_unresolved_events_by_level}
                | _ -> 
-                 let error_list,error = 
-                   PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "760") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
-                 in 
-                 PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard 
+		   warn parameter error (Some "set, line 917, Incompatible address and value in function set") (Failure "Incompatible address and value in function Blackboard.set") blackboard 
            end 
          | Keep_event step_id -> 
            begin 
@@ -958,11 +924,8 @@ module Blackboard =
                  let _ = PB.A.set blackboard.selected_events step_id b in 
                  error,blackboard 
                | _ -> 
-                 let error_list,error = 
-                   PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "773") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
-                 in 
-                 PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard 
-           end 
+		  warn parameter error (Some "set, line 927, Incompatible address and value in function set") (Failure "Incompatible address and value in function Blackboard.set") blackboard 
+          end 
          | Exist case_address -> 
            begin 
              match case_value
@@ -973,10 +936,7 @@ module Blackboard =
                  let error,blackboard = set_case parameter handler error case_address case_value blackboard in 
                  error,blackboard 
                | _ -> 
-                 let error_list,error = 
-                   PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "788") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
-                 in 
-                 PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard 
+		  warn parameter error (Some "set, line 939, Incompatible address and value in function set") (Failure "Incompatible address and value in function Blackboard.set") blackboard 
            end 
              
      let rec get parameter handler error case_address blackboard = 
@@ -1006,10 +966,7 @@ module Blackboard =
            let pointer = case.dynamic.pointer_previous in 
            if is_null_pointer pointer 
            then 
-              let error_list,error = 
-                PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "get") (Some "814") (Some "Value before an unexisting element requested ") (failwith "Value before an unexisting element requested")  
-              in 
-              PB.CI.Po.K.H.raise_error parameter handler error_list error (State PB.undefined)
+	     warn parameter error (Some "get, line 814, Value before an unexisting element requested ") (Failure "Value before an unexisting element requested") (State PB.undefined)
            else 
              get parameter handler error (Value_after {case_address with row_short_event_id = pointer}) blackboard 
          | Pointer_to_previous case_address -> 
@@ -1216,7 +1173,7 @@ module Blackboard =
                let error = print_case_address parameter handler error blackboard case_address in 
                let _ = print_case_value parameter old in 
                let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "\nNew value: " in 
-              let _ = print_case_value parameter case_value in 
+               let _ = print_case_value parameter case_value in 
                let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "\nIGNORED***\n" in 
                error
              else 
@@ -1301,10 +1258,7 @@ module Blackboard =
              let error,blackboard = record_modif parameter handler error case_address old blackboard in 
              error,blackboard 
          | _ ->    
-           let error_list,error = 
-                PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "dec") (Some "916") (Some "Wrong type of case value") (failwith "Wrong type of case value")  
-              in 
-              PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard 
+            warn parameter error (Some "dec, line 1261, Wrong type of case value") (Failure "Wrong type of case value")   blackboard 
          
      let branch parameter handler error log_info blackboard = 
        let error = 
@@ -1531,9 +1485,8 @@ module Blackboard =
        match 
          parameter.PB.CI.Po.K.H.current_compression_mode 
        with 
-       | None ->  
-         let error_list,error = PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "import") (Some "1551") (Some "Compression mode has not been set up.") (failwith "Compression mode has not been set up.") in 
-          PB.CI.Po.K.H.raise_error parameter handler error_list error (log_info,preblackboard,0,"None",false)
+       | None ->
+	  warn parameter error (Some "import, line 1551, Compression mode has not been set up.") (Failure "Compression mode has not been set up.") (log_info,preblackboard,0,"None",false)
        | Some Parameter.Strong -> 
          let error,log_info,preblackboard,int = 
            List.fold_left 

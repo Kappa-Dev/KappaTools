@@ -20,7 +20,7 @@
 
 module D:Dag.Dag
 	   
-type error_log = D.S.PH.B.PB.CI.Po.K.H.error list 
+type error_log = Exception.method_handler 
 
 (** error_init is an empty log of errors *)
 val error_init: error_log 

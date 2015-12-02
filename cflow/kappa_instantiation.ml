@@ -51,10 +51,10 @@ sig
   val agent_name_of_site: Instantiation.concrete Instantiation.site -> Instantiation.agent_name
   val site_name_of_site: Instantiation.concrete Instantiation.site -> Instantiation.site_name
   val build_subs_refined_step: int -> int -> refined_step
-  val tests_of_refined_step: (refined_step -> H.error_channel * Instantiation.concrete Instantiation.test list) H.with_handler
+  val tests_of_refined_step: (refined_step -> Exception.method_handler * Instantiation.concrete Instantiation.test list) H.with_handler
   val actions_of_refined_step:
     (refined_step ->
-     H.error_channel *
+     Exception.method_handler *
        (Instantiation.concrete Instantiation.action list *
 	  (Instantiation.concrete Instantiation.site*Instantiation.concrete Instantiation.binding_state) list)) H.with_handler
   val is_obs_of_refined_step: refined_step -> bool
@@ -83,14 +83,14 @@ sig
 
   val get_kasim_side_effects: refined_step -> side_effect
 
-  val level_of_event: (refined_step -> (agent_id -> bool) -> H.error_channel * Priority.level) H.with_handler
+  val level_of_event: (refined_step -> (agent_id -> bool) -> Exception.method_handler * Priority.level) H.with_handler
   val disambiguate: refined_step list -> refined_step list
   val clean_events: refined_step list -> refined_step list
-  val agent_id_in_obs: (refined_step -> H.error_channel * AgentIdSet.t) H.with_handler 
+  val agent_id_in_obs: (refined_step -> Exception.method_handler * AgentIdSet.t) H.with_handler 
 
   val fill_siphon: refined_step list -> refined_step list
   val split_init: refined_step list -> refined_step list 
-  val agent_id_in_obs: (refined_step -> H.error_channel * AgentIdSet.t) H.with_handler
+  val agent_id_in_obs: (refined_step -> Exception.method_handler * AgentIdSet.t) H.with_handler
 end
 
 
