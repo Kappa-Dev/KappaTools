@@ -1515,6 +1515,7 @@ module type Projection = sig
     type 'a map_a
     type 'a map_b
     val proj: (elt_a -> elt_b) -> 'a -> ('a -> 'a -> 'a) -> 'a map_a -> 'a map_b
+    val proj_monadic: 'parameters -> 'method_handler -> (elt_a -> elt_b) -> 'a -> ('parameters -> 'method_handler -> 'a -> 'a -> 'method_handler * 'a) -> 'a map_a -> 'method_handler * 'a map_b
   end
 			   
 module Proj(A:S)(B:S) = 
@@ -1533,6 +1534,21 @@ module Proj(A:S)(B:S) =
 		  MB.add key_b (merge (MB.find_default identity_elt key_b map_b) data_a) map_b)
 		 map
 		 MB.empty
+		 
+	     let proj_monadic parameter handler f identity_elt monadic_merge map  =
+	       MA.fold 
+		 (fun key_a data_a (handler,map_b) -> 
+		   let key_b = f key_a in
+		   let handler,data' = 
+		     monadic_merge 
+		       parameter 
+		       handler  
+		       (MB.find_default identity_elt key_b map_b) 
+		       data_a
+		   in 
+		   handler,MB.add key_b data' map_b)
+		 map
+		 (handler,MB.empty)
 		 
 	   end
 
@@ -1594,6 +1610,7 @@ module type Projection2 = sig
     type 'a map_b
     type 'a map_c
     val proj2: (elt_a -> elt_b) -> (elt_a -> elt_c) -> 'a -> ('a -> 'a -> 'a) -> 'a map_a -> 'a map_c map_b
+    val proj2_monadic: 'parameters -> 'method_handler -> (elt_a -> elt_b) -> (elt_a -> elt_c) -> 'a -> ('parameters -> 'method_handler -> 'a -> 'a -> 'method_handler * 'a) -> 'a map_a -> 'method_handler * 'a map_c map_b
   end
 
 module Proj2(A:S)(B:S)(C:S) = 
@@ -1627,4 +1644,29 @@ module Proj2(A:S)(B:S)(C:S) =
 		  MB.add key_b submap map_b)
 		 map
 		 MB.empty
+
+	     let proj2_monadic parameter handler f g identity_elt merge map =
+	       MA.fold
+		 (fun key_a data_a (handler,map_b) ->
+		   let key_b = f key_a in
+		   let key_c = g key_a in 
+		   let submap = MB.find_default MC.empty key_b map_b in 
+		   let handler,data' =
+		     merge parameter handler  
+		       (MC.find_default 
+			  identity_elt 
+			  key_c 
+			  submap) 
+		       data_a
+		   in 
+		   let submap = 
+		     MC.add 
+		       key_c 
+		       data'
+		       submap 
+		   in 
+		   handler,MB.add key_b submap map_b)
+		 map
+		 (handler,MB.empty)
+
 	   end

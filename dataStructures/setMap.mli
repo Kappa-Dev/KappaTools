@@ -169,50 +169,11 @@ module type Projection = sig
     type 'a map_a
     type 'a map_b
     val proj: (elt_a -> elt_b) -> 'a -> ('a -> 'a -> 'a) -> 'a map_a -> 'a map_b
+    val proj_monadic: 'parameters -> 'method_handler -> (elt_a -> elt_b) -> 'a -> 
+      ('parameters -> 'method_handler -> 'a -> 'a -> 'method_handler * 'a) -> 'a map_a -> 'method_handler * 'a map_b
   end
 
 module Proj(A:S)(B:S): Projection with type elt_a = A.elt and type elt_b = B.elt and type 'a map_a = 'a A.Map.t and type 'a map_b = 'a B.Map.t
-
-
-(**
-    the following code: 
-
-module IntMap = Make(struct type t = int let compare = compare end)
-module P = Proj(IntMap)(IntMap)
-
-	       
-let f = List.fold_left
-	  (fun map (a,b) -> IntMap.Map.add a b map)
-	  IntMap.Map.empty
-	  [1,[2;3];2,[3;4];5,[6;7];8,[12;13]] 
-
-let g = P.proj (fun i -> i mod 2) [] (List.append) f
-
-let dump (s:string) f =
-  let _ = Printf.fprintf stderr "%s: \n" s in 
-  let _ = IntMap.Map.iter
-	    (fun a l ->
-	     let _ = Printf.fprintf stderr "  %i:" a in
-	     let _ = List.iter (Printf.fprintf stderr "%i,") l in
-	     let _ = Printf.fprintf stderr "\n" in ())
-	    f in
-  ()
-let _ = dump "f" f
-let _ = dump "g" g 
-	  
-should dump: 
-
-f: 
-  1:2,3,
-  2:3,4,
-  5:6,7,
-  8:12,13,
-g: 
-  0:12,13,3,4,
-  1:6,7,2,3,
- *)
-																       
-																       
 
 module type Projection2 = sig
     type elt_a
@@ -222,6 +183,7 @@ module type Projection2 = sig
     type 'a map_b
     type 'a map_c
     val proj2: (elt_a -> elt_b) -> (elt_a -> elt_c) -> 'a -> ('a -> 'a -> 'a) -> 'a map_a -> 'a map_c map_b
-  end
+    val proj2_monadic: 'parameters -> 'method_handler -> (elt_a -> elt_b) -> (elt_a -> elt_c) -> 'a -> ('parameters -> 'method_handler -> 'a -> 'a -> 'method_handler * 'a) -> 'a map_a -> 'method_handler * 'a map_c map_b
+ end
 
 module Proj2(A:S)(B:S)(C:S): Projection2 with type elt_a = A.elt and type elt_b = B.elt and type 'a map_a = 'a A.Map.t and type 'a map_b = 'a B.Map.t and type elt_c = C.elt and type 'a map_c = 'a C.Map.t
