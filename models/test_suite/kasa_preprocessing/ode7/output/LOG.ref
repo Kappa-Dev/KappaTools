@@ -515,6 +515,6 @@ site_type:1:state:0
 * Fixpoint iteration :
 ------------------------------------------------------------
 ** Discovered sites that are bond on the rhs for the first time:
-There is no bond on the rhs
+false
 ** Fixpoint iteration function:
 execution finished without any exception

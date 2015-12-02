@@ -249,7 +249,8 @@ let scan_rule_bdu_build parameter handler_bdu error rule_id rule covering_classe
 (************************************************************************************)
 (*scan rule fixpoint*)
 
-let scan_rule_fixpoint parameter handler_bdu error rule_id 
+let scan_rule_fixpoint parameter handler_bdu error 
+    rule_id 
     rule
     store_wl_creation 
     store_proj_bdu_creation_restriction_map
@@ -261,13 +262,13 @@ let scan_rule_fixpoint parameter handler_bdu error rule_id
     =
   (*-------------------------------------------------------------------------------*)
   (*TODO*)
-  let error, (b, store_test_has_bond_rhs) =
+  let error, b, store_test_has_bond_rhs =
     store_test_has_bond_rhs
       parameter
       error
       rule_id
       rule
-      store_result.store_test_has_bond_rhs
+      (snd store_result.store_test_has_bond_rhs)
   in
   let error, (handler_bdu, store_bdu_update_map) =
     collect_bdu_update_map
@@ -280,24 +281,13 @@ let scan_rule_fixpoint parameter handler_bdu error rule_id
       store_proj_modif_list_restriction_map
       store_proj_bdu_test_restriction_map
       store_bdu_test_restriction_map
-      store_test_has_bond_rhs
+      (*store_test_has_bond_rhs*)
       store_covering_classes_modification_update
   in
-  (*let error, store_triple_test =
-    collect_product
-      parameter
-      handler_bdu
-      error
-      2
-      store_remanent_creation_map
-      store_final_creation_bdu_map
-      store_remanent_modif_map
-      store_final_modif_list_map
-  in*)
   (*-------------------------------------------------------------------------------*)
   error, handler_bdu, 
   {
-    store_test_has_bond_rhs = (b, store_test_has_bond_rhs);
+    store_test_has_bond_rhs = b, store_test_has_bond_rhs;
     store_bdu_update_map    = store_bdu_update_map;
   }
   
@@ -438,7 +428,7 @@ let init_bdu_build parameter error =
 (*init of bdu fixpoint*)
 
 let init_bdu_fixpoint parameter error = (*TODO*)
-  let init_test_has_bond_rhs = (false, Map_test_bond.Map.empty) in
+  let init_test_has_bond_rhs = false, Map_test_bond.Map.empty in
   let init_bdu_update_map    = Map_bdu_update.Map.empty in
   let init_bdu_fixpoint =
     {

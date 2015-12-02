@@ -557,7 +557,7 @@ site_type:1:state:0
 * Fixpoint iteration :
 ------------------------------------------------------------
 ** Discovered sites that are bond on the rhs for the first time:
-rule_id:0
-{agent_id:1; agent_type:1; site_type:0} -- {agent_id:0; agent_type:0; site_type:0} 
+false
+rule_id:0{agent_id:0; agent_type:0; site_type:0} -- {agent_id:1; agent_type:1; site_type:0} 
 ** Fixpoint iteration function:
 execution finished without any exception

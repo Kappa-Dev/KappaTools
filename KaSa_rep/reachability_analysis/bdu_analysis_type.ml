@@ -215,7 +215,7 @@ module Map_site_address =
 module Map_test_bond =
   SetMap.Make (
     struct
-      type t = int
+      type t = int (*rule_id*)
       let compare = compare
     end)
 
@@ -288,8 +288,10 @@ type bdu_build =
 
 type bdu_fixpoint =
   {
-    store_test_has_bond_rhs :
-    bool * (int list * Map_site_address.Set.t) Map_test_bond.Map.t;
+    (*store_test_has_bond_rhs :
+    bool * (int list * Map_site_address.Set.t) Map_test_bond.Map.t;*)
+    store_test_has_bond_rhs : bool * Map_site_address.Set.t Map_test_bond.Map.t;
+    (*store_new_wl_side_effect : *)
     store_bdu_update_map :
       Mvbdu_wrapper.Mvbdu.mvbdu Map_bdu_update.Map.t;
   }
