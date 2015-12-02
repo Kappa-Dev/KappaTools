@@ -71,8 +71,9 @@ val set_compression_mode: parameter -> Parameter.current_compression_mode -> par
 val weakly_compress:  Format.formatter -> parameter -> kappa_handler -> error_log -> profiling_info -> trace -> error_log * profiling_info * trace list
 val strongly_compress: Format.formatter -> parameter -> kappa_handler -> error_log -> profiling_info -> trace -> error_log * profiling_info * trace list																	   
 type story_table 
-val fold_story_table_with_progress_bar: Format.formatter -> string -> (trace -> profiling_info Mods.simulation_info list -> 'a -> 'a) -> story_table -> 'a -> 'a
-val fold_story_table_without_progress_bar: Format.formatter -> string -> (trace -> profiling_info Mods.simulation_info list -> 'a -> 'a) -> story_table -> 'a -> 'a																	
+val fold_story_table_with_progress_bar: Format.formatter -> parameter -> kappa_handler -> error_log -> string -> (parameter -> kappa_handler -> error_log -> trace -> profiling_info Mods.simulation_info list -> 'a -> error_log * 'a) -> story_table -> 'a -> error_log * 'a
+val fold_story_table_without_progress_bar: Format.formatter -> parameter -> kappa_handler -> error_log -> string -> (parameter -> kappa_handler -> error_log -> trace -> profiling_info Mods.simulation_info list -> 'a -> error_log * 'a) -> story_table -> 'a -> error_log * 'a
+																					
 (** put together the stories having the same canonic form, this has do be done explicitely on the moment, I will improve this soon*)
 val flatten_story_table: parameter -> kappa_handler -> error_log -> story_table -> error_log * story_table 
 

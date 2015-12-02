@@ -272,7 +272,7 @@ let inc_fails a a' b =
   then succ b
   else b 
     
-let fold_story_table_gen logger logger_fail s f l a =
+let fold_story_table_gen logger logger_fail parameter handler error s f l a =
   let n_stories_input = count_stories l in 
   let progress_bar = 
     match logger
@@ -280,16 +280,16 @@ let fold_story_table_gen logger logger_fail s f l a =
        | Some logger -> 
 	  Some (logger,n_stories_input,Mods.tick_stories logger n_stories_input (false,0,0))
   in
-  let g story info (progress_bar,a,n_fails) =
-    let a' = f (Pretrace story) info a in
+  let g parameter handler error story info (progress_bar,a,n_fails) =
+    let error,a' = f parameter handler error (Pretrace story) info a in
     let progress_bar = tick_opt progress_bar in
     let n_fails = inc_fails a a' n_fails in 
-    progress_bar,a',n_fails 
+    error,(progress_bar,a',n_fails)
   in
-  let _,a,n_fails =   D.fold_table g l.story_list (progress_bar,a,0) in 
+  let error,(_,a,n_fails) =   D.fold_table parameter handler error g l.story_list (progress_bar,a,0) in 
   let () = close_progress_bar_opt logger in 
   let () = print_fails logger_fail  s n_fails in 
-  a 
+  error,a 
 
 let fold_story_table_with_progress_bar logger = fold_story_table_gen (Some logger) logger 
 let fold_story_table_without_progress_bar a = fold_story_table_gen None a

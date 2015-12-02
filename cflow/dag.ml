@@ -27,7 +27,7 @@ module type StoryTable =
       
     type table
 	   
-    val fold_table: (S.PH.B.PB.CI.Po.K.refined_step list -> S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list -> 'a -> 'a) -> table -> 'a -> 'a
+    val fold_table: (((S.PH.B.PB.CI.Po.K.refined_step list -> S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list -> 'a -> Exception.method_handler * 'a) S.PH.B.PB.CI.Po.K.H.with_handler) -> table -> 'a -> Exception.method_handler * 'a) S.PH.B.PB.CI.Po.K.H.with_handler 
     val init_table: (Exception.method_handler * table) S.PH.B.PB.CI.Po.K.H.with_handler 
     val count_stories: table -> int 
     val add_story: (Causal.grid -> S.PH.B.PB.CI.Po.K.refined_step list -> S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list -> table -> Exception.method_handler * table) S.PH.B.PB.CI.Po.K.H.with_handler 
@@ -701,18 +701,242 @@ module ListTable =
 	  0 
 	  list
 	  
-      let fold_table g list a  =
+      let fold_table parameter handler (error:Exception.method_handler) g list a  =
 	List.fold_left
 	  (fun a (_,l) ->
 	  List.fold_left
-	    (fun a (_,_,_,x,y) -> g x y a)
+	    (fun (error,a) (_,_,_,x,y) -> g parameter handler error x y a)
 	    a
 	    l)
-	  a
+	  (error,a)
 	  (List.rev list)
 	  
 	  end:StoryTable)
 
+module BucketTable =
+  (struct
+      type story_id = int 
+      let first_story_id = 0
+      let succ_story_id = succ 
+      type prehash_elt = node * int 
+    
+      module KeyS = (SetMap.Make (struct type t = key let compare = compare end))
+      module PreHashS = (SetMap.Make (struct type t = prehash_elt let compare = compare end))
+      module KeyMap = KeyS.Map
+      module PreHashMap = PreHashS.Map
+
+      type inner_tree =
+	| Inner_node of (inner_tree KeyMap.t * story_id option)
+	| Inner_leave of (key list * story_id)
+			   
+
+      type outer_tree = 
+      | Empty
+      | Outer_node of (outer_tree PreHashMap.t * story_id option)
+      | Outer_leave of (prehash_elt list * story_id)
+      | To_inner of (outer_tree PreHashMap.t * inner_tree)
+	  
+      type table =
+	{
+	  tree: outer_tree;
+	  array: (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list)  Int_storage.Nearly_inf_Imperatif.t;
+	  fresh_id: story_id 
+	}
+
+   
+      let init_table parameters _ error= 
+	let error,array =  Int_storage.Nearly_inf_Imperatif.create (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameters) error 0 in 
+	error,{
+	  tree= Empty; 
+	  array= array;
+	  fresh_id= 0 }
+
+      let get_cannonical_form parameter handler error id table =
+	let _,assoc = (* to do plug errors *)
+	  Int_storage.Nearly_inf_Imperatif.get
+	    (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter)
+	    (Exception.empty_error_handler) 
+	    id
+	    table.array
+	in
+	match assoc
+	with
+	  None -> (* to do warn *)
+	  error,table,[]
+	| Some (_,_,Some cannonic,_,_) ->
+	   error,table,cannonic 
+	| Some (grid,graph,None,trace,info) ->
+	   let error,cannonic = canonicalize parameter handler error graph in
+	   let _,array' = Int_storage.Nearly_inf_Imperatif.set 
+	     (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters  parameter) (Exception.empty_error_handler) id (grid,graph,Some cannonic,trace,info) table.array in 
+	   let table = {table with array = array'}
+	   in
+	   error,table,cannonic
+
+     
+			 
+     
+			
+      let add_story  parameter handler error grid pretrace story_info table =
+	let error,graph = graph_of_grid parameter handler error grid in 
+	let error,prehash = prehash parameter handler error graph in 
+	let add_story error x table =
+	  let _,array = Int_storage.Nearly_inf_Imperatif.set (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) (Exception.empty_error_handler)  table.fresh_id x table.array in (* plug errors *)
+	  error,table.fresh_id,
+	  {table
+	  with
+	    array = array ;
+	    fresh_id = succ_story_id table.fresh_id}
+	in 
+	let build_inner_tree error canonic_opt table =
+	  let error,id,table = add_story error (grid,graph,canonic_opt,pretrace,story_info) table in
+	  let error,table,cannonic_form = get_cannonical_form parameter handler error id table in
+	  let inner_tree = Inner_leave (cannonic_form, table.fresh_id) in
+	  error,id,table,inner_tree
+	in 
+	let rec aux_inner2 error canonic_form id' cannonic_form' table = (* to do *)
+	  error,table, Inner_node (KeyMap.empty,None)
+	in
+	let rec aux_outer2 error id' l' suffix assoc table = (* to do *)
+	  error,table, Outer_node(PreHashMap.empty,None)
+	in 
+	let rec replace_inner error suffix id inner_tree table = (* to do *)
+	  error,table,inner_tree
+	in 
+	let add_story_info error story_info id table = (* to do*)
+	  error,table
+	in 
+	let update_assoc x y = y in 
+	let rec aux_inner error assoc story_info suffix inner_tree table = 
+	   match
+	     suffix
+	   with
+	   | [] ->
+	      begin
+		match
+		  inner_tree
+		with 
+		| Inner_node (map,None) ->
+		   let error,id,table = add_story error assoc table in 
+		   error,table,
+		   Inner_node (map , (Some id))
+		| Inner_node (_,Some id')
+		| Inner_leave ([],id') ->
+		   let error,table = add_story_info error story_info id' table in 
+		   error,table,inner_tree
+		| Inner_leave (t'::q',id') -> 
+		   let error,id,table = add_story error assoc table in
+		   error,table,Inner_node (KeyMap.add t' (Inner_leave (q',id')) KeyMap.empty,Some id)
+	      end
+	   | t::q ->
+	      begin
+		match
+		  inner_tree
+		with
+		| Inner_node (map,assoc') ->
+		   begin 
+		     match
+		       KeyMap.find_option t map
+		     with
+		     | None ->
+			let error,id,table = add_story error assoc table in
+			let inner_tree =
+			  Inner_node (KeyMap.add t (Inner_leave (q,id)) map,assoc')
+			in
+			error,table,inner_tree
+		     | Some (inner_tree')  ->
+			let error,table',inner_tree'' = aux_inner error assoc story_info q inner_tree' table in
+			if inner_tree'' == inner_tree'
+			then error,table,inner_tree
+			else
+			  error,table',Inner_node(KeyMap.add t inner_tree'' map,assoc')
+		   end
+		| Inner_leave (l',id') ->
+		   aux_inner2 error id' l' suffix table 
+	      end
+	in
+	let rec aux_outer error assoc story_info suffix outer_tree table = 
+	   match
+	     suffix
+	   with
+	   | [] ->
+	      begin
+		match
+		  outer_tree
+		with 
+		| Outer_node (map,None) ->
+		   let error,id,table = add_story error assoc table in
+		    error,table,Outer_node (map , Some id)
+    		| Outer_node (map,Some id') ->
+		   let (grid,graph,None,pretrace,story_info) = assoc in 
+		   let error,cannonic_form = canonicalize parameter handler error graph in 
+		   let error,table,cannonic_form' = get_cannonical_form parameter handler error id' table in 
+		   let error,table,inner = aux_inner2 error cannonic_form id' cannonic_form'  table in
+		   error,table,To_inner (map,  inner)
+		| Outer_leave (q,id') ->
+		   let error,table = add_story_info error story_info id' table in 
+		   error,table,outer_tree
+		| To_inner (map,inner) ->
+		   let error,suffix =  canonicalize parameter handler error graph in
+		   let assoc = update_assoc suffix assoc in 
+		   let error,table,inner = aux_inner error assoc story_info suffix inner table in
+		   error,table,To_inner(map,inner) 
+	      end
+	   | t::q ->
+	      begin
+		match
+		  outer_tree
+		with
+		| Outer_node (map,assoc') ->
+		   begin 
+		     match
+		       PreHashMap.find_option t map
+		     with
+		     | None ->
+			let error,id,table = add_story error assoc table in
+			let inner_tree =
+			  Outer_node (PreHashMap.add t (Outer_leave (q,id)) map,assoc')
+			in
+			error,table,inner_tree
+		     | Some (outer_tree')  ->
+			let error,table',outer_tree'' = aux_outer error assoc story_info q outer_tree' table in
+			if outer_tree'' == outer_tree'
+			then error,table,outer_tree
+			else
+			  error,table',Outer_node(PreHashMap.add t outer_tree'' map,assoc')
+		   end	     
+		| Outer_leave (t'::q',id') when t != t' ->
+		   let error,id,table = add_story error assoc table in
+		   error,table, Outer_node (PreHashMap.add t (Outer_leave (q,id)) (PreHashMap.add t' (Outer_leave (q',id')) PreHashMap.empty),None)
+		| Outer_leave (l',id') ->
+		   aux_outer2 error id' l' suffix assoc table 
+	      end
+	in
+	let error,table,tree = aux_outer error (grid,graph,None,pretrace,story_info) story_info prehash table.tree table in
+	error,{table with tree = tree}
+		
+      let hash_list _ _  error table = error,table 
+      let sort_list parameter _ error table = (* to do plug KaSa errors *)
+	 error,
+	snd (Int_storage.Nearly_inf_Imperatif.fold 
+	       (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter)
+	       (Exception.empty_error_handler)
+	       (fun parameter error _ (a,b,c,d,e) l -> error,(a,e)::l)
+	       table.array 
+	       [])
+
+      let count_stories table = table.fresh_id
+
+      let fold_table parameter (handler:S.PH.B.PB.CI.Po.K.H.handler) error f table a =  
+	Int_storage.Nearly_inf_Imperatif.fold 
+	  (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter)
+	  error
+	  (fun parameter' error _ (_,_,_,d,e) a -> f (S.PH.B.PB.CI.Po.K.H.set_kasa_parameters parameter' parameter) handler error d e a)
+	  table.array 
+	  a
+
+      end:StoryTable)
+    
 module type Selector =
   sig
     val choose_fst: H.parameter -> bool 
@@ -724,7 +948,7 @@ module Choice(S:Selector)(A:StoryTable)(B:StoryTable) =
       type table =
 	| A of A.table
 	| B of B.table
-		 																					    
+	 	 
       let init_table parameter handler error =
 	if S.choose_fst parameter
 	then
@@ -770,12 +994,12 @@ module Choice(S:Selector)(A:StoryTable)(B:StoryTable) =
 	| A(table) -> A.count_stories table
 	| B(table) -> B.count_stories table 
 
-      let fold_table g table a  =
+      let fold_table parameter handler error g table a  =
 	match
 	  table
 	with
-	| A(table) -> A.fold_table g table a
-	| B(table) -> B.fold_table g table a
+	| A(table) -> A.fold_table parameter handler error g table a
+	| B(table) -> B.fold_table parameter handler error g table a
 				   	  
    
     end:StoryTable)

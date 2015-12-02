@@ -65,7 +65,8 @@ module type Cflow_handler =
     val get_debugging_channel: parameter -> Format.formatter
     val set_debugging_channel: parameter -> Format.formatter -> parameter
     val get_kasa_parameters: parameter -> Remanent_parameters_sig.parameters 
-end
+    val set_kasa_parameters: Remanent_parameters_sig.parameters -> parameter -> parameter 
+  end
 
 
 module Cflow_handler =
@@ -160,5 +161,7 @@ module Cflow_handler =
    let set_debugging_channel parameter fmt = {parameter with out_channel_err = fmt }
 
    let get_kasa_parameters parameter = parameter.kasa 
-end:Cflow_handler)
+   let set_kasa_parameters parameter parameter' = {parameter' with kasa = parameter}
+						    
+    end:Cflow_handler)
     

@@ -268,11 +268,11 @@ let compress_and_print logger env log_info step_list =
                   let () = Format.fprintf logger "\t - weak flow compression (%i)@." n_causal_stories in 
                   let parameter = S.PH.B.PB.CI.Po.K.H.set_compression_weak parameter in 
                   let error,weak_stories_table =  U.create_story_table parameter handler error in 		
-                  let error,log_info,weakly_story_table = 
+                  let error,(log_info,weakly_story_table) = 
 		    U.fold_story_table_with_progress_bar
-		      logger
+		      logger parameter handler error 
 		      "weak compression" 
-		      (fun trace info (error,log_info,story_list) ->
+		      (fun parameter handler error trace info (log_info,story_list) ->
 		       let error,log_info,list = U.weakly_compress logger parameter handler error log_info trace in 
 		       let error,story_list,log_info =
 			 List.fold_left
@@ -280,9 +280,9 @@ let compress_and_print logger env log_info step_list =
 			    U.store_trace parameter handler error info log_info trace story_list)
 			   (error,story_list,log_info)
 			   list
-		       in error,log_info,story_list)
+		       in error,(log_info,story_list))
 		      causal_story_table 
-		      (error,log_info,weak_stories_table)
+		      (log_info,weak_stories_table)
                   in 
 	          let error,weakly_story_table = U.flatten_story_table  parameter handler error weakly_story_table in
                   error,weakly_story_table
@@ -300,10 +300,12 @@ let compress_and_print logger env log_info step_list =
                 let parameter = S.PH.B.PB.CI.Po.K.H.set_compression_strong parameter in 
                 let () = Format.fprintf logger "\t - strong flow compression (%i)@." n_weak_stories in
 		let error,strong_story_table = U.create_story_table parameter handler error in 
-		let error,strong_story_table,log_info =
-		  U.fold_story_table_with_progress_bar logger 
-		      "strong_compression" 
-		    (fun refined_event_list list_info (error,strong_story_table,log_info) -> 
+		let error,(strong_story_table,log_info) =
+		  U.fold_story_table_with_progress_bar
+		    logger
+		    parameter handler error 
+		    "strong_compression" 
+		    (fun parameter handler error refined_event_list list_info (strong_story_table,log_info) -> 
                         let error,log_info,list = U.compress logger parameter handler error log_info refined_event_list in
 			let error,strong_story_table,log_info = 
                           match 
@@ -319,9 +321,9 @@ let compress_and_print logger env log_info step_list =
 			       (error,strong_story_table,log_info)
 			       list 
 			in 			
-			error,strong_story_table,log_info)
+			error,(strong_story_table,log_info))
 		      weakly_story_table 
-		      (error,strong_story_table,log_info)
+		      (strong_story_table,log_info)
 		in 	
 	        U.flatten_story_table parameter handler error strong_story_table 
 	      end
