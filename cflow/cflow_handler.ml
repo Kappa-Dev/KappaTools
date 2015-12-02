@@ -2,7 +2,7 @@
   * cflow_handler.ml
   *
   * Creation:                      <2013-08-02 feret>
-  * Last modification: Time-stamp: <2015-11-20 21:39:37 feret>
+  * Last modification: Time-stamp: <2015-12-02 11:21:41 feret>
   *
   * Causal flow compression: a module for KaSim
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -36,7 +36,8 @@ module type Cflow_handler =
           out_channel : Format.formatter ;
 	  log_step : bool ;
 	  debug_mode : bool ;
-	  log_step_channel : Format.formatter 
+	  log_step_channel : Format.formatter ;
+	  kasa : Remanent_parameters_sig.parameters ;
         } (*a struct which contains parameterizable options*)
     type error
     type error_channel = error list (*a list which contains the errors so far*)
@@ -71,6 +72,7 @@ module type Cflow_handler =
     val set_out_channel: parameter -> Format.formatter -> parameter
     val get_debugging_channel: parameter -> Format.formatter
     val set_debugging_channel: parameter -> Format.formatter -> parameter
+    val get_kasa_parameters: parameter -> Remanent_parameters_sig.parameters 
 end
 
 
@@ -90,7 +92,8 @@ module Cflow_handler =
           out_channel : Format.formatter;
 	  log_step: bool ;
 	  debug_mode: bool ;
-	  log_step_channel : Format.formatter 
+	  log_step_channel : Format.formatter ;
+	  kasa : Remanent_parameters_sig.parameters 
         }
 
     let build_parameter () =
@@ -108,7 +111,8 @@ module Cflow_handler =
         cache_size = Parameter.get_cache_size () ;
 	debug_mode = false ;
 	log_step = true ;
-	log_step_channel = Format.std_formatter 
+	log_step_channel = Format.std_formatter ; 
+	kasa = Remanent_parameters.get_parameters () 
       }
 
     let set_compression_weak p =
@@ -213,6 +217,7 @@ module Cflow_handler =
    let set_out_channel parameter fmt = {parameter with out_channel = fmt}				  
    let get_debugging_channel parameter = parameter.out_channel_err
    let set_debugging_channel parameter fmt = {parameter with out_channel_err = fmt }
-					       
+
+   let get_kasa_parameters parameter = parameter.kasa 
 end:Cflow_handler)
     

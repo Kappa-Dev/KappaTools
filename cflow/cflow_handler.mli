@@ -14,7 +14,8 @@ module type Cflow_handler =
           out_channel : Format.formatter ;
 	  log_step : bool ;
 	  debug_mode : bool ;
-	  log_step_channel: Format.formatter 
+	  log_step_channel: Format.formatter ; 
+	  kasa: Remanent_parameters_sig.parameters
         } (*a struct which contains parameterizable options*)
     type error
     type error_channel = error list (*a list which contains the errors so far*)
@@ -49,7 +50,7 @@ module type Cflow_handler =
     val set_out_channel: parameter -> Format.formatter -> parameter
     val get_debugging_channel: parameter -> Format.formatter
     val set_debugging_channel: parameter -> Format.formatter -> parameter
-
+    val get_kasa_parameters: parameter -> Remanent_parameters_sig.parameters 
 end
 
 module Cflow_handler:Cflow_handler
