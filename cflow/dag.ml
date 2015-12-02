@@ -27,22 +27,29 @@ module type Dag =
     type graph 
     type prehash
     type canonical_form 
-       
+    type table
+	   
     val graph_of_grid: (Causal.grid -> Exception.method_handler * graph) S.PH.B.PB.CI.Po.K.H.with_handler
     val graph_of_config: (Causal.config -> Exception.method_handler * graph) S.PH.B.PB.CI.Po.K.H.with_handler
     val dot_of_graph: (graph -> Exception.method_handler) S.PH.B.PB.CI.Po.K.H.with_handler
     val prehash: (graph -> Exception.method_handler * prehash) S.PH.B.PB.CI.Po.K.H.with_handler
     val canonicalize: (graph -> Exception.method_handler * canonical_form) S.PH.B.PB.CI.Po.K.H.with_handler
-      
     val print_prehash: (prehash -> Exception.method_handler) S.PH.B.PB.CI.Po.K.H.with_handler
     val print_canonical_form: (canonical_form -> Exception.method_handler) S.PH.B.PB.CI.Po.K.H.with_handler
     val print_graph: (graph -> Exception.method_handler) S.PH.B.PB.CI.Po.K.H.with_handler
 
-    val hash_list:
+    (*val hash_list:
       ((prehash * (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list) list -> Exception.method_handler * (prehash * (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list  * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list) list) S.PH.B.PB.CI.Po.K.H.with_handler
 
     val sort_list:
-      (prehash * (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list ) list) list -> (Causal.grid * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list
+      (prehash * (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list ) list) list -> (Causal.grid * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list*)
+    val fold_table: (S.PH.B.PB.CI.Po.K.refined_step list -> S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list -> 'a -> 'a) -> table -> 'a -> 'a
+    val init_table: (Exception.method_handler * table) S.PH.B.PB.CI.Po.K.H.with_handler 
+    val count_stories: table -> int 
+    val add_story: (Causal.grid -> S.PH.B.PB.CI.Po.K.refined_step list -> S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list -> table -> Exception.method_handler * table) S.PH.B.PB.CI.Po.K.H.with_handler 
+    val hash_list: (table -> Exception.method_handler * table) S.PH.B.PB.CI.Po.K.H.with_handler  
+      
+    val sort_list: (table -> Exception.method_handler * (Causal.grid * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list) S.PH.B.PB.CI.Po.K.H.with_handler 
   end
 
 
@@ -89,7 +96,12 @@ module Dag =
 
       let dummy_cannonical_form = []
       let dummy_prehash = []
-          
+
+      type table = (prehash * (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list  * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list) list
+
+      let init_table parameter handler error =
+	error,[]
+		
       let print_graph parameter handler error graph =
         let _ = Format.fprintf parameter.H.out_channel "****@\ngraph@\n****" in
         let _ = Format.fprintf parameter.H.out_channel "Root: %i@\n" graph.root in
@@ -121,7 +133,7 @@ module Dag =
             )
             graph.conflict_succ
         in 
-          let _ = 
+        let _ = 
           A.iteri 
             (fun i l  ->  
               List.iter 
@@ -595,7 +607,12 @@ module Dag =
         with 
           | Some (rep,_,_,_) -> error,rep
           | None -> error,[]
-     
+
+      let add_story parameter handler error grid pretrace info table =
+	let error,graph = graph_of_grid parameter handler error grid in
+	let error,prehash = prehash parameter handler error graph in
+	error,(prehash,[grid,graph,None,pretrace,info])::table 
+			    
       let dot_of_graph parameter handler error graph = error  
 
       let sort_outer = 
@@ -633,7 +650,7 @@ module Dag =
         error,list 
 
       let hash_list parameter handler error list = 
-        let list = sort_outer list in 
+        let list = sort_outer (List.rev list) in 
         let rec visit elements_to_store stored_elements last_element last_element_occurrences = 
           match elements_to_store,last_element
           with 
@@ -681,7 +698,7 @@ module Dag =
       let project_tuple (grid,_,_,_,list) = 
         List.hd list,grid,list
 
-      let sort_list list = 
+      let sort_list parameter handler error list = 
         let flat_list = 
           List.fold_left
             (fun list_out (prehash,list) -> 
@@ -694,7 +711,22 @@ module Dag =
         in 
         let compare_pair (a,_,_) (c,_,_) = Mods.compare_profiling_info a c in 
         let flat_list = List.sort compare_pair flat_list in 
-          List.rev_map (fun (a,b,c) -> b,c) (List.rev flat_list)
+         error, List.rev_map (fun (a,b,c) -> b,c) (List.rev flat_list)
 
-        
+      let count_stories list =
+	List.fold_left 
+	  (fun n l -> n + List.length (snd l))
+	  0 
+	  list
+	  
+      let fold_table g list a  =
+	List.fold_left
+	  (fun a (_,l) ->
+	  List.fold_left
+	    (fun a (_,_,_,x,y) -> g x y a)
+	    a
+	    l)
+	  a
+	  (List.rev list)
+	  
     end:Dag)

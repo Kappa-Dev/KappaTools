@@ -114,7 +114,7 @@ val causal_prefix_of_an_observable_hit: string -> parameter -> kappa_handler -> 
 
 (** Story table *)
 
-val empty_story_table: unit -> story_table
+val create_story_table: parameter -> kappa_handler -> error_log -> error_log * story_table
 val get_counter: story_table -> int 		      
 val count_stories: story_table -> int 
 
@@ -122,7 +122,7 @@ val count_stories: story_table -> int
 (** Store trace in story table *)
 
 val store_trace: parameter -> kappa_handler -> error_log ->  profiling_info Mods.simulation_info list -> profiling_info  -> trace -> story_table -> error_log * story_table *  profiling_info
-val export_story_table: story_table ->  (Causal.grid * D.S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list
+val export_story_table: parameter -> kappa_handler -> error_log -> story_table -> error_log * (Causal.grid * D.S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list
 
 																			          
 val fold_left_with_progress_bar: Format.formatter -> string -> ('a -> 'b -> 'a) -> 'a -> 'b list -> 'a 

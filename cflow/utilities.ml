@@ -163,35 +163,14 @@ let remove_pseudo_inverse_events =
 type cflow_grid = Causal.grid  
 type enriched_cflow_grid = Causal.enriched_grid
 type musical_grid =  D.S.PH.B.blackboard 
-type transitive_closure_config = Graph_closure.config 
-		       
-(* dag: internal representation for cflows *)
-type dag = D.graph
-(* cannonical form for cflows (completely capture isomorphisms) *)
-type canonical_form = D.canonical_form
-(* prehashform for cflows, if two cflows are isomorphic, they have the same prehash form *) 
-type hash = D.prehash 
-
-(** For each hash form, the list of stories with that hash. 
-    For each such stories: the grid and the graph.
-    If necessessary the cannonical form.
-    The pretrace (to apply further compression later on) 
-    Some information about the corresponding observable hits *)	       
-type story_list =
-  hash * (cflow_grid * dag  * canonical_form option * step list  * profiling_info Mods.simulation_info list) list
-		
-	
+type transitive_closure_config = Graph_closure.config
 type story_table =  
   { 
     story_counter:int;
-    story_list: story_list list;
+    story_list: D.table ;
   }
     
-let count_stories story_table = 
-  List.fold_left 
-    (fun n l -> n + List.length (snd l))
-    0 
-    story_table.story_list 
+let count_stories story_table = D.count_stories story_table.story_list 
     
 type observable_hit = 
   {
@@ -252,19 +231,17 @@ let export_musical_grid_to_xls = D.S.PH.B.export_blackboard_to_xls
 let print_musical_grid = D.S.PH.B.print_blackboard 
 
 
-let empty_story_table ()  = 
+let create_story_table parameters handler error  =
+  let error,init = D.init_table parameters handler error in
+  error,
   { 
     story_counter=1;
-    story_list=[];
+    story_list= init ;
   }  
   
 let get_trace_of_story (_,_,_,y,_) = Pretrace y
 let get_info_of_story (_,_,_,_,t) = t
-let fold_story_list f (l:story_list) a =
-  List.fold_left
-    (fun a x -> f (get_trace_of_story x) (get_info_of_story x) a)
-    a
-    (snd l)
+
 
 let tick_opt bar = 
   match 
@@ -303,16 +280,12 @@ let fold_story_table_gen logger logger_fail s f l a =
 	  Some (logger,n_stories_input,Mods.tick_stories logger n_stories_input (false,0,0))
   in
   let g story info (progress_bar,a,n_fails) =
-    let a' = f story info a in
+    let a' = f (Pretrace story) info a in
     let progress_bar = tick_opt progress_bar in
     let n_fails = inc_fails a a' n_fails in 
     progress_bar,a',n_fails 
   in
-  let _,a,n_fails =     
-    (List.fold_left
-       (fun a x -> fold_story_list g x a)
-       (progress_bar,a,0) (List.rev l.story_list))
-  in 
+  let _,a,n_fails =   D.fold_table g l.story_list (progress_bar,a,0) in 
   let () = close_progress_bar_opt logger in 
   let () = print_fails logger_fail  s n_fails in 
   a 
@@ -336,18 +309,19 @@ let store_trace (parameter:parameter) (handler:kappa_handler) (error:error_log) 
   let bool = is_compressed_trace trace in 
   let grid = D.S.PH.B.PB.CI.Po.K.build_grid trace2 bool  handler in
   let computation_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  computation_info in 
-  let error,graph = D.graph_of_grid parameter handler error grid in 
-  let error,prehash = D.prehash parameter handler error graph in 
+ (* let error,graph = D.graph_of_grid parameter handler error grid in 
+  let error,prehash = D.prehash parameter handler error graph in *)
   let computation_info = D.S.PH.B.PB.CI.Po.K.P.set_canonicalisation computation_info in 
   let story_info = 
     List.map 
       (Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy computation_info))
       obs_info 
-  in 
+  in
+  let error,story_list = D.add_story parameter handler error grid pretrace story_info story_table.story_list in 
   let story_table = 
     {
-       story_list = (prehash,[grid,graph,None,pretrace,story_info])::story_table.story_list ;
-       story_counter = story_table.story_counter +1 								       
+      story_list = story_list ;
+      story_counter = story_table.story_counter +1 								       
     }
   in
   error,story_table,computation_info 
@@ -370,10 +344,7 @@ let fold_left_with_progress_bar logger string f a l =
   a 
    
 let flatten_story_table parameter handler error story_table = 
-  let error,list = 
-    D.hash_list parameter handler error 
-      (List.rev story_table.story_list)
-  in 
+  let error,list = D.hash_list parameter handler error story_table.story_list in 
   error,
   {story_table
    with 
@@ -452,6 +423,6 @@ let enrich_small_grid_with_transitive_closure f = Causal.enrich_grid f Graph_clo
 let enrich_std_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closure.config_std
 					    
 let sort_story_list  = D.sort_list 
-let export_story_table x = sort_story_list (get_stories x)
+let export_story_table parameter handler error x = sort_story_list parameter handler error (get_stories x)
 let has_obs x = List.exists D.S.PH.B.PB.CI.Po.K.is_obs_of_refined_step (get_pretrace x)
 				   

@@ -46,8 +46,6 @@ let th_of_int n =
 let always = (fun _ -> true)
 let do_not_log parameter = (D.S.PH.B.PB.CI.Po.K.H.set_log_step parameter false)
 
-let empty_story_table = U.empty_story_table () 
-let empty_compression = empty_story_table,empty_story_table,empty_story_table,empty_story_table
 										
 let compress_and_print logger env log_info step_list =
   let parameter = D.S.PH.B.PB.CI.Po.K.H.build_parameter () in
@@ -67,6 +65,11 @@ let compress_and_print logger env log_info step_list =
     {
       D.S.PH.B.PB.CI.Po.K.H.env = env ;
     } in
+  let error,table1 = U.create_story_table parameter handler error in
+  let error,table2 = U.create_story_table parameter handler error in
+  let error,table3 = U.create_story_table parameter handler error in
+  let error,table4 = U.create_story_table parameter handler error in 
+  let empty_compression = table1,table2,table3,table4 in 
   let step_list = U.trace_of_pretrace step_list in 
   let causal,trivial,weak,strong =
     if (not causal_trace_on)
@@ -178,7 +181,7 @@ let compress_and_print logger env log_info step_list =
 		        "causal & weak flow compression") 
 		    n_stories 
 	      in
-	      let story_list = U.empty_story_table () in
+	      let error,story_list = U.create_story_table parameter handler error in
 	      (*logger n_stories in *)
               U.fold_left_with_progress_bar logger "causal compression"  
                 (fun (error,log_info,story_list) observable_id -> 
@@ -239,15 +242,17 @@ let compress_and_print logger env log_info step_list =
             if causal_trace_on 
             then 
               deal_with error false log_info 
-            else 
-	      error,log_info,U.empty_story_table ()
+            else
+	      let error,table = U.create_story_table parameter handler error in 
+	      error,log_info,table
           in 
           let error,log_info,causal_story_table = 
             if weak_compression_on || strong_compression_on 
             then 
               deal_with error true log_info 
             else
-              error,log_info,U.empty_story_table ()
+	      let error,table = U.create_story_table parameter handler error in 
+              error,log_info,table 
           in 
           let _ = print_newline () in 
           let _ = print_newline () in 
@@ -261,7 +266,7 @@ let compress_and_print logger env log_info step_list =
 		begin 
                   let () = Format.fprintf logger "\t - weak flow compression (%i)@." n_causal_stories in 
                   let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_weak parameter in 
-                  let weak_stories_table =  U.empty_story_table () in 		
+                  let error,weak_stories_table =  U.create_story_table parameter handler error in 		
                   let error,log_info,weakly_story_table = 
 		    U.fold_story_table_with_progress_bar
 		      logger
@@ -284,8 +289,8 @@ let compress_and_print logger env log_info step_list =
 	      else
 		error,causal_story_table
             else 
-              error,U.empty_story_table ()
-          in 
+              U.create_story_table parameter handler error
+	  in 
           let n_weak_stories = U.count_stories weakly_story_table in 
           let error,strong_story_table = 
             if strong_compression_on 
@@ -293,7 +298,7 @@ let compress_and_print logger env log_info step_list =
               begin 
                 let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_strong parameter in 
                 let () = Format.fprintf logger "\t - strong flow compression (%i)@." n_weak_stories in
-		let strong_story_table = U.empty_story_table () in 
+		let error,strong_story_table = U.create_story_table parameter handler error in 
 		let error,strong_story_table,log_info =
 		  U.fold_story_table_with_progress_bar logger 
 		      "strong_compression" 
@@ -320,25 +325,38 @@ let compress_and_print logger env log_info step_list =
 	        U.flatten_story_table parameter handler error strong_story_table 
 	      end
             else 
-              error,U.empty_story_table ()
+              U.create_story_table parameter handler error
           in 
-	  let _ =
-            Exception.print_for_KaSim (D.S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error
-	  in 
 	  causal_table,
 	  causal_story_table,
 	  weakly_story_table,
 	  strong_story_table 
         end 
   in 
-  let () =
+  let error =
     if causal_trace_on then
-      Causal.pretty_print logger env Graph_closure.config_std "" ""
-			  (U.export_story_table causal) in
-  let () =
+      let error,export = U.export_story_table parameter handler error causal in 
+      let () = Causal.pretty_print logger env Graph_closure.config_std "" "" export in
+      error
+    else error
+  in
+  let error =
     if weak_compression_on then
-      Causal.pretty_print logger env Graph_closure.config_std "Weakly" "weakly "
-	(U.export_story_table weak) in
-  if strong_compression_on then
-    Causal.pretty_print logger env Graph_closure.config_std "Strongly" "strongly "
-      (U.export_story_table strong)
+      let error,export = U.export_story_table parameter handler error weak in
+      let () = Causal.pretty_print logger env Graph_closure.config_std "Weakly" "weakly " export in
+      error
+    else error
+  in
+  let error = 
+    if strong_compression_on then
+      let error,export = U.export_story_table parameter handler error strong in
+      let () = Causal.pretty_print logger env Graph_closure.config_std "Strongly" "strongly " export in
+      error
+    else
+      error 
+  in
+  let _ =
+    Exception.print_for_KaSim (D.S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error
+  in
+  ()
+    
