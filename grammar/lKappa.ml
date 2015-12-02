@@ -98,10 +98,19 @@ let build_link pos i ag_ty p_id switch (links_one,links_two) =
 	   if maintained then Maintained else switch),
 	  (one',Mods.IntMap.add i (ag_ty,p_id,maintained) links_two)
 
-let internal_state_failure pos =
-  raise (ExceptionDefn.Internal_Error
-	   ("Internal state of site is problematic! Either Sanity.mixture is"^
-	      "broken or you don't use it!",pos))
+let several_internal_states pos =
+  raise (ExceptionDefn.Malformed_Decl
+	   ("In a pattern, a site cannot have several internal state ",pos))
+
+let not_enough_specified agent_name (na,pos) =
+  raise (ExceptionDefn.Malformed_Decl
+	   ("The link status of agent '"^agent_name^"', site '"^na
+	    ^"' on the right hand side is underspecified",pos))
+
+let several_occurence_of_site agent_name (na,pos) =
+  raise (ExceptionDefn.Malformed_Decl
+	   ("Site '"^na^
+	      "' occurs more than once in this agent '"^agent_name^"'",pos))
 
 let site_occurence_failure ag_na (na,pos) =
   raise (ExceptionDefn.Internal_Error
@@ -119,11 +128,14 @@ let annotate_dropped_agent sigs links_annot ((agent_name, _ as ag_ty),intf) =
                (fun i ->
 		match Signature.default_internal_state ag_id i sigs with
 		| None -> I_ANY | Some _ -> I_ANY_ERASED) in
-  let lannot =
+  let lannot,_ =
     List.fold_left
-      (fun lannot p ->
+      (fun (lannot,pset) p ->
        let p_na = p.Ast.port_nme in
        let p_id = Signature.num_of_site ~agent_name p_na sign in
+       let pset' = Mods.IntSet.add p_id pset in
+       let () = if pset == pset' then
+		  several_occurence_of_site agent_name p.Ast.port_nme in
        let () =
 	 if ports.(p_id) <> (Location.dummy_annot Ast.LNK_ANY, Erased) ||
 	      match Signature.default_internal_state ag_id p_id sigs with
@@ -136,10 +148,10 @@ let annotate_dropped_agent sigs links_annot ((agent_name, _ as ag_ty),intf) =
 	 | [ va ] ->
 	    internals.(p_id) <-
 	      I_VAL_ERASED (Signature.num_of_internal_state p_id va sign)
-	 | _ :: (_, pos) :: _ -> internal_state_failure pos in
+	 | _ :: (_, pos) :: _ -> several_internal_states pos in
        match p.Ast.port_lnk with
        | (Ast.LNK_ANY, pos) ->
-	  let () = ports.(p_id) <- ((Ast.LNK_ANY,pos), Erased) in lannot
+	  let () = ports.(p_id) <- ((Ast.LNK_ANY,pos), Erased) in (lannot,pset')
        | (Ast.LNK_SOME, pos_lnk) ->
 	  let (na,pos) = p.Ast.port_nme in
 	  let () =
@@ -149,7 +161,8 @@ let annotate_dropped_agent sigs links_annot ((agent_name, _ as ag_ty),intf) =
 	       Format.fprintf
 		 f "breaking a semi-link on site '%s' will induce a side effect"
 		 na) in
-	  let () = ports.(p_id) <- ((Ast.LNK_SOME,pos_lnk), Erased) in lannot
+	  let () = ports.(p_id) <- ((Ast.LNK_SOME,pos_lnk), Erased) in
+	  (lannot,pset')
        | (Ast.LNK_TYPE (dst_p, dst_ty),pos_lnk) ->
 	  let (na,pos) = p.Ast.port_nme in
 	  let () =
@@ -161,13 +174,13 @@ let annotate_dropped_agent sigs links_annot ((agent_name, _ as ag_ty),intf) =
 		 na) in
 	  let () = ports.(p_id) <-
 		     build_l_type sigs pos_lnk dst_ty dst_p Erased in
-	  lannot
+	  (lannot,pset')
        | (Ast.FREE, pos) ->
-	  let () = ports.(p_id) <- (Ast.FREE,pos), Erased in lannot
+	  let () = ports.(p_id) <- (Ast.FREE,pos), Erased in (lannot,pset')
        | (Ast.LNK_VALUE (i,()), pos) ->
 	  let va,lannot' = build_link pos i ag_id p_id Erased lannot in
-	  let () = ports.(p_id) <- va in lannot')
-      links_annot intf in
+	  let () = ports.(p_id) <- va in (lannot',pset'))
+      (links_annot,Mods.IntSet.empty) intf in
   { ra_type = ag_id; ra_ports = ports; ra_ints = internals; ra_erased = true;
     ra_syntax = Some (Array.copy ports, Array.copy internals);},lannot
 
@@ -180,11 +193,14 @@ let annotate_created_agent id sigs ((agent_name, pos as ag_ty),intf) =
     Array.init arity
 	       (fun i ->
 		Signature.default_internal_state ag_id i sigs) in
-  let () =
-    List.iter
-      (fun p ->
+  let _ =
+    List.fold_left
+      (fun pset p ->
        let p_na = p.Ast.port_nme in
        let p_id = Signature.num_of_site ~agent_name p_na sign in
+       let pset' = Mods.IntSet.add p_id pset in
+       let () = if pset == pset' then
+		  several_occurence_of_site agent_name p.Ast.port_nme in
        let () =
 	 if ports.(p_id) <> Raw_mixture.FREE ||
 	      internals.(p_id) <>
@@ -195,13 +211,15 @@ let annotate_created_agent id sigs ((agent_name, pos as ag_ty),intf) =
 	 | [ va ] ->
 	    internals.(p_id) <-
 	      Some (Signature.num_of_internal_state p_id va sign)
-	 | _ :: (_, pos) :: _ -> internal_state_failure pos in
+	 | _ :: (_, pos) :: _ -> several_internal_states pos in
        match p.Ast.port_lnk with
        | ((Ast.LNK_ANY, _) | (Ast.LNK_SOME, _) | (Ast.LNK_TYPE _,_)) ->
-	  site_occurence_failure agent_name p_na
-       | (Ast.LNK_VALUE (i,()), _) ->  ports.(p_id) <- Raw_mixture.VAL i
-       | (Ast.FREE, _) -> ()
-      ) intf in
+	  not_enough_specified agent_name p_na
+       | (Ast.LNK_VALUE (i,()), _) ->
+	  let () = ports.(p_id) <- Raw_mixture.VAL i in
+	  pset'
+       | (Ast.FREE, _) -> pset'
+      ) Mods.IntSet.empty intf in
   ({ Raw_mixture.a_id = id; Raw_mixture.a_type = ag_id;
      Raw_mixture.a_ports = ports; Raw_mixture.a_ints = internals; },
    pos)
@@ -303,7 +321,8 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) links_annot lp rp =
 	   ~pos
 	   (fun f ->
 	    Format.fprintf
-	      f "internal state of site '%s' of agent '%s' is modified although it is left unpecified in the left hand side"
+	      f
+	      "internal state of site '%s' of agent '%s' is modified although it is left unpecified in the left hand side"
 	      na agent_name) in
        internals.(p_id) <-
 	 I_ANY_CHANGED (Signature.num_of_internal_state p_id va sign)
@@ -313,19 +332,23 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) links_annot lp rp =
 		("The internal state of port '"^na^
 		   "' is underspecified on the right hand side", pos))
     | (_ :: (_,pos) :: _, _ | _, _ :: (_,pos) :: _) ->
-       internal_state_failure pos in
+       several_internal_states pos in
   let find_in_rp (na,pos) rp =
     let (p',r) =
       List.partition (fun p -> String.compare (fst p.Ast.port_nme) na = 0) rp in
     match p' with
     | [p'] -> (p',r)
     | [] -> site_occurence_failure agent_name (na,pos)
-    | _ :: _ -> site_occurence_failure agent_name (na,pos) in
-  let rp_r,lannot =
+    | _ :: _ -> several_occurence_of_site agent_name (na,pos) in
+  let rp_r,lannot,_ =
     List.fold_left
-      (fun (rp,lannot) p ->
+      (fun (rp,lannot,pset) p ->
        let p_na = p.Ast.port_nme in
        let p_id = Signature.num_of_site ~agent_name p_na sign in
+       let pset' = Mods.IntSet.add p_id pset in
+       let () = if pset == pset' then
+		  several_occurence_of_site agent_name p.Ast.port_nme in
+
        let () =
 	 if ports.(p_id) <> (Location.dummy_annot Ast.LNK_ANY, Maintained)
 	    || internals.(p_id) <> I_ANY
@@ -333,7 +356,7 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) links_annot lp rp =
        let p',rp' = find_in_rp p_na rp in
        let lannot' = register_port_modif p_id p.Ast.port_lnk p' lannot in
        let () = register_internal_modif p_id p.Ast.port_int p' in
-       (rp',lannot')) (rp,links_annot) lp in
+       (rp',lannot',pset')) (rp,links_annot,Mods.IntSet.empty) lp in
   let lannot' =
     List.fold_left
       (fun lannot p ->
@@ -363,12 +386,22 @@ let refer_links_annot links_annot mix =
 		       Ast.LNK_SOME | Ast.LNK_TYPE _ | Ast.FREE),_),_ -> ())
        ra.ra_ports) mix
 
+(*
+Is responsible for the check that:
+- agent exists
+- sites exist
+- unique site occurence / agent
+- internal_states exist
+- unique internal_state / site
+- links appear exactly twice
+*)
+
 let annotate_lhs_with_diff sigs lhs rhs =
   let rec aux links_annot acc lhs rhs =
     match lhs,rhs with
     | ((lag_na,_ as ag_ty),lag_p)::lt, ((rag_na,_),rag_p)::rt
 	 when String.compare lag_na rag_na = 0 &&
-		Ast.no_more_site_on_right false lag_p rag_p ->
+		Ast.no_more_site_on_right true lag_p rag_p ->
        let ra,links_annot' =
 	 annotate_agent_with_diff sigs ag_ty links_annot lag_p rag_p in
        aux links_annot' (ra::acc) lt rt

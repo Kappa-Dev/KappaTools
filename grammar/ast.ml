@@ -20,14 +20,14 @@ type agent = (string Location.annot * port list)
 
 type mixture = agent list
 
-type 'mixt ast_alg_expr =
+type ('mixt,'id) ast_alg_expr =
     BIN_ALG_OP of
-      bin_alg_op * 'mixt ast_alg_expr Location.annot
-      * 'mixt ast_alg_expr Location.annot
-  | UN_ALG_OP of un_alg_op * 'mixt ast_alg_expr Location.annot
+      bin_alg_op * ('mixt,'id) ast_alg_expr Location.annot
+      * ('mixt,'id) ast_alg_expr Location.annot
+  | UN_ALG_OP of un_alg_op * ('mixt,'id) ast_alg_expr Location.annot
   | STATE_ALG_OP of state_alg_op
-  | OBS_VAR of string
-  | TOKEN_ID of string
+  | OBS_VAR of 'id
+  | TOKEN_ID of 'id
   | KAPPA_INSTANCE of 'mixt
   | CONST of Nbr.t
   | TMAX
@@ -45,16 +45,19 @@ type arrow = RAR | LRAR
 
 type rule = {
   lhs: mixture ;
-  rm_token: (mixture ast_alg_expr Location.annot * string Location.annot) list ;
+  rm_token: ((mixture,string) ast_alg_expr Location.annot
+	     * string Location.annot) list ;
   arrow:arrow ;
   rhs: mixture ;
-  add_token: (mixture ast_alg_expr Location.annot * string Location.annot) list;
-  k_def: mixture ast_alg_expr Location.annot ;
+  add_token: ((mixture,string) ast_alg_expr Location.annot
+	      * string Location.annot) list;
+  k_def: (mixture,string) ast_alg_expr Location.annot ;
   k_un:
-    (mixture ast_alg_expr Location.annot *
-       mixture ast_alg_expr Location.annot option) option;
+    ((mixture,string) ast_alg_expr Location.annot *
+       (mixture,string) ast_alg_expr Location.annot option) option;
   (*k_1:radius_opt*)
-  k_op: mixture ast_alg_expr Location.annot option ; (*rate for backward rule*)
+  k_op: (mixture,string) ast_alg_expr Location.annot option ;
+  (*rate for backward rule*)
 }
 
 let flip_label str = str^"_op"
@@ -63,55 +66,65 @@ type 'alg_expr print_expr =
     Str_pexpr of string
   | Alg_pexpr of 'alg_expr
 
-type 'mixture modif_expr =
-  | INTRO of ('mixture ast_alg_expr Location.annot * 'mixture Location.annot)
-  | DELETE of ('mixture ast_alg_expr Location.annot * 'mixture Location.annot)
+type ('mixture,'id) modif_expr =
+  | INTRO of
+      (('mixture,'id) ast_alg_expr Location.annot * 'mixture Location.annot)
+  | DELETE of
+      (('mixture,'id) ast_alg_expr Location.annot * 'mixture Location.annot)
   | UPDATE of
-      (string Location.annot * 'mixture ast_alg_expr Location.annot) (*TODO: pause*)
+      (string Location.annot *
+	 ('mixture,'id) ast_alg_expr Location.annot) (*TODO: pause*)
   | UPDATE_TOK of
-      (string Location.annot * 'mixture ast_alg_expr Location.annot) (*TODO: pause*)
-  | STOP of ('mixture ast_alg_expr print_expr Location.annot list * Tools.pos)
+      ('id Location.annot *
+	 ('mixture,'id) ast_alg_expr Location.annot) (*TODO: pause*)
+  | STOP of
+      (('mixture,'id) ast_alg_expr print_expr Location.annot list * Tools.pos)
   | SNAPSHOT of
-      ('mixture ast_alg_expr print_expr Location.annot list * Tools.pos)
+      (('mixture,'id) ast_alg_expr print_expr Location.annot list * Tools.pos)
   (*maybe later of mixture too*)
   | PRINT of
-      (('mixture ast_alg_expr print_expr Location.annot list) *
-	  ('mixture  ast_alg_expr print_expr Location.annot list) * Tools.pos)
+      ((('mixture,'id) ast_alg_expr print_expr Location.annot list) *
+	 (('mixture,'id)  ast_alg_expr print_expr Location.annot list) * Tools.pos)
   | PLOTENTRY
   | CFLOWLABEL of (bool * string Location.annot)
   | CFLOWMIX of (bool * 'mixture Location.annot)
-  | FLUX of 'mixture ast_alg_expr print_expr Location.annot list * Tools.pos
-  | FLUXOFF of 'mixture ast_alg_expr print_expr Location.annot list * Tools.pos
+  | FLUX of
+      ('mixture,'id) ast_alg_expr print_expr Location.annot list * Tools.pos
+  | FLUXOFF of
+      ('mixture,'id) ast_alg_expr print_expr Location.annot list * Tools.pos
 
-type 'mixture perturbation =
-    ('mixture ast_alg_expr bool_expr Location.annot * ('mixture modif_expr list) *
-       'mixture ast_alg_expr bool_expr Location.annot option) Location.annot
+type ('mixture,'id) perturbation =
+  (('mixture,'id) ast_alg_expr bool_expr Location.annot *
+     (('mixture,'id) modif_expr list) *
+       ('mixture,'id) ast_alg_expr bool_expr Location.annot option) Location.annot
 
 type configuration = string Location.annot * (str_pos list)
 
-type 'mixture variable_def =
-    string Location.annot * 'mixture ast_alg_expr Location.annot
+type ('mixture,'id) variable_def =
+    string Location.annot * ('mixture,'id) ast_alg_expr Location.annot
 
-type 'mixture init_t =
-  | INIT_MIX of 'mixture ast_alg_expr Location.annot * 'mixture Location.annot
-  | INIT_TOK of 'mixture ast_alg_expr Location.annot * string Location.annot
+type ('mixture,'id) init_t =
+  | INIT_MIX of
+      ('mixture,'id) ast_alg_expr Location.annot * 'mixture Location.annot
+  | INIT_TOK of
+      ('mixture,'id) ast_alg_expr Location.annot * 'id Location.annot
 
-type 'mixture instruction =
+type ('mixture,'id) instruction =
   | SIG      of agent
   | TOKENSIG of string Location.annot
   | VOLSIG   of str_pos * float * str_pos (* type, volume, parameter*)
-  | INIT     of string Location.annot option * 'mixture init_t * Tools.pos
+  | INIT     of string Location.annot option * ('mixture,'id) init_t * Tools.pos
   (*volume, init, position *)
-  | DECLARE  of 'mixture variable_def
-  | OBS      of 'mixture variable_def (*for backward compatibility*)
-  | PLOT     of 'mixture ast_alg_expr Location.annot
-  | PERT     of 'mixture perturbation
+  | DECLARE  of ('mixture,'id) variable_def
+  | OBS      of ('mixture,'id) variable_def (*for backward compatibility*)
+  | PLOT     of ('mixture,'id) ast_alg_expr Location.annot
+  | PERT     of ('mixture,'id) perturbation
   | CONFIG   of configuration
 
-type ('agent,'mixture,'rule) compil =
+type ('agent,'mixture,'id,'rule) compil =
     {
       variables :
-	'mixture variable_def list;
+	('mixture,'id) variable_def list;
       (*pattern declaration for reusing as variable in perturbations or kinetic rate*)
       signatures :
 	'agent list; (*agent signature declaration*)
@@ -119,13 +132,13 @@ type ('agent,'mixture,'rule) compil =
 	(string Location.annot option * 'rule Location.annot) list;
       (*rules (possibly named)*)
       observables :
-	'mixture ast_alg_expr Location.annot list;
+	('mixture,'id) ast_alg_expr Location.annot list;
       (*list of patterns to plot*)
       init :
-	(string Location.annot option * 'mixture init_t * Tools.pos) list;
+	(string Location.annot option * ('mixture,'id) init_t * Tools.pos) list;
       (*initial graph declaration*)
       perturbations :
-	'mixture perturbation list;
+	('mixture,'id) perturbation list;
       configurations :
 	configuration list;
       tokens :
@@ -153,7 +166,7 @@ let no_more_site_on_right warning left right =
 	in false)
     right
 
-let result:(agent,mixture,rule) compil ref =
+let result:(agent,mixture,string,rule) compil ref =
   ref {
     variables      = [];
     signatures     = [];
