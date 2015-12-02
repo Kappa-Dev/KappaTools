@@ -368,6 +368,9 @@ site_type:2:state:1
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
+** Discovered sites that are bond on the rhs for the first time:
+There is no bond on the rhs
+** Fixpoint iteration function:
 agent_type:0:cv_id:0
 Id=6
  Node(site_type:1<0)

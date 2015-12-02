@@ -49,10 +49,7 @@ let print_remanent_triple parameter error result =
 
 let print_test_bdu_map parameter error result =
   Map_test_bdu.Map.iter
-    (fun (agent_id, agent_type, rule_id, cv_id) (l1, (_, bdu_test)) ->
-      if l1 <> []
-      then ()
-      else ();
+    (fun (agent_id, agent_type, rule_id, cv_id) bdu_test ->
       let _ =
         fprintf parameter.log
           "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i\n"
@@ -63,23 +60,19 @@ let print_test_bdu_map parameter error result =
 
 let print_proj_test_bdu_map parameter error result =
   Map_final_test_bdu.Map.iter
-    (fun rule_id (l1, (agent_id, bdu_test)) ->
-      if l1 <> []
-      then ()
-      else ();
+    (fun rule_id map_b ->
       let _ = fprintf parameter.log "rule_id:%i\n" rule_id in
-      let _ = fprintf parameter.log "agent_id:%i\n" agent_id in
-      Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_test
+      Map_agent_id_test_bdu.Map.iter (fun agent_id bdu_test ->
+        let _ = fprintf parameter.log "agent_id:%i\n" agent_id in
+        Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_test
+      ) map_b
     ) result
 
 (************************************************************************************)
 
 let print_creation_bdu_map parameter error result =
   Map_creation_bdu.Map.iter
-    (fun (agent_type, rule_id, cv_id) (l1, (_, bdu_creation)) ->
-      if l1 <> []
-      then ()
-      else ();
+    (fun (agent_type, rule_id, cv_id) bdu_creation ->
       let _ =
         fprintf parameter.log "agent_type:%i:rule_id:%i:covering_class_id:%i\n"
           agent_type rule_id cv_id
@@ -89,23 +82,20 @@ let print_creation_bdu_map parameter error result =
 
 let print_proj_creation_bdu_map parameter error result =
   Map_final_creation_bdu.Map.iter
-    (fun rule_id (l1, (agent_type, bdu_creation)) ->
-      if l1 <> []
-      then ()
-      else ();
+    (fun rule_id map_b ->
       let _ = fprintf parameter.log "rule_id:%i\n" rule_id in
-      let _ = fprintf parameter.log "agent_type:%i\n" agent_type in
-      Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_creation
+      Map_agent_type_creation_bdu.Map.iter
+        (fun agent_type bdu_creation ->
+          let _ = fprintf parameter.log "agent_type:%i\n" agent_type in
+          Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_creation
+        ) map_b
     ) result
 
 (************************************************************************************)
 
 let print_modif_list_map parameter error result =
   Map_modif_list.Map.iter
-    (fun (agent_id, agent_type, rule_id, cv_id) (l1, (_, l2)) ->
-      if l1 <> []
-      then ()
-      else ();
+    (fun (agent_id, agent_type, rule_id, cv_id) l2 ->
       let _ =
         fprintf parameter.log 
           "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i\n"
@@ -120,15 +110,15 @@ let print_modif_list_map parameter error result =
 
 let print_proj_modif_list_map parameter error result =
   Map_final_modif_list.Map.iter
-    (fun rule_id (l1, (agent_id, l2)) ->
-      if l1 <> []
-      then ()
-      else ();
+    (fun rule_id map_b ->
       let _ = fprintf parameter.log "rule_id:%i\n" rule_id in
-      let _ = fprintf parameter.log "agent_id:%i:\n" agent_id in
-      List.iter (fun (site, state) ->
-          fprintf parameter.log "site_type:%i:state:%i\n" site state
-      ) l2
+      Map_agent_id_modif_list.Map.iter
+        (fun agent_id l ->
+          let _ = fprintf parameter.log "agent_id:%i:\n" agent_id in
+          List.iter (fun (site, state) ->
+            fprintf parameter.log "site_type:%i:state:%i\n" site state
+          ) l
+        ) map_b
     ) result
 
 (************************************************************************************)

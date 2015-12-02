@@ -156,4 +156,7 @@ List of rules to awake when the state of a site is modified and tested:
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
+** Discovered sites that are bond on the rhs for the first time:
+There is no bond on the rhs
+** Fixpoint iteration function:
 execution finished without any exception

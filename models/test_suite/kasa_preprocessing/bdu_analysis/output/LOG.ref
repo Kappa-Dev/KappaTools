@@ -783,6 +783,20 @@ Id=9
      Leaf False 
 
 rule_id:6
+agent_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
 agent_id:1
 Id=3
  Node(site_type:1<0)
@@ -798,6 +812,30 @@ Id=3
      Leaf False 
 
 rule_id:7
+agent_id:0
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
 agent_id:1
 Id=3
  Node(site_type:1<0)
@@ -936,6 +974,20 @@ Id=7
      Leaf False 
 
 rule_id:1
+agent_type:0
+Id=9
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
 agent_type:1
 Id=9
  Node(site_type:1<1)
@@ -951,6 +1003,30 @@ Id=9
      Leaf False 
 
 rule_id:2
+agent_type:0
+Id=13
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=12
+   Node(site_type:1<1)
+    Id=11
+     Node(site_type:2<1)
+      Id=1
+       Leaf False 
+
+      Id=10
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
 agent_type:2
 Id=9
  Node(site_type:1<1)
@@ -998,26 +1074,41 @@ agent_id:0:
 site_type:2:state:0
 site_type:1:state:0
 rule_id:1
+agent_id:0:
+site_type:1:state:1
 agent_id:1:
 site_type:1:state:1
 rule_id:2
+agent_id:0:
+site_type:2:state:1
+site_type:1:state:0
 agent_id:1:
 site_type:1:state:1
 rule_id:5
 agent_id:0:
 site_type:1:state:0
 rule_id:6
+agent_id:0:
+site_type:1:state:1
 agent_id:1:
 site_type:1:state:1
 rule_id:7
+agent_id:0:
+site_type:2:state:1
 agent_id:1:
 site_type:1:state:1
 
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
+** Discovered sites that are bond on the rhs for the first time:
+rule_id:6
+{agent_id:1; agent_type:1; site_type:0} -- {agent_id:0; agent_type:0; site_type:2} 
+rule_id:7
+{agent_id:1; agent_type:2; site_type:0} -- {agent_id:0; agent_type:0; site_type:3} 
+** Fixpoint iteration function:
 agent_type:0:cv_id:0
-Id=19
+Id=24
  Node(site_type:1<0)
   Id=1
    Leaf False 
@@ -1031,8 +1122,8 @@ Id=19
      Leaf False 
 
 agent_type:1:cv_id:0
-Id=19
- Node(site_type:1<0)
+Id=9
+ Node(site_type:1<1)
   Id=1
    Leaf False 
 
@@ -1045,8 +1136,8 @@ Id=19
      Leaf False 
 
 agent_type:2:cv_id:0
-Id=19
- Node(site_type:1<0)
+Id=9
+ Node(site_type:1<1)
   Id=1
    Leaf False 
 

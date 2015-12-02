@@ -118,8 +118,15 @@ module Map_final_creation_bdu =
       let compare = compare
     end)
 
+module Map_agent_type_creation_bdu =
+  SetMap.Make (
+    struct
+      type t = int
+      let compare = compare
+    end)
+
 module Project2bdu_creation =
-  SetMap.Proj (Map_creation_bdu)(Map_final_creation_bdu)
+  SetMap.Proj2 (Map_creation_bdu)(Map_final_creation_bdu)(Map_agent_type_creation_bdu)
 
 module Map_creation_bdu_ag =
   SetMap.Make (
@@ -139,12 +146,19 @@ module Map_test_bdu =
 module Map_final_test_bdu =
   SetMap.Make (
     struct
-      type t = int
+      type t = int (*rule_id*)
+      let compare = compare
+    end)
+
+module Map_agent_id_test_bdu =
+  SetMap.Make (
+    struct
+      type t = int (*agent_id*)
       let compare = compare
     end)
 
 module Project2bdu_test =
-  SetMap.Proj (Map_test_bdu)(Map_final_test_bdu)
+  SetMap.Proj2 (Map_test_bdu)(Map_final_test_bdu)(Map_agent_id_test_bdu)
 
 module Map_test_bdu_ag =
   SetMap.Make (
@@ -169,16 +183,15 @@ module Map_final_modif_list =
       let compare = compare
     end)
 
-module Map_modif_ag =
+module Map_agent_id_modif_list =
   SetMap.Make (
     struct
       type t = int
       let compare = compare
     end)
 
-
 module Project2bdu_modif =
-  SetMap.Proj (Map_modif_list)(Map_final_modif_list)
+  SetMap.Proj2 (Map_modif_list)(Map_final_modif_list)(Map_agent_id_modif_list)
 
 (************************************************************************************)
 (*fixpoint iteration*)
@@ -256,17 +269,18 @@ type bdu_build =
   {
     store_remanent_triple: ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;
     store_bdu_test_restriction_map     :
-      (int list * (int * Mvbdu_wrapper.Mvbdu.mvbdu)) Map_test_bdu.Map.t;
+      Mvbdu_wrapper.Mvbdu.mvbdu Map_test_bdu.Map.t;
     store_proj_bdu_test_restriction_map :
-      (int list * (int * Mvbdu_wrapper.Mvbdu.mvbdu)) Map_final_test_bdu.Map.t;
+      Mvbdu_wrapper.Mvbdu.mvbdu Map_agent_id_test_bdu.Map.t Map_final_test_bdu.Map.t;
     store_bdu_creation_restriction_map :
-      (int list * (int * Mvbdu_wrapper.Mvbdu.mvbdu)) Map_creation_bdu.Map.t;
+      Mvbdu_wrapper.Mvbdu.mvbdu Map_creation_bdu.Map.t;
     store_proj_bdu_creation_restriction_map :
-      (int list * (int * Mvbdu_wrapper.Mvbdu.mvbdu)) Map_final_creation_bdu.Map.t;
+      Mvbdu_wrapper.Mvbdu.mvbdu Map_agent_type_creation_bdu.Map.t
+      Map_final_creation_bdu.Map.t;
     store_modif_list_restriction_map :
-      (int list * (int * (int * int) list)) Map_modif_list.Map.t;
+      ((int * int) list) Map_modif_list.Map.t;
     store_proj_modif_list_restriction_map :
-      (int list * (int * (int * int) list)) Map_final_modif_list.Map.t
+      ((int * int) list) Map_agent_id_modif_list.Map.t Map_final_modif_list.Map.t
   }
 
 (************************************************************************************)
@@ -274,11 +288,10 @@ type bdu_build =
 
 type bdu_fixpoint =
   {
-    store_test_has_bond_rhs : (int list * Map_site_address.Set.t) Map_test_bond.Map.t;
-    store_bdu_update_map    : (int list * Mvbdu_wrapper.Mvbdu.mvbdu) Map_bdu_update.Map.t;
-    (*store_triple_test : (*REMOVE*)
-      ((int list * Mvbdu_wrapper.Mvbdu.mvbdu) Map_creation_bdu_ag.Map.t *
-          (int list * (int * int) list) Map_modif_ag.Map.t);*) 
+    store_test_has_bond_rhs :
+    bool * (int list * Map_site_address.Set.t) Map_test_bond.Map.t;
+    store_bdu_update_map :
+      Mvbdu_wrapper.Mvbdu.mvbdu Map_bdu_update.Map.t;
   }
 
 (************************************************************************************)

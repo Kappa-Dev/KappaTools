@@ -221,4 +221,7 @@ rule_id:1
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
+** Discovered sites that are bond on the rhs for the first time:
+There is no bond on the rhs
+** Fixpoint iteration function:
 execution finished without any exception
