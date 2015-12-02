@@ -262,7 +262,7 @@ let scan_rule_fixpoint parameter handler_bdu error
     =
   (*-------------------------------------------------------------------------------*)
   (*TODO*)
-  let error, b, store_test_has_bond_rhs =
+  let error, is_new_bond, store_test_has_bond_rhs =
     store_test_has_bond_rhs
       parameter
       error
@@ -281,13 +281,14 @@ let scan_rule_fixpoint parameter handler_bdu error
       store_proj_modif_list_restriction_map
       store_proj_bdu_test_restriction_map
       store_bdu_test_restriction_map
-      (*store_test_has_bond_rhs*)
+      is_new_bond
+      store_test_has_bond_rhs
       store_covering_classes_modification_update
   in
   (*-------------------------------------------------------------------------------*)
   error, handler_bdu, 
   {
-    store_test_has_bond_rhs = b, store_test_has_bond_rhs;
+    store_test_has_bond_rhs = is_new_bond, store_test_has_bond_rhs;
     store_bdu_update_map    = store_bdu_update_map;
   }
   

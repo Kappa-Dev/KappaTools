@@ -81,7 +81,18 @@ let print_test_bonds parameter error result =
     ) set
   ) map
 
-
+let print_test_bond_map parameter error set =
+  Map_site_address.Set.iter (fun (site_add1, site_add2) ->
+    fprintf parameter.log 
+      "{agent_id:%i; agent_type:%i; site_type:%i} -- "
+      site_add1.Cckappa_sig.agent_index site_add1.Cckappa_sig.agent_type 
+      site_add1.Cckappa_sig.site;
+    fprintf parameter.log 
+      "{agent_id:%i; agent_type:%i; site_type:%i} \n"
+      site_add2.Cckappa_sig.agent_index site_add2.Cckappa_sig.agent_type 
+      site_add2.Cckappa_sig.site     
+  ) set
+      
 (************************************************************************************)
 
 let print_bdu_update_map parameter error result =

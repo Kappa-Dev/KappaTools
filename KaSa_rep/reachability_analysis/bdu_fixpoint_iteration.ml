@@ -31,31 +31,6 @@ let warn parameters mh message exn default =
 let local_trace = false
 
 (************************************************************************************)
-(*it is an enable rule when the intersection between bdu_test and
-  bdu_remanent is different than empty set*)
-
-(*let is_bdu_test_enable parameter handler error bdu_false bdu_test bdu_X = (*CHECK*)
-  (*if bdu_test is empty*)
-  if Mvbdu_wrapper.Mvbdu.equal bdu_test bdu_false
-  then
-    (*then it is an enable rule*)
-    error, handler, true
-  else
-    (*if bdu_test is not empty, then do the intersection with bdu_X*)
-    begin
-      let error, handler, bdu_inter =
-        Mvbdu_wrapper.Mvbdu.mvbdu_and parameter handler error bdu_test bdu_X
-      in
-      (*then test the enable of this result*)
-      if not (Mvbdu_wrapper.Mvbdu.equal bdu_inter bdu_false)
-      then 
-        (*if it is empty then it is not enable*)
-        error, handler, true
-      else
-        error, handler, false        
-    end*)
-
-(************************************************************************************)
 (*update bdu:
   - (bdu_X U bdu_creation) U [\rho[update_views] | \rho \in bdu_X (inter) bdu_test views]
 *)
@@ -331,7 +306,8 @@ let collect_bdu_update_map parameter handler error
     store_proj_modif_list_restriction_map
     store_proj_bdu_test_restriction_map
     store_bdu_test_restriction_map
-    (*store_test_has_bond_rhs*)
+    is_new_bond
+    store_test_has_bond_rhs
     store_covering_classes_modification_update
     =
   let error, handler, bdu_false = 
@@ -475,33 +451,37 @@ let collect_bdu_update_map parameter handler error
                   add_link handler (agent_type, cv_id) bdu_update store_update_map
                 in
                 (*-----------------------------------------------------------------------*)
-                if is_new_view
-                then
+                begin
+                  if is_new_view
+                  then
                   (*is a new bond discovered?*)
-                  (*let error, is_new_bond, bond_rhs_map =
-                    List.fold_left (fun (error, b, store_result) (site_add1, site_add2) ->
-                      let error, is_new_bond, result =
-                        add_bond rule_id (site_add1, site_add2) store_result
-                      in
-                      error, is_new_bond, result                   
-                    ) (error, false, Map_test_bond.Map.empty) rule.actions.bind
-                  in
-                  (*TEST*)
-                  let _ =
-                    fprintf stdout "is_new_bond:%b\n" is_new_bond;
-                    Print_bdu_fixpoint.print_test_bond_map parameter error bond_rhs_map
-                  in*)
-                   (*add update(c) into wl_tl*)
-                  let error, new_wl =
-                    add_update_to_wl
-                      parameter
-                      error
-                      store_covering_classes_modification_update
-                      wl_tl
-                  in
-                  error, (handler, new_wl, store_result)
-                else
-                  error, (handler, store_wl, store_result)
+                    begin
+                      if is_new_bond
+                      then
+                        (*TODO:add update(c') into wl_tl; side_effect*)
+                        (*get a set of bond_rhs*)
+                        let error, bond_rhs_set =
+                          match Map_test_bond.Map.find_option rule_id
+                            store_test_has_bond_rhs
+                          with
+                          | None -> error, Map_site_address.Set.empty
+                          | Some s -> error, s
+                        in
+                        error, (handler, store_wl, store_result)
+                      else
+                      (*add update(c) into wl_tl*)
+                        let error, new_wl =
+                          add_update_to_wl
+                            parameter
+                            error
+                            store_covering_classes_modification_update
+                          wl_tl
+                        in
+                      error, (handler, new_wl, store_result)
+                    end
+                  else
+                    error, (handler, store_wl, store_result)
+                end
               ) store_bdu_test_restriction_map 
               (error, (handler, wl_tl, store_bdu_update_map))
           in
