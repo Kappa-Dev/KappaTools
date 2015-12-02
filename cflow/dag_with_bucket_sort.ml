@@ -39,12 +39,17 @@ module type Dag =
     val print_canonical_form: (canonical_form -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler
     val print_graph: (graph -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler
 
-								  
-  (*  val hash_list:
-      ((prehash * (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list) list -> S.PH.B.PB.CI.Po.K.H.error_channel * (prehash * (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list  * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list) list) S.PH.B.PB.CI.Po.K.H.with_handler
+    val insert: 
+      (Causal.grid ->
+       graph ->
+       S.PH.B.PB.CI.Po.K.refined_step list ->
+       S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list ->
+       table -> S.PH.B.PB.CI.Po.K.H.error_channel * table) S.PH.B.PB.CI.Po.K.H.with_handler 
+    val hash_list:   
+      (table ->  S.PH.B.PB.CI.Po.K.H.error_channel * table) S.PH.B.PB.CI.Po.K.H.with_handler
 
     val sort_list:
-      (prehash * (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list ) list) list -> (Causal.grid * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list*)
+      (table -> S.PH.B.PB.CI.Po.K.H.error_channel * (Causal.grid * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list) S.PH.B.PB.CI.Po.K.H.with_handler 
   end
 
 
@@ -629,10 +634,10 @@ module Dag =
 	
 
       let get_cannonical_form parameter handler error id table =
-	let error,assoc =
+	let _,assoc = (* to do plug errors *)
 	  Int_storage.Nearly_inf_Imperatif.get
-	    parameter
-	    error
+	    (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter)
+	    (Exception.empty_error_handler) 
 	    id
 	    table.array
 	in
@@ -644,7 +649,8 @@ module Dag =
 	   error,table,cannonic 
 	| Some (grid,graph,None,trace,info) ->
 	   let error,cannonic = canonicalize parameter handler error graph in
-	   let error,array' = Int_storage.Nearly_inf_Imperatif.set parameter error id (grid,graph,Some cannonic,trace,info) table.array in 
+	   let _,array' = Int_storage.Nearly_inf_Imperatif.set 
+	     (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters  parameter) (Exception.empty_error_handler) id (grid,graph,Some cannonic,trace,info) table.array in 
 	   let table = {table with array = array'}
 	   in
 	   error,table,cannonic
@@ -653,9 +659,10 @@ module Dag =
 			 
      
 			
-      let insert  parameter handler error prehash grid graph pretrace story_info table =
+      let insert  parameter handler error grid graph pretrace story_info table =
+	let error,prehash = prehash parameter handler error graph in 
 	let add_story error x table =
-	  let error,array = Int_storage.Nearly_inf_Imperatif.set parameter error table.fresh_id x table.array in 
+	  let _,array = Int_storage.Nearly_inf_Imperatif.set (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) (Exception.empty_error_handler)  table.fresh_id x table.array in (* plug errors *)
 	  error,table.fresh_id,
 	  {table
 	  with
@@ -860,7 +867,7 @@ module Dag =
         let list = visit list [] None [] in 
         error,list 
 
-      let hash_list parameter handler error list = 
+(*      let hash_list parameter handler error list = 
         let list = sort_outer list in 
         let rec visit elements_to_store stored_elements last_element last_element_occurrences = 
           match elements_to_store,last_element
@@ -923,6 +930,15 @@ module Dag =
         let compare_pair (a,_,_) (c,_,_) = Mods.compare_profiling_info a c in 
         let flat_list = List.sort compare_pair flat_list in 
           List.rev_map (fun (a,b,c) -> b,c) (List.rev flat_list)
+*)
 
-        
+      let hash_list _ _  error table = error,table 
+      let sort_list parameter _ error table = (* to do plug KaSa errors *)
+	 error,
+	snd (Int_storage.Nearly_inf_Imperatif.fold 
+	       (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter)
+	       (Exception.empty_error_handler)
+	       (fun parameter error _ (a,b,c,d,e) l -> error,(a,e)::l)
+	       table.array 
+	       [])
     end:Dag)
