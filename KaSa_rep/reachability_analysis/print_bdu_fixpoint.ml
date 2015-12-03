@@ -96,21 +96,6 @@ let print_test_bond_map parameter error set =
 (************************************************************************************)
 
 let print_new_wl_side_effect parameter error result =
-  (*let result1, result2 = result in*)
-  (*let _ =*)
-    Int2Map_CV_Modif.Map.iter
-      ( fun (x, y) (_, s2) ->
-	let _ =
-          fprintf parameter.log
-            "agent_type:%i:covering_class_id:%i:@set of rule_id:\n" x y
-	in
-	Site_map_and_set.Set.iter
-          (fun rule_id ->
-            fprintf parameter.log "rule_id:%i\n" rule_id
-          ) s2
-      ) result
-(*in*)
-(*fprintf stdout "Remove:\n";
   Int2Map_CV_Modif.Map.iter
     ( fun (x, y) (_, s2) ->
       let _ =
@@ -121,8 +106,7 @@ let print_new_wl_side_effect parameter error result =
         (fun rule_id ->
           fprintf parameter.log "rule_id:%i\n" rule_id
         ) s2
-    ) result2*)
-  
+    ) result
     
 (************************************************************************************)
 

@@ -367,7 +367,7 @@ let add_rule_id_to_update
       store_result_map
   in
   error, store_result
-
+  
 (*write a function add update(c) into working list*)
 
 let add_update_to_wl parameter error store_covering_classes_modification_update wl =
@@ -382,6 +382,37 @@ let add_update_to_wl parameter error store_covering_classes_modification_update 
       in
       error, result
     ) store_covering_classes_modification_update (error, wl)
+
+(*write a function add update(c) with side effects into working list, 
+  if we discovered a new bond*)
+    
+(*let add_update_bond_to_wl parameter error
+    is_new_bond
+    store_new_result_map
+    store_covering_classes_modification_update
+    wl
+    =
+  if is_new_bond
+  then
+  (*add side_effect with new update(c) into wl*)
+    let error, new_wl =
+      add_update_to_wl
+	parameter
+	error
+	store_new_result_map
+	wl
+    in
+    error, new_wl
+  else
+    (*if it is not a new bond then return add update (c) into wl*)
+    let error, new_wl =
+      add_update_to_wl
+	parameter
+	error
+	store_covering_classes_modification_udpate
+	wl
+    in
+    error, new_wl*)
 
 (************************************************************************************)
 (*fixpoint*)
@@ -480,7 +511,8 @@ let collect_bdu_update_map parameter handler error
     store_proj_bdu_test_restriction_map
     store_bdu_test_restriction_map
     is_new_bond
-    store_test_has_bond_rhs
+      store_test_has_bond_rhs
+      store_new_result_map
     store_covering_classes_modification_update
     =
   let error, handler, bdu_false = 
@@ -627,40 +659,30 @@ let collect_bdu_update_map parameter handler error
                 begin
                   if is_new_view
                   then
-		    (*add update(c) into wl_tl*)
-                    let error, new_wl =
-                      add_update_to_wl
-                        parameter
-                        error
-                        store_covering_classes_modification_update
-                        wl_tl
-                    in
-                    error, (handler, new_wl, store_result)
-                  (*is a new bond discovered?*)
-                   (* begin
+		   (*is a new bond discovered?*)
+                    begin
                       if is_new_bond
                       then
-                        (*TODO:add update(c') into wl_tl; side_effect*)
-                        (*get a set of bond_rhs*)
-                        let error, bond_rhs_set =
-                          match Map_test_bond.Map.find_option rule_id
-                            store_test_has_bond_rhs
-                          with
-                          | None -> error, Map_site_address.Set.empty
-                          | Some s -> error, s
-                        in
-                        error, (handler, store_wl, store_result)
+                        (*add update(c') into wl_tl; side_effect*)
+			let error, new_wl =
+			  add_update_to_wl
+			    parameter
+			    error
+			    store_new_result_map
+			    wl_tl
+			in
+			error, (handler, new_wl, store_result)
                       else
-                      (*add update(c) into wl_tl*)
+			(*add update(c) into wl_tl*)
                         let error, new_wl =
                           add_update_to_wl
                             parameter
                             error
                             store_covering_classes_modification_update
-                          wl_tl
+                            wl_tl
                         in
                       error, (handler, new_wl, store_result)
-                    end*)
+                    end
                   else
                     error, (handler, store_wl, store_result)
                 end

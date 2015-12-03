@@ -294,7 +294,8 @@ let scan_rule_fixpoint parameter handler_bdu error
       store_proj_bdu_test_restriction_map
       store_bdu_test_restriction_map
       is_new_bond
-      store_test_has_bond_rhs
+	store_test_has_bond_rhs
+	store_new_wl_side_effect
       store_covering_classes_modification_update
   in
   (*-------------------------------------------------------------------------------*)
@@ -443,15 +444,15 @@ let init_bdu_build parameter error =
 (************************************************************************************)
 (*init of bdu fixpoint*)
 
-let init_bdu_fixpoint parameter error = (*TODO*)
-  let init_test_has_bond_rhs = false, Map_test_bond.Map.empty in
+let init_bdu_fixpoint parameter error =
+  let init_test_has_bond_rhs  = false, Map_test_bond.Map.empty in
   let init_new_wl_side_effect = Int2Map_CV_Modif.Map.empty in
-  let init_bdu_update_map    = Map_bdu_update.Map.empty in
+  let init_bdu_update_map     = Map_bdu_update.Map.empty in
   let init_bdu_fixpoint =
     {
-      store_test_has_bond_rhs = init_test_has_bond_rhs;
+      store_test_has_bond_rhs  = init_test_has_bond_rhs;
       store_new_wl_side_effect = init_new_wl_side_effect;
-      store_bdu_update_map    = init_bdu_update_map;
+      store_bdu_update_map     = init_bdu_update_map;
     }
   in
   error, init_bdu_fixpoint
