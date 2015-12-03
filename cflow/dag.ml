@@ -757,7 +757,7 @@ module BucketTable =
 	let error,assoc = 
 	  Int_storage.Nearly_inf_Imperatif.get
 	    (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter)
-	    (Exception.empty_error_handler) 
+	    error 
 	    id
 	    table.array
 	in
@@ -769,7 +769,7 @@ module BucketTable =
 	| Some (grid,graph,None,trace,info) ->
 	   let error,cannonic = canonicalize parameter handler error graph in
 	   let error,array' = Int_storage.Nearly_inf_Imperatif.set 
-	     (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters  parameter) (Exception.empty_error_handler) id (grid,graph,Some cannonic,trace,info) table.array in 
+	     (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters  parameter) error id (grid,graph,Some cannonic,trace,info) table.array in 
 	   let table = {table with array = array'}
 	   in
 	   error,(table,cannonic)
@@ -777,8 +777,9 @@ module BucketTable =
       let add_story  parameter handler error grid pretrace story_info table =
 	let error,graph = graph_of_grid parameter handler error grid in 
 	let error,prehash = prehash parameter handler error graph in 
+	let assoc = (grid,graph,None,pretrace,story_info) in 
 	let add_story error x table =
-	  let error,array = Int_storage.Nearly_inf_Imperatif.set (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) (Exception.empty_error_handler)  table.fresh_id x table.array in 
+	  let error,array = Int_storage.Nearly_inf_Imperatif.set (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error table.fresh_id x table.array in 
 	  error,table.fresh_id,
 	  {table
 	  with
@@ -791,19 +792,64 @@ module BucketTable =
 	  let inner_tree = Inner_leave (cannonic_form, table.fresh_id) in
 	  error,id,table,inner_tree
 	in *)
-	let rec aux_inner2 error canonic_form id' cannonic_form' table = (* to do *)
-	  error,table, Inner_node (KeyMap.empty,None)
-	in
-	let rec aux_outer2 error id' l' suffix assoc table = (* to do *)
-	  error,table, Outer_node(PreHashMap.empty,None)
-	in 
-(*	let rec replace_inner error suffix id inner_tree table = (* to do *)
-	  error,table,inner_tree
-	in *)
 	let add_story_info error story_info id table = (* to do*)
-	  error,table
+	  let error,asso_opt = Int_storage.Nearly_inf_Imperatif.get (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error id table.array in
+	  match
+	    asso_opt
+	  with
+	  | None -> warn parameter error (Some "add_story_info, line 800, Unknown story id") (Failure "Unknown story id") table  
+	  | Some (grid,graph,canonic,trace,info) -> 
+	     let error,array = Int_storage.Nearly_inf_Imperatif.set (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error table.fresh_id (grid,graph,canonic,trace,story_info@info) table.array in
+	     error,{table with array = array}
 	in 
-	let update_assoc x y = y in 
+	let update_assoc error canonic_form assoc =  
+	  match
+	    assoc
+	  with
+	  | (grid,graph,None,trace,info) -> error,(grid,graph,Some canonic_form,trace,info)
+	  | (_,_,Some _,_,_) ->
+			warn parameter error (Some "update_assoc, line 812, the canonical form of this story should not have been computed yet") (Failure "the canonical form of stories  should not have been computed yet") assoc
+	in
+	let rec aux_inner2 error canonic_form canonic_form' id' assoc table = 
+	  match canonic_form,canonic_form'
+	  with
+	  | [],[] -> error,table,Inner_leave (canonic_form',id')
+	  | t::q,[] ->
+	     let error,id,table = add_story error assoc table in 
+	     error,table, Inner_node (KeyMap.add t (Inner_leave(q,id))  KeyMap.empty,Some id')
+	  | [],t'::q' ->
+	     let error,id,table = add_story error assoc table in
+	     error,table, Inner_node (KeyMap.add t' (Inner_leave(q',id')) KeyMap.empty,Some id)
+	  | t::q,t'::q' when t=t' ->
+	     let error,table,tree = aux_inner2 error q q' id' assoc table in
+	     error,table, Inner_node (KeyMap.add t tree KeyMap.empty,None)
+	  | t::q,t'::q' ->
+	     let error,id,table = add_story error assoc table in 
+	     error,table, Inner_node (KeyMap.add t (Inner_leave(q,id)) (KeyMap.add t' (Inner_leave(q',id')) KeyMap.empty),None)
+	in
+	let rec aux_outer2 error prehash prehash' id' table = 
+	  match
+	    prehash,prehash'  
+	  with
+	  | [],[] ->
+	     let error,cannonic_form = canonicalize parameter handler error graph in
+	     let error,assoc = update_assoc error cannonic_form assoc in 
+	     let error,(table,cannonic_form') = get_cannonical_form parameter handler error id' table in 
+	     let error,table,inner = aux_inner2 error cannonic_form cannonic_form' id' assoc table in
+	     error,table,To_inner (PreHashMap.empty,  inner)
+	  | t::q,[] ->
+	     let error,id,table = add_story error assoc table in 
+	     error,table, Outer_node (PreHashMap.add t (Outer_leave(q,id)) PreHashMap.empty,Some id')
+	  | [],t'::q' ->
+	     let error,id,table = add_story error assoc table in
+	     error,table, Outer_node (PreHashMap.add t' (Outer_leave(q',id')) PreHashMap.empty,Some id)
+	  | t::q,t'::q' when t=t' ->
+	     let error,table,tree = aux_outer2 error q q' id' table in
+	     error,table, Outer_node (PreHashMap.add t tree PreHashMap.empty,None)
+	  | t::q,t'::q' ->
+	     let error,id,table = add_story error assoc table in 
+	     error,table, Outer_node (PreHashMap.add t (Outer_leave(q,id)) (PreHashMap.add t' (Outer_leave(q',id')) PreHashMap.empty),None)
+	in
 	let rec aux_inner error assoc story_info suffix inner_tree table = 
 	   match
 	     suffix
@@ -849,7 +895,7 @@ module BucketTable =
 			  error,table',Inner_node(KeyMap.add t inner_tree'' map,assoc')
 		   end
 		| Inner_leave (l',id') ->
-		   aux_inner2 error id' l' suffix table 
+		   aux_inner2 error suffix l' id' assoc table 
 	      end
 	in
 	let rec aux_outer error assoc story_info suffix outer_tree table = 
@@ -876,16 +922,17 @@ module BucketTable =
 		     | (_,graph,Some _,_,_) ->
 			warn parameter error (Some "add_story, line 878, the canonical form of stories in the outer tree should not have been computed yet") (Failure "the canonical form of stories in the outer tree should not have been computed yet") graph
 		   in 
-		   let error,cannonic_form = canonicalize parameter handler error graph in 
+		   let error,cannonic_form = canonicalize parameter handler error graph in
+		   let error,assoc = update_assoc error cannonic_form assoc in 
 		   let error,(table,cannonic_form') = get_cannonical_form parameter handler error id' table in 
-		   let error,table,inner = aux_inner2 error cannonic_form id' cannonic_form'  table in
+		   let error,table,inner = aux_inner2 error cannonic_form cannonic_form' id' assoc table in
 		   error,table,To_inner (map,  inner)
 		| Outer_leave (q,id') ->
 		   let error,table = add_story_info error story_info id' table in 
 		   error,table,outer_tree
 		| To_inner (map,inner) ->
 		   let error,suffix =  canonicalize parameter handler error graph in
-		   let assoc = update_assoc suffix assoc in 
+		   let error,assoc = update_assoc error suffix assoc in 
 		   let error,table,inner = aux_inner error assoc story_info suffix inner table in
 		   error,table,To_inner(map,inner) 
 	      end
@@ -919,7 +966,7 @@ module BucketTable =
 		   let error,id,table = add_story error assoc table in
 		   error,table, Outer_node (PreHashMap.add t (Outer_leave (q,id)) (PreHashMap.add t' (Outer_leave (q',id')) PreHashMap.empty),None)
 		| Outer_leave (l',id') ->
-		   aux_outer2 error id' l' suffix assoc table 
+		   aux_outer2 error suffix l' id' table 
 		| To_inner (map,inner) ->
 		   let error,id,table = add_story error assoc table in
 		   error,table, To_inner (PreHashMap.add t (Outer_leave (q,id)) (PreHashMap.add t (Outer_leave (q,id)) PreHashMap.empty),inner)
@@ -1019,4 +1066,5 @@ module Choice(S:Selector)(A:StoryTable)(B:StoryTable) =
    
     end:StoryTable)
 
-module StoryTable = ListTable
+    (*module StoryTable = BucketTable*)
+module StoryTable = ListTable 
