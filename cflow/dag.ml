@@ -21,6 +21,8 @@
 
 module S = Generic_branch_and_cut_solver.Solver
    
+let warn parameter error option exn default = 
+       Exception.warn (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error (Some "dag.ml") option exn (fun () -> default)
 
 module type StoryTable = 
   sig
@@ -752,7 +754,7 @@ module BucketTable =
 	  fresh_id= 0 }
 
       let get_cannonical_form parameter handler error id table =
-	let _,assoc = (* to do plug errors *)
+	let error,assoc = 
 	  Int_storage.Nearly_inf_Imperatif.get
 	    (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter)
 	    (Exception.empty_error_handler) 
@@ -761,48 +763,43 @@ module BucketTable =
 	in
 	match assoc
 	with
-	  None -> (* to do warn *)
-	  error,table,[]
+	  None -> warn parameter error (Some "get_cannonical_form, line 767, unknown story id") (Failure "Inconsistent story id") (table,[])
 	| Some (_,_,Some cannonic,_,_) ->
-	   error,table,cannonic 
+	   error,(table,cannonic)
 	| Some (grid,graph,None,trace,info) ->
 	   let error,cannonic = canonicalize parameter handler error graph in
-	   let _,array' = Int_storage.Nearly_inf_Imperatif.set 
+	   let error,array' = Int_storage.Nearly_inf_Imperatif.set 
 	     (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters  parameter) (Exception.empty_error_handler) id (grid,graph,Some cannonic,trace,info) table.array in 
 	   let table = {table with array = array'}
 	   in
-	   error,table,cannonic
-
-     
-			 
-     
+	   error,(table,cannonic)
 			
       let add_story  parameter handler error grid pretrace story_info table =
 	let error,graph = graph_of_grid parameter handler error grid in 
 	let error,prehash = prehash parameter handler error graph in 
 	let add_story error x table =
-	  let _,array = Int_storage.Nearly_inf_Imperatif.set (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) (Exception.empty_error_handler)  table.fresh_id x table.array in (* plug errors *)
+	  let error,array = Int_storage.Nearly_inf_Imperatif.set (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) (Exception.empty_error_handler)  table.fresh_id x table.array in 
 	  error,table.fresh_id,
 	  {table
 	  with
 	    array = array ;
 	    fresh_id = succ_story_id table.fresh_id}
 	in 
-	let build_inner_tree error canonic_opt table =
+(*	let build_inner_tree error canonic_opt table =
 	  let error,id,table = add_story error (grid,graph,canonic_opt,pretrace,story_info) table in
-	  let error,table,cannonic_form = get_cannonical_form parameter handler error id table in
+	  let error,(table,cannonic_form) = get_cannonical_form parameter handler error id table in
 	  let inner_tree = Inner_leave (cannonic_form, table.fresh_id) in
 	  error,id,table,inner_tree
-	in 
+	in *)
 	let rec aux_inner2 error canonic_form id' cannonic_form' table = (* to do *)
 	  error,table, Inner_node (KeyMap.empty,None)
 	in
 	let rec aux_outer2 error id' l' suffix assoc table = (* to do *)
 	  error,table, Outer_node(PreHashMap.empty,None)
 	in 
-	let rec replace_inner error suffix id inner_tree table = (* to do *)
+(*	let rec replace_inner error suffix id inner_tree table = (* to do *)
 	  error,table,inner_tree
-	in 
+	in *)
 	let add_story_info error story_info id table = (* to do*)
 	  error,table
 	in 
@@ -864,13 +861,23 @@ module BucketTable =
 		match
 		  outer_tree
 		with 
+		| Empty ->
+		   let error,id,table = add_story error assoc table in
+		   error,table,Outer_leave(suffix,id)
 		| Outer_node (map,None) ->
 		   let error,id,table = add_story error assoc table in
 		    error,table,Outer_node (map , Some id)
     		| Outer_node (map,Some id') ->
-		   let (grid,graph,None,pretrace,story_info) = assoc in 
+		   let error,graph =
+		     match
+		       assoc
+		     with
+		     |	(_,graph,None,_,_) -> error,graph
+		     | (_,graph,Some _,_,_) ->
+			warn parameter error (Some "add_story, line 878, the canonical form of stories in the outer tree should not have been computed yet") (Failure "the canonical form of stories in the outer tree should not have been computed yet") graph
+		   in 
 		   let error,cannonic_form = canonicalize parameter handler error graph in 
-		   let error,table,cannonic_form' = get_cannonical_form parameter handler error id' table in 
+		   let error,(table,cannonic_form') = get_cannonical_form parameter handler error id' table in 
 		   let error,table,inner = aux_inner2 error cannonic_form id' cannonic_form'  table in
 		   error,table,To_inner (map,  inner)
 		| Outer_leave (q,id') ->
@@ -887,6 +894,9 @@ module BucketTable =
 		match
 		  outer_tree
 		with
+		| Empty ->
+		   let error,id,table = add_story error assoc table in
+		   error,table,Outer_leave(suffix,id)
 		| Outer_node (map,assoc') ->
 		   begin 
 		     match
@@ -910,6 +920,11 @@ module BucketTable =
 		   error,table, Outer_node (PreHashMap.add t (Outer_leave (q,id)) (PreHashMap.add t' (Outer_leave (q',id')) PreHashMap.empty),None)
 		| Outer_leave (l',id') ->
 		   aux_outer2 error id' l' suffix assoc table 
+		| To_inner (map,inner) ->
+		   let error,id,table = add_story error assoc table in
+		   error,table, To_inner (PreHashMap.add t (Outer_leave (q,id)) (PreHashMap.add t (Outer_leave (q,id)) PreHashMap.empty),inner)
+
+		 
 	      end
 	in
 	let error,table,tree = aux_outer error (grid,graph,None,pretrace,story_info) story_info prehash table.tree table in
