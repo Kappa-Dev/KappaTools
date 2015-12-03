@@ -782,6 +782,17 @@ site_type:1:state:0
 * Fixpoint iteration :
 ------------------------------------------------------------
 ** update Discovered sites that are bond on the rhs for the first time:
+agent_type:0:covering_class_id:0:@set of rule_id:
+rule_id:3
+agent_type:0:covering_class_id:1:@set of rule_id:
+rule_id:0
+rule_id:1
+rule_id:2
+agent_type:1:covering_class_id:0:@set of rule_id:
+rule_id:1
+rule_id:2
+agent_type:2:covering_class_id:0:@set of rule_id:
+rule_id:3
 ** Discovered sites that are bond on the rhs for the first time:
 false
 ** Fixpoint iteration function:
