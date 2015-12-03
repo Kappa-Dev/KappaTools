@@ -556,8 +556,17 @@ site_type:1:state:0
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
+** update Discovered sites that are bond on the rhs for the first time:
+agent_type:1:covering_class_id:0:@set of rule_id:
+rule_id:0
+rule_id:2
+rule_id:4
 ** Discovered sites that are bond on the rhs for the first time:
 false
 rule_id:0{agent_id:0; agent_type:0; site_type:0} -- {agent_id:1; agent_type:1; site_type:0} 
 ** Fixpoint iteration function:
-execution finished without any exception
+Some exceptions have been raised
+error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
+error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
+error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)
+error: file_name: setMap.ml; message: SetMap line 300 an already elt has been added to a set; exception:Failure(Set_and_Map.SET.add)

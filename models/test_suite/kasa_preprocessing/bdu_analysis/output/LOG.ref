@@ -1101,6 +1101,15 @@ site_type:1:state:1
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
+** update Discovered sites that are bond on the rhs for the first time:
+agent_type:1:covering_class_id:0:@set of rule_id:
+rule_id:1
+rule_id:5
+rule_id:6
+agent_type:2:covering_class_id:0:@set of rule_id:
+rule_id:2
+rule_id:5
+rule_id:7
 ** Discovered sites that are bond on the rhs for the first time:
 true
 rule_id:1{agent_id:0; agent_type:0; site_type:2} -- {agent_id:1; agent_type:1; site_type:0} 
@@ -1109,33 +1118,18 @@ rule_id:6{agent_id:0; agent_type:0; site_type:2} -- {agent_id:1; agent_type:1; s
 rule_id:7{agent_id:0; agent_type:0; site_type:3} -- {agent_id:1; agent_type:2; site_type:0} 
 ** Fixpoint iteration function:
 agent_type:0:cv_id:0
-Id=21
+Id=24
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=20
-   Node(site_type:1<1)
-    Id=19
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
 
-      Id=10
-       Node(site_type:2<2)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=8
-     Node(site_type:1<2)
-      Id=0
-       Leaf True 
-
-      Id=1
-       Leaf False 
+    Id=1
+     Leaf False 
 
 agent_type:1:cv_id:0
 Id=9

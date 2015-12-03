@@ -84,63 +84,7 @@ let compute_bdu_update parameter handler error bdu_test list_a bdu_creation bdu_
   rule, then add rule of side effects into the update(c), and then add
   update(c') to the working list.*)
  
-(*let collect_rhs_bond parameter error rule_id rule store_result =
-  List.fold_left (fun (error, set) (site_add1, site_add2) ->
-    if Map_site_address.Set.mem (site_add1, site_add2) set
-    then error, set
-    else
-      error, Map_site_address.Set.add (site_add1, site_add2) set
-  ) (error, store_result) rule.actions.bind*)
-
-(*let store_test_has_bond_rhs parameter error rule_id rule store_result =
-  let add_link rule_id set store_result =
-    let error, (l, old) =
-      match
-	Map_test_bond.Map.find_option rule_id store_result
-      with 
-      | None -> error, ([], Map_site_address.Set.empty)
-      | Some (l, old) -> error, (l, old)
-    in
-    let union_set = Map_site_address.Set.union set old in
-    (*-----------------------------------------------------------------------*)
-    (*check if a bond is discovered for the first time*)
-    if Map_site_address.Set.equal union_set old
-    then
-      (*it is not discovered for the first time*)
-      error, false, store_result
-    else
-      (*it is discovered for the first time*)
-      let result_map = 
-        Map_test_bond.Map.add rule_id (l, set) store_result
-      in
-      error, true, result_map
-  in
-  AgentMap.fold2_common parameter error
-    (fun parameter error agent_id agent site_add_map (b, store_result) ->
-      match agent with
-      | Ghost -> error, (b, store_result)
-      | Unknown_agent _ | Dead_agent _ ->
-	 warn parameter error (Some "line 156, rhs should not have dead agents")
-           Exit (b, store_result)
-      | Agent agent ->
-        let agent_type = agent.agent_name in
-        let error, set =
-          Site_map_and_set.Map.fold
-            (fun site site_add2 (error, set) ->
-              let site_add1 = Cckappa_sig.build_address agent_id agent_type site in
-              if Map_site_address.Set.mem (site_add1, site_add2) set
-              then error, set
-              else
-                error, Map_site_address.Set.add (site_add1, site_add2) set
-            ) site_add_map (error, Map_site_address.Set.empty)
-        in
-        let error, is_new_bond, store_result =
-          add_link rule_id set store_result
-        in
-        error, (is_new_bond, store_result)
-    ) rule.rule_lhs.views rule.rule_rhs.bonds store_result*)
-
-let store_test_has_bond_rhs parameter error rule_id rule store_result =
+let collect_test_has_bond_rhs parameter error rule_id rule store_result =
   let add_bond rule_id set store_result =
     let error, old =
       match Map_test_bond.Map.find_option rule_id store_result with
@@ -173,27 +117,122 @@ let store_test_has_bond_rhs parameter error rule_id rule store_result =
     ) (error, false, store_result) rule.actions.bind
   in
   error, bool, store_result
-
+    
 (*write a function if discover a new bond, add rule_id into working list*)
-
-(*let add_bond_to_wl parameter error 
-    bond_rhs_set 
+    
+let add_rule_id_to_update_aux parameter error
+    rule_id_eff
+    bond_rhs_map
+    store_covering_classes_modification_update
+    store_result
+    =
+  let error, store_new_update_map =
+    Int2Map_CV_Modif.Map.fold
+      (fun (agent_type, cv_id) (l', rule_id_set) (error, store_result) ->
+	let error, store_result =
+	  Map_test_bond.Map.fold (fun rule_id set (error, store_result) ->
+	      let error, store_result =
+		Map_site_address.Set.fold (fun (_, site_add2) (error, store_result) ->
+		  let agent_type2_bond_rhs = site_add2.agent_type in
+		  (*if agent_type in update is equal to side_address2 in bond_rhs*)
+		  if agent_type2_bond_rhs = agent_type
+		  then
+		    (*add rule_id_effect inside rule_id_set with
+		      agent_type2*)
+		    let error, new_rule_id_set =
+		      Site_map_and_set.Set.add parameter error rule_id_eff rule_id_set
+		    in
+		    (*add this new rule_id_set into map*)
+		    let result =
+		      Int2Map_CV_Modif.Map.add (agent_type, cv_id)
+			(l', new_rule_id_set) store_result
+		    in
+		    error, result
+		  else
+		    error, store_result
+		) set (error, store_result)
+	      in
+	      error, store_result
+	  ) bond_rhs_map (error, store_result)
+	in
+	error, store_result
+      ) store_covering_classes_modification_update
+      (error, store_result)
+  in
+  error, store_new_update_map
+    
+let state_compatible
+    parameter
+    error
+    state
+    bond_rhs_map
+    rule_id_eff
+    store_covering_classes_modification_update
+    store_contact_map
+    store_result_map
+    =
+  let error, store_result =
+    Int2Map_CM_state.Map.fold
+      (fun (agent_type1, site_type1, state1) (l, triple_list) (error, store_result) ->
+	let error, store_result_map =
+	  List.fold_left (fun (error, store_result) (agent_type2, site_type2, state2) ->
+	    (*check the state of side effect is compatible with 
+	      the state of iit binding state in contact map?*)
+	    if state = state2
+	    then
+	      let error, store_new_update_map =
+		add_rule_id_to_update_aux
+		  parameter
+		  error
+		  rule_id_eff
+		  bond_rhs_map
+		  store_covering_classes_modification_update
+		  store_result
+	      in
+	      error, store_new_update_map
+	    else
+	      error, store_result
+	  ) (error, store_result) triple_list
+	in
+	error, store_result_map
+      ) store_contact_map (error, store_result_map)
+  in
+  error, store_result
+    
+let add_rule_id_to_update
+    parameter
+    error 
+    store_contact_map
+    bond_rhs_map
     store_side_effects
-    store_covering_classes_modification_update wl =
+    store_covering_classes_modification_update
+    store_result_map
+    =
   let (half_break_map, remove_map) = store_side_effects in
-  let error, _ =
+  (*fold inside a side effects function and get a pair (rule_id, state)*)
+  let error, store_new_result_map =
     Int2Map_HalfBreak_effect.Map.fold
-      (fun (agent_type, site_type) (l1, l2) _ ->
-        let _ =
-          List.fold_left (fun _ (rule_id, state) ->
-            
-
-          ) _ l2
+      (fun (agent_type_eff, site_type_eff) (l1, l2) (error, store_result) ->
+        let error, store_result_map =
+          List.fold_left (fun (error, store_result) (rule_id_eff, state) ->
+	    let error, store_result =
+	      state_compatible
+		parameter
+		error
+		state
+		bond_rhs_map
+		rule_id_eff
+		store_covering_classes_modification_update
+		store_contact_map
+		store_result
+	    in
+	    error, store_result
+          ) (error, store_result) l2
         in
-
-      ) half_break_map _
-  in*)
-  
+	error, store_result_map
+      ) half_break_map (error, store_result_map)
+  in
+  error, store_new_result_map
 
 (*write a function add update(c) into working list*)
 
@@ -454,8 +493,17 @@ let collect_bdu_update_map parameter handler error
                 begin
                   if is_new_view
                   then
+		    (*add update(c) into wl_tl*)
+                    let error, new_wl =
+                      add_update_to_wl
+                        parameter
+                        error
+                        store_covering_classes_modification_update
+                        wl_tl
+                    in
+                    error, (handler, new_wl, store_result)
                   (*is a new bond discovered?*)
-                    begin
+                   (* begin
                       if is_new_bond
                       then
                         (*TODO:add update(c') into wl_tl; side_effect*)
@@ -478,7 +526,7 @@ let collect_bdu_update_map parameter handler error
                           wl_tl
                         in
                       error, (handler, new_wl, store_result)
-                    end
+                    end*)
                   else
                     error, (handler, store_wl, store_result)
                 end

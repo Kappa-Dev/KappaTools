@@ -287,11 +287,12 @@ type bdu_build =
 (*fixpoint*)
 
 type bdu_fixpoint =
-  {
-    store_test_has_bond_rhs : bool * Map_site_address.Set.t Map_test_bond.Map.t;
-    (*store_new_wl_side_effect : *)
-    store_bdu_update_map :
-      Mvbdu_wrapper.Mvbdu.mvbdu Map_bdu_update.Map.t;
+    {
+      store_test_has_bond_rhs : bool * Map_site_address.Set.t Map_test_bond.Map.t;
+      store_new_wl_side_effect :
+	(int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;
+      store_bdu_update_map :
+	Mvbdu_wrapper.Mvbdu.mvbdu Map_bdu_update.Map.t;
   }
 
 (************************************************************************************)

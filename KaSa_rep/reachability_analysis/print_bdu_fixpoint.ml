@@ -92,7 +92,22 @@ let print_test_bond_map parameter error set =
       site_add2.Cckappa_sig.agent_index site_add2.Cckappa_sig.agent_type 
       site_add2.Cckappa_sig.site     
   ) set
-      
+
+(************************************************************************************)
+
+let print_new_wl_side_effect parameter error result =
+  Int2Map_CV_Modif.Map.iter
+    ( fun (x, y) (_, s2) ->
+      let _ =
+        fprintf parameter.log
+          "agent_type:%i:covering_class_id:%i:@set of rule_id:\n" x y
+      in
+      Site_map_and_set.Set.iter
+        (fun rule_id ->
+          fprintf parameter.log "rule_id:%i\n" rule_id
+        ) s2
+    ) result
+    
 (************************************************************************************)
 
 let print_bdu_update_map parameter error result =
@@ -114,6 +129,14 @@ let print_bdu_fixpoint parameter error result =
       "* Fixpoint iteration :\n";
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
+  in
+  let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "** update Discovered sites that are bond on the rhs for the first time:\n";
+    print_new_wl_side_effect
+      parameter
+      error
+      result.store_new_wl_side_effect
   in
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
