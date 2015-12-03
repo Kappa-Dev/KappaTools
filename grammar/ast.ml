@@ -204,15 +204,18 @@ let init_compil () =
   res:={patterns=l_pat ; signatures=l_sig ; rules=l_rul ; init = l_ini ; observables = l_obs}
 *)
 
-let print_link pr_type pr_annot f = function
+let print_link pr_port pr_type pr_annot f = function
   | FREE -> ()
-  | LNK_TYPE (p, a) -> Format.fprintf f "!%a.%a" pr_type p pr_type a
+  | LNK_TYPE (p, a) -> Format.fprintf f "!%a.%a" (pr_port a) p pr_type a
   | LNK_ANY -> Format.fprintf f "?"
   | LNK_SOME -> Format.fprintf f "!_"
   | LNK_VALUE (i,a) -> Format.fprintf f "!%i%a" i pr_annot a
 
 let print_ast_link =
-  print_link (fun f (x,_) -> Format.pp_print_string f x) (fun _ () -> ())
+  print_link
+    (fun _ f (x,_) -> Format.pp_print_string f x)
+    (fun f (x,_) -> Format.pp_print_string f x)
+    (fun _ () -> ())
 let print_ast_internal f l =
   Pp.list Pp.empty (fun f (x,_) -> Format.fprintf f "~%s" x) f l
 
@@ -227,43 +230,59 @@ let print_ast_agent f ((ag_na,_),l) =
 
 let print_ast_mix f m = Pp.list Pp.comma print_ast_agent f m
 
-let rec print_ast_alg f = function
+let rec print_ast_alg pr_mix pr_tok pr_var f = function
   | EMAX -> Format.fprintf f "[Emax]"
   | PLOTNUM -> Format.fprintf f "[p]"
   | TMAX -> Format.fprintf f "[Tmax]"
   | CONST n -> Nbr.print f n
-  | OBS_VAR lab -> Format.fprintf f "'%s'" lab
+  | OBS_VAR lab -> Format.fprintf f "'%a'" pr_var lab
   | KAPPA_INSTANCE ast ->
-     Format.fprintf f "|%a|" print_ast_mix ast
-  | TOKEN_ID tk -> Format.fprintf f "|%s|" tk
+     Format.fprintf f "|%a|" pr_mix ast
+  | TOKEN_ID tk -> Format.fprintf f "|%a|" pr_tok tk
   | STATE_ALG_OP op -> Operator.print_state_alg_op f op
   | BIN_ALG_OP (op, (a,_), (b,_)) ->
      Format.fprintf f "(%a %a %a)"
-		    print_ast_alg a Operator.print_bin_alg_op op print_ast_alg b
+		    (print_ast_alg pr_mix pr_tok pr_var) a
+		    Operator.print_bin_alg_op op
+		    (print_ast_alg pr_mix pr_tok pr_var) b
   |UN_ALG_OP (op, (a,_)) ->
-    Format.fprintf f "(%a %a)" Operator.print_un_alg_op op print_ast_alg a
+    Format.fprintf f "(%a %a)" Operator.print_un_alg_op op
+		   (print_ast_alg pr_mix pr_tok pr_var) a
 
-let print_tok f ((nb,_),(n,_)) = Format.fprintf f "%a:%s" print_ast_alg nb n
+let print_tok pr_mix pr_tok pr_var f ((nb,_),(n,_)) =
+  Format.fprintf f "%a:%a" (print_ast_alg pr_mix pr_tok pr_var) nb pr_tok n
 let print_one_size tk f mix =
   Format.fprintf
     f "%a%t%a" print_ast_mix mix
     (fun f -> match tk with [] -> () | _::_ -> Format.pp_print_string f " | ")
-    (Pp.list (fun f -> Format.pp_print_string f " + ") print_tok) tk
+    (Pp.list
+       (fun f -> Format.pp_print_string f " + ")
+       (print_tok print_ast_mix Format.pp_print_string Format.pp_print_string))
+    tk
 let print_arrow f = function
   | RAR -> Format.pp_print_string f "->"
   | LRAR -> Format.pp_print_string f "<->"
-let print_raw_rate op f (def,_) =
+let print_raw_rate pr_mix pr_tok pr_var op f (def,_) =
   Format.fprintf
-    f "%a%t" print_ast_alg def
+    f "%a%t" (print_ast_alg pr_mix pr_tok pr_var) def
     (fun f ->
-     match op with None -> ()
-		 | Some (d,_) -> Format.fprintf f ", %a" print_ast_alg d)
+     match op with
+       None -> ()
+     | Some (d,_) ->
+	Format.fprintf f ", %a" (print_ast_alg pr_mix pr_tok pr_var) d)
 let print_rates un op f def =
   Format.fprintf
-    f "%a%t" (print_raw_rate op) def
+    f "%a%t"
+    (print_raw_rate print_ast_mix Format.pp_print_string Format.pp_print_string op)
+    def
     (fun f ->
-     match un with None -> ()
-		 | Some (d,o) -> Format.fprintf f " (%a)" (print_raw_rate o) d)
+     match un with
+       None -> ()
+		 | Some (d,o) ->
+		    Format.fprintf
+		      f " (%a)"
+		      (print_raw_rate print_ast_mix Format.pp_print_string Format.pp_print_string o)
+		      d)
 let print_ast_rule f r =
   Format.fprintf
     f "@[<h>%a %a %a @@ %a@]"
@@ -287,5 +306,5 @@ let rec print_bool p_alg f = function
      Format.fprintf f "(%a %a %a)"
 		    p_alg a Operator.print_compare_op op p_alg b
 
-let print_ast_bool = print_bool print_ast_alg
-
+let print_ast_bool pr_mix pr_tok pr_var =
+  print_bool (print_ast_alg pr_mix pr_tok pr_var)

@@ -8,20 +8,22 @@ let print_link f = function
   | FREE -> ()
   | VAL i -> Format.fprintf f "!%i" i
 
-let print_intf with_link sigs ag_ty f (ports,ints) =
+let print_intf compact with_link sigs ag_ty f (ports,ints) =
   let rec aux empty i =
     if i < Array.length ports then
       let () = Format.fprintf
-		 f "%t%a%a" (if empty then Pp.empty else Pp.comma)
+		 f "%t%a%a"
+		 (if empty then Pp.empty
+		  else if compact then Pp.compact_comma else Pp.comma)
 		 (Signature.print_site_internal_state sigs ag_ty i)
 		 ints.(i) (if with_link then print_link else (fun _ _ -> ()))
 			  ports.(i) in
       aux false (succ i) in
   aux true 0
 
-let print_agent with_link sigs f ag =
+let print_agent compact link sigs f ag =
   Format.fprintf f "%a(@[<h>%a@])" (Signature.print_agent sigs) ag.a_type
-		 (print_intf with_link sigs ag.a_type) (ag.a_ports,ag.a_ints)
+		 (print_intf compact link sigs ag.a_type) (ag.a_ports,ag.a_ints)
 
 let get_color =
   let store = Hashtbl.create 10 in
@@ -38,7 +40,8 @@ let print_dot sigs nb_cc f mix =
     (fun i f ag ->
      Format.fprintf
        f "node%d_%d [label = \"@[<h>%a@]\", color = \"%s\", style=filled];@,"
-	      nb_cc i (print_agent false sigs) ag (get_color ag.a_type);
+       nb_cc i (print_agent true false sigs) ag
+       (get_color ag.a_type);
      Format.fprintf
        f "node%d_%d -> counter%d [style=invis];@," nb_cc i nb_cc) f mix;
   ignore @@
@@ -63,8 +66,8 @@ let print_dot sigs nb_cc f mix =
        (succ a,acc'))
       (0,Mods.IntMap.empty) mix
 
-let print sigs f mix =
-  Pp.list Pp.comma (print_agent true sigs) f mix
+let print ~compact sigs f mix =
+  Pp.list Pp.comma (print_agent compact true sigs) f mix
 
 let agent_is_linked_on_port me i id = function
   | VAL j when i = j -> id <> me

@@ -6,8 +6,8 @@ val init :
   Signature.s -> unit NamedDecls.t -> Alg_expr.t Location.annot NamedDecls.t ->
   (Operator.DepSet.t * Operator.DepSet.t *
      Operator.DepSet.t array * Operator.DepSet.t array) ->
-  ((string Location.annot option * Ast.rule Location.annot) array *
-     Primitives.elementary_rule NamedDecls.t *
+  ((string Location.annot option * LKappa.rule Location.annot) array *
+     Primitives.elementary_rule array *
        Connected_component.Set.t) ->
   Alg_expr.t Location.annot array -> Primitives.perturbation array -> t
 (** [init sigs tokens algs dependencies (ast_rules,rules) obs perts]
@@ -33,13 +33,12 @@ val get_token_reverse_dependencies : t -> int -> Operator.DepSet.t
 val get_always_outdated : t -> Operator.DepSet.t
 
 val num_of_agent : string Location.annot -> t -> int
-val num_of_rule : string Location.annot -> t -> int
 val num_of_alg : string Location.annot -> t -> int
 val num_of_token : string Location.annot -> t -> int
 
 val print_ast_rule : ?env:t -> Format.formatter -> int -> unit
-val print_agent : ?env:t -> Format.formatter -> int -> unit
 val print_rule : ?env:t -> Format.formatter -> int -> unit
+val print_agent : ?env:t -> Format.formatter -> int -> unit
 val print_alg : ?env:t -> Format.formatter -> int -> unit
 val print_token : ?env:t -> Format.formatter -> int -> unit
 

@@ -22,7 +22,7 @@
     g.setNode(1, { label: "Intro B", style: "fill: #7f7" });
     g.setNode(2, { label: "Intro A", style: "fill: #7f7" });
     g.setNode(3, { label: "A() -> ", style: "fill: #77f" });
-    g.setNode(4, { label: " -> A()", style: "fill: #77f" });
+    g.setNode(4, { label: " -> A(x)", style: "fill: #77f" });
     g.setNode(5, { label: "A(x), B(x) -> A(x!1), B(x!1)", style: "fill: #77f" });
     g.setNode(6, { label: "A(x!1), B(x!1) -> A(x!1), B(x!1), C()", style: "fill: #77f" });
     g.setNode(7, { label: "goal", style: "fill: #f77" });

@@ -20,10 +20,11 @@ let bottom f = Format.pp_print_string f "\xE2\x8A\xA5"
 let nu f = Format.pp_print_string f "\xCE\xBD"
 let empty_set f = Format.pp_print_string f "\xE2\x88\x85"
 let comma f = fprintf f ",@ "
+let compact_comma f = fprintf f ",@,"
 let colon f = fprintf f ";@ "
 let space f = pp_print_space f ()
 let cut f = pp_print_cut f ()
-let empty f = fprintf f ""
+let empty f = pp_print_string f ""
 let option pr f = function
   | None -> ()
   | Some x -> fprintf f "@ %a" pr x

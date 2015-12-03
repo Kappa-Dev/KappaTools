@@ -153,10 +153,15 @@ val no_more_site_on_right : bool -> port list -> port list -> bool
 (** {6 Printers} *)
 
 val print_link :
-  (Format.formatter -> 'a -> unit) -> (Format.formatter -> 'b -> unit) ->
+  ('a -> Format.formatter -> 'a -> unit) ->
+  (Format.formatter -> 'a -> unit) ->
+  (Format.formatter -> 'b -> unit) ->
   Format.formatter -> ('a, 'b) link -> unit
 val print_ast_mix : Format.formatter -> mixture -> unit
-val print_ast_alg : Format.formatter -> (mixture,string) ast_alg_expr -> unit
+val print_ast_alg :
+  (Format.formatter -> 'a -> unit) -> (Format.formatter -> 'b -> unit) ->
+  (Format.formatter -> 'b -> unit) ->
+  Format.formatter -> ('a,'b) ast_alg_expr -> unit
 val print_ast_rule : Format.formatter -> rule -> unit
 val print_ast_rule_no_rate :
   reverse:bool -> Format.formatter -> rule -> unit
@@ -165,4 +170,6 @@ val print_bool :
   (Format.formatter -> 'a -> unit) ->
   Format.formatter -> 'a bool_expr -> unit
 val print_ast_bool :
-  Format.formatter -> (mixture,string) ast_alg_expr bool_expr -> unit
+  (Format.formatter -> 'a -> unit) -> (Format.formatter -> 'b -> unit) ->
+  (Format.formatter -> 'b -> unit) ->
+  Format.formatter -> ('a,'b) ast_alg_expr bool_expr -> unit

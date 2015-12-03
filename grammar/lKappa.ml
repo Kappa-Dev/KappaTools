@@ -16,6 +16,25 @@ type rule_agent =
 		  rule_internal array) option;
   }
 
+type rule_mixture = rule_agent list
+
+type rule =
+  { r_mix: rule_mixture;
+    r_created: Raw_mixture.t;
+    r_rm_tokens :
+      ((rule_mixture,int) Ast.ast_alg_expr Location.annot * int) list;
+    r_add_tokens :
+      ((rule_mixture,int) Ast.ast_alg_expr Location.annot * int) list;
+    r_rate : (rule_mixture,int) Ast.ast_alg_expr Location.annot;
+    r_un_rate : (rule_mixture,int) Ast.ast_alg_expr Location.annot option;
+  }
+
+let print_link_annot ~ltypes sigs f (s,a) =
+  if ltypes then
+    Format.fprintf f "(*%a.%a*)"
+		   (Signature.print_site sigs a) s
+		   (Signature.print_agent sigs) a
+
 let print_rule_internal sigs ag_ty site f = function
   | I_ANY -> ()
   | I_ANY_CHANGED j ->
@@ -41,11 +60,10 @@ let print_switching f = function
 let print_rule_link sigs f ((e,_),s) =
   Format.fprintf
     f "%a%a"
-    (Ast.print_link Format.pp_print_int
-		    (fun f (s,a) ->
-		     Format.fprintf f "(*%a.%a*)"
-				    (Signature.print_site sigs a) s
-				    (Signature.print_agent sigs) a))
+    (Ast.print_link
+       (Signature.print_site sigs)
+       (Signature.print_agent sigs)
+       (print_link_annot ~ltypes:true sigs))
     e
     print_switching s
 
@@ -72,6 +90,143 @@ let print_rule_agent sigs f ag =
 
 let print_rule_mixture sigs f mix =
   Pp.list Pp.comma (print_rule_agent sigs) f mix
+
+let print_internal_lhs sigs ag_ty site f = function
+  | (I_ANY | I_ANY_CHANGED _ | I_ANY_ERASED) -> ()
+  | (I_VAL_CHANGED (i,_) | I_VAL_ERASED i) ->
+     Format.fprintf f "~%a" (Signature.print_internal_state sigs ag_ty site) i
+
+let print_internal_rhs sigs ag_ty site f = function
+  | I_ANY -> ()
+  | (I_ANY_CHANGED j | I_VAL_CHANGED (_,j)) ->
+     Format.fprintf f "~%a" (Signature.print_internal_state sigs ag_ty site) j
+  | (I_ANY_ERASED | I_VAL_ERASED _) -> assert false
+
+let print_link_lhs ~ltypes sigs f ((e,_),_) =
+  Ast.print_link
+    (Signature.print_site sigs)
+    (Signature.print_agent sigs)
+    (print_link_annot ~ltypes sigs)
+    f e
+
+let print_link_rhs ~ltypes sigs f ((e,_),s) =
+  match s with
+  | Linked (i,_) ->
+     Ast.print_link
+       (Signature.print_site sigs) (Signature.print_agent sigs) (fun _ () -> ())
+		    f (Ast.LNK_VALUE (i,()))
+  | Freed -> ()
+  | Maintained ->
+     Ast.print_link
+       (Signature.print_site sigs) (Signature.print_agent sigs)
+		    (print_link_annot ~ltypes sigs)
+    f e
+  | Erased -> assert false
+
+let print_intf_lhs ~ltypes sigs ag_ty f (ports,ints) =
+  let rec aux empty i =
+    if i < Array.length ports then
+      if (match ports.(i) with
+	  | (((Ast.LNK_SOME | Ast.FREE |
+	       Ast.LNK_TYPE _ | Ast.LNK_VALUE _),_), _) -> true
+	  | (Ast.LNK_ANY, _), _ ->
+	     match ints.(i) with
+	     | (I_ANY | I_ANY_ERASED | I_ANY_CHANGED _) -> false
+	     | ( I_VAL_CHANGED _ | I_VAL_ERASED _) -> true) then
+	let () = Format.fprintf
+		   f "%t%a%a%a"
+		   (if empty then Pp.empty else Pp.compact_comma)
+		   (Signature.print_site sigs ag_ty) i
+		   (print_internal_lhs sigs ag_ty i)
+		   ints.(i) (print_link_lhs ~ltypes sigs) ports.(i) in
+	aux false (succ i)
+      else aux empty (succ i) in
+  aux true 0
+
+let print_intf_rhs ~ltypes sigs ag_ty f (ports,ints) =
+  let rec aux empty i =
+    if i < Array.length ports then
+      if (match ports.(i) with
+	  | (((Ast.LNK_SOME | Ast.FREE |
+	       Ast.LNK_TYPE _ | Ast.LNK_VALUE _),_), _) -> true
+	  | ((Ast.LNK_ANY, _), (Erased | Freed | Linked _)) -> true
+	  | ((Ast.LNK_ANY, _), Maintained) ->
+	     match ints.(i) with
+	     | I_ANY -> false
+	     | I_VAL_CHANGED (i,j) -> i <> j
+	     | (I_ANY_ERASED | I_ANY_CHANGED _ | I_VAL_ERASED _) -> true) then
+	let () = Format.fprintf
+		   f "%t%a%a%a"
+		   (if empty then Pp.empty else Pp.compact_comma)
+		   (Signature.print_site sigs ag_ty) i
+		   (print_internal_rhs sigs ag_ty i)
+		   ints.(i) (print_link_rhs ~ltypes sigs) ports.(i) in
+	aux false (succ i)
+      else aux empty (succ i) in
+  aux true 0
+
+let print_agent_lhs ~ltypes sigs f ag =
+  Format.fprintf
+    f "%a(@[<h>%a@])" (Signature.print_agent sigs) ag.ra_type
+    (print_intf_lhs ~ltypes sigs ag.ra_type) (ag.ra_ports,ag.ra_ints)
+
+let print_agent_rhs ~ltypes sigs f ag =
+  if not ag.ra_erased then
+    Format.fprintf
+      f "%a(@[<h>%a@])" (Signature.print_agent sigs) ag.ra_type
+      (print_intf_rhs ~ltypes sigs ag.ra_type) (ag.ra_ports,ag.ra_ints)
+
+let print_rhs ~ltypes sigs created f mix =
+  let rec aux empty = function
+    | [] ->
+       Format.fprintf f "%t%a"
+		      (if empty || created = [] then Pp.empty else Pp.comma)
+		      (Raw_mixture.print ~compact:true sigs) created
+    | h :: t ->
+       if h.ra_erased then aux empty t
+       else
+	 let () = Format.fprintf f "%t%a"
+		      (if empty then Pp.empty else Pp.comma)
+		      (print_agent_rhs ~ltypes sigs) h in
+	 aux false t in
+  aux true mix
+
+let print_rates sigs pr_tok pr_var f r =
+  Format.fprintf
+    f " @@ %a%t"
+    (Ast.print_ast_alg (print_rule_mixture sigs) pr_tok pr_var) (fst r.r_rate)
+    (fun f -> match r.r_un_rate with
+		None -> ()
+	      | Some (ra,_) ->
+		 Ast.print_ast_alg (print_rule_mixture sigs) pr_tok pr_var f ra)
+
+let print_rule ~ltypes ~rates sigs pr_tok pr_var f r =
+  Format.fprintf
+    f "@[<h>%a%t%a -> %a%t%a%t@]"
+    (Pp.list Pp.comma (print_agent_lhs ~ltypes sigs)) r.r_mix
+    (fun f -> match r.r_rm_tokens with [] -> ()
+				     | _::_ -> Format.pp_print_string f " | ")
+    (Pp.list
+       (fun f -> Format.pp_print_string f " + ")
+       (fun f ((nb,_),tk) ->
+	Format.fprintf
+	  f "%a:%a"
+	  (Ast.print_ast_alg (print_rule_mixture sigs) pr_tok pr_var) nb
+	  pr_tok tk))
+    r.r_rm_tokens
+    (print_rhs ~ltypes sigs r.r_created) r.r_mix
+    (fun f ->
+     match r.r_add_tokens with [] -> ()
+			     | _::_ -> Format.pp_print_string f " | ")
+    (Pp.list
+       (fun f -> Format.pp_print_string f " + ")
+       (fun f ((nb,_),tk) ->
+	Format.fprintf
+	  f "%a:%a"
+	  (Ast.print_ast_alg (print_rule_mixture sigs) pr_tok pr_var) nb
+	  pr_tok tk))
+    r.r_add_tokens
+    (fun f -> if rates then print_rates sigs pr_tok pr_var f r)
 
 let build_l_type sigs pos dst_ty dst_p switch =
   let ty_id = Signature.num_of_agent dst_ty sigs in
@@ -117,6 +272,77 @@ let site_occurence_failure ag_na (na,pos) =
 	   ("Site '"^na^"' of agent '"^ag_na^
 	      "' is problematic! Either Sanity.mixture is"^
 		"broken or you don't use it!",pos))
+
+let copy_rule_agent a =
+  let p = Array.copy a.ra_ports in
+  let i = Array.copy a.ra_ints in
+  { ra_type = a.ra_type; ra_erased = a.ra_erased; ra_ports = p; ra_ints = i;
+    ra_syntax =
+      Tools.option_map (fun _ -> Array.copy p, Array.copy i) a.ra_syntax; }
+
+let to_erased x =
+  List.map
+    (fun r ->
+     let ports = Array.map (fun (a,_) -> a,Erased) r.ra_ports in
+     let ints =
+       Array.map (function
+		   | I_VAL_CHANGED (i,_) | I_VAL_ERASED i -> I_VAL_ERASED i
+		   | I_ANY | I_ANY_CHANGED _ | I_ANY_ERASED -> I_ANY_ERASED
+		 ) r.ra_ints in
+     { ra_type = r.ra_type; ra_erased = true; ra_ports = ports; ra_ints =ints;
+       ra_syntax =
+	 match r.ra_syntax with None -> None | Some _ -> Some (ports,ints);})
+    x
+
+let to_maintained x =
+  List.map
+    (fun r ->
+     let ports = Array.map (fun (a,_) -> a,Maintained) r.ra_ports in
+     let ints =
+       Array.map (function
+		   | I_VAL_CHANGED (i,_) | I_VAL_ERASED i -> I_VAL_CHANGED (i,i)
+		   | I_ANY | I_ANY_CHANGED _ | I_ANY_ERASED -> I_ANY
+		 ) r.ra_ints in
+     { ra_type = r.ra_type; ra_erased = false; ra_ports = ports; ra_ints =ints;
+       ra_syntax =
+	 match r.ra_syntax with None -> None | Some _ -> Some (ports,ints);})
+    x
+
+let to_raw_mixture sigs x =
+  Tools.list_mapi
+    (fun id r ->
+     let internals =
+       Array.mapi
+	 (fun j -> function
+		| I_VAL_CHANGED (i,_) | I_VAL_ERASED i -> Some i
+		| (I_ANY | I_ANY_CHANGED _ | I_ANY_ERASED) ->
+		   Signature.default_internal_state r.ra_type j sigs)
+	 r.ra_ints in
+     let ports =
+       Array.mapi
+	 (fun j -> function
+		| ((Ast.LNK_SOME, pos) | (Ast.LNK_TYPE _,pos)),_ ->
+		   let ag_na =
+		     Format.asprintf
+		       "%a" (Signature.print_agent sigs) r.ra_type in
+		   let p_na =
+		     Format.asprintf
+		       "%a" (Signature.print_site sigs r.ra_type) j in
+		   not_enough_specified ag_na (p_na,pos)
+		| (Ast.LNK_VALUE (i,_), _),_ -> Raw_mixture.VAL i
+		| ((Ast.LNK_ANY, _) | (Ast.FREE, _)),_ -> Raw_mixture.FREE
+	 )
+	 r.ra_ports in
+     { Raw_mixture.a_id = id; Raw_mixture.a_type = r.ra_type;
+       Raw_mixture.a_ports = ports; Raw_mixture.a_ints = internals; })
+    x
+
+let rec ast_alg_has_mix = function
+  | Ast.BIN_ALG_OP (_, a, b), _ -> ast_alg_has_mix a || ast_alg_has_mix b
+  | Ast.UN_ALG_OP (_, a), _  -> ast_alg_has_mix a
+  | (Ast.STATE_ALG_OP _ | Ast.OBS_VAR _ | Ast.TOKEN_ID _ | Ast.CONST _ |
+     Ast.TMAX | Ast.EMAX | Ast.PLOTNUM), _ -> false
+  | Ast.KAPPA_INSTANCE _, _ -> true
 
 let annotate_dropped_agent sigs links_annot ((agent_name, _ as ag_ty),intf) =
   let ag_id = Signature.num_of_agent ag_ty sigs in
@@ -420,8 +646,235 @@ let annotate_lhs_with_diff sigs lhs rhs =
 		     ("The link '"^string_of_int i^
 			"' occurs only one time in the mixture.", pos)) in
        let () = refer_links_annot links_two mix in
-       mix,
-       List.fold_left
-	 (fun (id,acc) x ->
-	  succ id, annotate_created_agent id sigs x::acc) (0,[]) added in
+       List.rev mix,
+       List.rev @@ snd @@
+	 List.fold_left
+	   (fun (id,acc) x ->
+	    succ id, annotate_created_agent id sigs x::acc) (0,[]) added in
   aux (Mods.IntMap.empty,Mods.IntMap.empty) [] lhs rhs
+
+let name_and_purify_rule (label_opt,(r,r_pos)) (id,acc,rules) =
+  let id',label = match label_opt with
+    | None ->
+       succ id, Format.asprintf "r%i: %a" id Ast.print_ast_rule r
+    | Some (lab,_) -> id,lab in
+  let acc',k_def =
+    if ast_alg_has_mix r.Ast.k_def then
+      let rate_var = label^"_rate" in
+      ((Location.dummy_annot rate_var,r.Ast.k_def)::acc,
+       Location.dummy_annot (Ast.OBS_VAR rate_var))
+    else (acc,r.Ast.k_def) in
+  let acc'',k_un,k_un_op = match r.Ast.k_un with
+    | None -> (acc',None,None)
+    | Some (k,k_op_op) ->
+       let acc_un,k' =
+	 if ast_alg_has_mix k then
+	   let rate_var = label^"_un_rate" in
+	   ((Location.dummy_annot rate_var,k)::acc',
+	    Location.dummy_annot (Ast.OBS_VAR rate_var))
+	 else (acc',k) in
+       let acc_un',k_op' =
+	 match k_op_op,r.Ast.k_op with
+	 | Some k_op, Some _ when ast_alg_has_mix k_op ->
+	    let rate_var = (Ast.flip_label label)^"_un_rate" in
+	    ((Location.dummy_annot rate_var,k_op)::acc_un,
+	     Some (Location.dummy_annot (Ast.OBS_VAR rate_var)))
+	 | (Some _, None) | (Some _, Some _) | (None, None) ->
+						      (acc_un,k_op_op)
+	 | (None, Some (_,pos)) ->
+	    raise (ExceptionDefn.Malformed_Decl
+		     ("Missing rate for reverse rule",pos)) in
+       (acc_un',Some k',k_op') in
+  let acc''',rules' =
+    match r.Ast.arrow,r.Ast.k_op with
+    | Ast.LRAR, Some k when ast_alg_has_mix k ->
+       let rate_var = (Ast.flip_label label)^"_rate" in
+       ((Location.dummy_annot rate_var,k)::acc'',
+	(Tools.option_map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
+	 r.Ast.rhs,r.Ast.lhs,r.Ast.add_token,r.Ast.rm_token,
+	 Location.dummy_annot (Ast.OBS_VAR rate_var),k_un_op,r_pos)::rules)
+    | Ast.LRAR, Some rate ->
+       (acc'',
+	(Tools.option_map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
+	 r.Ast.rhs,r.Ast.lhs,r.Ast.add_token,r.Ast.rm_token,
+	 rate,k_un_op,r_pos)::rules)
+    | Ast.RAR, None -> (acc'',rules)
+    | (Ast.RAR, Some _ | Ast.LRAR, None) ->
+       raise
+	 (ExceptionDefn.Malformed_Decl
+	    ("Incompatible arrow and kinectic rate for inverse definition",
+	     r_pos)) in
+  (id',acc''',
+   (label_opt
+     ,r.Ast.lhs,r.Ast.rhs,r.Ast.rm_token,r.Ast.add_token,k_def,k_un,r_pos)
+   ::rules')
+
+let mixture_of_ast sigs pos mix =
+  match annotate_lhs_with_diff sigs mix mix with
+  | r, [] -> r
+  | _, _ -> raise (ExceptionDefn.Internal_Error
+		     ("A mixture cannot create agents",pos))
+
+let rec alg_expr_of_ast sigs tok algs ?max_allowed_var (alg,pos) =
+  ((match alg with
+   | Ast.KAPPA_INSTANCE ast -> Ast.KAPPA_INSTANCE (mixture_of_ast sigs pos ast)
+   | Ast.OBS_VAR lab ->
+      let i =
+	match Mods.StringMap.find_option lab algs with
+	| Some x -> x
+	| None ->
+	   raise (ExceptionDefn.Malformed_Decl
+		    (lab ^" is not a declared variable",pos)) in
+      let () = match max_allowed_var with
+	| Some j when j < i ->
+	   raise (ExceptionDefn.Malformed_Decl
+		    ("Reference to not yet defined '"^lab ^"' is forbidden.",
+		     pos))
+	| None | Some _ -> ()
+      in Ast.OBS_VAR i
+   | Ast.TOKEN_ID tk_nme ->
+      let i =
+	match Mods.StringMap.find_option tk_nme tok with
+	| Some x -> x
+	| None ->
+	   raise (ExceptionDefn.Malformed_Decl
+		    (tk_nme ^ " is not a declared token",pos))
+      in Ast.TOKEN_ID i
+   | (Ast.STATE_ALG_OP _ | Ast.CONST _ |
+      Ast.EMAX | Ast.TMAX | Ast.PLOTNUM) as x -> x
+   | Ast.BIN_ALG_OP (op, a, b) ->
+      Ast.BIN_ALG_OP (op,
+		      alg_expr_of_ast sigs tok algs ?max_allowed_var a,
+		      alg_expr_of_ast sigs tok algs ?max_allowed_var b)
+   | Ast.UN_ALG_OP (op,a) ->
+      Ast.UN_ALG_OP
+	(op,alg_expr_of_ast sigs tok algs ?max_allowed_var a)),
+   pos)
+
+let rec bool_expr_of_ast sigs tok algs = function
+  | (Ast.TRUE | Ast.FALSE),_ as x -> x
+  | Ast.BOOL_OP (op,x,y),pos ->
+     Ast.BOOL_OP
+       (op, bool_expr_of_ast sigs tok algs x, bool_expr_of_ast sigs tok algs y),
+     pos
+  | Ast.COMPARE_OP (op,x,y),pos ->
+     Ast.COMPARE_OP
+       (op,alg_expr_of_ast sigs tok algs x, alg_expr_of_ast sigs tok algs y),pos
+
+let print_expr_of_ast sigs tok algs = function
+  | Ast.Str_pexpr _,_ as x -> x
+  | Ast.Alg_pexpr x,pos ->
+     Ast.Alg_pexpr (fst @@ alg_expr_of_ast sigs tok algs (x,pos)),pos
+
+let modif_expr_of_ast sigs tok algs = function
+  | Ast.INTRO (how,(who,pos)) ->
+     Ast.INTRO
+       (alg_expr_of_ast sigs tok algs how, (mixture_of_ast sigs pos who,pos))
+  | Ast.DELETE (how,(who,pos)) ->
+     Ast.DELETE
+       (alg_expr_of_ast sigs tok algs how,(mixture_of_ast sigs pos who,pos))
+  | Ast.UPDATE ((lab,pos),how) ->
+     Ast.UPDATE ((lab,pos),alg_expr_of_ast sigs tok algs how)
+  | Ast.UPDATE_TOK ((lab,pos),how) ->
+     let i =
+       match Mods.StringMap.find_option lab tok with
+       | Some x -> x
+       | None ->
+	  raise (ExceptionDefn.Malformed_Decl
+		   (lab ^" is not a declared token",pos)) in
+     Ast.UPDATE_TOK ((i,pos), alg_expr_of_ast sigs tok algs how)
+  | Ast.STOP (p,pos) ->
+     Ast.STOP (List.map (print_expr_of_ast sigs tok algs) p,pos)
+  | Ast.SNAPSHOT (p,pos) ->
+     Ast.SNAPSHOT (List.map (print_expr_of_ast sigs tok algs) p,pos)
+  | Ast.FLUX (p,pos) ->
+     Ast.FLUX (List.map (print_expr_of_ast sigs tok algs) p,pos)
+  | Ast.FLUXOFF (p,pos) ->
+     Ast.FLUXOFF (List.map (print_expr_of_ast sigs tok algs) p,pos)
+  | (Ast.PLOTENTRY | Ast.CFLOWLABEL (_,_ ) as x) -> x
+  | Ast.PRINT (p,p',pos) ->
+     Ast.PRINT
+       (List.map (print_expr_of_ast sigs tok algs) p,
+	List.map (print_expr_of_ast sigs tok algs) p',
+	pos)
+  | Ast.CFLOWMIX (b,(m,pos)) -> Ast.CFLOWMIX (b,(mixture_of_ast sigs pos m,pos))
+
+let perturbation_of_ast sigs tok algs ((pre,mods,post),pos) =
+  (bool_expr_of_ast sigs tok algs pre,
+   List.map (modif_expr_of_ast sigs tok algs) mods,
+   match post with
+   | None -> None
+   | Some post -> Some (bool_expr_of_ast sigs tok algs post)),pos
+
+let init_of_ast sigs tok algs = function
+  | Ast.INIT_MIX (how,(who,pos)) ->
+     Ast.INIT_MIX
+       (alg_expr_of_ast sigs tok algs how, (mixture_of_ast sigs pos who,pos))
+  | Ast.INIT_TOK (how,(lab,pos)) ->
+     let i =
+       match Mods.StringMap.find_option lab tok with
+       | Some x -> x
+       | None ->
+	  raise (ExceptionDefn.Malformed_Decl
+		   (lab ^" is not a declared token",pos)) in
+     Ast.INIT_TOK
+       (alg_expr_of_ast sigs tok algs how,(i,pos))
+
+let compil_of_ast overwrite c =
+  let sigs = Signature.create c.Ast.signatures in
+  let (_,extra_vars,cleaned_rules) =
+    List.fold_right name_and_purify_rule c.Ast.rules (0,[],[]) in
+  let alg_vars_over =
+    Tools.list_rev_map_append
+      (fun (x,v) -> (Location.dummy_annot x,
+		     Location.dummy_annot (Ast.CONST v))) overwrite
+      (List.filter
+	 (fun ((x,_),_) ->
+	  List.for_all (fun (x',_) -> x <> x') overwrite)
+	 (c.Ast.variables@extra_vars)) in
+  let algs =
+    (NamedDecls.create (Array.of_list alg_vars_over)).NamedDecls.finder in
+  let tk_nd = NamedDecls.create
+		(Tools.array_map_of_list (fun x -> (x,())) c.Ast.tokens) in
+  let tok = tk_nd.NamedDecls.finder in
+  sigs,tk_nd,
+  {
+    Ast.variables =
+      Tools.list_mapi
+	(fun i (lab,expr) ->
+	 (lab,alg_expr_of_ast ~max_allowed_var:(pred i) sigs tok algs expr))
+	alg_vars_over;
+    Ast.rules =
+      List.map (fun (label,lhs,rhs,rm_tk,add_tk,rate,un_rate,r_pos) ->
+		let mix,created = annotate_lhs_with_diff sigs lhs rhs in
+		label,
+		({ r_mix = mix; r_created = List.map fst created;
+		   r_rm_tokens =
+		     List.map (fun (al,tk) ->
+			       (alg_expr_of_ast sigs tok algs al,
+				NamedDecls.elt_id ~kind:"token" tk_nd tk))
+			      rm_tk;
+		   r_add_tokens =
+		     List.map (fun (al,tk) ->
+			       (alg_expr_of_ast sigs tok algs al,
+				NamedDecls.elt_id ~kind:"token" tk_nd tk))
+			      add_tk;
+		   r_rate = alg_expr_of_ast sigs tok algs rate;
+		   r_un_rate =
+		     Tools.option_map
+		       (alg_expr_of_ast sigs tok algs ?max_allowed_var:None)
+		       un_rate;
+		 },r_pos)) cleaned_rules;
+    Ast.observables =
+      List.map (fun expr -> alg_expr_of_ast sigs tok algs expr)
+	       c.Ast.observables;
+    Ast.init =
+      List.map (fun (lab,ini,pos) -> lab,init_of_ast sigs tok algs ini,pos)
+	       c.Ast.init;
+    Ast.perturbations =
+      List.map (perturbation_of_ast sigs tok algs) c.Ast.perturbations;
+    Ast.volumes = c.Ast.volumes;
+    Ast.tokens = c.Ast.tokens;
+    Ast.signatures = c.Ast.signatures;
+    Ast.configurations = c.Ast.configurations;
+  }

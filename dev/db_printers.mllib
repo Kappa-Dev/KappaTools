@@ -23,6 +23,7 @@ Operator
 ExceptionDefn
 
 Ast
+LKappa
 Expr
 Signature
 NamedDecls

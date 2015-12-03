@@ -10,7 +10,7 @@ node_2 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 node_3 [label="A(x), A(x) -> A(x!1), A(x!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "2" [shape=plaintext] ;
-node_4 [label="A(y,x!1), A(y,x!1) -> A(y!1,x!2), A(y!1,x!2)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_4 [label="A(x!1,y), A(x!1,y) -> A(x!1,y!1), A(x!1,y!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "3" [shape=plaintext] ;
 node_5 [label="A(x!1,y!2), A(x!1,y!2) -> A(x!1,y!2), A(x!2,y!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;

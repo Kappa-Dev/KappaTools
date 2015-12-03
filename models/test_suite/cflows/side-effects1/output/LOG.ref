@@ -24,7 +24,7 @@ ____________________________________________________________
 	 - renaming agents to avoid conflicts after event removals (no change)
 	 - detecting siphons (no change)
 	 - renaming agents to avoid conflicts after event removals (no change)
-	 - cutting concurrent events (-7 events)
+	 - cutting concurrent events (-8 events)
 	 - blackboard generation
 	 - computing causal past of each observed events (8)
 Stats:
@@ -42,10 +42,10 @@ ____________________________________________________________
 	 - blackboard generation
 	 - computing causal past of each observed events (8)
 Stats:
- number of step   : 19
+ number of step   : 18
  longest story    : 4
- average length   : 3.4
- geometric mean   : 3.60555127546
+ average length   : 3.22222222222
+ geometric mean   : 3.34995854037
 
 	 - causal flow compression (8)
 

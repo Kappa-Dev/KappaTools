@@ -4,12 +4,12 @@ digraph G{
  ranksep=.5 ;
 { rank = same ; "0" [shape=plaintext] ;
 node_1 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
-node_2 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
-node_3 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_2 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_3 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 node_4 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 node_5 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
-node_6 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
-node_7 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_6 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_7 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 node_11 [label="pert", shape=invhouse, style=filled, fillcolor = green] ;
 node_12 [label="pert", shape=invhouse, style=filled, fillcolor = green] ;
 node_13 [label="pert", shape=invhouse, style=filled, fillcolor = green] ;
@@ -131,10 +131,10 @@ node_49 [label="Cpp", style=filled, fillcolor=red] ;
 "23" -> "24" [style="invis"];
 "24" -> "25" [style="invis"];
 "25" -> "26" [style="invis"];
-node_2 -> node_8
-node_7 -> node_8
+node_3 -> node_8
+node_6 -> node_8
 node_8 -> node_9
-node_6 -> node_10
+node_7 -> node_10
 node_9 -> node_10
 node_10 -> node_21
 node_11 -> node_21
@@ -147,7 +147,7 @@ node_24 -> node_25
 node_25 -> node_26
 node_13 -> node_27
 node_26 -> node_27
-node_3 -> node_28
+node_2 -> node_28
 node_4 -> node_28
 node_27 -> node_29
 node_17 -> node_30

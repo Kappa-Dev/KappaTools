@@ -207,23 +207,27 @@ let define_full_transformation
   | LKappa.Linked (i,pos) ->
      match IntMap.find_option i links_transf with
      | None ->
-       let links_transf' = IntMap.add i ((place,site),dst=None) links_transf in
+	let links_transf' =
+	  IntMap.add
+	    i ((place,site),Tools.option_map (fun _ -> pos) dst) links_transf in
        ((cands removed,added),links_transf')
-     | Some ((place',site' as dst'),safe) ->
+     | Some ((place',site' as dst'),risk) ->
        let links_transf' = IntMap.remove i links_transf in
        match dst with
        | Some (dst,_) when dst = dst' -> assert false
        | Some (_) ->
 	  let () =
-	    if not safe then
-	      let sort = Agent_place.get_type place' in
-	      ExceptionDefn.warning
-		~pos
-		(fun f ->
-		 Format.fprintf
-		   f "rule induces a link permutation on site '%a' of agent '%a'"
-		   (Signature.print_site sigs sort) site'
-		   (Signature.print_agent sigs) sort) in
+	    match risk with
+	    | Some _ ->
+	       let sort = Agent_place.get_type place' in
+	       ExceptionDefn.warning
+		 ~pos
+		 (fun f ->
+		  Format.fprintf
+		    f "rule induces a link permutation on site '%a' of agent '%a'"
+		    (Signature.print_site sigs sort) site'
+		    (Signature.print_agent sigs) sort)
+	    | None -> () in
 	  ((cands removed,
 	    Primitives.Transformation.Linked((place,site),dst')::added),
 	   links_transf')
@@ -243,7 +247,7 @@ let define_positive_transformation
   | LKappa.Linked (i,pos) ->
      match IntMap.find_option i links_transf with
      | None ->
-       let links_transf' = IntMap.add i ((place,site),false) links_transf in
+       let links_transf' = IntMap.add i ((place,site),Some pos) links_transf in
        (transf,links_transf')
      | Some (dst',_) ->
        let links_transf' = IntMap.remove i links_transf in
@@ -480,7 +484,7 @@ let rec complete_with_creation
 		     (List.rev removed, List.rev added)
 	   | Some (i,_) -> link_occurence_failure i Location.dummy
      end
-  | (ag,pos) :: ag_l ->
+  | ag :: ag_l ->
      let place = Agent_place.Fresh (ag.Raw_mixture.a_type,fresh) in
      let rec handle_ports added l_t actions intf site_id =
        if site_id = Array.length ag.Raw_mixture.a_ports then
@@ -504,23 +508,25 @@ let rec complete_with_creation
 	      l_t
 	   | Raw_mixture.VAL i ->
 	      match IntMap.pop i l_t with
-	      | Some ((place',site' as dst),safe),l_t' ->
+	      | Some ((place',site' as dst),risk),l_t' ->
 		 let () =
-		  if not safe then
-		    let sort = Agent_place.get_type place' in
-		    ExceptionDefn.warning
-		      ~pos
-		      (fun f ->
-		       Format.fprintf
-			 f "rule induces a link permutation on site '%a' of agent '%a'"
-			 (Signature.print_site sigs sort) site'
-			 (Signature.print_agent sigs) sort) in
-		Primitives.Transformation.Linked((place,site_id),dst)::added',
-		(Instantiation.Bind_to((place,site_id),dst)
-		 ::(Instantiation.Bind_to((dst,(place,site_id))))::actions),
+		   match risk with
+		   | Some pos ->
+		      let sort = Agent_place.get_type place' in
+		      ExceptionDefn.warning
+			~pos
+			(fun f ->
+			 Format.fprintf
+			   f "rule induces a link permutation on site '%a' of agent '%a'"
+			   (Signature.print_site sigs sort) site'
+			   (Signature.print_agent sigs) sort)
+		   | None -> () in
+		 Primitives.Transformation.Linked((place,site_id),dst)::added',
+		 (Instantiation.Bind_to((place,site_id),dst)
+		  ::(Instantiation.Bind_to((dst,(place,site_id))))::actions),
 		l_t'
 	      | None,l_t ->
-		let l_t' = IntMap.add i ((place,site_id),true) l_t in
+		let l_t' = IntMap.add i ((place,site_id),None) l_t in
 		(added',actions,l_t') in
 	 handle_ports added'' l_t' actions' (point::intf) (succ site_id) in
      handle_ports
@@ -581,17 +587,17 @@ let connected_components_of_mixture created (env,origin) mix =
   in aux env ([],[]) ([],([],[],[]))
 	 IntMap.empty [] 0 mix
 
-let rule_mixtures_of_ambiguous_rule contact_map sigs lhs rhs =
-  let precomp_mixs,created = LKappa.annotate_lhs_with_diff sigs lhs rhs in
+let rule_mixtures_of_ambiguous_rule contact_map sigs precomp_mixs =
   add_implicit_infos
-    sigs (find_implicit_infos sigs contact_map (List.rev precomp_mixs)),
-  created
+    sigs (find_implicit_infos
+	    sigs contact_map
+	    (List.map LKappa.copy_rule_agent precomp_mixs))
 
-let aux_connected_components_sum_of_ambiguous_rule
-      contact_map env ?origin lhs rhs =
+let connected_components_sum_of_ambiguous_rule
+      contact_map env ?origin precomp_mixs created =
   let sigs = Connected_component.Env.sigs env in
-  let all_mixs,(_,created) =
-    rule_mixtures_of_ambiguous_rule contact_map sigs lhs rhs in
+  let all_mixs =
+    rule_mixtures_of_ambiguous_rule contact_map sigs precomp_mixs in
   let () =
     if !Parameter.compileModeOn then
       Format.eprintf "@[<v>_____(%i)@,%a@]@."
@@ -607,18 +613,16 @@ let aux_connected_components_sum_of_ambiguous_rule
 			    | [] -> ()
 			    | _ -> Format.fprintf
 				     f "@ (+%t) %a" Pp.nu
-				     (Raw_mixture.print sigs)
-				     (List.map fst created))))
+				     (Raw_mixture.print ~compact:false sigs)
+				     (List.rev created))))
 		     all_mixs in
   Tools.list_fold_right_map (connected_components_of_mixture created)
 			    (env,origin) all_mixs
 
-let connected_components_sum_of_ambiguous_rule contact_map env ?origin lhs rhs =
-  aux_connected_components_sum_of_ambiguous_rule contact_map env ?origin lhs rhs
 let connected_components_sum_of_ambiguous_mixture contact_map env ?origin mix =
   let (cc_env,_),rules =
-    aux_connected_components_sum_of_ambiguous_rule
-      contact_map env ?origin mix mix in
+    connected_components_sum_of_ambiguous_rule
+      contact_map env ?origin mix [] in
   (cc_env, List.map
 	     (function _, l, (tests,_), ([],[]) -> l,tests
 		     | _ -> assert false) rules)

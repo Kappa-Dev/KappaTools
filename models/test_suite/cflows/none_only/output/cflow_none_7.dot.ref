@@ -5,8 +5,8 @@ digraph G{
 { rank = same ; "0" [shape=plaintext] ;
 node_1 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 node_2 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
-node_3 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
-node_4 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_3 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_4 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 node_8 [label="pert", shape=invhouse, style=filled, fillcolor = green] ;
 node_9 [label="pert", shape=invhouse, style=filled, fillcolor = green] ;
 node_10 [label="pert", shape=invhouse, style=filled, fillcolor = green] ;
@@ -149,9 +149,9 @@ node_48 [label="Cpp", style=filled, fillcolor=red] ;
 "30" -> "31" [style="invis"];
 "31" -> "32" [style="invis"];
 node_1 -> node_5
-node_4 -> node_5
+node_3 -> node_5
 node_5 -> node_6
-node_3 -> node_7
+node_4 -> node_7
 node_6 -> node_7
 node_7 -> node_20
 node_8 -> node_20

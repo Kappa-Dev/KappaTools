@@ -110,8 +110,8 @@ let modification ?env f m =
        | Operator.ALG id ->
 	  Format.fprintf f "$UPDATE %a %a"
 			 (Environment.print_alg ?env) id
-       | Operator.RULE id ->
-	  Format.fprintf f "$UPDATE '%a' %a" (Environment.print_rule ?env) id
+       | Operator.RULE _ ->
+	  Format.fprintf f "$UPDATE '%a' %a" Operator.print_rev_dep d_id
        | Operator.PERT _ ->
 	  Format.fprintf f "$UPDATE '%a' %a" Operator.print_rev_dep d_id
      end (alg_expr ?env) va
