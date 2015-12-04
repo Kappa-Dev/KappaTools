@@ -593,9 +593,14 @@ let html_of_grid profiling compression_type cpt env enriched_grid =
 	   "http://cpettitt.github.io/project/dagre-d3/latest/dagre-d3.min.js"]
     (fun f ->
      let () = Format.fprintf f "@[<v 2><style>@," in
+     let () =
+       Format.fprintf f "dt {float: left; clear: left; width: 20em;}@," in
+     let () =
+       Format.fprintf f "dd {font-weight: bold; margin: 0 0 0 21em;}@," in
      let () = Format.fprintf f ".node rect {stroke: #333; fill: #fff;}@," in
-     let () = Format.fprintf
-		f ".edgePath path {stroke: #333; fill: #333; stroke-width: 1.5px;}" in
+     let () =
+       Format.fprintf
+	 f ".edgePath path {stroke: #333; fill: #333; stroke-width: 1.5px;}" in
      Format.fprintf f "@]@,</style>")
     (fun f ->
      let () = Format.fprintf f "<p>@[%t@]</p>@," profiling in
@@ -603,7 +608,8 @@ let html_of_grid profiling compression_type cpt env enriched_grid =
        f "@[<v 2><script>@,%t@]@,</script>"
        (js_of_grid env enriched_grid))
 
-(*story_list:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...] et sim_info:{with story_id:int story_time: float ; story_event: int}*)
+(*story_list:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...]
+ et sim_info:{with story_id:int story_time: float ; story_event: int}*)
 let pretty_print err_fmt env config_closure compression_type label story_list =
   let n = List.length story_list in
   let () =
@@ -628,14 +634,6 @@ let pretty_print err_fmt env config_closure compression_type label story_list =
 	   )
 	   (0.,[],0) (List.rev stories)
        in
-       let profiling desc =
-	 Format.fprintf
-	   desc "/* @[Compression of %d causal flows@ obtained in average at %E t.u@] */@,"
-	   n (av_t/.(float_of_int n)) ;
-	 Format.fprintf desc "@[/* Compressed causal flows were:@ [%a] */@]"
-			(Pp.list (fun f -> Format.fprintf f ";@,")
-				 Format.pp_print_int) ids
-       in
        let enriched_config' =
 	 if !Parameter.reduceCflows
 	 then {enriched_config with
@@ -645,13 +643,39 @@ let pretty_print err_fmt env config_closure compression_type label story_list =
 	 else enriched_config in
         let () =   (*dump grid fic state env ; *)
 	  if !Parameter.dotCflows then
+	    let profiling desc =
+	      Format.fprintf
+		desc "/* @[Compression of %d causal flows" n;
+	      Format.fprintf
+		desc "@ obtained in average at %E t.u@] */@,"
+		(av_t/.(float_of_int n)) ;
+	      Format.fprintf
+		desc "@[/* Compressed causal flows were:@ [%a] */@]"
+		(Pp.list (fun f -> Format.fprintf f ";@,")
+			 Format.pp_print_int) ids
+	    in
 	    Kappa_files.with_cflow_file
 	      [compression_type;string_of_int cpt] "dot"
 	      (dot_of_grid profiling env enriched_config')
 	  else
+	    let profiling desc =
+	      Format.fprintf
+		desc
+		"@[<v 2><dl>@,<dt>Compression of</dt><dd>%d causal flows</dd>"n;
+	      Format.fprintf
+		desc "@,<dt>obtained in average at</dt><dd>%E t.u</dd>@,"
+		(av_t/.(float_of_int n)) ;
+	      Format.fprintf desc "<dt>Compressed causal flows were:</dt>";
+	      Format.fprintf
+		desc "@ <dd>[@[%a@]]</dd>@]@,</dl>"
+		(Pp.list (fun f -> Format.fprintf f ";@,")
+			 Format.pp_print_int) ids;
+       in
+
 	    Kappa_files.with_cflow_file
 	      [compression_type;string_of_int cpt] "html"
-	      (html_of_grid profiling compression_type cpt env enriched_config') in
+	      (html_of_grid
+		 profiling compression_type cpt env enriched_config') in
 	cpt+1
       ) 0 story_list
   in

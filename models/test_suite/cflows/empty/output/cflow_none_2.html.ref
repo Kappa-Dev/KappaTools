@@ -7,6 +7,8 @@
   <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
   <script src="http://cpettitt.github.io/project/dagre-d3/latest/dagre-d3.min.js" charset="utf-8"></script>
   <style>
+    dt {float: left; clear: left; width: 20em;}
+    dd {font-weight: bold; margin: 0 0 0 21em;}
     .node rect {stroke: #333; fill: #fff;}
     .edgePath path {stroke: #333; fill: #333; stroke-width: 1.5px;}
   </style>
@@ -14,8 +16,12 @@
 <body>
   <h1>none compressed story number 2</h1>
   <svg width=960 height=600><g/></svg>
-  <p>/* Compression of 1 causal flows obtained in average at 4.547208E-01 t.u */
-     /* Compressed causal flows were: [2] */</p>
+  <p><dl>
+       <dt>Compression of</dt><dd>1 causal flows</dd>
+       <dt>obtained in average at</dt><dd>4.547208E-01 t.u</dd>
+       <dt>Compressed causal flows were:</dt>
+       <dd>[2]</dd>
+     </dl></p>
   <script>
     // Create a new directed graph
     var g = new dagreD3.graphlib.Graph().setGraph({});
