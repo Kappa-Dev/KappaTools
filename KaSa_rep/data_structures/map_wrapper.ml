@@ -10,6 +10,8 @@ module type Set_with_logs =
 
    
     val add: Remanent_parameters_sig.parameters -> Exception.method_handler -> elt -> t -> Exception.method_handler * t 
+    val add_when_not_in: Remanent_parameters_sig.parameters -> Exception.method_handler -> elt -> t -> Exception.method_handler * t 
+
     val remove:  Remanent_parameters_sig.parameters -> Exception.method_handler -> elt -> t -> Exception.method_handler * t 			      
 
     val minus: Remanent_parameters_sig.parameters -> Exception.method_handler -> t -> t -> Exception.method_handler * t 
@@ -109,6 +111,9 @@ module Make(S_both:(SetMap.S)): S_with_logs with type elt = S_both.elt and type 
 	  let singleton = S_both.Set.singleton
 	  let is_singleton = S_both.Set.is_singleton 
 	  let add = lift S_both.Set.add_with_logs 
+	  let add_when_not_in p e x s = 
+	    let e,_,s = (lift S_both.Set.add_while_testing_freshness) p e x s in 
+	    e,s
 	  let remove = lift S_both.Set.remove_with_logs
 	  let union = lift S_both.Set.union_with_logs
 	  let disjoint_union = lift S_both.Set.disjoint_union_with_logs 

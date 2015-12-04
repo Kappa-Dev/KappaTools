@@ -140,8 +140,8 @@ let add_rule_id_to_update_aux parameter error
 		  then
 		    (*add rule_id_effect inside rule_id_set with
 		      agent_type2*)
-		    let error, new_rule_id_set =
-		      Site_map_and_set.Set.add parameter error rule_id_eff rule_id_set
+		    let error', new_rule_id_set =
+		      Site_map_and_set.Set.add_when_not_in parameter error rule_id_eff rule_id_set (* the rule id may already be in the set *)
 		    in
 		    (*add this new rule_id_set into map*)
 		    let result =

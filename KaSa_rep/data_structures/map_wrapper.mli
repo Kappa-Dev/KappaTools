@@ -10,6 +10,7 @@ module type Set_with_logs =
 
    
     val add: Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> t -> Exception.method_handler  * t 
+    val add_when_not_in: Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> t -> Exception.method_handler  * t 
     val remove:  Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> t -> Exception.method_handler  * t 			      
 
     val minus: Remanent_parameters_sig.parameters -> Exception.method_handler -> t -> t -> Exception.method_handler  * t
