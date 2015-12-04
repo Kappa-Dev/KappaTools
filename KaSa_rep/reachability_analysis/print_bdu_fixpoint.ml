@@ -107,20 +107,6 @@ let print_new_wl_side_effect parameter error result =
           fprintf parameter.log "rule_id:%i\n" rule_id
         ) s2
     ) result
-    
-(*TEST*)
-(*let print_store_test parameter error result =
-  Int2Map_CV_Modif.Map.iter
-    ( fun (x, y) (_, s2) ->
-      let _ =
-        fprintf parameter.log
-          "agent_type:%i:covering_class_id:%i:@set of rule_id:\n" x y
-      in
-      Site_map_and_set.Set.iter
-        (fun rule_id ->
-          fprintf parameter.log "rule_id:%i\n" rule_id
-        ) s2
-    ) result*)
   
 (************************************************************************************)
 
