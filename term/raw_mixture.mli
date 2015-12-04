@@ -5,5 +5,5 @@ type agent =
 type t = agent list
 
 val equal : t -> t -> bool
-val print : Signature.s -> Format.formatter -> t -> unit
+val print : compact:bool -> Signature.s -> Format.formatter -> t -> unit
 val print_dot : Signature.s -> int -> Format.formatter -> t -> unit

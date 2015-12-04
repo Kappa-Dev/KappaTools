@@ -28,6 +28,7 @@ val list_fold_right_map :
   ('a -> 'b -> 'a * 'c) -> 'a -> 'b list -> 'a * 'c list
 val list_fold_left2 :
   ('a -> 'b -> 'c -> 'a) -> 'a -> 'b list -> 'c list -> 'a
+val list_mapi : (int -> 'a -> 'b) -> 'a list -> 'b list
 
 (** not tail rec but don't allocate if unecessary *)
 val list_smart_filter : ('a -> bool) -> 'a list -> 'a list

@@ -71,6 +71,12 @@ let rec list_smart_map f = function
      if t' == t && q' == q then l else t' :: q'
   | l -> l
 
+let list_mapi f l =
+  let rec aux i = function
+    | [] -> []
+    | h :: q -> f i h :: aux (succ i) q in
+  aux 0 l
+
 let list_exists_uniq f l =
   let rec second = function
     | [] -> true

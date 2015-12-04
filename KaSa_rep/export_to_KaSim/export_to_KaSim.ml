@@ -42,12 +42,12 @@ module type Export_to_KaSim =
   sig
     type state
     val init:
-      ((string Location.annot) * Ast.port list,Ast.mixture, Ast.rule) Ast.compil
-      -> state
+      ((string Location.annot) * Ast.port list,
+       Ast.mixture, string, Ast.rule) Ast.compil -> state
     val get_influence_map: state -> state * influence_map
     val get_contact_map:
       state -> state * (string list * (string*string) list) String2Map.t
-    val get_signature: 
+    val get_signature:
       state -> state * Signature.s
 
     val dump_errors: state -> unit

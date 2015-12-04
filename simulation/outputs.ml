@@ -1,5 +1,4 @@
 let dot_of_flux env (file,flux) =
-  let p i = i - Environment.nb_syntactic_rules env in
   let printer desc =
     let () = Format.fprintf
 	       desc "@[<v>digraph G{ label=\"Flux map\" ; labelloc=\"t\" ; " in
@@ -25,15 +24,14 @@ let dot_of_flux env (file,flux) =
 	      Format.fprintf
 		f
 		"@[<h>\"%a\" -> \"%a\" [weight=%d,label=\"%.3f\",color=%s,arrowhead=%s];@]@,"
-		(Environment.print_ast_rule ~env) (p s)
-		(Environment.print_ast_rule ~env) (p d)
+		(Environment.print_ast_rule ~env) s
+		(Environment.print_ast_rule ~env) d
 		(abs (int_of_float v)) v color arrowhead)) desc flux in
     Format.fprintf desc "}@]@."
   in
   Kappa_files.with_flux file printer
 
 let html_of_flux env (file,flux) =
-  let p i = i - Environment.nb_syntactic_rules env in
   Kappa_files.with_flux
     file
     (Pp_html.graph_page
@@ -81,7 +79,7 @@ let html_of_flux env (file,flux) =
 	    (Pp.array Pp.comma
 		      (fun i f _ ->
 		       Format.fprintf
-			 f "\"%a\"" (Environment.print_ast_rule ~env) (p i)))
+			 f "\"%a\"" (Environment.print_ast_rule ~env) i))
 	    flux in
 	let () =
 	  Format.fprintf

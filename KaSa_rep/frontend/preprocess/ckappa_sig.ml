@@ -71,19 +71,20 @@ type 'mixture rule =
       lhs   : 'mixture; 
       arrow : Ast.arrow; 
       rhs   : 'mixture; 
-      k_def : 'mixture Ast.ast_alg_expr Location.annot;
-      k_un  : 'mixture Ast.ast_alg_expr Location.annot option
+      k_def : ('mixture,string) Ast.ast_alg_expr Location.annot;
+      k_un  : ('mixture,string) Ast.ast_alg_expr Location.annot option
     }
 
-type 'mixture perturbation = 'mixture Ast.perturbation 
+type 'mixture perturbation = ('mixture,string) Ast.perturbation
 
-type 'mixture modif_expr   = 'mixture Ast.modif_expr 
-   
-type 'mixture variable     = 'mixture Ast.variable_def 
+type 'mixture modif_expr   = ('mixture,string) Ast.modif_expr
+
+type 'mixture variable     = ('mixture,string) Ast.variable_def
 
 type direction = Direct | Reverse 
 
-type ('agent,'mixture,'rule) compil = ('agent, 'mixture, 'rule) Ast.compil 
+type ('agent,'mixture,'rule) compil =
+  ('agent, 'mixture, string, 'rule) Ast.compil
   
 type ('a,'b) site_type = 
   | Internal of 'a 
@@ -188,15 +189,16 @@ type c_agent =
    | C_ghost
    | C_agent of c_proper_agent                               
 
-type c_mixture = 
-    { 
-      c_views : c_agent Int_storage.Quick_Nearly_inf_Imperatif.t;
-      c_bonds : site_address C_site_map_and_set.Map.t Int_storage.Nearly_inf_Imperatif.t; 
-      c_plus  : (int * int) list;
-      c_dot   : (int * int) list
-    }
+type c_mixture =
+  {
+    c_views : c_agent Int_storage.Quick_Nearly_inf_Imperatif.t;
+    c_bonds :
+      site_address C_site_map_and_set.Map.t Int_storage.Nearly_inf_Imperatif.t;
+    c_plus  : (int * int) list;
+    c_dot   : (int * int) list
+  }
       
-type c_variable = c_mixture Ast.ast_alg_expr 
+type c_variable = (c_mixture,string) Ast.ast_alg_expr
 
 type action =
   | Release    of c_bond
@@ -213,14 +215,17 @@ type c_rule =
       c_side_effects : action list
     }
 
-type c_perturbation = 
-  (((c_mixture Ast.ast_alg_expr Ast.bool_expr) * position) * (c_modif_expr list) 
-   * (c_mixture Ast.ast_alg_expr Ast.bool_expr * position) option) * position
+type c_perturbation =
+  ((((c_mixture,string) Ast.ast_alg_expr Ast.bool_expr) * position)
+   * (c_modif_expr list)
+   * ((c_mixture,string) Ast.ast_alg_expr Ast.bool_expr * position) option)
+  * position
 
-and c_modif_expr = 
-  | C_INTRO    of (c_mixture Ast.ast_alg_expr * c_mixture * position) 
-  | C_DELETE   of (c_mixture Ast.ast_alg_expr * c_mixture * position) 
-  | C_UPDATE   of (string * Tools.pos * c_mixture Ast.ast_alg_expr * position) (*TODO: pause*)
+and c_modif_expr =
+  | C_INTRO    of ((c_mixture,string) Ast.ast_alg_expr * c_mixture * position)
+  | C_DELETE   of ((c_mixture,string) Ast.ast_alg_expr * c_mixture * position)
+  | C_UPDATE   of
+      (string * Tools.pos * (c_mixture,string) Ast.ast_alg_expr * position) (*TODO: pause*)
   | C_STOP     of position
   | C_SNAPSHOT of position (*maybe later of mixture too*)
 
@@ -240,15 +245,18 @@ type enriched_init =
       e_init_pos       : position
     } 
       
-type c_compil = 
-    {
-      c_variables : c_variable Int_storage.Nearly_inf_Imperatif.t; (*pattern declaration for reusing as variable in perturbations or kinetic rate*)
-      c_signatures : (agent * position) Int_storage.Nearly_inf_Imperatif.t; (*agent signature declaration*)
-      c_rules : enriched_rule Int_storage.Nearly_inf_Imperatif.t; (*rules (possibly named)*)
-      c_observables : c_mixture Ast.ast_alg_expr Int_storage.Nearly_inf_Imperatif.t; (*list of patterns to plot*) 
-      c_init : enriched_init Int_storage.Nearly_inf_Imperatif.t  ; (*initial graph declaration*)
-      c_perturbations : c_mixture Location.annot perturbation Int_storage.Nearly_inf_Imperatif.t 
-    }
-  
-
-   
+type c_compil =
+  {
+    c_variables : c_variable Int_storage.Nearly_inf_Imperatif.t;
+    (*pattern declaration for reusing as variable in perturbations or kinetic rate*)
+    c_signatures : (agent * position) Int_storage.Nearly_inf_Imperatif.t;
+    (*agent signature declaration*)
+    c_rules : enriched_rule Int_storage.Nearly_inf_Imperatif.t;
+    (*rules (possibly named)*)
+    c_observables : (c_mixture,string) Ast.ast_alg_expr Int_storage.Nearly_inf_Imperatif.t;
+    (*list of patterns to plot*)
+    c_init : enriched_init Int_storage.Nearly_inf_Imperatif.t  ;
+    (*initial graph declaration*)
+    c_perturbations :
+      c_mixture Location.annot perturbation Int_storage.Nearly_inf_Imperatif.t
+  }

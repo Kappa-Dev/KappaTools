@@ -1,20 +1,12 @@
 open Alg_expr
 
-let rec ast_alg_has_mix = function
-  | Ast.BIN_ALG_OP (_, a, b), _ -> ast_alg_has_mix a || ast_alg_has_mix b
-  | Ast.UN_ALG_OP (_, a), _  -> ast_alg_has_mix a
-  | (Ast.STATE_ALG_OP _ | Ast.OBS_VAR _ | Ast.TOKEN_ID _ | Ast.CONST _ |
-     Ast.TMAX | Ast.EMAX | Ast.PLOTNUM), _ -> false
-  | Ast.KAPPA_INSTANCE _, _ -> true
-
 type ('a,'b) contractible = NO of 'a
 			  | MAYBE of 'a * Operator.bin_alg_op * 'a * 'b
 			  | YES of 'b
 
-let rec compile_alg var_map tk_map ?max_allowed_var
-		    domain (alg,pos) =
+let rec compile_alg domain (alg,pos) =
   let rec_call domain x =
-    match compile_alg var_map tk_map ?max_allowed_var domain x with
+    match compile_alg domain x with
     | (domain',(ALG_VAR _ | TOKEN_ID _ | UN_ALG_OP _ | STATE_ALG_OP _
 		| KAPPA_INSTANCE _ as alg,_)) -> (domain', NO alg)
     | (domain',(CONST n,_)) -> (domain',YES n)
@@ -34,31 +26,10 @@ let rec compile_alg var_map tk_map ?max_allowed_var
 	   (KAPPA_INSTANCE (List.map fst ccs),pos))
        | None ->
 	  raise (ExceptionDefn.Internal_Error
-		   ("Theoritically pure alg_expr has a misture",pos))
+		   ("Theoritically pure alg_expr has a mixture",pos))
      end
-  | Ast.OBS_VAR lab ->
-     let i =
-       match Mods.StringMap.find_option lab var_map with
-       | Some x -> x
-       | None ->
-	 raise (ExceptionDefn.Malformed_Decl
-		  (lab ^" is not a declared variable",pos))
-     in
-     let () = match max_allowed_var with
-       | Some j when j < i ->
-	  raise (ExceptionDefn.Malformed_Decl
-		   ("Reference to not yet defined '"^lab ^"' is forbidden.",
-		    pos))
-       | None | Some _ -> ()
-     in (domain,(ALG_VAR i,pos))
-  | Ast.TOKEN_ID tk_nme ->
-     let i =
-       match Mods.StringMap.find_option tk_nme tk_map with
-       | Some x -> x
-       | None ->
-	 raise (ExceptionDefn.Malformed_Decl
-		  (tk_nme ^ " is not a declared token",pos))
-     in (domain,(TOKEN_ID i,pos))
+  | Ast.OBS_VAR i -> (domain,(ALG_VAR i,pos))
+  | Ast.TOKEN_ID i -> (domain,(TOKEN_ID i,pos))
   | Ast.STATE_ALG_OP (op) -> (domain,(STATE_ALG_OP (op),pos))
   | Ast.CONST n -> (domain,(CONST n,pos))
   | Ast.EMAX ->
@@ -110,29 +81,27 @@ let rec compile_alg var_map tk_map ?max_allowed_var
 	      (domain',(UN_ALG_OP (op,(x,pos1)),pos))
      end
 
-let compile_pure_alg var_map tk_map (alg,pos) =
-  snd @@ compile_alg var_map tk_map None (alg,pos)
+let compile_pure_alg (alg,pos) =
+  snd @@ compile_alg None (alg,pos)
 
-let compile_alg ?origin var_map tk_map ?max_allowed_var
-		contact_map domain (alg,pos) =
-  match compile_alg var_map tk_map ?max_allowed_var
-		    (Some (origin,contact_map,domain)) (alg,pos) with
+let compile_alg ?origin contact_map domain (alg,pos) =
+  match compile_alg (Some (origin,contact_map,domain)) (alg,pos) with
   | Some (_, _,domain),alg -> domain,alg
   | None, _ -> failwith "domain has been lost in Expr.compile_alg"
 
-let rec compile_bool var_map tk_map contact_map domain = function
+let rec compile_bool contact_map domain = function
   | Ast.TRUE,pos -> (domain,(Ast.TRUE,pos))
   | Ast.FALSE,pos -> (domain,(Ast.FALSE,pos))
   | Ast.BOOL_OP (op,a,b), pos ->
-     begin match compile_bool var_map tk_map contact_map domain a, op with
+     begin match compile_bool contact_map domain a, op with
 	   | (_,(Ast.TRUE,_)), Operator.OR -> (domain,(Ast.TRUE,pos))
 	   | (_,(Ast.FALSE,_)), Operator.AND -> (domain,(Ast.FALSE,pos))
 	   | (_,(Ast.TRUE,_)), Operator.AND
 	   | (_,(Ast.FALSE,_)), Operator.OR ->
-	      compile_bool var_map tk_map contact_map domain b
+	      compile_bool contact_map domain b
 	   | (domain',
 	      ((Ast.BOOL_OP _ | Ast.COMPARE_OP _) ,_ as a') as out1),_ ->
-	      match compile_bool var_map tk_map contact_map domain' b, op with
+	      match compile_bool contact_map domain' b, op with
 	      | (_,(Ast.TRUE,_)), Operator.OR -> (domain,(Ast.TRUE,pos))
 	      | (_,(Ast.FALSE,_)), Operator.AND -> (domain,(Ast.FALSE,pos))
 	      | (_,(Ast.TRUE,_)), Operator.AND
@@ -143,9 +112,9 @@ let rec compile_bool var_map tk_map contact_map domain = function
      end
   | Ast.COMPARE_OP (op,a,b),pos ->
      let (domain',a') =
-       compile_alg var_map tk_map contact_map domain a in
+       compile_alg contact_map domain a in
      let (domain'',b') =
-       compile_alg var_map tk_map contact_map domain' b in
+       compile_alg contact_map domain' b in
      match a',b' with
      | (CONST n1,_), (CONST n2,_) ->
 	(domain'',

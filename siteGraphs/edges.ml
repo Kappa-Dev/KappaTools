@@ -139,7 +139,7 @@ let build_snapshot sigs graph =
 let print sigs f graph =
   Pp.list Pp.space (fun f (i,mix) ->
 		    Format.fprintf f "%%init: %i @[<h>%a@]" i
-				   (Raw_mixture.print sigs) mix)
+				   (Raw_mixture.print ~compact:false sigs) mix)
 	  f (build_snapshot sigs graph)
 
 let print_dot sigs f graph =

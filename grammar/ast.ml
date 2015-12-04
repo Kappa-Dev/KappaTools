@@ -20,14 +20,14 @@ type agent = (string Location.annot * port list)
 
 type mixture = agent list
 
-type 'mixt ast_alg_expr =
+type ('mixt,'id) ast_alg_expr =
     BIN_ALG_OP of
-      bin_alg_op * 'mixt ast_alg_expr Location.annot
-      * 'mixt ast_alg_expr Location.annot
-  | UN_ALG_OP of un_alg_op * 'mixt ast_alg_expr Location.annot
+      bin_alg_op * ('mixt,'id) ast_alg_expr Location.annot
+      * ('mixt,'id) ast_alg_expr Location.annot
+  | UN_ALG_OP of un_alg_op * ('mixt,'id) ast_alg_expr Location.annot
   | STATE_ALG_OP of state_alg_op
-  | OBS_VAR of string
-  | TOKEN_ID of string
+  | OBS_VAR of 'id
+  | TOKEN_ID of 'id
   | KAPPA_INSTANCE of 'mixt
   | CONST of Nbr.t
   | TMAX
@@ -45,16 +45,19 @@ type arrow = RAR | LRAR
 
 type rule = {
   lhs: mixture ;
-  rm_token: (mixture ast_alg_expr Location.annot * string Location.annot) list ;
+  rm_token: ((mixture,string) ast_alg_expr Location.annot
+	     * string Location.annot) list ;
   arrow:arrow ;
   rhs: mixture ;
-  add_token: (mixture ast_alg_expr Location.annot * string Location.annot) list;
-  k_def: mixture ast_alg_expr Location.annot ;
+  add_token: ((mixture,string) ast_alg_expr Location.annot
+	      * string Location.annot) list;
+  k_def: (mixture,string) ast_alg_expr Location.annot ;
   k_un:
-    (mixture ast_alg_expr Location.annot *
-       mixture ast_alg_expr Location.annot option) option;
+    ((mixture,string) ast_alg_expr Location.annot *
+       (mixture,string) ast_alg_expr Location.annot option) option;
   (*k_1:radius_opt*)
-  k_op: mixture ast_alg_expr Location.annot option ; (*rate for backward rule*)
+  k_op: (mixture,string) ast_alg_expr Location.annot option ;
+  (*rate for backward rule*)
 }
 
 let flip_label str = str^"_op"
@@ -63,55 +66,65 @@ type 'alg_expr print_expr =
     Str_pexpr of string
   | Alg_pexpr of 'alg_expr
 
-type 'mixture modif_expr =
-  | INTRO of ('mixture ast_alg_expr Location.annot * 'mixture Location.annot)
-  | DELETE of ('mixture ast_alg_expr Location.annot * 'mixture Location.annot)
+type ('mixture,'id) modif_expr =
+  | INTRO of
+      (('mixture,'id) ast_alg_expr Location.annot * 'mixture Location.annot)
+  | DELETE of
+      (('mixture,'id) ast_alg_expr Location.annot * 'mixture Location.annot)
   | UPDATE of
-      (string Location.annot * 'mixture ast_alg_expr Location.annot) (*TODO: pause*)
+      (string Location.annot *
+	 ('mixture,'id) ast_alg_expr Location.annot) (*TODO: pause*)
   | UPDATE_TOK of
-      (string Location.annot * 'mixture ast_alg_expr Location.annot) (*TODO: pause*)
-  | STOP of ('mixture ast_alg_expr print_expr Location.annot list * Tools.pos)
+      ('id Location.annot *
+	 ('mixture,'id) ast_alg_expr Location.annot) (*TODO: pause*)
+  | STOP of
+      (('mixture,'id) ast_alg_expr print_expr Location.annot list * Tools.pos)
   | SNAPSHOT of
-      ('mixture ast_alg_expr print_expr Location.annot list * Tools.pos)
+      (('mixture,'id) ast_alg_expr print_expr Location.annot list * Tools.pos)
   (*maybe later of mixture too*)
   | PRINT of
-      (('mixture ast_alg_expr print_expr Location.annot list) *
-	  ('mixture  ast_alg_expr print_expr Location.annot list) * Tools.pos)
+      ((('mixture,'id) ast_alg_expr print_expr Location.annot list) *
+	 (('mixture,'id)  ast_alg_expr print_expr Location.annot list) * Tools.pos)
   | PLOTENTRY
   | CFLOWLABEL of (bool * string Location.annot)
   | CFLOWMIX of (bool * 'mixture Location.annot)
-  | FLUX of 'mixture ast_alg_expr print_expr Location.annot list * Tools.pos
-  | FLUXOFF of 'mixture ast_alg_expr print_expr Location.annot list * Tools.pos
+  | FLUX of
+      ('mixture,'id) ast_alg_expr print_expr Location.annot list * Tools.pos
+  | FLUXOFF of
+      ('mixture,'id) ast_alg_expr print_expr Location.annot list * Tools.pos
 
-type 'mixture perturbation =
-    ('mixture ast_alg_expr bool_expr Location.annot * ('mixture modif_expr list) *
-       'mixture ast_alg_expr bool_expr Location.annot option) Location.annot
+type ('mixture,'id) perturbation =
+  (('mixture,'id) ast_alg_expr bool_expr Location.annot *
+     (('mixture,'id) modif_expr list) *
+       ('mixture,'id) ast_alg_expr bool_expr Location.annot option) Location.annot
 
 type configuration = string Location.annot * (str_pos list)
 
-type 'mixture variable_def =
-    string Location.annot * 'mixture ast_alg_expr Location.annot
+type ('mixture,'id) variable_def =
+    string Location.annot * ('mixture,'id) ast_alg_expr Location.annot
 
-type 'mixture init_t =
-  | INIT_MIX of 'mixture ast_alg_expr Location.annot * 'mixture Location.annot
-  | INIT_TOK of 'mixture ast_alg_expr Location.annot * string Location.annot
+type ('mixture,'id) init_t =
+  | INIT_MIX of
+      ('mixture,'id) ast_alg_expr Location.annot * 'mixture Location.annot
+  | INIT_TOK of
+      ('mixture,'id) ast_alg_expr Location.annot * 'id Location.annot
 
-type 'mixture instruction =
+type ('mixture,'id) instruction =
   | SIG      of agent
   | TOKENSIG of string Location.annot
   | VOLSIG   of str_pos * float * str_pos (* type, volume, parameter*)
-  | INIT     of string Location.annot option * 'mixture init_t * Tools.pos
+  | INIT     of string Location.annot option * ('mixture,'id) init_t * Tools.pos
   (*volume, init, position *)
-  | DECLARE  of 'mixture variable_def
-  | OBS      of 'mixture variable_def (*for backward compatibility*)
-  | PLOT     of 'mixture ast_alg_expr Location.annot
-  | PERT     of 'mixture perturbation
+  | DECLARE  of ('mixture,'id) variable_def
+  | OBS      of ('mixture,'id) variable_def (*for backward compatibility*)
+  | PLOT     of ('mixture,'id) ast_alg_expr Location.annot
+  | PERT     of ('mixture,'id) perturbation
   | CONFIG   of configuration
 
-type ('agent,'mixture,'rule) compil =
+type ('agent,'mixture,'id,'rule) compil =
     {
       variables :
-	'mixture variable_def list;
+	('mixture,'id) variable_def list;
       (*pattern declaration for reusing as variable in perturbations or kinetic rate*)
       signatures :
 	'agent list; (*agent signature declaration*)
@@ -119,13 +132,13 @@ type ('agent,'mixture,'rule) compil =
 	(string Location.annot option * 'rule Location.annot) list;
       (*rules (possibly named)*)
       observables :
-	'mixture ast_alg_expr Location.annot list;
+	('mixture,'id) ast_alg_expr Location.annot list;
       (*list of patterns to plot*)
       init :
-	(string Location.annot option * 'mixture init_t * Tools.pos) list;
+	(string Location.annot option * ('mixture,'id) init_t * Tools.pos) list;
       (*initial graph declaration*)
       perturbations :
-	'mixture perturbation list;
+	('mixture,'id) perturbation list;
       configurations :
 	configuration list;
       tokens :
@@ -153,7 +166,7 @@ let no_more_site_on_right warning left right =
 	in false)
     right
 
-let result:(agent,mixture,rule) compil ref =
+let result:(agent,mixture,string,rule) compil ref =
   ref {
     variables      = [];
     signatures     = [];
@@ -191,15 +204,18 @@ let init_compil () =
   res:={patterns=l_pat ; signatures=l_sig ; rules=l_rul ; init = l_ini ; observables = l_obs}
 *)
 
-let print_link pr_type pr_annot f = function
+let print_link pr_port pr_type pr_annot f = function
   | FREE -> ()
-  | LNK_TYPE (p, a) -> Format.fprintf f "!%a.%a" pr_type p pr_type a
+  | LNK_TYPE (p, a) -> Format.fprintf f "!%a.%a" (pr_port a) p pr_type a
   | LNK_ANY -> Format.fprintf f "?"
   | LNK_SOME -> Format.fprintf f "!_"
   | LNK_VALUE (i,a) -> Format.fprintf f "!%i%a" i pr_annot a
 
 let print_ast_link =
-  print_link (fun f (x,_) -> Format.pp_print_string f x) (fun _ () -> ())
+  print_link
+    (fun _ f (x,_) -> Format.pp_print_string f x)
+    (fun f (x,_) -> Format.pp_print_string f x)
+    (fun _ () -> ())
 let print_ast_internal f l =
   Pp.list Pp.empty (fun f (x,_) -> Format.fprintf f "~%s" x) f l
 
@@ -214,43 +230,59 @@ let print_ast_agent f ((ag_na,_),l) =
 
 let print_ast_mix f m = Pp.list Pp.comma print_ast_agent f m
 
-let rec print_ast_alg f = function
+let rec print_ast_alg pr_mix pr_tok pr_var f = function
   | EMAX -> Format.fprintf f "[Emax]"
   | PLOTNUM -> Format.fprintf f "[p]"
   | TMAX -> Format.fprintf f "[Tmax]"
   | CONST n -> Nbr.print f n
-  | OBS_VAR lab -> Format.fprintf f "'%s'" lab
+  | OBS_VAR lab -> Format.fprintf f "'%a'" pr_var lab
   | KAPPA_INSTANCE ast ->
-     Format.fprintf f "|%a|" print_ast_mix ast
-  | TOKEN_ID tk -> Format.fprintf f "|%s|" tk
+     Format.fprintf f "|%a|" pr_mix ast
+  | TOKEN_ID tk -> Format.fprintf f "|%a|" pr_tok tk
   | STATE_ALG_OP op -> Operator.print_state_alg_op f op
   | BIN_ALG_OP (op, (a,_), (b,_)) ->
      Format.fprintf f "(%a %a %a)"
-		    print_ast_alg a Operator.print_bin_alg_op op print_ast_alg b
+		    (print_ast_alg pr_mix pr_tok pr_var) a
+		    Operator.print_bin_alg_op op
+		    (print_ast_alg pr_mix pr_tok pr_var) b
   |UN_ALG_OP (op, (a,_)) ->
-    Format.fprintf f "(%a %a)" Operator.print_un_alg_op op print_ast_alg a
+    Format.fprintf f "(%a %a)" Operator.print_un_alg_op op
+		   (print_ast_alg pr_mix pr_tok pr_var) a
 
-let print_tok f ((nb,_),(n,_)) = Format.fprintf f "%a:%s" print_ast_alg nb n
+let print_tok pr_mix pr_tok pr_var f ((nb,_),(n,_)) =
+  Format.fprintf f "%a:%a" (print_ast_alg pr_mix pr_tok pr_var) nb pr_tok n
 let print_one_size tk f mix =
   Format.fprintf
     f "%a%t%a" print_ast_mix mix
     (fun f -> match tk with [] -> () | _::_ -> Format.pp_print_string f " | ")
-    (Pp.list (fun f -> Format.pp_print_string f " + ") print_tok) tk
+    (Pp.list
+       (fun f -> Format.pp_print_string f " + ")
+       (print_tok print_ast_mix Format.pp_print_string Format.pp_print_string))
+    tk
 let print_arrow f = function
   | RAR -> Format.pp_print_string f "->"
   | LRAR -> Format.pp_print_string f "<->"
-let print_raw_rate op f (def,_) =
+let print_raw_rate pr_mix pr_tok pr_var op f (def,_) =
   Format.fprintf
-    f "%a%t" print_ast_alg def
+    f "%a%t" (print_ast_alg pr_mix pr_tok pr_var) def
     (fun f ->
-     match op with None -> ()
-		 | Some (d,_) -> Format.fprintf f ", %a" print_ast_alg d)
+     match op with
+       None -> ()
+     | Some (d,_) ->
+	Format.fprintf f ", %a" (print_ast_alg pr_mix pr_tok pr_var) d)
 let print_rates un op f def =
   Format.fprintf
-    f "%a%t" (print_raw_rate op) def
+    f "%a%t"
+    (print_raw_rate print_ast_mix Format.pp_print_string Format.pp_print_string op)
+    def
     (fun f ->
-     match un with None -> ()
-		 | Some (d,o) -> Format.fprintf f " (%a)" (print_raw_rate o) d)
+     match un with
+       None -> ()
+		 | Some (d,o) ->
+		    Format.fprintf
+		      f " (%a)"
+		      (print_raw_rate print_ast_mix Format.pp_print_string Format.pp_print_string o)
+		      d)
 let print_ast_rule f r =
   Format.fprintf
     f "@[<h>%a %a %a @@ %a@]"
@@ -274,5 +306,5 @@ let rec print_bool p_alg f = function
      Format.fprintf f "(%a %a %a)"
 		    p_alg a Operator.print_compare_op op p_alg b
 
-let print_ast_bool = print_bool print_ast_alg
-
+let print_ast_bool pr_mix pr_tok pr_var =
+  print_bool (print_ast_alg pr_mix pr_tok pr_var)

@@ -3,8 +3,8 @@ type t = {
   tokens : unit NamedDecls.t;
   algs : (Alg_expr.t Location.annot) NamedDecls.t;
   observables : Alg_expr.t Location.annot array;
-  ast_rules : (string Location.annot option * Ast.rule Location.annot) array;
-  rules : Primitives.elementary_rule NamedDecls.t;
+  ast_rules : (string Location.annot option * LKappa.rule Location.annot) array;
+  rules : Primitives.elementary_rule array;
   cc_of_unaries : Connected_component.Set.t;
   perturbations : Primitives.perturbation array;
   need_update_each_loop : Operator.DepSet.t;
@@ -17,7 +17,7 @@ let init sigs tokens algs (deps_in_t,deps_in_e,tok_rd,alg_rd)
 	 (ast_rules,rules,cc_of_unaries) obs perts =
   { signatures = sigs; tokens = tokens; ast_rules = ast_rules;
     rules = rules; cc_of_unaries = cc_of_unaries; algs = algs;
-    observables = obs; perturbations = perts; 
+    observables = obs; perturbations = perts;
     algs_reverse_dependencies = alg_rd; tokens_reverse_dependencies = tok_rd;
     need_update_each_loop = Operator.DepSet.union deps_in_t deps_in_e;
 
@@ -41,22 +41,19 @@ let close_desc env =
 let num_of_agent nme env =
   Signature.num_of_agent nme env.signatures
 
-let num_of_rule s env = NamedDecls.elt_id ~kind:"rule" env.rules s
-let get_rule env i = snd env.rules.NamedDecls.decls.(i)
-let nb_rules env = NamedDecls.size env.rules
+let get_rule env i = env.rules.(i)
+let nb_rules env = Array.length env.rules
 
 let nb_syntactic_rules env = Array.length env.ast_rules
 
 let connected_components_of_unary_rules env = env.cc_of_unaries
 
-let num_of_alg s env = NamedDecls.elt_id ~kind:"variable" env.rules s
+let num_of_alg s env = NamedDecls.elt_id ~kind:"variable" env.algs s
 let get_alg env i = fst @@ snd env.algs.NamedDecls.decls.(i)
 let nb_algs env = NamedDecls.size env.algs
 
-let num_of_token str env =
-  NamedDecls.elt_id ~kind:"token" env.rules str
-let nb_tokens env =
-  NamedDecls.size env.tokens
+let num_of_token str env = NamedDecls.elt_id ~kind:"token" env.tokens str
+let nb_tokens env = NamedDecls.size env.tokens
 
 let get_perturbation env i = env.perturbations.(i)
 let nb_perturbations env = Array.length env.perturbations
@@ -65,31 +62,11 @@ let get_alg_reverse_dependencies env i = env.algs_reverse_dependencies.(i)
 let get_token_reverse_dependencies env i = env.tokens_reverse_dependencies.(i)
 let get_always_outdated env = env.need_update_each_loop
 
-let print_ast_rule ?env f i =
-  match env with
-  | None -> Format.fprintf f "__ast_rule_%i" i
-  | Some env ->
-     if i = 0 then Format.pp_print_string f "A generated rule for perturbations"
-     else
-       if i < 0 then
-	 match env.ast_rules.(pred (~- i)) with
-	 | (Some (na,_),_) -> Format.pp_print_string f (Ast.flip_label na)
-	 | (None,(r,_)) -> Ast.print_ast_rule_no_rate ~reverse:true f r
-       else
-	 match env.ast_rules.(pred i) with
-	 | (Some (na,_),_) -> Format.pp_print_string f na
-	 | (None,(r,_)) -> Ast.print_ast_rule_no_rate ~reverse:false f r
-
 let print_agent ?env f i =
   match env with
   | None -> Format.fprintf f "__agent_%i" i
   | Some env ->
      Signature.print_agent env.signatures f i
-let print_rule ?env f id =
-  match env with
-  | None -> Format.fprintf f "__rule_%i" id
-  | Some env ->
-     Format.fprintf f "%s" (NamedDecls.elt_name env.rules id)
 let print_alg ?env f id =
   match env with
   | None -> Format.fprintf f "'__alg_%i'" id
@@ -98,14 +75,32 @@ let print_alg ?env f id =
 let print_token ?env f id =
     match env with
     | None -> Format.fprintf f "__token_%i" id
-  | Some env ->
+    | Some env ->
      Format.fprintf f "%s" (NamedDecls.elt_name env.tokens id)
+
+let print_ast_rule ?env f i =
+  match env with
+  | None -> Format.fprintf f "__ast_rule_%i" i
+  | Some env ->
+     let sigs = env.signatures in
+     if i = 0 then Format.pp_print_string f "A generated rule for perturbations"
+     else
+       match env.ast_rules.(pred i) with
+       | (Some (na,_),_) -> Format.pp_print_string f na
+       | (None,(r,_)) ->
+	  LKappa.print_rule ~ltypes:false ~rates:false sigs
+			    (print_token ~env) (print_alg ~env) f r
+
+let print_rule ?env f id =
+    match env with
+    | None -> Format.fprintf f "__rule_%i" id
+    | Some env -> print_ast_rule ~env f env.rules.(id).Primitives.syntactic_rule
 
 let map_observables f env =
   Array.map (fun (x,_) -> f x) env.observables
 let fold_rules f x env =
   Tools.array_fold_lefti
-    (fun i x(_,rule) -> f i x rule) x env.rules.NamedDecls.decls
+    (fun i x rule -> f i x rule) x env.rules
 
 let print pr_alg pr_rule pr_pert f env =
   let () =
@@ -125,9 +120,8 @@ let print pr_alg pr_rule pr_pert f env =
       env.observables in
   Format.fprintf
     f"@[<v 2>Rules:@,%a@]@,@[<v 2>Perturbations:@,%a@]@]"
-    (NamedDecls.print
-       ~sep:Pp.space
-       (fun i n f r -> Format.fprintf f "@[<2>%i:%s:@ %a@]" i n (pr_rule env) r))
+    (Pp.array Pp.space
+       (fun i f r -> Format.fprintf f "@[<2>%i:@ %a@]" i (pr_rule env) r))
     env.rules
     (Pp.array Pp.space (fun i f p ->
 			Format.fprintf f "@[<2>/*%i*/%a@]" i (pr_pert env) p))
