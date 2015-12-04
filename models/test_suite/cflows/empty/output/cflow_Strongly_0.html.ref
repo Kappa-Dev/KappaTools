@@ -14,13 +14,13 @@
 <body>
   <h1>Strongly compressed story number 0</h1>
   <svg width=960 height=600><g/></svg>
-  <p>/* Compression of 1 causal flows obtained in average at 1.657193E-01 t.u */
-     /* Compressed causal flows were: [1] */</p>
+  <p>/* Compression of 3 causal flows obtained in average at 4.117599E+00 t.u */
+     /* Compressed causal flows were: [2;3;4] */</p>
   <script>
     // Create a new directed graph
     var g = new dagreD3.graphlib.Graph().setGraph({});
     g.setNode(1, { label: "Intro B", style: "fill: #7f7" });
-    g.setNode(2, { label: "Intro A", style: "fill: #7f7" });
+    g.setNode(2, { label: " -> A()", style: "fill: #77f" });
     g.setNode(3, { label: "A(x), B(x) -> A(x!1), B(x!1)", style: "fill: #77f" });
     g.setNode(4, { label: "A(x!1), B(x!1) -> A(x!1), B(x!1), C()", style: "fill: #77f" });
     g.setNode(5, { label: "goal", style: "fill: #f77" });

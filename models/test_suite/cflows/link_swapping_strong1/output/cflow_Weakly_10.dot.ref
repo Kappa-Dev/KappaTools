@@ -1,5 +1,5 @@
-/* Compression of 1 causal flows obtained in average at 9.044557E+01 t.u */
-/* Compressed causal flows were: [17] */
+/* Compression of 1 causal flows obtained in average at 9.471423E+01 t.u */
+/* Compressed causal flows were: [18] */
 digraph G{
  ranksep=.5 ;
 { rank = same ; "0" [shape=plaintext] ;
@@ -100,14 +100,20 @@ node_39 [label="B(x,y) -> A(x,y)", shape=invhouse, style=filled, fillcolor = lig
 node_40 [label="A(x,y) -> B(x,y)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "28" [shape=plaintext] ;
-node_42 [label="A(x), B(x) -> A(x!1), B(x!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_43 [label="A(y), B(y) -> A(y!1), B(y!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_42 [label="B(x,y) -> A(x,y)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "29" [shape=plaintext] ;
-node_44 [label="A(x!1,y!2), B(x!1,y!2) -> A(x!1,y!2), B(x!2,y!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_43 [label="A(x,y) -> B(x,y)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "30" [shape=plaintext] ;
-node_45 [label="GOAL", style=filled, fillcolor=red] ;
+node_44 [label="A(y), B(y) -> A(y!1), B(y!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_45 [label="A(x), B(x) -> A(x!1), B(x!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "31" [shape=plaintext] ;
+node_46 [label="A(x!1,y!2), B(x!1,y!2) -> A(x!1,y!2), B(x!2,y!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "32" [shape=plaintext] ;
+node_47 [label="GOAL", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];
@@ -139,6 +145,8 @@ node_45 [label="GOAL", style=filled, fillcolor=red] ;
 "27" -> "28" [style="invis"];
 "28" -> "29" [style="invis"];
 "29" -> "30" [style="invis"];
+"30" -> "31" [style="invis"];
+"31" -> "32" [style="invis"];
 node_1 -> node_3
 node_2 -> node_4
 node_4 -> node_5
@@ -179,16 +187,18 @@ node_38 -> node_39
 node_39 -> node_40
 node_33 -> node_41
 node_40 -> node_42
-node_41 -> node_42
-node_40 -> node_43
-node_41 -> node_43
-node_40 -> node_44
+node_42 -> node_43
 node_41 -> node_44
-node_42 -> node_44
 node_43 -> node_44
-node_40 -> node_45
 node_41 -> node_45
-node_44 -> node_45
+node_43 -> node_45
+node_41 -> node_46
+node_43 -> node_46
+node_44 -> node_46
+node_45 -> node_46
+node_41 -> node_47
+node_43 -> node_47
+node_46 -> node_47
 }
 /*
 */
