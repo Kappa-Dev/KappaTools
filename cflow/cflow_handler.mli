@@ -9,6 +9,7 @@ module type Cflow_handler =
           priorities_strong : Priority.priorities ;
           priorities_causal : Priority.priorities ;
 	  compute_all_stories : bool ; 
+	  sort_algo_for_stories: Parameter.sort_algo_for_stories;	  
 	  out_channel_err : Format.formatter ;
           out_channel_profiling : Format.formatter ;
           out_channel : Format.formatter ;
@@ -46,6 +47,9 @@ module type Cflow_handler =
     val set_debugging_channel: parameter -> Format.formatter -> parameter
     val get_kasa_parameters: parameter -> Remanent_parameters_sig.parameters 
     val set_kasa_parameters: Remanent_parameters_sig.parameters -> parameter -> parameter 
+    val do_we_use_bucket_sort: parameter -> bool
+    val use_bucket_sort: parameter -> parameter
+    val use_fusion_sort: parameter -> parameter 
   end
 
 module Cflow_handler:Cflow_handler

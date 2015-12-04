@@ -86,6 +86,7 @@ let marshalizedInFile = ref ""
 let (openInDescriptors:in_channel list ref) = ref []
 let add_in_desc d = openInDescriptors := d::!openInDescriptors
 
+type sort_algo_for_stories = Bucket | Fusion
 type current_compression_mode = Weak | Strong | Causal
 type compression_mode = 
     { 

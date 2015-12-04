@@ -34,7 +34,7 @@ let debug_mode = false
 let dump_profiling_info = true
 
 let store_uncompressed_stories = true
-
+let bucket_sort = true 
 let get_all_stories = false (** false -> only the first story per observable hit; true -> all stories per obs hit *)
 			
 let th_of_int n =
@@ -56,6 +56,13 @@ let compress_and_print logger env log_info step_list =
     if get_all_stories
     then S.PH.B.PB.CI.Po.K.H.set_all_stories_per_obs parameter 
     else parameter 
+  in
+  let parameter =
+    if bucket_sort
+    then
+      S.PH.B.PB.CI.Po.K.H.use_bucket_sort parameter
+    else
+      S.PH.B.PB.CI.Po.K.H.use_fusion_sort parameter
   in 
   let mode = parameter.S.PH.B.PB.CI.Po.K.H.compression_mode in
   let causal_trace_on = Parameter.get_causal_trace mode in

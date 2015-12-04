@@ -786,20 +786,14 @@ module BucketTable =
 	    array = array ;
 	    fresh_id = succ_story_id table.fresh_id}
 	in 
-(*	let build_inner_tree error canonic_opt table =
-	  let error,id,table = add_story error (grid,graph,canonic_opt,pretrace,story_info) table in
-	  let error,(table,cannonic_form) = get_cannonical_form parameter handler error id table in
-	  let inner_tree = Inner_leave (cannonic_form, table.fresh_id) in
-	  error,id,table,inner_tree
-	in *)
-	let add_story_info error story_info id table = (* to do*)
+	let add_story_info error story_info id table = 
 	  let error,asso_opt = Int_storage.Nearly_inf_Imperatif.get (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error id table.array in
 	  match
 	    asso_opt
 	  with
 	  | None -> warn parameter error (Some "add_story_info, line 800, Unknown story id") (Failure "Unknown story id") table  
 	  | Some (grid,graph,canonic,trace,info) -> 
-	     let error,array = Int_storage.Nearly_inf_Imperatif.set (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error table.fresh_id (grid,graph,canonic,trace,story_info@info) table.array in
+	     let error,array = Int_storage.Nearly_inf_Imperatif.set (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error id (grid,graph,canonic,trace,story_info@info) table.array in
 	     error,{table with array = array}
 	in 
 	let update_assoc error canonic_form assoc =  
@@ -813,7 +807,9 @@ module BucketTable =
 	let rec aux_inner2 error canonic_form canonic_form' id' assoc table = 
 	  match canonic_form,canonic_form'
 	  with
-	  | [],[] -> error,table,Inner_leave (canonic_form',id')
+	  | [],[] ->
+	     let error,table = add_story_info error story_info id' table in 
+	     error,table,Inner_leave ([],id')
 	  | t::q,[] ->
 	     let error,id,table = add_story error assoc table in 
 	     error,table, Inner_node (KeyMap.add t (Inner_leave(q,id))  KeyMap.empty,Some id')
@@ -827,7 +823,7 @@ module BucketTable =
 	     let error,id,table = add_story error assoc table in 
 	     error,table, Inner_node (KeyMap.add t (Inner_leave(q,id)) (KeyMap.add t' (Inner_leave(q',id')) KeyMap.empty),None)
 	in
-	let rec aux_outer2 error prehash prehash' id' table = 
+	let rec aux_outer2 error prehash prehash' id' table =
 	  match
 	    prehash,prehash'  
 	  with
@@ -890,7 +886,7 @@ module BucketTable =
 		     | Some (inner_tree')  ->
 			let error,table',inner_tree'' = aux_inner error assoc story_info q inner_tree' table in
 			if inner_tree'' == inner_tree'
-			then error,table,inner_tree
+			then error,table',inner_tree
 			else
 			  error,table',Inner_node(KeyMap.add t inner_tree'' map,assoc')
 		   end
@@ -958,11 +954,11 @@ module BucketTable =
 		     | Some (outer_tree')  ->
 			let error,table',outer_tree'' = aux_outer error assoc story_info q outer_tree' table in
 			if outer_tree'' == outer_tree'
-			then error,table,outer_tree
+			then error,table',outer_tree
 			else
 			  error,table',Outer_node(PreHashMap.add t outer_tree'' map,assoc')
 		   end	     
-		| Outer_leave (t'::q',id') when t != t' ->
+		| Outer_leave (t'::q',id') when not (t = t') ->
 		   let error,id,table = add_story error assoc table in
 		   error,table, Outer_node (PreHashMap.add t (Outer_leave (q,id)) (PreHashMap.add t' (Outer_leave (q',id')) PreHashMap.empty),None)
 		| Outer_leave (l',id') ->
@@ -976,16 +972,98 @@ module BucketTable =
 	in
 	let error,table,tree = aux_outer error (grid,graph,None,pretrace,story_info) story_info prehash table.tree table in
 	error,{table with tree = tree}
+
+      let rec print_inner_tree parameter handler error prefix inner_tree =
+	match
+	  inner_tree
+	with
+	| Inner_node (map,assoc') ->
+	   let () = 
+	     match
+	       assoc'
+	     with
+	     | None ->
+		Format.fprintf parameter.H.out_channel "%sUnfilled Node\n" prefix
+	     | Some (id)  ->
+		Format.fprintf parameter.H.out_channel "%sFilled Node: %i\n" prefix id
+	   in
+	   let prefix' = prefix^" " in
+	   KeyMap.iter
+	     (fun elt map ->
+	      print_elt parameter.H.out_channel elt;
+	      print_inner_tree parameter handler error prefix' map)
+	     map
+	| Inner_leave (l,id)  ->
+	   let () = Format.fprintf parameter.H.out_channel "%sLEAVE:\n" prefix in 
+	   let _ = print_canonical_form parameter handler error l in
+	   () 
+	     
+      let rec print_outer_tree parameter handler error prefix outer_tree =
+	match
+	  outer_tree
+	with
+	| Empty ->
+	   Format.fprintf parameter.H.out_channel "%sEMPTY\n" prefix 
+	| Outer_node (map,assoc') ->
+	   let () = 
+	     match
+	       assoc'
+	     with
+	     | None ->
+		Format.fprintf parameter.H.out_channel "%sUnfilled Node\n" prefix
+	     | Some (id)  ->
+		Format.fprintf parameter.H.out_channel "%sFilled Node: %i\n" prefix id
+	   in
+	   let prefix' = prefix^" " in
+	   PreHashMap.iter
+	     (fun ((_,b),i)  map ->
+	      Format.fprintf parameter.H.out_channel "%s%s:%i->\n" prefix b i ;
+	      print_outer_tree parameter handler error prefix' map)
+	     map
+	| Outer_leave (l,id)  ->
+	   let () = Format.fprintf parameter.H.out_channel "%sLEAVE:\n" prefix in 
+	   let _ = print_prehash parameter handler error l in
+	   () 
+	| To_inner (map,inner) ->
+	   let () = Format.fprintf parameter.H.out_channel "%sTO INNER TREE:\n" prefix in
+	   let prefix' = prefix^" " in 
+	   let () = PreHashMap.iter
+		      (fun ((_,b),i)  map ->
+		       Format.fprintf parameter.H.out_channel "%s%s:%i->\n" prefix b i ;
+		       print_outer_tree parameter handler error prefix' map)
+		      map
+	   in 
+	   print_inner_tree parameter handler error prefix' inner 
+	     
+   (*   let add_story parameter handler error grid pretrace story_info table =
+	let error,output = add_story parameter handler error grid pretrace story_info table in
+	let () = print_outer_tree parameter handler error " " output.tree in
+	let () = Format.fprintf parameter.H.out_channel "\n\n" in 
+	error,output*)
 		
-      let hash_list _ _  error table = error,table 
-      let sort_list parameter _ error table = (* to do plug KaSa errors *)
-	 error,
-	snd (Int_storage.Nearly_inf_Imperatif.fold 
+      let hash_list parameter _  error table =
+	let error,array =
+	  Int_storage.Nearly_inf_Imperatif.fold
+	    (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter)
+	    error
+	    (fun parameter' error i (a,b,c,d,e) array ->
+	     Int_storage.Nearly_inf_Imperatif.set
+	       parameter' error
+	       i
+	       (a,b,c,d,List.sort Mods.compare_profiling_info e)
+	       array)
+	    table.array
+	    table.array
+	in
+	error,{table with array = array} 
+
+      let sort_list parameter _ error table = 
+	 Int_storage.Nearly_inf_Imperatif.fold 
 	       (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter)
-	       (Exception.empty_error_handler)
+	       error
 	       (fun parameter error _ (a,b,c,d,e) l -> error,(a,e)::l)
 	       table.array 
-	       [])
+	       []
 
       let count_stories table = table.fresh_id
 
@@ -1066,5 +1144,6 @@ module Choice(S:Selector)(A:StoryTable)(B:StoryTable) =
    
     end:StoryTable)
 
-    (*module StoryTable = BucketTable*)
-module StoryTable = ListTable 
+(* module StoryTable = ListTable*)
+(* module StoryTable = BucketTable*) 
+module StoryTable = Choice(struct let choose_fst = S.PH.B.PB.CI.Po.K.H.do_we_use_bucket_sort end)(BucketTable)(ListTable)

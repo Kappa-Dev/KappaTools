@@ -31,6 +31,7 @@ module type Cflow_handler =
           priorities_strong : Priority.priorities ;
           priorities_causal : Priority.priorities ;
 	  compute_all_stories : bool ; 
+	  sort_algo_for_stories: Parameter.sort_algo_for_stories;
 	  out_channel_err : Format.formatter ;
           out_channel_profiling : Format.formatter ;
           out_channel : Format.formatter ;
@@ -66,6 +67,9 @@ module type Cflow_handler =
     val set_debugging_channel: parameter -> Format.formatter -> parameter
     val get_kasa_parameters: parameter -> Remanent_parameters_sig.parameters 
     val set_kasa_parameters: Remanent_parameters_sig.parameters -> parameter -> parameter 
+    val do_we_use_bucket_sort: parameter -> bool
+    val use_bucket_sort: parameter -> parameter
+    val use_fusion_sort: parameter -> parameter 
   end
 
 
@@ -80,6 +84,7 @@ module Cflow_handler =
           priorities_strong : Priority.priorities ;
           priorities_causal: Priority.priorities ;
 	  compute_all_stories : bool ; 
+	  sort_algo_for_stories: Parameter.sort_algo_for_stories;	  
 	  out_channel_err : Format.formatter;
           out_channel_profiling: Format.formatter;
           out_channel : Format.formatter;
@@ -97,7 +102,8 @@ module Cflow_handler =
         priorities_strong = Priority.strong2 ;
         priorities_causal = Priority.causal ;
 	compute_all_stories = false ; 
-        out_channel = Format.err_formatter ;
+	sort_algo_for_stories = Parameter.Bucket;
+	out_channel = Format.err_formatter ;
         out_channel_err = Format.err_formatter ;
         out_channel_profiling = Format.formatter_of_out_channel channel ;
         compression_mode = Parameter.get_compression_mode () ;
@@ -162,6 +168,9 @@ module Cflow_handler =
 
    let get_kasa_parameters parameter = parameter.kasa 
    let set_kasa_parameters parameter parameter' = {parameter' with kasa = parameter}
-						    
+
+   let do_we_use_bucket_sort parameter = parameter.sort_algo_for_stories == Parameter.Bucket
+   let use_bucket_sort parameter = {parameter with sort_algo_for_stories = Parameter.Bucket}
+   let use_fusion_sort parameter = {parameter with sort_algo_for_stories = Parameter.Fusion}
     end:Cflow_handler)
     
