@@ -335,7 +335,7 @@ site_type:2:state:1
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
-** update Discovered sites that are bond on the rhs for the first time:
+** New update function when discovered sites that are bond on the rhs for the first time:
 ** Discovered sites that are bond on the rhs for the first time:
 false
 ** Fixpoint iteration function:

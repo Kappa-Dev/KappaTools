@@ -93,7 +93,7 @@ module Int2Map_CM_state =
 module Int2Map_CV_Modif = 
   SetMap.Make (
     struct
-      (*agent_id, agent_type, covering_class_id*)
+      (*agent_type,site_type, covering_class_id*)
       type t = int * int
       let compare = compare
     end)

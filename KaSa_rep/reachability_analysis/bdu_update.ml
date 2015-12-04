@@ -45,17 +45,28 @@ let store_covering_classes_modification_update_aux parameter error agent_type_cv
     site_type_cv cv_id store_test_modification_map store_result =
   let add_link (agent_type, cv_id) rule_id_set store_result =
     let (l, old) =
-      Int2Map_CV_Modif.Map.find_default ([], Site_map_and_set.Set.empty)
-	(agent_type, cv_id) store_result in
-    let error',new_set = Site_map_and_set.Set.union parameter error rule_id_set old in
+      Int2Map_CV_Modif.Map.find_default
+        ([], Site_map_and_set.Set.empty)
+	(agent_type, cv_id) 
+        store_result 
+    in
+    let error',new_set = 
+      Site_map_and_set.Set.union parameter error rule_id_set old 
+    in
     let error = Exception.check warn parameter error error' (Some "line 51") Exit in    
     let result =
-      Int2Map_CV_Modif.Map.add (agent_type, cv_id) (l, new_set) store_result
+      Int2Map_CV_Modif.Map.add 
+        (agent_type, cv_id)
+        (l, new_set) 
+        store_result
     in
     error, result
   in
-  let (l1, s2) = Int2Map_Test_Modif.Map.find_default ([], Site_map_and_set.Set.empty)
-    (agent_type_cv, site_type_cv) store_test_modification_map
+  let (l1, s2) = 
+    Int2Map_Test_Modif.Map.find_default 
+      ([], Site_map_and_set.Set.empty)
+      (agent_type_cv, site_type_cv) 
+      store_test_modification_map
   in
   let error, result =
     add_link (agent_type_cv, cv_id) s2 store_result

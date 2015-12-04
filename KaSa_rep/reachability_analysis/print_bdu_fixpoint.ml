@@ -108,6 +108,20 @@ let print_new_wl_side_effect parameter error result =
         ) s2
     ) result
     
+(*TEST*)
+(*let print_store_test parameter error result =
+  Int2Map_CV_Modif.Map.iter
+    ( fun (x, y) (_, s2) ->
+      let _ =
+        fprintf parameter.log
+          "agent_type:%i:covering_class_id:%i:@set of rule_id:\n" x y
+      in
+      Site_map_and_set.Set.iter
+        (fun rule_id ->
+          fprintf parameter.log "rule_id:%i\n" rule_id
+        ) s2
+    ) result*)
+  
 (************************************************************************************)
 
 let print_bdu_update_map parameter error result =
@@ -132,7 +146,7 @@ let print_bdu_fixpoint parameter error result =
   in
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
-      "** update Discovered sites that are bond on the rhs for the first time:\n";
+      "** New update function when discovered sites that are bond on the rhs for the first time:\n";
     print_new_wl_side_effect
       parameter
       error

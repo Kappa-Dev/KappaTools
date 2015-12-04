@@ -117,162 +117,155 @@ let collect_test_has_bond_rhs parameter error rule_id rule store_result =
     ) (error, false, store_result) rule.actions.bind
   in
   error, bool, store_result
-    
-(*write a function if discover a new bond, add rule_id into working list*)
-    
-let add_rule_id_to_update_aux parameter error
+
+(************************************************************************************)
+(*side effects in the case of half break, add into update function*)
+
+let add_rule_id_to_update parameter error
+    agent_type2
     rule_id_eff
-    bond_rhs_map
     store_covering_classes_modification_update
-    store_result
     =
-  let error, store_new_update_map =
+  let error, store_new_update =
     Int2Map_CV_Modif.Map.fold
-      (fun (agent_type, cv_id) (l', rule_id_set) (error, store_result) ->
-	let error, store_result =
-	  Map_test_bond.Map.fold (fun rule_id set (error, store_result) ->
-	    let error, store_result =
-		(*This is the case: A(x!1), B(x!)*)
-		Map_site_address.Set.fold (fun (_, site_add2) (error, store_result) ->
-		  let agent_type2_bond_rhs = site_add2.agent_type in
-		  (*if agent_type in update is equal to side_address2 in bond_rhs*)
-		  if agent_type2_bond_rhs = agent_type
-		  then
-		    (*add rule_id_effect inside rule_id_set with
-		      agent_type2*)
-		    let error', new_rule_id_set =
-		      Site_map_and_set.Set.add_when_not_in parameter error rule_id_eff rule_id_set (* the rule id may already be in the set *)
-		    in
-		    (*add this new rule_id_set into map*)
-		    let result =
-		      Int2Map_CV_Modif.Map.add (agent_type, cv_id)
-			(l', new_rule_id_set) store_result (*store in update function*)
-		    in
-		    error, result
-		  else
-		    error, store_result (*return the orginal update function*)
-		) set (error, store_result)
-	      in
-	      error, store_result
-	  ) bond_rhs_map (error, store_result)
-	in
-	error, store_result
+      (fun (agent_type, cv_id) (l', rule_id_set)
+        (error, store_result) ->
+          let error, store_result =
+            if agent_type = agent_type2
+            then
+              let error, new_rule_id_set =
+                Site_map_and_set.Set.add_when_not_in
+                  parameter error rule_id_eff rule_id_set
+              in
+              let result =
+                Int2Map_CV_Modif.Map.add
+                  (agent_type, cv_id) (l', new_rule_id_set) store_result
+              in
+              error, result
+            else
+              error, store_result
+          in
+          error, store_result                                 
       ) store_covering_classes_modification_update
       (error, store_covering_classes_modification_update)
   in
-  error, store_new_update_map
+  error, store_new_update
 
-(*checking the state of binding in the case of half break side effects. Remove does not has information about state of binding.*)
-let state_compatible
+let state_compatible 
     parameter
     error
+    agent_type_eff
+    site_type_eff
+    rule_id_eff
     state
-    bond_rhs_map
+    store_covering_classes_modification_update
+    store_contact_map
+    store_result
+    =
+  Int2Map_CM_state.Map.fold
+    (fun (agent_type1, site_type1, state1)(l, triple_list)
+      (error, store_result) ->
+        List.fold_left 
+          (fun (error, store_result) (agent_type2, site_type2, state2) ->
+            if state = state2
+            then
+              if agent_type1 = agent_type_eff &&
+                site_type1 = site_type_eff
+              then
+                add_rule_id_to_update
+                  parameter
+                  error
+                  agent_type2
+                  rule_id_eff
+                  store_covering_classes_modification_update
+              else
+                error, store_result
+            else
+              error, store_result
+          ) (error, store_result) triple_list
+    ) store_contact_map (error, store_result)
+
+let store_new_result_hb_map
+    parameter
+    error 
+    half_break_map
+    store_covering_classes_modification_update
+    store_contact_map
+    store_result_map
+    =
+  Int2Map_HalfBreak_effect.Map.fold
+    (fun (agent_type_eff, site_type_eff) (l1, l2) (error, store_result) ->
+      let error, store_result_map =
+        List.fold_left (fun (error, store_result) (rule_id_eff, state) ->
+          state_compatible
+            parameter
+            error
+            agent_type_eff
+            site_type_eff
+            rule_id_eff
+            state
+            store_covering_classes_modification_update
+            store_contact_map
+            store_result
+        ) (error, store_result) l2
+      in
+      error, store_result_map
+    ) half_break_map (error, store_result_map)
+
+(************************************************************************************)
+(*side effects in the case of remove, add into update function*)
+
+let add_rule_id_remove_to_update
+    parameter
+    error
     rule_id_eff
     store_covering_classes_modification_update
     store_contact_map
-    store_result_map
+    store_result
     =
-  let error, store_result =
-    Int2Map_CM_state.Map.fold
-      (fun (agent_type1, site_type1, state1) (l, triple_list) (error, store_result) ->
-	let error, store_result_map =
-	  List.fold_left (fun (error, store_result) (agent_type2, site_type2, state2) ->
-	    (*check the state of side effect is compatible with 
-	      the state of it binding state in contact map?*)
-	    if state = state2
-	    then
-	      let error, store_new_update_map =
-		add_rule_id_to_update_aux
-		  parameter
-		  error
-		  rule_id_eff
-		  bond_rhs_map
-		  store_covering_classes_modification_update
-		  store_result
-	      in
-	      error, store_new_update_map
-	    else
-	      error, store_result
-	  ) (error, store_result) triple_list
-	in
-	error, store_result_map
-      ) store_contact_map (error, store_result_map)
-  in
-  error, store_result
+  Int2Map_CM_state.Map.fold
+    (fun (agent_type1, site_type1, state1)(l, triple_list)
+      (error, store_result) ->
+        List.fold_left 
+          (fun (error, store_result) (agent_type2, site_type2, state2) ->
+            add_rule_id_to_update
+              parameter
+              error
+              agent_type2
+              rule_id_eff
+              store_covering_classes_modification_update
+          ) (error, store_result) triple_list
+    ) store_contact_map (error, store_result)
 
-(*side effects in the case of half break, add into update function*)
-let store_new_result_hb_map
-    parameter
-    error
-    half_break_map
-    bond_rhs_map
-    store_covering_classes_modification_update
-    store_contact_map
-    store_result_map
-    =
-  let error, store_new_result_hb_map =
-    Int2Map_HalfBreak_effect.Map.fold
-      (fun (agent_type_eff, site_type_eff) (l1, l2) (error, store_result) ->
-        let error, store_result_map =
-          List.fold_left (fun (error, store_result) (rule_id_eff, state) ->
-	    let error, store_result =
-	      state_compatible
-		parameter
-		error
-		state
-		bond_rhs_map
-		rule_id_eff
-		store_covering_classes_modification_update
-		store_contact_map
-		store_result
-	    in
-	    error, store_result
-          ) (error, store_result) l2
-        in
-	error, store_result_map
-      ) half_break_map (error, store_result_map)
-  in
-  error, store_new_result_hb_map
-
-(*side effects in the case of remove, add into update function*)
 let store_new_result_remove_map
   parameter
   error
   remove_map
-  bond_rhs_map
   store_covering_classes_modification_update
+  store_contact_map
   store_result_map
   =
-  let error, store_result =
-    Int2Map_Remove_effect.Map.fold
-      (fun (agent_type_eff, site_type_eff) (l1, l2) (error, store_result) ->
-	let error, store_result_map =
-	  List.fold_left (fun (error, store_result) rule_id_eff ->
-	    let error, store_result =
-	      add_rule_id_to_update_aux
-		parameter
-		error
-		rule_id_eff
-		bond_rhs_map
-		store_covering_classes_modification_update
-		store_result
-	    in
-	    error, store_result
-	  ) (error, store_result) l2
-	in
-	error, store_result_map
-      ) remove_map (error, store_result_map)
-  in
-  error, store_result
+  Int2Map_Remove_effect.Map.fold
+    (fun (agent_type_eff, site_type_eff) (l1, l2) (error, store_result) ->
+      List.fold_left (fun (error, store_result) rule_id_eff ->
+        add_rule_id_remove_to_update
+          parameter
+	  error
+	  rule_id_eff
+	  store_covering_classes_modification_update
+          store_contact_map
+	  store_result
+      ) (error, store_result) l2
+    ) remove_map (error, store_result_map)
 
+(************************************************************************************)
 (* add side effects into update function*)
+
 let store_new_result_map
     parameter
     error
     remove_map
     half_break_map
-    bond_rhs_map
     store_covering_classes_modification_update
     store_contact_map
     store_result_map
@@ -292,7 +285,6 @@ let store_new_result_map
       parameter
       error
       half_break_map
-      bond_rhs_map
       store_covering_classes_modification_update
       store_contact_map
       Int2Map_CV_Modif.Map.empty
@@ -302,8 +294,8 @@ let store_new_result_map
       parameter
       error
       remove_map
-      bond_rhs_map
       store_covering_classes_modification_update
+      store_contact_map
       Int2Map_CV_Modif.Map.empty
   in
   let error, store_result_map =
@@ -344,12 +336,13 @@ let store_new_result_map
   in
   error, store_result_map
 
-(*add side effects into update function*)  
+(************************************************************************************)
+(*add side effects into update function*)
+
 let add_rule_id_to_update
     parameter
     error 
     store_contact_map
-    bond_rhs_map
     store_side_effects
     store_covering_classes_modification_update
     store_result_map
@@ -361,13 +354,13 @@ let add_rule_id_to_update
       error
       remove_map
       half_break_map
-      bond_rhs_map
       store_covering_classes_modification_update
       store_contact_map
       store_result_map
   in
   error, store_result
   
+(************************************************************************************)
 (*write a function add update(c) into working list*)
 
 let add_update_to_wl parameter error store_covering_classes_modification_update wl =
@@ -382,37 +375,6 @@ let add_update_to_wl parameter error store_covering_classes_modification_update 
       in
       error, result
     ) store_covering_classes_modification_update (error, wl)
-
-(*write a function add update(c) with side effects into working list, 
-  if we discovered a new bond*)
-    
-(*let add_update_bond_to_wl parameter error
-    is_new_bond
-    store_new_result_map
-    store_covering_classes_modification_update
-    wl
-    =
-  if is_new_bond
-  then
-  (*add side_effect with new update(c) into wl*)
-    let error, new_wl =
-      add_update_to_wl
-	parameter
-	error
-	store_new_result_map
-	wl
-    in
-    error, new_wl
-  else
-    (*if it is not a new bond then return add update (c) into wl*)
-    let error, new_wl =
-      add_update_to_wl
-	parameter
-	error
-	store_covering_classes_modification_udpate
-	wl
-    in
-    error, new_wl*)
 
 (************************************************************************************)
 (*fixpoint*)
@@ -452,7 +414,9 @@ let collect_bdu_creation_and_modif_list
    in
    error, (bdu_creation_map, modif_list_map, bdu_test_map)
 
+(************************************************************************************)
 (*check is_enable of all *)
+
 let is_enable 
     parameter
     handler
@@ -501,6 +465,7 @@ let is_enable
   in
   error, is_enable
 
+(************************************************************************************)
 (*fixpoint iteration*)
 
 let collect_bdu_update_map parameter handler error 

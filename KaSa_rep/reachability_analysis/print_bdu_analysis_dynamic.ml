@@ -78,8 +78,8 @@ let print_covering_classes_modification_aux parameter error result =
   Int2Map_CV_Modif.Map.iter
     ( fun (x, y) (l1, s2) ->
       if l1 <> []
-      then
-        begin
+      then ()
+        (*begin
           let _ =
             fprintf parameter.log
               "agent_type:%i:covering_class_id:%i" x y
@@ -94,7 +94,7 @@ let print_covering_classes_modification_aux parameter error result =
             ) false l1
           in
           fprintf stdout "\n"
-        end
+        end*)
       else ();
       let _ =
         fprintf parameter.log

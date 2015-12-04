@@ -257,9 +257,10 @@ let scan_rule_fixpoint parameter handler_bdu error
     store_proj_modif_list_restriction_map
     store_proj_bdu_test_restriction_map
     store_bdu_test_restriction_map
-      store_covering_classes_modification_update
-      store_contact_map
-      store_side_effects
+    store_covering_classes_modification_update
+    store_contact_map
+    store_side_effects
+    store_covering_classes_id
     store_result
     =
   (*-------------------------------------------------------------------------------*)
@@ -277,7 +278,6 @@ let scan_rule_fixpoint parameter handler_bdu error
       parameter
       error
       store_contact_map
-      store_test_has_bond_rhs
       store_side_effects
       store_covering_classes_modification_update
       store_result.store_new_wl_side_effect
@@ -362,6 +362,7 @@ let scan_rule parameter handler_bdu error handler_kappa rule_id rule store_cover
 	store_bdu_analysis_dynamic.store_covering_classes_modification_update
 	store_bdu_analysis_dynamic.store_contact_map
 	store_bdu_analysis_static.store_side_effects
+      store_bdu_analysis_static.store_covering_classes_id
       store_result.store_bdu_fixpoint
   in
   (*------------------------------------------------------------------------------*)
