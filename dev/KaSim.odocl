@@ -10,11 +10,13 @@ Signature
 Connected_component
 Instantiation
 Alg_expr
+Raw_mixture
 Primitives
 Environment
 Kappa_printer
 
 Expr
+LKappa
 Snip
 
 Edges
