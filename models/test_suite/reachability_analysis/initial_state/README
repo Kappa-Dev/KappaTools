@@ -1,0 +1,5 @@
+#Command-line:
+"${KAPPABIN}"KaSa initial_state.ka  --debugging-mode --output-directory output || exit 0 
+
+#checking that KaSa is sound VS the initial state
+

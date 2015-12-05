@@ -1,0 +1,5 @@
+%init: 0 A(x~u,y~u)
+
+A(x~u,y~u) -> A(x~p,y~u)
+A(x~u,y~u) -> A(x~u,y~p)
+A(x~p,y~u) -> D(x~u)

@@ -1,0 +1,993 @@
+Parsing relations.ka...
+done
+Scan rules!
+Signature:
+Signature:agents: 
+Signature:agents:agent_type:0:A
+Signature:sites: 
+Signature:sites:agent_type:0:
+Signature:sites:agent_type:0:site_type:0->x(internal state)
+Signature:sites:agent_type:0:site_type:1->y(internal state)
+Signature:sites:agent_type:0:site_type:2->z(internal state)
+Signature:states: 
+Signature:states:0:
+Signature:states:0:0:
+Signature:states:0:0:state_id:0->u
+Signature:states:0:0:state_id:1->p
+Signature:states:0:0:state_id:2->0
+Signature:states:0:0:state_id:3->q
+Signature:states:0:1:
+Signature:states:0:1:state_id:0->u
+Signature:states:0:1:state_id:1->p
+Signature:states:0:1:state_id:2->q
+Signature:states:0:2:
+Signature:states:0:2:state_id:0->u
+Signature:states:0:2:state_id:1->q
+Signature:duals: 
+Compiling...
+Generating the raw contact map...
+Compilation:
+Compilation:rules:0:lhs:
+Compilation:rules:0:lhs:agent_id_0:
+Compilation:rules:0:lhs:agent_id_0:Ghost
+Compilation:rules:0:rhs:
+Compilation:rules:0:rhs:agent_id_0:
+Compilation:rules:0:rhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:0:rhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:0:rhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
+Compilation:rules:0:direct:
+Compilation:rules:0:direct:agent_id_0:
+Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
+Compilation:rules:0:reverse:
+Compilation:rules:0:actions:creation:(agent_id_0,agent_type_0)
+
+Compilation:rules:1:lhs:
+Compilation:rules:1:lhs:agent_id_0:
+Compilation:rules:1:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:1:rhs:
+Compilation:rules:1:rhs:agent_id_0:
+Compilation:rules:1:rhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:1:direct:
+Compilation:rules:1:direct:agent_id_0:
+Compilation:rules:1:direct:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:1:reverse:
+Compilation:rules:1:reverse:agent_id_0:
+Compilation:rules:1:reverse:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
+
+Compilation:rules:2:lhs:
+Compilation:rules:2:lhs:agent_id_0:
+Compilation:rules:2:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:2:lhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:2:rhs:
+Compilation:rules:2:rhs:agent_id_0:
+Compilation:rules:2:rhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:2:rhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:2:direct:
+Compilation:rules:2:direct:agent_id_0:
+Compilation:rules:2:direct:agent_id_0:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:2:reverse:
+Compilation:rules:2:reverse:agent_id_0:
+Compilation:rules:2:reverse:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+
+Compilation:rules:3:lhs:
+Compilation:rules:3:lhs:agent_id_0:
+Compilation:rules:3:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:3:lhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:3:lhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
+Compilation:rules:3:rhs:
+Compilation:rules:3:rhs:agent_id_0:
+Compilation:rules:3:rhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:2;state_max:2]
+Compilation:rules:3:rhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:3:rhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:1;state_max:1]
+Compilation:rules:3:direct:
+Compilation:rules:3:direct:agent_id_0:
+Compilation:rules:3:direct:agent_id_0:agent_type_0:site_type_0->state:[state_min:2;state_max:2]
+Compilation:rules:3:direct:agent_id_0:agent_type_0:site_type_2->state:[state_min:1;state_max:1]
+Compilation:rules:3:reverse:
+Compilation:rules:3:reverse:agent_id_0:
+Compilation:rules:3:reverse:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:3:reverse:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
+
+Compilation:rules:4:lhs:
+Compilation:rules:4:lhs:agent_id_0:
+Compilation:rules:4:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:4:rhs:
+Compilation:rules:4:rhs:agent_id_0:
+Compilation:rules:4:rhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:3;state_max:3]
+Compilation:rules:4:direct:
+Compilation:rules:4:direct:agent_id_0:
+Compilation:rules:4:direct:agent_id_0:agent_type_0:site_type_0->state:[state_min:3;state_max:3]
+Compilation:rules:4:reverse:
+Compilation:rules:4:reverse:agent_id_0:
+Compilation:rules:4:reverse:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
+
+Compilation:rules:5:lhs:
+Compilation:rules:5:lhs:agent_id_0:
+Compilation:rules:5:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:3;state_max:3]
+Compilation:rules:5:lhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:5:rhs:
+Compilation:rules:5:rhs:agent_id_0:
+Compilation:rules:5:rhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:3;state_max:3]
+Compilation:rules:5:rhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:2;state_max:2]
+Compilation:rules:5:direct:
+Compilation:rules:5:direct:agent_id_0:
+Compilation:rules:5:direct:agent_id_0:agent_type_0:site_type_1->state:[state_min:2;state_max:2]
+Compilation:rules:5:reverse:
+Compilation:rules:5:reverse:agent_id_0:
+Compilation:rules:5:reverse:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+
+Compilation:rules:6:lhs:
+Compilation:rules:6:lhs:agent_id_0:
+Compilation:rules:6:lhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:2;state_max:2]
+Compilation:rules:6:lhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
+Compilation:rules:6:rhs:
+Compilation:rules:6:rhs:agent_id_0:
+Compilation:rules:6:rhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:2;state_max:2]
+Compilation:rules:6:rhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:1;state_max:1]
+Compilation:rules:6:direct:
+Compilation:rules:6:direct:agent_id_0:
+Compilation:rules:6:direct:agent_id_0:agent_type_0:site_type_2->state:[state_min:1;state_max:1]
+Compilation:rules:6:reverse:
+Compilation:rules:6:reverse:agent_id_0:
+Compilation:rules:6:reverse:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
+Generating the raw influence map...
+Quarks:Quarkify
+Quarks:Rule 0
+Quarks:TEST
+Quarks:CREATION
+Quarks:rule_id:0,agent_type:0
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:0,agent_type:0,site_type:0,state:0
+Quarks:rule_id:0,agent_type:0,site_type:1,state:0
+Quarks:rule_id:0,agent_type:0,site_type:2,state:0
+Quarks:MODIFICATION-
+Quarks:Rule 1
+Quarks:TEST
+Quarks:rule_id:1,agent_type:0
+Quarks:rule_id:1,agent_type:0,site_type:0,state:0
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:1,agent_type:0,site_type:0,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:1,agent_type:0,site_type:0,state:0
+Quarks:Rule 2
+Quarks:TEST
+Quarks:rule_id:2,agent_type:0
+Quarks:rule_id:2,agent_type:0,site_type:0,state:1
+Quarks:rule_id:2,agent_type:0,site_type:1,state:0
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:2,agent_type:0,site_type:1,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:2,agent_type:0,site_type:1,state:0
+Quarks:Rule 3
+Quarks:TEST
+Quarks:rule_id:3,agent_type:0
+Quarks:rule_id:3,agent_type:0,site_type:0,state:1
+Quarks:rule_id:3,agent_type:0,site_type:1,state:1
+Quarks:rule_id:3,agent_type:0,site_type:2,state:0
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:3,agent_type:0,site_type:0,state:2
+Quarks:rule_id:3,agent_type:0,site_type:2,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:3,agent_type:0,site_type:0,state:1
+Quarks:rule_id:3,agent_type:0,site_type:2,state:0
+Quarks:Rule 4
+Quarks:TEST
+Quarks:rule_id:4,agent_type:0
+Quarks:rule_id:4,agent_type:0,site_type:0,state:0
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:4,agent_type:0,site_type:0,state:3
+Quarks:MODIFICATION-
+Quarks:rule_id:4,agent_type:0,site_type:0,state:0
+Quarks:Rule 5
+Quarks:TEST
+Quarks:rule_id:5,agent_type:0
+Quarks:rule_id:5,agent_type:0,site_type:0,state:3
+Quarks:rule_id:5,agent_type:0,site_type:1,state:0
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:5,agent_type:0,site_type:1,state:2
+Quarks:MODIFICATION-
+Quarks:rule_id:5,agent_type:0,site_type:1,state:0
+Quarks:Rule 6
+Quarks:TEST
+Quarks:rule_id:6,agent_type:0
+Quarks:rule_id:6,agent_type:0,site_type:1,state:2
+Quarks:rule_id:6,agent_type:0,site_type:2,state:0
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:6,agent_type:0,site_type:2,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:6,agent_type:0,site_type:2,state:0
+
+REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
+Quarks:agent_test**:agent_type:0,rule:1->[0]
+Quarks:agent_test**:agent_type:0,rule:2->[0]
+Quarks:agent_test**:agent_type:0,rule:3->[0]
+Quarks:agent_test**:agent_type:0,rule:4->[0]
+Quarks:agent_test**:agent_type:0,rule:5->[0]
+Quarks:agent_test**:agent_type:0,rule:6->[0]
+Quarks:agent_modif+:agent_type:0,rule:0->[0]
+Quarks:site_test**:agent_type:0,site_type:0,state:0,rule:1->[0]
+Quarks:site_test**:agent_type:0,site_type:0,state:0,rule:4->[0]
+Quarks:site_test**:agent_type:0,site_type:0,state:1,rule:2->[0]
+Quarks:site_test**:agent_type:0,site_type:0,state:1,rule:3->[0]
+Quarks:site_test**:agent_type:0,site_type:0,state:3,rule:5->[0]
+Quarks:site_test**:agent_type:0,site_type:1,state:0,rule:2->[0]
+Quarks:site_test**:agent_type:0,site_type:1,state:0,rule:5->[0]
+Quarks:site_test**:agent_type:0,site_type:1,state:1,rule:3->[0]
+Quarks:site_test**:agent_type:0,site_type:1,state:2,rule:6->[0]
+Quarks:site_test**:agent_type:0,site_type:2,state:0,rule:3->[0]
+Quarks:site_test**:agent_type:0,site_type:2,state:0,rule:6->[0]
+Quarks:site_modif+:agent_type:0,site_type:0,state:0,rule:0->[0]
+Quarks:site_modif+:agent_type:0,site_type:0,state:1,rule:1->[0]
+Quarks:site_modif+:agent_type:0,site_type:0,state:2,rule:3->[0]
+Quarks:site_modif+:agent_type:0,site_type:0,state:3,rule:4->[0]
+Quarks:site_modif+:agent_type:0,site_type:1,state:0,rule:0->[0]
+Quarks:site_modif+:agent_type:0,site_type:1,state:1,rule:2->[0]
+Quarks:site_modif+:agent_type:0,site_type:1,state:2,rule:5->[0]
+Quarks:site_modif+:agent_type:0,site_type:2,state:0,rule:0->[0]
+Quarks:site_modif+:agent_type:0,site_type:2,state:1,rule:3->[0]
+Quarks:site_modif+:agent_type:0,site_type:2,state:1,rule:6->[0]
+Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:1->[0]
+Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:4->[0]
+Quarks:site_modif-:agent_type:0,site_type:0,state:1,rule:3->[0]
+Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:2->[0]
+Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:5->[0]
+Quarks:site_modif-:agent_type:0,site_type:2,state:0,rule:3->[0]
+Quarks:site_modif-:agent_type:0,site_type:2,state:0,rule:6->[0]
+Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
+Influence_map:Wake_up_map:rule(0):'' ->A(x~u,y~u,z~u) -> rule(1):'' A(x~u)->A(x~p)[0->0]
+Influence_map:Wake_up_map:rule(0):'' ->A(x~u,y~u,z~u) -> rule(4):'' A(x~u)->A(x~q)[0->0]
+Influence_map:Wake_up_map:rule(1):'' A(x~u)->A(x~p) -> rule(2):'' A(x~p,y~u)->A(x~p,y~p)[0->0]
+Influence_map:Wake_up_map:rule(1):'' A(x~u)->A(x~p) -> rule(3):'' A(x~p,y~p,z~u)->A(x~0,y~p,z~q)[0->0]
+Influence_map:Wake_up_map:rule(2):'' A(x~p,y~u)->A(x~p,y~p) -> rule(3):'' A(x~p,y~p,z~u)->A(x~0,y~p,z~q)[0->0]
+Influence_map:Wake_up_map:rule(4):'' A(x~u)->A(x~q) -> rule(5):'' A(x~q,y~u)->A(x~q,y~q)[0->0]
+Influence_map:Wake_up_map:rule(5):'' A(x~q,y~u)->A(x~q,y~q) -> rule(6):'' A(y~q,z~u)->A(y~q,z~q)[0->0]
+Influence_map:Inhibition_map:rule(1):'' A(x~u)->A(x~p) -> rule(4):'' A(x~u)->A(x~q)[0->0]
+Influence_map:Inhibition_map:rule(4):'' A(x~u)->A(x~q) -> rule(1):'' A(x~u)->A(x~p)[0->0]
+Refining the influence map...
+Reachability analysis...
+
+agent_type:0:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+site_type:0
+site_type:1
+site_type:2
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1
+site_type:2
+site_type:3
+------------------------------------------------------
+Covering classes with type set:
+agent_type:0:
+Potential dependencies between sites:Covering_class_id:0
+site_type:0
+site_type:1
+site_type:2
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+Global:site_type:0  => Local:site_type':1
+Global:site_type:1  => Local:site_type':2
+Global:site_type:2  => Local:site_type':3
+Local:site_type':1  => Global:site_type:0
+Local:site_type':2  => Global:site_type:1
+Local:site_type':3  => Global:site_type:2
+============================================================
+* BDU Analysis:
+============================================================
+
+** Static information:
+
+------------------------------------------------------------
+Mapping between sites and the covering classes they belong to:
+------------------------------------------------------------
+agent_type:0:site_type:0@list of covering_class_id:
+covering_class_id:0
+agent_type:0:site_type:1@list of covering_class_id:
+covering_class_id:0
+agent_type:0:site_type:2@list of covering_class_id:
+covering_class_id:0
+------------------------------------------------------------
+Sites that may/must occurs side-effects:
+------------------------------------------------------------
+------------------------------------------------------------
+Set of rules that may modify a given site (excluding created agents):
+------------------------------------------------------------
+agent_id:0:agent_type:0:site_type:0@set of rule_id:
+rule_id:0
+rule_id:1
+rule_id:3
+rule_id:4
+agent_id:0:agent_type:0:site_type:1@set of rule_id:
+rule_id:0
+rule_id:2
+rule_id:5
+agent_id:0:agent_type:0:site_type:2@set of rule_id:
+rule_id:0
+rule_id:3
+rule_id:6
+------------------------------------------------------------
+Set of rules that may test a given site:
+------------------------------------------------------------
+agent_id:0:agent_type:0:site_type:0@set of rule_id:
+rule_id:1
+rule_id:2
+rule_id:3
+rule_id:4
+rule_id:5
+agent_id:0:agent_type:0:site_type:1@set of rule_id:
+rule_id:2
+rule_id:3
+rule_id:5
+rule_id:6
+agent_id:0:agent_type:0:site_type:2@set of rule_id:
+rule_id:3
+rule_id:6
+------------------------------------------------------------
+Set of rules that may test and modify a given site (excluding created agents):
+------------------------------------------------------------
+agent_id:0:agent_type:0:site_type:0@set of rule_id:
+rule_id:0
+rule_id:1
+rule_id:2
+rule_id:3
+rule_id:4
+rule_id:5
+agent_id:0:agent_type:0:site_type:1@set of rule_id:
+rule_id:0
+rule_id:2
+rule_id:3
+rule_id:5
+rule_id:6
+agent_id:0:agent_type:0:site_type:2@set of rule_id:
+rule_id:0
+rule_id:3
+rule_id:6
+------------------------------------------------------------
+Set of rules that may modify a given site (excluding created agents, without agent_id):
+------------------------------------------------------------
+agent_type:0:site_type:0@set of rule_id:
+rule_id:0
+rule_id:1
+rule_id:3
+rule_id:4
+agent_type:0:site_type:1@set of rule_id:
+rule_id:0
+rule_id:2
+rule_id:5
+agent_type:0:site_type:2@set of rule_id:
+rule_id:0
+rule_id:3
+rule_id:6
+------------------------------------------------------------
+Set of rules that may test a given site (without agent_id):
+------------------------------------------------------------
+agent_type:0:site_type:0@set of rule_id:
+rule_id:1
+rule_id:2
+rule_id:3
+rule_id:4
+rule_id:5
+agent_type:0:site_type:1@set of rule_id:
+rule_id:2
+rule_id:3
+rule_id:5
+rule_id:6
+agent_type:0:site_type:2@set of rule_id:
+rule_id:3
+rule_id:6
+------------------------------------------------------------
+Set of rules that may test and modify a given site (excluding created agents, without agent_id):
+------------------------------------------------------------
+agent_type:0:site_type:0@set of rule_id:
+rule_id:0
+rule_id:1
+rule_id:2
+rule_id:3
+rule_id:4
+rule_id:5
+agent_type:0:site_type:1@set of rule_id:
+rule_id:0
+rule_id:2
+rule_id:3
+rule_id:5
+rule_id:6
+agent_type:0:site_type:2@set of rule_id:
+rule_id:0
+rule_id:3
+rule_id:6
+
+** Dynamic information:
+
+------------------------------------------------------------
+(Syntactic) Contact map (only considering rhs) and initital state:
+------------------------------------------------------------
+Sites are annotated with the id of binding type:
+
+------------------------------------------------------------
+List of rules to awake when the state of a site is modified and tested:
+------------------------------------------------------------
+agent_type:0:covering_class_id:0:@set of rule_id:
+rule_id:0
+rule_id:1
+rule_id:2
+rule_id:3
+rule_id:4
+rule_id:5
+rule_id:6
+
+------------------------------------------------------------
+* Rules in the working list:
+------------------------------------------------------------
+- Working list creation:
+0 
+
+------------------------------------------------------------
+* Covering classes with new indexes:
+------------------------------------------------------------
+
+------------------------------------------------------------
+- Bdu for the valuations of the views that are tested (per rule, agent and covering class):
+
+agent_id:0:agent_type:0:rule_id:1:covering_class_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_id:0:agent_type:0:rule_id:2:covering_class_id:0
+Id=18
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=17
+   Node(site_type:1<2)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_id:0:agent_type:0:rule_id:3:covering_class_id:0
+Id=22
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=21
+   Node(site_type:1<2)
+    Id=20
+     Node(site_type:2<1)
+      Id=1
+       Leaf False 
+
+      Id=19
+       Node(site_type:2<2)
+        Id=7
+         Node(site_type:3<0)
+          Id=1
+           Leaf False 
+
+          Id=6
+           Node(site_type:3<1)
+            Id=0
+             Leaf True 
+
+            Id=1
+             Leaf False 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_id:0:agent_type:0:rule_id:4:covering_class_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_id:0:agent_type:0:rule_id:5:covering_class_id:0
+Id=59
+ Node(site_type:1<3)
+  Id=1
+   Leaf False 
+
+  Id=58
+   Node(site_type:1<4)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_id:0:agent_type:0:rule_id:6:covering_class_id:0
+Id=61
+ Node(site_type:2<2)
+  Id=1
+   Leaf False 
+
+  Id=60
+   Node(site_type:2<3)
+    Id=7
+     Node(site_type:3<0)
+      Id=1
+       Leaf False 
+
+      Id=6
+       Node(site_type:3<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+
+------------------------------------------------------------
+- Bdu for the valuations of the views that are tested (projection per rule):
+
+rule_id:1
+agent_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+rule_id:2
+agent_id:0
+Id=18
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=17
+   Node(site_type:1<2)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:3
+agent_id:0
+Id=22
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=21
+   Node(site_type:1<2)
+    Id=20
+     Node(site_type:2<1)
+      Id=1
+       Leaf False 
+
+      Id=19
+       Node(site_type:2<2)
+        Id=7
+         Node(site_type:3<0)
+          Id=1
+           Leaf False 
+
+          Id=6
+           Node(site_type:3<1)
+            Id=0
+             Leaf True 
+
+            Id=1
+             Leaf False 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:4
+agent_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+rule_id:5
+agent_id:0
+Id=59
+ Node(site_type:1<3)
+  Id=1
+   Leaf False 
+
+  Id=58
+   Node(site_type:1<4)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:6
+agent_id:0
+Id=61
+ Node(site_type:2<2)
+  Id=1
+   Leaf False 
+
+  Id=60
+   Node(site_type:2<3)
+    Id=7
+     Node(site_type:3<0)
+      Id=1
+       Leaf False 
+
+      Id=6
+       Node(site_type:3<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+
+------------------------------------------------------------
+- Bdu for the valuations of the views that are created (per rule, agent and covering class):
+
+agent_type:0:rule_id:0:covering_class_id:0
+Id=11
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=10
+   Node(site_type:1<1)
+    Id=9
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<1)
+        Id=7
+         Node(site_type:3<0)
+          Id=1
+           Leaf False 
+
+          Id=6
+           Node(site_type:3<1)
+            Id=0
+             Leaf True 
+
+            Id=1
+             Leaf False 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+
+------------------------------------------------------------
+- Bdu for the valuations of the views that are created (per rule_id; projection function):
+
+rule_id:0
+agent_type:0
+Id=11
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=10
+   Node(site_type:1<1)
+    Id=9
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<1)
+        Id=7
+         Node(site_type:3<0)
+          Id=1
+           Leaf False 
+
+          Id=6
+           Node(site_type:3<1)
+            Id=0
+             Leaf True 
+
+            Id=1
+             Leaf False 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+
+------------------------------------------------------------
+- List for update of the views due to modification (per rule, agent and covering class):
+agent_id:0:agent_type:0:rule_id:0:covering_class_id:0
+site_type:3:state:0
+site_type:2:state:0
+site_type:1:state:0
+agent_id:0:agent_type:0:rule_id:1:covering_class_id:0
+site_type:1:state:1
+agent_id:0:agent_type:0:rule_id:2:covering_class_id:0
+site_type:2:state:1
+agent_id:0:agent_type:0:rule_id:3:covering_class_id:0
+site_type:3:state:1
+site_type:1:state:2
+agent_id:0:agent_type:0:rule_id:4:covering_class_id:0
+site_type:1:state:3
+agent_id:0:agent_type:0:rule_id:5:covering_class_id:0
+site_type:2:state:2
+agent_id:0:agent_type:0:rule_id:6:covering_class_id:0
+site_type:3:state:1
+
+------------------------------------------------------------
+- List for update of the views due to modification (projection per rule):
+rule_id:0
+agent_id:0:
+site_type:3:state:0
+site_type:2:state:0
+site_type:1:state:0
+rule_id:1
+agent_id:0:
+site_type:1:state:1
+rule_id:2
+agent_id:0:
+site_type:2:state:1
+rule_id:3
+agent_id:0:
+site_type:3:state:1
+site_type:1:state:2
+rule_id:4
+agent_id:0:
+site_type:1:state:3
+rule_id:5
+agent_id:0:
+site_type:2:state:2
+rule_id:6
+agent_id:0:
+site_type:3:state:1
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+** New update function when discovered sites that are bond on the rhs for the first time:
+agent_type:0:covering_class_id:0:@set of rule_id:
+rule_id:0
+rule_id:1
+rule_id:2
+rule_id:3
+rule_id:4
+rule_id:5
+rule_id:6
+** Discovered sites that are bond on the rhs for the first time:
+false
+** Fixpoint iteration function:
+agent_type:0:cv_id:0
+Id=90
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=89
+   Node(site_type:1<1)
+    Id=9
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<1)
+        Id=7
+         Node(site_type:3<0)
+          Id=1
+           Leaf False 
+
+          Id=6
+           Node(site_type:3<1)
+            Id=0
+             Leaf True 
+
+            Id=1
+             Leaf False 
+
+        Id=1
+         Leaf False 
+
+    Id=88
+     Node(site_type:1<2)
+      Id=23
+       Node(site_type:2<0)
+        Id=1
+         Leaf False 
+
+        Id=19
+         Node(site_type:2<2)
+          Id=7
+           Node(site_type:3<0)
+            Id=1
+             Leaf False 
+
+            Id=6
+             Node(site_type:3<1)
+              Id=0
+               Leaf True 
+
+              Id=1
+               Leaf False 
+
+          Id=1
+           Leaf False 
+
+      Id=87
+       Node(site_type:1<3)
+        Id=36
+         Node(site_type:2<1)
+          Id=1
+           Leaf False 
+
+          Id=35
+           Node(site_type:2<2)
+            Id=34
+             Node(site_type:3<1)
+              Id=1
+               Leaf False 
+
+              Id=33
+               Node(site_type:3<2)
+                Id=0
+                 Leaf True 
+
+                Id=1
+                 Leaf False 
+
+            Id=1
+             Leaf False 
+
+        Id=86
+         Node(site_type:1<4)
+          Id=85
+           Node(site_type:2<0)
+            Id=1
+             Leaf False 
+
+            Id=84
+             Node(site_type:2<1)
+              Id=7
+               Node(site_type:3<0)
+                Id=1
+                 Leaf False 
+
+                Id=6
+                 Node(site_type:3<1)
+                  Id=0
+                   Leaf True 
+
+                  Id=1
+                   Leaf False 
+
+              Id=83
+               Node(site_type:2<2)
+                Id=1
+                 Leaf False 
+
+                Id=82
+                 Node(site_type:2<3)
+                  Id=42
+                   Node(site_type:3<0)
+                    Id=1
+                     Leaf False 
+
+                    Id=33
+                     Node(site_type:3<2)
+                      Id=0
+                       Leaf True 
+
+                      Id=1
+                       Leaf False 
+
+                  Id=1
+                   Leaf False 
+
+          Id=1
+           Leaf False 
+
+execution finished without any exception
