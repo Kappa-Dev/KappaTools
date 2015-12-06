@@ -21,9 +21,6 @@ ____________________________________________________________
  (-857 events)
 + Producing causal traces
 	 - splitting initial events (+10 events)
-	 - renaming agents to avoid conflicts after event removals (no change)
-	 - detecting siphons (+29 events)
-	 - renaming agents to avoid conflicts after event removals (no change)
 	 - blackboard generation
 	 - computing causal past of each observed events (10)
 Stats:

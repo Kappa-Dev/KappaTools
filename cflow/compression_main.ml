@@ -98,29 +98,31 @@ let compress_and_print logger env log_info step_list =
             then Debug.tag logger "+ Producing causal compressions"
             else Debug.tag logger "+ Producing causal traces"
           in
-	  let error,log_info,step_list_with_more_init = U.split_init parameter  always handler log_info error step_list in 
-          let error,log_info,refined_event_list = U.disambiguate parameter always handler log_info error step_list_with_more_init in
-	  let error,log_info,refined_event_list_wo_siphon =
-	    if Graph_closure.ignore_flow_from_outgoing_siphon
-	    then
-	      let error,log_info,step_list = U.fill_siphon parameter always handler log_info error refined_event_list in
-	      U.disambiguate parameter always handler log_info error step_list
-	    else
-	      error,log_info,refined_event_list 
-	  in
-	  let () =
-            if debug_mode then
-	      U.print_trace parameter handler refined_event_list_wo_siphon
-	  in
+	  let error,log_info,refined_event_list  = U.split_init parameter  always handler log_info error step_list in 
+	  (*          let error,log_info,refined_event_list = U.disambiguate parameter always handler log_info error step_list_with_more_init in*)
 	  let error,log_info,refined_event_list_cut =
             if (weak_compression_on || strong_compression_on)
-	       && Parameter.do_global_cut
 	    then
-              U.cut parameter always handler log_info error refined_event_list_wo_siphon 
-	    else
-	      error,log_info,refined_event_list_wo_siphon
-          in
-          
+	      let error,log_info,refined_event_list_wo_siphon =
+		if Graph_closure.ignore_flow_from_outgoing_siphon
+		then
+		  U.fill_siphon parameter always handler log_info error refined_event_list 
+				(* U.disambiguate parameter always handler log_info error step_list*)
+		else
+		  error,log_info,refined_event_list 
+	      in
+	      let () =
+		if debug_mode then
+		  U.print_trace parameter handler refined_event_list_wo_siphon
+	      in
+	      if  Parameter.do_global_cut
+	      then
+		U.cut parameter always handler log_info error refined_event_list_wo_siphon 
+	      else
+		error,log_info,refined_event_list_wo_siphon
+            else
+	      error,log_info,refined_event_list 
+	  in          
           let deal_with error cut log_info = 
             let error,log_info,refined_event_list_without_pseudo_inverse = 
               if cut && Parameter.cut_pseudo_inverse_event 

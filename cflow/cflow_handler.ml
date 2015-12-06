@@ -39,7 +39,8 @@ module type Cflow_handler =
 	  debug_mode : bool ;
 	  log_step_channel : Format.formatter ;
 	  kasa : Remanent_parameters_sig.parameters ;
-        } (*a struct which contains parameterizable options*)
+	  always_disambiguate_initial_states : bool  ;
+	} (*a struct which contains parameterizable options*)
     type handler =   (*handler to interpret abstract values*)
         {
           env: Environment.t ;
@@ -70,6 +71,8 @@ module type Cflow_handler =
     val do_we_use_bucket_sort: parameter -> bool
     val use_bucket_sort: parameter -> parameter
     val use_fusion_sort: parameter -> parameter 
+    val always_disambiguate: parameter -> bool 
+    val set_always_disambiguate: parameter -> bool -> parameter 
   end
 
 
@@ -91,8 +94,9 @@ module Cflow_handler =
 	  log_step: bool ;
 	  debug_mode: bool ;
 	  log_step_channel : Format.formatter ;
-	  kasa : Remanent_parameters_sig.parameters 
-        }
+	  kasa : Remanent_parameters_sig.parameters ;
+	  always_disambiguate_initial_states : bool  ;
+	}
 
     let build_parameter () =
       let channel = Kappa_files.open_profiling () in
@@ -111,7 +115,8 @@ module Cflow_handler =
 	debug_mode = false ;
 	log_step = true ;
 	log_step_channel = Format.std_formatter ; 
-	kasa = Remanent_parameters.get_parameters () 
+	kasa = Remanent_parameters.get_parameters () ;
+	always_disambiguate_initial_states = true ;
       }
 
     let set_compression_weak p =
@@ -172,5 +177,10 @@ module Cflow_handler =
    let do_we_use_bucket_sort parameter = parameter.sort_algo_for_stories == Parameter.Bucket
    let use_bucket_sort parameter = {parameter with sort_algo_for_stories = Parameter.Bucket}
    let use_fusion_sort parameter = {parameter with sort_algo_for_stories = Parameter.Fusion}
-    end:Cflow_handler)
+
+   let always_disambiguate parameter = parameter.always_disambiguate_initial_states
+   let set_always_disambiguate parameter  bool = { parameter with always_disambiguate_initial_states = bool}
+						   
+ 
+				     end:Cflow_handler)
     
