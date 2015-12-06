@@ -45,10 +45,7 @@ val remove_events_after_last_obs: parameter -> (parameter -> bool) -> kappa_hand
 		
 (** split_init split init event agent-wise *)
 val split_init: parameter -> (parameter -> bool) -> kappa_handler -> profiling_info -> error_log -> trace -> error_log * profiling_info * trace 
-			   
-(*(** disambiguate ensures that agent id are used only once along traces *)
-val disambiguate: parameter -> (parameter -> bool) -> kappa_handler -> profiling_info -> error_log -> trace -> error_log * profiling_info * trace (* try to hide this *)*)
-				     
+			   				     
 (** fill_siphon adds spurious init event, to break causal dependences; 
     Currently, it inserts an init event when an agent return to its initial state; 
     other heuristics may be considered;

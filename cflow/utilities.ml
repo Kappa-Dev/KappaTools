@@ -27,55 +27,41 @@ type step = S.PH.B.PB.CI.Po.K.refined_step
 type step_with_side_effects = S.PH.B.PB.CI.Po.K.refined_step * S.PH.B.PB.CI.Po.K.side_effect										
 type step_id = S.PH.B.PB.step_id
 
-type event_sequence  =
-  | Pretrace of step list
-  | Compressed_trace of step list * step_with_side_effects list 
 type trace =
   {
-    trace:event_sequence; 
+    compressed_trace: step_with_side_effects list option ;
+    pretrace: step list ; 
     with_potential_ambiguity: bool 
   }
 
-let get_event_sequence trace = trace.trace  
-let get_pretrace_of_event_sequence x =
-  match
-    x
-  with
-  | Pretrace x | Compressed_trace (x,_) -> x
-let get_event_sequence_of_pretrace x = Pretrace(x)
-let get_pretrace trace = get_pretrace_of_event_sequence (get_event_sequence trace)
-
-let may_initial_sites_be_ambiguous trace =
-  trace.with_potential_ambiguity
+let get_pretrace_of_trace trace = trace.pretrace 
+let may_initial_sites_be_ambiguous trace = trace.with_potential_ambiguity					     
 let set_ambiguity_level trace x = {trace with with_potential_ambiguity=x}
-let set_event_sequence l trace = {trace with trace = l}
-				   
+let set_pretrace trace x = {trace with pretrace = x}
+let set_compressed_trace trace x = {trace with compressed_trace = x}				     
 let get_compressed_trace trace =
   match
-    get_event_sequence trace
+    trace.compressed_trace
   with
-  | Pretrace x -> List.rev_map (fun x -> x,[]) (List.rev x) 					     
-  | Compressed_trace (_,x) -> x
+  | Some x -> x
+  | None -> List.rev_map (fun x -> x,[]) (List.rev (get_pretrace_of_trace trace)) 					     
+let is_compressed_trace trace = trace.compressed_trace != None 
 
-let is_compressed_trace trace =
-  match
-    get_event_sequence trace
-  with
-  | Pretrace _ -> true
-  | Compressed_trace _ -> false
-
-
-let trace_of_pretrace_with_ambiguity with_ambiguity x =
+let trace_of_pretrace_with_ambiguity with_ambiguity pretrace =
   {
-    trace = get_event_sequence_of_pretrace x ;
-    with_potential_ambiguity = with_ambiguity
+    pretrace =  pretrace ;
+    compressed_trace = None ; 
+    with_potential_ambiguity = with_ambiguity ;
   }
 
 let trace_of_pretrace = trace_of_pretrace_with_ambiguity true
 							 
 let build_compressed_trace x y =
-  {trace = Compressed_trace (x,y);
-   with_potential_ambiguity = false}
+  {
+    compressed_trace = Some y;
+    pretrace = x;
+    with_potential_ambiguity = false
+  }
     
 let get_log_step = S.PH.B.PB.CI.Po.K.H.get_log_step
 let get_debugging_mode = S.PH.B.PB.CI.Po.K.H.get_debugging_mode
@@ -90,18 +76,9 @@ let print_pretrace parameter handler =
 	"@[<v>%a@]@."
 	(Pp.list Pp.space (S.PH.B.PB.CI.Po.K.print_refined_step ~handler))
 
-let print_event_sequence parameter handler trace =
-  match
-    trace
-  with
-  | Pretrace x -> print_pretrace parameter handler x
-  | Compressed_trace (x,y) ->
-     let () = print_pretrace parameter handler x in
-     let () = () (* to do, print y*)
-     in () 
 (** operations over traces *) 
 
-let print_trace parameter handler trace = print_event_sequence parameter handler (get_event_sequence trace)
+let print_trace parameter handler trace = print_pretrace parameter handler (get_pretrace_of_trace trace)
 							       
 			     
 let transform_trace_gen f log_message debug_message log =
@@ -121,8 +98,15 @@ let transform_trace_gen f log_message debug_message log =
        else
 	 false 
      in
-     let pretrace = get_pretrace_of_event_sequence trace in 
+     let pretrace = get_pretrace_of_trace trace in 
      let error,(pretrace',n) = f parameters kappa_handler error pretrace in
+     let trace' = trace_of_pretrace pretrace' in
+     let trace =
+       if trace == trace'
+       then trace
+       else 
+	 set_ambiguity_level trace' (may_initial_sites_be_ambiguous trace)
+     in 
      let () =
        if
 	 bool
@@ -134,10 +118,10 @@ let transform_trace_gen f log_message debug_message log =
 	 S.PH.B.PB.CI.Po.K.H.get_debugging_mode parameters
        then
 	 let _ = Debug.tag (S.PH.B.PB.CI.Po.K.H.get_debugging_channel parameters) debug_message in 
-	 print_pretrace parameters kappa_handler pretrace'
+	 print_trace parameters kappa_handler trace
      in
      let profiling_info = log n profiling_info  in 
-     error,profiling_info,get_event_sequence_of_pretrace pretrace' 
+     error,profiling_info,trace 
    else
      error,profiling_info,trace)
 
@@ -169,9 +153,6 @@ let monadic_lift f = (fun _ _ e t ->
 		      let t' = f t in
 		      e,(t',List.length t - List.length t'))
 let dummy_profiling = (fun _ p -> p)
-(*let solve_ambiguity = (fun _ -> false)
-let keep_as_it_is = (fun x -> x)
-let create_ambiguity = (fun _ -> true)*)
 
 let disambiguate =
   transform_trace_gen
@@ -184,12 +165,11 @@ let disambiguate =
 let make_unambiguous parameters p kappa_handler profiling_info error trace =
   if may_initial_sites_be_ambiguous trace
   then 
-    let event_list = get_event_sequence trace in 
-    let error,_,event_list' = disambiguate parameters (fun parameters -> may_initial_sites_be_ambiguous trace && p parameters) kappa_handler profiling_info error event_list in
+    let error,_,trace' = disambiguate parameters (fun parameters -> may_initial_sites_be_ambiguous trace && p parameters) kappa_handler profiling_info error trace in
     error,
-    if event_list==event_list'   
+    if trace'==trace   
     then trace
-    else {trace = event_list' ; with_potential_ambiguity = false}
+    else set_ambiguity_level trace' false
   else
     error,trace 
 
@@ -208,10 +188,9 @@ let lift_to_care_about_ambiguities f requirement effect =
        else
 	 error,trace
      in
-     let event_list = get_event_sequence trace in 
-     let error,log_info,event_list = f parameters p kappa_handler profiling_info error event_list in
-     let trace = set_event_sequence event_list trace in 
-     error,log_info,set_ambiguity_level trace (handle_ambiguities effect true)
+     let error,log_info,trace = f parameters p kappa_handler profiling_info error trace in
+     let trace = set_ambiguity_level trace (handle_ambiguities effect true) in
+     error,log_info,trace 
    else
      error,profiling_info,trace)
 	    
@@ -348,7 +327,7 @@ let create_story_table parameters handler error  =
     story_list= init ;
   }  
   
-let get_trace_of_story (_,_,_,y,_) = Pretrace y
+let get_trace_of_story (_,_,_,y,_) = trace_of_pretrace y
 let get_info_of_story (_,_,_,_,t) = t
 
 
@@ -413,9 +392,9 @@ let inc_counter story_list =
 
 
 let store_trace (parameter:parameter) (handler:kappa_handler) (error:error_log) obs_info  computation_info trace  (story_table:story_table) = 
-  let pretrace = get_pretrace trace in
+  let pretrace = get_pretrace_of_trace trace in
   let trace2 = get_compressed_trace trace in 
-  let bool = is_compressed_trace trace in 
+  let bool = not (is_compressed_trace trace) in 
   let grid = S.PH.B.PB.CI.Po.K.build_grid trace2 bool  handler in
   let computation_info  = S.PH.B.PB.CI.Po.K.P.set_grid_generation  computation_info in 
   let story_info = 
@@ -468,7 +447,7 @@ let compress logger parameter handler error log_info trace =
      let error,log_info,trace = cut parameter always handler log_info error trace
      in error,log_info,[trace] 
   | Some Parameter.Weak | Some Parameter.Strong -> 
-    let event_list = get_pretrace trace in 
+    let event_list = get_pretrace_of_trace trace in 
     let error,log_info,blackboard = S.PH.B.import parameter handler error log_info event_list in 
     let error,list = S.PH.forced_events parameter handler error blackboard in     
     let list_order = 
@@ -519,9 +498,9 @@ let weakly_compress logger parameter = compress logger (set_compression_mode par
 								  
 let convert_trace_into_grid trace handler = 
     let event_list = get_compressed_trace trace in
-    S.PH.B.PB.CI.Po.K.build_grid event_list ((*not*) (is_compressed_trace trace)) handler 
+    S.PH.B.PB.CI.Po.K.build_grid event_list (not (is_compressed_trace trace)) handler 
     
-let convert_trace_into_musical_notation p h e info x = S.PH.B.import p h e info (get_pretrace x)
+let convert_trace_into_musical_notation p h e info x = S.PH.B.import p h e info (get_pretrace_of_trace x)
 
 let enrich_grid_with_transitive_closure = Causal.enrich_grid
 let enrich_big_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closure.config_init
@@ -530,5 +509,5 @@ let enrich_std_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closu
 					    
 let sort_story_list  = D.sort_list 
 let export_story_table parameter handler error x = sort_story_list parameter handler error (get_stories x)
-let has_obs x = List.exists S.PH.B.PB.CI.Po.K.is_obs_of_refined_step (get_pretrace x)
+let has_obs x = List.exists S.PH.B.PB.CI.Po.K.is_obs_of_refined_step (get_pretrace_of_trace x)
 				   

@@ -99,7 +99,6 @@ let compress_and_print logger env log_info step_list =
             else Debug.tag logger "+ Producing causal traces"
           in
 	  let error,log_info,refined_event_list  = U.split_init parameter  always handler log_info error step_list in 
-	  (*          let error,log_info,refined_event_list = U.disambiguate parameter always handler log_info error step_list_with_more_init in*)
 	  let error,log_info,refined_event_list_cut =
             if (weak_compression_on || strong_compression_on)
 	    then
@@ -107,7 +106,6 @@ let compress_and_print logger env log_info step_list =
 		if Graph_closure.ignore_flow_from_outgoing_siphon
 		then
 		  U.fill_siphon parameter always handler log_info error refined_event_list 
-				(* U.disambiguate parameter always handler log_info error step_list*)
 		else
 		  error,log_info,refined_event_list 
 	      in
