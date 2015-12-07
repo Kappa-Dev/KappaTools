@@ -2,7 +2,7 @@
  * utilities.ml 
  *      
  * Creation:                      <2015-03-28 feret>
- * Last modification: Time-stamp: <2015-11-30 09:43:03 feret>
+ * Last modification: Time-stamp: <2015-12-07 18:37:16 feret>
  * 
  * API for causal compression
  * Jerome Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -34,7 +34,9 @@ type trace =
     with_potential_ambiguity: bool 
   }
 
+
 let get_pretrace_of_trace trace = trace.pretrace 
+let size_of_pretrace trace = List.length (get_pretrace_of_trace trace)
 let may_initial_sites_be_ambiguous trace = trace.with_potential_ambiguity					     
 let set_ambiguity_level trace x = {trace with with_potential_ambiguity=x}
 let set_pretrace trace x = {trace with pretrace = x}

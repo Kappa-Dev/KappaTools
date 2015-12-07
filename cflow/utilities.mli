@@ -2,7 +2,7 @@
   * utilities.mli  
   *
   * Creation:                      <2015-08-10 09:21:53 feret>
-  * Last modification: Time-stamp: <2015-11-30 09:26:26 feret>
+  * Last modification: Time-stamp: <2015-12-07 18:35:44 feret>
   * 
   * Causal flow compression: a module for KaSim 
   * Jerome Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -33,6 +33,7 @@ type profiling_info = S.PH.B.PB.CI.Po.K.P.log_info
 (** traces *)			
 type trace 
 
+val size_of_pretrace: trace -> int 
 val print_trace: parameter -> kappa_handler -> trace -> unit  
 
 (** check wether there is an observable in a trace *)
