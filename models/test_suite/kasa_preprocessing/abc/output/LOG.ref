@@ -1201,6 +1201,40 @@ Id=5
 
 
 ------------------------------------------------------------
+- Bdu for the valuations of the views that are created in the initial state (per rule, agent and covering class):
+
+agent_id:0:agent_type:0:rule_id:0:covering_class_id:0
+Id=0
+ Leaf True 
+
+agent_id:0:agent_type:2:rule_id:1:covering_class_id:0
+Id=0
+ Leaf True 
+
+agent_id:1:agent_type:1:rule_id:0:covering_class_id:0
+Id=0
+ Leaf True 
+
+
+------------------------------------------------------------
+- Bdu for the valuations of the views that are created in the initial state (per rule_id; projection function):
+
+rule_id:0
+agent_type:0
+Id=0
+ Leaf True 
+
+agent_type:1
+Id=0
+ Leaf True 
+
+rule_id:1
+agent_type:2
+Id=0
+ Leaf True 
+
+
+------------------------------------------------------------
 - List for update of the views due to modification (per rule, agent and covering class):
 agent_id:0:agent_type:0:rule_id:0:covering_class_id:0
 site_type:1:state:1

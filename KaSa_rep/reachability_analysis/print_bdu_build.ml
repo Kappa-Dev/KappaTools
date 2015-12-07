@@ -93,6 +93,29 @@ let print_proj_creation_bdu_map parameter error result =
 
 (************************************************************************************)
 
+let print_init_bdu_map parameter error result =
+  Map_init_bdu.Map.iter
+    (fun (agent_id, agent_type, rule_id, cv_id) bdu_init ->
+      let _ =
+        fprintf parameter.log "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i\n"
+          agent_id agent_type rule_id cv_id
+      in
+      Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_init
+    ) result
+
+let print_proj_init_bdu_map parameter error result =
+  Map_final_init_bdu.Map.iter
+    (fun rule_id map_b ->
+      let _ = fprintf parameter.log "rule_id:%i\n" rule_id in
+      Map_agent_type_init_bdu.Map.iter
+        (fun agent_type bdu_creation ->
+          let _ = fprintf parameter.log "agent_type:%i\n" agent_type in
+          Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_creation
+        ) map_b
+    ) result
+
+(************************************************************************************)
+
 let print_modif_list_map parameter error result =
   Map_modif_list.Map.iter
     (fun (agent_id, agent_type, rule_id, cv_id) l2 ->
@@ -172,6 +195,26 @@ let print_bdu_build parameter error result =
       parameter
       error
       result.store_proj_bdu_creation_restriction_map
+  in
+  let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "\n------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter)
+      "- Bdu for the valuations of the views that are created in the initial state (per rule, agent and covering class):\n\n";
+    print_init_bdu_map
+      parameter
+      error
+      result.store_bdu_init_restriction_map
+  in
+  let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "\n------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter)
+      "- Bdu for the valuations of the views that are created in the initial state (per rule_id; projection function):\n\n";
+    print_proj_init_bdu_map
+      parameter
+      error
+      result.store_proj_bdu_init_restriction_map
   in
   let _ =
     fprintf (Remanent_parameters.get_log parameter)

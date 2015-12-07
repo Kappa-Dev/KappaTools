@@ -60,23 +60,31 @@ let compute_bdu_update_creation parameter handler error bdu_creation bdu_X' =
   error, handler, bdu_result
 
 (*the final update*)
-let compute_bdu_update parameter handler error bdu_test list_a bdu_creation bdu_X =
-  (*to the first one with bdu_test*)
-  let error, handler, bdu_Xn = 
-    compute_bdu_update_test
-      parameter
-      handler
-      error
-      bdu_test
-      list_a
-      bdu_X
-  in
-  (*do the union per creation*)
-  let error, handler, bdu_result =
-    Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_Xn bdu_creation
-  in
-  error, handler, bdu_result
-
+let compute_bdu_update parameter handler error bdu_test list_a bdu_creation
+    (*store_bdu_init_restriction_map*) bdu_X =
+  (*let error, handler, init = Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error in
+  Map_init_bdu.Map.fold
+    (fun (agent_id, agent_type, rule_id, cv_id) bdu_init _ ->*)
+      (*first union bdu_init with bdu_X*)
+      (*let error, handler, bdu_X_union_init =
+        Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_X bdu_init
+      in*)
+      (*to the first one with bdu_test*)
+      let error, handler, bdu_Xn = 
+        compute_bdu_update_test
+          parameter
+          handler
+          error
+          bdu_test
+          list_a
+          bdu_X
+      in
+      (*do the union per creation*)
+      let error, handler, bdu_result =
+        Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_Xn bdu_creation
+      in
+      error, handler, bdu_result
+    
 (************************************************************************************)
 (*a bond is discovered for the first time*)
 
@@ -104,6 +112,7 @@ let collect_test_has_bond_rhs parameter error rule_id rule store_result =
   in
   let error, bool, store_result =
     List.fold_left (fun (error, b, store_result) (site_add1, site_add2) ->
+      (*TODO*: add pair site_add as an element*)
       let error, set =
         (*if Map_site_address.Set.mem (site_add1, site_add2) set
           then error, set
@@ -416,7 +425,6 @@ let add_update_to_wl parameter error store_covering_classes_modification_update 
 
 let collect_bdu_creation_and_modif_list
     parameter
-    bdu_false 
     error
     rule_id
     store_proj_bdu_creation_restriction_map
@@ -479,6 +487,18 @@ let is_enable
           | Some bdu -> error, bdu
         in
         (*-----------------------------------------------------------------------*)
+        (*TODO:search bdu_init inside *)
+        (*let error, bdu_init =
+          match Map_init_bdu.Map.find_option (agent_id, agent_type, rule_id', cv_id)
+            store_bdu_init_restriction_map with
+            | None -> error, bdu_true (*when it is empty then return true?*)
+            | Some bdu -> error, bdu
+        in
+        (*do the union with bdu_X*)
+        let error, handler, bdu_X_union_init =
+          Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_X bdu_init
+        in*)
+        (*-----------------------------------------------------------------------*)
         (*do the intersection of the bdu_test and bdu_iterate*)
         let error, handler, bdu_inter =
           Mvbdu_wrapper.Mvbdu.mvbdu_and parameter handler error bdu_test bdu_X
@@ -507,6 +527,7 @@ let collect_bdu_update_map parameter handler error
     store_proj_bdu_creation_restriction_map
     store_proj_modif_list_restriction_map
     store_proj_bdu_test_restriction_map
+    store_bdu_init_restriction_map
     store_bdu_test_restriction_map
     is_new_bond
     store_test_has_bond_rhs
@@ -565,7 +586,6 @@ let collect_bdu_update_map parameter handler error
         let error, (bdu_creation_map, modif_list_map, bdu_test_map) =
           collect_bdu_creation_and_modif_list
             parameter
-            bdu_false
             error
             rule_id
             store_proj_bdu_creation_restriction_map
@@ -592,98 +612,112 @@ let collect_bdu_update_map parameter handler error
           let error, (handler, new_wl, store_new_result) =
             Map_test_bdu.Map.fold
               (fun (agent_id, agent_type, rule_id', cv_id) _ 
-              (error, (handler, store_wl, store_update_map)) ->
-                let error, bdu_test =
-                  match
-                    Map_agent_id_test_bdu.Map.find_option agent_id bdu_test_map
-                  with
-                  | None -> error, bdu_true (*bdu_test is empty*)
-                  | Some bdu -> error, bdu
-                in
-                (*-----------------------------------------------------------------------*)
-                (*search bdu_X inside a store_result_map*)
-                let error, bdu_X =
-                  match Map_bdu_update.Map.find_option (agent_type, cv_id)
-                    store_update_map
-                  with
-                  | None -> error, bdu_false (*the initial state is bdu_false*)
-                  | Some bdu -> error, bdu
-                in
-                (*-----------------------------------------------------------------------*)
-                (*TODO:do the fold later over agent_type not agent_id*)
-                (*get bdu_creation from bdu_creation_map*)
-                let error, bdu_creation =
-                  match
-                    Map_agent_type_creation_bdu.Map.find_option agent_type
-                      bdu_creation_map
-                  with
-                  | None -> error, bdu_false
-                  | Some bdu -> error, bdu
-                in
-                (*-----------------------------------------------------------------------*)
-                (*get modif_list of agent_id from modif_list_map*)
-                let error, modif_list =
-                  match
-                    Map_agent_id_modif_list.Map.find_option agent_id
-                      modif_list_map
-                  with
-                  | None -> error, []
-                  | Some l -> error, l
-                in
-                (*build_list from modif_list*)
-                let error, handler, list_a =
-                  Mvbdu_wrapper.Mvbdu.build_list
-                    parameter
-                    handler
-                    error
-                    modif_list
-                in
-                (*-----------------------------------------------------------------------*)
-                let error, handler, bdu_update =
-                  compute_bdu_update
-                    parameter
-                    handler
-                    error
-                    bdu_test
-                    list_a
-                    bdu_creation (*TODO:do the fold later over agent_type not agent_id*)
-                    bdu_X
-                in
-                (*-----------------------------------------------------------------------*)
-                let error, handler, is_new_view, store_result =
-                  add_link handler (agent_type, cv_id) bdu_update store_update_map
-                in
-                (*-----------------------------------------------------------------------*)
-                begin
-                  if is_new_view
-                  then
-		  (*is a new bond discovered?*)
-                    begin
-                      if is_new_bond
-                      then
-                        (*add update(c') into wl_tl; side_effect*)
-			let error, new_wl =
-			  add_update_to_wl
-			    parameter
-			    error
-			    store_new_result_map
-			    wl_tl
-			in
-			error, (handler, new_wl, store_result)
-                      else
-			(*add update(c) into wl_tl*)
-                        let error, new_wl =
-                          add_update_to_wl
-                            parameter
-                            error
-                            store_covering_classes_modification_update
-                            wl_tl
-                        in
-                        error, (handler, new_wl, store_result)
-                    end
-                  else
-                    error, (handler, store_wl, store_result)
-                end
+                (error, (handler, store_wl, store_update_map)) ->
+                  let error, bdu_test =
+                    match
+                      Map_agent_id_test_bdu.Map.find_option agent_id bdu_test_map
+                    with
+                    | None -> error, bdu_true (*bdu_test is empty*)
+                    | Some bdu -> error, bdu
+                  in
+                  (*-------------------------------------------------------------------*)
+                  (*search bdu_X inside a store_result_map*)
+                  let error, bdu_X =
+                    match Map_bdu_update.Map.find_option (agent_type, cv_id)
+                      store_update_map
+                    with
+                    | None -> error, bdu_false (*the initial state is bdu_false*)
+                    | Some bdu -> error, bdu
+                  in
+                  (*-------------------------------------------------------------------*)
+                  (*TODO: union with bdu_init here?*)
+                  let error, bdu_init =
+                    match
+                      Map_init_bdu.Map.find_option (agent_id, agent_type, rule_id, cv_id) 
+                        store_bdu_init_restriction_map
+                    with
+                    | None -> error, bdu_false (*FIXME: false?*)
+                    | Some bdu -> error, bdu 
+                  in
+                  let error, handler, bdu_X_union_init =
+                    Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_X bdu_init
+                  in
+                  (*-------------------------------------------------------------------*)
+                  (*TODO:do the fold later over agent_type not agent_id*)
+                  (*get bdu_creation from bdu_creation_map*)
+                  let error, bdu_creation =
+                    match
+                      Map_agent_type_creation_bdu.Map.find_option agent_type
+                        bdu_creation_map
+                    with
+                    | None -> error, bdu_false
+                    | Some bdu -> error, bdu
+                  in
+                  (*-------------------------------------------------------------------*)
+                  (*get modif_list of agent_id from modif_list_map*)
+                  let error, modif_list =
+                    match
+                      Map_agent_id_modif_list.Map.find_option agent_id
+                        modif_list_map
+                    with
+                    | None -> error, []
+                    | Some l -> error, l
+                  in
+                  (*build_list from modif_list*)
+                  let error, handler, list_a =
+                    Mvbdu_wrapper.Mvbdu.build_list
+                      parameter
+                      handler
+                      error
+                      modif_list
+                  in
+                  (*-------------------------------------------------------------------*)
+                  (*case when there are some initial states*)
+                  let error, handler, bdu_update =
+                    compute_bdu_update
+                      parameter
+                      handler
+                      error
+                      bdu_test
+                      list_a
+                      bdu_creation (*TODO:do the fold later over agent_type not agent_id*)
+                      bdu_X_union_init
+                  in
+                    (*-------------------------------------------------------------------*)
+                  let error, handler, is_new_view, store_result =
+                    add_link handler (agent_type, cv_id) bdu_update store_update_map
+                  in
+                  (*--------------------------------------------------------------------*)
+                  begin
+                    if is_new_view
+                    then
+		      (*is a new bond discovered?*)
+                      begin
+                        if is_new_bond
+                        then
+                          (*add update(c') into wl_tl; side_effect*)
+			  let error, new_wl =
+			    add_update_to_wl
+			      parameter
+			      error
+			      store_new_result_map
+			      wl_tl
+			  in
+			  error, (handler, new_wl, store_result)
+                        else
+			  (*add update(c) into wl_tl*)
+                          let error, new_wl =
+                            add_update_to_wl
+                              parameter
+                              error
+                              store_covering_classes_modification_update
+                              wl_tl
+                          in
+                          error, (handler, new_wl, store_result)
+                      end
+                    else
+                      error, (handler, store_wl, store_result)
+                  end
               ) store_bdu_test_restriction_map 
               (error, (handler, wl_tl, store_bdu_update_map))
           in
