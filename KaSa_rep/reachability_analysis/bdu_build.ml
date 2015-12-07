@@ -326,6 +326,111 @@ let collect_proj_bdu_creation_restriction_map parameter handler error
   (error, handler), store_result
 		    
 (************************************************************************************)
+(*build bdu in the case of initial state. Declare as %init in Kappa*)
+
+let collect_bdu_init_restriction_map parameter handler error compil store_remanent_triple 
+    store_result =
+  let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in
+  let add_link handler (agent_id, agent_type, rule_id, cv_id) bdu store_result =
+    let error, old_bdu =
+      match Map_init_bdu.Map.find_option (agent_id, agent_type, rule_id, cv_id) store_result
+      with
+      | None -> error, bdu_true
+      | Some bdu -> error, bdu
+    in
+    let result_map =
+      Map_init_bdu.Map.add (agent_id, agent_type, rule_id, cv_id) bdu store_result
+    in
+    error, handler, result_map
+  in
+  let error, (handler, store_result) =
+    Int_storage.Nearly_inf_Imperatif.fold parameter error
+      (fun parameter error rule_id rule (handler, store_result) ->
+        AgentMap.fold2_common parameter error
+          (fun parameter error agent_id agent triple_list (handler, store_result) ->
+            match agent with
+            | Unknown_agent _ | Ghost -> error, (handler, store_result)
+            | Dead_agent (agent, _, _, _)
+            | Agent agent ->
+              let agent_type = agent.agent_name in
+              (*get map restriction from covering classes*)
+              let error, (cv_id, get_pair_list) =
+                List.fold_left (fun (error, (_, current_list)) (cv_id, list, set) ->
+                  (*-----------------------------------------------------------------*)
+                  (*new index for site type in covering class*)
+                  let error, (map_new_index_forward, _) =
+                    new_index_pair_map parameter error list
+                  in
+                  (*-----------------------------------------------------------------*)
+                  let error', map_res =
+                    Site_map_and_set.Map.fold_restriction parameter error
+                      (fun site port (error,store_result) ->
+                        let state = port.site_state.min in
+                        let error,site' = Site_map_and_set.Map.find_default parameter error 
+                          0 site map_new_index_forward in
+                        let error,map_res =
+                          Site_map_and_set.Map.add parameter error 
+                            site'
+                            state
+                            store_result
+                        in
+                        error, map_res
+                      ) set agent.agent_interface Site_map_and_set.Map.empty
+                  in
+	          let error = Exception.check warn parameter error error'
+                    (Some "line 370") Exit in
+                  error, (cv_id, (map_res :: current_list))
+                ) (error, (0, [])) triple_list
+              in
+              (*-----------------------------------------------------------------*)
+              let error, pair_list =
+                List.fold_left (fun (error, current_list) map_res ->
+                  let error, pair_list =
+                    Site_map_and_set.Map.fold
+                      (fun site' state (error, current_list) ->
+                        let pair_list = (site', state) :: current_list in
+                        error, pair_list
+                      ) map_res (error, [])
+                  in
+                  error, List.concat [pair_list; current_list]
+                ) (error, []) get_pair_list
+              in
+              (*build bdu_init*)
+              let error, handler, bdu_init =
+                build_bdu parameter handler error pair_list
+              in
+              let error, handler, store_result =
+                add_link handler (agent_id, agent_type, rule_id, cv_id)
+                  bdu_init store_result
+              in
+              error, (handler, store_result)
+          ) rule.e_init_c_mixture.views store_remanent_triple (handler, store_result)
+      ) compil.init (handler, store_result)
+  in
+  error, (handler, store_result)
+
+(*projection with rule_id*)
+
+let collect_proj_bdu_init_restriction_map parameter handler error 
+    store_bdu_init_restriction_map =
+  let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in
+  let (error, handler), store_result =
+    Project2bdu_init.proj2_monadic
+      parameter
+      (error, handler)
+      (fun (agent_id, agent_type, rule_id, cv_id) -> rule_id)
+      (fun (agent_id, agent_type, rule_id, cv_id) -> agent_type)
+      bdu_true
+      (fun parameter (error, handler) bdu bdu' ->
+        let error, handler, bdu_union =
+          Mvbdu_wrapper.Mvbdu.mvbdu_and parameter handler error bdu bdu'
+        in
+        (error, handler), bdu_union
+      ) store_bdu_init_restriction_map
+  in
+  (error, handler), store_result
+  
+(************************************************************************************)
 (*modification rule with creation rules*)
 
 let collect_modif_list_restriction_map
