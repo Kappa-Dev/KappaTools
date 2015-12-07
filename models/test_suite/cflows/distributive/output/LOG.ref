@@ -21,10 +21,6 @@ ____________________________________________________________
  (-1 events)
 + Producing causal compressions
 	 - splitting initial events (no change)
-	 - renaming agents to avoid conflicts after event removals (no change)
-	 - detecting siphons (+281 events)
-	 - renaming agents to avoid conflicts after event removals (no change)
-	 - cutting concurrent events (-565 events)
 	 - blackboard generation
 	 - computing causal past of each observed events (106)
 Stats:
@@ -38,6 +34,10 @@ Stats:
 ____________________________________________________________
 ############################################################
 
+	 - renaming agents to avoid conflicts after event removals (no change)
+	 - detecting siphons (+281 events)
+	 - renaming agents to avoid conflicts after event removals (no change)
+	 - cutting concurrent events (-565 events)
 	 - detecting pseudo inverse events (-430 events)
 	 - blackboard generation
 	 - computing causal past of each observed events (106)
