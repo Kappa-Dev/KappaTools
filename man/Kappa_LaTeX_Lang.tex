@@ -1,0 +1,23 @@
+\lstdefinelanguage{kappa}{
+	alsoletter={\%,:,-,<,>,@},
+	morekeywords=[1]{\%agent\:, \%token\:, \%var\:, \%obs\:},
+	morekeywords=[2]{\%init\:},
+	morekeywords=[3]{\%mod\:, \%def\:, \$ADD, \$DEL, \$SNAPSHOT, \$STOP, \$FLUX, \$TRACK, \$UPDATE, \$PLOTENTRY, \$PRINT, \$PRINTF},
+	morekeywords=[4]{->, <->, @},
+	morestring=[d]{'},
+	morecomment=[l]\#
+}
+\lstset{	
+	basicstyle=\ttfamily,
+	numbers=left,
+	numberstyle=\tiny,
+	breaklines,
+	keywordstyle=[1]\color{LightSlateBlue},
+	keywordstyle=[2]\color{Brown},
+	keywordstyle=[3]\color{DarkOrange},
+	keywordstyle=[4]\color{Red},
+	stringstyle=\color{ForestGreen},
+	commentstyle=\color{LightSlateGrey}
+}
+\renewcommand{\lstlistlistingname}{Codes}
+\renewcommand{\lstlistingname}{Code}
