@@ -5,6 +5,8 @@ let document = Dom_html.window##document
 
 let opened_filename, set_opened_filename = React.S.create "model.ka"
 let max_events, set_max_events = React.S.create None
+let max_time, set_max_time = React.S.create None
+let nb_plot, set_nb_plot = React.S.create 0
 
 let raw_editor = Html5.div ~a:[Html5.a_id "editor"] []
 let editor = Tyxml_js.To_dom.of_div raw_editor
@@ -58,12 +60,36 @@ let raw_event_number =
 					     | Some va -> string_of_int va
 					     | None -> "") max_events)]
 	      ()
+let raw_time_limit =
+  Html5.input ~a:[Html5.a_input_type `Number;
+		  Html5.a_class ["form-control"];
+		  Html5.a_placeholder "Time limit";
+		  Tyxml_js.R.Html5.a_value
+		    (React.S.l1 (fun x -> match x with
+					     | Some va -> string_of_float va
+					     | None -> "") max_time)]
+	      ()
+let raw_plot_points =
+  Html5.input ~a:[Html5.a_input_type `Number;
+		  Html5.a_class ["form-control"];
+		  Html5.a_placeholder "Expected number";
+		  Tyxml_js.R.Html5.a_value
+		    (React.S.l1 string_of_int nb_plot)]
+	      ()
 
 let get_initial_content () =
   let args = Url.Current.arguments in
   let () =
     try
 	set_max_events (Some (int_of_string (List.assoc "nb_events" args)))
+    with Not_found | Failure "int_of_string" -> () in
+  let () =
+    try
+	set_nb_plot (int_of_string (List.assoc "plot_points" args))
+    with Not_found | Failure "int_of_string" -> () in
+  let () =
+    try
+      set_max_time (Some (float_of_string (List.assoc "time_limit" args)))
     with Not_found | Failure "int_of_string" -> () in
   try
     let url = List.assoc "model" args in
@@ -96,6 +122,27 @@ let raw_html =
 	       Some (int_of_string (Js.to_string (event_number##value)))
              with Failure _ -> None) in
 	 Js._false) in
+  let time_limit = Tyxml_js.To_dom.of_input raw_time_limit in
+  let () =
+    time_limit##onchange <-
+      Dom_html.handler
+	(fun _ ->
+	 let () =
+           set_max_time
+	     (try
+	       Some (float_of_string (Js.to_string (time_limit##value)))
+             with Failure _ -> None) in
+	 Js._false) in
+  let plot_points = Tyxml_js.To_dom.of_input raw_plot_points in
+  let () =
+    plot_points##onchange <-
+      Dom_html.handler
+	(fun _ ->
+	 let () =
+	   try
+	     set_nb_plot (int_of_string (Js.to_string (plot_points##value)))
+           with Failure _ -> () in
+	 Js._false) in
   <:html5list<<form class="form-inline">
 	      <div class="input-group">
 	      <span class="input-group-addon">Load File</span>
@@ -104,4 +151,10 @@ let raw_html =
 	      $raw_editor$
 	      <div class="form-group"><label class="sr-only">Maximum number of events</label>
 	      <div class="input-group">$raw_event_number$
-	      <span class="input-group-addon">events</span></div></div> >>
+	      <span class="input-group-addon">events</span></div>
+	      <label class="sr-only">Maximum simulation time</label>
+	      <div class="input-group">$raw_time_limit$
+	      <span class="input-group-addon">sec</span></div>
+	      <label class="sr-only">Number of plotted points</label>
+	      <div class="input-group">$raw_plot_points$
+	      <span class="input-group-addon">points</span></div></div> >>

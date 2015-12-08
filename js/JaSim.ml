@@ -22,17 +22,16 @@ let write_out div () =
 let run stop out_div s =
   catch
     (fun () ->
-     let () = Parameter.pointNumberValue := 100 in
      let () = Ast.init_compil () in
      wrap1 parse s
      >>= fun () ->
      let result = !Ast.result in
-     let counter = Counter.create 100 0. 0 None (React.S.value Input.max_events) in
+     let counter = Counter.create (React.S.value Input.nb_plot) 0. 0 (React.S.value Input.max_time) (React.S.value Input.max_events) in
      wrap4 Eval.initialize log_form [] counter result
      >>= fun (_kasa_state,env,domain,graph,state) ->
      let () = Plot.create "foo.svg" in
      let () =
-       if !Parameter.pointNumberValue > 0 then
+       if (React.S.value Input.nb_plot) > 0 then
 	 Plot.plot_now
 	   env (Counter.current_time counter)
 	   (State_interpreter.observables_values env counter graph state) in
