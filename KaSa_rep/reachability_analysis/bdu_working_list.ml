@@ -32,25 +32,23 @@ let trace = false
   - There is case when it has a lhs and created a new agent. 
     For instance:
     'r1' A(x,y) -> D(x,y)
-  will not add 'r1' into a working list.
+  will also add 'r1' into a working list. (lhs of D is Ghost. Rhs of A is Ghost)
 *)
 
-let collect_wl_creation parameter error rule_id rule store_remanent_triple store_result =
+(*CHECK ME*)
+
+let collect_wl_creation parameter error rule_id rule store_result =
   (*add rule_id that has no lhs into a working list*)
   let error, wl_creation =
-    AgentMap.fold parameter error
-      (fun parameter error agent_type' triple_list store_result ->
-        List.fold_left (fun (error, store_result) (agent_id, agent_type) ->
-          let error, agent = AgentMap.get parameter error agent_id rule.rule_rhs.views in
-          match agent with
-          | Some Dead_agent _
-          | Some Unknown_agent _ 
-          | None -> warn parameter error (Some "line 36") Exit store_result
-          | Some Ghost -> error, store_result			     
-          | Some Agent agent ->
-            let error, wl = IntWL.push parameter error rule_id store_result in
-            error, wl
-        ) (error, store_result) rule.actions.creation
-      ) store_remanent_triple (store_result)
+    List.fold_left (fun (error, store_result) (agent_id, agent_type) ->
+      let error, agent = AgentMap.get parameter error agent_id rule.rule_rhs.views in
+      match agent with
+      | Some Dead_agent _ | Some Ghost  -> error, store_result
+      | None ->  warn parameter error (Some "line 45") Exit store_result
+      | Some Unknown_agent _
+      | Some Agent _ -> 
+        let error, wl = IntWL.push parameter error rule_id store_result in
+        error, wl
+    ) (error, store_result) rule.actions.creation
   in
   error, wl_creation

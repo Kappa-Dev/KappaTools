@@ -180,7 +180,6 @@ let scan_rule_bdu_build parameter handler_bdu error rule_id rule compil
       error
       rule_id
       rule
-      store_remanent_triple
       store_result.store_wl_creation
   in
   (*-------------------------------------------------------------------------------*)

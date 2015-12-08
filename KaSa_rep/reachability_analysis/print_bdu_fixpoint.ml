@@ -24,46 +24,6 @@ let trace = false
 
 (************************************************************************************)
 
-(*let print_test_bonds parameter error result =
-  let b, map = result in
-  if b 
-  then
-    (*There is bond on the rhs*)
-    Map_test_bond.Map.iter (fun rule_id (l1, ( s2)) ->
-      if l1 <> []
-      then ()
-      else
-        ();
-      let _ =
-        fprintf parameter.log "rule_id:%i\n" rule_id
-      in
-      Map_site_address.Set.iter (fun (site_add1, site_add2) ->
-        fprintf parameter.log 
-          "{agent_id:%i; agent_type:%i; site_type:%i} -- "
-          site_add1.Cckappa_sig.agent_index site_add1.Cckappa_sig.agent_type 
-          site_add1.Cckappa_sig.site;
-        fprintf parameter.log 
-          "{agent_id:%i; agent_type:%i; site_type:%i} \n"
-          site_add2.Cckappa_sig.agent_index site_add2.Cckappa_sig.agent_type 
-          site_add2.Cckappa_sig.site     
-      ) s2
-    ) map
-  else
-    fprintf stdout "There is no bond on the rhs\n"*)
-
-(*let print_test_bonds parameter error result =
-  let (b, set) = result in
-  Map_site_address.Set.iter (fun (site_add1, site_add2) ->
-    fprintf parameter.log 
-      "{agent_id:%i; agent_type:%i; site_type:%i} -- "
-      site_add1.Cckappa_sig.agent_index site_add1.Cckappa_sig.agent_type 
-      site_add1.Cckappa_sig.site;
-    fprintf parameter.log 
-      "{agent_id:%i; agent_type:%i; site_type:%i} \n"
-      site_add2.Cckappa_sig.agent_index site_add2.Cckappa_sig.agent_type 
-      site_add2.Cckappa_sig.site     
-  ) set*)
-
 let print_test_bonds parameter error result =
   let (b, map) = result in
   fprintf stdout "%b\n" b;

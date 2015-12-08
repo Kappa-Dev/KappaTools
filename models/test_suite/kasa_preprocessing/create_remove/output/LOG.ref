@@ -129,7 +129,7 @@ List of rules to awake when the state of a site is modified and tested:
 * Covering classes with new indexes:
 ------------------------------------------------------------
 - Working list creation:
-
+0 1 
 
 ------------------------------------------------------------
 - Bdu for the valuations of the views that are tested (per rule, agent and covering class):
