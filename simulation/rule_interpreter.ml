@@ -204,7 +204,7 @@ let store_event
 	  let obs =
 	    (ev,
 	     obs_tests,
-	    Mods.Counter.next_story counter) in
+	    Counter.next_story counter) in
 	  Compression_main.secret_store_obs infos obs steps)
 	 (infos',steps')
 	 new_tracked_obs_instances

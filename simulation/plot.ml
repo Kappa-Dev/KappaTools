@@ -1,5 +1,3 @@
-open Mods
-
 type fd = {
   desc:out_channel;
   form:Format.formatter;
@@ -7,12 +5,7 @@ type fd = {
 
 type format = Raw of fd | Svg of Pp_svg.store
 
-type plot = {
-  format: format;
-  mutable last_point : int
-}
-
-type t = Wait of string | Ready of plot
+type t = Wait of string | Ready of format
 
 let plotDescr = ref (Wait "__dummy")
 
@@ -22,21 +15,15 @@ let value width =
   match !plotDescr with
   | Wait _ -> ""
   | Ready plot ->
-     match plot.format with
+     match plot with
      | Raw _ ->  ""
      | Svg s -> Pp_svg.to_string ~width s
 
-let close form counter =
-  let n = ref (!Parameter.progressBarSize - counter.Counter.ticks) in
-  let () = while !n > 0 do
-	     Format.fprintf form "%c" !Parameter.progressBarSymbol ;
-	     n := !n-1
-	   done in
-  let () = Format.pp_print_newline form () in
+let close () =
   match !plotDescr with
   | Wait _ -> ()
   | Ready plot ->
-     match plot.format with
+     match plot with
      | Raw plot ->  close_out plot.desc
      | Svg s -> Pp_svg.to_file s
 
@@ -78,58 +65,23 @@ let set_up filename env init_va =
       let () = print_values_raw d init_va in
       Raw {desc=d_chan; form=d} in
   plotDescr :=
-    Ready {format = format; last_point = 0}
-
-let next_point counter =
-  match counter.Counter.dT with
-  | Some dT ->
-     int_of_float
-       ((counter.Counter.time -. counter.Counter.init_time)
-	/. dT)
-  | None ->
-     match counter.Counter.dE with
-     | None -> 0
-     | Some dE ->
-	(counter.Counter.events - counter.Counter.init_event) / dE
-
-let set_last_point plot p = plot.last_point <- p
+    Ready format
 
 let plot_now env time observables_values =
   match !plotDescr with
   | Wait f -> set_up f env (time,observables_values)
-  | Ready plot ->
-     match plot.format with
-     | Raw fd ->
+  | Ready (Raw fd) ->
 	print_values_raw fd.form (time,observables_values)
-     | Svg s ->
-	s.Pp_svg.points <- (time,observables_values) :: s.Pp_svg.points
+  | Ready (Svg s) ->
+     s.Pp_svg.points <- (time,observables_values) :: s.Pp_svg.points
 
 let fill form counter env observables_values =
-  let () =
+  let counter' =
     match !plotDescr with
-    | Wait _ -> ()
-    | Ready plot ->
-       let next = next_point counter in
-       let last = plot.last_point in
-       let n = next - last in
-       let () = set_last_point plot next in
-       match counter.Counter.dE with
-       | Some _ ->
-	  if n>1 then
-	    invalid_arg ("Plot.fill: invalid increment "^string_of_int n)
-	  else
-	    if n <> 0
-	    then plot_now env counter.Mods.Counter.time observables_values
-       | None ->
-	  match counter.Counter.dT with
-	  | None -> ()
-	  | Some dT ->
-	     let n = ref n
-	     and output_time = ref ((float_of_int last) *. dT) in
-	     while (!n > 0) && (Counter.check_output_time counter !output_time) do
-	       output_time := !output_time +. dT ;
-	       Counter.tick form counter !output_time counter.Counter.events ;
-	       plot_now env !output_time observables_values;
-	       n:=!n-1 ;
-	     done in
-  Counter.tick form counter counter.Counter.time counter.Counter.events
+    | Wait _ -> counter
+    | Ready _ ->
+       let points, counter' =
+	 Counter.to_plot_points counter in
+       let () = List.iter (fun t -> plot_now env t observables_values) points in
+       counter' in
+  Counter.tick form counter'

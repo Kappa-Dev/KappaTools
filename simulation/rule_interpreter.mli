@@ -13,31 +13,31 @@ val empty : has_tracking:bool -> Environment.t -> t
 wired because perturbations can redefined alg_expr.*)
 
 val value_alg :
-  get_alg:(int -> Alg_expr.t) -> Mods.Counter.t -> t -> Alg_expr.t -> Nbr.t
+  get_alg:(int -> Alg_expr.t) -> Counter.t -> t -> Alg_expr.t -> Nbr.t
 
 val value_bool :
-  get_alg:(int -> Alg_expr.t) -> Mods.Counter.t -> t ->
+  get_alg:(int -> Alg_expr.t) -> Counter.t -> t ->
   Alg_expr.t Ast.bool_expr -> bool
 
 (** {6 Core} *)
 
 val apply_rule :
   ?rule_id:int -> get_alg:(int -> Alg_expr.t) -> Environment.t ->
-  Connected_component.Env.t -> Connected_component.Set.t -> Mods.Counter.t ->
+  Connected_component.Env.t -> Connected_component.Set.t -> Counter.t ->
   t -> Causal.event_kind -> Primitives.elementary_rule -> result
 (** Returns the graph obtained by applying the rule.
  [rule_id] is mandatory if the rula has an unary rate.*)
 
 val apply_unary_rule :
   rule_id:int -> get_alg:(int -> Alg_expr.t) -> Environment.t ->
-  Connected_component.Env.t -> Connected_component.Set.t -> Mods.Counter.t ->
+  Connected_component.Env.t -> Connected_component.Set.t -> Counter.t ->
   t -> Causal.event_kind -> Primitives.elementary_rule -> result
 (** Returns the graph obtained by applying the rule.
  [rule_id] is mandatory if the rula has an unary rate.*)
 
 val force_rule :
   get_alg:(int -> Alg_expr.t) -> Environment.t ->
-  Connected_component.Env.t -> Connected_component.Set.t -> Mods.Counter.t ->
+  Connected_component.Env.t -> Connected_component.Set.t -> Counter.t ->
   t -> Causal.event_kind -> Primitives.elementary_rule ->
   (t * Connected_component.Matching.t list option)
 (** Apply the rule for sure if it is possible. Try [apply_rule] but in
@@ -47,7 +47,7 @@ side to do apply the rule and returns the remaining exact injections. *)
 val extra_outdated_var : int -> t -> t
 val update_outdated_activities :
   get_alg:(int -> Alg_expr.t) -> (int -> int -> float -> unit) ->
-  Environment.t -> Mods.Counter.t -> t -> t
+  Environment.t -> Counter.t -> t -> t
 (** Resynchronize the state after a rule application.
 
 It takes the function to store the new activities as an argument whose

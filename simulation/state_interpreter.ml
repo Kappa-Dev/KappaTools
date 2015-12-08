@@ -52,11 +52,11 @@ let observables_values env counter graph state =
 let snapshot env counter file graph =
   if !Parameter.dotSnapshots then
     Kappa_files.with_snapshot
-      file (Mods.Counter.event counter) "dot"
+      file (Counter.current_event counter) "dot"
       (fun f -> Format.fprintf f "%a@." (Rule_interpreter.print_dot env) graph)
   else
     Kappa_files.with_snapshot
-      file (Mods.Counter.event counter) "ka"
+      file (Counter.current_event counter) "ka"
       (fun f -> Format.fprintf f "%a@." (Rule_interpreter.print env) graph)
 
 
@@ -104,7 +104,7 @@ let do_it env domain counter graph state modification =
      let () = Format.fprintf desc "%a@." print_expr_val pe_expr in
      (false, graph, state)
   | Primitives.PLOTENTRY ->
-     let () = Plot.plot_now env counter.Mods.Counter.time
+     let () = Plot.plot_now env (Counter.current_time counter)
 			    (observables_values env counter graph state) in
      (false, graph, state)
   | Primitives.SNAPSHOT pexpr  ->
@@ -134,7 +134,7 @@ let do_it env domain counter graph state modification =
 	      (fun f ->
 	       Format.fprintf
 		 f "At t=%f, e=%i: tracking FLUX into \"%s\" was already on"
-		 (Mods.Counter.time counter) (Mods.Counter.event counter) file)
+		 (Counter.current_time counter) (Counter.current_event counter) file)
      in
      let el = file,Array.make_matrix size size 0. in
      (false, graph, {state with flux = el::state.flux})
@@ -216,12 +216,12 @@ let one_rule _form dt stop env domain counter graph state =
        if !Parameter.debugModeOn then
 	 Format.printf "@[<v>Obtained@ %a@]@."
 		       (Rule_interpreter.print env) graph'' in
-     (not (Mods.Counter.one_constructive_event counter dt)||stop,graph'',state)
+     (not (Counter.one_constructive_event counter dt)||stop,graph'',state)
   | Rule_interpreter.Clash ->
-     if Mods.Counter.consecutive_null_event counter <
+     if Counter.consecutive_null_event counter <
 	  !Parameter.maxConsecutiveClash
      then
-       (not (Mods.Counter.one_clashing_instance_event counter dt)||stop,graph,state)
+       (not (Counter.one_clashing_instance_event counter dt)||stop,graph,state)
      else
        (*let graph' =
 	   match Rule_interpreter.force_rule
@@ -237,15 +237,15 @@ let one_rule _form dt stop env domain counter graph state =
 	     Format.printf "@[<v>Obtained after forcing rule@ %a@]@."
 			   (Rule_interpreter.print env) graph' in
 	 Some (graph'',state)*)
-       (not (Mods.Counter.one_clashing_instance_event counter dt)||stop,graph,state)
+       (not (Counter.one_clashing_instance_event counter dt)||stop,graph,state)
   | Rule_interpreter.Corrected graph' ->
      let graph'' =
        Rule_interpreter.update_outdated_activities
 	 ~get_alg register_new_activity env counter graph' in
      let continue =
        if choice mod 2 = 1
-       then Mods.Counter.one_no_more_unary_event counter dt
-       else Mods.Counter.one_no_more_binary_event counter dt in
+       then Counter.one_no_more_unary_event counter dt
+       else Counter.one_no_more_binary_event counter dt in
      (not continue||stop,graph'',state)
 
 let activity state =
@@ -267,30 +267,29 @@ let a_loop form env domain counter graph state =
 	 Format.fprintf
 	   form
 	   "?@.A deadlock was reached after %d events and %Es (Activity = %.5f)"
-	   (Mods.Counter.event counter) (Mods.Counter.time counter) activity in
+	   (Counter.current_event counter) (Counter.current_time counter) activity in
        (true,graph,state)
     | (ti,_) :: tail ->
        let () = state.stopping_times := tail in
-       let () = counter.Mods.Counter.time <- Nbr.to_float ti in
-       perturbate env domain counter graph state
+       let continue = Counter.one_time_correction_event counter ti in
+       let stop,graph',state' = perturbate env domain counter graph state in
+       (not continue||stop,graph',state')
   else
 (*activity is positive*)
     match !(state.stopping_times) with
     | (ti,_) :: tail
-	 when Nbr.is_smaller ti (Nbr.F (Mods.Counter.time counter +. dt)) ->
+	 when Nbr.is_smaller ti (Nbr.F (Counter.current_time counter +. dt)) ->
        let () = state.stopping_times := tail in
-       let () = counter.Mods.Counter.time <- Nbr.to_float ti in
+       let continue = Counter.one_time_correction_event counter ti in
        let stop,graph',state' = perturbate env domain counter graph state in
-       (not (Mods.Counter.one_time_correction_event counter 0.)||stop,graph',state')
+       (not continue||stop,graph',state')
     | _ ->
        let (stop,graph',state') =
 	 perturbate env domain counter graph state in
        one_rule form dt stop env domain counter graph' state'
 
 let loop_cps form hook return env domain counter graph state =
-  let () =
-    Mods.Counter.tick
-      form counter counter.Mods.Counter.time counter.Mods.Counter.events in
+  let () = Counter.tick form counter in
   let rec iter graph state =
     let stop,graph',state' =
       try
@@ -304,7 +303,7 @@ let loop_cps form hook return env domain counter graph state =
 	out
       with ExceptionDefn.UserInterrupted f ->
 	let () = Format.pp_print_newline form () in
-	let msg = f (Mods.Counter.time counter) (Mods.Counter.event counter) in
+	let msg = f (Counter.current_time counter) (Counter.current_event counter) in
 	let () =
 	  Format.fprintf
 	    form
@@ -320,7 +319,8 @@ let loop_cps form hook return env domain counter graph state =
   in iter graph state
 
 let finalize form env counter graph state =
-  let () = Plot.close form counter in
+  let () = Plot.close () in
+  let () = Counter.complete_progress_bar form counter in
   let () =
     List.iter
       (fun (file,_ as e) ->

@@ -1,10 +1,8 @@
-open Mods
-
-let value_state_alg_op counter ?(time=Counter.time counter) = function
+let value_state_alg_op counter ?(time=Counter.current_time counter) = function
   | Operator.CPUTIME -> Nbr.F (Sys.time ())
   | Operator.TIME_VAR -> Nbr.F time
-  | Operator.EVENT_VAR -> Nbr.I (Counter.event counter)
-  | Operator.NULL_EVENT_VAR -> Nbr.I (Counter.null_event counter)
+  | Operator.EVENT_VAR -> Nbr.I (Counter.current_event counter)
+  | Operator.NULL_EVENT_VAR -> Nbr.I (Counter.nb_null_event counter)
 
 type alg_stack_element =
   | TO_EXEC_ALG of Operator.bin_alg_op * Alg_expr.t

@@ -1,5 +1,3 @@
-open Mods
-
 let usage_msg =
   "KaSim "^Version.version_string^":\n"^
     "Usage is KaSim [-i] input_file [-e events | -t time] [-p points] [-o output_file]\n"
@@ -180,7 +178,7 @@ let () =
     let () =
       if !Parameter.pointNumberValue > 0 then
 	Plot.plot_now
-	  env counter.Mods.Counter.time
+	  env (Counter.current_time counter)
 	  (State_interpreter.observables_values env counter graph new_state) in
 
     Parameter.initSimTime () ;
@@ -188,13 +186,14 @@ let () =
       State_interpreter.loop Format.std_formatter env cc_env counter graph new_state
     in
     Format.printf "Simulation ended";
-    if Counter.null_event counter = 0 then Format.print_newline()
+    if Counter.nb_null_event counter = 0 then Format.print_newline()
     else
       let () =
 	Format.printf " (eff.: %f, detail below)@."
-		      ((float_of_int (Counter.event counter)) /.
+		      ((float_of_int (Counter.current_event counter)) /.
 			 (float_of_int
-			    (Counter.null_event counter + Counter.event counter))) in
+			    (Counter.nb_null_event counter +
+			       Counter.current_event counter))) in
       Counter.print_efficiency Format.std_formatter counter ;
   with
   | ExceptionDefn.Malformed_Decl er ->
