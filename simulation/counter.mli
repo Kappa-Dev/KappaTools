@@ -1,4 +1,4 @@
-(** Simulation time keeper *)
+(** Simulation progress keeper *)
 
 type t
 

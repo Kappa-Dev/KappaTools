@@ -13,4 +13,4 @@ In grammar/ are the parser and the compilers
 {!modules: Edges}
 
 Finally, the simulation engine is in simulation/
-{!modules: Expr_interpreter Rule_interpreter State_interpreter}
+{!modules: Counter Expr_interpreter Rule_interpreter State_interpreter}

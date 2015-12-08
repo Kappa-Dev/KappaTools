@@ -21,6 +21,7 @@ Snip
 
 Edges
 
+Counter
 Expr_interpreter
 Rule_interpreter
 State_interpreter
