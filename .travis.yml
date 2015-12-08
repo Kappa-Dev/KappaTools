@@ -36,6 +36,7 @@ matrix:
           - opam
           - gnuplot-nox
           - graphviz
+	  - latex-xcolor
           - texlive-latex-recommended
           - tex4ht
 
