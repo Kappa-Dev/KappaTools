@@ -10,6 +10,7 @@ type t = {
   need_update_each_loop : Operator.DepSet.t;
   algs_reverse_dependencies : Operator.DepSet.t array;
   tokens_reverse_dependencies : Operator.DepSet.t array;
+
   desc_table : (string,out_channel * Format.formatter) Hashtbl.t;
 }
 

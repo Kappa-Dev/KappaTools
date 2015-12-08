@@ -23,23 +23,22 @@ let write_out stop div counter =
     let () =
       stat##innerHTML <- (Js.string (Counter.to_bootstrap_html counter)) in
     let () = if va_l <> old_l then p##innerHTML <- (Js.string va) in
-    stop <?>
-       (Lwt_js.sleep 2. >>= (fun () -> return va_l) >>= aux) in
+    stop <?> (Lwt_js.sleep 2. >>= (fun () -> return va_l) >>= aux) in
   aux 0
 
-let run stop log_div out_div s =
+let run stop log_div out_div =
   catch
     (fun () ->
      let () = Ast.init_compil () in
-     wrap1 parse s
+     wrap1 parse (React.S.value Storage.model_text)
      >>= fun () ->
      let result = !Ast.result in
-     let counter = Counter.create (React.S.value Input.nb_plot) 0. 0 (React.S.value Input.max_time) (React.S.value Input.max_events) in
+     let counter = React.S.value Storage.model_counter in
      wrap4 Eval.initialize log_form [] counter result
      >>= fun (_kasa_state,env,domain,graph,state) ->
      let () = Plot.create "foo.svg" in
      let () =
-       if (React.S.value Input.nb_plot) > 0 then
+       if (React.S.value Storage.model_nb_plot) > 0 then
 	 Plot.plot_now
 	   env (Counter.current_time counter)
 	   (State_interpreter.observables_values env counter graph state) in
@@ -89,7 +88,7 @@ let launch_simulation go_button stop_button out_div log graph =
     stop_button##onclick <- Dom_html.handler
 			       (fun _ -> let () = Lwt.wakeup stopper () in
 					 Js._false) in
-  run stoppe log out_div (Js.to_string (Ace.get_editor_value ())) >>=
+  run stoppe log out_div >>=
     fun plot ->
     let () = Feedback.show_warnings out_div in
     let () = go_button##disabled <- Js._false in
@@ -119,15 +118,16 @@ let onload _ =
   let output = Tyxml_js.To_dom.of_div raw_output in
   let go_button = Tyxml_js.To_dom.of_button raw_go_button in
   let stop_button = Tyxml_js.To_dom.of_button raw_stop_button in
-  let () = Lwt_js_events.async (Input.get_initial_content) in
   let _ = Lwt_js_events.clicks go_button
 			       (fun _ _ ->
 				launch_simulation
 				  go_button stop_button output log graph) in
   let skeleton = Tyxml_js.To_dom.of_div
-		 <:html5<<div class="row">$raw_input$$raw_output$</div> >> in
+		 <:html5<<div class="row">$Ui.raw_menu$$raw_input$$raw_output$</div> >> in
   let () = Dom.appendChild main skeleton in
-  let () = Dom.appendChild document##body Ace.starter in
+  let editor_obj = Input.setup_editor () in
+  let () = Lwt_js_events.async (Input.get_initial_content editor_obj) in
+  let () =  (Ace.starter editor_obj Input.has_been_modified) in
   Js._false
 
 let _ = Dom_html.window##onload <- Dom_html.handler onload
