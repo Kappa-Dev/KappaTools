@@ -635,12 +635,12 @@ rule_id:7
 ------------------------------------------------------------
 * Rules in the working list:
 ------------------------------------------------------------
-- Working list creation:
-0 1 2 
 
 ------------------------------------------------------------
 * Covering classes with new indexes:
 ------------------------------------------------------------
+- Working list creation:
+0 1 2 
 
 ------------------------------------------------------------
 - Bdu for the valuations of the views that are tested (per rule, agent and covering class):
@@ -1044,10 +1044,6 @@ Id=9
 
 ------------------------------------------------------------
 - Bdu for the valuations of the views that are created in the initial state (per rule, agent and covering class):
-
-
-------------------------------------------------------------
-- Bdu for the valuations of the views that are created in the initial state (per rule_id; projection function):
 
 
 ------------------------------------------------------------

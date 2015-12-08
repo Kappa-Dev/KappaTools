@@ -46,6 +46,13 @@ let print_remanent_triple parameter error result =
     ) parameter result
 
 (************************************************************************************)
+(*working list*)
+
+let print_wl_creation parameter result =
+  Fifo.IntWL.print_wl parameter result
+
+(************************************************************************************)
+(*test rule*)
 
 let print_test_bdu_map parameter error result =
   Map_test_bdu.Map.iter
@@ -69,6 +76,7 @@ let print_proj_test_bdu_map parameter error result =
     ) result
 
 (************************************************************************************)
+(*creation rule*)
 
 let print_creation_bdu_map parameter error result =
   Map_creation_bdu.Map.iter
@@ -92,29 +100,20 @@ let print_proj_creation_bdu_map parameter error result =
     ) result
 
 (************************************************************************************)
+(*bdu initial state*)
 
 let print_init_bdu_map parameter error result =
-  Map_init_bdu.Map.iter
-    (fun (agent_id, agent_type, rule_id, cv_id) bdu_init ->
+  Map_bdu_update.Map.iter
+    (fun (agent_type, cv_id) bdu_init ->
       let _ =
-        fprintf parameter.log "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i\n"
-          agent_id agent_type rule_id cv_id
+        fprintf parameter.log "agent_type:%i:covering_class_id:%i\n"
+          agent_type cv_id
       in
       Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_init
     ) result
 
-let print_proj_init_bdu_map parameter error result =
-  Map_final_init_bdu.Map.iter
-    (fun rule_id map_b ->
-      let _ = fprintf parameter.log "rule_id:%i\n" rule_id in
-      Map_agent_type_init_bdu.Map.iter
-        (fun agent_type bdu_creation ->
-          let _ = fprintf parameter.log "agent_type:%i\n" agent_type in
-          Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_creation
-        ) map_b
-    ) result
-
 (************************************************************************************)
+(*modification list*)
 
 let print_modif_list_map parameter error result =
   Map_modif_list.Map.iter
@@ -155,6 +154,13 @@ let print_bdu_build parameter error result =
       "* Covering classes with new indexes:\n";
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
+  in
+  let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "- Working list creation:\n";
+    print_wl_creation
+      parameter
+      result.store_wl_creation
   in
   let _ =
      fprintf (Remanent_parameters.get_log parameter)
@@ -205,16 +211,6 @@ let print_bdu_build parameter error result =
       parameter
       error
       result.store_bdu_init_restriction_map
-  in
-  let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "\n------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "- Bdu for the valuations of the views that are created in the initial state (per rule_id; projection function):\n\n";
-    print_proj_init_bdu_map
-      parameter
-      error
-      result.store_proj_bdu_init_restriction_map
   in
   let _ =
     fprintf (Remanent_parameters.get_log parameter)

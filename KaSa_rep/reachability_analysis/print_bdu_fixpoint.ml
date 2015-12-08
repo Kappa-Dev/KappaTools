@@ -152,6 +152,6 @@ let print_bdu_fixpoint parameter error result =
     print_bdu_update_map
       parameter
       error
-      result.store_bdu_update_map    
+      result.store_bdu_fixpoint_map    
   in
   error

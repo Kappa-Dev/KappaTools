@@ -991,12 +991,12 @@ rule_id:10
 ------------------------------------------------------------
 * Rules in the working list:
 ------------------------------------------------------------
-- Working list creation:
-0 1 2 3 4 
 
 ------------------------------------------------------------
 * Covering classes with new indexes:
 ------------------------------------------------------------
+- Working list creation:
+0 1 2 3 4 
 
 ------------------------------------------------------------
 - Bdu for the valuations of the views that are tested (per rule, agent and covering class):
@@ -1727,10 +1727,6 @@ Id=7
 
 
 ------------------------------------------------------------
-- Bdu for the valuations of the views that are created in the initial state (per rule_id; projection function):
-
-
-------------------------------------------------------------
 - List for update of the views due to modification (per rule, agent and covering class):
 agent_id:0:agent_type:0:rule_id:0:covering_class_id:0
 site_type:2:state:0
@@ -1851,13 +1847,13 @@ rule_id:7{agent_id:0; agent_type:0; site_type:1} -- {agent_id:2; agent_type:2; s
 rule_id:10{agent_id:0; agent_type:3; site_type:1} -- {agent_id:1; agent_type:4; site_type:1} 
 ** Fixpoint iteration function:
 agent_type:0:cv_id:0
-Id=32
+Id=28
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=31
-   Node(site_type:1<2)
+  Id=27
+   Node(site_type:1<1)
     Id=12
      Node(site_type:2<0)
       Id=1
@@ -1871,8 +1867,23 @@ Id=32
         Id=1
          Leaf False 
 
-    Id=1
-     Leaf False 
+    Id=17
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
 
 agent_type:1:cv_id:0
 Id=20
@@ -1914,13 +1925,13 @@ Id=20
        Leaf False 
 
 agent_type:2:cv_id:0
-Id=32
+Id=28
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=31
-   Node(site_type:1<2)
+  Id=27
+   Node(site_type:1<1)
     Id=12
      Node(site_type:2<0)
       Id=1
@@ -1934,17 +1945,32 @@ Id=32
         Id=1
          Leaf False 
 
-    Id=1
-     Leaf False 
+    Id=17
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
 
 agent_type:3:cv_id:0
-Id=32
+Id=28
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=31
-   Node(site_type:1<2)
+  Id=27
+   Node(site_type:1<1)
     Id=12
      Node(site_type:2<0)
       Id=1
@@ -1958,8 +1984,23 @@ Id=32
         Id=1
          Leaf False 
 
-    Id=1
-     Leaf False 
+    Id=17
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
 
 agent_type:4:cv_id:0
 Id=20

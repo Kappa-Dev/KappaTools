@@ -331,15 +331,15 @@ let collect_proj_bdu_creation_restriction_map parameter handler error
 let collect_bdu_init_restriction_map parameter handler error compil store_remanent_triple 
     store_result =
   let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in
-  let add_link handler (agent_id, agent_type, rule_id, cv_id) bdu store_result =
+  let add_link handler (agent_type, cv_id) bdu store_result =
     let error, old_bdu =
-      match Map_init_bdu.Map.find_option (agent_id, agent_type, rule_id, cv_id) store_result
+      match Map_bdu_update.Map.find_option (agent_type, cv_id) store_result
       with
       | None -> error, bdu_true
       | Some bdu -> error, bdu
     in
     let result_map =
-      Map_init_bdu.Map.add (agent_id, agent_type, rule_id, cv_id) bdu store_result
+      Map_bdu_update.Map.add (agent_type, cv_id) bdu store_result
     in
     error, handler, result_map
   in
@@ -400,35 +400,13 @@ let collect_bdu_init_restriction_map parameter handler error compil store_remane
                 build_bdu parameter handler error pair_list
               in
               let error, handler, store_result =
-                add_link handler (agent_id, agent_type, rule_id, cv_id)
-                  bdu_init store_result
+                add_link handler (agent_type, cv_id) bdu_init store_result
               in
               error, (handler, store_result)
           ) rule.e_init_c_mixture.views store_remanent_triple (handler, store_result)
       ) compil.init (handler, store_result)
   in
   error, (handler, store_result)
-
-(*projection with rule_id*)
-
-let collect_proj_bdu_init_restriction_map parameter handler error 
-    store_bdu_init_restriction_map =
-  let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in
-  let (error, handler), store_result =
-    Project2bdu_init.proj2_monadic
-      parameter
-      (error, handler)
-      (fun (agent_id, agent_type, rule_id, cv_id) -> rule_id)
-      (fun (agent_id, agent_type, rule_id, cv_id) -> agent_type)
-      bdu_true
-      (fun parameter (error, handler) bdu bdu' ->
-        let error, handler, bdu_union =
-          Mvbdu_wrapper.Mvbdu.mvbdu_and parameter handler error bdu bdu'
-        in
-        (error, handler), bdu_union
-      ) store_bdu_init_restriction_map
-  in
-  (error, handler), store_result
   
 (************************************************************************************)
 (*modification rule with creation rules*)

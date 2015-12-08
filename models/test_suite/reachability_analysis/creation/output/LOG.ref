@@ -364,12 +364,12 @@ rule_id:4
 ------------------------------------------------------------
 * Rules in the working list:
 ------------------------------------------------------------
-- Working list creation:
-0 3 
 
 ------------------------------------------------------------
 * Covering classes with new indexes:
 ------------------------------------------------------------
+- Working list creation:
+0 3 
 
 ------------------------------------------------------------
 - Bdu for the valuations of the views that are tested (per rule, agent and covering class):
@@ -646,10 +646,6 @@ Id=3
 
 
 ------------------------------------------------------------
-- Bdu for the valuations of the views that are created in the initial state (per rule_id; projection function):
-
-
-------------------------------------------------------------
 - List for update of the views due to modification (per rule, agent and covering class):
 agent_id:0:agent_type:0:rule_id:0:covering_class_id:0
 site_type:2:state:0
@@ -698,13 +694,13 @@ rule_id:4
 false
 ** Fixpoint iteration function:
 agent_type:0:cv_id:0
-Id=7
+Id=10
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=6
-   Node(site_type:1<1)
+  Id=8
+   Node(site_type:1<2)
     Id=5
      Node(site_type:2<0)
       Id=1

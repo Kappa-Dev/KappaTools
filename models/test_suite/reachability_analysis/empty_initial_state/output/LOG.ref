@@ -275,12 +275,12 @@ rule_id:2
 ------------------------------------------------------------
 * Rules in the working list:
 ------------------------------------------------------------
-- Working list creation:
-2 
 
 ------------------------------------------------------------
 * Covering classes with new indexes:
 ------------------------------------------------------------
+- Working list creation:
+2 
 
 ------------------------------------------------------------
 - Bdu for the valuations of the views that are tested (per rule, agent and covering class):
@@ -448,36 +448,7 @@ Id=11
 ------------------------------------------------------------
 - Bdu for the valuations of the views that are created in the initial state (per rule, agent and covering class):
 
-agent_id:0:agent_type:0:rule_id:0:covering_class_id:0
-Id=7
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=6
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
-
-------------------------------------------------------------
-- Bdu for the valuations of the views that are created in the initial state (per rule_id; projection function):
-
-rule_id:0
-agent_type:0
+agent_type:0:covering_class_id:0
 Id=7
  Node(site_type:1<0)
   Id=1
@@ -529,4 +500,28 @@ rule_id:2
 ** Discovered sites that are bond on the rhs for the first time:
 false
 ** Fixpoint iteration function:
+agent_type:0:cv_id:0
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
 execution finished without any exception

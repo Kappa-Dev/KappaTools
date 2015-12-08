@@ -117,12 +117,6 @@ let print_covering_classes_modification parameter error result =
     parameter
     error
     result
-  
-(************************************************************************************)
-(*working list*)
-
-let print_wl_creation parameter result =
-  IntWL.print_wl parameter result
     
 (************************************************************************************)
 (*main print*)
@@ -152,13 +146,5 @@ let print_result_dynamic parameter error result =
       "* Rules in the working list:\n";
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
-  in
-  (*------------------------------------------------------------------------------*)
-  let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "- Working list creation:\n";
-    print_wl_creation
-      parameter
-      result.store_wl_creation
   in
   error
