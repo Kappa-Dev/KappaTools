@@ -495,7 +495,7 @@ let is_enable parameter handler error bdu_true bdu_false
   error, is_enable
 
 (************************************************************************************)
-(*fixpoint iteration*)
+(*compute a view that can apply*)
 
 let views_can_apply parameter handler error agent_id agent_type cv_id bdu_true
     bdu_false
@@ -551,6 +551,7 @@ let views_can_apply parameter handler error agent_id agent_type cv_id bdu_true
   error, handler, bdu_update
 
 (************************************************************************************)
+(*compute view in the case of it is a new view and check if it has new bond*)
 
 let compute_view_new_and_bond parameter handler error
     is_new_view 
@@ -588,10 +589,12 @@ let compute_view_new_and_bond parameter handler error
   error, (handler, store_wl, store_result)
 
 (************************************************************************************)
+(*compute view that is enabled*)
 
 let compute_views_enabled parameter handler error bdu_true bdu_false
     bdu_test_map
-    bdu_creation_map modif_list_map 
+    bdu_creation_map 
+    modif_list_map 
     store_new_result_map 
     is_new_bond
     wl_tl
@@ -664,9 +667,12 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
   error, (handler, new_wl, store_new_result)
 
 (************************************************************************************)
+(*fixpoint iteration without initial state*)
 
-let collect_bdu_fixpoint_map parameter handler error 
-    rule 
+let collect_bdu_fixpoint_without_init parameter handler error 
+    rule
+    bdu_true
+    bdu_false
     wl_creation
     store_proj_bdu_creation_restriction_map
     store_proj_modif_list_restriction_map
@@ -676,30 +682,16 @@ let collect_bdu_fixpoint_map parameter handler error
     store_test_has_bond_rhs
     store_new_result_map
     store_covering_classes_modification_update
-    store_bdu_init_restriction_map
     store_result_map
     =
-  let error, handler, bdu_false = 
-    Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error
-  in 
-  let error, handler, bdu_true = 
-    Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error 
-  in
-  (*-----------------------------------------------------------------------*)
-  (*union the result of bdu_fixpoint_map with initial state*)
-  let store_bdu_fixpoint_init_map =
-    Map_bdu_update.Map.union store_result_map store_bdu_init_restriction_map
-  in
-  (*-----------------------------------------------------------------------*)
-  (*iterate function over a working list*)
   let error, (handler, store_bdu_fixpoint_map) =
     let rec aux acc_wl (error, handler, store_bdu_update_map) =
       if IntWL.is_empty acc_wl
       then
         error, (handler, store_bdu_update_map)
       else
-      (*-----------------------------------------------------------------------*)
-      (*pop the first element (rule_id) in this working list*)
+        (*-----------------------------------------------------------------------*)
+        (*pop the first element (rule_id) in this working list*)
         let error, (rule_id_op, wl_tl) = IntWL.pop parameter error acc_wl in
         match rule_id_op with
         | None -> error, (handler, store_bdu_update_map) (* Put a warning in error *)
@@ -754,6 +746,172 @@ let collect_bdu_fixpoint_map parameter handler error
               aux wl_tl (error, handler, store_bdu_update_map)
           end
     in
-    aux wl_creation (error, handler, store_bdu_fixpoint_init_map)
+    (*start with init map without union with initial state*)
+    aux wl_creation (error, handler, store_result_map)
   in
   error, (handler, store_bdu_fixpoint_map)
+
+(************************************************************************************)
+(*fixpoint iteration with initial state*)
+
+let collect_bdu_fixpoint_init_map parameter handler error 
+    rule
+    bdu_true
+    bdu_false
+    wl_creation
+    store_proj_bdu_creation_restriction_map
+    store_proj_modif_list_restriction_map
+    store_proj_bdu_test_restriction_map
+    store_bdu_test_restriction_map
+    is_new_bond
+    store_test_has_bond_rhs
+    store_new_result_map
+    store_covering_classes_modification_update
+    store_bdu_init_restriction_map
+    store_result_map
+    =
+  let store_bdu_fixpoint_init_map =
+    Map_bdu_update.Map.union store_result_map store_bdu_init_restriction_map
+  in
+  let error, wl_init_creation =
+    add_update_to_wl parameter error store_covering_classes_modification_update
+      wl_creation
+  in
+  let error, (handler, store_bdu_fixpoint_map) =
+    let rec aux acc_wl (error, handler, store_bdu_update_map) =
+      if IntWL.is_empty acc_wl
+      then
+        error, (handler, store_bdu_update_map)
+      else
+        (*-----------------------------------------------------------------------*)
+        (*pop the first element (rule_id) in this working list*)
+        let error, (rule_id_op, wl_tl) = IntWL.pop parameter error acc_wl in
+        match rule_id_op with
+        | None -> error, (handler, store_bdu_update_map) (* Put a warning in error *)
+        | Some rule_id ->
+          (*----------------------------------------------------------------------*)
+          (*compute bdu_creation, bdu_test and modif_list for this rule_id*)
+          let error, (bdu_creation_map, modif_list_map, bdu_test_map) =
+            collect_bdu_creation_and_modif_list
+              parameter
+              error
+              rule_id
+              store_proj_bdu_creation_restriction_map
+              store_proj_modif_list_restriction_map
+              store_proj_bdu_test_restriction_map
+          in
+          (*--------------------------------------------------------------------*)
+          (*is for all bdu_test sastify a covering_class?*)
+          let error, is_enable = 
+            is_enable
+              parameter
+              handler
+              error
+              bdu_true
+              bdu_false
+              bdu_test_map
+              store_bdu_test_restriction_map
+              store_bdu_update_map
+          in
+          (*-----------------------------------------------------------------------*)
+          begin
+            if is_enable
+            then
+              let error, (handler, new_wl, store_new_result) =
+                compute_views_enabled
+                  parameter
+                  handler
+                  error
+                  bdu_true
+                  bdu_false
+                  bdu_test_map
+                  bdu_creation_map
+                  modif_list_map
+                  store_new_result_map
+                  is_new_bond
+                  wl_tl
+                  store_covering_classes_modification_update
+                  store_bdu_test_restriction_map
+                  store_bdu_update_map
+              in
+              aux new_wl (error, handler, store_new_result)
+            else
+              aux wl_tl (error, handler, store_bdu_update_map)
+          end
+    in
+    (*start with init_map and union with initial state*)
+    aux wl_init_creation (error, handler, store_bdu_fixpoint_init_map)
+  in
+  error, (handler, store_bdu_fixpoint_map)
+
+(************************************************************************************)
+(*final fixpoint iteration*)
+
+let collect_bdu_fixpoint_map parameter handler error 
+    rule 
+    wl_creation
+    store_proj_bdu_creation_restriction_map
+    store_proj_modif_list_restriction_map
+    store_proj_bdu_test_restriction_map
+    store_bdu_test_restriction_map
+    is_new_bond
+    store_test_has_bond_rhs
+    store_new_result_map
+    store_covering_classes_modification_update
+    store_bdu_init_restriction_map
+    store_result_map
+    =
+  let error, handler, bdu_false = 
+    Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error
+  in 
+  let error, handler, bdu_true = 
+    Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error 
+  in
+  (*-----------------------------------------------------------------------*)
+  (*union the result of bdu_fixpoint_map with initial state*)
+   if not (Map_bdu_update.Map.is_empty store_bdu_init_restriction_map)
+  then
+    (*there is initial state*)
+    let error, (handler, store_bdu_fixpoint_map) =
+      collect_bdu_fixpoint_init_map
+        parameter
+        handler
+        error
+        rule
+        bdu_true
+        bdu_false
+        wl_creation
+        store_proj_bdu_creation_restriction_map
+        store_proj_modif_list_restriction_map
+        store_proj_bdu_test_restriction_map
+        store_bdu_test_restriction_map
+        is_new_bond
+        store_test_has_bond_rhs
+        store_new_result_map
+        store_covering_classes_modification_update
+        store_bdu_init_restriction_map
+        store_result_map
+    in
+    error, (handler, store_bdu_fixpoint_map)
+  else
+    (*there is no initial state*)
+    let error, (handler, store_bdu_fixpoint_map) =
+      collect_bdu_fixpoint_without_init
+        parameter
+        handler
+        error
+        rule
+        bdu_true
+        bdu_false
+        wl_creation
+        store_proj_bdu_creation_restriction_map
+        store_proj_modif_list_restriction_map
+        store_proj_bdu_test_restriction_map
+        store_bdu_test_restriction_map
+        is_new_bond
+        store_test_has_bond_rhs
+        store_new_result_map
+        store_covering_classes_modification_update
+        store_result_map
+    in
+    error, (handler, store_bdu_fixpoint_map)

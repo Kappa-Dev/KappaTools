@@ -965,13 +965,13 @@ rule_id:2
 false
 ** Fixpoint iteration function:
 agent_type:0:cv_id:0
-Id=3
+Id=6
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=2
-   Node(site_type:1<1)
+  Id=4
+   Node(site_type:1<2)
     Id=0
      Leaf True 
 
@@ -979,13 +979,13 @@ Id=3
      Leaf False 
 
 agent_type:1:cv_id:0
-Id=3
+Id=6
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=2
-   Node(site_type:1<1)
+  Id=4
+   Node(site_type:1<2)
     Id=0
      Leaf True 
 

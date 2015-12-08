@@ -664,12 +664,12 @@ Id=9
      Leaf False 
 
 agent_id:0:agent_type:0:rule_id:4:covering_class_id:0
-Id=13
+Id=19
  Node(site_type:1<2)
   Id=1
    Leaf False 
 
-  Id=12
+  Id=18
    Node(site_type:1<3)
     Id=0
      Leaf True 
@@ -859,12 +859,12 @@ Id=9
 
 rule_id:4
 agent_id:0
-Id=13
+Id=19
  Node(site_type:1<2)
   Id=1
    Leaf False 
 
-  Id=12
+  Id=18
    Node(site_type:1<3)
     Id=0
      Leaf True 
