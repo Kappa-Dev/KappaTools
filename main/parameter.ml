@@ -48,9 +48,6 @@ let emacsMode = ref false
 (*User definable values*)
 let tmp_var_name = ref ""
 let alg_var_overwrite : (string * Nbr.t) list ref = ref []
-let (maxEventValue:int option ref) = ref None
-let (maxTimeValue:float option ref) = ref None
-let (pointNumberValue:int ref) = ref 0
 let (seedValue:int option ref) = ref None
 let compileModeOn = ref false
 let implicitSignature = ref false

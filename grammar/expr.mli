@@ -6,15 +6,15 @@
 val compile_alg :
   ?origin:Operator.rev_dep ->
   (string list * (string * string) list) Export_to_KaSim.String2Map.t ->
-  Connected_component.Env.t ->
+  Counter.t -> Connected_component.Env.t ->
   (LKappa.rule_mixture,int) Ast.ast_alg_expr Location.annot ->
   Connected_component.Env.t * Alg_expr.t Location.annot
 val compile_pure_alg :
-  (LKappa.rule_mixture,int) Ast.ast_alg_expr Location.annot ->
+  Counter.t -> (LKappa.rule_mixture,int) Ast.ast_alg_expr Location.annot ->
   Alg_expr.t Location.annot
 val compile_bool :
   (string list * (string * string) list) Export_to_KaSim.String2Map.t ->
-  Connected_component.Env.t ->
+  Counter.t -> Connected_component.Env.t ->
   (LKappa.rule_mixture,int) Ast.ast_alg_expr Ast.bool_expr Location.annot ->
   Connected_component.Env.t * Alg_expr.t Ast.bool_expr Location.annot
 

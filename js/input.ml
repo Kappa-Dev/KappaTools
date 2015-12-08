@@ -4,6 +4,7 @@ module Html5 = Tyxml_js.Html5
 let document = Dom_html.window##document
 
 let opened_filename, set_opened_filename = React.S.create "model.ka"
+let max_events, set_max_events = React.S.create None
 
 let raw_editor = Html5.div ~a:[Html5.a_id "editor"] []
 let editor = Tyxml_js.To_dom.of_div raw_editor
@@ -48,19 +49,22 @@ let () = save_file##onclick <-
 			    header##concat (Js.escape (Ace.get_editor_value ())) in
 			let () = has_been_modified := false in
 			Js._true)
-let event_number =
-  Dom_html.createInput ~_type:(Js.string "number") document
+let raw_event_number =
+  Html5.input ~a:[Html5.a_input_type `Number;
+		  Html5.a_class ["form-control"];
+		  Html5.a_placeholder "Max number";
+		  Tyxml_js.R.Html5.a_value
+		    (React.S.l1 (fun x -> match x with
+					     | Some va -> string_of_int va
+					     | None -> "") max_events)]
+	      ()
 
 let get_initial_content () =
   let args = Url.Current.arguments in
   let () =
     try
-      Parameter.maxEventValue :=
-	Some (int_of_string (List.assoc "nb_events" args))
+	set_max_events (Some (int_of_string (List.assoc "nb_events" args)))
     with Not_found | Failure "int_of_string" -> () in
-  let () = event_number##value <- Js.string (match !Parameter.maxEventValue with
-					     | Some va -> string_of_int va
-					     | None -> "") in
   try
     let url = List.assoc "model" args in
     XmlHttpRequest.get url >>=
@@ -81,20 +85,16 @@ let get_initial_content () =
   with Not_found -> return_unit
 
 let raw_html =
-  let () = event_number##placeholder <- Js.string "Max number" in
-  let () = event_number##className <- Js.string "form-control" in
+  let event_number = Tyxml_js.To_dom.of_input raw_event_number in
   let () =
     event_number##onchange <-
       Dom_html.handler
 	(fun _ ->
 	 let () =
-           Parameter.maxEventValue :=
-	     try
+           set_max_events
+	     (try
 	       Some (int_of_string (Js.to_string (event_number##value)))
-             with Invalid_argument _ -> None in
-	 event_number##value <- Js.string (match !Parameter.maxEventValue with
-					   | Some va -> string_of_int va
-					   | None -> "");
+             with Failure _ -> None) in
 	 Js._false) in
   <:html5list<<form class="form-inline">
 	      <div class="input-group">
@@ -103,5 +103,5 @@ let raw_html =
 	      </div>$raw_save_file$</form>
 	      $raw_editor$
 	      <div class="form-group"><label class="sr-only">Maximum number of events</label>
-	      <div class="input-group">$Tyxml_js.Of_dom.of_input event_number$
+	      <div class="input-group">$raw_event_number$
 	      <span class="input-group-addon">events</span></div></div> >>

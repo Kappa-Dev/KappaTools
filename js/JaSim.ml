@@ -27,13 +27,14 @@ let run stop out_div s =
      wrap1 parse s
      >>= fun () ->
      let result = !Ast.result in
-     wrap3 Eval.initialize log_form [] result
-     >>= fun (_kasa_state,env,domain,counter,graph,state) ->
+     let counter = Counter.create 100 0. 0 None (React.S.value Input.max_events) in
+     wrap4 Eval.initialize log_form [] counter result
+     >>= fun (_kasa_state,env,domain,graph,state) ->
      let () = Plot.create "foo.svg" in
      let () =
        if !Parameter.pointNumberValue > 0 then
 	 Plot.plot_now
-	   env counter.Mods.Counter.time
+	   env (Counter.current_time counter)
 	   (State_interpreter.observables_values env counter graph state) in
      let () = Feedback.show_warnings out_div in
      State_interpreter.loop_cps

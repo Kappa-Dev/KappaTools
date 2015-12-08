@@ -17,6 +17,7 @@ val one_time_correction_event : t -> Nbr.t -> bool
 
 val max_time : t -> float option
 val max_events : t -> int option
+val plot_points : t -> int
 val current_time : t -> float
 val current_event : t -> int
 val nb_null_event : t -> int

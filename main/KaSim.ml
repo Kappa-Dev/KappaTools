@@ -9,6 +9,10 @@ let close_desc opt_env =
   | None -> ()
   | Some env -> Environment.close_desc env
 
+let (maxEventValue:int option ref) = ref None
+let (maxTimeValue:float option ref) = ref None
+let (pointNumberValue:int ref) = ref 0
+
 let () =
   let options = [
     ("--version",
@@ -20,15 +24,13 @@ let () =
 		 Parameter.inputKappaFileNames:= fic:: (!Parameter.inputKappaFileNames)),
      "name of a kappa file to use as input (can be used multiple times for multiple input files)");
     ("-e",
-     Arg.Int (fun i -> if i < 0 then Parameter.maxEventValue := None
-		       else let () = Parameter.maxTimeValue:= None in
-			    Parameter.maxEventValue := Some i),
+     Arg.Int (fun i -> if i < 0 then maxEventValue := None
+		       else maxEventValue := Some i),
      "Number of total simulation events, including null events (negative value for unbounded simulation)");
     ("-t",
-     Arg.Float(fun t -> Parameter.maxTimeValue := Some t ;
-			Parameter.maxEventValue := None),
+     Arg.Float(fun t -> maxTimeValue := Some t),
      "Max time of simulation (arbitrary time unit)");
-    ("-p", Arg.Set_int Parameter.pointNumberValue,
+    ("-p", Arg.Set_int pointNumberValue,
      "Number of points in plot");
     ("-var",
      Arg.Tuple
@@ -133,10 +135,14 @@ let () =
     Format.printf
       "+ Initialized random number generator with seed %d@." theSeed;
 
-    let (kasa_state,env, cc_env, counter, graph, new_state) =
+    let counter =
+      Counter.create !pointNumberValue 0.0 0
+		     !maxTimeValue !maxEventValue in
+    let (kasa_state,env, cc_env, graph, new_state) =
       match !Parameter.marshalizedInFile with
       | "" ->
-	 Eval.initialize Format.std_formatter !Parameter.alg_var_overwrite result
+	 Eval.initialize
+	   Format.std_formatter !Parameter.alg_var_overwrite counter result
       | marshalized_file ->
 	 try
 	   let d = open_in_bin marshalized_file in
@@ -148,13 +154,13 @@ let () =
 	     else
 	       Format.printf "+Loading simulation package %s...@."
 			     marshalized_file in
-	   let kasa_state,env,cc_env,counter,graph,new_state =
+	   let kasa_state,env,cc_env,graph,new_state =
 	     (Marshal.from_channel d :
-		Export_to_KaSim.Export_to_KaSim.state*Environment.t*Connected_component.Env.t*Counter.t*
+		Export_to_KaSim.Export_to_KaSim.state*Environment.t*Connected_component.Env.t*
 		  Rule_interpreter.t * State_interpreter.t) in
 	   let () = Pervasives.close_in d  in
 	   let () = Format.printf "Done@." in
-	   (kasa_state,env,cc_env,counter,graph,new_state)
+	   (kasa_state,env,cc_env,graph,new_state)
 	 with
 	 | _exn ->
 	    Debug.tag
@@ -176,7 +182,7 @@ let () =
 
     let () = Plot.create (Kappa_files.get_data ()) in
     let () =
-      if !Parameter.pointNumberValue > 0 then
+      if !pointNumberValue > 0 then
 	Plot.plot_now
 	  env (Counter.current_time counter)
 	  (State_interpreter.observables_values env counter graph new_state) in

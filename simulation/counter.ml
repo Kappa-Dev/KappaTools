@@ -73,6 +73,7 @@ type t = {
     init_event : int ;
     max_time : float option ;
     max_events : int option ;
+    plot_points : int ;
     dE : int option ;
     dT : float option ;
   }
@@ -119,6 +120,7 @@ let next_story c =
     Mods.story_event = current_event c; Mods.profiling_info = (); }
 let max_time c = c.max_time
 let max_events c = c.max_events
+let plot_points c = c.plot_points
 let set_tick c (i,x) = c.last_tick <- (i,x)
 
 let compute_dT points mx_t =
@@ -186,10 +188,8 @@ let complete_progress_bar form counter =
 let create nb_points init_t init_e mx_t mx_e =
   let dE =
     compute_dE nb_points (Tools.option_map (fun x -> x - init_e) mx_e) in
-  let dT = match dE with
-      None ->
-      compute_dT nb_points (Tools.option_map (fun x -> x -. init_t) mx_t)
-    | Some _ -> None
+  let dT =
+    compute_dT nb_points (Tools.option_map (fun x -> x -. init_t) mx_t)
   in
   {time = init_t ;
    events = init_e ;
@@ -197,6 +197,7 @@ let create nb_points init_t init_e mx_t mx_e =
    stat_null = Stat_null_events.init () ;
    max_time = mx_t ;
    max_events = mx_e ;
+   plot_points = nb_points;
    last_tick = (init_e,init_t);
    dE = dE ;
    dT = dT ;
