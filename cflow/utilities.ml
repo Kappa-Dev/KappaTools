@@ -160,7 +160,7 @@ let disambiguate =
   transform_trace_gen
     (monadic_lift
        S.PH.B.PB.CI.Po.K.disambiguate)
-    (Some "\t - renaming agents to avoid conflicts after event removals")
+    None
     "Trace after having renames agents:\n"
     dummy_profiling
 

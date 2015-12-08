@@ -34,19 +34,19 @@ Stats:
 ____________________________________________________________
 ############################################################
 
-	 - renaming agents to avoid conflicts after event removals (no change)
 	 - detecting siphons (+281 events)
-	 - renaming agents to avoid conflicts after event removals (no change)
 	 - cutting concurrent events (-565 events)
 	 - detecting pseudo inverse events (-430 events)
+	 - detecting siphons (+20 events)
+	 - cutting concurrent events (-235 events)
+	 - detecting pseudo inverse events (no change)
+	 - detecting siphons (+20 events)
+	 - cutting concurrent events (-20 events)
+	 - detecting pseudo inverse events (no change)
 	 - blackboard generation
 	 - computing causal past of each observed events (106)
-
-____________________________________________________________
-############################################################
-
 Stats:
- number of step   : 412
+ number of step   : 197
  longest story    : 9
  average length   : 9.
  geometric mean   : 9.

@@ -22,6 +22,7 @@
 
 module type Cflow_handler =
   sig
+    (**a struct which contains parameterizable options*)
     type parameter  = (*try to hide type definition *)
         {
           cache_size : int option ;
@@ -40,13 +41,17 @@ module type Cflow_handler =
 	  log_step_channel : Format.formatter ;
 	  kasa : Remanent_parameters_sig.parameters ;
 	  always_disambiguate_initial_states : bool  ;
-	} (*a struct which contains parameterizable options*)
+	  bound_on_itteration_number: int option ;
+	}  
     type handler =   (*handler to interpret abstract values*)
         {
           env: Environment.t ;
         }
     type 'a with_handler = parameter -> handler -> Exception.method_handler -> 'a
 
+    val do_not_bound_itterations: parameter -> parameter 									 
+    val set_itteration_bound: parameter -> int -> parameter 
+    val get_bound_on_itteration_number: parameter -> int option 
     val set_first_story_per_obs: parameter -> parameter  
     val set_all_stories_per_obs: parameter -> parameter 
     val build_parameter: unit -> parameter
@@ -96,6 +101,7 @@ module Cflow_handler =
 	  log_step_channel : Format.formatter ;
 	  kasa : Remanent_parameters_sig.parameters ;
 	  always_disambiguate_initial_states : bool  ;
+	  bound_on_itteration_number: int option ;
 	}
 
     let build_parameter () =
@@ -117,6 +123,7 @@ module Cflow_handler =
 	log_step_channel = Format.std_formatter ; 
 	kasa = Remanent_parameters.get_parameters () ;
 	always_disambiguate_initial_states = true ;
+	bound_on_itteration_number = None ;
       }
 
     let set_compression_weak p =
@@ -181,6 +188,9 @@ module Cflow_handler =
    let always_disambiguate parameter = parameter.always_disambiguate_initial_states
    let set_always_disambiguate parameter  bool = { parameter with always_disambiguate_initial_states = bool}
 						   
- 
-				     end:Cflow_handler)
+   let do_not_bound_itterations parameter = {parameter with bound_on_itteration_number = None}
+   let set_itteration_bound parameter int = {parameter with bound_on_itteration_number = Some int}				      
+   let get_bound_on_itteration_number parameter = parameter.bound_on_itteration_number
+						    
+    end:Cflow_handler)
     

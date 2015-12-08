@@ -21,9 +21,7 @@ ____________________________________________________________
  (-7 events)
 + Producing causal compressions
 	 - splitting initial events (no change)
-	 - renaming agents to avoid conflicts after event removals (no change)
 	 - detecting siphons (no change)
-	 - renaming agents to avoid conflicts after event removals (no change)
 	 - cutting concurrent events (no change)
 	 - detecting pseudo inverse events (no change)
 	 - blackboard generation

@@ -21,10 +21,14 @@ ____________________________________________________________
  (-2 events)
 + Producing causal compressions
 	 - splitting initial events (no change)
-	 - renaming agents to avoid conflicts after event removals (no change)
 	 - detecting siphons (+197 events)
-	 - renaming agents to avoid conflicts after event removals (no change)
 	 - cutting concurrent events (-1439 events)
+	 - detecting pseudo inverse events (no change)
+	 - detecting siphons (+65 events)
+	 - cutting concurrent events (-67 events)
+	 - detecting pseudo inverse events (no change)
+	 - detecting siphons (+64 events)
+	 - cutting concurrent events (-64 events)
 	 - detecting pseudo inverse events (no change)
 	 - blackboard generation
 	 - computing causal past of each observed events (65)
@@ -33,10 +37,10 @@ ____________________________________________________________
 ############################################################
 
 Stats:
- number of step   : 322
- longest story    : 9
- average length   : 4.24242424242
- geometric mean   : 4.36237355465
+ number of step   : 320
+ longest story    : 8
+ average length   : 4.2
+ geometric mean   : 4.27335213404
 
 	 - causal flow compression (65)
 
@@ -45,7 +49,7 @@ ____________________________________________________________
 
 
 
-	 - weak flow compression (4)
+	 - weak flow compression (3)
 
 ____________________________________________________________
 ############################################################

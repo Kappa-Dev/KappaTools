@@ -44,7 +44,7 @@ let th_of_int n =
   | 3 -> (string_of_int n)^"rd"
   | _ -> (string_of_int n)^"th"
 
-let max_number_of_itterations = Some 1 
+let max_number_of_itterations = None
 
 let always = (fun _ -> true)
 let do_not_log parameter = (S.PH.B.PB.CI.Po.K.H.set_log_step parameter false)
@@ -54,6 +54,13 @@ let compress_and_print logger env log_info step_list =
   let parameter = S.PH.B.PB.CI.Po.K.H.build_parameter () in
   let parameter = S.PH.B.PB.CI.Po.K.H.set_log_step parameter log_step in
   let parameter = S.PH.B.PB.CI.Po.K.H.set_debugging_mode parameter debug_mode in 
+  let parameter =
+    match
+      max_number_of_itterations
+    with
+    | None -> S.PH.B.PB.CI.Po.K.H.do_not_bound_itterations parameter
+    | Some i -> S.PH.B.PB.CI.Po.K.H.set_itteration_bound parameter i
+  in 
   let parameter =
     if get_all_stories
     then S.PH.B.PB.CI.Po.K.H.set_all_stories_per_obs parameter 
@@ -225,7 +232,8 @@ let compress_and_print logger env log_info step_list =
               error,log_info,event_list				      
           in 
 	  let rec aux k (error,log_info,event_list) = 
-	    match max_number_of_itterations 
+	    match 
+	      S.PH.B.PB.CI.Po.K.H.get_bound_on_itteration_number parameter
 	    with 
 	      Some k' when k>=k' -> error,log_info,event_list 
 	    | Some _ | None -> 

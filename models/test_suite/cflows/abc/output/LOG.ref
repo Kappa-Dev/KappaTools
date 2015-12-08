@@ -51,10 +51,11 @@ Stats:
 ____________________________________________________________
 ############################################################
 
-	 - renaming agents to avoid conflicts after event removals (no change)
 	 - detecting siphons (+324 events)
-	 - renaming agents to avoid conflicts after event removals (no change)
 	 - cutting concurrent events (-11575 events)
+	 - detecting pseudo inverse events (no change)
+	 - detecting siphons (+43 events)
+	 - cutting concurrent events (-43 events)
 	 - detecting pseudo inverse events (no change)
 	 - blackboard generation
 	 - computing causal past of each observed events (626)
