@@ -35,6 +35,7 @@ val get_always_outdated : t -> Operator.DepSet.t
 val num_of_agent : string Location.annot -> t -> int
 val num_of_alg : string Location.annot -> t -> int
 val num_of_token : string Location.annot -> t -> int
+val nums_of_rule : string -> t -> int list
 
 val print_ast_rule : ?env:t -> Format.formatter -> int -> unit
 val print_rule : ?env:t -> Format.formatter -> int -> unit

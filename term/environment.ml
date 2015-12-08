@@ -41,8 +41,19 @@ let close_desc env =
 let num_of_agent nme env =
   Signature.num_of_agent nme env.signatures
 
+let fold_rules f x env =
+  Tools.array_fold_lefti
+    (fun i x rule -> f i x rule) x env.rules
+
 let get_rule env i = env.rules.(i)
 let nb_rules env = Array.length env.rules
+let nums_of_rule name env =
+  fold_rules
+    (fun i acc r ->
+      match env.ast_rules.(r.Primitives.syntactic_rule) with
+      | Some (x,_), _ -> if x = name then i::acc else acc
+      | None, _ -> acc)
+    [] env
 
 let nb_syntactic_rules env = Array.length env.ast_rules
 
@@ -98,9 +109,6 @@ let print_rule ?env f id =
 
 let map_observables f env =
   Array.map (fun (x,_) -> f x) env.observables
-let fold_rules f x env =
-  Tools.array_fold_lefti
-    (fun i x rule -> f i x rule) x env.rules
 
 let print pr_alg pr_rule pr_pert f env =
   let () =
