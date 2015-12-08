@@ -13,4 +13,7 @@ In grammar/ are the parser and the compilers
 {!modules: Edges}
 
 Finally, the simulation engine is in simulation/
-{!modules: Counter Expr_interpreter Rule_interpreter State_interpreter}
+The core of the interpreter
+{!modules: Expr_interpreter Rule_interpreter State_interpreter}
+and some storage and rendering
+{!modules: Counter Plot Outputs}

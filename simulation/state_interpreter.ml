@@ -297,7 +297,7 @@ let loop_cps form hook return env domain counter graph state =
 	  a_loop form env domain counter graph state in
 	let () =
 	  Plot.fill
-	    form counter env (observables_values env counter graph' state') in
+	    counter env (observables_values env counter graph' state') in
 	let () = if stop then
 		   ignore (perturbate env domain counter graph' state') in
 	out
@@ -334,7 +334,9 @@ let finalize form env counter graph state =
   let () = ExceptionDefn.flush_warning form in
   Rule_interpreter.generate_stories form env graph
 
-let go f = f ()
+let go form counter f =
+  let () = Counter.tick form counter in
+  f ()
 
 let loop form env domain counter graph state =
-  loop_cps form go finalize env domain counter graph state
+  loop_cps form (go form counter) finalize env domain counter graph state

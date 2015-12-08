@@ -75,13 +75,10 @@ let plot_now env time observables_values =
   | Ready (Svg s) ->
      s.Pp_svg.points <- (time,observables_values) :: s.Pp_svg.points
 
-let fill form counter env observables_values =
-  let counter' =
-    match !plotDescr with
-    | Wait _ -> counter
-    | Ready _ ->
-       let points, counter' =
-	 Counter.to_plot_points counter in
-       let () = List.iter (fun t -> plot_now env t observables_values) points in
-       counter' in
-  Counter.tick form counter'
+let fill counter env observables_values =
+  match !plotDescr with
+  | Wait _ -> ()
+  | Ready _ ->
+     let points, _counter =
+       Counter.to_plot_points counter in
+     List.iter (fun t -> plot_now env t observables_values) points
