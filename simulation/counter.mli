@@ -9,6 +9,8 @@ val tick : Format.formatter -> t -> unit
 val to_plot_points : t -> float list * t
 val complete_progress_bar : Format.formatter -> t -> unit
 
+val to_bootstrap_html : t -> string
+
 val one_constructive_event : t -> float -> bool
 val one_clashing_instance_event : t -> float -> bool
 val one_no_more_unary_event : t -> float -> bool

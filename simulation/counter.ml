@@ -136,6 +136,37 @@ let compute_dE points mx_e =
     | Some max_e ->
        Some (max (max_e / points) 1)
 
+let to_bootstrap_html counter =
+  let print_event_va f =
+    match counter.max_events with
+    | None -> Format.pp_print_int f counter.events
+    | Some va ->
+       let progress =
+	 100 * (counter.events - counter.init_event)
+	 / (va - counter.init_event) in
+       let () = Format.pp_print_string f "<div class=\"progress\">" in
+       let () =
+	 Format.fprintf
+	   f "<div class=\"progress-bar\" role=\"progressbar\" style=\"width: %i%%;\">"
+	   progress in
+       Format.fprintf f "%i</div></div>" counter.events in
+  let print_time_va f =
+    match counter.max_time with
+    | None -> Format.pp_print_float f counter.time
+    | Some va ->
+       let progress =
+	 100. *. (counter.time -. counter.init_time)
+	 /. (va -. counter.init_time) in
+       let () = Format.pp_print_string f "<div class=\"progress\">" in
+       let () =
+	 Format.fprintf
+	   f "<div class=\"progress-bar\" role=\"progressbar\" style=\"width: %i%%;\">"
+	   (int_of_float progress) in
+       Format.fprintf f "%f</div></div>" counter.time in
+  Format.asprintf
+    "<dl class=\"dl-horizontal\"><dt>Event</dt><dd>%t</dd><dt>Time</dt><dd>%t</dd><dt>Tracked event</dt><dd>%i</dd></dl>"
+    print_event_va print_time_va (succ counter.stories)
+
 let tick f counter =
   let () =
     if not counter.initialized then

@@ -289,7 +289,6 @@ let a_loop form env domain counter graph state =
        one_rule form dt stop env domain counter graph' state'
 
 let loop_cps form hook return env domain counter graph state =
-  let () = Counter.tick form counter in
   let rec iter graph state =
     let stop,graph',state' =
       try
