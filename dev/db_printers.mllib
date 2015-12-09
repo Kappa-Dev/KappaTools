@@ -21,6 +21,7 @@ Kappa_files
 Nbr
 Operator
 ExceptionDefn
+Counter
 
 Ast
 LKappa

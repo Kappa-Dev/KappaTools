@@ -5,7 +5,7 @@ install_printer Location.print
 install_printer Random_tree.debug_print
 install_printer Renaming.print_full
 install_printer Ast.print_ast_mix
-install_printer Ast.print_ast_alg
+install_printer Raw_printers.print_ast_alg
 install_printer Raw_printers.print_alg
 install_printer Raw_printers.print_bool
 install_printer Raw_printers.print_cc
@@ -23,4 +23,3 @@ install_printer Causal.debug_print_grid
 install_printer Raw_printers.print_injections
 install_printer Rule_interpreter.debug_print
 install_printer Raw_printers.print_refined_step
-install_printer Raw_printers.print_refined_step'

@@ -50,7 +50,7 @@ let nb_rules env = Array.length env.rules
 let nums_of_rule name env =
   fold_rules
     (fun i acc r ->
-      match env.ast_rules.(r.Primitives.syntactic_rule) with
+      match env.ast_rules.(pred r.Primitives.syntactic_rule) with
       | Some (x,_), _ -> if x = name then i::acc else acc
       | None, _ -> acc)
     [] env

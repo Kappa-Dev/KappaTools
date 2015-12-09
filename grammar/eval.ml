@@ -111,11 +111,13 @@ let cflows_of_label contact_map domain on algs rules (label,pos) rev_effects =
     if on then Primitives.CFLOW (Some label,x,tests) :: l
     else Primitives.CFLOWOFF x :: l in
   let mix =
-    try
-      let (_,(rule,_)) =
-	List.find (function None,_ -> false | Some (l,_),_ -> l=label) rules in
-      LKappa.to_maintained rule.LKappa.r_mix
-  with Not_found ->
+    match Array.fold_left
+	    (fun acc -> function
+		     | None,_ -> acc
+		     | Some (l,_),x -> if l=label then Some x else acc)
+	    None rules with
+    | Some (rule,_) -> LKappa.to_maintained rule.LKappa.r_mix
+    | None ->
     try let (_,(var,_)) = List.find (fun ((l,_),_) -> l = label) algs in
 	match var with
 	| Ast.KAPPA_INSTANCE mix -> mix
@@ -134,7 +136,7 @@ let cflows_of_label contact_map domain on algs rules (label,pos) rev_effects =
    List.fold_left (fun x (y,t) -> adds t x y) rev_effects ccs)
 
 let effects_of_modif
-      algs ast_algs ast_rules contact_map counter domain ast_list =
+      algs ast_algs (ast_rules,comp_rules) contact_map counter domain ast_list =
   let rec iter rev_effects domain ast_list =
     let rule_effect alg_expr (mix,created,rm,add) mix_pos =
       let ast_rule =
@@ -169,18 +171,28 @@ let effects_of_modif
 	    rule_effect
 	      alg_expr (LKappa.to_erased ast_mix,[],[],[]) mix_pos
 	 | UPDATE ((nme, pos_rule), alg_expr) ->
-	    let i,is_rule =
-	      match StringMap.find_option nme algs.NamedDecls.finder with
-	      | Some x -> (x, false)
-	      | None ->
-		 raise (ExceptionDefn.Malformed_Decl
-			  ("Variable " ^ (nme ^ " is neither a constant nor a rule")
-			  ,pos_rule)) in
 	    let (domain', alg_pos) =
 	      Expr.compile_alg contact_map counter domain alg_expr in
-	    (domain',
-	     (Primitives.UPDATE ((if is_rule then Operator.RULE i
-	      else Operator.ALG i), alg_pos))::rev_effects)
+	    let rev_effects' =
+	      match StringMap.find_option nme algs.NamedDecls.finder with
+	      | Some i ->
+		 Primitives.UPDATE (Operator.ALG i, alg_pos)::rev_effects
+	      | None ->
+		 Tools.array_fold_lefti
+		   (fun i acc r ->
+		    match ast_rules.(pred r.Primitives.syntactic_rule) with
+		    | Some (x,_), _ ->
+		       if x = nme
+		       then Primitives.UPDATE (Operator.RULE i, alg_pos)::acc
+		       else acc
+		    | None, _ -> acc)
+		   rev_effects comp_rules in
+	    let () =
+	      if rev_effects == rev_effects' then
+		raise (ExceptionDefn.Malformed_Decl
+			 ("Variable " ^ (nme ^ " is neither a constant nor a rule")
+			 ,pos_rule)) in
+	    (domain',rev_effects')
 	 | UPDATE_TOK ((tk_id,tk_pos),alg_expr) ->
 	    rule_effect (Location.dummy_annot (Ast.CONST (Nbr.one)))
 			([],[],
@@ -544,18 +556,19 @@ let initialize logger overwrite counter result =
   let (domain',alg_deps',compiled_rules,cc_unaries) =
     compile_rules alg_deps contact_map counter domain' result'.Ast.rules in
   let rule_nd = Array.of_list compiled_rules in
+  let ast_rules = Array.of_list result'.rules in
 
   Debug.tag logger "\t -observables";
   let domain,obs =
     obs_of_result contact_map counter domain' result' in
   Debug.tag logger "\t -perturbations" ;
   let (domain,pert,stops,tracking_enabled) =
-    pert_of_result alg_nd alg_deps' result'.variables result'.rules
+    pert_of_result alg_nd alg_deps' result'.variables (ast_rules,rule_nd)
 		   contact_map counter domain result' in
 
   let env =
     Environment.init sigs_nd tk_nd alg_nd alg_deps'
-		     (Array.of_list result'.rules,rule_nd,cc_unaries)
+		     (ast_rules,rule_nd,cc_unaries)
 		     (Array.of_list (List.rev obs)) (Array.of_list pert) in
 
   Debug.tag logger "\t -initial conditions";
