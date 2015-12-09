@@ -131,7 +131,7 @@ let diff_list_decreasing =  diff_list (swap compare_bool)
 let merge_list_decreasing = merge_list (swap compare_bool)
 let merge_list_increasing = merge_list compare_bool
 				       
-let closure_old err_fmt config prec is_obs init_to_eidmax weak_events init =
+let closure_old err_fmt config prec is_obs init_to_eidmax =
   let max_index = M.fold (fun i _ -> max i) prec 0 in
   let is_init x =
     match M.find_option x prec with
@@ -254,9 +254,9 @@ let closure_old err_fmt config prec is_obs init_to_eidmax weak_events init =
 	    A.set s_pred_star  i ([],0)) 
 	s_pred_star
   in 
-  s_pred_star
+  A.map fst s_pred_star
 
-let closure_obs err_fmt config prec is_obs init_to_eidmax weak_events init =
+let closure_obs err_fmt config prec is_obs init_to_eidmax =
   let max_index = M.fold (fun i _ -> max i) prec 0 in
   let prec =
     M.fold (fun i s_pred l -> (i,s_pred)::l) prec []
@@ -272,7 +272,7 @@ let closure_obs err_fmt config prec is_obs init_to_eidmax weak_events init =
       (fun x -> x),(false,0,0),(fun () -> ())
   in
   let tainting = A.make (max_index+1) [] in
-  let s_pred_star = A.make (max_index+1) ([],0) in 
+  let s_pred_star = A.make (max_index+1) [] in 
   let _,lobs =
     List.fold_left
       (fun (tick,lobs) (i,s_pred) ->
@@ -284,49 +284,55 @@ let closure_obs err_fmt config prec is_obs init_to_eidmax weak_events init =
 	   let taints = A.get tainting i in
 	   let () = 
 	     List.iter
-	       (fun taints ->
-		let (old,m) = A.get s_pred_star taints in 
-		A.set s_pred_star taints ((i::old),m))
+	       (fun taints -> A.set s_pred_star taints ((i::(A.get s_pred_star taints))))
 	       taints
 	   in
 	   taints,lobs
        in
        let taint x = A.set tainting x (merge_list_increasing taints  (A.get tainting x)) in 
        let () = S.iter taint s_pred in
-       (*    let () = List.iter taint (init i) in  (* this is ugly and costly, when will we handle with initial states in causal.ml *)*)
        let () = A.set tainting i [] in      
        do_tick tick,lobs)
       (tick,[]) prec 
   in
   let () = close_tick () in
-  let () = List.iter (fun i ->
-		      let old,m = A.get s_pred_star i in 
-		      A.set s_pred_star i (List.rev old,m)) lobs in 
+  let t = Sys.time () in 
+  let () =
+    List.iter
+      (fun i ->
+       let old = A.get s_pred_star i in 
+       A.set s_pred_star i (List.rev old)) lobs
+  in
+  let _ = Printf.fprintf stderr "GACHIS %f \n" (Sys.time () -. t) in 
   s_pred_star
 
-let closure_check err_fmt config prec is_obs init_to_eidmax weak_events init =
-      let a = closure_obs err_fmt config prec is_obs init_to_eidmax weak_events init in
-      let b = closure_old err_fmt {config with do_tick = false} prec is_obs init_to_eidmax weak_events init in
-      let _ =
-	A.iteri
-	  (fun i (s,_) ->
-	   if is_obs i
-	   then 
-	     let (s',_) = A.get b i in
-	     if s = s' then ()
-	     else
-	       let _ = Printf.fprintf stderr "DIFFER %i\n" i in
-	       let _ = List.iter (Printf.fprintf stderr "%i, ") s in
-	       let _ = Printf.fprintf stderr "\n" in 
-	       let _ = List.iter (Printf.fprintf stderr "%i, ") s' in 
-	       let _ = Printf.fprintf stderr "\n" in 
-	       ())
-	a
-      in a
+let closure_check err_fmt config prec is_obs init_to_eidmax =
+  let t = Sys.time () in 
+  let a = closure_obs err_fmt config prec is_obs init_to_eidmax in
+  let t' = Sys.time () in
+  let b = closure_old err_fmt {config with do_tick = false} prec is_obs init_to_eidmax in
+  let t'' = Sys.time () in
+  let _ = Printf.fprintf stderr "NEW: %f OLD: %f \n" (t'-.t) (t''-.t') in 
+  let _ =
+    A.iteri
+      (fun i s ->
+       if is_obs i
+       then 
+	 let s' = A.get b i in
+	 if s = s' then ()
+	 else
+	   let _ = Printf.fprintf stderr "DIFFER %i\n" i in
+	   let _ = List.iter (Printf.fprintf stderr "%i, ") s in
+	   let _ = Printf.fprintf stderr "\n" in 
+	   let _ = List.iter (Printf.fprintf stderr "%i, ") s' in 
+	   let _ = Printf.fprintf stderr "\n" in 
+	   ())
+      a
+  in a
     
-let closure err_fmt config prec is_obs init_to_eidmax weak_events init =
-  if config.use_new_algo then closure_check err_fmt config prec is_obs init_to_eidmax weak_events init
-  else closure_old err_fmt config prec is_obs init_to_eidmax weak_events init
+let closure err_fmt config prec is_obs init_to_eidmax =
+  if config.use_new_algo then closure_check err_fmt config prec is_obs init_to_eidmax 
+  else closure_old err_fmt config prec is_obs init_to_eidmax
 
 
 let closure = closure_old

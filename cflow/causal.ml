@@ -393,13 +393,8 @@ let config_of_grid = cut
       IntMap.add eid set prec_star
     ) config.events IntMap.empty *)
 
-let prec_star_of_config err_fmt config_closure prec to_keep init_to_eidmax
-			weak_events init =
-  let a =
-    Graph_closure.closure err_fmt config_closure prec to_keep
-			  init_to_eidmax weak_events init in
-  Graph_closure.A.map fst a
-
+let prec_star_of_config = Graph_closure.closure
+			   
 let depth_and_size_of_event config =
   IntMap.fold
     (fun eid prec_eids (emap,_) ->
@@ -419,17 +414,12 @@ let enrich_grid err_fmt config_closure grid =
   let to_keep i = IntSet.mem i keep_l in
   let ids = ids_of_grid grid  in
   let config = config_of_grid ids grid in
-  let init_fun i =
-    try
-      List.rev (Mods.IntSet.elements (Mods.IntSet.remove
-					i (Hashtbl.find grid.init_tbl i)))
-    with _ -> [] in
   let init_to_eid_max i =
     try Hashtbl.find grid.init_to_eidmax i
     with Not_found -> 0 in
   let prec_star = prec_star_of_config
 		    err_fmt config_closure config.prec_1 to_keep
-		    init_to_eid_max (fun _ -> true)  init_fun in
+		    init_to_eid_max in
   let depth_of_event,depth = depth_and_size_of_event config in
   {
     config = config ;
