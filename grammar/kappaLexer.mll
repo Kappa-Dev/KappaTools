@@ -22,6 +22,8 @@
  let () = Hashtbl.add keywords "INF" INFINITY in
  fun x ->
  try Hashtbl.find keywords x with Not_found -> ID x
+
+let space_chars = [' ';'\n';'\t']
 }
 
 let eol = '\r'? '\n'
@@ -64,7 +66,7 @@ rule token = parse
 			       Location.of_pos (Lexing.lexeme_start_p lexbuf)
 				(Lexing.lexeme_end_p lexbuf)))
 		     }
-	 | '[' {let lab = read_label [] [']'] lexbuf in
+	 | '[' {let lab = read_label [] (']'::space_chars) lexbuf in
 		match lab with
 		| "E" -> EVENT
 		| "E-" -> NULL_EVENT
@@ -119,7 +121,7 @@ rule token = parse
 	 | '<' {SMALLER}
 	 | '>' {GREATER}
 	 | '=' {EQUAL}
-	 | '%' {let lab = read_label [] [':'] lexbuf in
+	 | '%' {let lab = read_label [] (':'::space_chars) lexbuf in
 		let pos = position lexbuf in
 		match lab with
 		| "agent" -> (SIGNATURE pos)
