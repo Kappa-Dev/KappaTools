@@ -144,12 +144,19 @@ let add i w t =
   in
   () (*t.total <- (max 0.0 total) (*not satisfactory*)*)
 
+let total t =
+  if IntSet.is_empty t.inf_list then
+    let t = update_structure t in
+    if t.size = 0 then 0. else t.weight_of_subtrees.(1)
+  else
+    infinity
+
 let random t =
   match IntSet.choose t.inf_list with
   | Some x -> (unmask t x,infinity)
   | None ->
     let t = update_structure t in
-    let a = t.weight_of_subtrees.(1) in
+    let a = total t in
     if a = 0.0
     then raise Not_found
     else
@@ -170,13 +177,6 @@ let random t =
       in
       let rep,w = find 1 r in
       (unmask t rep,w)
-
-let total t =
-  if IntSet.is_empty t.inf_list then
-    let t = update_structure t in
-    t.weight_of_subtrees.(1)
-  else
-    infinity
 
 (* TODO
   weight_of_subtrees: float array ;
