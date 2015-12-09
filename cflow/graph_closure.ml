@@ -244,6 +244,16 @@ let closure_old err_fmt config prec is_obs init_to_eidmax weak_events init =
       prec tick 
   in 
   let _ = close_tick () in 
+  let () = 
+    if config.enable_gc 
+    then 
+      A.iteri 
+	(fun i _ -> 
+	  if not (is_obs i) 
+	  then 
+	    A.set s_pred_star  i ([],0)) 
+	s_pred_star
+  in 
   s_pred_star
 
 let closure_obs err_fmt config prec is_obs init_to_eidmax weak_events init =
@@ -296,7 +306,7 @@ let closure_obs err_fmt config prec is_obs init_to_eidmax weak_events init =
 
 let closure_check err_fmt config prec is_obs init_to_eidmax weak_events init =
       let a = closure_obs err_fmt config prec is_obs init_to_eidmax weak_events init in
-      let b = closure_old err_fmt config prec is_obs init_to_eidmax weak_events init in
+      let b = closure_old err_fmt {config with do_tick = false} prec is_obs init_to_eidmax weak_events init in
       let _ =
 	A.iteri
 	  (fun i (s,_) ->
