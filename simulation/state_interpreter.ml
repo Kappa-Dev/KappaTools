@@ -76,18 +76,12 @@ let do_it env domain counter graph state modification =
 		(Environment.connected_components_of_unary_rules env)
 		counter g (Causal.PERT "pert") r))
 	graph n,state)
-  | Primitives.UPDATE (va,(expr,_)) ->
-     begin
-       match va with
-       | Operator.ALG i ->
-	  let () =
-	    state.variables_overwrite.(i) <-
-	      Some (Alg_expr.CONST (Rule_interpreter.value_alg
-				      counter graph ~get_alg expr)) in
-	  (false, Rule_interpreter.extra_outdated_var i graph, state)
-       | (Operator.RULE _ | Operator.PERT _) ->
-	  failwith "Problematic update perturbation"
-     end
+  | Primitives.UPDATE (i,(expr,_)) ->
+     let () =
+       state.variables_overwrite.(i) <-
+	 Some (Alg_expr.CONST (Rule_interpreter.value_alg
+				 counter graph ~get_alg expr)) in
+     (false, Rule_interpreter.extra_outdated_var i graph, state)
   | Primitives.STOP pexpr ->
      let file = Format.asprintf "@[<h>%a@]" print_expr_val pexpr in
      let () = snapshot env counter file graph in

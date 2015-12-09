@@ -33,7 +33,7 @@ type elementary_rule = {
 
 type modification =
     ITER_RULE of Alg_expr.t Location.annot * elementary_rule
-  | UPDATE of Operator.rev_dep * Alg_expr.t Location.annot
+  | UPDATE of int * Alg_expr.t Location.annot
   | SNAPSHOT of Alg_expr.t Ast.print_expr Location.annot list
   | STOP of Alg_expr.t Ast.print_expr Location.annot list
   | CFLOW of string option * Connected_component.t array *

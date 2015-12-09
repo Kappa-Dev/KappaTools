@@ -104,17 +104,9 @@ let modification ?env f m =
      else
        Format.fprintf f "$APPLY %a %a" (alg_expr ?env) n
 		      (elementary_rule ?env) rule (* TODO Later *)
-  | Primitives.UPDATE (d_id,(va,_)) ->
-     begin
-       match d_id with
-       | Operator.ALG id ->
-	  Format.fprintf f "$UPDATE %a %a"
-			 (Environment.print_alg ?env) id
-       | Operator.RULE _ ->
-	  Format.fprintf f "$UPDATE '%a' %a" Operator.print_rev_dep d_id
-       | Operator.PERT _ ->
-	  Format.fprintf f "$UPDATE '%a' %a" Operator.print_rev_dep d_id
-     end (alg_expr ?env) va
+  | Primitives.UPDATE (id,(va,_)) ->
+     Format.fprintf f "$UPDATE %a %a"
+		    (Environment.print_alg ?env) id (alg_expr ?env) va
   | Primitives.SNAPSHOT fn ->
      Format.fprintf f "SNAPSHOT %a" (print_expr ?env) fn
   | Primitives.STOP fn ->
