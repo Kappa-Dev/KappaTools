@@ -28,14 +28,14 @@ let alg_expr ?env f alg =
 
 let print_expr ?env f e =
   let aux f = function
-    | Ast.Str_pexpr str,_ -> Format.fprintf f "\"%s\"" str
-    | Ast.Alg_pexpr alg,_ -> alg_expr ?env f alg
+    | Ast.Str_pexpr (str,_) -> Format.fprintf f "\"%s\"" str
+    | Ast.Alg_pexpr (alg,_) -> alg_expr ?env f alg
   in Pp.list (fun f -> Format.fprintf f ".") aux f e
 
 let print_expr_val alg_val f e =
   let aux f = function
-    | Ast.Str_pexpr str,_ -> Format.pp_print_string f str
-    | Ast.Alg_pexpr alg,_ ->
+    | Ast.Str_pexpr (str,_) -> Format.pp_print_string f str
+    | Ast.Alg_pexpr (alg,_) ->
        Nbr.print f (alg_val alg)
   in Pp.list (fun f -> Format.pp_print_cut f ()) aux f e
 

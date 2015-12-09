@@ -98,13 +98,13 @@ let obs_of_result contact_map counter domain res =
 
 let compile_print_expr contact_map counter domain ex =
   List.fold_right
-    (fun (el,pos) (domain,out) ->
+    (fun el (domain,out) ->
      match el with
-     | Ast.Str_pexpr s -> (domain,(Ast.Str_pexpr s,pos)::out)
+     | Ast.Str_pexpr s -> (domain,Ast.Str_pexpr s::out)
      | Ast.Alg_pexpr ast_alg ->
-	let (domain', (alg,_pos)) =
-	  Expr.compile_alg contact_map counter domain (ast_alg,pos) in
-	(domain',(Ast.Alg_pexpr alg,pos)::out))
+	let (domain', alg) =
+	  Expr.compile_alg contact_map counter domain ast_alg in
+	(domain',(Ast.Alg_pexpr alg::out)))
     ex (domain,[])
 
 let cflows_of_label contact_map domain on algs rules (label,pos) rev_effects =
@@ -187,12 +187,12 @@ let effects_of_modif
 			 [Location.dummy_annot (Ast.TOKEN_ID tk_id), tk_id],
 			 [(alg_expr, tk_id)])
 			tk_pos
-	 | SNAPSHOT (pexpr,_) ->
+	 | SNAPSHOT pexpr ->
 	    let (domain',pexpr') =
 	      compile_print_expr contact_map counter domain pexpr in
 	    (*when specializing snapshots to particular mixtures, add variables below*)
 	    (domain', (Primitives.SNAPSHOT pexpr')::rev_effects)
-	 | STOP (pexpr,_) ->
+	 | STOP pexpr ->
 	    let (domain',pexpr') =
 	      compile_print_expr contact_map counter domain pexpr in
 	    (domain', (Primitives.STOP pexpr')::rev_effects)
@@ -208,15 +208,15 @@ let effects_of_modif
 		contact_map domain ~origin:(Operator.PERT(-1)) ast in
 	    (domain',
 	     List.fold_left (fun x (y,t) -> adds t x y) rev_effects ccs)
-	 | FLUX (pexpr,_) ->
+	 | FLUX pexpr ->
 	    let (domain',pexpr') =
 	      compile_print_expr contact_map counter domain pexpr in
 	    (domain', (Primitives.FLUX pexpr')::rev_effects)
-	 | FLUXOFF (pexpr,_) ->
+	 | FLUXOFF pexpr ->
 	    let (domain',pexpr') =
 	      compile_print_expr contact_map counter domain pexpr in
 	    (domain', (Primitives.FLUXOFF pexpr')::rev_effects)
-	 | PRINT (pexpr,print,_) ->
+	 | PRINT (pexpr,print) ->
 	    let (domain',pexpr') =
 	      compile_print_expr contact_map counter domain pexpr in
 	    let (domain'',print') =
@@ -383,7 +383,7 @@ let init_graph_of_result algs has_tracking contact_map counter env domain res =
 let configurations_of_result result =
   let raw_set_value pos_p param value_list f =
     match value_list with
-    | (v,_) :: _ -> f v pos_p
+    | (v,pos) :: _ -> f v pos
     | [] -> ExceptionDefn.warning
 	      ~pos:pos_p
 	      (fun f -> Format.fprintf f "Empty value for parameter %s" param)
@@ -413,9 +413,9 @@ let configurations_of_result result =
 	    | ("weak",_)::tl -> (Parameter.weakCompression := true ; parse tl)
 	    | ("none",_)::tl -> (Parameter.mazCompression := true ; parse tl)
 	    | [] -> ()
-	    | (error,_)::_ ->
+	    | (error,pos)::_ ->
 	       raise (ExceptionDefn.Malformed_Decl
-			("Unkown value "^error^" for compression mode", pos_p))
+			("Unkown value "^error^" for compression mode", pos))
 	  in
 	  parse value_list
 	end

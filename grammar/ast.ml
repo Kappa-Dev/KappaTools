@@ -1,7 +1,5 @@
 open Operator
 
-type str_pos = string * Tools.pos
-
 type ('a,'annot) link =
   | LNK_VALUE of int * 'annot
   | FREE
@@ -64,8 +62,8 @@ type rule = {
 let flip_label str = str^"_op"
 
 type 'alg_expr print_expr =
-    Str_pexpr of string
-  | Alg_pexpr of 'alg_expr
+    Str_pexpr of string Location.annot
+  | Alg_pexpr of 'alg_expr Location.annot
 
 type ('mixture,'id) modif_expr =
   | INTRO of
@@ -78,28 +76,24 @@ type ('mixture,'id) modif_expr =
   | UPDATE_TOK of
       ('id Location.annot *
 	 ('mixture,'id) ast_alg_expr Location.annot) (*TODO: pause*)
-  | STOP of
-      (('mixture,'id) ast_alg_expr print_expr Location.annot list * Tools.pos)
-  | SNAPSHOT of
-      (('mixture,'id) ast_alg_expr print_expr Location.annot list * Tools.pos)
+  | STOP of ('mixture,'id) ast_alg_expr print_expr list
+  | SNAPSHOT of ('mixture,'id) ast_alg_expr print_expr list
   (*maybe later of mixture too*)
   | PRINT of
-      ((('mixture,'id) ast_alg_expr print_expr Location.annot list) *
-	 (('mixture,'id)  ast_alg_expr print_expr Location.annot list) * Tools.pos)
+      ((('mixture,'id) ast_alg_expr print_expr list) *
+	 (('mixture,'id)  ast_alg_expr print_expr list))
   | PLOTENTRY
   | CFLOWLABEL of (bool * string Location.annot)
   | CFLOWMIX of (bool * 'mixture Location.annot)
-  | FLUX of
-      ('mixture,'id) ast_alg_expr print_expr Location.annot list * Tools.pos
-  | FLUXOFF of
-      ('mixture,'id) ast_alg_expr print_expr Location.annot list * Tools.pos
+  | FLUX of ('mixture,'id) ast_alg_expr print_expr list
+  | FLUXOFF of ('mixture,'id) ast_alg_expr print_expr list
 
 type ('mixture,'id) perturbation =
   (('mixture,'id) ast_alg_expr bool_expr Location.annot *
      (('mixture,'id) modif_expr list) *
        ('mixture,'id) ast_alg_expr bool_expr Location.annot option) Location.annot
 
-type configuration = string Location.annot * (str_pos list)
+type configuration = string Location.annot * (string Location.annot list)
 
 type ('mixture,'id) variable_def =
     string Location.annot * ('mixture,'id) ast_alg_expr Location.annot
@@ -113,7 +107,7 @@ type ('mixture,'id) init_t =
 type ('mixture,'id) instruction =
   | SIG      of agent
   | TOKENSIG of string Location.annot
-  | VOLSIG   of str_pos * float * str_pos (* type, volume, parameter*)
+  | VOLSIG   of string * float * string (* type, volume, parameter*)
   | INIT     of string Location.annot option * ('mixture,'id) init_t
   (*volume, init, position *)
   | DECLARE  of ('mixture,'id) variable_def
@@ -145,7 +139,7 @@ type ('agent,'mixture,'id,'rule) compil =
       tokens :
 	string Location.annot list;
       volumes :
-	(str_pos * float * str_pos) list
+	(string * float * string) list
     }
 
 let no_more_site_on_right warning left right =

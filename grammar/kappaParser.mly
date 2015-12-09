@@ -5,21 +5,18 @@
   Location.of_pos (Parsing.rhs_start_pos i) (Parsing.rhs_end_pos i)
 %}
 
-%token EOF NEWLINE SEMICOLON COMMA DOT OP_PAR CL_PAR OP_CUR CL_CUR
-%token AT TYPE LAR CPUTIME EMAX TMAX PLOTNUM PLOTENTRY DELETE INTRO TRACK
-%token DO SET REPEAT UNTIL LOG PLUS MULT MINUS MAX MIN DIV SINUS COSINUS TAN
-%token POW ABS MODULO SQRT EXPONENT INFINITY TIME EVENT NULL_EVENT
-%token EQUAL AND OR GREATER SMALLER TRUE FALSE DIFF KAPPA_RAR KAPPA_LRAR
-%token SIGNATURE INIT LET PLOT PERT OBS TOKEN CONFIG
-%token <Tools.pos> KAPPA_WLD KAPPA_SEMI
-%token <Tools.pos> FLUX ASSIGN ASSIGN2 KAPPA_LNK PIPE
-%token <Tools.pos> PRINT PRINTF
+%token EOF NEWLINE SEMICOLON COMMA DOT OP_PAR CL_PAR OP_CUR CL_CUR AT TYPE LAR
+%token CPUTIME EMAX TMAX PLOTNUM PLOTENTRY DELETE INTRO TRACK DO SET REPEAT
+%token UNTIL LOG PLUS MULT MINUS MAX MIN DIV SINUS COSINUS TAN POW ABS MODULO
+%token SQRT EXPONENT INFINITY TIME EVENT NULL_EVENT PIPE EQUAL AND OR
+%token GREATER SMALLER TRUE FALSE DIFF KAPPA_RAR KAPPA_LRAR KAPPA_LNK
+%token SIGNATURE INIT LET PLOT PERT OBS TOKEN CONFIG KAPPA_WLD KAPPA_SEMI
+%token FLUX ASSIGN ASSIGN2 PRINT PRINTF STOP SNAPSHOT
 %token <int> INT
 %token <string> ID
 %token <string> KAPPA_MRK LABEL
 %token <float> FLOAT
-%token <string*Tools.pos> STRING
-%token <Tools.pos> STOP SNAPSHOT
+%token <string> STRING
 
 %left MINUS PLUS
 %left MULT DIV
@@ -131,7 +128,7 @@ instruction:
 			    f "Perturbation need not be applied repeatedly") in
 	    Ast.PERT (add_pos (bool_expr,mod_expr_list,Some $5))}
     | CONFIG STRING value_list
-	     {Ast.CONFIG ((fst $2,rhs_pos 2),$3)}
+	     {Ast.CONFIG (($2,rhs_pos 2),$3)}
     | PERT bool_expr DO effect_list UNTIL bool_expr
       /* backward compatibility */
 	   {ExceptionDefn.deprecated
@@ -152,8 +149,8 @@ init_declaration:
     ;
 
 value_list:
-    | STRING {[$1]}
-    | STRING value_list {$1::$2}
+    | STRING {[$1, rhs_pos 1]}
+    | STRING value_list {($1,rhs_pos 1)::$2}
     ;
 
 perturbation_declaration:
@@ -194,7 +191,7 @@ effect:
     | TRACK non_empty_mixture boolean
 	    {Ast.CFLOWMIX ($3,($2,rhs_pos 2))}
     | FLUX print_expr boolean
-	   {if $3 then Ast.FLUX ($2,$1) else Ast.FLUXOFF ($2,$1)}
+	   {if $3 then Ast.FLUX $2 else Ast.FLUXOFF $2}
     | INTRO multiple_mixture
 	    {let (alg,mix) = $2 in Ast.INTRO (alg,mix)}
     | INTRO error
@@ -207,19 +204,19 @@ effect:
 		  (add_pos "Malformed perturbation instruction, I was expecting '$DEL alg_expression kappa_expression'"))}
     | ID LAR alg_expr /*updating the value of a token*/
 						{Ast.UPDATE_TOK (($1,rhs_pos 1),$3)}
-    | SNAPSHOT print_expr {Ast.SNAPSHOT ($2,$1)}
-    | STOP print_expr {Ast.STOP ($2,$1)}
-    | PRINT SMALLER print_expr GREATER {(Ast.PRINT ([],$3,$1))}
-    | PRINTF print_expr SMALLER print_expr GREATER { Ast.PRINT ($2,$4,$1) }
+    | SNAPSHOT print_expr {Ast.SNAPSHOT $2}
+    | STOP print_expr {Ast.STOP $2}
+    | PRINT SMALLER print_expr GREATER {(Ast.PRINT ([],$3))}
+    | PRINTF print_expr SMALLER print_expr GREATER { Ast.PRINT ($2,$4) }
     | PLOTENTRY { Ast.PLOTENTRY }
     ;
 
 print_expr:
   /*empty*/ {[]}
-    | STRING {[add_pos (Ast.Str_pexpr (fst $1))]}
-    | alg_expr {[add_pos (Ast.Alg_pexpr (fst $1))]}
-    | STRING DOT print_expr {(add_pos (Ast.Str_pexpr (fst $1)))::$3}
-    | alg_expr DOT print_expr {(add_pos (Ast.Alg_pexpr (fst $1)))::$3}
+    | STRING {[Ast.Str_pexpr (add_pos $1)]}
+    | alg_expr {[Ast.Alg_pexpr $1]}
+    | STRING DOT print_expr {Ast.Str_pexpr ($1, rhs_pos 1)::$3}
+    | alg_expr DOT print_expr {Ast.Alg_pexpr $1::$3}
     ;
 
 boolean:

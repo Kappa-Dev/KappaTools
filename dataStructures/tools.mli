@@ -1,10 +1,3 @@
-(** {5 Old fashion positions } *)
-type pos = string * int * int
-val no_pos : pos
-val fn : pos -> string
-val ln : pos -> int
-val cn : pos -> int
-
 (** {5 Combinators on primitive types *)
 val option_map : ('a -> 'b) -> 'a option -> 'b option
 val iteri : (int -> unit) -> int -> unit

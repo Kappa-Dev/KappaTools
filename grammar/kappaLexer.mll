@@ -45,19 +45,18 @@ rule token = parse
 	 | "<->" {KAPPA_LRAR}
 	 | "->" {KAPPA_RAR}
 	 | "<-" {LAR}
-	 | ":=" {let pos = position lexbuf in ASSIGN pos}
+	 | ":=" {ASSIGN}
 	 | "<>" {DIFF}
-	 | pert as s {let pos = position lexbuf in
-		      match s with
+	 | pert as s {match s with
 		      | "$DEL" -> DELETE
 		      | "$ADD" -> INTRO
-		      | "$SNAPSHOT" -> (SNAPSHOT pos)
-		      | "$STOP" -> (STOP pos)
-		      | "$FLUX" -> (FLUX pos)
+		      | "$SNAPSHOT" -> SNAPSHOT
+		      | "$STOP" -> STOP
+		      | "$FLUX" -> FLUX
 		      | "$TRACK" -> TRACK
-		      | "$UPDATE" -> (ASSIGN2 pos)
-		      | "$PRINT" -> (PRINT pos)
-		      | "$PRINTF" -> (PRINTF pos)
+		      | "$UPDATE" -> ASSIGN2
+		      | "$PRINT" -> PRINT
+		      | "$PRINTF" -> PRINTF
 		      | "$PLOTENTRY" -> PLOTENTRY
 		      | s ->
 			 raise
@@ -97,7 +96,7 @@ rule token = parse
 	 | ':' {TYPE}
 	 | ';' {SEMICOLON}
 	 | '\"' {let str = read_label [] ['\"'] lexbuf in
-		 let pos = position lexbuf in STRING (str,pos)}
+		 STRING str}
 	 | eol {Lexing.new_line lexbuf ; NEWLINE}
 	 | '#' {comment lexbuf}
 	 | '/' '*' {inline_comment lexbuf; token lexbuf}
@@ -111,7 +110,7 @@ rule token = parse
 	 | ')' {CL_PAR}
 	 | '{' {OP_CUR}
 	 | '}' {CL_CUR}
-	 | '|' {let pos = position lexbuf in PIPE pos}
+	 | '|' {PIPE}
 	 | '.' {DOT}
 	 | '+' {PLUS}
 	 | '*' {MULT}
@@ -137,13 +136,13 @@ rule token = parse
 					(Lexing.lexeme_start_p lexbuf)
 					 (Lexing.lexeme_end_p lexbuf)))
 	       }
-	 | '!' {let pos = position lexbuf in KAPPA_LNK pos}
+	 | '!' {KAPPA_LNK}
 	 | internal_state as s {let i = String.index s '~' in
 				let r = String.sub s (i+1) (String.length s-i-1) in
 				KAPPA_MRK r
 			       }
-	 | '?' {let pos = position lexbuf in (KAPPA_WLD pos)}
-	 | '_' {let pos = position lexbuf in (KAPPA_SEMI pos)}
+	 | '?' {KAPPA_WLD}
+	 | '_' {KAPPA_SEMI}
 	 | blank  {token lexbuf}
 	 | eof {reach_eof lexbuf; EOF}
 	 | _ as c {

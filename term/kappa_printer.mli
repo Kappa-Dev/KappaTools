@@ -3,8 +3,7 @@
 val alg_expr : ?env:Environment.t -> Format.formatter -> Alg_expr.t -> unit
 
 val print_expr_val :
-  ('a -> Nbr.t) -> Format.formatter ->
-  'a Ast.print_expr Location.annot list -> unit
+  ('a -> Nbr.t) -> Format.formatter -> 'a Ast.print_expr list -> unit
 
 val elementary_rule :
   ?env:Environment.t -> Format.formatter -> Primitives.elementary_rule -> unit

@@ -338,16 +338,14 @@ let rec print_expr_map  f error alg =
     alg 
   with 
   | Ast.Str_pexpr(s) -> error,Ast.Str_pexpr(s) 
-  | Ast.Alg_pexpr (alg) -> 
+  | Ast.Alg_pexpr (alg,pos) -> 
     let error,alg' = alg_map f error alg in 
-    error,Ast.Alg_pexpr (alg') 
+    error,Ast.Alg_pexpr (alg',pos) 
 
 let map_with_pos map = 
   (fun f error (x,pos) -> 
     let error,x' = map f error x in 
     error,(x',pos) )
-
-let print_expr_with_pos_map  = map_with_pos print_expr_map 
 
 let alg_with_pos_map = map_with_pos alg_map 
 
@@ -400,63 +398,63 @@ let rec modif_map f_forbidding_question_marks f_allowing_question_marks error al
    | Ast.UPDATE_TOK (pos,alg) -> 
     let error,alg' = (map_with_pos alg_map) f_allowing_question_marks error alg in 
     error,Ast.UPDATE_TOK (pos,alg')
-   | Ast.STOP (list,pos) -> 
+   | Ast.STOP list -> 
      let error,list' = 
        List.fold_left 
 	 (fun (error,list) elt -> 
-	   let error,elt' = (map_with_pos print_expr_map) f_allowing_question_marks error elt in 
+	   let error,elt' = print_expr_map f_allowing_question_marks error elt in
 	   error,elt'::list)
 	 (error,[]) (List.rev list)
      in 
-     error,Ast.STOP (list',pos)
-   | Ast.SNAPSHOT (list,pos) ->
+     error,Ast.STOP list'
+   | Ast.SNAPSHOT list ->
         let error,list' = 
 	  List.fold_left 
 	    (fun (error,list) elt -> 
-	      let error,elt' = (map_with_pos print_expr_map)  f_allowing_question_marks error elt in 
+	      let error,elt' = print_expr_map f_allowing_question_marks error elt in
 	   error,elt'::list)
 	 (error,[]) (List.rev list)
      in 
-	error,Ast.SNAPSHOT (list',pos)
-   | Ast.PRINT (list1,list2,pos) ->
+	error,Ast.SNAPSHOT list'
+   | Ast.PRINT (list1,list2) ->
      let error,list1' = 
        List.fold_left 
 	 (fun (error,list) elt -> 
-	   let error,elt' = (map_with_pos print_expr_map) f_allowing_question_marks error elt in 
+	   let error,elt' = print_expr_map f_allowing_question_marks error elt in
 	   error,elt'::list)
 	 (error,[]) (List.rev list1)
      in 
      let error,list2' = 
        List.fold_left 
 	 (fun (error,list) elt -> 
-	   let error,elt' = (map_with_pos print_expr_map) f_allowing_question_marks error elt in 
+	   let error,elt' = print_expr_map f_allowing_question_marks error elt in
 	   error,elt'::list)
 	 (error,[]) (List.rev list2)
      in 
-	error,Ast.PRINT (list1',list2',pos)
+	error,Ast.PRINT (list1',list2')
    | Ast.PLOTENTRY -> error,Ast.PLOTENTRY
    | Ast.CFLOWLABEL (a,b) -> error,Ast.CFLOWLABEL(a,b)
    | Ast.CFLOWMIX (a,(mix,pos)) ->
       let error,mix' = f_allowing_question_marks error mix in
       error,Ast.CFLOWMIX(a,(mix',pos))
-   | Ast.FLUX(list,pos) -> 
+   | Ast.FLUX list ->
      let error,list' = 
        List.fold_left 
 	 (fun (error,list) elt -> 
-	   let error,elt' = (map_with_pos print_expr_map) f_allowing_question_marks error elt in 
+	   let error,elt' = print_expr_map f_allowing_question_marks error elt in
 	   error,elt'::list)
 	 (error,[]) (List.rev list)
      in 
-	error,Ast.FLUX (list',pos)
-   | Ast.FLUXOFF(list,pos) -> 
+	error,Ast.FLUX list'
+   | Ast.FLUXOFF list ->
      let error,list' = 
        List.fold_left 
 	 (fun (error,list) elt -> 
-	   let error,elt' = (map_with_pos print_expr_map) f_allowing_question_marks error elt in 
+	   let error,elt' = print_expr_map f_allowing_question_marks error elt in
 	   error,elt'::list)
 	 (error,[]) (List.rev list)
      in 
-	error,Ast.FLUXOFF (list',pos)
+	error,Ast.FLUXOFF list'
 
 
 let bool_with_pos_map = map_with_pos bool_map 
@@ -613,26 +611,26 @@ let translate_compil parameters error compil =
               | Ast.UPDATE (x,y) -> 
 		let error,y' = alg_with_pos_map (refine_mixture parameters) error y in  
 		error,(Ast.UPDATE (x,y'))::list
-              | Ast.STOP (l,pos) ->
+              | Ast.STOP l ->
 		let error,l' = 
 		  List.fold_left 
 		    (fun (error,l) x -> 
-		      let error,x' = print_expr_with_pos_map (refine_mixture parameters) error x in  
+		      let error,x' = print_expr_map (refine_mixture parameters) error x in  
 		      error,(x'::l)
 		    )
 		    (error,[]) (List.rev l)
 		in 
-		error,(Ast.STOP (l',pos))::list
-              | Ast.SNAPSHOT (l,pos) -> 
+		error,(Ast.STOP l')::list
+              | Ast.SNAPSHOT l ->
 		let error,l' = 
 		  List.fold_left 
 		    (fun (error,l) x -> 
-		      let error,x' = print_expr_with_pos_map (refine_mixture parameters) error x in  
+		      let error,x' = print_expr_map (refine_mixture parameters) error x in  
 		      error,(x'::l)
 		    )
 		    (error,[]) (List.rev l)
 		in 
-		error,(Ast.SNAPSHOT (l',pos))::list
+		error,(Ast.SNAPSHOT l')::list
 	      | _ -> error,list (*to do*))
             (error,[])
             m

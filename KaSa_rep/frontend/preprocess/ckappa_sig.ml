@@ -105,7 +105,6 @@ module Dictionary_of_States = Dictionary.Dictionary_of_Ord(State)
 type internal_state_specification =
     {
       string : internal_state;
-      where  : Tools.pos list
     }
   
 module Site = 
@@ -225,7 +224,7 @@ and c_modif_expr =
   | C_INTRO    of ((c_mixture,string) Ast.ast_alg_expr * c_mixture * position)
   | C_DELETE   of ((c_mixture,string) Ast.ast_alg_expr * c_mixture * position)
   | C_UPDATE   of
-      (string * Tools.pos * (c_mixture,string) Ast.ast_alg_expr * position) (*TODO: pause*)
+      (string * (c_mixture,string) Ast.ast_alg_expr * position) (*TODO: pause*)
   | C_STOP     of position
   | C_SNAPSHOT of position (*maybe later of mixture too*)
 

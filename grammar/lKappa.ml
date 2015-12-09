@@ -767,9 +767,9 @@ let rec bool_expr_of_ast sigs tok algs = function
        (op,alg_expr_of_ast sigs tok algs x, alg_expr_of_ast sigs tok algs y),pos
 
 let print_expr_of_ast sigs tok algs = function
-  | Ast.Str_pexpr _,_ as x -> x
-  | Ast.Alg_pexpr x,pos ->
-     Ast.Alg_pexpr (fst @@ alg_expr_of_ast sigs tok algs (x,pos)),pos
+  | Ast.Str_pexpr _ as x -> x
+  | Ast.Alg_pexpr x ->
+     Ast.Alg_pexpr (alg_expr_of_ast sigs tok algs x)
 
 let modif_expr_of_ast sigs tok algs = function
   | Ast.INTRO (how,(who,pos)) ->
@@ -788,20 +788,19 @@ let modif_expr_of_ast sigs tok algs = function
 	  raise (ExceptionDefn.Malformed_Decl
 		   (lab ^" is not a declared token",pos)) in
      Ast.UPDATE_TOK ((i,pos), alg_expr_of_ast sigs tok algs how)
-  | Ast.STOP (p,pos) ->
-     Ast.STOP (List.map (print_expr_of_ast sigs tok algs) p,pos)
-  | Ast.SNAPSHOT (p,pos) ->
-     Ast.SNAPSHOT (List.map (print_expr_of_ast sigs tok algs) p,pos)
-  | Ast.FLUX (p,pos) ->
-     Ast.FLUX (List.map (print_expr_of_ast sigs tok algs) p,pos)
-  | Ast.FLUXOFF (p,pos) ->
-     Ast.FLUXOFF (List.map (print_expr_of_ast sigs tok algs) p,pos)
+  | Ast.STOP p ->
+     Ast.STOP (List.map (print_expr_of_ast sigs tok algs) p)
+  | Ast.SNAPSHOT p ->
+     Ast.SNAPSHOT (List.map (print_expr_of_ast sigs tok algs) p)
+  | Ast.FLUX p ->
+     Ast.FLUX (List.map (print_expr_of_ast sigs tok algs) p)
+  | Ast.FLUXOFF p ->
+     Ast.FLUXOFF (List.map (print_expr_of_ast sigs tok algs) p)
   | (Ast.PLOTENTRY | Ast.CFLOWLABEL (_,_ ) as x) -> x
-  | Ast.PRINT (p,p',pos) ->
+  | Ast.PRINT (p,p') ->
      Ast.PRINT
        (List.map (print_expr_of_ast sigs tok algs) p,
-	List.map (print_expr_of_ast sigs tok algs) p',
-	pos)
+	List.map (print_expr_of_ast sigs tok algs) p')
   | Ast.CFLOWMIX (b,(m,pos)) -> Ast.CFLOWMIX (b,(mixture_of_ast sigs pos m,pos))
 
 let perturbation_of_ast sigs tok algs ((pre,mods,post),pos) =

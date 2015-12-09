@@ -1,11 +1,3 @@
-type pos = string*int*int
-
-let ln (_,i,_) = i
-let cn (_,_,j) = j
-let fn (n,_,_) = n
-
-let no_pos = ("",-1,-1)
-
 let pow x n =
   assert (n >= 0);
   let rec aux x n acc =
