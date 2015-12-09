@@ -8,47 +8,46 @@ node_2 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 node_3 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
 node_4 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
 node_5 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
-node_6 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
 }
 { rank = same ; "1" [shape=plaintext] ;
-node_7 [label="C(a!_) -> C(a)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_8 [label="A(b) -> ", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_11 [label="C(a!_) -> C(a)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-}
-{ rank = same ; "2" [shape=plaintext] ;
-node_9 [label="B(a), C(a~u) -> B(a!1), C(a~p!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-}
-{ rank = same ; "3" [shape=plaintext] ;
+node_6 [label="C(a!_) -> C(a)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_7 [label="A(b) -> ", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_10 [label="C(a!_) -> C(a)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
+{ rank = same ; "2" [shape=plaintext] ;
+node_8 [label="B(a), C(a~u) -> B(a!1), C(a~p!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "3" [shape=plaintext] ;
+node_9 [label="C(a!_) -> C(a)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
 { rank = same ; "4" [shape=plaintext] ;
-node_12 [label="B(a), C(a~u) -> B(a!1), C(a~p!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_11 [label="B(a), C(a~u) -> B(a!1), C(a~p!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "5" [shape=plaintext] ;
-node_13 [label="D", style=filled, fillcolor=red] ;
+node_12 [label="D", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];
 "2" -> "3" [style="invis"];
 "3" -> "4" [style="invis"];
 "4" -> "5" [style="invis"];
-node_6 -> node_7
-node_2 -> node_8
-node_1 -> node_9
-node_6 -> node_9
-node_7 -> node_9
+node_5 -> node_6
+node_2 -> node_7
+node_1 -> node_8
+node_5 -> node_8
+node_6 -> node_8
+node_7 -> node_8
+node_5 -> node_9
 node_8 -> node_9
-node_6 -> node_10
-node_9 -> node_10
-node_3 -> node_11
+node_3 -> node_10
+node_4 -> node_10
+node_1 -> node_11
 node_4 -> node_11
+node_9 -> node_11
+node_10 -> node_11
 node_1 -> node_12
 node_4 -> node_12
-node_10 -> node_12
 node_11 -> node_12
-node_1 -> node_13
-node_4 -> node_13
-node_12 -> node_13
 }
 /*
 */

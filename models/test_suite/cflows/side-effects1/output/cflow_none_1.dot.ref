@@ -4,21 +4,20 @@ digraph G{
  ranksep=.5 ;
 { rank = same ; "0" [shape=plaintext] ;
 node_1 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
-node_2 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
-node_4 [label=" -> A(a!1,b), B(a!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_3 [label=" -> A(a!1,b), B(a!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "1" [shape=plaintext] ;
-node_3 [label="C(a!_) -> C(a)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_2 [label="C(a!_) -> C(a)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "2" [shape=plaintext] ;
-node_5 [label="C", style=filled, fillcolor=red] ;
+node_4 [label="C", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];
-node_2 -> node_3
-node_2 -> node_5
-node_3 -> node_5
-node_4 -> node_5
+node_1 -> node_2
+node_1 -> node_4
+node_2 -> node_4
+node_3 -> node_4
 }
 /*
 */

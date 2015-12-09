@@ -226,7 +226,7 @@ let closure_old err_fmt config prec is_obs init_to_eidmax weak_events init =
           in
           let pred_star,max_out = 
             let l_pred = S.fold (fun i j -> i::j) s_pred [] in 
-            let l_pred = merge_list_decreasing l_pred (init succ) in
+            (*    let l_pred = merge_list_decreasing l_pred (init succ) in*)
             
             let s,max_out = A.get s_pred_star succ in 
             aux 
@@ -293,7 +293,7 @@ let closure_obs err_fmt config prec is_obs init_to_eidmax weak_events init =
        in
        let taint x = A.set tainting x (merge_list_increasing taints  (A.get tainting x)) in 
        let () = S.iter taint s_pred in
-       let () = List.iter taint (init i) in  (* this is ugly and costly, when will we handle with initial states in causal.ml *)
+       (*    let () = List.iter taint (init i) in  (* this is ugly and costly, when will we handle with initial states in causal.ml *)*)
        let () = A.set tainting i [] in      
        do_tick tick,lobs)
       (tick,[]) prec 
@@ -329,7 +329,7 @@ let closure err_fmt config prec is_obs init_to_eidmax weak_events init =
   else closure_old err_fmt config prec is_obs init_to_eidmax weak_events init
 
 
-let closure = closure_old    
+let closure = closure_old
 		   
 let neighbor_non_direct_descendant sons prec =
   let selection x = S.mem x sons in
