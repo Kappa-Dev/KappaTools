@@ -175,7 +175,7 @@ let last_event attribute =
  Collapses last atom if if bears the same id as a --in the case of a non atomic action*)
 let push (a:atom) (att:atom list) =
   match att with
-  | [] -> [a]
+  | [] -> [{a with causal_impact = a.causal_impact }]
   | a'::att' ->
      if a'.eid = a.eid then
        let () = assert (a'.kind = a.kind) in
