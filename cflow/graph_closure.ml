@@ -29,7 +29,8 @@ type config =
     enable_gc: bool ; 
     cut_transitive_path: bool ; 
     stat_trans_closure_for_big_graphs: bool;
-    max_index:int
+    max_index:int;
+    use_new_algo:bool
   }
 
 let config_init = 
@@ -39,10 +40,11 @@ let config_init =
     cut_transitive_path=true ;
     stat_trans_closure_for_big_graphs=true;
     max_index=300;
+    use_new_algo=true;
   }
 
 let config_intermediary = 
-  { config_init with do_tick = false}
+  { config_init with do_tick = false; use_new_algo=false}
     
 let config_std = 
   {
@@ -50,6 +52,7 @@ let config_std =
     enable_gc = false ;
     cut_transitive_path = false ;
     stat_trans_closure_for_big_graphs=true;
+    use_new_algo=false ;
     max_index = 300;
   }
 
@@ -126,8 +129,9 @@ let diff_list p a b =
 let compare_bool a b = compare a b < 0 
 let diff_list_decreasing =  diff_list (swap compare_bool)
 let merge_list_decreasing = merge_list (swap compare_bool)
-
-let closure err_fmt config prec is_obs init_to_eidmax weak_events init =
+let merge_list_increasing = merge_list compare_bool
+				       
+let closure_old err_fmt config prec is_obs init_to_eidmax weak_events init =
   let max_index = M.fold (fun i _ -> max i) prec 0 in
   let is_init x =
     match M.find_option x prec with
@@ -240,8 +244,83 @@ let closure err_fmt config prec is_obs init_to_eidmax weak_events init =
       prec tick 
   in 
   let _ = close_tick () in 
-  s_pred_star 
+  s_pred_star
 
+let closure_obs err_fmt config prec is_obs init_to_eidmax weak_events init =
+  let max_index = M.fold (fun i _ -> max i) prec 0 in
+  let prec =
+    M.fold (fun i s_pred l -> (i,s_pred)::l) prec []
+  in
+  let do_tick,tick,close_tick =
+    if max_index > 300 && config.do_tick
+    then
+      let tick = Mods.tick_stories err_fmt max_index (false,0,0) in
+      let f = Mods.tick_stories err_fmt max_index in
+      let close = Format.pp_print_newline err_fmt in 	  
+      f,tick,close
+    else
+      (fun x -> x),(false,0,0),(fun () -> ())
+  in
+  let tainting = A.make (max_index+1) [] in
+  let s_pred_star = A.make (max_index+1) ([],0) in 
+  let _,lobs =
+    List.fold_left
+      (fun (tick,lobs) (i,s_pred) ->
+       let taints,lobs = 
+	 if is_obs i
+	 then
+	   [i],i::lobs
+	 else
+	   let taints = A.get tainting i in
+	   let () = 
+	     List.iter
+	       (fun taints ->
+		let (old,m) = A.get s_pred_star taints in 
+		A.set s_pred_star taints ((i::old),m))
+	       taints
+	   in
+	   taints,lobs
+       in
+       let taint x = A.set tainting x (merge_list_increasing taints  (A.get tainting x)) in 
+       let () = S.iter taint s_pred in
+       let () = List.iter taint (init i) in  (* this is ugly and costly, when will we handle with initial states in causal.ml *)
+       let () = A.set tainting i [] in      
+       do_tick tick,lobs)
+      (tick,[]) prec 
+  in
+  let () = close_tick () in
+  let () = List.iter (fun i ->
+		      let old,m = A.get s_pred_star i in 
+		      A.set s_pred_star i (List.rev old,m)) lobs in 
+  s_pred_star
+
+let closure_check err_fmt config prec is_obs init_to_eidmax weak_events init =
+      let a = closure_obs err_fmt config prec is_obs init_to_eidmax weak_events init in
+      let b = closure_old err_fmt config prec is_obs init_to_eidmax weak_events init in
+      let _ =
+	A.iteri
+	  (fun i (s,_) ->
+	   if is_obs i
+	   then 
+	     let (s',_) = A.get b i in
+	     if s = s' then ()
+	     else
+	       let _ = Printf.fprintf stderr "DIFFER %i\n" i in
+	       let _ = List.iter (Printf.fprintf stderr "%i, ") s in
+	       let _ = Printf.fprintf stderr "\n" in 
+	       let _ = List.iter (Printf.fprintf stderr "%i, ") s' in 
+	       let _ = Printf.fprintf stderr "\n" in 
+	       ())
+	a
+      in a
+    
+let closure err_fmt config prec is_obs init_to_eidmax weak_events init =
+  if config.use_new_algo then closure_check err_fmt config prec is_obs init_to_eidmax weak_events init
+  else closure_old err_fmt config prec is_obs init_to_eidmax weak_events init
+
+
+let closure = closure_old    
+		   
 let neighbor_non_direct_descendant sons prec =
   let selection x = S.mem x sons in
   let rec aux (selected,todos) don =
