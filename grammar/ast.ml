@@ -114,7 +114,7 @@ type ('mixture,'id) instruction =
   | SIG      of agent
   | TOKENSIG of string Location.annot
   | VOLSIG   of str_pos * float * str_pos (* type, volume, parameter*)
-  | INIT     of string Location.annot option * ('mixture,'id) init_t * Tools.pos
+  | INIT     of string Location.annot option * ('mixture,'id) init_t
   (*volume, init, position *)
   | DECLARE  of ('mixture,'id) variable_def
   | OBS      of ('mixture,'id) variable_def (*for backward compatibility*)
@@ -136,7 +136,7 @@ type ('agent,'mixture,'id,'rule) compil =
 	('mixture,'id) ast_alg_expr Location.annot list;
       (*list of patterns to plot*)
       init :
-	(string Location.annot option * ('mixture,'id) init_t * Tools.pos) list;
+	(string Location.annot option * ('mixture,'id) init_t) list;
       (*initial graph declaration*)
       perturbations :
 	('mixture,'id) perturbation list;

@@ -10,9 +10,9 @@
 %token DO SET REPEAT UNTIL LOG PLUS MULT MINUS MAX MIN DIV SINUS COSINUS TAN
 %token POW ABS MODULO SQRT EXPONENT INFINITY TIME EVENT NULL_EVENT
 %token EQUAL AND OR GREATER SMALLER TRUE FALSE DIFF KAPPA_RAR KAPPA_LRAR
-%token <Tools.pos> PERT OBS CONFIG
-%token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INIT LET PLOT
-%token <Tools.pos> FLUX ASSIGN ASSIGN2 TOKEN KAPPA_LNK PIPE
+%token SIGNATURE INIT LET PLOT PERT OBS TOKEN CONFIG
+%token <Tools.pos> KAPPA_WLD KAPPA_SEMI
+%token <Tools.pos> FLUX ASSIGN ASSIGN2 KAPPA_LNK PIPE
 %token <Tools.pos> PRINT PRINTF
 %token <int> INT
 %token <string> ID
@@ -61,9 +61,9 @@ start_rule:
 		      | Ast.VOLSIG (vol_type,vol,vol_param) ->
 			 (Ast.result := {!Ast.result with
 					  Ast.volumes=(vol_type,vol,vol_param)::!Ast.result.Ast.volumes})
-		      | Ast.INIT (opt_vol,init_t,pos) ->
+		      | Ast.INIT (opt_vol,init_t) ->
 			 (Ast.result := {!Ast.result with
-					  Ast.init=(opt_vol,init_t,pos)::!Ast.result.Ast.init})
+					  Ast.init=(opt_vol,init_t)::!Ast.result.Ast.init})
 		      | Ast.DECLARE var ->
 			 (Ast.result := {!Ast.result with
 					  Ast.variables = var::!Ast.result.Ast.variables})
@@ -98,7 +98,7 @@ instruction:
 				(add_pos "Malformed agent signature, I was expecting something of the form '%agent: A(x,y~u~v,z)'"))}
 
     | INIT init_declaration
-	   {let (opt_vol,init) = $2 in Ast.INIT (opt_vol,init,$1)}
+	   {let (opt_vol,init) = $2 in Ast.INIT (opt_vol,init)}
     | INIT error
 	{ raise (ExceptionDefn.Syntax_Error
 		   (add_pos "Malformed initial condition"))}

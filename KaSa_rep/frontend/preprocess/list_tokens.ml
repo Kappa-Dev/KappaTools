@@ -232,7 +232,7 @@ let rec scan_alg parameters remanent alg = (*TO DO*)
 
 let scan_initial_states parameters = 
   List.fold_left 
-    (fun remanent (_,init_t,_) -> 
+    (fun remanent (_,init_t) -> 
       match 
 	init_t
       with 

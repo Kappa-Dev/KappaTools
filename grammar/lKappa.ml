@@ -875,7 +875,7 @@ let compil_of_ast overwrite c =
       List.map (fun expr -> alg_expr_of_ast sigs tok algs expr)
 	       c.Ast.observables;
     Ast.init =
-      List.map (fun (lab,ini,pos) -> lab,init_of_ast sigs tok algs ini,pos)
+      List.map (fun (lab,ini) -> lab,init_of_ast sigs tok algs ini)
 	       c.Ast.init;
     Ast.perturbations =
       List.map (perturbation_of_ast sigs tok algs) c.Ast.perturbations;

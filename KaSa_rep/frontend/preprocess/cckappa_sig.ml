@@ -231,9 +231,8 @@ type enriched_init =
       e_init_c_factor   : (mixture,string) Ast.ast_alg_expr;
       e_init_string_pos : string Location.annot option;
       e_init_mixture    : Ckappa_sig.mixture;
-      e_init_c_mixture  : mixture; 
-      e_init_pos        : Tools.pos
-    } 
+      e_init_c_mixture  : mixture
+    }
       
 let dummy_init parameters error =
   let error,views = Int_storage.Quick_Nearly_inf_Imperatif.create parameters error 0 in 
@@ -252,7 +251,6 @@ let dummy_init parameters error =
 	plus      = [];
 	dot       = []
       };
-    e_init_pos         = Tools.no_pos
   }
 
 type compil =

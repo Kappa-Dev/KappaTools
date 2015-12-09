@@ -159,5 +159,5 @@ Intial graph;
   %init: 1000 B(x)
   %init: 10000 C(x1~u, x2~u)
   
-File "abc.ka", line 40, characters 17-18:
+File "abc.ka", line 40, characters 12-18:
 Warning: [Emax] constant is evaluated to infinity

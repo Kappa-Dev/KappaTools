@@ -580,11 +580,11 @@ let translate_compil parameters error compil =
   in 
   let error,init_rev = 
      List.fold_left
-      (fun (error,list) (id,init_t,position) -> 
+      (fun (error,list) (id,init_t) -> 
         let error,mixture = refine_init_t parameters error init_t in 
         match mixture 
         with 
-        |  Some (init) ->  error,(id,init,position)::list
+        |  Some (init) ->  error,(id,init)::list
         | None -> error,list)
     (error,[])
     compil.Ast.init    

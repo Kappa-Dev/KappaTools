@@ -66,7 +66,7 @@ rule token = parse
 			       Location.of_pos (Lexing.lexeme_start_p lexbuf)
 				(Lexing.lexeme_end_p lexbuf)))
 		     }
-	 | '[' {let lab = read_label [] (']'::space_chars) lexbuf in
+	 | '[' (id as lab) ']' {
 		match lab with
 		| "E" -> EVENT
 		| "E-" -> NULL_EVENT
@@ -121,17 +121,16 @@ rule token = parse
 	 | '<' {SMALLER}
 	 | '>' {GREATER}
 	 | '=' {EQUAL}
-	 | '%' {let lab = read_label [] (':'::space_chars) lexbuf in
-		let pos = position lexbuf in
+	 | '%' (id as lab) ':' {
 		match lab with
-		| "agent" -> (SIGNATURE pos)
-		| "init" -> (INIT pos)
-		| "var" -> (LET pos)
-		| "plot" -> (PLOT pos)
-		| "mod" -> (PERT pos)
-		| "obs" -> (OBS pos)
-		| "def" -> (CONFIG pos)
-		| "token" -> (TOKEN pos)
+		| "agent" -> SIGNATURE
+		| "init" -> INIT
+		| "var" -> LET
+		| "plot" -> PLOT
+		| "mod" -> PERT
+		| "obs" -> OBS
+		| "def" -> CONFIG
+		| "token" -> TOKEN
 		| _ as s ->
 		   raise (Syntax_Error ("Instruction \""^s^"\" not recognized",
 					Location.of_pos
