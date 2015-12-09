@@ -26,6 +26,7 @@ type rule =
     r_add_tokens :
       ((rule_mixture,int) Ast.ast_alg_expr Location.annot * int) list;
     r_rate : (rule_mixture,int) Ast.ast_alg_expr Location.annot;
+    r_rate_absolute : bool;
     r_un_rate : (rule_mixture,int) Ast.ast_alg_expr Location.annot option;
   }
 

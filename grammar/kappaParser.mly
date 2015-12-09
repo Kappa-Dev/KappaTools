@@ -287,29 +287,17 @@ mixture:
 ;
 
 rule_expression:
-    | rule_label lhs_rhs arrow lhs_rhs AT rate
+    | rule_label lhs_rhs arrow lhs_rhs rate
 		 { let pos =
 		     Location.of_pos (Parsing.rhs_start_pos 2)
 				     (Parsing.symbol_end_pos ()) in
-		   let (k2,k1,kback) = $6 in
+		   let (absolute,k2,k1,kback) = $5 in
 		   let lhs,token_l = $2 and rhs,token_r = $4 in
 		   ($1,({Ast.lhs=lhs; Ast.rm_token = token_l; Ast.arrow=$3;
 			 Ast.rhs=rhs; Ast.add_token = token_r;
+			 Ast.k_absolute=absolute;
 			 Ast.k_def=k2; Ast.k_un=k1; Ast.k_op=kback},pos))
 		 }
-    | rule_label lhs_rhs arrow lhs_rhs
-		 {let pos =
-		    Location.of_pos (Parsing.rhs_start_pos 2)
-				    (Parsing.symbol_end_pos ()) in
-		  let lhs,token_l = $2 and rhs,token_r = $4 in
-		  ExceptionDefn.warning
-		    ~pos
-		    (fun f -> Format.pp_print_string
-				f "Rule has no kinetics. Default rate of 0.0 is assumed.");
-		  ($1,({Ast.lhs = lhs; Ast.rm_token = token_l; Ast.arrow=$3;
-			Ast.rhs=rhs; Ast.add_token = token_r;
-			Ast.k_def=Location.dummy_annot (Ast.CONST (Nbr.F 0.));
-			Ast.k_un=None; Ast.k_op=None},pos))}
     ;
 
 arrow:
@@ -364,9 +352,19 @@ alg_expr:
     | alg_expr MODULO alg_expr {add_pos (Ast.BIN_ALG_OP(Operator.MODULO,$1,$3))}
 
 rate:
-    | alg_expr OP_PAR alg_with_radius CL_PAR {($1,Some $3,None)}
-    | alg_expr {($1,None,None)}
-    | alg_expr COMMA alg_expr {($1,None,Some $3)}
+    | AT alg_expr OP_PAR alg_with_radius CL_PAR {(false,$2,Some $4,None)}
+    | AT alg_expr {(false,$2,None,None)}
+    | AT alg_expr COMMA alg_expr {(false,$2,None,Some $4)}
+    | AT AT alg_expr OP_PAR alg_with_radius CL_PAR {(true,$3,Some $5,None)}
+    | AT AT alg_expr {(true,$3,None,None)}
+    | AT AT alg_expr COMMA alg_expr {(true,$3,None,Some $5)}
+    | {let pos =
+        Location.of_pos (Parsing.symbol_start_pos ()) (Parsing.symbol_end_pos ()) in
+      let () = ExceptionDefn.warning
+		  ~pos
+		  (fun f -> Format.pp_print_string
+				f "Rule has no kinetics. Default rate of 0.0 is assumed.") in
+				(false,Location.dummy_annot (Ast.CONST (Nbr.F 0.)),None,None)}
     ;
 
 alg_with_radius:

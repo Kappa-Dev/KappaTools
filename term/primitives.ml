@@ -49,6 +49,7 @@ module Transformation =
 
 type elementary_rule = {
   rate : Alg_expr.t;
+  rate_absolute : bool;
   unary_rate : Alg_expr.t option;
   connected_components : Connected_component.t array;
   removed : Transformation.t list;
@@ -56,8 +57,7 @@ type elementary_rule = {
   consumed_tokens : (Alg_expr.t * int) list;
   injected_tokens : (Alg_expr.t * int) list;
   syntactic_rule : int;
-  (** negative number [n] means opposite of rule |[n]|,
-[0] means generated for perturbation. *)
+  (** [0] means generated for perturbation. *)
   instantiations : Instantiation.abstract Instantiation.event;
 }
 

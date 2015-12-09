@@ -55,6 +55,7 @@ let rules_of_ast ?deps_machinery contact_map counter domain ~syntax_ref (rule,_)
       deps,un_ccs',{
 	Primitives.unary_rate = unrate;
 	Primitives.rate = rate;
+	Primitives.rate_absolute = rule.LKappa.r_rate_absolute;
 	Primitives.connected_components = ccs;
 	Primitives.removed = neg;
 	Primitives.inserted = pos;
@@ -141,7 +142,7 @@ let effects_of_modif
 	{ LKappa.r_mix = mix; LKappa.r_created = created;
 	  LKappa.r_rm_tokens = rm; LKappa.r_add_tokens = add;
 	  LKappa.r_rate = Location.dummy_annot (CONST Nbr.zero);
-	  LKappa.r_un_rate = None; } in
+	  LKappa.r_rate_absolute = false; LKappa.r_un_rate = None; } in
       let (domain',alg_pos) =
 	Expr.compile_alg contact_map counter domain alg_expr in
       let domain'',_,_,elem_rules =
@@ -309,7 +310,7 @@ let init_graph_of_result algs has_tracking contact_map counter env domain res =
 	      LKappa.r_created = LKappa.to_raw_mixture sigs ast;
 	      LKappa.r_rm_tokens = []; LKappa.r_add_tokens = [];
 	      LKappa.r_rate = Location.dummy_annot (CONST Nbr.zero);
-	      LKappa.r_un_rate = None; } in
+	      LKappa.r_rate_absolute = false; LKappa.r_un_rate = None; } in
 	  let domain'',state' =
 	    match
 	      rules_of_ast
@@ -352,7 +353,7 @@ let init_graph_of_result algs has_tracking contact_map counter env domain res =
 	    { LKappa.r_mix = []; LKappa.r_created = []; LKappa.r_rm_tokens = [];
 	      LKappa.r_add_tokens = [(alg, tk_id)];
 	      LKappa.r_rate = Location.dummy_annot (CONST Nbr.zero);
-	      LKappa.r_un_rate = None; } in
+	      LKappa.r_rate_absolute = false; LKappa.r_un_rate = None; } in
 	  let domain',state' =
 	    match
 	      rules_of_ast

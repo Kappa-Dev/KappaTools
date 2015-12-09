@@ -26,6 +26,7 @@ type rule =
     r_add_tokens :
       ((rule_mixture,int) Ast.ast_alg_expr Location.annot * int) list;
     r_rate : (rule_mixture,int) Ast.ast_alg_expr Location.annot;
+    r_rate_absolute : bool;
     r_un_rate : (rule_mixture,int) Ast.ast_alg_expr Location.annot option;
   }
 
@@ -666,7 +667,11 @@ let name_and_purify_rule (label_opt,(r,r_pos)) (id,acc,rules) =
     else (acc,r.Ast.k_def) in
   let acc'',k_un,k_un_op = match r.Ast.k_un with
     | None -> (acc',None,None)
-    | Some (k,k_op_op) ->
+    | Some ((_,pos as k),k_op_op) ->
+       let () =
+	 if r.Ast.k_absolute then
+	   raise (ExceptionDefn.Malformed_Decl
+		    ("Unary rate and absolute rate are incompatibles",pos)) in
        let acc_un,k' =
 	 if ast_alg_has_mix k then
 	   let rate_var = label^"_un_rate" in
@@ -692,12 +697,12 @@ let name_and_purify_rule (label_opt,(r,r_pos)) (id,acc,rules) =
        ((Location.dummy_annot rate_var,k)::acc'',
 	(Tools.option_map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
 	 r.Ast.rhs,r.Ast.lhs,r.Ast.add_token,r.Ast.rm_token,
-	 Location.dummy_annot (Ast.OBS_VAR rate_var),k_un_op,r_pos)::rules)
+	 Location.dummy_annot (Ast.OBS_VAR rate_var),r.Ast.k_absolute,k_un_op,r_pos)::rules)
     | Ast.LRAR, Some rate ->
        (acc'',
 	(Tools.option_map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
 	 r.Ast.rhs,r.Ast.lhs,r.Ast.add_token,r.Ast.rm_token,
-	 rate,k_un_op,r_pos)::rules)
+	 rate,r.Ast.k_absolute,k_un_op,r_pos)::rules)
     | Ast.RAR, None -> (acc'',rules)
     | (Ast.RAR, Some _ | Ast.LRAR, None) ->
        raise
@@ -705,8 +710,8 @@ let name_and_purify_rule (label_opt,(r,r_pos)) (id,acc,rules) =
 	    ("Incompatible arrow and kinectic rate for inverse definition",
 	     r_pos)) in
   (id',acc''',
-   (label_opt
-     ,r.Ast.lhs,r.Ast.rhs,r.Ast.rm_token,r.Ast.add_token,k_def,k_un,r_pos)
+   (label_opt,r.Ast.lhs,r.Ast.rhs,r.Ast.rm_token,r.Ast.add_token,
+   k_def,r.Ast.k_absolute,k_un,r_pos)
    ::rules')
 
 let mixture_of_ast sigs pos mix =
@@ -845,7 +850,7 @@ let compil_of_ast overwrite c =
 	 (lab,alg_expr_of_ast ~max_allowed_var:(pred i) sigs tok algs expr))
 	alg_vars_over;
     Ast.rules =
-      List.map (fun (label,lhs,rhs,rm_tk,add_tk,rate,un_rate,r_pos) ->
+      List.map (fun (label,lhs,rhs,rm_tk,add_tk,rate,absolute,un_rate,r_pos) ->
 		let mix,created = annotate_lhs_with_diff sigs lhs rhs in
 		label,
 		({ r_mix = mix; r_created = List.map fst created;
@@ -860,6 +865,7 @@ let compil_of_ast overwrite c =
 				NamedDecls.elt_id ~kind:"token" tk_nd tk))
 			      add_tk;
 		   r_rate = alg_expr_of_ast sigs tok algs rate;
+		   r_rate_absolute = absolute;
 		   r_un_rate =
 		     Tools.option_map
 		       (alg_expr_of_ast sigs tok algs ?max_allowed_var:None)

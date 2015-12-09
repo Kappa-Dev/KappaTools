@@ -1,6 +1,6 @@
 File "lhs.ka", line 3, characters 15-16:
 Site 'x' occurs more than once in this agent 'A'
-File "rhs.ka", line 3, characters 0-32:
+File "rhs.ka", line 3, characters 32-32:
 Warning: Rule has no kinetics. Default rate of 0.0 is assumed.
 File "rhs.ka", line 3, characters 2-3:
 Site 'x' occurs more than once in this agent 'A'

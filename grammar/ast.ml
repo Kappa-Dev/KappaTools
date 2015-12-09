@@ -52,6 +52,7 @@ type rule = {
   add_token: ((mixture,string) ast_alg_expr Location.annot
 	      * string Location.annot) list;
   k_def: (mixture,string) ast_alg_expr Location.annot ;
+  k_absolute: bool;
   k_un:
     ((mixture,string) ast_alg_expr Location.annot *
        (mixture,string) ast_alg_expr Location.annot option) option;

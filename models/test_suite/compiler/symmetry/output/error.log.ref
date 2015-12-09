@@ -105,9 +105,9 @@ Domain:
 Intial graph;
   
   
-File "symmetry.ka", line 4, characters 8-39:
+File "symmetry.ka", line 4, characters 39-39:
 Warning: Rule has no kinetics. Default rate of 0.0 is assumed.
-File "symmetry.ka", line 5, characters 10-35:
+File "symmetry.ka", line 5, characters 35-35:
 Warning: Rule has no kinetics. Default rate of 0.0 is assumed.
-File "symmetry.ka", line 6, characters 9-78:
+File "symmetry.ka", line 6, characters 78-78:
 Warning: Rule has no kinetics. Default rate of 0.0 is assumed.

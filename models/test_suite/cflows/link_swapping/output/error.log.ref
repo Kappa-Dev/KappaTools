@@ -1,4 +1,4 @@
-File "link_swapping.ka", line 8, characters 7-23:
+File "link_swapping.ka", line 8, characters 23-23:
 Warning: Rule has no kinetics. Default rate of 0.0 is assumed.
 File "link_swapping.ka", line 6, characters 40-41:
 Warning: rule induces a link permutation on site 'y' of agent 'A'
