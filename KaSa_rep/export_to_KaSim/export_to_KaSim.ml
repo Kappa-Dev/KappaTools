@@ -41,14 +41,12 @@ type influence_map =
 module type Export_to_KaSim =
   sig
     type state
-    val init:
+    val init: Format.formatter -> 
       ((string Location.annot) * Ast.port list,
-       Ast.mixture, string, Ast.rule) Ast.compil -> state
+       Ast.mixture, string, Ast.rule) Ast.compil  -> state
     val get_influence_map: state -> state * influence_map
-    val get_contact_map:
-      Format.formatter -> state -> state * (string list * (string*string) list) String2Map.t
-    val get_signature:
-      Format.formatter -> state -> state * Signature.s
+    val get_contact_map: state -> state * (string list * (string*string) list) String2Map.t
+    val get_signature: state -> state * Signature.s
 
     val dump_errors: state -> unit
     val dump_errors_light: state -> unit
@@ -120,9 +118,10 @@ module Export_to_KaSim =
 	  errors: Exception.method_handler ;
 	}
 
-    let init compil  =
+    let init logger compil  =
       let errors = Exception.empty_error_handler in
-      let parameters = Remanent_parameters.get_parameters () in   
+      let parameters = Remanent_parameters.get_parameters () in
+      let parameters = Remanent_parameters.set_formatter parameters logger in 
       let parameters_compil =
 	Remanent_parameters.update_call_stack
 	  parameters Preprocess.local_trace (Some "Prepreprocess.translate_compil") in
@@ -160,12 +159,12 @@ module Export_to_KaSim =
     let flush_errors state =
       {state with errors = Exception.empty_error_handler}
 
-    let compute_contact_map f state =
+    let compute_contact_map state =
       let sol = ref String2Map.empty in
       let handler = state.handler in
       let parameters = state.parameters in
       let error = state.errors in
-      let _ = Format.fprintf f "+ Compute the contact map@," in
+      let _ = Format.fprintf (Remanent_parameters.get_formatter parameters)  "+ Compute the contact map@," in
       let add_link (a,b) (c,d) sol =
 	let l,old =
 	  String2Map.find_default ([],[]) (a,b) sol
@@ -265,11 +264,11 @@ module Export_to_KaSim =
 
     let compute_influence_map state = state
       
-    let rec get_contact_map f state =
+    let rec get_contact_map state =
       match state.contact_map with
       | Some x -> state,x
       | None ->
-	 get_contact_map f (compute_contact_map f state)
+	 get_contact_map (compute_contact_map state)
 
     let rec get_influence_map state =
       match state.influence_map with
@@ -277,8 +276,8 @@ module Export_to_KaSim =
       | None ->
 	 get_influence_map (compute_influence_map state)
 
-     let compute_signature f state = 
-      let state,contact_map = get_contact_map f state in 
+    let compute_signature state = 
+      let state,contact_map = get_contact_map state in 
       let add a x states map = 
 	let old = 
 	    StringMap.find_default [] a map 
@@ -315,10 +314,10 @@ module Export_to_KaSim =
 
 
 	
-    let rec get_signature f state =
+    let rec get_signature state =
       match state.signature with
       | Some x -> state,x
-      | None -> get_signature f (compute_signature f state)
+      | None -> get_signature (compute_signature state)
 	   
     let dump_influence_map state =
       match state.influence_map with

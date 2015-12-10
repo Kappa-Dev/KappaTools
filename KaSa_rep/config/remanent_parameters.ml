@@ -238,7 +238,7 @@ let get_command_line_1                               marshalisable =
 let get_marshalisable parameter = parameter.Remanent_parameters_sig.marshalisable_parameters
 let get_log parameter = parameter.Remanent_parameters_sig.log   
 let get_formatter parameter = parameter.Remanent_parameters_sig.formatter 
-
+let set_formatter parameter logger = {parameter with Remanent_parameters_sig.formatter = logger}
 
 let upgrade_from_marshal_field f = compose f get_marshalisable 
 

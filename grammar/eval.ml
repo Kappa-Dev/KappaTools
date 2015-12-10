@@ -528,9 +528,9 @@ let initialize logger overwrite counter result =
   Debug.tag logger "\t -sanity checks";
   let (sigs_nd,tk_nd,result') = LKappa.compil_of_ast overwrite result in
   Debug.tag logger "\t -KaSa tools initialization";
-  let pre_kasa_state = Export_to_KaSim.Export_to_KaSim.init result in
+  let pre_kasa_state = Export_to_KaSim.Export_to_KaSim.init logger result in
   let kasa_state,contact_map =
-    Export_to_KaSim.Export_to_KaSim.get_contact_map logger pre_kasa_state in
+    Export_to_KaSim.Export_to_KaSim.get_contact_map pre_kasa_state in
   let () = Export_to_KaSim.Export_to_KaSim.dump_errors_light kasa_state in
   let kasa_state = Export_to_KaSim.Export_to_KaSim.flush_errors kasa_state in
   let domain = Connected_component.Env.empty sigs_nd in
