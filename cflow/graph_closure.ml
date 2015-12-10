@@ -22,7 +22,7 @@ module S = Mods.IntSet
 module M = Mods.IntMap
 
 let ignore_flow_from_outgoing_siphon = true
-let check_mode = false 
+let check_mode = false
 					 
 type algo_type = Top_down | Bottom_up | Check 
 type order = Increasing_with_last_event | Decreasing_without_last_event
@@ -44,7 +44,7 @@ let config_big_graph_with_progress_bar =
     cut_transitive_path=true ;
     stat_trans_closure_for_big_graphs=true;
     max_index=300;
-    algo= Bottom_up (*  if check_mode then Check else Top_down*) ;
+    algo= Bottom_up (*if check_mode then Check else Top_down*) ;
   }
 
 let config_big_graph_without_progress_bar = 
@@ -133,7 +133,7 @@ let diff_list p a b =
 let compare_bool a b = compare a b < 0 
 let diff_list_decreasing =  diff_list (swap compare_bool)
 let merge_list_decreasing = merge_list (swap compare_bool)
-let merge_list_increasing = merge_list compare_bool
+(*let merge_list_increasing = merge_list compare_bool*)
 				       
 let closure_bottom_up err_fmt config prec is_obs init_to_eidmax =
   let max_index = M.fold (fun i _ -> max i) prec 0 in
@@ -258,11 +258,41 @@ let closure_bottom_up err_fmt config prec is_obs init_to_eidmax =
   in 
   A.map fst s_pred_star,Decreasing_without_last_event 
 
-let closure_top_down err_fmt config prec is_obs init_to_eidmax =
+let closure_top_down err_fmt config prec is_obs  delta =
   let max_index = M.fold (fun i _ -> max i) prec 0 in
   let prec =
     M.fold (fun i s_pred l -> (i,s_pred)::l) prec []
   in
+  let create_taints i =
+    let rec aux delta output =
+      if delta = 0 then output
+      else aux (delta - 1) (S.empty::output)
+    in
+    aux delta [S.singleton i]
+  in
+  let shift_taints l =
+    match l with t::t'::q -> (S.union t t')::q
+	       | _ -> l
+  in
+  let rec merge_taints l1 l2 =
+    match
+      l1,l2
+    with
+    | _,[] -> l1
+    | [],_ -> l2
+    | t::q,t'::q' ->
+       (S.union t t')::(merge_taints q q')
+  in 
+  let s_pred_star = A.make (max_index+1) [] in 
+  let taint i taints =
+    match
+      taints
+    with [] -> ()
+       | t::q ->
+	  S.iter
+	    (fun taint -> A.set s_pred_star taint (i::(A.get s_pred_star taint)))
+	    t
+  in 
   let do_tick,tick,close_tick =
     if max_index > 300 && config.do_tick
     then
@@ -274,25 +304,19 @@ let closure_top_down err_fmt config prec is_obs init_to_eidmax =
       (fun x -> x),(false,0,0),(fun () -> ())
   in
   let tainting = A.make (max_index+1) [] in
-  let s_pred_star = A.make (max_index+1) [] in 
   let _ =
     List.fold_left
       (fun tick (i,s_pred) ->
        let taints = 
 	 if is_obs i
 	 then
-	   let _ = A.set s_pred_star i [i] in 
-	   [i]
+	   create_taints i
 	 else
-	   let taints = A.get tainting i in
-	   let () = 
-	     List.iter
-	       (fun taints -> A.set s_pred_star taints ((i::(A.get s_pred_star taints))))
-	       taints
-	   in
-	   taints
+	   A.get tainting i 
        in
-       let taint x = A.set tainting x (merge_list_increasing taints  (A.get tainting x)) in 
+       let () = taint i taints in 
+       let shifted_taints = shift_taints taints in 
+       let taint x = A.set tainting x (merge_taints shifted_taints  (A.get tainting x)) in 
        let () = S.iter taint s_pred in
        let () = A.set tainting i [] in      
        do_tick tick)
@@ -317,7 +341,7 @@ let get_list_in_increasing_order_with_last_event i (m,mode) =
        
 let closure_check err_fmt config prec is_obs init_to_eidmax =
   let t = Sys.time () in 
-  let a,a' = closure_top_down err_fmt config prec is_obs init_to_eidmax in
+  let a,a' = closure_top_down err_fmt config prec is_obs 0 in
   let t' = Sys.time () in
   let b,b' = closure_bottom_up err_fmt {config with do_tick = false} prec is_obs init_to_eidmax in
   let t'' = Sys.time () in
@@ -344,7 +368,7 @@ let closure err_fmt config prec is_obs init_to_eidmax =
   with
   | Check -> closure_check err_fmt config prec is_obs init_to_eidmax 
   | Bottom_up -> closure_bottom_up err_fmt config prec is_obs init_to_eidmax
-  | Top_down -> closure_top_down err_fmt config prec is_obs init_to_eidmax 
+  | Top_down -> closure_top_down err_fmt config prec is_obs 0
 		   
 let neighbor_non_direct_descendant sons prec =
   let selection x = S.mem x sons in
