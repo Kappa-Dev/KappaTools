@@ -44,7 +44,7 @@ let config_big_graph_with_progress_bar =
     cut_transitive_path=true ;
     stat_trans_closure_for_big_graphs=true;
     max_index=300;
-    algo= Bottom_up (*if check_mode then Check else Top_down*) ;
+    algo= Bottom_up (* if check_mode then Check else Top_down *);
   }
 
 let config_big_graph_without_progress_bar = 
@@ -275,14 +275,14 @@ let closure_top_down err_fmt config prec is_obs init_to_eidmax =
   in
   let tainting = A.make (max_index+1) [] in
   let s_pred_star = A.make (max_index+1) [] in 
-  let _,lobs =
+  let _ =
     List.fold_left
-      (fun (tick,lobs) (i,s_pred) ->
-       let taints,lobs = 
+      (fun tick (i,s_pred) ->
+       let taints = 
 	 if is_obs i
 	 then
 	   let _ = A.set s_pred_star i [i] in 
-	   [i],i::lobs
+	   [i]
 	 else
 	   let taints = A.get tainting i in
 	   let () = 
@@ -290,13 +290,13 @@ let closure_top_down err_fmt config prec is_obs init_to_eidmax =
 	       (fun taints -> A.set s_pred_star taints ((i::(A.get s_pred_star taints))))
 	       taints
 	   in
-	   taints,lobs
+	   taints
        in
        let taint x = A.set tainting x (merge_list_increasing taints  (A.get tainting x)) in 
        let () = S.iter taint s_pred in
        let () = A.set tainting i [] in      
-       do_tick tick,lobs)
-      (tick,[]) prec 
+       do_tick tick)
+      tick prec 
   in
   let () = close_tick () in
   s_pred_star,Increasing_with_last_event
