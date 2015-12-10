@@ -25,9 +25,9 @@ ____________________________________________________________
 	 - computing causal past of each observed events (3024)
 Stats:
  number of step   : 33024
- longest story    : 2
- average length   : 1.10150808552
- geometric mean   : 1.14215771965
+ longest story    : 3
+ average length   : 2.10150808552
+ geometric mean   : 2.12309689548
 
 	 - causal flow compression (3024)
 
@@ -48,9 +48,9 @@ ____________________________________________________________
 
 Stats:
  number of step   : 11430
- longest story    : 2
- average length   : 2.
- geometric mean   : 2.
+ longest story    : 3
+ average length   : 3.
+ geometric mean   : 3.
 
 	 - causal flow compression (3024)
 

@@ -44,7 +44,7 @@ let config_big_graph_with_progress_bar =
     cut_transitive_path=true ;
     stat_trans_closure_for_big_graphs=true;
     max_index=300;
-    algo= Bottom_up (* if check_mode then Check else Top_down *);
+    algo= Bottom_up (*  if check_mode then Check else Top_down*) ;
   }
 
 let config_big_graph_without_progress_bar = 
