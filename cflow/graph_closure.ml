@@ -259,6 +259,7 @@ let closure_bottom_up err_fmt config prec is_obs init_to_eidmax =
   A.map fst s_pred_star,Decreasing_without_last_event 
 
 let closure_top_down err_fmt config prec is_obs  delta =
+  let is_obs = if config.keep_all_nodes then (fun _ -> true) else is_obs in 
   let max_index = M.fold (fun i _ -> max i) prec 0 in
   let prec =
     M.fold (fun i s_pred l -> (i,s_pred)::l) prec []
@@ -307,13 +308,14 @@ let closure_top_down err_fmt config prec is_obs  delta =
   let _ =
     List.fold_left
       (fun tick (i,s_pred) ->
-       let taints = 
-	 if is_obs i
+       let new_taint = 
+	 if is_obs i 
 	 then
 	   create_taints i
 	 else
-	   A.get tainting i 
+	   []
        in
+       let taints = merge_taints new_taint (A.get tainting i) in 
        let () = taint i taints in 
        let shifted_taints = shift_taints taints in 
        let taint x = A.set tainting x (merge_taints shifted_taints  (A.get tainting x)) in 
@@ -395,3 +397,62 @@ let reduction prec =
      if S.is_empty to_remove then out
      else M.add eid (S.minus neigh to_remove) out
     ) prec prec
+
+let reduction_top_down prec =
+  let prec_star = fst (closure_top_down Format.std_formatter config_big_graph_without_progress_bar prec (fun _ -> true) 2) in
+  M.fold
+    (fun eid neigh out ->
+     let to_remove = A.get prec_star eid in
+     let s =
+       S.fold (fun i l -> i::l) neigh []
+     in
+     let s = List.rev s in
+     let rec aux l1 l2 output =
+       match l1,l2 with
+	 _,[] -> List.fold_left (fun set i -> S.add i set) output l1 (* This is quite annoying, why prec is not described with ordered list *)
+       | [],_ -> output
+       | h::q,h'::q' ->
+	  let cmp = compare h h' in
+	  if cmp < 0 then aux q l2 (S.add h output) 
+	  else if cmp = 0 then aux q q' output
+	  else  aux (h::q) q' output
+     in
+     let s = aux s to_remove S.empty in
+     M.add eid s out 
+    )
+    prec prec
+
+let reduction_check prec =
+  let t = Sys.time () in
+  let a = reduction prec in
+  let t' = Sys.time () in
+  let a' = reduction_top_down prec in
+  let t'' = Sys.time () in 
+  let differ i l l' =
+    let _ = Printf.fprintf stderr "DIFFER %i\n" i in
+    let _ = S.iter (Printf.fprintf stderr "%i, ") l in
+    let _ = Printf.fprintf stderr "\n" in 
+    let _ = S.iter (Printf.fprintf stderr "%i, ") l' in 
+    let _ = Printf.fprintf stderr "\n" in
+    ()
+  in
+(*  let _ = Printf.fprintf stderr "PREC:\n" in 
+  let _ =
+    M.iter (fun i s ->
+	    Printf.fprintf stderr "%i:\n" i;
+	    S.iter (Printf.fprintf stderr "  %i,") s;
+	    Printf.fprintf stderr "\n")
+	   prec
+  in *)
+  let _ =
+    M.monadic_fold2
+      () () 
+      (fun () () i l l' () -> (),if not (S.equal l l') then differ i l l')
+      (fun () () i l () -> (), if not (S.is_empty l) then differ i l S.empty)
+      (fun () () i l () -> (), if not (S.is_empty l) then differ i S.empty l)
+      a a' ()
+  in
+  let _ = Printf.fprintf stderr "OLD: %f ; NEW: %f \n" (t'-.t) (t''-.t') in
+  a
+
+    (*let reduction = reduction_check  *)
