@@ -441,21 +441,21 @@ let compress_and_print logger env log_info step_list =
   let error =
     if causal_trace_on then
       let error,export = U.export_story_table parameter handler error causal in 
-      let () = Causal.pretty_print logger env Graph_closure.config_std "" "" export in
+      let () = Causal.pretty_print logger env Graph_closure.config_small_graph "" "" export in
       error
     else error
   in
   let error =
     if weak_compression_on then
       let error,export = U.export_story_table parameter handler error weak in
-      let () = Causal.pretty_print logger env Graph_closure.config_std "Weakly" "weakly " export in
+      let () = Causal.pretty_print logger env Graph_closure.config_small_graph "Weakly" "weakly " export in
       error
     else error
   in
   let error = 
     if strong_compression_on then
       let error,export = U.export_story_table parameter handler error strong in
-      let () = Causal.pretty_print logger env Graph_closure.config_std "Strongly" "strongly " export in
+      let () = Causal.pretty_print logger env Graph_closure.config_small_graph "Strongly" "strongly " export in
       error
     else
       error 

@@ -309,8 +309,7 @@ let causal_prefix_of_an_observable_hit string parameter handler error log_info b
     | [] -> failwith ("no observable in that story"^string)
     | _ -> failwith  ("several observables in that story"^string)
   in 
-  let event_id_list_rev = ((eid+1)::(enriched_grid.Causal.prec_star.(eid+1))) in 
-  let event_id_list = List.rev_map pred (event_id_list_rev) in 
+  let event_id_list = Graph_closure.get_list_in_increasing_order_with_last_event (eid+1) enriched_grid.Causal.prec_star in 
   let error,list_eid,_ = S.translate parameter handler error blackboard event_id_list in 
   error,trace_of_pretrace list_eid 
 
@@ -505,9 +504,9 @@ let convert_trace_into_grid trace handler =
 let convert_trace_into_musical_notation p h e info x = S.PH.B.import p h e info (get_pretrace_of_trace x)
 
 let enrich_grid_with_transitive_closure = Causal.enrich_grid
-let enrich_big_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closure.config_init
-let enrich_small_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closure.config_intermediary
-let enrich_std_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closure.config_std
+let enrich_big_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closure.config_big_graph_with_progress_bar
+let enrich_small_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closure.config_big_graph_without_progress_bar
+let enrich_std_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closure.config_small_graph
 					    
 let sort_story_list  = D.sort_list 
 let export_story_table parameter handler error x = sort_story_list parameter handler error (get_stories x)

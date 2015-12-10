@@ -22,37 +22,41 @@ module S = Mods.IntSet
 module M = Mods.IntMap
 
 let ignore_flow_from_outgoing_siphon = true
+let check_mode = false 
 					 
+type algo_type = Top_down | Bottom_up | Check 
+type order = Increasing_with_last_event | Decreasing_without_last_event
+			    
 type config = 
   { 
     do_tick: bool ;
-    enable_gc: bool ; 
+    keep_all_nodes: bool ; 
     cut_transitive_path: bool ; 
     stat_trans_closure_for_big_graphs: bool;
     max_index:int;
-    use_new_algo:bool
+    algo: algo_type
   }
 
-let config_init = 
+let config_big_graph_with_progress_bar = 
   {
    do_tick = true;
-    enable_gc=true;
+    keep_all_nodes=false;
     cut_transitive_path=true ;
     stat_trans_closure_for_big_graphs=true;
     max_index=300;
-    use_new_algo=true;
+    algo= Bottom_up (*if check_mode then Check else Top_down*) ;
   }
 
-let config_intermediary = 
-  { config_init with do_tick = false; use_new_algo=false}
+let config_big_graph_without_progress_bar = 
+  { config_big_graph_with_progress_bar with do_tick = false}
     
-let config_std = 
+let config_small_graph = 
   {
     do_tick = false;
-    enable_gc = false ;
+    keep_all_nodes = true ;
     cut_transitive_path = false ;
     stat_trans_closure_for_big_graphs=true;
-    use_new_algo=false ;
+    algo= Bottom_up ;
     max_index = 300;
   }
 
@@ -131,7 +135,7 @@ let diff_list_decreasing =  diff_list (swap compare_bool)
 let merge_list_decreasing = merge_list (swap compare_bool)
 let merge_list_increasing = merge_list compare_bool
 				       
-let closure_old err_fmt config prec is_obs init_to_eidmax =
+let closure_bottom_up err_fmt config prec is_obs init_to_eidmax =
   let max_index = M.fold (fun i _ -> max i) prec 0 in
   let is_init x =
     match M.find_option x prec with
@@ -156,9 +160,12 @@ let closure_old err_fmt config prec is_obs init_to_eidmax =
       (fun x -> x),(false,0,0),(fun () -> ())
   in
   let s_pred_star = A.make (max_index+1) ([],0) in
-  let clean,max_succ(*,redirect,cut_event*) = 
-    if config.enable_gc 
+  let clean,max_succ = 
+    if config.keep_all_nodes 
     then 
+      (fun _ -> ()),
+      (fun _ -> (max_index+1))
+    else 
       begin 
         let max_succ = A.make (max_index+1) 0 in 
         let _ = A.iteri (fun i _ -> A.set max_succ i (init_to_eidmax i)) max_succ in 
@@ -185,16 +192,13 @@ let closure_old err_fmt config prec is_obs init_to_eidmax =
         in 
         let _ = A.set is_last_succ_of 0 [] in 
         let gc_when_visit node =
-          if config.enable_gc then
+          if not config.keep_all_nodes then
             List.iter
               (fun k -> A.set s_pred_star k ([],0))
               (A.get is_last_succ_of node) in
         gc_when_visit,
         (fun i -> A.get max_succ i)
-      end 
-    else  
-      (fun _ -> ()),
-      (fun _ -> (max_index+1))
+      end    
   in 
   let _ = 
     M.fold 
@@ -226,8 +230,6 @@ let closure_old err_fmt config prec is_obs init_to_eidmax =
           in
           let pred_star,max_out = 
             let l_pred = S.fold (fun i j -> i::j) s_pred [] in 
-            (*    let l_pred = merge_list_decreasing l_pred (init succ) in*)
-            
             let s,max_out = A.get s_pred_star succ in 
             aux 
               l_pred 
@@ -245,7 +247,7 @@ let closure_old err_fmt config prec is_obs init_to_eidmax =
   in 
   let _ = close_tick () in 
   let () = 
-    if config.enable_gc 
+    if not config.keep_all_nodes 
     then 
       A.iteri 
 	(fun i _ -> 
@@ -254,9 +256,9 @@ let closure_old err_fmt config prec is_obs init_to_eidmax =
 	    A.set s_pred_star  i ([],0)) 
 	s_pred_star
   in 
-  A.map fst s_pred_star
+  A.map fst s_pred_star,Decreasing_without_last_event 
 
-let closure_obs err_fmt config prec is_obs init_to_eidmax =
+let closure_top_down err_fmt config prec is_obs init_to_eidmax =
   let max_index = M.fold (fun i _ -> max i) prec 0 in
   let prec =
     M.fold (fun i s_pred l -> (i,s_pred)::l) prec []
@@ -279,6 +281,7 @@ let closure_obs err_fmt config prec is_obs init_to_eidmax =
        let taints,lobs = 
 	 if is_obs i
 	 then
+	   let _ = A.set s_pred_star i [i] in 
 	   [i],i::lobs
 	 else
 	   let taints = A.get tainting i in
@@ -296,46 +299,52 @@ let closure_obs err_fmt config prec is_obs init_to_eidmax =
       (tick,[]) prec 
   in
   let () = close_tick () in
-  let t = Sys.time () in 
-  let () =
-    List.iter
-      (fun i ->
-       let old = A.get s_pred_star i in 
-       A.set s_pred_star i (List.rev old)) lobs
-  in
-  let _ = Printf.fprintf stderr "GACHIS %f \n" (Sys.time () -. t) in 
-  s_pred_star
+  s_pred_star,Increasing_with_last_event
 
+let get_list_in_increasing_order_with_last_event i (m,mode) =
+  match
+    mode
+  with
+  | Increasing_with_last_event -> m.(i)
+  | Decreasing_without_last_event ->
+     begin
+       match
+	 m.(i)
+       with
+	 [] -> []
+       | l -> List.rev (i::l)
+     end
+       
 let closure_check err_fmt config prec is_obs init_to_eidmax =
   let t = Sys.time () in 
-  let a = closure_obs err_fmt config prec is_obs init_to_eidmax in
+  let a,a' = closure_top_down err_fmt config prec is_obs init_to_eidmax in
   let t' = Sys.time () in
-  let b = closure_old err_fmt {config with do_tick = false} prec is_obs init_to_eidmax in
+  let b,b' = closure_bottom_up err_fmt {config with do_tick = false} prec is_obs init_to_eidmax in
   let t'' = Sys.time () in
   let _ = Printf.fprintf stderr "NEW: %f OLD: %f \n" (t'-.t) (t''-.t') in 
   let _ =
     A.iteri
       (fun i s ->
-       if is_obs i
-       then 
-	 let s' = A.get b i in
-	 if s = s' then ()
-	 else
-	   let _ = Printf.fprintf stderr "DIFFER %i\n" i in
-	   let _ = List.iter (Printf.fprintf stderr "%i, ") s in
-	   let _ = Printf.fprintf stderr "\n" in 
+       let s = get_list_in_increasing_order_with_last_event i (a,a') in
+       let s' = get_list_in_increasing_order_with_last_event i (b,b') in 
+       if s = s' then ()
+       else
+	 let _ = Printf.fprintf stderr "DIFFER %i\n" i in
+	 let _ = List.iter (Printf.fprintf stderr "%i, ") s in
+	 let _ = Printf.fprintf stderr "\n" in 
 	   let _ = List.iter (Printf.fprintf stderr "%i, ") s' in 
 	   let _ = Printf.fprintf stderr "\n" in 
 	   ())
       a
-  in a
-    
+  in a,a'
+       
 let closure err_fmt config prec is_obs init_to_eidmax =
-  if config.use_new_algo then closure_check err_fmt config prec is_obs init_to_eidmax 
-  else closure_old err_fmt config prec is_obs init_to_eidmax
-
-
-let closure = closure_old
+  match
+    config.algo
+  with
+  | Check -> closure_check err_fmt config prec is_obs init_to_eidmax 
+  | Bottom_up -> closure_bottom_up err_fmt config prec is_obs init_to_eidmax
+  | Top_down -> closure_top_down err_fmt config prec is_obs init_to_eidmax 
 		   
 let neighbor_non_direct_descendant sons prec =
   let selection x = S.mem x sons in

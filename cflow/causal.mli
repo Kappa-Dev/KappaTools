@@ -40,7 +40,7 @@ type enriched_grid =
     {
       config:config;
       depth:int;
-      prec_star: int list array ; (*decreasing*)
+      prec_star: (int list array * Graph_closure.order) ; 
       depth_of_event: int Mods.IntMap.t ;
       size:int;
     }
