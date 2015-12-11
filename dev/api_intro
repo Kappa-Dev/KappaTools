@@ -2,15 +2,17 @@
 
 The folder dataStructures/ has a transparent name. You can find there:
 {!modules: SetMap Nbr NamedDecls Location}
+Some pretty printing utilities are Here too:
+{!modules: Pp Pp_svg Pp_html}
 
 In term/ directory stands all definitions the simulator works on.
-{!modules: Operator Agent_place Signature Connected_component Instantiation
-Alg_expr Raw_mixture Primitives Environment Kappa_printer }
+{!modules: Operator Agent_place Signature Connected_component
+Instantiation Alg_expr Raw_mixture Primitives Environment Kappa_printer }
 
 In grammar/ are the parser and the compilers
 {!modules:LKappa Expr Snip}
 
-{!modules: Edges}
+{!modules: Edges Navigation}
 
 Finally, the simulation engine is in simulation/
 The core of the interpreter

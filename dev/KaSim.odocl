@@ -1,3 +1,7 @@
+Pp
+Pp_svg
+Pp_html
+
 SetMap
 
 Nbr
@@ -7,6 +11,7 @@ Location
 Operator
 Agent_place
 Signature
+Navigation
 Connected_component
 Instantiation
 Alg_expr
