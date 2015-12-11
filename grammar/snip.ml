@@ -32,25 +32,28 @@ let find_implicit_infos sigs contact_map ags =
     else
      match ports.(i) with
      | (Ast.LNK_TYPE (p,a),_),s ->
-	List.map (fun (free_id,ports,ags,cor) ->
-		  let () =
-		    ports.(i) <-
-		      (Location.dummy_annot (Ast.LNK_VALUE (free_id,(p,a))),s) in
-		  (succ free_id, ports, ags, (free_id,(a,p),or_ty,new_switch s)::cor))
-		 (aux_one ag_tail ty_id (max_s max_id s) ports (succ i))
+	List.map
+	  (fun (free_id,ports,ags,cor) ->
+	   let () =
+	     ports.(i) <-
+	       (Location.dummy_annot (Ast.LNK_VALUE (free_id,(p,a))),s) in
+	   (succ free_id, ports, ags, (free_id,(p,a),or_ty,new_switch s)::cor))
+	  (aux_one ag_tail ty_id (max_s max_id s) ports (succ i))
      | (Ast.LNK_SOME,_), s ->
 	Tools.list_map_flatten
 	  (fun (free_id,ports,ags,cor) ->
-	   List.map (fun x ->
-		     let ports' = Array.copy ports in
-		     let () =
-		       ports'.(i) <-
-			 (Location.dummy_annot (Ast.LNK_VALUE (free_id,x)),s) in
-		     (succ free_id, ports', ags, (free_id,x,or_ty,new_switch s)::cor))
-		    (ports_from_contact_map sigs contact_map ty_id i))
+	   List.map
+	     (fun (a,p) ->
+	      let ports' = Array.copy ports in
+	      let () =
+		ports'.(i) <-
+		  (Location.dummy_annot (Ast.LNK_VALUE (free_id,(p,a))),s) in
+	      (succ free_id, ports', ags,
+	       (free_id,(p,a),or_ty,new_switch s)::cor))
+	     (ports_from_contact_map sigs contact_map ty_id i))
 	  (aux_one ag_tail ty_id (max_s max_id s) ports (succ i))
      | (Ast.LNK_VALUE (j,_),_),s ->
-	  aux_one ag_tail ty_id (max_s (max j max_id) s) ports (succ i)
+	aux_one ag_tail ty_id (max_s (max j max_id) s) ports (succ i)
      | (Ast.FREE, pos), LKappa.Maintained ->
 	let () = (* Do not make test is being free is the only possibility *)
 	  match ports_from_contact_map sigs contact_map ty_id i with
@@ -75,13 +78,15 @@ let find_implicit_infos sigs contact_map ags =
 			 (Location.dummy_annot Ast.FREE,
 			  if s = LKappa.Freed then LKappa.Maintained else s) in
 	      (free_id, ports, ags, cor) ::
-		List.map (fun x ->
-			  let ports' = Array.copy ports in
-			  let () =
-			    ports'.(i) <-
-			      (Location.dummy_annot (Ast.LNK_VALUE (free_id,x)),s) in
-			  (succ free_id, ports', ags, (free_id,x,or_ty,new_switch s)::cor))
-			 pfcm)
+		List.map
+		  (fun (a,p) ->
+		   let ports' = Array.copy ports in
+		   let () =
+		     ports'.(i) <- (Location.dummy_annot
+				      (Ast.LNK_VALUE (free_id,(p,a))),s) in
+		   (succ free_id, ports', ags,
+		    (free_id,(p,a),or_ty,new_switch s)::cor))
+		  pfcm)
 	     (aux_one ag_tail ty_id (max_s max_id s) ports (succ i))
   and aux_ags max_id = function
     | [] -> [succ max_id,[],[]]
@@ -146,7 +151,7 @@ let new_agent_with_one_link sigs ty_id port link dst_info switch =
   { LKappa.ra_type = ty_id; LKappa.ra_ports = ports; LKappa.ra_ints = internals;
     LKappa.ra_erased = false; LKappa.ra_syntax = None;}
 
-let rec add_one_implicit_info sigs id ((ty_id,port),dst_info,s as info) todo =
+let rec add_one_implicit_info sigs id ((port,ty_id),dst_info,s as info) todo =
   function
   | [] -> [[new_agent_with_one_link sigs ty_id port id dst_info s],todo]
   | ag :: ag_tail ->
