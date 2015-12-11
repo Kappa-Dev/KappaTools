@@ -853,21 +853,29 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  | Private.Empty -> None
 	  | Private.Node (_,v,_,_,_) -> Some v
 
-	let random m =
-	  let s = size m in
-	  if s = 0 then None
-	  else
-	    let rec find k m =
-	      match m with
-		Private.Empty -> None
-	      | Private.Node (l, key, r, _, _) ->
-		 if k = 0 then Some key
-		 else
-		   let s = size l in
-		   if k <= s then find (k - 1) l
-		   else find (k - s - 1) r
-	    in
-	    find (Random.int (size m)) m
+	let rec find_acc aim_acc = function
+	    Private.Empty -> None
+	  | Private.Node(l,key,r,_,acc) ->
+	     if aim_acc >= acc then None
+	     else
+	       let acc_l = size l in
+	       let acc_r = size r in
+	       if acc_l > aim_acc then find_acc aim_acc l
+	       else if (acc_r + acc_l) > aim_acc
+	       then find_acc (aim_acc - acc_l) r
+	       else Some key
+
+        (* let rec find_acc k m = *)
+	(*   match m with *)
+        (*     Private.Empty -> None *)
+        (*   | Private.Node (l, key, r, _, _) -> *)
+        (*      let s = size l in *)
+        (*      if k < s then find_acc k l *)
+	(*      else if k = s then Some key *)
+        (*      else find_acc (k - s - 1) r *)
+
+	let random m = find_acc (Random.int (size m)) m
+
 (*	let add = Lift_error_logs.lift_generic_binary_for_KaSim add_with_logs
 	let split = Lift_error_logs.lift_generic_binary_for_KaSim split_with_logs
 	let remove =  Lift_error_logs.lift_generic_binary_for_KaSim remove_with_logs
