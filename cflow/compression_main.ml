@@ -2,7 +2,7 @@
   * compression_main.ml 
   *
   * Creation:                      <2011-10-19 16:52:55 feret>
-  * Last modification: Time-stamp: <2015-12-11 11:29:09 feret> 
+  * Last modification: Time-stamp: <2015-12-11 11:44:27 feret> 
   * 
   * Causal flow compression: a module for KaSim 
   * Jerome Feret, projet Antique, INRIA Paris-Rocquencourt
@@ -322,16 +322,17 @@ let compress_and_print logger env log_info step_list =
 		      let error,log_info,trace_without_pseudo_inverse_events = 
                       	U.remove_pseudo_inverse_events (do_not_log parameter) always handler log_info error trace_before_compression  
                       in 
-                      let error,log_info,blackboard_cflow = U.convert_trace_into_musical_notation parameter handler error log_info trace_without_pseudo_inverse_events in
-		      let error,observable_hit = U.extract_observable_hit_from_musical_notation "compression_main.ml, line 214, " parameter handler error blackboard_cflow in 		 
-		      let grid = U.convert_trace_into_grid trace_without_pseudo_inverse_events handler in 
-		      (* there is no need for a closure here, we should provide a primitive to work with the grid instead *)
-                      let enriched_grid = U.enrich_grid_with_transitive_past_of_observables_without_a_progress_bar logger grid in 
-		      let error,event_list = U.causal_prefix_of_an_observable_hit "" parameter handler error log_info blackboard_cflow enriched_grid observable_hit in 
-		      let error,causal_story_array,log_info = U.store_trace parameter handler error info log_info  event_list story_list in 
+                      let error,log_info,trace_without_pseudo_inverse_events = 
+			U.cut (do_not_log parameter) always handler log_info error trace_without_pseudo_inverse_events
+		      in 
+		      let error,causal_story_array,log_info = 
+			U.store_trace parameter handler error info log_info trace_without_pseudo_inverse_events  story_list 
+		      in 
 		      error,log_info,causal_story_array  
 		    else
-		      let error,log_info,list = U.weakly_compress logger parameter handler error log_info trace_before_compression in 
+		      let error,log_info,list = 
+			U.weakly_compress logger parameter handler error log_info trace_before_compression 
+		      in 
 		      let error,story_list,log_info =
 			List.fold_left
 			  (fun (error,story_list,log_info) trace -> 
