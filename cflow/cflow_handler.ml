@@ -42,6 +42,7 @@ module type Cflow_handler =
 	  kasa : Remanent_parameters_sig.parameters ;
 	  always_disambiguate_initial_states : bool  ;
 	  bound_on_itteration_number: int option ;
+	  reduce_graph_before_canonicalisation: bool ;
 	}  
     type handler =   (*handler to interpret abstract values*)
         {
@@ -77,7 +78,8 @@ module type Cflow_handler =
     val use_bucket_sort: parameter -> parameter
     val use_fusion_sort: parameter -> parameter 
     val always_disambiguate: parameter -> bool 
-    val set_always_disambiguate: parameter -> bool -> parameter 
+    val set_always_disambiguate: parameter -> bool -> parameter
+    val do_we_reduce_graph_before_canonicalisation: parameter -> bool  						
   end
 
 
@@ -102,6 +104,7 @@ module Cflow_handler =
 	  kasa : Remanent_parameters_sig.parameters ;
 	  always_disambiguate_initial_states : bool  ;
 	  bound_on_itteration_number: int option ;
+	  reduce_graph_before_canonicalisation: bool ;
 	}
 
     let build_parameter () =
@@ -124,6 +127,7 @@ module Cflow_handler =
 	kasa = Remanent_parameters.get_parameters () ;
 	always_disambiguate_initial_states = true ;
 	bound_on_itteration_number = None ;
+	reduce_graph_before_canonicalisation = true 
       }
 
     let set_compression_weak p =
@@ -191,6 +195,7 @@ module Cflow_handler =
    let do_not_bound_itterations parameter = {parameter with bound_on_itteration_number = None}
    let set_itteration_bound parameter int = {parameter with bound_on_itteration_number = Some int}				      
    let get_bound_on_itteration_number parameter = parameter.bound_on_itteration_number
-						    
+
+   let do_we_reduce_graph_before_canonicalisation parameter = parameter.reduce_graph_before_canonicalisation
     end:Cflow_handler)
     

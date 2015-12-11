@@ -195,6 +195,13 @@ let graph_of_grid parameter handler error grid =
   let ids = Hashtbl.fold (fun key _ l -> key::l) grid.Causal.flow [] in
   let label = label handler in 
   let config = Causal.cut ids grid in 
+  let config =
+    if H.do_we_reduce_graph_before_canonicalisation parameter
+    then
+      {config with Causal.prec_1 = Graph_closure.reduction config.Causal.prec_1}
+    else
+      config 
+  in 
   let labels = A.make 1 (FICTITIOUS,"") in 
   let set =  
     Mods.IntMap.fold
@@ -274,89 +281,7 @@ let graph_of_grid parameter handler error grid =
       conflict_succ = conflict_succ ;
       conflict_pred = conflict_pred 
     }
-	    
-let graph_of_config parameter handler error config = 
-  let label = label handler in 
-  let labels = A.make 1 (FICTITIOUS,"") in 
-  let set =  
-    Mods.IntMap.fold
-      (fun i atom_kind ->
-       let _ = A.set labels i (kind atom_kind,label atom_kind) in
-       Mods.IntSet.add i 
-      )
-      config.Causal.events_kind
-      Mods.IntSet.empty 
-  in 
-  let add_to_list_array i j a = 
-    try 
-      let old = 
-        try 
-          A.get a i 
-        with 
-        | Not_found -> []
-      in 
-      A.set a i  (j::old) 
-    with 
-    | _ -> A.set a i [j]
-  in 
-  let add i j s p = 
-    let _ = add_to_list_array i j s in 
-    let _ = add_to_list_array j i p in 
-    ()
-  in 
-  let succ  = A.make 1 [] in 
-  let pred = A.make 1 [] in 
-  let root = 
-    Mods.IntMap.fold
-      (fun i s set ->
-       if Mods.IntSet.is_empty s
-       then set 
-       else 
-         let set  = 
-           Mods.IntSet.fold
-             (fun j -> 
-              let _ = add j i succ pred in 
-              Mods.IntSet.remove j)
-             s
-             set
-         in 
-         set)
-      config.Causal.prec_1
-      set 
-  in 
-  let conflict_pred = A.make 1 [] in 
-  let conflict_succ = A.make 1 [] in 
-  let root = 
-    Mods.IntMap.fold
-      (fun i s root ->
-       if Mods.IntSet.is_empty s 
-       then set 
-       else 
-         let root = 
-           Mods.IntSet.fold 
-             (fun j -> 
-              let _ = add j i conflict_succ conflict_pred in 
-              Mods.IntSet.remove j)
-             s
-             root 
-         in 
-         root)
-      config.Causal.conflict 
-      root
-  in 
-  if Mods.IntSet.is_empty root
-  then 
-    error,dummy_graph 
-  else 
-    error,{ 
-      root = (match Mods.IntSet.min_elt root with Some x -> x | None -> -1);
-      labels = labels ;
-      succ = succ ;
-      pred = pred ;
-      conflict_succ = conflict_succ ;
-      conflict_pred = conflict_pred 
-    }
-	    
+	    	    
 let concat list1 list2 = 
   let rec aux list1 list2 = 
     match list2 

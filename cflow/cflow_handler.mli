@@ -20,7 +20,8 @@ module type Cflow_handler =
 	  kasa: Remanent_parameters_sig.parameters ;
 	  always_disambiguate_initial_states : bool  ;
 	  bound_on_itteration_number: int option ;
-        } 
+	  reduce_graph_before_canonicalisation: bool ;
+	} 
 
     type handler =   (*handler to interpret abstract values*)
         {
@@ -58,7 +59,7 @@ module type Cflow_handler =
     val use_fusion_sort: parameter -> parameter
     val always_disambiguate: parameter -> bool 
     val set_always_disambiguate: parameter -> bool -> parameter 
- 
+    val do_we_reduce_graph_before_canonicalisation: parameter -> bool 
   end
 
 module Cflow_handler:Cflow_handler
