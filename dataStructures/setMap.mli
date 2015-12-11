@@ -46,7 +46,7 @@ module type Set =
     val inter_with_logs: ('parameters,'error,t -> t -> 'error * t) with_log_wrap
     val diff_with_logs: ('parameters,'error,t -> t -> 'error * t) with_log_wrap
 
-    val cardinal: t -> int
+    val size: t -> int
 
     val mem: elt -> t -> bool
     val exists: (elt -> bool) -> t -> bool

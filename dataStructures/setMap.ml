@@ -62,7 +62,7 @@ module type Set =
   (*  val split_with_logs:
          ('parameters,'error,elt -> t -> 'error * ( t * bool * t)) with_log_wrap *)
 
-    val cardinal: t -> int
+    val size: t -> int
 
     val mem: elt -> t -> bool
     val exists: (elt -> bool) -> t -> bool
@@ -260,7 +260,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	type t = Private.t
 	let empty = Private.empty
 	let height = Private.height
-	let cardinal = Private.size
+	let size = Private.size
 	let node = Private.node
 
 	let is_empty = function Private.Empty -> true | Private.Node _ -> false
@@ -854,7 +854,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  | Private.Node (_,v,_,_,_) -> Some v
 
 	let random m =
-	  let s = cardinal m in
+	  let s = size m in
 	  if s = 0 then None
 	  else
 	    let rec find k m =
@@ -863,11 +863,11 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	      | Private.Node (l, key, r, _, _) ->
 		 if k = 0 then Some key
 		 else
-		   let s = cardinal l in
+		   let s = size l in
 		   if k <= s then find (k - 1) l
 		   else find (k - s - 1) r
 	    in
-	    find (Random.int (cardinal m)) m
+	    find (Random.int (size m)) m
 (*	let add = Lift_error_logs.lift_generic_binary_for_KaSim add_with_logs
 	let split = Lift_error_logs.lift_generic_binary_for_KaSim split_with_logs
 	let remove =  Lift_error_logs.lift_generic_binary_for_KaSim remove_with_logs

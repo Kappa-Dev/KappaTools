@@ -2,8 +2,8 @@ type jf_data =
   Compression_main.secret_log_info * Compression_main.secret_step list
 
 type t = {
-  roots_of_ccs: int ValMap.tree Connected_component.Map.t;
-  unary_candidates: (int * int) ValMap.tree Mods.IntMap.t;
+  roots_of_ccs: Mods.IntSet.t Connected_component.Map.t;
+  unary_candidates: Mods.Int2Set.t Mods.IntMap.t;
   unary_pathes: Edges.path Mods.Int2Map.t;
   edges: Edges.t;
   tokens: Nbr.t array;
@@ -35,9 +35,6 @@ let empty ~has_tracking env = {
       else None;
 }
 
-let print_heap pr f h =
-  ValMap.iter (fun c -> Format.fprintf f "%a%t" pr c Pp.comma) h
-
 let print_injections ?sigs pr f roots_of_ccs =
   Format.fprintf
     f "@[<v>%a@]"
@@ -45,27 +42,30 @@ let print_injections ?sigs pr f roots_of_ccs =
 	    (fun f (cc,roots) ->
 	     Format.fprintf
 	       f "@[# @[%a@] ==>@ @[%a@]@]"
-	       (Connected_component.print ?sigs true) cc (print_heap pr) roots
+	       (Connected_component.print ?sigs true) cc
+	       (Pp.set Mods.IntSet.elements Pp.comma pr) roots
 	    )
     ) roots_of_ccs
 
 let update_roots is_add map cc root =
   let va =
-    Connected_component.Map.find_default ValMap.empty cc map in
+    Connected_component.Map.find_default Mods.IntSet.empty cc map in
   Connected_component.Map.add
-    cc ((if is_add then ValMap.add else ValMap.remove) root va) map
+    cc ((if is_add then Mods.IntSet.add else Mods.IntSet.remove) root va) map
 
 let add_candidate cands pathes rule_id x y p =
   let a = min x y in
   let b = max x y in
-  let va = Mods.IntMap.find_default ValMap.empty rule_id cands in
-  (Mods.IntMap.add rule_id (ValMap.add (x,y) va) cands,
+  let va = Mods.IntMap.find_default Mods.Int2Set.empty rule_id cands in
+  (Mods.IntMap.add rule_id (Mods.Int2Set.add (x,y) va) cands,
    Mods.Int2Map.add (a,b) p pathes)
 let remove_candidate cands pathes rule_id x y =
   let a = min x y in
   let b = max x y in
-  let va = ValMap.remove (x,y) (Mods.IntMap.find_default ValMap.empty rule_id cands) in
-  ((if ValMap.is_empty va then Mods.IntMap.remove rule_id cands
+  let va =
+    Mods.Int2Set.remove
+      (x,y) (Mods.IntMap.find_default Mods.Int2Set.empty rule_id cands) in
+  ((if Mods.Int2Set.is_empty va then Mods.IntMap.remove rule_id cands
     else Mods.IntMap.add rule_id va cands),
    Mods.Int2Map.remove (a,b) pathes)
 
@@ -88,11 +88,11 @@ let all_injections ?excp edges roots cca =
        match excp with
        | Some (cc',root)
            when Connected_component.is_equal_canonicals cc cc' ->
-         ValMap.add root ValMap.empty,None
+         Mods.IntSet.add root Mods.IntSet.empty,None
        | (Some _ | None) ->
-         Connected_component.Map.find_default ValMap.empty cc roots,excp in
+         Connected_component.Map.find_default Mods.IntSet.empty cc roots,excp in
      (excp',
-      ValMap.fold
+      Mods.IntSet.fold
        (fun root new_injs ->
         List.fold_left
           (fun corrects inj ->
@@ -237,15 +237,16 @@ let exists_root_of_unary_ccs unary_ccs roots =
   not @@
     Connected_component.Set.for_all
       (fun cc ->
-       ValMap.is_empty (Connected_component.Map.find_default ValMap.empty cc roots))
+       Mods.IntSet.is_empty
+	 (Connected_component.Map.find_default Mods.IntSet.empty cc roots))
       unary_ccs
 
 let potential_root_of_unary_ccs unary_ccs roots i =
   let ccs =
     Connected_component.Set.filter
       (fun cc ->
-	ValMap.mem
-	  i (Connected_component.Map.find_default ValMap.empty cc roots))
+	Mods.IntSet.mem
+	  i (Connected_component.Map.find_default Mods.IntSet.empty cc roots))
       unary_ccs in
   if Connected_component.Set.is_empty ccs then None else Some ccs
 
@@ -311,8 +312,8 @@ let update_edges counter domain unary_ccs inj_nodes state event_kind rule =
 
 let raw_instance_number state ccs_l =
   let size cc =
-    ValMap.total (Connected_component.Map.find_default
-		    ValMap.empty cc state.roots_of_ccs) in
+    Mods.IntSet.size (Connected_component.Map.find_default
+			Mods.IntSet.empty cc state.roots_of_ccs) in
   let rect_approx ccs =
     Array.fold_left (fun acc cc ->  acc * (size cc)) 1 ccs in
   List.fold_left (fun acc ccs -> acc + (rect_approx ccs)) 0 ccs_l
@@ -368,7 +369,7 @@ let new_unary_instances rule_id cc1 cc2 created_obs state =
 		  else add_candidate cands pathes rule_id id d p)
 		 acc
 		 (Edges.pathes_of_interrest
-		    (fun x -> if ValMap.mem x goals then Some () else None)
+		    (fun x -> if Mods.IntSet.mem x goals then Some () else None)
 		    state.edges restart path)
 	     with Not_found -> acc)
 	    ccs acc) acc l)
@@ -420,8 +421,8 @@ let update_outdated_activities ~get_alg store env counter state =
 		i rule.Primitives.connected_components.(0)
 		rule.Primitives.connected_components.(1) unary_cands state in
 	    let va =
-	      ValMap.total
-		(Mods.IntMap.find_default ValMap.empty i state'.unary_candidates) in
+	      Mods.Int2Set.size
+		(Mods.IntMap.find_default Mods.Int2Set.empty i state'.unary_candidates) in
 	    let () =
 	      store_activity (2*i+1) rule.Primitives.syntactic_rule unrate va in
 	    state') state env in
@@ -453,9 +454,13 @@ let transform_by_a_rule
 
 let apply_unary_rule
       ~rule_id ~get_alg env domain unary_ccs counter state event_kind rule =
-  let root1,root2 =
-    ValMap.random_val
-      (Mods.IntMap.find_default ValMap.empty rule_id state.unary_candidates) in
+  let  (root1,root2) =
+    match
+      Mods.Int2Set.random
+	(Mods.IntMap.find_default
+	   Mods.Int2Set.empty rule_id state.unary_candidates) with
+    | None -> failwith "Tried apply_unary_rule with no roots"
+    | Some x -> x in
   let cc1 = rule.Primitives.connected_components.(0) in
   let cc2 = rule.Primitives.connected_components.(1) in
   let pair = (min root1 root2,max root1 root2) in
@@ -472,11 +477,11 @@ let apply_unary_rule
       outdated_elements =
 	(Operator.DepSet.add (Operator.RULE rule_id) deps,unary_cands,false)} in
   let missing_ccs =
-      not @@
-	ValMap.mem root1 (Connected_component.Map.find_default
-			    ValMap.empty cc1 state.roots_of_ccs) &&
-	ValMap.mem root2 (Connected_component.Map.find_default
-			    ValMap.empty cc2 state.roots_of_ccs) in
+    not @@
+      Mods.IntSet.mem root1 (Connected_component.Map.find_default
+			       Mods.IntSet.empty cc1 state.roots_of_ccs) &&
+      Mods.IntSet.mem root2 (Connected_component.Map.find_default
+			       Mods.IntSet.empty cc2 state.roots_of_ccs) in
   match Edges.are_connected ~candidate state.edges root1 root2 with
   | None -> Corrected state'
   | Some _ when missing_ccs -> Corrected state'
@@ -496,16 +501,17 @@ let apply_unary_rule
 	  (transform_by_a_rule
 	     ~get_alg env domain unary_ccs counter state' event_kind rule inj)
 
-
 let apply_rule
-    ?rule_id ~get_alg env domain unary_ccs counter state event_kind rule =
+      ?rule_id ~get_alg env domain unary_ccs counter state event_kind rule =
   let inj,roots =
     Tools.array_fold_left_mapi
       (fun id inj cc ->
        let root =
-	 ValMap.random_val
-	   (Connected_component.Map.find_default
-	      ValMap.empty cc state.roots_of_ccs) in
+	 match Mods.IntSet.random
+		 (Connected_component.Map.find_default
+		    Mods.IntSet.empty cc state.roots_of_ccs) with
+	 | None -> failwith "Tried to apply_rule with no root"
+	 | Some x -> x in
        (match inj with
        | Some inj ->
 	  Connected_component.Matching.reconstruct state.edges inj id cc root
@@ -595,7 +601,7 @@ let debug_print f state =
 		 (Pp.set Mods.IntMap.bindings Pp.cut
 			 (fun f (rule,roots) ->
 			  Format.fprintf f "@[rule_%i ==> %a@]" rule
-					 (print_heap (fun f (x,y) -> Format.fprintf f "(%i,%i)" x y))
+					 (Pp.set Mods.Int2Set.elements Pp.comma (fun f (x,y) -> Format.fprintf f "(%i,%i)" x y))
 					 roots))
 		 state.unary_candidates
 
