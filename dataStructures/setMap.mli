@@ -1,12 +1,17 @@
 (** Our own implementattion of Set and Map
 
-Purely functionnal. Nothing there raises any exception. *)
+Purely functionnal.
+ No function without _with_logs there raises any exception. *)
 
 module type OrderedType =
   sig
     type t
     val compare : t -> t -> int
   end
+
+type ('parameters,'error,'a) with_log_wrap =
+  ('parameters -> 'error -> string -> string option -> exn -> 'error) ->
+  'parameters -> 'error -> 'a
 
 module type Set =
   sig
@@ -19,13 +24,14 @@ module type Set =
     val is_singleton: t -> bool
 
     val add: elt -> t -> t
-    val add_with_logs:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * t 
+    val add_with_logs: ('parameters,'error,elt -> t -> 'error * t) with_log_wrap
     val remove: elt -> t -> t
-    val add_while_testing_freshness: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * bool * t
-    val remove_while_testing_existence: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * bool * t
-    val remove_with_logs: ('parameters -> 'error -> string -> string option  -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * t 			      
-
-    																		 
+    val add_while_testing_freshness:
+      ('parameters,'error,elt -> t -> 'error * bool * t) with_log_wrap
+    val remove_while_testing_existence:
+      ('parameters,'error,elt -> t -> 'error * bool * t) with_log_wrap
+    val remove_with_logs:
+      ('parameters,'error,elt -> t -> 'error * t) with_log_wrap
     val split: elt -> t -> (t * bool * t)
     val union: t -> t -> t
     val inter: t -> t -> t
@@ -33,24 +39,29 @@ module type Set =
     (** [minus a b] contains elements of [a] that are not in [b] *)
     val diff: t -> t -> t
     (** [diff a b] = [minus (union a b) (inter a b)] *)
-    val minus_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t 
-    val union_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t 
-    val disjoint_union_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t 								
-    val inter_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t
-    val diff_with_logs:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t
-(*    val split_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * ( t * bool * t)*)
+    val minus_with_logs: ('parameters,'error,t -> t -> 'error * t) with_log_wrap
+    val union_with_logs: ('parameters,'error,t -> t -> 'error * t) with_log_wrap
+    val disjoint_union_with_logs:
+      ('parameters,'error,t -> t -> 'error * t) with_log_wrap
+    val inter_with_logs: ('parameters,'error,t -> t -> 'error * t) with_log_wrap
+    val diff_with_logs: ('parameters,'error,t -> t -> 'error * t) with_log_wrap
 
-  
     val cardinal: t -> int
 
     val mem: elt -> t -> bool
     val exists: (elt -> bool) -> t -> bool
     val filter: (elt -> bool) -> t -> t
+    val filter_with_logs:
+      ('parameters,'error,(elt -> bool) -> t -> 'error * t) with_log_wrap
     val for_all: (elt -> bool) -> t -> bool
     val partition: (elt -> bool) -> t -> t * t
+    val partition_with_logs:
+      ('parameters,'error,(elt -> bool) -> t -> 'error * t * t) with_log_wrap
 
     val compare: t -> t -> int
     val equal: t -> t -> bool
+
+
     val subset: t -> t -> bool
 
     val iter: (elt -> unit) -> t -> unit
@@ -60,6 +71,7 @@ module type Set =
     val elements: t -> elt list
 
     val choose: t -> elt option
+    val random: t -> elt option
     val min_elt: t -> elt option
     val max_elt: t -> elt option
   end
@@ -78,45 +90,82 @@ module type Map =
 
     val add: elt -> 'a -> 'a t -> 'a t
     val remove: elt -> 'a t -> 'a t
-    val add_while_testing_freshness: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a -> 'a t -> 'error * bool * 'a t
-    val remove_while_testing_existence: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * bool * 'a t
- 
+    val add_while_testing_freshness:
+      ('parameters,'error,
+       elt -> 'a -> 'a t -> 'error * bool * 'a t) with_log_wrap
+    val remove_while_testing_existence:
+      ('parameters,'error,elt -> 'a t -> 'error * bool * 'a t) with_log_wrap
 
-   
     val pop: elt -> 'a t -> ('a option * 'a t)
     val merge: 'a t -> 'a t -> 'a t
     val min_elt: (elt -> 'a -> bool) -> 'a t -> elt option
     val find_option: elt -> 'a t -> 'a option
     val find_default: 'a -> elt -> 'a t -> 'a
-    val find_option_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * 'a option
-    val find_default_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a -> elt -> 'a t -> 'error * 'a
+    val find_option_with_logs:
+      ('parameters,'error,elt -> 'a t -> 'error * 'a option) with_log_wrap
+    val find_default_with_logs:
+      ('parameters,'error,'a -> elt -> 'a t -> 'error * 'a) with_log_wrap
     val mem:  elt -> 'a t -> bool
     val diff: 'a t -> 'a t -> 'a t * 'a t
     val union: 'a t -> 'a t -> 'a t
     val update: 'a t -> 'a t -> 'a t
     val diff_pred: ('a -> 'a -> bool) -> 'a t -> 'a t -> 'a t * 'a t
-    val add_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a -> 'a t -> 'error * 'a t
-    val remove_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * 'a t
-													     
-    
-    val join_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> elt -> 'a -> 'a t -> 'error * 'a t
-    val split_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * ('a t * 'a option * 'a t)
-    val update_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error  -> 'a t -> 'a t -> 'error * 'a t    
-    val map2_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('parameters -> 'error -> 'a -> 'error * 'a) -> ('parameters -> 'error -> 'a -> 'error *  'a) -> ('parameters -> 'error -> 'a -> 'a -> 'error * 'a) -> 'a t -> 'a t -> 'error * 'a t
-    val map2z_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('parameters -> 'error -> 'a -> 'a -> 'error * 'a) -> 'a t -> 'a t -> 'error * 'a t 
-    val fold2z_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('parameters -> 'error -> elt -> 'a  -> 'b  -> 'c   -> ('error * 'c)) -> 'a t -> 'b t -> 'c -> 'error * 'c 
-    val fold2_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('parameters -> 'error -> elt -> 'a   -> 'c  -> 'error * 'c) -> ('parameters -> 'error -> elt -> 'b  ->  'c  -> 'error * 'c) -> ('parameters -> 'error -> elt -> 'a -> 'b  -> 'c  -> 'error * 'c) ->  'a t -> 'b t -> 'c -> 'error * 'c 
-  
-   
-    val fold2_sparse_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('parameters -> 'error -> elt -> 'a  -> 'b  -> 'c  -> ('error * 'c)) ->  'a t -> 'b t -> 'c -> 'error * 'c
-    val iter2_sparse_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('parameters -> 'error -> elt -> 'a  -> 'b  -> 'error)->  'a t -> 'b t -> 'error 
-    val diff_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t * 'a t 
-    val diff_pred_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('a -> 'a -> bool) -> 'a t -> 'a t -> 'error * 'a t * 'a t 
-    val merge_with_logs : ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t
-    val union_with_logs : ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t
-    val fold_restriction_with_logs:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a -> ('error * 'b) -> ('error* 'b)) -> set -> 'a t -> 'b -> 'error * 'b 
- 
-								   
+    val add_with_logs:
+      ('parameters,'error,elt -> 'a -> 'a t -> 'error * 'a t) with_log_wrap
+    val remove_with_logs:
+      ('parameters,'error,elt -> 'a t -> 'error * 'a t) with_log_wrap
+
+    val join_with_logs:
+      ('parameters,'error,
+       'a t -> elt -> 'a -> 'a t -> 'error * 'a t) with_log_wrap
+    val split_with_logs:
+      ('parameters,'error,
+       elt -> 'a t -> 'error * ('a t * 'a option * 'a t)) with_log_wrap
+    val update_with_logs:
+      ('parameters,'error,'a t -> 'a t -> 'error * 'a t) with_log_wrap
+    val map2_with_logs:
+      ('parameters,'error,
+       ('parameters -> 'error -> 'a -> 'error * 'c) ->
+       ('parameters -> 'error -> 'b -> 'error * 'c) ->
+       ('parameters -> 'error -> 'a -> 'b -> 'error * 'c) ->
+       'a t -> 'b t -> 'error * 'c t) with_log_wrap
+    val map2z_with_logs:
+      ('parameters,'error,
+       ('parameters -> 'error -> 'a -> 'a -> 'error * 'a) ->
+       'a t -> 'a t -> 'error * 'a t) with_log_wrap
+    val fold2z_with_logs:
+      ('parameters,'error,
+       ('parameters -> 'error -> elt -> 'a  -> 'b  -> 'c  -> ('error * 'c)) ->
+       'a t -> 'b t -> 'c -> 'error * 'c) with_log_wrap
+    val fold2_with_logs:
+      ('parameters,'error,
+       ('parameters -> 'error -> elt -> 'a   -> 'c  -> 'error * 'c) ->
+       ('parameters -> 'error -> elt -> 'b  ->  'c  -> 'error * 'c) ->
+       ('parameters -> 'error -> elt -> 'a -> 'b  -> 'c  -> 'error * 'c) ->
+       'a t -> 'b t -> 'c -> 'error * 'c) with_log_wrap
+    val fold2_sparse_with_logs:
+      ('parameters,'error,
+       ('parameters -> 'error -> elt -> 'a  -> 'b  -> 'c  -> ('error * 'c)) ->
+       'a t -> 'b t -> 'c -> 'error * 'c) with_log_wrap
+    val iter2_sparse_with_logs:
+      ('parameters,'error,
+       ('parameters -> 'error -> elt -> 'a  -> 'b  -> 'error) ->
+       'a t -> 'b t -> 'error) with_log_wrap
+    val diff_with_logs:
+      ('parameters,'error,'a t -> 'a t -> 'error * 'a t * 'a t) with_log_wrap
+
+    val diff_pred_with_logs:
+      ('parameters,'error,
+       ('a -> 'a -> bool) -> 'a t -> 'a t -> 'error * 'a t * 'a t) with_log_wrap
+    val merge_with_logs :
+      ('parameters,'error,'a t -> 'a t -> 'error * 'a t) with_log_wrap
+    val union_with_logs :
+      ('parameters,'error,'a t -> 'a t -> 'error * 'a t) with_log_wrap
+    val fold_restriction_with_logs:
+      ('parameters,'error,
+       (elt -> 'a -> ('error * 'b) -> ('error* 'b)) ->
+       set -> 'a t -> 'b -> 'error * 'b) with_log_wrap
+
     val iter: (elt -> 'a -> unit) -> 'a t -> unit
     val fold: (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
     val monadic_fold2:
@@ -162,18 +211,21 @@ module type S = sig
 
 module Make(Ord:OrderedType): S with type elt = Ord.t
 
-						  
 module type Projection = sig
     type elt_a
     type elt_b
     type 'a map_a
     type 'a map_b
     val proj: (elt_a -> elt_b) -> 'a -> ('a -> 'a -> 'a) -> 'a map_a -> 'a map_b
-    val proj_monadic: 'parameters -> 'method_handler -> (elt_a -> elt_b) -> 'a -> 
-      ('parameters -> 'method_handler -> 'a -> 'a -> 'method_handler * 'a) -> 'a map_a -> 'method_handler * 'a map_b
+    val proj_monadic:
+      'parameters -> 'method_handler -> (elt_a -> elt_b) -> 'a ->
+      ('parameters -> 'method_handler -> 'a -> 'a -> 'method_handler * 'a) ->
+      'a map_a -> 'method_handler * 'a map_b
   end
 
-module Proj(A:S)(B:S): Projection with type elt_a = A.elt and type elt_b = B.elt and type 'a map_a = 'a A.Map.t and type 'a map_b = 'a B.Map.t
+module Proj(A:S)(B:S): Projection with
+	 type elt_a = A.elt and type elt_b = B.elt and
+	 type 'a map_a = 'a A.Map.t and type 'a map_b = 'a B.Map.t
 
 module type Projection2 = sig
     type elt_a
@@ -182,8 +234,17 @@ module type Projection2 = sig
     type 'a map_a
     type 'a map_b
     type 'a map_c
-    val proj2: (elt_a -> elt_b) -> (elt_a -> elt_c) -> 'a -> ('a -> 'a -> 'a) -> 'a map_a -> 'a map_c map_b
-    val proj2_monadic: 'parameters -> 'method_handler -> (elt_a -> elt_b) -> (elt_a -> elt_c) -> 'a -> ('parameters -> 'method_handler -> 'a -> 'a -> 'method_handler * 'a) -> 'a map_a -> 'method_handler * 'a map_c map_b
+    val proj2:
+      (elt_a -> elt_b) -> (elt_a -> elt_c) ->
+      'a -> ('a -> 'a -> 'a) -> 'a map_a -> 'a map_c map_b
+    val proj2_monadic:
+      'parameters -> 'method_handler -> (elt_a -> elt_b) -> (elt_a -> elt_c) ->
+      'a ->
+      ('parameters -> 'method_handler -> 'a -> 'a -> 'method_handler * 'a) ->
+      'a map_a -> 'method_handler * 'a map_c map_b
  end
 
-module Proj2(A:S)(B:S)(C:S): Projection2 with type elt_a = A.elt and type elt_b = B.elt and type 'a map_a = 'a A.Map.t and type 'a map_b = 'a B.Map.t and type elt_c = C.elt and type 'a map_c = 'a C.Map.t
+module Proj2(A:S)(B:S)(C:S): Projection2 with
+	 type elt_a = A.elt and type elt_b = B.elt and
+	 type 'a map_a = 'a A.Map.t and type 'a map_b = 'a B.Map.t and
+	 type elt_c = C.elt and type 'a map_c = 'a C.Map.t
