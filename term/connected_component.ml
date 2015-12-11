@@ -19,7 +19,7 @@ type transition = {
   next: Navigation.step;
   dst: int (* id of cc and also address in the Env.domain map*);
   inj: Renaming.t list; (* From dst To ("this" cc + extra edge) *)
-  above_obs: int list;
+  above_obs: IntSet.t;
 }
 
 type point = {
@@ -356,29 +356,31 @@ let print f env =
     env.single_agent_points
     (Pp.set IntMap.bindings Pp.space
 	    (fun f (_,p) ->
-	     Format.fprintf f "@[<hov 2>(%a)@ -> @[<h>%a@]@ %t-> @[(%a)@]@]"
-			    (Pp.list Pp.space Format.pp_print_int) p.fathers
-			    (print ~sigs:env.sig_decl true) p.content
-			    (fun f ->
-			     match p.is_obs_of with
-			     | None -> ()
-			     | Some deps ->
-				Format.fprintf
-				  f "@[[%a]@]@ "
-				  (Pp.set Operator.DepSet.elements Pp.space Operator.print_rev_dep)
-				  deps)
-			    (Pp.list
-			       Pp.space
-			       (fun f s ->
-				let () =
-				  Navigation.print_step env.sig_decl (find_ty p.content) f s.next in
-				let () =
-				  Pp.list
-				    Pp.space
-				    (fun f -> Format.fprintf f "(@[%a@])" Renaming.print)
-				    f s.inj in
-				Format.pp_print_int f s.dst))
-			    p.sons))
+	     Format.fprintf
+	       f "@[<hov 2>(%a)@ -> @[<h>%a@]@ %t-> @[(%a)@]@]"
+	       (Pp.list Pp.space Format.pp_print_int) p.fathers
+	       (print ~sigs:env.sig_decl true) p.content
+	       (fun f ->
+		match p.is_obs_of with
+		| None -> ()
+		| Some deps ->
+		   Format.fprintf
+		     f "@[[%a]@]@ "
+		     (Pp.set Operator.DepSet.elements Pp.space Operator.print_rev_dep)
+		     deps)
+	       (Pp.list
+		  Pp.space
+		  (fun f s ->
+		   Format.fprintf
+		     f "@[%a%a@ %i[@[%a@]]@]"
+		     (Navigation.print_step env.sig_decl (find_ty p.content)) s.next
+		     (Pp.list
+			Pp.space
+			(fun f -> Format.fprintf f "(@[%a@])" Renaming.print))
+		     s.inj s.dst
+		     (Pp.set IntSet.elements Pp.space Format.pp_print_int)
+		     s.above_obs))
+	       p.sons))
     env.domain
 
 let add_point id el env =
@@ -475,8 +477,8 @@ let propagate_add_obs obs_id env cc_id =
     let cc = Env.get domain cc_id in
     let sons' =
       Tools.list_smart_map
-	(fun s -> if s.dst = son_id && not (List.mem obs_id s.above_obs)
-		  then {s with above_obs = obs_id::s.above_obs}
+	(fun s -> if s.dst = son_id && not (IntSet.mem obs_id s.above_obs)
+		  then {s with above_obs = IntSet.add obs_id s.above_obs}
 		  else s) cc.sons in
     if sons' == cc.sons then domain
     else
@@ -689,7 +691,7 @@ let rec complete_domain_with obs_id dst env free_id cc edge inj_dst2cc =
        [{ dst = dst;
 	  next = Navigation.rename_step inj_cc2found edge;
 	  inj = [Renaming.compose inj_dst2cc inj_cc2found];
-	  above_obs = [obs_id];}]
+	  above_obs = IntSet.singleton obs_id;}]
     | h :: t when h.dst = dst && (h.next = edge) ->
        {h with inj = (Renaming.compose inj_dst2cc inj_cc2found) :: h.inj} :: t
     | h :: t -> h :: new_son inj_cc2found t in
@@ -895,46 +897,58 @@ module Matching = struct
     | Some x -> x
     | None -> raise Not_found
 
-(*edges: list of concrete edges, returns the roots of observables that are above in the domain*)
+(*edges: list of concrete edges,
+returns the roots of observables that are above in the domain*)
   let from_edge domain graph edges =
+    let update_cache update id cache =
+      IntMap.add id (update (IntMap.find_default IntSet.empty id cache)) cache
+    in
+    let get_root inj point =
+      match find_root point.content with
+      | None -> assert false
+      | Some (root_type,root) -> Renaming.apply inj root,root_type in
     let rec aux cache (obs,rev_deps as acc) = function
       | [] -> cache,acc
-      | (point,inj_point2graph) :: remains ->
+      | (pid,point,inj_point2graph) :: remains ->
 	 let (concrete_root,_ as root_bundle) =
-	   match find_root point.content with
-	   | None -> assert false
-	   | Some (root_type,root) ->
-	      Renaming.apply inj_point2graph root,root_type in
-	 if Int2Set.mem (point.content.id,concrete_root) cache
-	 then aux cache acc remains
-	 else
-	   let acc' =
-	     match point.is_obs_of with
-	     | None -> acc
-	     | Some ndeps ->
-		((point.content,root_bundle) :: obs,
-		 Operator.DepSet.union rev_deps ndeps) in
-	   let remains' =
-	     List.fold_left
-	       (fun re son ->
-		match Navigation.injection_for_one_more_edge
-			inj_point2graph graph son.next with
-		| None -> re
-		| Some inj' ->
-		   let p' = Env.get domain son.dst in
-		   List.fold_left
-		     (fun remains renaming ->
-		      (p',Renaming.compose renaming inj')::remains) re son.inj)
-	       remains point.sons in
-	   aux (Int2Set.add (point.content.id,concrete_root) cache) acc' remains' in
+	   get_root inj_point2graph point in
+	 let cache',acc' =
+	   match point.is_obs_of with
+	   | None -> cache,acc
+	   | Some ndeps ->
+	      (update_cache (IntSet.add pid) concrete_root cache,
+	       ((point.content,root_bundle) :: obs,
+		Operator.DepSet.union rev_deps ndeps)) in
+	 let remains',cache'' =
+	   List.fold_left
+	     (fun (re,cache) son ->
+	      match Navigation.injection_for_one_more_edge
+		      inj_point2graph graph son.next with
+	      | None ->
+		 (re, update_cache (IntSet.union son.above_obs)
+				   concrete_root cache)
+	      | Some inj' ->
+		 let p' = Env.get domain son.dst in
+		 (List.fold_left
+		    (fun remains renaming ->
+		     let rename = Renaming.compose renaming inj' in
+		     if IntSet.subset
+			  son.above_obs
+			  (IntMap.find_default
+			     IntSet.empty (fst @@ get_root rename p') cache)
+		     then remains
+		     else (son.dst,p',rename)::remains) re son.inj,
+		  cache))
+	     (remains,cache') point.sons in
+	 aux cache'' acc' remains' in
     if List.for_all (Navigation.check_edge graph) edges then
       match Env.navigate domain edges with
       | None -> ([],Operator.DepSet.empty)
-      | Some (_,injs,point) ->
+      | Some (pid,injs,point) ->
 	 snd @@
 	   List.fold_left
-	     (fun (cache,out) inj -> aux cache out [(point,inj)])
-	     (Mods.Int2Set.empty,([],Operator.DepSet.empty)) injs
+	     (fun (cache,out) inj -> aux cache out [(pid,point,inj)])
+	     (Mods.IntMap.empty,([],Operator.DepSet.empty)) injs
     else ([],Operator.DepSet.empty)
 
   let observables_from_agent domain graph (_,ty as node) =
