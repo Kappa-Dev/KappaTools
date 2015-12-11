@@ -2,7 +2,7 @@
   * compression_main.ml 
   *
   * Creation:                      <2011-10-19 16:52:55 feret>
-  * Last modification: Time-stamp: <2015-12-11 11:48:40 feret> 
+  * Last modification: Time-stamp: <2015-12-11 12:04:55 feret> 
   * 
   * Causal flow compression: a module for KaSim 
   * Jerome Feret, projet Antique, INRIA Paris-Rocquencourt
@@ -73,7 +73,7 @@ let compress_and_print logger env log_info step_list =
     else
       S.PH.B.PB.CI.Po.K.H.use_fusion_sort parameter
   in 
-  let mode = S.PH.B.PB.CI.Po.K.H.compression_mode in
+  let mode = parameter.S.PH.B.PB.CI.Po.K.H.compression_mode in
   let causal_trace_on = Parameter.get_causal_trace mode in
   let weak_compression_on = Parameter.get_weak_compression mode in
   let strong_compression_on = Parameter.get_strong_compression mode in
