@@ -2,7 +2,7 @@
   * compression_main.ml 
   *
   * Creation:                      <2011-10-19 16:52:55 feret>
-  * Last modification: Time-stamp: <2015-12-11 09:50:37 feret> 
+  * Last modification: Time-stamp: <2015-12-11 11:29:09 feret> 
   * 
   * Causal flow compression: a module for KaSim 
   * Jerome Feret, projet Antique, INRIA Paris-Rocquencourt
@@ -186,15 +186,7 @@ let compress_and_print logger env log_info step_list =
 			in 
 			[info]
                     in
-(* Strange, it seems to be useless *)
-                    let error,log_info,blackboard_cflow = U.convert_trace_into_musical_notation parameter handler error log_info trace_before_compression in 
-		    let error,observable_hit = U.extract_observable_hit_from_musical_notation "compression_main.ml, line 214, " parameter handler error blackboard_cflow in 		 
-		    let grid = U.convert_trace_into_grid trace_before_compression handler in 
-                    let enriched_grid = U.enrich_grid_with_transitive_past_of_observables_without_a_progress_bar
- logger grid in 
-		    let error,event_list = U.causal_prefix_of_an_observable_hit "" parameter handler error log_info blackboard_cflow enriched_grid observable_hit in 
-(* until this point *)
-		    let error,causal_story_array,log_info = U.store_trace parameter handler error info log_info  event_list story_list in 
+		    let error,causal_story_array,log_info = U.store_trace parameter handler error info log_info  trace_before_compression story_list in 
 		    error,log_info,causal_story_array  
 		  )
 	        (error,log_info,table1)
