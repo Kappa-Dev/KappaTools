@@ -2,7 +2,7 @@
   * compression_main.ml 
   *
   * Creation:                      <2011-10-19 16:52:55 feret>
-  * Last modification: Time-stamp: <2015-12-07 18:48:57 feret> 
+  * Last modification: Time-stamp: <2015-12-11 09:50:37 feret> 
   * 
   * Causal flow compression: a module for KaSim 
   * Jerome Feret, projet Antique, INRIA Paris-Rocquencourt
@@ -149,7 +149,7 @@ let compress_and_print logger env log_info step_list =
 		let log_info = U.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
 		(* We use the grid to get the causal precedence (pred* ) of each observable *)
 		let grid = U.convert_trace_into_grid step_list handler in
-		let enriched_grid = U.enrich_std_grid_with_transitive_closure logger grid in 
+		let enriched_grid = U.enrich_grid_with_transitive_past_of_each_node_without_a_progress_bar logger grid in 
 		let _ = 
                   if Parameter.log_number_of_causal_flows
                   then 
@@ -186,14 +186,14 @@ let compress_and_print logger env log_info step_list =
 			in 
 			[info]
                     in
-		    let error,log_info,trace_without_pseudo_inverse_events = 
-		      error,log_info,trace_before_compression
-                    in 
-                    let error,log_info,blackboard_cflow = U.convert_trace_into_musical_notation parameter handler error log_info trace_without_pseudo_inverse_events in 
-                    let error,observable_hit = U.extract_observable_hit_from_musical_notation "compression_main.ml, line 214, " parameter handler error blackboard_cflow in 		 
-		    let grid = U.convert_trace_into_grid trace_without_pseudo_inverse_events handler in 
-                    let enriched_grid = U.enrich_small_grid_with_transitive_closure logger grid in 
+(* Strange, it seems to be useless *)
+                    let error,log_info,blackboard_cflow = U.convert_trace_into_musical_notation parameter handler error log_info trace_before_compression in 
+		    let error,observable_hit = U.extract_observable_hit_from_musical_notation "compression_main.ml, line 214, " parameter handler error blackboard_cflow in 		 
+		    let grid = U.convert_trace_into_grid trace_before_compression handler in 
+                    let enriched_grid = U.enrich_grid_with_transitive_past_of_observables_without_a_progress_bar
+ logger grid in 
 		    let error,event_list = U.causal_prefix_of_an_observable_hit "" parameter handler error log_info blackboard_cflow enriched_grid observable_hit in 
+(* until this point *)
 		    let error,causal_story_array,log_info = U.store_trace parameter handler error info log_info  event_list story_list in 
 		    error,log_info,causal_story_array  
 		  )
@@ -286,7 +286,7 @@ let compress_and_print logger env log_info step_list =
 	      (* We use the grid to get the causal precedence (pred* ) of each observable *)
 		let grid = U.convert_trace_into_grid simplified_event_list handler in
 		let enriched_grid =
-		  U.enrich_big_grid_with_transitive_closure logger grid
+		  U.enrich_grid_with_transitive_past_of_observables_with_a_progression_bar logger grid
 		in 
 		let _ = 
                   if Parameter.log_number_of_causal_flows
@@ -333,7 +333,8 @@ let compress_and_print logger env log_info step_list =
                       let error,log_info,blackboard_cflow = U.convert_trace_into_musical_notation parameter handler error log_info trace_without_pseudo_inverse_events in
 		      let error,observable_hit = U.extract_observable_hit_from_musical_notation "compression_main.ml, line 214, " parameter handler error blackboard_cflow in 		 
 		      let grid = U.convert_trace_into_grid trace_without_pseudo_inverse_events handler in 
-                      let enriched_grid = U.enrich_small_grid_with_transitive_closure logger grid in 
+		      (* there is no need for a closure here, we should provide a primitive to work with the grid instead *)
+                      let enriched_grid = U.enrich_grid_with_transitive_past_of_observables_without_a_progress_bar logger grid in 
 		      let error,event_list = U.causal_prefix_of_an_observable_hit "" parameter handler error log_info blackboard_cflow enriched_grid observable_hit in 
 		      let error,causal_story_array,log_info = U.store_trace parameter handler error info log_info  event_list story_list in 
 		      error,log_info,causal_story_array  

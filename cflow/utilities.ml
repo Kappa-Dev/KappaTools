@@ -2,7 +2,7 @@
  * utilities.ml 
  *      
  * Creation:                      <2015-03-28 feret>
- * Last modification: Time-stamp: <2015-12-07 18:37:16 feret>
+ * Last modification: Time-stamp: <2015-12-11 09:51:29 feret>
  * 
  * API for causal compression
  * Jerome Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -504,9 +504,10 @@ let convert_trace_into_grid trace handler =
 let convert_trace_into_musical_notation p h e info x = S.PH.B.import p h e info (get_pretrace_of_trace x)
 
 let enrich_grid_with_transitive_closure = Causal.enrich_grid
-let enrich_big_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closure.config_big_graph_with_progress_bar
-let enrich_small_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closure.config_big_graph_without_progress_bar
-let enrich_std_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closure.config_small_graph
+
+let enrich_grid_with_transitive_past_of_observables_with_a_progression_bar f = Causal.enrich_grid f Graph_closure.config_big_graph_with_progress_bar
+let enrich_grid_with_transitive_past_of_observables_without_a_progress_bar f = Causal.enrich_grid f Graph_closure.config_big_graph_without_progress_bar
+let enrich_grid_with_transitive_past_of_each_node_without_a_progress_bar f = Causal.enrich_grid f Graph_closure.config_small_graph
 					    
 let sort_story_list  = D.sort_list 
 let export_story_table parameter handler error x = sort_story_list parameter handler error (get_stories x)

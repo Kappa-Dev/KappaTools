@@ -2,7 +2,7 @@
   * utilities.mli  
   *
   * Creation:                      <2015-08-10 09:21:53 feret>
-  * Last modification: Time-stamp: <2015-12-07 18:35:44 feret>
+  * Last modification: Time-stamp: <2015-12-11 09:51:17 feret>
   * 
   * Causal flow compression: a module for KaSim 
   * Jerome Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -100,9 +100,9 @@ val convert_trace_into_grid: trace -> kappa_handler -> cflow_grid
 
 (** compute transitive closure with different parameters (progress_bar, gc) *)
 (* change the names to more explicit ones *)
-val enrich_big_grid_with_transitive_closure: Format.formatter -> cflow_grid -> enriched_cflow_grid
-val enrich_small_grid_with_transitive_closure: Format.formatter -> cflow_grid -> enriched_cflow_grid 
-val enrich_std_grid_with_transitive_closure: Format.formatter -> cflow_grid -> enriched_cflow_grid 
+val enrich_grid_with_transitive_past_of_observables_with_a_progression_bar: Format.formatter -> cflow_grid -> enriched_cflow_grid
+val enrich_grid_with_transitive_past_of_observables_without_a_progress_bar: Format.formatter -> cflow_grid -> enriched_cflow_grid 
+val enrich_grid_with_transitive_past_of_each_node_without_a_progress_bar: Format.formatter -> cflow_grid -> enriched_cflow_grid 
 										   
 
 (** Musical processing *)
