@@ -73,30 +73,45 @@ module StoryStats =
              stack_size: int ;
            }
 
+       type step_kind =
+	 | Beginning 
+	 | Collect_traces
+	 | Causal_compression
+	 | Weak_compression
+	 | Strong_compression
+	 | Iteration of int
+	 | Story of int
+	 | Partial_order_reduction
+	 | Siphon_detection
+	 | Agent_ids_disambiguation
+	 | Pseudo_inverse_deletion
+	 | Compression
+	 | Transitive_closure
+	 | Graph_reduction 
+	 | Cannonic_form_computation
+	   
+       type 'a step =
+	 {
+	   tag: step_kind list;
+	   level: int;
+	   size: 'a option; 
+	   time: float
+	 }
+	   
        type log_info = 
            {
-             last_tick:float;
-             global_start_time:float;
-             story_start_time:float;
-             step_start_time: float;
-             grid_time: float;
-             concurrent_event_detection_time: float; 
-             concurrent_event_deletion_time: float;
-             story_research_time:float;
-             canonicalization_time: float;
-             propagation: int array;
-             branch: int;
-             global_cut: int; 
-             pseudo_inv_cut: int;
-             cut: int; 
-             kasim_events: int;
-             init_events: int;
-             obs_events: int;
-             fictitious_events: int;
-             cut_events: int;
-             stack: stack_head list ;
+	     global_time: float;
+	     story_time: float;
+	     step_time: float;
+	     current_tasks: (int step) list;
+	     terminated_tasks: ((int * int) step) list ;
+	     branch: int;
+	     cut: int;
+	     stack: stack_head list ;
              current_stack: stack_head ;
-           }
+	     propagation: int array ; 
+	     last_tick:float;
+	   }
              
 
      
@@ -153,24 +168,21 @@ module StoryStats =
        let init_log_info () = 
          let time = Sys.time () in
          { 
-           global_start_time = time ;
-           story_start_time = time ;
-           step_start_time = time ; 
-           grid_time = 0.;
-           concurrent_event_detection_time = 0.; 
-           concurrent_event_deletion_time = 0.;
-           story_research_time = 0.;
-           canonicalization_time = 0. ; 
-           last_tick = time ;
-           propagation = Array.make propagation_cases 0 ;
+	   global_time = 0.;
+	   story_time = 0.;
+	   step_time = 0.;
+	   terminated_tasks = [];
+	   current_tasks =
+	     [
+	       {
+		 tag =  [Beginning];
+		 level = 0;
+		 size = None; 
+		 time = time
+	       }];
+	   propagation = Array.make propagation_cases 0 ;
            branch = 0 ;
-           cut = 0 ;
-           global_cut = 0 ; 
-           pseudo_inv_cut = 0 ;
-           kasim_events = 0 ;
-           init_events = 0 ;
-           obs_events = 0 ;
-           fictitious_events = 0 ;
+	   cut = 0 ;
            current_stack = 
              {
                current_branch = 0 ;
@@ -180,8 +192,9 @@ module StoryStats =
                stack_size = 0 
              } ;
            stack = [] ;
-           cut_events = 0 ;
-         }
+	   last_tick = 0.}
+	      
+	      
 
        let dump_short_log log log_info =
          let _ = Format.fprintf log "Remaining events: %i ; Stack size: %i ; "
@@ -193,20 +206,14 @@ module StoryStats =
 
            
        let reset_log log = 
-         let time = Sys.time () in 
          let t = log.propagation in 
          let _ = Array.fill t 0 (Array.length t) 0 in 
-         {log 
-           with 
-             cut_events = 0;
-             story_start_time = time ; 
-             step_start_time = time ;
-             grid_time = 0.;
-             concurrent_event_detection_time = 0. ;
-             concurrent_event_deletion_time = 0. ;
-             story_research_time = 0.;
-             canonicalization_time = 0. ; 
-         }
+	 let time = Sys.time () in 
+	 { log
+	 with
+	   step_time = time ;
+	   story_time = time}
+          
 
        let propagate_up i = i 
        let propagate_down i = i+16 
@@ -215,60 +222,33 @@ module StoryStats =
 
        let ellapsed_time log = 
          let time = Sys.time () in 
-         time -. log.story_start_time 
+         time -. log.story_time 
 
        let ellapsed_global_time log = 
          let time = Sys.time () in 
-         time -. log.global_start_time 
+         time -. log.global_time 
 
        let set_time log = 
-         { log with story_start_time = Sys.time () ; step_start_time = Sys.time ()}
+         { log with story_time = Sys.time () ; step_time = Sys.time ()}
        let set_step_time log = 
-         { log with step_start_time = Sys.time ()}
+         { log with step_time = Sys.time ()}
 
 
        let set_start_compression = set_time  
 
        let set_story_research_time log = 
          let t = Sys.time () in 
-         let st = log.step_start_time in 
+         let st = log.step_time in 
          { log 
            with 
-             story_research_time = t -. st ; 
-             step_start_time = t }
+             story_time = t -. st ; 
+             step_time = t }
            
-       let set_concurrent_event_detection_time log = 
-         let t = Sys.time () in 
-         let st = log.step_start_time in 
-         {log 
-          with 
-            concurrent_event_detection_time = t -. st ; 
-            step_start_time = t }
+       let set_concurrent_event_detection_time log = log 
+       let set_concurrent_event_deletion_time log = log 
+       let set_grid_generation log = log
+       let set_canonicalisation log = log 
 
-       let set_concurrent_event_deletion_time log = 
-         let t = Sys.time () in 
-         let st = log.step_start_time in 
-         {log 
-          with 
-            concurrent_event_deletion_time = t -. st ; 
-            step_start_time = t 
-         }
-
-
-       let set_grid_generation log = 
-         let t = Sys.time () in 
-         let st = log.step_start_time in 
-         { log with grid_time = t -. st ;
-           step_start_time = t}
-
-       let set_canonicalisation log =
-         let t = Sys.time () in 
-         let st = log.step_start_time in 
-         { log with canonicalization_time = t -. st ;
-                    step_start_time = t}
-           
-           
-           
        let add_case i log = 
          let t = log.propagation in 
          let _ = t.(i)<-t.(i)+1 in 
@@ -303,69 +283,22 @@ module StoryStats =
              {log.current_stack 
               with current_branch = log.current_stack.current_branch + 1}}
            
-       let inc_n_kasim_events log = 
-         let old = log.kasim_events in 
-         { log with kasim_events = old + 1}
-
-       let inc_n_obs_events log = 
-         let old = log.obs_events in 
-         { log with obs_events = old + 1}
-           
-       let inc_n_side_events log = 
-         let old = log.fictitious_events in 
-         { log with fictitious_events = old+1}
-
-       let inc_n_init_events log = 
-         let old = log.init_events in 
-         { log with init_events = old + 1}
-
-       let inc_cut_events log = 
-         { log with cut_events = log.cut_events + 1}
-
-       let inc_k_cut_events k log = 
-         { log with cut_events = log.cut_events + k}
-
-       let reset_cut_events log = 
-         { log with cut_events = 0}
-
-       let inc_selected_events log = 
-          { log 
-           with current_stack = 
-             {log.current_stack 
-              with selected_events = 
-                 log.current_stack.selected_events + 1
-             }
-         }
-
-       let inc_removed_events log = 
-         { log 
-           with current_stack = 
-             {log.current_stack 
-              with removed_events = 
-                 log.current_stack.removed_events + 1
-             }
-         }
+       let inc_n_kasim_events log = log
+       let inc_n_obs_events log = log 
+       let inc_n_side_events log = log 
+       let inc_n_init_events log = log 
+       let inc_cut_events log = log 
+       let inc_k_cut_events k log = log  
+       let reset_cut_events log = log 
+       let inc_selected_events log = log 
+       let inc_removed_events log = log 
 
            
        let dump_complete_log log log_info = 
          let _ = Format.fprintf log "/*@\n" in 
          let _ = Format.fprintf log "Story profiling@\n" in 
          let _ = Format.fprintf log "Ellapsed_time:                  %f@\n" (ellapsed_time log_info) in 
-         let _ = Format.fprintf log "Concurrent event research time: %f@\n" (log_info.concurrent_event_detection_time) in 
-         let _ = Format.fprintf log "Concurrent event deletion time: %f@\n" (log_info.concurrent_event_deletion_time) in 
-         let _ = Format.fprintf log "Story research time:            %f@\n" (log_info.story_research_time) in 
-         let _ = Format.fprintf log "Grid generation time:           %f@\n" (log_info.grid_time) in 
-         let _ = Format.fprintf log "Canonicalization time:          %f@\n" (log_info.canonicalization_time) in 
-         let _ = Format.fprintf log "KaSim events:                   %i@\n" log_info.kasim_events in 
-         let _ = Format.fprintf log "Init events:                    %i@\n" log_info.init_events in 
-         let _ = Format.fprintf log "Obs events:                     %i@\n" log_info.obs_events in 
-         let _ = Format.fprintf log "Fictitious events:              %i@\n" log_info.fictitious_events in 
-         let _ = Format.fprintf log "Cut events (globally):          %i@\n" log_info.global_cut in 
-         let _ = Format.fprintf log "Pseudo-inverse events:          %i@\n" log_info.pseudo_inv_cut in 
-         let _ = Format.fprintf log "Cut events (for this story):    %i@\n" log_info.cut_events in 
-         let _ = Format.fprintf log "Selected events:                %i@\n" log_info.current_stack.selected_events in 
-         let _ = Format.fprintf log "Removed events:                 %i@\n" log_info.current_stack.removed_events in 
-         let _ = Format.fprintf log "Remaining events:               %i@\n" (log_info.kasim_events + log_info.obs_events + log_info.init_events +log_info.fictitious_events - log_info.cut_events - log_info.current_stack.selected_events - log_info.current_stack.removed_events - log_info.global_cut - log_info.pseudo_inv_cut) in 
+         let _ = Format.fprintf log "Story research time:            %f@\n" (log_info.story_time) in 
          let _ = Format.fprintf log "Exploration depth:              %i@\n" log_info.current_stack.current_branch in 
          let _ = Format.fprintf log "Exploration cuts:               %i@\n" log_info.cut in 
          let _ = Format.fprintf log "***\nPropagation Hits:@\n" in
@@ -388,11 +321,9 @@ module StoryStats =
          else
            false,log_info
 
-       let set_global_cut n log_info = 
-         {log_info with global_cut = n}
+       let set_global_cut n log_info = log_info 
+       let set_pseudo_inv n log_info = log_info 
 
-       let set_pseudo_inv n log_info = 
-         {log_info with pseudo_inv_cut = n}
-           
-      end:StoryStats)
+       end:StoryStats)
+	   
            
