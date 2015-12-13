@@ -149,7 +149,8 @@ let closure_bottom_up_with_fold err_fmt config prec is_obs init_to_eidmax f a  =
       let n_edges =
         M.fold (ignore_fst (S.fold (ignore_fst succ))) prec 0 in
       Format.fprintf err_fmt "@.\t\tTransitive closure (%i nodes, %i edges)@."
-		     max_index n_edges in
+		     max_index n_edges
+  in
   let do_tick,tick,close_tick =
     if max_index > 300 && config.do_tick
     then
@@ -162,43 +163,38 @@ let closure_bottom_up_with_fold err_fmt config prec is_obs init_to_eidmax f a  =
   in
   let s_pred_star = A.make (max_index+1) ([],0) in
   let clean,max_succ = 
-    if config.keep_all_nodes 
-    then 
-      (fun _ -> ()),
-      (fun _ -> (max_index+1))
-    else 
-      begin 
-        let max_succ = A.make (max_index+1) 0 in 
-        let _ = A.iteri (fun i _ -> A.set max_succ i (init_to_eidmax i)) max_succ in 
-        let _ =
-	  M.iter
-            (fun succ -> 
-              S.iter 
-                (fun pred -> 
-                  A.set max_succ pred (max succ (A.get max_succ pred))))
+    begin 
+      let max_succ = A.make (max_index+1) 0 in 
+      let _ = A.iteri (fun i _ -> A.set max_succ i (init_to_eidmax i)) max_succ in 
+      let _ =
+	M.iter
+          (fun succ -> 
+           S.iter 
+             (fun pred -> 
+              A.set max_succ pred (max succ (A.get max_succ pred))))
               prec
-        in 
-        let is_last_succ_of = A.make (max_index+1) [] in 
-        let add node max_succ = 
-          if not (is_obs node) && not (is_init node)
-          then 
-            let old_l = A.get is_last_succ_of max_succ in 
-            let l' = node::old_l in 
-            A.set is_last_succ_of max_succ l'
-        in 
-        let _ = 
-          A.iteri 
-            add 
-            max_succ 
-        in 
-        let _ = A.set is_last_succ_of 0 [] in 
-        let gc_when_visit node =
-          List.iter
-            (fun k -> A.set s_pred_star k ([],0))
-            (A.get is_last_succ_of node) in
-        gc_when_visit,
-        (fun i -> A.get max_succ i)
-      end    
+      in 
+      let is_last_succ_of = A.make (max_index+1) [] in 
+      let add node max_succ = 
+        if not (is_obs node) && not (is_init node)
+        then 
+          let old_l = A.get is_last_succ_of max_succ in 
+          let l' = node::old_l in 
+          A.set is_last_succ_of max_succ l'
+      in 
+      let _ = 
+        A.iteri 
+          add 
+          max_succ 
+      in 
+      let _ = A.set is_last_succ_of 0 [] in 
+      let gc_when_visit node =
+        List.iter
+          (fun k -> A.set s_pred_star k ([],0))
+          (A.get is_last_succ_of node) in
+      gc_when_visit,
+      (fun i -> A.get max_succ i)
+    end    
   in 
   let _,a = 
     M.fold 
@@ -210,11 +206,6 @@ let closure_bottom_up_with_fold err_fmt config prec is_obs init_to_eidmax f a  =
             | pred::t ->
               begin 
                 let new_l,max_out' = A.get s_pred_star pred in 
-                (*let max_out' = 
-                  if  is_obs pred
-                  then 0
-                  else max_out' 
-                in*)
                 let diff = 
                   if config.cut_transitive_path 
                   then 
