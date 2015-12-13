@@ -54,13 +54,9 @@ node_7 [label="Cpu", style=filled, fillcolor=red] ;
 "3" -> "4" [style="invis"];
 node_1 -> node_4
 node_2 -> node_4
-node_1 -> node_5
 node_3 -> node_5
 node_4 -> node_5
-node_1 -> node_6
-node_3 -> node_6
 node_5 -> node_6
-node_3 -> node_7
 node_6 -> node_7
 }
 /*

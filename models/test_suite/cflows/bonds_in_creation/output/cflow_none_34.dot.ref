@@ -49,11 +49,9 @@ node_18 [label="L", style=filled, fillcolor=red] ;
 "8" -> "9" [style="invis"];
 "9" -> "10" [style="invis"];
 node_5 -> node_6
-node_5 -> node_7
 node_6 -> node_7
 node_7 -> node_9
 node_8 -> node_9
-node_8 -> node_10
 node_9 -> node_10
 node_10 -> node_12
 node_11 -> node_12
@@ -62,9 +60,7 @@ node_12 -> node_15
 node_13 -> node_16
 node_14 -> node_16
 node_15 -> node_16
-node_13 -> node_17
 node_16 -> node_17
-node_13 -> node_18
 node_17 -> node_18
 }
 /*

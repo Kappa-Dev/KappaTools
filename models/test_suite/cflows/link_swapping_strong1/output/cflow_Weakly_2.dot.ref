@@ -259,12 +259,8 @@ node_60 -> node_64
 node_63 -> node_64
 node_60 -> node_65
 node_63 -> node_65
-node_60 -> node_66
-node_63 -> node_66
 node_64 -> node_66
 node_65 -> node_66
-node_60 -> node_67
-node_63 -> node_67
 node_66 -> node_67
 }
 /*

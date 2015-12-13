@@ -143,12 +143,8 @@ node_24 -> node_27
 node_26 -> node_27
 node_24 -> node_28
 node_26 -> node_28
-node_24 -> node_29
-node_26 -> node_29
 node_27 -> node_29
 node_28 -> node_29
-node_24 -> node_30
-node_26 -> node_30
 node_29 -> node_30
 }
 /*

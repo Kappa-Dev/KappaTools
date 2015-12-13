@@ -84,10 +84,7 @@ node_14 -> node_19
 node_18 -> node_20
 node_19 -> node_20
 node_15 -> node_21
-node_18 -> node_21
-node_19 -> node_21
 node_20 -> node_21
-node_15 -> node_22
 node_21 -> node_22
 }
 /*

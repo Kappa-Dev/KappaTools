@@ -39,26 +39,13 @@ node_2 -> node_6
 node_3 -> node_6
 node_1 -> node_7
 node_4 -> node_7
-node_2 -> node_8
-node_3 -> node_8
 node_6 -> node_8
-node_1 -> node_9
 node_5 -> node_9
 node_7 -> node_9
-node_1 -> node_10
-node_5 -> node_10
 node_9 -> node_10
-node_3 -> node_11
-node_5 -> node_11
 node_8 -> node_11
 node_10 -> node_11
-node_3 -> node_12
-node_5 -> node_12
-node_8 -> node_12
-node_10 -> node_12
 node_11 -> node_12
-node_5 -> node_13
-node_10 -> node_13
 node_12 -> node_13
 }
 /*

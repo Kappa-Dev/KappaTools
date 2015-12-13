@@ -79,42 +79,27 @@ node_25 [label="B-", style=filled, fillcolor=red] ;
 "15" -> "16" [style="invis"];
 node_1 -> node_10
 node_9 -> node_10
-node_1 -> node_11
 node_10 -> node_11
 node_6 -> node_12
-node_9 -> node_12
 node_11 -> node_12
-node_6 -> node_13
 node_12 -> node_13
 node_8 -> node_14
-node_9 -> node_14
 node_13 -> node_14
-node_8 -> node_15
 node_14 -> node_15
 node_7 -> node_16
-node_9 -> node_16
 node_15 -> node_16
-node_7 -> node_17
 node_16 -> node_17
 node_4 -> node_18
-node_9 -> node_18
 node_17 -> node_18
-node_4 -> node_19
 node_18 -> node_19
 node_3 -> node_20
-node_9 -> node_20
 node_19 -> node_20
-node_3 -> node_21
 node_20 -> node_21
 node_2 -> node_22
-node_9 -> node_22
 node_21 -> node_22
-node_2 -> node_23
 node_22 -> node_23
 node_5 -> node_24
-node_9 -> node_24
 node_23 -> node_24
-node_5 -> node_25
 node_24 -> node_25
 }
 /*

@@ -45,17 +45,13 @@ node_18 [label="L", style=filled, fillcolor=red] ;
 "8" -> "9" [style="invis"];
 "9" -> "10" [style="invis"];
 node_8 -> node_9
-node_8 -> node_10
 node_9 -> node_10
-node_8 -> node_11
 node_10 -> node_11
 node_11 -> node_12
 node_11 -> node_13
 node_12 -> node_14
 node_13 -> node_14
 node_14 -> node_15
-node_12 -> node_16
-node_13 -> node_16
 node_15 -> node_16
 node_16 -> node_17
 node_17 -> node_18

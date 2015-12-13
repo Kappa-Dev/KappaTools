@@ -120,10 +120,7 @@ node_25 -> node_28
 node_27 -> node_29
 node_28 -> node_29
 node_21 -> node_30
-node_27 -> node_30
-node_28 -> node_30
 node_29 -> node_30
-node_21 -> node_31
 node_30 -> node_31
 }
 /*

@@ -123,10 +123,7 @@ node_30 -> node_31
 node_28 -> node_32
 node_31 -> node_32
 node_25 -> node_33
-node_28 -> node_33
-node_31 -> node_33
 node_32 -> node_33
-node_25 -> node_34
 node_33 -> node_34
 }
 /*

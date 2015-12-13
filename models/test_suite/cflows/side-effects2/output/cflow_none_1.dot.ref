@@ -38,17 +38,11 @@ node_3 -> node_8
 node_4 -> node_8
 node_2 -> node_9
 node_1 -> node_10
-node_6 -> node_10
 node_7 -> node_10
 node_9 -> node_10
-node_6 -> node_11
 node_10 -> node_11
-node_1 -> node_12
-node_4 -> node_12
 node_8 -> node_12
 node_11 -> node_12
-node_1 -> node_13
-node_4 -> node_13
 node_12 -> node_13
 }
 /*

@@ -255,12 +255,8 @@ node_60 -> node_62
 node_61 -> node_62
 node_60 -> node_63
 node_61 -> node_63
-node_60 -> node_64
-node_61 -> node_64
 node_62 -> node_64
 node_63 -> node_64
-node_60 -> node_65
-node_61 -> node_65
 node_64 -> node_65
 }
 /*

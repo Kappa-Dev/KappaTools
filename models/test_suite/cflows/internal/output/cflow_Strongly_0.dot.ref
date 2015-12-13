@@ -200,7 +200,6 @@ node_3 [label="GOAL", style=filled, fillcolor=red] ;
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];
 node_1 -> node_2
-node_1 -> node_3
 node_2 -> node_3
 }
 /*

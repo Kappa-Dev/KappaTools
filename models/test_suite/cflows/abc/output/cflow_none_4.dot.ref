@@ -40,32 +40,19 @@ node_16 [label="Cpu", style=filled, fillcolor=red] ;
 "5" -> "6" [style="invis"];
 node_1 -> node_7
 node_3 -> node_7
-node_1 -> node_8
-node_3 -> node_8
 node_7 -> node_8
 node_2 -> node_9
 node_4 -> node_9
-node_2 -> node_10
 node_6 -> node_10
 node_9 -> node_10
-node_2 -> node_11
-node_4 -> node_11
 node_9 -> node_11
-node_2 -> node_12
-node_6 -> node_12
 node_10 -> node_12
-node_2 -> node_13
-node_3 -> node_13
 node_8 -> node_13
 node_11 -> node_13
-node_2 -> node_14
 node_5 -> node_14
 node_12 -> node_14
 node_13 -> node_14
-node_2 -> node_15
-node_5 -> node_15
 node_14 -> node_15
-node_5 -> node_16
 node_15 -> node_16
 node_11 -> node_10 [style=dotted, arrowhead = tee]
 }

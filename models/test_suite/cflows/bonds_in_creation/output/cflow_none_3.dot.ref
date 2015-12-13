@@ -83,28 +83,19 @@ node_36 [label="L", style=filled, fillcolor=red] ;
 "15" -> "16" [style="invis"];
 node_8 -> node_9
 node_10 -> node_11
-node_10 -> node_12
 node_11 -> node_12
-node_8 -> node_13
 node_9 -> node_13
-node_10 -> node_15
 node_12 -> node_15
 node_12 -> node_16
 node_14 -> node_16
-node_14 -> node_17
 node_16 -> node_17
 node_17 -> node_19
 node_18 -> node_19
-node_10 -> node_20
 node_15 -> node_20
-node_10 -> node_21
 node_13 -> node_21
 node_20 -> node_21
-node_10 -> node_22
 node_21 -> node_22
-node_18 -> node_23
 node_19 -> node_23
-node_18 -> node_24
 node_22 -> node_24
 node_23 -> node_24
 node_24 -> node_25
@@ -112,21 +103,13 @@ node_24 -> node_26
 node_25 -> node_28
 node_26 -> node_28
 node_27 -> node_28
-node_27 -> node_29
 node_28 -> node_29
-node_25 -> node_31
-node_26 -> node_31
 node_29 -> node_31
 node_30 -> node_31
-node_30 -> node_32
 node_31 -> node_32
-node_25 -> node_34
-node_26 -> node_34
 node_32 -> node_34
 node_33 -> node_34
-node_33 -> node_35
 node_34 -> node_35
-node_33 -> node_36
 node_35 -> node_36
 }
 /*

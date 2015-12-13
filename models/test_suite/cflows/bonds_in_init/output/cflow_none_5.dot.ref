@@ -37,9 +37,7 @@ node_14 [label="L", style=filled, fillcolor=red] ;
 "6" -> "7" [style="invis"];
 "7" -> "8" [style="invis"];
 node_6 -> node_7
-node_6 -> node_8
 node_7 -> node_8
-node_6 -> node_9
 node_8 -> node_9
 node_9 -> node_10
 node_9 -> node_11

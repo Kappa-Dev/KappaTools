@@ -22,9 +22,7 @@ node_4 [label="c", style=filled, fillcolor=red] ;
 "1" -> "2" [style="invis"];
 "2" -> "3" [style="invis"];
 node_1 -> node_2
-node_1 -> node_3
 node_2 -> node_3
-node_1 -> node_4
 node_3 -> node_4
 }
 /*

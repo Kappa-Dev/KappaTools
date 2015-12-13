@@ -32,8 +32,6 @@
     g.setNode(5, { label: "goal", style: "fill: #f77" });
     g.setEdge(1,3,{});
     g.setEdge(2,3,{});
-    g.setEdge(1,4,{});
-    g.setEdge(2,4,{});
     g.setEdge(3,4,{});
     g.setEdge(4,5,{});
     var svg = d3.select("svg"),inner = svg.select("g");

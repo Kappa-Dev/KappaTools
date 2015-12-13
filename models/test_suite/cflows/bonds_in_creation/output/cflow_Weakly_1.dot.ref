@@ -41,7 +41,6 @@ node_14 [label="L", style=filled, fillcolor=red] ;
 "7" -> "8" [style="invis"];
 node_4 -> node_6
 node_6 -> node_7
-node_4 -> node_8
 node_6 -> node_8
 node_5 -> node_9
 node_8 -> node_9
@@ -49,9 +48,7 @@ node_9 -> node_10
 node_7 -> node_12
 node_10 -> node_12
 node_11 -> node_12
-node_11 -> node_13
 node_12 -> node_13
-node_11 -> node_14
 node_13 -> node_14
 node_8 -> node_7 [style=dotted, arrowhead = tee]
 }

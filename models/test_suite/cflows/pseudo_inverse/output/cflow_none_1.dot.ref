@@ -74,37 +74,21 @@ node_18 [label="c", style=filled, fillcolor=red] ;
 "15" -> "16" [style="invis"];
 "16" -> "17" [style="invis"];
 node_1 -> node_2
-node_1 -> node_3
 node_2 -> node_3
-node_1 -> node_4
 node_3 -> node_4
-node_1 -> node_5
 node_4 -> node_5
-node_1 -> node_6
 node_5 -> node_6
-node_1 -> node_7
 node_6 -> node_7
-node_1 -> node_8
 node_7 -> node_8
-node_1 -> node_9
 node_8 -> node_9
-node_1 -> node_10
 node_9 -> node_10
-node_1 -> node_11
 node_10 -> node_11
-node_1 -> node_12
 node_11 -> node_12
-node_1 -> node_13
 node_12 -> node_13
-node_1 -> node_14
 node_13 -> node_14
-node_1 -> node_15
 node_14 -> node_15
-node_1 -> node_16
 node_15 -> node_16
-node_1 -> node_17
 node_16 -> node_17
-node_1 -> node_18
 node_17 -> node_18
 }
 /*

@@ -94,12 +94,8 @@ node_20 -> node_21
 node_13 -> node_22
 node_22 -> node_23
 node_23 -> node_24
-node_19 -> node_25
-node_20 -> node_25
 node_21 -> node_25
 node_24 -> node_25
-node_20 -> node_26
-node_24 -> node_26
 node_25 -> node_26
 }
 /*

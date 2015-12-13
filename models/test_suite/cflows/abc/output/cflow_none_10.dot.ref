@@ -40,35 +40,19 @@ node_16 [label="Cpp", style=filled, fillcolor=red] ;
 "5" -> "6" [style="invis"];
 node_3 -> node_7
 node_4 -> node_7
-node_3 -> node_8
 node_5 -> node_8
 node_7 -> node_8
-node_3 -> node_9
-node_4 -> node_9
 node_7 -> node_9
-node_3 -> node_10
-node_5 -> node_10
 node_8 -> node_10
 node_1 -> node_11
 node_2 -> node_11
-node_1 -> node_12
 node_6 -> node_12
 node_11 -> node_12
-node_1 -> node_13
-node_6 -> node_13
 node_12 -> node_13
-node_3 -> node_14
-node_6 -> node_14
 node_9 -> node_14
 node_10 -> node_14
 node_13 -> node_14
-node_3 -> node_15
-node_6 -> node_15
-node_9 -> node_15
-node_13 -> node_15
 node_14 -> node_15
-node_6 -> node_16
-node_13 -> node_16
 node_15 -> node_16
 node_9 -> node_8 [style=dotted, arrowhead = tee]
 }

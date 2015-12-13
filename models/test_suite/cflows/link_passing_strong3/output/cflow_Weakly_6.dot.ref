@@ -80,11 +80,7 @@ node_19 -> node_20
 node_16 -> node_21
 node_20 -> node_21
 node_13 -> node_22
-node_16 -> node_22
-node_20 -> node_22
 node_21 -> node_22
-node_13 -> node_23
-node_16 -> node_23
 node_22 -> node_23
 }
 /*

@@ -155,12 +155,8 @@ node_33 -> node_36
 node_35 -> node_36
 node_33 -> node_37
 node_35 -> node_37
-node_33 -> node_38
-node_35 -> node_38
 node_36 -> node_38
 node_37 -> node_38
-node_33 -> node_39
-node_35 -> node_39
 node_38 -> node_39
 }
 /*

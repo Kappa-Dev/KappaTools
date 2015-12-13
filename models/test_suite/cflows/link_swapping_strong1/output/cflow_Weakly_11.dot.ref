@@ -182,12 +182,8 @@ node_40 -> node_42
 node_41 -> node_42
 node_40 -> node_43
 node_41 -> node_43
-node_40 -> node_44
-node_41 -> node_44
 node_42 -> node_44
 node_43 -> node_44
-node_40 -> node_45
-node_41 -> node_45
 node_44 -> node_45
 }
 /*

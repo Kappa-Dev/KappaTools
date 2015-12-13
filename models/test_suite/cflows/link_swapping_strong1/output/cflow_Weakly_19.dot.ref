@@ -69,12 +69,8 @@ node_12 -> node_14
 node_13 -> node_14
 node_12 -> node_15
 node_13 -> node_15
-node_12 -> node_16
-node_13 -> node_16
 node_14 -> node_16
 node_15 -> node_16
-node_12 -> node_17
-node_13 -> node_17
 node_16 -> node_17
 }
 /*

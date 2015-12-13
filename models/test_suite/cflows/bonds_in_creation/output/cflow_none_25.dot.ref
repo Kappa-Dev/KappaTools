@@ -48,24 +48,17 @@ node_16 [label="L", style=filled, fillcolor=red] ;
 "8" -> "9" [style="invis"];
 "9" -> "10" [style="invis"];
 node_4 -> node_5
-node_4 -> node_6
 node_5 -> node_6
-node_4 -> node_7
 node_6 -> node_7
 node_7 -> node_8
 node_7 -> node_9
 node_8 -> node_11
 node_9 -> node_11
 node_10 -> node_11
-node_10 -> node_13
 node_11 -> node_13
-node_8 -> node_14
-node_9 -> node_14
 node_12 -> node_14
 node_13 -> node_14
-node_12 -> node_15
 node_14 -> node_15
-node_12 -> node_16
 node_15 -> node_16
 }
 /*

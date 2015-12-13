@@ -72,33 +72,19 @@ node_4 -> node_6
 node_5 -> node_8
 node_6 -> node_8
 node_7 -> node_8
-node_7 -> node_9
 node_8 -> node_9
-node_5 -> node_11
-node_6 -> node_11
 node_9 -> node_11
 node_10 -> node_11
-node_10 -> node_12
 node_11 -> node_12
-node_5 -> node_14
-node_6 -> node_14
 node_12 -> node_14
 node_13 -> node_14
-node_13 -> node_15
 node_14 -> node_15
-node_5 -> node_17
-node_6 -> node_17
 node_15 -> node_17
 node_16 -> node_17
-node_16 -> node_18
 node_17 -> node_18
-node_5 -> node_20
-node_6 -> node_20
 node_18 -> node_20
 node_19 -> node_20
-node_19 -> node_21
 node_20 -> node_21
-node_19 -> node_22
 node_21 -> node_22
 }
 /*

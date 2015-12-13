@@ -135,7 +135,8 @@ let diff_list_decreasing =  diff_list (swap compare_bool)
 let merge_list_decreasing = merge_list (swap compare_bool)
 (*let merge_list_increasing = merge_list compare_bool*)
 				       
-let closure_bottom_up err_fmt config prec is_obs init_to_eidmax =
+let closure_bottom_up_with_fold err_fmt config prec is_obs init_to_eidmax f a  =
+  let is_obs = if config.keep_all_nodes then (fun _ -> true) else is_obs in 
   let max_index = M.fold (fun i _ -> max i) prec 0 in
   let is_init x =
     match M.find_option x prec with
@@ -192,17 +193,16 @@ let closure_bottom_up err_fmt config prec is_obs init_to_eidmax =
         in 
         let _ = A.set is_last_succ_of 0 [] in 
         let gc_when_visit node =
-          if not config.keep_all_nodes then
-            List.iter
-              (fun k -> A.set s_pred_star k ([],0))
-              (A.get is_last_succ_of node) in
+          List.iter
+            (fun k -> A.set s_pred_star k ([],0))
+            (A.get is_last_succ_of node) in
         gc_when_visit,
         (fun i -> A.get max_succ i)
       end    
   in 
-  let _ = 
+  let _,a = 
     M.fold 
-      (fun succ s_pred  tick -> 
+      (fun succ s_pred (tick,a) -> 
         begin
           let rec aux (l:int list) (accu:int list) max_out = 
             match l with 
@@ -210,11 +210,11 @@ let closure_bottom_up err_fmt config prec is_obs init_to_eidmax =
             | pred::t ->
               begin 
                 let new_l,max_out' = A.get s_pred_star pred in 
-                let max_out' = 
+                (*let max_out' = 
                   if  is_obs pred
-                  then 0 
+                  then 0
                   else max_out' 
-                in
+                in*)
                 let diff = 
                   if config.cut_transitive_path 
                   then 
@@ -231,32 +231,29 @@ let closure_bottom_up err_fmt config prec is_obs init_to_eidmax =
           let pred_star,max_out = 
             let l_pred = S.fold (fun i j -> i::j) s_pred [] in 
             let s,max_out = A.get s_pred_star succ in 
-            aux 
-              l_pred 
-              s
-              max_out 
+            aux l_pred s max_out 
           in 
-          let _ = 
+          let _ =
             A.set s_pred_star succ (pred_star,max (max_succ succ) max_out)
-          in 
-          let _ = clean succ in 
+          in
+	  let _ = clean succ in 
           let tick = do_tick tick in 
-          tick           
+          (tick,if is_obs succ then
+		  f succ pred_star a else a)            
         end)
-      prec tick 
+      prec (tick,a) 
   in 
-  let _ = close_tick () in 
-  let () = 
-    if not config.keep_all_nodes 
-    then 
-      A.iteri 
-	(fun i _ -> 
-	  if not (is_obs i) 
-	  then 
-	    A.set s_pred_star  i ([],0)) 
-	s_pred_star
+  let _ = close_tick () in
+  a
+
+let  closure_bottom_up err_fmt config prec is_obs init_to_eidmax =
+  let max_index = M.fold (fun i _ -> max i) prec 0 in
+  let s_pred_star = A.make (max_index+1) [] in
+  let f i s a =
+    let _ = A.set a i s in a
   in 
-  A.map fst s_pred_star,Decreasing_without_last_event 
+  closure_bottom_up_with_fold err_fmt config prec is_obs init_to_eidmax f s_pred_star,
+  Decreasing_without_last_event 
 
 let closure_top_down err_fmt config prec is_obs  delta =
   let is_obs = if config.keep_all_nodes then (fun _ -> true) else is_obs in 

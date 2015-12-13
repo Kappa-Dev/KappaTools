@@ -123,12 +123,8 @@ node_18 -> node_23
 node_22 -> node_23
 node_18 -> node_24
 node_22 -> node_24
-node_18 -> node_25
-node_22 -> node_25
 node_23 -> node_25
 node_24 -> node_25
-node_18 -> node_26
-node_22 -> node_26
 node_25 -> node_26
 }
 /*

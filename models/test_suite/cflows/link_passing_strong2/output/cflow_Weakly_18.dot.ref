@@ -53,11 +53,8 @@ node_8 -> node_9
 node_9 -> node_10
 node_3 -> node_11
 node_10 -> node_11
-node_3 -> node_12
 node_7 -> node_12
-node_10 -> node_12
 node_11 -> node_12
-node_7 -> node_13
 node_12 -> node_13
 }
 /*

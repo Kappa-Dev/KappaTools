@@ -414,6 +414,7 @@ let enrich_grid err_fmt config_closure grid =
   let to_keep i = IntSet.mem i keep_l in
   let ids = ids_of_grid grid  in
   let config = config_of_grid ids grid in
+  let config = {config with prec_1 = Graph_closure.reduction config.prec_1} in 
   let init_to_eid_max i =
     try Hashtbl.find grid.init_to_eidmax i
     with Not_found -> 0 in

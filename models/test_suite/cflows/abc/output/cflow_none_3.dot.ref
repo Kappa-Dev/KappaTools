@@ -70,47 +70,24 @@ node_22 [label="Cpu", style=filled, fillcolor=red] ;
 "13" -> "14" [style="invis"];
 node_1 -> node_9
 node_3 -> node_9
-node_1 -> node_10
-node_3 -> node_10
 node_9 -> node_10
-node_1 -> node_11
 node_2 -> node_11
 node_10 -> node_11
-node_1 -> node_12
 node_6 -> node_12
 node_11 -> node_12
-node_1 -> node_13
-node_6 -> node_13
 node_12 -> node_13
-node_1 -> node_14
 node_7 -> node_14
-node_11 -> node_14
 node_13 -> node_14
-node_1 -> node_15
-node_7 -> node_15
 node_14 -> node_15
-node_1 -> node_16
 node_4 -> node_16
-node_11 -> node_16
 node_15 -> node_16
-node_1 -> node_17
-node_4 -> node_17
 node_16 -> node_17
-node_1 -> node_18
 node_8 -> node_18
-node_11 -> node_18
 node_17 -> node_18
-node_1 -> node_19
-node_8 -> node_19
 node_18 -> node_19
-node_1 -> node_20
 node_5 -> node_20
-node_11 -> node_20
 node_19 -> node_20
-node_1 -> node_21
-node_5 -> node_21
 node_20 -> node_21
-node_5 -> node_22
 node_21 -> node_22
 }
 /*
