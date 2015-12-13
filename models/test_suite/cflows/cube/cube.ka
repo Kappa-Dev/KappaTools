@@ -1,5 +1,6 @@
 %def: "displayCompression" "none" "weak" 
 %def: "showIntroEvents" "true" 
+%def: "reduceCflows" "true"
 
 'x++' A(x~u,z~u) -> A(x~p,z~u) @10
 'x--' A(x~p,y~p,z~p) -> A(x~u,y~p,z~p) @10

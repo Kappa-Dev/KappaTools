@@ -20,3 +20,4 @@
 
 %def: "displayCompression" "strong"
 %def: "showIntroEvents" "true"
+%def: "reduceCflows" "true"

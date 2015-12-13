@@ -1,5 +1,6 @@
 %def: "displayCompression" "weak" "strong" 
 %def: "showIntroEvents" "true"
+%def: "reduceCflows" "true"
 
 A(x,y) -> C(x,y) @1
 C(x,y) -> A(x,y) @1

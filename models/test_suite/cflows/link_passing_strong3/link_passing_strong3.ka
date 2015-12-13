@@ -1,6 +1,7 @@
 %def: "displayCompression" "weak" "strong" 
 %def: "showIntroEvents" "true" 
 %def: "dumpIfDeadlocked" "true"
+%def: "reduceCflows" "true"
 
 A(x)->B(x) @1
 B(x)->C(x) @1 

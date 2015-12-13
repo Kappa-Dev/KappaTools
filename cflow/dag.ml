@@ -195,13 +195,6 @@ let graph_of_grid parameter handler error grid =
   let ids = Hashtbl.fold (fun key _ l -> key::l) grid.Causal.flow [] in
   let label = label handler in 
   let config = Causal.cut ids grid in 
-  let config =
-    if H.do_we_reduce_graph_before_canonicalisation parameter
-    then
-      {config with Causal.prec_1 = Graph_closure.reduction config.Causal.prec_1}
-    else
-      config 
-  in 
   let labels = A.make 1 (FICTITIOUS,"") in 
   let set =  
     Mods.IntMap.fold

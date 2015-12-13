@@ -340,8 +340,13 @@ let cut attribute_ids grid =
 	      {cfg with prec_1 = prec_1 ; events_kind = events_kind}
        in build_config tl cfg
   in
-  build_config attribute_ids empty_config
-
+  let cfg = build_config attribute_ids empty_config in
+  if !Parameter.reduceCflows
+  then
+    {cfg with prec_1 = Graph_closure.reduction cfg.prec_1}
+  else
+    cfg
+      
 let pp_atom f atom =
   let imp_str = match atom.causal_impact with
       1 -> "o" | 2 -> "x" | 3 -> "%"
@@ -414,7 +419,6 @@ let enrich_grid err_fmt config_closure grid =
   let to_keep i = IntSet.mem i keep_l in
   let ids = ids_of_grid grid  in
   let config = config_of_grid ids grid in
-  let config = {config with prec_1 = Graph_closure.reduction config.prec_1} in 
   let init_to_eid_max i =
     try Hashtbl.find grid.init_to_eidmax i
     with Not_found -> 0 in
@@ -625,49 +629,42 @@ let pretty_print err_fmt env config_closure compression_type label story_list =
 	   )
 	   (0.,[],0) (List.rev stories)
        in
-       let enriched_config' =
-	 if !Parameter.reduceCflows
-	 then {enriched_config with
-		config = {enriched_config.config with
-			   prec_1 = Graph_closure.reduction
-				      enriched_config.config.prec_1}}
-	 else enriched_config in
-        let () =   (*dump grid fic state env ; *)
-	  if !Parameter.dotCflows then
-	    let profiling desc =
-	      Format.fprintf
-		desc "/* @[Compression of %d causal flows" n;
-	      Format.fprintf
-		desc "@ obtained in average at %E t.u@] */@,"
-		(av_t/.(float_of_int n)) ;
-	      Format.fprintf
-		desc "@[/* Compressed causal flows were:@ [%a] */@]"
-		(Pp.list (fun f -> Format.fprintf f ";@,")
-			 Format.pp_print_int) ids
-	    in
-	    Kappa_files.with_cflow_file
-	      [compression_type;string_of_int cpt] "dot"
-	      (dot_of_grid profiling env enriched_config')
-	  else
-	    let profiling desc =
-	      Format.fprintf
-		desc
-		"@[<v 2><dl>@,<dt>Compression of</dt><dd>%d causal flows</dd>"n;
-	      Format.fprintf
-		desc "@,<dt>obtained in average at</dt><dd>%E t.u</dd>@,"
-		(av_t/.(float_of_int n)) ;
-	      Format.fprintf desc "<dt>Compressed causal flows were:</dt>";
-	      Format.fprintf
-		desc "@ <dd>[@[%a@]]</dd>@]@,</dl>"
-		(Pp.list (fun f -> Format.fprintf f ";@,")
-			 Format.pp_print_int) ids;
-       in
-
-	    Kappa_files.with_cflow_file
-	      [compression_type;string_of_int cpt] "html"
-	      (html_of_grid
-		 profiling compression_type cpt env enriched_config') in
-	cpt+1
+       let () =   (*dump grid fic state env ; *)
+	 if !Parameter.dotCflows then
+	   let profiling desc =
+	     Format.fprintf
+	       desc "/* @[Compression of %d causal flows" n;
+	     Format.fprintf
+	       desc "@ obtained in average at %E t.u@] */@,"
+	       (av_t/.(float_of_int n)) ;
+	     Format.fprintf
+	       desc "@[/* Compressed causal flows were:@ [%a] */@]"
+	       (Pp.list (fun f -> Format.fprintf f ";@,")
+			Format.pp_print_int) ids
+	   in
+	   Kappa_files.with_cflow_file
+	     [compression_type;string_of_int cpt] "dot"
+	     (dot_of_grid profiling env enriched_config)
+	 else
+	   let profiling desc =
+	     Format.fprintf
+	       desc
+	       "@[<v 2><dl>@,<dt>Compression of</dt><dd>%d causal flows</dd>"n;
+	     Format.fprintf
+	       desc "@,<dt>obtained in average at</dt><dd>%E t.u</dd>@,"
+	       (av_t/.(float_of_int n)) ;
+	     Format.fprintf desc "<dt>Compressed causal flows were:</dt>";
+	     Format.fprintf
+	       desc "@ <dd>[@[%a@]]</dd>@]@,</dl>"
+	       (Pp.list (fun f -> Format.fprintf f ";@,")
+			Format.pp_print_int) ids;
+	   in
+	   
+	   Kappa_files.with_cflow_file
+	     [compression_type;string_of_int cpt] "html"
+	     (html_of_grid
+		profiling compression_type cpt env enriched_config) in
+       cpt+1
       ) 0 story_list
   in
   Kappa_files.with_cflow_file
@@ -687,7 +684,7 @@ let pretty_print err_fmt env config_closure compression_type label story_list =
 				   cpt event time depth size
 		   ) story) form story_list in
      Format.fprintf form "@]@?")
-
+    
 let print_stat f parameter handler enriched_grid =
   let count_obs =
     match

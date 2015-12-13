@@ -1,6 +1,7 @@
 ####### TEMPLATE MODEL AS DESCRIBED IN THE MANUAL#############
 %def: "displayCompression" "none" "weak" 
 %def: "showIntroEvents" "true"
+%def: "reduceCflows" "true"
 
 #### Signatures 
 %agent: A(x,c) # Declaration of agent A 

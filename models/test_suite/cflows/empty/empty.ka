@@ -17,3 +17,4 @@ A(x!1),B(x!1) -> A(x!1),B(x!1),C() @1
 %def: "displayCompression" "none" "weak" "strong"
 %def: "showIntroEvents" "true"
 %def: "dotCflows" "false"
+%def: "reduceCflows" "true"
