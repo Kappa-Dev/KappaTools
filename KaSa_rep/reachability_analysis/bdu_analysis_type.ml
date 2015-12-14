@@ -44,6 +44,15 @@ module Int2Map_Remove_effect =
       let compare = compare
     end)
 
+(*potential partner side effects*)
+module Int2Map_potential_effect =
+  SetMap.Make (
+    struct
+      (*agent_type, site*)
+      type t = int * int
+      let compare = compare
+    end)
+
 (*views that are tested and modified with agent_id*)
 
 module Int2Map_Modif =
@@ -232,10 +241,20 @@ type half_break_action =
 type remove_action =
   (int list * int list) Int2Map_Remove_effect.Map.t
 
+(*potential side effects*)
+type free_half_break = (int * int) list Int2Map_potential_effect.Map.t
+type bind_half_break = (int * int) list Int2Map_potential_effect.Map.t
+type potential_half_break_action = (free_half_break * bind_half_break)
+
+type free_remove = (int * int) list Int2Map_potential_effect.Map.t
+type bind_remove = (int * int) list Int2Map_potential_effect.Map.t
+type potential_remove_action = (free_remove * bind_remove)
+
 type bdu_analysis_static =
   {
     store_covering_classes_id : (int list * int list) Int2Map_CV.Map.t;
     store_side_effects        : half_break_action * remove_action;
+    store_potential_side_effects : potential_half_break_action *  potential_remove_action;
     (* views that are tested and modificated with agent_id*)
     store_modification_sites  :
       (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t;

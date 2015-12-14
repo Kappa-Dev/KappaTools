@@ -55,6 +55,18 @@ let scan_rule_static parameter error handler rule_id rule covering_classes
       rule.actions.remove
       store_result.store_side_effects
   in 
+  (*------------------------------------------------------------------------------*)
+  (*potential partner side effects*)
+  let error, store_potential_side_effects =
+    store_potential_side_effects
+      parameter
+      error
+      handler
+      rule_id
+      rule.actions.half_break
+      rule.actions.remove
+      store_result.store_potential_side_effects
+  in
   (*-------------------------------------------------------------------------------*)
   (*update of the views due to modification with agent_id*)
   let error, store_modification_sites =
@@ -118,6 +130,7 @@ let scan_rule_static parameter error handler rule_id rule covering_classes
   {
     store_covering_classes_id     = store_covering_classes_id;
     store_side_effects            = store_side_effects;
+    store_potential_side_effects  = store_potential_side_effects;
     store_modification_sites      = store_modification_sites;
     store_test_sites              = store_test_sites;
     store_test_modification_sites = store_test_modification_sites;
@@ -399,6 +412,10 @@ let init_bdu_analysis_static =
   let init_covering_classes_id = Int2Map_CV.Map.empty in
   let init_half_break          = Int2Map_HalfBreak_effect.Map.empty  in
   let init_remove              = Int2Map_Remove_effect.Map.empty  in
+  let init_half_break_free     = Int2Map_potential_effect.Map.empty in
+  let init_half_break_bind     = Int2Map_potential_effect.Map.empty in
+  let init_remove_free         = Int2Map_potential_effect.Map.empty in
+  let init_remove_bind         = Int2Map_potential_effect.Map.empty in
   let init_modification        = Int2Map_Modif.Map.empty in
   let init_test                = Int2Map_Modif.Map.empty in
   let init_test_modification   = Int2Map_Modif.Map.empty in
@@ -409,6 +426,9 @@ let init_bdu_analysis_static =
     {
       store_covering_classes_id     = init_covering_classes_id;
       store_side_effects            = (init_half_break, init_remove);
+      store_potential_side_effects  = 
+        (init_half_break_free, init_half_break_bind),
+        (init_remove_free, init_remove_bind);
       store_modification_sites      = init_modification;
       store_test_sites              = init_test;
       store_test_modification_sites = init_test_modification;

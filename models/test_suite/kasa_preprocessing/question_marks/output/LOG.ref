@@ -158,6 +158,7 @@ Quarks:MODIFICATION+
 Quarks:rule_id:0,agent_type:0,site_type:0,state:1
 Quarks:MODIFICATION-
 Quarks:rule_id:0,agent_type:0,site_type:0,state:0
+Quarks:HALF BOND BREAKING
 Quarks:Rule 1
 Quarks:TEST
 Quarks:rule_id:1,agent_type:0
@@ -170,6 +171,7 @@ Quarks:rule_id:1,agent_type:0,site_type:1,state:0
 Quarks:MODIFICATION-
 Quarks:rule_id:1,agent_type:0,site_type:1,state:0
 Quarks:rule_id:1,agent_type:0,site_type:1,state:1
+Quarks:HALF BOND BREAKING
 Quarks:Rule 2
 Quarks:TEST
 Quarks:rule_id:2,agent_type:0
@@ -184,6 +186,7 @@ Quarks:rule_id:2,agent_type:0,site_type:1,state:1
 Quarks:MODIFICATION-
 Quarks:rule_id:2,agent_type:0,site_type:1,state:0
 Quarks:rule_id:2,agent_type:0,site_type:1,state:0
+Quarks:HALF BOND BREAKING
 Quarks:Rule 3
 Quarks:TEST
 Quarks:rule_id:3,agent_type:0
@@ -197,6 +200,7 @@ Quarks:rule_id:3,agent_type:0,site_type:1,state:0
 Quarks:MODIFICATION-
 Quarks:rule_id:3,agent_type:0,site_type:1,state:0
 Quarks:rule_id:3,agent_type:0,site_type:1,state:1
+Quarks:HALF BOND BREAKING
 Quarks:Rule 4
 Quarks:TEST
 Quarks:rule_id:4,agent_type:0
@@ -208,6 +212,7 @@ Quarks:MODIFICATION+
 Quarks:rule_id:4,agent_type:0,site_type:0,state:0
 Quarks:MODIFICATION-
 Quarks:rule_id:4,agent_type:0,site_type:0,state:1
+Quarks:HALF BOND BREAKING
 Quarks:Rule 5
 Quarks:TEST
 Quarks:rule_id:5,agent_type:0
@@ -218,6 +223,7 @@ Quarks:rule_id:5,agent_type:0,site_type:1,state:0
 Quarks:rule_id:5,agent_type:0,site_type:1,state:1
 Quarks:MODIFICATION+
 Quarks:MODIFICATION-
+Quarks:HALF BOND BREAKING
 Quarks:Rule 6
 Quarks:TEST
 Quarks:rule_id:6,agent_type:0
@@ -234,6 +240,7 @@ Quarks:MODIFICATION-
 Quarks:rule_id:6,agent_type:0,site_type:1,state:0
 Quarks:rule_id:6,agent_type:0,site_type:1,state:1
 Quarks:rule_id:6,agent_type:0,site_type:1,state:0
+Quarks:HALF BOND BREAKING
 
 REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
 Quarks:agent_test**:agent_type:0,rule:0->[0]
@@ -367,6 +374,15 @@ agent_type:0:site_type:0@list of pair (rule_id, binding state):
 (rule_id:5 * state:no_information)
 agent_type:0:site_type:1@list of pair (rule_id, binding state):
 (rule_id:5 * state:no_information)
+------------------------------------------------------------
+Sites that may/must occurs in the potential partner side-effects:
+------------------------------------------------------------
+- Potential partner of half break action:
+- Potential partner of remove action:
+agent_type:0:site_type:1@(rule_id, free state)
+(rule_id:5 * state:0)
+agent_type:0:site_type:1@(rule_id, binding state)
+(rule_id:5 * state:1)
 ------------------------------------------------------------
 Set of rules that may modify a given site (excluding created agents):
 ------------------------------------------------------------

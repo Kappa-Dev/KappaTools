@@ -271,6 +271,7 @@ Quarks:MODIFICATION-
 Quarks:rule_id:0,agent_type:0,site_type:0,state:0
 Quarks:rule_id:0,agent_type:0,site_type:2,state:0
 Quarks:rule_id:0,agent_type:1,site_type:0,state:0
+Quarks:HALF BOND BREAKING
 Quarks:Rule 1
 Quarks:TEST
 Quarks:rule_id:1,agent_type:0
@@ -288,6 +289,7 @@ Quarks:MODIFICATION-
 Quarks:rule_id:1,agent_type:0,site_type:1,state:0
 Quarks:rule_id:1,agent_type:0,site_type:3,state:0
 Quarks:rule_id:1,agent_type:2,site_type:0,state:0
+Quarks:HALF BOND BREAKING
 Quarks:Rule 2
 Quarks:TEST
 Quarks:rule_id:2,agent_type:1
@@ -303,6 +305,7 @@ Quarks:rule_id:2,agent_type:3,site_type:0,state:1
 Quarks:MODIFICATION-
 Quarks:rule_id:2,agent_type:1,site_type:1,state:0
 Quarks:rule_id:2,agent_type:3,site_type:0,state:0
+Quarks:HALF BOND BREAKING
 Quarks:Rule 3
 Quarks:TEST
 Quarks:rule_id:3,agent_type:2
@@ -318,6 +321,7 @@ Quarks:rule_id:3,agent_type:3,site_type:1,state:1
 Quarks:MODIFICATION-
 Quarks:rule_id:3,agent_type:2,site_type:1,state:0
 Quarks:rule_id:3,agent_type:3,site_type:1,state:0
+Quarks:HALF BOND BREAKING
 Quarks:Rule 4
 Quarks:TEST
 Quarks:rule_id:4,agent_type:3
@@ -336,6 +340,7 @@ Quarks:rule_id:4,agent_type:0,site_type:4,state:1
 Quarks:MODIFICATION-
 Quarks:rule_id:4,agent_type:3,site_type:2,state:0
 Quarks:rule_id:4,agent_type:0,site_type:4,state:0
+Quarks:HALF BOND BREAKING
 
 REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
 Quarks:agent_test**:agent_type:0,rule:0->[0]
@@ -563,6 +568,11 @@ covering_class_id:0
 ------------------------------------------------------------
 Sites that may/must occurs side-effects:
 ------------------------------------------------------------
+------------------------------------------------------------
+Sites that may/must occurs in the potential partner side-effects:
+------------------------------------------------------------
+- Potential partner of half break action:
+- Potential partner of remove action:
 ------------------------------------------------------------
 Set of rules that may modify a given site (excluding created agents):
 ------------------------------------------------------------
