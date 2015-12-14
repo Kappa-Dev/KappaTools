@@ -366,7 +366,7 @@ let inc_fails a a' b =
   then succ b
   else b 
     
-let fold_story_table_gen logger logger_fail parameter handler error s f l a =
+let fold_story_table_gen logger parameter handler error s f l a =
   let n_stories_input = count_stories l in 
   let progress_bar = 
     match logger
@@ -382,20 +382,16 @@ let fold_story_table_gen logger logger_fail parameter handler error s f l a =
   in
   let error,(_,a,n_fails) =   D.fold_table parameter handler error g l.story_list (progress_bar,a,0) in 
   let () = close_progress_bar_opt logger in 
-  let () = print_fails logger_fail  s n_fails in 
+  let () = print_fails parameter.S.PH.B.PB.CI.Po.K.H.out_channel_err s n_fails in 
   error,a 
 
-let fold_story_table_with_progress_bar logger = fold_story_table_gen (Some logger) logger 
-let fold_story_table_without_progress_bar a = fold_story_table_gen None a
+let fold_story_table_with_progress_bar parameter handler error s f l a = fold_story_table_gen (Some (S.PH.B.PB.CI.Po.K.H.get_logger parameter)) parameter handler error s f l a 
+let fold_story_table_without_progress_bar parameter handler error s f l a = fold_story_table_gen None parameter handler error s f l a 
 
 
 let get_counter story_list = story_list.story_counter 
 let get_stories story_list = story_list.story_list 
-let inc_counter story_list =
-  {
-    story_list with 
-      story_counter = succ story_list.story_counter
-  }
+let inc_counter story_list = { story_list with story_counter = succ story_list.story_counter }
 
 
 let store_trace (parameter:parameter) (handler:kappa_handler) (error:error_log) obs_info  computation_info trace  (story_table:story_table) = 
@@ -417,23 +413,6 @@ let store_trace (parameter:parameter) (handler:kappa_handler) (error:error_log) 
     }
   in
   error,story_table,computation_info 
-
-let fold_left_with_progress_bar logger string f a l =
-  let n = List.length l in
-  let progress_bar = Mods.tick_stories logger n (false,0,0) in
-  let _,a,n_fail = 
-    (List.fold_left
-       (fun (bar,a,n_fail) x ->
-	let a' = f a x in
-	let bar = Mods.tick_stories logger n bar in
-	let n_fail = inc_fails a a' n_fail in 
-	(bar,a',n_fail))
-       (progress_bar,a,0)
-       l)
-  in 
-  let () = close_progress_bar_opt (Some logger) in 
-  let () = print_fails logger string n_fail in 
-  a 
    
 let flatten_story_table parameter handler error story_table = 
   let error,list = D.hash_list parameter handler error story_table.story_list in 
@@ -445,7 +424,7 @@ let flatten_story_table parameter handler error story_table =
 let always = (fun _ -> true) 
 
 
-let compress logger parameter handler error log_info trace =
+let compress parameter handler error log_info trace =
   match
     parameter.S.PH.B.PB.CI.Po.K.H.current_compression_mode
   with
@@ -478,7 +457,7 @@ let compress logger parameter handler error log_info trace =
     let error = 
       if debug_mode
       then 
-	let _ =  Debug.tag logger "\t\t * result"  in
+	let _ =  Debug.tag parameter.S.PH.B.PB.CI.Po.K.H.out_channel_err "\t\t * result"  in
 	let _ =
           if S.PH.B.is_failed output 
           then 
@@ -500,8 +479,8 @@ let set_compression_mode p x =
   | Parameter.Strong -> S.PH.B.PB.CI.Po.K.H.set_compression_strong p
   | Parameter.Weak -> S.PH.B.PB.CI.Po.K.H.set_compression_weak p
 						       
-let strongly_compress logger parameter = compress logger (set_compression_mode parameter Parameter.Strong)
-let weakly_compress logger parameter = compress logger (set_compression_mode parameter Parameter.Weak)
+let strongly_compress parameter = compress (set_compression_mode parameter Parameter.Strong)
+let weakly_compress parameter = compress (set_compression_mode parameter Parameter.Weak)
 								  
 let convert_trace_into_grid trace handler = 
     let event_list = get_compressed_trace trace in
@@ -511,18 +490,36 @@ let convert_trace_into_musical_notation p h e info x = S.PH.B.import p h e info 
 
 let enrich_grid_with_transitive_closure = Causal.enrich_grid
 
-let enrich_grid_with_transitive_past_of_observables_with_a_progression_bar f = Causal.enrich_grid f Graph_closure.config_big_graph_with_progress_bar
-let enrich_grid_with_transitive_past_of_observables_without_a_progress_bar f = Causal.enrich_grid f Graph_closure.config_big_graph_without_progress_bar
-let enrich_grid_with_transitive_past_of_each_node_without_a_progress_bar f = Causal.enrich_grid f Graph_closure.config_small_graph
+let enrich_grid_with_transitive_past_of_observables_with_a_progression_bar f = Causal.enrich_grid (S.PH.B.PB.CI.Po.K.H.get_logger f) Graph_closure.config_big_graph_with_progress_bar
+let enrich_grid_with_transitive_past_of_observables_without_a_progress_bar f = Causal.enrich_grid (S.PH.B.PB.CI.Po.K.H.get_logger f) Graph_closure.config_big_graph_without_progress_bar
+let enrich_grid_with_transitive_past_of_each_node_without_a_progress_bar f = Causal.enrich_grid (S.PH.B.PB.CI.Po.K.H.get_logger f) Graph_closure.config_big_graph_without_progress_bar
+let enrich_grid_with_transitive_past_of_each_node_without_a_progress_bar f = Causal.enrich_grid (S.PH.B.PB.CI.Po.K.H.get_logger f) Graph_closure.config_small_graph
 					    
 let sort_story_list  = D.sort_list 
 let export_story_table parameter handler error x = sort_story_list parameter handler error (get_stories x)
 let has_obs x = List.exists S.PH.B.PB.CI.Po.K.is_obs_of_refined_step (get_pretrace_of_trace x)
-				   
-let fold_over_the_causal_past_of_observables_with_progress_bar log parameter handler error f t a =
+
+let fold_left_with_progress_bar parameter string f a l =
+  let n = List.length l in
+  let progress_bar = Mods.tick_stories (S.PH.B.PB.CI.Po.K.H.get_logger parameter) n (false,0,0) in
+  let _,a,n_fail = 
+    (List.fold_left
+       (fun (bar,a,n_fail) x ->
+       let a' = f a x in
+       let bar = Mods.tick_stories (S.PH.B.PB.CI.Po.K.H.get_logger parameter) n bar in
+       let n_fail = inc_fails a a' n_fail in 
+       (bar,a',n_fail))
+       (progress_bar,a,0)
+       l)
+  in 
+  let () = close_progress_bar_opt (Some (S.PH.B.PB.CI.Po.K.H.get_logger parameter)) in 
+  let () = print_fails parameter.S.PH.B.PB.CI.Po.K.H.out_channel_err string n_fail in 
+  a 			    
+
+let fold_over_the_causal_past_of_observables_with_progress_bar parameter handler error f t a =
   let grid = convert_trace_into_grid t handler in 
   Causal.fold_over_causal_past_of_obs 
-    log 
+    (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
     Graph_closure.config_big_graph_with_progress_bar
     grid 
     f (error,a) 

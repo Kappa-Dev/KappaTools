@@ -61,18 +61,18 @@ val cut: parameter -> (parameter -> bool) -> kappa_handler -> profiling_info -> 
 val remove_pseudo_inverse_events: parameter -> (parameter -> bool) -> kappa_handler -> profiling_info -> error_log -> trace -> error_log * profiling_info * trace 
 
 (** compress a trace with the level of abstraction defined in the argument parameter *)
-val compress: Format.formatter -> parameter -> kappa_handler -> error_log -> profiling_info -> trace -> error_log * profiling_info * trace list
+val compress: parameter -> kappa_handler -> error_log -> profiling_info -> trace -> error_log * profiling_info * trace list
 
 (** change the default level of oabstraction for compression (when used with compress) *) 
 val set_compression_mode: parameter -> Parameter.current_compression_mode -> parameter
 									       															         
-val weakly_compress:  Format.formatter -> parameter -> kappa_handler -> error_log -> profiling_info -> trace -> error_log * profiling_info * trace list
-val strongly_compress: Format.formatter -> parameter -> kappa_handler -> error_log -> profiling_info -> trace -> error_log * profiling_info * trace list																	   
+val weakly_compress:  parameter -> kappa_handler -> error_log -> profiling_info -> trace -> error_log * profiling_info * trace list
+val strongly_compress: parameter -> kappa_handler -> error_log -> profiling_info -> trace -> error_log * profiling_info * trace list																	   
 type story_table 
 
 
-val fold_story_table_with_progress_bar: Format.formatter -> parameter -> kappa_handler -> error_log -> string -> (parameter -> kappa_handler -> error_log -> trace -> profiling_info Mods.simulation_info list -> 'a -> error_log * 'a) -> story_table -> 'a -> error_log * 'a
-val fold_story_table_without_progress_bar: Format.formatter -> parameter -> kappa_handler -> error_log -> string -> (parameter -> kappa_handler -> error_log -> trace -> profiling_info Mods.simulation_info list -> 'a -> error_log * 'a) -> story_table -> 'a -> error_log * 'a
+val fold_story_table_with_progress_bar: parameter -> kappa_handler -> error_log -> string -> (parameter -> kappa_handler -> error_log -> trace -> profiling_info Mods.simulation_info list -> 'a -> error_log * 'a) -> story_table -> 'a -> error_log * 'a
+val fold_story_table_without_progress_bar: parameter -> kappa_handler -> error_log -> string -> (parameter -> kappa_handler -> error_log -> trace -> profiling_info Mods.simulation_info list -> 'a -> error_log * 'a) -> story_table -> 'a -> error_log * 'a
 																					
 (** put together the stories having the same canonic form, this has do be done explicitely on the moment, I will improve this soon*)
 val flatten_story_table: parameter -> kappa_handler -> error_log -> story_table -> error_log * story_table 
@@ -80,8 +80,8 @@ val flatten_story_table: parameter -> kappa_handler -> error_log -> story_table 
        
 type step_id = S.PH.B.PB.step_id
 type observable_hit 
-val fold_over_the_causal_past_of_observables_with_progress_bar: 
-Format.formatter -> parameter -> kappa_handler -> error_log -> (int -> int list -> error_log * 'a -> error_log * 'a) -> trace -> 'a  -> error_log * 'a 
+
+val fold_over_the_causal_past_of_observables_with_progress_bar: parameter -> kappa_handler -> error_log -> (int -> int list -> error_log * 'a -> error_log * 'a) -> trace -> 'a  -> error_log * 'a 
 val get_event_list_from_observable_hit: observable_hit -> step_id list     
 val get_runtime_info_from_observable_hit: observable_hit -> unit  Mods.simulation_info option
 
@@ -105,10 +105,9 @@ val translate: parameter -> kappa_handler -> error_log -> musical_grid -> step_i
 val convert_trace_into_grid: trace -> kappa_handler -> cflow_grid 
 
 (** compute transitive closure with different parameters (progress_bar, gc) *)
-(* change the names to more explicit ones *)
-val enrich_grid_with_transitive_past_of_observables_with_a_progression_bar: Format.formatter -> cflow_grid -> enriched_cflow_grid
-val enrich_grid_with_transitive_past_of_observables_without_a_progress_bar: Format.formatter -> cflow_grid -> enriched_cflow_grid 
-val enrich_grid_with_transitive_past_of_each_node_without_a_progress_bar: Format.formatter -> cflow_grid -> enriched_cflow_grid 
+val enrich_grid_with_transitive_past_of_observables_with_a_progression_bar: parameter -> cflow_grid -> enriched_cflow_grid
+val enrich_grid_with_transitive_past_of_observables_without_a_progress_bar: parameter -> cflow_grid -> enriched_cflow_grid 
+val enrich_grid_with_transitive_past_of_each_node_without_a_progress_bar: parameter -> cflow_grid -> enriched_cflow_grid 
 										   
 
 (** Musical processing *)
@@ -131,5 +130,4 @@ val store_trace: parameter -> kappa_handler -> error_log ->  profiling_info Mods
 val export_story_table: parameter -> kappa_handler -> error_log -> story_table -> error_log * (Causal.grid * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list
 
 
-
-val fold_left_with_progress_bar: Format.formatter -> string -> ('a -> 'b -> 'a) -> 'a -> 'b list -> 'a 
+val fold_left_with_progress_bar: parameter -> string -> ('a -> 'b -> 'a) -> 'a -> 'b list -> 'a 
