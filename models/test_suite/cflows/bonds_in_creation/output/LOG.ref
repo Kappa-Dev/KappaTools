@@ -45,17 +45,6 @@ ____________________________________________________________
 	 - detecting pseudo inverse events (no change)
 	 - blackboard generation
 	 - computing causal past of each observed events (43)
-Stats:
- number of step   : 238
- longest story    : 32
- average length   : 18.0930232558
- geometric mean   : 18.8728918428
-
-	 - causal flow compression (43)
-
-____________________________________________________________
-############################################################
-
 
 
 	 - weak flow compression (13)
