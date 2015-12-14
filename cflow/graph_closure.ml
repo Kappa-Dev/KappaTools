@@ -135,7 +135,7 @@ let diff_list_decreasing =  diff_list (swap compare_bool)
 let merge_list_decreasing = merge_list (swap compare_bool)
 (*let merge_list_increasing = merge_list compare_bool*)
 				       
-let closure_bottom_up_with_fold err_fmt config prec is_obs init_to_eidmax f a  =
+let closure_bottom_up_with_fold err_fmt config prec is_obs f a  =
   let is_obs = if config.keep_all_nodes then (fun _ -> true) else is_obs in 
   let max_index = M.fold (fun i _ -> max i) prec 0 in
   let () =
@@ -160,7 +160,6 @@ let closure_bottom_up_with_fold err_fmt config prec is_obs init_to_eidmax f a  =
   let clean,max_succ = 
     begin 
       let max_succ = A.make (max_index+1) 0 in 
-      let _ = A.iteri (fun i _ -> A.set max_succ i (init_to_eidmax i)) max_succ in 
       let _ =
 	M.iter
           (fun succ -> 
@@ -230,13 +229,13 @@ let closure_bottom_up_with_fold err_fmt config prec is_obs init_to_eidmax f a  =
   let _ = close_tick () in
   a
 
-let  closure_bottom_up err_fmt config prec is_obs init_to_eidmax =
+let closure_bottom_up err_fmt config prec is_obs =
   let max_index = M.fold (fun i _ -> max i) prec 0 in
   let s_pred_star = A.make (max_index+1) [] in
   let f i s a =
     let _ = A.set a i s in a
   in 
-  closure_bottom_up_with_fold err_fmt config prec is_obs init_to_eidmax f s_pred_star,
+  closure_bottom_up_with_fold err_fmt config prec is_obs f s_pred_star,
   Decreasing_without_last_event 
 
 let closure_top_down err_fmt config prec is_obs  delta =
@@ -322,11 +321,11 @@ let get_list_in_increasing_order_with_last_event i (m,mode) =
        | l -> List.rev (i::l)
      end
        
-let closure_check err_fmt config prec is_obs init_to_eidmax =
+let closure_check err_fmt config prec is_obs (*init_to_eidmax*) =
   let t = Sys.time () in 
   let a,a' = closure_top_down err_fmt config prec is_obs 0 in
   let t' = Sys.time () in
-  let b,b' = closure_bottom_up err_fmt {config with do_tick = false} prec is_obs init_to_eidmax in
+  let b,b' = closure_bottom_up err_fmt {config with do_tick = false} prec is_obs in
   let t'' = Sys.time () in
   let _ = Printf.fprintf stderr "NEW: %f OLD: %f \n" (t'-.t) (t''-.t') in 
   let _ =
@@ -345,12 +344,12 @@ let closure_check err_fmt config prec is_obs init_to_eidmax =
       a
   in a,a'
        
-let closure err_fmt config prec is_obs init_to_eidmax =
+let closure err_fmt config prec is_obs =
   match
     config.algo
   with
-  | Check -> closure_check err_fmt config prec is_obs init_to_eidmax 
-  | Bottom_up -> closure_bottom_up err_fmt config prec is_obs init_to_eidmax
+  | Check -> closure_check err_fmt config prec is_obs 
+  | Bottom_up -> closure_bottom_up err_fmt config prec is_obs 
   | Top_down -> closure_top_down err_fmt config prec is_obs 0
 		   
 let neighbor_non_direct_descendant sons prec =
