@@ -502,6 +502,7 @@ let scan_rule parameter error handler rule_id rule quarks =
        site_modif_minus
   in 
   let error,(site_modif_plus,site_modif_minus) = (*the sites that are released via half bond breaking*)
+    let _ = Misc_sa.trace parameter (fun () -> "HALF BOND BREAKING\n") in
     List.fold_left
       (fun (error,(site_modif_plus,site_modif_minus)) (add,state) -> 
         let agent_index = add.Cckappa_sig.agent_index in 
