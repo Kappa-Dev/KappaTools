@@ -138,11 +138,6 @@ let merge_list_decreasing = merge_list (swap compare_bool)
 let closure_bottom_up_with_fold err_fmt config prec is_obs init_to_eidmax f a  =
   let is_obs = if config.keep_all_nodes then (fun _ -> true) else is_obs in 
   let max_index = M.fold (fun i _ -> max i) prec 0 in
-  let is_init x =
-    match M.find_option x prec with
-    | Some s ->
-      S.is_empty s || (S.equal s (S.singleton x))
-    | None -> true in
   let () =
     if config.stat_trans_closure_for_big_graphs && config.max_index > 300
     then
@@ -176,11 +171,9 @@ let closure_bottom_up_with_fold err_fmt config prec is_obs init_to_eidmax f a  =
       in 
       let is_last_succ_of = A.make (max_index+1) [] in 
       let add node max_succ = 
-        if not (is_obs node) && not (is_init node)
-        then 
-          let old_l = A.get is_last_succ_of max_succ in 
-          let l' = node::old_l in 
-          A.set is_last_succ_of max_succ l'
+        let old_l = A.get is_last_succ_of max_succ in 
+        let l' = node::old_l in 
+        A.set is_last_succ_of max_succ l'
       in 
       let _ = 
         A.iteri 
