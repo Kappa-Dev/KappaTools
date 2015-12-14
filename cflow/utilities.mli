@@ -2,7 +2,7 @@
   * utilities.mli  
   *
   * Creation:                      <2015-08-10 09:21:53 feret>
-  * Last modification: Time-stamp: <2015-12-11 09:51:17 feret>
+  * Last modification: Time-stamp: <2015-12-14 09:56:14 feret>
   * 
   * Causal flow compression: a module for KaSim 
   * Jerome Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -69,6 +69,8 @@ val set_compression_mode: parameter -> Parameter.current_compression_mode -> par
 val weakly_compress:  Format.formatter -> parameter -> kappa_handler -> error_log -> profiling_info -> trace -> error_log * profiling_info * trace list
 val strongly_compress: Format.formatter -> parameter -> kappa_handler -> error_log -> profiling_info -> trace -> error_log * profiling_info * trace list																	   
 type story_table 
+
+
 val fold_story_table_with_progress_bar: Format.formatter -> parameter -> kappa_handler -> error_log -> string -> (parameter -> kappa_handler -> error_log -> trace -> profiling_info Mods.simulation_info list -> 'a -> error_log * 'a) -> story_table -> 'a -> error_log * 'a
 val fold_story_table_without_progress_bar: Format.formatter -> parameter -> kappa_handler -> error_log -> string -> (parameter -> kappa_handler -> error_log -> trace -> profiling_info Mods.simulation_info list -> 'a -> error_log * 'a) -> story_table -> 'a -> error_log * 'a
 																					
@@ -78,6 +80,8 @@ val flatten_story_table: parameter -> kappa_handler -> error_log -> story_table 
        
 type step_id = S.PH.B.PB.step_id
 type observable_hit 
+val fold_over_the_causal_past_of_observables_with_progress_bar: 
+Format.formatter -> parameter -> kappa_handler -> error_log -> (int -> int list -> error_log * 'a -> error_log * 'a) -> trace -> 'a  -> error_log * 'a 
 val get_event_list_from_observable_hit: observable_hit -> step_id list     
 val get_runtime_info_from_observable_hit: observable_hit -> unit  Mods.simulation_info option
 

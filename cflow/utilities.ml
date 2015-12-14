@@ -2,7 +2,7 @@
  * utilities.ml 
  *      
  * Creation:                      <2015-03-28 feret>
- * Last modification: Time-stamp: <2015-12-11 09:51:29 feret>
+ * Last modification: Time-stamp: <2015-12-14 09:55:30 feret>
  * 
  * API for causal compression
  * Jerome Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -272,6 +272,9 @@ let get_event_list_from_observable_hit a = a.list_of_events
 let get_runtime_info_from_observable_hit a = a.runtime_info 
 let get_list_order a = a.list_of_actions 
 
+
+    
+
 module Profiling = S.PH.B.PB.CI.Po.K.P
 
 		     
@@ -513,3 +516,10 @@ let sort_story_list  = D.sort_list
 let export_story_table parameter handler error x = sort_story_list parameter handler error (get_stories x)
 let has_obs x = List.exists S.PH.B.PB.CI.Po.K.is_obs_of_refined_step (get_pretrace_of_trace x)
 				   
+let fold_over_the_causal_past_of_observables_with_progress_bar log parameter handler error f t a =
+  let grid = convert_trace_into_grid t handler in 
+  Causal.fold_over_causal_past_of_obs 
+    log 
+    Graph_closure.config_big_graph_with_progress_bar
+    grid 
+    f (error,a) 

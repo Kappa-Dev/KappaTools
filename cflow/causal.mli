@@ -63,7 +63,9 @@ val record_init :
 val cut : (int * int * int) list -> grid -> config
 val enrich_grid :
   Format.formatter -> Graph_closure.config -> grid -> enriched_grid
-
+val fold_over_causal_past_of_obs : 
+  Format.formatter -> Graph_closure.config -> grid -> (int -> int list -> 'a -> 'a) -> 'a -> 'a
+      
 val debug_print_grid : Format.formatter -> grid -> unit
 val pretty_print :
   Format.formatter -> Environment.t -> Graph_closure.config -> string ->
@@ -72,3 +74,4 @@ val pretty_print :
                   state env] *)
 val print_stat :
   Format.formatter -> 'a -> 'b -> enriched_grid -> unit
+
