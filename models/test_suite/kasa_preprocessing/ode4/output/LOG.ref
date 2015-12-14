@@ -378,6 +378,17 @@ rule_id:1
 
 
 ------------------------------------------------------------
+- Bdu for the valuations of the views that are created from potential partner in side effects (per rule, agent and covering class):
+
+
+------------------------------------------------------------
+- Bdu for the valuations of the views that are created from potential partner in side effects (projection per rule):
+
+
+------------------------------------------------------------
+- List for update of the views due to modification that are created from potential partner in side effects (per rule, agent and covering class):
+
+------------------------------------------------------------
 - Bdu for the valuations of the views that are tested (per rule, agent and covering class):
 
 agent_id:0:agent_type:0:rule_id:0:covering_class_id:0

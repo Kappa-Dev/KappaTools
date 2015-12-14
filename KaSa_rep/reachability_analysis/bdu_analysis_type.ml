@@ -138,12 +138,12 @@ module Map_agent_type_creation_bdu =
 module Project2bdu_creation =
   SetMap.Proj2 (Map_creation_bdu)(Map_final_creation_bdu)(Map_agent_type_creation_bdu)
 
-module Map_creation_bdu_ag =
+(*module Map_creation_bdu_ag =
   SetMap.Make (
     struct
       type t = int (*agent_type*)
       let compare = compare
-    end)
+    end)*)
 
 (*test*)
 
@@ -172,12 +172,12 @@ module Map_agent_id_test_bdu =
 module Project2bdu_test =
   SetMap.Proj2 (Map_test_bdu)(Map_final_test_bdu)(Map_agent_id_test_bdu)
 
-module Map_test_bdu_ag =
+(*module Map_test_bdu_ag =
   SetMap.Make (
     struct
       type t = int (*agent_id*)
       let compare = compare
-    end)
+    end)*)
 
 (*modification*)
 
@@ -204,6 +204,42 @@ module Map_agent_id_modif_list =
 
 module Project2bdu_modif =
   SetMap.Proj2 (Map_modif_list)(Map_final_modif_list)(Map_agent_id_modif_list)
+
+(*potential side effect*)
+
+module Map_potential_bdu =
+  SetMap.Make (
+    struct
+      type t = int * int * int
+      let compare = compare
+    end)
+
+(*with projection*)
+module Map_final_potential_bdu =
+  SetMap.Make (
+    struct
+      type t = int
+      let compare = compare
+    end)
+
+module Map_agent_type_potential_bdu =
+  SetMap.Make (
+    struct
+      type t = int
+      let compare = compare
+    end)
+
+module Project2bdu_potential =
+  SetMap.Proj2 (Map_potential_bdu)(Map_final_potential_bdu)(Map_agent_type_potential_bdu)
+
+(*list of potential side effect (site free)*)
+
+module Map_potential_list =
+  SetMap.Make (
+    struct
+      type t = int * int * int
+      let compare = compare
+    end)
 
 (************************************************************************************)
 (*fixpoint iteration*)
@@ -296,7 +332,19 @@ type bdu_build =
     store_proj_bdu_creation_restriction_map: Mvbdu_wrapper.Mvbdu.mvbdu Map_agent_type_creation_bdu.Map.t Map_final_creation_bdu.Map.t;
     store_bdu_init_restriction_map: Mvbdu_wrapper.Mvbdu.mvbdu Map_bdu_update.Map.t;
     store_modif_list_restriction_map: ((int * int) list) Map_modif_list.Map.t;
-    store_proj_modif_list_restriction_map: ((int * int) list) Map_agent_id_modif_list.Map.t Map_final_modif_list.Map.t
+    store_proj_modif_list_restriction_map: ((int * int) list) Map_agent_id_modif_list.Map.t Map_final_modif_list.Map.t;
+    store_bdu_potential_effect_restriction_map : 
+      Mvbdu_wrapper.Mvbdu.mvbdu Map_potential_bdu.Map.t * 
+      Mvbdu_wrapper.Mvbdu.mvbdu Map_potential_bdu.Map.t;
+    store_proj_bdu_potential_restriction_map :
+      Mvbdu_wrapper.Mvbdu.mvbdu Map_agent_type_potential_bdu.Map.t
+      Map_final_potential_bdu.Map.t
+    * 
+      Mvbdu_wrapper.Mvbdu.mvbdu Map_agent_type_potential_bdu.Map.t
+      Map_final_potential_bdu.Map.t;
+    store_potential_list_restriction_map :
+      (int * int) list Map_potential_list.Map.t * 
+      (int * int) list Map_potential_list.Map.t ;
   }
 
 (************************************************************************************)
@@ -307,6 +355,7 @@ type bdu_fixpoint =
       store_test_has_bond_rhs  : bool * Map_site_address.Set.t Map_test_bond.Map.t;
       store_new_wl_side_effect : (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;
       store_bdu_fixpoint_map   : Mvbdu_wrapper.Mvbdu.mvbdu Map_bdu_update.Map.t;
+
   }
 
 (************************************************************************************)

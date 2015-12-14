@@ -170,49 +170,49 @@ let print_side_effects parameter error result =
 
 let print_free_hb parameter error result =
   Int2Map_potential_effect.Map.iter 
-    (fun (agent_type, site_type) l ->
+    (fun (agent_type, rule_id) l ->
       let _ =
-        fprintf stdout "agent_type:%i:site_type:%i@(rule_id, free state)\n"
-          agent_type site_type
+        fprintf stdout "agent_type:%i:rule_id:%i@(site, free state)\n"
+          agent_type rule_id
       in
-      List.iter (fun (rule_id, state) ->
-        fprintf stdout "(rule_id:%i * state:%i)\n" rule_id state
+      List.iter (fun (site, state) ->
+        fprintf stdout "(site_type:%i * state:%i)\n" site state
       ) l
     ) result
 
 let print_bind_hb parameter error result =
   Int2Map_potential_effect.Map.iter 
-    (fun (agent_type, site_type) l ->
+    (fun (agent_type, rule_id) l ->
       let _ =
-        fprintf stdout "agent_type:%i:site_type:%i@(rule_id, binding state)\n"
-          agent_type site_type
+        fprintf stdout "agent_type:%i:rule_id:%i@(site, binding state)\n"
+          agent_type rule_id
       in
-      List.iter (fun (rule_id, state) ->
-        fprintf stdout "(rule_id:%i * state:%i)\n" rule_id state
+      List.iter (fun (site, state) ->
+        fprintf stdout "(site_type:%i * state:%i)\n" site state
       ) l
     ) result
 
 let print_free_remove parameter error result =
   Int2Map_potential_effect.Map.iter 
-    (fun (agent_type, site_type) l ->
+    (fun (agent_type, rule_id) l ->
       let _ =
-        fprintf stdout "agent_type:%i:site_type:%i@(rule_id, free state)\n"
-          agent_type site_type
+        fprintf stdout "agent_type:%i:rule_id:%i@(site, free state)\n"
+          agent_type rule_id
       in
-      List.iter (fun (rule_id, state) ->
-        fprintf stdout "(rule_id:%i * state:%i)\n" rule_id state
+      List.iter (fun (site, state) ->
+        fprintf stdout "(site_type:%i * state:%i)\n" site state
       ) l
     ) result
 
 let print_bind_remove parameter error result =
   Int2Map_potential_effect.Map.iter 
-    (fun (agent_type, site_type) l ->
+    (fun (agent_type, rule_id) l ->
       let _ =
-        fprintf stdout "agent_type:%i:site_type:%i@(rule_id, binding state)\n"
-          agent_type site_type
+        fprintf stdout "agent_type:%i:rule_id:%i@(site, binding state)\n"
+          agent_type rule_id
       in
-      List.iter (fun (rule_id, state) ->
-        fprintf stdout "(rule_id:%i * state:%i)\n" rule_id state
+      List.iter (fun (site, state) ->
+        fprintf stdout "(site_type:%i * state:%i)\n" site state
       ) l
     ) result
 

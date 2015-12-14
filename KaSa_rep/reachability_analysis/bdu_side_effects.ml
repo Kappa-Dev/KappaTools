@@ -89,60 +89,6 @@ let half_break_action parameter error handler rule_id half_break store_result =
   error, store_result
 
 (************************************************************************************)
-(*return a potential sites of side effects in the case of half break action*)
-
-let store_potential_half_break parameter error handler rule_id half_break store_result =
-  (*map of potential partner that is bond/free*)
-  let add_link (agent_type, site_type) (rule_id, state) store_result =
-    let old =
-      Int2Map_potential_effect.Map.find_default [] (agent_type, site_type) 
-        store_result
-    in
-    let result =
-      Int2Map_potential_effect.Map.add
-        (agent_type, site_type) ((rule_id, state) :: old) store_result
-    in
-    error, result
-  in
-  List.fold_left (fun (error, store_modif_minus) (add, state_op) ->
-    let agent_type = add.agent_type in
-    let site = add.site in
-    (*state*)
-    let error, (state_min, state_max) =
-      match state_op with
-      | None -> 
-        begin
-          let error, state_value =
-            Misc_sa.unsome
-              (Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
-                 parameter
-                 error
-                 (agent_type, site)
-                 handler.states_dic)
-              (fun error -> warn parameter error (Some "line 109") Exit 
-                (Dictionary_of_States.init()))
-               in
-              let error, last_entry =
-                Dictionary_of_States.last_entry parameter error state_value
-              in
-              error, (1, last_entry)
-        end
-      | Some interval -> error, (interval.min, interval.max)
-    in
-    (*potential partner*)
-    match Handler.dual parameter error handler agent_type site state_min with
-      | error, None -> error, store_result
-      | error, Some (agent_type2, site2, state2) ->
-        let error, store_potential_free =
-          add_link (agent_type2, site2) (rule_id, 0) (fst store_result)
-        in
-        let error, store_potential_bind =
-          add_link (agent_type2, site2) (rule_id, state2) (snd store_result)
-        in
-        error, (store_potential_free, store_potential_bind)
-  ) (error, store_result) half_break
-
-(************************************************************************************)
 (*compute remove action: r0 and r1 are remove action *)
 
 let remove_action parameter error rule_id remove store_result =
@@ -176,17 +122,77 @@ let remove_action parameter error rule_id remove store_result =
   error, store_result
 
 (************************************************************************************)
-(*potential partner of remove action*)
+(*return a potential sites of side effects in the case of half break action*)
 
-let store_potential_remove parameter error handler rule_id remove store_result =
-  let add_link (agent_type, site_type) (rule_id, state) store_result =
+let store_potential_half_break parameter error handler rule_id half_break store_result =
+  (*map of potential partner that is bond/free*)
+  let add_link (agent_type, rule_id) (site, state) store_result =
     let old =
-      Int2Map_potential_effect.Map.find_default [] (agent_type, site_type) 
+      Int2Map_potential_effect.Map.find_default [] (agent_type, rule_id) 
         store_result
     in
     let result =
       Int2Map_potential_effect.Map.add
-        (agent_type, site_type) ((rule_id, state) :: old) store_result
+        (agent_type, rule_id) ((site, state) :: old) store_result
+    in
+    error, result
+  in
+  List.fold_left (fun (error, store_modif_minus) (add, state_op) ->
+    let agent_type = add.agent_type in
+    let site = add.site in
+    (*state*)
+    let error, (state_min, state_max) =
+      match state_op with
+      | None -> 
+        begin
+          let error, state_value =
+            Misc_sa.unsome
+              (Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+                 parameter
+                 error
+                 (agent_type, site)
+                 handler.states_dic)
+              (fun error -> warn parameter error (Some "line 109") Exit 
+                (Dictionary_of_States.init()))
+               in
+              let error, last_entry =
+                Dictionary_of_States.last_entry parameter error state_value
+              in
+              error, (1, last_entry)
+        end
+      | Some interval -> error, (interval.min, interval.max)
+    in
+    let rec aux k (error, store_result) =
+      if k > state_max
+      then
+        error, store_result
+      else
+        (*potential partner*)
+        match Handler.dual parameter error handler agent_type site k with
+        | error, None -> error, store_result
+        | error, Some (agent_type2, site2, state2) ->
+          let error, store_potential_free =
+            add_link (agent_type2, rule_id) (site2, 0) (fst store_result)
+          in
+          let error, store_potential_bind =
+            add_link (agent_type2, rule_id) (site2, state2) (snd store_result)
+          in
+          error, (store_potential_free, store_potential_bind)
+    in aux state_min (error, store_result)
+  ) (error, store_result) half_break
+
+(************************************************************************************)
+(*potential partner of remove action*)
+
+let store_potential_remove parameter error handler rule_id remove store_result =
+  let add_link (agent_type, rule_id) (site, state) store_result =
+    let old =
+      Int2Map_potential_effect.Map.find_default [] (agent_type, rule_id) 
+        store_result
+    in
+    let result =
+      Int2Map_potential_effect.Map.add
+        (agent_type, rule_id) ((site, state) :: old) store_result
     in
     error, result
   in
@@ -210,17 +216,23 @@ let store_potential_remove parameter error handler rule_id remove store_result =
             let error, last_entry =
               Dictionary_of_States.last_entry parameter error state_dic
             in
-            (*potential partner*)
-            match Handler.dual parameter error handler agent_type site 1 with
-            | error, None -> error, store_result
-            | error, Some (agent_type2, site2, state2) ->
-              let error, store_potential_free =
-                add_link (agent_type2, site2) (rule_id, 0) (fst store_result)
-              in
-              let error, store_potential_bind =
-                add_link (agent_type2, site2) (rule_id, state2) (snd store_result)
-              in
-              error, (store_potential_free, store_potential_bind)
+            let rec aux k (error, store_result) =
+              if k > last_entry
+              then error, store_result
+              else
+                (*potential partner*)
+                match Handler.dual parameter error handler agent_type site k with
+                | error, None -> error, store_result
+                | error, Some (agent_type2, site2, state2) ->
+                  let error, store_potential_free =
+                    add_link (agent_type2, rule_id) (site2, 0) (fst store_result)
+                  in
+                  let error, store_potential_bind =
+                    add_link (agent_type2, rule_id) (site2, state2) (snd store_result)
+                  in
+                  error, (store_potential_free, store_potential_bind)
+            in
+            aux 1 (error, store_result)
           end          
         else
           error, store_result
@@ -231,7 +243,8 @@ let store_potential_remove parameter error handler rule_id remove store_result =
 
 (************************************************************************************)
 
-let store_potential_side_effects parameter error handler rule_id half_break remove store_result =
+let store_potential_side_effects parameter error handler rule_id half_break remove
+    store_result =
   let error, store_potential_half_break =
     store_potential_half_break
       parameter

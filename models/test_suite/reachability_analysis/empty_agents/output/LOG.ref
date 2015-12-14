@@ -254,6 +254,17 @@ List of rules to awake when the state of a site is modified and tested:
 0 1 2 3 4 
 
 ------------------------------------------------------------
+- Bdu for the valuations of the views that are created from potential partner in side effects (per rule, agent and covering class):
+
+
+------------------------------------------------------------
+- Bdu for the valuations of the views that are created from potential partner in side effects (projection per rule):
+
+
+------------------------------------------------------------
+- List for update of the views due to modification that are created from potential partner in side effects (per rule, agent and covering class):
+
+------------------------------------------------------------
 - Bdu for the valuations of the views that are tested (per rule, agent and covering class):
 
 

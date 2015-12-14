@@ -447,6 +447,12 @@ let collect_bdu_creation_and_modif_list
    in
    error, (bdu_creation_map, modif_list_map, bdu_test_map)
 
+(*TODO*)
+
+(*form rule_id get bdu_potential_map, and modif_list_map (when state of the site is free)*)
+
+
+
 (************************************************************************************)
 (*check is_enable of all *)
 
@@ -591,6 +597,8 @@ let compute_view_new_and_bond parameter handler error
 (************************************************************************************)
 (*compute view that is enabled*)
 
+(*TEST*)
+
 let compute_views_enabled parameter handler error bdu_true bdu_false
     bdu_test_map
     bdu_creation_map 
@@ -612,6 +620,7 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
     let error, handler, bdu_union =
       Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_update bdu_old
     in
+    (*checking if it is a new view*)
     if Mvbdu_wrapper.Mvbdu.equal bdu_union bdu_old
     then error, handler, false, store_result
     else

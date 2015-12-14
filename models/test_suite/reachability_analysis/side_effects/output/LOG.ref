@@ -735,19 +735,19 @@ agent_type:2:site_type:1@list of pair (rule_id, binding state):
 Sites that may/must occurs in the potential partner side-effects:
 ------------------------------------------------------------
 - Potential partner of half break action:
-agent_type:1:site_type:1@(rule_id, free state)
-(rule_id:5 * state:0)
-agent_type:4:site_type:1@(rule_id, free state)
-(rule_id:11 * state:0)
-agent_type:1:site_type:1@(rule_id, binding state)
-(rule_id:5 * state:1)
-agent_type:4:site_type:1@(rule_id, binding state)
-(rule_id:11 * state:1)
+agent_type:1:rule_id:5@(site, free state)
+(site_type:1 * state:0)
+agent_type:4:rule_id:11@(site, free state)
+(site_type:1 * state:0)
+agent_type:1:rule_id:5@(site, binding state)
+(site_type:1 * state:1)
+agent_type:4:rule_id:11@(site, binding state)
+(site_type:1 * state:1)
 - Potential partner of remove action:
-agent_type:0:site_type:1@(rule_id, free state)
-(rule_id:9 * state:0)
-agent_type:0:site_type:1@(rule_id, binding state)
-(rule_id:9 * state:2)
+agent_type:0:rule_id:9@(site, free state)
+(site_type:1 * state:0)
+agent_type:0:rule_id:9@(site, binding state)
+(site_type:1 * state:2)
 ------------------------------------------------------------
 Set of rules that may modify a given site (excluding created agents):
 ------------------------------------------------------------
@@ -1026,6 +1026,110 @@ rule_id:10
 ------------------------------------------------------------
 - Working list creation:
 0 1 2 3 4 
+
+------------------------------------------------------------
+- Bdu for the valuations of the views that are created from potential partner in side effects (per rule, agent and covering class):
+
+agent_type:1:rule_id:5:covering_class_id:0
+Id=9
+ Node(site_type:2<1)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:2<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_type:4:rule_id:11:covering_class_id:0
+Id=9
+ Node(site_type:2<1)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:2<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_type:0:rule_id:9:covering_class_id:0
+Id=24
+ Node(site_type:2<2)
+  Id=1
+   Leaf False 
+
+  Id=23
+   Node(site_type:2<3)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+
+------------------------------------------------------------
+- Bdu for the valuations of the views that are created from potential partner in side effects (projection per rule):
+
+rule_id:5
+agent_type:1
+Id=9
+ Node(site_type:2<1)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:2<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+rule_id:11
+agent_type:4
+Id=9
+ Node(site_type:2<1)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:2<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+rule_id:9
+agent_type:0
+Id=24
+ Node(site_type:2<2)
+  Id=1
+   Leaf False 
+
+  Id=23
+   Node(site_type:2<3)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+
+------------------------------------------------------------
+- List for update of the views due to modification that are created from potential partner in side effects (per rule, agent and covering class):
+agent_type:1:rule_id:5:covering_class_id:0
+site_type:2:state:0
+agent_type:4:rule_id:11:covering_class_id:0
+site_type:2:state:0
+agent_type:0:rule_id:9:covering_class_id:0
+site_type:2:state:0
 
 ------------------------------------------------------------
 - Bdu for the valuations of the views that are tested (per rule, agent and covering class):

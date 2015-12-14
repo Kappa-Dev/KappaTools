@@ -176,7 +176,7 @@ let scan_rule_dynamic parameter error handler rule_id rule
 (*rule bdu build*)
 
 let scan_rule_bdu_build parameter handler_bdu error rule_id rule compil
-    covering_classes store_result =
+    covering_classes store_potential_side_effects store_result =
   (*------------------------------------------------------------------------------*)
   let error, store_remanent_triple =
     collect_remanent_triple
@@ -259,6 +259,39 @@ let scan_rule_bdu_build parameter handler_bdu error rule_id rule compil
       store_modif_list_restriction_map
   in
   (*-------------------------------------------------------------------------------*)
+  let error, 
+    (handler_bdu, store_bdu_potential_hb_restriction_map,
+     store_bdu_potential_remove_restriction_map) =
+    store_bdu_potential_effect_restriction_map
+      parameter
+      handler_bdu
+      error
+      store_remanent_triple
+      store_potential_side_effects
+      store_result.store_bdu_potential_effect_restriction_map
+  in
+  let (error, handler_bdu), 
+    (store_proj_bdu_potential_hb_restriction_map, 
+     store_proj_bdu_potential_remove_restriction_map) =
+    collect_proj_bdu_potential_restriction_map
+      parameter
+      handler_bdu
+      error
+      store_bdu_potential_hb_restriction_map
+      store_bdu_potential_remove_restriction_map
+
+  in
+  (*-------------------------------------------------------------------------------*)
+  let error, (store_potential_list_hb_restriction_map,
+              store_potential_list_remove_restriction_map) =
+    collect_potential_list_effect_restriction_map
+      parameter
+      error
+      store_remanent_triple
+      store_potential_side_effects
+      store_result.store_potential_list_restriction_map
+  in
+  (*-------------------------------------------------------------------------------*)
   error, handler_bdu, 
   {
     store_remanent_triple                   = store_remanent_triple;
@@ -269,7 +302,17 @@ let scan_rule_bdu_build parameter handler_bdu error rule_id rule compil
     store_proj_bdu_creation_restriction_map = store_proj_bdu_creation_restriction_map;
     store_bdu_init_restriction_map          = store_bdu_init_restriction_map;
     store_modif_list_restriction_map        = store_modif_list_restriction_map;
-    store_proj_modif_list_restriction_map   = store_proj_modif_list_restriction_map
+    store_proj_modif_list_restriction_map   = store_proj_modif_list_restriction_map;
+    store_bdu_potential_effect_restriction_map = 
+      (store_bdu_potential_hb_restriction_map, 
+       store_bdu_potential_remove_restriction_map);
+    store_proj_bdu_potential_restriction_map =
+      (store_proj_bdu_potential_hb_restriction_map,
+       store_proj_bdu_potential_remove_restriction_map);
+    store_potential_list_restriction_map =
+      (store_potential_list_hb_restriction_map,
+       store_potential_list_remove_restriction_map)
+      ;
   }
 
 (************************************************************************************)
@@ -374,6 +417,7 @@ let scan_rule parameter handler_bdu error handler_kappa rule_id rule compil
       rule
       compil
       covering_classes
+      store_bdu_analysis_static.store_potential_side_effects
       store_result.store_bdu_build
   in
   (*-------------------------------------------------------------------------------*)
@@ -466,6 +510,12 @@ let init_bdu_build parameter error =
   let init_bdu_init_restriction_map          = Map_bdu_update.Map.empty in
   let init_modif_list_restriction_map        = Map_modif_list.Map.empty in
   let init_proj_modif_list_restriction_map   = Map_final_modif_list.Map.empty in
+  let init_bdu_potential_hb_restriction_map          = Map_potential_bdu.Map.empty in
+  let init_bdu_potential_remove_restriction_map      = Map_potential_bdu.Map.empty in
+  let init_proj_bdu_potential_hb_restriction_map     = Map_final_potential_bdu.Map.empty in
+  let init_proj_bdu_potential_remove_restriction_map = Map_final_potential_bdu.Map.empty in
+  let init_potential_list_hb_restriction_map     = Map_potential_list.Map.empty in
+  let init_potential_list_remove_restriction_map = Map_potential_list.Map.empty in
   let init_restriction_bdu_test =
     {
       store_remanent_triple                   = init_remanent_triple;
@@ -476,7 +526,14 @@ let init_bdu_build parameter error =
       store_proj_bdu_creation_restriction_map = init_proj_bdu_creation_restriction_map;
       store_bdu_init_restriction_map          = init_bdu_init_restriction_map;
       store_modif_list_restriction_map        = init_modif_list_restriction_map;
-      store_proj_modif_list_restriction_map   = init_proj_modif_list_restriction_map
+      store_proj_modif_list_restriction_map   = init_proj_modif_list_restriction_map;
+      store_bdu_potential_effect_restriction_map = 
+        (init_bdu_potential_hb_restriction_map, init_bdu_potential_remove_restriction_map);
+      store_proj_bdu_potential_restriction_map =
+        (init_proj_bdu_potential_hb_restriction_map, 
+         init_proj_bdu_potential_remove_restriction_map);
+      store_potential_list_restriction_map =
+        (init_potential_list_hb_restriction_map, init_potential_list_remove_restriction_map)
     }
   in
   error, init_restriction_bdu_test

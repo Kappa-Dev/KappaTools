@@ -502,3 +502,242 @@ let collect_proj_modif_list_restriction_map parameter handler error
       store_modif_list_restriction_map
   in
   (error, handler), store_result
+
+(************************************************************************************)
+(*build bdu for potential side effects*)
+
+let store_bdu_potential_restriction_map_aux parameter handler error store_remanent_triple 
+    store_potential_side_effects store_result =
+  let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in
+  let add_link handler (agent_type, rule_id, cv_id) bdu store_result =
+    let error, old_bdu =
+      match
+        Map_potential_bdu.Map.find_option (agent_type, rule_id, cv_id) store_result 
+      with
+      | None -> error, bdu_true (*default value if there is no test in the rule*)
+      | Some bdu -> error, bdu
+    in
+    let result_map =
+      Map_potential_bdu.Map.add (agent_type, rule_id, cv_id) bdu store_result
+    in
+    error, handler, result_map
+  in
+  AgentMap.fold parameter error
+    (fun parameter error agent_type' triple_list (handler, store_result) ->
+      (*map of potential partner side_effect with site is bond*)
+      Int2Map_potential_effect.Map.fold
+        (fun (agent_type, rule_id) pair_list (error, (handler, store_result)) ->
+          if agent_type' = agent_type
+          then
+            let error, (cv_id, get_pair_list) =
+              List.fold_left (fun (error, (_, current_list)) (cv_id, list, set) ->
+                let error, (map_new_index_forward, _) =
+                  new_index_pair_map parameter error list
+                in
+                let error', map_res =
+                  Site_map_and_set.Set.fold
+                    (fun _ (error, store_result) ->
+                      let error, store_result =
+                        List.fold_left (fun (error, store_result) (site, state) ->
+                          let error, site' =
+                            Site_map_and_set.Map.find_default parameter error
+                              0 site map_new_index_forward
+                          in
+                          let error, map_res =
+                            Site_map_and_set.Map.add parameter error
+                              site'
+                              state
+                              store_result
+                          in
+                          error, map_res
+                        ) (error, store_result) pair_list
+                      in
+                      error, store_result
+                    ) set (error, Site_map_and_set.Map.empty)
+                in
+                let error =
+                  Exception.check warn parameter error error' (Some "line 630") Exit in
+                error, (cv_id, (map_res :: current_list))
+              )(error, (0, [])) triple_list
+            in
+            let error, new_pair_list =
+              List.fold_left (fun (error, current_list) map_res ->
+                let error, pair_list' =
+                  Site_map_and_set.Map.fold
+                    (fun site' state (error, current_list) ->
+                      let pair = (site', state) :: current_list in
+                      error, pair
+                    ) map_res (error, [])
+                in
+                error, List.concat [pair_list'; current_list]                
+              ) (error, []) get_pair_list
+            in
+            (*build bdu_potential side effects*)
+            let error, handler, bdu_potential_effect =
+              build_bdu parameter handler error new_pair_list
+            in
+            let error, handler, store_result =
+              add_link handler (agent_type, rule_id, cv_id) bdu_potential_effect
+                store_result
+            in
+            error, (handler, store_result)
+          else
+            error, (handler, store_result)
+        ) store_potential_side_effects (error, (handler, store_result))
+    ) store_remanent_triple (handler, store_result)
+
+(*build bdu_potential in the case of binding*)
+let store_bdu_potential_effect_restriction_map parameter handler error store_remanent_triple 
+    store_potential_side_effects store_result =
+  let (_, store_potential_half_break_bind), _ = store_potential_side_effects in
+  let _, (_, store_potential_remove_bind) = store_potential_side_effects in
+  let error, (handler, store_result_hb) =
+    store_bdu_potential_restriction_map_aux
+      parameter
+      handler
+      error
+      store_remanent_triple
+      store_potential_half_break_bind
+      (fst store_result)
+  in
+  let error, (handler, store_result_remove) =
+    store_bdu_potential_restriction_map_aux
+      parameter
+      handler
+      error
+      store_remanent_triple
+      store_potential_remove_bind
+      (snd store_result)
+  in
+  error, (handler, store_result_hb, store_result_remove)
+
+(*projection with rule_id*)
+
+let collect_proj_bdu_potential_restriction_map parameter handler error
+    store_bdu_potential_hb_restriction_map store_bdu_potential_remove_restriction_map =
+  let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in
+  let (error, handler), store_result_proj_hb =
+    Project2bdu_potential.proj2_monadic
+      parameter
+      (error, handler)
+      (fun (agent_type, rule_id, cv_id) -> rule_id)
+      (fun (agent_type, rule_id, cv_id) -> agent_type)
+      bdu_true
+      (fun parameter (error, handler) bdu bdu' ->
+        let error, handler, bdu_union = Mvbdu_wrapper.Mvbdu.mvbdu_and
+          parameter handler error bdu bdu'
+        in
+        (error, handler), bdu_union
+      ) store_bdu_potential_hb_restriction_map
+  in
+  let (error, handler), store_result_proj_remove =
+    Project2bdu_potential.proj2_monadic
+      parameter
+      (error, handler)
+      (fun (agent_type, rule_id, cv_id) -> rule_id)
+      (fun (agent_type, rule_id, cv_id) -> agent_type)
+      bdu_true
+      (fun parameter (error, handler) bdu bdu' ->
+        let error, handler, bdu_union = Mvbdu_wrapper.Mvbdu.mvbdu_and
+          parameter handler error bdu bdu'
+        in
+        (error, handler), bdu_union
+      ) store_bdu_potential_remove_restriction_map
+  in
+  (error, handler), (store_result_proj_hb, store_result_proj_remove)
+
+(*return a modification in the case of state free*)
+let collect_potential_list_restriction_map_aux parameter error store_remanent_triple
+    store_potential_side_effects store_result =
+  let add_link (agent_type, rule_id, cv_id) pair_list store_result =
+    let error, old =
+      match Map_potential_list.Map.find_option (agent_type, rule_id, cv_id) store_result with
+      | None -> error, []
+      | Some l -> error, l
+    in
+    let result_map =
+      Map_potential_list.Map.add (agent_type, rule_id, cv_id) pair_list store_result
+    in
+    error, result_map
+  in
+  AgentMap.fold parameter error
+    (fun parameter error agent_type' triple_list store_result ->
+      Int2Map_potential_effect.Map.fold
+        (fun (agent_type, rule_id) pair_list (error, store_result) ->
+          if agent_type = agent_type'
+          then
+            let error, (cv_id, get_pair_list) =
+              List.fold_left (fun (error, (_, current_list)) (cv_id, list, set) ->
+                let error, (map_new_index_forward, _) =
+                  new_index_pair_map parameter error list
+                in
+                let error', map_res =
+                  Site_map_and_set.Set.fold
+                    (fun _ (error, store_result) ->
+                      let error, store_result =
+                        List.fold_left (fun (error, store_result) (site, state) ->
+                          let error, site' =
+                            Site_map_and_set.Map.find_default parameter error
+                              0 site map_new_index_forward
+                          in
+                          let error, map_res =
+                            Site_map_and_set.Map.add parameter error
+                              site'
+                              state
+                              store_result
+                          in
+                          error, map_res
+                        ) (error, store_result) pair_list
+                      in
+                      error, store_result
+                    ) set (error, Site_map_and_set.Map.empty)
+                in
+                let error =
+                  Exception.check warn parameter error error' (Some "line 685") Exit in
+                error, (cv_id, (map_res :: current_list))
+              )(error, (0, [])) triple_list
+            in
+            let error, new_pair_list =
+              List.fold_left (fun (error, current_list) map_res ->
+                let error, pair_list' =
+                  Site_map_and_set.Map.fold
+                    (fun site' state (error, current_list) ->
+                      let pair = (site', state) :: current_list in
+                      error, pair
+                    ) map_res (error, [])
+                in
+                error, List.concat [pair_list'; current_list]                
+              ) (error, []) get_pair_list
+            in
+            let error, store_result =
+              add_link (agent_type, rule_id, cv_id) new_pair_list store_result
+            in
+            error, store_result
+          else
+            error, store_result
+        ) store_potential_side_effects (error, store_result)
+    ) store_remanent_triple store_result
+
+(*build list of modification of potential partner in the case of site is free*)
+
+let collect_potential_list_effect_restriction_map parameter error store_remanent_triple
+    store_potential_side_effects store_result =
+  let (store_potential_half_break_free, _), _ = store_potential_side_effects in
+  let _, (store_potential_remove_free, _) = store_potential_side_effects in
+  let error, store_result_hb =
+    collect_potential_list_restriction_map_aux
+      parameter
+      error
+      store_remanent_triple
+      store_potential_half_break_free
+      (fst store_result)
+  in
+  let error, store_result_remove =
+    collect_potential_list_restriction_map_aux
+      parameter
+      error
+      store_remanent_triple
+      store_potential_remove_free
+      (snd store_result)
+  in
+  error, (store_result_hb, store_result_remove)
