@@ -156,10 +156,10 @@ let closure_bottom_up_with_fold err_fmt config prec is_obs f a  =
     else
       (fun x -> x),(false,0,0),(fun () -> ())
   in
-  let s_pred_star = A.make (max_index+1) ([],0) in
+  let s_pred_star = A.make (max_index+1) [] in
   let clean,max_succ = 
     begin 
-      let max_succ = A.make (max_index+1) 0 in 
+      let max_succ = A.init (max_index+1) (fun i -> i) in 
       let _ =
 	M.iter
           (fun succ -> 
@@ -182,8 +182,9 @@ let closure_bottom_up_with_fold err_fmt config prec is_obs f a  =
       let _ = A.set is_last_succ_of 0 [] in 
       let gc_when_visit node =
         List.iter
-          (fun k -> A.set s_pred_star k ([],0))
-          (A.get is_last_succ_of node) in
+          (fun k -> A.set s_pred_star k [])
+          (A.get is_last_succ_of node) 
+      in
       gc_when_visit,
       (fun i -> A.get max_succ i)
     end    
@@ -192,12 +193,12 @@ let closure_bottom_up_with_fold err_fmt config prec is_obs f a  =
     M.fold 
       (fun succ s_pred (tick,a) -> 
         begin
-          let rec aux (l:int list) (accu:int list) max_out = 
+          let rec aux (l:int list) (accu:int list) = 
             match l with 
-            | [] -> accu,max_out
+            | [] -> accu
             | pred::t ->
               begin 
-                let new_l,max_out' = A.get s_pred_star pred in 
+                let new_l = A.get s_pred_star pred in 
                 let diff = 
                   if config.cut_transitive_path 
                   then 
@@ -208,16 +209,15 @@ let closure_bottom_up_with_fold err_fmt config prec is_obs f a  =
                 aux 
                   diff
                   (merge_list_decreasing (pred::new_l) accu)
-                  (if new_l=[] then max_out else max max_out max_out')
               end 
           in
-          let pred_star,max_out = 
+          let pred_star = 
             let l_pred = S.fold (fun i j -> i::j) s_pred [] in 
-            let s,max_out = A.get s_pred_star succ in 
-            aux l_pred s max_out 
+            let s = A.get s_pred_star succ in 
+            aux l_pred s  
           in 
           let _ =
-            A.set s_pred_star succ (pred_star,max (max_succ succ) max_out)
+            A.set s_pred_star succ pred_star
           in
 	  let _ = clean succ in 
           let tick = do_tick tick in 
@@ -227,7 +227,19 @@ let closure_bottom_up_with_fold err_fmt config prec is_obs f a  =
       prec (tick,a) 
   in 
   let _ = close_tick () in
-  a
+  let () = 
+    if check_mode 
+    then 
+      let () = Printf.fprintf stderr "CHECK\n" in 
+      let () = 
+	A.iteri (fun i a -> 
+	  match a with 
+	    [] -> ()
+	  | l -> Printf.fprintf stderr "%i  \n" i;
+            List.iter (Printf.fprintf stderr "-->%i\n") l)
+	  s_pred_star
+      in ()	  
+  in a
 
 let closure_bottom_up err_fmt config prec is_obs =
   let max_index = M.fold (fun i _ -> max i) prec 0 in

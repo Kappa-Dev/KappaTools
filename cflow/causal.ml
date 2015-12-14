@@ -435,10 +435,6 @@ let fold_over_causal_past_of_obs err_fmt config_closure grid f a =
   let to_keep i = IntSet.mem i keep_l in
   let ids = ids_of_grid grid  in
   let config = config_of_grid ids grid in
-  let init_to_eid_max i =
-    try Hashtbl.find grid.init_to_eidmax i
-    with Not_found -> 0 
-  in
   Graph_closure.closure_bottom_up_with_fold err_fmt config_closure config.prec_1 to_keep f a 
     
 let dot_of_grid profiling env enriched_grid form =
