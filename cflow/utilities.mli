@@ -2,7 +2,7 @@
   * utilities.mli  
   *
   * Creation:                      <2015-08-10 09:21:53 feret>
-  * Last modification: Time-stamp: <2015-12-14 09:56:14 feret>
+  * Last modification: Time-stamp: <2015-12-14 11:15:41 feret>
   * 
   * Causal flow compression: a module for KaSim 
   * Jerome Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -89,14 +89,16 @@ val get_runtime_info_from_observable_hit: observable_hit -> unit  Mods.simulatio
 type cflow_grid = Causal.grid  
 type enriched_cflow_grid = Causal.enriched_grid 
 
-(** Blackbord with debugging utilities *)
+(** Blackboard with debugging utilities *)
 type musical_grid       
 
 (** Show the current status of the branch and cut assumptions in a libreoffice macro file *)
 val export_musical_grid_to_xls: parameter -> kappa_handler -> error_log  -> string -> int -> int -> musical_grid  -> error_log				
-
 (** Show the current status of the branch and cut assumptions in ASCII *)
 val print_musical_grid: parameter -> kappa_handler -> error_log  -> musical_grid  -> error_log					   
+
+(** replace event ids with their corresponding events as stores in the blackboard *)
+val translate: parameter -> kappa_handler -> error_log -> musical_grid -> step_id list -> error_log * trace  
 
 
 (** causal flows *)
@@ -128,5 +130,6 @@ val count_stories: story_table -> int
 val store_trace: parameter -> kappa_handler -> error_log ->  profiling_info Mods.simulation_info list -> profiling_info  -> trace -> story_table -> error_log * story_table *  profiling_info
 val export_story_table: parameter -> kappa_handler -> error_log -> story_table -> error_log * (Causal.grid * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list
 
-																			          
+
+
 val fold_left_with_progress_bar: Format.formatter -> string -> ('a -> 'b -> 'a) -> 'a -> 'b list -> 'a 

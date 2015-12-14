@@ -2,7 +2,7 @@
  * utilities.ml 
  *      
  * Creation:                      <2015-03-28 feret>
- * Last modification: Time-stamp: <2015-12-14 09:55:30 feret>
+ * Last modification: Time-stamp: <2015-12-14 10:49:59 feret>
  * 
  * API for causal compression
  * Jerome Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -303,6 +303,10 @@ let extract_observable_hit_from_musical_notation string a b c d =
   | _::_ -> failwith (string^" several stories")
       
     
+let translate p h e b list = 
+  let error,list,_ = S.translate p h e b list in 
+  error,trace_of_pretrace list 
+
 let causal_prefix_of_an_observable_hit string parameter handler error log_info blackboard (enriched_grid:enriched_cflow_grid) observable_id = 
   let eid = 
     match 
@@ -313,9 +317,8 @@ let causal_prefix_of_an_observable_hit string parameter handler error log_info b
     | _ -> failwith  ("several observables in that story"^string)
   in 
   let event_id_list = Graph_closure.get_list_in_increasing_order_with_last_event (eid+1) enriched_grid.Causal.prec_star in 
-  let error,list_eid,_ = S.translate parameter handler error blackboard event_id_list in 
-  error,trace_of_pretrace list_eid 
-
+  translate parameter handler error blackboard event_id_list 
+  
 
 
 let export_musical_grid_to_xls = S.PH.B.export_blackboard_to_xls
