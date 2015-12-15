@@ -146,7 +146,8 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
           in
           (*-----------------------------------------------------------------*)
           let error', map_res =
-            Site_map_and_set.Map.fold_restriction parameter error
+            Site_map_and_set.Map.fold_restriction
+              parameter error
               (fun site port (error,store_result) ->
                 let state = port.site_state.min in
                 let error,site' = Site_map_and_set.Map.find_default parameter error 
@@ -252,12 +253,13 @@ let collect_bdu_creation_restriction_map parameter handler error rule_id rule st
                 in
                 (*-----------------------------------------------------------------*)
                 let error', map_res =
-                  Site_map_and_set.Map.fold_restriction_with_missing_associations parameter error
-                    (fun site port (error,store_result) ->
+                  Site_map_and_set.Map.fold_restriction_with_missing_associations
+                    parameter error
+                    (fun site port (error, store_result) ->
                       let state = port.site_state.min in
                       let error,site' = Site_map_and_set.Map.find_default
                         parameter error 0 site map_new_index_forward in
-                      let error,map_res =
+                      let error,map_res = (*default value of state in creation is 0*)
                         Site_map_and_set.Map.add
                           parameter
 			  error
@@ -267,10 +269,10 @@ let collect_bdu_creation_restriction_map parameter handler error rule_id rule st
                       in
                       error, map_res
                     )
-		    (fun site (error,store_result) -> 
-		      let error,site' = Site_map_and_set.Map.find_default
+                    (fun site (error,store_result) ->
+                      let error,site' = Site_map_and_set.Map.find_default
                         parameter error 0 site map_new_index_forward in
-                      let error,map_res =
+                      let error,map_res = (*default value of state in creation is 0*)
                         Site_map_and_set.Map.add
                           parameter
 			  error
@@ -278,7 +280,8 @@ let collect_bdu_creation_restriction_map parameter handler error rule_id rule st
                           0
                           store_result
                       in
-                      error, map_res)
+                      error, map_res
+                    )
 		    set
 		    agent.agent_interface
 		    Site_map_and_set.Map.empty
@@ -710,7 +713,7 @@ let collect_potential_list_restriction_map_aux parameter error store_remanent_tr
             error, store_result
         ) store_potential_side_effects (error, store_result)
     ) store_remanent_triple store_result
-
+ 
 (************************************************************************************)
 (*build list of modification of potential partner in the case of site is free*)
 
