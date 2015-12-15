@@ -75,8 +75,8 @@ module type Map_with_logs =
     val diff_pred:  Remanent_parameters_sig.parameters -> Exception.method_handler  -> ('a -> 'a -> bool) -> 'a t -> 'a t -> Exception.method_handler  * 'a t * 'a t 
     val merge: Remanent_parameters_sig.parameters -> Exception.method_handler  -> 'a t -> 'a t -> Exception.method_handler  * 'a t
     val union: Remanent_parameters_sig.parameters -> Exception.method_handler  -> 'a t -> 'a t -> Exception.method_handler  * 'a t
-    val fold_restriction: Remanent_parameters_sig.parameters -> Exception.method_handler  -> (elt -> 'a -> (Exception.method_handler  * 'b) -> (Exception.method_handler * 'b)) -> set -> 'a t -> 'b -> Exception.method_handler  * 'b 																       
-								   
+    val fold_restriction: Remanent_parameters_sig.parameters -> Exception.method_handler  -> (elt -> 'a -> (Exception.method_handler  * 'b) -> (Exception.method_handler * 'b)) -> set -> 'a t -> 'b -> Exception.method_handler  * 'b 				   
+    val fold_restriction_with_missing_associations: Remanent_parameters_sig.parameters -> Exception.method_handler  -> (elt -> 'a -> (Exception.method_handler  * 'b) -> (Exception.method_handler * 'b)) -> (elt -> (Exception.method_handler * 'b) -> (Exception.method_handler * 'b)) -> set -> 'a t -> 'b -> Exception.method_handler  * 'b 
     val iter: (elt -> 'a -> unit) -> 'a t -> unit
     val iter2: Remanent_parameters_sig.parameters -> Exception.method_handler  ->  (Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'a  -> Exception.method_handler ) -> (Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'b  -> Exception.method_handler ) -> (Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'a  -> 'b  -> Exception.method_handler )->  'a t -> 'b t -> Exception.method_handler
     val fold: (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
@@ -192,6 +192,7 @@ module Make(S_both:(SetMap.S)): S_with_logs with type elt = S_both.elt and type 
 	  let merge a b c = lift S_both.Map.merge_with_logs a b c 
 	  let union a b c = lift S_both.Map.union_with_logs a b c 
 	  let fold_restriction a b c = lift S_both.Map.fold_restriction_with_logs a b c 
+	  let fold_restriction_with_missing_associations a b c = lift S_both.Map.fold_restriction_with_missing_associations_with_logs a b c 
 	  let iter = S_both.Map.iter 
 	  let fold = S_both.Map.fold
 	  let mapi = S_both.Map.mapi

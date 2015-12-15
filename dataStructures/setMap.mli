@@ -165,6 +165,12 @@ module type Map =
       ('parameters,'error,
        (elt -> 'a -> ('error * 'b) -> ('error* 'b)) ->
        set -> 'a t -> 'b -> 'error * 'b) with_log_wrap
+    val fold_restriction_with_missing_associations_with_logs:
+      ('parameters,'error,
+       (elt -> 'a -> ('error * 'b) -> ('error* 'b)) ->
+       (elt -> ('error * 'b) -> ('error * 'b)) -> 
+       set -> 'a t -> 'b -> 'error * 'b) with_log_wrap
+      
 
     val iter: (elt -> 'a -> unit) -> 'a t -> unit
     val fold: (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
