@@ -4,8 +4,8 @@ type t
 
 val empty : t
 
-val add_agent : int -> int -> t -> t
-(** [add_agent agent_type agent graph] *)
+val add_agent : int -> t -> int * t
+(** [add_agent agent_type graph] *)
 
 val add_free : int -> int -> t -> t
 (** [add_free agent site graph] *)

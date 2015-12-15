@@ -33,3 +33,8 @@ let debug_print pr f nd =
 		       Format.fprintf f "@[%i>%s: @[<2>%a@]@]"
 				      i n pr el)
 	f nd
+
+let fold f acc nd =
+  Tools.array_fold_lefti
+    (fun i acc ((na,_),x) -> f i na acc x)
+    acc nd.decls
