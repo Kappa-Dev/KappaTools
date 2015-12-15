@@ -453,6 +453,4744 @@ Mapping between global identifier of sites (per agent) and local identifier of s
 Covering_class_id:0
 Global:site_type:0  => Local:site_type':1
 Local:site_type':1  => Global:site_type:0
+Test for rule:0
+enabled
+Test for rule:0
+enabled
+Test for rule:1
+enabled
+Test for rule:0
+enabled
+Test for rule:1
+enabled
+Test for rule:2
+enabled
+Test for rule:0
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl:rule_id:0
+in add_update_to_wl: working list:
+0 1 2 
+in add_update_to_wl:rule_id:1
+in add_update_to_wl: working list:
+0 1 2 
+in add_update_to_wl:rule_id:2
+in add_update_to_wl: working list:
+0 1 2 
+in add_update_to_wl:agent_type:1:cv_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl:rule_id:1
+in add_update_to_wl: working list:
+0 1 2 
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl:rule_id:2
+in add_update_to_wl: working list:
+0 1 2 
+Test for rule:1
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=16
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=10
+   Node(site_type:1<2)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl:rule_id:0
+in add_update_to_wl: working list:
+0 2 
+in add_update_to_wl:rule_id:1
+in add_update_to_wl: working list:
+0 1 2 
+in add_update_to_wl:rule_id:2
+in add_update_to_wl: working list:
+0 1 2 
+in add_update_to_wl:agent_type:1:cv_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl:rule_id:1
+in add_update_to_wl: working list:
+0 1 2 
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl:rule_id:2
+in add_update_to_wl: working list:
+0 1 2 
+Test for rule:2
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=19
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=18
+   Node(site_type:1<1)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=10
+     Node(site_type:1<2)
+      Id=5
+       Node(site_type:2<0)
+        Id=1
+         Leaf False 
+
+        Id=4
+         Node(site_type:2<1)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl:rule_id:0
+in add_update_to_wl: working list:
+0 1 
+in add_update_to_wl:rule_id:1
+in add_update_to_wl: working list:
+0 1 
+in add_update_to_wl:rule_id:2
+in add_update_to_wl: working list:
+0 1 2 
+in add_update_to_wl:agent_type:1:cv_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl:rule_id:1
+in add_update_to_wl: working list:
+0 1 2 
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl:rule_id:2
+in add_update_to_wl: working list:
+0 1 2 
+Test for rule:0
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=19
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=18
+   Node(site_type:1<1)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=10
+     Node(site_type:1<2)
+      Id=5
+       Node(site_type:2<0)
+        Id=1
+         Leaf False 
+
+        Id=4
+         Node(site_type:2<1)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+Test for rule:1
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl:rule_id:0
+in add_update_to_wl: working list:
+0 2 
+in add_update_to_wl:rule_id:1
+in add_update_to_wl: working list:
+0 1 2 
+in add_update_to_wl:rule_id:2
+in add_update_to_wl: working list:
+0 1 2 
+in add_update_to_wl:agent_type:1:cv_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl:rule_id:1
+in add_update_to_wl: working list:
+0 1 2 
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl:rule_id:2
+in add_update_to_wl: working list:
+0 1 2 
+Test for rule:2
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Test for rule:0
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Test for rule:1
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Test for rule:0
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Test for rule:1
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Test for rule:2
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Test for rule:0
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Test for rule:1
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Test for rule:2
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Test for rule:0
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+Test for rule:1
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=9
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:0
+in add_update_to_wl: working list:
+0 2 
+in add_update_to_wl:rule_id:1
+in add_update_to_wl: working list:
+0 1 2 
+in add_update_to_wl:rule_id:2
+in add_update_to_wl: working list:
+0 1 2 
+in add_update_to_wl:rule_id:4
+in add_update_to_wl: working list:
+0 1 2 4 
+in add_update_to_wl:rule_id:5
+in add_update_to_wl: working list:
+0 1 2 4 5 
+in add_update_to_wl:rule_id:6
+in add_update_to_wl: working list:
+0 1 2 4 5 6 
+in add_update_to_wl:agent_type:1:cv_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:1
+in add_update_to_wl: working list:
+0 1 2 4 5 6 
+in add_update_to_wl:rule_id:3
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 
+in add_update_to_wl:rule_id:5
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 
+in add_update_to_wl:rule_id:6
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl:rule_id:2
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 
+in add_update_to_wl:rule_id:3
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 
+in add_update_to_wl:rule_id:4
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 
+Test for rule:2
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=9
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Test for rule:0
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=9
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Test for rule:1
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=9
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Test for rule:4
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=9
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Test for rule:5
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:0
+in add_update_to_wl: working list:
+0 3 6 
+in add_update_to_wl:rule_id:1
+in add_update_to_wl: working list:
+0 1 3 6 
+in add_update_to_wl:rule_id:2
+in add_update_to_wl: working list:
+0 1 2 3 6 
+in add_update_to_wl:rule_id:4
+in add_update_to_wl: working list:
+0 1 2 3 4 6 
+in add_update_to_wl:rule_id:5
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 
+in add_update_to_wl:rule_id:6
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 
+in add_update_to_wl:agent_type:1:cv_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:1
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 
+in add_update_to_wl:rule_id:3
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 
+in add_update_to_wl:rule_id:5
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 
+in add_update_to_wl:rule_id:6
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl:rule_id:2
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 
+in add_update_to_wl:rule_id:3
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 
+in add_update_to_wl:rule_id:4
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 
+Test for rule:6
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Test for rule:3
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Test for rule:0
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Test for rule:1
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Test for rule:2
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Test for rule:4
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Test for rule:5
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Test for rule:0
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+Test for rule:1
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+Test for rule:2
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=9
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl: set of rule_id:7
+in add_update_to_wl:rule_id:0
+in add_update_to_wl: working list:
+0 
+in add_update_to_wl:rule_id:1
+in add_update_to_wl: working list:
+0 1 
+in add_update_to_wl:rule_id:2
+in add_update_to_wl: working list:
+0 1 2 
+in add_update_to_wl:rule_id:4
+in add_update_to_wl: working list:
+0 1 2 4 
+in add_update_to_wl:rule_id:5
+in add_update_to_wl: working list:
+0 1 2 4 5 
+in add_update_to_wl:rule_id:6
+in add_update_to_wl: working list:
+0 1 2 4 5 6 
+in add_update_to_wl:rule_id:7
+in add_update_to_wl: working list:
+0 1 2 4 5 6 7 
+in add_update_to_wl:agent_type:1:cv_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:1
+in add_update_to_wl: working list:
+0 1 2 4 5 6 7 
+in add_update_to_wl:rule_id:3
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 7 
+in add_update_to_wl:rule_id:5
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 7 
+in add_update_to_wl:rule_id:6
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 7 
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:7
+in add_update_to_wl:rule_id:2
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 7 
+in add_update_to_wl:rule_id:3
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 7 
+in add_update_to_wl:rule_id:4
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 7 
+in add_update_to_wl:rule_id:7
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 7 
+Test for rule:0
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=9
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Test for rule:1
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=9
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Test for rule:2
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=9
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Test for rule:4
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl: set of rule_id:7
+in add_update_to_wl:rule_id:0
+in add_update_to_wl: working list:
+0 3 5 6 7 
+in add_update_to_wl:rule_id:1
+in add_update_to_wl: working list:
+0 1 3 5 6 7 
+in add_update_to_wl:rule_id:2
+in add_update_to_wl: working list:
+0 1 2 3 5 6 7 
+in add_update_to_wl:rule_id:4
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 7 
+in add_update_to_wl:rule_id:5
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 7 
+in add_update_to_wl:rule_id:6
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 7 
+in add_update_to_wl:rule_id:7
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 7 
+in add_update_to_wl:agent_type:1:cv_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:1
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 7 
+in add_update_to_wl:rule_id:3
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 7 
+in add_update_to_wl:rule_id:5
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 7 
+in add_update_to_wl:rule_id:6
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 7 
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:7
+in add_update_to_wl:rule_id:2
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 7 
+in add_update_to_wl:rule_id:3
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 7 
+in add_update_to_wl:rule_id:4
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 7 
+in add_update_to_wl:rule_id:7
+in add_update_to_wl: working list:
+0 1 2 3 4 5 6 7 
+Test for rule:5
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Test for rule:6
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Test for rule:7
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Test for rule:3
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Test for rule:0
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Test for rule:1
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Test for rule:2
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Test for rule:4
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=24
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<2)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:1, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=25
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
 ============================================================
 * BDU Analysis:
 ============================================================

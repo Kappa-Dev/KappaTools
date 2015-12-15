@@ -516,6 +516,262 @@ Mapping between global identifier of sites (per agent) and local identifier of s
 Covering_class_id:0
 Global:site_type:1  => Local:site_type':1
 Local:site_type':1  => Global:site_type:1
+Test for rule:1
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+Test for rule:1
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+Test for rule:1
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+Test for rule:3
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+Test for rule:1
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:4, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+Test for rule:3
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:4, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+Test for rule:1
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:4, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:4, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+Test for rule:3
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:4, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:4, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+Test for rule:1
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:4, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:4, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:5, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+Test for rule:3
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:4, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:4, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:5, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+Test for rule:1
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:4, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:4, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:5, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:5, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+Test for rule:3
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:4, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:4, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:5, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:5, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+Test for rule:1
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:4, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:4, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:5, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:5, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+Test for rule:3
+enabled
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:0, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:2, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:4, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:4, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:5, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
+in views_can_apply:(agent_type:5, cv_id:0) bdu_update:
+Id=1
+ Leaf False 
+
 ============================================================
 * BDU Analysis:
 ============================================================

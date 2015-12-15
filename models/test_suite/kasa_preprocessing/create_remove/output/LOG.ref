@@ -81,6 +81,12 @@ Reachability analysis...
 
 ------------------------------------------------------
 Covering classes with type set:
+Test for rule:0
+enabled
+Test for rule:0
+enabled
+Test for rule:1
+enabled
 ============================================================
 * BDU Analysis:
 ============================================================
