@@ -182,6 +182,12 @@ module type Map =
        (elt -> 'a -> ('error * 'b) -> ('error* 'b)) ->
        set -> 'a t -> 'b -> 'error * 'b) with_log_wrap
 
+    val fold_restriction_with_missing_associations_with_logs:
+      ('parameters,'error,
+       (elt -> 'a -> ('error * 'b) -> ('error* 'b)) ->
+       (elt -> ('error * 'b) -> ('error * 'b)) -> 
+       set -> 'a t -> 'b -> 'error * 'b) with_log_wrap
+
     val iter: (elt -> 'a -> unit) -> 'a t -> unit
     val fold: (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
     val fold_with_interruption: (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
@@ -1701,7 +1707,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		  merge_with_logs warn parameters error oleft2 oright2 in
                 error,o1,o2
 
-	let rec fold_restriction_with_logs warn parameters error f set map res =
+	let rec fold_restriction_with_missing_associations_with_logs warn parameters error f g set map res =
 	  match set,map with
           | Set.Private.Empty,_ -> error,res
           | Set.Private.Node(left1,key1,right1,_,_),_ ->
@@ -1709,16 +1715,18 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	       split_with_logs warn parameters error key1 map in
              match data2 with
              | None ->
-		let error, res' = fold_restriction_with_logs
-				    warn parameters error f left1 left2 res in
-                fold_restriction_with_logs
-		  warn parameters error f right1 right2 res'
+		let error, res' = fold_restriction_with_missing_associations_with_logs warn parameters error f g left1 left2 res in
+		let error, res'' = g key1 (error,res') in 
+                fold_restriction_with_missing_associations_with_logs
+		  warn parameters error f g right1 right2 res''
              | Some data2 ->
-                let error, res' = fold_restriction_with_logs
-				    warn parameters error f left1 left2 res in
+                let error, res' = fold_restriction_with_missing_associations_with_logs  warn parameters error f g left1 left2 res in
                 let error,res'' = f key1 data2 (error,res') in
-                fold_restriction_with_logs
-		  warn parameters error f right1 right2 res''
+                fold_restriction_with_missing_associations_with_logs
+		  warn parameters error f g right1 right2 res''
+
+	let fold_restriction_with_logs warn parameters error f set map res = fold_restriction_with_missing_associations_with_logs warn parameters error f (fun _ x -> x) set map res 
+   
       end
   end
 
