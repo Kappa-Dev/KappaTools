@@ -184,6 +184,7 @@ module type Map =
 
     val iter: (elt -> 'a -> unit) -> 'a t -> unit
     val fold: (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+    val fold_with_interruption: (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
     val monadic_fold2:
       'parameters -> 'method_handler ->
       ('parameters -> 'method_handler ->
@@ -1386,6 +1387,27 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
           | Private.Empty -> value
           | Private.Node(left,key,data,right,_,_) ->
              fold f right (f key data (fold f left value))
+
+	let rec fold_with_interruption f map value =
+	  match map with
+          | Private.Empty -> false,value
+          | Private.Node(left,key,data,right,_,_) ->
+	    let outputl = fold_with_interruption f left value in 
+	    let interrupted,value = outputl in 
+	    if interrupted then outputl
+	    else 
+	      let val_opt = 
+		try 
+		  Some (f key data value)
+		with 
+		  ExceptionDefn_with_no_dep.UserInterrupted _ -> None
+	      in 
+	      match 
+		val_opt
+	      with 
+	      |	None -> (true,value)
+	      | Some v -> fold_with_interruption f right v 
+	let fold_with_interruption f map value = snd (fold_with_interruption f map value)
 
 	let rec monadic_fold param err f map value =
 	  match map with

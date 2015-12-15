@@ -2,7 +2,7 @@
  * utilities.ml 
  *      
  * Creation:                      <2015-03-28 feret>
- * Last modification: Time-stamp: <2015-12-14 10:49:59 feret>
+ * Last modification: Time-stamp: <2015-12-15 09:14:46 feret>
  * 
  * API for causal compression
  * Jerome Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -34,7 +34,6 @@ type trace =
     with_potential_ambiguity: bool 
   }
 
-exception Interruption
 	    
 let get_pretrace_of_trace trace = trace.pretrace 
 let size_of_pretrace trace = List.length (get_pretrace_of_trace trace)
@@ -501,8 +500,6 @@ let export_story_table parameter handler error x = sort_story_list parameter han
 let has_obs x = List.exists S.PH.B.PB.CI.Po.K.is_obs_of_refined_step (get_pretrace_of_trace x)
 			    
 let fold_left_with_progress_bar parameter string f a l =
-  let sigint_handle = fun _ -> raise Interruption in 
-  let _ = Sys.set_signal Sys.sigint (Sys.Signal_handle sigint_handle) in
   let n = List.length l in
   let progress_bar = Mods.tick_stories (S.PH.B.PB.CI.Po.K.H.get_logger parameter) n (false,0,0) in
   let _,a,n_fail =
@@ -518,7 +515,7 @@ let fold_left_with_progress_bar parameter string f a l =
 	    let bar = Mods.tick_stories (S.PH.B.PB.CI.Po.K.H.get_logger parameter) n bar in
 	    let n_fail = inc_fails a a' n_fail in
 	    Some (bar,a',n_fail) 
-	   with Interruption -> None
+	   with ExceptionDefn.UserInterrupted _  -> None
 	 in
 	 match output_opt
 	 with

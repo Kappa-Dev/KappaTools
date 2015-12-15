@@ -1,3 +1,4 @@
+include ExceptionDefn_with_no_dep
 exception IntFound of int
 exception StringFound of string
 exception MapFound of (int Mods.IntMap.t)
@@ -12,7 +13,6 @@ exception Break of int
 (* 4:invalid injection clash *)
 (* 5: perturbation interrupting time*)
 exception Null_event of int
-exception UserInterrupted of (float -> int -> string)
 exception StopReached of string
 
 exception Syntax_Error of string Location.annot

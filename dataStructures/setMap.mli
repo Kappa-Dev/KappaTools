@@ -168,6 +168,8 @@ module type Map =
 
     val iter: (elt -> 'a -> unit) -> 'a t -> unit
     val fold: (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+    val fold_with_interruption: (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+  
     val monadic_fold2:
       'parameters -> 'method_handler ->
       ('parameters -> 'method_handler ->

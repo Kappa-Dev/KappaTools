@@ -190,7 +190,7 @@ let closure_bottom_up_with_fold err_fmt config prec is_obs f a  =
     end    
   in 
   let _,a = 
-    M.fold 
+    M.fold_with_interruption 
       (fun succ s_pred (tick,a) -> 
         begin
           let rec aux (l:int list) (accu:int list) = 

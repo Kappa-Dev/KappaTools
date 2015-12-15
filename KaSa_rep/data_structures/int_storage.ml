@@ -1,17 +1,20 @@
 
 (**
    * int_storage.ml
+   *      
+   * Creation:                      <2010-07-27 feret>
+   * Last modification: Time-stamp: <2015-12-15 09:26:21 feret>  
+   *
    * openkappa
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
    * 
-   * Creation: 2010, the 27th of July
-   * Last modification: 2015, the 5th of February
-   * * 
+   * 
    * This library provides primitives to deal with storage functions
    *  
-   * Copyright 2010,2011 Institut National de Recherche en Informatique et   
-   * en Automatique.  All rights reserved.  This file is distributed     
-   *  under the terms of the GNU Library General Public License *)
+   * Copyright 2010,2011,2012,2013,2014,2015 Institut National 
+   * de Recherche en Informatique et en Automatique.  
+   * All rights reserved.  This file is distributed     
+   * under the terms of the GNU Library General Public License *)
 
 module type Storage = 
 sig
@@ -31,6 +34,7 @@ sig
 
   val key_list: Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a t -> (Exception.method_handler * key list)   
   val iter:Remanent_parameters_sig.parameters -> Exception.method_handler -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> key  -> 'a  ->  Exception.method_handler ) -> 'a t ->  Exception.method_handler 
+  val fold_with_interruption: Remanent_parameters_sig.parameters -> Exception.method_handler -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> key  -> 'a  -> 'b-> Exception.method_handler  * 'b ) -> 'a t -> 'b ->  Exception.method_handler * 'b
   val fold: Remanent_parameters_sig.parameters -> Exception.method_handler -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> key  -> 'a  -> 'b-> Exception.method_handler  * 'b ) -> 'a t -> 'b ->  Exception.method_handler * 'b
   val fold2_common:Remanent_parameters_sig.parameters -> Exception.method_handler -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> key -> 'a -> 'b -> 'c ->  Exception.method_handler  * 'c ) -> 'a t -> 'b t ->  'c ->  Exception.method_handler * 'c
     
@@ -235,6 +239,33 @@ module Int_storage_imperatif =
               aux (k+1) (f parameter error k x  sol)
       in 
       aux 0  (error,init)
+
+    let fold_with_interruption parameter error f t init = 
+      let size = t.size in
+      let array = t.array in 
+      let rec aux k remanent = 
+        if k>size then remanent
+        else 
+          match array.(k) with
+            | None -> 
+              aux (k+1) remanent
+            | Some x -> 
+              let error,sol  = remanent in 
+              let output_opt = 
+		try 
+		  Some (f parameter error k x sol) 
+		with 
+		  ExceptionDefn.UserInterrupted _ -> None 
+	      in 
+	      match 
+		output_opt 
+	      with 
+	      | None -> remanent 
+	      | Some a -> aux (k+1) a
+      in 
+      aux 0  (error,init)
+
+	
         
     let fold2_common  parameter error f t1 t2 init = 
       let size = min t1.size t2.size in
@@ -295,6 +326,7 @@ module Nearly_infinite_arrays =
       let print_site_f = Basic.print_site_f 
       let iter = Basic.iter
       let fold = Basic.fold 
+      let fold_with_interruption = Basic.fold_with_interruption 
       let fold2_common = Basic.fold2_common 
 
      end:Storage with type key = int and type dimension = int)
@@ -399,12 +431,12 @@ module Extend =
             )
             a.matrix 
             
-        let fold parameter error f a b = 
-          Extension.fold 
+        let fold_gen fold1 fold2  parameter error f a b = 
+          fold1
             parameter 
             error 
             (fun parameter error k a b -> 
-              Underlying.fold 
+              fold2 
                 parameter 
                 error 
                 (fun parameter error k' a' b -> f parameter error (k,k') a' b)
@@ -413,6 +445,9 @@ module Extend =
             )
             a.matrix 
             b
+
+	let fold parameter error f a b = fold_gen Extension.fold Underlying.fold parameter error f a b 
+	let fold_with_interruption parameter error f a b = fold_gen Extension.fold_with_interruption Underlying.fold_with_interruption parameter error f a b 
             
         let fold2_common parameter error f a b c = 
           fold 
@@ -499,6 +534,31 @@ module Quick_key_list =
               | Some im -> f parameters error k im b)
           (error,b) 
           (List.rev list)
+
+      let fold_with_interruption parameters error f a b = 
+	let error,list = key_list parameters error a in 
+	let rec aux list output = 
+	  match 
+	    list 
+	  with 
+	  | [] -> output
+	  | head::tail -> 
+	    let output_opt =
+	      try 
+		let error,im = get parameters error head a in 
+		let b = snd output in 
+		match im with 
+		| None ->
+                  Some (invalid_arg parameters error (Some "fold, line 391") Exit b)
+		| Some im -> Some (f parameters error head im b)
+	      with ExceptionDefn.UserInterrupted _ -> None
+	    in 
+	    match 
+	      output_opt 
+	    with 
+	    | None -> output
+	    | Some output -> aux tail output 
+	in aux list (error,b) 
 
       let fold2_common parameter error f a b c = 
         fold 

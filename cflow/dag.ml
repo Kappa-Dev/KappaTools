@@ -986,7 +986,7 @@ module BucketTable =
       let count_stories table = table.fresh_id
 
       let fold_table parameter (handler:S.PH.B.PB.CI.Po.K.H.handler) error f table a =  
-	Int_storage.Nearly_inf_Imperatif.fold 
+	Int_storage.Nearly_inf_Imperatif.fold_with_interruption
 	  (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter)
 	  error
 	  (fun parameter' error _ (_,_,_,d,e) a -> f (S.PH.B.PB.CI.Po.K.H.set_kasa_parameters parameter' parameter) handler error d e a)

@@ -2,7 +2,7 @@
   * compression_main.ml 
   *
   * Creation:                      <2011-10-19 16:52:55 feret>
-  * Last modification: Time-stamp: <2015-12-14 11:00:14 feret> 
+  * Last modification: Time-stamp: <2015-12-15 09:57:31 feret> 
   * 
   * Causal flow compression: a module for KaSim 
   * Jerome Feret, projet Antique, INRIA Paris-Rocquencourt
@@ -224,12 +224,22 @@ let compress_and_print logger env log_info step_list =
 	    with 
 	      Some k' when k>=k' -> error,log_info,event_list 
 	    | Some _ | None -> 
-	      let (error,log_info,event_list') = one_iteration_of_compression (log_info,error,event_list) in 
-	      if U.size_of_pretrace event_list' < U.size_of_pretrace event_list
-	      then 
-		aux (k+1) (error,log_info,event_list')
-	      else 
-		error,log_info,event_list'
+	      let output_opt = 
+		try 
+		  Some (one_iteration_of_compression (log_info,error,event_list))
+		with 
+		  ExceptionDefn.UserInterrupted _ -> None 
+	      in 
+	      match 
+		output_opt 
+	      with 
+	      | None -> error,log_info,event_list 
+	      | Some (error,log_info,event_list') -> 
+		if U.size_of_pretrace event_list' < U.size_of_pretrace event_list
+		then 
+		  aux (k+1) (error,log_info,event_list')
+		else 
+		  error,log_info,event_list'
 	  in 
 	  let error,log_info,causal_story_table = 
             if weak_compression_on || strong_compression_on 
