@@ -37,7 +37,7 @@ let local_trace = false
 
 (*Xn intersection with bdu_test and modif and then union with X_n*)
 
-let compute_bdu_update_test parameter handler error bdu_test list_a bdu_X =
+let compute_bdu_update_aux parameter handler error bdu_test list_a bdu_X =
   (*do the intersection X_n and bdu_test*)
   let error, handler, bdu_inter =
     Mvbdu_wrapper.Mvbdu.mvbdu_and parameter handler error bdu_X bdu_test
@@ -53,17 +53,16 @@ let compute_bdu_update_test parameter handler error bdu_test list_a bdu_X =
   error, handler, bdu_result
 
 (*REMOVE:per creation*)
-let compute_bdu_update_creation parameter handler error bdu_creation bdu_X' =
+(*let compute_bdu_update_creation parameter handler error bdu_creation bdu_X' =
   let error, handler, bdu_result =
     Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_X' bdu_creation
   in
-  error, handler, bdu_result
+  error, handler, bdu_result*)
 
-(*the final update*)
-let compute_bdu_update parameter handler error bdu_test list_a bdu_creation bdu_X =
+let compute_bdu_update_test parameter handler error bdu_test list_a bdu_creation bdu_X =
   (*to the first one with bdu_test*)
   let error, handler, bdu_Xn = 
-    compute_bdu_update_test
+    compute_bdu_update_aux
       parameter
       handler
       error
@@ -76,6 +75,31 @@ let compute_bdu_update parameter handler error bdu_test list_a bdu_creation bdu_
     Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_Xn bdu_creation
   in
   error, handler, bdu_result
+
+(*the final update*)
+
+let compute_bdu_update parameter handler error bdu_test list_a bdu_creation
+    bdu_potential list_b bdu_X =
+  let error, handler, bdu_X_update_test =
+    compute_bdu_update_test
+      parameter
+      handler
+      error
+      bdu_test
+      list_a
+      bdu_creation
+      bdu_X
+  in
+  let error, handler, bdu_update_test_side_effects =
+    compute_bdu_update_aux
+      parameter
+      handler
+      error
+      bdu_potential
+      list_b
+      bdu_X_update_test
+  in
+  error, handler, bdu_update_test_side_effects
     
 (************************************************************************************)
 (*a bond is discovered for the first time*)
@@ -451,10 +475,24 @@ let collect_bdu_creation_and_modif_list
 
 (*form rule_id get bdu_potential_map, and modif_list_map (when state of the site is free)*)
 
-(*let collect_bdu_potential_and_list parameter error rule_id
+let collect_bdu_potential_and_list parameter error rule_id
     store_proj_bdu_potential_restriction_map
-    store_proj_potential_list_restriction_map*)
-
+    store_proj_potential_list_restriction_map =
+  let error, bdu_potential_map =
+    match Map_final_potential_bdu.Map.find_option rule_id 
+      store_proj_bdu_potential_restriction_map 
+    with
+    | None -> error, Map_agent_type_potential_bdu.Map.empty
+    | Some map -> error, map
+  in
+  let error, potential_list_map =
+    match Map_final_potential_list.Map.find_option rule_id
+      store_proj_potential_list_restriction_map
+    with
+    | None -> error, Map_agent_type_potential_list.Map.empty
+    | Some map -> error, map
+  in
+  error, (bdu_potential_map, potential_list_map)
 
 (************************************************************************************)
 (*check is_enable of all *)
@@ -511,7 +549,10 @@ let views_can_apply parameter handler error agent_id agent_type cv_id bdu_true
     bdu_test_map
     bdu_creation_map 
     modif_list_map
-    store_update_map =
+    bdu_potential_map
+    potential_list_map
+    store_update_map 
+    =
   let error, bdu_test =
     match Map_agent_id_test_bdu.Map.find_option agent_id bdu_test_map
     with
@@ -546,6 +587,26 @@ let views_can_apply parameter handler error agent_id agent_type cv_id bdu_true
       error
       modif_list
   in
+  (*TODO: side effects*)
+  let error, bdu_potential =
+    match Map_agent_type_potential_bdu.Map.find_option agent_type bdu_potential_map
+    with
+    | None -> error, bdu_false
+    | Some bdu -> error, bdu
+  in
+  let error, potential_list =
+    match Map_agent_type_potential_list.Map.find_option agent_type potential_list_map
+    with
+    | None -> error, []
+    | Some l -> error, l
+  in
+  let error, handler, list_b =
+    Mvbdu_wrapper.Mvbdu.build_list
+      parameter
+      handler
+      error
+      potential_list
+  in
   (*-----------------------------------------------------------------------*)
   let error, handler, bdu_update =
     compute_bdu_update
@@ -555,6 +616,8 @@ let views_can_apply parameter handler error agent_id agent_type cv_id bdu_true
       bdu_test
       list_a
       bdu_creation
+      bdu_potential
+      list_b
       bdu_X
   in
   error, handler, bdu_update
@@ -606,6 +669,8 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
     bdu_test_map
     bdu_creation_map 
     modif_list_map 
+    bdu_potential_map
+    potential_list_map
     store_new_result_map 
     is_new_bond
     wl_tl
@@ -651,6 +716,8 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
               bdu_test_map
               bdu_creation_map
               modif_list_map
+              bdu_potential_map
+              potential_list_map
               store_update_map
           in
           (*-----------------------------------------------------------------------*)
@@ -689,6 +756,8 @@ let collect_bdu_fixpoint_without_init parameter handler error
     store_proj_bdu_creation_restriction_map
     store_proj_modif_list_restriction_map
     store_proj_bdu_test_restriction_map
+    store_proj_bdu_potential_restriction_map
+    store_proj_potential_list_restriction_map
     store_bdu_test_restriction_map
     is_new_bond
     store_test_has_bond_rhs
@@ -720,6 +789,16 @@ let collect_bdu_fixpoint_without_init parameter handler error
               store_proj_bdu_test_restriction_map
           in
           (*--------------------------------------------------------------------*)
+          (*get a map of bdu_potential and list of potential partner in side effects*)
+          let error, (bdu_potential_map, potential_list_map) =
+            collect_bdu_potential_and_list
+              parameter
+              error
+              rule_id
+              store_proj_bdu_potential_restriction_map
+              store_proj_potential_list_restriction_map
+          in
+          (*--------------------------------------------------------------------*)
           (*is for all bdu_test sastify a covering_class?*)
           let error, is_enable = 
             is_enable
@@ -746,6 +825,8 @@ let collect_bdu_fixpoint_without_init parameter handler error
                   bdu_test_map
                   bdu_creation_map
                   modif_list_map
+                  bdu_potential_map
+                  potential_list_map
                   store_new_result_map
                   is_new_bond
                   wl_tl
@@ -774,6 +855,8 @@ let collect_bdu_fixpoint_init_map parameter handler error
     store_proj_bdu_creation_restriction_map
     store_proj_modif_list_restriction_map
     store_proj_bdu_test_restriction_map
+    store_proj_bdu_potential_restriction_map
+    store_proj_potential_list_restriction_map
     store_bdu_test_restriction_map
     is_new_bond
     store_test_has_bond_rhs
@@ -813,6 +896,15 @@ let collect_bdu_fixpoint_init_map parameter handler error
               store_proj_bdu_test_restriction_map
           in
           (*--------------------------------------------------------------------*)
+          let error, (bdu_potential_map, potential_list_map) =
+            collect_bdu_potential_and_list
+              parameter
+              error
+              rule_id
+              store_proj_bdu_potential_restriction_map
+              store_proj_potential_list_restriction_map
+          in
+          (*--------------------------------------------------------------------*)
           (*is for all bdu_test sastify a covering_class?*)
           let error, is_enable = 
             is_enable
@@ -839,6 +931,8 @@ let collect_bdu_fixpoint_init_map parameter handler error
                   bdu_test_map
                   bdu_creation_map
                   modif_list_map
+                  bdu_potential_map
+                  potential_list_map
                   store_new_result_map
                   is_new_bond
                   wl_tl
@@ -865,6 +959,8 @@ let collect_bdu_fixpoint_map parameter handler error
     store_proj_bdu_creation_restriction_map
     store_proj_modif_list_restriction_map
     store_proj_bdu_test_restriction_map
+    store_proj_bdu_potential_restriction_map
+    store_proj_potential_list_restriction_map
     store_bdu_test_restriction_map
     is_new_bond
     store_test_has_bond_rhs
@@ -896,6 +992,8 @@ let collect_bdu_fixpoint_map parameter handler error
         store_proj_bdu_creation_restriction_map
         store_proj_modif_list_restriction_map
         store_proj_bdu_test_restriction_map
+        store_proj_bdu_potential_restriction_map
+        store_proj_potential_list_restriction_map
         store_bdu_test_restriction_map
         is_new_bond
         store_test_has_bond_rhs
@@ -919,6 +1017,8 @@ let collect_bdu_fixpoint_map parameter handler error
         store_proj_bdu_creation_restriction_map
         store_proj_modif_list_restriction_map
         store_proj_bdu_test_restriction_map
+        store_proj_bdu_potential_restriction_map
+        store_proj_potential_list_restriction_map
         store_bdu_test_restriction_map
         is_new_bond
         store_test_has_bond_rhs

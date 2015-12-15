@@ -1353,8 +1353,8 @@ Id=24
      Leaf False 
 
 agent_type:1:cv_id:0
-Id=9
- Node(site_type:1<1)
+Id=25
+ Node(site_type:1<0)
   Id=1
    Leaf False 
 
@@ -1367,8 +1367,8 @@ Id=9
      Leaf False 
 
 agent_type:2:cv_id:0
-Id=9
- Node(site_type:1<1)
+Id=25
+ Node(site_type:1<0)
   Id=1
    Leaf False 
 

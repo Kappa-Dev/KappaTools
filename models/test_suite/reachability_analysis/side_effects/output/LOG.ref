@@ -1031,12 +1031,12 @@ rule_id:10
 - Bdu for the valuations of the views that are created from potential partner in side effects (per rule, agent and covering class):
 
 agent_type:0:rule_id:9:covering_class_id:0
-Id=24
+Id=27
  Node(site_type:2<2)
   Id=1
    Leaf False 
 
-  Id=23
+  Id=26
    Node(site_type:2<3)
     Id=0
      Leaf True 
@@ -1093,12 +1093,12 @@ Id=9
 
 rule_id:9
 agent_type:0
-Id=24
+Id=27
  Node(site_type:2<2)
   Id=1
    Leaf False 
 
-  Id=23
+  Id=26
    Node(site_type:2<3)
     Id=0
      Leaf True 
@@ -1255,19 +1255,19 @@ Id=9
      Leaf False 
 
 agent_id:1:agent_type:0:rule_id:8:covering_class_id:0
-Id=26
+Id=29
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=25
+  Id=28
    Node(site_type:1<1)
-    Id=24
+    Id=27
      Node(site_type:2<2)
       Id=1
        Leaf False 
 
-      Id=23
+      Id=26
        Node(site_type:2<3)
         Id=0
          Leaf True 
@@ -1521,19 +1521,19 @@ Id=18
      Leaf False 
 
 agent_id:1
-Id=26
+Id=29
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=25
+  Id=28
    Node(site_type:1<1)
-    Id=24
+    Id=27
      Node(site_type:2<2)
       Id=1
        Leaf False 
 
-      Id=23
+      Id=26
        Node(site_type:2<3)
         Id=0
          Leaf True 
@@ -1992,20 +1992,20 @@ rule_id:7{agent_id:0; agent_type:0; site_type:1} -- {agent_id:2; agent_type:2; s
 rule_id:10{agent_id:0; agent_type:3; site_type:1} -- {agent_id:1; agent_type:4; site_type:1} 
 ** Fixpoint iteration function:
 agent_type:0:cv_id:0
-Id=28
+Id=36
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=27
+  Id=35
    Node(site_type:1<1)
-    Id=12
+    Id=30
      Node(site_type:2<0)
       Id=1
        Leaf False 
 
-      Id=8
-       Node(site_type:2<2)
+      Id=26
+       Node(site_type:2<3)
         Id=0
          Leaf True 
 
@@ -2031,12 +2031,12 @@ Id=28
        Leaf False 
 
 agent_type:1:cv_id:0
-Id=20
+Id=23
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=19
+  Id=22
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<0)
@@ -2051,10 +2051,10 @@ Id=20
         Id=1
          Leaf False 
 
-    Id=17
+    Id=21
      Node(site_type:1<2)
-      Id=9
-       Node(site_type:2<1)
+      Id=12
+       Node(site_type:2<0)
         Id=1
          Leaf False 
 
@@ -2070,12 +2070,12 @@ Id=20
        Leaf False 
 
 agent_type:2:cv_id:0
-Id=28
+Id=34
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=27
+  Id=33
    Node(site_type:1<1)
     Id=12
      Node(site_type:2<0)
@@ -2109,12 +2109,12 @@ Id=28
        Leaf False 
 
 agent_type:3:cv_id:0
-Id=28
+Id=34
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=27
+  Id=33
    Node(site_type:1<1)
     Id=12
      Node(site_type:2<0)
