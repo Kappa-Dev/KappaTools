@@ -34,7 +34,8 @@ type trace =
     with_potential_ambiguity: bool 
   }
 
-
+exception Interruption
+	    
 let get_pretrace_of_trace trace = trace.pretrace 
 let size_of_pretrace trace = List.length (get_pretrace_of_trace trace)
 let may_initial_sites_be_ambiguous trace = trace.with_potential_ambiguity					     
@@ -498,20 +499,35 @@ let enrich_grid_with_transitive_past_of_each_node_without_a_progress_bar f = Cau
 let sort_story_list  = D.sort_list 
 let export_story_table parameter handler error x = sort_story_list parameter handler error (get_stories x)
 let has_obs x = List.exists S.PH.B.PB.CI.Po.K.is_obs_of_refined_step (get_pretrace_of_trace x)
-
+			    
 let fold_left_with_progress_bar parameter string f a l =
+  let sigint_handle = fun _ -> raise Interruption in 
+  let _ = Sys.set_signal Sys.sigint (Sys.Signal_handle sigint_handle) in
   let n = List.length l in
   let progress_bar = Mods.tick_stories (S.PH.B.PB.CI.Po.K.H.get_logger parameter) n (false,0,0) in
-  let _,a,n_fail = 
-    (List.fold_left
-       (fun (bar,a,n_fail) x ->
-       let a' = f a x in
-       let bar = Mods.tick_stories (S.PH.B.PB.CI.Po.K.H.get_logger parameter) n bar in
-       let n_fail = inc_fails a a' n_fail in 
-       (bar,a',n_fail))
-       (progress_bar,a,0)
-       l)
-  in 
+  let _,a,n_fail =
+    let rec aux list (bar,a,n_fail) =
+      match
+	list
+      with
+      | [] -> (bar,a,n_fail)
+      | x::tail -> 
+	 let output_opt  =
+	   try 
+	    let a' = f a x in
+	    let bar = Mods.tick_stories (S.PH.B.PB.CI.Po.K.H.get_logger parameter) n bar in
+	    let n_fail = inc_fails a a' n_fail in
+	    Some (bar,a',n_fail) 
+	   with Interruption -> None
+	 in
+	 match output_opt
+	 with
+	   None -> (bar,a,n_fail)
+	 | Some remanent -> 
+	    aux tail remanent	 
+    in
+    aux l (progress_bar,a,0)
+  in  
   let () = close_progress_bar_opt (Some (S.PH.B.PB.CI.Po.K.H.get_logger parameter)) in 
   let () = print_fails parameter.S.PH.B.PB.CI.Po.K.H.out_channel_err string n_fail in 
   a 			    
