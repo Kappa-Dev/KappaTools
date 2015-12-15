@@ -147,18 +147,6 @@ let print_proj_modif_list_map parameter error result =
 (*bdu of potential partner in side effects*)
 
 let print_potential_bdu_map parameter error result =
-  let result1, result2 = result in
-  let _ =
-    Map_potential_bdu.Map.iter
-      (fun (agent_type, rule_id, cv_id) bdu_potential ->
-        let _ =
-          fprintf parameter.log
-            "agent_type:%i:rule_id:%i:covering_class_id:%i\n"
-            agent_type rule_id cv_id
-        in
-        Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_potential      
-      ) result1
-  in
   Map_potential_bdu.Map.iter
     (fun (agent_type, rule_id, cv_id) bdu_potential ->
       let _ =
@@ -167,21 +155,11 @@ let print_potential_bdu_map parameter error result =
           agent_type rule_id cv_id
       in
       Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_potential      
-    ) result2
+    ) result
+ 
+(*projection*)
 
 let print_proj_potential_bdu_map parameter error result =
-  let result1, result2 = result in
-  let _ =
-    Map_final_potential_bdu.Map.iter
-      (fun rule_id map_b ->
-        let _ = fprintf parameter.log "rule_id:%i\n" rule_id in
-        Map_agent_type_potential_bdu.Map.iter
-          (fun agent_type bdu_potential ->
-            let _ = fprintf parameter.log "agent_type:%i\n" agent_type in
-            Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_potential
-          ) map_b
-      ) result1
-  in
   Map_final_potential_bdu.Map.iter
     (fun rule_id map_b ->
       let _ = fprintf parameter.log "rule_id:%i\n" rule_id in
@@ -190,22 +168,12 @@ let print_proj_potential_bdu_map parameter error result =
           let _ = fprintf parameter.log "agent_type:%i\n" agent_type in
           Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_potential
         ) map_b
-    ) result2
+    ) result
+
+(************************************************************************************)
+(*potential partner list of side effects*)
 
 let print_potential_list_map parameter error result =
-  let result1, result2 = result in
-  let _ =
-    Map_potential_list.Map.iter
-      (fun (agent_type, rule_id, cv_id) l ->
-        let _ =
-          fprintf parameter.log "agent_type:%i:rule_id:%i:covering_class_id:%i\n"
-            agent_type rule_id cv_id
-        in
-        List.iter (fun (site, state) ->
-          fprintf parameter.log "site_type:%i:state:%i\n" site state
-        ) l        
-      ) result1
-  in
   Map_potential_list.Map.iter
     (fun (agent_type, rule_id, cv_id) l ->
       let _ =
@@ -215,8 +183,22 @@ let print_potential_list_map parameter error result =
       List.iter (fun (site, state) ->
         fprintf parameter.log "site_type:%i:state:%i\n" site state
       ) l        
-    ) result2
+    ) result
 
+(*projection*)
+
+let print_proj_potential_list_map parameter error result =
+  Map_final_potential_list.Map.iter
+    (fun rule_id map_b ->
+      let _ = fprintf parameter.log "rule_id:%i\n" rule_id in
+      Map_agent_type_potential_list.Map.iter
+        (fun agent_type l ->
+          let _ = fprintf parameter.log "agent_type:%i\n" agent_type in
+          List.iter (fun (site, state) ->
+            fprintf parameter.log "site_type:%i:state:%i\n" site state
+          ) l
+        ) map_b
+    ) result
   
 (************************************************************************************)
 (*main print*)
@@ -266,6 +248,16 @@ let print_bdu_build parameter error result =
       parameter
       error
       result.store_potential_list_restriction_map
+  in
+  let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "\n------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter)
+      "- List for update of the views due to modification that are created from potential partner in side effects (projection per rule):\n";
+    print_proj_potential_list_map
+      parameter
+      error
+      result.store_proj_potential_list_restriction_map
   in
   let _ =
      fprintf (Remanent_parameters.get_log parameter)

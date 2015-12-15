@@ -377,10 +377,10 @@ agent_type:0:site_type:1@list of pair (rule_id, binding state):
 ------------------------------------------------------------
 Sites that may/must occurs in the potential partner side-effects:
 ------------------------------------------------------------
-- Potential partner of half break action:
-- Potential partner of remove action:
+- Potential partner has site that is free:
 agent_type:0:rule_id:5@(site, free state)
 (site_type:1 * state:0)
+- Potential partner has site that is bind:
 agent_type:0:rule_id:5@(site, binding state)
 (site_type:1 * state:1)
 ------------------------------------------------------------
@@ -536,6 +536,12 @@ Id=13
 ------------------------------------------------------------
 - List for update of the views due to modification that are created from potential partner in side effects (per rule, agent and covering class):
 agent_type:0:rule_id:5:covering_class_id:0
+site_type:2:state:0
+
+------------------------------------------------------------
+- List for update of the views due to modification that are created from potential partner in side effects (projection per rule):
+rule_id:5
+agent_type:0
 site_type:2:state:0
 
 ------------------------------------------------------------

@@ -130,8 +130,8 @@ Sites that may/must occurs side-effects:
 ------------------------------------------------------------
 Sites that may/must occurs in the potential partner side-effects:
 ------------------------------------------------------------
-- Potential partner of half break action:
-- Potential partner of remove action:
+- Potential partner has site that is free:
+- Potential partner has site that is bind:
 ------------------------------------------------------------
 Set of rules that may modify a given site (excluding created agents):
 ------------------------------------------------------------
@@ -208,6 +208,9 @@ rule_id:0
 
 ------------------------------------------------------------
 - List for update of the views due to modification that are created from potential partner in side effects (per rule, agent and covering class):
+
+------------------------------------------------------------
+- List for update of the views due to modification that are created from potential partner in side effects (projection per rule):
 
 ------------------------------------------------------------
 - Bdu for the valuations of the views that are tested (per rule, agent and covering class):

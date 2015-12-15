@@ -451,6 +451,9 @@ let collect_bdu_creation_and_modif_list
 
 (*form rule_id get bdu_potential_map, and modif_list_map (when state of the site is free)*)
 
+(*let collect_bdu_potential_and_list parameter error rule_id
+    store_proj_bdu_potential_restriction_map
+    store_proj_potential_list_restriction_map*)
 
 
 (************************************************************************************)

@@ -243,30 +243,161 @@ let store_potential_remove parameter error handler rule_id remove store_result =
 
 (************************************************************************************)
 
-let store_potential_side_effects parameter error handler rule_id half_break remove
-    store_result =
-  let error, store_potential_half_break =
+let collect_potential_side_effects_free parameter error handler rule_id 
+    half_break remove store_result_map =
+  let error, store_result_hb =
     store_potential_half_break
       parameter
       error
       handler
       rule_id
       half_break
-      (fst store_result)
+      (Int2Map_potential_effect.Map.empty, Int2Map_potential_effect.Map.empty)
   in
-  let error, store_potential_remove =
+  let error, store_result_remove =
     store_potential_remove
       parameter
       error
       handler
       rule_id
       remove
+      (Int2Map_potential_effect.Map.empty, Int2Map_potential_effect.Map.empty)
+  in
+  let add_link error (agent_type, rule_id) l store_result =
+    let old =
+      Int2Map_potential_effect.Map.find_default [] (agent_type, rule_id) store_result
+    in
+    let concat = List.concat [l; old] in
+    let result = Int2Map_potential_effect.Map.add (agent_type, rule_id) concat store_result
+    in
+    error, result
+  in
+  Int2Map_potential_effect.Map.fold2_with_logs
+    (fun parameter error str str_opt exn ->
+      let error, _ = warn parameter error str_opt exn Not_found in
+      error
+    )
+    parameter
+    error
+    (*exists in 'a t*)
+    (fun parameter error (agent_type, rule_id) l1 store_result ->
+      let error, store_result =
+        add_link error (agent_type, rule_id) l1 store_result
+      in
+      error, store_result
+    )
+    (*exists in 'b t*)
+    (fun paramter error (agent_type, rule_id) l2 store_result ->
+      let error, store_result =
+        add_link error (agent_type, rule_id) l2 store_result
+      in
+      error, store_result
+    )
+    (*exists in both*)
+    (fun parameter error (agent_type, rule_id) l1 l2 store_result ->
+      let concat = List.concat [l1; l2] in
+      let error, store_result =
+        add_link error (agent_type, rule_id) concat store_result
+      in
+      error, store_result
+    )
+    (fst store_result_hb)
+    (fst store_result_remove)
+    store_result_map
+
+(************************************************************************************)
+
+let collect_potential_side_effects_bind parameter error handler rule_id 
+    half_break remove store_result_map =
+  let error, store_result_hb =
+    store_potential_half_break
+      parameter
+      error
+      handler
+      rule_id
+      half_break
+      (Int2Map_potential_effect.Map.empty, Int2Map_potential_effect.Map.empty)
+  in
+  let error, store_result_remove =
+    store_potential_remove
+      parameter
+      error
+      handler
+      rule_id
+      remove
+      (Int2Map_potential_effect.Map.empty, Int2Map_potential_effect.Map.empty)
+  in
+  let add_link error (agent_type, rule_id) l store_result =
+    let old =
+      Int2Map_potential_effect.Map.find_default [] (agent_type, rule_id) store_result
+    in
+    let concat = List.concat [l; old] in
+    let result = Int2Map_potential_effect.Map.add (agent_type, rule_id) concat store_result
+    in
+    error, result
+  in
+  Int2Map_potential_effect.Map.fold2_with_logs
+    (fun parameter error str str_opt exn ->
+      let error, _ = warn parameter error str_opt exn Not_found in
+      error
+    )
+    parameter
+    error
+    (*exists in 'a t*)
+    (fun parameter error (agent_type, rule_id) l1 store_result ->
+      let error, store_result =
+        add_link error (agent_type, rule_id) l1 store_result
+      in
+      error, store_result
+    )
+    (*exists in 'b t*)
+    (fun paramter error (agent_type, rule_id) l2 store_result ->
+      let error, store_result =
+        add_link error (agent_type, rule_id) l2 store_result
+      in
+      error, store_result
+    )
+    (*exists in both*)
+    (fun parameter error (agent_type, rule_id) l1 l2 store_result ->
+      let concat = List.concat [l1; l2] in
+      let error, store_result =
+        add_link error (agent_type, rule_id) concat store_result
+      in
+      error, store_result
+    )
+    (snd store_result_hb)
+    (snd store_result_remove)
+    store_result_map
+
+(************************************************************************************)
+
+let collect_potential_side_effects parameter error handler rule_id half_break remove
+    store_result =
+  let error, store_result_free =
+    collect_potential_side_effects_free
+      parameter
+      error
+      handler
+      rule_id
+      half_break
+      remove
+      (fst store_result)
+  in
+  let error, store_result_bind =
+    collect_potential_side_effects_bind
+      parameter
+      error
+      handler
+      rule_id
+      half_break
+      remove
       (snd store_result)
   in
-  error, (store_potential_half_break, store_potential_remove)
+  error, (store_result_free, store_result_bind)
 
 (************************************************************************************)
 (*compute side effects: this is an update before discover bond function *)
+(*TODO: fold it and return one single result*)
 
 let collect_side_effects parameter error handler rule_id half_break remove store_result =
   let store_half_break_action, store_remove_action = store_result in

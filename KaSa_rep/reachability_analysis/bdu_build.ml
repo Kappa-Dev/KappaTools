@@ -586,37 +586,30 @@ let store_bdu_potential_restriction_map_aux parameter handler error store_remane
         ) store_potential_side_effects (error, (handler, store_result))
     ) store_remanent_triple (handler, store_result)
 
+(************************************************************************************)
 (*build bdu_potential in the case of binding*)
+
 let store_bdu_potential_effect_restriction_map parameter handler error store_remanent_triple 
     store_potential_side_effects store_result =
-  let (_, store_potential_half_break_bind), _ = store_potential_side_effects in
-  let _, (_, store_potential_remove_bind) = store_potential_side_effects in
-  let error, (handler, store_result_hb) =
+  let _, store_potential_bind = store_potential_side_effects in
+  let error, (handler, store_result) =
     store_bdu_potential_restriction_map_aux
       parameter
       handler
       error
       store_remanent_triple
-      store_potential_half_break_bind
-      (fst store_result)
+      store_potential_bind
+      store_result
   in
-  let error, (handler, store_result_remove) =
-    store_bdu_potential_restriction_map_aux
-      parameter
-      handler
-      error
-      store_remanent_triple
-      store_potential_remove_bind
-      (snd store_result)
-  in
-  error, (handler, store_result_hb, store_result_remove)
+  error, (handler, store_result)
 
+(************************************************************************************)
 (*projection with rule_id*)
 
 let collect_proj_bdu_potential_restriction_map parameter handler error
-    store_bdu_potential_hb_restriction_map store_bdu_potential_remove_restriction_map =
+    store_bdu_potential_restriction_map =
   let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in
-  let (error, handler), store_result_proj_hb =
+  let (error, handler), store_result =
     Project2bdu_potential.proj2_monadic
       parameter
       (error, handler)
@@ -628,25 +621,13 @@ let collect_proj_bdu_potential_restriction_map parameter handler error
           parameter handler error bdu bdu'
         in
         (error, handler), bdu_union
-      ) store_bdu_potential_hb_restriction_map
+      ) store_bdu_potential_restriction_map
   in
-  let (error, handler), store_result_proj_remove =
-    Project2bdu_potential.proj2_monadic
-      parameter
-      (error, handler)
-      (fun (agent_type, rule_id, cv_id) -> rule_id)
-      (fun (agent_type, rule_id, cv_id) -> agent_type)
-      bdu_true
-      (fun parameter (error, handler) bdu bdu' ->
-        let error, handler, bdu_union = Mvbdu_wrapper.Mvbdu.mvbdu_and
-          parameter handler error bdu bdu'
-        in
-        (error, handler), bdu_union
-      ) store_bdu_potential_remove_restriction_map
-  in
-  (error, handler), (store_result_proj_hb, store_result_proj_remove)
+  (error, handler), store_result
 
+(************************************************************************************)
 (*return a modification in the case of state free*)
+
 let collect_potential_list_restriction_map_aux parameter error store_remanent_triple
     store_potential_side_effects store_result =
   let add_link (agent_type, rule_id, cv_id) pair_list store_result =
@@ -718,26 +699,36 @@ let collect_potential_list_restriction_map_aux parameter error store_remanent_tr
         ) store_potential_side_effects (error, store_result)
     ) store_remanent_triple store_result
 
+(************************************************************************************)
 (*build list of modification of potential partner in the case of site is free*)
 
-let collect_potential_list_effect_restriction_map parameter error store_remanent_triple
+let collect_potential_list_restriction_map parameter error store_remanent_triple
     store_potential_side_effects store_result =
-  let (store_potential_half_break_free, _), _ = store_potential_side_effects in
-  let _, (store_potential_remove_free, _) = store_potential_side_effects in
-  let error, store_result_hb =
+  let store_potential_free, _ = store_potential_side_effects in
+  let error, store_result =
     collect_potential_list_restriction_map_aux
       parameter
       error
       store_remanent_triple
-      store_potential_half_break_free
-      (fst store_result)
+      store_potential_free
+      store_result
   in
-  let error, store_result_remove =
-    collect_potential_list_restriction_map_aux
+  error, store_result
+
+(************************************************************************************)
+(*projection with rule_id*)
+
+let collect_proj_potential_list_restriction_map parameter handler error 
+    store_potential_free =
+  let (error, handler), store_result =
+    Project2bdu_potential_list.proj2_monadic
       parameter
-      error
-      store_remanent_triple
-      store_potential_remove_free
-      (snd store_result)
+      (error, handler)
+      (fun (agent_type, rule_id, cv_id) -> rule_id)
+      (fun (agent_type, rule_id, cv_id) -> agent_type)
+      []
+      (fun parameter (error, handler) l l' ->
+        (error, handler), List.concat [l; l'])
+      store_potential_free
   in
-  error, (store_result_hb, store_result_remove)
+  (error, handler), store_result

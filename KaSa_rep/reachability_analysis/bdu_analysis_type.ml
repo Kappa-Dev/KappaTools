@@ -241,6 +241,25 @@ module Map_potential_list =
       let compare = compare
     end)
 
+(*with projection*)
+module Map_final_potential_list =
+  SetMap.Make (
+    struct
+      type t = int
+      let compare = compare
+    end)
+
+module Map_agent_type_potential_list =
+  SetMap.Make (
+    struct
+      type t = int
+      let compare = compare
+    end)
+
+module Project2bdu_potential_list =
+  SetMap.Proj2 (Map_potential_list)(Map_final_potential_list)(Map_agent_type_potential_list)
+
+
 (************************************************************************************)
 (*fixpoint iteration*)
 
@@ -278,19 +297,17 @@ type remove_action =
   (int list * int list) Int2Map_Remove_effect.Map.t
 
 (*potential side effects*)
-type free_half_break = (int * int) list Int2Map_potential_effect.Map.t
-type bind_half_break = (int * int) list Int2Map_potential_effect.Map.t
-type potential_half_break_action = (free_half_break * bind_half_break)
+type free_partner = (int * int) list Int2Map_potential_effect.Map.t
+type bind_partner = (int * int) list Int2Map_potential_effect.Map.t
 
-type free_remove = (int * int) list Int2Map_potential_effect.Map.t
-type bind_remove = (int * int) list Int2Map_potential_effect.Map.t
-type potential_remove_action = (free_remove * bind_remove)
+type potential_partner_free = free_partner
+type potential_partner_bind = bind_partner
 
 type bdu_analysis_static =
   {
     store_covering_classes_id : (int list * int list) Int2Map_CV.Map.t;
     store_side_effects        : half_break_action * remove_action;
-    store_potential_side_effects : potential_half_break_action *  potential_remove_action;
+    store_potential_side_effects : potential_partner_free *  potential_partner_bind;
     (* views that are tested and modificated with agent_id*)
     store_modification_sites  :
       (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t;
@@ -327,24 +344,25 @@ type bdu_build =
     store_remanent_triple: ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;
     store_wl_creation: wl_int;
     store_bdu_test_restriction_map:  Mvbdu_wrapper.Mvbdu.mvbdu Map_test_bdu.Map.t;
-    store_proj_bdu_test_restriction_map: Mvbdu_wrapper.Mvbdu.mvbdu Map_agent_id_test_bdu.Map.t Map_final_test_bdu.Map.t;
+    store_proj_bdu_test_restriction_map: 
+      Mvbdu_wrapper.Mvbdu.mvbdu Map_agent_id_test_bdu.Map.t Map_final_test_bdu.Map.t;
     store_bdu_creation_restriction_map: Mvbdu_wrapper.Mvbdu.mvbdu Map_creation_bdu.Map.t;
-    store_proj_bdu_creation_restriction_map: Mvbdu_wrapper.Mvbdu.mvbdu Map_agent_type_creation_bdu.Map.t Map_final_creation_bdu.Map.t;
+    store_proj_bdu_creation_restriction_map: 
+      Mvbdu_wrapper.Mvbdu.mvbdu Map_agent_type_creation_bdu.Map.t
+      Map_final_creation_bdu.Map.t;
     store_bdu_init_restriction_map: Mvbdu_wrapper.Mvbdu.mvbdu Map_bdu_update.Map.t;
     store_modif_list_restriction_map: ((int * int) list) Map_modif_list.Map.t;
-    store_proj_modif_list_restriction_map: ((int * int) list) Map_agent_id_modif_list.Map.t Map_final_modif_list.Map.t;
+    store_proj_modif_list_restriction_map: 
+      ((int * int) list) Map_agent_id_modif_list.Map.t Map_final_modif_list.Map.t;
     store_bdu_potential_effect_restriction_map : 
-      Mvbdu_wrapper.Mvbdu.mvbdu Map_potential_bdu.Map.t * 
       Mvbdu_wrapper.Mvbdu.mvbdu Map_potential_bdu.Map.t;
     store_proj_bdu_potential_restriction_map :
       Mvbdu_wrapper.Mvbdu.mvbdu Map_agent_type_potential_bdu.Map.t
-      Map_final_potential_bdu.Map.t
-    * 
-      Mvbdu_wrapper.Mvbdu.mvbdu Map_agent_type_potential_bdu.Map.t
       Map_final_potential_bdu.Map.t;
     store_potential_list_restriction_map :
-      (int * int) list Map_potential_list.Map.t * 
-      (int * int) list Map_potential_list.Map.t ;
+      (int * int) list Map_potential_list.Map.t;
+    store_proj_potential_list_restriction_map :
+      (int * int) list Map_agent_type_potential_list.Map.t Map_final_potential_list.Map.t;
   }
 
 (************************************************************************************)

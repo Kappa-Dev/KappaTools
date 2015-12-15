@@ -168,7 +168,7 @@ let print_side_effects parameter error result =
 (************************************************************************************)
 (*Potential partner side-effects*)
 
-let print_free_hb parameter error result =
+let print_potential_partner_free parameter error result =
   Int2Map_potential_effect.Map.iter 
     (fun (agent_type, rule_id) l ->
       let _ =
@@ -180,7 +180,7 @@ let print_free_hb parameter error result =
       ) l
     ) result
 
-let print_bind_hb parameter error result =
+let print_potential_partner_bind parameter error result =
   Int2Map_potential_effect.Map.iter 
     (fun (agent_type, rule_id) l ->
       let _ =
@@ -191,70 +191,33 @@ let print_bind_hb parameter error result =
         fprintf stdout "(site_type:%i * state:%i)\n" site state
       ) l
     ) result
-
-let print_free_remove parameter error result =
-  Int2Map_potential_effect.Map.iter 
-    (fun (agent_type, rule_id) l ->
-      let _ =
-        fprintf stdout "agent_type:%i:rule_id:%i@(site, free state)\n"
-          agent_type rule_id
-      in
-      List.iter (fun (site, state) ->
-        fprintf stdout "(site_type:%i * state:%i)\n" site state
-      ) l
-    ) result
-
-let print_bind_remove parameter error result =
-  Int2Map_potential_effect.Map.iter 
-    (fun (agent_type, rule_id) l ->
-      let _ =
-        fprintf stdout "agent_type:%i:rule_id:%i@(site, binding state)\n"
-          agent_type rule_id
-      in
-      List.iter (fun (site, state) ->
-        fprintf stdout "(site_type:%i * state:%i)\n" site state
-      ) l
-    ) result
-
-let print_potential_half_break parameter error result =
-  let result_free_hb, result_bind_hb = result in
-  let _ = print_free_hb parameter error result_free_hb
-  in
-  print_bind_hb parameter error result_bind_hb
-
-let print_potential_remove parameter error result =
-  let result_free_remove, result_bind_remove = result in
-  let _ = print_free_remove parameter error result_free_remove
-  in
-  print_bind_remove parameter error result_bind_remove
 
 let print_potential_side_effects parameter error result =
+  let result1, result2 = result in
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter) 
     "Sites that may/must occurs in the potential partner side-effects:\n";
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
+  fprintf stdout "- Potential partner has site that is free:\n";
   let _ =
-    fprintf stdout "- Potential partner of half break action:\n";
-    print_potential_half_break
+    print_potential_partner_free
       parameter
       error 
-      (fst result)
+      result1
   in
-  fprintf stdout "- Potential partner of remove action:\n";
-  let error =
-    print_potential_remove
-      parameter
-      error
-      (snd result)
-  in
-  error
+  fprintf stdout "- Potential partner has site that is bind:\n";
+  print_potential_partner_bind
+    parameter
+    error
+    result2
 
 (************************************************************************************)
 (*update of the views due to modification*)
 
 (*with agent_id*)
+
 let print_modification_sites_aux parameter error result =
   Int2Map_Modif.Map.iter
     ( fun (x, y, z) (l1, s2) ->
