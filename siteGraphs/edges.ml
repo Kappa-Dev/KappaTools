@@ -1,5 +1,7 @@
 open Mods
 
+let reuse_id = false
+
 module Edge = struct
   type t = ToFree
 	 | Link of (int * int * int) (** sort * id * site *)
@@ -15,17 +17,27 @@ module Edge = struct
   let dummy_link = Link (-1,-1,-1)
 end
 
-type t = Edge.t Int2Map.t * int Int2Map.t * IntSet.t IntMap.t * int
+type t = Edge.t Int2Map.t * int Int2Map.t * IntSet.t IntMap.t * (int * int list)
 (** agent,site -> binding_state; agent,site -> internal_state; sort -> agents;
 free_id *)
 
-let empty = (Int2Map.empty, Int2Map.empty, IntMap.empty,1)
+let empty = (Int2Map.empty, Int2Map.empty, IntMap.empty,(1,[]))
 
 let add_agent ty (connect,state,sort,free_id) =
-  free_id,
-  (connect,state,
-   IntMap.add ty (IntSet.add free_id (IntMap.find_default IntSet.empty ty sort)) sort,
-  succ free_id)
+  match free_id with
+  | new_id,h :: t when reuse_id ->
+     h,
+     (connect,state,
+      IntMap.add ty (IntSet.add
+		       h (IntMap.find_default IntSet.empty ty sort)) sort,
+      (new_id,t))
+  | new_id,l ->
+     new_id,
+     (connect,state,
+      IntMap.add ty (IntSet.add
+		       new_id (IntMap.find_default IntSet.empty ty sort)) sort,
+      (succ new_id,l))
+
 let add_free ag s (connect,state,sort,free_id) =
   (Int2Map.add (ag,s) Edge.ToFree connect,state,sort,free_id)
 let add_internal ag s i (connect,state,sort,free_id) =
@@ -40,10 +52,10 @@ let remove ag s (connect,state,sort,free_id) = function
   | Edge.ToFree -> (Int2Map.remove (ag,s) connect,state,sort,free_id)
   | Edge.Link (_,ag',s') ->
      (Int2Map.remove (ag,s) (Int2Map.remove (ag',s') connect),state,sort,free_id)
-let remove_agent ty ag (connect,state,sort,free_id) =
+let remove_agent ty ag (connect,state,sort,(new_id,ids)) =
   (connect,state,
    IntMap.add ty (IntSet.remove ag (IntMap.find_default IntSet.empty ty sort)) sort,
-  free_id)
+  (new_id,ag::ids))
 let remove_free ag s t = remove ag s t Edge.ToFree
 let remove_internal ag s (connect,state,sort,free_id) =
   match Int2Map.pop (ag,s) state with
