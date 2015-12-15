@@ -138,13 +138,6 @@ module Map_agent_type_creation_bdu =
 module Project2bdu_creation =
   SetMap.Proj2 (Map_creation_bdu)(Map_final_creation_bdu)(Map_agent_type_creation_bdu)
 
-(*module Map_creation_bdu_ag =
-  SetMap.Make (
-    struct
-      type t = int (*agent_type*)
-      let compare = compare
-    end)*)
-
 (*test*)
 
 module Map_test_bdu =
@@ -171,13 +164,6 @@ module Map_agent_id_test_bdu =
 
 module Project2bdu_test =
   SetMap.Proj2 (Map_test_bdu)(Map_final_test_bdu)(Map_agent_id_test_bdu)
-
-(*module Map_test_bdu_ag =
-  SetMap.Make (
-    struct
-      type t = int (*agent_id*)
-      let compare = compare
-    end)*)
 
 (*modification*)
 
@@ -373,7 +359,6 @@ type bdu_fixpoint =
       store_test_has_bond_rhs  : bool * Map_site_address.Set.t Map_test_bond.Map.t;
       store_new_wl_side_effect : (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;
       store_bdu_fixpoint_map   : Mvbdu_wrapper.Mvbdu.mvbdu Map_bdu_update.Map.t;
-
   }
 
 (************************************************************************************)

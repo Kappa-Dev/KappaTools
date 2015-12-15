@@ -71,12 +71,13 @@ let print_new_wl_side_effect parameter error result =
 (************************************************************************************)
 
 let print_bdu_update_map parameter error result =
+  (*let result1, result_array = result in*)
   Map_bdu_update.Map.iter (fun (agent_type, cv_id) bdu_update ->
     let _ =
       fprintf parameter.log "agent_type:%i:cv_id:%i\n" agent_type cv_id
     in
     Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_update
-  ) result   
+    ) result
   
 (************************************************************************************)
 (*main print*)

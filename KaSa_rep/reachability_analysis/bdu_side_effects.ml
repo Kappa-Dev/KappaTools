@@ -397,7 +397,6 @@ let collect_potential_side_effects parameter error handler rule_id half_break re
 
 (************************************************************************************)
 (*compute side effects: this is an update before discover bond function *)
-(*TODO: fold it and return one single result*)
 
 let collect_side_effects parameter error handler rule_id half_break remove store_result =
   let store_half_break_action, store_remove_action = store_result in
