@@ -10,7 +10,6 @@ type t = {
   outdated_elements:
     Operator.DepSet.t *
     (int * ((Connected_component.Set.t *int) * Edges.path) list) list * bool;
-  free_id: int;
   story_machinery :
     ((Causal.event_kind * Connected_component.t array *
 	Instantiation.abstract Instantiation.test list) list
@@ -27,7 +26,6 @@ let empty ~has_tracking env = {
     edges = Edges.empty;
     tokens = Array.make (Environment.nb_tokens env) Nbr.zero;
     outdated_elements = Operator.DepSet.empty,[],true;
-    free_id = 1;
     story_machinery =
       if has_tracking
       then Some (Connected_component.Map.empty,
@@ -69,16 +67,19 @@ let remove_candidate cands pathes rule_id x y =
     else Mods.IntMap.add rule_id va cands),
    Mods.Int2Map.remove (a,b) pathes)
 
-let from_place (inj_nodes,inj_fresh,free_id as inj2graph) = function
+let from_place (inj_nodes,inj_fresh) = function
   | Agent_place.Existing (n,id) ->
      (Connected_component.ContentAgent.get_sort n,
-      Connected_component.Matching.get (n,id) inj_nodes,
-      inj2graph)
+      Connected_component.Matching.get (n,id) inj_nodes)
   | Agent_place.Fresh (ty,id) ->
      match Mods.IntMap.find_option id inj_fresh with
-     | Some x -> (ty,x,inj2graph)
-     | None ->
-       ty,free_id,(inj_nodes,Mods.IntMap.add id free_id inj_fresh,succ free_id)
+     | Some x -> (ty,x)
+     | None -> failwith "Rule_interpreter.from_place"
+
+let new_place free_id (inj_nodes,inj_fresh) = function
+  | Agent_place.Existing _ -> failwith "Rule_interpreter.new_place"
+  | Agent_place.Fresh (_,id) ->
+     (inj_nodes,Mods.IntMap.add id free_id inj_fresh)
 
 let all_injections ?excp edges roots cca =
   snd @@
@@ -111,57 +112,61 @@ let deal_transformation is_add domain to_explore_unaries inj2graph edges roots t
 NB inj should not change if [is_add] is false*)
     match transf with
     | Primitives.Transformation.Agent n ->
-       let ty, id, inj2graph' = from_place inj2graph n in (*(A,23,phi)*)
-       let edges' =
-	 if is_add then Edges.add_agent ty id edges
-	 else Edges.remove_agent ty id edges in
+       let ty, id, inj2graph',edges' =
+	 if is_add then
+	   let ty = Agent_place.get_type n in
+	   let id,edges' = Edges.add_agent ty edges in
+	   ty,id,new_place id inj2graph n,edges'
+	 else
+	   let ty, id = from_place inj2graph n in (*(A,23,phi)*)
+	   ty, id, inj2graph,Edges.remove_agent ty id edges in
        let new_obs =
 	 Connected_component.Matching.observables_from_agent
 	   domain (if is_add then edges' else edges) ty id in (*this hack should disappear when chekcing O\H only*)
        (inj2graph',edges',new_obs)
     | Primitives.Transformation.Freed (n,s) -> (*(n,s)-bottom*)
-       let ty, id, inj2graph' = from_place inj2graph n in (*(A,23,phi)*)
+       let ty, id = from_place inj2graph n in (*(A,23,phi)*)
        let edges' =
 	 if is_add then Edges.add_free id s edges
 	 else Edges.remove_free id s edges in
        let new_obs =
 	 Connected_component.Matching.observables_from_free
 	   domain (if is_add then edges' else edges) ty id s in (*this hack should disappear when chekcing O\H only*)
-       (inj2graph',edges',new_obs)
+       (inj2graph,edges',new_obs)
     | Primitives.Transformation.Linked ((n,s),(n',s')) ->
-       let ty, id, inj2graph' = from_place inj2graph n in
-       let ty', id', inj2graph'' = from_place inj2graph' n' in
+       let ty, id = from_place inj2graph n in
+       let ty', id' = from_place inj2graph n' in
        let edges' =
 	 if is_add then Edges.add_link ty id s ty' id' s' edges
 	 else Edges.remove_link id s id' s' edges in
        let new_obs =
 	 Connected_component.Matching.observables_from_link
 	   domain (if is_add then edges' else edges) ty id s ty' id' s' in
-       (inj2graph'',edges',new_obs)
+       (inj2graph,edges',new_obs)
     | Primitives.Transformation.PositiveInternalized (n,s,i) ->
        if not is_add then
 	 raise
 	   (ExceptionDefn.Internal_Error
 	      (Location.dummy_annot "PositiveInternalized in negative update"))
        else
-	 let ty, id, inj2graph' = from_place inj2graph n in
+	 let ty, id = from_place inj2graph n in
 	 let edges' = Edges.add_internal id s i edges in
 	 let new_obs =
 	   Connected_component.Matching.observables_from_internal
 	     domain edges' ty id s i in
-	 (inj2graph',edges',new_obs)
+	 (inj2graph,edges',new_obs)
     | Primitives.Transformation.NegativeInternalized (n,s) ->
        if is_add then
 	 raise
 	   (ExceptionDefn.Internal_Error
 	      (Location.dummy_annot "NegativeInternalized in positive update"))
        else
-	 let ty, id, inj2graph' = from_place inj2graph n in
+	 let ty, id = from_place inj2graph n in
 	 let edges',i = Edges.remove_internal id s edges in
 	 let new_obs =
 	   Connected_component.Matching.observables_from_internal
 	     domain edges ty id s i in
-	 (inj2graph',edges',new_obs)
+	 (inj2graph,edges',new_obs)
   in
   let roots' =
     List.fold_left
@@ -183,7 +188,7 @@ NB inj should not change if [is_add] is false*)
 	 if Agent_place.same_connected_component n n'
 	 then to_explore_unaries
 	 else
-	   let _, id, _ = from_place inj n in
+	   let _, id = from_place inj n in
 	   id::to_explore_unaries in
   ((inj,graph,to_explore',roots',deps),obs)
 
@@ -193,7 +198,7 @@ let store_event
   | Some (x,(info,steps)) ->
      let concrete_event =
        Instantiation.concretize_event
-	 (fun p -> let (_,x,_) = from_place inj2graph p in x)
+	 (fun p -> let (_,x) = from_place inj2graph p in x)
 	 rule.Primitives.instantiations in
      let infos',steps' =
        Compression_main.secret_store_event
@@ -224,8 +229,8 @@ let store_obs edges roots obs acc = function
 		let tests' =
 		  List.map (Instantiation.concretize_test
 			      (fun p ->
-			       let (_,x,_) =
-				 from_place (inj,Mods.IntMap.empty,0) p in x))
+			       let (_,x) =
+				 from_place (inj,Mods.IntMap.empty) p in x))
 			   tests in
 		(ev,tests') :: acc)
 	       acc (all_injections ~excp:(cc,root) edges roots ccs))
@@ -260,12 +265,12 @@ let update_edges counter domain unary_ccs inj_nodes state event_kind rule =
        let ((a,b,_,c,new_deps),_) =
 	 deal_transformation false domain unaries_to_expl inj2graph edges roots transf in
        (a,b,c,(Operator.DepSet.union new_deps deps,unaries_to_expl)))
-      ((inj_nodes,Mods.IntMap.empty,state.free_id), (*initial inj2graph: (existing,new,fresh_id) *)
+      ((inj_nodes,Mods.IntMap.empty), (*initial inj2graph: (existing,new) *)
        state.edges,state.roots_of_ccs,(former_deps,[]))
       rule.Primitives.removed (*removed: statically defined edges*)
   in
   (*Positive update*)
-  let (((_,_,free_id' as final_inj2graph),edges',roots',
+  let (((_,_ as final_inj2graph),edges',roots',
 	(rev_deps',unaries_to_explore)),new_tracked_obs_instances,all_new_obs) =
     List.fold_left
       (fun ((inj2graph,edges,roots,(deps,unaries_to_expl)),tracked_inst,all_nobs) transf ->
@@ -308,7 +313,7 @@ let update_edges counter domain unary_ccs inj_nodes state event_kind rule =
   { roots_of_ccs = roots'; unary_candidates = state.unary_candidates;
     unary_pathes = state.unary_pathes; edges = edges';
     tokens = state.tokens; outdated_elements = (rev_deps',unary_cands',no_unary');
-    free_id = free_id'; story_machinery = story_machinery'; }
+    story_machinery = story_machinery'; }
 
 let raw_instance_number state ccs_l =
   let size cc =

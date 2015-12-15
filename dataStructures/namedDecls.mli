@@ -14,6 +14,8 @@ val size : 'a t -> int
 val elt_name : 'a t -> int -> string
 val elt_id : ?kind:string -> 'a t -> string Location.annot -> int
 
+val fold : (int -> string -> 'a -> 'b -> 'a) -> 'a -> 'b t -> 'a
+
 val print :
   sep:(Format.formatter -> unit) ->
   (int -> string -> Format.formatter -> 'a -> unit) ->

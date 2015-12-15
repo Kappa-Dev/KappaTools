@@ -15,56 +15,60 @@ module Edge = struct
   let dummy_link = Link (-1,-1,-1)
 end
 
-type t = Edge.t Int2Map.t * int Int2Map.t * IntSet.t IntMap.t
-(** agent,site -> binding_state; agent,site -> internal_state; sort -> agents *)
+type t = Edge.t Int2Map.t * int Int2Map.t * IntSet.t IntMap.t * int
+(** agent,site -> binding_state; agent,site -> internal_state; sort -> agents;
+free_id *)
 
-let empty = (Int2Map.empty, Int2Map.empty, IntMap.empty)
+let empty = (Int2Map.empty, Int2Map.empty, IntMap.empty,1)
 
-let add_agent ty ag (connect,state,sort) =
+let add_agent ty (connect,state,sort,free_id) =
+  free_id,
   (connect,state,
-   IntMap.add ty (IntSet.add ag (IntMap.find_default IntSet.empty ty sort)) sort)
-let add_free ag s (connect,state,sort) =
-  (Int2Map.add (ag,s) Edge.ToFree connect,state,sort)
-let add_internal ag s i (connect,state,sort) =
-  (connect,Int2Map.add (ag,s) i state,sort)
+   IntMap.add ty (IntSet.add free_id (IntMap.find_default IntSet.empty ty sort)) sort,
+  succ free_id)
+let add_free ag s (connect,state,sort,free_id) =
+  (Int2Map.add (ag,s) Edge.ToFree connect,state,sort,free_id)
+let add_internal ag s i (connect,state,sort,free_id) =
+  (connect,Int2Map.add (ag,s) i state,sort,free_id)
 
-let add_link ty ag s ty' ag' s' (connect,state,sort) =
+let add_link ty ag s ty' ag' s' (connect,state,sort,free_id) =
   (Int2Map.add (ag,s) (Edge.Link (ty',ag',s'))
 	       (Int2Map.add (ag',s') (Edge.Link (ty,ag,s)) connect),
-   state,sort)
+   state,sort,free_id)
 
-let remove ag s (connect,state,sort) = function
-  | Edge.ToFree -> (Int2Map.remove (ag,s) connect,state,sort)
+let remove ag s (connect,state,sort,free_id) = function
+  | Edge.ToFree -> (Int2Map.remove (ag,s) connect,state,sort,free_id)
   | Edge.Link (_,ag',s') ->
-     (Int2Map.remove (ag,s) (Int2Map.remove (ag',s') connect),state,sort)
-let remove_agent ty ag (connect,state,sort) =
+     (Int2Map.remove (ag,s) (Int2Map.remove (ag',s') connect),state,sort,free_id)
+let remove_agent ty ag (connect,state,sort,free_id) =
   (connect,state,
-   IntMap.add ty (IntSet.remove ag (IntMap.find_default IntSet.empty ty sort)) sort)
+   IntMap.add ty (IntSet.remove ag (IntMap.find_default IntSet.empty ty sort)) sort,
+  free_id)
 let remove_free ag s t = remove ag s t Edge.ToFree
-let remove_internal ag s (connect,state,sort) =
+let remove_internal ag s (connect,state,sort,free_id) =
   match Int2Map.pop (ag,s) state with
-  | Some i, state' -> (connect,state',sort),i
+  | Some i, state' -> (connect,state',sort,free_id),i
   | None, _ ->
      failwith ("Site "^string_of_int s^ " of agent "^string_of_int ag^
 		 " has no internal state to remove in the current graph.")
 let remove_link ag s ag' s' t = remove ag s t (Edge.Link (-1,ag',s'))
 
-let is_agent ty ag (_,_,s) =
+let is_agent ty ag (_,_,s,_) =
   IntSet.mem ag (IntMap.find_default IntSet.empty ty s)
-let is_free ag s (t,_,_) =
+let is_free ag s (t,_,_,_) =
   match Int2Map.find_default Edge.dummy_link (ag,s) t with
   | Edge.ToFree -> true
   | Edge.Link _ -> false
-let is_internal i ag s (_,t,_) =
+let is_internal i ag s (_,t,_,_) =
   match Int2Map.find_option (ag,s) t with
   | Some j -> j = i
   | None -> false
-let link_exists ag s ag' s' (t,_,_) =
+let link_exists ag s ag' s' (t,_,_,_) =
   match Int2Map.find_default Edge.ToFree (ag,s) t with
   | Edge.Link (_,ag'',s'') -> ag'=ag'' && s'=s''
   | Edge.ToFree -> false
 
-let exists_fresh ag s ty s' (t,_,_) =
+let exists_fresh ag s ty s' (t,_,_,_) =
   match Int2Map.find_option (ag,s) t with
   | Some (Edge.Link (ty',ag',s'')) ->
     if ty'=ty && s'=s'' then Some ag' else None
@@ -73,7 +77,7 @@ let exists_fresh ag s ty s' (t,_,_) =
 
 (** The snapshot machinery *)
 let one_connected_component sigs ty node graph =
-  let rec build acc free_id dangling (links,internals,sorts as graph) = function
+  let rec build acc free_id dangling (links,internals,sorts,free_ag as graph) = function
     | [] -> acc,free_id,graph
     | (ty,node) :: todos ->
        let nodes_of_type = IntMap.find_default IntSet.empty ty sorts in
@@ -115,7 +119,7 @@ let one_connected_component sigs ty node graph =
 	   { Raw_mixture.a_id = node; Raw_mixture.a_type = ty;
 	     Raw_mixture.a_ports = ports; Raw_mixture.a_ints = ints; } in
 	 build (skel::acc) free_id' dangling'
-	       (links',internals',sorts') todos'
+	       (links',internals',sorts',free_ag) todos'
   in build [] 1 Int2Map.empty graph [ty,node]
 
 let build_snapshot sigs graph =
@@ -124,12 +128,12 @@ let build_snapshot sigs graph =
     | (n,y as h)::t ->
        if Raw_mixture.equal x y then (succ n,y)::t
        else h::increment x t in
-  let rec aux ccs (e,i,sorts as graph) =
+  let rec aux ccs (e,i,sorts,free_id as graph) =
     match IntMap.root sorts with
     | None -> ccs
     | Some (ty,nodes) ->
        match IntSet.choose nodes with
-       | None -> aux ccs (e,i,IntMap.remove ty sorts)
+       | None -> aux ccs (e,i,IntMap.remove ty sorts,free_id)
        | Some node ->
 	  let (out,_,graph') =
 	    one_connected_component sigs ty node graph in
@@ -152,7 +156,7 @@ let print_dot sigs f graph =
        i nb (Raw_mixture.print_dot sigs i) mix)
     f (build_snapshot sigs graph)
 
-let debug_print f (links,ints,sorts) =
+let debug_print f (links,ints,sorts,_) =
   Pp.set
     ~trailing:(fun f -> Format.fprintf f "@])")
     Int2Map.bindings (fun f -> Format.fprintf f ",")
@@ -219,7 +223,7 @@ let breath_first_traversal stop_on_find is_interresting links =
     | [] -> match next with [] -> out | _ -> aux don out [] next in
   aux
 
-let pathes_of_interrest is_interresting (links,_,_) start_point done_path =
+let pathes_of_interrest is_interresting (links,_,_,_) start_point done_path =
   let don = List.fold_left (fun s (_,_,_,x) -> IntSet.add x s)
 			   (IntSet.singleton start_point) done_path in
   let acc = match is_interresting start_point with
@@ -228,7 +232,7 @@ let pathes_of_interrest is_interresting (links,_,_) start_point done_path =
   breath_first_traversal
     false is_interresting links don acc [] [start_point,done_path]
 
-let are_connected ?candidate (links,_,_ as graph) x y =
+let are_connected ?candidate (links,_,_,_ as graph) x y =
   match candidate with
   | Some p when is_valid_path graph p -> Some p
   | (Some _ | None) ->

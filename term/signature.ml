@@ -1,10 +1,9 @@
 type t = ((unit NamedDecls.t) option) NamedDecls.t
 
 let fold f sign cont =
-  let cont,_ = Array.fold_left
-		 (fun (cont,i) ((na,_),_) -> (f i na cont,i+1)) (cont,0)
-		 sign.NamedDecls.decls
-  in cont
+  Tools.array_fold_lefti
+    (fun i cont ((na,_),_) -> f i na cont) cont
+    sign.NamedDecls.decls
 
 let num_of_site ?agent_name site_name sign =
   let kind = match agent_name with
@@ -76,6 +75,8 @@ type s = t NamedDecls.t
 let size sigs = NamedDecls.size sigs
 let get sigs agent_id = snd sigs.NamedDecls.decls.(agent_id)
 let arity sigs agent_id = NamedDecls.size (get sigs agent_id)
+let max_arity sigs =
+  NamedDecls.fold (fun _ _ x a -> max x (NamedDecls.size a)) 0 sigs
 
 let agent_of_num i sigs = NamedDecls.elt_name sigs i
 let num_of_agent name sigs =
