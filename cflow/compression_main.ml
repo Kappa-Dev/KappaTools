@@ -44,6 +44,7 @@ let th_of_int n =
 
 let max_number_of_itterations = None
 
+let never = (fun _ -> false) 
 let always = (fun _ -> true)
 let do_not_log parameter = (S.PH.B.PB.CI.Po.K.H.set_log_step parameter false)
 
@@ -245,7 +246,28 @@ let compress_and_print logger env log_info step_list =
             then 
 	      (* Firstly, run the causal compression *)
 	      let error,log_info,simplified_event_list = aux 0 (error,log_info,step_list) in 
-	      let () = 
+	      let error,log_info,causal_story_list =
+		U.fold_over_the_causal_past_of_observables_with_a_progress_bar
+		  parameter always (if debug_mode then always else never)
+		  handler log_info error
+		  (fun parameter handler error log_info trace info story_list -> 
+		   (* we remove pseudo inverse events *)
+		      let error,log_info,trace = 
+                      	U.remove_pseudo_inverse_events (do_not_log parameter) always handler log_info error trace
+		      in
+		      (* we compute causal compression *)
+		      let error,log_info,trace = 
+			U.cut (do_not_log parameter) always handler log_info error trace
+		      in
+		      (* we store the trace *)
+		      let error,causal_story_array,log_info = 
+			U.store_trace parameter handler error info log_info trace story_list 
+		      in 
+		      error,log_info,causal_story_array)
+		  simplified_event_list
+		  table2
+	      in 
+	      (*    let () = 
 		if log_step 
 		then 
                   Debug.tag logger "\t - blackboard generation"
@@ -284,7 +306,7 @@ let compress_and_print logger env log_info step_list =
 		let log_info = U.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
 	      (* We use the grid to get the causal precedence (pred* ) of each observable *)
 		let error,(log_info,list,table) = 
-		  U.fold_over_the_causal_past_of_observables_with_progress_bar 
+		  U.fold_over_the_causal_past_of_observables_through_a_grid_with_a_progress_bar 
 		    parameter handler error 
 		    (fun observable_hit causal_past (error,(log_info,list,story_list)) -> 
 		     (* list contains logging info about observable hit *)
@@ -329,7 +351,7 @@ let compress_and_print logger env log_info step_list =
 		    (simplified_event_list) 
 		    (log_info,(List.rev list),table2)
 		in error,log_info,table 
-	      in 
+	      in *)
 	      let error,causal_story_list = 
 		U.flatten_story_table  parameter handler error causal_story_list 
 	      in 

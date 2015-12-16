@@ -490,7 +490,7 @@ let convert_trace_into_musical_notation p h e info x = S.PH.B.import p h e info 
 
 let enrich_grid_with_transitive_closure = Causal.enrich_grid
 
-let enrich_grid_with_transitive_past_of_observables_with_a_progression_bar f = Causal.enrich_grid (S.PH.B.PB.CI.Po.K.H.get_logger f) Graph_closure.config_big_graph_with_progress_bar
+let enrich_grid_with_transitive_past_of_observables_with_a_progress_bar f = Causal.enrich_grid (S.PH.B.PB.CI.Po.K.H.get_logger f) Graph_closure.config_big_graph_with_progress_bar
 let enrich_grid_with_transitive_past_of_observables_without_a_progress_bar f = Causal.enrich_grid (S.PH.B.PB.CI.Po.K.H.get_logger f) Graph_closure.config_big_graph_without_progress_bar
 let enrich_grid_with_transitive_past_of_each_node_without_a_progress_bar f = Causal.enrich_grid (S.PH.B.PB.CI.Po.K.H.get_logger f) Graph_closure.config_big_graph_without_progress_bar
 let enrich_grid_with_transitive_past_of_each_node_without_a_progress_bar f = Causal.enrich_grid (S.PH.B.PB.CI.Po.K.H.get_logger f) Graph_closure.config_small_graph
@@ -529,10 +529,70 @@ let fold_left_with_progress_bar parameter string f a l =
   let () = print_fails parameter.S.PH.B.PB.CI.Po.K.H.out_channel_err string n_fail in 
   a 			    
 
-let fold_over_the_causal_past_of_observables_with_progress_bar parameter handler error f t a =
+let fold_over_the_causal_past_of_observables_through_a_grid_with_a_progress_bar parameter handler error f t a =
   let grid = convert_trace_into_grid t handler in 
   Causal.fold_over_causal_past_of_obs 
     (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
     Graph_closure.config_big_graph_with_progress_bar
     grid 
-    f (error,a) 
+    f (error,a)
+
+    
+let fold_over_the_causal_past_of_observables_with_a_progress_bar parameter log_step debug_mode handler log_info error f t a =
+  let () = 
+    if log_step parameter 
+    then 
+      Debug.tag (S.PH.B.PB.CI.Po.K.H.get_logger parameter) "\t - blackboard generation"
+  in 
+  let error,log_info,blackboard = convert_trace_into_musical_notation parameter handler error log_info t in
+  let error,list = extract_observable_hits_from_musical_notation parameter handler error blackboard in 
+  let n_stories = List.length list in 
+  let () =
+    if log_step parameter 
+    then 
+      Format.fprintf (S.PH.B.PB.CI.Po.K.H.get_logger parameter) "\t - computing causal past of each observed events (%i)@." n_stories 
+  in
+  (* generation of uncompressed stories *)
+  let () = 
+    if debug_mode parameter
+    then 
+      Debug.tag (S.PH.B.PB.CI.Po.K.H.get_logger parameter) "\t\t * causal compression "
+  in 
+  let log_info = S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
+  let grid = convert_trace_into_grid t handler in 
+  let error,log_info,_,_,a =
+    Causal.fold_over_causal_past_of_obs 
+      (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
+      Graph_closure.config_big_graph_with_progress_bar
+      grid
+      (fun observable_hit causal_past (error,log_info,counter,list,a) ->
+       match list with
+       | [] -> error,log_info,counter,list,a
+       | head::tail ->
+	  let observable_id = head in 
+	  let log_info = S.PH.B.PB.CI.Po.K.P.reset_log log_info in 
+	  let () = 
+	    if debug_mode parameter 
+	    then 
+	      Debug.tag (S.PH.B.PB.CI.Po.K.H.get_logger parameter) "\t\t * causal compression "
+	  in
+	  (* we translate the list of event ids into a trace thanks to the blackboad *)
+	  let error,trace = 
+	    translate parameter handler error blackboard (List.rev (observable_hit::causal_past)) 
+	  in
+	  (* we collect run time info about the observable *)
+	  let info = 
+	    match get_runtime_info_from_observable_hit observable_id 
+	    with 
+	    | None -> []
+	    | Some info -> 
+	       let info = {info with Mods.story_id = counter} in 
+	       let info = Mods.update_profiling_info log_info  info 
+	       in 
+	       [info]
+	  in
+	  let error,log_info,a = f parameter handler error log_info trace info a in
+	  error,log_info,counter+1,tail,a)
+      (error,log_info,1,List.rev list,a)
+  in
+  error,log_info,a 

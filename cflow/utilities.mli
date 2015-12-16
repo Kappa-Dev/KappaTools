@@ -92,10 +92,17 @@ val strongly_compress:
 type step_id = S.PH.B.PB.step_id
 type observable_hit
 
-val fold_over_the_causal_past_of_observables_with_progress_bar:
+val fold_over_the_causal_past_of_observables_with_a_progress_bar:
+  parameter -> (parameter -> bool) -> (parameter -> bool) -> kappa_handler -> profiling_info ->
+  error_log -> (parameter -> kappa_handler -> error_log -> profiling_info ->
+   trace -> profiling_info Mods.simulation_info list -> 'a -> error_log * profiling_info * 'a)
+    -> trace -> 'a  -> error_log * profiling_info * 'a
+       
+val fold_over_the_causal_past_of_observables_through_a_grid_with_a_progress_bar:
   parameter -> kappa_handler -> error_log ->
   (int -> int list -> error_log * 'a -> error_log * 'a) ->
   trace -> 'a  -> error_log * 'a
+
 val get_event_list_from_observable_hit:
   observable_hit -> step_id list
 val get_runtime_info_from_observable_hit:
@@ -124,7 +131,7 @@ val translate:
 val convert_trace_into_grid: trace -> kappa_handler -> cflow_grid
 
 (** compute transitive closure with different parameters (progress_bar, gc) *)
-val enrich_grid_with_transitive_past_of_observables_with_a_progression_bar:
+val enrich_grid_with_transitive_past_of_observables_with_a_progress_bar:
   parameter -> cflow_grid -> enriched_cflow_grid
 val enrich_grid_with_transitive_past_of_observables_without_a_progress_bar:
   parameter -> cflow_grid -> enriched_cflow_grid
