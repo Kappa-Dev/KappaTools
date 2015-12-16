@@ -19,7 +19,6 @@
   * under the terms of the GNU Library General Public License *)
 
 module U = Utilities 
-module D = U.D
 module S = U.S
 	     
 type secret_log_info = U.S.PH.B.PB.CI.Po.K.P.log_info

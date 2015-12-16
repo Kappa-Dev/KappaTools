@@ -19,3 +19,5 @@ The core of the interpreter
 {!modules: Expr_interpreter Rule_interpreter State_interpreter}
 and some storage and rendering
 {!modules: Counter Plot Outputs}
+
+{!modules: Utilities}
