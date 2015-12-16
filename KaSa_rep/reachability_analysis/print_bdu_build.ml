@@ -219,7 +219,8 @@ let print_bdu_build parameter error result =
       parameter
       result.store_wl_creation
   in
-  let _ =
+  (*print if one wants to debug*)
+  (*let _ =
      fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
@@ -228,7 +229,7 @@ let print_bdu_build parameter error result =
       parameter
       error
       result.store_bdu_potential_effect_restriction_map
-  in
+  in*)
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
@@ -239,7 +240,8 @@ let print_bdu_build parameter error result =
       error
       result.store_proj_bdu_potential_restriction_map
   in
-  let _ =
+  (*print if one wants to debug*)
+  (*let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
@@ -248,7 +250,7 @@ let print_bdu_build parameter error result =
       parameter
       error
       result.store_potential_list_restriction_map
-  in
+  in*)
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
@@ -259,7 +261,8 @@ let print_bdu_build parameter error result =
       error
       result.store_proj_potential_list_restriction_map
   in
-  let _ =
+  (*print if one wants to debug*)
+  (*let _ =
      fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
@@ -268,7 +271,7 @@ let print_bdu_build parameter error result =
       parameter
       error
       result.store_bdu_test_restriction_map
-  in
+  in*)
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
@@ -279,7 +282,8 @@ let print_bdu_build parameter error result =
       error
       result.store_proj_bdu_test_restriction_map
   in
-  let _ =
+  (*print if one wants to debug*)
+  (*let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
@@ -288,7 +292,7 @@ let print_bdu_build parameter error result =
       parameter
       error
       result.store_bdu_creation_restriction_map
-  in
+  in*)
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
@@ -299,7 +303,8 @@ let print_bdu_build parameter error result =
       error
       result.store_proj_bdu_creation_restriction_map
   in
-  let _ =
+  (*print if one wants to debug*)
+  (*let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
@@ -308,8 +313,8 @@ let print_bdu_build parameter error result =
       parameter
       error
       result.store_bdu_init_restriction_map
-  in
-  let _ =
+  in*)
+  (*let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
@@ -318,7 +323,7 @@ let print_bdu_build parameter error result =
       parameter
       error
       result.store_modif_list_restriction_map
-  in
+  in*)
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";

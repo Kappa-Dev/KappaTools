@@ -41,18 +41,6 @@ let print_test_bonds parameter error result =
     ) set
   ) map
 
-let print_test_bond_map parameter error set =
-  Map_site_address.Set.iter (fun (site_add1, site_add2) ->
-    fprintf parameter.log 
-      "{agent_id:%i; agent_type:%i; site_type:%i} -- "
-      site_add1.Cckappa_sig.agent_index site_add1.Cckappa_sig.agent_type 
-      site_add1.Cckappa_sig.site;
-    fprintf parameter.log 
-      "{agent_id:%i; agent_type:%i; site_type:%i} \n"
-      site_add2.Cckappa_sig.agent_index site_add2.Cckappa_sig.agent_type 
-      site_add2.Cckappa_sig.site     
-  ) set
-
 (************************************************************************************)
 
 let print_new_wl_side_effect parameter error result =
@@ -71,7 +59,6 @@ let print_new_wl_side_effect parameter error result =
 (************************************************************************************)
 
 let print_bdu_update_map parameter error result =
-  (*let result1, result_array = result in*)
   Map_bdu_update.Map.iter (fun (agent_type, cv_id) bdu_update ->
     let _ =
       fprintf parameter.log "agent_type:%i:cv_id:%i\n" agent_type cv_id
@@ -101,6 +88,8 @@ let print_bdu_fixpoint parameter error result =
   in
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
+      "------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter)
       "** Discovered sites that are bond on the rhs for the first time:\n";
     print_test_bonds
       parameter
@@ -108,6 +97,8 @@ let print_bdu_fixpoint parameter error result =
       result.store_test_has_bond_rhs
   in
   let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
     "** Fixpoint iteration function:\n";
     print_bdu_update_map

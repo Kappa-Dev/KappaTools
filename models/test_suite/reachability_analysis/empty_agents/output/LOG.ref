@@ -180,36 +180,6 @@ Reachability analysis...
 
 ------------------------------------------------------
 Covering classes with type set:
-Test for rule:0
-enabled
-Test for rule:0
-enabled
-Test for rule:1
-enabled
-Test for rule:0
-enabled
-Test for rule:1
-enabled
-Test for rule:2
-enabled
-Test for rule:0
-enabled
-Test for rule:1
-enabled
-Test for rule:2
-enabled
-Test for rule:3
-enabled
-Test for rule:0
-enabled
-Test for rule:1
-enabled
-Test for rule:2
-enabled
-Test for rule:3
-enabled
-Test for rule:4
-enabled
 ============================================================
 * BDU Analysis:
 ============================================================
@@ -244,25 +214,13 @@ agent_id:1:agent_type:3:site_type:0@set of rule_id:
 rule_id:3
 agent_id:1:agent_type:5:site_type:0@set of rule_id:
 rule_id:4
-------------------------------------------------------------
-Set of rules that may modify a given site (excluding created agents, without agent_id):
-------------------------------------------------------------
-agent_type:3:site_type:0@set of rule_id:
-rule_id:3
-agent_type:5:site_type:0@set of rule_id:
-rule_id:4
-------------------------------------------------------------
-Set of rules that may test a given site (without agent_id):
-------------------------------------------------------------
-------------------------------------------------------------
-Set of rules that may test and modify a given site (excluding created agents, without agent_id):
-------------------------------------------------------------
-agent_type:3:site_type:0@set of rule_id:
-rule_id:3
-agent_type:5:site_type:0@set of rule_id:
-rule_id:4
 
 ** Dynamic information:
+
+------------------------------------------------------------
+(Full) Contact map and initital state:
+------------------------------------------------------------
+Sites are annotated with the id of binding type:
 
 ------------------------------------------------------------
 (Syntactic) Contact map (only considering rhs) and initital state:
@@ -274,51 +232,25 @@ List of rules to awake when the state of a site is modified and tested:
 ------------------------------------------------------------
 
 ------------------------------------------------------------
-* Rules in the working list:
-------------------------------------------------------------
-
-------------------------------------------------------------
 * Covering classes with new indexes:
 ------------------------------------------------------------
 - Working list creation:
 0 1 2 3 4 
 
 ------------------------------------------------------------
-- Bdu for the valuations of the views that are created from potential partner in side effects (per rule, agent and covering class):
-
-
-------------------------------------------------------------
 - Bdu for the valuations of the views that are created from potential partner in side effects (projection per rule):
 
 
 ------------------------------------------------------------
-- List for update of the views due to modification that are created from potential partner in side effects (per rule, agent and covering class):
-
-------------------------------------------------------------
 - List for update of the views due to modification that are created from potential partner in side effects (projection per rule):
-
-------------------------------------------------------------
-- Bdu for the valuations of the views that are tested (per rule, agent and covering class):
-
 
 ------------------------------------------------------------
 - Bdu for the valuations of the views that are tested (projection per rule):
 
 
 ------------------------------------------------------------
-- Bdu for the valuations of the views that are created (per rule, agent and covering class):
-
-
-------------------------------------------------------------
 - Bdu for the valuations of the views that are created (per rule_id; projection function):
 
-
-------------------------------------------------------------
-- Bdu for the valuations of the views that are created in the initial state (per rule, agent and covering class):
-
-
-------------------------------------------------------------
-- List for update of the views due to modification (per rule, agent and covering class):
 
 ------------------------------------------------------------
 - List for update of the views due to modification (projection per rule):
@@ -327,7 +259,9 @@ List of rules to awake when the state of a site is modified and tested:
 * Fixpoint iteration :
 ------------------------------------------------------------
 ** New update function when discovered sites that are bond on the rhs for the first time:
+------------------------------------------------------------
 ** Discovered sites that are bond on the rhs for the first time:
 false
+------------------------------------------------------------
 ** Fixpoint iteration function:
 execution finished without any exception

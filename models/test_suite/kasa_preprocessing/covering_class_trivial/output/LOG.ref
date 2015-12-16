@@ -218,41 +218,13 @@ rule_id:2
 agent_id:0:agent_type:0:site_type:2@set of rule_id:
 rule_id:1
 rule_id:2
-------------------------------------------------------------
-Set of rules that may modify a given site (excluding created agents, without agent_id):
-------------------------------------------------------------
-agent_type:0:site_type:1@set of rule_id:
-rule_id:0
-agent_type:0:site_type:2@set of rule_id:
-rule_id:1
-------------------------------------------------------------
-Set of rules that may test a given site (without agent_id):
-------------------------------------------------------------
-agent_type:0:site_type:0@set of rule_id:
-rule_id:0
-rule_id:1
-rule_id:2
-agent_type:0:site_type:1@set of rule_id:
-rule_id:0
-rule_id:2
-agent_type:0:site_type:2@set of rule_id:
-rule_id:1
-rule_id:2
-------------------------------------------------------------
-Set of rules that may test and modify a given site (excluding created agents, without agent_id):
-------------------------------------------------------------
-agent_type:0:site_type:0@set of rule_id:
-rule_id:0
-rule_id:1
-rule_id:2
-agent_type:0:site_type:1@set of rule_id:
-rule_id:0
-rule_id:2
-agent_type:0:site_type:2@set of rule_id:
-rule_id:1
-rule_id:2
 
 ** Dynamic information:
+
+------------------------------------------------------------
+(Full) Contact map and initital state:
+------------------------------------------------------------
+Sites are annotated with the id of binding type:
 
 ------------------------------------------------------------
 (Syntactic) Contact map (only considering rhs) and initital state:
@@ -272,17 +244,9 @@ rule_id:1
 rule_id:2
 
 ------------------------------------------------------------
-* Rules in the working list:
-------------------------------------------------------------
-
-------------------------------------------------------------
 * Covering classes with new indexes:
 ------------------------------------------------------------
 - Working list creation:
-
-
-------------------------------------------------------------
-- Bdu for the valuations of the views that are created from potential partner in side effects (per rule, agent and covering class):
 
 
 ------------------------------------------------------------
@@ -290,86 +254,7 @@ rule_id:2
 
 
 ------------------------------------------------------------
-- List for update of the views due to modification that are created from potential partner in side effects (per rule, agent and covering class):
-
-------------------------------------------------------------
 - List for update of the views due to modification that are created from potential partner in side effects (projection per rule):
-
-------------------------------------------------------------
-- Bdu for the valuations of the views that are tested (per rule, agent and covering class):
-
-agent_id:0:agent_type:0:rule_id:0:covering_class_id:0
-Id=7
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=6
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
-agent_id:0:agent_type:0:rule_id:1:covering_class_id:0
-Id=7
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=6
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
-agent_id:0:agent_type:0:rule_id:2:covering_class_id:0
-Id=7
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=6
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
 
 ------------------------------------------------------------
 - Bdu for the valuations of the views that are tested (projection per rule):
@@ -451,23 +336,8 @@ Id=7
 
 
 ------------------------------------------------------------
-- Bdu for the valuations of the views that are created (per rule, agent and covering class):
-
-
-------------------------------------------------------------
 - Bdu for the valuations of the views that are created (per rule_id; projection function):
 
-
-------------------------------------------------------------
-- Bdu for the valuations of the views that are created in the initial state (per rule, agent and covering class):
-
-
-------------------------------------------------------------
-- List for update of the views due to modification (per rule, agent and covering class):
-agent_id:0:agent_type:0:rule_id:0:covering_class_id:0
-site_type:2:state:1
-agent_id:0:agent_type:0:rule_id:1:covering_class_id:0
-site_type:2:state:1
 
 ------------------------------------------------------------
 - List for update of the views due to modification (projection per rule):
@@ -490,7 +360,9 @@ agent_type:0:covering_class_id:1:@set of rule_id:
 rule_id:0
 rule_id:1
 rule_id:2
+------------------------------------------------------------
 ** Discovered sites that are bond on the rhs for the first time:
 false
+------------------------------------------------------------
 ** Fixpoint iteration function:
 execution finished without any exception

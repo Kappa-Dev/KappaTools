@@ -120,12 +120,6 @@ Mapping between global identifier of sites (per agent) and local identifier of s
 Covering_class_id:0
 Global:site_type:0  => Local:site_type':1
 Local:site_type':1  => Global:site_type:0
-Test for rule:0
-enabled
-Test for rule:0
-enabled
-Test for rule:1
-enabled
 ============================================================
 * BDU Analysis:
 ============================================================
@@ -168,25 +162,13 @@ agent_id:0:agent_type:2:site_type:0@set of rule_id:
 rule_id:1
 agent_id:1:agent_type:0:site_type:0@set of rule_id:
 rule_id:1
-------------------------------------------------------------
-Set of rules that may modify a given site (excluding created agents, without agent_id):
-------------------------------------------------------------
-agent_type:0:site_type:0@set of rule_id:
-rule_id:1
-------------------------------------------------------------
-Set of rules that may test a given site (without agent_id):
-------------------------------------------------------------
-agent_type:2:site_type:0@set of rule_id:
-rule_id:1
-------------------------------------------------------------
-Set of rules that may test and modify a given site (excluding created agents, without agent_id):
-------------------------------------------------------------
-agent_type:0:site_type:0@set of rule_id:
-rule_id:1
-agent_type:2:site_type:0@set of rule_id:
-rule_id:1
 
 ** Dynamic information:
+
+------------------------------------------------------------
+(Full) Contact map and initital state:
+------------------------------------------------------------
+Sites are annotated with the id of binding type:
 
 ------------------------------------------------------------
 (Syntactic) Contact map (only considering rhs) and initital state:
@@ -200,51 +182,25 @@ agent_type:2:covering_class_id:0:@set of rule_id:
 rule_id:1
 
 ------------------------------------------------------------
-* Rules in the working list:
-------------------------------------------------------------
-
-------------------------------------------------------------
 * Covering classes with new indexes:
 ------------------------------------------------------------
 - Working list creation:
 0 1 
 
 ------------------------------------------------------------
-- Bdu for the valuations of the views that are created from potential partner in side effects (per rule, agent and covering class):
-
-
-------------------------------------------------------------
 - Bdu for the valuations of the views that are created from potential partner in side effects (projection per rule):
 
 
 ------------------------------------------------------------
-- List for update of the views due to modification that are created from potential partner in side effects (per rule, agent and covering class):
-
-------------------------------------------------------------
 - List for update of the views due to modification that are created from potential partner in side effects (projection per rule):
-
-------------------------------------------------------------
-- Bdu for the valuations of the views that are tested (per rule, agent and covering class):
-
 
 ------------------------------------------------------------
 - Bdu for the valuations of the views that are tested (projection per rule):
 
 
 ------------------------------------------------------------
-- Bdu for the valuations of the views that are created (per rule, agent and covering class):
-
-
-------------------------------------------------------------
 - Bdu for the valuations of the views that are created (per rule_id; projection function):
 
-
-------------------------------------------------------------
-- Bdu for the valuations of the views that are created in the initial state (per rule, agent and covering class):
-
-
-------------------------------------------------------------
-- List for update of the views due to modification (per rule, agent and covering class):
 
 ------------------------------------------------------------
 - List for update of the views due to modification (projection per rule):
@@ -255,7 +211,9 @@ rule_id:1
 ** New update function when discovered sites that are bond on the rhs for the first time:
 agent_type:2:covering_class_id:0:@set of rule_id:
 rule_id:1
+------------------------------------------------------------
 ** Discovered sites that are bond on the rhs for the first time:
 false
+------------------------------------------------------------
 ** Fixpoint iteration function:
 execution finished without any exception

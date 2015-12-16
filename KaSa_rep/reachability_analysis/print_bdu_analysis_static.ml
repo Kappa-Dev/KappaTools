@@ -433,22 +433,23 @@ let print_result_static parameter error result =
       error 
       result.store_test_modification_sites
   in
-  let _ =
+  (*print if one wants to debug*)
+  (*let _ =
     print_modification_map
       parameter
       error 
       result.store_modif_map
-  in
-  let _ =
+  in*)
+  (*let _ =
     print_test_map
       parameter
       error 
       result.store_test_map
-  in
-  let _ =
+  in*)
+ (*let _ =
     print_test_modification_map
       parameter
       error 
       result.store_test_modif_map
-  in
+  in*)
   error

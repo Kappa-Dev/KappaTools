@@ -133,6 +133,7 @@ let collect_test_has_bond_rhs parameter error rule_id rule store_result =
 (************************************************************************************)
 (*side effects in the case of half break*)
 
+(*FIXME*)
 let store_new_result_hb_map
     parameter
     error 
@@ -161,40 +162,41 @@ let store_new_result_hb_map
  Int2Map_HalfBreak_effect.Map.fold
     (fun (agent_type_eff, site_type_eff) (l1, l2) (error, store_result) ->
       List.fold_left (fun (error, store_result) (rule_id_eff, state) ->
-        Int2Map_CM_state.Map.fold
-          (fun (agent_type1, site_type1, state1) (l, triple_list) 
+        Int2Map_test_state.Map.fold
+          (fun (agent_type1, site_type1 (*state1*)) triple_set 
             (error, store_result) ->
-              List.fold_left (fun (error, store_result) (agent_type2, site_type2, state2) ->
-                if state = state2
-                then
-                  if agent_type1 = agent_type_eff &&
-                    site_type1 = site_type_eff
+              Map_second_agent_bind.Set.fold
+                (fun (agent_type2, site_type2 (*, state2*)) (error, store_result) ->
+                  if state = 0 (*state2*)
                   then
-                    Int2Map_CV_Modif.Map.fold
-                      (fun (agent_type, cv_id) (l', rule_id_set) (error, store_result) ->
-                        Site_map_and_set.Set.fold
-                          (fun rule_id_update (error, current_result) ->
-                            if agent_type = agent_type2
-                            then
-                              let error, result =
-                                add_link (agent_type, cv_id) rule_id_eff
-                                  current_result
-                              in
-                              error, result
-                            else
-                              error, current_result
-                          ) rule_id_set (error, store_result)
-                      ) store_covering_classes_modification_update
-                      (error, store_result)
+                    if agent_type1 = agent_type_eff &&
+                      site_type1 = site_type_eff
+                    then
+                      Int2Map_CV_Modif.Map.fold
+                        (fun (agent_type, cv_id) (l', rule_id_set) (error, store_result) ->
+                          Site_map_and_set.Set.fold
+                            (fun rule_id_update (error, current_result) ->
+                              if agent_type = agent_type2
+                              then
+                                let error, result =
+                                  add_link (agent_type, cv_id) rule_id_eff
+                                    current_result
+                                in
+                                error, result
+                              else
+                                error, current_result
+                            ) rule_id_set (error, store_result)
+                        ) store_covering_classes_modification_update
+                        (error, store_result)
+                    else
+                    error, store_result
                   else
                     error, store_result
-                else
-                  error, store_result
-              ) (error, store_result) triple_list            
-          )store_contact_map (error, store_result)
+                ) triple_set (error, store_result)
+          ) store_contact_map (error, store_result)
       ) (error, store_result) l2
     ) half_break_map (error, store_result_map)
-
+   
 (************************************************************************************)
 (*side effects in the case of remove*)
 
@@ -226,11 +228,11 @@ let store_new_result_remove_map
   Int2Map_Remove_effect.Map.fold
     (fun (agent_type_eff, site_type_eff) (l1, l2) (error, store_result) ->
       List.fold_left (fun (error, store_result) rule_id_eff ->
-        Int2Map_CM_state.Map.fold
-          (fun (agent_type1, site_type1, state1)(l, triple_list)
+        Int2Map_test_state.Map.fold
+          (fun (agent_type1, site_type1 (*, state1*))triple_set
             (error, store_result) ->
-              List.fold_left 
-                (fun (error, store_result) (agent_type2, site_type2, state2) ->
+              Map_second_agent_bind.Set.fold
+                (fun (agent_type2, site_type2 (*, state2*)) (error, store_result) ->
                   if agent_type1 = agent_type_eff && 
                     site_type1 = site_type_eff
                   then
@@ -255,7 +257,7 @@ let store_new_result_remove_map
                     error, store_result
                   else
                     error, store_result
-                ) (error, store_result) triple_list
+                ) triple_set (error, store_result)
           ) store_contact_map (error, store_result)
       ) (error, store_result) l2
     ) remove_map (error, store_result_map)
@@ -411,19 +413,19 @@ let collect_update_hb_remove_map parameter error
 let add_update_to_wl parameter error store_covering_classes_modification_update wl =
   Int2Map_CV_Modif.Map.fold
     (fun (agent_type, cv_id) (l1, s1) (error, wl) ->
-      let _ = Printf.fprintf stdout "in add_update_to_wl:agent_type:%i:cv_id:%i\n" agent_type cv_id in
+      (*let _ = Printf.fprintf stdout "in add_update_to_wl:agent_type:%i:cv_id:%i\n" agent_type cv_id in
       let _ = Site_map_and_set.Set.iter 
         (Printf.fprintf stdout "in add_update_to_wl: set of rule_id:%i\n") s1
-      in
+      in*)
       let error, wl =
         Site_map_and_set.Set.fold (fun rule_id (error, wl) ->
-          let _ = Printf.fprintf stdout "in add_update_to_wl:rule_id:%i\n" rule_id in
+          (*let _ = Printf.fprintf stdout "in add_update_to_wl:rule_id:%i\n" rule_id in*)
           let error, wl = IntWL.push parameter error rule_id wl
           in
-          let _ =
+          (*let _ =
             Printf.fprintf stdout "in add_update_to_wl: working list:\n";
             Fifo.IntWL.print_wl parameter wl 
-          in
+          in*)
           error, wl
         ) s1 (error, wl)
       in
@@ -505,6 +507,10 @@ let is_enable parameter handler error bdu_true bdu_false
           | None -> error, true, bdu_true (*if bdu_test is empty*)
           | Some bdu_test -> error, false, bdu_test
         in
+        (*TEST*)
+        (*let _ = fprintf stdout "in is_enable:bdu_test\n";
+          Mvbdu_wrapper.Mvbdu.print stdout "" bdu_test
+        in*)
         (*-----------------------------------------------------------------------*)
         (*search bdu_X inside a store_result_map*)
         let error, bdu_X =
@@ -615,11 +621,12 @@ let views_can_apply parameter handler error agent_id agent_type cv_id bdu_true
       list_b
       bdu_X
   in
-  let _ =
+  (*TEST*)
+  (*let _ =
     Printf.fprintf stdout "in views_can_apply:(agent_type:%i, cv_id:%i) bdu_update:\n"
       agent_type cv_id;
     Mvbdu_wrapper.Mvbdu.print stdout "" bdu_update
-  in
+  in*)
   error, handler, bdu_update
 
 (************************************************************************************)
@@ -630,9 +637,8 @@ let compute_view_new_and_bond parameter handler error
     is_new_view 
     is_new_bond
     store_new_result_map
-    (*wl_tl*)
     store_covering_classes_modification_update
-    store_wl
+    wl_tl
     store_result =
   let error, (handler, new_wl, store_result) =
     if is_new_view
@@ -645,7 +651,7 @@ let compute_view_new_and_bond parameter handler error
               parameter
               error
               store_new_result_map
-              (*wl_tl*)store_wl
+              wl_tl
           in
           error, (handler, new_wl, store_result)
         else
@@ -654,12 +660,12 @@ let compute_view_new_and_bond parameter handler error
               parameter
               error
               store_covering_classes_modification_update
-              (*wl_tl*)store_wl
+              wl_tl
           in
           error, (handler, new_wl, store_result)
       end
     else
-      error, (handler, store_wl, store_result)
+      error, (handler, wl_tl, store_result)
   in
   error, (handler, new_wl, store_result)
 
@@ -702,7 +708,7 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
   let error, (handler, new_wl, store_new_result) =
     Map_test_bdu.Map.fold
       (fun (agent_id, agent_type, rule_id_test, cv_id) _
-        (error, (handler, store_wl, store_update_map)) ->
+        (error, (handler, wl_tl, store_update_map)) ->
           (*-----------------------------------------------------------------------*)
           let error, handler, bdu_update =
             views_can_apply
@@ -734,9 +740,8 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
               is_new_view
               is_new_bond
               store_new_result_map
-              (*wl_tl*)
               store_covering_classes_modification_update
-              store_wl
+              wl_tl
               store_result
           in
           (*let _ =
@@ -774,6 +779,13 @@ let collect_bdu_fixpoint_without_init parameter handler error
     store_covering_classes_modification_update
     store_result_map
     =
+  (*let _ =
+    fprintf stdout "store_result_map\n";
+    Map_bdu_update.Map.iter (fun (agent_type, cv_id) bdu ->
+      fprintf stdout "(agent_type:%i:cv_id:%i)\n" agent_type cv_id;
+      Mvbdu_wrapper.Mvbdu.print stdout "" bdu
+    ) store_result_map
+  in*)
   (*-----------------------------------------------------------------------*)
   let error, (handler, store_bdu_fixpoint_map) =
     let rec aux acc_wl (error, handler, store_bdu_update_map) =
@@ -823,10 +835,10 @@ let collect_bdu_fixpoint_without_init parameter handler error
           in
           (*-----------------------------------------------------------------------*)
           begin
-            let _ = Printf.fprintf stdout "Test for rule:%i\n" rule_id in
+            (*let _ = Printf.fprintf stdout "Test for rule:%i\n" rule_id in*)
             if is_enable
             then
-              let _ = Printf.fprintf stdout "enabled\n" in
+              (*let _ = Printf.fprintf stdout "enabled\n" in*)
               let error, (handler, new_wl, store_new_result) =
                 compute_views_enabled
                   parameter
@@ -846,19 +858,9 @@ let collect_bdu_fixpoint_without_init parameter handler error
                   store_bdu_test_restriction_map
                   store_bdu_update_map
               in
-              (*let _ =
-                fprintf stdout "--------------------------------------\n1)\n";
-                fprintf stdout "rule_id:%i:is_enable:%b\n"
-                  rule_id is_enable;
-              in*)
               aux new_wl (error, handler, store_new_result)
             else
-              let _ = Printf.fprintf stdout "disabled\n" in
-              (*let _ =
-                fprintf stdout "--------------------------------------\n2)\n";
-                fprintf stdout "rule_id:%i:is_enable:%b\n"
-                  rule_id is_enable;
-              in*)
+              (*let _ = Printf.fprintf stdout "disabled\n" in*)
               aux wl_tl (error, handler, store_bdu_update_map)
           end
     in
@@ -871,7 +873,7 @@ let collect_bdu_fixpoint_without_init parameter handler error
 (*fixpoint iteration with initial state*)
 
 (*FIXME: there is no bdu_test*)
-let collect_bdu_fixpoint_init_map parameter handler error 
+let collect_bdu_fixpoint_with_init parameter handler error 
     rule
     bdu_true
     bdu_false
@@ -889,24 +891,91 @@ let collect_bdu_fixpoint_init_map parameter handler error
     store_bdu_init_restriction_map
     store_result_map
     =
-  let store_bdu_fixpoint_init_map =
-    Map_bdu_update.Map.union store_result_map store_bdu_init_restriction_map
+  (*fold 2 map*)
+  let add_link handler (agent_type, cv_id) bdu store_result =
+    let bdu_old =
+      Map_bdu_update.Map.find_default bdu_false (agent_type, cv_id) store_result
+    in
+    let error, handler, bdu_union =
+      Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_old bdu
+    in
+    let result_map =
+      Map_bdu_update.Map.add (agent_type, cv_id) bdu_union store_result
+    in
+    error, result_map
   in
+  let error, store_bdu_fixpoint_init_map =
+    Map_bdu_update.Map.fold2_with_logs
+      (fun parameter error str str_opt exn ->
+        let error, _ = warn parameter error str_opt exn Not_found in
+        error
+      )
+      parameter
+      error
+      (fun parameter error (agent_type, cv_id) bdu store_result ->
+        let error, store_result =
+          add_link handler (agent_type, cv_id) bdu store_result
+        in
+        error, store_result
+      )
+      (fun parameter error (agent_type, cv_id) bdu store_result ->
+        let error, store_result =
+          add_link handler (agent_type, cv_id) bdu store_result
+        in
+        error, store_result
+      )
+      (fun parameter error (agent_type, cv_id) bdu bdu' store_result ->
+        let error, handler, union_bdu =
+          Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu bdu'
+        in
+        let error, store_result =
+          add_link handler (agent_type, cv_id) union_bdu store_result
+        in
+        error, store_result
+      )
+      store_result_map
+      store_bdu_init_restriction_map
+      Map_bdu_update.Map.empty
+  in
+  (*let store_bdu_fixpoint_init_map =
+    Map_bdu_update.Map.union store_result_map store_bdu_init_restriction_map
+  in*)
+  (*let _ =
+    fprintf stdout "store_result_map\n";
+    Map_bdu_update.Map.iter (fun (agent_type, cv_id) bdu ->
+      fprintf stdout "(agent_type:%i:cv_id:%i)\n" agent_type cv_id;
+      Mvbdu_wrapper.Mvbdu.print stdout "" bdu
+    ) store_result_map;
+    fprintf stdout "store_bdu_init_restriction_map:\n";
+    Map_bdu_update.Map.iter (fun (agent_type, cv_id) bdu ->
+      fprintf stdout "(agent_type:%i:cv_id:%i)\n" agent_type cv_id;
+      Mvbdu_wrapper.Mvbdu.print stdout "" bdu
+    ) store_bdu_init_restriction_map;
+    fprintf stdout "store_bdu_fixpoint_init_map\n";
+    Map_bdu_update.Map.iter (fun (agent_type, cv_id) bdu ->
+      fprintf stdout "(agent_type:%i:cv_id:%i)\n" agent_type cv_id;
+      Mvbdu_wrapper.Mvbdu.print stdout "" bdu
+    ) store_bdu_fixpoint_init_map
+  in*)
   let error, wl_init_creation =
     add_update_to_wl parameter error store_covering_classes_modification_update
       wl_creation
   in
-  let error, (handler, store_bdu_fixpoint_map) =
-    let rec aux acc_wl (error, handler, store_bdu_update_map) =
+  (*let _ =
+    fprintf stdout "wl_init_creation:\n";
+    Fifo.IntWL.print_wl parameter wl_init_creation
+  in*)
+  (*let error, (handler, store_bdu_fixpoint_map) =*)
+    let rec aux acc_wl (error, handler, store_bdu_fixpoint_init_map) =
       if IntWL.is_empty acc_wl
       then
-        error, (handler, store_bdu_update_map)
+        error, (handler, store_bdu_fixpoint_init_map)
       else
         (*-----------------------------------------------------------------------*)
         (*pop the first element (rule_id) in this working list*)
         let error, (rule_id_op, wl_tl) = IntWL.pop parameter error acc_wl in
         match rule_id_op with
-        | None -> error, (handler, store_bdu_update_map) (* Put a warning in error *)
+        | None -> error, (handler, store_bdu_fixpoint_init_map) (* Put a warning in error *)
         | Some rule_id ->
           (*----------------------------------------------------------------------*)
           (*compute bdu_creation, bdu_test and modif_list for this rule_id*)
@@ -939,14 +1008,14 @@ let collect_bdu_fixpoint_init_map parameter handler error
               bdu_false
               bdu_test_map
               store_bdu_test_restriction_map
-              store_bdu_update_map
+              store_bdu_fixpoint_init_map
           in
           (*-----------------------------------------------------------------------*)
           begin
-            let _ = Printf.fprintf stdout "Test for rule:%i\n" rule_id in
+            (*let _ = Printf.fprintf stdout "Test for rule:%i\n" rule_id in*)
             if is_enable
             then
-              let _ = Printf.fprintf stdout "enabled\n" in
+              (*let _ = Printf.fprintf stdout "enabled\n" in*)
               let error, (handler, new_wl, store_new_result) =
                 compute_views_enabled
                   parameter
@@ -964,21 +1033,120 @@ let collect_bdu_fixpoint_init_map parameter handler error
                   wl_tl
                   store_covering_classes_modification_update
                   store_bdu_test_restriction_map
-                  store_bdu_update_map
+                  store_bdu_fixpoint_init_map
               in
               aux new_wl (error, handler, store_new_result)
             else
-              let _ = Printf.fprintf stdout "disabled\n" in
-              aux wl_tl (error, handler, store_bdu_update_map)
+              (*let _ = Printf.fprintf stdout "disabled\n" in*)
+              aux wl_tl (error, handler, store_bdu_fixpoint_init_map)
           end
     in
     (*start with init_map and union with initial state*)
     aux wl_init_creation (error, handler, store_bdu_fixpoint_init_map)
-  in
-  error, (handler, store_bdu_fixpoint_map)
 
 (************************************************************************************)
 (*final fixpoint iteration*)
+
+let collect_bdu_fixpoint_map' parameter handler error 
+    rule 
+    wl_creation
+    store_proj_bdu_creation_restriction_map
+    store_proj_modif_list_restriction_map
+    store_proj_bdu_test_restriction_map
+    store_proj_bdu_potential_restriction_map
+    store_proj_potential_list_restriction_map
+    store_bdu_test_restriction_map
+    is_new_bond
+    store_test_has_bond_rhs
+    store_new_result_map
+    store_covering_classes_modification_update
+    store_bdu_init_restriction_map
+    store_result_map
+    =
+  let error, handler, bdu_false = 
+    Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error
+  in 
+  let error, handler, bdu_true = 
+    Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error 
+  in
+  (*-----------------------------------------------------------------------*)
+  (*union the result of bdu_fixpoint_map with initial state*)
+  let error, (handler, store_bdu_fixpoint_map) =
+    collect_bdu_fixpoint_with_init
+      parameter
+      handler
+      error
+      rule
+      bdu_true
+      bdu_false
+      wl_creation
+      store_proj_bdu_creation_restriction_map
+      store_proj_modif_list_restriction_map
+      store_proj_bdu_test_restriction_map
+      store_proj_bdu_potential_restriction_map
+      store_proj_potential_list_restriction_map
+      store_bdu_test_restriction_map
+      is_new_bond
+      store_test_has_bond_rhs
+      store_new_result_map
+      store_covering_classes_modification_update
+      store_bdu_init_restriction_map
+      store_result_map
+  in
+  error, (handler, store_bdu_fixpoint_map)
+
+  (* if not (Map_bdu_update.Map.is_empty store_bdu_init_restriction_map)
+   then
+    (*FIXME*)
+    (*there is initial state*)
+    let error, (handler, store_bdu_fixpoint_map) =
+      collect_bdu_fixpoint_init_map
+        parameter
+        handler
+        error
+        rule
+        bdu_true
+        bdu_false
+        wl_creation
+        store_proj_bdu_creation_restriction_map
+        store_proj_modif_list_restriction_map
+        store_proj_bdu_test_restriction_map
+        store_proj_bdu_potential_restriction_map
+        store_proj_potential_list_restriction_map
+        store_bdu_test_restriction_map
+        is_new_bond
+        store_test_has_bond_rhs
+        store_new_result_map
+        store_covering_classes_modification_update
+        store_bdu_init_restriction_map
+        store_result_map
+    in
+    error, (handler, store_bdu_fixpoint_map)
+  else
+    (*there is no initial state*)
+    let error, (handler, store_bdu_fixpoint_map) =
+      collect_bdu_fixpoint_without_init
+        parameter
+        handler
+        error
+        rule
+        bdu_true
+        bdu_false
+        wl_creation
+        store_proj_bdu_creation_restriction_map
+        store_proj_modif_list_restriction_map
+        store_proj_bdu_test_restriction_map
+        store_proj_bdu_potential_restriction_map
+        store_proj_potential_list_restriction_map
+        store_bdu_test_restriction_map
+        is_new_bond
+        store_test_has_bond_rhs
+        store_new_result_map
+        store_covering_classes_modification_update
+        store_result_map
+    in
+    error, (handler, store_bdu_fixpoint_map)*)
+
 
 let collect_bdu_fixpoint_map parameter handler error 
     rule 
@@ -1009,7 +1177,7 @@ let collect_bdu_fixpoint_map parameter handler error
     (*FIXME*)
     (*there is initial state*)
     let error, (handler, store_bdu_fixpoint_map) =
-      collect_bdu_fixpoint_init_map
+      collect_bdu_fixpoint_with_init
         parameter
         handler
         error

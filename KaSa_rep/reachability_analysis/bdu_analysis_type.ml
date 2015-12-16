@@ -272,6 +272,35 @@ module Map_test_bond =
       let compare = compare
     end)
 
+(*binding*)
+module Map_second_agent_bind =
+  SetMap.Make (
+    struct
+      type t = int * int
+      let compare = compare
+    end )
+
+module Int2Map_test_state =
+  SetMap.Make (
+    struct
+      type t = int * int
+      let compare = compare
+    end )
+
+module Set_triple =
+  SetMap.Make (
+    struct
+      type t = int * int * int
+      let compare = compare
+    end )
+
+module Int2Map_state =
+  SetMap.Make (
+    struct
+      type t = int * int * int
+      let compare = compare
+    end )
+
 (************************************************************************************)
 (*static information*)
 
@@ -315,9 +344,14 @@ type wl_int = IntWL.WSetMap.elt list * IntWL.WSetMap.elt list * IntWL.WSetMap.Se
 
 type bdu_analysis_dynamic =
   {
+    store_contact_map_full :
+     Set_triple.Set.t Int2Map_CM_state.Map.t;
     store_contact_map : 
     (*TODO: combine contact map and modification update into a product type*)
-    (int list * (int * int * int) list) Int2Map_CM_state.Map.t;
+    Map_second_agent_bind.Set.t Int2Map_test_state.Map.t;
+    (*store_test : Set_triple.Set.t Int2Map_CM_state.Map.t;
+    store_diff : Set_triple.Set.t Int2Map_CM_state.Map.t * Set_triple.Set.t 
+      Int2Map_CM_state.Map.t;*)
     store_covering_classes_modification_update : (*update(c)*)
       (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;
   }

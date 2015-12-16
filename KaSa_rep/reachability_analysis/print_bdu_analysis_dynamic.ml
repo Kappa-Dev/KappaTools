@@ -27,7 +27,7 @@ let trace = false
 (************************************************************************************)
 (*contact map*)
 
-let print_contact_map_aux parameter error result =
+(*let print_contact_map_aux parameter error result =
   Int2Map_CM_state.Map.iter
     (fun (x, y, s) (l1, l2) ->
       if l1 <> []
@@ -53,7 +53,17 @@ let print_contact_map_aux parameter error result =
             "agent_type:%i@site_type:%i:state:%i--agent_type':%i@site_type':%i:state':%i\n"
             x y s z t s'
 	) l2
-    ) result
+    ) result*)
+
+
+let print_contact_map_aux parameter error result =
+  Int2Map_test_state.Map.iter (fun (agent1, site1) s ->
+    Map_second_agent_bind.Set.iter (fun (agent2, site2) ->
+        fprintf stdout "agent_type:%i@site_type:%i--agent_type':%i@site_type':%i\n"
+          agent1 site1 agent2 site2 
+    ) s
+  ) result
+
 
 let print_contact_map parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
@@ -74,27 +84,41 @@ let print_contact_map parameter error result =
 
 (************************************************************************************)
 
+let print_contact_map_full_aux parameter error result =
+  Int2Map_CM_state.Map.iter
+    (fun (x, y, s) set ->
+      Set_triple.Set.iter
+	(fun (z, t, s') ->
+	  Printf.fprintf parameter.log
+            "agent_type:%i@site_type:%i:state:%i--agent_type':%i@site_type':%i:state':%i\n"
+            x y s z t s'
+	) set
+    ) result
+
+let print_contact_map_full parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "\n------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "(Full) Contact map and initital state:\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "Sites are annotated with the id of binding type:\n";
+  let error =
+    print_contact_map_full_aux
+      parameter
+      error
+      result
+  in
+  error
+
+(************************************************************************************)
+
 let print_covering_classes_modification_aux parameter error result =
   Int2Map_CV_Modif.Map.iter
     ( fun (x, y) (l1, s2) ->
       if l1 <> []
       then ()
-        (*begin
-          let _ =
-            fprintf parameter.log
-              "agent_type:%i:covering_class_id:%i" x y
-          in
-          let _ = List.fold_left
-            (fun bool x ->
-              (if bool
-               then
-                  fprintf parameter.log ", ");
-              fprintf parameter.log "agent_type:%i" x;
-              true
-            ) false l1
-          in
-          fprintf stdout "\n"
-        end*)
       else ();
       let _ =
         fprintf parameter.log
@@ -118,6 +142,33 @@ let print_covering_classes_modification parameter error result =
     error
     result
     
+let print_test parameter error result =
+  Int2Map_CM_state.Map.iter (fun (agent_type, site_type, state) s ->
+    (*fprintf stdout "agent_type:%i:site_type:%i:state:%i\n" agent_type site_type state;*)
+    Set_triple.Set.iter (fun (agent2, site2, state) ->
+      fprintf stdout "agent:%i:site:%i:state:%i\n" agent2 site2 state
+    ) s
+  ) result
+
+let print_diff result =
+  let result1, result2 = result in
+  let _ =
+  Int2Map_CM_state.Map.iter (fun (agent_type, site_type, state) s ->
+    (*fprintf stdout "agent_type:%i:site_type:%i:state:%i\n" agent_type site_type state;*)
+    Set_triple.Set.iter (fun (agent2, site2, state) ->
+      fprintf stdout "agent:%i:site:%i:state:%i\n" agent2 site2 state
+    ) s
+  ) result1
+  in
+  fprintf stdout "Second\n";
+  Int2Map_CM_state.Map.iter (fun (agent_type, site_type, state) s ->
+    (*fprintf stdout "agent_type:%i:site_type:%i:state:%i\n" agent_type site_type state;*)
+    Set_triple.Set.iter (fun (agent2, site2, state) ->
+      fprintf stdout "agent:%i:site:%i:state:%i\n" agent2 site2 state
+    ) s
+  ) result2
+
+
 (************************************************************************************)
 (*main print*)
 
@@ -126,25 +177,33 @@ let print_result_dynamic parameter error result =
     "\n** Dynamic information:\n";
   (*------------------------------------------------------------------------------*)
   let _ =
+    print_contact_map_full
+      parameter
+      error 
+      result.store_contact_map_full
+  in
+  (*------------------------------------------------------------------------------*)
+  let _ =
     print_contact_map
       parameter
       error 
       result.store_contact_map
   in
+  (*let _ =
+    fprintf stdout "TEST\n";
+    print_test parameter
+      error result.store_test
+  in
+  let _ =
+    fprintf stdout "DIFF\n";
+    print_diff
+      result.store_diff
+  in*)
   (*------------------------------------------------------------------------------*)
   let _ =
     print_covering_classes_modification
       parameter
       error
       result.store_covering_classes_modification_update
-  in
-  (*------------------------------------------------------------------------------*)
-  let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "\n------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "* Rules in the working list:\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
   in
   error
