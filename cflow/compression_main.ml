@@ -246,6 +246,7 @@ let compress_and_print logger env log_info step_list =
             then 
 	      (* Firstly, run the causal compression *)
 	      let error,log_info,simplified_event_list = aux 0 (error,log_info,step_list) in 
+	      (* Then we fold over each trace that end in an observable, and store the causal compression in a table *)
 	      let error,log_info,causal_story_list =
 		U.fold_over_the_causal_past_of_observables_with_a_progress_bar
 		  parameter always (if debug_mode then always else never)
@@ -267,91 +268,6 @@ let compress_and_print logger env log_info step_list =
 		  simplified_event_list
 		  table2
 	      in 
-	      (*    let () = 
-		if log_step 
-		then 
-                  Debug.tag logger "\t - blackboard generation"
-              in 
-	      (* Then construct a blackboard with the whole trace *)
-	      let error,log_info,blackboard = U.convert_trace_into_musical_notation parameter handler error log_info simplified_event_list in           
-              let () = 
-		if debug_mode && log_step  
-		then 
-                  Debug.tag logger "\t - pretty printing the grid"
-              in 
-              let error = 
-		if debug_mode 
-		then 
-                  let error = U.export_musical_grid_to_xls parameter handler error "a" 0 0 blackboard in 
-                  let error = U.print_musical_grid parameter handler error blackboard in 
-		  error
-		else 
-                  error 
-              in  
-	      (* Then, we get the list of observable hits *)
-	      let error,list = U.extract_observable_hits_from_musical_notation parameter handler error blackboard in 
-              let n_stories = List.length list in 
-              let () =
-		if log_step 
-		then 
-		  Format.fprintf logger "\t - computing causal past of each observed events (%i)@." n_stories 
-	      in
-	      (* generation of uncompressed stories *)
-	      let error,log_info,causal_story_list = 
-		let () = 
-                  if debug_mode
-                  then 
-                    Debug.tag logger "\t\t * causal compression "
-		in 
-		let log_info = U.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
-	      (* We use the grid to get the causal precedence (pred* ) of each observable *)
-		let error,(log_info,list,table) = 
-		  U.fold_over_the_causal_past_of_observables_through_a_grid_with_a_progress_bar 
-		    parameter handler error 
-		    (fun observable_hit causal_past (error,(log_info,list,story_list)) -> 
-		     (* list contains logging info about observable hit *)
-		     match list with 
-		       [] -> error,(log_info,list,story_list)
-		     | head::tail  -> 
-			let observable_id = head in 
-			let log_info = S.PH.B.PB.CI.Po.K.P.reset_log log_info in 
-			let () = 
-			  if debug_mode
-			  then 
-			    Debug.tag logger "\t\t * causal compression "
-			in
-			(* we translate the list of event ids into a trace thanks to the blackboad *)
-			let error,trace = 
-			  U.translate parameter handler error blackboard (List.rev (observable_hit::causal_past)) 
-			in
-			(* we remove pseudo inverse events *)
-			let error,log_info,trace = 
-                      	  U.remove_pseudo_inverse_events (do_not_log parameter) always handler log_info error trace
-			in
-			(* we compute causal compression *)
-			let error,log_info,trace = 
-			  U.cut (do_not_log parameter) always handler log_info error trace
-			in
-			(* we collect run time info about the observable *)
-			let info = 
-			  match U.get_runtime_info_from_observable_hit observable_id 
-			  with 
-			  | None -> []
-			  | Some info -> 
-			     let info = {info with Mods.story_id = U.get_counter story_list} in 
-			     let info = Mods.update_profiling_info log_info  info 
-			     in 
-			     [info]
-			in
-			(* we store the trace *)
-			let error,causal_story_array,log_info = 
-			  U.store_trace parameter handler error info log_info trace story_list 
-			in 
-			error,(log_info,tail,causal_story_array))
-		    (simplified_event_list) 
-		    (log_info,(List.rev list),table2)
-		in error,log_info,table 
-	      in *)
 	      let error,causal_story_list = 
 		U.flatten_story_table  parameter handler error causal_story_list 
 	      in 
