@@ -44,11 +44,11 @@ ____________________________________________________________
 	 - computing causal past of each observed events (32)
 
 
-	 - weak flow compression (2)
+	 - weak flow compression (1)
 
 ____________________________________________________________
 ############################################################
 
 + Pretty printing 32 flows
-+ Pretty printing 2 weakly compressed flows
++ Pretty printing 1 weakly compressed flow
 Simulation ended

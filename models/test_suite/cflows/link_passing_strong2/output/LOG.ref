@@ -22,7 +22,7 @@ ____________________________________________________________
 + Producing causal compressions
 	 - splitting initial events (no change)
 	 - detecting siphons (+63 events)
-	 - cutting concurrent events (-17 events)
+	 - cutting concurrent events (-14 events)
 	 - detecting pseudo inverse events (no change)
 	 - blackboard generation
 	 - computing causal past of each observed events (56)
@@ -32,16 +32,16 @@ ____________________________________________________________
 
 
 
-	 - weak flow compression (49)
+	 - weak flow compression (47)
 
 ____________________________________________________________
 ############################################################
 
-	 - strong flow compression (21)
+	 - strong flow compression (20)
 
 ____________________________________________________________
 ############################################################
 
-+ Pretty printing 21 weakly compressed flows
++ Pretty printing 20 weakly compressed flows
 + Pretty printing 1 strongly compressed flow
 Simulation ended
