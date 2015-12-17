@@ -689,6 +689,1256 @@ Global:site_type:0  => Local:site_type':1
 Global:site_type:1  => Local:site_type':2
 Local:site_type':1  => Global:site_type:0
 Local:site_type':2  => Global:site_type:1
+Id=14
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=13
+   Node(site_type:1<1)
+    Id=12
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Id=20
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=19
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=17
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+Id=14
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=13
+   Node(site_type:1<1)
+    Id=12
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Id=14
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=13
+   Node(site_type:1<1)
+    Id=12
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Id=20
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=19
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=17
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+Id=14
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=13
+   Node(site_type:1<1)
+    Id=12
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Id=20
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=19
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=17
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+Id=14
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=13
+   Node(site_type:1<1)
+    Id=12
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Id=14
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=13
+   Node(site_type:1<1)
+    Id=12
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Id=20
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=19
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=17
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+Id=14
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=13
+   Node(site_type:1<1)
+    Id=12
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Id=20
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=19
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=17
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+Id=14
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=13
+   Node(site_type:1<1)
+    Id=12
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Id=14
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=13
+   Node(site_type:1<1)
+    Id=12
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Id=20
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=19
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=17
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+Id=14
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=13
+   Node(site_type:1<1)
+    Id=12
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Id=20
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=19
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=17
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+Id=14
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=13
+   Node(site_type:1<1)
+    Id=12
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Id=14
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=13
+   Node(site_type:1<1)
+    Id=12
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Id=20
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=19
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=17
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+Id=14
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=13
+   Node(site_type:1<1)
+    Id=12
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Id=20
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=19
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=17
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+Id=20
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=19
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=17
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+Id=20
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=19
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=17
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+Id=14
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=13
+   Node(site_type:1<1)
+    Id=12
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Id=14
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=13
+   Node(site_type:1<1)
+    Id=12
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Id=20
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=19
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=17
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+Id=20
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=19
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=17
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+Id=20
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=19
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=17
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+Id=14
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=13
+   Node(site_type:1<1)
+    Id=12
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Id=20
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=19
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=17
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+Id=20
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=19
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=17
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+Id=20
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=19
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=17
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+Id=29
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=28
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=27
+     Node(site_type:1<2)
+      Id=12
+       Node(site_type:2<0)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+Id=14
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=13
+   Node(site_type:1<1)
+    Id=12
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Id=14
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=13
+   Node(site_type:1<1)
+    Id=12
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+Id=20
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=19
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=17
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+Id=29
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=28
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=27
+     Node(site_type:1<2)
+      Id=12
+       Node(site_type:2<0)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+Id=20
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=19
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=17
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+Id=29
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=28
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=27
+     Node(site_type:1<2)
+      Id=12
+       Node(site_type:2<0)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
 ============================================================
 * BDU Analysis:
 ============================================================
@@ -947,12 +2197,12 @@ Id=9
 
 rule_id:9
 agent_type:0
-Id=27
+Id=24
  Node(site_type:2<2)
   Id=1
    Leaf False 
 
-  Id=26
+  Id=23
    Node(site_type:2<3)
     Id=0
      Leaf True 
@@ -1134,19 +2384,19 @@ Id=18
      Leaf False 
 
 agent_id:1
-Id=29
+Id=26
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=28
+  Id=25
    Node(site_type:1<1)
-    Id=27
+    Id=24
      Node(site_type:2<2)
       Id=1
        Leaf False 
 
-      Id=26
+      Id=23
        Node(site_type:2<3)
         Id=0
          Leaf True 
@@ -1549,19 +2799,19 @@ Id=18
      Leaf False 
 
 agent_id:1:agent_type:0:cv_id:0
-Id=29
+Id=26
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=28
+  Id=25
    Node(site_type:1<1)
-    Id=27
+    Id=24
      Node(site_type:2<2)
       Id=1
        Leaf False 
 
-      Id=26
+      Id=23
        Node(site_type:2<3)
         Id=0
          Leaf True 
@@ -1672,199 +2922,4 @@ rule_id:10
 rule_id:11
 ------------------------------------------------------------
 ** Fixpoint iteration function:
-agent_type:0:cv_id:0
-Id=42
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=41
-   Node(site_type:1<1)
-    Id=30
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
-
-      Id=26
-       Node(site_type:2<3)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=40
-     Node(site_type:1<2)
-      Id=39
-       Node(site_type:2<1)
-        Id=1
-         Leaf False 
-
-        Id=26
-         Node(site_type:2<3)
-          Id=0
-           Leaf True 
-
-          Id=1
-           Leaf False 
-
-      Id=1
-       Leaf False 
-
-agent_type:1:cv_id:0
-Id=23
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=22
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=21
-     Node(site_type:1<2)
-      Id=12
-       Node(site_type:2<0)
-        Id=1
-         Leaf False 
-
-        Id=8
-         Node(site_type:2<2)
-          Id=0
-           Leaf True 
-
-          Id=1
-           Leaf False 
-
-      Id=1
-       Leaf False 
-
-agent_type:2:cv_id:0
-Id=36
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=35
-   Node(site_type:1<1)
-    Id=30
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
-
-      Id=26
-       Node(site_type:2<3)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=17
-     Node(site_type:1<2)
-      Id=9
-       Node(site_type:2<1)
-        Id=1
-         Leaf False 
-
-        Id=8
-         Node(site_type:2<2)
-          Id=0
-           Leaf True 
-
-          Id=1
-           Leaf False 
-
-      Id=1
-       Leaf False 
-
-agent_type:3:cv_id:0
-Id=36
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=35
-   Node(site_type:1<1)
-    Id=30
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
-
-      Id=26
-       Node(site_type:2<3)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=17
-     Node(site_type:1<2)
-      Id=9
-       Node(site_type:2<1)
-        Id=1
-         Leaf False 
-
-        Id=8
-         Node(site_type:2<2)
-          Id=0
-           Leaf True 
-
-          Id=1
-           Leaf False 
-
-      Id=1
-       Leaf False 
-
-agent_type:4:cv_id:0
-Id=20
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=19
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=17
-     Node(site_type:1<2)
-      Id=9
-       Node(site_type:2<1)
-        Id=1
-         Leaf False 
-
-        Id=8
-         Node(site_type:2<2)
-          Id=0
-           Leaf True 
-
-          Id=1
-           Leaf False 
-
-      Id=1
-       Leaf False 
-
 execution finished without any exception

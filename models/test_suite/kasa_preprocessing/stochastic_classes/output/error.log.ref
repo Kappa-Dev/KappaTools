@@ -1,0 +1,85 @@
+Test for rule:1
+enabled
+CHECK: 1 0
+Test for rule:1
+enabled
+CHECK: 1 0
+CHECK: 1 2
+Test for rule:1
+enabled
+CHECK: 1 0
+CHECK: 1 2
+Test for rule:3
+enabled
+CHECK: 3 0
+CHECK: 3 2
+Test for rule:1
+enabled
+CHECK: 1 0
+CHECK: 1 2
+CHECK: 1 4
+Test for rule:3
+enabled
+CHECK: 3 0
+CHECK: 3 2
+CHECK: 3 4
+Test for rule:1
+enabled
+CHECK: 1 0
+CHECK: 1 2
+CHECK: 1 4
+CHECK: 1 5
+Test for rule:3
+enabled
+CHECK: 3 0
+CHECK: 3 2
+CHECK: 3 4
+CHECK: 3 5
+Test for rule:1
+enabled
+CHECK: 1 0
+CHECK: 1 2
+CHECK: 1 4
+CHECK: 1 5
+CHECK: 1 6
+Test for rule:3
+enabled
+CHECK: 3 0
+CHECK: 3 2
+CHECK: 3 4
+CHECK: 3 5
+CHECK: 3 6
+Test for rule:1
+enabled
+CHECK: 1 0
+CHECK: 1 2
+CHECK: 1 4
+CHECK: 1 5
+CHECK: 1 6
+CHECK: 1 7
+Test for rule:3
+enabled
+CHECK: 3 0
+CHECK: 3 2
+CHECK: 3 4
+CHECK: 3 5
+CHECK: 3 6
+CHECK: 3 7
+Test for rule:1
+enabled
+CHECK: 1 0
+CHECK: 1 2
+CHECK: 1 4
+CHECK: 1 5
+CHECK: 1 6
+CHECK: 1 7
+CHECK: 1 8
+Test for rule:3
+enabled
+CHECK: 3 0
+CHECK: 3 2
+CHECK: 3 4
+CHECK: 3 5
+CHECK: 3 6
+CHECK: 3 7
+CHECK: 3 8

@@ -553,6 +553,132 @@ Local:site_type':1  => Global:site_type:0
 Local:site_type':2  => Global:site_type:1
 Local:site_type':3  => Global:site_type:2
 Local:site_type':4  => Global:site_type:3
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
+Id=0
+ Leaf True 
+
 ============================================================
 * BDU Analysis:
 ============================================================
@@ -1186,16 +1312,4 @@ rule_id:4
 rule_id:5
 ------------------------------------------------------------
 ** Fixpoint iteration function:
-agent_type:0:cv_id:0
-Id=0
- Leaf True 
-
-agent_type:1:cv_id:0
-Id=0
- Leaf True 
-
-agent_type:2:cv_id:0
-Id=0
- Leaf True 
-
 execution finished without any exception

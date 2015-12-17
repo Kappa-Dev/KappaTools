@@ -360,7 +360,8 @@ let scan_rule_fixpoint parameter handler_bdu error
       store_result.store_new_wl_side_effect
   in
   (*-------------------------------------------------------------------------------*)
-  let error, (handler_bdu, store_bdu_fixpoint_map) =
+ (* JF: iteration should be done with the working list, starting from the rules that are either enabled by initial states, or with an empty lhs *)
+  (* let error, (handler_bdu, store_bdu_fixpoint_map) =
     collect_bdu_fixpoint_map
       parameter
       handler_bdu
@@ -379,12 +380,12 @@ let scan_rule_fixpoint parameter handler_bdu error
       store_covering_classes_modification_update
       store_bdu_init_restriction_map
       store_result.store_bdu_fixpoint_map
-  in
+  in*)
   (*-------------------------------------------------------------------------------*)
   error, handler_bdu, 
-  {
+  { store_result with 
     store_new_wl_side_effect = store_new_wl_side_effect;
-    store_bdu_fixpoint_map   = store_bdu_fixpoint_map;
+    (*    store_bdu_fixpoint_map   = store_bdu_fixpoint_map;*)
   }
   
 (************************************************************************************)
@@ -454,6 +455,27 @@ let scan_rule parameter handler_bdu error handler_kappa rule_id rule compil
   in
   (*------------------------------------------------------------------------------*)
   (*store*)
+  let error, (handler_bdu, store_bdu_fixpoint_map) =
+    collect_bdu_fixpoint_map
+      parameter
+      handler_bdu
+      error
+      (*0*) (*no rule in particular, we should start with rule with no lhs and those induced by intial states  to remove *)
+      store_bdu_build.store_wl_creation
+      store_bdu_build.store_proj_bdu_creation_restriction_map
+      store_bdu_build.store_proj_modif_list_restriction_map
+      store_bdu_build.store_proj_bdu_test_restriction_map
+      store_bdu_build.store_proj_bdu_potential_restriction_map
+      store_bdu_build.store_proj_potential_list_restriction_map
+      store_bdu_build.store_bdu_test_restriction_map
+      store_bdu_build.store_proj_bdu_views
+      false (*is_new_bond*)
+      store_result.store_bdu_fixpoint.store_new_wl_side_effect
+      store_bdu_analysis_dynamic.store_covering_classes_modification_update
+      store_bdu_build.store_bdu_init_restriction_map
+      store_result.store_bdu_fixpoint.store_bdu_fixpoint_map 
+  in
+
   error, (handler_bdu, 
   {
     store_bdu_analysis_static  = store_bdu_analysis_static;
