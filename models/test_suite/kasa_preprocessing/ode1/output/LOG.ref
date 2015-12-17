@@ -310,8 +310,9 @@ agent_type:2@site_type:0:state:1--agent_type':1@site_type':1:state':1
 (Syntactic) Contact map (only considering rhs) and initital state:
 ------------------------------------------------------------
 Sites are annotated with the id of binding type:
-agent_type:0@site_type:1--agent_type':1@site_type':0
-agent_type:1@site_type:1--agent_type':2@site_type':0
+agent_type:0@site_type:1:state:1--agent_type':1:site_type':0:state':1
+agent_type:1@site_type:1:state:0--agent_type':2:site_type':0:state':1
+agent_type:1@site_type:1:state:1--agent_type':2:site_type':0:state':1
 
 ------------------------------------------------------------
 List of rules to awake when the state of a site is modified and tested:

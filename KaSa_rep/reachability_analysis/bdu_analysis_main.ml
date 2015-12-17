@@ -159,23 +159,11 @@ let scan_rule_dynamic parameter error handler rule_id rule
     compute_contact_map
       parameter
       error
+      rule_id
       rule
       handler
       store_result.store_contact_map
   in
-  (*let store_test =
-    compute_contact_map_aux 
-      parameter
-      error
-      store_contact_map_full
-      store_contact_map
-      store_result.store_test
-  in
-  let store_diff =
-    collect_contact
-      store_contact_map_full
-      store_test
-  in*)
   (*-------------------------------------------------------------------------------*)
   (*return a mapping of covering classes to a list of rules that has [modified and test]
     sites*)
@@ -191,8 +179,6 @@ let scan_rule_dynamic parameter error handler rule_id rule
   {
     store_contact_map_full                     = store_contact_map_full;
     store_contact_map                          = store_contact_map;
-    (*store_test = store_test;
-    store_diff = store_diff;*)
     store_covering_classes_modification_update = store_covering_classes_modification_update;
   }
 
@@ -461,7 +447,7 @@ let scan_rule parameter handler_bdu error handler_kappa rule_id rule compil
       store_bdu_build.store_bdu_init_restriction_map
       store_bdu_build.store_bdu_test_restriction_map
       store_bdu_analysis_dynamic.store_covering_classes_modification_update
-      store_bdu_analysis_dynamic.store_contact_map
+      (fst store_bdu_analysis_dynamic.store_contact_map)
       store_bdu_analysis_static.store_side_effects
       store_result.store_bdu_fixpoint
   in
@@ -510,17 +496,14 @@ let init_bdu_analysis_static =
 
 let init_bdu_analysis_dynamic parameter error =
   let init_contact_map_full = Int2Map_CM_state.Map.empty in
-  let init_contact_map     = Int2Map_test_state.Map.empty in
+  let init_contact_map     = Int2Map_syn.Map.empty in
+  let init_contact_map'    = Int2Map_syn.Map.empty in
   let init_cv_modification = Int2Map_CV_Modif.Map.empty in
-  (*let init_test = Int2Map_CM_state.Map.empty in
-  let init_diff = Int2Map_CM_state.Map.empty in
-  let init_diff' = Int2Map_CM_state.Map.empty in*)
+
   let init_bdu_analysis_dynamic =
     {
       store_contact_map_full                     = init_contact_map_full;
-      store_contact_map                          = init_contact_map;
-      (*store_test = init_test;
-      store_diff = init_diff, init_diff' ;*)
+      store_contact_map                          = init_contact_map, init_contact_map';
       store_covering_classes_modification_update = init_cv_modification;
     }
   in

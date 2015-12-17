@@ -86,7 +86,7 @@ module Int2Map_CV =
       let compare = compare
     end)
 
-(*syntactic contact map*)
+(*full contact map*)
 
 module Int2Map_CM_state = 
   SetMap.Make (
@@ -96,6 +96,36 @@ module Int2Map_CM_state =
       let compare = compare
     end
   )
+
+(*syntactic contact map *)
+(*module Map_second_agent_bind =
+  SetMap.Make (
+    struct
+      type t = int * int
+      let compare = compare
+    end )*)
+
+module Int2Map_pair =
+  SetMap.Make (
+    struct
+      type t = int * int
+      let compare = compare
+    end )
+
+module Int2Map_syn =
+  SetMap.Make (
+    struct
+      type t = int
+      let compare = compare
+    end )
+
+module Set_triple =
+  SetMap.Make (
+    struct
+      type t = int * int * int
+      let compare = compare
+    end )
+
 
 (*list of rules to awake when the state of a site is modified and tested*)
 
@@ -272,35 +302,6 @@ module Map_test_bond =
       let compare = compare
     end)
 
-(*binding*)
-module Map_second_agent_bind =
-  SetMap.Make (
-    struct
-      type t = int * int
-      let compare = compare
-    end )
-
-module Int2Map_test_state =
-  SetMap.Make (
-    struct
-      type t = int * int
-      let compare = compare
-    end )
-
-module Set_triple =
-  SetMap.Make (
-    struct
-      type t = int * int * int
-      let compare = compare
-    end )
-
-module Int2Map_state =
-  SetMap.Make (
-    struct
-      type t = int * int * int
-      let compare = compare
-    end )
-
 (************************************************************************************)
 (*static information*)
 
@@ -347,11 +348,8 @@ type bdu_analysis_dynamic =
     store_contact_map_full :
      Set_triple.Set.t Int2Map_CM_state.Map.t;
     store_contact_map : 
-    (*TODO: combine contact map and modification update into a product type*)
-    Map_second_agent_bind.Set.t Int2Map_test_state.Map.t;
-    (*store_test : Set_triple.Set.t Int2Map_CM_state.Map.t;
-    store_diff : Set_triple.Set.t Int2Map_CM_state.Map.t * Set_triple.Set.t 
-      Int2Map_CM_state.Map.t;*)
+      (int list * Set_triple.Set.t) Int2Map_syn.Map.t * 
+      (int list * Set_triple.Set.t) Int2Map_syn.Map.t;
     store_covering_classes_modification_update : (*update(c)*)
       (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;
   }

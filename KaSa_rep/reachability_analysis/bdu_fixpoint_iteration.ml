@@ -162,11 +162,11 @@ let store_new_result_hb_map
  Int2Map_HalfBreak_effect.Map.fold
     (fun (agent_type_eff, site_type_eff) (l1, l2) (error, store_result) ->
       List.fold_left (fun (error, store_result) (rule_id_eff, state) ->
-        Int2Map_test_state.Map.fold
-          (fun (agent_type1, site_type1 (*state1*)) triple_set 
+        Int2Map_syn.Map.fold
+          (fun rule_id' (_, set) 
             (error, store_result) ->
-              Map_second_agent_bind.Set.fold
-                (fun (agent_type2, site_type2 (*, state2*)) (error, store_result) ->
+              Set_triple.Set.fold
+                (fun (agent_type1, site_type1, state1) (error, store_result) ->
                   if state = 0 (*state2*)
                   then
                     if agent_type1 = agent_type_eff &&
@@ -176,7 +176,7 @@ let store_new_result_hb_map
                         (fun (agent_type, cv_id) (l', rule_id_set) (error, store_result) ->
                           Site_map_and_set.Set.fold
                             (fun rule_id_update (error, current_result) ->
-                              if agent_type = agent_type2
+                              if agent_type = (*agent_type2*) agent_type1 (*FIXME*)
                               then
                                 let error, result =
                                   add_link (agent_type, cv_id) rule_id_eff
@@ -192,7 +192,7 @@ let store_new_result_hb_map
                     error, store_result
                   else
                     error, store_result
-                ) triple_set (error, store_result)
+                ) set (error, store_result)
           ) store_contact_map (error, store_result)
       ) (error, store_result) l2
     ) half_break_map (error, store_result_map)
@@ -228,11 +228,11 @@ let store_new_result_remove_map
   Int2Map_Remove_effect.Map.fold
     (fun (agent_type_eff, site_type_eff) (l1, l2) (error, store_result) ->
       List.fold_left (fun (error, store_result) rule_id_eff ->
-        Int2Map_test_state.Map.fold
-          (fun (agent_type1, site_type1 (*, state1*))triple_set
+        Int2Map_syn.Map.fold
+          (fun rule_id' (_, set)
             (error, store_result) ->
-              Map_second_agent_bind.Set.fold
-                (fun (agent_type2, site_type2 (*, state2*)) (error, store_result) ->
+              Set_triple.Set.fold
+                (fun (agent_type1, site_type1, state1) (error, store_result) ->
                   if agent_type1 = agent_type_eff && 
                     site_type1 = site_type_eff
                   then
@@ -243,7 +243,7 @@ let store_new_result_remove_map
                             let error, store_result =
                               Site_map_and_set.Set.fold
                                 (fun rule_id_update (error, current_result) ->
-                                  if agent_type = agent_type2
+                                  if agent_type = (*agent_type2*) agent_type1 (*FIXME*)
                                   then
                                     add_link (agent_type, cv_id) rule_id_eff current_result
                                   else
@@ -257,7 +257,7 @@ let store_new_result_remove_map
                     error, store_result
                   else
                     error, store_result
-                ) triple_set (error, store_result)
+                ) set (error, store_result)
           ) store_contact_map (error, store_result)
       ) (error, store_result) l2
     ) remove_map (error, store_result_map)
