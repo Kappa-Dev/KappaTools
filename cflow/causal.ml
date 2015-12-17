@@ -341,12 +341,8 @@ let cut attribute_ids grid =
        in build_config tl cfg
   in
   let cfg = build_config attribute_ids empty_config in
-  if !Parameter.reduceCflows
-  then
     {cfg with prec_1 = Graph_closure.reduction cfg.prec_1}
-  else
-    cfg
-      
+
 let pp_atom f atom =
   let imp_str = match atom.causal_impact with
       1 -> "o" | 2 -> "x" | 3 -> "%"

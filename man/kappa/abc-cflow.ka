@@ -45,4 +45,3 @@
 %def: "displayCompression" "weak" 
 %def: "dotSnapshots" "false"
 %def: "showIntroEvents" "true"
-%def: "reduceCflows" "true"

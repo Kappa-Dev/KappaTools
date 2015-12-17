@@ -1,6 +1,5 @@
 %def: "displayCompression" "weak" "none"
 %def: "showIntroEvents" "true" 
-%def: "reduceCflows" "true"
 
 -> C() @1
 A(x!_) -> A(x) @1

@@ -25,9 +25,9 @@ ____________________________________________________________
 	 - computing causal past of each observed events (10)
 Stats:
  number of step   : 115
- longest story    : 13
- average length   : 5.3
- geometric mean   : 6.27853486094
+ longest story    : 17
+ average length   : 5.7
+ geometric mean   : 6.9728043139
 
 	 - causal flow compression (10)
 
@@ -35,7 +35,7 @@ ____________________________________________________________
 ############################################################
 
 	 - detecting siphons (no change)
-	 - cutting concurrent events (-45 events)
+	 - cutting concurrent events (-47 events)
 	 - detecting pseudo inverse events (no change)
 	 - detecting siphons (no change)
 	 - cutting concurrent events (no change)
@@ -44,11 +44,11 @@ ____________________________________________________________
 	 - computing causal past of each observed events (10)
 
 
-	 - weak flow compression (5)
+	 - weak flow compression (6)
 
 ____________________________________________________________
 ############################################################
 
-+ Pretty printing 5 flows
++ Pretty printing 6 flows
 + Pretty printing 3 weakly compressed flows
 Simulation ended

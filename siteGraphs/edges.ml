@@ -1,7 +1,5 @@
 open Mods
 
-let reuse_id = false
-
 module Edge = struct
   type t = ToFree
 	 | Link of (int * int * int) (** sort * id * site *)
@@ -25,18 +23,18 @@ let empty = (Int2Map.empty, Int2Map.empty, IntMap.empty,(1,[]))
 
 let add_agent ty (connect,state,sort,free_id) =
   match free_id with
-  | new_id,h :: t when reuse_id ->
+  | new_id,h :: t ->
      h,
      (connect,state,
       IntMap.add ty (IntSet.add
 		       h (IntMap.find_default IntSet.empty ty sort)) sort,
       (new_id,t))
-  | new_id,l ->
+  | new_id,[] ->
      new_id,
      (connect,state,
       IntMap.add ty (IntSet.add
 		       new_id (IntMap.find_default IntSet.empty ty sort)) sort,
-      (succ new_id,l))
+      (succ new_id,[]))
 
 let add_free ag s (connect,state,sort,free_id) =
   (Int2Map.add (ag,s) Edge.ToFree connect,state,sort,free_id)

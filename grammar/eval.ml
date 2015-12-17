@@ -460,8 +460,6 @@ let configurations_of_result result =
 	set_bool_value pos_p param value_list Parameter.dotSnapshots
      | "dotCflows" ->
 	set_bool_value pos_p param value_list Parameter.dotCflows
-     | "reduceCflows" ->
-	set_bool_value pos_p param value_list Parameter.reduceCflows
      | "colorDot" ->
 	set_value pos_p param value_list
 		  (fun value pos_v ->
