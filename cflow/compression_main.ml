@@ -119,7 +119,8 @@ let compress_and_print logger env log_info step_list =
 		then 
                   Debug.tag logger "\t - blackboard generation"
               in 
-              let error,log_info,blackboard = U.convert_trace_into_musical_notation parameter handler error log_info step_list in           
+	      let error,step_list = U.make_unambiguous parameter always handler log_info error step_list in
+	      let error,log_info,blackboard = U.convert_trace_into_musical_notation parameter handler error log_info step_list in
               let () = 
 		if debug_mode && log_step  
 		then

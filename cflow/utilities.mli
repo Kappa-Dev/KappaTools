@@ -74,6 +74,11 @@ val remove_pseudo_inverse_events:
   parameter -> (parameter -> bool) -> kappa_handler -> profiling_info ->
   error_log -> trace -> error_log * profiling_info * trace
 
+(** reallocate agent id to avoid conflict (implicitly called by cut and fill_siphon) *)
+val make_unambiguous:
+  parameter -> (parameter -> bool) -> kappa_handler -> profiling_info ->
+  error_log -> trace -> error_log  * trace
+
 (** compress a trace with the level of abstraction defined in the argument parameter *)
 val compress:
   parameter -> kappa_handler -> error_log -> profiling_info ->

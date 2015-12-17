@@ -172,11 +172,7 @@ let make_unambiguous parameters p kappa_handler profiling_info error trace =
     if trace'==trace   
     then trace
     else
-      begin
-(*	print_trace parameters kappa_handler trace ;
-	print_trace parameters kappa_handler trace' ;*)
 	set_ambiguity_level trace' false
-      end 
   else
     error,trace 
 
@@ -487,11 +483,12 @@ let set_compression_mode p x =
 let strongly_compress parameter = compress (set_compression_mode parameter Parameter.Strong)
 let weakly_compress parameter = compress (set_compression_mode parameter Parameter.Weak)
 								  
-let convert_trace_into_grid trace handler = 
+let convert_trace_into_grid trace handler =
     let event_list = get_compressed_trace trace in
     S.PH.B.PB.CI.Po.K.build_grid event_list (not (is_compressed_trace trace)) handler 
     
-let convert_trace_into_musical_notation p h e info x = S.PH.B.import p h e info (get_pretrace_of_trace x)
+let convert_trace_into_musical_notation parameters kappa_handler error profiling_info trace =
+  S.PH.B.import parameters kappa_handler error profiling_info (get_pretrace_of_trace trace)
 
 let enrich_grid_with_transitive_closure = Causal.enrich_grid
 
