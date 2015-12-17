@@ -122,6 +122,7 @@ let collect_contact_map parameter error rule_id rule handler store_result =
     let set = Set_pair.Set.add
       ((agent_type1, site_type1, state1), (agent_type2, site_type2, state2)) old in
     let union_set = Set_pair.Set.union old set in
+    (*check if it is a bond that is discovered for the first time*)
     if Set_pair.Set.equal union_set old 
     then error, false, store_result
     else 

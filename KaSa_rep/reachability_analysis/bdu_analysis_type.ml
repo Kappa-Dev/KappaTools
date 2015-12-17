@@ -73,6 +73,9 @@ module Int2Map_Test_Modif =
       let compare = compare
     end)
 
+module Project2_modif =
+  SetMap.Proj (Int2Map_Modif)(Int2Map_Test_Modif)
+
 (************************************************************************************)
 (*dynamic information*)
 

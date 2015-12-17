@@ -104,7 +104,7 @@ let scan_rule_static parameter error handler rule_id rule covering_classes
       parameter
       error
       store_modification_sites
-      store_result.store_modif_map
+      (*store_result.store_modif_map*)
   in
   (*-------------------------------------------------------------------------------*)
   (*valuations of the views that are tested without agent_id*)
@@ -113,7 +113,7 @@ let scan_rule_static parameter error handler rule_id rule covering_classes
       parameter
       error
       store_test_sites
-      store_result.store_test_map
+      (*store_result.store_test_map*)
   in
   (*-------------------------------------------------------------------------------*)
   (*valuations and update of the views that are tested and modification
@@ -123,7 +123,7 @@ let scan_rule_static parameter error handler rule_id rule covering_classes
       parameter
       error
       store_test_modification_sites
-      store_result.store_test_modif_map
+      (*store_result.store_test_modif_map*)
   in
   (*-------------------------------------------------------------------------------*)
   error, 
