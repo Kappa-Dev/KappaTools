@@ -201,6 +201,22 @@ let print_proj_potential_list_map parameter error result =
     ) result
   
 (************************************************************************************)
+(*TODO: projection function will be used in is_enable function*)
+
+let print_proj_bdu_views parameter error result =
+  Map_rule_id_views.Map.iter
+    (fun rule_id map_b ->
+      let _ = fprintf parameter.log "rule_id:%i\n" rule_id in
+      Map_triple_views.Map.iter 
+        (fun (agent_id, agent_type, cv_id) bdu ->
+          let _ = fprintf parameter.log "agent_id:%i:agent_type:%i:cv_id:%i\n" 
+            agent_id agent_type cv_id in
+          Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu
+        ) map_b
+    ) result
+
+
+(************************************************************************************)
 (*main print*)
 
 let print_bdu_build parameter error result =
@@ -333,5 +349,15 @@ let print_bdu_build parameter error result =
       parameter
       error
       result.store_proj_modif_list_restriction_map
+  in
+  let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "\n------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter)
+      "- Bdu fpr the valuation of the views that are tested (projection per rule):\n";
+    print_proj_bdu_views
+      parameter
+      error
+      result.store_proj_bdu_views
   in
   error

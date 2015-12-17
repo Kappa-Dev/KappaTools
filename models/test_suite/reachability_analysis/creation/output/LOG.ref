@@ -507,22 +507,61 @@ agent_id:0:
 site_type:1:state:1
 
 ------------------------------------------------------------
-* Fixpoint iteration :
-------------------------------------------------------------
-** New update function when discovered sites that are bond on the rhs for the first time:
-agent_type:0:covering_class_id:0:@set of rule_id:
-rule_id:0
+- Bdu fpr the valuation of the views that are tested (projection per rule):
 rule_id:1
-rule_id:2
-rule_id:3
-agent_type:1:covering_class_id:0:@set of rule_id:
-rule_id:3
-rule_id:4
-------------------------------------------------------------
-** Fixpoint iteration function:
-agent_type:0:cv_id:0
-Id=10
+agent_id:0:agent_type:0:cv_id:0
+Id=7
  Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:2
+agent_id:0:agent_type:0:cv_id:0
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:3
+agent_id:0:agent_type:0:cv_id:0
+Id=9
+ Node(site_type:1<1)
   Id=1
    Leaf False 
 
@@ -540,6 +579,74 @@ Id=10
 
         Id=1
          Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:4
+agent_id:0:agent_type:1:cv_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+** New update function when discovered sites that are bond on the rhs for the first time:
+agent_type:0:covering_class_id:0:@set of rule_id:
+rule_id:0
+rule_id:1
+rule_id:2
+rule_id:3
+agent_type:1:covering_class_id:0:@set of rule_id:
+rule_id:3
+rule_id:4
+------------------------------------------------------------
+** Fixpoint iteration function:
+agent_type:0:cv_id:0
+Id=26
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=24
+   Node(site_type:1<2)
+    Id=19
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=15
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_type:1:cv_id:0
+Id=27
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=11
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
 
     Id=1
      Leaf False 

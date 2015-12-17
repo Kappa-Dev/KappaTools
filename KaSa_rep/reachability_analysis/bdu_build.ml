@@ -211,7 +211,7 @@ let collect_proj_bdu_test_restriction_map parameter handler error
       store_bdu_test_restriction_map
   in
   (error, handler), store_result
-		       
+
 (************************************************************************************)
 (*creation rules*)
 
@@ -745,5 +745,27 @@ let collect_proj_potential_list_restriction_map parameter handler error
       (fun parameter (error, handler) l l' ->
         (error, handler), List.concat [l; l'])
       store_potential_free
+  in
+  (error, handler), store_result
+
+(************************************************************************************)
+(*TODO: used in is_enable*)
+
+let collect_focus_views parameter handler error store_bdu_test_restriction_map =
+  let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in
+  let (error, handler), store_result =
+    Project2_bdu_views.proj2_monadic
+      parameter
+      (error, handler)
+      (fun (agent_id, agent_type, rule_id, cv_id) -> rule_id)
+      (fun (agent_id, agent_type, rule_id, cv_id) -> (agent_id, agent_type, cv_id))
+      bdu_true
+      (fun parameter (error, handler) bdu bdu' ->
+        let error, handler, bdu_union = Mvbdu_wrapper.Mvbdu.mvbdu_and
+          parameter handler error bdu bdu'
+        in
+        (error, handler), bdu_union
+      )
+      store_bdu_test_restriction_map
   in
   (error, handler), store_result

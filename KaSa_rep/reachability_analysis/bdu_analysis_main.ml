@@ -104,7 +104,6 @@ let scan_rule_static parameter error handler rule_id rule covering_classes
       parameter
       error
       store_modification_sites
-      (*store_result.store_modif_map*)
   in
   (*-------------------------------------------------------------------------------*)
   (*valuations of the views that are tested without agent_id*)
@@ -113,7 +112,6 @@ let scan_rule_static parameter error handler rule_id rule covering_classes
       parameter
       error
       store_test_sites
-      (*store_result.store_test_map*)
   in
   (*-------------------------------------------------------------------------------*)
   (*valuations and update of the views that are tested and modification
@@ -123,7 +121,6 @@ let scan_rule_static parameter error handler rule_id rule covering_classes
       parameter
       error
       store_test_modification_sites
-      (*store_result.store_test_modif_map*)
   in
   (*-------------------------------------------------------------------------------*)
   error, 
@@ -304,6 +301,15 @@ let scan_rule_bdu_build parameter handler_bdu error rule_id rule compil
       store_potential_list_restriction_map
   in
   (*-------------------------------------------------------------------------------*)
+  (*TODO: is_enable function *)
+  let (error, handler_bdu), store_proj_bdu_views =
+    collect_focus_views
+      parameter
+      handler_bdu
+      error
+      store_bdu_test_restriction_map
+  in
+  (*-------------------------------------------------------------------------------*)
   error, handler_bdu, 
   {
     store_remanent_triple                   = store_remanent_triple;
@@ -319,6 +325,7 @@ let scan_rule_bdu_build parameter handler_bdu error rule_id rule compil
     store_proj_bdu_potential_restriction_map   = store_proj_bdu_potential_restriction_map;
     store_potential_list_restriction_map       = store_potential_list_restriction_map;
     store_proj_potential_list_restriction_map  = store_proj_potential_list_restriction_map;
+    store_proj_bdu_views = store_proj_bdu_views;
   }
 
 (************************************************************************************)
@@ -335,6 +342,7 @@ let scan_rule_fixpoint parameter handler_bdu error
     store_proj_potential_list_restriction_map
     store_bdu_init_restriction_map
     store_bdu_test_restriction_map
+    store_proj_bdu_views
     store_covering_classes_modification_update
     is_new_bond
     store_contact_map
@@ -365,6 +373,7 @@ let scan_rule_fixpoint parameter handler_bdu error
       store_proj_bdu_potential_restriction_map
       store_proj_potential_list_restriction_map
       store_bdu_test_restriction_map
+      store_proj_bdu_views
       is_new_bond
       store_new_wl_side_effect
       store_covering_classes_modification_update
@@ -436,6 +445,7 @@ let scan_rule parameter handler_bdu error handler_kappa rule_id rule compil
       store_bdu_build.store_proj_potential_list_restriction_map
       store_bdu_build.store_bdu_init_restriction_map
       store_bdu_build.store_bdu_test_restriction_map
+      store_bdu_build.store_proj_bdu_views
       store_bdu_analysis_dynamic.store_covering_classes_modification_update
       (fst store_bdu_analysis_dynamic.store_contact_map)
       (snd store_bdu_analysis_dynamic.store_contact_map)
@@ -516,6 +526,7 @@ let init_bdu_build parameter error =
   let init_proj_bdu_potential_restriction_map  = Map_final_potential_bdu.Map.empty in
   let init_potential_list_restriction_map      = Map_potential_list.Map.empty in
   let init_proj_potential_list_restriction_map = Map_final_potential_list.Map.empty in
+  let init_proj_bdu_views = Map_rule_id_views.Map.empty in
   let init_restriction_bdu_test =
     {
       store_remanent_triple                   = init_remanent_triple;
@@ -531,6 +542,7 @@ let init_bdu_build parameter error =
       store_proj_bdu_potential_restriction_map   = init_proj_bdu_potential_restriction_map;
       store_potential_list_restriction_map       = init_potential_list_restriction_map;
       store_proj_potential_list_restriction_map  = init_proj_potential_list_restriction_map;
+      store_proj_bdu_views = init_proj_bdu_views;
      }
   in
   error, init_restriction_bdu_test

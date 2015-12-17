@@ -207,6 +207,9 @@ rule_id:1
 - List for update of the views due to modification (projection per rule):
 
 ------------------------------------------------------------
+- Bdu fpr the valuation of the views that are tested (projection per rule):
+
+------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
 ** New update function when discovered sites that are bond on the rhs for the first time:

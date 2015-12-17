@@ -227,6 +227,34 @@ site_type:2:state:1
 site_type:1:state:1
 
 ------------------------------------------------------------
+- Bdu fpr the valuation of the views that are tested (projection per rule):
+rule_id:0
+agent_id:0:agent_type:0:cv_id:0
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+
+------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
 ** New update function when discovered sites that are bond on the rhs for the first time:

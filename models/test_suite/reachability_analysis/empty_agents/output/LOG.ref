@@ -257,6 +257,9 @@ List of rules to awake when the state of a site is modified and tested:
 - List for update of the views due to modification (projection per rule):
 
 ------------------------------------------------------------
+- Bdu fpr the valuation of the views that are tested (projection per rule):
+
+------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
 ** New update function when discovered sites that are bond on the rhs for the first time:

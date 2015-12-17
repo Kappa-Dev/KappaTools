@@ -53,6 +53,7 @@ module Int2Map_potential_effect =
       let compare = compare
     end)
 
+(************************************************************************************)
 (*views that are tested and modified with agent_id*)
 
 module Int2Map_Modif =
@@ -177,6 +178,7 @@ module Map_agent_type_creation_bdu =
 module Project2bdu_creation =
   SetMap.Proj2 (Map_creation_bdu)(Map_final_creation_bdu)(Map_agent_type_creation_bdu)
 
+(************************************************************************************)
 (*test*)
 
 module Map_test_bdu =
@@ -204,6 +206,27 @@ module Map_agent_id_test_bdu =
 module Project2bdu_test =
   SetMap.Proj2 (Map_test_bdu)(Map_final_test_bdu)(Map_agent_id_test_bdu)
 
+(************************************************************************************)
+(*TODO:projection for views used in is_enable*)
+
+module Map_rule_id_views =
+  SetMap.Make
+    (struct
+      type t = int
+      let compare = compare
+     end)
+    
+module Map_triple_views =
+  SetMap.Make
+    (struct 
+      type t = int * int * int
+      let compare = compare
+     end)
+    
+module Project2_bdu_views =
+  SetMap.Proj2 (Map_test_bdu) (Map_rule_id_views) (Map_triple_views)
+
+(************************************************************************************)
 (*modification*)
 
 module Map_modif_list =
@@ -230,6 +253,7 @@ module Map_agent_id_modif_list =
 module Project2bdu_modif =
   SetMap.Proj2 (Map_modif_list)(Map_final_modif_list)(Map_agent_id_modif_list)
 
+(************************************************************************************)
 (*potential side effect*)
 
 module Map_potential_bdu =
@@ -257,6 +281,7 @@ module Map_agent_type_potential_bdu =
 module Project2bdu_potential =
   SetMap.Proj2 (Map_potential_bdu)(Map_final_potential_bdu)(Map_agent_type_potential_bdu)
 
+(************************************************************************************)
 (*list of potential side effect (site free)*)
 
 module Map_potential_list =
@@ -386,6 +411,8 @@ type bdu_build =
       (int * int) list Map_potential_list.Map.t;
     store_proj_potential_list_restriction_map :
       (int * int) list Map_agent_type_potential_list.Map.t Map_final_potential_list.Map.t;
+    store_proj_bdu_views :
+      Mvbdu_wrapper.Mvbdu.mvbdu Map_triple_views.Map.t Map_rule_id_views.Map.t;
   }
 
 (************************************************************************************)

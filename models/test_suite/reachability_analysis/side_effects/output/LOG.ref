@@ -1405,6 +1405,244 @@ agent_id:0:
 site_type:2:state:0
 
 ------------------------------------------------------------
+- Bdu fpr the valuation of the views that are tested (projection per rule):
+rule_id:5
+agent_id:0:agent_type:0:cv_id:0
+Id=9
+ Node(site_type:2<1)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:2<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+rule_id:6
+agent_id:0:agent_type:0:cv_id:0
+Id=5
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:2<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_id:1:agent_type:1:cv_id:0
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:7
+agent_id:0:agent_type:0:cv_id:0
+Id=5
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:2<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_id:1:agent_type:1:cv_id:0
+Id=16
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=15
+   Node(site_type:1<2)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_id:2:agent_type:2:cv_id:0
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:8
+agent_id:0:agent_type:2:cv_id:0
+Id=18
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=17
+   Node(site_type:1<2)
+    Id=9
+     Node(site_type:2<1)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_id:1:agent_type:0:cv_id:0
+Id=29
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=28
+   Node(site_type:1<1)
+    Id=27
+     Node(site_type:2<2)
+      Id=1
+       Leaf False 
+
+      Id=26
+       Node(site_type:2<3)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:9
+agent_id:0:agent_type:2:cv_id:0
+Id=0
+ Leaf True 
+
+rule_id:10
+agent_id:0:agent_type:3:cv_id:0
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_id:1:agent_type:4:cv_id:0
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:11
+agent_id:0:agent_type:3:cv_id:0
+Id=9
+ Node(site_type:2<1)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:2<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+
+------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
 ** New update function when discovered sites that are bond on the rhs for the first time:
@@ -1435,12 +1673,12 @@ rule_id:11
 ------------------------------------------------------------
 ** Fixpoint iteration function:
 agent_type:0:cv_id:0
-Id=36
+Id=42
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=35
+  Id=41
    Node(site_type:1<1)
     Id=30
      Node(site_type:2<0)
@@ -1455,15 +1693,15 @@ Id=36
         Id=1
          Leaf False 
 
-    Id=17
+    Id=40
      Node(site_type:1<2)
-      Id=9
+      Id=39
        Node(site_type:2<1)
         Id=1
          Leaf False 
 
-        Id=8
-         Node(site_type:2<2)
+        Id=26
+         Node(site_type:2<3)
           Id=0
            Leaf True 
 
@@ -1513,20 +1751,20 @@ Id=23
        Leaf False 
 
 agent_type:2:cv_id:0
-Id=34
+Id=36
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=33
+  Id=35
    Node(site_type:1<1)
-    Id=12
+    Id=30
      Node(site_type:2<0)
       Id=1
        Leaf False 
 
-      Id=8
-       Node(site_type:2<2)
+      Id=26
+       Node(site_type:2<3)
         Id=0
          Leaf True 
 
@@ -1552,20 +1790,20 @@ Id=34
        Leaf False 
 
 agent_type:3:cv_id:0
-Id=34
+Id=36
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=33
+  Id=35
    Node(site_type:1<1)
-    Id=12
+    Id=30
      Node(site_type:2<0)
       Id=1
        Leaf False 
 
-      Id=8
-       Node(site_type:2<2)
+      Id=26
+       Node(site_type:2<3)
         Id=0
          Leaf True 
 

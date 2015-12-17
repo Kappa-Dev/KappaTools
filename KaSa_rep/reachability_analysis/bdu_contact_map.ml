@@ -162,6 +162,22 @@ let collect_contact_map parameter error rule_id rule handler store_result =
   error, (is_new_bond, store_result)
     
 (*****************************************************************************************)
+(*compute initial state where there is/are binding agent(s)*)
+
+(*let collect_init_map_aux parameter error compil store_result =
+  Nearly_inf_Imperatif.fold parameter error
+    (fun parameter error rule_id rule store_result ->
+      AgentMap.fold2_common parameter error
+        (fun parameter error agent_id agent site_add_map store_result ->
+          
+
+
+
+        ) rule.e_init_c_mixtire.views rule.e_init_c_mixture.bonds store_result      
+    ) compil.init store_result*)
+
+
+(*****************************************************************************************)
 (*contact map*)
 
 let compute_contact_map_full parameter error handler rule =
