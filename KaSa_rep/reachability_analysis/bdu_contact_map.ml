@@ -36,59 +36,9 @@ let trace = false
   - A bond to C; C bond to A.
 *)
 
-(*let compute_contact_map parameter error handler rule =
-  let store_result = Int2Map_CM_state.Map.empty in
-  let add_link (a, b, s) (c, d, s') store_result =
-    let (l, old) =
-      Int2Map_CM_state.Map.find_default ([],[]) (a, b, s) store_result in
-    let add_map =
-      Int2Map_CM_state.Map.add (a, b, s) (l, ((c, d, s') :: []))
-	store_result
-    in
-    error, add_map
-  in  
-  (*folding this solution with the information in dual*)
-  let error, store_result =
-    Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
-      parameter error
-      (fun parameter error (agent1, (site, state)) (agent', site', state') store_result ->
-        (*check on the lhs binding *)
-        AgentMap.fold parameter error 
-          (fun parameter error agent_id agent store_result ->
-            match agent with
-	    | Unknown_agent _ | Dead_agent _ ->
-	       warn parameter error (Some "line 60, dead agents/sites should not occur in rhs") Exit store_result 
-	    | Ghost-> error, store_result
-            | Agent agent ->
-              let agent_type = agent.agent_name in
-              let error, store_result =
-                Site_map_and_set.Map.fold
-                  (fun site_lhs port (error, store_result) ->
-                    let state_lhs = port.site_state.min in
-                    (*if Int2Map_CM_state.Map.mem (agent_type, site_lhs, state_lhs)
-                      store_result
-                    then 
-                      (*let result =
-                        Int2Map_CM_state.Map.remove
-                          (agent_type, site_lhs, state_lhs)
-                          store_result
-                      in*)
-                      error, store_result
-                    else*)
-	            let error, store_result =
-                    add_link (agent1, site, state) (agent', site', state') store_result
-	            in
-	            error, store_result
-                  ) agent.agent_interface (error, store_result)
-              in
-              error, store_result
-          ) rule.rule_lhs.views store_result
-      ) handler.dual store_result
-  in
-  error, store_result*)
+(************************************************************************************)
 
-(*TODO: it is not including initial state: include it in this contact map*)
-let compute_contact_map parameter error rule_id rule handler store_result =
+let compute_contact_map_aux parameter error rule_id rule handler store_result =
   let add_link rule_id (agent, site, state) store_result =
     let error, (l, old) =
       match Int2Map_syn.Map.find_option rule_id store_result with
@@ -105,13 +55,14 @@ let compute_contact_map parameter error rule_id rule handler store_result =
       in
       error, add_map
   in  
+  (*-----------------------------------------------------------------------*)
   (*folding this solution with the information in dual*)
   let error, (store_result1, store_result2) =
     AgentMap.fold parameter error 
       (fun parameter error agent_id agent store_result ->
         match agent with
         | Unknown_agent _ | Dead_agent _ ->
-	  warn parameter error (Some "line 113, dead agents/sites should not occur in rhs") 
+	  warn parameter error (Some "line 64, dead agents/sites should not occur in rhs") 
             Exit store_result 
 	| Ghost-> error, store_result
         | Agent agent ->
@@ -123,6 +74,7 @@ let compute_contact_map parameter error rule_id rule handler store_result =
             let agent2 = site_add2.agent_type in
             let site2 = site_add2.site in
             let agent_index2 = site_add2.agent_index in
+            (*-----------------------------------------------------------------------*)
             let error, map1 =
               Site_map_and_set.Map.fold
                 (fun site port (error, store_result) ->
@@ -134,6 +86,7 @@ let compute_contact_map parameter error rule_id rule handler store_result =
                     error, store_result
                 ) agent.agent_interface (error, store_result1)
             in
+            (*-----------------------------------------------------------------------*)
             let error, map2 = 
               Site_map_and_set.Map.fold
                 (fun site port (error, store_result) ->
@@ -149,6 +102,7 @@ let compute_contact_map parameter error rule_id rule handler store_result =
           ) (error, store_result) rule.actions.bind
       ) rule.rule_rhs.views store_result
   in
+  (*-----------------------------------------------------------------------*)
   let store_result1 = 
     Int2Map_syn.Map.map (fun (l, x) -> List.rev l, x) store_result1
   in
@@ -157,11 +111,59 @@ let compute_contact_map parameter error rule_id rule handler store_result =
   in
   error, (store_result1, store_result2)
 
+(************************************************************************************)
+
+let collect_contact_map parameter error rule_id rule handler store_result =
+  let add_link rule_id ((agent_type1, site_type1, state1), (agent_type2, site_type2, state2))
+      store_result =
+    let old = Int2Map_syn.Map.find_default Set_pair.Set.empty rule_id
+      store_result
+    in
+    let set = Set_pair.Set.add
+      ((agent_type1, site_type1, state1), (agent_type2, site_type2, state2)) old in
+    let union_set = Set_pair.Set.union old set in
+    if Set_pair.Set.equal union_set old 
+    then error, false, store_result
+    else 
+      let store_result = Int2Map_syn.Map.add rule_id union_set
+        store_result
+      in
+      error, true, store_result
+  in
+  (*-----------------------------------------------------------------------*)
+  let error, (map1, map2) =
+    compute_contact_map_aux
+      parameter
+      error
+      rule_id
+      rule
+      handler
+      (Int2Map_syn.Map.empty, Int2Map_syn.Map.empty)
+  in
+  (*-----------------------------------------------------------------------*)
+  let error, (is_new_bond, store_result) =
+    Int2Map_syn.Map.monadic_fold2_sparse parameter error
+      (fun parameter error rule_id (_, set1) (_, set2) (b, store_result) ->
+        Set_triple.Set.fold (fun (agent_type1, site_type1, state1) 
+          (error, (b, store_result)) ->
+            Set_triple.Set.fold (fun (agent_type2, site_type2, state2) 
+              (error, (b, store_result)) ->
+                let error, is_new_bond, store_result =
+                  add_link rule_id 
+                    ((agent_type1, site_type1, state1), (agent_type2, site_type2, state2))
+                    store_result
+                in
+                error, (is_new_bond, store_result)
+            ) set2 (error, (b, store_result))
+        ) set1 (error, (b, store_result))
+      ) map1 map2 store_result
+  in
+  error, (is_new_bond, store_result)
+    
 (*****************************************************************************************)
 (*contact map*)
 
 let compute_contact_map_full parameter error handler rule =
-  let store_result = Int2Map_CM_state.Map.empty in
   let add_link (a, b, s) (c, d, s') store_result =
     let old =
       Int2Map_CM_state.Map.find_default Set_triple.Set.empty (a, b, s) store_result
@@ -175,7 +177,8 @@ let compute_contact_map_full parameter error handler rule =
         Int2Map_CM_state.Map.add (a, b, s) union_set store_result
       in
       error, add_map
-  in  
+  in
+  (*-----------------------------------------------------------------------*)
   (*folding this solution with the information in dual*)
   let error, store_result =
     Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
@@ -185,6 +188,6 @@ let compute_contact_map_full parameter error handler rule =
           add_link (agent1, site, state) (agent', site', state') store_result
 	in
 	error, store_result
-      ) handler.dual store_result
+      ) handler.dual Int2Map_CM_state.Map.empty
   in
   error, store_result

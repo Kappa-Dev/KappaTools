@@ -485,6 +485,7 @@ Sites are annotated with the id of binding type:
 (Syntactic) Contact map (only considering rhs) and initital state:
 ------------------------------------------------------------
 Sites are annotated with the id of binding type:
+A bond is discovered for the first time:false
 
 ------------------------------------------------------------
 List of rules to awake when the state of a site is modified and tested:
@@ -730,9 +731,6 @@ agent_type:1:covering_class_id:0:@set of rule_id:
 rule_id:0
 rule_id:1
 rule_id:2
-------------------------------------------------------------
-** Discovered sites that are bond on the rhs for the first time:
-false
 ------------------------------------------------------------
 ** Fixpoint iteration function:
 agent_type:0:cv_id:0

@@ -28,19 +28,12 @@ let trace = false
 (*contact map*)
 
 let print_contact_map_aux parameter error result =
-  let result1, result2 = result in
-  Int2Map_syn.Map.iter (fun rule_id (_, set) ->
-    Int2Map_syn.Map.iter (fun rule_id' (_, set2) ->
-      Set_triple.Set.iter (fun (agent1, site1, state1) ->
-        Set_triple.Set.iter (fun (agent2, site2, state2) ->
-          if rule_id = rule_id'
-          then
-            fprintf stdout "agent_type:%i@site_type:%i:state:%i--agent_type':%i:site_type':%i:state':%i\n"
-              agent1 site1 state1 agent2 site2 state2
-          else ()
-        ) set2
-      ) set
-    ) result2
+  let b, result1 = result in
+  fprintf stdout "A bond is discovered for the first time:%b\n" b;
+  Int2Map_syn.Map.iter (fun rule_id set ->
+    Set_pair.Set.iter (fun ((agent1, site1, state1), (agent2, site2,state2)) ->
+      fprintf stdout "agent_type:%i@site_type:%i:state:%i--agent_type':%i@site_type':%i:state':%i\n" agent1 site1 state1 agent2 site2 state2
+    ) set
   ) result1
 
 let print_contact_map parameter error result =
@@ -63,15 +56,11 @@ let print_contact_map parameter error result =
 (************************************************************************************)
 
 let print_contact_map_full_aux parameter error result =
-  Int2Map_CM_state.Map.iter
-    (fun (x, y, s) set ->
-      Set_triple.Set.iter
-	(fun (z, t, s') ->
-	  Printf.fprintf parameter.log
-            "agent_type:%i@site_type:%i:state:%i--agent_type':%i@site_type':%i:state':%i\n"
-            x y s z t s'
-	) set
-    ) result
+  Int2Map_CM_state.Map.iter (fun (agent1, site1, state1) set ->
+    Set_triple.Set.iter (fun (agent2, site2, state2) ->
+      fprintf stdout "agent_type:%i@site_type:%i:state:%i--agent_type':%i@site_type':%i:state':%i\n" agent1 site1 state1 agent2 site2 state2
+    ) set
+  ) result
 
 let print_contact_map_full parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
@@ -137,7 +126,7 @@ let print_result_dynamic parameter error result =
   let _ =
     print_contact_map
       parameter
-      error 
+      error
       result.store_contact_map
   in
   (*------------------------------------------------------------------------------*)

@@ -24,7 +24,7 @@ let trace = false
 
 (************************************************************************************)
 
-let print_test_bonds parameter error result =
+(*let print_test_bonds parameter error result =
   let (b, map) = result in
   fprintf stdout "%b\n" b;
   Map_test_bond.Map.iter (fun rule_id set ->
@@ -39,7 +39,7 @@ let print_test_bonds parameter error result =
         site_add2.Cckappa_sig.agent_index site_add2.Cckappa_sig.agent_type 
         site_add2.Cckappa_sig.site     
     ) set
-  ) map
+  ) map*)
 
 (************************************************************************************)
 
@@ -86,7 +86,7 @@ let print_bdu_fixpoint parameter error result =
       error
       result.store_new_wl_side_effect
   in
-  let _ =
+  (*let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
@@ -95,7 +95,7 @@ let print_bdu_fixpoint parameter error result =
       parameter
       error
       result.store_test_has_bond_rhs
-  in
+  in*)
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";

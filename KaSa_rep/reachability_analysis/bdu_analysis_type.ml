@@ -126,6 +126,12 @@ module Set_triple =
       let compare = compare
     end )
 
+module Set_pair =
+  SetMap.Make (
+    struct
+      type t = (int * int * int) * (int * int * int)
+      let compare = compare
+    end )
 
 (*list of rules to awake when the state of a site is modified and tested*)
 
@@ -345,11 +351,8 @@ type wl_int = IntWL.WSetMap.elt list * IntWL.WSetMap.elt list * IntWL.WSetMap.Se
 
 type bdu_analysis_dynamic =
   {
-    store_contact_map_full :
-     Set_triple.Set.t Int2Map_CM_state.Map.t;
-    store_contact_map : 
-      (int list * Set_triple.Set.t) Int2Map_syn.Map.t * 
-      (int list * Set_triple.Set.t) Int2Map_syn.Map.t;
+    store_contact_map_full : Set_triple.Set.t Int2Map_CM_state.Map.t;
+    store_contact_map :  bool * Set_pair.Set.t Int2Map_syn.Map.t;
     store_covering_classes_modification_update : (*update(c)*)
       (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;
   }
@@ -388,7 +391,7 @@ type bdu_build =
 
 type bdu_fixpoint =
     {
-      store_test_has_bond_rhs  : bool * Map_site_address.Set.t Map_test_bond.Map.t;
+      (*store_test_has_bond_rhs  : bool * Map_site_address.Set.t Map_test_bond.Map.t;*)
       store_new_wl_side_effect : (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;
       store_bdu_fixpoint_map   : Mvbdu_wrapper.Mvbdu.mvbdu Map_bdu_update.Map.t;
   }

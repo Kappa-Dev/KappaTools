@@ -163,35 +163,36 @@ let store_new_result_hb_map
     (fun (agent_type_eff, site_type_eff) (l1, l2) (error, store_result) ->
       List.fold_left (fun (error, store_result) (rule_id_eff, state) ->
         Int2Map_syn.Map.fold
-          (fun rule_id' (_, set) 
-            (error, store_result) ->
-              Set_triple.Set.fold
-                (fun (agent_type1, site_type1, state1) (error, store_result) ->
-                  if state = 0 (*state2*)
-                  then
-                    if agent_type1 = agent_type_eff &&
-                      site_type1 = site_type_eff
+          (fun rule_id set (error, store_result) ->
+              Set_pair.Set.fold 
+                (fun ((agent_type1, site_type1, state1),(agent_type2,site_type2, state2))
+                  (error, store_result) ->
+                    if state = state2
                     then
-                      Int2Map_CV_Modif.Map.fold
-                        (fun (agent_type, cv_id) (l', rule_id_set) (error, store_result) ->
-                          Site_map_and_set.Set.fold
-                            (fun rule_id_update (error, current_result) ->
-                              if agent_type = (*agent_type2*) agent_type1 (*FIXME*)
-                              then
-                                let error, result =
-                                  add_link (agent_type, cv_id) rule_id_eff
-                                    current_result
-                                in
-                                error, result
-                              else
-                                error, current_result
-                            ) rule_id_set (error, store_result)
-                        ) store_covering_classes_modification_update
-                        (error, store_result)
+                      if agent_type1 = agent_type_eff &&
+                        site_type1 = site_type_eff
+                      then
+                        Int2Map_CV_Modif.Map.fold
+                          (fun (agent_type, cv_id) 
+                            (l', rule_id_set) (error, store_result) ->
+                              Site_map_and_set.Set.fold
+                                (fun rule_id_update (error, current_result) ->
+                                  if agent_type = agent_type2
+                                  then
+                                    let error, result =
+                                      add_link (agent_type, cv_id) rule_id_eff
+                                        current_result
+                                    in
+                                    error, result
+                                  else
+                                    error, current_result
+                                ) rule_id_set (error, store_result)
+                          ) store_covering_classes_modification_update
+                          (error, store_result)
+                      else
+                        error, store_result
                     else
-                    error, store_result
-                  else
-                    error, store_result
+                      error, store_result
                 ) set (error, store_result)
           ) store_contact_map (error, store_result)
       ) (error, store_result) l2
@@ -229,10 +230,10 @@ let store_new_result_remove_map
     (fun (agent_type_eff, site_type_eff) (l1, l2) (error, store_result) ->
       List.fold_left (fun (error, store_result) rule_id_eff ->
         Int2Map_syn.Map.fold
-          (fun rule_id' (_, set)
-            (error, store_result) ->
-              Set_triple.Set.fold
-                (fun (agent_type1, site_type1, state1) (error, store_result) ->
+          (fun rule_id set (error, store_result) ->
+            Set_pair.Set.fold
+              (fun ((agent_type1, site_type1, state1),(agent_type2, site_type2, state2))
+                (error, store_result) ->
                   if agent_type1 = agent_type_eff && 
                     site_type1 = site_type_eff
                   then
@@ -243,7 +244,7 @@ let store_new_result_remove_map
                             let error, store_result =
                               Site_map_and_set.Set.fold
                                 (fun rule_id_update (error, current_result) ->
-                                  if agent_type = (*agent_type2*) agent_type1 (*FIXME*)
+                                  if agent_type = agent_type2
                                   then
                                     add_link (agent_type, cv_id) rule_id_eff current_result
                                   else
@@ -257,7 +258,7 @@ let store_new_result_remove_map
                     error, store_result
                   else
                     error, store_result
-                ) set (error, store_result)
+              ) set (error, store_result)
           ) store_contact_map (error, store_result)
       ) (error, store_result) l2
     ) remove_map (error, store_result_map)
@@ -774,7 +775,7 @@ let collect_bdu_fixpoint_without_init parameter handler error
     store_proj_potential_list_restriction_map
     store_bdu_test_restriction_map
     is_new_bond
-    store_test_has_bond_rhs
+    (*store_test_has_bond_rhs*)
     store_new_result_map
     store_covering_classes_modification_update
     store_result_map
@@ -885,7 +886,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
     store_proj_potential_list_restriction_map
     store_bdu_test_restriction_map
     is_new_bond
-    store_test_has_bond_rhs
+    (*store_test_has_bond_rhs*)
     store_new_result_map
     store_covering_classes_modification_update
     store_bdu_init_restriction_map
@@ -1057,7 +1058,7 @@ let collect_bdu_fixpoint_map' parameter handler error
     store_proj_potential_list_restriction_map
     store_bdu_test_restriction_map
     is_new_bond
-    store_test_has_bond_rhs
+    (*store_test_has_bond_rhs*)
     store_new_result_map
     store_covering_classes_modification_update
     store_bdu_init_restriction_map
@@ -1087,7 +1088,7 @@ let collect_bdu_fixpoint_map' parameter handler error
       store_proj_potential_list_restriction_map
       store_bdu_test_restriction_map
       is_new_bond
-      store_test_has_bond_rhs
+      (*store_test_has_bond_rhs*)
       store_new_result_map
       store_covering_classes_modification_update
       store_bdu_init_restriction_map
@@ -1158,7 +1159,7 @@ let collect_bdu_fixpoint_map parameter handler error
     store_proj_potential_list_restriction_map
     store_bdu_test_restriction_map
     is_new_bond
-    store_test_has_bond_rhs
+    (*store_test_has_bond_rhs*)
     store_new_result_map
     store_covering_classes_modification_update
     store_bdu_init_restriction_map
@@ -1192,7 +1193,7 @@ let collect_bdu_fixpoint_map parameter handler error
         store_proj_potential_list_restriction_map
         store_bdu_test_restriction_map
         is_new_bond
-        store_test_has_bond_rhs
+        (*store_test_has_bond_rhs*)
         store_new_result_map
         store_covering_classes_modification_update
         store_bdu_init_restriction_map
@@ -1217,7 +1218,7 @@ let collect_bdu_fixpoint_map parameter handler error
         store_proj_potential_list_restriction_map
         store_bdu_test_restriction_map
         is_new_bond
-        store_test_has_bond_rhs
+        (*store_test_has_bond_rhs*)
         store_new_result_map
         store_covering_classes_modification_update
         store_result_map
