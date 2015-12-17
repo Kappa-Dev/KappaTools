@@ -1,0 +1,21 @@
+#Command-line:
+"${KAPPABIN}"KaSim -i side-effects.ka  -e 25 -seed 253329392 -d output || exit 0 
+
+
+#A and B can for dimmer.
+#A can release its link. 
+
+#After a given time, releasing a link can produce a C. 
+
+#The observable require A to be associated with the specific B and C to exist. 
+
+#Causal flows can be compressed in 
+#A and (specific) B unbind which creates a C, then A and the specific B rebind. 
+
+#This compression can be achieved only by playing the event unbind A and creates C in a different context. 
+#(Which is OK since it is a side-effect and we do no track the identity of the released partner). 
+
+ 
+
+
+

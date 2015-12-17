@@ -1,0 +1,18 @@
+%def: "displayCompression" "weak" "none"
+%def: "showIntroEvents" "true" 
+%def: "reduceCflows" "true"
+
+
+
+A(x),B(x) -> A(x!1),B(x!1) @1 
+A() -> B() @1
+B() -> A() @1
+'GOAL' A(x!1),B(x!1) -> A(x),B(x) @1 
+
+%init: 1 A(x),B(x)
+
+%mod: [true] do $TRACK 'GOAL' [true]
+
+
+%agent: A(x)
+%agent: B(x)

@@ -1,0 +1,35 @@
++ Command line is: 'KaSim' '-i' 'side-effects.ka' '-e' '25' '-seed' '253329392' '-d' 'output'
+Parsing side-effects.ka...
+done
++ Initialized random number generator with seed 253329392
++ Building initial simulation conditions...
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -sanity checks
+	 -KaSa tools initialization
++ Compute the contact map
+	 -variable declarations
+	 -rules
+	 -observables
+	 -perturbations
+	 -initial conditions
+	 Done
+____________________________________________________________
+############################################################
+	 - removing events occurring after the last observable:
+ (no change)
++ Producing causal compressions
+	 - splitting initial events (+1 events)
+	 - blackboard generation
+	 - computing causal past of each observed events (5)
+Stats:
+ number of step   : 33
+ longest story    : 24
+ average length   : 9.76666666667
+ geometric mean   : 11.4528016951
+
+	 - causal flow compression (5)
+
+____________________________________________________________
+Fatal error: exception Failure("several observables in that storycompression_main, line 2014")
