@@ -95,45 +95,8 @@ let compute_bdu_update parameter handler error bdu_test list_a bdu_creation
   error, handler, bdu_update_test_side_effects
     
 (************************************************************************************)
-(*a bond is discovered for the first time*)
-
-(*rule that has the views that are tested and bond: if one can apply this
-  rule, then add rule of side effects into the update(c), and then add
-  update(c') to the working list.*)
- 
-let collect_test_has_bond_rhs parameter error rule_id rule store_result =
-  let add_bond rule_id (site_add1, site_add2) store_result =
-    let error, old =
-      match Map_test_bond.Map.find_option rule_id store_result with
-      | None -> error, Map_site_address.Set.empty
-      | Some s -> error, s
-    in
-    let set = Map_site_address.Set.add (site_add1, site_add2) old in
-    let union_set = Map_site_address.Set.union set old in
-    (*check if a bond is discovered for the first time*)
-    if Map_site_address.Set.equal union_set old
-    then error, false, store_result
-    else 
-      (*it is discovered for the first time*)
-      let result_map =
-        Map_test_bond.Map.add rule_id union_set store_result
-      in
-      error, true, result_map
-  in
-  let error, bool, store_result =
-    List.fold_left (fun (error, b, store_result) (site_add1, site_add2) ->
-      let error, is_new_bond, store_result =
-        add_bond rule_id (site_add1, site_add2) store_result
-      in
-      error, is_new_bond, store_result
-    ) (error, false, store_result) rule.actions.bind
-  in
-  error, bool, store_result
-
-(************************************************************************************)
 (*side effects in the case of half break*)
 
-(*FIXME*)
 let store_new_result_hb_map
     parameter
     error 
@@ -775,7 +738,6 @@ let collect_bdu_fixpoint_without_init parameter handler error
     store_proj_potential_list_restriction_map
     store_bdu_test_restriction_map
     is_new_bond
-    (*store_test_has_bond_rhs*)
     store_new_result_map
     store_covering_classes_modification_update
     store_result_map
@@ -886,7 +848,6 @@ let collect_bdu_fixpoint_with_init parameter handler error
     store_proj_potential_list_restriction_map
     store_bdu_test_restriction_map
     is_new_bond
-    (*store_test_has_bond_rhs*)
     store_new_result_map
     store_covering_classes_modification_update
     store_bdu_init_restriction_map
@@ -1058,7 +1019,6 @@ let collect_bdu_fixpoint_map' parameter handler error
     store_proj_potential_list_restriction_map
     store_bdu_test_restriction_map
     is_new_bond
-    (*store_test_has_bond_rhs*)
     store_new_result_map
     store_covering_classes_modification_update
     store_bdu_init_restriction_map
@@ -1088,7 +1048,6 @@ let collect_bdu_fixpoint_map' parameter handler error
       store_proj_potential_list_restriction_map
       store_bdu_test_restriction_map
       is_new_bond
-      (*store_test_has_bond_rhs*)
       store_new_result_map
       store_covering_classes_modification_update
       store_bdu_init_restriction_map
@@ -1159,7 +1118,6 @@ let collect_bdu_fixpoint_map parameter handler error
     store_proj_potential_list_restriction_map
     store_bdu_test_restriction_map
     is_new_bond
-    (*store_test_has_bond_rhs*)
     store_new_result_map
     store_covering_classes_modification_update
     store_bdu_init_restriction_map
@@ -1193,7 +1151,6 @@ let collect_bdu_fixpoint_map parameter handler error
         store_proj_potential_list_restriction_map
         store_bdu_test_restriction_map
         is_new_bond
-        (*store_test_has_bond_rhs*)
         store_new_result_map
         store_covering_classes_modification_update
         store_bdu_init_restriction_map
@@ -1218,7 +1175,6 @@ let collect_bdu_fixpoint_map parameter handler error
         store_proj_potential_list_restriction_map
         store_bdu_test_restriction_map
         is_new_bond
-        (*store_test_has_bond_rhs*)
         store_new_result_map
         store_covering_classes_modification_update
         store_result_map

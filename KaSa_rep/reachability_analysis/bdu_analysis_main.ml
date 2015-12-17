@@ -342,15 +342,6 @@ let scan_rule_fixpoint parameter handler_bdu error
     store_result
     =
   (*-------------------------------------------------------------------------------*)
-  (*let error, is_new_bond, store_test_has_bond_rhs =
-    collect_test_has_bond_rhs
-      parameter
-      error
-      rule_id
-      rule
-      (snd store_result.store_test_has_bond_rhs)
-  in*)
-  (*-------------------------------------------------------------------------------*)
   let error, store_new_wl_side_effect =
     collect_update_hb_remove_map
       parameter
@@ -375,7 +366,6 @@ let scan_rule_fixpoint parameter handler_bdu error
       store_proj_potential_list_restriction_map
       store_bdu_test_restriction_map
       is_new_bond
-      (*store_test_has_bond_rhs*)
       store_new_wl_side_effect
       store_covering_classes_modification_update
       store_bdu_init_restriction_map
@@ -384,7 +374,6 @@ let scan_rule_fixpoint parameter handler_bdu error
   (*-------------------------------------------------------------------------------*)
   error, handler_bdu, 
   {
-    (*store_test_has_bond_rhs  = is_new_bond, store_test_has_bond_rhs;*)
     store_new_wl_side_effect = store_new_wl_side_effect;
     store_bdu_fixpoint_map   = store_bdu_fixpoint_map;
   }
@@ -550,12 +539,10 @@ let init_bdu_build parameter error =
 (*init of bdu fixpoint*)
 
 let init_bdu_fixpoint parameter error =
-  (*let init_test_has_bond_rhs  = false, Map_test_bond.Map.empty in*)
   let init_new_wl_side_effect = Int2Map_CV_Modif.Map.empty in
   let init_bdu_fixpoint_map   = Map_bdu_update.Map.empty in
   let init_bdu_fixpoint =
     {
-      (*store_test_has_bond_rhs  = init_test_has_bond_rhs;*)
       store_new_wl_side_effect = init_new_wl_side_effect;
       store_bdu_fixpoint_map   = init_bdu_fixpoint_map;
     }

@@ -86,16 +86,6 @@ let print_bdu_fixpoint parameter error result =
       error
       result.store_new_wl_side_effect
   in
-  (*let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "** Discovered sites that are bond on the rhs for the first time:\n";
-    print_test_bonds
-      parameter
-      error
-      result.store_test_has_bond_rhs
-  in*)
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
