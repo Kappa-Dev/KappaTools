@@ -126,8 +126,8 @@ let compute_contact_map parameter error rule_id rule handler store_result =
             let error, map1 =
               Site_map_and_set.Map.fold
                 (fun site port (error, store_result) ->
-                  let state = port.site_state.min in
-                  if agent_id = agent_index1 
+                  let state = port.site_state.max in
+                  if agent_id = agent_index1 && state > 0
                   then
                     add_link rule_id (agent1, site1, state) store_result
                   else
@@ -137,8 +137,8 @@ let compute_contact_map parameter error rule_id rule handler store_result =
             let error, map2 = 
               Site_map_and_set.Map.fold
                 (fun site port (error, store_result) ->
-                  let state = port.site_state.min in
-                  if agent_id = agent_index2
+                  let state = port.site_state.max in
+                  if agent_id = agent_index2 && state > 0
                   then
                     add_link rule_id (agent2, site2, state) store_result
                   else
