@@ -2,7 +2,7 @@
  * utilities.ml 
  *      
  * Creation:                      <2015-03-28 feret>
- * Last modification: Time-stamp: <2015-12-15 09:14:46 feret>
+ * Last modification: Time-stamp: <2015-12-16 09:14:46 feret>
  * 
  * API for causal compression
  * Jerome Feret, projet Abstraction, INRIA Paris-Rocquencourt
