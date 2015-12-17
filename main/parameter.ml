@@ -53,7 +53,6 @@ let compileModeOn = ref false
 let implicitSignature = ref false
 let dotSnapshots = ref false
 let dotCflows = ref true
-let reduceCflows = ref false
 let fluxModeOn = ref false
 let snapshotHighres = ref true
 

@@ -18,7 +18,6 @@
 
 
 %def: "displayCompression" "none" "weak" "strong"
-%def: "reduceCflows" "true"
 %mod: [true] do $TRACK 'L' [true]
 
 

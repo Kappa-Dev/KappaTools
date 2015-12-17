@@ -1,6 +1,5 @@
 %def: "displayCompression" "weak" "none"
 %def: "showIntroEvents" "true" 
-%def: "reduceCflows" "true"
 
 
 

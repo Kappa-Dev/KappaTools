@@ -1,6 +1,5 @@
 %def: "displayCompression" "weak" "strong" "none"
 %def: "showIntroEvents" "true"
-%def: "reduceCflows" "true"
 
 %agent: A(x~a~b~c~d~e)
 
