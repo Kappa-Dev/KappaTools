@@ -379,12 +379,13 @@ module Cflow_linker =
        | (Dummy _ | Subs _ | Init _) ->
 	  error,priorities.Priority.substitution
 
-  let subs_agent_in_event mapping = function
+  let subs_agent_in_event mapping mapping' = function
     | Event (a,event) ->
        Event
 	 (a,
-	  PI.subst_map_agent_in_concrete_event
+	  PI.subst_map2_agent_in_concrete_event
 	    (fun x -> AgentIdMap.find_default x x mapping)
+	    (fun x -> AgentIdMap.find_default x x mapping')
 	    event)
     | Obs (a,b,c) ->
        Obs(a,
@@ -396,14 +397,14 @@ module Cflow_linker =
        Init
 	 (Tools.list_smart_map
 	    (PI.subst_map_agent_in_concrete_action
-	       (fun x -> AgentIdMap.find_default x x mapping)) b)
+	       (fun x -> AgentIdMap.find_default x x mapping')) b)
     | Dummy _ | Subs _ as event -> event
 
   let disambiguate event_list =
     let _,_,_,event_list_rev =
       List.fold_left
         (fun (max_id,used,mapping,event_list) event ->
-         let max_id,used,mapping =
+         let max_id,used,mapping' =
            List.fold_left
              (fun (max_id,used,mapping) x ->
               if AgentIdSet.mem x used
@@ -412,8 +413,8 @@ module Cflow_linker =
 		 AgentIdMap.add x (max_id+1) mapping)
               else (max x max_id,AgentIdSet.add x used,mapping))
              (max_id,used,mapping) (creation_of_event event) in
-         let list = (subs_agent_in_event mapping event)::event_list in
-         max_id,used,mapping,list)
+         let list = (subs_agent_in_event mapping mapping' event)::event_list in
+         max_id,used,mapping',list)
         (0,AgentIdSet.empty,AgentIdMap.empty,[])
         event_list
     in List.rev event_list_rev

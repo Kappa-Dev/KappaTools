@@ -109,27 +109,31 @@ let subst_agent_in_concrete_test id id' x =
 let rename_abstract_test wk id cc inj x =
   subst_map_agent_in_test (Agent_place.rename wk id cc inj) x
 
-let subst_map_agent_in_action f = function
+
+let subst_map2_agent_in_action f f' = function
   | Create (agent,list) as x ->
-     let agent' = f agent in
+     let agent' = f' agent in
      if agent == agent' then x else Create(agent',list)
   | Mod_internal (site,i) as x ->
-     let site' = subst_map_site f site in
+     let site' = subst_map_site f' site in
      if site == site' then x else Mod_internal(site',i)
   | Bind (s1,s2) as x ->
-     let s1' = subst_map_site f s1 in
-     let s2' = subst_map_site f s2 in
+     let s1' = subst_map_site f' s1 in
+     let s2' = subst_map_site f' s2 in
      if s1==s1' && s2==s2' then x else Bind(s1',s2')
   | Bind_to (s1,s2) as x ->
-     let s1' = subst_map_site f s1 in
-     let s2' = subst_map_site f s2 in
+     let s1' = subst_map_site f' s1 in
+     let s2' = subst_map_site f' s2 in
      if s1==s1' && s2==s2' then x else Bind_to(s1',s2')
   | Free site as x ->
-     let site' = subst_map_site f site in
+     let site' = subst_map_site f' site in
      if site == site' then x else Free site'
   | Remove agent as x ->
      let agent' = f agent in
      if agent==agent' then x else Remove agent'
+
+let subst_map_agent_in_action f x = subst_map2_agent_in_action f f x
+							       
 let subst_map_agent_in_concrete_action f x =
   subst_map_agent_in_action (subst_map_concrete_agent f) x
 let subst_agent_in_concrete_action id id' x =
@@ -159,8 +163,18 @@ let subst_map_agent_in_event f (tests,(acs,kasa_side,kasim_side)) =
    (Tools.list_smart_map (subst_map_agent_in_action f) acs,
     Tools.list_smart_map (subst_map_agent_in_side_effect f) kasa_side,
     Tools.list_smart_map (subst_map_site f) kasim_side))
+let subst_map2_agent_in_event f f' (tests,(acs,kasa_side,kasim_side)) =
+  (Tools.list_smart_map (subst_map_agent_in_test f) tests,
+   (Tools.list_smart_map (subst_map2_agent_in_action f f') acs,
+    Tools.list_smart_map (subst_map_agent_in_side_effect f) kasa_side,
+    Tools.list_smart_map (subst_map_site f) kasim_side))
+
 let subst_map_agent_in_concrete_event f x =
   subst_map_agent_in_event (subst_map_concrete_agent f) x
+let subst_map2_agent_in_concrete_event f f' x =
+  subst_map2_agent_in_event (subst_map_concrete_agent f) (subst_map_concrete_agent f') x
+
+
 let subst_agent_in_concrete_event id id' x =
   subst_map_agent_in_concrete_event
     (fun j -> if j = id then id' else j) x

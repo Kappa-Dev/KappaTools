@@ -171,7 +171,12 @@ let make_unambiguous parameters p kappa_handler profiling_info error trace =
     error,
     if trace'==trace   
     then trace
-    else set_ambiguity_level trace' false
+    else
+      begin
+(*	print_trace parameters kappa_handler trace ;
+	print_trace parameters kappa_handler trace' ;*)
+	set_ambiguity_level trace' false
+      end 
   else
     error,trace 
 

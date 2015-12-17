@@ -72,6 +72,8 @@ val subst_agent_in_concrete_side_effect:
   (concrete site * concrete binding_state)
 val subst_map_agent_in_concrete_event:
   (int -> int) -> concrete event -> concrete event
+val subst_map2_agent_in_concrete_event:
+  (int -> int) -> (int -> int) -> concrete event -> concrete event 
 val subst_agent_in_concrete_event:
   int -> int -> concrete event -> concrete event
 
