@@ -262,6 +262,13 @@ agent_type:0:covering_class_id:0:@set of rule_id:
 rule_id:0
 ------------------------------------------------------------
 ** Fixpoint iteration function:
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl:rule_id:0
+wl_init_creation:
+0 
+Test for rule:0
+disabled
 ============================================================
 * BDU Analysis:
 ============================================================

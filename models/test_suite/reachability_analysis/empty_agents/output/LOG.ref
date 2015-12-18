@@ -265,6 +265,8 @@ List of rules to awake when the state of a site is modified and tested:
 ** New update function when discovered sites that are bond on the rhs for the first time:
 ------------------------------------------------------------
 ** Fixpoint iteration function:
+wl_init_creation:
+0 1 2 3 4 
 Test for rule:0
 enabled
 Test for rule:1

@@ -966,10 +966,52 @@ agent_type:5:covering_class_id:1:@set of rule_id:
 rule_id:6
 ------------------------------------------------------------
 ** Fixpoint iteration function:
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:8
+in add_update_to_wl:rule_id:8
+in add_update_to_wl:agent_type:0:cv_id:1
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:agent_type:0:cv_id:2
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:agent_type:4:cv_id:0
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:agent_type:4:cv_id:1
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:agent_type:5:cv_id:0
+in add_update_to_wl: set of rule_id:7
+in add_update_to_wl:rule_id:7
+in add_update_to_wl:agent_type:5:cv_id:1
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:6
+wl_init_creation:
+0 1 2 3 4 5 6 7 8 
 Test for rule:1
 enabled
 Test for rule:3
 enabled
+Test for rule:8
+disabled
+Test for rule:0
+disabled
+Test for rule:2
+disabled
+Test for rule:4
+disabled
+Test for rule:5
+disabled
+Test for rule:7
+disabled
+Test for rule:6
+disabled
 ============================================================
 * BDU Analysis:
 ============================================================

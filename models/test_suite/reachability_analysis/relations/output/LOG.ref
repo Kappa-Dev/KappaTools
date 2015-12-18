@@ -775,6 +775,23 @@ rule_id:5
 rule_id:6
 ------------------------------------------------------------
 ** Fixpoint iteration function:
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:3
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+wl_init_creation:
+0 1 2 3 4 5 6 
 Test for rule:0
 enabled
 Ag:0
@@ -826,10 +843,6 @@ in add_update_to_wl:rule_id:3
 in add_update_to_wl:rule_id:4
 in add_update_to_wl:rule_id:5
 in add_update_to_wl:rule_id:6
-Test for rule:0
-enabled
-Ag:0
-Nothing has changed
 Test for rule:1
 enabled
 Ag:0 Type: 0 Cvid: 0
