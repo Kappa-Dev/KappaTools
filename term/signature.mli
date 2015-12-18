@@ -21,6 +21,7 @@ val get : s -> int -> t
 
 val arity : s -> int -> int
 (** [arity sigs agent_id] *)
+
 val max_arity : s -> int
 (** [max_arity sigs] returns max {arities sigs i} *)
 
