@@ -1224,8 +1224,8 @@ let collect_bdu_fixpoint_with_init parameter handler error
 
 (*TODO*)
 
-let collect_bdu_fixpoint_map parameter handler error 
-			      (*rule/meaningless*)
+(*let collect_bdu_fixpoint_map parameter handler error 
+    (*rule/meaningless*)
     wl_creation
     store_proj_bdu_creation_restriction_map
     store_proj_modif_list_restriction_map
@@ -1299,3 +1299,86 @@ let collect_bdu_fixpoint_map parameter handler error
         store_result_map
     in
     error, (handler, store_bdu_fixpoint_map)
+      *)
+
+let collect_bdu_fixpoint_map parameter handler error 
+    (*rule/meaningless*)
+    wl_creation
+    store_proj_bdu_creation_restriction_map
+    store_proj_modif_list_restriction_map
+    store_proj_bdu_test_restriction_map
+    store_proj_bdu_potential_restriction_map
+    store_proj_potential_list_restriction_map
+    store_bdu_test_restriction_map
+    store_proj_bdu_views
+    is_new_bond
+    store_new_result_map
+    store_covering_classes_modification_update
+    store_bdu_init_restriction_map
+    store_result_map
+    =
+  let error, handler, bdu_false = 
+    Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error
+  in 
+  let error, handler, bdu_true = 
+    Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error 
+  in
+  (*-----------------------------------------------------------------------*)
+  let add_link handler (agent_type, cv_id) bdu store_result =
+    let error, bdu_old =
+      match Map_bdu_update.Map.find_option (agent_type, cv_id) store_result with
+      | None -> error, bdu_false
+      | Some bdu -> error, bdu
+    in
+    let error, handler, bdu_union =
+      Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_old bdu
+    in
+    if Mvbdu_wrapper.Mvbdu.equal bdu_old bdu_union
+    then error, handler, store_result
+    else
+      let result_map =
+        Map_bdu_update.Map.add (agent_type, cv_id) bdu_union store_result
+      in
+      error, handler, result_map
+  in
+  (*-----------------------------------------------------------------------*)
+  (*union the result of bdu_fixpoint_map with initial state*)
+  let error, handler, store_bdu_init_X =
+    Map_bdu_update.Map.fold
+      (fun (agent_type, cv_id) bdu_init (error, handler, store_result) ->
+        (*get bdu_X*)
+        let error, bdu_X =
+          match Map_bdu_update.Map.find_option (agent_type, cv_id) store_result_map with
+          | None -> error, bdu_false
+          | Some bdu -> error, bdu
+        in
+        let error, handler, bdu_union =
+          Mvbdu_wrapper.Mvbdu.mvbdu_and parameter handler error bdu_init bdu_X
+        in
+        add_link handler (agent_type, cv_id) bdu_union store_result
+      ) store_bdu_init_restriction_map (error, handler, Map_bdu_update.Map.empty)
+  in
+  (*-----------------------------------------------------------------------*)
+  (*fixpoint*)
+  let error, (handler, store_bdu_fixpoint_map) =
+     collect_bdu_fixpoint_without_init
+       parameter
+       handler
+       error
+       (*rule*)
+       bdu_true
+       bdu_false
+       wl_creation
+       store_proj_bdu_creation_restriction_map
+       store_proj_modif_list_restriction_map
+       store_proj_bdu_test_restriction_map
+       store_proj_bdu_potential_restriction_map
+       store_proj_potential_list_restriction_map
+       store_bdu_test_restriction_map
+       store_proj_bdu_views
+       is_new_bond
+       store_new_result_map
+       store_covering_classes_modification_update
+       store_bdu_init_X
+  in
+  error, (handler, store_bdu_fixpoint_map)

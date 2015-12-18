@@ -421,7 +421,7 @@ type bdu_build =
 type bdu_fixpoint =
     {
       store_new_wl_side_effect : (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;
-      store_bdu_fixpoint_map   : Mvbdu_wrapper.Mvbdu.mvbdu Map_bdu_update.Map.t;
+      store_bdu_fixpoint_map   : Mvbdu_wrapper.Mvbdu.mvbdu Map_bdu_update.Map.t; (*REMOVE*)
   }
 
 (************************************************************************************)
