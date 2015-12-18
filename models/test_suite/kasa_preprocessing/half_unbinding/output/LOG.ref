@@ -210,6 +210,9 @@ rule_id:1
 
 
 ------------------------------------------------------------
+- List for update of the views due to modification (per rule, agent and covering class):
+
+------------------------------------------------------------
 - List for update of the views due to modification (projection per rule):
 
 ------------------------------------------------------------

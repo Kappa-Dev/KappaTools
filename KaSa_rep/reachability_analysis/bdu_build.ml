@@ -427,24 +427,24 @@ let collect_bdu_init_restriction_map parameter handler error compil store_remane
 (*modification rule with creation rules*)
 
 let collect_modif_list_restriction_map
-    parameter error rule_id rule store_remanent_triple store_result =
-  let add_link (agent_id, agent_type, rule_id, cv_id) pair_list store_result =
+    parameter handler error rule_id rule store_remanent_triple store_result =
+  let add_link (agent_id, agent_type, rule_id, cv_id) list_a store_result =
     let error, old =
       match
         Map_modif_list.Map.find_option (agent_id, agent_type, rule_id, cv_id) store_result
       with
-      | None -> error, []
+      | None -> error, (*Mvbdu_wrapper.Mvbdu.empty_list*) []
       | Some l -> error, l
     in
     let result_map =
-      Map_modif_list.Map.add (agent_id, agent_type, rule_id, cv_id) pair_list store_result
+      Map_modif_list.Map.add (agent_id, agent_type, rule_id, cv_id) list_a store_result
     in
     error, result_map
   in
   AgentMap.fold2_common parameter error 
-    (fun parameter error agent_id agent_modif triple_list store_result ->
+    (fun parameter error agent_id agent_modif triple_list (handler, store_result) ->
       if Site_map_and_set.Map.is_empty agent_modif.agent_interface
-      then error, store_result
+      then error, (handler, store_result)
       else
         let agent_type = agent_modif.agent_name in
         (*-----------------------------------------------------------------*)
@@ -494,11 +494,19 @@ let collect_modif_list_restriction_map
             ) (error, []) get_pair_list
         in
         (*-----------------------------------------------------------------*)
-        let error, store_result =
-          add_link (agent_id, agent_type, rule_id, cv_id) pair_list store_result
+        (*build list_a here*)
+        let error, handler, list_a =
+          Mvbdu_wrapper.Mvbdu.build_list
+            parameter
+            handler
+            error
+            pair_list
         in
-        error, store_result
-    ) rule.diff_direct store_remanent_triple store_result
+        let error, store_result =
+          add_link (agent_id, agent_type, rule_id, cv_id) (*list_a*)pair_list store_result
+        in
+        error, (handler, store_result)
+    ) rule.diff_direct store_remanent_triple (handler, store_result)
 
 (*projection with (rule_id) *)
 
@@ -510,9 +518,10 @@ let collect_proj_modif_list_restriction_map parameter handler error
       (error, handler)
       (fun (agent_id, agent_type, rule_id, cv_id) -> rule_id)
       (fun (agent_id, agent_type, rule_id, cv_id) -> agent_id)
-      []
+      (*Mvbdu_wrapper.Mvbdu.empty_list*) []
       (fun parameter (error, handler) l l' ->
-       (error, handler), List.concat [l; l']
+        (*FIXME: how to combine two list_a*)
+        (error, handler), List.concat [l; l']
       )
       store_modif_list_restriction_map
   in

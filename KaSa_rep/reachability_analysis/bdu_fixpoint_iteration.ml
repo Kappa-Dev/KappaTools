@@ -59,48 +59,6 @@ let compute_bdu_update_aux parameter handler error bdu_test list_a bdu_X =
   in
   error, handler, bdu_result
 
-(*let compute_bdu_update_test parameter handler error bdu_test list_a bdu_creation bdu_X =
-  (*to the first one with bdu_test*)
-  let error, handler, bdu_Xn = 
-    compute_bdu_update_aux
-      parameter
-      handler
-      error
-      bdu_test
-      list_a
-      bdu_X
-  in
-  (*do the union per creation*)
-  let error, handler, bdu_result =
-    Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_Xn bdu_creation
-  in
-  error, handler, bdu_result*)
-
-(*the final update*)
-
-(*let compute_bdu_update parameter handler error bdu_test list_a bdu_creation
-    bdu_potential list_b bdu_X =
-  let error, handler, bdu_X_update_test =
-    compute_bdu_update_test
-      parameter
-      handler
-      error
-      bdu_test
-      list_a
-      bdu_creation
-      bdu_X
-  in
-  let error, handler, bdu_update_test_side_effects =
-    compute_bdu_update_aux
-      parameter
-      handler
-      error
-      bdu_potential
-      list_b
-      bdu_X_update_test
-  in
-  error, handler, bdu_update_test_side_effects*)
-
 (************************************************************************************)
 (*bdu update function for views*)
 
@@ -514,7 +472,7 @@ let is_enable parameter handler error bdu_false
     rule_id store_proj_bdu_views store_bdu_update_map =
   (*TODO: fold over this map??*)
   (*get bdu_test_map (agent_id, agent_type, cv_id)*)
-  let error, bdu_proj_views =
+  let error, bdu_proj_views = (*TODO: use projec_views in fixpoint function*)
     match Map_rule_id_views.Map.find_option rule_id store_proj_bdu_views with
     | None -> error, Map_triple_views.Map.empty
     | Some m -> error, m
@@ -597,15 +555,16 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
     store_bdu_update_map =
   (*-----------------------------------------------------------------------*)
   let error, bdu_proj_views =
+    (*TODO: used project_views in the function compute fixpoint at the end*)
     match Map_rule_id_views.Map.find_option rule_id 
       store_proj_bdu_test_restriction_map 
     with
     | None -> error, Map_triple_views.Map.empty
     | Some m -> error, m
   in
-  let error, handler, empty_list =
+  (*let error, handler, empty_list =
     Mvbdu_wrapper.Mvbdu.build_list parameter handler error []
-  in 
+  in *)
   (*-----------------------------------------------------------------------*)
   (* add_link should collect the list/set of (agent_type,cv_id) for which
      something has changed, so that add_update_to_wl can focus on these
@@ -668,7 +627,7 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
         (*TODO: Q:do I need to get the triple like in bdu_test*)
         let error, list =
           match Map_agent_id_modif_list.Map.find_option agent_id modif_list_map with
-          | None -> error, []
+          | None -> error, (*Mvbdu_wrapper.Mvbdu.empty_list*) []
           | Some l -> error, l
         in
         (*JF: the list should not be built each time, it should be stored
@@ -776,6 +735,7 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
           | None -> error, []
           | Some l -> error, l
         in 
+        (*TODO*)
         (* JF: the list should not be built each time, it should be stored
            with the rest of static information *)
         let error,handler,list =
@@ -935,7 +895,8 @@ let collect_bdu_fixpoint_with_init parameter handler error
 	  | None -> error, Map_triple_views.Map.empty
 	  | Some m -> error, m
 	in
-	let error, (bdu_creation_map, modif_list_map, bdu_test_map) =
+        (*Q:return list_a instead of a pair of list*)
+        let error, (bdu_creation_map, modif_list_map, bdu_test_map) =
           collect_bdu_creation_and_modif_list
             parameter
             error
@@ -1055,6 +1016,48 @@ let collect_bdu_fixpoint_map parameter handler error
 (************************************************************************************)
 (*fixpoint iteration without initial state*)
 (*REMOVE*)
+
+(*let compute_bdu_update_test parameter handler error bdu_test list_a bdu_creation bdu_X =
+  (*to the first one with bdu_test*)
+  let error, handler, bdu_Xn = 
+    compute_bdu_update_aux
+      parameter
+      handler
+      error
+      bdu_test
+      list_a
+      bdu_X
+  in
+  (*do the union per creation*)
+  let error, handler, bdu_result =
+    Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_Xn bdu_creation
+  in
+  error, handler, bdu_result*)
+
+(*the final update*)
+
+(*let compute_bdu_update parameter handler error bdu_test list_a bdu_creation
+    bdu_potential list_b bdu_X =
+  let error, handler, bdu_X_update_test =
+    compute_bdu_update_test
+      parameter
+      handler
+      error
+      bdu_test
+      list_a
+      bdu_creation
+      bdu_X
+  in
+  let error, handler, bdu_update_test_side_effects =
+    compute_bdu_update_aux
+      parameter
+      handler
+      error
+      bdu_potential
+      list_b
+      bdu_X_update_test
+  in
+  error, handler, bdu_update_test_side_effects*)
 
 (************************************************************************************)
 (*compute a view that can apply*)

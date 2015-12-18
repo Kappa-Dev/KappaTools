@@ -15,6 +15,11 @@
 let invalid_arg parameters mh message exn value = 
   Exception.warn parameters mh (Some "List_algebra") message exn (fun () -> value)
 
+let empty_list =
+  { List_sig.id = 0;
+    List_sig.value = List_sig.Empty
+  }
+
 let rec build_reversed_sorted_list_aux allocate parameters error handler list already = 
   List.fold_left 
     (fun (error,(handler,already)) (var,asso) -> 

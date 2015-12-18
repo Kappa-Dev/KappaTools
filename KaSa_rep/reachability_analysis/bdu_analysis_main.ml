@@ -263,9 +263,10 @@ let scan_rule_bdu_build parameter handler_bdu error rule_id rule compil
       store_result.store_bdu_init_restriction_map
   in
   (*-------------------------------------------------------------------------------*)
-  let error, store_modif_list_restriction_map =
+  let error, (handler_bdu, store_modif_list_restriction_map) =
     collect_modif_list_restriction_map
       parameter
+      handler_bdu
       error
       rule_id
       rule

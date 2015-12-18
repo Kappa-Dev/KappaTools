@@ -113,7 +113,7 @@ let print_init_bdu_map parameter error result =
     ) result
 
 (************************************************************************************)
-(*modification list*)
+(*modification list, this is list_a*)
 
 let print_modif_list_map parameter error result =
   Map_modif_list.Map.iter
@@ -123,6 +123,7 @@ let print_modif_list_map parameter error result =
           "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i\n"
           agent_id agent_type rule_id cv_id
       in
+    (*Mvbdu_wrapper.Mvbdu.print_list parameter.log "" l2*)
       List.iter (fun (site, state) ->
         fprintf parameter.log "site_type:%i:state:%i\n" site state
       ) l2
@@ -137,6 +138,7 @@ let print_proj_modif_list_map parameter error result =
       Map_agent_id_modif_list.Map.iter
         (fun agent_id l ->
           let _ = fprintf parameter.log "agent_id:%i:\n" agent_id in
+          (*Mvbdu_wrapper.Mvbdu.print_list parameter.log "" l*)
           List.iter (fun (site, state) ->
             fprintf parameter.log "site_type:%i:state:%i\n" site state
           ) l
@@ -330,7 +332,7 @@ let print_bdu_build parameter error result =
       error
       result.store_bdu_init_restriction_map
   in*)
-  (*let _ =
+  let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
@@ -339,7 +341,7 @@ let print_bdu_build parameter error result =
       parameter
       error
       result.store_modif_list_restriction_map
-  in*)
+  in
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";

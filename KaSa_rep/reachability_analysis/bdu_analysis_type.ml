@@ -401,9 +401,16 @@ type bdu_build =
       Mvbdu_wrapper.Mvbdu.mvbdu Map_agent_type_creation_bdu.Map.t
       Map_final_creation_bdu.Map.t;
     store_bdu_init_restriction_map: Mvbdu_wrapper.Mvbdu.mvbdu Map_bdu_update.Map.t;
-    store_modif_list_restriction_map: ((int * int) list) Map_modif_list.Map.t;
+
+    (*TODO*)
+    store_modif_list_restriction_map: 
+      (*Mvbdu_wrapper.Mvbdu.hconsed_list Map_modif_list.Map.t;*)
+      ((int * int) list) Map_modif_list.Map.t;
     store_proj_modif_list_restriction_map: 
+      (*Mvbdu_wrapper.Mvbdu.hconsed_list Map_agent_id_modif_list.Map.t
+      Map_final_modif_list.Map.t;*)
       ((int * int) list) Map_agent_id_modif_list.Map.t Map_final_modif_list.Map.t;
+
     store_bdu_potential_effect_restriction_map : 
       Mvbdu_wrapper.Mvbdu.mvbdu Map_potential_bdu.Map.t;
     store_proj_bdu_potential_restriction_map :

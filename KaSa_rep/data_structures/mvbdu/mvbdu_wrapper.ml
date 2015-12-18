@@ -39,6 +39,7 @@ module type Mvbdu =
     val build_list: ((int * int) list,hconsed_list) unary  
     val build_sorted_list: ((int * int) list,hconsed_list) unary
     val build_reverse_sorted_list: ((int * int) list,hconsed_list) unary
+    val empty_list : hconsed_list
     val print: out_channel -> string -> mvbdu -> unit
     val print_list: out_channel -> string -> hconsed_list -> unit 
   end
@@ -77,9 +78,9 @@ module type Internalized_mvbdu =
     val build_list: (int * int) list ->  hconsed_list 
     val build_sorted_list: (int * int) list -> hconsed_list
     val build_reverse_sorted_list: (int * int) list -> hconsed_list
+    val empty_list : hconsed_list
     val print: out_channel -> string -> mvbdu -> unit
     val print_list: out_channel -> string -> hconsed_list -> unit 
-
   end
 
 
@@ -203,6 +204,9 @@ module Make (M:Nul)  =
 
     let build_reverse_sorted_list = lift1ter "line 181, build_list" List_algebra.build_reversed_sorted_list
       
+    (*Added: build empty list_a*)
+    let empty_list = List_algebra.empty_list
+
     let print = Boolean_mvbdu.print_mvbdu
     let print_list = List_algebra.print_list 
   end: Mvbdu)
@@ -309,6 +313,10 @@ module Internalize(M:Mvbdu) =
     let build_list = lift_unary "line 297" M.build_list 
     let build_sorted_list = lift_unary "line 298" M.build_sorted_list  
     let build_reverse_sorted_list = lift_unary "line 299" M.build_reverse_sorted_list 
+
+    (*added*)
+    let empty_list = M.empty_list
+
     let print = M.print
     let print_list = M.print_list 
    end:Internalized_mvbdu)
@@ -376,6 +384,10 @@ module Optimize(M:Mvbdu) =
 	     let build_list = M.build_list 
 	     let build_sorted_list = M.build_sorted_list
 	     let build_reverse_sorted_list = M.build_reverse_sorted_list 
+               
+             (*Added*)
+             let empty_list = M.empty_list
+
 	     let print = M.print 
 	     let print_list = M.print_list 
 	   end:Mvbdu)
@@ -416,6 +428,7 @@ module Optimize'(M:Internalized_mvbdu) =
 	     let build_sorted_list = M.build_sorted_list
 	     let build_reverse_sorted_list = M.build_reverse_sorted_list 
 	     let mvbdu_redefine = M.mvbdu_redefine
+             let empty_list = M.empty_list (*added*)
 	     let print = M.print
 	     let print_list = M.print_list 
 	   end:Internalized_mvbdu)
