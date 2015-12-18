@@ -61,7 +61,7 @@ let get_initial_content editor_obj () =
   let () =
     try Storage.set_model_max_time
 	  (Some (float_of_string (List.assoc "time_limit" args)))
-    with Not_found | Failure "int_of_string" -> () in
+    with Not_found | Failure "float_of_string" -> () in
   try
     let url = List.assoc "model" args in
     XmlHttpRequest.get url >>=
@@ -79,7 +79,14 @@ let get_initial_content editor_obj () =
 	 let () = Ace.set_editor_value editor_obj
 		  @@ Js.string content.XmlHttpRequest.content in
 	 return_unit)
-  with Not_found -> return_unit
+  with Not_found ->
+       try
+	 let text = List.assoc "model_text" args in
+	 let () = Ace.set_editor_value editor_obj
+		  @@ Js.string text in
+	 return_unit
+       with Not_found ->
+	 return_unit
 
 let raw_html =
   let event_number = Tyxml_js.To_dom.of_input raw_event_number in
