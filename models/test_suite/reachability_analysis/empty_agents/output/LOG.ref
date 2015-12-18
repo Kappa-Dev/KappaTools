@@ -233,6 +233,10 @@ List of rules to awake when the state of a site is modified and tested:
 ------------------------------------------------------------
 
 ------------------------------------------------------------
+List of rules to awake when discovered sites that are bond on the rhs for the first time:
+------------------------------------------------------------
+
+------------------------------------------------------------
 * Covering classes with new indexes:
 ------------------------------------------------------------
 - Working list creation:
@@ -258,13 +262,6 @@ List of rules to awake when the state of a site is modified and tested:
 
 ------------------------------------------------------------
 - Bdu fpr the valuation of the views that are tested (projection per rule):
-
-------------------------------------------------------------
-* Fixpoint iteration :
-------------------------------------------------------------
-** New update function when discovered sites that are bond on the rhs for the first time:
-------------------------------------------------------------
-** Fixpoint iteration function:
 wl_init_creation:
 0 1 2 3 4 
 Test for rule:0
@@ -277,89 +274,8 @@ Test for rule:3
 enabled
 Test for rule:4
 enabled
-============================================================
-* BDU Analysis:
-============================================================
-
-** Static information:
-
-------------------------------------------------------------
-Mapping between sites and the covering classes they belong to:
-------------------------------------------------------------
-------------------------------------------------------------
-Sites that may/must occurs side-effects:
-------------------------------------------------------------
-------------------------------------------------------------
-Sites that may/must occurs in the potential partner side-effects:
-------------------------------------------------------------
-- Potential partner has site that is free:
-- Potential partner has site that is bind:
-------------------------------------------------------------
-Set of rules that may modify a given site (excluding created agents):
-------------------------------------------------------------
-agent_id:1:agent_type:3:site_type:0@set of rule_id:
-rule_id:3
-agent_id:1:agent_type:5:site_type:0@set of rule_id:
-rule_id:4
-------------------------------------------------------------
-Set of rules that may test a given site:
-------------------------------------------------------------
-------------------------------------------------------------
-Set of rules that may test and modify a given site (excluding created agents):
-------------------------------------------------------------
-agent_id:1:agent_type:3:site_type:0@set of rule_id:
-rule_id:3
-agent_id:1:agent_type:5:site_type:0@set of rule_id:
-rule_id:4
-
-** Dynamic information:
-
-------------------------------------------------------------
-(Full) Contact map and initital state:
-------------------------------------------------------------
-Sites are annotated with the id of binding type:
-
-------------------------------------------------------------
-(Syntactic) Contact map (only considering rhs) and initital state:
-------------------------------------------------------------
-Sites are annotated with the id of binding type:
-A bond is discovered for the first time:false
-
-------------------------------------------------------------
-List of rules to awake when the state of a site is modified and tested:
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Covering classes with new indexes:
-------------------------------------------------------------
-- Working list creation:
-0 1 2 3 4 
-
-------------------------------------------------------------
-- Bdu for the valuations of the views that are created from potential partner in side effects (projection per rule):
-
-
-------------------------------------------------------------
-- List for update of the views due to modification that are created from potential partner in side effects (projection per rule):
-
-------------------------------------------------------------
-- Bdu for the valuations of the views that are tested (projection per rule):
-
-
-------------------------------------------------------------
-- Bdu for the valuations of the views that are created (per rule_id; projection function):
-
-
-------------------------------------------------------------
-- List for update of the views due to modification (projection per rule):
-
-------------------------------------------------------------
-- Bdu fpr the valuation of the views that are tested (projection per rule):
 
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
-** New update function when discovered sites that are bond on the rhs for the first time:
-------------------------------------------------------------
-** Fixpoint iteration function:
 execution finished without any exception

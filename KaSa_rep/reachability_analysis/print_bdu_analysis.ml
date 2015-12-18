@@ -20,7 +20,7 @@ open Bdu_analysis_type
 open Print_bdu_analysis_static
 open Print_bdu_analysis_dynamic
 open Print_bdu_build
-open Print_bdu_fixpoint
+(*open Print_bdu_fixpoint*)
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "BDU creation") message exn (fun () -> default)  
@@ -53,11 +53,32 @@ let print_result parameter error result =
       error
       result.store_bdu_build
   in
-  (*------------------------------------------------------------------------------*)
+  error
+
+(************************************************************************************)
+(*main print of fixpoint*)
+
+let print_bdu_update_map parameter error result =
+  Map_bdu_update.Map.iter (fun (agent_type, cv_id) bdu_update ->
+    let _ =
+      fprintf parameter.log "agent_type:%i:cv_id:%i\n" agent_type cv_id
+    in
+    Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_update
+    ) result
+
+let print_result_fixpoint parameter error result =
   let _ =
-    print_bdu_fixpoint
+    fprintf (Remanent_parameters.get_log parameter)
+      "\n------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter)
+      "* Fixpoint iteration :\n";
+    fprintf (Remanent_parameters.get_log parameter)
+      "------------------------------------------------------------\n";
+  in
+  let _ =
+    print_bdu_update_map
       parameter
       error
-      result.store_bdu_fixpoint
+      result
   in
   error

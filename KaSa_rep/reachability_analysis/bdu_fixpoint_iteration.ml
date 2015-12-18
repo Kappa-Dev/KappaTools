@@ -500,7 +500,6 @@ let is_enable parameter handler error bdu_false
   in
   error, is_enable
 
-
 (************************************************************************************)
 (*compute a view that can apply*)
 
@@ -665,8 +664,7 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
     in
     let error, handler, bdu_union =
       Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_update bdu_old
-    in
-  
+    in  
     (*checking if it is a new view*)
     let _ = dump_channel parameter (fun stderr -> Printf.fprintf stderr 
       "Ag:%i\n" agent_type)
@@ -841,7 +839,6 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
 (*fixpoint iteration with/without initial state*)
 
 let collect_bdu_fixpoint_with_init parameter handler error 
-    (* rule: meaningless, we start with the initial working list (with rules wo lhs and rules that can apply with initial states *)
     bdu_true
     bdu_false
     (wl_creation:Fifo.IntWL.WSet.elt list * Fifo.IntWL.WSet.elt list *
@@ -1016,7 +1013,6 @@ let collect_bdu_fixpoint_with_init parameter handler error
 (************************************************************************************)
 (*final fixpoint iteration*)
 
-
 let collect_bdu_fixpoint_map parameter handler error 
     wl_creation
     store_proj_bdu_creation_restriction_map
@@ -1027,8 +1023,8 @@ let collect_bdu_fixpoint_map parameter handler error
     store_bdu_test_restriction_map
     store_proj_bdu_views
     is_new_bond
-    store_new_result_map
     store_covering_classes_modification_update
+    store_new_result_map
     store_bdu_init_restriction_map
     store_result_map
     =

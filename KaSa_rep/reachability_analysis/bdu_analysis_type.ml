@@ -382,6 +382,8 @@ type bdu_analysis_dynamic =
     store_contact_map :  bool * Set_pair.Set.t Int2Map_syn.Map.t;
     store_covering_classes_modification_update : (*update(c)*)
       (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;
+    store_covering_classes_modification_update_side_effects :
+      (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;
   }
 
 (************************************************************************************)
@@ -416,15 +418,6 @@ type bdu_build =
   }
 
 (************************************************************************************)
-(*fixpoint*)
-
-type bdu_fixpoint =
-    {
-      store_new_wl_side_effect : (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;
-      store_bdu_fixpoint_map   : Mvbdu_wrapper.Mvbdu.mvbdu Map_bdu_update.Map.t; (*REMOVE*)
-  }
-
-(************************************************************************************)
 (*main*)
 
 type bdu_analysic =
@@ -432,5 +425,4 @@ type bdu_analysic =
       store_bdu_analysis_static  : bdu_analysis_static;
       store_bdu_analysis_dynamic : bdu_analysis_dynamic;
       store_bdu_build            : bdu_build;
-      store_bdu_fixpoint         : bdu_fixpoint
     }

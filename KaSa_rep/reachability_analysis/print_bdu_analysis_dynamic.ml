@@ -110,6 +110,33 @@ let print_covering_classes_modification parameter error result =
     result
     
 (************************************************************************************)
+
+let print_covering_classes_modification_side_effects_aux parameter error result =
+  Int2Map_CV_Modif.Map.iter
+    ( fun (x, y) (_, s2) ->
+      let _ =
+        fprintf parameter.log
+          "agent_type:%i:covering_class_id:%i:@set of rule_id:\n" x y
+      in
+      Site_map_and_set.Set.iter
+        (fun rule_id ->
+          fprintf parameter.log "rule_id:%i\n" rule_id
+        ) s2
+    ) result
+
+let print_covering_classes_modification_side_effects parameter error result =
+   fprintf (Remanent_parameters.get_log parameter)
+    "\n------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "List of rules to awake when discovered sites that are bond on the rhs for the first time:\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  print_covering_classes_modification_side_effects_aux
+    parameter
+    error
+    result
+
+(************************************************************************************)
 (*main print*)
 
 let print_result_dynamic parameter error result =
@@ -135,5 +162,12 @@ let print_result_dynamic parameter error result =
       parameter
       error
       result.store_covering_classes_modification_update
+  in
+  (*------------------------------------------------------------------------------*)
+  let _ =
+    print_covering_classes_modification_side_effects
+      parameter
+      error
+      result.store_covering_classes_modification_update_side_effects
   in
   error
