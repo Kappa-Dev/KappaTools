@@ -1,12 +1,12 @@
--> A(x~u)
--> B(x~u)
--> C(x~u)
--> D(x~u)
--> E(x~u)
-A(x!x.B) ->
-A(x),B(x~u) -> A(x!1),B(x~p!1)
-A(x),B(x~p),C(x~u) -> A(x!1),B(x~p),C(x~p!1)
-C(x~p!1),A(x~u!1) -> C(x~p!1),A(x~p!1)
-C() -> 
-D(x~u),E(x~u) -> D(x~p!1),E(x~p!1)
-D(x!_) -> D(x)
+'r0' -> A(x~u)
+'r1' -> B(x~u)
+'r2' -> C(x~u)
+'r3' -> D(x~u)
+'r4' -> E(x~u)
+'r5' A(x!x.B) ->
+'r6' A(x),B(x~u) -> A(x!1),B(x~p!1)
+'r7' A(x),B(x~p),C(x~u) -> A(x!1),B(x~p),C(x~p!1)
+'r8' C(x~p!1),A(x~u!1) -> C(x~p!1),A(x~p!1)
+'r9' C() -> 
+'r10' D(x~u),E(x~u) -> D(x~p!1),E(x~p!1)
+'r11' D(x!_) -> D(x)

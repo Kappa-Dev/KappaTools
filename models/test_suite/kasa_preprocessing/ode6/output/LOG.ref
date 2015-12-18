@@ -1083,4 +1083,561 @@ agent_type:3:covering_class_id:1:@set of rule_id:
 rule_id:3
 ------------------------------------------------------------
 ** Fixpoint iteration function:
+============================================================
+* BDU Analysis:
+============================================================
+
+** Static information:
+
+------------------------------------------------------------
+Mapping between sites and the covering classes they belong to:
+------------------------------------------------------------
+agent_type:0:site_type:0@list of covering_class_id:
+covering_class_id:0
+agent_type:1:site_type:0@list of covering_class_id:
+covering_class_id:0
+agent_type:1:site_type:1@list of covering_class_id:
+covering_class_id:0
+agent_type:1:site_type:2@list of covering_class_id:
+covering_class_id:0
+agent_type:2:site_type:0@list of covering_class_id:
+covering_class_id:0
+agent_type:2:site_type:1@list of covering_class_id:
+covering_class_id:0
+agent_type:2:site_type:2@list of covering_class_id:
+covering_class_id:1
+agent_type:2:site_type:3@list of covering_class_id:
+covering_class_id:1
+agent_type:2:site_type:4@list of covering_class_id:
+covering_class_id:0
+agent_type:3:site_type:0@list of covering_class_id:
+covering_class_id:1
+agent_type:3:site_type:1@list of covering_class_id:
+covering_class_id:0
+------------------------------------------------------------
+Sites that may/must occurs side-effects:
+------------------------------------------------------------
+------------------------------------------------------------
+Sites that may/must occurs in the potential partner side-effects:
+------------------------------------------------------------
+- Potential partner has site that is free:
+- Potential partner has site that is bind:
+------------------------------------------------------------
+Set of rules that may modify a given site (excluding created agents):
+------------------------------------------------------------
+agent_id:0:agent_type:1:site_type:0@set of rule_id:
+rule_id:0
+rule_id:1
+agent_id:0:agent_type:1:site_type:1@set of rule_id:
+rule_id:0
+agent_id:0:agent_type:1:site_type:2@set of rule_id:
+rule_id:1
+agent_id:0:agent_type:2:site_type:1@set of rule_id:
+rule_id:2
+agent_id:0:agent_type:2:site_type:3@set of rule_id:
+rule_id:3
+agent_id:0:agent_type:2:site_type:4@set of rule_id:
+rule_id:4
+agent_id:1:agent_type:0:site_type:0@set of rule_id:
+rule_id:0
+agent_id:1:agent_type:2:site_type:0@set of rule_id:
+rule_id:1
+agent_id:1:agent_type:2:site_type:2@set of rule_id:
+rule_id:2
+agent_id:1:agent_type:3:site_type:0@set of rule_id:
+rule_id:3
+agent_id:1:agent_type:3:site_type:1@set of rule_id:
+rule_id:4
+------------------------------------------------------------
+Set of rules that may test a given site:
+------------------------------------------------------------
+agent_id:0:agent_type:1:site_type:0@set of rule_id:
+rule_id:0
+rule_id:1
+agent_id:0:agent_type:1:site_type:1@set of rule_id:
+rule_id:0
+rule_id:1
+agent_id:0:agent_type:1:site_type:2@set of rule_id:
+rule_id:0
+rule_id:1
+agent_id:0:agent_type:2:site_type:0@set of rule_id:
+rule_id:2
+rule_id:4
+agent_id:0:agent_type:2:site_type:1@set of rule_id:
+rule_id:2
+rule_id:4
+agent_id:0:agent_type:2:site_type:2@set of rule_id:
+rule_id:3
+agent_id:0:agent_type:2:site_type:3@set of rule_id:
+rule_id:3
+agent_id:0:agent_type:2:site_type:4@set of rule_id:
+rule_id:2
+rule_id:4
+agent_id:1:agent_type:0:site_type:0@set of rule_id:
+rule_id:0
+agent_id:1:agent_type:2:site_type:0@set of rule_id:
+rule_id:1
+agent_id:1:agent_type:2:site_type:1@set of rule_id:
+rule_id:1
+agent_id:1:agent_type:2:site_type:2@set of rule_id:
+rule_id:2
+agent_id:1:agent_type:2:site_type:3@set of rule_id:
+rule_id:2
+agent_id:1:agent_type:2:site_type:4@set of rule_id:
+rule_id:1
+agent_id:1:agent_type:3:site_type:0@set of rule_id:
+rule_id:3
+agent_id:1:agent_type:3:site_type:1@set of rule_id:
+rule_id:4
+------------------------------------------------------------
+Set of rules that may test and modify a given site (excluding created agents):
+------------------------------------------------------------
+agent_id:0:agent_type:1:site_type:0@set of rule_id:
+rule_id:0
+rule_id:1
+agent_id:0:agent_type:1:site_type:1@set of rule_id:
+rule_id:0
+rule_id:1
+agent_id:0:agent_type:1:site_type:2@set of rule_id:
+rule_id:0
+rule_id:1
+agent_id:0:agent_type:2:site_type:0@set of rule_id:
+rule_id:2
+rule_id:4
+agent_id:0:agent_type:2:site_type:1@set of rule_id:
+rule_id:2
+rule_id:4
+agent_id:0:agent_type:2:site_type:2@set of rule_id:
+rule_id:3
+agent_id:0:agent_type:2:site_type:3@set of rule_id:
+rule_id:3
+agent_id:0:agent_type:2:site_type:4@set of rule_id:
+rule_id:2
+rule_id:4
+agent_id:1:agent_type:0:site_type:0@set of rule_id:
+rule_id:0
+agent_id:1:agent_type:2:site_type:0@set of rule_id:
+rule_id:1
+agent_id:1:agent_type:2:site_type:1@set of rule_id:
+rule_id:1
+agent_id:1:agent_type:2:site_type:2@set of rule_id:
+rule_id:2
+agent_id:1:agent_type:2:site_type:3@set of rule_id:
+rule_id:2
+agent_id:1:agent_type:2:site_type:4@set of rule_id:
+rule_id:1
+agent_id:1:agent_type:3:site_type:0@set of rule_id:
+rule_id:3
+agent_id:1:agent_type:3:site_type:1@set of rule_id:
+rule_id:4
+
+** Dynamic information:
+
+------------------------------------------------------------
+(Full) Contact map and initital state:
+------------------------------------------------------------
+Sites are annotated with the id of binding type:
+agent_type:0@site_type:0:state:1--agent_type':1@site_type':1:state':1
+agent_type:1@site_type:1:state:1--agent_type':0@site_type':0:state':1
+agent_type:1@site_type:2:state:1--agent_type':2@site_type':0:state':1
+agent_type:2@site_type:0:state:1--agent_type':1@site_type':2:state':1
+agent_type:2@site_type:1:state:1--agent_type':2@site_type':2:state':1
+agent_type:2@site_type:2:state:1--agent_type':2@site_type':1:state':1
+agent_type:2@site_type:3:state:1--agent_type':3@site_type':0:state':1
+agent_type:2@site_type:4:state:1--agent_type':3@site_type':1:state':1
+agent_type:3@site_type:0:state:1--agent_type':2@site_type':3:state':1
+agent_type:3@site_type:1:state:1--agent_type':2@site_type':4:state':1
+
+------------------------------------------------------------
+(Syntactic) Contact map (only considering rhs) and initital state:
+------------------------------------------------------------
+Sites are annotated with the id of binding type:
+A bond is discovered for the first time:true
+agent_type:1@site_type:1:state:1--agent_type':0@site_type':0:state':1
+agent_type:1@site_type:2:state:1--agent_type':2@site_type':0:state':1
+agent_type:2@site_type:1:state:1--agent_type':2@site_type':2:state':1
+agent_type:2@site_type:3:state:1--agent_type':3@site_type':0:state':1
+agent_type:2@site_type:4:state:1--agent_type':3@site_type':1:state':1
+
+------------------------------------------------------------
+List of rules to awake when the state of a site is modified and tested:
+------------------------------------------------------------
+agent_type:0:covering_class_id:0:@set of rule_id:
+rule_id:0
+agent_type:1:covering_class_id:0:@set of rule_id:
+rule_id:0
+rule_id:1
+agent_type:2:covering_class_id:0:@set of rule_id:
+rule_id:1
+rule_id:2
+rule_id:4
+agent_type:2:covering_class_id:1:@set of rule_id:
+rule_id:2
+rule_id:3
+agent_type:3:covering_class_id:0:@set of rule_id:
+rule_id:4
+agent_type:3:covering_class_id:1:@set of rule_id:
+rule_id:3
+
+------------------------------------------------------------
+* Covering classes with new indexes:
+------------------------------------------------------------
+- Working list creation:
+
+
+------------------------------------------------------------
+- Bdu for the valuations of the views that are created from potential partner in side effects (projection per rule):
+
+
+------------------------------------------------------------
+- List for update of the views due to modification that are created from potential partner in side effects (projection per rule):
+
+------------------------------------------------------------
+- Bdu for the valuations of the views that are tested (projection per rule):
+
+rule_id:0
+agent_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_id:1
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+rule_id:1
+agent_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_id:1
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:2
+agent_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_id:1
+Id=9
+ Node(site_type:3<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:3<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+rule_id:3
+agent_id:0
+Id=0
+ Leaf True 
+
+agent_id:1
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+rule_id:4
+agent_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_id:1
+Id=5
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:2<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+
+------------------------------------------------------------
+- Bdu for the valuations of the views that are created (per rule_id; projection function):
+
+
+------------------------------------------------------------
+- List for update of the views due to modification (projection per rule):
+rule_id:0
+agent_id:0:
+site_type:1:state:1
+agent_id:1:
+site_type:1:state:1
+rule_id:1
+agent_id:0:
+site_type:1:state:1
+agent_id:1:
+site_type:1:state:1
+rule_id:2
+agent_id:0:
+agent_id:1:
+site_type:3:state:1
+rule_id:3
+agent_id:0:
+agent_id:1:
+site_type:1:state:1
+rule_id:4
+agent_id:0:
+agent_id:1:
+site_type:2:state:1
+
+------------------------------------------------------------
+- Bdu fpr the valuation of the views that are tested (projection per rule):
+rule_id:0
+agent_id:0:agent_type:1:cv_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_id:1:agent_type:0:cv_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+rule_id:1
+agent_id:0:agent_type:1:cv_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_id:1:agent_type:2:cv_id:0
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:2
+agent_id:0:agent_type:2:cv_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_id:1:agent_type:2:cv_id:0
+Id=9
+ Node(site_type:3<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:3<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+rule_id:3
+agent_id:0:agent_type:2:cv_id:0
+Id=0
+ Leaf True 
+
+agent_id:1:agent_type:3:cv_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+rule_id:4
+agent_id:0:agent_type:2:cv_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_id:1:agent_type:3:cv_id:0
+Id=5
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:2<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+** New update function when discovered sites that are bond on the rhs for the first time:
+agent_type:0:covering_class_id:0:@set of rule_id:
+rule_id:0
+agent_type:1:covering_class_id:0:@set of rule_id:
+rule_id:0
+rule_id:1
+agent_type:2:covering_class_id:0:@set of rule_id:
+rule_id:1
+rule_id:2
+rule_id:4
+agent_type:2:covering_class_id:1:@set of rule_id:
+rule_id:2
+rule_id:3
+agent_type:3:covering_class_id:0:@set of rule_id:
+rule_id:4
+agent_type:3:covering_class_id:1:@set of rule_id:
+rule_id:3
+------------------------------------------------------------
+** Fixpoint iteration function:
 execution finished without any exception

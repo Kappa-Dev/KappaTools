@@ -30,6 +30,12 @@ let warn parameters mh message exn default =
 
 let local_trace = false
 
+let dump_channel parameter  f =
+  if local_trace ||  Remanent_parameters.get_trace parameter
+  then f (Remanent_parameters.get_log parameter)
+let dump_formatter parameter  f =
+  if local_trace ||  Remanent_parameters.get_trace parameter
+  then f (Remanent_parameters.get_formatter parameter) 
 (************************************************************************************)
 (*update bdu:
   - (bdu_X U bdu_creation) U [\rho[update_views] | \rho \in bdu_X (inter) bdu_test views]
@@ -376,27 +382,34 @@ let collect_update_hb_remove_map parameter error
 (*write a function add update(c) into working list*)
 
 let add_update_to_wl parameter error store_covering_classes_modification_update wl =
+  (* JF: this function should not fold over the full map; 
+         this function should receive the list/set of couple to be updated 
+         I do not have the spec, but I think that they should contain only all the couple (agent_type,cv_id) that has associated with a new view) *)
   Int2Map_CV_Modif.Map.fold
     (fun (agent_type, cv_id) (l1, s1) (error, wl) ->
-      let _ = Printf.fprintf stderr "in add_update_to_wl:agent_type:%i:cv_id:%i\n" agent_type cv_id in
-      let _ = Site_map_and_set.Set.iter 
-        (Printf.fprintf stderr "in add_update_to_wl: set of rule_id:%i\n") s1
-      in
-      let error, wl =
-        Site_map_and_set.Set.fold (fun rule_id (error, wl) ->
-          let _ = Printf.fprintf stderr "in add_update_to_wl:rule_id:%i\n" rule_id in
-          let error, wl = IntWL.push parameter error rule_id wl
-          in
-          (*let _ =
+     let _ = dump_channel parameter
+		  (fun stderr ->
+		   let () = Printf.fprintf stderr "in add_update_to_wl:agent_type:%i:cv_id:%i\n" agent_type cv_id in
+		   let _ = Site_map_and_set.Set.iter 
+			     (Printf.fprintf stderr "in add_update_to_wl: set of rule_id:%i\n") s1
+		   in
+		   ())
+     in 
+     let error, wl =
+       Site_map_and_set.Set.fold (fun rule_id (error, wl) ->
+				  let _ = dump_channel parameter (fun stderr -> Printf.fprintf stderr "in add_update_to_wl:rule_id:%i\n" rule_id) in
+				  let error, wl = IntWL.push parameter error rule_id wl
+				  in
+				  (*let _ =
             Printf.fprintf stdout "in add_update_to_wl: working list:\n";
             Fifo.IntWL.print_wl parameter wl 
           in*)
-          error, wl
-        ) s1 (error, wl)
-      in
-      error, wl
+				  error, wl
+				 ) s1 (error, wl)
+     in
+     error, wl
     ) store_covering_classes_modification_update (error, wl)
-
+    
 (************************************************************************************)
 (*fixpoint*)
 
@@ -458,7 +471,7 @@ let collect_bdu_potential_and_list parameter error rule_id
 (************************************************************************************)
 (*check is_enable of all *)
 
-let is_enable' parameter handler error bdu_true bdu_false
+(*let is_enable' parameter handler error bdu_true bdu_false
     bdu_test_map
     store_bdu_test_restriction_map 
     store_bdu_update_map = 
@@ -504,7 +517,7 @@ let is_enable' parameter handler error bdu_true bdu_false
           else true
       ) store_bdu_test_restriction_map
   in
-  error, is_enable
+  error, is_enable*)
 
 (*TODO: changed to use projection function *)
 let is_enable parameter handler error bdu_false 
@@ -614,16 +627,17 @@ let views_can_apply parameter handler error agent_id agent_type cv_id bdu_true
       error
       bdu_test
       list_a
-      bdu_false (*  bdu_creation*)
+      bdu_false (* JF: I put bdu_false to seprate the computation of modification and creation (* bdu_creation*)*)
       bdu_potential
       list_b
       bdu_X
   in
   (*TEST*)
   let _ =
-    Printf.fprintf stderr "in views_can_apply:(agent_type:%i, cv_id:%i) bdu_update:\n"
-      agent_type cv_id;
-    Mvbdu_wrapper.Mvbdu.print stdout "" bdu_update
+    dump_channel parameter
+		 (fun stderr -> Printf.fprintf stderr "in views_can_apply:(agent_type:%i, cv_id:%i)\n bdu_update:\n"
+					       agent_type cv_id;
+				Mvbdu_wrapper.Mvbdu.print stderr "" bdu_update)
   in
   error, handler, bdu_update
 
@@ -689,15 +703,11 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
     | None -> error, Map_triple_views.Map.empty
     | Some m -> error, m
    in
-   let _ =
-     Map_rule_id_views.Map.iter
-       (fun r map -> Printf.fprintf stderr "CHECK: %i %i\n" rule_id r)
-       store_proj_bdu_test_restriction_map
-   in 
    let error, handler, empty_list =
       Mvbdu_wrapper.Mvbdu.build_list parameter handler error []
    in 
    let add_link handler (agent_type, cv_id) bdu_update store_result =
+     (* add_link should collect the list/set of (agent_type,cv_id) for which something has changed, so that add_update_to_wl can focus on these pairs *)
     let error, bdu_old =
       match Map_bdu_update.Map.find_option (agent_type, cv_id) store_result
       with
@@ -709,16 +719,18 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
     in
   
     (*checking if it is a new view*)
-    let _ = Printf.fprintf stderr "Ag:%i\n" agent_type in 
+    let _ = dump_channel parameter (fun stderr -> Printf.fprintf stderr "Ag:%i\n" agent_type) in 
     if Mvbdu_wrapper.Mvbdu.equal bdu_union bdu_old
     then
-      let _ = Printf.fprintf stderr "Nothing has changed\n" in
+      let _ = dump_channel parameter (fun stderr -> Printf.fprintf stderr "Nothing has changed\n") in
       error, handler, false, store_result
     else
       let error,handler,bdu_diff =
 	Mvbdu_wrapper.Mvbdu.mvbdu_xor parameter handler error bdu_union bdu_old
       in
-      let () = Mvbdu_wrapper.Mvbdu.print stderr "" bdu_diff in 
+      let () = dump_channel parameter (fun stderr ->
+				       Printf.fprintf stderr "new views:\b" ;
+				       Mvbdu_wrapper.Mvbdu.print stderr "" bdu_diff) in 
       let store_result =
         Map_bdu_update.Map.add (agent_type, cv_id) bdu_union store_result
       in
@@ -730,7 +742,7 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
       (fun (agent_id, agent_type,  cv_id) _
         (error, (handler, wl_tl, store_result)) ->
           (*-----------------------------------------------------------------------*)
-       let _ = Printf.fprintf stderr "Ag:%i Type: %i Cvid: %i\n" agent_id agent_type cv_id in 
+       let _ = dump_channel parameter (fun stderr -> Printf.fprintf stderr "Ag:%i Type: %i Cvid: %i\n" agent_id agent_type cv_id) in 
        let error, handler, bdu_update =
             views_can_apply
               parameter
@@ -778,10 +790,11 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
       bdu_proj_views
       (error, (handler, wl_tl, store_bdu_update_map))
   in
-  let error, (handler, wl_tl, store_result) =
+  let error, (handler, wl_tl, store_result) = (* JF: Here I deal with agent creation *)
     Map_agent_type_creation_bdu.Map.fold
       (fun agent_type bdu_creation (error, (handler, wl_tl, store_result)) ->
-       let cv_id = 0 in (* it should be partioned w.r.t cv_id *) 
+       let cv_id = 0 in (*JF: the following should be applied for each covering class of the agent agent_type,
+                              but I do not know where this information is stored  *)
         let error, bdu_X =
 	  match Map_bdu_update.Map.find_option (agent_type, cv_id) store_result
 	  with
@@ -872,7 +885,7 @@ let collect_bdu_fixpoint_without_init parameter handler error
         match rule_id_op with
         | None -> error, (handler, store_bdu_update_map) (* Put a warning in error *)
         | Some rule_id ->
-	   let _ = Printf.fprintf stderr "Test for rule:%i\n" rule_id in
+	   let _ = dump_channel parameter (fun stderr -> Printf.fprintf stderr "Test for rule:%i\n" rule_id) in
            let error, bdu_proj_views =
 	     match Map_rule_id_views.Map.find_option rule_id store_proj_bdu_views with
 	     | None -> error, Map_triple_views.Map.empty
@@ -924,7 +937,7 @@ let collect_bdu_fixpoint_without_init parameter handler error
           begin
             if is_enable
             then
-              let _ = Printf.fprintf stderr "enabled\n" in
+              let _ = dump_channel parameter (fun stderr -> Printf.fprintf stderr "enabled\n") in
 	      let error, (handler, new_wl, store_new_result) =
                 compute_views_enabled
                   parameter
@@ -947,7 +960,7 @@ let collect_bdu_fixpoint_without_init parameter handler error
               in
               aux new_wl (error, handler, store_new_result)
             else
-              let _ = Printf.fprintf stderr "disabled\n" in
+              let _ = dump_channel parameter (fun stderr -> Printf.fprintf stderr "disabled\n") in
               aux wl_tl (error, handler, store_bdu_update_map)
           end
     in
@@ -961,7 +974,7 @@ let collect_bdu_fixpoint_without_init parameter handler error
 
 (*FIXME: there is no bdu_test*)
 let collect_bdu_fixpoint_with_init parameter handler error 
-				    (* rule: meaningless, we should start with the initial working list (with rules wo lhs and rules that can apply with initial states *)
+				    (* rule: meaningless, we start with the initial working list (with rules wo lhs and rules that can apply with initial states *)
     bdu_true
     bdu_false
     (wl_creation:Fifo.IntWL.WSet.elt list * Fifo.IntWL.WSet.elt list *
@@ -1049,10 +1062,11 @@ let collect_bdu_fixpoint_with_init parameter handler error
     add_update_to_wl parameter error store_covering_classes_modification_update
       wl_creation
   in
-  (*let _ =
-    fprintf stdout "wl_init_creation:\n";
-    Fifo.IntWL.print_wl parameter wl_init_creation
-  in*)
+  let _ =
+    dump_channel parameter (fun stderr -> 
+    fprintf stderr "wl_init_creation:\n";
+    Fifo.IntWL.print_wl parameter wl_init_creation)
+  in
   (*let error, (handler, store_bdu_fixpoint_map) =*)
     let rec aux acc_wl (error, handler, store_bdu_fixpoint_init_map) =
       if IntWL.is_empty acc_wl
@@ -1067,7 +1081,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
         | Some rule_id ->
           (*----------------------------------------------------------------------*)
           (*compute bdu_creation, bdu_test and modif_list for this rule_id*)
-	   let _ = Printf.fprintf stderr "Test for rule:%i\n" rule_id in
+	   let _ = dump_channel parameter (fun stderr -> Printf.fprintf stderr "Test for rule:%i\n" rule_id) in
            let error, bdu_proj_views =
 	     match Map_rule_id_views.Map.find_option rule_id store_proj_bdu_views with
 	     | None -> error, Map_triple_views.Map.empty
@@ -1116,7 +1130,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
           begin
             if is_enable
             then
-              let _ = Printf.fprintf stderr "enabled\n" in
+              let _ = dump_channel parameter (fun stderr -> Printf.fprintf stderr "enabled\n") in
               let error, (handler, new_wl, store_new_result) =
                 compute_views_enabled
                   parameter
@@ -1139,7 +1153,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
               in
               aux new_wl (error, handler, store_new_result)
             else
-              let _ = Printf.fprintf stderr "disabled\n" in
+              let _ = dump_channel parameter (fun stderr -> Printf.fprintf stderr "disabled\n") in
               aux wl_tl (error, handler, store_bdu_fixpoint_init_map)
           end
     in
@@ -1179,7 +1193,7 @@ let collect_bdu_fixpoint_map parameter handler error
    then
     (*FIXME*)
     (*there is initial state*)
-    let error, (handler, store_bdu_fixpoint_map) =
+     let error, (handler, store_bdu_fixpoint_map) = (* there should be only one function, in the case there is no init, something will be fold over store_bdu_init_restriction_map  before doing the fixpoint, if it is empty the fold will do nothing, but the code should be shared *)
       collect_bdu_fixpoint_with_init
         parameter
         handler

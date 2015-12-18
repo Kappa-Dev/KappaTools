@@ -455,7 +455,7 @@ let scan_rule parameter handler_bdu error handler_kappa rule_id rule compil
   in
   (*------------------------------------------------------------------------------*)
   (*store*)
-  let error, (handler_bdu, store_bdu_fixpoint_map) =
+ (* let error, (handler_bdu, store_bdu_fixpoint_map) =
     collect_bdu_fixpoint_map
       parameter
       handler_bdu
@@ -475,7 +475,7 @@ let scan_rule parameter handler_bdu error handler_kappa rule_id rule compil
       store_bdu_build.store_bdu_init_restriction_map
       store_result.store_bdu_fixpoint.store_bdu_fixpoint_map 
   in
-
+  *)
   error, (handler_bdu, 
   {
     store_bdu_analysis_static  = store_bdu_analysis_static;
@@ -634,9 +634,36 @@ let bdu_main parameter error handler_kappa store_covering_classes cc_compil =
       store_covering_classes
       cc_compil.rules 
   in
+  let error = (* Static information before fixpoint computation *)
+    if  (Remanent_parameters.get_trace parameter) || trace
+    then print_result parameter error result
+    else error
+  in
+  let error, (handler_bdu, store_bdu_fixpoint) =
+    collect_bdu_fixpoint_map
+      parameter
+      handler_bdu
+      error
+      (*0*) (*no rule in particular, we should start with rule with no lhs and those induced by intial states  to remove *)
+      result.store_bdu_build.store_wl_creation
+      result.store_bdu_build.store_proj_bdu_creation_restriction_map
+      result.store_bdu_build.store_proj_modif_list_restriction_map
+      result.store_bdu_build.store_proj_bdu_test_restriction_map
+      result.store_bdu_build.store_proj_bdu_potential_restriction_map
+      result.store_bdu_build.store_proj_potential_list_restriction_map
+      result.store_bdu_build.store_bdu_test_restriction_map
+      result.store_bdu_build.store_proj_bdu_views
+      false (*is_new_bond*)
+      result.store_bdu_fixpoint.store_new_wl_side_effect
+      result.store_bdu_analysis_dynamic.store_covering_classes_modification_update
+      result.store_bdu_build.store_bdu_init_restriction_map
+      result.store_bdu_fixpoint.store_bdu_fixpoint_map 
+  in
+  let result = {result with store_bdu_fixpoint = {result.store_bdu_fixpoint with store_bdu_fixpoint_map = store_bdu_fixpoint}} in 
   let error =
     if  (Remanent_parameters.get_trace parameter) || trace
     then print_result parameter error result
     else error
   in
   error, handler_bdu, result
+			
