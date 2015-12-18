@@ -59,7 +59,7 @@ let compute_bdu_update_aux parameter handler error bdu_test list_a bdu_X =
   in
   error, handler, bdu_result
 
-let compute_bdu_update_test parameter handler error bdu_test list_a bdu_creation bdu_X =
+(*let compute_bdu_update_test parameter handler error bdu_test list_a bdu_creation bdu_X =
   (*to the first one with bdu_test*)
   let error, handler, bdu_Xn = 
     compute_bdu_update_aux
@@ -74,11 +74,11 @@ let compute_bdu_update_test parameter handler error bdu_test list_a bdu_creation
   let error, handler, bdu_result =
     Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_Xn bdu_creation
   in
-  error, handler, bdu_result
+  error, handler, bdu_result*)
 
 (*the final update*)
 
-let compute_bdu_update parameter handler error bdu_test list_a bdu_creation
+(*let compute_bdu_update parameter handler error bdu_test list_a bdu_creation
     bdu_potential list_b bdu_X =
   let error, handler, bdu_X_update_test =
     compute_bdu_update_test
@@ -99,7 +99,7 @@ let compute_bdu_update parameter handler error bdu_test list_a bdu_creation
       list_b
       bdu_X_update_test
   in
-  error, handler, bdu_update_test_side_effects
+  error, handler, bdu_update_test_side_effects*)
 
 (************************************************************************************)
 (*bdu update function for views*)
@@ -654,21 +654,6 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
           (fun stderr -> Printf.fprintf stderr
             "Ag:%i Type: %i Cvid: %i\n" agent_id agent_type cv_id)
         in 
-        (*let error, handler, bdu_update =
-          views_can_apply
-            parameter
-            handler
-            error
-            agent_id
-            agent_type
-            cv_id
-            bdu_true
-            bdu_false
-            bdu_test_map
-            modif_list_map
-            store_result
-        in*)
-        (*TODO: build bdu_update here*)
         let error, bdu_X =
           match Map_bdu_update.Map.find_option (agent_type, cv_id) store_result with
           | None -> error, bdu_false
@@ -695,15 +680,6 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
             error
             list
         in
-        (*REMOVE*)
-        (*let error, handler, list_b =
-          Mvbdu_wrapper.Mvbdu.build_list
-            parameter
-            handler
-            error
-            []
-        in*)
-        (*TODO*)
         let error, handler, bdu_update =
           compute_bdu_update_views
             parameter
@@ -712,17 +688,15 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
             bdu_test
             list_a
             bdu_X
-          (*compute_bdu_update
-            parameter
-            handler
-            error
-            bdu_test
-            list_a
-            bdu_false
-            bdu_false
-            list_b
-            bdu_X*)
-        in        
+        in 
+        (*TEST*)
+        (*let _ =
+          dump_channel parameter (fun stderr -> 
+          Printf.fprintf stderr
+          "in views_can_apply:(agent_type:%i, cv_id:%i)\n bdu_update:\n"
+	  agent_type cv_id;
+          Mvbdu_wrapper.Mvbdu.print stderr "" bdu_update)
+          in*)
         (*-----------------------------------------------------------------------*)
         let error, handler, is_new_view, store_result =
           add_link handler (agent_type, cv_id) bdu_update store_result
@@ -767,16 +741,6 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
             error
             bdu_creation
             bdu_X
-	  (*compute_bdu_update
-	    parameter
-	    handler
-	    error
-	    bdu_true
-	    empty_list
-	    bdu_creation
-	    bdu_false
-	    empty_list
-	    bdu_X*)
 	in
 	let error, handler, is_new_view, store_result =
           add_link handler (agent_type, cv_id) bdu_update store_result
@@ -839,16 +803,6 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
             bdu_test
             list
             bdu_X
-	  (*compute_bdu_update
-	    parameter
-	    handler
-	    error
-	    bdu_true
-	    empty_list
-	    bdu_false
-	    bdu_test
-	    list
-	    bdu_X*)
 	in
 	let error, handler, is_new_view, store_result =
           add_link handler (agent_type, cv_id) bdu_update store_result
