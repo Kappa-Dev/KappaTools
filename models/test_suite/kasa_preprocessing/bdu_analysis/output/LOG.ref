@@ -1325,46 +1325,6 @@ in add_update_to_wl:rule_id:7
 Test for rule:4
 enabled
 Ag:0 Type: 0 Cvid: 0
-in views_can_apply:(agent_type:0, cv_id:0)
- bdu_update:
-Id=19
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=18
-   Node(site_type:1<1)
-    Id=17
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
-
-      Id=12
-       Node(site_type:2<2)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=10
-     Node(site_type:1<2)
-      Id=5
-       Node(site_type:2<0)
-        Id=1
-         Leaf False 
-
-        Id=4
-         Node(site_type:2<1)
-          Id=0
-           Leaf True 
-
-          Id=1
-           Leaf False 
-
-      Id=1
-       Leaf False 
-
 Ag:0
 Nothing has changed
 Ag:2
@@ -1409,46 +1369,6 @@ in add_update_to_wl:rule_id:7
 Test for rule:5
 enabled
 Ag:0 Type: 0 Cvid: 0
-in views_can_apply:(agent_type:0, cv_id:0)
- bdu_update:
-Id=19
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=18
-   Node(site_type:1<1)
-    Id=17
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
-
-      Id=12
-       Node(site_type:2<2)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=10
-     Node(site_type:1<2)
-      Id=5
-       Node(site_type:2<0)
-        Id=1
-         Leaf False 
-
-        Id=4
-         Node(site_type:2<1)
-          Id=0
-           Leaf True 
-
-          Id=1
-           Leaf False 
-
-      Id=1
-       Leaf False 
-
 Ag:0
 Nothing has changed
 Ag:1
@@ -1493,31 +1413,6 @@ in add_update_to_wl:rule_id:7
 Test for rule:6
 enabled
 Ag:0 Type: 0 Cvid: 0
-in views_can_apply:(agent_type:0, cv_id:0)
- bdu_update:
-Id=25
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=23
-   Node(site_type:1<2)
-    Id=17
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
-
-      Id=12
-       Node(site_type:2<2)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
 Ag:0
 new views:Id=27
  Node(site_type:1<1)
@@ -1568,69 +1463,14 @@ in add_update_to_wl: set of rule_id:7
 in add_update_to_wl:rule_id:2
 in add_update_to_wl:rule_id:7
 Ag:1 Type: 1 Cvid: 0
-in views_can_apply:(agent_type:1, cv_id:0)
- bdu_update:
-Id=22
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=8
-   Node(site_type:1<2)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
 Ag:1
 Nothing has changed
 Test for rule:7
 enabled
 Ag:0 Type: 0 Cvid: 0
-in views_can_apply:(agent_type:0, cv_id:0)
- bdu_update:
-Id=25
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=23
-   Node(site_type:1<2)
-    Id=17
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
-
-      Id=12
-       Node(site_type:2<2)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
 Ag:0
 Nothing has changed
 Ag:1 Type: 2 Cvid: 0
-in views_can_apply:(agent_type:2, cv_id:0)
- bdu_update:
-Id=22
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=8
-   Node(site_type:1<2)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
 Ag:2
 Nothing has changed
 Test for rule:0
@@ -1652,31 +1492,6 @@ Nothing has changed
 Test for rule:4
 enabled
 Ag:0 Type: 0 Cvid: 0
-in views_can_apply:(agent_type:0, cv_id:0)
- bdu_update:
-Id=25
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=23
-   Node(site_type:1<2)
-    Id=17
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
-
-      Id=12
-       Node(site_type:2<2)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
 Ag:0
 Nothing has changed
 Ag:2
@@ -1684,31 +1499,6 @@ Nothing has changed
 Test for rule:5
 enabled
 Ag:0 Type: 0 Cvid: 0
-in views_can_apply:(agent_type:0, cv_id:0)
- bdu_update:
-Id=25
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=23
-   Node(site_type:1<2)
-    Id=17
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
-
-      Id=12
-       Node(site_type:2<2)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
 Ag:0
 Nothing has changed
 Ag:1
@@ -1716,49 +1506,9 @@ Nothing has changed
 Test for rule:6
 enabled
 Ag:0 Type: 0 Cvid: 0
-in views_can_apply:(agent_type:0, cv_id:0)
- bdu_update:
-Id=25
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=23
-   Node(site_type:1<2)
-    Id=17
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
-
-      Id=12
-       Node(site_type:2<2)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
 Ag:0
 Nothing has changed
 Ag:1 Type: 1 Cvid: 0
-in views_can_apply:(agent_type:1, cv_id:0)
- bdu_update:
-Id=22
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=8
-   Node(site_type:1<2)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
 Ag:1
 Nothing has changed
 

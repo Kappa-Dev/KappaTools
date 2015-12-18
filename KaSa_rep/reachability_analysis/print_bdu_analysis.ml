@@ -20,10 +20,9 @@ open Bdu_analysis_type
 open Print_bdu_analysis_static
 open Print_bdu_analysis_dynamic
 open Print_bdu_build
-(*open Print_bdu_fixpoint*)
 
 let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "BDU creation") message exn (fun () -> default)  
+  Exception.warn parameters mh (Some "Print bdu analysis") message exn (fun () -> default)  
 
 let trace = false
 

@@ -36,6 +36,7 @@ let dump_channel parameter  f =
 let dump_formatter parameter  f =
   if local_trace ||  Remanent_parameters.get_trace parameter
   then f (Remanent_parameters.get_formatter parameter) 
+
 (************************************************************************************)
 (*update bdu:
   - (bdu_X U bdu_creation) U [\rho[update_views] | \rho \in bdu_X (inter) bdu_test views]
@@ -99,6 +100,45 @@ let compute_bdu_update parameter handler error bdu_test list_a bdu_creation
       bdu_X_update_test
   in
   error, handler, bdu_update_test_side_effects
+
+(************************************************************************************)
+(*bdu update function for views*)
+
+let compute_bdu_update_views parameter handler error bdu_test list_a bdu_X =
+  let error, handler, bdu_result =
+    compute_bdu_update_aux
+      parameter
+      handler
+      error
+      bdu_test
+      list_a
+      bdu_X
+  in
+  error, handler, bdu_result
+
+(************************************************************************************)
+(*bdu update function deal with agent creation*)
+
+let compute_bdu_update_creation parameter handler error bdu_creation bdu_X =
+  let error, handler, bdu_result =
+    Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_creation bdu_X
+  in
+  error, handler, bdu_result
+
+(************************************************************************************)
+(*bdu update function deal with side effects*)
+
+let compute_bdu_update_side_effects parameter handler error bdu_test list_a bdu_X =
+  let error, handler, bdu_result =
+    compute_bdu_update_aux
+      parameter
+      handler
+      error
+      bdu_test
+      list_a
+      bdu_X
+  in
+  error, handler, bdu_result
     
 (************************************************************************************)
 (*side effects in the case of half break*)
@@ -501,98 +541,8 @@ let is_enable parameter handler error bdu_false
   error, is_enable
 
 (************************************************************************************)
-(*compute a view that can apply*)
-
-let views_can_apply parameter handler error agent_id agent_type cv_id bdu_true
-    bdu_false
-    bdu_test_map
-    (* bdu_creation_map *) 
-    modif_list_map
-   (* bdu_potential_map
-    potential_list_map*)
-    store_update_map 
-    =
-  let error, bdu_test =
-    match Map_triple_views.Map.find_option (agent_id,agent_type,cv_id) bdu_test_map
-    with
-    | None -> error, bdu_true
-    | Some bdu -> error, bdu
-  in
-  (*-----------------------------------------------------------------------*)
-  let error, bdu_X =
-    match Map_bdu_update.Map.find_option (agent_type, cv_id) store_update_map
-    with
-    | None -> error, bdu_false
-    | Some bdu -> error, bdu
-  in
- (* (*-----------------------------------------------------------------------*)
-  let error, bdu_creation = (* JF: not in the good place, it is not related to a given agent_id and/or a cv_id, you should do it after in a separate routine, by folding over the creation for this rule *)
-    match Map_agent_type_creation_bdu.Map.find_option agent_type bdu_creation_map
-    with
-    | None -> error, bdu_false
-    | Some bdu -> error, bdu
-  in*)
-  (*-----------------------------------------------------------------------*)
-  let error, modif_list =
-    match Map_agent_id_modif_list.Map.find_option agent_id modif_list_map
-    with
-    | None -> error, []
-    | Some l -> error, l
-  in
-  let error, handler, list_a =
-    Mvbdu_wrapper.Mvbdu.build_list (* JF: the list should not be built each time, it should be stored with the rest of static information *)
-      parameter
-      handler
-      error
-      modif_list
-  in
-  (*-----------------------------------------------------------------------*)
-  (*side effects*)
-  let error, bdu_potential = error,bdu_false (*
-    match Map_agent_type_potential_bdu.Map.find_option agent_type bdu_potential_map
-    with
-    | None -> error, bdu_false
-    | Some bdu -> error, bdu*)
-  in
- (* let error, potential_list =
-    match Map_agent_type_potential_list.Map.find_option agent_type potential_list_map
-    with
-    | None -> error, []
-    | Some l -> error, l
-  in*)
-  let error, handler, list_b =
-    Mvbdu_wrapper.Mvbdu.build_list  (* JF: the list should not be built each time, it should be stored with the rest of static information *)
-      parameter
-      handler
-      error
-      [] (* I put this to separate the computation of side effects (*potential_list*)*)
-  in
-  (*-----------------------------------------------------------------------*)
-  let error, handler, bdu_update =
-    compute_bdu_update
-      parameter
-      handler
-      error
-      bdu_test
-      list_a
-      bdu_false (* JF: I put bdu_false to separate the computation of modification and creation (* bdu_creation*)*)
-      bdu_false (* JF: I put bdu_false to separate the computation of side_effects (* bdu_potential *)*)
-      list_b 
-      bdu_X
-  in
-  (*TEST*)
-  let _ =
-    dump_channel parameter (fun stderr -> 
-      Printf.fprintf stderr "in views_can_apply:(agent_type:%i, cv_id:%i)\n bdu_update:\n"
-	agent_type cv_id;
-      Mvbdu_wrapper.Mvbdu.print stderr "" bdu_update)
-  in
-  error, handler, bdu_update
-
-(************************************************************************************)
 (*compute view in the case of it is a new view and check if it has new bond*)
 
-(*CHECK ME*)
 let compute_view_new_and_bond parameter handler error
     is_new_view 
     is_new_bond
@@ -645,17 +595,22 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
     store_covering_classes_modification_update 
     store_proj_bdu_test_restriction_map
     store_bdu_update_map =
-   (*-----------------------------------------------------------------------*)
+  (*-----------------------------------------------------------------------*)
   let error, bdu_proj_views =
-    match Map_rule_id_views.Map.find_option rule_id store_proj_bdu_test_restriction_map with
+    match Map_rule_id_views.Map.find_option rule_id 
+      store_proj_bdu_test_restriction_map 
+    with
     | None -> error, Map_triple_views.Map.empty
     | Some m -> error, m
-   in
-   let error, handler, empty_list =
-      Mvbdu_wrapper.Mvbdu.build_list parameter handler error []
-   in 
-   let add_link handler (agent_type, cv_id) bdu_update store_result =
-     (* add_link should collect the list/set of (agent_type,cv_id) for which something has changed, so that add_update_to_wl can focus on these pairs *)
+  in
+  let error, handler, empty_list =
+    Mvbdu_wrapper.Mvbdu.build_list parameter handler error []
+  in 
+  (*-----------------------------------------------------------------------*)
+  (* add_link should collect the list/set of (agent_type,cv_id) for which
+     something has changed, so that add_update_to_wl can focus on these
+     pairs *)
+  let add_link handler (agent_type, cv_id) bdu_update store_result =
     let error, bdu_old =
       match Map_bdu_update.Map.find_option (agent_type, cv_id) store_result
       with
@@ -665,10 +620,12 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
     let error, handler, bdu_union =
       Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_update bdu_old
     in  
+    (*-----------------------------------------------------------------------*)
     (*checking if it is a new view*)
     let _ = dump_channel parameter (fun stderr -> Printf.fprintf stderr 
       "Ag:%i\n" agent_type)
     in 
+    (*-----------------------------------------------------------------------*)
     if Mvbdu_wrapper.Mvbdu.equal bdu_union bdu_old
     then
       let _ = dump_channel parameter (fun stderr -> Printf.fprintf stderr
@@ -676,7 +633,7 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
       in
       error, handler, false, store_result
     else
-      let error,handler,bdu_diff =
+      let error, handler, bdu_diff =
 	Mvbdu_wrapper.Mvbdu.mvbdu_xor parameter handler error bdu_union bdu_old
       in
       let () = dump_channel parameter (fun stderr ->
@@ -688,59 +645,115 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
       error, handler, true, store_result
   in
   (*-----------------------------------------------------------------------*)
+  (*deal with views*)
   let error, (handler, wl_tl, store_result) =
     Map_triple_views.Map.fold
-      (fun (agent_id, agent_type,  cv_id) _
-        (error, (handler, wl_tl, store_result)) ->
-          (*-----------------------------------------------------------------------*)
-       let _ = dump_channel parameter 
-         (fun stderr -> Printf.fprintf stderr
-           "Ag:%i Type: %i Cvid: %i\n" agent_id agent_type cv_id)
-       in 
-       let error, handler, bdu_update =
-            views_can_apply
-              parameter
-              handler
-              error
-              agent_id
-              agent_type
-              cv_id
-              bdu_true
-              bdu_false
-              bdu_test_map
-              (*bdu_creation_map*)
-              modif_list_map
-             (* bdu_potential_map
-              potential_list_map*)
-              store_result
-          in
-          (*-----------------------------------------------------------------------*)
-          let error, handler, is_new_view, store_result =
-            add_link handler (agent_type, cv_id) bdu_update store_result
-          in
-          (*-----------------------------------------------------------------------*)
-          let error, (handler, new_wl, store_result) =
-            compute_view_new_and_bond
-              parameter
-              handler
-              error
-              is_new_view
-              is_new_bond
-              store_new_result_map
-              store_covering_classes_modification_update
-              wl_tl
-              store_result
-          in
-          error, (handler, new_wl, store_result)          
+      (fun (agent_id, agent_type, cv_id) _ (error, (handler, wl_tl, store_result)) ->
+       (*-----------------------------------------------------------------------*)
+        let _ = dump_channel parameter 
+          (fun stderr -> Printf.fprintf stderr
+            "Ag:%i Type: %i Cvid: %i\n" agent_id agent_type cv_id)
+        in 
+        (*let error, handler, bdu_update =
+          views_can_apply
+            parameter
+            handler
+            error
+            agent_id
+            agent_type
+            cv_id
+            bdu_true
+            bdu_false
+            bdu_test_map
+            modif_list_map
+            store_result
+        in*)
+        (*TODO: build bdu_update here*)
+        let error, bdu_X =
+          match Map_bdu_update.Map.find_option (agent_type, cv_id) store_result with
+          | None -> error, bdu_false
+          | Some bdu -> error, bdu
+        in
+        let error, bdu_test =
+          match Map_triple_views.Map.find_option (agent_id, agent_type, cv_id) bdu_test_map
+          with
+          | None -> error, bdu_true
+          | Some bdu -> error, bdu
+        in
+        (*TODO: Q:do I need to get the triple like in bdu_test*)
+        let error, list =
+          match Map_agent_id_modif_list.Map.find_option agent_id modif_list_map with
+          | None -> error, []
+          | Some l -> error, l
+        in
+        (*JF: the list should not be built each time, it should be stored
+          with the rest of static information*)
+        let error, handler, list_a =
+          Mvbdu_wrapper.Mvbdu.build_list
+            parameter
+            handler
+            error
+            list
+        in
+        (*REMOVE*)
+        (*let error, handler, list_b =
+          Mvbdu_wrapper.Mvbdu.build_list
+            parameter
+            handler
+            error
+            []
+        in*)
+        (*TODO*)
+        let error, handler, bdu_update =
+          compute_bdu_update_views
+            parameter
+            handler
+            error
+            bdu_test
+            list_a
+            bdu_X
+          (*compute_bdu_update
+            parameter
+            handler
+            error
+            bdu_test
+            list_a
+            bdu_false
+            bdu_false
+            list_b
+            bdu_X*)
+        in        
+        (*-----------------------------------------------------------------------*)
+        let error, handler, is_new_view, store_result =
+          add_link handler (agent_type, cv_id) bdu_update store_result
+        in
+        (*-----------------------------------------------------------------------*)
+        let error, (handler, new_wl, store_result) =
+          compute_view_new_and_bond
+            parameter
+            handler
+            error
+            is_new_view
+            is_new_bond
+            store_new_result_map
+            store_covering_classes_modification_update
+            wl_tl
+            store_result
+        in
+        error, (handler, new_wl, store_result)          
       )
       bdu_proj_views
       (error, (handler, wl_tl, store_bdu_update_map))
   in
-  let error, (handler, wl_tl, store_result) = (* JF: Here I deal with agent creation *)
+  (*-----------------------------------------------------------------------*)
+  (*JF:start to deal with agent creation*)
+  let error, (handler, wl_tl, store_result) =
     Map_agent_type_creation_bdu.Map.fold
       (fun agent_type bdu_creation (error, (handler, wl_tl, store_result)) ->
-       let cv_id = 0 in 
-        (*JF: the following should be applied for each covering class of the agent agent_type, but I do not know where this information is stored  *)
+        let cv_id = 0 in 
+        (*JF: the following should be applied for each covering class of
+          the agent agent_type, but I do not know where this information is
+          stored *)
         let error, bdu_X =
 	  match Map_bdu_update.Map.find_option (agent_type, cv_id) store_result
 	  with
@@ -748,7 +761,13 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
 	  | Some bdu -> error, bdu
 	in
 	let error, handler, bdu_update =
-	  compute_bdu_update
+          compute_bdu_update_creation
+            parameter
+            handler
+            error
+            bdu_creation
+            bdu_X
+	  (*compute_bdu_update
 	    parameter
 	    handler
 	    error
@@ -757,42 +776,55 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
 	    bdu_creation
 	    bdu_false
 	    empty_list
-	    bdu_X
+	    bdu_X*)
 	in
 	let error, handler, is_new_view, store_result =
-         add_link handler (agent_type, cv_id) bdu_update store_result
-       in
-       (*-----------------------------------------------------------------------*)
-       let error, (handler, wl_tl, store_result) =
-         compute_view_new_and_bond
-           parameter
-           handler
-           error
-           is_new_view
-           is_new_bond
-           store_new_result_map
-           store_covering_classes_modification_update
-           wl_tl
-           store_result
-       in
-       error, (handler, wl_tl, store_result)          
+          add_link handler (agent_type, cv_id) bdu_update store_result
+        in
+        (*-----------------------------------------------------------------------*)
+        let error, (handler, wl_tl, store_result) =
+          compute_view_new_and_bond
+            parameter
+            handler
+            error
+            is_new_view
+            is_new_bond
+            store_new_result_map
+            store_covering_classes_modification_update
+            wl_tl
+            store_result
+        in
+        error, (handler, wl_tl, store_result)          
       )
       bdu_creation_map
       (error, (handler, wl_tl, store_result))
   in 
-   let error, (handler, wl_tl, store_result) = (* JF: Here I deal with side effects *)
-     Bdu_analysis_type.Map_agent_type_potential_bdu.Map.fold (* JF: to do use a fold2 *)
+  (*-----------------------------------------------------------------------*)
+  (*JF: start fo deal with side effects*)
+  let error, (handler, wl_tl, store_result) =
+    Map_agent_type_potential_bdu.Map.fold 
+      (* JF: to do use a fold2 *)
       (fun agent_type bdu_test (error, (handler, wl_tl, store_result)) ->
-       let list = Bdu_analysis_type.Map_agent_type_potential_list.Map.find_default [] agent_type potential_list_map in 
-       let error,handler,list =
-         Mvbdu_wrapper.Mvbdu.build_list (* JF: the list should not be built each time, it should be stored with the rest of static information *)
-	   parameter
-	   handler
-	   error
-	   list
-       in
-       let cv_id = 0 in 
-        (*JF: the following should be applied for each covering class of the agent agent_type, but I do not know where this information is stored  *)
+        let error, list = 
+          match
+            Map_agent_type_potential_list.Map.find_option agent_type potential_list_map
+          with
+          | None -> error, []
+          | Some l -> error, l
+        in 
+        (* JF: the list should not be built each time, it should be stored
+           with the rest of static information *)
+        let error,handler,list =
+          Mvbdu_wrapper.Mvbdu.build_list
+            parameter
+	    handler
+	    error
+	    list
+        in
+        (*JF: the following should be applied for each covering class of
+          the agent agent_type, but I do not know where this information is
+          stored *)
+        let cv_id = 0 in 
         let error, bdu_X =
 	  match Map_bdu_update.Map.find_option (agent_type, cv_id) store_result
 	  with
@@ -800,7 +832,14 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
 	  | Some bdu -> error, bdu
 	in
 	let error, handler, bdu_update =
-	  compute_bdu_update
+          compute_bdu_update_side_effects
+            parameter
+            handler
+            error
+            bdu_test
+            list
+            bdu_X
+	  (*compute_bdu_update
 	    parameter
 	    handler
 	    error
@@ -809,27 +848,27 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
 	    bdu_false
 	    bdu_test
 	    list
-	    bdu_X
+	    bdu_X*)
 	in
 	let error, handler, is_new_view, store_result =
-         add_link handler (agent_type, cv_id) bdu_update store_result
-       in
-       (*-----------------------------------------------------------------------*)
-       let error, (handler, wl_tl, store_result) =
-         compute_view_new_and_bond
-           parameter
-           handler
-           error
-           is_new_view
-           is_new_bond
-           store_new_result_map
-           store_covering_classes_modification_update
-           wl_tl
-           store_result
-       in
-       error, (handler, wl_tl, store_result)          
+          add_link handler (agent_type, cv_id) bdu_update store_result
+        in
+        (*-----------------------------------------------------------------------*)
+        let error, (handler, wl_tl, store_result) =
+          compute_view_new_and_bond
+            parameter
+            handler
+            error
+            is_new_view
+            is_new_bond
+            store_new_result_map
+            store_covering_classes_modification_update
+            wl_tl
+            store_result
+        in
+        error, (handler, wl_tl, store_result)          
       )
-       bdu_potential_map
+      bdu_potential_map
       (* potential_list_map*)
       (error, (handler, wl_tl, store_result))
   in 
@@ -1062,6 +1101,177 @@ let collect_bdu_fixpoint_map parameter handler error
 (************************************************************************************)
 (*fixpoint iteration without initial state*)
 (*REMOVE*)
+
+(************************************************************************************)
+(*compute a view that can apply*)
+
+(*let views_can_apply parameter handler error agent_id agent_type cv_id bdu_true
+    bdu_false
+    bdu_test_map
+    modif_list_map
+    store_update_map 
+    =
+  let error, bdu_test =
+    match Map_triple_views.Map.find_option (agent_id,agent_type,cv_id) bdu_test_map
+    with
+    | None -> error, bdu_true
+    | Some bdu -> error, bdu
+  in
+  (*-----------------------------------------------------------------------*)
+  let error, bdu_X =
+    match Map_bdu_update.Map.find_option (agent_type, cv_id) store_update_map
+    with
+    | None -> error, bdu_false
+    | Some bdu -> error, bdu
+  in
+ (* (*-----------------------------------------------------------------------*)
+  let error, bdu_creation = (* JF: not in the good place, it is not related to a given agent_id and/or a cv_id, you should do it after in a separate routine, by folding over the creation for this rule *)
+    match Map_agent_type_creation_bdu.Map.find_option agent_type bdu_creation_map
+    with
+    | None -> error, bdu_false
+    | Some bdu -> error, bdu
+  in*)
+  (*-----------------------------------------------------------------------*)
+  let error, modif_list =
+    match Map_agent_id_modif_list.Map.find_option agent_id modif_list_map
+    with
+    | None -> error, []
+    | Some l -> error, l
+  in
+  let error, handler, list_a =
+    Mvbdu_wrapper.Mvbdu.build_list (* JF: the list should not be built each time, it should be stored with the rest of static information *)
+      parameter
+      handler
+      error
+      modif_list
+  in
+  (*-----------------------------------------------------------------------*)
+  (*side effects*)
+  let error, bdu_potential = error,bdu_false (*
+    match Map_agent_type_potential_bdu.Map.find_option agent_type bdu_potential_map
+    with
+    | None -> error, bdu_false
+    | Some bdu -> error, bdu*)
+  in
+ (* let error, potential_list =
+    match Map_agent_type_potential_list.Map.find_option agent_type potential_list_map
+    with
+    | None -> error, []
+    | Some l -> error, l
+  in*)
+  let error, handler, list_b =
+    Mvbdu_wrapper.Mvbdu.build_list  (* JF: the list should not be built each time, it should be stored with the rest of static information *)
+      parameter
+      handler
+      error
+      [] (* I put this to separate the computation of side effects (*potential_list*)*)
+  in
+  (*-----------------------------------------------------------------------*)
+  let error, handler, bdu_update =
+    compute_bdu_update
+      parameter
+      handler
+      error
+      bdu_test
+      list_a
+      bdu_false (* JF: I put bdu_false to separate the computation of modification and creation (* bdu_creation*)*)
+      bdu_false (* JF: I put bdu_false to separate the computation of side_effects (* bdu_potential *)*)
+      list_b 
+      bdu_X
+  in
+  (*TEST*)
+  let _ =
+    dump_channel parameter (fun stderr -> 
+      Printf.fprintf stderr "in views_can_apply:(agent_type:%i, cv_id:%i)\n bdu_update:\n"
+	agent_type cv_id;
+      Mvbdu_wrapper.Mvbdu.print stderr "" bdu_update)
+  in
+  error, handler, bdu_update*)
+
+(*let views_can_apply parameter handler error agent_id agent_type cv_id bdu_true
+    bdu_false
+    bdu_test_map
+    modif_list_map
+    store_update_map 
+    =
+  let error, bdu_test =
+    match Map_triple_views.Map.find_option (agent_id,agent_type,cv_id) bdu_test_map
+    with
+    | None -> error, bdu_true
+    | Some bdu -> error, bdu
+  in
+  (*-----------------------------------------------------------------------*)
+  let error, bdu_X =
+    match Map_bdu_update.Map.find_option (agent_type, cv_id) store_update_map
+    with
+    | None -> error, bdu_false
+    | Some bdu -> error, bdu
+  in
+ (* (*-----------------------------------------------------------------------*)
+  let error, bdu_creation = (* JF: not in the good place, it is not related to a given agent_id and/or a cv_id, you should do it after in a separate routine, by folding over the creation for this rule *)
+    match Map_agent_type_creation_bdu.Map.find_option agent_type bdu_creation_map
+    with
+    | None -> error, bdu_false
+    | Some bdu -> error, bdu
+  in*)
+  (*-----------------------------------------------------------------------*)
+  let error, modif_list =
+    match Map_agent_id_modif_list.Map.find_option agent_id modif_list_map
+    with
+    | None -> error, []
+    | Some l -> error, l
+  in
+  error, (bdu_test, bdu_X, modif_list)
+
+  (*let error, handler, list_a =
+    Mvbdu_wrapper.Mvbdu.build_list (* JF: the list should not be built each time, it should be stored with the rest of static information *)
+      parameter
+      handler
+      error
+      modif_list
+  in*)
+  (*-----------------------------------------------------------------------*)
+  (*side effects*)
+  let error, bdu_potential = error,bdu_false (*
+    match Map_agent_type_potential_bdu.Map.find_option agent_type bdu_potential_map
+    with
+    | None -> error, bdu_false
+    | Some bdu -> error, bdu*)
+  in
+ (* let error, potential_list =
+    match Map_agent_type_potential_list.Map.find_option agent_type potential_list_map
+    with
+    | None -> error, []
+    | Some l -> error, l
+  in*)
+  let error, handler, list_b =
+    Mvbdu_wrapper.Mvbdu.build_list  (* JF: the list should not be built each time, it should be stored with the rest of static information *)
+      parameter
+      handler
+      error
+      [] (* I put this to separate the computation of side effects (*potential_list*)*)
+  in
+  (*-----------------------------------------------------------------------*)
+  let error, handler, bdu_update =
+    compute_bdu_update
+      parameter
+      handler
+      error
+      bdu_test
+      list_a
+      bdu_false (* JF: I put bdu_false to separate the computation of modification and creation (* bdu_creation*)*)
+      bdu_false (* JF: I put bdu_false to separate the computation of side_effects (* bdu_potential *)*)
+      list_b 
+      bdu_X
+  in
+  (*TEST*)
+  (*let _ =
+    dump_channel parameter (fun stderr -> 
+      Printf.fprintf stderr "in views_can_apply:(agent_type:%i, cv_id:%i)\n bdu_update:\n"
+	agent_type cv_id;
+      Mvbdu_wrapper.Mvbdu.print stderr "" bdu_update)
+  in*)
+  error, handler, bdu_update*)
 
 (*let is_enable' parameter handler error bdu_true bdu_false
     bdu_test_map

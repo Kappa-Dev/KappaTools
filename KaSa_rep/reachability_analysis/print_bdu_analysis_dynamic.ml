@@ -25,7 +25,7 @@ let warn parameters mh message exn default =
 let trace = false
 
 (************************************************************************************)
-(*contact map*)
+(*syntactic contact map*)
 
 let print_contact_map_aux parameter error result =
   let b, result1 = result in
@@ -54,6 +54,7 @@ let print_contact_map parameter error result =
   error
 
 (************************************************************************************)
+(*contact map full information*)
 
 let print_contact_map_full_aux parameter error result =
   Int2Map_CM_state.Map.iter (fun (agent1, site1, state1) set ->
@@ -80,6 +81,7 @@ let print_contact_map_full parameter error result =
   error
 
 (************************************************************************************)
+(*update (c) function*)
 
 let print_covering_classes_modification_aux parameter error result =
   Int2Map_CV_Modif.Map.iter
@@ -110,6 +112,7 @@ let print_covering_classes_modification parameter error result =
     result
     
 (************************************************************************************)
+(*update(c'), when discovered a bond for the first time*)
 
 let print_covering_classes_modification_side_effects_aux parameter error result =
   Int2Map_CV_Modif.Map.iter

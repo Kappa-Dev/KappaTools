@@ -1215,109 +1215,49 @@ wl_init_creation:
 Test for rule:0
 enabled
 Ag:0 Type: 0 Cvid: 0
-in views_can_apply:(agent_type:0, cv_id:0)
- bdu_update:
-Id=0
- Leaf True 
-
 Ag:0
 Nothing has changed
 Ag:1 Type: 1 Cvid: 0
-in views_can_apply:(agent_type:1, cv_id:0)
- bdu_update:
-Id=0
- Leaf True 
-
 Ag:1
 Nothing has changed
 Test for rule:1
 enabled
 Ag:0 Type: 0 Cvid: 0
-in views_can_apply:(agent_type:0, cv_id:0)
- bdu_update:
-Id=0
- Leaf True 
-
 Ag:0
 Nothing has changed
 Ag:1 Type: 1 Cvid: 0
-in views_can_apply:(agent_type:1, cv_id:0)
- bdu_update:
-Id=0
- Leaf True 
-
 Ag:1
 Nothing has changed
 Test for rule:2
 enabled
 Ag:0 Type: 0 Cvid: 0
-in views_can_apply:(agent_type:0, cv_id:0)
- bdu_update:
-Id=0
- Leaf True 
-
 Ag:0
 Nothing has changed
 Ag:1 Type: 2 Cvid: 0
-in views_can_apply:(agent_type:2, cv_id:0)
- bdu_update:
-Id=0
- Leaf True 
-
 Ag:2
 Nothing has changed
 Test for rule:3
 enabled
 Ag:0 Type: 2 Cvid: 0
-in views_can_apply:(agent_type:2, cv_id:0)
- bdu_update:
-Id=0
- Leaf True 
-
 Ag:2
 Nothing has changed
 Ag:1 Type: 0 Cvid: 0
-in views_can_apply:(agent_type:0, cv_id:0)
- bdu_update:
-Id=0
- Leaf True 
-
 Ag:0
 Nothing has changed
 Test for rule:4
 enabled
 Ag:0 Type: 0 Cvid: 0
-in views_can_apply:(agent_type:0, cv_id:0)
- bdu_update:
-Id=0
- Leaf True 
-
 Ag:0
 Nothing has changed
 Ag:1 Type: 2 Cvid: 0
-in views_can_apply:(agent_type:2, cv_id:0)
- bdu_update:
-Id=0
- Leaf True 
-
 Ag:2
 Nothing has changed
 Test for rule:5
 enabled
 Ag:0 Type: 0 Cvid: 0
-in views_can_apply:(agent_type:0, cv_id:0)
- bdu_update:
-Id=0
- Leaf True 
-
 Ag:0
 Nothing has changed
 Ag:1 Type: 2 Cvid: 0
-in views_can_apply:(agent_type:2, cv_id:0)
- bdu_update:
-Id=0
- Leaf True 
-
 Ag:2
 Nothing has changed
 
