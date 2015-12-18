@@ -479,7 +479,7 @@ rule_id:6
 - Bdu for the valuations of the views that are created from potential partner in side effects (projection per rule):
 
 rule_id:5
-agent_type:0
+agent_type:0:covering_class_id:0
 Id=13
  Node(site_type:2<1)
   Id=1

@@ -269,7 +269,7 @@ Id=11
 - Bdu for the valuations of the views that are created (per rule_id; projection function):
 
 rule_id:0
-agent_type:0
+agent_type:0:cv_id:0
 Id=7
  Node(site_type:1<0)
   Id=1

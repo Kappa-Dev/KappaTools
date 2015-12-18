@@ -328,7 +328,7 @@ let collect_proj_bdu_creation_restriction_map parameter handler error
       parameter
       (error, handler)
       (fun (agent_type, rule_id, cv_id) -> rule_id)
-      (fun (agent_type, rule_id, cv_id) -> agent_type)
+      (fun (agent_type, rule_id, cv_id) -> agent_type, cv_id)
       bdu_true
       (fun parameter (error, handler) bdu bdu' ->
         let error, handler, bdu_union = Mvbdu_wrapper.Mvbdu.mvbdu_and
@@ -638,7 +638,7 @@ let collect_proj_bdu_potential_restriction_map parameter handler error
       parameter
       (error, handler)
       (fun (agent_type, rule_id, cv_id) -> rule_id)
-      (fun (agent_type, rule_id, cv_id) -> agent_type)
+      (fun (agent_type, rule_id, cv_id) -> agent_type, cv_id)
       bdu_true
       (fun parameter (error, handler) bdu bdu' ->
         let error, handler, bdu_union = Mvbdu_wrapper.Mvbdu.mvbdu_and

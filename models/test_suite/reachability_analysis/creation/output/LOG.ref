@@ -459,7 +459,7 @@ Id=3
 - Bdu for the valuations of the views that are created (per rule_id; projection function):
 
 rule_id:0
-agent_type:0
+agent_type:0:cv_id:0
 Id=7
  Node(site_type:1<0)
   Id=1
@@ -484,7 +484,7 @@ Id=7
      Leaf False 
 
 rule_id:3
-agent_type:1
+agent_type:1:cv_id:0
 Id=3
  Node(site_type:1<0)
   Id=1

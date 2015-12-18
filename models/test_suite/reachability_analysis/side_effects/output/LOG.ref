@@ -959,7 +959,7 @@ rule_id:11
 - Bdu for the valuations of the views that are created from potential partner in side effects (projection per rule):
 
 rule_id:5
-agent_type:1
+agent_type:1:covering_class_id:0
 Id=9
  Node(site_type:2<1)
   Id=1
@@ -974,7 +974,7 @@ Id=9
      Leaf False 
 
 rule_id:9
-agent_type:0
+agent_type:0:covering_class_id:0
 Id=17
  Node(site_type:2<2)
   Id=1
@@ -989,7 +989,7 @@ Id=17
      Leaf False 
 
 rule_id:11
-agent_type:4
+agent_type:4:covering_class_id:0
 Id=9
  Node(site_type:2<1)
   Id=1
@@ -1259,7 +1259,7 @@ Id=9
 - Bdu for the valuations of the views that are created (per rule_id; projection function):
 
 rule_id:0
-agent_type:0
+agent_type:0:cv_id:0
 Id=7
  Node(site_type:1<0)
   Id=1
@@ -1284,7 +1284,7 @@ Id=7
      Leaf False 
 
 rule_id:1
-agent_type:1
+agent_type:1:cv_id:0
 Id=7
  Node(site_type:1<0)
   Id=1
@@ -1309,7 +1309,7 @@ Id=7
      Leaf False 
 
 rule_id:2
-agent_type:2
+agent_type:2:cv_id:0
 Id=7
  Node(site_type:1<0)
   Id=1
@@ -1334,7 +1334,7 @@ Id=7
      Leaf False 
 
 rule_id:3
-agent_type:3
+agent_type:3:cv_id:0
 Id=7
  Node(site_type:1<0)
   Id=1
@@ -1359,7 +1359,7 @@ Id=7
      Leaf False 
 
 rule_id:4
-agent_type:4
+agent_type:4:cv_id:0
 Id=7
  Node(site_type:1<0)
   Id=1

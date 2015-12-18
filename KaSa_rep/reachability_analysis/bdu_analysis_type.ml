@@ -171,7 +171,7 @@ module Map_final_creation_bdu =
 module Map_agent_type_creation_bdu =
   SetMap.Make (
     struct
-      type t = int
+      type t = int * int (*agent_type, cv_id*)
       let compare = compare
     end)
 
@@ -274,7 +274,7 @@ module Map_final_potential_bdu =
 module Map_agent_type_potential_bdu =
   SetMap.Make (
     struct
-      type t = int
+      type t = int * int (*agent_type, cv_id*)
       let compare = compare
     end)
 
@@ -302,7 +302,7 @@ module Map_final_potential_list =
 module Map_agent_type_potential_list =
   SetMap.Make (
     struct
-      type t = int
+      type t = int 
       let compare = compare
     end)
 

@@ -469,14 +469,7 @@ let collect_bdu_potential_and_list parameter error rule_id
 (*check is_enable of all using the projection function*)
 
 let is_enable parameter handler error bdu_false 
-    rule_id store_proj_bdu_views store_bdu_update_map =
-  (*TODO: fold over this map??*)
-  (*get bdu_test_map (agent_id, agent_type, cv_id)*)
-  let error, bdu_proj_views = (*TODO: use projec_views in fixpoint function*)
-    match Map_rule_id_views.Map.find_option rule_id store_proj_bdu_views with
-    | None -> error, Map_triple_views.Map.empty
-    | Some m -> error, m
-  in
+    rule_id bdu_proj_views store_bdu_update_map =
   let is_enable =
     Map_triple_views.Map.for_all
       (fun (agent_id, agent_type, cv_id)  bdu_test ->
@@ -551,20 +544,8 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
     is_new_bond
     wl_tl
     store_covering_classes_modification_update 
-    store_proj_bdu_test_restriction_map
+    bdu_proj_views
     store_bdu_update_map =
-  (*-----------------------------------------------------------------------*)
-  let error, bdu_proj_views =
-    (*TODO: used project_views in the function compute fixpoint at the end*)
-    match Map_rule_id_views.Map.find_option rule_id 
-      store_proj_bdu_test_restriction_map 
-    with
-    | None -> error, Map_triple_views.Map.empty
-    | Some m -> error, m
-  in
-  (*let error, handler, empty_list =
-    Mvbdu_wrapper.Mvbdu.build_list parameter handler error []
-  in *)
   (*-----------------------------------------------------------------------*)
   (* add_link should collect the list/set of (agent_type,cv_id) for which
      something has changed, so that add_update_to_wl can focus on these
@@ -682,8 +663,8 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
   (*JF:start to deal with agent creation*)
   let error, (handler, wl_tl, store_result) =
     Map_agent_type_creation_bdu.Map.fold
-      (fun agent_type bdu_creation (error, (handler, wl_tl, store_result)) ->
-        let cv_id = 0 in 
+      (fun (agent_type, cv_id) bdu_creation (error, (handler, wl_tl, store_result)) ->
+        (*let cv_id = 0 in *)
         (*JF: the following should be applied for each covering class of
           the agent agent_type, but I do not know where this information is
           stored *)
@@ -727,7 +708,7 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
   let error, (handler, wl_tl, store_result) =
     Map_agent_type_potential_bdu.Map.fold 
       (* JF: to do use a fold2 *)
-      (fun agent_type bdu_test (error, (handler, wl_tl, store_result)) ->
+      (fun (agent_type, cv_id) bdu_test (error, (handler, wl_tl, store_result)) ->
         let error, list = 
           match
             Map_agent_type_potential_list.Map.find_option agent_type potential_list_map
@@ -748,7 +729,6 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
         (*JF: the following should be applied for each covering class of
           the agent agent_type, but I do not know where this information is
           stored *)
-        let cv_id = 0 in 
         let error, bdu_X =
 	  match Map_bdu_update.Map.find_option (agent_type, cv_id) store_result
 	  with
@@ -783,7 +763,7 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
         error, (handler, wl_tl, store_result)          
       )
       bdu_potential_map
-      (* potential_list_map*)
+      (*store_proj_bdu_views*)
       (error, (handler, wl_tl, store_result))
   in 
   error, (handler, wl_tl, store_result)
@@ -890,11 +870,13 @@ let collect_bdu_fixpoint_with_init parameter handler error
 	let _ = dump_channel parameter 
           (fun stderr -> Printf.fprintf stderr "Test for rule:%i\n" rule_id)
         in
+        (*--------------------------------------------------------------------*)
         let error, bdu_proj_views =
 	  match Map_rule_id_views.Map.find_option rule_id store_proj_bdu_views with
 	  | None -> error, Map_triple_views.Map.empty
 	  | Some m -> error, m
 	in
+        (*--------------------------------------------------------------------*)
         (*Q:return list_a instead of a pair of list*)
         let error, (bdu_creation_map, modif_list_map, bdu_test_map) =
           collect_bdu_creation_and_modif_list
@@ -923,7 +905,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
             error
             bdu_false
             rule_id
-            store_proj_bdu_views
+            bdu_proj_views
             store_bdu_fixpoint_init_map
         in
         (*-----------------------------------------------------------------------*)
@@ -950,7 +932,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
                 is_new_bond
                 wl_tl
                 store_covering_classes_modification_update
-                store_proj_bdu_views
+                bdu_proj_views
                 store_bdu_fixpoint_init_map
             in
             aux new_wl (error, handler, store_new_result)

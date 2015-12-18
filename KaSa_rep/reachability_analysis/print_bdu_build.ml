@@ -93,8 +93,10 @@ let print_proj_creation_bdu_map parameter error result =
     (fun rule_id map_b ->
       let _ = fprintf parameter.log "rule_id:%i\n" rule_id in
       Map_agent_type_creation_bdu.Map.iter
-        (fun agent_type bdu_creation ->
-          let _ = fprintf parameter.log "agent_type:%i\n" agent_type in
+        (fun (agent_type, cv_id) bdu_creation ->
+          let _ = fprintf parameter.log "agent_type:%i:cv_id:%i\n" 
+            agent_type cv_id
+          in
           Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_creation
         ) map_b
     ) result
@@ -166,8 +168,10 @@ let print_proj_potential_bdu_map parameter error result =
     (fun rule_id map_b ->
       let _ = fprintf parameter.log "rule_id:%i\n" rule_id in
       Map_agent_type_potential_bdu.Map.iter
-        (fun agent_type bdu_potential ->
-          let _ = fprintf parameter.log "agent_type:%i\n" agent_type in
+        (fun (agent_type, cv_id) bdu_potential ->
+          let _ = fprintf parameter.log "agent_type:%i:covering_class_id:%i\n" 
+            agent_type cv_id
+          in
           Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_potential
         ) map_b
     ) result
