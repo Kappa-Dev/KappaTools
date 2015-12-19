@@ -914,9 +914,6 @@ agent_id:0:agent_type:1:rule_id:0:covering_class_id:0
 site_type:1:state:1
 agent_id:0:agent_type:1:rule_id:1:covering_class_id:0
 site_type:1:state:1
-agent_id:0:agent_type:2:rule_id:2:covering_class_id:0
-agent_id:0:agent_type:2:rule_id:3:covering_class_id:0
-agent_id:0:agent_type:2:rule_id:4:covering_class_id:0
 agent_id:1:agent_type:0:rule_id:0:covering_class_id:0
 site_type:1:state:1
 agent_id:1:agent_type:2:rule_id:1:covering_class_id:0
@@ -941,15 +938,12 @@ site_type:1:state:1
 agent_id:1:
 site_type:1:state:1
 rule_id:2
-agent_id:0:
 agent_id:1:
 site_type:3:state:1
 rule_id:3
-agent_id:0:
 agent_id:1:
 site_type:1:state:1
 rule_id:4
-agent_id:0:
 agent_id:1:
 site_type:2:state:1
 
