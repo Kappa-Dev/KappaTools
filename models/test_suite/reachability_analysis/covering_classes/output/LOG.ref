@@ -1,0 +1,4465 @@
+Parsing covering_classes.ka...
+done
+Scan rules!
+Signature:
+Signature:agents: 
+Signature:agents:agent_type:0:A
+Signature:agents:agent_type:1:B
+Signature:agents:agent_type:2:C
+Signature:sites: 
+Signature:sites:agent_type:0:
+Signature:sites:agent_type:0:site_type:0->x(internal state)
+Signature:sites:agent_type:0:site_type:1->y(internal state)
+Signature:sites:agent_type:0:site_type:2->x(binding state)
+Signature:sites:agent_type:0:site_type:3->y(binding state)
+Signature:sites:agent_type:1:
+Signature:sites:agent_type:1:site_type:0->x(internal state)
+Signature:sites:agent_type:1:site_type:1->y(internal state)
+Signature:sites:agent_type:1:site_type:2->x(binding state)
+Signature:sites:agent_type:1:site_type:3->y(binding state)
+Signature:sites:agent_type:2:
+Signature:sites:agent_type:2:site_type:0->x(internal state)
+Signature:sites:agent_type:2:site_type:1->y(internal state)
+Signature:sites:agent_type:2:site_type:2->x(binding state)
+Signature:sites:agent_type:2:site_type:3->y(binding state)
+Signature:states: 
+Signature:states:0:
+Signature:states:0:0:
+Signature:states:0:0:state_id:0->u
+Signature:states:0:0:state_id:1->p
+Signature:states:0:1:
+Signature:states:0:1:state_id:0->u
+Signature:states:0:1:state_id:1->p
+Signature:states:0:2:
+Signature:states:0:2:state_id:0->free
+Signature:states:0:2:state_id:1->agent_type:1@site_type:2
+Signature:states:0:2:state_id:2->agent_type:2@site_type:2
+Signature:states:0:3:
+Signature:states:0:3:state_id:0->free
+Signature:states:0:3:state_id:1->agent_type:1@site_type:3
+Signature:states:0:3:state_id:2->agent_type:2@site_type:3
+Signature:states:1:
+Signature:states:1:0:
+Signature:states:1:0:state_id:0->u
+Signature:states:1:0:state_id:1->p
+Signature:states:1:1:
+Signature:states:1:1:state_id:0->u
+Signature:states:1:1:state_id:1->p
+Signature:states:1:2:
+Signature:states:1:2:state_id:0->free
+Signature:states:1:2:state_id:1->agent_type:0@site_type:2
+Signature:states:1:3:
+Signature:states:1:3:state_id:0->free
+Signature:states:1:3:state_id:1->agent_type:0@site_type:3
+Signature:states:2:
+Signature:states:2:0:
+Signature:states:2:0:state_id:0->u
+Signature:states:2:0:state_id:1->p
+Signature:states:2:1:
+Signature:states:2:1:state_id:0->u
+Signature:states:2:1:state_id:1->p
+Signature:states:2:2:
+Signature:states:2:2:state_id:0->free
+Signature:states:2:2:state_id:1->agent_type:0@site_type:2
+Signature:states:2:3:
+Signature:states:2:3:state_id:0->free
+Signature:states:2:3:state_id:1->agent_type:0@site_type:3
+Signature:duals: 
+Signature:duals:0:
+Signature:duals:0:2:
+Signature:duals:0:2:1:
+Signature:duals:0:2:1:agent_type:1,site_type:2,state_id:1
+Signature:duals:0:2:2:
+Signature:duals:0:2:2:agent_type:2,site_type:2,state_id:1
+Signature:duals:0:3:
+Signature:duals:0:3:1:
+Signature:duals:0:3:1:agent_type:1,site_type:3,state_id:1
+Signature:duals:0:3:2:
+Signature:duals:0:3:2:agent_type:2,site_type:3,state_id:1
+Signature:duals:1:
+Signature:duals:1:2:
+Signature:duals:1:2:1:
+Signature:duals:1:2:1:agent_type:0,site_type:2,state_id:1
+Signature:duals:1:3:
+Signature:duals:1:3:1:
+Signature:duals:1:3:1:agent_type:0,site_type:3,state_id:1
+Signature:duals:2:
+Signature:duals:2:2:
+Signature:duals:2:2:1:
+Signature:duals:2:2:1:agent_type:0,site_type:2,state_id:2
+Signature:duals:2:3:
+Signature:duals:2:3:1:
+Signature:duals:2:3:1:agent_type:0,site_type:3,state_id:2
+Compiling...
+Generating the raw contact map...
+Compilation:
+Compilation:rules:0:lhs:
+Compilation:rules:0:lhs:agent_id_0:
+Compilation:rules:0:lhs:agent_id_0:Ghost
+Compilation:rules:0:rhs:
+Compilation:rules:0:rhs:agent_id_0:
+Compilation:rules:0:rhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:0:rhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:0:rhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
+Compilation:rules:0:rhs:agent_id_0:agent_type_0:site_type_3->state:[state_min:0;state_max:0]
+Compilation:rules:0:direct:
+Compilation:rules:0:direct:agent_id_0:
+Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
+Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_3->state:[state_min:0;state_max:0]
+Compilation:rules:0:reverse:
+Compilation:rules:0:actions:creation:(agent_id_0,agent_type_0)
+
+Compilation:rules:1:lhs:
+Compilation:rules:1:lhs:agent_id_0:
+Compilation:rules:1:lhs:agent_id_0:Ghost
+Compilation:rules:1:rhs:
+Compilation:rules:1:rhs:agent_id_0:
+Compilation:rules:1:rhs:agent_id_0:agent_type_1:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:1:rhs:agent_id_0:agent_type_1:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:1:rhs:agent_id_0:agent_type_1:site_type_2->state:[state_min:0;state_max:0]
+Compilation:rules:1:rhs:agent_id_0:agent_type_1:site_type_3->state:[state_min:0;state_max:0]
+Compilation:rules:1:direct:
+Compilation:rules:1:direct:agent_id_0:
+Compilation:rules:1:direct:agent_id_0:agent_type_1:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:1:direct:agent_id_0:agent_type_1:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:1:direct:agent_id_0:agent_type_1:site_type_2->state:[state_min:0;state_max:0]
+Compilation:rules:1:direct:agent_id_0:agent_type_1:site_type_3->state:[state_min:0;state_max:0]
+Compilation:rules:1:reverse:
+Compilation:rules:1:actions:creation:(agent_id_0,agent_type_1)
+
+Compilation:rules:2:lhs:
+Compilation:rules:2:lhs:agent_id_0:
+Compilation:rules:2:lhs:agent_id_0:Ghost
+Compilation:rules:2:rhs:
+Compilation:rules:2:rhs:agent_id_0:
+Compilation:rules:2:rhs:agent_id_0:agent_type_2:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:2:rhs:agent_id_0:agent_type_2:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:2:rhs:agent_id_0:agent_type_2:site_type_2->state:[state_min:0;state_max:0]
+Compilation:rules:2:rhs:agent_id_0:agent_type_2:site_type_3->state:[state_min:0;state_max:0]
+Compilation:rules:2:direct:
+Compilation:rules:2:direct:agent_id_0:
+Compilation:rules:2:direct:agent_id_0:agent_type_2:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:2:direct:agent_id_0:agent_type_2:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:2:direct:agent_id_0:agent_type_2:site_type_2->state:[state_min:0;state_max:0]
+Compilation:rules:2:direct:agent_id_0:agent_type_2:site_type_3->state:[state_min:0;state_max:0]
+Compilation:rules:2:reverse:
+Compilation:rules:2:actions:creation:(agent_id_0,agent_type_2)
+
+Compilation:rules:3:lhs:
+Compilation:rules:3:lhs:agent_id_0:
+Compilation:rules:3:lhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:1;state_max:1]
+Compilation:rules:3:rhs:
+Compilation:rules:3:rhs:agent_id_0:
+Compilation:rules:3:rhs:agent_id_0:Ghost
+Compilation:rules:3:direct:
+Compilation:rules:3:reverse:
+Compilation:rules:3:reverse:agent_id_0:
+Compilation:rules:3:reverse:agent_id_0:agent_type_0:site_type_2->state:[state_min:1;state_max:1]
+Compilation:rules:3:actions:1/2unbinding:(agent_id_0,agent_type_0)@site_type_2
+Compilation:rules:3:actions:deletion:(agent_id_0,agent_type_0)
+Compilation:rules:3:actions:deletion:documented_site:(agent_id_0,agent_type_0)@site_type_2
+Compilation:rules:3:actions:deletion:undocumented_site:(agent_id_0,agent_type_0)@site_type_0
+Compilation:rules:3:actions:deletion:undocumented_site:(agent_id_0,agent_type_0)@site_type_1
+Compilation:rules:3:actions:deletion:undocumented_site:(agent_id_0,agent_type_0)@site_type_3
+
+Compilation:rules:4:lhs:
+Compilation:rules:4:lhs:agent_id_0:
+Compilation:rules:4:lhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
+Compilation:rules:4:lhs:agent_id_1:
+Compilation:rules:4:lhs:agent_id_1:agent_type_1:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:4:lhs:agent_id_1:agent_type_1:site_type_2->state:[state_min:0;state_max:0]
+Compilation:rules:4:rhs:
+Compilation:rules:4:rhs:agent_id_0:
+Compilation:rules:4:rhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:1;state_max:1]
+Compilation:rules:4:rhs:agent_id_1:
+Compilation:rules:4:rhs:agent_id_1:agent_type_1:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:4:rhs:agent_id_1:agent_type_1:site_type_2->state:[state_min:1;state_max:1]
+Compilation:rules:4:rhs:bonds:agent_id_0:
+Compilation:rules:4:rhs:bonds:agent_id_0:site_type_2->agent_id_1.site_type_2
+Compilation:rules:4:rhs:bonds:agent_id_1:
+Compilation:rules:4:rhs:bonds:agent_id_1:site_type_2->agent_id_0.site_type_2
+Compilation:rules:4:direct:
+Compilation:rules:4:direct:agent_id_0:
+Compilation:rules:4:direct:agent_id_0:agent_type_0:site_type_2->state:[state_min:1;state_max:1]
+Compilation:rules:4:direct:agent_id_1:
+Compilation:rules:4:direct:agent_id_1:agent_type_1:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:4:direct:agent_id_1:agent_type_1:site_type_2->state:[state_min:1;state_max:1]
+Compilation:rules:4:reverse:
+Compilation:rules:4:reverse:agent_id_0:
+Compilation:rules:4:reverse:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
+Compilation:rules:4:reverse:agent_id_1:
+Compilation:rules:4:reverse:agent_id_1:agent_type_1:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:4:reverse:agent_id_1:agent_type_1:site_type_2->state:[state_min:0;state_max:0]
+Compilation:rules:4:actions:binding:(agent_id_0,agent_type_0)@site_type_2----(agent_id_1,agent_type_1)@site_type_2
+
+Compilation:rules:5:lhs:
+Compilation:rules:5:lhs:agent_id_0:
+Compilation:rules:5:lhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
+Compilation:rules:5:lhs:agent_id_1:
+Compilation:rules:5:lhs:agent_id_1:agent_type_1:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:5:lhs:agent_id_1:agent_type_1:site_type_2->state:[state_min:0;state_max:0]
+Compilation:rules:5:lhs:agent_id_2:
+Compilation:rules:5:lhs:agent_id_2:agent_type_2:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:5:lhs:agent_id_2:agent_type_2:site_type_2->state:[state_min:0;state_max:0]
+Compilation:rules:5:rhs:
+Compilation:rules:5:rhs:agent_id_0:
+Compilation:rules:5:rhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:2;state_max:2]
+Compilation:rules:5:rhs:agent_id_1:
+Compilation:rules:5:rhs:agent_id_1:agent_type_1:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:5:rhs:agent_id_1:agent_type_1:site_type_2->state:[state_min:0;state_max:0]
+Compilation:rules:5:rhs:agent_id_2:
+Compilation:rules:5:rhs:agent_id_2:agent_type_2:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:5:rhs:agent_id_2:agent_type_2:site_type_2->state:[state_min:1;state_max:1]
+Compilation:rules:5:rhs:bonds:agent_id_0:
+Compilation:rules:5:rhs:bonds:agent_id_0:site_type_2->agent_id_2.site_type_2
+Compilation:rules:5:rhs:bonds:agent_id_2:
+Compilation:rules:5:rhs:bonds:agent_id_2:site_type_2->agent_id_0.site_type_2
+Compilation:rules:5:direct:
+Compilation:rules:5:direct:agent_id_0:
+Compilation:rules:5:direct:agent_id_0:agent_type_0:site_type_2->state:[state_min:2;state_max:2]
+Compilation:rules:5:direct:agent_id_1:
+Compilation:rules:5:direct:agent_id_2:
+Compilation:rules:5:direct:agent_id_2:agent_type_2:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:5:direct:agent_id_2:agent_type_2:site_type_2->state:[state_min:1;state_max:1]
+Compilation:rules:5:reverse:
+Compilation:rules:5:reverse:agent_id_0:
+Compilation:rules:5:reverse:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
+Compilation:rules:5:reverse:agent_id_1:
+Compilation:rules:5:reverse:agent_id_2:
+Compilation:rules:5:reverse:agent_id_2:agent_type_2:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:5:reverse:agent_id_2:agent_type_2:site_type_2->state:[state_min:0;state_max:0]
+Compilation:rules:5:actions:binding:(agent_id_0,agent_type_0)@site_type_2----(agent_id_2,agent_type_2)@site_type_2
+
+Compilation:rules:6:lhs:
+Compilation:rules:6:lhs:agent_id_0:
+Compilation:rules:6:lhs:agent_id_0:agent_type_2:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:6:lhs:agent_id_0:agent_type_2:site_type_2->state:[state_min:1;state_max:1]
+Compilation:rules:6:lhs:agent_id_1:
+Compilation:rules:6:lhs:agent_id_1:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:6:lhs:agent_id_1:agent_type_0:site_type_2->state:[state_min:2;state_max:2]
+Compilation:rules:6:lhs:bonds:agent_id_0:
+Compilation:rules:6:lhs:bonds:agent_id_0:site_type_2->agent_id_1.site_type_2
+Compilation:rules:6:lhs:bonds:agent_id_1:
+Compilation:rules:6:lhs:bonds:agent_id_1:site_type_2->agent_id_0.site_type_2
+Compilation:rules:6:rhs:
+Compilation:rules:6:rhs:agent_id_0:
+Compilation:rules:6:rhs:agent_id_0:agent_type_2:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:6:rhs:agent_id_0:agent_type_2:site_type_2->state:[state_min:1;state_max:1]
+Compilation:rules:6:rhs:agent_id_1:
+Compilation:rules:6:rhs:agent_id_1:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:6:rhs:agent_id_1:agent_type_0:site_type_2->state:[state_min:2;state_max:2]
+Compilation:rules:6:rhs:bonds:agent_id_0:
+Compilation:rules:6:rhs:bonds:agent_id_0:site_type_2->agent_id_1.site_type_2
+Compilation:rules:6:rhs:bonds:agent_id_1:
+Compilation:rules:6:rhs:bonds:agent_id_1:site_type_2->agent_id_0.site_type_2
+Compilation:rules:6:direct:
+Compilation:rules:6:direct:agent_id_0:
+Compilation:rules:6:direct:agent_id_1:
+Compilation:rules:6:direct:agent_id_1:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:6:reverse:
+Compilation:rules:6:reverse:agent_id_0:
+Compilation:rules:6:reverse:agent_id_1:
+Compilation:rules:6:reverse:agent_id_1:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
+
+Compilation:rules:7:lhs:
+Compilation:rules:7:lhs:agent_id_0:
+Compilation:rules:7:lhs:agent_id_0:agent_type_2:site_type_2->state:[state_min:1;state_max:1]
+Compilation:rules:7:rhs:
+Compilation:rules:7:rhs:agent_id_0:
+Compilation:rules:7:rhs:agent_id_0:Ghost
+Compilation:rules:7:direct:
+Compilation:rules:7:reverse:
+Compilation:rules:7:reverse:agent_id_0:
+Compilation:rules:7:reverse:agent_id_0:agent_type_2:site_type_2->state:[state_min:1;state_max:1]
+Compilation:rules:7:actions:1/2unbinding:(agent_id_0,agent_type_2)@site_type_2
+Compilation:rules:7:actions:deletion:(agent_id_0,agent_type_2)
+Compilation:rules:7:actions:deletion:documented_site:(agent_id_0,agent_type_2)@site_type_2
+Compilation:rules:7:actions:deletion:undocumented_site:(agent_id_0,agent_type_2)@site_type_0
+Compilation:rules:7:actions:deletion:undocumented_site:(agent_id_0,agent_type_2)@site_type_1
+Compilation:rules:7:actions:deletion:undocumented_site:(agent_id_0,agent_type_2)@site_type_3
+
+Compilation:rules:8:lhs:
+Compilation:rules:8:lhs:agent_id_0:
+Compilation:rules:8:lhs:agent_id_0:agent_type_0:site_type_3->state:[state_min:1;state_max:1]
+Compilation:rules:8:rhs:
+Compilation:rules:8:rhs:agent_id_0:
+Compilation:rules:8:rhs:agent_id_0:Ghost
+Compilation:rules:8:direct:
+Compilation:rules:8:reverse:
+Compilation:rules:8:reverse:agent_id_0:
+Compilation:rules:8:reverse:agent_id_0:agent_type_0:site_type_3->state:[state_min:1;state_max:1]
+Compilation:rules:8:actions:1/2unbinding:(agent_id_0,agent_type_0)@site_type_3
+Compilation:rules:8:actions:deletion:(agent_id_0,agent_type_0)
+Compilation:rules:8:actions:deletion:documented_site:(agent_id_0,agent_type_0)@site_type_3
+Compilation:rules:8:actions:deletion:undocumented_site:(agent_id_0,agent_type_0)@site_type_0
+Compilation:rules:8:actions:deletion:undocumented_site:(agent_id_0,agent_type_0)@site_type_1
+Compilation:rules:8:actions:deletion:undocumented_site:(agent_id_0,agent_type_0)@site_type_2
+
+Compilation:rules:9:lhs:
+Compilation:rules:9:lhs:agent_id_0:
+Compilation:rules:9:lhs:agent_id_0:agent_type_0:site_type_3->state:[state_min:0;state_max:0]
+Compilation:rules:9:lhs:agent_id_1:
+Compilation:rules:9:lhs:agent_id_1:agent_type_1:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:9:lhs:agent_id_1:agent_type_1:site_type_3->state:[state_min:0;state_max:0]
+Compilation:rules:9:rhs:
+Compilation:rules:9:rhs:agent_id_0:
+Compilation:rules:9:rhs:agent_id_0:agent_type_0:site_type_3->state:[state_min:1;state_max:1]
+Compilation:rules:9:rhs:agent_id_1:
+Compilation:rules:9:rhs:agent_id_1:agent_type_1:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:9:rhs:agent_id_1:agent_type_1:site_type_3->state:[state_min:1;state_max:1]
+Compilation:rules:9:rhs:bonds:agent_id_0:
+Compilation:rules:9:rhs:bonds:agent_id_0:site_type_3->agent_id_1.site_type_3
+Compilation:rules:9:rhs:bonds:agent_id_1:
+Compilation:rules:9:rhs:bonds:agent_id_1:site_type_3->agent_id_0.site_type_3
+Compilation:rules:9:direct:
+Compilation:rules:9:direct:agent_id_0:
+Compilation:rules:9:direct:agent_id_0:agent_type_0:site_type_3->state:[state_min:1;state_max:1]
+Compilation:rules:9:direct:agent_id_1:
+Compilation:rules:9:direct:agent_id_1:agent_type_1:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:9:direct:agent_id_1:agent_type_1:site_type_3->state:[state_min:1;state_max:1]
+Compilation:rules:9:reverse:
+Compilation:rules:9:reverse:agent_id_0:
+Compilation:rules:9:reverse:agent_id_0:agent_type_0:site_type_3->state:[state_min:0;state_max:0]
+Compilation:rules:9:reverse:agent_id_1:
+Compilation:rules:9:reverse:agent_id_1:agent_type_1:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:9:reverse:agent_id_1:agent_type_1:site_type_3->state:[state_min:0;state_max:0]
+Compilation:rules:9:actions:binding:(agent_id_0,agent_type_0)@site_type_3----(agent_id_1,agent_type_1)@site_type_3
+
+Compilation:rules:10:lhs:
+Compilation:rules:10:lhs:agent_id_0:
+Compilation:rules:10:lhs:agent_id_0:agent_type_0:site_type_3->state:[state_min:0;state_max:0]
+Compilation:rules:10:lhs:agent_id_1:
+Compilation:rules:10:lhs:agent_id_1:agent_type_1:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:10:lhs:agent_id_1:agent_type_1:site_type_3->state:[state_min:0;state_max:0]
+Compilation:rules:10:lhs:agent_id_2:
+Compilation:rules:10:lhs:agent_id_2:agent_type_2:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:10:lhs:agent_id_2:agent_type_2:site_type_3->state:[state_min:0;state_max:0]
+Compilation:rules:10:rhs:
+Compilation:rules:10:rhs:agent_id_0:
+Compilation:rules:10:rhs:agent_id_0:agent_type_0:site_type_3->state:[state_min:2;state_max:2]
+Compilation:rules:10:rhs:agent_id_1:
+Compilation:rules:10:rhs:agent_id_1:agent_type_1:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:10:rhs:agent_id_1:agent_type_1:site_type_3->state:[state_min:0;state_max:0]
+Compilation:rules:10:rhs:agent_id_2:
+Compilation:rules:10:rhs:agent_id_2:agent_type_2:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:10:rhs:agent_id_2:agent_type_2:site_type_3->state:[state_min:1;state_max:1]
+Compilation:rules:10:rhs:bonds:agent_id_0:
+Compilation:rules:10:rhs:bonds:agent_id_0:site_type_3->agent_id_2.site_type_3
+Compilation:rules:10:rhs:bonds:agent_id_2:
+Compilation:rules:10:rhs:bonds:agent_id_2:site_type_3->agent_id_0.site_type_3
+Compilation:rules:10:direct:
+Compilation:rules:10:direct:agent_id_0:
+Compilation:rules:10:direct:agent_id_0:agent_type_0:site_type_3->state:[state_min:2;state_max:2]
+Compilation:rules:10:direct:agent_id_1:
+Compilation:rules:10:direct:agent_id_2:
+Compilation:rules:10:direct:agent_id_2:agent_type_2:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:10:direct:agent_id_2:agent_type_2:site_type_3->state:[state_min:1;state_max:1]
+Compilation:rules:10:reverse:
+Compilation:rules:10:reverse:agent_id_0:
+Compilation:rules:10:reverse:agent_id_0:agent_type_0:site_type_3->state:[state_min:0;state_max:0]
+Compilation:rules:10:reverse:agent_id_1:
+Compilation:rules:10:reverse:agent_id_2:
+Compilation:rules:10:reverse:agent_id_2:agent_type_2:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:10:reverse:agent_id_2:agent_type_2:site_type_3->state:[state_min:0;state_max:0]
+Compilation:rules:10:actions:binding:(agent_id_0,agent_type_0)@site_type_3----(agent_id_2,agent_type_2)@site_type_3
+
+Compilation:rules:11:lhs:
+Compilation:rules:11:lhs:agent_id_0:
+Compilation:rules:11:lhs:agent_id_0:agent_type_2:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:11:lhs:agent_id_0:agent_type_2:site_type_3->state:[state_min:1;state_max:1]
+Compilation:rules:11:lhs:agent_id_1:
+Compilation:rules:11:lhs:agent_id_1:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:11:lhs:agent_id_1:agent_type_0:site_type_3->state:[state_min:2;state_max:2]
+Compilation:rules:11:lhs:bonds:agent_id_0:
+Compilation:rules:11:lhs:bonds:agent_id_0:site_type_3->agent_id_1.site_type_3
+Compilation:rules:11:lhs:bonds:agent_id_1:
+Compilation:rules:11:lhs:bonds:agent_id_1:site_type_3->agent_id_0.site_type_3
+Compilation:rules:11:rhs:
+Compilation:rules:11:rhs:agent_id_0:
+Compilation:rules:11:rhs:agent_id_0:agent_type_2:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:11:rhs:agent_id_0:agent_type_2:site_type_3->state:[state_min:1;state_max:1]
+Compilation:rules:11:rhs:agent_id_1:
+Compilation:rules:11:rhs:agent_id_1:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:11:rhs:agent_id_1:agent_type_0:site_type_3->state:[state_min:2;state_max:2]
+Compilation:rules:11:rhs:bonds:agent_id_0:
+Compilation:rules:11:rhs:bonds:agent_id_0:site_type_3->agent_id_1.site_type_3
+Compilation:rules:11:rhs:bonds:agent_id_1:
+Compilation:rules:11:rhs:bonds:agent_id_1:site_type_3->agent_id_0.site_type_3
+Compilation:rules:11:direct:
+Compilation:rules:11:direct:agent_id_0:
+Compilation:rules:11:direct:agent_id_1:
+Compilation:rules:11:direct:agent_id_1:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:11:reverse:
+Compilation:rules:11:reverse:agent_id_0:
+Compilation:rules:11:reverse:agent_id_1:
+Compilation:rules:11:reverse:agent_id_1:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+
+Compilation:rules:12:lhs:
+Compilation:rules:12:lhs:agent_id_0:
+Compilation:rules:12:lhs:agent_id_0:agent_type_2:site_type_3->state:[state_min:1;state_max:1]
+Compilation:rules:12:rhs:
+Compilation:rules:12:rhs:agent_id_0:
+Compilation:rules:12:rhs:agent_id_0:Ghost
+Compilation:rules:12:direct:
+Compilation:rules:12:reverse:
+Compilation:rules:12:reverse:agent_id_0:
+Compilation:rules:12:reverse:agent_id_0:agent_type_2:site_type_3->state:[state_min:1;state_max:1]
+Compilation:rules:12:actions:1/2unbinding:(agent_id_0,agent_type_2)@site_type_3
+Compilation:rules:12:actions:deletion:(agent_id_0,agent_type_2)
+Compilation:rules:12:actions:deletion:documented_site:(agent_id_0,agent_type_2)@site_type_3
+Compilation:rules:12:actions:deletion:undocumented_site:(agent_id_0,agent_type_2)@site_type_0
+Compilation:rules:12:actions:deletion:undocumented_site:(agent_id_0,agent_type_2)@site_type_1
+Compilation:rules:12:actions:deletion:undocumented_site:(agent_id_0,agent_type_2)@site_type_2
+Generating the raw influence map...
+Quarks:Quarkify
+Quarks:Rule 0
+Quarks:TEST
+Quarks:CREATION
+Quarks:rule_id:0,agent_type:0
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:0,agent_type:0,site_type:0,state:0
+Quarks:rule_id:0,agent_type:0,site_type:1,state:0
+Quarks:rule_id:0,agent_type:0,site_type:2,state:0
+Quarks:rule_id:0,agent_type:0,site_type:3,state:0
+Quarks:MODIFICATION-
+Quarks:HALF BOND BREAKING
+Quarks:Rule 1
+Quarks:TEST
+Quarks:CREATION
+Quarks:rule_id:1,agent_type:1
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:1,agent_type:1,site_type:0,state:0
+Quarks:rule_id:1,agent_type:1,site_type:1,state:0
+Quarks:rule_id:1,agent_type:1,site_type:2,state:0
+Quarks:rule_id:1,agent_type:1,site_type:3,state:0
+Quarks:MODIFICATION-
+Quarks:HALF BOND BREAKING
+Quarks:Rule 2
+Quarks:TEST
+Quarks:CREATION
+Quarks:rule_id:2,agent_type:2
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:2,agent_type:2,site_type:0,state:0
+Quarks:rule_id:2,agent_type:2,site_type:1,state:0
+Quarks:rule_id:2,agent_type:2,site_type:2,state:0
+Quarks:rule_id:2,agent_type:2,site_type:3,state:0
+Quarks:MODIFICATION-
+Quarks:HALF BOND BREAKING
+Quarks:Rule 3
+Quarks:TEST
+Quarks:rule_id:3,agent_type:0
+Quarks:rule_id:3,agent_type:0,site_type:2,state:1
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:rule_id:3,agent_type:0
+Quarks:rule_id:3,agent_type:1,site_type:3,state:0
+Quarks:rule_id:3,agent_type:1,site_type:3,state:1
+Quarks:MODIFICATION+
+Quarks:MODIFICATION-
+Quarks:rule_id:3,agent_type:0,site_type:2,state:1
+Quarks:HALF BOND BREAKING
+Quarks:rule_id:3,agent_type:1,site_type:2,state:0
+Quarks:rule_id:3,agent_type:1,site_type:2,state:1
+Quarks:Rule 4
+Quarks:TEST
+Quarks:rule_id:4,agent_type:0
+Quarks:rule_id:4,agent_type:0,site_type:2,state:0
+Quarks:rule_id:4,agent_type:1
+Quarks:rule_id:4,agent_type:1,site_type:0,state:0
+Quarks:rule_id:4,agent_type:1,site_type:2,state:0
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:4,agent_type:0,site_type:2,state:1
+Quarks:rule_id:4,agent_type:1,site_type:0,state:1
+Quarks:rule_id:4,agent_type:1,site_type:2,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:4,agent_type:0,site_type:2,state:0
+Quarks:rule_id:4,agent_type:1,site_type:0,state:0
+Quarks:rule_id:4,agent_type:1,site_type:2,state:0
+Quarks:HALF BOND BREAKING
+Quarks:Rule 5
+Quarks:TEST
+Quarks:rule_id:5,agent_type:0
+Quarks:rule_id:5,agent_type:0,site_type:2,state:0
+Quarks:rule_id:5,agent_type:1
+Quarks:rule_id:5,agent_type:1,site_type:0,state:1
+Quarks:rule_id:5,agent_type:1,site_type:2,state:0
+Quarks:rule_id:5,agent_type:2
+Quarks:rule_id:5,agent_type:2,site_type:0,state:0
+Quarks:rule_id:5,agent_type:2,site_type:2,state:0
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:5,agent_type:0,site_type:2,state:2
+Quarks:rule_id:5,agent_type:2,site_type:0,state:1
+Quarks:rule_id:5,agent_type:2,site_type:2,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:5,agent_type:0,site_type:2,state:0
+Quarks:rule_id:5,agent_type:2,site_type:0,state:0
+Quarks:rule_id:5,agent_type:2,site_type:2,state:0
+Quarks:HALF BOND BREAKING
+Quarks:Rule 6
+Quarks:TEST
+Quarks:rule_id:6,agent_type:2
+Quarks:rule_id:6,agent_type:2,site_type:0,state:1
+Quarks:rule_id:6,agent_type:2,site_type:2,state:1
+Quarks:rule_id:6,agent_type:0
+Quarks:rule_id:6,agent_type:0,site_type:0,state:0
+Quarks:rule_id:6,agent_type:0,site_type:2,state:2
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:6,agent_type:0,site_type:0,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:6,agent_type:0,site_type:0,state:0
+Quarks:HALF BOND BREAKING
+Quarks:Rule 7
+Quarks:TEST
+Quarks:rule_id:7,agent_type:2
+Quarks:rule_id:7,agent_type:2,site_type:2,state:1
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:rule_id:7,agent_type:2
+Quarks:rule_id:7,agent_type:0,site_type:3,state:0
+Quarks:rule_id:7,agent_type:0,site_type:3,state:2
+Quarks:MODIFICATION+
+Quarks:MODIFICATION-
+Quarks:rule_id:7,agent_type:2,site_type:2,state:1
+Quarks:HALF BOND BREAKING
+Quarks:rule_id:7,agent_type:0,site_type:2,state:0
+Quarks:rule_id:7,agent_type:0,site_type:2,state:2
+Quarks:Rule 8
+Quarks:TEST
+Quarks:rule_id:8,agent_type:0
+Quarks:rule_id:8,agent_type:0,site_type:3,state:1
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:rule_id:8,agent_type:0
+Quarks:rule_id:8,agent_type:1,site_type:2,state:0
+Quarks:rule_id:8,agent_type:1,site_type:2,state:1
+Quarks:MODIFICATION+
+Quarks:MODIFICATION-
+Quarks:rule_id:8,agent_type:0,site_type:3,state:1
+Quarks:HALF BOND BREAKING
+Quarks:rule_id:8,agent_type:1,site_type:3,state:0
+Quarks:rule_id:8,agent_type:1,site_type:3,state:1
+Quarks:Rule 9
+Quarks:TEST
+Quarks:rule_id:9,agent_type:0
+Quarks:rule_id:9,agent_type:0,site_type:3,state:0
+Quarks:rule_id:9,agent_type:1
+Quarks:rule_id:9,agent_type:1,site_type:1,state:0
+Quarks:rule_id:9,agent_type:1,site_type:3,state:0
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:9,agent_type:0,site_type:3,state:1
+Quarks:rule_id:9,agent_type:1,site_type:1,state:1
+Quarks:rule_id:9,agent_type:1,site_type:3,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:9,agent_type:0,site_type:3,state:0
+Quarks:rule_id:9,agent_type:1,site_type:1,state:0
+Quarks:rule_id:9,agent_type:1,site_type:3,state:0
+Quarks:HALF BOND BREAKING
+Quarks:Rule 10
+Quarks:TEST
+Quarks:rule_id:10,agent_type:0
+Quarks:rule_id:10,agent_type:0,site_type:3,state:0
+Quarks:rule_id:10,agent_type:1
+Quarks:rule_id:10,agent_type:1,site_type:1,state:1
+Quarks:rule_id:10,agent_type:1,site_type:3,state:0
+Quarks:rule_id:10,agent_type:2
+Quarks:rule_id:10,agent_type:2,site_type:1,state:0
+Quarks:rule_id:10,agent_type:2,site_type:3,state:0
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:10,agent_type:0,site_type:3,state:2
+Quarks:rule_id:10,agent_type:2,site_type:1,state:1
+Quarks:rule_id:10,agent_type:2,site_type:3,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:10,agent_type:0,site_type:3,state:0
+Quarks:rule_id:10,agent_type:2,site_type:1,state:0
+Quarks:rule_id:10,agent_type:2,site_type:3,state:0
+Quarks:HALF BOND BREAKING
+Quarks:Rule 11
+Quarks:TEST
+Quarks:rule_id:11,agent_type:2
+Quarks:rule_id:11,agent_type:2,site_type:1,state:1
+Quarks:rule_id:11,agent_type:2,site_type:3,state:1
+Quarks:rule_id:11,agent_type:0
+Quarks:rule_id:11,agent_type:0,site_type:1,state:0
+Quarks:rule_id:11,agent_type:0,site_type:3,state:2
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:11,agent_type:0,site_type:1,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:11,agent_type:0,site_type:1,state:0
+Quarks:HALF BOND BREAKING
+Quarks:Rule 12
+Quarks:TEST
+Quarks:rule_id:12,agent_type:2
+Quarks:rule_id:12,agent_type:2,site_type:3,state:1
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:rule_id:12,agent_type:2
+Quarks:rule_id:12,agent_type:0,site_type:2,state:0
+Quarks:rule_id:12,agent_type:0,site_type:2,state:2
+Quarks:MODIFICATION+
+Quarks:MODIFICATION-
+Quarks:rule_id:12,agent_type:2,site_type:3,state:1
+Quarks:HALF BOND BREAKING
+Quarks:rule_id:12,agent_type:0,site_type:3,state:0
+Quarks:rule_id:12,agent_type:0,site_type:3,state:2
+
+REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
+Quarks:agent_test**:agent_type:0,rule:3->[0]
+Quarks:agent_test**:agent_type:0,rule:4->[0]
+Quarks:agent_test**:agent_type:0,rule:5->[0]
+Quarks:agent_test**:agent_type:0,rule:6->[1]
+Quarks:agent_test**:agent_type:0,rule:8->[0]
+Quarks:agent_test**:agent_type:0,rule:9->[0]
+Quarks:agent_test**:agent_type:0,rule:10->[0]
+Quarks:agent_test**:agent_type:0,rule:11->[1]
+Quarks:agent_test**:agent_type:1,rule:4->[1]
+Quarks:agent_test**:agent_type:1,rule:5->[1]
+Quarks:agent_test**:agent_type:1,rule:9->[1]
+Quarks:agent_test**:agent_type:1,rule:10->[1]
+Quarks:agent_test**:agent_type:2,rule:5->[2]
+Quarks:agent_test**:agent_type:2,rule:6->[0]
+Quarks:agent_test**:agent_type:2,rule:7->[0]
+Quarks:agent_test**:agent_type:2,rule:10->[2]
+Quarks:agent_test**:agent_type:2,rule:11->[0]
+Quarks:agent_test**:agent_type:2,rule:12->[0]
+Quarks:agent_modif+:agent_type:0,rule:0->[0]
+Quarks:agent_modif+:agent_type:1,rule:1->[0]
+Quarks:agent_modif+:agent_type:2,rule:2->[0]
+Quarks:agent_modif-:agent_type:0,rule:3->[0]
+Quarks:agent_modif-:agent_type:0,rule:8->[0]
+Quarks:agent_modif-:agent_type:2,rule:7->[0]
+Quarks:agent_modif-:agent_type:2,rule:12->[0]
+Quarks:site_test**:agent_type:0,site_type:2,state:1,rule:3->[0]
+Quarks:site_test**:agent_type:0,site_type:2,state:0,rule:4->[0]
+Quarks:site_test**:agent_type:0,site_type:2,state:0,rule:5->[0]
+Quarks:site_test**:agent_type:0,site_type:2,state:2,rule:6->[1]
+Quarks:site_test**:agent_type:0,site_type:0,state:0,rule:6->[1]
+Quarks:site_test**:agent_type:0,site_type:3,state:1,rule:8->[0]
+Quarks:site_test**:agent_type:0,site_type:3,state:0,rule:9->[0]
+Quarks:site_test**:agent_type:0,site_type:3,state:0,rule:10->[0]
+Quarks:site_test**:agent_type:0,site_type:3,state:2,rule:11->[1]
+Quarks:site_test**:agent_type:0,site_type:1,state:0,rule:11->[1]
+Quarks:site_test**:agent_type:1,site_type:0,state:0,rule:4->[1]
+Quarks:site_test**:agent_type:1,site_type:0,state:1,rule:5->[1]
+Quarks:site_test**:agent_type:1,site_type:2,state:0,rule:4->[1]
+Quarks:site_test**:agent_type:1,site_type:2,state:0,rule:5->[1]
+Quarks:site_test**:agent_type:1,site_type:1,state:0,rule:9->[1]
+Quarks:site_test**:agent_type:1,site_type:1,state:1,rule:10->[1]
+Quarks:site_test**:agent_type:1,site_type:3,state:0,rule:9->[1]
+Quarks:site_test**:agent_type:1,site_type:3,state:0,rule:10->[1]
+Quarks:site_test**:agent_type:2,site_type:0,state:0,rule:5->[2]
+Quarks:site_test**:agent_type:2,site_type:0,state:1,rule:6->[0]
+Quarks:site_test**:agent_type:2,site_type:2,state:0,rule:5->[2]
+Quarks:site_test**:agent_type:2,site_type:2,state:1,rule:6->[0]
+Quarks:site_test**:agent_type:2,site_type:2,state:1,rule:7->[0]
+Quarks:site_test**:agent_type:2,site_type:1,state:0,rule:10->[2]
+Quarks:site_test**:agent_type:2,site_type:1,state:1,rule:11->[0]
+Quarks:site_test**:agent_type:2,site_type:3,state:0,rule:10->[2]
+Quarks:site_test**:agent_type:2,site_type:3,state:1,rule:11->[0]
+Quarks:site_test**:agent_type:2,site_type:3,state:1,rule:12->[0]
+Quarks:site_modif+:agent_type:0,site_type:0,state:0,rule:0->[0]
+Quarks:site_modif+:agent_type:0,site_type:0,state:1,rule:6->[1]
+Quarks:site_modif+:agent_type:0,site_type:1,state:0,rule:0->[0]
+Quarks:site_modif+:agent_type:0,site_type:1,state:1,rule:11->[1]
+Quarks:site_modif+:agent_type:0,site_type:2,state:0,rule:0->[0]
+Quarks:site_modif+:agent_type:0,site_type:2,state:0,rule:7->[0*]
+Quarks:site_modif+:agent_type:0,site_type:2,state:0,rule:12->[0*]
+Quarks:site_modif+:agent_type:0,site_type:2,state:1,rule:4->[0]
+Quarks:site_modif+:agent_type:0,site_type:2,state:2,rule:5->[0]
+Quarks:site_modif+:agent_type:0,site_type:3,state:0,rule:0->[0]
+Quarks:site_modif+:agent_type:0,site_type:3,state:0,rule:7->[0*]
+Quarks:site_modif+:agent_type:0,site_type:3,state:0,rule:12->[0*]
+Quarks:site_modif+:agent_type:0,site_type:3,state:1,rule:9->[0]
+Quarks:site_modif+:agent_type:0,site_type:3,state:2,rule:10->[0]
+Quarks:site_modif+:agent_type:1,site_type:0,state:0,rule:1->[0]
+Quarks:site_modif+:agent_type:1,site_type:0,state:1,rule:4->[1]
+Quarks:site_modif+:agent_type:1,site_type:1,state:0,rule:1->[0]
+Quarks:site_modif+:agent_type:1,site_type:1,state:1,rule:9->[1]
+Quarks:site_modif+:agent_type:1,site_type:2,state:0,rule:1->[0]
+Quarks:site_modif+:agent_type:1,site_type:2,state:0,rule:3->[0*]
+Quarks:site_modif+:agent_type:1,site_type:2,state:0,rule:8->[0*]
+Quarks:site_modif+:agent_type:1,site_type:2,state:1,rule:4->[1]
+Quarks:site_modif+:agent_type:1,site_type:3,state:0,rule:1->[0]
+Quarks:site_modif+:agent_type:1,site_type:3,state:0,rule:3->[0*]
+Quarks:site_modif+:agent_type:1,site_type:3,state:0,rule:8->[0*]
+Quarks:site_modif+:agent_type:1,site_type:3,state:1,rule:9->[1]
+Quarks:site_modif+:agent_type:2,site_type:0,state:0,rule:2->[0]
+Quarks:site_modif+:agent_type:2,site_type:0,state:1,rule:5->[2]
+Quarks:site_modif+:agent_type:2,site_type:1,state:0,rule:2->[0]
+Quarks:site_modif+:agent_type:2,site_type:1,state:1,rule:10->[2]
+Quarks:site_modif+:agent_type:2,site_type:2,state:0,rule:2->[0]
+Quarks:site_modif+:agent_type:2,site_type:2,state:1,rule:5->[2]
+Quarks:site_modif+:agent_type:2,site_type:3,state:0,rule:2->[0]
+Quarks:site_modif+:agent_type:2,site_type:3,state:1,rule:10->[2]
+Quarks:site_modif-:agent_type:1,site_type:3,state:1,rule:3->[0*]
+Quarks:site_modif-:agent_type:1,site_type:3,state:1,rule:8->[0*]
+Quarks:site_modif-:agent_type:1,site_type:3,state:0,rule:9->[1]
+Quarks:site_modif-:agent_type:1,site_type:2,state:1,rule:3->[0*]
+Quarks:site_modif-:agent_type:1,site_type:2,state:1,rule:8->[0*]
+Quarks:site_modif-:agent_type:1,site_type:2,state:0,rule:4->[1]
+Quarks:site_modif-:agent_type:1,site_type:0,state:0,rule:4->[1]
+Quarks:site_modif-:agent_type:1,site_type:1,state:0,rule:9->[1]
+Quarks:site_modif-:agent_type:0,site_type:2,state:1,rule:3->[0]
+Quarks:site_modif-:agent_type:0,site_type:2,state:0,rule:4->[0]
+Quarks:site_modif-:agent_type:0,site_type:2,state:0,rule:5->[0]
+Quarks:site_modif-:agent_type:0,site_type:2,state:2,rule:7->[0*]
+Quarks:site_modif-:agent_type:0,site_type:2,state:2,rule:12->[0*]
+Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:6->[1]
+Quarks:site_modif-:agent_type:0,site_type:3,state:2,rule:7->[0*]
+Quarks:site_modif-:agent_type:0,site_type:3,state:2,rule:12->[0*]
+Quarks:site_modif-:agent_type:0,site_type:3,state:1,rule:8->[0]
+Quarks:site_modif-:agent_type:0,site_type:3,state:0,rule:9->[0]
+Quarks:site_modif-:agent_type:0,site_type:3,state:0,rule:10->[0]
+Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:11->[1]
+Quarks:site_modif-:agent_type:2,site_type:0,state:0,rule:5->[2]
+Quarks:site_modif-:agent_type:2,site_type:2,state:0,rule:5->[2]
+Quarks:site_modif-:agent_type:2,site_type:2,state:1,rule:7->[0]
+Quarks:site_modif-:agent_type:2,site_type:1,state:0,rule:10->[2]
+Quarks:site_modif-:agent_type:2,site_type:3,state:0,rule:10->[2]
+Quarks:site_modif-:agent_type:2,site_type:3,state:1,rule:12->[0]
+Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
+Influence_map:Wake_up_map:rule(0):'r0' ->A(x~u,y~u) -> rule(4):'r4' A(x),B(x~u)->A(x!1),B(x~p!1)[0->0]
+Influence_map:Wake_up_map:rule(0):'r0' ->A(x~u,y~u) -> rule(5):'r5' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1)[0->0]
+Influence_map:Wake_up_map:rule(0):'r0' ->A(x~u,y~u) -> rule(9):'r9' A(y),B(y~u)->A(y!1),B(y~p!1)[0->0]
+Influence_map:Wake_up_map:rule(0):'r0' ->A(x~u,y~u) -> rule(10):'r10' A(y),B(y~p),C(y~u)->A(y!1),B(y~p),C(y~p!1)[0->0]
+Influence_map:Wake_up_map:rule(1):'r1' ->B(x~u,y~u) -> rule(4):'r4' A(x),B(x~u)->A(x!1),B(x~p!1)[0->1]
+Influence_map:Wake_up_map:rule(1):'r1' ->B(x~u,y~u) -> rule(9):'r9' A(y),B(y~u)->A(y!1),B(y~p!1)[0->1]
+Influence_map:Wake_up_map:rule(2):'r2' ->C(x~u,y~u) -> rule(5):'r5' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1)[0->2]
+Influence_map:Wake_up_map:rule(2):'r2' ->C(x~u,y~u) -> rule(10):'r10' A(y),B(y~p),C(y~u)->A(y!1),B(y~p),C(y~p!1)[0->2]
+Influence_map:Wake_up_map:rule(3):'r3' A(x!x.B)-> -> rule(4):'r4' A(x),B(x~u)->A(x!1),B(x~p!1)[0*->1]
+Influence_map:Wake_up_map:rule(3):'r3' A(x!x.B)-> -> rule(5):'r5' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1)[0*->1]
+Influence_map:Wake_up_map:rule(3):'r3' A(x!x.B)-> -> rule(9):'r9' A(y),B(y~u)->A(y!1),B(y~p!1)[0*->1]
+Influence_map:Wake_up_map:rule(3):'r3' A(x!x.B)-> -> rule(10):'r10' A(y),B(y~p),C(y~u)->A(y!1),B(y~p),C(y~p!1)[0*->1]
+Influence_map:Wake_up_map:rule(4):'r4' A(x),B(x~u)->A(x!1),B(x~p!1) -> rule(3):'r3' A(x!x.B)->[0->0]
+Influence_map:Wake_up_map:rule(5):'r5' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1) -> rule(6):'r6' C(x~p!1),A(x~u!1)->C(x~p!1),A(x~p!1)[0->1];[2->0]
+Influence_map:Wake_up_map:rule(5):'r5' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1) -> rule(7):'r7' C(x!_)->[2->0]
+Influence_map:Wake_up_map:rule(7):'r7' C(x!_)-> -> rule(4):'r4' A(x),B(x~u)->A(x!1),B(x~p!1)[0*->0]
+Influence_map:Wake_up_map:rule(7):'r7' C(x!_)-> -> rule(5):'r5' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1)[0*->0]
+Influence_map:Wake_up_map:rule(7):'r7' C(x!_)-> -> rule(9):'r9' A(y),B(y~u)->A(y!1),B(y~p!1)[0*->0]
+Influence_map:Wake_up_map:rule(7):'r7' C(x!_)-> -> rule(10):'r10' A(y),B(y~p),C(y~u)->A(y!1),B(y~p),C(y~p!1)[0*->0]
+Influence_map:Wake_up_map:rule(8):'r8' A(y!y.B)-> -> rule(4):'r4' A(x),B(x~u)->A(x!1),B(x~p!1)[0*->1]
+Influence_map:Wake_up_map:rule(8):'r8' A(y!y.B)-> -> rule(5):'r5' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1)[0*->1]
+Influence_map:Wake_up_map:rule(8):'r8' A(y!y.B)-> -> rule(9):'r9' A(y),B(y~u)->A(y!1),B(y~p!1)[0*->1]
+Influence_map:Wake_up_map:rule(8):'r8' A(y!y.B)-> -> rule(10):'r10' A(y),B(y~p),C(y~u)->A(y!1),B(y~p),C(y~p!1)[0*->1]
+Influence_map:Wake_up_map:rule(9):'r9' A(y),B(y~u)->A(y!1),B(y~p!1) -> rule(8):'r8' A(y!y.B)->[0->0]
+Influence_map:Wake_up_map:rule(10):'r10' A(y),B(y~p),C(y~u)->A(y!1),B(y~p),C(y~p!1) -> rule(11):'r11' C(y~p!1),A(y~u!1)->C(y~p!1),A(y~p!1)[0->1];[2->0]
+Influence_map:Wake_up_map:rule(10):'r10' A(y),B(y~p),C(y~u)->A(y!1),B(y~p),C(y~p!1) -> rule(12):'r12' C(y!_)->[2->0]
+Influence_map:Wake_up_map:rule(12):'r12' C(y!_)-> -> rule(4):'r4' A(x),B(x~u)->A(x!1),B(x~p!1)[0*->0]
+Influence_map:Wake_up_map:rule(12):'r12' C(y!_)-> -> rule(5):'r5' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1)[0*->0]
+Influence_map:Wake_up_map:rule(12):'r12' C(y!_)-> -> rule(9):'r9' A(y),B(y~u)->A(y!1),B(y~p!1)[0*->0]
+Influence_map:Wake_up_map:rule(12):'r12' C(y!_)-> -> rule(10):'r10' A(y),B(y~p),C(y~u)->A(y!1),B(y~p),C(y~p!1)[0*->0]
+Influence_map:Inhibition_map:rule(3):'r3' A(x!x.B)-> -> rule(8):'r8' A(y!y.B)->[0->0]
+Influence_map:Inhibition_map:rule(3):'r3' A(x!x.B)-> -> rule(9):'r9' A(y),B(y~u)->A(y!1),B(y~p!1)[0->0]
+Influence_map:Inhibition_map:rule(3):'r3' A(x!x.B)-> -> rule(10):'r10' A(y),B(y~p),C(y~u)->A(y!1),B(y~p),C(y~p!1)[0->0]
+Influence_map:Inhibition_map:rule(3):'r3' A(x!x.B)-> -> rule(11):'r11' C(y~p!1),A(y~u!1)->C(y~p!1),A(y~p!1)[0->1]
+Influence_map:Inhibition_map:rule(4):'r4' A(x),B(x~u)->A(x!1),B(x~p!1) -> rule(5):'r5' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1)[0->0]
+Influence_map:Inhibition_map:rule(5):'r5' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1) -> rule(4):'r4' A(x),B(x~u)->A(x!1),B(x~p!1)[0->0]
+Influence_map:Inhibition_map:rule(7):'r7' C(x!_)-> -> rule(6):'r6' C(x~p!1),A(x~u!1)->C(x~p!1),A(x~p!1)[0*->1];[0->0]
+Influence_map:Inhibition_map:rule(7):'r7' C(x!_)-> -> rule(10):'r10' A(y),B(y~p),C(y~u)->A(y!1),B(y~p),C(y~p!1)[0->2]
+Influence_map:Inhibition_map:rule(7):'r7' C(x!_)-> -> rule(11):'r11' C(y~p!1),A(y~u!1)->C(y~p!1),A(y~p!1)[0*->1];[0->0]
+Influence_map:Inhibition_map:rule(7):'r7' C(x!_)-> -> rule(12):'r12' C(y!_)->[0->0]
+Influence_map:Inhibition_map:rule(8):'r8' A(y!y.B)-> -> rule(3):'r3' A(x!x.B)->[0->0]
+Influence_map:Inhibition_map:rule(8):'r8' A(y!y.B)-> -> rule(4):'r4' A(x),B(x~u)->A(x!1),B(x~p!1)[0->0]
+Influence_map:Inhibition_map:rule(8):'r8' A(y!y.B)-> -> rule(5):'r5' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1)[0->0]
+Influence_map:Inhibition_map:rule(8):'r8' A(y!y.B)-> -> rule(6):'r6' C(x~p!1),A(x~u!1)->C(x~p!1),A(x~p!1)[0->1]
+Influence_map:Inhibition_map:rule(9):'r9' A(y),B(y~u)->A(y!1),B(y~p!1) -> rule(10):'r10' A(y),B(y~p),C(y~u)->A(y!1),B(y~p),C(y~p!1)[0->0]
+Influence_map:Inhibition_map:rule(10):'r10' A(y),B(y~p),C(y~u)->A(y!1),B(y~p),C(y~p!1) -> rule(9):'r9' A(y),B(y~u)->A(y!1),B(y~p!1)[0->0]
+Influence_map:Inhibition_map:rule(12):'r12' C(y!_)-> -> rule(5):'r5' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1)[0->2]
+Influence_map:Inhibition_map:rule(12):'r12' C(y!_)-> -> rule(6):'r6' C(x~p!1),A(x~u!1)->C(x~p!1),A(x~p!1)[0*->1];[0->0]
+Influence_map:Inhibition_map:rule(12):'r12' C(y!_)-> -> rule(7):'r7' C(x!_)->[0->0]
+Influence_map:Inhibition_map:rule(12):'r12' C(y!_)-> -> rule(11):'r11' C(y~p!1),A(y~u!1)->C(y~p!1),A(y~p!1)[0*->1];[0->0]
+Refining the influence map...
+Reachability analysis...
+
+agent_type:0:
+Potential dependencies between sites:Number of covering classes:2
+Potential dependencies between sites:Covering_class_id:0:
+site_type:1
+site_type:3
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1
+site_type:2
+Potential dependencies between sites:Covering_class_id:1:
+site_type:0
+site_type:2
+Potential dependencies between sites:New-index:Covering_class_id:1:class_id:0:
+site_type:1
+site_type:2
+agent_type:1:
+Potential dependencies between sites:Number of covering classes:2
+Potential dependencies between sites:Covering_class_id:0:
+site_type:1
+site_type:3
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1
+site_type:2
+Potential dependencies between sites:Covering_class_id:1:
+site_type:0
+site_type:2
+Potential dependencies between sites:New-index:Covering_class_id:1:class_id:0:
+site_type:1
+site_type:2
+agent_type:2:
+Potential dependencies between sites:Number of covering classes:2
+Potential dependencies between sites:Covering_class_id:0:
+site_type:1
+site_type:3
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1
+site_type:2
+Potential dependencies between sites:Covering_class_id:1:
+site_type:0
+site_type:2
+Potential dependencies between sites:New-index:Covering_class_id:1:class_id:0:
+site_type:1
+site_type:2
+------------------------------------------------------
+Covering classes with type set:
+agent_type:0:
+Potential dependencies between sites:Covering_class_id:1
+site_type:0
+site_type:2
+Potential dependencies between sites:Covering_class_id:0
+site_type:1
+site_type:3
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:1
+Global:site_type:0  => Local:site_type':1
+Global:site_type:2  => Local:site_type':2
+Local:site_type':1  => Global:site_type:0
+Local:site_type':2  => Global:site_type:2
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+Global:site_type:1  => Local:site_type':1
+Global:site_type:3  => Local:site_type':2
+Local:site_type':1  => Global:site_type:1
+Local:site_type':2  => Global:site_type:3
+agent_type:1:
+Potential dependencies between sites:Covering_class_id:1
+site_type:0
+site_type:2
+Potential dependencies between sites:Covering_class_id:0
+site_type:1
+site_type:3
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:1
+Global:site_type:0  => Local:site_type':1
+Global:site_type:2  => Local:site_type':2
+Local:site_type':1  => Global:site_type:0
+Local:site_type':2  => Global:site_type:2
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+Global:site_type:1  => Local:site_type':1
+Global:site_type:3  => Local:site_type':2
+Local:site_type':1  => Global:site_type:1
+Local:site_type':2  => Global:site_type:3
+agent_type:2:
+Potential dependencies between sites:Covering_class_id:1
+site_type:0
+site_type:2
+Potential dependencies between sites:Covering_class_id:0
+site_type:1
+site_type:3
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:1
+Global:site_type:0  => Local:site_type':1
+Global:site_type:2  => Local:site_type':2
+Local:site_type':1  => Global:site_type:0
+Local:site_type':2  => Global:site_type:2
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+Global:site_type:1  => Local:site_type':1
+Global:site_type:3  => Local:site_type':2
+Local:site_type':1  => Global:site_type:1
+Local:site_type':2  => Global:site_type:3
+CREATION CV_ID:1
+SITE: 0 1 0
+SITE: 2 2 0
+CREATION CV_ID:0
+SITE: 1 1 0
+SITE: 3 2 0
+CREATION CV_ID:1
+SITE: 0 1 0
+SITE: 2 2 0
+CREATION CV_ID:0
+SITE: 1 1 0
+SITE: 3 2 0
+CREATION CV_ID:1
+SITE: 0 1 0
+SITE: 2 2 0
+CREATION CV_ID:0
+SITE: 1 1 0
+SITE: 3 2 0
+============================================================
+* BDU Analysis:
+============================================================
+
+** Static information:
+
+------------------------------------------------------------
+Mapping between sites and the covering classes they belong to:
+------------------------------------------------------------
+agent_type:0:site_type:0@list of covering_class_id:
+covering_class_id:1
+agent_type:0:site_type:1@list of covering_class_id:
+covering_class_id:0
+agent_type:0:site_type:2@list of covering_class_id:
+covering_class_id:1
+agent_type:0:site_type:3@list of covering_class_id:
+covering_class_id:0
+agent_type:1:site_type:0@list of covering_class_id:
+covering_class_id:1
+agent_type:1:site_type:1@list of covering_class_id:
+covering_class_id:0
+agent_type:1:site_type:2@list of covering_class_id:
+covering_class_id:1
+agent_type:1:site_type:3@list of covering_class_id:
+covering_class_id:0
+agent_type:2:site_type:0@list of covering_class_id:
+covering_class_id:1
+agent_type:2:site_type:1@list of covering_class_id:
+covering_class_id:0
+agent_type:2:site_type:2@list of covering_class_id:
+covering_class_id:1
+agent_type:2:site_type:3@list of covering_class_id:
+covering_class_id:0
+------------------------------------------------------------
+Sites that may/must occurs side-effects:
+------------------------------------------------------------
+agent_type:0:site_type:2@list of pair (rule_id, binding state):
+(rule_id:3 * state:1)
+agent_type:0:site_type:3@list of pair (rule_id, binding state):
+(rule_id:8 * state:1)
+agent_type:2:site_type:2@list of pair (rule_id, binding state):
+(rule_id:7 * state:1)
+agent_type:2:site_type:3@list of pair (rule_id, binding state):
+(rule_id:12 * state:1)
+agent_type:0:site_type:0@list of pair (rule_id, binding state):
+(rule_id:8 * state:no_information)
+(rule_id:3 * state:no_information)
+agent_type:0:site_type:1@list of pair (rule_id, binding state):
+(rule_id:8 * state:no_information)
+(rule_id:3 * state:no_information)
+agent_type:0:site_type:2@list of pair (rule_id, binding state):
+(rule_id:8 * state:no_information)
+agent_type:0:site_type:3@list of pair (rule_id, binding state):
+(rule_id:3 * state:no_information)
+agent_type:2:site_type:0@list of pair (rule_id, binding state):
+(rule_id:12 * state:no_information)
+(rule_id:7 * state:no_information)
+agent_type:2:site_type:1@list of pair (rule_id, binding state):
+(rule_id:12 * state:no_information)
+(rule_id:7 * state:no_information)
+agent_type:2:site_type:2@list of pair (rule_id, binding state):
+(rule_id:12 * state:no_information)
+agent_type:2:site_type:3@list of pair (rule_id, binding state):
+(rule_id:7 * state:no_information)
+------------------------------------------------------------
+Sites that may/must occurs in the potential partner side-effects:
+------------------------------------------------------------
+- Potential partner has site that is free:
+agent_type:0:rule_id:7@(site, free state)
+(site_type:2 * state:0)
+(site_type:3 * state:0)
+agent_type:0:rule_id:12@(site, free state)
+(site_type:3 * state:0)
+(site_type:2 * state:0)
+agent_type:1:rule_id:3@(site, free state)
+(site_type:2 * state:0)
+(site_type:3 * state:0)
+agent_type:1:rule_id:8@(site, free state)
+(site_type:3 * state:0)
+(site_type:2 * state:0)
+- Potential partner has site that is bind:
+agent_type:0:rule_id:7@(site, binding state)
+(site_type:2 * state:2)
+(site_type:3 * state:2)
+agent_type:0:rule_id:12@(site, binding state)
+(site_type:3 * state:2)
+(site_type:2 * state:2)
+agent_type:1:rule_id:3@(site, binding state)
+(site_type:2 * state:1)
+(site_type:3 * state:1)
+agent_type:1:rule_id:8@(site, binding state)
+(site_type:3 * state:1)
+(site_type:2 * state:1)
+------------------------------------------------------------
+Set of rules that may modify a given site (excluding created agents):
+------------------------------------------------------------
+agent_id:0:agent_type:0:site_type:0@set of rule_id:
+rule_id:0
+agent_id:0:agent_type:0:site_type:1@set of rule_id:
+rule_id:0
+agent_id:0:agent_type:0:site_type:2@set of rule_id:
+rule_id:0
+rule_id:4
+rule_id:5
+agent_id:0:agent_type:0:site_type:3@set of rule_id:
+rule_id:0
+rule_id:9
+rule_id:10
+agent_id:0:agent_type:1:site_type:0@set of rule_id:
+rule_id:1
+agent_id:0:agent_type:1:site_type:1@set of rule_id:
+rule_id:1
+agent_id:0:agent_type:1:site_type:2@set of rule_id:
+rule_id:1
+agent_id:0:agent_type:1:site_type:3@set of rule_id:
+rule_id:1
+agent_id:0:agent_type:2:site_type:0@set of rule_id:
+rule_id:2
+agent_id:0:agent_type:2:site_type:1@set of rule_id:
+rule_id:2
+agent_id:0:agent_type:2:site_type:2@set of rule_id:
+rule_id:2
+agent_id:0:agent_type:2:site_type:3@set of rule_id:
+rule_id:2
+agent_id:1:agent_type:0:site_type:0@set of rule_id:
+rule_id:6
+agent_id:1:agent_type:0:site_type:1@set of rule_id:
+rule_id:11
+agent_id:1:agent_type:1:site_type:0@set of rule_id:
+rule_id:4
+agent_id:1:agent_type:1:site_type:1@set of rule_id:
+rule_id:9
+agent_id:1:agent_type:1:site_type:2@set of rule_id:
+rule_id:4
+agent_id:1:agent_type:1:site_type:3@set of rule_id:
+rule_id:9
+agent_id:2:agent_type:2:site_type:0@set of rule_id:
+rule_id:5
+agent_id:2:agent_type:2:site_type:1@set of rule_id:
+rule_id:10
+agent_id:2:agent_type:2:site_type:2@set of rule_id:
+rule_id:5
+agent_id:2:agent_type:2:site_type:3@set of rule_id:
+rule_id:10
+------------------------------------------------------------
+Set of rules that may test a given site:
+------------------------------------------------------------
+agent_id:0:agent_type:0:site_type:2@set of rule_id:
+rule_id:3
+rule_id:4
+rule_id:5
+agent_id:0:agent_type:0:site_type:3@set of rule_id:
+rule_id:8
+rule_id:9
+rule_id:10
+agent_id:0:agent_type:2:site_type:0@set of rule_id:
+rule_id:6
+agent_id:0:agent_type:2:site_type:1@set of rule_id:
+rule_id:11
+agent_id:0:agent_type:2:site_type:2@set of rule_id:
+rule_id:6
+rule_id:7
+agent_id:0:agent_type:2:site_type:3@set of rule_id:
+rule_id:11
+rule_id:12
+agent_id:1:agent_type:0:site_type:0@set of rule_id:
+rule_id:6
+agent_id:1:agent_type:0:site_type:1@set of rule_id:
+rule_id:11
+agent_id:1:agent_type:0:site_type:2@set of rule_id:
+rule_id:6
+agent_id:1:agent_type:0:site_type:3@set of rule_id:
+rule_id:11
+agent_id:1:agent_type:1:site_type:0@set of rule_id:
+rule_id:4
+rule_id:5
+agent_id:1:agent_type:1:site_type:1@set of rule_id:
+rule_id:9
+rule_id:10
+agent_id:1:agent_type:1:site_type:2@set of rule_id:
+rule_id:4
+rule_id:5
+agent_id:1:agent_type:1:site_type:3@set of rule_id:
+rule_id:9
+rule_id:10
+agent_id:2:agent_type:2:site_type:0@set of rule_id:
+rule_id:5
+agent_id:2:agent_type:2:site_type:1@set of rule_id:
+rule_id:10
+agent_id:2:agent_type:2:site_type:2@set of rule_id:
+rule_id:5
+agent_id:2:agent_type:2:site_type:3@set of rule_id:
+rule_id:10
+------------------------------------------------------------
+Set of rules that may test and modify a given site (excluding created agents):
+------------------------------------------------------------
+agent_id:0:agent_type:0:site_type:0@set of rule_id:
+rule_id:0
+agent_id:0:agent_type:0:site_type:1@set of rule_id:
+rule_id:0
+agent_id:0:agent_type:0:site_type:2@set of rule_id:
+rule_id:0
+rule_id:3
+rule_id:4
+rule_id:5
+agent_id:0:agent_type:0:site_type:3@set of rule_id:
+rule_id:0
+rule_id:8
+rule_id:9
+rule_id:10
+agent_id:0:agent_type:1:site_type:0@set of rule_id:
+rule_id:1
+agent_id:0:agent_type:1:site_type:1@set of rule_id:
+rule_id:1
+agent_id:0:agent_type:1:site_type:2@set of rule_id:
+rule_id:1
+agent_id:0:agent_type:1:site_type:3@set of rule_id:
+rule_id:1
+agent_id:0:agent_type:2:site_type:0@set of rule_id:
+rule_id:2
+rule_id:6
+agent_id:0:agent_type:2:site_type:1@set of rule_id:
+rule_id:2
+rule_id:11
+agent_id:0:agent_type:2:site_type:2@set of rule_id:
+rule_id:2
+rule_id:6
+rule_id:7
+agent_id:0:agent_type:2:site_type:3@set of rule_id:
+rule_id:2
+rule_id:11
+rule_id:12
+agent_id:1:agent_type:0:site_type:0@set of rule_id:
+rule_id:6
+agent_id:1:agent_type:0:site_type:1@set of rule_id:
+rule_id:11
+agent_id:1:agent_type:0:site_type:2@set of rule_id:
+rule_id:6
+agent_id:1:agent_type:0:site_type:3@set of rule_id:
+rule_id:11
+agent_id:1:agent_type:1:site_type:0@set of rule_id:
+rule_id:4
+rule_id:5
+agent_id:1:agent_type:1:site_type:1@set of rule_id:
+rule_id:9
+rule_id:10
+agent_id:1:agent_type:1:site_type:2@set of rule_id:
+rule_id:4
+rule_id:5
+agent_id:1:agent_type:1:site_type:3@set of rule_id:
+rule_id:9
+rule_id:10
+agent_id:2:agent_type:2:site_type:0@set of rule_id:
+rule_id:5
+agent_id:2:agent_type:2:site_type:1@set of rule_id:
+rule_id:10
+agent_id:2:agent_type:2:site_type:2@set of rule_id:
+rule_id:5
+agent_id:2:agent_type:2:site_type:3@set of rule_id:
+rule_id:10
+
+** Dynamic information:
+
+------------------------------------------------------------
+(Full) Contact map and initital state:
+------------------------------------------------------------
+Sites are annotated with the id of binding type:
+agent_type:0@site_type:2:state:1--agent_type':1@site_type':2:state':1
+agent_type:0@site_type:2:state:2--agent_type':2@site_type':2:state':1
+agent_type:0@site_type:3:state:1--agent_type':1@site_type':3:state':1
+agent_type:0@site_type:3:state:2--agent_type':2@site_type':3:state':1
+agent_type:1@site_type:2:state:1--agent_type':0@site_type':2:state':1
+agent_type:1@site_type:3:state:1--agent_type':0@site_type':3:state':1
+agent_type:2@site_type:2:state:1--agent_type':0@site_type':2:state':2
+agent_type:2@site_type:3:state:1--agent_type':0@site_type':3:state':2
+
+------------------------------------------------------------
+(Syntactic) Contact map (only considering rhs) and initital state:
+------------------------------------------------------------
+Sites are annotated with the id of binding type:
+A bond is discovered for the first time:true
+agent_type:0@site_type:2:state:1--agent_type':1@site_type':2:state':1
+agent_type:0@site_type:2:state:2--agent_type':2@site_type':2:state':1
+agent_type:0@site_type:3:state:1--agent_type':1@site_type':3:state':1
+agent_type:0@site_type:3:state:2--agent_type':2@site_type':3:state':1
+
+------------------------------------------------------------
+List of rules to awake when the state of a site is modified and tested:
+------------------------------------------------------------
+agent_type:0:covering_class_id:0:@set of rule_id:
+rule_id:0
+rule_id:8
+rule_id:9
+rule_id:10
+rule_id:11
+agent_type:0:covering_class_id:1:@set of rule_id:
+rule_id:0
+rule_id:3
+rule_id:4
+rule_id:5
+rule_id:6
+agent_type:1:covering_class_id:0:@set of rule_id:
+rule_id:1
+rule_id:9
+rule_id:10
+agent_type:1:covering_class_id:1:@set of rule_id:
+rule_id:1
+rule_id:4
+rule_id:5
+agent_type:2:covering_class_id:0:@set of rule_id:
+rule_id:2
+rule_id:10
+rule_id:11
+rule_id:12
+agent_type:2:covering_class_id:1:@set of rule_id:
+rule_id:2
+rule_id:5
+rule_id:6
+rule_id:7
+
+------------------------------------------------------------
+List of rules to awake when discovered sites that are bond on the rhs for the first time:
+------------------------------------------------------------
+agent_type:0:covering_class_id:0:@set of rule_id:
+rule_id:0
+rule_id:8
+rule_id:9
+rule_id:10
+rule_id:11
+agent_type:0:covering_class_id:1:@set of rule_id:
+rule_id:0
+rule_id:3
+rule_id:4
+rule_id:5
+rule_id:6
+agent_type:1:covering_class_id:0:@set of rule_id:
+rule_id:1
+rule_id:3
+rule_id:8
+rule_id:9
+rule_id:10
+agent_type:1:covering_class_id:1:@set of rule_id:
+rule_id:1
+rule_id:3
+rule_id:4
+rule_id:5
+rule_id:8
+agent_type:2:covering_class_id:0:@set of rule_id:
+rule_id:2
+rule_id:3
+rule_id:8
+rule_id:10
+rule_id:11
+rule_id:12
+agent_type:2:covering_class_id:1:@set of rule_id:
+rule_id:2
+rule_id:3
+rule_id:5
+rule_id:6
+rule_id:7
+rule_id:8
+
+------------------------------------------------------------
+* Covering classes with new indexes:
+------------------------------------------------------------
+- Working list creation:
+0 1 2 
+
+------------------------------------------------------------
+- Bdu for the valuations of the views that are created from potential partner in side effects (projection per rule):
+
+rule_id:3
+agent_type:1:covering_class_id:0
+Id=13
+ Node(site_type:0<1)
+  Id=1
+   Leaf False 
+
+  Id=12
+   Node(site_type:0<2)
+    Id=9
+     Node(site_type:2<1)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:7
+agent_type:0:covering_class_id:0
+Id=27
+ Node(site_type:0<2)
+  Id=1
+   Leaf False 
+
+  Id=26
+   Node(site_type:0<3)
+    Id=21
+     Node(site_type:2<2)
+      Id=1
+       Leaf False 
+
+      Id=20
+       Node(site_type:2<3)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:8
+agent_type:1:covering_class_id:0
+Id=13
+ Node(site_type:0<1)
+  Id=1
+   Leaf False 
+
+  Id=12
+   Node(site_type:0<2)
+    Id=9
+     Node(site_type:2<1)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:12
+agent_type:0:covering_class_id:0
+Id=27
+ Node(site_type:0<2)
+  Id=1
+   Leaf False 
+
+  Id=26
+   Node(site_type:0<3)
+    Id=21
+     Node(site_type:2<2)
+      Id=1
+       Leaf False 
+
+      Id=20
+       Node(site_type:2<3)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+
+------------------------------------------------------------
+- List for update of the views due to modification that are created from potential partner in side effects (projection per rule):
+rule_id:3
+agent_type:1
+site_type:2:state:0
+site_type:0:state:0
+site_type:2:state:0
+site_type:0:state:0
+rule_id:7
+agent_type:0
+site_type:2:state:0
+site_type:0:state:0
+site_type:2:state:0
+site_type:0:state:0
+rule_id:8
+agent_type:1
+site_type:2:state:0
+site_type:0:state:0
+site_type:2:state:0
+site_type:0:state:0
+rule_id:12
+agent_type:0
+site_type:2:state:0
+site_type:0:state:0
+site_type:2:state:0
+site_type:0:state:0
+
+------------------------------------------------------------
+- Bdu for the valuations of the views that are tested (projection per rule):
+
+rule_id:3
+agent_id:0
+Id=9
+ Node(site_type:2<1)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:2<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+rule_id:4
+agent_id:0
+Id=5
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:2<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_id:1
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:5
+agent_id:0
+Id=5
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:2<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_id:1
+Id=17
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_id:2
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:6
+agent_id:0
+Id=19
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=18
+   Node(site_type:1<2)
+    Id=9
+     Node(site_type:2<1)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_id:1
+Id=23
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<1)
+    Id=21
+     Node(site_type:2<2)
+      Id=1
+       Leaf False 
+
+      Id=20
+       Node(site_type:2<3)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:7
+agent_id:0
+Id=9
+ Node(site_type:2<1)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:2<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+rule_id:8
+agent_id:0
+Id=9
+ Node(site_type:2<1)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:2<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+rule_id:9
+agent_id:0
+Id=5
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:2<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_id:1
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:10
+agent_id:0
+Id=5
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:2<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_id:1
+Id=17
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_id:2
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:11
+agent_id:0
+Id=19
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=18
+   Node(site_type:1<2)
+    Id=9
+     Node(site_type:2<1)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_id:1
+Id=23
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<1)
+    Id=21
+     Node(site_type:2<2)
+      Id=1
+       Leaf False 
+
+      Id=20
+       Node(site_type:2<3)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:12
+agent_id:0
+Id=9
+ Node(site_type:2<1)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:2<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+
+------------------------------------------------------------
+- Bdu for the valuations of the views that are created (per rule, agent and covering class):
+
+agent_type:0:rule_id:0:covering_class_id:0
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_type:0:rule_id:0:covering_class_id:1
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_type:1:rule_id:1:covering_class_id:0
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_type:1:rule_id:1:covering_class_id:1
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_type:2:rule_id:2:covering_class_id:0
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_type:2:rule_id:2:covering_class_id:1
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+
+------------------------------------------------------------
+- Bdu for the valuations of the views that are created (per rule_id; projection function):
+
+rule_id:0
+agent_type:0:cv_id:0
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_type:0:cv_id:1
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:1
+agent_type:1:cv_id:0
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_type:1:cv_id:1
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:2
+agent_type:2:cv_id:0
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_type:2:cv_id:1
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+
+------------------------------------------------------------
+- List for update of the views due to modification (per rule, agent and covering class):
+agent_id:0:agent_type:0:rule_id:0:covering_class_id:0
+site_type:2:state:0
+site_type:1:state:0
+agent_id:0:agent_type:0:rule_id:0:covering_class_id:1
+site_type:2:state:0
+site_type:1:state:0
+agent_id:0:agent_type:0:rule_id:4:covering_class_id:0
+agent_id:0:agent_type:0:rule_id:4:covering_class_id:1
+site_type:2:state:1
+agent_id:0:agent_type:0:rule_id:5:covering_class_id:0
+agent_id:0:agent_type:0:rule_id:5:covering_class_id:1
+site_type:2:state:2
+agent_id:0:agent_type:0:rule_id:9:covering_class_id:0
+site_type:2:state:1
+agent_id:0:agent_type:0:rule_id:9:covering_class_id:1
+agent_id:0:agent_type:0:rule_id:10:covering_class_id:0
+site_type:2:state:2
+agent_id:0:agent_type:0:rule_id:10:covering_class_id:1
+agent_id:0:agent_type:1:rule_id:1:covering_class_id:0
+site_type:2:state:0
+site_type:1:state:0
+agent_id:0:agent_type:1:rule_id:1:covering_class_id:1
+site_type:2:state:0
+site_type:1:state:0
+agent_id:0:agent_type:2:rule_id:2:covering_class_id:0
+site_type:2:state:0
+site_type:1:state:0
+agent_id:0:agent_type:2:rule_id:2:covering_class_id:1
+site_type:2:state:0
+site_type:1:state:0
+agent_id:1:agent_type:0:rule_id:6:covering_class_id:0
+agent_id:1:agent_type:0:rule_id:6:covering_class_id:1
+site_type:1:state:1
+agent_id:1:agent_type:0:rule_id:11:covering_class_id:0
+site_type:1:state:1
+agent_id:1:agent_type:0:rule_id:11:covering_class_id:1
+agent_id:1:agent_type:1:rule_id:4:covering_class_id:0
+agent_id:1:agent_type:1:rule_id:4:covering_class_id:1
+site_type:2:state:1
+site_type:1:state:1
+agent_id:1:agent_type:1:rule_id:9:covering_class_id:0
+site_type:2:state:1
+site_type:1:state:1
+agent_id:1:agent_type:1:rule_id:9:covering_class_id:1
+agent_id:2:agent_type:2:rule_id:5:covering_class_id:0
+agent_id:2:agent_type:2:rule_id:5:covering_class_id:1
+site_type:2:state:1
+site_type:1:state:1
+agent_id:2:agent_type:2:rule_id:10:covering_class_id:0
+site_type:2:state:1
+site_type:1:state:1
+agent_id:2:agent_type:2:rule_id:10:covering_class_id:1
+
+------------------------------------------------------------
+- List for update of the views due to modification (projection per rule):
+rule_id:0
+agent_id:0:
+site_type:2:state:0
+site_type:1:state:0
+site_type:2:state:0
+site_type:1:state:0
+rule_id:1
+agent_id:0:
+site_type:2:state:0
+site_type:1:state:0
+site_type:2:state:0
+site_type:1:state:0
+rule_id:2
+agent_id:0:
+site_type:2:state:0
+site_type:1:state:0
+site_type:2:state:0
+site_type:1:state:0
+rule_id:4
+agent_id:0:
+site_type:2:state:1
+agent_id:1:
+site_type:2:state:1
+site_type:1:state:1
+rule_id:5
+agent_id:0:
+site_type:2:state:2
+agent_id:2:
+site_type:2:state:1
+site_type:1:state:1
+rule_id:6
+agent_id:1:
+site_type:1:state:1
+rule_id:9
+agent_id:0:
+site_type:2:state:1
+agent_id:1:
+site_type:2:state:1
+site_type:1:state:1
+rule_id:10
+agent_id:0:
+site_type:2:state:2
+agent_id:2:
+site_type:2:state:1
+site_type:1:state:1
+rule_id:11
+agent_id:1:
+site_type:1:state:1
+
+------------------------------------------------------------
+- Bdu fpr the valuation of the views that are tested (projection per rule):
+rule_id:3
+agent_id:0:agent_type:0:cv_id:1
+Id=9
+ Node(site_type:2<1)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:2<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+rule_id:4
+agent_id:0:agent_type:0:cv_id:1
+Id=5
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:2<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_id:1:agent_type:1:cv_id:1
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:5
+agent_id:0:agent_type:0:cv_id:1
+Id=5
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:2<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_id:1:agent_type:1:cv_id:1
+Id=17
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_id:2:agent_type:2:cv_id:1
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:6
+agent_id:0:agent_type:2:cv_id:1
+Id=19
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=18
+   Node(site_type:1<2)
+    Id=9
+     Node(site_type:2<1)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_id:1:agent_type:0:cv_id:1
+Id=23
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<1)
+    Id=21
+     Node(site_type:2<2)
+      Id=1
+       Leaf False 
+
+      Id=20
+       Node(site_type:2<3)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:7
+agent_id:0:agent_type:2:cv_id:1
+Id=9
+ Node(site_type:2<1)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:2<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+rule_id:8
+agent_id:0:agent_type:0:cv_id:0
+Id=9
+ Node(site_type:2<1)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:2<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+rule_id:9
+agent_id:0:agent_type:0:cv_id:0
+Id=5
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:2<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_id:1:agent_type:1:cv_id:0
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:10
+agent_id:0:agent_type:0:cv_id:0
+Id=5
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:2<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_id:1:agent_type:1:cv_id:0
+Id=17
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_id:2:agent_type:2:cv_id:0
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:11
+agent_id:0:agent_type:2:cv_id:0
+Id=19
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=18
+   Node(site_type:1<2)
+    Id=9
+     Node(site_type:2<1)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_id:1:agent_type:0:cv_id:0
+Id=23
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<1)
+    Id=21
+     Node(site_type:2<2)
+      Id=1
+       Leaf False 
+
+      Id=20
+       Node(site_type:2<3)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+rule_id:12
+agent_id:0:agent_type:2:cv_id:0
+Id=9
+ Node(site_type:2<1)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:2<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:8
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:8
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:agent_type:0:cv_id:1
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:3
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:agent_type:1:cv_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:agent_type:1:cv_id:1
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl: set of rule_id:12
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:rule_id:12
+in add_update_to_wl:agent_type:2:cv_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl: set of rule_id:7
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:rule_id:7
+wl_init_creation:
+0 1 2 3 4 5 6 7 8 9 10 11 12 
+Test for rule:0
+enabled
+CREATION: Type: 0 Cvid: 0
+Ag:0
+new views:Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:8
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:8
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:agent_type:0:cv_id:1
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:3
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:agent_type:1:cv_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:agent_type:1:cv_id:1
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl: set of rule_id:12
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:rule_id:12
+in add_update_to_wl:agent_type:2:cv_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl: set of rule_id:7
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:rule_id:7
+CREATION: Type: 0 Cvid: 1
+Ag:0
+new views:Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:8
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:8
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:agent_type:0:cv_id:1
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:3
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:agent_type:1:cv_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:agent_type:1:cv_id:1
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl: set of rule_id:12
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:rule_id:12
+in add_update_to_wl:agent_type:2:cv_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl: set of rule_id:7
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:rule_id:7
+Test for rule:1
+enabled
+CREATION: Type: 1 Cvid: 0
+Ag:1
+new views:Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:8
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:8
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:agent_type:0:cv_id:1
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:3
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:agent_type:1:cv_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:agent_type:1:cv_id:1
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl: set of rule_id:12
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:rule_id:12
+in add_update_to_wl:agent_type:2:cv_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl: set of rule_id:7
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:rule_id:7
+CREATION: Type: 1 Cvid: 1
+Ag:1
+new views:Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:8
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:8
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:agent_type:0:cv_id:1
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:3
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:agent_type:1:cv_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:agent_type:1:cv_id:1
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl: set of rule_id:12
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:rule_id:12
+in add_update_to_wl:agent_type:2:cv_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl: set of rule_id:7
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:rule_id:7
+Test for rule:2
+enabled
+CREATION: Type: 2 Cvid: 0
+Ag:2
+new views:Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:8
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:8
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:agent_type:0:cv_id:1
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:3
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:agent_type:1:cv_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:agent_type:1:cv_id:1
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl: set of rule_id:12
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:rule_id:12
+in add_update_to_wl:agent_type:2:cv_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl: set of rule_id:7
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:rule_id:7
+CREATION: Type: 2 Cvid: 1
+Ag:2
+new views:Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:8
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:8
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:agent_type:0:cv_id:1
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:3
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:agent_type:1:cv_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:agent_type:1:cv_id:1
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl: set of rule_id:12
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:rule_id:12
+in add_update_to_wl:agent_type:2:cv_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl: set of rule_id:7
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:rule_id:7
+Test for rule:8
+disabled
+Test for rule:9
+enabled
+Ag:0 Type: 0 Cvid: 0
+Ag:0
+new views:Id=29
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=28
+   Node(site_type:1<1)
+    Id=9
+     Node(site_type:2<1)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:8
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:8
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:agent_type:0:cv_id:1
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:3
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:agent_type:1:cv_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:agent_type:1:cv_id:1
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl: set of rule_id:12
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:rule_id:12
+in add_update_to_wl:agent_type:2:cv_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl: set of rule_id:7
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:rule_id:7
+Ag:1 Type: 1 Cvid: 0
+Ag:1
+new views:Id=19
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=18
+   Node(site_type:1<2)
+    Id=9
+     Node(site_type:2<1)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:8
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:8
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:agent_type:0:cv_id:1
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:3
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:agent_type:1:cv_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:agent_type:1:cv_id:1
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl: set of rule_id:12
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:rule_id:12
+in add_update_to_wl:agent_type:2:cv_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl: set of rule_id:7
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:rule_id:7
+Test for rule:10
+disabled
+Test for rule:11
+disabled
+Test for rule:3
+disabled
+Test for rule:4
+enabled
+Ag:0 Type: 0 Cvid: 1
+Ag:0
+new views:Id=29
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=28
+   Node(site_type:1<1)
+    Id=9
+     Node(site_type:2<1)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:8
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:8
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:agent_type:0:cv_id:1
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:3
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:agent_type:1:cv_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:agent_type:1:cv_id:1
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl: set of rule_id:12
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:rule_id:12
+in add_update_to_wl:agent_type:2:cv_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl: set of rule_id:7
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:rule_id:7
+Ag:1 Type: 1 Cvid: 1
+Ag:1
+new views:Id=19
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=18
+   Node(site_type:1<2)
+    Id=9
+     Node(site_type:2<1)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:8
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:8
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:agent_type:0:cv_id:1
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:3
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:agent_type:1:cv_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:agent_type:1:cv_id:1
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl: set of rule_id:12
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:rule_id:12
+in add_update_to_wl:agent_type:2:cv_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl: set of rule_id:7
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:rule_id:7
+Test for rule:5
+disabled
+Test for rule:6
+disabled
+Test for rule:12
+disabled
+Test for rule:7
+disabled
+Test for rule:0
+enabled
+CREATION: Type: 0 Cvid: 0
+Ag:0
+Nothing has changed
+CREATION: Type: 0 Cvid: 1
+Ag:0
+Nothing has changed
+Test for rule:1
+enabled
+CREATION: Type: 1 Cvid: 0
+Ag:1
+Nothing has changed
+CREATION: Type: 1 Cvid: 1
+Ag:1
+Nothing has changed
+Test for rule:2
+enabled
+CREATION: Type: 2 Cvid: 0
+Ag:2
+Nothing has changed
+CREATION: Type: 2 Cvid: 1
+Ag:2
+Nothing has changed
+Test for rule:8
+enabled
+Ag:0 Type: 0 Cvid: 0
+Ag:0
+Nothing has changed
+Ag:1
+new views:Id=40
+ Node(site_type:0<0)
+  Id=1
+   Leaf False 
+
+  Id=39
+   Node(site_type:0<1)
+    Id=17
+     Node(site_type:1<1)
+      Id=1
+       Leaf False 
+
+      Id=16
+       Node(site_type:1<2)
+        Id=5
+         Node(site_type:2<0)
+          Id=1
+           Leaf False 
+
+          Id=4
+           Node(site_type:2<1)
+            Id=0
+             Leaf True 
+
+            Id=1
+             Leaf False 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:8
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:8
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:agent_type:0:cv_id:1
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:3
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:agent_type:1:cv_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:agent_type:1:cv_id:1
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl: set of rule_id:12
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:rule_id:12
+in add_update_to_wl:agent_type:2:cv_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl: set of rule_id:7
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:rule_id:7
+Test for rule:9
+enabled
+Ag:0 Type: 0 Cvid: 0
+Ag:0
+Nothing has changed
+Ag:1 Type: 1 Cvid: 0
+Ag:1
+Nothing has changed
+Test for rule:10
+enabled
+Ag:0 Type: 0 Cvid: 0
+Ag:0
+new views:Id=23
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<1)
+    Id=21
+     Node(site_type:2<2)
+      Id=1
+       Leaf False 
+
+      Id=20
+       Node(site_type:2<3)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:8
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:8
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:agent_type:0:cv_id:1
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:3
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:agent_type:1:cv_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:agent_type:1:cv_id:1
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl: set of rule_id:12
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:rule_id:12
+in add_update_to_wl:agent_type:2:cv_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl: set of rule_id:7
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:rule_id:7
+Ag:1 Type: 1 Cvid: 0
+Ag:1
+Nothing has changed
+Ag:2 Type: 2 Cvid: 0
+Ag:2
+new views:Id=19
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=18
+   Node(site_type:1<2)
+    Id=9
+     Node(site_type:2<1)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:8
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:8
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:agent_type:0:cv_id:1
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:3
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:agent_type:1:cv_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:agent_type:1:cv_id:1
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl: set of rule_id:12
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:rule_id:12
+in add_update_to_wl:agent_type:2:cv_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl: set of rule_id:7
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:rule_id:7
+Test for rule:11
+enabled
+Ag:0 Type: 2 Cvid: 0
+Ag:2
+Nothing has changed
+Ag:1 Type: 0 Cvid: 0
+Ag:0
+new views:Id=50
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=49
+   Node(site_type:1<2)
+    Id=21
+     Node(site_type:2<2)
+      Id=1
+       Leaf False 
+
+      Id=20
+       Node(site_type:2<3)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:8
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:8
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:agent_type:0:cv_id:1
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:3
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:agent_type:1:cv_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:agent_type:1:cv_id:1
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl: set of rule_id:12
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:rule_id:12
+in add_update_to_wl:agent_type:2:cv_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl: set of rule_id:7
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:rule_id:7
+Test for rule:3
+enabled
+Ag:0 Type: 0 Cvid: 1
+Ag:0
+Nothing has changed
+Ag:1
+Nothing has changed
+Test for rule:4
+enabled
+Ag:0 Type: 0 Cvid: 1
+Ag:0
+Nothing has changed
+Ag:1 Type: 1 Cvid: 1
+Ag:1
+Nothing has changed
+Test for rule:0
+enabled
+CREATION: Type: 0 Cvid: 0
+Ag:0
+Nothing has changed
+CREATION: Type: 0 Cvid: 1
+Ag:0
+Nothing has changed
+Test for rule:8
+enabled
+Ag:0 Type: 0 Cvid: 0
+Ag:0
+Nothing has changed
+Ag:1
+Nothing has changed
+Test for rule:5
+disabled
+Test for rule:6
+disabled
+Test for rule:1
+enabled
+CREATION: Type: 1 Cvid: 0
+Ag:1
+Nothing has changed
+CREATION: Type: 1 Cvid: 1
+Ag:1
+Nothing has changed
+Test for rule:2
+enabled
+CREATION: Type: 2 Cvid: 0
+Ag:2
+Nothing has changed
+CREATION: Type: 2 Cvid: 1
+Ag:2
+Nothing has changed
+Test for rule:12
+enabled
+Ag:0 Type: 2 Cvid: 0
+Ag:2
+Nothing has changed
+Ag:0
+new views:Id=40
+ Node(site_type:0<0)
+  Id=1
+   Leaf False 
+
+  Id=39
+   Node(site_type:0<1)
+    Id=17
+     Node(site_type:1<1)
+      Id=1
+       Leaf False 
+
+      Id=16
+       Node(site_type:1<2)
+        Id=5
+         Node(site_type:2<0)
+          Id=1
+           Leaf False 
+
+          Id=4
+           Node(site_type:2<1)
+            Id=0
+             Leaf True 
+
+            Id=1
+             Leaf False 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:8
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:8
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:agent_type:0:cv_id:1
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:3
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:agent_type:1:cv_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:agent_type:1:cv_id:1
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl: set of rule_id:12
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:rule_id:12
+in add_update_to_wl:agent_type:2:cv_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl: set of rule_id:7
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:rule_id:7
+Test for rule:7
+disabled
+Test for rule:9
+enabled
+Ag:0 Type: 0 Cvid: 0
+Ag:0
+new views:Id=38
+ Node(site_type:0<0)
+  Id=1
+   Leaf False 
+
+  Id=37
+   Node(site_type:0<1)
+    Id=19
+     Node(site_type:1<1)
+      Id=1
+       Leaf False 
+
+      Id=18
+       Node(site_type:1<2)
+        Id=9
+         Node(site_type:2<1)
+          Id=1
+           Leaf False 
+
+          Id=8
+           Node(site_type:2<2)
+            Id=0
+             Leaf True 
+
+            Id=1
+             Leaf False 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:8
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:8
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:agent_type:0:cv_id:1
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:3
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:agent_type:1:cv_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:9
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:9
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:agent_type:1:cv_id:1
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:10
+in add_update_to_wl: set of rule_id:11
+in add_update_to_wl: set of rule_id:12
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:10
+in add_update_to_wl:rule_id:11
+in add_update_to_wl:rule_id:12
+in add_update_to_wl:agent_type:2:cv_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl: set of rule_id:7
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+in add_update_to_wl:rule_id:7
+Ag:1 Type: 1 Cvid: 0
+Ag:1
+Nothing has changed
+Test for rule:10
+enabled
+Ag:0 Type: 0 Cvid: 0
+Ag:0
+Nothing has changed
+Ag:1 Type: 1 Cvid: 0
+Ag:1
+Nothing has changed
+Ag:2 Type: 2 Cvid: 0
+Ag:2
+Nothing has changed
+Test for rule:11
+enabled
+Ag:0 Type: 2 Cvid: 0
+Ag:2
+Nothing has changed
+Ag:1 Type: 0 Cvid: 0
+Ag:0
+Nothing has changed
+Test for rule:0
+enabled
+CREATION: Type: 0 Cvid: 0
+Ag:0
+Nothing has changed
+CREATION: Type: 0 Cvid: 1
+Ag:0
+Nothing has changed
+Test for rule:8
+enabled
+Ag:0 Type: 0 Cvid: 0
+Ag:0
+Nothing has changed
+Ag:1
+Nothing has changed
+Test for rule:3
+enabled
+Ag:0 Type: 0 Cvid: 1
+Ag:0
+Nothing has changed
+Ag:1
+Nothing has changed
+Test for rule:4
+enabled
+Ag:0 Type: 0 Cvid: 1
+Ag:0
+Nothing has changed
+Ag:1 Type: 1 Cvid: 1
+Ag:1
+Nothing has changed
+Test for rule:5
+disabled
+Test for rule:6
+disabled
+Test for rule:1
+enabled
+CREATION: Type: 1 Cvid: 0
+Ag:1
+Nothing has changed
+CREATION: Type: 1 Cvid: 1
+Ag:1
+Nothing has changed
+Test for rule:2
+enabled
+CREATION: Type: 2 Cvid: 0
+Ag:2
+Nothing has changed
+CREATION: Type: 2 Cvid: 1
+Ag:2
+Nothing has changed
+Test for rule:12
+enabled
+Ag:0 Type: 2 Cvid: 0
+Ag:2
+Nothing has changed
+Ag:0
+Nothing has changed
+Test for rule:9
+enabled
+Ag:0 Type: 0 Cvid: 0
+Ag:0
+Nothing has changed
+Ag:1 Type: 1 Cvid: 0
+Ag:1
+Nothing has changed
+Test for rule:7
+disabled
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+agent_type:0:cv_id:0
+Id=76
+ Node(site_type:0<0)
+  Id=52
+   Node(site_type:1<0)
+    Id=1
+     Leaf False 
+
+    Id=51
+     Node(site_type:1<1)
+      Id=46
+       Node(site_type:2<0)
+        Id=1
+         Leaf False 
+
+        Id=20
+         Node(site_type:2<3)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=49
+       Node(site_type:1<2)
+        Id=21
+         Node(site_type:2<2)
+          Id=1
+           Leaf False 
+
+          Id=20
+           Node(site_type:2<3)
+            Id=0
+             Leaf True 
+
+            Id=1
+             Leaf False 
+
+        Id=1
+         Leaf False 
+
+  Id=75
+   Node(site_type:0<1)
+    Id=74
+     Node(site_type:1<0)
+      Id=1
+       Leaf False 
+
+      Id=73
+       Node(site_type:1<2)
+        Id=46
+         Node(site_type:2<0)
+          Id=1
+           Leaf False 
+
+          Id=20
+           Node(site_type:2<3)
+            Id=0
+             Leaf True 
+
+            Id=1
+             Leaf False 
+
+        Id=1
+         Leaf False 
+
+    Id=52
+     Node(site_type:1<0)
+      Id=1
+       Leaf False 
+
+      Id=51
+       Node(site_type:1<1)
+        Id=46
+         Node(site_type:2<0)
+          Id=1
+           Leaf False 
+
+          Id=20
+           Node(site_type:2<3)
+            Id=0
+             Leaf True 
+
+            Id=1
+             Leaf False 
+
+        Id=49
+         Node(site_type:1<2)
+          Id=21
+           Node(site_type:2<2)
+            Id=1
+             Leaf False 
+
+            Id=20
+             Node(site_type:2<3)
+              Id=0
+               Leaf True 
+
+              Id=1
+               Leaf False 
+
+          Id=1
+           Leaf False 
+
+agent_type:0:cv_id:1
+Id=32
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=31
+   Node(site_type:1<1)
+    Id=30
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_type:1:cv_id:0
+Id=45
+ Node(site_type:0<0)
+  Id=34
+   Node(site_type:1<0)
+    Id=1
+     Leaf False 
+
+    Id=33
+     Node(site_type:1<1)
+      Id=5
+       Node(site_type:2<0)
+        Id=1
+         Leaf False 
+
+        Id=4
+         Node(site_type:2<1)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=18
+       Node(site_type:1<2)
+        Id=9
+         Node(site_type:2<1)
+          Id=1
+           Leaf False 
+
+          Id=8
+           Node(site_type:2<2)
+            Id=0
+             Leaf True 
+
+            Id=1
+             Leaf False 
+
+        Id=1
+         Leaf False 
+
+  Id=44
+   Node(site_type:0<1)
+    Id=43
+     Node(site_type:1<0)
+      Id=1
+       Leaf False 
+
+      Id=42
+       Node(site_type:1<1)
+        Id=5
+         Node(site_type:2<0)
+          Id=1
+           Leaf False 
+
+          Id=4
+           Node(site_type:2<1)
+            Id=0
+             Leaf True 
+
+            Id=1
+             Leaf False 
+
+        Id=41
+         Node(site_type:1<2)
+          Id=30
+           Node(site_type:2<0)
+            Id=1
+             Leaf False 
+
+            Id=8
+             Node(site_type:2<2)
+              Id=0
+               Leaf True 
+
+              Id=1
+               Leaf False 
+
+          Id=1
+           Leaf False 
+
+    Id=34
+     Node(site_type:1<0)
+      Id=1
+       Leaf False 
+
+      Id=33
+       Node(site_type:1<1)
+        Id=5
+         Node(site_type:2<0)
+          Id=1
+           Leaf False 
+
+          Id=4
+           Node(site_type:2<1)
+            Id=0
+             Leaf True 
+
+            Id=1
+             Leaf False 
+
+        Id=18
+         Node(site_type:1<2)
+          Id=9
+           Node(site_type:2<1)
+            Id=1
+             Leaf False 
+
+            Id=8
+             Node(site_type:2<2)
+              Id=0
+               Leaf True 
+
+              Id=1
+               Leaf False 
+
+          Id=1
+           Leaf False 
+
+agent_type:1:cv_id:1
+Id=34
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=33
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=18
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+agent_type:2:cv_id:0
+Id=34
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=33
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=18
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+agent_type:2:cv_id:1
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+execution finished without any exception

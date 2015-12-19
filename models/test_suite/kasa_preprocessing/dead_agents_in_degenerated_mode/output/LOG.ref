@@ -402,6 +402,10 @@ Mapping between global identifier of sites (per agent) and local identifier of s
 Covering_class_id:0
 Global:site_type:0  => Local:site_type':1
 Local:site_type':1  => Global:site_type:0
+CREATION CV_ID:0
+SITE: 0 1 0
+CREATION CV_ID:0
+SITE: 0 1 0
 ============================================================
 * BDU Analysis:
 ============================================================
@@ -538,10 +542,6 @@ rule_id:2
 - Bdu for the valuations of the views that are tested (projection per rule):
 
 rule_id:0
-agent_id:0
-Id=0
- Leaf True 
-
 agent_id:1
 Id=3
  Node(site_type:1<0)
@@ -663,6 +663,38 @@ Id=3
 
 
 ------------------------------------------------------------
+- Bdu for the valuations of the views that are created (per rule, agent and covering class):
+
+agent_type:0:rule_id:8:covering_class_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_type:0:rule_id:9:covering_class_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+
+------------------------------------------------------------
 - Bdu for the valuations of the views that are created (per rule_id; projection function):
 
 rule_id:8
@@ -759,10 +791,6 @@ site_type:1:state:0
 ------------------------------------------------------------
 - Bdu fpr the valuation of the views that are tested (projection per rule):
 rule_id:0
-agent_id:0:agent_type:0:cv_id:0
-Id=0
- Leaf True 
-
 agent_id:1:agent_type:1:cv_id:0
 Id=3
  Node(site_type:1<0)
@@ -910,17 +938,16 @@ wl_init_creation:
 0 1 2 3 4 5 6 7 8 9 
 Test for rule:8
 enabled
+CREATION: Type: 0 Cvid: 0
 Ag:0
 Nothing has changed
 Test for rule:9
 enabled
+CREATION: Type: 0 Cvid: 0
 Ag:0
 Nothing has changed
 Test for rule:0
 enabled
-Ag:0 Type: 0 Cvid: 0
-Ag:0
-Nothing has changed
 Ag:1 Type: 1 Cvid: 0
 Ag:1
 new views:Id=5
@@ -1033,18 +1060,17 @@ Ag:1
 Nothing has changed
 Test for rule:0
 enabled
-Ag:0 Type: 0 Cvid: 0
-Ag:0
-Nothing has changed
 Ag:1 Type: 1 Cvid: 0
 Ag:1
 Nothing has changed
 Test for rule:8
 enabled
+CREATION: Type: 0 Cvid: 0
 Ag:0
 Nothing has changed
 Test for rule:9
 enabled
+CREATION: Type: 0 Cvid: 0
 Ag:0
 Nothing has changed
 Test for rule:3

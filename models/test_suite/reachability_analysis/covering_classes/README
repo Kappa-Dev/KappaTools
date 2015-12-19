@@ -1,0 +1,5 @@
+#Command-line:
+"${KAPPABIN}"KaSa covering_classes.ka  --debugging-mode --output-directory output || exit 0 
+
+#checking initial state with the constant 0 should be ignored.
+

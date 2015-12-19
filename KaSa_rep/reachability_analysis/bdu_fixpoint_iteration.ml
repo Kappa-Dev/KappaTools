@@ -668,7 +668,11 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
         (*JF: the following should be applied for each covering class of
           the agent agent_type, but I do not know where this information is
           stored *)
-        let error, bdu_X =
+       let _ = dump_channel parameter 
+          (fun stderr -> Printf.fprintf stderr
+            "CREATION: Type: %i Cvid: %i\n" agent_type cv_id)
+        in 
+       let error, bdu_X =
 	  match Map_bdu_update.Map.find_option (agent_type, cv_id) store_result
 	  with
 	  | None -> error, bdu_false

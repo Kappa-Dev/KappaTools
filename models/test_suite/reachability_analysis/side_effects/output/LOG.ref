@@ -689,6 +689,21 @@ Global:site_type:0  => Local:site_type':1
 Global:site_type:1  => Local:site_type':2
 Local:site_type':1  => Global:site_type:0
 Local:site_type':2  => Global:site_type:1
+CREATION CV_ID:0
+SITE: 0 1 0
+SITE: 1 2 0
+CREATION CV_ID:0
+SITE: 0 1 0
+SITE: 1 2 0
+CREATION CV_ID:0
+SITE: 0 1 0
+SITE: 1 2 0
+CREATION CV_ID:0
+SITE: 0 1 0
+SITE: 1 2 0
+CREATION CV_ID:0
+SITE: 0 1 0
+SITE: 1 2 0
 ============================================================
 * BDU Analysis:
 ============================================================
@@ -1185,11 +1200,6 @@ Id=19
     Id=1
      Leaf False 
 
-rule_id:9
-agent_id:0
-Id=0
- Leaf True 
-
 rule_id:10
 agent_id:0
 Id=7
@@ -1250,6 +1260,130 @@ Id=9
    Node(site_type:2<2)
     Id=0
      Leaf True 
+
+    Id=1
+     Leaf False 
+
+
+------------------------------------------------------------
+- Bdu for the valuations of the views that are created (per rule, agent and covering class):
+
+agent_type:0:rule_id:0:covering_class_id:0
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_type:1:rule_id:1:covering_class_id:0
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_type:2:rule_id:2:covering_class_id:0
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_type:3:rule_id:3:covering_class_id:0
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_type:4:rule_id:4:covering_class_id:0
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
 
     Id=1
      Leaf False 
@@ -1638,11 +1772,6 @@ Id=19
     Id=1
      Leaf False 
 
-rule_id:9
-agent_id:0:agent_type:2:cv_id:0
-Id=0
- Leaf True 
-
 rule_id:10
 agent_id:0:agent_type:3:cv_id:0
 Id=7
@@ -1748,6 +1877,7 @@ wl_init_creation:
 0 1 2 3 4 5 6 7 8 10 11 
 Test for rule:0
 enabled
+CREATION: Type: 0 Cvid: 0
 Ag:0
 new views:Id=7
  Node(site_type:1<0)
@@ -1811,6 +1941,7 @@ in add_update_to_wl:rule_id:4
 in add_update_to_wl:rule_id:10
 Test for rule:1
 enabled
+CREATION: Type: 1 Cvid: 0
 Ag:1
 new views:Id=7
  Node(site_type:1<0)
@@ -1874,6 +2005,7 @@ in add_update_to_wl:rule_id:4
 in add_update_to_wl:rule_id:10
 Test for rule:2
 enabled
+CREATION: Type: 2 Cvid: 0
 Ag:2
 new views:Id=7
  Node(site_type:1<0)
@@ -1937,6 +2069,7 @@ in add_update_to_wl:rule_id:4
 in add_update_to_wl:rule_id:10
 Test for rule:3
 enabled
+CREATION: Type: 3 Cvid: 0
 Ag:3
 new views:Id=7
  Node(site_type:1<0)
@@ -2000,6 +2133,7 @@ in add_update_to_wl:rule_id:4
 in add_update_to_wl:rule_id:10
 Test for rule:4
 enabled
+CREATION: Type: 4 Cvid: 0
 Ag:4
 new views:Id=7
  Node(site_type:1<0)
@@ -2446,22 +2580,27 @@ in add_update_to_wl:rule_id:4
 in add_update_to_wl:rule_id:10
 Test for rule:0
 enabled
+CREATION: Type: 0 Cvid: 0
 Ag:0
 Nothing has changed
 Test for rule:1
 enabled
+CREATION: Type: 1 Cvid: 0
 Ag:1
 Nothing has changed
 Test for rule:2
 enabled
+CREATION: Type: 2 Cvid: 0
 Ag:2
 Nothing has changed
 Test for rule:3
 enabled
+CREATION: Type: 3 Cvid: 0
 Ag:3
 Nothing has changed
 Test for rule:4
 enabled
+CREATION: Type: 4 Cvid: 0
 Ag:4
 Nothing has changed
 Test for rule:5
@@ -2751,6 +2890,7 @@ Ag:4
 Nothing has changed
 Test for rule:0
 enabled
+CREATION: Type: 0 Cvid: 0
 Ag:0
 Nothing has changed
 Test for rule:5
@@ -2762,18 +2902,22 @@ Ag:1
 Nothing has changed
 Test for rule:1
 enabled
+CREATION: Type: 1 Cvid: 0
 Ag:1
 Nothing has changed
 Test for rule:2
 enabled
+CREATION: Type: 2 Cvid: 0
 Ag:2
 Nothing has changed
 Test for rule:3
 enabled
+CREATION: Type: 3 Cvid: 0
 Ag:3
 Nothing has changed
 Test for rule:4
 enabled
+CREATION: Type: 4 Cvid: 0
 Ag:4
 Nothing has changed
 Test for rule:6

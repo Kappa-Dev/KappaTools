@@ -851,18 +851,8 @@ Id=3
 
 rule_id:2
 agent_id:0
-Id=9
- Node(site_type:1<1)
-  Id=1
-   Leaf False 
-
-  Id=8
-   Node(site_type:1<2)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
+Id=1
+ Leaf False 
 
 agent_id:1
 Id=3
@@ -880,18 +870,8 @@ Id=3
 
 rule_id:3
 agent_id:0
-Id=9
- Node(site_type:1<1)
-  Id=1
-   Leaf False 
-
-  Id=8
-   Node(site_type:1<2)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
+Id=1
+ Leaf False 
 
 agent_id:1
 Id=5
@@ -909,32 +889,12 @@ Id=5
 
 rule_id:4
 agent_id:0
-Id=11
- Node(site_type:1<1)
-  Id=1
-   Leaf False 
+Id=1
+ Leaf False 
 
-  Id=10
-   Node(site_type:1<2)
-    Id=5
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
 
-      Id=4
-       Node(site_type:2<1)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
-agent_id:1
-Id=0
- Leaf True 
+------------------------------------------------------------
+- Bdu for the valuations of the views that are created (per rule, agent and covering class):
 
 
 ------------------------------------------------------------
@@ -944,20 +904,30 @@ Id=0
 ------------------------------------------------------------
 - List for update of the views due to modification (per rule, agent and covering class):
 agent_id:0:agent_type:0:rule_id:0:covering_class_id:0
-site_type:2:state:1
 site_type:1:state:1
+agent_id:0:agent_type:0:rule_id:0:covering_class_id:1
+agent_id:0:agent_type:0:rule_id:0:covering_class_id:2
+site_type:2:state:1
 site_type:1:state:1
 agent_id:0:agent_type:0:rule_id:1:covering_class_id:0
 site_type:2:state:1
-site_type:1:state:1
+agent_id:0:agent_type:0:rule_id:1:covering_class_id:1
 site_type:2:state:1
+site_type:1:state:1
+agent_id:0:agent_type:0:rule_id:1:covering_class_id:2
 agent_id:0:agent_type:1:rule_id:2:covering_class_id:0
+agent_id:0:agent_type:1:rule_id:2:covering_class_id:1
 site_type:1:state:1
+agent_id:0:agent_type:1:rule_id:2:covering_class_id:2
 agent_id:0:agent_type:2:rule_id:3:covering_class_id:0
+agent_id:0:agent_type:2:rule_id:3:covering_class_id:1
 site_type:1:state:1
+agent_id:0:agent_type:2:rule_id:3:covering_class_id:2
 agent_id:0:agent_type:3:rule_id:4:covering_class_id:0
-site_type:2:state:1
 site_type:1:state:1
+agent_id:0:agent_type:3:rule_id:4:covering_class_id:1
+agent_id:0:agent_type:3:rule_id:4:covering_class_id:2
+site_type:2:state:1
 agent_id:1:agent_type:0:rule_id:4:covering_class_id:0
 agent_id:1:agent_type:1:rule_id:0:covering_class_id:0
 site_type:1:state:1
@@ -972,16 +942,16 @@ site_type:2:state:1
 - List for update of the views due to modification (projection per rule):
 rule_id:0
 agent_id:0:
-site_type:2:state:1
 site_type:1:state:1
+site_type:2:state:1
 site_type:1:state:1
 agent_id:1:
 site_type:1:state:1
 rule_id:1
 agent_id:0:
 site_type:2:state:1
-site_type:1:state:1
 site_type:2:state:1
+site_type:1:state:1
 agent_id:1:
 site_type:1:state:1
 rule_id:2
@@ -996,14 +966,28 @@ agent_id:1:
 site_type:2:state:1
 rule_id:4
 agent_id:0:
-site_type:2:state:1
 site_type:1:state:1
+site_type:2:state:1
 agent_id:1:
 
 ------------------------------------------------------------
 - Bdu fpr the valuation of the views that are tested (projection per rule):
 rule_id:0
 agent_id:0:agent_type:0:cv_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_id:0:agent_type:0:cv_id:2
 Id=7
  Node(site_type:1<0)
   Id=1
@@ -1043,6 +1027,20 @@ Id=3
 
 rule_id:1
 agent_id:0:agent_type:0:cv_id:0
+Id=5
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:2<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_id:0:agent_type:0:cv_id:1
 Id=7
  Node(site_type:1<0)
   Id=1
@@ -1081,7 +1079,21 @@ Id=3
      Leaf False 
 
 rule_id:2
-agent_id:0:agent_type:1:cv_id:0
+agent_id:0:agent_type:1:cv_id:1
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_id:0:agent_type:1:cv_id:2
 Id=9
  Node(site_type:1<1)
   Id=1
@@ -1110,7 +1122,21 @@ Id=3
      Leaf False 
 
 rule_id:3
-agent_id:0:agent_type:2:cv_id:0
+agent_id:0:agent_type:2:cv_id:1
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_id:0:agent_type:2:cv_id:2
 Id=9
  Node(site_type:1<1)
   Id=1
@@ -1140,6 +1166,34 @@ Id=5
 
 rule_id:4
 agent_id:0:agent_type:3:cv_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_id:0:agent_type:3:cv_id:1
+Id=9
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_id:0:agent_type:3:cv_id:2
 Id=11
  Node(site_type:1<1)
   Id=1
@@ -1162,10 +1216,6 @@ Id=11
 
     Id=1
      Leaf False 
-
-agent_id:1:agent_type:0:cv_id:0
-Id=0
- Leaf True 
 
 in add_update_to_wl:agent_type:0:cv_id:0
 in add_update_to_wl: set of rule_id:0

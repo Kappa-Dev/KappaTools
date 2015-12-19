@@ -199,6 +199,8 @@ Mapping between global identifier of sites (per agent) and local identifier of s
 Covering_class_id:0
 Global:site_type:0  => Local:site_type':1
 Local:site_type':1  => Global:site_type:0
+CREATION CV_ID:0
+SITE: 0 1 1
 ============================================================
 * BDU Analysis:
 ============================================================
@@ -369,6 +371,24 @@ Id=3
 
 rule_id:3
 agent_id:0
+Id=5
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+
+------------------------------------------------------------
+- Bdu for the valuations of the views that are created (per rule, agent and covering class):
+
+agent_type:0:rule_id:0:covering_class_id:0
 Id=5
  Node(site_type:1<1)
   Id=1

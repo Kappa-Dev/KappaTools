@@ -293,6 +293,10 @@ Global:site_type:2  => Local:site_type':3
 Local:site_type':1  => Global:site_type:0
 Local:site_type':2  => Global:site_type:1
 Local:site_type':3  => Global:site_type:2
+CREATION CV_ID:0
+SITE: 0 1 0
+SITE: 1 2 0
+SITE: 2 3 0
 ============================================================
 * BDU Analysis:
 ============================================================
@@ -565,6 +569,44 @@ Id=29
 
 
 ------------------------------------------------------------
+- Bdu for the valuations of the views that are created (per rule, agent and covering class):
+
+agent_type:0:rule_id:0:covering_class_id:0
+Id=11
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=10
+   Node(site_type:1<1)
+    Id=9
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<1)
+        Id=7
+         Node(site_type:3<0)
+          Id=1
+           Leaf False 
+
+          Id=6
+           Node(site_type:3<1)
+            Id=0
+             Leaf True 
+
+            Id=1
+             Leaf False 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+
+------------------------------------------------------------
 - Bdu for the valuations of the views that are created (per rule_id; projection function):
 
 rule_id:0
@@ -811,6 +853,7 @@ wl_init_creation:
 0 1 2 3 4 5 6 
 Test for rule:0
 enabled
+CREATION: Type: 0 Cvid: 0
 Ag:0
 new views:Id=11
  Node(site_type:1<0)
@@ -1174,6 +1217,7 @@ in add_update_to_wl:rule_id:5
 in add_update_to_wl:rule_id:6
 Test for rule:0
 enabled
+CREATION: Type: 0 Cvid: 0
 Ag:0
 Nothing has changed
 Test for rule:1

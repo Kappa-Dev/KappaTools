@@ -337,6 +337,10 @@ Mapping between global identifier of sites (per agent) and local identifier of s
 Covering_class_id:0
 Global:site_type:0  => Local:site_type':1
 Local:site_type':1  => Global:site_type:0
+CREATION CV_ID:0
+SITE: 0 1 0
+CREATION CV_ID:0
+SITE: 0 1 0
 ============================================================
 * BDU Analysis:
 ============================================================
@@ -702,6 +706,38 @@ Id=3
 
 
 ------------------------------------------------------------
+- Bdu for the valuations of the views that are created (per rule, agent and covering class):
+
+agent_type:1:rule_id:2:covering_class_id:0
+Id=9
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_type:2:rule_id:3:covering_class_id:0
+Id=9
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+
+------------------------------------------------------------
 - Bdu for the valuations of the views that are created (per rule_id; projection function):
 
 rule_id:2
@@ -738,6 +774,7 @@ Id=9
 ------------------------------------------------------------
 - List for update of the views due to modification (per rule, agent and covering class):
 agent_id:0:agent_type:0:rule_id:1:covering_class_id:0
+agent_id:0:agent_type:0:rule_id:1:covering_class_id:1
 site_type:1:state:0
 agent_id:1:agent_type:1:rule_id:1:covering_class_id:0
 site_type:1:state:0
@@ -763,7 +800,7 @@ site_type:1:state:0
 ------------------------------------------------------------
 - Bdu fpr the valuation of the views that are tested (projection per rule):
 rule_id:0
-agent_id:0:agent_type:0:cv_id:0
+agent_id:0:agent_type:0:cv_id:1
 Id=3
  Node(site_type:1<1)
   Id=1
@@ -778,7 +815,7 @@ Id=3
      Leaf False 
 
 rule_id:1
-agent_id:0:agent_type:0:cv_id:0
+agent_id:0:agent_type:0:cv_id:1
 Id=3
  Node(site_type:1<1)
   Id=1
@@ -807,7 +844,7 @@ Id=3
      Leaf False 
 
 rule_id:2
-agent_id:0:agent_type:0:cv_id:0
+agent_id:0:agent_type:0:cv_id:1
 Id=3
  Node(site_type:1<1)
   Id=1

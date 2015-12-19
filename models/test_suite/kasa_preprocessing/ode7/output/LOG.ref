@@ -400,6 +400,10 @@ Id=9
 
 
 ------------------------------------------------------------
+- Bdu for the valuations of the views that are created (per rule, agent and covering class):
+
+
+------------------------------------------------------------
 - Bdu for the valuations of the views that are created (per rule_id; projection function):
 
 

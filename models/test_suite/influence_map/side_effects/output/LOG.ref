@@ -491,11 +491,6 @@ Id=5
     Id=1
      Leaf False 
 
-rule_id:3
-agent_id:0
-Id=0
- Leaf True 
-
 rule_id:4
 agent_id:0
 Id=3
@@ -510,6 +505,10 @@ Id=3
 
     Id=1
      Leaf False 
+
+
+------------------------------------------------------------
+- Bdu for the valuations of the views that are created (per rule, agent and covering class):
 
 
 ------------------------------------------------------------
@@ -601,11 +600,6 @@ Id=5
 
     Id=1
      Leaf False 
-
-rule_id:3
-agent_id:0:agent_type:0:cv_id:0
-Id=0
- Leaf True 
 
 rule_id:4
 agent_id:0:agent_type:1:cv_id:0

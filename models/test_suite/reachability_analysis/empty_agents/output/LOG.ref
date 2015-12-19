@@ -254,6 +254,10 @@ List of rules to awake when discovered sites that are bond on the rhs for the fi
 
 
 ------------------------------------------------------------
+- Bdu for the valuations of the views that are created (per rule, agent and covering class):
+
+
+------------------------------------------------------------
 - Bdu for the valuations of the views that are created (per rule_id; projection function):
 
 
