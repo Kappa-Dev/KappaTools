@@ -19,6 +19,27 @@
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
+let warn parameter error option exn default = 
+       Exception.warn parameter error (Some "storyProfiling.ml") option exn (fun () -> default)
+
+
+type step_kind =
+	 | Beginning 
+	 | Collect_traces
+	 | Causal_compression
+	 | Weak_compression
+	 | Strong_compression
+	 | Iteration of int
+	 | Story of int
+	 | Partial_order_reduction
+	 | Siphon_detection
+	 | Agent_ids_disambiguation
+	 | Pseudo_inverse_deletion
+	 | Compression
+	 | Transitive_closure
+	 | Graph_reduction 
+	 | Cannonic_form_computation
+
 module type StoryStats = 
   sig 
     type log_info 
@@ -45,6 +66,9 @@ module type StoryStats =
 
     val copy: log_info -> log_info 
 
+    val add_event: step_kind -> (unit -> int) option -> log_info -> log_info 
+    val close_event: Remanent_parameters_sig.parameters -> Exception.method_handler -> step_kind -> (unit -> int) option -> log_info -> Exception.method_handler * log_info
+									  
     val set_time: log_info -> log_info 
     val set_step_time: log_info -> log_info
     val set_global_cut: int -> log_info -> log_info 
@@ -71,31 +95,15 @@ module StoryStats =
              remaining_events: int ;
              removed_events: int ;
              stack_size: int ;
+	    
            }
 
-       type step_kind =
-	 | Beginning 
-	 | Collect_traces
-	 | Causal_compression
-	 | Weak_compression
-	 | Strong_compression
-	 | Iteration of int
-	 | Story of int
-	 | Partial_order_reduction
-	 | Siphon_detection
-	 | Agent_ids_disambiguation
-	 | Pseudo_inverse_deletion
-	 | Compression
-	 | Transitive_closure
-	 | Graph_reduction 
-	 | Cannonic_form_computation
-	   
        type 'a step =
 	 {
-	   tag: step_kind list;
-	   level: int;
+	   tag: step_kind;
 	   size: 'a option; 
-	   time: float
+	   time: float;
+	   depth: int
 	 }
 	   
        type log_info = 
@@ -104,6 +112,7 @@ module StoryStats =
 	     story_time: float;
 	     step_time: float;
 	     current_tasks: (int step) list;
+	     next_depth:int;
 	     terminated_tasks: ((int * int) step) list ;
 	     branch: int;
 	     cut: int;
@@ -113,8 +122,62 @@ module StoryStats =
 	     last_tick:float;
 	   }
              
-
-     
+       let add_event step_kind f log_info =
+	 let next_depth = log_info.next_depth in 
+	 let task =
+	   {
+	     tag = step_kind ;
+	     size = begin match f with | None -> None | Some f -> Some (f ()) end ;
+	     time = Sys.time () ;
+	     depth = next_depth ;
+	   }
+	 in 
+	 { log_info
+	 with
+	   next_depth = next_depth + 1 ;
+	   current_tasks = task::log_info.current_tasks 
+	 }
+	   
+       let close_event parameter error step_kind f log_info =
+	 let next_depth = log_info.next_depth in
+	 let error,() =
+	   if next_depth = 1
+	   then
+	     warn  parameter error (Some "line 146, Inconsistent profiling information, depth should not be equal to 1 when closing an event") (Failure "Depth=1 in close_event") ()
+	   else
+	     error,()
+	 in
+	 match 
+	   log_info.current_tasks
+	 with
+	 | [] ->
+	    warn  parameter error (Some "line 156, Inconsistent profiling information, no current task when closing an event") (Failure "No current tasks in close_event") log_info
+	 | current_task::tail ->
+	    begin
+	      let size = 
+		match current_task.size,f
+		with Some i,Some f -> Some (i,f ())
+		   | None,_ | _,None -> None
+	      in
+	      let time = Sys.time () -. current_task.time in
+	      let task =
+		{
+		  current_task
+		with
+		  size = size ;
+		  time = time
+		}
+	      in
+	      error,
+	      {
+		log_info 
+	      with
+		next_depth = next_depth - 1;
+		current_tasks = tail ;
+		terminated_tasks = task::log_info.terminated_tasks
+	      }
+	    end
+	      
        let propagation_labels = 
          [|
            "None" ; 
@@ -168,18 +231,12 @@ module StoryStats =
        let init_log_info () = 
          let time = Sys.time () in
          { 
-	   global_time = 0.;
-	   story_time = 0.;
-	   step_time = 0.;
+	   next_depth = 1;
+	   global_time = time ;
+	   story_time = time;
+	   step_time = time;
 	   terminated_tasks = [];
-	   current_tasks =
-	     [
-	       {
-		 tag =  [Beginning];
-		 level = 0;
-		 size = None; 
-		 time = time
-	       }];
+	   current_tasks = [];
 	   propagation = Array.make propagation_cases 0 ;
            branch = 0 ;
 	   cut = 0 ;
