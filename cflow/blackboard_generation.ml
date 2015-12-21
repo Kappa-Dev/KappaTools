@@ -53,10 +53,10 @@ sig
   val strictly_more_refined: predicate_value -> predicate_value -> bool 
   val get_pre_column_map_inv: pre_blackboard -> predicate_info A.t
   (** generation*)
-  val init:  ((*CI.Po.K.P.log_info ->*) Exception.method_handler * pre_blackboard) CI.Po.K.H.with_handler 
-  val add_step: (CI.Po.K.P.log_info -> CI.Po.K.refined_step -> pre_blackboard -> step_id -> Exception.method_handler * CI.Po.K.P.log_info * pre_blackboard * step_id) CI.Po.K.H.with_handler
-  val add_step_up_to_iso: (CI.Po.K.P.log_info -> CI.Po.K.refined_step -> pre_blackboard -> step_id -> Exception.method_handler * CI.Po.K.P.log_info * pre_blackboard * step_id) CI.Po.K.H.with_handler
-  val finalize: (CI.Po.K.P.log_info -> pre_blackboard -> Exception.method_handler * CI.Po.K.P.log_info * pre_blackboard) CI.Po.K.H.with_handler 
+  val init:  ((*StoryProfiling.StoryStats.log_info ->*) Exception.method_handler * pre_blackboard) CI.Po.K.H.with_handler 
+  val add_step: (StoryProfiling.StoryStats.log_info -> CI.Po.K.refined_step -> pre_blackboard -> step_id -> Exception.method_handler * StoryProfiling.StoryStats.log_info * pre_blackboard * step_id) CI.Po.K.H.with_handler
+  val add_step_up_to_iso: (StoryProfiling.StoryStats.log_info -> CI.Po.K.refined_step -> pre_blackboard -> step_id -> Exception.method_handler * StoryProfiling.StoryStats.log_info * pre_blackboard * step_id) CI.Po.K.H.with_handler
+  val finalize: (StoryProfiling.StoryStats.log_info -> pre_blackboard -> Exception.method_handler * StoryProfiling.StoryStats.log_info * pre_blackboard) CI.Po.K.H.with_handler 
 
   (**pretty printing*)
   val string_of_predicate_value: predicate_value -> string 
@@ -737,7 +737,7 @@ module Preblackboard =
 		  
          let init_fictitious_action log_info error predicate_id blackboard = 
            let nsid = blackboard.pre_nsteps+1 in 
-           let log_info = CI.Po.K.P.inc_n_side_events log_info in 
+           let log_info = StoryProfiling.StoryStats.inc_n_side_events log_info in 
            let test = Undefined in 
            let action = Counter 0 in
            let _ = A.set blackboard.pre_steps_by_column predicate_id (2,[nsid,1,test,action])  in 
@@ -1640,7 +1640,7 @@ module Preblackboard =
                                List.fold_left 
                                  (fun (error,log_info,blackboard) list -> 
                                    let blackboard = {blackboard with pre_nsteps = blackboard.pre_nsteps+1} in 
-                                   let log_info = CI.Po.K.P.inc_n_side_events log_info in 
+                                   let log_info = StoryProfiling.StoryStats.inc_n_side_events log_info in 
                                      let side_effect = 
                                        List.fold_left 
                                          (fun list (_,a,_) -> 
@@ -1835,7 +1835,7 @@ module Preblackboard =
                                    List.fold_left 
                                      (fun (error,log_info,blackboard) list -> 
                                        let blackboard = {blackboard with pre_nsteps = blackboard.pre_nsteps+1} in 
-                                       let log_info = CI.Po.K.P.inc_n_side_events log_info in 
+                                       let log_info = StoryProfiling.StoryStats.inc_n_side_events log_info in 
                                        let side_effect = 
                                          List.fold_left 
                                            (fun list (_,a,_) -> 
@@ -2270,7 +2270,7 @@ according to the corresponding substitution *)
                            List.fold_left 
                              (fun (error,log_info,blackboard) list -> 
                                let blackboard = {blackboard with pre_nsteps = blackboard.pre_nsteps+1} in 
-                               let log_info = CI.Po.K.P.inc_n_side_events log_info in 
+                               let log_info = StoryProfiling.StoryStats.inc_n_side_events log_info in 
                                let side_effect = 
                                  List.fold_left 
                                    (fun list (_,a,_) -> 
@@ -2489,7 +2489,7 @@ according to the corresponding substitution *)
                            List.fold_left 
                              (fun (error,log_info,blackboard) list -> 
                                let blackboard = {blackboard with pre_nsteps = blackboard.pre_nsteps+1} in 
-                               let log_info = CI.Po.K.P.inc_n_side_events log_info in 
+                               let log_info = StoryProfiling.StoryStats.inc_n_side_events log_info in 
                                let side_effect = 
                                  List.fold_left 
                                    (fun list (_,a,_) -> 
@@ -2622,7 +2622,7 @@ according to the corresponding substitution *)
              | [] -> error,log_info,blackboard 
              | _ -> 
                let nsid = blackboard.pre_nsteps + 1 in 
-               let log_info = CI.Po.K.P.inc_n_side_events log_info in 
+               let log_info = StoryProfiling.StoryStats.inc_n_side_events log_info in 
                let observable_list = 
                  List.rev_map (fun (x,info) -> (nsid::x,info)) (List.rev blackboard.pre_observable_list) 
                in 

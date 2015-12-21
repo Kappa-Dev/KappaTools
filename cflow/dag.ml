@@ -29,13 +29,13 @@ module type StoryTable =
       
     type table
 	   
-    val fold_table: (((S.PH.B.PB.CI.Po.K.refined_step list -> S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list -> 'a -> Exception.method_handler * 'a) S.PH.B.PB.CI.Po.K.H.with_handler) -> table -> 'a -> Exception.method_handler * 'a) S.PH.B.PB.CI.Po.K.H.with_handler 
+    val fold_table: (((S.PH.B.PB.CI.Po.K.refined_step list -> StoryProfiling.StoryStats.log_info Mods.simulation_info list -> 'a -> Exception.method_handler * 'a) S.PH.B.PB.CI.Po.K.H.with_handler) -> table -> 'a -> Exception.method_handler * 'a) S.PH.B.PB.CI.Po.K.H.with_handler 
     val init_table: (Exception.method_handler * table) S.PH.B.PB.CI.Po.K.H.with_handler 
     val count_stories: table -> int 
-    val add_story: (Causal.grid -> S.PH.B.PB.CI.Po.K.refined_step list -> S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list -> table -> Exception.method_handler * table) S.PH.B.PB.CI.Po.K.H.with_handler 
+    val add_story: (Causal.grid -> S.PH.B.PB.CI.Po.K.refined_step list -> StoryProfiling.StoryStats.log_info Mods.simulation_info list -> table -> Exception.method_handler * table) S.PH.B.PB.CI.Po.K.H.with_handler 
     val hash_list: (table -> Exception.method_handler * table) S.PH.B.PB.CI.Po.K.H.with_handler  
       
-    val sort_list: (table -> Exception.method_handler * (Causal.grid * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list) S.PH.B.PB.CI.Po.K.H.with_handler 
+    val sort_list: (table -> Exception.method_handler * (Causal.grid * StoryProfiling.StoryStats.log_info Mods.simulation_info list) list) S.PH.B.PB.CI.Po.K.H.with_handler 
   end
 
 
@@ -506,7 +506,7 @@ let dot_of_graph parameter handler error graph = error
 module ListTable = 
   (
     struct
-      type table = (prehash * (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list  * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list) list) list
+      type table = (prehash * (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list  * StoryProfiling.StoryStats.log_info Mods.simulation_info list) list) list
 																					    
       let init_table parameter handler error =
 	error,[]
@@ -659,7 +659,7 @@ module BucketTable =
       type table =
 	{
 	  tree: outer_tree;
-	  array: (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info list)  Int_storage.Nearly_inf_Imperatif.t;
+	  array: (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list * StoryProfiling.StoryStats.log_info Mods.simulation_info list)  Int_storage.Nearly_inf_Imperatif.t;
 	  fresh_id: story_id 
 	}
 

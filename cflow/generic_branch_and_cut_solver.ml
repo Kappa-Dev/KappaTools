@@ -24,15 +24,15 @@ module type Solver =
   (sig 
     module PH:Propagation_heuristics.Blackboard_with_heuristic
 
-    val compress: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.update_order list -> Exception.method_handler * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard * PH.B.assign_result  * PH.B.result list) PH.B.PB.CI.Po.K.H.with_handler
+    val compress: (StoryProfiling.StoryStats.log_info -> PH.B.blackboard -> PH.update_order list -> Exception.method_handler * StoryProfiling.StoryStats.log_info * PH.B.blackboard * PH.B.assign_result  * PH.B.result list) PH.B.PB.CI.Po.K.H.with_handler
       
-    val detect_independent_events: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.B.PB.step_id list -> Exception.method_handler * PH.B.PB.CI.Po.K.P.log_info * PH.B.PB.step_id list) PH.B.PB.CI.Po.K.H.with_handler
+    val detect_independent_events: (StoryProfiling.StoryStats.log_info -> PH.B.blackboard -> PH.B.PB.step_id list -> Exception.method_handler * StoryProfiling.StoryStats.log_info * PH.B.PB.step_id list) PH.B.PB.CI.Po.K.H.with_handler
 
-    val filter: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.B.PB.step_id list -> Exception.method_handler * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
+    val filter: (StoryProfiling.StoryStats.log_info -> PH.B.blackboard -> PH.B.PB.step_id list -> Exception.method_handler * StoryProfiling.StoryStats.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
 
-    val sub: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.PB.CI.Po.K.refined_step list -> Exception.method_handler * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
+    val sub: (StoryProfiling.StoryStats.log_info -> PH.B.PB.CI.Po.K.refined_step list -> Exception.method_handler * StoryProfiling.StoryStats.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
 
-    val clean: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> Exception.method_handler * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
+    val clean: (StoryProfiling.StoryStats.log_info -> PH.B.blackboard -> Exception.method_handler * StoryProfiling.StoryStats.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
 
     val translate: (PH.B.blackboard -> PH.B.PB.step_id list -> Exception.method_handler * PH.B.PB.CI.Po.K.refined_step list * PH.B.result) PH.B.PB.CI.Po.K.H.with_handler 
     val translate_result: PH.B.result -> PH.B.PB.CI.Po.K.refined_step list 
@@ -56,7 +56,7 @@ struct
     let bool,log_info = PH.B.tick log_info in 
     let _ = 
       if bool then
-        PH.B.PB.CI.Po.K.P.dump_complete_log
+        StoryProfiling.StoryStats.dump_complete_log
 	  parameter.PH.B.PB.CI.Po.K.H.out_channel_profiling log_info
     in
     match instruction_list 
@@ -222,7 +222,7 @@ struct
     PH.B.reset_init parameter handler error log_info blackboard 
 
   let filter parameter handler error log_info blackboard events_to_keep = 
-    let log_info = PH.B.PB.CI.Po.K.P.set_step_time log_info in 
+    let log_info = StoryProfiling.StoryStats.set_step_time log_info in 
     let error,log_info,blackboard = PH.B.branch parameter handler error log_info blackboard in
     let events_to_remove = 
       let n_events = PH.B.get_n_eid blackboard in 
@@ -251,21 +251,21 @@ struct
     let error,log_info,blackboard,output = 
       propagate parameter handler error log_info forbidden_events [] blackboard  
     in 
-    let log_info = PH.B.PB.CI.Po.K.P.set_concurrent_event_deletion_time log_info in 
-    let log_info = PH.B.PB.CI.Po.K.P.set_step_time log_info in 
+    let log_info = StoryProfiling.StoryStats.set_concurrent_event_deletion_time log_info in 
+    let log_info = StoryProfiling.StoryStats.set_step_time log_info in 
     error,log_info,blackboard 
 
   let sub parameter handler error log_info to_keep = 
-    let log_info = PH.B.PB.CI.Po.K.P.set_step_time log_info in 
+    let log_info = StoryProfiling.StoryStats.set_step_time log_info in 
     let error,log_info,blackboard = PH.B.import parameter handler error log_info to_keep in 
-    let log_info = PH.B.PB.CI.Po.K.P.set_concurrent_event_deletion_time log_info in 
-    let log_info = PH.B.PB.CI.Po.K.P.set_step_time log_info in 
+    let log_info = StoryProfiling.StoryStats.set_concurrent_event_deletion_time log_info in 
+    let log_info = StoryProfiling.StoryStats.set_step_time log_info in 
     error,log_info,blackboard 
     
   let compress parameter handler error log_info blackboard list_order =
     let error,log_info,blackboard = PH.B.branch parameter handler error log_info blackboard in 
-    let log_info = PH.B.PB.CI.Po.K.P.set_concurrent_event_deletion_time log_info in 
-    let log_info = PH.B.PB.CI.Po.K.P.set_step_time log_info in 
+    let log_info = StoryProfiling.StoryStats.set_concurrent_event_deletion_time log_info in 
+    let log_info = StoryProfiling.StoryStats.set_step_time log_info in 
     let _ =
       if log_steps then
         Format.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err

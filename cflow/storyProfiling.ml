@@ -33,8 +33,10 @@ type step_kind =
 	 | Story of int
 	 | Partial_order_reduction
 	 | Siphon_detection
+	 | Decompose_initial_state
 	 | Agent_ids_disambiguation
 	 | Pseudo_inverse_deletion
+	 | Remove_events_after_last_observable
 	 | Compression
 	 | Transitive_closure
 	 | Graph_reduction 

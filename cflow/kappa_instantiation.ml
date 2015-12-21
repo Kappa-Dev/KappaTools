@@ -23,11 +23,13 @@ let compose_with_handler f g parameter handler error x =
   let error,y = g parameter handler error x in 
   f parameter handler error y 
 
+module P = StoryProfiling.StoryStats
+
+    
 module type Cflow_signature =
 sig
   module H:Cflow_handler.Cflow_handler
-  module P:StoryProfiling.StoryStats
-
+ 
   type agent_id = int 
   module AgentIdSet:SetMap.Set with type elt = agent_id
 

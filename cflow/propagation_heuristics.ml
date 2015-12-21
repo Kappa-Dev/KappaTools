@@ -35,9 +35,9 @@ module type Blackboard_with_heuristic =
     val forced_events: (B.blackboard -> Exception.method_handler * (update_order list * B.PB.step_id list * unit Mods.simulation_info option) list) B.PB.CI.Po.K.H.with_handler 
     val forbidden_events: (B.PB.step_id list -> Exception.method_handler * update_order list) B.PB.CI.Po.K.H.with_handler 
     val next_choice: (B.blackboard -> Exception.method_handler * update_order list) B.PB.CI.Po.K.H.with_handler 
-    val apply_instruction: (B.PB.CI.Po.K.P.log_info -> B.blackboard -> update_order -> update_order list -> propagation_check list -> Exception.method_handler * B.PB.CI.Po.K.P.log_info * B.blackboard * update_order list * propagation_check list * B.assign_result) B.PB.CI.Po.K.H.with_handler 
+    val apply_instruction: (StoryProfiling.StoryStats.log_info -> B.blackboard -> update_order -> update_order list -> propagation_check list -> Exception.method_handler * StoryProfiling.StoryStats.log_info * B.blackboard * update_order list * propagation_check list * B.assign_result) B.PB.CI.Po.K.H.with_handler 
 
-    val propagate: (B.PB.CI.Po.K.P.log_info ->B.blackboard -> propagation_check -> update_order list -> propagation_check list -> Exception.method_handler * B.PB.CI.Po.K.P.log_info * B.blackboard * update_order list * propagation_check list * B.assign_result) B.PB.CI.Po.K.H.with_handler
+    val propagate: (StoryProfiling.StoryStats.log_info ->B.blackboard -> propagation_check -> update_order list -> propagation_check list -> Exception.method_handler * StoryProfiling.StoryStats.log_info * B.blackboard * update_order list * propagation_check list * B.assign_result) B.PB.CI.Po.K.H.with_handler
    
   end 
 
@@ -255,7 +255,7 @@ module Propagation_heuristic =
                             (* next event is selected *)
                             (* no test, no action in next event *)
                             (* we propagate the value after the next event*)
-                          let log_info = B.PB.CI.Po.K.P.add_propagation_case_down 1 log_info in 
+                          let log_info = StoryProfiling.StoryStats.add_propagation_case_down 1 log_info in 
                           error,
                           log_info,
                           blackboard,
@@ -278,7 +278,7 @@ module Propagation_heuristic =
                             (* next event is selected *)
                             (* no test, but an action in next event *)
                             (* nothing to propagate downward*)
-                          let log_info = B.PB.CI.Po.K.P.add_propagation_case_down 2 log_info in 
+                          let log_info = StoryProfiling.StoryStats.add_propagation_case_down 2 log_info in 
                           error,
                           log_info,
                           blackboard,
@@ -312,7 +312,7 @@ module Propagation_heuristic =
                               (* no action, but a test in next event *)
                               (* the test is compatible with the value *)
                               (* we propagate the meet of the test and the value before and after the next event *)
-                            let log_info = B.PB.CI.Po.K.P.add_propagation_case_down 3 log_info in 
+                            let log_info = StoryProfiling.StoryStats.add_propagation_case_down 3 log_info in 
                             error,
                             log_info, 
                             blackboard,
@@ -334,7 +334,7 @@ module Propagation_heuristic =
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                 () 
                             in 
-                            let log_info = B.PB.CI.Po.K.P.add_propagation_case_down 4 log_info in 
+                            let log_info = StoryProfiling.StoryStats.add_propagation_case_down 4 log_info in 
                             (* next event is selected *)
                             (* no action, but a test in next event *)
                             (* the test is not compatible with the value *)
@@ -369,7 +369,7 @@ module Propagation_heuristic =
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                 () 
                             in 
-                            let log_info = B.PB.CI.Po.K.P.add_propagation_case_down 5 log_info in 
+                            let log_info = StoryProfiling.StoryStats.add_propagation_case_down 5 log_info in 
                             (* next event is selected *)
                             (* an action and a test in next event *)
                             (* the test is compatible with the value *)
@@ -398,7 +398,7 @@ module Propagation_heuristic =
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                 () 
                             in 
-                            let log_info = B.PB.CI.Po.K.P.add_propagation_case_down 6 log_info in 
+                            let log_info = StoryProfiling.StoryStats.add_propagation_case_down 6 log_info in 
                             (* next event is selected *)
                             (* an action and a test in next event *)
                             (* the test is not compatible with the value *)
@@ -435,7 +435,7 @@ module Propagation_heuristic =
                                     let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                     () 
                                 in 
-                                let log_info = B.PB.CI.Po.K.P.add_propagation_case_down 7 log_info in 
+                                let log_info = StoryProfiling.StoryStats.add_propagation_case_down 7 log_info in 
                                 (* we do not know whether the event is played or not *)
                                 (*there is no test in the next event *)
                                 (* there is no action in the next event *)
@@ -467,7 +467,7 @@ module Propagation_heuristic =
                                       let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                       () 
                                   in 
-                                  let log_info = B.PB.CI.Po.K.P.add_propagation_case_down 8 log_info in 
+                                  let log_info = StoryProfiling.StoryStats.add_propagation_case_down 8 log_info in 
                                   (* we do not know whether the event is played or not *)
                                   (* there is a test in the next event *)
                                   (* there is no action in the next event *)
@@ -494,7 +494,7 @@ module Propagation_heuristic =
                                       let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                       () 
                                   in 
-                                  let log_info  = B.PB.CI.Po.K.P.add_propagation_case_down 9 log_info in 
+                                  let log_info  = StoryProfiling.StoryStats.add_propagation_case_down 9 log_info in 
                                   (* we do not know whether the event is played or not *)
                                   (* there is a test in the next event *)
                                   (* there is no action in the next event *)
@@ -531,7 +531,7 @@ module Propagation_heuristic =
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                 () 
                             in 
-                            let log_info = B.PB.CI.Po.K.P.add_propagation_case_down 10 log_info in 
+                            let log_info = StoryProfiling.StoryStats.add_propagation_case_down 10 log_info in 
                             (* we do not know whether the event is played or not *)
                             (* there is an action in the next event *)
                             (* the action is compatible with the value *)
@@ -568,7 +568,7 @@ module Propagation_heuristic =
                                         () 
                                     in 
                                     let log_info = 
-                                      B.PB.CI.Po.K.P.add_propagation_case_down 11 log_info in 
+                                      StoryProfiling.StoryStats.add_propagation_case_down 11 log_info in 
                                     (* we do not know whether the event is played or not *)
                                     (* there is no test in the next event *)
                                     (* there is an action in the next event *)
@@ -604,7 +604,7 @@ module Propagation_heuristic =
                                           () 
                                       in 
                                       let log_info = 
-                                        B.PB.CI.Po.K.P.add_propagation_case_down 12 log_info in 
+                                        StoryProfiling.StoryStats.add_propagation_case_down 12 log_info in 
                                       (* we do not know whether the event is played or not *)
                                       (* there is a test in the next event *)
                                       (* there is an action in the next event *)
@@ -634,7 +634,7 @@ module Propagation_heuristic =
                                           let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                           () 
                                       in
-                                      let log_info = B.PB.CI.Po.K.P.add_propagation_case_down 13 log_info in 
+                                      let log_info = StoryProfiling.StoryStats.add_propagation_case_down 13 log_info in 
                                       (* we do not know whether the event is played or not *)
                                       (* there is a test in the next event *)
                                       (* there is an action in the next event *)
@@ -677,14 +677,14 @@ module Propagation_heuristic =
                    in 
                    if bool 
                    then 
-                      let log_info = B.PB.CI.Po.K.P.add_look_up_case 1 log_info in 
+                      let log_info = StoryProfiling.StoryStats.add_look_up_case 1 log_info in 
                       let _ = Format.pp_print_flush
 				parameter.B.PB.CI.Po.K.H.out_channel_err () in
                       error,not (B.PB.is_undefined predicate_value),log_info,blackboard 
                    else 
                      last_chance_up  parameter handler error log_info blackboard predicate_value preview_event_case_address 
                  else 
-                   let log_info = B.PB.CI.Po.K.P.add_look_up_case 2 log_info in 
+                   let log_info = StoryProfiling.StoryStats.add_look_up_case 2 log_info in 
                    error,true,log_info,blackboard
               end 
             else 
@@ -693,7 +693,7 @@ module Propagation_heuristic =
                 then 
                   error,false,log_info,blackboard 
                 else 
-                   let log_info = B.PB.CI.Po.K.P.add_look_up_case 3 log_info in 
+                   let log_info = StoryProfiling.StoryStats.add_look_up_case 3 log_info in 
                    error,true,log_info,blackboard
               end 
           end 
@@ -713,7 +713,7 @@ module Propagation_heuristic =
                   then 
                       last_chance_up  parameter handler error log_info blackboard predicate_value preview_event_case_address 
                   else 
-                    let log_info = B.PB.CI.Po.K.P.add_look_up_case 4 log_info in 
+                    let log_info = StoryProfiling.StoryStats.add_look_up_case 4 log_info in 
                     error,true,log_info,blackboard 
                 end 
             end 
@@ -772,7 +772,7 @@ module Propagation_heuristic =
                         let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                         ()
                     in 
-                    let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 1 log_info in 
+                    let log_info = StoryProfiling.StoryStats.add_propagation_case_up 1 log_info in 
                     error,
                     log_info,
                     blackboard,
@@ -794,7 +794,7 @@ module Propagation_heuristic =
                         let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                         ()
                     in 
-                    let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 2 log_info in 
+                    let log_info = StoryProfiling.StoryStats.add_propagation_case_up 2 log_info in 
                     error,
                     log_info, 
                     blackboard,
@@ -823,7 +823,7 @@ module Propagation_heuristic =
                         let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                         ()
                     in 
-                    let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 3 log_info in 
+                    let log_info = StoryProfiling.StoryStats.add_propagation_case_up 3 log_info in 
                     error,
                     log_info, 
                     blackboard,
@@ -853,7 +853,7 @@ module Propagation_heuristic =
                             let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                             ()
                         in 
-                        let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 4 log_info in 
+                        let log_info = StoryProfiling.StoryStats.add_propagation_case_up 4 log_info in 
                         error,
                         log_info,
                         blackboard,
@@ -879,7 +879,7 @@ module Propagation_heuristic =
                             let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                             ()
                         in 
-                        let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 5 log_info in 
+                        let log_info = StoryProfiling.StoryStats.add_propagation_case_up 5 log_info in 
                         error,
                         log_info,
                         blackboard,
@@ -902,7 +902,7 @@ module Propagation_heuristic =
                       let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                       ()
                   in 
-                  let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 6 log_info in 
+                  let log_info = StoryProfiling.StoryStats.add_propagation_case_up 6 log_info in 
                   error,
                   log_info,
                   blackboard,
@@ -940,7 +940,7 @@ module Propagation_heuristic =
                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                               ()
                           in 
-                          let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 7 log_info in 
+                          let log_info = StoryProfiling.StoryStats.add_propagation_case_up 7 log_info in 
                           error,
                           log_info,
                           blackboard,
@@ -968,7 +968,7 @@ module Propagation_heuristic =
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                 ()
                             in 
-                            let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 8 log_info in 
+                            let log_info = StoryProfiling.StoryStats.add_propagation_case_up 8 log_info in 
                             error,
                             log_info,
                             blackboard,
@@ -990,7 +990,7 @@ module Propagation_heuristic =
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                 ()
                             in 
-                            let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 9 log_info in 
+                            let log_info = StoryProfiling.StoryStats.add_propagation_case_up 9 log_info in 
                             error,
                             log_info,
                             blackboard,
@@ -1030,7 +1030,7 @@ module Propagation_heuristic =
                                     let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                     ()
                                 in 
-                                let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 10 log_info in 
+                                let log_info = StoryProfiling.StoryStats.add_propagation_case_up 10 log_info in 
                                 error,
                                 log_info,
                                 blackboard,
@@ -1062,7 +1062,7 @@ module Propagation_heuristic =
                                         let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                         ()
                                     in 
-                                    let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 11 log_info in 
+                                    let log_info = StoryProfiling.StoryStats.add_propagation_case_up 11 log_info in 
                                     error,
                                     log_info,
                                     blackboard,
@@ -1097,7 +1097,7 @@ module Propagation_heuristic =
                                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                               ()
                                           in
-                                          let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 12 log_info in 
+                                          let log_info = StoryProfiling.StoryStats.add_propagation_case_up 12 log_info in 
                                           error,
                                           log_info,
                                           blackboard,
@@ -1122,7 +1122,7 @@ module Propagation_heuristic =
                                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                               ()
                                           in
-                                          let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 13 log_info in 
+                                          let log_info = StoryProfiling.StoryStats.add_propagation_case_up 13 log_info in 
                                           error,
                                           log_info,
                                           blackboard,
@@ -1150,7 +1150,7 @@ module Propagation_heuristic =
                                           let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                           ()
                                       in
-                                       let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 14 log_info in 
+                                       let log_info = StoryProfiling.StoryStats.add_propagation_case_up 14 log_info in 
                                        error,
                                        log_info,
                                        blackboard,
@@ -1176,7 +1176,7 @@ module Propagation_heuristic =
                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                               ()
                           in
-                          let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 15 log_info in 
+                          let log_info = StoryProfiling.StoryStats.add_propagation_case_up 15 log_info in 
                           error,
                           log_info,
                           blackboard,
@@ -1205,7 +1205,7 @@ module Propagation_heuristic =
                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                               ()
                           in
-                          let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 16 log_info in 
+                          let log_info = StoryProfiling.StoryStats.add_propagation_case_up 16 log_info in 
                           error,
                           log_info,
                           blackboard,
@@ -1229,7 +1229,7 @@ module Propagation_heuristic =
                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                               ()
                           in
-                          let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 17 log_info in 
+                          let log_info = StoryProfiling.StoryStats.add_propagation_case_up 17 log_info in 
                           error,
                           log_info,
                           blackboard,
@@ -1308,7 +1308,7 @@ module Propagation_heuristic =
                     if B.PB.more_refined predicate_value value 
                     then 
                       let error,pointer_next = B.follow_pointer_down parameter handler error blackboard case in 
-                      let log_info = B.PB.CI.Po.K.P.add_look_down_case 1 log_info in 
+                      let log_info = StoryProfiling.StoryStats.add_look_down_case 1 log_info in 
                       (Propagate_up pointer_next)::propagate_list,log_info,blackboard
                     else 
                       let error,next_case = B.follow_pointer_down parameter handler error blackboard case in 
@@ -1316,7 +1316,7 @@ module Propagation_heuristic =
                       match exist 
                       with 
                         | Some true -> 
-                          let log_info = B.PB.CI.Po.K.P.add_look_down_case 2 log_info in 
+                          let log_info = StoryProfiling.StoryStats.add_look_down_case 2 log_info in 
                           propagate_list,log_info,blackboard
                         | Some false -> aux next_case bool 
                         | None -> 
@@ -1325,7 +1325,7 @@ module Propagation_heuristic =
                           then 
                             if bool 
                             then 
-                              let log_info = B.PB.CI.Po.K.P.add_look_down_case 3 log_info in 
+                              let log_info = StoryProfiling.StoryStats.add_look_down_case 3 log_info in 
                               propagate_list,log_info,blackboard
                             else 
                               aux next_case true 
@@ -1486,7 +1486,7 @@ module Propagation_heuristic =
       then 
         error,log_info,blackboard,instruction_list,propagate_list,success
       else 
-        let log_info = B.PB.CI.Po.K.P.inc_selected_events log_info in 
+        let log_info = StoryProfiling.StoryStats.inc_selected_events log_info in 
         let _ = 
           if debug_mode 
           then 
@@ -1558,8 +1558,8 @@ module Propagation_heuristic =
                 error,log_info,blackboard,instruction_list,propagate_list,success 
               end 
 
-    let cut_event = gen_event cut_case B.PB.CI.Po.K.P.inc_cut_events
-    let discard_event = gen_event discard_case B.PB.CI.Po.K.P.inc_removed_events  
+    let cut_event = gen_event cut_case StoryProfiling.StoryStats.inc_cut_events
+    let discard_event = gen_event discard_case StoryProfiling.StoryStats.inc_removed_events  
 
     let apply_instruction parameter handler error log_info blackboard instruction instruction_list propagate_list = 
         match instruction 

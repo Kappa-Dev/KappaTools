@@ -71,12 +71,12 @@ sig
   val dec: (case_address -> blackboard -> Exception.method_handler * blackboard) PB.CI.Po.K.H.with_handler
   val overwrite: (case_address -> case_value -> blackboard -> Exception.method_handler * blackboard) PB.CI.Po.K.H.with_handler  
   val refine: (case_address -> case_value -> blackboard -> Exception.method_handler * blackboard * assign_result) PB.CI.Po.K.H.with_handler  
-  val branch: (PB.CI.Po.K.P.log_info -> blackboard -> Exception.method_handler * PB.CI.Po.K.P.log_info * blackboard) PB.CI.Po.K.H.with_handler 
-  val reset_last_branching: (PB.CI.Po.K.P.log_info -> blackboard -> Exception.method_handler * PB.CI.Po.K.P.log_info * blackboard ) PB.CI.Po.K.H.with_handler 
-  val reset_init: (PB.CI.Po.K.P.log_info -> blackboard -> Exception.method_handler * PB.CI.Po.K.P.log_info * blackboard) PB.CI.Po.K.H.with_handler 
+  val branch: (StoryProfiling.StoryStats.log_info -> blackboard -> Exception.method_handler * StoryProfiling.StoryStats.log_info * blackboard) PB.CI.Po.K.H.with_handler 
+  val reset_last_branching: (StoryProfiling.StoryStats.log_info -> blackboard -> Exception.method_handler * StoryProfiling.StoryStats.log_info * blackboard ) PB.CI.Po.K.H.with_handler 
+  val reset_init: (StoryProfiling.StoryStats.log_info -> blackboard -> Exception.method_handler * StoryProfiling.StoryStats.log_info * blackboard) PB.CI.Po.K.H.with_handler 
 
   (** initialisation*)
-  val import:  (PB.CI.Po.K.P.log_info -> PB.CI.Po.K.refined_step list -> Exception.method_handler * PB.CI.Po.K.P.log_info * blackboard) PB.CI.Po.K.H.with_handler 
+  val import:  (StoryProfiling.StoryStats.log_info -> PB.CI.Po.K.refined_step list -> Exception.method_handler * StoryProfiling.StoryStats.log_info * blackboard) PB.CI.Po.K.H.with_handler 
 
 
   (** output result*)
@@ -108,8 +108,8 @@ sig
   val n_unresolved_events_in_column: event_case_address -> case_address 
   val forced_events: blackboard -> (PB.step_id list * unit Mods.simulation_info option) list 
   val side_effect_of_event: blackboard -> PB.step_id -> PB.CI.Po.K.side_effect
-  val cut: (PB.CI.Po.K.P.log_info -> blackboard -> PB.step_id list -> Exception.method_handler * PB.CI.Po.K.P.log_info * blackboard * PB.step_id list) PB.CI.Po.K.H.with_handler 
-  val tick: PB.CI.Po.K.P.log_info -> bool * PB.CI.Po.K.P.log_info (* to do: move to the module PB.CI.Po.K.P*)
+  val cut: (StoryProfiling.StoryStats.log_info -> blackboard -> PB.step_id list -> Exception.method_handler * StoryProfiling.StoryStats.log_info * blackboard * PB.step_id list) PB.CI.Po.K.H.with_handler 
+  val tick: StoryProfiling.StoryStats.log_info -> bool * StoryProfiling.StoryStats.log_info (* to do: move to the module StoryProfiling.StoryStats*)
   val level_of_event: (blackboard -> PB.step_id -> Exception.method_handler * Priority.level) PB.CI.Po.K.H.with_handler 
 end
 
@@ -364,7 +364,7 @@ module Blackboard =
            level_of_event: Priority.level PB.A.t;
          }
            
-     let tick profiling_info = PB.CI.Po.K.P.tick profiling_info 
+     let tick profiling_info = StoryProfiling.StoryStats.tick profiling_info 
      let level_of_event parameter handler error blackboard eid = 
        try 
          error,PB.A.get blackboard.level_of_event eid 
@@ -1270,7 +1270,7 @@ module Blackboard =
          else 
            error
        in 
-       let log_info = PB.CI.Po.K.P.inc_branch log_info in 
+       let log_info = StoryProfiling.StoryStats.inc_branch log_info in 
        error,
        log_info,
        {
@@ -1307,7 +1307,7 @@ module Blackboard =
          else
            error 
        in 
-       let log_info = PB.CI.Po.K.P.inc_cut log_info in 
+       let log_info = StoryProfiling.StoryStats.inc_cut log_info in 
        match blackboard.stack 
        with 
          | [] -> error,log_info,{blackboard with current_stack = []}
@@ -1322,7 +1322,7 @@ module Blackboard =
            | _  -> aux (reset_last_branching parameter handler error log_info blackboard)
        in 
        let error,log_info,blackboard = aux (error,log_info,blackboard) in 
-       let log_info = PB.CI.Po.K.P.reset_log log_info in 
+       let log_info = StoryProfiling.StoryStats.reset_log log_info in 
        error,log_info,blackboard 
     
   (** output result*)
@@ -1474,9 +1474,9 @@ module Blackboard =
          
    let cut parameter handler error log_info blackboard list = 
      let error,cut_causal_flow,n_events_removed = useless_predicate_id parameter handler error blackboard list in 
-     let log_info = PB.CI.Po.K.P.set_concurrent_event_detection_time log_info in 
-     let log_info = PB.CI.Po.K.P.set_step_time log_info in 
-     let log_info = PB.CI.Po.K.P.inc_k_cut_events n_events_removed log_info in 
+     let log_info = StoryProfiling.StoryStats.set_concurrent_event_detection_time log_info in 
+     let log_info = StoryProfiling.StoryStats.set_step_time log_info in 
+     let log_info = StoryProfiling.StoryStats.inc_k_cut_events n_events_removed log_info in 
      error,log_info,blackboard,cut_causal_flow
 
    let import parameter handler error log_info list = 
