@@ -67,11 +67,11 @@ module ContentAgent = struct
        Signature.print_site sigs agent f id
     | None -> Format.fprintf f "cc%in%is%i" cc i id
 
-  let print_internal ?sigs (_,agent,_) site f id =
+  let print_internal ?sigs (cc,agent,i) site f id =
     match sigs with
     | Some sigs ->
        Signature.print_site_internal_state sigs agent site f (Some id)
-    | None -> Format.pp_print_int f id
+    | None -> Format.fprintf f "cc%in%is%i~%i" cc i site id
 end
 
 let raw_find_ty tys id =
@@ -115,6 +115,8 @@ let find_root cc =
 	    let x = List.fold_left (fun _ x -> x) h t in
 	    Some(ty,x)
   in aux 0
+
+let find_root_type cc = Tools.option_map fst (find_root cc)
 
 (*turns a cc into a path(:list) in the domain*)
 let to_navigation (full:bool) cc =
@@ -898,10 +900,11 @@ module Matching = struct
     let rec aux cache (obs,rev_deps as acc) = function
       | [] -> cache,acc
       | (point,inj_point2graph) :: remains ->
-	 let concrete_root =
+	 let (concrete_root,_ as root_bundle) =
 	   match find_root point.content with
 	   | None -> assert false
-	   | Some (_,root) -> Renaming.apply inj_point2graph root in
+	   | Some (root_type,root) ->
+	      Renaming.apply inj_point2graph root,root_type in
 	 if Int2Set.mem (point.content.id,concrete_root) cache
 	 then aux cache acc remains
 	 else
@@ -909,7 +912,7 @@ module Matching = struct
 	     match point.is_obs_of with
 	     | None -> acc
 	     | Some ndeps ->
-		((point.content,concrete_root) :: obs,
+		((point.content,root_bundle) :: obs,
 		 Operator.DepSet.union rev_deps ndeps) in
 	   let remains' =
 	     List.fold_left
@@ -934,20 +937,20 @@ module Matching = struct
 	     (Mods.Int2Set.empty,([],Operator.DepSet.empty)) injs
     else ([],Operator.DepSet.empty)
 
-  let observables_from_agent domain graph ty node_id =
-    if Edges.is_agent ty node_id graph
+  let observables_from_agent domain graph (_,ty as node) =
+    if Edges.is_agent node graph
     then match Env.get_single_agent ty domain with
-	 | Some (cc,deps) -> ([cc,node_id],deps)
+	 | Some (cc,deps) -> ([cc,node],deps)
 	 | None -> ([],Operator.DepSet.empty)
     else ([],Operator.DepSet.empty)
 
-  let observables_from_free domain graph ty node_id site =
+  let observables_from_free domain graph (node_id,ty) site =
     from_edge domain graph
 	      [(Navigation.Fresh (ty,node_id),site),Navigation.ToNothing]
-  let observables_from_internal domain graph ty node_id site id =
+  let observables_from_internal domain graph (node_id,ty) site id =
     from_edge domain graph
 	      [(Navigation.Fresh (ty,node_id),site),Navigation.ToInternal id]
-  let observables_from_link domain graph ty n_id site  ty' n_id' site' =
+  let observables_from_link domain graph (n_id,ty) site  (n_id',ty') site' =
     from_edge domain graph
 	      [(Navigation.Fresh (ty,n_id),site),
 	       Navigation.ToNode (Navigation.Fresh (ty',n_id'),site')]

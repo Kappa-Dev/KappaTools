@@ -56,6 +56,8 @@ val print : ?sigs:Signature.s -> bool -> Format.formatter -> t -> unit
 
 val print_dot : Signature.s -> Format.formatter -> t -> unit
 
+val find_root_type : t -> int option
+
 module Matching : sig
   type t
   val empty : t
@@ -64,20 +66,25 @@ module Matching : sig
   val reconstruct : Edges.t -> t -> int -> cc -> int -> t option
 
   val observables_from_agent :
-    Env.t -> Edges.t -> int -> int -> ((cc * int) list * Operator.DepSet.t)
-  (** [observables_from_free domain graph sort agent] *)
+    Env.t -> Edges.t -> Edges.agent ->
+    ((cc * (int * int)) list * Operator.DepSet.t)
+  (** [observables_from_free domain graph sort agent]
+    the int * int in the return list and the following ones
+    is a Instantiation.concrete *)
 
   val observables_from_free :
-    Env.t -> Edges.t -> int -> int -> int -> ((cc * int) list * Operator.DepSet.t)
+    Env.t -> Edges.t -> Edges.agent -> int ->
+    ((cc * (int * int)) list * Operator.DepSet.t)
   (** [observables_from_free domain graph sort agent site] *)
 
   val observables_from_internal :
-    Env.t -> Edges.t -> int -> int -> int -> int -> ((cc * int) list * Operator.DepSet.t)
+    Env.t -> Edges.t -> Edges.agent -> int -> int ->
+    ((cc * (int * int)) list * Operator.DepSet.t)
   (** [observables_from_internal domain graph sort agent site internal_state] *)
 
   val observables_from_link :
-    Env.t -> Edges.t -> int -> int -> int -> int -> int -> int ->
-    ((cc * int) list * Operator.DepSet.t)
+    Env.t -> Edges.t -> Edges.agent -> int -> Edges.agent -> int ->
+    ((cc * (int * int)) list * Operator.DepSet.t)
   (** [observables_from_link domain graph sort ag site sort' ag' site'] *)
 end
 
