@@ -115,7 +115,7 @@ module StoryStats =
 	     step_time: float;
 	     current_tasks: (int step) list;
 	     next_depth:int;
-	     terminated_tasks: ((int * int) step) list ;
+	     terminated_tasks: ((int * int) step * step_kind list) list ;
 	     branch: int;
 	     cut: int;
 	     stack: stack_head list ;
@@ -176,7 +176,7 @@ module StoryStats =
 	      with
 		next_depth = next_depth - 1;
 		current_tasks = tail ;
-		terminated_tasks = task::log_info.terminated_tasks
+		terminated_tasks = (task,List.rev_map (fun x -> x.tag) (List.rev tail))::log_info.terminated_tasks
 	      }
 	    end
 	      

@@ -45,6 +45,7 @@ module type Cflow_handler =
     val get_log_step: parameter -> bool
     val set_debugging_mode: parameter -> bool -> parameter
     val get_debugging_mode: parameter -> bool
+    val get_profiling_logger: parameter -> Format.formatter 
     val get_logger: parameter -> Format.formatter
     val set_logger: parameter -> Format.formatter -> parameter
     val get_out_channel: parameter -> Format.formatter

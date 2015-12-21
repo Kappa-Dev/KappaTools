@@ -65,6 +65,7 @@ module type Cflow_handler =
     val get_log_step: parameter -> bool
     val set_debugging_mode: parameter -> bool -> parameter
     val get_debugging_mode: parameter -> bool
+    val get_profiling_logger: parameter -> Format.formatter 
     val get_logger: parameter -> Format.formatter 
     val set_logger: parameter -> Format.formatter -> parameter
     val get_out_channel: parameter -> Format.formatter
@@ -191,6 +192,6 @@ module Cflow_handler =
    let do_not_bound_itterations parameter = {parameter with bound_on_itteration_number = None}
    let set_itteration_bound parameter int = {parameter with bound_on_itteration_number = Some int}				      
    let get_bound_on_itteration_number parameter = parameter.bound_on_itteration_number
-
+   let get_profiling_logger parameter = parameter. out_channel_profiling 
    end:Cflow_handler)
     
