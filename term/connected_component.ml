@@ -129,7 +129,7 @@ let to_navigation (full:bool) cc =
 	      if (full || first) && v >= 0 then
 		(false,
 		 (((if first
-		    then Navigation.Fresh (find_ty cc h,h)
+		    then Navigation.Fresh (h,find_ty cc h)
 		    else Navigation.Existing h),i),
 		  Navigation.ToInternal v)::out)
 	      else acc)
@@ -144,7 +144,7 @@ let to_navigation (full:bool) cc =
 	       if full || first
 	       then (false,
 		     (((if first
-			then Navigation.Fresh (find_ty cc h,h)
+			then Navigation.Fresh (h,find_ty cc h)
 			else Navigation.Existing h),i),
 		      Navigation.ToNothing)::ans,re)
 	       else acc
@@ -155,16 +155,16 @@ let to_navigation (full:bool) cc =
 		 if full
 		 then (false,
 		       (((if first
-			  then Navigation.Fresh (find_ty cc h,h)
+			  then Navigation.Fresh (h,find_ty cc h)
 			  else Navigation.Existing h),i),
 			Navigation.ToNode (Navigation.Existing n,l))::ans ,re)
 		 else acc
 	       else
 		 (false,
 		  (((if first
-		     then Navigation.Fresh (find_ty cc h,h)
+		     then Navigation.Fresh (h,find_ty cc h)
 		     else Navigation.Existing h),i),
-		   Navigation.ToNode(Navigation.Fresh(find_ty cc n,n),l))::ans,
+		   Navigation.ToNode(Navigation.Fresh(n,find_ty cc n),l))::ans,
 		  n::re))
 	   (first_ints,out_ints,t) (IntMap.find_default [||] h cc.links) in
        build_for (first_lnk,out'') (h::don) todo
@@ -589,15 +589,15 @@ let remove_cycle_edges complete_domain_with obs_id dst env free_id cc =
        let e' =
 	 if n = n' && has_removed'
 	 then
-	   (Navigation.Fresh (find_ty cc n,Renaming.apply inj2cc' n),i),
+	   (Navigation.Fresh (Renaming.apply inj2cc' n,find_ty cc n),i),
 	   Navigation.ToNode (Navigation.Existing (Renaming.apply inj2cc' n),i')
 	 else
 	   ((if has_removed
-	     then Navigation.Fresh (find_ty cc n,Renaming.apply inj2cc' n)
+	     then Navigation.Fresh (Renaming.apply inj2cc' n,find_ty cc n)
 	     else Navigation.Existing (Renaming.apply inj2cc' n)),i),
 	   Navigation.ToNode
 	     ((if has_removed'
-	       then Navigation.Fresh (find_ty cc n',Renaming.apply inj2cc' n')
+	       then Navigation.Fresh (Renaming.apply inj2cc' n',find_ty cc n')
 	       else Navigation.Existing (Renaming.apply inj2cc' n')),i') in
        let pack,ans =
 	 complete_domain_with obs_id dst env' (succ f_id)
@@ -631,7 +631,7 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
 	   complete_domain_with
 	     obs_id dst env' (succ f_id) cc'
 	     (((if has_removed
-		then Navigation.Fresh (find_ty cc ag_id, Renaming.apply inj2cc' ag_id)
+		then Navigation.Fresh (Renaming.apply inj2cc' ag_id, find_ty cc ag_id)
 		else Navigation.Existing (Renaming.apply inj2cc' ag_id)),i),Navigation.ToInternal el)
 	     inj2cc' in
 	 (pack,ans::out)
@@ -651,7 +651,7 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
 	    complete_domain_with
 	      obs_id dst env' (succ f_id) cc'
 	      (((if has_removed
-		 then Navigation.Fresh (find_ty cc ag_id,Renaming.apply inj2cc' ag_id)
+		 then Navigation.Fresh (Renaming.apply inj2cc' ag_id, find_ty cc ag_id)
 		 else Navigation.Existing (Renaming.apply inj2cc' ag_id)),i),Navigation.ToNothing)
 		 inj2cc' in
 	  (pack,ans::out)
@@ -669,10 +669,10 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
 	      complete_domain_with
 		obs_id dst env' (succ f_id) cc''
 		(((if has_removed
-		   then Navigation.Fresh (find_ty cc n',Renaming.apply inj2cc'' n')
+		   then Navigation.Fresh (Renaming.apply inj2cc'' n', find_ty cc n')
 		   else Navigation.Existing (Renaming.apply inj2cc'' n')),i'),
 		 Navigation.ToNode
-		   (Navigation.Fresh(find_ty cc ag_id,Renaming.apply inj2cc'' ag_id),i))
+		   (Navigation.Fresh(Renaming.apply inj2cc'' ag_id,find_ty cc ag_id),i))
 		inj2cc'' in
 	    (pack,ans::out))
       (remove_one_internal acc ag_id links internals) links in
@@ -944,16 +944,16 @@ module Matching = struct
 	 | None -> ([],Operator.DepSet.empty)
     else ([],Operator.DepSet.empty)
 
-  let observables_from_free domain graph (node_id,ty) site =
+  let observables_from_free domain graph node site =
     from_edge domain graph
-	      [(Navigation.Fresh (ty,node_id),site),Navigation.ToNothing]
-  let observables_from_internal domain graph (node_id,ty) site id =
+	      [(Navigation.Fresh node,site),Navigation.ToNothing]
+  let observables_from_internal domain graph node site id =
     from_edge domain graph
-	      [(Navigation.Fresh (ty,node_id),site),Navigation.ToInternal id]
-  let observables_from_link domain graph (n_id,ty) site  (n_id',ty') site' =
+	      [(Navigation.Fresh node,site),Navigation.ToInternal id]
+  let observables_from_link domain graph n site  n' site' =
     from_edge domain graph
-	      [(Navigation.Fresh (ty,n_id),site),
-	       Navigation.ToNode (Navigation.Fresh (ty',n_id'),site')]
+	      [(Navigation.Fresh n,site),
+	       Navigation.ToNode (Navigation.Fresh n',site')]
 end
 
 let compare_canonicals cc cc' = Mods.int_compare cc.id cc'.id
