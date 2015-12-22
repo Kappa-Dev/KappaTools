@@ -195,7 +195,8 @@ let make_unambiguous parameters ?(shall_we_compute=we_shall) ?(shall_we_compute_
 				      kappa_handler profiling_info error trace in
     error,profiling_info,
     if trace'==trace   
-    then trace
+    then
+      set_ambiguity_level trace false 
     else
 	set_ambiguity_level trace' false
   else
@@ -404,13 +405,16 @@ let fold_story_table_gen logger parameter ?(shall_we_compute=we_shall) ?(shall_w
        | Some logger -> 
 	  Some (logger,n_stories_input,Mods.tick_stories logger n_stories_input (false,0,0))
   in
-  let g (parameter:parameter) (handler:kappa_handler) error story (info:trace_runtime_info) (profiling_info,progress_bar,a,n_fails) =
+  let g parameter (handler:kappa_handler) error story (info:trace_runtime_info) (k,profiling_info,progress_bar,a,n_fails) =
+    let event = StoryProfiling.Story k in 
+    let profiling_info = P.add_event event None profiling_info in
     let error,profiling_info,a' = f parameter ~shall_we_compute:shall_we_compute ~shall_we_compute_profiling_information:shall_we_compute_profiling_information handler profiling_info error (trace_of_pretrace_with_ambiguity false story) info a in
     let progress_bar = tick_opt progress_bar in
     let n_fails = inc_fails a a' n_fails in 
-    error,(profiling_info,progress_bar,a',n_fails)
+    let error,profiling_info = P.close_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error event None profiling_info in
+    error,(succ k,profiling_info,progress_bar,a',n_fails)
   in
-  let error,(profiling_info,_,a,n_fails) =   D.fold_table parameter handler error g l.story_list (profiling_info,progress_bar,a,0) in 
+  let error,(_,profiling_info,_,a,n_fails) =   D.fold_table parameter handler error g l.story_list (1,profiling_info,progress_bar,a,0) in 
   let () = close_progress_bar_opt logger in 
   let () = print_fails parameter.S.PH.B.PB.CI.Po.K.H.out_channel_err s n_fails in 
   error,(profiling_info:profiling_info),a 
@@ -478,45 +482,53 @@ let compress parameter ?(shall_we_compute=always) ?(shall_we_compute_profiling_i
   | Some Parameter.Causal ->
      let error,log_info,trace = cut parameter ~shall_we_compute:always handler log_info error trace
      in error,log_info,[trace] 
-  | Some Parameter.Weak | Some Parameter.Strong -> 
-    let event_list = get_pretrace_of_trace trace in 
-    let error,log_info,blackboard = S.PH.B.import parameter handler error log_info event_list in 
-    let error,list = S.PH.forced_events parameter handler error blackboard in     
-    let list_order = 
-      match list 
-      with 
-      | (list_order,_,_)::_ -> list_order
-      | _ -> []
-    in 
-    let error,log_info,blackboard,output,list = 
-      S.compress parameter handler error log_info blackboard list_order 
-    in
-    let list =
-      List.rev_map
-	(fun pretrace ->
-	 let event_list = S.translate_result pretrace in 
-	 let event_list = S.PH.B.PB.CI.Po.K.clean_events event_list in 
-	 (build_compressed_trace event_list pretrace))
-	list
-    in 
-    let log_info = P.set_story_research_time log_info in 
-    let error = 
-      if debug_mode
-      then 
-	let _ =  Debug.tag parameter.S.PH.B.PB.CI.Po.K.H.out_channel_err "\t\t * result"  in
-	let _ =
-          if S.PH.B.is_failed output 
-          then 
-            let _ = Format.fprintf parameter.S.PH.B.PB.CI.Po.K.H.out_channel_err "Fail_to_compress" in  error
-          else 
-            let _ = Format.fprintf parameter.S.PH.B.PB.CI.Po.K.H.out_channel_err "Succeed_to_compress" in 
-            error
-	in 
-      error 
-      else 
-	error
-    in error,log_info,list
-			
+  | Some Parameter.Weak
+  | Some Parameter.Strong -> 
+     let event = match parameter.S.PH.B.PB.CI.Po.K.H.current_compression_mode
+       with Some Parameter.Weak -> StoryProfiling.Weak_compression
+	  | _ -> StoryProfiling.Strong_compression
+     in
+     let log_info = P.add_event event (Some (fun () -> size_of_pretrace trace)) log_info in 
+     let event_list = get_pretrace_of_trace trace in 
+     let error,log_info,blackboard = S.PH.B.import parameter handler error log_info event_list in 
+     let error,list = S.PH.forced_events parameter handler error blackboard in     
+     let list_order = 
+       match list 
+       with 
+       | (list_order,_,_)::_ -> list_order
+       | _ -> []
+     in 
+     let error,log_info,blackboard,output,list = 
+       S.compress parameter handler error log_info blackboard list_order 
+     in
+     let list =
+       List.rev_map
+	 (fun pretrace ->
+	  let event_list = S.translate_result pretrace in 
+	  let event_list = S.PH.B.PB.CI.Po.K.clean_events event_list in 
+	  (build_compressed_trace event_list pretrace))
+	 list
+     in 
+     let log_info = P.set_story_research_time log_info in 
+     let error,log_info = P.close_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error event (Some  (fun () -> size_of_pretrace trace)) log_info in 
+  
+     let error = 
+       if debug_mode
+       then 
+	 let _ =  Debug.tag parameter.S.PH.B.PB.CI.Po.K.H.out_channel_err "\t\t * result"  in
+	 let _ =
+	   if S.PH.B.is_failed output 
+           then 
+             let _ = Format.fprintf parameter.S.PH.B.PB.CI.Po.K.H.out_channel_err "Fail_to_compress" in  error
+	   else 
+	     let _ = Format.fprintf parameter.S.PH.B.PB.CI.Po.K.H.out_channel_err "Succeed_to_compress" in 
+	     error
+	 in 
+			       error 
+       else 
+	 error
+     in error,log_info,list
+			 
 let set_compression_mode p x =
   match
     x
@@ -555,14 +567,16 @@ let fold_left_with_progress_bar
       handler profiling_information error (string:string) (f:('a,'b,'a) binary) a list =
   let n = List.length list in
   let progress_bar = Mods.tick_stories (S.PH.B.PB.CI.Po.K.H.get_logger parameter) n (false,0,0) in
-  let error,profiling_information,_,a,n_fail =
-    let rec aux list (error,profiling_information,bar,a,n_fail) =
+  let error,profiling_information,_,_,a,n_fail =
+    let rec aux list (error,profiling_information,bar,k,a,n_fail) =
+      let event = StoryProfiling.Story k in 
       match
 	list
       with
-      | [] -> error,profiling_information,bar,a,n_fail
+      | [] -> error,profiling_information,bar,k,a,n_fail
       | x::tail -> 
-	 let output_opt  =
+	 let profiling_information = P.add_event event None profiling_information in
+ 	 let output_opt  =
 	   try 
 	     let error,profiling_information,a' =
 	       f
@@ -575,16 +589,19 @@ let fold_left_with_progress_bar
 	     in
 	     let bar = Mods.tick_stories (S.PH.B.PB.CI.Po.K.H.get_logger parameter) n bar in
 	     let n_fail = inc_fails a a' n_fail in
-	     Some (error,profiling_information,bar,a',n_fail) 
+	     let error,profiling_information = P.close_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error event None profiling_information in 
+	     Some (error,profiling_information,bar,k+1,a',n_fail) 
 	   with ExceptionDefn.UserInterrupted _  -> None
 	 in
 	 match output_opt
 	 with
-	   None -> (error,profiling_information,bar,a,n_fail)
+	   None ->
+	   let error,profiling_information = P.close_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error event None profiling_information in 
+	   (error,profiling_information,bar,k+1,a,n_fail)
 	 | Some remanent -> 
 	    aux tail remanent	 
     in
-    aux list (error,profiling_information,progress_bar,a,0)
+    aux list (error,profiling_information,progress_bar,1,a,0)
   in  
   let () = close_progress_bar_opt (Some (S.PH.B.PB.CI.Po.K.H.get_logger parameter)) in 
   let () = print_fails parameter.S.PH.B.PB.CI.Po.K.H.out_channel_err string n_fail in 

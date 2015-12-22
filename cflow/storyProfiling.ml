@@ -42,6 +42,29 @@ type step_kind =
 	 | Graph_reduction 
 	 | Cannonic_form_computation
 
+let print_step_kind logger x =
+  match
+    x
+    with
+    | Beginning -> ()  
+    | Collect_traces -> Format.fprintf logger "Collect traces\t" 
+    | Causal_compression -> Format.fprintf logger "Causal compression\t"
+    | Weak_compression -> Format.fprintf logger "Weak compression\t" 
+    | Strong_compression -> Format.fprintf logger "Strong compression\t"
+    | Iteration int -> Format.fprintf logger "Iteration %i\t" int
+    | Story int -> Format.fprintf logger "Story %i\t" int 
+    | Partial_order_reduction -> Format.fprintf logger "Partial order reduction\t" 
+    | Siphon_detection -> Format.fprintf logger "Detection of siphons\t" 
+    | Decompose_initial_state -> Format.fprintf logger "Splitting initial states\t" 
+    | Agent_ids_disambiguation -> Format.fprintf logger "Renaming agents to avoid conflicts\t" 
+    | Pseudo_inverse_deletion -> Format.fprintf logger "Deletion of pseudo inverse events\t" 
+    | Remove_events_after_last_observable -> Format.fprintf logger "Removing events after the last observables\t"
+    | Compression -> Format.fprintf logger "Compression\t" 
+    | Transitive_closure -> Format.fprintf logger "Transitive closure\t" 
+    | Graph_reduction -> Format.fprintf logger "Transitive reduction\t" 
+    | Cannonic_form_computation -> Format.fprintf logger "Computing the cannonic form\t" 
+
+						  
 module type StoryStats = 
   sig 
     type log_info 
@@ -84,8 +107,9 @@ module type StoryStats =
     val ellapsed_global_time: log_info -> float
     val ellapsed_time: log_info -> float
     val init_log_info: unit -> log_info 
-    val tick: log_info -> bool * log_info 
-
+    val tick: log_info -> bool * log_info
+    val close_logger: Remanent_parameters_sig.parameters -> unit
+    val flush_logger: Remanent_parameters_sig.parameters -> unit
   end
 
 module StoryStats =
@@ -107,7 +131,27 @@ module StoryStats =
 	   time: float;
 	   depth: int
 	 }
-	   
+
+       let print_task logger (a,b) =
+	 let _ =
+	   List.iter
+	     (print_step_kind logger)
+	     b
+	 in
+	 let _ = print_step_kind logger a.tag in
+	 let _ =
+	   match
+	     a.size
+	   with
+	     None -> let () = Format.fprintf logger "%f\n@." a.time in ()
+	   | Some ((i:int),(j:int)) -> let () = Format.fprintf logger "%f\t%i\t%i\n@." a.time i j in () 
+	 in ()
+
+       let close_logger parameter  =
+	 close_out (Remanent_parameters.get_profiling_info_channel parameter)
+       let flush_logger parameter =
+	 flush (Remanent_parameters.get_profiling_info_channel parameter)
+		      
        type log_info = 
            {
 	     global_time: float;
@@ -170,13 +214,18 @@ module StoryStats =
 		  time = time
 		}
 	      in
+	      let terminated_task =
+		(task,List.rev_map (fun x -> x.tag) (List.rev tail))
+	      in
+	      let _ = print_task (Remanent_parameters.get_profiling_info_logger parameter) terminated_task in 
+	      let _ = flush_logger  parameter in 
 	      error,
 	      {
 		log_info 
 	      with
 		next_depth = next_depth - 1;
 		current_tasks = tail ;
-		terminated_tasks = (task,List.rev_map (fun x -> x.tag) (List.rev tail))::log_info.terminated_tasks
+		terminated_tasks = terminated_task::log_info.terminated_tasks
 	      }
 	    end
 	      

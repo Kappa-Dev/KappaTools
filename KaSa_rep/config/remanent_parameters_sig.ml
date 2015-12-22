@@ -111,7 +111,9 @@ type marshalisable_parameters =
 type parameters = 
   {
     log : out_channel ;
-    formatter : Format.formatter ; 
+    formatter : Format.formatter ;
+    profiling_info_formatter: Format.formatter ;
+    profiling_info_channel: out_channel ;
     marshalisable_parameters : marshalisable_parameters  
   }
 

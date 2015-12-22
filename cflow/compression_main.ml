@@ -379,6 +379,7 @@ let compress_and_print logger env log_info step_list =
     else
       error,log_info
   in
+  let _ = StoryProfiling.StoryStats.close_logger (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) in 
   let _ =
     Exception.print_for_KaSim (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error
   in
