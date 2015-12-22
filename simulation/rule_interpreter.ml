@@ -9,7 +9,7 @@ type t = {
   tokens: Nbr.t array;
   outdated_elements:
     Operator.DepSet.t *
-    (int * ((Connected_component.Set.t *int) * Edges.path) list) list * bool;
+    (Edges.agent * ((Connected_component.Set.t *int) * Edges.path) list) list * bool;
   story_machinery :
     ((Causal.event_kind * Connected_component.t array *
 	Instantiation.abstract Instantiation.test list) list
@@ -69,11 +69,11 @@ let remove_candidate cands pathes rule_id x y =
 
 let from_place (inj_nodes,inj_fresh) = function
   | Agent_place.Existing (n,id) ->
-     (Connected_component.ContentAgent.get_sort n,
-      Connected_component.Matching.get (n,id) inj_nodes)
+     (Connected_component.Matching.get (n,id) inj_nodes,
+     Connected_component.ContentAgent.get_sort n)
   | Agent_place.Fresh (ty,id) ->
      match Mods.IntMap.find_option id inj_fresh with
-     | Some x -> (ty,x)
+     | Some x -> (x,ty)
      | None -> failwith "Rule_interpreter.from_place"
 
 let new_place free_id (inj_nodes,inj_fresh) = function
@@ -112,36 +112,38 @@ let deal_transformation is_add domain to_explore_unaries inj2graph edges roots t
 NB inj should not change if [is_add] is false*)
     match transf with
     | Primitives.Transformation.Agent n ->
-       let ty, id, inj2graph',edges' =
+       let nc, inj2graph',edges' =
 	 if is_add then
 	   let ty = Agent_place.get_type n in
 	   let id,edges' = Edges.add_agent ty edges in
-	   ty,id,new_place id inj2graph n,edges'
+	   (id,ty),new_place id inj2graph n,edges'
 	 else
-	   let ty, id = from_place inj2graph n in (*(A,23,phi)*)
-	   ty, id, inj2graph,Edges.remove_agent ty id edges in
+	   let nc = from_place inj2graph n in (*(A,23,phi)*)
+	   nc, inj2graph,Edges.remove_agent nc edges in
        let new_obs =
 	 Connected_component.Matching.observables_from_agent
-	   domain (if is_add then edges' else edges) ty id in (*this hack should disappear when chekcing O\H only*)
+	   domain (if is_add then edges' else edges) nc in
+       (*this hack should disappear when chekcing O\H only*)
        (inj2graph',edges',new_obs)
     | Primitives.Transformation.Freed (n,s) -> (*(n,s)-bottom*)
-       let ty, id = from_place inj2graph n in (*(A,23,phi)*)
+       let (id,_ as nc) = from_place inj2graph n in (*(A,23,phi)*)
        let edges' =
 	 if is_add then Edges.add_free id s edges
 	 else Edges.remove_free id s edges in
        let new_obs =
 	 Connected_component.Matching.observables_from_free
-	   domain (if is_add then edges' else edges) ty id s in (*this hack should disappear when chekcing O\H only*)
+	   domain (if is_add then edges' else edges) nc s in
+       (*this hack should disappear when chekcing O\H only*)
        (inj2graph,edges',new_obs)
     | Primitives.Transformation.Linked ((n,s),(n',s')) ->
-       let ty, id = from_place inj2graph n in
-       let ty', id' = from_place inj2graph n' in
+       let (id,_ as nc) = from_place inj2graph n in
+       let (id',_ as nc') = from_place inj2graph n' in
        let edges' =
-	 if is_add then Edges.add_link ty id s ty' id' s' edges
+	 if is_add then Edges.add_link nc s nc' s' edges
 	 else Edges.remove_link id s id' s' edges in
        let new_obs =
 	 Connected_component.Matching.observables_from_link
-	   domain (if is_add then edges' else edges) ty id s ty' id' s' in
+	   domain (if is_add then edges' else edges) nc s nc' s' in
        (inj2graph,edges',new_obs)
     | Primitives.Transformation.PositiveInternalized (n,s,i) ->
        if not is_add then
@@ -149,11 +151,11 @@ NB inj should not change if [is_add] is false*)
 	   (ExceptionDefn.Internal_Error
 	      (Location.dummy_annot "PositiveInternalized in negative update"))
        else
-	 let ty, id = from_place inj2graph n in
+	 let (id,_ as nc) = from_place inj2graph n in
 	 let edges' = Edges.add_internal id s i edges in
 	 let new_obs =
 	   Connected_component.Matching.observables_from_internal
-	     domain edges' ty id s i in
+	     domain edges' nc s i in
 	 (inj2graph,edges',new_obs)
     | Primitives.Transformation.NegativeInternalized (n,s) ->
        if is_add then
@@ -161,16 +163,16 @@ NB inj should not change if [is_add] is false*)
 	   (ExceptionDefn.Internal_Error
 	      (Location.dummy_annot "NegativeInternalized in positive update"))
        else
-	 let ty, id = from_place inj2graph n in
+	 let (id,_ as nc) = from_place inj2graph n in
 	 let edges',i = Edges.remove_internal id s edges in
 	 let new_obs =
 	   Connected_component.Matching.observables_from_internal
-	     domain edges ty id s i in
+	     domain edges nc s i in
 	 (inj2graph,edges',new_obs)
   in
   let roots' =
     List.fold_left
-      (fun r' (cc,root) ->
+      (fun r' (cc,(root,_)) ->
        (* let () = *)
        (* 	 Format.eprintf *)
        (* 	   "@[add:%b %a in %i@]@." is_add *)
@@ -188,21 +190,52 @@ NB inj should not change if [is_add] is false*)
 	 if Agent_place.same_connected_component n n'
 	 then to_explore_unaries
 	 else
-	   let _, id = from_place inj n in
-	   id::to_explore_unaries in
+	   let nc = from_place inj n in
+	   nc::to_explore_unaries in
   ((inj,graph,to_explore',roots',deps),obs)
 
-let store_event
-      counter inj2graph new_tracked_obs_instances event_kind rule = function
+let add_path_to_tests path tests =
+  let path_agents,path_tests =
+    List.fold_left
+      (fun (ag,te) (((id,_ as a),_),((id',_ as a'),_)) ->
+       let ag',te' =
+	 if Mods.IntSet.mem id ag then ag,te
+	 else Mods.IntSet.add id ag,Instantiation.Is_Here a::te in
+       if Mods.IntSet.mem id' ag' then ag',te'
+       else Mods.IntSet.add id' ag',Instantiation.Is_Here a'::te')
+      (Mods.IntSet.empty,[]) path in
+  let tests' =
+    List.filter (function
+		  | Instantiation.Is_Here (id, _) ->
+		     not @@ Mods.IntSet.mem id path_agents
+		  | Instantiation.Is_Bound_to (a,b) ->
+		     List.for_all (fun (x,y) -> x <> a && x <> b && y<>a && y<>b) path
+		  | (Instantiation.Has_Internal _ | Instantiation.Is_Free _
+		     | Instantiation.Is_Bound _
+		     | Instantiation.Has_Binding_type _) -> true)
+		tests in
+  List.rev_append
+    path_tests
+    (Tools.list_rev_map_append
+       (fun (x,y) -> Instantiation.Is_Bound_to (x,y)) path tests')
+
+let store_event counter inj2graph new_tracked_obs_instances event_kind
+		?path rule = function
   | None as x -> x
   | Some (x,(info,steps)) ->
      let concrete_event =
        Instantiation.concretize_event
-	 (fun p -> let (_,x) = from_place inj2graph p in x)
+	 (fun p -> let (x,_) = from_place inj2graph p in x)
 	 rule.Primitives.instantiations in
+     let full_concrete_event =
+       match path with
+       | None -> concrete_event
+       | Some path ->
+	  let tests,actions = concrete_event in
+	  add_path_to_tests path tests,actions in
      let infos',steps' =
        Compression_main.secret_store_event
-	 info (event_kind,concrete_event) steps in
+	 info (event_kind,full_concrete_event) steps in
      let infos'',steps'' =
        List.fold_left
 	 (fun (infos,steps) (ev,obs_tests) ->
@@ -220,7 +253,7 @@ let store_obs edges roots obs acc = function
   | None -> acc
   | Some (tracked,_) ->
      List.fold_left
-       (fun acc (cc,root) ->
+       (fun acc (cc,(root,_)) ->
 	try
 	  List.fold_left
 	    (fun acc (ev,ccs,tests) ->
@@ -229,7 +262,7 @@ let store_obs edges roots obs acc = function
 		let tests' =
 		  List.map (Instantiation.concretize_test
 			      (fun p ->
-			       let (_,x) =
+			       let (x,_) =
 				 from_place (inj,Mods.IntMap.empty) p in x))
 			   tests in
 		(ev,tests') :: acc)
@@ -255,7 +288,7 @@ let potential_root_of_unary_ccs unary_ccs roots i =
       unary_ccs in
   if Connected_component.Set.is_empty ccs then None else Some ccs
 
-let update_edges counter domain unary_ccs inj_nodes state event_kind rule =
+let update_edges counter domain unary_ccs inj_nodes state event_kind ?path rule=
   let former_deps,unary_cands,no_unary = state.outdated_elements in
   (*Negative update*)
   let aux =
@@ -290,25 +323,25 @@ let update_edges counter domain unary_ccs inj_nodes state event_kind rule =
 	  (List.fold_left
 	     (fun (unary_cands,_ as acc) (cc,root) ->
 	      if Connected_component.Set.mem cc unary_ccs then
-		(root,[(Connected_component.Set.singleton cc,root),
+		(root,[(Connected_component.Set.singleton cc,fst root),
 		       Edges.empty_path])::unary_cands,false
 	      else acc)) (unary_cands,no_unary) all_new_obs in
       if exists_root_of_unary_ccs unary_ccs roots'
       then
 	List.fold_left
-	  (fun (unary_cands,_ as acc) id ->
+	  (fun (unary_cands,_ as acc) (id,ty) ->
 	   match
 	     Edges.pathes_of_interrest
 	       (potential_root_of_unary_ccs unary_ccs roots')
-	       state.edges id Edges.empty_path with
+	       state.edges ty id Edges.empty_path with
 	   | [] -> acc
-	   | l -> (id,l) :: unary_cands,false) unary_pack unaries_to_explore
+	   | l -> ((id,ty),l) :: unary_cands,false) unary_pack unaries_to_explore
       else unary_pack in
   (*Store event*)
   let story_machinery' =
     store_event
-      counter final_inj2graph new_tracked_obs_instances event_kind rule
-      state.story_machinery in
+      counter final_inj2graph new_tracked_obs_instances event_kind
+      ?path rule state.story_machinery in
 
   { roots_of_ccs = roots'; unary_candidates = state.unary_candidates;
     unary_pathes = state.unary_pathes; edges = edges';
@@ -346,7 +379,7 @@ let extra_outdated_var i state =
 let new_unary_instances rule_id cc1 cc2 created_obs state =
   let (unary_candidates,unary_pathes) =
     List.fold_left
-      (fun acc (restart,l) ->
+      (fun acc ((restart,restart_ty),l) ->
        List.fold_left
 	 (fun acc ((ccs,id),path) ->
 	  let path = Edges.rev_path path in
@@ -375,7 +408,7 @@ let new_unary_instances rule_id cc1 cc2 created_obs state =
 		 acc
 		 (Edges.pathes_of_interrest
 		    (fun x -> if Mods.IntSet.mem x goals then Some () else None)
-		    state.edges restart path)
+		    state.edges restart_ty restart path)
 	     with Not_found -> acc)
 	    ccs acc) acc l)
       (state.unary_candidates,state.unary_pathes) created_obs in
@@ -450,12 +483,12 @@ let update_tokens ~get_alg env counter state consumed injected =
   let state' = do_op Nbr.sub state consumed in do_op Nbr.add state' injected
 
 let transform_by_a_rule
-      ~get_alg env domain unary_ccs counter state event_kind rule inj =
+      ~get_alg env domain unary_ccs counter state event_kind ?path rule inj =
   let state' =
     update_tokens
       ~get_alg env counter state rule.Primitives.consumed_tokens
       rule.Primitives.injected_tokens in
-  update_edges counter domain unary_ccs inj state' event_kind rule
+  update_edges counter domain unary_ccs inj state' event_kind ?path rule
 
 let apply_unary_rule
       ~rule_id ~get_alg env domain unary_ccs counter state event_kind rule =
@@ -487,10 +520,12 @@ let apply_unary_rule
 			       Mods.IntSet.empty cc1 state.roots_of_ccs) &&
       Mods.IntSet.mem root2 (Connected_component.Map.find_default
 			       Mods.IntSet.empty cc2 state.roots_of_ccs) in
-  match Edges.are_connected ~candidate state.edges root1 root2 with
+  let root1_ty = match Connected_component.find_root_type cc1 with
+    | None -> assert false | Some x -> x in
+  match Edges.are_connected ~candidate state.edges root1_ty root1 root2 with
   | None -> Corrected state'
   | Some _ when missing_ccs -> Corrected state'
-  | Some _path' ->
+  | Some _ as path ->
      let inj1 =
        Connected_component.Matching.reconstruct
 	 state'.edges Connected_component.Matching.empty 0 cc1 root1 in
@@ -503,8 +538,8 @@ let apply_unary_rule
      | None -> Clash
      | Some inj ->
 	Success
-	  (transform_by_a_rule
-	     ~get_alg env domain unary_ccs counter state' event_kind rule inj)
+	  (transform_by_a_rule ~get_alg env domain unary_ccs counter state'
+			       event_kind ?path rule inj)
 
 let apply_rule
       ?rule_id ~get_alg env domain unary_ccs counter state event_kind rule =
@@ -539,8 +574,12 @@ let apply_rule
 	    match Mods.Int2Map.find_option point state.unary_pathes with
 	    | Some x -> x
 	    | None -> raise Not_found in
+	  let root0_ty =
+	    match Connected_component.find_root_type
+		    rule.Primitives.connected_components.(0) with
+	    | None -> assert false | Some x -> x in
 	  match
-	    Edges.are_connected ~candidate state.edges roots.(0) roots.(1) with
+	    Edges.are_connected ~candidate state.edges root0_ty roots.(0) roots.(1) with
 	  | None ->
 	     let rid =
 	       match rule_id with None -> assert false | Some rid -> rid in

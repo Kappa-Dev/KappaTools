@@ -15,6 +15,9 @@ module Edge = struct
   let dummy_link = Link (-1,-1,-1)
 end
 
+type agent = int * int
+(** agent_id * agent_type *)
+
 type t = Edge.t Int2Map.t * int Int2Map.t * IntSet.t IntMap.t * (int * int list)
 (** agent,site -> binding_state; agent,site -> internal_state; sort -> agents;
 free_id *)
@@ -41,7 +44,7 @@ let add_free ag s (connect,state,sort,free_id) =
 let add_internal ag s i (connect,state,sort,free_id) =
   (connect,Int2Map.add (ag,s) i state,sort,free_id)
 
-let add_link ty ag s ty' ag' s' (connect,state,sort,free_id) =
+let add_link (ag,ty) s (ag',ty') s' (connect,state,sort,free_id) =
   (Int2Map.add (ag,s) (Edge.Link (ty',ag',s'))
 	       (Int2Map.add (ag',s') (Edge.Link (ty,ag,s)) connect),
    state,sort,free_id)
@@ -50,7 +53,7 @@ let remove ag s (connect,state,sort,free_id) = function
   | Edge.ToFree -> (Int2Map.remove (ag,s) connect,state,sort,free_id)
   | Edge.Link (_,ag',s') ->
      (Int2Map.remove (ag,s) (Int2Map.remove (ag',s') connect),state,sort,free_id)
-let remove_agent ty ag (connect,state,sort,(new_id,ids)) =
+let remove_agent (ag,ty) (connect,state,sort,(new_id,ids)) =
   (connect,state,
    IntMap.add ty (IntSet.remove ag (IntMap.find_default IntSet.empty ty sort)) sort,
   (new_id,ag::ids))
@@ -63,7 +66,7 @@ let remove_internal ag s (connect,state,sort,free_id) =
 		 " has no internal state to remove in the current graph.")
 let remove_link ag s ag' s' t = remove ag s t (Edge.Link (-1,ag',s'))
 
-let is_agent ty ag (_,_,s,_) =
+let is_agent (ag,ty) (_,_,s,_) =
   IntSet.mem ag (IntMap.find_default IntSet.empty ty s)
 let is_free ag s (t,_,_,_) =
   match Int2Map.find_default Edge.dummy_link (ag,s) t with
@@ -196,35 +199,37 @@ let debug_print f (links,ints,sorts,_) =
 	   fun f -> Format.fprintf f "->%i:%i.%i" ag' ty' s'))
     f links
 
-type path = (int * int * int * int) list
+type path = ((agent * int) * (agent * int)) list
+(** ((agent_id, agent_name),site_name) *)
+
 let rec print_path ?sigs ?graph f = function
   | [] -> Pp.empty_set f
-  | [p,s,s',p'] -> Format.fprintf f "%i.%i@,-%i.%i" p s s' p'
-  | (p,s,s',p')::((p'',_,_,_)::_ as l) ->
+  | [((p,_),s),((p',_),s')] -> Format.fprintf f "%i.%i@,-%i.%i" p s s' p'
+  | (((p,_),s),((p',_),s'))::((((p'',_),_),_)::_ as l) ->
      Format.fprintf f "%i.%i@,-%i.%t%a" p s s'
 		    (fun f -> if p' <> p'' then Format.fprintf f "%i##" p')
 		    (print_path ?sigs ?graph) l
 let empty_path = []
-let rev_path l = List.rev_map (fun (a,s,s',a') -> (a',s',s,a)) l
+let rev_path l = List.rev_map (fun (x,y) -> (y,x)) l
 let is_valid_path graph l =
-  List.for_all (fun (a,s,s',a') -> link_exists a s a' s' graph) l
+  List.for_all (fun (((a,_),s),((a',_),s')) -> link_exists a s a' s' graph) l
 
 let breath_first_traversal stop_on_find is_interresting links =
-  let rec look_each_site (id,path as x) site (stop,don,out,next as acc) =
+  let rec look_each_site (id,ty,path as x) site (stop,don,out,next as acc) =
     match Int2Map.pop (id,site) links with
     | None,_ -> acc
     | Some Edge.ToFree,_ -> look_each_site x (succ site) acc
-    | Some (Edge.Link (_,id',site')),_ ->
+    | Some (Edge.Link (ty',id',site')),_ ->
        if (stop&&stop_on_find) then acc
        else if IntSet.mem id' don then look_each_site x (succ site) acc
        else
 	 let don' = IntSet.add id' don in
-	 let path' = (id',site',site,id)::path in
+	 let path' = (((id',ty'),site'),((id,ty),site))::path in
 	 let out',store =
 	   match is_interresting id' with
 	   | Some x -> ((x,id'),path')::out,true
 	   | None -> out,false in
-	 let next' = (id',path')::next in
+	 let next' = (id',ty',path')::next in
 	 look_each_site x (succ site) (stop||store,don',out',next') in
   let rec aux don out next = function
     | x::todos ->
@@ -233,22 +238,23 @@ let breath_first_traversal stop_on_find is_interresting links =
     | [] -> match next with [] -> out | _ -> aux don out [] next in
   aux
 
-let pathes_of_interrest is_interresting (links,_,_,_) start_point done_path =
-  let don = List.fold_left (fun s (_,_,_,x) -> IntSet.add x s)
+let pathes_of_interrest
+      is_interresting (links,_,_,_) start_ty start_point done_path =
+  let don = List.fold_left (fun s (_,((x,_),_)) -> IntSet.add x s)
 			   (IntSet.singleton start_point) done_path in
   let acc = match is_interresting start_point with
     | None -> []
     | Some x -> [(x,start_point),done_path] in
   breath_first_traversal
-    false is_interresting links don acc [] [start_point,done_path]
+    false is_interresting links don acc [] [start_point,start_ty,done_path]
 
-let are_connected ?candidate (links,_,_,_ as graph) x y =
+let are_connected ?candidate (links,_,_,_ as graph) ty_x x y =
   match candidate with
   | Some p when is_valid_path graph p -> Some p
   | (Some _ | None) ->
      match breath_first_traversal
 	     true (fun z -> if z = y then Some () else None)
-	     links (IntSet.singleton x) [] [] [x,[]] with
+	     links (IntSet.singleton x) [] [] [x,ty_x,[]] with
      | [] -> None
      | [ _,p ] -> Some p
      | _ :: _ -> failwith "Edges.are_they_connected completely broken"

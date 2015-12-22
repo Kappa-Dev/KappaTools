@@ -2,7 +2,7 @@
 
 type id_upto_alpha =
     Existing of int
-  | Fresh of int * int (* type, id *)
+  | Fresh of Edges.agent
 
 type port = id_upto_alpha * int
 

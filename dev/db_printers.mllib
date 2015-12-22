@@ -1,7 +1,6 @@
 Cache
 Color
 SafeHeap
-ValMap
 Heap
 DynamicArray
 LargeArray
@@ -20,6 +19,7 @@ Parameter
 Kappa_files
 Nbr
 Operator
+ExceptionDefn_with_no_dep
 ExceptionDefn
 Counter
 
@@ -81,6 +81,7 @@ Compression_main
 
 Raw_mixture
 Edges
+Navigation
 Connected_component
 Snip
 Edges

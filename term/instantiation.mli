@@ -8,7 +8,7 @@ type internal_state  = int
 type binding_type = agent_name * site_name
 
 type abstract = Agent_place.t
-type concrete = int (*agent_id*) * agent_name
+type concrete = Edges.agent
 
 type 'a site = 'a * site_name
 
