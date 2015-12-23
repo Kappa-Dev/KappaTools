@@ -35,7 +35,7 @@ type trace =
     pretrace: step list ; 
     with_potential_ambiguity: bool 
   }
-type trace_runtime_info = profiling_info Mods.simulation_info list
+type trace_runtime_info = profiling_info Mods.simulation_info
 
 				 					 
 type do_we_log = (parameter -> bool)			
@@ -400,8 +400,8 @@ let inc_fails a a' b =
   then succ b
   else b 
     
-let fold_story_table_gen logger parameter ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall) handler profiling_info error s
-			 (f:(trace, trace_runtime_info, 'a, 'a) ternary) l a =
+let fold_story_table_gen logger parameter ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall) (handler:kappa_handler) (profiling_info:profiling_info) error s
+			 (f:((trace, trace_runtime_info list, 'a, 'a) ternary)) l a =
   let n_stories_input = count_stories l in 
   let progress_bar = 
     match logger
@@ -409,7 +409,7 @@ let fold_story_table_gen logger parameter ?(shall_we_compute=we_shall) ?(shall_w
        | Some logger -> 
 	  Some (logger,n_stories_input,Mods.tick_stories logger n_stories_input (false,0,0))
   in
-  let g parameter (handler:kappa_handler) profiling_info error story (info:trace_runtime_info) (k,progress_bar,a,n_fails) =
+  let g parameter handler profiling_info error story info (k,progress_bar,a,n_fails) =
     let event = StoryProfiling.Story k in 
     let profiling_info = P.add_event event None profiling_info in
     let error,profiling_info,a' = f parameter ~shall_we_compute:shall_we_compute ~shall_we_compute_profiling_information:shall_we_compute_profiling_information handler profiling_info error (trace_of_pretrace_with_ambiguity false story) info a in
@@ -423,7 +423,7 @@ let fold_story_table_gen logger parameter ?(shall_we_compute=we_shall) ?(shall_w
   let () = print_fails parameter.S.PH.B.PB.CI.Po.K.H.out_channel_err s n_fails in 
   error,(profiling_info:profiling_info),a 
 
-let fold_story_table_with_progress_bar (parameter:parameter) ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall) (handler:kappa_handler) profiling_info error s
+let fold_story_table_with_progress_bar parameter ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall) (handler:kappa_handler) profiling_info error s
 				        f l a =
   fold_story_table_gen
     (Some (S.PH.B.PB.CI.Po.K.H.get_logger parameter))
@@ -479,7 +479,6 @@ let always = (fun _ -> true)
 
 
 let compress parameter ?(shall_we_compute=always) ?(shall_we_compute_profiling_information=we_shall) handler log_info error trace =
-  let logger = S.PH.B.PB.CI.Po.K.H.get_logger parameter in 
   match
     parameter.S.PH.B.PB.CI.Po.K.H.current_compression_mode
   with

@@ -31,6 +31,9 @@ type kappa_handler = S.PH.B.PB.CI.Po.K.H.handler
 type profiling_info = StoryProfiling.StoryStats.log_info
 
 type shall_we = (parameter -> bool)			
+
+(** enriched types for functions: *)
+
 type 'a with_handlers =
   parameter -> ?shall_we_compute:shall_we -> ?shall_we_compute_profiling_information:shall_we -> kappa_handler -> profiling_info -> error_log -> 'a 
 type 'a zeroary =
@@ -50,9 +53,12 @@ val fold_left_with_progress_bar: (string,('a,'b,'a) binary,'a,'b list,'a) quater
 
 (** traces *)
 type trace
-type trace_runtime_info = profiling_info Mods.simulation_info list
+
+(** Runtime information about a trace provided by the simulator*)
+type trace_runtime_info = profiling_info Mods.simulation_info
 
 val size_of_pretrace: trace -> int
+
 val print_trace: parameter -> kappa_handler -> trace -> unit
 
 (** check wether there is an observable in a trace *)
@@ -83,39 +89,54 @@ val remove_pseudo_inverse_events: (trace,trace) unary
 (** reallocate agent id to avoid conflict (implicitly called by cut and fill_siphon) *)
 val make_unambiguous: (trace,trace) unary 
 
-
+(** compute the weak compression of a given trace, 
+    if parameter.compute_all_stories, then each minimal stories is computed, 
+    otherwise, only the first found one is provided *)
 val weakly_compress: (trace,trace list) unary 
+
+(** compute the strong compression of a given trace, 
+    if parameter.compute_all_stories, then each minimal stories is computed, 
+    otherwise, only the first found one is provided *)
 val strongly_compress: (trace,trace list) unary 
 
+(** fold over the causal past of each observable in a given trace, 
+    the first argument indicates whether we display the current steps on the err output;
+    the second arfument indicated whether the function is launched in debug mode or not *)
+val fold_over_the_causal_past_of_observables_with_a_progress_bar:
+  (shall_we,shall_we,(trace,trace_runtime_info list,'a,'a) ternary,trace,'a,'a) quinternary
+					  
 (** Story table *)
 type story_table
-       
+
+(** Initialization *)
 val create_story_table:
   story_table zeroary
 	      
-val get_counter: story_table -> int
+(** Give the number of stories (up to isomorphism classes) stored in a table *)
 val count_stories: story_table -> int
 
 (** Store trace in story table *)
-val store_trace: (trace,trace_runtime_info,story_table,story_table) ternary
+val store_trace: (trace,trace_runtime_info list,story_table,story_table) ternary
 									  
-val fold_over_the_causal_past_of_observables_with_a_progress_bar:
-  (shall_we,shall_we,(trace,trace_runtime_info,'a,'a) ternary,trace,'a,'a) quinternary
-       							   
-val fold_story_table_with_progress_bar:
-  (string,(trace,trace_runtime_info,'a,'a) ternary,story_table,'a,'a) quaternary 
 
+(** Apply a function on each trace (and each list of runtime information associated to this trace), 
+the string contains the message to display in case of faillure of one call of the ternary function*)      							   
+val fold_story_table_with_progress_bar:
+  (string,(trace,trace_runtime_info list,'a,'a) ternary,story_table,'a,'a) quaternary 
+
+(** Apply a function on each trace (and each list of runtime information associated to this trace), 
+the string contains the message to display in case of faillure of one call of the ternary function*)   
 val fold_story_table_without_progress_bar:
-  (string,(trace,trace_runtime_info,'a,'a) ternary,story_table,'a,'a) quaternary 
+  (string,(trace,trace_runtime_info list,'a,'a) ternary,story_table,'a,'a) quaternary 
 
 (** put together the stories having the same canonic form, this has do be done explicitely on the moment, I will improve this soon*)
 val flatten_story_table: (story_table,story_table) unary
-			    
-val export_story_table: (story_table,(Causal.grid*trace_runtime_info) list) unary  
+
+(** convert a table into a list of grid (with runtime information)*)
+val export_story_table: (story_table,(Causal.grid*trace_runtime_info list) list) unary  
 							   
 
-(** causal flows *)			  
-
+(** The following functions are for expert only *)										 
 (** compress a trace with the level of abstraction defined in the argument parameter *)
 val compress: (trace,trace list) unary
 
@@ -168,6 +189,6 @@ val print_musical_grid:
 
 
 
-
+val get_counter: story_table -> int (* to be removed from the interface*)
 	 
 
