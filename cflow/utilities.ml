@@ -109,7 +109,7 @@ let transform_trace_gen f log_message debug_message profiling_event =
   (fun parameters ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall) kappa_handler profiling_info error trace ->
    if shall_we_compute parameters
    then 
-     let profiling_info = StoryProfiling.StoryStats.add_event profiling_event (Some (fun () -> size_of_pretrace trace)) profiling_info in 
+     let error, profiling_info = StoryProfiling.StoryStats.add_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameters) error profiling_event (Some (fun () -> size_of_pretrace trace)) profiling_info in 
      let bool =
        if
 	 S.PH.B.PB.CI.Po.K.H.get_log_step parameters
@@ -411,7 +411,7 @@ let fold_story_table_gen logger parameter ?(shall_we_compute=we_shall) ?(shall_w
   in
   let g parameter handler profiling_info error story info (k,progress_bar,a,n_fails) =
     let event = StoryProfiling.Story k in 
-    let profiling_info = P.add_event event None profiling_info in
+    let error, profiling_info = P.add_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error event None profiling_info in
     let error,profiling_info,a' = f parameter ~shall_we_compute:shall_we_compute ~shall_we_compute_profiling_information:shall_we_compute_profiling_information handler profiling_info error (trace_of_pretrace_with_ambiguity false story) info a in
     let progress_bar = tick_opt progress_bar in
     let n_fails = inc_fails a a' n_fails in 
@@ -492,7 +492,7 @@ let compress parameter ?(shall_we_compute=always) ?(shall_we_compute_profiling_i
        with Some Parameter.Weak -> StoryProfiling.Weak_compression
 	  | _ -> StoryProfiling.Strong_compression
      in
-     let log_info = P.add_event event (Some (fun () -> size_of_pretrace trace)) log_info in 
+     let error, log_info = P.add_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error event (Some (fun () -> size_of_pretrace trace)) log_info in 
     let event_list = get_pretrace_of_trace trace in 
      let error,log_info,blackboard = S.PH.B.import parameter handler log_info error event_list in 
      let error,log_info,list = S.PH.forced_events parameter handler log_info error blackboard in     
@@ -579,7 +579,7 @@ let fold_left_with_progress_bar
       with
       | [] -> error,profiling_information,bar,k,a,n_fail
       | x::tail -> 
-	 let profiling_information = P.add_event event None profiling_information in
+	 let error, profiling_information = P.add_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error event None profiling_information in
  	 let output_opt  =
 	   try 
 	     let error,profiling_information,a' =

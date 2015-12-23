@@ -91,7 +91,7 @@ module type StoryStats =
 
     val copy: log_info -> log_info 
 
-    val add_event: step_kind -> (unit -> int) option -> log_info -> log_info 
+    val add_event: Remanent_parameters_sig.parameters -> Exception.method_handler -> step_kind -> (unit -> int) option -> log_info -> Exception.method_handler * log_info 
     val close_event: Remanent_parameters_sig.parameters -> Exception.method_handler -> step_kind -> (unit -> int) option -> log_info -> Exception.method_handler * log_info
 									  
     val set_time: log_info -> log_info 
@@ -124,42 +124,77 @@ module StoryStats =
 	    
            }
 
-       type 'a step =
+       type step =
 	 {
 	   tag: step_kind;
-	   size: 'a option; 
-	   time: float;
+	   size_before: int option;
+	   size_after: int option;
+	   time_start: float;
+	   duration: float option;
 	   depth: int
 	 }
 
+       let k_first k l =
+	 let rec aux k l output =
+	   if k=0 then [],output
+	   else
+	     match
+	       l
+	     with
+	     | [] -> (let rec aux k output = if k = 0 then output else aux (k-1) ("\t"::output) in aux k []),output
+	     | t::q -> aux (k-1) q (t::output)
+	 in aux k l []
+	 
+
+	   
        let print_task logger (a,b) =
+	 let _ = print_step_kind logger a.tag in
+	 let tab,b = k_first 4 b in
 	 let _ =
 	   List.iter
 	     (print_step_kind logger)
 	     b
 	 in
-	 let _ = print_step_kind logger a.tag in
+	 let _ = List.iter (Format.fprintf logger "%s") tab in 
 	 let _ =
 	   match
-	     a.size
+	     a.size_before
 	   with
-	     None -> let () = Format.fprintf logger "%f@." a.time in ()
-	   | Some ((i:int),(j:int)) -> let () = Format.fprintf logger "%f\t%i\t%i@." a.time i j in () 
-	 in ()
+	     None -> Format.fprintf logger "\t" 
+	   | Some i -> Format.fprintf logger "%i\t"  i 
+	 in
+	 let _ =
+	   match
+	     a.size_after
+	   with
+	     None -> Format.fprintf logger "\t"
+	   | Some i -> Format.fprintf logger "%i\t" i
+	 in 
+	 let _ =
+	   match
+	     a.duration
+	   with
+	     None -> Format.fprintf logger "@."
+	   | Some time -> Format.fprintf logger "%f@." time
+	 in
+	 () 
 
        let close_logger parameter  =
 	 close_out (Remanent_parameters.get_profiling_info_channel parameter)
        let flush_logger parameter =
 	 flush (Remanent_parameters.get_profiling_info_channel parameter)
-		      
+
+       
+											     
+	       
        type log_info = 
            {
 	     global_time: float;
 	     story_time: float;
 	     step_time: float;
-	     current_tasks: (int step) list;
+	     current_task: step list;
 	     next_depth:int;
-	     terminated_tasks: ((int * int) step * step_kind list) list ;
+	     (*  terminated_tasks: ((int * int) step * step_kind list) list ;*)
 	     branch: int;
 	     cut: int;
 	     stack: stack_head list ;
@@ -168,20 +203,31 @@ module StoryStats =
 	     last_tick:float;
 	   }
              
-       let add_event step_kind f log_info =
+       let add_event parameter error step_kind f log_info =
 	 let next_depth = log_info.next_depth in 
 	 let task =
 	   {
 	     tag = step_kind ;
-	     size = begin match f with | None -> None | Some f -> Some (f ()) end ;
-	     time = Sys.time () ;
+	     size_before = begin match f with | None -> None | Some f -> Some (f ()) end ;
+	     size_after = None ;
+	     time_start = Sys.time () ;
+	     duration = None ; 
 	     depth = next_depth ;
 	   }
-	 in 
+	 in
+	 let _ = Format.fprintf (Remanent_parameters.get_profiling_info_logger parameter) "Start\t" in 
+	 let terminated_task =
+	   (task,List.rev_map (fun x -> x.tag) (List.rev log_info.current_task))
+	 in
+	 let _ = print_task (Remanent_parameters.get_profiling_info_logger parameter) terminated_task in 
+	 let _ = flush_logger  parameter in 	 
+	 let current_task = task::log_info.current_task in 
+	 
+	 error,
 	 { log_info
 	 with
 	   next_depth = next_depth + 1 ;
-	   current_tasks = task::log_info.current_tasks 
+	   current_task = current_task
 	 }
 	   
        let close_event parameter error step_kind f log_info =
@@ -194,29 +240,30 @@ module StoryStats =
 	     error,()
 	 in
 	 match 
-	   log_info.current_tasks
+	   log_info.current_task
 	 with
 	 | [] ->
 	    warn  parameter error (Some "line 156, Inconsistent profiling information, no current task when closing an event") (Failure "No current tasks in close_event") log_info
 	 | current_task::tail ->
 	    begin
-	      let size = 
-		match current_task.size,f
-		with Some i,Some f -> Some (i,f ())
-		   | None,_ | _,None -> None
+	      let size_after = 
+		match f
+		with Some f -> Some (f ())
+		   | None -> None
 	      in
-	      let time = Sys.time () -. current_task.time in
+	      let time = Sys.time () -. current_task.time_start in
 	      let task =
 		{
 		  current_task
 		with
-		  size = size ;
-		  time = time
+		  size_after = size_after ;
+		  duration = Some time
 		}
 	      in
 	      let terminated_task =
 		(task,List.rev_map (fun x -> x.tag) (List.rev tail))
 	      in
+	      let _ = Format.fprintf (Remanent_parameters.get_profiling_info_logger parameter) "End\t" in 
 	      let _ = print_task (Remanent_parameters.get_profiling_info_logger parameter) terminated_task in 
 	      let _ = flush_logger  parameter in 
 	      error,
@@ -224,8 +271,8 @@ module StoryStats =
 		log_info 
 	      with
 		next_depth = next_depth - 1;
-		current_tasks = tail ;
-		terminated_tasks = terminated_task::log_info.terminated_tasks
+		current_task = tail ;
+		(*	terminated_tasks = terminated_task::log_info.terminated_tasks*)
 	      }
 	    end
 	      
@@ -286,8 +333,8 @@ module StoryStats =
 	   global_time = time ;
 	   story_time = time;
 	   step_time = time;
-	   terminated_tasks = [];
-	   current_tasks = [];
+	   (*   terminated_tasks = [];*)
+	   current_task = [];
 	   propagation = Array.make propagation_cases 0 ;
            branch = 0 ;
 	   cut = 0 ;

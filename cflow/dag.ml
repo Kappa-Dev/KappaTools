@@ -312,7 +312,7 @@ let prehash parameter handler error graph =
         in 
         !l))
     
-let canonicalize parameter handler error graph = 
+let canonicalize parameter handler log_info error graph = 
   let asso = Mods.IntMap.empty in 
   let label i = 
     try 
@@ -320,15 +320,6 @@ let canonicalize parameter handler error graph =
     with 
     | _ -> FICTITIOUS,"" 
   in 
-  (*    let print_to_beat f to_beat =
-          let () = Format.fprintf f "TO BEAT :" in
-          let () =
-            match to_beat with ≈
-              | None -> Format.fprintf f "NONE  "
-              | Some l -> List.iter (print_elt f) l
-          in
-          Format.pp_print_new_line f ()
-        in *)
   let rec pop (candidate:key list) (to_beat:key list option) = 
     match 
       candidate,to_beat
@@ -492,12 +483,17 @@ let canonicalize parameter handler error graph =
             end (*1*)
        end (*0*)
   in 
-  match 
-    visit graph.root asso 0 None 
-  with 
-  | Some (rep,_,_,_) -> error,rep
-  | None -> error,[]
-
+  let error, log_info = StoryProfiling.StoryStats.add_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error StoryProfiling.Cannonic_form_computation None log_info in 
+  let error, output =
+    match 
+      visit graph.root asso 0 None 
+    with 
+    | Some (rep,_,_,_) -> error,rep
+    | None -> error,[]
+  in
+  let error, log_info = StoryProfiling.StoryStats.close_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error StoryProfiling.Cannonic_form_computation None log_info in
+  error,log_info,output
+		   
 let dot_of_graph parameter handler error graph = error  
 		    
 		    
@@ -567,33 +563,34 @@ module ListTable =
               List.rev ((a,last_element_occurrences)::stored_elements)
         in
         let list = visit list [] None [] in 
-        let rec visit2 l error acc = 
+        let rec visit2 l log_info error acc = 
           match l 
           with 
-            | []   -> error,acc 
+            | []   -> error,log_info,acc 
             | (t,list)::q -> 
               if List.length list = 1 
-              then visit2 q error ((t,list)::acc)
+              then visit2 q log_info error ((t,list)::acc)
               else 
-                let error,list' = 
+                let error,log_info,list' = 
                   List.fold_left 
-                    (fun (error,list') (grid,graph,dag,b,c) -> 
-                      let error,dag' = 
+                    (fun (error,log_info,list') (grid,graph,dag,b,c) -> 
+                      let error,log_info,dag' = 
                         match dag 
                         with 
-                          | None -> canonicalize parameter handler error graph 
-                          | Some dag -> error,dag
+                          | None -> canonicalize parameter handler log_info error graph 
+                          | Some dag -> error,log_info,dag
                       in 
-                      (error,(grid,graph,Some dag',b,c)::list')
-                    ) (error,[]) list 
+                      (error,log_info,(grid,graph,Some dag',b,c)::list')
+                    )
+		    (error,log_info,[]) list 
                 in 
                 let error,list' = 
                   hash_inner parameter handler error Mods.compare_profiling_info list' 
                 in 
-                visit2 q error ((t,list')::acc)
+                visit2 q log_info error ((t,list')::acc)
         in 
-        let error,list = visit2 list error [] in 
-        error,log_info,list 
+        let error,log_info,list = visit2 list log_info error [] in 
+        error,log_info,list
 
       let project_tuple (grid,_,_,_,list) = 
         List.hd list,grid,list
@@ -669,7 +666,7 @@ module BucketTable =
 	  array= array;
 	  fresh_id= 0 }
 
-      let get_cannonical_form parameter handler error id table =
+      let get_cannonical_form parameter handler log_info error id table =
 	let error,assoc = 
 	  Int_storage.Nearly_inf_Imperatif.get
 	    (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter)
@@ -679,16 +676,17 @@ module BucketTable =
 	in
 	match assoc
 	with
-	  None -> warn parameter error (Some "get_cannonical_form, line 767, unknown story id") (Failure "Inconsistent story id") (table,[])
+	  None ->
+	  let error,a = warn parameter error (Some "get_cannonical_form, line 767, unknown story id") (Failure "Inconsistent story id") (table,[]) in
+	  error,log_info,a
 	| Some (_,_,Some cannonic,_,_) ->
-	   error,(table,cannonic)
+	   error,log_info,(table,cannonic)
 	| Some (grid,graph,None,trace,info) ->
-	   let error,cannonic = canonicalize parameter handler error graph in
+	   let error,log_info,cannonic = canonicalize parameter handler log_info error graph in
 	   let error,array' = Int_storage.Nearly_inf_Imperatif.set 
 	     (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters  parameter) error id (grid,graph,Some cannonic,trace,info) table.array in 
-	   let table = {table with array = array'}
-	   in
-	   error,(table,cannonic)
+	   let table = {table with array = array'} in
+	   error,log_info,(table,cannonic)
 			
       let add_story  parameter handler log_info error grid pretrace story_info table =
 	let error,graph = graph_of_grid parameter handler error grid in 
@@ -744,9 +742,9 @@ module BucketTable =
 	    prehash,prehash'  
 	  with
 	  | [],[] ->
-	     let error,cannonic_form = canonicalize parameter handler error graph in
+	     let error,log_info,cannonic_form = canonicalize parameter handler log_info error graph in
 	     let error,assoc = update_assoc error cannonic_form assoc in 
-	     let error,(table,cannonic_form') = get_cannonical_form parameter handler error id' table in 
+	     let error,log_info,(table,cannonic_form') = get_cannonical_form parameter handler log_info error id' table in 
 	     let error,log_info,table,inner = aux_inner2 log_info error cannonic_form cannonic_form' id' assoc table in
 	     error,log_info,table,To_inner (PreHashMap.empty,  inner)
 	  | t::q,[] ->
@@ -834,16 +832,16 @@ module BucketTable =
 		     | (_,graph,Some _,_,_) ->
 			warn parameter error (Some "add_story, line 878, the canonical form of stories in the outer tree should not have been computed yet") (Failure "the canonical form of stories in the outer tree should not have been computed yet") graph
 		   in 
-		   let error,cannonic_form = canonicalize parameter handler error graph in
+		   let error,log_info,cannonic_form = canonicalize parameter handler log_info error graph in
 		   let error,assoc = update_assoc error cannonic_form assoc in 
-		   let error,(table,cannonic_form') = get_cannonical_form parameter handler error id' table in 
+		   let error,log_info,(table,cannonic_form') = get_cannonical_form parameter handler log_info error id' table in 
 		   let error,log_info,table,inner = aux_inner2 log_info error cannonic_form cannonic_form' id' assoc table in
 		   error,log_info,table,To_inner (map,  inner)
 		| Outer_leave (q,id') ->
 		   let error,table = add_story_info error story_info id' table in 
 		   error,log_info,table,outer_tree
 		| To_inner (map,inner) ->
-		   let error,suffix =  canonicalize parameter handler error graph in
+		   let error,log_info,suffix =  canonicalize parameter handler log_info error graph in
 		   let error,assoc = update_assoc error suffix assoc in 
 		   let error,log_info,table,inner = aux_inner log_info error assoc story_info suffix inner table in
 		   error,log_info,table,To_inner(map,inner) 
@@ -951,12 +949,6 @@ module BucketTable =
 	   in 
 	   print_inner_tree parameter handler error prefix' inner 
 	     
-   (*   let add_story parameter handler error grid pretrace story_info table =
-	let error,output = add_story parameter handler error grid pretrace story_info table in
-	let () = print_outer_tree parameter handler error " " output.tree in
-	let () = Format.fprintf parameter.H.out_channel "\n\n" in 
-	error,output*)
-		
       let hash_list parameter _  log_info error table =
 	let error,array =
 	  Int_storage.Nearly_inf_Imperatif.fold
