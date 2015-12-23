@@ -288,22 +288,41 @@ let potential_root_of_unary_ccs unary_ccs roots i =
       unary_ccs in
   if Connected_component.Set.is_empty ccs then None else Some ccs
 
+let remove_unary_instances unaries obs deps =
+  Operator.DepSet.fold
+    (fun x (cands,pathes as acc) ->
+     match x with
+     | (Operator.ALG _ | Operator.PERT _) -> acc
+     | Operator.RULE i ->
+	match Mods.IntMap.find_option i cands with
+	| None -> acc
+	| Some l ->
+	   let byebye,stay =
+	     Mods.Int2Set.partition
+	       (fun (x,y) -> List.exists (fun (_,(a,_)) -> a = x || a = y) obs)
+	       l in
+	   (Mods.IntMap.add i stay cands,
+	    Mods.Int2Set.fold Mods.Int2Map.remove byebye pathes)
+    ) deps unaries
+
 let update_edges counter domain unary_ccs inj_nodes state event_kind ?path rule=
   let former_deps,unary_cands,no_unary = state.outdated_elements in
   (*Negative update*)
-  let aux =
+  let aux,(unary_candidates',unary_pathes') =
     List.fold_left
-      (fun (inj2graph,edges,roots,(deps,unaries_to_expl)) transf ->
+      (fun ((inj2graph,edges,roots,(deps,unaries_to_expl)),unaries) transf ->
        (*inj2graph: abs -> conc, roots define the injection that is used*)
-       let ((a,b,_,c,new_deps),_) =
+       let ((a,b,_,c,new_deps),new_obs) =
 	 deal_transformation false domain unaries_to_expl inj2graph edges roots transf in
-       (a,b,c,(Operator.DepSet.union new_deps deps,unaries_to_expl)))
-      ((inj_nodes,Mods.IntMap.empty), (*initial inj2graph: (existing,new) *)
-       state.edges,state.roots_of_ccs,(former_deps,[]))
+       ((a,b,c,(Operator.DepSet.union new_deps deps,unaries_to_expl)),
+	remove_unary_instances unaries new_obs new_deps))
+      (((inj_nodes,Mods.IntMap.empty), (*initial inj2graph: (existing,new) *)
+	state.edges,state.roots_of_ccs,(former_deps,[])),
+       (state.unary_candidates,state.unary_pathes))
       rule.Primitives.removed (*removed: statically defined edges*)
   in
   (*Positive update*)
-  let (((_,_ as final_inj2graph),edges',roots',
+  let ((final_inj2graph,edges',roots',
 	(rev_deps',unaries_to_explore)),new_tracked_obs_instances,all_new_obs) =
     List.fold_left
       (fun ((inj2graph,edges,roots,(deps,unaries_to_expl)),tracked_inst,all_nobs) transf ->
@@ -343,9 +362,9 @@ let update_edges counter domain unary_ccs inj_nodes state event_kind ?path rule=
       counter final_inj2graph new_tracked_obs_instances event_kind
       ?path rule state.story_machinery in
 
-  { roots_of_ccs = roots'; unary_candidates = state.unary_candidates;
-    unary_pathes = state.unary_pathes; edges = edges';
-    tokens = state.tokens; outdated_elements = (rev_deps',unary_cands',no_unary');
+  { roots_of_ccs = roots'; unary_candidates = unary_candidates';
+    unary_pathes = unary_pathes'; edges = edges'; tokens = state.tokens;
+    outdated_elements = (rev_deps',unary_cands',no_unary');
     story_machinery = story_machinery'; }
 
 let raw_instance_number state ccs_l =
@@ -499,6 +518,9 @@ let apply_unary_rule
 	   Mods.Int2Set.empty rule_id state.unary_candidates) with
     | None -> failwith "Tried apply_unary_rule with no roots"
     | Some x -> x in
+  let () =
+    if !Parameter.debugModeOn then
+      Format.printf "@[On roots:@ %i@ %i@]@." root1 root2 in
   let cc1 = rule.Primitives.connected_components.(0) in
   let cc2 = rule.Primitives.connected_components.(1) in
   let pair = (min root1 root2,max root1 root2) in
@@ -558,6 +580,10 @@ let apply_rule
        | None -> None),root)
       (Some Connected_component.Matching.empty)
       rule.Primitives.connected_components in
+  let () =
+    if !Parameter.debugModeOn then
+      Format.printf "@[On roots:@ @[%a@]@]@."
+		    (Pp.array Pp.space (fun _ -> Format.pp_print_int)) roots in
   match inj with
   | None -> Clash
   | Some inj ->
