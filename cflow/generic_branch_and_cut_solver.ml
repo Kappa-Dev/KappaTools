@@ -24,17 +24,15 @@ module type Solver =
   (sig 
     module PH:Propagation_heuristics.Blackboard_with_heuristic
 
-    val compress: (StoryProfiling.StoryStats.log_info -> PH.B.blackboard -> PH.update_order list -> Exception.method_handler * StoryProfiling.StoryStats.log_info * PH.B.blackboard * PH.B.assign_result  * PH.B.result list) PH.B.PB.CI.Po.K.H.with_handler
-      
-    val detect_independent_events: (StoryProfiling.StoryStats.log_info -> PH.B.blackboard -> PH.B.PB.step_id list -> Exception.method_handler * StoryProfiling.StoryStats.log_info * PH.B.PB.step_id list) PH.B.PB.CI.Po.K.H.with_handler
+    val compress: (PH.B.blackboard,PH.update_order list,PH.B.blackboard * PH.B.assign_result  * PH.B.result list) PH.B.PB.CI.Po.K.H.binary      
+    val detect_independent_events: (PH.B.blackboard,PH.B.PB.step_id list,PH.B.PB.step_id list) PH.B.PB.CI.Po.K.H.binary
+    val filter: (PH.B.blackboard,PH.B.PB.step_id list,PH.B.blackboard) PH.B.PB.CI.Po.K.H.binary
 
-    val filter: (StoryProfiling.StoryStats.log_info -> PH.B.blackboard -> PH.B.PB.step_id list -> Exception.method_handler * StoryProfiling.StoryStats.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
+    val sub: (PH.B.PB.CI.Po.K.refined_step list,PH.B.blackboard) PH.B.PB.CI.Po.K.H.unary
 
-    val sub: (StoryProfiling.StoryStats.log_info -> PH.B.PB.CI.Po.K.refined_step list -> Exception.method_handler * StoryProfiling.StoryStats.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
+    val clean: (PH.B.blackboard,PH.B.blackboard) PH.B.PB.CI.Po.K.H.unary
 
-    val clean: (StoryProfiling.StoryStats.log_info -> PH.B.blackboard -> Exception.method_handler * StoryProfiling.StoryStats.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
-
-    val translate: (PH.B.blackboard -> PH.B.PB.step_id list -> Exception.method_handler * PH.B.PB.CI.Po.K.refined_step list * PH.B.result) PH.B.PB.CI.Po.K.H.with_handler 
+    val translate: (PH.B.blackboard,PH.B.PB.step_id list,PH.B.PB.CI.Po.K.refined_step list*PH.B.result) PH.B.PB.CI.Po.K.H.binary
     val translate_result: PH.B.result -> PH.B.PB.CI.Po.K.refined_step list 
 
    end)
@@ -52,7 +50,7 @@ struct
   let combine_output o1 o2 = 
     if PH.B.is_ignored o2 then o1 else o2 
       
-  let rec propagate parameter handler error log_info instruction_list propagate_list blackboard = 
+  let rec propagate parameter handler log_info error instruction_list propagate_list blackboard = 
     let bool,log_info = PH.B.tick log_info in 
     let _ = 
       if bool then
@@ -63,25 +61,25 @@ struct
     with 
       | t::q ->
         begin 
-          let error,log_info,blackboard,instruction_list,propagate_list,assign_result = PH.apply_instruction parameter handler error log_info blackboard t q propagate_list in 
+          let error,log_info,(blackboard,instruction_list,propagate_list,assign_result) = PH.apply_instruction parameter handler log_info error blackboard t q propagate_list in 
           if PH.B.is_failed assign_result 
           then 
-            error,log_info,blackboard,assign_result 
+            error,log_info,(blackboard,assign_result)
           else 
-            propagate parameter handler error log_info instruction_list propagate_list blackboard
+            propagate parameter handler log_info error instruction_list propagate_list blackboard
         end
       | [] -> 
         begin
           match propagate_list 
           with 
             | t::q -> 
-              let error,log_info,blackboard,instruction_list,propagate_list,assign_result = PH.propagate parameter handler error log_info blackboard t instruction_list q in 
+              let error,log_info,(blackboard,instruction_list,propagate_list,assign_result) = PH.propagate parameter handler log_info error blackboard t instruction_list q in 
                     if PH.B.is_failed assign_result 
                     then 
-                      error,log_info,blackboard,assign_result 
+                      error,log_info,(blackboard,assign_result) 
                     else 
-                      propagate parameter handler error log_info instruction_list propagate_list blackboard
-            | [] -> error,log_info,blackboard,PH.B.success
+                      propagate parameter handler log_info error instruction_list propagate_list blackboard
+            | [] -> error,log_info,(blackboard,PH.B.success)
         end 
           
   type choices = 
@@ -103,24 +101,24 @@ struct
       | [] -> true
       | _ -> false 
 
-  let backtrack parameter handler error log_info blackboard choice_list = 
-    let rec backtrack_aux error log_info blackboard choice_list = 
+  let backtrack parameter handler log_info error blackboard choice_list = 
+    let rec backtrack_aux log_info error blackboard choice_list = 
       match choice_list.current
       with 
         | [] -> 
           begin 
             match choice_list.stack 
             with 
-            | [] -> error,log_info,blackboard,None 
+            | [] -> error,log_info,(blackboard,None)
             | t::q -> 
               let choice_list = {current = t ; stack = q } in 
-              let error,log_info,blackboard =  PH.B.reset_last_branching parameter handler error log_info blackboard in 
-              backtrack_aux error log_info blackboard choice_list
+              let error,log_info,blackboard =  PH.B.reset_last_branching parameter handler log_info error blackboard in 
+              backtrack_aux log_info error blackboard choice_list
         end 
-      | _ -> error,log_info,blackboard,Some choice_list
+      | _ -> error,log_info,(blackboard,Some choice_list)
     in 
-    let error,log_info,blackboard = PH.B.reset_last_branching parameter handler error log_info blackboard in 
-    backtrack_aux error log_info blackboard choice_list 
+    let error,log_info,blackboard = PH.B.reset_last_branching parameter handler log_info error blackboard in 
+    backtrack_aux log_info error blackboard choice_list 
  
 
   let empty_choice_list = 
@@ -148,13 +146,13 @@ struct
 	     (h::(List.filter (fun story -> not (sublist h story)) goodones))
     in aux (sort_stories_according_to_length l) []
       
-  let rec iter parameter handler error log_info blackboard choice_list story_list = 
-    let error,bool = PH.B.is_maximal_solution parameter handler error blackboard in
+  let rec iter parameter handler log_info error blackboard choice_list story_list = 
+    let error,log_info,bool = PH.B.is_maximal_solution parameter handler log_info error blackboard in
     if bool 
     then 
       (* SUCCESS *)
-      let error,list = 
-          PH.B.translate_blackboard parameter handler error blackboard 
+      let error,log_info,list = 
+          PH.B.translate_blackboard parameter handler log_info error blackboard 
       in
        if PH.B.PB.CI.Po.K.H.get_all_stories_per_obs parameter
        then
@@ -172,48 +170,48 @@ struct
 	     with [] -> choice_list
 		| t::q -> { current=t;stack=q}
 	   in 
-	   let error,log_info,blackboard,choice_list = backtrack parameter handler error log_info blackboard choice_list in 	  
+	   let error,log_info,(blackboard,choice_list) = backtrack parameter handler log_info error blackboard choice_list in 	  
 	   begin 
              match choice_list 
              with 
-             | Some choice_list -> iter parameter handler error log_info blackboard choice_list story_list (*(update_first_story first_story list)*)
-             | None -> error,log_info,blackboard,story_list
+             | Some choice_list -> iter parameter handler log_info error blackboard choice_list story_list (*(update_first_story first_story list)*)
+             | None -> error,log_info,(blackboard,story_list)
 	   end
 	 end 
        else
-	 error,log_info,blackboard,[list] 
+	 error,log_info,(blackboard,[list]) 
     else
       let error,choice_list = 
         if no_more_choice choice_list 
         then 
-          let error,list = PH.next_choice parameter handler error blackboard in
+          let error,log_info,list = PH.next_choice parameter handler log_info error blackboard in
           error,update_current choice_list list
         else
           error,choice_list 
       in 
-      let error,log_info,blackboard = PH.B.branch parameter handler error log_info blackboard in
+      let error,log_info,blackboard = PH.B.branch parameter handler log_info error blackboard in
       let error,(choice,choice_list) = pop_next_choice parameter handler error choice_list in 
-      let error,log_info,blackboard,output = propagate parameter handler error log_info [choice] [] blackboard in
+      let error,log_info,(blackboard,output) = propagate parameter handler log_info error [choice] [] blackboard in
       if PH.B.is_failed output 
       then 
-        let error,log_info,blackboard,choice_list = backtrack parameter handler error log_info blackboard choice_list in 
+        let error,log_info,(blackboard,choice_list) = backtrack parameter handler log_info error blackboard choice_list in 
         begin 
           match choice_list 
           with 
-          | Some choice_list -> iter parameter handler error log_info blackboard choice_list story_list  
-            | None -> error,log_info,blackboard,story_list
+          | Some choice_list -> iter parameter handler log_info error blackboard choice_list story_list  
+            | None -> error,log_info,(blackboard,story_list)
         end
       else 
-        iter parameter handler error log_info blackboard (branch_choice_list choice_list) story_list  
+        iter parameter handler log_info error blackboard (branch_choice_list choice_list) story_list  
             
-  let detect_independent_events parameter handler error log_info blackboard list_eid = 
-    let error,log_info,blackboard,events_to_keep = PH.B.cut parameter handler error log_info blackboard list_eid  in 
+  let detect_independent_events parameter handler log_info error blackboard list_eid = 
+    let error,log_info,(blackboard,events_to_keep) = PH.B.cut parameter handler log_info error blackboard list_eid  in 
     error,log_info,events_to_keep 
 
-  let translate parameter handler error blackboard list =
+  let translate parameter handler log_info error blackboard list =
     let list' = List.rev_map (fun k -> PH.B.get_event blackboard (pred k),PH.B.side_effect_of_event blackboard (pred k)) (List.rev list) in 
     let list = List.rev_map fst (List.rev list') in 
-    error,list,list'
+    error,log_info,(list,list')
     
   let translate_result result = 
     List.rev_map fst @@ List.rev result 
@@ -221,9 +219,9 @@ struct
   let clean parameter handler error log_info blackboard = 
     PH.B.reset_init parameter handler error log_info blackboard 
 
-  let filter parameter handler error log_info blackboard events_to_keep = 
+  let filter parameter handler log_info error blackboard events_to_keep = 
     let log_info = StoryProfiling.StoryStats.set_step_time log_info in 
-    let error,log_info,blackboard = PH.B.branch parameter handler error log_info blackboard in
+    let error,log_info,blackboard = PH.B.branch parameter handler log_info error blackboard in
     let events_to_remove = 
       let n_events = PH.B.get_n_eid blackboard in 
       let rec aux k list sol = 
@@ -243,27 +241,27 @@ struct
       in 
       aux 0 events_to_keep []
     in 
-    let error,forbidden_events = PH.forbidden_events parameter handler error events_to_remove in
+    let error,log_info,forbidden_events = PH.forbidden_events parameter handler log_info error events_to_remove in
     let _ =
       if log_steps then
         Format.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err "Start cutting@."
     in
-    let error,log_info,blackboard,output = 
-      propagate parameter handler error log_info forbidden_events [] blackboard  
+    let error,log_info,(blackboard,output) = 
+      propagate parameter handler log_info error forbidden_events [] blackboard  
     in 
     let log_info = StoryProfiling.StoryStats.set_concurrent_event_deletion_time log_info in 
     let log_info = StoryProfiling.StoryStats.set_step_time log_info in 
     error,log_info,blackboard 
 
-  let sub parameter handler error log_info to_keep = 
+  let sub parameter handler log_info error to_keep = 
     let log_info = StoryProfiling.StoryStats.set_step_time log_info in 
-    let error,log_info,blackboard = PH.B.import parameter handler error log_info to_keep in 
+    let error,log_info,blackboard = PH.B.import parameter handler log_info error to_keep in 
     let log_info = StoryProfiling.StoryStats.set_concurrent_event_deletion_time log_info in 
     let log_info = StoryProfiling.StoryStats.set_step_time log_info in 
     error,log_info,blackboard 
     
-  let compress parameter handler error log_info blackboard list_order =
-    let error,log_info,blackboard = PH.B.branch parameter handler error log_info blackboard in 
+  let compress parameter handler log_info error blackboard list_order =
+    let error,log_info,blackboard = PH.B.branch parameter handler log_info error blackboard in 
     let log_info = StoryProfiling.StoryStats.set_concurrent_event_deletion_time log_info in 
     let log_info = StoryProfiling.StoryStats.set_step_time log_info in 
     let _ =
@@ -271,15 +269,15 @@ struct
         Format.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err
 		       "After Causal Cut  %i @." (PH.B.get_n_unresolved_events blackboard)
     in 
-    let error,log_info,blackboard,output = 
-      propagate parameter handler error log_info list_order [] blackboard 
+    let error,log_info,(blackboard,output) = 
+      propagate parameter handler log_info error list_order [] blackboard 
     in 
     let _ =
       if log_steps then
         Format.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err
 		       "After observable propagation  %i @." (PH.B.get_n_unresolved_events blackboard)
     in
-    let error,log_info,blackboard,story_list = iter parameter handler error log_info blackboard empty_choice_list [] 
+    let error,log_info,(blackboard,story_list) = iter parameter handler log_info error blackboard empty_choice_list [] 
     in 
     let output =
       match
@@ -288,7 +286,7 @@ struct
 	[] -> PH.B.fail
       | _ -> PH.B.success
     in 
-    error,log_info,blackboard,output,filter_out_non_minimal_story (List.rev story_list) 
+    error,log_info,(blackboard,output,filter_out_non_minimal_story (List.rev story_list))
 
 
 end 

@@ -27,7 +27,6 @@ let init_secret_log_info = StoryProfiling.StoryStats.init_log_info
 let secret_store_event = S.PH.B.PB.CI.Po.K.store_event
 let secret_store_obs = S.PH.B.PB.CI.Po.K.store_obs
 
-let old_version = false
 let log_step = true
 let debug_mode = false
 let dump_profiling_info = true
@@ -82,10 +81,10 @@ let compress_and_print logger env log_info step_list =
     {
       S.PH.B.PB.CI.Po.K.H.env = env ;
     } in
-  let error,table1 = U.create_story_table parameter handler error in
-  let error,table2 = U.create_story_table parameter handler error in
-  let error,table3 = U.create_story_table parameter handler error in
-  let error,table4 = U.create_story_table parameter handler error in 
+  let error,log_info,table1 = U.create_story_table parameter handler log_info error in
+  let error,log_info,table2 = U.create_story_table parameter handler log_info error in
+  let error,log_info,table3 = U.create_story_table parameter handler log_info error in
+  let error,log_info,table4 = U.create_story_table parameter handler log_info error in 
   let empty_compression = table1,table2,table3,table4 in 
   let step_list = U.trace_of_pretrace step_list in 
   let causal,trivial,weak,strong =

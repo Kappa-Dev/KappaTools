@@ -53,12 +53,11 @@ sig
   val agent_name_of_site: Instantiation.concrete Instantiation.site -> Instantiation.agent_name
   val site_name_of_site: Instantiation.concrete Instantiation.site -> Instantiation.site_name
   val build_subs_refined_step: int -> int -> refined_step
-  val tests_of_refined_step: (refined_step -> Exception.method_handler * Instantiation.concrete Instantiation.test list) H.with_handler
+  val tests_of_refined_step: (refined_step, Instantiation.concrete Instantiation.test list) H.unary
   val actions_of_refined_step:
-    (refined_step ->
-     Exception.method_handler *
+    (refined_step,
        (Instantiation.concrete Instantiation.action list *
-	  (Instantiation.concrete Instantiation.site*Instantiation.concrete Instantiation.binding_state) list)) H.with_handler
+	  (Instantiation.concrete Instantiation.site*Instantiation.concrete Instantiation.binding_state) list)) H.unary
   val is_obs_of_refined_step: refined_step -> bool
   val is_init_of_refined_step: refined_step -> bool
   val is_subs_of_refined_step: refined_step -> bool
@@ -85,14 +84,14 @@ sig
 
   val get_kasim_side_effects: refined_step -> side_effect
 
-  val level_of_event: (refined_step -> (agent_id -> bool) -> Exception.method_handler * Priority.level) H.with_handler
+  val level_of_event: (refined_step,(agent_id -> bool),Priority.level) H.binary
   val disambiguate: refined_step list -> refined_step list
   val clean_events: refined_step list -> refined_step list
-  val agent_id_in_obs: (refined_step -> Exception.method_handler * AgentIdSet.t) H.with_handler 
+  val agent_id_in_obs: (refined_step, AgentIdSet.t) H.unary 
 
   val fill_siphon: refined_step list -> refined_step list
   val split_init: refined_step list -> refined_step list 
-  val agent_id_in_obs: (refined_step -> Exception.method_handler * AgentIdSet.t) H.with_handler
+  val agent_id_in_obs: (refined_step, AgentIdSet.t) H.unary
 end
 
 
@@ -177,14 +176,14 @@ module Cflow_linker =
     Format.fprintf log "%s(%a,%a)\n" prefix (print_site ~env) s
 		   (print_binding_state ~env) binding_state
 
-  let tests_of_refined_obs _ _ error (_,x,_) = error, x
-  let tests_of_refined_event _ _ error (_,(y,(_,_,_))) =  error,y
-  let tests_of_refined_init _ _ error _ =  error,[]
-  let tests_of_refined_subs _ _ error _ _ = error,[]
-  let actions_of_refined_event _ _ error (_,(_,(x,y,_))) = error,(x,y)
-  let actions_of_refined_init _ _ error y = error,(y,[])
-  let actions_of_refined_obs _ _ error _ = error,([],[])
-  let actions_of_refined_subs _ _ error _ _ = error,([],[])
+  let tests_of_refined_obs _ _ info error (_,x,_) = error, info, x
+  let tests_of_refined_event _ _ info error (_,(y,(_,_,_))) =  error, info, y
+  let tests_of_refined_init _ _ info error _ =  error, info, []
+  let tests_of_refined_subs _ _ info error _ _ = error, info, []
+  let actions_of_refined_event _ _ info error (_,(_,(x,y,_))) = error, info, (x,y)
+  let actions_of_refined_init _ _ info error y = error, info, (y,[])
+  let actions_of_refined_obs _ _ info error _ = error, info, ([],[])
+  let actions_of_refined_subs _ _ info error _ _ = error, info, ([],[])
 
   let print_side_effects ?handler =
     let env = Tools.option_map (fun x -> x.H.env) handler in
@@ -225,13 +224,13 @@ module Cflow_linker =
 		   actions
 		   (print_side_effects ?handler) side_sites
 
-  let gen f0 f1 f2 f3 f4 (p:H.parameter) h e step =
+  let gen f0 f1 f2 f3 f4 (p:H.parameter) h l e step =
     match step with
-    | Subs (a,b) -> f0 p h e a b
-    | Event (x,y) -> f1 p h e (x,y)
-    | Init a -> f2 p h e a
-    | Obs a -> f3 p h e a
-    | Dummy x  -> f4 p h e x
+    | Subs (a,b) -> f0 p h l e a b
+    | Event (x,y) -> f1 p h l e (x,y)
+    | Init a -> f2 p h l e a
+    | Obs a -> f3 p h l e a
+    | Dummy x  -> f4 p h l e x
 
   let print_refined_step ?handler f = function
     | Subs (a,b) -> print_refined_subs f (a,b)
@@ -246,7 +245,7 @@ module Cflow_linker =
       tests_of_refined_event
       tests_of_refined_init
       tests_of_refined_obs
-      (fun _ _ error _ -> error,[])
+      (fun _ _ l error _ -> error, l, ([]:Instantiation.concrete Instantiation.test list))
 
   let is_obs_of_refined_step x =
     match x with
@@ -276,7 +275,7 @@ module Cflow_linker =
       actions_of_refined_event
       actions_of_refined_init
       actions_of_refined_obs
-      (fun _ _ error _ -> error,([],[]))
+      (fun _ _ l error _ -> error,l,([],[]))
   let store_event log_info (event:refined_event) (step_list:refined_step list) =
     match event with
     | Causal.INIT _,(_,(actions,_,_)) ->
@@ -347,16 +346,16 @@ module Cflow_linker =
     Pp.list Pp.comma (fun f ((a,_),b) -> Format.fprintf f "(%i,%i)," a b)
   let side_effect_of_list l = l
 
-  let level_of_event parameter handler error e set =
+  let level_of_event parameter handler log_info error e set =
     match H.get_priorities parameter with
-    | None -> error,0
+    | None -> error,log_info,0
     | Some priorities ->
        match e with
-       | Obs _ -> error,priorities.Priority.other_events
+       | Obs _ -> error,log_info,priorities.Priority.other_events
        | Event _ ->
           begin
-            let error,actions =
-	      actions_of_refined_step parameter handler error e in
+            let error,log_info,actions =
+	      actions_of_refined_step parameter handler log_info error e in
             let priority =
               List.fold_left
                 (fun priority ->
@@ -376,10 +375,10 @@ module Cflow_linker =
                 priorities.Priority.other_events
                 (fst (actions))
             in
-            error,priority
+            error,log_info,priority
           end
        | (Dummy _ | Subs _ | Init _) ->
-	  error,priorities.Priority.substitution
+	  error,log_info,priorities.Priority.substitution
 
   let subs_agent_in_event mapping mapping' = function
     | Event (a,event) ->
@@ -630,10 +629,10 @@ module Cflow_linker =
 	refined_step_list in
     List.rev a
 
-  let agent_id_in_obs _parameter _handler error = function
-    | Subs _ | Event _ | Init _ | Dummy _ -> error,AgentIdSet.empty
+  let agent_id_in_obs _parameter _handler info error = function
+    | Subs _ | Event _ | Init _ | Dummy _ -> error,info,AgentIdSet.empty
     | Obs (_,tests,_) ->
-       error,
+       error, info, 
        List.fold_left
          (fun l x ->
           match x with

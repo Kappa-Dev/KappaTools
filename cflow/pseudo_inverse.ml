@@ -26,7 +26,7 @@
      module A:LargeArray.GenArray 
 
      val cut:
-       (Po.K.refined_step list -> Exception.method_handler * ( (Po.K.refined_step list) * int)) Po.K.H.with_handler
+       (Po.K.refined_step list, ( (Po.K.refined_step list) * int)) Po.K.H.unary 
    end
 
  module Pseudo_inv = 
@@ -396,10 +396,10 @@
 
 
 
-   let add_step parameter handler error step blackboard =
+   let add_step parameter handler info error step blackboard =
      let pre_event = blackboard.event in 
-     let error,test_list = Po.K.tests_of_refined_step parameter handler error step in 
-     let error,(action_list,_) = Po.K.actions_of_refined_step parameter handler error step in
+     let error,info,test_list = Po.K.tests_of_refined_step parameter handler info error step in 
+     let error,info,(action_list,_) = Po.K.actions_of_refined_step parameter handler info error step in
      let side_effect = Po.K.get_kasim_side_effects (step) in 
      let build_map list map = 
        List.fold_left 
@@ -521,27 +521,27 @@
           nsteps = nsid;
       }
     in 
-    error,blackboard
+    error,info,blackboard
 
       
 
-  let cut parameter handler error list = 
+  let cut parameter handler info error list = 
     let n = List.length list in 
     let blackboard = init_blackboard n in 
-    let error,blackboard,n_cut = 
+    let error,info,blackboard,n_cut = 
       List.fold_left 
-        (fun (error,blackboard,n_cut) step ->  
-          let error,blackboard = add_step parameter handler error step blackboard in 
+        (fun (error,info,blackboard,n_cut) step ->  
+          let error,info,blackboard = add_step parameter handler info error step blackboard in 
           let error,to_pop = check parameter handler error blackboard in 
           match 
             to_pop 
           with 
-            | None -> error,blackboard,n_cut 
+            | None -> error,info,blackboard,n_cut 
             | Some (e1,e2) -> 
               let error,blackboard = pop parameter handler error blackboard e1 in 
               let error,blackboard = pop parameter handler error blackboard e2 in 
-              (error,blackboard,n_cut+2) )
-        (error,blackboard,0)
+              (error,info,blackboard,n_cut+2) )
+        (error,info,blackboard,0)
         list 
     in 
     let list = 
@@ -556,6 +556,6 @@
             | None -> aux (k-1) list 
       in aux (blackboard.nsteps) [] 
     in 
-    error,(list,n_cut)
+    error,info, (list,n_cut)
     
     end:Cut_pseudo_inverse)

@@ -33,6 +33,8 @@ type profiling_info = StoryProfiling.StoryStats.log_info
 type shall_we = (parameter -> bool)			
 type 'a with_handlers =
   parameter -> ?shall_we_compute:shall_we -> ?shall_we_compute_profiling_information:shall_we -> kappa_handler -> profiling_info -> error_log -> 'a 
+type 'a zeroary =
+  (error_log * profiling_info * 'a) with_handlers
 type ('a,'b) unary =
   ('a -> error_log * profiling_info * 'b) with_handlers
 type ('a,'b,'c) binary =
@@ -89,8 +91,8 @@ val strongly_compress: (trace,trace list) unary
 type story_table
        
 val create_story_table:
-  parameter -> kappa_handler -> error_log -> error_log * story_table
-
+  story_table zeroary
+	      
 val get_counter: story_table -> int
 val count_stories: story_table -> int
 

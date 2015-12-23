@@ -143,8 +143,8 @@ module StoryStats =
 	   match
 	     a.size
 	   with
-	     None -> let () = Format.fprintf logger "%f\n@." a.time in ()
-	   | Some ((i:int),(j:int)) -> let () = Format.fprintf logger "%f\t%i\t%i\n@." a.time i j in () 
+	     None -> let () = Format.fprintf logger "%f@." a.time in ()
+	   | Some ((i:int),(j:int)) -> let () = Format.fprintf logger "%f\t%i\t%i@." a.time i j in () 
 	 in ()
 
        let close_logger parameter  =

@@ -22,7 +22,7 @@
    sig
      module K:Kappa_instantiation.Cflow_signature
 
-     val cut: (K.refined_step list -> Exception.method_handler * (K.refined_step list * int )) K.H.with_handler 
+     val cut: (K.refined_step list,(K.refined_step list * int )) K.H.unary
    end
 
  module Po_cut = 
@@ -91,7 +91,7 @@
      let predicates_of_side_effects sides =
        List.map (fun ((ag_id,_),s_id) -> Bound_site(ag_id,s_id)) sides
 
-     let cut parameter handler error event_list = 
+     let cut parameter handler info error event_list = 
        let seen_predicates = PS.empty in 
        let _,event_list,n = 
          List.fold_left 
@@ -123,7 +123,7 @@
                    else 
                      keep2 q 
              in 
-             let error,(action_list,_) = K.actions_of_refined_step parameter handler error event in 
+             let error,info,(action_list,_) = K.actions_of_refined_step parameter handler info error event in 
              let seen =   
                List.fold_left 
                  (fun seen action -> 
@@ -134,14 +134,14 @@
                  )
                  seen action_list
              in 
-             let error,(actions,_) = K.actions_of_refined_step parameter handler error event in  
+             let error,info,(actions,_) = K.actions_of_refined_step parameter handler info error event in  
              if (K.is_obs_of_refined_step event)
                || (keep actions)
                || (keep2 (predicates_of_side_effects (K.get_kasim_side_effects event)))
              then 
                begin
                  let kept = event::kept in 
-                 let error,tests = K.tests_of_refined_step parameter handler error event in 
+                 let error,info,tests = K.tests_of_refined_step parameter handler info error event in 
                  let seen = 
                    List.fold_left 
                      (fun seen test -> 
@@ -161,6 +161,6 @@
            (seen_predicates,[],0) 
            (List.rev event_list) 
        in 
-       error,(event_list,n)
+       error,info,(event_list,n)
         
    end:Po_cut)
