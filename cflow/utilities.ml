@@ -551,14 +551,14 @@ let convert_trace_into_grid trace handler =
 let convert_trace_into_musical_notation parameters  ?(shall_we_compute=always) ?(shall_we_compute_profiling_information=we_shall) kappa_handler profiling_info error trace =
   S.PH.B.import parameters kappa_handler profiling_info error (get_pretrace_of_trace trace)
 
-let enrich_grid_with_transitive_closure logger config  ?(shall_we_compute=always) ?(shall_we_compute_profiling_information=we_shall) handler log_info error grid =
-  let output = Causal.enrich_grid logger config grid in
+let enrich_grid_with_transitive_closure config  logger ?(shall_we_compute=always) ?(shall_we_compute_profiling_information=we_shall) handler log_info error grid =
+  let error,log_info,output = Causal.enrich_grid (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters logger) handler log_info error config grid in
   error,log_info,output
 
-let enrich_grid_with_transitive_past_of_observables_with_a_progress_bar f = enrich_grid_with_transitive_closure  (S.PH.B.PB.CI.Po.K.H.get_logger f) Graph_closure.config_big_graph_with_progress_bar
-let enrich_grid_with_transitive_past_of_observables_without_a_progress_bar f = enrich_grid_with_transitive_closure (S.PH.B.PB.CI.Po.K.H.get_logger f) Graph_closure.config_big_graph_without_progress_bar
-let enrich_grid_with_transitive_past_of_each_node_without_a_progress_bar f = enrich_grid_with_transitive_closure (S.PH.B.PB.CI.Po.K.H.get_logger f) Graph_closure.config_big_graph_without_progress_bar
-let enrich_grid_with_transitive_past_of_each_node_without_a_progress_bar f = enrich_grid_with_transitive_closure (S.PH.B.PB.CI.Po.K.H.get_logger f) Graph_closure.config_small_graph
+let enrich_grid_with_transitive_past_of_observables_with_a_progress_bar = enrich_grid_with_transitive_closure Graph_closure.config_big_graph_with_progress_bar
+let enrich_grid_with_transitive_past_of_observables_without_a_progress_bar = enrich_grid_with_transitive_closure Graph_closure.config_big_graph_without_progress_bar
+let enrich_grid_with_transitive_past_of_each_node_without_a_progress_bar = enrich_grid_with_transitive_closure Graph_closure.config_big_graph_without_progress_bar
+let enrich_grid_with_transitive_past_of_each_node_without_a_progress_bar = enrich_grid_with_transitive_closure Graph_closure.config_small_graph
 					    
 let sort_story_list  = D.sort_list 
 let export_story_table parameter ?(shall_we_compute=always) ?(shall_we_compute_profiling_information=we_shall) handler log_info error x =
@@ -614,7 +614,10 @@ let fold_left_with_progress_bar
 let fold_over_the_causal_past_of_observables_through_a_grid_with_a_progress_bar parameter handler log_info error f t a =
   let grid = convert_trace_into_grid t handler in 
   Causal.fold_over_causal_past_of_obs 
-    (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
+    parameter 
+    handler
+    log_info
+    error 
     Graph_closure.config_big_graph_with_progress_bar
     grid 
     f (error,log_info,a)
@@ -642,14 +645,17 @@ let fold_over_the_causal_past_of_observables_with_a_progress_bar parameter  ?(sh
   in 
   let log_info = P.set_start_compression log_info in 
   let grid = convert_trace_into_grid t handler in 
-  let error,log_info,_,_,a =
+  let error,log_info,(_,_,a) =
     Causal.fold_over_causal_past_of_obs 
-      (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
+      (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter)
+      handler
+      log_info
+      error 
       Graph_closure.config_big_graph_with_progress_bar
       grid
-      (fun observable_hit causal_past (error,log_info,counter,list,a) ->
+      (fun observable_hit causal_past (counter,list,a) ->
        match list with
-       | [] -> error,log_info,counter,list,a
+       | [] -> counter,list,a
        | head::tail ->
 	  let observable_id = head in 
 	  let log_info = P.reset_log log_info in 
@@ -674,8 +680,8 @@ let fold_over_the_causal_past_of_observables_with_a_progress_bar parameter  ?(sh
 	       [info]
 	  in
 	  let error,log_info,a = (f:('a,'b,'c,'d) ternary)  parameter handler log_info error trace info a in
-	  error,log_info,counter+1,tail,a)
-      (error,log_info,1,List.rev list,a)
+	  counter+1,tail,a)
+      (1,List.rev list,a)
   in
   error,log_info,a 
 

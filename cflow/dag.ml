@@ -189,10 +189,10 @@ let compare_canonic_opt x y =
 				    
 let compare_prehash = aux compare 
 			  
-let graph_of_grid parameter handler error grid = 
+let graph_of_grid parameter handler log_info error grid = 
   let ids = Hashtbl.fold (fun key _ l -> key::l) grid.Causal.flow [] in
   let label = label handler in 
-  let config = Causal.cut ids grid in 
+  let error,log_info,config = Causal.cut (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) handler log_info error ids grid in 
   let labels = A.make 1 (FICTITIOUS,"") in 
   let set =  
     Mods.IntMap.fold
@@ -262,9 +262,11 @@ let graph_of_grid parameter handler error grid =
   in 
   if Mods.IntSet.is_empty root
   then 
-    error,dummy_graph 
+    error,log_info,dummy_graph 
   else 
-    error,{ 
+    error,
+    log_info,
+    { 
       root = (match Mods.IntSet.min_elt root with Some x -> x | None -> -1);
       labels = labels ;
       succ = succ ;
@@ -506,7 +508,7 @@ module ListTable =
 	error,log_info,[]
 		
       let add_story parameter handler log_info error grid pretrace info table =
-	let error,graph = graph_of_grid parameter handler error grid in
+	let error,log_info,graph = graph_of_grid parameter handler log_info error grid in
 	let error,prehash = prehash parameter handler error graph in
 	error,log_info,(prehash,[grid,graph,None,pretrace,info])::table 
 			    
@@ -689,7 +691,7 @@ module BucketTable =
 	   error,log_info,(table,cannonic)
 			
       let add_story  parameter handler log_info error grid pretrace story_info table =
-	let error,graph = graph_of_grid parameter handler error grid in 
+	let error,log_info,graph = graph_of_grid parameter handler log_info error grid in 
 	let error,prehash = prehash parameter handler error graph in 
 	let assoc = (grid,graph,None,pretrace,story_info) in 
 	let add_story error x table =

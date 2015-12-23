@@ -224,7 +224,7 @@ let closure_bottom_up_with_fold err_fmt config prec is_obs f a  =
           (tick,if is_obs succ then
 		  f succ pred_star a else a)            
         end)
-      prec (tick,a) 
+      prec (tick,a)
   in 
   let _ = close_tick () in
   let () = 
@@ -364,87 +364,34 @@ let closure err_fmt config prec is_obs =
   | Bottom_up -> closure_bottom_up err_fmt config prec is_obs 
   | Top_down -> closure_top_down err_fmt config prec is_obs 0
 		   
-let neighbor_non_direct_descendant sons prec =
-  let selection x = S.mem x sons in
-  let rec aux (selected,todos) don =
-    if S.is_empty todos then selected
-    else
-      let done' = S.inter don todos in
-      aux
-	(S.fold
-	   (fun eid (sel',todos') ->
-	    match M.find_option eid prec with
-	    | None -> raise Not_found
-	    | Some sons' ->
-	       let todos'' = S.union todos' (S.minus sons' done') in
-	       let sel'' = S.union sel' (S.filter selection sons') in
-	       (sel'',todos'')
-	   ) todos (selected,S.empty)) done'
-  in aux (S.empty,sons) S.empty
 
-let reduction prec =
-  M.fold
-    (fun eid neigh out ->
-     let to_remove = neighbor_non_direct_descendant neigh prec in
-     if S.is_empty to_remove then out
-     else M.add eid (S.minus neigh to_remove) out
-    ) prec prec
-
-let reduction_top_down prec =
+let reduction_top_down parameter handler log_info error prec =
+  let error,log_info = StoryProfiling.StoryStats.add_event parameter error StoryProfiling.Transitive_closure None log_info in 
   let prec_star = fst (closure_top_down Format.std_formatter config_big_graph_without_progress_bar prec (fun _ -> true) 2) in
-  M.fold
-    (fun eid neigh out ->
-     let to_remove = A.get prec_star eid in
-     let s =
-       S.fold (fun i l -> i::l) neigh []
-     in
-     let s = List.rev s in
-     let rec aux l1 l2 output =
-       match l1,l2 with
-	 _,[] -> List.fold_left (fun set i -> S.add i set) output l1 (* This is quite annoying, why prec is not described with ordered list *)
-       | [],_ -> output
-       | h::q,h'::q' ->
-	  let cmp = compare h h' in
-	  if cmp < 0 then aux q l2 (S.add h output) 
-	  else if cmp = 0 then aux q q' output
-	  else  aux (h::q) q' output
-     in
-     let s = aux s to_remove S.empty in
-     M.add eid s out 
-    )
-    prec prec
+  let output =
+    M.fold
+      (fun eid neigh out ->
+       let to_remove = A.get prec_star eid in
+       let s =
+	 S.fold (fun i l -> i::l) neigh []
+	   in
+	   let s = List.rev s in
+	   let rec aux l1 l2 output =
+	     match l1,l2 with
+	       _,[] -> List.fold_left (fun set i -> S.add i set) output l1 (* This is quite annoying, why prec is not described with ordered list *)
+	     | [],_ -> output
+	     | h::q,h'::q' ->
+		let cmp = compare h h' in
+		if cmp < 0 then aux q l2 (S.add h output) 
+		else if cmp = 0 then aux q q' output
+		else  aux (h::q) q' output
+	   in
+	   let s = aux s to_remove S.empty in
+	   M.add eid s out 
+      )
+      prec prec
+  in 
+  let error,log_info = StoryProfiling.StoryStats.close_event parameter error StoryProfiling.Transitive_closure None log_info in
+  error,log_info,output
 
-let reduction_check prec =
-  let t = Sys.time () in
-  let a = reduction prec in
-  let t' = Sys.time () in
-  let a' = reduction_top_down prec in
-  let t'' = Sys.time () in 
-  let differ i l l' =
-    let _ = Printf.fprintf stderr "DIFFER %i\n" i in
-    let _ = S.iter (Printf.fprintf stderr "%i, ") l in
-    let _ = Printf.fprintf stderr "\n" in 
-    let _ = S.iter (Printf.fprintf stderr "%i, ") l' in 
-    let _ = Printf.fprintf stderr "\n" in
-    ()
-  in
-(*  let _ = Printf.fprintf stderr "PREC:\n" in 
-  let _ =
-    M.iter (fun i s ->
-	    Printf.fprintf stderr "%i:\n" i;
-	    S.iter (Printf.fprintf stderr "  %i,") s;
-	    Printf.fprintf stderr "\n")
-	   prec
-  in *)
-  let _ =
-    M.monadic_fold2
-      () () 
-      (fun () () i l l' () -> (),if not (S.equal l l') then differ i l l')
-      (fun () () i l () -> (), if not (S.is_empty l) then differ i l S.empty)
-      (fun () () i l () -> (), if not (S.is_empty l) then differ i S.empty l)
-      a a' ()
-  in
-  let _ = Printf.fprintf stderr "OLD: %f ; NEW: %f \n" (t'-.t) (t''-.t') in
-  a
-
-    (*let reduction = reduction_check  *)
+let reduction = reduction_top_down 	   
