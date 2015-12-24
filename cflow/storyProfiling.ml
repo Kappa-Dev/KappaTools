@@ -38,6 +38,7 @@ type step_kind =
 	 | Pseudo_inverse_deletion
 	 | Remove_events_after_last_observable
 	 | Compression
+	 | Build_configuration
 	 | Transitive_closure
 	 | Graph_reduction 
 	 | Cannonic_form_computation
@@ -47,6 +48,7 @@ let print_step_kind logger x =
     x
     with
     | Beginning -> ()  
+    | Build_configuration -> Format.fprintf logger "Build configuration\t"
     | Collect_traces -> Format.fprintf logger "Collect traces\t" 
     | Causal_compression -> Format.fprintf logger "Causal compression\t"
     | Weak_compression -> Format.fprintf logger "Weak compression\t" 
@@ -93,7 +95,9 @@ module type StoryStats =
 
     val add_event: Remanent_parameters_sig.parameters -> Exception.method_handler -> step_kind -> (unit -> int) option -> log_info -> Exception.method_handler * log_info 
     val close_event: Remanent_parameters_sig.parameters -> Exception.method_handler -> step_kind -> (unit -> int) option -> log_info -> Exception.method_handler * log_info
-									  
+    val add_event_opt: Remanent_parameters_sig.parameters -> Exception.method_handler -> step_kind option -> (unit -> int) option -> log_info -> Exception.method_handler * log_info 
+    val close_event_opt: Remanent_parameters_sig.parameters -> Exception.method_handler -> step_kind option -> (unit -> int) option -> log_info -> Exception.method_handler * log_info
+								  
     val set_time: log_info -> log_info 
     val set_step_time: log_info -> log_info
     val set_global_cut: int -> log_info -> log_info 
@@ -275,6 +279,16 @@ module StoryStats =
 		(*	terminated_tasks = terminated_task::log_info.terminated_tasks*)
 	      }
 	    end
+
+       let gen_opt gen parameter error step_kind f log_info =
+	 match
+	   step_kind
+	 with None -> error,log_info
+	    | Some e -> gen parameter error e f log_info
+
+	      
+       let add_event_opt = gen_opt add_event
+       let close_event_opt = gen_opt close_event 
 	      
        let propagation_labels = 
          [|

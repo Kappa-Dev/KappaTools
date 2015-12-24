@@ -411,13 +411,12 @@ let depth_and_size_of_event config =
     ) config.prec_1 (IntMap.empty,0)
 
 let enrich_grid parameter handler log_info error config_closure grid =
-  let err_fmt = Remanent_parameters.get_formatter parameter in 
   let keep_l =
     List.fold_left (fun a b -> IntSet.add b a) IntSet.empty grid.obs in
   let to_keep i = IntSet.mem i keep_l in
   let ids = ids_of_grid grid  in
   let error,log_info,config = config_of_grid parameter handler log_info error ids grid in
-  let prec_star = prec_star_of_config err_fmt config_closure config.prec_1 to_keep in 
+  let error,log_info,prec_star = prec_star_of_config parameter handler log_info error (Some StoryProfiling.Transitive_closure) config_closure config.prec_1 to_keep in 
   let depth_of_event,depth = depth_and_size_of_event config in
   error,log_info,
   {
@@ -429,12 +428,14 @@ let enrich_grid parameter handler log_info error config_closure grid =
   }
 
 let fold_over_causal_past_of_obs parameter handler log_info error config_closure grid f a = 
-  let err_fmt = Remanent_parameters.get_formatter parameter in 
+  (* let err_fmt = Remanent_parameters.get_formatter parameter in *)
   let keep_l = List.fold_left (fun a b -> IntSet.add b a) IntSet.empty grid.obs in
   let to_keep i = IntSet.mem i keep_l in
   let ids = ids_of_grid grid  in
+  let error,log_info = StoryProfiling.StoryStats.add_event parameter error StoryProfiling.Build_configuration None log_info in 
   let error,log_info,config = config_of_grid parameter handler log_info error ids grid in
-  error,log_info,Graph_closure.closure_bottom_up_with_fold err_fmt config_closure config.prec_1 to_keep f a 
+  let ettor,log_info = StoryProfiling.StoryStats.close_event parameter error StoryProfiling.Build_configuration None log_info in 
+  Graph_closure.closure_bottom_up_with_fold parameter handler log_info error (Some StoryProfiling.Collect_traces) config_closure config.prec_1 to_keep f a 
     
 let dot_of_grid profiling env enriched_grid form =
   let t = Sys.time () in

@@ -135,7 +135,8 @@ let diff_list_decreasing =  diff_list (swap compare_bool)
 let merge_list_decreasing = merge_list (swap compare_bool)
 (*let merge_list_increasing = merge_list compare_bool*)
 				       
-let closure_bottom_up_with_fold err_fmt config prec is_obs f a  =
+let closure_bottom_up_with_fold parameter handler log_info error event config prec is_obs f a  =
+  let err_fmt = Remanent_parameters.get_formatter parameter in 
   let is_obs = if config.keep_all_nodes then (fun _ -> true) else is_obs in 
   let max_index = M.fold (fun i _ -> max i) prec 0 in
   let () =
@@ -188,7 +189,13 @@ let closure_bottom_up_with_fold err_fmt config prec is_obs f a  =
       gc_when_visit,
       (fun i -> A.get max_succ i)
     end    
-  in 
+  in
+  let error,log_info =
+    match
+      event
+    with
+    | None -> error,log_info
+    | Some e -> StoryProfiling.StoryStats.add_event parameter error e None log_info in 
   let _,a = 
     M.fold_with_interruption 
       (fun succ s_pred (tick,a) -> 
@@ -227,30 +234,26 @@ let closure_bottom_up_with_fold err_fmt config prec is_obs f a  =
       prec (tick,a)
   in 
   let _ = close_tick () in
-  let () = 
-    if check_mode 
-    then 
-      let () = Printf.fprintf stderr "CHECK\n" in 
-      let () = 
-	A.iteri (fun i a -> 
-	  match a with 
-	    [] -> ()
-	  | l -> Printf.fprintf stderr "%i  \n" i;
-            List.iter (Printf.fprintf stderr "-->%i\n") l)
-	  s_pred_star
-      in ()	  
-  in a
+  let error,log_info =
+    match event
+    with
+      None -> error,log_info
+    | Some e ->
+       StoryProfiling.StoryStats.close_event parameter error e None log_info
+  in 
+  error,log_info,a
 
-let closure_bottom_up err_fmt config prec is_obs =
+let closure_bottom_up parameter handler log_info error event_opt config prec is_obs =
   let max_index = M.fold (fun i _ -> max i) prec 0 in
   let s_pred_star = A.make (max_index+1) [] in
   let f i s a =
     let _ = A.set a i s in a
   in 
-  closure_bottom_up_with_fold err_fmt config prec is_obs f s_pred_star,
-  Decreasing_without_last_event 
+  let error,log_info,graph = closure_bottom_up_with_fold parameter handler log_info error event_opt config prec is_obs f s_pred_star in 
+  error,log_info,(graph,Decreasing_without_last_event)
 
-let closure_top_down err_fmt config prec is_obs  delta =
+let closure_top_down parameter handler log_info error event_opt config prec is_obs  delta =
+  let err_fmt = Remanent_parameters.get_formatter parameter in 
   let is_obs = if config.keep_all_nodes then (fun _ -> true) else is_obs in 
   let max_index = M.fold (fun i _ -> max i) prec 0 in
   let prec =
@@ -317,7 +320,7 @@ let closure_top_down err_fmt config prec is_obs  delta =
       tick prec 
   in
   let () = close_tick () in
-  s_pred_star,Increasing_with_last_event
+  error,log_info,(s_pred_star,Increasing_with_last_event)
 
 let get_list_in_increasing_order_with_last_event i (m,mode) =
   match
@@ -333,11 +336,11 @@ let get_list_in_increasing_order_with_last_event i (m,mode) =
        | l -> List.rev (i::l)
      end
        
-let closure_check err_fmt config prec is_obs (*init_to_eidmax*) =
+let closure_check parameter handler log_info error event_opt config prec is_obs =
   let t = Sys.time () in 
-  let a,a' = closure_top_down err_fmt config prec is_obs 0 in
+  let error,log_info,(a,a') = closure_top_down parameter handler log_info error event_opt config prec is_obs 0 in
   let t' = Sys.time () in
-  let b,b' = closure_bottom_up err_fmt {config with do_tick = false} prec is_obs in
+  let error,log_info,(b,b') = closure_bottom_up parameter handler log_info error event_opt {config with do_tick = false} prec is_obs in
   let t'' = Sys.time () in
   let _ = Printf.fprintf stderr "NEW: %f OLD: %f \n" (t'-.t) (t''-.t') in 
   let _ =
@@ -354,20 +357,20 @@ let closure_check err_fmt config prec is_obs (*init_to_eidmax*) =
 	   let _ = Printf.fprintf stderr "\n" in 
 	   ())
       a
-  in a,a'
+  in error,log_info,(a,a')
        
-let closure err_fmt config prec is_obs =
+let closure parameter handler log_info error event_opt config prec is_obs =
   match
     config.algo
   with
-  | Check -> closure_check err_fmt config prec is_obs 
-  | Bottom_up -> closure_bottom_up err_fmt config prec is_obs 
-  | Top_down -> closure_top_down err_fmt config prec is_obs 0
+  | Check -> closure_check parameter handler log_info error event_opt config prec is_obs 
+  | Bottom_up -> closure_bottom_up parameter handler log_info error event_opt config prec is_obs 
+  | Top_down -> closure_top_down parameter handler log_info error event_opt config prec is_obs 0
 		   
 
 let reduction_top_down parameter handler log_info error prec =
-  let error,log_info = StoryProfiling.StoryStats.add_event parameter error StoryProfiling.Transitive_closure None log_info in 
-  let prec_star = fst (closure_top_down Format.std_formatter config_big_graph_without_progress_bar prec (fun _ -> true) 2) in
+  let error,log_info = StoryProfiling.StoryStats.add_event parameter error StoryProfiling.Graph_reduction None log_info in 
+  let error,log_info,(prec_star,_) = closure_top_down parameter handler log_info error StoryProfiling.Transitive_closure config_big_graph_without_progress_bar prec (fun _ -> true) 2 in
   let output =
     M.fold
       (fun eid neigh out ->
@@ -391,7 +394,7 @@ let reduction_top_down parameter handler log_info error prec =
       )
       prec prec
   in 
-  let error,log_info = StoryProfiling.StoryStats.close_event parameter error StoryProfiling.Transitive_closure None log_info in
+  let error,log_info = StoryProfiling.StoryStats.close_event parameter error StoryProfiling.Graph_reduction None log_info in
   error,log_info,output
 
 let reduction = reduction_top_down 	   
