@@ -77,10 +77,7 @@ let compress_and_print logger env log_info step_list =
   let weak_compression_on = Parameter.get_weak_compression mode in
   let strong_compression_on = Parameter.get_strong_compression mode in
   let error = U.error_init in       
-  let handler =
-    {
-      S.PH.B.PB.CI.Po.K.H.env = env ;
-    } in
+  let handler = S.PH.B.PB.CI.Po.K.H.init_handler env in
   let error,log_info,table1 = U.create_story_table parameter handler log_info error in
   let error,log_info,table2 = U.create_story_table parameter handler log_info error in
   let error,log_info,table3 = U.create_story_table parameter handler log_info error in

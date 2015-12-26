@@ -46,6 +46,8 @@ module type Cflow_handler =
     type handler =   (*handler to interpret abstract values*)
         {
           env: Environment.t ;
+	  rule_name_cache: string array;
+	  agent_name_cache: string array
         }
 
     type 'a zeroary = parameter -> handler -> StoryProfiling.StoryStats.log_info -> Exception.method_handler -> Exception.method_handler * StoryProfiling.StoryStats.log_info * 'a
@@ -85,6 +87,9 @@ module type Cflow_handler =
     val use_fusion_sort: parameter -> parameter 
     val always_disambiguate: parameter -> bool 
     val set_always_disambiguate: parameter -> bool -> parameter
+    val init_handler: Environment.t -> handler
+    val string_of_rule_id: handler -> int -> string
+    val string_of_agent_id: handler -> int -> string
   end
 
 
@@ -145,6 +150,8 @@ module Cflow_handler =
     type handler =
         {
           env: Environment.t ;
+	  rule_name_cache: string array;
+	  agent_name_cache: string array
         }
 
     type 'a zeroary = parameter -> handler -> StoryProfiling.StoryStats.log_info -> Exception.method_handler -> Exception.method_handler * StoryProfiling.StoryStats.log_info * 'a
@@ -153,7 +160,15 @@ module Cflow_handler =
     type ('a,'b,'c,'d) ternary  = parameter -> handler -> StoryProfiling.StoryStats.log_info -> Exception.method_handler -> 'a -> 'b -> 'c ->  Exception.method_handler * StoryProfiling.StoryStats.log_info * 'd
     type ('a,'b,'c,'d,'e) quaternary  = parameter -> handler -> StoryProfiling.StoryStats.log_info -> Exception.method_handler -> 'a -> 'b -> 'c -> 'd -> Exception.method_handler * StoryProfiling.StoryStats.log_info * 'e
     
-   
+    let init_handler env =
+      let n_rules = Environment.nb_syntactic_rules env in
+      let rule_name_cache = Array.init (n_rules+1) (Format.asprintf "%a" (Environment.print_ast_rule ~env:env)) in
+      let n_agents = Signature.size (Environment.signatures env) in
+      let agent_name_cache = Array.init n_agents (Format.asprintf "%a" (Environment.print_agent ~env:env)) in
+      {env = env;
+       rule_name_cache=rule_name_cache;
+       agent_name_cache=agent_name_cache}
+
     let string_of_exn x = Some ""
 
     let get_priorities parameter =
@@ -203,5 +218,7 @@ module Cflow_handler =
    let set_itteration_bound parameter int = {parameter with bound_on_itteration_number = Some int}				      
    let get_bound_on_itteration_number parameter = parameter.bound_on_itteration_number
    let get_profiling_logger parameter = parameter. out_channel_profiling 
-   end:Cflow_handler)
+   let string_of_rule_id handler i = handler.rule_name_cache.(i)
+   let string_of_agent_id handler i = handler.agent_name_cache.(i)
+end:Cflow_handler)
     

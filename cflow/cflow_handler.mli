@@ -25,6 +25,8 @@ module type Cflow_handler =
     type handler =   (*handler to interpret abstract values*)
         {
           env: Environment.t ;
+	  rule_name_cache: string array;
+	  agent_name_cache: string array
         }
 
     type 'a zeroary = parameter -> handler -> StoryProfiling.StoryStats.log_info -> Exception.method_handler -> Exception.method_handler * StoryProfiling.StoryStats.log_info * 'a
@@ -62,6 +64,9 @@ module type Cflow_handler =
     val use_fusion_sort: parameter -> parameter
     val always_disambiguate: parameter -> bool 
     val set_always_disambiguate: parameter -> bool -> parameter 
-   end
+    val init_handler: Environment.t -> handler
+    val string_of_rule_id: handler -> int -> string
+    val string_of_agent_id: handler -> int -> string
+  end
 
 module Cflow_handler:Cflow_handler

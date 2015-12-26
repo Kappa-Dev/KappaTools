@@ -125,7 +125,12 @@ let print_prehash parameter handler error representation =
   let _ = Format.fprintf parameter.H.out_channel_err "@." in 
   error 
     
-let label handler = Causal.label ~env:handler.H.env
+let label handler x =
+  match x
+  with
+  | Causal.RULE i -> H.string_of_rule_id handler i
+  | Causal.INIT [i] -> H.string_of_agent_id handler i
+  | _ -> Causal.label ~env:handler.H.env x
 				 
 let kind node = 
   match node 
