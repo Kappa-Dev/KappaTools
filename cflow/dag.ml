@@ -195,14 +195,12 @@ let graph_of_grid parameter handler log_info error grid =
   let label = label handler in 
   let error,log_info,config = Causal.cut (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) handler log_info error ids grid in 
   let labels = A.make 1 (FICTITIOUS,"") in 
-  let set =  
-    Mods.IntMap.fold
+  let () =  
+    Mods.IntMap.iter
       (fun i atom_kind ->
-       let _ = A.set labels i (kind atom_kind,label atom_kind) in
-       Mods.IntSet.add i 
+       A.set labels i (kind atom_kind,label atom_kind)
       )
       config.Causal.events_kind
-      Mods.IntSet.empty 
   in 
   let add_to_list_array i j a = 
     try 
@@ -223,53 +221,53 @@ let graph_of_grid parameter handler log_info error grid =
   in 
   let succ  = A.make 1 [] in 
   let pred = A.make 1 [] in 
-  let root = 
-    Mods.IntMap.fold
-      (fun i s set ->
+  let () = 
+    Mods.IntMap.iter
+      (fun i s ->
        if Mods.IntSet.is_empty s
-       then set 
+       then ()
        else 
-         let set  = 
-           Mods.IntSet.fold
-             (fun j -> 
-              let _ = add j i succ pred in 
-              Mods.IntSet.remove j)
-             s
-             set
-         in 
-         set)
+           Mods.IntSet.iter
+             (fun j -> add j i succ pred)
+             s)
       config.Causal.prec_1
-      set 
-  in 
+   in 
   let conflict_pred = A.make 1 [] in 
   let conflict_succ = A.make 1 [] in 
-  let root = 
-    Mods.IntMap.fold
-      (fun i s root ->
+  let () = 
+    Mods.IntMap.iter
+      (fun i s  ->
        if Mods.IntSet.is_empty s 
-       then set 
+       then () 
        else 
-         let root = 
-           Mods.IntSet.fold 
-             (fun j -> 
-              let _ = add j i conflict_succ conflict_pred in 
-              Mods.IntSet.remove j)
-             s
-             root 
-         in 
-         root)
+           Mods.IntSet.iter 
+             (fun j -> add j i conflict_succ conflict_pred)
+             s)
       config.Causal.conflict 
-      root
   in 
+  let root =
+    let rec aux k  =
+      if k<0 then k
+      else 
+	if (A.get pred k <> [] || A.get conflict_pred k <> []) && A.get succ k = [] && A.get conflict_succ k = [] 
+	then
+	  k
+	else aux (k-1) 
+    in
+    match Mods.IntMap.max_key config.Causal.prec_1
+    with None -> -1
+       | Some k -> aux k 
+  in
+	     
   let error,log_info = StoryProfiling.StoryStats.close_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error StoryProfiling.Graph_conversion None log_info in 
-  if Mods.IntSet.is_empty root
+  if root = -1
   then 
     error,log_info,dummy_graph 
   else 
     error,
     log_info,
     { 
-      root = (match Mods.IntSet.min_elt root with Some x -> x | None -> -1);
+      root = root;
       labels = labels ;
       succ = succ ;
       pred = pred ;
