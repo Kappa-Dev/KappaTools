@@ -313,6 +313,7 @@ let rec parse_attribute last_modif last_tested attribute config =
        parse_attribute last_modif (atom.eid::last_tested) att config
 
 let cut parameter handler log_info error attribute_ids grid =
+  let error,log_info = StoryProfiling.StoryStats.add_event parameter error StoryProfiling.Build_configuration None log_info in 
   let rec build_config attribute_ids cfg =
     match attribute_ids with
     | [] -> cfg
@@ -341,6 +342,7 @@ let cut parameter handler log_info error attribute_ids grid =
        in build_config tl cfg
   in
   let cfg = build_config attribute_ids empty_config in
+  let error,log_info = StoryProfiling.StoryStats.close_event parameter error StoryProfiling.Build_configuration None log_info in 
   let error,log_info,reduction = Graph_closure.reduction parameter handler log_info error cfg.prec_1 in 
   error,log_info,{cfg with prec_1 = reduction}
 

@@ -50,19 +50,15 @@ type graph =
     root: int; 
     labels: node A.t ;
     pred: int list A.t ;
-    succ: int list A.t ;
     conflict_pred: int list A.t; 
-    conflict_succ: int list A.t;
-  }
+   }
     
 let dummy_graph = 
   {
     root = 0 ;
     labels = A.make 1 (FICTITIOUS,"") ;
     pred = A.make 1 [] ;
-    succ = A.make 1 [] ;
     conflict_pred = A.make 1 [] ; 
-    conflict_succ = A.make 1 [] ;
   }
     
 type edge_kind = Succ | Conflict 
@@ -83,12 +79,6 @@ let print_graph parameter handler error graph =
   let _ = Format.fprintf parameter.H.out_channel "Root: %i@\n" graph.root in
   let _ = Format.fprintf parameter.H.out_channel "Labels:@\n" in
   let _ = A.iteri (fun i (_,j) -> Format.fprintf parameter.H.out_channel "Node %i,Label %s@\n" i j) graph.labels in
-  let _ = Format.fprintf parameter.H.out_channel "Succ:@\n" in
-  let _ = 
-    A.iteri 
-      (fun i l -> List.iter (Format.fprintf parameter.H.out_channel "%i -> %i@\n" i) l)
-      graph.succ 
-  in 
   let _ = 
     A.iteri 
       (fun i l   -> 
@@ -97,15 +87,6 @@ let print_graph parameter handler error graph =
       graph.pred
   in 
   let _ = Format.fprintf parameter.H.out_channel "Conflicts:@\n" in 
-  let _ = 
-    A.iteri 
-      (fun i l ->  
-       List.iter 
-         (Format.fprintf parameter.H.out_channel "%i --| %i@\n" i)
-         l
-      )
-      graph.conflict_succ
-  in 
   let _ = 
     A.iteri 
       (fun i l  ->  
@@ -194,87 +175,49 @@ let graph_of_grid parameter handler log_info error grid =
   let ids = Hashtbl.fold (fun key _ l -> key::l) grid.Causal.flow [] in
   let label = label handler in 
   let error,log_info,config = Causal.cut (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) handler log_info error ids grid in 
-  let labels = A.make 1 (FICTITIOUS,"") in 
-  let () =  
-    Mods.IntMap.iter
-      (fun i atom_kind ->
-       A.set labels i (kind atom_kind,label atom_kind)
-      )
-      config.Causal.events_kind
-  in 
-  let add_to_list_array i j a = 
-    try 
-      let old = 
-        try 
-          A.get a i 
-        with 
-        | Not_found -> []
-      in 
-      A.set a i  (j::old) 
-    with 
-    | _ -> A.set a i [j]
-  in 
-  let add i j s p = 
-    let _ = add_to_list_array i j s in 
-    let _ = add_to_list_array j i p in 
-    ()
-  in 
-  let succ  = A.make 1 [] in 
-  let pred = A.make 1 [] in 
-  let () = 
-    Mods.IntMap.iter
-      (fun i s ->
-       if Mods.IntSet.is_empty s
-       then ()
-       else 
-           Mods.IntSet.iter
-             (fun j -> add j i succ pred)
-             s)
-      config.Causal.prec_1
-   in 
-  let conflict_pred = A.make 1 [] in 
-  let conflict_succ = A.make 1 [] in 
-  let () = 
-    Mods.IntMap.iter
-      (fun i s  ->
-       if Mods.IntSet.is_empty s 
-       then () 
-       else 
-           Mods.IntSet.iter 
-             (fun j -> add j i conflict_succ conflict_pred)
-             s)
-      config.Causal.conflict 
-  in 
-  let root =
-    let rec aux k  =
-      if k<0 then k
-      else 
-	if (A.get pred k <> [] || A.get conflict_pred k <> []) && A.get succ k = [] && A.get conflict_succ k = [] 
-	then
-	  k
-	else aux (k-1) 
-    in
-    match Mods.IntMap.max_key config.Causal.prec_1
-    with None -> -1
-       | Some k -> aux k 
-  in
-	     
-  let error,log_info = StoryProfiling.StoryStats.close_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error StoryProfiling.Graph_conversion None log_info in 
-  if root = -1
-  then 
-    error,log_info,dummy_graph 
-  else 
-    error,
-    log_info,
-    { 
-      root = root;
-      labels = labels ;
-      succ = succ ;
-      pred = pred ;
-      conflict_succ = conflict_succ ;
-      conflict_pred = conflict_pred 
-    }
-	    	    
+  match Mods.IntMap.max_key config.Causal.prec_1
+  with None -> error,log_info,dummy_graph 
+     | Some size ->
+	let succ_size = succ size in 
+	let labels = A.make succ_size (FICTITIOUS,"") in 
+	let pred = A.make succ_size [] in
+	let conflict_pred = A.make succ_size [] in 
+	let () =
+	  Mods.IntMap.iter
+	    (fun i atom_kind ->
+	     A.set labels i (kind atom_kind,label atom_kind)
+	    )
+	    config.Causal.events_kind
+	in 
+	let () = 
+	  Mods.IntMap.iter
+	    (fun i s ->
+	     if Mods.IntSet.is_empty s
+	     then ()
+	     else 
+	       A.set pred i (Mods.IntSet.elements s))
+	    config.Causal.prec_1
+	in 
+	let () = 
+	  Mods.IntMap.iter
+	    (fun i s  ->
+	     if Mods.IntSet.is_empty s 
+	     then () 
+	     else 
+               A.set conflict_pred i (Mods.IntSet.elements s))
+	    config.Causal.conflict 
+	in 
+	let root = size	in
+	let error,log_info = StoryProfiling.StoryStats.close_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error StoryProfiling.Graph_conversion None log_info in 
+	  error,
+	  log_info,
+	  { 
+	    root = root;
+	    labels = labels ;
+	    pred = pred ;
+	    conflict_pred = conflict_pred 
+	  }
+	    
 let concat list1 list2 = 
   let rec aux list1 list2 = 
     match list2 

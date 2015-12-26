@@ -150,12 +150,12 @@ module StoryStats =
 
        let k_first k l =
 	 let rec aux k l output =
-	   if k=0 then [],output
+	   if k=0 then [],List.rev output
 	   else
 	     match
 	       l
 	     with
-	     | [] -> (let rec aux k output = if k = 0 then output else aux (k-1) ("\t"::output) in aux k []),output
+	     | [] -> (let rec aux k output = if k = 0 then output else aux (k-1) ("\t"::output) in aux k []),List.rev output
 	     | t::q -> aux (k-1) q (t::output)
 	 in aux k l []
 	 
