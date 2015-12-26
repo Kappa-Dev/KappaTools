@@ -24,48 +24,57 @@ let warn parameter error option exn default =
 
 
 type step_kind =
-	 | Beginning 
-	 | Collect_traces
-	 | Causal_compression
-	 | Weak_compression
-	 | Strong_compression
-	 | Iteration of int
-	 | Story of int
-	 | Partial_order_reduction
-	 | Siphon_detection
-	 | Decompose_initial_state
-	 | Agent_ids_disambiguation
-	 | Pseudo_inverse_deletion
-	 | Remove_events_after_last_observable
-	 | Compression
-	 | Build_configuration
-	 | Transitive_closure
-	 | Graph_reduction 
-	 | Cannonic_form_computation
-
-let print_step_kind logger x =
+  | Dummy 
+  | Beginning 
+  | Collect_traces
+  | Causal_compression
+  | Weak_compression
+  | Strong_compression
+  | Iteration of int
+  | Story of int
+  | Partial_order_reduction
+  | Siphon_detection
+  | Decompose_initial_state
+  | Agent_ids_disambiguation
+  | Pseudo_inverse_deletion
+  | Remove_events_after_last_observable
+  | Compression
+  | Build_grid 
+  | Build_configuration
+  | Transitive_closure
+  | Graph_reduction
+  | Graph_conversion
+  | Cannonic_form_computation
+  | Store_trace
+      
+let string_of_step_kind x =
   match
     x
     with
-    | Beginning -> ()  
-    | Build_configuration -> Format.fprintf logger "Build configuration\t"
-    | Collect_traces -> Format.fprintf logger "Collect traces\t" 
-    | Causal_compression -> Format.fprintf logger "Causal compression\t"
-    | Weak_compression -> Format.fprintf logger "Weak compression\t" 
-    | Strong_compression -> Format.fprintf logger "Strong compression\t"
-    | Iteration int -> Format.fprintf logger "Iteration %i\t" int
-    | Story int -> Format.fprintf logger "Story %i\t" int 
-    | Partial_order_reduction -> Format.fprintf logger "Partial order reduction\t" 
-    | Siphon_detection -> Format.fprintf logger "Detection of siphons\t" 
-    | Decompose_initial_state -> Format.fprintf logger "Splitting initial states\t" 
-    | Agent_ids_disambiguation -> Format.fprintf logger "Renaming agents to avoid conflicts\t" 
-    | Pseudo_inverse_deletion -> Format.fprintf logger "Deletion of pseudo inverse events\t" 
-    | Remove_events_after_last_observable -> Format.fprintf logger "Removing events after the last observables\t"
-    | Compression -> Format.fprintf logger "Compression\t" 
-    | Transitive_closure -> Format.fprintf logger "Transitive closure\t" 
-    | Graph_reduction -> Format.fprintf logger "Transitive reduction\t" 
-    | Cannonic_form_computation -> Format.fprintf logger "Computing the cannonic form\t" 
-
+    | Dummy 
+    | Beginning -> "" 
+    | Build_configuration -> "Build configuration\t"
+    | Collect_traces -> "Collect traces\t" 
+    | Causal_compression -> "Causal compression\t"
+    | Weak_compression -> "Weak compression\t" 
+    | Strong_compression -> "Strong compression\t"
+    | Iteration int -> Printf.sprintf "Iteration %i\t" int
+    | Story int -> Printf.sprintf "Story %i\t" int 
+    | Partial_order_reduction -> "Partial order reduction\t" 
+    | Siphon_detection -> "Detection of siphons\t" 
+    | Decompose_initial_state -> "Splitting initial states\t" 
+    | Agent_ids_disambiguation -> "Renaming agents to avoid conflicts\t" 
+    | Pseudo_inverse_deletion -> "Deletion of pseudo inverse events\t" 
+    | Remove_events_after_last_observable -> "Removing events after the last observables\t"
+    | Compression -> "Compression\t" 
+    | Transitive_closure -> "Transitive closure\t" 
+    | Build_grid -> "Grid computation\t" 
+    | Graph_reduction -> "Transitive reduction\t" 
+    | Graph_conversion -> "Graph conversion\t"
+    | Cannonic_form_computation -> "Computing the cannonic form\t" 
+    | Store_trace -> "Store trace\t"
+	     
+let print_step_kind logger x = Format.fprintf logger "%s" (string_of_step_kind x)
 						  
 module type StoryStats = 
   sig 
@@ -93,6 +102,7 @@ module type StoryStats =
 
     val copy: log_info -> log_info 
 
+    val is_dummy: step_kind -> bool
     val add_event: Remanent_parameters_sig.parameters -> Exception.method_handler -> step_kind -> (unit -> int) option -> log_info -> Exception.method_handler * log_info 
     val close_event: Remanent_parameters_sig.parameters -> Exception.method_handler -> step_kind -> (unit -> int) option -> log_info -> Exception.method_handler * log_info
     val add_event_opt: Remanent_parameters_sig.parameters -> Exception.method_handler -> step_kind option -> (unit -> int) option -> log_info -> Exception.method_handler * log_info 
@@ -206,80 +216,114 @@ module StoryStats =
 	     propagation: int array ; 
 	     last_tick:float;
 	   }
-             
+
+       let is_dummy step_kind =
+	 match
+	   step_kind
+	 with 
+	 | Dummy -> true
+	 | _ -> false 
+
        let add_event parameter error step_kind f log_info =
-	 let next_depth = log_info.next_depth in 
-	 let task =
-	   {
-	     tag = step_kind ;
-	     size_before = begin match f with | None -> None | Some f -> Some (f ()) end ;
-	     size_after = None ;
-	     time_start = Sys.time () ;
-	     duration = None ; 
-	     depth = next_depth ;
-	   }
-	 in
-	 let _ = Format.fprintf (Remanent_parameters.get_profiling_info_logger parameter) "Start\t" in 
-	 let terminated_task =
-	   (task,List.rev_map (fun x -> x.tag) (List.rev log_info.current_task))
-	 in
-	 let _ = print_task (Remanent_parameters.get_profiling_info_logger parameter) terminated_task in 
-	 let _ = flush_logger  parameter in 	 
-	 let current_task = task::log_info.current_task in 
+	 if is_dummy step_kind then
+	   let error,() =   warn  parameter error (Some "line 146, Inconsistent profiling information, add_event should not be called with a dummy event")  (Failure "Dummy event in add_event") ()
+	   in
+	   error,log_info
+	 else 
+	   let next_depth = log_info.next_depth in 
+	   let task =
+	     {
+	       tag = step_kind ;
+	       size_before = begin match f with | None -> None | Some f -> Some (f ()) end ;
+	       size_after = None ;
+	       time_start = Sys.time () ;
+	       duration = None ; 
+	       depth = next_depth ;
+	     }
+	   in
+	   let _ = Format.fprintf (Remanent_parameters.get_profiling_info_logger parameter) "Start\t" in 
+	   let terminated_task =
+	     (task,List.rev_map (fun x -> x.tag) (List.rev log_info.current_task))
+	   in
+	   let _ = print_task (Remanent_parameters.get_profiling_info_logger parameter) terminated_task in 
+	   let _ = flush_logger  parameter in 	 
+	   let current_task = task::log_info.current_task in 
 	 
-	 error,
-	 { log_info
-	 with
-	   next_depth = next_depth + 1 ;
-	   current_task = current_task
-	 }
-	   
+	   error,
+	   { log_info
+	   with
+	     next_depth = next_depth + 1 ;
+	     current_task = current_task
+	   }
+	     
        let close_event parameter error step_kind f log_info =
-	 let next_depth = log_info.next_depth in
-	 let error,() =
-	   if next_depth = 1
-	   then
-	     warn  parameter error (Some "line 146, Inconsistent profiling information, depth should not be equal to 1 when closing an event") (Failure "Depth=1 in close_event") ()
-	   else
-	     error,()
-	 in
-	 match 
-	   log_info.current_task
-	 with
-	 | [] ->
-	    warn  parameter error (Some "line 156, Inconsistent profiling information, no current task when closing an event") (Failure "No current tasks in close_event") log_info
-	 | current_task::tail ->
-	    begin
-	      let size_after = 
-		match f
-		with Some f -> Some (f ())
-		   | None -> None
-	      in
-	      let time = Sys.time () -. current_task.time_start in
-	      let task =
-		{
-		  current_task
-		with
+	 if is_dummy step_kind then
+	   let error,() =   warn  parameter error (Some "line 146, Inconsistent profiling information, close_event should not be called with a dummy event")  (Failure "Dummy event in close_event") ()
+	   in
+	   error,log_info
+	 else 
+	   let rec aux log_info error interrupted =
+	     let next_depth = log_info.next_depth in
+	     let error,() =
+	       if next_depth = 1
+	       then
+		 warn  parameter error (Some "line 146, Inconsistent profiling information, depth should not be equal to 1 when closing an event") (Failure "Depth=1 in close_event") ()
+	       else
+		 error,()
+	     in
+	     match 
+	       log_info.current_task
+	     with
+	     | [] ->
+		warn  parameter error (Some "line 156, Inconsistent profiling information, no current task when closing an event") (Failure "No current tasks in close_event") log_info
+	     | current_task::tail when current_task.tag = step_kind ->
+		begin
+		  let size_after = 
+		    match f
+		    with Some f -> Some (f ())
+		       | None -> None
+		  in
+		  let time = Sys.time () -. current_task.time_start in
+		  let task =
+		    {
+		      current_task
+		    with
 		  size_after = size_after ;
 		  duration = Some time
-		}
-	      in
-	      let terminated_task =
-		(task,List.rev_map (fun x -> x.tag) (List.rev tail))
-	      in
-	      let _ = Format.fprintf (Remanent_parameters.get_profiling_info_logger parameter) "End\t" in 
-	      let _ = print_task (Remanent_parameters.get_profiling_info_logger parameter) terminated_task in 
-	      let _ = flush_logger  parameter in 
-	      error,
-	      {
-		log_info 
-	      with
-		next_depth = next_depth - 1;
-		current_task = tail ;
-		(*	terminated_tasks = terminated_task::log_info.terminated_tasks*)
-	      }
-	    end
-
+		    }
+		  in
+		  let terminated_task =
+		    (task,List.rev_map (fun x -> x.tag) (List.rev tail))
+		  in
+		  let _ = Format.fprintf (Remanent_parameters.get_profiling_info_logger parameter) (if interrupted then "Interrupted\t" else "End\t") in 
+		  let _ = print_task (Remanent_parameters.get_profiling_info_logger parameter) terminated_task in 
+		  let _ = flush_logger  parameter in 
+		  error,
+		  {
+		    log_info 
+		  with
+		    next_depth = next_depth - 1;
+		    current_task = tail ;
+		    (*	terminated_tasks = terminated_task::log_info.terminated_tasks*)
+		  }
+		    
+		end
+	     | current_task::tail ->
+		let terminated_task = (current_task,List.rev_map (fun x -> x.tag) (List.rev tail)) in
+		let _ = Format.fprintf (Remanent_parameters.get_profiling_info_logger parameter) "Interrupted\t" in 
+		let _ = print_task (Remanent_parameters.get_profiling_info_logger parameter) terminated_task in 
+		let _ = flush_logger  parameter in 
+		aux 
+		  {
+		    log_info 
+		  with
+		    next_depth = next_depth - 1;
+		    current_task = tail ;
+		    (*	terminated_tasks = terminated_task::log_info.terminated_tasks*)
+		  }
+		  error true
+	   in aux log_info error false 
+		  
        let gen_opt gen parameter error step_kind f log_info =
 	 match
 	   step_kind

@@ -166,7 +166,7 @@ let compress_and_print logger env log_info step_list =
 		  handler
 		  log_info
 		  error
-		  "causal compression"  
+		  ~event:StoryProfiling.Collect_traces  
 		  (fun
 		      parameter 
 		      ?(shall_we_compute=always) 

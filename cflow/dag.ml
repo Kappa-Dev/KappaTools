@@ -189,7 +189,8 @@ let compare_canonic_opt x y =
 				    
 let compare_prehash = aux compare 
 			  
-let graph_of_grid parameter handler log_info error grid = 
+let graph_of_grid parameter handler log_info error grid =
+  let error,log_info = StoryProfiling.StoryStats.add_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error StoryProfiling.Graph_conversion None log_info in 
   let ids = Hashtbl.fold (fun key _ l -> key::l) grid.Causal.flow [] in
   let label = label handler in 
   let error,log_info,config = Causal.cut (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) handler log_info error ids grid in 
@@ -260,6 +261,7 @@ let graph_of_grid parameter handler log_info error grid =
       config.Causal.conflict 
       root
   in 
+  let error,log_info = StoryProfiling.StoryStats.close_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error StoryProfiling.Graph_conversion None log_info in 
   if Mods.IntSet.is_empty root
   then 
     error,log_info,dummy_graph 

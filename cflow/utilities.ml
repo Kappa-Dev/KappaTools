@@ -444,14 +444,20 @@ let get_counter story_list = story_list.story_counter
 let get_stories story_list = story_list.story_list 
 let inc_counter story_list = { story_list with story_counter = succ story_list.story_counter }
 
+let build_grid parameter handler computation_info error trace bool =
+  let error,computation_info = StoryProfiling.StoryStats.add_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error StoryProfiling.Build_grid None computation_info in
+  let grid = S.PH.B.PB.CI.Po.K.build_grid trace bool handler in
+  let error,computation_info = StoryProfiling.StoryStats.close_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error StoryProfiling.Build_grid None computation_info in
+  error,computation_info,grid 
 
 let store_trace
       (parameter:parameter) ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall) handler
       computation_info error trace obs_info story_table = 
+  let error,computation_info = StoryProfiling.StoryStats.add_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error StoryProfiling.Store_trace None computation_info in
   let pretrace = get_pretrace_of_trace trace in
   let trace2 = get_compressed_trace trace in 
   let bool = not (is_compressed_trace trace) in 
-  let grid = S.PH.B.PB.CI.Po.K.build_grid trace2 bool  handler in
+  let error,computation_info,grid = build_grid parameter handler computation_info error trace2 bool in
   let computation_info  = P.set_grid_generation  computation_info in 
   let story_info = 
     List.map 
@@ -465,6 +471,8 @@ let store_trace
       story_counter = story_table.story_counter +1 								       
     }
   in
+   let error,computation_info = StoryProfiling.StoryStats.close_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error StoryProfiling.Store_trace None computation_info in
+ 
   error,computation_info,story_table
    
 let flatten_story_table parameter ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall) handler log_info error story_table = 
@@ -566,10 +574,16 @@ let export_story_table parameter ?(shall_we_compute=always) ?(shall_we_compute_p
   a,log_info,b
 let has_obs x = List.exists S.PH.B.PB.CI.Po.K.is_obs_of_refined_step (get_pretrace_of_trace x)
 			    
-let fold_left_with_progress_bar
+let fold_left_with_progress_bar ?(event=StoryProfiling.Dummy)
       parameter ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall)
-      handler profiling_information error (string:string) (f:('a,'b,'a) binary) a list =
+      handler profiling_information error  (f:('a,'b,'a) binary) a list =
   let n = List.length list in
+  let string,(error,profiling_information) =
+    if StoryProfiling.StoryStats.is_dummy event 
+    then "",(error,profiling_information)
+    else StoryProfiling.string_of_step_kind event,
+	 StoryProfiling.StoryStats.add_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error event (Some (fun _ -> List.length list)) profiling_information
+  in 
   let progress_bar = Mods.tick_stories (S.PH.B.PB.CI.Po.K.H.get_logger parameter) n (false,0,0) in
   let error,profiling_information,_,_,a,n_fail =
     let rec aux list (error,profiling_information,bar,k,a,n_fail) =
@@ -608,6 +622,11 @@ let fold_left_with_progress_bar
     aux list (error,profiling_information,progress_bar,1,a,0)
   in  
   let () = close_progress_bar_opt (Some (S.PH.B.PB.CI.Po.K.H.get_logger parameter)) in 
+  let error,profiling_information =
+    if StoryProfiling.StoryStats.is_dummy event
+    then error,profiling_information
+    else StoryProfiling.StoryStats.close_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error event None profiling_information
+  in 
   let () = print_fails parameter.S.PH.B.PB.CI.Po.K.H.out_channel_err string n_fail in 
   error,profiling_information,a 			    
 

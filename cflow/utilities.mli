@@ -49,7 +49,7 @@ type ('a,'b,'c,'d,'e) quaternary =
 type ('a,'b,'c,'d,'e,'f) quinternary =
   ('a -> 'b -> 'c -> 'd -> 'e -> error_log * profiling_info * 'f) with_handlers
 				     
-val fold_left_with_progress_bar: (string,('a,'b,'a) binary,'a,'b list,'a) quaternary 
+val fold_left_with_progress_bar: ?event:StoryProfiling.step_kind -> (('a,'b,'a) binary,'a,'b list,'a) ternary 
 
 (** traces *)
 type trace
