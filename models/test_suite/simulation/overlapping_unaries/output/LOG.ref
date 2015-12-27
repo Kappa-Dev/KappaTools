@@ -1,0 +1,24 @@
++ Command line is: 'KaSim' '-t' '120' '-seed' '56235278' '-o' 'data.svg' '-d' 'output' '-p' '100' 'overlapping_unaries.ka'
+Parsing overlapping_unaries.ka...
+done
++ Initialized random number generator with seed 56235278
++ Building initial simulation conditions...
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -sanity checks
+	 -KaSa tools initialization
++ Compute the contact map
+	 -variable declarations
+	 -rules
+	 -observables
+	 -perturbations
+	 -initial conditions
+	 Done
+____________________________________________________________
+############################################################
+Simulation ended (eff.: 0.999744, detail below)
+	Valid embedding but no longer unary when required: 1.000000
+	Valid embedding but not binary when required: 0.000000
+	Clashing instance: 0.000000
+	Perturbation interrupting time advance: 0.000000

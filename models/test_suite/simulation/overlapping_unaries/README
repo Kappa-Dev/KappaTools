@@ -1,0 +1,1 @@
+"${KAPPABIN}"KaSim -t 120 -seed 56235278 -o data.svg -d output -p 100 overlapping_unaries.ka

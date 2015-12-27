@@ -1,0 +1,498 @@
+<?xml version="1.0"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg xmlns="http://www.w3.org/2000/svg"
+xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
+<title>overlapping_unaries.ka output</title>
+<descr></descr>
+
+<style type="text/css" >
+<![CDATA[
+#legend text {text-anchor:end; baseline-shift:-.4em;}
+#axis_t text {text-anchor:middle; baseline-shift:-1em;}
+#axis_va text {text-anchor:end; baseline-shift:-.4em;}
+#axes {color:black;stroke:currentColor;stroke-size:1px;}
+#axes text {stroke:none;fill:currentColor;}
+]]>
+</style>
+
+<defs>
+<path id="plus" class="point" stroke="currentColor" d="M-3.5,0 h7 M0,-3.5 v7"/>
+<path id="cross" class="point" stroke="currentColor" d="M-3.5,-3.5 L3.5,3.5 M3.5,-3.5 L-3.5,3.5"/>
+<circle id="point" class="point" r="2.5" stroke="none" fill="currentColor"/>
+</defs>
+
+<g id="axes">
+<g id="axis_va">
+  <title>Observable values</title>
+  <path d="M 70,10 L 70,575"/>
+  <text x="62.000000" y="575.000000">0</text>
+  <line x1="65.000000" y1="575.000000" x2="75.000000" y2="575.000000"/>
+  <text x="62.000000" y="512.222222">1.11e+03</text>
+  <line x1="65.000000" y1="512.222222" x2="75.000000" y2="512.222222"/>
+  <text x="62.000000" y="449.444444">2.22e+03</text>
+  <line x1="65.000000" y1="449.444444" x2="75.000000" y2="449.444444"/>
+  <text x="62.000000" y="386.666667">3.33e+03</text>
+  <line x1="65.000000" y1="386.666667" x2="75.000000" y2="386.666667"/>
+  <text x="62.000000" y="323.888889">4.44e+03</text>
+  <line x1="65.000000" y1="323.888889" x2="75.000000" y2="323.888889"/>
+  <text x="62.000000" y="261.111111">5.56e+03</text>
+  <line x1="65.000000" y1="261.111111" x2="75.000000" y2="261.111111"/>
+  <text x="62.000000" y="198.333333">6.67e+03</text>
+  <line x1="65.000000" y1="198.333333" x2="75.000000" y2="198.333333"/>
+  <text x="62.000000" y="135.555556">7.78e+03</text>
+  <line x1="65.000000" y1="135.555556" x2="75.000000" y2="135.555556"/>
+  <text x="62.000000" y="72.777778">8.89e+03</text>
+  <line x1="65.000000" y1="72.777778" x2="75.000000" y2="72.777778"/>
+  <text x="62.000000" y="10.000000">1e+04</text>
+  <line x1="65.000000" y1="10.000000" x2="75.000000" y2="10.000000"/>
+  </g>
+<g id="axis_t">
+  <title>Time in second</title>
+  <path d="M 70,575 L 790,575"/>
+  <text x="70.000000" y="583.000000">0</text>
+  <line x1="70.000000" y1="570.000000" x2="70.000000" y2="580.000000"/>
+  <text x="135.454545" y="583.000000">10.9</text>
+  <line x1="135.454545" y1="570.000000" x2="135.454545" y2="580.000000"/>
+  <text x="200.909091" y="583.000000">21.8</text>
+  <line x1="200.909091" y1="570.000000" x2="200.909091" y2="580.000000"/>
+  <text x="266.363636" y="583.000000">32.7</text>
+  <line x1="266.363636" y1="570.000000" x2="266.363636" y2="580.000000"/>
+  <text x="331.818182" y="583.000000">43.6</text>
+  <line x1="331.818182" y1="570.000000" x2="331.818182" y2="580.000000"/>
+  <text x="397.272727" y="583.000000">54.5</text>
+  <line x1="397.272727" y1="570.000000" x2="397.272727" y2="580.000000"/>
+  <text x="462.727273" y="583.000000">65.5</text>
+  <line x1="462.727273" y1="570.000000" x2="462.727273" y2="580.000000"/>
+  <text x="528.181818" y="583.000000">76.4</text>
+  <line x1="528.181818" y1="570.000000" x2="528.181818" y2="580.000000"/>
+  <text x="593.636364" y="583.000000">87.3</text>
+  <line x1="593.636364" y1="570.000000" x2="593.636364" y2="580.000000"/>
+  <text x="659.090909" y="583.000000">98.2</text>
+  <line x1="659.090909" y1="570.000000" x2="659.090909" y2="580.000000"/>
+  <text x="724.545455" y="583.000000">109</text>
+  <line x1="724.545455" y1="570.000000" x2="724.545455" y2="580.000000"/>
+  <text x="790.000000" y="583.000000">120</text>
+  <line x1="790.000000" y1="570.000000" x2="790.000000" y2="580.000000"/>
+  </g>
+</g>
+
+<g id="legend">
+  <text x="785" y="10">'fS(s~o)'</text>
+  <use xlink:href="#plus" style="color:blue" x="793" y="10"/>
+  <text x="785" y="25">'fS(s~x)'</text>
+  <use xlink:href="#cross" style="color:purple" x="793" y="25"/>
+  </g>
+
+<g id="data">
+<g id="data_0" style="color:blue">
+  <use xlink:href="#plus" x="790.000000" y="18.983500">
+  <title>'fS(s~o)' t=120 v=9841</title></use>
+  <use xlink:href="#plus" x="782.800000" y="18.870500">
+  <title>'fS(s~o)' t=118.8 v=9843</title></use>
+  <use xlink:href="#plus" x="775.600000" y="18.701000">
+  <title>'fS(s~o)' t=117.6 v=9846</title></use>
+  <use xlink:href="#plus" x="768.400000" y="18.588000">
+  <title>'fS(s~o)' t=116.4 v=9848</title></use>
+  <use xlink:href="#plus" x="761.200000" y="18.418500">
+  <title>'fS(s~o)' t=115.2 v=9851</title></use>
+  <use xlink:href="#plus" x="754.000000" y="18.305500">
+  <title>'fS(s~o)' t=114 v=9853</title></use>
+  <use xlink:href="#plus" x="746.800000" y="18.305500">
+  <title>'fS(s~o)' t=112.8 v=9853</title></use>
+  <use xlink:href="#plus" x="739.600000" y="18.305500">
+  <title>'fS(s~o)' t=111.6 v=9853</title></use>
+  <use xlink:href="#plus" x="732.400000" y="18.079500">
+  <title>'fS(s~o)' t=110.4 v=9857</title></use>
+  <use xlink:href="#plus" x="725.200000" y="18.079500">
+  <title>'fS(s~o)' t=109.2 v=9857</title></use>
+  <use xlink:href="#plus" x="718.000000" y="18.023000">
+  <title>'fS(s~o)' t=108 v=9858</title></use>
+  <use xlink:href="#plus" x="710.800000" y="18.023000">
+  <title>'fS(s~o)' t=106.8 v=9858</title></use>
+  <use xlink:href="#plus" x="703.600000" y="17.966500">
+  <title>'fS(s~o)' t=105.6 v=9859</title></use>
+  <use xlink:href="#plus" x="696.400000" y="17.853500">
+  <title>'fS(s~o)' t=104.4 v=9861</title></use>
+  <use xlink:href="#plus" x="689.200000" y="17.627500">
+  <title>'fS(s~o)' t=103.2 v=9865</title></use>
+  <use xlink:href="#plus" x="682.000000" y="17.571000">
+  <title>'fS(s~o)' t=102 v=9866</title></use>
+  <use xlink:href="#plus" x="674.800000" y="17.458000">
+  <title>'fS(s~o)' t=100.8 v=9868</title></use>
+  <use xlink:href="#plus" x="667.600000" y="17.345000">
+  <title>'fS(s~o)' t=99.6 v=9870</title></use>
+  <use xlink:href="#plus" x="660.400000" y="17.288500">
+  <title>'fS(s~o)' t=98.4 v=9871</title></use>
+  <use xlink:href="#plus" x="653.200000" y="17.288500">
+  <title>'fS(s~o)' t=97.2 v=9871</title></use>
+  <use xlink:href="#plus" x="646.000000" y="17.288500">
+  <title>'fS(s~o)' t=96 v=9871</title></use>
+  <use xlink:href="#plus" x="638.800000" y="17.288500">
+  <title>'fS(s~o)' t=94.8 v=9871</title></use>
+  <use xlink:href="#plus" x="631.600000" y="17.288500">
+  <title>'fS(s~o)' t=93.6 v=9871</title></use>
+  <use xlink:href="#plus" x="624.400000" y="17.175500">
+  <title>'fS(s~o)' t=92.4 v=9873</title></use>
+  <use xlink:href="#plus" x="617.200000" y="17.175500">
+  <title>'fS(s~o)' t=91.2 v=9873</title></use>
+  <use xlink:href="#plus" x="610.000000" y="17.119000">
+  <title>'fS(s~o)' t=90 v=9874</title></use>
+  <use xlink:href="#plus" x="602.800000" y="17.006000">
+  <title>'fS(s~o)' t=88.8 v=9876</title></use>
+  <use xlink:href="#plus" x="595.600000" y="16.893000">
+  <title>'fS(s~o)' t=87.6 v=9878</title></use>
+  <use xlink:href="#plus" x="588.400000" y="16.610500">
+  <title>'fS(s~o)' t=86.4 v=9883</title></use>
+  <use xlink:href="#plus" x="581.200000" y="16.441000">
+  <title>'fS(s~o)' t=85.2 v=9886</title></use>
+  <use xlink:href="#plus" x="574.000000" y="16.384500">
+  <title>'fS(s~o)' t=84 v=9887</title></use>
+  <use xlink:href="#plus" x="566.800000" y="16.328000">
+  <title>'fS(s~o)' t=82.8 v=9888</title></use>
+  <use xlink:href="#plus" x="559.600000" y="16.271500">
+  <title>'fS(s~o)' t=81.6 v=9889</title></use>
+  <use xlink:href="#plus" x="552.400000" y="16.102000">
+  <title>'fS(s~o)' t=80.4 v=9892</title></use>
+  <use xlink:href="#plus" x="545.200000" y="16.045500">
+  <title>'fS(s~o)' t=79.2 v=9893</title></use>
+  <use xlink:href="#plus" x="538.000000" y="15.989000">
+  <title>'fS(s~o)' t=78 v=9894</title></use>
+  <use xlink:href="#plus" x="530.800000" y="15.989000">
+  <title>'fS(s~o)' t=76.8 v=9894</title></use>
+  <use xlink:href="#plus" x="523.600000" y="15.876000">
+  <title>'fS(s~o)' t=75.6 v=9896</title></use>
+  <use xlink:href="#plus" x="516.400000" y="15.763000">
+  <title>'fS(s~o)' t=74.4 v=9898</title></use>
+  <use xlink:href="#plus" x="509.200000" y="15.706500">
+  <title>'fS(s~o)' t=73.2 v=9899</title></use>
+  <use xlink:href="#plus" x="502.000000" y="15.650000">
+  <title>'fS(s~o)' t=72 v=9900</title></use>
+  <use xlink:href="#plus" x="494.800000" y="15.480500">
+  <title>'fS(s~o)' t=70.8 v=9903</title></use>
+  <use xlink:href="#plus" x="487.600000" y="15.367500">
+  <title>'fS(s~o)' t=69.6 v=9905</title></use>
+  <use xlink:href="#plus" x="480.400000" y="15.254500">
+  <title>'fS(s~o)' t=68.4 v=9907</title></use>
+  <use xlink:href="#plus" x="473.200000" y="15.198000">
+  <title>'fS(s~o)' t=67.2 v=9908</title></use>
+  <use xlink:href="#plus" x="466.000000" y="15.141500">
+  <title>'fS(s~o)' t=66 v=9909</title></use>
+  <use xlink:href="#plus" x="458.800000" y="15.028500">
+  <title>'fS(s~o)' t=64.8 v=9911</title></use>
+  <use xlink:href="#plus" x="451.600000" y="14.972000">
+  <title>'fS(s~o)' t=63.6 v=9912</title></use>
+  <use xlink:href="#plus" x="444.400000" y="14.859000">
+  <title>'fS(s~o)' t=62.4 v=9914</title></use>
+  <use xlink:href="#plus" x="437.200000" y="14.746000">
+  <title>'fS(s~o)' t=61.2 v=9916</title></use>
+  <use xlink:href="#plus" x="430.000000" y="14.520000">
+  <title>'fS(s~o)' t=60 v=9920</title></use>
+  <use xlink:href="#plus" x="422.800000" y="14.463500">
+  <title>'fS(s~o)' t=58.8 v=9921</title></use>
+  <use xlink:href="#plus" x="415.600000" y="14.181000">
+  <title>'fS(s~o)' t=57.6 v=9926</title></use>
+  <use xlink:href="#plus" x="408.400000" y="14.124500">
+  <title>'fS(s~o)' t=56.4 v=9927</title></use>
+  <use xlink:href="#plus" x="401.200000" y="14.068000">
+  <title>'fS(s~o)' t=55.2 v=9928</title></use>
+  <use xlink:href="#plus" x="394.000000" y="14.011500">
+  <title>'fS(s~o)' t=54 v=9929</title></use>
+  <use xlink:href="#plus" x="386.800000" y="13.785500">
+  <title>'fS(s~o)' t=52.8 v=9933</title></use>
+  <use xlink:href="#plus" x="379.600000" y="13.672500">
+  <title>'fS(s~o)' t=51.6 v=9935</title></use>
+  <use xlink:href="#plus" x="372.400000" y="13.559500">
+  <title>'fS(s~o)' t=50.4 v=9937</title></use>
+  <use xlink:href="#plus" x="365.200000" y="13.390000">
+  <title>'fS(s~o)' t=49.2 v=9940</title></use>
+  <use xlink:href="#plus" x="358.000000" y="13.277000">
+  <title>'fS(s~o)' t=48 v=9942</title></use>
+  <use xlink:href="#plus" x="350.800000" y="13.220500">
+  <title>'fS(s~o)' t=46.8 v=9943</title></use>
+  <use xlink:href="#plus" x="343.600000" y="13.164000">
+  <title>'fS(s~o)' t=45.6 v=9944</title></use>
+  <use xlink:href="#plus" x="336.400000" y="13.107500">
+  <title>'fS(s~o)' t=44.4 v=9945</title></use>
+  <use xlink:href="#plus" x="329.200000" y="13.107500">
+  <title>'fS(s~o)' t=43.2 v=9945</title></use>
+  <use xlink:href="#plus" x="322.000000" y="13.107500">
+  <title>'fS(s~o)' t=42 v=9945</title></use>
+  <use xlink:href="#plus" x="314.800000" y="13.107500">
+  <title>'fS(s~o)' t=40.8 v=9945</title></use>
+  <use xlink:href="#plus" x="307.600000" y="13.051000">
+  <title>'fS(s~o)' t=39.6 v=9946</title></use>
+  <use xlink:href="#plus" x="300.400000" y="12.881500">
+  <title>'fS(s~o)' t=38.4 v=9949</title></use>
+  <use xlink:href="#plus" x="293.200000" y="12.881500">
+  <title>'fS(s~o)' t=37.2 v=9949</title></use>
+  <use xlink:href="#plus" x="286.000000" y="12.768500">
+  <title>'fS(s~o)' t=36 v=9951</title></use>
+  <use xlink:href="#plus" x="278.800000" y="12.712000">
+  <title>'fS(s~o)' t=34.8 v=9952</title></use>
+  <use xlink:href="#plus" x="271.600000" y="12.599000">
+  <title>'fS(s~o)' t=33.6 v=9954</title></use>
+  <use xlink:href="#plus" x="264.400000" y="12.429500">
+  <title>'fS(s~o)' t=32.4 v=9957</title></use>
+  <use xlink:href="#plus" x="257.200000" y="12.429500">
+  <title>'fS(s~o)' t=31.2 v=9957</title></use>
+  <use xlink:href="#plus" x="250.000000" y="12.316500">
+  <title>'fS(s~o)' t=30 v=9959</title></use>
+  <use xlink:href="#plus" x="242.800000" y="12.203500">
+  <title>'fS(s~o)' t=28.8 v=9961</title></use>
+  <use xlink:href="#plus" x="235.600000" y="12.147000">
+  <title>'fS(s~o)' t=27.6 v=9962</title></use>
+  <use xlink:href="#plus" x="228.400000" y="12.147000">
+  <title>'fS(s~o)' t=26.4 v=9962</title></use>
+  <use xlink:href="#plus" x="221.200000" y="12.090500">
+  <title>'fS(s~o)' t=25.2 v=9963</title></use>
+  <use xlink:href="#plus" x="214.000000" y="12.034000">
+  <title>'fS(s~o)' t=24 v=9964</title></use>
+  <use xlink:href="#plus" x="206.800000" y="11.977500">
+  <title>'fS(s~o)' t=22.8 v=9965</title></use>
+  <use xlink:href="#plus" x="199.600000" y="11.977500">
+  <title>'fS(s~o)' t=21.6 v=9965</title></use>
+  <use xlink:href="#plus" x="192.400000" y="11.864500">
+  <title>'fS(s~o)' t=20.4 v=9967</title></use>
+  <use xlink:href="#plus" x="185.200000" y="11.751500">
+  <title>'fS(s~o)' t=19.2 v=9969</title></use>
+  <use xlink:href="#plus" x="178.000000" y="11.638500">
+  <title>'fS(s~o)' t=18 v=9971</title></use>
+  <use xlink:href="#plus" x="170.800000" y="11.582000">
+  <title>'fS(s~o)' t=16.8 v=9972</title></use>
+  <use xlink:href="#plus" x="163.600000" y="11.469000">
+  <title>'fS(s~o)' t=15.6 v=9974</title></use>
+  <use xlink:href="#plus" x="156.400000" y="11.469000">
+  <title>'fS(s~o)' t=14.4 v=9974</title></use>
+  <use xlink:href="#plus" x="149.200000" y="11.412500">
+  <title>'fS(s~o)' t=13.2 v=9975</title></use>
+  <use xlink:href="#plus" x="142.000000" y="11.412500">
+  <title>'fS(s~o)' t=12 v=9975</title></use>
+  <use xlink:href="#plus" x="134.800000" y="11.186500">
+  <title>'fS(s~o)' t=10.8 v=9979</title></use>
+  <use xlink:href="#plus" x="127.600000" y="11.017000">
+  <title>'fS(s~o)' t=9.6 v=9982</title></use>
+  <use xlink:href="#plus" x="120.400000" y="10.904000">
+  <title>'fS(s~o)' t=8.4 v=9984</title></use>
+  <use xlink:href="#plus" x="113.200000" y="10.791000">
+  <title>'fS(s~o)' t=7.2 v=9986</title></use>
+  <use xlink:href="#plus" x="106.000000" y="10.734500">
+  <title>'fS(s~o)' t=6 v=9987</title></use>
+  <use xlink:href="#plus" x="98.800000" y="10.508500">
+  <title>'fS(s~o)' t=4.8 v=9991</title></use>
+  <use xlink:href="#plus" x="91.600000" y="10.508500">
+  <title>'fS(s~o)' t=3.6 v=9991</title></use>
+  <use xlink:href="#plus" x="84.400000" y="10.452000">
+  <title>'fS(s~o)' t=2.4 v=9992</title></use>
+  <use xlink:href="#plus" x="77.200000" y="10.056500">
+  <title>'fS(s~o)' t=1.2 v=9999</title></use>
+  <use xlink:href="#plus" x="70.000000" y="10.000000">
+  <title>'fS(s~o)' t=0 v=10000</title></use>
+  </g>
+<g id="data_1" style="color:purple">
+  <use xlink:href="#cross" x="790.000000" y="566.016500">
+  <title>'fS(s~x)' t=120 v=159</title></use>
+  <use xlink:href="#cross" x="782.800000" y="566.129500">
+  <title>'fS(s~x)' t=118.8 v=157</title></use>
+  <use xlink:href="#cross" x="775.600000" y="566.299000">
+  <title>'fS(s~x)' t=117.6 v=154</title></use>
+  <use xlink:href="#cross" x="768.400000" y="566.412000">
+  <title>'fS(s~x)' t=116.4 v=152</title></use>
+  <use xlink:href="#cross" x="761.200000" y="566.581500">
+  <title>'fS(s~x)' t=115.2 v=149</title></use>
+  <use xlink:href="#cross" x="754.000000" y="566.694500">
+  <title>'fS(s~x)' t=114 v=147</title></use>
+  <use xlink:href="#cross" x="746.800000" y="566.694500">
+  <title>'fS(s~x)' t=112.8 v=147</title></use>
+  <use xlink:href="#cross" x="739.600000" y="566.694500">
+  <title>'fS(s~x)' t=111.6 v=147</title></use>
+  <use xlink:href="#cross" x="732.400000" y="566.920500">
+  <title>'fS(s~x)' t=110.4 v=143</title></use>
+  <use xlink:href="#cross" x="725.200000" y="566.920500">
+  <title>'fS(s~x)' t=109.2 v=143</title></use>
+  <use xlink:href="#cross" x="718.000000" y="566.977000">
+  <title>'fS(s~x)' t=108 v=142</title></use>
+  <use xlink:href="#cross" x="710.800000" y="566.977000">
+  <title>'fS(s~x)' t=106.8 v=142</title></use>
+  <use xlink:href="#cross" x="703.600000" y="567.033500">
+  <title>'fS(s~x)' t=105.6 v=141</title></use>
+  <use xlink:href="#cross" x="696.400000" y="567.146500">
+  <title>'fS(s~x)' t=104.4 v=139</title></use>
+  <use xlink:href="#cross" x="689.200000" y="567.372500">
+  <title>'fS(s~x)' t=103.2 v=135</title></use>
+  <use xlink:href="#cross" x="682.000000" y="567.429000">
+  <title>'fS(s~x)' t=102 v=134</title></use>
+  <use xlink:href="#cross" x="674.800000" y="567.542000">
+  <title>'fS(s~x)' t=100.8 v=132</title></use>
+  <use xlink:href="#cross" x="667.600000" y="567.655000">
+  <title>'fS(s~x)' t=99.6 v=130</title></use>
+  <use xlink:href="#cross" x="660.400000" y="567.711500">
+  <title>'fS(s~x)' t=98.4 v=129</title></use>
+  <use xlink:href="#cross" x="653.200000" y="567.711500">
+  <title>'fS(s~x)' t=97.2 v=129</title></use>
+  <use xlink:href="#cross" x="646.000000" y="567.711500">
+  <title>'fS(s~x)' t=96 v=129</title></use>
+  <use xlink:href="#cross" x="638.800000" y="567.711500">
+  <title>'fS(s~x)' t=94.8 v=129</title></use>
+  <use xlink:href="#cross" x="631.600000" y="567.711500">
+  <title>'fS(s~x)' t=93.6 v=129</title></use>
+  <use xlink:href="#cross" x="624.400000" y="567.824500">
+  <title>'fS(s~x)' t=92.4 v=127</title></use>
+  <use xlink:href="#cross" x="617.200000" y="567.824500">
+  <title>'fS(s~x)' t=91.2 v=127</title></use>
+  <use xlink:href="#cross" x="610.000000" y="567.881000">
+  <title>'fS(s~x)' t=90 v=126</title></use>
+  <use xlink:href="#cross" x="602.800000" y="567.994000">
+  <title>'fS(s~x)' t=88.8 v=124</title></use>
+  <use xlink:href="#cross" x="595.600000" y="568.107000">
+  <title>'fS(s~x)' t=87.6 v=122</title></use>
+  <use xlink:href="#cross" x="588.400000" y="568.389500">
+  <title>'fS(s~x)' t=86.4 v=117</title></use>
+  <use xlink:href="#cross" x="581.200000" y="568.559000">
+  <title>'fS(s~x)' t=85.2 v=114</title></use>
+  <use xlink:href="#cross" x="574.000000" y="568.615500">
+  <title>'fS(s~x)' t=84 v=113</title></use>
+  <use xlink:href="#cross" x="566.800000" y="568.672000">
+  <title>'fS(s~x)' t=82.8 v=112</title></use>
+  <use xlink:href="#cross" x="559.600000" y="568.728500">
+  <title>'fS(s~x)' t=81.6 v=111</title></use>
+  <use xlink:href="#cross" x="552.400000" y="568.898000">
+  <title>'fS(s~x)' t=80.4 v=108</title></use>
+  <use xlink:href="#cross" x="545.200000" y="568.954500">
+  <title>'fS(s~x)' t=79.2 v=107</title></use>
+  <use xlink:href="#cross" x="538.000000" y="569.011000">
+  <title>'fS(s~x)' t=78 v=106</title></use>
+  <use xlink:href="#cross" x="530.800000" y="569.011000">
+  <title>'fS(s~x)' t=76.8 v=106</title></use>
+  <use xlink:href="#cross" x="523.600000" y="569.124000">
+  <title>'fS(s~x)' t=75.6 v=104</title></use>
+  <use xlink:href="#cross" x="516.400000" y="569.237000">
+  <title>'fS(s~x)' t=74.4 v=102</title></use>
+  <use xlink:href="#cross" x="509.200000" y="569.293500">
+  <title>'fS(s~x)' t=73.2 v=101</title></use>
+  <use xlink:href="#cross" x="502.000000" y="569.350000">
+  <title>'fS(s~x)' t=72 v=100</title></use>
+  <use xlink:href="#cross" x="494.800000" y="569.519500">
+  <title>'fS(s~x)' t=70.8 v=97</title></use>
+  <use xlink:href="#cross" x="487.600000" y="569.632500">
+  <title>'fS(s~x)' t=69.6 v=95</title></use>
+  <use xlink:href="#cross" x="480.400000" y="569.745500">
+  <title>'fS(s~x)' t=68.4 v=93</title></use>
+  <use xlink:href="#cross" x="473.200000" y="569.802000">
+  <title>'fS(s~x)' t=67.2 v=92</title></use>
+  <use xlink:href="#cross" x="466.000000" y="569.858500">
+  <title>'fS(s~x)' t=66 v=91</title></use>
+  <use xlink:href="#cross" x="458.800000" y="569.971500">
+  <title>'fS(s~x)' t=64.8 v=89</title></use>
+  <use xlink:href="#cross" x="451.600000" y="570.028000">
+  <title>'fS(s~x)' t=63.6 v=88</title></use>
+  <use xlink:href="#cross" x="444.400000" y="570.141000">
+  <title>'fS(s~x)' t=62.4 v=86</title></use>
+  <use xlink:href="#cross" x="437.200000" y="570.254000">
+  <title>'fS(s~x)' t=61.2 v=84</title></use>
+  <use xlink:href="#cross" x="430.000000" y="570.480000">
+  <title>'fS(s~x)' t=60 v=80</title></use>
+  <use xlink:href="#cross" x="422.800000" y="570.536500">
+  <title>'fS(s~x)' t=58.8 v=79</title></use>
+  <use xlink:href="#cross" x="415.600000" y="570.819000">
+  <title>'fS(s~x)' t=57.6 v=74</title></use>
+  <use xlink:href="#cross" x="408.400000" y="570.875500">
+  <title>'fS(s~x)' t=56.4 v=73</title></use>
+  <use xlink:href="#cross" x="401.200000" y="570.932000">
+  <title>'fS(s~x)' t=55.2 v=72</title></use>
+  <use xlink:href="#cross" x="394.000000" y="570.988500">
+  <title>'fS(s~x)' t=54 v=71</title></use>
+  <use xlink:href="#cross" x="386.800000" y="571.214500">
+  <title>'fS(s~x)' t=52.8 v=67</title></use>
+  <use xlink:href="#cross" x="379.600000" y="571.327500">
+  <title>'fS(s~x)' t=51.6 v=65</title></use>
+  <use xlink:href="#cross" x="372.400000" y="571.440500">
+  <title>'fS(s~x)' t=50.4 v=63</title></use>
+  <use xlink:href="#cross" x="365.200000" y="571.610000">
+  <title>'fS(s~x)' t=49.2 v=60</title></use>
+  <use xlink:href="#cross" x="358.000000" y="571.723000">
+  <title>'fS(s~x)' t=48 v=58</title></use>
+  <use xlink:href="#cross" x="350.800000" y="571.779500">
+  <title>'fS(s~x)' t=46.8 v=57</title></use>
+  <use xlink:href="#cross" x="343.600000" y="571.836000">
+  <title>'fS(s~x)' t=45.6 v=56</title></use>
+  <use xlink:href="#cross" x="336.400000" y="571.892500">
+  <title>'fS(s~x)' t=44.4 v=55</title></use>
+  <use xlink:href="#cross" x="329.200000" y="571.892500">
+  <title>'fS(s~x)' t=43.2 v=55</title></use>
+  <use xlink:href="#cross" x="322.000000" y="571.892500">
+  <title>'fS(s~x)' t=42 v=55</title></use>
+  <use xlink:href="#cross" x="314.800000" y="571.892500">
+  <title>'fS(s~x)' t=40.8 v=55</title></use>
+  <use xlink:href="#cross" x="307.600000" y="571.949000">
+  <title>'fS(s~x)' t=39.6 v=54</title></use>
+  <use xlink:href="#cross" x="300.400000" y="572.118500">
+  <title>'fS(s~x)' t=38.4 v=51</title></use>
+  <use xlink:href="#cross" x="293.200000" y="572.118500">
+  <title>'fS(s~x)' t=37.2 v=51</title></use>
+  <use xlink:href="#cross" x="286.000000" y="572.231500">
+  <title>'fS(s~x)' t=36 v=49</title></use>
+  <use xlink:href="#cross" x="278.800000" y="572.288000">
+  <title>'fS(s~x)' t=34.8 v=48</title></use>
+  <use xlink:href="#cross" x="271.600000" y="572.401000">
+  <title>'fS(s~x)' t=33.6 v=46</title></use>
+  <use xlink:href="#cross" x="264.400000" y="572.570500">
+  <title>'fS(s~x)' t=32.4 v=43</title></use>
+  <use xlink:href="#cross" x="257.200000" y="572.570500">
+  <title>'fS(s~x)' t=31.2 v=43</title></use>
+  <use xlink:href="#cross" x="250.000000" y="572.683500">
+  <title>'fS(s~x)' t=30 v=41</title></use>
+  <use xlink:href="#cross" x="242.800000" y="572.796500">
+  <title>'fS(s~x)' t=28.8 v=39</title></use>
+  <use xlink:href="#cross" x="235.600000" y="572.853000">
+  <title>'fS(s~x)' t=27.6 v=38</title></use>
+  <use xlink:href="#cross" x="228.400000" y="572.853000">
+  <title>'fS(s~x)' t=26.4 v=38</title></use>
+  <use xlink:href="#cross" x="221.200000" y="572.909500">
+  <title>'fS(s~x)' t=25.2 v=37</title></use>
+  <use xlink:href="#cross" x="214.000000" y="572.966000">
+  <title>'fS(s~x)' t=24 v=36</title></use>
+  <use xlink:href="#cross" x="206.800000" y="573.022500">
+  <title>'fS(s~x)' t=22.8 v=35</title></use>
+  <use xlink:href="#cross" x="199.600000" y="573.022500">
+  <title>'fS(s~x)' t=21.6 v=35</title></use>
+  <use xlink:href="#cross" x="192.400000" y="573.135500">
+  <title>'fS(s~x)' t=20.4 v=33</title></use>
+  <use xlink:href="#cross" x="185.200000" y="573.248500">
+  <title>'fS(s~x)' t=19.2 v=31</title></use>
+  <use xlink:href="#cross" x="178.000000" y="573.361500">
+  <title>'fS(s~x)' t=18 v=29</title></use>
+  <use xlink:href="#cross" x="170.800000" y="573.418000">
+  <title>'fS(s~x)' t=16.8 v=28</title></use>
+  <use xlink:href="#cross" x="163.600000" y="573.531000">
+  <title>'fS(s~x)' t=15.6 v=26</title></use>
+  <use xlink:href="#cross" x="156.400000" y="573.531000">
+  <title>'fS(s~x)' t=14.4 v=26</title></use>
+  <use xlink:href="#cross" x="149.200000" y="573.587500">
+  <title>'fS(s~x)' t=13.2 v=25</title></use>
+  <use xlink:href="#cross" x="142.000000" y="573.587500">
+  <title>'fS(s~x)' t=12 v=25</title></use>
+  <use xlink:href="#cross" x="134.800000" y="573.813500">
+  <title>'fS(s~x)' t=10.8 v=21</title></use>
+  <use xlink:href="#cross" x="127.600000" y="573.983000">
+  <title>'fS(s~x)' t=9.6 v=18</title></use>
+  <use xlink:href="#cross" x="120.400000" y="574.096000">
+  <title>'fS(s~x)' t=8.4 v=16</title></use>
+  <use xlink:href="#cross" x="113.200000" y="574.209000">
+  <title>'fS(s~x)' t=7.2 v=14</title></use>
+  <use xlink:href="#cross" x="106.000000" y="574.265500">
+  <title>'fS(s~x)' t=6 v=13</title></use>
+  <use xlink:href="#cross" x="98.800000" y="574.491500">
+  <title>'fS(s~x)' t=4.8 v=9</title></use>
+  <use xlink:href="#cross" x="91.600000" y="574.491500">
+  <title>'fS(s~x)' t=3.6 v=9</title></use>
+  <use xlink:href="#cross" x="84.400000" y="574.548000">
+  <title>'fS(s~x)' t=2.4 v=8</title></use>
+  <use xlink:href="#cross" x="77.200000" y="574.943500">
+  <title>'fS(s~x)' t=1.2 v=1</title></use>
+  <use xlink:href="#cross" x="70.000000" y="575.000000">
+  <title>'fS(s~x)' t=0 v=0</title></use>
+  </g></g>
+
+</svg>

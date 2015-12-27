@@ -1,0 +1,24 @@
+%agent: fE(c,s)
+%agent: fC(e,s)
+%agent: fS(c,e,s~o~x)
+
+'f:E.C+' fE(c), fC(e) -> fE(c!1), fC(e!1) @ 1.0e-4 (1.0e-3)
+'f:E.C-' fE(c!1), fC(e!1) -> fE(c), fC(e) @ 1.0e-2
+
+'f:C.O+' fC(s), fS(c,s~o) -> fC(s!1), fS(c!1,s~o) @ 1.0e-4 (1.0e-3)
+'f:C.O-' fC(s!1), fS(c!1,s~o) -> fC(s), fS(c,s~o) @ 1.0e-2
+'f:C.X+' fC(s), fS(c,s~x) -> fC(s!1), fS(c!1,s~x) @ 1.0e-4 (1.0e-3)
+'f:C.X-' fC(s!1), fS(c!1,s~x) -> fC(s), fS(c,s~x) @ 1.0e-1
+
+'f:E.O+' fE(s), fS(e,s~o) -> fE(s!1), fS(e!1,s~o) @ 1.0e-4 (1.0e-3)
+'f:E.O-' fE(s!1), fS(e!1,s~o) -> fE(s), fS(e,s~o) @ 1.0e-2
+'f:E.X+' fE(s), fS(e,s~x) -> fE(s!1), fS(e!1,s~x) @ 1.0e-4 (1.0e-3)
+'f:E.X-' fE(s!1), fS(e!1,s~x) -> fE(s), fS(e,s~x) @ 1.0e-1
+
+'f:S->P' fE(), fS(s~o) ->  fE(), fS(s~x) @ 0.0 (1.0)
+%obs: 'fS(s~o)' |fS(s~o)|
+%obs: 'fS(s~x)' |fS(s~x)|
+
+%init: 1000 fC()
+%init: 10 fE()
+%init: 10000 fS()
