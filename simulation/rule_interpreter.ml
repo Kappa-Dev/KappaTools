@@ -4,7 +4,7 @@ type jf_data =
 type t = {
   roots_of_ccs: Mods.IntSet.t Connected_component.Map.t;
   unary_candidates: Mods.Int2Set.t Mods.IntMap.t;
-  unary_pathes: Edges.path Mods.Int2Map.t;
+  unary_pathes: (int * Edges.path) Mods.Int2Map.t;
   edges: Edges.t;
   tokens: Nbr.t array;
   outdated_elements:
@@ -51,21 +51,26 @@ let update_roots is_add map cc root =
   Connected_component.Map.add
     cc ((if is_add then Mods.IntSet.add else Mods.IntSet.remove) root va) map
 
+let remove_path (x,y) pathes =
+  let pair = (min x y, max x y) in
+  match Mods.Int2Map.find_option pair pathes with
+   | None -> pathes
+   | Some (1,_) -> Mods.Int2Map.remove pair pathes
+   | Some (i,p) -> Mods.Int2Map.add pair (pred i,p) pathes
 let add_candidate cands pathes rule_id x y p =
   let a = min x y in
   let b = max x y in
   let va = Mods.IntMap.find_default Mods.Int2Set.empty rule_id cands in
   (Mods.IntMap.add rule_id (Mods.Int2Set.add (x,y) va) cands,
-   Mods.Int2Map.add (a,b) p pathes)
-let remove_candidate cands pathes rule_id x y =
-  let a = min x y in
-  let b = max x y in
+   match Mods.Int2Map.find_option (a,b) pathes with
+   | None -> Mods.Int2Map.add (a,b) (1,p) pathes
+   | Some (i,_) -> Mods.Int2Map.add (a,b) (succ i,p) pathes)
+let remove_candidate cands pathes rule_id pair =
   let va =
     Mods.Int2Set.remove
-      (x,y) (Mods.IntMap.find_default Mods.Int2Set.empty rule_id cands) in
+      pair (Mods.IntMap.find_default Mods.Int2Set.empty rule_id cands) in
   ((if Mods.Int2Set.is_empty va then Mods.IntMap.remove rule_id cands
-    else Mods.IntMap.add rule_id va cands),
-   Mods.Int2Map.remove (a,b) pathes)
+    else Mods.IntMap.add rule_id va cands), remove_path pair pathes)
 
 let from_place (inj_nodes,inj_fresh) = function
   | Agent_place.Existing (n,id) ->
@@ -301,8 +306,9 @@ let remove_unary_instances unaries obs deps =
 	     Mods.Int2Set.partition
 	       (fun (x,y) -> List.exists (fun (_,(a,_)) -> a = x || a = y) obs)
 	       l in
-	   (Mods.IntMap.add i stay cands,
-	    Mods.Int2Set.fold Mods.Int2Map.remove byebye pathes)
+	   ((if Mods.Int2Set.is_empty stay then Mods.IntMap.remove i cands
+	     else Mods.IntMap.add i stay cands),
+	    Mods.Int2Set.fold remove_path byebye pathes)
     ) deps unaries
 
 let update_edges counter domain unary_ccs inj_nodes state event_kind ?path rule=
@@ -511,7 +517,7 @@ let transform_by_a_rule
 
 let apply_unary_rule
       ~rule_id ~get_alg env domain unary_ccs counter state event_kind rule =
-  let  (root1,root2) =
+  let  (root1,root2 as roots) =
     match
       Mods.Int2Set.random
 	(Mods.IntMap.find_default
@@ -526,10 +532,10 @@ let apply_unary_rule
   let pair = (min root1 root2,max root1 root2) in
   let candidate =
     match Mods.Int2Map.find_option pair state.unary_pathes with
-    | Some x -> x
+    | Some (_,x) -> x
     | None -> raise Not_found in
   let cands,pathes = remove_candidate state.unary_candidates state.unary_pathes
-				      rule_id root1 root2 in
+				      rule_id roots in
   let deps,unary_cands,_ = state.outdated_elements in
   let state' =
     {state with
@@ -596,7 +602,7 @@ let apply_rule
      | Some _ ->
 	try
 	  let point = (min roots.(0) roots.(1), max roots.(0) roots.(1)) in
-	  let candidate =
+	  let nb_use_cand,candidate =
 	    match Mods.Int2Map.find_option point state.unary_pathes with
 	    | Some x -> x
 	    | None -> raise Not_found in
@@ -611,7 +617,7 @@ let apply_rule
 	       match rule_id with None -> assert false | Some rid -> rid in
 	     let cands,pathes =
 	       remove_candidate state.unary_candidates state.unary_pathes rid
-				roots.(0) roots.(1) in
+				(roots.(0),roots.(1)) in
 	     let state' =
 	       {state with unary_candidates = cands; unary_pathes = pathes} in
 	     Success (transform_by_a_rule
@@ -620,8 +626,9 @@ let apply_rule
 	  | Some p ->
 	     let state' =
 	       if p == candidate then state
-	       else {state with unary_pathes =
-				  Mods.Int2Map.add point p state.unary_pathes}
+	       else {state with
+		      unary_pathes =
+			Mods.Int2Map.add point (nb_use_cand,p) state.unary_pathes}
 	     in Corrected state'
 	with Not_found -> Success out
 
