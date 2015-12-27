@@ -87,7 +87,7 @@ val fold_over_causal_past_of_obs :
            Exception.method_handler ->
            Graph_closure.config ->
            grid ->
-           (Graph_closure.M.elt -> int list -> 'b -> 'b) ->
+           (Remanent_parameters_sig.parameters -> 'a -> StoryProfiling.StoryStats.log_info -> Exception.method_handler -> Graph_closure.M.elt -> int list -> 'b -> Exception.method_handler * StoryProfiling.StoryStats.log_info * 'b) ->
            'b ->
            Exception.method_handler * StoryProfiling.StoryStats.log_info * 'b 
 val debug_print_grid : Format.formatter -> grid -> unit

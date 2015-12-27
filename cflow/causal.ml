@@ -430,7 +430,6 @@ let enrich_grid parameter handler log_info error config_closure grid =
   }
 
 let fold_over_causal_past_of_obs parameter handler log_info error config_closure grid f a = 
-  (* let err_fmt = Remanent_parameters.get_formatter parameter in *)
   let keep_l = List.fold_left (fun a b -> IntSet.add b a) IntSet.empty grid.obs in
   let to_keep i = IntSet.mem i keep_l in
   let ids = ids_of_grid grid  in

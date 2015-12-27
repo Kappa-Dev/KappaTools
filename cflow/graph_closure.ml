@@ -195,10 +195,11 @@ let closure_bottom_up_with_fold parameter handler log_info error event config pr
       event
     with
     | None -> error,log_info
-    | Some e -> StoryProfiling.StoryStats.add_event parameter error e None log_info in 
-  let _,a = 
+    | Some e -> StoryProfiling.StoryStats.add_event parameter error e None log_info
+  in 
+  let _,error,log_info,_,a = 
     M.fold_with_interruption 
-      (fun succ s_pred (tick,a) -> 
+      (fun succ s_pred (tick,error,log_info,counter,a) -> 
         begin
           let rec aux (l:int list) (accu:int list) = 
             match l with 
@@ -228,10 +229,17 @@ let closure_bottom_up_with_fold parameter handler log_info error event config pr
           in
 	  let _ = clean succ in 
           let tick = do_tick tick in 
-          (tick,if is_obs succ then
-		  f succ pred_star a else a)            
+	  let a,counter,error,log_info =
+	    if is_obs succ
+	    then
+	      let error,log_info,a = f parameter handler log_info error succ pred_star a in
+	      a,counter+1,error,log_info
+	    else
+	      a,counter,error,log_info
+	  in 
+	  (tick,error,log_info,counter,a)           
         end)
-      prec (tick,a)
+      prec (tick,error,log_info,1,a)
   in 
   let _ = close_tick () in
   let error,log_info =
@@ -246,8 +254,8 @@ let closure_bottom_up_with_fold parameter handler log_info error event config pr
 let closure_bottom_up parameter handler log_info error event_opt config prec is_obs =
   let max_index = M.fold (fun i _ -> max i) prec 0 in
   let s_pred_star = A.make (max_index+1) [] in
-  let f i s a =
-    let _ = A.set a i s in a
+  let f p h c e i s a =
+    let _ = A.set a i s in e,c,a
   in 
   let error,log_info,graph = closure_bottom_up_with_fold parameter handler log_info error event_opt config prec is_obs f s_pred_star in 
   error,log_info,(graph,Decreasing_without_last_event)

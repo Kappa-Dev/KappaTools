@@ -672,10 +672,11 @@ let fold_over_the_causal_past_of_observables_with_a_progress_bar parameter  ?(sh
       error 
       Graph_closure.config_big_graph_with_progress_bar
       grid
-      (fun observable_hit causal_past (counter,list,a) ->
+      (fun parameter' handler log_info error observable_hit causal_past (counter,list,a) ->
        match list with
-       | [] -> counter,list,a
+       | [] -> error,log_info,(counter,list,a)
        | head::tail ->
+	  let error,log_info = StoryProfiling.StoryStats.add_event parameter' error (StoryProfiling.Story counter) None log_info in 
 	  let observable_id = head in 
 	  let log_info = P.reset_log log_info in 
 	  let () = 
@@ -699,7 +700,8 @@ let fold_over_the_causal_past_of_observables_with_a_progress_bar parameter  ?(sh
 	       [info]
 	  in
 	  let error,log_info,a = (f:('a,'b,'c,'d) ternary)  parameter handler log_info error trace info a in
-	  counter+1,tail,a)
+	  let error,log_info = StoryProfiling.StoryStats.close_event parameter' error (StoryProfiling.Story counter) None log_info in 
+	  error,log_info,(counter+1,tail,a))
       (1,List.rev list,a)
   in
   error,log_info,a 
