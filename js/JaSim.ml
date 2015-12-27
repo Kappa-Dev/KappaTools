@@ -8,6 +8,13 @@ let log_form = Format.formatter_of_buffer log_buffer
 let parse s =
     KappaParser.start_rule KappaLexer.token (Lexing.from_string s)
 
+let show_graph stop div =
+  let rec aux () =
+    let () =
+      div##innerHTML <- Js.string (Plot.value 555) in
+    stop <?> (Lwt_js.sleep 5. >>= aux) in
+  aux ()
+
 let write_out stop div counter =
   let () = while Js.Opt.test div##firstChild do
 	     Js.Opt.iter (div##firstChild) (Dom.removeChild div)
@@ -26,7 +33,7 @@ let write_out stop div counter =
     stop <?> (Lwt_js.sleep 2. >>= (fun () -> return va_l) >>= aux) in
   aux 0
 
-let run stop log_div out_div =
+let run stop stopper log_div out_div graph_div =
   catch
     (fun () ->
      let () = Ast.init_compil () in
@@ -43,40 +50,47 @@ let run stop log_div out_div =
 	   env (Counter.current_time counter)
 	   (State_interpreter.observables_values env counter graph state) in
      let () = Feedback.show_warnings out_div in
-     Lwt.pick [write_out stop log_div counter;
+     Lwt.join [
+	 show_graph stop graph_div;
+	 write_out stop log_div counter;
      State_interpreter.loop_cps
        log_form
        (fun f -> if Lwt.is_sleeping stop
 		 then Lwt.bind (Lwt_js.yield ()) f
 		 else Lwt.return_unit)
        (fun f _ _ _ _ ->
+	let () = Lwt.wakeup stopper () in
 	let () = ExceptionDefn.flush_warning f in Lwt.return_unit)
-       env domain counter graph state]
-     >>= fun () -> return (Plot.value 555))
+       env domain counter graph state])
     (function
       | ExceptionDefn.Syntax_Error er ->
 	 let () = Feedback.show_error Format.pp_print_string out_div er in
-	 return ""
+	 let () = Lwt.wakeup stopper () in
+	 return_unit
       | ExceptionDefn.Malformed_Decl er ->
 	 let () = Feedback.show_error Format.pp_print_string out_div er in
-	 return ""
+	 let () = Lwt.wakeup stopper () in
+	 return_unit
       | ExceptionDefn.Internal_Error er ->
 	 let () =
 	   Feedback.show_error
 	     (fun f x -> Format.fprintf f "Internal Error (please report):@ %s" x)
 	     out_div er in
-	 return ""
+	 let () = Lwt.wakeup stopper () in
+	 return_unit
       | Invalid_argument msg ->
 	 let () =
 	   Feedback.show_error
 	     (fun f msg ->
 	      Format.fprintf f "Runtime error %s" msg)
 	     out_div (Location.dummy_annot msg) in
-	 return ""
+	 let () = Lwt.wakeup stopper () in
+	 return_unit
       | Sys_error msg ->
 	 let () = Feedback.show_error
 		    Format.pp_print_string out_div (Location.dummy_annot msg) in
-	 return ""
+	 let () = Lwt.wakeup stopper () in
+	 return_unit
       | e -> fail e)
 
 let launch_simulation go_button stop_button out_div log graph =
@@ -88,13 +102,11 @@ let launch_simulation go_button stop_button out_div log graph =
     stop_button##onclick <- Dom_html.handler
 			       (fun _ -> let () = Lwt.wakeup stopper () in
 					 Js._false) in
-  run stoppe log out_div >>=
-    fun plot ->
+  run stoppe stopper log out_div graph >>=
+    fun () ->
     let () = Feedback.show_warnings out_div in
     let () = go_button##disabled <- Js._false in
     let () = stop_button##disabled <- Js._true in
-    let () =
-      graph##innerHTML <- Js.string plot in
     return ()
 
 let onload _ =
@@ -114,7 +126,7 @@ let onload _ =
   let raw_log = <:html5<<div id="log" class="alert alert-info"></div> >> in
   let log = Tyxml_js.To_dom.of_div raw_log in
   let raw_output =
-    <:html5<<div class="col-lg-6 visible-lg-block">$raw_graph$$raw_log$</div> >> in
+    <:html5<<div class="col-lg-6 visible-lg-block">$Ui.raw_menu$$raw_graph$$raw_log$</div> >> in
   let output = Tyxml_js.To_dom.of_div raw_output in
   let go_button = Tyxml_js.To_dom.of_button raw_go_button in
   let stop_button = Tyxml_js.To_dom.of_button raw_stop_button in
@@ -123,7 +135,7 @@ let onload _ =
 				launch_simulation
 				  go_button stop_button output log graph) in
   let skeleton = Tyxml_js.To_dom.of_div
-		 <:html5<<div class="row">$Ui.raw_menu$$raw_input$$raw_output$</div> >> in
+		 <:html5<<div class="row">$raw_input$$raw_output$</div> >> in
   let () = Dom.appendChild main skeleton in
   let editor_obj = Input.setup_editor () in
   let () = Lwt_js_events.async (Input.get_initial_content editor_obj) in
