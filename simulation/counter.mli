@@ -5,6 +5,8 @@ type t
 val create : int -> float -> int -> float option -> int option -> t
 (** [create nb_plot_point init_t init_event max_t max_event] *)
 
+val reinitialize : t -> unit
+
 val tick : Format.formatter -> t -> unit
 val to_plot_points : t -> float list * t
 val complete_progress_bar : Format.formatter -> t -> unit

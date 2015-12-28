@@ -238,6 +238,15 @@ let create nb_points init_t init_e mx_t mx_e =
    last_point = 0 ;
    ticks = 0 ;
   }
+let reinitialize counter =
+  counter.time <- counter.init_time;
+  counter.events <- counter.init_event;
+  counter.stories <- -1;
+  counter.last_tick <- (counter.init_event, counter.init_time);
+  counter.last_point <- 0;
+  counter.initialized <- false;
+  counter.ticks <- 0;
+  counter.stat_null <- Stat_null_events.init ()
 
 let next_point counter =
   match counter.dT with
