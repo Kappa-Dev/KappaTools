@@ -982,7 +982,7 @@ module Blackboard =
 
      let export_blackboard_to_xls parameter handler log_info error prefix int int2 blackboard = 
         let file_name = prefix^"_"^(string_of_int int)^"_"^(string_of_int int2)^".sxw" in 
-        let desc_chan = open_out file_name in
+        let desc_chan = Kappa_files.open_out file_name in
 	let desc = Format.formatter_of_out_channel desc_chan in
         let parameter = 
           {parameter with PB.CI.Po.K.H.out_channel = desc }

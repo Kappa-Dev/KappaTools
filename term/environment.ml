@@ -10,8 +10,6 @@ type t = {
   need_update_each_loop : Operator.DepSet.t;
   algs_reverse_dependencies : Operator.DepSet.t array;
   tokens_reverse_dependencies : Operator.DepSet.t array;
-
-  desc_table : (string,out_channel * Format.formatter) Hashtbl.t;
 }
 
 let init sigs tokens algs (deps_in_t,deps_in_e,tok_rd,alg_rd)
@@ -21,23 +19,9 @@ let init sigs tokens algs (deps_in_t,deps_in_e,tok_rd,alg_rd)
     observables = obs; perturbations = perts;
     algs_reverse_dependencies = alg_rd; tokens_reverse_dependencies = tok_rd;
     need_update_each_loop = Operator.DepSet.union deps_in_t deps_in_e;
-
-    desc_table = Hashtbl.create 2;
   }
 
 let signatures env = env.signatures
-
-let get_desc file env =
-  try snd (Hashtbl.find env.desc_table file)
-  with Not_found ->
-       let d_chan = Kappa_files.open_out file in
-    let d = Format.formatter_of_out_channel d_chan in
-    (Hashtbl.add env.desc_table file (d_chan,d) ; d)
-
-let close_desc env =
-	Hashtbl.iter (fun _file (d_chan,d) ->
-		      let () = Format.pp_print_newline d () in
-		      close_out d_chan) env.desc_table
 
 let num_of_agent nme env =
   Signature.num_of_agent nme env.signatures

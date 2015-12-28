@@ -160,10 +160,7 @@ let with_influence f = with_formatter !influenceFileName f
 let set_ccFile f = ccFileName := f
 let with_ccFile f = with_formatter !ccFileName f
 
-let close_out_desc desc =
-  let () = openOutDescriptors :=
-	     List.filter (fun x -> x != desc) !openOutDescriptors in
-  close_out desc
-
 let close_all_out_desc () =
-  List.iter (fun d -> close_out d) !openOutDescriptors
+  let () =
+    List.iter (fun d -> close_out d) !openOutDescriptors in
+  openOutDescriptors := []

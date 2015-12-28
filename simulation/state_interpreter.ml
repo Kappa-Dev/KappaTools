@@ -4,6 +4,7 @@ type t = {
   activities : Random_tree.tree;(* pair numbers are binary rule, odd unary *)
   variables_overwrite: Alg_expr.t option array;
   flux: (string * float array array) list;
+  print_desc: (string,out_channel * Format.formatter) Hashtbl.t;
 }
 
 let initial_activity get_alg env counter graph activities =
@@ -36,7 +37,19 @@ let initial env counter graph stopping_times =
     variables_overwrite =
       Array.make (Environment.nb_algs env) None;
     flux = [];
+    print_desc = Hashtbl.create 2;
+
 }
+
+let get_desc file state =
+  try snd (Hashtbl.find state.print_desc file)
+  with Not_found ->
+       let d_chan = Kappa_files.open_out file in
+    let d = Format.formatter_of_out_channel d_chan in
+    (Hashtbl.add state.print_desc file (d_chan,d) ; d)
+
+let close_desc state =
+  Hashtbl.iter (fun _file (d_chan,_d) -> close_out d_chan) state.print_desc
 
 let get_alg env state i =
   match state.variables_overwrite.(i) with
@@ -94,7 +107,7 @@ let do_it env domain counter graph state modification =
      let file = Format.asprintf "@[<h>%a@]" print_expr_val pe_file in
      let desc =
        match file with "" -> Format.std_formatter
-		     | _ -> Environment.get_desc file env in
+		     | _ -> get_desc file state in
      let () = Format.fprintf desc "%a@." print_expr_val pe_expr in
      (false, graph, state)
   | Primitives.PLOTENTRY ->
@@ -314,6 +327,7 @@ let loop_cps form hook return env domain counter graph state =
 let finalize form env counter graph state =
   let () = Plot.close () in
   let () = Counter.complete_progress_bar form counter in
+  let () = close_desc state in
   let () =
     List.iter
       (fun (file,_ as e) ->

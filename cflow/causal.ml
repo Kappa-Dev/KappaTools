@@ -353,7 +353,7 @@ let pp_atom f atom =
   Format.fprintf f "%s_%d" imp_str atom.eid
 
 let dump grid fic =
-  let d_chan = open_out ((Filename.chop_extension fic)^".txt") in
+  let d_chan = Kappa_files.open_out ((Filename.chop_extension fic)^".txt") in
   let d = Format.formatter_of_out_channel d_chan in
   let () = Format.pp_open_vbox d 0 in
   Hashtbl.fold

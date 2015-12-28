@@ -43,9 +43,6 @@ val print_agent : ?env:t -> Format.formatter -> int -> unit
 val print_alg : ?env:t -> Format.formatter -> int -> unit
 val print_token : ?env:t -> Format.formatter -> int -> unit
 
-val get_desc : string -> t -> Format.formatter
-val close_desc : t -> unit
-
 val print :
   (t -> Format.formatter -> Alg_expr.t -> unit) ->
   (t -> Format.formatter -> Primitives.elementary_rule -> unit) ->
