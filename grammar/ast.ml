@@ -161,21 +161,7 @@ let no_more_site_on_right warning left right =
 	in false)
     right
 
-let result:(agent,mixture,string,rule) compil ref =
-  ref {
-    variables      = [];
-    signatures     = [];
-    rules          = [];
-    init           = [];
-    observables    = [];
-    perturbations  = [];
-    configurations = [];
-    tokens         = [];
-    volumes        = []
-  }
-
-let init_compil () =
-  result :=
+let empty_compil =
     {
       variables      = [];
       signatures     = [];

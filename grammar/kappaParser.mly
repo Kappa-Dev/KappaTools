@@ -28,61 +28,46 @@
 %left AND
 
 %start start_rule
-%type <unit> start_rule
+%type <(Ast.agent,Ast.mixture,string,Ast.rule) Ast.compil -> (Ast.agent,Ast.mixture,string,Ast.rule) Ast.compil> start_rule
 
 %% /*Grammar rules*/
 
 newline:
     | NEWLINE start_rule {$2}
-    | EOF {()};
+    | EOF {fun c -> c};
 
 start_rule:
     | newline {$1}
     | rule_expression newline
-		       {Ast.result := {!Ast.result with
-				       Ast.rules = $1::!Ast.result.Ast.rules};
-		       $2}
+        {fun c -> let r = $2 c in {r with Ast.rules = $1::r.Ast.rules}}
     | instruction newline
-		  {
-		    let inst = $1 in
-		    begin
-		      match inst with
+		  { fun c -> let r = $2 c in
+		      match $1 with
 		      | Ast.SIG ag ->
-			 (Ast.result:={!Ast.result with
-					Ast.signatures=ag::!Ast.result.Ast.signatures}
-			 )
+			 {r with Ast.signatures=ag::r.Ast.signatures}
 		      | Ast.TOKENSIG (str_pos) ->
-			 (Ast.result:={!Ast.result with
-					Ast.tokens=str_pos::!Ast.result.Ast.tokens}
-			 )
+			 {r with Ast.tokens=str_pos::r.Ast.tokens}
 		      | Ast.VOLSIG (vol_type,vol,vol_param) ->
-			 (Ast.result := {!Ast.result with
-					  Ast.volumes=(vol_type,vol,vol_param)::!Ast.result.Ast.volumes})
+			 {r with Ast.volumes=(vol_type,vol,vol_param)::r.Ast.volumes}
 		      | Ast.INIT (opt_vol,init_t) ->
-			 (Ast.result := {!Ast.result with
-					  Ast.init=(opt_vol,init_t)::!Ast.result.Ast.init})
+			 {r with Ast.init=(opt_vol,init_t)::r.Ast.init}
 		      | Ast.DECLARE var ->
-			 (Ast.result := {!Ast.result with
-					  Ast.variables = var::!Ast.result.Ast.variables})
+			 {r with Ast.variables = var::r.Ast.variables}
 		      | Ast.OBS ((lbl,pos),_ as var) ->
 			 (*for backward compatibility, shortcut for %var + %plot*)
-			 Ast.result :=
-			   {!Ast.result with
-			     Ast.variables = var::!Ast.result.Ast.variables;
+			   {r with
+			     Ast.variables = var::r.Ast.variables;
 			     Ast.observables = (Ast.OBS_VAR lbl,pos)
-						 ::!Ast.result.Ast.observables}
+						 ::r.Ast.observables}
 		      | Ast.PLOT expr ->
-			 (Ast.result := {!Ast.result with
-					  Ast.observables = expr::!Ast.result.Ast.observables})
+			 {r with Ast.observables = expr::r.Ast.observables}
 		      | Ast.PERT ((pre,effect,opt),pos) ->
-			 (Ast.result := {!Ast.result with
-					  Ast.perturbations =
-					    ((pre,effect,opt),pos)
-					      ::!Ast.result.Ast.perturbations})
+			 {r with
+			  Ast.perturbations =
+			   ((pre,effect,opt),pos)::r.Ast.perturbations}
 		      | Ast.CONFIG (param_name,value_list) ->
-			 (Ast.result := {!Ast.result with
-					  Ast.configurations = (param_name,value_list)::!Ast.result.Ast.configurations})
-		    end ; $2
+			 {r with
+			  Ast.configurations = (param_name,value_list)::r.Ast.configurations}
 		  }
     | error
 	{raise (ExceptionDefn.Syntax_Error (add_pos "Syntax error"))}

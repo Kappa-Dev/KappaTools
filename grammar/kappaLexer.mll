@@ -175,15 +175,15 @@ and inline_comment = parse
 		   | '/' '*' {inline_comment lexbuf; inline_comment lexbuf}
 		   | _ {inline_comment lexbuf}
 {
-  let compile logger fic =
+  let compile logger compil fic =
     let d = open_in fic in
     let lexbuf = Lexing.from_channel d in
     lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_fname = fic} ;
     try
-      Debug.tag logger ("Parsing "^fic^"...") ;
-      KappaParser.start_rule token lexbuf ;
-      Debug.tag logger "done" ;
-      close_in d
+      let () = Debug.tag logger ("Parsing "^fic^"...") in
+      let out = KappaParser.start_rule token lexbuf compil in
+      let () = Debug.tag logger "done" in
+      let () = close_in d in out
     with Syntax_Error (msg,pos) ->
       let () = close_in d in
       let () = Pp.error Format.pp_print_string (msg,pos) in

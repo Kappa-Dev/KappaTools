@@ -140,8 +140,7 @@ type ('agent,'mixture,'id,'rule) compil =
 	(string * float * string) list
     }
 
-val result : (agent,mixture,string,rule) compil ref
-val init_compil : unit -> unit
+val empty_compil : (agent,mixture,string,rule) compil
 
 val no_more_site_on_right : bool -> port list -> port list -> bool
 

@@ -10,5 +10,8 @@ val set_model_nb_plot : ?step:React.step -> int -> unit
 val model_text : string React.S.t
 val set_model_text : ?step:React.step -> string -> unit
 
+val model_ast : (Ast.agent,Ast.mixture,string,Ast.rule) Ast.compil React.S.t
 val model_counter : Counter.t React.S.t
 val model_env : Environment.t React.S.t
+
+val model_syntax_error : string Location.annot option React.S.t

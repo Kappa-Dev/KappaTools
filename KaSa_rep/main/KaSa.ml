@@ -17,15 +17,7 @@ let main () =
   let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%s\n" (Remanent_parameters.get_full_version parameters) in 
   let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%s\n" (Remanent_parameters.get_launched_when_and_where parameters) in
   let compil =
-    let _ = Ast.init_compil() in 
-    let _ =  
-      List.iter (fun fic -> 
-                 let () = KappaLexer.compile Format.std_formatter fic in
-                 ())
-                files 
-    in 
-    !Ast.result
-  in 
+    List.fold_left (KappaLexer.compile Format.std_formatter) Ast.empty_compil files in
   let parameters_compil = Remanent_parameters.update_call_stack parameters Preprocess.local_trace (Some "Prepreprocess.translate_compil") in 
   let error,refined_compil = Prepreprocess.translate_compil parameters_compil error compil in 
   let parameters_list_tokens = Remanent_parameters.update_call_stack parameters List_tokens.local_trace (Some "List_tokens.scan_compil") in 

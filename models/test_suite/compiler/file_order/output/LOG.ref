@@ -1,0 +1,20 @@
++ Command line is: 'KaSim' 'file1.ka' 'file2.ka' '--compile' '-d' 'output'
+Parsing file2.ka...
+done
+Parsing file1.ka...
+done
++ Self seeding...
++ Initialized random number generator with seed 160952738
++ Building initial simulation conditions...
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -sanity checks
+	 -KaSa tools initialization
++ Compute the contact map
+	 -variable declarations
+	 -rules
+	 -observables
+	 -perturbations
+	 -initial conditions
+	 Done

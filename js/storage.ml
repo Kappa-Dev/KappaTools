@@ -18,3 +18,14 @@ let model_counter =
   React.S.l5 Counter.create
 	     model_nb_plot  (React.S.const 0.) (React.S.const 0)
 	     model_max_time model_max_events
+
+let model_syntax_error, set_model_syntax_error = React.S.create None
+let parse text =
+  try
+    let () = set_model_syntax_error None in
+    Some (KappaParser.start_rule KappaLexer.token text Ast.empty_compil)
+  with ExceptionDefn.Syntax_Error e ->
+    let () = set_model_syntax_error (Some e) in None
+
+let model_ast =
+  React.S.fmap parse Ast.empty_compil (React.S.l1 Lexing.from_string model_text)

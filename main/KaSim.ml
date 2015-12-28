@@ -109,10 +109,8 @@ let () =
 		  Sys.argv;
 
     let result =
-      Ast.init_compil() ;
-      List.iter (fun fic -> KappaLexer.compile Format.std_formatter fic)
-		!Parameter.inputKappaFileNames ;
-      !Ast.result in
+      List.fold_left (KappaLexer.compile Format.std_formatter)
+		     Ast.empty_compil !Parameter.inputKappaFileNames in
 
     let theSeed =
       match !Parameter.seedValue with

@@ -1,0 +1,2 @@
+#!/bin/sh
+"${KAPPABIN}"KaSim file1.ka file2.ka --compile -d output || exit 0

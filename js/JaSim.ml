@@ -5,9 +5,6 @@ let document = Dom_html.window##document
 let log_buffer = Buffer.create 512
 let log_form = Format.formatter_of_buffer log_buffer
 
-let parse s =
-    KappaParser.start_rule KappaLexer.token (Lexing.from_string s)
-
 let show_graph stop div =
   let rec aux () =
     let () =
@@ -34,64 +31,62 @@ let write_out stop div counter =
   aux 0
 
 let run stop stopper log_div out_div graph_div =
-  catch
-    (fun () ->
-     let () = Ast.init_compil () in
-     wrap1 parse (React.S.value Storage.model_text)
-     >>= fun () ->
-     let result = !Ast.result in
-     let counter = React.S.value Storage.model_counter in
-     wrap4 Eval.initialize log_form [] counter result
-     >>= fun (_kasa_state,env,domain,graph,state) ->
-     let () = Plot.create "foo.svg" in
-     let () =
-       if (React.S.value Storage.model_nb_plot) > 0 then
-	 Plot.plot_now
-	   env (Counter.current_time counter)
-	   (State_interpreter.observables_values env counter graph state) in
-     let () = Feedback.show_warnings out_div in
-     Lwt.join [
-	 show_graph stop graph_div;
-	 write_out stop log_div counter;
-     State_interpreter.loop_cps
-       log_form
-       (fun f -> if Lwt.is_sleeping stop
-		 then Lwt.bind (Lwt_js.yield ()) f
-		 else Lwt.return_unit)
-       (fun f _ _ _ _ ->
-	let () = Lwt.wakeup stopper () in
-	let () = ExceptionDefn.flush_warning f in Lwt.return_unit)
-       env domain counter graph state])
-    (function
-      | ExceptionDefn.Syntax_Error er ->
-	 let () = Feedback.show_error Format.pp_print_string out_div er in
-	 let () = Lwt.wakeup stopper () in
-	 return_unit
-      | ExceptionDefn.Malformed_Decl er ->
-	 let () = Feedback.show_error Format.pp_print_string out_div er in
-	 let () = Lwt.wakeup stopper () in
-	 return_unit
-      | ExceptionDefn.Internal_Error er ->
-	 let () =
-	   Feedback.show_error
-	     (fun f x -> Format.fprintf f "Internal Error (please report):@ %s" x)
-	     out_div er in
-	 let () = Lwt.wakeup stopper () in
-	 return_unit
-      | Invalid_argument msg ->
-	 let () =
-	   Feedback.show_error
-	     (fun f msg ->
-	      Format.fprintf f "Runtime error %s" msg)
-	     out_div (Location.dummy_annot msg) in
-	 let () = Lwt.wakeup stopper () in
-	 return_unit
-      | Sys_error msg ->
-	 let () = Feedback.show_error
-		    Format.pp_print_string out_div (Location.dummy_annot msg) in
-	 let () = Lwt.wakeup stopper () in
-	 return_unit
-      | e -> fail e)
+  match React.S.value Storage.model_syntax_error with
+  | Some er ->
+     let () = Feedback.show_error Format.pp_print_string out_div er in
+     return_unit
+  | None ->
+     catch
+       (fun () ->
+	let result = React.S.value Storage.model_ast in
+	let counter = React.S.value Storage.model_counter in
+	wrap4 Eval.initialize log_form [] counter result
+	>>= fun (_kasa_state,env,domain,graph,state) ->
+	let () = Plot.create "foo.svg" in
+	let () =
+	  if (React.S.value Storage.model_nb_plot) > 0 then
+	    Plot.plot_now
+	      env (Counter.current_time counter)
+	      (State_interpreter.observables_values env counter graph state) in
+	let () = Feedback.show_warnings out_div in
+	Lwt.join [
+	    show_graph stop graph_div;
+	    write_out stop log_div counter;
+	    State_interpreter.loop_cps
+	      log_form
+	      (fun f -> if Lwt.is_sleeping stop
+			then Lwt.bind (Lwt_js.yield ()) f
+			else Lwt.return_unit)
+	      (fun f _ _ _ _ ->
+	       let () = Lwt.wakeup stopper () in
+	       let () = ExceptionDefn.flush_warning f in Lwt.return_unit)
+	      env domain counter graph state])
+       (function
+	 | ExceptionDefn.Malformed_Decl er ->
+	    let () = Feedback.show_error Format.pp_print_string out_div er in
+	    let () = Lwt.wakeup stopper () in
+	    return_unit
+	 | ExceptionDefn.Internal_Error er ->
+	    let () =
+	      Feedback.show_error
+		(fun f x -> Format.fprintf f "Internal Error (please report):@ %s" x)
+		out_div er in
+	    let () = Lwt.wakeup stopper () in
+	    return_unit
+	 | Invalid_argument msg ->
+	    let () =
+	      Feedback.show_error
+		(fun f msg ->
+		 Format.fprintf f "Runtime error %s" msg)
+		out_div (Location.dummy_annot msg) in
+	    let () = Lwt.wakeup stopper () in
+	    return_unit
+	 | Sys_error msg ->
+	    let () = Feedback.show_error
+		       Format.pp_print_string out_div (Location.dummy_annot msg) in
+	    let () = Lwt.wakeup stopper () in
+	    return_unit
+	 | e -> fail e)
 
 let launch_simulation go_button stop_button out_div log graph =
   let () = Buffer.reset log_buffer in
