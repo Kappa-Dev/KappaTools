@@ -379,33 +379,29 @@ let collect_update_hb_remove_map parameter error
 (************************************************************************************)
 (*write a function add update(c) into working list*)
 
-let add_update_to_wl parameter error store_covering_classes_modification_update wl =
+let add_update_to_wl parameter error agent_type cv_id store_covering_classes_modification_update wl =
   (* JF: this function should not fold over the full map; 
      this function should receive the list/set of couple to be updated 
      I do not have the spec, but I think that they should contain only all the couple (agent_type,cv_id) that has associated with a new view) *)
-  Int2Map_CV_Modif.Map.fold
-    (fun (agent_type, cv_id) (l1, s1) (error, wl) ->
-      let _ = dump_channel parameter
-	(fun stderr ->
-	  let () = Printf.fprintf stderr 
-            "in add_update_to_wl:agent_type:%i:cv_id:%i\n" agent_type cv_id 
-          in
-	  let _ = Site_map_and_set.Set.iter 
-	    (Printf.fprintf stderr "in add_update_to_wl: set of rule_id:%i\n") s1
-	  in
-	  ())
-      in 
-      let error, wl =
-        Site_map_and_set.Set.fold (fun rule_id (error, wl) ->
-	  let _ = dump_channel parameter (fun stderr ->
-            Printf.fprintf stderr "in add_update_to_wl:rule_id:%i\n" rule_id) 
-          in
-	  let error, wl = IntWL.push parameter error rule_id wl in
-          error, wl
-	) s1 (error, wl)
+  let l1,s1  = Int2Map_CV_Modif.Map.find_default ([],Site_map_and_set.Set.empty) (agent_type,cv_id) store_covering_classes_modification_update in 
+  let _ = dump_channel parameter
+    (fun stderr ->
+      let () = Printf.fprintf stderr 
+        "in add_update_to_wl:agent_type:%i:cv_id:%i\n" agent_type cv_id 
       in
-      error, wl
-    ) store_covering_classes_modification_update (error, wl)
+      let _ = Site_map_and_set.Set.iter 
+	(Printf.fprintf stderr "in add_update_to_wl: set of rule_id:%i\n") s1
+      in
+      ())
+  in 
+  Site_map_and_set.Set.fold (fun rule_id (error, wl) ->
+    let _ = dump_channel parameter (fun stderr ->
+      Printf.fprintf stderr "in add_update_to_wl:rule_id:%i\n" rule_id) 
+    in
+    let error, wl = IntWL.push parameter error rule_id wl in
+    error, wl
+  ) s1 (error, wl)
+  
     
 (************************************************************************************)
 (*fixpoint*)
@@ -495,6 +491,8 @@ let is_enable parameter handler error bdu_false
 (*compute view in the case of it is a new view and check if it has new bond*)
 
 let compute_view_new_and_bond parameter handler error
+    agent_type
+    cv_id 
     is_new_view 
     is_new_bond
     store_new_result_map
@@ -511,6 +509,8 @@ let compute_view_new_and_bond parameter handler error
             add_update_to_wl
               parameter
               error
+	      agent_type 
+	      cv_id 
               store_new_result_map
               wl_tl
           in
@@ -520,6 +520,8 @@ let compute_view_new_and_bond parameter handler error
             add_update_to_wl
               parameter
               error
+	      agent_type
+	      cv_id 
               store_covering_classes_modification_update
               wl_tl
           in
@@ -577,7 +579,7 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
 	Mvbdu_wrapper.Mvbdu.mvbdu_xor parameter handler error bdu_union bdu_old
       in
       let () = dump_channel parameter (fun stderr ->
-	Printf.fprintf stderr "new views:\b" ;
+	Printf.fprintf stderr "new views:\n" ;
 	Mvbdu_wrapper.Mvbdu.print stderr "" bdu_diff) in 
       let store_result =
         Map_bdu_update.Map.add (agent_type, cv_id) bdu_union store_result
@@ -647,6 +649,8 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
             parameter
             handler
             error
+	    agent_type
+	    cv_id
             is_new_view
             is_new_bond
             store_new_result_map
@@ -687,6 +691,8 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
             parameter
             handler
             error
+	    agent_type
+	    cv_id 
             is_new_view
             is_new_bond
             store_new_result_map
@@ -749,6 +755,8 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
             parameter
             handler
             error
+	    agent_type
+	    cv_id
             is_new_view
             is_new_bond
             store_new_result_map
@@ -783,7 +791,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
     store_new_result_map
     store_covering_classes_modification_update
     store_bdu_init_restriction_map
-    store_result_map
+(*    store_result_map / JF: empty at the beggining *)
     =
   (*-----------------------------------------------------------------------*)
   let add_link handler (agent_type, cv_id) bdu store_result =
@@ -802,51 +810,42 @@ let collect_bdu_fixpoint_with_init parameter handler error
   (*in case having initial state the bdu_iter will be the union of bdu_init
     and bdu_iter*)
   let error, store_bdu_fixpoint_init_map =
-    Map_bdu_update.Map.fold2_with_logs
-      (fun parameter error str str_opt exn ->
-        let error, _ = warn parameter error str_opt exn Not_found in
-        error)
-      parameter
-      error
-      (*exists 'a t*)
-      (fun parameter error (agent_type, cv_id) bdu store_result ->
+    Map_bdu_update.Map.fold
+      (fun (agent_type, cv_id) bdu (error,store_result) ->
         let error, store_result =
           add_link handler (agent_type, cv_id) bdu store_result
         in
         error, store_result
       )
-      (*exists 'b t*)
-      (fun parameter error (agent_type, cv_id) bdu store_result ->
-        let error, store_result =
-          add_link handler (agent_type, cv_id) bdu store_result
-        in
-        error, store_result
-      )
-      (*both cases*)
-      (fun parameter error (agent_type, cv_id) bdu bdu' store_result ->
-        let error, handler, union_bdu =
-          Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu bdu'
-        in
-        let error, store_result =
-          add_link handler (agent_type, cv_id) union_bdu store_result
-        in
-        error, store_result
-      )
-      store_result_map
       store_bdu_init_restriction_map
-      Map_bdu_update.Map.empty
+      (error,Map_bdu_update.Map.empty)
   in
   (*-----------------------------------------------------------------------*)
   (*add update(c) into working list*)
-  let error, wl_init_creation =
-    add_update_to_wl parameter error store_covering_classes_modification_update
-      wl_creation
+  let error, wl_init_creation = 
+    Map_bdu_update.Map.fold 
+      (fun (ag_type,cv_id) _ (error,wl_init_creation) -> 
+	add_update_to_wl parameter error ag_type cv_id store_covering_classes_modification_update
+      wl_init_creation)
+      store_bdu_fixpoint_init_map
+      (error,wl_creation)
   in
   (*-----------------------------------------------------------------------*)
   let _ =
     dump_channel parameter (fun stderr -> 
       fprintf stderr "wl_init_creation:\n";
       Fifo.IntWL.print_wl parameter wl_init_creation)
+  in
+  let _ = 
+    dump_channel parameter 
+      (fun stderr -> 
+	Map_bdu_update.Map.iter 
+	  (fun (agent_type,cv_id) bdu -> 
+	      Printf.fprintf stderr
+	      "initial_states:(agent_type:%i, cv_id:%i)\n bdu:\n"
+	      agent_type cv_id;
+           Mvbdu_wrapper.Mvbdu.print stderr "" bdu)
+	  store_bdu_fixpoint_init_map )
   in
   (*-----------------------------------------------------------------------*)
   (*iterate function*)
@@ -954,11 +953,11 @@ let collect_bdu_fixpoint_map parameter handler error
     store_proj_potential_list_restriction_map
     store_bdu_test_restriction_map
     store_proj_bdu_views
-    is_new_bond
+    is_new_bond (* JF: ??? *)
     store_covering_classes_modification_update
     store_new_result_map
     store_bdu_init_restriction_map
-    store_result_map
+ (*   store_result_map / JF: empty at the begginning *)
     =
   let error, handler, bdu_false = 
     Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error
@@ -983,11 +982,11 @@ let collect_bdu_fixpoint_map parameter handler error
        store_proj_potential_list_restriction_map
        store_bdu_test_restriction_map
        store_proj_bdu_views
-       is_new_bond
+       is_new_bond (* JF: ??? *)
        store_new_result_map
        store_covering_classes_modification_update
        store_bdu_init_restriction_map
-       store_result_map
+       (*store_result_map : JF: empty at the begginning *)
   in
   error, (handler, store_bdu_fixpoint_map)
 

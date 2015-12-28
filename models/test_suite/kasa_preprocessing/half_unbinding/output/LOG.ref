@@ -221,9 +221,6 @@ rule_id:1
 
 ------------------------------------------------------------
 - Bdu fpr the valuation of the views that are tested (projection per rule):
-in add_update_to_wl:agent_type:2:cv_id:0
-in add_update_to_wl: set of rule_id:1
-in add_update_to_wl:rule_id:1
 wl_init_creation:
 0 1 
 Test for rule:0

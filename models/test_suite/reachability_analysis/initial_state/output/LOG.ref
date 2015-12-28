@@ -463,13 +463,39 @@ in add_update_to_wl:rule_id:1
 in add_update_to_wl:rule_id:2
 wl_init_creation:
 0 1 2 
+initial_states:(agent_type:0, cv_id:0)
+ bdu:
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
 Test for rule:2
 disabled
 Test for rule:0
 enabled
 Ag:0 Type: 0 Cvid: 0
 Ag:0
-new views:Id=11
+new views:
+Id=11
  Node(site_type:1<1)
   Id=1
    Leaf False 
@@ -503,7 +529,8 @@ Test for rule:1
 enabled
 Ag:0 Type: 0 Cvid: 0
 Ag:0
-new views:Id=16
+new views:
+Id=16
  Node(site_type:1<0)
   Id=1
    Leaf False 

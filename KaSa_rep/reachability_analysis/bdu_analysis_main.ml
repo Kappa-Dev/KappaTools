@@ -538,7 +538,7 @@ let bdu_main parameter error handler_kappa store_covering_classes cc_compil =
   (*-------------------------------------------------------------------------------*)
   (*fixpoint computation: no rule in particular, we should start with rule
     with no lhs and those induced by intial states to remove *)
-  let init_bdu_fixpoint = Map_bdu_update.Map.empty in
+(*  let init_bdu_fixpoint = Map_bdu_update.Map.empty in*)
   let error, (handler_bdu, store_bdu_fixpoint) =
     collect_bdu_fixpoint_map
       parameter
@@ -556,7 +556,7 @@ let bdu_main parameter error handler_kappa store_covering_classes cc_compil =
       result.store_bdu_analysis_dynamic.store_covering_classes_modification_update
       result.store_bdu_analysis_dynamic.store_covering_classes_modification_update_side_effects
       result.store_bdu_build.store_bdu_init_restriction_map
-      init_bdu_fixpoint
+(*      init_bdu_fixpoint*)
   in
   let error =
     if  (Remanent_parameters.get_trace parameter) || trace

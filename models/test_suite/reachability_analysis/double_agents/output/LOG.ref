@@ -1399,35 +1399,13 @@ Id=21
     Id=1
      Leaf False 
 
-in add_update_to_wl:agent_type:0:cv_id:0
-in add_update_to_wl: set of rule_id:0
-in add_update_to_wl: set of rule_id:3
-in add_update_to_wl: set of rule_id:4
-in add_update_to_wl:rule_id:0
-in add_update_to_wl:rule_id:3
-in add_update_to_wl:rule_id:4
-in add_update_to_wl:agent_type:1:cv_id:0
-in add_update_to_wl: set of rule_id:1
-in add_update_to_wl: set of rule_id:2
-in add_update_to_wl: set of rule_id:3
-in add_update_to_wl: set of rule_id:6
-in add_update_to_wl: set of rule_id:7
-in add_update_to_wl:rule_id:1
-in add_update_to_wl:rule_id:2
-in add_update_to_wl:rule_id:3
-in add_update_to_wl:rule_id:6
-in add_update_to_wl:rule_id:7
-in add_update_to_wl:agent_type:2:cv_id:0
-in add_update_to_wl: set of rule_id:5
-in add_update_to_wl: set of rule_id:6
-in add_update_to_wl:rule_id:5
-in add_update_to_wl:rule_id:6
 wl_init_creation:
-0 1 2 3 4 5 6 7 
+0 1 5 
 Test for rule:0
 enabled
 Ag:0
-new views:Id=3
+new views:
+Id=3
  Node(site_type:1<0)
   Id=1
    Leaf False 
@@ -1447,26 +1425,11 @@ in add_update_to_wl: set of rule_id:4
 in add_update_to_wl:rule_id:0
 in add_update_to_wl:rule_id:3
 in add_update_to_wl:rule_id:4
-in add_update_to_wl:agent_type:1:cv_id:0
-in add_update_to_wl: set of rule_id:1
-in add_update_to_wl: set of rule_id:2
-in add_update_to_wl: set of rule_id:3
-in add_update_to_wl: set of rule_id:6
-in add_update_to_wl: set of rule_id:7
-in add_update_to_wl:rule_id:1
-in add_update_to_wl:rule_id:2
-in add_update_to_wl:rule_id:3
-in add_update_to_wl:rule_id:6
-in add_update_to_wl:rule_id:7
-in add_update_to_wl:agent_type:2:cv_id:0
-in add_update_to_wl: set of rule_id:5
-in add_update_to_wl: set of rule_id:6
-in add_update_to_wl:rule_id:5
-in add_update_to_wl:rule_id:6
 Test for rule:1
 enabled
 Ag:1
-new views:Id=5
+new views:
+Id=5
  Node(site_type:1<0)
   Id=1
    Leaf False 
@@ -1524,13 +1487,6 @@ new views:Id=5
       Id=1
        Leaf False 
 
-in add_update_to_wl:agent_type:0:cv_id:0
-in add_update_to_wl: set of rule_id:0
-in add_update_to_wl: set of rule_id:3
-in add_update_to_wl: set of rule_id:4
-in add_update_to_wl:rule_id:0
-in add_update_to_wl:rule_id:3
-in add_update_to_wl:rule_id:4
 in add_update_to_wl:agent_type:1:cv_id:0
 in add_update_to_wl: set of rule_id:1
 in add_update_to_wl: set of rule_id:2
@@ -1542,15 +1498,11 @@ in add_update_to_wl:rule_id:2
 in add_update_to_wl:rule_id:3
 in add_update_to_wl:rule_id:6
 in add_update_to_wl:rule_id:7
-in add_update_to_wl:agent_type:2:cv_id:0
-in add_update_to_wl: set of rule_id:5
-in add_update_to_wl: set of rule_id:6
-in add_update_to_wl:rule_id:5
-in add_update_to_wl:rule_id:6
 Test for rule:5
 enabled
 Ag:2
-new views:Id=3
+new views:
+Id=3
  Node(site_type:1<0)
   Id=1
    Leaf False 
@@ -1563,6 +1515,18 @@ new views:Id=3
     Id=1
      Leaf False 
 
+in add_update_to_wl:agent_type:2:cv_id:0
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
+Test for rule:0
+enabled
+Ag:0
+new views:
+Id=1
+ Leaf False 
+
 in add_update_to_wl:agent_type:0:cv_id:0
 in add_update_to_wl: set of rule_id:0
 in add_update_to_wl: set of rule_id:3
@@ -1570,27 +1534,12 @@ in add_update_to_wl: set of rule_id:4
 in add_update_to_wl:rule_id:0
 in add_update_to_wl:rule_id:3
 in add_update_to_wl:rule_id:4
-in add_update_to_wl:agent_type:1:cv_id:0
-in add_update_to_wl: set of rule_id:1
-in add_update_to_wl: set of rule_id:2
-in add_update_to_wl: set of rule_id:3
-in add_update_to_wl: set of rule_id:6
-in add_update_to_wl: set of rule_id:7
-in add_update_to_wl:rule_id:1
-in add_update_to_wl:rule_id:2
-in add_update_to_wl:rule_id:3
-in add_update_to_wl:rule_id:6
-in add_update_to_wl:rule_id:7
-in add_update_to_wl:agent_type:2:cv_id:0
-in add_update_to_wl: set of rule_id:5
-in add_update_to_wl: set of rule_id:6
-in add_update_to_wl:rule_id:5
-in add_update_to_wl:rule_id:6
 Test for rule:3
 enabled
 Ag:0 Type: 0 Cvid: 0
 Ag:0
-new views:Id=5
+new views:
+Id=5
  Node(site_type:1<1)
   Id=1
    Leaf False 
@@ -1610,25 +1559,10 @@ in add_update_to_wl: set of rule_id:4
 in add_update_to_wl:rule_id:0
 in add_update_to_wl:rule_id:3
 in add_update_to_wl:rule_id:4
-in add_update_to_wl:agent_type:1:cv_id:0
-in add_update_to_wl: set of rule_id:1
-in add_update_to_wl: set of rule_id:2
-in add_update_to_wl: set of rule_id:3
-in add_update_to_wl: set of rule_id:6
-in add_update_to_wl: set of rule_id:7
-in add_update_to_wl:rule_id:1
-in add_update_to_wl:rule_id:2
-in add_update_to_wl:rule_id:3
-in add_update_to_wl:rule_id:6
-in add_update_to_wl:rule_id:7
-in add_update_to_wl:agent_type:2:cv_id:0
-in add_update_to_wl: set of rule_id:5
-in add_update_to_wl: set of rule_id:6
-in add_update_to_wl:rule_id:5
-in add_update_to_wl:rule_id:6
 Ag:1 Type: 1 Cvid: 0
 Ag:1
-new views:Id=31
+new views:
+Id=31
  Node(site_type:1<0)
   Id=1
    Leaf False 
@@ -1686,13 +1620,6 @@ new views:Id=31
       Id=1
        Leaf False 
 
-in add_update_to_wl:agent_type:0:cv_id:0
-in add_update_to_wl: set of rule_id:0
-in add_update_to_wl: set of rule_id:3
-in add_update_to_wl: set of rule_id:4
-in add_update_to_wl:rule_id:0
-in add_update_to_wl:rule_id:3
-in add_update_to_wl:rule_id:4
 in add_update_to_wl:agent_type:1:cv_id:0
 in add_update_to_wl: set of rule_id:1
 in add_update_to_wl: set of rule_id:2
@@ -1704,16 +1631,15 @@ in add_update_to_wl:rule_id:2
 in add_update_to_wl:rule_id:3
 in add_update_to_wl:rule_id:6
 in add_update_to_wl:rule_id:7
-in add_update_to_wl:agent_type:2:cv_id:0
-in add_update_to_wl: set of rule_id:5
-in add_update_to_wl: set of rule_id:6
-in add_update_to_wl:rule_id:5
-in add_update_to_wl:rule_id:6
 Test for rule:4
 enabled
 Ag:0 Type: 0 Cvid: 0
 Ag:0
 Nothing has changed
+Ag:1
+Nothing has changed
+Test for rule:1
+enabled
 Ag:1
 Nothing has changed
 Test for rule:2
@@ -1725,7 +1651,8 @@ Test for rule:6
 enabled
 Ag:1 Type: 1 Cvid: 0
 Ag:1
-new views:Id=53
+new views:
+Id=53
  Node(site_type:1<0)
   Id=1
    Leaf False 
@@ -1783,13 +1710,6 @@ new views:Id=53
       Id=1
        Leaf False 
 
-in add_update_to_wl:agent_type:0:cv_id:0
-in add_update_to_wl: set of rule_id:0
-in add_update_to_wl: set of rule_id:3
-in add_update_to_wl: set of rule_id:4
-in add_update_to_wl:rule_id:0
-in add_update_to_wl:rule_id:3
-in add_update_to_wl:rule_id:4
 in add_update_to_wl:agent_type:1:cv_id:0
 in add_update_to_wl: set of rule_id:1
 in add_update_to_wl: set of rule_id:2
@@ -1801,11 +1721,6 @@ in add_update_to_wl:rule_id:2
 in add_update_to_wl:rule_id:3
 in add_update_to_wl:rule_id:6
 in add_update_to_wl:rule_id:7
-in add_update_to_wl:agent_type:2:cv_id:0
-in add_update_to_wl: set of rule_id:5
-in add_update_to_wl: set of rule_id:6
-in add_update_to_wl:rule_id:5
-in add_update_to_wl:rule_id:6
 Test for rule:7
 enabled
 Ag:1 Type: 1 Cvid: 0
@@ -1814,43 +1729,22 @@ Nothing has changed
 Ag:0
 Nothing has changed
 Ag:2
-new views:Id=1
+new views:
+Id=1
  Leaf False 
 
-in add_update_to_wl:agent_type:0:cv_id:0
-in add_update_to_wl: set of rule_id:0
-in add_update_to_wl: set of rule_id:3
-in add_update_to_wl: set of rule_id:4
-in add_update_to_wl:rule_id:0
-in add_update_to_wl:rule_id:3
-in add_update_to_wl:rule_id:4
-in add_update_to_wl:agent_type:1:cv_id:0
-in add_update_to_wl: set of rule_id:1
-in add_update_to_wl: set of rule_id:2
-in add_update_to_wl: set of rule_id:3
-in add_update_to_wl: set of rule_id:6
-in add_update_to_wl: set of rule_id:7
-in add_update_to_wl:rule_id:1
-in add_update_to_wl:rule_id:2
-in add_update_to_wl:rule_id:3
-in add_update_to_wl:rule_id:6
-in add_update_to_wl:rule_id:7
 in add_update_to_wl:agent_type:2:cv_id:0
 in add_update_to_wl: set of rule_id:5
 in add_update_to_wl: set of rule_id:6
 in add_update_to_wl:rule_id:5
 in add_update_to_wl:rule_id:6
-Test for rule:0
-enabled
-Ag:0
-Nothing has changed
-Test for rule:1
-enabled
-Ag:1
-Nothing has changed
 Test for rule:5
 enabled
 Ag:2
+Nothing has changed
+Test for rule:0
+enabled
+Ag:0
 Nothing has changed
 Test for rule:3
 enabled
@@ -1860,11 +1754,8 @@ Nothing has changed
 Ag:1 Type: 1 Cvid: 0
 Ag:1
 Nothing has changed
-Test for rule:4
+Test for rule:1
 enabled
-Ag:0 Type: 0 Cvid: 0
-Ag:0
-Nothing has changed
 Ag:1
 Nothing has changed
 Test for rule:2
@@ -1876,15 +1767,6 @@ Test for rule:6
 enabled
 Ag:1 Type: 1 Cvid: 0
 Ag:1
-Nothing has changed
-Test for rule:7
-enabled
-Ag:1 Type: 1 Cvid: 0
-Ag:1
-Nothing has changed
-Ag:0
-Nothing has changed
-Ag:2
 Nothing has changed
 
 ------------------------------------------------------------

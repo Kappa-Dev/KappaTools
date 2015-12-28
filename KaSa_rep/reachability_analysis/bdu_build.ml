@@ -262,39 +262,15 @@ let collect_bdu_creation_restriction_map parameter handler error rule_id rule st
                   new_index_pair_map parameter error list
                 in
                 (*-----------------------------------------------------------------*)
-                let error', map_res =
-                  Site_map_and_set.Map.fold_restriction_with_missing_associations
+		let add site state (error,store_result) = 
+		  let error,site' = Site_map_and_set.Map.find_default parameter error 0 site map_new_index_forward in (* JF: we should raise an alarm if not found *) 
+                  Site_map_and_set.Map.add parameter error site' state store_result 
+		in 
+		let error', map_res =
+		  Site_map_and_set.Map.fold_restriction_with_missing_associations
                     parameter error
-                    (fun site port (error, store_result) ->
-                      let state = port.site_state.min in
-                      let error,site' = Site_map_and_set.Map.find_default
-                        parameter error 0 site map_new_index_forward in
-		      let _ = if local_trace then Printf.fprintf stderr "SITE: %i %i %i\n" site site' state in 
-		      let error,map_res = (*default value of state in creation is 0*)
-                        Site_map_and_set.Map.add
-                          parameter
-			  error
-			  site'
-                          state
-                          store_result
-                      in
-                      error, map_res
-                    )
-                    (fun site (error,store_result) ->
-                      let error,site' = Site_map_and_set.Map.find_default
-                        parameter error 0 site map_new_index_forward in
-		      let _ = if local_trace then Printf.fprintf stdout "SITE: %i %i 0\n" site site' in 
-		   
-		      let error,map_res = (*default value of state in creation is 0*)
-                        Site_map_and_set.Map.add
-                          parameter
-			  error
-			  site'
-                          0
-                          store_result
-                      in
-                      error, map_res
-                    )
+                    (fun site port -> add site port.site_state.min)
+		    (fun site -> add site 0)
 		    set
 		    agent.agent_interface
 		    Site_map_and_set.Map.empty
@@ -390,20 +366,15 @@ let collect_bdu_init_restriction_map parameter handler error compil store_remane
                     new_index_pair_map parameter error list
                   in
                   (*-----------------------------------------------------------------*)
+		  let add site state (error,store_result) = 
+		    let error,site' = Site_map_and_set.Map.find_default parameter error 0 site map_new_index_forward in (* JF: should raise an alarm if not found *)
+		    Site_map_and_set.Map.add parameter error site' state store_result 
+		  in 
                   let error', map_res =
-                    Site_map_and_set.Map.fold_restriction parameter error
-                      (fun site port (error,store_result) ->
-                        let state = port.site_state.min in
-                        let error,site' = Site_map_and_set.Map.find_default parameter error 
-                          0 site map_new_index_forward in
-                        let error,map_res =
-                          Site_map_and_set.Map.add parameter error 
-                            site'
-                            state
-                            store_result
-                        in
-                        error, map_res
-                      ) set agent.agent_interface Site_map_and_set.Map.empty
+                    Site_map_and_set.Map.fold_restriction_with_missing_associations parameter error
+                      (fun site port -> add site port.site_state.min) (* JF: we should check that port.site_state.min is equal to port_site_state.max *)
+                      (fun site -> add site 0) 
+		      set agent.agent_interface Site_map_and_set.Map.empty
                   in
 	          let error = Exception.check warn parameter error error'
                     (Some "line 370") Exit in
