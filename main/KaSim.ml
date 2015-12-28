@@ -2,10 +2,6 @@ let usage_msg =
   "KaSim "^Version.version_string^":\n"^
     "Usage is KaSim [-i] input_file [-e events | -t time] [-p points] [-o output_file]\n"
 
-let close_desc () =
-  let () = Kappa_files.close_all_out_desc () in
-  List.iter (fun d -> close_in d) !Parameter.openInDescriptors
-
 let (maxEventValue:int option ref) = ref None
 let (maxTimeValue:float option ref) = ref None
 let (pointNumberValue:int ref) = ref 0
@@ -201,12 +197,12 @@ let () =
   with
   | ExceptionDefn.Malformed_Decl er ->
      let () = ExceptionDefn.flush_warning Format.err_formatter in
-     let () = close_desc () in
+     let () = Kappa_files.close_all_out_desc () in
      let () = Pp.error Format.pp_print_string er in
      exit 2
   | ExceptionDefn.Internal_Error er ->
      let () = ExceptionDefn.flush_warning Format.err_formatter in
-     let () = close_desc () in
+     let () = Kappa_files.close_all_out_desc () in
      let () =
        Pp.error
 	 (fun f x -> Format.fprintf f "Internal Error (please report):@ %s" x)
@@ -214,18 +210,18 @@ let () =
      exit 2
   | Invalid_argument msg ->
      let () = ExceptionDefn.flush_warning Format.err_formatter in
-     let () = close_desc () in
+     let () = Kappa_files.close_all_out_desc () in
      let s = "" (*Printexc.get_backtrace()*) in
      let () = Format.eprintf "@.@[<v>***Runtime error %s***@,%s@]@." msg s in
     exit 2
   | ExceptionDefn.UserInterrupted f ->
      let () = ExceptionDefn.flush_warning Format.err_formatter in
-     let () = close_desc () in
+     let () = Kappa_files.close_all_out_desc () in
      let msg = f 0. 0 in
      let () =Format.eprintf "@.***Interrupted by user: %s***@." msg in
      exit 1
   | Sys_error msg ->
      let () = ExceptionDefn.flush_warning Format.err_formatter in
-     let () = close_desc () in
+     let () = Kappa_files.close_all_out_desc () in
      let () = Format.eprintf "%s@." msg in
      exit 2
