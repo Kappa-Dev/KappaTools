@@ -449,12 +449,6 @@ Mapping between global identifier of sites (per agent) and local identifier of s
 Covering_class_id:0
 Global:site_type:0  => Local:site_type':1
 Local:site_type':1  => Global:site_type:0
-CREATION CV_ID:0
-SITE: 0 1 0
-SITE: 1 2 0
-CREATION CV_ID:0
-SITE: 0 1 0
-SITE: 1 2 0
 ============================================================
 * BDU Analysis:
 ============================================================
@@ -1102,12 +1096,10 @@ wl_init_creation:
 0 1 2 3 4 5 6 7 8 9 
 Test for rule:8
 enabled
-CREATION: Type: 0 Cvid: 0
 Ag:0
 Nothing has changed
 Test for rule:9
 enabled
-CREATION: Type: 0 Cvid: 0
 Ag:0
 Nothing has changed
 Test for rule:0
@@ -1238,12 +1230,10 @@ Ag:0
 Nothing has changed
 Test for rule:8
 enabled
-CREATION: Type: 0 Cvid: 0
 Ag:0
 Nothing has changed
 Test for rule:9
 enabled
-CREATION: Type: 0 Cvid: 0
 Ag:0
 Nothing has changed
 Test for rule:4

@@ -240,11 +240,6 @@ Mapping between global identifier of sites (per agent) and local identifier of s
 Covering_class_id:0
 Global:site_type:0  => Local:site_type':1
 Local:site_type':1  => Global:site_type:0
-CREATION CV_ID:0
-SITE: 0 1 0
-SITE: 1 2 0
-CREATION CV_ID:0
-SITE: 0 1 0
 ============================================================
 * BDU Analysis:
 ============================================================
@@ -689,7 +684,6 @@ wl_init_creation:
 0 1 2 3 4 
 Test for rule:0
 enabled
-CREATION: Type: 0 Cvid: 0
 Ag:0
 new views:Id=7
  Node(site_type:1<0)
@@ -816,7 +810,6 @@ Test for rule:4
 disabled
 Test for rule:0
 enabled
-CREATION: Type: 0 Cvid: 0
 Ag:0
 Nothing has changed
 Test for rule:1
@@ -829,7 +822,6 @@ enabled
 Ag:0 Type: 0 Cvid: 0
 Ag:0
 Nothing has changed
-CREATION: Type: 1 Cvid: 0
 Ag:1
 new views:Id=3
  Node(site_type:1<0)
@@ -865,7 +857,6 @@ Ag:0
 Nothing has changed
 Test for rule:0
 enabled
-CREATION: Type: 0 Cvid: 0
 Ag:0
 Nothing has changed
 Test for rule:1
@@ -878,7 +869,6 @@ enabled
 Ag:0 Type: 0 Cvid: 0
 Ag:0
 Nothing has changed
-CREATION: Type: 1 Cvid: 0
 Ag:1
 Nothing has changed
 Test for rule:4
@@ -914,7 +904,6 @@ in add_update_to_wl:rule_id:3
 in add_update_to_wl:rule_id:4
 Test for rule:0
 enabled
-CREATION: Type: 0 Cvid: 0
 Ag:0
 Nothing has changed
 Test for rule:1
@@ -932,7 +921,6 @@ enabled
 Ag:0 Type: 0 Cvid: 0
 Ag:0
 Nothing has changed
-CREATION: Type: 1 Cvid: 0
 Ag:1
 Nothing has changed
 Test for rule:4
