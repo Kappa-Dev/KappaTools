@@ -257,7 +257,7 @@ let collect_bdu_creation_restriction_map parameter handler error rule_id rule st
 	       (*JF  there is a problem here, you store only the last id that you see *)
                 (*-----------------------------------------------------------------*)
                 (*new index for site type in covering class*)
-		let _ = Printf.fprintf stdout "CREATION CV_ID:%i\n" cv_id in 
+		let _ = if local_trace then Printf.fprintf stderr "CREATION CV_ID:%i\n" cv_id in 
 		let error, (map_new_index_forward, _) =
                   new_index_pair_map parameter error list
                 in
@@ -269,7 +269,7 @@ let collect_bdu_creation_restriction_map parameter handler error rule_id rule st
                       let state = port.site_state.min in
                       let error,site' = Site_map_and_set.Map.find_default
                         parameter error 0 site map_new_index_forward in
-		      let _ = Printf.fprintf stdout "SITE: %i %i %i\n" site site' state in 
+		      let _ = if local_trace then Printf.fprintf stderr "SITE: %i %i %i\n" site site' state in 
 		      let error,map_res = (*default value of state in creation is 0*)
                         Site_map_and_set.Map.add
                           parameter
@@ -283,7 +283,7 @@ let collect_bdu_creation_restriction_map parameter handler error rule_id rule st
                     (fun site (error,store_result) ->
                       let error,site' = Site_map_and_set.Map.find_default
                         parameter error 0 site map_new_index_forward in
-		      let _ = Printf.fprintf stdout "SITE: %i %i 0\n" site site' in 
+		      let _ = if local_trace then Printf.fprintf stdout "SITE: %i %i 0\n" site site' in 
 		   
 		      let error,map_res = (*default value of state in creation is 0*)
                         Site_map_and_set.Map.add

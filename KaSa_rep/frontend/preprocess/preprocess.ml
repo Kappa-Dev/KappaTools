@@ -12,9 +12,18 @@
   * en Automatique.  All riGhoghts reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
-let warn parameters mh message exn default = 
-     Exception.warn parameters mh (Some "Preprocess") message exn (fun () -> default) 
-  
+let warn parameters mh ?pos:(pos=None) message exn default = 
+  let message =
+    match
+      message,pos
+    with
+    | _,None -> message
+    | None,Some pos -> Some (Location.to_string pos)
+    | Some m,Some p -> Some (m^(Location.to_string p))
+  in
+  Exception.warn parameters mh (Some "Preprocess") message exn (fun () -> default) 
+
+let check ?pos:(pos=None) = Exception.check (warn ~pos:pos)		 
 
 let local_trace = true  
 
@@ -103,7 +112,7 @@ let add_bond parameters error i id_agent agent site id_agent' agent' site' bond_
     | _,Some i -> error,i 
   in 
   let error',updated = Cckappa_sig.Site_map_and_set.Map.add parameters error site {Cckappa_sig.agent_index = id_agent' ; Cckappa_sig.agent_type = agent' ; Cckappa_sig.site = site'} old in
-  let error = Exception.check warn parameters error error' (Some "line 106, add_bond") Exit  in 
+  let error = check parameters error error' (Some "line 106, add_bond") Exit  in 
   Int_storage.Quick_Nearly_inf_Imperatif.set parameters error id_agent updated bond_list
   
 let translate_agent_sig parameters error handler agent kasim_id = 
@@ -166,7 +175,7 @@ let translate_agent_sig parameters error handler agent kasim_id =
                       Cckappa_sig.site_free = port.Ckappa_sig.port_free 
                     } c_interface
 	      in
-	      let error = Exception.check warn parameters error error' (Some "line 170, translate_agent_sig") Exit  in 
+	      let error = check parameters error error' (Some "line 170, translate_agent_sig") Exit  in 
 	      error,c_interface 
         in 
         let error,c_interface =
@@ -189,7 +198,7 @@ let translate_agent_sig parameters error handler agent kasim_id =
                             }
                             c_interface
 		     in
-		     let error = Exception.check warn parameters error error' (Some "line 192") Exit  in
+		     let error = check parameters error error' (Some "line 192") Exit  in
 		     error,c_interface 
 	   
               end
@@ -253,7 +262,7 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
 				       let error',dead_state_list =
 				       Cckappa_sig.Site_map_and_set.Map.add parameters error site_name (Ckappa_sig.Internal state) dead_state_sites
 				       in 
-				       Exception.check warn parameters error error' (Some "line 254, a site even dead should occur only once in an interface") Exit,
+				       check parameters error error' (Some "line 254, a site even dead should occur only once in an interface") Exit,
 				       (c_interface,dead_sites,dead_state_sites)
 			| _ , Some (internal,_,_,_) ->  
 			   let error',c_interface =
@@ -271,7 +280,7 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
 				     Cckappa_sig.max = internal
 				   };
 			       } c_interface in
-			   let error = Exception.check warn parameters error error' (Some "line 272, a site should occur only once in an interface") Exit  in
+			   let error = check parameters error error' (Some "line 272, a site should occur only once in an interface") Exit  in
 			   error,(c_interface,dead_sites,dead_state_sites)
 		      end 
 		 end 
@@ -307,7 +316,7 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
 			    } 
 			    c_interface 
 			in
-			let error = Exception.check warn parameters error error' (Some "line 192") Exit  in
+			let error = check parameters error error' (Some "line 192") Exit  in
 			error,(c_interface,bond_list,(k,site_name)::question_marks,dead_sites,dead_link_sites)
 		   end 
 		 end
@@ -330,7 +339,7 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
                           }
                           c_interface
                       in
-		      let error = Exception.check warn parameters error error' (Some "line 192") Exit  in
+		      let error = check parameters error error' (Some "line 192") Exit  in
 		      error,(c_interface,bond_list,question_marks,dead_sites,dead_link_sites)
 		 end
               | Ckappa_sig.LNK_SOME pos -> 
@@ -351,7 +360,7 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
 			   let error',dead_link_sites =
 			     Cckappa_sig.Site_map_and_set.Map.add parameters error site_name port.Ckappa_sig.port_lnk dead_link_sites
 			   in 
-			   Exception.check warn parameters error error' (Some "line 350, a site even dead should occur only once in an interface") Exit,
+			   check parameters error error' (Some "line 350, a site even dead should occur only once in an interface") Exit,
 			   (c_interface,bond_list,question_marks,dead_sites,dead_link_sites)
 			| error,Some state_dic -> 
 			   let error,max = Cckappa_sig.Dictionary_of_States.last_entry parameters error state_dic in 
@@ -360,7 +369,7 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
 			     let error',dead_link_sites =
 			       Cckappa_sig.Site_map_and_set.Map.add parameters error site_name port.Ckappa_sig.port_lnk dead_link_sites
 			     in 
-			     Exception.check warn parameters error error' (Some "line 357, a site even dead should occur only once in an interface") Exit,
+			     check parameters error error' (Some "line 357, a site even dead should occur only once in an interface") Exit,
 			     (c_interface,bond_list,question_marks,dead_sites,dead_link_sites)
 			   else 
 			     let error',c_interface =
@@ -376,7 +385,7 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
 				 } 
 				 c_interface 
 			     in
-			     let error = Exception.check warn parameters error error' (Some "line 192") Exit  in
+			     let error = check parameters error error' (Some "line 192") Exit  in
 			     error,(c_interface,bond_list,question_marks,dead_sites,dead_link_sites)
 		      end
 		 end 
@@ -397,7 +406,7 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
 			   let error',dead_link_sites =
 			     Cckappa_sig.Site_map_and_set.Map.add parameters error site_name port.Ckappa_sig.port_lnk dead_link_sites
 			   in 
-			   Exception.check warn parameters error error' (Some "line 395, a site even dead should occur only once in an interface") Exit,
+			   check parameters error error' (Some "line 395, a site even dead should occur only once in an interface") Exit,
 			   (c_interface,bond_list,question_marks,dead_sites,dead_link_sites)		 
 			| error,Some state_dic -> 
 			   begin
@@ -427,7 +436,7 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
 			     let error,c_interface = 
 			       match bool,output with
 			       | _ , None | true, _ -> 
-					     warn parameters error (Some "line 308") Exit c_interface  
+					     warn parameters error (Some "line 308, this link can never be formed, ") ~pos:(Some pos) Exit c_interface  
 			       | _ ,Some (i,_,_,_) -> 
 				  let error',c_interface =
 				    Cckappa_sig.Site_map_and_set.Map.add
@@ -442,7 +451,7 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
 				      } 
 				      c_interface 
 				  in
-				  let error = Exception.check warn parameters error error' (Some "line 416") Exit in
+				  let error = check parameters error error' (Some "line 416") Exit in
 				  error,c_interface 
 			     in
 			     error,(c_interface,bond_list,question_marks,dead_sites,dead_link_sites)			      
@@ -504,7 +513,7 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
 			    } 
 			    c_interface
 			in
-			let error = Exception.check warn parameters error error' (Some "line 192") Exit  in
+			let error = check parameters error error' (Some "line 192") Exit  in
 			error,c_interface
 		   in 
 		   error,(c_interface,bond_list,question_marks,dead_sites,dead_link_sites)
@@ -599,7 +608,7 @@ let translate_mixture parameters error handler mixture =
 		    Cckappa_sig.site = site}
 		  set
 	      in
-     	      let error = Exception.check warn parameters error error' (Some "line 192") Exit  in
+     	      let error = check parameters error error' (Some "line 192") Exit  in
 	      error,set)
      ag.Cckappa_sig.agent_interface
      (error,set)
@@ -619,7 +628,7 @@ let translate_mixture parameters error handler mixture =
                Cckappa_sig.agent_type = ag.Cckappa_sig.agent_name;
                Cckappa_sig.site = site} set
 	 in
-	 let error = Exception.check warn parameters error error' (Some "line 576") Exit  in
+	 let error = check parameters error error' (Some "line 576") Exit  in
 	 error,set
        else error,set)
      (fun parameters error site state state' set ->
@@ -636,7 +645,7 @@ let translate_mixture parameters error handler mixture =
 		Cckappa_sig.agent_type = ag.Cckappa_sig.agent_name;
 		Cckappa_sig.site = site} set
 	 in
-	 let error = Exception.check warn parameters error error' (Some "line 593") Exit in
+	 let error = check parameters error error' (Some "line 593") Exit in
 	 error,set)    
      ag.Cckappa_sig.agent_interface ag'.Cckappa_sig.agent_interface set
 
@@ -660,11 +669,11 @@ let translate_mixture parameters error handler mixture =
 	    | Some Cckappa_sig.Unknown_agent _ | None | Some Cckappa_sig.Ghost -> warn parameters error (Some ("Preprocess line 557"^", question marks should not appear on the rhs or in introduction")) Exit (Cckappa_sig.Ghost)  
 	    | Some Cckappa_sig.Dead_agent (ag,set,l,l') ->
 	       let error',interface = Cckappa_sig.Site_map_and_set.Map.remove parameters error s ag.Cckappa_sig.agent_interface in
-	       let error = Exception.check warn parameters error error' (Some "line 617") Exit in 
+	       let error = check parameters error error' (Some "line 617") Exit in 
 	       error,Cckappa_sig.Dead_agent ({ag with Cckappa_sig.agent_interface = interface},set,l,l')
 	    | Some Cckappa_sig.Agent ag ->
 	       let error',interface = Cckappa_sig.Site_map_and_set.Map.remove parameters error s ag.Cckappa_sig.agent_interface in
-	       let error = Exception.check warn parameters error error' (Some "line 617") Exit in 
+	       let error = check parameters error error' (Some "line 617") Exit in 
 	       error,Cckappa_sig.Agent {ag with Cckappa_sig.agent_interface = interface}
 	  in 
           let error,views = Int_storage.Quick_Nearly_inf_Imperatif.set parameters error k agent views in 
@@ -787,7 +796,7 @@ let translate_mixture parameters error handler mixture =
 	   | Some Cckappa_sig.Dead_agent (lagk,_,_,_), Some Cckappa_sig.Agent ragk -> (* TO DO check what happen if one site is dead *)
 	      let agent_type = lagk.Cckappa_sig.agent_name in 
 	      let error',ldiff,rdiff = Cckappa_sig.Site_map_and_set.Map.diff_pred parameters error equ_port lagk.Cckappa_sig.agent_interface ragk.Cckappa_sig.agent_interface in 
-	      let error = Exception.check warn parameters error error' (Some "line 617") Exit in 
+	      let error = check parameters error error' (Some "line 617") Exit in 
 	      let error,lbondk = Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get parameters error k c_rule_lhs.Cckappa_sig.bonds in  
 	      let error,rbondk = Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get parameters error k c_rule_rhs.Cckappa_sig.bonds in  
 	      let lbondk = 
@@ -812,7 +821,7 @@ let translate_mixture parameters error handler mixture =
 							 (print_int k;print_newline ();warn parameters error (Some "line 542") Exit (direct,reverse,actions,half_release_set,None,Cckappa_sig.Site_map_and_set.Map.empty,Cckappa_sig.Site_map_and_set.Map.empty,true))
          in 
          let error',bond_l,bond_r = Cckappa_sig.Site_map_and_set.Map.diff parameters error lbondk rbondk in
-	 let error = Exception.check warn parameters error error' (Some "line 746") Exit in 
+	 let error = check parameters error error' (Some "line 746") Exit in 
          let release = actions.Cckappa_sig.release in 
          let error,(full_release_set,release) =
 	   match agent_type
@@ -823,7 +832,7 @@ let translate_mixture parameters error handler mixture =
 		(fun site target (error,(full_release_set,release)) -> 
                  let source = Cckappa_sig.build_address k agent_type site in 
                  let error',full_release_set = Cckappa_sig.Address_map_and_set.Set.add parameters error source full_release_set in 
-		 let error = Exception.check warn parameters error error' (Some "line 753") Exit in 
+		 let error = check parameters error error' (Some "line 753") Exit in 
                  let release = 
                    if compare source target < 0 
                      then (source,target)::release
@@ -857,7 +866,7 @@ let translate_mixture parameters error handler mixture =
    in
    let error,(direct,reverse,actions,half_release_set,full_release_set,dead) = aux_agent 0 (error,(direct,reverse,actions,half_release_set,full_release_set,false)) in
    let error',half_release_set = Cckappa_sig.Address_map_and_set.Set.minus parameters error half_release_set full_release_set in
-   let error = Exception.check warn parameters error error' (Some "line 753") Exit in                  
+   let error = check parameters error error' (Some "line 753") Exit in                  
    let list = Cckappa_sig.Address_map_and_set.Set.elements half_release_set in
    let error,list = 
      List.fold_left 
@@ -885,18 +894,18 @@ let translate_mixture parameters error handler mixture =
 	    	      error,(add,None)::list
 		 end
 	      | error',Some state ->
-		 Exception.check warn parameters error error' (Some "line 799") Exit,
+		 check parameters error error' (Some "line 799") Exit,
 		 (add,Some state.Cckappa_sig.site_state)::list
 	    end
 	 | Some (Cckappa_sig.Agent ag) ->
             let interface = ag.Cckappa_sig.agent_interface in
 	    match Cckappa_sig.Site_map_and_set.Map.find_option parameters error add.Cckappa_sig.site interface with
 	    | error',None ->
-	       Exception.warn parameters (Exception.check warn parameters error error' (Some "line 799") Exit)
+	       Exception.warn parameters (check parameters error error' (Some "line 799") Exit)
 			      (Some "Preprocess") (Some "find_map, line 405")
 			      Not_found (fun () -> (add,None)::list)
             | error',Some state ->
-	       Exception.check warn parameters error error' (Some "line 799") Exit,
+	       check parameters error error' (Some "line 799") Exit,
 	       (add,Some state.Cckappa_sig.site_state)::list)
        (error,[])
        (List.rev list) 
