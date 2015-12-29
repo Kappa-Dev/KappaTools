@@ -1110,4 +1110,36 @@ Id=6
     Id=1
      Leaf False 
 
+
+------------------------------------------------------------
+* Cartesian abstraction:
+------------------------------------------------------------
+agent_type:0:cv_id:0
+Id=6
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_type:1:cv_id:0
+Id=6
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
 execution finished without any exception

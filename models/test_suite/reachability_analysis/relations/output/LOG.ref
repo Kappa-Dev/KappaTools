@@ -1373,4 +1373,48 @@ Id=76
           Id=1
            Leaf False 
 
+
+------------------------------------------------------------
+* Cartesian abstraction:
+------------------------------------------------------------
+agent_type:0:cv_id:0
+Id=77
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:1<4)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Id=83
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=26
+   Node(site_type:2<3)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Id=67
+ Node(site_type:3<0)
+  Id=1
+   Leaf False 
+
+  Id=39
+   Node(site_type:3<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
 execution finished without any exception
