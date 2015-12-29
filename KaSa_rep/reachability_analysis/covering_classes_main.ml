@@ -75,6 +75,28 @@ let scan_rule_set_covering_classes parameter error handler rules =
   let error, init_modif_map =  AgentMap.create parameter error n_agents in
   let error, init_class     =  AgentMap.create parameter error n_agents in
   (*------------------------------------------------------------------------------*)
+  (* add each singleton as a covering class *)
+  let error, init_class = 
+    Int_storage.Nearly_inf_Imperatif.fold
+      parameter 
+      error
+      (fun parameters error a b init_class -> 
+	Ckappa_sig.Dictionary_of_sites.fold 
+	  (fun _ _ b (error,init_class) -> 
+	    let error,l' = 
+	      match 
+		AgentMap.unsafe_get parameters error a init_class
+	      with 
+	      | error,None -> error,[[b]]
+	      | error,Some l -> error,[b]::l
+	    in 
+	    AgentMap.set parameters error a l' init_class)
+	  b (error,init_class))
+      handler.Cckappa_sig.sites
+      init_class
+  in 
+  
+  (*------------------------------------------------------------------------------*)
   (*init state of covering class*)
   let init_class =
     {
@@ -84,6 +106,8 @@ let scan_rule_set_covering_classes parameter error handler rules =
   in
   (*------------------------------------------------------------------------------*)
   (*map each agent to a covering classes*)
+  
+  
   let error, store_covering_classes =
     Nearly_inf_Imperatif.fold
       parameter error
@@ -160,7 +184,7 @@ let scan_rule_set_remanent parameter error handler rules =
 
 let covering_classes parameter error handler cc_compil =
   let error, init = AgentMap.create parameter error 0 in
-  let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
+  let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in 
   let error, result = scan_rule_set_remanent parameter error handler cc_compil.rules in
   let error =
     if (Remanent_parameters.get_trace parameter) || trace
