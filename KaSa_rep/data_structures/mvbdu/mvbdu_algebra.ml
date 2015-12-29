@@ -315,6 +315,56 @@ let rec clean_head allocate memoized_fun union handler error parameters (mvbdu_i
         end  
       end    
         
+let rec keep_head_only allocate memoized_fun bdu_true handler error parameters (mvbdu_input:'mvbdu) 
+    = 
+  match memoized_fun.Memo_sig.get parameters error handler mvbdu_input with 
+    | error,(handler,Some output) -> error,(handler,Some output)
+    | error,(handler,None) -> 
+      begin
+        match mvbdu_input.Mvbdu_sig.value with 
+        | Mvbdu_sig.Leaf a -> 
+          error,(handler,Some mvbdu_input) 
+        | Mvbdu_sig.Node x -> 
+          let var_ref = x.Mvbdu_sig.variable in 
+          let rec aux handler error mvbdu =
+            begin                         
+              match mvbdu.Mvbdu_sig.value with 
+              | Mvbdu_sig.Node x when x.Mvbdu_sig.variable = var_ref ->
+                begin 
+		  let error,(handler,b_true) = aux handler error x.Mvbdu_sig.branch_true in 
+		  let error,(handler,b_false) = aux handler error x.Mvbdu_sig.branch_false in 
+		  match b_true,b_false
+		  with Some b_true, Some b_false -> 
+		    begin 
+			  match Mvbdu_core.compress_node allocate error handler 
+			    (Mvbdu_sig.Node 
+                               {x with 
+				 Mvbdu_sig.branch_true = b_true;
+				 Mvbdu_sig.branch_false = b_false}) 
+			  with 
+			  | error,None ->     
+			    invalid_arg parameters error (Some "line 342") Exit 
+			      (handler,None) 
+			  | error,Some (_,_,bdu,handler) -> error,(handler,Some bdu)
+		    end 
+		  | None,_ | _,None -> error,(handler,None)
+		end
+              | Mvbdu_sig.Leaf _ -> error,(handler,Some mvbdu) 
+	      | Mvbdu_sig.Node _ -> 
+		let error,(handler,output) = bdu_true parameters handler error parameters in 
+                begin
+                  match output with 
+                  |  None -> 
+                    invalid_arg parameters error (Some "line 357") Exit 
+                      (handler,None)    
+                  | Some a -> 
+		    error,(handler,Some a)
+                end
+	    end
+	  in 
+	  aux handler error mvbdu_input
+      end
+
 let rec redefine allocate memoized_fun error parameters handler mvbdu_input list_input = 
   match memoized_fun.Memo_sig.get parameters error handler (mvbdu_input,list_input) 
   with 
@@ -647,3 +697,4 @@ let not_recursive_binary f g allocate =
         | Some _ -> error, (handler,output))}
     
 let id_of_mvbdu x = x.Mvbdu_sig.id  
+

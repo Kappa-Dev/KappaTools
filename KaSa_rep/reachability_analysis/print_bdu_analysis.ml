@@ -65,7 +65,21 @@ let print_bdu_update_map parameter error result =
     Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_update
     ) result
 
-let print_result_fixpoint parameter error result =
+let print_bdu_update_map_cartesian parameter handler error result = 
+  Map_bdu_update.Map.fold 
+    (fun (agent_type, cv_id) bdu_update (error,handler) -> 
+      let _ = fprintf parameter.log "agent_type:%i:cv_id:%i\n" agent_type cv_id in 
+      let error,handler,list = Mvbdu_wrapper.Mvbdu.mvbdu_cartesian_abstraction parameter handler error bdu_update in 
+      let _ = 
+	List.iter 
+	  (Mvbdu_wrapper.Mvbdu.print parameter.log "")
+	  list
+      in 
+      error,handler)
+    result (error,handler)
+	
+
+let print_result_fixpoint parameter handler error result =
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
@@ -80,4 +94,12 @@ let print_result_fixpoint parameter error result =
       error
       result
   in
-  error
+  let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "\n------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter)
+      "* Cartesian abstraction:\n";
+    fprintf (Remanent_parameters.get_log parameter)
+      "------------------------------------------------------------\n";
+  in
+  print_bdu_update_map_cartesian parameter handler error result 

@@ -36,12 +36,14 @@ module type Mvbdu =
     val mvbdu_nfst: (mvbdu,mvbdu,mvbdu) binary 
     val mvbdu_nsnd: (mvbdu,mvbdu,mvbdu) binary 
     val mvbdu_redefine: (mvbdu,hconsed_list,mvbdu) binary 
+    val mvbdu_cartesian_abstraction: (mvbdu,mvbdu list) unary 
     val build_list: ((int * int) list,hconsed_list) unary  
     val build_sorted_list: ((int * int) list,hconsed_list) unary
     val build_reverse_sorted_list: ((int * int) list,hconsed_list) unary
-    val empty_list : hconsed_list
+    val empty_list : hconsed_list constant
     val print: out_channel -> string -> mvbdu -> unit
     val print_list: out_channel -> string -> hconsed_list -> unit 
+  
   end
 
 
@@ -75,10 +77,11 @@ module type Internalized_mvbdu =
     val mvbdu_nfst:  mvbdu -> mvbdu -> mvbdu 
     val mvbdu_nsnd:  mvbdu -> mvbdu -> mvbdu 
     val mvbdu_redefine: mvbdu -> hconsed_list -> mvbdu
+    val mvbdu_cartesian_abstraction: mvbdu -> mvbdu list
     val build_list: (int * int) list ->  hconsed_list 
     val build_sorted_list: (int * int) list -> hconsed_list
     val build_reverse_sorted_list: (int * int) list -> hconsed_list
-    val empty_list : hconsed_list
+    val empty_list : unit -> hconsed_list 
     val print: out_channel -> string -> mvbdu -> unit
     val print_list: out_channel -> string -> hconsed_list -> unit 
   end
@@ -152,6 +155,17 @@ module Make (M:Nul)  =
 	 f (Boolean_mvbdu.list_allocate parameters) parameters error handler a
       in a,b,c
 
+    let lift1_ string f parameters handler error a = 
+      match 
+	 f parameters handler error a
+      with 
+      | error,(handler,Some a) -> error,handler,a 
+      | error,(handler,None) -> 
+        let error, a =
+          Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> a) 
+        in 
+	error, handler, a
+
     let lift2 string f parameters handler error a b = 
       match 
 	f parameters handler error parameters a b
@@ -197,18 +211,32 @@ module Make (M:Nul)  =
     let mvbdu_nfst = lift2 "line 100, bdd_nfst" Boolean_mvbdu.boolean_mvbdu_nfst
     let mvbdu_nsnd = lift2 "line 101, bdd_nsnd" Boolean_mvbdu.boolean_mvbdu_nsnd 
     let mvbdu_redefine = lift2bis "line 102, bdd_redefine" Boolean_mvbdu.redefine  
-
+ 
     let build_list = lift1bis "line 181, build_list" List_algebra.build_list
       
     let build_sorted_list = lift1ter "line 181, build_list" List_algebra.build_sorted_list
 
     let build_reverse_sorted_list = lift1ter "line 181, build_list" List_algebra.build_reversed_sorted_list
       
-    (*Added: build empty list_a*)
-    let empty_list = List_algebra.empty_list
+    let empty_list parameter handler error = build_list parameter handler error []
 
     let print = Boolean_mvbdu.print_mvbdu
     let print_list = List_algebra.print_list 
+      
+    let mvbdu_clean_head = lift1_ "line 216, bdd_clean_head" Boolean_mvbdu.clean_head
+    let mvbdu_keep_head_only = lift1_ "line 217, bdd_keep_head_only" Boolean_mvbdu.keep_head_only
+
+    let mvbdu_cartesian_abstraction parameters handler error bdu = 
+      let error,handler,bdd_true = mvbdu_true parameters handler error in 
+      let error,handler,bdd_false = mvbdu_false parameters handler error in 
+      let rec aux error handler bdu list = 
+	if equal bdu bdd_true || equal bdu bdd_false 
+	then error,handler,List.rev list
+	else 
+	  let error,handler,head = mvbdu_keep_head_only parameters error handler  bdu in 
+	  let error,handler,tail = mvbdu_clean_head parameters error handler bdu in 
+	  aux error handler tail (head::list)
+      in aux error handler bdu []
   end: Mvbdu)
 
 module Internalize(M:Mvbdu) = 
@@ -314,8 +342,9 @@ module Internalize(M:Mvbdu) =
     let build_sorted_list = lift_unary "line 298" M.build_sorted_list  
     let build_reverse_sorted_list = lift_unary "line 299" M.build_reverse_sorted_list 
 
-    (*added*)
-    let empty_list = M.empty_list
+    let mvbdu_cartesian_abstraction = lift_unary "line 349" M.mvbdu_cartesian_abstraction 
+
+    let empty_list () = build_list []
 
     let print = M.print
     let print_list = M.print_list 
@@ -380,12 +409,13 @@ module Optimize(M:Mvbdu) =
 	     let mvbdu_snd = M.mvbdu_snd 
 	     let mvbdu_nfst parameters handler error a _ = mvbdu_not parameters handler error a 
 	     let mvbdu_nsnd parameters handler error _ a = mvbdu_not parameters handler error a						  
+
+	     let mvbdu_cartesian_abstraction = M.mvbdu_cartesian_abstraction
 	     let mvbdu_redefine = M.mvbdu_redefine
 	     let build_list = M.build_list 
 	     let build_sorted_list = M.build_sorted_list
 	     let build_reverse_sorted_list = M.build_reverse_sorted_list 
                
-             (*Added*)
              let empty_list = M.empty_list
 
 	     let print = M.print 
@@ -428,9 +458,11 @@ module Optimize'(M:Internalized_mvbdu) =
 	     let build_sorted_list = M.build_sorted_list
 	     let build_reverse_sorted_list = M.build_reverse_sorted_list 
 	     let mvbdu_redefine = M.mvbdu_redefine
-             let empty_list = M.empty_list (*added*)
+             let empty_list = M.empty_list
 	     let print = M.print
-	     let print_list = M.print_list 
+	     let print_list = M.print_list
+	     let mvbdu_cartesian_abstraction = M.mvbdu_cartesian_abstraction 
+	       
 	   end:Internalized_mvbdu)
 
 module Vd = struct end

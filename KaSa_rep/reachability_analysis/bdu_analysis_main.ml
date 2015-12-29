@@ -558,10 +558,10 @@ let bdu_main parameter error handler_kappa store_covering_classes cc_compil =
       result.store_bdu_build.store_bdu_init_restriction_map
 (*      init_bdu_fixpoint*)
   in
-  let error =
+  let error,handler_bdu =
     if  (Remanent_parameters.get_trace parameter) || trace
-    then print_result_fixpoint parameter error store_bdu_fixpoint
-    else error
+    then print_result_fixpoint parameter handler_bdu error store_bdu_fixpoint
+    else error,handler_bdu
   in
   error, handler_bdu, result
 			

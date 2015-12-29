@@ -34,10 +34,11 @@ module type Mvbdu =
     val mvbdu_nfst: (mvbdu,mvbdu,mvbdu) binary 
     val mvbdu_nsnd: (mvbdu,mvbdu,mvbdu) binary 
     val mvbdu_redefine: (mvbdu,hconsed_list,mvbdu) binary 
+    val mvbdu_cartesian_abstraction: (mvbdu,mvbdu list) unary 
     val build_list: ((int * int) list,hconsed_list) unary  
     val build_sorted_list: ((int * int) list,hconsed_list) unary
     val build_reverse_sorted_list: ((int * int) list,hconsed_list) unary
-    val empty_list : hconsed_list
+    val empty_list : hconsed_list constant
     val print: out_channel -> string -> mvbdu -> unit 
     val print_list: out_channel -> string -> hconsed_list -> unit 
   end
@@ -72,10 +73,11 @@ module type Internalized_mvbdu =
     val mvbdu_nfst:  mvbdu -> mvbdu -> mvbdu 
     val mvbdu_nsnd:  mvbdu -> mvbdu -> mvbdu 
     val mvbdu_redefine:  mvbdu -> hconsed_list -> mvbdu
+    val mvbdu_cartesian_abstraction: mvbdu -> mvbdu list
     val build_list: (int * int) list ->  hconsed_list 
     val build_sorted_list: (int * int) list -> hconsed_list
     val build_reverse_sorted_list: (int * int) list -> hconsed_list
-    val empty_list : hconsed_list
+    val empty_list : unit -> hconsed_list
     val print: out_channel -> string -> mvbdu -> unit 
     val print_list: out_channel -> string -> hconsed_list -> unit 
   end

@@ -69,6 +69,7 @@ type memo_tables =
     boolean_mvbdu_snd         : bool Mvbdu_sig.mvbdu Hash_2.t;
     boolean_mvbdu_nsnd        : bool Mvbdu_sig.mvbdu Hash_2.t;
     boolean_mvbdu_clean_head  : bool Mvbdu_sig.mvbdu Hash_1.t;
+    boolean_mvbdu_keep_head_only: bool Mvbdu_sig.mvbdu Hash_1.t;
     boolean_mvbdu_redefine    : bool Mvbdu_sig.mvbdu Hash_2.t;  
   }
 
@@ -91,6 +92,7 @@ let split_memo error handler =
   [ "id:",         x.boolean_mvbdu_identity;
     "not:",        x.boolean_mvbdu_not;
     "clean_head:", x.boolean_mvbdu_clean_head;
+    "keep_head_only:", x.boolean_mvbdu_keep_head_only;
   ],
   [ "and:",     x.boolean_mvbdu_and;
     "or:",      x.boolean_mvbdu_or;
@@ -150,6 +152,7 @@ let init_data parameters error =
   let error,id = Hash_1.create parameters error 0 in 
   let error,not = Hash_1.create parameters error 0 in 
   let error,mvbdu_clean_head = Hash_1.create parameters error 0 in 
+  let error,mvbdu_keep_head_only = Hash_1.create parameters error 0 in 
   let error,mvbdu_and = Hash_2.create parameters error (0,0) in 
   let error,mvbdu_or = Hash_2.create parameters error (0,0) in 
   let error,mvbdu_xor = Hash_2.create parameters error (0,0) in 
@@ -168,6 +171,7 @@ let init_data parameters error =
   error,
     {
       boolean_mvbdu_clean_head = mvbdu_clean_head ;
+      boolean_mvbdu_keep_head_only = mvbdu_keep_head_only ;
       boolean_mvbdu_identity = id ;
       boolean_mvbdu_not = not;
       boolean_mvbdu_and = mvbdu_and ; 
@@ -574,6 +578,48 @@ let memo_clean_head =
         error 
         (Mvbdu_core.id_of_mvbdu mvbdu))
     
+let memo_keep_head_only = 
+  Mvbdu_algebra.memoize_no_fun 
+    (fun x -> x.Memo_sig.data.boolean_mvbdu_keep_head_only)
+    (fun x h ->
+      {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_keep_head_only = x}})
+    (fun parameters error handler mvbdu d -> 
+      let a,b = Hash_1.unsafe_get parameters error (Mvbdu_core.id_of_mvbdu mvbdu) d
+      in a,(handler,b)
+    )
+    (fun parameters error h mvbdu -> 
+      Hash_1.set 
+        parameters 
+        error 
+        (Mvbdu_core.id_of_mvbdu mvbdu))
+    
+let keep_head_only parameters error handler = 
+  Mvbdu_algebra.keep_head_only 
+    (mvbdu_allocate parameters)
+    memo_keep_head_only
+    boolean_mvbdu_true
+    handler 
+    error 
+    parameters
+    
+let memo_keep_head_only = 
+  Mvbdu_algebra.memoize_no_fun 
+    (fun x -> x.Memo_sig.data.boolean_mvbdu_keep_head_only)
+    (fun x h ->
+      {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_keep_head_only = x}})  
+    (fun parameters error handler mvbdu d -> 
+      match Hash_1.unsafe_get parameters error (Mvbdu_core.id_of_mvbdu mvbdu) d with 
+        | error,None -> 
+          keep_head_only parameters error handler mvbdu
+        | error,Some x -> error,(handler,Some x) 
+    )
+    (fun parameters error h mvbdu -> 
+      Hash_1.set 
+        parameters 
+        error 
+        (Mvbdu_core.id_of_mvbdu mvbdu))
+    
+
 let reset_handler error = 
   {
     Memo_sig.empty_list = error,memo_identity;
