@@ -312,7 +312,7 @@ let rec parse_attribute last_modif last_tested attribute config =
        in
        parse_attribute last_modif (atom.eid::last_tested) att config
 
-let cut parameter handler log_info error attribute_ids grid =
+let cut ?with_reduction:(with_reduction=true) parameter handler log_info error attribute_ids grid =
   let error,log_info = StoryProfiling.StoryStats.add_event parameter error StoryProfiling.Build_configuration None log_info in 
   let rec build_config attribute_ids cfg =
     match attribute_ids with
@@ -343,7 +343,13 @@ let cut parameter handler log_info error attribute_ids grid =
   in
   let cfg = build_config attribute_ids empty_config in
   let error,log_info = StoryProfiling.StoryStats.close_event parameter error StoryProfiling.Build_configuration None log_info in 
-  let error,log_info,reduction = Graph_closure.reduction parameter handler log_info error cfg.prec_1 in 
+  let error,log_info,reduction = 
+    if with_reduction 
+    then 
+      Graph_closure.reduction parameter handler log_info error cfg.prec_1 
+    else 
+      error,log_info,cfg.prec_1
+  in
   error,log_info,{cfg with prec_1 = reduction}
 
 let pp_atom f atom =
@@ -434,7 +440,7 @@ let fold_over_causal_past_of_obs parameter handler log_info error config_closure
   let to_keep i = IntSet.mem i keep_l in
   let ids = ids_of_grid grid  in
   let error,log_info = StoryProfiling.StoryStats.add_event parameter error StoryProfiling.Build_configuration None log_info in 
-  let error,log_info,config = config_of_grid parameter handler log_info error ids grid in
+  let error,log_info,config = config_of_grid ~with_reduction:false parameter handler log_info error ids grid in
   let ettor,log_info = StoryProfiling.StoryStats.close_event parameter error StoryProfiling.Build_configuration None log_info in 
   Graph_closure.closure_bottom_up_with_fold parameter handler log_info error (Some StoryProfiling.Collect_traces) config_closure config.prec_1 to_keep f a 
     

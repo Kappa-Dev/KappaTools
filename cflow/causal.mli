@@ -60,7 +60,8 @@ val record_init :
   int list * Instantiation.concrete Instantiation.action list ->
   int -> Environment.t -> grid -> grid
 
-val cut : Remanent_parameters_sig.parameters ->
+val cut : ?with_reduction:bool -> 
+  Remanent_parameters_sig.parameters ->
            'a ->
            StoryProfiling.StoryStats.log_info ->
            Exception.method_handler ->
