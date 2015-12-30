@@ -145,27 +145,21 @@
       type pseudo_inv_blackboard = 
        {
          steps_by_column: (step_id * predicate_value * bool) list CPredicateMap.t ;
-         init_state: predicate_value CPredicateMap.t ; 
          nsteps: step_id ; 
-         predicates_of_event: predicate_info  list A.t ;
+         predicates_of_event: predicate_info list A.t ;
          is_remove_action: bool A.t ;
-         weak_actions: step_id list;
          modified_predicates_of_event: int A.t ;
          event: (Po.K.refined_step (** step_id list*)) option A.t; 
-         predicate_id_list_related_to_predicate_id: (predicate_info list) CPredicateMap.t ; 
        }
 
       let init_blackboard n_agents n_steps = 
         {
-          init_state = CPredicateMap.empty n_agents ; 
-          weak_actions= []; 
           steps_by_column = CPredicateMap.empty n_agents ; 
           nsteps = -1 ; 
           predicates_of_event = A.make  n_steps [] ;
           is_remove_action = A.make n_steps false ;
           modified_predicates_of_event = A.create n_steps  0 ; 
           event = A.make n_steps  None ; 
-          predicate_id_list_related_to_predicate_id = CPredicateMap.empty n_agents ; 
        }
 
 
@@ -285,18 +279,7 @@
           | Instantiation.Remove ag -> 
             let ag_id = Po.K.agent_id_of_agent ag in 
             let predicate_id = Here ag_id in 
-            let set =
-              CPredicateMap.find_default
-                [] predicate_id
-                blackboard.predicate_id_list_related_to_predicate_id in
-            let list = 
-              List.fold_left 
-                (fun list predicateid -> 
-                  (predicateid,Undefined)::list)
-                ([predicate_id,Undefined])
-                set 
-            in   
-            list,[],true,false
+            [predicate_id,Undefined],[],true,false
 
       let no_remove parameter handler error blackboard eid = 
         not (A.get blackboard.is_remove_action eid)
@@ -533,21 +516,10 @@
          unambiguous_side_effects merged_map in
      let nsid = blackboard.nsteps + 1 in 
      let _ = A.set blackboard.event nsid (Some step) in 
-     let n_modifications,pre_steps_by_column,init_state,list  = 
+     let n_modifications,pre_steps_by_column(*,init_state*),list  = 
        PredicateMap.fold 
-         (fun id (test,action) (n_modifications,map,init_state,list) -> 
+         (fun id (test,action) (n_modifications,map(*,init_state*),list) -> 
           begin 
-            let init_state =
-              match 
-                action
-              with 
-              | None -> init_state
-              | Some action -> 
-                 begin 
-                   if CPredicateMap.mem id init_state then init_state
-		   else CPredicateMap.add id action init_state
-                 end
-            in 
             let old_list =
               CPredicateMap.find_default [-1,Undefined,false] id map in
             let old_value = 
@@ -571,11 +543,10 @@
             in 
             n_modifications,
             CPredicateMap.add id ((nsid,new_value,bool_action)::old_list) map,
-            init_state,
             (id,new_value)::list
           end)
          merged_map
-         (0,blackboard.steps_by_column,blackboard.init_state,[])
+         (0,blackboard.steps_by_column,[])
      in 
      let _ = 
       if is_remove_action 
@@ -587,7 +558,6 @@
     let blackboard = 
       { 
         blackboard with 
-          init_state = init_state ;
           event = pre_event ;
           steps_by_column = pre_steps_by_column; 
           nsteps = nsid;

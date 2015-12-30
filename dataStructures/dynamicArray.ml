@@ -155,6 +155,8 @@ module DynArray =
             }
       let iter f a = G.iter f !(a.array)
       let iteri f a = G.iteri f !(a.array)
+      let fold_lefti f b a = G.fold_lefti f b !(a.array)
+      let fold_righti f a b = G.fold_righti f !(a.array) b
 
       let blit a1 ofs1 a2 ofs2 len =
 	if len < 0 || ofs1 < 0 || ofs1 > length a1 - len

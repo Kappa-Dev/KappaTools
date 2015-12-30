@@ -17,6 +17,8 @@ module type GenArray =
 		val iter: ('a -> unit) -> 'a t -> unit
                 val iteri: (int -> 'a -> unit) -> 'a t -> unit
 		val blit: 'a t -> int -> 'a t -> int -> int -> unit 
+		val fold_lefti: (int -> 'b -> 'a -> 'b) -> 'b -> 'a t -> 'b
+		val fold_righti: (int -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
 	end)
 
 module GenArray =
@@ -223,7 +225,7 @@ module GenArray =
                             (fun k' a -> f (g k k') a)
                             a)
                         a
-                        
+
                 let map =
 			gen
 				Array.map
@@ -269,10 +271,15 @@ module GenArray =
 			|	Binary a ->
 					Array.fold_left
 						(Array.fold_left f)
-						init
+						init 
 						a
+
+		let fold_lefti f init a  =
+		  let g (i,current) k = (i+1,f i current k) in
+		  snd (fold_left g (0,init) a)
+		 
 		
-		let fold_right f a init =
+		let fold_right f a init  =
 			match a
 			with Unary a -> Array.fold_right f a init
 			|	Binary a ->
@@ -280,6 +287,10 @@ module GenArray =
 						(Array.fold_right f)
 						a
 						init
+		let fold_righti f a init =
+		  let g k (i,current) = (i-1,f i k current) in 
+		  snd (fold_right g a (length a-1,init))
+
 		
 	end: GenArray)
 
