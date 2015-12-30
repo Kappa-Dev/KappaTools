@@ -52,6 +52,76 @@
        SetMap.Make (struct type t = predicate_info let compare = compare end)
      module PredicateMap = PredicateSetMap.Map
 
+     module QPredicateMap = 
+       struct 
+	 type 'a t = 'a PredicateMap.t A.t 
+	   
+	 let predicate_max parameter handler info error step old =
+	  let error,info,(action_list,_) = Po.K.actions_of_refined_step parameter handler info error step in
+	  error,info,List.fold_left 
+	    (fun old action -> 
+	      match 
+		  action
+	       with 
+	       | Instantiation.Create (ag,_) -> max old (Po.K.agent_id_of_agent ag)
+	       | Instantiation.Mod_internal _ 
+               | Instantiation.Bind_to _
+               | Instantiation.Bind _  
+               | Instantiation.Free _ 
+               | Instantiation.Remove _ -> old)
+	    (old:int) 
+	    action_list 
+
+	 let predicate_max parameter handler info err list =
+	   List.fold_left (fun (error,info,current) refined_step -> predicate_max parameter handler info error refined_step current) 
+	     (err,info,0) list 
+
+	 let empty n = A.make n PredicateMap.empty
+
+	 let iter f t = 
+	   A.iter 
+	     (PredicateMap.iter f)
+	     t
+
+	 let hash predicate =
+	   match 
+	     predicate
+	   with 
+	      | Here ag 
+	      | Bound_site (ag,_)
+	      | Internal_state (ag,_) -> ag 
+
+	 let lift f predicate_id tab =
+	   f predicate_id (A.get tab (hash predicate_id))
+
+	 let find_default def p t = lift (PredicateMap.find_default def) p t
+	 let find_option p t = lift (PredicateMap.find_option) p t
+	 let mem p t = lift (PredicateMap.mem) p t
+
+	 let add predicate_id x tab =
+	   let hash = hash predicate_id in 
+	   let old = A.get tab hash in 
+	   let _ = A.set tab hash (PredicateMap.add predicate_id x old) in 
+	   tab 
+       end
+
+     module MPredicateMap = 
+       struct 
+	 type 'a t = 'a PredicateMap.t  
+	   
+	 let predicate_max parameter handler info error list = error,info,0 
+	 let empty n = PredicateMap.empty
+
+	 let iter = PredicateMap.iter 
+	 let find_default = PredicateMap.find_default 
+	 let find_option = PredicateMap.find_option
+	 let mem = PredicateMap.mem
+	 let add = PredicateMap.add 
+       end
+	 
+
+     module CPredicateMap = MPredicateMap 
+
      type step_id = int 
 
      type predicate_value = 
@@ -74,28 +144,28 @@
 
       type pseudo_inv_blackboard = 
        {
-         steps_by_column: (step_id * predicate_value * bool) list PredicateMap.t ;
-         init_state: predicate_value PredicateMap.t ; 
+         steps_by_column: (step_id * predicate_value * bool) list CPredicateMap.t ;
+         init_state: predicate_value CPredicateMap.t ; 
          nsteps: step_id ; 
          predicates_of_event: predicate_info  list A.t ;
          is_remove_action: bool A.t ;
          weak_actions: step_id list;
          modified_predicates_of_event: int A.t ;
          event: (Po.K.refined_step (** step_id list*)) option A.t; 
-         predicate_id_list_related_to_predicate_id: (predicate_info list) PredicateMap.t ; 
+         predicate_id_list_related_to_predicate_id: (predicate_info list) CPredicateMap.t ; 
        }
 
-      let init_blackboard n = 
+      let init_blackboard n_agents n_steps = 
         {
-          init_state = PredicateMap.empty ; 
+          init_state = CPredicateMap.empty n_agents ; 
           weak_actions= []; 
-          steps_by_column = PredicateMap.empty ; 
+          steps_by_column = CPredicateMap.empty n_agents ; 
           nsteps = -1 ; 
-          predicates_of_event = A.make  n [] ;
-          is_remove_action = A.make n false ;
-          modified_predicates_of_event = A.create n 0 ; 
-          event = A.make n None ; 
-          predicate_id_list_related_to_predicate_id = PredicateMap.empty ; 
+          predicates_of_event = A.make  n_steps [] ;
+          is_remove_action = A.make n_steps false ;
+          modified_predicates_of_event = A.create n_steps  0 ; 
+          event = A.make n_steps  None ; 
+          predicate_id_list_related_to_predicate_id = CPredicateMap.empty n_agents ; 
        }
 
 
@@ -104,7 +174,7 @@
         let _ = Format.fprintf parameter.Po.K.H.out_channel_err "n_events: %i\n" blackboard.nsteps in 
         let _ = Format.fprintf parameter.Po.K.H.out_channel_err "Steps_by_column:\n" in 
         let _ = 
-          PredicateMap.iter 
+          CPredicateMap.iter 
             (fun pred list -> 
               let _ = 
                 Format.fprintf parameter.Po.K.H.out_channel_err "%s: " (string_of_predicate_info pred)
@@ -216,7 +286,7 @@
             let ag_id = Po.K.agent_id_of_agent ag in 
             let predicate_id = Here ag_id in 
             let set =
-              PredicateMap.find_default
+              CPredicateMap.find_default
                 [] predicate_id
                 blackboard.predicate_id_list_related_to_predicate_id in
             let list = 
@@ -267,7 +337,7 @@
                   blackboard 
                  with 
                    steps_by_column = 
-                    PredicateMap.add t column  blackboard.steps_by_column  }
+                    CPredicateMap.add t column  blackboard.steps_by_column  }
               in column,blackboard 
             else
               column,blackboard 
@@ -283,7 +353,7 @@
             | t::q -> 
             begin
               let column =
-                PredicateMap.find_default
+                CPredicateMap.find_default
 		  [] t blackboard.steps_by_column in
               let column,blackboard = clean t column blackboard in 
               match 
@@ -312,7 +382,7 @@
                 List.for_all 
                 (fun pid -> 
                  let column =
-                   PredicateMap.find_default
+                   CPredicateMap.find_default
 		     [] pid blackboard.steps_by_column in
                   let column,blackboard = clean pid column blackboard in 
                   match 
@@ -337,7 +407,7 @@
             | [] -> error,blackboard
             | pid::tail -> 
                let list =
-                 match PredicateMap.find_option pid blackboard.steps_by_column with
+                 match CPredicateMap.find_option pid blackboard.steps_by_column with
 		 | Some x -> x
 		 | None -> raise Exit in
               begin 
@@ -352,7 +422,7 @@
                   {blackboard 
                    with 
                      steps_by_column = 
-                      PredicateMap.add pid list blackboard.steps_by_column
+                      CPredicateMap.add pid list blackboard.steps_by_column
                   }
               end
         in 
@@ -394,6 +464,8 @@
             let predicate_id = Bound_site (ag_id,site_id) in 
             [predicate_id]
 
+
+     
 
 
    let add_step parameter handler info error step blackboard =
@@ -472,12 +544,12 @@
               | None -> init_state
               | Some action -> 
                  begin 
-                   if PredicateMap.mem id init_state then init_state
-		   else PredicateMap.add id action init_state
+                   if CPredicateMap.mem id init_state then init_state
+		   else CPredicateMap.add id action init_state
                  end
             in 
             let old_list =
-              PredicateMap.find_default [-1,Undefined,false] id map in
+              CPredicateMap.find_default [-1,Undefined,false] id map in
             let old_value = 
               match 
                 old_list
@@ -498,7 +570,7 @@
               | Some _ -> (n_modifications+1),true 
             in 
             n_modifications,
-            PredicateMap.add id ((nsid,new_value,bool_action)::old_list) map,
+            CPredicateMap.add id ((nsid,new_value,bool_action)::old_list) map,
             init_state,
             (id,new_value)::list
           end)
@@ -526,8 +598,9 @@
       
 
   let cut parameter handler info error list = 
-    let n = List.length list in 
-    let blackboard = init_blackboard n in 
+    let n_steps = List.length list in 
+    let error,info,n_agents = CPredicateMap.predicate_max parameter handler info error list in 
+    let blackboard = init_blackboard (n_agents+1) n_steps  in 
     let error,info,blackboard,n_cut = 
       List.fold_left 
         (fun (error,info,blackboard,n_cut) step ->  
