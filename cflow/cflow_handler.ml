@@ -2,7 +2,7 @@
   * cflow_handler.ml
   *
   * Creation:                      <2013-08-02 feret>
-  * Last modification: Time-stamp: <2015-12-02 11:21:41 feret>
+  * Last modification: Time-stamp: <2015-12-30 21:13:30 feret>
   *
   * Causal flow compression: a module for KaSim
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -20,6 +20,7 @@
   * under the terms of the GNU Library General Public License *)
 
 
+  
 module type Cflow_handler =
   sig
     (**a struct which contains parameterizable options*)
@@ -47,7 +48,8 @@ module type Cflow_handler =
         {
           env: Environment.t ;
 	  rule_name_cache: string array;
-	  agent_name_cache: string array
+	  agent_name_cache: string array;
+	  steps_by_column:  (int * Predicate_maps.predicate_value * bool) list Predicate_maps.QPredicateMap.t ;
         }
 
     type 'a zeroary = parameter -> handler -> StoryProfiling.StoryStats.log_info -> Exception.method_handler -> Exception.method_handler * StoryProfiling.StoryStats.log_info * 'a
@@ -90,6 +92,7 @@ module type Cflow_handler =
     val init_handler: Environment.t -> handler
     val string_of_rule_id: handler -> int -> string
     val string_of_agent_id: handler -> int -> string
+    val get_predicate_map: handler ->  (int * Predicate_maps.predicate_value * bool) list Predicate_maps.QPredicateMap.t
   end
 
 
@@ -151,7 +154,9 @@ module Cflow_handler =
         {
           env: Environment.t ;
 	  rule_name_cache: string array;
-	  agent_name_cache: string array
+	  agent_name_cache: string array;
+	  steps_by_column:  (int * Predicate_maps.predicate_value * bool) list Predicate_maps.QPredicateMap.t ;
+    
         }
 
     type 'a zeroary = parameter -> handler -> StoryProfiling.StoryStats.log_info -> Exception.method_handler -> Exception.method_handler * StoryProfiling.StoryStats.log_info * 'a
@@ -165,9 +170,13 @@ module Cflow_handler =
       let rule_name_cache = Array.init (n_rules+1) (Format.asprintf "%a" (Environment.print_ast_rule ~env:env)) in
       let n_agents = Signature.size (Environment.signatures env) in
       let agent_name_cache = Array.init n_agents (Format.asprintf "%a" (Environment.print_agent ~env:env)) in
+      let steps_by_column = 
+	Predicate_maps.QPredicateMap.empty 0 in 
       {env = env;
        rule_name_cache=rule_name_cache;
-       agent_name_cache=agent_name_cache}
+       agent_name_cache=agent_name_cache;
+       steps_by_column=steps_by_column 
+    }
 
     let string_of_exn x = Some ""
 
@@ -220,5 +229,7 @@ module Cflow_handler =
    let get_profiling_logger parameter = parameter. out_channel_profiling 
    let string_of_rule_id handler i = handler.rule_name_cache.(i)
    let string_of_agent_id handler i = handler.agent_name_cache.(i)
+
+   let get_predicate_map handler = handler.steps_by_column
 end:Cflow_handler)
     

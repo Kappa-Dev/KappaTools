@@ -26,8 +26,9 @@ module type Cflow_handler =
         {
           env: Environment.t ;
 	  rule_name_cache: string array;
-	  agent_name_cache: string array
-        }
+	  agent_name_cache: string array;
+	    steps_by_column:  (int * Predicate_maps.predicate_value * bool) list Predicate_maps.QPredicateMap.t ;
+	}
 
     type 'a zeroary = parameter -> handler -> StoryProfiling.StoryStats.log_info -> Exception.method_handler -> Exception.method_handler * StoryProfiling.StoryStats.log_info * 'a
     type ('a,'b) unary  = parameter -> handler -> StoryProfiling.StoryStats.log_info -> Exception.method_handler -> 'a -> Exception.method_handler * StoryProfiling.StoryStats.log_info * 'b
@@ -67,6 +68,7 @@ module type Cflow_handler =
     val init_handler: Environment.t -> handler
     val string_of_rule_id: handler -> int -> string
     val string_of_agent_id: handler -> int -> string
-  end
+    val get_predicate_map: handler -> (int * Predicate_maps.predicate_value * bool) list Predicate_maps.QPredicateMap.t
+end
 
 module Cflow_handler:Cflow_handler

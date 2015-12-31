@@ -34,132 +34,46 @@
 
      module Po=Po_cut.Po_cut 
      module A = Mods.DynArray 
-
-     type predicate_info = 
-       | Here of Po.K.agent_id  
-       | Bound_site of Po.K.agent_id * Instantiation.site_name
-       | Internal_state of Po.K.agent_id * Instantiation.site_name 
-
-     let string_of_predicate_info pi = 
-       match 
-         pi 
-       with 
-         | Here ag -> "Here "^(string_of_int ag)
-         | Bound_site (ag,s) -> "Bound_state "^(string_of_int ag)^" "^(string_of_int s)
-         | Internal_state (ag,s) -> "Internal_state "^(string_of_int ag)^" "^(string_of_int s)
-           
-     module PredicateSetMap =
-       SetMap.Make (struct type t = predicate_info let compare = compare end)
-     module PredicateMap = PredicateSetMap.Map
-
-     module QPredicateMap = 
-       struct 
-	 type 'a t = 'a PredicateMap.t A.t 
-	   
-	 let predicate_max parameter handler info error step old =
-	  let error,info,(action_list,_) = Po.K.actions_of_refined_step parameter handler info error step in
-	  error,info,List.fold_left 
-	    (fun old action -> 
-	      match 
-		  action
-	       with 
-	       | Instantiation.Create (ag,_) -> max old (Po.K.agent_id_of_agent ag)
-	       | Instantiation.Mod_internal _ 
-               | Instantiation.Bind_to _
-               | Instantiation.Bind _  
-               | Instantiation.Free _ 
-               | Instantiation.Remove _ -> old)
-	    (old:int) 
-	    action_list 
-
-	 let predicate_max parameter handler info err list =
-	   List.fold_left (fun (error,info,current) refined_step -> predicate_max parameter handler info error refined_step current) 
-	     (err,info,0) list 
-
-	 let empty n = A.make n PredicateMap.empty
-
-	 let iter f t = 
-	   A.iter 
-	     (PredicateMap.iter f)
-	     t
-
-	 let hash predicate =
-	   match 
-	     predicate
-	   with 
-	      | Here ag 
-	      | Bound_site (ag,_)
-	      | Internal_state (ag,_) -> ag 
-
-	 let lift f predicate_id tab =
-	   f predicate_id (A.get tab (hash predicate_id))
-
-	 let find_default def p t = lift (PredicateMap.find_default def) p t
-	 let find_option p t = lift (PredicateMap.find_option) p t
-	 let mem p t = lift (PredicateMap.mem) p t
-
-	 let add predicate_id x tab =
-	   let hash = hash predicate_id in 
-	   let old = A.get tab hash in 
-	   let _ = A.set tab hash (PredicateMap.add predicate_id x old) in 
-	   tab 
-       end
-
-     module MPredicateMap = 
-       struct 
-	 type 'a t = 'a PredicateMap.t  
-	   
-	 let predicate_max parameter handler info error list = error,info,0 
-	 let empty n = PredicateMap.empty
-
-	 let iter = PredicateMap.iter 
-	 let find_default = PredicateMap.find_default 
-	 let find_option = PredicateMap.find_option
-	 let mem = PredicateMap.mem
-	 let add = PredicateMap.add 
-       end
-	 
-
-     module CPredicateMap = MPredicateMap 
-
+     module CPredicateMap = Predicate_maps.QPredicateMap
+     module PredicateMap = Predicate_maps.PredicateMap       
+   
+     type predicate_info = Predicate_maps.predicate_info
      type step_id = int 
 
-     type predicate_value = 
-       | Internal_state_is of Po.K.internal_state
-       | Undefined (** the wire does not exist yet *)
-       | Present   (** for agent presence *)
-       | Free      (** for binding sites *)
-        | Bound_to of Po.K.agent_id * Instantiation.agent_name * Instantiation.site_name   (** for binding sites *)
+   
+     let string_of_predicate_info = Predicate_maps.string_of_predicate_info 
 
       let string_of_predicate_value pi = 
         match 
           pi 
         with
-          | Internal_state_is s -> (string_of_int s)
-          | Undefined -> "#Undef" 
-          | Present -> "#Here"
-          | Free -> "#Free" 
-          | Bound_to (ag,ag_name,s) -> 
+          | Predicate_maps.Internal_state_is s -> (string_of_int s)
+          | Predicate_maps.Undefined -> "#Undef" 
+          | Predicate_maps.Present -> "#Here"
+          | Predicate_maps.Free -> "#Free" 
+          | Predicate_maps.Bound_to (ag,ag_name,s) -> 
             "Bound_to "^(string_of_int ag)^" "^(string_of_int ag_name)^" "^(string_of_int s)
 
       type pseudo_inv_blackboard = 
        {
-         steps_by_column: (step_id * predicate_value * bool) list CPredicateMap.t ;
+         steps_by_column: (step_id * Predicate_maps.predicate_value * bool) list CPredicateMap.t ;
          nsteps: step_id ; 
          predicates_of_event: predicate_info list A.t ;
          is_remove_action: bool A.t ;
          modified_predicates_of_event: int A.t ;
          event: (Po.K.refined_step (** step_id list*)) option A.t; 
+	 agent_list: int list ;
        }
 
-      let init_blackboard n_agents n_steps = 
+      let init_blackboard n_steps handler = 
         {
-          steps_by_column = CPredicateMap.empty n_agents ; 
+          steps_by_column = Po.K.H.get_predicate_map handler;
           nsteps = -1 ; 
           predicates_of_event = A.make  n_steps [] ;
           is_remove_action = A.make n_steps false ;
           modified_predicates_of_event = A.create n_steps  0 ; 
           event = A.make n_steps  None ; 
+	  agent_list = [];
        }
 
 
@@ -226,40 +140,40 @@
         let error = aux 0 in 
         error 
 
-      let predicates_of_action parameter handler error blackboard action = 
+      let predicates_of_action parameter handler error blackboard action  = 
         match action with 
           | Instantiation.Create (ag,interface) -> 
             let ag_id = Po.K.agent_id_of_agent ag in
-            let predicate_id = Here ag_id in   
+            let predicate_id = Predicate_maps.Here ag_id in   
             let list1,list2 = 
               List.fold_left 
                 (fun (list1,list2) (s_id,opt) -> 
-                  let predicate_id = Bound_site(ag_id,s_id) in 
-                  let list1 = (predicate_id,Free)::list1 in
+                  let predicate_id = Predicate_maps.Bound_site(ag_id,s_id) in 
+                  let list1 = (predicate_id,Predicate_maps.Free)::list1 in
                   let list2 = predicate_id::list2 in 
                   match opt 
                   with 
                     | None -> list1,list2
                     | Some x -> 
-                      let predicate_id = Internal_state (ag_id,s_id) in 
-                      (predicate_id,Internal_state_is x)::list1,
+                      let predicate_id = Predicate_maps.Internal_state (ag_id,s_id) in 
+                      (predicate_id,Predicate_maps.Internal_state_is x)::list1,
                       predicate_id::list2
                 )
-                ([predicate_id,Present],[predicate_id])
+                ([predicate_id,Predicate_maps.Present],[predicate_id])
                 interface
             in 
-            list1,list2,false,true
+            {blackboard with agent_list = ag_id::blackboard.agent_list},list1,list2,false,true
           | Instantiation.Mod_internal (site,int)  -> 
-            let predicate_id = Internal_state (Po.K.agent_id_of_site site,Po.K.site_name_of_site site) in 
-            [predicate_id,Internal_state_is int],[],false,false
+            let predicate_id = Predicate_maps.Internal_state (Po.K.agent_id_of_site site,Po.K.site_name_of_site site) in 
+            blackboard,[predicate_id,Predicate_maps.Internal_state_is int],[],false,false
           | Instantiation.Bind_to (s1,s2) -> 
             let ag_id1 = Po.K.agent_id_of_site s1 in 
             let ag_id2 = Po.K.agent_id_of_site s2 in 
             let agent_name2 = Po.K.agent_name_of_site s2 in 
             let site_id1 = Po.K.site_name_of_site s1 in 
             let site_id2 = Po.K.site_name_of_site s2 in 
-            let predicate_id1 = Bound_site (ag_id1,site_id1) in 
-            [predicate_id1,Bound_to (ag_id2,agent_name2,site_id2)],[],false,false
+            let predicate_id1 = Predicate_maps.Bound_site (ag_id1,site_id1) in 
+            blackboard,[predicate_id1,Predicate_maps.Bound_to (ag_id2,agent_name2,site_id2)],[],false,false
           | Instantiation.Bind (s1,s2) -> 
             let ag_id1 = Po.K.agent_id_of_site s1 in 
             let ag_id2 = Po.K.agent_id_of_site s2 in 
@@ -267,19 +181,23 @@
             let agent_name2 = Po.K.agent_name_of_site s2 in 
             let site_id1 = Po.K.site_name_of_site s1 in 
             let site_id2 = Po.K.site_name_of_site s2 in 
-            let predicate_id1 = Bound_site (ag_id1,site_id1) in 
-            let predicate_id2 = Bound_site (ag_id2,site_id2) in 
-            [predicate_id1,Bound_to (ag_id2,agent_name2,site_id2);
-             predicate_id2,Bound_to (ag_id1,agent_name1,site_id1)],[],false,false
+            let predicate_id1 = Predicate_maps.Bound_site (ag_id1,site_id1) in 
+            let predicate_id2 = Predicate_maps.Bound_site (ag_id2,site_id2) in 
+            blackboard,
+	    [
+	      predicate_id1,Predicate_maps.Bound_to (ag_id2,agent_name2,site_id2);
+              predicate_id2,Predicate_maps.Bound_to (ag_id1,agent_name1,site_id1)
+	    ],
+	    [],false,false
           | Instantiation.Free s -> 
             let ag_id = Po.K.agent_id_of_site s in 
             let site_id = Po.K.site_name_of_site s in 
-            let predicate_id = Bound_site (ag_id,site_id) in     
-            [predicate_id,Free],[],false,false
+            let predicate_id = Predicate_maps.Bound_site (ag_id,site_id) in     
+            blackboard,[predicate_id,Predicate_maps.Free],[],false,false
           | Instantiation.Remove ag -> 
             let ag_id = Po.K.agent_id_of_agent ag in 
-            let predicate_id = Here ag_id in 
-            [predicate_id,Undefined],[],true,false
+            let predicate_id = Predicate_maps.Here ag_id in 
+            blackboard,[predicate_id,Predicate_maps.Undefined],[],true,false
 
       let no_remove parameter handler error blackboard eid = 
         not (A.get blackboard.is_remove_action eid)
@@ -418,33 +336,33 @@
         with 
           | Instantiation.Is_Here (agent) ->
             let ag_id = Po.K.agent_id_of_agent agent in 
-            let predicate_id = Here ag_id in 
+            let predicate_id = Predicate_maps.Here ag_id in 
             [predicate_id]
           | Instantiation.Has_Internal(site,int) -> 
-            let predicate_id = Internal_state (Po.K.agent_id_of_site site,Po.K.site_name_of_site site) in 
+            let predicate_id = Predicate_maps.Internal_state (Po.K.agent_id_of_site site,Po.K.site_name_of_site site) in 
             [predicate_id]
           | Instantiation.Is_Free s -> 
             let ag_id = Po.K.agent_id_of_site s in 
             let site_id = Po.K.site_name_of_site s in 
-            let predicate_id = Bound_site (ag_id,site_id) in     
+            let predicate_id = Predicate_maps.Bound_site (ag_id,site_id) in     
             [predicate_id]
           | Instantiation.Is_Bound_to  (s1,s2) -> 
             let ag_id1 = Po.K.agent_id_of_site s1 in 
             let ag_id2 = Po.K.agent_id_of_site s2 in 
             let site_id1 = Po.K.site_name_of_site s1 in 
             let site_id2 = Po.K.site_name_of_site s2 in 
-            let predicate_id1 = Bound_site (ag_id1,site_id1) in 
-            let predicate_id2 = Bound_site (ag_id2,site_id2) in 
+            let predicate_id1 = Predicate_maps.Bound_site (ag_id1,site_id1) in 
+            let predicate_id2 = Predicate_maps.Bound_site (ag_id2,site_id2) in 
             [predicate_id1;predicate_id2]
           | Instantiation.Is_Bound s -> 
             let ag_id = Po.K.agent_id_of_site s in 
             let site_id = Po.K.site_name_of_site s in 
-            let predicate_id = Bound_site (ag_id,site_id) in 
+            let predicate_id = Predicate_maps.Bound_site (ag_id,site_id) in 
             [predicate_id]   
           | Instantiation.Has_Binding_type (s,_) ->
             let ag_id = Po.K.agent_id_of_site s in 
             let site_id = Po.K.site_name_of_site s in
-            let predicate_id = Bound_site (ag_id,site_id) in 
+            let predicate_id = Predicate_maps.Bound_site (ag_id,site_id) in 
             [predicate_id]
 
 
@@ -458,7 +376,7 @@
      let side_effect = Po.K.get_kasim_side_effects (step) in 
      let build_map list map = 
        List.fold_left 
-         (fun map (id,value) -> PredicateMap.add id value map)
+         (fun map (id,value) -> Predicate_maps.PredicateMap.add id value map)
          map 
          list 
      in 
@@ -493,7 +411,7 @@
      let error,blackboard,action_map,test_map,is_remove_action,is_create_action = 
        List.fold_left 
          (fun (error,blackboard,action_map,test_map,bool,bool_creation) action -> 
-           let action_list,test_list,bool',bool_creation' = predicates_of_action parameter handler error blackboard action in 
+           let blackboard,action_list,test_list,bool',bool_creation' = predicates_of_action parameter handler error blackboard action in 
            error,blackboard,build_map action_list action_map,build_map_test test_list test_map,bool || bool',bool_creation || bool_creation')
          (error,blackboard,PredicateMap.empty,test_map,false,false)
          (action_list) in 
@@ -512,7 +430,7 @@
      let merged_map =
        List.fold_right
          (fun ((a,_),b) map ->
-          let pid = Bound_site(a,b) in add_state pid (false,Some Free) map)
+          let pid = Predicate_maps.Bound_site(a,b) in add_state pid (false,Some Predicate_maps.Free) map)
          unambiguous_side_effects merged_map in
      let nsid = blackboard.nsteps + 1 in 
      let _ = A.set blackboard.event nsid (Some step) in 
@@ -521,13 +439,13 @@
          (fun id (test,action) (n_modifications,map(*,init_state*),list) -> 
           begin 
             let old_list =
-              CPredicateMap.find_default [-1,Undefined,false] id map in
+              CPredicateMap.find_default [-1,Predicate_maps.Undefined,false] id map in
             let old_value = 
               match 
                 old_list
               with 
               | (_,v,_)::_ -> v
-              | [] -> Undefined 
+              | [] -> Predicate_maps.Undefined 
             in 
             let new_value = 
               match action 
@@ -569,8 +487,7 @@
 
   let cut parameter handler info error list = 
     let n_steps = List.length list in 
-    let error,info,n_agents = CPredicateMap.predicate_max parameter handler info error list in 
-    let blackboard = init_blackboard (n_agents+1) n_steps  in 
+    let blackboard = init_blackboard n_steps handler in 
     let error,info,blackboard,n_cut = 
       List.fold_left 
         (fun (error,info,blackboard,n_cut) step ->  
@@ -598,6 +515,12 @@
               aux (k-1) (a::list) 
             | None -> aux (k-1) list 
       in aux (blackboard.nsteps) [] 
+    in 
+    let tab = blackboard.steps_by_column in 
+    let _ = 
+      List.iter 
+	(CPredicateMap.recycle tab) 
+	blackboard.agent_list
     in 
     error,info, (list,n_cut)
     
