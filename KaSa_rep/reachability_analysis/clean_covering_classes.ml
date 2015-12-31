@@ -111,82 +111,79 @@ let store_remanent parameter error covering_class modified_map remanent =
   let good_test_dic       = remanent.store_test_new_index_dic in
   let good_modif_dic      = remanent.store_modif_new_index_dic in
   (*------------------------------------------------------------------------------*)
-  match covering_class with
-    | [] -> error, remanent
-    | _ ->
-      (*------------------------------------------------------------------------------*)
-      (*covering class dictionary*)
-      let error, (covering_class_id, store_dic) =
-        covering_class_dic 
-          parameter 
-          error 
-          covering_class
-          good_covering_class 
-      in
-      (*------------------------------------------------------------------------------*)
-      (*store pointer backward*)
-      let error, pointer_backward =
-        store_pointer_backward 
-          parameter
-          error
-          covering_class_id 
-          pointer_backward
-          covering_class 
-      in
-      (*------------------------------------------------------------------------------*)
-      (*PART II: compute new_index in covering_class*)
-      let new_index_covering_class = re_index_value_list covering_class in
-      let error, (new_id, new_dic) =
-        new_index_dic 
-          parameter 
-          error 
-          new_index_covering_class 
-          good_index 
-      in
-      (*------------------------------------------------------------------------------*)
-      (*PART II: site test with new index*)
-      let error, (new_test_id, test_new_index_dic) =
+  (*covering class dictionary*)
+  let error, (covering_class_id, store_dic) =
+    covering_class_dic 
+      parameter 
+      error 
+      covering_class
+      good_covering_class 
+  in
+  (*------------------------------------------------------------------------------*)
+  (*store pointer backward*)
+  let error, pointer_backward =
+    store_pointer_backward 
+      parameter
+      error
+      covering_class_id 
+      pointer_backward
+      covering_class 
+  in
+  (*------------------------------------------------------------------------------*)
+  (*PART II: compute new_index in covering_class*)
+  let new_index_covering_class = re_index_value_list covering_class in
+  let error, (new_id, new_dic) =
+    new_index_dic 
+      parameter 
+      error 
+      new_index_covering_class 
+      good_index 
+  in
+  (*------------------------------------------------------------------------------*)
+  (*PART II: site test with new index*)
+  let error, (new_test_id, test_new_index_dic) =
         test_new_index_dic 
           parameter 
           error
           new_id 
           new_dic 
           good_test_dic 
-      in     
-      (*------------------------------------------------------------------------------*)
-      (*PART II: site modified with new_index*)
-      let error, (new_modif_id, modif_index_dic) =
-        modified_index_dic 
-          parameter
-          error 
-          covering_class
-          modified_map
-          good_modif_dic 
-      in
-      (*------------------------------------------------------------------------------*)
-      (*result*)
-      error,
-      {
-        store_pointer_backward    = pointer_backward;
-        store_dic                 = store_dic;
-        store_new_index_dic       = new_dic;
-        store_test_new_index_dic  = test_new_index_dic;
-        store_modif_new_index_dic = modif_index_dic;
-      }
-
+  in     
+  (*------------------------------------------------------------------------------*)
+  (*PART II: site modified with new_index*)
+  let error, (new_modif_id, modif_index_dic) =
+    modified_index_dic 
+      parameter
+      error 
+      covering_class
+      modified_map
+      good_modif_dic 
+  in
+  (*------------------------------------------------------------------------------*)
+  (*result*)
+  error,
+  {
+    store_pointer_backward    = pointer_backward;
+    store_dic                 = store_dic;
+    store_new_index_dic       = new_dic;
+    store_test_new_index_dic  = test_new_index_dic;
+    store_modif_new_index_dic = modif_index_dic;
+  }
+    
 (*------------------------------------------------------------------------------*)
 (*CLEAN: In a covering class, it will store the old result of the previous
   covering class of an agent.
-
+  
   For example:
   - rule 0: agent A has a covering class: (0)
   - rule 1: agent A has a covering class: (0,1)
   => Then do the intersection of two covering classes of agent A:
   (0) inter (0,1) -> 0
 *)
-
+    
+    
 let init_dic = Dictionary_of_Covering_class.init ()
-
+  
 let clean_classes parameter error covering_classes modified_map =
   let error, init_pointer = Nearly_inf_Imperatif.create parameter error 0 in
   let init_index          = init_dic in
@@ -210,7 +207,17 @@ let clean_classes parameter error covering_classes modified_map =
   let is_empty_set = Site_map_and_set.Set.is_empty in
   List.fold_left (fun (error, remanent) covering_class ->
     match covering_class with
-      | [] -> error, remanent
+      | [] -> 
+	if current_covering_classes = [[]] (* if the agent has only an empty covering class, keep it *)
+	then 
+	  store_remanent 
+            parameter 
+            error
+            covering_class
+            modified_map
+            remanent
+	else 
+	  error,remanent
       | t :: tl ->
         let pointer_backward = remanent.store_pointer_backward in
         (* return the set of list(id) containing t.

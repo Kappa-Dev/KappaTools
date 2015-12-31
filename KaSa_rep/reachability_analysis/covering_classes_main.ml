@@ -81,20 +81,31 @@ let scan_rule_set_covering_classes parameter error handler rules =
       parameter 
       error
       (fun parameters error a b init_class -> 
-	Ckappa_sig.Dictionary_of_sites.fold 
-	  (fun _ _ b (error,init_class) -> 
-	    let error,l' = 
-	      match 
-		AgentMap.unsafe_get parameters error a init_class
-	      with 
-	      | error,None -> error,[[b]]
-	      | error,Some l -> error,[b]::l
-	    in 
-	    AgentMap.set parameters error a l' init_class)
-	  b (error,init_class))
+	let error,bool,init_class = 
+	  Ckappa_sig.Dictionary_of_sites.fold 
+	    (fun _ _ b (error,bool,init_class) -> 
+	      let error,l' = 
+		match 
+		  AgentMap.unsafe_get parameters error a init_class
+		with 
+		| error,None -> error,[[b]]
+		| error,Some l -> error,[b]::l
+	      in 
+	      let error,map = AgentMap.set parameters error a l' init_class in 
+	      error,true,map)
+	    b (error,false,init_class)
+	in 
+	if bool then error,init_class
+	else 
+	  (* add an empty covering class for the agents without sites *)
+	  AgentMap.set parameters error a [[]] init_class
+      )
       handler.Cckappa_sig.sites
       init_class
   in 
+  
+
+
   
   (*------------------------------------------------------------------------------*)
   (*init state of covering class*)
@@ -105,7 +116,7 @@ let scan_rule_set_covering_classes parameter error handler rules =
     }
   in
   (*------------------------------------------------------------------------------*)
-  (*map each agent to a covering classes*)
+  (*map each agent to a list of covering classes*)
   
   
   let error, store_covering_classes =
