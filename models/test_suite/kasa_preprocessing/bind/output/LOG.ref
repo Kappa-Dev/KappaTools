@@ -774,37 +774,14 @@ Id=9
     Id=1
      Leaf False 
 
-in add_update_to_wl:agent_type:0:cv_id:0
-in add_update_to_wl: set of rule_id:0
-in add_update_to_wl: set of rule_id:1
-in add_update_to_wl: set of rule_id:2
-in add_update_to_wl:rule_id:0
-in add_update_to_wl:rule_id:1
-in add_update_to_wl:rule_id:2
-in add_update_to_wl:agent_type:1:cv_id:0
-in add_update_to_wl: set of rule_id:0
-in add_update_to_wl: set of rule_id:1
-in add_update_to_wl: set of rule_id:3
-in add_update_to_wl:rule_id:0
-in add_update_to_wl:rule_id:1
-in add_update_to_wl:rule_id:3
-in add_update_to_wl:agent_type:2:cv_id:0
-in add_update_to_wl: set of rule_id:2
-in add_update_to_wl: set of rule_id:3
-in add_update_to_wl:rule_id:2
-in add_update_to_wl:rule_id:3
 wl_init_creation:
-0 1 2 3 
-Test for rule:0
-disabled
-Test for rule:1
-disabled
-Test for rule:2
-disabled
-Test for rule:3
-disabled
+
 
 ------------------------------------------------------------
 * Fixpoint iteration :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Cartesian abstraction:
 ------------------------------------------------------------
 execution finished without any exception

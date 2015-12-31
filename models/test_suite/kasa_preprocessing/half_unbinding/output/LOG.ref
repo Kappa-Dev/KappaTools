@@ -105,21 +105,52 @@ Influence_map: The notation [i -> j] means an agent at position [i] of the first
 Refining the influence map...
 Reachability analysis...
 
-agent_type:2:
+agent_type:0:
 Potential dependencies between sites:Number of covering classes:1
 Potential dependencies between sites:Covering_class_id:0:
 site_type:0
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
 site_type:1
+agent_type:1:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+agent_type:2:
+Potential dependencies between sites:Number of covering classes:2
+Potential dependencies between sites:Covering_class_id:0:
+site_type:0
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1
+Potential dependencies between sites:Covering_class_id:1:
+site_type:1
+Potential dependencies between sites:New-index:Covering_class_id:1:class_id:0:
+site_type:1
 ------------------------------------------------------
 Covering classes with type set:
-agent_type:2:
+agent_type:0:
 Potential dependencies between sites:Covering_class_id:0
 site_type:0
 Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
 Covering_class_id:0
 Global:site_type:0  => Local:site_type':1
 Local:site_type':1  => Global:site_type:0
+agent_type:1:
+Potential dependencies between sites:Covering_class_id:0
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+agent_type:2:
+Potential dependencies between sites:Covering_class_id:0
+site_type:0
+Potential dependencies between sites:Covering_class_id:1
+site_type:1
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+Global:site_type:0  => Local:site_type':1
+Local:site_type':1  => Global:site_type:0
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:1
+Global:site_type:1  => Local:site_type':1
+Local:site_type':1  => Global:site_type:1
 ============================================================
 * BDU Analysis:
 ============================================================
@@ -129,8 +160,12 @@ Local:site_type':1  => Global:site_type:0
 ------------------------------------------------------------
 Mapping between sites and the covering classes they belong to:
 ------------------------------------------------------------
+agent_type:0:site_type:0@list of covering_class_id:
+covering_class_id:0
 agent_type:2:site_type:0@list of covering_class_id:
 covering_class_id:0
+agent_type:2:site_type:1@list of covering_class_id:
+covering_class_id:1
 ------------------------------------------------------------
 Sites that may/must occurs side-effects:
 ------------------------------------------------------------
@@ -179,12 +214,16 @@ A bond is discovered for the first time:false
 ------------------------------------------------------------
 List of rules to awake when the state of a site is modified and tested:
 ------------------------------------------------------------
+agent_type:0:covering_class_id:0:@set of rule_id:
+rule_id:1
 agent_type:2:covering_class_id:0:@set of rule_id:
 rule_id:1
 
 ------------------------------------------------------------
 List of rules to awake when discovered sites that are bond on the rhs for the first time:
 ------------------------------------------------------------
+agent_type:0:covering_class_id:0:@set of rule_id:
+rule_id:1
 agent_type:2:covering_class_id:0:@set of rule_id:
 rule_id:1
 
@@ -204,13 +243,71 @@ rule_id:1
 ------------------------------------------------------------
 - Bdu for the valuations of the views that are tested (projection per rule):
 
+rule_id:0
+agent_id:0
+Id=0
+ Leaf True 
+
+rule_id:1
+agent_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
 
 ------------------------------------------------------------
 - Bdu for the valuations of the views that are created (per rule, agent and covering class):
 
+agent_type:0:rule_id:1:covering_class_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_type:1:rule_id:0:covering_class_id:0
+Id=0
+ Leaf True 
+
 
 ------------------------------------------------------------
 - Bdu for the valuations of the views that are created (per rule_id; projection function):
+
+rule_id:0
+agent_type:1:cv_id:0
+Id=0
+ Leaf True 
+
+rule_id:1
+agent_type:0:cv_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
 
 
 ------------------------------------------------------------
@@ -221,17 +318,38 @@ rule_id:1
 
 ------------------------------------------------------------
 - Bdu fpr the valuation of the views that are tested (projection per rule):
-in add_update_to_wl:agent_type:2:cv_id:0
-in add_update_to_wl: set of rule_id:1
-in add_update_to_wl:rule_id:1
+rule_id:0
+agent_id:0:agent_type:0:cv_id:0
+Id=0
+ Leaf True 
+
+rule_id:1
+agent_id:0:agent_type:2:cv_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
 wl_init_creation:
 0 1 
 Test for rule:0
-enabled
+disabled
 Test for rule:1
-enabled
+disabled
 
 ------------------------------------------------------------
 * Fixpoint iteration :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Cartesian abstraction:
 ------------------------------------------------------------
 execution finished without any exception

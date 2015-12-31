@@ -430,6 +430,16 @@ Potential dependencies between sites:Covering_class_id:0:
 site_type:0
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
 site_type:1
+agent_type:2:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+agent_type:3:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+site_type:0
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1
 ------------------------------------------------------
 Covering classes with type set:
 agent_type:0:
@@ -443,6 +453,17 @@ Global:site_type:1  => Local:site_type':2
 Local:site_type':1  => Global:site_type:0
 Local:site_type':2  => Global:site_type:1
 agent_type:1:
+Potential dependencies between sites:Covering_class_id:0
+site_type:0
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+Global:site_type:0  => Local:site_type':1
+Local:site_type':1  => Global:site_type:0
+agent_type:2:
+Potential dependencies between sites:Covering_class_id:0
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+agent_type:3:
 Potential dependencies between sites:Covering_class_id:0
 site_type:0
 Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
@@ -463,6 +484,8 @@ covering_class_id:0
 agent_type:0:site_type:1@list of covering_class_id:
 covering_class_id:0
 agent_type:1:site_type:0@list of covering_class_id:
+covering_class_id:0
+agent_type:3:site_type:0@list of covering_class_id:
 covering_class_id:0
 ------------------------------------------------------------
 Sites that may/must occurs side-effects:
@@ -750,6 +773,16 @@ Id=9
 
     Id=1
      Leaf False 
+
+rule_id:8
+agent_id:0
+Id=0
+ Leaf True 
+
+rule_id:9
+agent_id:0
+Id=0
+ Leaf True 
 
 
 ------------------------------------------------------------
@@ -1068,6 +1101,16 @@ Id=9
     Id=1
      Leaf False 
 
+rule_id:8
+agent_id:0:agent_type:2:cv_id:0
+Id=0
+ Leaf True 
+
+rule_id:9
+agent_id:0:agent_type:3:cv_id:0
+Id=0
+ Leaf True 
+
 in add_update_to_wl:agent_type:0:cv_id:0
 in add_update_to_wl: set of rule_id:0
 in add_update_to_wl: set of rule_id:3
@@ -1094,21 +1137,68 @@ in add_update_to_wl:rule_id:1
 in add_update_to_wl:rule_id:2
 wl_init_creation:
 0 1 2 3 4 5 6 7 8 9 
+initial_states:(agent_type:0, cv_id:0)
+ bdu:
+Id=11
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=10
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+initial_states:(agent_type:1, cv_id:0)
+ bdu:
+Id=11
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=10
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
 Test for rule:8
-enabled
-Ag:0
-Nothing has changed
+disabled
 Test for rule:9
-enabled
-Ag:0
-Nothing has changed
+disabled
 Test for rule:0
 disabled
 Test for rule:3
 enabled
 Ag:0 Type: 0 Cvid: 0
 Ag:0
-new views:Id=15
+new views:
+Id=15
  Node(site_type:1<2)
   Id=1
    Leaf False 
@@ -1148,13 +1238,6 @@ in add_update_to_wl:rule_id:6
 in add_update_to_wl:rule_id:7
 in add_update_to_wl:rule_id:8
 in add_update_to_wl:rule_id:9
-in add_update_to_wl:agent_type:1:cv_id:0
-in add_update_to_wl: set of rule_id:0
-in add_update_to_wl: set of rule_id:1
-in add_update_to_wl: set of rule_id:2
-in add_update_to_wl:rule_id:0
-in add_update_to_wl:rule_id:1
-in add_update_to_wl:rule_id:2
 Test for rule:4
 enabled
 Ag:0 Type: 0 Cvid: 0
@@ -1179,36 +1262,30 @@ Test for rule:1
 enabled
 Ag:0 Type: 1 Cvid: 0
 Ag:1
-new views:Id=3
+new views:
+Id=7
  Node(site_type:1<1)
   Id=1
    Leaf False 
 
-  Id=2
+  Id=6
    Node(site_type:1<2)
-    Id=0
-     Leaf True 
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
 
     Id=1
      Leaf False 
 
-in add_update_to_wl:agent_type:0:cv_id:0
-in add_update_to_wl: set of rule_id:0
-in add_update_to_wl: set of rule_id:3
-in add_update_to_wl: set of rule_id:4
-in add_update_to_wl: set of rule_id:5
-in add_update_to_wl: set of rule_id:6
-in add_update_to_wl: set of rule_id:7
-in add_update_to_wl: set of rule_id:8
-in add_update_to_wl: set of rule_id:9
-in add_update_to_wl:rule_id:0
-in add_update_to_wl:rule_id:3
-in add_update_to_wl:rule_id:4
-in add_update_to_wl:rule_id:5
-in add_update_to_wl:rule_id:6
-in add_update_to_wl:rule_id:7
-in add_update_to_wl:rule_id:8
-in add_update_to_wl:rule_id:9
 in add_update_to_wl:agent_type:1:cv_id:0
 in add_update_to_wl: set of rule_id:0
 in add_update_to_wl: set of rule_id:1
@@ -1229,33 +1306,9 @@ Ag:0 Type: 0 Cvid: 0
 Ag:0
 Nothing has changed
 Test for rule:8
-enabled
-Ag:0
-Nothing has changed
+disabled
 Test for rule:9
-enabled
-Ag:0
-Nothing has changed
-Test for rule:4
-enabled
-Ag:0 Type: 0 Cvid: 0
-Ag:0
-Nothing has changed
-Test for rule:5
-enabled
-Ag:0 Type: 0 Cvid: 0
-Ag:0
-Nothing has changed
-Test for rule:6
-enabled
-Ag:0 Type: 0 Cvid: 0
-Ag:0
-Nothing has changed
-Test for rule:7
-enabled
-Ag:0 Type: 0 Cvid: 0
-Ag:0
-Nothing has changed
+disabled
 Test for rule:1
 enabled
 Ag:0 Type: 1 Cvid: 0
@@ -1315,8 +1368,86 @@ Id=18
   Id=1
    Leaf False 
 
+  Id=6
+   Node(site_type:1<2)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+
+------------------------------------------------------------
+* Cartesian abstraction:
+------------------------------------------------------------
+agent_type:0:cv_id:0
+Id=20
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=19
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=13
+     Node(site_type:1<2)
+      Id=1
+       Leaf False 
+
+      Id=12
+       Node(site_type:1<3)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+Id=5
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:2<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_type:1:cv_id:0
+Id=21
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
   Id=2
    Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Id=5
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:2<1)
     Id=0
      Leaf True 
 
