@@ -830,13 +830,27 @@ Id=29
     Id=1
      Leaf False 
 
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:5
+in add_update_to_wl: set of rule_id:6
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:2
+in add_update_to_wl:rule_id:3
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:5
+in add_update_to_wl:rule_id:6
 wl_init_creation:
-0 
+0 1 2 3 4 5 6 
 Test for rule:0
 enabled
 Ag:0
-new views:
-Id=11
+new views:Id=11
  Node(site_type:1<0)
   Id=1
    Leaf False 
@@ -884,16 +898,11 @@ in add_update_to_wl:rule_id:3
 in add_update_to_wl:rule_id:4
 in add_update_to_wl:rule_id:5
 in add_update_to_wl:rule_id:6
-Test for rule:0
-enabled
-Ag:0
-Nothing has changed
 Test for rule:1
 enabled
 Ag:0 Type: 0 Cvid: 0
 Ag:0
-new views:
-Id=31
+new views:Id=31
  Node(site_type:1<1)
   Id=1
    Leaf False 
@@ -945,8 +954,7 @@ Test for rule:2
 enabled
 Ag:0 Type: 0 Cvid: 0
 Ag:0
-new views:
-Id=21
+new views:Id=21
  Node(site_type:1<1)
   Id=1
    Leaf False 
@@ -998,8 +1006,7 @@ Test for rule:3
 enabled
 Ag:0 Type: 0 Cvid: 0
 Ag:0
-new views:
-Id=44
+new views:Id=44
  Node(site_type:1<2)
   Id=1
    Leaf False 
@@ -1051,8 +1058,7 @@ Test for rule:4
 enabled
 Ag:0 Type: 0 Cvid: 0
 Ag:0
-new views:
-Id=49
+new views:Id=49
  Node(site_type:1<3)
   Id=1
    Leaf False 
@@ -1104,8 +1110,7 @@ Test for rule:5
 enabled
 Ag:0 Type: 0 Cvid: 0
 Ag:0
-new views:
-Id=55
+new views:Id=55
  Node(site_type:1<3)
   Id=1
    Leaf False 
@@ -1157,8 +1162,7 @@ Test for rule:6
 enabled
 Ag:0 Type: 0 Cvid: 0
 Ag:0
-new views:
-Id=66
+new views:Id=66
  Node(site_type:1<3)
   Id=1
    Leaf False 
@@ -1372,49 +1376,5 @@ Id=76
 
           Id=1
            Leaf False 
-
-
-------------------------------------------------------------
-* Cartesian abstraction:
-------------------------------------------------------------
-agent_type:0:cv_id:0
-Id=77
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=22
-   Node(site_type:1<4)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
-Id=83
- Node(site_type:2<0)
-  Id=1
-   Leaf False 
-
-  Id=26
-   Node(site_type:2<3)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
-Id=67
- Node(site_type:3<0)
-  Id=1
-   Leaf False 
-
-  Id=39
-   Node(site_type:3<2)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
 
 execution finished without any exception

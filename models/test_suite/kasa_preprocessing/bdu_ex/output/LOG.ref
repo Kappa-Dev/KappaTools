@@ -385,13 +385,19 @@ Id=11
     Id=1
      Leaf False 
 
+in add_update_to_wl:agent_type:0:cv_id:0
+in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:1
+in add_update_to_wl: set of rule_id:2
+in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:1
+in add_update_to_wl:rule_id:2
 wl_init_creation:
-0 
+0 1 2 
 Test for rule:0
 enabled
 Ag:0
-new views:
-Id=7
+new views:Id=7
  Node(site_type:1<0)
   Id=1
    Leaf False 
@@ -421,16 +427,11 @@ in add_update_to_wl: set of rule_id:2
 in add_update_to_wl:rule_id:0
 in add_update_to_wl:rule_id:1
 in add_update_to_wl:rule_id:2
-Test for rule:0
-enabled
-Ag:0
-Nothing has changed
 Test for rule:1
 enabled
 Ag:0 Type: 0 Cvid: 0
 Ag:0
-new views:
-Id=11
+new views:Id=11
  Node(site_type:1<1)
   Id=1
    Leaf False 
@@ -464,8 +465,7 @@ Test for rule:2
 enabled
 Ag:0 Type: 0 Cvid: 0
 Ag:0
-new views:
-Id=16
+new views:Id=16
  Node(site_type:1<1)
   Id=1
    Leaf False 
@@ -551,36 +551,5 @@ Id=20
 
       Id=1
        Leaf False 
-
-
-------------------------------------------------------------
-* Cartesian abstraction:
-------------------------------------------------------------
-agent_type:0:cv_id:0
-Id=21
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=8
-   Node(site_type:1<2)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
-Id=17
- Node(site_type:2<0)
-  Id=1
-   Leaf False 
-
-  Id=13
-   Node(site_type:2<2)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
 
 execution finished without any exception
