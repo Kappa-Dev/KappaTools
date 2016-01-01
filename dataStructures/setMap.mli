@@ -174,7 +174,7 @@ module type Map =
 
     val iter: (elt -> 'a -> unit) -> 'a t -> unit
     val fold: (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
-    val fold_with_interruption: (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+    val fold_with_interruption: (elt -> 'a -> 'b -> ('b,'c) Stop.stop) -> 'a t -> 'b -> ('b,'c) Stop.stop
   
     val monadic_fold2:
       'parameters -> 'method_handler ->

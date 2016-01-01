@@ -103,7 +103,9 @@ val strongly_compress: (trace,trace list) unary
     the first argument indicates whether we display the current steps on the err output;
     the second arfument indicated whether the function is launched in debug mode or not *)
 val fold_over_the_causal_past_of_observables_with_a_progress_bar:
-  (shall_we,shall_we,(trace,trace_runtime_info list,'a,'a) ternary,trace,'a,'a) quinternary
+  (shall_we,shall_we,
+   (trace,trace_runtime_info list,'a,('a,'b) Stop.stop) ternary,
+   trace,'a,('a,'b) Stop.stop) quinternary
 					  
 (** Story table *)
 type story_table

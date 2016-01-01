@@ -250,6 +250,24 @@ let compress_and_print logger env log_info step_list =
 	  let error,log_info,causal_story_table = 
             if weak_compression_on || strong_compression_on 
             then 
+	     (* let error,log_info,causal_story_list = (* in progress *)
+		Utilities_expert.fold_over_the_causal_past_of_observables_with_a_progress_bar_while_reshaking_the_trace
+		  parameter ~shall_we_compute:always ~shall_we_compute_profiling_information:always 
+		  handler log_info error
+		  always never
+		  score_before
+		  stop_before      
+		  score_after
+		  store_after
+		  merge_score
+		  n_first
+		  global_trace_simplification
+		  f
+		  store_result 
+		  trace
+		 xs table 
+	      in *)
+
 	      (* Firstly, run the causal compression *)
 	      let error,log_info,simplified_event_list = aux 0 (error,log_info,step_list) in 
 	      (* Then we fold over each trace that end in an observable, and store the causal compression in a table *)
@@ -271,9 +289,12 @@ let compress_and_print logger env log_info step_list =
 		      let error,log_info,causal_story_array = 
 			U.store_trace parameter  ~shall_we_compute:always ~shall_we_compute_profiling_information:always handler log_info error trace info story_list 
 		      in 
-		      error,log_info,causal_story_array)
+		      error,log_info,Stop.success causal_story_array)
 		  simplified_event_list
 		  table2
+	      in
+	      let causal_story_list =
+		Stop.success_or_stop (fun a -> a) (fun a -> a) causal_story_list
 	      in 
 	      let error,log_info,causal_story_list = 
 		U.flatten_story_table  parameter handler log_info error causal_story_list 

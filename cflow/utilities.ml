@@ -664,7 +664,7 @@ let fold_over_the_causal_past_of_observables_with_a_progress_bar parameter  ?(sh
   in 
   let log_info = P.set_start_compression log_info in 
   let grid = convert_trace_into_grid t handler in 
-  let error,log_info,(_,_,a) =
+  let output =
     Causal.fold_over_causal_past_of_obs 
       (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter)
       handler
@@ -674,7 +674,7 @@ let fold_over_the_causal_past_of_observables_with_a_progress_bar parameter  ?(sh
       grid
       (fun parameter' handler log_info error observable_hit causal_past (counter,list,a) ->
        match list with
-       | [] -> error,log_info,(counter,list,a)
+       | [] -> error,log_info,Stop.success (counter,list,a)
        | head::tail ->
 	  let error,log_info = StoryProfiling.StoryStats.add_event parameter' error (StoryProfiling.Story counter) None log_info in 
 	  let observable_id = head in 
@@ -701,9 +701,16 @@ let fold_over_the_causal_past_of_observables_with_a_progress_bar parameter  ?(sh
 	  in
 	  let error,log_info,a = (f:('a,'b,'c,'d) ternary)  parameter handler log_info error trace info a in
 	  let error,log_info = StoryProfiling.StoryStats.close_event parameter' error (StoryProfiling.Story counter) None log_info in 
-	  error,log_info,(counter+1,tail,a))
+	  error,log_info,Stop.success_or_stop
+			   (fun a -> Stop.success (counter+1,tail,a))
+			   (fun b -> Stop.stop b)
+			   a)
+      
       (1,List.rev list,a)
   in
-  error,log_info,a 
+  Stop.success_or_stop
+    (fun (error,log_info,(_,_,a)) -> error,log_info,Stop.success a)
+    (fun (error,log_info,a) -> error,log_info,Stop.stop a)
+    output
 
 let copy_log_info = P.copy

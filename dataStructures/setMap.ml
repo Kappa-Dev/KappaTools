@@ -190,7 +190,7 @@ module type Map =
 
     val iter: (elt -> 'a -> unit) -> 'a t -> unit
     val fold: (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
-    val fold_with_interruption: (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+    val fold_with_interruption: (elt -> 'a -> 'b -> ('b,'c) Stop.stop) -> 'a t -> 'b -> ('b,'c) Stop.stop
     val monadic_fold2:
       'parameters -> 'method_handler ->
       ('parameters -> 'method_handler ->
@@ -1396,23 +1396,33 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 
 	let rec fold_with_interruption f map value =
 	  match map with
-          | Private.Empty -> false,value
+          | Private.Empty -> false,Stop.success value
           | Private.Node(left,key,data,right,_,_) ->
 	    let outputl = fold_with_interruption f left value in 
 	    let interrupted,value = outputl in 
 	    if interrupted then outputl
 	    else 
-	      let val_opt = 
-		try 
-		  Some (f key data value)
-		with 
-		  ExceptionDefn_with_no_dep.UserInterrupted _ -> None
-	      in 
-	      match 
-		val_opt
-	      with 
-	      |	None -> (true,value)
-	      | Some v -> fold_with_interruption f right v 
+	      Stop.success_or_stop
+		(fun value ->
+		 let val_opt = 
+		   try 
+		     Some (f key data value)
+		   with 
+		     ExceptionDefn_with_no_dep.UserInterrupted _ -> None
+		 in 
+		 match 
+		   val_opt
+		 with 
+		 | None -> (true,Stop.success value)
+		 | Some v ->
+		    Stop.success_or_stop
+		      (fun v -> 
+		       fold_with_interruption f right v )
+		      (fun v -> false,Stop.stop v)
+		      v)
+		(fun x -> false,Stop.stop x)
+		value
+		   
 	let fold_with_interruption f map value = snd (fold_with_interruption f map value)
 
 	let rec monadic_fold param err f map value =
