@@ -139,8 +139,8 @@ let stop_after global status =
 
 let set_status_init parameters float1 float2 counter =
   { counter_min =  counter + parameters.iteration_before_calibrating ;
-    global_time_min = add_float_opt (Some float2) (mult_float_opt (Some (float2 -. float1)) parameters.global_time_factor_min) ;
-    global_time_max = add_float_opt (Some float2) (mult_float_opt (Some (float2 -. float1)) parameters.global_time_factor_max) ;
+    global_time_min = if !Parameter.time_independent then None else add_float_opt (Some float2) (mult_float_opt (Some (float2 -. float1)) parameters.global_time_factor_min) ;
+    global_time_max = if !Parameter.time_independent then None else add_float_opt (Some float2) (mult_float_opt (Some (float2 -. float1)) parameters.global_time_factor_max) ;
     cpu_time_min = None;
     cpu_time_max = None;
     cpu_time_ref = None;
@@ -179,8 +179,8 @@ let compute_status_ranges parameter global_status =
   {
     global_status
   with
-    cpu_time_min = mult_float_opt global_status.cpu_time_ref parameter.computation_time_factor_min;
-    cpu_time_max = mult_float_opt global_status.cpu_time_ref parameter.computation_time_factor_max;
+    cpu_time_min = if !Parameter.time_independent then None else mult_float_opt global_status.cpu_time_ref parameter.computation_time_factor_min;
+    cpu_time_max = if !Parameter.time_independent then None else mult_float_opt global_status.cpu_time_ref parameter.computation_time_factor_max;
     trace_length_before_min = mult_int_opt global_status.trace_length_before_ref parameter.trace_before_factor_min;
     trace_length_before_max = mult_int_opt global_status.trace_length_before_ref parameter.trace_before_factor_max;
     trace_length_after_min = mult_int_opt global_status.trace_length_after_ref parameter.trace_after_factor_min;

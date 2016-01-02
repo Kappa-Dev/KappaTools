@@ -1,4 +1,4 @@
-+ Command line is: 'KaSim' '-i' 'link_swapping_strong2.ka' '-seed' '924556145' '-e' '300' '-d' 'output'
++ Command line is: 'KaSim' '-i' 'link_swapping_strong2.ka' '-seed' '924556145' '-e' '300' '-d' 'output' '--time-independent'
 Parsing link_swapping_strong2.ka...
 done
 + Initialized random number generator with seed 924556145
@@ -26,29 +26,6 @@ ____________________________________________________________
 	 - detecting pseudo inverse events (no change)
 	 - blackboard generation
 	 - computing causal past of each observed events (48)
-
-____________________________________________________________
-###################################
-	 - Removing visited obersvable hits last eid 27 
-(-27 events)
-	 - detecting siphons (+45 events)
-	 - cutting concurrent events (-55 events)
-	 - detecting pseudo inverse events (no change)
-	 - detecting siphons (+45 events)
-	 - cutting concurrent events (-45 events)
-	 - detecting pseudo inverse events (no change)
-	 - blackboard generation
-	 - computing causal past of each observed events (21)
-
-____________________________________________________________
-#####################################################
-	 - Removing visited obersvable hits last eid 42 
-(-15 events)
-	 - detecting siphons (+45 events)
-	 - cutting concurrent events (-45 events)
-	 - detecting pseudo inverse events (no change)
-	 - blackboard generation
-	 - computing causal past of each observed events (6)
 
 ____________________________________________________________
 ############################################################

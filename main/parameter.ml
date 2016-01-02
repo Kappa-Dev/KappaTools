@@ -61,7 +61,8 @@ let weakCompression = ref false
 let strongCompression = ref false 
 let mazCompression = ref false 
 let showIntroEvents = ref false
-
+let time_independent = ref false
+			   
 (*XLS output for the grids during compression*)
 let dump_grid_before_weak_compression = false
 let dump_grid_before_strong_compression = false

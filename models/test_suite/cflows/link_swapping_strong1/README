@@ -1,5 +1,5 @@
 #Command-line:
-"${KAPPABIN}"KaSim -i link_swapping_strong1.ka -seed 924556145 -e 300 -d output || exit 0 
+"${KAPPABIN}"KaSim -i link_swapping_strong1.ka -seed 924556145 -e 300 -d output --time-independent || exit 0 
 
 #In this model 
 #A can turn into B and B can turn into A

@@ -75,6 +75,9 @@ let () =
      "Lower gc activity for a faster but memory intensive simulation") ;
     ("-rescale-to", Arg.Int (fun i -> Parameter.rescale:=Some i),
      "Rescale initial concentration to given number for quick testing purpose");
+    ("--time-independent",
+     Arg.Set Parameter.time_independent,
+     "Disable the use of time is story heuritics (for test suite)") 
   ]
   in
   try

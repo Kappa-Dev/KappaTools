@@ -1,5 +1,5 @@
 #Command-line:
-"${KAPPABIN}"KaSim -i link_passing_strong2.ka -seed 611463625 -e 280 -d output || exit 0 
+"${KAPPABIN}"KaSim -i link_passing_strong2.ka -seed 611463625 -e 280 -d output --time-independent || exit 0 
 
 #In this examples, free A can turn into free B, which can turn into free C, which can turn into free A
 #Each agent has a site x
