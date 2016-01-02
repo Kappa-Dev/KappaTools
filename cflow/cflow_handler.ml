@@ -43,6 +43,7 @@ module type Cflow_handler =
 	  kasa : Remanent_parameters_sig.parameters ;
 	  always_disambiguate_initial_states : bool  ;
 	  bound_on_itteration_number: int option ;
+	  time_independent: bool ;
 	}  
     type handler =   (*handler to interpret abstract values*)
         {
@@ -93,6 +94,7 @@ module type Cflow_handler =
     val string_of_rule_id: handler -> int -> string
     val string_of_agent_id: handler -> int -> string
     val get_predicate_map: handler ->  (int * Predicate_maps.predicate_value * bool) list Predicate_maps.QPredicateMap.t
+    val get_is_time_independent: parameter -> bool
   end
 
 
@@ -117,6 +119,7 @@ module Cflow_handler =
 	  kasa : Remanent_parameters_sig.parameters ;
 	  always_disambiguate_initial_states : bool  ;
 	  bound_on_itteration_number: int option ;
+	  time_independent: bool ;
 	}
 
     let build_parameter () =
@@ -139,6 +142,7 @@ module Cflow_handler =
 	kasa = Remanent_parameters.get_parameters () ;
 	always_disambiguate_initial_states = true ;
 	bound_on_itteration_number = None ;
+	time_independent = !Parameter.time_independent ;
     }
 
     let set_compression_weak p =
@@ -226,10 +230,11 @@ module Cflow_handler =
    let do_not_bound_itterations parameter = {parameter with bound_on_itteration_number = None}
    let set_itteration_bound parameter int = {parameter with bound_on_itteration_number = Some int}				      
    let get_bound_on_itteration_number parameter = parameter.bound_on_itteration_number
-   let get_profiling_logger parameter = parameter. out_channel_profiling 
+   let get_profiling_logger parameter = parameter.out_channel_profiling 
    let string_of_rule_id handler i = handler.rule_name_cache.(i)
    let string_of_agent_id handler i = handler.agent_name_cache.(i)
 
    let get_predicate_map handler = handler.steps_by_column
+   let get_is_time_independent parameter = parameter.time_independent 
 end:Cflow_handler)
     

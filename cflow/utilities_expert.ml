@@ -137,10 +137,18 @@ let stop_after global status =
 	 && cmp_int_opt (Some status.trace_length_before) global.trace_length_before_min >= 0
 	 && cmp_int_opt (Some status.trace_length_after) global.trace_length_after_min >= 0))
 
-let set_status_init parameters float1 float2 counter =
+let set_status_init cflow_parameters parameters float1 float2 counter =
   { counter_min =  counter + parameters.iteration_before_calibrating ;
-    global_time_min = if !Parameter.time_independent then None else add_float_opt (Some float2) (mult_float_opt (Some (float2 -. float1)) parameters.global_time_factor_min) ;
-    global_time_max = if !Parameter.time_independent then None else add_float_opt (Some float2) (mult_float_opt (Some (float2 -. float1)) parameters.global_time_factor_max) ;
+    global_time_min = if Utilities.S.PH.B.PB.CI.Po.K.H.get_is_time_independent cflow_parameters 
+		      then
+			None
+		      else
+			add_float_opt (Some float2) (mult_float_opt (Some (float2 -. float1)) parameters.global_time_factor_min) ;
+    global_time_max = if Utilities.S.PH.B.PB.CI.Po.K.H.get_is_time_independent cflow_parameters
+		      then
+			None
+		      else
+			add_float_opt (Some float2) (mult_float_opt (Some (float2 -. float1)) parameters.global_time_factor_max) ;
     cpu_time_min = None;
     cpu_time_max = None;
     cpu_time_ref = None;
@@ -175,12 +183,20 @@ let update_status_after global status =
   else
     global
       
-let compute_status_ranges parameter global_status =
+let compute_status_ranges cflow_parameters parameter global_status =
   {
     global_status
   with
-    cpu_time_min = if !Parameter.time_independent then None else mult_float_opt global_status.cpu_time_ref parameter.computation_time_factor_min;
-    cpu_time_max = if !Parameter.time_independent then None else mult_float_opt global_status.cpu_time_ref parameter.computation_time_factor_max;
+    cpu_time_min = if Utilities.S.PH.B.PB.CI.Po.K.H.get_is_time_independent cflow_parameters 
+		   then
+		     None
+		   else
+		     mult_float_opt global_status.cpu_time_ref parameter.computation_time_factor_min;
+    cpu_time_max = if Utilities.S.PH.B.PB.CI.Po.K.H.get_is_time_independent cflow_parameters 
+		   then
+		     None
+		   else
+		     mult_float_opt global_status.cpu_time_ref parameter.computation_time_factor_max;
     trace_length_before_min = mult_int_opt global_status.trace_length_before_ref parameter.trace_before_factor_min;
     trace_length_before_max = mult_int_opt global_status.trace_length_before_ref parameter.trace_before_factor_max;
     trace_length_after_min = mult_int_opt global_status.trace_length_after_ref parameter.trace_after_factor_min;
@@ -189,10 +205,10 @@ let compute_status_ranges parameter global_status =
         
     
 let fold_over_the_causal_past_of_observables_with_a_progress_bar_while_reshaking_the_trace
-      parameter ~shall_we_compute:always ~shall_we_compute_profiling_information:always 
+      cflow_parameters ~shall_we_compute:always ~shall_we_compute_profiling_information:always 
       handler log_info error
       always never
-      (parameters:parameters) 
+      parameters
       global_trace_simplification
       f
       (store_result:(
@@ -203,7 +219,7 @@ let fold_over_the_causal_past_of_observables_with_a_progress_bar_while_reshaking
       trace
       table 
   =
-  let f parameter ?(shall_we_compute=always) ?(shall_we_compute_profiling_information=always) handler log_info error trace info (last_info,stop_next,global_status,counter,table) =
+  let f cflow_parameters ?(shall_we_compute=always) ?(shall_we_compute_profiling_information=always) handler log_info error trace info (last_info,stop_next,global_status,counter,table) =
     if stop_next 
     then error,log_info,Stop.stop (last_info,table)
     else 
@@ -214,16 +230,16 @@ let fold_over_the_causal_past_of_observables_with_a_progress_bar_while_reshaking
       then error,log_info,Stop.stop (last_info,table)
       else
 	begin
-	  let error,log_info,trace = f parameter handler log_info error trace in
+	  let error,log_info,trace = f cflow_parameters handler log_info error trace in
 	  let status_after = get_status_after status_before trace in 
 	  let stop = stop_after global_status status_after in
-	  let error,log_info,table = store_result parameter ~shall_we_compute:always ~shall_we_compute_profiling_information:always handler log_info error trace info table in
+	  let error,log_info,table = store_result cflow_parameters ~shall_we_compute:always ~shall_we_compute_profiling_information:always handler log_info error trace info table in
 	  let last_info = Some info in 
 	  let global_status = update_status_after global_status status_after in 
 	  let global_status =
 	    if counter = global_status.counter_min
 	    then
-	      compute_status_ranges parameters global_status
+	      compute_status_ranges cflow_parameters parameters global_status
 	    else
 	      global_status
 	  in
@@ -246,10 +262,10 @@ let fold_over_the_causal_past_of_observables_with_a_progress_bar_while_reshaking
 	  | None -> error,log_info,table
 	  | Some (error,log_info,trace) -> 
 	    let end_simplification = Sys.time () in
-	    let status = set_status_init parameters start_iteration end_simplification counter in 
+	    let status = set_status_init cflow_parameters parameters start_iteration end_simplification counter in 
 	    let error,log_info,output =
 	      Utilities.fold_over_the_causal_past_of_observables_with_a_progress_bar
-		parameter ~shall_we_compute:always ~shall_we_compute_profiling_information:always 
+		cflow_parameters ~shall_we_compute:always ~shall_we_compute_profiling_information:always 
 		handler log_info error
 		always never
 		counter
@@ -260,7 +276,7 @@ let fold_over_the_causal_past_of_observables_with_a_progress_bar_while_reshaking
 	    Stop.success_or_stop
 	      (fun (_,_,_,_,output) -> error,log_info,output)
 	      (fun ((last_info,table),counter) -> 
-	       let error,log_info,trace = Utilities.remove_obs_before parameter handler log_info error last_info trace in
+	       let error,log_info,trace = Utilities.remove_obs_before cflow_parameters handler log_info error last_info trace in
 	       aux log_info error counter trace table)
 	      output
 	end

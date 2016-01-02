@@ -20,6 +20,7 @@ module type Cflow_handler =
 	  kasa: Remanent_parameters_sig.parameters ;
 	  always_disambiguate_initial_states : bool  ;
 	  bound_on_itteration_number: int option ;
+	  time_independent: bool ;
 	} 
 
     type handler =   (*handler to interpret abstract values*)
@@ -69,6 +70,7 @@ module type Cflow_handler =
     val string_of_rule_id: handler -> int -> string
     val string_of_agent_id: handler -> int -> string
     val get_predicate_map: handler -> (int * Predicate_maps.predicate_value * bool) list Predicate_maps.QPredicateMap.t
-end
+    val get_is_time_independent: parameter -> bool
+  end
 
 module Cflow_handler:Cflow_handler
