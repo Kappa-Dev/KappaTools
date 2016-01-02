@@ -28,47 +28,34 @@ ____________________________________________________________
 	 - computing causal past of each observed events (66)
 
 ____________________________________________________________
-###############################
-	 - Removing visited obersvable hits last eid 30 
-(-30 events)
+#####################################
+	 - Removing visited obersvable hits last eid 35 
+(-35 events)
 	 - detecting siphons (+57 events)
 	 - cutting concurrent events (-57 events)
 	 - detecting pseudo inverse events (no change)
 	 - blackboard generation
-	 - computing causal past of each observed events (36)
+	 - computing causal past of each observed events (31)
 
 ____________________________________________________________
-########################################
-	 - Removing visited obersvable hits last eid 41 
+############################################
+	 - Removing visited obersvable hits last eid 46 
 (-11 events)
 	 - detecting siphons (+57 events)
 	 - cutting concurrent events (-57 events)
 	 - detecting pseudo inverse events (no change)
 	 - blackboard generation
-	 - computing causal past of each observed events (25)
+	 - computing causal past of each observed events (20)
 
 ____________________________________________________________
-##################################################
-	 - Removing visited obersvable hits last eid 52 
+######################################################
+	 - Removing visited obersvable hits last eid 57 
 (-11 events)
 	 - detecting siphons (+57 events)
 	 - cutting concurrent events (-57 events)
 	 - detecting pseudo inverse events (no change)
 	 - blackboard generation
-	 - computing causal past of each observed events (14)
-
-____________________________________________________________
-###########################################################
-	 - Removing visited obersvable hits last eid 63 
-(-11 events)
-	 - detecting siphons (+57 events)
-	 - cutting concurrent events (-64 events)
-	 - detecting pseudo inverse events (no change)
-	 - detecting siphons (+56 events)
-	 - cutting concurrent events (-56 events)
-	 - detecting pseudo inverse events (no change)
-	 - blackboard generation
-	 - computing causal past of each observed events (3)
+	 - computing causal past of each observed events (9)
 
 ____________________________________________________________
 ############################################################

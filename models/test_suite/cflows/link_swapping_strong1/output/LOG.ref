@@ -28,28 +28,34 @@ ____________________________________________________________
 	 - computing causal past of each observed events (46)
 
 ____________________________________________________________
-#######################################
-	 - Removing visited obersvable hits last eid 28 
-(-28 events)
+###############################
+	 - Removing visited obersvable hits last eid 21 
+(-21 events)
 	 - detecting siphons (no change)
 	 - cutting concurrent events (no change)
 	 - detecting pseudo inverse events (no change)
 	 - blackboard generation
-	 - computing causal past of each observed events (18)
+	 - computing causal past of each observed events (25)
 
 ____________________________________________________________
-###################################################
-	 - Removing visited obersvable hits last eid 39 
+###########################################
+	 - Removing visited obersvable hits last eid 32 
 (-11 events)
 	 - detecting siphons (no change)
 	 - cutting concurrent events (no change)
 	 - detecting pseudo inverse events (no change)
 	 - blackboard generation
-	 - computing causal past of each observed events (7)
+	 - computing causal past of each observed events (14)
 
 ____________________________________________________________
-############################################################
-
+#########################################################
+	 - Removing visited obersvable hits last eid 43 
+(-11 events)
+	 - detecting siphons (no change)
+	 - cutting concurrent events (no change)
+	 - detecting pseudo inverse events (no change)
+	 - blackboard generation
+	 - computing causal past of each observed events (3)
 
 
 	 - weak flow compression (46)
