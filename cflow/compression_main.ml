@@ -249,26 +249,51 @@ let compress_and_print logger env log_info step_list =
 	  in 
 	  let error,log_info,causal_story_table = 
             if weak_compression_on || strong_compression_on 
-            then 
-	     (* let error,log_info,causal_story_list = (* in progress *)
+            then
+	      let score parameter handler log_info error t = error,log_info,Some (U.size_of_pretrace t) in
+	      let score_before = score in
+	      let score_after = score in
+	      let stop k parameter handler log_info error t t' =
+		match t,t'
+		with None,_ | _,None ->
+			       error,log_info,false
+		     | Some t,Some t' ->
+			let _ = if t'>k*t then Printf.fprintf stdout "STOP %i %i %i \n" k t t' in
+			error,log_info,t'>k*t
+	      in
+	      let stop_before = stop 10 in
+	      let stop_after  = stop 100 in 
+	      let merge_score parmaters handler log_info error a b =
+		error,log_info,
+		match
+		  a,b with None,None -> None
+			 | Some a,None | None,Some a -> Some a
+			 | Some a,Some a' -> Some (max a a')
+	      in
+	      let n_first = 10 in 
+	      let error,log_info,causal_story_list = (* in progress *)
 		Utilities_expert.fold_over_the_causal_past_of_observables_with_a_progress_bar_while_reshaking_the_trace
 		  parameter ~shall_we_compute:always ~shall_we_compute_profiling_information:always 
 		  handler log_info error
-		  always never
-		  score_before
-		  stop_before      
-		  score_after
-		  store_after
-		  merge_score
-		  n_first
-		  global_trace_simplification
-		  f
-		  store_result 
-		  trace
-		 xs table 
-	      in *)
+		  always never		  
+		  Utilities_expert.parameters
+		  aux
+		  (fun
+		      parameter  (*?(shall_we_compute=always) ?(shall_we_compute_profiling_information=always)*)
+		      handler log_info error trace  -> 
+		   (* we remove pseudo inverse events *)
+		   let error,log_info,trace = 
+                     U.remove_pseudo_inverse_events (do_not_log parameter)  ~shall_we_compute:always ~shall_we_compute_profiling_information:always handler log_info error trace
+		   in
+		   (* we compute causal compression *)
+		     U.cut (do_not_log parameter) ~shall_we_compute:always ~shall_we_compute_profiling_information:always handler log_info error trace
+		   )
+		  U.store_trace
+		  step_list
+		  table2
+	      in 
 
-	      (* Firstly, run the causal compression *)
+	  (*    (* Firstly, run the causal compression *)
 	      let error,log_info,simplified_event_list = aux 0 (error,log_info,step_list) in 
 	      (* Then we fold over each trace that end in an observable, and store the causal compression in a table *)
 	      let error,log_info,causal_story_list =
@@ -292,10 +317,7 @@ let compress_and_print logger env log_info step_list =
 		      error,log_info,Stop.success causal_story_array)
 		  simplified_event_list
 		  table2
-	      in
-	      let causal_story_list =
-		Stop.success_or_stop (fun a -> a) (fun a -> a) causal_story_list
-	      in 
+	      in*)
 	      let error,log_info,causal_story_list = 
 		U.flatten_story_table  parameter handler log_info error causal_story_list 
 	      in 

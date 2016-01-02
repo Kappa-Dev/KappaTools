@@ -28,7 +28,8 @@ type 'a simulation_info = (* type of data to be given with observables for story
       profiling_info: 'a;
     }
 
-let triple_of_simulation_info a = (a.story_id,a.story_time,a.story_event)
+let event_of_simulation_info a = a.story_event
+let story_id_of_simulation_info a = a.story_id
       
 module Palette:
 	sig

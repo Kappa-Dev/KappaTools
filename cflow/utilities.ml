@@ -53,7 +53,9 @@ type ('a,'b,'c,'d,'e) quaternary =
   ('a -> 'b -> 'c -> 'd -> error_log * profiling_info * 'e) with_handlers
 type ('a,'b,'c,'d,'e,'f) quinternary =
   ('a -> 'b -> 'c -> 'd -> 'e -> error_log * profiling_info * 'f) with_handlers 
-							    
+type ('a,'b,'c,'d,'e,'f,'g) sexternary =
+  ('a -> 'b -> 'c -> 'd -> 'e -> 'f -> error_log * profiling_info * 'g) with_handlers
+									
 let (we_shall:shall_we) = (fun _ -> true)
 let (we_shall_not:shall_we) = (fun _ -> false)
 		     
@@ -249,7 +251,55 @@ let cut =
        StoryProfiling.Partial_order_reduction)
     Require_the_abscence_of_ambiguity    
     Neutral 
-    
+
+let remove_obs_before parameter handler log_info error last_eid trace =
+   error,log_info,
+   (let _ = Printf.fprintf stdout "last eid %i \n" last_eid in
+    let rec aux l score output =
+     match l with
+       [] -> List.rev output,score
+     | t::q ->
+	if 
+	  S.PH.B.PB.CI.Po.K.is_obs_of_refined_step t
+	then
+	  match S.PH.B.PB.CI.Po.K.simulation_info_of_refined_step t
+	  with None -> aux q score (t::output)
+	     | Some x ->
+		if Mods.story_id_of_simulation_info x >= last_eid
+		then
+		  List.rev (List.fold_left
+			      (fun list a -> a::list) output l),
+		  score
+		else
+		  aux q (succ score) output
+	else aux q score (t::output)
+   in
+    aux trace 0 [])
+
+let remove_obs_before parameter handler log_info error last_info trace =
+  lift_to_care_about_ambiguities
+    (transform_trace_gen
+       (fun parameter handler log_info error -> remove_obs_before parameter handler  log_info error last_info)
+       (Some "\t - Removing visited obersvable hits")
+       "Trace after having removed seen observable hits\n"
+       StoryProfiling.Partial_order_reduction)
+    Do_not_care
+    Neutral
+    parameter handler log_info error trace
+
+let remove_obs_before parameter ?shall_we_compute:(shall_we_compute=we_shall)  ?shall_we_compute_profiling_information:(shall_we_compute_profiling_information=we_shall) handler log_info error last_info trace =
+  match last_info
+  with
+  | None -> error,log_info,trace
+  | Some l ->
+     let last =
+       List.fold_left
+	 (fun result x ->
+	  let last_eid = Mods.story_id_of_simulation_info x in
+	  max result last_eid)
+	 0 l
+     in 
+     remove_obs_before parameter handler log_info error last trace
     
 let fill_siphon =
   lift_to_care_about_ambiguities
@@ -642,7 +692,7 @@ let fold_over_the_causal_past_of_observables_through_a_grid_with_a_progress_bar 
     f (error,log_info,a)
 
     
-let fold_over_the_causal_past_of_observables_with_a_progress_bar parameter  ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall) handler log_info error log_step debug_mode f t a =
+let fold_over_the_causal_past_of_observables_with_a_progress_bar parameter  ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall) handler log_info error log_step debug_mode counter f t a =
   let () = 
     if log_step parameter 
     then 
@@ -703,14 +753,14 @@ let fold_over_the_causal_past_of_observables_with_a_progress_bar parameter  ?(sh
 	  let error,log_info = StoryProfiling.StoryStats.close_event parameter' error (StoryProfiling.Story counter) None log_info in 
 	  error,log_info,Stop.success_or_stop
 			   (fun a -> Stop.success (counter+1,tail,a))
-			   (fun b -> Stop.stop b)
+			   (fun b -> Stop.stop (b,counter))
 			   a)
       
-      (1,List.rev list,a)
+      (counter,List.rev list,a)
   in
   Stop.success_or_stop
-    (fun (error,log_info,(_,_,a)) -> error,log_info,Stop.success a)
-    (fun (error,log_info,a) -> error,log_info,Stop.stop a)
+    (fun (error,log_info,(counter,_,a)) -> error,log_info,Stop.success a)
+    (fun (error,log_info,(a,counter)) -> error,log_info,Stop.stop (a,counter))
     output
 
 let copy_log_info = P.copy

@@ -48,7 +48,9 @@ type ('a,'b,'c,'d,'e) quaternary =
   ('a -> 'b -> 'c -> 'd -> error_log * profiling_info * 'e) with_handlers
 type ('a,'b,'c,'d,'e,'f) quinternary =
   ('a -> 'b -> 'c -> 'd -> 'e -> error_log * profiling_info * 'f) with_handlers
-				     
+type ('a,'b,'c,'d,'e,'f,'g) sexternary =
+  ('a -> 'b -> 'c -> 'd -> 'e -> 'f -> error_log * profiling_info * 'g) with_handlers
+									
 val fold_left_with_progress_bar: ?event:StoryProfiling.step_kind -> (('a,'b,'a) binary,'a,'b list,'a) ternary 
 
 (** traces *)
@@ -86,6 +88,9 @@ val cut: (trace,trace) unary
 (** remove_pseudo_inverse_events removes pseudo inverse events *)
 val remove_pseudo_inverse_events: (trace,trace) unary 
 
+(** remove_obs_before removes the observable_hits before the simulation info prodided as a first argument*)
+val remove_obs_before: (trace_runtime_info list option,trace,trace) binary
+		      
 (** reallocate agent id to avoid conflict (implicitly called by cut and fill_siphon) *)
 val make_unambiguous: (trace,trace) unary 
 
@@ -103,9 +108,9 @@ val strongly_compress: (trace,trace list) unary
     the first argument indicates whether we display the current steps on the err output;
     the second arfument indicated whether the function is launched in debug mode or not *)
 val fold_over_the_causal_past_of_observables_with_a_progress_bar:
-  (shall_we,shall_we,
+  (shall_we,shall_we,int,
    (trace,trace_runtime_info list,'a,('a,'b) Stop.stop) ternary,
-   trace,'a,('a,'b) Stop.stop) quinternary
+   trace,'a,('a,'b*int) Stop.stop) sexternary
 					  
 (** Story table *)
 type story_table
