@@ -831,12 +831,12 @@ For instance, the declaration\index{declaration}:
 \lstinline[language=kappa]*%mod:  [E-]/([E]+[E-])>0.9 do $SNAPSHOT "prefix"*
 will ask \KaSim~to export the mixture\index{mixture} the first time the percentage of null events reaches 90\%. The exported file will be named \ttt{prefix\_$n$.ka} where $n$ is the event number at which the snapshot was taken. One may also use a \textit{string\_expression} to construct any prefix using local variables. Note that one may omit to define a prefix and simply type:
 \lstinline[language=kappa]!%mod:  [E-]/([E]+[E-])>0.9 do $SNAPSHOT!
-in which case the default prefix \ttt{snap} will be used for naming snapshots.
+in which case the default prefix \ttt{snap.ka} will be used for naming snapshots.
 If the name already exists a counter will be appended at the end of the file to prevent overwriting. Snapshots can be performed multiple times, for instance every 1000 events, using the declaration\index{declaration}:
 \begin{lstlisting}[language=kappa]
-%mod: repeat ([E] [mod] 1000)=0 do $SNAPSHOT "abc" until [false]
+%mod: repeat ([E] [mod] 1000)=0 do $SNAPSHOT "abc.ka" until [false]
 \end{lstlisting}
-which results in \KaSim~producing a snapshot every 1000 (productive) events until the simulation ends. The perturbation \ttt{\$STOP "final\_state"} will terminate the simulation whenever its precondition is satisfied and produce a snapshot of the last mixture\index{mixture}. Note that instead of producing kappa files, one may use snapshot perturbations to produce an image of the mixture\index{mixture} in the dot format using the parameter \ttt{"dotSnapshots"} (see Section~\ref{sec:param}).
+which results in \KaSim~producing a snapshot every 1000 (productive) events until the simulation ends. The perturbation \ttt{\$STOP "final\_state.ka"} will terminate the simulation whenever its precondition is satisfied and produce a snapshot of the last mixture\index{mixture}. Note that instead of producing kappa files, one may use snapshot perturbations to produce an image of the mixture\index{mixture} in the dot/html format using the parameter by specifying the extention in the name skeleton (\lstinline[language=kappa]!%mod:  [E-]/([E]+[E-])>0.9 do $SNAPSHOT ``snap.dot!).
 
 \subsection{Changing the value of a token}
 The concentration of any token can be reset on the fly using a perturbation. For instance the declaration\index{declaration}:
@@ -973,7 +973,6 @@ parameter & possible values & description \\
 \ttt{"dotCflows"} & \ttt{"no", "yes"} & \small generate causal flows in dot format\\
 \textit{Pretty printing}&\\
 \ttt{"plotSepChar"} & \ttt{" "} or any character & \small separation character for plots\\
-\ttt{"dotSnapshots"} & \ttt{"no", "yes"} & \small generate dot snapshots\\
 \ttt{"colorDot"} &  \ttt{"no", "yes"} & \small use colors in dot format files\\
 \ttt{"progressBarSymbol"} & \ttt{"\#"} or any character & \small symbol for the progress bar\\
 \ttt{"progressBarSize"} & \ttt{"60"} or any integer & \small length of the progress bar\\ &&\\

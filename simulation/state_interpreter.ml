@@ -63,7 +63,7 @@ let observables_values env counter graph state =
      env
 
 let snapshot env counter file graph =
-  if !Parameter.dotSnapshots then
+  if Filename.check_suffix file ".dot" then
     Kappa_files.with_snapshot
       file (Counter.current_event counter) "dot"
       (fun f -> Format.fprintf f "%a@." (Rule_interpreter.print_dot env) graph)
@@ -269,7 +269,7 @@ let a_loop form env domain counter graph state =
     | [] ->
        let () =
 	 if !Parameter.dumpIfDeadlocked then
-	   snapshot env counter "deadlock" graph in
+	   snapshot env counter "deadlock.ka" graph in
        let () =
 	 Format.fprintf
 	   form
@@ -317,7 +317,7 @@ let loop_cps form hook return env domain counter graph state =
 	    msg in
 	let () = if not !Parameter.batchmode then
 		   match String.lowercase (Tools.read_input ()) with
-		   | ("y" | "yes") -> snapshot env counter "dump" graph
+		   | ("y" | "yes") -> snapshot env counter "dump.ka" graph
 		   | _ -> () in
 	(true,graph,state) in
     if stop then return form env counter graph' state'

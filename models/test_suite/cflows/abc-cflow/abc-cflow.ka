@@ -34,10 +34,10 @@
 
 %var: 'counter' 0
 
-#%mod: repeat ([E] [mod] 1000 = 0) do \
-# ($UPDATE 'counter' ('counter'+1) ; \
-# $SNAPSHOT <"snap".'counter'."_".[E].".ka">) \
-# until [false]
+%mod: repeat ([E] [mod] 10000 = 0) do \
+ ($SNAPSHOT "snap".'counter'."_".[E].".dot"; \
+ $UPDATE 'counter' ('counter'+1)) \
+ until [false]
 
 %mod: [T]>5 do $ADD 10000 C()
 %mod: [T]>10 do ($TRACK 'Cpp' [true] ; $UPDATE 'cflow' 'Cpp')
@@ -45,5 +45,4 @@
 
 
 %def: "displayCompression" "weak"
-%def: "dotSnapshots" "true"
 %def: "showIntroEvents" "true"

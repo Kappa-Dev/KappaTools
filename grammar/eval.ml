@@ -456,8 +456,6 @@ let configurations_of_result result =
 			      ("Value "^v^" should be an integer",p))
 		  ) Parameter.maxConsecutiveClash
 
-     | "dotSnapshots" ->
-	set_bool_value pos_p param value_list Parameter.dotSnapshots
      | "dotCflows" ->
 	set_bool_value pos_p param value_list Parameter.dotCflows
      | "colorDot" ->

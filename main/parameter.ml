@@ -51,10 +51,7 @@ let alg_var_overwrite : (string * Nbr.t) list ref = ref []
 let (seedValue:int option ref) = ref None
 let compileModeOn = ref false
 let implicitSignature = ref false
-let dotSnapshots = ref false
 let dotCflows = ref true
-let fluxModeOn = ref false
-let snapshotHighres = ref true
 
 let causalModeOn = ref false
 let weakCompression = ref false 
@@ -72,13 +69,11 @@ let xlsweakFileName = "grid_weak_compression"
 let xlsstrongFileName = "grid_strong_compression"
 
 (*Computed values*)
-let (timeIncrementValue:float option ref) = ref None
-
 let cpuTime = ref 0.0
-let initSimTime () = cpuTime := Sys.time ()  
+let initSimTime () = cpuTime := Sys.time ()
 
 (*Name convention*)
-let inputKappaFileNames:(string list ref) = ref [] 
+let inputKappaFileNames:(string list ref) = ref []
 let marshalizedInFile = ref ""
 
 type sort_algo_for_stories = Bucket | Fusion

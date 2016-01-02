@@ -33,15 +33,11 @@
 %init: 'n_ab' A(),B()
 %init: 'n_c' C()
 
-%obs: 'snapshots' 0
-
-
 %mod: [T]>5 do $ADD 10000 C()
 %mod: [T]>10 do ($TRACK 'Cpp' [true] ; $UPDATE 'cflow' 'Cpp')
 %mod: [T]>10 && ('Cpp' - 'cflow' = 10) do ($TRACK 'Cpp' [false])
 
 
 %def: "cflowFileName" "abc-flow"
-%def: "displayCompression" "weak" 
-%def: "dotSnapshots" "false"
+%def: "displayCompression" "weak"
 %def: "showIntroEvents" "true"

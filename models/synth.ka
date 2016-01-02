@@ -38,7 +38,4 @@
 
 %obs: 'GC content' ('C'+'G')/('N'+ 0.01)
 
-# Uncomment the next line to have snapshot as a kappa file
-#%def: "dotSnapshots" "yes"
-
 %mod: [E]=[Emax] do $SNAPSHOT "dna_".'N'

@@ -51,6 +51,4 @@ C(b!3,a),B(c!3,a) -> C(a,b),B(a,c) @ 'koff'
 %obs: 'Monomers' ('A'+'B'+'C')/('nA'+'nB'+'nC')
 %obs: 'Dimers' 2*('AB'+'BC'+'AC')/('nA'+'nB'+'nC')
 %obs: 'Trimers' 3*('ABC')/('nA'+'nB'+'nC')
-#%mod: [E]=18000 do $SNAPSHOT "dotsnap"
-
-#%def: "dotSnapshots" "yes"
+#%mod: [E]=18000 do $SNAPSHOT "dotsnap.dot"

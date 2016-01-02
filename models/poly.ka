@@ -18,5 +18,4 @@
 %var: 'n'  1000
 ##
 %init: 'n'  A(),B(),C()
-%mod: [E] > 10000 do $STOP
-%def: "dotSnapshots" "true"
+%mod: [E] > 10000 do $STOP "snap.dot"

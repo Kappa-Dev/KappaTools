@@ -1,0 +1,13 @@
+# Snapshot [Event: 0]
+digraph G{
+subgraph cluster0{
+  counter0 [label = "1000 instance(s)", shape=none];
+  node0_0 [label = "A(x,c)", color = "#2bc26f", style=filled];
+  node0_0 -> counter0 [style=invis];
+  }
+subgraph cluster1{
+  counter1 [label = "1000 instance(s)", shape=none];
+  node1_0 [label = "B(x)", color = "#60191f", style=filled];
+  node1_0 -> counter1 [style=invis];
+  }
+}
