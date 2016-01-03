@@ -41,7 +41,7 @@ let rec generic_zeroary allocate handler f error parameters  =
     | None -> invalid_arg parameters error (Some "line 28") Exit (handler,None)       
     | Some (key,cell,mvbdu,handler) -> error,(handler,Some mvbdu)
         
-let rec generic_unary allocate (memoized_fun:('a,'b,'c,'d,'e,'f) Memo_sig.unary_memoized_fun)
+let rec generic_unary allocate (memoized_fun:('a,'b,'c,'d,'e,'f,'g) Memo_sig.unary_memoized_fun)
  handler error parameters mvbdu_input = 
   match memoized_fun.Memo_sig.get parameters error handler mvbdu_input with 
     | error,(handler,Some output) -> 
@@ -106,7 +106,7 @@ let cut x t1  =
       
   
             
-let rec generic_binary allocate (memoized_fun:('a,'b,'c,'d,'e,'f) Memo_sig.binary_memoized_fun) handler error parameters mvbdu_a mvbdu_b = 
+let rec generic_binary allocate (memoized_fun:('a,'b,'c,'d,'e,'f,'g) Memo_sig.binary_memoized_fun) handler error parameters mvbdu_a mvbdu_b = 
   match memoized_fun.Memo_sig.get parameters error handler (mvbdu_a,mvbdu_b) with 
     | error,(handler,Some output) -> error, (handler, Some output)
     | error,(handler,None) ->
@@ -375,7 +375,7 @@ let rec redefine allocate memoized_fun error parameters handler mvbdu_input list
           match list_input.List_sig.value with 
             | List_sig.Empty ->  
               let error,depreciated =
-                (memoized_fun.Memo_sig.f parameters error).Memo_sig.empty_list
+                (memoized_fun.Memo_sig.f parameters error).Memo_sig.empty_association_list
               in 
               generic_unary
                 allocate
@@ -592,11 +592,11 @@ let recursive_not_memoize f =
     
 let memoize_no_fun a b c d = 
   (recursive_memoize (fun _ -> raise Exit)
-     a b c d:('a,'b,'c,'d,'e,'f) Memo_sig.unary_memoized_fun)  
+     a b c d:('a,'b,'c,'d,'e,'f,'g) Memo_sig.unary_memoized_fun)  
 
 let memoize_binary_no_fun a b c d = 
   (recursive_memoize (fun _ -> raise Exit)
-     a b c d:('a,'b,'c,'d,'e,'f) Memo_sig.binary_memoized_fun)  
+     a b c d:('a,'b,'c,'d,'e,'f,'g) Memo_sig.binary_memoized_fun)  
     
 let not_recursive_not_memoize_unary  f g allocate = 
   { Memo_sig.f = g;

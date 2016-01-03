@@ -31,7 +31,7 @@ let get_skeleton prelist =
         { x with 
           List_sig.tail = get_hash_key x.List_sig.tail}
         
-let build_list (allocate:('a,'b,'c) Sanity_test_sig.g) error handler skeleton cell = 
+let build_list (allocate:('a,'b,'c,'d) Sanity_test_sig.g) error handler skeleton cell = 
   allocate 
     error
     compare 

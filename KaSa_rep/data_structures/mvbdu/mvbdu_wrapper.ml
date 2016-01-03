@@ -2,7 +2,7 @@
 
 module type Mvbdu =
   sig
-    type handler = (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.list_dic,bool,int) Memo_sig.handler
+    type handler = (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.association_list_dic,Boolean_mvbdu.variables_list_dic,bool,int) Memo_sig.handler
     type mvbdu
     type hconsed_association_list
     type 'output constant = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> Exception.method_handler * handler * 'output
@@ -93,7 +93,7 @@ module type Nul =
   end 
 module Make (M:Nul)  = 
   (struct 
-    type handler = (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.list_dic,bool,int) Memo_sig.handler  
+    type handler = (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.association_list_dic,Boolean_mvbdu.variables_list_dic,bool,int) Memo_sig.handler  
     type mvbdu = bool Mvbdu_sig.mvbdu
     type hconsed_association_list = int List_sig.list
     type 'output constant = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> Exception.method_handler * handler * 'output

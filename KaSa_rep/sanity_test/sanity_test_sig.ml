@@ -12,37 +12,37 @@
    * en Automatique.  All rights reserved.  This file is distributed     
    * under the terms of the GNU Library General Public License *)
 
-type ('data,'dicmvbdu,'diclist) f = 
+type ('data,'dicmvbdu,'diclist,'dicvlist) f = 
     Exception.method_handler -> 
     (bool Mvbdu_sig.cell -> bool Mvbdu_sig.cell -> int) -> 
     bool Mvbdu_sig.skeleton -> 
     bool Mvbdu_sig.cell ->  
     (int -> bool Mvbdu_sig.mvbdu) -> 
-    ('data,'dicmvbdu,'diclist,bool,int) Memo_sig.handler  ->  
+    ('data,'dicmvbdu,'diclist,'dicvlist,bool,int) Memo_sig.handler  ->  
     Exception.method_handler * 
       ((int * bool Mvbdu_sig.cell * bool Mvbdu_sig.mvbdu * 
-          ('data,'dicmvbdu,'diclist,bool,int) Memo_sig.handler) option)
+          ('data,'dicmvbdu,'diclist,'dicvlist,bool,int) Memo_sig.handler) option)
 
-type ('data,'dicmvbdu,'diclist) g = 
+type ('data,'dicmvbdu,'diclist,'dicvlist) g = 
     Exception.method_handler -> 
     (int List_sig.cell -> int List_sig.cell -> int) ->  
     int List_sig.skeleton -> 
     int List_sig.cell ->  
     (int -> int List_sig.list) -> 
-    ('data,'dicmvbdu,'diclist,bool,int) Memo_sig.handler  ->  
+    ('data,'dicmvbdu,'diclist,'dicvlist,bool,int) Memo_sig.handler  ->  
     Exception.method_handler * 
       ((int * int List_sig.cell * int List_sig.list * 
-          ('data,'dicmvbdu,'diclist,bool,int) Memo_sig.handler) option)
+          ('data,'dicmvbdu,'diclist,'dicvlist,bool,int) Memo_sig.handler) option)
       
-type ('mvbdu_handler,'dicmvbdu,'diclist,'data) remanent = 
+type ('mvbdu_handler,'dicmvbdu,'diclist,'dicvlist,'data) remanent = 
     {
       mvbdu_handler: 'mvbdu_handler;
       error: Exception.method_handler;
       output:out_channel;
-      allocate_mvbdu: ('data,'dicmvbdu,'diclist) f;
-      allocate_uniquely_mvbdu: ('data,'dicmvbdu,'diclist) f;
-      allocate_list: ('data,'dicmvbdu,'diclist) g;
-      allocate_uniquely_list: ('data,'dicmvbdu,'diclist) g;
+      allocate_mvbdu: ('data,'dicmvbdu,'diclist,'dicvlist) f;
+      allocate_uniquely_mvbdu: ('data,'dicmvbdu,'diclist,'dicvlist) f;
+      allocate_list: ('data,'dicmvbdu,'diclist,'dicvlist) g;
+      allocate_uniquely_list: ('data,'dicmvbdu,'diclist,'dicvlist) g;
       parameters: Remanent_parameters_sig.parameters;
     }
       

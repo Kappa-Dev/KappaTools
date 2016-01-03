@@ -39,7 +39,7 @@ let print_flag parameters bool =
   then Printf.fprintf parameters.Remanent_parameters_sig.log "Yes" 
   else Printf.fprintf parameters.Remanent_parameters_sig.log "No"
 
-let build_already_compressed_cell (allocate: ('a,'b,'c) Sanity_test_sig.f)
+let build_already_compressed_cell (allocate: ('a,'b,'c,'d) Sanity_test_sig.f)
     error handler skeleton cell = 
   allocate
     error
@@ -49,7 +49,7 @@ let build_already_compressed_cell (allocate: ('a,'b,'c) Sanity_test_sig.f)
     (fun key -> {Mvbdu_sig.id=key; Mvbdu_sig.value=cell})
     handler  
 
-let compress_node (allocate:('a,'b,'c) Sanity_test_sig.f) error handler cell = 
+let compress_node (allocate:('a,'b,'c,'d) Sanity_test_sig.f) error handler cell = 
   match cell with 
     | Mvbdu_sig.Leaf a as x ->
       build_already_compressed_cell

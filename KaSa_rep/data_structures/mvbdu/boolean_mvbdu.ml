@@ -74,13 +74,15 @@ type memo_tables =
   }
 
 type mvbdu_dic = (bool Mvbdu_sig.cell, bool Mvbdu_sig.mvbdu) D_mvbdu_skeleton.dictionary
-type list_dic  = (int List_sig.cell, int List_sig.list) D_list_skeleton.dictionary
-type handler   = (memo_tables, mvbdu_dic, list_dic, bool, int) Memo_sig.handler  
+type association_list_dic  = (int List_sig.cell, int List_sig.list) D_list_skeleton.dictionary
+type variables_list_dic = (unit List_sig.cell, unit List_sig.list) D_list_skeleton.dictionary					
+type handler   = (memo_tables, mvbdu_dic, association_list_dic, variables_list_dic, bool, int) Memo_sig.handler  
   
 type unary_memoized_fun = 
     (bool,
      mvbdu_dic,
-     list_dic,
+     association_list_dic,
+     variables_list_dic,
      Exception.method_handler -> bool -> Exception.method_handler  * 
      (bool Mvbdu_sig.mvbdu,bool) Mvbdu_sig.premvbdu, memo_tables,
        memo_tables, int)
@@ -197,6 +199,7 @@ let init_remanent parameters error =
     Memo_sig.data = data;
     Memo_sig.mvbdu_dictionary = D_mvbdu_skeleton.init ();
     Memo_sig.association_list_dictionary = D_list_skeleton.init ();
+    Memo_sig.variables_list_dictionary = D_list_skeleton.init ();
     Memo_sig.print_skel = print_skeleton ;
     Memo_sig.print_cell = print_cell ;
     Memo_sig.print_mvbdu = print_mvbdu
@@ -204,7 +207,7 @@ let init_remanent parameters error =
 
 let mvbdu_allocate = 
   (fun parameters error b c d e
-    (old_handler:('a,mvbdu_dic,list_dic,'c,'d) Memo_sig.handler) -> 
+    (old_handler:('a,mvbdu_dic,association_list_dic,variables_list_dic,'c,'d) Memo_sig.handler) -> 
     let old_dictionary = old_handler.Memo_sig.mvbdu_dictionary in 
     let error,output =
       D_mvbdu_skeleton.allocate
@@ -515,7 +518,7 @@ let boolean_mvbdu_nsnd parameters =
        (fun x h -> {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_nsnd = x}}))
     
 let association_list_allocate parameters = 
-  (fun error b c d e (old_handler:('a,mvbdu_dic,list_dic,'c,'d) Memo_sig.handler) -> 
+  (fun error b c d e (old_handler:('a,mvbdu_dic,association_list_dic,variables_list_dic,'c,'d) Memo_sig.handler) -> 
     let old_dictionary = old_handler.Memo_sig.association_list_dictionary in 
     let error,output =
       D_list_skeleton.allocate 
@@ -622,7 +625,8 @@ let memo_keep_head_only =
 
 let reset_handler error = 
   {
-    Memo_sig.empty_list = error,memo_identity;
+    Memo_sig.empty_association_list = error,memo_identity;
+    Memo_sig.empty_variables_list = error,memo_identity;
     Memo_sig.leaf = (fun bool -> error,(fun error -> error, Mvbdu_sig.Leaf bool));
     Memo_sig.clean_head = error,memo_clean_head;
     Memo_sig.build_false =

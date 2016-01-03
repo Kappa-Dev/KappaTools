@@ -26,7 +26,7 @@ let rec safety_equal_list list_x list_y  =
     | _ -> false 
 
 
-let rec safety_check_maximal_sharing (allocate_uniquely:('a,'b,'c) Sanity_test_sig.g)
+let rec safety_check_maximal_sharing (allocate_uniquely:('a,'b,'c,'d) Sanity_test_sig.g)
     error list handler = 
   let list_val = list.List_sig.value in  
   match list_val with 
@@ -86,7 +86,7 @@ let print_flag log bool =
   then Printf.fprintf log "Yes" 
   else Printf.fprintf log "No"
 
-let sanity_check (allocate_uniquely:('a,'b,'c) Sanity_test_sig.g) error log handler mvbdu =
+let sanity_check (allocate_uniquely:('a,'b,'c,'d) Sanity_test_sig.g) error log handler mvbdu =
   let error,bool1 =
     safety_check_increasing_nodes
       error
