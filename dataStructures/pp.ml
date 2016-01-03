@@ -3,8 +3,13 @@ open Format
 let listi ?(trailing=(fun _ -> ())) pr_sep pr_el f l =
   let rec aux acc f = function
     | [] -> ()
-    | [el] -> fprintf f "%a%t" (pr_el acc) el trailing
-    | h :: t -> fprintf f "%a%t%a" (pr_el acc) h pr_sep (aux (succ acc)) t
+    | [el] ->
+       let () = pr_el acc f el in
+       trailing f
+    | h :: t ->
+       let () = pr_el acc f h in
+       let () = pr_sep f in
+       aux (succ acc) f t
   in aux 0 f l
 
 let list ?trailing pr_sep pr_el f l =
@@ -32,9 +37,9 @@ let option pr f = function
 let array ?(trailing=(fun _ -> ())) pr_sep pr_el f a =
   let rec aux i f =
     if i < Array.length a then
-      let () = Format.fprintf f "%a" (pr_el i) a.(i) in
+      let () = pr_el i f a.(i) in
       if i < Array.length a - 1 then
-	Format.fprintf f "%t%t" pr_sep (aux (succ i))
+	let () = pr_sep f in aux (succ i) f
       else if i > 0 then trailing f
   in aux 0 f
 
