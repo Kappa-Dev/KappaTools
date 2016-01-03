@@ -41,7 +41,7 @@ matrix:
   - os: osx
 
 before_install:
-  - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] ; then brew update ; brew outdated opam || brew upgrade opam ; fi"
+  - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] ; then brew update ; brew install opam ; fi"
 
 install:
   - opam init -a git://github.com/ocaml/opam-repository && eval $(opam config env)
