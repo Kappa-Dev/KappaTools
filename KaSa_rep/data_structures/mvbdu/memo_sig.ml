@@ -29,7 +29,7 @@ and
     {
       data             : 'f;
       mvbdu_dictionary : 'b;
-      list_dictionary  : 'c;
+      association_list_dictionary  : 'c;
       print_cell       : out_channel -> string -> 'd Mvbdu_sig.cell -> unit;
       print_skel       : out_channel -> string -> 'd Mvbdu_sig.skeleton -> unit;
       print_mvbdu      : out_channel -> string -> 'd Mvbdu_sig.mvbdu -> unit

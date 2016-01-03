@@ -642,7 +642,7 @@ let bdu_test remanent parameters =
   let list' = [2,2; 4,1; 1,3] in 
   let error,(handler,list_a) =
     List_algebra.build_list
-      (Boolean_mvbdu.list_allocate parameters)
+      (Boolean_mvbdu.association_list_allocate parameters)
       error
       parameters
       handler
@@ -650,7 +650,7 @@ let bdu_test remanent parameters =
   in 
   let error,(handler,list_b) =
     List_algebra.build_sorted_list
-      (Boolean_mvbdu.list_allocate parameters)
+      (Boolean_mvbdu.association_list_allocate parameters)
       parameters
       error
       handler
@@ -658,7 +658,7 @@ let bdu_test remanent parameters =
   in
   let error,(handler,list_c) =
     List_algebra.build_reversed_sorted_list
-      (Boolean_mvbdu.list_allocate parameters)
+      (Boolean_mvbdu.association_list_allocate parameters)
       parameters
       error
       handler
@@ -666,7 +666,7 @@ let bdu_test remanent parameters =
   in 
   let error,(handler,list_a') =
     List_algebra.build_list
-      (Boolean_mvbdu.list_allocate parameters)
+      (Boolean_mvbdu.association_list_allocate parameters)
       error
       parameters
       handler
@@ -674,7 +674,7 @@ let bdu_test remanent parameters =
   in 
   let error,(handler,list_b') =
     List_algebra.build_sorted_list
-      (Boolean_mvbdu.list_allocate parameters)
+      (Boolean_mvbdu.association_list_allocate parameters)
       parameters
       error
       handler
@@ -682,7 +682,7 @@ let bdu_test remanent parameters =
   in
   let error,(handler,list_c') =
     List_algebra.build_reversed_sorted_list
-      (Boolean_mvbdu.list_allocate parameters)
+      (Boolean_mvbdu.association_list_allocate parameters)
       parameters 
       error
       handler
@@ -793,10 +793,10 @@ let bdu_test remanent parameters =
   let error,handler,bmvbdu_false32' = Mvbdu_wrapper.Mvbdu.mvbdu_nrev_imply parameters handler error bmvbdu_true0' bmvbdu_false0' in
   let list = [4,1; 2,2; 1,3] in 
   let list' = [2,2; 4,1; 1,3] in 
-  let error,handler,list__a = Mvbdu_wrapper.Mvbdu.build_list parameters handler error list in 
-  let error,handler,list__c = Mvbdu_wrapper.Mvbdu.build_reverse_sorted_list parameters handler error list in 
-  let error,handler,list__a' =Mvbdu_wrapper.Mvbdu.build_list parameters handler error list' in 
-  let error,handler,list__b' = Mvbdu_wrapper.Mvbdu.build_sorted_list parameters handler error list' in 
+  let error,handler,list__a = Mvbdu_wrapper.Mvbdu.build_association_list parameters handler error list in 
+  let error,handler,list__c = Mvbdu_wrapper.Mvbdu.build_reverse_sorted_association_list parameters handler error list in 
+  let error,handler,list__a' =Mvbdu_wrapper.Mvbdu.build_association_list parameters handler error list' in 
+  let error,handler,list__b' = Mvbdu_wrapper.Mvbdu.build_sorted_association_list parameters handler error list' in 
   let error,handler,mvbdu = Mvbdu_wrapper.Mvbdu.mvbdu_redefine parameters handler error bmvbdu_true0' list__a in 
 
  (* WRAPPED MVBDU OPTIMIZED *)
@@ -874,12 +874,12 @@ let bdu_test remanent parameters =
   let error,handler,bmvbdu_false32'' = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_nrev_imply parameters handler error bmvbdu_true0'' bmvbdu_false0'' in
   let list = [4,1; 2,2; 1,3] in 
   let list' = [2,2; 4,1; 1,3] in 
-  let error,handler,list___a = Mvbdu_wrapper.Optimized_Mvbdu.build_list parameters handler error list in 
-  let error,handler,list___b = Mvbdu_wrapper.Optimized_Mvbdu.build_sorted_list parameters handler error list in 
-  let error,handler,list___c = Mvbdu_wrapper.Optimized_Mvbdu.build_reverse_sorted_list parameters handler error list in 
-  let error,handler,list___a' =Mvbdu_wrapper.Optimized_Mvbdu.build_list parameters handler error list' in 
-  let error,handler,list___b' =Mvbdu_wrapper.Optimized_Mvbdu.build_sorted_list parameters handler error list' in 
-  let error,handler,list___c' = Mvbdu_wrapper.Optimized_Mvbdu.build_reverse_sorted_list parameters handler error list' in 
+  let error,handler,list___a = Mvbdu_wrapper.Optimized_Mvbdu.build_association_list parameters handler error list in 
+  let error,handler,list___b = Mvbdu_wrapper.Optimized_Mvbdu.build_sorted_association_list parameters handler error list in 
+  let error,handler,list___c = Mvbdu_wrapper.Optimized_Mvbdu.build_reverse_sorted_association_list parameters handler error list in 
+  let error,handler,list___a' =Mvbdu_wrapper.Optimized_Mvbdu.build_association_list parameters handler error list' in 
+  let error,handler,list___b' =Mvbdu_wrapper.Optimized_Mvbdu.build_sorted_association_list parameters handler error list' in 
+  let error,handler,list___c' = Mvbdu_wrapper.Optimized_Mvbdu.build_reverse_sorted_association_list parameters handler error list' in 
   let error,handler,mvbdu = Mvbdu_wrapper.Optimized_Mvbdu.mvbdu_redefine parameters handler error bmvbdu_true0'' list___a in 
 
  (* WRAPPED MVBDU INTERNALIZED *)
@@ -955,9 +955,9 @@ let bdu_test remanent parameters =
   let bmvbdu_false32''' = Mvbdu_wrapper.IntMvbdu.mvbdu_nrev_imply bmvbdu_true0''' bmvbdu_false0''' in
   let list = [4,1; 2,2; 1,3] in 
   let list' = [2,2; 4,1; 1,3] in 
-  let list____a = Mvbdu_wrapper.IntMvbdu.build_list list in 
-  let list____c = Mvbdu_wrapper.IntMvbdu.build_reverse_sorted_list list in 
-  let list____a' =Mvbdu_wrapper.IntMvbdu.build_list list' in 
+  let list____a = Mvbdu_wrapper.IntMvbdu.build_association_list list in 
+  let list____c = Mvbdu_wrapper.IntMvbdu.build_reverse_sorted_association_list list in 
+  let list____a' =Mvbdu_wrapper.IntMvbdu.build_association_list list' in 
   let _ = Mvbdu_wrapper.IntMvbdu.mvbdu_redefine bmvbdu_true0''' list____a in 
 
  (* WRAPPED MVBDU INTERNALISED & OPTIMIZED *)
@@ -1033,9 +1033,9 @@ let bdu_test remanent parameters =
   let bmvbdu_false32'''' = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_nrev_imply bmvbdu_true0'''' bmvbdu_false0'''' in
   let list = [4,1; 2,2; 1,3] in 
   let list' = [2,2; 4,1; 1,3] in 
-  let list_____a = Mvbdu_wrapper.Optimized_IntMvbdu.build_list list in 
-  let list_____c = Mvbdu_wrapper.Optimized_IntMvbdu.build_reverse_sorted_list list in 
-  let list_____a' =Mvbdu_wrapper.Optimized_IntMvbdu.build_list list' in 
+  let list_____a = Mvbdu_wrapper.Optimized_IntMvbdu.build_association_list list in 
+  let list_____c = Mvbdu_wrapper.Optimized_IntMvbdu.build_reverse_sorted_association_list list in 
+  let list_____a' =Mvbdu_wrapper.Optimized_IntMvbdu.build_association_list list' in 
   let _ = Mvbdu_wrapper.Optimized_IntMvbdu.mvbdu_redefine bmvbdu_true0'''' list_____a in 
 
 

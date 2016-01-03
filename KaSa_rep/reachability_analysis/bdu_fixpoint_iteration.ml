@@ -616,7 +616,7 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
         (*JF: the list should not be built each time, it should be stored
           with the rest of static information*)
         let error, handler, list_a =
-          Mvbdu_wrapper.Mvbdu.build_list
+          Mvbdu_wrapper.Mvbdu.build_association_list
             parameter
             handler
             error
@@ -722,7 +722,7 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
         (* JF: the list should not be built each time, it should be stored
            with the rest of static information *)
         let error,handler,list =
-          Mvbdu_wrapper.Mvbdu.build_list
+          Mvbdu_wrapper.Mvbdu.build_association_list
             parameter
 	    handler
 	    error

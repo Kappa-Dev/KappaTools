@@ -196,7 +196,7 @@ let init_remanent parameters error =
   error,{
     Memo_sig.data = data;
     Memo_sig.mvbdu_dictionary = D_mvbdu_skeleton.init ();
-    Memo_sig.list_dictionary = D_list_skeleton.init ();
+    Memo_sig.association_list_dictionary = D_list_skeleton.init ();
     Memo_sig.print_skel = print_skeleton ;
     Memo_sig.print_cell = print_cell ;
     Memo_sig.print_mvbdu = print_mvbdu
@@ -514,9 +514,9 @@ let boolean_mvbdu_nsnd parameters =
        (fun x -> x.Memo_sig.data.boolean_mvbdu_nsnd)
        (fun x h -> {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_nsnd = x}}))
     
-let list_allocate parameters = 
+let association_list_allocate parameters = 
   (fun error b c d e (old_handler:('a,mvbdu_dic,list_dic,'c,'d) Memo_sig.handler) -> 
-    let old_dictionary = old_handler.Memo_sig.list_dictionary in 
+    let old_dictionary = old_handler.Memo_sig.association_list_dictionary in 
     let error,output =
       D_list_skeleton.allocate 
         parameters 

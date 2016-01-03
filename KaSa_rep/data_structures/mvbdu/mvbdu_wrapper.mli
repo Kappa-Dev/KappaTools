@@ -2,7 +2,7 @@ module type Mvbdu =
   sig
     type handler = (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.list_dic,bool,int) Memo_sig.handler
     type mvbdu
-    type hconsed_list
+    type hconsed_association_list
     type 'output constant = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> Exception.method_handler * handler * 'output
     type ('input,'output) unary =  Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input -> Exception.method_handler * handler * 'output
     type ('input1,'input2,'output) binary = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input1 -> 'input2 -> Exception.method_handler * handler * 'output
@@ -33,20 +33,20 @@ module type Mvbdu =
     val mvbdu_snd: (mvbdu,mvbdu,mvbdu) binary 
     val mvbdu_nfst: (mvbdu,mvbdu,mvbdu) binary 
     val mvbdu_nsnd: (mvbdu,mvbdu,mvbdu) binary 
-    val mvbdu_redefine: (mvbdu,hconsed_list,mvbdu) binary 
+    val mvbdu_redefine: (mvbdu,hconsed_association_list,mvbdu) binary 
     val mvbdu_cartesian_abstraction: (mvbdu,mvbdu list) unary 
-    val build_list: ((int * int) list,hconsed_list) unary  
-    val build_sorted_list: ((int * int) list,hconsed_list) unary
-    val build_reverse_sorted_list: ((int * int) list,hconsed_list) unary
-    val empty_list : hconsed_list constant
+    val build_association_list: ((int * int) list,hconsed_association_list) unary  
+    val build_sorted_association_list: ((int * int) list,hconsed_association_list) unary
+    val build_reverse_sorted_association_list: ((int * int) list,hconsed_association_list) unary
+    val empty_association_list : hconsed_association_list constant
     val print: out_channel -> string -> mvbdu -> unit 
-    val print_list: out_channel -> string -> hconsed_list -> unit 
+    val print_association_list: out_channel -> string -> hconsed_association_list -> unit 
   end
   
 module type Internalized_mvbdu =
   sig
     type mvbdu
-    type hconsed_list
+    type hconsed_association_list
     val init: Remanent_parameters_sig.parameters -> unit 
     val is_init: unit -> bool 
     val equal: mvbdu -> mvbdu -> bool 
@@ -72,14 +72,14 @@ module type Internalized_mvbdu =
     val mvbdu_snd:  mvbdu -> mvbdu -> mvbdu 
     val mvbdu_nfst:  mvbdu -> mvbdu -> mvbdu 
     val mvbdu_nsnd:  mvbdu -> mvbdu -> mvbdu 
-    val mvbdu_redefine:  mvbdu -> hconsed_list -> mvbdu
+    val mvbdu_redefine:  mvbdu -> hconsed_association_list -> mvbdu
     val mvbdu_cartesian_abstraction: mvbdu -> mvbdu list
-    val build_list: (int * int) list ->  hconsed_list 
-    val build_sorted_list: (int * int) list -> hconsed_list
-    val build_reverse_sorted_list: (int * int) list -> hconsed_list
-    val empty_list : unit -> hconsed_list
+    val build_association_list: (int * int) list ->  hconsed_association_list 
+    val build_sorted_association_list: (int * int) list -> hconsed_association_list
+    val build_reverse_sorted_association_list: (int * int) list -> hconsed_association_list
+    val empty_association_list : unit -> hconsed_association_list
     val print: out_channel -> string -> mvbdu -> unit 
-    val print_list: out_channel -> string -> hconsed_list -> unit 
+    val print_association_list: out_channel -> string -> hconsed_association_list -> unit 
   end
 
 module type Nul = 

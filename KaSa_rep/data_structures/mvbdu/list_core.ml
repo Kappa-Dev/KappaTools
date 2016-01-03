@@ -43,11 +43,11 @@ let build_list (allocate:('a,'b,'c) Sanity_test_sig.g) error handler skeleton ce
 let id_of_list x = x.List_sig.id 
 
 let update_dictionary handler dictionary = 
-  if handler.Memo_sig.list_dictionary == dictionary 
+  if handler.Memo_sig.association_list_dictionary == dictionary 
   then 
     handler 
   else  
-    {handler with Memo_sig.list_dictionary = dictionary}
+    {handler with Memo_sig.association_list_dictionary = dictionary}
 
 let rec print_list error print_empty string_of_var string_of_value (parameters:Remanent_parameters_sig.parameters) list = 
   match list.List_sig.value with 

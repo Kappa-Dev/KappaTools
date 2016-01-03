@@ -99,7 +99,7 @@ let collect_remanent_triple parameter error store_remanent store_result =
 let build_bdu parameter handler error pair_list =
   let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in
   let error, handler, list_a =
-    Mvbdu_wrapper.Mvbdu.build_list
+    Mvbdu_wrapper.Mvbdu.build_association_list
       parameter
       handler
       error
@@ -489,7 +489,7 @@ let collect_modif_list_restriction_map
 		  (*-----------------------------------------------------------------*)
 		  (*build list_a here*)
 		  let error, handler, list_a =
-		    Mvbdu_wrapper.Mvbdu.build_list
+		    Mvbdu_wrapper.Mvbdu.build_association_list
 		      parameter
 		      handler
 		      error

@@ -66,7 +66,7 @@ let remanent parameters =
       match x with 
         | true -> 
           (fun error b c (d:int List_sig.cell) (e:int -> int List_sig.list) old_handler -> 
-            let old_dictionary = old_handler.Memo_sig.list_dictionary in 
+            let old_dictionary = old_handler.Memo_sig.association_list_dictionary in 
             let error,output =
               Boolean_mvbdu.D_list_skeleton.allocate_uniquely
                 parameters 
@@ -83,7 +83,7 @@ let remanent parameters =
                 Some (i, a, b, List_core.update_dictionary old_handler new_dic))
         | false -> 
           (fun error b c d e old_handler -> 
-            let old_dictionary = old_handler.Memo_sig.list_dictionary in 
+            let old_dictionary = old_handler.Memo_sig.association_list_dictionary in 
             let error,output =
               Boolean_mvbdu.D_list_skeleton.allocate
                 parameters
