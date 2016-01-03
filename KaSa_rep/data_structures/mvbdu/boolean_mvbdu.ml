@@ -20,17 +20,23 @@ let invalid_arg parameters mh message exn value =
      Exception.warn parameters mh (Some "Mvbdu_bool") message exn (fun () -> value)
   
 module Mvbdu_Skeleton = 
-struct
-  type t = bool Mvbdu_sig.skeleton
-  let (compare:t->t -> int) = compare 
-end 
-     
-module List_Skeleton = 
-struct 
-  type t = int List_sig.skeleton
-  let (compare:t->t->int) = compare 
-end 
-  
+  struct
+    type t = bool Mvbdu_sig.skeleton
+    let (compare:t->t -> int) = compare 
+  end 
+    
+module Association_List_Skeleton = 
+  struct 
+    type t = int List_sig.skeleton
+    let (compare:t->t->int) = compare 
+  end
+    
+module Variables_List_Skeleton =
+  struct
+    type t = unit List_sig.skeleton
+    let (compare:t->t->int) = compare
+  end
+      
 module Hash_key = 
 struct 
   type t = int 
@@ -41,10 +47,14 @@ module D_mvbdu_skeleton =
   (Dictionary.Dictionary_of_Ord (Mvbdu_Skeleton):Dictionary.Dictionary 
    with type value = bool Mvbdu_sig.skeleton)
 
-module D_list_skeleton =
-  (Dictionary.Dictionary_of_Ord (List_Skeleton):Dictionary.Dictionary 
+module D_Association_list_skeleton =
+  (Dictionary.Dictionary_of_Ord (Association_List_Skeleton):Dictionary.Dictionary 
    with type value = int List_sig.skeleton) 
-                                                                        
+
+module D_Variables_list_skeleton =
+  (Dictionary.Dictionary_of_Ord (Variables_List_Skeleton):Dictionary.Dictionary 
+   with type value = unit List_sig.skeleton)
+    
 module Hash_1 = Int_storage.Nearly_inf_Imperatif
 module Hash_2 = Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif
   
@@ -70,12 +80,14 @@ type memo_tables =
     boolean_mvbdu_nsnd        : bool Mvbdu_sig.mvbdu Hash_2.t;
     boolean_mvbdu_clean_head  : bool Mvbdu_sig.mvbdu Hash_1.t;
     boolean_mvbdu_keep_head_only: bool Mvbdu_sig.mvbdu Hash_1.t;
-    boolean_mvbdu_redefine    : bool Mvbdu_sig.mvbdu Hash_2.t;  
+    boolean_mvbdu_redefine    : bool Mvbdu_sig.mvbdu Hash_2.t;
+    boolean_mvbdu_project_keep_only: bool Mvbdu_sig.mvbdu Hash_2.t;
+    boolean_mvbdu_project_abstract_away: bool Mvbdu_sig.mvbdu Hash_2.t;
   }
 
 type mvbdu_dic = (bool Mvbdu_sig.cell, bool Mvbdu_sig.mvbdu) D_mvbdu_skeleton.dictionary
-type association_list_dic  = (int List_sig.cell, int List_sig.list) D_list_skeleton.dictionary
-type variables_list_dic = (unit List_sig.cell, unit List_sig.list) D_list_skeleton.dictionary					
+type association_list_dic  = (int List_sig.cell, int List_sig.list) D_Association_list_skeleton.dictionary
+type variables_list_dic = (unit List_sig.cell, unit List_sig.list) D_Variables_list_skeleton.dictionary					
 type handler   = (memo_tables, mvbdu_dic, association_list_dic, variables_list_dic, bool, int) Memo_sig.handler  
   
 type unary_memoized_fun = 
@@ -110,7 +122,10 @@ let split_memo error handler =
     "not fst:", x.boolean_mvbdu_nfst;
     "snd:",     x.boolean_mvbdu_snd;
     "not snd:", x.boolean_mvbdu_nsnd; 
-    "reset:",   x.boolean_mvbdu_redefine]
+    "reset:",   x.boolean_mvbdu_redefine;
+    "project_onto:", x.boolean_mvbdu_project_keep_only;
+    "project_away:", x.boolean_mvbdu_project_abstract_away;
+  ]
   
 let rec print_cell log prefix cell = 
   match cell with 
@@ -170,6 +185,8 @@ let init_data parameters error =
   let error,mvbdu_nimply = Hash_2.create parameters error (0,0) in 
   let error,mvbdu_nis_implied = Hash_2.create parameters error (0,0) in
   let error,mvbdu_redefine = Hash_2.create parameters error (0,0) in 
+  let error,mvbdu_project_keep_only = Hash_2.create parameters error (0,0) in
+  let error,mvbdu_project_abstract_away = Hash_2.create parameters error (0,0) in
   error,
     {
       boolean_mvbdu_clean_head = mvbdu_clean_head ;
@@ -190,7 +207,9 @@ let init_data parameters error =
       boolean_mvbdu_imply = mvbdu_imply;
       boolean_mvbdu_nis_implied = mvbdu_nis_implied; 
       boolean_mvbdu_nimply = mvbdu_nimply;
-      boolean_mvbdu_redefine = mvbdu_redefine; 
+      boolean_mvbdu_redefine = mvbdu_redefine;
+      boolean_mvbdu_project_keep_only = mvbdu_project_keep_only;
+      boolean_mvbdu_project_abstract_away = mvbdu_project_abstract_away;
     }
     
 let init_remanent parameters error =
@@ -198,8 +217,8 @@ let init_remanent parameters error =
   error,{
     Memo_sig.data = data;
     Memo_sig.mvbdu_dictionary = D_mvbdu_skeleton.init ();
-    Memo_sig.association_list_dictionary = D_list_skeleton.init ();
-    Memo_sig.variables_list_dictionary = D_list_skeleton.init ();
+    Memo_sig.association_list_dictionary = D_Association_list_skeleton.init ();
+    Memo_sig.variables_list_dictionary = D_Variables_list_skeleton.init ();
     Memo_sig.print_skel = print_skeleton ;
     Memo_sig.print_cell = print_cell ;
     Memo_sig.print_mvbdu = print_mvbdu
@@ -521,7 +540,7 @@ let association_list_allocate parameters =
   (fun error b c d e (old_handler:('a,mvbdu_dic,association_list_dic,variables_list_dic,'c,'d) Memo_sig.handler) -> 
     let old_dictionary = old_handler.Memo_sig.association_list_dictionary in 
     let error,output =
-      D_list_skeleton.allocate 
+      D_Association_list_skeleton.allocate 
         parameters 
         error
         b

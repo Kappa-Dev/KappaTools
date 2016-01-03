@@ -68,7 +68,7 @@ let remanent parameters =
           (fun error b c (d:int List_sig.cell) (e:int -> int List_sig.list) old_handler -> 
             let old_dictionary = old_handler.Memo_sig.association_list_dictionary in 
             let error,output =
-              Boolean_mvbdu.D_list_skeleton.allocate_uniquely
+              Boolean_mvbdu.D_Association_list_skeleton.allocate_uniquely
                 parameters 
                 error
                 b 
@@ -85,7 +85,7 @@ let remanent parameters =
           (fun error b c d e old_handler -> 
             let old_dictionary = old_handler.Memo_sig.association_list_dictionary in 
             let error,output =
-              Boolean_mvbdu.D_list_skeleton.allocate
+              Boolean_mvbdu.D_Association_list_skeleton.allocate
                 parameters
                 error 
                 b 
