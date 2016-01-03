@@ -657,7 +657,7 @@ let pretty_print parameter handler log_info error env config_closure compression
 	     Format.fprintf
 	       desc "@[/* Compressed causal flows were:@ [%a] */@]"
 	       (Pp.list (fun f -> Format.fprintf f ";@,")
-			Format.pp_print_int) ids
+			Format.pp_print_int) ids (* Pp.list can raise a Stack_overflow if the list is large, what should we use instead ? *)
 	   in
 	   Kappa_files.with_cflow_file
 	     [compression_type;string_of_int cpt] "dot"
@@ -674,7 +674,7 @@ let pretty_print parameter handler log_info error env config_closure compression
 	     Format.fprintf
 	       desc "@ <dd>[@[%a@]]</dd>@]@,</dl>"
 	       (Pp.list (fun f -> Format.fprintf f ";@,")
-			Format.pp_print_int) ids;
+			Format.pp_print_int) ids;  (* Pp.list can raise a Stack_overflow if the list is large, what should we use instead ? *)
 	   in
 	   
 	   Kappa_files.with_cflow_file

@@ -320,7 +320,6 @@ let compress_and_print logger env log_info step_list =
 							let error,log_info,story_list =
 							  List.fold_left
 							    (fun (error,log_info,story_list) trace -> 
-							     let list_info = List.map (Mods.update_profiling_info (U.copy_log_info log_info)) list_info in  
 							     U.store_trace parameter handler log_info error trace list_info story_list)
 							    (error,log_info,story_list)
 							    list
@@ -355,7 +354,6 @@ let compress_and_print logger env log_info step_list =
                           | _ -> 
 			     List.fold_left
 			       (fun (error,log_info,strong_story_table) list -> 
-				let list_info = List.map (Mods.update_profiling_info (U.copy_log_info log_info)) list_info in  
 				U.store_trace parameter handler log_info error list list_info strongly_story_table) 
 			       (error,log_info,strongly_story_table)
 			       list 

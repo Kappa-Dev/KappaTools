@@ -29,7 +29,7 @@ ____________________________________________________________
 
 ____________________________________________________________
 ################################
-	 - Removing visited obersvable hits last eid 26 
+	 - Removing already visited observable hits last eid 26 
 (-26 events)
 	 - detecting siphons (+60 events)
 	 - cutting concurrent events (-60 events)

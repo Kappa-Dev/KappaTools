@@ -280,7 +280,7 @@ let remove_obs_before parameter handler log_info error last_info trace =
   lift_to_care_about_ambiguities
     (transform_trace_gen
        (fun parameter handler log_info error -> remove_obs_before parameter handler  log_info error last_info)
-       (Some "\t - Removing visited obersvable hits")
+       (Some "\t - Removing already visited observable hits")
        "Trace after having removed seen observable hits\n"
        StoryProfiling.Partial_order_reduction)
     Do_not_care
@@ -510,9 +510,9 @@ let store_trace
   let error,computation_info,grid = build_grid parameter handler computation_info error trace2 bool in
   let computation_info  = P.set_grid_generation  computation_info in 
   let story_info = 
-    List.map 
+    List.rev_map 
       (Mods.update_profiling_info (P.copy computation_info))
-      obs_info 
+      (List.rev obs_info) 
   in
   let error,computation_info,story_list = D.add_story parameter handler computation_info error grid pretrace story_info story_table.story_list in 
   let story_table = 
