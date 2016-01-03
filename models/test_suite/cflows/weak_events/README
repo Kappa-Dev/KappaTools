@@ -1,5 +1,5 @@
 #Command-line:
-"${KAPPABIN}"KaSim -i weak_events.ka -seed 924556145 -e 100 -d output || exit 0 
+"${KAPPABIN}"KaSim -i weak_events.ka -seed 924556145 -e 100 -d output --time-independent || exit 0 
 
 #This is the classical abc model. 
 #3 stories are expected, but one is very unlikely.
