@@ -6,17 +6,16 @@ env:
   global:
     secure: bZcUIoyDu8tL8xyO6FL8JjfpRQe2QzzdKav7/V68NVjRxVNuc6FPc+VTchaVtKAfo7iVxjk0krUpyOeQujY3j8uL+ePs7dswGDHY/9trTyGws7NvcCzH+UrR5Yn2TM6I6ill5eHiBiW9W1/eX+K8UiSd/Usk9gZeBjJyz76tZh4=
 
-addons:
-  apt:
-    sources:
-    - avsm
-    packages:
-    - ocaml-nox
-    - opam
-
 matrix:
   include:
   - env: CHECKED=js
+  addons:
+    apt:
+      sources:
+        - avsm
+      packages:
+        - ocaml-nox
+        - opam
   - env: USE_TK=1
     addons:
       apt:
@@ -39,6 +38,10 @@ matrix:
           - latex-xcolor
           - texlive-latex-recommended
           - tex4ht
+  - os: osx
+
+before_install:
+  - sh -c "if [ '$TRAVIS_OS_NAME' = osx ] : then brew update ; brew outdated opam || brew upgrade opam ; fi"
 
 install:
   - opam init -a git://github.com/ocaml/opam-repository && eval $(opam config env)
