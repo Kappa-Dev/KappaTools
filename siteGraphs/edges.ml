@@ -82,11 +82,15 @@ let link_exists ag s ag' s' (t,_,_,_) =
   | Edge.ToFree -> false
 
 let exists_fresh ag s ty s' (t,_,_,_) =
-  match Int2Map.find_option (ag,s) t with
-  | Some (Edge.Link (ty',ag',s'')) ->
+  match Int2Map.find_default Edge.ToFree (ag,s) t with
+  | Edge.Link (ty',ag',s'') ->
     if ty'=ty && s'=s'' then Some ag' else None
-  | Some Edge.ToFree -> None
-  | None -> None
+  | Edge.ToFree -> None
+
+let link_destination ag s (t,_,_,_) =
+  match Int2Map.find_default Edge.ToFree (ag,s) t with
+  | Edge.Link (ty',ag',s') -> Some ((ag',ty'),s')
+  | Edge.ToFree -> None
 
 (** The snapshot machinery *)
 let one_connected_component sigs ty node graph =

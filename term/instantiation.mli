@@ -53,8 +53,10 @@ val rename_abstract_side_effect:
   (Agent_place.t * 'a) * Agent_place.t binding_state ->
   (Agent_place.t * 'a) * Agent_place.t binding_state
 val concretize_test : (Agent_place.t -> int) -> abstract test -> concrete test
-val concretize_action : (Agent_place.t -> int) -> abstract action -> concrete action
-val concretize_event : (Agent_place.t -> int) -> abstract event -> concrete event
+val concretize_action :
+  (Agent_place.t -> int) -> abstract action -> concrete action
+val concretize_event :
+  (Agent_place.t -> int) -> abstract event -> concrete event
 
 val subst_map_agent_in_concrete_test :
   (int -> int) -> concrete test -> concrete test
@@ -73,7 +75,7 @@ val subst_agent_in_concrete_side_effect:
 val subst_map_agent_in_concrete_event:
   (int -> int) -> concrete event -> concrete event
 val subst_map2_agent_in_concrete_event:
-  (int -> int) -> (int -> int) -> concrete event -> concrete event 
+  (int -> int) -> (int -> int) -> concrete event -> concrete event
 val subst_agent_in_concrete_event:
   int -> int -> concrete event -> concrete event
 

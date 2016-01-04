@@ -4,6 +4,7 @@ module Transformation =
       | Agent of Agent_place.t
       | Freed of Agent_place.t * int
       | Linked of (Agent_place.t * int) * (Agent_place.t * int)
+      | NegativeWhatEver of Agent_place.t * int
       | PositiveInternalized of Agent_place.t * int * int
       | NegativeInternalized of Agent_place.t * int
 
@@ -11,6 +12,9 @@ module Transformation =
       | Freed (p,s) as x ->
 	 let p' = Agent_place.rename wk id cc inj p in
 	 if p == p' then x else Freed (p',s)
+      | NegativeWhatEver (p,s) as x ->
+	 let p' = Agent_place.rename wk id cc inj p in
+	 if p == p' then x else NegativeWhatEver (p',s)
       | Linked ((p1,s1),(p2,s2)) as x ->
 	 let p1' = Agent_place.rename wk id cc inj p1 in
 	 let p2' = Agent_place.rename wk id cc inj p2 in
@@ -32,6 +36,10 @@ module Transformation =
 	 Format.fprintf
 	   f "@[%a.%a = %t@]" (Agent_place.print ?sigs) p
 	   (Agent_place.print_site ?sigs p) s Pp.bottom
+      | NegativeWhatEver (p,s) ->
+	 Format.fprintf
+	   f "@[%a.%a = ???@]" (Agent_place.print ?sigs) p
+	   (Agent_place.print_site ?sigs p) s
       | Linked ((p1,s1),(p2,s2)) ->
 	 Format.fprintf
 	   f "@[%a.%a = %a.%a@]"

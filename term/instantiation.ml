@@ -133,7 +133,7 @@ let subst_map2_agent_in_action f f' = function
      if agent==agent' then x else Remove agent'
 
 let subst_map_agent_in_action f x = subst_map2_agent_in_action f f x
-							       
+
 let subst_map_agent_in_concrete_action f x =
   subst_map_agent_in_action (subst_map_concrete_agent f) x
 let subst_agent_in_concrete_action id id' x =
@@ -172,8 +172,8 @@ let subst_map2_agent_in_event f f' (tests,(acs,kasa_side,kasim_side)) =
 let subst_map_agent_in_concrete_event f x =
   subst_map_agent_in_event (subst_map_concrete_agent f) x
 let subst_map2_agent_in_concrete_event f f' x =
-  subst_map2_agent_in_event (subst_map_concrete_agent f) (subst_map_concrete_agent f') x
-
+  subst_map2_agent_in_event
+    (subst_map_concrete_agent f) (subst_map_concrete_agent f') x
 
 let subst_agent_in_concrete_event id id' x =
   subst_map_agent_in_concrete_event

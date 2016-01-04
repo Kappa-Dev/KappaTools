@@ -40,6 +40,9 @@ val link_exists : int -> int -> int -> int -> t -> bool
 val exists_fresh : int -> int -> int -> int -> t -> int option
 (** [exists_fresh ag1 site1 type_of_ag2 site2 graph] *)
 
+val link_destination : int -> int -> t -> (agent * int) option
+(** [link_destination ag site graph] *)
+
 type path = ((agent * int) * (agent * int)) list
 val empty_path : path
 

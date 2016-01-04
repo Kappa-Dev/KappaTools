@@ -7,6 +7,7 @@ sig
     | Agent of Agent_place.t
     | Freed of Agent_place.t * int
     | Linked of (Agent_place.t * int) * (Agent_place.t * int)
+    | NegativeWhatEver of Agent_place.t * int
     | PositiveInternalized of Agent_place.t * int * int
     | NegativeInternalized of Agent_place.t * int
 
