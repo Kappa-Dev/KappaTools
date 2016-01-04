@@ -1,5 +1,5 @@
 #Command-line:
-"${KAPPABIN}"KaSim -i link_passing_strong4.ka -seed 924556145 -e 10000 -d output || exit 0 
+"${KAPPABIN}"KaSim -i link_passing_strong4.ka -seed 924556145 -e 10000 -d output --time-independent || exit 0 
 
 #In this model K can connect to A on x. 
 #Then the link can be pass from A.x to A.y, and from A.y to A.z. 

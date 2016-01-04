@@ -1,5 +1,5 @@
 #Command-line:
-"${KAPPABIN}"KaSim -i agents_without_sites.ka -seed 924556145 -e 10000 -d output -p 50 || exit 0
+"${KAPPABIN}"KaSim -i agents_without_sites.ka -seed 924556145 -e 10000 -d output -p 50 --time-independent || exit 0
 
 #Here we test a classical network (agents have no site).
 #There is only one causal flow. 
