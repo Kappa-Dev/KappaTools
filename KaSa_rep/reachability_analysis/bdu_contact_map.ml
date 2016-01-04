@@ -138,18 +138,18 @@ let compute_contact_map parameter error rule store_result =
     let error, agent1 =
       match AgentMap.get parameter error agent_index1 rule.rule_rhs.views
       with
-      | error, None ->  exit 0
+      | error, None -> warn parameter error (Some "line 141") Exit Ghost
       | error, Some agent -> error, agent
     in
     let error, agent2 =
       match AgentMap.get parameter error agent_index2 rule.rule_rhs.views
       with
-      | error, None -> exit 0
+      | error, None -> warn parameter error (Some "line 147") Exit Ghost
       | error, Some agent -> error, agent
     in
     match agent1, agent2 with
     | Unknown_agent _, Unknown_agent _ | Dead_agent _, Dead_agent _ ->
-      warn parameter error (Some "") Exit store_result
+      warn parameter error (Some "line 152") Exit store_result
     | (Agent _, (Ghost|Dead_agent _|Unknown_agent _))
     | (Ghost, (Agent _|Dead_agent _|Unknown_agent _))
     | (Dead_agent _, (Ghost|Agent _|Unknown_agent _))
