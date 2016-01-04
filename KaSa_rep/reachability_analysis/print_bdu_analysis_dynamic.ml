@@ -27,7 +27,7 @@ let trace = false
 (************************************************************************************)
 (*syntactic contact map*)
 
-let print_contact_map_aux parameter error result =
+(*let print_contact_map_aux parameter error result =
   let b, result1 = result in
   fprintf stdout "A bond is discovered for the first time:%b\n" b;
   Int2Map_syn.Map.iter (fun rule_id set ->
@@ -41,6 +41,34 @@ let print_contact_map parameter error result =
     "\n------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
     "(Syntactic) Contact map (only considering rhs) and initital state:\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "Sites are annotated with the id of binding type:\n";
+  let error =
+    print_contact_map_aux
+      parameter
+      error
+      result
+  in
+  error*)
+
+(*TODO*)
+
+let print_contact_map_aux parameter error result =
+  Int2Map_CM_Syntactic.Map.iter (fun set1 set2 ->
+    Set_triple.Set.iter (fun (agent1, site1, state1) ->
+      Set_triple.Set.iter (fun (agent2, site2, state2) ->
+        fprintf stdout "agent_type:%i@site_type:%i:state:%i--agent_type':%i@site_type':%i:state':%i\n" agent1 site1 state1 agent2 site2 state2
+      ) set2
+    )set1
+  ) result    
+
+let print_contact_map parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "\n------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "(Syntactic) Contact map and initital state:\n";
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
@@ -114,7 +142,7 @@ let print_covering_classes_modification parameter error result =
 (************************************************************************************)
 (*update(c'), when discovered a bond for the first time*)
 
-let print_covering_classes_modification_side_effects_aux parameter error result =
+(*let print_covering_classes_modification_side_effects_aux parameter error result =
   Int2Map_CV_Modif.Map.iter
     ( fun (x, y) (_, s2) ->
       let _ =
@@ -137,7 +165,7 @@ let print_covering_classes_modification_side_effects parameter error result =
   print_covering_classes_modification_side_effects_aux
     parameter
     error
-    result
+    result*)
 
 (************************************************************************************)
 (*main print*)
@@ -153,6 +181,13 @@ let print_result_dynamic parameter error result =
       result.store_contact_map_full
   in
   (*------------------------------------------------------------------------------*)
+  (*let _ =
+    print_contact_map
+      parameter
+      error
+      result.store_contact_map
+  in*)
+  (*TODO*)
   let _ =
     print_contact_map
       parameter
@@ -167,10 +202,10 @@ let print_result_dynamic parameter error result =
       result.store_covering_classes_modification_update
   in
   (*------------------------------------------------------------------------------*)
-  let _ =
+  (*let _ =
     print_covering_classes_modification_side_effects
       parameter
       error
       result.store_covering_classes_modification_update_side_effects
-  in
+  in*)
   error

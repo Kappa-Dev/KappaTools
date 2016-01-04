@@ -116,12 +116,12 @@ module Int2Map_pair =
       let compare = compare
     end )
 
-module Int2Map_syn =
+(*module Int2Map_syn =
   SetMap.Make (
     struct
       type t = int
       let compare = compare
-    end )
+    end )*)
 
 module Set_triple =
   SetMap.Make (
@@ -147,6 +147,13 @@ module Int2Map_CV_Modif =
       let compare = compare
     end)
 
+(*todo*)
+module Int2Map_CM_Syntactic =
+  SetMap.Make 
+    (struct 
+        type t = Set_triple.Set.t
+        let compare = compare
+      end)
 
 (************************************************************************************)
 (*type bdu_build_map:
@@ -379,11 +386,12 @@ type wl_int = IntWL.WSetMap.elt list * IntWL.WSetMap.elt list * IntWL.WSetMap.Se
 type bdu_analysis_dynamic =
   {
     store_contact_map_full : Set_triple.Set.t Int2Map_CM_state.Map.t;
-    store_contact_map :  bool * Set_pair.Set.t Int2Map_syn.Map.t;
+    (*store_contact_map :  bool * Set_pair.Set.t Int2Map_syn.Map.t;*)
+    store_contact_map : Set_triple.Set.t Int2Map_CM_Syntactic.Map.t;
     store_covering_classes_modification_update : (*update(c)*)
       (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;
-    store_covering_classes_modification_update_side_effects :
-      (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;
+    (*store_covering_classes_modification_update_side_effects :
+      (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;*)
   }
 
 (************************************************************************************)
@@ -401,25 +409,21 @@ type bdu_build =
       Mvbdu_wrapper.Mvbdu.mvbdu Map_agent_type_creation_bdu.Map.t
       Map_final_creation_bdu.Map.t;
     store_bdu_init_restriction_map: Mvbdu_wrapper.Mvbdu.mvbdu Map_bdu_update.Map.t;
-
-    (*TODO*)
     store_modif_list_restriction_map: 
-      (*Mvbdu_wrapper.Mvbdu.hconsed_list Map_modif_list.Map.t;*)
-      ((int * int) list) Map_modif_list.Map.t;
+      Mvbdu_wrapper.Mvbdu.hconsed_association_list list Map_modif_list.Map.t;
     store_proj_modif_list_restriction_map: 
-      (*Mvbdu_wrapper.Mvbdu.hconsed_list Map_agent_id_modif_list.Map.t
-      Map_final_modif_list.Map.t;*)
-      ((int * int) list) Map_agent_id_modif_list.Map.t Map_final_modif_list.Map.t;
-
+      Mvbdu_wrapper.Mvbdu.hconsed_association_list list Map_agent_id_modif_list.Map.t
+      Map_final_modif_list.Map.t;
     store_bdu_potential_effect_restriction_map : 
       Mvbdu_wrapper.Mvbdu.mvbdu Map_potential_bdu.Map.t;
     store_proj_bdu_potential_restriction_map :
       Mvbdu_wrapper.Mvbdu.mvbdu Map_agent_type_potential_bdu.Map.t
       Map_final_potential_bdu.Map.t;
     store_potential_list_restriction_map :
-      (int * int) list Map_potential_list.Map.t;
+      Mvbdu_wrapper.Mvbdu.hconsed_association_list list Map_potential_list.Map.t;
     store_proj_potential_list_restriction_map :
-      (int * int) list Map_agent_type_potential_list.Map.t Map_final_potential_list.Map.t;
+      Mvbdu_wrapper.Mvbdu.hconsed_association_list list 
+      Map_agent_type_potential_list.Map.t Map_final_potential_list.Map.t;
     store_proj_bdu_views :
       Mvbdu_wrapper.Mvbdu.mvbdu Map_triple_views.Map.t Map_rule_id_views.Map.t;
   }

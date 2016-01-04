@@ -285,21 +285,12 @@ rule_id:4
 Sites are annotated with the id of binding type:
 
 ------------------------------------------------------------
-(Syntactic) Contact map (only considering rhs) and initital state:
+(Syntactic) Contact map and initital state:
 ------------------------------------------------------------
 Sites are annotated with the id of binding type:
-A bond is discovered for the first time:false
 
 ------------------------------------------------------------
 List of rules to awake when the state of a site is modified and tested:
-------------------------------------------------------------
-agent_type:3:covering_class_id:0:@set of rule_id:
-rule_id:3
-agent_type:5:covering_class_id:0:@set of rule_id:
-rule_id:4
-
-------------------------------------------------------------
-List of rules to awake when discovered sites that are bond on the rhs for the first time:
 ------------------------------------------------------------
 agent_type:3:covering_class_id:0:@set of rule_id:
 rule_id:3
@@ -443,7 +434,7 @@ Id=3
 - List for update of the views due to modification (projection per rule):
 
 ------------------------------------------------------------
-- Bdu fpr the valuation of the views that are tested (projection per rule):
+- Bdu for the valuation of the views that are tested (projection per rule):
 rule_id:1
 agent_id:0:agent_type:0:cv_id:0
 Id=0
@@ -476,7 +467,7 @@ Id=0
 in add_update_to_wl:agent_type:0:cv_id:0
 Test for rule:1
 enabled
-Ag:0 Type: 0 Cvid: 0
+Ag:0 Type:0 Cv_id:0
 Ag:0
 Nothing has changed
 Ag:1
@@ -487,7 +478,7 @@ Id=0
 in add_update_to_wl:agent_type:1:cv_id:0
 Test for rule:2
 enabled
-Ag:0 Type: 1 Cvid: 0
+Ag:0 Type:1 Cv_id:0
 Ag:1
 Nothing has changed
 Ag:2
@@ -498,7 +489,7 @@ Id=0
 in add_update_to_wl:agent_type:2:cv_id:0
 Test for rule:3
 enabled
-Ag:0 Type: 2 Cvid: 0
+Ag:0 Type:2 Cv_id:0
 Ag:2
 Nothing has changed
 Ag:3
@@ -523,7 +514,7 @@ Test for rule:4
 disabled
 Test for rule:3
 enabled
-Ag:0 Type: 2 Cvid: 0
+Ag:0 Type:2 Cv_id:0
 Ag:2
 Nothing has changed
 Ag:3

@@ -119,16 +119,15 @@ let print_init_bdu_map parameter error result =
 
 let print_modif_list_map parameter error result =
   Map_modif_list.Map.iter
-    (fun (agent_id, agent_type, rule_id, cv_id) l2 ->
+    (fun (agent_id, agent_type, rule_id, cv_id) l ->
       let _ =
         fprintf parameter.log 
           "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i\n"
           agent_id agent_type rule_id cv_id
       in
-    (*Mvbdu_wrapper.Mvbdu.print_list parameter.log "" l2*)
-      List.iter (fun (site, state) ->
-        fprintf parameter.log "site_type:%i:state:%i\n" site state
-      ) l2
+      List.iter (fun list_a ->
+        Mvbdu_wrapper.Mvbdu.print_association_list parameter.log "" list_a
+      ) l
     ) result
 
 (*projection*)
@@ -140,9 +139,8 @@ let print_proj_modif_list_map parameter error result =
       Map_agent_id_modif_list.Map.iter
         (fun agent_id l ->
           let _ = fprintf parameter.log "agent_id:%i:\n" agent_id in
-          (*Mvbdu_wrapper.Mvbdu.print_list parameter.log "" l*)
-          List.iter (fun (site, state) ->
-            fprintf parameter.log "site_type:%i:state:%i\n" site state
+          List.iter (fun list_a ->
+            Mvbdu_wrapper.Mvbdu.print_association_list parameter.log "" list_a
           ) l
         ) map_b
     ) result
@@ -186,8 +184,8 @@ let print_potential_list_map parameter error result =
         fprintf parameter.log "agent_type:%i:rule_id:%i:covering_class_id:%i\n"
           agent_type rule_id cv_id
       in
-      List.iter (fun (site, state) ->
-        fprintf parameter.log "site_type:%i:state:%i\n" site state
+      List.iter (fun list_a ->
+        Mvbdu_wrapper.Mvbdu.print_association_list parameter.log "" list_a
       ) l        
     ) result
 
@@ -200,8 +198,9 @@ let print_proj_potential_list_map parameter error result =
       Map_agent_type_potential_list.Map.iter
         (fun agent_type l ->
           let _ = fprintf parameter.log "agent_type:%i\n" agent_type in
-          List.iter (fun (site, state) ->
-            fprintf parameter.log "site_type:%i:state:%i\n" site state
+          List.iter (fun list_a ->
+            Mvbdu_wrapper.Mvbdu.print_association_list parameter.log "" list_a
+            (*fprintf parameter.log "site_type:%i:state:%i\n" site state*)
           ) l
         ) map_b
     ) result
@@ -360,7 +359,7 @@ let print_bdu_build parameter error result =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
-      "- Bdu fpr the valuation of the views that are tested (projection per rule):\n";
+      "- Bdu for the valuation of the views that are tested (projection per rule):\n";
     print_proj_bdu_views
       parameter
       error

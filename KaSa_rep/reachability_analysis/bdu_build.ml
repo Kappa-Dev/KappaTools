@@ -116,13 +116,7 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
     store_remanent_triple store_result =
   let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in
   let add_link (agent_id, agent_type, rule_id, cv_id) bdu store_result =
-  (*  let error, old_bdu =
-      match
-        Map_test_bdu.Map.find_option (agent_id, agent_type, rule_id, cv_id) store_result 
-      with
-      | None -> error, bdu_true (*default value if there is no test in the rule*)
-      | Some bdu -> error, bdu
-    in*) (* JF: add_link should assign views uniquely *)
+    (* JF: add_link should assign views uniquely *)
     let result_map =
       Map_test_bdu.Map.add (agent_id, agent_type, rule_id, cv_id) bdu store_result
     in
@@ -168,11 +162,13 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
                     error, map_res
 		  ) set agent.agent_interface Site_map_and_set.Map.empty
               in
-	      let error = Exception.check warn parameter error error' (Some "line 132") Exit in
-              error, (cv_id,map_res) :: current_list)
+	      let error = Exception.check warn parameter error error' 
+                (Some "line 132") Exit 
+              in
+              error, (cv_id, map_res) :: current_list)
 	      (error, []) triple_list
           in
-        (*-----------------------------------------------------------------*)
+          (*-----------------------------------------------------------------*)
           let error, handler, store_result =
             List.fold_left 
               (fun (error, handler, store_result) (cv_id,map_res) ->
@@ -188,7 +184,7 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
 			  error, pair_list
 			) map_res (error, [])
 		    in
-		  (*build bdu_test*)
+		    (*build bdu_test*)
 		    let error, handler, bdu_test =
 		      build_bdu parameter handler error pair_list
 		    in
@@ -240,7 +236,9 @@ let collect_bdu_creation_restriction_map parameter handler error rule_id rule st
       (*default value when there is no creation in this rule*)
       | Some bdu -> error, bdu
     in 
-    let error, handler, bdu_new = Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error old_bdu bdu in (* In the case when the agent is created twice, we take the union *)
+    let error, handler, bdu_new =
+      Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error old_bdu bdu 
+    in (* In the case when the agent is created twice, we take the union *)
     let result_map =
       Map_creation_bdu.Map.add (agent_type, rule_id, cv_id) bdu_new store_result
     in
@@ -261,16 +259,28 @@ let collect_bdu_creation_restriction_map parameter handler error rule_id rule st
             (*get map restriction from covering classes*)
             let error, get_pair_list =
               List.fold_left (fun (error, current_list) (cv_id, list, set) ->
-	       (*JF  there is a problem here, you store only the last id that you see *)
                 (*-----------------------------------------------------------------*)
                 (*new index for site type in covering class*)
-		let _ = if local_trace then Printf.fprintf stderr "CREATION CV_ID:%i\n" cv_id in 
+		let _ = 
+                  if local_trace 
+                  then Printf.fprintf stderr "CREATION CV_ID:%i\n" cv_id 
+                in 
 		let error, (map_new_index_forward, _) =
                   new_index_pair_map parameter error list
                 in
                 (*-----------------------------------------------------------------*)
-		let add site state (error,store_result) = 
-		  let error,site' = Site_map_and_set.Map.find_default parameter error 0 site map_new_index_forward in (* JF: we should raise an alarm if not found *) 
+		let add site state (error, store_result) = 
+		  (*let error, site' = 
+                    Site_map_and_set.Map.find_default parameter error 0 
+                      site map_new_index_forward 
+                  in*) (* JF: we should raise an alarm if not found *) 
+                  let error, site' =
+                    match Site_map_and_set.Map.find_option parameter error
+                      site map_new_index_forward 
+                    with
+                    | error, None -> warn parameter error (Some "282") Exit 0
+                    | error, Some s -> error, s
+                  in
                   Site_map_and_set.Map.add parameter error site' state store_result 
 		in 
 		let error', map_res =
@@ -283,9 +293,10 @@ let collect_bdu_creation_restriction_map parameter handler error rule_id rule st
 		    Site_map_and_set.Map.empty
                 in
 		let error = 
-                  Exception.check warn parameter error error' (Some "line 212") Exit in
+                  Exception.check warn parameter error error' (Some "line 212") Exit
+                in
                 error, (cv_id, map_res) :: current_list)
-		      (error, []) triple_list
+		(error, []) triple_list
             in
             (*-----------------------------------------------------------------*)
             (*fold a list and get a pair of site and state and rule_id*)
@@ -348,7 +359,9 @@ let collect_bdu_init_restriction_map parameter handler error compil store_remane
       | None -> error, bdu_false
       | Some bdu -> error, bdu
     in
-    let error, handler, bdu_new = Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error old_bdu bdu in (* In the case when the agent is created twice, we take the union *)
+    let error, handler, bdu_new = 
+      Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error old_bdu bdu
+    in (* In the case when the agent is created twice, we take the union *)
     let result_map =
       Map_bdu_update.Map.add (agent_type, cv_id) bdu_new store_result
     in
@@ -373,18 +386,33 @@ let collect_bdu_init_restriction_map parameter handler error compil store_remane
                     new_index_pair_map parameter error list
                   in
                   (*-----------------------------------------------------------------*)
-		  let add site state (error,store_result) = 
-		    let error,site' = Site_map_and_set.Map.find_default parameter error 0 site map_new_index_forward in (* JF: should raise an alarm if not found *)
-		    Site_map_and_set.Map.add parameter error site' state store_result 
+		  let add site state (error, store_result) = 
+		    (*let error, site' =
+                      Site_map_and_set.Map.find_default parameter error 0 site 
+                        map_new_index_forward 
+                    in*) (* JF: should raise an alarm if not found *)
+                    let error, site' =
+                      match Site_map_and_set.Map.find_option parameter error site
+                        map_new_index_forward
+                      with
+                      | error, None -> warn parameter error (Some "398") Exit 0
+                      | error, Some s -> error, s
+                    in
+		    Site_map_and_set.Map.add parameter error site' state store_result
 		  in 
+                  (*-----------------------------------------------------------------*)
                   let error', map_res =
-                    Site_map_and_set.Map.fold_restriction_with_missing_associations parameter error
-                      (fun site port -> add site port.site_state.min) (* JF: we should check that port.site_state.min is equal to port_site_state.max *)
+                    Site_map_and_set.Map.fold_restriction_with_missing_associations 
+                      parameter error
+                      (fun site port -> add site port.site_state.min)
+                      (* JF: we should check that port.site_state.min is 
+                         equal to port_site_state.max *)
                       (fun site -> add site 0) 
 		      set agent.agent_interface Site_map_and_set.Map.empty
                   in
 	          let error = Exception.check warn parameter error error'
-                    (Some "line 370") Exit in
+                    (Some "line 370") Exit 
+                  in
                   error, ((cv_id,map_res) :: current_list)
                 ) (error, []) triple_list
               in
@@ -421,13 +449,7 @@ let collect_bdu_init_restriction_map parameter handler error compil store_remane
 let collect_modif_list_restriction_map
     parameter handler error rule_id rule store_remanent_triple store_result =
   let add_link (agent_id, agent_type, rule_id, cv_id) list_a store_result =
-   (* let error, old =
-      match
-        Map_modif_list.Map.find_option (agent_id, agent_type, rule_id, cv_id) store_result
-      with
-      | None -> error, (*Mvbdu_wrapper.Mvbdu.empty_list*) []
-      | Some l -> error, l
-    in*) (* the association must be unique *)
+    (*the association must be unique *)
     let result_map =
       Map_modif_list.Map.add (agent_id, agent_type, rule_id, cv_id) list_a store_result
     in
@@ -453,8 +475,10 @@ let collect_modif_list_restriction_map
               Site_map_and_set.Map.fold_restriction parameter error
                 (fun site port (error,store_result) ->
                   let state = port.site_state.min in
-                  let error,site' = Site_map_and_set.Map.find_default parameter error 
-                    0 site map_new_index_forward in
+                  let error,site' = 
+                    Site_map_and_set.Map.find_default parameter error 
+                    0 site map_new_index_forward 
+                  in
                   let error,map_res =
                     Site_map_and_set.Map.add parameter error 
                       site'
@@ -467,8 +491,8 @@ let collect_modif_list_restriction_map
 	    let error = Exception.check warn parameter error error' 
               (Some "line 293") Exit 
             in        
-            error, (cv_id,map_res) :: current_list
-			 ) (error, []) triple_list
+            error, (cv_id, map_res) :: current_list
+	  ) (error, []) triple_list
         in
         (*-----------------------------------------------------------------*)
         (*fold a list and get a pair of site and state and rule_id*)
@@ -496,15 +520,15 @@ let collect_modif_list_restriction_map
 		      pair_list
 		  in
 		  let error, store_result =
-		    add_link (agent_id, agent_type, rule_id, cv_id) (*list_a*) pair_list store_result
+		    add_link (agent_id, agent_type, rule_id, cv_id) 
+                      [list_a] store_result
 		  in
 		  error, handler, store_result
 		end
 	    )
 	    (error, handler, store_result)
 	    get_pair_list
-	in error, (handler, store_result) )
-	    
+	in error, (handler, store_result))
     rule.diff_direct store_remanent_triple (handler, store_result)
 
 (*projection with (rule_id) *)
@@ -517,9 +541,9 @@ let collect_proj_modif_list_restriction_map parameter handler error
       (error, handler)
       (fun (agent_id, agent_type, rule_id, cv_id) -> rule_id)
       (fun (agent_id, agent_type, rule_id, cv_id) -> agent_id)
-      (*Mvbdu_wrapper.Mvbdu.empty_list*) []
+      []
       (fun parameter (error, handler) l l' ->
-        (*FIXME: how to combine two list_a*)
+        (*combine two list_a*)
         (error, handler), List.concat [l; l']
       )
       store_modif_list_restriction_map
@@ -554,8 +578,6 @@ let store_bdu_potential_restriction_map_aux parameter handler error store_remane
           then
             let error, get_pair_list =
               List.fold_left (fun (error, current_list) (cv_id, list, set) ->
-		(* JF: you should not throw the cv_id away, 
-		   please correct as the previous functions *)
                 let error, (map_new_index_forward, _) =
                   new_index_pair_map parameter error list
                 in
@@ -599,6 +621,8 @@ let store_bdu_potential_restriction_map_aux parameter handler error store_remane
 			  error, pair
 			) map_res (error, [])
                     in
+		    (*-----------------------------------------------------------------*)
+                    (*build bdu_potential side effects*)
 		    let error, handler, bdu_potential_effect =
 		      build_bdu parameter handler error pair_list'
 		    in
@@ -611,15 +635,6 @@ let store_bdu_potential_restriction_map_aux parameter handler error store_remane
 		  ) (error, handler, store_result) get_pair_list
             in
 	    error, (handler, store_result)
-            (*build bdu_potential side effects*)
-            (*let error, handler, bdu_potential_effect =
-              build_bdu parameter handler error new_pair_list
-            in
-            let error, handler, store_result =
-              add_link handler (agent_type, rule_id, cv_id) bdu_potential_effect
-                store_result
-            in
-            error, (handler, store_result)*)
           else
             error, (handler, store_result)
         ) store_potential_side_effects (error, (handler, store_result))
@@ -667,7 +682,7 @@ let collect_proj_bdu_potential_restriction_map parameter handler error
 (************************************************************************************)
 (*return a modification in the case of state free*)
 
-let collect_potential_list_restriction_map_aux parameter error store_remanent_triple
+let collect_potential_list_restriction_map_aux parameter handler error store_remanent_triple
     store_potential_side_effects store_result =
   let add_link (agent_type, rule_id, cv_id) pair_list store_result =
     let error, old =
@@ -688,8 +703,6 @@ let collect_potential_list_restriction_map_aux parameter error store_remanent_tr
           then
             let error, get_pair_list =
               List.fold_left (fun (error, current_list) (cv_id, list, set) ->
-		(* JF: you should not throw the cv_id away, 
-		   please correct as the previous functions *)
                 let error, (map_new_index_forward, _) =
                   new_index_pair_map parameter error list
                 in
@@ -732,18 +745,23 @@ let collect_potential_list_restriction_map_aux parameter error store_remanent_tr
 			  error, pair
 			) map_res (error, [])
                     in
+		    (*-----------------------------------------------------------------*)
+                    (*build list_a here*)
+                    let error, handler, list_a =
+                      Mvbdu_wrapper.Mvbdu.build_association_list
+		        parameter
+		        handler
+		        error
+		        pair_list'
+                    in
 		    let error, store_result =
-		      add_link (agent_type, rule_id, cv_id) pair_list' store_result
+		      add_link (agent_type, rule_id, cv_id) [list_a] store_result
 		    in
 		    error, store_result
 		  end
 		  ) (error, store_result) get_pair_list
             in
 	    error, store_result
-          (*let error, store_result =
-              add_link (agent_type, rule_id, cv_id) new_pair_list store_result
-            in
-            error, store_result*)
           else
             error, store_result
         ) store_potential_side_effects (error, store_result)
@@ -752,12 +770,13 @@ let collect_potential_list_restriction_map_aux parameter error store_remanent_tr
 (************************************************************************************)
 (*build list of modification of potential partner in the case of site is free*)
 
-let collect_potential_list_restriction_map parameter error store_remanent_triple
+let collect_potential_list_restriction_map parameter handler error store_remanent_triple
     store_potential_side_effects store_result =
   let store_potential_free, _ = store_potential_side_effects in
   let error, store_result =
     collect_potential_list_restriction_map_aux
       parameter
+      handler
       error
       store_remanent_triple
       store_potential_free

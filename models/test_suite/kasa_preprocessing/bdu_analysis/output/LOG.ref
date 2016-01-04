@@ -614,12 +614,9 @@ agent_type:1@site_type:0:state:1--agent_type':0@site_type':2:state':1
 agent_type:2@site_type:0:state:1--agent_type':0@site_type':3:state':1
 
 ------------------------------------------------------------
-(Syntactic) Contact map (only considering rhs) and initital state:
+(Syntactic) Contact map and initital state:
 ------------------------------------------------------------
 Sites are annotated with the id of binding type:
-A bond is discovered for the first time:true
-agent_type:0@site_type:2:state:1--agent_type':1@site_type':0:state':1
-agent_type:0@site_type:3:state:1--agent_type':2@site_type':0:state':1
 agent_type:0@site_type:2:state:1--agent_type':1@site_type':0:state':1
 agent_type:0@site_type:3:state:1--agent_type':2@site_type':0:state':1
 
@@ -643,32 +640,6 @@ rule_id:1
 rule_id:6
 agent_type:2:covering_class_id:0:@set of rule_id:
 rule_id:2
-rule_id:7
-
-------------------------------------------------------------
-List of rules to awake when discovered sites that are bond on the rhs for the first time:
-------------------------------------------------------------
-agent_type:0:covering_class_id:0:@set of rule_id:
-rule_id:0
-rule_id:1
-rule_id:2
-rule_id:4
-rule_id:5
-rule_id:6
-rule_id:7
-agent_type:0:covering_class_id:1:@set of rule_id:
-rule_id:0
-agent_type:0:covering_class_id:2:@set of rule_id:
-rule_id:0
-agent_type:1:covering_class_id:0:@set of rule_id:
-rule_id:1
-rule_id:3
-rule_id:5
-rule_id:6
-agent_type:2:covering_class_id:0:@set of rule_id:
-rule_id:2
-rule_id:3
-rule_id:4
 rule_id:7
 
 ------------------------------------------------------------
@@ -744,15 +715,27 @@ Id=9
 - List for update of the views due to modification that are created from potential partner in side effects (projection per rule):
 rule_id:3
 agent_type:1
-site_type:1:state:0
+Id=3
+ (site_type:1 = 0)
+  Id=0
+   []
 agent_type:2
-site_type:1:state:0
+Id=3
+ (site_type:1 = 0)
+  Id=0
+   []
 rule_id:4
 agent_type:2
-site_type:1:state:0
+Id=3
+ (site_type:1 = 0)
+  Id=0
+   []
 rule_id:5
 agent_type:1
-site_type:1:state:0
+Id=3
+ (site_type:1 = 0)
+  Id=0
+   []
 
 ------------------------------------------------------------
 - Bdu for the valuations of the views that are tested (projection per rule):
@@ -1243,67 +1226,143 @@ Id=9
 ------------------------------------------------------------
 - List for update of the views due to modification (per rule, agent and covering class):
 agent_id:0:agent_type:0:rule_id:0:covering_class_id:0
-site_type:2:state:0
-site_type:1:state:0
+Id=2
+ (site_type:1 = 0)
+  Id=1
+   (site_type:2 = 0)
+    Id=0
+     []
 agent_id:0:agent_type:0:rule_id:0:covering_class_id:1
-site_type:1:state:0
+Id=3
+ (site_type:1 = 0)
+  Id=0
+   []
 agent_id:0:agent_type:0:rule_id:0:covering_class_id:2
-site_type:1:state:0
+Id=3
+ (site_type:1 = 0)
+  Id=0
+   []
 agent_id:0:agent_type:0:rule_id:1:covering_class_id:0
-site_type:1:state:1
+Id=5
+ (site_type:1 = 1)
+  Id=0
+   []
 agent_id:0:agent_type:0:rule_id:2:covering_class_id:0
-site_type:2:state:1
-site_type:1:state:0
+Id=7
+ (site_type:1 = 0)
+  Id=6
+   (site_type:2 = 1)
+    Id=0
+     []
 agent_id:0:agent_type:0:rule_id:5:covering_class_id:0
-site_type:1:state:0
+Id=3
+ (site_type:1 = 0)
+  Id=0
+   []
 agent_id:0:agent_type:0:rule_id:6:covering_class_id:0
-site_type:1:state:1
+Id=5
+ (site_type:1 = 1)
+  Id=0
+   []
 agent_id:0:agent_type:0:rule_id:7:covering_class_id:0
-site_type:2:state:1
+Id=6
+ (site_type:2 = 1)
+  Id=0
+   []
 agent_id:1:agent_type:1:rule_id:1:covering_class_id:0
-site_type:1:state:1
+Id=5
+ (site_type:1 = 1)
+  Id=0
+   []
 agent_id:1:agent_type:1:rule_id:6:covering_class_id:0
-site_type:1:state:1
+Id=5
+ (site_type:1 = 1)
+  Id=0
+   []
 agent_id:1:agent_type:2:rule_id:2:covering_class_id:0
-site_type:1:state:1
+Id=5
+ (site_type:1 = 1)
+  Id=0
+   []
 agent_id:1:agent_type:2:rule_id:7:covering_class_id:0
-site_type:1:state:1
+Id=5
+ (site_type:1 = 1)
+  Id=0
+   []
 
 ------------------------------------------------------------
 - List for update of the views due to modification (projection per rule):
 rule_id:0
 agent_id:0:
-site_type:2:state:0
-site_type:1:state:0
-site_type:1:state:0
-site_type:1:state:0
+Id=2
+ (site_type:1 = 0)
+  Id=1
+   (site_type:2 = 0)
+    Id=0
+     []
+Id=3
+ (site_type:1 = 0)
+  Id=0
+   []
+Id=3
+ (site_type:1 = 0)
+  Id=0
+   []
 rule_id:1
 agent_id:0:
-site_type:1:state:1
+Id=5
+ (site_type:1 = 1)
+  Id=0
+   []
 agent_id:1:
-site_type:1:state:1
+Id=5
+ (site_type:1 = 1)
+  Id=0
+   []
 rule_id:2
 agent_id:0:
-site_type:2:state:1
-site_type:1:state:0
+Id=7
+ (site_type:1 = 0)
+  Id=6
+   (site_type:2 = 1)
+    Id=0
+     []
 agent_id:1:
-site_type:1:state:1
+Id=5
+ (site_type:1 = 1)
+  Id=0
+   []
 rule_id:5
 agent_id:0:
-site_type:1:state:0
+Id=3
+ (site_type:1 = 0)
+  Id=0
+   []
 rule_id:6
 agent_id:0:
-site_type:1:state:1
+Id=5
+ (site_type:1 = 1)
+  Id=0
+   []
 agent_id:1:
-site_type:1:state:1
+Id=5
+ (site_type:1 = 1)
+  Id=0
+   []
 rule_id:7
 agent_id:0:
-site_type:2:state:1
+Id=6
+ (site_type:2 = 1)
+  Id=0
+   []
 agent_id:1:
-site_type:1:state:1
+Id=5
+ (site_type:1 = 1)
+  Id=0
+   []
 
 ------------------------------------------------------------
-- Bdu fpr the valuation of the views that are tested (projection per rule):
+- Bdu for the valuation of the views that are tested (projection per rule):
 rule_id:3
 agent_id:0:agent_type:0:cv_id:0
 Id=0
@@ -1629,7 +1688,7 @@ Ag:0
 Nothing has changed
 Test for rule:4
 enabled
-Ag:0 Type: 0 Cvid: 0
+Ag:0 Type:0 Cv_id:0
 Ag:0
 Nothing has changed
 Ag:2
@@ -1654,7 +1713,7 @@ in add_update_to_wl:rule_id:2
 in add_update_to_wl:rule_id:7
 Test for rule:5
 enabled
-Ag:0 Type: 0 Cvid: 0
+Ag:0 Type:0 Cv_id:0
 Ag:0
 Nothing has changed
 Ag:1
@@ -1679,7 +1738,7 @@ in add_update_to_wl:rule_id:1
 in add_update_to_wl:rule_id:6
 Test for rule:6
 enabled
-Ag:0 Type: 0 Cvid: 0
+Ag:0 Type:0 Cv_id:0
 Ag:0
 new views:
 Id=27
@@ -1720,15 +1779,15 @@ in add_update_to_wl:rule_id:4
 in add_update_to_wl:rule_id:5
 in add_update_to_wl:rule_id:6
 in add_update_to_wl:rule_id:7
-Ag:1 Type: 1 Cvid: 0
+Ag:1 Type:1 Cv_id:0
 Ag:1
 Nothing has changed
 Test for rule:7
 enabled
-Ag:0 Type: 0 Cvid: 0
+Ag:0 Type:0 Cv_id:0
 Ag:0
 Nothing has changed
-Ag:1 Type: 2 Cvid: 0
+Ag:1 Type:2 Cv_id:0
 Ag:2
 Nothing has changed
 Test for rule:1
@@ -1761,24 +1820,24 @@ Ag:0
 Nothing has changed
 Test for rule:4
 enabled
-Ag:0 Type: 0 Cvid: 0
+Ag:0 Type:0 Cv_id:0
 Ag:0
 Nothing has changed
 Ag:2
 Nothing has changed
 Test for rule:5
 enabled
-Ag:0 Type: 0 Cvid: 0
+Ag:0 Type:0 Cv_id:0
 Ag:0
 Nothing has changed
 Ag:1
 Nothing has changed
 Test for rule:6
 enabled
-Ag:0 Type: 0 Cvid: 0
+Ag:0 Type:0 Cv_id:0
 Ag:0
 Nothing has changed
-Ag:1 Type: 1 Cvid: 0
+Ag:1 Type:1 Cv_id:0
 Ag:1
 Nothing has changed
 
@@ -1838,7 +1897,7 @@ Id=3
      Leaf False 
 
 agent_type:1:cv_id:0
-Id=22
+Id=20
  Node(site_type:1<0)
   Id=1
    Leaf False 
@@ -1852,7 +1911,7 @@ Id=22
      Leaf False 
 
 agent_type:2:cv_id:0
-Id=22
+Id=20
  Node(site_type:1<0)
   Id=1
    Leaf False 
@@ -1870,7 +1929,7 @@ Id=22
 * Cartesian abstraction:
 ------------------------------------------------------------
 agent_type:0:cv_id:0
-Id=22
+Id=20
  Node(site_type:1<0)
   Id=1
    Leaf False 
@@ -1925,7 +1984,7 @@ Id=3
      Leaf False 
 
 agent_type:1:cv_id:0
-Id=22
+Id=20
  Node(site_type:1<0)
   Id=1
    Leaf False 
@@ -1939,7 +1998,7 @@ Id=22
      Leaf False 
 
 agent_type:2:cv_id:0
-Id=22
+Id=20
  Node(site_type:1<0)
   Id=1
    Leaf False 

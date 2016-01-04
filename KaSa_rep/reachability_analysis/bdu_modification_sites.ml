@@ -82,31 +82,6 @@ let collect_modification_sites parameter error rule_id diff_direct store_result 
 
 (*update of the views due to modification without agent_id*)
 
-(*let collect_modif_map' parameter error store_modification_sites store_result =
-  let add_link (agent_type, site_type) set_rule_id store_result =
-    let (l, old) =
-      Int2Map_Test_Modif.Map.find_default
-        ([], Site_map_and_set.Set.empty) (agent_type, site_type) store_result
-    in
-    let error',new_set =
-      Site_map_and_set.Set.union parameter error set_rule_id old
-    in
-    let error = Exception.check warn parameter error error' (Some "line 51") Exit in   
-    let result =
-      Int2Map_Test_Modif.Map.add (agent_type, site_type) (l, new_set) store_result
-    in
-    error, result
-  in
-  Int2Map_Modif.Map.fold
-    (fun (agent_id, agent_type, site_type) (l1, s1) (error, store_result) ->
-      let error, store_result =
-        add_link (agent_type, site_type) s1 store_result
-      in
-      error, store_result
-    ) store_modification_sites (error, store_result)*)
-
-(*use projection instead*)
-
 let collect_modif_map parameter error store_modification_sites =
   Project2_modif.proj_monadic
     parameter
@@ -166,29 +141,6 @@ let collect_test_sites parameter error rule_id viewslhs
   error, store_result
 
 (*valuations of the views that are created without agent_id*)
-
-(*let collect_test_map parameter error store_test_sites store_result =
-  let add_link (agent_type, site_type) set_rule_id store_result =
-    let (l, old) =
-      Int2Map_Test_Modif.Map.find_default
-        ([], Site_map_and_set.Set.empty) (agent_type, site_type) store_result
-    in
-    let error',new_set =
-      Site_map_and_set.Set.union parameter error set_rule_id old
-    in
-    let error = Exception.check warn parameter error error' (Some "line 156") Exit in    
-    let result =
-      Int2Map_Test_Modif.Map.add (agent_type, site_type) (l, new_set) store_result
-    in
-    error, result
-  in
-  Int2Map_Modif.Map.fold
-    (fun (agent_id, agent_type, site_type) (l1, s1) (error, store_result) ->
-      let error, store_result =
-        add_link (agent_type, site_type) s1 store_result
-      in
-      error, store_result
-    ) store_test_sites (error, store_result)*)
 
 let collect_test_map parameter error store_test_sites =
   Project2_modif.proj_monadic
@@ -258,29 +210,6 @@ let collect_test_modification_sites
     ) store_modification_map store_test_map store_result
 
 (*valuations of the views that are created without agent_id*)
-
-(*let collect_test_modif_map parameter error store_test_modification_sites store_result =
-  let add_link (agent_type, site_type) set_rule_id store_result =
-    let (l, old) =
-      Int2Map_Test_Modif.Map.find_default
-        ([], Site_map_and_set.Set.empty) (agent_type, site_type) store_result
-    in
-    let error',new_set =
-      Site_map_and_set.Set.union parameter error set_rule_id old
-    in
-    let error = Exception.check warn parameter error error' (Some "line 230") Exit in   
-    let result =
-      Int2Map_Test_Modif.Map.add (agent_type, site_type) (l, new_set) store_result
-    in
-    error, result
-  in
-  Int2Map_Modif.Map.fold
-    (fun (agent_id, agent_type, site_type) (l1, s1) (error, store_result) ->
-      let error, store_result =
-        add_link (agent_type, site_type) s1 store_result
-      in
-      error, store_result
-    ) store_test_modification_sites (error, store_result)*)
 
 let collect_test_modif_map parameter error store_test_modification_sites =
   Project2_modif.proj_monadic

@@ -378,25 +378,12 @@ rule_id:6
 Sites are annotated with the id of binding type:
 
 ------------------------------------------------------------
-(Syntactic) Contact map (only considering rhs) and initital state:
+(Syntactic) Contact map and initital state:
 ------------------------------------------------------------
 Sites are annotated with the id of binding type:
-A bond is discovered for the first time:false
 
 ------------------------------------------------------------
 List of rules to awake when the state of a site is modified and tested:
-------------------------------------------------------------
-agent_type:0:covering_class_id:0:@set of rule_id:
-rule_id:0
-rule_id:1
-rule_id:2
-rule_id:3
-rule_id:4
-rule_id:5
-rule_id:6
-
-------------------------------------------------------------
-List of rules to awake when discovered sites that are bond on the rhs for the first time:
 ------------------------------------------------------------
 agent_type:0:covering_class_id:0:@set of rule_id:
 rule_id:0
@@ -644,52 +631,100 @@ Id=11
 ------------------------------------------------------------
 - List for update of the views due to modification (per rule, agent and covering class):
 agent_id:0:agent_type:0:rule_id:0:covering_class_id:0
-site_type:3:state:0
-site_type:2:state:0
-site_type:1:state:0
+Id=3
+ (site_type:1 = 0)
+  Id=2
+   (site_type:2 = 0)
+    Id=1
+     (site_type:3 = 0)
+      Id=0
+       []
 agent_id:0:agent_type:0:rule_id:1:covering_class_id:0
-site_type:1:state:1
+Id=5
+ (site_type:1 = 1)
+  Id=0
+   []
 agent_id:0:agent_type:0:rule_id:2:covering_class_id:0
-site_type:2:state:1
+Id=8
+ (site_type:2 = 1)
+  Id=0
+   []
 agent_id:0:agent_type:0:rule_id:3:covering_class_id:0
-site_type:3:state:1
-site_type:1:state:2
+Id=12
+ (site_type:1 = 2)
+  Id=11
+   (site_type:3 = 1)
+    Id=0
+     []
 agent_id:0:agent_type:0:rule_id:4:covering_class_id:0
-site_type:1:state:3
+Id=13
+ (site_type:1 = 3)
+  Id=0
+   []
 agent_id:0:agent_type:0:rule_id:5:covering_class_id:0
-site_type:2:state:2
+Id=15
+ (site_type:2 = 2)
+  Id=0
+   []
 agent_id:0:agent_type:0:rule_id:6:covering_class_id:0
-site_type:3:state:1
+Id=11
+ (site_type:3 = 1)
+  Id=0
+   []
 
 ------------------------------------------------------------
 - List for update of the views due to modification (projection per rule):
 rule_id:0
 agent_id:0:
-site_type:3:state:0
-site_type:2:state:0
-site_type:1:state:0
+Id=3
+ (site_type:1 = 0)
+  Id=2
+   (site_type:2 = 0)
+    Id=1
+     (site_type:3 = 0)
+      Id=0
+       []
 rule_id:1
 agent_id:0:
-site_type:1:state:1
+Id=5
+ (site_type:1 = 1)
+  Id=0
+   []
 rule_id:2
 agent_id:0:
-site_type:2:state:1
+Id=8
+ (site_type:2 = 1)
+  Id=0
+   []
 rule_id:3
 agent_id:0:
-site_type:3:state:1
-site_type:1:state:2
+Id=12
+ (site_type:1 = 2)
+  Id=11
+   (site_type:3 = 1)
+    Id=0
+     []
 rule_id:4
 agent_id:0:
-site_type:1:state:3
+Id=13
+ (site_type:1 = 3)
+  Id=0
+   []
 rule_id:5
 agent_id:0:
-site_type:2:state:2
+Id=15
+ (site_type:2 = 2)
+  Id=0
+   []
 rule_id:6
 agent_id:0:
-site_type:3:state:1
+Id=11
+ (site_type:3 = 1)
+  Id=0
+   []
 
 ------------------------------------------------------------
-- Bdu fpr the valuation of the views that are tested (projection per rule):
+- Bdu for the valuation of the views that are tested (projection per rule):
 rule_id:1
 agent_id:0:agent_type:0:cv_id:0
 Id=3
@@ -890,7 +925,7 @@ Ag:0
 Nothing has changed
 Test for rule:1
 enabled
-Ag:0 Type: 0 Cvid: 0
+Ag:0 Type:0 Cv_id:0
 Ag:0
 new views:
 Id=31
@@ -943,7 +978,7 @@ in add_update_to_wl:rule_id:5
 in add_update_to_wl:rule_id:6
 Test for rule:2
 enabled
-Ag:0 Type: 0 Cvid: 0
+Ag:0 Type:0 Cv_id:0
 Ag:0
 new views:
 Id=21
@@ -996,7 +1031,7 @@ in add_update_to_wl:rule_id:5
 in add_update_to_wl:rule_id:6
 Test for rule:3
 enabled
-Ag:0 Type: 0 Cvid: 0
+Ag:0 Type:0 Cv_id:0
 Ag:0
 new views:
 Id=44
@@ -1049,7 +1084,7 @@ in add_update_to_wl:rule_id:5
 in add_update_to_wl:rule_id:6
 Test for rule:4
 enabled
-Ag:0 Type: 0 Cvid: 0
+Ag:0 Type:0 Cv_id:0
 Ag:0
 new views:
 Id=49
@@ -1102,7 +1137,7 @@ in add_update_to_wl:rule_id:5
 in add_update_to_wl:rule_id:6
 Test for rule:5
 enabled
-Ag:0 Type: 0 Cvid: 0
+Ag:0 Type:0 Cv_id:0
 Ag:0
 new views:
 Id=55
@@ -1155,7 +1190,7 @@ in add_update_to_wl:rule_id:5
 in add_update_to_wl:rule_id:6
 Test for rule:6
 enabled
-Ag:0 Type: 0 Cvid: 0
+Ag:0 Type:0 Cv_id:0
 Ag:0
 new views:
 Id=66
@@ -1212,32 +1247,32 @@ Ag:0
 Nothing has changed
 Test for rule:1
 enabled
-Ag:0 Type: 0 Cvid: 0
+Ag:0 Type:0 Cv_id:0
 Ag:0
 Nothing has changed
 Test for rule:2
 enabled
-Ag:0 Type: 0 Cvid: 0
+Ag:0 Type:0 Cv_id:0
 Ag:0
 Nothing has changed
 Test for rule:3
 enabled
-Ag:0 Type: 0 Cvid: 0
+Ag:0 Type:0 Cv_id:0
 Ag:0
 Nothing has changed
 Test for rule:4
 enabled
-Ag:0 Type: 0 Cvid: 0
+Ag:0 Type:0 Cv_id:0
 Ag:0
 Nothing has changed
 Test for rule:5
 enabled
-Ag:0 Type: 0 Cvid: 0
+Ag:0 Type:0 Cv_id:0
 Ag:0
 Nothing has changed
 Test for rule:6
 enabled
-Ag:0 Type: 0 Cvid: 0
+Ag:0 Type:0 Cv_id:0
 Ag:0
 Nothing has changed
 
