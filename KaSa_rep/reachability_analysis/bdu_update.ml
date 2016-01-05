@@ -177,7 +177,7 @@ let store_covering_classes_modification_update_full parameter error
     store_update_with_side_effects
     store_result
     =
-  let add_link error (agent_type, cv_id) set store_result =
+  let add_link error (agent_type, cv_id) rule_id_set store_result =
     let l, old =
       Int2Map_CV_Modif.Map.find_default ([], Site_map_and_set.Set.empty)
         (agent_type, cv_id) store_result
