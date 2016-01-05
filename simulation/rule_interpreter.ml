@@ -224,7 +224,7 @@ let add_path_to_tests path tests =
     (Tools.list_rev_map_append
        (fun (x,y) -> Instantiation.Is_Bound_to (x,y)) path tests')
 
-let store_event counter inj2graph new_tracked_obs_instances event_kind
+let store_event form counter inj2graph new_tracked_obs_instances event_kind
 		?path rule = function
   | None as x -> x
   | Some (x,(info,steps)) ->
@@ -248,7 +248,7 @@ let store_event counter inj2graph new_tracked_obs_instances event_kind
 	    (ev,
 	     obs_tests,
 	    Counter.next_story counter) in
-	  Compression_main.secret_store_obs infos obs steps)
+	  Compression_main.secret_store_obs form infos obs steps)
 	 (infos',steps')
 	 new_tracked_obs_instances
      in
@@ -364,7 +364,7 @@ let update_edges counter domain unary_ccs inj_nodes state event_kind ?path rule=
       else unary_pack in
   (*Store event*)
   let story_machinery' =
-    store_event
+    store_event Format.std_formatter
       counter final_inj2graph new_tracked_obs_instances event_kind
       ?path rule state.story_machinery in
 

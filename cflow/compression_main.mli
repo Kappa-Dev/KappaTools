@@ -9,6 +9,7 @@ val secret_store_event :
     Instantiation.concrete Instantiation.event ->
   secret_step list -> secret_log_info * secret_step list
 val secret_store_obs :
+  Format.formatter ->
   secret_log_info ->
   (Causal.event_kind *
      Instantiation.concrete Instantiation.test list *

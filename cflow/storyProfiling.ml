@@ -124,6 +124,8 @@ module type StoryStats =
     val tick: log_info -> bool * log_info
     val close_logger: Remanent_parameters_sig.parameters -> unit
     val flush_logger: Remanent_parameters_sig.parameters -> unit
+
+    val check_compression_mode: Format.formatter -> log_info -> log_info
   end
 
 module StoryStats =
@@ -215,6 +217,7 @@ module StoryStats =
              current_stack: stack_head ;
 	     propagation: int array ; 
 	     last_tick:float;
+	     compression_mode_has_been_checked: bool;
 	   }
 
        let is_dummy step_kind =
@@ -405,7 +408,8 @@ module StoryStats =
                stack_size = 0 
              } ;
            stack = [] ;
-	   last_tick = 0.}
+	   last_tick = 0.;
+	   compression_mode_has_been_checked = false}
 	      
 	      
 
@@ -537,6 +541,33 @@ module StoryStats =
        let set_global_cut n log_info = log_info 
        let set_pseudo_inv n log_info = log_info 
 
+       let check_compression_mode form log_info =
+	 if
+	   log_info.compression_mode_has_been_checked
+	 then
+	   log_info
+	 else
+	   let bool =
+	     (
+	       !Parameter.causalModeOn
+	       || !Parameter.weakCompression
+	       || !Parameter.mazCompression
+	       || !Parameter.strongCompression
+	     ) in
+	   let () =
+	     if
+	       not bool
+	     then
+	       let () =
+		 ExceptionDefn.warning
+		   (fun f ->
+		    Format.fprintf
+		      f "an observable hit is tracked whereas no compression mode has been selected")
+	       in
+	       let _ = Format.fprintf form "@." in
+	       ExceptionDefn.flush_warning form
+	   in 
+	   {log_info with compression_mode_has_been_checked = true}
        end:StoryStats)
 	   
            
