@@ -161,3 +161,5 @@ Intial graph;
   
 File "abc.ka", line 40, characters 12-18:
 Warning: [Emax] constant is evaluated to infinity
+Warning: An observable may be tracked but no compression level to render stories has been specified
+Warning: An observable may be tracked but no compression level to render stories has been specified
