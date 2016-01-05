@@ -161,7 +161,5 @@ Signature:duals:2:3:1:agent_type:0,site_type:1,state_id:2
 	 -initial conditions
 	 Done
 ____________________________________________________________
-#
-Warning: an observable hit is tracked whereas no compression mode has been selected
-###########################################################
+############################################################
 Simulation ended

@@ -2,7 +2,7 @@
   * compression_main.ml 
   *
   * Creation:                      <2011-10-19 16:52:55 feret>
-  * Last modification: Time-stamp: <2015-12-15 09:57:31 feret> 
+  * Last modification: Time-stamp: <2016-01-05 16:21:22 feret> 
   * 
   * Causal flow compression: a module for KaSim 
   * Jerome Feret, projet Antique, INRIA Paris-Rocquencourt

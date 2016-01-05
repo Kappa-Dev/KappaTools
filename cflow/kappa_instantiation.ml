@@ -74,7 +74,7 @@ sig
   val store_event:
     P.log_info -> refined_event -> refined_step list -> P.log_info * refined_step list
   val store_obs :
-    Format.formatter -> P.log_info -> refined_obs  -> refined_step list -> P.log_info * refined_step list
+    P.log_info -> refined_obs  -> refined_step list -> P.log_info * refined_step list
 
   val build_grid:
     (refined_step * Instantiation.concrete Instantiation.site list)  list -> bool ->
@@ -283,8 +283,7 @@ module Cflow_linker =
     | Causal.OBS _,_ -> assert false
     | (Causal.RULE _ | Causal.PERT _ as k),x ->
        P.inc_n_kasim_events log_info,(Event (k,x))::step_list
-  let store_obs form log_info (i,x,c) step_list =
-    let log_info = StoryProfiling.StoryStats.check_compression_mode form log_info in
+  let store_obs log_info (i,x,c) step_list =
     P.inc_n_obs_events log_info,Obs(i,x,c)::step_list
 
   let creation_of_actions op actions =

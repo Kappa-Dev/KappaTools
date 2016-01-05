@@ -566,4 +566,13 @@ let initialize logger overwrite counter result =
 	Connected_component.Env.print domain
 	(Rule_interpreter.print env) graph in
   let graph',state = State_interpreter.initial env counter graph stops in
+  let () =
+    if tracking_enabled && not (!Parameter.causalModeOn || !Parameter.weakCompression || !Parameter.mazCompression || !Parameter.strongCompression) 
+    then 
+      ExceptionDefn.warning
+      	(fun f ->
+	  Format.fprintf 
+	    f 
+	    "An observable may be tracked but no compression level to render stories has been specified")
+  in 
   (Debug.tag logger "\t Done"; (kasa_state,env, domain, graph', state))
