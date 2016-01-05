@@ -194,9 +194,9 @@ module StoryStats =
 	 () 
 
        let close_logger parameter  =
-	 close_out (Remanent_parameters.get_profiling_info_channel parameter)
+	 close_out (Remanent_parameters.get_tasks_profiling_info_channel parameter)
        let flush_logger parameter =
-	 flush (Remanent_parameters.get_profiling_info_channel parameter)
+	 flush (Remanent_parameters.get_tasks_profiling_info_channel parameter)
 
        
 											     
@@ -241,13 +241,13 @@ module StoryStats =
 	       depth = next_depth ;
 	     }
 	   in
-	   let _ = Format.fprintf (Remanent_parameters.get_profiling_info_logger parameter) "Start\t" in 
+	   let _ = Format.fprintf (Remanent_parameters.get_tasks_profiling_info_logger parameter) "Start\t" in
 	   let terminated_task =
 	     (task,List.rev_map (fun x -> x.tag) (List.rev log_info.current_task))
 	   in
-	   let _ = print_task (Remanent_parameters.get_profiling_info_logger parameter) terminated_task in 
-	   let _ = flush_logger  parameter in 	 
-	   let current_task = task::log_info.current_task in 
+	   let _ = print_task (Remanent_parameters.get_tasks_profiling_info_logger parameter) terminated_task in
+	   let _ = flush_logger  parameter in
+	   let current_task = task::log_info.current_task in
 	 
 	   error,
 	   { log_info
@@ -295,9 +295,9 @@ module StoryStats =
 		  let terminated_task =
 		    (task,List.rev_map (fun x -> x.tag) (List.rev tail))
 		  in
-		  let _ = Format.fprintf (Remanent_parameters.get_profiling_info_logger parameter) (if interrupted then "Interrupted\t" else "End\t") in 
-		  let _ = print_task (Remanent_parameters.get_profiling_info_logger parameter) terminated_task in 
-		  let _ = flush_logger  parameter in 
+		  let _ = Format.fprintf (Remanent_parameters.get_tasks_profiling_info_logger parameter) (if interrupted then "Interrupted\t" else "End\t") in
+		  let _ = print_task (Remanent_parameters.get_tasks_profiling_info_logger parameter) terminated_task in
+		  let _ = flush_logger  parameter in
 		  error,
 		  {
 		    log_info 
@@ -310,9 +310,9 @@ module StoryStats =
 		end
 	     | current_task::tail ->
 		let terminated_task = (current_task,List.rev_map (fun x -> x.tag) (List.rev tail)) in
-		let _ = Format.fprintf (Remanent_parameters.get_profiling_info_logger parameter) "Interrupted\t" in 
-		let _ = print_task (Remanent_parameters.get_profiling_info_logger parameter) terminated_task in 
-		let _ = flush_logger  parameter in 
+		let _ = Format.fprintf (Remanent_parameters.get_tasks_profiling_info_logger parameter) "Interrupted\t" in
+		let _ = print_task (Remanent_parameters.get_tasks_profiling_info_logger parameter) terminated_task in
+		let _ = flush_logger  parameter in
 		aux 
 		  {
 		    log_info 

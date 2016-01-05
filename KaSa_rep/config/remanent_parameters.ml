@@ -110,7 +110,7 @@ let get_contact_map () =
    }
   
 let get_parameters () =
-   let channel = Kappa_files.open_profiling () in
+   let channel = Kappa_files.open_tasks_profiling () in
   { Remanent_parameters_sig.marshalisable_parameters = 
       {
 	Remanent_parameters_sig.do_contact_map = !Config.do_contact_map ; 
@@ -413,5 +413,5 @@ let open_influence_map_file parameters error =
    || lexical_analysis_of_tested_only_patterns_is_required_by_the_influence_map parameter
 
 
- let get_profiling_info_logger parameter = parameter.Remanent_parameters_sig.profiling_info_formatter
-let get_profiling_info_channel parameter = parameter.Remanent_parameters_sig.profiling_info_channel
+let get_tasks_profiling_info_logger parameter = parameter.Remanent_parameters_sig.profiling_info_formatter
+let get_tasks_profiling_info_channel parameter = parameter.Remanent_parameters_sig.profiling_info_channel

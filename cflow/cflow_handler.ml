@@ -123,7 +123,7 @@ module Cflow_handler =
 	}
 
     let build_parameter () =
-      let channel = Kappa_files.open_profiling () in
+      let channel = Kappa_files.open_branch_and_cut_engine_profiling () in
       {
         current_compression_mode = None ;
         priorities_weak = Priority.weak ;

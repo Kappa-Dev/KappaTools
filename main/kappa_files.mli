@@ -14,7 +14,8 @@ val set_cflow : string -> unit
 val with_cflow_file :
   string list -> string -> (Format.formatter -> unit) -> unit
 
-val open_profiling : unit -> out_channel
+val open_tasks_profiling : unit -> out_channel
+val open_branch_and_cut_engine_profiling: unit -> out_channel
 
 val set_flux : string -> int -> unit
 val with_flux : string -> (Format.formatter -> unit) -> unit

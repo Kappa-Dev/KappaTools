@@ -3,7 +3,8 @@ let marshalizedOutFile = ref ""
 let snapshotFileName = ref "snap"
 let ccFileName = ref ""
 let cflowFileName = ref "cflow.dot"
-let profilingName = ref "profiling.txt"
+let branch_and_cut_engine_profilingName = ref "compression_status.txt"
+let tasks_profilingName = ref "profiling.txt"
 let influenceFileName = ref ""
 let fluxFileName = ref ""
 let outputDataName = ref "data.out"
@@ -121,8 +122,8 @@ let set_cflow s = cflowFileName := s
 let with_cflow_file l e f =
   with_formatter (get_fresh_filename !cflowFileName l "" e) f
 
-let open_profiling () = open_out !profilingName
-
+let open_tasks_profiling () = open_out !tasks_profilingName
+let open_branch_and_cut_engine_profiling () = open_out !branch_and_cut_engine_profilingName
 let set_flux nme event =
   let () =
     match nme with
