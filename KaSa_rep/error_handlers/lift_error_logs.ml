@@ -7,20 +7,20 @@ let lift_generic_ternary_for_KaSim f =
   (fun a b c -> snd (for_KaSim f a b c))
 
 let lift_gen_unary dump f a =
-  let parameters = Remanent_parameters.dummy_parameters in
+  let parameters = Remanent_parameters.dummy_parameters () in
   let error = Exception.empty_error_handler in
   let error,output = f parameters error a in
   let _ = dump parameters error in
   output
     
 let lift_gen_binary dump f a b =
-  let parameters = Remanent_parameters.dummy_parameters in
+  let parameters = Remanent_parameters.dummy_parameters () in
   let error = Exception.empty_error_handler in
   let error,output = f parameters error a b in
   let _ = dump parameters error in
   output
 let lift_gen_ternary dump f a b c =
-  let parameters = Remanent_parameters.dummy_parameters in
+  let parameters = Remanent_parameters.dummy_parameters () in
   let error = Exception.empty_error_handler in
   let error,output = f parameters error a b c in
   let _ = dump parameters error in
