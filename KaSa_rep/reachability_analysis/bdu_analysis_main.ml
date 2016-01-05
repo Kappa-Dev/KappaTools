@@ -577,4 +577,48 @@ let bdu_main parameter error handler_kappa store_covering_classes cc_compil =
     else error,handler_bdu
   in
   error, handler_bdu, result
-			
+
+(************************************************************************************)
+(*print only the result at the end
+  TODO: add the array showing which rule is dead.
+*)
+
+let main_fixpoint_v1 parameter error handler_kappa store_covering_classes cc_compil =
+  let error, handler_bdu = 
+    Boolean_mvbdu.init_remanent parameter error in
+  let error, (handler_bdu, result) =
+    scan_rule_set
+      parameter
+      handler_bdu
+      error
+      handler_kappa
+      cc_compil
+      store_covering_classes
+      cc_compil.rules
+  in
+   (*-------------------------------------------------------------------------------*)
+  (*fixpoint computation: no rule in particular, we should start with rule
+    with no lhs and those induced by initial states to remove *)
+  let error, (handler_bdu, store_bdu_fixpoint) =
+    collect_bdu_fixpoint_map
+      parameter
+      handler_bdu
+      error
+      result.store_bdu_build.store_wl_creation
+      result.store_bdu_build.store_proj_bdu_creation_restriction_map
+      result.store_bdu_build.store_proj_modif_list_restriction_map
+      result.store_bdu_build.store_proj_bdu_test_restriction_map
+      result.store_bdu_build.store_proj_bdu_potential_restriction_map
+      result.store_bdu_build.store_proj_potential_list_restriction_map
+      result.store_bdu_build.store_bdu_test_restriction_map
+      result.store_bdu_build.store_proj_bdu_views
+      result.store_bdu_analysis_dynamic.store_covering_classes_modification_update_full
+      result.store_bdu_build.store_bdu_init_restriction_map
+  in
+  let error,handler_bdu =
+    if  (Remanent_parameters.get_trace parameter) || trace
+    then print_result_fixpoint parameter handler_bdu error store_bdu_fixpoint
+    else error, handler_bdu
+  in
+  error, handler_bdu, result
+

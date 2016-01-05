@@ -117,6 +117,7 @@ let main () =
     else 
       error, None 
   in
+  (*-----------------------------------------------------------------------*)
   (*BDU of fixpoint iteration function*)
   let error,handler_bdu, bdu_analysic = 
     if Remanent_parameters.get_do_reachability_analysis parameters
@@ -134,10 +135,33 @@ let main () =
        in
        let error, handler_bdu, dep =
 	 Bdu_analysis_main.bdu_main parameters_cv  error handler covering_classes c_compil 
-       in error,Some handler_bdu, Some dep
+       in error, Some handler_bdu, Some dep
     else 
-      error,None,None 
+      error, None, None 
   in
+  (*BDU of fixpoint iteration print level 1: only the result*)
+  let error, handler_bdu, bdu_analysic1 =
+    if Remanent_parameters.get_do_reachability_analysis_result parameters
+    then
+      let _ = Format.printf "Reachability analysis result ....@." in
+      let parameters_cv =
+        Remanent_parameters.update_prefix parameters ""
+      in
+      let _ =
+        if (Remanent_parameters.get_trace parameters_cv)
+        then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n"
+      in
+      let error, covering_classes =
+        Covering_classes_main.covering_classes parameters_cv error handler c_compil
+      in
+      let error, handler_bdu, dep =
+	Bdu_analysis_main.main_fixpoint_v1 parameters_cv  error handler
+          covering_classes c_compil 
+      in error, Some handler_bdu, Some dep
+    else 
+      error, None, None 
+  in
+  (*-----------------------------------------------------------------------*)
   (*BDU range*)
   (*let _ = Range_bdu.main in*)
   (*Stochastic flow of information*)

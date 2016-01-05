@@ -74,8 +74,9 @@ let do_ODE_flow_of_information = ref false
 let do_stochastic_flow_of_information = ref false
 (*covering classes, side effects, etc.*)
 let do_site_dependencies = ref false
-(*fixpoint iteration in bdu structure*)
-let do_reachability_analysis = ref true
+(*different reachability output*)
+let do_reachability_analysis = ref false
+let do_reachability_analysis_result = ref true
 
 (** accuracy *)
 let view_accuracy_level = ref "High"

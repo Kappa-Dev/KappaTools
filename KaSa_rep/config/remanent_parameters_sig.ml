@@ -86,7 +86,9 @@ type marshalisable_parameters =
    do_ODE_flow_of_information : bool ; 
    do_stochastic_flow_of_information : bool ; 
    do_site_dependencies : bool ;
+   (*different reachability output*)
    do_reachability_analysis : bool ;
+   do_reachability_analysis_result : bool;
    dump_error_as_soon_as_they_occur : bool ;
    file : string option ; 
    prefix : string ; 
