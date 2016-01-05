@@ -18,36 +18,40 @@ done
 ____________________________________________________________
 ############################################################
 	 - removing events occurring after the last observable:
- (-2 events)
+ (-3 events)
 + Producing causal compressions
 	 - splitting initial events (no change)
-	 - detecting siphons (+193 events)
-	 - cutting concurrent events (-1435 events)
+	 - detecting siphons (+191 events)
+	 - cutting concurrent events (-1422 events)
 	 - detecting pseudo inverse events (-2 events)
-	 - detecting siphons (+64 events)
-	 - cutting concurrent events (-65 events)
+	 - detecting siphons (+67 events)
+	 - cutting concurrent events (-68 events)
 	 - detecting pseudo inverse events (no change)
-	 - detecting siphons (+64 events)
-	 - cutting concurrent events (-64 events)
+	 - detecting siphons (+67 events)
+	 - cutting concurrent events (-67 events)
 	 - detecting pseudo inverse events (no change)
 	 - blackboard generation
-	 - computing causal past of each observed events (65)
+	 - computing causal past of each observed events (68)
 
 ____________________________________________________________
 ############################################################
 
 
 
-	 - weak flow compression (1)
+	 - weak flow compression (2)
 
 ____________________________________________________________
 ############################################################
 
-	 - strong flow compression (1)
+	 - strong flow compression (2)
 
 ____________________________________________________________
 ############################################################
 
-+ Pretty printing 1 weakly compressed flow
++ Pretty printing 2 weakly compressed flows
 + Pretty printing 1 strongly compressed flow
-Simulation ended
+Simulation ended (eff.: 0.998004, detail below)
+	Valid embedding but no longer unary when required: 0.000000
+	Valid embedding but not binary when required: 0.000000
+	Clashing instance: 1.000000
+	Perturbation interrupting time advance: 0.000000
