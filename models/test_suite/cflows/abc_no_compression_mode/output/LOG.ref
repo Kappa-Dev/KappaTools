@@ -1,4 +1,4 @@
-+ Command line is: 'KaSim' '-i' 'abc.ka' '-seed' '785872661' '--compile'
++ Command line is: 'KaSim' '-i' 'abc.ka' '-seed' '785872661' '--compile' '-d' 'output'
 Parsing abc.ka...
 done
 + Initialized random number generator with seed 785872661

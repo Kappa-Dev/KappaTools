@@ -44,8 +44,37 @@ ____________________________________________________________
 	 - computing causal past of each observed events (96)
 
 ____________________________________________________________
-############################################################
-
+#####################
+	 - Removing already visited observable hits last eid 28 
+(-28 events)
+	 - detecting siphons (no change)
+	 - cutting concurrent events (-84 events)
+	 - detecting pseudo inverse events (no change)
+	 - detecting siphons (no change)
+	 - cutting concurrent events (no change)
+	 - detecting pseudo inverse events (no change)
+	 - blackboard generation
+	 - computing causal past of each observed events (68)
+	 - Removing already visited observable hits last eid 39 
+(-11 events)
+	 - detecting siphons (no change)
+	 - cutting concurrent events (-33 events)
+	 - detecting pseudo inverse events (no change)
+	 - detecting siphons (no change)
+	 - cutting concurrent events (no change)
+	 - detecting pseudo inverse events (no change)
+	 - blackboard generation
+	 - computing causal past of each observed events (57)
+	 - Removing already visited observable hits last eid 50 
+(-11 events)
+	 - detecting siphons (no change)
+	 - cutting concurrent events (-33 events)
+	 - detecting pseudo inverse events (no change)
+	 - detecting siphons (no change)
+	 - cutting concurrent events (no change)
+	 - detecting pseudo inverse events (no change)
+	 - blackboard generation
+	 - computing causal past of each observed events (46)
 
 
 	 - weak flow compression (1)
