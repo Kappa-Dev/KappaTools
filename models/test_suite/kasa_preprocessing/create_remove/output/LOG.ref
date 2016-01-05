@@ -77,7 +77,7 @@ Quarks:agent_modif-:agent_type:1,rule:1->[0]
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Influence_map:Wake_up_map:rule(0):'r0' A()->B() -> rule(1):'r1' B()->C()[0->0]
 Refining the influence map...
-Reachability analysis result ....
+Reachability analysis dynamic information ....
 
 agent_type:0:
 Potential dependencies between sites:Number of covering classes:1
@@ -106,11 +106,27 @@ Potential dependencies between sites:Covering_class_id:0
 Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
 Covering_class_id:0
 
+** Dynamic information:
+
 ------------------------------------------------------------
-* Fixpoint iteration :
+(Full) Contact map and initital state:
+------------------------------------------------------------
+Sites are annotated with the id of binding type:
+
+------------------------------------------------------------
+(Syntactic) Contact map and initital state:
+------------------------------------------------------------
+Sites are annotated with the id of binding type:
+
+------------------------------------------------------------
+List of rules to awake when the state of a site is modified and tested:
 ------------------------------------------------------------
 
 ------------------------------------------------------------
-* Cartesian abstraction:
+List of rules to awake when the state of a site is modified and tested and side effects:
+------------------------------------------------------------
+
+------------------------------------------------------------
+Final list of rules to awake when the state of a site is modified and tested and side effects:
 ------------------------------------------------------------
 execution finished without any exception

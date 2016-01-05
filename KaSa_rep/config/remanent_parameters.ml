@@ -135,6 +135,10 @@ let get_parameters () =
         (*different reachability output*)
 	Remanent_parameters_sig.do_reachability_analysis = !Config.do_reachability_analysis ;
         Remanent_parameters_sig.do_reachability_analysis_result = !Config.do_reachability_analysis_result;
+        Remanent_parameters_sig.do_reachability_analysis_static = !Config.do_reachability_analysis_static;
+        Remanent_parameters_sig.do_reachability_analysis_dynamic = !Config.do_reachability_analysis_dynamic;
+        
+        (**)
 	Remanent_parameters_sig.file = !Config.file ;
 	Remanent_parameters_sig.symbols = get_symbols () ; 
 	Remanent_parameters_sig.influence_map_output = get_influence_map () ;
@@ -247,6 +251,10 @@ let get_do_site_dependencies_1             marshalisable = marshalisable.Remanen
 (*reachability different output*)
 let get_do_reachability_analysis_1        marshalisable = marshalisable.Remanent_parameters_sig.do_reachability_analysis
 let get_do_reachability_analysis_result_1 marshalisable = marshalisable.Remanent_parameters_sig.do_reachability_analysis_result
+let get_do_reachability_analysis_static_1 marshalisable = marshalisable.Remanent_parameters_sig.do_reachability_analysis_static
+let get_do_reachability_analysis_dynamic_1 marshalisable = marshalisable.Remanent_parameters_sig.do_reachability_analysis_dynamic
+
+(**)
 let get_influence_map_accuracy_level_1     marshalisable = marshalisable.Remanent_parameters_sig.influence_map_accuracy_level
 let get_contact_map_accuracy_level_1      marshalisable = marshalisable.Remanent_parameters_sig.contact_map_accuracy_level
 let get_view_accuracy_level_1             marshalisable = marshalisable.Remanent_parameters_sig.view_accuracy_level
@@ -290,7 +298,13 @@ let get_do_site_dependencies = upgrade_from_marshal_field get_do_site_dependenci
 let get_do_reachability_analysis = upgrade_from_marshal_field get_do_reachability_analysis_1
 let get_do_reachability_analysis_result =
   upgrade_from_marshal_field get_do_reachability_analysis_result_1
+let get_do_reachability_analysis_static =
+  upgrade_from_marshal_field get_do_reachability_analysis_static_1
+let get_do_reachability_analysis_dynamic =
+  upgrade_from_marshal_field get_do_reachability_analysis_dynamic_1
 
+
+(**)
 let get_symbols = upgrade_from_marshal_field get_symbols_1 
 let get_file = upgrade_from_marshal_field get_file_1 
 let get_influence_map = upgrade_from_marshal_field get_influence_map_1

@@ -8,6 +8,22 @@ done
 	 -agent signatures
 	 -sanity checks
 	 -KaSa tools initialization
+Scan rules!
+Signature:
+Signature:agents: 
+Signature:agents:agent_type:0:A
+Signature:sites: 
+Signature:sites:agent_type:0:
+Signature:sites:agent_type:0:site_type:0->x(internal state)
+Signature:states: 
+Signature:states:0:
+Signature:states:0:0:
+Signature:states:0:0:state_id:0->a
+Signature:states:0:0:state_id:1->b
+Signature:states:0:0:state_id:2->c
+Signature:states:0:0:state_id:3->d
+Signature:states:0:0:state_id:4->e
+Signature:duals: 
 + Compute the contact map
 	 -variable declarations
 	 -rules

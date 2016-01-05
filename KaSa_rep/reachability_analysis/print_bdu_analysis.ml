@@ -55,6 +55,30 @@ let print_result parameter error result =
   error
 
 (************************************************************************************)
+
+let print_result_static parameter error result =
+  let parameter = Remanent_parameters.update_prefix parameter "agent_type_" in
+  let _ =
+    print_result_static
+      parameter
+      error
+      result.store_bdu_analysis_static
+  in
+  error
+
+(************************************************************************************)
+
+let print_result_dynamic parameter error result =
+  let parameter = Remanent_parameters.update_prefix parameter "agent_type_" in
+  let _ =
+    print_result_dynamic
+      parameter
+      error
+      result.store_bdu_analysis_dynamic
+  in
+  error  
+
+(************************************************************************************)
 (*main print of fixpoint*)
 
 let print_bdu_update_map parameter error result =

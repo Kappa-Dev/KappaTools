@@ -220,7 +220,7 @@ Influence_map:Inhibition_map:rule(3):'' A()-> -> rule(1):'' A(x!_)->A(x)[0->0]
 Influence_map:Inhibition_map:rule(3):'' A()-> -> rule(2):'' B(x!_)->B(x)[0*->0]
 Influence_map:Inhibition_map:rule(4):'' B(x)-> -> rule(0):'' A(x),B(x)->A(x!1),B(x!1)[0->1]
 Refining the influence map...
-Reachability analysis result ....
+Reachability analysis dynamic information ....
 
 agent_type:0:
 Potential dependencies between sites:Number of covering classes:1
@@ -251,11 +251,57 @@ Covering_class_id:0
 Global:site_type:0  => Local:site_type':1
 Local:site_type':1  => Global:site_type:0
 
-------------------------------------------------------------
-* Fixpoint iteration :
-------------------------------------------------------------
+** Dynamic information:
 
 ------------------------------------------------------------
-* Cartesian abstraction:
+(Full) Contact map and initital state:
 ------------------------------------------------------------
+Sites are annotated with the id of binding type:
+agent_type:0@site_type:0:state:1--agent_type':1@site_type':0:state':1
+agent_type:1@site_type:0:state:1--agent_type':0@site_type':0:state':1
+
+------------------------------------------------------------
+(Syntactic) Contact map and initital state:
+------------------------------------------------------------
+Sites are annotated with the id of binding type:
+agent_type:0@site_type:0:state:1--agent_type':1@site_type':0:state':1
+
+------------------------------------------------------------
+List of rules to awake when the state of a site is modified and tested:
+------------------------------------------------------------
+agent_type:0:covering_class_id:0:@set of rule_id:
+rule_id:0
+rule_id:1
+agent_type:1:covering_class_id:0:@set of rule_id:
+rule_id:0
+rule_id:2
+rule_id:4
+
+------------------------------------------------------------
+List of rules to awake when the state of a site is modified and tested and side effects:
+------------------------------------------------------------
+agent_type:0:covering_class_id:0:@set of rule_id:
+rule_id:0
+rule_id:1
+rule_id:2
+agent_type:1:covering_class_id:0:@set of rule_id:
+rule_id:0
+rule_id:1
+rule_id:2
+rule_id:3
+rule_id:4
+
+------------------------------------------------------------
+Final list of rules to awake when the state of a site is modified and tested and side effects:
+------------------------------------------------------------
+agent_type:0:covering_class_id:0:@set of rule_id:
+rule_id:0
+rule_id:1
+rule_id:2
+agent_type:1:covering_class_id:0:@set of rule_id:
+rule_id:0
+rule_id:1
+rule_id:2
+rule_id:3
+rule_id:4
 execution finished without any exception

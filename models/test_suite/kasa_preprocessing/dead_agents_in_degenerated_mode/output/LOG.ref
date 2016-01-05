@@ -372,7 +372,7 @@ Influence_map:Inhibition_map:rule(6):'' A(x~u!_)->A(x~p) -> rule(7):'' A(x~u!_)-
 Influence_map:Inhibition_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(3):'' A(x~u?)->A(x~p?)[0->0]
 Influence_map:Inhibition_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(5):'' A(x~u?)->A(x~p?)[0->0]
 Influence_map:Inhibition_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(6):'' A(x~u!_)->A(x~p)[0->0]
-Reachability analysis result ....
+Reachability analysis dynamic information ....
 
 agent_type:0:
 Potential dependencies between sites:Number of covering classes:1
@@ -403,67 +403,53 @@ Covering_class_id:0
 Global:site_type:0  => Local:site_type':1
 Local:site_type':1  => Global:site_type:0
 
-------------------------------------------------------------
-* Fixpoint iteration :
-------------------------------------------------------------
-agent_type:0:cv_id:0
-Id=6
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=4
-   Node(site_type:1<2)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
-agent_type:1:cv_id:0
-Id=6
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=4
-   Node(site_type:1<2)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
+** Dynamic information:
 
 ------------------------------------------------------------
-* Cartesian abstraction:
+(Full) Contact map and initital state:
 ------------------------------------------------------------
-agent_type:0:cv_id:0
-Id=6
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
+Sites are annotated with the id of binding type:
 
-  Id=4
-   Node(site_type:1<2)
-    Id=0
-     Leaf True 
+------------------------------------------------------------
+(Syntactic) Contact map and initital state:
+------------------------------------------------------------
+Sites are annotated with the id of binding type:
 
-    Id=1
-     Leaf False 
+------------------------------------------------------------
+List of rules to awake when the state of a site is modified and tested:
+------------------------------------------------------------
+agent_type:0:covering_class_id:0:@set of rule_id:
+rule_id:0
+rule_id:3
+rule_id:4
+rule_id:5
+rule_id:6
+rule_id:7
+rule_id:8
+rule_id:9
+agent_type:1:covering_class_id:0:@set of rule_id:
+rule_id:0
+rule_id:1
+rule_id:2
 
-agent_type:1:cv_id:0
-Id=6
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
+------------------------------------------------------------
+List of rules to awake when the state of a site is modified and tested and side effects:
+------------------------------------------------------------
 
-  Id=4
-   Node(site_type:1<2)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
+------------------------------------------------------------
+Final list of rules to awake when the state of a site is modified and tested and side effects:
+------------------------------------------------------------
+agent_type:0:covering_class_id:0:@set of rule_id:
+rule_id:0
+rule_id:3
+rule_id:4
+rule_id:5
+rule_id:6
+rule_id:7
+rule_id:8
+rule_id:9
+agent_type:1:covering_class_id:0:@set of rule_id:
+rule_id:0
+rule_id:1
+rule_id:2
 execution finished without any exception

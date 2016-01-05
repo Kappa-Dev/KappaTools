@@ -8,6 +8,70 @@ done
 	 -agent signatures
 	 -sanity checks
 	 -KaSa tools initialization
+Scan rules!
+Signature:
+Signature:agents: 
+Signature:agents:agent_type:0:A
+Signature:agents:agent_type:1:B
+Signature:agents:agent_type:2:C
+Signature:sites: 
+Signature:sites:agent_type:0:
+Signature:sites:agent_type:0:site_type:0->x(binding state)
+Signature:sites:agent_type:0:site_type:1->c(binding state)
+Signature:sites:agent_type:1:
+Signature:sites:agent_type:1:site_type:0->x(binding state)
+Signature:sites:agent_type:2:
+Signature:sites:agent_type:2:site_type:0->x1(internal state)
+Signature:sites:agent_type:2:site_type:1->x2(internal state)
+Signature:sites:agent_type:2:site_type:2->x1(binding state)
+Signature:sites:agent_type:2:site_type:3->x2(binding state)
+Signature:states: 
+Signature:states:0:
+Signature:states:0:0:
+Signature:states:0:0:state_id:0->free
+Signature:states:0:0:state_id:1->agent_type:1@site_type:0
+Signature:states:0:1:
+Signature:states:0:1:state_id:0->free
+Signature:states:0:1:state_id:1->agent_type:2@site_type:2
+Signature:states:0:1:state_id:2->agent_type:2@site_type:3
+Signature:states:1:
+Signature:states:1:0:
+Signature:states:1:0:state_id:0->free
+Signature:states:1:0:state_id:1->agent_type:0@site_type:0
+Signature:states:2:
+Signature:states:2:0:
+Signature:states:2:0:state_id:0->u
+Signature:states:2:0:state_id:1->p
+Signature:states:2:1:
+Signature:states:2:1:state_id:0->u
+Signature:states:2:1:state_id:1->p
+Signature:states:2:2:
+Signature:states:2:2:state_id:0->free
+Signature:states:2:2:state_id:1->agent_type:0@site_type:1
+Signature:states:2:3:
+Signature:states:2:3:state_id:0->free
+Signature:states:2:3:state_id:1->agent_type:0@site_type:1
+Signature:duals: 
+Signature:duals:0:
+Signature:duals:0:0:
+Signature:duals:0:0:1:
+Signature:duals:0:0:1:agent_type:1,site_type:0,state_id:1
+Signature:duals:0:1:
+Signature:duals:0:1:1:
+Signature:duals:0:1:1:agent_type:2,site_type:2,state_id:1
+Signature:duals:0:1:2:
+Signature:duals:0:1:2:agent_type:2,site_type:3,state_id:1
+Signature:duals:1:
+Signature:duals:1:0:
+Signature:duals:1:0:1:
+Signature:duals:1:0:1:agent_type:0,site_type:0,state_id:1
+Signature:duals:2:
+Signature:duals:2:2:
+Signature:duals:2:2:1:
+Signature:duals:2:2:1:agent_type:0,site_type:1,state_id:1
+Signature:duals:2:3:
+Signature:duals:2:3:1:
+Signature:duals:2:3:1:agent_type:0,site_type:1,state_id:2
 + Compute the contact map
 	 -variable declarations
 	 -rules

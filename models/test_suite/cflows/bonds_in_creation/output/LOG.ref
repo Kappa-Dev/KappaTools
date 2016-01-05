@@ -8,6 +8,98 @@ done
 	 -agent signatures
 	 -sanity checks
 	 -KaSa tools initialization
+Scan rules!
+Signature:
+Signature:agents: 
+Signature:agents:agent_type:0:K
+Signature:agents:agent_type:1:S
+Signature:agents:agent_type:2:C
+Signature:agents:agent_type:3:L
+Signature:agents:agent_type:4:Z
+Signature:sites: 
+Signature:sites:agent_type:0:
+Signature:sites:agent_type:0:site_type:0->x(internal state)
+Signature:sites:agent_type:0:site_type:1->s(binding state)
+Signature:sites:agent_type:1:
+Signature:sites:agent_type:1:site_type:0->x(internal state)
+Signature:sites:agent_type:1:site_type:1->y(internal state)
+Signature:sites:agent_type:1:site_type:2->k(binding state)
+Signature:sites:agent_type:1:site_type:3->l(binding state)
+Signature:sites:agent_type:1:site_type:4->z(binding state)
+Signature:sites:agent_type:2:
+Signature:sites:agent_type:3:
+Signature:sites:agent_type:3:site_type:0->z(binding state)
+Signature:sites:agent_type:3:site_type:1->s(binding state)
+Signature:sites:agent_type:4:
+Signature:sites:agent_type:4:site_type:0->l(binding state)
+Signature:sites:agent_type:4:site_type:1->s(binding state)
+Signature:states: 
+Signature:states:0:
+Signature:states:0:0:
+Signature:states:0:0:state_id:0->u
+Signature:states:0:0:state_id:1->p
+Signature:states:0:1:
+Signature:states:0:1:state_id:0->free
+Signature:states:0:1:state_id:1->agent_type:1@site_type:2
+Signature:states:1:
+Signature:states:1:0:
+Signature:states:1:0:state_id:0->u
+Signature:states:1:0:state_id:1->p
+Signature:states:1:1:
+Signature:states:1:1:state_id:0->u
+Signature:states:1:1:state_id:1->p
+Signature:states:1:2:
+Signature:states:1:2:state_id:0->free
+Signature:states:1:2:state_id:1->agent_type:0@site_type:1
+Signature:states:1:3:
+Signature:states:1:3:state_id:0->free
+Signature:states:1:3:state_id:1->agent_type:3@site_type:1
+Signature:states:1:4:
+Signature:states:1:4:state_id:0->free
+Signature:states:1:4:state_id:1->agent_type:4@site_type:1
+Signature:states:3:
+Signature:states:3:0:
+Signature:states:3:0:state_id:0->free
+Signature:states:3:0:state_id:1->agent_type:4@site_type:0
+Signature:states:3:1:
+Signature:states:3:1:state_id:0->free
+Signature:states:3:1:state_id:1->agent_type:1@site_type:3
+Signature:states:4:
+Signature:states:4:0:
+Signature:states:4:0:state_id:0->free
+Signature:states:4:0:state_id:1->agent_type:3@site_type:0
+Signature:states:4:1:
+Signature:states:4:1:state_id:0->free
+Signature:states:4:1:state_id:1->agent_type:1@site_type:4
+Signature:duals: 
+Signature:duals:0:
+Signature:duals:0:1:
+Signature:duals:0:1:1:
+Signature:duals:0:1:1:agent_type:1,site_type:2,state_id:1
+Signature:duals:1:
+Signature:duals:1:2:
+Signature:duals:1:2:1:
+Signature:duals:1:2:1:agent_type:0,site_type:1,state_id:1
+Signature:duals:1:3:
+Signature:duals:1:3:1:
+Signature:duals:1:3:1:agent_type:3,site_type:1,state_id:1
+Signature:duals:1:4:
+Signature:duals:1:4:1:
+Signature:duals:1:4:1:agent_type:4,site_type:1,state_id:1
+Signature:duals:3:
+Signature:duals:3:0:
+Signature:duals:3:0:1:
+Signature:duals:3:0:1:agent_type:4,site_type:0,state_id:1
+Signature:duals:3:1:
+Signature:duals:3:1:1:
+Signature:duals:3:1:1:agent_type:1,site_type:3,state_id:1
+Signature:duals:4:
+Signature:duals:4:0:
+Signature:duals:4:0:1:
+Signature:duals:4:0:1:agent_type:3,site_type:0,state_id:1
+Signature:duals:4:1:
+Signature:duals:4:1:1:
+Signature:duals:4:1:1:agent_type:1,site_type:4,state_id:1
 + Compute the contact map
 	 -variable declarations
 	 -rules

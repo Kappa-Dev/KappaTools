@@ -24,7 +24,7 @@ let version = "4.01"
 let output_directory = ref "" 
 
 let unsafe = ref true
-let trace = ref false
+let trace = ref true
 let dump_error_as_soon_as_they_occur = ref false
 let log = ref stdout 
 let formatter = ref Format.std_formatter
@@ -76,7 +76,9 @@ let do_stochastic_flow_of_information = ref false
 let do_site_dependencies = ref false
 (*different reachability output*)
 let do_reachability_analysis = ref false
-let do_reachability_analysis_result = ref true
+let do_reachability_analysis_result = ref false
+let do_reachability_analysis_static = ref false
+let do_reachability_analysis_dynamic = ref true
 
 (** accuracy *)
 let view_accuracy_level = ref "High"

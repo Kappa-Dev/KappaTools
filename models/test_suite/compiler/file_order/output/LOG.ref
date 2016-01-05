@@ -10,6 +10,12 @@ done
 	 -agent signatures
 	 -sanity checks
 	 -KaSa tools initialization
+Scan rules!
+Signature:
+Signature:agents: 
+Signature:sites: 
+Signature:states: 
+Signature:duals: 
 + Compute the contact map
 	 -variable declarations
 	 -rules

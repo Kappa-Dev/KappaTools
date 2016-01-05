@@ -583,7 +583,7 @@ let bdu_main parameter error handler_kappa store_covering_classes cc_compil =
   TODO: add the array showing which rule is dead.
 *)
 
-let main_fixpoint_v1 parameter error handler_kappa store_covering_classes cc_compil =
+let main_analysis_result parameter error handler_kappa store_covering_classes cc_compil =
   let error, handler_bdu = 
     Boolean_mvbdu.init_remanent parameter error in
   let error, (handler_bdu, result) =
@@ -622,3 +622,54 @@ let main_fixpoint_v1 parameter error handler_kappa store_covering_classes cc_com
   in
   error, handler_bdu, result
 
+(************************************************************************************)
+(*print only static information*)
+
+let main_analysis_static parameter error handler_kappa store_covering_classes
+    cc_compil =
+  let error, handler_bdu = 
+    Boolean_mvbdu.init_remanent parameter error in
+  let error, (handler_bdu, result) =
+    scan_rule_set
+      parameter
+      handler_bdu
+      error
+      handler_kappa
+      cc_compil
+      store_covering_classes
+      cc_compil.rules
+  in
+  (*-------------------------------------------------------------------------------*)
+  (* Static information before fixpoint computation *)
+  let error = 
+    if  (Remanent_parameters.get_trace parameter) || trace
+    then print_result_static parameter error result
+    else error
+  in
+  error, handler_bdu, result
+
+(************************************************************************************)
+(*print only dynamic information*)
+
+let main_analysis_dynamic parameter error handler_kappa store_covering_classes
+    cc_compil =
+  let error, handler_bdu = 
+    Boolean_mvbdu.init_remanent parameter error in
+  let error, (handler_bdu, result) =
+    scan_rule_set
+      parameter
+      handler_bdu
+      error
+      handler_kappa
+      cc_compil
+      store_covering_classes
+      cc_compil.rules
+  in
+  (*-------------------------------------------------------------------------------*)
+  (* Static information before fixpoint computation *)
+  let error = 
+    if  (Remanent_parameters.get_trace parameter) || trace
+    then print_result_dynamic parameter error result
+    else error
+  in
+  error, handler_bdu, result

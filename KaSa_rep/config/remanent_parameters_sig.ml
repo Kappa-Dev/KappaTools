@@ -89,6 +89,10 @@ type marshalisable_parameters =
    (*different reachability output*)
    do_reachability_analysis : bool ;
    do_reachability_analysis_result : bool;
+   do_reachability_analysis_static : bool;
+   do_reachability_analysis_dynamic : bool;
+
+   (**)
    dump_error_as_soon_as_they_occur : bool ;
    file : string option ; 
    prefix : string ; 
