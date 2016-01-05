@@ -1,0 +1,20 @@
+digraph G{ label="Flux map" ; labelloc="t" ; node [shape=box,style=filled,fillcolor=lightskyblue]
+"a.b" -> "a.b" [weight=72,label="-72.281",color=red3,arrowhead=tee];
+"a.b" -> "a.b_op" [weight=43,label="43.400",color=green3,arrowhead=normal];
+"a.b" -> "ab.c" [weight=411,label="411.980",color=green3,arrowhead=normal];
+"a.b" -> "a.c" [weight=6,label="-6.386",color=red3,arrowhead=tee];
+"a.b" -> "mod x2" [weight=8,label="-8.000",color=red3,arrowhead=tee];
+"a.b_op" -> "a.b" [weight=22,label="22.975",color=green3,arrowhead=normal];
+"a.b_op" -> "a.b_op" [weight=14,label="-14.600",color=red3,arrowhead=tee];
+"a.b_op" -> "ab.c" [weight=92,label="-92.712",color=red3,arrowhead=tee];
+"a.b_op" -> "a.c" [weight=2,label="2.143",color=green3,arrowhead=normal];
+"ab.c" -> "ab.c" [weight=695,label="-695.158",color=red3,arrowhead=tee];
+"ab.c" -> "mod x1" [weight=712,label="712.000",color=green3,arrowhead=normal];
+"mod x1" -> "ab.c" [weight=522,label="522.640",color=green3,arrowhead=normal];
+"mod x1" -> "mod x1" [weight=583,label="-583.000",color=red3,arrowhead=tee];
+"mod x1" -> "a.c" [weight=45,label="45.213",color=green3,arrowhead=normal];
+"a.c" -> "a.c" [weight=8,label="-8.488",color=red3,arrowhead=tee];
+"a.c" -> "mod x2" [weight=81,label="81.000",color=green3,arrowhead=normal];
+"mod x2" -> "a.c" [weight=1,label="1.403",color=green3,arrowhead=normal];
+"mod x2" -> "mod x2" [weight=43,label="-43.000",color=red3,arrowhead=tee];
+}

@@ -1,0 +1,39 @@
++ Command line is: 'KaSim' '-i' 'abc.ka' '-seed' '785872661' '--compile'
+Parsing abc.ka...
+done
++ Initialized random number generator with seed 785872661
++ Building initial simulation conditions...
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -sanity checks
+	 -KaSa tools initialization
++ Compute the contact map
+	 -variable declarations
+	 -rules
+	 -observables
+	 -perturbations
+	 -initial conditions
+	 Done
++ Command line is: 'KaSim' '-i' 'abc.ka' '-seed' '924556145' '-var' 'on_rate' '1.0E-4' '-e' '2000' '-d' 'output' '-p' '500'
+Parsing abc.ka...
+done
++ Initialized random number generator with seed 924556145
++ Building initial simulation conditions...
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -sanity checks
+	 -KaSa tools initialization
++ Compute the contact map
+	 -variable declarations
+	 -rules
+	 -observables
+	 -perturbations
+	 -initial conditions
+	 Done
+____________________________________________________________
+#
+Warning: an observable hit is tracked whereas no compression mode has been selected
+###########################################################
+Simulation ended
