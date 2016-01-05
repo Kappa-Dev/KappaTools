@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   * 
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <2015-11-27 09:31:50 feret>
+  * Last modification: Time-stamp: <2016-01-05 16:06:59 feret>
   * * 
   * Configuration parameters which are passed through functions computation
 
@@ -108,9 +108,23 @@ let get_contact_map () =
     Remanent_parameters_sig.influence_color = !Config.influence_color ;
     Remanent_parameters_sig.influence_arrow = !Config.influence_arrow ;
    }
-  
+
+let open_tasks_profiling =
+  let cache = ref None in 
+  let f () = 
+    match 
+      !cache 
+    with 
+    | None -> 
+      let channel = Kappa_files.open_tasks_profiling () in 
+      let () = cache := Some channel in
+      channel
+    | Some channel -> channel
+  in 
+  f
+
 let get_parameters () =
-   let channel = Kappa_files.open_tasks_profiling () in
+   let channel = open_tasks_profiling () in
   { Remanent_parameters_sig.marshalisable_parameters = 
       {
 	Remanent_parameters_sig.do_contact_map = !Config.do_contact_map ; 
@@ -152,8 +166,19 @@ let get_parameters () =
       Format.formatter_of_out_channel channel
   }
 
-let dummy_parameters = get_parameters ()
-    
+let dummy_parameters = 
+  let cache = ref None in 
+  let f () = 
+    match 
+      !cache 
+    with 
+    | None -> 
+      let p = get_parameters () in 
+      let () = cache := Some p in
+      p
+    | Some p -> p
+  in 
+  f
 let get_btype_sep_symbol_1         symbol = symbol.Remanent_parameters_sig.btype_sep 
 let get_bound_symbol_1             symbol = symbol.Remanent_parameters_sig.bound 
 let get_at_symbol_1                symbol = symbol.Remanent_parameters_sig.at
