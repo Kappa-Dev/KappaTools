@@ -744,6 +744,110 @@ rule_id:5
 rule_id:6
 
 ------------------------------------------------------------
+List of rules to awake when the state of a site is modified and tested and side effects:
+------------------------------------------------------------
+agent_type:0:covering_class_id:0:@set of rule_id:
+rule_id:0
+rule_id:3
+rule_id:4
+rule_id:7
+agent_type:0:covering_class_id:1:@set of rule_id:
+rule_id:0
+rule_id:3
+rule_id:4
+rule_id:7
+agent_type:0:covering_class_id:2:@set of rule_id:
+rule_id:0
+rule_id:3
+rule_id:4
+rule_id:7
+agent_type:1:covering_class_id:0:@set of rule_id:
+rule_id:1
+rule_id:2
+rule_id:3
+rule_id:4
+rule_id:6
+rule_id:7
+agent_type:1:covering_class_id:1:@set of rule_id:
+rule_id:1
+rule_id:2
+rule_id:3
+rule_id:4
+rule_id:6
+rule_id:7
+agent_type:1:covering_class_id:2:@set of rule_id:
+rule_id:1
+rule_id:2
+rule_id:3
+rule_id:4
+rule_id:6
+rule_id:7
+agent_type:2:covering_class_id:0:@set of rule_id:
+rule_id:5
+rule_id:6
+rule_id:7
+agent_type:2:covering_class_id:1:@set of rule_id:
+rule_id:5
+rule_id:6
+rule_id:7
+agent_type:2:covering_class_id:2:@set of rule_id:
+rule_id:5
+rule_id:6
+rule_id:7
+
+------------------------------------------------------------
+Final list of rules to awake when the state of a site is modified and tested and side effects:
+------------------------------------------------------------
+agent_type:0:covering_class_id:0:@set of rule_id:
+rule_id:0
+rule_id:3
+rule_id:4
+rule_id:7
+agent_type:0:covering_class_id:1:@set of rule_id:
+rule_id:0
+rule_id:3
+rule_id:4
+rule_id:7
+agent_type:0:covering_class_id:2:@set of rule_id:
+rule_id:0
+rule_id:3
+rule_id:4
+rule_id:7
+agent_type:1:covering_class_id:0:@set of rule_id:
+rule_id:1
+rule_id:2
+rule_id:3
+rule_id:4
+rule_id:6
+rule_id:7
+agent_type:1:covering_class_id:1:@set of rule_id:
+rule_id:1
+rule_id:2
+rule_id:3
+rule_id:4
+rule_id:6
+rule_id:7
+agent_type:1:covering_class_id:2:@set of rule_id:
+rule_id:1
+rule_id:2
+rule_id:3
+rule_id:4
+rule_id:6
+rule_id:7
+agent_type:2:covering_class_id:0:@set of rule_id:
+rule_id:5
+rule_id:6
+rule_id:7
+agent_type:2:covering_class_id:1:@set of rule_id:
+rule_id:5
+rule_id:6
+rule_id:7
+agent_type:2:covering_class_id:2:@set of rule_id:
+rule_id:5
+rule_id:6
+rule_id:7
+
+------------------------------------------------------------
 * Covering classes with new indexes:
 ------------------------------------------------------------
 - Working list creation:
@@ -1557,9 +1661,11 @@ in add_update_to_wl:agent_type:0:cv_id:0
 in add_update_to_wl: set of rule_id:0
 in add_update_to_wl: set of rule_id:3
 in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:7
 in add_update_to_wl:rule_id:0
 in add_update_to_wl:rule_id:3
 in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:7
 Ag:0
 new views:
 Id=2
@@ -1577,7 +1683,13 @@ Id=2
 
 in add_update_to_wl:agent_type:0:cv_id:1
 in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:7
 in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:3
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:7
 Ag:0
 new views:
 Id=2
@@ -1595,7 +1707,13 @@ Id=2
 
 in add_update_to_wl:agent_type:0:cv_id:2
 in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:7
 in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:3
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:7
 Test for rule:1
 enabled
 Ag:1
@@ -1662,11 +1780,13 @@ in add_update_to_wl:agent_type:1:cv_id:0
 in add_update_to_wl: set of rule_id:1
 in add_update_to_wl: set of rule_id:2
 in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
 in add_update_to_wl: set of rule_id:6
 in add_update_to_wl: set of rule_id:7
 in add_update_to_wl:rule_id:1
 in add_update_to_wl:rule_id:2
 in add_update_to_wl:rule_id:3
+in add_update_to_wl:rule_id:4
 in add_update_to_wl:rule_id:6
 in add_update_to_wl:rule_id:7
 Test for rule:5
@@ -1689,8 +1809,10 @@ Id=3
 in add_update_to_wl:agent_type:2:cv_id:0
 in add_update_to_wl: set of rule_id:5
 in add_update_to_wl: set of rule_id:6
+in add_update_to_wl: set of rule_id:7
 in add_update_to_wl:rule_id:5
 in add_update_to_wl:rule_id:6
+in add_update_to_wl:rule_id:7
 Test for rule:0
 enabled
 Ag:0
@@ -1702,9 +1824,11 @@ in add_update_to_wl:agent_type:0:cv_id:0
 in add_update_to_wl: set of rule_id:0
 in add_update_to_wl: set of rule_id:3
 in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:7
 in add_update_to_wl:rule_id:0
 in add_update_to_wl:rule_id:3
 in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:7
 Ag:0
 new views:
 Id=1
@@ -1712,7 +1836,13 @@ Id=1
 
 in add_update_to_wl:agent_type:0:cv_id:1
 in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:7
 in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:3
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:7
 Ag:0
 new views:
 Id=1
@@ -1720,7 +1850,13 @@ Id=1
 
 in add_update_to_wl:agent_type:0:cv_id:2
 in add_update_to_wl: set of rule_id:0
+in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:7
 in add_update_to_wl:rule_id:0
+in add_update_to_wl:rule_id:3
+in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:7
 Test for rule:3
 enabled
 Ag:0 Type:0 Cv_id:0
@@ -1743,9 +1879,11 @@ in add_update_to_wl:agent_type:0:cv_id:0
 in add_update_to_wl: set of rule_id:0
 in add_update_to_wl: set of rule_id:3
 in add_update_to_wl: set of rule_id:4
+in add_update_to_wl: set of rule_id:7
 in add_update_to_wl:rule_id:0
 in add_update_to_wl:rule_id:3
 in add_update_to_wl:rule_id:4
+in add_update_to_wl:rule_id:7
 Ag:1 Type:1 Cv_id:0
 Ag:1
 new views:
@@ -1811,11 +1949,13 @@ in add_update_to_wl:agent_type:1:cv_id:0
 in add_update_to_wl: set of rule_id:1
 in add_update_to_wl: set of rule_id:2
 in add_update_to_wl: set of rule_id:3
+in add_update_to_wl: set of rule_id:4
 in add_update_to_wl: set of rule_id:6
 in add_update_to_wl: set of rule_id:7
 in add_update_to_wl:rule_id:1
 in add_update_to_wl:rule_id:2
 in add_update_to_wl:rule_id:3
+in add_update_to_wl:rule_id:4
 in add_update_to_wl:rule_id:6
 in add_update_to_wl:rule_id:7
 Test for rule:4
@@ -1828,14 +1968,6 @@ Ag:0
 Nothing has changed
 Ag:1
 Nothing has changed
-Test for rule:1
-enabled
-Ag:1
-Nothing has changed
-Test for rule:2
-disabled
-Test for rule:6
-disabled
 Test for rule:7
 enabled
 Ag:0 Type:1 Cv_id:0
@@ -1858,8 +1990,18 @@ Id=1
 in add_update_to_wl:agent_type:2:cv_id:0
 in add_update_to_wl: set of rule_id:5
 in add_update_to_wl: set of rule_id:6
+in add_update_to_wl: set of rule_id:7
 in add_update_to_wl:rule_id:5
 in add_update_to_wl:rule_id:6
+in add_update_to_wl:rule_id:7
+Test for rule:1
+enabled
+Ag:1
+Nothing has changed
+Test for rule:2
+disabled
+Test for rule:6
+disabled
 Test for rule:5
 enabled
 Ag:2
@@ -1880,8 +2022,22 @@ Nothing has changed
 Ag:1 Type:1 Cv_id:0
 Ag:1
 Nothing has changed
-Test for rule:6
-disabled
+Test for rule:7
+enabled
+Ag:0 Type:1 Cv_id:0
+Ag:1
+Nothing has changed
+Ag:1 Type:1 Cv_id:0
+Ag:1
+Nothing has changed
+Ag:0
+Nothing has changed
+Ag:0
+Nothing has changed
+Ag:0
+Nothing has changed
+Ag:2
+Nothing has changed
 
 ------------------------------------------------------------
 * Fixpoint iteration :

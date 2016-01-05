@@ -113,10 +113,7 @@ let print_contact_map_full parameter error result =
 
 let print_covering_classes_modification_aux parameter error result =
   Int2Map_CV_Modif.Map.iter
-    ( fun (x, y) (l1, s2) ->
-      if l1 <> []
-      then ()
-      else ();
+    ( fun (x, y) (_, s2) ->
       let _ =
         fprintf parameter.log
           "agent_type:%i:covering_class_id:%i:@set of rule_id:\n" x y
@@ -142,30 +139,32 @@ let print_covering_classes_modification parameter error result =
 (************************************************************************************)
 (*update(c'), when discovered a bond for the first time*)
 
-(*let print_covering_classes_modification_side_effects_aux parameter error result =
-  Int2Map_CV_Modif.Map.iter
-    ( fun (x, y) (_, s2) ->
-      let _ =
-        fprintf parameter.log
-          "agent_type:%i:covering_class_id:%i:@set of rule_id:\n" x y
-      in
-      Site_map_and_set.Set.iter
-        (fun rule_id ->
-          fprintf parameter.log "rule_id:%i\n" rule_id
-        ) s2
-    ) result
-
-let print_covering_classes_modification_side_effects parameter error result =
-   fprintf (Remanent_parameters.get_log parameter)
+let print_covering_classes_side_effects parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
     "\n------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
-    "List of rules to awake when discovered sites that are bond on the rhs for the first time:\n";
+    "List of rules to awake when the state of a site is modified and tested and side effects:\n";
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
-  print_covering_classes_modification_side_effects_aux
+  print_covering_classes_modification_aux
     parameter
     error
-    result*)
+    result
+
+(************************************************************************************)
+(*Final update function*)
+
+let print_covering_classes_update_full parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "\n------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "Final list of rules to awake when the state of a site is modified and tested and side effects:\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  print_covering_classes_modification_aux
+    parameter
+    error
+    result
 
 (************************************************************************************)
 (*main print*)
@@ -181,13 +180,6 @@ let print_result_dynamic parameter error result =
       result.store_contact_map_full
   in
   (*------------------------------------------------------------------------------*)
-  (*let _ =
-    print_contact_map
-      parameter
-      error
-      result.store_contact_map
-  in*)
-  (*TODO*)
   let _ =
     print_contact_map
       parameter
@@ -202,10 +194,17 @@ let print_result_dynamic parameter error result =
       result.store_covering_classes_modification_update
   in
   (*------------------------------------------------------------------------------*)
-  (*let _ =
-    print_covering_classes_modification_side_effects
+  let _ =
+    print_covering_classes_side_effects
       parameter
       error
-      result.store_covering_classes_modification_update_side_effects
-  in*)
+      result.store_covering_classes_modification_side_effects
+  in
+  (*------------------------------------------------------------------------------*)
+  let _ =
+    print_covering_classes_update_full
+      parameter
+      error
+      result.store_covering_classes_modification_update_full
+  in
   error

@@ -298,6 +298,18 @@ agent_type:5:covering_class_id:0:@set of rule_id:
 rule_id:4
 
 ------------------------------------------------------------
+List of rules to awake when the state of a site is modified and tested and side effects:
+------------------------------------------------------------
+
+------------------------------------------------------------
+Final list of rules to awake when the state of a site is modified and tested and side effects:
+------------------------------------------------------------
+agent_type:3:covering_class_id:0:@set of rule_id:
+rule_id:3
+agent_type:5:covering_class_id:0:@set of rule_id:
+rule_id:4
+
+------------------------------------------------------------
 * Covering classes with new indexes:
 ------------------------------------------------------------
 - Working list creation:

@@ -270,10 +270,6 @@ let collect_bdu_creation_restriction_map parameter handler error rule_id rule st
                 in
                 (*-----------------------------------------------------------------*)
 		let add site state (error, store_result) = 
-		  (*let error, site' = 
-                    Site_map_and_set.Map.find_default parameter error 0 
-                      site map_new_index_forward 
-                  in*) (* JF: we should raise an alarm if not found *) 
                   let error, site' =
                     match Site_map_and_set.Map.find_option parameter error
                       site map_new_index_forward 
@@ -387,10 +383,6 @@ let collect_bdu_init_restriction_map parameter handler error compil store_remane
                   in
                   (*-----------------------------------------------------------------*)
 		  let add site state (error, store_result) = 
-		    (*let error, site' =
-                      Site_map_and_set.Map.find_default parameter error 0 site 
-                        map_new_index_forward 
-                    in*) (* JF: should raise an alarm if not found *)
                     let error, site' =
                       match Site_map_and_set.Map.find_option parameter error site
                         map_new_index_forward
@@ -803,7 +795,7 @@ let collect_proj_potential_list_restriction_map parameter handler error
   (error, handler), store_result
 
 (************************************************************************************)
-(*TODO: used in is_enable*)
+(*REMOVE: used in is_enable*)
 
 let collect_focus_views parameter handler error store_bdu_test_restriction_map =
   let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in

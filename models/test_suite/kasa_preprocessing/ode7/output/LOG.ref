@@ -303,6 +303,21 @@ agent_type:2:covering_class_id:0:@set of rule_id:
 rule_id:1
 
 ------------------------------------------------------------
+List of rules to awake when the state of a site is modified and tested and side effects:
+------------------------------------------------------------
+
+------------------------------------------------------------
+Final list of rules to awake when the state of a site is modified and tested and side effects:
+------------------------------------------------------------
+agent_type:0:covering_class_id:0:@set of rule_id:
+rule_id:0
+agent_type:1:covering_class_id:0:@set of rule_id:
+rule_id:0
+rule_id:1
+agent_type:2:covering_class_id:0:@set of rule_id:
+rule_id:1
+
+------------------------------------------------------------
 * Covering classes with new indexes:
 ------------------------------------------------------------
 - Working list creation:

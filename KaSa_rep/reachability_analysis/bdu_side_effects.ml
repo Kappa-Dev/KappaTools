@@ -49,6 +49,7 @@ let half_break_action parameter error handler rule_id half_break store_result =
     in
     error, result
   in
+  (*-------------------------------------------------------------------------------*)
   let error, store_result =
     List.fold_left (fun (error, store_result) (site_address, state_op) ->
       (*site_address: {agent_index, site, agent_type}*)
@@ -75,6 +76,7 @@ let half_break_action parameter error handler rule_id half_break store_result =
           end
         | Some interval -> error, (interval.min, interval.max)
       in
+      (*-------------------------------------------------------------------------------*)
       (*return result*)
       let error, store_result =
         add_link (agent_type, site) (rule_id, state_min) store_result
@@ -82,6 +84,7 @@ let half_break_action parameter error handler rule_id half_break store_result =
       error, store_result  
   ) (error, store_result) half_break
   in
+  (*-------------------------------------------------------------------------------*)
   (*map function*)
   let store_result =
     Int2Map_HalfBreak_effect.Map.map (fun (l, x) -> List.rev l, x) store_result
@@ -100,6 +103,7 @@ let remove_action parameter error rule_id remove store_result =
     in
     error, result
   in
+  (*-------------------------------------------------------------------------------*)
   let error, store_result =
     List.fold_left (fun (error, store_result) (agent_index, agent, list_undoc) ->
       let agent_type = agent.agent_name in
@@ -116,6 +120,7 @@ let remove_action parameter error rule_id remove store_result =
       error, store_result
     ) (error, store_result) remove
   in
+  (*-------------------------------------------------------------------------------*)
   let store_result =
     Int2Map_Remove_effect.Map.map (fun (l, x) -> List.rev l, x) store_result
   in
@@ -137,6 +142,7 @@ let store_potential_half_break parameter error handler rule_id half_break store_
     in
     error, result
   in
+  (*-------------------------------------------------------------------------------*)
   List.fold_left (fun (error, store_modif_minus) (add, state_op) ->
     let agent_type = add.agent_type in
     let site = add.site in
@@ -162,6 +168,7 @@ let store_potential_half_break parameter error handler rule_id half_break store_
         end
       | Some interval -> error, (interval.min, interval.max)
     in
+    (*-------------------------------------------------------------------------------*)
     let rec aux k (error, store_result) =
       if k > state_max
       then
@@ -196,6 +203,7 @@ let store_potential_remove parameter error handler rule_id remove store_result =
     in
     error, result
   in
+  (*-------------------------------------------------------------------------------*)
   List.fold_left (fun (error, store_result) (agent_index, agent, list_undoc) ->
     let agent_type = agent.agent_name in
     let error, store_result =
@@ -216,6 +224,7 @@ let store_potential_remove parameter error handler rule_id remove store_result =
             let error, last_entry =
               Dictionary_of_States.last_entry parameter error state_dic
             in
+            (*---------------------------------------------------------------------------*)
             let rec aux k (error, store_result) =
               if k > last_entry
               then error, store_result
@@ -224,6 +233,7 @@ let store_potential_remove parameter error handler rule_id remove store_result =
                 match Handler.dual parameter error handler agent_type site k with
                 | error, None -> error, store_result
                 | error, Some (agent_type2, site2, state2) ->
+                  (*---------------------------------------------------------------------*)
                   let error, store_potential_free =
                     add_link (agent_type2, rule_id) (site2, 0) (fst store_result)
                   in
@@ -263,6 +273,7 @@ let collect_potential_side_effects_free parameter error handler rule_id
       remove
       (Int2Map_potential_effect.Map.empty, Int2Map_potential_effect.Map.empty)
   in
+  (*-------------------------------------------------------------------------------*)
   let add_link error (agent_type, rule_id) l store_result =
     let old =
       Int2Map_potential_effect.Map.find_default [] (agent_type, rule_id) store_result
@@ -272,6 +283,7 @@ let collect_potential_side_effects_free parameter error handler rule_id
     in
     error, result
   in
+  (*-------------------------------------------------------------------------------*)
   Int2Map_potential_effect.Map.fold2_with_logs
     (fun parameter error str str_opt exn ->
       let error, _ = warn parameter error str_opt exn Not_found in
@@ -327,6 +339,7 @@ let collect_potential_side_effects_bind parameter error handler rule_id
       remove
       (Int2Map_potential_effect.Map.empty, Int2Map_potential_effect.Map.empty)
   in
+  (*-------------------------------------------------------------------------------*)
   let add_link error (agent_type, rule_id) l store_result =
     let old =
       Int2Map_potential_effect.Map.find_default [] (agent_type, rule_id) store_result
@@ -336,6 +349,7 @@ let collect_potential_side_effects_bind parameter error handler rule_id
     in
     error, result
   in
+  (*-------------------------------------------------------------------------------*)
   Int2Map_potential_effect.Map.fold2_with_logs
     (fun parameter error str str_opt exn ->
       let error, _ = warn parameter error str_opt exn Not_found in

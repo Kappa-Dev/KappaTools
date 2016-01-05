@@ -93,8 +93,7 @@ let collect_modif_map parameter error store_modification_sites =
       let error = Exception.check warn parameter error error' (Some "line 118") Exit in
       error, (List.concat [l1; l2], new_set)
     )
-    store_modification_sites
-  
+    store_modification_sites  
 
 (************************************************************************************)
 (*collect a set of rule_id of test rule and modification *)
@@ -247,14 +246,14 @@ let site_covering_classes parameter error covering_classes (*store_result*) =
         (*fold a dictionary*)
         let error, store_result =
           Dictionary_of_Covering_class.fold
-            (fun value_list ((),()) cv_id (error, store_result) ->
+            (fun list_of_site_type ((),()) cv_id (error, store_result) ->
               (*get site_cv in value*)
               List.fold_left (fun (error, store_result) site_type_cv ->
                 let error, result =
                   add_link (agent_type_cv, site_type_cv) cv_id store_result
                 in 
                 error, result
-              ) (error, store_result) value_list
+              ) (error, store_result) list_of_site_type
             ) cv_dic (error, store_result)
         in
         error, store_result

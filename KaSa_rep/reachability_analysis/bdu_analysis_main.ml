@@ -143,9 +143,11 @@ let scan_rule_dynamic parameter error handler rule_id rule
     store_test_modification_map
     store_covering_classes_id
     store_side_effects
+    store_potential_side_effects
+    covering_classes
     store_result =
   (*------------------------------------------------------------------------------*)
-  (*contact map*)
+  (*contact map dynamic*)
   let error, store_contact_map_full =
     compute_contact_map_full
       parameter
@@ -153,16 +155,7 @@ let scan_rule_dynamic parameter error handler rule_id rule
       handler
       rule
   in
-  (*let error, (is_new_bond, store_contact_map) =
-    collect_contact_map
-      parameter
-      error
-      rule_id
-      rule
-      handler
-      store_result.store_contact_map
-  in*)
-  (*TODO*)
+  (*syntactic contact map*)
   let error, store_contact_map =
     compute_contact_map
       parameter
@@ -182,24 +175,35 @@ let scan_rule_dynamic parameter error handler rule_id rule
   in
   (*-------------------------------------------------------------------------------*)
   (*update(c) in the case when discover side effects*)
-  (*let error, store_covering_classes_modification_update_side_effects =
-    collect_update_hb_remove_map
+  let error, store_covering_classes_modification_side_effects =
+    store_covering_classes_modification_side_effects
       parameter
       error
-      store_side_effects
-      store_contact_map
+      store_test_modification_map
+      store_potential_side_effects
+      covering_classes
+      store_result.store_covering_classes_modification_side_effects
+  in
+  (*-------------------------------------------------------------------------------*)
+  (*final update function*)
+  let error, store_covering_classes_modification_update_full =
+    store_covering_classes_modification_update_full
+      parameter
+      error
       store_covering_classes_modification_update
-      store_result.store_covering_classes_modification_update_side_effects
-  in*)
+      store_covering_classes_modification_side_effects
+      store_result.store_covering_classes_modification_update_full
+  in
   (*-------------------------------------------------------------------------------*)
   error, 
   {
     store_contact_map_full                     = store_contact_map_full;
-    (*store_contact_map                          = (is_new_bond, store_contact_map);*)
-    store_contact_map = store_contact_map;
+    store_contact_map                          = store_contact_map;
     store_covering_classes_modification_update = store_covering_classes_modification_update;
-    (*store_covering_classes_modification_update_side_effects =
-      store_covering_classes_modification_update_side_effects*)
+    store_covering_classes_modification_side_effects =
+      store_covering_classes_modification_side_effects;
+    store_covering_classes_modification_update_full = 
+      store_covering_classes_modification_update_full;
   }
 
 (************************************************************************************)
@@ -380,6 +384,8 @@ let scan_rule parameter handler_bdu error handler_kappa rule_id rule compil
       store_bdu_analysis_static.store_test_modif_map
       store_bdu_analysis_static.store_covering_classes_id
       store_bdu_analysis_static.store_side_effects
+      store_bdu_analysis_static.store_potential_side_effects
+      covering_classes
       store_result.store_bdu_analysis_dynamic
   in
   (*-------------------------------------------------------------------------------*)
@@ -438,17 +444,16 @@ let init_bdu_analysis_static =
 let init_bdu_analysis_dynamic parameter error =
   let init_contact_map_full = Int2Map_CM_state.Map.empty in
   let init_contact_map      = Int2Map_CM_Syntactic.Map.empty in
-  (*let init_contact_map      = Int2Map_syn.Map.empty in*)
   let init_cv_modification  = Int2Map_CV_Modif.Map.empty in
-  (*let init_cv_modification_side_effects = Int2Map_CV_Modif.Map.empty in*)
+  let init_cv_modification_side_effects  = Int2Map_CV_Modif.Map.empty in
+  let init_cv_modification_full = Int2Map_CV_Modif.Map.empty in
   let init_bdu_analysis_dynamic =
     {
       store_contact_map_full                     = init_contact_map_full;
-      (*store_contact_map                          = false, init_contact_map;*)
-      store_contact_map = init_contact_map;
+      store_contact_map                          = init_contact_map;
       store_covering_classes_modification_update = init_cv_modification;
-      (*store_covering_classes_modification_update_side_effects 
-      = init_cv_modification_side_effects;*)
+      store_covering_classes_modification_side_effects = init_cv_modification_side_effects;
+      store_covering_classes_modification_update_full = init_cv_modification_full;
     }
   in
   error, init_bdu_analysis_dynamic
@@ -563,9 +568,7 @@ let bdu_main parameter error handler_kappa store_covering_classes cc_compil =
       result.store_bdu_build.store_proj_potential_list_restriction_map
       result.store_bdu_build.store_bdu_test_restriction_map
       result.store_bdu_build.store_proj_bdu_views
-      (*false*) (*is_new_bond*)
-      result.store_bdu_analysis_dynamic.store_covering_classes_modification_update
-      (*result.store_bdu_analysis_dynamic.store_covering_classes_modification_update_side_effects*)
+      result.store_bdu_analysis_dynamic.store_covering_classes_modification_update_full
       result.store_bdu_build.store_bdu_init_restriction_map
   in
   let error,handler_bdu =
