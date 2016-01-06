@@ -76,7 +76,7 @@ let do_stochastic_flow_of_information = ref false
 let do_site_dependencies = ref false
 (*different reachability output*)
 let do_reachability_analysis = ref true
-let do_reachability_analysis_result = ref true
+let do_reachability_analysis_result = ref false
 let do_reachability_analysis_iteration = ref false
 let do_reachability_analysis_static = ref false
 let do_reachability_analysis_dynamic = ref false

@@ -404,8 +404,6 @@ type bdu_build =
   {
     store_remanent_triple: ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;
     store_wl_creation: wl_int;
-    (*working list of initial state*)
-    (*store_wl_init : wl_int;*)
     store_bdu_test_restriction_map:  Mvbdu_wrapper.Mvbdu.mvbdu Map_test_bdu.Map.t;
     store_proj_bdu_test_restriction_map: 
       Mvbdu_wrapper.Mvbdu.mvbdu Map_agent_id_test_bdu.Map.t Map_final_test_bdu.Map.t;

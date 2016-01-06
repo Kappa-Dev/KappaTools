@@ -594,31 +594,15 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
     (*-----------------------------------------------------------------------*)
     if Mvbdu_wrapper.Mvbdu.equal bdu_union bdu_old
     then
-      error, handler, false, store_result
+      error, handler, false, bdu_union, store_result
     else
       let error, handler, bdu_diff =
 	Mvbdu_wrapper.Mvbdu.mvbdu_xor parameter handler error bdu_union bdu_old
       in
-      (*-----------------------------------------------------------------------*)
-      (*print the different of views*)
-      (*let () =
-        if (Remanent_parameters.get_do_reachability_analysis_diff parameter) 
-        then
-          let parameters_cv =
-            Remanent_parameters.update_prefix parameter ""
-          in
-          if (Remanent_parameters.get_trace parameters_cv)
-          then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
-          dump_channel parameter (fun stderr ->
-	    Printf.fprintf stderr "new views:\n";
-	    Mvbdu_wrapper.Mvbdu.print stderr "" bdu_diff)
-        else ()
-      in *)
-      (*-----------------------------------------------------------------------*)
       let store_result =
         Map_bdu_update.Map.add (agent_type, cv_id) bdu_union store_result
       in
-      error, handler, true, store_result
+      error, handler, true, bdu_diff, store_result
   in
   (*-----------------------------------------------------------------------*)
   (*deal with views*)
@@ -695,7 +679,7 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
           Mvbdu_wrapper.Mvbdu.print stderr "" bdu_update)
           in*)
         (*-----------------------------------------------------------------------*)
-        let error, handler, is_new_view, store_result =
+        let error, handler, is_new_view, bdu_diff, store_result =
           add_link handler (agent_type, cv_id) bdu_update store_result
         in
         (*-----------------------------------------------------------------------*)
@@ -703,34 +687,70 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
         let _ =
           if is_new_view 
           then
-            begin
-            (*true*)
-              if (Remanent_parameters.get_do_reachability_analysis_wl parameter) 
+            let _ =
+              (*print information of working list*)
+              begin
+                if (Remanent_parameters.get_do_reachability_analysis_wl parameter) 
+                then
+                  let parameters_cv =
+                    Remanent_parameters.update_prefix parameter ""
+                  in
+                  if (Remanent_parameters.get_trace parameters_cv)
+                  then
+                    dump_channel parameter (fun stderr ->
+	              Printf.fprintf stderr "discovering a new views")
+                  else ()
+              end
+            in
+            (*print information of different views*)
+            let _ =
+              if (Remanent_parameters.get_do_reachability_analysis_diff parameter) 
               then
                 let parameters_cv =
                   Remanent_parameters.update_prefix parameter ""
                 in
                 if (Remanent_parameters.get_trace parameters_cv)
                 then
-                dump_channel parameter (fun stderr ->
-	          Printf.fprintf stderr "discovering a new views")
-              else ()
-            end
+                  dump_channel parameter (fun stderr ->
+	            Printf.fprintf stderr "discovering a new views:\n";
+                    Mvbdu_wrapper.Mvbdu.print stderr "" bdu_diff)
+                else ()
+            in
+            ()    
+          (*-----------------------------------------------------------------------*)
+          (*deal with the case boolean return false*)
           else
-            begin
-            (*false*)
-              if (Remanent_parameters.get_do_reachability_analysis_wl parameter) 
+            let _ =
+              (*print information of working list*)
+              begin
+                if (Remanent_parameters.get_do_reachability_analysis_wl parameter) 
+                then
+                  let parameters_cv =
+                    Remanent_parameters.update_prefix parameter ""
+                  in
+                  if (Remanent_parameters.get_trace parameters_cv)
+                  then
+                    dump_channel parameter (fun stderr -> Printf.fprintf stderr
+                      "nothing has changed\n")
+                  else
+                    ()
+              end
+            in
+            (*print information of different views*)
+            let _ =
+              if (Remanent_parameters.get_do_reachability_analysis_diff parameter) 
               then
                 let parameters_cv =
                   Remanent_parameters.update_prefix parameter ""
                 in
                 if (Remanent_parameters.get_trace parameters_cv)
                 then
-                dump_channel parameter (fun stderr -> Printf.fprintf stderr
-                  "nothing has changed\n")
-              else
-                ()
-            end
+                  dump_channel parameter (fun stderr -> Printf.fprintf stderr
+                    "nothing has changed\n")
+                else
+                  ()
+            in
+            ()
         in      
         (*-----------------------------------------------------------------------*)
         let error, (handler, new_wl, store_result) =
@@ -769,7 +789,7 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
             bdu_creation
             bdu_X
 	in
-	let error, handler, is_new_view, store_result =
+	let error, handler, is_new_view, bdu_diff, store_result =
           add_link handler (agent_type, cv_id) bdu_update store_result
         in
         (*-----------------------------------------------------------------------*)
@@ -823,11 +843,10 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
             error, handler, bdu_update
           ) (error, handler, bdu_false) list
         in
-	let error, handler, is_new_view, store_result =
+	let error, handler, is_new_view, bdu_diff, store_result =
           add_link handler (agent_type, cv_id) bdu_update store_result
         in
         (*-----------------------------------------------------------------------*)
-        (*TODO: change it to the update list of side effects*)
         let error, (handler, wl_tl, store_result) =
           compute_new_views
             parameter
@@ -909,33 +928,6 @@ let collect_bdu_fixpoint_with_init parameter handler error
       (error, wl_creation)
   in
   (*-----------------------------------------------------------------------*)
-  (*print working list when parameter is tune to true*)
-  (*let _ =
-    if (Remanent_parameters.get_do_reachability_analysis_wl parameter) 
-    then
-      let _ = Format.printf "Reachability analysis working list information ....@." in
-      let parameters_cv =
-        Remanent_parameters.update_prefix parameter ""
-      in
-      if (Remanent_parameters.get_trace parameters_cv)
-      then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
-      dump_channel parameter (fun stderr -> 
-        fprintf stderr "wl_init_creation:\n";
-        Fifo.IntWL.print_wl parameter wl_creation)
-    else ()
-  in*)
-  (*let _ =
-    dump_channel parameter 
-      (fun stderr -> 
-	Map_bdu_update.Map.iter 
-	  (fun (agent_type, cv_id) bdu -> 
-	    Printf.fprintf stderr
-	      "initial_states: (agent_type:%i, cv_id:%i)\n bdu:\n"
-	      agent_type cv_id;
-            Mvbdu_wrapper.Mvbdu.print stderr "" bdu)
-	  store_bdu_fixpoint_init_map)
-  in*)
-  (*-----------------------------------------------------------------------*)
   (*iterate function*)
   let rec aux acc_wl (error, handler, store_bdu_fixpoint_init_map) =
     if IntWL.is_empty acc_wl
@@ -966,6 +958,19 @@ let collect_bdu_fixpoint_with_init parameter handler error
         (*--------------------------------------------------------------------*)
     	let _ = 
           if (Remanent_parameters.get_do_reachability_analysis_wl parameter) 
+          then
+            let parameters_cv =
+              Remanent_parameters.update_prefix parameter ""
+            in
+            if (Remanent_parameters.get_trace parameters_cv)
+            then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
+            dump_channel parameter 
+              (fun stderr -> Printf.fprintf stderr "apply for rule:%i " rule_id)
+          else ()
+        in
+        (*--------------------------------------------------------------------*)
+    	let _ = 
+          if (Remanent_parameters.get_do_reachability_analysis_diff parameter) 
           then
             let parameters_cv =
               Remanent_parameters.update_prefix parameter ""

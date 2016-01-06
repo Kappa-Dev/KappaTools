@@ -105,13 +105,4 @@ agent_type:2:
 Potential dependencies between sites:Covering_class_id:0
 Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
 Covering_class_id:0
-Reachability analysis result ....
-
-------------------------------------------------------------
-* Fixpoint iteration :
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Cartesian abstraction:
-------------------------------------------------------------
 execution finished without any exception

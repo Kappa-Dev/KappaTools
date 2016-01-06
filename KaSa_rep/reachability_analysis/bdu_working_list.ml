@@ -56,7 +56,7 @@ let collect_wl_creation parameter error rule_id rule store_result =
 (************************************************************************************)
 (*working list of initial state*)
 
-let collect_wl_init_creation parameter handler error store_bdu_init_restriction_map 
+(*let collect_wl_init_creation parameter handler error store_bdu_init_restriction_map 
     store_covering_classes_modification_update_full wl_creation =
   let error, handler, bdu_false = 
     Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error
@@ -101,4 +101,4 @@ let collect_wl_init_creation parameter handler error store_bdu_init_restriction_
       ) store_bdu_fixpoint_init_map
       (error, wl_creation)
   in
-  error, wl_init_creation
+  error, wl_init_creation*)

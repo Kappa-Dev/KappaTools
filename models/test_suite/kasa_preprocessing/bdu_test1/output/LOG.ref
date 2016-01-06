@@ -133,13 +133,4 @@ Global:site_type:0  => Local:site_type':1
 Global:site_type:1  => Local:site_type':2
 Local:site_type':1  => Global:site_type:0
 Local:site_type':2  => Global:site_type:1
-Reachability analysis result ....
-
-------------------------------------------------------------
-* Fixpoint iteration :
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Cartesian abstraction:
-------------------------------------------------------------
 execution finished without any exception

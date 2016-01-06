@@ -211,7 +211,6 @@ let scan_rule_dynamic parameter error handler rule_id rule
 
 let scan_rule_bdu_build parameter handler_bdu error rule_id rule compil
     covering_classes store_potential_side_effects 
-    (*store_covering_classes_modification_update_full*)
     store_result =
   (*------------------------------------------------------------------------------*)
   let error, store_remanent_triple =
@@ -277,15 +276,6 @@ let scan_rule_bdu_build parameter handler_bdu error rule_id rule compil
       store_remanent_triple
       store_result.store_bdu_init_restriction_map
   in
-  (*-------------------------------------------------------------------------------*)
-  (*working list of initial state and creation*)
-  (*let error, store_wl_init =
-    collect_wl_init
-      parameter
-      error
-      compil
-      store_result.store_wl_init
-  in*)
   (*-------------------------------------------------------------------------------*)
   let error, (handler_bdu, store_modif_list_restriction_map) =
     collect_modif_list_restriction_map
@@ -353,7 +343,6 @@ let scan_rule_bdu_build parameter handler_bdu error rule_id rule compil
   {
     store_remanent_triple                   = store_remanent_triple;
     store_wl_creation                       = store_wl_creation;
-    (*store_wl_init                           = store_wl_init;*)
     store_bdu_test_restriction_map          = store_bdu_test_restriction_map;
     store_proj_bdu_test_restriction_map     = store_proj_bdu_test_restriction_map;
     store_bdu_creation_restriction_map      = store_bdu_creation_restriction_map;
@@ -411,7 +400,6 @@ let scan_rule parameter handler_bdu error handler_kappa rule_id rule compil
       compil
       covering_classes
       store_bdu_analysis_static.store_potential_side_effects
-      (*store_bdu_analysis_dynamic.store_covering_classes_modification_update_full*)
       store_result.store_bdu_build
   in
   error, (handler_bdu, 
@@ -494,7 +482,6 @@ let init_bdu_build parameter error =
     {
       store_remanent_triple                   = init_remanent_triple;
       store_wl_creation                       = init_wl_creation;
-      (*store_wl_init                           = init_wl_init;*)
       store_bdu_test_restriction_map          = init_bdu_test_restriction_map;
       store_proj_bdu_test_restriction_map     = init_proj_bdu_test_restriction_map;
       store_bdu_creation_restriction_map      = init_bdu_creation_restriction_map;
