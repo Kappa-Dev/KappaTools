@@ -955,7 +955,10 @@ let collect_bdu_fixpoint_with_init parameter handler error
               (fun stderr -> Printf.fprintf stderr "apply for rule:%i " rule_id)
           else ()
         in
+        (*TODO: map integer to string for rule_id*)
+
         (*--------------------------------------------------------------------*)
+        (*output of working list*)
     	let _ = 
           if (Remanent_parameters.get_do_reachability_analysis_wl parameter) 
           then
@@ -969,6 +972,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
           else ()
         in
         (*--------------------------------------------------------------------*)
+        (*output of different bdu*)
     	let _ = 
           if (Remanent_parameters.get_do_reachability_analysis_diff parameter) 
           then
@@ -1023,6 +1027,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
           if is_enable
           then
             (*-----------------------------------------------------------------------*)
+            (*output of rule that is enabled*)
             let _ =
               if (Remanent_parameters.get_do_reachability_analysis_iteration parameter) 
               then
@@ -1058,6 +1063,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
             aux new_wl (error, handler, store_new_result)
           else
             (*-----------------------------------------------------------------------*)
+            (*output of rule that is disabled*)
             let _ =
               if (Remanent_parameters.get_do_reachability_analysis_iteration parameter) 
               then

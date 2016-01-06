@@ -19,7 +19,7 @@ open Covering_classes_type
 open Covering_classes
 
 let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "BDU modification sites") message exn (fun () -> default)
+  Exception.warn parameters mh (Some "BDU syntactic") message exn (fun () -> default)
 
 let trace = false
 
@@ -227,7 +227,7 @@ let collect_test_modif_map parameter error store_test_modification_sites =
 (*a pair (agent_type_cv, site_cv) in covering classes
   return a list of covering_classes_id*)
 
-let site_covering_classes parameter error covering_classes (*store_result*) =
+let site_covering_classes parameter error covering_classes =
   let add_link (agent_type, site_type) cv_id store_result =
     let (l, old) =
       Int2Map_CV.Map.find_default ([],[]) (agent_type, site_type) store_result in
@@ -263,5 +263,87 @@ let site_covering_classes parameter error covering_classes (*store_result*) =
   in
   let store_result =
     Int2Map_CV.Map.map (fun (l, x) -> List.rev l, x) store_result
+  in
+  error, store_result
+
+(************************************************************************************)
+(*TODO: mapping type int to string for site and agent name*)
+
+let site_covering_classes_string parameter error handler_kappa covering_classes =
+  let add_link (agent_type, agent_name_string, site_type_int, site_type) cv_id store_result =
+    let l, old =
+      Int2Map_CV_map.Map.find_default ([], [])
+        (agent_type, agent_name_string, site_type_int, site_type) store_result in
+    let result =
+      Int2Map_CV_map.Map.add
+        (agent_type, agent_name_string, site_type_int, site_type)
+        (l, (cv_id :: old)) store_result
+    in error, result
+  in
+  let error, store_result =
+    (*From sites return a list of covering_class_id*)
+    AgentMap.fold parameter error
+      (fun parameter error agent_type_cv remanent store_result ->
+        (*get a list of covering_class_id from remanent*)
+        let cv_dic = remanent.store_dic in
+        let agents_dic = handler_kappa.agents_dic in
+        let sites_map = handler_kappa.sites in
+        (*fold a dictionary*)
+        let error, store_result =
+          Dictionary_of_Covering_class.fold
+            (fun list_of_site_type ((),()) cv_id (error, store_result) ->
+              (*get site_cv in value*)
+              List.fold_left (fun (error, store_result) site_type_cv ->
+                (*get information of agent_name of type string from agent dictionary*)
+                let error, triple_agent_option =
+                  Ckappa_sig.Dictionary_of_agents.translate
+                    parameter 
+                    error
+                    agent_type_cv
+                    agents_dic
+                in
+                (*get sites dictionary*)
+                let error, sites_dic =
+                  Misc_sa.unsome 
+                    (Int_storage.Nearly_inf_Imperatif.get parameter error
+                       site_type_cv sites_map)
+                    (fun error -> warn parameter error (Some "line 307") Exit 
+                      (Ckappa_sig.Dictionary_of_sites.init()))
+                in
+                let error, nsites =
+                  Ckappa_sig.Dictionary_of_sites.last_entry
+                    parameter error sites_dic                 
+                in
+                let error, (site_type, _, _) =
+                  Misc_sa.unsome
+                    (Ckappa_sig.Dictionary_of_sites.translate
+                       parameter
+                       error
+                       nsites
+                       sites_dic)
+                    (fun error -> exit 0) (*TODO:warn*)
+                in
+                (*let _ =
+                  match site_type with
+                  | Ckappa_sig.Internal a ->
+                    Printf.fprintf stdout "site_int:%i:site_type:%s(internal state)\n" site_type_cv a
+                  | Ckappa_sig.Binding b ->
+                    Printf.fprintf stdout "site_int:%i:site_type:%s(binding state)\n" site_type_cv b
+                in*)
+                match triple_agent_option with
+                | Some (agent_name, _, _) ->
+                  add_link (agent_type_cv, agent_name, site_type_cv, site_type)
+                    cv_id store_result
+                | None -> error, store_result                
+              ) (error, store_result) list_of_site_type
+            ) cv_dic (error, store_result)
+        in
+        error, store_result
+      (*REMARK: when it is folding inside a list, start with empty result,
+        because the add_link function has already called the old result.*)
+      ) covering_classes Int2Map_CV_map.Map.empty
+  in
+  let store_result =
+    Int2Map_CV_map.Map.map (fun (l, x) -> List.rev l, x) store_result
   in
   error, store_result

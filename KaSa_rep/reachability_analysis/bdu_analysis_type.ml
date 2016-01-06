@@ -90,6 +90,15 @@ module Int2Map_CV =
       let compare = compare
     end)
 
+(*TODO:new function having information of type string*)
+module Int2Map_CV_map =
+  SetMap.Make (
+    struct
+      (*agent_type, agent_name_string, site*)
+      type t = int * string * int * Ckappa_sig.site
+      let compare = compare
+    end)
+
 (*full contact map*)
 
 module Int2Map_CM_state = 
@@ -362,6 +371,8 @@ type potential_partner_bind = bind_partner
 type bdu_analysis_static =
   {
     store_covering_classes_id : (int list * int list) Int2Map_CV.Map.t;
+    (*TEST: type string *)
+    store_covering_classes_id_string : (int list * int list) Int2Map_CV_map.Map.t;
     store_side_effects        : half_break_action * remove_action;
     store_potential_side_effects : potential_partner_free *  potential_partner_bind;
     (* views that are tested and modificated with agent_id*)

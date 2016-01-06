@@ -16,7 +16,7 @@ let warn parameters mh message exn default =
      Exception.warn parameters mh (Some "Translate_sig") message exn (fun () -> default) 
   
 let trace = false
-let local_trace = false 
+let local_trace = false
    
 let string_of_port port = "[state_min:"^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.min)^";state_max:"^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.max)^"]"
 

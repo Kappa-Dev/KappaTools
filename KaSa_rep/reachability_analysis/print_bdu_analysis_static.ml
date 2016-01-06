@@ -73,6 +73,43 @@ let print_covering_classes_id parameter error result =
   error
 
 (************************************************************************************)
+(*covering classes including type string*)
+
+
+let print_covering_classes_id_string_aux parameter error result =
+  Int2Map_CV_map.Map.iter
+    ( fun (x, s, y, site_type) (l1, l2) ->
+      let _ =
+        match site_type with
+        | Ckappa_sig.Internal a ->
+          fprintf parameter.log 
+            "agent_type:%i:%s:site_type:%i:%s(internal state)@list of covering_class_id:\n"
+            x s y a
+        | Ckappa_sig.Binding b ->
+          fprintf parameter.log 
+            "agent_type:%i:%s:site_type:%i:%s(binding state)@list of covering_class_id:\n"
+            x s y b
+      in
+      List.iter (fun id -> fprintf parameter.log "covering_class_id:%i\n" id)
+        l2
+    ) result
+
+let print_covering_classes_id_string parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "\n------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "Mapping between sites and the covering classes they belong to:\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  let error =
+    print_covering_classes_id_string_aux
+      parameter
+      error
+      result
+  in
+  error
+
+(************************************************************************************)
 (*side effects*)
 
 let print_half_break_effect parameter error result =
@@ -402,6 +439,13 @@ let print_result_static parameter error result =
       parameter 
       error
       result.store_covering_classes_id
+  in
+  (*TODO*)
+  let _ =
+    print_covering_classes_id_string
+      parameter
+      error
+      result.store_covering_classes_id_string
   in
   let _ =
     print_side_effects 
