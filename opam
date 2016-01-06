@@ -1,0 +1,21 @@
+opam-version: "1.2"
+name: "KaSim"
+version: "dev"
+maintainer: "Pierre Boutillier <pierre.boutillier@laposte.net>"
+authors: [ "Jean Krivine" "Jérôme Feret" "Pierre Boutillier" "Lý Kim Quyên"]
+license: "LGPL-3.0"
+homepage: "http://dev.executableknowledge.org/"
+bug-reports: "https://github.com/Kappa-Dev/KaSim/issues"
+dev-repo: "https://github.com/Kappa-Dev/KaSim.git"
+
+depends : [
+  "ocamlfind" {build}
+  "ocamlbuild" {build}
+]
+
+depopts: [ "labltk" ]
+
+build: [ [ make "USE_TK=1" {labltk:installed} "all"] ]
+build-test: [ [ make "check" ] ]
+
+available: [ ocaml-version >= "4.01.1" ]
