@@ -11,7 +11,7 @@ let map = ref StringMap.empty (* key => entry widget *)
 let fmap = ref StringMap.empty  (* key => frame widget *)
 
 let error = Exception.empty_error_handler 
-let parameters =  Remanent_parameters.get_parameters ()
+let parameters =  Remanent_parameters.get_parameters ~called_from:Remanent_parameters_sig.Internalised
   
 (* show / hide options according to current mode *)
 let set_visibility (a:Superarg.t) =

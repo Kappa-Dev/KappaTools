@@ -123,8 +123,23 @@ let open_tasks_profiling =
   in 
   f
 
-let get_parameters () =
-   let channel = open_tasks_profiling () in
+let get_parameters ?called_from:(called_from=Remanent_parameters_sig.KaSa) () =
+  let channel =
+    match
+      called_from
+    with
+    | Remanent_parameters_sig.Internalised -> stdout
+    | Remanent_parameters_sig.KaSim -> open_tasks_profiling ()
+    | Remanent_parameters_sig.KaSa ->
+       begin
+	 match
+	   !Config.output_directory,"profiling.txt" (*temporary, to do: provide a parameterisable filename*)
+	 with
+	 | _,"" -> stdout
+	 | "",a -> open_out a
+	 | a,b -> open_out (a^"/"^b)
+       end
+  in
   { Remanent_parameters_sig.marshalisable_parameters = 
       {
 	Remanent_parameters_sig.do_contact_map = !Config.do_contact_map ; 
@@ -164,7 +179,8 @@ let get_parameters () =
 	Remanent_parameters_sig.tk_interface=Tk_version.tk;
 	Remanent_parameters_sig.influence_map_accuracy_level = fetch_accuracy_level Config.influence_map_accuracy_level ;
 	Remanent_parameters_sig.contact_map_accuracy_level = fetch_accuracy_level Config.contact_map_accuracy_level ;
-	Remanent_parameters_sig.view_accuracy_level = fetch_accuracy_level Config.view_accuracy_level ; 
+	Remanent_parameters_sig.view_accuracy_level = fetch_accuracy_level Config.view_accuracy_level ;
+	Remanent_parameters_sig.called_from = called_from ;
       } ;
     Remanent_parameters_sig.log    = !Config.log ;
     Remanent_parameters_sig.formatter = !Config.formatter ;    
@@ -180,7 +196,7 @@ let dummy_parameters =
       !cache 
     with 
     | None -> 
-      let p = get_parameters () in 
+      let p = get_parameters ~called_from:Remanent_parameters_sig.KaSim () in 
       let () = cache := Some p in
       p
     | Some p -> p

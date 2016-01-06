@@ -120,7 +120,7 @@ module Export_to_KaSim =
 
     let init logger compil  =
       let errors = Exception.empty_error_handler in
-      let parameters = Remanent_parameters.get_parameters () in
+      let parameters = Remanent_parameters.get_parameters ~called_from:Remanent_parameters_sig.Internalised () in
       let parameters = Remanent_parameters.set_formatter parameters logger in 
       let parameters_compil =
 	Remanent_parameters.update_call_stack

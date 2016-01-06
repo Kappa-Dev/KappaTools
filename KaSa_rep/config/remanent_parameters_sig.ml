@@ -17,6 +17,7 @@
 
 module CharMap = Mods.CharMap
 
+type called_from = KaSa | KaSim | Internalised
 type accuracy_level = None | Low | Medium | High
 type link_mode = Bound_indices | Site_address | Bound_type 
   
@@ -94,7 +95,7 @@ type marshalisable_parameters =
    do_reachability_analysis_dynamic : bool;
    do_reachability_analysis_diff : bool;
    do_reachability_analysis_wl : bool;
-
+   called_from : called_from;
    (**)
    dump_error_as_soon_as_they_occur : bool ;
    file : string option ; 

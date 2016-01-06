@@ -305,7 +305,7 @@ module Internalize(M:Mvbdu) =
     type hconsed_variables_list = Mvbdu.hconsed_variables_list
     type handler = Mvbdu.handler 
     let handler = ref None 
-    let parameter = ref (Remanent_parameters.get_parameters ())
+    let parameter = ref (Remanent_parameters.get_parameters ~called_from:Remanent_parameters_sig.Internalised ())
 
   
     let check s error error' handler' = 
