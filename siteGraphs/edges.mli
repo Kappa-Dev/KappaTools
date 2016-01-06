@@ -7,8 +7,8 @@ type t
 
 val empty : t
 
-val add_agent : int -> t -> int * t
-(** [add_agent agent_type graph] *)
+val add_agent : Signature.s -> int -> t -> int * t
+(** [add_agent sigs agent_type graph] *)
 
 val add_free : int -> int -> t -> t
 (** [add_free agent_id site graph] *)
@@ -50,12 +50,14 @@ val rev_path : path -> path
 val print_path :
   ?sigs:Signature.s -> ?graph:t -> Format.formatter -> path -> unit
 
-val are_connected : ?candidate:path -> t -> int -> int -> int -> path option
-(** [are_connected ?candidate graph x_name x y] *)
+val are_connected :
+  ?candidate:path -> Signature.s -> t -> int -> int -> int -> path option
+(** [are_connected ?candidate sigs graph x_name x y] *)
 
-val pathes_of_interrest :
-  (int -> 'a option) -> t -> int -> int -> path -> (('a*int) * path) list
-(** [pathes_of_interrest is_interesting graph agent_name agent_id done_path] *)
+val pathes_of_interrest : (int -> 'a option) -> Signature.s -> t -> int ->
+			  int -> path -> (('a*int) * path) list
+(** [pathes_of_interrest
+         is_interesting sigs graph agent_name agent_id done_path] *)
 
 val print : Signature.s -> Format.formatter -> t -> unit
 val print_dot : Signature.s -> Format.formatter -> t -> unit
