@@ -135,8 +135,11 @@ let get_parameters () =
         (*different reachability output*)
 	Remanent_parameters_sig.do_reachability_analysis = !Config.do_reachability_analysis ;
         Remanent_parameters_sig.do_reachability_analysis_result = !Config.do_reachability_analysis_result;
+        Remanent_parameters_sig.do_reachability_analysis_iteration = !Config.do_reachability_analysis_iteration;
         Remanent_parameters_sig.do_reachability_analysis_static = !Config.do_reachability_analysis_static;
         Remanent_parameters_sig.do_reachability_analysis_dynamic = !Config.do_reachability_analysis_dynamic;
+        Remanent_parameters_sig.do_reachability_analysis_diff = !Config.do_reachability_analysis_diff;
+        Remanent_parameters_sig.do_reachability_analysis_wl = !Config.do_reachability_analysis_wl;
         
         (**)
 	Remanent_parameters_sig.file = !Config.file ;
@@ -251,8 +254,12 @@ let get_do_site_dependencies_1             marshalisable = marshalisable.Remanen
 (*reachability different output*)
 let get_do_reachability_analysis_1        marshalisable = marshalisable.Remanent_parameters_sig.do_reachability_analysis
 let get_do_reachability_analysis_result_1 marshalisable = marshalisable.Remanent_parameters_sig.do_reachability_analysis_result
+let get_do_reachability_analysis_iteration_1 marshalisable = marshalisable.Remanent_parameters_sig.do_reachability_analysis_iteration
 let get_do_reachability_analysis_static_1 marshalisable = marshalisable.Remanent_parameters_sig.do_reachability_analysis_static
 let get_do_reachability_analysis_dynamic_1 marshalisable = marshalisable.Remanent_parameters_sig.do_reachability_analysis_dynamic
+let get_do_reachability_analysis_diff_1 marshalisable = marshalisable.Remanent_parameters_sig.do_reachability_analysis_diff
+let get_do_reachability_analysis_wl_1 marshalisable = marshalisable.Remanent_parameters_sig.do_reachability_analysis_wl
+
 
 (**)
 let get_influence_map_accuracy_level_1     marshalisable = marshalisable.Remanent_parameters_sig.influence_map_accuracy_level
@@ -298,10 +305,16 @@ let get_do_site_dependencies = upgrade_from_marshal_field get_do_site_dependenci
 let get_do_reachability_analysis = upgrade_from_marshal_field get_do_reachability_analysis_1
 let get_do_reachability_analysis_result =
   upgrade_from_marshal_field get_do_reachability_analysis_result_1
+let get_do_reachability_analysis_iteration =
+  upgrade_from_marshal_field get_do_reachability_analysis_iteration_1
 let get_do_reachability_analysis_static =
   upgrade_from_marshal_field get_do_reachability_analysis_static_1
 let get_do_reachability_analysis_dynamic =
   upgrade_from_marshal_field get_do_reachability_analysis_dynamic_1
+let get_do_reachability_analysis_diff =
+  upgrade_from_marshal_field get_do_reachability_analysis_diff_1
+let get_do_reachability_analysis_wl =
+  upgrade_from_marshal_field get_do_reachability_analysis_wl_1
 
 
 (**)

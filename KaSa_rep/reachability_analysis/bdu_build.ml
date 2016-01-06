@@ -227,7 +227,7 @@ let collect_proj_bdu_test_restriction_map parameter handler error
 
 let collect_bdu_creation_restriction_map parameter handler error rule_id rule store_remanent_triple store_result   =
   let error, handler, bdu_false = Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error in
-  let add_link (agent_type, rule_id, cv_id) bdu store_result =
+  let add_link handler (agent_type, rule_id, cv_id) bdu store_result =
     let error, old_bdu =
       match
         Map_creation_bdu.Map.find_option (agent_type, rule_id, cv_id) store_result
@@ -242,7 +242,7 @@ let collect_bdu_creation_restriction_map parameter handler error rule_id rule st
     let result_map =
       Map_creation_bdu.Map.add (agent_type, rule_id, cv_id) bdu_new store_result
     in
-    error, result_map
+    error, handler, result_map
   in
   AgentMap.fold parameter error
     (fun parameter error agent_type' triple_list (handler,store_result) ->
@@ -309,8 +309,8 @@ let collect_bdu_creation_restriction_map parameter handler error rule_id rule st
 		  let error, handler, bdu_creation =
 		    build_bdu parameter handler error pair_list
 		  in
-		   let error, store_result =
-		     add_link (agent_type, rule_id, cv_id) bdu_creation store_result
+		   let error, handler, store_result =
+		     add_link handler (agent_type, rule_id, cv_id) bdu_creation store_result
 		   in
 		   error,handler,store_result 
                 ) (error, handler, store_result) get_pair_list
@@ -348,9 +348,9 @@ let collect_proj_bdu_creation_restriction_map parameter handler error
 let collect_bdu_init_restriction_map parameter handler error compil store_remanent_triple 
     store_result =
   let error, handler, bdu_false = Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error in
-  let add_link handler (agent_type, cv_id) bdu store_result =
+  let add_link handler (agent_type, index, cv_id) bdu store_result =
     let error, old_bdu =
-      match Map_bdu_update.Map.find_option (agent_type, cv_id) store_result
+      match Map_creation_bdu.Map.find_option (agent_type, index, cv_id) store_result
       with
       | None -> error, bdu_false
       | Some bdu -> error, bdu
@@ -359,82 +359,105 @@ let collect_bdu_init_restriction_map parameter handler error compil store_remane
       Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error old_bdu bdu
     in (* In the case when the agent is created twice, we take the union *)
     let result_map =
-      Map_bdu_update.Map.add (agent_type, cv_id) bdu_new store_result
+      Map_creation_bdu.Map.add (agent_type, index, cv_id) bdu_new store_result
     in
     error, handler, result_map
   in
   let error, (handler, store_result) =
     Int_storage.Nearly_inf_Imperatif.fold parameter error
-      (fun parameter error rule_id rule (handler, store_result) ->
-        AgentMap.fold2_common parameter error
-          (fun parameter error agent_id agent triple_list (handler, store_result) ->
+      (fun  parameter error index init (handler, store_result) ->
+        AgentMap.fold parameter error
+          (fun parameter error agent_id agent (handler, store_result) ->
             match agent with
             | Unknown_agent _ | Ghost -> error, (handler, store_result)
-            | Dead_agent (agent, _, _, _)
+            | Dead_agent _ -> warn parameter error (Some "373") Exit (handler, store_result)
             | Agent agent ->
               let agent_type = agent.agent_name in
-              (*get map restriction from covering classes*)
-              let error,  get_pair_list =
-                List.fold_left (fun (error, current_list) (cv_id, list, set) ->
-                  (*-----------------------------------------------------------------*)
-                  (*new index for site type in covering class*)
-                  let error, (map_new_index_forward, _) =
-                    new_index_pair_map parameter error list
-                  in
-                  (*-----------------------------------------------------------------*)
-		  let add site state (error, store_result) = 
-                    let error, site' =
-                      match Site_map_and_set.Map.find_option parameter error site
-                        map_new_index_forward
-                      with
-                      | error, None -> warn parameter error (Some "398") Exit 0
-                      | error, Some s -> error, s
+              AgentMap.fold parameter error
+                (fun parameter error agent_type' triple_list (handler, store_result) ->
+                  if agent_type = agent_type'
+                  then
+                    (*get map restriction from covering classes*)
+                    let error,  get_pair_list =
+                      List.fold_left (fun (error, current_list) (cv_id, list, set) ->
+                        (*-----------------------------------------------------------------*)
+                        (*new index for site type in covering class*)
+                        let _ =
+                          if local_trace
+                          then Printf.fprintf stderr "INITIAL CV_ID: %i\n" cv_id
+                        in
+                        let error, (map_new_index_forward, _) =
+                          new_index_pair_map parameter error list
+                        in
+                        (*-----------------------------------------------------------------*)
+		        let add site state (error, store_result) = 
+                          let error, site' =
+                            match Site_map_and_set.Map.find_option parameter error site
+                              map_new_index_forward
+                            with
+                            | error, None -> warn parameter error (Some "398") Exit 0
+                            | error, Some s -> error, s
+                          in
+		          Site_map_and_set.Map.add parameter error site' state store_result
+		        in 
+                        (*-----------------------------------------------------------------*)
+                        let error', map_res =
+                          Site_map_and_set.Map.fold_restriction_with_missing_associations 
+                            parameter error
+                            (fun site port -> add site port.site_state.min)
+                            (* JF: we should check that port.site_state.min is 
+                               equal to port_site_state.max *)
+                            (fun site -> add site 0) 
+		            set
+                            agent.agent_interface
+                            Site_map_and_set.Map.empty
+                        in
+	                let error = Exception.check warn parameter error error'
+                          (Some "line 370") Exit 
+                        in
+                        error, ((cv_id, map_res) :: current_list)
+                      ) (error, []) triple_list
                     in
-		    Site_map_and_set.Map.add parameter error site' state store_result
-		  in 
-                  (*-----------------------------------------------------------------*)
-                  let error', map_res =
-                    Site_map_and_set.Map.fold_restriction_with_missing_associations 
-                      parameter error
-                      (fun site port -> add site port.site_state.min)
-                      (* JF: we should check that port.site_state.min is 
-                         equal to port_site_state.max *)
-                      (fun site -> add site 0) 
-		      set agent.agent_interface Site_map_and_set.Map.empty
-                  in
-	          let error = Exception.check warn parameter error error'
-                    (Some "line 370") Exit 
-                  in
-                  error, ((cv_id,map_res) :: current_list)
-                ) (error, []) triple_list
-              in
-              (*-----------------------------------------------------------------*)
-              let error, handler, store_output =
-                List.fold_left
-		  (fun (error, handler, store_output) (cv_id,map_res) ->
-		   let error, pair_list =
-		     Site_map_and_set.Map.fold
-		       (fun site' state (error, current_list) ->
-			let pair_list = (site', state) :: current_list in
-			error, pair_list
-		       ) map_res (error, [])
-		   in
-		   let error, handler, bdu_init =
-		     build_bdu parameter handler error pair_list
-		   in
-		   let error, handler, store_result =
-		     add_link handler (agent_type, cv_id) bdu_init store_result
-		   in
-		   error, handler, store_result)
-		  (error,handler,store_result)
-		  get_pair_list 
-	      in
-	      error,(handler,store_output)
-          ) rule.e_init_c_mixture.views store_remanent_triple (handler, store_result)
+                    (*-----------------------------------------------------------------*)
+                    let error, handler, store_output =
+                      List.fold_left
+		        (fun (error, handler, store_output) (cv_id,map_res) ->
+		          let error, pair_list =
+		            Site_map_and_set.Map.fold
+		              (fun site' state (error, current_list) ->
+			        let pair_list = (site', state) :: current_list in
+			        error, pair_list
+		              ) map_res (error, [])
+		          in
+                          (*let _ =
+                            Printf.fprintf stdout "agent_type:%i:index:%i:cv_id:%i\n"
+                              agent_type index cv_id;
+                            List.iter
+                              (fun (site, state) ->
+                                Printf.fprintf stdout "site:%i:state:%i\n"
+                                  site state
+                              ) pair_list
+                          in*)
+		          let error, handler, bdu_init =
+		            build_bdu parameter handler error pair_list
+		          in
+		          let error, handler, store_result =
+		            add_link handler (agent_type, index, cv_id) bdu_init store_result
+		          in
+		          error, handler, store_result)
+		        (error, handler, store_result)
+		        get_pair_list 
+	            in
+	            error, (handler, store_output)
+                  else
+                    error, (handler, store_result)                
+                ) store_remanent_triple (handler, store_result)          
+            
+          ) init.e_init_c_mixture.views (handler, store_result)        
       ) compil.init (handler, store_result)
   in
   error, (handler, store_result)
-  
+
 (************************************************************************************)
 (*modification rule with creation rules*)
 

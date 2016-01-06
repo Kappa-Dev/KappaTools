@@ -53,8 +53,6 @@ let print_contact_map parameter error result =
   in
   error*)
 
-(*TODO*)
-
 let print_contact_map_aux parameter error result =
   Int2Map_CM_Syntactic.Map.iter (fun set1 set2 ->
     Set_triple.Set.iter (fun (agent1, site1, state1) ->
@@ -170,41 +168,49 @@ let print_covering_classes_update_full parameter error result =
 (*main print*)
 
 let print_result_dynamic parameter error result =
-  fprintf (Remanent_parameters.get_log parameter) 
-    "\n** Dynamic information:\n";
-  (*------------------------------------------------------------------------------*)
   let _ =
-    print_contact_map_full
-      parameter
-      error 
-      result.store_contact_map_full
-  in
-  (*------------------------------------------------------------------------------*)
-  let _ =
-    print_contact_map
-      parameter
-      error
-      result.store_contact_map
-  in
-  (*------------------------------------------------------------------------------*)
-  let _ =
-    print_covering_classes_modification
-      parameter
-      error
-      result.store_covering_classes_modification_update
-  in
-  (*------------------------------------------------------------------------------*)
-  let _ =
-    print_covering_classes_side_effects
-      parameter
-      error
-      result.store_covering_classes_modification_side_effects
-  in
-  (*------------------------------------------------------------------------------*)
-  let _ =
-    print_covering_classes_update_full
-      parameter
-      error
-      result.store_covering_classes_modification_update_full
+    fprintf (Remanent_parameters.get_log parameter)
+      "============================================================\n";
+    fprintf (Remanent_parameters.get_log parameter) "* BDU Analysis:\n";
+    fprintf (Remanent_parameters.get_log parameter)
+      "============================================================\n";
+    fprintf (Remanent_parameters.get_log parameter) 
+      "\n** Dynamic information:\n";
+    (*------------------------------------------------------------------------------*)
+    let _ =
+      print_contact_map_full
+        parameter
+        error 
+        result.store_contact_map_full
+    in
+    (*------------------------------------------------------------------------------*)
+    let _ =
+      print_contact_map
+        parameter
+        error
+        result.store_contact_map
+    in
+    (*------------------------------------------------------------------------------*)
+    let _ =
+      print_covering_classes_modification
+        parameter
+        error
+        result.store_covering_classes_modification_update
+    in
+    (*------------------------------------------------------------------------------*)
+    let _ =
+      print_covering_classes_side_effects
+        parameter
+        error
+        result.store_covering_classes_modification_side_effects
+    in
+    (*------------------------------------------------------------------------------*)
+    let _ =
+      print_covering_classes_update_full
+        parameter
+        error
+        result.store_covering_classes_modification_update_full
+    in
+    error
   in
   error

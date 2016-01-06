@@ -166,7 +166,7 @@ Quarks:site_modif-:agent_type:1,site_type:0,state:0,rule:0->[1]
 Quarks:site_modif-:agent_type:2,site_type:0,state:0,rule:1->[1]
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Refining the influence map...
-Reachability analysis dynamic information ....
+Reachability analysis...
 
 agent_type:0:
 Potential dependencies between sites:Number of covering classes:2
@@ -229,50 +229,13 @@ Mapping between global identifier of sites (per agent) and local identifier of s
 Covering_class_id:0
 Global:site_type:0  => Local:site_type':1
 Local:site_type':1  => Global:site_type:0
-
-** Dynamic information:
-
-------------------------------------------------------------
-(Full) Contact map and initital state:
-------------------------------------------------------------
-Sites are annotated with the id of binding type:
-agent_type:0@site_type:1:state:1--agent_type':1@site_type':0:state':1
-agent_type:0@site_type:2:state:1--agent_type':2@site_type':0:state':1
-agent_type:1@site_type:0:state:1--agent_type':0@site_type':1:state':1
-agent_type:2@site_type:0:state:1--agent_type':0@site_type':2:state':1
+Reachability analysis result ....
 
 ------------------------------------------------------------
-(Syntactic) Contact map and initital state:
-------------------------------------------------------------
-Sites are annotated with the id of binding type:
-agent_type:0@site_type:1:state:1--agent_type':1@site_type':0:state':1
-agent_type:0@site_type:2:state:1--agent_type':2@site_type':0:state':1
-
-------------------------------------------------------------
-List of rules to awake when the state of a site is modified and tested:
-------------------------------------------------------------
-agent_type:0:covering_class_id:0:@set of rule_id:
-rule_id:0
-agent_type:0:covering_class_id:1:@set of rule_id:
-rule_id:1
-agent_type:1:covering_class_id:0:@set of rule_id:
-rule_id:0
-agent_type:2:covering_class_id:0:@set of rule_id:
-rule_id:1
-
-------------------------------------------------------------
-List of rules to awake when the state of a site is modified and tested and side effects:
+* Fixpoint iteration :
 ------------------------------------------------------------
 
 ------------------------------------------------------------
-Final list of rules to awake when the state of a site is modified and tested and side effects:
+* Cartesian abstraction:
 ------------------------------------------------------------
-agent_type:0:covering_class_id:0:@set of rule_id:
-rule_id:0
-agent_type:0:covering_class_id:1:@set of rule_id:
-rule_id:1
-agent_type:1:covering_class_id:0:@set of rule_id:
-rule_id:0
-agent_type:2:covering_class_id:0:@set of rule_id:
-rule_id:1
 execution finished without any exception

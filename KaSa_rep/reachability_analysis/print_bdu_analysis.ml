@@ -32,22 +32,53 @@ let trace = false
 let print_result parameter error result =
   let parameter = Remanent_parameters.update_prefix parameter "agent_type_" in
   let _ =
-    print_result_static
-      parameter
-      error 
-      result.store_bdu_analysis_static
+    if Remanent_parameters.get_do_reachability_analysis_static parameter
+    then
+      let _ = Format.printf "Reachability analysis static information ....@." in
+      let parameters_cv =
+        Remanent_parameters.update_prefix parameter ""
+      in
+      if (Remanent_parameters.get_trace parameters_cv)
+      then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
+      print_result_static
+        parameter
+        error 
+        result.store_bdu_analysis_static
+    else error
   in
   (*------------------------------------------------------------------------------*)
   let _ =
-    print_result_dynamic
-      parameter
-      error
-      result.store_bdu_analysis_dynamic
+    if  Remanent_parameters.get_do_reachability_analysis_dynamic parameter
+    then
+      let _ = Format.printf "Reachability analysis dynamic information ....@." in
+      let parameters_cv =
+        Remanent_parameters.update_prefix parameter ""
+      in
+      if (Remanent_parameters.get_trace parameters_cv)
+      then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
+      print_result_dynamic
+        parameter
+        error
+        result.store_bdu_analysis_dynamic
+    else error
   in
   (*------------------------------------------------------------------------------*)
   (*print if one would like to test*)
-  let _ =
+  (*let _ =
     print_bdu_build
+      parameter
+      error
+      result.store_bdu_build
+  in*)
+  error
+
+(************************************************************************************)
+(*print only working list*)
+
+let print_result_wl parameter error result =
+  let parameter = Remanent_parameters.update_prefix parameter "agent_type_" in
+  let _ =
+    print_bdu_build_wl
       parameter
       error
       result.store_bdu_build
@@ -55,8 +86,9 @@ let print_result parameter error result =
   error
 
 (************************************************************************************)
+(*print only static information*)
 
-let print_result_static parameter error result =
+(*let print_result_static parameter error result =
   let parameter = Remanent_parameters.update_prefix parameter "agent_type_" in
   let _ =
     print_result_static
@@ -64,11 +96,12 @@ let print_result_static parameter error result =
       error
       result.store_bdu_analysis_static
   in
-  error
+  error*)
 
 (************************************************************************************)
+(*print only dynamic information*)
 
-let print_result_dynamic parameter error result =
+(*let print_result_dynamic parameter error result =
   let parameter = Remanent_parameters.update_prefix parameter "agent_type_" in
   let _ =
     print_result_dynamic
@@ -76,7 +109,7 @@ let print_result_dynamic parameter error result =
       error
       result.store_bdu_analysis_dynamic
   in
-  error  
+  error  *)
 
 (************************************************************************************)
 (*main print of fixpoint*)
@@ -93,7 +126,9 @@ let print_bdu_update_map_cartesian parameter handler error result =
   Map_bdu_update.Map.fold 
     (fun (agent_type, cv_id) bdu_update (error,handler) -> 
       let _ = fprintf parameter.log "agent_type:%i:cv_id:%i\n" agent_type cv_id in 
-      let error,handler,list = Mvbdu_wrapper.Mvbdu.mvbdu_cartesian_abstraction parameter handler error bdu_update in 
+      let error,handler,list = 
+        Mvbdu_wrapper.Mvbdu.mvbdu_cartesian_abstraction parameter handler error bdu_update 
+      in 
       let _ = 
 	List.iter 
 	  (Mvbdu_wrapper.Mvbdu.print parameter.log "")
@@ -102,28 +137,46 @@ let print_bdu_update_map_cartesian parameter handler error result =
       error,handler)
     result (error,handler)
 	
-
 let print_result_fixpoint parameter handler error result =
-  let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "\n------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "* Fixpoint iteration :\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
-  in
-  let _ =
-    print_bdu_update_map
-      parameter
-      error
-      result
-  in
-  let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "\n------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "* Cartesian abstraction:\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
-  in
-  print_bdu_update_map_cartesian parameter handler error result 
+  if Remanent_parameters.get_do_reachability_analysis_result parameter
+  then
+    let _ = Format.printf "Reachability analysis result ....@." in
+    let parameters_cv =
+      Remanent_parameters.update_prefix parameter ""
+    in
+    let _ =
+      if (Remanent_parameters.get_trace parameters_cv)
+      then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "";
+      let _ =
+        fprintf (Remanent_parameters.get_log parameter)
+          "\n------------------------------------------------------------\n";
+        fprintf (Remanent_parameters.get_log parameter)
+          "* Fixpoint iteration :\n";
+        fprintf (Remanent_parameters.get_log parameter)
+          "------------------------------------------------------------\n";
+      in
+      let _ =
+        print_bdu_update_map
+          parameter
+          error
+          result
+      in
+      let _ =
+        fprintf (Remanent_parameters.get_log parameter)
+          "\n------------------------------------------------------------\n";
+        fprintf (Remanent_parameters.get_log parameter)
+          "* Cartesian abstraction:\n";
+        fprintf (Remanent_parameters.get_log parameter)
+          "------------------------------------------------------------\n";
+      in
+      let _ =
+        print_bdu_update_map_cartesian
+          parameter
+          handler 
+          error
+          result
+      in
+      error, handler
+    in
+    error, handler
+  else error, handler

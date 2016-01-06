@@ -129,7 +129,7 @@ Influence_map: The notation [i -> j] means an agent at position [i] of the first
 Influence_map:Wake_up_map:rule(0):'r0' A(x),B(x)->A(x!1),B(x!1) -> rule(1):'r1' B(x!_)->C(x)[1->0]
 Influence_map:Wake_up_map:rule(1):'r1' B(x!_)->C(x) -> rule(0):'r0' A(x),B(x)->A(x!1),B(x!1)[0*->0]
 Refining the influence map...
-Reachability analysis dynamic information ....
+Reachability analysis...
 
 agent_type:0:
 Potential dependencies between sites:Number of covering classes:1
@@ -167,45 +167,13 @@ agent_type:2:
 Potential dependencies between sites:Covering_class_id:0
 Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
 Covering_class_id:0
-
-** Dynamic information:
-
-------------------------------------------------------------
-(Full) Contact map and initital state:
-------------------------------------------------------------
-Sites are annotated with the id of binding type:
-agent_type:0@site_type:0:state:1--agent_type':1@site_type':0:state':1
-agent_type:1@site_type:0:state:1--agent_type':0@site_type':0:state':1
+Reachability analysis result ....
 
 ------------------------------------------------------------
-(Syntactic) Contact map and initital state:
+* Fixpoint iteration :
 ------------------------------------------------------------
-Sites are annotated with the id of binding type:
-agent_type:0@site_type:0:state:1--agent_type':1@site_type':0:state':1
 
 ------------------------------------------------------------
-List of rules to awake when the state of a site is modified and tested:
+* Cartesian abstraction:
 ------------------------------------------------------------
-agent_type:0:covering_class_id:0:@set of rule_id:
-rule_id:0
-agent_type:1:covering_class_id:0:@set of rule_id:
-rule_id:0
-rule_id:1
-
-------------------------------------------------------------
-List of rules to awake when the state of a site is modified and tested and side effects:
-------------------------------------------------------------
-agent_type:0:covering_class_id:0:@set of rule_id:
-rule_id:0
-rule_id:1
-
-------------------------------------------------------------
-Final list of rules to awake when the state of a site is modified and tested and side effects:
-------------------------------------------------------------
-agent_type:0:covering_class_id:0:@set of rule_id:
-rule_id:0
-rule_id:1
-agent_type:1:covering_class_id:0:@set of rule_id:
-rule_id:0
-rule_id:1
 execution finished without any exception

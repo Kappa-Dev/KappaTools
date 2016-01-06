@@ -408,7 +408,7 @@ Influence_map:Inhibition_map:rule(2):'r1' B(x!_,y!_),C(x~u,y~p)->B(x!1,y!2),C(x~
 Influence_map:Inhibition_map:rule(2):'r1' B(x!_,y!_),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2) -> rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!_,y!_),C(x~u,y~p)[0->0]
 Influence_map:Inhibition_map:rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!_,y!_),C(x~u,y~p) -> rule(2):'r1' B(x!_,y!_),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2)[0->0]
 Refining the influence map...
-Reachability analysis dynamic information ....
+Reachability analysis...
 
 agent_type:0:
 Potential dependencies between sites:Number of covering classes:1
@@ -476,62 +476,13 @@ Local:site_type':1  => Global:site_type:0
 Local:site_type':2  => Global:site_type:1
 Local:site_type':3  => Global:site_type:2
 Local:site_type':4  => Global:site_type:3
-
-** Dynamic information:
-
-------------------------------------------------------------
-(Full) Contact map and initital state:
-------------------------------------------------------------
-Sites are annotated with the id of binding type:
-agent_type:0@site_type:0:state:1--agent_type':1@site_type':0:state':1
-agent_type:0@site_type:1:state:1--agent_type':1@site_type':1:state':1
-agent_type:1@site_type:0:state:1--agent_type':0@site_type':0:state':1
-agent_type:1@site_type:0:state:2--agent_type':2@site_type':2:state':1
-agent_type:1@site_type:1:state:1--agent_type':0@site_type':1:state':1
-agent_type:1@site_type:1:state:2--agent_type':2@site_type':3:state':1
-agent_type:2@site_type:2:state:1--agent_type':1@site_type':0:state':2
-agent_type:2@site_type:3:state:1--agent_type':1@site_type':1:state':2
+Reachability analysis result ....
 
 ------------------------------------------------------------
-(Syntactic) Contact map and initital state:
-------------------------------------------------------------
-Sites are annotated with the id of binding type:
-agent_type:0@site_type:0:state:1--agent_type':1@site_type':0:state':1
-agent_type:0@site_type:1:state:1--agent_type':1@site_type':1:state':1
-agent_type:1@site_type:0:state:2--agent_type':2@site_type':2:state':1
-agent_type:1@site_type:1:state:2--agent_type':2@site_type':3:state':1
-
-------------------------------------------------------------
-List of rules to awake when the state of a site is modified and tested:
-------------------------------------------------------------
-agent_type:0:covering_class_id:0:@set of rule_id:
-rule_id:0
-rule_id:1
-agent_type:1:covering_class_id:0:@set of rule_id:
-rule_id:0
-rule_id:1
-rule_id:2
-rule_id:3
-agent_type:2:covering_class_id:0:@set of rule_id:
-rule_id:2
-rule_id:3
-
-------------------------------------------------------------
-List of rules to awake when the state of a site is modified and tested and side effects:
+* Fixpoint iteration :
 ------------------------------------------------------------
 
 ------------------------------------------------------------
-Final list of rules to awake when the state of a site is modified and tested and side effects:
+* Cartesian abstraction:
 ------------------------------------------------------------
-agent_type:0:covering_class_id:0:@set of rule_id:
-rule_id:0
-rule_id:1
-agent_type:1:covering_class_id:0:@set of rule_id:
-rule_id:0
-rule_id:1
-rule_id:2
-rule_id:3
-agent_type:2:covering_class_id:0:@set of rule_id:
-rule_id:2
-rule_id:3
 execution finished without any exception

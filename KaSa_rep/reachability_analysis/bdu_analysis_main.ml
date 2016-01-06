@@ -210,7 +210,9 @@ let scan_rule_dynamic parameter error handler rule_id rule
 (*rule bdu build*)
 
 let scan_rule_bdu_build parameter handler_bdu error rule_id rule compil
-    covering_classes store_potential_side_effects store_result =
+    covering_classes store_potential_side_effects 
+    (*store_covering_classes_modification_update_full*)
+    store_result =
   (*------------------------------------------------------------------------------*)
   let error, store_remanent_triple =
     collect_remanent_triple
@@ -275,6 +277,15 @@ let scan_rule_bdu_build parameter handler_bdu error rule_id rule compil
       store_remanent_triple
       store_result.store_bdu_init_restriction_map
   in
+  (*-------------------------------------------------------------------------------*)
+  (*working list of initial state and creation*)
+  (*let error, store_wl_init =
+    collect_wl_init
+      parameter
+      error
+      compil
+      store_result.store_wl_init
+  in*)
   (*-------------------------------------------------------------------------------*)
   let error, (handler_bdu, store_modif_list_restriction_map) =
     collect_modif_list_restriction_map
@@ -342,6 +353,7 @@ let scan_rule_bdu_build parameter handler_bdu error rule_id rule compil
   {
     store_remanent_triple                   = store_remanent_triple;
     store_wl_creation                       = store_wl_creation;
+    (*store_wl_init                           = store_wl_init;*)
     store_bdu_test_restriction_map          = store_bdu_test_restriction_map;
     store_proj_bdu_test_restriction_map     = store_proj_bdu_test_restriction_map;
     store_bdu_creation_restriction_map      = store_bdu_creation_restriction_map;
@@ -399,6 +411,7 @@ let scan_rule parameter handler_bdu error handler_kappa rule_id rule compil
       compil
       covering_classes
       store_bdu_analysis_static.store_potential_side_effects
+      (*store_bdu_analysis_dynamic.store_covering_classes_modification_update_full*)
       store_result.store_bdu_build
   in
   error, (handler_bdu, 
@@ -446,7 +459,7 @@ let init_bdu_analysis_dynamic parameter error =
   let init_contact_map      = Int2Map_CM_Syntactic.Map.empty in
   let init_cv_modification  = Int2Map_CV_Modif.Map.empty in
   let init_cv_modification_side_effects  = Int2Map_CV_Modif.Map.empty in
-  let init_cv_modification_full = Int2Map_CV_Modif.Map.empty in
+  let init_cv_modification_full          = Int2Map_CV_Modif.Map.empty in
   let init_bdu_analysis_dynamic =
     {
       store_contact_map_full                     = init_contact_map_full;
@@ -464,11 +477,12 @@ let init_bdu_analysis_dynamic parameter error =
 let init_bdu_build parameter error =
   let error, init_remanent_triple            = AgentMap.create parameter error 0 in
   let init_wl_creation                       = IntWL.empty in
+  (*let init_wl_init                           = IntWL.empty in*)
   let init_bdu_test_restriction_map          = Map_test_bdu.Map.empty in
   let init_proj_bdu_test_restriction_map     = Map_final_test_bdu.Map.empty in
   let init_bdu_creation_restriction_map      = Map_creation_bdu.Map.empty in
   let init_proj_bdu_creation_restriction_map = Map_final_creation_bdu.Map.empty in
-  let init_bdu_init_restriction_map          = Map_bdu_update.Map.empty in
+  let init_bdu_init_restriction_map          = Map_creation_bdu.Map.empty in
   let init_modif_list_restriction_map        = Map_modif_list.Map.empty in
   let init_proj_modif_list_restriction_map   = Map_final_modif_list.Map.empty in
   let init_bdu_potential_restriction_map       = Map_potential_bdu.Map.empty in
@@ -480,6 +494,7 @@ let init_bdu_build parameter error =
     {
       store_remanent_triple                   = init_remanent_triple;
       store_wl_creation                       = init_wl_creation;
+      (*store_wl_init                           = init_wl_init;*)
       store_bdu_test_restriction_map          = init_bdu_test_restriction_map;
       store_proj_bdu_test_restriction_map     = init_proj_bdu_test_restriction_map;
       store_bdu_creation_restriction_map      = init_bdu_creation_restriction_map;
@@ -574,102 +589,6 @@ let bdu_main parameter error handler_kappa store_covering_classes cc_compil =
   let error,handler_bdu =
     if  (Remanent_parameters.get_trace parameter) || trace
     then print_result_fixpoint parameter handler_bdu error store_bdu_fixpoint
-    else error,handler_bdu
-  in
-  error, handler_bdu, result
-
-(************************************************************************************)
-(*print only the result at the end
-  TODO: add the array showing which rule is dead.
-*)
-
-let main_analysis_result parameter error handler_kappa store_covering_classes cc_compil =
-  let error, handler_bdu = 
-    Boolean_mvbdu.init_remanent parameter error in
-  let error, (handler_bdu, result) =
-    scan_rule_set
-      parameter
-      handler_bdu
-      error
-      handler_kappa
-      cc_compil
-      store_covering_classes
-      cc_compil.rules
-  in
-   (*-------------------------------------------------------------------------------*)
-  (*fixpoint computation: no rule in particular, we should start with rule
-    with no lhs and those induced by initial states to remove *)
-  let error, (handler_bdu, store_bdu_fixpoint) =
-    collect_bdu_fixpoint_map
-      parameter
-      handler_bdu
-      error
-      result.store_bdu_build.store_wl_creation
-      result.store_bdu_build.store_proj_bdu_creation_restriction_map
-      result.store_bdu_build.store_proj_modif_list_restriction_map
-      result.store_bdu_build.store_proj_bdu_test_restriction_map
-      result.store_bdu_build.store_proj_bdu_potential_restriction_map
-      result.store_bdu_build.store_proj_potential_list_restriction_map
-      result.store_bdu_build.store_bdu_test_restriction_map
-      result.store_bdu_build.store_proj_bdu_views
-      result.store_bdu_analysis_dynamic.store_covering_classes_modification_update_full
-      result.store_bdu_build.store_bdu_init_restriction_map
-  in
-  let error,handler_bdu =
-    if  (Remanent_parameters.get_trace parameter) || trace
-    then print_result_fixpoint parameter handler_bdu error store_bdu_fixpoint
     else error, handler_bdu
-  in
-  error, handler_bdu, result
-
-(************************************************************************************)
-(*print only static information*)
-
-let main_analysis_static parameter error handler_kappa store_covering_classes
-    cc_compil =
-  let error, handler_bdu = 
-    Boolean_mvbdu.init_remanent parameter error in
-  let error, (handler_bdu, result) =
-    scan_rule_set
-      parameter
-      handler_bdu
-      error
-      handler_kappa
-      cc_compil
-      store_covering_classes
-      cc_compil.rules
-  in
-  (*-------------------------------------------------------------------------------*)
-  (* Static information before fixpoint computation *)
-  let error = 
-    if  (Remanent_parameters.get_trace parameter) || trace
-    then print_result_static parameter error result
-    else error
-  in
-  error, handler_bdu, result
-
-(************************************************************************************)
-(*print only dynamic information*)
-
-let main_analysis_dynamic parameter error handler_kappa store_covering_classes
-    cc_compil =
-  let error, handler_bdu = 
-    Boolean_mvbdu.init_remanent parameter error in
-  let error, (handler_bdu, result) =
-    scan_rule_set
-      parameter
-      handler_bdu
-      error
-      handler_kappa
-      cc_compil
-      store_covering_classes
-      cc_compil.rules
-  in
-  (*-------------------------------------------------------------------------------*)
-  (* Static information before fixpoint computation *)
-  let error = 
-    if  (Remanent_parameters.get_trace parameter) || trace
-    then print_result_dynamic parameter error result
-    else error
   in
   error, handler_bdu, result
