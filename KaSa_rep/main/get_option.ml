@@ -130,8 +130,8 @@ let options =
     ]
 
 let get_option error = 
- let parameters = Remanent_parameters.get_parameters () in   
+ let parameters = Remanent_parameters.get_parameters ~called_from:Remanent_parameters_sig.Internalised () in   
  let _ = SuperargTk.parse parameters options FileNames.input in 
- let parameters = Remanent_parameters.get_parameters () in   
+ let parameters = Remanent_parameters.get_parameters () in
  error,parameters,!FileNames.input 
   
