@@ -201,11 +201,11 @@ module GenArray =
 						| t:: q -> (set a k t; aux q (k + 1))
 					in aux l 0
 		
-		let gen g1 g2 h1 h2 f a =
+		(*let gen g1 g2 h1 h2 f a =
 			match a with
 				Unary a -> h1 (g1 f a)
 			|	Binary a ->
-					h2 (g2 (g1 f) a)
+					h2 (g2 (g1 f) a)*)
 		
 		let iter f a =
 			match a with
@@ -226,7 +226,7 @@ module GenArray =
                             a)
                         a
 
-                let map =
+                (*let map =
 			gen
 				Array.map
 				Array.map
@@ -246,8 +246,8 @@ module GenArray =
 												a)
 								b)
 		
-	(*	let iteri = geni Array.iteri Array.iteri (fun _ -> ()) (fun _ -> ())*)
-		let mapi = geni Array.mapi Array.mapi (fun x -> Unary x) (fun x -> Binary x)
+		let iteri = geni Array.iteri Array.iteri (fun _ -> ()) (fun _ -> ())
+		let mapi = geni Array.mapi Array.mapi (fun x -> Unary x) (fun x -> Binary x)*)
 		
 		let blit a1 ofs1 a2 ofs2 len =
 			if len < 0 || ofs1 < 0 || ofs1 > length a1 - len

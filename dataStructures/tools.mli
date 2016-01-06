@@ -3,6 +3,7 @@ val option_map : ('a -> 'b) -> 'a option -> 'b option
 val iteri : (int -> unit) -> int -> unit
 val recti : (int -> 'a -> 'a) -> 'a -> int -> 'a
 (** [recti f n x] = f 0 (f 1 (.. (f (n-1) x))) *)
+
 val array_map_of_list : ('a -> 'b) -> 'a list -> 'b array
 val array_rev_of_list : 'a list -> 'a array
 val array_fold_lefti :
@@ -29,6 +30,7 @@ val list_smart_map : ('a -> 'a) -> 'a list -> 'a list
 
 (** {5 Misc utilities } *)
 val bit_rep_size : int -> int (**number of bits used to represent n in base 2*)
+
 val pow : int -> int -> int
 val pow64 : Int64.t -> Int64.t -> Int64.t
 val read_input : unit -> string

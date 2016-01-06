@@ -27,6 +27,7 @@ val iteri : (t -> 'a -> 'a) -> 'a -> t -> 'a
 @return f (n - k) (... (f (n - 1) (f n x))) where k < n <= k+1 *)
 
 val of_string : string -> t (** @raise Failure "float_of_string" *)
+
 val of_un_alg_op : Operator.un_alg_op -> t -> t
 val of_bin_alg_op : Operator.bin_alg_op -> t -> t -> t
 val of_compare_op : Operator.compare_op -> t -> t -> bool
