@@ -119,7 +119,7 @@ let m2false_instead_of_true =
 let test handler (b1,b2) bdu = 
   let error, mvbdu_handler,(c1,c2) =
     sanity_check
-      handler.Sanity_test_sig.allocate_uniquely_list
+      handler.Sanity_test_sig.allocate_uniquely_association_list
       handler.Sanity_test_sig.error
       handler.Sanity_test_sig.output
       handler.Sanity_test_sig.mvbdu_handler

@@ -23,81 +23,51 @@ let test remanent p s1 =
           (if bool then "ok" else "FAIL!")
   in remanent
 
+let gen_aux parameters allocate get update =
+  (fun error b c d e old_handler -> 
+    let old_dictionary = get old_handler in 
+    let error,output =
+      allocate
+        parameters
+        error
+        b
+        c
+        d
+        e
+        old_dictionary 
+    in  
+    match output with 
+    | None -> error, None 
+    | Some (i, a, b, new_dic) -> error,
+      Some (i, a, b, update old_handler new_dic))
+    
+let gen parameters allocate_uniquely allocate get update x error b c d e old_handler = 
+  match x with 
+  | true -> gen_aux parameters allocate_uniquely get update error b c d e old_handler
+  | false -> gen_aux parameters allocate get update error b c d e old_handler 
+
 let remanent parameters = 
   Sanity_test_sig.initial_remanent 
     (Boolean_mvbdu.init_remanent parameters) 
-    (fun x -> 
-      match x with 
-        | true -> 
-          (fun error b c d e old_handler -> 
-            let old_dictionary = old_handler.Memo_sig.mvbdu_dictionary in 
-            let error,output =
-              Boolean_mvbdu.D_mvbdu_skeleton.allocate_uniquely
-                parameters
-                error
-                b
-                c
-                d
-                e
-                old_dictionary 
-            in  
-            match output with 
-              | None -> error, None 
-              | Some (i, a, b, new_dic) -> error,
-                Some (i, a, b, Mvbdu_core.update_dictionary old_handler new_dic))
-        | false -> 
-          (fun error b c d e old_handler -> 
-            let old_dictionary = old_handler.Memo_sig.mvbdu_dictionary in 
-            let error,output =
-              Boolean_mvbdu.D_mvbdu_skeleton.allocate 
-                parameters
-                error 
-                b
-                c
-                d
-                e
-                old_dictionary 
-            in  
-            match output with 
-              | None -> error, None 
-              | Some (i, a, b, new_dic) -> error,
-                Some (i, a, b, Mvbdu_core.update_dictionary old_handler new_dic)))
-    (fun x -> 
-      match x with 
-        | true -> 
-          (fun error b c (d:int List_sig.cell) (e:int -> int List_sig.list) old_handler -> 
-            let old_dictionary = old_handler.Memo_sig.association_list_dictionary in 
-            let error,output =
-              Boolean_mvbdu.D_Association_list_skeleton.allocate_uniquely
-                parameters 
-                error
-                b 
-                c
-                d
-                e
-                old_dictionary 
-            in  
-            match output with 
-              | None -> error, None 
-              | Some (i, a, b, new_dic) -> error,
-                Some (i, a, b, List_core.update_dictionary old_handler new_dic))
-        | false -> 
-          (fun error b c d e old_handler -> 
-            let old_dictionary = old_handler.Memo_sig.association_list_dictionary in 
-            let error,output =
-              Boolean_mvbdu.D_Association_list_skeleton.allocate
-                parameters
-                error 
-                b 
-                c
-                d
-                e
-                old_dictionary 
-            in  
-            match output with 
-              | None -> error, None 
-              | Some (i, a, b, new_dic) -> error,
-                Some (i, a, b, List_core.update_dictionary old_handler new_dic)))           
+    (gen 
+       parameters
+       Boolean_mvbdu.D_mvbdu_skeleton.allocate_uniquely
+       Boolean_mvbdu.D_mvbdu_skeleton.allocate
+       (fun x -> x.Memo_sig.mvbdu_dictionary)
+       Mvbdu_core.update_dictionary)
+    (gen 
+       parameters
+       Boolean_mvbdu.D_Association_list_skeleton.allocate_uniquely
+       Boolean_mvbdu.D_Association_list_skeleton.allocate
+       (fun x -> x.Memo_sig.association_list_dictionary)
+       List_core.update_association_dictionary)
+    (gen
+       parameters
+       Boolean_mvbdu.D_Variables_list_skeleton.allocate_uniquely
+       Boolean_mvbdu.D_Variables_list_skeleton.allocate
+       (fun x -> x.Memo_sig.variables_list_dictionary)
+       List_core.update_variables_dictionary)
+    
 
 module I = SetMap.Make (struct type t = int let compare = compare end)
 module LI = (Map_wrapper.Make(I):Map_wrapper.S_with_logs with type 'a Map.t = 'a I.Map.t and type elt = int and type Set.t = I.Set.t)

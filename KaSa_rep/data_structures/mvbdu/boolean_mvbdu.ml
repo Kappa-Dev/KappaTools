@@ -535,29 +535,39 @@ let boolean_mvbdu_nsnd parameters =
          (h,g))
        (fun x -> x.Memo_sig.data.boolean_mvbdu_nsnd)
        (fun x h -> {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_nsnd = x}}))
-    
-let association_list_allocate parameters = 
-  (fun error b c d e (old_handler:('a,mvbdu_dic,association_list_dic,variables_list_dic,'c,'d) Memo_sig.handler) -> 
-    let old_dictionary = old_handler.Memo_sig.association_list_dictionary in 
-    let error,output =
-      D_Association_list_skeleton.allocate 
-        parameters 
-        error
-        b
-        c
-        d
-        e
-        old_dictionary
-    in  
-    match output with 
-      | None -> error, None 
-      | Some ((i:int), a, b, new_dic) -> 
-        let new_handler = 
-          List_core.update_dictionary
-            old_handler
-            new_dic
-        in 
-        error, (Some (i, a, b, new_handler)))
+
+let gen_list_allocate allocate get_dic update parameters error b c d e (old_handler:('a,mvbdu_dic,association_list_dic,variables_list_dic,'c,'d) Memo_sig.handler) =
+  let old_dictionary = get_dic old_handler in 
+  let error,output = 
+    allocate 
+      parameters
+      error
+      b
+      c
+      d
+      e
+      old_dictionary
+  in 
+  match output with 
+  | None -> error, None
+  | Some (i,a,b,new_dic) -> 
+    let new_handler = 
+      update 
+        old_handler
+        new_dic
+    in 
+    error, (Some (i, a, b, new_handler))
+
+
+let association_list_allocate parameters error b c d e old_handler = 
+  gen_list_allocate D_Association_list_skeleton.allocate (fun x -> x.Memo_sig.association_list_dictionary) 
+    List_core.update_association_dictionary
+    parameters error b c d e old_handler
+
+let variables_list_allocate parameters error b c d e old_handler = 
+  gen_list_allocate D_Variables_list_skeleton.allocate (fun x -> x.Memo_sig.variables_list_dictionary) 
+    List_core.update_variables_dictionary
+    parameters error b c d e old_handler
     
 let memo_clean_head = 
   Mvbdu_algebra.memoize_no_fun 
@@ -706,7 +716,7 @@ let redefine parameters error handler mvbdu_input list_input =
     
 let project_keep_only parameters error handler mvbdu_input list_input = 
   gen_bin_mvbdu_list
-    Mvbdu_algebra.project_keep_only
+    (fun a b -> Mvbdu_algebra.project_keep_only a b boolean_mvbdu_true)
     (fun x -> x.Memo_sig.data.boolean_mvbdu_project_keep_only)
     (fun x h ->
       {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_project_keep_only = x}})  

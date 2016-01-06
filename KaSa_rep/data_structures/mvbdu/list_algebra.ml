@@ -43,7 +43,7 @@ let rec build_reversed_sorted_list_aux allocate parameters error handler list al
     (error, (handler, already))
     list
 
-let build_reversed_sorted_list allocate parameters error handler list = 
+let build_reversed_sorted_list allocate parameters error handler  list = 
   let error,output = 
     List_core.build_list
       allocate 
@@ -89,9 +89,28 @@ let rec print_cell log prefix cell =
 			     x.List_sig.association
       in
       let prefix' = prefix^" " in 
-      let _ = print_list log prefix' x.List_sig.tail in
+      let _ = print_association_list log prefix' x.List_sig.tail in
       () 
-and print_list log prefix list = 
+and print_association_list log prefix list = 
+  let _ = Printf.fprintf log "%sId=%i\n" prefix list.List_sig.id in 
+  let _ = print_cell log (prefix^" ") list.List_sig.value in 
+  ()
+
+let rec print_cell log prefix cell = 
+  match cell with 
+    | List_sig.Empty -> 
+       let s = "[]" in
+       let _ = Printf.fprintf log "%s%s\n" prefix s in 
+       ()
+    | List_sig.Cons x -> 
+      let _ = Printf.fprintf log "%s(site_type:%i)\n"
+			     prefix 
+			     x.List_sig.variable
+      in
+      let prefix' = prefix^" " in 
+      let _ = print_variables_list log prefix' x.List_sig.tail in
+      () 
+and print_variables_list log prefix list = 
   let _ = Printf.fprintf log "%sId=%i\n" prefix list.List_sig.id in 
   let _ = print_cell log (prefix^" ") list.List_sig.value in 
   ()

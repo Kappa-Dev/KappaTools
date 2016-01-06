@@ -31,7 +31,7 @@ let get_skeleton prelist =
         { x with 
           List_sig.tail = get_hash_key x.List_sig.tail}
         
-let build_list (allocate:('a,'b,'c,'d) Sanity_test_sig.g) error handler skeleton cell = 
+let build_list allocate error handler skeleton cell = 
   allocate 
     error
     compare 
@@ -42,12 +42,19 @@ let build_list (allocate:('a,'b,'c,'d) Sanity_test_sig.g) error handler skeleton
 
 let id_of_list x = x.List_sig.id 
 
-let update_dictionary handler dictionary = 
+let update_association_dictionary handler dictionary = 
   if handler.Memo_sig.association_list_dictionary == dictionary 
   then 
     handler 
   else  
     {handler with Memo_sig.association_list_dictionary = dictionary}
+
+let update_variables_dictionary handler dictionary = 
+  if handler.Memo_sig.variables_list_dictionary == dictionary 
+  then 
+    handler 
+  else  
+    {handler with Memo_sig.variables_list_dictionary = dictionary}
 
 let rec print_list error print_empty string_of_var string_of_value (parameters:Remanent_parameters_sig.parameters) list = 
   match list.List_sig.value with 

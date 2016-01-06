@@ -5,6 +5,7 @@ module type Mvbdu =
     type handler = (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.association_list_dic,Boolean_mvbdu.variables_list_dic,bool,int) Memo_sig.handler
     type mvbdu
     type hconsed_association_list
+    type hconsed_variables_list  
     type 'output constant = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> Exception.method_handler * handler * 'output
     type ('input,'output) unary =  Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input -> Exception.method_handler * handler * 'output
     type ('input1,'input2,'output) binary = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input1 -> 'input2 -> Exception.method_handler * handler * 'output
@@ -36,14 +37,22 @@ module type Mvbdu =
     val mvbdu_nfst: (mvbdu,mvbdu,mvbdu) binary 
     val mvbdu_nsnd: (mvbdu,mvbdu,mvbdu) binary 
     val mvbdu_redefine: (mvbdu,hconsed_association_list,mvbdu) binary 
+    val mvbdu_project_keep_only: (mvbdu,hconsed_variables_list,mvbdu) binary
+    val mvbdu_project_abstract_away: (mvbdu,hconsed_variables_list,mvbdu) binary
+      
     val mvbdu_cartesian_abstraction: (mvbdu,mvbdu list) unary 
     val build_association_list: ((int * int) list,hconsed_association_list) unary  
     val build_sorted_association_list: ((int * int) list,hconsed_association_list) unary
     val build_reverse_sorted_association_list: ((int * int) list,hconsed_association_list) unary
     val empty_association_list : hconsed_association_list constant
+    val build_variables_list: (int list,hconsed_variables_list) unary  
+    val build_sorted_variables_list: (int list,hconsed_variables_list) unary
+    val build_reverse_sorted_variables_list: (int list,hconsed_variables_list) unary
+    val empty_variables_list: hconsed_variables_list constant
+    
     val print: out_channel -> string -> mvbdu -> unit
     val print_association_list: out_channel -> string -> hconsed_association_list -> unit 
-  
+    val print_variables_list: out_channel -> string -> hconsed_variables_list -> unit
   end
 
 
@@ -51,6 +60,9 @@ module type Internalized_mvbdu =
   sig
     type mvbdu
     type hconsed_association_list
+    type hconsed_variables_list
+ 
+    
     val init: Remanent_parameters_sig.parameters -> unit  
     val is_init: unit -> bool 
     val equal: mvbdu -> mvbdu -> bool 
@@ -77,14 +89,22 @@ module type Internalized_mvbdu =
     val mvbdu_nfst:  mvbdu -> mvbdu -> mvbdu 
     val mvbdu_nsnd:  mvbdu -> mvbdu -> mvbdu 
     val mvbdu_redefine: mvbdu -> hconsed_association_list -> mvbdu
+    val mvbdu_project_abstract_away: mvbdu -> hconsed_variables_list -> mvbdu
+    val mvbdu_project_keep_only: mvbdu -> hconsed_variables_list -> mvbdu
     val mvbdu_cartesian_abstraction: mvbdu -> mvbdu list
     val build_association_list: (int * int) list ->  hconsed_association_list 
     val build_sorted_association_list: (int * int) list -> hconsed_association_list
     val build_reverse_sorted_association_list: (int * int) list -> hconsed_association_list
     val empty_association_list : unit -> hconsed_association_list 
+    val build_variables_list: int list -> hconsed_variables_list
+    val build_sorted_variables_list: int list -> hconsed_variables_list
+    val build_reverse_sorted_variables_list: int list -> hconsed_variables_list
+    val empty_variables_list : unit -> hconsed_variables_list
+
     val print: out_channel -> string -> mvbdu -> unit
     val print_association_list: out_channel -> string -> hconsed_association_list -> unit 
-  end
+    val print_variables_list: out_channel -> string -> hconsed_variables_list -> unit
+end
 
 
     
@@ -96,6 +116,7 @@ module Make (M:Nul)  =
     type handler = (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.association_list_dic,Boolean_mvbdu.variables_list_dic,bool,int) Memo_sig.handler  
     type mvbdu = bool Mvbdu_sig.mvbdu
     type hconsed_association_list = int List_sig.list
+    type hconsed_variables_list = unit List_sig.list
     type 'output constant = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> Exception.method_handler * handler * 'output
     type ('input,'output) unary =  Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input -> Exception.method_handler * handler * 'output
     type ('input1,'input2,'output) binary = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input1 -> 'input2 -> Exception.method_handler * handler * 'output
@@ -155,6 +176,16 @@ module Make (M:Nul)  =
 	 f (Boolean_mvbdu.association_list_allocate parameters) parameters error handler a
       in a,b,c
 
+    let liftvbis string f parameters handler error a = 
+      let a,(b,c) = 
+	 f (Boolean_mvbdu.variables_list_allocate parameters) error parameters handler (List.rev_map (fun x -> (x,())) a)
+      in a,b,c
+    
+    let liftvter string f parameters handler error a = 
+      let a,(b,c) = 
+	 f (Boolean_mvbdu.variables_list_allocate parameters) parameters error handler (List.rev_map (fun x -> (x,())) a)
+      in a,b,c
+
     let lift1_ string f parameters handler error a = 
       match 
 	 f parameters handler error a
@@ -187,6 +218,18 @@ module Make (M:Nul)  =
           Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> a) 
         in 
 	error, handler, a
+
+    let lift2ter string f parameters handler error a b = 
+      match 
+	f parameters error  parameters handler a b
+      with 
+      | error,(handler,Some a) -> error,handler,a 
+      | error,(handler,None) -> 
+        let error, a =
+          Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> a) 
+        in 
+	error, handler, a
+
     let (mvbdu_not: (mvbdu,mvbdu) unary) = lift1 "line 80, bdd_not" Boolean_mvbdu.boolean_mvbdu_not
 
     let mvbdu_id parameters handler error a = error, handler, a
@@ -211,7 +254,9 @@ module Make (M:Nul)  =
     let mvbdu_nfst = lift2 "line 100, bdd_nfst" Boolean_mvbdu.boolean_mvbdu_nfst
     let mvbdu_nsnd = lift2 "line 101, bdd_nsnd" Boolean_mvbdu.boolean_mvbdu_nsnd 
     let mvbdu_redefine = lift2bis "line 102, bdd_redefine" Boolean_mvbdu.redefine  
- 
+    let mvbdu_project_keep_only = lift2ter "line 246, bdd_project_keep_only" Boolean_mvbdu.project_keep_only
+    let mvbdu_project_abstract_away = lift2ter "line 247, bdd_project_abstract_away" Boolean_mvbdu.project_abstract_away
+
     let build_association_list = lift1bis "line 181, build_list" List_algebra.build_list
       
     let build_sorted_association_list = lift1ter "line 181, build_list" List_algebra.build_sorted_list
@@ -220,8 +265,21 @@ module Make (M:Nul)  =
       
     let empty_association_list parameter handler error = build_association_list parameter handler error []
 
+    let build_variables_list 	= 
+      liftvbis "line 257, build_list" 
+	List_algebra.build_list 
+	
+      
+    let build_sorted_variables_list = liftvter "line 259, build_list" List_algebra.build_reversed_sorted_list
+
+    let build_reverse_sorted_variables_list = liftvter "line 261, build_list" List_algebra.build_sorted_list
+      
+    let empty_variables_list parameter handler error = build_variables_list parameter handler error []
+
+
     let print = Boolean_mvbdu.print_mvbdu
-    let print_association_list = List_algebra.print_list 
+    let print_association_list = List_algebra.print_association_list 
+    let print_variables_list = List_algebra.print_variables_list
       
     let mvbdu_clean_head = lift1_ "line 216, bdd_clean_head" Boolean_mvbdu.clean_head
     let mvbdu_keep_head_only = lift1_ "line 217, bdd_keep_head_only" Boolean_mvbdu.keep_head_only
@@ -244,6 +302,7 @@ module Internalize(M:Mvbdu) =
     module Mvbdu = M 
     type mvbdu = Mvbdu.mvbdu
     type hconsed_association_list = Mvbdu.hconsed_association_list 
+    type hconsed_variables_list = Mvbdu.hconsed_variables_list
     type handler = Mvbdu.handler 
     let handler = ref None 
     let parameter = ref (Remanent_parameters.get_parameters ())
@@ -319,6 +378,13 @@ module Internalize(M:Mvbdu) =
       let error',handler,mvbdu = f !parameter handler error' x y in 
       let _ = check s error error' handler in 
       mvbdu
+    let lift_binary'' s f x y =
+      let error = Exception.empty_error_handler in 
+      let error',handler = get_handler s error in 
+      let error',handler,mvbdu = f !parameter handler error' x y in 
+      let _ = check s error error' handler in 
+      mvbdu
+
     let mvbdu_and = lift_binary "line 243, mvbdu_and" M.mvbdu_and
     let mvbdu_or  = lift_binary "line 244, mvbdu_or" M.mvbdu_or
     let mvbdu_nand = lift_binary "line 245, mvbdu_nand" M.mvbdu_nand
@@ -335,19 +401,28 @@ module Internalize(M:Mvbdu) =
     let mvbdu_nrev_imply = lift_binary "line 256, mvbdu_nrev_imply" M.mvbdu_nrev_imply
     let mvbdu_equiv = lift_binary "line 256, mvbdu_nrev_imply" M.mvbdu_equiv
 			       
-				       
     let mvbdu_redefine = lift_binary "line 258, mvbdu_redefine" M.mvbdu_redefine
+    let mvbdu_project_keep_only = lift_binary "line 380, mvbdu_project_keep_only" M.mvbdu_project_keep_only
+    let mvbdu_project_abstract_away = lift_binary "line 381, mvbdu_project_abstract_away" M.mvbdu_project_abstract_away
 
     let build_association_list = lift_unary "line 297" M.build_association_list 
     let build_sorted_association_list = lift_unary "line 298" M.build_sorted_association_list  
     let build_reverse_sorted_association_list = lift_unary "line 299" M.build_reverse_sorted_association_list 
+    let empty_association_list () = build_association_list []
+
+    let build_variables_list = lift_unary "line 297" M.build_variables_list 
+    let build_sorted_variables_list = lift_unary "line 298" M.build_sorted_variables_list  
+    let build_reverse_sorted_variables_list = lift_unary "line 299" M.build_reverse_sorted_variables_list 
+    let empty_variables_list () = build_variables_list []
+
+
 
     let mvbdu_cartesian_abstraction = lift_unary "line 349" M.mvbdu_cartesian_abstraction 
 
-    let empty_association_list () = build_association_list []
-
+  
     let print = M.print
     let print_association_list = M.print_association_list 
+    let print_variables_list = M.print_variables_list
    end:Internalized_mvbdu)
 
 module Optimize(M:Mvbdu) =
@@ -356,6 +431,7 @@ module Optimize(M:Mvbdu) =
 	     type handler = Mvbdu.handler 	      
 	     type mvbdu = Mvbdu.mvbdu
 	     type hconsed_association_list = Mvbdu.hconsed_association_list 
+	     type hconsed_variables_list = Mvbdu.hconsed_variables_list
 	     type 'output constant = 'output Mvbdu.constant
 	     type ('input,'output) unary =  ('input,'output) Mvbdu.unary
 	     type ('input1,'input2,'output) binary = ('input1,'input2,'output) Mvbdu.binary
@@ -412,14 +488,21 @@ module Optimize(M:Mvbdu) =
 
 	     let mvbdu_cartesian_abstraction = M.mvbdu_cartesian_abstraction
 	     let mvbdu_redefine = M.mvbdu_redefine
+	     let mvbdu_project_keep_only = M.mvbdu_project_keep_only
+	     let mvbdu_project_abstract_away = M.mvbdu_project_abstract_away
 	     let build_association_list = M.build_association_list 
 	     let build_sorted_association_list = M.build_sorted_association_list
-	     let build_reverse_sorted_association_list = M.build_reverse_sorted_association_list 
-               
-             let empty_association_list = M.empty_association_list
+	     let build_reverse_sorted_association_list = M.build_reverse_sorted_association_list                
+             let build_variables_list = M.build_variables_list 
+	     let build_sorted_variables_list = M.build_sorted_variables_list
+	     let build_reverse_sorted_variables_list = M.build_reverse_sorted_variables_list                
+             
+	     let empty_association_list = M.empty_association_list
+	     let empty_variables_list = M.empty_variables_list
 
 	     let print = M.print 
-	     let print_association_list = M.print_association_list 
+	     let print_association_list = M.print_association_list
+	     let print_variables_list = M.print_variables_list
 	   end:Mvbdu)
 
 module Optimize'(M:Internalized_mvbdu) =
@@ -428,6 +511,7 @@ module Optimize'(M:Internalized_mvbdu) =
 			      
 	     type mvbdu = Mvbdu.mvbdu
 	     type hconsed_association_list = Mvbdu.hconsed_association_list 
+	     type hconsed_variables_list = Mvbdu.hconsed_variables_list
 	    
 	     let init = Mvbdu.init
 	     let is_init = Mvbdu.is_init 
@@ -458,9 +542,16 @@ module Optimize'(M:Internalized_mvbdu) =
 	     let build_sorted_association_list = M.build_sorted_association_list
 	     let build_reverse_sorted_association_list = M.build_reverse_sorted_association_list 
 	     let mvbdu_redefine = M.mvbdu_redefine
+	     let mvbdu_project_keep_only = M.mvbdu_project_keep_only
+	     let mvbdu_project_abstract_away = M.mvbdu_project_abstract_away
+	     let build_variables_list = M.build_variables_list 
+	     let build_sorted_variables_list = M.build_sorted_variables_list
+	     let build_reverse_sorted_variables_list = M.build_reverse_sorted_variables_list 
+	     let empty_variables_list = M.empty_variables_list
              let empty_association_list = M.empty_association_list
 	     let print = M.print
 	     let print_association_list = M.print_association_list
+	     let print_variables_list = M.print_variables_list
 	     let mvbdu_cartesian_abstraction = M.mvbdu_cartesian_abstraction 
 	       
 	   end:Internalized_mvbdu)
