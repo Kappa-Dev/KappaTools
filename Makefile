@@ -12,11 +12,8 @@ MANGENREP = $(MANREP)$(GENIMG)/
 KASAREP = KaSa_rep/
 
 TERM = $(shell echo $$TERM)
-ifeq ($(TERM), dumb) # An approximation of "am I launched from emacs ?" :-)
- OCAMLBUILDFLAGS = -classic-display $(EXTRAFLAGS)
-else
- OCAMLBUILDFLAGS = $(EXTRAFLAGS)
-endif
+
+OCAMLBUILDFLAGS = $(EXTRAFLAGS)
 
 USE_TK?=0
 
