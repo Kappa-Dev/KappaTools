@@ -1,4 +1,4 @@
 #Command-line:
-"${KAPPABIN}"KaSim nasty.ka -seed 924556145 -e 100 -d output -p 50 || exit 0
+"${KAPPABIN}"KaSim nasty.ka -seed 924556145 -e 100 -d output -p 50 --time-independent || exit 0
 
 #we check that the computation of causal stories work well when only the none option is used

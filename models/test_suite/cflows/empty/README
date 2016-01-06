@@ -1,1 +1,1 @@
-"${KAPPABIN}"KaSim -i empty.ka -e 18 -d output -seed 126704914 -p 50 || exit 0
+"${KAPPABIN}"KaSim -i empty.ka -e 18 -d output -seed 126704914 -p 50 --time-independent || exit 0

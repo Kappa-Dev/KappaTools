@@ -1,5 +1,5 @@
 #Command-line:
-"${KAPPABIN}"KaSim -i side-effects.ka -seed 501792230 -e 199 -d output || exit 0
+"${KAPPABIN}"KaSim -i side-effects.ka -seed 501792230 -e 199 -d output --time-independent || exit 0
 
 #A and B can for dimmer.
 #Each time A and B forms a dimmer the state of A is changed from 0 to 1, or from 1 to 0. 

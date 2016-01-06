@@ -1,5 +1,5 @@
 #Command-line:
-"${KAPPABIN}"KaSim pseudo.ka -seed 924556145 -var n_a 1000 -e 10000 -d output -p 50 || exit 0
+"${KAPPABIN}"KaSim pseudo.ka -seed 924556145 -var n_a 1000 -e 10000 -d output -p 50 --time-independent || exit 0
 
 #This is the classical abc model.
 #3 stories are expected, but one is very unlikly.

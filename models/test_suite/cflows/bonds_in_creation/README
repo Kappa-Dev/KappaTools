@@ -1,5 +1,5 @@
 #Command-line:
-"${KAPPABIN}"KaSim -i bonds_in_creation.ka  -t 40 -p 100  -seed 611463625 -d output  || exit 0 
+"${KAPPABIN}"KaSim -i bonds_in_creation.ka  -t 40 -p 100  -seed 611463625 -d output --time-independent || exit 0 
 
 #Variation to the test non regression against a fix to a 
 #bug found by Jonathan. 

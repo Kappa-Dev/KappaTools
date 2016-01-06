@@ -15,7 +15,7 @@ done
 	 -perturbations
 	 -initial conditions
 	 Done
-+ Command line is: 'KaSim' '-i' 'abc.ka' '-seed' '924556145' '-var' 'on_rate' '1.0E-4' '-e' '2000' '-d' 'output' '-p' '500'
++ Command line is: 'KaSim' '-i' 'abc.ka' '-seed' '924556145' '-var' 'on_rate' '1.0E-4' '-e' '2000' '-d' 'output' '-p' '500' '--time-independent'
 Parsing abc.ka...
 done
 + Initialized random number generator with seed 924556145
@@ -59,19 +59,6 @@ ____________________________________________________________
 	 - detecting pseudo inverse events (no change)
 	 - blackboard generation
 	 - computing causal past of each observed events (626)
-
-____________________________________________________________
-#######################
-	 - Removing already visited observable hits last eid 16 
-(-16 events)
-	 - detecting siphons (+43 events)
-	 - cutting concurrent events (-55 events)
-	 - detecting pseudo inverse events (no change)
-	 - detecting siphons (+43 events)
-	 - cutting concurrent events (-43 events)
-	 - detecting pseudo inverse events (no change)
-	 - blackboard generation
-	 - computing causal past of each observed events (610)
 
 ____________________________________________________________
 ############################################################

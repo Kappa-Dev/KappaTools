@@ -1,5 +1,5 @@
 #Command-line:
-"${KAPPABIN}"KaSim -i link_swapping.ka -seed 924556145 -e 3 -d output || exit 0 
+"${KAPPABIN}"KaSim -i link_swapping.ka -seed 924556145 -e 3 -d output --time-independent || exit 0 
 
 #In this model As can form a dimmer by connecting their two x(s), and their two y(s) concurrently. 
 #Then, they can swap these links to bind a site x to the site y of the other A, and vice versa (which triggers the observable).

@@ -1,7 +1,7 @@
 #Command-line:
 "${KAPPABIN}"KaSim -i abc.ka -seed 785872661 --compile -d output || exit 0
 "${KAPPABIN}"KaSim -i abc.ka -seed 924556145 -var on_rate 1.0E-4 -e 2000 \
--d output -p 500 || exit 0
+-d output -p 500 --time-independent || exit 0
 
 #This is the classical abc model. 
 #3 stories are expected, but one is very unlikely.

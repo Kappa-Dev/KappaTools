@@ -1,5 +1,5 @@
 #Command-line:
-"${KAPPABIN}"KaSim -i side-effects.ka -seed 924556145 -e 10000 -d output || exit 0 
+"${KAPPABIN}"KaSim -i side-effects.ka -seed 924556145 -e 10000 -d output --time-independent || exit 0 
 #KaSim -i side-effects.ka -seed 924556145 -e 22 -d output || exit 0 
 
 #The observable is triggerred when there is a B that is free and a C that is free and not phosphorilated. 

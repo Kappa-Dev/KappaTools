@@ -1,4 +1,4 @@
 #Command-line:
-"${KAPPABIN}"KaSim -i weak_only.ka -seed 924556145 -e 100000 -d output -o data.svg -p 50 || exit 0
+"${KAPPABIN}"KaSim -i weak_only.ka -seed 924556145 -e 100000 -d output -o data.svg -p 50 --time-independent || exit 0
 
 #Here we should show only weakly compressed flows.

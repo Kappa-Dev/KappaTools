@@ -1,5 +1,5 @@
 #Command-line:
-"${KAPPABIN}"KaSim -i distributive.ka -seed 240056667 -e 1000 -d output || exit 0 
+"${KAPPABIN}"KaSim -i distributive.ka -seed 240056667 -e 1000 -d output --time-independent || exit 0 
 
 #Distributive phosphorilation the sites of a protein A.
 #It is highly unlikely that the same kinase is used to phosphorilate the two sites of the protein A. 

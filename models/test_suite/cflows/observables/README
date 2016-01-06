@@ -1,5 +1,5 @@
 #Command-line:
-"${KAPPABIN}"KaSim -i observables.ka -seed 924556145 -e 10000 -d output || exit 0 
+"${KAPPABIN}"KaSim -i observables.ka -seed 924556145 -e 10000 -d output --time-independent || exit 0 
 
 #In this example A and B are synchronized. 
 #They are either both activated, or both not activated. 
