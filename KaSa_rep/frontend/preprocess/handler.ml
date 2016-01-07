@@ -142,30 +142,33 @@ warn parameters error (Some "line 122") Exit "ALG"*)
 (*         | Some Cckappa_sig.VAR_KAPPA(a,(b,c)) ->
              let m1 = b in  
              let m2 = string_of_int  var_id in 
-             let m = m1^m2 in 
+           let m = m1^m2 in 
                error,(if m="" then ("var"^(string_of_int var_id)) else ("var"^(string_of_int var_id)^":"^m))*)
         
     end 
 
 (*mapping agent of type int to string*)
-(*let string_of_agent parameter error handler_kappa agent_type =
+let string_of_agent parameter error handler_kappa agent_type =
   let agents_dic = handler_kappa.Cckappa_sig.agents_dic in
   (*get sites dictionary*)
   let error, output =
-    Ckappa_sig.Dictionary_of_agents.allocate
+    Ckappa_sig.Dictionary_of_agents.translate
       parameter
       error
-      Misc_sa.compare_unit
       agent_type
-      ()
-      Misc_sa.const_unit
       agents_dic
   in
   match output with
+  | None -> warn parameter error (Some "line 162") Exit ""
   | Some (agent_name, _, _) -> error, agent_name
-  | None -> warn parameter error (Some "line 166") Exit 0*)
-      
+    
 (*mapping site of type int to string*)
+
+let print_site_compact parameter site =
+  match site with
+  | Ckappa_sig.Internal a -> a
+  | Ckappa_sig.Binding a -> a ^ "!"
+
 
 let string_of_site parameter error handler_kappa agent_name site_int =
   let error, sites_dic =
@@ -180,17 +183,53 @@ let string_of_site parameter error handler_kappa agent_name site_int =
       (Ckappa_sig.Dictionary_of_sites.init())
     | error, Some i -> error, i
   in
-  let error, (site_type, _, _) =
-    Misc_sa.unsome
-      (Ckappa_sig.Dictionary_of_sites.translate
+  let error, site_type =
+    match
+      Ckappa_sig.Dictionary_of_sites.translate
          parameter
          error
          site_int
-         sites_dic)
-      (fun error -> exit 0)
+         sites_dic
+    with
+    | error, None -> error, exit 0 (*TODO*)
+    | error, Some (value, _, _) -> error, value 
   in
-  Print_handler.string_of_site parameter site_type
-  
+  error, (print_site_compact parameter site_type)
+
+(*mapping state of type int to string*)
+    
+let print_state state =
+  match state with
+  | Ckappa_sig.Internal a -> a
+  | Ckappa_sig.Binding Cckappa_sig.Free -> "free"
+  | Ckappa_sig.Binding Cckappa_sig.Lnk_type (a, b) -> 
+    "agent_type:" ^(string_of_int a) ^ "@" ^ "site_type:" ^ (string_of_int b)
+    
+let string_of_state parameter error handler_kappa agent_name site_int state =
+  let error, state_dic =
+    match Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+      parameter
+      error
+      (agent_name, site_int)
+      handler_kappa.Cckappa_sig.states_dic
+    with
+    | error, None -> warn parameter error (Some "line 206") Exit
+      (Cckappa_sig.Dictionary_of_States.init())
+    | error, Some i -> error, i
+  in
+  let error, value =
+    match
+      Cckappa_sig.Dictionary_of_States.translate
+        parameter
+        error
+        state
+        state_dic
+    with
+    | error, None -> error, exit 0 (*TODO*)
+    | error, Some (value, _, _) -> error, value
+  in
+  error, (print_state value)
+    
 
 let print_labels_txt parameters error handler couple = 
    let _ = Quark_type.Labels.dump_couple parameters error handler couple

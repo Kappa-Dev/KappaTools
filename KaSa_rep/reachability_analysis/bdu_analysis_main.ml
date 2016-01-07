@@ -588,7 +588,7 @@ let bdu_main parameter error handler_kappa store_covering_classes compiled =
   in
   let error,handler_bdu =
     if  (Remanent_parameters.get_trace parameter) || trace
-    then print_result_fixpoint parameter handler_bdu error store_bdu_fixpoint
+    then print_result_fixpoint parameter handler_bdu error handler_kappa store_bdu_fixpoint
     else error, handler_bdu
   in
   error, handler_bdu, result

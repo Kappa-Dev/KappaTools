@@ -79,18 +79,27 @@ let print_result parameter error handler_kappa compiled result =
 (************************************************************************************)
 (*main print of fixpoint*)
 
-let print_bdu_update_map parameter error result =
+let print_bdu_update_map parameter error handler_kappa result =
   Map_bdu_update.Map.iter (fun (agent_type, cv_id) bdu_update ->
+    let error, agent_string =
+      Handler.string_of_agent parameter error handler_kappa agent_type
+    in
     let _ =
-      fprintf parameter.log "agent_type:%i:cv_id:%i\n" agent_type cv_id
+      fprintf parameter.log "agent_type:%i:%s:cv_id:%i\n" 
+        agent_type agent_string cv_id
     in
     Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_update
     ) result
 
-let print_bdu_update_map_cartesian parameter handler error result = 
+let print_bdu_update_map_cartesian parameter handler error handler_kappa result = 
   Map_bdu_update.Map.fold 
-    (fun (agent_type, cv_id) bdu_update (error,handler) -> 
-      let _ = fprintf parameter.log "agent_type:%i:cv_id:%i\n" agent_type cv_id in 
+    (fun (agent_type, cv_id) bdu_update (error,handler) ->
+      let error, agent_string =
+        Handler.string_of_agent parameter error handler_kappa agent_type
+      in
+      let _ = fprintf parameter.log "agent_type:%i:%s:cv_id:%i\n" 
+        agent_type agent_string cv_id 
+      in 
       let error,handler,list = 
         Mvbdu_wrapper.Mvbdu.mvbdu_cartesian_abstraction parameter handler error bdu_update 
       in 
@@ -102,7 +111,7 @@ let print_bdu_update_map_cartesian parameter handler error result =
       error,handler)
     result (error,handler)
 	
-let print_result_fixpoint parameter handler error result =
+let print_result_fixpoint parameter handler error handler_kappa result =
   if Remanent_parameters.get_do_reachability_analysis_result parameter
   then
     let _ = Format.printf "\nReachability analysis result ....@." in
@@ -124,6 +133,7 @@ let print_result_fixpoint parameter handler error result =
         print_bdu_update_map
           parameter
           error
+          handler_kappa
           result
       in
       let _ =
@@ -139,6 +149,7 @@ let print_result_fixpoint parameter handler error result =
           parameter
           handler 
           error
+          handler_kappa
           result
       in
       error, handler

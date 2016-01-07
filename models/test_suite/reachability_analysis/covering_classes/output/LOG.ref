@@ -894,7 +894,7 @@ Reachability analysis result ....
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
-agent_type:0:cv_id:0
+agent_type:0:A:cv_id:0
 Id=69
  Node(site_type:0<0)
   Id=52
@@ -998,7 +998,7 @@ Id=69
           Id=1
            Leaf False 
 
-agent_type:0:cv_id:1
+agent_type:0:A:cv_id:1
 Id=69
  Node(site_type:0<0)
   Id=52
@@ -1102,7 +1102,7 @@ Id=69
           Id=1
            Leaf False 
 
-agent_type:1:cv_id:0
+agent_type:1:B:cv_id:0
 Id=45
  Node(site_type:0<0)
   Id=34
@@ -1221,7 +1221,7 @@ Id=45
           Id=1
            Leaf False 
 
-agent_type:1:cv_id:1
+agent_type:1:B:cv_id:1
 Id=45
  Node(site_type:0<0)
   Id=34
@@ -1340,7 +1340,7 @@ Id=45
           Id=1
            Leaf False 
 
-agent_type:2:cv_id:0
+agent_type:2:C:cv_id:0
 Id=34
  Node(site_type:1<0)
   Id=1
@@ -1379,7 +1379,7 @@ Id=34
       Id=1
        Leaf False 
 
-agent_type:2:cv_id:1
+agent_type:2:C:cv_id:1
 Id=34
  Node(site_type:1<0)
   Id=1
@@ -1422,7 +1422,7 @@ Id=34
 ------------------------------------------------------------
 * Cartesian abstraction:
 ------------------------------------------------------------
-agent_type:0:cv_id:0
+agent_type:0:A:cv_id:0
 Id=0
  Leaf True 
 
@@ -1455,7 +1455,7 @@ Id=46
     Id=1
      Leaf False 
 
-agent_type:0:cv_id:1
+agent_type:0:A:cv_id:1
 Id=0
  Leaf True 
 
@@ -1488,7 +1488,7 @@ Id=46
     Id=1
      Leaf False 
 
-agent_type:1:cv_id:0
+agent_type:1:B:cv_id:0
 Id=0
  Leaf True 
 
@@ -1518,7 +1518,7 @@ Id=30
     Id=1
      Leaf False 
 
-agent_type:1:cv_id:1
+agent_type:1:B:cv_id:1
 Id=0
  Leaf True 
 
@@ -1548,7 +1548,7 @@ Id=30
     Id=1
      Leaf False 
 
-agent_type:2:cv_id:0
+agent_type:2:C:cv_id:0
 Id=73
  Node(site_type:1<0)
   Id=1
@@ -1575,7 +1575,7 @@ Id=30
     Id=1
      Leaf False 
 
-agent_type:2:cv_id:1
+agent_type:2:C:cv_id:1
 Id=73
  Node(site_type:1<0)
   Id=1

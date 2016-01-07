@@ -124,8 +124,11 @@ let add_update_to_wl parameter error handler_kappa compiled agent_type cv_id
       dump_channel parameter
         (fun stderr ->
           let _ = 
-            Printf.fprintf stderr "deal with agent_type:%i:covering_class_id:%i\n"
-              agent_type cv_id;
+            let error, agent_string =
+              Handler.string_of_agent parameter error handler_kappa agent_type
+            in
+            Printf.fprintf stderr "deal with agent_type:%i:%s:covering_class_id:%i\n"
+              agent_type agent_string cv_id;
             Printf.fprintf stderr "add ";
             Site_map_and_set.Set.iter 
 	    (fun rule_id ->
@@ -324,11 +327,15 @@ let compute_views_enabled parameter handler error
               Remanent_parameters.update_prefix parameter ""
             in
             if (Remanent_parameters.get_trace parameters_cv)
-            then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
-            dump_channel parameter 
-              (fun stderr -> Printf.fprintf stderr
-                "\t at agent_id:%i:agent_type:%i:covering_classes_id:%i\n"
-                agent_id agent_type cv_id)
+            then 
+              let error, agent_string =
+                Handler.string_of_agent parameter error handler_kappa agent_type
+              in
+              Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
+              dump_channel parameter 
+                (fun stderr -> Printf.fprintf stderr
+                  "\t at agent_id:%i:agent_type:%i:%s:covering_classes_id:%i\n"
+                  agent_id agent_type agent_string cv_id)
           else ()
         in 
         (*-----------------------------------------------------------------------*)
@@ -340,12 +347,16 @@ let compute_views_enabled parameter handler error
               Remanent_parameters.update_prefix parameter ""
             in
             if (Remanent_parameters.get_trace parameters_cv)
-            then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
-            dump_channel parameter 
-              (fun stderr -> Printf.fprintf stderr
-                "\t at agent_id:%i:agent_type:%i:covering_classes_id:%i\n"
-                agent_id agent_type cv_id)
-          else ()
+            then 
+              let error, agent_string =
+                Handler.string_of_agent parameter error handler_kappa agent_type
+              in
+              Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
+              dump_channel parameter 
+                (fun stderr -> Printf.fprintf stderr
+                  "\t at agent_id:%i:agent_type:%i:%s:covering_classes_id:%i\n"
+                  agent_id agent_type agent_string cv_id)
+            else ()
         in 
         (*-----------------------------------------------------------------------*)
         let error, bdu_X =
@@ -677,7 +688,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
               (*let _ = Format.printf "\nReachability analysis iteration...@." in *)
               Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
               dump_channel parameter 
-                (fun stderr -> Printf.fprintf stderr "apply for %s" rule_id_string)
+                (fun stderr -> Printf.fprintf stderr "try applying %s" rule_id_string)
           else ()
         in       
         (*--------------------------------------------------------------------*)
@@ -698,7 +709,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
               (*let _ = Format.printf "\nReachability analysis working list...@." in *)
               Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
               dump_channel parameter 
-                (fun stderr -> Printf.fprintf stderr "apply for %s" rule_id_string)
+                (fun stderr -> Printf.fprintf stderr "try applying %s" rule_id_string)
           else ()
         in
         (*--------------------------------------------------------------------*)
@@ -719,7 +730,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
               (*let _ = Format.printf "\nReachability analysis different bdu...@." in *)
               Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
               dump_channel parameter 
-                (fun stderr -> Printf.fprintf stderr "apply for %s" rule_id_string)
+                (fun stderr -> Printf.fprintf stderr "try applying %s" rule_id_string)
           else ()
         in
         (*--------------------------------------------------------------------*)
@@ -774,7 +785,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
                 if (Remanent_parameters.get_trace parameters_cv)
                 then
                   dump_channel parameter 
-                    (fun stderr -> Printf.fprintf stderr " is enabled\n")
+                    (fun stderr -> Printf.fprintf stderr " \"enabled\"\n")
                 else
                   ()
             in
@@ -812,7 +823,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
                 if (Remanent_parameters.get_trace parameters_cv)
                 then
                   dump_channel parameter 
-                    (fun stderr -> Printf.fprintf stderr " is disabled\n") 
+                    (fun stderr -> Printf.fprintf stderr " \"disabled\"\n") 
                 else ()
             in
             (*-----------------------------------------------------------------------*)

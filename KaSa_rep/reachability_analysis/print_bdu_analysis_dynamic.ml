@@ -53,16 +53,30 @@ let print_contact_map parameter error result =
   in
   error*)
 
-let print_contact_map_aux parameter error result =
+let print_contact_map_aux parameter error handler_kappa result =
   Int2Map_CM_Syntactic.Map.iter (fun set1 set2 ->
     Set_triple.Set.iter (fun (agent1, site1, state1) ->
       Set_triple.Set.iter (fun (agent2, site2, state2) ->
-        fprintf stdout "agent_type:%i@site_type:%i:state:%i--agent_type':%i@site_type':%i:state':%i\n" agent1 site1 state1 agent2 site2 state2
+        let error, agent_string1 =
+          Handler.string_of_agent parameter error handler_kappa agent1
+        in
+        let error, site_string1 =
+          Handler.string_of_site parameter error handler_kappa agent1 site1
+        in
+        let error, agent_string2 =
+          Handler.string_of_agent parameter error handler_kappa agent2
+        in
+        let error, site_string2 =
+          Handler.string_of_site parameter error handler_kappa agent2 site2
+        in
+        fprintf stdout "agent_type:%i:%s@site_type:%i:%s:state:%i--agent_type':%i:%s@site_type':%i:%s:state':%i\n"
+          agent1 agent_string1 site1 site_string1 state1 
+          agent2 agent_string2 site2 site_string2 state2
       ) set2
     )set1
   ) result    
 
-let print_contact_map parameter error result =
+let print_contact_map parameter error handler_kappa result =
   fprintf (Remanent_parameters.get_log parameter)
     "\n------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
@@ -75,6 +89,7 @@ let print_contact_map parameter error result =
     print_contact_map_aux
       parameter
       error
+      handler_kappa
       result
   in
   error
@@ -82,14 +97,28 @@ let print_contact_map parameter error result =
 (************************************************************************************)
 (*contact map full information*)
 
-let print_contact_map_full_aux parameter error result =
+let print_contact_map_full_aux parameter error handler_kappa result =
   Int2Map_CM_state.Map.iter (fun (agent1, site1, state1) set ->
     Set_triple.Set.iter (fun (agent2, site2, state2) ->
-      fprintf stdout "agent_type:%i@site_type:%i:state:%i--agent_type':%i@site_type':%i:state':%i\n" agent1 site1 state1 agent2 site2 state2
+      let error, agent_string1 =
+        Handler.string_of_agent parameter error handler_kappa agent1
+      in
+      let error, site_string1 =
+        Handler.string_of_site parameter error handler_kappa agent1 site1
+      in
+      let error, agent_string2 =
+        Handler.string_of_agent parameter error handler_kappa agent2
+      in
+      let error, site_string2 =
+        Handler.string_of_site parameter error handler_kappa agent2 site2
+      in
+      fprintf stdout "agent_type:%i:%s@site_type:%i:%s:state:%i--agent_type':%i:%s@site_type':%i:%s:state':%i\n" 
+        agent1 agent_string1 site1 site_string1 state1
+        agent2 agent_string2 site2 site_string2 state2
     ) set
   ) result
 
-let print_contact_map_full parameter error result =
+let print_contact_map_full parameter error handler_kappa result =
   fprintf (Remanent_parameters.get_log parameter)
     "\n------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
@@ -102,6 +131,7 @@ let print_contact_map_full parameter error result =
     print_contact_map_full_aux
       parameter
       error
+      handler_kappa
       result
   in
   error
@@ -111,10 +141,14 @@ let print_contact_map_full parameter error result =
 
 let print_covering_classes_modification_aux parameter error handler_kappa compiled result =
   Int2Map_CV_Modif.Map.iter
-    ( fun (x, y) (_, s2) ->
+    ( fun (agent_type, y) (_, s2) ->
+      let error, agent_string =
+        Handler.string_of_agent parameter error handler_kappa agent_type
+      in
       let _ =
         fprintf parameter.log
-          "agent_type:%i:covering_class_id:%i:@set of rule_id:\n" x y
+          "agent_type:%i:%s:covering_class_id:%i:@set of rule_id:\n" 
+          agent_type agent_string y
       in
       Site_map_and_set.Set.iter
         (fun rule_id ->
@@ -191,7 +225,8 @@ let print_result_dynamic parameter error handler_kappa compiled result =
     let _ =
       print_contact_map_full
         parameter
-        error 
+        error
+        handler_kappa
         result.store_contact_map_full
     in
     (*------------------------------------------------------------------------------*)
@@ -199,6 +234,7 @@ let print_result_dynamic parameter error handler_kappa compiled result =
       print_contact_map
         parameter
         error
+        handler_kappa
         result.store_contact_map
     in
     (*------------------------------------------------------------------------------*)

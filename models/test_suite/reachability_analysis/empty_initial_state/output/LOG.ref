@@ -192,7 +192,7 @@ Reachability analysis result ....
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
-agent_type:0:cv_id:0
+agent_type:0:A:cv_id:0
 Id=19
  Node(site_type:1<0)
   Id=1
@@ -231,7 +231,7 @@ Id=19
       Id=1
        Leaf False 
 
-agent_type:1:cv_id:0
+agent_type:1:D:cv_id:0
 Id=3
  Node(site_type:1<0)
   Id=1
@@ -249,7 +249,7 @@ Id=3
 ------------------------------------------------------------
 * Cartesian abstraction:
 ------------------------------------------------------------
-agent_type:0:cv_id:0
+agent_type:0:A:cv_id:0
 Id=20
  Node(site_type:1<0)
   Id=1
@@ -276,7 +276,7 @@ Id=17
     Id=1
      Leaf False 
 
-agent_type:1:cv_id:0
+agent_type:1:D:cv_id:0
 Id=3
  Node(site_type:1<0)
   Id=1

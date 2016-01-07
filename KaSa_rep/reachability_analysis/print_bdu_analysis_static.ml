@@ -26,38 +26,25 @@ let trace = false
 (************************************************************************************)
 (*static information of covering classes id*)
 
-let print_covering_classes_id_aux parameter error result =
+let print_covering_classes_id_aux parameter error handler_kappa result =
   Int2Map_CV.Map.iter
-    ( fun (x, y) (l1, l2) ->
-      if l1 <> []
-      then
-        begin
-          let _ =
-            fprintf parameter.log "agent_type:%i:site_type:%i" x y
-          in
-          let _ = List.fold_left
-            (fun bool x ->
-              (if bool
-               then
-                  fprintf parameter.log ", ");
-              fprintf parameter.log "agent_type:%i" x;
-              true
-            ) false l1
-            
-          in
-          fprintf stdout "\n"
-        end
-      else ();
+    ( fun (agent_type, site_type) (l1, l2) ->
+      let error, agent_string =
+        Handler.string_of_agent parameter error handler_kappa agent_type
+      in
+      let error, site_string =
+        Handler.string_of_site parameter error handler_kappa agent_type site_type
+      in
       let _ =
         fprintf parameter.log 
-          "agent_type:%i:site_type:%i@list of covering_class_id:\n"
-          x y
+          "agent_type:%i:%s:site_type:%i:%s@list of covering_class_id:\n"
+          agent_type agent_string site_type site_string
       in
       List.iter (fun id -> fprintf parameter.log "covering_class_id:%i\n" id)
         l2
     ) result
 
-let print_covering_classes_id parameter error result =
+let print_covering_classes_id parameter error handler_kappa result =
   fprintf (Remanent_parameters.get_log parameter)
     "\n------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
@@ -68,112 +55,54 @@ let print_covering_classes_id parameter error result =
     print_covering_classes_id_aux
       parameter
       error
+      handler_kappa
       result
   in
   error
-
-(************************************************************************************)
-(*covering classes including type string*)
-
-(*let print_covering_classes_id_string_aux parameter error result =
-  Int2Map_CV_map.Map.iter
-    ( fun (x, s, y, site_type) (l1, l2) ->
-      let _ =
-        match site_type with
-        | Ckappa_sig.Internal a ->
-          fprintf parameter.log 
-            "agent_type:%i:%s:site_type:%i:%s(internal state)@list of covering_class_id:\n"
-            x s y a
-        | Ckappa_sig.Binding b ->
-          fprintf parameter.log 
-            "agent_type:%i:%s:site_type:%i:%s(binding state)@list of covering_class_id:\n"
-            x s y b
-      in
-      List.iter (fun id -> fprintf parameter.log "covering_class_id:%i\n" id)
-        l2
-    ) result
-
-let print_covering_classes_id_string parameter error result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "\n------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "Mapping between sites and the covering classes they belong to:\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  let error =
-    print_covering_classes_id_string_aux
-      parameter
-      error
-      result
-  in
-  error*)
 
 (************************************************************************************)
 (*side effects*)
 
 let print_half_break_effect parameter error handler_kappa compiled result =
   Int2Map_HalfBreak_effect.Map.iter
-    ( fun (x, y) (l1, l2) ->
-      if l1 <> []
-      then
-        begin
-          let _ =
-            fprintf parameter.log "agent_type:%i:site_type:%i" x y
-          in
-          let _ = List.fold_left
-            (fun bool x ->
-              (if bool
-               then
-                  fprintf parameter.log ", ");
-              fprintf parameter.log "agent_type:%i" x;
-              true
-            ) false l1
-            
-          in
-          fprintf stdout "\n"
-        end
-      else ();
+    ( fun (agent_type, site_type) (l1, l2) ->
+      let error, agent_string =
+        Handler.string_of_agent parameter error handler_kappa agent_type
+      in
+      let error, site_string =
+        Handler.string_of_site parameter error handler_kappa agent_type site_type
+      in
       let _ =
         fprintf parameter.log 
-          "agent_type:%i:site_type:%i@list of pair (rule_id, binding state):\n"
-          x y
+          "agent_type:%i:%s:site_type:%i:%s@list of pair (rule_id, binding state):\n"
+          agent_type agent_string site_type site_string
       in
-      List.iter (fun (rule_id, s) -> 
+      List.iter (fun (rule_id, state) -> 
         (*mapping rule_id of type int to string*)
         let error, rule_id_string =
           Handler.string_of_rule parameter error handler_kappa
             compiled rule_id
         in
-        fprintf parameter.log "(%s * state:%i)\n"
-          rule_id_string s) l2
+        let error, state_string =
+          Handler.string_of_state parameter error handler_kappa agent_type site_type state
+        in
+        fprintf parameter.log "(%s * state:%i:(%s))\n"
+          rule_id_string state state_string) l2
     ) result
 
 let print_remove_effect parameter error handler_kappa compiled result =
   Int2Map_Remove_effect.Map.iter
-    ( fun (x, y) (l1, l2) ->
-      if l1 <> []
-      then
-        begin
-          let _ =
-            fprintf parameter.log "agent_type:%i:site_type:%i" x y
-          in
-          let _ = List.fold_left
-            (fun bool x ->
-              (if bool
-               then
-                  fprintf parameter.log ", ");
-              fprintf parameter.log "agent_type:%i" x;
-              true
-            ) false l1
-            
-          in
-          fprintf stdout "\n"
-        end
-      else ();
+    ( fun (agent_type, site_type) (l1, l2) ->
+       let error, agent_string =
+        Handler.string_of_agent parameter error handler_kappa agent_type
+      in
+      let error, site_string =
+        Handler.string_of_site parameter error handler_kappa agent_type site_type
+      in
       let _ =
         fprintf parameter.log 
-          "agent_type:%i:site_type:%i@list of pair (rule_id, binding state):\n"
-          x y
+          "agent_type:%i:%s:site_type:%i:%s@list of pair (rule_id, binding state):\n"
+          agent_type agent_string site_type site_string
       in
       List.iter (fun r ->
         let error, rule_id_string =
@@ -228,12 +157,22 @@ let print_potential_partner_free parameter error handler_kappa compiled result =
         Handler.string_of_rule parameter error handler_kappa
           compiled rule_id
       in
-      let _ =
-        fprintf stdout "agent_type:%i:%s@(site, free state)\n"
-          agent_type rule_id_string
+      let error, agent_string =
+        Handler.string_of_agent parameter error handler_kappa agent_type
       in
-      List.iter (fun (site, state) ->
-        fprintf stdout "(site_type:%i * state:%i)\n" site state
+      let _ =
+        fprintf stdout "agent_type:%i:%s:%s@(site, free state)\n"
+          agent_type agent_string rule_id_string
+      in
+      List.iter (fun (site_type, state) ->
+        let error, site_string =
+          Handler.string_of_site parameter error handler_kappa agent_type site_type
+        in
+        let error, state_string =
+          Handler.string_of_state parameter error handler_kappa agent_type site_type state
+        in
+        fprintf stdout "(site_type:%i:%s * state:%i(%s))\n" site_type site_string
+          state state_string
       ) l
     ) result
 
@@ -244,12 +183,22 @@ let print_potential_partner_bind parameter error handler_kappa compiled result =
         Handler.string_of_rule parameter error handler_kappa
           compiled rule_id
       in
-      let _ =
-        fprintf stdout "agent_type:%i:%s@(site, binding state)\n"
-          agent_type rule_id_string
+      let error, agent_string =
+        Handler.string_of_agent parameter error handler_kappa agent_type
       in
-      List.iter (fun (site, state) ->
-        fprintf stdout "(site_type:%i * state:%i)\n" site state
+      let _ =
+        fprintf stdout "agent_type:%i:%s:%s@(site, binding state)\n"
+          agent_type agent_string rule_id_string
+      in
+      List.iter (fun (site_type, state) ->
+        let error, site_string =
+        Handler.string_of_site parameter error handler_kappa agent_type site_type
+        in
+         let error, state_string =
+          Handler.string_of_state parameter error handler_kappa agent_type site_type state
+        in
+        fprintf stdout "(site_type:%i:%s * state:%i(%s))\n" 
+          site_type site_string state state_string
       ) l
     ) result
 
@@ -285,29 +234,17 @@ let print_potential_side_effects parameter error handler_kappa compiled result =
 
 let print_modification_sites_aux parameter error handler_kappa compiled result =
   Int2Map_Modif.Map.iter
-    ( fun (x, y, z) (l1, s2) ->
-      if l1 <> []
-      then
-        begin
-          let _ =
-            fprintf parameter.log "agent_id:%i:agent_type:%i:site_type:%i" x y z
-          in
-          let _ = List.fold_left
-            (fun bool x ->
-              (if bool
-               then
-                  fprintf parameter.log ", ");
-              fprintf parameter.log "agent_id:%i" x;
-              true
-            ) false l1
-            
-          in
-          fprintf stdout "\n"
-        end
-      else ();
+    ( fun (agent_id, agent_type, site_type) (l1, s2) ->
+      let error, agent_string =
+        Handler.string_of_agent parameter error handler_kappa agent_type
+      in
+      let error, site_string =
+        Handler.string_of_site parameter error handler_kappa agent_type site_type
+      in
       let _ =
         fprintf parameter.log 
-          "agent_id:%i:agent_type:%i:site_type:%i@set of rule_id:\n" x y z
+          "agent_id:%i:agent_type:%i:%s:site_type:%i:%s@set of rule_id:\n"
+          agent_id agent_type agent_string site_type site_string 
       in
       Site_map_and_set.Set.iter
         (fun rule_id ->
@@ -339,29 +276,17 @@ let print_modification_sites parameter error handler_kappa compiled result =
 (*without agent_id*)
 let print_modification_map_aux parameter error handler_kappa compiled result =
   Int2Map_Test_Modif.Map.iter
-    ( fun (x, y) (l1, s2) ->
-      if l1 <> []
-      then
-        begin
-          let _ =
-            fprintf parameter.log "agent_type:%i:site_type:%i" x y
-          in
-          let _ = List.fold_left
-            (fun bool x ->
-              (if bool
-               then
-                  fprintf parameter.log ", ");
-              fprintf parameter.log "agent_type:%i" x;
-              true
-            ) false l1
-            
-          in
-          fprintf stdout "\n"
-        end
-      else ();
+    ( fun (agent_type, site_type) (l1, s2) ->
+      let error, agent_string =
+        Handler.string_of_agent parameter error handler_kappa agent_type
+      in
+      let error, site_string =
+        Handler.string_of_site parameter error handler_kappa agent_type site_type
+      in
       let _ =
         fprintf parameter.log 
-          "agent_type:%i:site_type:%i@set of rules:\n" x y
+          "agent_type:%i:%s:site_type:%i:%s@set of rules:\n"
+          agent_type agent_string site_type site_string
       in
       Site_map_and_set.Set.iter
         (fun rule_id ->
@@ -486,6 +411,7 @@ let print_result_static parameter error handler_kappa compiled result =
     print_covering_classes_id
       parameter 
       error
+      handler_kappa
       result.store_covering_classes_id
   in
   (*TODO*)
