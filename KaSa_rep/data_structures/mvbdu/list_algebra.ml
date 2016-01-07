@@ -114,3 +114,71 @@ and print_variables_list log prefix list =
   let _ = Printf.fprintf log "%sId=%i\n" prefix list.List_sig.id in 
   let _ = print_cell log (prefix^" ") list.List_sig.value in 
   ()
+
+
+let rec overwrite allocate get set error parameters handler list1 list2 = 
+  match get parameters error handler (list1,list2)
+  with 
+    | error, (handler,Some output) -> error, (handler, Some output)
+    | error, (handler,None) -> 
+      begin
+        let error, (handler,output) = 
+          match list1.List_sig.value,list2.List_sig.value with 
+            | List_sig.Empty,_ -> error,(handler,list2)
+	    | _,List_sig.Empty -> error,(handler,list1)
+	    | List_sig.Cons a1,List_sig.Cons a2 -> 
+	      let var1 = a1.List_sig.variable in 
+	      let var2 = a2.List_sig.variable in 
+	      let cmp = compare var1 var2 in 
+	      let var,asso,tail1,tail2 =
+		if cmp < 0
+		then
+		  var1,a1.List_sig.association,
+		  a1.List_sig.tail,list2
+		else if cmp = 0 
+		then 
+		  var1,a2.List_sig.association,
+		  a1.List_sig.tail,a2.List_sig.tail
+		else 
+		  var2,a2.List_sig.association,
+		  list1,a2.List_sig.tail
+	      in 
+	      let error, (handler,tail) =
+		overwrite allocate get set error parameters handler tail1 tail2
+	      in 
+	      match tail with 
+	      | Some tail -> 
+		error,
+		(handler,
+		 List_core.build_list 
+		   allocate   
+		   error 
+		   handler 
+		   (List_sig.Cons 
+		      {
+			List_sig.variable = var;
+		       List_sig.association = asso;
+		       List_sig.tail = tail.List_sig.id
+		      })
+		   (List_sig.Cons 
+		      {
+			List_sig.variable = var;
+			List_sig.association = asso;
+			List_sig.tail = tail
+		      }))
+	      | None -> 
+		 invalid_arg parameters error (Some "171") Exit
+		   (handler,
+		    {List_sig.id = 0;
+		     List_sig.value = List_sig.Empty})
+	in 	    
+        let error, handler =
+          set 
+            parameters
+            error
+            handler
+            (list1,list2)
+            output
+        in 
+        error, (handler, Some output)
+      end  
