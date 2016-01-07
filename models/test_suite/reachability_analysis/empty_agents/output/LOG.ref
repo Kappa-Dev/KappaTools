@@ -175,5 +175,120 @@ Influence_map: The notation [i -> j] means an agent at position [i] of the first
 Influence_map:Wake_up_map:rule(0):'' ->A() -> rule(1):'' A()->B()[0->0]
 Influence_map:Wake_up_map:rule(1):'' A()->B() -> rule(2):'' B()->C()[0->0]
 Influence_map:Wake_up_map:rule(2):'' B()->C() -> rule(3):'' C()->D(x~u)[0->0]
-execution finished without any exception
 Refining the influence map...
+Reachability analysis...
+
+agent_type:0:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+agent_type:1:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+agent_type:2:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+agent_type:3:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+site_type:0
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1
+agent_type:4:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+agent_type:5:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+site_type:0
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1
+------------------------------------------------------
+Covering classes with type set:
+agent_type:0:
+Potential dependencies between sites:Covering_class_id:0
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+agent_type:1:
+Potential dependencies between sites:Covering_class_id:0
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+agent_type:2:
+Potential dependencies between sites:Covering_class_id:0
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+agent_type:3:
+Potential dependencies between sites:Covering_class_id:0
+site_type:0
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+Global:site_type:0  => Local:site_type':1
+Local:site_type':1  => Global:site_type:0
+agent_type:4:
+Potential dependencies between sites:Covering_class_id:0
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+agent_type:5:
+Potential dependencies between sites:Covering_class_id:0
+site_type:0
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+Global:site_type:0  => Local:site_type':1
+Local:site_type':1  => Global:site_type:0
+
+Reachability analysis result ....
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+agent_type:0:cv_id:0
+Id=0
+ Leaf True 
+
+agent_type:1:cv_id:0
+Id=0
+ Leaf True 
+
+agent_type:2:cv_id:0
+Id=0
+ Leaf True 
+
+agent_type:3:cv_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+
+------------------------------------------------------------
+* Cartesian abstraction:
+------------------------------------------------------------
+agent_type:0:cv_id:0
+agent_type:1:cv_id:0
+agent_type:2:cv_id:0
+agent_type:3:cv_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+execution finished without any exception

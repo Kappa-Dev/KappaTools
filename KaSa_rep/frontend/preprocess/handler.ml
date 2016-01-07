@@ -146,7 +146,52 @@ warn parameters error (Some "line 122") Exit "ALG"*)
                error,(if m="" then ("var"^(string_of_int var_id)) else ("var"^(string_of_int var_id)^":"^m))*)
         
     end 
-       
+
+(*mapping agent of type int to string*)
+(*let string_of_agent parameter error handler_kappa agent_type =
+  let agents_dic = handler_kappa.Cckappa_sig.agents_dic in
+  (*get sites dictionary*)
+  let error, output =
+    Ckappa_sig.Dictionary_of_agents.allocate
+      parameter
+      error
+      Misc_sa.compare_unit
+      agent_type
+      ()
+      Misc_sa.const_unit
+      agents_dic
+  in
+  match output with
+  | Some (agent_name, _, _) -> error, agent_name
+  | None -> warn parameter error (Some "line 166") Exit 0*)
+      
+(*mapping site of type int to string*)
+
+let string_of_site parameter error handler_kappa agent_name site_int =
+  let error, sites_dic =
+    match 
+      Int_storage.Nearly_inf_Imperatif.get
+        parameter
+        error
+        agent_name
+        handler_kappa.Cckappa_sig.sites 
+    with
+    | error, None -> warn parameter error (Some "line 171") Exit 
+      (Ckappa_sig.Dictionary_of_sites.init())
+    | error, Some i -> error, i
+  in
+  let error, (site_type, _, _) =
+    Misc_sa.unsome
+      (Ckappa_sig.Dictionary_of_sites.translate
+         parameter
+         error
+         site_int
+         sites_dic)
+      (fun error -> exit 0)
+  in
+  Print_handler.string_of_site parameter site_type
+  
+
 let print_labels_txt parameters error handler couple = 
    let _ = Quark_type.Labels.dump_couple parameters error handler couple
    in error 
@@ -180,7 +225,6 @@ let print_var_txt parameters error var_id m1 m2 var =
    let error,_ = error,Printf.fprintf (Remanent_parameters.get_log parameters) "%s" (if m="" then ("var("^(string_of_int var_id)^")") else ("var("^string_of_int var_id)^"):"^m) in 
    let error = Print_ckappa.print_alg parameters error var  in
      error 
-
 
 let print_rule_dot parameters error rule_id m1 m2 rule = 
   let error = 

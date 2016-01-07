@@ -77,8 +77,8 @@ let do_site_dependencies = ref false
 
 (*REMARK: one needs to set do_reachability_analysis to true first to be
   able to active different output *)
-let do_reachability_analysis = ref false
-let do_reachability_analysis_result = ref false
+let do_reachability_analysis = ref true
+let do_reachability_analysis_result = ref true
 let do_reachability_analysis_iteration = ref false
 let do_reachability_analysis_static = ref false
 let do_reachability_analysis_dynamic = ref false

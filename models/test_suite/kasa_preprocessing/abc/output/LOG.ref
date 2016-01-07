@@ -489,5 +489,254 @@ Influence_map:Inhibition_map:rule(1):'a.b_op' A(x!1),B(x!1)->A(x),B(x) -> rule(2
 Influence_map:Inhibition_map:rule(1):'a.b_op' A(x!1),B(x!1)->A(x),B(x) -> var(3):'AB' A(x!x.B)[0->0]
 Influence_map:Inhibition_map:rule(3):'mod x1' C(x1~u!1),A(c!1)->C(x1~p),A(c) -> var(4):'Cuu' C(x1~u?,x2~u?)[0->0]
 Influence_map:Inhibition_map:rule(5):'mod x2' A(x,c!1),C(x1~p,x2~u!1)->A(x,c),C(x1~p,x2~p) -> var(5):'Cpu' C(x1~p?,x2~u?)[1->0]
-execution finished without any exception
 Refining the influence map...
+Reachability analysis...
+
+agent_type:0:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+site_type:0
+site_type:1
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1
+site_type:2
+agent_type:1:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+site_type:0
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1
+agent_type:2:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+site_type:0
+site_type:1
+site_type:2
+site_type:3
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1
+site_type:2
+site_type:3
+site_type:4
+------------------------------------------------------
+Covering classes with type set:
+agent_type:0:
+Potential dependencies between sites:Covering_class_id:0
+site_type:0
+site_type:1
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+Global:site_type:0  => Local:site_type':1
+Global:site_type:1  => Local:site_type':2
+Local:site_type':1  => Global:site_type:0
+Local:site_type':2  => Global:site_type:1
+agent_type:1:
+Potential dependencies between sites:Covering_class_id:0
+site_type:0
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+Global:site_type:0  => Local:site_type':1
+Local:site_type':1  => Global:site_type:0
+agent_type:2:
+Potential dependencies between sites:Covering_class_id:0
+site_type:0
+site_type:1
+site_type:2
+site_type:3
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+Global:site_type:0  => Local:site_type':1
+Global:site_type:1  => Local:site_type':2
+Global:site_type:2  => Local:site_type':3
+Global:site_type:3  => Local:site_type':4
+Local:site_type':1  => Global:site_type:0
+Local:site_type':2  => Global:site_type:1
+Local:site_type':3  => Global:site_type:2
+Local:site_type':4  => Global:site_type:3
+
+Reachability analysis result ....
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+agent_type:0:cv_id:0
+Id=56
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=48
+   Node(site_type:1<2)
+    Id=47
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=22
+       Node(site_type:2<3)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_type:1:cv_id:0
+Id=27
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=18
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_type:2:cv_id:0
+Id=38
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=36
+   Node(site_type:1<2)
+    Id=15
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=14
+       Node(site_type:2<1)
+        Id=13
+         Node(site_type:3<0)
+          Id=1
+           Leaf False 
+
+          Id=12
+           Node(site_type:3<1)
+            Id=11
+             Node(site_type:4<0)
+              Id=1
+               Leaf False 
+
+              Id=10
+               Node(site_type:4<1)
+                Id=0
+                 Leaf True 
+
+                Id=1
+                 Leaf False 
+
+            Id=1
+             Leaf False 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+
+------------------------------------------------------------
+* Cartesian abstraction:
+------------------------------------------------------------
+agent_type:0:cv_id:0
+Id=27
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=18
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Id=47
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=22
+   Node(site_type:2<3)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_type:1:cv_id:0
+Id=27
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=18
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_type:2:cv_id:0
+Id=27
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=18
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Id=5
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:2<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Id=9
+ Node(site_type:3<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:3<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Id=11
+ Node(site_type:4<0)
+  Id=1
+   Leaf False 
+
+  Id=10
+   Node(site_type:4<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+execution finished without any exception

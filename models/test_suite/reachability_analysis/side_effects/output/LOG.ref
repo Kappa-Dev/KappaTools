@@ -594,5 +594,424 @@ Influence_map:Inhibition_map:rule(6):'r6' A(x),B(x~u)->A(x!1),B(x~p!1) -> rule(7
 Influence_map:Inhibition_map:rule(7):'r7' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1) -> rule(6):'r6' A(x),B(x~u)->A(x!1),B(x~p!1)[0->0]
 Influence_map:Inhibition_map:rule(9):'r9' C()-> -> rule(7):'r7' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1)[0->2]
 Influence_map:Inhibition_map:rule(9):'r9' C()-> -> rule(8):'r8' C(x~p!1),A(x~u!1)->C(x~p!1),A(x~p!1)[0*->1];[0->0]
-execution finished without any exception
 Refining the influence map...
+Reachability analysis...
+
+agent_type:0:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+site_type:0
+site_type:1
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1
+site_type:2
+agent_type:1:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+site_type:0
+site_type:1
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1
+site_type:2
+agent_type:2:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+site_type:0
+site_type:1
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1
+site_type:2
+agent_type:3:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+site_type:0
+site_type:1
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1
+site_type:2
+agent_type:4:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+site_type:0
+site_type:1
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1
+site_type:2
+------------------------------------------------------
+Covering classes with type set:
+agent_type:0:
+Potential dependencies between sites:Covering_class_id:0
+site_type:0
+site_type:1
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+Global:site_type:0  => Local:site_type':1
+Global:site_type:1  => Local:site_type':2
+Local:site_type':1  => Global:site_type:0
+Local:site_type':2  => Global:site_type:1
+agent_type:1:
+Potential dependencies between sites:Covering_class_id:0
+site_type:0
+site_type:1
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+Global:site_type:0  => Local:site_type':1
+Global:site_type:1  => Local:site_type':2
+Local:site_type':1  => Global:site_type:0
+Local:site_type':2  => Global:site_type:1
+agent_type:2:
+Potential dependencies between sites:Covering_class_id:0
+site_type:0
+site_type:1
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+Global:site_type:0  => Local:site_type':1
+Global:site_type:1  => Local:site_type':2
+Local:site_type':1  => Global:site_type:0
+Local:site_type':2  => Global:site_type:1
+agent_type:3:
+Potential dependencies between sites:Covering_class_id:0
+site_type:0
+site_type:1
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+Global:site_type:0  => Local:site_type':1
+Global:site_type:1  => Local:site_type':2
+Local:site_type':1  => Global:site_type:0
+Local:site_type':2  => Global:site_type:1
+agent_type:4:
+Potential dependencies between sites:Covering_class_id:0
+site_type:0
+site_type:1
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+Global:site_type:0  => Local:site_type':1
+Global:site_type:1  => Local:site_type':2
+Local:site_type':1  => Global:site_type:0
+Local:site_type':2  => Global:site_type:1
+
+Reachability analysis result ....
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+agent_type:0:cv_id:0
+Id=46
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=45
+   Node(site_type:1<2)
+    Id=30
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=16
+       Node(site_type:2<3)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_type:1:cv_id:0
+Id=29
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=28
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=27
+     Node(site_type:1<2)
+      Id=22
+       Node(site_type:2<0)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+agent_type:2:cv_id:0
+Id=26
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=25
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=14
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+agent_type:3:cv_id:0
+Id=29
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=28
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=27
+     Node(site_type:1<2)
+      Id=22
+       Node(site_type:2<0)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+agent_type:4:cv_id:0
+Id=29
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=28
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=27
+     Node(site_type:1<2)
+      Id=22
+       Node(site_type:2<0)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+
+------------------------------------------------------------
+* Cartesian abstraction:
+------------------------------------------------------------
+agent_type:0:cv_id:0
+Id=47
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=10
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Id=30
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=16
+   Node(site_type:2<3)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_type:1:cv_id:0
+Id=47
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=10
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Id=22
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:2<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_type:2:cv_id:0
+Id=47
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=10
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Id=22
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:2<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_type:3:cv_id:0
+Id=47
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=10
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Id=22
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:2<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_type:4:cv_id:0
+Id=47
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=10
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Id=22
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:2<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+execution finished without any exception
