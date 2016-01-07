@@ -75,8 +75,7 @@ let print_covering_classes_id parameter error result =
 (************************************************************************************)
 (*covering classes including type string*)
 
-
-let print_covering_classes_id_string_aux parameter error result =
+(*let print_covering_classes_id_string_aux parameter error result =
   Int2Map_CV_map.Map.iter
     ( fun (x, s, y, site_type) (l1, l2) ->
       let _ =
@@ -107,7 +106,7 @@ let print_covering_classes_id_string parameter error result =
       error
       result
   in
-  error
+  error*)
 
 (************************************************************************************)
 (*side effects*)
@@ -441,12 +440,12 @@ let print_result_static parameter error result =
       result.store_covering_classes_id
   in
   (*TODO*)
-  let _ =
+  (*let _ =
     print_covering_classes_id_string
       parameter
       error
       result.store_covering_classes_id_string
-  in
+  in*)
   let _ =
     print_side_effects 
       parameter 

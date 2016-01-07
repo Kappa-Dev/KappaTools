@@ -269,7 +269,7 @@ let site_covering_classes parameter error covering_classes =
 (************************************************************************************)
 (*TODO: mapping type int to string for site and agent name*)
 
-let site_covering_classes_string parameter error handler_kappa covering_classes =
+(*let site_covering_classes_string parameter error handler_kappa covering_classes =
   let add_link (agent_type, agent_name_string, site_type_int, site_type) cv_id store_result =
     let l, old =
       Int2Map_CV_map.Map.find_default ([], [])
@@ -346,4 +346,4 @@ let site_covering_classes_string parameter error handler_kappa covering_classes 
   let store_result =
     Int2Map_CV_map.Map.map (fun (l, x) -> List.rev l, x) store_result
   in
-  error, store_result
+  error, store_result*)
