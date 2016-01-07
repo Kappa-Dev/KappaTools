@@ -26,19 +26,19 @@ Start	Partial order reduction	Story 1	Collect traces			13
 End	Partial order reduction	Story 1	Collect traces			13	13	0.000000
 Start	Store trace	Story 1	Collect traces					
 Start	Grid computation	Store trace	Story 1	Collect traces				
-End	Grid computation	Store trace	Story 1	Collect traces				0.000000
+End	Grid computation	Store trace	Story 1	Collect traces				0.000261
 Start	Graph conversion	Store trace	Story 1	Collect traces				
 Start	Build configuration	Graph conversion	Store trace	Story 1	Collect traces			
 End	Build configuration	Graph conversion	Store trace	Story 1	Collect traces			0.000000
 Start	Transitive reduction	Graph conversion	Store trace	Story 1	Collect traces			
 End	Transitive reduction	Graph conversion	Store trace	Story 1	Collect traces			0.000000
 End	Graph conversion	Store trace	Story 1	Collect traces				0.000000
-End	Store trace	Story 1	Collect traces					0.000225
-End	Story 1	Collect traces						0.000225
-End	Collect traces							0.000225
+End	Store trace	Story 1	Collect traces					0.000261
+End	Story 1	Collect traces						0.000261
+End	Collect traces							0.000261
 Start	Story 1							
 Start	Weak compression	Story 1				13		
-End	Weak compression	Story 1				13	13	0.001597
+End	Weak compression	Story 1				13	13	0.002212
 Start	Store trace	Story 1						
 Start	Grid computation	Store trace	Story 1					
 End	Grid computation	Store trace	Story 1					0.000000
@@ -49,10 +49,10 @@ Start	Transitive reduction	Graph conversion	Store trace	Story 1
 End	Transitive reduction	Graph conversion	Store trace	Story 1				0.000000
 End	Graph conversion	Store trace	Story 1					0.000000
 End	Store trace	Story 1						0.000000
-End	Story 1							0.001597
+End	Story 1							0.002212
 Start	Story 1							
 Start	Strong compression	Story 1				13		
-End	Strong compression	Story 1				13	13	0.047404
+End	Strong compression	Story 1				13	13	0.047917
 Start	Store trace	Story 1						
 Start	Grid computation	Store trace	Story 1					
 End	Grid computation	Store trace	Story 1					0.000000
@@ -60,10 +60,10 @@ Start	Graph conversion	Store trace	Story 1
 Start	Build configuration	Graph conversion	Store trace	Story 1				
 End	Build configuration	Graph conversion	Store trace	Story 1				0.000000
 Start	Transitive reduction	Graph conversion	Store trace	Story 1				
-End	Transitive reduction	Graph conversion	Store trace	Story 1				0.000000
-End	Graph conversion	Store trace	Story 1					0.000000
-End	Store trace	Story 1						0.000000
-End	Story 1							0.047404
+End	Transitive reduction	Graph conversion	Store trace	Story 1				0.000431
+End	Graph conversion	Store trace	Story 1					0.000431
+End	Store trace	Story 1						0.000431
+End	Story 1							0.048348
 Start	Build configuration							
 End	Build configuration							0.000000
 Start	Transitive reduction							
