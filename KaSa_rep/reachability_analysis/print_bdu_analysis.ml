@@ -77,19 +77,6 @@ let print_result parameter error handler_kappa compiled result =
   error
 
 (************************************************************************************)
-(*print only working list*)
-
-let print_result_wl parameter error result =
-  let parameter = Remanent_parameters.update_prefix parameter "agent_type_" in
-  let _ =
-    print_bdu_build_wl
-      parameter
-      error
-      result.store_bdu_build
-  in
-  error
-
-(************************************************************************************)
 (*main print of fixpoint*)
 
 let print_bdu_update_map parameter error result =
