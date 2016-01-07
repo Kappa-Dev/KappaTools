@@ -109,6 +109,16 @@ let get_contact_map () =
     Remanent_parameters_sig.influence_arrow = !Config.influence_arrow ;
    }
 
+let get_reachability_map () =
+  {
+    Remanent_parameters_sig.do_reachability_analysis_result = !Config.do_reachability_analysis_result;
+    Remanent_parameters_sig.do_reachability_analysis_iteration = !Config.do_reachability_analysis_iteration;
+    Remanent_parameters_sig.do_reachability_analysis_static = !Config.do_reachability_analysis_static;
+    Remanent_parameters_sig.do_reachability_analysis_dynamic = !Config.do_reachability_analysis_dynamic;
+    Remanent_parameters_sig.do_reachability_analysis_diff = !Config.do_reachability_analysis_diff;
+    Remanent_parameters_sig.do_reachability_analysis_wl = !Config.do_reachability_analysis_wl;
+  }
+
 let open_tasks_profiling =
   let cache = ref None in 
   let f () = 
@@ -149,18 +159,14 @@ let get_parameters ?called_from:(called_from=Remanent_parameters_sig.KaSa) () =
 	Remanent_parameters_sig.do_site_dependencies = !Config.do_site_dependencies ;
         (*different reachability output*)
 	Remanent_parameters_sig.do_reachability_analysis = !Config.do_reachability_analysis ;
-        Remanent_parameters_sig.do_reachability_analysis_result = !Config.do_reachability_analysis_result;
-        Remanent_parameters_sig.do_reachability_analysis_iteration = !Config.do_reachability_analysis_iteration;
-        Remanent_parameters_sig.do_reachability_analysis_static = !Config.do_reachability_analysis_static;
-        Remanent_parameters_sig.do_reachability_analysis_dynamic = !Config.do_reachability_analysis_dynamic;
-        Remanent_parameters_sig.do_reachability_analysis_diff = !Config.do_reachability_analysis_diff;
-        Remanent_parameters_sig.do_reachability_analysis_wl = !Config.do_reachability_analysis_wl;
         
         (**)
 	Remanent_parameters_sig.file = !Config.file ;
 	Remanent_parameters_sig.symbols = get_symbols () ; 
 	Remanent_parameters_sig.influence_map_output = get_influence_map () ;
 	Remanent_parameters_sig.contact_map_output = get_contact_map () ;
+        (*add reachability*)
+        Remanent_parameters_sig.reachability_map_output = get_reachability_map ();
 	Remanent_parameters_sig.unsafe = !Config.unsafe ;
 	Remanent_parameters_sig.trace  = !Config.trace ;
 	Remanent_parameters_sig.dump_error_as_soon_as_they_occur = !Config.dump_error_as_soon_as_they_occur;
@@ -179,8 +185,8 @@ let get_parameters ?called_from:(called_from=Remanent_parameters_sig.KaSa) () =
 	Remanent_parameters_sig.tk_interface=Tk_version.tk;
 	Remanent_parameters_sig.influence_map_accuracy_level = fetch_accuracy_level Config.influence_map_accuracy_level ;
 	Remanent_parameters_sig.contact_map_accuracy_level = fetch_accuracy_level Config.contact_map_accuracy_level ;
-	Remanent_parameters_sig.view_accuracy_level = fetch_accuracy_level Config.view_accuracy_level ;
-	Remanent_parameters_sig.called_from = called_from ;
+	Remanent_parameters_sig.view_accuracy_level = fetch_accuracy_level Config.view_accuracy_level ; 
+        Remanent_parameters_sig.called_from = called_from ;
       } ;
     Remanent_parameters_sig.log    = !Config.log ;
     Remanent_parameters_sig.formatter = !Config.formatter ;    
@@ -196,7 +202,7 @@ let dummy_parameters =
       !cache 
     with 
     | None -> 
-      let p = get_parameters ~called_from:Remanent_parameters_sig.KaSim () in 
+      let p = get_parameters () in 
       let () = cache := Some p in
       p
     | Some p -> p
@@ -250,11 +256,23 @@ let get_link_color_1          cm = cm.Remanent_parameters_sig.link_color
 let get_influence_color_1     cm = cm.Remanent_parameters_sig.influence_color 
 let get_influence_arrow_1     cm = cm.Remanent_parameters_sig.influence_arrow 
 
+(*add reachability*)
+
+let get_do_reachability_analysis_result_1 r = r.Remanent_parameters_sig.do_reachability_analysis_result
+let get_do_reachability_analysis_iteration_1 r = r.Remanent_parameters_sig.do_reachability_analysis_iteration
+let get_do_reachability_analysis_static_1 r = r.Remanent_parameters_sig.do_reachability_analysis_static
+let get_do_reachability_analysis_dynamic_1 r = r.Remanent_parameters_sig.do_reachability_analysis_dynamic
+let get_do_reachability_analysis_diff_1 r = r.Remanent_parameters_sig.do_reachability_analysis_diff
+let get_do_reachability_analysis_wl_1 r = r.Remanent_parameters_sig.do_reachability_analysis_wl
+
 
 let get_symbols_1                          marshalisable = marshalisable.Remanent_parameters_sig.symbols
 let get_file_1                             marshalisable = marshalisable.Remanent_parameters_sig.file 
 let get_influence_map_1                    marshalisable = marshalisable.Remanent_parameters_sig.influence_map_output 
 let get_contact_map_1                      marshalisable = marshalisable.Remanent_parameters_sig.contact_map_output
+(*add reachability*)
+let get_reachability_map_1                      marshalisable = marshalisable.Remanent_parameters_sig.reachability_map_output
+
 let get_unsafe_1                           marshalisable = marshalisable.Remanent_parameters_sig.unsafe 
 let get_trace_1                            marshalisable = marshalisable.Remanent_parameters_sig.trace 
 let get_dump_error_as_soon_as_they_occur_1 marshalisable = marshalisable.Remanent_parameters_sig.dump_error_as_soon_as_they_occur
@@ -269,13 +287,6 @@ let get_do_stochastic_flow_of_information_1  marshalisable = marshalisable.Reman
 let get_do_site_dependencies_1             marshalisable = marshalisable.Remanent_parameters_sig.do_site_dependencies
 (*reachability different output*)
 let get_do_reachability_analysis_1        marshalisable = marshalisable.Remanent_parameters_sig.do_reachability_analysis
-let get_do_reachability_analysis_result_1 marshalisable = marshalisable.Remanent_parameters_sig.do_reachability_analysis_result
-let get_do_reachability_analysis_iteration_1 marshalisable = marshalisable.Remanent_parameters_sig.do_reachability_analysis_iteration
-let get_do_reachability_analysis_static_1 marshalisable = marshalisable.Remanent_parameters_sig.do_reachability_analysis_static
-let get_do_reachability_analysis_dynamic_1 marshalisable = marshalisable.Remanent_parameters_sig.do_reachability_analysis_dynamic
-let get_do_reachability_analysis_diff_1 marshalisable = marshalisable.Remanent_parameters_sig.do_reachability_analysis_diff
-let get_do_reachability_analysis_wl_1 marshalisable = marshalisable.Remanent_parameters_sig.do_reachability_analysis_wl
-
 
 (**)
 let get_influence_map_accuracy_level_1     marshalisable = marshalisable.Remanent_parameters_sig.influence_map_accuracy_level
@@ -317,27 +328,16 @@ let get_do_influence_map = upgrade_from_marshal_field get_do_influence_map_1
 let get_do_ODE_flow_of_information = upgrade_from_marshal_field get_do_ODE_flow_of_information_1
 let get_do_stochastic_flow_of_information = upgrade_from_marshal_field get_do_stochastic_flow_of_information_1
 let get_do_site_dependencies = upgrade_from_marshal_field get_do_site_dependencies_1
-(*reachability analysis different output*)
+(*reachability analysis in different output*)
 let get_do_reachability_analysis = upgrade_from_marshal_field get_do_reachability_analysis_1
-let get_do_reachability_analysis_result =
-  upgrade_from_marshal_field get_do_reachability_analysis_result_1
-let get_do_reachability_analysis_iteration =
-  upgrade_from_marshal_field get_do_reachability_analysis_iteration_1
-let get_do_reachability_analysis_static =
-  upgrade_from_marshal_field get_do_reachability_analysis_static_1
-let get_do_reachability_analysis_dynamic =
-  upgrade_from_marshal_field get_do_reachability_analysis_dynamic_1
-let get_do_reachability_analysis_diff =
-  upgrade_from_marshal_field get_do_reachability_analysis_diff_1
-let get_do_reachability_analysis_wl =
-  upgrade_from_marshal_field get_do_reachability_analysis_wl_1
-
 
 (**)
 let get_symbols = upgrade_from_marshal_field get_symbols_1 
 let get_file = upgrade_from_marshal_field get_file_1 
 let get_influence_map = upgrade_from_marshal_field get_influence_map_1
 let get_contact_map = upgrade_from_marshal_field get_contact_map_1
+(*add reachability*)
+let get_reachability_map = upgrade_from_marshal_field get_reachability_map_1
 let get_unsafe = upgrade_from_marshal_field get_unsafe_1
 let get_trace = upgrade_from_marshal_field get_trace_1
 let get_dump_error_as_soon_as_they_occur = upgrade_from_marshal_field get_dump_error_as_soon_as_they_occur_1
@@ -351,6 +351,8 @@ let get_view_accuracy_level = upgrade_from_marshal_field get_view_accuracy_level
 let upgrade_from_influence_map_field f = compose f get_influence_map
 let upgrade_from_contact_map_field f = compose f get_contact_map
 let upgrade_from_symbols_field f = compose f get_symbols
+(*add reachability*)
+let upgrade_from_reachability_map_field f = compose f get_reachability_map
 
 let get_btype_sep_symbol = upgrade_from_symbols_field get_btype_sep_symbol_1
 let get_bound_symbol = upgrade_from_symbols_field get_bound_symbol_1 
@@ -399,6 +401,16 @@ let get_agent_color_def = upgrade_from_contact_map_field get_agent_color_def_1
 let get_link_color = upgrade_from_contact_map_field get_link_color_1
 let get_influence_color = upgrade_from_contact_map_field get_influence_color_1
 let get_influence_arrow = upgrade_from_contact_map_field get_influence_arrow_1
+
+(*add reachablity*)
+
+let get_do_reachability_analysis_result = upgrade_from_reachability_map_field get_do_reachability_analysis_result_1
+let get_do_reachability_analysis_iteration = upgrade_from_reachability_map_field get_do_reachability_analysis_iteration_1
+let get_do_reachability_analysis_static = upgrade_from_reachability_map_field get_do_reachability_analysis_static_1
+let get_do_reachability_analysis_dynamic = upgrade_from_reachability_map_field get_do_reachability_analysis_dynamic_1
+let get_do_reachability_analysis_diff = upgrade_from_reachability_map_field get_do_reachability_analysis_diff_1
+let get_do_reachability_analysis_wl = upgrade_from_reachability_map_field get_do_reachability_analysis_wl_1
+
 
 let set_prefix_1 marshalisable prefix = 
   {marshalisable with Remanent_parameters_sig.prefix = prefix}

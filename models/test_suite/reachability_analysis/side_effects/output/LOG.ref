@@ -594,5 +594,285 @@ Influence_map:Inhibition_map:rule(6):'r6' A(x),B(x~u)->A(x!1),B(x~p!1) -> rule(7
 Influence_map:Inhibition_map:rule(7):'r7' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1) -> rule(6):'r6' A(x),B(x~u)->A(x!1),B(x~p!1)[0->0]
 Influence_map:Inhibition_map:rule(9):'r9' C()-> -> rule(7):'r7' A(x),B(x~p),C(x~u)->A(x!1),B(x~p),C(x~p!1)[0->2]
 Influence_map:Inhibition_map:rule(9):'r9' C()-> -> rule(8):'r8' C(x~p!1),A(x~u!1)->C(x~p!1),A(x~p!1)[0*->1];[0->0]
-execution finished without any exception
 Refining the influence map...
+Reachability analysis...
+
+agent_type:0:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+site_type:0
+site_type:1
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1
+site_type:2
+agent_type:1:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+site_type:0
+site_type:1
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1
+site_type:2
+agent_type:2:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+site_type:0
+site_type:1
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1
+site_type:2
+agent_type:3:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+site_type:0
+site_type:1
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1
+site_type:2
+agent_type:4:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+site_type:0
+site_type:1
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1
+site_type:2
+------------------------------------------------------
+Covering classes with type set:
+agent_type:0:
+Potential dependencies between sites:Covering_class_id:0
+site_type:0
+site_type:1
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+Global:site_type:0  => Local:site_type':1
+Global:site_type:1  => Local:site_type':2
+Local:site_type':1  => Global:site_type:0
+Local:site_type':2  => Global:site_type:1
+agent_type:1:
+Potential dependencies between sites:Covering_class_id:0
+site_type:0
+site_type:1
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+Global:site_type:0  => Local:site_type':1
+Global:site_type:1  => Local:site_type':2
+Local:site_type':1  => Global:site_type:0
+Local:site_type':2  => Global:site_type:1
+agent_type:2:
+Potential dependencies between sites:Covering_class_id:0
+site_type:0
+site_type:1
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+Global:site_type:0  => Local:site_type':1
+Global:site_type:1  => Local:site_type':2
+Local:site_type':1  => Global:site_type:0
+Local:site_type':2  => Global:site_type:1
+agent_type:3:
+Potential dependencies between sites:Covering_class_id:0
+site_type:0
+site_type:1
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+Global:site_type:0  => Local:site_type':1
+Global:site_type:1  => Local:site_type':2
+Local:site_type':1  => Global:site_type:0
+Local:site_type':2  => Global:site_type:1
+agent_type:4:
+Potential dependencies between sites:Covering_class_id:0
+site_type:0
+site_type:1
+Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
+Covering_class_id:0
+Global:site_type:0  => Local:site_type':1
+Global:site_type:1  => Local:site_type':2
+Local:site_type':1  => Global:site_type:0
+Local:site_type':2  => Global:site_type:1
+Reachability analysis static information ....
+
+============================================================
+* BDU Analysis:
+============================================================
+
+** Static information:
+
+------------------------------------------------------------
+Mapping between sites and the covering classes they belong to:
+------------------------------------------------------------
+agent_type:0:site_type:0@list of covering_class_id:
+covering_class_id:0
+agent_type:0:site_type:1@list of covering_class_id:
+covering_class_id:0
+agent_type:1:site_type:0@list of covering_class_id:
+covering_class_id:0
+agent_type:1:site_type:1@list of covering_class_id:
+covering_class_id:0
+agent_type:2:site_type:0@list of covering_class_id:
+covering_class_id:0
+agent_type:2:site_type:1@list of covering_class_id:
+covering_class_id:0
+agent_type:3:site_type:0@list of covering_class_id:
+covering_class_id:0
+agent_type:3:site_type:1@list of covering_class_id:
+covering_class_id:0
+agent_type:4:site_type:0@list of covering_class_id:
+covering_class_id:0
+agent_type:4:site_type:1@list of covering_class_id:
+covering_class_id:0
+------------------------------------------------------------
+Sites that may/must occurs side-effects:
+------------------------------------------------------------
+agent_type:0:site_type:1@list of pair (rule_id, binding state):
+(rule_id:5 * state:1)
+agent_type:3:site_type:1@list of pair (rule_id, binding state):
+(rule_id:11 * state:1)
+agent_type:0:site_type:0@list of pair (rule_id, binding state):
+(rule_id:5 * state:no_information)
+agent_type:2:site_type:0@list of pair (rule_id, binding state):
+(rule_id:9 * state:no_information)
+agent_type:2:site_type:1@list of pair (rule_id, binding state):
+(rule_id:9 * state:no_information)
+------------------------------------------------------------
+Sites that may/must occurs in the potential partner side-effects:
+------------------------------------------------------------
+- Potential partner has site that is free:
+agent_type:0:rule_id:9@(site, free state)
+(site_type:1 * state:0)
+agent_type:1:rule_id:5@(site, free state)
+(site_type:1 * state:0)
+agent_type:4:rule_id:11@(site, free state)
+(site_type:1 * state:0)
+- Potential partner has site that is bind:
+agent_type:0:rule_id:9@(site, binding state)
+(site_type:1 * state:2)
+agent_type:1:rule_id:5@(site, binding state)
+(site_type:1 * state:1)
+agent_type:4:rule_id:11@(site, binding state)
+(site_type:1 * state:1)
+------------------------------------------------------------
+Set of rules that may modify a given site (excluding created agents):
+------------------------------------------------------------
+agent_id:0:agent_type:0:site_type:0@set of rule_id:
+rule_id:0
+agent_id:0:agent_type:0:site_type:1@set of rule_id:
+rule_id:0
+rule_id:6
+rule_id:7
+agent_id:0:agent_type:1:site_type:0@set of rule_id:
+rule_id:1
+agent_id:0:agent_type:1:site_type:1@set of rule_id:
+rule_id:1
+agent_id:0:agent_type:2:site_type:0@set of rule_id:
+rule_id:2
+agent_id:0:agent_type:2:site_type:1@set of rule_id:
+rule_id:2
+agent_id:0:agent_type:3:site_type:0@set of rule_id:
+rule_id:3
+rule_id:10
+agent_id:0:agent_type:3:site_type:1@set of rule_id:
+rule_id:3
+rule_id:10
+rule_id:11
+agent_id:0:agent_type:4:site_type:0@set of rule_id:
+rule_id:4
+agent_id:0:agent_type:4:site_type:1@set of rule_id:
+rule_id:4
+agent_id:1:agent_type:0:site_type:0@set of rule_id:
+rule_id:8
+agent_id:1:agent_type:1:site_type:0@set of rule_id:
+rule_id:6
+agent_id:1:agent_type:1:site_type:1@set of rule_id:
+rule_id:6
+agent_id:1:agent_type:4:site_type:0@set of rule_id:
+rule_id:10
+agent_id:1:agent_type:4:site_type:1@set of rule_id:
+rule_id:10
+agent_id:2:agent_type:2:site_type:0@set of rule_id:
+rule_id:7
+agent_id:2:agent_type:2:site_type:1@set of rule_id:
+rule_id:7
+------------------------------------------------------------
+Set of rules that may test a given site:
+------------------------------------------------------------
+agent_id:0:agent_type:0:site_type:1@set of rule_id:
+rule_id:5
+rule_id:6
+rule_id:7
+agent_id:0:agent_type:2:site_type:0@set of rule_id:
+rule_id:8
+agent_id:0:agent_type:2:site_type:1@set of rule_id:
+rule_id:8
+agent_id:0:agent_type:3:site_type:0@set of rule_id:
+rule_id:10
+agent_id:0:agent_type:3:site_type:1@set of rule_id:
+rule_id:10
+rule_id:11
+agent_id:1:agent_type:0:site_type:0@set of rule_id:
+rule_id:8
+agent_id:1:agent_type:0:site_type:1@set of rule_id:
+rule_id:8
+agent_id:1:agent_type:1:site_type:0@set of rule_id:
+rule_id:6
+rule_id:7
+agent_id:1:agent_type:1:site_type:1@set of rule_id:
+rule_id:6
+rule_id:7
+agent_id:1:agent_type:4:site_type:0@set of rule_id:
+rule_id:10
+agent_id:1:agent_type:4:site_type:1@set of rule_id:
+rule_id:10
+agent_id:2:agent_type:2:site_type:0@set of rule_id:
+rule_id:7
+agent_id:2:agent_type:2:site_type:1@set of rule_id:
+rule_id:7
+------------------------------------------------------------
+Set of rules that may test and modify a given site (excluding created agents):
+------------------------------------------------------------
+agent_id:0:agent_type:0:site_type:0@set of rule_id:
+rule_id:0
+agent_id:0:agent_type:0:site_type:1@set of rule_id:
+rule_id:0
+rule_id:5
+rule_id:6
+rule_id:7
+agent_id:0:agent_type:1:site_type:0@set of rule_id:
+rule_id:1
+agent_id:0:agent_type:1:site_type:1@set of rule_id:
+rule_id:1
+agent_id:0:agent_type:2:site_type:0@set of rule_id:
+rule_id:2
+rule_id:8
+agent_id:0:agent_type:2:site_type:1@set of rule_id:
+rule_id:2
+rule_id:8
+agent_id:0:agent_type:3:site_type:0@set of rule_id:
+rule_id:3
+rule_id:10
+agent_id:0:agent_type:3:site_type:1@set of rule_id:
+rule_id:3
+rule_id:10
+rule_id:11
+agent_id:0:agent_type:4:site_type:0@set of rule_id:
+rule_id:4
+agent_id:0:agent_type:4:site_type:1@set of rule_id:
+rule_id:4
+agent_id:1:agent_type:0:site_type:0@set of rule_id:
+rule_id:8
+agent_id:1:agent_type:0:site_type:1@set of rule_id:
+rule_id:8
+agent_id:1:agent_type:1:site_type:0@set of rule_id:
+rule_id:6
+rule_id:7
+agent_id:1:agent_type:1:site_type:1@set of rule_id:
+rule_id:6
+rule_id:7
+agent_id:1:agent_type:4:site_type:0@set of rule_id:
+rule_id:10
+agent_id:1:agent_type:4:site_type:1@set of rule_id:
+rule_id:10
+agent_id:2:agent_type:2:site_type:0@set of rule_id:
+rule_id:7
+agent_id:2:agent_type:2:site_type:1@set of rule_id:
+rule_id:7
+execution finished without any exception

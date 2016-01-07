@@ -78,6 +78,16 @@ type contact_map_output =
     influence_arrow : string ;
   }
 
+type reachability_map_output =
+  {
+    do_reachability_analysis_result : bool;
+    do_reachability_analysis_iteration : bool;
+    do_reachability_analysis_static : bool;
+    do_reachability_analysis_dynamic : bool;
+    do_reachability_analysis_diff : bool;
+    do_reachability_analysis_wl : bool;
+  }
+
 type marshalisable_parameters = 
  { 
    unsafe : bool ;
@@ -89,12 +99,13 @@ type marshalisable_parameters =
    do_site_dependencies : bool ;
    (*different reachability output*)
    do_reachability_analysis : bool ;
+   (*do_reachability_analysis : bool ;
    do_reachability_analysis_result : bool;
    do_reachability_analysis_iteration : bool;
    do_reachability_analysis_static : bool;
    do_reachability_analysis_dynamic : bool;
    do_reachability_analysis_diff : bool;
-   do_reachability_analysis_wl : bool;
+   do_reachability_analysis_wl : bool;*)
    called_from : called_from;
    (**)
    dump_error_as_soon_as_they_occur : bool ;
@@ -105,6 +116,7 @@ type marshalisable_parameters =
    symbols : symbol_table ; 
    influence_map_output : influence_map_output ;
    contact_map_output : contact_map_output ;
+   reachability_map_output : reachability_map_output;
    influence_map_accuracy_level: accuracy_level ;
    contact_map_accuracy_level: accuracy_level ;
    view_accuracy_level: accuracy_level ; 

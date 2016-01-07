@@ -1,250 +1,250 @@
 Start	Removing events after the last observables					111010		
-End	Removing events after the last observables					111010	29463	0.019651
+End	Removing events after the last observables					111010	29463	0.021749
 Start	Splitting initial states					29463		
-End	Splitting initial states					29463	30463	0.010385
+End	Splitting initial states					29463	30463	0.009945
 Start	Renaming agents to avoid conflicts					30463		
-End	Renaming agents to avoid conflicts					30463	30463	0.045714
+End	Renaming agents to avoid conflicts					30463	30463	0.052211
 Start	Detection of siphons					30463		
-End	Detection of siphons					30463	34283	0.051398
+End	Detection of siphons					30463	34283	0.053217
 Start	Renaming agents to avoid conflicts					34283		
-End	Renaming agents to avoid conflicts					34283	34283	0.346091
+End	Renaming agents to avoid conflicts					34283	34283	0.351376
 Start	Partial order reduction					34283		
-End	Partial order reduction					34283	211	0.058344
+End	Partial order reduction					34283	211	0.057591
 Start	Deletion of pseudo inverse events					211		
-End	Deletion of pseudo inverse events					211	207	0.003221
+End	Deletion of pseudo inverse events					211	207	0.003282
 Start	Renaming agents to avoid conflicts					207		
-End	Renaming agents to avoid conflicts					207	207	0.000176
+End	Renaming agents to avoid conflicts					207	207	0.000397
 Start	Detection of siphons					207		
-End	Detection of siphons					207	218	0.000090
+End	Detection of siphons					207	218	0.000000
 Start	Renaming agents to avoid conflicts					218		
-End	Renaming agents to avoid conflicts					218	218	0.000139
+End	Renaming agents to avoid conflicts					218	218	0.000000
 Start	Partial order reduction					218		
-End	Partial order reduction					218	205	0.000465
+End	Partial order reduction					218	205	0.000679
 Start	Deletion of pseudo inverse events					205		
-End	Deletion of pseudo inverse events					205	205	0.002189
+End	Deletion of pseudo inverse events					205	205	0.002263
 Start	Renaming agents to avoid conflicts					205		
-End	Renaming agents to avoid conflicts					205	205	0.000166
+End	Renaming agents to avoid conflicts					205	205	0.000000
 Start	Detection of siphons					205		
-End	Detection of siphons					205	216	0.000088
+End	Detection of siphons					205	216	0.000000
 Start	Renaming agents to avoid conflicts					216		
-End	Renaming agents to avoid conflicts					216	216	0.000137
+End	Renaming agents to avoid conflicts					216	216	0.000380
 Start	Partial order reduction					216		
-End	Partial order reduction					216	205	0.000451
+End	Partial order reduction					216	205	0.000433
 Start	Deletion of pseudo inverse events					205		
-End	Deletion of pseudo inverse events					205	205	0.001874
+End	Deletion of pseudo inverse events					205	205	0.001971
 Start	Build configuration							
 Start	Build configuration	Build configuration						
-End	Build configuration	Build configuration						0.004369
-End	Build configuration							0.004369
+End	Build configuration	Build configuration						0.003984
+End	Build configuration							0.003984
 Start	Collect traces							
 Start	Story 1	Collect traces						
 Start	Deletion of pseudo inverse events	Story 1	Collect traces			13		
-End	Deletion of pseudo inverse events	Story 1	Collect traces			13	13	0.000095
+End	Deletion of pseudo inverse events	Story 1	Collect traces			13	13	0.000000
 Start	Renaming agents to avoid conflicts	Story 1	Collect traces			13		
 End	Renaming agents to avoid conflicts	Story 1	Collect traces			13	13	0.000000
 Start	Partial order reduction	Story 1	Collect traces			13		
-End	Partial order reduction	Story 1	Collect traces			13	13	0.000062
+End	Partial order reduction	Story 1	Collect traces			13	13	0.000000
 Start	Store trace	Story 1	Collect traces					
 Start	Grid computation	Store trace	Story 1	Collect traces				
-End	Grid computation	Store trace	Story 1	Collect traces				0.000081
+End	Grid computation	Store trace	Story 1	Collect traces				0.000375
 Start	Graph conversion	Store trace	Story 1	Collect traces				
 Start	Build configuration	Graph conversion	Store trace	Story 1	Collect traces			
-End	Build configuration	Graph conversion	Store trace	Story 1	Collect traces			0.000056
+End	Build configuration	Graph conversion	Store trace	Story 1	Collect traces			0.000000
 Start	Transitive reduction	Graph conversion	Store trace	Story 1	Collect traces			
 End	Transitive reduction	Graph conversion	Store trace	Story 1	Collect traces			0.000000
-End	Graph conversion	Store trace	Story 1	Collect traces				0.000056
-End	Store trace	Story 1	Collect traces					0.000188
-End	Story 1	Collect traces						0.000345
+End	Graph conversion	Store trace	Story 1	Collect traces				0.000000
+End	Store trace	Story 1	Collect traces					0.000375
+End	Story 1	Collect traces						0.000375
 Start	Story 2	Collect traces						
 Start	Deletion of pseudo inverse events	Story 2	Collect traces			25		
-End	Deletion of pseudo inverse events	Story 2	Collect traces			25	25	0.000153
+End	Deletion of pseudo inverse events	Story 2	Collect traces			25	25	0.000000
 Start	Renaming agents to avoid conflicts	Story 2	Collect traces			25		
 End	Renaming agents to avoid conflicts	Story 2	Collect traces			25	25	0.000000
 Start	Partial order reduction	Story 2	Collect traces			25		
-End	Partial order reduction	Story 2	Collect traces			25	25	0.000073
+End	Partial order reduction	Story 2	Collect traces			25	25	0.000330
 Start	Store trace	Story 2	Collect traces					
 Start	Grid computation	Store trace	Story 2	Collect traces				
-End	Grid computation	Store trace	Story 2	Collect traces				0.000147
+End	Grid computation	Store trace	Story 2	Collect traces				0.000000
 Start	Graph conversion	Store trace	Story 2	Collect traces				
 Start	Build configuration	Graph conversion	Store trace	Story 2	Collect traces			
-End	Build configuration	Graph conversion	Store trace	Story 2	Collect traces			0.000115
+End	Build configuration	Graph conversion	Store trace	Story 2	Collect traces			0.000000
 Start	Transitive reduction	Graph conversion	Store trace	Story 2	Collect traces			
-End	Transitive reduction	Graph conversion	Store trace	Story 2	Collect traces			0.000057
-End	Graph conversion	Store trace	Story 2	Collect traces				0.000172
-End	Store trace	Story 2	Collect traces					0.000319
-End	Story 2	Collect traces						0.000545
+End	Transitive reduction	Graph conversion	Store trace	Story 2	Collect traces			0.000308
+End	Graph conversion	Store trace	Story 2	Collect traces				0.000308
+End	Store trace	Story 2	Collect traces					0.000308
+End	Story 2	Collect traces						0.000638
 Start	Story 3	Collect traces						
 Start	Deletion of pseudo inverse events	Story 3	Collect traces			28		
-End	Deletion of pseudo inverse events	Story 3	Collect traces			28	28	0.000519
+End	Deletion of pseudo inverse events	Story 3	Collect traces			28	28	0.000566
 Start	Renaming agents to avoid conflicts	Story 3	Collect traces			28		
-End	Renaming agents to avoid conflicts	Story 3	Collect traces			28	28	0.000028
+End	Renaming agents to avoid conflicts	Story 3	Collect traces			28	28	0.000000
 Start	Partial order reduction	Story 3	Collect traces			28		
-End	Partial order reduction	Story 3	Collect traces			28	28	0.000052
+End	Partial order reduction	Story 3	Collect traces			28	28	0.000000
 Start	Store trace	Story 3	Collect traces					
 Start	Grid computation	Store trace	Story 3	Collect traces				
-End	Grid computation	Store trace	Story 3	Collect traces				0.000146
+End	Grid computation	Store trace	Story 3	Collect traces				0.000000
 Start	Graph conversion	Store trace	Story 3	Collect traces				
 Start	Build configuration	Graph conversion	Store trace	Story 3	Collect traces			
-End	Build configuration	Graph conversion	Store trace	Story 3	Collect traces			0.000116
+End	Build configuration	Graph conversion	Store trace	Story 3	Collect traces			0.000337
 Start	Transitive reduction	Graph conversion	Store trace	Story 3	Collect traces			
-End	Transitive reduction	Graph conversion	Store trace	Story 3	Collect traces			0.000055
-End	Graph conversion	Store trace	Story 3	Collect traces				0.000171
-End	Store trace	Story 3	Collect traces					0.000342
-End	Story 3	Collect traces						0.000941
+End	Transitive reduction	Graph conversion	Store trace	Story 3	Collect traces			0.000000
+End	Graph conversion	Store trace	Story 3	Collect traces				0.000337
+End	Store trace	Story 3	Collect traces					0.000337
+End	Story 3	Collect traces						0.000903
 Start	Story 4	Collect traces						
 Start	Deletion of pseudo inverse events	Story 4	Collect traces			10		
-End	Deletion of pseudo inverse events	Story 4	Collect traces			10	10	0.000052
+End	Deletion of pseudo inverse events	Story 4	Collect traces			10	10	0.000000
 Start	Renaming agents to avoid conflicts	Story 4	Collect traces			10		
-End	Renaming agents to avoid conflicts	Story 4	Collect traces			10	10	0.000018
+End	Renaming agents to avoid conflicts	Story 4	Collect traces			10	10	0.000000
 Start	Partial order reduction	Story 4	Collect traces			10		
-End	Partial order reduction	Story 4	Collect traces			10	10	0.000023
+End	Partial order reduction	Story 4	Collect traces			10	10	0.000000
 Start	Store trace	Story 4	Collect traces					
 Start	Grid computation	Store trace	Story 4	Collect traces				
-End	Grid computation	Store trace	Story 4	Collect traces				0.000058
+End	Grid computation	Store trace	Story 4	Collect traces				0.000000
 Start	Graph conversion	Store trace	Story 4	Collect traces				
 Start	Build configuration	Graph conversion	Store trace	Story 4	Collect traces			
-End	Build configuration	Graph conversion	Store trace	Story 4	Collect traces			0.000042
+End	Build configuration	Graph conversion	Store trace	Story 4	Collect traces			0.000000
 Start	Transitive reduction	Graph conversion	Store trace	Story 4	Collect traces			
-End	Transitive reduction	Graph conversion	Store trace	Story 4	Collect traces			0.000019
-End	Graph conversion	Store trace	Story 4	Collect traces				0.000061
-End	Store trace	Story 4	Collect traces					0.000136
-End	Story 4	Collect traces						0.000249
+End	Transitive reduction	Graph conversion	Store trace	Story 4	Collect traces			0.000000
+End	Graph conversion	Store trace	Story 4	Collect traces				0.000253
+End	Store trace	Story 4	Collect traces					0.000253
+End	Story 4	Collect traces						0.000253
 Start	Story 5	Collect traces						
 Start	Deletion of pseudo inverse events	Story 5	Collect traces			13		
-End	Deletion of pseudo inverse events	Story 5	Collect traces			13	13	0.000069
+End	Deletion of pseudo inverse events	Story 5	Collect traces			13	13	0.000000
 Start	Renaming agents to avoid conflicts	Story 5	Collect traces			13		
-End	Renaming agents to avoid conflicts	Story 5	Collect traces			13	13	0.000019
+End	Renaming agents to avoid conflicts	Story 5	Collect traces			13	13	0.000000
 Start	Partial order reduction	Story 5	Collect traces			13		
-End	Partial order reduction	Story 5	Collect traces			13	13	0.000027
+End	Partial order reduction	Story 5	Collect traces			13	13	0.000000
 Start	Store trace	Story 5	Collect traces					
 Start	Grid computation	Store trace	Story 5	Collect traces				
-End	Grid computation	Store trace	Story 5	Collect traces				0.000074
+End	Grid computation	Store trace	Story 5	Collect traces				0.000269
 Start	Graph conversion	Store trace	Story 5	Collect traces				
 Start	Build configuration	Graph conversion	Store trace	Story 5	Collect traces			
-End	Build configuration	Graph conversion	Store trace	Story 5	Collect traces			0.000054
+End	Build configuration	Graph conversion	Store trace	Story 5	Collect traces			0.000000
 Start	Transitive reduction	Graph conversion	Store trace	Story 5	Collect traces			
-End	Transitive reduction	Graph conversion	Store trace	Story 5	Collect traces			0.000024
-End	Graph conversion	Store trace	Story 5	Collect traces				0.000078
+End	Transitive reduction	Graph conversion	Store trace	Story 5	Collect traces			0.000000
+End	Graph conversion	Store trace	Story 5	Collect traces				0.000000
 Start	Computing the cannonic form	Store trace	Story 5	Collect traces				
-End	Computing the cannonic form	Store trace	Story 5	Collect traces				0.000020
+End	Computing the cannonic form	Store trace	Story 5	Collect traces				0.000000
 Start	Computing the cannonic form	Store trace	Story 5	Collect traces				
-End	Computing the cannonic form	Store trace	Story 5	Collect traces				0.000023
-End	Store trace	Story 5	Collect traces					0.000226
-End	Story 5	Collect traces						0.000369
+End	Computing the cannonic form	Store trace	Story 5	Collect traces				0.000000
+End	Store trace	Story 5	Collect traces					0.000269
+End	Story 5	Collect traces						0.000269
 Start	Story 6	Collect traces						
 Start	Deletion of pseudo inverse events	Story 6	Collect traces			25		
-End	Deletion of pseudo inverse events	Story 6	Collect traces			25	25	0.000124
+End	Deletion of pseudo inverse events	Story 6	Collect traces			25	25	0.000295
 Start	Renaming agents to avoid conflicts	Story 6	Collect traces			25		
-End	Renaming agents to avoid conflicts	Story 6	Collect traces			25	25	0.000018
+End	Renaming agents to avoid conflicts	Story 6	Collect traces			25	25	0.000000
 Start	Partial order reduction	Story 6	Collect traces			25		
-End	Partial order reduction	Story 6	Collect traces			25	25	0.000038
+End	Partial order reduction	Story 6	Collect traces			25	25	0.000000
 Start	Store trace	Story 6	Collect traces					
 Start	Grid computation	Store trace	Story 6	Collect traces				
-End	Grid computation	Store trace	Story 6	Collect traces				0.000134
+End	Grid computation	Store trace	Story 6	Collect traces				0.000000
 Start	Graph conversion	Store trace	Story 6	Collect traces				
 Start	Build configuration	Graph conversion	Store trace	Story 6	Collect traces			
-End	Build configuration	Graph conversion	Store trace	Story 6	Collect traces			0.000095
+End	Build configuration	Graph conversion	Store trace	Story 6	Collect traces			0.000000
 Start	Transitive reduction	Graph conversion	Store trace	Story 6	Collect traces			
-End	Transitive reduction	Graph conversion	Store trace	Story 6	Collect traces			0.000043
-End	Graph conversion	Store trace	Story 6	Collect traces				0.000158
+End	Transitive reduction	Graph conversion	Store trace	Story 6	Collect traces			0.000000
+End	Graph conversion	Store trace	Story 6	Collect traces				0.000000
 Start	Computing the cannonic form	Store trace	Story 6	Collect traces				
-End	Computing the cannonic form	Store trace	Story 6	Collect traces				0.000036
+End	Computing the cannonic form	Store trace	Story 6	Collect traces				0.000000
 Start	Computing the cannonic form	Store trace	Story 6	Collect traces				
-End	Computing the cannonic form	Store trace	Story 6	Collect traces				0.000034
-End	Store trace	Story 6	Collect traces					0.000408
-End	Story 6	Collect traces						0.000628
+End	Computing the cannonic form	Store trace	Story 6	Collect traces				0.000234
+End	Store trace	Story 6	Collect traces					0.000446
+End	Story 6	Collect traces						0.000741
 Start	Story 7	Collect traces						
 Start	Deletion of pseudo inverse events	Story 7	Collect traces			22		
-End	Deletion of pseudo inverse events	Story 7	Collect traces			22	22	0.000605
+End	Deletion of pseudo inverse events	Story 7	Collect traces			22	22	0.000754
 Start	Renaming agents to avoid conflicts	Story 7	Collect traces			22		
 End	Renaming agents to avoid conflicts	Story 7	Collect traces			22	22	0.000000
 Start	Partial order reduction	Story 7	Collect traces			22		
-End	Partial order reduction	Story 7	Collect traces			22	22	0.000068
+End	Partial order reduction	Story 7	Collect traces			22	22	0.000000
 Start	Store trace	Story 7	Collect traces					
 Start	Grid computation	Store trace	Story 7	Collect traces				
-End	Grid computation	Store trace	Story 7	Collect traces				0.000131
+End	Grid computation	Store trace	Story 7	Collect traces				0.000000
 Start	Graph conversion	Store trace	Story 7	Collect traces				
 Start	Build configuration	Graph conversion	Store trace	Story 7	Collect traces			
-End	Build configuration	Graph conversion	Store trace	Story 7	Collect traces			0.000092
+End	Build configuration	Graph conversion	Store trace	Story 7	Collect traces			0.000000
 Start	Transitive reduction	Graph conversion	Store trace	Story 7	Collect traces			
 End	Transitive reduction	Graph conversion	Store trace	Story 7	Collect traces			0.000000
-End	Graph conversion	Store trace	Story 7	Collect traces				0.000142
-End	Store trace	Story 7	Collect traces					0.000273
-End	Story 7	Collect traces						0.000953
+End	Graph conversion	Store trace	Story 7	Collect traces				0.000000
+End	Store trace	Story 7	Collect traces					0.000000
+End	Story 7	Collect traces						0.000754
 Start	Story 8	Collect traces						
 Start	Deletion of pseudo inverse events	Story 8	Collect traces			25		
-End	Deletion of pseudo inverse events	Story 8	Collect traces			25	25	0.000155
+End	Deletion of pseudo inverse events	Story 8	Collect traces			25	25	0.000000
 Start	Renaming agents to avoid conflicts	Story 8	Collect traces			25		
 End	Renaming agents to avoid conflicts	Story 8	Collect traces			25	25	0.000000
 Start	Partial order reduction	Story 8	Collect traces			25		
-End	Partial order reduction	Story 8	Collect traces			25	25	0.000070
+End	Partial order reduction	Story 8	Collect traces			25	25	0.000000
 Start	Store trace	Story 8	Collect traces					
 Start	Grid computation	Store trace	Story 8	Collect traces				
-End	Grid computation	Store trace	Story 8	Collect traces				0.000138
+End	Grid computation	Store trace	Story 8	Collect traces				0.000000
 Start	Graph conversion	Store trace	Story 8	Collect traces				
 Start	Build configuration	Graph conversion	Store trace	Story 8	Collect traces			
-End	Build configuration	Graph conversion	Store trace	Story 8	Collect traces			0.000101
+End	Build configuration	Graph conversion	Store trace	Story 8	Collect traces			0.000000
 Start	Transitive reduction	Graph conversion	Store trace	Story 8	Collect traces			
-End	Transitive reduction	Graph conversion	Store trace	Story 8	Collect traces			0.000048
-End	Graph conversion	Store trace	Story 8	Collect traces				0.000149
-End	Store trace	Story 8	Collect traces					0.000287
-End	Story 8	Collect traces						0.000512
+End	Transitive reduction	Graph conversion	Store trace	Story 8	Collect traces			0.000000
+End	Graph conversion	Store trace	Story 8	Collect traces				0.000000
+End	Store trace	Story 8	Collect traces					0.000329
+End	Story 8	Collect traces						0.000329
 Start	Story 9	Collect traces						
 Start	Deletion of pseudo inverse events	Story 9	Collect traces			13		
-End	Deletion of pseudo inverse events	Story 9	Collect traces			13	13	0.000068
+End	Deletion of pseudo inverse events	Story 9	Collect traces			13	13	0.000000
 Start	Renaming agents to avoid conflicts	Story 9	Collect traces			13		
 End	Renaming agents to avoid conflicts	Story 9	Collect traces			13	13	0.000000
 Start	Partial order reduction	Story 9	Collect traces			13		
-End	Partial order reduction	Story 9	Collect traces			13	13	0.000051
+End	Partial order reduction	Story 9	Collect traces			13	13	0.000000
 Start	Store trace	Story 9	Collect traces					
 Start	Grid computation	Store trace	Story 9	Collect traces				
-End	Grid computation	Store trace	Story 9	Collect traces				0.000073
+End	Grid computation	Store trace	Story 9	Collect traces				0.000362
 Start	Graph conversion	Store trace	Story 9	Collect traces				
 Start	Build configuration	Graph conversion	Store trace	Story 9	Collect traces			
-End	Build configuration	Graph conversion	Store trace	Story 9	Collect traces			0.000052
+End	Build configuration	Graph conversion	Store trace	Story 9	Collect traces			0.000000
 Start	Transitive reduction	Graph conversion	Store trace	Story 9	Collect traces			
 End	Transitive reduction	Graph conversion	Store trace	Story 9	Collect traces			0.000000
-End	Graph conversion	Store trace	Story 9	Collect traces				0.000052
+End	Graph conversion	Store trace	Story 9	Collect traces				0.000000
 Start	Computing the cannonic form	Store trace	Story 9	Collect traces				
 End	Computing the cannonic form	Store trace	Story 9	Collect traces				0.000000
-End	Store trace	Story 9	Collect traces					0.000168
-End	Story 9	Collect traces						0.000329
+End	Store trace	Story 9	Collect traces					0.000362
+End	Story 9	Collect traces						0.000362
 Start	Story 10	Collect traces						
 Start	Deletion of pseudo inverse events	Story 10	Collect traces			31		
-End	Deletion of pseudo inverse events	Story 10	Collect traces			31	31	0.000159
+End	Deletion of pseudo inverse events	Story 10	Collect traces			31	31	0.000000
 Start	Renaming agents to avoid conflicts	Story 10	Collect traces			31		
-End	Renaming agents to avoid conflicts	Story 10	Collect traces			31	31	0.000000
+End	Renaming agents to avoid conflicts	Story 10	Collect traces			31	31	0.000313
 Start	Partial order reduction	Story 10	Collect traces			31		
-End	Partial order reduction	Story 10	Collect traces			31	31	0.000049
+End	Partial order reduction	Story 10	Collect traces			31	31	0.000000
 Start	Store trace	Story 10	Collect traces					
 Start	Grid computation	Store trace	Story 10	Collect traces				
-End	Grid computation	Store trace	Story 10	Collect traces				0.000171
+End	Grid computation	Store trace	Story 10	Collect traces				0.000000
 Start	Graph conversion	Store trace	Story 10	Collect traces				
 Start	Build configuration	Graph conversion	Store trace	Story 10	Collect traces			
-End	Build configuration	Graph conversion	Store trace	Story 10	Collect traces			0.000132
+End	Build configuration	Graph conversion	Store trace	Story 10	Collect traces			0.000346
 Start	Transitive reduction	Graph conversion	Store trace	Story 10	Collect traces			
-End	Transitive reduction	Graph conversion	Store trace	Story 10	Collect traces			0.000583
-End	Graph conversion	Store trace	Story 10	Collect traces				0.000715
-End	Store trace	Story 10	Collect traces					0.000914
-End	Story 10	Collect traces						0.001157
-End	Collect traces							0.006215
+End	Transitive reduction	Graph conversion	Store trace	Story 10	Collect traces			0.000544
+End	Graph conversion	Store trace	Story 10	Collect traces				0.000890
+End	Store trace	Story 10	Collect traces					0.000890
+End	Story 10	Collect traces						0.001203
+End	Collect traces							0.006177
 Start	Story 1							
 Start	Weak compression	Story 1				13		
-End	Weak compression	Story 1				13	13	0.000601
+End	Weak compression	Story 1				13	13	0.000464
 Start	Store trace	Story 1						
 Start	Grid computation	Store trace	Story 1					
-End	Grid computation	Store trace	Story 1					0.000053
+End	Grid computation	Store trace	Story 1					0.000000
 Start	Graph conversion	Store trace	Story 1					
 Start	Build configuration	Graph conversion	Store trace	Story 1				
-End	Build configuration	Graph conversion	Store trace	Story 1				0.000028
+End	Build configuration	Graph conversion	Store trace	Story 1				0.000242
 Start	Transitive reduction	Graph conversion	Store trace	Story 1				
-End	Transitive reduction	Graph conversion	Store trace	Story 1				0.000013
-End	Graph conversion	Store trace	Story 1					0.000061
-End	Store trace	Story 1						0.000130
-End	Story 1							0.000752
+End	Transitive reduction	Graph conversion	Store trace	Story 1				0.000000
+End	Graph conversion	Store trace	Story 1					0.000242
+End	Store trace	Story 1						0.000242
+End	Story 1							0.000706
 Start	Story 2							
 Start	Weak compression	Story 2				25		
-End	Weak compression	Story 2				25	25	0.004216
+End	Weak compression	Story 2				25	25	0.004017
 Start	Store trace	Story 2						
 Start	Grid computation	Store trace	Story 2					
 End	Grid computation	Store trace	Story 2					0.000000
@@ -259,7 +259,7 @@ End	Computing the cannonic form	Store trace	Story 2					0.000000
 Start	Computing the cannonic form	Store trace	Story 2					
 End	Computing the cannonic form	Store trace	Story 2					0.000000
 End	Store trace	Story 2						0.000000
-End	Story 2							0.004220
+End	Story 2							0.004017
 Start	Story 3							
 Start	Weak compression	Story 3				28		
 End	Weak compression	Story 3				28	28	0.000000
@@ -268,17 +268,17 @@ Start	Grid computation	Store trace	Story 3
 End	Grid computation	Store trace	Story 3					0.000000
 Start	Graph conversion	Store trace	Story 3					
 Start	Build configuration	Graph conversion	Store trace	Story 3				
-End	Build configuration	Graph conversion	Store trace	Story 3				0.000000
+End	Build configuration	Graph conversion	Store trace	Story 3				0.000173
 Start	Transitive reduction	Graph conversion	Store trace	Story 3				
 End	Transitive reduction	Graph conversion	Store trace	Story 3				0.000000
-End	Graph conversion	Store trace	Story 3					0.000000
+End	Graph conversion	Store trace	Story 3					0.000173
 Start	Computing the cannonic form	Store trace	Story 3					
 End	Computing the cannonic form	Store trace	Story 3					0.000000
-End	Store trace	Story 3						0.000000
-End	Story 3							0.000000
+End	Store trace	Story 3						0.000173
+End	Story 3							0.000173
 Start	Story 4							
 Start	Weak compression	Story 4				10		
-End	Weak compression	Story 4				10	10	0.003981
+End	Weak compression	Story 4				10	10	0.000566
 Start	Store trace	Story 4						
 Start	Grid computation	Store trace	Story 4					
 End	Grid computation	Store trace	Story 4					0.000000
@@ -287,49 +287,49 @@ Start	Build configuration	Graph conversion	Store trace	Story 4
 End	Build configuration	Graph conversion	Store trace	Story 4				0.000000
 Start	Transitive reduction	Graph conversion	Store trace	Story 4				
 End	Transitive reduction	Graph conversion	Store trace	Story 4				0.000000
-End	Graph conversion	Store trace	Story 4					0.000000
+End	Graph conversion	Store trace	Story 4					0.000173
 Start	Computing the cannonic form	Store trace	Story 4					
 End	Computing the cannonic form	Store trace	Story 4					0.000000
-End	Store trace	Story 4						0.000000
-End	Story 4							0.003981
+End	Store trace	Story 4						0.000173
+End	Story 4							0.000739
 Start	Story 5							
 Start	Weak compression	Story 5				22		
-End	Weak compression	Story 5				22	22	0.000000
+End	Weak compression	Story 5				22	22	0.001539
 Start	Store trace	Story 5						
 Start	Grid computation	Store trace	Story 5					
 End	Grid computation	Store trace	Story 5					0.000000
 Start	Graph conversion	Store trace	Story 5					
 Start	Build configuration	Graph conversion	Store trace	Story 5				
-End	Build configuration	Graph conversion	Store trace	Story 5				0.000000
+End	Build configuration	Graph conversion	Store trace	Story 5				0.000100
 Start	Transitive reduction	Graph conversion	Store trace	Story 5				
 End	Transitive reduction	Graph conversion	Store trace	Story 5				0.000000
-End	Graph conversion	Store trace	Story 5					0.000000
+End	Graph conversion	Store trace	Story 5					0.000100
 Start	Computing the cannonic form	Store trace	Story 5					
 End	Computing the cannonic form	Store trace	Story 5					0.000000
-End	Store trace	Story 5						0.000000
-End	Story 5							0.000000
+End	Store trace	Story 5						0.000100
+End	Story 5							0.001735
 Start	Story 6							
 Start	Weak compression	Story 6				25		
-End	Weak compression	Story 6				25	25	0.000000
+End	Weak compression	Story 6				25	25	0.001065
 Start	Store trace	Story 6						
 Start	Grid computation	Store trace	Story 6					
-End	Grid computation	Store trace	Story 6					0.000000
+End	Grid computation	Store trace	Story 6					0.000045
 Start	Graph conversion	Store trace	Story 6					
 Start	Build configuration	Graph conversion	Store trace	Story 6				
-End	Build configuration	Graph conversion	Store trace	Story 6				0.000000
+End	Build configuration	Graph conversion	Store trace	Story 6				0.000038
 Start	Transitive reduction	Graph conversion	Store trace	Story 6				
 End	Transitive reduction	Graph conversion	Store trace	Story 6				0.000000
-End	Graph conversion	Store trace	Story 6					0.000000
+End	Graph conversion	Store trace	Story 6					0.000065
 Start	Computing the cannonic form	Store trace	Story 6					
-End	Computing the cannonic form	Store trace	Story 6					0.000000
-End	Store trace	Story 6						0.000000
-End	Story 6							0.000000
+End	Computing the cannonic form	Store trace	Story 6					0.000023
+End	Store trace	Story 6						0.000162
+End	Story 6							0.001246
 Start	Story 7							
 Start	Weak compression	Story 7				31		
-End	Weak compression	Story 7				31	31	0.003991
+End	Weak compression	Story 7				31	31	0.001541
 Start	Store trace	Story 7						
 Start	Grid computation	Store trace	Story 7					
-End	Grid computation	Store trace	Story 7					0.000000
+End	Grid computation	Store trace	Story 7					0.000161
 Start	Graph conversion	Store trace	Story 7					
 Start	Build configuration	Graph conversion	Store trace	Story 7				
 End	Build configuration	Graph conversion	Store trace	Story 7				0.000000
@@ -338,10 +338,10 @@ End	Transitive reduction	Graph conversion	Store trace	Story 7				0.000000
 End	Graph conversion	Store trace	Story 7					0.000000
 Start	Computing the cannonic form	Store trace	Story 7					
 End	Computing the cannonic form	Store trace	Story 7					0.000000
-End	Store trace	Story 7						0.000000
-End	Story 7							0.003991
+End	Store trace	Story 7						0.000161
+End	Story 7							0.001702
 Start	Build configuration							
-End	Build configuration							0.000000
+End	Build configuration							0.000151
 Start	Transitive reduction							
 End	Transitive reduction							0.000000
 Start	Transitive closure							
