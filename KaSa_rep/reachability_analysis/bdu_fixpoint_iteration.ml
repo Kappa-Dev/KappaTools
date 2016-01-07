@@ -100,288 +100,6 @@ let compute_bdu_update_side_effects parameter handler error bdu_test list_a bdu_
   error, handler, bdu_result
     
 (************************************************************************************)
-(*side effects in the case of half break*)
-(*TODO: check the reverse binding: B.x - A.x *)
-
-(*let store_new_result_hb_map
-    parameter
-    error 
-    half_break_map
-    store_covering_classes_modification_update
-    store_contact_map
-    store_result_map
-    =
- let add_link (agent_type, cv_id) rule_id_effect store_result =
-    let (l, old) =
-      Int2Map_CV_Modif.Map.find_default
-	([], Site_map_and_set.Set.empty)
-        (agent_type, cv_id) store_result in
-    let errorm, current_set =
-      Site_map_and_set.Set.add parameter error rule_id_effect old
-    in
-    let error, new_set =
-      Site_map_and_set.Set.union parameter error current_set old
-    in
-    let result =
-      Int2Map_CV_Modif.Map.add (agent_type, cv_id)
-        (l, new_set) store_result
-    in
-    error, result
- in
- Int2Map_HalfBreak_effect.Map.fold
-   (fun (agent_type_eff, site_type_eff) (l1, l2) (error, store_result) ->
-     List.fold_left (fun (error, store_result) (rule_id_eff, state) ->
-       Int2Map_syn.Map.fold
-         (fun rule_id set (error, store_result) ->
-           Set_pair.Set.fold 
-             (fun ((agent_type1, site_type1, state1),(agent_type2,site_type2, state2))
-               (error, store_result) ->
-                 if state = state2
-                 then
-                   if agent_type1 = agent_type_eff &&
-                     site_type1 = site_type_eff
-                   then
-                     Int2Map_CV_Modif.Map.fold
-                       (fun (agent_type, cv_id) 
-                         (l', rule_id_set) (error, store_result) ->
-                           Site_map_and_set.Set.fold
-                             (fun rule_id_update (error, current_result) ->
-                               if agent_type = agent_type2
-                               then
-                                 let error, result =
-                                   add_link (agent_type, cv_id) rule_id_eff
-                                     current_result
-                                 in
-                                 error, result
-                               else
-                                 error, current_result
-                             ) rule_id_set (error, store_result)
-                       ) store_covering_classes_modification_update
-                       (error, store_result)
-                   else
-                     error, store_result
-                 else
-                   error, store_result
-             ) set (error, store_result)
-         ) store_contact_map (error, store_result)
-     ) (error, store_result) l2
-   ) half_break_map (error, store_result_map)
- *)   
-
-(************************************************************************************)
-(*side effects in the case of remove*)
-
-(*let store_new_result_remove_map
-  parameter
-  error
-  remove_map
-  store_covering_classes_modification_update
-  store_contact_map
-  store_result_map
-    =
-  let add_link (agent_type, cv_id) rule_id_effect store_result =
-    let (l, old) =
-      Int2Map_CV_Modif.Map.find_default
-	([], Site_map_and_set.Set.empty)
-        (agent_type, cv_id) store_result in
-    let errorm, current_set =
-      Site_map_and_set.Set.add parameter error rule_id_effect old
-    in
-    let error, new_set =
-      Site_map_and_set.Set.union parameter error current_set old
-    in
-    let result =
-      Int2Map_CV_Modif.Map.add (agent_type, cv_id)
-        (l, new_set) store_result
-    in
-    error, result
-  in
-  Int2Map_Remove_effect.Map.fold
-    (fun (agent_type_eff, site_type_eff) (l1, l2) (error, store_result) ->
-      List.fold_left (fun (error, store_result) rule_id_eff ->
-        Int2Map_syn.Map.fold
-          (fun rule_id set (error, store_result) ->
-            Set_pair.Set.fold
-              (fun ((agent_type1, site_type1, state1),(agent_type2, site_type2, state2))
-                (error, store_result) ->
-                  if agent_type1 = agent_type_eff && 
-                    site_type1 = site_type_eff
-                  then
-                    let error, store_result =
-                      Int2Map_CV_Modif.Map.fold
-                        (fun (agent_type, cv_id) (l', rule_id_set)
-                          (error, store_result) ->
-                            let error, store_result =
-                              Site_map_and_set.Set.fold
-                                (fun rule_id_update (error, current_result) ->
-                                  if agent_type = agent_type2
-                                  then
-                                    add_link (agent_type, cv_id) rule_id_eff current_result
-                                  else
-                                    error, current_result
-                                ) rule_id_set (error, store_result)
-                            in
-                            error, store_result
-                        ) store_covering_classes_modification_update
-                        (error, store_result)
-                    in
-                    error, store_result
-                  else
-                    error, store_result
-              ) set (error, store_result)
-          ) store_contact_map (error, store_result)
-      ) (error, store_result) l2
-    ) remove_map (error, store_result_map)
-  *)
-
-(************************************************************************************)
-(*combine the result of half break and remove*)
-
-(*let collect_hb_remove_map parameter error 
-    store_side_effects
-    store_covering_classes_modification_update
-    store_contact_map
-    store_result_map
-    =
-  let add_link error (agent_type, cv_id) rule_id_set store_result =
-    let (l, old) =
-      Int2Map_CV_Modif.Map.find_default
-        ([], Site_map_and_set.Set.empty) (agent_type, cv_id) store_result
-    in
-    let error, union =
-      Site_map_and_set.Set.union parameter error
-        rule_id_set old
-    in
-    let result =
-      Int2Map_CV_Modif.Map.add (agent_type, cv_id) (l, union) store_result
-    in
-    error, result
-  in
-  let (half_break_map, remove_map) = store_side_effects in
-  let error, store_hb_map =
-    store_new_result_hb_map
-      parameter
-      error
-      half_break_map
-      store_covering_classes_modification_update
-      store_contact_map
-      Int2Map_CV_Modif.Map.empty
-  in
-  let error, store_remove_map =
-    store_new_result_remove_map
-      parameter
-      error
-      remove_map
-      store_covering_classes_modification_update
-      store_contact_map
-      Int2Map_CV_Modif.Map.empty
-  in
-  Int2Map_CV_Modif.Map.fold2_with_logs
-    (fun parameter error str str_opt exn ->
-      let error, _ = warn parameter error str_opt exn Not_found
-      in
-      error
-    )
-    parameter
-    error
-    (*exists in 'a t*)
-    (fun parameter error (agent_type, cv_id) (l1, s1) store_result ->
-      let error, store_result =
-        add_link error (agent_type, cv_id) s1 store_result
-      in
-      error, store_result
-    )
-    (*exists in 'b t*)
-    (fun parameter error (agent_type, cv_id) (l2, s2) store_result ->
-      let error, store_result =
-        add_link error (agent_type, cv_id) s2 store_result
-      in
-      error, store_result
-    )
-    (*exists in both*)
-    (fun parameter error (agent_type, cv_id) (l1, s1) (l2, s2) store_result ->
-      let error', union = Site_map_and_set.Set.union parameter error s1 s2 in
-      let error = Exception.check warn parameter error error' (Some "line 331") Exit in
-      let error, store_result =
-        add_link error (agent_type, cv_id) union store_result
-      in
-      error, store_result
-    )
-    store_hb_map
-    store_remove_map
-    store_result_map
-  *)    
-
-(************************************************************************************)
-(*combine the result of update(c) and half break and remove side
-  effects. This is final update function for side effect*)
-
-(*let collect_update_hb_remove_map parameter error 
-    store_side_effects
-    store_contact_map
-    store_covering_classes_modification_update
-    store_result_map
-    =
-  let add_link error (agent_type, cv_id) rule_id_set store_result =
-    let (l, old) =
-      Int2Map_CV_Modif.Map.find_default
-        ([], Site_map_and_set.Set.empty) (agent_type, cv_id) store_result
-    in
-    let error, union =
-      Site_map_and_set.Set.union parameter error
-        rule_id_set old
-    in
-    let result =
-      Int2Map_CV_Modif.Map.add (agent_type, cv_id) (l, union) store_result
-    in
-    error, result
-  in
-  let error, store_hb_remove_map =
-    collect_hb_remove_map
-      parameter
-      error
-      store_side_effects
-      store_covering_classes_modification_update
-      store_contact_map
-      Int2Map_CV_Modif.Map.empty
-  in
-  Int2Map_CV_Modif.Map.fold2_with_logs
-    (fun parameter error str str_opt exn ->
-      let error, _ = warn parameter error str_opt exn Not_found
-      in
-      error
-    )
-    parameter
-    error
-    (*exists in 'a t*)
-    (fun parameter error (agent_type, cv_id) (l1, s1) store_result ->
-      let error, store_result =
-        add_link error (agent_type, cv_id) s1 store_result
-      in
-      error, store_result
-    )
-    (*exists in 'b t*)
-    (fun parameter error (agent_type, cv_id) (l2, s2) store_result ->
-      let error, store_result =
-        add_link error (agent_type, cv_id) s2 store_result
-      in
-      error, store_result
-    )
-    (*exists in both*)
-    (fun parameter error (agent_type, cv_id) (l1, s1) (l2, s2) store_result ->
-      let error', union = Site_map_and_set.Set.union parameter error s1 s2 in
-      let error = Exception.check warn parameter error error' (Some "line 331") Exit in
-      let error, store_result =
-        add_link error (agent_type, cv_id) union store_result
-      in
-      error, store_result
-    )
-    store_hb_remove_map
-    store_covering_classes_modification_update
-    store_result_map
-  *)
-
-(************************************************************************************)
 (*write a function add update(c) into working list*)
 
 let add_update_to_wl parameter error agent_type cv_id 
@@ -532,32 +250,6 @@ let compute_new_views parameter handler error
           wl_tl
       in
       error, (handler, new_wl, store_result)
-    (*REMARK: will be used later when changed to module and use dynamic contact map*)
-    (* begin
-       if is_new_bond
-       then
-       let error, new_wl =
-       add_update_to_wl
-       parameter
-       error
-       agent_type 
-       cv_id 
-       store_new_result_map
-       wl_tl
-       in
-       error, (handler, new_wl, store_result)
-       else
-       let error, new_wl =
-       add_update_to_wl
-       parameter
-       error
-       agent_type
-       cv_id 
-       store_covering_classes_modification_update
-       wl_tl
-       in
-       error, (handler, new_wl, store_result)
-       end*)
     else
       error, (handler, wl_tl, store_result)
   in
@@ -950,13 +642,19 @@ let collect_bdu_fixpoint_with_init parameter handler error
               Remanent_parameters.update_prefix parameter ""
             in
             if (Remanent_parameters.get_trace parameters_cv)
-            then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
+            then 
+              (*mapping rule_id of type int -> string*)
+              (*let error, rule_id_string =
+                Hanlder.string_of_rule parameter error handler_kappa
+                  compiled rule_id
+              in*)
+              Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
             dump_channel parameter 
               (fun stderr -> Printf.fprintf stderr "apply for rule:%i " rule_id)
           else ()
         in
         (*TODO: map integer to string for rule_id*)
-
+        
         (*--------------------------------------------------------------------*)
         (*output of working list*)
     	let _ = 
@@ -1125,3 +823,341 @@ let collect_bdu_fixpoint_map parameter handler error
        store_bdu_init_restriction_map
   in
   error, (handler, store_bdu_fixpoint_map)
+
+(************************************************************************************)
+(*BACKUP: DO NOT DELETE ME*)
+
+(*side effects in the case of half break*)
+
+(*check the reverse binding: B.x - A.x *)
+
+(*let store_new_result_hb_map
+    parameter
+    error 
+    half_break_map
+    store_covering_classes_modification_update
+    store_contact_map
+    store_result_map
+    =
+ let add_link (agent_type, cv_id) rule_id_effect store_result =
+    let (l, old) =
+      Int2Map_CV_Modif.Map.find_default
+	([], Site_map_and_set.Set.empty)
+        (agent_type, cv_id) store_result in
+    let errorm, current_set =
+      Site_map_and_set.Set.add parameter error rule_id_effect old
+    in
+    let error, new_set =
+      Site_map_and_set.Set.union parameter error current_set old
+    in
+    let result =
+      Int2Map_CV_Modif.Map.add (agent_type, cv_id)
+        (l, new_set) store_result
+    in
+    error, result
+ in
+ Int2Map_HalfBreak_effect.Map.fold
+   (fun (agent_type_eff, site_type_eff) (l1, l2) (error, store_result) ->
+     List.fold_left (fun (error, store_result) (rule_id_eff, state) ->
+       Int2Map_syn.Map.fold
+         (fun rule_id set (error, store_result) ->
+           Set_pair.Set.fold 
+             (fun ((agent_type1, site_type1, state1),(agent_type2,site_type2, state2))
+               (error, store_result) ->
+                 if state = state2
+                 then
+                   if agent_type1 = agent_type_eff &&
+                     site_type1 = site_type_eff
+                   then
+                     Int2Map_CV_Modif.Map.fold
+                       (fun (agent_type, cv_id) 
+                         (l', rule_id_set) (error, store_result) ->
+                           Site_map_and_set.Set.fold
+                             (fun rule_id_update (error, current_result) ->
+                               if agent_type = agent_type2
+                               then
+                                 let error, result =
+                                   add_link (agent_type, cv_id) rule_id_eff
+                                     current_result
+                                 in
+                                 error, result
+                               else
+                                 error, current_result
+                             ) rule_id_set (error, store_result)
+                       ) store_covering_classes_modification_update
+                       (error, store_result)
+                   else
+                     error, store_result
+                 else
+                   error, store_result
+             ) set (error, store_result)
+         ) store_contact_map (error, store_result)
+     ) (error, store_result) l2
+   ) half_break_map (error, store_result_map)
+ *)   
+
+(************************************************************************************)
+(*side effects in the case of remove*)
+
+(*let store_new_result_remove_map
+  parameter
+  error
+  remove_map
+  store_covering_classes_modification_update
+  store_contact_map
+  store_result_map
+    =
+  let add_link (agent_type, cv_id) rule_id_effect store_result =
+    let (l, old) =
+      Int2Map_CV_Modif.Map.find_default
+	([], Site_map_and_set.Set.empty)
+        (agent_type, cv_id) store_result in
+    let errorm, current_set =
+      Site_map_and_set.Set.add parameter error rule_id_effect old
+    in
+    let error, new_set =
+      Site_map_and_set.Set.union parameter error current_set old
+    in
+    let result =
+      Int2Map_CV_Modif.Map.add (agent_type, cv_id)
+        (l, new_set) store_result
+    in
+    error, result
+  in
+  Int2Map_Remove_effect.Map.fold
+    (fun (agent_type_eff, site_type_eff) (l1, l2) (error, store_result) ->
+      List.fold_left (fun (error, store_result) rule_id_eff ->
+        Int2Map_syn.Map.fold
+          (fun rule_id set (error, store_result) ->
+            Set_pair.Set.fold
+              (fun ((agent_type1, site_type1, state1),(agent_type2, site_type2, state2))
+                (error, store_result) ->
+                  if agent_type1 = agent_type_eff && 
+                    site_type1 = site_type_eff
+                  then
+                    let error, store_result =
+                      Int2Map_CV_Modif.Map.fold
+                        (fun (agent_type, cv_id) (l', rule_id_set)
+                          (error, store_result) ->
+                            let error, store_result =
+                              Site_map_and_set.Set.fold
+                                (fun rule_id_update (error, current_result) ->
+                                  if agent_type = agent_type2
+                                  then
+                                    add_link (agent_type, cv_id) rule_id_eff current_result
+                                  else
+                                    error, current_result
+                                ) rule_id_set (error, store_result)
+                            in
+                            error, store_result
+                        ) store_covering_classes_modification_update
+                        (error, store_result)
+                    in
+                    error, store_result
+                  else
+                    error, store_result
+              ) set (error, store_result)
+          ) store_contact_map (error, store_result)
+      ) (error, store_result) l2
+    ) remove_map (error, store_result_map)
+  *)
+
+(************************************************************************************)
+(*combine the result of half break and remove*)
+
+(*let collect_hb_remove_map parameter error 
+    store_side_effects
+    store_covering_classes_modification_update
+    store_contact_map
+    store_result_map
+    =
+  let add_link error (agent_type, cv_id) rule_id_set store_result =
+    let (l, old) =
+      Int2Map_CV_Modif.Map.find_default
+        ([], Site_map_and_set.Set.empty) (agent_type, cv_id) store_result
+    in
+    let error, union =
+      Site_map_and_set.Set.union parameter error
+        rule_id_set old
+    in
+    let result =
+      Int2Map_CV_Modif.Map.add (agent_type, cv_id) (l, union) store_result
+    in
+    error, result
+  in
+  let (half_break_map, remove_map) = store_side_effects in
+  let error, store_hb_map =
+    store_new_result_hb_map
+      parameter
+      error
+      half_break_map
+      store_covering_classes_modification_update
+      store_contact_map
+      Int2Map_CV_Modif.Map.empty
+  in
+  let error, store_remove_map =
+    store_new_result_remove_map
+      parameter
+      error
+      remove_map
+      store_covering_classes_modification_update
+      store_contact_map
+      Int2Map_CV_Modif.Map.empty
+  in
+  Int2Map_CV_Modif.Map.fold2_with_logs
+    (fun parameter error str str_opt exn ->
+      let error, _ = warn parameter error str_opt exn Not_found
+      in
+      error
+    )
+    parameter
+    error
+    (*exists in 'a t*)
+    (fun parameter error (agent_type, cv_id) (l1, s1) store_result ->
+      let error, store_result =
+        add_link error (agent_type, cv_id) s1 store_result
+      in
+      error, store_result
+    )
+    (*exists in 'b t*)
+    (fun parameter error (agent_type, cv_id) (l2, s2) store_result ->
+      let error, store_result =
+        add_link error (agent_type, cv_id) s2 store_result
+      in
+      error, store_result
+    )
+    (*exists in both*)
+    (fun parameter error (agent_type, cv_id) (l1, s1) (l2, s2) store_result ->
+      let error', union = Site_map_and_set.Set.union parameter error s1 s2 in
+      let error = Exception.check warn parameter error error' (Some "line 331") Exit in
+      let error, store_result =
+        add_link error (agent_type, cv_id) union store_result
+      in
+      error, store_result
+    )
+    store_hb_map
+    store_remove_map
+    store_result_map
+  *)    
+
+(************************************************************************************)
+(*combine the result of update(c) and half break and remove side
+  effects. This is final update function for side effect*)
+
+(*let collect_update_hb_remove_map parameter error 
+    store_side_effects
+    store_contact_map
+    store_covering_classes_modification_update
+    store_result_map
+    =
+  let add_link error (agent_type, cv_id) rule_id_set store_result =
+    let (l, old) =
+      Int2Map_CV_Modif.Map.find_default
+        ([], Site_map_and_set.Set.empty) (agent_type, cv_id) store_result
+    in
+    let error, union =
+      Site_map_and_set.Set.union parameter error
+        rule_id_set old
+    in
+    let result =
+      Int2Map_CV_Modif.Map.add (agent_type, cv_id) (l, union) store_result
+    in
+    error, result
+  in
+  let error, store_hb_remove_map =
+    collect_hb_remove_map
+      parameter
+      error
+      store_side_effects
+      store_covering_classes_modification_update
+      store_contact_map
+      Int2Map_CV_Modif.Map.empty
+  in
+  Int2Map_CV_Modif.Map.fold2_with_logs
+    (fun parameter error str str_opt exn ->
+      let error, _ = warn parameter error str_opt exn Not_found
+      in
+      error
+    )
+    parameter
+    error
+    (*exists in 'a t*)
+    (fun parameter error (agent_type, cv_id) (l1, s1) store_result ->
+      let error, store_result =
+        add_link error (agent_type, cv_id) s1 store_result
+      in
+      error, store_result
+    )
+    (*exists in 'b t*)
+    (fun parameter error (agent_type, cv_id) (l2, s2) store_result ->
+      let error, store_result =
+        add_link error (agent_type, cv_id) s2 store_result
+      in
+      error, store_result
+    )
+    (*exists in both*)
+    (fun parameter error (agent_type, cv_id) (l1, s1) (l2, s2) store_result ->
+      let error', union = Site_map_and_set.Set.union parameter error s1 s2 in
+      let error = Exception.check warn parameter error error' (Some "line 331") Exit in
+      let error, store_result =
+        add_link error (agent_type, cv_id) union store_result
+      in
+      error, store_result
+    )
+    store_hb_remove_map
+    store_covering_classes_modification_update
+    store_result_map
+  *)
+(************************************************************************************)
+(*compute view that has new view and new bond*)
+
+(*let compute_new_views parameter handler error
+    agent_type
+    cv_id 
+    is_new_view 
+    store_covering_classes_modification_update_full
+    wl_tl
+    store_result =
+  let error, (handler, new_wl, store_result) =
+    if is_new_view
+    then
+      let error, new_wl =
+        add_update_to_wl
+          parameter
+          error
+	  agent_type
+	  cv_id 
+          store_covering_classes_modification_update_full
+          wl_tl
+      in
+      error, (handler, new_wl, store_result)
+    (*REMARK: will be used later when changed to module and use dynamic contact map*)
+    (* begin
+       if is_new_bond
+       then
+       let error, new_wl =
+       add_update_to_wl
+       parameter
+       error
+       agent_type 
+       cv_id 
+       store_new_result_map
+       wl_tl
+       in
+       error, (handler, new_wl, store_result)
+       else
+       let error, new_wl =
+       add_update_to_wl
+       parameter
+       error
+       agent_type
+       cv_id 
+       store_covering_classes_modification_update
+       wl_tl
+       in
+       error, (handler, new_wl, store_result)
+       end*)
+    else
+      error, (handler, wl_tl, store_result)
+  in
+  error, (handler, new_wl, store_result)*)
