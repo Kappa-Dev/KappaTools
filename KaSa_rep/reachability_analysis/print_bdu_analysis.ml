@@ -29,12 +29,12 @@ let trace = false
 (************************************************************************************)
 (*MAIN PRINT*)
 
-let print_result parameter error result =
+let print_result parameter error handler_kappa compiled result =
   let parameter = Remanent_parameters.update_prefix parameter "agent_type_" in
   let _ =
     if Remanent_parameters.get_do_reachability_analysis_static parameter
     then
-      let _ = Format.printf "Reachability analysis static information ....@." in
+      let _ = Format.printf "\nReachability analysis static information ....@." in
       let parameters_cv =
         Remanent_parameters.update_prefix parameter ""
       in
@@ -42,7 +42,9 @@ let print_result parameter error result =
       then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
       print_result_static
         parameter
-        error 
+        error
+        handler_kappa
+        compiled
         result.store_bdu_analysis_static
     else error
   in
@@ -50,7 +52,7 @@ let print_result parameter error result =
   let _ =
     if  Remanent_parameters.get_do_reachability_analysis_dynamic parameter
     then
-      let _ = Format.printf "Reachability analysis dynamic information ....@." in
+      let _ = Format.printf "\nReachability analysis dynamic information ....@." in
       let parameters_cv =
         Remanent_parameters.update_prefix parameter ""
       in
@@ -59,6 +61,8 @@ let print_result parameter error result =
       print_result_dynamic
         parameter
         error
+        handler_kappa
+        compiled
         result.store_bdu_analysis_dynamic
     else error
   in
@@ -114,7 +118,7 @@ let print_bdu_update_map_cartesian parameter handler error result =
 let print_result_fixpoint parameter handler error result =
   if Remanent_parameters.get_do_reachability_analysis_result parameter
   then
-    let _ = Format.printf "Reachability analysis result ....@." in
+    let _ = Format.printf "\nReachability analysis result ....@." in
     let parameters_cv =
       Remanent_parameters.update_prefix parameter ""
     in

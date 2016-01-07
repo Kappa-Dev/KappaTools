@@ -102,7 +102,7 @@ let compute_bdu_update_side_effects parameter handler error bdu_test list_a bdu_
 (************************************************************************************)
 (*write a function add update(c) into working list*)
 
-let add_update_to_wl parameter error agent_type cv_id 
+let add_update_to_wl parameter error handler_kappa compiled agent_type cv_id 
     store_covering_classes_modification_update_full wl =
   let error, (_, s1) = 
     match Int2Map_CV_Modif.Map.find_option (agent_type, cv_id)
@@ -126,9 +126,15 @@ let add_update_to_wl parameter error agent_type cv_id
           let _ = 
             Printf.fprintf stderr "deal with agent_type:%i:covering_class_id:%i\n"
               agent_type cv_id;
-            Printf.fprintf stderr "add rule:";
+            Printf.fprintf stderr "add ";
             Site_map_and_set.Set.iter 
-	    (Printf.fprintf stderr " %i") s1;
+	    (fun rule_id ->
+              (*mapping rule_id of type int -> string*)
+              let error, rule_id_string =
+                Handler.string_of_rule parameter error handler_kappa
+                  compiled rule_id
+              in
+              Printf.fprintf stderr " (%s) " rule_id_string) s1;
             Printf.fprintf stderr " inside a working list.\n"
           in
           ())
@@ -231,6 +237,8 @@ let is_enable parameter handler error bdu_false
 (*compute view that has new view and new bond*)
 
 let compute_new_views parameter handler error
+    handler_kappa 
+    compiled
     agent_type
     cv_id 
     is_new_view 
@@ -244,6 +252,8 @@ let compute_new_views parameter handler error
         add_update_to_wl
           parameter
           error
+          handler_kappa
+          compiled
 	  agent_type
 	  cv_id 
           store_covering_classes_modification_update_full
@@ -258,7 +268,11 @@ let compute_new_views parameter handler error
 (************************************************************************************)
 (*compute views that is enabled*)
 
-let compute_views_enabled parameter handler error bdu_true bdu_false
+let compute_views_enabled parameter handler error
+    handler_kappa
+    compiled
+    bdu_true 
+    bdu_false
     rule_id
     bdu_test_map
     bdu_creation_map 
@@ -390,12 +404,13 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
                   if (Remanent_parameters.get_trace parameters_cv)
                   then
                     dump_channel parameter (fun stderr ->
-	              Printf.fprintf stderr "discovering a new views")
+	              Printf.fprintf stderr "discovering a new views.\n")
                   else ()
               end
             in
             (*print information of different views*)
             let _ =
+              let _ = Format.printf "\nReachability analysis different bdu...@." in 
               if (Remanent_parameters.get_do_reachability_analysis_diff parameter) 
               then
                 let parameters_cv =
@@ -450,6 +465,8 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
             parameter
             handler
             error
+            handler_kappa
+            compiled
 	    agent_type
 	    cv_id
             is_new_view
@@ -490,6 +507,8 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
             parameter
             handler
             error
+            handler_kappa
+            compiled
 	    agent_type
 	    cv_id 
             is_new_view
@@ -544,6 +563,8 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
             parameter
             handler
             error
+            handler_kappa
+            compiled
 	    agent_type
 	    cv_id
             is_new_view
@@ -563,6 +584,8 @@ let compute_views_enabled parameter handler error bdu_true bdu_false
 (*fixpoint iteration with/without initial state*)
 
 let collect_bdu_fixpoint_with_init parameter handler error 
+    handler_kappa
+    compiled
     bdu_true
     bdu_false
     (wl_creation:Fifo.IntWL.WSet.elt list * Fifo.IntWL.WSet.elt list *
@@ -612,6 +635,8 @@ let collect_bdu_fixpoint_with_init parameter handler error
 	add_update_to_wl 
           parameter
           error 
+          handler_kappa
+          compiled
           agent_type
           cv_id 
           store_covering_classes_modification_update_full
@@ -635,7 +660,9 @@ let collect_bdu_fixpoint_with_init parameter handler error
       | Some rule_id ->
         (*----------------------------------------------------------------------*)
         (*compute bdu_creation, bdu_test and modif_list for this rule_id*)
+        (*output of rule that is enabled*)
     	let _ = 
+          (*let _ = Format.printf "\nReachability analysis iteration...@." in *)
           if (Remanent_parameters.get_do_reachability_analysis_iteration parameter) 
           then
             let parameters_cv =
@@ -644,43 +671,55 @@ let collect_bdu_fixpoint_with_init parameter handler error
             if (Remanent_parameters.get_trace parameters_cv)
             then 
               (*mapping rule_id of type int -> string*)
-              (*let error, rule_id_string =
-                Hanlder.string_of_rule parameter error handler_kappa
+              let error, rule_id_string =
+                Handler.string_of_rule parameter error handler_kappa
                   compiled rule_id
-              in*)
+              in
               Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
             dump_channel parameter 
-              (fun stderr -> Printf.fprintf stderr "apply for rule:%i " rule_id)
+              (fun stderr -> Printf.fprintf stderr "apply for %s" rule_id_string)
           else ()
-        in
-        (*TODO: map integer to string for rule_id*)
-        
+        in       
         (*--------------------------------------------------------------------*)
         (*output of working list*)
     	let _ = 
+          (*let _ = Format.printf "\nReachability analysis working list...@." in *)
           if (Remanent_parameters.get_do_reachability_analysis_wl parameter) 
           then
             let parameters_cv =
               Remanent_parameters.update_prefix parameter ""
             in
             if (Remanent_parameters.get_trace parameters_cv)
-            then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
-            dump_channel parameter 
-              (fun stderr -> Printf.fprintf stderr "apply for rule:%i " rule_id)
+            then 
+              (*mapping rule_id of type int -> string*)
+              let error, rule_id_string =
+                Handler.string_of_rule parameter error handler_kappa
+                  compiled rule_id
+              in
+              Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
+              dump_channel parameter 
+                (fun stderr -> Printf.fprintf stderr "apply for %s" rule_id_string)
           else ()
         in
         (*--------------------------------------------------------------------*)
         (*output of different bdu*)
     	let _ = 
+          (*let _ = Format.printf "\nReachability analysis different bdu...@." in *)
           if (Remanent_parameters.get_do_reachability_analysis_diff parameter) 
           then
             let parameters_cv =
               Remanent_parameters.update_prefix parameter ""
             in
             if (Remanent_parameters.get_trace parameters_cv)
-            then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
+            then
+              (*mapping rule_id of type int -> string*)
+              let error, rule_id_string =
+                Handler.string_of_rule parameter error handler_kappa
+                  compiled rule_id
+              in
+              Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
             dump_channel parameter 
-              (fun stderr -> Printf.fprintf stderr "apply for rule:%i " rule_id)
+              (fun stderr -> Printf.fprintf stderr "apply for %s" rule_id_string)
           else ()
         in
         (*--------------------------------------------------------------------*)
@@ -735,7 +774,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
                 if (Remanent_parameters.get_trace parameters_cv)
                 then
                   dump_channel parameter 
-                    (fun stderr -> Printf.fprintf stderr "is enabled\n")
+                    (fun stderr -> Printf.fprintf stderr " is enabled\n")
                 else
                   ()
             in
@@ -745,6 +784,8 @@ let collect_bdu_fixpoint_with_init parameter handler error
                 parameter
                 handler
                 error
+                handler_kappa
+                compiled
                 bdu_true
                 bdu_false
 		rule_id 
@@ -771,7 +812,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
                 if (Remanent_parameters.get_trace parameters_cv)
                 then
                   dump_channel parameter 
-                    (fun stderr -> Printf.fprintf stderr "is disabled\n") 
+                    (fun stderr -> Printf.fprintf stderr " is disabled\n") 
                 else ()
             in
             (*-----------------------------------------------------------------------*)
@@ -785,6 +826,8 @@ let collect_bdu_fixpoint_with_init parameter handler error
 (*final fixpoint iteration*)
 
 let collect_bdu_fixpoint_map parameter handler error 
+    handler_kappa
+    compiled
     wl_creation
     store_proj_bdu_creation_restriction_map
     store_proj_modif_list_restriction_map
@@ -809,6 +852,8 @@ let collect_bdu_fixpoint_map parameter handler error
        parameter
        handler
        error
+       handler_kappa
+       compiled
        bdu_true
        bdu_false
        wl_creation

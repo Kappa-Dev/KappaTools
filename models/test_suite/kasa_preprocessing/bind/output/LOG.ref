@@ -308,6 +308,7 @@ Mapping between global identifier of sites (per agent) and local identifier of s
 Covering_class_id:0
 Global:site_type:0  => Local:site_type':1
 Local:site_type':1  => Global:site_type:0
+
 Reachability analysis static information ....
 
 ============================================================
@@ -339,54 +340,122 @@ Sites that may/must occurs in the potential partner side-effects:
 Set of rules that may modify a given site (excluding created agents):
 ------------------------------------------------------------
 agent_id:0:agent_type:0:site_type:0@set of rule_id:
-rule_id:0
-rule_id:1
-rule_id:2
+rule 0: r0
+rule 1: r0_op
+rule 2: r1
 agent_id:0:agent_type:1:site_type:0@set of rule_id:
-rule_id:3
+rule 3: r2
 agent_id:1:agent_type:1:site_type:1@set of rule_id:
-rule_id:0
-rule_id:1
+rule 0: r0
+rule 1: r0_op
 agent_id:1:agent_type:2:site_type:0@set of rule_id:
-rule_id:2
+rule 2: r1
 ------------------------------------------------------------
 Set of rules that may test a given site:
 ------------------------------------------------------------
 agent_id:0:agent_type:0:site_type:0@set of rule_id:
-rule_id:0
-rule_id:1
-rule_id:2
+rule 0: r0
+rule 1: r0_op
+rule 2: r1
 agent_id:0:agent_type:1:site_type:0@set of rule_id:
-rule_id:3
+rule 3: r2
 agent_id:0:agent_type:1:site_type:1@set of rule_id:
-rule_id:3
+rule 3: r2
 agent_id:1:agent_type:1:site_type:0@set of rule_id:
-rule_id:0
-rule_id:1
+rule 0: r0
+rule 1: r0_op
 agent_id:1:agent_type:1:site_type:1@set of rule_id:
-rule_id:0
-rule_id:1
+rule 0: r0
+rule 1: r0_op
 agent_id:1:agent_type:2:site_type:0@set of rule_id:
-rule_id:2
-rule_id:3
+rule 2: r1
+rule 3: r2
 ------------------------------------------------------------
 Set of rules that may test and modify a given site (excluding created agents):
 ------------------------------------------------------------
 agent_id:0:agent_type:0:site_type:0@set of rule_id:
-rule_id:0
-rule_id:1
-rule_id:2
+rule 0: r0
+rule 1: r0_op
+rule 2: r1
 agent_id:0:agent_type:1:site_type:0@set of rule_id:
-rule_id:3
+rule 3: r2
 agent_id:0:agent_type:1:site_type:1@set of rule_id:
-rule_id:3
+rule 3: r2
 agent_id:1:agent_type:1:site_type:0@set of rule_id:
-rule_id:0
-rule_id:1
+rule 0: r0
+rule 1: r0_op
 agent_id:1:agent_type:1:site_type:1@set of rule_id:
-rule_id:0
-rule_id:1
+rule 0: r0
+rule 1: r0_op
 agent_id:1:agent_type:2:site_type:0@set of rule_id:
-rule_id:2
-rule_id:3
+rule 2: r1
+rule 3: r2
+
+Reachability analysis dynamic information ....
+
+============================================================
+* BDU Analysis:
+============================================================
+
+** Dynamic information:
+
+------------------------------------------------------------
+(Full) Contact map and initital state:
+------------------------------------------------------------
+Sites are annotated with the id of binding type:
+agent_type:0@site_type:0:state:1--agent_type':1@site_type':1:state':1
+agent_type:0@site_type:0:state:2--agent_type':2@site_type':0:state':1
+agent_type:1@site_type:1:state:1--agent_type':0@site_type':0:state':1
+agent_type:2@site_type:0:state:1--agent_type':0@site_type':0:state':2
+
+------------------------------------------------------------
+(Syntactic) Contact map and initital state:
+------------------------------------------------------------
+Sites are annotated with the id of binding type:
+agent_type:0@site_type:0:state:1--agent_type':1@site_type':1:state':1
+agent_type:0@site_type:0:state:2--agent_type':2@site_type':0:state':1
+
+------------------------------------------------------------
+List of rules to awake when the state of a site is modified and tested:
+------------------------------------------------------------
+agent_type:0:covering_class_id:0:@set of rule_id:
+rule 0: r0
+rule 1: r0_op
+rule 2: r1
+agent_type:1:covering_class_id:0:@set of rule_id:
+rule 0: r0
+rule 1: r0_op
+rule 3: r2
+agent_type:2:covering_class_id:0:@set of rule_id:
+rule 2: r1
+rule 3: r2
+
+------------------------------------------------------------
+List of rules to awake when the state of a site is modified and tested and side effects:
+------------------------------------------------------------
+
+------------------------------------------------------------
+Final list of rules to awake when the state of a site is modified and tested and side effects:
+------------------------------------------------------------
+agent_type:0:covering_class_id:0:@set of rule_id:
+rule 0: r0
+rule 1: r0_op
+rule 2: r1
+agent_type:1:covering_class_id:0:@set of rule_id:
+rule 0: r0
+rule 1: r0_op
+rule 3: r2
+agent_type:2:covering_class_id:0:@set of rule_id:
+rule 2: r1
+rule 3: r2
+
+Reachability analysis result ....
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Cartesian abstraction:
+------------------------------------------------------------
 execution finished without any exception

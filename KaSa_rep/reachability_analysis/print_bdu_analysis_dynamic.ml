@@ -109,7 +109,7 @@ let print_contact_map_full parameter error result =
 (************************************************************************************)
 (*update (c) function*)
 
-let print_covering_classes_modification_aux parameter error result =
+let print_covering_classes_modification_aux parameter error handler_kappa compiled result =
   Int2Map_CV_Modif.Map.iter
     ( fun (x, y) (_, s2) ->
       let _ =
@@ -118,11 +118,16 @@ let print_covering_classes_modification_aux parameter error result =
       in
       Site_map_and_set.Set.iter
         (fun rule_id ->
-          fprintf parameter.log "rule_id:%i\n" rule_id
+        (*mapping rule_id of type int to string*)
+          let error, rule_id_string =
+            Handler.string_of_rule parameter error handler_kappa
+              compiled rule_id
+          in
+          fprintf parameter.log "%s\n" rule_id_string
         ) s2
     ) result
 
-let print_covering_classes_modification parameter error result =
+let print_covering_classes_modification parameter error handler_kappa compiled result =
   fprintf (Remanent_parameters.get_log parameter)
     "\n------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
@@ -132,12 +137,14 @@ let print_covering_classes_modification parameter error result =
   print_covering_classes_modification_aux
     parameter
     error
+    handler_kappa
+    compiled
     result
     
 (************************************************************************************)
 (*update(c'), when discovered a bond for the first time*)
 
-let print_covering_classes_side_effects parameter error result =
+let print_covering_classes_side_effects parameter error handler_kappa compiled result =
   fprintf (Remanent_parameters.get_log parameter)
     "\n------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
@@ -147,12 +154,14 @@ let print_covering_classes_side_effects parameter error result =
   print_covering_classes_modification_aux
     parameter
     error
+    handler_kappa
+    compiled
     result
 
 (************************************************************************************)
 (*Final update function*)
 
-let print_covering_classes_update_full parameter error result =
+let print_covering_classes_update_full parameter error handler_kappa compiled result =
   fprintf (Remanent_parameters.get_log parameter)
     "\n------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
@@ -162,12 +171,14 @@ let print_covering_classes_update_full parameter error result =
   print_covering_classes_modification_aux
     parameter
     error
+    handler_kappa
+    compiled
     result
 
 (************************************************************************************)
 (*main print*)
 
-let print_result_dynamic parameter error result =
+let print_result_dynamic parameter error handler_kappa compiled result =
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "============================================================\n";
@@ -195,6 +206,8 @@ let print_result_dynamic parameter error result =
       print_covering_classes_modification
         parameter
         error
+        handler_kappa
+        compiled
         result.store_covering_classes_modification_update
     in
     (*------------------------------------------------------------------------------*)
@@ -202,6 +215,8 @@ let print_result_dynamic parameter error result =
       print_covering_classes_side_effects
         parameter
         error
+        handler_kappa
+        compiled
         result.store_covering_classes_modification_side_effects
     in
     (*------------------------------------------------------------------------------*)
@@ -209,6 +224,8 @@ let print_result_dynamic parameter error result =
       print_covering_classes_update_full
         parameter
         error
+        handler_kappa
+        compiled
         result.store_covering_classes_modification_update_full
     in
     error

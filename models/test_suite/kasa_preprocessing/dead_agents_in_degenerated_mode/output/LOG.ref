@@ -402,6 +402,7 @@ Mapping between global identifier of sites (per agent) and local identifier of s
 Covering_class_id:0
 Global:site_type:0  => Local:site_type':1
 Local:site_type':1  => Global:site_type:0
+
 Reachability analysis static information ....
 
 ============================================================
@@ -429,50 +430,342 @@ Sites that may/must occurs in the potential partner side-effects:
 Set of rules that may modify a given site (excluding created agents):
 ------------------------------------------------------------
 agent_id:0:agent_type:0:site_type:0@set of rule_id:
-rule_id:0
-rule_id:3
-rule_id:4
-rule_id:5
-rule_id:6
-rule_id:7
+rule 0
+rule 3
+rule 4
+rule 5
+rule 6
+rule 7
 agent_id:0:agent_type:1:site_type:0@set of rule_id:
-rule_id:1
-rule_id:2
+rule 1
+rule 2
 agent_id:1:agent_type:0:site_type:0@set of rule_id:
-rule_id:8
-rule_id:9
+rule 8
+rule 9
 agent_id:1:agent_type:1:site_type:0@set of rule_id:
-rule_id:0
+rule 0
 ------------------------------------------------------------
 Set of rules that may test a given site:
 ------------------------------------------------------------
 agent_id:0:agent_type:0:site_type:0@set of rule_id:
-rule_id:3
-rule_id:4
-rule_id:5
-rule_id:6
-rule_id:7
+rule 3
+rule 4
+rule 5
+rule 6
+rule 7
 agent_id:0:agent_type:1:site_type:0@set of rule_id:
-rule_id:1
-rule_id:2
+rule 1
+rule 2
 agent_id:1:agent_type:1:site_type:0@set of rule_id:
-rule_id:0
+rule 0
 ------------------------------------------------------------
 Set of rules that may test and modify a given site (excluding created agents):
 ------------------------------------------------------------
 agent_id:0:agent_type:0:site_type:0@set of rule_id:
-rule_id:0
-rule_id:3
-rule_id:4
-rule_id:5
-rule_id:6
-rule_id:7
+rule 0
+rule 3
+rule 4
+rule 5
+rule 6
+rule 7
 agent_id:0:agent_type:1:site_type:0@set of rule_id:
-rule_id:1
-rule_id:2
+rule 1
+rule 2
 agent_id:1:agent_type:0:site_type:0@set of rule_id:
-rule_id:8
-rule_id:9
+rule 8
+rule 9
 agent_id:1:agent_type:1:site_type:0@set of rule_id:
-rule_id:0
+rule 0
+
+Reachability analysis dynamic information ....
+
+============================================================
+* BDU Analysis:
+============================================================
+
+** Dynamic information:
+
+------------------------------------------------------------
+(Full) Contact map and initital state:
+------------------------------------------------------------
+Sites are annotated with the id of binding type:
+
+------------------------------------------------------------
+(Syntactic) Contact map and initital state:
+------------------------------------------------------------
+Sites are annotated with the id of binding type:
+
+------------------------------------------------------------
+List of rules to awake when the state of a site is modified and tested:
+------------------------------------------------------------
+agent_type:0:covering_class_id:0:@set of rule_id:
+rule 0
+rule 3
+rule 4
+rule 5
+rule 6
+rule 7
+rule 8
+rule 9
+agent_type:1:covering_class_id:0:@set of rule_id:
+rule 0
+rule 1
+rule 2
+
+------------------------------------------------------------
+List of rules to awake when the state of a site is modified and tested and side effects:
+------------------------------------------------------------
+
+------------------------------------------------------------
+Final list of rules to awake when the state of a site is modified and tested and side effects:
+------------------------------------------------------------
+agent_type:0:covering_class_id:0:@set of rule_id:
+rule 0
+rule 3
+rule 4
+rule 5
+rule 6
+rule 7
+rule 8
+rule 9
+agent_type:1:covering_class_id:0:@set of rule_id:
+rule 0
+rule 1
+rule 2
+
+deal with agent_type:0:covering_class_id:0
+add  (rule 0)  (rule 3)  (rule 4)  (rule 5)  (rule 6)  (rule 7)  (rule 8)  (rule 9)  inside a working list.
+
+deal with agent_type:1:covering_class_id:0
+add  (rule 0)  (rule 1)  (rule 2)  inside a working list.
+
+apply for rule 8
+apply for rule 8
+apply for rule 8 is enabled
+
+apply for rule 9
+apply for rule 9
+apply for rule 9 is enabled
+
+apply for rule 0
+apply for rule 0
+apply for rule 0 is enabled
+
+at agent_id:0:agent_type:0:covering_classes_id:0
+
+at agent_id:0:agent_type:0:covering_classes_id:0
+nothing has changed
+nothing has changed
+
+at agent_id:1:agent_type:1:covering_classes_id:0
+
+at agent_id:1:agent_type:1:covering_classes_id:0
+discovering a new views.
+
+Reachability analysis different bdu...
+discovering a new views:
+Id=5
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+
+deal with agent_type:1:covering_class_id:0
+add  (rule 0)  (rule 1)  (rule 2)  inside a working list.
+
+apply for rule 3
+apply for rule 3
+apply for rule 3 is enabled
+
+at agent_id:0:agent_type:0:covering_classes_id:0
+
+at agent_id:0:agent_type:0:covering_classes_id:0
+discovering a new views.
+
+Reachability analysis different bdu...
+discovering a new views:
+Id=5
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+
+deal with agent_type:0:covering_class_id:0
+add  (rule 0)  (rule 3)  (rule 4)  (rule 5)  (rule 6)  (rule 7)  (rule 8)  (rule 9)  inside a working list.
+
+apply for rule 4
+apply for rule 4
+apply for rule 4 is enabled
+
+at agent_id:0:agent_type:0:covering_classes_id:0
+
+at agent_id:0:agent_type:0:covering_classes_id:0
+nothing has changed
+nothing has changed
+
+apply for rule 5
+apply for rule 5
+apply for rule 5 is enabled
+
+at agent_id:0:agent_type:0:covering_classes_id:0
+
+at agent_id:0:agent_type:0:covering_classes_id:0
+nothing has changed
+nothing has changed
+
+apply for rule 6
+apply for rule 6
+apply for rule 6 is enabled
+
+at agent_id:0:agent_type:0:covering_classes_id:0
+
+at agent_id:0:agent_type:0:covering_classes_id:0
+nothing has changed
+nothing has changed
+
+apply for rule 7
+apply for rule 7
+apply for rule 7 is enabled
+
+at agent_id:0:agent_type:0:covering_classes_id:0
+
+at agent_id:0:agent_type:0:covering_classes_id:0
+nothing has changed
+nothing has changed
+
+apply for rule 1
+apply for rule 1
+apply for rule 1 is enabled
+
+at agent_id:0:agent_type:1:covering_classes_id:0
+
+at agent_id:0:agent_type:1:covering_classes_id:0
+nothing has changed
+nothing has changed
+
+apply for rule 2
+apply for rule 2
+apply for rule 2 is enabled
+
+at agent_id:0:agent_type:1:covering_classes_id:0
+
+at agent_id:0:agent_type:1:covering_classes_id:0
+nothing has changed
+nothing has changed
+
+apply for rule 0
+apply for rule 0
+apply for rule 0 is enabled
+
+at agent_id:0:agent_type:0:covering_classes_id:0
+
+at agent_id:0:agent_type:0:covering_classes_id:0
+nothing has changed
+nothing has changed
+
+at agent_id:1:agent_type:1:covering_classes_id:0
+
+at agent_id:1:agent_type:1:covering_classes_id:0
+nothing has changed
+nothing has changed
+
+apply for rule 3
+apply for rule 3
+apply for rule 3 is enabled
+
+at agent_id:0:agent_type:0:covering_classes_id:0
+
+at agent_id:0:agent_type:0:covering_classes_id:0
+nothing has changed
+nothing has changed
+
+apply for rule 8
+apply for rule 8
+apply for rule 8 is enabled
+
+apply for rule 9
+apply for rule 9
+apply for rule 9 is enabled
+
+Reachability analysis result ....
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+agent_type:0:cv_id:0
+Id=6
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_type:1:cv_id:0
+Id=6
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+
+------------------------------------------------------------
+* Cartesian abstraction:
+------------------------------------------------------------
+agent_type:0:cv_id:0
+Id=6
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+agent_type:1:cv_id:0
+Id=6
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
 execution finished without any exception

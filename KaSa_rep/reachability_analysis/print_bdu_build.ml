@@ -366,39 +366,3 @@ let print_bdu_build parameter error result =
       result.store_proj_bdu_views
   in
   error
-
-(************************************************************************************)
-(*print only working list of creation*)
-
-let print_bdu_build_wl parameter error result =
-   let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "\n------------------------------------------------------------\n";
-     fprintf (Remanent_parameters.get_log parameter)
-      "- Working list of list of rules that may created a given site:\n";
-    print_wl_creation
-      parameter
-      result.store_wl_creation
-   in
-   (*print this if one wants to debug*)
-   (*let _ =
-     fprintf (Remanent_parameters.get_log parameter)
-       "\n------------------------------------------------------------\n";
-     fprintf (Remanent_parameters.get_log parameter)
-       "- Bdu for the valuations of the views that are created (per rule, agent and covering class):\n\n";
-     print_creation_bdu_map
-       parameter
-       error
-       result.store_bdu_creation_restriction_map
-   in*)
-   (*let _ =
-     fprintf (Remanent_parameters.get_log parameter)
-       "\n------------------------------------------------------------\n";
-     fprintf (Remanent_parameters.get_log parameter)
-       "- Bdu for the valuations of the views that are initial (per rule, agent and covering class):\n\n";
-     print_init_bdu_map
-       parameter
-       error
-       result.store_bdu_init_restriction_map
-   in*)
-   error

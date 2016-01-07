@@ -111,7 +111,7 @@ let print_covering_classes_id_string parameter error result =
 (************************************************************************************)
 (*side effects*)
 
-let print_half_break_effect parameter error result =
+let print_half_break_effect parameter error handler_kappa compiled result =
   Int2Map_HalfBreak_effect.Map.iter
     ( fun (x, y) (l1, l2) ->
       if l1 <> []
@@ -138,11 +138,17 @@ let print_half_break_effect parameter error result =
           "agent_type:%i:site_type:%i@list of pair (rule_id, binding state):\n"
           x y
       in
-      List.iter (fun (r, s) -> fprintf parameter.log "(rule_id:%i * state:%i)\n"
-        r s) l2
+      List.iter (fun (rule_id, s) -> 
+        (*mapping rule_id of type int to string*)
+        let error, rule_id_string =
+          Handler.string_of_rule parameter error handler_kappa
+            compiled rule_id
+        in
+        fprintf parameter.log "(%s * state:%i)\n"
+          rule_id_string s) l2
     ) result
 
-let print_remove_effect parameter error result =
+let print_remove_effect parameter error handler_kappa compiled result =
   Int2Map_Remove_effect.Map.iter
     ( fun (x, y) (l1, l2) ->
       if l1 <> []
@@ -169,24 +175,33 @@ let print_remove_effect parameter error result =
           "agent_type:%i:site_type:%i@list of pair (rule_id, binding state):\n"
           x y
       in
-      List.iter (fun r -> fprintf parameter.log "(rule_id:%i * state:no_information)\n"
-        r) l2
+      List.iter (fun r ->
+        let error, rule_id_string =
+          Handler.string_of_rule parameter error handler_kappa
+            compiled r
+        in
+        fprintf parameter.log "(%s * state:no_information)\n" rule_id_string
+      ) l2
     ) result
 
-let print_side_effects_aux parameter error result =
+let print_side_effects_aux parameter error handler_kappa compiled result =
   let result_half_break, result_remove = result in
   let _ =
     print_half_break_effect
       parameter
       error
+      handler_kappa
+      compiled
       result_half_break
   in
   print_remove_effect
     parameter
-    error 
+    error
+    handler_kappa
+    compiled
     result_remove
 
-let print_side_effects parameter error result =
+let print_side_effects parameter error handler_kappa compiled result =
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter) 
@@ -197,6 +212,8 @@ let print_side_effects parameter error result =
     print_side_effects_aux
       parameter
       error 
+      handler_kappa
+      compiled
       result
   in
   error
@@ -204,31 +221,39 @@ let print_side_effects parameter error result =
 (************************************************************************************)
 (*Potential partner side-effects*)
 
-let print_potential_partner_free parameter error result =
+let print_potential_partner_free parameter error handler_kappa compiled result =
   Int2Map_potential_effect.Map.iter 
     (fun (agent_type, rule_id) l ->
+      let error, rule_id_string =
+        Handler.string_of_rule parameter error handler_kappa
+          compiled rule_id
+      in
       let _ =
-        fprintf stdout "agent_type:%i:rule_id:%i@(site, free state)\n"
-          agent_type rule_id
+        fprintf stdout "agent_type:%i:%s@(site, free state)\n"
+          agent_type rule_id_string
       in
       List.iter (fun (site, state) ->
         fprintf stdout "(site_type:%i * state:%i)\n" site state
       ) l
     ) result
 
-let print_potential_partner_bind parameter error result =
+let print_potential_partner_bind parameter error handler_kappa compiled result =
   Int2Map_potential_effect.Map.iter 
     (fun (agent_type, rule_id) l ->
+      let error, rule_id_string =
+        Handler.string_of_rule parameter error handler_kappa
+          compiled rule_id
+      in
       let _ =
-        fprintf stdout "agent_type:%i:rule_id:%i@(site, binding state)\n"
-          agent_type rule_id
+        fprintf stdout "agent_type:%i:%s@(site, binding state)\n"
+          agent_type rule_id_string
       in
       List.iter (fun (site, state) ->
         fprintf stdout "(site_type:%i * state:%i)\n" site state
       ) l
     ) result
 
-let print_potential_side_effects parameter error result =
+let print_potential_side_effects parameter error handler_kappa compiled result =
   let result1, result2 = result in
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
@@ -241,12 +266,16 @@ let print_potential_side_effects parameter error result =
     print_potential_partner_free
       parameter
       error 
+      handler_kappa
+      compiled
       result1
   in
   fprintf stdout "- Potential partner has site that is bind:\n";
   print_potential_partner_bind
     parameter
     error
+    handler_kappa
+    compiled
     result2
 
 (************************************************************************************)
@@ -254,7 +283,7 @@ let print_potential_side_effects parameter error result =
 
 (*with agent_id*)
 
-let print_modification_sites_aux parameter error result =
+let print_modification_sites_aux parameter error handler_kappa compiled result =
   Int2Map_Modif.Map.iter
     ( fun (x, y, z) (l1, s2) ->
       if l1 <> []
@@ -282,11 +311,15 @@ let print_modification_sites_aux parameter error result =
       in
       Site_map_and_set.Set.iter
         (fun rule_id ->
-          fprintf parameter.log "rule_id:%i\n" rule_id
+          let error, rule_id_string =
+            Handler.string_of_rule parameter error handler_kappa
+              compiled rule_id
+          in
+          fprintf parameter.log "%s\n" rule_id_string
         ) s2
     ) result
 
-let print_modification_sites parameter error result =
+let print_modification_sites parameter error handler_kappa compiled result =
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
@@ -297,12 +330,14 @@ let print_modification_sites parameter error result =
     print_modification_sites_aux
       parameter
       error
+      handler_kappa
+      compiled
       result
   in
   error
 
 (*without agent_id*)
-let print_modification_map_aux parameter error result =
+let print_modification_map_aux parameter error handler_kappa compiled result =
   Int2Map_Test_Modif.Map.iter
     ( fun (x, y) (l1, s2) ->
       if l1 <> []
@@ -326,15 +361,19 @@ let print_modification_map_aux parameter error result =
       else ();
       let _ =
         fprintf parameter.log 
-          "agent_type:%i:site_type:%i@set of rule_id:\n" x y
+          "agent_type:%i:site_type:%i@set of rules:\n" x y
       in
       Site_map_and_set.Set.iter
         (fun rule_id ->
-          fprintf parameter.log "rule_id:%i\n" rule_id
+          let error, rule_id_string =
+            Handler.string_of_rule parameter error handler_kappa
+              compiled rule_id
+          in
+          fprintf parameter.log "%s\n" rule_id_string
         ) s2
     ) result
 
-let print_modification_map parameter error result =
+let print_modification_map parameter error handler_kappa compiled result =
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
@@ -345,6 +384,8 @@ let print_modification_map parameter error result =
     print_modification_map_aux
       parameter
       error
+      handler_kappa
+      compiled
       result
   in
   error
@@ -353,7 +394,7 @@ let print_modification_map parameter error result =
 (*valuation of the views that are tested*)
 
 (*with agent_id*)
-let print_test_sites parameter error result =
+let print_test_sites parameter error handler_kappa compiled result =
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
@@ -364,12 +405,14 @@ let print_test_sites parameter error result =
     print_modification_sites_aux 
       parameter
       error
+      handler_kappa
+      compiled
       result
   in
   error
 
 (*without agent_id*)
-let print_test_map parameter error result =
+let print_test_map parameter error handler_kappa compiled result =
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
@@ -380,6 +423,8 @@ let print_test_map parameter error result =
     print_modification_map_aux 
       parameter
       error
+      handler_kappa
+      compiled
       result
   in
   error
@@ -388,7 +433,7 @@ let print_test_map parameter error result =
 (*update and valuations of the views that are tested and modified.*)
 
 (*with agent_id*)
-let print_test_modification_sites parameter error result =
+let print_test_modification_sites parameter error handler_kappa compiled result =
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
@@ -399,13 +444,15 @@ let print_test_modification_sites parameter error result =
     print_modification_sites_aux
       parameter
       error
+      handler_kappa
+      compiled
       result
   in
   error
 
 (*without agent_id*)
 
-let print_test_modification_map parameter error result =
+let print_test_modification_map parameter error handler_kappa compiled result =
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
@@ -416,6 +463,8 @@ let print_test_modification_map parameter error result =
     print_modification_map_aux
       parameter
       error
+      handler_kappa
+      compiled
       result
   in
   error
@@ -423,7 +472,7 @@ let print_test_modification_map parameter error result =
 (************************************************************************************)
 (*main print*)
 
-let print_result_static parameter error result =
+let print_result_static parameter error handler_kappa compiled result =
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "============================================================\n";
@@ -450,49 +499,65 @@ let print_result_static parameter error result =
     print_side_effects 
       parameter 
       error 
+      handler_kappa
+      compiled
       result.store_side_effects
   in
   let _ =
     print_potential_side_effects
       parameter
       error
+      handler_kappa
+      compiled
       result.store_potential_side_effects
   in
   let _ =
     print_modification_sites 
       parameter
-      error 
+      error
+      handler_kappa
+      compiled
       result.store_modification_sites
   in
   let _ =
     print_test_sites
       parameter
-      error 
+      error
+      handler_kappa
+      compiled
       result.store_test_sites
   in
   let _ =
     print_test_modification_sites
       parameter
-      error 
+      error
+      handler_kappa
+      compiled
       result.store_test_modification_sites
   in
   (*print if one wants to debug*)
   (*let _ =
     print_modification_map
       parameter
-      error 
+      error
+    handler_kappa
+    compiled
       result.store_modif_map
   in*)
   (*let _ =
     print_test_map
       parameter
       error 
+    handler_kappa
+    compiled
       result.store_test_map
   in*)
  (*let _ =
     print_test_modification_map
       parameter
       error 
+   handler_kappa
+   compiled
       result.store_test_modif_map
   in*)
   error

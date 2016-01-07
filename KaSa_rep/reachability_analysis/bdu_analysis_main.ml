@@ -546,7 +546,7 @@ let scan_rule_set parameter handler_bdu error handler_kappa compil store_coverin
 (************************************************************************************)
 (*MAIN*)
 
-let bdu_main parameter error handler_kappa store_covering_classes cc_compil =
+let bdu_main parameter error handler_kappa store_covering_classes compiled =
   let error,handler_bdu = Boolean_mvbdu.init_remanent parameter error in
   let error, (handler_bdu, result) =
     scan_rule_set
@@ -554,15 +554,15 @@ let bdu_main parameter error handler_kappa store_covering_classes cc_compil =
       handler_bdu
       error 
       handler_kappa 
-      cc_compil
+      compiled
       store_covering_classes
-      cc_compil.rules 
+      compiled.rules 
   in
   (*-------------------------------------------------------------------------------*)
   (* Static information before fixpoint computation *)
   let error = 
     if  (Remanent_parameters.get_trace parameter) || trace
-    then print_result parameter error result
+    then print_result parameter error handler_kappa compiled result
     else error
   in
   (*-------------------------------------------------------------------------------*)
@@ -573,6 +573,8 @@ let bdu_main parameter error handler_kappa store_covering_classes cc_compil =
       parameter
       handler_bdu
       error
+      handler_kappa
+      compiled
       result.store_bdu_build.store_wl_creation
       result.store_bdu_build.store_proj_bdu_creation_restriction_map
       result.store_bdu_build.store_proj_modif_list_restriction_map
