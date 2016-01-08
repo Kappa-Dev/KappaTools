@@ -50,6 +50,9 @@ module type Mvbdu =
     val build_reverse_sorted_variables_list: (int list,hconsed_variables_list) unary
     val empty_variables_list: hconsed_variables_list constant
     
+    val overwrite_association_lists: (hconsed_association_list,hconsed_association_list,hconsed_association_list) binary
+    val merge_variables_lists: (hconsed_variables_list,hconsed_variables_list,hconsed_variables_list) binary
+      
     val print: out_channel -> string -> mvbdu -> unit
     val print_association_list: out_channel -> string -> hconsed_association_list -> unit 
     val print_variables_list: out_channel -> string -> hconsed_variables_list -> unit
@@ -100,10 +103,17 @@ module type Internalized_mvbdu =
     val build_sorted_variables_list: int list -> hconsed_variables_list
     val build_reverse_sorted_variables_list: int list -> hconsed_variables_list
     val empty_variables_list : unit -> hconsed_variables_list
+      
+    val overwrite_association_lists: hconsed_association_list -> hconsed_association_list -> hconsed_association_list
+    val merge_variables_lists: hconsed_variables_list -> hconsed_variables_list -> hconsed_variables_list 
+
 
     val print: out_channel -> string -> mvbdu -> unit
     val print_association_list: out_channel -> string -> hconsed_association_list -> unit 
     val print_variables_list: out_channel -> string -> hconsed_variables_list -> unit
+    
+   
+
 end
 
 
@@ -230,6 +240,30 @@ module Make (M:Nul)  =
         in 
 	error, handler, a
 
+    let lift2four string f parameters handler error a b = 
+      match 
+	f parameters error  parameters handler a b
+      with 
+      | error,(handler,Some a) -> error,handler,a 
+      | error,(handler,None) -> 
+        let error, a =
+          Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> a) 
+        in 
+	error, handler, a
+
+    let lift2five string f parameters handler error a b = 
+      match 
+	f parameters error  parameters handler a b
+      with 
+      | error,(handler,Some a) -> error,handler,a 
+      | error,(handler,None) -> 
+        let error, a =
+          Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> a) 
+        in 
+	error, handler, a
+
+	  
+
     let (mvbdu_not: (mvbdu,mvbdu) unary) = lift1 "line 80, bdd_not" Boolean_mvbdu.boolean_mvbdu_not
 
     let mvbdu_id parameters handler error a = error, handler, a
@@ -295,6 +329,13 @@ module Make (M:Nul)  =
 	  let error,handler,tail = mvbdu_clean_head parameters error handler bdu in 
 	  aux error handler tail (head::list)
       in aux error handler bdu []
+
+    let merge_variables_lists parameters handler error l1 l2 =
+      lift2four "line 332" Boolean_mvbdu.merge_variables_lists parameters handler error l1 l2
+
+    let overwrite_association_lists parameters handler error l1 l2 =
+      lift2five "line 335" Boolean_mvbdu.overwrite_association_lists parameters handler error l1 l2
+
   end: Mvbdu)
 
 module Internalize(M:Mvbdu) = 
@@ -385,6 +426,20 @@ module Internalize(M:Mvbdu) =
       let _ = check s error error' handler in 
       mvbdu
 
+    let lift_binary''' s f x y =
+      let error = Exception.empty_error_handler in 
+      let error',handler = get_handler s error in 
+      let error',handler,mvbdu = f !parameter handler error' x y in 
+      let _ = check s error error' handler in 
+      mvbdu
+
+    let lift_binary'''' s f x y =
+      let error = Exception.empty_error_handler in 
+      let error',handler = get_handler s error in 
+      let error',handler,mvbdu = f !parameter handler error' x y in 
+      let _ = check s error error' handler in 
+      mvbdu
+
     let mvbdu_and = lift_binary "line 243, mvbdu_and" M.mvbdu_and
     let mvbdu_or  = lift_binary "line 244, mvbdu_or" M.mvbdu_or
     let mvbdu_nand = lift_binary "line 245, mvbdu_nand" M.mvbdu_nand
@@ -415,6 +470,13 @@ module Internalize(M:Mvbdu) =
     let build_reverse_sorted_variables_list = lift_unary "line 299" M.build_reverse_sorted_variables_list 
     let empty_variables_list () = build_variables_list []
 
+    let merge_variables_lists l1 l2 =
+      lift_binary''' "line 472" 
+	M.merge_variables_lists 
+	l1 l2
+
+    let overwrite_association_lists l1 l2 =
+      lift_binary'''' "line 475" M.overwrite_association_lists l1 l2
 
 
     let mvbdu_cartesian_abstraction = lift_unary "line 349" M.mvbdu_cartesian_abstraction 
@@ -500,6 +562,8 @@ module Optimize(M:Mvbdu) =
 	     let empty_association_list = M.empty_association_list
 	     let empty_variables_list = M.empty_variables_list
 
+	     let merge_variables_lists = M.merge_variables_lists
+	     let overwrite_association_lists = M.overwrite_association_lists
 	     let print = M.print 
 	     let print_association_list = M.print_association_list
 	     let print_variables_list = M.print_variables_list
@@ -549,6 +613,8 @@ module Optimize'(M:Internalized_mvbdu) =
 	     let build_reverse_sorted_variables_list = M.build_reverse_sorted_variables_list 
 	     let empty_variables_list = M.empty_variables_list
              let empty_association_list = M.empty_association_list
+	     let merge_variables_lists = M.merge_variables_lists
+	     let overwrite_association_lists = M.overwrite_association_lists
 	     let print = M.print
 	     let print_association_list = M.print_association_list
 	     let print_variables_list = M.print_variables_list

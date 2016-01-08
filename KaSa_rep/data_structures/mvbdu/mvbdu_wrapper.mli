@@ -39,6 +39,7 @@ module type Mvbdu =
     val mvbdu_project_keep_only: (mvbdu,hconsed_variables_list,mvbdu) binary
     val mvbdu_project_abstract_away: (mvbdu,hconsed_variables_list,mvbdu) binary
     val mvbdu_cartesian_abstraction: (mvbdu,mvbdu list) unary 
+
     val build_association_list: ((int * int) list,hconsed_association_list) unary  
     val build_sorted_association_list: ((int * int) list,hconsed_association_list) unary
     val build_reverse_sorted_association_list: ((int * int) list,hconsed_association_list) unary
@@ -47,6 +48,10 @@ module type Mvbdu =
     val build_sorted_variables_list: (int list,hconsed_variables_list) unary
     val build_reverse_sorted_variables_list: (int list,hconsed_variables_list) unary
     val empty_variables_list: hconsed_variables_list constant
+    
+    val overwrite_association_lists: (hconsed_association_list,hconsed_association_list,hconsed_association_list) binary
+    val merge_variables_lists: (hconsed_variables_list,hconsed_variables_list,hconsed_variables_list) binary
+      
     val print: out_channel -> string -> mvbdu -> unit 
     val print_association_list: out_channel -> string -> hconsed_association_list -> unit 
     val print_variables_list: out_channel -> string -> hconsed_variables_list -> unit
@@ -94,7 +99,8 @@ module type Internalized_mvbdu =
     val build_sorted_variables_list: int list -> hconsed_variables_list
     val build_reverse_sorted_variables_list: int list -> hconsed_variables_list
     val empty_variables_list : unit -> hconsed_variables_list
-
+    val overwrite_association_lists: hconsed_association_list -> hconsed_association_list -> hconsed_association_list
+    val merge_variables_lists: hconsed_variables_list -> hconsed_variables_list -> hconsed_variables_list 
 
     val print: out_channel -> string -> mvbdu -> unit 
     val print_association_list: out_channel -> string -> hconsed_association_list -> unit 

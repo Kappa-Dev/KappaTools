@@ -148,24 +148,36 @@ let rec overwrite allocate get set error parameters handler list1 list2 =
 	      in 
 	      match tail with 
 	      | Some tail -> 
-		error,
-		(handler,
-		 List_core.build_list 
-		   allocate   
-		   error 
-		   handler 
-		   (List_sig.Cons 
-		      {
-			List_sig.variable = var;
-		       List_sig.association = asso;
-		       List_sig.tail = tail.List_sig.id
-		      })
-		   (List_sig.Cons 
-		      {
-			List_sig.variable = var;
-			List_sig.association = asso;
-			List_sig.tail = tail
-		      }))
+		let error,output =  
+		  List_core.build_list 
+		    allocate   
+		    error 
+		    handler 
+		    (List_sig.Cons 
+		       {
+			 List_sig.variable = var;
+			 List_sig.association = asso;
+			 List_sig.tail = tail.List_sig.id
+		       })
+		    (List_sig.Cons 
+		       {
+			 List_sig.variable = var;
+			 List_sig.association = asso;
+			 List_sig.tail = tail
+		       })
+		in
+		begin 
+		  match output with 
+		  | Some (key,cell,list,handler) -> error,(handler,list)
+		  | None -> 
+		    invalid_arg 
+		      parameters 
+		      error 
+		      (Some "Line 172") 
+		      Exit 
+		      (handler,{List_sig.id = 0;
+				List_sig.value = List_sig.Empty})
+		end
 	      | None -> 
 		 invalid_arg parameters error (Some "171") Exit
 		   (handler,

@@ -744,6 +744,37 @@ let project_abstract_away parameters error handler mvbdu_input list_input =
       {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_project_abstract_away = x}})  
     parameters error handler mvbdu_input list_input
 
+let merge_variables_lists parameters error handler list1 list2 = 
+  List_algebra.overwrite 
+    (variables_list_allocate parameters)
+    (fun parameter error handler (x1,x2) -> 
+      let error,output = Hash_2.get parameter error (x1.List_sig.id,x2.List_sig.id) handler.Memo_sig.data.boolean_mvbdu_merge_variables_lists in 
+      error,(handler,output))
+    (fun parameter error handler (x1,x2) output -> 
+      let error,memo = Hash_2.set parameter error (x1.List_sig.id,x2.List_sig.id) output handler.Memo_sig.data.boolean_mvbdu_merge_variables_lists in 
+      error,
+      {handler 
+       with Memo_sig.data = 
+	  {handler.Memo_sig.data with boolean_mvbdu_merge_variables_lists = memo}})
+    error handler
+    list1
+    list2
+
+let overwrite_association_lists parameters error handler list1 list2 =
+  List_algebra.overwrite 
+    (association_list_allocate parameters)
+    (fun parameter error handler (x1,x2) -> 
+      let error,output = Hash_2.get parameter error (x1.List_sig.id,x2.List_sig.id) handler.Memo_sig.data.boolean_mvbdu_overwrite_association_lists in 
+      error,(handler,output))
+    (fun parameter error handler (x1,x2) output -> 
+      let error,memo = Hash_2.set parameter error (x1.List_sig.id,x2.List_sig.id) output handler.Memo_sig.data.boolean_mvbdu_overwrite_association_lists in 
+      error,
+      {handler 
+       with Memo_sig.data = 
+	  {handler.Memo_sig.data with boolean_mvbdu_overwrite_association_lists = memo}})
+    error handler
+    list1
+    list2
 
 let print_boolean_mvbdu (error:Exception.method_handler) = 
   Mvbdu_core.print_mvbdu error  
