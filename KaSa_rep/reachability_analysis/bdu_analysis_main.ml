@@ -370,8 +370,8 @@ let scan_rule_bdu_build parameter handler_bdu error rule_id rule compil
 (*rule*)
 
 let scan_rule parameter handler_bdu error handler_kappa rule_id rule compil 
-    store_covering_classes store_result =
-  let covering_classes, covering_class_set = store_covering_classes in
+    covering_classes store_result =
+  (*let covering_classes, covering_class_set = store_covering_classes in*)
   (*-------------------------------------------------------------------------------*)
   let error, store_bdu_analysis_static =
     scan_rule_static 
@@ -592,3 +592,4 @@ let bdu_main parameter error handler_kappa store_covering_classes compiled =
     else error, handler_bdu
   in
   error, handler_bdu, result
+ 

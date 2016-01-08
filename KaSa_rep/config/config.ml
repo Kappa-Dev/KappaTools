@@ -78,12 +78,13 @@ let do_site_dependencies = ref false
 (*REMARK: one needs to set do_reachability_analysis to true first to be
   able to active different output *)
 let do_reachability_analysis = ref true
-let do_reachability_analysis_result = ref true
-let do_reachability_analysis_iteration = ref false
-let do_reachability_analysis_static = ref false
-let do_reachability_analysis_dynamic = ref false
-let do_reachability_analysis_diff = ref false
-let do_reachability_analysis_wl = ref false
+let dump_reachability_analysis_result = ref true
+let dump_reachability_analysis_covering_classes = ref false
+let dump_reachability_analysis_iteration = ref false
+let dump_reachability_analysis_static = ref false
+let dump_reachability_analysis_dynamic = ref false
+let dump_reachability_analysis_diff = ref false
+let dump_reachability_analysis_wl = ref false
 
 
 (** accuracy *)

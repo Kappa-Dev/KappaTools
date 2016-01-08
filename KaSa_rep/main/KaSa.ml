@@ -112,8 +112,8 @@ let main () =
 	if (Remanent_parameters.get_trace parameters_cv)
 	then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "Potential dependencies between sites:\n"
       in
-      let error, (dep, c) = Covering_classes_main.covering_classes parameters_cv error handler c_compil 
-      in error, Some (dep, c)
+      let error, dep = Covering_classes_main.covering_classes parameters_cv error handler c_compil 
+      in error, Some dep
     else 
       error, None 
   in
@@ -127,7 +127,7 @@ let main () =
 	Remanent_parameters.update_prefix parameters "" in 
       let _ = 
 	if (Remanent_parameters.get_trace parameters_cv)
-	then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n"
+	then Printf.fprintf (Remanent_parameters.get_log parameters_cv) ""
       in
       (*getting covering classes*)
       let error, covering_classes =

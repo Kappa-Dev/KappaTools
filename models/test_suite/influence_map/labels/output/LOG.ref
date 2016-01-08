@@ -143,22 +143,6 @@ Influence_map:Inhibition_map:rule(3):'\0' A(x~q)->A(x~p) -> rule(2):'"0' A(x~q)-
 Refining the influence map...
 Reachability analysis...
 
-agent_type:0:
-Potential dependencies between sites:Number of covering classes:1
-Potential dependencies between sites:Covering_class_id:0:
-site_type:0
-Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
-site_type:1
-------------------------------------------------------
-Covering classes with type set:
-agent_type:0:
-Potential dependencies between sites:Covering_class_id:0
-site_type:0
-Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
-Covering_class_id:0
-Global:site_type:0  => Local:site_type':1
-Local:site_type':1  => Global:site_type:0
-
 Reachability analysis result ....
 
 ------------------------------------------------------------

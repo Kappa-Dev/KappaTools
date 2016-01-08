@@ -68,7 +68,8 @@ let list2set parameter error list =
 
 (************************************************************************************)
 
-let collect_remanent_list2set parameter error store_remanent store_result =
+let collect_remanent_list2set parameter error handler_kappa store_remanent  =
+  let error, init = AgentMap.create parameter error 0 in
   AgentMap.fold parameter error 
     (fun paramter error agent_type remanent store_result ->
      (*-------------------------------------------------------------------------*)
@@ -84,93 +85,104 @@ let collect_remanent_list2set parameter error store_remanent store_result =
 	  let list_index = index :: index_list in
 	  error, (List.rev list_index, List.rev list_set)
 	 ) store_dic (error, ([], []))
-		 in
+     in
       (*-------------------------------------------------------------------------*)
       (*store a mapping function from a list of covering class into a list
-      of new index and a pair of map*)
-      let error, (id_list_map, list_of_map) =
-        Dictionary_of_Covering_class.fold
-          (fun list _ index (error, (index_list, current_list)) ->
-            let error, store_map =
-              new_index_pair_map parameter error list
-            in
-            let new_list = store_map :: current_list in
-            let index_list = index :: index_list in
-            error, (List.rev index_list, List.rev new_list)
+        of new index and a pair of map*)
+     let error, (id_list_map, list_of_map) =
+       Dictionary_of_Covering_class.fold
+         (fun list _ index (error, (index_list, current_list)) ->
+           let error, store_map =
+             new_index_pair_map parameter error list
+           in
+           let new_list = store_map :: current_list in
+           let index_list = index :: index_list in
+           error, (List.rev index_list, List.rev new_list)
           ) store_dic (error, ([], []))
-      in
-      (*-------------------------------------------------------------------------*)
-      (*store*)
-      let error, store_result =
-        AgentMap.set
-          parameter
-          error
-          agent_type
-          ((id_list, site_set_list),
-           (id_list_map, list_of_map)
-          )
-          store_result
-      in
-      error, store_result
-    ) store_remanent store_result
-
-(************************************************************************************)   
-(*PRINT*)
-
-let print_set set =
-  let _ =
-    Site_map_and_set.Set.iter (fun elt ->
-      Printf.fprintf stdout "site_type:%i\n" elt
-    ) set
-  in
-  ()
-
-let print_pair_site_list l l' =
-  let rec aux acc acc' =
-    match acc, acc' with
-    | [], [] | _, [] | [], _ -> []
-    | id :: tl, site :: tl' ->
-      Printf.fprintf stdout 
-        "Potential dependencies between sites:Covering_class_id:%i\n"
-        id; print_set site;
-      aux tl tl'
-  in aux l l'
-
-let print_map_functions l l' =
-  let rec aux acc acc' =
-    match acc, acc' with
-    | [], [] | _, [] | [], _ -> ()
-    | id :: tl, h :: tl' ->
-      Printf.fprintf stdout
-        "Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):\nCovering_class_id:%i\n" id; 
-      let (map1, map2) = h in
-      let () =
-        Site_map_and_set.Map.iter
-          (fun site site_new ->
-            Printf.fprintf stdout "Global:site_type:%i  => Local:site_type':%i\n" site site_new
-          ) map1
-      in
-      let () =
-        Site_map_and_set.Map.iter
-          (fun site_new site ->
-            Printf.fprintf stdout "Local:site_type':%i  => Global:site_type:%i\n" site_new site
-          ) map2
-      in
-      ();
-      aux tl tl'
-  in
-  aux l l'
-
-let print_list2set parameter error result =
-  AgentMap.print error (fun error parameter
-    ((id_site_list, site_list),
-     (id_list, list_of_map)
-    ) ->
-      let _ =
-        let _ =
-          print_pair_site_list id_site_list site_list
-        in
-        print_map_functions id_list list_of_map
-      in
-      error
-  ) parameter result
+     in
+     (*-------------------------------------------------------------------------*)
+     (*print covering classes*)
+     let _ =
+       if Remanent_parameters.get_dump_reachability_analysis_covering_classes parameter
+       then
+         let _ = Format.printf "Reachability analysis potential dependencies...@." in 
+         let parameter =
+           Remanent_parameters.update_prefix parameter ""
+         in
+         if Remanent_parameters.get_trace parameter
+         then
+           let error, agent_string = 
+             Handler.string_of_agent parameter error handler_kappa agent_type
+           in
+           List.iter (fun id ->
+             List.iter (fun site_set ->
+               let _ =
+                 Printf.fprintf stdout 
+                   "Potential dependencies between sites:\nagent_type:%i:%s:covering_class_id:%i\n" agent_type agent_string id
+               in
+               Site_map_and_set.Set.iter (fun site_type ->
+                 let error, site_string =
+                   Handler.string_of_site parameter error handler_kappa agent_type site_type
+                 in
+                 Printf.fprintf stdout "site_type:%i:%s\n" site_type site_string
+               ) site_set
+             ) site_set_list
+           ) id_list
+         else ()
+     in
+     (*-------------------------------------------------------------------------*)
+     (*print mapping with new indexes of site_type*)
+     let _ =
+        if Remanent_parameters.get_dump_reachability_analysis_covering_classes parameter
+        then
+          let parameter =
+            Remanent_parameters.update_prefix parameter ""
+          in
+          if Remanent_parameters.get_trace parameter
+          then
+            let error, agent_string = 
+              Handler.string_of_agent parameter error handler_kappa agent_type
+            in
+            List.iter (fun id ->
+              let _ =
+                Printf.fprintf stdout
+                  "Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):\nagent_type:%i:%s:covering_class_id:%i\n" 
+                  agent_type agent_string id
+              in
+              List.iter (fun (map1, map2) ->
+                let _ =
+                  Site_map_and_set.Map.iter
+                    (fun site site_new ->
+                      let error, site_string =
+                        Handler.string_of_site parameter error handler_kappa agent_type site
+                      in
+                      Printf.fprintf stdout
+                        "Global:site_type:%i:%s  => Local:site_type':%i:%s\n" 
+                        site site_string site_new site_string
+                    ) map1
+                in
+                Site_map_and_set.Map.iter
+                  (fun site_new site ->
+                    let error, site_string =
+                      Handler.string_of_site parameter error handler_kappa agent_type site
+                    in
+                    Printf.fprintf stdout "Local:site_type':%i:%s  => Global:site_type:%i:%s\n"
+                      site_new site_string site site_string
+                  ) map2
+              ) list_of_map
+            ) id_list_map
+          else ()
+     in
+     (*-------------------------------------------------------------------------*)
+     (*store*)
+     let error, store_result =
+       AgentMap.set
+         parameter
+         error
+         agent_type
+         ((id_list, site_set_list),
+          (id_list_map, list_of_map))
+         store_result
+     in
+     error, store_result
+    ) store_remanent init

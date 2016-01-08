@@ -374,35 +374,6 @@ Influence_map:Inhibition_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(5):'' A(x~u?)->
 Influence_map:Inhibition_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(6):'' A(x~u!_)->A(x~p)[0->0]
 Reachability analysis...
 
-agent_type:0:
-Potential dependencies between sites:Number of covering classes:1
-Potential dependencies between sites:Covering_class_id:0:
-site_type:0
-Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
-site_type:1
-agent_type:1:
-Potential dependencies between sites:Number of covering classes:1
-Potential dependencies between sites:Covering_class_id:0:
-site_type:0
-Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
-site_type:1
-------------------------------------------------------
-Covering classes with type set:
-agent_type:0:
-Potential dependencies between sites:Covering_class_id:0
-site_type:0
-Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
-Covering_class_id:0
-Global:site_type:0  => Local:site_type':1
-Local:site_type':1  => Global:site_type:0
-agent_type:1:
-Potential dependencies between sites:Covering_class_id:0
-site_type:0
-Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
-Covering_class_id:0
-Global:site_type:0  => Local:site_type':1
-Local:site_type':1  => Global:site_type:0
-
 Reachability analysis result ....
 
 ------------------------------------------------------------

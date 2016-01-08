@@ -164,13 +164,12 @@ let string_of_agent parameter error handler_kappa agent_type =
     
 (*mapping site of type int to string*)
 
-let print_site_compact parameter site =
+let print_site_compact site =
   match site with
   | Ckappa_sig.Internal a -> a ^ "~" (* JF: I prefer to have a ~ to make it clear that we are talking about an internal state *)
   | Ckappa_sig.Binding a -> a ^ "!"
 
-
-let string_of_site parameter error handler_kappa agent_name site_int =
+let string_of_site_aux parameter error handler_kappa agent_name site_int =
   let error, sites_dic =
     match 
       Int_storage.Nearly_inf_Imperatif.get
@@ -191,10 +190,29 @@ let string_of_site parameter error handler_kappa agent_name site_int =
          site_int
          sites_dic
     with
-    | error, None -> error, exit 0 (*TODO*)
+    | error, None -> warn parameter error (Some "line 194") Exit (Ckappa_sig.Internal "")
     | error, Some (value, _, _) -> error, value 
   in
-  error, (print_site_compact parameter site_type)
+  error, site_type
+
+let string_of_site parameter error handler_kappa agent_type site_int =
+  let error, site_type =
+    string_of_site_aux parameter error handler_kappa agent_type site_int
+  in
+  error, (print_site_compact site_type)
+
+(*print function for contact map*)
+
+let print_site_contact_map site =
+  match site with
+  | Ckappa_sig.Internal a -> a
+  | Ckappa_sig.Binding a -> a
+
+let string_of_site_contact_map parameter error handler_kappa agent_type site_int =
+  let error, site_type = 
+    string_of_site_aux parameter error handler_kappa agent_type site_int
+  in
+  error, (print_site_contact_map site_type)
 
 (*mapping state of type int to string*)
     
@@ -203,14 +221,14 @@ let print_state state =
   | Ckappa_sig.Internal a -> a
   | Ckappa_sig.Binding Cckappa_sig.Free -> "free"
   | Ckappa_sig.Binding Cckappa_sig.Lnk_type (a, b) -> 
-     (*"agent_type:" ^*)(string_of_int a) ^ "@" ^ (*"site_type:" ^*) (string_of_int b) (*JF: there is no need to labels these strings, it should be clear from the context *)
+    (string_of_int a) ^ "@" ^ (string_of_int b) (*JF: there is no need to labels these strings, it should be clear from the context *)
     
-let string_of_state parameter error handler_kappa agent_name site_int state =
+let string_of_state parameter error handler_kappa agent_type site_int state =
   let error, state_dic =
     match Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
       parameter
       error
-      (agent_name, site_int)
+      (agent_type, site_int)
       handler_kappa.Cckappa_sig.states_dic
     with
     | error, None -> warn parameter error (Some "line 206") Exit

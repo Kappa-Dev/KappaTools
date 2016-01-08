@@ -57,7 +57,7 @@ type influence_map_output =
     inhibition_arrow : string ;
     prompt_full_var_def: bool ; 
     prompt_full_rule_def: bool ;
-    make_labels_compatible: char list  CharMap.t
+    make_labels_compatible: char list CharMap.t
   }
   
 type contact_map_output = 
@@ -80,12 +80,13 @@ type contact_map_output =
 
 type reachability_map_output =
   {
-    do_reachability_analysis_result : bool;
-    do_reachability_analysis_iteration : bool;
-    do_reachability_analysis_static : bool;
-    do_reachability_analysis_dynamic : bool;
-    do_reachability_analysis_diff : bool;
-    do_reachability_analysis_wl : bool;
+    dump_reachability_analysis_result : bool;
+    dump_reachability_analysis_covering_classes : bool;
+    dump_reachability_analysis_iteration : bool;
+    dump_reachability_analysis_static : bool;
+    dump_reachability_analysis_dynamic : bool;
+    dump_reachability_analysis_diff : bool;
+    dump_reachability_analysis_wl : bool;
   }
 
 type marshalisable_parameters = 
