@@ -131,43 +131,6 @@ Influence_map:Wake_up_map:rule(1):'r1' B(x!_)->C(x) -> rule(0):'r0' A(x),B(x)->A
 Refining the influence map...
 Reachability analysis...
 
-agent_type:0:
-Potential dependencies between sites:Number of covering classes:1
-Potential dependencies between sites:Covering_class_id:0:
-site_type:0
-Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
-site_type:1
-agent_type:1:
-Potential dependencies between sites:Number of covering classes:1
-Potential dependencies between sites:Covering_class_id:0:
-site_type:0
-Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
-site_type:1
-agent_type:2:
-Potential dependencies between sites:Number of covering classes:1
-Potential dependencies between sites:Covering_class_id:0:
-Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
-------------------------------------------------------
-Covering classes with type set:
-agent_type:0:
-Potential dependencies between sites:Covering_class_id:0
-site_type:0
-Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
-Covering_class_id:0
-Global:site_type:0  => Local:site_type':1
-Local:site_type':1  => Global:site_type:0
-agent_type:1:
-Potential dependencies between sites:Covering_class_id:0
-site_type:0
-Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
-Covering_class_id:0
-Global:site_type:0  => Local:site_type':1
-Local:site_type':1  => Global:site_type:0
-agent_type:2:
-Potential dependencies between sites:Covering_class_id:0
-Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):
-Covering_class_id:0
-
 Reachability analysis result ....
 
 ------------------------------------------------------------

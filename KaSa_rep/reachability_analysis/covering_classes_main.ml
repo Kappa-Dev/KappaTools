@@ -103,10 +103,6 @@ let scan_rule_set_covering_classes parameter error handler rules =
       handler.Cckappa_sig.sites
       init_class
   in 
-  
-
-
-  
   (*------------------------------------------------------------------------------*)
   (*init state of covering class*)
   let init_class =
@@ -117,8 +113,6 @@ let scan_rule_set_covering_classes parameter error handler rules =
   in
   (*------------------------------------------------------------------------------*)
   (*map each agent to a list of covering classes*)
-  
-  
   let error, store_covering_classes =
     Nearly_inf_Imperatif.fold
       parameter error
@@ -205,19 +199,14 @@ let covering_classes parameter error handler cc_compil =
       error
   in
   (*convert a list of site inside result [remanent] to a set of site*)
-  let error, covering_classes_set2list =
-    Covering_classes_list2set.collect_remanent_list2set parameter error
-      result init
-  in
   let error =
     if (Remanent_parameters.get_trace parameter) || trace
     then
-      begin
-        Printf.fprintf stdout "------------------------------------------------------\n";
-        Printf.fprintf stdout "Covering classes with type set:\n";
-        Covering_classes_list2set.print_list2set parameter error covering_classes_set2list
-      end
+      let error, covering_classes_set2list =
+        Covering_classes_list2set.collect_remanent_list2set parameter error handler result
+      in
+      error
     else
       error
   in
-  error, (result, covering_classes_set2list)
+  error, result

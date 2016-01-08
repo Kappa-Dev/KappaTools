@@ -32,7 +32,7 @@ let trace = false
 let print_result parameter error handler_kappa compiled result =
   let parameter = Remanent_parameters.update_prefix parameter "agent_type_" in
   let _ =
-    if Remanent_parameters.get_do_reachability_analysis_static parameter
+    if Remanent_parameters.get_dump_reachability_analysis_static parameter
     then
       let _ = Format.printf "\nReachability analysis static information ....@." in
       let parameters_cv =
@@ -50,7 +50,7 @@ let print_result parameter error handler_kappa compiled result =
   in
   (*------------------------------------------------------------------------------*)
   let _ =
-    if  Remanent_parameters.get_do_reachability_analysis_dynamic parameter
+    if  Remanent_parameters.get_dump_reachability_analysis_dynamic parameter
     then
       let _ = Format.printf "\nReachability analysis dynamic information ....@." in
       let parameters_cv =
@@ -112,7 +112,7 @@ let print_bdu_update_map_cartesian parameter handler error handler_kappa result 
     result (error,handler)
 	
 let print_result_fixpoint parameter handler error handler_kappa result =
-  if Remanent_parameters.get_do_reachability_analysis_result parameter
+  if Remanent_parameters.get_dump_reachability_analysis_result parameter
   then
     let _ = Format.printf "\nReachability analysis result ....@." in
     let parameters_cv =

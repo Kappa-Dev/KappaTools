@@ -27,32 +27,6 @@ let trace = false
 (************************************************************************************)
 (*syntactic contact map*)
 
-(*let print_contact_map_aux parameter error result =
-  let b, result1 = result in
-  fprintf stdout "A bond is discovered for the first time:%b\n" b;
-  Int2Map_syn.Map.iter (fun rule_id set ->
-    Set_pair.Set.iter (fun ((agent1, site1, state1), (agent2, site2,state2)) ->
-      fprintf stdout "agent_type:%i@site_type:%i:state:%i--agent_type':%i@site_type':%i:state':%i\n" agent1 site1 state1 agent2 site2 state2
-    ) set
-  ) result1
-
-let print_contact_map parameter error result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "\n------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "(Syntactic) Contact map (only considering rhs) and initital state:\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "Sites are annotated with the id of binding type:\n";
-  let error =
-    print_contact_map_aux
-      parameter
-      error
-      result
-  in
-  error*)
-
 let print_contact_map_aux parameter error handler_kappa result =
   Int2Map_CM_Syntactic.Map.iter (fun set1 set2 ->
     Set_triple.Set.iter (fun (agent1, site1, state1) ->
@@ -61,17 +35,23 @@ let print_contact_map_aux parameter error handler_kappa result =
           Handler.string_of_agent parameter error handler_kappa agent1
         in
         let error, site_string1 =
-          Handler.string_of_site parameter error handler_kappa agent1 site1
+          Handler.string_of_site_contact_map parameter error handler_kappa agent1 site1
+        in
+        let error, state_string1 =
+          Handler.string_of_state parameter error handler_kappa agent1 site1 state1
         in
         let error, agent_string2 =
           Handler.string_of_agent parameter error handler_kappa agent2
         in
         let error, site_string2 =
-          Handler.string_of_site parameter error handler_kappa agent2 site2
+          Handler.string_of_site_contact_map parameter error handler_kappa agent2 site2
         in
-        fprintf stdout "agent_type:%i:%s@site_type:%i:%s:state:%i--agent_type':%i:%s@site_type':%i:%s:state':%i\n"
-          agent1 agent_string1 site1 site_string1 state1 
-          agent2 agent_string2 site2 site_string2 state2
+        let error, state_string2 =
+          Handler.string_of_state parameter error handler_kappa agent2 site2 state2
+        in
+        fprintf stdout "agent_type:%i:%s@site_type:%i:%s:state:%i(%s)--agent_type':%i:%s@site_type':%i:%s:state':%i(%s)\n"
+          agent1 agent_string1 site1 site_string1 state1 state_string1
+          agent2 agent_string2 site2 site_string2 state2 state_string2
       ) set2
     )set1
   ) result    
@@ -104,17 +84,23 @@ let print_contact_map_full_aux parameter error handler_kappa result =
         Handler.string_of_agent parameter error handler_kappa agent1
       in
       let error, site_string1 =
-        Handler.string_of_site parameter error handler_kappa agent1 site1
+        Handler.string_of_site_contact_map parameter error handler_kappa agent1 site1
+      in
+      let error, state_string1 =
+        Handler.string_of_state parameter error handler_kappa agent1 site1 state1
       in
       let error, agent_string2 =
         Handler.string_of_agent parameter error handler_kappa agent2
       in
       let error, site_string2 =
-        Handler.string_of_site parameter error handler_kappa agent2 site2
+        Handler.string_of_site_contact_map parameter error handler_kappa agent2 site2
       in
-      fprintf stdout "agent_type:%i:%s@site_type:%i:%s:state:%i--agent_type':%i:%s@site_type':%i:%s:state':%i\n" 
-        agent1 agent_string1 site1 site_string1 state1
-        agent2 agent_string2 site2 site_string2 state2
+      let error, state_string2 =
+        Handler.string_of_state parameter error handler_kappa agent2 site2 state2
+      in
+      fprintf stdout "agent_type:%i:%s@site_type:%i:%s:state:%i(%s)--agent_type':%i:%s@site_type':%i:%s:state':%i(%s)\n" 
+        agent1 agent_string1 site1 site_string1 state1 state_string1
+        agent2 agent_string2 site2 site_string2 state2 state_string2
     ) set
   ) result
 
