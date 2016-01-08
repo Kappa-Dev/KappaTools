@@ -158,6 +158,7 @@ let get_parameters ?called_from:(called_from=Remanent_parameters_sig.KaSa) () =
 	Remanent_parameters_sig.do_ODE_flow_of_information = !Config.do_ODE_flow_of_information ; 
 	Remanent_parameters_sig.do_stochastic_flow_of_information = !Config.do_stochastic_flow_of_information ; 
 	Remanent_parameters_sig.do_site_dependencies = !Config.do_site_dependencies ;
+	Remanent_parameters_sig.dump_site_dependencies = !Config.dump_site_dependencies ;
         (*different reachability output*)
 	Remanent_parameters_sig.do_reachability_analysis = !Config.do_reachability_analysis ;
         
@@ -287,6 +288,8 @@ let get_do_influence_map_1                 marshalisable = marshalisable.Remanen
 let get_do_ODE_flow_of_information_1       marshalisable = marshalisable.Remanent_parameters_sig.do_ODE_flow_of_information
 let get_do_stochastic_flow_of_information_1  marshalisable = marshalisable.Remanent_parameters_sig.do_stochastic_flow_of_information 
 let get_do_site_dependencies_1             marshalisable = marshalisable.Remanent_parameters_sig.do_site_dependencies
+let get_dump_site_dependencies_1             marshalisable = marshalisable.Remanent_parameters_sig.dump_site_dependencies
+
 (*reachability different output*)
 let get_do_reachability_analysis_1        marshalisable = marshalisable.Remanent_parameters_sig.do_reachability_analysis
 
@@ -330,6 +333,7 @@ let get_do_influence_map = upgrade_from_marshal_field get_do_influence_map_1
 let get_do_ODE_flow_of_information = upgrade_from_marshal_field get_do_ODE_flow_of_information_1
 let get_do_stochastic_flow_of_information = upgrade_from_marshal_field get_do_stochastic_flow_of_information_1
 let get_do_site_dependencies = upgrade_from_marshal_field get_do_site_dependencies_1
+let get_dump_site_dependencies = upgrade_from_marshal_field get_dump_site_dependencies_1
 (*reachability analysis in different output*)
 let get_do_reachability_analysis = upgrade_from_marshal_field get_do_reachability_analysis_1
 

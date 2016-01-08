@@ -142,12 +142,12 @@ let store_remanent parameter error covering_class modified_map remanent =
   (*------------------------------------------------------------------------------*)
   (*PART II: site test with new index*)
   let error, (new_test_id, test_new_index_dic) =
-        test_new_index_dic 
-          parameter 
-          error
-          new_id 
-          new_dic 
-          good_test_dic 
+    test_new_index_dic 
+      parameter 
+      error
+      new_id 
+      new_dic 
+      good_test_dic 
   in     
   (*------------------------------------------------------------------------------*)
   (*PART II: site modified with new_index*)
@@ -208,7 +208,8 @@ let clean_classes parameter error covering_classes modified_map =
   List.fold_left (fun (error, remanent) covering_class ->
     match covering_class with
       | [] -> 
-	if current_covering_classes = [[]] (* if the agent has only an empty covering class, keep it *)
+	if current_covering_classes = [[]] 
+        (* if the agent has only an empty covering class, keep it *)
 	then 
 	  store_remanent 
             parameter 
@@ -252,7 +253,9 @@ let clean_classes parameter error covering_classes modified_map =
                   potential_supersets
                   potential_supersets'
               in
-	      let error = Exception.check warn parameter error error' (Some "line 71") Exit in 
+	      let error = Exception.check warn parameter error error'
+                (Some "line 71") Exit
+              in 
               if is_empty_set potential_superset
               then
                 let error, result_covering_dic =

@@ -87,23 +87,9 @@ let main () =
     else
       error 
   in
-  (*Side effect*)
-  let _ =
-    if Remanent_parameters.get_do_site_dependencies parameters
-    then 
-      let parameters_se =
-	Remanent_parameters.update_prefix parameters "Side-effects:" in 
-      let _ = 
-	if (Remanent_parameters.get_trace parameters_se)
-	then Printf.fprintf (Remanent_parameters.get_log parameters_se) "Side-effects:\n"
-      in
-      let error,dep = Side_effect.side_effect parameters_se error handler c_compil 
-      in error, Some dep 
-    else 
-      error, None 
-  in
   (*covering classes*)
   let error, covering_classes = 
+    (*Remark: this parameter is a trick not to print covering classes twice*)
     if Remanent_parameters.get_do_site_dependencies parameters
     then 
       let parameters_cv =
@@ -140,8 +126,6 @@ let main () =
       error, None, None 
   in
   (*-----------------------------------------------------------------------*)
-  (*BDU range*)
-  (*let _ = Range_bdu.main in*)
   (*Stochastic flow of information*)
   let error, stochastic_flow =
     if Remanent_parameters.get_do_stochastic_flow_of_information parameters

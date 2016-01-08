@@ -166,6 +166,50 @@ let scan_rule_set_remanent parameter error handler rules =
             modified_map
         in
         (*------------------------------------------------------------------------------*)
+        (*compute the number of covering classes*)
+        let error, get_number_cv =
+          (Dictionary_of_Covering_class.last_entry parameter error
+            store_remanent_dic.Covering_classes_type.store_dic)
+        in
+        let number_cv = get_number_cv + 1 in
+        (*------------------------------------------------------------------------------*)
+        (*print covering classes*)
+        let _ =
+          if Remanent_parameters.get_dump_site_dependencies parameter
+          then
+            let parameter =
+              Remanent_parameters.update_prefix parameter ""
+            in
+            let error, agent_string =
+              Handler.string_of_agent parameter error handler agent_type
+            in
+            let _ =
+              Dictionary_of_Covering_class.print parameter error
+                (fun parameter error elt_id site_type_list _ _ ->
+                  let _ =
+                    Printf.fprintf stdout 
+                      "Potential dependencies between sites:Number of covering classes:%i\n"
+                      number_cv
+                  in
+                  let _ =
+                    (*print covering_class_id*)
+                    Printf.fprintf stdout "Potential dependencies between sites:\nagent_type:%i:%s:covering_class_id:%i\n"
+                      agent_type agent_string elt_id
+                  in
+                  let _ =
+                    List.iter (fun site_type ->
+                      let error, site_string =
+                        Handler.string_of_site parameter error handler agent_type site_type
+                      in
+                      Printf.fprintf stdout "site_type:%i:%s\n" site_type site_string
+                    ) site_type_list
+                  in
+                  error
+                ) store_remanent_dic.Covering_classes_type.store_dic
+            in
+            ()
+        in
+        (*------------------------------------------------------------------------------*)
         (*store the covering classes after cleaning theirs duplicate classes*)
         let error, store_remanent =
           AgentMap.set 
@@ -191,13 +235,6 @@ let covering_classes parameter error handler cc_compil =
   let error, init = AgentMap.create parameter error 0 in
   let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in 
   let error, result = scan_rule_set_remanent parameter error handler cc_compil.rules in
-  let error =
-    if (Remanent_parameters.get_trace parameter) || trace
-    then 
-      print_result parameter error result
-    else
-      error
-  in
   (*convert a list of site inside result [remanent] to a set of site*)
   let error =
     if (Remanent_parameters.get_trace parameter) || trace

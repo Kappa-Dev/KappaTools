@@ -158,7 +158,7 @@ let print_value_site parameter error elt site value_site = (*REMOVE*)
 (************************************************************************************)
 (*MAIN PRINT*)
 
-let print_result parameter error result_remanent =
+(*let print_result parameter error result_remanent =
   if Remanent_parameters.get_do_site_dependencies parameter
   then
     let _ = Format.printf "\nPotential dependencies ....@." in
@@ -193,4 +193,4 @@ let print_result parameter error result_remanent =
           error
         in
         error) parameter result_remanent
-  else error
+  else error*)
