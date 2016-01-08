@@ -293,6 +293,8 @@ Memoization tables:reset:16:0:  if(mvbdu_id:15) x4 < 2 then
 Memoization tables:reset:16:0:   true
 Memoization tables:reset:16:0:  else 
 Memoization tables:reset:16:0:   false
+Print Hash_3:
+Print Hash_4:
 Some exceptions have been raised
 error: file_name: Mvbdu_wrapper.ml; message: line 194, init; exception:Exit
 Some exceptions have been raised

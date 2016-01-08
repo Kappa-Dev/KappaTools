@@ -83,6 +83,9 @@ type memo_tables =
     boolean_mvbdu_redefine    : bool Mvbdu_sig.mvbdu Hash_2.t;
     boolean_mvbdu_project_keep_only: bool Mvbdu_sig.mvbdu Hash_2.t;
     boolean_mvbdu_project_abstract_away: bool Mvbdu_sig.mvbdu Hash_2.t;
+
+    boolean_mvbdu_merge_variables_lists: unit List_sig.list Hash_2.t;
+    boolean_mvbdu_overwrite_association_lists: int List_sig.list Hash_2.t;
   }
 
 type mvbdu_dic = (bool Mvbdu_sig.cell, bool Mvbdu_sig.mvbdu) D_mvbdu_skeleton.dictionary
@@ -124,7 +127,12 @@ let split_memo error handler =
     "not snd:", x.boolean_mvbdu_nsnd; 
     "reset:",   x.boolean_mvbdu_redefine;
     "project_onto:", x.boolean_mvbdu_project_keep_only;
-    "project_away:", x.boolean_mvbdu_project_abstract_away;
+    "project_away:", x.boolean_mvbdu_project_abstract_away;],
+  [
+    "merge:", x.boolean_mvbdu_merge_variables_lists;
+  ],
+  [
+    "overwrite:", x.boolean_mvbdu_overwrite_association_lists;
   ]
   
 let rec print_cell log prefix cell = 
@@ -187,6 +195,8 @@ let init_data parameters error =
   let error,mvbdu_redefine = Hash_2.create parameters error (0,0) in 
   let error,mvbdu_project_keep_only = Hash_2.create parameters error (0,0) in
   let error,mvbdu_project_abstract_away = Hash_2.create parameters error (0,0) in
+  let error,mvbdu_merge = Hash_2.create parameters error (0,0) in
+  let error,mvbdu_overwrite = Hash_2.create parameters error (0,0) in
   error,
     {
       boolean_mvbdu_clean_head = mvbdu_clean_head ;
@@ -210,6 +220,8 @@ let init_data parameters error =
       boolean_mvbdu_redefine = mvbdu_redefine;
       boolean_mvbdu_project_keep_only = mvbdu_project_keep_only;
       boolean_mvbdu_project_abstract_away = mvbdu_project_abstract_away;
+      boolean_mvbdu_merge_variables_lists = mvbdu_merge;
+      boolean_mvbdu_overwrite_association_lists = mvbdu_overwrite;
     }
     
 let init_remanent parameters error =
@@ -722,6 +734,8 @@ let project_keep_only parameters error handler mvbdu_input list_input =
       {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_project_keep_only = x}})  
     parameters error handler mvbdu_input list_input
 
+
+
 let project_abstract_away parameters error handler mvbdu_input list_input = 
   gen_bin_mvbdu_list
     Mvbdu_algebra.project_abstract_away
@@ -729,6 +743,7 @@ let project_abstract_away parameters error handler mvbdu_input list_input =
     (fun x h ->
       {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_project_abstract_away = x}})  
     parameters error handler mvbdu_input list_input
+
 
 let print_boolean_mvbdu (error:Exception.method_handler) = 
   Mvbdu_core.print_mvbdu error  
@@ -749,9 +764,23 @@ let print_hash1 error parameters  =
     
 let print_hash2 error log = 
   Hash_2.print error print_boolean_mvbdu log 
-    
+
+let lift f a b c = 
+  let () = f b.Remanent_parameters_sig.log b.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix c 
+  in a
+
+let print_hash3 error log =
+  Hash_2.print error 
+    (lift List_algebra.print_variables_list)
+    log
+
+let print_hash4 error log =
+  Hash_2.print error 
+    (lift List_algebra.print_association_list)
+    log
+
 let print_memo (error:Exception.method_handler) handler parameters = 
-  let error,l1,l2 = split_memo error handler in 
+  let error,l1,l2,l3,l4 = split_memo error handler in 
   let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s\n"
     parameters.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix in
   let error = 
@@ -767,4 +796,20 @@ let print_memo (error:Exception.method_handler) handler parameters =
       (fun error (pref,x) ->
         print_hash2 error (Remanent_parameters.update_prefix parameters pref) x)
       error l2
-  in error
+  in 
+  let error = 
+    Printf.fprintf stdout "Print Hash_3:\n";
+    List.fold_left 
+      (fun error (pref,x) ->
+        print_hash3 error (Remanent_parameters.update_prefix parameters pref) x)
+      error l3
+  in 
+  let error = 
+    Printf.fprintf stdout "Print Hash_4:\n";
+    List.fold_left 
+      (fun error (pref,x) ->
+        print_hash4 error (Remanent_parameters.update_prefix parameters pref) x)
+      error l4
+  in 
+   
+error
