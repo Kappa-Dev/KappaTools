@@ -166,7 +166,7 @@ let string_of_agent parameter error handler_kappa agent_type =
 
 let print_site_compact parameter site =
   match site with
-  | Ckappa_sig.Internal a -> a
+  | Ckappa_sig.Internal a -> a ^ "~" (* JF: I prefer to have a ~ to make it clear that we are talking about an internal state *)
   | Ckappa_sig.Binding a -> a ^ "!"
 
 
@@ -203,7 +203,7 @@ let print_state state =
   | Ckappa_sig.Internal a -> a
   | Ckappa_sig.Binding Cckappa_sig.Free -> "free"
   | Ckappa_sig.Binding Cckappa_sig.Lnk_type (a, b) -> 
-    "agent_type:" ^(string_of_int a) ^ "@" ^ "site_type:" ^ (string_of_int b)
+     (*"agent_type:" ^*)(string_of_int a) ^ "@" ^ (*"site_type:" ^*) (string_of_int b) (*JF: there is no need to labels these strings, it should be clear from the context *)
     
 let string_of_state parameter error handler_kappa agent_name site_int state =
   let error, state_dic =
@@ -225,7 +225,7 @@ let string_of_state parameter error handler_kappa agent_name site_int state =
         state
         state_dic
     with
-    | error, None -> error, exit 0 (*TODO*)
+    | error, None -> warn parameter error (Some "line 228") Exit (Ckappa_sig.Internal "")
     | error, Some (value, _, _) -> error, value
   in
   error, (print_state value)
