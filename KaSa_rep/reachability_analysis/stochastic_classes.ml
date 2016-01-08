@@ -55,6 +55,7 @@ let get_sites_list parameter error agent_type agent stochastic_class =
     | Some old_list -> old_list
   in
   let new_list = List.concat [sites_list;old_list] in
+  (*------------------------------------------------------------------------------*)
   let error, stochastic_class =
     Int_storage.Quick_Nearly_inf_Imperatif.set
       parameter
@@ -87,8 +88,10 @@ let scan_rule parameter error handler rule classes =
 	in
 	match agent with
 	  | None
-	  | Some Cckappa_sig.Unknown_agent _ | Some Cckappa_sig.Ghost -> error, stochastic_class_rhs
-	  | Some Cckappa_sig.Dead_agent (agent,_,_,_) | Some Cckappa_sig.Agent agent ->
+	  | Some Cckappa_sig.Unknown_agent _ 
+          | Some Cckappa_sig.Ghost -> error, stochastic_class_rhs
+	  | Some Cckappa_sig.Dead_agent (agent,_,_,_) 
+          | Some Cckappa_sig.Agent agent ->
              get_sites_list
                parameter
                error
@@ -185,8 +188,8 @@ let scan_rule_set parameter error handler rules =
        let error, result =
          Int_storage.Quick_Nearly_inf_Imperatif.fold
            parameter error
-           (fun parameter error id sites_list store_union ->
-            let nsites = get_nsites parameter error id handler in
+           (fun parameter error agent_type sites_list store_union ->
+            let nsites = get_nsites parameter error agent_type handler in
             match sites_list with
             | [] | [_] -> error, store_union
             | _ ->
@@ -195,7 +198,7 @@ let scan_rule_set parameter error handler rules =
                  Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get
                    parameter
                    error
-                   id
+                   agent_type
                    store_union
                in
                let array =
@@ -216,7 +219,7 @@ let scan_rule_set parameter error handler rules =
                  Int_storage.Quick_Nearly_inf_Imperatif.set
                    parameter
                    error
-                   id
+                   agent_type
                    union_array
                    store_union
                in error, result
@@ -230,35 +233,57 @@ let scan_rule_set parameter error handler rules =
 (************************************************************************************)
 (*PRINT*)
 
-let sprintf_array a =
+let sprintf_array parameter error handler agent_type array =
   let acc = ref "[|" in
-  Array.iteri (fun i x ->
-      acc := !acc ^
-             if i <> 0
-             then Printf.sprintf "; %d" x
-             else Printf.sprintf "%d" x
-    ) a;
+  Array.iteri (fun i site_type ->
+    let error, site_string = 
+      Handler.string_of_site parameter error handler agent_type site_type
+    in
+    acc := !acc ^
+      if i <> 0
+      then Printf.sprintf "; %d:%s" site_type site_string
+      else Printf.sprintf "%d:%s" site_type site_string
+  ) array;
   !acc ^ "|]"
-           
-let print_array a =
-  let output = sprintf_array a in
+  
+let print_array parameter error handler agent_type array =
+  let output = sprintf_array parameter error handler agent_type array in
   Printf.fprintf stdout "%s\n" output
-          
-let print_stochastic_class parameter error result =
-  Int_storage.Quick_Nearly_inf_Imperatif.print
+
+let print_stochastic_class parameter error handler result =
+  Int_storage.Quick_Nearly_inf_Imperatif.iter
+    parameter
     error
-    (fun error parameter a ->
-     let _ =
-       print_string "site_type:";
-       print_array a
-     in
-     error) parameter result
+    (fun parameter error agent_type array_site_type ->
+      let _ =
+        if Remanent_parameters.get_do_stochastic_flow_of_information parameter
+        then
+          let parameter =
+            Remanent_parameters.update_prefix parameter ""
+          in
+          begin
+            if Remanent_parameters.get_trace parameter
+            then
+              let _ =
+                let error, agent_string =
+                  Handler.string_of_agent parameter error handler agent_type
+                in
+                Printf.fprintf stdout "agent_type:%i:%s\n" agent_type agent_string
+              in
+              print_string "site_type:";
+              print_array parameter error handler agent_type array_site_type
+            else ()
+          end
+      in
+      error)
+    result
 
 (************************************************************************************)     
 (*MAIN*)
    
 let stochastic_classes parameter error handler cc_compil =
-  let parameter =  Remanent_parameters.update_prefix parameter "agent_type:" in 
-  let error, result = scan_rule_set parameter error handler cc_compil.Cckappa_sig.rules in
-  let _ = print_stochastic_class parameter error result in
+  let error, result = 
+    scan_rule_set parameter error handler cc_compil.Cckappa_sig.rules
+  in
+  let _ = print_stochastic_class parameter error handler result in
   error, result

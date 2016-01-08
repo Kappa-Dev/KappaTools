@@ -21,6 +21,18 @@ let warn parameter mh message exn default =
   Exception.warn parameter mh (Some "ODE fragmentation") message exn
                  (fun () -> default)
 
+let trace = false
+
+(*let sprintf_list l =
+  let acc = ref "{" in
+  List.iteri (fun i site_type ->
+    acc := !acc ^
+      if i <> 0
+      then sprintf "; %d" site_type
+      else sprintf "%d" site_type
+  ) l;
+  !acc ^ "}"*)
+
 let sprintf_list l =
   match l with
     | [] -> ""
@@ -166,56 +178,40 @@ let collect_sites_modified_set parameter error rule handler store_sites_modified
         then
           error, store_sites_modified_set
         else
-          (*get a site_dic from handler*)
-          let error, site_dic =
-	    Misc_sa.unsome
-	      (AgentMap.get
-	         parameter
-	         error
-	         agent_type
-	         handler.sites)
-	      (fun error -> warn parameter error (Some "line 204") Exit
-                (Ckappa_sig.Dictionary_of_sites.init()))
-	  in
           (*get a pair of (site_set, value)*)
-          let pair_site, error  =
+          let site_set, error  =
             SiteSet.Map.fold (fun site _ (current_set, error) ->
               (*get a set of site*)
-              let error,set =
-                SiteSet.Set.add parameter error site current_set in
-              (*get value*)
-              let error, (value, _, _) =
-	        Misc_sa.unsome
-	          (Ckappa_sig.Dictionary_of_sites.translate
-		     parameter
-		     error
-		     site
-		     site_dic)
-	          (fun error -> warn parameter error (Some "line 216") Exit
-                    (Ckappa_sig.Internal "", (), ()))
-	      in
-              (*PRINT*)
-	      let () =
-                fprintf stdout
-                  "Flow of information in the ODE semantics:agent_type:%i:" agent_type;
-                match value with
-	          | Ckappa_sig.Internal s ->
-		    fprintf stdout "site_modified:%i->%s(internal state)\n" site s
-	          | Ckappa_sig.Binding s ->
-		    fprintf stdout "site_modified:%i->%s(binding state)\n" site s
+              let error, set =
+                SiteSet.Set.add parameter error site current_set 
               in
               (set, error)
-            )
-              site_modif.agent_interface
+            ) site_modif.agent_interface
               (SiteSet.Set.empty, error)
           in
+          (*------------------------------------------------------------------------------*)
+          (*print*)
+          let _ =
+            SiteSet.Set.iter (fun site_type ->
+              let error, agent_type_string =
+                Handler.string_of_agent parameter error handler agent_type
+              in
+              let error, site_type_string =
+                Handler.string_of_site parameter error handler agent_type site_type
+              in
+              fprintf stdout "Flow of information in the ODE semantics:agent_type:%i:%s:site_type_modified:%i:%s\n"
+                agent_type agent_type_string
+                site_type site_type_string
+            ) site_set
+          in
+          (*------------------------------------------------------------------------------*)
           (*store only site_set*)
           let error, store_sites_modified_set =
             AgentMap.set
               parameter
               error
               agent_type
-              pair_site
+              site_set
               store_sites_modified_set
           in
           error, store_sites_modified_set
@@ -463,7 +459,7 @@ let store_sites_lhs parameter error rule store_sites_lhs =
 (************************************************************************************)
 (*ANCHOR SITES*)
 
-let collect_sites_anchor_set parameter error get_rule 
+let collect_sites_anchor_set parameter error handler get_rule 
     store_sites_modified_set
     store_sites_bond_pair_set
     store_sites_lhs
@@ -592,13 +588,19 @@ let collect_sites_anchor_set parameter error get_rule
                 get_anchor_set1
                 get_anchor_set2
             in
+            (*---------------------------------------------------------------------------*)
             (*print the final set*)
             let l = SiteSet.Set.elements final_anchor_set in
             match l with
               | [] -> ()
               | _ as l' ->
+                let error, agent_type_string =
+                  Handler.string_of_agent parameter error handler agent_type
+                in
                 Printf.fprintf stdout
-                  "Flow of information in the ODE semantics:agent_type:%i:" agent_type;
+                  "Flow of information in the ODE semantics:agent_type:%i:%s:"
+                  agent_type agent_type_string; (*TODO*)
+                               
                 print_string "anchor_type:";
                 print_list l'
           in
@@ -676,7 +678,7 @@ let internal_flow_lhs_anchor parameter error agent_type
 (*------------------------------------------------------------------------------*)
 (*INTERNAL FLOW*)
 
-let collect_internal_flow parameter error get_rule
+let collect_internal_flow parameter error handler get_rule
     store_sites_lhs
     store_sites_modified_set
     store_sites_anchor_set
@@ -723,17 +725,25 @@ let collect_internal_flow parameter error get_rule
               get_internal_flow1
               (fst store_internal_flow)
           in
+          (*------------------------------------------------------------------------------*)
           (*PRINT*)
           let _ =
-            let rec aux acc =
-              match acc with
-                | [] -> acc
-                | (agent_type, x, y) :: tl ->
-                  fprintf stdout
-                    "Flow of information in the ODE semantics:Internal flow:\n- agent_type:%i:site_type:%i -> agent_type:%i:modified_type:%i\n"
-                    agent_type x agent_type y;
-                  aux tl                    
-            in aux get_internal_flow1
+            List.iter (fun (agent_type, site_type, modified_site_type) ->
+              let error, agent_type_string =
+                Handler.string_of_agent parameter error handler agent_type
+              in
+              let error, site_type_string =
+                Handler.string_of_site parameter error handler agent_type site_type
+              in
+              let error, modified_site_type_string =
+                Handler.string_of_site parameter error handler agent_type modified_site_type
+              in
+              fprintf stdout "Flow of information in the ODE semantics:Internal flow:\n- agent_type:%i:%s:site_type:%i:%s -> agent_type:%i::%s:modified_type:%i:%s\n"
+                agent_type agent_type_string
+                site_type site_type_string
+                agent_type agent_type_string
+                modified_site_type modified_site_type_string
+            ) get_internal_flow1
           in
           (*------------------------------------------------------------------------------*)
           (*2nd: site -> anchor site*)
@@ -754,17 +764,22 @@ let collect_internal_flow parameter error get_rule
               get_internal_flow2
               (snd store_internal_flow)
           in
+          (*----------------------------------------------------------------------------*)  
           (*PRINT*)
           let _ =
-            let rec aux acc =
-              match acc with
-                | [] -> acc
-                | (agent_type, x, y) :: tl ->
-                  fprintf stdout
-                    "Flow of information in the ODE semantics:Internal flow:\n- agent_type:%i:site_type:%i -> agent_type:%i:anchor_type:%i\n"
-                    agent_type x agent_type y;
-                  aux tl                    
-            in aux get_internal_flow2
+            List.iter (fun (agent_type, site_type, y) ->
+              let error, agent_type_string =
+                Handler.string_of_agent parameter error handler agent_type
+              in
+              let error, site_type_string =
+                Handler.string_of_site parameter error handler agent_type site_type
+              in
+              fprintf stdout "Flow of information in the ODE semantics:Internal flow:\n- agent_type:%i:%s:site_type:%i:%s -> agent_type:%i:%s:anchor_type:%i\n"
+                agent_type agent_type_string 
+                site_type site_type_string
+                agent_type agent_type_string 
+                y
+            ) get_internal_flow2
           in
           (*result*)
           error, (internal_flow1, internal_flow2)
@@ -803,7 +818,7 @@ let cartesian_prod_external i anchor_set i' bond_fst_list bond_snd_set =
   in
   loop anchor_list [] 
     
-let collect_external_flow parameter error release
+let collect_external_flow parameter error handler release
     store_sites_bond_pair_set_external
     store_sites_anchor_set1
     store_sites_anchor_set2
@@ -844,18 +859,40 @@ let collect_external_flow parameter error release
 	bond_fst_list
         bond_snd_set
     in
-    (*PRINT*)
+    (*FIXME:PRINT*)
     let _ =
       let rec aux acc =
         match acc with
-          | [] -> acc
-          | (agent_type,x,agent_type',y) :: tl ->
-            fprintf stdout
-              "Flow of information in the ODE semantics:External flow:\n- agent_type:%i:anchor_type:%i -> agent_type:%i:modified_type:%i\n"
-              agent_type x agent_type' y;
-            aux tl
+        | [] -> acc
+        | (agent_type,x,agent_type',y) :: tl ->
+          fprintf stdout
+            "Flow of information in the ODE semantics:External flow:\n- agent_type:%i:anchor_type:%i -> agent_type:%i:modified_type:%i\n"
+            agent_type x agent_type' y;
+          aux tl
       in aux collect_external_flow
     in
+    (*------------------------------------------------------------------------------*)
+    (*PRINT*)
+    (*let _ =
+      List.iter (fun (agent_type_x, site_type_x, agent_type_y, site_type_y) ->
+        (*let error, agent_type_x_string =
+          Handler.string_of_agent parameter error handler agent_type_x
+        in
+        let error, agent_type_y_string = 
+          Handler.string_of_agent parameter error handler agent_type_y
+        in
+        let error, site_type_x_string =
+          Handler.string_of_site parameter error handler agent_type_x site_type_x
+        in
+        let error, site_type_y_string =
+          Handler.string_of_site parameter error handler agent_type_y site_type_y
+        in*)
+        fprintf stdout "Flow of information in the ODE semantics:External flow:\n- agent_type:%i:anchor_type:%i -> agent_type:%i:modified_type:%i\n"
+          agent_type_x site_type_x 
+          agent_type_y site_type_y
+      ) collect_external_flow
+    in*)
+    (*------------------------------------------------------------------------------*)
     error, collect_external_flow)
     (error, store_external_flow)
     release
@@ -915,6 +952,7 @@ let scan_rule parameter error handler get_rule ode_class =
     collect_sites_anchor_set
       parameter
       error
+      handler
       get_rule
       store_sites_modified_set
       store_sites_bond_pair_set
@@ -927,6 +965,7 @@ let scan_rule parameter error handler get_rule ode_class =
     collect_internal_flow
       parameter
       error
+      handler
       get_rule
       store_sites_lhs
       store_sites_modified_set
@@ -935,10 +974,12 @@ let scan_rule parameter error handler get_rule ode_class =
   in
   (*------------------------------------------------------------------------------*)
   (*f) external flow: a -> b, if 'a': anchor site or 'b':modified site*)
+  (*FIXME*)
   let error, store_external_flow =
     collect_external_flow
       parameter
       error
+      handler
       release
       store_sites_bond_pair_set_external
       (fst store_sites_anchor_set)
@@ -961,7 +1002,7 @@ let scan_rule parameter error handler get_rule ode_class =
 (************************************************************************************)
 (*RULES*)
 
-let scan_rule_set parameter error handler rules =
+let scan_rule_set parameter error handler rules compiled =
   let error, init = AgentMap.create parameter error 0 in
   let init_pair = (init, init) in
   let error, init_lhs = AgentMap.create parameter error 0 in
@@ -983,8 +1024,11 @@ let scan_rule_set parameter error handler rules =
     AgentMap.fold
       parameter error
       (fun parameter error rule_id rule ode_class ->
-	let _ =
-          fprintf stdout "Flow of information in the ODE semantics:rule_id:%i\n" rule_id in
+        (*map rule of type int to rule of type string*)
+        let error, rule_string =
+          Handler.string_of_rule parameter error handler compiled rule_id
+        in
+	fprintf stdout "Flow of information in the ODE semantics:%s\n" rule_string;
         scan_rule
           parameter
           error
@@ -998,6 +1042,8 @@ let scan_rule_set parameter error handler rules =
 (************************************************************************************)     
 (*MAIN*)
 
-let ode_fragmentation parameter error handler cc_compil =
-  let error, result = scan_rule_set parameter error handler cc_compil.rules in
+let ode_fragmentation parameter error handler compiled =
+  let error, result =
+    scan_rule_set parameter error handler compiled.rules compiled 
+  in
   error, result

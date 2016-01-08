@@ -423,7 +423,6 @@ let scan_rule parameter handler_bdu error handler_kappa rule_id rule compil
 
 let init_bdu_analysis_static =
   let init_covering_classes_id = Int2Map_CV.Map.empty in
-  (*let init_covering_classes_id_string = Int2Map_CV_map.Map.empty in*)
   let init_half_break          = Int2Map_HalfBreak_effect.Map.empty  in
   let init_remove              = Int2Map_Remove_effect.Map.empty  in
   let init_potential_free      = Int2Map_potential_effect.Map.empty in
@@ -437,7 +436,6 @@ let init_bdu_analysis_static =
   let init_bdu_analysis_static =
     {
       store_covering_classes_id     = init_covering_classes_id;
-      (*store_covering_classes_id_string  = init_covering_classes_id_string;*)
       store_side_effects            = (init_half_break, init_remove);
       store_potential_side_effects  = (init_potential_free, init_potential_bind);      
       store_modification_sites      = init_modification;

@@ -331,7 +331,7 @@ let compute_views_enabled parameter handler error
               Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
               dump_channel parameter 
                 (fun stderr -> Printf.fprintf stderr
-                  "\t at agent_id:%i:agent_type:%i:%s:covering_classes_id:%i (working list output):"
+                  "\t at agent_id:%i:agent_type:%i:%s:covering_classes_id:%i:\n"
                   agent_id agent_type agent_string cv_id)
           else ()
         in 
@@ -351,7 +351,7 @@ let compute_views_enabled parameter handler error
               Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
               dump_channel parameter 
                 (fun stderr -> Printf.fprintf stderr
-                  "\t at agent_id:%i:agent_type:%i:%s:covering_classes_id:%i (different views output):"
+                  "\t at agent_id:%i:agent_type:%i:%s:covering_classes_id:%i:\n"
                   agent_id agent_type agent_string cv_id)
             else ()
         in 
@@ -404,7 +404,7 @@ let compute_views_enabled parameter handler error
                   if (Remanent_parameters.get_trace parameters_cv)
                   then
                     dump_channel parameter (fun stderr ->
-	              Printf.fprintf stderr "\n\t\tdiscovering a new views (working list output).\n")
+	              Printf.fprintf stderr "\t\tdiscovering a new views.\n")
                   else ()
               end
             in
@@ -418,7 +418,7 @@ let compute_views_enabled parameter handler error
                 if (Remanent_parameters.get_trace parameters_cv)
                 then
                   dump_channel parameter (fun stderr ->
-	            Printf.fprintf stderr "\t\tdiscovering a new views (different views output):\n";
+	            Printf.fprintf stderr "\t\tdiscovering a new views:\n";
                     Mvbdu_wrapper.Mvbdu.print stderr "" bdu_diff)
                 else ()
             in
@@ -437,7 +437,7 @@ let compute_views_enabled parameter handler error
                   if (Remanent_parameters.get_trace parameters_cv)
                   then
                     dump_channel parameter (fun stderr -> Printf.fprintf stderr
-                      "\n\t\tnothing has changed (working list output).\n")
+                      "\t\tnothing has changed.\n")
                   else ()
               end
             in
@@ -451,7 +451,7 @@ let compute_views_enabled parameter handler error
                 if (Remanent_parameters.get_trace parameters_cv)
                 then
                   dump_channel parameter (fun stderr -> Printf.fprintf stderr
-                    "\t\tnothing has changed (different views output).\n")
+                    "\t\tnothing has changed.\n")
                 else ()
             in
             ()
@@ -673,7 +673,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
               in
               Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
               dump_channel parameter 
-                (fun stderr -> Printf.fprintf stderr "try applying %s (iteration output):" rule_id_string)
+                (fun stderr -> Printf.fprintf stderr "try applying %s:" rule_id_string)
           else ()
         in       
         (*--------------------------------------------------------------------*)
@@ -693,7 +693,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
               in
               Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
               dump_channel parameter 
-                (fun stderr -> Printf.fprintf stderr "try applying %s (working list output)." rule_id_string)
+                (fun stderr -> Printf.fprintf stderr "try applying %s." rule_id_string)
           else ()
         in
         (*--------------------------------------------------------------------*)
@@ -713,7 +713,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
               in
               Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
               dump_channel parameter 
-                (fun stderr -> Printf.fprintf stderr "try applying %s (different views output)." rule_id_string)
+                (fun stderr -> Printf.fprintf stderr "try applying %s." rule_id_string)
           else ()
         in
         (*--------------------------------------------------------------------*)
@@ -769,8 +769,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
                 then
                   dump_channel parameter 
                     (fun stderr -> Printf.fprintf stderr "\n\t\"enabled\"")
-                else
-                  ()
+                else ()
             in
             (*-----------------------------------------------------------------------*)
             let error, (handler, new_wl, store_new_result) =

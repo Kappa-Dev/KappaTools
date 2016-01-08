@@ -105,7 +105,7 @@ let collect_remanent_list2set parameter error handler_kappa store_remanent  =
      let _ =
        if Remanent_parameters.get_dump_reachability_analysis_covering_classes parameter
        then
-         let _ = Format.printf "Reachability analysis potential dependencies...@." in 
+         (*let _ = Format.printf "Reachability analysis potential dependencies...@." in *)
          let parameter =
            Remanent_parameters.update_prefix parameter ""
          in
