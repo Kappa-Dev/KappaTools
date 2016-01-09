@@ -39,7 +39,7 @@ let build_list allocate error handler skeleton cell =
     cell
     (fun key -> {List_sig.id = key; List_sig.value = cell})
     handler  
-
+   
 let id_of_list x = x.List_sig.id 
 
 let update_association_dictionary handler dictionary = 

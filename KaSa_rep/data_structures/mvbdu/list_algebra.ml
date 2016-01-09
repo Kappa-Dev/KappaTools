@@ -115,7 +115,39 @@ and print_variables_list log prefix list =
   let _ = print_cell log (prefix^" ") list.List_sig.value in 
   ()
 
+let rec extensional_gen f get set error parameters handler list =
+  match get parameters error handler list
+  with
+  | error, (handler, Some output) -> error, (handler, Some output)
+  | error, (handler, None) ->
+     begin
+       match
+	 list.List_sig.value
+       with
+       | List_sig.Empty -> error,(handler,Some [])
+       | List_sig.Cons a1 ->
+	  let error, (handler, tail) =
+	    extensional_gen f get set error parameters handler a1.List_sig.tail
+	    in
+	    match
+	      tail
+	    with
+	    | Some tail ->
+	       let output = (f a1)::tail in
+	       let error,handler = set parameters error handler list output in
+	       error, (handler, Some output)
+	    | None ->
+	       invalid_arg parameters error (Some "141") Exit
+			   (handler,Some [])
+     end
 
+let extensional_with_asso get set error parameters handler list =
+  extensional_gen (fun a1 -> (a1.List_sig.variable,a1.List_sig.association)) get set error parameters handler list
+
+let extensional_without_asso get set error parameters handler list =
+  extensional_gen (fun a1 -> (a1.List_sig.variable)) get set error parameters handler list
+		  
+       
 let rec overwrite allocate get set error parameters handler list1 list2 = 
   match get parameters error handler (list1,list2)
   with 
