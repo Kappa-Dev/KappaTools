@@ -54,7 +54,9 @@ module type Mvbdu =
 
     val extensional_of_variables_list: (hconsed_variables_list,int list) unary
     val extensional_of_association_list: (hconsed_association_list,(int*int) list) unary
-										  
+
+    val variables_list_of_mvbdu: (mvbdu,hconsed_variables_list) unary
+								
     val print: out_channel -> string -> mvbdu -> unit 
     val print_association_list: out_channel -> string -> hconsed_association_list -> unit 
     val print_variables_list: out_channel -> string -> hconsed_variables_list -> unit
@@ -107,7 +109,9 @@ module type Internalized_mvbdu =
 
     val extensional_of_variables_list: hconsed_variables_list -> int list
     val extensional_of_association_list: hconsed_association_list -> (int*int) list
-										     										     
+
+    val variables_list_of_mvbdu: mvbdu -> hconsed_variables_list
+					    
     val print: out_channel -> string -> mvbdu -> unit 
     val print_association_list: out_channel -> string -> hconsed_association_list -> unit 
     val print_variables_list: out_channel -> string -> hconsed_variables_list -> unit

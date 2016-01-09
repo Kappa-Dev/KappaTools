@@ -56,7 +56,8 @@ module type Mvbdu =
     val extensional_of_variables_list: (hconsed_variables_list,int list) unary
     val extensional_of_association_list: (hconsed_association_list,(int*int) list) unary
 
-												      
+    val variables_list_of_mvbdu: (mvbdu,hconsed_variables_list) unary
+
     val print: out_channel -> string -> mvbdu -> unit
     val print_association_list: out_channel -> string -> hconsed_association_list -> unit 
     val print_variables_list: out_channel -> string -> hconsed_variables_list -> unit
@@ -114,6 +115,7 @@ module type Internalized_mvbdu =
     val extensional_of_variables_list: hconsed_variables_list -> int list
     val extensional_of_association_list: hconsed_association_list -> (int*int) list
 
+    val variables_list_of_mvbdu: mvbdu -> hconsed_variables_list
 
     val print: out_channel -> string -> mvbdu -> unit
     val print_association_list: out_channel -> string -> hconsed_association_list -> unit 
@@ -182,7 +184,18 @@ module Make (M:Nul)  =
           Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> a) 
         in 
 	error, handler, a
-      
+
+    let lift1four string f parameters handler error a =
+       match 
+	 f parameters error handler a
+      with 
+      | error,(handler,Some a) -> error,handler,a 
+      | error,(handler,None) -> 
+        let error, a =
+          Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> a) 
+        in 
+	error, handler, a
+			  
     let lift1bis string f parameters handler error a = 
       let a,(b,c) = 
 	 f (Boolean_mvbdu.association_list_allocate parameters) error parameters handler a 
@@ -214,17 +227,31 @@ module Make (M:Nul)  =
         in 
 	error, handler, a
 
-    let lift1four string f parameters handler error a = 
+    let lift1four buildlist string f parameters handler error a = 
       match 
-	f parameters error  parameters handler a
+	f parameters error handler a
       with 
-      | error,(handler,Some a) -> error,handler,a 
+      | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) -> 
-        let error, a =
+         let error,handler,list =
+	   buildlist parameters handler error []
+	 in
+	 let error, a =
+          Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> list) 
+        in 
+	error, handler, (a:unit List_sig.list)
+
+    let lift1five string f parameters handler error a = 
+      match 
+	f parameters error parameters handler a
+      with 
+      | error,(handler,Some a) -> error,handler,a
+      | error,(handler,None) -> 
+         
+	 let error, a =
           Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> []) 
         in 
-	error, handler, []
-			  
+	error, handler, a
     let lift2 string f parameters handler error a b = 
       match 
 	f parameters handler error parameters a b
@@ -260,7 +287,7 @@ module Make (M:Nul)  =
 
     let lift2four string f parameters handler error a b = 
       match 
-	f parameters error  parameters handler a b
+	f parameters error handler a b
       with 
       | error,(handler,Some a) -> error,handler,a 
       | error,(handler,None) -> 
@@ -271,7 +298,7 @@ module Make (M:Nul)  =
 
     let lift2five string f parameters handler error a b = 
       match 
-	f parameters error  parameters handler a b
+	f parameters error handler a b
       with 
       | error,(handler,Some a) -> error,handler,a 
       | error,(handler,None) -> 
@@ -328,6 +355,13 @@ module Make (M:Nul)  =
       
     let empty_variables_list parameter handler error = build_variables_list parameter handler error []
 
+    let variables_list_of_mvbdu parameter handler error mvbdu =
+      lift1four
+	build_sorted_variables_list
+	"line 331, variables_list_of"
+	Boolean_mvbdu.variables_of_mvbdu
+	parameter handler error mvbdu
+
 
     let print = Boolean_mvbdu.print_mvbdu
     let print_association_list = List_algebra.print_association_list 
@@ -355,10 +389,10 @@ module Make (M:Nul)  =
       lift2five "line 335" Boolean_mvbdu.overwrite_association_lists parameters handler error l1 l2
 
     let extensional_of_association_list parameters handler error l =
-      lift1four "line 347"
+      lift1five "line 347"
 		Boolean_mvbdu.extensional_description_of_association_list parameters handler error l
     let extensional_of_variables_list parameters handler error l =
-      lift1four "line 361"
+      lift1five "line 361"
 		Boolean_mvbdu.extensional_description_of_variables_list parameters handler error l
 		
   end: Mvbdu)
@@ -503,6 +537,9 @@ module Internalize(M:Mvbdu) =
     let overwrite_association_lists l1 l2 =
       lift_binary'''' "line 475" M.overwrite_association_lists l1 l2
 
+    let variables_list_of_mvbdu l =
+      lift_unary "line 541" M.variables_list_of_mvbdu l
+		      
     let mvbdu_cartesian_abstraction = lift_unary "line 349" M.mvbdu_cartesian_abstraction 
 
     let extensional_of_association_list l =
@@ -597,6 +634,7 @@ module Optimize(M:Mvbdu) =
 	     let print_variables_list = M.print_variables_list
 	     let extensional_of_association_list = M.extensional_of_association_list
 	     let extensional_of_variables_list = M.extensional_of_variables_list
+	     let variables_list_of_mvbdu = M.variables_list_of_mvbdu
 	   end:Mvbdu)
 
 module Optimize'(M:Internalized_mvbdu) =
@@ -651,7 +689,7 @@ module Optimize'(M:Internalized_mvbdu) =
 	     let mvbdu_cartesian_abstraction = M.mvbdu_cartesian_abstraction 
 	     let extensional_of_association_list = M.extensional_of_association_list
 	     let extensional_of_variables_list = M.extensional_of_variables_list
-	 
+	     let variables_list_of_mvbdu = M.variables_list_of_mvbdu
 	   end:Internalized_mvbdu)
 
 module Vd = struct end

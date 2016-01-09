@@ -88,7 +88,9 @@ type memo_tables =
     boolean_mvbdu_overwrite_association_list: int List_sig.list Hash_2.t;
 
     boolean_mvbdu_extensional_description_of_variables_list: int list Hash_1.t;
-    boolean_mvbdu_extensional_description_of_association_list: (int*int) list Hash_1.t
+    boolean_mvbdu_extensional_description_of_association_list: (int*int) list Hash_1.t;
+
+    boolean_mvbdu_variables_of_mvbdu: unit List_sig.list Hash_1.t;
   }
 
 type mvbdu_dic = (bool Mvbdu_sig.cell, bool Mvbdu_sig.mvbdu) D_mvbdu_skeleton.dictionary
@@ -133,6 +135,9 @@ let split_memo error handler =
     "reset:",   x.boolean_mvbdu_redefine;
     "project_onto:", x.boolean_mvbdu_project_keep_only;
     "project_away:", x.boolean_mvbdu_project_abstract_away;],
+  [ (* _ -> variables_list *)
+    "variables_of:", x.boolean_mvbdu_variables_of_mvbdu;
+  ],
   [ (* _ -> _ -> variables_list *)
     "merge:", x.boolean_mvbdu_merge_variables_lists;
   ],
@@ -210,6 +215,7 @@ let init_data parameters error =
   let error,mvbdu_overwrite = Hash_2.create parameters error (0,0) in
   let error,mvbdu_extensional_variables_list = Hash_1.create parameters error 0 in
   let error,mvbdu_extensional_association_list = Hash_1.create parameters error 0 in
+  let error,mvbdu_variables_of = Hash_1.create parameters error 0 in
   error,
     {
       boolean_mvbdu_clean_head = mvbdu_clean_head ;
@@ -236,7 +242,8 @@ let init_data parameters error =
       boolean_mvbdu_merge_variables_lists = mvbdu_merge;
       boolean_mvbdu_overwrite_association_list = mvbdu_overwrite;
       boolean_mvbdu_extensional_description_of_variables_list = mvbdu_extensional_variables_list;
-      boolean_mvbdu_extensional_description_of_association_list = mvbdu_extensional_association_list
+      boolean_mvbdu_extensional_description_of_association_list = mvbdu_extensional_association_list;
+      boolean_mvbdu_variables_of_mvbdu = mvbdu_variables_of;
     }
     
 let init_remanent parameters error =
@@ -771,7 +778,7 @@ let merge_variables_lists parameters error handler list1 list2 =
       {handler 
        with Memo_sig.data = 
 	  {handler.Memo_sig.data with boolean_mvbdu_merge_variables_lists = memo}})
-    error handler
+    error parameters handler
     list1
     list2
 
@@ -787,7 +794,7 @@ let overwrite_association_lists parameters error handler list1 list2 =
       {handler 
        with Memo_sig.data = 
 	  {handler.Memo_sig.data with boolean_mvbdu_overwrite_association_list = memo}})
-    error handler
+    error parameters handler
     list1
     list2
 
@@ -816,7 +823,57 @@ let extensional_description_of_association_list parameters error handler list =
      with Memo_sig.data =
 	    {handler.Memo_sig.data with boolean_mvbdu_extensional_description_of_association_list = memo}})
     error handler list
-    
+
+let rec variables_of_mvbdu parameters error handler mvbdu =
+  match Hash_1.get parameters error mvbdu.Mvbdu_sig.id handler.Memo_sig.data.boolean_mvbdu_variables_of_mvbdu
+  with 
+  | error, Some output -> error, (handler, Some output)
+  | error, None -> 
+     begin
+       let error, (handler, output) =
+	 match mvbdu.Mvbdu_sig.value
+	 with
+	 | Mvbdu_sig.Leaf _ ->
+	    let error, (handler, list) = List_algebra.build_reversed_sorted_list (variables_list_allocate parameters) parameters error handler []
+	    in error, (handler, Some list)
+	 | Mvbdu_sig.Node a ->
+	    let error, (handler,list_false) = variables_of_mvbdu parameters error handler a.Mvbdu_sig.branch_false in
+	    let error, (handler,list_true) = variables_of_mvbdu parameters error handler a.Mvbdu_sig.branch_true in
+	    let error, (handler,singleton) = List_algebra.build_reversed_sorted_list (variables_list_allocate parameters) parameters error handler [a.Mvbdu_sig.variable,()] in
+	    begin
+	      match
+		list_false,list_true
+	      with
+	      | Some list_f, Some list_t ->
+		 begin
+		   let error, (handler,list_sibblings) = merge_variables_lists parameters error handler list_f list_t in
+		   let error, (handler,output) =
+		     match
+		       list_sibblings
+		     with
+		     | Some list_s -> merge_variables_lists parameters error handler singleton list_s
+		     | None -> Exception.warn parameters error (Some "Boolean_mvbdu") (Some "line 854") Exit (fun () -> handler,None)
+		   in
+		   error, (handler, output)
+		 end
+	      | None,_
+	      | _,None ->
+		 Exception.warn parameters error (Some "Boolean_mvbdu")
+				(Some "line 863") Exit (fun () -> handler,None) 
+	    end
+       in
+       match output
+       with
+       | Some output -> 
+	 let error, memo = Hash_1.set parameters error mvbdu.Mvbdu_sig.id output handler.Memo_sig.data.boolean_mvbdu_variables_of_mvbdu in
+	 error,
+	 ({handler
+	  with Memo_sig.data =
+		 { handler.Memo_sig.data with boolean_mvbdu_variables_of_mvbdu = memo}},Some output)
+       | None ->
+	  Exception.warn parameters error (Some "Boolean_mvbdu") (Some "line 874") Exit (fun () -> (handler,None))
+     end
+     
 let print_boolean_mvbdu (error:Exception.method_handler) = 
   Mvbdu_core.print_mvbdu error  
     (fun error parameters a -> 
@@ -831,8 +888,8 @@ let (f:Exception.method_handler ->
          Remanent_parameters_sig.parameters ->
          bool Mvbdu_sig.mvbdu -> Exception.method_handler) = print_boolean_mvbdu
     
-let print_hash1 error parameters  =
-  Hash_1.print error print_boolean_mvbdu parameters  
+let print_hash1 error log  =
+  Hash_1.print error print_boolean_mvbdu log  
     
 let print_hash2 error log = 
   Hash_2.print error print_boolean_mvbdu log 
@@ -842,16 +899,17 @@ let lift f a b c =
   in a
 
 let print_hash3 error log =
-  Hash_2.print error 
-    (lift List_algebra.print_variables_list)
-    log
-
+  Hash_1.print error (lift List_algebra.print_variables_list) log
+	       
 let print_hash4 error log =
+  Hash_2.print error (lift List_algebra.print_variables_list) log
+
+let print_hash5 error log =
   Hash_2.print error 
     (lift List_algebra.print_association_list)
     log
 
-let print_hash5 error log =
+let print_hash6 error log =
   Hash_1.print error
 	       (fun a b c ->
 		let log = b.Remanent_parameters_sig.log in
@@ -861,7 +919,7 @@ let print_hash5 error log =
 		let () = Printf.fprintf log "\n" in a)
 	       log
 	       
-let print_hash6 error log =
+let print_hash7 error log =
   Hash_1.print error (fun a b c ->
 		let log = b.Remanent_parameters_sig.log in
 		let prefix = b.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix in 
@@ -869,51 +927,22 @@ let print_hash6 error log =
 		let () = List.iter (fun (a,b) -> Printf.fprintf log "%i,%i;" a b) c in 
 		let () = Printf.fprintf log "\n" in a)
 	       log
-	      
+
+let print_gen log parameters error (title,print_hash,l) =
+  let () = Printf.fprintf log "%s:\n" title in
+  List.fold_left
+    (fun error (pref,x) ->
+     print_hash error (Remanent_parameters.update_prefix parameters pref) x)
+    error l
+    
 let print_memo (error:Exception.method_handler) handler parameters = 
-  let error,l1,l2,l3,l4,l5,l6 = split_memo error handler in 
-  let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s\n"
-    parameters.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix in
-  let error = 
-    Printf.fprintf stdout "Print Hash_1:\n";
-    List.fold_left
-      (fun error (pref,x) ->
-        print_hash1 error (Remanent_parameters.update_prefix parameters pref) x)
-      error l1
-  in 
-  let error = 
-    Printf.fprintf stdout "Print Hash_2:\n";
-    List.fold_left 
-      (fun error (pref,x) ->
-        print_hash2 error (Remanent_parameters.update_prefix parameters pref) x)
-      error l2
-  in 
-  let error = 
-    Printf.fprintf stdout "Print Hash_3:\n";
-    List.fold_left 
-      (fun error (pref,x) ->
-        print_hash3 error (Remanent_parameters.update_prefix parameters pref) x)
-      error l3
-  in 
-  let error = 
-    Printf.fprintf stdout "Print Hash_4:\n";
-    List.fold_left 
-      (fun error (pref,x) ->
-        print_hash4 error (Remanent_parameters.update_prefix parameters pref) x)
-      error l4
-  in 
-  let error = 
-    Printf.fprintf stdout "Print Hash_5:\n";
-    List.fold_left 
-      (fun error (pref,x) ->
-       print_hash4 error (Remanent_parameters.update_prefix parameters pref) x)
-      error l4
-  in
-  let error = 
-    Printf.fprintf stdout "Print Hash_6:\n";
-    List.fold_left 
-      (fun error (pref,x) ->
-       print_hash4 error (Remanent_parameters.update_prefix parameters pref) x)
-      error l4
-  in 
-error
+  let error,l1,l2,l3,l4,l5,l6,l7 = split_memo error handler in 
+  let () = Printf.fprintf parameters.Remanent_parameters_sig.log "%s\n" parameters.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix in
+  let error = print_gen stdout parameters error ("Print Hash_1",print_hash1,l1) in
+  let error = print_gen stdout parameters error ("Print Hash_2",print_hash2,l2) in
+  let error = print_gen stdout parameters error ("Print Hash_3",print_hash3,l3) in
+  let error = print_gen stdout parameters error ("Print Hash_4",print_hash4,l4) in
+  let error = print_gen stdout parameters error ("Print Hash_5",print_hash5,l5) in
+  let error = print_gen stdout parameters error ("Print Hash_6",print_hash6,l6) in
+  let error = print_gen stdout parameters error ("Print Hash_7",print_hash7,l7) in
+  error
