@@ -85,7 +85,7 @@ type memo_tables =
     boolean_mvbdu_project_abstract_away: bool Mvbdu_sig.mvbdu Hash_2.t;
 
     boolean_mvbdu_merge_variables_lists: unit List_sig.list Hash_2.t;
-    boolean_mvbdu_overwrite_association_lists: int List_sig.list Hash_2.t;
+    boolean_mvbdu_overwrite_association_list: int List_sig.list Hash_2.t;
 
     boolean_mvbdu_extensional_description_of_variables_list: int list Hash_1.t;
     boolean_mvbdu_extensional_description_of_association_list: (int*int) list Hash_1.t
@@ -109,12 +109,14 @@ type unary_memoized_fun =
 let split_memo error handler =
   let x = handler.Memo_sig.data in 
   error,
-  [ "id:",         x.boolean_mvbdu_identity;
+  [  (* _ -> mvbdu *)
+    "id:",         x.boolean_mvbdu_identity;  
     "not:",        x.boolean_mvbdu_not;
     "clean_head:", x.boolean_mvbdu_clean_head;
     "keep_head_only:", x.boolean_mvbdu_keep_head_only;
   ],
-  [ "and:",     x.boolean_mvbdu_and;
+  [ (* _ -> _ -> mvbdu *)
+    "and:",     x.boolean_mvbdu_and;
     "or:",      x.boolean_mvbdu_or;
     "xor:",     x.boolean_mvbdu_xor;
     "nand:",    x.boolean_mvbdu_nand; 
@@ -131,16 +133,16 @@ let split_memo error handler =
     "reset:",   x.boolean_mvbdu_redefine;
     "project_onto:", x.boolean_mvbdu_project_keep_only;
     "project_away:", x.boolean_mvbdu_project_abstract_away;],
-  [
+  [ (* _ -> _ -> variables_list *)
     "merge:", x.boolean_mvbdu_merge_variables_lists;
   ],
-  [
-    "overwrite:", x.boolean_mvbdu_overwrite_association_lists;
+  [ (* _ -> _ -> association_list *)
+    "overwrite:", x.boolean_mvbdu_overwrite_association_list;
   ],
-  [
+  [ (* _ -> int list *)
     "extensional_of_variables_list:", x.boolean_mvbdu_extensional_description_of_variables_list;
   ],
-  [
+  [ (* _ -> (int * int) list *)
     "Boolean_mvbdu_extensional_description_of_association_list:", x.boolean_mvbdu_extensional_description_of_association_list;
   ]
   
@@ -232,7 +234,7 @@ let init_data parameters error =
       boolean_mvbdu_project_keep_only = mvbdu_project_keep_only;
       boolean_mvbdu_project_abstract_away = mvbdu_project_abstract_away;
       boolean_mvbdu_merge_variables_lists = mvbdu_merge;
-      boolean_mvbdu_overwrite_association_lists = mvbdu_overwrite;
+      boolean_mvbdu_overwrite_association_list = mvbdu_overwrite;
       boolean_mvbdu_extensional_description_of_variables_list = mvbdu_extensional_variables_list;
       boolean_mvbdu_extensional_description_of_association_list = mvbdu_extensional_association_list
     }
@@ -777,14 +779,14 @@ let overwrite_association_lists parameters error handler list1 list2 =
   List_algebra.overwrite 
     (association_list_allocate parameters)
     (fun parameter error handler (x1,x2) -> 
-      let error,output = Hash_2.get parameter error (x1.List_sig.id,x2.List_sig.id) handler.Memo_sig.data.boolean_mvbdu_overwrite_association_lists in 
+      let error,output = Hash_2.get parameter error (x1.List_sig.id,x2.List_sig.id) handler.Memo_sig.data.boolean_mvbdu_overwrite_association_list in 
       error,(handler,output))
     (fun parameter error handler (x1,x2) output -> 
-      let error,memo = Hash_2.set parameter error (x1.List_sig.id,x2.List_sig.id) output handler.Memo_sig.data.boolean_mvbdu_overwrite_association_lists in 
+      let error,memo = Hash_2.set parameter error (x1.List_sig.id,x2.List_sig.id) output handler.Memo_sig.data.boolean_mvbdu_overwrite_association_list in 
       error,
       {handler 
        with Memo_sig.data = 
-	  {handler.Memo_sig.data with boolean_mvbdu_overwrite_association_lists = memo}})
+	  {handler.Memo_sig.data with boolean_mvbdu_overwrite_association_list = memo}})
     error handler
     list1
     list2
