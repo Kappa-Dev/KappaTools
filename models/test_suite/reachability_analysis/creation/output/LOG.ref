@@ -267,9 +267,48 @@ Id=20
 
 
 ------------------------------------------------------------
-* Cartesian abstraction:
+* Cartesian decomposition:
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
+Id=19
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=18
+   Node(site_type:1<1)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=13
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=10
+     Node(site_type:1<2)
+      Id=5
+       Node(site_type:2<0)
+        Id=1
+         Leaf False 
+
+        Id=4
+         Node(site_type:2<1)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+agent_type:1:D:cv_id:0
 Id=20
  Node(site_type:1<0)
   Id=1
@@ -283,18 +322,48 @@ Id=20
     Id=1
      Leaf False 
 
-Id=17
- Node(site_type:2<0)
+
+------------------------------------------------------------
+* Cartesian abstraction:
+------------------------------------------------------------
+agent_type:0:A:cv_id:0
+Id=19
+ Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=13
-   Node(site_type:2<2)
-    Id=0
-     Leaf True 
+  Id=18
+   Node(site_type:1<1)
+    Id=17
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
 
-    Id=1
-     Leaf False 
+      Id=13
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=10
+     Node(site_type:1<2)
+      Id=5
+       Node(site_type:2<0)
+        Id=1
+         Leaf False 
+
+        Id=4
+         Node(site_type:2<1)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
 
 agent_type:1:D:cv_id:0
 Id=20

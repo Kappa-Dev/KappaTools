@@ -784,22 +784,9 @@ Id=29
 
 
 ------------------------------------------------------------
-* Cartesian abstraction:
+* Cartesian decomposition:
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=47
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=10
-   Node(site_type:1<2)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
 Id=30
  Node(site_type:2<0)
   Id=1
@@ -813,7 +800,6 @@ Id=30
     Id=1
      Leaf False 
 
-agent_type:1:B:cv_id:0
 Id=47
  Node(site_type:1<0)
   Id=1
@@ -827,74 +813,180 @@ Id=47
     Id=1
      Leaf False 
 
-Id=22
- Node(site_type:2<0)
+agent_type:1:B:cv_id:0
+Id=29
+ Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=8
-   Node(site_type:2<2)
-    Id=0
-     Leaf True 
+  Id=28
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
 
-    Id=1
-     Leaf False 
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=27
+     Node(site_type:1<2)
+      Id=22
+       Node(site_type:2<0)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
 
 agent_type:2:C:cv_id:0
-Id=47
+Id=26
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=10
-   Node(site_type:1<2)
-    Id=0
-     Leaf True 
+  Id=25
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
 
-    Id=1
-     Leaf False 
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
 
-Id=22
- Node(site_type:2<0)
-  Id=1
-   Leaf False 
+        Id=1
+         Leaf False 
 
-  Id=8
-   Node(site_type:2<2)
-    Id=0
-     Leaf True 
+    Id=14
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
 
-    Id=1
-     Leaf False 
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
 
 agent_type:3:D:cv_id:0
-Id=47
+Id=29
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=10
-   Node(site_type:1<2)
-    Id=0
-     Leaf True 
+  Id=28
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
 
-    Id=1
-     Leaf False 
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
 
-Id=22
- Node(site_type:2<0)
-  Id=1
-   Leaf False 
+        Id=1
+         Leaf False 
 
-  Id=8
-   Node(site_type:2<2)
-    Id=0
-     Leaf True 
+    Id=27
+     Node(site_type:1<2)
+      Id=22
+       Node(site_type:2<0)
+        Id=1
+         Leaf False 
 
-    Id=1
-     Leaf False 
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
 
 agent_type:4:E:cv_id:0
+Id=29
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=28
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=27
+     Node(site_type:1<2)
+      Id=22
+       Node(site_type:2<0)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+
+------------------------------------------------------------
+* Cartesian abstraction:
+------------------------------------------------------------
+agent_type:0:A:cv_id:0
+Id=30
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=16
+   Node(site_type:2<3)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
 Id=47
  Node(site_type:1<0)
   Id=1
@@ -908,17 +1000,160 @@ Id=47
     Id=1
      Leaf False 
 
-Id=22
- Node(site_type:2<0)
+agent_type:1:B:cv_id:0
+Id=29
+ Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=8
-   Node(site_type:2<2)
-    Id=0
-     Leaf True 
+  Id=28
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
 
-    Id=1
-     Leaf False 
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=27
+     Node(site_type:1<2)
+      Id=22
+       Node(site_type:2<0)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+agent_type:2:C:cv_id:0
+Id=26
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=25
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=14
+     Node(site_type:1<2)
+      Id=9
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+agent_type:3:D:cv_id:0
+Id=29
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=28
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=27
+     Node(site_type:1<2)
+      Id=22
+       Node(site_type:2<0)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+agent_type:4:E:cv_id:0
+Id=29
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=28
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=27
+     Node(site_type:1<2)
+      Id=22
+       Node(site_type:2<0)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
 
 execution finished without any exception

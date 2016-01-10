@@ -1,7 +1,7 @@
-#This file has been computed by KaSa: a Static Analyzer for Kappa (Kappa Static Analyzer (DomainBased-340-ga043a97))
+#This file has been computed by KaSa: a Static Analyzer for Kappa (Kappa Static Analyzer (DomainBased-577-gde0acd3-dirty))
 #Download sources/binaries at https://github.com/Kappa-Dev/KaSim
 #
-#Analysis launched at 2015/12/05 05:11:19 (GMT+1) on applecell.home
+#Analysis launched at 2016/01/10 11:24:56 (GMT+1) on applecell.home
 #Command line is: KaSa relations.ka
 #
 #This file contains the description of the contact map in dot.

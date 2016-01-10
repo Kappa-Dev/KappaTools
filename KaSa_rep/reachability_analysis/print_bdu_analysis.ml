@@ -91,7 +91,27 @@ let print_bdu_update_map parameter error handler_kappa result =
     Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_update
     ) result
 
-let print_bdu_update_map_cartesian parameter handler error handler_kappa result = 
+let print_bdu_update_map_cartesian_decomposition parameter handler error handler_kappa result = 
+  Map_bdu_update.Map.fold 
+    (fun (agent_type, cv_id) bdu_update (error,handler) ->
+      let error, agent_string =
+        Handler.string_of_agent parameter error handler_kappa agent_type
+      in
+      let _ = fprintf parameter.log "agent_type:%i:%s:cv_id:%i\n" 
+        agent_type agent_string cv_id 
+      in 
+      let error,handler,list = 
+        Mvbdu_wrapper.Mvbdu.mvbdu_full_cartesian_decomposition parameter handler error bdu_update 
+      in 
+      let _ = 
+	List.iter 
+	  (Mvbdu_wrapper.Mvbdu.print parameter.log "")
+	  list
+      in 
+      error,handler)
+    result (error,handler)
+			  
+let print_bdu_update_map_cartesian_abstraction parameter handler error handler_kappa result = 
   Map_bdu_update.Map.fold 
     (fun (agent_type, cv_id) bdu_update (error,handler) ->
       let error, agent_string =
@@ -140,12 +160,28 @@ let print_result_fixpoint parameter handler error handler_kappa result =
         fprintf (Remanent_parameters.get_log parameter)
           "\n------------------------------------------------------------\n";
         fprintf (Remanent_parameters.get_log parameter)
+          "* Cartesian decomposition:\n";
+        fprintf (Remanent_parameters.get_log parameter)
+          "------------------------------------------------------------\n";
+      in
+      let _ =
+        print_bdu_update_map_cartesian_decomposition
+          parameter
+          handler 
+          error
+          handler_kappa
+          result
+      in
+      let _ =
+        fprintf (Remanent_parameters.get_log parameter)
+          "\n------------------------------------------------------------\n";
+        fprintf (Remanent_parameters.get_log parameter)
           "* Cartesian abstraction:\n";
         fprintf (Remanent_parameters.get_log parameter)
           "------------------------------------------------------------\n";
       in
       let _ =
-        print_bdu_update_map_cartesian
+        print_bdu_update_map_cartesian_decomposition
           parameter
           handler 
           error
