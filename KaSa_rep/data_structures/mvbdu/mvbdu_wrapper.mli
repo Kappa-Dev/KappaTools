@@ -38,6 +38,9 @@ module type Mvbdu =
     val mvbdu_redefine: (mvbdu,hconsed_association_list,mvbdu) binary 
     val mvbdu_project_keep_only: (mvbdu,hconsed_variables_list,mvbdu) binary
     val mvbdu_project_abstract_away: (mvbdu,hconsed_variables_list,mvbdu) binary
+    val mvbdu_cartesian_decomposition_depth: (mvbdu,int,mvbdu option * mvbdu list) binary
+    val mvbdu_full_cartesian_decomposition: (mvbdu,mvbdu list) unary
+  
     val mvbdu_cartesian_abstraction: (mvbdu,mvbdu list) unary 
 
     val build_association_list: ((int * int) list,hconsed_association_list) unary  
@@ -96,6 +99,9 @@ module type Internalized_mvbdu =
     val mvbdu_project_abstract_away: mvbdu -> hconsed_variables_list -> mvbdu
     val mvbdu_project_keep_only: mvbdu -> hconsed_variables_list -> mvbdu
     val mvbdu_cartesian_abstraction: mvbdu -> mvbdu list
+    val mvbdu_cartesian_decomposition_depth: mvbdu -> int -> mvbdu option * mvbdu list
+    val mvbdu_full_cartesian_decomposition: mvbdu -> mvbdu list 
+
     val build_association_list: (int * int) list ->  hconsed_association_list 
     val build_sorted_association_list: (int * int) list -> hconsed_association_list
     val build_reverse_sorted_association_list: (int * int) list -> hconsed_association_list

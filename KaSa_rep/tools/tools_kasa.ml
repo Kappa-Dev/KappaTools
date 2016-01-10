@@ -56,3 +56,18 @@ let make_id_compatible_with_dot_format parameters error string =
   let l = aux (String.length string -1) [] in 
   error,
   String.concat "" (List.rev_map (String.make 1) (List.rev l)) 
+
+
+let sorted_parts_of_list n list =
+  let list = List.sort (fun a b -> compare b a) list in
+  let rec aux k list suffix output =
+    if k=0
+    then
+      suffix::output
+    else
+      match list
+      with
+      | h::t ->
+	 aux k t suffix (aux (k-1) t (h::suffix) output)
+      | [] -> output
+  in aux n list [] []

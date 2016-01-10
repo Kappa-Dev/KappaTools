@@ -39,8 +39,10 @@ module type Mvbdu =
     val mvbdu_redefine: (mvbdu,hconsed_association_list,mvbdu) binary 
     val mvbdu_project_keep_only: (mvbdu,hconsed_variables_list,mvbdu) binary
     val mvbdu_project_abstract_away: (mvbdu,hconsed_variables_list,mvbdu) binary
-      
+    val mvbdu_cartesian_decomposition_depth: (mvbdu,int,mvbdu option * mvbdu list) binary
+    val mvbdu_full_cartesian_decomposition: (mvbdu,mvbdu list) unary
     val mvbdu_cartesian_abstraction: (mvbdu,mvbdu list) unary 
+
     val build_association_list: ((int * int) list,hconsed_association_list) unary  
     val build_sorted_association_list: ((int * int) list,hconsed_association_list) unary
     val build_reverse_sorted_association_list: ((int * int) list,hconsed_association_list) unary
@@ -100,6 +102,9 @@ module type Internalized_mvbdu =
     val mvbdu_project_abstract_away: mvbdu -> hconsed_variables_list -> mvbdu
     val mvbdu_project_keep_only: mvbdu -> hconsed_variables_list -> mvbdu
     val mvbdu_cartesian_abstraction: mvbdu -> mvbdu list
+    val mvbdu_cartesian_decomposition_depth: mvbdu -> int -> mvbdu option * mvbdu list
+    val mvbdu_full_cartesian_decomposition: mvbdu -> mvbdu list 
+
     val build_association_list: (int * int) list ->  hconsed_association_list 
     val build_sorted_association_list: (int * int) list -> hconsed_association_list
     val build_reverse_sorted_association_list: (int * int) list -> hconsed_association_list
@@ -362,7 +367,13 @@ module Make (M:Nul)  =
 	Boolean_mvbdu.variables_of_mvbdu
 	parameter handler error mvbdu
 
-
+    let extensional_of_association_list parameters handler error l =
+      lift1five "line 347"
+		Boolean_mvbdu.extensional_description_of_association_list parameters handler error l
+    let extensional_of_variables_list parameters handler error l =
+      lift1five "line 361"
+		Boolean_mvbdu.extensional_description_of_variables_list parameters handler error l
+		
     let print = Boolean_mvbdu.print_mvbdu
     let print_association_list = List_algebra.print_association_list 
     let print_variables_list = List_algebra.print_variables_list
@@ -382,18 +393,27 @@ module Make (M:Nul)  =
 	  aux error handler tail (head::list)
       in aux error handler bdu []
 
+    let mvbdu_cartesian_decomposition_depth parameters handler error bdu int =
+      Boolean_mvbdu.mvbdu_cartesian_decomposition_depth variables_list_of_mvbdu extensional_of_variables_list build_sorted_variables_list mvbdu_project_keep_only mvbdu_project_abstract_away mvbdu_and equal parameters handler error bdu int							
+	  
+    let mvbdu_full_cartesian_decomposition parameters handler error bdu =
+      let error,handler,l = variables_list_of_mvbdu parameters handler error bdu in
+      let error,handler,list = extensional_of_variables_list parameters handler error l in
+      let size = List.length list in
+      let error,handler,(bdu_opt,list) = mvbdu_cartesian_decomposition_depth parameters handler error bdu (size/2) in
+      match
+	bdu_opt
+      with
+      | None -> error,handler,list
+      | Some bdu -> error,handler,bdu::list
+	     
     let merge_variables_lists parameters handler error l1 l2 =
       lift2four "line 332" Boolean_mvbdu.merge_variables_lists parameters handler error l1 l2
 
     let overwrite_association_lists parameters handler error l1 l2 =
       lift2five "line 335" Boolean_mvbdu.overwrite_association_lists parameters handler error l1 l2
 
-    let extensional_of_association_list parameters handler error l =
-      lift1five "line 347"
-		Boolean_mvbdu.extensional_description_of_association_list parameters handler error l
-    let extensional_of_variables_list parameters handler error l =
-      lift1five "line 361"
-		Boolean_mvbdu.extensional_description_of_variables_list parameters handler error l
+  
 		
   end: Mvbdu)
 
@@ -546,7 +566,10 @@ module Internalize(M:Mvbdu) =
       lift_unary "line 509" M.extensional_of_association_list l
     let extensional_of_variables_list l =
       lift_unary "line 511" M.extensional_of_variables_list l
-						 
+
+    let mvbdu_full_cartesian_decomposition = lift_unary "line 569" M.mvbdu_full_cartesian_decomposition
+    let mvbdu_cartesian_decomposition_depth = lift_binary "line 570" M.mvbdu_cartesian_decomposition_depth
+		 
     let print = M.print
     let print_association_list = M.print_association_list 
     let print_variables_list = M.print_variables_list
@@ -629,12 +652,29 @@ module Optimize(M:Mvbdu) =
 
 	     let merge_variables_lists = M.merge_variables_lists
 	     let overwrite_association_lists = M.overwrite_association_lists
-	     let print = M.print 
-	     let print_association_list = M.print_association_list
-	     let print_variables_list = M.print_variables_list
+						 
 	     let extensional_of_association_list = M.extensional_of_association_list
 	     let extensional_of_variables_list = M.extensional_of_variables_list
 	     let variables_list_of_mvbdu = M.variables_list_of_mvbdu
+						 
+	     let mvbdu_cartesian_decomposition_depth parameters handler error bdu int =
+	       Boolean_mvbdu.mvbdu_cartesian_decomposition_depth variables_list_of_mvbdu extensional_of_variables_list build_sorted_variables_list mvbdu_project_keep_only mvbdu_project_abstract_away mvbdu_and equal parameters handler error bdu int							
+								 
+	     let mvbdu_full_cartesian_decomposition parameters handler error bdu =
+	       let error,handler,l = variables_list_of_mvbdu parameters handler error bdu in
+	       let error,handler,list = extensional_of_variables_list parameters handler error l in
+	       let size = List.length list in
+	       let error,handler,(bdu_opt,list) = mvbdu_cartesian_decomposition_depth parameters handler error bdu (size/2) in
+	       match
+		 bdu_opt
+	       with
+	       | None -> error,handler,list
+	       | Some bdu -> error,handler,bdu::list
+						 
+	     let print = M.print 
+	     let print_association_list = M.print_association_list
+	     let print_variables_list = M.print_variables_list
+	  
 	   end:Mvbdu)
 
 module Optimize'(M:Internalized_mvbdu) =
@@ -690,12 +730,17 @@ module Optimize'(M:Internalized_mvbdu) =
 	     let extensional_of_association_list = M.extensional_of_association_list
 	     let extensional_of_variables_list = M.extensional_of_variables_list
 	     let variables_list_of_mvbdu = M.variables_list_of_mvbdu
+
+	     let mvbdu_cartesian_decomposition_depth = M.mvbdu_cartesian_decomposition_depth
+							 	 
+	     let mvbdu_full_cartesian_decomposition = M.mvbdu_full_cartesian_decomposition							
+
 	   end:Internalized_mvbdu)
 
 module Vd = struct end
 module Mvbdu = Make(Vd)
 module IntMvbdu = Internalize(Make (Vd))
 module Optimized_Mvbdu = Optimize(Make(Vd))
-module Optimized_IntMvbdu = Optimize'(Internalize(Make (Vd)))
+module Optimized_IntMvbdu = Internalize(Optimize(Make (Vd)))
 				     
 
