@@ -91,6 +91,8 @@ type memo_tables =
     boolean_mvbdu_extensional_description_of_association_list: (int*int) list Hash_1.t;
 
     boolean_mvbdu_variables_of_mvbdu: unit List_sig.list Hash_1.t;
+
+    boolean_mvbdu_extensional_description_of_mvbdu: (int *int ) list list Hash_1.t;
   }
 
 type mvbdu_dic = (bool Mvbdu_sig.cell, bool Mvbdu_sig.mvbdu) D_mvbdu_skeleton.dictionary
@@ -149,6 +151,9 @@ let split_memo error handler =
   ],
   [ (* _ -> (int * int) list *)
     "Boolean_mvbdu_extensional_description_of_association_list:", x.boolean_mvbdu_extensional_description_of_association_list;
+  ],
+  [ (* _ -> (int * int) list list *)
+    "Boolean_mvbdu+extensional_description_of_mvbdu:",x.boolean_mvbdu_extensional_description_of_mvbdu;
   ]
   
 let rec print_cell log prefix cell = 
@@ -216,6 +221,7 @@ let init_data parameters error =
   let error,mvbdu_extensional_variables_list = Hash_1.create parameters error 0 in
   let error,mvbdu_extensional_association_list = Hash_1.create parameters error 0 in
   let error,mvbdu_variables_of = Hash_1.create parameters error 0 in
+  let error,mvbdu_extensional_description_of_mvbdu = Hash_1.create parameters error 0 in
   error,
     {
       boolean_mvbdu_clean_head = mvbdu_clean_head ;
@@ -244,6 +250,7 @@ let init_data parameters error =
       boolean_mvbdu_extensional_description_of_variables_list = mvbdu_extensional_variables_list;
       boolean_mvbdu_extensional_description_of_association_list = mvbdu_extensional_association_list;
       boolean_mvbdu_variables_of_mvbdu = mvbdu_variables_of;
+      boolean_mvbdu_extensional_description_of_mvbdu = mvbdu_extensional_description_of_mvbdu;
     }
     
 let init_remanent parameters error =
@@ -919,6 +926,59 @@ let mvbdu_cartesian_decomposition_depth variables_list_of_mvbdu extensional_of_v
       in
       let error,handler,(bdu_opt,list) = aux_k 1 handler error bdu [] in
       error,handler,(bdu_opt,List.rev list)
+
+let rec extensional_description_of_mvbdu parameters handler error mvbdu =  
+  match Hash_1.get parameters error mvbdu.Mvbdu_sig.id handler.Memo_sig.data.boolean_mvbdu_extensional_description_of_mvbdu 
+  with 
+  | error, Some output -> error, (handler, output)
+  | error, None -> 
+    begin
+      let rec aux mvbdu remanent handler error output =
+	match 
+	  mvbdu.Mvbdu_sig.value
+	with
+	| Mvbdu_sig.Leaf true -> error,(handler,[]::output)
+	| Mvbdu_sig.Leaf false -> error,(handler,output)
+	| Mvbdu_sig.Node a -> 
+	  let error,(handler,branch_false) = extensional_description_of_mvbdu parameters handler error a.Mvbdu_sig.branch_false in 
+	  let error,(handler,output) = 
+	  match 
+	    remanent,branch_false 
+	  with
+	  | _,[] -> error,(handler,output)
+	  | None,_ ->  
+	    Exception.warn parameters error (Some "Boolean_mvbdu")
+	      (Some "line 947") Exit (fun () -> handler,[]) 
+	  | Some (var,lower_bound),list -> 
+	    let upper_bound = a.Mvbdu_sig.upper_bound in 
+	    let head_list = 
+	      let rec aux k res = 
+		if k < lower_bound then res else aux (k-1) (k::res) 
+	      in aux upper_bound []
+	    in 
+	    let output = 
+	      List.fold_left
+		(fun output head ->
+		  List.fold_left
+		    (fun output tail -> ((var,head)::tail)::output)
+		    output list)
+		output head_list
+	    in 
+	    aux 
+	      a.Mvbdu_sig.branch_true 
+	      (Some (a.Mvbdu_sig.variable,upper_bound)) 
+	      handler error
+	      output
+	  in error,(handler,output)
+      in
+      let error,(handler,output) = aux mvbdu None handler error [] in
+      let error, memo = Hash_1.set parameters error mvbdu.Mvbdu_sig.id output handler.Memo_sig.data.boolean_mvbdu_extensional_description_of_mvbdu in
+	 error,
+	 ({handler
+	  with Memo_sig.data =
+		 { handler.Memo_sig.data with 
+boolean_mvbdu_extensional_description_of_mvbdu = memo}},output)
+    end
        
 let print_boolean_mvbdu (error:Exception.method_handler) = 
   Mvbdu_core.print_mvbdu error  
@@ -967,12 +1027,32 @@ let print_hash6 error log =
 	       
 let print_hash7 error log =
   Hash_1.print error (fun a b c ->
-		let log = b.Remanent_parameters_sig.log in
-		let prefix = b.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix in 
-		let () = Printf.fprintf log "%s" prefix in
-		let () = List.iter (fun (a,b) -> Printf.fprintf log "%i,%i;" a b) c in 
-		let () = Printf.fprintf log "\n" in a)
-	       log
+    let log = b.Remanent_parameters_sig.log in
+    let prefix = b.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix in 
+    let () = Printf.fprintf log "%s" prefix in
+    let () = List.iter (fun (a,b) -> Printf.fprintf log "%i,%i;" a b) c in 
+    let () = Printf.fprintf log "\n" in a)
+    log
+    
+let print_hash8 error log =
+  Hash_1.print error 
+    (fun a b c ->
+      let log = b.Remanent_parameters_sig.log in
+      let prefix = b.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix in 
+      let () = Printf.fprintf log "%s" prefix in
+      let () = 
+	List.iter 
+	  (fun x ->
+	    let () = 
+	      List.iter 
+		(fun (a,b) -> Printf.fprintf log "%i,%i;" a b)
+		x
+	    in 
+	    Printf.fprintf log "\n")
+	  c
+	   in 
+      let () = Printf.fprintf log "\n" in a)
+    log
 
 let print_gen log parameters error (title,print_hash,l) =
   let () = Printf.fprintf log "%s:\n" title in
@@ -982,7 +1062,7 @@ let print_gen log parameters error (title,print_hash,l) =
     error l
     
 let print_memo (error:Exception.method_handler) handler parameters = 
-  let error,l1,l2,l3,l4,l5,l6,l7 = split_memo error handler in 
+  let error,l1,l2,l3,l4,l5,l6,l7,l8 = split_memo error handler in 
   let () = Printf.fprintf parameters.Remanent_parameters_sig.log "%s\n" parameters.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix in
   let error = print_gen stdout parameters error ("Print Hash_1",print_hash1,l1) in
   let error = print_gen stdout parameters error ("Print Hash_2",print_hash2,l2) in
@@ -991,4 +1071,5 @@ let print_memo (error:Exception.method_handler) handler parameters =
   let error = print_gen stdout parameters error ("Print Hash_5",print_hash5,l5) in
   let error = print_gen stdout parameters error ("Print Hash_6",print_hash6,l6) in
   let error = print_gen stdout parameters error ("Print Hash_7",print_hash7,l7) in
+  let error = print_gen stdout parameters error ("Print Hash_8",print_hash8,l8) in 
   error
