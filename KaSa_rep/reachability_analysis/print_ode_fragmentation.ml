@@ -1,0 +1,111 @@
+(**
+    * ode_fragmentation.ml
+    * openkappa
+    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
+    * 
+    * Creation: 2015, the 9th of Apirl
+    * Last modification: 
+    * * 
+    * ODE fragmentation
+    * 
+    *  
+    * Copyright 2010,2011 Institut National de Recherche en Informatique et   
+    * en Automatique.  All rights reserved.  This file is distributed     
+    *  under the terms of the GNU Library General Public License *)
+
+open Int_storage
+open Cckappa_sig
+open Printf
+open Ode_fragmentation_type
+open Ode_fragmentation
+
+let warn parameter mh message exn default =
+  Exception.warn parameter mh (Some "print ODE fragmentation") message exn
+                 (fun () -> default)
+
+let trace = false
+
+(************************************************************************************)   
+(*Print sites that modified*)
+
+let print_sites_modified_set parameter error handler_kappa result =
+  AgentMap.iter parameter error
+    (fun parameter error agent_type site_set ->
+      let error, agent_name = 
+        Handler.string_of_agent parameter error handler_kappa agent_type
+      in
+      let _ =
+        fprintf stdout "agent_type:%i:%s\n" agent_type agent_name
+      in
+      (*convert site of type int to string*)
+      let _ =
+        Site_map_and_set.Set.iter (fun site ->
+          let error, site_string = 
+            Handler.string_of_site parameter error handler_kappa agent_type site
+          in
+          fprintf stdout "site_type:%i:%s\n" site site_string
+        ) site_set
+      in
+      error
+    ) result
+
+(************************************************************************************)   
+
+let cartesian_prod_eq i a b =
+  let rec loop a acc =
+    match a with
+      | [] -> List.rev acc
+      | x :: xs ->
+        loop xs (List.rev_append (List.rev (List.fold_left (fun acc y ->
+          if x <> y
+          then (i, x, y) :: acc
+          else acc
+        ) [] b)) acc)
+  in
+  loop a [] 
+
+let print_internal_flow parameter error handler_kappa result =
+  let store_result1, store_result2 = result in
+  if Remanent_parameters.get_do_ODE_flow_of_information parameter
+  then
+    if Remanent_parameters.get_trace parameter
+    then
+      let _ =
+        Printf.fprintf (Remanent_parameters.get_log parameter)
+          "Flow of information in the ODE semantics:internal flow (first case):\n"
+      in
+      Internal_flow_map.Map.iter
+        (fun agent_type (site_list, modified_set) ->
+          let modified_list =
+            Site_map_and_set.Set.elements modified_set
+          in
+          let cartesian_output =
+            cartesian_prod_eq agent_type site_list modified_list
+          in
+          let _ =
+            List.iter (fun (agent_type, site_type, site_modif) ->
+                fprintf stdout "Flow of information in the ODE semantics:Internal flow\n-agent_type:%i:site_type:%i -> agent_type:%i:site_type_modified:%i\n"
+                  agent_type site_type 
+                  agent_type site_modif
+            ) cartesian_output
+          in
+          ()
+        ) store_result1
+
+
+(************************************************************************************)   
+(*MAIN*)
+
+let print_result parameter error handler_kappa result =
+  let _ =
+    fprintf stdout "Flow of information in the ODE semantics:Internal flow\n";
+    let error =
+      print_internal_flow
+        parameter
+        error
+        handler_kappa
+        result.store_internal_flow
+    in
+    error
+  in
+  error

@@ -150,9 +150,9 @@ let main () =
 	then Printf.fprintf (Remanent_parameters.get_log parameters_ode) "Flow of information in the ODE semantics:\n"
       in
       let error, ode_fragmentation =
-        Ode_fragmentation.ode_fragmentation parameters_ode error handler c_compil
-      in error,Some ode_fragmentation
-    else error,None 
+        Ode_fragmentation_main.ode_fragmentation parameters_ode error handler c_compil
+      in error, Some ode_fragmentation
+    else error, None 
   in
   let _ = Exception.print parameters error in
   ()

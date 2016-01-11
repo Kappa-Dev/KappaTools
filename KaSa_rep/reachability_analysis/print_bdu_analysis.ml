@@ -130,7 +130,31 @@ let print_bdu_update_map_cartesian_abstraction parameter handler error handler_k
       in 
       error,handler)
     result (error,handler)
-	
+
+(*REMOVE*)
+let print_result_dead_rule parameter result =
+  if Remanent_parameters.get_dump_reachability_analysis_result parameter
+  then
+    let _ = Format.printf "\nReachability analysis result ....@." in
+    let parameter =
+      Remanent_parameters.update_prefix parameter ""
+    in
+    let _ =
+      fprintf (Remanent_parameters.get_log parameter)
+        "\n------------------------------------------------------------\n";
+      fprintf (Remanent_parameters.get_log parameter)
+        "* Rule that is dead :\n";
+      fprintf (Remanent_parameters.get_log parameter)
+        "------------------------------------------------------------\n";
+    in
+    Array.iteri (fun index bool ->
+      if bool
+      then
+        Printf.fprintf stdout "there is no dead rule.\n"
+      else
+        Printf.fprintf stdout "rule_id:%i %b\n" index bool
+    ) result  
+
 let print_result_fixpoint parameter handler error handler_kappa result =
   if Remanent_parameters.get_dump_reachability_analysis_result parameter
   then

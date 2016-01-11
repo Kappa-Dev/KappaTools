@@ -596,6 +596,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
     store_proj_bdu_views
     store_covering_classes_modification_update_full
     store_bdu_init_restriction_map
+    dead_rule_array
     =
   (*-----------------------------------------------------------------------*)
   let add_link parameter handler (agent_type, cv_id) bdu store_result =
@@ -643,17 +644,18 @@ let collect_bdu_fixpoint_with_init parameter handler error
   in
   (*-----------------------------------------------------------------------*)
   (*iterate function*)
-  let rec aux acc_wl (error, handler, store_bdu_fixpoint_init_map) =
+  let rec aux acc_wl (error, handler, store_bdu_fixpoint_init_map, dead_rule_array) =
     if IntWL.is_empty acc_wl
     then
-      error, (handler, store_bdu_fixpoint_init_map)
+      error, (handler, store_bdu_fixpoint_init_map, dead_rule_array)
     else
       (*-----------------------------------------------------------------------*)
       (*pop the first element (rule_id) in this working list*)
       let error, (rule_id_op, wl_tl) = IntWL.pop parameter error acc_wl in
       match rule_id_op with
       | None -> 
-        warn parameter error (Some "888") Exit (handler, store_bdu_fixpoint_init_map)
+        warn parameter error (Some "888") Exit 
+          (handler, store_bdu_fixpoint_init_map, dead_rule_array)
       | Some rule_id ->
         (*----------------------------------------------------------------------*)
         (*compute bdu_creation, bdu_test and modif_list for this rule_id*)
@@ -753,10 +755,34 @@ let collect_bdu_fixpoint_with_init parameter handler error
             bdu_proj_views
             store_bdu_fixpoint_init_map
         in
+        (*--------------------------------------------------------------------*)
+        (*discover dead rule; an initial array is false everywhere*)
+        (*let nrules = Handler.nrules parameter error handler_kappa in
+        let dead_rule_array = Array.make nrules false in*)
         (*-----------------------------------------------------------------------*)
         begin
           if is_enable
           then
+            (*dead_rule_array:when it is an enable rule set dead_rule_array is true*)
+            let dead_rule_array =
+              dead_rule_array.(rule_id) <- true;
+              dead_rule_array
+            in
+            (*print dead rule array in the result output*)
+            (*let _ =
+              if (Remanent_parameters.get_dump_reachability_analysis_result parameter) 
+              then
+                let parameters_cv =
+                  Remanent_parameters.update_prefix parameter ""
+                in
+                if (Remanent_parameters.get_trace parameters_cv)
+                then
+                  Array.iter (fun b ->
+                    Printf.fprintf stdout "rule_id:%i is alive: %b \n" rule_id b)
+                    dead_rule_array
+                else
+                  ()
+            in*)
             (*-----------------------------------------------------------------------*)
             (*output of rule that is enabled*)
             let _ =
@@ -792,8 +818,32 @@ let collect_bdu_fixpoint_with_init parameter handler error
                 bdu_proj_views
                 store_bdu_fixpoint_init_map
             in
-            aux new_wl (error, handler, store_new_result)
+            aux new_wl (error, handler, store_new_result, dead_rule_array)
           else
+            (*dead_rule_array:when it is not an enable rule set dead_rule_array is false*)
+            let dead_rule_array =
+              dead_rule_array.(rule_id) <- false;
+              dead_rule_array
+            in
+            (*print dead rule array in the result output*)
+            let _ =
+              if (Remanent_parameters.get_dump_reachability_analysis_result parameter) 
+              then
+                let parameters_cv =
+                  Remanent_parameters.update_prefix parameter ""
+                in
+                if (Remanent_parameters.get_trace parameters_cv)
+                then
+                  Array.iter (fun b ->
+                    if b 
+                    then
+                      Printf.fprintf stdout ""
+                    else
+                      Printf.fprintf stdout "rule_id:%i is alive: %b\n" rule_id b)
+                    dead_rule_array
+                else
+                  ()
+            in
             (*-----------------------------------------------------------------------*)
             (*output of rule that is disabled*)
             let _ =
@@ -809,11 +859,11 @@ let collect_bdu_fixpoint_with_init parameter handler error
                 else ()
             in
             (*-----------------------------------------------------------------------*)
-            aux wl_tl (error, handler, store_bdu_fixpoint_init_map)
+            aux wl_tl (error, handler, store_bdu_fixpoint_init_map, dead_rule_array)
         end
   in
   (*start with init_map and union with initial state*)
-  aux wl_init_creation (error, handler, store_bdu_fixpoint_init_map)
+  aux wl_init_creation (error, handler, store_bdu_fixpoint_init_map, dead_rule_array)
 
 (************************************************************************************)
 (*final fixpoint iteration*)
@@ -831,6 +881,7 @@ let collect_bdu_fixpoint_map parameter handler error
     store_proj_bdu_views
     store_covering_classes_modification_update_full
     store_bdu_init_restriction_map
+    init_dead_rule_array
     =
   let error, handler, bdu_false = 
     Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error
@@ -838,9 +889,13 @@ let collect_bdu_fixpoint_map parameter handler error
   let error, handler, bdu_true = 
     Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error 
   in
+  (*--------------------------------------------------------------------*)
+  (*discover dead rule; an initial array is false everywhere*)
+  (*let nrules = Handler.nrules parameter error handler_kappa in
+  let init_dead_rule_array = Array.make nrules false in*)
   (*-----------------------------------------------------------------------*)
   (*fixpoint*)
-  let error, (handler, store_bdu_fixpoint_map) =
+  let error, (handler, store_bdu_fixpoint_map, dead_rule_array) =
      collect_bdu_fixpoint_with_init
        parameter
        handler
@@ -859,8 +914,9 @@ let collect_bdu_fixpoint_map parameter handler error
        store_proj_bdu_views
        store_covering_classes_modification_update_full
        store_bdu_init_restriction_map
+       init_dead_rule_array
   in
-  error, (handler, store_bdu_fixpoint_map)
+  error, (handler, store_bdu_fixpoint_map, dead_rule_array)
 
 (************************************************************************************)
 (*BACKUP: DO NOT DELETE ME*)

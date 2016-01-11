@@ -16,6 +16,7 @@
 open Int_storage
 open Cckappa_sig
 open Printf
+open Ode_fragmentation_type
 
 let warn parameter mh message exn default =
   Exception.warn parameter mh (Some "ODE fragmentation") message exn
@@ -23,67 +24,952 @@ let warn parameter mh message exn default =
 
 let trace = false
 
-(*let sprintf_list l =
-  let acc = ref "{" in
-  List.iteri (fun i site_type ->
-    acc := !acc ^
-      if i <> 0
-      then sprintf "; %d" site_type
-      else sprintf "%d" site_type
-  ) l;
-  !acc ^ "}"*)
+(************************************************************************************)   
+(*collect modified set*)
 
-let sprintf_list l =
-  match l with
-    | [] -> ""
-    | _ as l' ->
-      let acc = ref "{" in
-      List.iteri (fun i x ->
-        acc := !acc ^
-          if i <> 0
-          then sprintf "; %d" x
-          else sprintf "%d" x
-      ) l';
-      !acc ^ "}"
-           
-let print_list l =
-  let output = sprintf_list l in
-  fprintf stdout "%s\n" output
-   
-(************************************************************************************)
-(*TYPE*)
+let collect_sites_modified_set parameter error rule handler_kappa store_result =
+  let error, store_result =
+    AgentMap.fold parameter error
+      (fun parameter error agent_id site_modif store_result ->
+        if Site_map_and_set.Map.is_empty site_modif.agent_interface
+        then
+          error, store_result
+        else
+          let agent_type = site_modif.agent_name in
+          (*----------------------------------------------------------------------*)
+          (*collect a set of site that modified*)
+          let error, site_set =
+            Site_map_and_set.Map.fold
+              (fun site _ (error, current_set) ->
+                let error, set =
+                  Site_map_and_set.Set.add parameter error site current_set
+                in
+                error, set
+              ) 
+              site_modif.agent_interface
+              (error, Site_map_and_set.Set.empty)
+          in
+          (*----------------------------------------------------------------------*)
+          (*PRINT at each rule*)
+          let _ =
+            if Remanent_parameters.get_do_ODE_flow_of_information parameter
+            then
+              if Remanent_parameters.get_trace parameter
+              then
+                let _ = 
+                  Printf.fprintf (Remanent_parameters.get_log parameter) 
+                    "Flow of information in the ODE semantics:modified sites:\n"
+                in
+                let error, agent_string =
+                  Handler.string_of_agent parameter error handler_kappa agent_type
+                in
+                let _ =
+                  fprintf stdout "\tagent_type:%i:%s\n" agent_type agent_string
+                in
+                Site_map_and_set.Set.iter (fun site_type ->
+                  let error, site_string = 
+                    Handler.string_of_site parameter error handler_kappa agent_type 
+                      site_type
+                  in
+                  fprintf stdout "\t\tsite_type:%i:%s\n" site_type site_string
+                ) site_set                    
+              else ()
+          in          
+          (*----------------------------------------------------------------------*)
+          (*get old?*)
+          let error, old_set =
+            match AgentMap.unsafe_get parameter error agent_type store_result with
+            | error, None -> error, Site_map_and_set.Set.empty
+            | error, Some s -> error, s
+          in
+          (*new*)
+          let error, new_set =
+            Site_map_and_set.Set.union parameter error site_set old_set
+          in
+          (*----------------------------------------------------------------------*)
+          (*store*)
+          let error, store_result =
+            AgentMap.set
+              parameter
+              error
+              agent_type
+              new_set
+              store_result
+          in
+          error, store_result
+      ) 
+      rule.diff_reverse
+      store_result
+  in
+  error, store_result
 
-module AgentMap = Nearly_inf_Imperatif
-module SiteSet  = Site_map_and_set
+(************************************************************************************)   
+(*collect sites that are released*)
 
-type set = SiteSet.Set.t
-type elt_set = SiteSet.elt
+let collect_sites_bond_pair_set parameter error handler_kappa rule store_result =
+  let bond_lhs = rule.rule_lhs.bonds in
+  List.fold_left (fun (error, store_result) (site_add1, site_add2) ->
+    let store_result1, store_result2 = store_result in
+    let agent_id1 = site_add1.agent_index in
+    let agent_type1 = site_add1.agent_type in
+    (*get site_address_map from bond_lhs*)
+    let error, site_add_map1 =
+      match AgentMap.unsafe_get parameter error agent_id1 bond_lhs with
+      | error, None -> error, Site_map_and_set.Map.empty
+      | error, Some map -> error, map
+    in
+    (*get a set of sites that are bond*)
+    let error, sites_bond_set1 =
+      Site_map_and_set.Map.fold 
+        (fun site _ (error, current_set) ->
+          let error, set =
+            Site_map_and_set.Set.add
+              parameter
+              error
+              site
+              current_set
+          in
+          error, set
+        ) site_add_map1 (error, Site_map_and_set.Set.empty)
+    in
+    (*----------------------------------------------------------------------*)
+    (*PRINT*)
+    let _ =
+      if Remanent_parameters.get_do_ODE_flow_of_information parameter
+      then
+        if Remanent_parameters.get_trace parameter
+        then
+          let _ =
+            Printf.fprintf (Remanent_parameters.get_log parameter)
+              "Flow of information in the ODE semantics:bond sites (first agent):\n"
+          in
+          let error, agent_string1 =
+            Handler.string_of_agent parameter error handler_kappa agent_type1
+          in
+          let _ =
+            fprintf stdout "\tagent_type:%i:%s\n" agent_type1 agent_string1
+          in
+          Site_map_and_set.Set.iter (fun site_type ->
+            let error, site_string =
+              Handler.string_of_site parameter error handler_kappa agent_type1
+                site_type
+            in
+            fprintf stdout "\t\tsite_type:%i:%s\n" site_type site_string
+          ) sites_bond_set1
+        else ()
+    in
+    (*----------------------------------------------------------------------*)
+    (*compute first pair*)
+    let error, store_result1 =
+      AgentMap.set
+        parameter
+        error
+        agent_type1
+        sites_bond_set1
+        store_result1
+    in
+    (*----------------------------------------------------------------------*)
+    (*compute second pair*)
+    let agent_id2 = site_add2.agent_index in
+    let agent_type2 = site_add2.agent_type in
+    let error, site_add_map2 =
+      match AgentMap.unsafe_get parameter error agent_id2 bond_lhs with
+      | error, None -> error, Site_map_and_set.Map.empty
+      | error, Some map -> error, map
+    in
+    (*get a set of sites that are bond*)
+    let error, sites_bond_set2 =
+      Site_map_and_set.Map.fold
+        (fun site _ (error, current_set) ->
+          let error, set =
+            Site_map_and_set.Set.add
+              parameter
+              error
+              site
+              current_set
+          in
+          error, set
+        ) site_add_map2 (error, Site_map_and_set.Set.empty)
+    in
+    (*----------------------------------------------------------------------*)
+    (*PRINT*)
+    let _ =
+      if Remanent_parameters.get_do_ODE_flow_of_information parameter
+      then
+        if Remanent_parameters.get_trace parameter
+        then
+          let _ =
+            Printf.fprintf (Remanent_parameters.get_log parameter)
+              "Flow of information in the ODE semantics:bond sites (second agent):\n"
+          in
+          let error, agent_string2 =
+            Handler.string_of_agent parameter error handler_kappa agent_type2
+          in
+          let _ =
+            fprintf stdout "\tagent_type:%i:%s\n" agent_type2 agent_string2
+          in
+          Site_map_and_set.Set.iter (fun site_type ->
+            let error, site_string =
+              Handler.string_of_site parameter error handler_kappa agent_type2
+                site_type
+            in
+            fprintf stdout "\t\tsite_type:%i:%s\n" site_type site_string
+          ) sites_bond_set2
+        else ()
+    in
+    (*----------------------------------------------------------------------*)
+    (*get old*)
+    let error, old_set2 =
+      match AgentMap.unsafe_get parameter error agent_type2 store_result2 with
+      | error, None -> error, Site_map_and_set.Set.empty
+      | error, Some s -> error, s
+    in
+    (*new set*)
+    let error, new_set2 =
+      Site_map_and_set.Set.union parameter error sites_bond_set2 old_set2
+    in
+    (*store*)
+    let error, store_result2 =
+      AgentMap.set
+        parameter
+        error
+        agent_type2
+        new_set2
+        store_result2
+    in
+    (*----------------------------------------------------------------------*)
+    (*result*)
+    (*return a pair, first pair is a first binding agent of each rule. Second
+      pair is a second binding agent, it is a result of anchor*)
+    let error, store_result =
+      error, (store_result1, store_result2)
+    in
+    error, store_result
+  ) (error, store_result) rule.actions.release
 
-type sites_ode = (set AgentMap.t * set AgentMap.t)
+(************************************************************************************)   
+(*collect sites that are external*)
 
-type pair_int_flow =
-    ((agent_name * elt_set * elt_set) list) AgentMap.t
+let collect_sites_bond_pair_set_external parameter error rule store_result =
+  let bond_lhs = rule.rule_lhs.bonds in
+  List.fold_left (fun (error, store_result) (site_add1, site_add2) ->
+    let store_result1, store_result2 = store_result in
+    let agent_id1 = site_add1.agent_index in
+    let agent_type1 = site_add1.agent_type in
+    let error, site_add_map1 =
+      match AgentMap.unsafe_get parameter error agent_id1 bond_lhs with
+      | error, None -> error, Site_map_and_set.Map.empty
+      | error, Some map -> error, map
+    in
+    let error, sites_bond_set1 =
+      Site_map_and_set.Map.fold
+        (fun site _ (error, current_set) ->
+          let error, set =
+            Site_map_and_set.Set.add
+              parameter
+              error
+              site
+              current_set
+          in
+          error, set
+        ) site_add_map1 (error, Site_map_and_set.Set.empty)
+    in
+    (*store*)
+    let error, store_result1 =
+      AgentMap.set
+        parameter
+        error
+        agent_type1
+        sites_bond_set1
+        store_result1
+    in
+    (*----------------------------------------------------------------------*)
+    (*compute second pair*)
+    let agent_id2 = site_add2.agent_index in
+    let agent_type2 = site_add2.agent_type in
+    let error, site_add_map2 =
+      match AgentMap.unsafe_get parameter error agent_id2 bond_lhs with
+      | error, None -> error, Site_map_and_set.Map.empty
+      | error, Some map -> error, map
+    in
+    let error, sites_bond_set2 =
+      Site_map_and_set.Map.fold
+        (fun site _ (error, current_set) ->
+          let error, set =
+            Site_map_and_set.Set.add
+              parameter
+              error
+              site
+              current_set
+          in
+          error, set
+        ) site_add_map2 (error, Site_map_and_set.Set.empty)
+    in
+    let error, store_result2 =
+      AgentMap.set
+        parameter
+        error
+        agent_type2
+        sites_bond_set2
+        store_result2
+    in
+    (*----------------------------------------------------------------------*)
+    let error, store_result =
+      error, (store_result1, store_result2)
+    in
+    error, store_result
+  ) (error, store_result) rule.actions.release
 
-type pair_ext_flow =
-    ((agent_name * int * agent_name * int) list)
+(************************************************************************************)   
+(*collect sites from lhs rule*)
 
-type ode_frag =
+let collect_sites_lhs parameter error rule store_result =
+  let error, store_result =
+    AgentMap.fold parameter error
+      (fun parameter error agent_id agent store_result ->
+        match agent with
+        | Ghost | Unknown_agent _ -> error, store_result
+        | Dead_agent (agent, _, _, _)
+        | Agent agent ->
+          let agent_type = agent.agent_name in
+          let error, site_list =
+            Site_map_and_set.Map.fold
+              (fun site _ (error, current_list) ->
+                let site_list = site :: current_list in
+                error, site_list
+              ) agent.agent_interface (error, [])
+          in
+          (*get old?*)
+          let error, old_list =
+            match AgentMap.unsafe_get parameter error agent_type store_result with
+            | error, None -> error, []
+            | error, Some l -> error, l
+          in
+          let new_list = List.concat [site_list; old_list] in
+          (*store*)
+          let error, store_result =
+            AgentMap.set
+              parameter
+              error
+              agent_type
+              new_list (*FIXME: new_list?*)
+              store_result
+          in
+          error, store_result          
+      ) rule.rule_lhs.views store_result
+  in
+  error, store_result
+
+(************************************************************************************)   
+(*collect sites anchor set*)
+
+let collect_sites_anchor_set parameter error handler_kappa rule 
+    store_sites_modified_set
+    store_sites_bond_pair_set
+    store_sites_lhs
+    store_result =
+  AgentMap.fold parameter error
+    (fun parameter error agent_id agent store_result ->
+      let store_result1, store_result2 = store_result in
+      match agent with
+      | Ghost | Unknown_agent _ -> error, store_result
+      | Dead_agent (agent, _, _, _)
+      | Agent agent ->
+        let agent_type = agent.agent_name in
+        (*----------------------------------------------------------------------*)
+        (*get sites that is modified*)
+        let error, modified_set =
+          match AgentMap.unsafe_get parameter error agent_type 
+            store_sites_modified_set
+          with
+          | error, None -> error, Site_map_and_set.Set.empty
+          | error, Some s -> error, s
+        in
+        (*----------------------------------------------------------------------*)
+        (*get a set of sites in the lhs that are bond*)
+        let error, site_lhs_bond_fst_set =
+          match AgentMap.unsafe_get parameter error agent_type 
+            (fst store_sites_bond_pair_set) 
+          with
+          | error, None -> error, Site_map_and_set.Set.empty
+          | error, Some s -> error, s
+        in
+        (*----------------------------------------------------------------------*)
+        (*get a list of sites in the lsh*)
+        let error, sites_lhs_list =
+          match AgentMap.unsafe_get parameter error agent_type store_sites_lhs with
+          | error, None -> error, []
+          | error, Some l -> error, l
+        in
+        (*----------------------------------------------------------------------*)
+        (*first case: a site connected to a modified site*)
+        let error, store_result1 =
+          List.fold_left (fun (error, store_result) x ->
+            begin
+              if Site_map_and_set.Set.mem x modified_set &&
+                Site_map_and_set.Set.mem x site_lhs_bond_fst_set
+              then
+                let store_result =
+                  snd store_sites_bond_pair_set
+                in
+                error, store_result
+              else
+                error, store_result
+            end
+          ) (error, store_result1) (List.rev sites_lhs_list)
+        in
+        (*----------------------------------------------------------------------*)
+        (*second result*)
+        (*get a set of anchor sites*)
+        let error, anchor_set1 =
+          match AgentMap.unsafe_get parameter error agent_type 
+            (fst store_sites_bond_pair_set)
+          with
+          | error, None -> error, Site_map_and_set.Set.empty
+          | error, Some s -> error, s
+        in
+        let error, anchor_set2 =
+          match AgentMap.unsafe_get parameter error agent_type
+            (snd store_sites_bond_pair_set)
+          with
+          | error, None -> error, Site_map_and_set.Set.empty
+          | error, Some s -> error, s
+        in
+        let error, anchor_set =
+          Site_map_and_set.Set.union parameter error anchor_set1 anchor_set2
+        in
+        (*----------------------------------------------------------------------*)
+        let error, store_result2 =
+          List.fold_left (fun (error, store_result) x ->
+            List.fold_left (fun (error, store_result) y ->
+              begin
+                if Site_map_and_set.Set.mem x anchor_set ||
+                  Site_map_and_set.Set.mem x modified_set &&
+                  Site_map_and_set.Set.mem y site_lhs_bond_fst_set
+                then
+                  let store_result =
+                    snd store_sites_bond_pair_set
+                  in
+                  error, store_result
+                else
+                  error, store_result
+              end
+            ) (error, store_result) (List.tl sites_lhs_list)
+          ) (error, store_result2) (List.rev sites_lhs_list)
+        in
+        (*----------------------------------------------------------------------*)
+        (*get union both result*)
+        let error, get_set1 =
+          match AgentMap.unsafe_get parameter error agent_type store_result1 with
+          | error, None -> error, Site_map_and_set.Set.empty
+          | error, Some s -> error, s
+        in
+        let error, get_set2 =
+          match AgentMap.unsafe_get parameter error agent_type store_result2 with
+          | error, None -> error, Site_map_and_set.Set.empty
+          | error, Some s -> error, s
+        in
+        let error, union_set =
+          Site_map_and_set.Set.union parameter error get_set1 get_set2
+        in
+        (*----------------------------------------------------------------------*)
+        (*PRINT*)
+        let _ =
+          if Remanent_parameters.get_do_ODE_flow_of_information parameter
+          then
+            if Remanent_parameters.get_trace parameter
+            then
+              let _ =
+                Printf.fprintf (Remanent_parameters.get_log parameter)
+                  "Flow of information in the ODE semantics:anchor sites:\n"
+              in
+              let error, agent_string =
+                Handler.string_of_agent parameter error handler_kappa agent_type 
+              in
+              let _ =
+                fprintf stdout "\tagent_type:%i:%s\n" agent_type agent_string
+              in
+              Site_map_and_set.Set.iter (fun site_type ->
+                let error, site_string =
+                  Handler.string_of_site parameter error handler_kappa agent_type
+                    site_type
+                in
+                fprintf stdout "\t\tsite_type:%i:%s\n" site_type site_string
+              ) union_set
+            else ()
+        in
+        (*----------------------------------------------------------------------*)
+        (*result*)
+        let error, store_result =
+          error, (store_result1, store_result2)
+        in
+        error, store_result
+    ) rule.rule_lhs.views store_result
+
+(************************************************************************************)   
+(*collect internal flow*)
+
+let cartesian_prod_eq i a b =
+  let rec loop a acc =
+    match a with
+      | [] -> List.rev acc
+      | x :: xs ->
+        loop xs (List.rev_append (List.rev (List.fold_left (fun acc y ->
+          if x <> y
+          then (i, x, y) :: acc
+          else acc
+        ) [] b)) acc)
+  in
+  loop a [] 
+
+let collect_internal_flow parameter error handler_kappa rule
+    store_sites_lhs
+    store_sites_modified_set
+    store_sites_anchor_set
+    store_result =
+  (*----------------------------------------------------------------------*)
+  let add_link agent_type (site_list, set) store_result =
+    let result =
+      Internal_flow_map.Map.add agent_type (site_list, set) store_result
+    in
+    error, result
+  in
+  (*----------------------------------------------------------------------*)
+  AgentMap.fold parameter error
+    (fun parameter error agent_id agent store_result ->
+      let store_result1, store_result2 = store_result in
+      match agent with
+      | Ghost | Unknown_agent _ -> error, store_result
+      | Dead_agent (agent, _, _, _)
+      | Agent agent ->
+        let agent_type = agent.agent_name in
+        (*let agent_type_modif = agent_modif.agent_name in*)
+        (*get modified set*)
+        let error, modified_set =
+          match AgentMap.unsafe_get parameter error agent_type
+            store_sites_modified_set
+          with
+          | error, None -> error, Site_map_and_set.Set.empty
+          | error, Some s -> error, s
+        in
+        (*get anchor set*)
+        let error, anchor_set1 =
+          match AgentMap.unsafe_get parameter error agent_type 
+            (fst store_sites_anchor_set) 
+          with
+          | error, None -> error, Site_map_and_set.Set.empty
+          | error, Some s -> error, s  
+        in
+        let error, anchor_set2 =
+          match AgentMap.unsafe_get parameter error agent_type
+            (snd store_sites_anchor_set)
+          with
+          | error, None -> error, Site_map_and_set.Set.empty
+          | error, Some s -> error, s
+        in
+        let error, anchor_set =
+          Site_map_and_set.Set.union parameter error anchor_set1 anchor_set2
+        in
+        (*----------------------------------------------------------------------*)
+        (*first result: site -> modified site*)
+        let error, site_list =
+          match AgentMap.unsafe_get parameter error agent_type store_sites_lhs with
+          | error, None -> error, []
+          | error, Some l -> error, l
+        in
+        (*------------------------------------------------------------------------------*)
+        (*PRINT*)
+        let _ =
+          if Remanent_parameters.get_do_ODE_flow_of_information parameter
+          then
+            if Remanent_parameters.get_trace parameter
+            then
+              let _ =
+                Printf.fprintf (Remanent_parameters.get_log parameter)
+                  "Flow of information in the ODE semantics:internal flow (first case):\n"
+              in
+              let modified_list =
+                Site_map_and_set.Set.elements modified_set
+              in
+              let cartesian_output =
+                cartesian_prod_eq agent_type site_list modified_list
+              in
+              let _ =
+                List.iter (fun (agent_type, site_type, site_modif) ->
+                  let error, agent_string =
+                    Handler.string_of_agent parameter error handler_kappa agent_type 
+                  in
+                  let error, site_string =
+                    Handler.string_of_site parameter error handler_kappa agent_type 
+                      site_type
+                  in
+                  let error, site_modif_string =
+                    Handler.string_of_site parameter error handler_kappa agent_type 
+                      site_modif
+                  in
+                  fprintf stdout "Flow of information in the ODE semantics:Internal flow\n-agent_type:%i:%s:site_type:%i:%s -> agent_type:%i:%s:site_type_modified:%i:%s\n"
+                    agent_type agent_string site_type site_string
+                    agent_type agent_string site_modif site_modif_string
+                ) cartesian_output
+              in
+              ()
+        in
+        (*------------------------------------------------------------------------------*)
+        (*PRINT second internal flow*)
+        let _ =
+          if Remanent_parameters.get_do_ODE_flow_of_information parameter
+          then
+            if Remanent_parameters.get_trace parameter
+            then
+              let _ =
+                Printf.fprintf (Remanent_parameters.get_log parameter)
+                  "Flow of information in the ODE semantics:internal flow (second case):\n"
+              in
+              let anchor_list =
+                Site_map_and_set.Set.elements anchor_set
+              in
+              let cartesian_output =
+                cartesian_prod_eq agent_type site_list anchor_list
+              in
+              let _ =
+                List.iter (fun (agent_type, site_type, site_anchor) ->
+                  let error, agent_string =
+                    Handler.string_of_agent parameter error handler_kappa agent_type 
+                  in
+                  let error, site_string =
+                    Handler.string_of_site parameter error handler_kappa agent_type 
+                      site_type
+                  in
+                  let error, site_anchor_string =
+                    Handler.string_of_site parameter error handler_kappa agent_type 
+                      site_anchor
+                  in
+                  fprintf stdout "Flow of information in the ODE semantics:Internal flow\n-agent_type:%i:%s:site_type:%i:%s -> agent_type:%i:%s:site_type_anchor:%i:%s\n"
+                    agent_type agent_string site_type site_string
+                    agent_type agent_string site_anchor site_anchor_string
+                ) cartesian_output
+              in
+              ()
+        in        
+        (*------------------------------------------------------------------------------*)
+        let error, store_result1 =
+          add_link agent_type (site_list, modified_set) store_result1
+        in
+        (*------------------------------------------------------------------------------*)
+        let error, store_result2 =
+          add_link agent_type (site_list, anchor_set) store_result2
+        in
+        (*------------------------------------------------------------------------------*)
+        let error, store_result =
+          error, (store_result1, store_result2)
+        in
+        error, store_result
+    ) rule.rule_lhs.views
+    store_result
+
+(************************************************************************************)   
+(*collect external flow*)
+
+let cartesian_prod_external i anchor_set i' bond_fst_list bond_snd_set =
+  let anchor_list = Site_map_and_set.Set.elements anchor_set in
+  let rec loop anchor_list acc =
+    match anchor_list with
+      | [] -> List.rev acc
+      | x :: xs ->
+        loop xs (List.rev_append (List.rev (List.fold_left (fun acc y ->
+          (*if not (SiteSet.Set.is_empty anchor_set &&
+            SiteSet.Set.is_empty bond_snd_set)
+            then
+            begin*)
+          if Site_map_and_set.Set.mem x anchor_set &&
+            Site_map_and_set.Set.mem x bond_snd_set
+          then (i, x, i', y) :: acc
+          else acc
+        (*else List.rev acc*)
+        ) [] bond_fst_list)) acc)
+  in
+  loop anchor_list [] 
+
+let collect_external_flow parameter error handler_kappa rule 
+    store_sites_bond_pair_set_external
+    store_sites_anchor_set
+    store_result =
+  (*------------------------------------------------------------------------------*)
+  let add_link (agent_type1, agent_type2) (anchor_set, bond_fst_set, bond_snd_set) 
+      store_result =
+    let result =
+      External_flow_map.Map.add (agent_type1, agent_type2)
+        (anchor_set, bond_fst_set, bond_snd_set) store_result
+    in
+    error, result
+  in
+  (*------------------------------------------------------------------------------*)
+  List.fold_left (fun (error, store_result) (site_add1, site_add2) ->
+    let agent_type1 = site_add1.agent_type in
+    let agent_type2 = site_add2.agent_type in
+    (*------------------------------------------------------------------------------*)
+    (*get sites that are bond on the lhs*)
+    let error, bond_fst_set =
+      match AgentMap.unsafe_get parameter error agent_type1
+        (fst store_sites_bond_pair_set_external)
+      with
+      | error, None -> error, Site_map_and_set.Set.empty
+      | error, Some s -> error, s
+    in
+    (*------------------------------------------------------------------------------*)
+    let error, bond_snd_set =
+      match AgentMap.unsafe_get parameter error agent_type2
+        (snd store_sites_bond_pair_set_external)
+      with
+      | error, None -> error, Site_map_and_set.Set.empty
+      | error, Some s -> error, s
+    in
+    (*------------------------------------------------------------------------------*)
+    (*get anchor set*)
+    let error, anchor_set1 =
+      AgentMap.fold parameter error
+        (fun parameter error agent_type site_set old_set ->
+          let error, set =
+            Site_map_and_set.Set.union
+              parameter
+              error
+              site_set
+              old_set
+          in
+          error, set
+        ) (fst store_sites_anchor_set) Site_map_and_set.Set.empty
+    in
+    let error, anchor_set2 =
+      AgentMap.fold parameter error
+        (fun parameter error agent_type site_set old_set ->
+          let error, set =
+            Site_map_and_set.Set.union
+              parameter
+              error
+              site_set
+              old_set
+          in
+          error, set
+        )(snd store_sites_anchor_set) Site_map_and_set.Set.empty
+    in
+    let error, anchor_set =
+      Site_map_and_set.Set.union
+        parameter
+        error
+        anchor_set1
+        anchor_set2
+    in
+    (*------------------------------------------------------------------------------*)
+    (*PRINT External flow*)
+    let bond_fst_list = Site_map_and_set.Set.elements bond_fst_set in
+    let cartesian_output =
+      cartesian_prod_external
+        agent_type2
+        anchor_set
+        agent_type1
+        bond_fst_list
+        bond_snd_set
+    in
+    let _ =
+      if Remanent_parameters.get_do_ODE_flow_of_information parameter
+      then
+        if Remanent_parameters.get_trace parameter
+        then
+          let _ =
+            Printf.fprintf (Remanent_parameters.get_log parameter)
+              "Flow of information in the ODE semantics:external flow:\n"
+          in
+          List.iter (fun (agent_type, anchor_site_type, agent_type', site_modif) ->
+            let error, agent_string =
+              Handler.string_of_agent parameter error handler_kappa agent_type
+            in
+            let error, agent_string' =
+              Handler.string_of_agent parameter error handler_kappa agent_type'
+            in
+            let error, anchor_site_type_string =
+              Handler.string_of_site parameter error handler_kappa agent_type
+                anchor_site_type
+            in
+            let error, site_modif_string =
+              Handler.string_of_site parameter error handler_kappa agent_type'
+                site_modif
+            in
+            fprintf stdout "Flow of information in the ODE semantics:External flow:\n-agent-type:%i:%s:site_type_anchor:%i:%s -> agent_type:%i:%s:site_type_modified:%i:%s\n"
+              agent_type agent_string
+              anchor_site_type anchor_site_type_string
+              agent_type' agent_string'
+              site_modif site_modif_string
+          ) cartesian_output
+        else ()
+    in
+    (*------------------------------------------------------------------------------*)
+    let error, store_result =
+      add_link (agent_type1, agent_type2) (anchor_set, bond_fst_set, bond_snd_set)
+        store_result
+    in
+    error, store_result 
+  ) (error, store_result) rule.actions.release
+
+(************************************************************************************)   
+(*RULE*)
+
+let scan_rule parameter error handler_kappa rule store_result =
+  (*----------------------------------------------------------------------*)
+  (*modified set*)
+  let error, store_sites_modified_set =
+    collect_sites_modified_set
+      parameter
+      error
+      rule
+      handler_kappa
+      store_result.store_sites_modified_set
+  in
+  (*----------------------------------------------------------------------*)
+  (*collect sites that are release*)
+  let error, store_sites_bond_pair_set =
+    collect_sites_bond_pair_set
+      parameter
+      error
+      handler_kappa
+      rule
+      store_result.store_sites_bond_pair_set
+  in
+  (*----------------------------------------------------------------------*)
+  (*collects sites that are external*)
+  let error, store_sites_bond_pair_set_external =
+    collect_sites_bond_pair_set_external
+      parameter
+      error
+      rule
+      store_result.store_sites_bond_pair_set_external
+  in
+  (*----------------------------------------------------------------------*)
+  (*collect sites from lhs rule*)
+  let error, store_sites_lhs =
+    collect_sites_lhs
+      parameter
+      error
+      rule
+      store_result.store_sites_lhs
+  in
+  (*----------------------------------------------------------------------*)
+  (*collect anchor sites*)
+  let error, store_sites_anchor_set =
+    collect_sites_anchor_set
+      parameter
+      error
+      handler_kappa
+      rule
+      store_sites_modified_set
+      store_sites_bond_pair_set
+      store_sites_lhs
+      store_result.store_sites_anchor_set
+  in
+  (*----------------------------------------------------------------------*)
+  (*collect internal flow: site -> modified/anchor site*)
+  let error, store_internal_flow =
+    collect_internal_flow
+      parameter
+      error
+      handler_kappa
+      rule
+      store_sites_lhs
+      store_sites_modified_set
+      store_sites_anchor_set
+      store_result.store_internal_flow
+  in
+  (*----------------------------------------------------------------------*)
+  (*collect external flow : a -> b , if 'a' is an anchor site or 'b' is a
+    modified site*)
+  let error, store_external_flow =
+    collect_external_flow
+      parameter
+      error
+      handler_kappa
+      rule
+      store_sites_bond_pair_set_external
+      store_sites_anchor_set
+      store_result.store_external_flow
+  in
+  (*----------------------------------------------------------------------*)
+  error,
+  {
+    store_sites_modified_set           = store_sites_modified_set;
+    store_sites_bond_pair_set          = store_sites_bond_pair_set;
+    store_sites_bond_pair_set_external = store_sites_bond_pair_set_external;
+    store_sites_lhs                    = store_sites_lhs;
+    store_sites_anchor_set             = store_sites_anchor_set;
+    store_internal_flow                = store_internal_flow;
+    store_external_flow                = store_external_flow;    
+  }
+
+(************************************************************************************)   
+(*RULES*)
+
+let scan_rule_set parameter error handler_kappa compiled =
+  let error, init_store_sites_modified_set    = AgentMap.create parameter error 0 in
+  let error, init                             = AgentMap.create parameter error 0 in
+  let init_store_sites_bond_pair_set          = (init, init) in
+  let init_store_sites_bond_pair_set_external = (init, init) in
+  let error, init_store_sites_lhs             = AgentMap.create parameter error 0 in
+  let init_store_sites_anchor                 = (init, init) in
+  let init_internal1                          = Internal_flow_map.Map.empty in
+  let init_internal2                          = Internal_flow_map.Map.empty in
+  let init_external                           = External_flow_map.Map.empty in
+  let init_ode =
     {
-      store_sites_modified_set            : set AgentMap.t;
-      store_sites_bond_pair_set           : sites_ode;
-      store_sites_bond_pair_set_external  : sites_ode;
-      store_sites_lhs                     : int list AgentMap.t;
-      store_sites_anchor_set              : (set AgentMap.t * set AgentMap.t);
-      store_internal_flow                 : (pair_int_flow * pair_int_flow);
-      store_external_flow                 : pair_ext_flow
+      store_sites_modified_set  = init_store_sites_modified_set;
+      store_sites_bond_pair_set = init_store_sites_bond_pair_set;
+      store_sites_bond_pair_set_external = init_store_sites_bond_pair_set_external;
+      store_sites_lhs        = init_store_sites_lhs;
+      store_sites_anchor_set = init_store_sites_anchor;
+      store_internal_flow    = init_internal1, init_internal2;
+      store_external_flow    = init_external;
     }
+  in
+  (*----------------------------------------------------------------------*)
+  let error, store_result =
+    Nearly_inf_Imperatif.fold parameter error
+      (fun parameter error rule_id rule store_result ->
+        (*----------------------------------------------------------------------*)
+        (*PRINT*)
+        let _ =
+          if Remanent_parameters.get_do_ODE_flow_of_information parameter
+          then
+            let parameter =
+              Remanent_parameters.update_prefix parameter ""
+            in
+            if Remanent_parameters.get_trace parameter
+            then
+              (*Print at each rule:*)
+              let error, rule_string =
+                Handler.string_of_rule parameter error handler_kappa compiled rule_id
+              in
+              fprintf stdout "%s\n" rule_string
+            else ()
+        in
+        (*----------------------------------------------------------------------*)
+        let error, store_result =
+          scan_rule
+            parameter
+            error
+            handler_kappa
+            rule.e_rule_c_rule
+            store_result
+        in
+        error, store_result
+      )
+      compiled.rules
+      init_ode
+  in
+  error, store_result
 
 (************************************************************************************)   
 (*UTILITIES FUNCTIONS*)
 
 (*------------------------------------------------------------------------------*)
 (* A list of site*)
-
+(*
 let get_site_common_list parameter error agent_type store_sites_common =
   let error, get_sites =
     AgentMap.unsafe_get
@@ -380,6 +1266,8 @@ let collect_sites_bond_pair_set_external parameter error bond_lhs
     store_sites_bond_set_1
     store_sites_bond_set_2
     store_sites_bond_pair_set =
+  let _ = fprintf stdout "print collect_sites\n" 
+  in
   let error, store_sites_bond_set_1 =
     collect_store_bond_set_each_rule
       parameter
@@ -407,6 +1295,8 @@ let result_sites_bond_pair_set_external parameter error bond_lhs release
     store_sites_bond_pair_set =
   List.fold_left (fun (error, store_sites_bond_pair_set)
     (site_address_1, site_address_2) ->
+      let _ = fprintf stdout "print result_sites\n" 
+      in
       let error, store_sites_bond_pair_set =
         error, collect_sites_bond_pair_set_external
           parameter
@@ -817,8 +1707,8 @@ let cartesian_prod_external i anchor_set i' bond_fst_list bond_snd_set =
         ) [] bond_fst_list)) acc)
   in
   loop anchor_list [] 
-    
-let collect_external_flow parameter error handler release
+      
+let collect_external_flow parameter error release
     store_sites_bond_pair_set_external
     store_sites_anchor_set1
     store_sites_anchor_set2
@@ -826,6 +1716,9 @@ let collect_external_flow parameter error handler release
   List.fold_left (fun (error, store_external_flow) (site_address_1, site_address_2) ->
     let agent_type_1 = site_address_1.agent_type in
     let agent_type_2 = site_address_2.agent_type in
+    let _ =
+      fprintf stdout "agent_type1:%i\n" agent_type_1
+    in
     (*collect site that are bond in the lhs; the first element in a pair*)
     let bond_fst_set =
       get_site_common_set
@@ -851,7 +1744,7 @@ let collect_external_flow parameter error handler release
         store_sites_anchor_set2 
     in
     let bond_fst_list = SiteSet.Set.elements bond_fst_set in
-    let collect_external_flow =
+    let store_result =
       cartesian_prod_external
         agent_type_2
         anchor_set
@@ -869,7 +1762,7 @@ let collect_external_flow parameter error handler release
             "Flow of information in the ODE semantics:External flow:\n- agent_type:%i:anchor_type:%i -> agent_type:%i:modified_type:%i\n"
             agent_type x agent_type' y;
           aux tl
-      in aux collect_external_flow
+      in aux store_result
     in
     (*------------------------------------------------------------------------------*)
     (*PRINT*)
@@ -893,7 +1786,7 @@ let collect_external_flow parameter error handler release
       ) collect_external_flow
     in*)
     (*------------------------------------------------------------------------------*)
-    error, collect_external_flow)
+    error, store_result)
     (error, store_external_flow)
     release
     
@@ -976,10 +1869,12 @@ let scan_rule parameter error handler get_rule ode_class =
   (*f) external flow: a -> b, if 'a': anchor site or 'b':modified site*)
   (*FIXME*)
   let error, store_external_flow =
+    let _ =
+      fprintf stdout "external flow\n"
+    in
     collect_external_flow
       parameter
       error
-      handler
       release
       store_sites_bond_pair_set_external
       (fst store_sites_anchor_set)
@@ -1002,12 +1897,13 @@ let scan_rule parameter error handler get_rule ode_class =
 (************************************************************************************)
 (*RULES*)
 
-let scan_rule_set parameter error handler rules compiled =
-  let error, init = AgentMap.create parameter error 0 in
-  let init_pair = (init, init) in
-  let error, init_lhs = AgentMap.create parameter error 0 in
-  let error, init_internal = AgentMap.create parameter error 0 in
-  let error, init_external = AgentMap.create parameter error 0 in
+let scan_rule_set parameter error handler compiled =
+  let error, init           = AgentMap.create parameter error 0 in
+  let init_pair             = (init, init) in
+  let error, init_lhs       = AgentMap.create parameter error 0 in
+  let error, init_internal1 = AgentMap.create parameter error 0 in
+  let error, init_internal2 = AgentMap.create parameter error 0 in
+  let error, init_external  = AgentMap.create parameter error 0 in
   (*init state of ode_class*)
   let init_ode =
     {
@@ -1016,8 +1912,8 @@ let scan_rule_set parameter error handler rules compiled =
       store_sites_bond_pair_set_external  = init_pair;
       store_sites_lhs                     = init_lhs;
       store_sites_anchor_set              = (init, init);
-      store_internal_flow                 = (init_internal, init_internal);
-      store_external_flow                 = []
+      store_internal_flow                 = (init_internal1, init_internal2);
+      store_external_flow                 = init_external
     }
   in
   let error, ode_class =
@@ -1035,7 +1931,7 @@ let scan_rule_set parameter error handler rules compiled =
           handler
           rule.e_rule_c_rule
           ode_class
-      ) rules init_ode
+      ) compiled.rules init_ode
   in
   error, ode_class
     
@@ -1044,6 +1940,7 @@ let scan_rule_set parameter error handler rules compiled =
 
 let ode_fragmentation parameter error handler compiled =
   let error, result =
-    scan_rule_set parameter error handler compiled.rules compiled 
+    scan_rule_set parameter error handler compiled 
   in
   error, result
+*)
