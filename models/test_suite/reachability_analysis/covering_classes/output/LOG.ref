@@ -1494,6 +1494,17 @@ Id=69
           Id=1
            Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:1;2:2;
+1:0;2:0;
+1:0;2:1;
+1:0;2:2;
+0:0;1:0;2:2;
+0:0;1:0;2:1;
+0:0;1:0;2:0;
+0:0;1:1;2:2;
+0:0;1:1;2:1;
+0:0;1:1;2:0;
 agent_type:0:A:cv_id:1
 Id=69
  Node(site_type:0<0)
@@ -1598,6 +1609,17 @@ Id=69
           Id=1
            Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:1;2:2;
+1:0;2:0;
+1:0;2:1;
+1:0;2:2;
+0:0;1:0;2:2;
+0:0;1:0;2:1;
+0:0;1:0;2:0;
+0:0;1:1;2:2;
+0:0;1:1;2:1;
+0:0;1:1;2:0;
 agent_type:1:B:cv_id:0
 Id=45
  Node(site_type:0<0)
@@ -1717,6 +1739,12 @@ Id=45
           Id=1
            Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:1;2:1;
+1:0;2:0;
+0:0;1:0;2:0;
+0:0;1:1;2:1;
+0:0;1:1;2:0;
 agent_type:1:B:cv_id:1
 Id=45
  Node(site_type:0<0)
@@ -1836,6 +1864,12 @@ Id=45
           Id=1
            Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:1;2:1;
+1:0;2:0;
+0:0;1:0;2:0;
+0:0;1:1;2:1;
+0:0;1:1;2:0;
 agent_type:2:C:cv_id:0
 Id=34
  Node(site_type:1<0)
@@ -1875,6 +1909,9 @@ Id=34
       Id=1
        Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:1;2:1;
+1:0;2:0;
 agent_type:2:C:cv_id:1
 Id=34
  Node(site_type:1<0)
@@ -1914,6 +1951,9 @@ Id=34
       Id=1
        Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:1;2:1;
+1:0;2:0;
 
 ------------------------------------------------------------
 * Cartesian abstraction:
@@ -2022,6 +2062,17 @@ Id=69
           Id=1
            Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:1;2:2;
+1:0;2:0;
+1:0;2:1;
+1:0;2:2;
+0:0;1:0;2:2;
+0:0;1:0;2:1;
+0:0;1:0;2:0;
+0:0;1:1;2:2;
+0:0;1:1;2:1;
+0:0;1:1;2:0;
 agent_type:0:A:cv_id:1
 Id=69
  Node(site_type:0<0)
@@ -2126,6 +2177,17 @@ Id=69
           Id=1
            Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:1;2:2;
+1:0;2:0;
+1:0;2:1;
+1:0;2:2;
+0:0;1:0;2:2;
+0:0;1:0;2:1;
+0:0;1:0;2:0;
+0:0;1:1;2:2;
+0:0;1:1;2:1;
+0:0;1:1;2:0;
 agent_type:1:B:cv_id:0
 Id=45
  Node(site_type:0<0)
@@ -2245,6 +2307,12 @@ Id=45
           Id=1
            Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:1;2:1;
+1:0;2:0;
+0:0;1:0;2:0;
+0:0;1:1;2:1;
+0:0;1:1;2:0;
 agent_type:1:B:cv_id:1
 Id=45
  Node(site_type:0<0)
@@ -2364,6 +2432,12 @@ Id=45
           Id=1
            Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:1;2:1;
+1:0;2:0;
+0:0;1:0;2:0;
+0:0;1:1;2:1;
+0:0;1:1;2:0;
 agent_type:2:C:cv_id:0
 Id=34
  Node(site_type:1<0)
@@ -2403,6 +2477,9 @@ Id=34
       Id=1
        Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:1;2:1;
+1:0;2:0;
 agent_type:2:C:cv_id:1
 Id=34
  Node(site_type:1<0)
@@ -2442,4 +2519,7 @@ Id=34
       Id=1
        Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:1;2:1;
+1:0;2:0;
 execution finished without any exception

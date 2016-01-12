@@ -597,6 +597,10 @@ Id=47
     Id=1
      Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+2:2;
+2:1;
+2:0;
 Id=27
  Node(site_type:1<0)
   Id=1
@@ -610,6 +614,9 @@ Id=27
     Id=1
      Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:1;
+1:0;
 agent_type:1:B:cv_id:0
 Id=27
  Node(site_type:1<0)
@@ -624,6 +631,9 @@ Id=27
     Id=1
      Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:1;
+1:0;
 agent_type:2:C:cv_id:0
 Id=15
  Node(site_type:2<0)
@@ -658,6 +668,8 @@ Id=15
     Id=1
      Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+2:0;3:0;4:0;
 Id=27
  Node(site_type:1<0)
   Id=1
@@ -671,6 +683,9 @@ Id=27
     Id=1
      Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:1;
+1:0;
 
 ------------------------------------------------------------
 * Cartesian abstraction:
@@ -689,6 +704,10 @@ Id=47
     Id=1
      Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+2:2;
+2:1;
+2:0;
 Id=27
  Node(site_type:1<0)
   Id=1
@@ -702,6 +721,9 @@ Id=27
     Id=1
      Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:1;
+1:0;
 agent_type:1:B:cv_id:0
 Id=27
  Node(site_type:1<0)
@@ -716,6 +738,9 @@ Id=27
     Id=1
      Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:1;
+1:0;
 agent_type:2:C:cv_id:0
 Id=15
  Node(site_type:2<0)
@@ -750,6 +775,8 @@ Id=15
     Id=1
      Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+2:0;3:0;4:0;
 Id=27
  Node(site_type:1<0)
   Id=1
@@ -763,4 +790,7 @@ Id=27
     Id=1
      Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:1;
+1:0;
 execution finished without any exception

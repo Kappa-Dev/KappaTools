@@ -199,6 +199,10 @@ Id=20
       Id=1
        Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:1;2:0;
+1:1;2:1;
+1:0;2:0;
 
 ------------------------------------------------------------
 * Cartesian abstraction:
@@ -242,4 +246,8 @@ Id=20
       Id=1
        Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:1;2:0;
+1:1;2:1;
+1:0;2:0;
 execution finished without any exception

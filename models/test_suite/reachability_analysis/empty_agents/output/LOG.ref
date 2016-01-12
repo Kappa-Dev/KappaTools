@@ -218,13 +218,19 @@ agent_type:0:A:cv_id:0
 Id=0
  Leaf True 
 
+EXTENSIONAL DESCRIPTION:
+
 agent_type:1:B:cv_id:0
 Id=0
  Leaf True 
 
+EXTENSIONAL DESCRIPTION:
+
 agent_type:2:C:cv_id:0
 Id=0
  Leaf True 
+
+EXTENSIONAL DESCRIPTION:
 
 agent_type:3:D:cv_id:0
 Id=3
@@ -240,6 +246,8 @@ Id=3
     Id=1
      Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:0;
 
 ------------------------------------------------------------
 * Cartesian abstraction:
@@ -248,13 +256,19 @@ agent_type:0:A:cv_id:0
 Id=0
  Leaf True 
 
+EXTENSIONAL DESCRIPTION:
+
 agent_type:1:B:cv_id:0
 Id=0
  Leaf True 
 
+EXTENSIONAL DESCRIPTION:
+
 agent_type:2:C:cv_id:0
 Id=0
  Leaf True 
+
+EXTENSIONAL DESCRIPTION:
 
 agent_type:3:D:cv_id:0
 Id=3
@@ -270,4 +284,6 @@ Id=3
     Id=1
      Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:0;
 execution finished without any exception

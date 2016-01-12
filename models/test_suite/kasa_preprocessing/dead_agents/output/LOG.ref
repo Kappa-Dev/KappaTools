@@ -536,6 +536,8 @@ Id=5
     Id=1
      Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+2:0;
 Id=20
  Node(site_type:1<0)
   Id=1
@@ -559,6 +561,9 @@ Id=20
         Id=1
          Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:2;
+1:0;
 agent_type:1:B:cv_id:0
 Id=18
  Node(site_type:1<0)
@@ -573,6 +578,9 @@ Id=18
     Id=1
      Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:1;
+1:0;
 
 ------------------------------------------------------------
 * Cartesian abstraction:
@@ -591,6 +599,8 @@ Id=5
     Id=1
      Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+2:0;
 Id=20
  Node(site_type:1<0)
   Id=1
@@ -614,6 +624,9 @@ Id=20
         Id=1
          Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:2;
+1:0;
 agent_type:1:B:cv_id:0
 Id=18
  Node(site_type:1<0)
@@ -628,4 +641,7 @@ Id=18
     Id=1
      Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:1;
+1:0;
 execution finished without any exception

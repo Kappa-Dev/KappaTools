@@ -425,6 +425,9 @@ Id=6
     Id=1
      Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:1;
+1:0;
 agent_type:1:B:cv_id:0
 Id=6
  Node(site_type:1<0)
@@ -439,6 +442,9 @@ Id=6
     Id=1
      Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:1;
+1:0;
 
 ------------------------------------------------------------
 * Cartesian abstraction:
@@ -457,6 +463,9 @@ Id=6
     Id=1
      Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:1;
+1:0;
 agent_type:1:B:cv_id:0
 Id=6
  Node(site_type:1<0)
@@ -471,4 +480,7 @@ Id=6
     Id=1
      Leaf False 
 
+EXTENSIONAL DESCRIPTION:
+1:1;
+1:0;
 execution finished without any exception
