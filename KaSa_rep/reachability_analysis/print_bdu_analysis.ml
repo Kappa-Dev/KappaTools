@@ -128,10 +128,19 @@ let print_bdu_update_map_cartesian_decomposition parameter handler error handler
                           Handler.string_of_state parameter error handler_kappa
                           agent_type (site_type-1) state
                         in
-			Printf.fprintf parameter.log "agent_type:%i:%s:(site_type:%i:%s:state:%i:%s);" 
-                          agent_type agent_string 
-                          site_type site_string
-                          state state_string
+                        (*Print with string*)
+			(*let _ =
+                          Printf.fprintf parameter.log 
+                            "agent_type:%i:%s:(site_type:%i:%s:state:%i:%s);" 
+                            agent_type agent_string 
+                            site_type site_string
+                            state state_string
+                        in*)
+                        let _ =
+                          Printf.fprintf parameter.log 
+                            "%s(%s;%s);" agent_string site_string state_string
+                        in
+                        ()
                       )
 		      l in
 		  Printf.fprintf parameter.log "\n")

@@ -1431,4 +1431,4 @@ Id=69
            Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-agent_type:0:A:(site_type:1:x~:state:1:p);
+A(x~;p);

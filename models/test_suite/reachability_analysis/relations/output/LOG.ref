@@ -542,13 +542,13 @@ Id=76
            Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-agent_type:0:A:(site_type:1:x~:state:3:q);agent_type:0:A:(site_type:2:y~:state:0:u);agent_type:0:A:(site_type:3:z~:state:0:u);
-agent_type:0:A:(site_type:1:x~:state:3:q);agent_type:0:A:(site_type:2:y~:state:2:q);agent_type:0:A:(site_type:3:z~:state:1:q);
-agent_type:0:A:(site_type:1:x~:state:3:q);agent_type:0:A:(site_type:2:y~:state:2:q);agent_type:0:A:(site_type:3:z~:state:0:u);
-agent_type:0:A:(site_type:1:x~:state:2:0);agent_type:0:A:(site_type:2:y~:state:1:p);agent_type:0:A:(site_type:3:z~:state:1:q);
-agent_type:0:A:(site_type:1:x~:state:1:p);agent_type:0:A:(site_type:2:y~:state:0:u);agent_type:0:A:(site_type:3:z~:state:0:u);
-agent_type:0:A:(site_type:1:x~:state:1:p);agent_type:0:A:(site_type:2:y~:state:1:p);agent_type:0:A:(site_type:3:z~:state:0:u);
-agent_type:0:A:(site_type:1:x~:state:0:u);agent_type:0:A:(site_type:2:y~:state:0:u);agent_type:0:A:(site_type:3:z~:state:0:u);
+A(x~;q);A(y~;u);A(z~;u);
+A(x~;q);A(y~;q);A(z~;q);
+A(x~;q);A(y~;q);A(z~;u);
+A(x~;0);A(y~;p);A(z~;q);
+A(x~;p);A(y~;u);A(z~;u);
+A(x~;p);A(y~;p);A(z~;u);
+A(x~;u);A(y~;u);A(z~;u);
 
 ------------------------------------------------------------
 * Cartesian abstraction:
@@ -683,11 +683,11 @@ Id=76
            Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-agent_type:0:A:(site_type:1:x~:state:3:q);agent_type:0:A:(site_type:2:y~:state:0:u);agent_type:0:A:(site_type:3:z~:state:0:u);
-agent_type:0:A:(site_type:1:x~:state:3:q);agent_type:0:A:(site_type:2:y~:state:2:q);agent_type:0:A:(site_type:3:z~:state:1:q);
-agent_type:0:A:(site_type:1:x~:state:3:q);agent_type:0:A:(site_type:2:y~:state:2:q);agent_type:0:A:(site_type:3:z~:state:0:u);
-agent_type:0:A:(site_type:1:x~:state:2:0);agent_type:0:A:(site_type:2:y~:state:1:p);agent_type:0:A:(site_type:3:z~:state:1:q);
-agent_type:0:A:(site_type:1:x~:state:1:p);agent_type:0:A:(site_type:2:y~:state:0:u);agent_type:0:A:(site_type:3:z~:state:0:u);
-agent_type:0:A:(site_type:1:x~:state:1:p);agent_type:0:A:(site_type:2:y~:state:1:p);agent_type:0:A:(site_type:3:z~:state:0:u);
-agent_type:0:A:(site_type:1:x~:state:0:u);agent_type:0:A:(site_type:2:y~:state:0:u);agent_type:0:A:(site_type:3:z~:state:0:u);
+A(x~;q);A(y~;u);A(z~;u);
+A(x~;q);A(y~;q);A(z~;q);
+A(x~;q);A(y~;q);A(z~;u);
+A(x~;0);A(y~;p);A(z~;q);
+A(x~;p);A(y~;u);A(z~;u);
+A(x~;p);A(y~;p);A(z~;u);
+A(x~;u);A(y~;u);A(z~;u);
 execution finished without any exception

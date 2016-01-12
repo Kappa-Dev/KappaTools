@@ -500,7 +500,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-agent_type:1:B:(site_type:1:x~:state:0:u);
+B(x~;u);
 agent_type:1:B:cv_id:1
 Id=3
  Node(site_type:1<0)
@@ -516,7 +516,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-agent_type:1:B:(site_type:1:x~:state:0:u);
+B(x~;u);
 agent_type:3:D:cv_id:0
 Id=3
  Node(site_type:1<0)
@@ -532,7 +532,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-agent_type:3:D:(site_type:1:x~:state:0:u);
+D(x~;u);
 agent_type:3:D:cv_id:1
 Id=3
  Node(site_type:1<0)
@@ -548,7 +548,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-agent_type:3:D:(site_type:1:x~:state:0:u);
+D(x~;u);
 
 ------------------------------------------------------------
 * Cartesian abstraction:
@@ -568,7 +568,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-agent_type:1:B:(site_type:1:x~:state:0:u);
+B(x~;u);
 agent_type:1:B:cv_id:1
 Id=3
  Node(site_type:1<0)
@@ -584,7 +584,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-agent_type:1:B:(site_type:1:x~:state:0:u);
+B(x~;u);
 agent_type:3:D:cv_id:0
 Id=3
  Node(site_type:1<0)
@@ -600,7 +600,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-agent_type:3:D:(site_type:1:x~:state:0:u);
+D(x~;u);
 agent_type:3:D:cv_id:1
 Id=3
  Node(site_type:1<0)
@@ -616,5 +616,5 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-agent_type:3:D:(site_type:1:x~:state:0:u);
+D(x~;u);
 execution finished without any exception
