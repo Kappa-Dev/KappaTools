@@ -937,47 +937,51 @@ let rec extensional_description_of_mvbdu parameters handler error mvbdu =
 	match 
 	  mvbdu.Mvbdu_sig.value
 	with
-	| Mvbdu_sig.Leaf true -> error,(handler,[]::output)
-	| Mvbdu_sig.Leaf false -> error,(handler,output)
+	| Mvbdu_sig.Leaf true ->
+	  error,(handler,[]::output)
+	| Mvbdu_sig.Leaf false ->
+	  error,(handler,output)
 	| Mvbdu_sig.Node a -> 
-	  let error,(handler,branch_false) = extensional_description_of_mvbdu parameters handler error a.Mvbdu_sig.branch_false in 
+	  let error,(handler,branch_true) = extensional_description_of_mvbdu parameters handler error a.Mvbdu_sig.branch_true in 
+	  let upper_bound = a.Mvbdu_sig.upper_bound in
 	  let error,(handler,output) = 
-	  match 
-	    remanent,branch_false 
-	  with
-	  | _,[] -> error,(handler,output)
-	  | None,_ ->  
-	    Exception.warn parameters error (Some "Boolean_mvbdu")
-	      (Some "line 947") Exit (fun () -> handler,[]) 
-	  | Some (var,lower_bound),list -> 
-	    let upper_bound = a.Mvbdu_sig.upper_bound in 
-	    let head_list = 
-	      let rec aux k res = 
-		if k < lower_bound then res else aux (k-1) (k::res) 
-	      in aux upper_bound []
-	    in 
-	    let output = 
-	      List.fold_left
-		(fun output head ->
-		  List.fold_left
-		    (fun output tail -> ((var,head)::tail)::output)
-		    output list)
-		output head_list
-	    in 
-	    aux 
-	      a.Mvbdu_sig.branch_true 
-	      (Some (a.Mvbdu_sig.variable,upper_bound)) 
-	      handler error
-	      output
-	  in error,(handler,output)
+	    match
+	      remanent,branch_true
+	    with
+	    | _,[] -> error,(handler,output)
+	    | None,_ ->
+	      Exception.warn parameters error (Some "Boolean_mvbdu")
+		(Some "line 947") Exit (fun () -> handler,[])
+	    | Some (var,lower_bound),list ->
+	      let head_list =
+		let rec aux k res =
+		  if k <= lower_bound then res else aux (k-1) (k::res)
+		in aux upper_bound []
+	      in
+	      let output =
+		List.fold_left
+		  (fun output head ->
+		    List.fold_left
+		      (fun output tail ->
+			((var,head)::tail)::output)
+		      output list)
+		  output head_list
+	      in
+	      error,(handler,output)
+	  in
+	  aux
+	    a.Mvbdu_sig.branch_false
+	    (Some (a.Mvbdu_sig.variable,upper_bound))
+	    handler error
+	    output
       in
       let error,(handler,output) = aux mvbdu None handler error [] in
       let error, memo = Hash_1.set parameters error mvbdu.Mvbdu_sig.id output handler.Memo_sig.data.boolean_mvbdu_extensional_description_of_mvbdu in
-	 error,
-	 ({handler
-	  with Memo_sig.data =
-		 { handler.Memo_sig.data with 
-boolean_mvbdu_extensional_description_of_mvbdu = memo}},output)
+      error,
+      ({handler
+	with Memo_sig.data =
+	  { handler.Memo_sig.data with
+	    boolean_mvbdu_extensional_description_of_mvbdu = memo}},output)
     end
        
 let print_boolean_mvbdu (error:Exception.method_handler) = 

@@ -103,9 +103,24 @@ let print_bdu_update_map_cartesian_decomposition parameter handler error handler
       let error,handler,list = 
         Mvbdu_wrapper.Mvbdu.mvbdu_full_cartesian_decomposition parameter handler error bdu_update 
       in 
-      let _ = 
-	List.iter 
-	  (Mvbdu_wrapper.Mvbdu.print parameter.log "")
+      let error,handler =
+	List.fold_left
+	  (fun (error,handler) mvbdu ->
+	    let () = Mvbdu_wrapper.Mvbdu.print parameter.log "" mvbdu in
+	    let error,handler,list = Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu parameter handler error mvbdu in
+	    let () = Printf.fprintf parameter.log "EXTENSIONAL DESCRIPTION:\n" in 
+	    let () =
+	      List.iter
+		(fun l ->
+	          let () =
+		    List.iter
+		      (fun (a,b) ->
+			Printf.fprintf parameter.log "%i:%i;" a b)
+		      l in
+		  Printf.fprintf parameter.log "\n")
+		list
+	    in error,handler)
+	  (error,handler)
 	  list
       in 
       error,handler)
