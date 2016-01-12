@@ -1,8 +1,8 @@
 \documentclass[11pt]{book}
 \frenchspacing
-\usepackage{geometry}             
+\usepackage{geometry}
 
-\usepackage[parfill]{parskip}    
+\usepackage[parfill]{parskip}
 \usepackage{graphicx}
 \usepackage{amssymb}
 \usepackage{epstopdf}
@@ -71,6 +71,9 @@
 \def\dd{-\hspace{0.001cm}-}
 \def\imp#1{\emph{#1}\index{#1}}
 %%%%
+
+\newcommand{\Remark}{\paragraph{Remark}}
+
 \def\version{3.90}
 
 \title{KaSim~\& KaSa~reference manual\\ \small (release \version)}
@@ -97,7 +100,7 @@ This manual describes the usage of \KaSim~and \KaSa, the latest implementation o
 Although this manual contains a self-contained description of Kappa, it is \emph{not} intended as a tutorial on rule-based modeling.%%Therefore, in the following of this manual some familiarity with Kappa is assumed and 
 %
 
-To get an idea of how Kappa is used in a modeling context, the reader can consult the following note \href{http://www.pps.jussieu.fr/~danos/pdf/eov.pdf}{Agile modelling of cellular signalling (SOS'08)}. A longer article, expounding on causal analysis is also available: \href{http://www.pps.jussieu.fr/~danos/pdf/ka-fix.pdf}{Rule-based modelling of cellular signalling (CONCUR'07)}. See also this tutorial: \href{http://www.pps.jussieu.fr/~danos/pdf/mytdg.pdf}{Modelling epigenetic information maintenance: a Kappa tutorial (CAV'09)}.
+To get an idea of how Kappa is used in a modeling context, the reader can consult the following note \href{http://www.pps.univ-paris-diderot.fr/~danos/pdf/eov.pdf}{Agile modelling of cellular signalling (SOS'08)}. A longer article, expounding on causal analysis is also available: \href{http://www.pps.univ-paris-diderot.fr/~danos/pdf/ka-fix.pdf}{Rule-based modelling of cellular signalling (CONCUR'07)}. See also this tutorial: \href{http://www.pps.univ-paris-diderot.fr/~danos/pdf/mytdg.pdf}{Modelling epigenetic information maintenance: a Kappa tutorial (CAV'09)}.
 
 
 
@@ -123,8 +126,7 @@ each step (see Fig.~\ref{fig:event-loop}). Importantly, the cost of a simulation
 \end{center}
 \end{figure}
 
-Note that \KaSim~is not equipped with a %curve 
-visualization tool. However, data outputs are given in a text format that can be displayed using any standard plotting software such as \href{http://www.gnuplot.info/}{gnuplot}.
+Note that \KaSim~can only render curves in the svg format. However, data outputs given in a text format can be displayed using any standard plotting software such as \href{http://www.gnuplot.info/}{gnuplot}.
 
 \section{The \KaSa~static analyser}
 
@@ -150,22 +152,31 @@ The easiest way to use \KaSim~and \KaSa~is to use pre-compiled versions availabl
 To test whether your program does work, simply type \ttt{./KaSim \dd version} on a terminal, from the directory that contains the binaries. If the version is displayed it means that the binaries are indeed compatible with your OS. Otherwise you may need to compile \KaSim~from the sources (see next Section).
 
 \section{Obtaining the sources}\label{sec:sources}
-To obtain \KaSim/\KaSa~you can either use pre-compiled binaries (see previous section)
-or compile the sources for your architecture. To do so, download the source code
-from \url{https://github.com/Kappa-Dev/KaSim}, make sure you have a recent ocaml
-compiler (\KaSim/\KaSa~currently requires Ocaml 4.01.0 to compile) and the findlib library
-installed. From a terminal window type \ttt{ocamlfind ocamlopt -v}. If it fails
-then you need to install Ocaml Native compiler that can be downloaded from
-\url{http://caml.inria.fr/download.en.html} and/or findlib available at
+To obtain \KaSim/\KaSa~you can either use pre-compiled binaries (see
+previous section) or compile the sources for your
+architecture by yourself.
+
+To do so, download the source code from
+\url{https://github.com/Kappa-Dev/KaSim}, make sure you have a recent
+OCaml compiler (\KaSim/\KaSa~currently requires Ocaml 4.01.0 to
+compile) and the findlib library installed.
+
+You can check if it is the case from a terminal window by typing
+\ttt{ocamlfind ocamlopt -v}. If it fails or prints a version number
+too old, then you need to install Ocaml Native compiler that can be
+downloaded from \url{http://caml.inria.fr/download.en.html} and/or
+findlib available at
 \url{http://projects.camlcity.org/projects/findlib.html}.
 
 \section{Compilation}
-Once Ocaml is safely installed, untar \KaSim~archive and compile following these
+Once OCaml is safely installed, untar \KaSim~archive and compile following these
 few steps: \ITE{
 \item[\$]\ttt{tar xzvf kasim.tar.gz -d Kappa}
 \item[\$]\ttt{cd Kappa}
-\item[\$]\ttt{make bin/KaSim} 
-\item[\$]\ttt{make bin/KaSa}} At the end of these steps you should see, in the
+\item[\$]\ttt{make bin/KaSim}
+\item[\$]\ttt{make bin/KaSa}}
+
+At the end of these steps you should see, in the
 \ttt{bin} directory of the \ttt{Kappa} directory, an executable file named
 KaSim.  In order to check the compilation went fine, simply type
 \ttt{bin/KaSim -\,-version}.
@@ -179,8 +190,7 @@ compiler by doing \ttt{make OCAMLBINPATH='the\_correct\_dir' bin/KaSim}.
 The graphical interface of \KaSa~requires \href{http://www.tcl.tk/}{tk-dev} and 
 \href{https://forge.ocamlcore.org/projects/labltk/}{labltk}. By default, the graphical interface is not compiled. The compilation of this interface can be toggled on by using the following script: \ITE{
 \item[\$]\ttt{cd Kappa}
-\item[\$]\ttt{sh switch\_full.sh}
-\item[\$]\ttt{make bin/KaSa}}
+\item[\$]\ttt{make USE\_TK=1 bin/KaSa}}
 
 Common compilation errors are the following:
 \begin{enumerate}
@@ -209,121 +219,79 @@ Please document the variable \texttt{LABLTKLIBREP} in the Makefile.
 
 \end{enumerate}
 
+\chapter{The kappa language}\label{chap:kappa}
 
+\section{General structure}
+A model is represented in Kappa by a set of \emph{Kappa File}. We use
+KF\index{kappa file} to denote the union of the files that are given
+as input (to either \KaSim~or \KaSa).
 
+Each line of the KF\index{kappa file} is interpreted as a
+\emph{declaration}\index{declaration} except if the line ends by
+the~{\textquotesingle} \ttt{$\bs$}{\textquotesingle}
+character. Therefore, in order to write a
+declaration\index{declaration} on several lines, ends every by the
+last of the lines with a \ttt{$\bs$}.
 
-
-\chapter{The command line}\label{chap:cl}
-
-\section{General usage}
-From a terminal window, \KaSim~can be invoked by typing 
-\ITE{
-\item[\$] \ttt{KaSim file\_1 ... file\_n [option] }
-}
-where \ttt{file\_i} are the input Kappa files containing the rules, initial conditions and observables (see Chapter~\ref{chap:kappa}). Tables~\ref{tab:options} and \ref{tab:add-options} summarize all the options that can be given to the simulator. Basically, one specifies an upper bound either in simulated or bio-time (arbitrary time unit), or in number of events. Note that bio-time is computed using Gillespie{\textquotesingle}s formula for time advance (see Fig.~\ref{fig:event-loop}) and should not be confused with CPU-time (it{\textquotesingle}s not even proportional). In doubt, we recommend using a bound in number of events since the cost of one event is bounded (in CPU time) by a constant, so the CPU-time used for simulating $n$ events is roughly $k$ times lower than that used for simulating $k\times n$ events.
-
-\section{Main options}
-
-Table~\ref{tab:options} summarizes the main options that are accessible through the command line. Options that expects an argument are preceded by a single dash, options that do not need any argument start with a double dash. Note that the option \ttt{-p} specifies the number of points that one wishes to have in the final plot. The interval at which these points will be taken is then computed using the simulation limit defined by the user using option \ttt{-t} or \ttt{-e}. For instance requiring a simulation of 100 points during 10 time units will result in a simulation where observables are recorded every 0.1 time units, while requiring 100 points for 1000 events will result in observable being written every 10 events. Be careful that the \emph{event density}, \ie the number of events per time unit, might vary during a simulation, and thus the two sampling methods can lead to very different repartitions of the instants at which observables are recorded even if they specify the same number of observations. 
-
-\begin{table}[h!]
-\caption{Command line: main options}
-\centering
-\begin{tabular}{|l|l|}
-\hline 
-Argument & Description \\ \hline
-\ttt{-e $e_{\mit{max}}$} & Terminates simulation after $e_{\mit{max}}\geq 0$ events\\
-\ttt{-t $t_{\mit{max}}$} & Terminates simulation after $t_{\mit{max}}\geq 0.0$ time units\\
-\ttt{-p $n$} & Produces a data file\index{data file} (default: \ttt{data.out}) with $n\geq 0$ data points\\
-\ttt{-o} \textit{file} & Set the name of data file to \textit{file}\\
-&Generate an image instead of a raw file when it ends by \verb$.svg$\\
-\ttt{-i} \textit{file} & Interpret \textit{file} as an input filename\\
-& (for compatibility with \KaSim <= 3 and filenames starting by -)\\
-\ttt{-d} \textit{dir} & Output any produced file to the directory \textit{dir}\\
-\hline
-\end{tabular}
-\label{tab:options}
-\end{table}%
-
-\section{Advanced options}
-
-Table~\ref{tab:add-options} summarizes the advanced options that are accessible through the command line.
-
-\begin{table}[h!]
-\caption{Command line: advanced options}
-\centering
-\begin{tabular}{|l|l|}
-\hline 
-Argument & Description \\ \hline
-\ttt{ -seed $n$} & Seeds the pseudo-random number generator $n>0$ \\
-\ttt{ \dd implicit-signature} & Automatically deduce agent signature\index{agent signature}s (see Chapter~\ref{chap:advanced})\\
-\ttt{ -make-sim} \textit{sim\_file} & makes a simulation package out of the input kappa files \\
-\ttt{ -load-sim} \textit{sim\_file} & use simulation package \textit{sim\_file} as input\\
-\ttt{ \dd gluttony} & simulation mode that is memory intensive \\ & but that speeds up simulation time\\
-\ttt{ \dd batch} & Set non interactive mode (never halt waiting for an user\\
-& action but assume default (data loosing) answer)\\
-\hline
-\end{tabular}
-\label{tab:add-options}
-\end{table}%
-%
-
-\section{Example}
-The command 
-\ITE{
-\item[\$] \ttt{KaSim model.ka -e 1000000 -p 1000 -o model.out}  
-}
-will generate a file \ttt{model.out} containing the trajectories of the observables defined in the kappa file \ttt{model.ka}. The file \ttt{model.out} will contain 1000 data points (\ie in this case, a measure will be taken every 1000 events). The command
-\ITE{
-\item[\$] \ttt{KaSim init.ka rules.ka obs.ka mod.ka -t 1.5 -p 1000}  
-}
-will generate a file \ttt{data.out} (default name) containing 1000 data points of a simulation of 1.5 (arbitrary) time units of the model. Note that the input Kappa file is split in four files containing, for instance, the initial conditions, \ttt{init.ka}, the rule set, \ttt{rules.ka}, the observables, \ttt{obs.ka}, and the perturbations, \ttt{pert.ka} (see Chapter~\ref{chap:kappa} for details). The order in which the files are given does not matter.
-
-\chapter{The kappa file}\label{chap:kappa}
-
-\section{General remarks}
-The \emph{Kappa File}\index{kappa file} (KF) is the formal
-representation of your model. We use KF\index{kappa file} to denote
-the union of the files that are given as input to \KaSim. Each line of
-the KF\index{kappa file} is interpreted by \KaSim~as a
-\emph{declaration}\index{declaration}. If the line is ended by the
-escape character~{\textquotesingle} \ttt{$\bs$}{\textquotesingle} ~the
-continuation of the declaration\index{declaration} is parsed onto the
-next line. Declarations can be: agent and token \emph{signatures}
+Declarations can be: agent and token \emph{signatures}
 (Sec.~\ref{sec:sig}), \emph{rules}\index{rule} (Sec.~\ref{sec:rules}),
 \emph{variables}\index{variable} (Sec.~\ref{sec:var}), \emph{initial
   conditions}\index{initial condition} (Sec.~\ref{sec:init}),
 \emph{perturbations}\index{perturbation} (Sec.~\ref{sec:mod}) and
-\emph{parameter configurations} (Sec.~\ref{sec:param}). The
-KF\index{kappa file}'s structure is quite flexible and can be divided
-in any number of sub-files in which the order of
-declaration\index{declaration}s does not matter (to the exception of
-variable declaration\index{declaration}s, see Section~\ref{sec:var}
-for details). Comments\index{comments} can be used either by inserting
-the marker \ttt{\#} that tells \KaSim~to ignore the rest of the line
-or by putting any text between the delimiters \ttt{/*} and \ttt{*/}. The
+\emph{parameter configurations} (Sec.~\ref{sec:param}).
+
+The KF\index{kappa file}'s structure is quite flexible. Neither
+dividing into several sub-files nor the order of
+declaration\index{declaration}s matters (to the exception of variable
+declaration\index{declaration}s, see Section~\ref{sec:var} for
+details).
+
+Comments\index{comments} can be used either by inserting the marker
+\ttt{\#} that tells \KaSim~to ignore the rest of the line or by
+putting any text between the delimiters \ttt{/*} and \ttt{*/}. The
 combined use of \ttt{$\bs$} and \ttt{\#} is an alternative way to
 write comments in the middle of a declaration\index{declaration}.
 
 \section{Agent and token signatures}\index{agent signature}\label{sec:sig}
 %
-In Kappa there are two entities that can be used for representing biological elements: \imp{agents} and \imp{tokens}.  Agents are used to represent complex molecules that may bind to other molecules on specific sites. Tokens are typically used to represent small particles such as ions, ATP, etc. Tokens cannot bind to each other, they can only appear or disappear. In a given model, agents always have a discrete number of instances while tokens may have a continuous concentration.
+In Kappa there are two entities that can be used for representing
+biological elements: \imp{agents} and \imp{tokens}.  Agents are used
+to represent complex molecules that may bind to other molecules on
+specific sites. Tokens are typically used to represent small particles
+such as ions, ATP, etc. Tokens cannot bind to each other, they can
+only appear or disappear. In a given model, agents always have a
+discrete number of instances while tokens may have a continuous
+concentration.
 
-In order to use agents or tokens in a model, one needs to declare them first. \emph{Agent signatures}\index{agent signature} constitute a form of typing information about the agents that are used in the model. It contains information about the name and number of interaction sites the agent has, and about their possible internal states. A signature\index{agent signature} is declared in the KF\index{kappa file} by the following line:
-\ITE{
-\item[] \ttt{\%agent: } \textit{signature\_expression}
-}
-according to the grammar given Table~\ref{tab:sig} where terminal symbols are written in (blue) typed font, and $\varepsilon$ stands for the empty list. An identifier
- \ttt{Id} can be any string generated by a regular expression of the type $[a\sep z\ A\sep Z][a\sep z\ A \sep Z\ 0\sep 9\ \_ \ -\ +]^*$. 
+In order to use agents or tokens in a model, one needs to declare them
+first. \emph{Agent signatures}\index{agent signature} constitute a
+form of typing information about the agents that are used in the
+model. It contains information about the name and number of
+interaction sites the agent has, and about their possible internal
+states. A signature\index{agent signature} is declared in the
+KF\index{kappa file} by the following line: \ITE{
+\item[] \ttt{\%agent: } \textit{signature\_expression} } according to
+the grammar given Table~\ref{tab:sig} where terminal symbols are
+written in (blue) typed font, and $\varepsilon$ stands for the empty
+list. An identifier \ttt{Id} can be any string generated by a regular
+expression of the type $[a\sep z\ A\sep Z][a\sep z\ A \sep Z\ 0\sep
+  9\ \_ \ -\ +]^*$.
 %%
 \begin{table}[htbp]
   \centering
   \caption{Agent signature%\index{agent signature}
  expression}
   \begin{tabular}{@{} lcl @{}}
-    \textit{signature\_expression} & ::= & \tcb{Id}\tcb{(}\textit{sig}\tcb{)} \\ 
-    \textit{sig} & ::= & \tcb{Id}~\textit{internal\_state\_list}\tcb{,}\ \textit{sig} $\mid\varepsilon$ \\ 
-    \textit{internal\_state\_list} & ::= & \tcb{\intstate Id}~\textit{internal\_state\_list} $\mid\varepsilon$ 
+    \textit{signature\_expression} & ::= &
+    \tcb{Id}\tcb{(}\textit{sig}\tcb{)} \\
+
+    \textit{sig} & ::= &
+    \tcb{Id}~\textit{internal\_state\_list}\tcb{,}\ \textit{sig}
+    $\mid\varepsilon$ \\
+
+    \textit{internal\_state\_list} & ::= &
+    \tcb{\intstate{}Id}~\textit{internal\_state\_list}
+    $\mid\varepsilon$
     \end{tabular}
   \label{tab:sig}
 \end{table}
@@ -333,63 +301,178 @@ For instance the line:
 \begin{lstlisting}[language=kappa]
 %agent: A(x,y~u~p,z~0~1~2) # Signature of agent A
 \end{lstlisting}
-will declare an agent \ttt{A} with 3 \emph{(interaction) sites} \ttt{x,y} and \ttt{z} with the site \ttt{y} possessing two \emph{internal states}\index{internal state} \ttt{u} and \ttt{p} (for instance for the unphosphorylated and phosphorylated forms of \ttt{y}) and the site \ttt{z} having three possible states $0$, $1$ and $2$. Note that internal states\index{internal state} values are treated as untyped symbols by \KaSim, so choosing a character or an integer as internal state is purely a matter of convention. 
+will declare an agent \ttt{A} with 3 \emph{(interaction) sites}
+\ttt{x,y} and \ttt{z} with the site \ttt{y} possessing two
+\emph{internal states}\index{internal state} \ttt{u} and \ttt{p} (for
+instance for the unphosphorylated and phosphorylated forms of \ttt{y})
+and the site \ttt{z} having three possible states $0$, $1$ and
+$2$. Note that internal states\index{internal state} values are
+treated as untyped symbols by \KaSim, so choosing a character or an
+integer as internal state is purely a matter of convention.
 
-Token signature\index{agent signature}s are declared using a statement of the form:
+Token signature\index{agent signature}s are declared using a statement
+of the form:
 \begin{lstlisting}[language=kappa]
 %token: ca+ # Signature of calcium token
 \end{lstlisting}
 
-\section{Rules}\label{sec:rules}
+\section{Sited-graph pattern: Kappa expression}
 
-Once agents are declared, one may add to the KF\index{kappa file} the rules\index{rule} that describe their dynamics. A \imp{pure rule} looks like: 
-\ITE{
-\item[] \ttt{{\textquotesingle}my rule{\textquotesingle} } {\it kappa\_expression} $\rar$ {\it kappa\_expression} \ttt{@} {\it rate}  
-}
-where \ttt{{\textquotesingle}my rule{\textquotesingle}} can be any name. This rule name
-can be used to refer to the rule which follows immediately. A rule can be decomposed into a \emph{left hand side}\index{left hand side} (LHS), a \emph{right hand side}\index{right hand side} (RHS) kappa expressions\index{kappa expressions}, and a \emph{rate expression}\index{rate}. One may also declare a \imp{bi-directional rule} using the convention:
-\ITE{
-\item[] \ttt{{\textquotesingle}bi-rule{\textquotesingle}} {\it kappa\_expression} $\lrar$ {\it kappa\_expression} \ttt{@} {\it rate$^+$,rate$^-$}  
-}
-Note that the above declaration\index{declaration} is equivalent to writing, in addition of \ttt{\var{my-rule}}, another rule named \ttt{\var{my rule\_op}} which swaps left and right hand sides, and has rate \textit{rate$^-$}.
+The state of the system is represented in Kappa as a sited graph: a
+graph were edges specifies a site of the node they use. You must think
+as sites as resources. At most one edge of the graph can use a site of
+a node (representing an agent in our case). We call this concept the
+\emph{rigidity of Kappa}.
 
+\subsection{Graph syntax}
+The ascii syntax we use to represent sited graphs follows the
+skeletons (describe formaly in fig~\ref{tab:patterns}):
+\begin{itemize}
+\item we the type of the agent and then it interface (the comma
+  separeted list of the state of its sites) in between parenthesis.
+\item When the site is \emph{free} (is not a member of a edge) you
+  just write its name to represent its state. If it has a internal
+  state, you write it after a '\intstate'. For example, the graph
+  TODO is written A(x,y\intstate{}p,z\intstate{}0)
+\item When a site is part of an edge, you assign an integer identifier
+  $n$ to this edge and you specify the appartenance of the site to
+  this edge by writing site\_name$!n$. The graph TODO can be
+  reprensented as A(x!23,y\intstate{}u!4,z\intstate{}1),
+  A(x!4,y\intstate{}u!954,z\intstate{}1),
+  A(x!95,y\intstate{}u!234,z\intstate{}1).
 
-Kappa and rate expressions are given by the grammar in Table~\ref{tab:patterns}. Algebraic expressions\index{algebraic expression} are described later in Table~\ref{tab:alg} (but can be thought of for now as positive real numbers).
+  \Remark{Each link identifier appears exactly twice of course. this is a
+  consequence of the regidity of Kappa.}
+\end{itemize}
 
-If pure rules induce reactions between agents, it is possible to mix agents and tokens in \imp{hybrid rules} (which may also be bi-directional). A hybrid rule has the following form:
- \ITE{
-\item[] {\it kappa\_expression} | {\it token\_expression} $\rar$ {\it kappa\_expression}  | {\it token\_expression }\ttt{@} {\it rate}  
-}
-Token expressions are also given by the grammar in Table~\ref{tab:patterns}.
-%%
-\begin{table}[h!]
+\subsection{Pattern syntax}
+Kappa strength is to describe transformations by only mentionning (and
+storing) the relevant part of the subgraph required for that
+transfor;ation to be possible. It plays a key role in resisting
+combinatorial explosion when writing models. We use the \emph{don't
+  care, don't write}\index{don't care don't write} principle. If a
+transformation occurs independently of the state of a site of an
+agent, don't mention it in the \emph{pattern} to match. The pattern
+A(x,z) represents an agent of type A whose sites x and z are free but
+the sites y and z can be in any internal state and the site y can be
+linked or not to anything.
+
+If the link state of a site does not matter but the internal state
+does, an '?' has to be added after the site name (and internal state).
+An agent A whose sites x and z are free, y is in state u and z in
+state 2 is written A(x,y\intstate{}u?4,z\intstate{}2).
+
+\begin{table}[ht!]
   \centering
   \caption{Kappa expressions}
   \begin{tabular}{@{} lcl @{}}
-    \textit{kappa\_expression} & ::= & \textit{agent\_expression} \tcb{,} \textit{kappa\_expression} $\mid\varepsilon$ \\ 
+    \textit{kappa\_expression} & ::= & \textit{agent\_expression} \tcb{,} \textit{kappa\_expression} $\mid\varepsilon$ \\
     \textit{agent\_expression} & ::= &  \tcb{Id}\tcb{(}\textit{interface}\tcb{)} \\
     \textit{interface} &::=& \tcb{Id} \textit{internal\_state link\_state}  \tcb{,} \textit{interface} $\mid\varepsilon$ \\
     \textit{internal\_state} &::=& $\varepsilon$ | \tcb{\intstate Id} \\
-    \textit{link\_state} &::=& $\varepsilon$ | \tcb{!n} | \tcb{!\_} | \tcb{?}  \\\\
-   \textit{token\_expression} &::=&  \textit{algebraic\_expression}\tcb{:}\textit{token\_name} \\
-	&&|  \textit{token\_expression} \tcb{+}\ \textit{token\_expression} \\\\
-\textit{token\_name} &::=& \tcb{Id}\\\\
-
-    \textit{rate\_expression} &::=& \textit{algebraic\_expression} \\
-&&| \textit{algebraic\_expression} \tcb{(}\textit{algebraic\_expression}\tcb{)} 
+    \textit{link\_state} &::=& $\varepsilon$ | \tcb{!n} | \tcb{!\_} | \tcb{?}  | \tcb{!Id.Id} \\
     \end{tabular}
   \label{tab:patterns}
 \end{table}
+
+\subsection{Link type}
+
+In standard kappa, in order to require a site to be bound for an
+interaction to occur, one may use the
+\emph{semi-link}\index{semi-link} construct \ttt{!\_} which does not
+specify who the partner of the bond is. For instance in the variable:
+\lstinline[language=kappa]*%var: \var{ab}~|A(x!_),B(y!_)|* will
+count the number of \ttt{A}s and \ttt{B}s connected to someone,
+including the limit case \ttt{A(x!1),B(y!1)}. It is sometimes
+convenient to specify the \emph{type}\index{link type} of the
+semi-link, in order to restrict the choice of the binding partner. For
+instance the variable:
+\lstinline[language=kappa]*%var: \var{ab}~|A(x!y.B),B(y!x.A)|!*
+will count the number of \ttt{A}s whose
+site \ttt{x} is connected to a site \ttt{y} of \ttt{B}, plus the
+number of \ttt{B}s whose site \ttt{y} is connected to a site \ttt{x}
+of \ttt{A}. Note that this still includes the case
+\ttt{A(x!1),B(y!1)}.
+
+\Remark{Transformations on semi-links and links type indiuce side
+  effects (effect on unmention agents/unmentionned site of agent) and
+  can even don't make sense at all. What would mean to remove the link
+  to A but not the link to B in the example above? Be carefull when
+  you use them.}
+
+\section{Rules}\label{sec:rules}
+
+Once agents are declared, one may add to the KF\index{kappa file} the
+rules\index{rule} that describe their dynamics. A \imp{pure rule}
+looks like:
+
+\ITE{
+\item[] \ttt{{\textquotesingle}my rule{\textquotesingle} } {\it
+  kappa\_expression} $\rar$ {\it kappa\_expression} \ttt{@} {\it rate}
+}
+
+where \ttt{{\textquotesingle}my rule{\textquotesingle}} can be any
+name. This rule name can be used to refer to the rule which follows
+immediately. A rule can be decomposed into a \emph{left hand
+  side}\index{left hand side} (LHS), a \emph{right hand
+  side}\index{right hand side} (RHS) kappa expressions\index{kappa
+  expressions}, and a \emph{rate expression}\index{rate}. One may also
+declare a \imp{bi-directional rule} using the convention:
+
+\ITE{
+\item[] \ttt{{\textquotesingle}bi-rule{\textquotesingle}} {\it kappa\_expression} $\lrar$ {\it kappa\_expression} \ttt{@} {\it rate$^+$,rate$^-$}
+}
+
+Note that the above declaration\index{declaration} is equivalent to
+writing, in addition of \ttt{\var{my-rule}}, another rule named
+\ttt{\var{my rule\_op}} which swaps left and right hand sides, and has
+rate \textit{rate$^-$}.
+
+Rate expressions are given by the grammar in
+Table~\ref{tab:rates}. Algebraic expressions\index{algebraic
+  expression} are described later in Table~\ref{tab:alg} (but can be
+thought of for now as positive real numbers).
+
+\begin{table}[ht!]
+  \centering
+  \caption{Rate expressions}
+  \begin{tabular}{@{} lcl @{}}
+    \textit{rate\_expression} &::=& \textit{algebraic\_expression} \\
+&&| \textit{algebraic\_expression} \tcb{(}\textit{algebraic\_expression}\tcb{)}
+    \end{tabular}
+  \label{tab:rates}
+\end{table}
+
+If pure rules induce reactions between agents, it is possible to mix
+agents and tokens in \imp{hybrid rules} (which may also be
+bi-directional). A hybrid rule has the following form:
+
+\ITE{
+\item[] {\it kappa\_expression} | {\it token\_expression} $\rar$ {\it kappa\_expression}  | {\it token\_expression }\ttt{@} {\it rate}
+}
+
+Token expressions are also given by the grammar in
+Table~\ref{tab:tokens}.
 %%
+\begin{table}[ht!]
+  \centering
+  \caption{Token expressions}
+  \begin{tabular}{@{} lcl @{}}
+   \textit{token\_expression} &::=&  \textit{algebraic\_expression}\tcb{:}\textit{token\_name} \\
+	&&|  \textit{token\_expression} \tcb{+}\ \textit{token\_expression} \\\\
+   \textit{token\_name} &::=& \tcb{Id}\\
+  \end{tabular}
+  \label{tab:tokens}
+\end{table}
 
 \subsection{Pure rules}\index{pure rule}
 
 \subsubsection*{A simple rule}
 With the signature\index{agent signature} of \ttt{A} defined in the previous section, the line
 \begin{lstlisting}[language=kappa]
-'A dimerization' A(x),A(y~p) -> A(x!1),A(y~p!1) @ 'gamma' 
+'A dimerization' A(x),A(y~p) -> A(x!1),A(y~p!1) @ 'gamma'
 \end{lstlisting}
-declares a dimerization rule between two instances of agent \ttt{A} provided the second is phosphorylated (say that is here the meaning of \ttt{p}) on site \ttt{y}. Note that the bond between both \ttt{A}s is denoted by the identifier \ttt{!1} which uses an arbitrary integer (\ttt{!0} would denote the same bond). In Kappa, a bond may connect exactly two sites so any occurrence of a bond identifier \ttt{!}$n$ has to be paired with exactly one other sibling in the expression. Note also the fact that site \ttt{z} of \ttt{A} is not mentioned in the expression which means that it has no influence on the triggering of this rule. This is the \emph{don't care don't write convention} (DCDW) \index{don't care don't write} that plays a key role in resisting combinatorial explosion when writing models.
+declares a dimerization rule between two instances of agent \ttt{A} provided the second is phosphorylated (say that is here the meaning of \ttt{p}) on site \ttt{y}. Note that the bond between both \ttt{A}s is denoted by the identifier \ttt{!1} which uses an arbitrary integer (\ttt{!0} would denote the same bond). Note also the fact that site \ttt{z} of \ttt{A} is not mentioned in the expression which means that it has no influence on the triggering of this rule. This is the \emph{don't care don't write convention} (DCDW) \index{don't care don't write}.
 
 \subsubsection*{Adding and deleting agents}
 Sticking with \ttt{A}'s signature\index{agent signature}, the rule
@@ -398,7 +481,7 @@ Sticking with \ttt{A}'s signature\index{agent signature}, the rule
 \end{lstlisting}
 indicates that an agent \ttt{A} free on site \ttt{z}, no matter what its internal state is, may beget a new copy of \ttt{A} bound to it \via site \ttt{x}. Note that in the RHS, the interface of the new copy is not completely described. Following the DCDW convention\index{don't care don't write}, \KaSim~will then assume that the sites that are not mentioned are created in the \emph{default state}\index{default state}, \ie they appear free of any bond and their internal state (if any) is the first of the list shown in the signature\index{agent signature} (here state \ttt{u} for \ttt{y} and \ttt{0} for \ttt{z}).
 
-Importantly, \KaSim~respects the \emph{longest prefix convention}\index{longest prefix convention} to determine which agent in the RHS stems from an agent in the LHS. 
+Importantly, \KaSim~respects the \emph{longest prefix convention}\index{longest prefix convention} to determine which agent in the RHS stems from an agent in the LHS.
 In a word, from a rule of the form $a_1,\dots,a_n\rar b_1,\dots,b_k$, with $a_i$s and $b_j$s being agents, one computes the largest $i\leq n,k$ such that the agents $a_1,\dots,a_i$ are pairwise consistent with $b_1,\dots,b_i$, \ie the $a_j$s and $b_j$s have the same name and the same sites. In which case we say that for all $j\leq i$, $a_j$ is \emph{preserved} by the transition and for all $j>i$, $a_j$ is \emph{deleted} by the transition and $b_j$ is \emph{created} by the transition. This convention allows us to write a deletion rule as:
 \begin{lstlisting}[language=kappa]
 'deleting A' A(x!1),A(z!1)} -> A(x) @ 'gamma'
@@ -444,7 +527,7 @@ One may then use these tokens in conjunction with a classical rule using the hyb
 \begin{lstlisting}[language=kappa]
 'hybrid rule' S(x~u!1),K(y!1) | 0.1:atp -> S(x~p),K(y) | 0.1:adp @ 'k'
 \end{lstlisting}
-When applied, the above rule will consume 0.1 \ttt{atp} token and produce 0.1 \ttt{adp} token. Note that as specified by the grammar given Table~\ref{tab:patterns}, the number of consumed (and produced) tokens can be given by a sum of the form:
+When applied, the above rule will consume 0.1 \ttt{atp} token and produce 0.1 \ttt{adp} token. Note that as specified by the grammar given Table~\ref{tab:tokens}, the number of consumed (and produced) tokens can be given by a sum of the form:
 \ITE{
 \item[] \ttt{\textit{lhs} | a$_1$:t$_1$ + ... + a$_n$:t$_n$ $\rar$ \textit{rhs} | a$_1'$:t$_1'$ + ... + a$_k'$:t$_k'$ @ r} 
 }
@@ -478,12 +561,12 @@ individual-based ones used by KaSim.
 %We refer the reader to \url{http://www.KappaLanguage.org} for a tutorial on kinetic rates. 
 Here are typical volumes used in modeling:
 \begin{itemize}
-\item
-Mammalian cell: $V=2.25\; 10^{-12}l$  ($1l=10^{-3}m^3$), and ${\cal A}V=1.35\; 10^{12}$. 
+\item Mammalian cell: $V=2.25\; 10^{-12}l$  ($1l=10^{-3}m^3$), and ${\cal A}V=1.35\; 10^{12}$.
 
 A concentration of $1M$ in a mammalian cell volume corresponds to $1.35\; 10^{12}$ molecules; $1nM\approx 1350$ molecules per cell.
+
 \item
-Yeast cell (haploid): $V=4\; 10^{-14}l$, and ${\cal A}V=2.4\; 10^{10}$. 
+Yeast cell (haploid): $V=4\; 10^{-14}l$, and ${\cal A}V=2.4\; 10^{10}$.
 
 A concentration of $1M$ in a yeast cell volume corresponds to $2.4\; 10^{10}$ molecules; $1nM\approx 24$ molecules per cell. The volume is doubled in a diploid cell.
 \item
@@ -674,6 +757,73 @@ where \textit{algebraic\_expression} is evaluated before initialization of the s
 \end{lstlisting}
 will add 1000 instances of \ttt{A} in its default state \ttt{A(x,y\intstate u,z\intstate 0)}, 1000 instances of \ttt{A} in state \ttt{A(x,y\intstate p,z\intstate 0)} and a concentration of 0.39 mM of calcium ions. Recall that the concentration of calcium can be observed during simulation using \ttt{|ca2+|}.
 As any other declaration\index{declaration}, \ttt{\%init} can be used multiple times, and agents will add up to the initial state.
+
+
+\chapter{The command line}\label{chap:cl}
+
+\section{General usage}
+From a terminal window, \KaSim~can be invoked by typing 
+\ITE{
+\item[\$] \ttt{KaSim file\_1 ... file\_n [option] }
+}
+where \ttt{file\_i} are the input Kappa files containing the rules, initial conditions and observables (see Chapter~\ref{chap:kappa}). Tables~\ref{tab:options} and \ref{tab:add-options} summarize all the options that can be given to the simulator. Basically, one specifies an upper bound either in simulated or bio-time (arbitrary time unit), or in number of events. Note that bio-time is computed using Gillespie{\textquotesingle}s formula for time advance (see Fig.~\ref{fig:event-loop}) and should not be confused with CPU-time (it{\textquotesingle}s not even proportional). In doubt, we recommend using a bound in number of events since the cost of one event is bounded (in CPU time) by a constant, so the CPU-time used for simulating $n$ events is roughly $k$ times lower than that used for simulating $k\times n$ events.
+
+\section{Main options}
+
+Table~\ref{tab:options} summarizes the main options that are accessible through the command line. Options that expects an argument are preceded by a single dash, options that do not need any argument start with a double dash. Note that the option \ttt{-p} specifies the number of points that one wishes to have in the final plot. The interval at which these points will be taken is then computed using the simulation limit defined by the user using option \ttt{-t} or \ttt{-e}. For instance requiring a simulation of 100 points during 10 time units will result in a simulation where observables are recorded every 0.1 time units, while requiring 100 points for 1000 events will result in observable being written every 10 events. Be careful that the \emph{event density}, \ie the number of events per time unit, might vary during a simulation, and thus the two sampling methods can lead to very different repartitions of the instants at which observables are recorded even if they specify the same number of observations. 
+
+\begin{table}[h!]
+\caption{Command line: main options}
+\centering
+\begin{tabular}{|l|l|}
+\hline 
+Argument & Description \\ \hline
+\ttt{-e $e_{\mit{max}}$} & Terminates simulation after $e_{\mit{max}}\geq 0$ events\\
+\ttt{-t $t_{\mit{max}}$} & Terminates simulation after $t_{\mit{max}}\geq 0.0$ time units\\
+\ttt{-p $n$} & Produces a data file\index{data file} (default: \ttt{data.out}) with $n\geq 0$ data points\\
+\ttt{-o} \textit{file} & Set the name of data file to \textit{file}\\
+&Generate an image instead of a raw file when it ends by \verb$.svg$\\
+\ttt{-i} \textit{file} & Interpret \textit{file} as an input filename\\
+& (for compatibility with \KaSim <= 3 and filenames starting by -)\\
+\ttt{-d} \textit{dir} & Output any produced file to the directory \textit{dir}\\
+\hline
+\end{tabular}
+\label{tab:options}
+\end{table}%
+
+\section{Advanced options}
+
+Table~\ref{tab:add-options} summarizes the advanced options that are accessible through the command line.
+
+\begin{table}[h!]
+\caption{Command line: advanced options}
+\centering
+\begin{tabular}{|l|l|}
+\hline 
+Argument & Description \\ \hline
+\ttt{ -seed $n$} & Seeds the pseudo-random number generator $n>0$ \\
+\ttt{ \dd implicit-signature} & Automatically deduce agent signature\index{agent signature}s (see Chapter~\ref{chap:advanced})\\
+\ttt{ -make-sim} \textit{sim\_file} & makes a simulation package out of the input kappa files \\
+\ttt{ -load-sim} \textit{sim\_file} & use simulation package \textit{sim\_file} as input\\
+\ttt{ \dd gluttony} & simulation mode that is memory intensive \\ & but that speeds up simulation time\\
+\ttt{ \dd batch} & Set non interactive mode (never halt waiting for an user\\
+& action but assume default (data loosing) answer)\\
+\hline
+\end{tabular}
+\label{tab:add-options}
+\end{table}%
+%
+
+\section{Example}
+The command 
+\ITE{
+\item[\$] \ttt{KaSim model.ka -e 1000000 -p 1000 -o model.out}  
+}
+will generate a file \ttt{model.out} containing the trajectories of the observables defined in the kappa file \ttt{model.ka}. The file \ttt{model.out} will contain 1000 data points (\ie in this case, a measure will be taken every 1000 events). The command
+\ITE{
+\item[\$] \ttt{KaSim init.ka rules.ka obs.ka mod.ka -t 1.5 -p 1000}  
+}
+will generate a file \ttt{data.out} (default name) containing 1000 data points of a simulation of 1.5 (arbitrary) time units of the model. Note that the input Kappa file is split in four files containing, for instance, the initial conditions, \ttt{init.ka}, the rule set, \ttt{rules.ka}, the observables, \ttt{obs.ka}, and the perturbations, \ttt{pert.ka} (see Chapter~\ref{chap:kappa} for details). The order in which the files are given does not matter.
 
 \chapter{A simple model}\label{chap:abc}
 
@@ -928,15 +1078,6 @@ The effect \ttt{\$PLOTENTRY} outputs a line with the current value of observable
 \lstinline[language=kappa]!%mod: repeat [E] [mod] 10 = 0 do $PLOTENTRY until [false]!
 will store the value of observables every 10 productive events.
 
-\section{Link type}
-
-In standard kappa, in order to require a site to be bound for an interaction to occur, one may use the \emph{semi-link}\index{semi-link} construct \ttt{!\_} which does not specify who the partner of the bond is. For instance in the variable:
-\lstinline[language=kappa]*%var: \var{ab}~|A(x!\_),B(y!\_)|*
-will count the number of \ttt{A}s and \ttt{B}s connected to someone, including the limit case \ttt{A(x!1),B(y!1)}. It is sometimes convenient to specify the \emph{type}\index{link type} of the semi-link, in order to restrict the choice of the binding partner. For instance the variable:
-\lstinline[language=kappa]*%var: \var{ab}~|A(x!y.B),B(y!x.A)|!*
-will count the number of \ttt{A}s whose site \ttt{x} is connected to a site \ttt{y} of \ttt{B}, plus the number of \ttt{B}s whose site \ttt{y} is connected to a site \ttt{x} of \ttt{A}. Note that this still includes the case \ttt{A(x!1),B(y!1)}.
-
-
 \section{Implicit signature}
 \KaSim~permits users in a hurry to avoid writing agent signatures explicitly using the option \ttt{-\,-implicit-signature} of the command line. The signature is then deduced using information gathered in the KF\index{kappa file}. Note that it is not recommended to use the DCDW convention for introduced agents in conjunction with the \ttt{-\,-implicit-signature} option unless the default state of all sites is mentioned in the \ttt{\%init} declaration\index{declaration}s or in the rules that create agents. 
 
@@ -962,23 +1103,26 @@ where tunable parameters are described table~\ref{tab:parameters} (default value
 %%
 \begin{table}[ht]
 \caption{User defined parameters}
-\begin{tabular}{l|l|lll}
+\begin{tabular}{l|l|l}
 parameter & possible values & description \\
-\hline &\\
-\textit{Causality analysis}&\\
-\ttt{"displayCompression"} & any combination of \\
-&  \ttt{"none", "strong", "weak"} & \small type of compression \\
-\ttt{"cflowFileName"} & \ttt{"cflow"}, any string & \small file name prefix for causal flows\\ & \\
-\ttt{"showIntroEvents"} & \ttt{"no", "yes"} & \small show introduction events in causal flows\\ & \\
-\ttt{"dotCflows"} & \ttt{"no", "yes"} & \small generate causal flows in dot format\\
-\textit{Pretty printing}&\\
+\hline
+\textit{Causality analysis}& &\\
+\ttt{"displayCompression"} & any combination of & \small type of compression \\
+&  \ttt{"none", "strong", "weak"} & \\
+\ttt{"cflowFileName"} & \ttt{"cflow"}, any string & \small file name prefix for causal flows\\
+\ttt{"showIntroEvents"} & \ttt{"no", "yes"} & \small show introduction events in \\ & & causal flows \\
+\ttt{"dotCflows"} & \ttt{"no", "yes"} & \small generate causal flows in dot \\
+& & format\\
+\textit{Pretty printing}& &\\
 \ttt{"plotSepChar"} & \ttt{" "} or any character & \small separation character for plots\\
 \ttt{"colorDot"} &  \ttt{"no", "yes"} & \small use colors in dot format files\\
 \ttt{"progressBarSymbol"} & \ttt{"\#"} or any character & \small symbol for the progress bar\\
 \ttt{"progressBarSize"} & \ttt{"60"} or any integer & \small length of the progress bar\\ &&\\
-\textit{Simulation options} &\\
+\textit{Simulation options} & &\\
 \ttt{"dumpIfDeadlocked"} & \ttt{"no","yes"} & \small Snapshot when simulation \\&&\small is stalled\\
-\ttt{"maxConsecutiveClash"} & \ttt{"2"} or any integer & \small number of consecutive clashes \\ && \small before giving up \\ && \small square approximation\\
+\ttt{"maxConsecutiveClash"} & \ttt{"2"} or any integer & \small number of consecutive clashes \\
+&& \small before giving up \\
+&& \small square approximation\\
 \end{tabular}
 \label{tab:parameters}
 \end{table}
