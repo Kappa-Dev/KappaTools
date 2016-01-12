@@ -78,6 +78,10 @@ Influence_map: The notation [i -> j] means an agent at position [i] of the first
 Influence_map:Wake_up_map:rule(0):'r0' A()->B() -> rule(1):'r1' B()->C()[0->0]
 Refining the influence map...
 Reachability analysis...
+rule_id:0 is alive: false
+rule_id:0 is alive: false
+rule_id:1 is alive: false
+rule_id:1 is alive: false
 
 Reachability analysis result ....
 

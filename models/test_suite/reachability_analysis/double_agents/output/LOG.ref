@@ -469,6 +469,10 @@ Influence_map:Inhibition_map:rule(7):'r7' B(),B(x!x.A),B(x!x.C)-> -> rule(6):'r6
 Influence_map:Inhibition_map:rule(7):'r7' B(),B(x!x.A),B(x!x.C)-> -> rule(7):'r7' B(),B(x!x.A),B(x!x.C)->[0->1];[0->2];[1->0];[2->0]
 Refining the influence map...
 Reachability analysis...
+rule_id:2 is alive: false
+rule_id:2 is alive: false
+rule_id:6 is alive: false
+rule_id:6 is alive: false
 
 Reachability analysis result ....
 

@@ -415,6 +415,45 @@ Influence_map:Inhibition_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(5):'' A(x~u?)->
 Influence_map:Inhibition_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(6):'' A(x~u!_)->A(x~p)[0->0]
 Refining the influence map...
 Reachability analysis...
+rule_id:8 is alive: false
+rule_id:8 is alive: false
+rule_id:8 is alive: false
+rule_id:8 is alive: false
+rule_id:8 is alive: false
+rule_id:8 is alive: false
+rule_id:8 is alive: false
+rule_id:8 is alive: false
+rule_id:8 is alive: false
+rule_id:8 is alive: false
+rule_id:9 is alive: false
+rule_id:9 is alive: false
+rule_id:9 is alive: false
+rule_id:9 is alive: false
+rule_id:9 is alive: false
+rule_id:9 is alive: false
+rule_id:9 is alive: false
+rule_id:9 is alive: false
+rule_id:9 is alive: false
+rule_id:9 is alive: false
+rule_id:0 is alive: false
+rule_id:0 is alive: false
+rule_id:0 is alive: false
+rule_id:0 is alive: false
+rule_id:0 is alive: false
+rule_id:0 is alive: false
+rule_id:0 is alive: false
+rule_id:0 is alive: false
+rule_id:0 is alive: false
+rule_id:0 is alive: false
+rule_id:0 is alive: false
+rule_id:0 is alive: false
+rule_id:0 is alive: false
+rule_id:8 is alive: false
+rule_id:8 is alive: false
+rule_id:8 is alive: false
+rule_id:9 is alive: false
+rule_id:9 is alive: false
+rule_id:9 is alive: false
 
 Reachability analysis result ....
 
