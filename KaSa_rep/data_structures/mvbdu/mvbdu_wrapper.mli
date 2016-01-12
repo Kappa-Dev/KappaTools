@@ -57,6 +57,7 @@ module type Mvbdu =
 
     val extensional_of_variables_list: (hconsed_variables_list,int list) unary
     val extensional_of_association_list: (hconsed_association_list,(int*int) list) unary
+    val extensional_of_mvbdu: (mvbdu,(int * int) list list) unary
 
     val variables_list_of_mvbdu: (mvbdu,hconsed_variables_list) unary
 								
@@ -115,6 +116,7 @@ module type Internalized_mvbdu =
 
     val extensional_of_variables_list: hconsed_variables_list -> int list
     val extensional_of_association_list: hconsed_association_list -> (int*int) list
+    val extensional_of_mvbdu: mvbdu -> (int * int) list list
 
     val variables_list_of_mvbdu: mvbdu -> hconsed_variables_list
 					    
