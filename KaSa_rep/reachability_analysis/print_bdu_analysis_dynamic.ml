@@ -126,12 +126,15 @@ let print_contact_map_full parameter error handler_kappa result =
 (*print init map*)
 
 let print_init_map_aux parameter error handler_kappa result =
-  Int2Map_CV.Map.iter 
-    (fun (agent_type, site_type) set ->
-      Site_map_and_set.Set.iter (fun state ->
-        fprintf stdout "agent_type:%i:site_type:%i:state:%i\n"
-          agent_type site_type state
-      ) set
+  Int2Map_CM_Syntactic.Map.iter 
+    (fun set1 set2 ->
+      Set_triple.Set.iter (fun (agent_type, site_type, state) ->
+        Set_triple.Set.iter (fun (agent_type', site_type', state') ->
+          fprintf stdout "agent_type:%i:site_type:%i:state:%i - > agent_type':%i:site_type':%i:state':%i\n"
+            agent_type site_type state
+            agent_type' site_type' state'
+        ) set2
+      ) set1
     ) result
 
 let print_init_map parameter error handler_kappa result =

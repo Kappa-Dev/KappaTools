@@ -189,35 +189,34 @@ let compute_contact_map parameter error rule store_result =
 (************************************************************************************)
 (*get the binding in initial state*)
 
+(*TODO*)
 let collect_init_map parameter error compiled store_result =
-  let add_link (agent_type, site_type) state store_result =
-    let error, old_set =
-      match Int2Map_CV.Map.find_option (agent_type, site_type) store_result with
-      | None -> error, Site_map_and_set.Set.empty
+  let add_link set1 set2 store_result =
+    let error, old =
+      match Int2Map_CM_Syntactic.Map.find_option set1 store_result with
+      | None -> error, Set_triple.Set.empty
       | Some s -> error, s
     in
-    let error, set = Site_map_and_set.Set.add parameter error state 
-      Site_map_and_set.Set.empty 
+    let union_set = Set_triple.Set.union set2 old in
+    let store_result =
+      Int2Map_CM_Syntactic.Map.add set1 union_set store_result
     in
-    let error, union_set = Site_map_and_set.Set.union parameter error set old_set in
-    let result =
-      Int2Map_CV.Map.add (agent_type, site_type) union_set store_result
-    in
-    error, result
+    error, store_result
   in
   Nearly_inf_Imperatif.fold parameter error
-    (fun parameter error index rule store_result ->
+    (fun parameter error index init store_result ->
       AgentMap.fold parameter error
-        (fun parameter error id bonds_map store_result ->
-          let error, set =
+        (fun parameter error agent_id bonds_map store_result ->
+          (*let error, store_result =
             Site_map_and_set.Map.fold
-              (fun elt site_add (error, store_result) ->
-                let agent_index = site_add.agent_index in
-                let agent_type = site_add.agent_type in
-                let site_type = site_add.site in
+              (fun site_type_source site_add (error, store_result) ->
+                (*Move this out*)
+                let agent_index_target = site_add.agent_index in
+                let agent_type_target = site_add.agent_type in
+                let site_type_target = site_add.site in
                 let error, agent =
-                  match AgentMap.get parameter error agent_index 
-                    rule.e_init_c_mixture.views 
+                  match AgentMap.get parameter error agent_id
+                    init.e_init_c_mixture.views 
                   with
                   | error, None -> exit 0 
                   | error, Some a -> error, a
@@ -226,28 +225,53 @@ let collect_init_map parameter error compiled store_result =
                 | Ghost | Unknown_agent _
                 | Dead_agent _ -> error, store_result
                 | Agent agent ->
-                  let error, set =
+                  let agent_type_source = agent.agent_name in
+                  let port_source =
+                    match Site_map_and_set.Map.find_option parameter error site_type_source
+                      agent.agent_interface
+                    with
+                    | error, None -> exit 0
+                    | error, Some port -> port
+                  in
+                  let port_target =
+                    match Site_map_and_set.Map.find_option parameter error site_type_target
+                      agent.agent_interface
+                    with
+                    | error, None -> exit 0
+                    | error, Some port -> port
+                  in
+                  (*let error, set =
                     Site_map_and_set.Map.fold
                       (fun _ port (error, store_result) ->
                         let state = port.site_state.max in
                         if state > 0
                         then
-                          let error, store_result =
-                            add_link (agent_type, site_type) state store_result
-                          in
-                          (*let _ =
-                            Printf.fprintf stdout "agent_type:%i:site_type:%i:state:%i\n"
-                              agent_type site_type state
-                          in*)
+                          let error, set = Site_map_and_set.Set.add 
+                            parameter error state store_result
+                          in                            
+                          error, set
+                        else 
                           error, store_result
-                        else error, store_result
-                      ) agent.agent_interface (error, store_result)
+                      ) agent.agent_interface (error, Site_map_and_set.Set.empty)
+                  in*)
+                  let state_source = port_source.site_state.max in
+                  let state_target = port_target.site_state.max in
+                  let set1 =
+                    Set_triple.Set.add (agent_type_source, site_type_source, state_source)
                   in
-                  error, set
+                  let set2 =
+                    Set_triple.Set.add (agent_type_target, site_type_target, state_target)
+                  in
+                  let error, store_result =
+                    add_link set1 set2 store_result
+                  in
+                  error, store_result
               ) bonds_map (error, store_result)
-          in
+          in*)
           error, store_result         
-        ) rule.e_init_c_mixture.bonds store_result
+        ) 
+        init.e_init_c_mixture.bonds
+        store_result
     ) compiled.init store_result
 
 (************************************************************************************)
