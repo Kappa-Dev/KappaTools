@@ -71,7 +71,7 @@ let influence_arrow = ref "normal"
 
 (**flow of information: internal; external flow*)
 let do_ODE_flow_of_information = ref false
-let do_stochastic_flow_of_information = ref false
+let do_stochastic_flow_of_information = ref true
 (*covering classes: this parameter does not matter if it is true/false*)
 let do_site_dependencies = ref false
 (*set to true if one wants to print covering classes*)

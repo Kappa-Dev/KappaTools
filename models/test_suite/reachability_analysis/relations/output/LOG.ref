@@ -271,6 +271,12 @@ Reachability analysis...
 Reachability analysis result ....
 
 ------------------------------------------------------------
+* Dead rule :
+------------------------------------------------------------
+
+Reachability analysis result ....
+
+------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
@@ -536,13 +542,13 @@ Id=76
            Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-1:3;2:0;3:0;
-1:3;2:2;3:1;
-1:3;2:2;3:0;
-1:2;2:1;3:1;
-1:1;2:0;3:0;
-1:1;2:1;3:0;
-1:0;2:0;3:0;
+agent_type:0:A:(site_type:1:x~:state:3:q);agent_type:0:A:(site_type:2:y~:state:0:u);agent_type:0:A:(site_type:3:z~:state:0:u);
+agent_type:0:A:(site_type:1:x~:state:3:q);agent_type:0:A:(site_type:2:y~:state:2:q);agent_type:0:A:(site_type:3:z~:state:1:q);
+agent_type:0:A:(site_type:1:x~:state:3:q);agent_type:0:A:(site_type:2:y~:state:2:q);agent_type:0:A:(site_type:3:z~:state:0:u);
+agent_type:0:A:(site_type:1:x~:state:2:0);agent_type:0:A:(site_type:2:y~:state:1:p);agent_type:0:A:(site_type:3:z~:state:1:q);
+agent_type:0:A:(site_type:1:x~:state:1:p);agent_type:0:A:(site_type:2:y~:state:0:u);agent_type:0:A:(site_type:3:z~:state:0:u);
+agent_type:0:A:(site_type:1:x~:state:1:p);agent_type:0:A:(site_type:2:y~:state:1:p);agent_type:0:A:(site_type:3:z~:state:0:u);
+agent_type:0:A:(site_type:1:x~:state:0:u);agent_type:0:A:(site_type:2:y~:state:0:u);agent_type:0:A:(site_type:3:z~:state:0:u);
 
 ------------------------------------------------------------
 * Cartesian abstraction:
@@ -677,11 +683,14 @@ Id=76
            Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-1:3;2:0;3:0;
-1:3;2:2;3:1;
-1:3;2:2;3:0;
-1:2;2:1;3:1;
-1:1;2:0;3:0;
-1:1;2:1;3:0;
-1:0;2:0;3:0;
+agent_type:0:A:(site_type:1:x~:state:3:q);agent_type:0:A:(site_type:2:y~:state:0:u);agent_type:0:A:(site_type:3:z~:state:0:u);
+agent_type:0:A:(site_type:1:x~:state:3:q);agent_type:0:A:(site_type:2:y~:state:2:q);agent_type:0:A:(site_type:3:z~:state:1:q);
+agent_type:0:A:(site_type:1:x~:state:3:q);agent_type:0:A:(site_type:2:y~:state:2:q);agent_type:0:A:(site_type:3:z~:state:0:u);
+agent_type:0:A:(site_type:1:x~:state:2:0);agent_type:0:A:(site_type:2:y~:state:1:p);agent_type:0:A:(site_type:3:z~:state:1:q);
+agent_type:0:A:(site_type:1:x~:state:1:p);agent_type:0:A:(site_type:2:y~:state:0:u);agent_type:0:A:(site_type:3:z~:state:0:u);
+agent_type:0:A:(site_type:1:x~:state:1:p);agent_type:0:A:(site_type:2:y~:state:1:p);agent_type:0:A:(site_type:3:z~:state:0:u);
+agent_type:0:A:(site_type:1:x~:state:0:u);agent_type:0:A:(site_type:2:y~:state:0:u);agent_type:0:A:(site_type:3:z~:state:0:u);
+Stochastic flow of information:
+agent_type:0:A
+site_type:[|0:x~; 0:x~; 0:x~|]
 execution finished without any exception

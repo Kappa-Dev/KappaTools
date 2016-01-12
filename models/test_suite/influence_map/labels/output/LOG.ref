@@ -146,6 +146,16 @@ Reachability analysis...
 Reachability analysis result ....
 
 ------------------------------------------------------------
+* Dead rule :
+------------------------------------------------------------
+rule 0: veryveryveryveryverylonglonglonglabel is dead.
+rule 1: otherotherveryveryveryverylonglabel is dead.
+rule 2: "0 is dead.
+rule 3: \0 is dead.
+
+Reachability analysis result ....
+
+------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
 
@@ -156,4 +166,5 @@ Reachability analysis result ....
 ------------------------------------------------------------
 * Cartesian abstraction:
 ------------------------------------------------------------
+Stochastic flow of information:
 execution finished without any exception

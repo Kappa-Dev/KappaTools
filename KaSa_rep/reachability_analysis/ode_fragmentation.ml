@@ -677,15 +677,10 @@ let cartesian_prod_external i anchor_set i' bond_fst_list bond_snd_set =
       | [] -> List.rev acc
       | x :: xs ->
         loop xs (List.rev_append (List.rev (List.fold_left (fun acc y ->
-          (*if not (SiteSet.Set.is_empty anchor_set &&
-            SiteSet.Set.is_empty bond_snd_set)
-            then
-            begin*)
           if Site_map_and_set.Set.mem x anchor_set &&
             Site_map_and_set.Set.mem x bond_snd_set
           then (i, x, i', y) :: acc
           else acc
-        (*else List.rev acc*)
         ) [] bond_fst_list)) acc)
   in
   loop anchor_list [] 

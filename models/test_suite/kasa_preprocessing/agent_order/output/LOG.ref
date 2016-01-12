@@ -149,8 +149,14 @@ Influence_map:Inhibition_map:rule(1):'remove' A(x),A(x)->A(x),B(x),A(x) -> rule(
 Influence_map:Inhibition_map:rule(1):'remove' A(x),A(x)->A(x),B(x),A(x) -> rule(1):'remove' A(x),A(x)->A(x),B(x),A(x)[1->0]
 Refining the influence map...
 Reachability analysis...
-rule_id:1 is alive: false
-rule_id:1 is alive: false
+
+Reachability analysis result ....
+
+------------------------------------------------------------
+* Dead rule :
+------------------------------------------------------------
+rule 0: bind is dead.
+rule 1: remove is dead.
 
 Reachability analysis result ....
 
@@ -165,4 +171,7 @@ Reachability analysis result ....
 ------------------------------------------------------------
 * Cartesian abstraction:
 ------------------------------------------------------------
+Stochastic flow of information:
+agent_type:0:A
+site_type:[|0:x!|]
 execution finished without any exception

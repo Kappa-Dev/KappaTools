@@ -123,6 +123,36 @@ let print_contact_map_full parameter error handler_kappa result =
   error
 
 (************************************************************************************)
+(*print init map*)
+
+let print_init_map_aux parameter error handler_kappa result =
+  Int2Map_CV.Map.iter 
+    (fun (agent_type, site_type) set ->
+      Site_map_and_set.Set.iter (fun state ->
+        fprintf stdout "agent_type:%i:site_type:%i:state:%i\n"
+          agent_type site_type state
+      ) set
+    ) result
+
+let print_init_map parameter error handler_kappa result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "\n------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "(Full) Contact map and initital state:\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "Sites are annotated with the id of binding type (init):\n";
+  let error =
+    print_init_map_aux
+      parameter
+      error
+      handler_kappa
+      result
+  in
+  error
+
+(************************************************************************************)
 (*update (c) function*)
 
 let print_covering_classes_modification_aux parameter error handler_kappa compiled result =
@@ -222,6 +252,14 @@ let print_result_dynamic parameter error handler_kappa compiled result =
         error
         handler_kappa
         result.store_contact_map
+    in
+    (*------------------------------------------------------------------------------*)
+    let _ =
+      print_init_map
+        parameter
+        error
+        handler_kappa
+        result.store_init_map
     in
     (*------------------------------------------------------------------------------*)
     let _ =

@@ -755,10 +755,6 @@ let collect_bdu_fixpoint_with_init parameter handler error
             bdu_proj_views
             store_bdu_fixpoint_init_map
         in
-        (*--------------------------------------------------------------------*)
-        (*discover dead rule; an initial array is false everywhere*)
-        (*let nrules = Handler.nrules parameter error handler_kappa in
-        let dead_rule_array = Array.make nrules false in*)
         (*-----------------------------------------------------------------------*)
         begin
           if is_enable
@@ -768,21 +764,6 @@ let collect_bdu_fixpoint_with_init parameter handler error
               dead_rule_array.(rule_id) <- true;
               dead_rule_array
             in
-            (*print dead rule array in the result output*)
-            (*let _ =
-              if (Remanent_parameters.get_dump_reachability_analysis_result parameter) 
-              then
-                let parameters_cv =
-                  Remanent_parameters.update_prefix parameter ""
-                in
-                if (Remanent_parameters.get_trace parameters_cv)
-                then
-                  Array.iter (fun b ->
-                    Printf.fprintf stdout "rule_id:%i is alive: %b \n" rule_id b)
-                    dead_rule_array
-                else
-                  ()
-            in*)
             (*-----------------------------------------------------------------------*)
             (*output of rule that is enabled*)
             let _ =
@@ -820,30 +801,6 @@ let collect_bdu_fixpoint_with_init parameter handler error
             in
             aux new_wl (error, handler, store_new_result, dead_rule_array)
           else
-            (*dead_rule_array:when it is not an enable rule set dead_rule_array is false*)
-            let dead_rule_array =
-              dead_rule_array.(rule_id) <- false;
-              dead_rule_array
-            in
-            (*print dead rule array in the result output*)
-            let _ =
-              if (Remanent_parameters.get_dump_reachability_analysis_result parameter) 
-              then
-                let parameters_cv =
-                  Remanent_parameters.update_prefix parameter ""
-                in
-                if (Remanent_parameters.get_trace parameters_cv)
-                then
-                  Array.iter (fun b ->
-                    if b 
-                    then
-                      Printf.fprintf stdout ""
-                    else
-                      Printf.fprintf stdout "rule_id:%i is alive: %b\n" rule_id b)
-                    dead_rule_array
-                else
-                  ()
-            in
             (*-----------------------------------------------------------------------*)
             (*output of rule that is disabled*)
             let _ =
@@ -889,10 +846,6 @@ let collect_bdu_fixpoint_map parameter handler error
   let error, handler, bdu_true = 
     Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error 
   in
-  (*--------------------------------------------------------------------*)
-  (*discover dead rule; an initial array is false everywhere*)
-  (*let nrules = Handler.nrules parameter error handler_kappa in
-  let init_dead_rule_array = Array.make nrules false in*)
   (*-----------------------------------------------------------------------*)
   (*fixpoint*)
   let error, (handler, store_bdu_fixpoint_map, dead_rule_array) =

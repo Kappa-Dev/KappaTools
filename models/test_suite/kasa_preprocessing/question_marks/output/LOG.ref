@@ -333,6 +333,19 @@ Reachability analysis...
 Reachability analysis result ....
 
 ------------------------------------------------------------
+* Dead rule :
+------------------------------------------------------------
+rule 0 is dead.
+rule 1 is dead.
+rule 2 is dead.
+rule 3 is dead.
+rule 4 is dead.
+rule 5 is dead.
+rule 6 is dead.
+
+Reachability analysis result ....
+
+------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
 
@@ -343,4 +356,7 @@ Reachability analysis result ....
 ------------------------------------------------------------
 * Cartesian abstraction:
 ------------------------------------------------------------
+Stochastic flow of information:
+agent_type:0:A
+site_type:[|0:x~; 0:x~|]
 execution finished without any exception

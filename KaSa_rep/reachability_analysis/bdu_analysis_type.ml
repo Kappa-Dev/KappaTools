@@ -371,8 +371,6 @@ type potential_partner_bind = bind_partner
 type bdu_analysis_static =
   {
     store_covering_classes_id : (int list * int list) Int2Map_CV.Map.t;
-    (*TEST: type string *)
-    (*store_covering_classes_id_string : (int list * int list) Int2Map_CV_map.Map.t;*)
     store_side_effects        : half_break_action * remove_action;
     store_potential_side_effects : potential_partner_free *  potential_partner_bind;
     (* views that are tested and modificated with agent_id*)
@@ -398,6 +396,7 @@ type bdu_analysis_dynamic =
   {
     store_contact_map_full : Set_triple.Set.t Int2Map_CM_state.Map.t;
     store_contact_map : Set_triple.Set.t Int2Map_CM_Syntactic.Map.t;
+    store_init_map : Site_map_and_set.Set.t Int2Map_CV.Map.t;
     store_covering_classes_modification_update : (*update(c)*)
       (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;
     (*update(c) with side effect information*)

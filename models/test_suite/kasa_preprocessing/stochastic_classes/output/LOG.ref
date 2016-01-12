@@ -410,6 +410,19 @@ Reachability analysis...
 Reachability analysis result ....
 
 ------------------------------------------------------------
+* Dead rule :
+------------------------------------------------------------
+rule 0: r0 is dead.
+rule 2: r2 is dead.
+rule 4: r4 is dead.
+rule 5: r5 is dead.
+rule 6: r6 is dead.
+rule 7: r7 is dead.
+rule 8: r8 is dead.
+
+Reachability analysis result ....
+
+------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:1:B:cv_id:0
@@ -487,7 +500,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-1:0;
+agent_type:1:B:(site_type:1:x~:state:0:u);
 agent_type:1:B:cv_id:1
 Id=3
  Node(site_type:1<0)
@@ -503,7 +516,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-1:0;
+agent_type:1:B:(site_type:1:x~:state:0:u);
 agent_type:3:D:cv_id:0
 Id=3
  Node(site_type:1<0)
@@ -519,7 +532,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-1:0;
+agent_type:3:D:(site_type:1:x~:state:0:u);
 agent_type:3:D:cv_id:1
 Id=3
  Node(site_type:1<0)
@@ -535,7 +548,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-1:0;
+agent_type:3:D:(site_type:1:x~:state:0:u);
 
 ------------------------------------------------------------
 * Cartesian abstraction:
@@ -555,7 +568,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-1:0;
+agent_type:1:B:(site_type:1:x~:state:0:u);
 agent_type:1:B:cv_id:1
 Id=3
  Node(site_type:1<0)
@@ -571,7 +584,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-1:0;
+agent_type:1:B:(site_type:1:x~:state:0:u);
 agent_type:3:D:cv_id:0
 Id=3
  Node(site_type:1<0)
@@ -587,7 +600,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-1:0;
+agent_type:3:D:(site_type:1:x~:state:0:u);
 agent_type:3:D:cv_id:1
 Id=3
  Node(site_type:1<0)
@@ -603,5 +616,16 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-1:0;
+agent_type:3:D:(site_type:1:x~:state:0:u);
+Stochastic flow of information:
+agent_type:0:A
+site_type:[|0:x~; 0:x~; 2:z~; 2:z~|]
+agent_type:1:B
+site_type:[|1:y~; 1:y~|]
+agent_type:2:C
+site_type:[|0:x~; 0:x~|]
+agent_type:3:D
+site_type:[|0:x~; 0:x~|]
+agent_type:4:E
+site_type:[|0:x~; 0:x~; 0:x~|]
 execution finished without any exception

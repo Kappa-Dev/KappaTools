@@ -170,10 +170,16 @@ Influence_map:Inhibition_map:rule(0):'' A(x~u),B(x~p)->A(x~u),A(x~p) -> rule(3):
 Influence_map:Inhibition_map:rule(3):'' B(x~p)->B(x~u) -> rule(0):'' A(x~u),B(x~p)->A(x~u),A(x~p)[0->1]
 Refining the influence map...
 Reachability analysis...
-rule_id:0 is alive: false
-rule_id:0 is alive: false
-rule_id:0 is alive: false
-rule_id:0 is alive: false
+
+Reachability analysis result ....
+
+------------------------------------------------------------
+* Dead rule :
+------------------------------------------------------------
+rule 0 is dead.
+rule 1 is dead.
+rule 2 is dead.
+rule 3 is dead.
 
 Reachability analysis result ....
 
@@ -188,4 +194,7 @@ Reachability analysis result ....
 ------------------------------------------------------------
 * Cartesian abstraction:
 ------------------------------------------------------------
+Stochastic flow of information:
+agent_type:0:A
+site_type:[|0:x~|]
 execution finished without any exception

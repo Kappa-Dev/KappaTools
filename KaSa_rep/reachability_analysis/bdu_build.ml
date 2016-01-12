@@ -820,7 +820,7 @@ let collect_proj_potential_list_restriction_map parameter handler error
 (************************************************************************************)
 (*REMOVE: used in is_enable*)
 
-let collect_focus_views parameter handler error store_bdu_test_restriction_map =
+let collect_proj_bdu_views parameter handler error store_bdu_test_restriction_map =
   let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in
   let (error, handler), store_result =
     Project2_bdu_views.proj2_monadic

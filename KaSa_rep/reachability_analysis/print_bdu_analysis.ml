@@ -100,33 +100,50 @@ let print_bdu_update_map_cartesian_decomposition parameter handler error handler
       let _ = fprintf parameter.log "agent_type:%i:%s:cv_id:%i\n" 
         agent_type agent_string cv_id 
       in 
-      let error,handler,list = 
-        Mvbdu_wrapper.Mvbdu.mvbdu_full_cartesian_decomposition parameter handler error bdu_update 
+      let error, handler, list = 
+        Mvbdu_wrapper.Mvbdu.mvbdu_full_cartesian_decomposition
+          parameter handler error bdu_update 
       in 
-      let error,handler =
+      let error, handler =
 	List.fold_left
-	  (fun (error,handler) mvbdu ->
+	  (fun (error, handler) mvbdu ->
 	    let () = Mvbdu_wrapper.Mvbdu.print parameter.log "" mvbdu in
-	    let error,handler,list = Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu parameter handler error mvbdu in
+	    let error, handler, list = 
+              Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu parameter handler error mvbdu 
+            in
 	    let () = Printf.fprintf parameter.log "EXTENSIONAL DESCRIPTION:\n" in 
 	    let () =
 	      List.iter
 		(fun l ->
 	          let () =
 		    List.iter
-		      (fun (a,b) ->
-			Printf.fprintf parameter.log "%i:%i;" a b)
+		      (fun (site_type, state) ->
+                        let error, site_string =
+                          Handler.string_of_site parameter error handler_kappa
+                            agent_type (site_type-1)
+                        (*NOTE: minus 1, because using a new indexes for
+                          site_type which is increased by 1*)
+                        in
+                        let error, state_string =
+                          Handler.string_of_state parameter error handler_kappa
+                          agent_type (site_type-1) state
+                        in
+			Printf.fprintf parameter.log "agent_type:%i:%s:(site_type:%i:%s:state:%i:%s);" 
+                          agent_type agent_string 
+                          site_type site_string
+                          state state_string
+                      )
 		      l in
 		  Printf.fprintf parameter.log "\n")
 		list
-	    in error,handler)
-	  (error,handler)
+	    in error, handler)
+	  (error, handler)
 	  list
       in 
       error,handler)
     result (error,handler)
 			  
-let print_bdu_update_map_cartesian_abstraction parameter handler error handler_kappa result = 
+let print_bdu_update_map_cartesian_abstraction parameter handler error handler_kappa result =
   Map_bdu_update.Map.fold 
     (fun (agent_type, cv_id) bdu_update (error,handler) ->
       let error, agent_string =
@@ -135,7 +152,7 @@ let print_bdu_update_map_cartesian_abstraction parameter handler error handler_k
       let _ = fprintf parameter.log "agent_type:%i:%s:cv_id:%i\n" 
         agent_type agent_string cv_id 
       in 
-      let error,handler,list = 
+      let error, handler, list = 
         Mvbdu_wrapper.Mvbdu.mvbdu_cartesian_abstraction parameter handler error bdu_update 
       in 
       let _ = 
@@ -146,8 +163,7 @@ let print_bdu_update_map_cartesian_abstraction parameter handler error handler_k
       error,handler)
     result (error,handler)
 
-(*REMOVE*)
-let print_result_dead_rule parameter result =
+let print_result_dead_rule parameter error handler compiled result =
   if Remanent_parameters.get_dump_reachability_analysis_result parameter
   then
     let _ = Format.printf "\nReachability analysis result ....@." in
@@ -158,16 +174,20 @@ let print_result_dead_rule parameter result =
       fprintf (Remanent_parameters.get_log parameter)
         "\n------------------------------------------------------------\n";
       fprintf (Remanent_parameters.get_log parameter)
-        "* Rule that is dead :\n";
+        "* Dead rule :\n";
       fprintf (Remanent_parameters.get_log parameter)
         "------------------------------------------------------------\n";
     in
     Array.iteri (fun index bool ->
+      let error, rule_string =
+        Handler.string_of_rule parameter error handler compiled index
+      in
       if bool
       then
-        Printf.fprintf stdout "there is no dead rule.\n"
+        ()
+        (*Printf.fprintf stdout "%s: %b.\n" rule_string bool*)
       else
-        Printf.fprintf stdout "rule_id:%i %b\n" index bool
+        Printf.fprintf stdout "%s is dead.\n" rule_string
     ) result  
 
 let print_result_fixpoint parameter handler error handler_kappa result =

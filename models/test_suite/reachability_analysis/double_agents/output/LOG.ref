@@ -469,10 +469,14 @@ Influence_map:Inhibition_map:rule(7):'r7' B(),B(x!x.A),B(x!x.C)-> -> rule(6):'r6
 Influence_map:Inhibition_map:rule(7):'r7' B(),B(x!x.A),B(x!x.C)-> -> rule(7):'r7' B(),B(x!x.A),B(x!x.C)->[0->1];[0->2];[1->0];[2->0]
 Refining the influence map...
 Reachability analysis...
-rule_id:2 is alive: false
-rule_id:2 is alive: false
-rule_id:6 is alive: false
-rule_id:6 is alive: false
+
+Reachability analysis result ....
+
+------------------------------------------------------------
+* Dead rule :
+------------------------------------------------------------
+rule 2: r2 is dead.
+rule 6: r6 is dead.
 
 Reachability analysis result ....
 
@@ -613,8 +617,8 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-1:1;
-1:0;
+agent_type:0:A:(site_type:1:x~:state:1:p);
+agent_type:0:A:(site_type:1:x~:state:0:u);
 agent_type:0:A:cv_id:1
 Id=6
  Node(site_type:1<0)
@@ -630,8 +634,8 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-1:1;
-1:0;
+agent_type:0:A:(site_type:1:x~:state:1:p);
+agent_type:0:A:(site_type:1:x~:state:0:u);
 agent_type:0:A:cv_id:2
 Id=6
  Node(site_type:1<0)
@@ -647,8 +651,8 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-1:1;
-1:0;
+agent_type:0:A:(site_type:1:x~:state:1:p);
+agent_type:0:A:(site_type:1:x~:state:0:u);
 agent_type:1:B:cv_id:0
 Id=50
  Node(site_type:1<0)
@@ -689,8 +693,8 @@ Id=50
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-1:1;2:1;
-1:0;2:0;
+agent_type:1:B:(site_type:1:x~:state:1:p);agent_type:1:B:(site_type:2:y~:state:1:p);
+agent_type:1:B:(site_type:1:x~:state:0:u);agent_type:1:B:(site_type:2:y~:state:0:u);
 Id=34
  Node(site_type:3<0)
   Id=1
@@ -705,8 +709,8 @@ Id=34
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-3:1;
-3:0;
+agent_type:1:B:(site_type:3:x!:state:1:0@2);
+agent_type:1:B:(site_type:3:x!:state:0:free);
 agent_type:2:C:cv_id:0
 Id=3
  Node(site_type:1<0)
@@ -722,7 +726,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-1:0;
+agent_type:2:C:(site_type:1:x!:state:0:free);
 
 ------------------------------------------------------------
 * Cartesian abstraction:
@@ -742,8 +746,8 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-1:1;
-1:0;
+agent_type:0:A:(site_type:1:x~:state:1:p);
+agent_type:0:A:(site_type:1:x~:state:0:u);
 agent_type:0:A:cv_id:1
 Id=6
  Node(site_type:1<0)
@@ -759,8 +763,8 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-1:1;
-1:0;
+agent_type:0:A:(site_type:1:x~:state:1:p);
+agent_type:0:A:(site_type:1:x~:state:0:u);
 agent_type:0:A:cv_id:2
 Id=6
  Node(site_type:1<0)
@@ -776,8 +780,8 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-1:1;
-1:0;
+agent_type:0:A:(site_type:1:x~:state:1:p);
+agent_type:0:A:(site_type:1:x~:state:0:u);
 agent_type:1:B:cv_id:0
 Id=50
  Node(site_type:1<0)
@@ -818,8 +822,8 @@ Id=50
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-1:1;2:1;
-1:0;2:0;
+agent_type:1:B:(site_type:1:x~:state:1:p);agent_type:1:B:(site_type:2:y~:state:1:p);
+agent_type:1:B:(site_type:1:x~:state:0:u);agent_type:1:B:(site_type:2:y~:state:0:u);
 Id=34
  Node(site_type:3<0)
   Id=1
@@ -834,8 +838,8 @@ Id=34
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-3:1;
-3:0;
+agent_type:1:B:(site_type:3:x!:state:1:0@2);
+agent_type:1:B:(site_type:3:x!:state:0:free);
 agent_type:2:C:cv_id:0
 Id=3
  Node(site_type:1<0)
@@ -851,5 +855,10 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-1:0;
+agent_type:2:C:(site_type:1:x!:state:0:free);
+Stochastic flow of information:
+agent_type:0:A
+site_type:[|0:x~; 0:x~; 0:x~|]
+agent_type:1:B
+site_type:[|0:x~; 0:x~; 0:x~|]
 execution finished without any exception

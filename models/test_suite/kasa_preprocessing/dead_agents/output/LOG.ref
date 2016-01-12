@@ -415,45 +415,15 @@ Influence_map:Inhibition_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(5):'' A(x~u?)->
 Influence_map:Inhibition_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(6):'' A(x~u!_)->A(x~p)[0->0]
 Refining the influence map...
 Reachability analysis...
-rule_id:8 is alive: false
-rule_id:8 is alive: false
-rule_id:8 is alive: false
-rule_id:8 is alive: false
-rule_id:8 is alive: false
-rule_id:8 is alive: false
-rule_id:8 is alive: false
-rule_id:8 is alive: false
-rule_id:8 is alive: false
-rule_id:8 is alive: false
-rule_id:9 is alive: false
-rule_id:9 is alive: false
-rule_id:9 is alive: false
-rule_id:9 is alive: false
-rule_id:9 is alive: false
-rule_id:9 is alive: false
-rule_id:9 is alive: false
-rule_id:9 is alive: false
-rule_id:9 is alive: false
-rule_id:9 is alive: false
-rule_id:0 is alive: false
-rule_id:0 is alive: false
-rule_id:0 is alive: false
-rule_id:0 is alive: false
-rule_id:0 is alive: false
-rule_id:0 is alive: false
-rule_id:0 is alive: false
-rule_id:0 is alive: false
-rule_id:0 is alive: false
-rule_id:0 is alive: false
-rule_id:0 is alive: false
-rule_id:0 is alive: false
-rule_id:0 is alive: false
-rule_id:8 is alive: false
-rule_id:8 is alive: false
-rule_id:8 is alive: false
-rule_id:9 is alive: false
-rule_id:9 is alive: false
-rule_id:9 is alive: false
+
+Reachability analysis result ....
+
+------------------------------------------------------------
+* Dead rule :
+------------------------------------------------------------
+rule 0 is dead.
+rule 8 is dead.
+rule 9 is dead.
 
 Reachability analysis result ....
 
@@ -537,7 +507,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-2:0;
+agent_type:0:A:(site_type:2:x!:state:0:free);
 Id=20
  Node(site_type:1<0)
   Id=1
@@ -562,8 +532,8 @@ Id=20
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-1:2;
-1:0;
+agent_type:0:A:(site_type:1:x~:state:2:p);
+agent_type:0:A:(site_type:1:x~:state:0:u);
 agent_type:1:B:cv_id:0
 Id=18
  Node(site_type:1<0)
@@ -579,8 +549,8 @@ Id=18
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-1:1;
-1:0;
+agent_type:1:B:(site_type:1:x~:state:1:p);
+agent_type:1:B:(site_type:1:x~:state:0:u);
 
 ------------------------------------------------------------
 * Cartesian abstraction:
@@ -600,7 +570,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-2:0;
+agent_type:0:A:(site_type:2:x!:state:0:free);
 Id=20
  Node(site_type:1<0)
   Id=1
@@ -625,8 +595,8 @@ Id=20
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-1:2;
-1:0;
+agent_type:0:A:(site_type:1:x~:state:2:p);
+agent_type:0:A:(site_type:1:x~:state:0:u);
 agent_type:1:B:cv_id:0
 Id=18
  Node(site_type:1<0)
@@ -642,6 +612,9 @@ Id=18
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-1:1;
-1:0;
+agent_type:1:B:(site_type:1:x~:state:1:p);
+agent_type:1:B:(site_type:1:x~:state:0:u);
+Stochastic flow of information:
+agent_type:0:A
+site_type:[|0:x~; 0:x~|]
 execution finished without any exception
