@@ -1206,15 +1206,4 @@ EXTENSIONAL DESCRIPTION:
 agent_type:4:E:(site_type:1:x~:state:1:p);agent_type:4:E:(site_type:2:x!:state:0:free);
 agent_type:4:E:(site_type:1:x~:state:1:p);agent_type:4:E:(site_type:2:x!:state:1:3@1);
 agent_type:4:E:(site_type:1:x~:state:0:u);agent_type:4:E:(site_type:2:x!:state:0:free);
-Stochastic flow of information:
-agent_type:0:A
-site_type:[|0:x~; 0:x~|]
-agent_type:1:B
-site_type:[|0:x~; 0:x~|]
-agent_type:2:C
-site_type:[|0:x~; 0:x~|]
-agent_type:3:D
-site_type:[|0:x~; 0:x~|]
-agent_type:4:E
-site_type:[|0:x~; 0:x~|]
 execution finished without any exception

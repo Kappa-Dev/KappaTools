@@ -232,9 +232,4 @@ Reachability analysis result ....
 ------------------------------------------------------------
 * Cartesian abstraction:
 ------------------------------------------------------------
-Stochastic flow of information:
-agent_type:0:A
-site_type:[|0:x!; 0:x!|]
-agent_type:1:B
-site_type:[|0:x!; 0:x!|]
 execution finished without any exception
