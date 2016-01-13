@@ -82,7 +82,7 @@ module Int2Map_potential_effect =
 (************************************************************************************)
 (*views that are tested and modified with agent_id*)
 
-module Int2Map_Modif =
+module Int2Map_Modif' =
   SetMap.Make (
     struct
       (*agent_id, agent_type, site*)
@@ -92,7 +92,7 @@ module Int2Map_Modif =
 
 (*views that are tested and modified without agent_id*)
 
-module Int2Map_Test_Modif =
+module Int2Map_Test_Modif' =
   SetMap.Make (
     struct
       (*agent_type, site*)
@@ -100,21 +100,49 @@ module Int2Map_Test_Modif =
       let compare = compare
     end)
 
+module Project2_modif' =
+  SetMap.Proj (Int2Map_Modif')(Int2Map_Test_Modif')
+
+module Int2Map_Modif =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = int * int * int
+         let compare = compare
+        end))
+
+module Int2Map_Test_Modif =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct 
+         type t = int * int
+         let compare = compare
+        end))
+
 module Project2_modif =
-  SetMap.Proj (Int2Map_Modif)(Int2Map_Test_Modif)
+  (*Map_wrapper.Proj*)
+  Map_wrapper.Proj (Int2Map_Modif) (Int2Map_Test_Modif)
 
 (************************************************************************************)
 (*dynamic information*)
 
 (*dynamic contact map*)
 
-module Int2Map_CV =
+module Int2Map_CV' =
   SetMap.Make (
     struct
       (*agent_type, site*)
       type t = int * int
       let compare = compare
     end)
+
+module Int2Map_CV =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = int * int
+         let compare = compare
+        end))
 
 (*full contact map*)
 
@@ -143,7 +171,7 @@ module Set_pair =
 
 (*list of rules to awake when the state of a site is modified and tested*)
 
-module Int2Map_CV_Modif = 
+module Int2Map_CV_Modif' = 
   SetMap.Make (
     struct
       (*agent_type,site_type, covering_class_id*)
@@ -151,6 +179,14 @@ module Int2Map_CV_Modif =
       let compare = compare
     end)
 
+module Int2Map_CV_Modif =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = int * int
+         let compare = compare
+        end))
+  
 (*syntactic contact map*)
 
 module Set_triple =
@@ -271,6 +307,34 @@ module Map_agent_id_modif_list =
 
 module Project2bdu_modif =
   SetMap.Proj2 (Map_modif_list)(Map_final_modif_list)(Map_agent_id_modif_list)
+
+(*module Map_modif_list =
+  Map_wrapper.Make
+    (SetMap.Make 
+       (struct
+         type t = int * int * int * int
+         let compare = compare
+        end))
+   
+module Map_final_modif_list =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = int
+         let compare = compare
+        end))
+
+module Map_agent_id_modif_list =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = int
+         let compare = compare
+        end))
+
+module Project2bdu_modif =
+  Map_wrapper.Proj2
+    (SetMap.Proj2 (Map_modif_list)(Map_final_modif_list)(Map_agent_id_modif_list))*)
 
 (************************************************************************************)
 (*potential side effect*)

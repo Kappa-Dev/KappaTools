@@ -105,11 +105,11 @@ let compute_bdu_update_side_effects parameter handler error bdu_test list_a bdu_
 let add_update_to_wl parameter error handler_kappa compiled agent_type cv_id 
     store_covering_classes_modification_update_full wl =
   let error, (_, s1) = 
-    match Int2Map_CV_Modif.Map.find_option (agent_type, cv_id)
+    match Int2Map_CV_Modif.Map.find_option_without_logs parameter error (agent_type, cv_id)
       store_covering_classes_modification_update_full
     with
-    | None -> error, ([], Site_map_and_set.Set.empty)
-    | Some (l, s) -> error, (l, s)
+    | error, None -> error, ([], Site_map_and_set.Set.empty)
+    | error, Some (l, s) -> error, (l, s)
   in 
   (*-----------------------------------------------------------------------*)
   (*print working list information*)

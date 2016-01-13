@@ -259,3 +259,71 @@ module Proj(A:S_with_logs)(B:S_with_logs) =
    and type 'a map_a = 'a A.Map.t
    and type 'a map_b = 'a B.Map.t )
     
+(*module type Projection2 = sig
+    type elt_a
+    type elt_b
+    type elt_c
+    type 'a map_a
+    type 'a map_b
+    type 'a map_c
+    val proj2:
+      (Remanent_parameters_sig.parameters -> Exception.method_handler -> elt_a -> elt_b) -> (elt_a -> elt_c) -> 'a -> ('a -> 'a -> 'a) -> 'a map_a -> 'a map_c map_b
+    val proj2_monadic:
+      'parameters -> 'method_handler -> (elt_a -> elt_b) -> (elt_a -> elt_c) ->
+      'a ->
+      ('parameters -> 'method_handler -> 'a -> 'a -> 'method_handler * 'a) ->
+      'a map_a -> 'method_handler * 'a map_c map_b
+  end
+
+module Proj2(A:S_with_logs)(B:S_with_logs)(C:S_with_logs) =
+  struct
+    module MA=A.Map
+    module MB=B.Map
+    module MC=C.Map
+    type elt_a = MA.elt
+    type elt_b = MB.elt
+    type elt_c = MC.elt
+    type 'a map_a = 'a MA.t
+    type 'a map_b = 'a MB.t
+    type 'a map_c = 'a MC.t
+
+    let proj2 parameter error f g identity_elt merge map =
+      MA.fold
+	(fun key_a data_a map_b ->
+	 let key_b = f key_a in
+	 let key_c = g key_a in
+	 let error, submap =
+           MB.find_default_without_logs parameter error MC.empty key_b map_b 
+         in
+	 let submap =
+	   MC.add
+	     key_c
+	     (merge
+		(MC.find_default_without_logs f g
+		   identity_elt
+		   key_c
+		   submap) data_a)
+	     submap
+	 in
+	 MB.add key_b submap map_b)
+	map
+	MB.empty
+
+    let proj2_monadic parameter error handler f g identity_elt merge map =
+      MA.fold
+	(fun key_a data_a (handler,map_b) ->
+	 let key_b = f key_a in
+	 let key_c = g key_a in
+	 let error, submap =
+           MB.find_default_without_logs parameter handler MC.empty key_b map_b
+         in
+	 let handler,data' =
+	   merge parameter handler
+		 (MC.find_default_without_logs parameter error identity_elt key_c submap)
+		 data_a
+	 in
+	 let submap = MC.add key_c data' submap in
+	 handler,MB.add key_b submap map_b)
+	map
+	(handler,MB.empty)
+  end*)
