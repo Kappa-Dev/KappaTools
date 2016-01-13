@@ -356,6 +356,4 @@ Reachability analysis result ....
 ------------------------------------------------------------
 * Cartesian abstraction:
 ------------------------------------------------------------
-Some exceptions have been raised
-error: file_name: setMap.ml ; message: SetMap line 895Attempt to add an association over a former one in a map; exception:Failure(Set_and_Map.Map.add)
-error: file_name: setMap.ml ; message: SetMap line 895Attempt to add an association over a former one in a map; exception:Failure(Set_and_Map.Map.add)
+execution finished without any exception
