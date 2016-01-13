@@ -180,9 +180,9 @@ and inline_comment = parse
     let lexbuf = Lexing.from_channel d in
     lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_fname = fic} ;
     try
-      let () = Debug.tag logger ("Parsing "^fic^"...") in
+      let () = Format.fprintf logger "Parsing %s...@." fic in
       let out = KappaParser.start_rule token lexbuf compil in
-      let () = Debug.tag logger "done" in
+      let () = Format.fprintf logger "done@." in
       let () = close_in d in out
     with Syntax_Error (msg,pos) ->
       let () = close_in d in
