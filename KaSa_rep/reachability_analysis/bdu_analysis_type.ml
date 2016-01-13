@@ -146,7 +146,7 @@ module Int2Map_CV =
 
 (*full contact map*)
 
-module Int2Map_CM_state = 
+module Int2Map_CM_state' = 
   SetMap.Make (
     struct
       (*agent_type, site, state*)
@@ -155,19 +155,13 @@ module Int2Map_CM_state =
     end
   )
 
-module Int2Map_pair =
-  SetMap.Make (
-    struct
-      type t = int * int
-      let compare = compare
-    end )
-
-module Set_pair =
-  SetMap.Make (
-    struct
-      type t = (int * int * int) * (int * int * int)
-      let compare = compare
-    end )
+module Int2Map_CM_state =
+  Map_wrapper.Make 
+    (SetMap.Make
+       (struct 
+         type t = int * int * int
+         let compare = compare
+        end))
 
 (*list of rules to awake when the state of a site is modified and tested*)
 
@@ -189,12 +183,20 @@ module Int2Map_CV_Modif =
   
 (*syntactic contact map*)
 
-module Set_triple =
+module Set_triple' =
   SetMap.Make (
     struct
       type t = int * int * int
       let compare = compare
-    end )
+    end)
+
+module Set_triple =
+  Map_wrapper.Make
+    (SetMap.Make (
+      struct
+        type t = int * int * int
+        let compare = compare
+      end))
 
 module Int2Map_CM_Syntactic =
   SetMap.Make 

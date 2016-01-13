@@ -46,7 +46,8 @@ let compute_contact_map parameter error rule store_result =
       | None -> error, Set_triple.Set.empty
       | Some s -> error, s
     in
-    let union_set = Set_triple.Set.union set2 old in
+    (*let union_set = Set_triple.Set.union set2 old in*)
+    let error, union_set = Set_triple.Set.union parameter error set2 old in
     let store_result =
       Int2Map_CM_Syntactic.Map.add set1 union_set store_result
     in
@@ -87,7 +88,10 @@ let compute_contact_map parameter error rule store_result =
           let state1 = port1.site_state.max in
           if state1 > 0
           then
-            let set = Set_triple.Set.add (agent_type1, site1, state1) store_result in
+            let error, set = 
+              Set_triple.Set.add_when_not_in parameter error
+                (agent_type1, site1, state1) store_result
+            in
             error, set
           else
             error, store_result
@@ -100,7 +104,10 @@ let compute_contact_map parameter error rule store_result =
           let state2 = port2.site_state.max in
           if state2 > 0
           then
-            let set = Set_triple.Set.add (agent_type2, site2, state2) store_result in
+            let error, set =
+              Set_triple.Set.add_when_not_in parameter error
+                (agent_type2, site2, state2) store_result 
+            in
             error, set
           else
             error, store_result
@@ -121,7 +128,7 @@ let collect_init_map parameter error compiled store_result =
       | None -> error, Set_triple.Set.empty
       | Some s -> error, s
     in
-    let union_set = Set_triple.Set.union set2 old in
+    let error, union_set = Set_triple.Set.union parameter error set2 old in
     let store_result =
       Int2Map_CM_Syntactic.Map.add set1 union_set store_result
     in
@@ -169,8 +176,10 @@ let collect_init_map parameter error compiled store_result =
                         let state1 = port1.site_state.max in
                         if state1 > 0
                         then
-                          let set =
-                            Set_triple.Set.add (agent_type1, site1, state1) store_result in
+                          let error, set =
+                            Set_triple.Set.add_when_not_in parameter error
+                              (agent_type1, site1, state1) store_result 
+                          in
                           error, set
                         else
                           error, store_result
@@ -184,9 +193,10 @@ let collect_init_map parameter error compiled store_result =
                         let state2 = port2.site_state.max in
                         if state2 > 0
                         then
-                          let set = 
-                            Set_triple.Set.add (agent_type2, site_type2, state2) 
-                              store_result in
+                          let error, set = 
+                            Set_triple.Set.add_when_not_in parameter error
+                              (agent_type2, site_type2, state2) store_result 
+                          in
                           error, set
                         else
                           error, store_result
@@ -213,7 +223,7 @@ let compute_syn_contact_map_full parameter error rule compiled store_result =
       | None -> error, Set_triple.Set.empty
       | Some s -> error, s
     in
-    let union_set = Set_triple.Set.union triple_set2 old_set in
+    let error, union_set = Set_triple.Set.union parameter error triple_set2 old_set in
     let result =
       Int2Map_CM_Syntactic.Map.add triple_set1 union_set store_result
     in
@@ -255,7 +265,7 @@ let compute_syn_contact_map_full parameter error rule compiled store_result =
     )
     (*exists in both*)
     (fun parameter error triple_set triple_set2 triple_set2' store_result ->
-      let union = Set_triple.Set.union triple_set2 triple_set2' in
+      let error, union = Set_triple.Set.union parameter error triple_set2 triple_set2' in
       let error, store_result =
         add_link triple_set union store_result
       in
@@ -271,7 +281,7 @@ let compute_syn_contact_map_full parameter error rule compiled store_result =
 
 let compute_contact_map_full parameter error handler rule =
   let add_link (agent, site, state) set store_result =
-    let old =
+    (*let old =
       Int2Map_CM_state.Map.find_default Set_triple.Set.empty (agent, site, state)
         store_result
     in
@@ -284,7 +294,20 @@ let compute_contact_map_full parameter error handler rule =
       let add_map =
         Int2Map_CM_state.Map.add (agent, site, state) union_set store_result
       in
-      error, add_map
+      error, add_map*)
+    let error, old =
+      match Int2Map_CM_state.Map.find_option_without_logs parameter error 
+        (agent, site, state) store_result
+      with
+      | error, None -> error, Set_triple.Set.empty
+      | error, Some s -> error, s
+    in
+    let error, union_set = Set_triple.Set.union parameter error old set in
+    let error, add_map =
+      Int2Map_CM_state.Map.add_or_overwrite parameter error (agent, site, state)
+        union_set store_result
+    in
+    error, add_map
   in
   (*-----------------------------------------------------------------------*)
   (*folding this solution with the information in dual*)
@@ -292,7 +315,11 @@ let compute_contact_map_full parameter error handler rule =
     Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
       parameter error
       (fun parameter error (agent, (site, state)) (agent', site', state') store_result ->
-        let set = Set_triple.Set.add (agent', site', state') Set_triple.Set.empty in
+        (*let set = Set_triple.Set.add (agent', site', state') Set_triple.Set.empty in*)
+        let error, set = 
+          Set_triple.Set.add_when_not_in parameter error
+            (agent', site', state') Set_triple.Set.empty 
+        in
         let error, store_result =
           add_link (agent, site, state) set store_result
 	in
