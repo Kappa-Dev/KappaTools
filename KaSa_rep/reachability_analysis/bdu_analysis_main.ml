@@ -155,21 +155,15 @@ let scan_rule_dynamic parameter error handler rule_id rule compiled
       handler
       rule
   in
+  (*------------------------------------------------------------------------------*)
   (*syntactic contact map*)
-  let error, store_contact_map =
-    Bdu_contact_map.compute_contact_map
+  let error, store_syn_contact_map_full =
+    Bdu_contact_map.compute_syn_contact_map_full
       parameter
       error
       rule
-      store_result.store_contact_map
-  in
-  (*TODO*)
-  let error, store_init_map =
-    Bdu_contact_map.collect_init_map
-      parameter
-      error
       compiled
-      store_result.store_init_map
+      store_result.store_syn_contact_map_full
   in
   (*-------------------------------------------------------------------------------*)
   (*return a mapping of covering classes to a list of rules that has [modified and test]
@@ -206,8 +200,7 @@ let scan_rule_dynamic parameter error handler rule_id rule compiled
   error, 
   {
     store_contact_map_full                     = store_contact_map_full;
-    store_contact_map                          = store_contact_map;
-    store_init_map = store_init_map;
+    store_syn_contact_map_full                 = store_syn_contact_map_full;
     store_covering_classes_modification_update = store_covering_classes_modification_update;
     store_covering_classes_modification_side_effects =
       store_covering_classes_modification_side_effects;
@@ -453,19 +446,17 @@ let init_bdu_analysis_static =
 
 let init_bdu_analysis_dynamic parameter error =
   let init_contact_map_full = Int2Map_CM_state.Map.empty in
-  let init_contact_map      = Int2Map_CM_Syntactic.Map.empty in
-  let init_init_map         = Int2Map_CM_Syntactic.Map.empty in
+  let init_syn_contact_map  = Int2Map_CM_Syntactic.Map.empty in
   let init_cv_modification  = Int2Map_CV_Modif.Map.empty in
   let init_cv_modification_side_effects  = Int2Map_CV_Modif.Map.empty in
   let init_cv_modification_full          = Int2Map_CV_Modif.Map.empty in
   let init_bdu_analysis_dynamic =
     {
-      store_contact_map_full                     = init_contact_map_full;
-      store_contact_map                          = init_contact_map;
-      store_init_map = init_init_map;
-      store_covering_classes_modification_update = init_cv_modification;
+      store_contact_map_full     = init_contact_map_full;
+      store_syn_contact_map_full = init_syn_contact_map;      
+      store_covering_classes_modification_update       = init_cv_modification;
       store_covering_classes_modification_side_effects = init_cv_modification_side_effects;
-      store_covering_classes_modification_update_full = init_cv_modification_full;
+      store_covering_classes_modification_update_full  = init_cv_modification_full;
     }
   in
   error, init_bdu_analysis_dynamic

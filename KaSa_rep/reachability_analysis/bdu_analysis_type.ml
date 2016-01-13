@@ -394,9 +394,9 @@ type wl_int = IntWL.WSetMap.elt list * IntWL.WSetMap.elt list * IntWL.WSetMap.Se
 
 type bdu_analysis_dynamic =
   {
-    store_contact_map_full : Set_triple.Set.t Int2Map_CM_state.Map.t;
-    store_contact_map      : Set_triple.Set.t Int2Map_CM_Syntactic.Map.t;
-    store_init_map         : Set_triple.Set.t Int2Map_CM_Syntactic.Map.t;
+    store_contact_map_full     : Set_triple.Set.t Int2Map_CM_state.Map.t;
+    (*syntactic contact map included initial bonds*)
+    store_syn_contact_map_full : Set_triple.Set.t Int2Map_CM_Syntactic.Map.t;
     store_covering_classes_modification_update : (*update(c)*)
       (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;
     (*update(c) with side effect information*)

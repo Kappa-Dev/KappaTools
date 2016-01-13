@@ -382,10 +382,6 @@ let collect_bdu_init_restriction_map parameter handler error compil store_remane
                       List.fold_left (fun (error, current_list) (cv_id, list, set) ->
                         (*-----------------------------------------------------------------*)
                         (*new index for site type in covering class*)
-                        let _ =
-                          if local_trace
-                          then Printf.fprintf stderr "INITIAL CV_ID: %i\n" cv_id
-                        in
                         let error, (map_new_index_forward, _) =
                           new_index_pair_map parameter error list
                         in
@@ -429,15 +425,6 @@ let collect_bdu_init_restriction_map parameter handler error compil store_remane
 			        error, pair_list
 		              ) map_res (error, [])
 		          in
-                          (*let _ =
-                            Printf.fprintf stdout "agent_type:%i:index:%i:cv_id:%i\n"
-                              agent_type index cv_id;
-                            List.iter
-                              (fun (site, state) ->
-                                Printf.fprintf stdout "site:%i:state:%i\n"
-                                  site state
-                              ) pair_list
-                          in*)
 		          let error, handler, bdu_init =
 		            build_bdu parameter handler error pair_list
 		          in

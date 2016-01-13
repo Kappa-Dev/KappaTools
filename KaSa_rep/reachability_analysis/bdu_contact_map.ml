@@ -37,82 +37,7 @@ let trace = false
 *)
 
 (************************************************************************************)
-
-(*let compute_contact_map_aux parameter error rule_id rule handler store_result =
-  let add_link rule_id (agent, site, state) store_result =
-    let error, (l, old) =
-      match Int2Map_syn.Map.find_option rule_id store_result with
-      | None -> error, ([], Set_triple.Set.empty)
-      | Some (l, s) -> error, (l, s)
-    in
-    let set = Set_triple.Set.add (agent, site, state) Set_triple.Set.empty in
-    let union_set = Set_triple.Set.union set old in
-    if Set_triple.Set.equal union_set old
-    then error, store_result
-    else
-      let add_map =
-        Int2Map_syn.Map.add rule_id (l, union_set) store_result
-      in
-      error, add_map
-  in  
-  (*-----------------------------------------------------------------------*)
-  (*folding this solution with the information in dual*)
-  let error, (store_result1, store_result2) =
-    AgentMap.fold parameter error 
-      (fun parameter error agent_id agent store_result ->
-        match agent with
-        | Unknown_agent _ | Dead_agent _ ->
-	  warn parameter error (Some "line 64, dead agents/sites should not occur in rhs") 
-            Exit store_result 
-	| Ghost-> error, store_result
-        | Agent agent ->
-          List.fold_left (fun (error, (store_result1, store_result2)) 
-            (site_add1, site_add2) ->
-            let agent_index1 = site_add1.agent_index in
-            let agent1 = site_add1.agent_type in
-            let site1 = site_add1.site in
-            let agent2 = site_add2.agent_type in
-            let site2 = site_add2.site in
-            let agent_index2 = site_add2.agent_index in
-            (*-----------------------------------------------------------------------*)
-            let error, map1 =
-              Site_map_and_set.Map.fold
-                (fun site port (error, store_result) ->
-                  let state = port.site_state.max in
-                  if agent_id = agent_index1 && state > 0
-                  then
-                    add_link rule_id (agent1, site1, state) store_result
-                  else
-                    error, store_result
-                ) agent.agent_interface (error, store_result1)
-            in
-            (*-----------------------------------------------------------------------*)
-            let error, map2 = 
-              Site_map_and_set.Map.fold
-                (fun site port (error, store_result) ->
-                  let state = port.site_state.max in
-                  if agent_id = agent_index2 && state > 0
-                  then
-                    add_link rule_id (agent2, site2, state) store_result
-                  else
-                    error, store_result
-                ) agent.agent_interface (error, store_result2)
-            in
-            error, (map1, map2)
-          ) (error, store_result) rule.actions.bind
-      ) rule.rule_rhs.views store_result
-  in
-  (*-----------------------------------------------------------------------*)
-  let store_result1 = 
-    Int2Map_syn.Map.map (fun (l, x) -> List.rev l, x) store_result1
-  in
-  let store_result2 = 
-    Int2Map_syn.Map.map (fun (l, x) -> List.rev l, x) store_result2
-  in
-  error, (store_result1, store_result2)*)
-
-(************************************************************************************)
-(*TODO*)
+(*syntactic contact map without initial state*)
 
 let compute_contact_map parameter error rule store_result =
   let add_link set1 set2 store_result =
@@ -148,14 +73,14 @@ let compute_contact_map parameter error rule store_result =
       | error, Some agent -> error, agent
     in
     match agent1, agent2 with
-    | Unknown_agent _, Unknown_agent _ | Dead_agent _, Dead_agent _ ->
-      warn parameter error (Some "line 152") Exit store_result
+    | Unknown_agent _, Unknown_agent _ | Dead_agent _, Dead_agent _
     | (Agent _, (Ghost|Dead_agent _|Unknown_agent _))
     | (Ghost, (Agent _|Dead_agent _|Unknown_agent _))
     | (Dead_agent _, (Ghost|Agent _|Unknown_agent _))
     | (Unknown_agent _, (Ghost|Agent _|Dead_agent _))
-    | Ghost, Ghost -> error, store_result
+    | Ghost, Ghost -> warn parameter error (Some "line 156") Exit store_result
     | Agent agent1, Agent agent2 ->
+    (*---------------------------------------------------------------------*)
     let error, set1 =
       Site_map_and_set.Map.fold
         (fun _ port1 (error, store_result) ->
@@ -168,6 +93,7 @@ let compute_contact_map parameter error rule store_result =
             error, store_result
         ) agent1.agent_interface (error, Set_triple.Set.empty)
     in
+    (*---------------------------------------------------------------------*)
     let error, set2 =
       Site_map_and_set.Map.fold
         (fun _ port2 (error, store_result) ->
@@ -180,16 +106,14 @@ let compute_contact_map parameter error rule store_result =
             error, store_result
         ) agent2.agent_interface (error, Set_triple.Set.empty)
     in
-    let error, store_result =
-      add_link set1 set2 store_result
-    in
+    (*---------------------------------------------------------------------*)
+    let error, store_result = add_link set1 set2 store_result in
     error, store_result
   ) (error, store_result) rule.actions.bind      
 
 (************************************************************************************)
 (*get the binding in initial state*)
 
-(*TODO*)
 let collect_init_map parameter error compiled store_result =
   let add_link set1 set2 store_result =
     let error, old =
@@ -207,72 +131,140 @@ let collect_init_map parameter error compiled store_result =
     (fun parameter error index init store_result ->
       AgentMap.fold parameter error
         (fun parameter error agent_id bonds_map store_result ->
-          (*let error, store_result =
+          let error, store_result =
             Site_map_and_set.Map.fold
               (fun site_type_source site_add (error, store_result) ->
-                (*Move this out*)
                 let agent_index_target = site_add.agent_index in
-                let agent_type_target = site_add.agent_type in
-                let site_type_target = site_add.site in
-                let error, agent =
+                (*get agent_source*)
+                let error, agent_source =
                   match AgentMap.get parameter error agent_id
                     init.e_init_c_mixture.views 
                   with
-                  | error, None -> exit 0 
-                  | error, Some a -> error, a
+                  | error, None -> warn parameter error (Some "line 218") Exit Ghost
+                  | error, Some agent -> error, agent
                 in
-                match agent with
-                | Ghost | Unknown_agent _
-                | Dead_agent _ -> error, store_result
-                | Agent agent ->
-                  let agent_type_source = agent.agent_name in
-                  let port_source =
-                    match Site_map_and_set.Map.find_option parameter error site_type_source
-                      agent.agent_interface
-                    with
-                    | error, None -> exit 0
-                    | error, Some port -> port
-                  in
-                  let port_target =
-                    match Site_map_and_set.Map.find_option parameter error site_type_target
-                      agent.agent_interface
-                    with
-                    | error, None -> exit 0
-                    | error, Some port -> port
-                  in
-                  (*let error, set =
+                (*get agent_target*)
+                let error, agent_target =
+                  match AgentMap.get parameter error agent_index_target
+                    init.e_init_c_mixture.views
+                  with
+                  | error, None -> warn parameter error (Some "line 226") Exit Ghost
+                  | error, Some agent -> error, agent
+                in
+                (*-----------------------------------------------------------------------*)
+                match agent_source, agent_target with
+                | Unknown_agent _, Unknown_agent _ 
+                | Dead_agent _, Dead_agent _ 
+                | (Agent _, (Ghost |Dead_agent _|Unknown_agent _))
+                | (Ghost, (Agent _|Dead_agent _|Unknown_agent _))
+                | (Dead_agent _, (Ghost|Agent _|Unknown_agent _))
+                | (Unknown_agent _, (Ghost|Agent _|Dead_agent _))
+                | Ghost, Ghost ->
+                  warn parameter error (Some "line 238") Exit store_result
+                | Agent agent1, Agent agent2 ->
+                  let agent_type1 = agent1.agent_name in
+                  let error, set1 =
                     Site_map_and_set.Map.fold
-                      (fun _ port (error, store_result) ->
-                        let state = port.site_state.max in
-                        if state > 0
+                      (fun site1 port1 (error, store_result) ->
+                        let state1 = port1.site_state.max in
+                        if state1 > 0
                         then
-                          let error, set = Site_map_and_set.Set.add 
-                            parameter error state store_result
-                          in                            
+                          let set =
+                            Set_triple.Set.add (agent_type1, site1, state1) store_result in
                           error, set
-                        else 
+                        else
                           error, store_result
-                      ) agent.agent_interface (error, Site_map_and_set.Set.empty)
-                  in*)
-                  let state_source = port_source.site_state.max in
-                  let state_target = port_target.site_state.max in
-                  let set1 =
-                    Set_triple.Set.add (agent_type_source, site_type_source, state_source)
+                      ) agent1.agent_interface (error, Set_triple.Set.empty)
                   in
-                  let set2 =
-                    Set_triple.Set.add (agent_type_target, site_type_target, state_target)
-                  in
-                  let error, store_result =
-                    add_link set1 set2 store_result
-                  in
-                  error, store_result
+                  (*---------------------------------------------------------------------*)
+                  let agent_type2 = agent2.agent_name in
+                  let error, set2 =
+                    Site_map_and_set.Map.fold
+                      (fun site_type2 port2 (error, store_result) ->
+                        let state2 = port2.site_state.max in
+                        if state2 > 0
+                        then
+                          let set = 
+                            Set_triple.Set.add (agent_type2, site_type2, state2) 
+                              store_result in
+                          error, set
+                        else
+                          error, store_result
+                      ) agent2.agent_interface (error, Set_triple.Set.empty)
+                  in                  
+                (*-----------------------------------------------------------------------*)
+                let error, store_result = add_link set1 set2 store_result in
+                error, store_result
               ) bonds_map (error, store_result)
-          in*)
+          in
           error, store_result         
         ) 
         init.e_init_c_mixture.bonds
         store_result
     ) compiled.init store_result
+
+(************************************************************************************)
+(*union init contact map and syntactic one*)
+
+let compute_syn_contact_map_full parameter error rule compiled store_result =
+  let add_link triple_set1 triple_set2 store_result =
+    let error, old_set =
+      match Int2Map_CM_Syntactic.Map.find_option triple_set1 store_result with
+      | None -> error, Set_triple.Set.empty
+      | Some s -> error, s
+    in
+    let union_set = Set_triple.Set.union triple_set2 old_set in
+    let result =
+      Int2Map_CM_Syntactic.Map.add triple_set1 union_set store_result
+    in
+    error, result
+  in
+  let error, syntactic_contact_map =
+    compute_contact_map
+      parameter
+      error
+      rule
+      Int2Map_CM_Syntactic.Map.empty
+  in
+  let error, init_contact_map =
+    collect_init_map
+      parameter
+      error
+      compiled
+      Int2Map_CM_Syntactic.Map.empty
+  in
+  Int2Map_CM_Syntactic.Map.fold2_with_logs
+    (fun parameter error str str_opt exn ->
+      let error, _ = warn parameter error str_opt exn Not_found in
+      error
+    )
+    parameter error
+    (*exists in 'a t*)
+    (fun parameter error triple_set1 triple_set2 store_result ->
+      let error, store_result =
+        add_link triple_set1 triple_set2 store_result
+      in
+      error, store_result
+    )
+    (*exists in 'b t*)
+    (fun parameter error triple_set1' triple_set2' store_result ->
+      let error, store_result =
+        add_link triple_set1' triple_set2' store_result
+      in
+      error, store_result
+    )
+    (*exists in both*)
+    (fun parameter error triple_set triple_set2 triple_set2' store_result ->
+      let union = Set_triple.Set.union triple_set2 triple_set2' in
+      let error, store_result =
+        add_link triple_set union store_result
+      in
+      error, store_result
+    )
+    syntactic_contact_map
+    init_contact_map
+    store_result
+
 
 (************************************************************************************)
 (*contact map*)

@@ -27,7 +27,7 @@ let trace = false
 (************************************************************************************)
 (*syntactic contact map*)
 
-let print_contact_map_aux parameter error handler_kappa result =
+(*let print_contact_map_aux parameter error handler_kappa result =
   Int2Map_CM_Syntactic.Map.iter (fun set1 set2 ->
     Set_triple.Set.iter (fun (agent1, site1, state1) ->
       Set_triple.Set.iter (fun (agent2, site2, state2) ->
@@ -72,10 +72,10 @@ let print_contact_map parameter error handler_kappa result =
       handler_kappa
       result
   in
-  error
+  error*)
 
 (************************************************************************************)
-(*contact map full information*)
+(*dynamic contact map full information*)
 
 let print_contact_map_full_aux parameter error handler_kappa result =
   Int2Map_CM_state.Map.iter (fun (agent1, site1, state1) set ->
@@ -99,8 +99,12 @@ let print_contact_map_full_aux parameter error handler_kappa result =
         Handler.string_of_state parameter error handler_kappa agent2 site2 state2
       in
       fprintf stdout "agent_type:%i:%s@site_type:%i:%s:state:%i(%s)--agent_type':%i:%s@site_type':%i:%s:state':%i(%s)\n" 
-        agent1 agent_string1 site1 site_string1 state1 state_string1
-        agent2 agent_string2 site2 site_string2 state2 state_string2
+        agent1 agent_string1 
+        site1 site_string1 
+        state1 state_string1
+        agent2 agent_string2 
+        site2 site_string2
+        state2 state_string2
     ) set
   ) result
 
@@ -125,7 +129,7 @@ let print_contact_map_full parameter error handler_kappa result =
 (************************************************************************************)
 (*print init map*)
 
-let print_init_map_aux parameter error handler_kappa result =
+(*let print_init_map_aux parameter error handler_kappa result =
   Int2Map_CM_Syntactic.Map.iter 
     (fun set1 set2 ->
       Set_triple.Set.iter (fun (agent_type, site_type, state) ->
@@ -141,13 +145,71 @@ let print_init_map parameter error handler_kappa result =
   fprintf (Remanent_parameters.get_log parameter)
     "\n------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
-    "(Full) Contact map and initital state:\n";
+    " Contact map in the initital state:\n";
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
-    "Sites are annotated with the id of binding type (init):\n";
+    "Sites are annotated with the id of binding type:\n";
   let error =
     print_init_map_aux
+      parameter
+      error
+      handler_kappa
+      result
+  in
+  error*)
+
+(************************************************************************************)
+(*syntactic contact map and init map*)
+
+let print_syn_map_aux parameter error handler_kappa result =
+  Int2Map_CM_Syntactic.Map.iter 
+    (fun set1 set2 ->
+      Set_triple.Set.iter (fun (agent_type, site_type, state) ->
+        let error, agent_string =
+          Handler.string_of_agent parameter error handler_kappa agent_type
+        in
+        let error, site_string =
+          Handler.string_of_site_contact_map
+            parameter error handler_kappa agent_type site_type
+        in
+        let error, state_string =
+          Handler.string_of_state parameter error handler_kappa agent_type site_type state
+        in
+        Set_triple.Set.iter (fun (agent_type', site_type', state') ->
+          let error, agent_string' =
+            Handler.string_of_agent parameter error handler_kappa agent_type'
+          in
+          let error, site_string' =
+            Handler.string_of_site_contact_map
+              parameter error handler_kappa agent_type' site_type'
+          in
+          let error, state_string' =
+            Handler.string_of_state parameter error handler_kappa 
+              agent_type' site_type' state'
+          in
+          fprintf stdout "agent_type:%i:%s:site_type:%i:%s:state:%i(%s) - > agent_type':%i:%s:site_type':%i:%s:state':%i(%s)\n"
+            agent_type agent_string
+            site_type site_string
+            state state_string
+            agent_type' agent_string'
+            site_type' site_string'
+            state' state_string'
+        ) set2
+      ) set1
+    ) result
+
+let print_syn_map parameter error handler_kappa result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "\n------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "(Syntactic) Contact map and initital state:\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "Sites are annotated with the id of binding type:\n";
+  let error =
+    print_syn_map_aux
       parameter
       error
       handler_kappa
@@ -250,19 +312,11 @@ let print_result_dynamic parameter error handler_kappa compiled result =
     in
     (*------------------------------------------------------------------------------*)
     let _ =
-      print_contact_map
+      print_syn_map
         parameter
         error
         handler_kappa
-        result.store_contact_map
-    in
-    (*------------------------------------------------------------------------------*)
-    let _ =
-      print_init_map
-        parameter
-        error
-        handler_kappa
-        result.store_init_map
+        result.store_syn_contact_map_full
     in
     (*------------------------------------------------------------------------------*)
     let _ =
