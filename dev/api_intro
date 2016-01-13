@@ -1,5 +1,8 @@
 {!indexlist}
 
+The main entry point of KaSim executable is main/KaSim.ml but let's
+describe the API bottom-up.
+
 The folder dataStructures/ has a transparent name. You can find there:
 {!modules: SetMap Nbr NamedDecls Location}
 Some pretty printing utilities are Here too:
@@ -12,12 +15,17 @@ Instantiation Alg_expr Raw_mixture Primitives Environment Kappa_printer }
 In grammar/ are the parser and the compilers
 {!modules:LKappa Expr Snip}
 
+The module to store and manipulate the state of the simulation are in
+siteGraph/
 {!modules: Edges Navigation}
 
-Finally, the simulation engine is in simulation/
+The simulation engine is in simulation/
 The core of the interpreter
 {!modules: Expr_interpreter Rule_interpreter State_interpreter}
 and some storage and rendering
 {!modules: Counter Plot Outputs}
 
-{!modules: Utilities}
+The machinary to cook stories from an execution trace is in cflow/
+{!modules: Compression_main Utilities}
+
+The code of the static analyser is in KaSa_rep/
