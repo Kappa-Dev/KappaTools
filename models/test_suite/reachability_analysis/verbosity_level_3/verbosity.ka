@@ -1,0 +1,8 @@
+ -> A(x~u,y~u,z~u)
+A(x~u)->A(x~p)
+A(x~p,y~u) -> A(x~p,y~p)
+A(x~p,y~p,z~u) -> A(x~0,y~p,z~q)
+A(x~u)->A(x~q)
+A(x~q,y~u)->A(x~q,y~q)
+A(y~q,z~u) -> A(y~q,z~q)
+'KO' A(x~0,y~q) -> A(x~1,y~0)

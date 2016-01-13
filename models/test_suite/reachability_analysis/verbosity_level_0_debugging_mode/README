@@ -1,0 +1,4 @@
+#Command-line:
+"${KAPPABIN}"KaSa verbosity.ka --output-directory output --verbosity-level-for-view-analysis Mute --debugging-mode || exit 0 
+
+#checking that the tuning of verbosity mode is working.
