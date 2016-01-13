@@ -65,7 +65,7 @@ let main () =
 	match Remanent_parameters.get_influence_map_accuracy_level parameters_influence_map
 	with
 	| Remanent_parameters_sig.None | Remanent_parameters_sig.Low -> error,wake_up_map,inhibition_map 
-	| Remanent_parameters_sig.Medium | Remanent_parameters_sig.High -> 
+	| Remanent_parameters_sig.Medium | Remanent_parameters_sig.High | Remanent_parameters_sig.Full -> 
 	  let parameters_refine_influence_map = Remanent_parameters.update_prefix parameters "Refine_influence_map:" in       
 	  let _ = Format.printf "Refining the influence map...\n" in 
 	  let error,wake_up_map = Algebraic_construction.filter_influence parameters_refine_influence_map error handler c_compil wake_up_map true in 

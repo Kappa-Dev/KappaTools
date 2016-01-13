@@ -17,16 +17,20 @@
 
 let compose f g = fun x -> f (g x)
 
-let fetch_accuracy_level r =
+let fetch_level_gen s r =
   match
-    !r
+    String.lowercase !r
   with
-  | "None" -> Remanent_parameters_sig.None 
-  | "Low" -> Remanent_parameters_sig.Low
-  | "Medium" -> Remanent_parameters_sig.Medium
-  | "High" -> Remanent_parameters_sig.High
+  | "mute" | "none"-> Remanent_parameters_sig.None 
+  | "low" -> Remanent_parameters_sig.Low
+  | "medium" -> Remanent_parameters_sig.Medium
+  | "high" -> Remanent_parameters_sig.High
+  | "complete" | "full" -> Remanent_parameters_sig.Full
   | _ ->
-     let _ = Printf.fprintf stderr "This is not an accuracy level !!!" in raise Exit 
+     let _ = Printf.fprintf stderr "This is not %s level !!!" in raise Exit
+
+let fetch_accuracy_level r = fetch_level_gen "an accuracy" r
+let fetch_verbosity_level r = fetch_level_gen "a verbosity" r 
 			     
 let get_symbols () = 
   {
@@ -109,16 +113,46 @@ let get_contact_map () =
     Remanent_parameters_sig.influence_arrow = !Config.influence_arrow ;
    }
 
-let get_reachability_map () =
+let reachability_map_0 =
   {
-    Remanent_parameters_sig.dump_reachability_analysis_result = !Config.dump_reachability_analysis_result;
-    Remanent_parameters_sig.dump_reachability_analysis_covering_classes = !Config.dump_reachability_analysis_covering_classes;
-    Remanent_parameters_sig.dump_reachability_analysis_iteration = !Config.dump_reachability_analysis_iteration;
-    Remanent_parameters_sig.dump_reachability_analysis_static = !Config.dump_reachability_analysis_static;
-    Remanent_parameters_sig.dump_reachability_analysis_dynamic = !Config.dump_reachability_analysis_dynamic;
-    Remanent_parameters_sig.dump_reachability_analysis_diff = !Config.dump_reachability_analysis_diff;
-    Remanent_parameters_sig.dump_reachability_analysis_wl = !Config.dump_reachability_analysis_wl;
+    Remanent_parameters_sig.dump_reachability_analysis_result = false;
+    Remanent_parameters_sig.dump_reachability_analysis_iteration = false;
+    Remanent_parameters_sig.dump_reachability_analysis_diff = false;
+    Remanent_parameters_sig.dump_reachability_analysis_wl = false;   
+    Remanent_parameters_sig.dump_reachability_analysis_covering_classes = false;
+    Remanent_parameters_sig.dump_reachability_analysis_static = false;
+    Remanent_parameters_sig.dump_reachability_analysis_dynamic = false;    
   }
+
+let reachability_map_1 = { reachability_map_0 with Remanent_parameters_sig.dump_reachability_analysis_result = true }
+let reachability_map_2 = { reachability_map_1 with Remanent_parameters_sig.dump_reachability_analysis_iteration = true }
+let reachability_map_3 = { reachability_map_2 with Remanent_parameters_sig.dump_reachability_analysis_diff = true }
+let reachability_map_4 = { reachability_map_3 with Remanent_parameters_sig.dump_reachability_analysis_wl = true }
+
+
+let add_debugging_parameters_to_reachability_map reachability =
+  let trace = !Config.trace in
+  if trace then
+    { reachability
+    with
+      Remanent_parameters_sig.dump_reachability_analysis_covering_classes = !Config.dump_reachability_analysis_covering_classes;
+      Remanent_parameters_sig.dump_reachability_analysis_static = !Config.dump_reachability_analysis_static;
+      Remanent_parameters_sig.dump_reachability_analysis_dynamic = !Config.dump_reachability_analysis_dynamic;
+    }
+  else reachability
+    
+let get_reachability_map () =
+  add_debugging_parameters_to_reachability_map
+    begin
+      match
+	fetch_verbosity_level Config.verbosity_level_for_reachability_analysis
+      with
+      | Remanent_parameters_sig.None -> reachability_map_0
+      | Remanent_parameters_sig.Low -> reachability_map_1
+      | Remanent_parameters_sig.Medium -> reachability_map_2
+      | Remanent_parameters_sig.High -> reachability_map_3
+      | Remanent_parameters_sig.Full -> reachability_map_4
+    end
 
 let open_tasks_profiling =
   let cache = ref None in 
@@ -167,7 +201,6 @@ let get_parameters ?called_from:(called_from=Remanent_parameters_sig.KaSa) () =
 	Remanent_parameters_sig.symbols = get_symbols () ; 
 	Remanent_parameters_sig.influence_map_output = get_influence_map () ;
 	Remanent_parameters_sig.contact_map_output = get_contact_map () ;
-        (*add reachability*)
         Remanent_parameters_sig.reachability_map_output = get_reachability_map ();
 	Remanent_parameters_sig.unsafe = !Config.unsafe ;
 	Remanent_parameters_sig.trace  = !Config.trace ;
@@ -499,7 +532,7 @@ let open_influence_map_file parameters error =
    (get_do_contact_map parameter) 
    && (match get_contact_map_accuracy_level parameter with
    | Remanent_parameters_sig.Medium | Remanent_parameters_sig.Low -> true
-   | Remanent_parameters_sig.None | Remanent_parameters_sig.High -> false)
+   | Remanent_parameters_sig.None | Remanent_parameters_sig.High | Remanent_parameters_sig.Full-> false)
 								      
  let lexical_analysis_of_tested_only_patterns parameter =
    lexical_analysis_of_tested_only_patterns_is_required_by_the_persistent_mode  parameter 

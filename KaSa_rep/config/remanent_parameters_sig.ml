@@ -18,7 +18,7 @@
 module CharMap = Mods.CharMap
 
 type called_from = KaSa | KaSim | Internalised
-type accuracy_level = None | Low | Medium | High
+type accuracy_level = None | Low | Medium | High | Full
 type link_mode = Bound_indices | Site_address | Bound_type 
   
 type symbol_table = 

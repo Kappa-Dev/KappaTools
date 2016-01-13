@@ -86,8 +86,20 @@ let options =
         "Tune the accuracy level of the view analysis",
 	["2_Reachability_analysis"],
 	Normal;
-      
-            
+
+      "--verbosity-level-for-view-analysis",
+      (Choice
+	 ([
+	     "Mute","No information displayed";
+	     "Low","Show analysis result only";
+	     "Medium","Also show which rules are applied";
+	     "High","Also show when new views are discovered";
+	     "Full","Also show which rules are put in the working list"],
+	  Config.verbosity_level_for_reachability_analysis)),
+	  "Tune the verbosity level for the view analysis",
+	  ["2_Reachability_analysis"],
+	  Normal;
+		      
       "--output-directory",
       String Config.output_directory,
       "put output files in this directory",
