@@ -38,6 +38,76 @@ let dump_formatter parameter  f =
   if local_trace ||  Remanent_parameters.get_trace parameter
   then f (Remanent_parameters.get_formatter parameter) 
 
+let dump_view_diff parameter handler_kappa handler_bdu error agent_type cv_id old_bdu new_bdu =
+  if trace || Remanent_parameters.get_dump_reachability_analysis_diff parameter || Remanent_parameters.get_trace parameter
+  then
+    let error, handler_bdu, bdu_diff =
+      Mvbdu_wrapper.Mvbdu.mvbdu_xor parameter handler_bdu error old_bdu new_bdu
+    in
+    let parameters_cv =
+      Remanent_parameters.update_prefix parameter ""
+    in
+    let error, agent_string =
+      Handler.string_of_agent parameter error handler_kappa agent_type
+    in
+    let () = Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n" in
+    let error,handler_bdu =
+      if trace || Remanent_parameters.get_trace parameter
+      then
+	let () = Printf.fprintf (Remanent_parameters.get_log parameter) "INTENSIONAL DESCRIPTION:\n" in
+	let () = Mvbdu_wrapper.Mvbdu.print (Remanent_parameters.get_log parameter) "" bdu_diff in
+	let () = Printf.fprintf (Remanent_parameters.get_log parameter) "EXTENSIONAL DESCRIPTION:\n" in
+	error,handler_bdu
+      else
+	error,handler_bdu
+    in
+    let error, handler_bdu, list = 
+      Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu parameter handler_bdu error bdu_diff
+    in
+    let error =
+      List.fold_left
+	(fun error l ->
+	 let error,bool =
+	   List.fold_left
+	     (fun (error,bool) (site_type, state) ->
+	      (* JF: this is wrong:
+                          You should use the mapping between new index (of this covering class) to old index to get the proper site type *)
+	      let site_type = site_type in (* JF: to correct *)
+	      let error, site_string = error, string_of_int site_type in
+	      (* let error, site_string =
+		try 
+                  Handler.string_of_site parameter error handler_kappa
+					 agent_type (site_type-1)
+		with
+		  _ -> warn parameter error (Some "line 136") Exit (string_of_int site_type)
+	      in*)
+	      (*NOTE: minus 1, because using a new indexes for
+                          site_type which is increased by 1*)
+	      let error, state_string = error, string_of_int state in
+	      (* let error, state_string =
+                try
+		  Handler.string_of_state parameter error handler_kappa
+					  agent_type (site_type-1) state
+		with
+		  _ -> warn parameter error (Some "line 146") Exit (string_of_int state)
+              in*)
+              let () =
+		if bool then Printf.fprintf (Remanent_parameters.get_log parameter) ","
+		else Printf.fprintf (Remanent_parameters.get_log parameter) "%s(" agent_string
+              in
+	      let () = Printf.fprintf (Remanent_parameters.get_log parameter) 
+				      "%s%s" site_string state_string
+              in
+              error,true
+             )
+	     (error,false) l
+	 in
+	 let () = 
+	   if bool then Printf.fprintf (Remanent_parameters.get_log parameter) ")\n"
+	 in error)
+	error list
+    in error, handler_bdu    
+  else error,handler_bdu
 (************************************************************************************)
 (*update bdu:
   - (bdu_X U bdu_creation) U [\rho[update_views] | \rho \in bdu_X (inter) bdu_test views]
@@ -300,15 +370,13 @@ let compute_views_enabled parameter handler error
     (*-----------------------------------------------------------------------*)
     if Mvbdu_wrapper.Mvbdu.equal bdu_union bdu_old
     then
-      error, handler, false, bdu_union, store_result
+      error, handler, false, store_result
     else
-      let error, handler, bdu_diff =
-	Mvbdu_wrapper.Mvbdu.mvbdu_xor parameter handler error bdu_union bdu_old
-      in
+      let error, handler = dump_view_diff parameter handler_kappa handler error agent_type cv_id bdu_old bdu_union in
       let store_result =
         Map_bdu_update.Map.add (agent_type, cv_id) bdu_union store_result
       in
-      error, handler, true, bdu_diff, store_result
+      error, handler, true, store_result
   in
   (*-----------------------------------------------------------------------*)
   (*deal with views*)
@@ -385,7 +453,7 @@ let compute_views_enabled parameter handler error
           ) (error, handler, bdu_false) list
         in
         (*-----------------------------------------------------------------------*)
-        let error, handler, is_new_view, bdu_diff, store_result =
+        let error, handler, is_new_view, store_result =
           add_link handler (agent_type, cv_id) bdu_update store_result
         in
         (*-----------------------------------------------------------------------*)
@@ -407,20 +475,6 @@ let compute_views_enabled parameter handler error
 	              Printf.fprintf stderr "\t\tdiscovering a new views.\n")
                   else ()
               end
-            in
-            (*print information of different views*)
-            let _ =
-              if (Remanent_parameters.get_dump_reachability_analysis_diff parameter) 
-              then
-                let parameters_cv =
-                  Remanent_parameters.update_prefix parameter ""
-                in
-                if (Remanent_parameters.get_trace parameters_cv)
-                then
-                  dump_channel parameter (fun stderr ->
-	            Printf.fprintf stderr "\t\tdiscovering a new views:\n";
-                    Mvbdu_wrapper.Mvbdu.print stderr "" bdu_diff)
-                else ()
             in
             ()    
           (*-----------------------------------------------------------------------*)
@@ -495,7 +549,7 @@ let compute_views_enabled parameter handler error
             bdu_creation
             bdu_X
 	in
-	let error, handler, is_new_view, bdu_diff, store_result =
+	let error, handler, is_new_view, store_result =
           add_link handler (agent_type, cv_id) bdu_update store_result
         in
         (*-----------------------------------------------------------------------*)
@@ -551,7 +605,7 @@ let compute_views_enabled parameter handler error
             error, handler, bdu_update
           ) (error, handler, bdu_false) list
         in
-	let error, handler, is_new_view, bdu_diff, store_result =
+	let error, handler, is_new_view, store_result =
           add_link handler (agent_type, cv_id) bdu_update store_result
         in
         (*-----------------------------------------------------------------------*)
@@ -606,6 +660,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
     let error, handler, bdu_union =
       Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_old bdu
     in
+    let error, handler = dump_view_diff parameter handler_kappa handler error agent_type cv_id bdu_old bdu_union in
     let result_map =
       Map_bdu_update.Map.add (agent_type, cv_id) bdu_union store_result
     in
@@ -617,7 +672,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
   let error, store_bdu_fixpoint_init_map =
     Map_creation_bdu.Map.fold
       (fun (agent_type, rule_id, cv_id) bdu (error, store_result) ->
-        let error, store_result =
+       let error, store_result =
           add_link parameter handler (agent_type, cv_id) bdu store_result
         in
         error, store_result
@@ -839,7 +894,7 @@ let collect_bdu_fixpoint_map parameter handler error
     store_covering_classes_modification_update_full
     store_bdu_init_restriction_map
     init_dead_rule_array
-    =
+  =
   let error, handler, bdu_false = 
     Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error
   in 

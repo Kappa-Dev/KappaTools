@@ -215,7 +215,7 @@ let scan_rule_bdu_build parameter handler_bdu error rule_id rule compil
     covering_classes store_potential_side_effects 
     store_result =
   (*------------------------------------------------------------------------------*)
-  let error, store_remanent_triple =
+  let error, store_remanent_triple = (* JF: it should be computed only once, not for each rule *)
     Bdu_build.collect_remanent_triple
       parameter
       error
@@ -233,7 +233,7 @@ let scan_rule_bdu_build parameter handler_bdu error rule_id rule compil
       store_result.store_wl_creation
   in
   (*-------------------------------------------------------------------------------*)
-  let error, (handler_bdu, store_bdu_test_restriction_map) =
+  let error, (handler_bdu, store_bdu_test_restriction_map) = 
     Bdu_build.collect_bdu_test_restriction_map
       parameter
       handler_bdu
@@ -269,7 +269,7 @@ let scan_rule_bdu_build parameter handler_bdu error rule_id rule compil
       store_bdu_creation_restriction_map
   in
   (*-------------------------------------------------------------------------------*)
-  let error, (handler_bdu, store_bdu_init_restriction_map) =
+  let error, (handler_bdu, store_bdu_init_restriction_map) = (* JF: it should be computed only once, not for each rule *)
     Bdu_build.collect_bdu_init_restriction_map
       parameter
       handler_bdu
@@ -519,7 +519,7 @@ let scan_rule_set parameter handler_bdu error handler_kappa compiled store_cover
     Nearly_inf_Imperatif.fold
       parameter error
       (fun parameter error rule_id rule (handler_bdu,store_result) ->
-          scan_rule
+       scan_rule
             parameter
 	    handler_bdu 
             error
@@ -582,10 +582,10 @@ let bdu_main parameter error handler_kappa store_covering_classes compiled =
       init_dead_rule_array
   in
   let error, handler_bdu =
-    if  (Remanent_parameters.get_trace parameter) || trace
+    if  Remanent_parameters.get_dump_reachability_analysis_result parameter
     then
       (*Print a list of rules that is dead*)
-      let _ =
+      let () =
         print_result_dead_rule parameter error handler_kappa compiled dead_rule_array
       in
       Print_bdu_analysis.print_result_fixpoint 
