@@ -28,7 +28,25 @@ module AgentMap = Quick_Nearly_inf_Imperatif
 
 (*half break side effect*)
 
+module Int2Map_HalfBreak_effect' =
+  SetMap.Make (
+    struct
+      (*agent_type, site*)
+      type t = int * int
+      let compare = compare
+    end)
+
+(*change to use Map_wrapper.Make instead of data structure in setMap.ml*)
+
 module Int2Map_HalfBreak_effect =
+  Map_wrapper.Make 
+    (SetMap.Make
+       (struct 
+         type t = int * int
+         let compare = compare
+        end))
+
+module Int2Map_Remove_effect' =
   SetMap.Make (
     struct
       (*agent_type, site*)
@@ -37,6 +55,15 @@ module Int2Map_HalfBreak_effect =
     end)
 
 module Int2Map_Remove_effect =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = int * int
+         let compare = compare
+        end))
+
+(*potential partner side effects*)
+module Int2Map_potential_effect' =
   SetMap.Make (
     struct
       (*agent_type, site*)
@@ -44,14 +71,13 @@ module Int2Map_Remove_effect =
       let compare = compare
     end)
 
-(*potential partner side effects*)
 module Int2Map_potential_effect =
-  SetMap.Make (
-    struct
-      (*agent_type, site*)
-      type t = int * int
-      let compare = compare
-    end)
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = int * int
+         let compare = compare
+        end))
 
 (************************************************************************************)
 (*views that are tested and modified with agent_id*)
@@ -90,15 +116,6 @@ module Int2Map_CV =
       let compare = compare
     end)
 
-(*TODO:new function having information of type string*)
-(*module Int2Map_CV_map =
-  SetMap.Make (
-    struct
-      (*agent_type, agent_name_string, site*)
-      type t = int * string * int * Ckappa_sig.site
-      let compare = compare
-    end)*)
-
 (*full contact map*)
 
 module Int2Map_CM_state = 
@@ -110,32 +127,10 @@ module Int2Map_CM_state =
     end
   )
 
-(*syntactic contact map *)
-(*module Map_second_agent_bind =
-  SetMap.Make (
-    struct
-      type t = int * int
-      let compare = compare
-    end )*)
-
 module Int2Map_pair =
   SetMap.Make (
     struct
       type t = int * int
-      let compare = compare
-    end )
-
-(*module Int2Map_syn =
-  SetMap.Make (
-    struct
-      type t = int
-      let compare = compare
-    end )*)
-
-module Set_triple =
-  SetMap.Make (
-    struct
-      type t = int * int * int
       let compare = compare
     end )
 
@@ -156,7 +151,15 @@ module Int2Map_CV_Modif =
       let compare = compare
     end)
 
-(*todo*)
+(*syntactic contact map*)
+
+module Set_triple =
+  SetMap.Make (
+    struct
+      type t = int * int * int
+      let compare = compare
+    end )
+
 module Int2Map_CM_Syntactic =
   SetMap.Make 
     (struct 

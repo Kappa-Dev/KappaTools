@@ -41,11 +41,22 @@ let trace = false
 let half_break_action parameter error handler rule_id half_break store_result =
   (*module (agent_type, site) -> (rule_id, binding_state) list*)
   let add_link (a, b) (r, state) store_result =
-    let (l, old) =
+    (*let (l, old) =
       Int2Map_HalfBreak_effect.Map.find_default ([],[]) (a, b) store_result in
     let result =
       Int2Map_HalfBreak_effect.Map.add
         (a, b) (l, (r, state) :: old) store_result
+    in*)
+    let error, (l, old) =
+      match Int2Map_HalfBreak_effect.Map.find_option_without_logs parameter error
+        (a, b) store_result
+      with
+      | error, None -> error, ([], [])
+      | error, Some (l, l') -> error, (l, l')
+    in
+    let error, result =
+      Int2Map_HalfBreak_effect.Map.add parameter error (a, b) (l, (r, state) :: old)
+        store_result
     in
     error, result
   in
@@ -96,10 +107,21 @@ let half_break_action parameter error handler rule_id half_break store_result =
 
 let remove_action parameter error rule_id remove store_result =
   let add_link (a, b) r store_result =
-    let (l, old) =
-      Int2Map_Remove_effect.Map.find_default ([],[]) (a, b) store_result in
+    (*let (l, old) =
+      Int2Map_Remove_effect.Map.find_default ([],[]) (a, b) store_result
+    in
     let result =
       Int2Map_Remove_effect.Map.add (a, b) (l, r :: old) store_result
+    in*)
+    let error, (l, old) =
+      match Int2Map_Remove_effect.Map.find_option_without_logs
+        parameter error (a, b) store_result
+      with
+      | error, None -> error, ([], [])
+      | error, Some (l, l') -> error, (l, l')
+    in
+    let error, result =
+      Int2Map_Remove_effect.Map.add parameter error (a, b) (l, r :: old) store_result
     in
     error, result
   in
@@ -132,12 +154,23 @@ let remove_action parameter error rule_id remove store_result =
 let store_potential_half_break parameter error handler rule_id half_break store_result =
   (*map of potential partner that is bond/free*)
   let add_link (agent_type, rule_id) (site, state) store_result =
-    let old =
+    (*let old =
       Int2Map_potential_effect.Map.find_default [] (agent_type, rule_id) 
         store_result
     in
     let result =
       Int2Map_potential_effect.Map.add
+        (agent_type, rule_id) ((site, state) :: old) store_result
+    in*)
+    let error, old =
+      match Int2Map_potential_effect.Map.find_option_without_logs
+        parameter error (agent_type, rule_id) store_result
+      with
+      | error, None -> error, []
+      | error, Some l -> error, l
+    in
+    let error, result =
+      Int2Map_potential_effect.Map.add parameter error
         (agent_type, rule_id) ((site, state) :: old) store_result
     in
     error, result
@@ -193,13 +226,24 @@ let store_potential_half_break parameter error handler rule_id half_break store_
 
 let store_potential_remove parameter error handler rule_id remove store_result =
   let add_link (agent_type, rule_id) (site, state) store_result =
-    let old =
+    (*let old =
       Int2Map_potential_effect.Map.find_default [] (agent_type, rule_id) 
         store_result
     in
     let result =
       Int2Map_potential_effect.Map.add
         (agent_type, rule_id) ((site, state) :: old) store_result
+    in*)
+    let error, old =
+      match Int2Map_potential_effect.Map.find_option_without_logs
+        parameter error (agent_type, rule_id) store_result
+      with
+      | error, None -> error, []
+      | error, Some l -> error, l
+    in
+    let error, result =
+      Int2Map_potential_effect.Map.add parameter error (agent_type, rule_id)
+        ((site, state) :: old) store_result
     in
     error, result
   in
@@ -275,16 +319,57 @@ let collect_potential_side_effects_free parameter error handler rule_id
   in
   (*-------------------------------------------------------------------------------*)
   let add_link error (agent_type, rule_id) l store_result =
-    let old =
+    (*let old =
       Int2Map_potential_effect.Map.find_default [] (agent_type, rule_id) store_result
     in
     let concat = List.concat [l; old] in
     let result = Int2Map_potential_effect.Map.add (agent_type, rule_id) concat store_result
+    in*)
+    let error, old =
+      match Int2Map_potential_effect.Map.find_option_without_logs parameter error
+        (agent_type, rule_id) store_result
+      with
+      | error, None -> error, []
+      | error, Some l -> error, l
+    in
+    let new_list = List.concat [l; old] in
+    let error, result =
+      Int2Map_potential_effect.Map.add parameter error (agent_type, rule_id)
+        new_list store_result
     in
     error, result
   in
   (*-------------------------------------------------------------------------------*)
-  Int2Map_potential_effect.Map.fold2_with_logs
+  Int2Map_potential_effect.Map.fold2
+    parameter
+    error
+    (*exists in 'a t*)
+    (fun parameter error (agent_type, rule_id) l1 store_result ->
+      let error, store_result =
+        add_link error (agent_type, rule_id) l1 store_result
+      in
+      error, store_result
+    )
+    (*exists in 'b t*)
+    (fun paramter error (agent_type, rule_id) l2 store_result ->
+      let error, store_result =
+        add_link error (agent_type, rule_id) l2 store_result
+      in
+      error, store_result
+    )
+    (*exists in both*)
+    (fun parameter error (agent_type, rule_id) l1 l2 store_result ->
+      let concat = List.concat [l1; l2] in
+      let error, store_result =
+        add_link error (agent_type, rule_id) concat store_result
+      in
+      error, store_result
+    )
+    (fst store_result_hb)
+    (fst store_result_remove)
+    store_result_map
+  (*-------------------------------------------------------------------------------*)
+  (*Int2Map_potential_effect.Map.fold2_with_logs
     (fun parameter error str str_opt exn ->
       let error, _ = warn parameter error str_opt exn Not_found in
       error
@@ -315,7 +400,7 @@ let collect_potential_side_effects_free parameter error handler rule_id
     )
     (fst store_result_hb)
     (fst store_result_remove)
-    store_result_map
+    store_result_map*)
 
 (************************************************************************************)
 
@@ -341,16 +426,57 @@ let collect_potential_side_effects_bind parameter error handler rule_id
   in
   (*-------------------------------------------------------------------------------*)
   let add_link error (agent_type, rule_id) l store_result =
-    let old =
+    (*let old =
       Int2Map_potential_effect.Map.find_default [] (agent_type, rule_id) store_result
     in
     let concat = List.concat [l; old] in
     let result = Int2Map_potential_effect.Map.add (agent_type, rule_id) concat store_result
+    in*)
+    let error, old =
+      match Int2Map_potential_effect.Map.find_option_without_logs
+        parameter error (agent_type, rule_id) store_result 
+      with
+      | error, None -> error, []
+      | error, Some l -> error, l
+    in
+    let new_list = List.concat [l; old] in
+    let error, result =
+      Int2Map_potential_effect.Map.add parameter error (agent_type, rule_id)
+        new_list store_result
     in
     error, result
   in
   (*-------------------------------------------------------------------------------*)
-  Int2Map_potential_effect.Map.fold2_with_logs
+  Int2Map_potential_effect.Map.fold2
+    parameter
+    error
+    (*exists in 'a t*)
+    (fun parameter error (agent_type, rule_id) l1 store_result ->
+      let error, store_result =
+        add_link error (agent_type, rule_id) l1 store_result
+      in
+      error, store_result
+    )
+    (*exists in 'b t*)
+    (fun paramter error (agent_type, rule_id) l2 store_result ->
+      let error, store_result =
+        add_link error (agent_type, rule_id) l2 store_result
+      in
+      error, store_result
+    )
+    (*exists in both*)
+    (fun parameter error (agent_type, rule_id) l1 l2 store_result ->
+      let concat = List.concat [l1; l2] in
+      let error, store_result =
+        add_link error (agent_type, rule_id) concat store_result
+      in
+      error, store_result
+    )
+    (snd store_result_hb)
+    (snd store_result_remove)
+    store_result_map
+  (*-------------------------------------------------------------------------------*)
+  (*Int2Map_potential_effect.Map.fold2_with_logs
     (fun parameter error str str_opt exn ->
       let error, _ = warn parameter error str_opt exn Not_found in
       error
@@ -381,7 +507,7 @@ let collect_potential_side_effects_bind parameter error handler rule_id
     )
     (snd store_result_hb)
     (snd store_result_remove)
-    store_result_map
+    store_result_map*)
 
 (************************************************************************************)
 
