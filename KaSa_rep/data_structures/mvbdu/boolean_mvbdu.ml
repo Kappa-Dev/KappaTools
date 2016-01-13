@@ -777,7 +777,7 @@ let merge_variables_lists parameters error handler list1 list2 =
   List_algebra.overwrite 
     (variables_list_allocate parameters)
     (fun parameter error handler (x1,x2) -> 
-      let error,output = Hash_2.get parameter error (x1.List_sig.id,x2.List_sig.id) handler.Memo_sig.data.boolean_mvbdu_merge_variables_lists in 
+      let error,output = Hash_2.unsafe_get parameter error (x1.List_sig.id,x2.List_sig.id) handler.Memo_sig.data.boolean_mvbdu_merge_variables_lists in 
       error,(handler,output))
     (fun parameter error handler (x1,x2) output -> 
       let error,memo = Hash_2.set parameter error (x1.List_sig.id,x2.List_sig.id) output handler.Memo_sig.data.boolean_mvbdu_merge_variables_lists in 
@@ -793,7 +793,7 @@ let overwrite_association_lists parameters error handler list1 list2 =
   List_algebra.overwrite 
     (association_list_allocate parameters)
     (fun parameter error handler (x1,x2) -> 
-      let error,output = Hash_2.get parameter error (x1.List_sig.id,x2.List_sig.id) handler.Memo_sig.data.boolean_mvbdu_overwrite_association_list in 
+      let error,output = Hash_2.unsafe_get parameter error (x1.List_sig.id,x2.List_sig.id) handler.Memo_sig.data.boolean_mvbdu_overwrite_association_list in 
       error,(handler,output))
     (fun parameter error handler (x1,x2) output -> 
       let error,memo = Hash_2.set parameter error (x1.List_sig.id,x2.List_sig.id) output handler.Memo_sig.data.boolean_mvbdu_overwrite_association_list in 
@@ -808,7 +808,7 @@ let overwrite_association_lists parameters error handler list1 list2 =
 let extensional_description_of_variables_list parameters error handler list =
   List_algebra.extensional_without_asso
     (fun parameter error handler x ->
-     let error,output = Hash_1.get parameter error x.List_sig.id handler.Memo_sig.data.boolean_mvbdu_extensional_description_of_variables_list in
+     let error,output = Hash_1.unsafe_get parameter error x.List_sig.id handler.Memo_sig.data.boolean_mvbdu_extensional_description_of_variables_list in
      error,(handler,output))
     (fun parameter error handler x output ->
      let error,memo = Hash_1.set parameter error x.List_sig.id output handler.Memo_sig.data.boolean_mvbdu_extensional_description_of_variables_list in
@@ -821,7 +821,7 @@ let extensional_description_of_variables_list parameters error handler list =
 let extensional_description_of_association_list parameters error handler list =
   List_algebra.extensional_with_asso
     (fun parameter error handler x ->
-     let error,output = Hash_1.get parameter error x.List_sig.id handler.Memo_sig.data.boolean_mvbdu_extensional_description_of_association_list in
+     let error,output = Hash_1.unsafe_get parameter error x.List_sig.id handler.Memo_sig.data.boolean_mvbdu_extensional_description_of_association_list in
      error,(handler,output))
     (fun parameter error handler x output ->
      let error,memo = Hash_1.set parameter error x.List_sig.id output handler.Memo_sig.data.boolean_mvbdu_extensional_description_of_association_list in
@@ -832,7 +832,7 @@ let extensional_description_of_association_list parameters error handler list =
     error handler list
 
 let rec variables_of_mvbdu parameters error handler mvbdu =
-  match Hash_1.get parameters error mvbdu.Mvbdu_sig.id handler.Memo_sig.data.boolean_mvbdu_variables_of_mvbdu
+  match Hash_1.unsafe_get parameters error mvbdu.Mvbdu_sig.id handler.Memo_sig.data.boolean_mvbdu_variables_of_mvbdu
   with 
   | error, Some output -> error, (handler, Some output)
   | error, None -> 
@@ -928,7 +928,7 @@ let mvbdu_cartesian_decomposition_depth variables_list_of_mvbdu extensional_of_v
       error,handler,(bdu_opt,List.rev list)
 
 let rec extensional_description_of_mvbdu parameters handler error mvbdu =  
-  match Hash_1.get parameters error mvbdu.Mvbdu_sig.id handler.Memo_sig.data.boolean_mvbdu_extensional_description_of_mvbdu 
+  match Hash_1.unsafe_get parameters error mvbdu.Mvbdu_sig.id handler.Memo_sig.data.boolean_mvbdu_extensional_description_of_mvbdu 
   with 
   | error, Some output -> error, (handler, output)
   | error, None -> 
