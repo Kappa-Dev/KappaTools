@@ -222,7 +222,8 @@ let print_state state =
   | Ckappa_sig.Binding Cckappa_sig.Free -> "free"
   | Ckappa_sig.Binding Cckappa_sig.Lnk_type (a, b) -> 
     (string_of_int a) ^ "@" ^ (string_of_int b) (*JF: there is no need to labels these strings, it should be clear from the context *)
-    
+                                                (* But this is important to convert them into an agent name (a string) and a site name (a string) *)
+
 let string_of_state parameter error handler_kappa agent_type site_int state =
   let error, state_dic =
     match Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
