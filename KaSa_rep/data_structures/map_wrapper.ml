@@ -259,7 +259,7 @@ module Proj(A:S_with_logs)(B:S_with_logs) =
    and type 'a map_a = 'a A.Map.t
    and type 'a map_b = 'a B.Map.t )
     
-(*module type Projection2 = sig
+module type Projection2 = sig
     type elt_a
     type elt_b
     type elt_c
@@ -295,21 +295,29 @@ module Proj2(A:S_with_logs)(B:S_with_logs)(C:S_with_logs) =
 	 let error, submap =
            MB.find_default_without_logs parameter error MC.empty key_b map_b 
          in
-	 let submap =
-	   MC.add
+         let error, find_default =
+           MC.find_default_without_logs parameter error identity_elt
+             key_c submap
+         in
+         let error, submap =
+	   MC.add parameter error 
 	     key_c
-	     (merge
-		(MC.find_default_without_logs f g
+	     (merge parameter error find_default
+		(*(MC.find_default_without_logs parameter error
 		   identity_elt
 		   key_c
-		   submap) data_a)
+		   submap)*) data_a)
 	     submap
 	 in
-	 MB.add key_b submap map_b)
+	 let error, add = 
+           MB.add_or_overwrite parameter error key_b submap map_b
+         in
+         add
+        )
 	map
 	MB.empty
 
-    let proj2_monadic parameter error handler f g identity_elt merge map =
+    let proj2_monadic parameter handler f g identity_elt merge map =
       MA.fold
 	(fun key_a data_a (handler,map_b) ->
 	 let key_b = f key_a in
@@ -317,13 +325,20 @@ module Proj2(A:S_with_logs)(B:S_with_logs)(C:S_with_logs) =
 	 let error, submap =
            MB.find_default_without_logs parameter handler MC.empty key_b map_b
          in
+         let error, find_default =
+           MC.find_default_without_logs parameter handler identity_elt key_c submap
+         in
 	 let handler,data' =
-	   merge parameter handler
-		 (MC.find_default_without_logs parameter error identity_elt key_c submap)
-		 data_a
+	   merge parameter handler find_default
+	     (*(MC.find_default_without_logs parameter error identity_elt key_c submap)*)
+	     data_a
 	 in
-	 let submap = MC.add key_c data' submap in
-	 handler,MB.add key_b submap map_b)
+	 let error, submap = MC.add_or_overwrite parameter handler key_c data' submap in
+         let error, add =
+           MB.add_or_overwrite parameter handler key_b submap map_b
+         in
+	 handler, add
+           (*MB.add key_b submap map_b*))
 	map
 	(handler,MB.empty)
-  end*)
+  end
