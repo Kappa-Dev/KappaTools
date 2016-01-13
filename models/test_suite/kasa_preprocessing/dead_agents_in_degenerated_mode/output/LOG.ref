@@ -374,6 +374,136 @@ Influence_map:Inhibition_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(5):'' A(x~u?)->
 Influence_map:Inhibition_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(6):'' A(x~u!_)->A(x~p)[0->0]
 Reachability analysis...
 
+Reachability analysis static information ....
+
+============================================================
+* BDU Analysis:
+============================================================
+
+** Static information:
+
+------------------------------------------------------------
+Mapping between sites and the covering classes they belong to:
+------------------------------------------------------------
+agent_type:0:A:site_type:0:x~@list of covering_class_id:
+covering_class_id:0
+agent_type:1:B:site_type:0:x~@list of covering_class_id:
+covering_class_id:0
+------------------------------------------------------------
+Sites that may/must occurs side-effects:
+------------------------------------------------------------
+------------------------------------------------------------
+Sites that may/must occurs in the potential partner side-effects:
+------------------------------------------------------------
+- Potential partner has site that is free:
+- Potential partner has site that is bind:
+------------------------------------------------------------
+Set of rules that may modify a given site (excluding created agents):
+------------------------------------------------------------
+agent_id:0:agent_type:0:A:site_type:0:x~@set of rule_id:
+rule 7
+agent_id:0:agent_type:1:B:site_type:0:x~@set of rule_id:
+rule 2
+agent_id:1:agent_type:0:A:site_type:0:x~@set of rule_id:
+rule 9
+agent_id:1:agent_type:1:B:site_type:0:x~@set of rule_id:
+rule 0
+------------------------------------------------------------
+Set of rules that may test a given site:
+------------------------------------------------------------
+agent_id:0:agent_type:0:A:site_type:0:x~@set of rule_id:
+rule 7
+agent_id:0:agent_type:1:B:site_type:0:x~@set of rule_id:
+rule 2
+agent_id:1:agent_type:1:B:site_type:0:x~@set of rule_id:
+rule 0
+------------------------------------------------------------
+Set of rules that may test and modify a given site (excluding created agents):
+------------------------------------------------------------
+agent_id:0:agent_type:0:A:site_type:0:x~@set of rule_id:
+rule 0
+rule 3
+rule 4
+rule 5
+rule 6
+rule 7
+agent_id:0:agent_type:1:B:site_type:0:x~@set of rule_id:
+rule 1
+rule 2
+agent_id:1:agent_type:0:A:site_type:0:x~@set of rule_id:
+rule 8
+rule 9
+agent_id:1:agent_type:1:B:site_type:0:x~@set of rule_id:
+rule 0
+
+INTENSIONAL DESCRIPTION:
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A(10)
+
+INTENSIONAL DESCRIPTION:
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+B(10)
+
+INTENSIONAL DESCRIPTION:
+Id=5
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+B(11)
+
+INTENSIONAL DESCRIPTION:
+Id=5
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A(11)
+
 Reachability analysis result ....
 
 ------------------------------------------------------------
@@ -418,6 +548,7 @@ Id=6
 * Cartesian decomposition:
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
+INTENSIONAL DESCRIPTION:
 Id=6
  Node(site_type:1<0)
   Id=1
@@ -432,9 +563,10 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x~;p);
-A(x~;u);
+A(11)
+A(10)
 agent_type:1:B:cv_id:0
+INTENSIONAL DESCRIPTION:
 Id=6
  Node(site_type:1<0)
   Id=1
@@ -449,13 +581,14 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(x~;p);
-B(x~;u);
+B(11)
+B(10)
 
 ------------------------------------------------------------
 * Cartesian abstraction:
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
+INTENSIONAL DESCRIPTION:
 Id=6
  Node(site_type:1<0)
   Id=1
@@ -470,9 +603,10 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x~;p);
-A(x~;u);
+A(11)
+A(10)
 agent_type:1:B:cv_id:0
+INTENSIONAL DESCRIPTION:
 Id=6
  Node(site_type:1<0)
   Id=1
@@ -487,6 +621,6 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(x~;p);
-B(x~;u);
+B(11)
+B(10)
 execution finished without any exception

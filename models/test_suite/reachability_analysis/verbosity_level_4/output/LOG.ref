@@ -5,4 +5,51 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
+
+A(10,20,30)
+
+A(11,20,30)
+
+A(11,21,30)
+
+A(12,21,31)
+
+A(13,20,30)
+
+A(13,22,30)
+
+A(13,22,31)
+
+Reachability analysis result ....
+
+------------------------------------------------------------
+* Dead rule :
+------------------------------------------------------------
+rule 7: KO is dead.
+
+Reachability analysis result ....
+
+------------------------------------------------------------
+* Cartesian decomposition:
+------------------------------------------------------------
+agent_type:0:A:cv_id:0
+A(13,20,30)
+A(13,22,31)
+A(13,22,30)
+A(12,21,31)
+A(11,20,30)
+A(11,21,30)
+A(10,20,30)
+
+------------------------------------------------------------
+* Cartesian abstraction:
+------------------------------------------------------------
+agent_type:0:A:cv_id:0
+A(13,20,30)
+A(13,22,31)
+A(13,22,30)
+A(12,21,31)
+A(11,20,30)
+A(11,21,30)
+A(10,20,30)
 execution finished without any exception

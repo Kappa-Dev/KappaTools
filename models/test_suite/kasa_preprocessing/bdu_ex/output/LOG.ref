@@ -112,6 +112,134 @@ Influence_map:Wake_up_map:rule(1):'x' A(x~u)->A(x~p) -> rule(2):'y' A(x~p,y~u)->
 Refining the influence map...
 Reachability analysis...
 
+Reachability analysis static information ....
+
+============================================================
+* BDU Analysis:
+============================================================
+
+** Static information:
+
+------------------------------------------------------------
+Mapping between sites and the covering classes they belong to:
+------------------------------------------------------------
+agent_type:0:A:site_type:0:x~@list of covering_class_id:
+covering_class_id:0
+agent_type:0:A:site_type:1:y~@list of covering_class_id:
+covering_class_id:0
+------------------------------------------------------------
+Sites that may/must occurs side-effects:
+------------------------------------------------------------
+------------------------------------------------------------
+Sites that may/must occurs in the potential partner side-effects:
+------------------------------------------------------------
+- Potential partner has site that is free:
+- Potential partner has site that is bind:
+------------------------------------------------------------
+Set of rules that may modify a given site (excluding created agents):
+------------------------------------------------------------
+agent_id:0:agent_type:0:A:site_type:0:x~@set of rule_id:
+rule 1: x
+agent_id:0:agent_type:0:A:site_type:1:y~@set of rule_id:
+rule 2: y
+------------------------------------------------------------
+Set of rules that may test a given site:
+------------------------------------------------------------
+agent_id:0:agent_type:0:A:site_type:0:x~@set of rule_id:
+rule 2: y
+agent_id:0:agent_type:0:A:site_type:1:y~@set of rule_id:
+rule 2: y
+------------------------------------------------------------
+Set of rules that may test and modify a given site (excluding created agents):
+------------------------------------------------------------
+agent_id:0:agent_type:0:A:site_type:0:x~@set of rule_id:
+rule 0: create
+rule 1: x
+rule 2: y
+agent_id:0:agent_type:0:A:site_type:1:y~@set of rule_id:
+rule 2: y
+
+INTENSIONAL DESCRIPTION:
+Id=7
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A(10,20)
+
+INTENSIONAL DESCRIPTION:
+Id=11
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=10
+   Node(site_type:1<2)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A(11,20)
+
+INTENSIONAL DESCRIPTION:
+Id=16
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=15
+   Node(site_type:1<2)
+    Id=14
+     Node(site_type:2<1)
+      Id=1
+       Leaf False 
+
+      Id=13
+       Node(site_type:2<2)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A(11,21)
+
 Reachability analysis result ....
 
 ------------------------------------------------------------
@@ -167,6 +295,7 @@ Id=20
 * Cartesian decomposition:
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
+INTENSIONAL DESCRIPTION:
 Id=20
  Node(site_type:1<0)
   Id=1
@@ -206,14 +335,15 @@ Id=20
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x~;p);A(y~;u);
-A(x~;p);A(y~;p);
-A(x~;u);A(y~;u);
+A(11,20)
+A(11,21)
+A(10,20)
 
 ------------------------------------------------------------
 * Cartesian abstraction:
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
+INTENSIONAL DESCRIPTION:
 Id=20
  Node(site_type:1<0)
   Id=1
@@ -253,7 +383,7 @@ Id=20
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x~;p);A(y~;u);
-A(x~;p);A(y~;p);
-A(x~;u);A(y~;u);
+A(11,20)
+A(11,21)
+A(10,20)
 execution finished without any exception

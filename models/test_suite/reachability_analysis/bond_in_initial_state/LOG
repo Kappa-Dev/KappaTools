@@ -1,0 +1,96 @@
+Kappa Static Analyzer (DomainBased-603-g13ed2cd-dirty) (without Tk interface)
+Analysis launched at 2016/01/13 21:20:23 (GMT+1) on applecell.home
+Parsing initial_state.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+Reachability analysis...
+
+Reachability analysis result ....
+
+------------------------------------------------------------
+* Dead rule :
+------------------------------------------------------------
+rule 2 is dead.
+rule 3 is dead.
+
+Reachability analysis result ....
+
+------------------------------------------------------------
+* Cartesian decomposition:
+------------------------------------------------------------
+agent_type:0:A:cv_id:0
+KOKO 1
+KOKO 1
+KOKO 1
+KO2
+KO3
+A(11)
+KO1
+agent_type:0:A:cv_id:1
+KOKO 1
+KOKO 1
+KOKO 1
+KO2
+KO3
+A(10)
+KO1
+agent_type:1:B:cv_id:0
+KOKO 1
+KOKO 1
+KOKO 1
+KO2
+KO3
+B(20)
+KO3
+B(11)
+B(10)
+
+------------------------------------------------------------
+* Cartesian abstraction:
+------------------------------------------------------------
+agent_type:0:A:cv_id:0
+A(11)
+agent_type:0:A:cv_id:1
+A(10)
+agent_type:1:B:cv_id:0
+B(20)
+B(11)
+B(10)
+Some exceptions have been raised
+error: file_name: Int_storage; message: get, line 88; exception:Exit
+error: file_name: Int_storage; message: get, line 88; exception:Exit
+error: file_name: Int_storage; message: get, line 88; exception:Exit
+error: file_name: Int_storage; message: get, line 92; exception:Exit
+error: file_name: Int_storage; message: get, line 92; exception:Exit
+error: file_name: Int_storage; message: get, line 298; exception:Exit
+error: file_name: Int_storage; message: get, line 92; exception:Exit
+error: file_name: Int_storage; message: get, line 298; exception:Exit
+error: file_name: Int_storage; message: get, line 92; exception:Exit
+error: file_name: Int_storage; message: get, line 88; exception:Exit
+error: file_name: Int_storage; message: get, line 92; exception:Exit
+error: file_name: Int_storage; message: get, line 88; exception:Exit
+error: file_name: Int_storage; message: get, line 88; exception:Exit
+error: file_name: Int_storage; message: get, line 92; exception:Exit
+error: file_name: Int_storage; message: get, line 88; exception:Exit
+error: file_name: Int_storage; message: get, line 92; exception:Exit
+error: file_name: Int_storage; message: get, line 88; exception:Exit
+error: file_name: Int_storage; message: get, line 88; exception:Exit
+error: file_name: Int_storage; message: get, line 92; exception:Exit
+error: file_name: Int_storage; message: get, line 92; exception:Exit
+error: file_name: Int_storage; message: get, line 92; exception:Exit
+error: file_name: Int_storage; message: get, line 92; exception:Exit
+error: file_name: Int_storage; message: get, line 298; exception:Exit
+error: file_name: Int_storage; message: get, line 88; exception:Exit
+error: file_name: Int_storage; message: get, line 88; exception:Exit
+error: file_name: Int_storage; message: get, line 92; exception:Exit
+error: file_name: Int_storage; message: get, line 92; exception:Exit
+error: file_name: Int_storage; message: get, line 298; exception:Exit
+error: file_name: Int_storage; message: get, line 92; exception:Exit
+error: file_name: Int_storage; message: get, line 88; exception:Exit
+error: file_name: Int_storage; message: get, line 92; exception:Exit
+error: file_name: Int_storage; message: get, line 92; exception:Exit
+error: file_name: Int_storage; message: get, line 92; exception:Exit
+error: file_name: Int_storage; message: get, line 88; exception:Exit

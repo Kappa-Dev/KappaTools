@@ -1,0 +1,6 @@
+%init: 1 A(x~u!1),B(x~u!1)
+
+-> A(x~u!1),B(x~u!1)
+A(x!_) ->
+B(x~p) -> B(x~p),B(x~p)
+B(x~u),B(x~u!_) -> B(x~u),B(x~p!_)

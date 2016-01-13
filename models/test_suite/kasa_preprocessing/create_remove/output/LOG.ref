@@ -79,6 +79,35 @@ Influence_map:Wake_up_map:rule(0):'r0' A()->B() -> rule(1):'r1' B()->C()[0->0]
 Refining the influence map...
 Reachability analysis...
 
+Reachability analysis static information ....
+
+============================================================
+* BDU Analysis:
+============================================================
+
+** Static information:
+
+------------------------------------------------------------
+Mapping between sites and the covering classes they belong to:
+------------------------------------------------------------
+------------------------------------------------------------
+Sites that may/must occurs side-effects:
+------------------------------------------------------------
+------------------------------------------------------------
+Sites that may/must occurs in the potential partner side-effects:
+------------------------------------------------------------
+- Potential partner has site that is free:
+- Potential partner has site that is bind:
+------------------------------------------------------------
+Set of rules that may modify a given site (excluding created agents):
+------------------------------------------------------------
+------------------------------------------------------------
+Set of rules that may test a given site:
+------------------------------------------------------------
+------------------------------------------------------------
+Set of rules that may test and modify a given site (excluding created agents):
+------------------------------------------------------------
+
 Reachability analysis result ....
 
 ------------------------------------------------------------

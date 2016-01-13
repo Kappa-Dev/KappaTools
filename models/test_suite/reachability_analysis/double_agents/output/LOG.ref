@@ -470,6 +470,374 @@ Influence_map:Inhibition_map:rule(7):'r7' B(),B(x!x.A),B(x!x.C)-> -> rule(7):'r7
 Refining the influence map...
 Reachability analysis...
 
+Reachability analysis static information ....
+
+============================================================
+* BDU Analysis:
+============================================================
+
+** Static information:
+
+------------------------------------------------------------
+Mapping between sites and the covering classes they belong to:
+------------------------------------------------------------
+agent_type:0:A:site_type:0:x~@list of covering_class_id:
+covering_class_id:2
+agent_type:0:A:site_type:1:y~@list of covering_class_id:
+covering_class_id:1
+agent_type:0:A:site_type:2:x!@list of covering_class_id:
+covering_class_id:0
+agent_type:1:B:site_type:0:x~@list of covering_class_id:
+covering_class_id:0
+agent_type:1:B:site_type:1:y~@list of covering_class_id:
+covering_class_id:0
+agent_type:1:B:site_type:2:x!@list of covering_class_id:
+covering_class_id:0
+agent_type:2:C:site_type:0:x!@list of covering_class_id:
+covering_class_id:0
+------------------------------------------------------------
+Sites that may/must occurs side-effects:
+------------------------------------------------------------
+agent_type:0:A:site_type:2:x!@list of pair (rule_id, binding state):
+(rule 4: r4 * state:1:(1@2))
+agent_type:1:B:site_type:2:x!@list of pair (rule_id, binding state):
+(rule 7: r7 * state:2:(2@0))
+(rule 7: r7 * state:1:(0@2))
+agent_type:0:A:site_type:0:x~@list of pair (rule_id, binding state):
+(rule 4: r4 * state:no_information)
+agent_type:0:A:site_type:1:y~@list of pair (rule_id, binding state):
+(rule 4: r4 * state:no_information)
+agent_type:0:A:site_type:2:x!@list of pair (rule_id, binding state):
+(rule 4: r4 * state:no_information)
+agent_type:1:B:site_type:0:x~@list of pair (rule_id, binding state):
+(rule 7: r7 * state:no_information)
+(rule 7: r7 * state:no_information)
+(rule 7: r7 * state:no_information)
+agent_type:1:B:site_type:1:y~@list of pair (rule_id, binding state):
+(rule 7: r7 * state:no_information)
+(rule 7: r7 * state:no_information)
+(rule 7: r7 * state:no_information)
+agent_type:1:B:site_type:2:x!@list of pair (rule_id, binding state):
+(rule 7: r7 * state:no_information)
+------------------------------------------------------------
+Sites that may/must occurs in the potential partner side-effects:
+------------------------------------------------------------
+- Potential partner has site that is free:
+agent_type:0:A:rule 7: r7@(site, free state)
+(site_type:2:x! * state:0(free))
+agent_type:1:B:rule 4: r4@(site, free state)
+(site_type:2:x! * state:0(free))
+(site_type:2:x! * state:0(free))
+agent_type:2:C:rule 7: r7@(site, free state)
+(site_type:0:x! * state:0(free))
+- Potential partner has site that is bind:
+agent_type:0:A:rule 7: r7@(site, binding state)
+(site_type:2:x! * state:1(1@2))
+agent_type:1:B:rule 4: r4@(site, binding state)
+(site_type:2:x! * state:1(0@2))
+(site_type:2:x! * state:1(0@2))
+agent_type:2:C:rule 7: r7@(site, binding state)
+(site_type:0:x! * state:1(1@2))
+------------------------------------------------------------
+Set of rules that may modify a given site (excluding created agents):
+------------------------------------------------------------
+agent_id:0:agent_type:0:A:site_type:0:x~@set of rule_id:
+rule 0: r0
+agent_id:0:agent_type:0:A:site_type:1:y~@set of rule_id:
+rule 0: r0
+agent_id:0:agent_type:0:A:site_type:2:x!@set of rule_id:
+rule 4: r4
+agent_id:0:agent_type:1:B:site_type:0:x~@set of rule_id:
+rule 2: r2
+agent_id:0:agent_type:1:B:site_type:1:y~@set of rule_id:
+rule 2: r2
+agent_id:0:agent_type:1:B:site_type:2:x!@set of rule_id:
+rule 1: r1
+agent_id:0:agent_type:2:C:site_type:0:x!@set of rule_id:
+rule 6: r6
+agent_id:1:agent_type:0:A:site_type:0:x~@set of rule_id:
+rule 0: r0
+agent_id:1:agent_type:0:A:site_type:1:y~@set of rule_id:
+rule 0: r0
+agent_id:1:agent_type:0:A:site_type:2:x!@set of rule_id:
+rule 0: r0
+agent_id:1:agent_type:1:B:site_type:0:x~@set of rule_id:
+rule 1: r1
+agent_id:1:agent_type:1:B:site_type:1:y~@set of rule_id:
+rule 1: r1
+agent_id:1:agent_type:1:B:site_type:2:x!@set of rule_id:
+rule 6: r6
+------------------------------------------------------------
+Set of rules that may test a given site:
+------------------------------------------------------------
+agent_id:0:agent_type:0:A:site_type:2:x!@set of rule_id:
+rule 4: r4
+agent_id:0:agent_type:1:B:site_type:0:x~@set of rule_id:
+rule 2: r2
+agent_id:0:agent_type:1:B:site_type:1:y~@set of rule_id:
+rule 2: r2
+agent_id:0:agent_type:1:B:site_type:2:x!@set of rule_id:
+rule 2: r2
+agent_id:0:agent_type:2:C:site_type:0:x!@set of rule_id:
+rule 6: r6
+agent_id:1:agent_type:1:B:site_type:2:x!@set of rule_id:
+rule 7: r7
+agent_id:2:agent_type:1:B:site_type:2:x!@set of rule_id:
+rule 7: r7
+------------------------------------------------------------
+Set of rules that may test and modify a given site (excluding created agents):
+------------------------------------------------------------
+agent_id:0:agent_type:0:A:site_type:0:x~@set of rule_id:
+rule 0: r0
+agent_id:0:agent_type:0:A:site_type:1:y~@set of rule_id:
+rule 0: r0
+agent_id:0:agent_type:0:A:site_type:2:x!@set of rule_id:
+rule 0: r0
+rule 3: r3
+rule 4: r4
+agent_id:0:agent_type:1:B:site_type:0:x~@set of rule_id:
+rule 1: r1
+rule 2: r2
+agent_id:0:agent_type:1:B:site_type:1:y~@set of rule_id:
+rule 1: r1
+rule 2: r2
+agent_id:0:agent_type:1:B:site_type:2:x!@set of rule_id:
+rule 1: r1
+rule 2: r2
+agent_id:0:agent_type:2:C:site_type:0:x!@set of rule_id:
+rule 5: r5
+rule 6: r6
+agent_id:1:agent_type:0:A:site_type:0:x~@set of rule_id:
+rule 0: r0
+agent_id:1:agent_type:0:A:site_type:1:y~@set of rule_id:
+rule 0: r0
+agent_id:1:agent_type:0:A:site_type:2:x!@set of rule_id:
+rule 0: r0
+agent_id:1:agent_type:1:B:site_type:0:x~@set of rule_id:
+rule 1: r1
+agent_id:1:agent_type:1:B:site_type:1:y~@set of rule_id:
+rule 1: r1
+agent_id:1:agent_type:1:B:site_type:2:x!@set of rule_id:
+rule 1: r1
+rule 3: r3
+rule 6: r6
+rule 7: r7
+agent_id:2:agent_type:1:B:site_type:2:x!@set of rule_id:
+rule 7: r7
+
+INTENSIONAL DESCRIPTION:
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A(10)
+
+INTENSIONAL DESCRIPTION:
+Id=6
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A(11)
+A(10)
+
+INTENSIONAL DESCRIPTION:
+Id=6
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A(11)
+A(10)
+
+INTENSIONAL DESCRIPTION:
+Id=22
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=21
+   Node(site_type:1<1)
+    Id=18
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=17
+       Node(site_type:2<1)
+        Id=10
+         Node(site_type:3<0)
+          Id=1
+           Leaf False 
+
+          Id=9
+           Node(site_type:3<1)
+            Id=0
+             Leaf True 
+
+            Id=1
+             Leaf False 
+
+        Id=1
+         Leaf False 
+
+    Id=13
+     Node(site_type:1<2)
+      Id=12
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=11
+         Node(site_type:2<2)
+          Id=10
+           Node(site_type:3<0)
+            Id=1
+             Leaf False 
+
+            Id=9
+             Node(site_type:3<1)
+              Id=0
+               Leaf True 
+
+              Id=1
+               Leaf False 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+B(11,21,30)
+B(10,20,30)
+
+INTENSIONAL DESCRIPTION:
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+C(10)
+
+INTENSIONAL DESCRIPTION:
+Id=5
+ Node(site_type:1<1)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A(11)
+
+INTENSIONAL DESCRIPTION:
+Id=33
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=32
+   Node(site_type:1<1)
+    Id=28
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=27
+       Node(site_type:2<1)
+        Id=24
+         Node(site_type:3<1)
+          Id=1
+           Leaf False 
+
+          Id=23
+           Node(site_type:3<2)
+            Id=0
+             Leaf True 
+
+            Id=1
+             Leaf False 
+
+        Id=1
+         Leaf False 
+
+    Id=31
+     Node(site_type:1<2)
+      Id=30
+       Node(site_type:2<1)
+        Id=1
+         Leaf False 
+
+        Id=29
+         Node(site_type:2<2)
+          Id=24
+           Node(site_type:3<1)
+            Id=1
+             Leaf False 
+
+            Id=23
+             Node(site_type:3<2)
+              Id=0
+               Leaf True 
+
+              Id=1
+               Leaf False 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+B(11,21,31)
+B(10,20,31)
+
 Reachability analysis result ....
 
 ------------------------------------------------------------
@@ -603,6 +971,7 @@ Id=3
 * Cartesian decomposition:
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
+INTENSIONAL DESCRIPTION:
 Id=6
  Node(site_type:1<0)
   Id=1
@@ -617,9 +986,10 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x~;p);
-A(x~;u);
+A(11)
+A(10)
 agent_type:0:A:cv_id:1
+INTENSIONAL DESCRIPTION:
 Id=6
  Node(site_type:1<0)
   Id=1
@@ -634,9 +1004,10 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x~;p);
-A(x~;u);
+A(11)
+A(10)
 agent_type:0:A:cv_id:2
+INTENSIONAL DESCRIPTION:
 Id=6
  Node(site_type:1<0)
   Id=1
@@ -651,9 +1022,10 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x~;p);
-A(x~;u);
+A(11)
+A(10)
 agent_type:1:B:cv_id:0
+INTENSIONAL DESCRIPTION:
 Id=50
  Node(site_type:1<0)
   Id=1
@@ -693,8 +1065,9 @@ Id=50
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(x~;p);B(y~;p);
-B(x~;u);B(y~;u);
+B(11,21)
+B(10,20)
+INTENSIONAL DESCRIPTION:
 Id=34
  Node(site_type:3<0)
   Id=1
@@ -709,9 +1082,10 @@ Id=34
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(x!;0@2);
-B(x!;free);
+B(31)
+B(30)
 agent_type:2:C:cv_id:0
+INTENSIONAL DESCRIPTION:
 Id=3
  Node(site_type:1<0)
   Id=1
@@ -726,12 +1100,13 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-C(x!;free);
+C(10)
 
 ------------------------------------------------------------
 * Cartesian abstraction:
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
+INTENSIONAL DESCRIPTION:
 Id=6
  Node(site_type:1<0)
   Id=1
@@ -746,9 +1121,10 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x~;p);
-A(x~;u);
+A(11)
+A(10)
 agent_type:0:A:cv_id:1
+INTENSIONAL DESCRIPTION:
 Id=6
  Node(site_type:1<0)
   Id=1
@@ -763,9 +1139,10 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x~;p);
-A(x~;u);
+A(11)
+A(10)
 agent_type:0:A:cv_id:2
+INTENSIONAL DESCRIPTION:
 Id=6
  Node(site_type:1<0)
   Id=1
@@ -780,9 +1157,10 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x~;p);
-A(x~;u);
+A(11)
+A(10)
 agent_type:1:B:cv_id:0
+INTENSIONAL DESCRIPTION:
 Id=50
  Node(site_type:1<0)
   Id=1
@@ -822,8 +1200,9 @@ Id=50
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(x~;p);B(y~;p);
-B(x~;u);B(y~;u);
+B(11,21)
+B(10,20)
+INTENSIONAL DESCRIPTION:
 Id=34
  Node(site_type:3<0)
   Id=1
@@ -838,9 +1217,10 @@ Id=34
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(x!;0@2);
-B(x!;free);
+B(31)
+B(30)
 agent_type:2:C:cv_id:0
+INTENSIONAL DESCRIPTION:
 Id=3
  Node(site_type:1<0)
   Id=1
@@ -855,5 +1235,6 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-C(x!;free);
-execution finished without any exception
+C(10)
+Some exceptions have been raised
+error: file_name: setMap.ml ; message: SetMap line 895Attempt to add an association over a former one in a map; exception:Failure(Set_and_Map.Map.add)

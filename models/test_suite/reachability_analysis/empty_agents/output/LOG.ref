@@ -178,6 +178,82 @@ Influence_map:Wake_up_map:rule(2):'' B()->C() -> rule(3):'' C()->D(x~u)[0->0]
 Refining the influence map...
 Reachability analysis...
 
+Reachability analysis static information ....
+
+============================================================
+* BDU Analysis:
+============================================================
+
+** Static information:
+
+------------------------------------------------------------
+Mapping between sites and the covering classes they belong to:
+------------------------------------------------------------
+agent_type:3:D:site_type:0:x~@list of covering_class_id:
+covering_class_id:0
+agent_type:5:F:site_type:0:x~@list of covering_class_id:
+covering_class_id:0
+------------------------------------------------------------
+Sites that may/must occurs side-effects:
+------------------------------------------------------------
+------------------------------------------------------------
+Sites that may/must occurs in the potential partner side-effects:
+------------------------------------------------------------
+- Potential partner has site that is free:
+- Potential partner has site that is bind:
+------------------------------------------------------------
+Set of rules that may modify a given site (excluding created agents):
+------------------------------------------------------------
+agent_id:1:agent_type:3:D:site_type:0:x~@set of rule_id:
+rule 3
+agent_id:1:agent_type:5:F:site_type:0:x~@set of rule_id:
+rule 4
+------------------------------------------------------------
+Set of rules that may test a given site:
+------------------------------------------------------------
+------------------------------------------------------------
+Set of rules that may test and modify a given site (excluding created agents):
+------------------------------------------------------------
+agent_id:1:agent_type:3:D:site_type:0:x~@set of rule_id:
+rule 3
+agent_id:1:agent_type:5:F:site_type:0:x~@set of rule_id:
+rule 4
+
+INTENSIONAL DESCRIPTION:
+Id=0
+ Leaf True 
+
+EXTENSIONAL DESCRIPTION:
+
+INTENSIONAL DESCRIPTION:
+Id=0
+ Leaf True 
+
+EXTENSIONAL DESCRIPTION:
+
+INTENSIONAL DESCRIPTION:
+Id=0
+ Leaf True 
+
+EXTENSIONAL DESCRIPTION:
+
+INTENSIONAL DESCRIPTION:
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+D(10)
+
 Reachability analysis result ....
 
 ------------------------------------------------------------
@@ -221,24 +297,25 @@ Id=3
 * Cartesian decomposition:
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
+INTENSIONAL DESCRIPTION:
 Id=0
  Leaf True 
 
 EXTENSIONAL DESCRIPTION:
-
 agent_type:1:B:cv_id:0
+INTENSIONAL DESCRIPTION:
 Id=0
  Leaf True 
 
 EXTENSIONAL DESCRIPTION:
-
 agent_type:2:C:cv_id:0
+INTENSIONAL DESCRIPTION:
 Id=0
  Leaf True 
 
 EXTENSIONAL DESCRIPTION:
-
 agent_type:3:D:cv_id:0
+INTENSIONAL DESCRIPTION:
 Id=3
  Node(site_type:1<0)
   Id=1
@@ -253,30 +330,31 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-D(x~;u);
+D(10)
 
 ------------------------------------------------------------
 * Cartesian abstraction:
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
+INTENSIONAL DESCRIPTION:
 Id=0
  Leaf True 
 
 EXTENSIONAL DESCRIPTION:
-
 agent_type:1:B:cv_id:0
+INTENSIONAL DESCRIPTION:
 Id=0
  Leaf True 
 
 EXTENSIONAL DESCRIPTION:
-
 agent_type:2:C:cv_id:0
+INTENSIONAL DESCRIPTION:
 Id=0
  Leaf True 
 
 EXTENSIONAL DESCRIPTION:
-
 agent_type:3:D:cv_id:0
+INTENSIONAL DESCRIPTION:
 Id=3
  Node(site_type:1<0)
   Id=1
@@ -291,5 +369,5 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-D(x~;u);
+D(10)
 execution finished without any exception

@@ -126,6 +126,62 @@ Influence_map:Inhibition_map:rule(1):'r1' A(x~u,z~u)->A(x~u,z~p) -> rule(2):'r2'
 Refining the influence map...
 Reachability analysis...
 
+Reachability analysis static information ....
+
+============================================================
+* BDU Analysis:
+============================================================
+
+** Static information:
+
+------------------------------------------------------------
+Mapping between sites and the covering classes they belong to:
+------------------------------------------------------------
+agent_type:0:A:site_type:0:x~@list of covering_class_id:
+covering_class_id:0
+covering_class_id:1
+agent_type:0:A:site_type:1:y~@list of covering_class_id:
+covering_class_id:1
+agent_type:0:A:site_type:2:z~@list of covering_class_id:
+covering_class_id:0
+------------------------------------------------------------
+Sites that may/must occurs side-effects:
+------------------------------------------------------------
+------------------------------------------------------------
+Sites that may/must occurs in the potential partner side-effects:
+------------------------------------------------------------
+- Potential partner has site that is free:
+- Potential partner has site that is bind:
+------------------------------------------------------------
+Set of rules that may modify a given site (excluding created agents):
+------------------------------------------------------------
+agent_id:0:agent_type:0:A:site_type:1:y~@set of rule_id:
+rule 0: r0
+agent_id:0:agent_type:0:A:site_type:2:z~@set of rule_id:
+rule 1: r1
+------------------------------------------------------------
+Set of rules that may test a given site:
+------------------------------------------------------------
+agent_id:0:agent_type:0:A:site_type:0:x~@set of rule_id:
+rule 2: r2
+agent_id:0:agent_type:0:A:site_type:1:y~@set of rule_id:
+rule 2: r2
+agent_id:0:agent_type:0:A:site_type:2:z~@set of rule_id:
+rule 2: r2
+------------------------------------------------------------
+Set of rules that may test and modify a given site (excluding created agents):
+------------------------------------------------------------
+agent_id:0:agent_type:0:A:site_type:0:x~@set of rule_id:
+rule 0: r0
+rule 1: r1
+rule 2: r2
+agent_id:0:agent_type:0:A:site_type:1:y~@set of rule_id:
+rule 0: r0
+rule 2: r2
+agent_id:0:agent_type:0:A:site_type:2:z~@set of rule_id:
+rule 1: r1
+rule 2: r2
+
 Reachability analysis result ....
 
 ------------------------------------------------------------
