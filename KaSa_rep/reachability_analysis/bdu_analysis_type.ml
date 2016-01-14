@@ -188,6 +188,17 @@ module Project2bdu_creation =
     (Map_creation_bdu)(Map_final_creation_bdu)(Map_agent_type_creation_bdu)*)
 
 (************************************************************************************)
+(*init*)
+
+module Map_init_bdu =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = int * int
+         let compare = compare
+        end))
+
+(************************************************************************************)
 (*test*)
 
 module Map_test_bdu =
@@ -428,7 +439,7 @@ type bdu_build =
     store_proj_bdu_creation_restriction_map: 
       Mvbdu_wrapper.Mvbdu.mvbdu Map_agent_type_creation_bdu.Map.t
       Map_final_creation_bdu.Map.t;
-    store_bdu_init_restriction_map: Mvbdu_wrapper.Mvbdu.mvbdu Map_creation_bdu.Map.t;
+    store_bdu_init_restriction_map: Mvbdu_wrapper.Mvbdu.mvbdu Map_init_bdu.Map.t;
     store_modif_list_restriction_map: 
       Mvbdu_wrapper.Mvbdu.hconsed_association_list list Map_modif_list.Map.t;
     store_proj_modif_list_restriction_map: 

@@ -270,7 +270,8 @@ let scan_rule_bdu_build parameter handler_bdu error rule_id rule compil
       store_bdu_creation_restriction_map
   in
   (*-------------------------------------------------------------------------------*)
-  let error, (handler_bdu, store_bdu_init_restriction_map) = (* JF: it should be computed only once, not for each rule *)
+  let error, (handler_bdu, store_bdu_init_restriction_map) =
+    (* JF: it should be computed only once, not for each rule *)
     Bdu_build.collect_bdu_init_restriction_map
       parameter
       handler_bdu
@@ -472,7 +473,7 @@ let init_bdu_build parameter error =
   let init_proj_bdu_test_restriction_map     = Map_final_test_bdu.Map.empty in
   let init_bdu_creation_restriction_map      = Map_creation_bdu.Map.empty in
   let init_proj_bdu_creation_restriction_map = Map_final_creation_bdu.Map.empty in
-  let init_bdu_init_restriction_map          = Map_creation_bdu.Map.empty in
+  let init_bdu_init_restriction_map          = Map_init_bdu.Map.empty in
   let init_modif_list_restriction_map        = Map_modif_list.Map.empty in
   let init_proj_modif_list_restriction_map   = Map_final_modif_list.Map.empty in
   let init_bdu_potential_restriction_map       = Map_potential_bdu.Map.empty in

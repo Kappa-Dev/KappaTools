@@ -105,11 +105,11 @@ let print_proj_creation_bdu_map parameter error result =
 (*bdu initial state*)
 
 let print_init_bdu_map parameter error result =
-  Map_creation_bdu.Map.iter
-    (fun (agent_type, rule_id, cv_id) bdu_init ->
+  Map_init_bdu.Map.iter
+    (fun (agent_type, cv_id) bdu_init ->
       let _ =
-        fprintf parameter.log "agent_type:%i:rule_id:%i:covering_class_id:%i\n"
-          agent_type rule_id cv_id
+        fprintf parameter.log "agent_type:%i:covering_class_id:%i\n"
+          agent_type cv_id
       in
       Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_init
     ) result

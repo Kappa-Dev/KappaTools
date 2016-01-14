@@ -361,22 +361,19 @@ let collect_proj_bdu_creation_restriction_map parameter handler error
 let collect_bdu_init_restriction_map parameter handler error compil store_remanent_triple 
     store =
   let error, handler, bdu_false = Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error in
-  let add_link handler (agent_type, index, cv_id) bdu store =
-    (* the index is useless here, agents with the same type should be
-       smashed thanks to the union *)
+  let add_link handler (agent_type, cv_id) bdu store =
     let error, old_bdu =
-      match Map_creation_bdu.Map.find_option
-        (agent_type, index, cv_id) store
+      match Map_init_bdu.Map.find_option_without_logs parameter error
+        (agent_type, cv_id) store 
       with
-      | None -> error, bdu_false
-      | Some bdu -> error, bdu
+      | error, None -> error, bdu_false
+      | error, Some bdu -> error, bdu
     in
     let error, handler, bdu_new = 
       Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error old_bdu bdu
     in (* In the case when the agent is created twice, we take the union *)
-    let store =
-      Map_creation_bdu.Map.add
-        (agent_type, index, cv_id) bdu_new store
+    let error, store =
+      Map_init_bdu.Map.add_or_overwrite parameter error (agent_type, cv_id) bdu_new store
     in
     error, handler, store
   in
@@ -446,7 +443,7 @@ let collect_bdu_init_restriction_map parameter handler error compil store_remane
 		            build_bdu parameter handler error pair_list
 		          in
 		          let error, handler, store =
-		            add_link handler (agent_type, index, cv_id) bdu_init store
+		            add_link handler (agent_type, cv_id) bdu_init store
 		          in
 		          error, handler, store)
 		        (error, handler, store)

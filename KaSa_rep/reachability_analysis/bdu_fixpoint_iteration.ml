@@ -752,8 +752,8 @@ let collect_bdu_fixpoint_with_init parameter handler error
   (*in case having initial state the bdu_iter will be the union of bdu_init
     and bdu_iter*)
   let error, store_bdu_fixpoint_init_map =
-    Map_creation_bdu.Map.fold
-      (fun (agent_type, rule_id, cv_id) bdu (error, store_result) ->
+    Map_init_bdu.Map.fold
+      (fun (agent_type, cv_id) bdu (error, store_result) ->
        let error, store_result =
           add_link parameter handler error 
             site_correspondence_in_covering_classes (agent_type, cv_id) bdu store_result
