@@ -98,8 +98,7 @@ let dump_view_diff parameter handler_kappa handler_bdu error site_correspondence
 		| None -> warn parameter error (Some "line 100") Exit (-1)
 		| Some i -> error, i
 	      in
-	      (* let error, site_string = error, string_of_int site_type in*)
-	       let error, site_string =
+	      let error, site_string =
 		try 
                   Handler.string_of_site parameter error handler_kappa
 					 agent_type site_type
@@ -108,7 +107,7 @@ let dump_view_diff parameter handler_kappa handler_bdu error site_correspondence
 	      in
 	      let error, state_string =
                 try
-		  Handler.string_of_state parameter error handler_kappa
+		  Handler.string_of_state_fully_deciphered parameter error handler_kappa
 					  agent_type site_type state
 		with
 		  _ -> warn parameter error (Some "line 146") Exit (string_of_int state)
