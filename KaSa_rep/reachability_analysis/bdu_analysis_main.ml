@@ -569,6 +569,7 @@ let bdu_main parameter error handler_kappa store_covering_classes compiled =
       error
       handler_kappa
       compiled
+      result.store_bdu_build.store_remanent_triple
       result.store_bdu_build.store_wl_creation
       result.store_bdu_build.store_proj_bdu_creation_restriction_map
       result.store_bdu_build.store_proj_modif_list_restriction_map
@@ -593,7 +594,8 @@ let bdu_main parameter error handler_kappa store_covering_classes compiled =
         handler_bdu 
         error 
         handler_kappa
-        store_bdu_fixpoint
+	result.store_bdu_build.store_remanent_triple
+	store_bdu_fixpoint
     else error, handler_bdu
   in
   error, handler_bdu, result

@@ -20,6 +20,7 @@ open Bdu_analysis_type
 open Print_bdu_analysis_static
 open Print_bdu_analysis_dynamic
 open Print_bdu_build
+open Site_map_and_set
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Print bdu analysis") message exn (fun () -> default)  
@@ -91,15 +92,39 @@ let print_bdu_update_map parameter error handler_kappa result =
     Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_update
     ) result
 
-let print_bdu_update_map_cartesian_decomposition parameter handler error handler_kappa result = 
+let print_bdu_update_map_cartesian_decomposition parameter handler error handler_kappa site_correspondence result =
   Map_bdu_update.Map.fold 
     (fun (agent_type, cv_id) bdu_update (error,handler) ->
       let error, agent_string =
         Handler.string_of_agent parameter error handler_kappa agent_type
       in
-      let _ = fprintf parameter.log "agent_type:%i:%s:cv_id:%i\n" 
-        agent_type agent_string cv_id 
+      let () =
+	if trace || Remanent_parameters.get_trace parameter
+	then
+	  fprintf parameter.log "agent_type:%i:%s:cv_id:%i\n"
+		  agent_type agent_string cv_id
       in
+      let error, site_correspondence = AgentMap.get parameter error agent_type site_correspondence in
+      let error, site_correspondence =
+	match
+	  site_correspondence
+	with
+	| None ->
+	   warn parameter error (Some "line 58") Exit []
+	| Some a -> error,a
+      in
+      let error, site_correspondence =
+	let rec aux list =
+	  match
+	    list
+	  with
+	  | [] -> warn parameter error (Some "line 68") Exit []
+	  | (h,list,_)::_ when h=cv_id -> error,list
+	  | _::tail -> aux tail
+	in aux site_correspondence
+      in
+      let error,(map1,map2) = Bdu_build.new_index_pair_map parameter error site_correspondence in
+ 
       let error, handler, list = 
         Mvbdu_wrapper.Mvbdu.mvbdu_full_cartesian_decomposition
           parameter handler error bdu_update 
@@ -126,27 +151,29 @@ let print_bdu_update_map_cartesian_decomposition parameter handler error handler
 	          let error,bool =
 		    List.fold_left
 		      (fun (error,bool) (site_type, state) ->
-		       (* JF: this is wrong:
-                          You should use the mapping between new index (of this covering class) to old index to get the proper site type *)
-		       let site_type = site_type in (* JF: to correct *)
-		       let error, site_string = error, string_of_int site_type in 
-		(*	  try 
-                            Handler.string_of_site parameter error handler_kappa
-						   agent_type (site_type-1)
-			  with
-			    _ -> warn parameter error (Some "line 136") Exit (string_of_int site_type)
-			in*)
-			(*NOTE: minus 1, because using a new indexes for
-                          site_type which is increased by 1*)
-		       let error, state_string = error, string_of_int state in
-                      (*   let error, state_string =
-                          try
-			    Handler.string_of_state parameter error handler_kappa
-						    agent_type (site_type-1) state
-			  with
-			    _ -> warn parameter error (Some "line 146") Exit (string_of_int state)
-                        in*)
-		  let () =
+		       let error, site_type = Map.find_option parameter error  site_type map2 in 
+		       let error, site_type =
+			 match
+			   site_type
+			 with
+			 | None -> warn parameter error (Some "line 139") Exit (-1)
+			 | Some i -> error, i
+		       in
+		       let error, site_string =
+			 try 
+			   Handler.string_of_site parameter error handler_kappa
+						  agent_type site_type
+			 with
+			   _ -> warn parameter error (Some "line 147") Exit (string_of_int site_type)
+		       in
+		       let error, state_string =
+			 try
+			   Handler.string_of_state_fully_deciphered parameter error handler_kappa
+						   agent_type site_type state
+			 with
+			   _ -> warn parameter error (Some "line 146") Exit (string_of_int state)
+		       in
+		       let () =
 			  if bool then Printf.fprintf parameter.log ","
 			  else Printf.fprintf parameter.log "%s(" agent_string
                         in
@@ -193,7 +220,7 @@ let print_bdu_update_map_cartesian_abstraction = print_bdu_update_map_cartesian_
 let print_result_dead_rule parameter error handler compiled result =
   if Remanent_parameters.get_dump_reachability_analysis_result parameter
   then
-    let _ = Format.printf "\nReachability analysis result ....@." in
+    let _ = Format.fprintf (Remanent_parameters.get_formatter parameter) "\nReachability analysis result ....@." in
     let parameter =
       Remanent_parameters.update_prefix parameter ""
     in
@@ -216,7 +243,7 @@ let print_result_dead_rule parameter error handler compiled result =
         Printf.fprintf stdout "%s is dead.\n" rule_string
     ) result  
 
-let print_result_fixpoint parameter handler error handler_kappa result =
+let print_result_fixpoint parameter handler error handler_kappa site_correspondence result =
   if Remanent_parameters.get_dump_reachability_analysis_result parameter
   then
     let _ = Format.printf "\nReachability analysis result ....@." in
@@ -261,6 +288,7 @@ let print_result_fixpoint parameter handler error handler_kappa result =
         handler 
         error
         handler_kappa
+	site_correspondence
         result
     in
     let () =
@@ -277,6 +305,7 @@ let print_result_fixpoint parameter handler error handler_kappa result =
         handler 
         error
         handler_kappa
+	site_correspondence
         result
     in
     error, handler

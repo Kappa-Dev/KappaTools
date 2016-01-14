@@ -37,7 +37,7 @@ let warn parameters mh message exn default =
 
 let local_trace = false
        
-let new_index_pair_map parameter error l =
+let new_index_pair_map parameter error l = (*JF:  it should be computed only once *)
   let rec aux acc k map1 map2 error =
     match acc with
     | [] -> error, (map1, map2)

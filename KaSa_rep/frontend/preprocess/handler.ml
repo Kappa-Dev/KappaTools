@@ -163,10 +163,9 @@ let string_of_agent parameter error handler_kappa agent_type =
   | Some (agent_name, _, _) -> error, agent_name
     
 (*mapping site of type int to string*)
-
 let print_site_compact site =
   match site with
-  | Ckappa_sig.Internal a -> a ^ "~" (* JF: I prefer to have a ~ to make it clear that we are talking about an internal state *)
+  | Ckappa_sig.Internal a -> a ^ "~"
   | Ckappa_sig.Binding a -> a ^ "!"
 
 let string_of_site_aux parameter error handler_kappa agent_name site_int =
@@ -216,15 +215,23 @@ let string_of_site_contact_map parameter error handler_kappa agent_type site_int
 
 (*mapping state of type int to string*)
     
-let print_state state =
+let print_state parameter error handler_kappa state =
   match state with
-  | Ckappa_sig.Internal a -> a
-  | Ckappa_sig.Binding Cckappa_sig.Free -> "free"
+  | Ckappa_sig.Internal a -> error,a
+  | Ckappa_sig.Binding Cckappa_sig.Free -> error,"free"
   | Ckappa_sig.Binding Cckappa_sig.Lnk_type (a, b) -> 
-    (string_of_int a) ^ "@" ^ (string_of_int b) (*JF: there is no need to labels these strings, it should be clear from the context *)
-                                                (* But this is important to convert them into an agent name (a string) and a site name (a string) *)
+     error, (string_of_int a) ^ "@" ^ (string_of_int b)
 
-let string_of_state parameter error handler_kappa agent_type site_int state =
+let print_state_fully_deciphered parameter error handler_kappa state =
+  match state with
+  | Ckappa_sig.Internal a -> error,a
+  | Ckappa_sig.Binding Cckappa_sig.Free -> error,"free"
+  | Ckappa_sig.Binding Cckappa_sig.Lnk_type (a, b) ->
+     let error, ag = string_of_agent parameter error handler_kappa a in
+     let error, site = string_of_site_contact_map parameter error handler_kappa a b in
+     error, ag ^ "@" ^ site
+
+let string_of_state_gen print_state parameter error handler_kappa agent_type site_int state =
   let error, state_dic =
     match Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
       parameter
@@ -247,8 +254,10 @@ let string_of_state parameter error handler_kappa agent_type site_int state =
     | error, None -> warn parameter error (Some "line 228") Exit (Ckappa_sig.Internal "")
     | error, Some (value, _, _) -> error, value
   in
-  error, (print_state value)
-    
+  print_state parameter error handler_kappa value
+
+let string_of_state = string_of_state_gen print_state
+let string_of_state_fully_deciphered = string_of_state_gen print_state_fully_deciphered
 
 let print_labels_txt parameters error handler couple = 
    let _ = Quark_type.Labels.dump_couple parameters error handler couple

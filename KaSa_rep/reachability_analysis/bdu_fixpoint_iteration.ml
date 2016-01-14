@@ -38,7 +38,7 @@ let dump_formatter parameter  f =
   if local_trace ||  Remanent_parameters.get_trace parameter
   then f (Remanent_parameters.get_formatter parameter) 
 
-let dump_view_diff parameter handler_kappa handler_bdu error agent_type cv_id old_bdu new_bdu =
+let dump_view_diff parameter handler_kappa handler_bdu error site_correspondence agent_type cv_id old_bdu new_bdu =
   if trace || Remanent_parameters.get_dump_reachability_analysis_diff parameter || Remanent_parameters.get_trace parameter
   then
     let error, handler_bdu, bdu_diff =
@@ -50,6 +50,26 @@ let dump_view_diff parameter handler_kappa handler_bdu error agent_type cv_id ol
     let error, agent_string =
       Handler.string_of_agent parameter error handler_kappa agent_type
     in
+    let error, site_correspondence = AgentMap.get parameter error agent_type site_correspondence in
+    let error, site_correspondence =
+      match
+	site_correspondence
+      with
+      | None ->
+	 warn parameter error (Some "line 58") Exit []
+      | Some a -> error,a
+    in
+    let error, site_correspondence =
+      let rec aux list =
+	match
+	  list
+	with
+	| [] -> warn parameter error (Some "line 68") Exit []
+	| (h,list,_)::_ when h=cv_id -> error,list
+	| _::tail -> aux tail
+      in aux site_correspondence
+    in
+    let error,(map1,map2) = Bdu_build.new_index_pair_map parameter error site_correspondence in
     let () = Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n" in
     let error,handler_bdu =
       if trace || Remanent_parameters.get_trace parameter
@@ -70,27 +90,29 @@ let dump_view_diff parameter handler_kappa handler_bdu error agent_type cv_id ol
 	 let error,bool =
 	   List.fold_left
 	     (fun (error,bool) (site_type, state) ->
-	      (* JF: this is wrong:
-                          You should use the mapping between new index (of this covering class) to old index to get the proper site type *)
-	      let site_type = site_type in (* JF: to correct *)
-	      let error, site_string = error, string_of_int site_type in
-	      (* let error, site_string =
+	      let error, site_type = Map.find_option parameter error  site_type map2 in
+	      let error, site_type =
+		match
+		  site_type
+		with
+		| None -> warn parameter error (Some "line 100") Exit (-1)
+		| Some i -> error, i
+	      in
+	      (* let error, site_string = error, string_of_int site_type in*)
+	       let error, site_string =
 		try 
                   Handler.string_of_site parameter error handler_kappa
-					 agent_type (site_type-1)
+					 agent_type site_type
 		with
 		  _ -> warn parameter error (Some "line 136") Exit (string_of_int site_type)
-	      in*)
-	      (*NOTE: minus 1, because using a new indexes for
-                          site_type which is increased by 1*)
-	      let error, state_string = error, string_of_int state in
-	      (* let error, state_string =
+	      in
+	      let error, state_string =
                 try
 		  Handler.string_of_state parameter error handler_kappa
-					  agent_type (site_type-1) state
+					  agent_type site_type state
 		with
 		  _ -> warn parameter error (Some "line 146") Exit (string_of_int state)
-              in*)
+              in
               let () =
 		if bool then Printf.fprintf (Remanent_parameters.get_log parameter) ","
 		else Printf.fprintf (Remanent_parameters.get_log parameter) "%s(" agent_string
@@ -341,6 +363,7 @@ let compute_new_views parameter handler error
 let compute_views_enabled parameter handler error
     handler_kappa
     compiled
+    correspondence
     bdu_true 
     bdu_false
     rule_id
@@ -357,7 +380,7 @@ let compute_views_enabled parameter handler error
   (* add_link should collect the list/set of (agent_type,cv_id) for which
      something has changed, so that add_update_to_wl can focus on these
      pairs *)
-  let add_link handler (agent_type, cv_id) bdu_update store_result =
+  let add_link handler error correspondence (agent_type, cv_id) bdu_update store_result =
     let error, bdu_old =
       match Map_bdu_update.Map.find_option (agent_type, cv_id) store_result
       with
@@ -372,7 +395,7 @@ let compute_views_enabled parameter handler error
     then
       error, handler, false, store_result
     else
-      let error, handler = dump_view_diff parameter handler_kappa handler error agent_type cv_id bdu_old bdu_union in
+      let error, handler = dump_view_diff parameter handler_kappa handler error correspondence agent_type cv_id bdu_old bdu_union in
       let store_result =
         Map_bdu_update.Map.add (agent_type, cv_id) bdu_union store_result
       in
@@ -454,7 +477,7 @@ let compute_views_enabled parameter handler error
         in
         (*-----------------------------------------------------------------------*)
         let error, handler, is_new_view, store_result =
-          add_link handler (agent_type, cv_id) bdu_update store_result
+          add_link handler error correspondence (agent_type, cv_id) bdu_update store_result
         in
         (*-----------------------------------------------------------------------*)
         (*print working list of new view*)
@@ -550,7 +573,7 @@ let compute_views_enabled parameter handler error
             bdu_X
 	in
 	let error, handler, is_new_view, store_result =
-          add_link handler (agent_type, cv_id) bdu_update store_result
+          add_link handler error correspondence (agent_type, cv_id) bdu_update store_result
         in
         (*-----------------------------------------------------------------------*)
         let error, (handler, wl_tl, store_result) =
@@ -606,7 +629,7 @@ let compute_views_enabled parameter handler error
           ) (error, handler, bdu_false) list
         in
 	let error, handler, is_new_view, store_result =
-          add_link handler (agent_type, cv_id) bdu_update store_result
+          add_link handler error correspondence (agent_type, cv_id) bdu_update store_result
         in
         (*-----------------------------------------------------------------------*)
         let error, (handler, wl_tl, store_result) =
@@ -639,6 +662,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
     compiled
     bdu_true
     bdu_false
+    site_correspondence_in_covering_classes
     (wl_creation:Fifo.IntWL.WSet.elt list * Fifo.IntWL.WSet.elt list *
        Fifo.IntWL.WSet.t)
     store_proj_bdu_creation_restriction_map
@@ -653,14 +677,14 @@ let collect_bdu_fixpoint_with_init parameter handler error
     dead_rule_array
     =
   (*-----------------------------------------------------------------------*)
-  let add_link parameter handler (agent_type, cv_id) bdu store_result =
+  let add_link parameter handler error correspondence (agent_type, cv_id) bdu store_result =
     let bdu_old =
       Map_bdu_update.Map.find_default bdu_false (agent_type, cv_id) store_result
     in
     let error, handler, bdu_union =
       Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_old bdu
     in
-    let error, handler = dump_view_diff parameter handler_kappa handler error agent_type cv_id bdu_old bdu_union in
+    let error, handler = dump_view_diff parameter handler_kappa handler error correspondence agent_type cv_id bdu_old bdu_union in
     let result_map =
       Map_bdu_update.Map.add (agent_type, cv_id) bdu_union store_result
     in
@@ -673,7 +697,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
     Map_creation_bdu.Map.fold
       (fun (agent_type, rule_id, cv_id) bdu (error, store_result) ->
        let error, store_result =
-          add_link parameter handler (agent_type, cv_id) bdu store_result
+          add_link parameter handler error site_correspondence_in_covering_classes (agent_type, cv_id) bdu store_result
         in
         error, store_result
       )
@@ -841,6 +865,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
                 error
                 handler_kappa
                 compiled
+		site_correspondence_in_covering_classes
                 bdu_true
                 bdu_false
 		rule_id 
@@ -883,6 +908,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
 let collect_bdu_fixpoint_map parameter handler error 
     handler_kappa
     compiled
+    site_correspondence_in_covering_classes
     wl_creation
     store_proj_bdu_creation_restriction_map
     store_proj_modif_list_restriction_map
@@ -912,6 +938,7 @@ let collect_bdu_fixpoint_map parameter handler error
        compiled
        bdu_true
        bdu_false
+       site_correspondence_in_covering_classes
        wl_creation
        store_proj_bdu_creation_restriction_map
        store_proj_modif_list_restriction_map
