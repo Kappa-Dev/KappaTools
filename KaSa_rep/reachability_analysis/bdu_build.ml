@@ -122,14 +122,21 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
     in
     error, result_map
   in
-  AgentMap.fold2_common parameter error
-    (fun parameter error agent_id agent triple_list (handler,store_result) ->
+  AgentMap.fold parameter error
+    (fun parameter error agent_id agent (handler,store_result) ->
       match agent with
       | Unknown_agent _ | Ghost -> error, (handler, store_result)
       | Dead_agent (agent,_,_,_) 		  
       | Agent agent ->
         let agent_type = agent.agent_name in
-        (*-----------------------------------------------------------------*)
+	let error,triple_list =
+	  match
+	    AgentMap.get parameter error agent_type store_remanent_triple
+	  with
+	  | error, None -> warn parameter error (Some "Line 136") Exit []
+	  | error, Some x -> error, x
+	in
+	(*-----------------------------------------------------------------*)
         (*get map restriction from covering classes*)
 	if Site_map_and_set.Map.is_empty agent.agent_interface 
 	then (* if the covering class is empty, put the bdu true since there is no test *)
@@ -197,7 +204,7 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
 	      (error, handler, store_result) get_pair_list
         in
         error, (handler, store_result)
-    ) rule.rule_lhs.views store_remanent_triple (handler,store_result)
+    ) rule.rule_lhs.views  (handler,store_result)
 
 (*projection with (rule_id), from map (rule_id -> map (agent_id -> bdu)) *)
 
@@ -456,12 +463,19 @@ let collect_modif_list_restriction_map
     in
     error, result_map
   in
-  AgentMap.fold2_common parameter error 
-    (fun parameter error agent_id agent_modif triple_list (handler, store_result) ->
+  AgentMap.fold parameter error 
+    (fun parameter error agent_id agent_modif (handler, store_result) ->
       if Site_map_and_set.Map.is_empty agent_modif.agent_interface
       then error, (handler, store_result)
       else
         let agent_type = agent_modif.agent_name in
+	let error,triple_list =
+	  match
+	    AgentMap.get parameter error agent_type store_remanent_triple
+	  with
+	  | error, None -> warn parameter error (Some "Line 476") Exit []
+	  | error, Some x -> error, x
+	in
         (*-----------------------------------------------------------------*)
         (*get map restriction from covering classes*)
         let error, get_pair_list =
@@ -530,7 +544,7 @@ let collect_modif_list_restriction_map
 	    (error, handler, store_result)
 	    get_pair_list
 	in error, (handler, store_result))
-    rule.diff_direct store_remanent_triple (handler, store_result)
+    rule.diff_direct (handler, store_result)
 
 (*projection with (rule_id) *)
 

@@ -285,7 +285,7 @@ let is_enable parameter handler error bdu_false
   let is_enable =
     Map_triple_views.Map.for_all
       (fun (agent_id, agent_type, cv_id)  bdu_test ->
-        let error, bdu_X =
+       let error, bdu_X =
           match Map_bdu_update.Map.find_option (agent_type, cv_id) store_bdu_update_map
           with
           | None -> error, bdu_false
