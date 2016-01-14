@@ -54,6 +54,7 @@ let compute_contact_map parameter error rule store_result =
     in
     error, store_result
   in
+  (*---------------------------------------------------------------------*)
   List.fold_left (fun (error, store_result) (site_add1, site_add2) ->
     let agent_index1 = site_add1.agent_index in
     let agent_type1 = site_add1.agent_type in
@@ -61,6 +62,7 @@ let compute_contact_map parameter error rule store_result =
     let agent_type2 = site_add2.agent_type in
     let site2 = site_add2.site in
     let agent_index2 = site_add2.agent_index in
+    (*---------------------------------------------------------------------*)
     (*find state for each agent*)
     let error, agent1 =
       match AgentMap.get parameter error agent_index1 rule.rule_rhs.views
@@ -74,45 +76,49 @@ let compute_contact_map parameter error rule store_result =
       | error, None -> warn parameter error (Some "line 147") Exit Ghost
       | error, Some agent -> error, agent
     in
-    match agent1, agent2 with
-    | Unknown_agent _, Unknown_agent _ | Dead_agent _, Dead_agent _
-    | (Agent _, (Ghost|Dead_agent _|Unknown_agent _))
-    | (Ghost, (Agent _|Dead_agent _|Unknown_agent _))
-    | (Dead_agent _, (Ghost|Agent _|Unknown_agent _))
-    | (Unknown_agent _, (Ghost|Agent _|Dead_agent _))
-    | Ghost, Ghost -> warn parameter error (Some "line 156") Exit store_result
-    | Agent agent1, Agent agent2 ->
     (*---------------------------------------------------------------------*)
     let error, set1 =
-      Site_map_and_set.Map.fold
-        (fun _ port1 (error, store_result) ->
-          let state1 = port1.site_state.max in
-          if state1 > 0
-          then
-            let error, set = 
-              Set_triple.Set.add_when_not_in parameter error
-                (agent_type1, site1, state1) store_result
-            in
-            error, set
-          else
-            error, store_result
-        ) agent1.agent_interface (error, Set_triple.Set.empty)
+      match agent1 with
+      | Ghost | Unknown_agent _ 
+      | Dead_agent _ -> warn parameter error (Some "line 102") Exit Set_triple.Set.empty
+      | Agent agent1 ->
+        let error, state1 =
+          match Site_map_and_set.Map.find_option_without_logs parameter error
+            site1 agent1.agent_interface
+          with
+          | error, None -> warn parameter error (Some "line 105") Exit 0
+          | error, Some port -> 
+            if port.site_state.max > 0
+          then error, port.site_state.max
+            else warn parameter error (Some "line 109") Exit 0
+        in
+        let error, set1 =
+          Set_triple.Set.add_when_not_in parameter error
+            (agent_type1, site1, state1) Set_triple.Set.empty
+        in
+        error, set1
     in
     (*---------------------------------------------------------------------*)
     let error, set2 =
-      Site_map_and_set.Map.fold
-        (fun _ port2 (error, store_result) ->
-          let state2 = port2.site_state.max in
-          if state2 > 0
-          then
-            let error, set =
-              Set_triple.Set.add_when_not_in parameter error
-                (agent_type2, site2, state2) store_result 
-            in
-            error, set
-          else
-            error, store_result
-        ) agent2.agent_interface (error, Set_triple.Set.empty)
+      match agent2 with
+      | Ghost | Unknown_agent _ 
+      | Dead_agent _ -> warn parameter error (Some "line 140") Exit Set_triple.Set.empty
+      | Agent agent2 ->
+        let error, state2 =
+          match Site_map_and_set.Map.find_option_without_logs parameter error
+            site2 agent2.agent_interface
+          with
+          | error, None -> warn parameter error (Some "line 134") Exit 0
+          | error, Some port ->
+            if port.site_state.max > 0
+            then error, port.site_state.max
+            else warn parameter error (Some "line 139") Exit 0
+        in
+        let error, set2 =
+          Set_triple.Set.add_when_not_in parameter error 
+            (agent_type2, site2, state2) Set_triple.Set.empty
+        in
+        error, set2
     in
     (*---------------------------------------------------------------------*)
     let error, store_result = add_link set1 set2 store_result in
@@ -137,6 +143,7 @@ let collect_init_map parameter error compiled store_result =
     in
     error, store_result
   in
+  (*---------------------------------------------------------------------*)
   Nearly_inf_Imperatif.fold parameter error
     (fun parameter error index init store_result ->
       AgentMap.fold parameter error
@@ -144,7 +151,10 @@ let collect_init_map parameter error compiled store_result =
           let error, store_result =
             Site_map_and_set.Map.fold
               (fun site_type_source site_add (error, store_result) ->
+                (*---------------------------------------------------------------------*)
                 let agent_index_target = site_add.agent_index in
+                let site_type_target = site_add.site in
+                (*---------------------------------------------------------------------*)
                 (*get agent_source*)
                 let error, agent_source =
                   match AgentMap.get parameter error agent_id
@@ -153,6 +163,7 @@ let collect_init_map parameter error compiled store_result =
                   | error, None -> warn parameter error (Some "line 218") Exit Ghost
                   | error, Some agent -> error, agent
                 in
+                (*---------------------------------------------------------------------*)
                 (*get agent_target*)
                 let error, agent_target =
                   match AgentMap.get parameter error agent_index_target
@@ -161,50 +172,54 @@ let collect_init_map parameter error compiled store_result =
                   | error, None -> warn parameter error (Some "line 226") Exit Ghost
                   | error, Some agent -> error, agent
                 in
-                (*-----------------------------------------------------------------------*)
-                match agent_source, agent_target with
-                | Unknown_agent _, Unknown_agent _ 
-                | Dead_agent _, Dead_agent _ 
-                | (Agent _, (Ghost |Dead_agent _|Unknown_agent _))
-                | (Ghost, (Agent _|Dead_agent _|Unknown_agent _))
-                | (Dead_agent _, (Ghost|Agent _|Unknown_agent _))
-                | (Unknown_agent _, (Ghost|Agent _|Dead_agent _))
-                | Ghost, Ghost ->
-                  warn parameter error (Some "line 238") Exit store_result
-                | Agent agent1, Agent agent2 ->
-                  let agent_type1 = agent1.agent_name in
-                  let error, set1 =
-                    Site_map_and_set.Map.fold
-                      (fun site1 port1 (error, store_result) ->
-                        let state1 = port1.site_state.max in
-                        if state1 > 0
-                        then
-                          let error, set =
-                            Set_triple.Set.add_when_not_in parameter error
-                              (agent_type1, site1, state1) store_result 
-                          in
-                          error, set
-                        else
-                          error, store_result
-                      ) agent1.agent_interface (error, Set_triple.Set.empty)
-                  in
-                  (*---------------------------------------------------------------------*)
-                  let agent_type2 = agent2.agent_name in
-                  let error, set2 =
-                    Site_map_and_set.Map.fold
-                      (fun site_type2 port2 (error, store_result) ->
-                        let state2 = port2.site_state.max in
-                        if state2 > 0
-                        then
-                          let error, set = 
-                            Set_triple.Set.add_when_not_in parameter error
-                              (agent_type2, site_type2, state2) store_result 
-                          in
-                          error, set
-                        else
-                          error, store_result
-                      ) agent2.agent_interface (error, Set_triple.Set.empty)
-                  in                  
+                (*---------------------------------------------------------------------*)
+                let error, set1 =
+                  match agent_source with
+                  | Ghost | Unknown_agent _ | Dead_agent _ -> 
+                    warn parameter error (Some "line 209") Exit Set_triple.Set.empty
+                  | Agent agent1 ->
+                    let agent_type1 = agent1.agent_name in
+                    let error, state1 =
+                      match Site_map_and_set.Map.find_option_without_logs
+                        parameter error site_type_source 
+                        agent1.agent_interface
+                      with
+                      | error, None -> warn parameter error (Some "line 217") Exit 0
+                      | error, Some port ->
+                        if port.site_state.max > 0
+                        then error, port.site_state.max
+                        else warn parameter error (Some "line 222") Exit 0
+                    in
+                    let error, set1 =
+                      Set_triple.Set.add_when_not_in parameter error
+                        (agent_type1, site_type_source, state1) Set_triple.Set.empty
+                    in
+                    error, set1
+                in
+                (*---------------------------------------------------------------------*)
+                let error, set2 =
+                  match agent_target with
+                  | Ghost | Unknown_agent _ | Dead_agent _ ->
+                    warn parameter error (Some "line 232") Exit Set_triple.Set.empty
+                  | Agent agent2 ->
+                    let agent_type2 = agent2.agent_name in
+                    let error, state2 =
+                      match Site_map_and_set.Map.find_option_without_logs
+                        parameter error site_type_target
+                        agent2.agent_interface
+                      with
+                      | error, None -> warn parameter error (Some "line 241") Exit 0
+                      | error, Some port ->
+                        if port.site_state.max > 0
+                        then error, port.site_state.max
+                        else warn parameter error (Some "line 246") Exit 0
+                    in
+                    let error, set2 =
+                      Set_triple.Set.add_when_not_in parameter error
+                        (agent_type2, site_type_target, state2) Set_triple.Set.empty
+                    in
+                    error, set2
+                in
                 (*-----------------------------------------------------------------------*)
                 let error, store_result = add_link set1 set2 store_result in
                 error, store_result

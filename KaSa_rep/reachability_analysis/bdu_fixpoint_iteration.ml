@@ -725,9 +725,6 @@ let collect_bdu_fixpoint_with_init parameter handler error
     =
   (*-----------------------------------------------------------------------*)
   let add_link parameter handler error correspondence (agent_type, cv_id) bdu store_result =
-    (*let bdu_old =
-      Map_bdu_update.Map.find_default bdu_false (agent_type, cv_id) store_result
-    in*)
     let error, bdu_old =
       match Map_bdu_update.Map.find_option_without_logs parameter error
         (agent_type, cv_id) store_result
