@@ -28,16 +28,6 @@ module AgentMap = Quick_Nearly_inf_Imperatif
 
 (*half break side effect*)
 
-module Int2Map_HalfBreak_effect' =
-  SetMap.Make (
-    struct
-      (*agent_type, site*)
-      type t = int * int
-      let compare = compare
-    end)
-
-(*change to use Map_wrapper.Make instead of data structure in setMap.ml*)
-
 module Int2Map_HalfBreak_effect =
   Map_wrapper.Make 
     (SetMap.Make
@@ -45,14 +35,6 @@ module Int2Map_HalfBreak_effect =
          type t = int * int
          let compare = compare
         end))
-
-module Int2Map_Remove_effect' =
-  SetMap.Make (
-    struct
-      (*agent_type, site*)
-      type t = int * int
-      let compare = compare
-    end)
 
 module Int2Map_Remove_effect =
   Map_wrapper.Make
@@ -63,13 +45,6 @@ module Int2Map_Remove_effect =
         end))
 
 (*potential partner side effects*)
-module Int2Map_potential_effect' =
-  SetMap.Make (
-    struct
-      (*agent_type, site*)
-      type t = int * int
-      let compare = compare
-    end)
 
 module Int2Map_potential_effect =
   Map_wrapper.Make
@@ -82,26 +57,7 @@ module Int2Map_potential_effect =
 (************************************************************************************)
 (*views that are tested and modified with agent_id*)
 
-module Int2Map_Modif' =
-  SetMap.Make (
-    struct
-      (*agent_id, agent_type, site*)
-      type t = int * int * int
-      let compare = compare
-    end)
-
 (*views that are tested and modified without agent_id*)
-
-module Int2Map_Test_Modif' =
-  SetMap.Make (
-    struct
-      (*agent_type, site*)
-      type t = int * int
-      let compare = compare
-    end)
-
-module Project2_modif' =
-  SetMap.Proj (Int2Map_Modif')(Int2Map_Test_Modif')
 
 module Int2Map_Modif =
   Map_wrapper.Make
@@ -127,14 +83,6 @@ module Project2_modif =
 
 (*dynamic contact map*)
 
-module Int2Map_CV' =
-  SetMap.Make (
-    struct
-      (*agent_type, site*)
-      type t = int * int
-      let compare = compare
-    end)
-
 module Int2Map_CV =
   Map_wrapper.Make
     (SetMap.Make
@@ -144,15 +92,6 @@ module Int2Map_CV =
         end))
 
 (*full contact map*)
-
-module Int2Map_CM_state' = 
-  SetMap.Make (
-    struct
-      (*agent_type, site, state*)
-      type t = int * int * int
-      let compare = compare
-    end
-  )
 
 module Int2Map_CM_state =
   Map_wrapper.Make 
@@ -164,14 +103,6 @@ module Int2Map_CM_state =
 
 (*list of rules to awake when the state of a site is modified and tested*)
 
-module Int2Map_CV_Modif' = 
-  SetMap.Make (
-    struct
-      (*agent_type,site_type, covering_class_id*)
-      type t = int * int
-      let compare = compare
-    end)
-
 module Int2Map_CV_Modif =
   Map_wrapper.Make
     (SetMap.Make
@@ -182,13 +113,6 @@ module Int2Map_CV_Modif =
   
 (*syntactic contact map*)
 
-module Set_triple' =
-  SetMap.Make (
-    struct
-      type t = int * int * int
-      let compare = compare
-    end)
-
 module Set_triple =
   Map_wrapper.Make
     (SetMap.Make (
@@ -196,13 +120,6 @@ module Set_triple =
         type t = int * int * int
         let compare = compare
       end))
-
-module Int2Map_CM_Syntactic' =
-  SetMap.Make 
-    (struct 
-        type t = Set_triple.Set.t
-        let compare = compare
-      end)
 
 module Int2Map_CM_Syntactic =
   Map_wrapper.Make
@@ -433,13 +350,6 @@ module Project2bdu_potential_list =
 (************************************************************************************)
 (*fixpoint iteration*)
 
-module Map_bdu_update' =
-  SetMap.Make (
-    struct
-      type t = int * int
-      let compare = compare
-    end)
-
 module Map_bdu_update =
   Map_wrapper.Make
     (SetMap.Make
@@ -447,21 +357,6 @@ module Map_bdu_update =
          type t = int * int
          let compare = compare
         end))
-
-(*build a pair of site_address map*)
-(*module Map_site_address =
-  SetMap.Make (
-    struct
-      type t = site_address * site_address
-      let compare = compare
-    end)
-
-module Map_test_bond =
-  SetMap.Make (
-    struct
-      type t = int (*rule_id*)
-      let compare = compare
-    end)*)
 
 (************************************************************************************)
 (*static information*)

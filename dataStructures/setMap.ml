@@ -1768,7 +1768,7 @@ module Proj(A:S)(B:S) =
 	(fun key_a data_a map_b ->
 	 let key_b = f key_a in
 	 MB.add key_b
-		(merge (MB.find_default identity_elt key_b map_b) data_a) map_b)
+	   (merge (MB.find_default identity_elt key_b map_b) data_a) map_b)
 	map
 	MB.empty
 
@@ -1891,8 +1891,8 @@ module Proj2(A:S)(B:S)(C:S) =
 	 let submap = MB.find_default MC.empty key_b map_b in
 	 let handler,data' =
 	   merge parameter handler
-		 (MC.find_default identity_elt key_c submap)
-		 data_a
+	     (MC.find_default identity_elt key_c submap)
+	     data_a
 	 in
 	 let submap = MC.add key_c data' submap in
 	 handler,MB.add key_b submap map_b)

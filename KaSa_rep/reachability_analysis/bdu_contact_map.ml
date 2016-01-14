@@ -48,7 +48,6 @@ let compute_contact_map parameter error rule store_result =
       | error, None -> error, Set_triple.Set.empty
       | error, Some s -> error, s
     in
-    (*let union_set = Set_triple.Set.union set2 old in*)
     let error, union_set = Set_triple.Set.union parameter error set2 old in
     let error, store_result =
       Int2Map_CM_Syntactic.Map.add_or_overwrite parameter error set1 union_set store_result
@@ -278,58 +277,12 @@ let compute_syn_contact_map_full parameter error rule compiled store_result =
     syntactic_contact_map
     init_contact_map
     store_result
-  (*Int2Map_CM_Syntactic.Map.fold2_with_logs
-    (fun parameter error str str_opt exn ->
-      let error, _ = warn parameter error str_opt exn Not_found in
-      error
-    )
-    parameter error
-    (*exists in 'a t*)
-    (fun parameter error triple_set1 triple_set2 store_result ->
-      let error, store_result =
-        add_link triple_set1 triple_set2 store_result
-      in
-      error, store_result
-    )
-    (*exists in 'b t*)
-    (fun parameter error triple_set1' triple_set2' store_result ->
-      let error, store_result =
-        add_link triple_set1' triple_set2' store_result
-      in
-      error, store_result
-    )
-    (*exists in both*)
-    (fun parameter error triple_set triple_set2 triple_set2' store_result ->
-      let error, union = Set_triple.Set.union parameter error triple_set2 triple_set2' in
-      let error, store_result =
-        add_link triple_set union store_result
-      in
-      error, store_result
-    )
-    syntactic_contact_map
-    init_contact_map
-    store_result*)
-
 
 (************************************************************************************)
 (*contact map*)
 
 let compute_contact_map_full parameter error handler rule =
   let add_link (agent, site, state) set store_result =
-    (*let old =
-      Int2Map_CM_state.Map.find_default Set_triple.Set.empty (agent, site, state)
-        store_result
-    in
-    (*let set = Set_triple.Set.add (agent', site', state') Set_triple.Set.empty in*)
-    let union_set = Set_triple.Set.union old set in
-    if Set_triple.Set.equal union_set old
-    then 
-      error, store_result
-    else
-      let add_map =
-        Int2Map_CM_state.Map.add (agent, site, state) union_set store_result
-      in
-      error, add_map*)
     let error, old =
       match Int2Map_CM_state.Map.find_option_without_logs parameter error 
         (agent, site, state) store_result
@@ -350,7 +303,6 @@ let compute_contact_map_full parameter error handler rule =
     Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
       parameter error
       (fun parameter error (agent, (site, state)) (agent', site', state') store_result ->
-        (*let set = Set_triple.Set.add (agent', site', state') Set_triple.Set.empty in*)
         let error, set = 
           Set_triple.Set.add_when_not_in parameter error
             (agent', site', state') Set_triple.Set.empty 
@@ -362,71 +314,3 @@ let compute_contact_map_full parameter error handler rule =
       ) handler.dual Int2Map_CM_state.Map.empty
   in
   error, store_result
-
-(************************************************************************************)
-
-(*let collect_contact_map parameter error rule_id rule handler store_result =
-  let add_link rule_id ((agent_type1, site_type1, state1), (agent_type2, site_type2, state2))
-      store_result =
-    let old = Int2Map_syn.Map.find_default Set_pair.Set.empty rule_id
-      store_result
-    in
-    let set = Set_pair.Set.add
-      ((agent_type1, site_type1, state1), (agent_type2, site_type2, state2))
-      Set_pair.Set.empty 
-    in
-    let union_set = Set_pair.Set.union old set in
-    (*check if it is a bond that is discovered for the first time*)
-    if Set_pair.Set.equal union_set old
-    then
-      error, false, store_result
-    else 
-      let store_result = Int2Map_syn.Map.add rule_id union_set store_result in
-      error, true, store_result
-  in
-  (*-----------------------------------------------------------------------*)
-  let error, (map1, map2) =
-    compute_contact_map_aux
-      parameter
-      error
-      rule_id
-      rule
-      handler
-      (Int2Map_syn.Map.empty, Int2Map_syn.Map.empty)
-  in
-  (*-----------------------------------------------------------------------*)
-  let error, (is_new_bond, store_result) =
-    Int2Map_syn.Map.monadic_fold2_sparse parameter error
-      (fun parameter error rule_id (_, set1) (_, set2) (b, store_result) ->
-        Set_triple.Set.fold (fun (agent_type1, site_type1, state1) 
-          (error, (b, store_result)) ->
-            Set_triple.Set.fold (fun (agent_type2, site_type2, state2) 
-              (error, (b, store_result)) ->
-                let error, is_new_bond, store_result =
-                  add_link rule_id 
-                    ((agent_type1, site_type1, state1), (agent_type2, site_type2, state2))
-                    store_result
-                in
-                error, (is_new_bond, store_result)
-            ) set2 (error, (b, store_result))
-        ) set1 (error, (b, store_result))
-      ) map1 map2 store_result
-  in
-  error, (is_new_bond, store_result)*)
-    
-(*****************************************************************************************)
-(*compute initial state where there is/are binding agent(s)*)
-
-(*let collect_init_map_aux parameter error compil store_result =
-  Nearly_inf_Imperatif.fold parameter error
-    (fun parameter error rule_id rule store_result ->
-      AgentMap.fold2_common parameter error
-        (fun parameter error agent_id agent site_add_map store_result ->
-          
-
-
-
-        ) rule.e_init_c_mixtire.views rule.e_init_c_mixture.bonds store_result      
-    ) compil.init store_result*)
-
-
