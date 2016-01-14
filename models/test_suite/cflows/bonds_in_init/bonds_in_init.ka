@@ -13,7 +13,7 @@
 'S..L..Z'  S(l!1, z!2), L(z!0, s!1), Z(l!0, s!2) -> S(l, z), L(z, s), Z(l, s) @ 1
 
 %init: 10 (K(), S(), L(z!0), Z(l!0))
-%obs: 'L' |L(z)|
+%var: 'L' |L(z)|
 
 
 %def: "displayCompression" "none" "weak" "strong"

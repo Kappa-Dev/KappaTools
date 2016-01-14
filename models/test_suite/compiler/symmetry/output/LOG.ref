@@ -1,4 +1,4 @@
-+ Command line is: 'KaSim' 'symmetry.ka' '-seed' '880671133' '--compile' '-d' 'output'
++ Command line is: 'KaSim' 'symmetry.ka' '-seed' '880671133' '--compile' '-d' 'output' '-e' '0' '-p' '10'
 Parsing symmetry.ka...
 done
 + Initialized random number generator with seed 880671133
@@ -11,7 +11,7 @@ done
 + Compute the contact map
 	 -variable declarations
 	 -rules
-	 -observables
 	 -perturbations
+	 -observables
 	 -initial conditions
 	 Done

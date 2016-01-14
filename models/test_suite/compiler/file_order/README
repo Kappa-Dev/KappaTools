@@ -1,2 +1,2 @@
 #!/bin/sh
-"${KAPPABIN}"KaSim file1.ka file2.ka -seed 1061933100 --compile -d output || exit 0
+"${KAPPABIN}"KaSim file1.ka file2.ka -seed 1061933100 --compile -d output -t 0 || exit 0

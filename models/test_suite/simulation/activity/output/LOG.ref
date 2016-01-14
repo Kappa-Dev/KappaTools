@@ -12,8 +12,8 @@ Some exceptions have been raised during the static analysis, please analyse your
 + Compute the contact map
 	 -variable declarations
 	 -rules
-	 -observables
 	 -perturbations
+	 -observables
 	 -initial conditions
 	 Done
 ____________________________________________________________

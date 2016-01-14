@@ -53,3 +53,5 @@ type perturbation =
       abort : Alg_expr.t Ast.bool_expr option;
       stopping_time : Nbr.t list
     }
+
+val exists_modification : (modification -> bool) -> perturbation list -> bool

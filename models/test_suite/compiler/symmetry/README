@@ -1,2 +1,2 @@
 #!/bin/sh
-"${KAPPABIN}"KaSim symmetry.ka -seed 880671133 --compile -d output || exit 0
+"${KAPPABIN}"KaSim symmetry.ka -seed 880671133 --compile -d output -e 0 -p 10 || exit 0

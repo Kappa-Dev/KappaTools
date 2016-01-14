@@ -541,13 +541,34 @@ let initialize logger overwrite counter result =
     compile_rules alg_deps contact_map counter domain' result'.Ast.rules in
   let rule_nd = Array.of_list compiled_rules in
 
-  Debug.tag logger "\t -observables";
-  let domain,obs =
-    obs_of_result contact_map counter domain' result' in
   Debug.tag logger "\t -perturbations" ;
   let (domain,pert,stops,tracking_enabled) =
     pert_of_result alg_nd alg_deps' result'.variables result'.rules
-		   contact_map counter domain result' in
+		   contact_map counter domain' result' in
+  let () =
+    if Counter.max_time counter = None && Counter.max_events counter = None &&
+	 not @@
+	   Primitives.exists_modification
+	     (function Primitives.STOP _ -> true
+		     | (Primitives.ITER_RULE _ | Primitives.UPDATE _ |
+			Primitives.SNAPSHOT _ | Primitives.CFLOW _ |
+			Primitives.FLUX _ | Primitives.FLUXOFF _ |
+			Primitives.CFLOWOFF _ | Primitives.PLOTENTRY |
+			Primitives.PRINT _) -> false) pert then
+      raise (ExceptionDefn.Malformed_Decl
+	       (Location.dummy_annot "There is no way for the simulation to stop.")) in
+
+  Debug.tag logger "\t -observables";
+  let domain,obs =
+    obs_of_result contact_map counter domain result' in
+  let () =
+    match obs with
+    | (_,pos) :: _ when Counter.plot_points counter = 0
+			&& not @@ Primitives.exists_modification
+				    (fun x -> x = Primitives.PLOTENTRY) pert ->
+       raise (ExceptionDefn.Malformed_Decl
+		("Number of point to plot has not been defined.",pos))
+    | _ -> () in
 
   let env =
     Environment.init sigs_nd tk_nd alg_nd alg_deps'
@@ -567,12 +588,14 @@ let initialize logger overwrite counter result =
 	(Rule_interpreter.print env) graph in
   let graph',state = State_interpreter.initial env counter graph stops in
   let () =
-    if tracking_enabled && not (!Parameter.causalModeOn || !Parameter.weakCompression || !Parameter.mazCompression || !Parameter.strongCompression) 
-    then 
+    if tracking_enabled &&
+	 not (!Parameter.causalModeOn || !Parameter.weakCompression ||
+		!Parameter.mazCompression || !Parameter.strongCompression)
+    then
       ExceptionDefn.warning
-      	(fun f ->
-	  Format.fprintf 
-	    f 
-	    "An observable may be tracked but no compression level to render stories has been specified")
-  in 
+	(fun f ->
+	 Format.fprintf
+	   f
+	   "An observable may be tracked but no compression level to render stories has been specified")
+  in
   (Debug.tag logger "\t Done"; (kasa_state,env, domain, graph', state))

@@ -1,4 +1,4 @@
-+ Command line is: 'KaSim' 'tokens.ka' '-seed' '580151237' '--compile' '-d' 'output'
++ Command line is: 'KaSim' 'tokens.ka' '-seed' '580151237' '--compile' '-d' 'output' '-t' '0'
 Parsing tokens.ka...
 done
 + Initialized random number generator with seed 580151237
@@ -12,7 +12,7 @@ Some exceptions have been raised during the static analysis, please analyse your
 + Compute the contact map
 	 -variable declarations
 	 -rules
-	 -observables
 	 -perturbations
+	 -observables
 	 -initial conditions
 	 Done

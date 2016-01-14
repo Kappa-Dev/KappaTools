@@ -90,3 +90,6 @@ type perturbation =
       abort : Alg_expr.t Ast.bool_expr option;
       stopping_time : Nbr.t list
     }
+
+let exists_modification check l =
+  List.exists (fun p -> List.exists check p.effect) l
