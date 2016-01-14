@@ -252,7 +252,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-D(10)
+D(x~u)
 
 Reachability analysis result ....
 
@@ -330,7 +330,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-D(10)
+D(x~u)
 
 ------------------------------------------------------------
 * Cartesian abstraction:
@@ -369,5 +369,5 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-D(10)
+D(x~u)
 execution finished without any exception

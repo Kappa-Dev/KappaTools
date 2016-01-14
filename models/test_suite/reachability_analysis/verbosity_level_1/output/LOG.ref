@@ -18,24 +18,22 @@ Reachability analysis result ....
 ------------------------------------------------------------
 * Cartesian decomposition:
 ------------------------------------------------------------
-agent_type:0:A:cv_id:0
-A(13,20,30)
-A(13,22,31)
-A(13,22,30)
-A(12,21,31)
-A(11,20,30)
-A(11,21,30)
-A(10,20,30)
+A(x~q,y~u,z~u)
+A(x~q,y~q,z~q)
+A(x~q,y~q,z~u)
+A(x~0,y~p,z~q)
+A(x~p,y~u,z~u)
+A(x~p,y~p,z~u)
+A(x~u,y~u,z~u)
 
 ------------------------------------------------------------
 * Cartesian abstraction:
 ------------------------------------------------------------
-agent_type:0:A:cv_id:0
-A(13,20,30)
-A(13,22,31)
-A(13,22,30)
-A(12,21,31)
-A(11,20,30)
-A(11,21,30)
-A(10,20,30)
+A(x~q,y~u,z~u)
+A(x~q,y~q,z~q)
+A(x~q,y~q,z~u)
+A(x~0,y~p,z~q)
+A(x~p,y~u,z~u)
+A(x~p,y~p,z~u)
+A(x~u,y~u,z~u)
 execution finished without any exception

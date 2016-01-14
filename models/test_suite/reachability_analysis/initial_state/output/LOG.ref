@@ -237,7 +237,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(10,20)
+A(x~u,y~u)
 
 INTENSIONAL DESCRIPTION:
 Id=11
@@ -264,7 +264,7 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(11,20)
+A(x~p,y~u)
 
 INTENSIONAL DESCRIPTION:
 Id=16
@@ -291,7 +291,7 @@ Id=16
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(10,21)
+A(x~u,y~p)
 
 INTENSIONAL DESCRIPTION:
 Id=3
@@ -308,7 +308,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-D(10)
+D(x~u)
 
 Reachability analysis result ....
 
@@ -419,9 +419,9 @@ Id=19
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(11,20)
-A(10,20)
-A(10,21)
+A(x~p,y~u)
+A(x~u,y~u)
+A(x~u,y~p)
 agent_type:1:D:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=3
@@ -438,7 +438,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-D(10)
+D(x~u)
 
 ------------------------------------------------------------
 * Cartesian abstraction:
@@ -484,9 +484,9 @@ Id=19
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(11,20)
-A(10,20)
-A(10,21)
+A(x~p,y~u)
+A(x~u,y~u)
+A(x~u,y~p)
 agent_type:1:D:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=3
@@ -503,5 +503,5 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-D(10)
+D(x~u)
 execution finished without any exception

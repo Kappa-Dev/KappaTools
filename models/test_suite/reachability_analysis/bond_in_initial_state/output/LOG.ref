@@ -6,13 +6,13 @@ Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
 
-A(11)
+A(x!B@x)
 
-A(10)
+A(x~u)
 
-B(11,20)
+B(x!A@x,x~u)
 
-B(10,20)
+B(x!free,x~u)
 
 Reachability analysis result ....
 
@@ -26,24 +26,18 @@ Reachability analysis result ....
 ------------------------------------------------------------
 * Cartesian decomposition:
 ------------------------------------------------------------
-agent_type:0:A:cv_id:0
-A(11)
-agent_type:0:A:cv_id:1
-A(10)
-agent_type:1:B:cv_id:0
-B(20)
-B(11)
-B(10)
+A(x!B@x)
+A(x~u)
+B(x~u)
+B(x!A@x)
+B(x!free)
 
 ------------------------------------------------------------
 * Cartesian abstraction:
 ------------------------------------------------------------
-agent_type:0:A:cv_id:0
-A(11)
-agent_type:0:A:cv_id:1
-A(10)
-agent_type:1:B:cv_id:0
-B(20)
-B(11)
-B(10)
+A(x!B@x)
+A(x~u)
+B(x~u)
+B(x!A@x)
+B(x!free)
 execution finished without any exception

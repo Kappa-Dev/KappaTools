@@ -414,7 +414,7 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(10,20,30)
+A(x~u,y~u,z~u)
 
 deal with agent_type:0:A:covering_class_id:0:
 add:
@@ -474,7 +474,7 @@ Id=35
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(11,20,30)
+A(x~p,y~u,z~u)
 		discovering a new views.
 
 deal with agent_type:0:A:covering_class_id:0:
@@ -531,7 +531,7 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(11,21,30)
+A(x~p,y~p,z~u)
 		discovering a new views.
 
 deal with agent_type:0:A:covering_class_id:0:
@@ -588,7 +588,7 @@ Id=48
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(12,21,31)
+A(x~0,y~p,z~q)
 		discovering a new views.
 
 deal with agent_type:0:A:covering_class_id:0:
@@ -645,7 +645,7 @@ Id=53
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(13,20,30)
+A(x~q,y~u,z~u)
 		discovering a new views.
 
 deal with agent_type:0:A:covering_class_id:0:
@@ -702,7 +702,7 @@ Id=59
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(13,22,30)
+A(x~q,y~q,z~u)
 		discovering a new views.
 
 deal with agent_type:0:A:covering_class_id:0:
@@ -759,7 +759,7 @@ Id=70
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(13,22,31)
+A(x~q,y~q,z~q)
 		discovering a new views.
 
 deal with agent_type:0:A:covering_class_id:0:
@@ -1117,13 +1117,13 @@ Id=80
            Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(13,20,30)
-A(13,22,31)
-A(13,22,30)
-A(12,21,31)
-A(11,20,30)
-A(11,21,30)
-A(10,20,30)
+A(x~q,y~u,z~u)
+A(x~q,y~q,z~q)
+A(x~q,y~q,z~u)
+A(x~0,y~p,z~q)
+A(x~p,y~u,z~u)
+A(x~p,y~p,z~u)
+A(x~u,y~u,z~u)
 
 ------------------------------------------------------------
 * Cartesian abstraction:
@@ -1259,11 +1259,11 @@ Id=80
            Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(13,20,30)
-A(13,22,31)
-A(13,22,30)
-A(12,21,31)
-A(11,20,30)
-A(11,21,30)
-A(10,20,30)
+A(x~q,y~u,z~u)
+A(x~q,y~q,z~q)
+A(x~q,y~q,z~u)
+A(x~0,y~p,z~q)
+A(x~p,y~u,z~u)
+A(x~p,y~p,z~u)
+A(x~u,y~u,z~u)
 execution finished without any exception

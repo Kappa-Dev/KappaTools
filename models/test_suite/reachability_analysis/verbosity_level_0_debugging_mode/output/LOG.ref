@@ -410,7 +410,7 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(10,20,30)
+A(x~u,y~u,z~u)
 
 INTENSIONAL DESCRIPTION:
 Id=35
@@ -447,7 +447,7 @@ Id=35
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(11,20,30)
+A(x~p,y~u,z~u)
 
 INTENSIONAL DESCRIPTION:
 Id=21
@@ -484,7 +484,7 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(11,21,30)
+A(x~p,y~p,z~u)
 
 INTENSIONAL DESCRIPTION:
 Id=48
@@ -521,7 +521,7 @@ Id=48
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(12,21,31)
+A(x~0,y~p,z~q)
 
 INTENSIONAL DESCRIPTION:
 Id=53
@@ -558,7 +558,7 @@ Id=53
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(13,20,30)
+A(x~q,y~u,z~u)
 
 INTENSIONAL DESCRIPTION:
 Id=59
@@ -595,7 +595,7 @@ Id=59
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(13,22,30)
+A(x~q,y~q,z~u)
 
 INTENSIONAL DESCRIPTION:
 Id=70
@@ -632,5 +632,5 @@ Id=70
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(13,22,31)
+A(x~q,y~q,z~q)
 execution finished without any exception

@@ -412,7 +412,7 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(10,20,30)
+A(x~u,y~u,z~u)
 
 try applying rule 0:
 	"enabled"
@@ -453,7 +453,7 @@ Id=35
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(11,20,30)
+A(x~p,y~u,z~u)
 
 try applying rule 2:
 	"enabled"
@@ -492,7 +492,7 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(11,21,30)
+A(x~p,y~p,z~u)
 
 try applying rule 3:
 	"enabled"
@@ -531,7 +531,7 @@ Id=48
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(12,21,31)
+A(x~0,y~p,z~q)
 
 try applying rule 4:
 	"enabled"
@@ -570,7 +570,7 @@ Id=53
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(13,20,30)
+A(x~q,y~u,z~u)
 
 try applying rule 5:
 	"enabled"
@@ -609,7 +609,7 @@ Id=59
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(13,22,30)
+A(x~q,y~q,z~u)
 
 try applying rule 6:
 	"enabled"
@@ -648,7 +648,7 @@ Id=70
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(13,22,31)
+A(x~q,y~q,z~q)
 
 try applying rule 7: KO:
 	"disabled"
@@ -942,13 +942,13 @@ Id=80
            Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(13,20,30)
-A(13,22,31)
-A(13,22,30)
-A(12,21,31)
-A(11,20,30)
-A(11,21,30)
-A(10,20,30)
+A(x~q,y~u,z~u)
+A(x~q,y~q,z~q)
+A(x~q,y~q,z~u)
+A(x~0,y~p,z~q)
+A(x~p,y~u,z~u)
+A(x~p,y~p,z~u)
+A(x~u,y~u,z~u)
 
 ------------------------------------------------------------
 * Cartesian abstraction:
@@ -1084,11 +1084,11 @@ Id=80
            Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(13,20,30)
-A(13,22,31)
-A(13,22,30)
-A(12,21,31)
-A(11,20,30)
-A(11,21,30)
-A(10,20,30)
+A(x~q,y~u,z~u)
+A(x~q,y~q,z~q)
+A(x~q,y~q,z~u)
+A(x~0,y~p,z~q)
+A(x~p,y~u,z~u)
+A(x~p,y~p,z~u)
+A(x~u,y~u,z~u)
 execution finished without any exception

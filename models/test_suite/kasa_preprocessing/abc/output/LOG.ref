@@ -631,7 +631,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(10,20)
+A(x!free,c!free)
 
 INTENSIONAL DESCRIPTION:
 Id=3
@@ -648,7 +648,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(10)
+B(x!free)
 
 INTENSIONAL DESCRIPTION:
 Id=17
@@ -695,7 +695,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-C(10,20,30,40)
+C(x1~u,x2~u,x1!free,x2!free)
 
 INTENSIONAL DESCRIPTION:
 Id=21
@@ -722,7 +722,7 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(11,20)
+A(x!B@x,c!free)
 
 INTENSIONAL DESCRIPTION:
 Id=19
@@ -739,7 +739,7 @@ Id=19
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(11)
+B(x!A@x)
 
 INTENSIONAL DESCRIPTION:
 Id=47
@@ -766,7 +766,7 @@ Id=47
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(11,21)
+A(x!B@x,c!C@x1)
 
 INTENSIONAL DESCRIPTION:
 Id=57
@@ -813,7 +813,7 @@ Id=57
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-C(10,20,31,40)
+C(x1~u,x2~u,x1!A@c,x2!free)
 
 INTENSIONAL DESCRIPTION:
 Id=31
@@ -860,7 +860,7 @@ Id=31
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-C(11,20,30,40)
+C(x1~p,x2~u,x1!free,x2!free)
 
 INTENSIONAL DESCRIPTION:
 Id=35
@@ -887,7 +887,7 @@ Id=35
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(10,22)
+A(x!free,c!C@x2)
 
 INTENSIONAL DESCRIPTION:
 Id=43
@@ -934,7 +934,7 @@ Id=43
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-C(11,20,30,41)
+C(x1~p,x2~u,x1!free,x2!A@c)
 
 INTENSIONAL DESCRIPTION:
 Id=84
@@ -981,7 +981,7 @@ Id=84
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-C(11,21,30,40)
+C(x1~p,x2~p,x1!free,x2!free)
 
 INTENSIONAL DESCRIPTION:
 Id=99
@@ -1008,7 +1008,7 @@ Id=99
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(11,22)
+A(x!B@x,c!C@x2)
 
 INTENSIONAL DESCRIPTION:
 Id=105
@@ -1035,7 +1035,7 @@ Id=105
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(10,21)
+A(x!free,c!C@x1)
 
 Reachability analysis result ....
 
@@ -1210,9 +1210,9 @@ Id=94
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(22)
-A(21)
-A(20)
+A(c!C@x2)
+A(c!C@x1)
+A(c!free)
 INTENSIONAL DESCRIPTION:
 Id=45
  Node(site_type:1<0)
@@ -1228,8 +1228,8 @@ Id=45
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(11)
-A(10)
+A(x!B@x)
+A(x!free)
 agent_type:1:B:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=45
@@ -1246,8 +1246,8 @@ Id=45
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(11)
-B(10)
+B(x!A@x)
+B(x!free)
 agent_type:2:C:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=89
@@ -1354,11 +1354,11 @@ Id=89
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-C(11,20,30,40)
-C(11,20,30,41)
-C(11,21,30,40)
-C(10,20,31,40)
-C(10,20,30,40)
+C(x1~p,x2~u,x1!free,x2!free)
+C(x1~p,x2~u,x1!free,x2!A@c)
+C(x1~p,x2~p,x1!free,x2!free)
+C(x1~u,x2~u,x1!A@c,x2!free)
+C(x1~u,x2~u,x1!free,x2!free)
 
 ------------------------------------------------------------
 * Cartesian abstraction:
@@ -1379,9 +1379,9 @@ Id=94
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(22)
-A(21)
-A(20)
+A(c!C@x2)
+A(c!C@x1)
+A(c!free)
 INTENSIONAL DESCRIPTION:
 Id=45
  Node(site_type:1<0)
@@ -1397,8 +1397,8 @@ Id=45
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(11)
-A(10)
+A(x!B@x)
+A(x!free)
 agent_type:1:B:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=45
@@ -1415,8 +1415,8 @@ Id=45
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(11)
-B(10)
+B(x!A@x)
+B(x!free)
 agent_type:2:C:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=89
@@ -1523,9 +1523,9 @@ Id=89
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-C(11,20,30,40)
-C(11,20,30,41)
-C(11,21,30,40)
-C(10,20,31,40)
-C(10,20,30,40)
+C(x1~p,x2~u,x1!free,x2!free)
+C(x1~p,x2~u,x1!free,x2!A@c)
+C(x1~p,x2~p,x1!free,x2!free)
+C(x1~u,x2~u,x1!A@c,x2!free)
+C(x1~u,x2~u,x1!free,x2!free)
 execution finished without any exception
