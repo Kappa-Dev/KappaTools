@@ -61,15 +61,23 @@ let collect_sites_modified_set parameter error rule handler_kappa store_result =
                     "Flow of information in the ODE semantics:modified sites:\n"
                 in
                 let error, agent_string =
-                  Handler.string_of_agent parameter error handler_kappa agent_type
+                  try
+                    Handler.string_of_agent parameter error handler_kappa agent_type
+                  with
+                    _ -> warn parameter error (Some "line 67") Exit 
+                      (string_of_int agent_type)
                 in
                 let _ =
                   fprintf stdout "\tagent_type:%i:%s\n" agent_type agent_string
                 in
                 Site_map_and_set.Set.iter (fun site_type ->
                   let error, site_string = 
-                    Handler.string_of_site parameter error handler_kappa agent_type 
-                      site_type
+                    try
+                      Handler.string_of_site parameter error handler_kappa agent_type 
+                        site_type
+                    with
+                      _ -> warn parameter error (Some "line 79") Exit 
+                        (string_of_int site_type)
                   in
                   fprintf stdout "\t\tsite_type:%i:%s\n" site_type site_string
                 ) site_set                    
@@ -144,15 +152,21 @@ let collect_sites_bond_pair_set parameter error handler_kappa rule store_result 
               "Flow of information in the ODE semantics:bond sites (first agent):\n"
           in
           let error, agent_string1 =
-            Handler.string_of_agent parameter error handler_kappa agent_type1
+            try
+              Handler.string_of_agent parameter error handler_kappa agent_type1
+            with
+              _ -> warn parameter error (Some "line 158") Exit (string_of_int agent_type1)
           in
           let _ =
             fprintf stdout "\tagent_type:%i:%s\n" agent_type1 agent_string1
           in
           Site_map_and_set.Set.iter (fun site_type ->
             let error, site_string =
-              Handler.string_of_site parameter error handler_kappa agent_type1
-                site_type
+              try
+                Handler.string_of_site parameter error handler_kappa agent_type1
+                  site_type
+              with
+                _ -> warn parameter error (Some "line 169") Exit (string_of_int site_type)
             in
             fprintf stdout "\t\tsite_type:%i:%s\n" site_type site_string
           ) sites_bond_set1
@@ -203,15 +217,21 @@ let collect_sites_bond_pair_set parameter error handler_kappa rule store_result 
               "Flow of information in the ODE semantics:bond sites (second agent):\n"
           in
           let error, agent_string2 =
-            Handler.string_of_agent parameter error handler_kappa agent_type2
+            try
+              Handler.string_of_agent parameter error handler_kappa agent_type2
+            with
+              _ -> warn parameter error (Some "line 223") Exit (string_of_int agent_type2)
           in
           let _ =
             fprintf stdout "\tagent_type:%i:%s\n" agent_type2 agent_string2
           in
           Site_map_and_set.Set.iter (fun site_type ->
             let error, site_string =
-              Handler.string_of_site parameter error handler_kappa agent_type2
-                site_type
+              try
+                Handler.string_of_site parameter error handler_kappa agent_type2
+                  site_type
+              with
+                _ -> warn parameter error (Some "line 234") Exit (string_of_int site_type)
             in
             fprintf stdout "\t\tsite_type:%i:%s\n" site_type site_string
           ) sites_bond_set2
@@ -484,15 +504,23 @@ let collect_sites_anchor_set parameter error handler_kappa rule
                   "Flow of information in the ODE semantics:anchor sites:\n"
               in
               let error, agent_string =
-                Handler.string_of_agent parameter error handler_kappa agent_type 
+                try
+                  Handler.string_of_agent parameter error handler_kappa agent_type
+                with
+                  _ -> warn parameter error (Some "line 510") Exit
+                    (string_of_int agent_type)
               in
               let _ =
                 fprintf stdout "\tagent_type:%i:%s\n" agent_type agent_string
               in
               Site_map_and_set.Set.iter (fun site_type ->
                 let error, site_string =
-                  Handler.string_of_site parameter error handler_kappa agent_type
-                    site_type
+                  try
+                    Handler.string_of_site parameter error handler_kappa agent_type
+                      site_type
+                  with
+                    _ -> warn parameter error (Some "line 522") Exit 
+                      (string_of_int site_type)
                 in
                 fprintf stdout "\t\tsite_type:%i:%s\n" site_type site_string
               ) union_set
@@ -597,19 +625,30 @@ let collect_internal_flow parameter error handler_kappa rule
               let _ =
                 List.iter (fun (agent_type, site_type, site_modif) ->
                   let error, agent_string =
-                    Handler.string_of_agent parameter error handler_kappa agent_type 
+                    try
+                      Handler.string_of_agent parameter error handler_kappa agent_type
+                    with
+                      _ -> warn parameter error (Some "line 631") Exit 
+                        (string_of_int agent_type)
                   in
                   let error, site_string =
-                    Handler.string_of_site parameter error handler_kappa agent_type 
-                      site_type
+                    try
+                      Handler.string_of_site parameter error handler_kappa agent_type 
+                        site_type
+                    with
+                      _ -> warn parameter error (Some "line 639") Exit
+                        (string_of_int site_type)
                   in
                   let error, site_modif_string =
                     Handler.string_of_site parameter error handler_kappa agent_type 
                       site_modif
                   in
-                  fprintf stdout "Flow of information in the ODE semantics:Internal flow\n-agent_type:%i:%s:site_type:%i:%s -> agent_type:%i:%s:site_type_modified:%i:%s\n"
-                    agent_type agent_string site_type site_string
-                    agent_type agent_string site_modif site_modif_string
+                  fprintf stdout 
+                    "Flow of information in the ODE semantics:Internal flow\n-agent_type:%i:%s:site_type:%i:%s -> agent_type:%i:%s:site_type_modified:%i:%s\n"
+                    agent_type agent_string 
+                    site_type site_string
+                    agent_type agent_string 
+                    site_modif site_modif_string
                 ) cartesian_output
               in
               ()
@@ -634,19 +673,33 @@ let collect_internal_flow parameter error handler_kappa rule
               let _ =
                 List.iter (fun (agent_type, site_type, site_anchor) ->
                   let error, agent_string =
-                    Handler.string_of_agent parameter error handler_kappa agent_type 
+                    try
+                      Handler.string_of_agent parameter error handler_kappa agent_type
+                    with
+                      _ -> warn parameter error (Some "line 678") Exit
+                        (string_of_int agent_type)
                   in
                   let error, site_string =
-                    Handler.string_of_site parameter error handler_kappa agent_type 
-                      site_type
+                    try
+                      Handler.string_of_site parameter error handler_kappa agent_type 
+                        site_type
+                    with
+                      _ -> warn parameter error (Some "line 687") Exit
+                        (string_of_int site_type)
                   in
                   let error, site_anchor_string =
-                    Handler.string_of_site parameter error handler_kappa agent_type 
-                      site_anchor
+                    try
+                      Handler.string_of_site parameter error handler_kappa agent_type 
+                        site_anchor
+                    with
+                      _ -> warn parameter error (Some "line 695") Exit
+                        (string_of_int site_anchor)
                   in
                   fprintf stdout "Flow of information in the ODE semantics:Internal flow\n-agent_type:%i:%s:site_type:%i:%s -> agent_type:%i:%s:site_type_anchor:%i:%s\n"
-                    agent_type agent_string site_type site_string
-                    agent_type agent_string site_anchor site_anchor_string
+                    agent_type agent_string 
+                    site_type site_string
+                    agent_type agent_string 
+                    site_anchor site_anchor_string
                 ) cartesian_output
               in
               ()
@@ -776,18 +829,31 @@ let collect_external_flow parameter error handler_kappa rule
           in
           List.iter (fun (agent_type, anchor_site_type, agent_type', site_modif) ->
             let error, agent_string =
-              Handler.string_of_agent parameter error handler_kappa agent_type
+              try
+                Handler.string_of_agent parameter error handler_kappa agent_type
+              with
+                _ -> warn parameter error (Some "line 835") Exit (string_of_int agent_type)
             in
             let error, agent_string' =
-              Handler.string_of_agent parameter error handler_kappa agent_type'
+              try
+                Handler.string_of_agent parameter error handler_kappa agent_type'
+              with
+                _ -> warn parameter error (Some "line 841") Exit (string_of_int agent_type')
             in
             let error, anchor_site_type_string =
-              Handler.string_of_site parameter error handler_kappa agent_type
-                anchor_site_type
+              try
+                Handler.string_of_site parameter error handler_kappa agent_type
+                  anchor_site_type
+              with
+                _ -> warn parameter error (Some "line 848") Exit 
+                  (string_of_int anchor_site_type)
             in
             let error, site_modif_string =
-              Handler.string_of_site parameter error handler_kappa agent_type'
-                site_modif
+              try
+                Handler.string_of_site parameter error handler_kappa agent_type'
+                  site_modif
+              with
+                _ -> warn parameter error (Some "line 856") Exit (string_of_int site_modif)
             in
             fprintf stdout "Flow of information in the ODE semantics:External flow:\n-agent-type:%i:%s:site_type_anchor:%i:%s -> agent_type:%i:%s:site_type_modified:%i:%s\n"
               agent_type agent_string
@@ -938,7 +1004,10 @@ let scan_rule_set parameter error handler_kappa compiled =
             then
               (*Print at each rule:*)
               let error, rule_string =
-                Handler.string_of_rule parameter error handler_kappa compiled rule_id
+                try
+                  Handler.string_of_rule parameter error handler_kappa compiled rule_id
+                with
+                  _ -> warn parameter error (Some "line 1010") Exit (string_of_int rule_id)
               in
               fprintf stdout "%s\n" rule_string
             else ()

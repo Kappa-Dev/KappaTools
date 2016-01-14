@@ -112,7 +112,10 @@ let collect_remanent_list2set parameter error handler_kappa store_remanent  =
          if Remanent_parameters.get_trace parameter
          then
            let error, agent_string = 
-             Handler.string_of_agent parameter error handler_kappa agent_type
+             try
+               Handler.string_of_agent parameter error handler_kappa agent_type
+             with
+               _ -> warn parameter error (Some "line 118") Exit (string_of_int agent_type)
            in
            List.iter (fun id ->
              List.iter (fun site_set ->
@@ -122,7 +125,12 @@ let collect_remanent_list2set parameter error handler_kappa store_remanent  =
                in
                Site_map_and_set.Set.iter (fun site_type ->
                  let error, site_string =
-                   Handler.string_of_site parameter error handler_kappa agent_type site_type
+                   try
+                     Handler.string_of_site parameter error handler_kappa 
+                       agent_type site_type
+                   with
+                     _ -> warn parameter error (Some "line 132") Exit 
+                       (string_of_int site_type)
                  in
                  Printf.fprintf stdout "site_type:%i:%s\n" site_type site_string
                ) site_set
@@ -141,7 +149,10 @@ let collect_remanent_list2set parameter error handler_kappa store_remanent  =
           if Remanent_parameters.get_trace parameter
           then
             let error, agent_string = 
-              Handler.string_of_agent parameter error handler_kappa agent_type
+              try
+                Handler.string_of_agent parameter error handler_kappa agent_type
+              with
+                _ -> warn parameter error (Some "line 155") Exit (string_of_int agent_type)
             in
             List.iter (fun id ->
               let _ =
@@ -154,7 +165,12 @@ let collect_remanent_list2set parameter error handler_kappa store_remanent  =
                   Site_map_and_set.Map.iter
                     (fun site site_new ->
                       let error, site_string =
-                        Handler.string_of_site parameter error handler_kappa agent_type site
+                        try
+                          Handler.string_of_site parameter error handler_kappa
+                            agent_type site
+                        with
+                          _ -> warn parameter error (Some "line 172") Exit 
+                            (string_of_int site)
                       in
                       Printf.fprintf stdout
                         "Global:site_type:%i:%s  => Local:site_type':%i:%s\n" 
@@ -164,9 +180,14 @@ let collect_remanent_list2set parameter error handler_kappa store_remanent  =
                 Site_map_and_set.Map.iter
                   (fun site_new site ->
                     let error, site_string =
-                      Handler.string_of_site parameter error handler_kappa agent_type site
+                      try
+                        Handler.string_of_site parameter error handler_kappa agent_type site
+                      with
+                        _ -> warn parameter error (Some "line 186") Exit 
+                          (string_of_int site)
                     in
-                    Printf.fprintf stdout "Local:site_type':%i:%s  => Global:site_type:%i:%s\n"
+                    Printf.fprintf stdout 
+                      "Local:site_type':%i:%s  => Global:site_type:%i:%s\n"
                       site_new site_string site site_string
                   ) map2
               ) list_of_map

@@ -21,7 +21,7 @@ open Ode_fragmentation
 
 let warn parameter mh message exn default =
   Exception.warn parameter mh (Some "print ODE fragmentation") message exn
-                 (fun () -> default)
+    (fun () -> default)
 
 let trace = false
 
@@ -32,18 +32,24 @@ let print_sites_modified_set parameter error handler_kappa result =
   AgentMap.iter parameter error
     (fun parameter error agent_type site_set ->
       let error, agent_name = 
-        Handler.string_of_agent parameter error handler_kappa agent_type
+        try
+          Handler.string_of_agent parameter error handler_kappa agent_type
+        with
+          _ -> warn parameter error (Some "line 38") Exit (string_of_int agent_type)
       in
       let _ =
         fprintf stdout "agent_type:%i:%s\n" agent_type agent_name
       in
       (*convert site of type int to string*)
       let _ =
-        Site_map_and_set.Set.iter (fun site ->
+        Site_map_and_set.Set.iter (fun site_type ->
           let error, site_string = 
-            Handler.string_of_site parameter error handler_kappa agent_type site
+            try
+              Handler.string_of_site parameter error handler_kappa agent_type site_type
+            with
+              _ -> warn parameter error (Some "line 50") Exit (string_of_int site_type)
           in
-          fprintf stdout "site_type:%i:%s\n" site site_string
+          fprintf stdout "site_type:%i:%s\n" site_type site_string
         ) site_set
       in
       error

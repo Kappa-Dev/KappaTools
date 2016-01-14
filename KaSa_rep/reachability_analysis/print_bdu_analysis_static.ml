@@ -30,10 +30,16 @@ let print_covering_classes_id_aux parameter error handler_kappa result =
   Int2Map_CV.Map.iter
     ( fun (agent_type, site_type) (l1, l2) ->
       let error, agent_string =
-        Handler.string_of_agent parameter error handler_kappa agent_type
+        try 
+          Handler.string_of_agent parameter error handler_kappa agent_type
+        with
+          _ -> warn parameter error (Some "line 36") Exit (string_of_int agent_type)
       in
       let error, site_string =
-        Handler.string_of_site parameter error handler_kappa agent_type site_type
+        try
+          Handler.string_of_site parameter error handler_kappa agent_type site_type
+        with
+          _ -> warn parameter error (Some "line 39") Exit (string_of_int site_type)
       in
       let _ =
         fprintf parameter.log 
@@ -67,10 +73,16 @@ let print_half_break_effect parameter error handler_kappa compiled result =
   Int2Map_HalfBreak_effect.Map.iter
     ( fun (agent_type, site_type) (l1, l2) ->
       let error, agent_string =
-        Handler.string_of_agent parameter error handler_kappa agent_type
+        try
+          Handler.string_of_agent parameter error handler_kappa agent_type
+        with
+          _ -> warn parameter error (Some "79") Exit (string_of_int agent_type)
       in
       let error, site_string =
-        Handler.string_of_site parameter error handler_kappa agent_type site_type
+        try 
+          Handler.string_of_site parameter error handler_kappa agent_type site_type
+        with
+          _ -> warn parameter error (Some "line 85") Exit (string_of_int site_type)
       in
       let _ =
         fprintf parameter.log 
@@ -80,11 +92,17 @@ let print_half_break_effect parameter error handler_kappa compiled result =
       List.iter (fun (rule_id, state) -> 
         (*mapping rule_id of type int to string*)
         let error, rule_id_string =
-          Handler.string_of_rule parameter error handler_kappa
-            compiled rule_id
+          try
+            Handler.string_of_rule parameter error handler_kappa
+              compiled rule_id
+          with
+            _ -> warn parameter error (Some "line 98") Exit (string_of_int rule_id)
         in
         let error, state_string =
-          Handler.string_of_state parameter error handler_kappa agent_type site_type state
+          try
+            Handler.string_of_state parameter error handler_kappa agent_type site_type state
+          with
+            _ -> warn parameter error (Some "line 105") Exit (string_of_int state)
         in
         fprintf parameter.log "(%s * state:%i:(%s))\n"
           rule_id_string state state_string) l2
@@ -93,21 +111,30 @@ let print_half_break_effect parameter error handler_kappa compiled result =
 let print_remove_effect parameter error handler_kappa compiled result =
   Int2Map_Remove_effect.Map.iter
     ( fun (agent_type, site_type) (l1, l2) ->
-       let error, agent_string =
-        Handler.string_of_agent parameter error handler_kappa agent_type
+      let error, agent_string =
+        try
+          Handler.string_of_agent parameter error handler_kappa agent_type
+        with
+          _ -> warn parameter error (Some "line 118") Exit (string_of_int agent_type)
       in
       let error, site_string =
-        Handler.string_of_site parameter error handler_kappa agent_type site_type
+        try
+          Handler.string_of_site parameter error handler_kappa agent_type site_type
+        with
+          _ -> warn parameter error (Some "line 124") Exit (string_of_int site_type)
       in
       let _ =
         fprintf parameter.log 
           "agent_type:%i:%s:site_type:%i:%s@list of pair (rule_id, binding state):\n"
           agent_type agent_string site_type site_string
       in
-      List.iter (fun r ->
+      List.iter (fun rule_id ->
         let error, rule_id_string =
-          Handler.string_of_rule parameter error handler_kappa
-            compiled r
+          try
+            Handler.string_of_rule parameter error handler_kappa
+              compiled rule_id
+          with
+            _ -> warn parameter error (Some "line 137") Exit (string_of_int rule_id)
         in
         fprintf parameter.log "(%s * state:no_information)\n" rule_id_string
       ) l2
@@ -154,11 +181,17 @@ let print_potential_partner_free parameter error handler_kappa compiled result =
   Int2Map_potential_effect.Map.iter 
     (fun (agent_type, rule_id) l ->
       let error, rule_id_string =
-        Handler.string_of_rule parameter error handler_kappa
-          compiled rule_id
+        try
+          Handler.string_of_rule parameter error handler_kappa
+            compiled rule_id
+        with
+          _ -> warn parameter error (Some "line 188") Exit (string_of_int rule_id)
       in
       let error, agent_string =
-        Handler.string_of_agent parameter error handler_kappa agent_type
+        try
+          Handler.string_of_agent parameter error handler_kappa agent_type
+        with
+          _ -> warn parameter error (Some "line 194") Exit (string_of_int agent_type)
       in
       let _ =
         fprintf stdout "agent_type:%i:%s:%s@(site, free state)\n"
@@ -166,10 +199,16 @@ let print_potential_partner_free parameter error handler_kappa compiled result =
       in
       List.iter (fun (site_type, state) ->
         let error, site_string =
-          Handler.string_of_site parameter error handler_kappa agent_type site_type
+          try
+            Handler.string_of_site parameter error handler_kappa agent_type site_type
+          with
+            _ -> warn parameter error (Some "line 205") Exit (string_of_int site_type)
         in
         let error, state_string =
-          Handler.string_of_state parameter error handler_kappa agent_type site_type state
+          try
+            Handler.string_of_state parameter error handler_kappa agent_type site_type state
+          with
+            _ -> warn parameter error (Some "line 211") Exit (string_of_int state)
         in
         fprintf stdout "(site_type:%i:%s * state:%i(%s))\n" site_type site_string
           state state_string
@@ -180,11 +219,17 @@ let print_potential_partner_bind parameter error handler_kappa compiled result =
   Int2Map_potential_effect.Map.iter 
     (fun (agent_type, rule_id) l ->
       let error, rule_id_string =
-        Handler.string_of_rule parameter error handler_kappa
-          compiled rule_id
+        try
+          Handler.string_of_rule parameter error handler_kappa
+            compiled rule_id
+        with
+          _ -> warn parameter error (Some "line 226") Exit (string_of_int rule_id)
       in
       let error, agent_string =
-        Handler.string_of_agent parameter error handler_kappa agent_type
+        try
+          Handler.string_of_agent parameter error handler_kappa agent_type
+        with
+          _ -> warn parameter error (Some "line 232") Exit (string_of_int agent_type)
       in
       let _ =
         fprintf stdout "agent_type:%i:%s:%s@(site, binding state)\n"
@@ -192,10 +237,16 @@ let print_potential_partner_bind parameter error handler_kappa compiled result =
       in
       List.iter (fun (site_type, state) ->
         let error, site_string =
-        Handler.string_of_site parameter error handler_kappa agent_type site_type
+          try
+            Handler.string_of_site parameter error handler_kappa agent_type site_type
+          with
+            _ -> warn parameter error (Some "line 243") Exit (string_of_int site_type)
         in
          let error, state_string =
-          Handler.string_of_state parameter error handler_kappa agent_type site_type state
+           try
+             Handler.string_of_state parameter error handler_kappa agent_type site_type state
+           with
+             _ -> warn parameter error (Some "line 249") Exit (string_of_int state)
         in
         fprintf stdout "(site_type:%i:%s * state:%i(%s))\n" 
           site_type site_string state state_string
@@ -236,10 +287,16 @@ let print_modification_sites_aux parameter error handler_kappa compiled result =
   Int2Map_Modif.Map.iter
     ( fun (agent_id, agent_type, site_type) (l1, s2) ->
       let error, agent_string =
-        Handler.string_of_agent parameter error handler_kappa agent_type
+        try
+          Handler.string_of_agent parameter error handler_kappa agent_type
+        with
+          _ -> warn parameter error (Some "line 293") Exit (string_of_int agent_type)
       in
       let error, site_string =
-        Handler.string_of_site parameter error handler_kappa agent_type site_type
+        try
+          Handler.string_of_site parameter error handler_kappa agent_type site_type
+        with
+          _ -> warn parameter error (Some "line 299") Exit (string_of_int site_type)
       in
       let _ =
         fprintf parameter.log 
@@ -249,8 +306,11 @@ let print_modification_sites_aux parameter error handler_kappa compiled result =
       Site_map_and_set.Set.iter
         (fun rule_id ->
           let error, rule_id_string =
-            Handler.string_of_rule parameter error handler_kappa
-              compiled rule_id
+            try
+              Handler.string_of_rule parameter error handler_kappa
+                compiled rule_id
+            with
+              _ -> warn parameter error (Some "line 313") Exit (string_of_int rule_id)
           in
           fprintf parameter.log "%s\n" rule_id_string
         ) s2
@@ -278,10 +338,16 @@ let print_modification_map_aux parameter error handler_kappa compiled result =
   Int2Map_Test_Modif.Map.iter
     ( fun (agent_type, site_type) (l1, s2) ->
       let error, agent_string =
-        Handler.string_of_agent parameter error handler_kappa agent_type
+        try
+          Handler.string_of_agent parameter error handler_kappa agent_type
+        with
+          _ -> warn parameter error (Some "line 344") Exit (string_of_int agent_type)
       in
       let error, site_string =
-        Handler.string_of_site parameter error handler_kappa agent_type site_type
+        try
+          Handler.string_of_site parameter error handler_kappa agent_type site_type
+        with
+          _ -> warn parameter error (Some "line 350") Exit (string_of_int site_type)
       in
       let _ =
         fprintf parameter.log 
@@ -291,8 +357,11 @@ let print_modification_map_aux parameter error handler_kappa compiled result =
       Site_map_and_set.Set.iter
         (fun rule_id ->
           let error, rule_id_string =
-            Handler.string_of_rule parameter error handler_kappa
-              compiled rule_id
+            try
+              Handler.string_of_rule parameter error handler_kappa
+                compiled rule_id
+            with
+              _ -> warn parameter error (Some "line 364") Exit (string_of_int rule_id)
           in
           fprintf parameter.log "%s\n" rule_id_string
         ) s2
@@ -414,13 +483,6 @@ let print_result_static parameter error handler_kappa compiled result =
       handler_kappa
       result.store_covering_classes_id
   in
-  (*TODO*)
-  (*let _ =
-    print_covering_classes_id_string
-      parameter
-      error
-      result.store_covering_classes_id_string
-  in*)
   let _ =
     print_side_effects 
       parameter 

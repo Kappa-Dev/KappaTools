@@ -215,7 +215,8 @@ let scan_rule_bdu_build parameter handler_bdu error rule_id rule compil
     covering_classes store_potential_side_effects 
     store_result =
   (*------------------------------------------------------------------------------*)
-  let error, store_remanent_triple = (* JF: it should be computed only once, not for each rule *)
+  let error, store_remanent_triple =
+    (* JF: it should be computed only once, not for each rule *)
     Bdu_build.collect_remanent_triple
       parameter
       error
@@ -599,4 +600,3 @@ let bdu_main parameter error handler_kappa store_covering_classes compiled =
     else error, handler_bdu
   in
   error, handler_bdu, result
- 

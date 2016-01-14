@@ -225,7 +225,10 @@ let sprintf_array parameter error handler agent_type array =
   let acc = ref "[|" in
   Array.iteri (fun i site_type ->
     let error, site_string = 
-      Handler.string_of_site parameter error handler agent_type site_type
+      try
+        Handler.string_of_site parameter error handler agent_type site_type
+      with
+        _ -> warn parameter error (Some "line 231") Exit (string_of_int site_type)
     in
     acc := !acc ^
       if i <> 0
@@ -254,7 +257,11 @@ let print_stochastic_class parameter error handler result =
             then
               let _ =
                 let error, agent_string =
-                  Handler.string_of_agent parameter error handler agent_type
+                  try
+                    Handler.string_of_agent parameter error handler agent_type
+                  with
+                    _ -> warn parameter error (Some "line 263") Exit 
+                      (string_of_int agent_type)
                 in
                 Printf.fprintf stdout "agent_type:%i:%s\n" agent_type agent_string
               in

@@ -38,8 +38,11 @@ let dump_formatter parameter  f =
   if local_trace ||  Remanent_parameters.get_trace parameter
   then f (Remanent_parameters.get_formatter parameter) 
 
-let dump_view_diff parameter handler_kappa handler_bdu error site_correspondence agent_type cv_id old_bdu new_bdu =
-  if trace || Remanent_parameters.get_dump_reachability_analysis_diff parameter || Remanent_parameters.get_trace parameter
+let dump_view_diff parameter handler_kappa handler_bdu error 
+    site_correspondence agent_type cv_id old_bdu new_bdu =
+  if trace || 
+    Remanent_parameters.get_dump_reachability_analysis_diff parameter ||
+    Remanent_parameters.get_trace parameter
   then
     let error, handler_bdu, bdu_diff =
       Mvbdu_wrapper.Mvbdu.mvbdu_xor parameter handler_bdu error old_bdu new_bdu
@@ -48,9 +51,14 @@ let dump_view_diff parameter handler_kappa handler_bdu error site_correspondence
       Remanent_parameters.update_prefix parameter ""
     in
     let error, agent_string =
-      Handler.string_of_agent parameter error handler_kappa agent_type
+      try 
+        Handler.string_of_agent parameter error handler_kappa agent_type
+      with
+        _ -> warn parameter error (Some "line 56") Exit (string_of_int agent_type)
     in
-    let error, site_correspondence = AgentMap.get parameter error agent_type site_correspondence in
+    let error, site_correspondence =
+      AgentMap.get parameter error agent_type site_correspondence 
+    in
     let error, site_correspondence =
       match
 	site_correspondence
@@ -65,19 +73,28 @@ let dump_view_diff parameter handler_kappa handler_bdu error site_correspondence
 	  list
 	with
 	| [] -> warn parameter error (Some "line 68") Exit []
-	| (h,list,_)::_ when h=cv_id -> error,list
-	| _::tail -> aux tail
+	| (h, list, _) :: _ when h = cv_id -> error, list
+	| _ :: tail -> aux tail
       in aux site_correspondence
     in
-    let error,(map1,map2) = Bdu_build.new_index_pair_map parameter error site_correspondence in
+    let error, (map1, map2) =
+      Bdu_build.new_index_pair_map parameter error site_correspondence 
+    in
     let () = Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n" in
     let error,handler_bdu =
       if trace || Remanent_parameters.get_trace parameter
       then
-	let () = Printf.fprintf (Remanent_parameters.get_log parameter) "INTENSIONAL DESCRIPTION:\n" in
-	let () = Mvbdu_wrapper.Mvbdu.print (Remanent_parameters.get_log parameter) "" bdu_diff in
-	let () = Printf.fprintf (Remanent_parameters.get_log parameter) "EXTENSIONAL DESCRIPTION:\n" in
-	error,handler_bdu
+	let () = 
+          Printf.fprintf (Remanent_parameters.get_log parameter) 
+            "INTENSIONAL DESCRIPTION:\n" 
+        in
+	let () =
+          Mvbdu_wrapper.Mvbdu.print (Remanent_parameters.get_log parameter) "" bdu_diff in
+	let () = 
+          Printf.fprintf (Remanent_parameters.get_log parameter) 
+            "EXTENSIONAL DESCRIPTION:\n" 
+        in
+	error, handler_bdu
       else
 	error,handler_bdu
     in
@@ -87,48 +104,54 @@ let dump_view_diff parameter handler_kappa handler_bdu error site_correspondence
     let error =
       List.fold_left
 	(fun error l ->
-	 let error,bool =
+	 let error, bool =
 	   List.fold_left
-	     (fun (error,bool) (site_type, state) ->
-	      let error, site_type = Map.find_option parameter error  site_type map2 in
-	      let error, site_type =
-		match
-		  site_type
-		with
-		| None -> warn parameter error (Some "line 100") Exit (-1)
-		| Some i -> error, i
-	      in
-	      let error, site_string =
-		try 
-                  Handler.string_of_site parameter error handler_kappa
-					 agent_type site_type
-		with
-		  _ -> warn parameter error (Some "line 136") Exit (string_of_int site_type)
-	      in
-	      let error, state_string =
-                try
-		  Handler.string_of_state_fully_deciphered parameter error handler_kappa
-					  agent_type site_type state
-		with
-		  _ -> warn parameter error (Some "line 146") Exit (string_of_int state)
-              in
-              let () =
-		if bool then Printf.fprintf (Remanent_parameters.get_log parameter) ","
-		else Printf.fprintf (Remanent_parameters.get_log parameter) "%s(" agent_string
-              in
-	      let () = Printf.fprintf (Remanent_parameters.get_log parameter) 
-				      "%s%s" site_string state_string
-              in
-              error,true
+	     (fun (error, bool) (site_type, state) ->
+	       let error, site_type = Map.find_option parameter error site_type map2 in
+	       let error, site_type =
+		 match
+		   site_type
+		 with
+		 | None -> warn parameter error (Some "line 100") Exit (-1)
+		 | Some i -> error, i
+	       in
+	       let error, site_string =
+		 try 
+                   Handler.string_of_site parameter error handler_kappa
+		     agent_type site_type
+		 with
+		   _ -> warn parameter error (Some "line 136") 
+                     Exit (string_of_int site_type)
+	       in
+	       let error, state_string =
+                 try
+		   Handler.string_of_state_fully_deciphered parameter error handler_kappa
+		     agent_type site_type state
+		 with
+		   _ -> warn parameter error (Some "line 146") Exit (string_of_int state)
+               in
+               let () =
+		 if bool 
+                 then Printf.fprintf (Remanent_parameters.get_log parameter) ","
+		 else Printf.fprintf (Remanent_parameters.get_log parameter)
+                   "%s(" agent_string
+               in
+	       let () = 
+                 Printf.fprintf (Remanent_parameters.get_log parameter) 
+		   "%s%s" site_string state_string
+               in
+               error, true
              )
-	     (error,false) l
+	     (error, false) l
 	 in
 	 let () = 
-	   if bool then Printf.fprintf (Remanent_parameters.get_log parameter) ")\n"
+	   if bool 
+           then Printf.fprintf (Remanent_parameters.get_log parameter) ")\n"
 	 in error)
 	error list
     in error, handler_bdu    
-  else error,handler_bdu
+  else error, handler_bdu
+
 (************************************************************************************)
 (*update bdu:
   - (bdu_X U bdu_creation) U [\rho[update_views] | \rho \in bdu_X (inter) bdu_test views]
@@ -225,8 +248,11 @@ let add_update_to_wl parameter error handler_kappa compiled agent_type cv_id
 	    (fun rule_id ->
               (*mapping rule_id of type int -> string*)
               let error, rule_id_string =
-                Handler.string_of_rule parameter error handler_kappa
-                  compiled rule_id
+                try
+                  Handler.string_of_rule parameter error handler_kappa
+                    compiled rule_id
+                with
+                  _ -> warn parameter error (Some "line 250") Exit (string_of_int rule_id)
               in
               Printf.fprintf stderr " (%s)\n" rule_id_string) s1;
             Printf.fprintf stderr "inside a working list."
@@ -394,7 +420,10 @@ let compute_views_enabled parameter handler error
     then
       error, handler, false, store_result
     else
-      let error, handler = dump_view_diff parameter handler_kappa handler error correspondence agent_type cv_id bdu_old bdu_union in
+      let error, handler = 
+        dump_view_diff parameter handler_kappa 
+          handler error correspondence agent_type cv_id bdu_old bdu_union 
+      in
       let store_result =
         Map_bdu_update.Map.add (agent_type, cv_id) bdu_union store_result
       in
@@ -416,7 +445,11 @@ let compute_views_enabled parameter handler error
             if (Remanent_parameters.get_trace parameters_cv)
             then 
               let error, agent_string =
-                Handler.string_of_agent parameter error handler_kappa agent_type
+                try
+                  Handler.string_of_agent parameter error handler_kappa agent_type
+                with
+                  _ -> warn parameter error (Some "line 446") Exit 
+                    (string_of_int agent_type)
               in
               Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
               dump_channel parameter 
@@ -436,7 +469,11 @@ let compute_views_enabled parameter handler error
             if (Remanent_parameters.get_trace parameters_cv)
             then 
               let error, agent_string =
-                Handler.string_of_agent parameter error handler_kappa agent_type
+                try 
+                  Handler.string_of_agent parameter error handler_kappa agent_type
+                with
+                  _ -> warn parameter error (Some "line 470") Exit 
+                    (string_of_int agent_type)
               in
               Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
               dump_channel parameter 
@@ -683,7 +720,10 @@ let collect_bdu_fixpoint_with_init parameter handler error
     let error, handler, bdu_union =
       Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_old bdu
     in
-    let error, handler = dump_view_diff parameter handler_kappa handler error correspondence agent_type cv_id bdu_old bdu_union in
+    let error, handler = 
+      dump_view_diff parameter handler_kappa handler error
+        correspondence agent_type cv_id bdu_old bdu_union
+    in
     let result_map =
       Map_bdu_update.Map.add (agent_type, cv_id) bdu_union store_result
     in
@@ -696,7 +736,8 @@ let collect_bdu_fixpoint_with_init parameter handler error
     Map_creation_bdu.Map.fold
       (fun (agent_type, rule_id, cv_id) bdu (error, store_result) ->
        let error, store_result =
-          add_link parameter handler error site_correspondence_in_covering_classes (agent_type, cv_id) bdu store_result
+          add_link parameter handler error 
+            site_correspondence_in_covering_classes (agent_type, cv_id) bdu store_result
         in
         error, store_result
       )
@@ -748,8 +789,12 @@ let collect_bdu_fixpoint_with_init parameter handler error
             then 
               (*mapping rule_id of type int -> string*)
               let error, rule_id_string =
-                Handler.string_of_rule parameter error handler_kappa
-                  compiled rule_id
+                try 
+                  Handler.string_of_rule parameter error handler_kappa
+                    compiled rule_id
+                with
+                  _ -> warn parameter error (Some "line 795") Exit 
+                    (string_of_int rule_id)
               in
               Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
               dump_channel parameter 
@@ -768,8 +813,12 @@ let collect_bdu_fixpoint_with_init parameter handler error
             then 
               (*mapping rule_id of type int -> string*)
               let error, rule_id_string =
-                Handler.string_of_rule parameter error handler_kappa
-                  compiled rule_id
+                try
+                  Handler.string_of_rule parameter error handler_kappa
+                    compiled rule_id
+                with
+                  _ -> warn parameter error (Some "line 819") Exit
+                    (string_of_int rule_id)
               in
               Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
               dump_channel parameter 
@@ -788,8 +837,12 @@ let collect_bdu_fixpoint_with_init parameter handler error
             then
               (*mapping rule_id of type int -> string*)
               let error, rule_id_string =
-                Handler.string_of_rule parameter error handler_kappa
-                  compiled rule_id
+                try
+                  Handler.string_of_rule parameter error handler_kappa
+                    compiled rule_id
+                with
+                  _ -> warn parameter error (Some "line 843") Exit 
+                    (string_of_int rule_id)
               in
               Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
               dump_channel parameter 

@@ -55,7 +55,8 @@ let half_break_action parameter error handler rule_id half_break store_result =
       | error, Some (l, l') -> error, (l, l')
     in
     let error, result =
-      Int2Map_HalfBreak_effect.Map.add_or_overwrite parameter error (a, b) (l, (r, state) :: old)
+      Int2Map_HalfBreak_effect.Map.add_or_overwrite
+        parameter error (a, b) (l, (r, state) :: old)
         store_result
     in
     error, result
@@ -121,7 +122,8 @@ let remove_action parameter error rule_id remove store_result =
       | error, Some (l, l') -> error, (l, l')
     in
     let error, result =
-      Int2Map_Remove_effect.Map.add_or_overwrite parameter error (a, b) (l, r :: old) store_result
+      Int2Map_Remove_effect.Map.add_or_overwrite
+        parameter error (a, b) (l, r :: old) store_result
     in
     error, result
   in

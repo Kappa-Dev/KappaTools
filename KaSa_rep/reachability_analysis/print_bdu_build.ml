@@ -200,7 +200,6 @@ let print_proj_potential_list_map parameter error result =
           let _ = fprintf parameter.log "agent_type:%i\n" agent_type in
           List.iter (fun list_a ->
             Mvbdu_wrapper.Mvbdu.print_association_list parameter.log "" list_a
-            (*fprintf parameter.log "site_type:%i:state:%i\n" site state*)
           ) l
         ) map_b
     ) result

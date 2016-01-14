@@ -81,24 +81,43 @@ let print_contact_map_full_aux parameter error handler_kappa result =
   Int2Map_CM_state.Map.iter (fun (agent1, site1, state1) set ->
     Set_triple.Set.iter (fun (agent2, site2, state2) ->
       let error, agent_string1 =
-        Handler.string_of_agent parameter error handler_kappa agent1
+        try
+          Handler.string_of_agent parameter error handler_kappa agent1
+        with
+          _ -> warn parameter error (Some "line 87") Exit (string_of_int agent1)
       in
       let error, site_string1 =
-        Handler.string_of_site_contact_map parameter error handler_kappa agent1 site1
+        try
+          Handler.string_of_site_contact_map parameter error handler_kappa agent1 site1
+        with
+          _ -> warn parameter error (Some "line 92") Exit (string_of_int site1)
       in
       let error, state_string1 =
-        Handler.string_of_state parameter error handler_kappa agent1 site1 state1
+        try
+          Handler.string_of_state parameter error handler_kappa agent1 site1 state1
+        with
+          _ -> warn parameter error (Some "line 99") Exit (string_of_int state1)
       in
       let error, agent_string2 =
-        Handler.string_of_agent parameter error handler_kappa agent2
+        try
+          Handler.string_of_agent parameter error handler_kappa agent2
+        with
+          _ -> warn parameter error (Some "line 105") Exit (string_of_int agent2)
       in
       let error, site_string2 =
-        Handler.string_of_site_contact_map parameter error handler_kappa agent2 site2
+        try
+          Handler.string_of_site_contact_map parameter error handler_kappa agent2 site2
+        with
+          _ -> warn parameter error (Some "line 111") Exit (string_of_int site2)
       in
       let error, state_string2 =
-        Handler.string_of_state parameter error handler_kappa agent2 site2 state2
+        try
+          Handler.string_of_state parameter error handler_kappa agent2 site2 state2
+        with
+          _ -> warn parameter error (Some "line 117") Exit (string_of_int state2)
       in
-      fprintf stdout "agent_type:%i:%s@site_type:%i:%s:state:%i(%s)--agent_type':%i:%s@site_type':%i:%s:state':%i(%s)\n" 
+      fprintf stdout 
+        "agent_type:%i:%s@site_type:%i:%s:state:%i(%s)--agent_type':%i:%s@site_type':%i:%s:state':%i(%s)\n" 
         agent1 agent_string1 
         site1 site_string1 
         state1 state_string1
@@ -167,28 +186,47 @@ let print_syn_map_aux parameter error handler_kappa result =
     (fun set1 set2 ->
       Set_triple.Set.iter (fun (agent_type, site_type, state) ->
         let error, agent_string =
-          Handler.string_of_agent parameter error handler_kappa agent_type
+          try
+            Handler.string_of_agent parameter error handler_kappa agent_type
+          with
+            _ -> warn parameter error (Some "line 192") Exit (string_of_int agent_type)
         in
         let error, site_string =
-          Handler.string_of_site_contact_map
-            parameter error handler_kappa agent_type site_type
+          try
+            Handler.string_of_site_contact_map
+              parameter error handler_kappa agent_type site_type
+          with
+            _ -> warn parameter error (Some "line 199") Exit (string_of_int site_type)
         in
         let error, state_string =
-          Handler.string_of_state parameter error handler_kappa agent_type site_type state
+          try
+            Handler.string_of_state parameter error handler_kappa agent_type site_type state
+          with
+            _ -> warn parameter error (Some "line 205") Exit (string_of_int state)
         in
         Set_triple.Set.iter (fun (agent_type', site_type', state') ->
           let error, agent_string' =
-            Handler.string_of_agent parameter error handler_kappa agent_type'
+            try
+              Handler.string_of_agent parameter error handler_kappa agent_type'
+            with
+              _ -> warn parameter error (Some "line 212") Exit (string_of_int agent_type')
           in
           let error, site_string' =
-            Handler.string_of_site_contact_map
-              parameter error handler_kappa agent_type' site_type'
+            try
+              Handler.string_of_site_contact_map
+                parameter error handler_kappa agent_type' site_type'
+            with
+              _ -> warn parameter error (Some "line 218") Exit (string_of_int site_type')
           in
           let error, state_string' =
-            Handler.string_of_state parameter error handler_kappa 
-              agent_type' site_type' state'
+            try
+              Handler.string_of_state parameter error handler_kappa
+                agent_type' site_type' state'
+            with
+              _ -> warn parameter error (Some "line 226") Exit (string_of_int state')
           in
-          fprintf stdout "agent_type:%i:%s:site_type:%i:%s:state:%i(%s) - > agent_type':%i:%s:site_type':%i:%s:state':%i(%s)\n"
+          fprintf stdout 
+            "agent_type:%i:%s:site_type:%i:%s:state:%i(%s) - > agent_type':%i:%s:site_type':%i:%s:state':%i(%s)\n"
             agent_type agent_string
             site_type site_string
             state state_string
@@ -224,7 +262,10 @@ let print_covering_classes_modification_aux parameter error handler_kappa compil
   Int2Map_CV_Modif.Map.iter
     ( fun (agent_type, y) (_, s2) ->
       let error, agent_string =
-        Handler.string_of_agent parameter error handler_kappa agent_type
+        try
+          Handler.string_of_agent parameter error handler_kappa agent_type
+        with
+          _ -> warn parameter error (Some "line 268") Exit (string_of_int agent_type)
       in
       let _ =
         fprintf parameter.log
@@ -235,8 +276,11 @@ let print_covering_classes_modification_aux parameter error handler_kappa compil
         (fun rule_id ->
         (*mapping rule_id of type int to string*)
           let error, rule_id_string =
-            Handler.string_of_rule parameter error handler_kappa
-              compiled rule_id
+            try
+              Handler.string_of_rule parameter error handler_kappa
+                compiled rule_id
+            with
+              _ -> warn parameter error (Some "line 283") Exit (string_of_int rule_id)
           in
           fprintf parameter.log "%s\n" rule_id_string
         ) s2
