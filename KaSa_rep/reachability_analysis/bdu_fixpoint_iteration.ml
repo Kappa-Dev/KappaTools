@@ -31,18 +31,20 @@ let warn parameters mh message exn default =
 let local_trace = false
 
 let dump_channel parameter  f =
-  if local_trace ||  Remanent_parameters.get_trace parameter
+  if local_trace 
+    || Remanent_parameters.get_trace parameter
   then f (Remanent_parameters.get_log parameter)
 
 let dump_formatter parameter  f =
-  if local_trace ||  Remanent_parameters.get_trace parameter
+  if local_trace 
+    || Remanent_parameters.get_trace parameter
   then f (Remanent_parameters.get_formatter parameter) 
-
+    
 let dump_view_diff parameter handler_kappa handler_bdu error 
     site_correspondence agent_type cv_id old_bdu new_bdu =
-  if trace || 
-    Remanent_parameters.get_dump_reachability_analysis_diff parameter ||
-    Remanent_parameters.get_trace parameter
+  if trace 
+    || Remanent_parameters.get_dump_reachability_analysis_diff parameter 
+    || Remanent_parameters.get_trace parameter
   then
     let error, handler_bdu, bdu_diff =
       Mvbdu_wrapper.Mvbdu.mvbdu_xor parameter handler_bdu error old_bdu new_bdu
@@ -81,8 +83,9 @@ let dump_view_diff parameter handler_kappa handler_bdu error
       Bdu_build.new_index_pair_map parameter error site_correspondence 
     in
     let () = Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n" in
-    let error,handler_bdu =
-      if trace || Remanent_parameters.get_trace parameter
+    let error, handler_bdu =
+      if trace
+        || Remanent_parameters.get_trace parameter
       then
 	let () = 
           Printf.fprintf (Remanent_parameters.get_log parameter) 
@@ -96,7 +99,7 @@ let dump_view_diff parameter handler_kappa handler_bdu error
         in
 	error, handler_bdu
       else
-	error,handler_bdu
+	error, handler_bdu
     in
     let error, handler_bdu, list = 
       Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu parameter handler_bdu error bdu_diff
@@ -228,7 +231,8 @@ let add_update_to_wl parameter error handler_kappa compiled agent_type cv_id
   (*-----------------------------------------------------------------------*)
   (*print working list information*)
   let _ =
-    if (Remanent_parameters.get_dump_reachability_analysis_wl parameter) 
+    if trace 
+      || Remanent_parameters.get_dump_reachability_analysis_wl parameter
     then
       let parameters_cv =
         Remanent_parameters.update_prefix parameter ""
