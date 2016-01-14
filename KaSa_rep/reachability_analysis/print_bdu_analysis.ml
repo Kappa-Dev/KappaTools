@@ -159,11 +159,11 @@ let print_bdu_update_map_cartesian_decomposition
 	   let error =
 	      List.fold_left
 		(fun error l ->
-	          let error,bool =
+	          let error, bool =
 		    List.fold_left
-		      (fun (error,bool) (site_type, state) ->
+		      (fun (error, bool) (site_type, state) ->
 		       let error, site_type = 
-                         Map.find_option parameter error  site_type map2 
+                         Map.find_option parameter error site_type map2 
                        in 
 		       let error, site_type =
 			 match

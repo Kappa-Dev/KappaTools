@@ -234,12 +234,14 @@ let collect_proj_bdu_test_restriction_map parameter handler error
 (************************************************************************************)
 (*creation rules*)
 
-let collect_bdu_creation_restriction_map parameter handler error rule_id rule store_remanent_triple store_result   =
+let collect_bdu_creation_restriction_map
+    parameter handler error rule_id rule store_remanent_triple store_result   =
   let error, handler, bdu_false = Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error in
   let add_link handler (agent_type, rule_id, cv_id) bdu store_result =
     let error, old_bdu =
       match
-        Map_creation_bdu.Map.find_option (agent_type, rule_id, cv_id) store_result
+        Map_creation_bdu.Map.find_option
+          (agent_type, rule_id, cv_id) store_result
       with
       | None -> error, bdu_false
       (*default value when there is no creation in this rule*)
@@ -249,7 +251,8 @@ let collect_bdu_creation_restriction_map parameter handler error rule_id rule st
       Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error old_bdu bdu 
     in (* In the case when the agent is created twice, we take the union *)
     let result_map =
-      Map_creation_bdu.Map.add (agent_type, rule_id, cv_id) bdu_new store_result
+      Map_creation_bdu.Map.add
+        (agent_type, rule_id, cv_id) bdu_new store_result
     in
     error, handler, result_map
   in
@@ -330,6 +333,7 @@ let collect_bdu_creation_restriction_map parameter handler error rule_id rule st
     ) store_remanent_triple (handler, store_result)
 
 (*projection with rule_id*)
+(*FIXME: return handler*)
 
 let collect_proj_bdu_creation_restriction_map parameter handler error
     store_bdu_creation_restriction_map =
@@ -361,7 +365,8 @@ let collect_bdu_init_restriction_map parameter handler error compil store_remane
     (* the index is useless here, agents with the same type should be
        smashed thanks to the union *)
     let error, old_bdu =
-      match Map_creation_bdu.Map.find_option (agent_type, index, cv_id) store
+      match Map_creation_bdu.Map.find_option
+        (agent_type, index, cv_id) store
       with
       | None -> error, bdu_false
       | Some bdu -> error, bdu
@@ -370,7 +375,8 @@ let collect_bdu_init_restriction_map parameter handler error compil store_remane
       Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error old_bdu bdu
     in (* In the case when the agent is created twice, we take the union *)
     let store =
-      Map_creation_bdu.Map.add (agent_type, index, cv_id) bdu_new store
+      Map_creation_bdu.Map.add
+        (agent_type, index, cv_id) bdu_new store
     in
     error, handler, store
   in

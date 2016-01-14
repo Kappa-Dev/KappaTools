@@ -42,14 +42,16 @@ let trace = false
 let compute_contact_map parameter error rule store_result =
   let add_link set1 set2 store_result =
     let error, old =
-      match Int2Map_CM_Syntactic.Map.find_option set1 store_result with
-      | None -> error, Set_triple.Set.empty
-      | Some s -> error, s
+      match Int2Map_CM_Syntactic.Map.find_option_without_logs
+        parameter error set1 store_result 
+      with
+      | error, None -> error, Set_triple.Set.empty
+      | error, Some s -> error, s
     in
     (*let union_set = Set_triple.Set.union set2 old in*)
     let error, union_set = Set_triple.Set.union parameter error set2 old in
-    let store_result =
-      Int2Map_CM_Syntactic.Map.add set1 union_set store_result
+    let error, store_result =
+      Int2Map_CM_Syntactic.Map.add_or_overwrite parameter error set1 union_set store_result
     in
     error, store_result
   in
@@ -124,13 +126,15 @@ let compute_contact_map parameter error rule store_result =
 let collect_init_map parameter error compiled store_result =
   let add_link set1 set2 store_result =
     let error, old =
-      match Int2Map_CM_Syntactic.Map.find_option set1 store_result with
-      | None -> error, Set_triple.Set.empty
-      | Some s -> error, s
+      match 
+        Int2Map_CM_Syntactic.Map.find_option_without_logs parameter error set1 store_result
+      with
+      | error, None -> error, Set_triple.Set.empty
+      | error, Some s -> error, s
     in
     let error, union_set = Set_triple.Set.union parameter error set2 old in
-    let store_result =
-      Int2Map_CM_Syntactic.Map.add set1 union_set store_result
+    let error, store_result =
+      Int2Map_CM_Syntactic.Map.add_or_overwrite parameter error set1 union_set store_result
     in
     error, store_result
   in
@@ -219,13 +223,17 @@ let collect_init_map parameter error compiled store_result =
 let compute_syn_contact_map_full parameter error rule compiled store_result =
   let add_link triple_set1 triple_set2 store_result =
     let error, old_set =
-      match Int2Map_CM_Syntactic.Map.find_option triple_set1 store_result with
-      | None -> error, Set_triple.Set.empty
-      | Some s -> error, s
+      match 
+        Int2Map_CM_Syntactic.Map.find_option_without_logs parameter error
+          triple_set1 store_result 
+      with
+      | error, None -> error, Set_triple.Set.empty
+      | error, Some s -> error, s
     in
     let error, union_set = Set_triple.Set.union parameter error triple_set2 old_set in
-    let result =
-      Int2Map_CM_Syntactic.Map.add triple_set1 union_set store_result
+    let error, result =
+      Int2Map_CM_Syntactic.Map.add_or_overwrite
+        parameter error triple_set1 union_set store_result
     in
     error, result
   in
@@ -243,7 +251,34 @@ let compute_syn_contact_map_full parameter error rule compiled store_result =
       compiled
       Int2Map_CM_Syntactic.Map.empty
   in
-  Int2Map_CM_Syntactic.Map.fold2_with_logs
+  Int2Map_CM_Syntactic.Map.fold2
+    parameter error
+    (*exists in 'a t*)
+    (fun parameter error triple_set1 triple_set2 store_result ->
+      let error, store_result =
+        add_link triple_set1 triple_set2 store_result
+      in
+      error, store_result
+    )
+    (*exists in 'b t*)
+    (fun parameter error triple_set1' triple_set2' store_result ->
+      let error, store_result =
+        add_link triple_set1' triple_set2' store_result
+      in
+      error, store_result
+    )
+    (*exists in both*)
+    (fun parameter error triple_set triple_set2 triple_set2' store_result ->
+      let error, union = Set_triple.Set.union parameter error triple_set2 triple_set2' in
+      let error, store_result =
+        add_link triple_set union store_result
+      in
+      error, store_result
+    )
+    syntactic_contact_map
+    init_contact_map
+    store_result
+  (*Int2Map_CM_Syntactic.Map.fold2_with_logs
     (fun parameter error str str_opt exn ->
       let error, _ = warn parameter error str_opt exn Not_found in
       error
@@ -273,7 +308,7 @@ let compute_syn_contact_map_full parameter error rule compiled store_result =
     )
     syntactic_contact_map
     init_contact_map
-    store_result
+    store_result*)
 
 
 (************************************************************************************)

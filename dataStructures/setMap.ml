@@ -452,40 +452,40 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  match left,right with
           | Private.Empty,_ -> add_with_logs warn parameters error value right
           | _,Private.Empty -> add_with_logs warn parameters error value left
-        | Private.Node(leftleft,leftvalue,leftright,leftheight,_),
-          Private.Node(rightleft,rightvalue,rightright,rightheight,_) ->
-           if leftheight > rightheight + 2 then
-             let error, right' =
-	       join_with_logs warn parameters error leftright value right in
-             balance_with_logs warn parameters error leftleft leftvalue right'
-           else if rightheight > leftheight +2 then
-             let error, left' =
-	       join_with_logs warn parameters error left value rightleft in
-             balance_with_logs warn parameters error left' rightvalue rightright
-          else
-            error,node left value right
+          | Private.Node(leftleft,leftvalue,leftright,leftheight,_),
+            Private.Node(rightleft,rightvalue,rightright,rightheight,_) ->
+            if leftheight > rightheight + 2 then
+              let error, right' =
+	        join_with_logs warn parameters error leftright value right in
+              balance_with_logs warn parameters error leftleft leftvalue right'
+            else if rightheight > leftheight +2 then
+              let error, left' =
+	        join_with_logs warn parameters error left value rightleft in
+              balance_with_logs warn parameters error left' rightvalue rightright
+            else
+              error,node left value right
 
 	let concat set1 set2 =
 	  match set1,set2 with
 	  |   Private.Empty,_ -> set2
 	  | _,Private.Empty -> set1
 	  | Private.Node _, Private.Node (left2,value2,right2,_,_) ->
-             let min2,set2' = safe_extract_min_elt left2 value2 right2 in
-             join set1 min2 set2'
+            let min2,set2' = safe_extract_min_elt left2 value2 right2 in
+            join set1 min2 set2'
 
 	let concat_with_logs warn parameters error set1 set2 =
 	  match set1,set2 with
           | Private.Empty,_ -> error,set2
           | _,Private.Empty -> error,set1
           | Private.Node _, Private.Node _ ->
-             let error,left2 =
-	       remove_min_elt_with_logs warn parameters error set2 in
-	     let error,elt_opt =
-	       min_elt_with_logs warn parameters error set2 in
-             match elt_opt with
-	     | None ->
-		let error = warn parameters error "setMap.ml"
-				 (Some "concat_with_logs,line 390") Not_found in
+            let error,left2 =
+	      remove_min_elt_with_logs warn parameters error set2 in
+	    let error,elt_opt =
+	      min_elt_with_logs warn parameters error set2 in
+            match elt_opt with
+	    | None ->
+	      let error = warn parameters error "setMap.ml"
+		(Some "concat_with_logs,line 390") Not_found in
 		error,set1
 	     | Some elt -> join_with_logs warn parameters error set1 elt left2
 

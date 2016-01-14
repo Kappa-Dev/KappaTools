@@ -120,7 +120,6 @@ module Int2Map_Test_Modif =
         end))
 
 module Project2_modif =
-  (*Map_wrapper.Proj*)
   Map_wrapper.Proj (Int2Map_Modif) (Int2Map_Test_Modif)
 
 (************************************************************************************)
@@ -198,12 +197,20 @@ module Set_triple =
         let compare = compare
       end))
 
-module Int2Map_CM_Syntactic =
+module Int2Map_CM_Syntactic' =
   SetMap.Make 
     (struct 
         type t = Set_triple.Set.t
         let compare = compare
       end)
+
+module Int2Map_CM_Syntactic =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = Set_triple.Set.t
+         let compare = compare
+        end))
 
 (************************************************************************************)
 (*type bdu_build_map:
@@ -234,6 +241,34 @@ module Map_agent_type_creation_bdu =
 
 module Project2bdu_creation =
   SetMap.Proj2 (Map_creation_bdu)(Map_final_creation_bdu)(Map_agent_type_creation_bdu)
+
+(*module Map_creation_bdu =
+  Map_wrapper.Make 
+    (SetMap.Make
+       (struct
+         type t = int * int * int
+         let compare = compare
+        end))
+
+module Map_final_creation_bdu =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = int
+         let compare = compare
+        end))
+
+module Map_agent_type_creation_bdu =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = int * int
+         let compare = compare
+        end))
+
+module Project2bdu_creation =
+  Map_wrapper.Proj2
+    (Map_creation_bdu)(Map_final_creation_bdu)(Map_agent_type_creation_bdu)*)
 
 (************************************************************************************)
 (*test*)
@@ -398,12 +433,20 @@ module Project2bdu_potential_list =
 (************************************************************************************)
 (*fixpoint iteration*)
 
-module Map_bdu_update =
+module Map_bdu_update' =
   SetMap.Make (
     struct
       type t = int * int
       let compare = compare
     end)
+
+module Map_bdu_update =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = int * int
+         let compare = compare
+        end))
 
 (*build a pair of site_address map*)
 (*module Map_site_address =

@@ -337,10 +337,11 @@ let is_enable parameter handler error bdu_false
     Map_triple_views.Map.for_all
       (fun (agent_id, agent_type, cv_id)  bdu_test ->
        let error, bdu_X =
-          match Map_bdu_update.Map.find_option (agent_type, cv_id) store_bdu_update_map
+          match Map_bdu_update.Map.find_option_without_logs parameter error
+            (agent_type, cv_id) store_bdu_update_map
           with
-          | None -> error, bdu_false
-          | Some bdu -> error, bdu
+          | error, None -> error, bdu_false
+          | error, Some bdu -> error, bdu
         in
         (*do the intersection of bdu_test and bdu_X*)
         let error, handler, bdu_inter =
@@ -411,10 +412,11 @@ let compute_views_enabled parameter handler error
      pairs *)
   let add_link handler error correspondence (agent_type, cv_id) bdu_update store_result =
     let error, bdu_old =
-      match Map_bdu_update.Map.find_option (agent_type, cv_id) store_result
+      match Map_bdu_update.Map.find_option_without_logs parameter error
+        (agent_type, cv_id) store_result
       with
-      | None -> error, bdu_false
-      | Some old -> error, old
+      | error, None -> error, bdu_false
+      | error, Some old -> error, old
     in
     let error, handler, bdu_union =
       Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_update bdu_old
@@ -428,8 +430,9 @@ let compute_views_enabled parameter handler error
         dump_view_diff parameter handler_kappa 
           handler error correspondence agent_type cv_id bdu_old bdu_union 
       in
-      let store_result =
-        Map_bdu_update.Map.add (agent_type, cv_id) bdu_union store_result
+      let error, store_result =
+        Map_bdu_update.Map.add_or_overwrite parameter error
+          (agent_type, cv_id) bdu_union store_result
       in
       error, handler, true, store_result
   in
@@ -488,9 +491,11 @@ let compute_views_enabled parameter handler error
         in 
         (*-----------------------------------------------------------------------*)
         let error, bdu_X =
-          match Map_bdu_update.Map.find_option (agent_type, cv_id) store_result with
-          | None -> error, bdu_false
-          | Some bdu -> error, bdu
+          match Map_bdu_update.Map.find_option_without_logs parameter error
+            (agent_type, cv_id) store_result 
+          with
+          | error, None -> error, bdu_false
+          | error, Some bdu -> error, bdu
         in
         let error, bdu_test =
           match Map_triple_views.Map.find_option (agent_id, agent_type, cv_id) bdu_test_map
@@ -599,10 +604,11 @@ let compute_views_enabled parameter handler error
     Map_agent_type_creation_bdu.Map.fold
       (fun (agent_type, cv_id) bdu_creation (error, (handler, wl_tl, store_result)) ->
        let error, bdu_X =
-	  match Map_bdu_update.Map.find_option (agent_type, cv_id) store_result
+	  match Map_bdu_update.Map.find_option_without_logs parameter error
+            (agent_type, cv_id) store_result
 	  with
-	  | None -> error, bdu_false
-	  | Some bdu -> error, bdu
+	  | error, None -> error, bdu_false
+	  | error, Some bdu -> error, bdu
 	in
         let error, handler, bdu_update =
           compute_bdu_update_creation
@@ -642,10 +648,11 @@ let compute_views_enabled parameter handler error
       (* JF: to do use a fold2 *)
       (fun (agent_type, cv_id) bdu_test (error, (handler, wl_tl, store_result)) ->
         let error, bdu_X =
-	  match Map_bdu_update.Map.find_option (agent_type, cv_id) store_result
+	  match Map_bdu_update.Map.find_option_without_logs parameter error
+            (agent_type, cv_id) store_result
 	  with
-	  | None -> error, bdu_false
-	  | Some bdu -> error, bdu
+	  | error, None -> error, bdu_false
+	  | error, Some bdu -> error, bdu
 	in
         let error, list = 
           match
@@ -718,8 +725,15 @@ let collect_bdu_fixpoint_with_init parameter handler error
     =
   (*-----------------------------------------------------------------------*)
   let add_link parameter handler error correspondence (agent_type, cv_id) bdu store_result =
-    let bdu_old =
+    (*let bdu_old =
       Map_bdu_update.Map.find_default bdu_false (agent_type, cv_id) store_result
+    in*)
+    let error, bdu_old =
+      match Map_bdu_update.Map.find_option_without_logs parameter error
+        (agent_type, cv_id) store_result
+      with
+      | error, None -> error, bdu_false
+      | error, Some bdu -> error, bdu
     in
     let error, handler, bdu_union =
       Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_old bdu
@@ -728,8 +742,9 @@ let collect_bdu_fixpoint_with_init parameter handler error
       dump_view_diff parameter handler_kappa handler error
         correspondence agent_type cv_id bdu_old bdu_union
     in
-    let result_map =
-      Map_bdu_update.Map.add (agent_type, cv_id) bdu_union store_result
+    let error, result_map =
+      Map_bdu_update.Map.add_or_overwrite parameter error
+        (agent_type, cv_id) bdu_union store_result
     in
     error, result_map
   in
@@ -751,7 +766,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
   (*-----------------------------------------------------------------------*)
   (*add update(c) into working list*)
   let error, wl_init_creation = 
-    Map_bdu_update.Map.fold 
+    Map_bdu_update.Map.fold
       (fun (agent_type, cv_id) _ (error, wl_init_creation) -> 
 	add_update_to_wl 
           parameter

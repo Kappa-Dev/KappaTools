@@ -124,27 +124,30 @@ let build_address k agent site =
     agent_type  = agent
   }
   
-module Address_map_and_set = Map_wrapper.Make( SetMap.Make
-  (struct
-    type t = site_address
-    let compare = compare
-   end))
-module KaSim_Site_map_and_set = Map_wrapper.Make( SetMap.Make
-					       (struct 
-						   type t = (string, string) Ckappa_sig.site_type
-						   let compare = compare
-						 end))
-						  
+module Address_map_and_set = 
+  Map_wrapper.Make (SetMap.Make
+                      (struct
+                        type t = site_address
+                        let compare = compare
+                       end))
+
+module KaSim_Site_map_and_set = 
+  Map_wrapper.Make( SetMap.Make
+		      (struct 
+			type t = (string, string) Ckappa_sig.site_type
+			let compare = compare
+		       end))
+    
 type agent = 
-   | Ghost
-   | Agent of state_index interval interface proper_agent 
-   | Dead_agent of state_index interval interface proper_agent * KaSim_Site_map_and_set.Set.t * ((string, unit) Ckappa_sig.site_type) Site_map_and_set.Map.t  * Ckappa_sig.link Site_map_and_set.Map.t
-				 (* agent with a site or state that never occur in the rhs or an initial state, 
-                                    set of the undefined sites, map of sites with undefined internal states, map of sites with undefined binding states*)																   
-   | Unknown_agent of (string*int) (* agent with a type that never occur in rhs or initial states *)
-       
+| Ghost
+| Agent of state_index interval interface proper_agent 
+| Dead_agent of state_index interval interface proper_agent * KaSim_Site_map_and_set.Set.t * ((string, unit) Ckappa_sig.site_type) Site_map_and_set.Map.t  * Ckappa_sig.link Site_map_and_set.Map.t
+   (* agent with a site or state that never occur in the rhs or an initial state, 
+      set of the undefined sites, map of sites with undefined internal states, map of sites with undefined binding states*)																   
+| Unknown_agent of (string*int) (* agent with a type that never occur in rhs or initial states *)
+    
 type agent_sig = state_index list interface proper_agent 
- 
+  
 type views = agent Int_storage.Quick_Nearly_inf_Imperatif.t 
 
 type diff_views =
