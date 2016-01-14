@@ -52,12 +52,14 @@ let dump_view_diff parameter handler_kappa handler_bdu error
     let parameters_cv =
       Remanent_parameters.update_prefix parameter ""
     in
+    (*-----------------------------------------------------------------------*)
     let error, agent_string =
       try 
         Handler.string_of_agent parameter error handler_kappa agent_type
       with
         _ -> warn parameter error (Some "line 56") Exit (string_of_int agent_type)
     in
+    (*-----------------------------------------------------------------------*)
     let error, site_correspondence =
       AgentMap.get parameter error agent_type site_correspondence 
     in
@@ -79,10 +81,13 @@ let dump_view_diff parameter handler_kappa handler_bdu error
 	| _ :: tail -> aux tail
       in aux site_correspondence
     in
+    (*-----------------------------------------------------------------------*)
     let error, (map1, map2) =
       Bdu_build.new_index_pair_map parameter error site_correspondence 
     in
+    (*-----------------------------------------------------------------------*)
     let () = Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n" in
+    (*-----------------------------------------------------------------------*)
     let error, handler_bdu =
       if trace
         || Remanent_parameters.get_trace parameter
@@ -104,6 +109,7 @@ let dump_view_diff parameter handler_kappa handler_bdu error
     let error, handler_bdu, list = 
       Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu parameter handler_bdu error bdu_diff
     in
+    (*-----------------------------------------------------------------------*)
     let error =
       List.fold_left
 	(fun error l ->
@@ -112,12 +118,11 @@ let dump_view_diff parameter handler_kappa handler_bdu error
 	     (fun (error, bool) (site_type, state) ->
 	       let error, site_type = Map.find_option parameter error site_type map2 in
 	       let error, site_type =
-		 match
-		   site_type
-		 with
+		 match site_type with
 		 | None -> warn parameter error (Some "line 100") Exit (-1)
 		 | Some i -> error, i
 	       in
+               (*-----------------------------------------------------------------------*)
 	       let error, site_string =
 		 try 
                    Handler.string_of_site parameter error handler_kappa
@@ -133,6 +138,7 @@ let dump_view_diff parameter handler_kappa handler_bdu error
 		 with
 		   _ -> warn parameter error (Some "line 146") Exit (string_of_int state)
                in
+               (*-----------------------------------------------------------------------*)
                let () =
 		 if bool 
                  then Printf.fprintf (Remanent_parameters.get_log parameter) ","
@@ -147,6 +153,7 @@ let dump_view_diff parameter handler_kappa handler_bdu error
              )
 	     (error, false) l
 	 in
+         (*-----------------------------------------------------------------------*)
 	 let () = 
 	   if bool 
            then Printf.fprintf (Remanent_parameters.get_log parameter) ")\n"
