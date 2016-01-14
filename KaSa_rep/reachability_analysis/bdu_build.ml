@@ -570,17 +570,18 @@ let collect_proj_modif_list_restriction_map parameter handler error
 
 let store_bdu_potential_restriction_map_aux parameter handler error store_remanent_triple 
     store_potential_side_effects store_result =
-  let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in
+  let error, handler, bdu_false = Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error in
   let add_link handler (agent_type, rule_id, cv_id) bdu store_result =
     let error, old_bdu =
       match
         Map_potential_bdu.Map.find_option (agent_type, rule_id, cv_id) store_result 
       with
-      | None -> error, bdu_true (*default value if there is no test in the rule*)
+      | None -> error, bdu_false (* potential partners are initially empty *) 
       | Some bdu -> error, bdu
     in
+    let error, handler, bdu_union = Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error old_bdu bdu in (* we join the potential partners for each agent *)
     let result_map =
-      Map_potential_bdu.Map.add (agent_type, rule_id, cv_id) bdu store_result
+      Map_potential_bdu.Map.add (agent_type, rule_id, cv_id) bdu_union store_result
     in
     error, handler, result_map
   in
@@ -589,27 +590,34 @@ let store_bdu_potential_restriction_map_aux parameter handler error store_remane
       (*map of potential partner side_effect with site is bond*)
       Int2Map_potential_effect.Map.fold
         (fun (agent_type, rule_id) pair_list (error, (handler, store_result)) ->
-          if agent_type' = agent_type
+	 if agent_type' = agent_type
           then
             let error, get_pair_list =
               List.fold_left (fun (error, current_list) (cv_id, list, set) ->
-                let error, (map_new_index_forward, _) =
+			      let error, (map_new_index_forward, _) =
                   new_index_pair_map parameter error list
                 in
 		(*-----------------------------------------------------------------*)
                 let error', map_res =
                   Site_map_and_set.Set.fold
                     (fun _ (error, store_result) ->
-                      let error, store_result =
+		     let error, store_result =
                         List.fold_left (fun (error, store_result) (site, state) ->
-                          let error, site' =
-                            Site_map_and_set.Map.find_default parameter error
-                              0 site map_new_index_forward
-                          in
-                          let error, map_res =
-                            Site_map_and_set.Map.add parameter error
+					let error, site' =
+					  Site_map_and_set.Map.find_default_without_logs parameter error
+											 0 site map_new_index_forward
+					in
+			  let error, old =
+			    Site_map_and_set.Map.find_default_without_logs
+			      parameter error
+			      []
+			      site'
+			      store_result
+			  in
+			  let error, map_res =
+                            Site_map_and_set.Map.add_or_overwrite parameter error
                               site'
-                              state
+                              (state::old)
                               store_result
                           in
                           error, map_res
@@ -632,7 +640,9 @@ let store_bdu_potential_restriction_map_aux parameter handler error store_remane
 		    let error, pair_list' =
                       Site_map_and_set.Map.fold
 			(fun site' state (error, current_list) ->
-			  let pair = (site', state) :: current_list in
+			 let pair =
+			   List.fold_left (fun current_list state -> (site', state) :: current_list) current_list state
+			 in
 			  error, pair
 			) map_res (error, [])
                     in
@@ -661,7 +671,7 @@ let store_bdu_potential_restriction_map_aux parameter handler error store_remane
 let store_bdu_potential_effect_restriction_map parameter handler error store_remanent_triple 
     store_potential_side_effects store_result =
   let _, store_potential_bind = store_potential_side_effects in
-  let error, (handler, store_result) =
+  let error', (handler, store_result) =
     store_bdu_potential_restriction_map_aux
       parameter
       handler
@@ -670,6 +680,8 @@ let store_bdu_potential_effect_restriction_map parameter handler error store_rem
       store_potential_bind
       store_result
   in
+  let error =
+                  Exception.check warn parameter error error' (Some "line 675") Exit in
   error, (handler, store_result)
 
 (************************************************************************************)
@@ -706,7 +718,7 @@ let collect_potential_list_restriction_map_aux parameter handler error store_rem
       | Some l -> error, l
     in
     let result_map =
-      Map_potential_list.Map.add (agent_type, rule_id, cv_id) pair_list store_result
+      Map_potential_list.Map.add (agent_type, rule_id, cv_id) (pair_list@old) store_result
     in
     error, result_map
   in
@@ -727,13 +739,20 @@ let collect_potential_list_restriction_map_aux parameter handler error store_rem
                       let error, store_result =
                         List.fold_left (fun (error, store_result) (site, state) ->
                           let error, site' =
-                            Site_map_and_set.Map.find_default parameter error
+                            Site_map_and_set.Map.find_default_without_logs parameter error
                               0 site map_new_index_forward
                           in
-                          let error, map_res =
-                            Site_map_and_set.Map.add parameter error
+			  let error, old =
+			    Site_map_and_set.Map.find_default_without_logs
+			      parameter error
+			      []
+			      site'
+			      store_result
+			  in
+			  let error, map_res =
+                            Site_map_and_set.Map.add_or_overwrite parameter error
                               site'
-                              state
+                              (state::old)
                               store_result
                           in
                           error, map_res
@@ -756,8 +775,10 @@ let collect_potential_list_restriction_map_aux parameter handler error store_rem
                     let error, pair_list' =
                       Site_map_and_set.Map.fold
 			(fun site' state (error, current_list) ->
-			  let pair = (site', state) :: current_list in
-			  error, pair
+			 let pair =
+			   List.fold_left (fun current_list state -> (site', state) :: current_list) current_list state
+			 in
+			 error, pair
 			) map_res (error, [])
                     in
 		    (*-----------------------------------------------------------------*)

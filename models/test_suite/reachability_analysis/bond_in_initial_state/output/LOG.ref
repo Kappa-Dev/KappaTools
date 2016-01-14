@@ -14,15 +14,12 @@ B(11,20)
 
 B(10,20)
 
-B(11,21)
-
-B(10,21)
-
 Reachability analysis result ....
 
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------
+rule 2 is dead.
 
 Reachability analysis result ....
 
@@ -34,7 +31,6 @@ A(11)
 agent_type:0:A:cv_id:1
 A(10)
 agent_type:1:B:cv_id:0
-B(21)
 B(20)
 B(11)
 B(10)
@@ -47,7 +43,6 @@ A(11)
 agent_type:0:A:cv_id:1
 A(10)
 agent_type:1:B:cv_id:0
-B(21)
 B(20)
 B(11)
 B(10)

@@ -55,7 +55,7 @@ let half_break_action parameter error handler rule_id half_break store_result =
       | error, Some (l, l') -> error, (l, l')
     in
     let error, result =
-      Int2Map_HalfBreak_effect.Map.add parameter error (a, b) (l, (r, state) :: old)
+      Int2Map_HalfBreak_effect.Map.add_or_overwrite parameter error (a, b) (l, (r, state) :: old)
         store_result
     in
     error, result
@@ -121,7 +121,7 @@ let remove_action parameter error rule_id remove store_result =
       | error, Some (l, l') -> error, (l, l')
     in
     let error, result =
-      Int2Map_Remove_effect.Map.add parameter error (a, b) (l, r :: old) store_result
+      Int2Map_Remove_effect.Map.add_or_overwrite parameter error (a, b) (l, r :: old) store_result
     in
     error, result
   in
@@ -170,7 +170,7 @@ let store_potential_half_break parameter error handler rule_id half_break store_
       | error, Some l -> error, l
     in
     let error, result =
-      Int2Map_potential_effect.Map.add parameter error
+      Int2Map_potential_effect.Map.add_or_overwrite parameter error
         (agent_type, rule_id) ((site, state) :: old) store_result
     in
     error, result
@@ -242,7 +242,7 @@ let store_potential_remove parameter error handler rule_id remove store_result =
       | error, Some l -> error, l
     in
     let error, result =
-      Int2Map_potential_effect.Map.add parameter error (agent_type, rule_id)
+      Int2Map_potential_effect.Map.add_or_overwrite parameter error (agent_type, rule_id)
         ((site, state) :: old) store_result
     in
     error, result
