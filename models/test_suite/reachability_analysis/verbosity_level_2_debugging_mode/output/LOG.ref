@@ -651,7 +651,7 @@ EXTENSIONAL DESCRIPTION:
 A(x~q,y~q,z~q)
 
 try applying rule 7: KO:
-	"disabled"
+	"not enabled yet"
 try applying rule 0:
 	"enabled"
 try applying rule 1:

@@ -159,6 +159,8 @@ rule 2: y
 agent_id:0:agent_type:0:A:site_type:1:y~@set of rule_id:
 rule 2: y
 
+try applying rule 0: create:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=7
  Node(site_type:1<0)
@@ -186,6 +188,10 @@ Id=7
 EXTENSIONAL DESCRIPTION:
 A(x~u,y~u)
 
+try applying rule 0: create:
+	"enabled"
+try applying rule 1: x:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=11
  Node(site_type:1<1)
@@ -213,6 +219,8 @@ Id=11
 EXTENSIONAL DESCRIPTION:
 A(x~p,y~u)
 
+try applying rule 2: y:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=16
  Node(site_type:1<1)
@@ -240,6 +248,12 @@ Id=16
 EXTENSIONAL DESCRIPTION:
 A(x~p,y~p)
 
+try applying rule 0: create:
+	"enabled"
+try applying rule 1: x:
+	"enabled"
+try applying rule 2: y:
+	"enabled"
 Reachability analysis result ....
 
 ------------------------------------------------------------

@@ -12,8 +12,69 @@ A(x~u)
 
 B(x!A@x,x~u)
 
+deal with agent_type:0:A:covering_class_id:0:
+add:
+ (rule 0)
+ (rule 1)
+inside a working list.
+deal with agent_type:0:A:covering_class_id:1:
+add:
+ (rule 0)
+inside a working list.
+deal with agent_type:1:B:covering_class_id:0:
+add:
+ (rule 0)
+ (rule 1)
+ (rule 2)
+ (rule 3)
+inside a working list.
+try applying rule 0:
+	"enabled"
+try applying rule 2:
+	"not enabled yet"
+try applying rule 1:
+	"enabled"
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+		nothing has changed.
+		nothing has changed.
+
 B(x!free,x~u)
 
+deal with agent_type:1:B:covering_class_id:0:
+add:
+ (rule 0)
+ (rule 1)
+ (rule 2)
+ (rule 3)
+inside a working list.
+try applying rule 3:
+	"enabled"
+	 at agent_id:0:agent_type:1:B:covering_classes_id:0:
+
+	 at agent_id:0:agent_type:1:B:covering_classes_id:0:
+		nothing has changed.
+		nothing has changed.
+
+	 at agent_id:1:agent_type:1:B:covering_classes_id:0:
+
+	 at agent_id:1:agent_type:1:B:covering_classes_id:0:
+		nothing has changed.
+		nothing has changed.
+
+try applying rule 0:
+	"enabled"
+try applying rule 1:
+	"enabled"
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+		nothing has changed.
+		nothing has changed.
+
+try applying rule 2:
+	"not enabled yet"
 Reachability analysis result ....
 
 ------------------------------------------------------------

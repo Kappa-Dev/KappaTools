@@ -544,6 +544,14 @@ Id=9
 EXTENSIONAL DESCRIPTION:
 B(x~u)
 
+try applying rule 8:
+	"not enabled yet"
+try applying rule 9:
+	"not enabled yet"
+try applying rule 0:
+	"not enabled yet"
+try applying rule 3:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=15
  Node(site_type:1<2)
@@ -571,6 +579,16 @@ Id=15
 EXTENSIONAL DESCRIPTION:
 A(x~p,x!free)
 
+try applying rule 4:
+	"enabled"
+try applying rule 5:
+	"enabled"
+try applying rule 6:
+	"enabled"
+try applying rule 7:
+	"enabled"
+try applying rule 1:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=3
  Node(site_type:1<1)
@@ -588,6 +606,18 @@ Id=3
 EXTENSIONAL DESCRIPTION:
 B(x~p)
 
+try applying rule 2:
+	"enabled"
+try applying rule 0:
+	"not enabled yet"
+try applying rule 3:
+	"enabled"
+try applying rule 8:
+	"not enabled yet"
+try applying rule 9:
+	"not enabled yet"
+try applying rule 1:
+	"enabled"
 Reachability analysis result ....
 
 ------------------------------------------------------------

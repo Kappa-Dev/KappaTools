@@ -697,6 +697,8 @@ Id=17
 EXTENSIONAL DESCRIPTION:
 C(x1~u,x2~u,x1!free,x2!free)
 
+try applying rule 0: a.b:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=21
  Node(site_type:1<1)
@@ -741,6 +743,10 @@ Id=19
 EXTENSIONAL DESCRIPTION:
 B(x!A@x)
 
+try applying rule 1: a.b_op:
+	"enabled"
+try applying rule 2: ab.c:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=47
  Node(site_type:1<1)
@@ -815,6 +821,8 @@ Id=57
 EXTENSIONAL DESCRIPTION:
 C(x1~u,x2~u,x1!A@c,x2!free)
 
+try applying rule 3: mod x1:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=31
  Node(site_type:1<1)
@@ -862,6 +870,8 @@ Id=31
 EXTENSIONAL DESCRIPTION:
 C(x1~p,x2~u,x1!free,x2!free)
 
+try applying rule 4: a.c:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=35
  Node(site_type:1<0)
@@ -936,6 +946,8 @@ Id=43
 EXTENSIONAL DESCRIPTION:
 C(x1~p,x2~u,x1!free,x2!A@c)
 
+try applying rule 5: mod x2:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=84
  Node(site_type:1<1)
@@ -983,6 +995,8 @@ Id=84
 EXTENSIONAL DESCRIPTION:
 C(x1~p,x2~p,x1!free,x2!free)
 
+try applying rule 0: a.b:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=99
  Node(site_type:1<1)
@@ -1010,6 +1024,8 @@ Id=99
 EXTENSIONAL DESCRIPTION:
 A(x!B@x,c!C@x2)
 
+try applying rule 1: a.b_op:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=105
  Node(site_type:1<0)
@@ -1037,6 +1053,18 @@ Id=105
 EXTENSIONAL DESCRIPTION:
 A(x!free,c!C@x1)
 
+try applying rule 2: ab.c:
+	"enabled"
+try applying rule 3: mod x1:
+	"enabled"
+try applying rule 4: a.c:
+	"enabled"
+try applying rule 5: mod x2:
+	"enabled"
+try applying rule 0: a.b:
+	"enabled"
+try applying rule 1: a.b_op:
+	"enabled"
 Reachability analysis result ....
 
 ------------------------------------------------------------

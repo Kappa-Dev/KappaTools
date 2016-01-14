@@ -6,19 +6,194 @@ Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
 
+try applying rule 0:
+	"enabled"
 A(x~u,y~u,z~u)
 
+deal with agent_type:0:A:covering_class_id:0:
+add:
+ (rule 0)
+ (rule 1)
+ (rule 2)
+ (rule 3)
+ (rule 4)
+ (rule 5)
+ (rule 6)
+ (rule 7: KO)
+inside a working list.
+try applying rule 0:
+	"enabled"
+try applying rule 1:
+	"enabled"
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+
 A(x~p,y~u,z~u)
+		discovering a new views.
+
+deal with agent_type:0:A:covering_class_id:0:
+add:
+ (rule 0)
+ (rule 1)
+ (rule 2)
+ (rule 3)
+ (rule 4)
+ (rule 5)
+ (rule 6)
+ (rule 7: KO)
+inside a working list.
+try applying rule 2:
+	"enabled"
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
 
 A(x~p,y~p,z~u)
+		discovering a new views.
+
+deal with agent_type:0:A:covering_class_id:0:
+add:
+ (rule 0)
+ (rule 1)
+ (rule 2)
+ (rule 3)
+ (rule 4)
+ (rule 5)
+ (rule 6)
+ (rule 7: KO)
+inside a working list.
+try applying rule 3:
+	"enabled"
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
 
 A(x~0,y~p,z~q)
+		discovering a new views.
+
+deal with agent_type:0:A:covering_class_id:0:
+add:
+ (rule 0)
+ (rule 1)
+ (rule 2)
+ (rule 3)
+ (rule 4)
+ (rule 5)
+ (rule 6)
+ (rule 7: KO)
+inside a working list.
+try applying rule 4:
+	"enabled"
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
 
 A(x~q,y~u,z~u)
+		discovering a new views.
+
+deal with agent_type:0:A:covering_class_id:0:
+add:
+ (rule 0)
+ (rule 1)
+ (rule 2)
+ (rule 3)
+ (rule 4)
+ (rule 5)
+ (rule 6)
+ (rule 7: KO)
+inside a working list.
+try applying rule 5:
+	"enabled"
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
 
 A(x~q,y~q,z~u)
+		discovering a new views.
+
+deal with agent_type:0:A:covering_class_id:0:
+add:
+ (rule 0)
+ (rule 1)
+ (rule 2)
+ (rule 3)
+ (rule 4)
+ (rule 5)
+ (rule 6)
+ (rule 7: KO)
+inside a working list.
+try applying rule 6:
+	"enabled"
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
 
 A(x~q,y~q,z~q)
+		discovering a new views.
+
+deal with agent_type:0:A:covering_class_id:0:
+add:
+ (rule 0)
+ (rule 1)
+ (rule 2)
+ (rule 3)
+ (rule 4)
+ (rule 5)
+ (rule 6)
+ (rule 7: KO)
+inside a working list.
+try applying rule 7: KO:
+	"not enabled yet"
+try applying rule 0:
+	"enabled"
+try applying rule 1:
+	"enabled"
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+		nothing has changed.
+		nothing has changed.
+
+try applying rule 2:
+	"enabled"
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+		nothing has changed.
+		nothing has changed.
+
+try applying rule 3:
+	"enabled"
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+		nothing has changed.
+		nothing has changed.
+
+try applying rule 4:
+	"enabled"
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+		nothing has changed.
+		nothing has changed.
+
+try applying rule 5:
+	"enabled"
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+		nothing has changed.
+		nothing has changed.
+
+try applying rule 6:
+	"enabled"
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+
+	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+		nothing has changed.
+		nothing has changed.
 
 Reachability analysis result ....
 

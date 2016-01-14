@@ -332,6 +332,8 @@ rule 0
 rule 3
 rule 6
 
+try applying rule 0:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=11
  Node(site_type:1<0)
@@ -369,6 +371,10 @@ Id=11
 EXTENSIONAL DESCRIPTION:
 A(x~u,y~u,z~u)
 
+try applying rule 0:
+	"enabled"
+try applying rule 1:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=31
  Node(site_type:1<1)
@@ -406,6 +412,8 @@ Id=31
 EXTENSIONAL DESCRIPTION:
 A(x~p,y~u,z~u)
 
+try applying rule 2:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=21
  Node(site_type:1<1)
@@ -443,6 +451,8 @@ Id=21
 EXTENSIONAL DESCRIPTION:
 A(x~p,y~p,z~u)
 
+try applying rule 3:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=44
  Node(site_type:1<2)
@@ -480,6 +490,8 @@ Id=44
 EXTENSIONAL DESCRIPTION:
 A(x~0,y~p,z~q)
 
+try applying rule 4:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=49
  Node(site_type:1<3)
@@ -517,6 +529,8 @@ Id=49
 EXTENSIONAL DESCRIPTION:
 A(x~q,y~u,z~u)
 
+try applying rule 5:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=55
  Node(site_type:1<3)
@@ -554,6 +568,8 @@ Id=55
 EXTENSIONAL DESCRIPTION:
 A(x~q,y~q,z~u)
 
+try applying rule 6:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=66
  Node(site_type:1<3)
@@ -591,6 +607,20 @@ Id=66
 EXTENSIONAL DESCRIPTION:
 A(x~q,y~q,z~q)
 
+try applying rule 0:
+	"enabled"
+try applying rule 1:
+	"enabled"
+try applying rule 2:
+	"enabled"
+try applying rule 3:
+	"enabled"
+try applying rule 4:
+	"enabled"
+try applying rule 5:
+	"enabled"
+try applying rule 6:
+	"enabled"
 Reachability analysis result ....
 
 ------------------------------------------------------------

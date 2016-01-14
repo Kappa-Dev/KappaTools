@@ -274,6 +274,8 @@ rule 4
 agent_id:1:agent_type:1:D:site_type:0:x~@set of rule_id:
 rule 3
 
+try applying rule 0:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=7
  Node(site_type:1<0)
@@ -301,6 +303,12 @@ Id=7
 EXTENSIONAL DESCRIPTION:
 A(x~u,y~u)
 
+try applying rule 3:
+	"not enabled yet"
+try applying rule 0:
+	"enabled"
+try applying rule 1:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=11
  Node(site_type:1<1)
@@ -328,6 +336,8 @@ Id=11
 EXTENSIONAL DESCRIPTION:
 A(x~p,y~u)
 
+try applying rule 2:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=16
  Node(site_type:1<0)
@@ -355,6 +365,12 @@ Id=16
 EXTENSIONAL DESCRIPTION:
 A(x~u,y~p)
 
+try applying rule 0:
+	"enabled"
+try applying rule 1:
+	"enabled"
+try applying rule 3:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=3
  Node(site_type:1<0)
@@ -372,6 +388,12 @@ Id=3
 EXTENSIONAL DESCRIPTION:
 D(x~u)
 
+try applying rule 2:
+	"enabled"
+try applying rule 3:
+	"enabled"
+try applying rule 4:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=9
  Node(site_type:1<1)
@@ -389,6 +411,10 @@ Id=9
 EXTENSIONAL DESCRIPTION:
 D(x~p)
 
+try applying rule 3:
+	"enabled"
+try applying rule 4:
+	"enabled"
 Reachability analysis result ....
 
 ------------------------------------------------------------

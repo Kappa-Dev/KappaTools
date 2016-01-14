@@ -208,6 +208,8 @@ rule 1: remove
 agent_id:3:agent_type:0:A:site_type:0:x!@set of rule_id:
 rule 1: remove
 
+try applying rule 1: remove:
+	"not enabled yet"
 Reachability analysis result ....
 
 ------------------------------------------------------------

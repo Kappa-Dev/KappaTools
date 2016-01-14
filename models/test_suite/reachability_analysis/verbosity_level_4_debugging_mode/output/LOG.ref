@@ -376,8 +376,6 @@ rule 3
 rule 6
 
 try applying rule 0:
-try applying rule 0.
-try applying rule 0.
 	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=11
@@ -428,12 +426,8 @@ add:
  (rule 7: KO)
 inside a working list.
 try applying rule 0:
-try applying rule 0.
-try applying rule 0.
 	"enabled"
 try applying rule 1:
-try applying rule 1.
-try applying rule 1.
 	"enabled"
 	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
 
@@ -489,8 +483,6 @@ add:
  (rule 7: KO)
 inside a working list.
 try applying rule 2:
-try applying rule 2.
-try applying rule 2.
 	"enabled"
 	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
 
@@ -546,8 +538,6 @@ add:
  (rule 7: KO)
 inside a working list.
 try applying rule 3:
-try applying rule 3.
-try applying rule 3.
 	"enabled"
 	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
 
@@ -603,8 +593,6 @@ add:
  (rule 7: KO)
 inside a working list.
 try applying rule 4:
-try applying rule 4.
-try applying rule 4.
 	"enabled"
 	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
 
@@ -660,8 +648,6 @@ add:
  (rule 7: KO)
 inside a working list.
 try applying rule 5:
-try applying rule 5.
-try applying rule 5.
 	"enabled"
 	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
 
@@ -717,8 +703,6 @@ add:
  (rule 7: KO)
 inside a working list.
 try applying rule 6:
-try applying rule 6.
-try applying rule 6.
 	"enabled"
 	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
 
@@ -774,16 +758,10 @@ add:
  (rule 7: KO)
 inside a working list.
 try applying rule 7: KO:
-try applying rule 7: KO.
-try applying rule 7: KO.
-	"disabled"
+	"not enabled yet"
 try applying rule 0:
-try applying rule 0.
-try applying rule 0.
 	"enabled"
 try applying rule 1:
-try applying rule 1.
-try applying rule 1.
 	"enabled"
 	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
 
@@ -792,8 +770,6 @@ try applying rule 1.
 		nothing has changed.
 
 try applying rule 2:
-try applying rule 2.
-try applying rule 2.
 	"enabled"
 	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
 
@@ -802,8 +778,6 @@ try applying rule 2.
 		nothing has changed.
 
 try applying rule 3:
-try applying rule 3.
-try applying rule 3.
 	"enabled"
 	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
 
@@ -812,8 +786,6 @@ try applying rule 3.
 		nothing has changed.
 
 try applying rule 4:
-try applying rule 4.
-try applying rule 4.
 	"enabled"
 	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
 
@@ -822,8 +794,6 @@ try applying rule 4.
 		nothing has changed.
 
 try applying rule 5:
-try applying rule 5.
-try applying rule 5.
 	"enabled"
 	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
 
@@ -832,8 +802,6 @@ try applying rule 5.
 		nothing has changed.
 
 try applying rule 6:
-try applying rule 6.
-try applying rule 6.
 	"enabled"
 	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
 

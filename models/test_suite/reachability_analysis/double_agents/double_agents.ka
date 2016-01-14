@@ -1,5 +1,9 @@
-'r0' -> A(x~u,y~u),A(x~p,y~p)
-'r1' -> B(x~u,y~u),B(x~p,y~p)
+%agent: A(x~u~p,y~p~u)
+%agent: B(x~p~q~u,y~u~p~q)
+%agent: C(x)
+
+'r0' -> A(y~u),A(x~p)
+'r1' -> B(x~u),B(y~p)
 'r2' B(x~u,y~u) -> B(x~q,y~q)
 'r3' A(x),B(x) -> A(x!1),B(x!1)
 'r4' A(x!_),A() -> A(x) 

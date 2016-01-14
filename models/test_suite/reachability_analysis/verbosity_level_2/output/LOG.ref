@@ -6,6 +6,38 @@ Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
 
+try applying rule 0:
+	"enabled"
+try applying rule 0:
+	"enabled"
+try applying rule 1:
+	"enabled"
+try applying rule 2:
+	"enabled"
+try applying rule 3:
+	"enabled"
+try applying rule 4:
+	"enabled"
+try applying rule 5:
+	"enabled"
+try applying rule 6:
+	"enabled"
+try applying rule 7: KO:
+	"not enabled yet"
+try applying rule 0:
+	"enabled"
+try applying rule 1:
+	"enabled"
+try applying rule 2:
+	"enabled"
+try applying rule 3:
+	"enabled"
+try applying rule 4:
+	"enabled"
+try applying rule 5:
+	"enabled"
+try applying rule 6:
+	"enabled"
 Reachability analysis result ....
 
 ------------------------------------------------------------

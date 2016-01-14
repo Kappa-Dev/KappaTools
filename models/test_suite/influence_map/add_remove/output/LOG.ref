@@ -228,6 +228,8 @@ rule 0
 agent_id:2:agent_type:0:A:site_type:0:x~@set of rule_id:
 rule 0
 
+try applying rule 0:
+	"not enabled yet"
 Reachability analysis result ....
 
 ------------------------------------------------------------

@@ -1036,6 +1036,8 @@ rule 5: r5
 agent_id:2:agent_type:2:C:site_type:3:y!@set of rule_id:
 rule 10: r10
 
+try applying rule 0: r0:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=7
  Node(site_type:1<0)
@@ -1090,6 +1092,8 @@ Id=7
 EXTENSIONAL DESCRIPTION:
 A(x~u,x!free)
 
+try applying rule 1: r1:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=7
  Node(site_type:1<0)
@@ -1144,6 +1148,8 @@ Id=7
 EXTENSIONAL DESCRIPTION:
 B(x~u,x!free)
 
+try applying rule 2: r2:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=7
  Node(site_type:1<0)
@@ -1198,6 +1204,12 @@ Id=7
 EXTENSIONAL DESCRIPTION:
 C(x~u,x!free)
 
+try applying rule 0: r0:
+	"enabled"
+try applying rule 3: r3:
+	"not enabled yet"
+try applying rule 4: r4:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=29
  Node(site_type:1<0)
@@ -1252,6 +1264,16 @@ Id=19
 EXTENSIONAL DESCRIPTION:
 B(x~p,x!A@x)
 
+try applying rule 5: r5:
+	"not enabled yet"
+try applying rule 6: r6:
+	"not enabled yet"
+try applying rule 7: r7:
+	"not enabled yet"
+try applying rule 8: r8:
+	"not enabled yet"
+try applying rule 9: r9:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=29
  Node(site_type:1<0)
@@ -1306,6 +1328,20 @@ Id=19
 EXTENSIONAL DESCRIPTION:
 B(y~p,y!A@y)
 
+try applying rule 10: r10:
+	"not enabled yet"
+try applying rule 11: r11:
+	"not enabled yet"
+try applying rule 12: r12:
+	"not enabled yet"
+try applying rule 1: r1:
+	"enabled"
+try applying rule 2: r2:
+	"enabled"
+try applying rule 0: r0:
+	"enabled"
+try applying rule 3: r3:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=40
  Node(site_type:0<0)
@@ -1380,6 +1416,10 @@ Id=40
 EXTENSIONAL DESCRIPTION:
 B(-10,x~p,x!free)
 
+try applying rule 4: r4:
+	"enabled"
+try applying rule 5: r5:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=23
  Node(site_type:1<0)
@@ -1434,6 +1474,8 @@ Id=19
 EXTENSIONAL DESCRIPTION:
 C(x~p,x!A@x)
 
+try applying rule 6: r6:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=50
  Node(site_type:1<1)
@@ -1461,6 +1503,8 @@ Id=50
 EXTENSIONAL DESCRIPTION:
 A(x~p,x!C@x)
 
+try applying rule 7: r7:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=40
  Node(site_type:0<0)
@@ -1498,6 +1542,16 @@ Id=40
 EXTENSIONAL DESCRIPTION:
 A(-10,x~p,x!free)
 
+try applying rule 8: r8:
+	"enabled"
+try applying rule 9: r9:
+	"enabled"
+try applying rule 1: r1:
+	"enabled"
+try applying rule 3: r3:
+	"enabled"
+try applying rule 10: r10:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=23
  Node(site_type:1<0)
@@ -1552,6 +1606,10 @@ Id=19
 EXTENSIONAL DESCRIPTION:
 C(y~p,y!A@y)
 
+try applying rule 0: r0:
+	"enabled"
+try applying rule 4: r4:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=38
  Node(site_type:0<0)
@@ -1589,6 +1647,10 @@ Id=38
 EXTENSIONAL DESCRIPTION:
 A(-10,x~p,x!B@x)
 
+try applying rule 5: r5:
+	"enabled"
+try applying rule 11: r11:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=50
  Node(site_type:1<1)
@@ -1616,6 +1678,8 @@ Id=50
 EXTENSIONAL DESCRIPTION:
 A(y~p,y!C@y)
 
+try applying rule 12: r12:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=40
  Node(site_type:0<0)
@@ -1653,6 +1717,18 @@ Id=40
 EXTENSIONAL DESCRIPTION:
 A(-10,y~p,y!free)
 
+try applying rule 2: r2:
+	"enabled"
+try applying rule 6: r6:
+	"enabled"
+try applying rule 7: r7:
+	"enabled"
+try applying rule 3: r3:
+	"enabled"
+try applying rule 8: r8:
+	"enabled"
+try applying rule 9: r9:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=38
  Node(site_type:0<0)
@@ -1690,6 +1766,28 @@ Id=38
 EXTENSIONAL DESCRIPTION:
 A(-10,y~p,y!B@y)
 
+try applying rule 10: r10:
+	"enabled"
+try applying rule 0: r0:
+	"enabled"
+try applying rule 4: r4:
+	"enabled"
+try applying rule 5: r5:
+	"enabled"
+try applying rule 11: r11:
+	"enabled"
+try applying rule 12: r12:
+	"enabled"
+try applying rule 3: r3:
+	"enabled"
+try applying rule 6: r6:
+	"enabled"
+try applying rule 7: r7:
+	"enabled"
+try applying rule 8: r8:
+	"enabled"
+try applying rule 9: r9:
+	"enabled"
 Reachability analysis result ....
 
 ------------------------------------------------------------

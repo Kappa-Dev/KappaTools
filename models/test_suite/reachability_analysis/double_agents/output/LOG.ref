@@ -23,16 +23,16 @@ Signature:states:0:0:
 Signature:states:0:0:state_id:0->u
 Signature:states:0:0:state_id:1->p
 Signature:states:0:1:
-Signature:states:0:1:state_id:0->u
-Signature:states:0:1:state_id:1->p
+Signature:states:0:1:state_id:0->p
+Signature:states:0:1:state_id:1->u
 Signature:states:0:2:
 Signature:states:0:2:state_id:0->free
 Signature:states:0:2:state_id:1->agent_type:1@site_type:2
 Signature:states:1:
 Signature:states:1:0:
-Signature:states:1:0:state_id:0->u
-Signature:states:1:0:state_id:1->p
-Signature:states:1:0:state_id:2->q
+Signature:states:1:0:state_id:0->p
+Signature:states:1:0:state_id:1->q
+Signature:states:1:0:state_id:2->u
 Signature:states:1:1:
 Signature:states:1:1:state_id:0->u
 Signature:states:1:1:state_id:1->p
@@ -70,21 +70,15 @@ Compilation:rules:0:lhs:agent_id_1:
 Compilation:rules:0:lhs:agent_id_1:Ghost
 Compilation:rules:0:rhs:
 Compilation:rules:0:rhs:agent_id_0:
-Compilation:rules:0:rhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
-Compilation:rules:0:rhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
-Compilation:rules:0:rhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
+Compilation:rules:0:rhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
 Compilation:rules:0:rhs:agent_id_1:
 Compilation:rules:0:rhs:agent_id_1:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
-Compilation:rules:0:rhs:agent_id_1:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
 Compilation:rules:0:rhs:agent_id_1:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
 Compilation:rules:0:direct:
 Compilation:rules:0:direct:agent_id_0:
-Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
-Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
-Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
+Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
 Compilation:rules:0:direct:agent_id_1:
 Compilation:rules:0:direct:agent_id_1:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
-Compilation:rules:0:direct:agent_id_1:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
 Compilation:rules:0:direct:agent_id_1:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
 Compilation:rules:0:reverse:
 Compilation:rules:0:actions:creation:(agent_id_0,agent_type_0)
@@ -97,43 +91,37 @@ Compilation:rules:1:lhs:agent_id_1:
 Compilation:rules:1:lhs:agent_id_1:Ghost
 Compilation:rules:1:rhs:
 Compilation:rules:1:rhs:agent_id_0:
-Compilation:rules:1:rhs:agent_id_0:agent_type_1:site_type_0->state:[state_min:0;state_max:0]
-Compilation:rules:1:rhs:agent_id_0:agent_type_1:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:1:rhs:agent_id_0:agent_type_1:site_type_0->state:[state_min:2;state_max:2]
 Compilation:rules:1:rhs:agent_id_0:agent_type_1:site_type_2->state:[state_min:0;state_max:0]
 Compilation:rules:1:rhs:agent_id_1:
-Compilation:rules:1:rhs:agent_id_1:agent_type_1:site_type_0->state:[state_min:1;state_max:1]
 Compilation:rules:1:rhs:agent_id_1:agent_type_1:site_type_1->state:[state_min:1;state_max:1]
-Compilation:rules:1:rhs:agent_id_1:agent_type_1:site_type_2->state:[state_min:0;state_max:0]
 Compilation:rules:1:direct:
 Compilation:rules:1:direct:agent_id_0:
-Compilation:rules:1:direct:agent_id_0:agent_type_1:site_type_0->state:[state_min:0;state_max:0]
-Compilation:rules:1:direct:agent_id_0:agent_type_1:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:1:direct:agent_id_0:agent_type_1:site_type_0->state:[state_min:2;state_max:2]
 Compilation:rules:1:direct:agent_id_0:agent_type_1:site_type_2->state:[state_min:0;state_max:0]
 Compilation:rules:1:direct:agent_id_1:
-Compilation:rules:1:direct:agent_id_1:agent_type_1:site_type_0->state:[state_min:1;state_max:1]
 Compilation:rules:1:direct:agent_id_1:agent_type_1:site_type_1->state:[state_min:1;state_max:1]
-Compilation:rules:1:direct:agent_id_1:agent_type_1:site_type_2->state:[state_min:0;state_max:0]
 Compilation:rules:1:reverse:
 Compilation:rules:1:actions:creation:(agent_id_0,agent_type_1)
 Compilation:rules:1:actions:creation:(agent_id_1,agent_type_1)
 
 Compilation:rules:2:lhs:
 Compilation:rules:2:lhs:agent_id_0:
-Compilation:rules:2:lhs:agent_id_0:agent_type_1:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:2:lhs:agent_id_0:agent_type_1:site_type_0->state:[state_min:2;state_max:2]
 Compilation:rules:2:lhs:agent_id_0:agent_type_1:site_type_1->state:[state_min:0;state_max:0]
 Compilation:rules:2:lhs:agent_id_0:agent_type_1:site_type_2->state:[state_min:0;state_max:0]
 Compilation:rules:2:rhs:
 Compilation:rules:2:rhs:agent_id_0:
-Compilation:rules:2:rhs:agent_id_0:agent_type_1:site_type_0->state:[state_min:2;state_max:2]
+Compilation:rules:2:rhs:agent_id_0:agent_type_1:site_type_0->state:[state_min:1;state_max:1]
 Compilation:rules:2:rhs:agent_id_0:agent_type_1:site_type_1->state:[state_min:2;state_max:2]
 Compilation:rules:2:rhs:agent_id_0:agent_type_1:site_type_2->state:[state_min:0;state_max:0]
 Compilation:rules:2:direct:
 Compilation:rules:2:direct:agent_id_0:
-Compilation:rules:2:direct:agent_id_0:agent_type_1:site_type_0->state:[state_min:2;state_max:2]
+Compilation:rules:2:direct:agent_id_0:agent_type_1:site_type_0->state:[state_min:1;state_max:1]
 Compilation:rules:2:direct:agent_id_0:agent_type_1:site_type_1->state:[state_min:2;state_max:2]
 Compilation:rules:2:reverse:
 Compilation:rules:2:reverse:agent_id_0:
-Compilation:rules:2:reverse:agent_id_0:agent_type_1:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:2:reverse:agent_id_0:agent_type_1:site_type_0->state:[state_min:2;state_max:2]
 Compilation:rules:2:reverse:agent_id_0:agent_type_1:site_type_1->state:[state_min:0;state_max:0]
 
 Compilation:rules:3:lhs:
@@ -265,11 +253,8 @@ Quarks:rule_id:0,agent_type:0
 Quarks:rule_id:0,agent_type:0
 Quarks:REMOVAL
 Quarks:MODIFICATION+
-Quarks:rule_id:0,agent_type:0,site_type:0,state:0
-Quarks:rule_id:0,agent_type:0,site_type:1,state:0
-Quarks:rule_id:0,agent_type:0,site_type:2,state:0
-Quarks:rule_id:0,agent_type:0,site_type:0,state:1
 Quarks:rule_id:0,agent_type:0,site_type:1,state:1
+Quarks:rule_id:0,agent_type:0,site_type:0,state:1
 Quarks:rule_id:0,agent_type:0,site_type:2,state:0
 Quarks:MODIFICATION-
 Quarks:HALF BOND BREAKING
@@ -280,27 +265,24 @@ Quarks:rule_id:1,agent_type:1
 Quarks:rule_id:1,agent_type:1
 Quarks:REMOVAL
 Quarks:MODIFICATION+
-Quarks:rule_id:1,agent_type:1,site_type:0,state:0
-Quarks:rule_id:1,agent_type:1,site_type:1,state:0
+Quarks:rule_id:1,agent_type:1,site_type:0,state:2
 Quarks:rule_id:1,agent_type:1,site_type:2,state:0
-Quarks:rule_id:1,agent_type:1,site_type:0,state:1
 Quarks:rule_id:1,agent_type:1,site_type:1,state:1
-Quarks:rule_id:1,agent_type:1,site_type:2,state:0
 Quarks:MODIFICATION-
 Quarks:HALF BOND BREAKING
 Quarks:Rule 2
 Quarks:TEST
 Quarks:rule_id:2,agent_type:1
-Quarks:rule_id:2,agent_type:1,site_type:0,state:0
+Quarks:rule_id:2,agent_type:1,site_type:0,state:2
 Quarks:rule_id:2,agent_type:1,site_type:1,state:0
 Quarks:rule_id:2,agent_type:1,site_type:2,state:0
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
-Quarks:rule_id:2,agent_type:1,site_type:0,state:2
+Quarks:rule_id:2,agent_type:1,site_type:0,state:1
 Quarks:rule_id:2,agent_type:1,site_type:1,state:2
 Quarks:MODIFICATION-
-Quarks:rule_id:2,agent_type:1,site_type:0,state:0
+Quarks:rule_id:2,agent_type:1,site_type:0,state:2
 Quarks:rule_id:2,agent_type:1,site_type:1,state:0
 Quarks:HALF BOND BREAKING
 Quarks:Rule 3
@@ -396,7 +378,7 @@ Quarks:agent_modif+:agent_type:1,rule:1->[0;1]
 Quarks:agent_modif+:agent_type:2,rule:5->[0]
 Quarks:agent_modif-:agent_type:0,rule:4->[1]
 Quarks:agent_modif-:agent_type:1,rule:7->[0;1;2]
-Quarks:site_test**:agent_type:1,site_type:0,state:0,rule:2->[0]
+Quarks:site_test**:agent_type:1,site_type:0,state:2,rule:2->[0]
 Quarks:site_test**:agent_type:1,site_type:1,state:0,rule:2->[0]
 Quarks:site_test**:agent_type:1,site_type:2,state:0,rule:2->[0]
 Quarks:site_test**:agent_type:1,site_type:2,state:0,rule:3->[1]
@@ -406,28 +388,24 @@ Quarks:site_test**:agent_type:1,site_type:2,state:2,rule:7->[2]
 Quarks:site_test**:agent_type:0,site_type:2,state:0,rule:3->[0]
 Quarks:site_test**:agent_type:0,site_type:2,state:1,rule:4->[0]
 Quarks:site_test**:agent_type:2,site_type:0,state:0,rule:6->[0]
-Quarks:site_modif+:agent_type:0,site_type:0,state:0,rule:0->[0]
+Quarks:site_modif+:agent_type:0,site_type:1,state:1,rule:0->[0]
 Quarks:site_modif+:agent_type:0,site_type:0,state:1,rule:0->[1]
-Quarks:site_modif+:agent_type:0,site_type:1,state:0,rule:0->[0]
-Quarks:site_modif+:agent_type:0,site_type:1,state:1,rule:0->[1]
-Quarks:site_modif+:agent_type:0,site_type:2,state:0,rule:0->[0;1]
+Quarks:site_modif+:agent_type:0,site_type:2,state:0,rule:0->[1]
 Quarks:site_modif+:agent_type:0,site_type:2,state:0,rule:4->[0]
 Quarks:site_modif+:agent_type:0,site_type:2,state:0,rule:7->[1*;0*]
 Quarks:site_modif+:agent_type:0,site_type:2,state:1,rule:3->[0]
-Quarks:site_modif+:agent_type:1,site_type:0,state:0,rule:1->[0]
-Quarks:site_modif+:agent_type:1,site_type:0,state:1,rule:1->[1]
-Quarks:site_modif+:agent_type:1,site_type:0,state:2,rule:2->[0]
-Quarks:site_modif+:agent_type:1,site_type:1,state:0,rule:1->[0]
-Quarks:site_modif+:agent_type:1,site_type:1,state:1,rule:1->[1]
-Quarks:site_modif+:agent_type:1,site_type:1,state:2,rule:2->[0]
-Quarks:site_modif+:agent_type:1,site_type:2,state:0,rule:1->[0;1]
+Quarks:site_modif+:agent_type:1,site_type:0,state:2,rule:1->[0]
+Quarks:site_modif+:agent_type:1,site_type:0,state:1,rule:2->[0]
+Quarks:site_modif+:agent_type:1,site_type:2,state:0,rule:1->[0]
 Quarks:site_modif+:agent_type:1,site_type:2,state:0,rule:4->[1*;0*]
 Quarks:site_modif+:agent_type:1,site_type:2,state:1,rule:3->[1]
 Quarks:site_modif+:agent_type:1,site_type:2,state:2,rule:6->[1]
+Quarks:site_modif+:agent_type:1,site_type:1,state:1,rule:1->[1]
+Quarks:site_modif+:agent_type:1,site_type:1,state:2,rule:2->[0]
 Quarks:site_modif+:agent_type:2,site_type:0,state:0,rule:5->[0]
 Quarks:site_modif+:agent_type:2,site_type:0,state:0,rule:7->[2*]
 Quarks:site_modif+:agent_type:2,site_type:0,state:1,rule:6->[0]
-Quarks:site_modif-:agent_type:1,site_type:0,state:0,rule:2->[0]
+Quarks:site_modif-:agent_type:1,site_type:0,state:2,rule:2->[0]
 Quarks:site_modif-:agent_type:1,site_type:1,state:0,rule:2->[0]
 Quarks:site_modif-:agent_type:1,site_type:2,state:0,rule:3->[1]
 Quarks:site_modif-:agent_type:1,site_type:2,state:0,rule:6->[1]
@@ -440,12 +418,12 @@ Quarks:site_modif-:agent_type:0,site_type:2,state:1,rule:7->[1*;0*]
 Quarks:site_modif-:agent_type:2,site_type:0,state:0,rule:6->[0]
 Quarks:site_modif-:agent_type:2,site_type:0,state:1,rule:7->[2*]
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
-Influence_map:Wake_up_map:rule(0):'r0' ->A(x~u,y~u),A(x~p,y~p) -> rule(3):'r3' A(x),B(x)->A(x!1),B(x!1)[0->0];[1->0]
-Influence_map:Wake_up_map:rule(0):'r0' ->A(x~u,y~u),A(x~p,y~p) -> rule(4):'r4' A(x!_),A()->A(x)[0->1];[1->1]
-Influence_map:Wake_up_map:rule(1):'r1' ->B(x~u,y~u),B(x~p,y~p) -> rule(2):'r2' B(x~u,y~u)->B(x~q,y~q)[0->0]
-Influence_map:Wake_up_map:rule(1):'r1' ->B(x~u,y~u),B(x~p,y~p) -> rule(3):'r3' A(x),B(x)->A(x!1),B(x!1)[0->1];[1->1]
-Influence_map:Wake_up_map:rule(1):'r1' ->B(x~u,y~u),B(x~p,y~p) -> rule(6):'r6' C(x),B(x)->C(x!1),B(x!1)[0->1];[1->1]
-Influence_map:Wake_up_map:rule(1):'r1' ->B(x~u,y~u),B(x~p,y~p) -> rule(7):'r7' B(),B(x!x.A),B(x!x.C)->[0->0];[1->0]
+Influence_map:Wake_up_map:rule(0):'r0' ->A(y~u),A(x~p) -> rule(3):'r3' A(x),B(x)->A(x!1),B(x!1)[0->0];[1->0]
+Influence_map:Wake_up_map:rule(0):'r0' ->A(y~u),A(x~p) -> rule(4):'r4' A(x!_),A()->A(x)[0->0];[0->1];[1->1]
+Influence_map:Wake_up_map:rule(1):'r1' ->B(x~u),B(y~p) -> rule(2):'r2' B(x~u,y~u)->B(x~q,y~q)[0->0]
+Influence_map:Wake_up_map:rule(1):'r1' ->B(x~u),B(y~p) -> rule(3):'r3' A(x),B(x)->A(x!1),B(x!1)[0->1];[1->1]
+Influence_map:Wake_up_map:rule(1):'r1' ->B(x~u),B(y~p) -> rule(6):'r6' C(x),B(x)->C(x!1),B(x!1)[0->1];[1->1]
+Influence_map:Wake_up_map:rule(1):'r1' ->B(x~u),B(y~p) -> rule(7):'r7' B(),B(x!x.A),B(x!x.C)->[0->0];[1->0];[1->1];[1->2]
 Influence_map:Wake_up_map:rule(3):'r3' A(x),B(x)->A(x!1),B(x!1) -> rule(4):'r4' A(x!_),A()->A(x)[0->0]
 Influence_map:Wake_up_map:rule(3):'r3' A(x),B(x)->A(x!1),B(x!1) -> rule(7):'r7' B(),B(x!x.A),B(x!x.C)->[1->1]
 Influence_map:Wake_up_map:rule(4):'r4' A(x!_),A()->A(x) -> rule(2):'r2' B(x~u,y~u)->B(x~q,y~q)[1*->0];[0*->0]
@@ -541,8 +519,6 @@ agent_type:2:C:rule 7: r7@(site, binding state)
 ------------------------------------------------------------
 Set of rules that may modify a given site (excluding created agents):
 ------------------------------------------------------------
-agent_id:0:agent_type:0:A:site_type:0:x~@set of rule_id:
-rule 0: r0
 agent_id:0:agent_type:0:A:site_type:1:y~@set of rule_id:
 rule 0: r0
 agent_id:0:agent_type:0:A:site_type:2:x!@set of rule_id:
@@ -557,12 +533,8 @@ agent_id:0:agent_type:2:C:site_type:0:x!@set of rule_id:
 rule 6: r6
 agent_id:1:agent_type:0:A:site_type:0:x~@set of rule_id:
 rule 0: r0
-agent_id:1:agent_type:0:A:site_type:1:y~@set of rule_id:
-rule 0: r0
 agent_id:1:agent_type:0:A:site_type:2:x!@set of rule_id:
 rule 0: r0
-agent_id:1:agent_type:1:B:site_type:0:x~@set of rule_id:
-rule 1: r1
 agent_id:1:agent_type:1:B:site_type:1:y~@set of rule_id:
 rule 1: r1
 agent_id:1:agent_type:1:B:site_type:2:x!@set of rule_id:
@@ -587,19 +559,15 @@ rule 7: r7
 ------------------------------------------------------------
 Set of rules that may test and modify a given site (excluding created agents):
 ------------------------------------------------------------
-agent_id:0:agent_type:0:A:site_type:0:x~@set of rule_id:
-rule 0: r0
 agent_id:0:agent_type:0:A:site_type:1:y~@set of rule_id:
 rule 0: r0
 agent_id:0:agent_type:0:A:site_type:2:x!@set of rule_id:
-rule 0: r0
 rule 3: r3
 rule 4: r4
 agent_id:0:agent_type:1:B:site_type:0:x~@set of rule_id:
 rule 1: r1
 rule 2: r2
 agent_id:0:agent_type:1:B:site_type:1:y~@set of rule_id:
-rule 1: r1
 rule 2: r2
 agent_id:0:agent_type:1:B:site_type:2:x!@set of rule_id:
 rule 1: r1
@@ -609,22 +577,19 @@ rule 5: r5
 rule 6: r6
 agent_id:1:agent_type:0:A:site_type:0:x~@set of rule_id:
 rule 0: r0
-agent_id:1:agent_type:0:A:site_type:1:y~@set of rule_id:
-rule 0: r0
 agent_id:1:agent_type:0:A:site_type:2:x!@set of rule_id:
 rule 0: r0
-agent_id:1:agent_type:1:B:site_type:0:x~@set of rule_id:
-rule 1: r1
 agent_id:1:agent_type:1:B:site_type:1:y~@set of rule_id:
 rule 1: r1
 agent_id:1:agent_type:1:B:site_type:2:x!@set of rule_id:
-rule 1: r1
 rule 3: r3
 rule 6: r6
 rule 7: r7
 agent_id:2:agent_type:1:B:site_type:2:x!@set of rule_id:
 rule 7: r7
 
+try applying rule 0: r0:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=3
  Node(site_type:1<0)
@@ -657,8 +622,8 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(y~p)
 A(y~u)
+A(y~p)
 
 INTENSIONAL DESCRIPTION:
 Id=6
@@ -678,21 +643,23 @@ EXTENSIONAL DESCRIPTION:
 A(x~p)
 A(x~u)
 
+try applying rule 1: r1:
+	"enabled"
 INTENSIONAL DESCRIPTION:
-Id=22
+Id=24
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=21
+  Id=23
    Node(site_type:1<1)
-    Id=18
-     Node(site_type:2<0)
+    Id=12
+     Node(site_type:2<1)
       Id=1
        Leaf False 
 
-      Id=17
-       Node(site_type:2<1)
+      Id=11
+       Node(site_type:2<2)
         Id=10
          Node(site_type:3<0)
           Id=1
@@ -709,38 +676,45 @@ Id=22
         Id=1
          Leaf False 
 
-    Id=13
+    Id=22
      Node(site_type:1<2)
-      Id=12
-       Node(site_type:2<1)
-        Id=1
-         Leaf False 
-
-        Id=11
-         Node(site_type:2<2)
-          Id=10
-           Node(site_type:3<0)
-            Id=1
-             Leaf False 
-
-            Id=9
-             Node(site_type:3<1)
-              Id=0
-               Leaf True 
-
-              Id=1
-               Leaf False 
-
-          Id=1
-           Leaf False 
-
       Id=1
        Leaf False 
 
-EXTENSIONAL DESCRIPTION:
-B(x~p,y~p,x!free)
-B(x~u,y~u,x!free)
+      Id=21
+       Node(site_type:1<3)
+        Id=20
+         Node(site_type:2<0)
+          Id=1
+           Leaf False 
 
+          Id=19
+           Node(site_type:2<1)
+            Id=10
+             Node(site_type:3<0)
+              Id=1
+               Leaf False 
+
+              Id=9
+               Node(site_type:3<1)
+                Id=0
+                 Leaf True 
+
+                Id=1
+                 Leaf False 
+
+            Id=1
+             Leaf False 
+
+        Id=1
+         Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+B(x~u,y~u,x!free)
+B(x~p,y~p,x!free)
+
+try applying rule 5: r5:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=3
  Node(site_type:1<0)
@@ -758,6 +732,10 @@ Id=3
 EXTENSIONAL DESCRIPTION:
 C(x!free)
 
+try applying rule 0: r0:
+	"enabled"
+try applying rule 3: r3:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=5
  Node(site_type:1<1)
@@ -776,26 +754,26 @@ EXTENSIONAL DESCRIPTION:
 A(x!B@x)
 
 INTENSIONAL DESCRIPTION:
-Id=35
+Id=38
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=34
+  Id=37
    Node(site_type:1<1)
-    Id=30
-     Node(site_type:2<0)
+    Id=32
+     Node(site_type:2<1)
       Id=1
        Leaf False 
 
-      Id=29
-       Node(site_type:2<1)
-        Id=24
+      Id=31
+       Node(site_type:2<2)
+        Id=26
          Node(site_type:3<1)
           Id=1
            Leaf False 
 
-          Id=23
+          Id=25
            Node(site_type:3<2)
             Id=0
              Leaf True 
@@ -806,52 +784,65 @@ Id=35
         Id=1
          Leaf False 
 
-    Id=33
+    Id=36
      Node(site_type:1<2)
-      Id=32
-       Node(site_type:2<1)
-        Id=1
-         Leaf False 
-
-        Id=31
-         Node(site_type:2<2)
-          Id=24
-           Node(site_type:3<1)
-            Id=1
-             Leaf False 
-
-            Id=23
-             Node(site_type:3<2)
-              Id=0
-               Leaf True 
-
-              Id=1
-               Leaf False 
-
-          Id=1
-           Leaf False 
-
       Id=1
        Leaf False 
 
-EXTENSIONAL DESCRIPTION:
-B(x~p,y~p,x!A@x)
-B(x~u,y~u,x!A@x)
+      Id=35
+       Node(site_type:1<3)
+        Id=34
+         Node(site_type:2<0)
+          Id=1
+           Leaf False 
 
+          Id=33
+           Node(site_type:2<1)
+            Id=26
+             Node(site_type:3<1)
+              Id=1
+               Leaf False 
+
+              Id=25
+               Node(site_type:3<2)
+                Id=0
+                 Leaf True 
+
+                Id=1
+                 Leaf False 
+
+            Id=1
+             Leaf False 
+
+        Id=1
+         Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+B(x~u,y~u,x!A@x)
+B(x~p,y~p,x!A@x)
+
+try applying rule 4: r4:
+	"enabled"
+try applying rule 7: r7:
+	"not enabled yet"
+try applying rule 1: r1:
+	"enabled"
+try applying rule 2: r2:
+	"enabled"
 INTENSIONAL DESCRIPTION:
-Id=49
- Node(site_type:1<2)
+Id=53
+ Node(site_type:1<1)
   Id=1
    Leaf False 
 
-  Id=48
-   Node(site_type:1<3)
-    Id=47
+  Id=52
+   Node(site_type:1<2)
+    Id=51
      Node(site_type:2<2)
       Id=1
        Leaf False 
 
-      Id=46
+      Id=50
        Node(site_type:2<3)
         Id=10
          Node(site_type:3<0)
@@ -875,6 +866,8 @@ Id=49
 EXTENSIONAL DESCRIPTION:
 B(x~q,y~q,x!free)
 
+try applying rule 6: r6:
+	"enabled"
 INTENSIONAL DESCRIPTION:
 Id=5
  Node(site_type:1<1)
@@ -893,26 +886,26 @@ EXTENSIONAL DESCRIPTION:
 C(x!B@x)
 
 INTENSIONAL DESCRIPTION:
-Id=65
+Id=69
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=64
+  Id=68
    Node(site_type:1<1)
-    Id=57
-     Node(site_type:2<0)
+    Id=61
+     Node(site_type:2<1)
       Id=1
        Leaf False 
 
-      Id=56
-       Node(site_type:2<1)
-        Id=26
+      Id=60
+       Node(site_type:2<2)
+        Id=28
          Node(site_type:3<2)
           Id=1
            Leaf False 
 
-          Id=25
+          Id=27
            Node(site_type:3<3)
             Id=0
              Leaf True 
@@ -923,21 +916,21 @@ Id=65
         Id=1
          Leaf False 
 
-    Id=63
+    Id=67
      Node(site_type:1<2)
-      Id=59
-       Node(site_type:2<1)
+      Id=63
+       Node(site_type:2<2)
         Id=1
          Leaf False 
 
-        Id=58
-         Node(site_type:2<2)
-          Id=26
+        Id=62
+         Node(site_type:2<3)
+          Id=28
            Node(site_type:3<2)
             Id=1
              Leaf False 
 
-            Id=25
+            Id=27
              Node(site_type:3<3)
               Id=0
                Leaf True 
@@ -948,21 +941,21 @@ Id=65
           Id=1
            Leaf False 
 
-      Id=62
+      Id=66
        Node(site_type:1<3)
-        Id=61
-         Node(site_type:2<2)
+        Id=65
+         Node(site_type:2<0)
           Id=1
            Leaf False 
 
-          Id=60
-           Node(site_type:2<3)
-            Id=26
+          Id=64
+           Node(site_type:2<1)
+            Id=28
              Node(site_type:3<2)
               Id=1
                Leaf False 
 
-              Id=25
+              Id=27
                Node(site_type:3<3)
                 Id=0
                  Leaf True 
@@ -977,31 +970,37 @@ Id=65
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+B(x~u,y~u,x!C@x)
 B(x~q,y~q,x!C@x)
 B(x~p,y~p,x!C@x)
-B(x~u,y~u,x!C@x)
 
+try applying rule 5: r5:
+	"enabled"
+try applying rule 0: r0:
+	"enabled"
+try applying rule 3: r3:
+	"enabled"
 INTENSIONAL DESCRIPTION:
-Id=91
- Node(site_type:1<2)
+Id=94
+ Node(site_type:1<1)
   Id=1
    Leaf False 
 
-  Id=81
-   Node(site_type:1<3)
-    Id=80
+  Id=93
+   Node(site_type:1<2)
+    Id=84
      Node(site_type:2<2)
       Id=1
        Leaf False 
 
-      Id=79
+      Id=83
        Node(site_type:2<3)
-        Id=24
+        Id=26
          Node(site_type:3<1)
           Id=1
            Leaf False 
 
-          Id=23
+          Id=25
            Node(site_type:3<2)
             Id=0
              Leaf True 
@@ -1018,6 +1017,18 @@ Id=91
 EXTENSIONAL DESCRIPTION:
 B(x~q,y~q,x!A@x)
 
+try applying rule 1: r1:
+	"enabled"
+try applying rule 2: r2:
+	"enabled"
+try applying rule 4: r4:
+	"enabled"
+try applying rule 7: r7:
+	"enabled"
+try applying rule 6: r6:
+	"enabled"
+try applying rule 3: r3:
+	"enabled"
 Reachability analysis result ....
 
 ------------------------------------------------------------
@@ -1072,26 +1083,26 @@ Id=6
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=90
+Id=92
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=89
+  Id=91
    Node(site_type:1<1)
-    Id=68
-     Node(site_type:2<0)
+    Id=72
+     Node(site_type:2<1)
       Id=1
        Leaf False 
 
-      Id=67
-       Node(site_type:2<1)
-        Id=66
+      Id=71
+       Node(site_type:2<2)
+        Id=70
          Node(site_type:3<0)
           Id=1
            Leaf False 
 
-          Id=25
+          Id=27
            Node(site_type:3<3)
             Id=0
              Leaf True 
@@ -1102,21 +1113,21 @@ Id=90
         Id=1
          Leaf False 
 
-    Id=88
+    Id=90
      Node(site_type:1<2)
-      Id=70
-       Node(site_type:2<1)
+      Id=89
+       Node(site_type:2<2)
         Id=1
          Leaf False 
 
-        Id=69
-         Node(site_type:2<2)
-          Id=66
+        Id=88
+         Node(site_type:2<3)
+          Id=70
            Node(site_type:3<0)
             Id=1
              Leaf False 
 
-            Id=25
+            Id=27
              Node(site_type:3<3)
               Id=0
                Leaf True 
@@ -1127,21 +1138,21 @@ Id=90
           Id=1
            Leaf False 
 
-      Id=87
+      Id=79
        Node(site_type:1<3)
-        Id=86
-         Node(site_type:2<2)
+        Id=78
+         Node(site_type:2<0)
           Id=1
            Leaf False 
 
-          Id=85
-           Node(site_type:2<3)
-            Id=66
+          Id=77
+           Node(site_type:2<1)
+            Id=70
              Node(site_type:3<0)
               Id=1
                Leaf False 
 
-              Id=25
+              Id=27
                Node(site_type:3<3)
                 Id=0
                  Leaf True 
@@ -1207,8 +1218,8 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(y~p)
 A(y~u)
+A(y~p)
 agent_type:0:A:cv_id:2
 INTENSIONAL DESCRIPTION:
 Id=6
@@ -1229,50 +1240,50 @@ A(x~p)
 A(x~u)
 agent_type:1:B:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=106
+Id=108
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=105
+  Id=107
    Node(site_type:1<1)
-    Id=16
-     Node(site_type:2<0)
+    Id=8
+     Node(site_type:2<1)
       Id=1
        Leaf False 
 
-      Id=15
-       Node(site_type:2<1)
+      Id=7
+       Node(site_type:2<2)
         Id=0
          Leaf True 
 
         Id=1
          Leaf False 
 
-    Id=104
+    Id=106
      Node(site_type:1<2)
-      Id=8
-       Node(site_type:2<1)
+      Id=104
+       Node(site_type:2<2)
         Id=1
          Leaf False 
 
-        Id=7
-         Node(site_type:2<2)
+        Id=100
+         Node(site_type:2<3)
           Id=0
            Leaf True 
 
           Id=1
            Leaf False 
 
-      Id=103
+      Id=105
        Node(site_type:1<3)
-        Id=102
-         Node(site_type:2<2)
+        Id=18
+         Node(site_type:2<0)
           Id=1
            Leaf False 
 
-          Id=98
-           Node(site_type:2<3)
+          Id=17
+           Node(site_type:2<1)
             Id=0
              Leaf True 
 
@@ -1283,16 +1294,16 @@ Id=106
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+B(x~u,y~u)
 B(x~q,y~q)
 B(x~p,y~p)
-B(x~u,y~u)
 INTENSIONAL DESCRIPTION:
-Id=66
+Id=70
  Node(site_type:3<0)
   Id=1
    Leaf False 
 
-  Id=25
+  Id=27
    Node(site_type:3<3)
     Id=0
      Leaf True 
@@ -1360,8 +1371,8 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(y~p)
 A(y~u)
+A(y~p)
 agent_type:0:A:cv_id:2
 INTENSIONAL DESCRIPTION:
 Id=6
@@ -1382,50 +1393,50 @@ A(x~p)
 A(x~u)
 agent_type:1:B:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=106
+Id=108
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=105
+  Id=107
    Node(site_type:1<1)
-    Id=16
-     Node(site_type:2<0)
+    Id=8
+     Node(site_type:2<1)
       Id=1
        Leaf False 
 
-      Id=15
-       Node(site_type:2<1)
+      Id=7
+       Node(site_type:2<2)
         Id=0
          Leaf True 
 
         Id=1
          Leaf False 
 
-    Id=104
+    Id=106
      Node(site_type:1<2)
-      Id=8
-       Node(site_type:2<1)
+      Id=104
+       Node(site_type:2<2)
         Id=1
          Leaf False 
 
-        Id=7
-         Node(site_type:2<2)
+        Id=100
+         Node(site_type:2<3)
           Id=0
            Leaf True 
 
           Id=1
            Leaf False 
 
-      Id=103
+      Id=105
        Node(site_type:1<3)
-        Id=102
-         Node(site_type:2<2)
+        Id=18
+         Node(site_type:2<0)
           Id=1
            Leaf False 
 
-          Id=98
-           Node(site_type:2<3)
+          Id=17
+           Node(site_type:2<1)
             Id=0
              Leaf True 
 
@@ -1436,16 +1447,16 @@ Id=106
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
+B(x~u,y~u)
 B(x~q,y~q)
 B(x~p,y~p)
-B(x~u,y~u)
 INTENSIONAL DESCRIPTION:
-Id=66
+Id=70
  Node(site_type:3<0)
   Id=1
    Leaf False 
 
-  Id=25
+  Id=27
    Node(site_type:3<3)
     Id=0
      Leaf True 

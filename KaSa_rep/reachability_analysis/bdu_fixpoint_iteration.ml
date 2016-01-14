@@ -234,34 +234,30 @@ let add_update_to_wl parameter error handler_kappa compiled agent_type cv_id
     if trace 
       || Remanent_parameters.get_dump_reachability_analysis_wl parameter
     then
-      let parameters_cv =
-        Remanent_parameters.update_prefix parameter ""
-      in
-      if (Remanent_parameters.get_trace parameters_cv)
-      then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
-      dump_channel parameter
-        (fun stderr ->
-          let _ = 
-            let error, agent_string =
-              Handler.string_of_agent parameter error handler_kappa agent_type
-            in
-            Printf.fprintf stderr "deal with agent_type:%i:%s:covering_class_id:%i:\n"
-              agent_type agent_string cv_id;
-            Printf.fprintf stderr "add:\n";
-            Site_map_and_set.Set.iter 
-	    (fun rule_id ->
-              (*mapping rule_id of type int -> string*)
-              let error, rule_id_string =
-                try
-                  Handler.string_of_rule parameter error handler_kappa
-                    compiled rule_id
-                with
-                  _ -> warn parameter error (Some "line 250") Exit (string_of_int rule_id)
-              in
-              Printf.fprintf stderr " (%s)\n" rule_id_string) s1;
-            Printf.fprintf stderr "inside a working list."
-          in
-          ())
+      begin
+	let log = Remanent_parameters.get_log parameter in
+	let () = Printf.fprintf log "\n" in
+	let error, agent_string =
+	  Handler.string_of_agent parameter error handler_kappa agent_type
+	in
+	let () = Printf.fprintf log "deal with agent_type:%i:%s:covering_class_id:%i:\n"
+				       agent_type agent_string cv_id in
+	let () = Printf.fprintf log "add:\n" in
+	let () = Site_map_and_set.Set.iter 
+		   (fun rule_id ->
+		    (*mapping rule_id of type int -> string*)
+		    let error, rule_id_string =
+		      try
+			Handler.string_of_rule parameter error handler_kappa
+					       compiled rule_id
+		      with
+			_ -> warn parameter error (Some "line 250") Exit (string_of_int rule_id)
+		    in
+		    Printf.fprintf log " (%s)\n" rule_id_string) s1;
+		 Printf.fprintf log "inside a working list."
+	in
+	()
+      end
     else ()
   in
   (*-----------------------------------------------------------------------*)
@@ -330,30 +326,33 @@ let collect_bdu_potential_and_list parameter error rule_id
 
 (************************************************************************************)
 (*check is_enable*)
-
+exception False of Exception.method_handler * Mvbdu_wrapper.Mvbdu.handler (* TO DO, do the thing cleanly with a forall in wrapped map module *)
+		     
 let is_enable parameter handler error bdu_false 
     rule_id bdu_proj_views store_bdu_update_map =
-  let is_enable =
-    Map_triple_views.Map.for_all
-      (fun (agent_id, agent_type, cv_id)  bdu_test ->
-       let error, bdu_X =
-          match Map_bdu_update.Map.find_option_without_logs parameter error
-            (agent_type, cv_id) store_bdu_update_map
-          with
-          | error, None -> error, bdu_false
-          | error, Some bdu -> error, bdu
-        in
+    try
+      let error,handler =
+	Map_triple_views.Map.fold
+	(fun (agent_id, agent_type, cv_id)  bdu_test (error,handler)->
+	 let error, bdu_X =
+           match Map_bdu_update.Map.find_option_without_logs parameter error
+							     (agent_type, cv_id) store_bdu_update_map
+           with
+           | error, None -> error, bdu_false
+           | error, Some bdu -> error, bdu
+         in
         (*do the intersection of bdu_test and bdu_X*)
-        let error, handler, bdu_inter =
-          Mvbdu_wrapper.Mvbdu.mvbdu_and parameter handler error bdu_test bdu_X
-        in
-        (*check is enable*)
-        if Mvbdu_wrapper.Mvbdu.equal bdu_inter bdu_false
-        then false
-        else true
-      ) bdu_proj_views
-  in
-  error, is_enable
+         let error, handler, bdu_inter =
+           Mvbdu_wrapper.Mvbdu.mvbdu_and parameter handler error bdu_test bdu_X
+         in
+         (*check is enable*)
+         if Mvbdu_wrapper.Mvbdu.equal bdu_inter bdu_false
+         then raise (False (error,handler))
+         else error,handler
+	) bdu_proj_views (error,handler)
+      in error,handler,true
+    with False (error,handler) -> error,handler,false 
+    
 
 (************************************************************************************)
 (*compute view that has new view and new bond*)
@@ -410,6 +409,7 @@ let compute_views_enabled parameter handler error
   (* add_link should collect the list/set of (agent_type,cv_id) for which
      something has changed, so that add_update_to_wl can focus on these
      pairs *)
+  let log = Remanent_parameters.get_log parameter in
   let add_link handler error correspondence (agent_type, cv_id) bdu_update store_result =
     let error, bdu_old =
       match Map_bdu_update.Map.find_option_without_logs parameter error
@@ -443,52 +443,38 @@ let compute_views_enabled parameter handler error
       (fun (agent_id, agent_type, cv_id) _ (error, (handler, wl_tl, store_result)) ->
         (*-----------------------------------------------------------------------*)
         (*print working list information*)
-        let _ = 
+        let () = 
           if (Remanent_parameters.get_dump_reachability_analysis_wl parameter) 
           then
-            let parameters_cv =
-              Remanent_parameters.update_prefix parameter ""
+            let error, agent_string =
+              try
+                Handler.string_of_agent parameter error handler_kappa agent_type
+              with
+                _ -> warn parameter error (Some "line 446") Exit 
+			  (string_of_int agent_type)
             in
-            if (Remanent_parameters.get_trace parameters_cv)
-            then 
-              let error, agent_string =
-                try
-                  Handler.string_of_agent parameter error handler_kappa agent_type
-                with
-                  _ -> warn parameter error (Some "line 446") Exit 
-                    (string_of_int agent_type)
-              in
-              Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
-              dump_channel parameter 
-                (fun stderr -> Printf.fprintf stderr
-                  "\t at agent_id:%i:agent_type:%i:%s:covering_classes_id:%i:\n"
-                  agent_id agent_type agent_string cv_id)
-          else ()
+            let () = Printf.fprintf log  "\n" in
+            let () = Printf.fprintf log "\t at agent_id:%i:agent_type:%i:%s:covering_classes_id:%i:\n"
+				    agent_id agent_type agent_string cv_id 
+	    in ()
         in 
         (*-----------------------------------------------------------------------*)
         (*print different of views information*)
         let _ = 
           if (Remanent_parameters.get_dump_reachability_analysis_diff parameter) 
           then
-            let parameters_cv =
-              Remanent_parameters.update_prefix parameter ""
+            let error, agent_string =
+              try 
+                Handler.string_of_agent parameter error handler_kappa agent_type
+              with
+                _ -> warn parameter error (Some "line 470") Exit 
+			  (string_of_int agent_type)
             in
-            if (Remanent_parameters.get_trace parameters_cv)
-            then 
-              let error, agent_string =
-                try 
-                  Handler.string_of_agent parameter error handler_kappa agent_type
-                with
-                  _ -> warn parameter error (Some "line 470") Exit 
-                    (string_of_int agent_type)
-              in
-              Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
-              dump_channel parameter 
-                (fun stderr -> Printf.fprintf stderr
-                  "\t at agent_id:%i:agent_type:%i:%s:covering_classes_id:%i:\n"
-                  agent_id agent_type agent_string cv_id)
-            else ()
-        in 
+            let () = Printf.fprintf log "\n" in
+            let () = Printf.fprintf log "\t at agent_id:%i:agent_type:%i:%s:covering_classes_id:%i:\n"
+				    agent_id agent_type agent_string cv_id in
+	    ()
+	in 
         (*-----------------------------------------------------------------------*)
         let error, bdu_X =
           match Map_bdu_update.Map.find_option_without_logs parameter error
@@ -505,12 +491,13 @@ let compute_views_enabled parameter handler error
         in
         (*list of list_a in modification*)
         let error, list =
-          match Map_agent_id_modif_list.Map.find_option agent_id modif_list_map with
+          match Map_agent_id_modif_list.Map.find_option agent_id modif_list_map with (*JF: I do not understand, you should fetch the modif for this agent id and this covering class *)
+	                                                                             (*JF: maybe you assume that each covering class contains the modified sites, but this is dangerous *)
           | None -> error, []
           | Some l -> error, l
         in
         let error, handler, bdu_update =
-          List.fold_left (fun _ list_a ->
+          List.fold_left (fun _ list_a -> (* JF: VERY STRANGE ?? *)
             compute_bdu_update_views
               parameter
               handler
@@ -534,14 +521,7 @@ let compute_views_enabled parameter handler error
               begin
                 if (Remanent_parameters.get_dump_reachability_analysis_wl parameter) 
                 then
-                  let parameters_cv =
-                    Remanent_parameters.update_prefix parameter ""
-                  in
-                  if (Remanent_parameters.get_trace parameters_cv)
-                  then
-                    dump_channel parameter (fun stderr ->
-	              Printf.fprintf stderr "\t\tdiscovering a new views.\n")
-                  else ()
+                  Printf.fprintf log "\t\tdiscovering a new views.\n"
               end
             in
             ()    
@@ -553,28 +533,14 @@ let compute_views_enabled parameter handler error
               begin
                 if (Remanent_parameters.get_dump_reachability_analysis_wl parameter) 
                 then
-                  let parameters_cv =
-                    Remanent_parameters.update_prefix parameter ""
-                  in
-                  if (Remanent_parameters.get_trace parameters_cv)
-                  then
-                    dump_channel parameter (fun stderr -> Printf.fprintf stderr
-                      "\t\tnothing has changed.\n")
-                  else ()
+                  Printf.fprintf log "\t\tnothing has changed.\n"
               end
             in
             (*print information of different views*)
             let _ =
               if (Remanent_parameters.get_dump_reachability_analysis_diff parameter) 
               then
-                let parameters_cv =
-                  Remanent_parameters.update_prefix parameter ""
-                in
-                if (Remanent_parameters.get_trace parameters_cv)
-                then
-                  dump_channel parameter (fun stderr -> Printf.fprintf stderr
-                    "\t\tnothing has changed.\n")
-                else ()
+		Printf.fprintf log  "\t\tnothing has changed.\n"
             in
             ()
         in      
@@ -662,7 +628,7 @@ let compute_views_enabled parameter handler error
           | Some l -> error, l
         in
         let error, handler, bdu_update =
-          List.fold_left (fun _ list_a ->
+          List.fold_left (fun _ list_a -> (* JF: very strange *)
             let error, handler, bdu_update =
               compute_bdu_update_side_effects
                 parameter
@@ -696,7 +662,6 @@ let compute_views_enabled parameter handler error
         error, (handler, wl_tl, store_result)          
       )
       bdu_potential_map
-      (*store_proj_bdu_views*)
       (error, (handler, wl_tl, store_result))
   in 
   error, (handler, wl_tl, store_result)
@@ -724,7 +689,8 @@ let collect_bdu_fixpoint_with_init parameter handler error
     dead_rule_array
     =
   (*-----------------------------------------------------------------------*)
-  let add_link parameter handler error correspondence (agent_type, cv_id) bdu store_result =
+    let log = Remanent_parameters.get_log parameter in
+    let add_link parameter handler error correspondence (agent_type, cv_id) bdu store_result =
     let error, bdu_old =
       match Map_bdu_update.Map.find_option_without_logs parameter error
         (agent_type, cv_id) store_result
@@ -733,7 +699,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
       | error, Some bdu -> error, bdu
     in
     let error, handler, bdu_union =
-      Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_old bdu
+      Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_old bdu (*JF: this is a computation, thus you have to pass the handler *)
     in
     let error, handler = 
       dump_view_diff parameter handler_kappa handler error
@@ -743,22 +709,22 @@ let collect_bdu_fixpoint_with_init parameter handler error
       Map_bdu_update.Map.add_or_overwrite parameter error
         (agent_type, cv_id) bdu_union store_result
     in
-    error, result_map
+    error, handler, result_map
   in
   (*-----------------------------------------------------------------------*)
   (*in case having initial state the bdu_iter will be the union of bdu_init
     and bdu_iter*)
-  let error, store_bdu_fixpoint_init_map =
+  let error, handler, store_bdu_fixpoint_init_map =
     Map_init_bdu.Map.fold
-      (fun (agent_type, cv_id) bdu (error, store_result) ->
-       let error, store_result =
+      (fun (agent_type, cv_id) bdu (error, handler, store_result) ->
+       let error, handler, store_result =
           add_link parameter handler error 
             site_correspondence_in_covering_classes (agent_type, cv_id) bdu store_result
         in
-        error, store_result
+        error, handler, store_result
       )
       store_bdu_init_restriction_map
-      (error, Map_bdu_update.Map.empty)
+      (error, handler, Map_bdu_update.Map.empty)
   in
   (*-----------------------------------------------------------------------*)
   (*add update(c) into working list*)
@@ -796,75 +762,24 @@ let collect_bdu_fixpoint_with_init parameter handler error
         (*compute bdu_creation, bdu_test and modif_list for this rule_id*)
         (*output of rule that is enabled*)
     	let _ = 
-          if (Remanent_parameters.get_dump_reachability_analysis_iteration parameter) 
+          if
+	    trace
+	    || (Remanent_parameters.get_dump_reachability_analysis_iteration parameter)
+	    || (Remanent_parameters.get_trace parameter)
           then
-            let parameters_cv =
-              Remanent_parameters.update_prefix parameter ""
+            (*mapping rule_id of type int -> string*)
+            let error, rule_id_string =
+              try 
+                Handler.string_of_rule parameter error handler_kappa
+				       compiled rule_id
+              with
+                _ -> warn parameter error (Some "line 795") Exit 
+			  (string_of_int rule_id)
             in
-            if (Remanent_parameters.get_trace parameters_cv)
-            then 
-              (*mapping rule_id of type int -> string*)
-              let error, rule_id_string =
-                try 
-                  Handler.string_of_rule parameter error handler_kappa
-                    compiled rule_id
-                with
-                  _ -> warn parameter error (Some "line 795") Exit 
-                    (string_of_int rule_id)
-              in
-              Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
-              dump_channel parameter 
-                (fun stderr -> Printf.fprintf stderr "try applying %s:" rule_id_string)
-          else ()
+            let () = Printf.fprintf log "\n" in
+            let () = Printf.fprintf log"try applying %s:" rule_id_string in
+	    ()
         in       
-        (*--------------------------------------------------------------------*)
-        (*output of working list*)
-    	let _ = 
-          if (Remanent_parameters.get_dump_reachability_analysis_wl parameter)
-          then
-            let parameters_cv =
-              Remanent_parameters.update_prefix parameter ""
-            in
-            if (Remanent_parameters.get_trace parameters_cv)
-            then 
-              (*mapping rule_id of type int -> string*)
-              let error, rule_id_string =
-                try
-                  Handler.string_of_rule parameter error handler_kappa
-                    compiled rule_id
-                with
-                  _ -> warn parameter error (Some "line 819") Exit
-                    (string_of_int rule_id)
-              in
-              Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
-              dump_channel parameter 
-                (fun stderr -> Printf.fprintf stderr "try applying %s." rule_id_string)
-          else ()
-        in
-        (*--------------------------------------------------------------------*)
-        (*output of different bdu*)
-    	let _ = 
-          if (Remanent_parameters.get_dump_reachability_analysis_diff parameter) 
-          then
-            let parameters_cv =
-              Remanent_parameters.update_prefix parameter ""
-            in
-            if (Remanent_parameters.get_trace parameters_cv)
-            then
-              (*mapping rule_id of type int -> string*)
-              let error, rule_id_string =
-                try
-                  Handler.string_of_rule parameter error handler_kappa
-                    compiled rule_id
-                with
-                  _ -> warn parameter error (Some "line 843") Exit 
-                    (string_of_int rule_id)
-              in
-              Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n";
-              dump_channel parameter 
-                (fun stderr -> Printf.fprintf stderr "try applying %s." rule_id_string)
-          else ()
-        in
         (*--------------------------------------------------------------------*)
         let error, bdu_proj_views =
 	  match Map_rule_id_views.Map.find_option rule_id store_proj_bdu_views with
@@ -891,8 +806,9 @@ let collect_bdu_fixpoint_with_init parameter handler error
             store_proj_potential_list_restriction_map
         in
         (*--------------------------------------------------------------------*)
-        (*is for all bdu_test satisfy a covering_class?*)
-        let error, is_enable = 
+        (*is for all bdu_tes
+t satisfy a covering_class?*)
+        let error, handler, is_enable = 
           is_enable
             parameter
             handler
@@ -914,16 +830,12 @@ let collect_bdu_fixpoint_with_init parameter handler error
             (*-----------------------------------------------------------------------*)
             (*output of rule that is enabled*)
             let _ =
-              if (Remanent_parameters.get_dump_reachability_analysis_iteration parameter) 
+              if
+		trace
+		|| Remanent_parameters.get_trace parameter
+		|| Remanent_parameters.get_dump_reachability_analysis_iteration parameter
               then
-                let parameters_cv =
-                  Remanent_parameters.update_prefix parameter ""
-                in
-                if (Remanent_parameters.get_trace parameters_cv)
-                then
-                  dump_channel parameter 
-                    (fun stderr -> Printf.fprintf stderr "\n\t\"enabled\"")
-                else ()
+		Printf.fprintf log "\n\t\"enabled\""
             in
             (*-----------------------------------------------------------------------*)
             let error, (handler, new_wl, store_new_result) =
@@ -952,16 +864,11 @@ let collect_bdu_fixpoint_with_init parameter handler error
             (*-----------------------------------------------------------------------*)
             (*output of rule that is disabled*)
             let _ =
-              if (Remanent_parameters.get_dump_reachability_analysis_iteration parameter) 
+              if trace
+		 || (Remanent_parameters.get_dump_reachability_analysis_iteration parameter)
+		 || (Remanent_parameters.get_trace parameter)
               then
-                let parameters_cv =
-                  Remanent_parameters.update_prefix parameter ""
-                in
-                if (Remanent_parameters.get_trace parameters_cv)
-                then
-                  dump_channel parameter 
-                    (fun stderr -> Printf.fprintf stderr "\n\t\"disabled\"") 
-                else ()
+                Printf.fprintf log "\n\t\"not enabled yet\""
             in
             (*-----------------------------------------------------------------------*)
             aux wl_tl (error, handler, store_bdu_fixpoint_init_map, dead_rule_array)

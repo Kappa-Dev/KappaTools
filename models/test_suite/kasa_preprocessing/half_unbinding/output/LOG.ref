@@ -154,6 +154,10 @@ rule 1: r1
 agent_id:1:agent_type:0:A:site_type:0:x!@set of rule_id:
 rule 1: r1
 
+try applying rule 0: r0:
+	"not enabled yet"
+try applying rule 1: r1:
+	"not enabled yet"
 Reachability analysis result ....
 
 ------------------------------------------------------------
