@@ -106,19 +106,19 @@ let print_bdu_update_map_cartesian_decomposition
         with
           _ -> warn parameter error (Some "line 103") Exit (string_of_int agent_type)
       in
+      (*-----------------------------------------------------------------------*)
       let () =
 	if trace || Remanent_parameters.get_trace parameter
 	then
 	  fprintf parameter.log "agent_type:%i:%s:cv_id:%i\n"
 	    agent_type agent_string cv_id
       in
+      (*-----------------------------------------------------------------------*)
       let error, site_correspondence = 
         AgentMap.get parameter error agent_type site_correspondence 
       in
       let error, site_correspondence =
-	match
-	  site_correspondence
-	with
+	match site_correspondence with
 	| None ->
 	   warn parameter error (Some "line 58") Exit []
 	| Some a -> error, a
@@ -133,13 +133,16 @@ let print_bdu_update_map_cartesian_decomposition
 	  | _:: tail -> aux tail
 	in aux site_correspondence
       in
-      let error,(map1,map2) = 
+      (*-----------------------------------------------------------------------*)
+      let error,(map1, map2) = 
         Bdu_build.new_index_pair_map parameter error site_correspondence 
       in
+      (*-----------------------------------------------------------------------*)
       let error, handler, list = 
         Mvbdu_wrapper.Mvbdu.mvbdu_full_cartesian_decomposition
           parameter handler error bdu_update 
       in 
+      (*-----------------------------------------------------------------------*)
       let error, handler =
 	List.fold_left
 	  (fun (error, handler) mvbdu ->	  
@@ -156,6 +159,7 @@ let print_bdu_update_map_cartesian_decomposition
 	   let error, handler, list = 
               Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu parameter handler error mvbdu 
            in
+           (*-----------------------------------------------------------------------*)
 	   let error =
 	      List.fold_left
 		(fun error l ->
@@ -166,12 +170,11 @@ let print_bdu_update_map_cartesian_decomposition
                          Map.find_option parameter error site_type map2 
                        in 
 		       let error, site_type =
-			 match
-			   site_type
-			 with
+			 match site_type with
 			 | None -> warn parameter error (Some "line 139") Exit (-1)
 			 | Some i -> error, i
 		       in
+                       (*-----------------------------------------------------------*)
 		       let error, site_string =
 			 try 
 			   Handler.string_of_site parameter error handler_kappa
@@ -189,6 +192,7 @@ let print_bdu_update_map_cartesian_decomposition
 			   _ -> warn parameter error (Some "line 146") Exit 
                              (string_of_int state)
 		       in
+                       (*-----------------------------------------------------------*)
 		       let () =
 			  if bool 
                           then Printf.fprintf parameter.log ","
@@ -201,8 +205,10 @@ let print_bdu_update_map_cartesian_decomposition
                       )
 		      (error,false) l
 		  in
+                  (*-----------------------------------------------------------*)
 		  let () = 
-		    if bool then Printf.fprintf parameter.log ")\n"
+		    if bool 
+                    then Printf.fprintf parameter.log ")\n"
 		  in error)
 		error list
 	    in error, handler)
@@ -323,7 +329,7 @@ let print_result_fixpoint parameter handler error handler_kappa site_corresponde
       fprintf (Remanent_parameters.get_log parameter)
         "------------------------------------------------------------\n";
     in
-    let error,handler =
+    let error, handler =
       print_bdu_update_map_cartesian_decomposition
         parameter
         handler 
