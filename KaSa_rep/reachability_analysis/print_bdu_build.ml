@@ -119,15 +119,13 @@ let print_init_bdu_map parameter error result =
 
 let print_modif_list_map parameter error result =
   Map_modif_list.Map.iter
-    (fun (agent_id, agent_type, rule_id, cv_id) l ->
+    (fun (agent_id, agent_type, rule_id, cv_id) list_a ->
       let _ =
         fprintf parameter.log 
           "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i\n"
           agent_id agent_type rule_id cv_id
       in
-      List.iter (fun list_a ->
-        Mvbdu_wrapper.Mvbdu.print_association_list parameter.log "" list_a
-      ) l
+      Mvbdu_wrapper.Mvbdu.print_association_list parameter.log "" list_a
     ) result
 
 (*projection*)
@@ -344,7 +342,7 @@ let print_bdu_build parameter error result =
       error
       result.store_modif_list_restriction_map
   in
-  let _ =
+(*  let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
@@ -353,7 +351,7 @@ let print_bdu_build parameter error result =
       parameter
       error
       result.store_proj_modif_list_restriction_map
-  in
+  in*)
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";

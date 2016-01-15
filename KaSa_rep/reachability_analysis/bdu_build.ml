@@ -543,7 +543,7 @@ let collect_modif_list_restriction_map
 		  in
 		  let error, store_result =
 		    add_link (agent_id, agent_type, rule_id, cv_id) 
-                      [list_a] store_result
+                      list_a store_result
 		  in
 		  error, handler, store_result
 		end
@@ -553,7 +553,7 @@ let collect_modif_list_restriction_map
 	in error, (handler, store_result))
     rule.diff_direct (handler, store_result)
 
-(*projection with (rule_id) *)
+(*(*projection with (rule_id) *)
 
 let collect_proj_modif_list_restriction_map parameter handler error
     store_modif_list_restriction_map =
@@ -570,7 +570,7 @@ let collect_proj_modif_list_restriction_map parameter handler error
       )
       store_modif_list_restriction_map
   in
-  (error, handler), store_result
+  (error, handler), store_result*)
 
 (************************************************************************************)
 (*build bdu for potential side effects*)

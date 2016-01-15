@@ -441,10 +441,10 @@ type bdu_build =
       Map_final_creation_bdu.Map.t;
     store_bdu_init_restriction_map: Mvbdu_wrapper.Mvbdu.mvbdu Map_init_bdu.Map.t;
     store_modif_list_restriction_map: 
-      Mvbdu_wrapper.Mvbdu.hconsed_association_list list Map_modif_list.Map.t;
-    store_proj_modif_list_restriction_map: 
+      Mvbdu_wrapper.Mvbdu.hconsed_association_list (*list*) Map_modif_list.Map.t;
+(*    store_proj_modif_list_restriction_map: 
       Mvbdu_wrapper.Mvbdu.hconsed_association_list list Map_agent_id_modif_list.Map.t
-      Map_final_modif_list.Map.t;
+      Map_final_modif_list.Map.t;*)
     (*potential partner of side effects*)
     store_bdu_potential_effect_restriction_map : 
       Mvbdu_wrapper.Mvbdu.mvbdu Map_potential_bdu.Map.t;
