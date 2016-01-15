@@ -756,7 +756,7 @@ let compute_views_enabled parameter handler error
 	  | error, None -> error, bdu_false
 	  | error, Some bdu -> error, bdu
 	in
-	let error, handler, bdu_update =
+	let error, list =
           match
             Map_agent_type_potential_list.Map.find_option agent_type potential_list_map
           with
