@@ -5,76 +5,65 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
+	Views in initial state
 
-A(x!B@x)
 
-A(x~u)
+	A(x!B@x)
 
-B(x!A@x,x~u)
+	A(x~u)
 
-deal with agent_type:0:A:covering_class_id:0:
-add:
- (rule 0)
- (rule 1)
-inside a working list.
-deal with agent_type:0:A:covering_class_id:1:
-add:
- (rule 0)
-inside a working list.
-deal with agent_type:1:B:covering_class_id:0:
-add:
- (rule 0)
- (rule 1)
- (rule 2)
- (rule 3)
-inside a working list.
-try applying rule 0:
-	"enabled"
-try applying rule 2:
-	"not enabled yet"
-try applying rule 1:
-	"enabled"
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+	B(x!A@x,x~u)
+	Wake-up rules
 
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
-		nothing has changed.
-		nothing has changed.
+	Dealing with A(x!)
+		(rule 0) should be investigated 
+		(rule 1) should be investigated 
 
-B(x!free,x~u)
+	Dealing with A(x~)
+		(rule 0) should be investigated 
 
-deal with agent_type:1:B:covering_class_id:0:
-add:
- (rule 0)
- (rule 1)
- (rule 2)
- (rule 3)
-inside a working list.
-try applying rule 3:
-	"enabled"
-	 at agent_id:0:agent_type:1:B:covering_classes_id:0:
+	Dealing with B(x!,x~)
+		(rule 0) should be investigated 
+		(rule 1) should be investigated 
+		(rule 2) should be investigated 
+		(rule 3) should be investigated 
 
-	 at agent_id:0:agent_type:1:B:covering_classes_id:0:
-		nothing has changed.
-		nothing has changed.
+	Applying rule 0:
+		the precondition is satisfied
 
-	 at agent_id:1:agent_type:1:B:covering_classes_id:0:
+	Applying rule 2:
+		the predcondition is not satisfied yet
 
-	 at agent_id:1:agent_type:1:B:covering_classes_id:0:
-		nothing has changed.
-		nothing has changed.
+	Applying rule 1:
+		the precondition is satisfied
 
-try applying rule 0:
-	"enabled"
-try applying rule 1:
-	"enabled"
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+		Updating the views for A(x!)
 
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
-		nothing has changed.
-		nothing has changed.
+				B(x!free,x~u)
 
-try applying rule 2:
-	"not enabled yet"
+				(rule 0) should be investigated 
+				(rule 1) should be investigated 
+				(rule 2) should be investigated 
+				(rule 3) should be investigated 
+
+	Applying rule 3:
+		the precondition is satisfied
+
+		Updating the views for B(x!,x~)
+
+		Updating the views for B(x!,x~)
+
+	Applying rule 0:
+		the precondition is satisfied
+
+	Applying rule 1:
+		the precondition is satisfied
+
+		Updating the views for A(x!)
+
+	Applying rule 2:
+		the predcondition is not satisfied yet
+
 Reachability analysis result ....
 
 ------------------------------------------------------------

@@ -5,195 +5,158 @@ Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
 Reachability analysis...
+	Initial state is empty
 
-try applying rule 0:
-	"enabled"
-A(x~u,y~u,z~u)
+	Wake-up rules
 
-deal with agent_type:0:A:covering_class_id:0:
-add:
- (rule 0)
- (rule 1)
- (rule 2)
- (rule 3)
- (rule 4)
- (rule 5)
- (rule 6)
- (rule 7: KO)
-inside a working list.
-try applying rule 0:
-	"enabled"
-try applying rule 1:
-	"enabled"
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+	Applying rule 0:
+		the precondition is satisfied
 
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+				A(x~u,y~u,z~u)
 
-A(x~p,y~u,z~u)
-		discovering a new views.
+				(rule 0) should be investigated 
+				(rule 1) should be investigated 
+				(rule 2) should be investigated 
+				(rule 3) should be investigated 
+				(rule 4) should be investigated 
+				(rule 5) should be investigated 
+				(rule 6) should be investigated 
+				(rule 7: KO) should be investigated 
 
-deal with agent_type:0:A:covering_class_id:0:
-add:
- (rule 0)
- (rule 1)
- (rule 2)
- (rule 3)
- (rule 4)
- (rule 5)
- (rule 6)
- (rule 7: KO)
-inside a working list.
-try applying rule 2:
-	"enabled"
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+	Applying rule 0:
+		the precondition is satisfied
 
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+	Applying rule 1:
+		the precondition is satisfied
 
-A(x~p,y~p,z~u)
-		discovering a new views.
+		Updating the views for A(x~,y~,z~)
 
-deal with agent_type:0:A:covering_class_id:0:
-add:
- (rule 0)
- (rule 1)
- (rule 2)
- (rule 3)
- (rule 4)
- (rule 5)
- (rule 6)
- (rule 7: KO)
-inside a working list.
-try applying rule 3:
-	"enabled"
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+				A(x~p,y~u,z~u)
 
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+				(rule 0) should be investigated 
+				(rule 1) should be investigated 
+				(rule 2) should be investigated 
+				(rule 3) should be investigated 
+				(rule 4) should be investigated 
+				(rule 5) should be investigated 
+				(rule 6) should be investigated 
+				(rule 7: KO) should be investigated 
 
-A(x~0,y~p,z~q)
-		discovering a new views.
+	Applying rule 2:
+		the precondition is satisfied
 
-deal with agent_type:0:A:covering_class_id:0:
-add:
- (rule 0)
- (rule 1)
- (rule 2)
- (rule 3)
- (rule 4)
- (rule 5)
- (rule 6)
- (rule 7: KO)
-inside a working list.
-try applying rule 4:
-	"enabled"
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+		Updating the views for A(x~,y~,z~)
 
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+				A(x~p,y~p,z~u)
 
-A(x~q,y~u,z~u)
-		discovering a new views.
+				(rule 0) should be investigated 
+				(rule 1) should be investigated 
+				(rule 2) should be investigated 
+				(rule 3) should be investigated 
+				(rule 4) should be investigated 
+				(rule 5) should be investigated 
+				(rule 6) should be investigated 
+				(rule 7: KO) should be investigated 
 
-deal with agent_type:0:A:covering_class_id:0:
-add:
- (rule 0)
- (rule 1)
- (rule 2)
- (rule 3)
- (rule 4)
- (rule 5)
- (rule 6)
- (rule 7: KO)
-inside a working list.
-try applying rule 5:
-	"enabled"
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+	Applying rule 3:
+		the precondition is satisfied
 
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+		Updating the views for A(x~,y~,z~)
 
-A(x~q,y~q,z~u)
-		discovering a new views.
+				A(x~0,y~p,z~q)
 
-deal with agent_type:0:A:covering_class_id:0:
-add:
- (rule 0)
- (rule 1)
- (rule 2)
- (rule 3)
- (rule 4)
- (rule 5)
- (rule 6)
- (rule 7: KO)
-inside a working list.
-try applying rule 6:
-	"enabled"
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+				(rule 0) should be investigated 
+				(rule 1) should be investigated 
+				(rule 2) should be investigated 
+				(rule 3) should be investigated 
+				(rule 4) should be investigated 
+				(rule 5) should be investigated 
+				(rule 6) should be investigated 
+				(rule 7: KO) should be investigated 
 
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+	Applying rule 4:
+		the precondition is satisfied
 
-A(x~q,y~q,z~q)
-		discovering a new views.
+		Updating the views for A(x~,y~,z~)
 
-deal with agent_type:0:A:covering_class_id:0:
-add:
- (rule 0)
- (rule 1)
- (rule 2)
- (rule 3)
- (rule 4)
- (rule 5)
- (rule 6)
- (rule 7: KO)
-inside a working list.
-try applying rule 7: KO:
-	"not enabled yet"
-try applying rule 0:
-	"enabled"
-try applying rule 1:
-	"enabled"
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+				A(x~q,y~u,z~u)
 
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
-		nothing has changed.
-		nothing has changed.
+				(rule 0) should be investigated 
+				(rule 1) should be investigated 
+				(rule 2) should be investigated 
+				(rule 3) should be investigated 
+				(rule 4) should be investigated 
+				(rule 5) should be investigated 
+				(rule 6) should be investigated 
+				(rule 7: KO) should be investigated 
 
-try applying rule 2:
-	"enabled"
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+	Applying rule 5:
+		the precondition is satisfied
 
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
-		nothing has changed.
-		nothing has changed.
+		Updating the views for A(x~,y~,z~)
 
-try applying rule 3:
-	"enabled"
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+				A(x~q,y~q,z~u)
 
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
-		nothing has changed.
-		nothing has changed.
+				(rule 0) should be investigated 
+				(rule 1) should be investigated 
+				(rule 2) should be investigated 
+				(rule 3) should be investigated 
+				(rule 4) should be investigated 
+				(rule 5) should be investigated 
+				(rule 6) should be investigated 
+				(rule 7: KO) should be investigated 
 
-try applying rule 4:
-	"enabled"
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+	Applying rule 6:
+		the precondition is satisfied
 
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
-		nothing has changed.
-		nothing has changed.
+		Updating the views for A(x~,y~,z~)
 
-try applying rule 5:
-	"enabled"
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+				A(x~q,y~q,z~q)
 
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
-		nothing has changed.
-		nothing has changed.
+				(rule 0) should be investigated 
+				(rule 1) should be investigated 
+				(rule 2) should be investigated 
+				(rule 3) should be investigated 
+				(rule 4) should be investigated 
+				(rule 5) should be investigated 
+				(rule 6) should be investigated 
+				(rule 7: KO) should be investigated 
 
-try applying rule 6:
-	"enabled"
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
+	Applying rule 7: KO:
+		the predcondition is not satisfied yet
 
-	 at agent_id:0:agent_type:0:A:covering_classes_id:0:
-		nothing has changed.
-		nothing has changed.
+	Applying rule 0:
+		the precondition is satisfied
+
+	Applying rule 1:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule 2:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule 3:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule 4:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule 5:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule 6:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~)
 
 Reachability analysis result ....
 

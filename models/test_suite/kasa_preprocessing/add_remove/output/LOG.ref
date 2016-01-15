@@ -227,9 +227,13 @@ agent_id:1:agent_type:1:B:site_type:0:x~@set of rule_id:
 rule 0
 agent_id:2:agent_type:0:A:site_type:0:x~@set of rule_id:
 rule 0
+	Initial state is empty
 
-try applying rule 0:
-	"not enabled yet"
+	Wake-up rules
+
+	Applying rule 0:
+		the predcondition is not satisfied yet
+
 Reachability analysis result ....
 
 ------------------------------------------------------------

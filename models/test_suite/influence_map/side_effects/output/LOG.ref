@@ -292,6 +292,9 @@ rule 2
 rule 4
 agent_id:1:agent_type:1:B:site_type:0:x!@set of rule_id:
 rule 0
+	Initial state is empty
+
+	Wake-up rules
 
 Reachability analysis result ....
 

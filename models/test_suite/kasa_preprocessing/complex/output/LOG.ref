@@ -520,6 +520,9 @@ rule 3: r1_op
 agent_id:1:agent_type:2:C:site_type:3:y!@set of rule_id:
 rule 2: r1
 rule 3: r1_op
+	Initial state is empty
+
+	Wake-up rules
 
 Reachability analysis result ....
 

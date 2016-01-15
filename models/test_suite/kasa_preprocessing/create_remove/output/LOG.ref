@@ -107,11 +107,16 @@ Set of rules that may test a given site:
 ------------------------------------------------------------
 Set of rules that may test and modify a given site (excluding created agents):
 ------------------------------------------------------------
+	Initial state is empty
 
-try applying rule 0: r0:
-	"not enabled yet"
-try applying rule 1: r1:
-	"not enabled yet"
+	Wake-up rules
+
+	Applying rule 0: r0:
+		the predcondition is not satisfied yet
+
+	Applying rule 1: r1:
+		the predcondition is not satisfied yet
+
 Reachability analysis result ....
 
 ------------------------------------------------------------

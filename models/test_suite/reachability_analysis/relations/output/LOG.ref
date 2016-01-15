@@ -331,296 +331,338 @@ agent_id:0:agent_type:0:A:site_type:2:z~@set of rule_id:
 rule 0
 rule 3
 rule 6
+	Initial state is empty
 
-try applying rule 0:
-	"enabled"
-INTENSIONAL DESCRIPTION:
-Id=11
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
+	Wake-up rules
 
-  Id=10
-   Node(site_type:1<1)
-    Id=9
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
+	Applying rule 0:
+		the precondition is satisfied
 
-      Id=8
-       Node(site_type:2<1)
-        Id=7
-         Node(site_type:3<0)
-          Id=1
-           Leaf False 
+				INTENSIONAL DESCRIPTION:
+				Id=11
+				 Node(site_type:1<0)
+				  Id=1
+				   Leaf False 
 
-          Id=6
-           Node(site_type:3<1)
-            Id=0
-             Leaf True 
+				  Id=10
+				   Node(site_type:1<1)
+				    Id=9
+				     Node(site_type:2<0)
+				      Id=1
+				       Leaf False 
 
-            Id=1
-             Leaf False 
+				      Id=8
+				       Node(site_type:2<1)
+				        Id=7
+				         Node(site_type:3<0)
+				          Id=1
+				           Leaf False 
 
-        Id=1
-         Leaf False 
+				          Id=6
+				           Node(site_type:3<1)
+				            Id=0
+				             Leaf True 
 
-    Id=1
-     Leaf False 
+				            Id=1
+				             Leaf False 
 
-EXTENSIONAL DESCRIPTION:
-A(x~u,y~u,z~u)
+				        Id=1
+				         Leaf False 
 
-try applying rule 0:
-	"enabled"
-try applying rule 1:
-	"enabled"
-INTENSIONAL DESCRIPTION:
-Id=31
- Node(site_type:1<1)
-  Id=1
-   Leaf False 
+				    Id=1
+				     Leaf False 
 
-  Id=30
-   Node(site_type:1<2)
-    Id=9
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
+				EXTENSIONAL DESCRIPTION:
+				A(x~u,y~u,z~u)
 
-      Id=8
-       Node(site_type:2<1)
-        Id=7
-         Node(site_type:3<0)
-          Id=1
-           Leaf False 
+	Applying rule 0:
+		the precondition is satisfied
 
-          Id=6
-           Node(site_type:3<1)
-            Id=0
-             Leaf True 
+	Applying rule 1:
+		the precondition is satisfied
 
-            Id=1
-             Leaf False 
+		Updating the views for A(x~,y~,z~)
 
-        Id=1
-         Leaf False 
+				INTENSIONAL DESCRIPTION:
+				Id=31
+				 Node(site_type:1<1)
+				  Id=1
+				   Leaf False 
 
-    Id=1
-     Leaf False 
+				  Id=30
+				   Node(site_type:1<2)
+				    Id=9
+				     Node(site_type:2<0)
+				      Id=1
+				       Leaf False 
 
-EXTENSIONAL DESCRIPTION:
-A(x~p,y~u,z~u)
+				      Id=8
+				       Node(site_type:2<1)
+				        Id=7
+				         Node(site_type:3<0)
+				          Id=1
+				           Leaf False 
 
-try applying rule 2:
-	"enabled"
-INTENSIONAL DESCRIPTION:
-Id=21
- Node(site_type:1<1)
-  Id=1
-   Leaf False 
+				          Id=6
+				           Node(site_type:3<1)
+				            Id=0
+				             Leaf True 
 
-  Id=20
-   Node(site_type:1<2)
-    Id=19
-     Node(site_type:2<1)
-      Id=1
-       Leaf False 
+				            Id=1
+				             Leaf False 
 
-      Id=18
-       Node(site_type:2<2)
-        Id=7
-         Node(site_type:3<0)
-          Id=1
-           Leaf False 
+				        Id=1
+				         Leaf False 
 
-          Id=6
-           Node(site_type:3<1)
-            Id=0
-             Leaf True 
+				    Id=1
+				     Leaf False 
 
-            Id=1
-             Leaf False 
+				EXTENSIONAL DESCRIPTION:
+				A(x~p,y~u,z~u)
 
-        Id=1
-         Leaf False 
+	Applying rule 2:
+		the precondition is satisfied
 
-    Id=1
-     Leaf False 
+		Updating the views for A(x~,y~,z~)
 
-EXTENSIONAL DESCRIPTION:
-A(x~p,y~p,z~u)
+				INTENSIONAL DESCRIPTION:
+				Id=21
+				 Node(site_type:1<1)
+				  Id=1
+				   Leaf False 
 
-try applying rule 3:
-	"enabled"
-INTENSIONAL DESCRIPTION:
-Id=44
- Node(site_type:1<2)
-  Id=1
-   Leaf False 
+				  Id=20
+				   Node(site_type:1<2)
+				    Id=19
+				     Node(site_type:2<1)
+				      Id=1
+				       Leaf False 
 
-  Id=43
-   Node(site_type:1<3)
-    Id=42
-     Node(site_type:2<1)
-      Id=1
-       Leaf False 
+				      Id=18
+				       Node(site_type:2<2)
+				        Id=7
+				         Node(site_type:3<0)
+				          Id=1
+				           Leaf False 
 
-      Id=41
-       Node(site_type:2<2)
-        Id=40
-         Node(site_type:3<1)
-          Id=1
-           Leaf False 
+				          Id=6
+				           Node(site_type:3<1)
+				            Id=0
+				             Leaf True 
 
-          Id=39
-           Node(site_type:3<2)
-            Id=0
-             Leaf True 
+				            Id=1
+				             Leaf False 
 
-            Id=1
-             Leaf False 
+				        Id=1
+				         Leaf False 
 
-        Id=1
-         Leaf False 
+				    Id=1
+				     Leaf False 
 
-    Id=1
-     Leaf False 
+				EXTENSIONAL DESCRIPTION:
+				A(x~p,y~p,z~u)
 
-EXTENSIONAL DESCRIPTION:
-A(x~0,y~p,z~q)
+	Applying rule 3:
+		the precondition is satisfied
 
-try applying rule 4:
-	"enabled"
-INTENSIONAL DESCRIPTION:
-Id=49
- Node(site_type:1<3)
-  Id=1
-   Leaf False 
+		Updating the views for A(x~,y~,z~)
 
-  Id=48
-   Node(site_type:1<4)
-    Id=9
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
+				INTENSIONAL DESCRIPTION:
+				Id=44
+				 Node(site_type:1<2)
+				  Id=1
+				   Leaf False 
 
-      Id=8
-       Node(site_type:2<1)
-        Id=7
-         Node(site_type:3<0)
-          Id=1
-           Leaf False 
+				  Id=43
+				   Node(site_type:1<3)
+				    Id=42
+				     Node(site_type:2<1)
+				      Id=1
+				       Leaf False 
 
-          Id=6
-           Node(site_type:3<1)
-            Id=0
-             Leaf True 
+				      Id=41
+				       Node(site_type:2<2)
+				        Id=40
+				         Node(site_type:3<1)
+				          Id=1
+				           Leaf False 
 
-            Id=1
-             Leaf False 
+				          Id=39
+				           Node(site_type:3<2)
+				            Id=0
+				             Leaf True 
 
-        Id=1
-         Leaf False 
+				            Id=1
+				             Leaf False 
 
-    Id=1
-     Leaf False 
+				        Id=1
+				         Leaf False 
 
-EXTENSIONAL DESCRIPTION:
-A(x~q,y~u,z~u)
+				    Id=1
+				     Leaf False 
 
-try applying rule 5:
-	"enabled"
-INTENSIONAL DESCRIPTION:
-Id=55
- Node(site_type:1<3)
-  Id=1
-   Leaf False 
+				EXTENSIONAL DESCRIPTION:
+				A(x~0,y~p,z~q)
 
-  Id=54
-   Node(site_type:1<4)
-    Id=29
-     Node(site_type:2<2)
-      Id=1
-       Leaf False 
+	Applying rule 4:
+		the precondition is satisfied
 
-      Id=28
-       Node(site_type:2<3)
-        Id=7
-         Node(site_type:3<0)
-          Id=1
-           Leaf False 
+		Updating the views for A(x~,y~,z~)
 
-          Id=6
-           Node(site_type:3<1)
-            Id=0
-             Leaf True 
+				INTENSIONAL DESCRIPTION:
+				Id=49
+				 Node(site_type:1<3)
+				  Id=1
+				   Leaf False 
 
-            Id=1
-             Leaf False 
+				  Id=48
+				   Node(site_type:1<4)
+				    Id=9
+				     Node(site_type:2<0)
+				      Id=1
+				       Leaf False 
 
-        Id=1
-         Leaf False 
+				      Id=8
+				       Node(site_type:2<1)
+				        Id=7
+				         Node(site_type:3<0)
+				          Id=1
+				           Leaf False 
 
-    Id=1
-     Leaf False 
+				          Id=6
+				           Node(site_type:3<1)
+				            Id=0
+				             Leaf True 
 
-EXTENSIONAL DESCRIPTION:
-A(x~q,y~q,z~u)
+				            Id=1
+				             Leaf False 
 
-try applying rule 6:
-	"enabled"
-INTENSIONAL DESCRIPTION:
-Id=66
- Node(site_type:1<3)
-  Id=1
-   Leaf False 
+				        Id=1
+				         Leaf False 
 
-  Id=65
-   Node(site_type:1<4)
-    Id=64
-     Node(site_type:2<2)
-      Id=1
-       Leaf False 
+				    Id=1
+				     Leaf False 
 
-      Id=63
-       Node(site_type:2<3)
-        Id=40
-         Node(site_type:3<1)
-          Id=1
-           Leaf False 
+				EXTENSIONAL DESCRIPTION:
+				A(x~q,y~u,z~u)
 
-          Id=39
-           Node(site_type:3<2)
-            Id=0
-             Leaf True 
+	Applying rule 5:
+		the precondition is satisfied
 
-            Id=1
-             Leaf False 
+		Updating the views for A(x~,y~,z~)
 
-        Id=1
-         Leaf False 
+				INTENSIONAL DESCRIPTION:
+				Id=55
+				 Node(site_type:1<3)
+				  Id=1
+				   Leaf False 
 
-    Id=1
-     Leaf False 
+				  Id=54
+				   Node(site_type:1<4)
+				    Id=29
+				     Node(site_type:2<2)
+				      Id=1
+				       Leaf False 
 
-EXTENSIONAL DESCRIPTION:
-A(x~q,y~q,z~q)
+				      Id=28
+				       Node(site_type:2<3)
+				        Id=7
+				         Node(site_type:3<0)
+				          Id=1
+				           Leaf False 
 
-try applying rule 0:
-	"enabled"
-try applying rule 1:
-	"enabled"
-try applying rule 2:
-	"enabled"
-try applying rule 3:
-	"enabled"
-try applying rule 4:
-	"enabled"
-try applying rule 5:
-	"enabled"
-try applying rule 6:
-	"enabled"
+				          Id=6
+				           Node(site_type:3<1)
+				            Id=0
+				             Leaf True 
+
+				            Id=1
+				             Leaf False 
+
+				        Id=1
+				         Leaf False 
+
+				    Id=1
+				     Leaf False 
+
+				EXTENSIONAL DESCRIPTION:
+				A(x~q,y~q,z~u)
+
+	Applying rule 6:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~)
+
+				INTENSIONAL DESCRIPTION:
+				Id=66
+				 Node(site_type:1<3)
+				  Id=1
+				   Leaf False 
+
+				  Id=65
+				   Node(site_type:1<4)
+				    Id=64
+				     Node(site_type:2<2)
+				      Id=1
+				       Leaf False 
+
+				      Id=63
+				       Node(site_type:2<3)
+				        Id=40
+				         Node(site_type:3<1)
+				          Id=1
+				           Leaf False 
+
+				          Id=39
+				           Node(site_type:3<2)
+				            Id=0
+				             Leaf True 
+
+				            Id=1
+				             Leaf False 
+
+				        Id=1
+				         Leaf False 
+
+				    Id=1
+				     Leaf False 
+
+				EXTENSIONAL DESCRIPTION:
+				A(x~q,y~q,z~q)
+
+	Applying rule 0:
+		the precondition is satisfied
+
+	Applying rule 1:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule 2:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule 3:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule 4:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule 5:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule 6:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~,z~)
+
 Reachability analysis result ....
 
 ------------------------------------------------------------

@@ -335,6 +335,9 @@ rule 1: r0_op
 agent_id:1:agent_type:2:C:site_type:0:x!@set of rule_id:
 rule 2: r1
 rule 3: r2
+	Initial state is empty
+
+	Wake-up rules
 
 Reachability analysis result ....
 

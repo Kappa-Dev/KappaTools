@@ -218,54 +218,71 @@ agent_id:1:agent_type:3:D:site_type:0:x~@set of rule_id:
 rule 3
 agent_id:1:agent_type:5:F:site_type:0:x~@set of rule_id:
 rule 4
+	Initial state is empty
 
-try applying rule 0:
-	"enabled"
-INTENSIONAL DESCRIPTION:
-Id=0
- Leaf True 
+	Wake-up rules
 
-EXTENSIONAL DESCRIPTION:
+	Applying rule 0:
+		the precondition is satisfied
 
-try applying rule 1:
-	"enabled"
-INTENSIONAL DESCRIPTION:
-Id=0
- Leaf True 
+				INTENSIONAL DESCRIPTION:
+				Id=0
+				 Leaf True 
 
-EXTENSIONAL DESCRIPTION:
+				EXTENSIONAL DESCRIPTION:
 
-try applying rule 2:
-	"enabled"
-INTENSIONAL DESCRIPTION:
-Id=0
- Leaf True 
+	Applying rule 1:
+		the precondition is satisfied
 
-EXTENSIONAL DESCRIPTION:
+		Updating the views for A()
 
-try applying rule 3:
-	"enabled"
-INTENSIONAL DESCRIPTION:
-Id=3
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
+				INTENSIONAL DESCRIPTION:
+				Id=0
+				 Leaf True 
 
-  Id=2
-   Node(site_type:1<1)
-    Id=0
-     Leaf True 
+				EXTENSIONAL DESCRIPTION:
 
-    Id=1
-     Leaf False 
+	Applying rule 2:
+		the precondition is satisfied
 
-EXTENSIONAL DESCRIPTION:
-D(x~u)
+		Updating the views for B()
 
-try applying rule 4:
-	"not enabled yet"
-try applying rule 3:
-	"enabled"
+				INTENSIONAL DESCRIPTION:
+				Id=0
+				 Leaf True 
+
+				EXTENSIONAL DESCRIPTION:
+
+	Applying rule 3:
+		the precondition is satisfied
+
+		Updating the views for C()
+
+				INTENSIONAL DESCRIPTION:
+				Id=3
+				 Node(site_type:1<0)
+				  Id=1
+				   Leaf False 
+
+				  Id=2
+				   Node(site_type:1<1)
+				    Id=0
+				     Leaf True 
+
+				    Id=1
+				     Leaf False 
+
+				EXTENSIONAL DESCRIPTION:
+				D(x~u)
+
+	Applying rule 4:
+		the predcondition is not satisfied yet
+
+	Applying rule 3:
+		the precondition is satisfied
+
+		Updating the views for C()
+
 Reachability analysis result ....
 
 ------------------------------------------------------------

@@ -399,6 +399,9 @@ rule 6
 agent_id:1:agent_type:0:A:site_type:1:x!@set of rule_id:
 rule 2
 rule 6
+	Initial state is empty
+
+	Wake-up rules
 
 Reachability analysis result ....
 

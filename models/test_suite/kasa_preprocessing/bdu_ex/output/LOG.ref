@@ -158,102 +158,120 @@ rule 1: x
 rule 2: y
 agent_id:0:agent_type:0:A:site_type:1:y~@set of rule_id:
 rule 2: y
+	Initial state is empty
 
-try applying rule 0: create:
-	"enabled"
-INTENSIONAL DESCRIPTION:
-Id=7
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
+	Wake-up rules
 
-  Id=6
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
+	Applying rule 0: create:
+		the precondition is satisfied
 
-      Id=4
-       Node(site_type:2<1)
-        Id=0
-         Leaf True 
+				INTENSIONAL DESCRIPTION:
+				Id=7
+				 Node(site_type:1<0)
+				  Id=1
+				   Leaf False 
 
-        Id=1
-         Leaf False 
+				  Id=6
+				   Node(site_type:1<1)
+				    Id=5
+				     Node(site_type:2<0)
+				      Id=1
+				       Leaf False 
 
-    Id=1
-     Leaf False 
+				      Id=4
+				       Node(site_type:2<1)
+				        Id=0
+				         Leaf True 
 
-EXTENSIONAL DESCRIPTION:
-A(x~u,y~u)
+				        Id=1
+				         Leaf False 
 
-try applying rule 0: create:
-	"enabled"
-try applying rule 1: x:
-	"enabled"
-INTENSIONAL DESCRIPTION:
-Id=11
- Node(site_type:1<1)
-  Id=1
-   Leaf False 
+				    Id=1
+				     Leaf False 
 
-  Id=10
-   Node(site_type:1<2)
-    Id=5
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
+				EXTENSIONAL DESCRIPTION:
+				A(x~u,y~u)
 
-      Id=4
-       Node(site_type:2<1)
-        Id=0
-         Leaf True 
+	Applying rule 0: create:
+		the precondition is satisfied
 
-        Id=1
-         Leaf False 
+	Applying rule 1: x:
+		the precondition is satisfied
 
-    Id=1
-     Leaf False 
+		Updating the views for A(x~,y~)
 
-EXTENSIONAL DESCRIPTION:
-A(x~p,y~u)
+				INTENSIONAL DESCRIPTION:
+				Id=11
+				 Node(site_type:1<1)
+				  Id=1
+				   Leaf False 
 
-try applying rule 2: y:
-	"enabled"
-INTENSIONAL DESCRIPTION:
-Id=16
- Node(site_type:1<1)
-  Id=1
-   Leaf False 
+				  Id=10
+				   Node(site_type:1<2)
+				    Id=5
+				     Node(site_type:2<0)
+				      Id=1
+				       Leaf False 
 
-  Id=15
-   Node(site_type:1<2)
-    Id=14
-     Node(site_type:2<1)
-      Id=1
-       Leaf False 
+				      Id=4
+				       Node(site_type:2<1)
+				        Id=0
+				         Leaf True 
 
-      Id=13
-       Node(site_type:2<2)
-        Id=0
-         Leaf True 
+				        Id=1
+				         Leaf False 
 
-        Id=1
-         Leaf False 
+				    Id=1
+				     Leaf False 
 
-    Id=1
-     Leaf False 
+				EXTENSIONAL DESCRIPTION:
+				A(x~p,y~u)
 
-EXTENSIONAL DESCRIPTION:
-A(x~p,y~p)
+	Applying rule 2: y:
+		the precondition is satisfied
 
-try applying rule 0: create:
-	"enabled"
-try applying rule 1: x:
-	"enabled"
-try applying rule 2: y:
-	"enabled"
+		Updating the views for A(x~,y~)
+
+				INTENSIONAL DESCRIPTION:
+				Id=16
+				 Node(site_type:1<1)
+				  Id=1
+				   Leaf False 
+
+				  Id=15
+				   Node(site_type:1<2)
+				    Id=14
+				     Node(site_type:2<1)
+				      Id=1
+				       Leaf False 
+
+				      Id=13
+				       Node(site_type:2<2)
+				        Id=0
+				         Leaf True 
+
+				        Id=1
+				         Leaf False 
+
+				    Id=1
+				     Leaf False 
+
+				EXTENSIONAL DESCRIPTION:
+				A(x~p,y~p)
+
+	Applying rule 0: create:
+		the precondition is satisfied
+
+	Applying rule 1: x:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~)
+
+	Applying rule 2: y:
+		the precondition is satisfied
+
+		Updating the views for A(x~,y~)
+
 Reachability analysis result ....
 
 ------------------------------------------------------------
