@@ -602,7 +602,7 @@ let remove_cycle_edges complete_domain_with obs_id dst env free_id cc =
 	       then Navigation.Fresh (Renaming.apply inj2cc' n',find_ty cc n')
 	       else Navigation.Existing (Renaming.apply inj2cc' n')),i') in
        let pack,ans =
-	 complete_domain_with obs_id dst env' (succ f_id)
+	 complete_domain_with obs_id dst env' f_id
 			      cc' e' inj2cc' in
        aux (pack,ans::out) q
     | [] -> acc
@@ -631,7 +631,7 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
 	   update_cc (identity_injection cc) f_id cc ag_id links int' in
 	 let pack,ans =
 	   complete_domain_with
-	     obs_id dst env' (succ f_id) cc'
+	     obs_id dst env' f_id cc'
 	     (((if has_removed
 		then Navigation.Fresh (Renaming.apply inj2cc' ag_id, find_ty cc ag_id)
 		else Navigation.Existing (Renaming.apply inj2cc' ag_id)),i),Navigation.ToInternal el)
@@ -651,7 +651,7 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
 	    update_cc (identity_injection cc) f_id cc ag_id links' internals in
 	  let pack,ans =
 	    complete_domain_with
-	      obs_id dst env' (succ f_id) cc'
+	      obs_id dst env' f_id cc'
 	      (((if has_removed
 		 then Navigation.Fresh (Renaming.apply inj2cc' ag_id, find_ty cc ag_id)
 		 else Navigation.Existing (Renaming.apply inj2cc' ag_id)),i),Navigation.ToNothing)
@@ -669,7 +669,7 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
 	      remove_ag_cc inj2cc' f_id cc' (Renaming.apply inj2cc' ag_id) in
 	    let pack,ans =
 	      complete_domain_with
-		obs_id dst env' (succ f_id) cc''
+		obs_id dst env' f_id cc''
 		(((if has_removed
 		   then Navigation.Fresh (Renaming.apply inj2cc'' n', find_ty cc n')
 		   else Navigation.Existing (Renaming.apply inj2cc'' n')),i'),
@@ -709,7 +709,7 @@ let rec complete_domain_with obs_id dst env free_id cc edge inj_dst2cc =
      add_new_point ~origin:None obs_id env free_id son cc
 and add_new_point ~origin obs_id env free_id sons cc =
   let (free_id'',env'),fathers =
-    compute_father_candidates complete_domain_with obs_id cc.id env free_id cc in
+    compute_father_candidates complete_domain_with obs_id cc.id env (succ free_id) cc in
   let completed =
     Env.add_point
       cc.id
@@ -744,7 +744,7 @@ let add_domain ?origin env cc =
 	   propagate_add_obs id (Env.add_point id point' env) id),
        List.hd inj,point.content
     | None ->
-       let (_,env'),_ = add_new_point ~origin cc.id env (succ cc.id) [] cc in
+       let (_,env'),_ = add_new_point ~origin cc.id env cc.id [] cc in
        (env',identity_injection cc, cc)
 
 (** Operation to create cc *)
