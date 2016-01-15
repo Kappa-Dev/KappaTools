@@ -301,6 +301,7 @@ module Env : sig
     Signature.s -> int list array -> int -> point IntMap.t ->
     (cc * Operator.DepSet.t) IntMap.t -> t
   val empty : Signature.s -> t
+  val finalize : t -> t
   val sigs : t -> Signature.s
   val find : t -> cc -> (int * Renaming.t list * point) option
   val navigate :
@@ -313,12 +314,14 @@ module Env : sig
   val nb_ag : t -> int
   val print : Format.formatter -> t -> unit
   val print_dot : Format.formatter -> t -> unit
-end = struct
+  end = struct
+    type domain = Provisional of point IntMap.t | Final of point array
+
   type t = {
     sig_decl: Signature.s;
     id_by_type: int list array;
     nb_id: int;
-    domain: point IntMap.t;
+    domain: domain;
     single_agent_points: (cc*Operator.DepSet.t) IntMap.t;
     mutable used_by_a_begin_new: bool;
   }
@@ -328,23 +331,59 @@ let fresh sigs id_by_type nb_id domain single_agent_points =
     sig_decl = sigs;
     id_by_type = id_by_type;
     nb_id = nb_id;
-    domain = domain;
+    domain = Provisional domain;
     single_agent_points = single_agent_points;
     used_by_a_begin_new = false;
   }
 
-let empty sigs =
+let empty_point sigs =
   let nbt = Array.make (Signature.size sigs) [] in
-  let nbt' = Array.make (Signature.size sigs) [] in
   let empty_cc = {id = 0; nodes_by_type = nbt;
 		  links = IntMap.empty; internals = IntMap.empty;} in
-  let empty_point =
-    {content = empty_cc; is_obs_of = None; fathers = []; sons = [];} in
-  fresh sigs nbt' 1 (IntMap.add 0 empty_point IntMap.empty) IntMap.empty
+  {content = empty_cc; is_obs_of = None; fathers = []; sons = [];}
+
+let empty sigs =
+  let nbt' = Array.make (Signature.size sigs) [] in
+  fresh sigs nbt' 1 (IntMap.add 0 (empty_point sigs) IntMap.empty) IntMap.empty
+
+let finalize env =
+  match env.domain with
+  | Final _ -> env
+  | Provisional s ->
+     let si = match IntMap.max_key s with Some i -> succ i | None -> 0 in
+     let out = Array.make si (empty_point env.sig_decl) in
+     let () = IntMap.iter (fun i p -> out.(i) <- p) s in
+     { env with domain = Final out}
 
 let check_vitality env = assert (env.used_by_a_begin_new = false)
 
 let print f env =
+  let pp_point f p =
+    Format.fprintf
+      f "@[<hov 2>(%a)@ -> @[<h>%a@]@ %t-> @[(%a)@]@]"
+      (Pp.list Pp.space Format.pp_print_int) p.fathers
+      (print ~sigs:env.sig_decl true) p.content
+      (fun f ->
+       match p.is_obs_of with
+       | None -> ()
+       | Some deps ->
+	  Format.fprintf
+	    f "@[[%a]@]@ "
+	    (Pp.set Operator.DepSet.elements Pp.space Operator.print_rev_dep)
+	    deps)
+      (Pp.list
+	 Pp.space
+	 (fun f s ->
+	  Format.fprintf
+	    f "@[%a%a@ %i[@[%a@]]@]"
+	    (Navigation.print_step env.sig_decl (find_ty p.content)) s.next
+	    (Pp.list
+	       Pp.space
+	       (fun f -> Format.fprintf f "(@[%a@])" Renaming.print))
+	    s.inj s.dst
+	    (Pp.set IntSet.elements Pp.space Format.pp_print_int)
+	    s.above_obs))
+      p.sons in
   Format.fprintf
     f "@[<v>%a%a@]"
     (Pp.set IntMap.bindings Pp.space ~trailing:Pp.space
@@ -354,33 +393,10 @@ let print f env =
 			    (Pp.set Operator.DepSet.elements Pp.space Operator.print_rev_dep)
 			    deps))
     env.single_agent_points
-    (Pp.set IntMap.bindings Pp.space
-	    (fun f (_,p) ->
-	     Format.fprintf
-	       f "@[<hov 2>(%a)@ -> @[<h>%a@]@ %t-> @[(%a)@]@]"
-	       (Pp.list Pp.space Format.pp_print_int) p.fathers
-	       (print ~sigs:env.sig_decl true) p.content
-	       (fun f ->
-		match p.is_obs_of with
-		| None -> ()
-		| Some deps ->
-		   Format.fprintf
-		     f "@[[%a]@]@ "
-		     (Pp.set Operator.DepSet.elements Pp.space Operator.print_rev_dep)
-		     deps)
-	       (Pp.list
-		  Pp.space
-		  (fun f s ->
-		   Format.fprintf
-		     f "@[%a%a@ %i[@[%a@]]@]"
-		     (Navigation.print_step env.sig_decl (find_ty p.content)) s.next
-		     (Pp.list
-			Pp.space
-			(fun f -> Format.fprintf f "(@[%a@])" Renaming.print))
-		     s.inj s.dst
-		     (Pp.set IntSet.elements Pp.space Format.pp_print_int)
-		     s.above_obs))
-	       p.sons))
+    (fun f -> function
+	   | Provisional s ->
+	      Pp.set IntMap.bindings Pp.space (fun f (_,p) -> pp_point f p) f s
+	   | Final a -> Pp.array Pp.space (fun _ -> pp_point) f a)
     env.domain
 
 let add_point id el env =
@@ -388,7 +404,10 @@ let add_point id el env =
     sig_decl = env.sig_decl;
     id_by_type = env.id_by_type;
     nb_id = env.nb_id;
-    domain = IntMap.add id el env.domain;
+    domain =
+      (match env.domain with
+      | Final _ -> failwith "Connected_component.Env.add_point on finalized env"
+      | Provisional s -> Provisional (IntMap.add id el s));
     single_agent_points = env.single_agent_points;
     used_by_a_begin_new = false;
   }
@@ -411,16 +430,22 @@ let get_single_agent ty env =
   IntMap.find_option ty env.single_agent_points
 
 let get env cc_id =
-  match IntMap.find_option cc_id env.domain with
-  | Some x -> x
-  | None -> raise Not_found
+  match env.domain with
+  | Final a -> a.(cc_id)
+  | Provisional s ->
+     match IntMap.find_option cc_id s with
+     | Some x -> x
+     | None -> raise Not_found
 
 let fresh_id env =
   let max_id_single =
     IntMap.fold (fun _ (cc,_) x -> max x cc.id) env.single_agent_points 0 in
-  match IntMap.max_key env.domain with
+  match match env.domain with
+	| Final _ ->
+	   failwith "Connected_component.Env.fresh_id on finalized env"
+	| Provisional s -> IntMap.max_key s with
   | Some i -> succ (max max_id_single i)
-  | None -> max_id_single
+  | None -> succ max_id_single
 
 let sigs env = env.sig_decl
 
@@ -429,7 +454,10 @@ let to_work env =
   let () = env.used_by_a_begin_new <- true in
   {
     sigs = env.sig_decl;
-    cc_env = env.domain;
+    cc_env = (match env.domain with
+	      | Provisional s -> s
+	      | Final _ ->
+		 failwith "Connected_component.Env.fresh_id on finalized env");
     cc_single_ag = env.single_agent_points;
     reserved_id = env.id_by_type;
     used_id = Array.make (Array.length env.id_by_type) [];
@@ -467,8 +495,14 @@ let nb_ag env = env.nb_id
 let print_dot f env =
   let () = Format.fprintf f "@[<v>strict digraph G {@," in
   let () =
-    Pp.set ~trailing:Pp.space IntMap.bindings Pp.space
-	   (print_point_dot (sigs env)) f env.domain in
+    match env.domain with
+    | Provisional s ->
+       Pp.set ~trailing:Pp.space IntMap.bindings Pp.space
+	      (print_point_dot (sigs env)) f s
+    | Final a ->
+       Pp.array ~trailing:Pp.space Pp.space
+		(fun i f s -> print_point_dot (sigs env) f (i,s)) f a
+  in
   Format.fprintf f "}@]@."
 end
 

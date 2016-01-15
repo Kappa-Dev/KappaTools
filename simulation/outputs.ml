@@ -169,4 +169,3 @@ let output_flux env (file,_ as b) =
   if Filename.check_suffix file ".html"
   then html_of_flux env b
   else dot_of_flux env b
-

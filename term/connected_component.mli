@@ -23,6 +23,8 @@ module Env : sig
   type t
 
   val empty : Signature.s -> t
+  val finalize : t -> t
+
   val sigs : t -> Signature.s
   val nb_ag : t -> int
   val print : Format.formatter -> t -> unit

@@ -598,4 +598,5 @@ let initialize logger overwrite counter result =
 	   f
 	   "An observable may be tracked but no compression level to render stories has been specified")
   in
-  (Debug.tag logger "\t Done"; (kasa_state,env, domain, graph', state))
+  (Debug.tag logger "\t Done";
+   (kasa_state,env, Connected_component.Env.finalize domain, graph', state))
