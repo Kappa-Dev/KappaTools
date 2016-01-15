@@ -376,46 +376,37 @@ A(x~u,y~u)
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=20
+Id=21
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=19
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
+  Id=8
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
 
-      Id=4
-       Node(site_type:2<1)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=18
-     Node(site_type:1<2)
-      Id=17
-       Node(site_type:2<0)
-        Id=1
-         Leaf False 
-
-        Id=13
-         Node(site_type:2<2)
-          Id=0
-           Leaf True 
-
-          Id=1
-           Leaf False 
-
-      Id=1
-       Leaf False 
+    Id=1
+     Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x~p,y~u)
-A(x~p,y~p)
-A(x~u,y~u)
+A(x~p)
+A(x~u)
+INTENSIONAL DESCRIPTION:
+Id=17
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=13
+   Node(site_type:2<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A(y~p)
+A(y~u)
 execution finished without any exception

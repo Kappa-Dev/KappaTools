@@ -951,140 +951,57 @@ A(x~u,y~u,z~u)
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=76
+Id=77
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=75
-   Node(site_type:1<1)
-    Id=9
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
+  Id=22
+   Node(site_type:1<4)
+    Id=0
+     Leaf True 
 
-      Id=8
-       Node(site_type:2<1)
-        Id=7
-         Node(site_type:3<0)
-          Id=1
-           Leaf False 
-
-          Id=6
-           Node(site_type:3<1)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=1
-         Leaf False 
-
-    Id=74
-     Node(site_type:1<2)
-      Id=33
-       Node(site_type:2<0)
-        Id=1
-         Leaf False 
-
-        Id=18
-         Node(site_type:2<2)
-          Id=7
-           Node(site_type:3<0)
-            Id=1
-             Leaf False 
-
-            Id=6
-             Node(site_type:3<1)
-              Id=0
-               Leaf True 
-
-              Id=1
-               Leaf False 
-
-          Id=1
-           Leaf False 
-
-      Id=73
-       Node(site_type:1<3)
-        Id=42
-         Node(site_type:2<1)
-          Id=1
-           Leaf False 
-
-          Id=41
-           Node(site_type:2<2)
-            Id=40
-             Node(site_type:3<1)
-              Id=1
-               Leaf False 
-
-              Id=39
-               Node(site_type:3<2)
-                Id=0
-                 Leaf True 
-
-                Id=1
-                 Leaf False 
-
-            Id=1
-             Leaf False 
-
-        Id=72
-         Node(site_type:1<4)
-          Id=71
-           Node(site_type:2<0)
-            Id=1
-             Leaf False 
-
-            Id=70
-             Node(site_type:2<1)
-              Id=7
-               Node(site_type:3<0)
-                Id=1
-                 Leaf False 
-
-                Id=6
-                 Node(site_type:3<1)
-                  Id=0
-                   Leaf True 
-
-                  Id=1
-                   Leaf False 
-
-              Id=69
-               Node(site_type:2<2)
-                Id=1
-                 Leaf False 
-
-                Id=68
-                 Node(site_type:2<3)
-                  Id=67
-                   Node(site_type:3<0)
-                    Id=1
-                     Leaf False 
-
-                    Id=39
-                     Node(site_type:3<2)
-                      Id=0
-                       Leaf True 
-
-                      Id=1
-                       Leaf False 
-
-                  Id=1
-                   Leaf False 
-
-          Id=1
-           Leaf False 
+    Id=1
+     Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x~q,y~u,z~u)
-A(x~q,y~q,z~q)
-A(x~q,y~q,z~u)
-A(x~0,y~p,z~q)
-A(x~p,y~u,z~u)
-A(x~p,y~p,z~u)
-A(x~u,y~u,z~u)
+A(x~q)
+A(x~0)
+A(x~p)
+A(x~u)
+INTENSIONAL DESCRIPTION:
+Id=85
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=26
+   Node(site_type:2<3)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A(y~q)
+A(y~p)
+A(y~u)
+INTENSIONAL DESCRIPTION:
+Id=67
+ Node(site_type:3<0)
+  Id=1
+   Leaf False 
+
+  Id=39
+   Node(site_type:3<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A(z~q)
+A(z~u)
 execution finished without any exception

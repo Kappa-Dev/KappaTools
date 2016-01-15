@@ -365,23 +365,8 @@ D(x~u)
 * Cartesian abstraction:
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-INTENSIONAL DESCRIPTION:
-Id=0
- Leaf True 
-
-EXTENSIONAL DESCRIPTION:
 agent_type:1:B:cv_id:0
-INTENSIONAL DESCRIPTION:
-Id=0
- Leaf True 
-
-EXTENSIONAL DESCRIPTION:
 agent_type:2:C:cv_id:0
-INTENSIONAL DESCRIPTION:
-Id=0
- Leaf True 
-
-EXTENSIONAL DESCRIPTION:
 agent_type:3:D:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=3

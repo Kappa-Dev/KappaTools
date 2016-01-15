@@ -96,7 +96,7 @@ let print_bdu_update_map parameter error handler_kappa result =
     Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_update
     ) result
 
-let print_bdu_update_map_cartesian_decomposition
+let print_bdu_update_map_gen_decomposition decomposition
     parameter handler error handler_kappa site_correspondence result =
   Map_bdu_update.Map.fold 
     (fun (agent_type, cv_id) bdu_update (error,handler) ->
@@ -139,8 +139,7 @@ let print_bdu_update_map_cartesian_decomposition
       in
       (*-----------------------------------------------------------------------*)
       let error, handler, list = 
-        Mvbdu_wrapper.Mvbdu.mvbdu_full_cartesian_decomposition
-          parameter handler error bdu_update 
+        decomposition parameter handler error bdu_update 
       in 
       (*-----------------------------------------------------------------------*)
       let error, handler =
@@ -219,8 +218,9 @@ let print_bdu_update_map_cartesian_decomposition
     result (error, handler)
   
 			  
-let print_bdu_update_map_cartesian_abstraction =
-  print_bdu_update_map_cartesian_decomposition
+let print_bdu_update_map_cartesian_abstraction a b c d = print_bdu_update_map_gen_decomposition Mvbdu_wrapper.Mvbdu.mvbdu_cartesian_abstraction a b c d
+let print_bdu_update_map_cartesian_decomposition a b c d = print_bdu_update_map_gen_decomposition Mvbdu_wrapper.Mvbdu.mvbdu_full_cartesian_decomposition a b c d
+
 
 (*parameter handler error handler_kappa result =
   Map_bdu_update.Map.fold 
@@ -319,6 +319,7 @@ let print_result_fixpoint parameter handler error handler_kappa site_corresponde
         error
         handler_kappa
 	site_correspondence
+	
         result
     in
     let () =
@@ -330,7 +331,7 @@ let print_result_fixpoint parameter handler error handler_kappa site_corresponde
         "------------------------------------------------------------\n";
     in
     let error, handler =
-      print_bdu_update_map_cartesian_decomposition
+      print_bdu_update_map_cartesian_abstraction
         parameter
         handler 
         error

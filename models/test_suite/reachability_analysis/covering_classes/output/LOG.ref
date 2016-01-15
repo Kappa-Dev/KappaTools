@@ -3061,574 +3061,276 @@ C(x~u,x!free)
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=69
- Node(site_type:0<0)
-  Id=52
-   Node(site_type:1<0)
+Id=0
+ Leaf True 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=0
+ Leaf True 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=73
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=14
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
     Id=1
      Leaf False 
 
-    Id=51
-     Node(site_type:1<1)
-      Id=46
-       Node(site_type:2<0)
-        Id=1
-         Leaf False 
+EXTENSIONAL DESCRIPTION:
+A(y~p)
+A(y~u)
+INTENSIONAL DESCRIPTION:
+Id=73
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
 
-        Id=20
-         Node(site_type:2<3)
-          Id=0
-           Leaf True 
+  Id=14
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
 
-          Id=1
-           Leaf False 
-
-      Id=49
-       Node(site_type:1<2)
-        Id=21
-         Node(site_type:2<2)
-          Id=1
-           Leaf False 
-
-          Id=20
-           Node(site_type:2<3)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=1
-         Leaf False 
-
-  Id=68
-   Node(site_type:0<1)
-    Id=67
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=66
-       Node(site_type:1<2)
-        Id=46
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=20
-           Node(site_type:2<3)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=1
-         Leaf False 
-
-    Id=52
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=51
-       Node(site_type:1<1)
-        Id=46
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=20
-           Node(site_type:2<3)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=49
-         Node(site_type:1<2)
-          Id=21
-           Node(site_type:2<2)
-            Id=1
-             Leaf False 
-
-            Id=20
-             Node(site_type:2<3)
-              Id=0
-               Leaf True 
-
-              Id=1
-               Leaf False 
-
-          Id=1
-           Leaf False 
+    Id=1
+     Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(y~p,y!C@y)
-A(y~u,y!free)
-A(y~u,y!B@y)
-A(y~u,y!C@y)
-A(-10,y~u,y!C@y)
-A(-10,y~u,y!B@y)
-A(-10,y~u,y!free)
-A(-10,y~p,y!C@y)
-A(-10,y~p,y!B@y)
-A(-10,y~p,y!free)
+A(y~p)
+A(y~u)
+INTENSIONAL DESCRIPTION:
+Id=21
+ Node(site_type:2<2)
+  Id=1
+   Leaf False 
+
+  Id=20
+   Node(site_type:2<3)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A(y!C@y)
 agent_type:0:A:cv_id:1
 INTENSIONAL DESCRIPTION:
-Id=69
- Node(site_type:0<0)
-  Id=52
-   Node(site_type:1<0)
+Id=0
+ Leaf True 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=0
+ Leaf True 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=73
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=14
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
     Id=1
      Leaf False 
 
-    Id=51
-     Node(site_type:1<1)
-      Id=46
-       Node(site_type:2<0)
-        Id=1
-         Leaf False 
+EXTENSIONAL DESCRIPTION:
+A(x~p)
+A(x~u)
+INTENSIONAL DESCRIPTION:
+Id=73
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
 
-        Id=20
-         Node(site_type:2<3)
-          Id=0
-           Leaf True 
+  Id=14
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
 
-          Id=1
-           Leaf False 
-
-      Id=49
-       Node(site_type:1<2)
-        Id=21
-         Node(site_type:2<2)
-          Id=1
-           Leaf False 
-
-          Id=20
-           Node(site_type:2<3)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=1
-         Leaf False 
-
-  Id=68
-   Node(site_type:0<1)
-    Id=67
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=66
-       Node(site_type:1<2)
-        Id=46
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=20
-           Node(site_type:2<3)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=1
-         Leaf False 
-
-    Id=52
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=51
-       Node(site_type:1<1)
-        Id=46
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=20
-           Node(site_type:2<3)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=49
-         Node(site_type:1<2)
-          Id=21
-           Node(site_type:2<2)
-            Id=1
-             Leaf False 
-
-            Id=20
-             Node(site_type:2<3)
-              Id=0
-               Leaf True 
-
-              Id=1
-               Leaf False 
-
-          Id=1
-           Leaf False 
+    Id=1
+     Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x~p,x!C@x)
-A(x~u,x!free)
-A(x~u,x!B@x)
-A(x~u,x!C@x)
-A(-10,x~u,x!C@x)
-A(-10,x~u,x!B@x)
-A(-10,x~u,x!free)
-A(-10,x~p,x!C@x)
-A(-10,x~p,x!B@x)
-A(-10,x~p,x!free)
+A(x~p)
+A(x~u)
+INTENSIONAL DESCRIPTION:
+Id=21
+ Node(site_type:2<2)
+  Id=1
+   Leaf False 
+
+  Id=20
+   Node(site_type:2<3)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A(x!C@x)
 agent_type:1:B:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=45
- Node(site_type:0<0)
-  Id=34
-   Node(site_type:1<0)
+Id=0
+ Leaf True 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=73
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=14
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
     Id=1
      Leaf False 
 
-    Id=33
-     Node(site_type:1<1)
-      Id=5
-       Node(site_type:2<0)
-        Id=1
-         Leaf False 
+EXTENSIONAL DESCRIPTION:
+B(y~p)
+B(y~u)
+INTENSIONAL DESCRIPTION:
+Id=30
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
 
-        Id=4
-         Node(site_type:2<1)
-          Id=0
-           Leaf True 
+  Id=8
+   Node(site_type:2<2)
+    Id=0
+     Leaf True 
 
-          Id=1
-           Leaf False 
-
-      Id=18
-       Node(site_type:1<2)
-        Id=9
-         Node(site_type:2<1)
-          Id=1
-           Leaf False 
-
-          Id=8
-           Node(site_type:2<2)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=1
-         Leaf False 
-
-  Id=44
-   Node(site_type:0<1)
-    Id=43
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=42
-       Node(site_type:1<1)
-        Id=5
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=4
-           Node(site_type:2<1)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=41
-         Node(site_type:1<2)
-          Id=30
-           Node(site_type:2<0)
-            Id=1
-             Leaf False 
-
-            Id=8
-             Node(site_type:2<2)
-              Id=0
-               Leaf True 
-
-              Id=1
-               Leaf False 
-
-          Id=1
-           Leaf False 
-
-    Id=34
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=33
-       Node(site_type:1<1)
-        Id=5
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=4
-           Node(site_type:2<1)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=18
-         Node(site_type:1<2)
-          Id=9
-           Node(site_type:2<1)
-            Id=1
-             Leaf False 
-
-            Id=8
-             Node(site_type:2<2)
-              Id=0
-               Leaf True 
-
-              Id=1
-               Leaf False 
-
-          Id=1
-           Leaf False 
+    Id=1
+     Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(y~p,y!A@y)
-B(y~u,y!free)
-B(-10,y~u,y!free)
-B(-10,y~p,y!A@y)
-B(-10,y~p,y!free)
+B(y!A@y)
+B(y!free)
 agent_type:1:B:cv_id:1
 INTENSIONAL DESCRIPTION:
-Id=45
- Node(site_type:0<0)
-  Id=34
-   Node(site_type:1<0)
+Id=0
+ Leaf True 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=73
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=14
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
     Id=1
      Leaf False 
 
-    Id=33
-     Node(site_type:1<1)
-      Id=5
-       Node(site_type:2<0)
-        Id=1
-         Leaf False 
+EXTENSIONAL DESCRIPTION:
+B(x~p)
+B(x~u)
+INTENSIONAL DESCRIPTION:
+Id=30
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
 
-        Id=4
-         Node(site_type:2<1)
-          Id=0
-           Leaf True 
+  Id=8
+   Node(site_type:2<2)
+    Id=0
+     Leaf True 
 
-          Id=1
-           Leaf False 
-
-      Id=18
-       Node(site_type:1<2)
-        Id=9
-         Node(site_type:2<1)
-          Id=1
-           Leaf False 
-
-          Id=8
-           Node(site_type:2<2)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=1
-         Leaf False 
-
-  Id=44
-   Node(site_type:0<1)
-    Id=43
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=42
-       Node(site_type:1<1)
-        Id=5
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=4
-           Node(site_type:2<1)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=41
-         Node(site_type:1<2)
-          Id=30
-           Node(site_type:2<0)
-            Id=1
-             Leaf False 
-
-            Id=8
-             Node(site_type:2<2)
-              Id=0
-               Leaf True 
-
-              Id=1
-               Leaf False 
-
-          Id=1
-           Leaf False 
-
-    Id=34
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=33
-       Node(site_type:1<1)
-        Id=5
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=4
-           Node(site_type:2<1)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=18
-         Node(site_type:1<2)
-          Id=9
-           Node(site_type:2<1)
-            Id=1
-             Leaf False 
-
-            Id=8
-             Node(site_type:2<2)
-              Id=0
-               Leaf True 
-
-              Id=1
-               Leaf False 
-
-          Id=1
-           Leaf False 
+    Id=1
+     Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(x~p,x!A@x)
-B(x~u,x!free)
-B(-10,x~u,x!free)
-B(-10,x~p,x!A@x)
-B(-10,x~p,x!free)
+B(x!A@x)
+B(x!free)
 agent_type:2:C:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=34
+Id=73
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=33
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
+  Id=14
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
 
-      Id=4
-       Node(site_type:2<1)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=18
-     Node(site_type:1<2)
-      Id=9
-       Node(site_type:2<1)
-        Id=1
-         Leaf False 
-
-        Id=8
-         Node(site_type:2<2)
-          Id=0
-           Leaf True 
-
-          Id=1
-           Leaf False 
-
-      Id=1
-       Leaf False 
+    Id=1
+     Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-C(y~p,y!A@y)
-C(y~u,y!free)
+C(y~p)
+C(y~u)
+INTENSIONAL DESCRIPTION:
+Id=30
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:2<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+C(y!A@y)
+C(y!free)
 agent_type:2:C:cv_id:1
 INTENSIONAL DESCRIPTION:
-Id=34
+Id=73
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=33
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
+  Id=14
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
 
-      Id=4
-       Node(site_type:2<1)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=18
-     Node(site_type:1<2)
-      Id=9
-       Node(site_type:2<1)
-        Id=1
-         Leaf False 
-
-        Id=8
-         Node(site_type:2<2)
-          Id=0
-           Leaf True 
-
-          Id=1
-           Leaf False 
-
-      Id=1
-       Leaf False 
+    Id=1
+     Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-C(x~p,x!A@x)
-C(x~u,x!free)
+C(x~p)
+C(x~u)
+INTENSIONAL DESCRIPTION:
+Id=30
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=8
+   Node(site_type:2<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+C(x!A@x)
+C(x!free)
 Some exceptions have been raised
 error: file_name: setMap.ml; message: line 659; exception:Not_found
 error: file_name: Bdu_fixpoint_iteration; message: line 100; exception:Exit
@@ -3704,78 +3406,6 @@ error: file_name: Print bdu analysis; message: line 139; exception:Exit
 error: file_name: Print bdu analysis; message: line 147; exception:Exit
 error: file_name: Print bdu analysis; message: line 146; exception:Exit
 error: file_name: Boolean_mvbdu; message: line 947; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
 error: file_name: setMap.ml; message: line 659; exception:Not_found
 error: file_name: Print bdu analysis; message: line 139; exception:Exit
 error: file_name: Print bdu analysis; message: line 147; exception:Exit

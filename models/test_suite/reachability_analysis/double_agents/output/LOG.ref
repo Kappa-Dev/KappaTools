@@ -1453,63 +1453,41 @@ A(x~p)
 A(x~u)
 agent_type:1:B:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=108
+Id=95
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=107
-   Node(site_type:1<1)
-    Id=8
-     Node(site_type:2<1)
-      Id=1
-       Leaf False 
+  Id=15
+   Node(site_type:1<3)
+    Id=0
+     Leaf True 
 
-      Id=7
-       Node(site_type:2<2)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=106
-     Node(site_type:1<2)
-      Id=104
-       Node(site_type:2<2)
-        Id=1
-         Leaf False 
-
-        Id=100
-         Node(site_type:2<3)
-          Id=0
-           Leaf True 
-
-          Id=1
-           Leaf False 
-
-      Id=105
-       Node(site_type:1<3)
-        Id=18
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=17
-           Node(site_type:2<1)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=1
-         Leaf False 
+    Id=1
+     Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(x~u,y~u)
-B(x~q,y~q)
-B(x~p,y~p)
+B(x~u)
+B(x~q)
+B(x~p)
+INTENSIONAL DESCRIPTION:
+Id=101
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=100
+   Node(site_type:2<3)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+B(y~q)
+B(y~p)
+B(y~u)
 INTENSIONAL DESCRIPTION:
 Id=70
  Node(site_type:3<0)

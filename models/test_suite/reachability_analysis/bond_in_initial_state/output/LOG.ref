@@ -87,7 +87,7 @@ B(x!free)
 ------------------------------------------------------------
 A(x!B@x)
 A(x~u)
-B(x~u)
 B(x!A@x)
 B(x!free)
+B(x~u)
 execution finished without any exception

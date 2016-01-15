@@ -798,22 +798,6 @@ B(x~u)
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=5
- Node(site_type:2<0)
-  Id=1
-   Leaf False 
-
-  Id=4
-   Node(site_type:2<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-A(x!free)
-INTENSIONAL DESCRIPTION:
 Id=20
  Node(site_type:1<0)
   Id=1
@@ -840,6 +824,22 @@ Id=20
 EXTENSIONAL DESCRIPTION:
 A(x~p)
 A(x~u)
+INTENSIONAL DESCRIPTION:
+Id=5
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=4
+   Node(site_type:2<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A(x!free)
 agent_type:1:B:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=18
