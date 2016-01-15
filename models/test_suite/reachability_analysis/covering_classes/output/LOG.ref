@@ -1222,12 +1222,12 @@ rule 10: r10
 		Updating the views for A(x~,x!)
 
 				INTENSIONAL DESCRIPTION:
-				Id=29
+				Id=21
 				 Node(site_type:1<0)
 				  Id=1
 				   Leaf False 
 
-				  Id=28
+				  Id=20
 				   Node(site_type:1<1)
 				    Id=9
 				     Node(site_type:2<1)
@@ -1251,12 +1251,12 @@ rule 10: r10
 		Updating the views for B(x~,x!)
 
 				INTENSIONAL DESCRIPTION:
-				Id=19
+				Id=15
 				 Node(site_type:1<1)
 				  Id=1
 				   Leaf False 
 
-				  Id=18
+				  Id=14
 				   Node(site_type:1<2)
 				    Id=9
 				     Node(site_type:2<1)
@@ -1295,12 +1295,12 @@ rule 10: r10
 		Updating the views for A(y~,y!)
 
 				INTENSIONAL DESCRIPTION:
-				Id=29
+				Id=21
 				 Node(site_type:1<0)
 				  Id=1
 				   Leaf False 
 
-				  Id=28
+				  Id=20
 				   Node(site_type:1<1)
 				    Id=9
 				     Node(site_type:2<1)
@@ -1324,12 +1324,12 @@ rule 10: r10
 		Updating the views for B(y~,y!)
 
 				INTENSIONAL DESCRIPTION:
-				Id=19
+				Id=15
 				 Node(site_type:1<1)
 				  Id=1
 				   Leaf False 
 
-				  Id=18
+				  Id=14
 				   Node(site_type:1<2)
 				    Id=9
 				     Node(site_type:2<1)
@@ -1374,32 +1374,22 @@ rule 10: r10
 		Updating the views for A(x~,x!)
 
 				INTENSIONAL DESCRIPTION:
-				Id=40
-				 Node(site_type:0<0)
+				Id=13
+				 Node(site_type:1<1)
 				  Id=1
 				   Leaf False 
 
-				  Id=39
-				   Node(site_type:0<1)
-				    Id=17
-				     Node(site_type:1<1)
+				  Id=12
+				   Node(site_type:1<2)
+				    Id=5
+				     Node(site_type:2<0)
 				      Id=1
 				       Leaf False 
 
-				      Id=16
-				       Node(site_type:1<2)
-				        Id=5
-				         Node(site_type:2<0)
-				          Id=1
-				           Leaf False 
-
-				          Id=4
-				           Node(site_type:2<1)
-				            Id=0
-				             Leaf True 
-
-				            Id=1
-				             Leaf False 
+				      Id=4
+				       Node(site_type:2<1)
+				        Id=0
+				         Leaf True 
 
 				        Id=1
 				         Leaf False 
@@ -1408,35 +1398,25 @@ rule 10: r10
 				     Leaf False 
 
 				EXTENSIONAL DESCRIPTION:
-				B(-10,y~p,y!free)
+				B(y~p,y!free)
 
 				INTENSIONAL DESCRIPTION:
-				Id=40
-				 Node(site_type:0<0)
+				Id=13
+				 Node(site_type:1<1)
 				  Id=1
 				   Leaf False 
 
-				  Id=39
-				   Node(site_type:0<1)
-				    Id=17
-				     Node(site_type:1<1)
+				  Id=12
+				   Node(site_type:1<2)
+				    Id=5
+				     Node(site_type:2<0)
 				      Id=1
 				       Leaf False 
 
-				      Id=16
-				       Node(site_type:1<2)
-				        Id=5
-				         Node(site_type:2<0)
-				          Id=1
-				           Leaf False 
-
-				          Id=4
-				           Node(site_type:2<1)
-				            Id=0
-				             Leaf True 
-
-				            Id=1
-				             Leaf False 
+				      Id=4
+				       Node(site_type:2<1)
+				        Id=0
+				         Leaf True 
 
 				        Id=1
 				         Leaf False 
@@ -1445,7 +1425,7 @@ rule 10: r10
 				     Leaf False 
 
 				EXTENSIONAL DESCRIPTION:
-				B(-10,x~p,x!free)
+				B(x~p,x!free)
 
 	Applying rule 4: r4:
 		the precondition is satisfied
@@ -1460,19 +1440,19 @@ rule 10: r10
 		Updating the views for A(x~,x!)
 
 				INTENSIONAL DESCRIPTION:
-				Id=23
+				Id=19
 				 Node(site_type:1<0)
 				  Id=1
 				   Leaf False 
 
-				  Id=22
+				  Id=18
 				   Node(site_type:1<1)
-				    Id=21
+				    Id=17
 				     Node(site_type:2<2)
 				      Id=1
 				       Leaf False 
 
-				      Id=20
+				      Id=16
 				       Node(site_type:2<3)
 				        Id=0
 				         Leaf True 
@@ -1491,12 +1471,12 @@ rule 10: r10
 		Updating the views for C(x~,x!)
 
 				INTENSIONAL DESCRIPTION:
-				Id=19
+				Id=15
 				 Node(site_type:1<1)
 				  Id=1
 				   Leaf False 
 
-				  Id=18
+				  Id=14
 				   Node(site_type:1<2)
 				    Id=9
 				     Node(site_type:2<1)
@@ -1525,19 +1505,19 @@ rule 10: r10
 		Updating the views for A(x~,x!)
 
 				INTENSIONAL DESCRIPTION:
-				Id=50
+				Id=34
 				 Node(site_type:1<1)
 				  Id=1
 				   Leaf False 
 
-				  Id=49
+				  Id=33
 				   Node(site_type:1<2)
-				    Id=21
+				    Id=17
 				     Node(site_type:2<2)
 				      Id=1
 				       Leaf False 
 
-				      Id=20
+				      Id=16
 				       Node(site_type:2<3)
 				        Id=0
 				         Leaf True 
@@ -1557,32 +1537,22 @@ rule 10: r10
 		Updating the views for C(x~,x!)
 
 				INTENSIONAL DESCRIPTION:
-				Id=40
-				 Node(site_type:0<0)
+				Id=13
+				 Node(site_type:1<1)
 				  Id=1
 				   Leaf False 
 
-				  Id=39
-				   Node(site_type:0<1)
-				    Id=17
-				     Node(site_type:1<1)
+				  Id=12
+				   Node(site_type:1<2)
+				    Id=5
+				     Node(site_type:2<0)
 				      Id=1
 				       Leaf False 
 
-				      Id=16
-				       Node(site_type:1<2)
-				        Id=5
-				         Node(site_type:2<0)
-				          Id=1
-				           Leaf False 
-
-				          Id=4
-				           Node(site_type:2<1)
-				            Id=0
-				             Leaf True 
-
-				            Id=1
-				             Leaf False 
+				      Id=4
+				       Node(site_type:2<1)
+				        Id=0
+				         Leaf True 
 
 				        Id=1
 				         Leaf False 
@@ -1591,7 +1561,7 @@ rule 10: r10
 				     Leaf False 
 
 				EXTENSIONAL DESCRIPTION:
-				A(-10,x~p,x!free)
+				A(x~p,x!free)
 
 	Applying rule 8: r8:
 		the precondition is satisfied
@@ -1619,19 +1589,19 @@ rule 10: r10
 		Updating the views for A(y~,y!)
 
 				INTENSIONAL DESCRIPTION:
-				Id=23
+				Id=19
 				 Node(site_type:1<0)
 				  Id=1
 				   Leaf False 
 
-				  Id=22
+				  Id=18
 				   Node(site_type:1<1)
-				    Id=21
+				    Id=17
 				     Node(site_type:2<2)
 				      Id=1
 				       Leaf False 
 
-				      Id=20
+				      Id=16
 				       Node(site_type:2<3)
 				        Id=0
 				         Leaf True 
@@ -1650,12 +1620,12 @@ rule 10: r10
 		Updating the views for C(y~,y!)
 
 				INTENSIONAL DESCRIPTION:
-				Id=19
+				Id=15
 				 Node(site_type:1<1)
 				  Id=1
 				   Leaf False 
 
-				  Id=18
+				  Id=14
 				   Node(site_type:1<2)
 				    Id=9
 				     Node(site_type:2<1)
@@ -1685,32 +1655,22 @@ rule 10: r10
 		Updating the views for A(x~,x!)
 
 				INTENSIONAL DESCRIPTION:
-				Id=38
-				 Node(site_type:0<0)
+				Id=15
+				 Node(site_type:1<1)
 				  Id=1
 				   Leaf False 
 
-				  Id=37
-				   Node(site_type:0<1)
-				    Id=19
-				     Node(site_type:1<1)
+				  Id=14
+				   Node(site_type:1<2)
+				    Id=9
+				     Node(site_type:2<1)
 				      Id=1
 				       Leaf False 
 
-				      Id=18
-				       Node(site_type:1<2)
-				        Id=9
-				         Node(site_type:2<1)
-				          Id=1
-				           Leaf False 
-
-				          Id=8
-				           Node(site_type:2<2)
-				            Id=0
-				             Leaf True 
-
-				            Id=1
-				             Leaf False 
+				      Id=8
+				       Node(site_type:2<2)
+				        Id=0
+				         Leaf True 
 
 				        Id=1
 				         Leaf False 
@@ -1719,7 +1679,7 @@ rule 10: r10
 				     Leaf False 
 
 				EXTENSIONAL DESCRIPTION:
-				A(-10,x~p,x!B@x)
+				A(x~p,x!B@x)
 
 		Updating the views for B(x~,x!)
 
@@ -1740,19 +1700,19 @@ rule 10: r10
 		Updating the views for A(y~,y!)
 
 				INTENSIONAL DESCRIPTION:
-				Id=50
+				Id=34
 				 Node(site_type:1<1)
 				  Id=1
 				   Leaf False 
 
-				  Id=49
+				  Id=33
 				   Node(site_type:1<2)
-				    Id=21
+				    Id=17
 				     Node(site_type:2<2)
 				      Id=1
 				       Leaf False 
 
-				      Id=20
+				      Id=16
 				       Node(site_type:2<3)
 				        Id=0
 				         Leaf True 
@@ -1772,32 +1732,22 @@ rule 10: r10
 		Updating the views for C(y~,y!)
 
 				INTENSIONAL DESCRIPTION:
-				Id=40
-				 Node(site_type:0<0)
+				Id=13
+				 Node(site_type:1<1)
 				  Id=1
 				   Leaf False 
 
-				  Id=39
-				   Node(site_type:0<1)
-				    Id=17
-				     Node(site_type:1<1)
+				  Id=12
+				   Node(site_type:1<2)
+				    Id=5
+				     Node(site_type:2<0)
 				      Id=1
 				       Leaf False 
 
-				      Id=16
-				       Node(site_type:1<2)
-				        Id=5
-				         Node(site_type:2<0)
-				          Id=1
-				           Leaf False 
-
-				          Id=4
-				           Node(site_type:2<1)
-				            Id=0
-				             Leaf True 
-
-				            Id=1
-				             Leaf False 
+				      Id=4
+				       Node(site_type:2<1)
+				        Id=0
+				         Leaf True 
 
 				        Id=1
 				         Leaf False 
@@ -1806,7 +1756,7 @@ rule 10: r10
 				     Leaf False 
 
 				EXTENSIONAL DESCRIPTION:
-				A(-10,y~p,y!free)
+				A(y~p,y!free)
 
 	Applying rule 2: r2:
 		the precondition is satisfied
@@ -1839,32 +1789,22 @@ rule 10: r10
 		Updating the views for A(y~,y!)
 
 				INTENSIONAL DESCRIPTION:
-				Id=38
-				 Node(site_type:0<0)
+				Id=15
+				 Node(site_type:1<1)
 				  Id=1
 				   Leaf False 
 
-				  Id=37
-				   Node(site_type:0<1)
-				    Id=19
-				     Node(site_type:1<1)
+				  Id=14
+				   Node(site_type:1<2)
+				    Id=9
+				     Node(site_type:2<1)
 				      Id=1
 				       Leaf False 
 
-				      Id=18
-				       Node(site_type:1<2)
-				        Id=9
-				         Node(site_type:2<1)
-				          Id=1
-				           Leaf False 
-
-				          Id=8
-				           Node(site_type:2<2)
-				            Id=0
-				             Leaf True 
-
-				            Id=1
-				             Leaf False 
+				      Id=8
+				       Node(site_type:2<2)
+				        Id=0
+				         Leaf True 
 
 				        Id=1
 				         Leaf False 
@@ -1873,7 +1813,7 @@ rule 10: r10
 				     Leaf False 
 
 				EXTENSIONAL DESCRIPTION:
-				A(-10,y~p,y!B@y)
+				A(y~p,y!B@y)
 
 		Updating the views for B(y~,y!)
 
@@ -1958,458 +1898,60 @@ Reachability analysis result ....
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=69
- Node(site_type:0<0)
-  Id=52
-   Node(site_type:1<0)
-    Id=1
-     Leaf False 
-
-    Id=51
-     Node(site_type:1<1)
-      Id=46
-       Node(site_type:2<0)
-        Id=1
-         Leaf False 
-
-        Id=20
-         Node(site_type:2<3)
-          Id=0
-           Leaf True 
-
-          Id=1
-           Leaf False 
-
-      Id=49
-       Node(site_type:1<2)
-        Id=21
-         Node(site_type:2<2)
-          Id=1
-           Leaf False 
-
-          Id=20
-           Node(site_type:2<3)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=1
-         Leaf False 
-
-  Id=68
-   Node(site_type:0<1)
-    Id=67
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=66
-       Node(site_type:1<2)
-        Id=46
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=20
-           Node(site_type:2<3)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=1
-         Leaf False 
-
-    Id=52
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=51
-       Node(site_type:1<1)
-        Id=46
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=20
-           Node(site_type:2<3)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=49
-         Node(site_type:1<2)
-          Id=21
-           Node(site_type:2<2)
-            Id=1
-             Leaf False 
-
-            Id=20
-             Node(site_type:2<3)
-              Id=0
-               Leaf True 
-
-              Id=1
-               Leaf False 
-
-          Id=1
-           Leaf False 
-
-agent_type:0:A:cv_id:1
-Id=69
- Node(site_type:0<0)
-  Id=52
-   Node(site_type:1<0)
-    Id=1
-     Leaf False 
-
-    Id=51
-     Node(site_type:1<1)
-      Id=46
-       Node(site_type:2<0)
-        Id=1
-         Leaf False 
-
-        Id=20
-         Node(site_type:2<3)
-          Id=0
-           Leaf True 
-
-          Id=1
-           Leaf False 
-
-      Id=49
-       Node(site_type:1<2)
-        Id=21
-         Node(site_type:2<2)
-          Id=1
-           Leaf False 
-
-          Id=20
-           Node(site_type:2<3)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=1
-         Leaf False 
-
-  Id=68
-   Node(site_type:0<1)
-    Id=67
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=66
-       Node(site_type:1<2)
-        Id=46
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=20
-           Node(site_type:2<3)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=1
-         Leaf False 
-
-    Id=52
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=51
-       Node(site_type:1<1)
-        Id=46
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=20
-           Node(site_type:2<3)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=49
-         Node(site_type:1<2)
-          Id=21
-           Node(site_type:2<2)
-            Id=1
-             Leaf False 
-
-            Id=20
-             Node(site_type:2<3)
-              Id=0
-               Leaf True 
-
-              Id=1
-               Leaf False 
-
-          Id=1
-           Leaf False 
-
-agent_type:1:B:cv_id:0
-Id=45
- Node(site_type:0<0)
-  Id=34
-   Node(site_type:1<0)
-    Id=1
-     Leaf False 
-
-    Id=33
-     Node(site_type:1<1)
-      Id=5
-       Node(site_type:2<0)
-        Id=1
-         Leaf False 
-
-        Id=4
-         Node(site_type:2<1)
-          Id=0
-           Leaf True 
-
-          Id=1
-           Leaf False 
-
-      Id=18
-       Node(site_type:1<2)
-        Id=9
-         Node(site_type:2<1)
-          Id=1
-           Leaf False 
-
-          Id=8
-           Node(site_type:2<2)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=1
-         Leaf False 
-
-  Id=44
-   Node(site_type:0<1)
-    Id=43
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=42
-       Node(site_type:1<1)
-        Id=5
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=4
-           Node(site_type:2<1)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=41
-         Node(site_type:1<2)
-          Id=30
-           Node(site_type:2<0)
-            Id=1
-             Leaf False 
-
-            Id=8
-             Node(site_type:2<2)
-              Id=0
-               Leaf True 
-
-              Id=1
-               Leaf False 
-
-          Id=1
-           Leaf False 
-
-    Id=34
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=33
-       Node(site_type:1<1)
-        Id=5
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=4
-           Node(site_type:2<1)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=18
-         Node(site_type:1<2)
-          Id=9
-           Node(site_type:2<1)
-            Id=1
-             Leaf False 
-
-            Id=8
-             Node(site_type:2<2)
-              Id=0
-               Leaf True 
-
-              Id=1
-               Leaf False 
-
-          Id=1
-           Leaf False 
-
-agent_type:1:B:cv_id:1
-Id=45
- Node(site_type:0<0)
-  Id=34
-   Node(site_type:1<0)
-    Id=1
-     Leaf False 
-
-    Id=33
-     Node(site_type:1<1)
-      Id=5
-       Node(site_type:2<0)
-        Id=1
-         Leaf False 
-
-        Id=4
-         Node(site_type:2<1)
-          Id=0
-           Leaf True 
-
-          Id=1
-           Leaf False 
-
-      Id=18
-       Node(site_type:1<2)
-        Id=9
-         Node(site_type:2<1)
-          Id=1
-           Leaf False 
-
-          Id=8
-           Node(site_type:2<2)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=1
-         Leaf False 
-
-  Id=44
-   Node(site_type:0<1)
-    Id=43
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=42
-       Node(site_type:1<1)
-        Id=5
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=4
-           Node(site_type:2<1)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=41
-         Node(site_type:1<2)
-          Id=30
-           Node(site_type:2<0)
-            Id=1
-             Leaf False 
-
-            Id=8
-             Node(site_type:2<2)
-              Id=0
-               Leaf True 
-
-              Id=1
-               Leaf False 
-
-          Id=1
-           Leaf False 
-
-    Id=34
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=33
-       Node(site_type:1<1)
-        Id=5
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=4
-           Node(site_type:2<1)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=18
-         Node(site_type:1<2)
-          Id=9
-           Node(site_type:2<1)
-            Id=1
-             Leaf False 
-
-            Id=8
-             Node(site_type:2<2)
-              Id=0
-               Leaf True 
-
-              Id=1
-               Leaf False 
-
-          Id=1
-           Leaf False 
-
-agent_type:2:C:cv_id:0
-Id=34
+Id=46
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=33
+  Id=45
+   Node(site_type:1<2)
+    Id=30
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=16
+       Node(site_type:2<3)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_type:0:A:cv_id:1
+Id=46
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=45
+   Node(site_type:1<2)
+    Id=30
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=16
+       Node(site_type:2<3)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+agent_type:1:B:cv_id:0
+Id=29
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=28
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<0)
@@ -2424,7 +1966,85 @@ Id=34
         Id=1
          Leaf False 
 
-    Id=18
+    Id=27
+     Node(site_type:1<2)
+      Id=22
+       Node(site_type:2<0)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+agent_type:1:B:cv_id:1
+Id=29
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=28
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=27
+     Node(site_type:1<2)
+      Id=22
+       Node(site_type:2<0)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+agent_type:2:C:cv_id:0
+Id=26
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=25
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=14
      Node(site_type:1<2)
       Id=9
        Node(site_type:2<1)
@@ -2443,12 +2063,12 @@ Id=34
        Leaf False 
 
 agent_type:2:C:cv_id:1
-Id=34
+Id=26
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=33
+  Id=25
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<0)
@@ -2463,7 +2083,7 @@ Id=34
         Id=1
          Leaf False 
 
-    Id=18
+    Id=14
      Node(site_type:1<2)
       Id=9
        Node(site_type:2<1)
@@ -2487,496 +2107,84 @@ Id=34
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=69
- Node(site_type:0<0)
-  Id=52
-   Node(site_type:1<0)
+Id=30
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=16
+   Node(site_type:2<3)
+    Id=0
+     Leaf True 
+
     Id=1
      Leaf False 
 
-    Id=51
-     Node(site_type:1<1)
-      Id=46
-       Node(site_type:2<0)
-        Id=1
-         Leaf False 
-
-        Id=20
-         Node(site_type:2<3)
-          Id=0
-           Leaf True 
-
-          Id=1
-           Leaf False 
-
-      Id=49
-       Node(site_type:1<2)
-        Id=21
-         Node(site_type:2<2)
-          Id=1
-           Leaf False 
-
-          Id=20
-           Node(site_type:2<3)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=1
-         Leaf False 
-
-  Id=68
-   Node(site_type:0<1)
-    Id=67
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=66
-       Node(site_type:1<2)
-        Id=46
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=20
-           Node(site_type:2<3)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=1
-         Leaf False 
-
-    Id=52
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=51
-       Node(site_type:1<1)
-        Id=46
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=20
-           Node(site_type:2<3)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=49
-         Node(site_type:1<2)
-          Id=21
-           Node(site_type:2<2)
-            Id=1
-             Leaf False 
-
-            Id=20
-             Node(site_type:2<3)
-              Id=0
-               Leaf True 
-
-              Id=1
-               Leaf False 
-
-          Id=1
-           Leaf False 
-
 EXTENSIONAL DESCRIPTION:
-A(y~p,y!C@y)
-A(y~u,y!free)
-A(y~u,y!B@y)
-A(y~u,y!C@y)
-A(-10,y~u,y!C@y)
-A(-10,y~u,y!B@y)
-A(-10,y~u,y!free)
-A(-10,y~p,y!C@y)
-A(-10,y~p,y!B@y)
-A(-10,y~p,y!free)
-agent_type:0:A:cv_id:1
+A(y!C@y)
+A(y!B@y)
+A(y!free)
 INTENSIONAL DESCRIPTION:
-Id=69
- Node(site_type:0<0)
-  Id=52
-   Node(site_type:1<0)
-    Id=1
-     Leaf False 
-
-    Id=51
-     Node(site_type:1<1)
-      Id=46
-       Node(site_type:2<0)
-        Id=1
-         Leaf False 
-
-        Id=20
-         Node(site_type:2<3)
-          Id=0
-           Leaf True 
-
-          Id=1
-           Leaf False 
-
-      Id=49
-       Node(site_type:1<2)
-        Id=21
-         Node(site_type:2<2)
-          Id=1
-           Leaf False 
-
-          Id=20
-           Node(site_type:2<3)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=1
-         Leaf False 
-
-  Id=68
-   Node(site_type:0<1)
-    Id=67
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=66
-       Node(site_type:1<2)
-        Id=46
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=20
-           Node(site_type:2<3)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=1
-         Leaf False 
-
-    Id=52
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=51
-       Node(site_type:1<1)
-        Id=46
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=20
-           Node(site_type:2<3)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=49
-         Node(site_type:1<2)
-          Id=21
-           Node(site_type:2<2)
-            Id=1
-             Leaf False 
-
-            Id=20
-             Node(site_type:2<3)
-              Id=0
-               Leaf True 
-
-              Id=1
-               Leaf False 
-
-          Id=1
-           Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-A(x~p,x!C@x)
-A(x~u,x!free)
-A(x~u,x!B@x)
-A(x~u,x!C@x)
-A(-10,x~u,x!C@x)
-A(-10,x~u,x!B@x)
-A(-10,x~u,x!free)
-A(-10,x~p,x!C@x)
-A(-10,x~p,x!B@x)
-A(-10,x~p,x!free)
-agent_type:1:B:cv_id:0
-INTENSIONAL DESCRIPTION:
-Id=45
- Node(site_type:0<0)
-  Id=34
-   Node(site_type:1<0)
-    Id=1
-     Leaf False 
-
-    Id=33
-     Node(site_type:1<1)
-      Id=5
-       Node(site_type:2<0)
-        Id=1
-         Leaf False 
-
-        Id=4
-         Node(site_type:2<1)
-          Id=0
-           Leaf True 
-
-          Id=1
-           Leaf False 
-
-      Id=18
-       Node(site_type:1<2)
-        Id=9
-         Node(site_type:2<1)
-          Id=1
-           Leaf False 
-
-          Id=8
-           Node(site_type:2<2)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=1
-         Leaf False 
-
-  Id=44
-   Node(site_type:0<1)
-    Id=43
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=42
-       Node(site_type:1<1)
-        Id=5
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=4
-           Node(site_type:2<1)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=41
-         Node(site_type:1<2)
-          Id=30
-           Node(site_type:2<0)
-            Id=1
-             Leaf False 
-
-            Id=8
-             Node(site_type:2<2)
-              Id=0
-               Leaf True 
-
-              Id=1
-               Leaf False 
-
-          Id=1
-           Leaf False 
-
-    Id=34
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=33
-       Node(site_type:1<1)
-        Id=5
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=4
-           Node(site_type:2<1)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=18
-         Node(site_type:1<2)
-          Id=9
-           Node(site_type:2<1)
-            Id=1
-             Leaf False 
-
-            Id=8
-             Node(site_type:2<2)
-              Id=0
-               Leaf True 
-
-              Id=1
-               Leaf False 
-
-          Id=1
-           Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-B(y~p,y!A@y)
-B(y~u,y!free)
-B(-10,y~u,y!free)
-B(-10,y~p,y!A@y)
-B(-10,y~p,y!free)
-agent_type:1:B:cv_id:1
-INTENSIONAL DESCRIPTION:
-Id=45
- Node(site_type:0<0)
-  Id=34
-   Node(site_type:1<0)
-    Id=1
-     Leaf False 
-
-    Id=33
-     Node(site_type:1<1)
-      Id=5
-       Node(site_type:2<0)
-        Id=1
-         Leaf False 
-
-        Id=4
-         Node(site_type:2<1)
-          Id=0
-           Leaf True 
-
-          Id=1
-           Leaf False 
-
-      Id=18
-       Node(site_type:1<2)
-        Id=9
-         Node(site_type:2<1)
-          Id=1
-           Leaf False 
-
-          Id=8
-           Node(site_type:2<2)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=1
-         Leaf False 
-
-  Id=44
-   Node(site_type:0<1)
-    Id=43
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=42
-       Node(site_type:1<1)
-        Id=5
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=4
-           Node(site_type:2<1)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=41
-         Node(site_type:1<2)
-          Id=30
-           Node(site_type:2<0)
-            Id=1
-             Leaf False 
-
-            Id=8
-             Node(site_type:2<2)
-              Id=0
-               Leaf True 
-
-              Id=1
-               Leaf False 
-
-          Id=1
-           Leaf False 
-
-    Id=34
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=33
-       Node(site_type:1<1)
-        Id=5
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=4
-           Node(site_type:2<1)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=18
-         Node(site_type:1<2)
-          Id=9
-           Node(site_type:2<1)
-            Id=1
-             Leaf False 
-
-            Id=8
-             Node(site_type:2<2)
-              Id=0
-               Leaf True 
-
-              Id=1
-               Leaf False 
-
-          Id=1
-           Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-B(x~p,x!A@x)
-B(x~u,x!free)
-B(-10,x~u,x!free)
-B(-10,x~p,x!A@x)
-B(-10,x~p,x!free)
-agent_type:2:C:cv_id:0
-INTENSIONAL DESCRIPTION:
-Id=34
+Id=47
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=33
+  Id=10
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A(y~p)
+A(y~u)
+agent_type:0:A:cv_id:1
+INTENSIONAL DESCRIPTION:
+Id=30
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=16
+   Node(site_type:2<3)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A(x!C@x)
+A(x!B@x)
+A(x!free)
+INTENSIONAL DESCRIPTION:
+Id=47
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=10
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A(x~p)
+A(x~u)
+agent_type:1:B:cv_id:0
+INTENSIONAL DESCRIPTION:
+Id=29
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=28
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<0)
@@ -2991,7 +2199,95 @@ Id=34
         Id=1
          Leaf False 
 
-    Id=18
+    Id=27
+     Node(site_type:1<2)
+      Id=22
+       Node(site_type:2<0)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+B(y~p,y!free)
+B(y~p,y!A@y)
+B(y~u,y!free)
+agent_type:1:B:cv_id:1
+INTENSIONAL DESCRIPTION:
+Id=29
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=28
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=27
+     Node(site_type:1<2)
+      Id=22
+       Node(site_type:2<0)
+        Id=1
+         Leaf False 
+
+        Id=8
+         Node(site_type:2<2)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+B(x~p,x!free)
+B(x~p,x!A@x)
+B(x~u,x!free)
+agent_type:2:C:cv_id:0
+INTENSIONAL DESCRIPTION:
+Id=26
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=25
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=14
      Node(site_type:1<2)
       Id=9
        Node(site_type:2<1)
@@ -3014,12 +2310,12 @@ C(y~p,y!A@y)
 C(y~u,y!free)
 agent_type:2:C:cv_id:1
 INTENSIONAL DESCRIPTION:
-Id=34
+Id=26
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=33
+  Id=25
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<0)
@@ -3034,7 +2330,7 @@ Id=34
         Id=1
          Leaf False 
 
-    Id=18
+    Id=14
      Node(site_type:1<2)
       Id=9
        Node(site_type:2<1)
@@ -3061,22 +2357,12 @@ C(x~u,x!free)
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=0
- Leaf True 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=0
- Leaf True 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=73
+Id=47
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=14
+  Id=10
    Node(site_type:1<2)
     Id=0
      Leaf True 
@@ -3088,29 +2374,12 @@ EXTENSIONAL DESCRIPTION:
 A(y~p)
 A(y~u)
 INTENSIONAL DESCRIPTION:
-Id=73
- Node(site_type:1<0)
+Id=30
+ Node(site_type:2<0)
   Id=1
    Leaf False 
 
-  Id=14
-   Node(site_type:1<2)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-A(y~p)
-A(y~u)
-INTENSIONAL DESCRIPTION:
-Id=21
- Node(site_type:2<2)
-  Id=1
-   Leaf False 
-
-  Id=20
+  Id=16
    Node(site_type:2<3)
     Id=0
      Leaf True 
@@ -3120,24 +2389,16 @@ Id=21
 
 EXTENSIONAL DESCRIPTION:
 A(y!C@y)
+A(y!B@y)
+A(y!free)
 agent_type:0:A:cv_id:1
 INTENSIONAL DESCRIPTION:
-Id=0
- Leaf True 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=0
- Leaf True 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=73
+Id=47
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=14
+  Id=10
    Node(site_type:1<2)
     Id=0
      Leaf True 
@@ -3149,29 +2410,12 @@ EXTENSIONAL DESCRIPTION:
 A(x~p)
 A(x~u)
 INTENSIONAL DESCRIPTION:
-Id=73
- Node(site_type:1<0)
+Id=30
+ Node(site_type:2<0)
   Id=1
    Leaf False 
 
-  Id=14
-   Node(site_type:1<2)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-A(x~p)
-A(x~u)
-INTENSIONAL DESCRIPTION:
-Id=21
- Node(site_type:2<2)
-  Id=1
-   Leaf False 
-
-  Id=20
+  Id=16
    Node(site_type:2<3)
     Id=0
      Leaf True 
@@ -3181,19 +2425,16 @@ Id=21
 
 EXTENSIONAL DESCRIPTION:
 A(x!C@x)
+A(x!B@x)
+A(x!free)
 agent_type:1:B:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=0
- Leaf True 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=73
+Id=47
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=14
+  Id=10
    Node(site_type:1<2)
     Id=0
      Leaf True 
@@ -3205,7 +2446,7 @@ EXTENSIONAL DESCRIPTION:
 B(y~p)
 B(y~u)
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=22
  Node(site_type:2<0)
   Id=1
    Leaf False 
@@ -3223,17 +2464,12 @@ B(y!A@y)
 B(y!free)
 agent_type:1:B:cv_id:1
 INTENSIONAL DESCRIPTION:
-Id=0
- Leaf True 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=73
+Id=47
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=14
+  Id=10
    Node(site_type:1<2)
     Id=0
      Leaf True 
@@ -3245,7 +2481,7 @@ EXTENSIONAL DESCRIPTION:
 B(x~p)
 B(x~u)
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=22
  Node(site_type:2<0)
   Id=1
    Leaf False 
@@ -3263,12 +2499,12 @@ B(x!A@x)
 B(x!free)
 agent_type:2:C:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=73
+Id=47
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=14
+  Id=10
    Node(site_type:1<2)
     Id=0
      Leaf True 
@@ -3280,7 +2516,7 @@ EXTENSIONAL DESCRIPTION:
 C(y~p)
 C(y~u)
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=22
  Node(site_type:2<0)
   Id=1
    Leaf False 
@@ -3298,12 +2534,12 @@ C(y!A@y)
 C(y!free)
 agent_type:2:C:cv_id:1
 INTENSIONAL DESCRIPTION:
-Id=73
+Id=47
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=14
+  Id=10
    Node(site_type:1<2)
     Id=0
      Leaf True 
@@ -3315,7 +2551,7 @@ EXTENSIONAL DESCRIPTION:
 C(x~p)
 C(x~u)
 INTENSIONAL DESCRIPTION:
-Id=30
+Id=22
  Node(site_type:2<0)
   Id=1
    Leaf False 
@@ -3331,102 +2567,4 @@ Id=30
 EXTENSIONAL DESCRIPTION:
 C(x!A@x)
 C(x!free)
-Some exceptions have been raised
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Bdu_fixpoint_iteration; message: line 100; exception:Exit
-error: file_name: Bdu_fixpoint_iteration; message: line 136; exception:Exit
-error: file_name: Bdu_fixpoint_iteration; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Bdu_fixpoint_iteration; message: line 100; exception:Exit
-error: file_name: Bdu_fixpoint_iteration; message: line 136; exception:Exit
-error: file_name: Bdu_fixpoint_iteration; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Bdu_fixpoint_iteration; message: line 100; exception:Exit
-error: file_name: Bdu_fixpoint_iteration; message: line 136; exception:Exit
-error: file_name: Bdu_fixpoint_iteration; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Bdu_fixpoint_iteration; message: line 100; exception:Exit
-error: file_name: Bdu_fixpoint_iteration; message: line 136; exception:Exit
-error: file_name: Bdu_fixpoint_iteration; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Bdu_fixpoint_iteration; message: line 100; exception:Exit
-error: file_name: Bdu_fixpoint_iteration; message: line 136; exception:Exit
-error: file_name: Bdu_fixpoint_iteration; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Bdu_fixpoint_iteration; message: line 100; exception:Exit
-error: file_name: Bdu_fixpoint_iteration; message: line 136; exception:Exit
-error: file_name: Bdu_fixpoint_iteration; message: line 146; exception:Exit
-error: file_name: Boolean_mvbdu; message: line 947; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: Boolean_mvbdu; message: line 947; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: Print bdu analysis; message: line 139; exception:Exit
-error: file_name: Print bdu analysis; message: line 147; exception:Exit
-error: file_name: Print bdu analysis; message: line 146; exception:Exit
+execution finished without any exception

@@ -317,7 +317,7 @@ let scan_rule_bdu_build parameter handler_bdu error rule_id rule compil
       store_bdu_potential_restriction_map
   in
   (*-------------------------------------------------------------------------------*)
-  let error, store_potential_list_restriction_map =
+(*  let error, store_potential_list_restriction_map =
     Bdu_build.collect_potential_list_restriction_map
       parameter
       handler_bdu
@@ -333,7 +333,7 @@ let scan_rule_bdu_build parameter handler_bdu error rule_id rule compil
       handler_bdu
       error
       store_potential_list_restriction_map
-  in
+  in*)
   (*-------------------------------------------------------------------------------*)
   (*TODO: is_enable function *)
   let (error, handler_bdu), store_proj_bdu_views =
@@ -357,8 +357,8 @@ let scan_rule_bdu_build parameter handler_bdu error rule_id rule compil
 (*    store_proj_modif_list_restriction_map   = store_proj_modif_list_restriction_map;*)
     store_bdu_potential_effect_restriction_map = store_bdu_potential_restriction_map;
     store_proj_bdu_potential_restriction_map   = store_proj_bdu_potential_restriction_map;
-    store_potential_list_restriction_map       = store_potential_list_restriction_map;
-    store_proj_potential_list_restriction_map  = store_proj_potential_list_restriction_map;
+ (*   store_potential_list_restriction_map       = store_potential_list_restriction_map;
+    store_proj_potential_list_restriction_map  = store_proj_potential_list_restriction_map;*)
     store_proj_bdu_views                       = store_proj_bdu_views;
   }
 
@@ -479,8 +479,8 @@ let init_bdu_build parameter error =
 (*  let init_proj_modif_list_restriction_map   = Map_final_modif_list.Map.empty in*)
   let init_bdu_potential_restriction_map       = Map_potential_bdu.Map.empty in
   let init_proj_bdu_potential_restriction_map  = Map_final_potential_bdu.Map.empty in
-  let init_potential_list_restriction_map      = Map_potential_list.Map.empty in
-  let init_proj_potential_list_restriction_map = Map_final_potential_list.Map.empty in
+(*  let init_potential_list_restriction_map      = Map_potential_list.Map.empty in
+  let init_proj_potential_list_restriction_map = Map_final_potential_list.Map.empty in*)
   let init_proj_bdu_views                      = Map_rule_id_views.Map.empty in
   let init_restriction_bdu_test =
     {
@@ -495,8 +495,8 @@ let init_bdu_build parameter error =
 (*      store_proj_modif_list_restriction_map   = init_proj_modif_list_restriction_map;*)
       store_bdu_potential_effect_restriction_map = init_bdu_potential_restriction_map;
       store_proj_bdu_potential_restriction_map   = init_proj_bdu_potential_restriction_map;
-      store_potential_list_restriction_map       = init_potential_list_restriction_map;
-      store_proj_potential_list_restriction_map  = init_proj_potential_list_restriction_map;
+   (*   store_potential_list_restriction_map       = init_potential_list_restriction_map;
+      store_proj_potential_list_restriction_map  = init_proj_potential_list_restriction_map;*)
       store_proj_bdu_views                       = init_proj_bdu_views;
      }
   in
@@ -578,7 +578,7 @@ let bdu_main parameter error handler_kappa store_covering_classes compiled =
       result.store_bdu_build.store_modif_list_restriction_map
       result.store_bdu_build.store_proj_bdu_test_restriction_map
       result.store_bdu_build.store_proj_bdu_potential_restriction_map
-      result.store_bdu_build.store_proj_potential_list_restriction_map
+      (* result.store_bdu_build.store_proj_potential_list_restriction_map*)
       result.store_bdu_build.store_bdu_test_restriction_map
       result.store_bdu_build.store_proj_bdu_views
       result.store_bdu_analysis_dynamic.store_covering_classes_modification_update_full

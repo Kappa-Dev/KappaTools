@@ -501,22 +501,22 @@ let collect_bdu_creation_and_modif_list
 
 let collect_bdu_potential_and_list parameter error rule_id
     store_proj_bdu_potential_restriction_map
-    store_proj_potential_list_restriction_map =
-  let error, bdu_potential_map =
+  (*store_proj_potential_list_restriction_map*) =
+  let error, bdu_and_list_potential_map =
     match Map_final_potential_bdu.Map.find_option rule_id 
       store_proj_bdu_potential_restriction_map 
     with
     | None -> error, Map_agent_type_potential_bdu.Map.empty
     | Some map -> error, map
   in
-  let error, potential_list_map =
+ (* let error, potential_list_map =
     match Map_final_potential_list.Map.find_option rule_id
       store_proj_potential_list_restriction_map
     with
     | None -> error, Map_agent_type_potential_list.Map.empty
     | Some map -> error, map
-  in
-  error, (bdu_potential_map, potential_list_map)
+  in*)
+  error, (bdu_and_list_potential_map(*, potential_list_map*))
 
 (************************************************************************************)
 (*check is_enable*)
@@ -595,8 +595,8 @@ let compute_views_enabled parameter handler error
     bdu_test_map
     bdu_creation_map 
     modif_list_map 
-    bdu_potential_map
-    potential_list_map
+    bdu_and_list_potential_map
+    (* potential_list_map*)
     wl_tl
     store_covering_classes_modification_update_full
     bdu_proj_views
@@ -748,7 +748,7 @@ let compute_views_enabled parameter handler error
   let error, (handler, wl_tl, store_result) =
     Map_agent_type_potential_bdu.Map.fold 
       (* JF: to do use a fold2 *)
-      (fun (agent_type, cv_id) bdu_test (error, (handler, wl_tl, store_result)) -> (* JF: we miss the site that is getting free by the side effect *)
+      (fun (agent_type, new_site_id, cv_id) (bdu_test,list) (error, (handler, wl_tl, store_result)) -> 
         let error, bdu_X =
 	  match Map_bdu_update.Map.find_option_without_logs parameter error
             (agent_type, cv_id) store_result
@@ -756,27 +756,27 @@ let compute_views_enabled parameter handler error
 	  | error, None -> error, bdu_false
 	  | error, Some bdu -> error, bdu
 	in
-	let error, list =
+(*	let error, list =
           match
             Map_agent_type_potential_list.Map.find_option agent_type potential_list_map
           with
 	  | None -> error, []
 	  | Some l -> error, l
-	in
+	in*)
+(*	let error, handler, bdu_update =
+	  List.fold_left (fun _ list_a -> (* JF: very strange, check what happens if two sites of a given type can be released by side effect *)*)
 	let error, handler, bdu_update =
-	  List.fold_left (fun _ list_a -> (* JF: very strange, check what happens if two sites of a given type can be released by side effect *)
-	    let error, handler, bdu_update =
-	      compute_bdu_update_side_effects
-		parameter_views
-		handler
-		error
-		bdu_test
-		list_a
-		bdu_X
-	    in
-	    error, handler, bdu_update
-	  ) (error, handler, bdu_false) list
+	  compute_bdu_update_side_effects
+	    parameter_views
+	    handler
+	    error
+	    bdu_test
+	    list
+	    bdu_X
 	in
+(*	error, handler, bdu_update
+) (error, handler, bdu_false) list*)
+	(*	in*)
 	let error, handler, is_new_view, store_result =
 	  add_link parameter_views handler error correspondence (agent_type, cv_id) bdu_update store_result
 	in
@@ -798,7 +798,7 @@ let compute_views_enabled parameter handler error
 	in
 	error, (handler, wl_tl, store_result)          
       )
-      bdu_potential_map
+      bdu_and_list_potential_map
       (error, (handler, wl_tl, store_result))
   in 
   error, (handler, wl_tl, store_result)
@@ -819,7 +819,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
 (*    store_proj_modif_list_restriction_map *)
     store_proj_bdu_test_restriction_map
     store_proj_bdu_potential_restriction_map
-    store_proj_potential_list_restriction_map
+    (*  store_proj_potential_list_restriction_map*)
     store_bdu_test_restriction_map
     store_proj_bdu_views
     store_covering_classes_modification_update_full
@@ -963,13 +963,13 @@ let collect_bdu_fixpoint_with_init parameter handler error
             store_proj_bdu_test_restriction_map
         in
         (*--------------------------------------------------------------------*)
-        let error, (bdu_potential_map, potential_list_map) =
+        let error, bdu_and_list_potential_map =
           collect_bdu_potential_and_list
             parameter
             error
             rule_id
             store_proj_bdu_potential_restriction_map
-            store_proj_potential_list_restriction_map
+            (* store_proj_potential_list_restriction_map*)
         in
         (*--------------------------------------------------------------------*)
         (*is for all bdu_tes
@@ -1018,8 +1018,8 @@ t satisfy a covering_class?*)
 		bdu_proj_views
                 bdu_creation_map
                 modif_list_map
-                bdu_potential_map
-                potential_list_map
+                bdu_and_list_potential_map
+		(*   potential_list_map*)
                 wl_tl
                 store_covering_classes_modification_update_full
                 bdu_proj_views
@@ -1055,7 +1055,7 @@ let collect_bdu_fixpoint_map parameter handler error
     store_proj_modif_list_restriction_map
     store_proj_bdu_test_restriction_map
     store_proj_bdu_potential_restriction_map
-    store_proj_potential_list_restriction_map
+    (*store_proj_potential_list_restriction_map*)
     store_bdu_test_restriction_map
     store_proj_bdu_views
     store_covering_classes_modification_update_full
@@ -1085,7 +1085,7 @@ let collect_bdu_fixpoint_map parameter handler error
        store_proj_modif_list_restriction_map
        store_proj_bdu_test_restriction_map
        store_proj_bdu_potential_restriction_map
-       store_proj_potential_list_restriction_map
+       (*store_proj_potential_list_restriction_map*)
        store_bdu_test_restriction_map
        store_proj_bdu_views
        store_covering_classes_modification_update_full

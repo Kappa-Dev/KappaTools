@@ -766,19 +766,19 @@ rule 7: r7
 		Updating the views for B(x~,y~,x!)
 
 				INTENSIONAL DESCRIPTION:
-				Id=38
+				Id=36
 				 Node(site_type:1<0)
 				  Id=1
 				   Leaf False 
 
-				  Id=37
+				  Id=35
 				   Node(site_type:1<1)
-				    Id=32
+				    Id=30
 				     Node(site_type:2<1)
 				      Id=1
 				       Leaf False 
 
-				      Id=31
+				      Id=29
 				       Node(site_type:2<2)
 				        Id=26
 				         Node(site_type:3<1)
@@ -796,19 +796,19 @@ rule 7: r7
 				        Id=1
 				         Leaf False 
 
-				    Id=36
+				    Id=34
 				     Node(site_type:1<2)
 				      Id=1
 				       Leaf False 
 
-				      Id=35
+				      Id=33
 				       Node(site_type:1<3)
-				        Id=34
+				        Id=32
 				         Node(site_type:2<0)
 				          Id=1
 				           Leaf False 
 
-				          Id=33
+				          Id=31
 				           Node(site_type:2<1)
 				            Id=26
 				             Node(site_type:3<1)
@@ -852,19 +852,19 @@ rule 7: r7
 		Updating the views for B(x~,y~,x!)
 
 				INTENSIONAL DESCRIPTION:
-				Id=53
+				Id=51
 				 Node(site_type:1<1)
 				  Id=1
 				   Leaf False 
 
-				  Id=52
+				  Id=50
 				   Node(site_type:1<2)
-				    Id=51
+				    Id=49
 				     Node(site_type:2<2)
 				      Id=1
 				       Leaf False 
 
-				      Id=50
+				      Id=48
 				       Node(site_type:2<3)
 				        Id=10
 				         Node(site_type:3<0)
@@ -913,19 +913,19 @@ rule 7: r7
 		Updating the views for B(x~,y~,x!)
 
 				INTENSIONAL DESCRIPTION:
-				Id=69
+				Id=67
 				 Node(site_type:1<0)
 				  Id=1
 				   Leaf False 
 
-				  Id=68
+				  Id=66
 				   Node(site_type:1<1)
-				    Id=61
+				    Id=59
 				     Node(site_type:2<1)
 				      Id=1
 				       Leaf False 
 
-				      Id=60
+				      Id=58
 				       Node(site_type:2<2)
 				        Id=28
 				         Node(site_type:3<2)
@@ -943,14 +943,14 @@ rule 7: r7
 				        Id=1
 				         Leaf False 
 
-				    Id=67
+				    Id=65
 				     Node(site_type:1<2)
-				      Id=63
+				      Id=61
 				       Node(site_type:2<2)
 				        Id=1
 				         Leaf False 
 
-				        Id=62
+				        Id=60
 				         Node(site_type:2<3)
 				          Id=28
 				           Node(site_type:3<2)
@@ -968,14 +968,14 @@ rule 7: r7
 				          Id=1
 				           Leaf False 
 
-				      Id=66
+				      Id=64
 				       Node(site_type:1<3)
-				        Id=65
+				        Id=63
 				         Node(site_type:2<0)
 				          Id=1
 				           Leaf False 
 
-				          Id=64
+				          Id=62
 				           Node(site_type:2<1)
 				            Id=28
 				             Node(site_type:3<2)
@@ -1015,19 +1015,19 @@ rule 7: r7
 		Updating the views for B(x~,y~,x!)
 
 				INTENSIONAL DESCRIPTION:
-				Id=94
+				Id=92
 				 Node(site_type:1<1)
 				  Id=1
 				   Leaf False 
 
-				  Id=93
+				  Id=91
 				   Node(site_type:1<2)
-				    Id=84
+				    Id=82
 				     Node(site_type:2<2)
 				      Id=1
 				       Leaf False 
 
-				      Id=83
+				      Id=81
 				       Node(site_type:2<3)
 				        Id=26
 				         Node(site_type:3<1)
@@ -1143,21 +1143,21 @@ Id=6
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=92
+Id=90
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=91
+  Id=89
    Node(site_type:1<1)
-    Id=72
+    Id=70
      Node(site_type:2<1)
       Id=1
        Leaf False 
 
-      Id=71
+      Id=69
        Node(site_type:2<2)
-        Id=70
+        Id=68
          Node(site_type:3<0)
           Id=1
            Leaf False 
@@ -1173,16 +1173,16 @@ Id=92
         Id=1
          Leaf False 
 
-    Id=90
+    Id=88
      Node(site_type:1<2)
-      Id=89
+      Id=87
        Node(site_type:2<2)
         Id=1
          Leaf False 
 
-        Id=88
+        Id=86
          Node(site_type:2<3)
-          Id=70
+          Id=68
            Node(site_type:3<0)
             Id=1
              Leaf False 
@@ -1198,16 +1198,16 @@ Id=92
           Id=1
            Leaf False 
 
-      Id=79
+      Id=77
        Node(site_type:1<3)
-        Id=78
+        Id=76
          Node(site_type:2<0)
           Id=1
            Leaf False 
 
-          Id=77
+          Id=75
            Node(site_type:2<1)
-            Id=70
+            Id=68
              Node(site_type:3<0)
               Id=1
                Leaf False 
@@ -1300,12 +1300,12 @@ A(x~p)
 A(x~u)
 agent_type:1:B:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=108
+Id=106
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=107
+  Id=105
    Node(site_type:1<1)
     Id=8
      Node(site_type:2<1)
@@ -1320,14 +1320,14 @@ Id=108
         Id=1
          Leaf False 
 
-    Id=106
+    Id=104
      Node(site_type:1<2)
-      Id=104
+      Id=102
        Node(site_type:2<2)
         Id=1
          Leaf False 
 
-        Id=100
+        Id=98
          Node(site_type:2<3)
           Id=0
            Leaf True 
@@ -1335,7 +1335,7 @@ Id=108
           Id=1
            Leaf False 
 
-      Id=105
+      Id=103
        Node(site_type:1<3)
         Id=18
          Node(site_type:2<0)
@@ -1358,7 +1358,7 @@ B(x~u,y~u)
 B(x~q,y~q)
 B(x~p,y~p)
 INTENSIONAL DESCRIPTION:
-Id=70
+Id=68
  Node(site_type:3<0)
   Id=1
    Leaf False 
@@ -1453,7 +1453,7 @@ A(x~p)
 A(x~u)
 agent_type:1:B:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=95
+Id=93
  Node(site_type:1<0)
   Id=1
    Leaf False 
@@ -1471,12 +1471,12 @@ B(x~u)
 B(x~q)
 B(x~p)
 INTENSIONAL DESCRIPTION:
-Id=101
+Id=99
  Node(site_type:2<0)
   Id=1
    Leaf False 
 
-  Id=100
+  Id=98
    Node(site_type:2<3)
     Id=0
      Leaf True 
@@ -1489,7 +1489,7 @@ B(y~q)
 B(y~p)
 B(y~u)
 INTENSIONAL DESCRIPTION:
-Id=70
+Id=68
  Node(site_type:3<0)
   Id=1
    Leaf False 

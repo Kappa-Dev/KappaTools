@@ -307,7 +307,7 @@ module Project2bdu_modif =
 module Map_potential_bdu =
   SetMap.Make (
     struct
-      type t = int * int * int
+      type t = int * int * int * int
       let compare = compare
     end)
 
@@ -322,7 +322,7 @@ module Map_final_potential_bdu =
 module Map_agent_type_potential_bdu =
   SetMap.Make (
     struct
-      type t = int * int (*agent_type, cv_id*)
+      type t = int * int * int (*agent_type, site_type, cv_id*)
       let compare = compare
     end)
 
@@ -331,11 +331,11 @@ module Project2bdu_potential =
 
 (************************************************************************************)
 (*list of potential side effect (site free)*)
-
+(*
 module Map_potential_list =
   SetMap.Make (
     struct
-      type t = int * int * int
+      type t = int * int * int * int
       let compare = compare
     end)
 
@@ -355,7 +355,7 @@ module Map_agent_type_potential_list =
     end)
 
 module Project2bdu_potential_list =
-  SetMap.Proj2 (Map_potential_list)(Map_final_potential_list)(Map_agent_type_potential_list)
+  SetMap.Proj2 (Map_potential_list)(Map_final_potential_list)(Map_agent_type_potential_list)*)
 
 
 (************************************************************************************)
@@ -447,15 +447,15 @@ type bdu_build =
       Map_final_modif_list.Map.t;*)
     (*potential partner of side effects*)
     store_bdu_potential_effect_restriction_map : 
-      Mvbdu_wrapper.Mvbdu.mvbdu Map_potential_bdu.Map.t;
+      (Mvbdu_wrapper.Mvbdu.mvbdu* Mvbdu_wrapper.Mvbdu.hconsed_association_list) Map_potential_bdu.Map.t;
     store_proj_bdu_potential_restriction_map :
-      Mvbdu_wrapper.Mvbdu.mvbdu Map_agent_type_potential_bdu.Map.t
+      (Mvbdu_wrapper.Mvbdu.mvbdu * Mvbdu_wrapper.Mvbdu.hconsed_association_list) Map_agent_type_potential_bdu.Map.t
       Map_final_potential_bdu.Map.t;
-    store_potential_list_restriction_map :
+    (*store_potential_list_restriction_map :
       Mvbdu_wrapper.Mvbdu.hconsed_association_list list Map_potential_list.Map.t;
     store_proj_potential_list_restriction_map :
       Mvbdu_wrapper.Mvbdu.hconsed_association_list list 
-      Map_agent_type_potential_list.Map.t Map_final_potential_list.Map.t;
+      Map_agent_type_potential_list.Map.t Map_final_potential_list.Map.t;*)
     store_proj_bdu_views :
       Mvbdu_wrapper.Mvbdu.mvbdu Map_triple_views.Map.t Map_rule_id_views.Map.t;
   }
