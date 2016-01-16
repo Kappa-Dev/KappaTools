@@ -380,7 +380,6 @@ rule 6
 
 	Applying rule 1:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~,z~)
 
 				INTENSIONAL DESCRIPTION:
@@ -422,7 +421,6 @@ rule 6
 
 	Applying rule 2:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~,z~)
 
 				INTENSIONAL DESCRIPTION:
@@ -464,7 +462,6 @@ rule 6
 
 	Applying rule 3:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~,z~)
 
 				INTENSIONAL DESCRIPTION:
@@ -506,7 +503,6 @@ rule 6
 
 	Applying rule 4:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~,z~)
 
 				INTENSIONAL DESCRIPTION:
@@ -548,7 +544,6 @@ rule 6
 
 	Applying rule 5:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~,z~)
 
 				INTENSIONAL DESCRIPTION:
@@ -590,7 +585,6 @@ rule 6
 
 	Applying rule 6:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~,z~)
 
 				INTENSIONAL DESCRIPTION:
@@ -635,32 +629,26 @@ rule 6
 
 	Applying rule 1:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~,z~)
 
 	Applying rule 2:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~,z~)
 
 	Applying rule 3:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~,z~)
 
 	Applying rule 4:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~,z~)
 
 	Applying rule 5:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~,z~)
 
 	Applying rule 6:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~,z~)
 
 Reachability analysis result ....

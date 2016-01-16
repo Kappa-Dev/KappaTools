@@ -702,7 +702,6 @@ rule 5: mod x2
 
 	Applying rule 0: a.b:
 		the precondition is satisfied
-
 		Updating the views for A(x!,c!)
 
 				INTENSIONAL DESCRIPTION:
@@ -731,7 +730,6 @@ rule 5: mod x2
 
 				EXTENSIONAL DESCRIPTION:
 				A(x!B@x,c!free)
-
 		Updating the views for B(x!)
 
 				INTENSIONAL DESCRIPTION:
@@ -753,14 +751,11 @@ rule 5: mod x2
 
 	Applying rule 1: a.b_op:
 		the precondition is satisfied
-
 		Updating the views for A(x!,c!)
-
 		Updating the views for B(x!)
 
 	Applying rule 2: ab.c:
 		the precondition is satisfied
-
 		Updating the views for A(x!,c!)
 
 				INTENSIONAL DESCRIPTION:
@@ -789,7 +784,6 @@ rule 5: mod x2
 
 				EXTENSIONAL DESCRIPTION:
 				A(x!B@x,c!C@x1)
-
 		Updating the views for C(x1~,x2~,x1!,x2!)
 
 				INTENSIONAL DESCRIPTION:
@@ -841,7 +835,6 @@ rule 5: mod x2
 
 	Applying rule 3: mod x1:
 		the precondition is satisfied
-
 		Updating the views for C(x1~,x2~,x1!,x2!)
 
 				INTENSIONAL DESCRIPTION:
@@ -890,12 +883,10 @@ rule 5: mod x2
 
 				EXTENSIONAL DESCRIPTION:
 				C(x1~p,x2~u,x1!free,x2!free)
-
 		Updating the views for A(x!,c!)
 
 	Applying rule 4: a.c:
 		the precondition is satisfied
-
 		Updating the views for A(x!,c!)
 
 				INTENSIONAL DESCRIPTION:
@@ -924,7 +915,6 @@ rule 5: mod x2
 
 				EXTENSIONAL DESCRIPTION:
 				A(x!free,c!C@x2)
-
 		Updating the views for C(x1~,x2~,x1!,x2!)
 
 				INTENSIONAL DESCRIPTION:
@@ -976,9 +966,7 @@ rule 5: mod x2
 
 	Applying rule 5: mod x2:
 		the precondition is satisfied
-
 		Updating the views for A(x!,c!)
-
 		Updating the views for C(x1~,x2~,x1!,x2!)
 
 				INTENSIONAL DESCRIPTION:
@@ -1030,7 +1018,6 @@ rule 5: mod x2
 
 	Applying rule 0: a.b:
 		the precondition is satisfied
-
 		Updating the views for A(x!,c!)
 
 				INTENSIONAL DESCRIPTION:
@@ -1059,12 +1046,10 @@ rule 5: mod x2
 
 				EXTENSIONAL DESCRIPTION:
 				A(x!B@x,c!C@x2)
-
 		Updating the views for B(x!)
 
 	Applying rule 1: a.b_op:
 		the precondition is satisfied
-
 		Updating the views for A(x!,c!)
 
 				INTENSIONAL DESCRIPTION:
@@ -1093,49 +1078,36 @@ rule 5: mod x2
 
 				EXTENSIONAL DESCRIPTION:
 				A(x!free,c!C@x1)
-
 		Updating the views for B(x!)
 
 	Applying rule 2: ab.c:
 		the precondition is satisfied
-
 		Updating the views for A(x!,c!)
-
 		Updating the views for C(x1~,x2~,x1!,x2!)
 
 	Applying rule 3: mod x1:
 		the precondition is satisfied
-
 		Updating the views for C(x1~,x2~,x1!,x2!)
-
 		Updating the views for A(x!,c!)
 
 	Applying rule 4: a.c:
 		the precondition is satisfied
-
 		Updating the views for A(x!,c!)
-
 		Updating the views for C(x1~,x2~,x1!,x2!)
 
 	Applying rule 5: mod x2:
 		the precondition is satisfied
-
 		Updating the views for A(x!,c!)
-
 		Updating the views for C(x1~,x2~,x1!,x2!)
 
 	Applying rule 0: a.b:
 		the precondition is satisfied
-
 		Updating the views for A(x!,c!)
-
 		Updating the views for B(x!)
 
 	Applying rule 1: a.b_op:
 		the precondition is satisfied
-
 		Updating the views for A(x!,c!)
-
 		Updating the views for B(x!)
 
 Reachability analysis result ....

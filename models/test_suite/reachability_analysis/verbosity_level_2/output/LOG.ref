@@ -15,26 +15,20 @@ Reachability analysis...
 	Applying rule 1:
 		the precondition is satisfied
 
-
 	Applying rule 2:
 		the precondition is satisfied
-
 
 	Applying rule 3:
 		the precondition is satisfied
 
-
 	Applying rule 4:
 		the precondition is satisfied
-
 
 	Applying rule 5:
 		the precondition is satisfied
 
-
 	Applying rule 6:
 		the precondition is satisfied
-
 
 	Applying rule 7: KO:
 		the predcondition is not satisfied yet
@@ -45,26 +39,20 @@ Reachability analysis...
 	Applying rule 1:
 		the precondition is satisfied
 
-
 	Applying rule 2:
 		the precondition is satisfied
-
 
 	Applying rule 3:
 		the precondition is satisfied
 
-
 	Applying rule 4:
 		the precondition is satisfied
-
 
 	Applying rule 5:
 		the precondition is satisfied
 
-
 	Applying rule 6:
 		the precondition is satisfied
-
 
 Reachability analysis result ....
 

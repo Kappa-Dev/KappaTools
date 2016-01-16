@@ -50,9 +50,6 @@ let dump_view_diff parameter handler_kappa handler_bdu error
     let error, handler_bdu, bdu_diff =
       Mvbdu_wrapper.Mvbdu.mvbdu_xor parameter handler_bdu error old_bdu new_bdu
     in
-    let parameters_cv =
-      Remanent_parameters.update_prefix parameter ""
-    in
     (*-----------------------------------------------------------------------*)
     let error, agent_string =
       try 
@@ -87,7 +84,7 @@ let dump_view_diff parameter handler_kappa handler_bdu error
       Bdu_build.new_index_pair_map parameter error site_correspondence 
     in
     (*-----------------------------------------------------------------------*)
-    let () = Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n" in
+    let () = Printf.fprintf (Remanent_parameters.get_log parameter) "\n" in
     (*-----------------------------------------------------------------------*)
     let error, handler_bdu =
       if trace
@@ -171,9 +168,6 @@ let dump_valuation parameter handler_kappa handler_bdu error
     || Remanent_parameters.get_trace parameter
   then
     let prefix = Remanent_parameters.get_prefix parameter in
-    let parameters_cv =
-      Remanent_parameters.update_prefix parameter ""
-    in
     (*-----------------------------------------------------------------------*)
     let error, agent_string =
       try
@@ -208,7 +202,7 @@ let dump_valuation parameter handler_kappa handler_bdu error
       Bdu_build.new_index_pair_map parameter error site_correspondence
     in
     (*-----------------------------------------------------------------------*)
-    let () = Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n" in
+    let () = Printf.fprintf (Remanent_parameters.get_log parameter) "\n" in
     (*-----------------------------------------------------------------------*)
     let error, handler_bdu =
       if trace
@@ -422,7 +416,6 @@ let add_update_to_wl ?title:(title="") parameter error handler_kappa compiled si
     then
       begin
 	let log = Remanent_parameters.get_log parameter in
-	let () = Printf.fprintf log "\n" in
 	let error, agent_string =
 	  Handler.string_of_agent parameter error handler_kappa agent_type
 	in
@@ -640,7 +633,6 @@ let compute_views_enabled parameter handler error
     Map_triple_views.Map.fold
       (fun (agent_id, agent_type, cv_id) _ (error, (handler, wl_tl, store_result)) ->
         (*-----------------------------------------------------------------------*)
-	let () = Printf.fprintf (Remanent_parameters.get_log parameter) "\n" in
 	let error = dump_cv_label (Remanent_parameters.get_dump_reachability_analysis_diff parameter)  parameter_cv handler_kappa error correspondence agent_type cv_id in 
 	(*-----------------------------------------------------------------------*)
         (*print different of views information*)

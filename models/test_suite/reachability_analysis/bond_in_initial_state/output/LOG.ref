@@ -14,14 +14,11 @@ Reachability analysis...
 
 	B(x!A@x,x~u)
 	Wake-up rules
-
 	Dealing with A(x!)
 		(rule 0) should be investigated 
 		(rule 1) should be investigated 
-
 	Dealing with A(x~)
 		(rule 0) should be investigated 
-
 	Dealing with B(x!,x~)
 		(rule 0) should be investigated 
 		(rule 1) should be investigated 
@@ -36,11 +33,9 @@ Reachability analysis...
 
 	Applying rule 1:
 		the precondition is satisfied
-
 		Updating the views for A(x!)
 
 				B(x!free,x~u)
-
 				(rule 0) should be investigated 
 				(rule 1) should be investigated 
 				(rule 2) should be investigated 
@@ -48,13 +43,10 @@ Reachability analysis...
 
 	Applying rule 3:
 		the precondition is satisfied
-
 		Updating the views for B(x!,x~)
-
 		Updating the views for B(x!,x~)
 
 				B(x!A@x,x~p)
-
 				(rule 0) should be investigated 
 				(rule 1) should be investigated 
 				(rule 2) should be investigated 
@@ -65,11 +57,9 @@ Reachability analysis...
 
 	Applying rule 1:
 		the precondition is satisfied
-
 		Updating the views for A(x!)
 
 				B(x!free,x~p)
-
 				(rule 0) should be investigated 
 				(rule 1) should be investigated 
 				(rule 2) should be investigated 
@@ -77,14 +67,11 @@ Reachability analysis...
 
 	Applying rule 2:
 		the precondition is satisfied
-
 		Updating the views for B(x!,x~)
 
 	Applying rule 3:
 		the precondition is satisfied
-
 		Updating the views for B(x!,x~)
-
 		Updating the views for B(x!,x~)
 
 	Applying rule 0:
@@ -92,7 +79,6 @@ Reachability analysis...
 
 	Applying rule 1:
 		the precondition is satisfied
-
 		Updating the views for A(x!)
 
 Reachability analysis result ....

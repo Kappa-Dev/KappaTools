@@ -276,16 +276,13 @@ let print_result_dead_rule parameter error handler compiled result =
 let print_result_fixpoint parameter handler error handler_kappa site_correspondence result =
   if Remanent_parameters.get_dump_reachability_analysis_result parameter
   then
-    let _ = Format.printf "\nReachability analysis result ....@." in
-    let parameters_cv =
-      Remanent_parameters.update_prefix parameter ""
-    in
+    let _ = Format.fprintf (Remanent_parameters.get_formatter parameter) "\nReachability analysis result ....@." in
     let () =
       if trace
-	 || (Remanent_parameters.get_trace parameters_cv)
+	 || (Remanent_parameters.get_trace parameter)
       then
 	begin
-	  let () = Printf.fprintf (Remanent_parameters.get_log parameters_cv) "" in
+	  let () = Printf.fprintf (Remanent_parameters.get_log parameter) "" in
 	  let () =
             fprintf (Remanent_parameters.get_log parameter)
 	      "\n------------------------------------------------------------\n";

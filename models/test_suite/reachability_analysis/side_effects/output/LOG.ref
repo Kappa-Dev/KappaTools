@@ -935,7 +935,6 @@ rule 7: r7
 
 	Applying rule 6: r6:
 		the precondition is satisfied
-
 		Updating the views for A(x~,x!)
 
 				INTENSIONAL DESCRIPTION:
@@ -964,7 +963,6 @@ rule 7: r7
 
 				EXTENSIONAL DESCRIPTION:
 				A(x~u,x!B@x)
-
 		Updating the views for B(x~,x!)
 
 				INTENSIONAL DESCRIPTION:
@@ -1002,7 +1000,6 @@ rule 7: r7
 
 	Applying rule 9: r9:
 		the precondition is satisfied
-
 		Updating the views for C(x~,x!)
 
 	Applying rule 1: r1:
@@ -1016,7 +1013,6 @@ rule 7: r7
 
 	Applying rule 10: r10:
 		the precondition is satisfied
-
 		Updating the views for D(x~,x!)
 
 				INTENSIONAL DESCRIPTION:
@@ -1045,7 +1041,6 @@ rule 7: r7
 
 				EXTENSIONAL DESCRIPTION:
 				D(x~p,x!E@x)
-
 		Updating the views for E(x~,x!)
 
 				INTENSIONAL DESCRIPTION:
@@ -1077,7 +1072,6 @@ rule 7: r7
 
 	Applying rule 11: r11:
 		the precondition is satisfied
-
 		Updating the views for D(x~,x!)
 
 				INTENSIONAL DESCRIPTION:
@@ -1142,7 +1136,6 @@ rule 7: r7
 
 	Applying rule 5: r5:
 		the precondition is satisfied
-
 		Updating the views for A(x~,x!)
 
 				INTENSIONAL DESCRIPTION:
@@ -1174,9 +1167,7 @@ rule 7: r7
 
 	Applying rule 6: r6:
 		the precondition is satisfied
-
 		Updating the views for A(x~,x!)
-
 		Updating the views for B(x~,x!)
 
 	Applying rule 3: r3:
@@ -1184,14 +1175,11 @@ rule 7: r7
 
 	Applying rule 10: r10:
 		the precondition is satisfied
-
 		Updating the views for D(x~,x!)
-
 		Updating the views for E(x~,x!)
 
 	Applying rule 11: r11:
 		the precondition is satisfied
-
 		Updating the views for D(x~,x!)
 
 	Applying rule 1: r1:
@@ -1199,12 +1187,10 @@ rule 7: r7
 
 	Applying rule 5: r5:
 		the precondition is satisfied
-
 		Updating the views for A(x~,x!)
 
 	Applying rule 7: r7:
 		the precondition is satisfied
-
 		Updating the views for A(x~,x!)
 
 				INTENSIONAL DESCRIPTION:
@@ -1233,9 +1219,7 @@ rule 7: r7
 
 				EXTENSIONAL DESCRIPTION:
 				A(x~u,x!C@x)
-
 		Updating the views for B(x~,x!)
-
 		Updating the views for C(x~,x!)
 
 				INTENSIONAL DESCRIPTION:
@@ -1270,30 +1254,22 @@ rule 7: r7
 
 	Applying rule 5: r5:
 		the precondition is satisfied
-
 		Updating the views for A(x~,x!)
 
 	Applying rule 6: r6:
 		the precondition is satisfied
-
 		Updating the views for A(x~,x!)
-
 		Updating the views for B(x~,x!)
 
 	Applying rule 7: r7:
 		the precondition is satisfied
-
 		Updating the views for A(x~,x!)
-
 		Updating the views for B(x~,x!)
-
 		Updating the views for C(x~,x!)
 
 	Applying rule 8: r8:
 		the precondition is satisfied
-
 		Updating the views for C(x~,x!)
-
 		Updating the views for A(x~,x!)
 
 				INTENSIONAL DESCRIPTION:
@@ -1325,7 +1301,6 @@ rule 7: r7
 
 	Applying rule 9: r9:
 		the precondition is satisfied
-
 		Updating the views for C(x~,x!)
 
 				INTENSIONAL DESCRIPTION:
@@ -1363,12 +1338,10 @@ rule 7: r7
 
 	Applying rule 5: r5:
 		the precondition is satisfied
-
 		Updating the views for A(x~,x!)
 
 	Applying rule 6: r6:
 		the precondition is satisfied
-
 		Updating the views for A(x~,x!)
 
 				INTENSIONAL DESCRIPTION:
@@ -1397,28 +1370,21 @@ rule 7: r7
 
 				EXTENSIONAL DESCRIPTION:
 				A(x~p,x!B@x)
-
 		Updating the views for B(x~,x!)
 
 	Applying rule 7: r7:
 		the precondition is satisfied
-
 		Updating the views for A(x~,x!)
-
 		Updating the views for B(x~,x!)
-
 		Updating the views for C(x~,x!)
 
 	Applying rule 8: r8:
 		the precondition is satisfied
-
 		Updating the views for C(x~,x!)
-
 		Updating the views for A(x~,x!)
 
 	Applying rule 9: r9:
 		the precondition is satisfied
-
 		Updating the views for C(x~,x!)
 
 	Applying rule 0: r0:
@@ -1426,14 +1392,11 @@ rule 7: r7
 
 	Applying rule 5: r5:
 		the precondition is satisfied
-
 		Updating the views for A(x~,x!)
 
 	Applying rule 6: r6:
 		the precondition is satisfied
-
 		Updating the views for A(x~,x!)
-
 		Updating the views for B(x~,x!)
 
 Reachability analysis result ....

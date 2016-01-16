@@ -558,7 +558,6 @@ rule 0
 
 	Applying rule 3:
 		the precondition is satisfied
-
 		Updating the views for A(x~,x!)
 
 				INTENSIONAL DESCRIPTION:
@@ -590,27 +589,22 @@ rule 0
 
 	Applying rule 4:
 		the precondition is satisfied
-
 		Updating the views for A(x~,x!)
 
 	Applying rule 5:
 		the precondition is satisfied
-
 		Updating the views for A(x~,x!)
 
 	Applying rule 6:
 		the precondition is satisfied
-
 		Updating the views for A(x~,x!)
 
 	Applying rule 7:
 		the precondition is satisfied
-
 		Updating the views for A(x~,x!)
 
 	Applying rule 1:
 		the precondition is satisfied
-
 		Updating the views for B(x~)
 
 				INTENSIONAL DESCRIPTION:
@@ -632,7 +626,6 @@ rule 0
 
 	Applying rule 2:
 		the precondition is satisfied
-
 		Updating the views for B(x~)
 
 	Applying rule 0:
@@ -640,7 +633,6 @@ rule 0
 
 	Applying rule 3:
 		the precondition is satisfied
-
 		Updating the views for A(x~,x!)
 
 	Applying rule 8:
@@ -651,7 +643,6 @@ rule 0
 
 	Applying rule 1:
 		the precondition is satisfied
-
 		Updating the views for B(x~)
 
 Reachability analysis result ....

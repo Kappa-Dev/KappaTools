@@ -743,7 +743,6 @@ rule 7: r7
 
 	Applying rule 3: r3:
 		the precondition is satisfied
-
 		Updating the views for A(x!)
 
 				INTENSIONAL DESCRIPTION:
@@ -762,7 +761,6 @@ rule 7: r7
 
 				EXTENSIONAL DESCRIPTION:
 				A(x!B@x)
-
 		Updating the views for B(x~,y~,x!)
 
 				INTENSIONAL DESCRIPTION:
@@ -835,9 +833,7 @@ rule 7: r7
 
 	Applying rule 4: r4:
 		the precondition is satisfied
-
 		Updating the views for A(x!)
-
 		Updating the views for A(x!)
 
 	Applying rule 7: r7:
@@ -848,7 +844,6 @@ rule 7: r7
 
 	Applying rule 2: r2:
 		the precondition is satisfied
-
 		Updating the views for B(x~,y~,x!)
 
 				INTENSIONAL DESCRIPTION:
@@ -890,7 +885,6 @@ rule 7: r7
 
 	Applying rule 6: r6:
 		the precondition is satisfied
-
 		Updating the views for C(x!)
 
 				INTENSIONAL DESCRIPTION:
@@ -909,7 +903,6 @@ rule 7: r7
 
 				EXTENSIONAL DESCRIPTION:
 				C(x!B@x)
-
 		Updating the views for B(x~,y~,x!)
 
 				INTENSIONAL DESCRIPTION:
@@ -1009,9 +1002,7 @@ rule 7: r7
 
 	Applying rule 3: r3:
 		the precondition is satisfied
-
 		Updating the views for A(x!)
-
 		Updating the views for B(x~,y~,x!)
 
 				INTENSIONAL DESCRIPTION:
@@ -1056,37 +1047,27 @@ rule 7: r7
 
 	Applying rule 2: r2:
 		the precondition is satisfied
-
 		Updating the views for B(x~,y~,x!)
 
 	Applying rule 4: r4:
 		the precondition is satisfied
-
 		Updating the views for A(x!)
-
 		Updating the views for A(x!)
 
 	Applying rule 7: r7:
 		the precondition is satisfied
-
 		Updating the views for B(x~,y~,x!)
-
 		Updating the views for B(x~,y~,x!)
-
 		Updating the views for B(x~,y~,x!)
 
 	Applying rule 6: r6:
 		the precondition is satisfied
-
 		Updating the views for C(x!)
-
 		Updating the views for B(x~,y~,x!)
 
 	Applying rule 3: r3:
 		the precondition is satisfied
-
 		Updating the views for A(x!)
-
 		Updating the views for B(x~,y~,x!)
 
 Reachability analysis result ....

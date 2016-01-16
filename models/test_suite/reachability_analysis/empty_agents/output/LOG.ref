@@ -233,7 +233,6 @@ rule 4
 
 	Applying rule 1:
 		the precondition is satisfied
-
 		Updating the views for A()
 
 				INTENSIONAL DESCRIPTION:
@@ -244,7 +243,6 @@ rule 4
 
 	Applying rule 2:
 		the precondition is satisfied
-
 		Updating the views for B()
 
 				INTENSIONAL DESCRIPTION:
@@ -255,7 +253,6 @@ rule 4
 
 	Applying rule 3:
 		the precondition is satisfied
-
 		Updating the views for C()
 
 				INTENSIONAL DESCRIPTION:
@@ -280,7 +277,6 @@ rule 4
 
 	Applying rule 3:
 		the precondition is satisfied
-
 		Updating the views for C()
 
 Reachability analysis result ....

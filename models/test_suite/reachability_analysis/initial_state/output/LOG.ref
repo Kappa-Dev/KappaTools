@@ -247,7 +247,6 @@ rule 2
 
 	Applying rule 0:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~)
 
 				INTENSIONAL DESCRIPTION:
@@ -279,7 +278,6 @@ rule 2
 
 	Applying rule 1:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~)
 
 				INTENSIONAL DESCRIPTION:
@@ -311,12 +309,10 @@ rule 2
 
 	Applying rule 0:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~)
 
 	Applying rule 2:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~)
 
 				INTENSIONAL DESCRIPTION:
@@ -338,12 +334,10 @@ rule 2
 
 	Applying rule 1:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~)
 
 	Applying rule 2:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~)
 
 Reachability analysis result ....

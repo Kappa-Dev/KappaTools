@@ -417,7 +417,6 @@ rule 6
 
 				EXTENSIONAL DESCRIPTION:
 				A(x~u,y~u,z~u)
-
 				(rule 0) should be investigated 
 				(rule 1) should be investigated 
 				(rule 2) should be investigated 
@@ -432,7 +431,6 @@ rule 6
 
 	Applying rule 1:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~,z~)
 
 				INTENSIONAL DESCRIPTION:
@@ -471,7 +469,6 @@ rule 6
 
 				EXTENSIONAL DESCRIPTION:
 				A(x~p,y~u,z~u)
-
 				(rule 0) should be investigated 
 				(rule 1) should be investigated 
 				(rule 2) should be investigated 
@@ -483,7 +480,6 @@ rule 6
 
 	Applying rule 2:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~,z~)
 
 				INTENSIONAL DESCRIPTION:
@@ -522,7 +518,6 @@ rule 6
 
 				EXTENSIONAL DESCRIPTION:
 				A(x~p,y~p,z~u)
-
 				(rule 0) should be investigated 
 				(rule 1) should be investigated 
 				(rule 2) should be investigated 
@@ -534,7 +529,6 @@ rule 6
 
 	Applying rule 3:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~,z~)
 
 				INTENSIONAL DESCRIPTION:
@@ -573,7 +567,6 @@ rule 6
 
 				EXTENSIONAL DESCRIPTION:
 				A(x~0,y~p,z~q)
-
 				(rule 0) should be investigated 
 				(rule 1) should be investigated 
 				(rule 2) should be investigated 
@@ -585,7 +578,6 @@ rule 6
 
 	Applying rule 4:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~,z~)
 
 				INTENSIONAL DESCRIPTION:
@@ -624,7 +616,6 @@ rule 6
 
 				EXTENSIONAL DESCRIPTION:
 				A(x~q,y~u,z~u)
-
 				(rule 0) should be investigated 
 				(rule 1) should be investigated 
 				(rule 2) should be investigated 
@@ -636,7 +627,6 @@ rule 6
 
 	Applying rule 5:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~,z~)
 
 				INTENSIONAL DESCRIPTION:
@@ -675,7 +665,6 @@ rule 6
 
 				EXTENSIONAL DESCRIPTION:
 				A(x~q,y~q,z~u)
-
 				(rule 0) should be investigated 
 				(rule 1) should be investigated 
 				(rule 2) should be investigated 
@@ -687,7 +676,6 @@ rule 6
 
 	Applying rule 6:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~,z~)
 
 				INTENSIONAL DESCRIPTION:
@@ -726,7 +714,6 @@ rule 6
 
 				EXTENSIONAL DESCRIPTION:
 				A(x~q,y~q,z~q)
-
 				(rule 0) should be investigated 
 				(rule 1) should be investigated 
 				(rule 2) should be investigated 
@@ -744,32 +731,26 @@ rule 6
 
 	Applying rule 1:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~,z~)
 
 	Applying rule 2:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~,z~)
 
 	Applying rule 3:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~,z~)
 
 	Applying rule 4:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~,z~)
 
 	Applying rule 5:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~,z~)
 
 	Applying rule 6:
 		the precondition is satisfied
-
 		Updating the views for A(x~,y~,z~)
 
 Reachability analysis result ....
