@@ -888,7 +888,7 @@ let mvbdu_cartesian_decomposition_depth variables_list_of_mvbdu extensional_of_v
 	then
 	  error,handler,(Some bdu_to_decompose,list)
 	else
-	  let error,handler,l = variables_list_of_mvbdu parameters handler error bdu in 
+	  let error,handler,l = variables_list_of_mvbdu parameters handler error bdu_to_decompose in 
 	  let error,handler,list_var =extensional_of_variables_list parameters handler error l in
 	  let parts = Tools_kasa.sorted_parts_of_list k list_var in
 	  let rec aux list_of_parts handler error bdu_to_decompose list_of_decomposed_bdu decomposed_var =
@@ -903,8 +903,8 @@ let mvbdu_cartesian_decomposition_depth variables_list_of_mvbdu extensional_of_v
 		 aux t handler error bdu_to_decompose list_of_decomposed_bdu decomposed_var
 	       else
 		 let error,hadnler,list = build_sorted_variables_list parameters handler error h in 
-		 let error,handler,restriction = mvbdu_project_keep_only parameters handler error bdu list in
-		 let error,handler,abstract_away = mvbdu_project_abstract_away parameters handler error bdu list in
+		 let error,handler,restriction = mvbdu_project_keep_only parameters handler error bdu_to_decompose list in
+		 let error,handler,abstract_away = mvbdu_project_abstract_away parameters handler error bdu_to_decompose list in
 		 let error,handler,cartesian_abstraction = mvbdu_and parameters handler error restriction abstract_away in
 		 if equal cartesian_abstraction bdu_to_decompose
 		 then

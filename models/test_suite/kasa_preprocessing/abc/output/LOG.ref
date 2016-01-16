@@ -1297,23 +1297,10 @@ Id=89
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=94
- Node(site_type:2<0)
-  Id=1
-   Leaf False 
-
-  Id=32
-   Node(site_type:2<3)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
+Id=0
+ Leaf True 
 
 EXTENSIONAL DESCRIPTION:
-A(c!C@x2)
-A(c!C@x1)
-A(c!free)
 INTENSIONAL DESCRIPTION:
 Id=45
  Node(site_type:1<0)
@@ -1331,6 +1318,24 @@ Id=45
 EXTENSIONAL DESCRIPTION:
 A(x!B@x)
 A(x!free)
+INTENSIONAL DESCRIPTION:
+Id=94
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=32
+   Node(site_type:2<3)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A(c!C@x2)
+A(c!C@x1)
+A(c!free)
 agent_type:1:B:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=45

@@ -2107,23 +2107,10 @@ Id=26
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=30
- Node(site_type:2<0)
-  Id=1
-   Leaf False 
-
-  Id=16
-   Node(site_type:2<3)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
+Id=0
+ Leaf True 
 
 EXTENSIONAL DESCRIPTION:
-A(y!C@y)
-A(y!B@y)
-A(y!free)
 INTENSIONAL DESCRIPTION:
 Id=47
  Node(site_type:1<0)
@@ -2141,7 +2128,47 @@ Id=47
 EXTENSIONAL DESCRIPTION:
 A(y~p)
 A(y~u)
+INTENSIONAL DESCRIPTION:
+Id=30
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=16
+   Node(site_type:2<3)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A(y!C@y)
+A(y!B@y)
+A(y!free)
 agent_type:0:A:cv_id:1
+INTENSIONAL DESCRIPTION:
+Id=0
+ Leaf True 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=47
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=10
+   Node(site_type:1<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+A(x~p)
+A(x~u)
 INTENSIONAL DESCRIPTION:
 Id=30
  Node(site_type:2<0)
@@ -2160,23 +2187,6 @@ EXTENSIONAL DESCRIPTION:
 A(x!C@x)
 A(x!B@x)
 A(x!free)
-INTENSIONAL DESCRIPTION:
-Id=47
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=10
-   Node(site_type:1<2)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-A(x~p)
-A(x~u)
 agent_type:1:B:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=29
