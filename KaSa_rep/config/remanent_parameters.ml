@@ -121,7 +121,11 @@ let reachability_map_0 =
     Remanent_parameters_sig.dump_reachability_analysis_wl = false;   
     Remanent_parameters_sig.dump_reachability_analysis_covering_classes = false;
     Remanent_parameters_sig.dump_reachability_analysis_static = false;
-    Remanent_parameters_sig.dump_reachability_analysis_dynamic = false;    
+    Remanent_parameters_sig.dump_reachability_analysis_dynamic = false;
+    Remanent_parameters_sig.hide_one_d_relations_from_cartesian_decomposition = false;
+    Remanent_parameters_sig.smash_relations = false;
+    Remanent_parameters_sig.use_natural_language = false;
+  
   }
 
 let reachability_map_1 = { reachability_map_0 with Remanent_parameters_sig.dump_reachability_analysis_result = true }
@@ -132,13 +136,22 @@ let reachability_map_4 = { reachability_map_3 with Remanent_parameters_sig.dump_
 
 let add_debugging_parameters_to_reachability_map reachability =
   let trace = !Config.trace in
+  let reachability =
+    {
+      reachability
+    with
+      Remanent_parameters_sig.hide_one_d_relations_from_cartesian_decomposition = !Config.hide_one_d_relations_from_cartesian_decomposition;
+      Remanent_parameters_sig.smash_relations = !Config.smash_relations;
+      Remanent_parameters_sig.use_natural_language = !Config.use_natural_language;
+    }
+  in
   if trace then
     { reachability
     with
       Remanent_parameters_sig.dump_reachability_analysis_covering_classes = !Config.dump_reachability_analysis_covering_classes;
       Remanent_parameters_sig.dump_reachability_analysis_static = !Config.dump_reachability_analysis_static;
       Remanent_parameters_sig.dump_reachability_analysis_dynamic = !Config.dump_reachability_analysis_dynamic;
-    }
+      }
   else reachability
     
 let get_reachability_map () =
@@ -300,7 +313,9 @@ let get_dump_reachability_analysis_static_1 r = r.Remanent_parameters_sig.dump_r
 let get_dump_reachability_analysis_dynamic_1 r = r.Remanent_parameters_sig.dump_reachability_analysis_dynamic
 let get_dump_reachability_analysis_diff_1 r = r.Remanent_parameters_sig.dump_reachability_analysis_diff
 let get_dump_reachability_analysis_wl_1 r = r.Remanent_parameters_sig.dump_reachability_analysis_wl
-
+let get_smash_relations_1 r = r.Remanent_parameters_sig.smash_relations
+let get_hide_one_d_relations_from_cartesian_decomposition_1 r = r.Remanent_parameters_sig.hide_one_d_relations_from_cartesian_decomposition
+let get_use_natural_language_1 r = r.Remanent_parameters_sig.use_natural_language
 
 let get_symbols_1                          marshalisable = marshalisable.Remanent_parameters_sig.symbols
 let get_file_1                             marshalisable = marshalisable.Remanent_parameters_sig.file 
@@ -386,7 +401,7 @@ let get_link_mode = upgrade_from_marshal_field get_link_mode_1
 let get_contact_map_accuracy_level = upgrade_from_marshal_field get_contact_map_accuracy_level_1
 let get_influence_map_accuracy_level = upgrade_from_marshal_field get_influence_map_accuracy_level_1
 let get_view_accuracy_level = upgrade_from_marshal_field get_view_accuracy_level_1
-								    
+							 
 let upgrade_from_influence_map_field f = compose f get_influence_map
 let upgrade_from_contact_map_field f = compose f get_contact_map
 let upgrade_from_symbols_field f = compose f get_symbols
@@ -450,6 +465,9 @@ let get_dump_reachability_analysis_static = upgrade_from_reachability_map_field 
 let get_dump_reachability_analysis_dynamic = upgrade_from_reachability_map_field get_dump_reachability_analysis_dynamic_1
 let get_dump_reachability_analysis_diff = upgrade_from_reachability_map_field get_dump_reachability_analysis_diff_1
 let get_dump_reachability_analysis_wl = upgrade_from_reachability_map_field get_dump_reachability_analysis_wl_1
+let get_use_natural_language = upgrade_from_reachability_map_field get_use_natural_language_1
+let get_hide_one_d_relations_from_cartesian_decomposition = upgrade_from_reachability_map_field get_hide_one_d_relations_from_cartesian_decomposition_1
+let get_smash_relations = upgrade_from_reachability_map_field get_smash_relations_1
 
 
 let set_prefix_1 marshalisable prefix = 

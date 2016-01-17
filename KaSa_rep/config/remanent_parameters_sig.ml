@@ -87,6 +87,9 @@ type reachability_map_output =
     dump_reachability_analysis_dynamic : bool;
     dump_reachability_analysis_diff : bool;
     dump_reachability_analysis_wl : bool;
+    hide_one_d_relations_from_cartesian_decomposition : bool;
+    smash_relations : bool;
+    use_natural_language : bool;
   }
 
 type marshalisable_parameters = 
@@ -99,17 +102,8 @@ type marshalisable_parameters =
    do_stochastic_flow_of_information : bool ; 
    do_site_dependencies : bool ;
    dump_site_dependencies : bool ;
-   (*different reachability output*)
    do_reachability_analysis : bool ;
-   (*do_reachability_analysis : bool ;
-   do_reachability_analysis_result : bool;
-   do_reachability_analysis_iteration : bool;
-   do_reachability_analysis_static : bool;
-   do_reachability_analysis_dynamic : bool;
-   do_reachability_analysis_diff : bool;
-   do_reachability_analysis_wl : bool;*)
    called_from : called_from;
-   (**)
    dump_error_as_soon_as_they_occur : bool ;
    file : string option ; 
    prefix : string ; 

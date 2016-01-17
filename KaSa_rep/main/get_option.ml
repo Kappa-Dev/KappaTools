@@ -99,6 +99,26 @@ let options =
 	  "Tune the verbosity level for the view analysis",
 	  ["2_Reachability_analysis"],
 	  Normal;
+
+      "--hide-one-d-relations-from-cartesian-decomposition",
+      Bool Config.hide_one_d_relations_from_cartesian_decomposition,
+      "Filter out 1-d relations from the Cartesian decomposition",
+      ["2_Reachability_analysis"],
+      Developper;
+
+      "--smash-relations",
+      Bool Config.smash_relations,
+      "Recombine relations to get a more precise & compact output",
+      ["2_Reachability_analysis"],
+      Developper;
+      
+      "--use-natural-language",
+      Bool Config.use_natural_language,
+      "translate relations in sentences when it is possible",
+      ["2_Reachability_analysis"],
+      Normal;
+
+      
 		      
       "--output-directory",
       String Config.output_directory,
