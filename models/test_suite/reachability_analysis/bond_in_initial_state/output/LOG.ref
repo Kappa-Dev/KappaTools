@@ -92,20 +92,12 @@ Reachability analysis result ....
 ------------------------------------------------------------
 * Cartesian decomposition:
 ------------------------------------------------------------
-A(x!B@x)
-A(x~u)
-B(x!A@x)
-B(x!free)
-B(x~p)
-B(x~u)
 
 ------------------------------------------------------------
 * Cartesian abstraction:
 ------------------------------------------------------------
-A(x!B@x)
-A(x~u)
-B(x!A@x)
-B(x!free)
-B(x~p)
-B(x~u)
+The state of the site x! in agent A is always B@x.
+The state of the site x~ in agent A is always u.
+The state of the site x! in agent B ranges over free and A@x.
+The state of the site x~ in agent B ranges over u and p.
 execution finished without any exception

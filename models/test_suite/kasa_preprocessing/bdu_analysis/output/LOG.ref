@@ -885,11 +885,6 @@ Id=22
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=0
- Leaf True 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
 Id=22
  Node(site_type:1<0)
   Id=1
@@ -904,8 +899,6 @@ Id=22
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x!B@x)
-A(x!free)
 INTENSIONAL DESCRIPTION:
 Id=17
  Node(site_type:2<0)
@@ -921,8 +914,6 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(y!C@x)
-A(y!free)
 agent_type:0:A:cv_id:1
 INTENSIONAL DESCRIPTION:
 Id=3
@@ -939,7 +930,6 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(y~u)
 agent_type:0:A:cv_id:2
 INTENSIONAL DESCRIPTION:
 Id=3
@@ -956,7 +946,6 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x~u)
 agent_type:1:B:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=22
@@ -973,8 +962,6 @@ Id=22
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(x!A@x)
-B(x!free)
 agent_type:2:C:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=22
@@ -991,8 +978,6 @@ Id=22
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-C(x!A@y)
-C(x!free)
 
 ------------------------------------------------------------
 * Cartesian abstraction:
@@ -1013,8 +998,7 @@ Id=22
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x!B@x)
-A(x!free)
+The state of the site x! in agent A ranges over free and B@x.
 INTENSIONAL DESCRIPTION:
 Id=17
  Node(site_type:2<0)
@@ -1030,8 +1014,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(y!C@x)
-A(y!free)
+The state of the site y! in agent A ranges over free and C@x.
 agent_type:0:A:cv_id:1
 INTENSIONAL DESCRIPTION:
 Id=3
@@ -1048,7 +1031,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(y~u)
+The state of the site y~ in agent A is always u.
 agent_type:0:A:cv_id:2
 INTENSIONAL DESCRIPTION:
 Id=3
@@ -1065,7 +1048,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x~u)
+The state of the site x~ in agent A is always u.
 agent_type:1:B:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=22
@@ -1082,8 +1065,7 @@ Id=22
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(x!A@x)
-B(x!free)
+The state of the site x! in agent B ranges over free and A@x.
 agent_type:2:C:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=22
@@ -1100,6 +1082,5 @@ Id=22
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-C(x!A@y)
-C(x!free)
+The state of the site x! in agent C ranges over free and A@y.
 execution finished without any exception

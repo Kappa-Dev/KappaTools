@@ -884,45 +884,55 @@ let rec variables_of_mvbdu parameters error handler mvbdu =
 let mvbdu_cartesian_decomposition_depth variables_list_of_mvbdu extensional_of_variables_list build_sorted_variables_list mvbdu_project_keep_only mvbdu_project_abstract_away mvbdu_and equal
 					parameters handler error bdu int =
       let rec aux_k k handler error bdu_to_decompose list =
-	if k>int
+	if k > int 
 	then
-	  error,handler,(Some bdu_to_decompose,list)
+	  error, handler, (Some bdu_to_decompose,list)
 	else
 	  let error,handler,l = variables_list_of_mvbdu parameters handler error bdu_to_decompose in 
 	  let error,handler,list_var =extensional_of_variables_list parameters handler error l in
-	  let parts = Tools_kasa.sorted_parts_of_list k list_var in
-	  let rec aux list_of_parts handler error bdu_to_decompose list_of_decomposed_bdu decomposed_var =
+	  let n_var = List.length list_var in
+	  if k > n_var / 2
+	  then
+	    error, handler, (Some bdu_to_decompose,list)
+	  else 
+	    let parts = Tools_kasa.sorted_parts_of_list k list_var in
+	    let rec aux n_var list_of_parts handler error bdu_to_decompose list_of_decomposed_bdu decomposed_var =
+	      if k > n_var / 2
+	      then
+		error,handler,None,bdu_to_decompose::list_of_decomposed_bdu
+	      else
+		match
+		  list_of_parts
+		with
+		| [] -> error,handler,Some bdu_to_decompose,list_of_decomposed_bdu
+		| h::t -> 
+		   if
+		     List.exists (fun x -> Mods.IntSet.mem x decomposed_var) h
+		   then
+		     aux n_var t handler error bdu_to_decompose list_of_decomposed_bdu decomposed_var
+		   else
+		     let error,hadnler,list = build_sorted_variables_list parameters handler error h in 
+		     let error,handler,restriction = mvbdu_project_keep_only parameters handler error bdu_to_decompose list in
+		     let error,handler,abstract_away = mvbdu_project_abstract_away parameters handler error bdu_to_decompose list in
+		     let error,handler,cartesian_abstraction = mvbdu_and parameters handler error restriction abstract_away in
+		     if equal cartesian_abstraction bdu_to_decompose
+		     then
+		       let decomposed_var = List.fold_left (fun set a -> Mods.IntSet.add a set) decomposed_var h in
+		       aux (n_var - k) t handler error abstract_away (restriction::list_of_decomposed_bdu) decomposed_var
+		     else
+		       aux n_var t handler error bdu_to_decompose list_of_decomposed_bdu decomposed_var
+	    in 
+	    let error,handler,bdu_opt,list = aux
+						 n_var
+						 parts
+						 handler error bdu_to_decompose
+						 list
+						 Mods.IntSet.empty in
 	    match
-	      list_of_parts
+	      bdu_opt
 	    with
-	    | [] -> error,handler,(Some bdu_to_decompose,list_of_decomposed_bdu)
-	    | h::t -> 
-	       if
-		 List.exists (fun x -> Mods.IntSet.mem x decomposed_var) h
-	       then
-		 aux t handler error bdu_to_decompose list_of_decomposed_bdu decomposed_var
-	       else
-		 let error,hadnler,list = build_sorted_variables_list parameters handler error h in 
-		 let error,handler,restriction = mvbdu_project_keep_only parameters handler error bdu_to_decompose list in
-		 let error,handler,abstract_away = mvbdu_project_abstract_away parameters handler error bdu_to_decompose list in
-		 let error,handler,cartesian_abstraction = mvbdu_and parameters handler error restriction abstract_away in
-		 if equal cartesian_abstraction bdu_to_decompose
-		 then
-		   let decomposed_var = List.fold_left (fun set a -> Mods.IntSet.add a set) decomposed_var h in
-		   aux t handler error abstract_away (restriction::list_of_decomposed_bdu) decomposed_var
-		 else
-		   aux t handler error bdu_to_decompose list_of_decomposed_bdu decomposed_var
-	  in 
-	  let error,handler,(bdu_opt,list) = aux
-					       parts
-					       handler error bdu_to_decompose
-					       list
-					       Mods.IntSet.empty in
-	  match
-	    bdu_opt
-	  with
-	  | None -> error,handler,(None,list)
-	  | Some bdu -> aux_k (k+1) handler error bdu list
+	    | None -> error,handler,(None,list)
+	    | Some bdu -> aux_k (k+1) handler error bdu list
       in
       let error,handler,(bdu_opt,list) = aux_k 1 handler error bdu [] in
       error,handler,(bdu_opt,List.rev list)

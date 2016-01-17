@@ -449,9 +449,7 @@ Id=19
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x~p,y~u)
-A(x~u,y~u)
-A(x~u,y~p)
+In agent A, the state of the site y~ is u whenever the state of the site x~ is p.
 agent_type:1:D:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=3
@@ -468,7 +466,6 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-D(x~u)
 
 ------------------------------------------------------------
 * Cartesian abstraction:
@@ -489,8 +486,7 @@ Id=20
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x~p)
-A(x~u)
+The state of the site x~ in agent A ranges over u and p.
 INTENSIONAL DESCRIPTION:
 Id=17
  Node(site_type:2<0)
@@ -506,8 +502,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(y~p)
-A(y~u)
+The state of the site y~ in agent A ranges over u and p.
 agent_type:1:D:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=3
@@ -524,5 +519,5 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-D(x~u)
+The state of the site x~ in agent D is always u.
 execution finished without any exception

@@ -735,7 +735,6 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(y~u)
 agent_type:1:B:cv_id:1
 INTENSIONAL DESCRIPTION:
 Id=3
@@ -752,7 +751,6 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(x~u)
 agent_type:3:D:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=3
@@ -769,7 +767,6 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-D(y~u)
 agent_type:3:D:cv_id:1
 INTENSIONAL DESCRIPTION:
 Id=3
@@ -786,7 +783,6 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-D(x~u)
 
 ------------------------------------------------------------
 * Cartesian abstraction:
@@ -807,7 +803,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(y~u)
+The state of the site y~ in agent B is always u.
 agent_type:1:B:cv_id:1
 INTENSIONAL DESCRIPTION:
 Id=3
@@ -824,7 +820,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(x~u)
+The state of the site x~ in agent B is always u.
 agent_type:3:D:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=3
@@ -841,7 +837,7 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-D(y~u)
+The state of the site y~ in agent D is always u.
 agent_type:3:D:cv_id:1
 INTENSIONAL DESCRIPTION:
 Id=3
@@ -858,5 +854,5 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-D(x~u)
+The state of the site x~ in agent D is always u.
 execution finished without any exception

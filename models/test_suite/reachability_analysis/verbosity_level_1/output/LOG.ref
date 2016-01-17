@@ -29,13 +29,7 @@ A(x~u,y~u,z~u)
 ------------------------------------------------------------
 * Cartesian abstraction:
 ------------------------------------------------------------
-A(x~q)
-A(x~0)
-A(x~p)
-A(x~u)
-A(y~q)
-A(y~p)
-A(y~u)
-A(z~q)
-A(z~u)
+The state of the site x~ in agent A ranges over u, p, 0, and q.
+The state of the site y~ in agent A ranges over u, p, and q.
+The state of the site z~ in agent A ranges over u and q.
 execution finished without any exception

@@ -1269,11 +1269,6 @@ Id=89
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=0
- Leaf True 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
 Id=45
  Node(site_type:1<0)
   Id=1
@@ -1288,8 +1283,6 @@ Id=45
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x!B@x)
-A(x!free)
 INTENSIONAL DESCRIPTION:
 Id=94
  Node(site_type:2<0)
@@ -1305,9 +1298,6 @@ Id=94
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(c!C@x2)
-A(c!C@x1)
-A(c!free)
 agent_type:1:B:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=45
@@ -1324,8 +1314,6 @@ Id=45
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(x!A@x)
-B(x!free)
 agent_type:2:C:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=89
@@ -1457,8 +1445,7 @@ Id=45
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x!B@x)
-A(x!free)
+The state of the site x! in agent A ranges over free and B@x.
 INTENSIONAL DESCRIPTION:
 Id=94
  Node(site_type:2<0)
@@ -1474,9 +1461,7 @@ Id=94
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(c!C@x2)
-A(c!C@x1)
-A(c!free)
+The state of the site c! in agent A ranges over free, C@x1, and C@x2.
 agent_type:1:B:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=45
@@ -1493,8 +1478,7 @@ Id=45
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(x!A@x)
-B(x!free)
+The state of the site x! in agent B ranges over free and A@x.
 agent_type:2:C:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=45
@@ -1511,8 +1495,7 @@ Id=45
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-C(x1~p)
-C(x1~u)
+The state of the site x1~ in agent C ranges over u and p.
 INTENSIONAL DESCRIPTION:
 Id=48
  Node(site_type:2<0)
@@ -1528,8 +1511,7 @@ Id=48
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-C(x2~p)
-C(x2~u)
+The state of the site x2~ in agent C ranges over u and p.
 INTENSIONAL DESCRIPTION:
 Id=123
  Node(site_type:3<0)
@@ -1545,8 +1527,7 @@ Id=123
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-C(x1!A@c)
-C(x1!free)
+The state of the site x1! in agent C ranges over free and A@c.
 INTENSIONAL DESCRIPTION:
 Id=71
  Node(site_type:4<0)
@@ -1562,6 +1543,5 @@ Id=71
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-C(x2!A@c)
-C(x2!free)
+The state of the site x2! in agent C ranges over free and A@c.
 execution finished without any exception

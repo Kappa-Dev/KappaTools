@@ -620,8 +620,6 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x~p)
-A(x~u)
 agent_type:1:B:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=6
@@ -638,8 +636,6 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(x~p)
-B(x~u)
 
 ------------------------------------------------------------
 * Cartesian abstraction:
@@ -660,8 +656,7 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x~p)
-A(x~u)
+The state of the site x~ in agent A ranges over u and p.
 agent_type:1:B:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=6
@@ -678,6 +673,5 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(x~p)
-B(x~u)
+The state of the site x~ in agent B ranges over u and p.
 execution finished without any exception

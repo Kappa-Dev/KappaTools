@@ -1056,10 +1056,7 @@ Id=81
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x~q)
-A(x~0)
-A(x~p)
-A(x~u)
+The state of the site x~ in agent A ranges over u, p, 0, and q.
 INTENSIONAL DESCRIPTION:
 Id=89
  Node(site_type:2<0)
@@ -1075,9 +1072,7 @@ Id=89
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(y~q)
-A(y~p)
-A(y~u)
+The state of the site y~ in agent A ranges over u, p, and q.
 INTENSIONAL DESCRIPTION:
 Id=71
  Node(site_type:3<0)
@@ -1093,6 +1088,5 @@ Id=71
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(z~q)
-A(z~u)
+The state of the site z~ in agent A ranges over u and q.
 execution finished without any exception

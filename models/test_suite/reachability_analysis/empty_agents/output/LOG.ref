@@ -355,7 +355,6 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-D(x~u)
 
 ------------------------------------------------------------
 * Cartesian abstraction:
@@ -379,5 +378,8 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-D(x~u)
-execution finished without any exception
+The state of the site x~ in agent D is always u.
+Some exceptions have been raised
+error: file_name: Print bdu analysis; message: line 122; exception:Exit
+error: file_name: Print bdu analysis; message: line 122; exception:Exit
+error: file_name: Print bdu analysis; message: line 122; exception:Exit
