@@ -26,7 +26,8 @@ open Printf
 open Mvbdu_wrapper
 
 let warn parameters mh message exn default = 
-     Exception.warn parameters mh (Some "Bdu_fixpoint_iteration") message exn (fun () -> default) 
+  Exception.warn parameters mh (Some "Bdu_fixpoint_iteration") message exn
+    (fun () -> default) 
 
 let local_trace = false
 
@@ -39,7 +40,10 @@ let dump_formatter parameter  f =
   if local_trace 
     || Remanent_parameters.get_trace parameter
   then f (Remanent_parameters.get_formatter parameter) 
-    
+
+(************************************************************************************)
+(*print different views*)
+
 let dump_view_diff parameter handler_kappa handler_bdu error 
     site_correspondence agent_type cv_id old_bdu new_bdu =
   if trace 
@@ -58,28 +62,23 @@ let dump_view_diff parameter handler_kappa handler_bdu error
         _ -> warn parameter error (Some "line 56") Exit (string_of_int agent_type)
     in
     (*-----------------------------------------------------------------------*)
+    (*list of sites in a covering class*)
     let error, site_correspondence =
-      AgentMap.get parameter error agent_type site_correspondence 
-    in
-    let error, site_correspondence =
-      match
-	site_correspondence
-      with
-      | None ->
-	 warn parameter error (Some "line 58") Exit []
-      | Some a -> error,a
+      match AgentMap.get parameter error agent_type site_correspondence with
+      | error, None -> warn parameter error (Some "73") Exit []
+      | error, Some a -> error, a
     in
     let error, site_correspondence =
       let rec aux list =
-	match
-	  list
-	with
+	match list with
 	| [] -> warn parameter error (Some "line 68") Exit []
 	| (h, list, _) :: _ when h = cv_id -> error, list
 	| _ :: tail -> aux tail
       in aux site_correspondence
     in
     (*-----------------------------------------------------------------------*)
+    (*build a pair of coresspondence map: 
+      - map1: global -> local; map2: local -> global*)
     let error, (map1, map2) =
       Bdu_build.new_index_pair_map parameter error site_correspondence 
     in
@@ -94,8 +93,12 @@ let dump_view_diff parameter handler_kappa handler_bdu error
           Printf.fprintf (Remanent_parameters.get_log parameter) 
             "%sINTENSIONAL DESCRIPTION:\n" prefix
         in
+        (*print bdu different: this will print in a format of bdu*)
 	let () =
-          Mvbdu_wrapper.Mvbdu.print (Remanent_parameters.get_log parameter) prefix bdu_diff in
+          Mvbdu_wrapper.Mvbdu.print (Remanent_parameters.get_log parameter) 
+            prefix bdu_diff 
+        in
+        (*print a list of relations: this will print in a format readable*)
 	let () = 
           Printf.fprintf (Remanent_parameters.get_log parameter) 
             "%sEXTENSIONAL DESCRIPTION:\n" prefix
@@ -104,22 +107,24 @@ let dump_view_diff parameter handler_kappa handler_bdu error
       else
 	error, handler_bdu
     in
+    (*this is a function to convert a bdu of diff into a list.
+      return a pair: (bdu, and a pair of (site, state) list of list)*)
     let error, handler_bdu, list = 
       Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu parameter handler_bdu error bdu_diff
     in
     (*-----------------------------------------------------------------------*)
+    (*print function for extentional description*)
     let error =
       List.fold_left
 	(fun error l ->
 	 let error, bool =
 	   List.fold_left
 	     (fun (error, bool) (site_type, state) ->
-	       let error, site_type = Map.find_option parameter error site_type map2 in
-	       let error, site_type =
-		 match site_type with
-		 | None -> warn parameter error (Some "line 100") Exit (-1)
-		 | Some i -> error, i
-	       in
+               let error, site_type =
+                 match Map.find_option parameter error site_type map2 with
+                 | error, None -> warn parameter error (Some "line 100") Exit (-1)
+                 | error, Some i -> error, i
+               in
                (*-----------------------------------------------------------------------*)
 	       let error, site_string =
 		 try 
@@ -160,7 +165,9 @@ let dump_view_diff parameter handler_kappa handler_bdu error
     in error, handler_bdu    
   else error, handler_bdu
 
+(************************************************************************************)
 (* This function is useful for debugging purpose, please do not digest it *)
+
 let dump_valuation parameter handler_kappa handler_bdu error
     site_correspondence agent_type cv_id valuation =
   if trace
@@ -176,22 +183,15 @@ let dump_valuation parameter handler_kappa handler_bdu error
         _ -> warn parameter error (Some "line 56") Exit (string_of_int agent_type)
     in
     (*-----------------------------------------------------------------------*)
+    (*get a list of sites in a covering class*)
     let error, site_correspondence =
-      AgentMap.get parameter error agent_type site_correspondence
-    in
-    let error, site_correspondence =
-      match
-	site_correspondence
-      with
-      | None ->
-	 warn parameter error (Some "line 58") Exit []
-      | Some a -> error,a
+      match AgentMap.get parameter error agent_type site_correspondence with
+      | error, None -> warn parameter error (Some "line 202") Exit []
+      | error, Some a -> error, a
     in
     let error, site_correspondence =
       let rec aux list =
-	match
-	  list
-	with
+	match list with
 	| [] -> warn parameter error (Some "line 68") Exit []
 	| (h, list, _) :: _ when h = cv_id -> error, list
 	| _ :: tail -> aux tail
@@ -213,7 +213,8 @@ let dump_valuation parameter handler_kappa handler_bdu error
             "%sINTENSIONAL DESCRIPTION:\n" prefix
         in
 	let () =
-          Mvbdu_wrapper.Mvbdu.print_association_list (Remanent_parameters.get_log parameter) prefix valuation in
+          Mvbdu_wrapper.Mvbdu.print_association_list 
+            (Remanent_parameters.get_log parameter) prefix valuation in
 	let () =
           Printf.fprintf (Remanent_parameters.get_log parameter)
             "%sEXTENSIONAL DESCRIPTION:\n" prefix
@@ -222,27 +223,28 @@ let dump_valuation parameter handler_kappa handler_bdu error
       else
 	error, handler_bdu
     in
+    (*-----------------------------------------------------------------------*)
+    (*build a list*)
     let error, handler_bdu, list =
-      Mvbdu_wrapper.Mvbdu.extensional_of_association_list parameter handler_bdu error valuation
+      Mvbdu_wrapper.Mvbdu.extensional_of_association_list 
+        parameter handler_bdu error valuation
     in
     (*-----------------------------------------------------------------------*)
     let error, bool =
       List.fold_left
 	(fun (error, bool) (site_type, state) ->
-	  let error, site_type = Map.find_option parameter error site_type map2 in
-	  let error, site_type =
-	    match site_type with
-	    | None -> warn parameter error (Some "line 100") Exit (-1)
-	    | Some i -> error, i
-	  in
-               (*-----------------------------------------------------------------------*)
+          let error, site_type =
+            match Map.find_option parameter error site_type map2 with
+            | error, None -> warn parameter error (Some "262") Exit (-1)
+            | error, Some i -> error, i
+          in
+          (*-----------------------------------------------------------------------*)
 	  let error, site_string =
 	    try
               Handler.string_of_site parameter error handler_kappa
 		agent_type site_type
 	    with
-	      _ -> warn parameter error (Some "line 136")
-                Exit (string_of_int site_type)
+	      _ -> warn parameter error (Some "line 136") Exit (string_of_int site_type)
 	  in
 	  let error, state_string =
             try
@@ -251,7 +253,7 @@ let dump_valuation parameter handler_kappa handler_bdu error
 	    with
 	      _ -> warn parameter error (Some "line 146") Exit (string_of_int state)
           in
-               (*-----------------------------------------------------------------------*)
+          (*-----------------------------------------------------------------------*)
           let () =
 	    if bool
             then Printf.fprintf (Remanent_parameters.get_log parameter) ","
@@ -275,60 +277,58 @@ let dump_valuation parameter handler_kappa handler_bdu error
   else
     error,handler_bdu
 
-   
-let dump_cv_label bool parameter handler_kappa error 
-    site_correspondence agent_type cv_id =
+(************************************************************************************)
+
+let dump_cv_label bool parameter handler_kappa error site_correspondence agent_type cv_id =
   if trace 
     || Remanent_parameters.get_trace parameter
     || bool
   then
     let log = Remanent_parameters.get_log parameter in
     let prefix = Remanent_parameters.get_prefix parameter in
+    (*-----------------------------------------------------------------------*)
     let error, agent_string =
       try 
         Handler.string_of_agent parameter error handler_kappa agent_type
       with
         _ -> warn parameter error (Some "line 56") Exit (string_of_int agent_type)
     in
+    (*-----------------------------------------------------------------------*)
     let error, site_correspondence =
       AgentMap.get parameter error agent_type site_correspondence 
     in
     let error, site_correspondence =
-      match
-	site_correspondence
-      with
-      | None ->
-	 warn parameter error (Some "line 187") Exit []
-      | Some a -> error,a
+      match site_correspondence with
+      | None -> warn parameter error (Some "line 187") Exit []
+      | Some a -> error, a
     in
+    (*get a list of sites in a covering class *)
     let error, site_correspondence =
       let rec aux list =
-	match
-	  list
-	with
+	match list with
 	| [] -> warn parameter error (Some "line 195") Exit []
 	| (h, list, _) :: _ when h = cv_id -> error, list
 	| _ :: tail -> aux tail
       in aux site_correspondence
     in
     (*-----------------------------------------------------------------------*)
+    (*output*)
     let () = Printf.fprintf log "%s %s(" prefix agent_string in
     let error, _ =
       List.fold_left 
-	(fun (error,bool) site_type ->
+	(fun (error, bool) site_type ->
 	    let error, site_string =
-		 try 
-                   Handler.string_of_site parameter error handler_kappa
-		     agent_type site_type
-		 with
-		   _ -> warn parameter error (Some "line 210") 
-                     Exit (string_of_int site_type)
+	      try 
+                Handler.string_of_site parameter error handler_kappa
+		  agent_type site_type
+	      with
+		_ -> warn parameter error (Some "line 210") Exit (string_of_int site_type)
 	    in
 	    let () = 
 	      Printf.fprintf log "%s%s" (if bool then "," else "") site_string 
 	    in
-	    error,true)
-	(error,false) site_correspondence
+	    error, true)
+	(error, false) site_correspondence
     in
     let () = Printf.fprintf log ")\n" in
     error
@@ -399,8 +399,11 @@ let compute_bdu_update_side_effects parameter handler error bdu_test list_a bdu_
 (************************************************************************************)
 (*write a function add update(c) into working list*)
 
-let add_update_to_wl ?title:(title="") parameter error handler_kappa compiled site_correspondence agent_type cv_id 
+let add_update_to_wl ?title:(title="") parameter error handler_kappa compiled
+    site_correspondence agent_type cv_id 
     store_covering_classes_modification_update_full wl =
+  (*-----------------------------------------------------------------------*)
+  (*get a set of sites that are needed to add into working list*)
   let error, (_, s1) = 
     match Int2Map_CV_Modif.Map.find_option_without_logs parameter error (agent_type, cv_id)
       store_covering_classes_modification_update_full
@@ -416,32 +419,44 @@ let add_update_to_wl ?title:(title="") parameter error handler_kappa compiled si
     then
       begin
 	let log = Remanent_parameters.get_log parameter in
+        (*-----------------------------------------------------------------------*)
 	let error, agent_string =
-	  Handler.string_of_agent parameter error handler_kappa agent_type
+	  try
+            Handler.string_of_agent parameter error handler_kappa agent_type
+          with
+            _ -> warn parameter error (Some "line 460") Exit (string_of_int agent_type)
 	in
+        (*-----------------------------------------------------------------------*)
+        (*dump covering class label*)
 	let error =
 	  if title <> ""
 	  then 
 	    let parameter_cv = Remanent_parameters.update_prefix parameter ("\t"^title) in
-	    let error = dump_cv_label true parameter_cv handler_kappa error site_correspondence agent_type cv_id in 
+	    let error =
+              (*true: print the site type inside covering class*)
+              dump_cv_label true parameter_cv handler_kappa error 
+                site_correspondence agent_type cv_id 
+            in 
 	    error
 	  else
 	    error
 	in
-	let () = Site_map_and_set.Set.iter 
-		   (fun rule_id ->
-		    (*mapping rule_id of type int -> string*)
-		    let error, rule_id_string =
-		      try
-			Handler.string_of_rule parameter error handler_kappa
-					       compiled rule_id
-		      with
-			_ -> warn parameter error (Some "line 250") Exit (string_of_int rule_id)
-		    in
-		    let tab =
-		      if title = "" then "\t" else "\t\t" 
-		    in
-		    Printf.fprintf log "%s%s(%s) should be investigated \n" (Remanent_parameters.get_prefix parameter) tab rule_id_string) s1;
+        (*-----------------------------------------------------------------------*)
+	let () = 
+          Site_map_and_set.Set.iter (fun rule_id ->
+	    (*mapping rule_id of type int -> string*)
+	    let error, rule_id_string =
+	      try
+		Handler.string_of_rule parameter error handler_kappa
+		  compiled rule_id
+	      with
+		_ -> warn parameter error (Some "line 250") Exit (string_of_int rule_id)
+	    in
+	    let tab =
+	      if title = "" then "\t" else "\t\t" 
+	    in
+	    Printf.fprintf log "%s%s(%s) should be investigated \n" 
+              (Remanent_parameters.get_prefix parameter) tab rule_id_string) s1;
 	in
 	error
       end
@@ -456,14 +471,10 @@ let add_update_to_wl ?title:(title="") parameter error handler_kappa compiled si
 (************************************************************************************)
 (*fixpoint*)
 
-(*from rule_id get bdu_creation_map, bdu_test_map, and modif_list_map*)
+(*from rule_id get bdu_creation_map, bdu_test_map*)
 
-let collect_bdu_creation_and_modif_list
-    parameter
-    error
-    rule_id
+(*let collect_bdu_creation_and_modif_list parameter error rule_id
     store_proj_bdu_creation_restriction_map
-  (*  store_proj_modif_list_restriction_map*)
     store_proj_bdu_test_restriction_map
     =
   let error, bdu_creation_map = 
@@ -473,13 +484,6 @@ let collect_bdu_creation_and_modif_list
     | None -> error, Map_agent_type_creation_bdu.Map.empty
     | Some map -> error, map
   in
-(*  let error, modif_list_map =
-    match Map_final_modif_list.Map.find_option rule_id
-      store_proj_modif_list_restriction_map
-    with
-    | None -> error, Map_agent_id_modif_list.Map.empty
-    | Some map -> error, map
-  in*)
    let error, bdu_test_map = 
      match 
        Map_final_test_bdu.Map.find_option rule_id 
@@ -488,7 +492,7 @@ let collect_bdu_creation_and_modif_list
      | None -> error, Map_agent_id_test_bdu.Map.empty
      | Some map -> error, map
    in
-   error, (bdu_creation_map, (*modif_list_map,*) bdu_test_map)
+   error, (bdu_creation_map, bdu_test_map)
 
 (*form rule_id get bdu_potential_map, and modif_list_map (when state of the site is free)*)
 
@@ -510,36 +514,73 @@ let collect_bdu_potential_and_list parameter error rule_id
     | Some map -> error, map
   in*)
   error, (bdu_and_list_potential_map(*, potential_list_map*))
+    *)
+
+let collect_map_views_creation_test_potential parameter error rule_id
+    store_proj_bdu_views
+    store_proj_bdu_creation_restriction_map
+    store_proj_bdu_test_restriction_map
+    store_proj_bdu_potential_restriction_map
+    =
+  let error, bdu_proj_views =
+    match Map_rule_id_views.Map.find_option rule_id store_proj_bdu_views with
+    | None -> error, Map_triple_views.Map.empty
+    | Some m -> error, m
+  in
+  let error, bdu_creation_map = 
+    match Map_final_creation_bdu.Map.find_option rule_id
+      store_proj_bdu_creation_restriction_map
+    with
+    | None -> error, Map_agent_type_creation_bdu.Map.empty
+    | Some map -> error, map
+  in
+  let error, bdu_test_map = 
+    match 
+      Map_final_test_bdu.Map.find_option rule_id 
+        store_proj_bdu_test_restriction_map
+    with
+    | None -> error, Map_agent_id_test_bdu.Map.empty
+    | Some map -> error, map
+  in
+  let error, bdu_potential_map =
+    match Map_final_potential_bdu.Map.find_option rule_id 
+      store_proj_bdu_potential_restriction_map 
+    with
+    | None -> error, Map_agent_type_potential_bdu.Map.empty
+    | Some map -> error, map
+  in
+  error, (bdu_proj_views, bdu_creation_map, bdu_test_map, bdu_potential_map)
 
 (************************************************************************************)
 (*check is_enable*)
-exception False of Exception.method_handler * Mvbdu_wrapper.Mvbdu.handler (* TO DO, do the thing cleanly with a forall in wrapped map module *)
+
+exception False of Exception.method_handler * Mvbdu_wrapper.Mvbdu.handler 
+(* TO DO, do the thing cleanly with a forall in wrapped map module *)
 		     
-let is_enable parameter handler error bdu_false 
-    rule_id bdu_proj_views store_bdu_update_map =
-    try
-      let error,handler =
-	Map_triple_views.Map.fold
-	(fun (agent_id, agent_type, cv_id)  bdu_test (error,handler)->
-	 let error, bdu_X =
-           match Map_bdu_update.Map.find_option_without_logs parameter error
-							     (agent_type, cv_id) store_bdu_update_map
-           with
-           | error, None -> error, bdu_false
-           | error, Some bdu -> error, bdu
-         in
-        (*do the intersection of bdu_test and bdu_X*)
-         let error, handler, bdu_inter =
-           Mvbdu_wrapper.Mvbdu.mvbdu_and parameter handler error bdu_test bdu_X
-         in
+let is_enable parameter handler error bdu_false rule_id 
+    bdu_proj_views store_bdu_update_map =
+  try
+    let error,handler =
+      Map_triple_views.Map.fold
+	(fun (agent_id, agent_type, cv_id) bdu_test (error, handler)->
+	  let error, bdu_X =
+            match Map_bdu_update.Map.find_option_without_logs parameter error
+	      (agent_type, cv_id) store_bdu_update_map
+            with
+            | error, None -> error, bdu_false
+            | error, Some bdu -> error, bdu
+          in
+         (*do the intersection of bdu_test and bdu_X*)
+          let error, handler, bdu_inter =
+            Mvbdu_wrapper.Mvbdu.mvbdu_and parameter handler error bdu_test bdu_X
+          in
          (*check is enable*)
-         if Mvbdu_wrapper.Mvbdu.equal bdu_inter bdu_false
-         then raise (False (error,handler))
-         else error,handler
-	) bdu_proj_views (error,handler)
-      in error,handler,true
-    with False (error,handler) -> error,handler,false 
-    
+          if Mvbdu_wrapper.Mvbdu.equal bdu_inter bdu_false
+          then raise (False (error, handler))
+          else error, handler
+	) bdu_proj_views (error, handler)
+    in error, handler, true
+  with False (error, handler) -> error, handler, false 
 
 (************************************************************************************)
 (*compute view that has new view and new bond*)
@@ -589,7 +630,6 @@ let compute_views_enabled parameter handler error
     bdu_creation_map 
     modif_list_map 
     bdu_and_list_potential_map
-    (* potential_list_map*)
     wl_tl
     store_covering_classes_modification_update_full
     bdu_proj_views
@@ -598,7 +638,8 @@ let compute_views_enabled parameter handler error
   (* add_link should collect the list/set of (agent_type,cv_id) for which
      something has changed, so that add_update_to_wl can focus on these
      pairs *)
-  let add_link parameter handler error correspondence (agent_type, cv_id) bdu_update store_result =
+  let add_link parameter handler error correspondence (agent_type, cv_id)
+      bdu_update store_result =
     let error, bdu_old =
       match Map_bdu_update.Map.find_option_without_logs parameter error
         (agent_type, cv_id) store_result
@@ -614,11 +655,13 @@ let compute_views_enabled parameter handler error
     then
       error, handler, false, store_result
     else
+      (*print different views*)
       let parameter_view_diff = Remanent_parameters.update_prefix parameter "\t" in
       let error, handler = 
         dump_view_diff parameter_view_diff handler_kappa 
           handler error correspondence agent_type cv_id bdu_old bdu_union 
       in
+      (*add bdu union inside the result, return true if it discovers a new views*)
       let error, store_result =
         Map_bdu_update.Map.add_or_overwrite parameter error
           (agent_type, cv_id) bdu_union store_result
@@ -627,16 +670,20 @@ let compute_views_enabled parameter handler error
   in
   (*-----------------------------------------------------------------------*)
   (*deal with views*)
-  let parameter_cv = Remanent_parameters.update_prefix parameter "\t\tUpdating the views for" in
+  let parameter_cv = 
+    Remanent_parameters.update_prefix parameter "\t\tUpdating the views for"
+  in
   let parameter_views = Remanent_parameters.update_prefix parameter "\t\t\t" in
   let error, (handler, wl_tl, store_result) =
     Map_triple_views.Map.fold
       (fun (agent_id, agent_type, cv_id) _ (error, (handler, wl_tl, store_result)) ->
         (*-----------------------------------------------------------------------*)
-	let error = dump_cv_label (Remanent_parameters.get_dump_reachability_analysis_diff parameter)  parameter_cv handler_kappa error correspondence agent_type cv_id in 
+        (*print covering class label. Ex: A(x!,y!)*)
+	let error =
+          dump_cv_label (Remanent_parameters.get_dump_reachability_analysis_diff parameter) 
+            parameter_cv handler_kappa error correspondence agent_type cv_id 
+        in 
 	(*-----------------------------------------------------------------------*)
-        (*print different of views information*)
-        (*-----------------------------------------------------------------------*)
         let error, bdu_X =
           match Map_bdu_update.Map.find_option_without_logs parameter error
             (agent_type, cv_id) store_result 
@@ -645,31 +692,31 @@ let compute_views_enabled parameter handler error
           | error, Some bdu -> error, bdu
         in
         let error, bdu_test =
-          match Map_triple_views.Map.find_option (agent_id, agent_type, cv_id) bdu_test_map
+          match Map_triple_views.Map.find_option
+            (agent_id, agent_type, cv_id) bdu_test_map
           with
           | None -> error, bdu_true
           | Some bdu -> error, bdu
         in
-        (*list of list_a in modification*)
 	let error, handler, bdu_update =
-          match Map_modif_list.Map.find_option (agent_id,agent_type,rule_id,cv_id) modif_list_map
+          match Map_modif_list.Map.find_option 
+            (agent_id, agent_type, rule_id, cv_id) modif_list_map
 	  with
           | None -> error, handler, bdu_X
 	  | Some list_a ->
-              compute_bdu_update_views
-		parameter_views
-		handler
-		error
-		bdu_test
-		list_a
-		bdu_X
+            compute_bdu_update_views
+	      parameter_views
+	      handler
+	      error
+	      bdu_test
+	      list_a
+	      bdu_X
         in
         (*-----------------------------------------------------------------------*)
         let error, handler, is_new_view, store_result =
-          add_link parameter_views handler error correspondence (agent_type, cv_id) bdu_update store_result
+          add_link parameter_views handler error correspondence
+            (agent_type, cv_id) bdu_update store_result
         in
-        (*-----------------------------------------------------------------------*)
-        (*print working list of new view*)
         (*-----------------------------------------------------------------------*)
         let error, (handler, new_wl, store_result) =
           compute_new_views
@@ -712,7 +759,8 @@ let compute_views_enabled parameter handler error
             bdu_X
 	in
 	let error, handler, is_new_view, store_result =
-          add_link parameter_views handler error correspondence (agent_type, cv_id) bdu_update store_result
+          add_link parameter_views handler error correspondence
+            (agent_type, cv_id) bdu_update store_result
         in
         (*-----------------------------------------------------------------------*)
         let error, (handler, wl_tl, store_result) =
@@ -740,7 +788,8 @@ let compute_views_enabled parameter handler error
   let error, (handler, wl_tl, store_result) =
     Map_agent_type_potential_bdu.Map.fold 
       (* JF: to do use a fold2 *)
-      (fun (agent_type, new_site_id, cv_id) (bdu_test,list) (error, (handler, wl_tl, store_result)) -> 
+      (fun (agent_type, new_site_id, cv_id) (bdu_test,list) 
+        (error, (handler, wl_tl, store_result)) -> 
         let error, bdu_X =
 	  match Map_bdu_update.Map.find_option_without_logs parameter error
             (agent_type, cv_id) store_result
@@ -748,15 +797,6 @@ let compute_views_enabled parameter handler error
 	  | error, None -> error, bdu_false
 	  | error, Some bdu -> error, bdu
 	in
-(*	let error, list =
-          match
-            Map_agent_type_potential_list.Map.find_option agent_type potential_list_map
-          with
-	  | None -> error, []
-	  | Some l -> error, l
-	in*)
-(*	let error, handler, bdu_update =
-	  List.fold_left (fun _ list_a -> (* JF: very strange, check what happens if two sites of a given type can be released by side effect *)*)
 	let error, handler, bdu_update =
 	  compute_bdu_update_side_effects
 	    parameter_views
@@ -765,15 +805,13 @@ let compute_views_enabled parameter handler error
 	    bdu_test
 	    list
 	    bdu_X
-	in
-(*	error, handler, bdu_update
-) (error, handler, bdu_false) list*)
-	(*	in*)
-	let error, handler, is_new_view, store_result =
-	  add_link parameter_views handler error correspondence (agent_type, cv_id) bdu_update store_result
-	in
-  (*-----------------------------------------------------------------------*)
-	let error, (handler, wl_tl, store_result) =
+        in
+        let error, handler, is_new_view, store_result =
+	  add_link parameter_views handler error correspondence
+            (agent_type, cv_id) bdu_update store_result
+        in
+        (*-----------------------------------------------------------------------*)
+        let error, (handler, wl_tl, store_result) =
 	  compute_new_views
 	    parameter_views
 	    handler
@@ -808,10 +846,8 @@ let collect_bdu_fixpoint_with_init parameter handler error
        Fifo.IntWL.WSet.t)
     store_proj_bdu_creation_restriction_map
     modif_list_map
-(*    store_proj_modif_list_restriction_map *)
     store_proj_bdu_test_restriction_map
     store_proj_bdu_potential_restriction_map
-    (*  store_proj_potential_list_restriction_map*)
     store_bdu_test_restriction_map
     store_proj_bdu_views
     store_covering_classes_modification_update_full
@@ -820,7 +856,8 @@ let collect_bdu_fixpoint_with_init parameter handler error
     =
   (*-----------------------------------------------------------------------*)
     let log = Remanent_parameters.get_log parameter in
-    let add_link parameter handler error correspondence (agent_type, cv_id) bdu store_result =
+    let add_link parameter handler error correspondence (agent_type, cv_id) 
+        bdu store_result =
       let error, bdu_old =
 	match Map_bdu_update.Map.find_option_without_logs parameter error
           (agent_type, cv_id) store_result
@@ -829,10 +866,12 @@ let collect_bdu_fixpoint_with_init parameter handler error
 	| error, Some bdu -> error, bdu
       in
       let error, handler, bdu_union =
-	Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_old bdu (*JF: this is a computation, thus you have to pass the handler *)
+	Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_old bdu
+      (*JF: this is a computation, thus you have to pass the handler *)
       in
       let parameter_views = Remanent_parameters.update_prefix parameter "\t" in
-      let error, handler = 
+      (*print bdu different in views*)
+      let error, handler =
 	dump_view_diff parameter_views handler_kappa handler error
           correspondence agent_type cv_id bdu_old bdu_union
       in
@@ -888,7 +927,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
   let error, wl_init_creation = 
     Map_bdu_update.Map.fold
       (fun (agent_type, cv_id) _ (error, wl_init_creation) -> 
-	add_update_to_wl 
+	add_update_to_wl
 	  ~title:"Dealing with"
 	  parameter
           error 
@@ -918,7 +957,6 @@ let collect_bdu_fixpoint_with_init parameter handler error
           (handler, store_bdu_fixpoint_init_map, dead_rule_array)
       | Some rule_id ->
         (*----------------------------------------------------------------------*)
-        (*compute bdu_creation, bdu_test and modif_list for this rule_id*)
         (*output of rule that is enabled*)
     	let _ = 
           if
@@ -939,19 +977,19 @@ let collect_bdu_fixpoint_with_init parameter handler error
 	    ()
         in       
         (*--------------------------------------------------------------------*)
-        let error, bdu_proj_views =
+        (*let error, bdu_proj_views =
 	  match Map_rule_id_views.Map.find_option rule_id store_proj_bdu_views with
 	  | None -> error, Map_triple_views.Map.empty
 	  | Some m -> error, m
-	in
+	in*)
         (*--------------------------------------------------------------------*)
-        let error, (bdu_creation_map, (*modif_list_map,*) bdu_test_map) =
+        (*compute bdu_creation, bdu_test for this rule_id*)
+        (*let error, (bdu_creation_map, bdu_test_map) =
           collect_bdu_creation_and_modif_list
             parameter
             error
             rule_id
             store_proj_bdu_creation_restriction_map
-         (*   store_proj_modif_list_restriction_map*)
             store_proj_bdu_test_restriction_map
         in
         (*--------------------------------------------------------------------*)
@@ -961,11 +999,20 @@ let collect_bdu_fixpoint_with_init parameter handler error
             error
             rule_id
             store_proj_bdu_potential_restriction_map
-            (* store_proj_potential_list_restriction_map*)
+        in*)
+        let error, 
+          (bdu_proj_views, bdu_creation_map, bdu_test_map, bdu_and_list_potential_map) =
+          collect_map_views_creation_test_potential
+            parameter
+            error
+            rule_id
+            store_proj_bdu_views
+            store_proj_bdu_creation_restriction_map
+            store_proj_bdu_test_restriction_map
+            store_proj_bdu_potential_restriction_map
         in
         (*--------------------------------------------------------------------*)
-        (*is for all bdu_tes
-t satisfy a covering_class?*)
+        (*is for all bdu_test satisfy a covering_class?*)
         let error, handler, is_enable = 
           is_enable
             parameter
@@ -1011,7 +1058,6 @@ t satisfy a covering_class?*)
                 bdu_creation_map
                 modif_list_map
                 bdu_and_list_potential_map
-		(*   potential_list_map*)
                 wl_tl
                 store_covering_classes_modification_update_full
                 bdu_proj_views
@@ -1047,7 +1093,6 @@ let collect_bdu_fixpoint_map parameter handler error
     store_proj_modif_list_restriction_map
     store_proj_bdu_test_restriction_map
     store_proj_bdu_potential_restriction_map
-    (*store_proj_potential_list_restriction_map*)
     store_bdu_test_restriction_map
     store_proj_bdu_views
     store_covering_classes_modification_update_full
@@ -1077,7 +1122,6 @@ let collect_bdu_fixpoint_map parameter handler error
        store_proj_modif_list_restriction_map
        store_proj_bdu_test_restriction_map
        store_proj_bdu_potential_restriction_map
-       (*store_proj_potential_list_restriction_map*)
        store_bdu_test_restriction_map
        store_proj_bdu_views
        store_covering_classes_modification_update_full

@@ -45,7 +45,7 @@ module type Mvbdu =
 
     val build_association_list: ((int * int) list,hconsed_association_list) unary  
     val build_sorted_association_list: ((int * int) list,hconsed_association_list) unary
-    val build_reverse_sorted_association_list: ((int * int) list,hconsed_association_list) unary
+    val build_reverse_sorted_association_list: ((int * int) list, hconsed_association_list) unary
     val empty_association_list : hconsed_association_list constant
     val build_variables_list: (int list,hconsed_variables_list) unary  
     val build_sorted_variables_list: (int list,hconsed_variables_list) unary
@@ -57,7 +57,7 @@ module type Mvbdu =
 
     val extensional_of_variables_list: (hconsed_variables_list,int list) unary
     val extensional_of_association_list: (hconsed_association_list,(int*int) list) unary
-    val extensional_of_mvbdu: (mvbdu,(int * int) list list) unary
+    val extensional_of_mvbdu: (mvbdu, (int * int) list list) unary
 
 
     val variables_list_of_mvbdu: (mvbdu,hconsed_variables_list) unary

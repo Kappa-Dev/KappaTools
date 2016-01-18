@@ -217,15 +217,15 @@ let string_of_site_contact_map parameter error handler_kappa agent_type site_int
     
 let print_state parameter error handler_kappa state =
   match state with
-  | Ckappa_sig.Internal a -> error,a
-  | Ckappa_sig.Binding Cckappa_sig.Free -> error,"free"
+  | Ckappa_sig.Internal a -> error, a
+  | Ckappa_sig.Binding Cckappa_sig.Free -> error, "free"
   | Ckappa_sig.Binding Cckappa_sig.Lnk_type (a, b) -> 
      error, (string_of_int a) ^ "@" ^ (string_of_int b)
 
 let print_state_fully_deciphered parameter error handler_kappa state =
   match state with
   | Ckappa_sig.Internal a -> error,a
-  | Ckappa_sig.Binding Cckappa_sig.Free -> error,"free"
+  | Ckappa_sig.Binding Cckappa_sig.Free -> error, "free"
   | Ckappa_sig.Binding Cckappa_sig.Lnk_type (a, b) ->
      let error, ag = string_of_agent parameter error handler_kappa a in
      let error, site = string_of_site_contact_map parameter error handler_kappa a b in
