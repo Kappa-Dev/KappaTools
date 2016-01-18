@@ -104,38 +104,28 @@ let print ~show_dep_with_dimmension_higher_than:dim_min parameter handler_kappa 
       begin
 	if dim_min <= 1
 	then
-	  let error, site_string =
-	    try 
-	      Handler.string_of_site parameter error handler_kappa
+	  let error', site_string =
+	    Handler.string_of_site parameter error handler_kappa
 				     agent_type site_type
-	    with
-	      _ ->
-              warn parameter error (Some "line 273") Exit
-                   (string_of_int site_type)
-	  in
+	  in 
+          let error = Exception.check warn parameter error error' (Some "line 111") Exit in
 	  let rec aux list error =
 	    match list
 	    with
 	    | [] -> warn parameter error (Some "line 282") Exit ()
 	    | [state] ->
-	       let error, state_string =
-			 try
-			   Handler.string_of_state_fully_deciphered parameter error
-								    handler_kappa agent_type site_type state
-			 with
-			   _ -> warn parameter error (Some "line 290") Exit 
-				     (string_of_int state)
-		       in
-		       error, Printf.fprintf (Remanent_parameters.get_log parameter) " and %s.\n" state_string
+	       let error', state_string =
+		 Handler.string_of_state_fully_deciphered parameter error
+		   handler_kappa agent_type site_type state
+	       in
+	       let error = Exception.check warn parameter error error' (Some "line 121") Exit in
+	       error, Printf.fprintf (Remanent_parameters.get_log parameter) " and %s.\n" state_string
 	    | state::tail ->
-	       let error, state_string =
-		 try
+	       let error', state_string =
 		   Handler.string_of_state_fully_deciphered parameter error
 							    handler_kappa agent_type site_type state
-		 with
-		   _ -> warn parameter error (Some "line 300") Exit 
-			     (string_of_int state)
 	       in
+	       let error = Exception.check warn parameter error error' (Some "line 128") Exit in
 	       let () = Printf.fprintf (Remanent_parameters.get_log parameter) " %s," state_string in
 	       aux tail error
 	  in
@@ -144,122 +134,88 @@ let print ~show_dep_with_dimmension_higher_than:dim_min parameter handler_kappa 
 	  with
 	  | [] -> warn parameter error (Some "line 305") Exit ()
 	  | [state] ->
-	     let error, state_string =
-	       try
+	     let error', state_string =
 		 Handler.string_of_state_fully_deciphered parameter error
 							  handler_kappa agent_type site_type state
-	       with
-		 _ -> warn parameter error (Some "line 313") Exit 
-			   (string_of_int state)
 	     in
+	     let error = Exception.check warn parameter error error' (Some "line 141") Exit in
 	     error, Printf.fprintf (Remanent_parameters.get_log parameter) 
-				   "The state of the site %s in agent %s is always %s.\n" site_string agent_string state_string
+	       "The state of the site %s in agent %s is always %s.\n" site_string agent_string state_string
 	  | [state1;state2] ->
-	     let error, state_string1 =
-	       try
-		 Handler.string_of_state_fully_deciphered parameter error
-							  handler_kappa agent_type site_type state1
-	       with
-		 _ -> warn parameter error (Some "line 323") Exit 
-			   (string_of_int state1)
+	     let error', state_string1 =
+	       Handler.string_of_state_fully_deciphered parameter error
+		 handler_kappa agent_type site_type state1
 	     in
-	     let error, state_string2 =
-	       try
-		 Handler.string_of_state_fully_deciphered parameter error
+	     let error = Exception.check warn parameter error error' (Some "line 149") Exit in
+	     let error', state_string2 =
+	       Handler.string_of_state_fully_deciphered parameter error
 							  handler_kappa agent_type site_type state2
-	       with
-		 _ -> warn parameter error (Some "line 331") Exit 
-			   (string_of_int state2)
 	     in
+	     let error = Exception.check warn parameter error error' (Some "line 154") Exit in
 	     error, Printf.fprintf (Remanent_parameters.get_log parameter) 
-				   "The state of the site %s in agent %s ranges over %s and %s.\n" site_string agent_string state_string1 state_string2
+	       "The state of the site %s in agent %s ranges over %s and %s.\n" site_string agent_string state_string1 state_string2
 	  | list ->
-	     let () = Printf.fprintf (Remanent_parameters.get_log parameter)
-				     "The state of the site %s in agent %s ranges over" site_string agent_string
-	     in
-	     aux list error
+	    let () = Printf.fprintf (Remanent_parameters.get_log parameter)
+	      "The state of the site %s in agent %s ranges over" site_string agent_string
+	    in
+	    aux list error
 	else error,()
       end
    | Equiv ((site1,state1),(site2,state2)) ->
-      if dim_min <= 2
-      then
-	begin
-	  let error, site_string1 =
-	    try 
-	      Handler.string_of_site parameter error handler_kappa
+     if dim_min <= 2
+     then
+       begin
+	 let error', site_string1 =
+	   Handler.string_of_site parameter error handler_kappa
 				     agent_type site1
-	    with
-	      _ ->
-	      warn parameter error (Some "line 348") Exit
-                   (string_of_int site1)
-	  in
-	  let error, state_string1 =
-	    try
-	      Handler.string_of_state_fully_deciphered parameter error
-						       handler_kappa agent_type site1 state1
-	    with
-	      _ -> warn parameter error (Some "line 357") Exit 
-			(string_of_int state1)
-	  in
-	  let error, site_string2 =
-	    try 
-	      Handler.string_of_site parameter error handler_kappa
-				     agent_type site2
-	    with
-	      _ ->
-              warn parameter error (Some "line 365") Exit
-                   (string_of_int site2)
-	  in
-	  let error, state_string2 =
-	    try
-	      Handler.string_of_state_fully_deciphered parameter error
+	 in
+	 let error = Exception.check warn parameter error error' (Some "line 172") Exit in
+	 let error', state_string1 =
+	   Handler.string_of_state_fully_deciphered parameter error
+	     handler_kappa agent_type site1 state1
+	 in
+	 let error = Exception.check warn parameter error error' (Some "line 177") Exit in
+	 let error', site_string2 =
+	   Handler.string_of_site parameter error handler_kappa
+	     agent_type site2
+	 in
+	 let error = Exception.check warn parameter error error' (Some "line 182") Exit in
+	 let error', state_string2 =
+	   Handler.string_of_state_fully_deciphered parameter error
 						       handler_kappa agent_type site2 state2
-	    with
-	      _ -> warn parameter error (Some "line 373") Exit 
-			(string_of_int state2)
-	  in
-	  error,
-	  Printf.fprintf (Remanent_parameters.get_log parameter) "In agent %s, the state of the site %s is %s, if and only if, the state of the site %s is %s.\n" agent_string site_string1 state_string1 site_string2 state_string2
-	end
-      else
-	error,()
+	 in
+	 let error = Exception.check warn parameter error error' (Some "line 187") Exit in
+	 error,
+	 Printf.fprintf (Remanent_parameters.get_log parameter) "In agent %s, the state of the site %s is %s, if and only if, the state of the site %s is %s.\n" agent_string site_string1 state_string1 site_string2 state_string2
+       end
+     else
+       error,()
    | Imply ((site1,state1),(site2,state2)) ->
       if dim_min <= 2
       then
 	begin
-	  let error, site_string1 =
-	    try 
-	      Handler.string_of_site parameter error handler_kappa agent_type site1
-	    with
-	      _ ->
-              warn parameter error (Some "line 348") Exit (string_of_int site1)
+	  let error', site_string1 =
+	    Handler.string_of_site parameter error handler_kappa agent_type site1
 	  in
-	  let error, state_string1 =
-	    try
-	      Handler.string_of_state_fully_deciphered parameter error
-						       handler_kappa agent_type site1 state1
-		    with
-		      _ -> warn parameter error (Some "line 357") Exit (string_of_int state1)
-		  in
-		  let error, site_string2 =
-		    try 
-		      Handler.string_of_site parameter error handler_kappa agent_type site2
-		    with
-		      _ ->
-                      warn parameter error (Some "line 365") Exit (string_of_int site2)
-		  in
-		  let error, state_string2 =
-		    try
-		      Handler.string_of_state_fully_deciphered parameter error
-							       handler_kappa agent_type site2 state2
-		    with
-		      _ -> warn parameter error (Some "line 373") Exit 	(string_of_int state2)
-		  in
-		  error,
-		  Printf.fprintf (Remanent_parameters.get_log parameter) "In agent %s, the state of the site %s is %s whenever the state of the site %s is %s.\n" agent_string site_string2 state_string2 site_string1 state_string1
-		  end
-		else
-		  error,()
+	  let error = Exception.check warn parameter error error' (Some "line 200") Exit in
+	  let error', state_string1 =
+	    Handler.string_of_state_fully_deciphered parameter error
+	      handler_kappa agent_type site1 state1
+	  in
+	  let error = Exception.check warn parameter error error' (Some "line 204") Exit in
+	  let error', site_string2 =
+	    Handler.string_of_site parameter error handler_kappa agent_type site2
+	  in
+	  let error = Exception.check warn parameter error error' (Some "line 208") Exit in
+	  let error', state_string2 =
+	    Handler.string_of_state_fully_deciphered parameter error
+	      handler_kappa agent_type site2 state2 in
+	  let error = Exception.check warn parameter error error' (Some "line 212") Exit in
+	  error,
+	  Printf.fprintf (Remanent_parameters.get_log parameter) "In agent %s, the state of the site %s is %s whenever the state of the site %s is %s.\n" agent_string site_string2 state_string2 site_string1 state_string1
+	end
+      else
+	error,()
    | No_known_translation list ->
       begin
 	match list
@@ -273,23 +229,16 @@ let print ~show_dep_with_dimmension_higher_than:dim_min parameter handler_kappa 
 		let error, bool =
 		  List.fold_left
 		    (fun (error, bool) (site_type, state) ->
-		     let error, site_string =
-		       try 
-			 Handler.string_of_site parameter error handler_kappa
+		     let error', site_string =
+		       Handler.string_of_site parameter error handler_kappa
 						agent_type site_type
-		       with
-			 _ ->
-			 warn parameter error (Some "line 147") Exit
-			      (string_of_int site_type)
 		     in
+		     let error = Exception.check warn parameter error error' (Some "line 235") Exit in
 		     let error, state_string =
-		       try
-			 Handler.string_of_state_fully_deciphered parameter error
+		       Handler.string_of_state_fully_deciphered parameter error
 								  handler_kappa agent_type site_type state
-		       with
-			 _ -> warn parameter error (Some "line 146") Exit 
-				   (string_of_int state)
 		     in
+		     let error = Exception.check warn parameter error error' (Some "line 240") Exit in
 		     (*-----------------------------------------------------------*)
 		     let () =
 		       if bool 

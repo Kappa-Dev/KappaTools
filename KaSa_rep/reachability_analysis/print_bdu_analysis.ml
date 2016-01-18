@@ -33,7 +33,9 @@ let trace = false
 let print_result parameter error handler_kappa compiled result =
   let parameter = Remanent_parameters.update_prefix parameter "agent_type_" in
   let _ =
-    if true (*Remanent_parameters.get_dump_reachability_analysis_static parameter*)
+    if trace
+      || Remanent_parameters.get_trace parameter
+      || Remanent_parameters.get_dump_reachability_analysis_static parameter
     then
       let _ = Format.printf "\nReachability analysis static information ....@." in
       let parameters_cv =
@@ -88,30 +90,29 @@ let print_result parameter error handler_kappa compiled result =
     
 
 let print_bdu_update_map parameter error handler_kappa result =
-  Map_bdu_update.Map.iter (fun (agent_type, cv_id) bdu_update ->
-    let error, agent_string =
-      try
+  Map_bdu_update.Map.fold (fun (agent_type, cv_id) bdu_update error ->
+    let error', agent_string =
         Handler.string_of_agent parameter error handler_kappa agent_type
-      with
-        _ -> warn parameter error (Some "line 89") Exit (string_of_int agent_type)
     in
-    let _ =
+    let error = Exception.check warn parameter error error' (Some "line 95") Exit in
+    let () =
       fprintf parameter.log "agent_type:%i:%s:cv_id:%i\n" 
         agent_type agent_string cv_id
     in
-    Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_update
-    ) result
+    let () =
+      Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_update
+    in
+    error) 
+    result error
 
 let print_bdu_update_map_gen_decomposition decomposition ~show_dep_with_dimmension_higher_than:dim_min 
     parameter handler error handler_kappa site_correspondence result =
   Map_bdu_update.Map.fold 
     (fun (agent_type, cv_id) bdu_update (error,handler) ->
-      let error, agent_string =
-        try
+      let error', agent_string =
           Handler.string_of_agent parameter error handler_kappa agent_type
-        with
-          _ -> warn parameter error (Some "line 103") Exit (string_of_int agent_type)
       in
+      let error = Exception.check warn parameter error error' (Some "line 110") Exit in
       (*-----------------------------------------------------------------------*)
       let () =
 	if trace || Remanent_parameters.get_trace parameter
@@ -231,25 +232,33 @@ let print_result_dead_rule parameter error handler compiled result =
       fprintf (Remanent_parameters.get_log parameter)
         "------------------------------------------------------------\n";
     in
-    Array.iteri (fun index bool ->
-      let error, rule_string =
-        try
-          Handler.string_of_rule parameter error handler compiled index
-        with
-          _ -> warn parameter error (Some "line 253") Exit (string_of_int index)
-      in
-      if bool
-      then
-        ()
+    let size = Array.length result in
+    let rec aux k error = 
+      if k = size then error
       else
-        Printf.fprintf stdout "%s is dead.\n" rule_string
-    ) result  
+	let bool = Array.get result k in
+	let error =
+	  if bool
+	  then
+	    error
+	  else
+	    let error', rule_string =
+              Handler.string_of_rule parameter error handler compiled k
+	    in
+	    let error = Exception.check warn parameter error error' (Some "line 234") Exit in
+            let () = Printf.fprintf stdout "%s will never be applied.\n" rule_string 
+	    in error
+	in aux (k+1) error
+    in aux 0 error
+  else
+    error
+
 
 let print_result_fixpoint parameter handler error handler_kappa site_correspondence result =
   if Remanent_parameters.get_dump_reachability_analysis_result parameter
   then
-    let _ = Format.fprintf (Remanent_parameters.get_formatter parameter) "\nReachability analysis result ....@." in
-    let () =
+    let () = Format.fprintf (Remanent_parameters.get_formatter parameter) "\nReachability analysis result ....@." in
+    let error =
       if trace
 	 || (Remanent_parameters.get_trace parameter)
       then
@@ -263,15 +272,16 @@ let print_result_fixpoint parameter handler error handler_kappa site_corresponde
             fprintf (Remanent_parameters.get_log parameter)
 	      "------------------------------------------------------------\n";
 	  in
-	  let () =
+	  let error =
             print_bdu_update_map
               parameter
               error
               handler_kappa
               result
 	  in
-	  ()
+	  error
 	end
+      else error
     in 
     let () =
       fprintf (Remanent_parameters.get_log parameter)

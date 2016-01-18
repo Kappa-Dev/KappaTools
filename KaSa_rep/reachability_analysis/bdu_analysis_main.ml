@@ -589,7 +589,7 @@ let bdu_main parameter error handler_kappa store_covering_classes compiled =
     if  Remanent_parameters.get_dump_reachability_analysis_result parameter
     then
       (*Print a list of rules that is dead*)
-      let () =
+      let error =
         print_result_dead_rule parameter error handler_kappa compiled dead_rule_array
       in
       Print_bdu_analysis.print_result_fixpoint 
