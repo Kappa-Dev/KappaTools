@@ -144,7 +144,7 @@ Reachability analysis result ....
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------
-rule 7: KO is dead.
+rule 7: KO will never be applied.
 
 Reachability analysis result ....
 

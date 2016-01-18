@@ -219,8 +219,8 @@ Reachability analysis result ....
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------
-rule 0: bind is dead.
-rule 1: remove is dead.
+rule 0: bind will never be applied.
+rule 1: remove will never be applied.
 
 Reachability analysis result ....
 

@@ -284,7 +284,7 @@ Reachability analysis result ....
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------
-rule 4 is dead.
+rule 4 will never be applied.
 
 Reachability analysis result ....
 

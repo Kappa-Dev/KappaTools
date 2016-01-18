@@ -191,10 +191,10 @@ Reachability analysis result ....
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------
-rule 0: veryveryveryveryverylonglonglonglabel is dead.
-rule 1: otherotherveryveryveryverylonglabel is dead.
-rule 2: "0 is dead.
-rule 3: \0 is dead.
+rule 0: veryveryveryveryverylonglonglonglabel will never be applied.
+rule 1: otherotherveryveryveryverylonglabel will never be applied.
+rule 2: "0 will never be applied.
+rule 3: \0 will never be applied.
 
 Reachability analysis result ....
 

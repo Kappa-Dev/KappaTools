@@ -239,10 +239,10 @@ Reachability analysis result ....
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------
-rule 0 is dead.
-rule 1 is dead.
-rule 2 is dead.
-rule 3 is dead.
+rule 0 will never be applied.
+rule 1 will never be applied.
+rule 2 will never be applied.
+rule 3 will never be applied.
 
 Reachability analysis result ....
 

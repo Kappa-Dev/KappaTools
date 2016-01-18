@@ -650,9 +650,9 @@ Reachability analysis result ....
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------
-rule 0 is dead.
-rule 8 is dead.
-rule 9 is dead.
+rule 0 will never be applied.
+rule 8 will never be applied.
+rule 9 will never be applied.
 
 Reachability analysis result ....
 
