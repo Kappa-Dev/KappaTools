@@ -3,15 +3,14 @@
   <head>
     <meta charset="utf-8">
     <title>KaSim in browser</title>
-    <style type="text/css" media="screen">
-      #editor {
-      height: 450px;
-      }
-      </style>
+
     <!-- Boostrap stuff -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <!-- CodeMirror -->
+    <script src="https://mooodkiri.coq.club/javascript/codemirror/codemirror.js"></script>
+    <link rel="stylesheet" href="https://mooodkiri.coq.club/javascript/codemirror/codemirror.css">
   </head>
   <body>
     <nav class="navbar navbar-default navbar-static-top">
@@ -19,14 +18,12 @@
 	<div class="navbar-header">
 	  <a class="navbar-brand" href="http://Kappa-Dev.github.io/">KaSim</a>
 	  <ul class="nav navbar-nav">
-	    <li><a href="index.html?&nb_events=10000&model=https%3A%2F%2Fraw.githubusercontent.com%2FKappa-Dev%2FKaSim%2Fmaster%2Fmodels%2Fabc-pert.ka">Try it Online</a></li>
+	    <li><a href="index.html?&nb_events=10000&plot_points=150&time_limit=30&model=https%3A%2F%2Fraw.githubusercontent.com%2FKappa-Dev%2FKaSim%2Fmaster%2Fmodels%2Fabc-pert.ka">Try it Online</a></li>
 	  </ul>
 	</div>
       </div>
     </nav>
     <div class="container" id="main"></div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.1.9/ace.js"
-	    type="text/javascript" charset="utf-8"></script>
     <!-- The code -->
     <script type="text/javascript" src="JaSim.js"></script>
   </body>

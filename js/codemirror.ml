@@ -1,10 +1,8 @@
 class type t = object end
 
-let create s =
+let create e =
   Js.Unsafe.fun_call
-    (Js.Unsafe.js_expr
-       "ace")##edit
-    [| Js.Unsafe.inject s |]
+    (Js.Unsafe.js_expr "CodeMirror") [| Js.Unsafe.inject e|]
 
 let get_editor_value editor =
   Js.Unsafe.fun_call

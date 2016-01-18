@@ -76,13 +76,13 @@ let get_initial_content editor_obj () =
 				 | (Url.Http h | Url.Https h) -> h.Url.hu_path
 				 | Url.File f -> f.Url.fu_path) in
 	      Storage.set_opened_filename filename in
-	 let () = Ace.set_editor_value editor_obj
+	 let () = Codemirror.set_editor_value editor_obj
 		  @@ Js.string content.XmlHttpRequest.content in
 	 return_unit)
   with Not_found ->
        try
 	 let text = List.assoc "model_text" args in
-	 let () = Ace.set_editor_value editor_obj
+	 let () = Codemirror.set_editor_value editor_obj
 		  @@ Js.string text in
 	 return_unit
        with Not_found ->
@@ -136,7 +136,7 @@ let raw_html =
 	      <span class="input-group-addon">points</span></div></div> >>
 
 let setup_editor () =
-  let editor_obj = Ace.create (Js.string "editor") in
+  let editor_obj = Codemirror.create editor in
   let _ = Lwt_js_events.changes
 	    load_file
 	    (fun _ _ ->
@@ -151,7 +151,7 @@ let setup_editor () =
 		       Js.to_bool
 			 (Dom_html.window##confirm
 			    (Js.string "Load with loosing modifications?"))
-		  then Ace.set_editor_value editor_obj va in
+		  then Codemirror.set_editor_value editor_obj va in
 		let () = has_been_modified := false in
 		return_unit)) in
   let () = save_file##onclick <-
@@ -160,7 +160,7 @@ let setup_editor () =
 		let header = Js.string "data:text/plain;charset=utf-8," in
 		let () =
 		  save_file##href <-
-		    header##concat (Js.escape (Ace.get_editor_value editor_obj)) in
+		    header##concat (Js.escape (Codemirror.get_editor_value editor_obj)) in
 		let () = has_been_modified := false in
 		Js._true) in
   editor_obj

@@ -135,7 +135,7 @@ let onload _ =
   let () = Dom.appendChild main skeleton in
   let editor_obj = Input.setup_editor () in
   let () = Lwt_js_events.async (Input.get_initial_content editor_obj) in
-  let () =  (Ace.starter editor_obj Input.has_been_modified) in
+  let () =  (Codemirror.starter editor_obj Input.has_been_modified) in
   Js._false
 
 let _ = Dom_html.window##onload <- Dom_html.handler onload
