@@ -130,7 +130,7 @@ Note that \KaSim~can only render curves in the svg format. However, data outputs
 
 \section{The \KaSa~static analyser}
 
-\KaSa~is an open source static analyser  tool of rule-based models~\cite{DanLan04,Dan_etal07a,Fae_etal05} written in Kappa. \KaSa~takes one or several \hyperref[chap:kappa]{Kappa files} as input and some command line options to toggle on/off some specific static analysis. Currently, only the computation of the contact map and of the influence map are available. Other analyses including reachability analysis \cite{Feret-ICCMSE2007,DanosEtAl-VMCAI08} and model reduction \cite{Feret-et-al-pnas2009,DanosEtAl-LICS2010,Feret-MFPSXXVII} will come soon. 
+\KaSa~is an open source static analyser  tool of rule-based models~\cite{DanLan04,Dan_etal07a,Fae_etal05} written in Kappa. \KaSa~takes one or several \hyperref[chap:kappa]{Kappa files} as input and some command line options to toggle on/off some specific static analysis. Currently, \KaSa~can compute the contact map and the influence map. It can perform reachability analysis \cite{Feret-ICCMSE2007,DanosEtAl-VMCAI08} as well.  Other analyses including  model reduction \cite{Feret-et-al-pnas2009,DanosEtAl-LICS2010,Feret-MFPSXXVII} will come soon. 
 
 A graphical interface is proposed to navigate through the various options and utilities  of \KaSa. The compilation of this interface requires \href{https://forge.ocamlcore.org/projects/labltk/}{labltk} and, in particular,  \href{http://www.tcl.tk/}{tk-dev}.
 
@@ -1192,8 +1192,9 @@ The onglet \texttt{0\_Actions} (see Fig.~\ref{fig:kasa:0}) contains the main act
 \begin{itemize}
 \item The button \texttt{--do-all} activates all the functionalities. 
 \item The button \texttt{--reset-all} inactivates all the functionalities.
-\item The option \texttt{--compute-contact-map} can be used to activate the computation of the contact map. 
-\item The option \texttt{--compute-influence-map} can be used to activate the computation of the influence map.
+\item The option \texttt{--compute-contact-map} can be used to (des)activate the computation of the contact map. 
+\item The option \texttt{--compute-influence-map} can be used to (des)activate the computation of the influence map.
+\item The option \texttt{--compute-reachability-analysis} can be used to (des)activate the computation of the reachability analysis.
 \end{itemize}
 
 \subsection{The onglet \texttt{1\_Output}}
@@ -1215,6 +1216,72 @@ The onglet \texttt{1\_Ouput} (see Fig.~\ref{fig:kasa:1}) contains the names of t
 \end{itemize}
 
 When a file already exists, it is overwritten without any warning. 
+
+\section{Reachability analysis}
+
+Reachability analysis aimed at detecting statically properties about the bio-molecular species that can be formed in a model. 
+Knowing whether, or not, a given bio-molecular species, can be formed in a model is an undecidable problem \cite{}. Thus, our analysis is approximate. Indeed, it computes an over-approximation of the set of the bio-molecular species that can be reached from the initial state of the model, by applying an unbounded number of computation steps. As formalized in \cite{}, the abstraction consists in:
+\begin{enumerate}
+\item firstly, ignoring the number of occurrences (we assume that whenever a bio-molecular species can be formed, then it can be formed as many time as it could be necessary), 
+\item secondly, abstracting a bio-molecular species by the set of its local views (that is to say that we focus on the relationships between the states of the sites within agents, but we abstract away any relationships between different agents within a bio-molecular species).
+\end{enumerate}
+
+As an example, we consider the following model:
+\begin{lstlisting}[language=kappa]
+'A.p'   A(x~u,y) -> A(x~p,y)
+'dimer' A(x~p,y),A(x~p,y) -> A(x~p,y!1),A(x~p,y!1)
+'dead'  A(x~u,y!_) -> A(x~q,y)
+
+%init: 1 A(x~u,y~u)
+\end{lstlisting}
+
+Typing the following instruction:
+
+\texttt{KaSa reachability.ka --reset-all --compute-reachability-analysis}
+
+will perform the reachability analysis on the model \texttt{reachability.ka}. 
+
+\begin{figure}[t]
+\input{generated_img/LOG_low.txt}
+\caption{Reachability analysis of the model \texttt{reachbility.ka}}
+\label{fig:reachability}
+\end{figure}
+
+
+The result (eg.~see Fig.~\ref{fig:reachability})is displayed in the standard output, and it is made of three parts:
+\begin{itemize}
+\item \textbf{Detection of dead rules.} A rule is called dead, if there is no trace starting from the initial state in which this rule is applied. The analysis reports the list of the rules it has detected to be dead. Due to the over-approximation, it may happen that a dead rule is not discovered by the analysis. Yet, any rule that is reported as dead, is dead indeed. 
+  
+\item \textbf{Relational properties.} The analysis detects some relationships among the states of the sites of each agent. Simple properties are reported in natural languages. More complex properties are reported in extension, by enumerating the states that these site can take simultaneously within a given instance of an agent. Due to the over-approximation of the analysis, the analysis may fail in discovering a relationship. But each relationship that is found by the analysis, is satisfied. 
+
+\item \textbf{Non-relational properties.} The analysis detects for each kind of site, the set of states this site can take. This set is described in natural language. Due to the over-approximation, the analysis reports a super-set of the set of the potential states. Yet, we are sure that a given site only take states within this set. 
+\end{itemize}
+
+The option \texttt{--use-natural-language} can be used to switch on/off the translation of properties in natural language: when the option is disabled, each relationship is described in extension. 
+
+It is possible to get more details about the computation of the analysis by tuning the verbosity level of the view analysis:
+\begin{itemize}
+\item With the option \texttt{--use-natural-language Mute}, nothing is displayed. Even the result of the analysis is omitted.
+
+\input{generated_img/LOG_mute.txt}
+
+\item With the option \texttt{--use-natural-language Low}, only the result of the analysis is displayed. 
+\input{generated_img/LOG_low.txt}
+
+\item With the option \texttt{--use-natural-language Medium}, the analysis also describes which rules are applied and in which order. 
+
+\input{generated_img/LOG_medium.txt}
+
+\item With the option \texttt{--use-natural-language High}, the analysis also describes which views are discovered. 
+
+\input{generated_img/LOG_high.txt}
+
+\item With the option \texttt{--use-natural-language Full}, the analysis also describes which rules are awaken by the discovery of a new view. 
+
+\input{generated_img/LOG_full.txt}
+\end{itemize}
+
+
 
 \section{Contact map}
 
