@@ -12,7 +12,6 @@ let plotSepChar = ref (fun f -> Format.pp_print_space f ())
 let dumpIfDeadlocked = ref false
 let maxConsecutiveClash = ref 2
 let backtrace = ref false
-let (rescale:int option ref) = ref None
 let eclipseMode = ref false
 let useColor = ref true
 let safeModeOn = ref false

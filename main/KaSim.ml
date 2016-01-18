@@ -5,6 +5,7 @@ let usage_msg =
 let (maxEventValue:int option ref) = ref None
 let (maxTimeValue:float option ref) = ref None
 let (pointNumberValue:int ref) = ref 0
+let (rescale:float option ref) = ref None
 
 let () =
   let options = [
@@ -73,11 +74,11 @@ let () =
      Arg.Unit (fun () -> Gc.set { (Gc.get()) with
 				  Gc.space_overhead = 500 (*default 80*) } ;),
      "Lower gc activity for a faster but memory intensive simulation") ;
-    ("-rescale-to", Arg.Int (fun i -> Parameter.rescale:=Some i),
-     "Rescale initial concentration to given number for quick testing purpose");
+    ("-rescale", Arg.Float (fun i -> rescale:=Some i),
+     "Apply rescaling factor to initial condition");
     ("--time-independent",
      Arg.Set Parameter.time_independent,
-     "Disable the use of time is story heuritics (for test suite)") 
+     "Disable the use of time is story heuritics (for test suite)")
   ]
   in
   try
@@ -136,7 +137,8 @@ let () =
       match !Parameter.marshalizedInFile with
       | "" ->
 	 Eval.initialize
-	   Format.std_formatter !Parameter.alg_var_overwrite counter result
+	   ?rescale_init:!rescale Format.std_formatter
+	   !Parameter.alg_var_overwrite counter result
       | marshalized_file ->
 	 try
 	   let d = open_in_bin marshalized_file in

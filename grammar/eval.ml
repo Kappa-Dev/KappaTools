@@ -295,7 +295,8 @@ let pert_of_result
   let lpert = lpert_stopping_time@lpert_ineq in
   ( domain, lpert,stop_times,tracking_enabled)
 
-let init_graph_of_result algs has_tracking contact_map counter env domain res =
+let init_graph_of_result
+      ?rescale algs has_tracking contact_map counter env domain res =
   let domain',init_state =
     List.fold_left
       (fun (domain,state) (_opt_vol,init_t) -> (*TODO dealing with volumes*)
@@ -305,6 +306,9 @@ let init_graph_of_result algs has_tracking contact_map counter env domain res =
 	  let (domain',alg') =
 	    Expr.compile_alg contact_map counter domain alg in
 	  let value = initial_value_alg counter algs alg' in
+	  let value' = match rescale with
+	    | None -> value
+	    | Some r -> Nbr.mult value (Nbr.F r) in
 	  let fake_rule =
 	    { LKappa.r_mix = [];
 	      LKappa.r_created = LKappa.to_raw_mixture sigs ast;
@@ -340,7 +344,7 @@ let init_graph_of_result algs has_tracking contact_map counter env domain res =
 		     raise (ExceptionDefn.Internal_Error
 			      ("Bugged initial rule",mix_pos))
       )
-		 state value
+		 state value'
 	    | domain'',_,_,[] -> domain'',state
 	    | _,_,_,_ ->
 	       raise (ExceptionDefn.Malformed_Decl
@@ -514,7 +518,7 @@ let compile_rules alg_deps contact_map counter domain rules =
   | _, _, None, _, _ ->
      failwith "The origin of Eval.compile_rules has been lost"
 
-let initialize logger overwrite counter result =
+let initialize logger ?rescale_init overwrite counter result =
   Debug.tag logger "+ Building initial simulation conditions...";
   Debug.tag logger "+ Compiling..." ;
   Debug.tag logger "\t -simulation parameters" ;
@@ -578,7 +582,8 @@ let initialize logger overwrite counter result =
   Debug.tag logger "\t -initial conditions";
   let domain,graph =
     init_graph_of_result
-      alg_nd tracking_enabled contact_map counter env domain result' in
+      ?rescale:rescale_init alg_nd tracking_enabled contact_map
+      counter env domain result' in
   let () =
     if !Parameter.compileModeOn || !Parameter.debugModeOn then
       Format.eprintf

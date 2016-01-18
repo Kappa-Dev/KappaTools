@@ -41,7 +41,7 @@ let run stop stopper log_div out_div graph_div =
 	let result = React.S.value Storage.model_ast in
 	let counter = React.S.value Storage.model_counter in
 	let () = Counter.reinitialize counter in
-	wrap4 Eval.initialize log_form [] counter result
+	wrap4 (Eval.initialize ?rescale_init:None) log_form [] counter result
 	>>= fun (_kasa_state,env,domain,graph,state) ->
 	let () = Plot.create "foo.svg" in
 	let () =
