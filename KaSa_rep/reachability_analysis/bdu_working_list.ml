@@ -35,8 +35,6 @@ let trace = false
   will also add 'r1' into a working list. (lhs of D is Ghost. Rhs of A is Ghost)
 *)
 
-(*CHECK ME*)
-
 let collect_wl_creation parameter error rule_id rule store_result =
   (*add rule_id that has no lhs into a working list*)
   let error, wl_creation =
@@ -52,53 +50,3 @@ let collect_wl_creation parameter error rule_id rule store_result =
     ) (error, store_result) rule.actions.creation
   in
   error, wl_creation
-
-(************************************************************************************)
-(*working list of initial state*)
-
-(*let collect_wl_init_creation parameter handler error store_bdu_init_restriction_map 
-    store_covering_classes_modification_update_full wl_creation =
-  let error, handler, bdu_false = 
-    Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error
-  in
-  (*-----------------------------------------------------------------------*)
-  let add_link handler (agent_type, cv_id) bdu store_result =
-    let bdu_old =
-      Map_bdu_update.Map.find_default bdu_false (agent_type, cv_id) store_result
-    in
-    let error, handler, bdu_union =
-      Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_old bdu
-    in
-    let result_map =
-      Map_bdu_update.Map.add (agent_type, cv_id) bdu_union store_result
-    in
-    error, result_map
-  in
-  (*-----------------------------------------------------------------------*)
-  let error, store_bdu_fixpoint_init_map =
-    Map_bdu_update.Map.fold
-      (fun (agent_type, cv_id) bdu (error, store_result) ->
-        let error, store_result =
-          add_link handler (agent_type, cv_id) bdu store_result
-        in
-        error, store_result
-      )
-      store_bdu_init_restriction_map
-      (error, Map_bdu_update.Map.empty)
-  in
-  (*-----------------------------------------------------------------------*)
-  (*add update(c) into working list*)
-  let error, wl_init_creation =
-    Map_bdu_update.Map.fold
-      (fun (agent_type, cv_id) _ (error, wl_init_creation) ->
-        Bdu_fixpoint_iteration.add_update_to_wl
-          parameter
-          error
-          agent_type
-          cv_id
-          store_covering_classes_modification_update_full
-          wl_init_creation
-      ) store_bdu_fixpoint_init_map
-      (error, wl_creation)
-  in
-  error, wl_init_creation*)
