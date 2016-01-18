@@ -249,13 +249,6 @@ module Project2_bdu_views =
 (************************************************************************************)
 (*modification*)
 
-module Map_modif_list' =
-  SetMap.Make (
-    struct
-      type t = int * int * int * int
-      let compare = compare
-    end)
-
 module Map_modif_list =
   Map_wrapper.Make
     (SetMap.Make (
@@ -263,23 +256,6 @@ module Map_modif_list =
         type t = int * int * int * int
         let compare = compare
       end))
-
-(*module Map_final_modif_list =
-  SetMap.Make (
-    struct
-      type t = int
-      let compare = compare
-    end)
-
-module Map_agent_id_modif_list =
-  SetMap.Make (
-    struct
-      type t = int
-      let compare = compare
-    end)
-
-module Project2bdu_modif =
-  SetMap.Proj2 (Map_modif_list)(Map_final_modif_list)(Map_agent_id_modif_list)*)
 
 (************************************************************************************)
 (*potential side effect*)
