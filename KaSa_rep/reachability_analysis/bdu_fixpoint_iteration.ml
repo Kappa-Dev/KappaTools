@@ -699,11 +699,11 @@ let compute_views_enabled parameter handler error
           | Some bdu -> error, bdu
         in
 	let error, handler, bdu_update =
-          match Map_modif_list.Map.find_option 
+          match Map_modif_list.Map.find_option_without_logs parameter error 
             (agent_id, agent_type, rule_id, cv_id) modif_list_map
 	  with
-          | None -> error, handler, bdu_X
-	  | Some list_a ->
+          | error, None -> error, handler, bdu_X
+	  | error, Some list_a ->
             compute_bdu_update_views
 	      parameter_views
 	      handler

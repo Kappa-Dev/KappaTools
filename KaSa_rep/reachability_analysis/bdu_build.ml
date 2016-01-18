@@ -475,8 +475,9 @@ let collect_modif_list_restriction_map
     parameter handler error rule_id rule store_remanent_triple store_result =
   let add_link (agent_id, agent_type, rule_id, cv_id) list_a store_result =
     (*the association must be unique *)
-    let result_map =
-      Map_modif_list.Map.add (agent_id, agent_type, rule_id, cv_id) list_a store_result
+    let error, result_map =
+      Map_modif_list.Map.add_or_overwrite parameter error
+        (agent_id, agent_type, rule_id, cv_id) list_a store_result
     in
     error, result_map
   in
@@ -487,7 +488,7 @@ let collect_modif_list_restriction_map
       then error, (handler, store_result)
       else
         let agent_type = agent_modif.agent_name in
-	let error,triple_list =
+	let error, triple_list =
 	  match
 	    AgentMap.get parameter error agent_type store_remanent_triple
 	  with

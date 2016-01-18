@@ -249,14 +249,22 @@ module Project2_bdu_views =
 (************************************************************************************)
 (*modification*)
 
-module Map_modif_list =
+module Map_modif_list' =
   SetMap.Make (
     struct
       type t = int * int * int * int
       let compare = compare
     end)
 
-module Map_final_modif_list =
+module Map_modif_list =
+  Map_wrapper.Make
+    (SetMap.Make (
+      struct
+        type t = int * int * int * int
+        let compare = compare
+      end))
+
+(*module Map_final_modif_list =
   SetMap.Make (
     struct
       type t = int
@@ -271,35 +279,7 @@ module Map_agent_id_modif_list =
     end)
 
 module Project2bdu_modif =
-  SetMap.Proj2 (Map_modif_list)(Map_final_modif_list)(Map_agent_id_modif_list)
-
-(*module Map_modif_list =
-  Map_wrapper.Make
-    (SetMap.Make 
-       (struct
-         type t = int * int * int * int
-         let compare = compare
-        end))
-   
-module Map_final_modif_list =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = int
-         let compare = compare
-        end))
-
-module Map_agent_id_modif_list =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = int
-         let compare = compare
-        end))
-
-module Project2bdu_modif =
-  Map_wrapper.Proj2
-    (SetMap.Proj2 (Map_modif_list)(Map_final_modif_list)(Map_agent_id_modif_list))*)
+  SetMap.Proj2 (Map_modif_list)(Map_final_modif_list)(Map_agent_id_modif_list)*)
 
 (************************************************************************************)
 (*potential side effect*)
@@ -328,35 +308,6 @@ module Map_agent_type_potential_bdu =
 
 module Project2bdu_potential =
   SetMap.Proj2 (Map_potential_bdu)(Map_final_potential_bdu)(Map_agent_type_potential_bdu)
-
-(************************************************************************************)
-(*list of potential side effect (site free)*)
-(*
-module Map_potential_list =
-  SetMap.Make (
-    struct
-      type t = int * int * int * int
-      let compare = compare
-    end)
-
-(*with projection*)
-module Map_final_potential_list =
-  SetMap.Make (
-    struct
-      type t = int
-      let compare = compare
-    end)
-
-module Map_agent_type_potential_list =
-  SetMap.Make (
-    struct
-      type t = int 
-      let compare = compare
-    end)
-
-module Project2bdu_potential_list =
-  SetMap.Proj2 (Map_potential_list)(Map_final_potential_list)(Map_agent_type_potential_list)*)
-
 
 (************************************************************************************)
 (*fixpoint iteration*)
@@ -441,21 +392,14 @@ type bdu_build =
       Map_final_creation_bdu.Map.t;
     store_bdu_init_restriction_map: Mvbdu_wrapper.Mvbdu.mvbdu Map_init_bdu.Map.t;
     store_modif_list_restriction_map: 
-      Mvbdu_wrapper.Mvbdu.hconsed_association_list (*list*) Map_modif_list.Map.t;
-(*    store_proj_modif_list_restriction_map: 
-      Mvbdu_wrapper.Mvbdu.hconsed_association_list list Map_agent_id_modif_list.Map.t
-      Map_final_modif_list.Map.t;*)
+      Mvbdu_wrapper.Mvbdu.hconsed_association_list Map_modif_list.Map.t;
     (*potential partner of side effects*)
     store_bdu_potential_effect_restriction_map : 
-      (Mvbdu_wrapper.Mvbdu.mvbdu* Mvbdu_wrapper.Mvbdu.hconsed_association_list) Map_potential_bdu.Map.t;
+      (Mvbdu_wrapper.Mvbdu.mvbdu* Mvbdu_wrapper.Mvbdu.hconsed_association_list)
+      Map_potential_bdu.Map.t;
     store_proj_bdu_potential_restriction_map :
-      (Mvbdu_wrapper.Mvbdu.mvbdu * Mvbdu_wrapper.Mvbdu.hconsed_association_list) Map_agent_type_potential_bdu.Map.t
-      Map_final_potential_bdu.Map.t;
-    (*store_potential_list_restriction_map :
-      Mvbdu_wrapper.Mvbdu.hconsed_association_list list Map_potential_list.Map.t;
-    store_proj_potential_list_restriction_map :
-      Mvbdu_wrapper.Mvbdu.hconsed_association_list list 
-      Map_agent_type_potential_list.Map.t Map_final_potential_list.Map.t;*)
+      (Mvbdu_wrapper.Mvbdu.mvbdu * Mvbdu_wrapper.Mvbdu.hconsed_association_list)
+      Map_agent_type_potential_bdu.Map.t Map_final_potential_bdu.Map.t;
     store_proj_bdu_views :
       Mvbdu_wrapper.Mvbdu.mvbdu Map_triple_views.Map.t Map_rule_id_views.Map.t;
   }
