@@ -46,7 +46,7 @@ let new_index_pair_map parameter error l = (*JF:  it should be computed only onc
       let error, map2 = Map.add parameter error k h map2 in   
       aux tl (k+1) map1 map2 error
   in
-  let error',(map1, map2) = aux l 1 Map.empty Map.empty error in
+  let error', (map1, map2) = aux l 1 Map.empty Map.empty error in
   let error = Exception.check warn parameter error error' (Some "line 49") Exit in
   error,(map1,map2)
 
