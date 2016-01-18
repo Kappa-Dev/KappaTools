@@ -1,0 +1,5 @@
+'A.p'   A(x~u,y) -> A(x~p,y)
+'dimer' A(x~p,y),A(x~p,y) -> A(x~p,y!1),A(x~p,y!1)
+'dead'  A(x~u,y!_) -> A(x~q,y)
+
+%init: 1 A(x~u,y~u)
