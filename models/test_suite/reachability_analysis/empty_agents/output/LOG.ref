@@ -379,7 +379,4 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 The state of the site x~ in agent D is always u.
-Some exceptions have been raised
-error: file_name: Print bdu analysis; message: line 122; exception:Exit
-error: file_name: Print bdu analysis; message: line 122; exception:Exit
-error: file_name: Print bdu analysis; message: line 122; exception:Exit
+execution finished without any exception
