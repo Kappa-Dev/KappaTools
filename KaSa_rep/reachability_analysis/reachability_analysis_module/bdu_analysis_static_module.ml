@@ -35,11 +35,10 @@ sig
   val init_bdu_analysis_static : Exception.method_handler
     -> Exception.method_handler * bdu_analysis_static
 
-  val site_covering_classes : Remanent_parameters_sig.parameters
+  val collect_covering_classes_id : Remanent_parameters_sig.parameters
     -> Exception.method_handler 
     -> Covering_classes_type.remanent Covering_classes_type.AgentMap.t
-    -> Exception.method_handler * 
-    (int list * int list) Int2Map_CV.Map.t
+    -> Exception.method_handler * (int list * int list) Int2Map_CV.Map.t
       
   val collect_side_effects : Remanent_parameters_sig.parameters
     -> Exception.method_handler
@@ -108,6 +107,75 @@ sig
     -> bdu_analysis_static
     -> Exception.method_handler * bdu_analysis_static
 
+  val print_covering_classes_id : Remanent_parameters_sig.parameters
+    -> Exception.method_handler
+    -> Cckappa_sig.kappa_handler
+    -> (int list * int list) Int2Map_CV.Map.t
+    -> unit
+
+  val print_side_effects : Remanent_parameters_sig.parameters
+    -> Exception.method_handler
+    -> Cckappa_sig.kappa_handler
+    -> Cckappa_sig.compil
+    -> (half_break_action * remove_action)
+    -> unit
+
+  val print_potential_side_effects : Remanent_parameters_sig.parameters
+    -> Exception.method_handler
+    -> Cckappa_sig.kappa_handler
+    -> Cckappa_sig.compil
+    -> (potential_partner_free * potential_partner_bind)
+    -> unit
+
+  val print_modification_sites : Remanent_parameters_sig.parameters
+    -> Exception.method_handler
+    -> Cckappa_sig.kappa_handler
+    -> Cckappa_sig.compil
+    -> (int list * Cckappa_sig.Site_map_and_set.Set.t) Int2Map_Modif.Map.t
+    -> unit
+
+  val print_test_sites : Remanent_parameters_sig.parameters
+    -> Exception.method_handler
+    -> Cckappa_sig.kappa_handler
+    -> Cckappa_sig.compil
+    ->  (int list * Cckappa_sig.Site_map_and_set.Set.t) Int2Map_Modif.Map.t
+    -> unit
+
+  val print_test_modification_sites : Remanent_parameters_sig.parameters
+    -> Exception.method_handler
+    -> Cckappa_sig.kappa_handler
+    -> Cckappa_sig.compil
+    ->  (int list * Cckappa_sig.Site_map_and_set.Set.t) Int2Map_Modif.Map.t
+    -> unit
+
+  val print_modif_map : Remanent_parameters_sig.parameters
+    -> Exception.method_handler
+    -> Cckappa_sig.kappa_handler
+    -> Cckappa_sig.compil
+    -> (int list * Cckappa_sig.Site_map_and_set.Set.t) Int2Map_Test_Modif.Map.t
+    -> unit
+
+  val print_test_map : Remanent_parameters_sig.parameters
+    -> Exception.method_handler
+    -> Cckappa_sig.kappa_handler
+    -> Cckappa_sig.compil
+    -> (int list * Cckappa_sig.Site_map_and_set.Set.t) Int2Map_Test_Modif.Map.t
+    -> unit
+
+  val print_test_modif_map : Remanent_parameters_sig.parameters
+    -> Exception.method_handler
+    -> Cckappa_sig.kappa_handler
+    -> Cckappa_sig.compil
+    -> (int list * Cckappa_sig.Site_map_and_set.Set.t) Int2Map_Test_Modif.Map.t
+    -> unit
+
+  val print_bdu_analysis_static : Remanent_parameters_sig.parameters
+    -> Exception.method_handler
+    -> Cckappa_sig.kappa_handler
+    -> Cckappa_sig.compil
+    -> bdu_analysis_static
+    -> unit
+
 end
 
 (*******************************************************************************)
@@ -148,8 +216,9 @@ module Bdu_analysis_Static =
         store_test_modif_map          = init_test_modif_map;
       }
 
-    let site_covering_classes parameter error covering_classes =
-      Bdu_analysis_static_operations.site_covering_classes parameter error covering_classes
+    let collect_covering_classes_id parameter error covering_classes =
+      Bdu_analysis_static_operations.collect_covering_classes_id
+        parameter error covering_classes
         
     let collect_side_effects parameter error handler_kappa rule_id rule store_result =
       Bdu_analysis_static_operations.collect_side_effects parameter error
@@ -188,7 +257,7 @@ module Bdu_analysis_Static =
     let scan_rule_static parameter error handler_kappa rule_id rule covering_classes
         store_result=
       let error, store_covering_classes_id = 
-        site_covering_classes
+        collect_covering_classes_id
           parameter
           error
           covering_classes
@@ -265,5 +334,79 @@ module Bdu_analysis_Static =
         store_test_map                = store_test_map;
         store_test_modif_map          = store_test_modif_map;
       }
+
+    (*PRINT SECTION*)
+
+    let print_covering_classes_id parameter error handler_kappa result =
+      Bdu_analysis_static_operations.print_covering_classes_id
+        parameter error handler_kappa result
+        
+    let print_side_effects parameter error handler_kappa compiled result =
+      Bdu_analysis_static_operations.print_side_effects
+        parameter error handler_kappa compiled result
+
+    let print_potential_side_effects parameter error handler_kappa compiled result =
+      Bdu_analysis_static_operations.print_potential_side_effects
+        parameter error handler_kappa compiled result
+
+    let print_modification_sites parameter error handler_kappa compiled result =
+      Bdu_analysis_static_operations.print_modification_sites
+        parameter error handler_kappa compiled result
+
+    let print_test_sites parameter error handler_kappa compiled result =
+      Bdu_analysis_static_operations.print_test_sites
+        parameter error handler_kappa compiled result
+
+    let print_test_modification_sites parameter error handler_kappa compiled result =
+      Bdu_analysis_static_operations.print_test_modification_sites
+        parameter error handler_kappa compiled result
+
+    let print_modif_map parameter error handler_kappa compiled result =
+      Bdu_analysis_static_operations.print_modification_map
+        parameter error handler_kappa compiled result
+        
+    let print_test_map parameter error handler_kappa compiled result =
+      Bdu_analysis_static_operations.print_test_map
+        parameter error handler_kappa compiled result
+
+    let print_test_modif_map parameter error handler_kappa compiled result =
+      Bdu_analysis_static_operations.print_test_modification_map
+        parameter error handler_kappa compiled result
+
+    let print_bdu_analysis_static parameter error handler_kappa compiled result =
+      let () =
+        Printf.fprintf (Remanent_parameters.get_log parameter)
+          "============================================================\n";
+        Printf.fprintf (Remanent_parameters.get_log parameter) "* BDU Analysis:\n";
+        Printf.fprintf (Remanent_parameters.get_log parameter)
+          "============================================================\n";
+        Printf.fprintf (Remanent_parameters.get_log parameter)
+          "\n** Static information:\n";
+      in
+      let () =
+        print_covering_classes_id parameter error handler_kappa 
+          result.store_covering_classes_id
+      in
+      let () =
+        print_side_effects parameter error handler_kappa compiled
+          result.store_side_effects
+      in
+      let () =
+        print_potential_side_effects parameter error handler_kappa compiled
+          result.store_potential_side_effects
+      in
+      let () =
+        print_modification_sites parameter error handler_kappa compiled
+          result.store_modification_sites
+      in
+      let () =
+        print_test_sites parameter error handler_kappa compiled
+          result.store_test_sites
+      in
+      let () =
+        print_test_modification_sites parameter error handler_kappa compiled
+          result.store_test_modification_sites
+      in
+      ()
 
    end:Bdu_analysis_Static)
