@@ -1242,14 +1242,8 @@ Typing the following instruction:
 
 will perform the reachability analysis on the model \texttt{reachability.ka}. 
 
-\begin{figure}[t]
-\input{generated_img/LOG_low.txt}
-\caption{Reachability analysis of the model \texttt{reachbility.ka}}
-\label{fig:reachability}
-\end{figure}
 
-
-The result (eg.~see Fig.~\ref{fig:reachability})is displayed in the standard output, and it is made of three parts:
+The result (eg.~see Fig.~\ref{fig:reachability_low})is displayed in the standard output, and it is made of three parts:
 \begin{itemize}
 \item \textbf{Detection of dead rules.} A rule is called dead, if there is no trace starting from the initial state in which this rule is applied. The analysis reports the list of the rules it has detected to be dead. Due to the over-approximation, it may happen that a dead rule is not discovered by the analysis. Yet, any rule that is reported as dead, is dead indeed. 
   
@@ -1264,22 +1258,56 @@ It is possible to get more details about the computation of the analysis by tuni
 \begin{itemize}
 \item With the option \texttt{--use-natural-language Mute}, nothing is displayed. Even the result of the analysis is omitted.
 
+\begin{figure}[p]
 \input{generated_img/LOG_mute.txt}
+\caption{Reachability analysis of the model \texttt{reachbility.ka} with verbosity level ``Mute''.}
+\end{figure}
+
 
 \item With the option \texttt{--use-natural-language Low}, only the result of the analysis is displayed. 
+
+\begin{figure}[p]
 \input{generated_img/LOG_low.txt}
+\caption{Reachability analysis of the model \texttt{reachbility.ka} with verbosity level ``Low''.}
+\label{fig:reachability_low}
+\end{figure}
 
 \item With the option \texttt{--use-natural-language Medium}, the analysis also describes which rules are applied and in which order. 
 
-\input{generated_img/LOG_medium.txt}
+\begin{figure}[p]
+\input{generated_img/LOG_medium_KO.txt}
+\caption{Reachability analysis: one rule that cannot be applied yet, according to the bio-molecular species already constructed.}
+\label{fig:reachability_medium_ok}
+\end{figure}
+
+\begin{figure}[p]
+\input{generated_img/LOG_medium_OK.txt}
+\caption{Reachability analysis: one rule successfully applied}
+\label{fig:reachability_medium_ok}
+\end{figure}
 
 \item With the option \texttt{--use-natural-language High}, the analysis also describes which views are discovered. 
 
-\input{generated_img/LOG_high.txt}
+\begin{figure}[p]
+\input{generated_img/LOG_high_init.txt}
+\caption{Reachability analysis: extensional description of initial states.}
+\label{fig:reachability_high_init}
+\end{figure}
+
+\begin{figure}[p]
+\input{generated_img/LOG_high_rule.txt}
+\caption{Reachability analysis: extensional description of the new views created when applying a rule.}
+\label{fig:reachability_high_rule}
+\end{figure}
 
 \item With the option \texttt{--use-natural-language Full}, the analysis also describes which rules are awaken by the discovery of a new view. 
 
+\begin{figure}[p]
 \input{generated_img/LOG_full.txt}
+\caption{Reachability analysis: discovering new views force the analysis to apply some rules again, until reaching a fix-point.}
+\label{fig:reachability_full}
+\end{figure}
+
 \end{itemize}
 
 
