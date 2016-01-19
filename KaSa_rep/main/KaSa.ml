@@ -126,6 +126,30 @@ let main () =
       error, None, None 
   in
   (*-----------------------------------------------------------------------*)
+  (*Reachability analysis in module*)
+  let error,handler_bdu, bdu_analysic_module = 
+    if Remanent_parameters.get_do_reachability_analysis_module parameters
+    then
+      let _ = Format.printf "Reachability analysis...@." in 
+      let parameters_cv =
+	Remanent_parameters.update_prefix parameters "" in 
+      let _ = 
+	if (Remanent_parameters.get_trace parameters_cv)
+	then Printf.fprintf (Remanent_parameters.get_log parameters_cv) ""
+      in
+      (*getting covering classes*)
+      let error, covering_classes =
+        Covering_classes_main.covering_classes parameters_cv error handler c_compil
+       in
+       let error, handler_bdu, dep =
+	 Bdu_analysis_module_main.bdu_main parameters_cv error 
+           handler covering_classes c_compil 
+       in 
+       error, Some handler_bdu, Some dep
+    else 
+      error, None, None 
+  in  
+  (*-----------------------------------------------------------------------*)
   (*Stochastic flow of information*)
   let error, stochastic_flow =
     if Remanent_parameters.get_do_stochastic_flow_of_information parameters
