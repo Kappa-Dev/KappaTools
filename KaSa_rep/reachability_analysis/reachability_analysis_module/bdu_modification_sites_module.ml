@@ -12,7 +12,6 @@
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
-open Bdu_analysis_module_type
 open Cckappa_sig
 open Int_storage
 open Covering_classes_type
@@ -237,14 +236,14 @@ let collect_test_modif_map parameter error store_test_modification_sites =
 let site_covering_classes parameter error covering_classes =
   let add_link (agent_type, site_type) cv_id store_result =
     let error, (l, old) =
-      match Int2Map_CV.Map.find_option_without_logs parameter error
-        (agent_type, site_type) store_result 
+      match Bdu_analysis_static_type.Int2Map_CV.Map.find_option_without_logs
+        parameter error (agent_type, site_type) store_result 
       with
       | error, None -> error, ([], [])
       | error, Some (l, l') -> error, (l, l')
     in
     let error, result =
-      Int2Map_CV.Map.add_or_overwrite parameter error
+      Bdu_analysis_static_type.Int2Map_CV.Map.add_or_overwrite parameter error
         (agent_type, site_type) (l, cv_id :: old) store_result
     in
     error, result
@@ -271,9 +270,9 @@ let site_covering_classes parameter error covering_classes =
         error, store_result
       (*REMARK: when it is folding inside a list, start with empty result,
         because the add_link function has already called the old result.*)
-      ) covering_classes Int2Map_CV.Map.empty
+      ) covering_classes Bdu_analysis_static_type.Int2Map_CV.Map.empty
   in
   let store_result =
-    Int2Map_CV.Map.map (fun (l, x) -> List.rev l, x) store_result
+    Bdu_analysis_static_type.Int2Map_CV.Map.map (fun (l, x) -> List.rev l, x) store_result
   in
   error, store_result

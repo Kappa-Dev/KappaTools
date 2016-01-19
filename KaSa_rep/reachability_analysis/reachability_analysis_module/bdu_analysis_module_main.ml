@@ -17,8 +17,13 @@ let warn parameters mh message exn default =
 
 let trace = false
 
-open Bdu_analysis_module_type
-open Bdu_analysis_static_module
+(*******************************************************************************)
+(*type abstraction*)
+
+type bdu_analysis =
+  {
+    store_bdu_analysis_static : Bdu_analysis_static_type.bdu_analysis_static;
+  }
 
 (*******************************************************************************)
 (*RULE*)
@@ -26,7 +31,7 @@ open Bdu_analysis_static_module
 let scan_rule parameter error handler_bdu handler_kappa rule_id rule compiled
     covering_classes store_result =
   let error, store_bdu_analysis_static =
-    Bdu_analysis_Static.scan_rule_static
+    Bdu_analysis_static_module.Bdu_analysis_Static.scan_rule_static
       parameter
       error
       handler_kappa
@@ -47,7 +52,7 @@ let scan_rule parameter error handler_bdu handler_kappa rule_id rule compiled
 let scan_rule_set parameter error handler_bdu handler_kappa compiled 
     store_covering_classes = 
   let error, init_bdu_analysis_static =
-    Bdu_analysis_Static.init_bdu_analysis_static error
+    Bdu_analysis_static_module.Bdu_analysis_Static.init_bdu_analysis_static error
   in
   let error, init_bdu =
     error, 
