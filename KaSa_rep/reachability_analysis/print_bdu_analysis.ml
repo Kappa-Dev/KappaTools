@@ -205,9 +205,6 @@ let print_bdu_update_map_cartesian_decomposition a b c d =
 let print_result_dead_rule parameter error handler compiled result =
   if Remanent_parameters.get_dump_reachability_analysis_result parameter
   then
-    let _ = Format.fprintf (Remanent_parameters.get_formatter parameter) 
-      "\nReachability analysis result ....@." 
-    in
     let parameter =
       Remanent_parameters.update_prefix parameter ""
     in
