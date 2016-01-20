@@ -25,13 +25,6 @@ open Bdu_analysis_static_type
 module type Bdu_analysis_Static =
 sig
   
-  type handler = 
-    (Boolean_mvbdu.memo_tables,
-     Boolean_mvbdu.mvbdu_dic,
-     Boolean_mvbdu.association_list_dic,
-     Boolean_mvbdu.variables_list_dic,
-     bool, int) Memo_sig.handler
-
   val init_bdu_analysis_static : Exception.method_handler
     -> Exception.method_handler * bdu_analysis_static
 
@@ -183,13 +176,6 @@ end
 
 module Bdu_analysis_Static =
   (struct
-      
-    type handler = 
-      (Boolean_mvbdu.memo_tables,
-       Boolean_mvbdu.mvbdu_dic,
-       Boolean_mvbdu.association_list_dic,
-       Boolean_mvbdu.variables_list_dic,
-       bool, int) Memo_sig.handler
 
     let init_bdu_analysis_static error =
       let init_covering_classes_id = Int2Map_CV.Map.empty in
