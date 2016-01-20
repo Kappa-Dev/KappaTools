@@ -112,27 +112,27 @@ let all_injections ?excp edges roots cca =
 
 let apply_negative_transformation domain inj2graph side_effects edges = function
   | Primitives.Transformation.Agent n ->
-     let nc, edges' =
-       let nc = from_place inj2graph n in (*(A,23)*)
-       nc, Edges.remove_agent nc edges in
+     let nc = from_place inj2graph n in (*(A,23)*)
      let new_obs =
        Connected_component.Matching.observables_from_agent domain edges nc in
      (*this hack should disappear when chekcing O\H only*)
+     let edges' =
+       Edges.remove_agent nc edges in
      (side_effects,edges',new_obs)
   | Primitives.Transformation.Freed (n,s) -> (*(n,s)-bottom*)
      let (id,_ as nc) = from_place inj2graph n in (*(A,23)*)
-     let edges' = Edges.remove_free id s edges in
      let new_obs =
        Connected_component.Matching.observables_from_free domain edges nc s in
      (*this hack should disappear when chekcing O\H only*)
+     let edges' = Edges.remove_free id s edges in
      (side_effects,edges',new_obs)
   | Primitives.Transformation.Linked ((n,s),(n',s')) ->
      let (id,_ as nc) = from_place inj2graph n in
      let (id',_ as nc') = from_place inj2graph n' in
-     let edges' = Edges.remove_link id s id' s' edges in
      let new_obs =
        Connected_component.Matching.observables_from_link
 	 domain edges nc s nc' s' in
+     let edges' = Edges.remove_link id s id' s' edges in
      (side_effects,edges',new_obs)
   | Primitives.Transformation.NegativeWhatEver (n,s) ->
      let (id,_ as nc) = from_place inj2graph n in

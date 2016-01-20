@@ -14,18 +14,21 @@ module Edge = struct
 end
 
 type t =
-  (Edge.t Int2Map.t * Int2Set.t) *
+  (Edge.t option array array * Int2Set.t) *
     int Int2Map.t * IntSet.t IntMap.t * (int * int list)
 (** (agent,site -> binding_state; missings);
     agent,site -> internal_state; sort -> agents; free_id *)
 
-let empty = ((Int2Map.empty,Int2Set.empty), Int2Map.empty, IntMap.empty,(1,[]))
+let empty = (([|[||]|],Int2Set.empty), Int2Map.empty, IntMap.empty,(0,[]))
 
 let add_agent sigs ty ((connect,missings),state,sort,free_id) =
+  let ar = Signature.arity sigs ty in
+  let ag = Array.make ar None in
   match free_id with
   | new_id,h :: t ->
      let missings' = Tools.recti (fun s a -> Int2Set.add (h,s) a)
-				 missings (Signature.arity sigs ty) in
+				 missings ar in
+     let () = connect.(h) <- ag in
      h,
      ((connect,missings'),state,
       IntMap.add ty (IntSet.add
@@ -33,29 +36,37 @@ let add_agent sigs ty ((connect,missings),state,sort,free_id) =
       (new_id,t))
   | new_id,[] ->
      let missings' = Tools.recti (fun s a -> Int2Set.add (new_id,s) a)
-				 missings (Signature.arity sigs ty) in
+				 missings ar in
+     let connect' =
+       if Array.length connect = new_id
+       then Array.append connect (Array.make new_id [||])
+       else connect in
+     let () = connect'.(new_id) <- ag in
      new_id,
-     ((connect,missings'),state,
+     ((connect',missings'),state,
       IntMap.add ty (IntSet.add
 		       new_id (IntMap.find_default IntSet.empty ty sort)) sort,
       (succ new_id,[]))
 
 let add_free ag s ((connect,missings),state,sort,free_id) =
+  let () = connect.(ag).(s) <- None in
   ((connect,Int2Set.remove (ag,s) missings),state,sort,free_id)
 let add_internal ag s i (connect,state,sort,free_id) =
   (connect,Int2Map.add (ag,s) i state,sort,free_id)
 
 let add_link (ag,ty) s (ag',ty') s' ((connect,missings),state,sort,free_id) =
-  ((Int2Map.add (ag,s) ((ag',ty'),s')
-		(Int2Map.add (ag',s') ((ag,ty),s) connect),
-   Int2Set.remove (ag,s) (Int2Set.remove (ag',s') missings)),
+  let () = connect.(ag).(s) <- Some ((ag',ty'),s') in
+  let () = connect.(ag').(s') <- Some ((ag,ty),s) in
+  ((connect,Int2Set.remove (ag,s) (Int2Set.remove (ag',s') missings)),
    state,sort,free_id)
 
 let remove_agent (ag,ty) ((connect,missings),state,sort,(new_id,ids)) =
+  let () = connect.(ag) <- [||] in
   ((connect,Int2Set.filter (fun (ag',_) -> ag <> ag') missings),state,
    IntMap.add ty (IntSet.remove ag (IntMap.find_default IntSet.empty ty sort)) sort,
   (new_id,ag::ids))
 let remove_free ag s ((connect,missings),state,sort,free_id) =
+  let () = assert (connect.(ag).(s) = None) in
   ((connect,Int2Set.add (ag,s) missings),state,sort,free_id)
 let remove_internal ag s (connect,state,sort,free_id) =
   match Int2Map.pop (ag,s) state with
@@ -64,29 +75,30 @@ let remove_internal ag s (connect,state,sort,free_id) =
      failwith ("Site "^string_of_int s^ " of agent "^string_of_int ag^
 		 " has no internal state to remove in the current graph.")
 let remove_link ag s ag' s' ((connect,missings),state,sort,free_id) =
-  ((Int2Map.remove (ag,s) (Int2Map.remove (ag',s') connect),
-   Int2Set.add (ag,s) (Int2Set.add (ag',s') missings)),state,sort,free_id)
+  let () = connect.(ag).(s) <- None in
+  let () = connect.(ag').(s') <- None in
+  ((connect, Int2Set.add (ag,s) (Int2Set.add (ag',s') missings)),state,sort,free_id)
 
 let is_agent (ag,ty) (_,_,s,_) =
   IntSet.mem ag (IntMap.find_default IntSet.empty ty s)
 let is_free ag s ((t,m),_,_,_) =
-  not @@ (Int2Map.mem (ag,s) t || Int2Set.mem (ag,s) m)
+  t.(ag).(s) = None && not @@ Int2Set.mem (ag,s) m
 let is_internal i ag s (_,t,_,_) =
   match Int2Map.find_option (ag,s) t with
   | Some j -> j = i
   | None -> false
 let link_exists ag s ag' s' ((t,_),_,_,_) =
-  match Int2Map.find_option (ag,s) t with
+  match t.(ag).(s) with
   | Some ((ag'',_),s'') -> ag'=ag'' && s'=s''
   | None -> false
 
 let exists_fresh ag s ty s' ((t,_),_,_,_) =
-  match Int2Map.find_option (ag,s) t with
+  match t.(ag).(s) with
   | Some ((ag',ty'),s'') ->
     if ty'=ty && s'=s'' then Some ag' else None
   | None -> None
 
-let link_destination ag s ((t,_),_,_,_) = Int2Map.find_option (ag,s) t
+let link_destination ag s ((t,_),_,_,_) = t.(ag).(s)
 
 (** The snapshot machinery *)
 let one_connected_component sigs ty node graph =
@@ -104,24 +116,24 @@ let one_connected_component sigs ty node graph =
 	 let arity = Signature.arity sigs ty in
 	 let ports = Array.make arity Raw_mixture.FREE in
 	 let ints = Array.make arity None in
-	 let (free_id',links',dangling',todos'),ports =
+	 let (free_id',dangling',todos'),ports =
 	   Tools.array_fold_left_mapi
-	     (fun i (free_id,links,dangling,todos) _ ->
-	      match Int2Map.pop (node,i) links with
-	      | None, links' ->
-		 (free_id,links',dangling,todos),Raw_mixture.FREE
-	      | Some ((n',ty'),s'), links' ->
+	     (fun i (free_id,dangling,todos) _ ->
+	      match links.(node).(i) with
+	      | None ->
+		 (free_id,dangling,todos),Raw_mixture.FREE
+	      | Some ((n',ty'),s') ->
 		 match Int2Map.pop (n',s') dangling with
 		 | None, dangling ->
-		    (succ free_id,links',
+		    (succ free_id,
 		     Int2Map.add (node,i) free_id dangling,
 		     if n' = node || List.mem (ty',n') todos
 		     then todos
 		     else (ty',n')::todos),
 		    Raw_mixture.VAL free_id
 		 | Some id, dangling' ->
-		    (free_id,links',dangling',todos), Raw_mixture.VAL id)
-	     (free_id,links,dangling,todos) ports in
+		    (free_id,dangling',todos), Raw_mixture.VAL id)
+	     (free_id,dangling,todos) ports in
 	 let internals',ints =
 	   Tools.array_fold_left_mapi
 	     (fun i internals _ ->
@@ -131,7 +143,7 @@ let one_connected_component sigs ty node graph =
 	   { Raw_mixture.a_id = node; Raw_mixture.a_type = ty;
 	     Raw_mixture.a_ports = ports; Raw_mixture.a_ints = ints; } in
 	 build (skel::acc) free_id' dangling'
-	       ((links',missings),internals',sorts',free_ag) todos'
+	       ((links,missings),internals',sorts',free_ag) todos'
   in build [] 1 Int2Map.empty graph [ty,node]
 
 let build_snapshot sigs graph =
@@ -169,32 +181,54 @@ let print_dot sigs f graph =
     f (build_snapshot sigs graph)
 
 let debug_print f ((links,missings),ints,sorts,_) =
-  Pp.set
+  let print_sites ag =
+    (Pp.array Pp.comma
+	      (fun s f l ->
+	       Format.fprintf
+		 f "%i%t%t" s
+		 (match Int2Map.find_option (ag,s) ints with
+		  | Some int -> fun f -> Format.fprintf f "~%i" int
+		  | None -> fun _ -> ())
+		 (fun f -> match l with
+			   | None ->
+			      if Int2Set.mem (ag,s) missings
+			      then Format.pp_print_string f "?"
+			   | Some ((ag',ty'),s') ->
+			      Format.fprintf f "->%i:%i.%i" ag' ty' s'))) in
+  Pp.array
+    Pp.empty
+    (fun ag f a ->
+     match IntMap.fold
+	     (fun ty nodes -> function
+			   | None ->
+			      if IntSet.mem ag nodes then Some ty else None
+			   | Some _ as x ->
+			      if IntSet.mem ag nodes then Some (-42) else x)
+	     sorts None with
+     | Some ty ->
+	Format.fprintf
+	  f "%i:%i(@[%a@])@ " ag ty (print_sites ag) a
+     | None -> if a = [||] then ()
+	       else Format.fprintf
+			  f "%i:NOTYPE(@[%a@])@ " ag (print_sites ag) a
+)
+    f links
+(*
     ~trailing:(fun f -> Format.fprintf f "@])")
-    Int2Map.bindings (fun f -> Format.fprintf f ",")
     (fun f ((ag,s),((ag',ty'),s')) ->
      let () =
        if s=0 then
 	 let () = if ag <> 1 then Format.fprintf f "@])%t" Pp.space in
-	 match IntMap.fold
-		 (fun ty nodes -> function
-			       | None ->
-				  if IntSet.mem ag nodes then Some ty else None
-			       | Some _ as x ->
-				  if IntSet.mem ag nodes then Some (-42) else x)
-		 sorts None with
-	 | Some ty ->
-	    Format.fprintf f "%i:%i(@[" ag ty
-	 | None ->
-	    Format.fprintf f "%i:notype(@[" ag in
-     Format.fprintf
+
+
+	 Format.fprintf
        f "%i%t->%i:%i.%i" s
        (match Int2Map.find_option (ag,s) ints with
        | Some int -> fun f -> Format.fprintf f "~%i" int
        | None -> fun _ -> ())
        ag' ty' s')
     f (Int2Set.fold (fun x y -> Int2Map.add x Edge.dummy_link y) missings links)
-
+ *)
 type path = ((agent * int) * (agent * int)) list
 (** ((agent_id, agent_name),site_name) *)
 
@@ -213,9 +247,9 @@ let is_valid_path graph l =
 let breath_first_traversal stop_on_find is_interresting sigs links =
   let rec look_each_site (id,ty,path as x) site (stop,don,out,next as acc) =
     if site = 0 then acc else
-    match Int2Map.pop (id,pred site) links with
-    | None,_ -> look_each_site x (pred site) acc
-    | Some ((id',ty'),site'),_ ->
+    match links.(id).(pred site) with
+    | None -> look_each_site x (pred site) acc
+    | Some ((id',ty'),site') ->
        if (stop&&stop_on_find) then acc
        else if IntSet.mem id' don then look_each_site x (pred site) acc
        else
