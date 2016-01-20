@@ -1,0 +1,232 @@
+<html>
+  <head>
+    <title>KaSim in browser</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.10.0/codemirror.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.10.0/codemirror.min.css">
+    <style type="text/css">
+      .tab-pane {
+      border-left: 1px solid #ddd;
+      border-right: 1px solid #ddd;
+      border-bottom: 1px solid #ddd;
+      border-radius: 0px 0px 5px 5px;
+      padding: 10px;
+      }
+
+      .nav-tabs {
+      margin-bottom: 0;
+      }
+      .filename {
+      display: inline-block;
+      padding: 6px 12px;
+      margin-bottom: 0;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.42857143;
+      text-align: center;
+      white-space: nowrap;
+      vertical-align: middle;
+      background: rgb(245, 245, 245);
+      border : 0px;
+      cursor : default;
+      }
+      .error-footer {
+        color: rgb(169, 68, 66);
+        background-color: rgb(242, 222, 222);
+      }
+    </style>
+    <script type="text/javascript">
+      $( document ).ready(function() {
+      var editor = CodeMirror.fromTextArea(document.getElementById("code-mirror"),
+      { lineNumbers: true,
+        gutters: ["CodeMirror-linenumbers", "breakpoints"]});
+        $( "#start-button" ).click(function() {
+            $( "#simulation-panel" ).toggle();
+            $( "#configuration-panel" ).toggle();
+          });
+        $( "#stop-button" ).click(function() {
+            $( "#simulation-panel" ).toggle();
+            $( "#configuration-panel" ).toggle();
+          });
+
+        $( "#simulation-panel" ).hide();
+        $( "#configuration-panel" ).show();
+      });
+    </script>
+  </head>
+  <body>
+    <nav class="navbar navbar-default navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="http://Kappa-Dev.github.io/">KaSim</a>
+          <ul class="nav navbar-nav">
+            <li><a>Try it Online</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- container -->
+    <div class="container" id="main">
+      <!-- row -->
+      <div class="row">
+
+        <!-- code column -->
+        <div class="col-md-6">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+
+              <div class="row">
+                <div class="col-md-2">
+                  <label class="btn btn-default" for="file-selector">
+                    <input id="file-selector" type="file" style="display:none;">
+                    Load
+                  </label>
+                </div>
+                <div class="col-md-4">
+                  <label class="filename">
+                    filename
+                  </label>
+                </div>
+                <div class="col-md-2 col-sm-offset-4 pull-right">
+                  <button id="save-button" type="button" class="btn btn-default">Save</button>
+                </div>
+              </div>
+
+            </div> <!-- panel heading -->
+
+            <div class="panel-body">
+              <textarea id="code-mirror"></textarea>
+            </div> <!-- panel body -->
+
+            <!-- configuration panel -->
+            <div id="configuration-panel">
+              <div class="panel-footer">
+                &nbsp;
+              </div>
+
+              <div class="panel-footer" style="background:white;">
+                <div class="row">
+                  <div class="col-md-4">
+                    <input placeholder="max number" id="intNumber" type="number" min="1" max="20" />
+                  </div>
+                  <div class="col-md-2">
+                    events
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-4">
+                    <input placeholder="time limit" id="intNumber" type="number" min="1" max="20" />
+                  </div>
+                  <div class="col-md-2">
+                    sec
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-4">
+                    <input placeholder="simulation points"  id="intNumber" type="number" min="1" max="20" />
+                  </div>
+                  <div class="col-md-2">
+                    points
+                  </div>
+                </div>
+
+              </div>
+              <div class="panel-footer">
+                <button id="start-button" type="button" class="btn btn-default">Start</button>
+              </div>
+
+            </div> <!-- configuration panel -->
+
+            <!-- simulation panel -->
+            <div id="simulation-panel">
+              <div class="panel-footer error-footer">
+                line 0, characters -1--1: There is no way for the simulation to stop.
+              </div>
+
+              <div class="panel-footer" style="background:white;">
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="progress">
+                      <div class="progress-bar" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width: 80%;">
+                        <span class="sr-only">80% Complete</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-2">
+                    events
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="progress">
+                      <div class="progress-bar" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
+                        <span class="sr-only">70% Complete</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    time
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-4">
+                    0
+                  </div>
+                  <div class="col-md-4">
+                    tracked events
+                  </div>
+                </div>
+              </div>
+              <div class="panel-footer">
+                <button id="stop-button" type="button" class="btn btn-default">Stop</button>
+              </div>
+
+            </div> <!-- simulation panel -->
+
+          </div> <!-- panel -->
+        </div>
+        <!-- code column -->
+
+        <!-- code column -->
+        <div class="col-md-6">
+          <!-- Nav tabs -->
+          <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#graph" aria-controls="graph" role="tab" data-toggle="tab">graph</a></li>
+            <li role="presentation"><a href="#flux" aria-controls="profile" role="tab" data-toggle="tab">flux</a></li>
+            <li role="presentation"><a href="#log" aria-controls="log" role="tab" data-toggle="tab">log</a></li>
+          </ul>
+
+          <!-- Tab panes -->
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="graph">
+              <img src="screenshot.png"/>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="flux">...</div>
+            <div role="tabpanel" class="tab-pane" id="log">
+              <div style="white-space: pre-wrap">
++ Building initial simulation conditions...
++ Compiling... -simulation parameters -agent signatures -sanity checks -KaSa tools initialization
++ Compute the contact map -variable declarations -rules -perturbations -observables -initial conditions
+Done ? A deadlock was reached after 0 events and 0.000000E+00s (Activity = 0.00000)
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- code column -->
+
+      </div>
+      <!-- row -->
+
+    </div>
+    <!-- container -->
+  </body>
+</div>
