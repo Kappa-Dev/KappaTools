@@ -135,4 +135,52 @@ let bdu_main parameter error handler_kappa store_covering_classes compiled =
       compiled
       store_covering_classes
   in
+  (* Static information before fixpoint computation *)
+  (*let error = 
+    if  (Remanent_parameters.get_trace parameter) || trace
+    then Print_bdu_analysis.print_result parameter error handler_kappa compiled result
+    else error
+  in*)
+  (*--------------------------------------------------------------------*)
+  (*discover dead rule; an initial array is false everywhere*)
+  (*let nrules = Handler.nrules parameter error handler_kappa in
+  let init_dead_rule_array = Array.make nrules false in
+  (*-------------------------------------------------------------------------------*)
+  (*fixpoint computation: no rule in particular, we should start with rule
+    with no lhs and those induced by initial states to remove *)
+  let error, (handler_bdu, store_bdu_fixpoint, dead_rule_array) =
+    Bdu_fixpoint_iteration.collect_bdu_fixpoint_map
+      parameter
+      handler_bdu
+      error
+      handler_kappa
+      compiled
+      result.store_bdu_build.store_remanent_triple
+      result.store_bdu_build.store_wl_creation
+      result.store_bdu_build.store_proj_bdu_creation_restriction_map
+      result.store_bdu_build.store_modif_list_restriction_map
+      result.store_bdu_build.store_proj_bdu_test_restriction_map
+      result.store_bdu_build.store_proj_bdu_potential_restriction_map
+      result.store_bdu_build.store_bdu_test_restriction_map
+      result.store_bdu_build.store_proj_bdu_views
+      result.store_bdu_analysis_dynamic.store_covering_classes_modification_update_full
+      result.store_bdu_build.store_bdu_init_restriction_map
+      init_dead_rule_array
+  in
+  (*let error, handler_bdu =
+    if  Remanent_parameters.get_dump_reachability_analysis_result parameter
+    then
+      (*Print a list of rules that is dead*)
+      let error =
+        print_result_dead_rule parameter error handler_kappa compiled dead_rule_array
+      in
+      Print_bdu_analysis.print_result_fixpoint 
+        parameter
+        handler_bdu 
+        error 
+        handler_kappa
+	result.store_bdu_build.store_remanent_triple
+	store_bdu_fixpoint
+    else error, handler_bdu*)
+  in*)
   error, handler_bdu, result
