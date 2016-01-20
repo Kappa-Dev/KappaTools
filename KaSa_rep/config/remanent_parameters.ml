@@ -133,7 +133,6 @@ let reachability_map_2 = { reachability_map_1 with Remanent_parameters_sig.dump_
 let reachability_map_3 = { reachability_map_2 with Remanent_parameters_sig.dump_reachability_analysis_diff = true }
 let reachability_map_4 = { reachability_map_3 with Remanent_parameters_sig.dump_reachability_analysis_wl = true }
 
-
 let add_debugging_parameters_to_reachability_map reachability =
   let trace = !Config.trace in
   let reachability =
@@ -208,6 +207,7 @@ let get_parameters ?called_from:(called_from=Remanent_parameters_sig.KaSa) () =
 	Remanent_parameters_sig.dump_site_dependencies = !Config.dump_site_dependencies ;
         (*different reachability output*)
 	Remanent_parameters_sig.do_reachability_analysis = !Config.do_reachability_analysis ;
+
 	Remanent_parameters_sig.do_reachability_analysis_module = !Config.do_reachability_analysis_module ;
         
         (**)
@@ -216,6 +216,7 @@ let get_parameters ?called_from:(called_from=Remanent_parameters_sig.KaSa) () =
 	Remanent_parameters_sig.influence_map_output = get_influence_map () ;
 	Remanent_parameters_sig.contact_map_output = get_contact_map () ;
         Remanent_parameters_sig.reachability_map_output = get_reachability_map ();
+        
 	Remanent_parameters_sig.unsafe = !Config.unsafe ;
 	Remanent_parameters_sig.trace  = !Config.trace ;
 	Remanent_parameters_sig.dump_error_as_soon_as_they_occur = !Config.dump_error_as_soon_as_they_occur;

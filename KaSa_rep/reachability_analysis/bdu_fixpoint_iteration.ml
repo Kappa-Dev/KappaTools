@@ -471,51 +471,6 @@ let add_update_to_wl ?title:(title="") parameter error handler_kappa compiled
 (************************************************************************************)
 (*fixpoint*)
 
-(*from rule_id get bdu_creation_map, bdu_test_map*)
-
-(*let collect_bdu_creation_and_modif_list parameter error rule_id
-    store_proj_bdu_creation_restriction_map
-    store_proj_bdu_test_restriction_map
-    =
-  let error, bdu_creation_map = 
-    match Map_final_creation_bdu.Map.find_option rule_id
-      store_proj_bdu_creation_restriction_map
-    with
-    | None -> error, Map_agent_type_creation_bdu.Map.empty
-    | Some map -> error, map
-  in
-   let error, bdu_test_map = 
-     match 
-       Map_final_test_bdu.Map.find_option rule_id 
-         store_proj_bdu_test_restriction_map
-     with
-     | None -> error, Map_agent_id_test_bdu.Map.empty
-     | Some map -> error, map
-   in
-   error, (bdu_creation_map, bdu_test_map)
-
-(*form rule_id get bdu_potential_map, and modif_list_map (when state of the site is free)*)
-
-let collect_bdu_potential_and_list parameter error rule_id
-    store_proj_bdu_potential_restriction_map
-  (*store_proj_potential_list_restriction_map*) =
-  let error, bdu_and_list_potential_map =
-    match Map_final_potential_bdu.Map.find_option rule_id 
-      store_proj_bdu_potential_restriction_map 
-    with
-    | None -> error, Map_agent_type_potential_bdu.Map.empty
-    | Some map -> error, map
-  in
- (* let error, potential_list_map =
-    match Map_final_potential_list.Map.find_option rule_id
-      store_proj_potential_list_restriction_map
-    with
-    | None -> error, Map_agent_type_potential_list.Map.empty
-    | Some map -> error, map
-  in*)
-  error, (bdu_and_list_potential_map(*, potential_list_map*))
-    *)
-
 let collect_map_views_creation_test_potential parameter error rule_id
     store_proj_bdu_views
     store_proj_bdu_creation_restriction_map
@@ -968,39 +923,16 @@ let collect_bdu_fixpoint_with_init parameter handler error
             let error, rule_id_string =
               try 
                 Handler.string_of_rule parameter error handler_kappa
-				       compiled rule_id
+		  compiled rule_id
               with
                 _ -> warn parameter error (Some "line 795") Exit 
-			  (string_of_int rule_id)
+		  (string_of_int rule_id)
             in
             let () = Printf.fprintf log "\n\tApplying %s:\n" rule_id_string in
 	    ()
-        in       
-        (*--------------------------------------------------------------------*)
-        (*let error, bdu_proj_views =
-	  match Map_rule_id_views.Map.find_option rule_id store_proj_bdu_views with
-	  | None -> error, Map_triple_views.Map.empty
-	  | Some m -> error, m
-	in*)
-        (*--------------------------------------------------------------------*)
-        (*compute bdu_creation, bdu_test for this rule_id*)
-        (*let error, (bdu_creation_map, bdu_test_map) =
-          collect_bdu_creation_and_modif_list
-            parameter
-            error
-            rule_id
-            store_proj_bdu_creation_restriction_map
-            store_proj_bdu_test_restriction_map
         in
         (*--------------------------------------------------------------------*)
-        let error, bdu_and_list_potential_map =
-          collect_bdu_potential_and_list
-            parameter
-            error
-            rule_id
-            store_proj_bdu_potential_restriction_map
-        in*)
-        let error, 
+        let error,
           (bdu_proj_views, bdu_creation_map, bdu_test_map, bdu_and_list_potential_map) =
           collect_map_views_creation_test_potential
             parameter
