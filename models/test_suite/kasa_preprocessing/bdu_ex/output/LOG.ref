@@ -363,7 +363,7 @@ Id=20
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-In agent A,  the internal state of site y is u whenever the internal state of site x is u.
+In agent A, the internal state of site x is p whenever the internal state of site y is p.
 
 ------------------------------------------------------------
 * Cartesian abstraction:

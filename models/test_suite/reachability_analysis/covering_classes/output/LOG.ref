@@ -2155,7 +2155,7 @@ Id=29
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-In agent B,  the binding state of site y is free whenever the internal state of site y is u.
+In agent B, the internal state of site y is p whenever the binding state of site y is A@y.
 agent_type:1:B:cv_id:1
 INTENSIONAL DESCRIPTION:
 Id=29
@@ -2197,7 +2197,7 @@ Id=29
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-In agent B,  the binding state of site x is free whenever the internal state of site x is u.
+In agent B, the internal state of site x is p whenever the binding state of site x is A@x.
 agent_type:2:C:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=26
@@ -2239,7 +2239,7 @@ Id=26
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-In agent C,  the internal state of site y is p, if and only if, the binding state of site y is A@y.
+In agent C, the internal state of site y is p, if and only if, the binding state of site y is A@y.
 agent_type:2:C:cv_id:1
 INTENSIONAL DESCRIPTION:
 Id=26
@@ -2281,7 +2281,7 @@ Id=26
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-In agent C,  the internal state of site x is p, if and only if, the binding state of site x is A@x.
+In agent C, the internal state of site x is p, if and only if, the binding state of site x is A@x.
 
 ------------------------------------------------------------
 * Cartesian abstraction:

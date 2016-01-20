@@ -549,7 +549,7 @@ Id=19
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-In agent A,  the internal state of site y is u whenever the internal state of site x is p.
+In agent A, the internal state of site y is u whenever the internal state of site x is p.
 agent_type:1:D:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=20

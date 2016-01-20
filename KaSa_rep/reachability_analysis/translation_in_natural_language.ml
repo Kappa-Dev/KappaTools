@@ -207,11 +207,15 @@ let translate parameter handler error rename_site_inverse mvbdu =
 	      list
 	    with
 	    | [] | [_] -> warn parameter error (Some "line 138") Exit (handler, No_known_translation list)
-	    | [[site1,state1;site2,state2];[site1',_;site2',_]] ->
+	    | [[site1,state1;site2,state2];[site1',state1';site2',state2']] ->
 	       begin
 		 if site1 = site1' && site2 = site2'
 		 then
-		   error, (handler, Equiv ((site1, state1), (site2, state2)))
+		   if state1 > state1'
+		   then 
+		     error, (handler, Equiv ((site1, state1), (site2, state2)))
+		   else 
+		     error, (handler, Equiv ((site1, state1'), (site2, state2')))
 		 else
 		   warn parameter error (Some "line 144") Exit (handler, No_known_translation list)
 	       end
@@ -220,11 +224,23 @@ let translate parameter handler error rename_site_inverse mvbdu =
 		 if site1 = site1' && site1 = site1'' && site2 = site2' && site2 = site2''
 		 then
 		   if state1 = state1'
-		   then  error, (handler, Imply ((site1,state1''),(site2,state2'')))
+		   then  
+		     if state1 < state1'' 
+		     then error, (handler, Imply ((site1,state1''),(site2,state2'')))
+		     else error, (handler, Imply ((site2,if state2=state2'' then state2' else state2)
+						     ,((site1,state1))))
 		   else if state1 = state1''
-		   then  error, (handler, Imply ((site1,state1'),(site2,state2')))
+		   then  
+		     if state1 < state1'
+		     then error, (handler, Imply ((site1,state1'),(site2,state2')))
+		     else error, (handler, Imply ((site2,if state2=state2' then state2'' else state2),(site1,state1)))
 		   else if state1' = state1''
-		   then error, (handler, Imply ((site1,state1),(site2,state2)))
+		   then 
+		     if state1' < state1 
+		     then 
+		       error, (handler, Imply ((site1,state1),(site2,state2)))
+		     else
+		       error, (handler, Imply ((site2,if state2=state2'' then state2' else state2''),(site1,state1')))
 		   else error, (handler, No_known_translation list)
 		 else
 		   warn parameter error (Some "line 159") Exit (handler, No_known_translation list)
@@ -349,7 +365,7 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	 in
 	 let error = Exception.check warn parameter error error' (Some "line 187") Exit in
 	 error,
-	 Printf.fprintf (Remanent_parameters.get_log parameter) "%s%s %s is %s, if and only if, %s is %s.\n" (Remanent_parameters.get_prefix parameter) (cap (in_agent_comma agent_string)) site_string1 state_string1 site_string2 state_string2
+	 Printf.fprintf (Remanent_parameters.get_log parameter) "%s%s%s is %s, if and only if, %s is %s.\n" (Remanent_parameters.get_prefix parameter) (cap (in_agent_comma agent_string)) site_string1 state_string1 site_string2 state_string2
        end
      else
        error,()
@@ -375,7 +391,7 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	     handler_kappa agent_type site2 state2 in
 	 let error = Exception.check warn parameter error error' (Some "line 212") Exit in
 	 error,
-	 Printf.fprintf (Remanent_parameters.get_log parameter) "%s%s %s is %s whenever %s is %s.\n"  (Remanent_parameters.get_prefix parameter) (cap (in_agent_comma agent_string)) site_string2 state_string2 site_string1 state_string1
+	 Printf.fprintf (Remanent_parameters.get_log parameter) "%s%s%s is %s whenever %s is %s.\n"  (Remanent_parameters.get_prefix parameter) (cap (in_agent_comma agent_string)) site_string2 state_string2 site_string1 state_string1
        end
      else
        error,()
