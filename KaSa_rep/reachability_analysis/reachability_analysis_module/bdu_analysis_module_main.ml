@@ -22,13 +22,15 @@ let trace = false
 
 type bdu_analysis =
   {
-    store_bdu_analysis_static : Bdu_analysis_static_type.bdu_analysis_static;
+    store_bdu_analysis_static  : Bdu_analysis_static_type.bdu_analysis_static;
+    store_bdu_analysis_dynamic : Bdu_analysis_dynamic_type.bdu_analysis_dynamic;
   }
 
 (*******************************************************************************)
 (*RULE*)
 
-let scan_rule parameter error handler_bdu handler_kappa rule_id rule compiled
+let scan_rule parameter error handler_bdu (handler_kappa: Cckappa_sig.kappa_handler)
+    (rule_id: int) (rule: Cckappa_sig.rule) (compiled: Cckappa_sig.compil)
     covering_classes store_result =
   let error, store_bdu_analysis_static =
     Bdu_analysis_static_module.Bdu_analysis_Static.scan_rule_static
@@ -40,10 +42,26 @@ let scan_rule parameter error handler_bdu handler_kappa rule_id rule compiled
       covering_classes
       store_result.store_bdu_analysis_static          
   in
+  (*-------------------------------------------------------------------------------*)
+  let error, store_bdu_analysis_dynamic =
+    Bdu_analysis_dynamic_module.Bdu_analysis_Dynamic.scan_rule_dynamic
+      parameter
+      error
+      handler_kappa
+      rule_id
+      rule
+      compiled
+      store_bdu_analysis_static.store_test_modif_map
+      store_bdu_analysis_static.store_covering_classes_id
+      store_bdu_analysis_static.store_potential_side_effects
+      covering_classes
+      store_result.store_bdu_analysis_dynamic
+  in
   error, 
   (handler_bdu, 
    {
      store_bdu_analysis_static  = store_bdu_analysis_static;
+     store_bdu_analysis_dynamic = store_bdu_analysis_dynamic;
    })
 
 (*******************************************************************************)
@@ -54,10 +72,14 @@ let scan_rule_set parameter error handler_bdu handler_kappa compiled
   let error, init_bdu_analysis_static =
     Bdu_analysis_static_module.Bdu_analysis_Static.init_bdu_analysis_static error
   in
+  let error, init_bdu_analysis_dynamic =
+    Bdu_analysis_dynamic_module.Bdu_analysis_Dynamic.init_bdu_analysis_dynamic error
+  in
   let error, init_bdu =
     error, 
     {
-      store_bdu_analysis_static = init_bdu_analysis_static
+      store_bdu_analysis_static = init_bdu_analysis_static;
+      store_bdu_analysis_dynamic = init_bdu_analysis_dynamic
     }
   in
   (*------------------------------------------------------------------------------*)
