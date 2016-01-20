@@ -1257,15 +1257,16 @@ The option \verb?--use-natural-language? can be used to switch on/off the transl
 
 It is possible to get more details about the computation of the analysis by tuning the verbosity level of the view analysis:
 \begin{itemize}
-\item With the option \verb?--use-natural-language Mute?, nothing is displayed. Even the result of the analysis is omitted.
+\item With the option \verb?--use-natural-language Mute?, nothing is displayed. Even the result of the analysis is omitted (eg.~see Fig.~\ref{fig:reachability_mute}).
 
 \begin{figure}[p]
 \input{generated_img/LOG_mute.txt}
 \caption{Reachability analysis of the model \texttt{reachbility.ka} with verbosity level ``Mute''.}
+\label{fig:reachability_mute}
 \end{figure}
 
 
-\item With the option \verb?--use-natural-language Low?, only the result of the analysis is displayed. 
+\item With the option \verb?--use-natural-language Low?, only the result of the analysis is displayed (eg.~see Fig.~\ref{fig:reachability_low}). 
 
 \begin{figure}[p]
 \input{generated_img/LOG_low.txt}
@@ -1273,12 +1274,14 @@ It is possible to get more details about the computation of the analysis by tuni
 \label{fig:reachability_low}
 \end{figure}
 
-\item With the option \texttt{--use-natural-language Medium}, the analysis also describes which rules are applied and in which order. 
+\item With the option \verb?--use-natural-language Medium?, the analysis also describes which rules are applied and in which order. 
+
+When trying to apply a rule, the analysis may detect that the rule cannot be applied yet because the precondition is not satisfied at the current state of the iteration (eg.~see Fig.~\ref{fig:reachability_medium_ko}). Otherwise, the analysis can apply the rule and update the state of the iteration accordingly (eg.~see Fig.~\ref{fig:reachability_medium_ok}).
 
 \begin{figure}[p]
 \input{generated_img/LOG_medium_KO.txt}
 \caption{Reachability analysis: one rule that cannot be applied yet, according to the bio-molecular species already constructed.}
-\label{fig:reachability_medium_ok}
+\label{fig:reachability_medium_ko}
 \end{figure}
 
 \begin{figure}[p]
@@ -1287,7 +1290,7 @@ It is possible to get more details about the computation of the analysis by tuni
 \label{fig:reachability_medium_ok}
 \end{figure}
 
-\item With the option \texttt{--use-natural-language High}, the analysis also describes which views are discovered. 
+\item With the option \verb?--use-natural-language High?, the analysis also describes which views are discovered. 
 
 \begin{figure}[p]
 \input{generated_img/LOG_high_init.txt}
@@ -1301,7 +1304,7 @@ It is possible to get more details about the computation of the analysis by tuni
 \label{fig:reachability_high_rule}
 \end{figure}
 
-\item With the option \texttt{--use-natural-language Full}, the analysis also describes which rules are awaken by the discovery of a new view. 
+\item With the option \verb?--use-natural-language Full?, the analysis also describes which rules are awaken by the discovery of a new view. 
 
 \begin{figure}[p]
 \input{generated_img/LOG_full.txt}
