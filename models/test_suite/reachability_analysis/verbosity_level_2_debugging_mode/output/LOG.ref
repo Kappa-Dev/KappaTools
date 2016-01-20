@@ -973,7 +973,7 @@ Id=80
            Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-In agent A, , the sites ... are entangled by the following 3-d relationship:
+In agent A, the internal state of site x, the internal state of site y, and the internal state of site z, are entangled by the following 3-d relationship:
 	A(x~q,y~u,z~u)
 	A(x~q,y~q,z~q)
 	A(x~q,y~q,z~u)

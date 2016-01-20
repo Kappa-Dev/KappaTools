@@ -1420,7 +1420,7 @@ Id=89
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-In agent C, , the sites ... are entangled by the following 4-d relationship:
+In agent C, the internal state of site x1, the internal state of site x2, the binding state of site x1, and the binding state of site x2, are entangled by the following 4-d relationship:
 	C(x1~p,x2~u,x1!free,x2!free)
 	C(x1~p,x2~u,x1!free,x2!A@c)
 	C(x1~p,x2~p,x1!free,x2!free)

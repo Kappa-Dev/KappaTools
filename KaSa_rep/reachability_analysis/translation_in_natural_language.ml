@@ -427,8 +427,31 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	 let n = List.length head in
 	 if List.length head >= dim_min
 	 then 
-	   let () = Printf.fprintf (Remanent_parameters.get_log parameter) "%s%s, the sites " (Remanent_parameters.get_prefix parameter) (cap (in_agent_comma agent_string)) in
-	   let () = Printf.fprintf (Remanent_parameters.get_log parameter) "... " in
+	   let () = Printf.fprintf (Remanent_parameters.get_log parameter) "%s%s" (Remanent_parameters.get_prefix parameter) (cap (in_agent_comma agent_string)) in
+	   let error,() = 
+	     let rec aux l error = 
+	       match 
+		 l
+	       with 
+	       | [a,_] -> 
+		 let error,string = Handler.string_of_site_in_natural_language parameter error handler_kappa agent_type a in
+		 let () = Printf.fprintf (Remanent_parameters.get_log parameter) ", and %s, " string in
+		 error,()
+	       | [] -> warn parameter error (Some "line 439") Exit ()
+	       | (a,_)::b -> 
+		 let error,string = Handler.string_of_site_in_natural_language parameter error handler_kappa agent_type a in
+		 let () = Printf.fprintf (Remanent_parameters.get_log parameter) ", %s" string in
+		 aux b error
+	     in
+	     match 
+	       head 
+	     with 
+	     | [] | [_] -> warn parameter error (Some "Line 441") Exit ()
+	     | (a,_)::b -> 
+	       let error, string = Handler.string_of_site_in_natural_language parameter error handler_kappa agent_type a in
+	       let () = Printf.fprintf (Remanent_parameters.get_log parameter) "%s" string in
+	       aux b error
+	   in
 	   let () = Printf.fprintf (Remanent_parameters.get_log parameter) "are entangled by the following %i-d relationship:\n" n in
 	   let parameter = Remanent_parameters.update_prefix parameter "\t" in
 	   List.fold_left
