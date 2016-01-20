@@ -561,8 +561,6 @@ rule 0
 	Applying rule 9:
 		the precondition is satisfied
 
-Reachability analysis result ....
-
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------

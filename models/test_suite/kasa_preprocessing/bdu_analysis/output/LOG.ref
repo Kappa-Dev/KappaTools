@@ -788,8 +788,6 @@ rule 7: r7
 		Updating the views for A(x!,y!)
 		Updating the views for B(x!)
 
-Reachability analysis result ....
-
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------

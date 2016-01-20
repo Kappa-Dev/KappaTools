@@ -1110,8 +1110,6 @@ rule 5: mod x2
 		Updating the views for A(x!,c!)
 		Updating the views for B(x!)
 
-Reachability analysis result ....
-
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------

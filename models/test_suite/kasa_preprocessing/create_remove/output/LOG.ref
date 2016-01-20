@@ -117,8 +117,6 @@ Set of rules that may test and modify a given site (excluding created agents):
 	Applying rule 1: r1:
 		the predcondition is not satisfied yet
 
-Reachability analysis result ....
-
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------

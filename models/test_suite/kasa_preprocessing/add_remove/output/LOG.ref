@@ -234,8 +234,6 @@ rule 0
 	Applying rule 0:
 		the predcondition is not satisfied yet
 
-Reachability analysis result ....
-
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------

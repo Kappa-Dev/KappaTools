@@ -1221,9 +1221,9 @@ When a file already exists, it is overwritten without any warning.
 \section{Reachability analysis}
 
 Reachability analysis aimed at detecting statically properties about the bio-molecular species that can be formed in a model. 
-Knowing whether, or not, a given bio-molecular species, can be formed in a model is an undecidable problem \cite{}. Thus, our analysis is approximate. Indeed, it computes an over-approximation of the set of the bio-molecular species that can be reached from the initial state of the model, by applying an unbounded number of computation steps. As formalized in \cite{}, the abstraction consists in:
+Knowing whether, or not, a given bio-molecular species, can be formed in a model is an undecidable problem \cite{Kreyssig}. Thus, our analysis is approximate. Indeed, it computes an over-approximation of the set of the bio-molecular species that can be reached from the initial state of the model, by applying an unbounded number of computation steps. As formalized in \cite{DanosEtAl-VMCAI08}, the abstraction consists in:
 \begin{enumerate}
-\item firstly, ignoring the number of occurrences (we assume that whenever a bio-molecular species can be formed, then it can be formed as many time as it could be necessary), 
+\item firstly, ignoring the number of occurrences of bio-molecular species (we assume that whenever a bio-molecular species can be formed, then it can be formed as many time as it could be necessary), 
 \item secondly, abstracting a bio-molecular species by the set of its local views (that is to say that we focus on the relationships between the states of the sites within agents, but we abstract away any relationships between different agents within a bio-molecular species).
 \end{enumerate}
 

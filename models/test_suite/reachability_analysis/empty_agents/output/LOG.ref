@@ -279,8 +279,6 @@ rule 4
 		the precondition is satisfied
 		Updating the views for C()
 
-Reachability analysis result ....
-
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------

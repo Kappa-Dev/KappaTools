@@ -1833,8 +1833,6 @@ rule 10: r10
 		Updating the views for A(y~,y!)
 		Updating the views for B(y~,y!)
 
-Reachability analysis result ....
-
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------

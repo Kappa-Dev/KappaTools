@@ -214,8 +214,6 @@ rule 1: remove
 	Applying rule 1: remove:
 		the predcondition is not satisfied yet
 
-Reachability analysis result ....
-
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------

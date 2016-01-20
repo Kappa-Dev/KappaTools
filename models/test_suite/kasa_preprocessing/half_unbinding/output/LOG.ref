@@ -163,8 +163,6 @@ rule 1: r1
 	Applying rule 1: r1:
 		the predcondition is not satisfied yet
 
-Reachability analysis result ....
-
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------

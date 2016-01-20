@@ -641,8 +641,6 @@ rule 5: r5
 	Applying rule 3: r3:
 		the precondition is satisfied
 
-Reachability analysis result ....
-
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------

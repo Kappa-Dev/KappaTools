@@ -645,8 +645,6 @@ rule 0
 		the precondition is satisfied
 		Updating the views for B(x~)
 
-Reachability analysis result ....
-
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------

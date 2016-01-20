@@ -753,8 +753,6 @@ rule 6
 		the precondition is satisfied
 		Updating the views for A(x~,y~,z~)
 
-Reachability analysis result ....
-
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------

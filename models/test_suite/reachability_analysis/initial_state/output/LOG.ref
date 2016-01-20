@@ -340,8 +340,6 @@ rule 2
 		the precondition is satisfied
 		Updating the views for A(x~,y~)
 
-Reachability analysis result ....
-
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------

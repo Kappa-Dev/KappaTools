@@ -393,8 +393,6 @@ rule 3: r3
 	Applying rule 3: r3:
 		the predcondition is not satisfied yet
 
-Reachability analysis result ....
-
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------
