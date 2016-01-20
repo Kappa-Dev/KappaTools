@@ -738,11 +738,12 @@ let print_covering_classes_id_aux parameter error handler_kappa result =
           _ -> warn parameter error (Some "line 39") Exit (string_of_int site_type)
       in
       let _ =
-        fprintf parameter.log 
+        fprintf (Remanent_parameters.get_log parameter)
           "agent_type:%i:%s:site_type:%i:%s@list of covering_class_id:\n"
           agent_type agent_string site_type site_string
       in
-      List.iter (fun id -> fprintf parameter.log "covering_class_id:%i\n" id)
+      List.iter (fun id -> fprintf (Remanent_parameters.get_log parameter)
+        "covering_class_id:%i\n" id)
         l2
     ) result
 
@@ -781,7 +782,7 @@ let print_half_break_effect parameter error handler_kappa compiled result =
           _ -> warn parameter error (Some "line 85") Exit (string_of_int site_type)
       in
       let _ =
-        fprintf parameter.log 
+        fprintf (Remanent_parameters.get_log parameter)
           "agent_type:%i:%s:site_type:%i:%s@list of pair (rule_id, binding state):\n"
           agent_type agent_string site_type site_string
       in
@@ -800,7 +801,7 @@ let print_half_break_effect parameter error handler_kappa compiled result =
           with
             _ -> warn parameter error (Some "line 105") Exit (string_of_int state)
         in
-        fprintf parameter.log "(%s * state:%i:(%s))\n"
+        fprintf (Remanent_parameters.get_log parameter) "(%s * state:%i:(%s))\n"
           rule_id_string state state_string) l2
     ) result
 
@@ -820,7 +821,7 @@ let print_remove_effect parameter error handler_kappa compiled result =
           _ -> warn parameter error (Some "line 124") Exit (string_of_int site_type)
       in
       let _ =
-        fprintf parameter.log 
+        fprintf (Remanent_parameters.get_log parameter) 
           "agent_type:%i:%s:site_type:%i:%s@list of pair (rule_id, binding state):\n"
           agent_type agent_string site_type site_string
       in
@@ -832,7 +833,7 @@ let print_remove_effect parameter error handler_kappa compiled result =
           with
             _ -> warn parameter error (Some "line 137") Exit (string_of_int rule_id)
         in
-        fprintf parameter.log "(%s * state:no_information)\n" rule_id_string
+        fprintf (Remanent_parameters.get_log parameter) "(%s * state:no_information)\n" rule_id_string
       ) l2
     ) result
 
@@ -906,7 +907,7 @@ let print_potential_partner_free parameter error handler_kappa compiled result =
           with
             _ -> warn parameter error (Some "line 211") Exit (string_of_int state)
         in
-        fprintf stdout "(site_type:%i:%s * state:%i(%s))\n" site_type site_string
+        fprintf (Remanent_parameters.get_log parameter) "(site_type:%i:%s * state:%i(%s))\n" site_type site_string
           state state_string
       ) l
     ) result
@@ -928,7 +929,7 @@ let print_potential_partner_bind parameter error handler_kappa compiled result =
           _ -> warn parameter error (Some "line 232") Exit (string_of_int agent_type)
       in
       let _ =
-        fprintf stdout "agent_type:%i:%s:%s@(site, binding state)\n"
+        fprintf (Remanent_parameters.get_log parameter) "agent_type:%i:%s:%s@(site, binding state)\n"
           agent_type agent_string rule_id_string
       in
       List.iter (fun (site_type, state) ->
@@ -944,7 +945,7 @@ let print_potential_partner_bind parameter error handler_kappa compiled result =
            with
              _ -> warn parameter error (Some "line 249") Exit (string_of_int state)
         in
-        fprintf stdout "(site_type:%i:%s * state:%i(%s))\n" 
+        fprintf (Remanent_parameters.get_log parameter) "(site_type:%i:%s * state:%i(%s))\n" 
           site_type site_string state state_string
       ) l
     ) result
@@ -995,7 +996,7 @@ let print_modification_sites_aux parameter error handler_kappa compiled result =
           _ -> warn parameter error (Some "line 299") Exit (string_of_int site_type)
       in
       let _ =
-        fprintf parameter.log 
+        fprintf (Remanent_parameters.get_log parameter) 
           "agent_id:%i:agent_type:%i:%s:site_type:%i:%s@set of rule_id:\n"
           agent_id agent_type agent_string site_type site_string 
       in
@@ -1008,7 +1009,7 @@ let print_modification_sites_aux parameter error handler_kappa compiled result =
             with
               _ -> warn parameter error (Some "line 313") Exit (string_of_int rule_id)
           in
-          fprintf parameter.log "%s\n" rule_id_string
+          fprintf (Remanent_parameters.get_log parameter) "%s\n" rule_id_string
         ) s2
     ) result
 
@@ -1046,7 +1047,7 @@ let print_modification_map_aux parameter error handler_kappa compiled result =
           _ -> warn parameter error (Some "line 350") Exit (string_of_int site_type)
       in
       let _ =
-        fprintf parameter.log 
+        fprintf (Remanent_parameters.get_log parameter)  
           "agent_type:%i:%s:site_type:%i:%s@set of rules:\n"
           agent_type agent_string site_type site_string
       in
@@ -1059,7 +1060,7 @@ let print_modification_map_aux parameter error handler_kappa compiled result =
             with
               _ -> warn parameter error (Some "line 364") Exit (string_of_int rule_id)
           in
-          fprintf parameter.log "%s\n" rule_id_string
+          fprintf (Remanent_parameters.get_log parameter) "%s\n" rule_id_string
         ) s2
     ) result
 
