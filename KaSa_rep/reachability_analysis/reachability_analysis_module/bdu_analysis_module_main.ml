@@ -24,6 +24,7 @@ type bdu_analysis =
   {
     store_bdu_analysis_static  : Bdu_analysis_static_type.bdu_analysis_static;
     store_bdu_analysis_dynamic : Bdu_analysis_dynamic_type.bdu_analysis_dynamic;
+    store_bdu_build            : Bdu_build_type.bdu_build
   }
 
 (*******************************************************************************)
@@ -57,11 +58,25 @@ let scan_rule parameter error handler_bdu (handler_kappa: Cckappa_sig.kappa_hand
       covering_classes
       store_result.store_bdu_analysis_dynamic
   in
+  (*-------------------------------------------------------------------------------*)
+  let error, handler_bdu, store_bdu_build =
+    Bdu_build_module.Bdu_Build.scan_rule_bdu_build
+      parameter
+      handler_bdu
+      error
+      rule_id
+      rule
+      compiled
+      covering_classes
+      store_bdu_analysis_static.Bdu_analysis_static_type.store_potential_side_effects
+      store_result.store_bdu_build
+  in
   error, 
   (handler_bdu, 
    {
      store_bdu_analysis_static  = store_bdu_analysis_static;
      store_bdu_analysis_dynamic = store_bdu_analysis_dynamic;
+     store_bdu_build            = store_bdu_build
    })
 
 (*******************************************************************************)
@@ -75,11 +90,15 @@ let scan_rule_set parameter error handler_bdu handler_kappa compiled
   let error, init_bdu_analysis_dynamic =
     Bdu_analysis_dynamic_module.Bdu_analysis_Dynamic.init_bdu_analysis_dynamic error
   in
+  let error, init_bdu_build =
+    Bdu_build_module.Bdu_Build.init_bdu_build parameter error
+  in
   let error, init_bdu =
     error, 
     {
       store_bdu_analysis_static = init_bdu_analysis_static;
-      store_bdu_analysis_dynamic = init_bdu_analysis_dynamic
+      store_bdu_analysis_dynamic = init_bdu_analysis_dynamic;
+      store_bdu_build            = init_bdu_build;
     }
   in
   (*------------------------------------------------------------------------------*)

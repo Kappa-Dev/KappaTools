@@ -747,3 +747,187 @@ let collect_proj_bdu_views parameter handler error store_bdu_test_restriction_ma
       store_bdu_test_restriction_map
   in
   (error, handler), store_result
+
+(*******************************************************************************)
+(*PRINT SECTION*)
+
+open Printf
+
+(************************************************************************************)
+
+let print_triple_list l =
+  let rec aux acc =
+    match acc with
+    | [] -> []
+    | (id, _, set) :: tl ->
+      fprintf stdout "Covering_class_id:%i\n" id;
+      Site_map_and_set.Set.iter (fun site ->
+        fprintf stdout "site_type:%i\n" site
+      ) set; aux tl
+  in aux l
+
+let print_remanent_triple parameter error result =
+  AgentMap.print error
+    (fun error parameter triple_list ->
+      let _ =
+        print_triple_list triple_list
+      in
+      error
+    ) parameter result
+
+(************************************************************************************)
+(*working list*)
+
+let print_wl_creation parameter result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "- Working list creation:\n";
+  Fifo.IntWL.print_wl parameter result
+
+(************************************************************************************)
+(*test rule*)
+
+let print_bdu_test_restriction_map parameter error result =
+  Map_test_bdu.Map.iter
+    (fun (agent_id, agent_type, rule_id, cv_id) bdu_test ->
+      let _ =
+        fprintf  (Remanent_parameters.get_log parameter)
+          "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i\n"
+          agent_id agent_type rule_id cv_id
+      in
+      Mvbdu_wrapper.Mvbdu.print  (Remanent_parameters.get_log parameter) "" bdu_test
+    ) result
+
+let print_proj_bdu_test_restriction_map parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "\n------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "- Bdu for the valuations of the views that are tested (projection per rule):\n\n";
+  Map_final_test_bdu.Map.iter
+    (fun rule_id map_b ->
+      let _ = fprintf  (Remanent_parameters.get_log parameter) "rule_id:%i\n" rule_id in
+      Map_agent_id_test_bdu.Map.iter (fun agent_id bdu_test ->
+        let _ = fprintf  (Remanent_parameters.get_log parameter) "agent_id:%i\n" agent_id in
+        Mvbdu_wrapper.Mvbdu.print  (Remanent_parameters.get_log parameter) "" bdu_test
+      ) map_b
+    ) result
+
+(************************************************************************************)
+(*creation rule*)
+
+let print_bdu_creation_restriction_map parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "\n------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "- Bdu for the valuations of the views that are created (per rule, agent and covering class):\n\n";
+  Map_creation_bdu.Map.iter
+    (fun (agent_type, rule_id, cv_id) bdu_creation ->
+      let _ =
+        fprintf  (Remanent_parameters.get_log parameter) "agent_type:%i:rule_id:%i:covering_class_id:%i\n"
+          agent_type rule_id cv_id
+      in
+      Mvbdu_wrapper.Mvbdu.print  (Remanent_parameters.get_log parameter) "" bdu_creation
+    ) result
+
+let print_proj_bdu_creation_restriction_map parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "\n------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "- Bdu for the valuations of the views that are created (per rule_id; projection function):\n\n";
+  Map_final_creation_bdu.Map.iter
+    (fun rule_id map_b ->
+      let _ = fprintf (Remanent_parameters.get_log parameter) "rule_id:%i\n" rule_id in
+      Map_agent_type_creation_bdu.Map.iter
+        (fun (agent_type, cv_id) bdu_creation ->
+          let _ = fprintf (Remanent_parameters.get_log parameter) "agent_type:%i:cv_id:%i\n" 
+            agent_type cv_id
+          in
+          Mvbdu_wrapper.Mvbdu.print (Remanent_parameters.get_log parameter) "" bdu_creation
+        ) map_b
+    ) result
+
+(************************************************************************************)
+(*bdu initial state*)
+
+let print_bdu_init_restriction_map parameter error result =
+  Map_init_bdu.Map.iter
+    (fun (agent_type, cv_id) bdu_init ->
+      let _ =
+        fprintf (Remanent_parameters.get_log parameter) "agent_type:%i:covering_class_id:%i\n"
+          agent_type cv_id
+      in
+      Mvbdu_wrapper.Mvbdu.print (Remanent_parameters.get_log parameter) "" bdu_init
+    ) result
+
+(************************************************************************************)
+(*modification list, this is list_a*)
+
+let print_modif_list_restriction_map parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "\n------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "- List for update of the views due to modification (per rule, agent and covering class):\n";
+  Map_modif_list.Map.iter
+    (fun (agent_id, agent_type, rule_id, cv_id) list_a ->
+      let _ =
+        fprintf  (Remanent_parameters.get_log parameter) 
+          "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i\n"
+          agent_id agent_type rule_id cv_id
+      in
+      Mvbdu_wrapper.Mvbdu.print_association_list  (Remanent_parameters.get_log parameter) "" list_a
+    ) result
+
+(************************************************************************************)
+(*bdu of potential partner in side effects*)
+
+let print_bdu_potential_effect_restriction_map parameter error result =
+  Map_potential_bdu.Map.iter
+    (fun (agent_type, site_type, rule_id, cv_id) (bdu_potential,list) ->
+      let _ =
+        fprintf  (Remanent_parameters.get_log parameter)
+          "agent_type:%i:new_site_name:%i:rule_id:%i:covering_class_id:%i\n"
+          agent_type site_type rule_id cv_id
+      in
+      Mvbdu_wrapper.Mvbdu.print  (Remanent_parameters.get_log parameter) "" bdu_potential;
+      Mvbdu_wrapper.Mvbdu.print_association_list  (Remanent_parameters.get_log parameter) "" list
+    ) result
+ 
+(*projection*)
+
+let print_proj_bdu_potential_restriction_map parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "\n------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "- Bdu for the valuations of the views that are created from potential partner in side effects (projection per rule):\n\n";
+  Map_final_potential_bdu.Map.iter
+    (fun rule_id map_b ->
+      let _ = fprintf  (Remanent_parameters.get_log parameter) "rule_id:%i\n" rule_id in
+      Map_agent_type_potential_bdu.Map.iter
+        (fun (agent_type, site_type, cv_id) (bdu_potential,list) ->
+          let _ = fprintf (Remanent_parameters.get_log parameter)
+            "agent_type:%i:new_site_name:%i:covering_class_id:%i\n" 
+            agent_type site_type cv_id
+          in
+          Mvbdu_wrapper.Mvbdu.print (Remanent_parameters.get_log parameter) "" bdu_potential;
+	  Mvbdu_wrapper.Mvbdu.print_association_list 
+            (Remanent_parameters.get_log parameter) "" list
+        ) map_b
+    ) result
+
+(************************************************************************************)
+(*projection function will be used in is_enable function*)
+
+let print_proj_bdu_views parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "\n------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "- Bdu for the valuation of the views that are tested (projection per rule):\n";
+  Map_rule_id_views.Map.iter
+    (fun rule_id map_b ->
+      let _ = fprintf  (Remanent_parameters.get_log parameter) "rule_id:%i\n" rule_id in
+      Map_triple_views.Map.iter 
+        (fun (agent_id, agent_type, cv_id) bdu ->
+          let _ = fprintf (Remanent_parameters.get_log parameter) "agent_id:%i:agent_type:%i:cv_id:%i\n" 
+            agent_id agent_type cv_id in
+          Mvbdu_wrapper.Mvbdu.print (Remanent_parameters.get_log parameter) "" bdu
+        ) map_b
+    ) result
