@@ -96,8 +96,8 @@ Reachability analysis result ....
 ------------------------------------------------------------
 * Cartesian abstraction:
 ------------------------------------------------------------
-The state of the site x! in agent A is always B@x.
-The state of the site x~ in agent A is always u.
-The state of the site x! in agent B ranges over free and A@x.
-The state of the site x~ in agent B ranges over u and p.
+The binding state of site x in agent A is always B@x.
+The internal state of site x in agent A is always u.
+The binding state of site x in agent B ranges over free and A@x.
+The internal state of site x in agent B ranges over u and p.
 execution finished without any exception

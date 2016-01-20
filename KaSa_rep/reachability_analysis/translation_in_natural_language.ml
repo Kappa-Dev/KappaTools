@@ -251,7 +251,7 @@ let translate parameter handler error rename_site_inverse mvbdu =
     
 let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt_agent_type=true) ~show_dep_with_dimmension_higher_than:dim_min parameter handler_kappa error agent_string agent_type translation =
   let cap s = if beggining then String.capitalize s else s in
-  let in_agent s = if prompt_agent_type then " in agent "^s^" " else "" in
+  let in_agent s = if prompt_agent_type then "in agent "^s^" " else "" in
   let in_agent_comma s = if prompt_agent_type then "in agent "^s^", " else "" in
   let in_agent_colon s = if prompt_agent_type then "in agent "^s^": " else "" in 
   let error, () =
@@ -263,7 +263,7 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	if dim_min <= 1
 	then
 	  let error', site_string =
-	    Handler.string_of_site parameter error handler_kappa
+	    Handler.string_of_site_in_natural_language parameter error handler_kappa
 	      agent_type site_type
 	  in 
           let error = Exception.check warn parameter error error' (Some "line 111") Exit in
@@ -300,8 +300,8 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	    error, 
 	    Printf.fprintf 
 	      (Remanent_parameters.get_log parameter) 
-	      "%s%she state of the site %s%sis always %s.\n" 
-	      (Remanent_parameters.get_prefix parameter) (cap "t") site_string (in_agent agent_string) state_string
+	      "%s%s %sis always %s.\n" 
+	      (Remanent_parameters.get_prefix parameter) (cap site_string) (in_agent agent_string) state_string
 	  | [state1;state2] ->
 	    let error', state_string1 =
 	      Handler.string_of_state_fully_deciphered parameter error
@@ -314,12 +314,12 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	    in
 	    let error = Exception.check warn parameter error error' (Some "line 154") Exit in
 	    error, Printf.fprintf (Remanent_parameters.get_log parameter) 
-	      "%s%she state of the site %s%sranges over %s and %s.\n" 
-	      (Remanent_parameters.get_prefix parameter) (cap "t") site_string (in_agent agent_string) state_string1 state_string2
+	      "%s%s %sranges over %s and %s.\n" 
+	      (Remanent_parameters.get_prefix parameter) (cap site_string) (in_agent agent_string) state_string1 state_string2
 	  | list ->
 	    let () = Printf.fprintf (Remanent_parameters.get_log parameter)
-	      "%s%she state of the site %s%sranges over" 
-	      (Remanent_parameters.get_prefix parameter) (cap "t") site_string (in_agent agent_string)
+	      "%s%s %sranges over" 
+	      (Remanent_parameters.get_prefix parameter) (cap site_string)  (in_agent agent_string)
 	    in
 	    aux list error
 	else error,()
@@ -329,7 +329,7 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
      then
        begin
 	 let error', site_string1 =
-	   Handler.string_of_site parameter error handler_kappa
+	   Handler.string_of_site_in_natural_language parameter error handler_kappa
 	     agent_type site1
 	 in
 	 let error = Exception.check warn parameter error error' (Some "line 172") Exit in
@@ -339,7 +339,7 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	 in
 	 let error = Exception.check warn parameter error error' (Some "line 177") Exit in
 	 let error', site_string2 =
-	   Handler.string_of_site parameter error handler_kappa
+	   Handler.string_of_site_in_natural_language parameter error handler_kappa
 	     agent_type site2
 	 in
 	 let error = Exception.check warn parameter error error' (Some "line 182") Exit in
@@ -349,7 +349,7 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	 in
 	 let error = Exception.check warn parameter error error' (Some "line 187") Exit in
 	 error,
-	 Printf.fprintf (Remanent_parameters.get_log parameter) "%s%sthe state of the site %s is %s, if and only if, the state of the site %s is %s.\n" (Remanent_parameters.get_prefix parameter) (cap (in_agent_comma agent_string)) site_string1 state_string1 site_string2 state_string2
+	 Printf.fprintf (Remanent_parameters.get_log parameter) "%s%s %s is %s, if and only if, %s is %s.\n" (Remanent_parameters.get_prefix parameter) (cap (in_agent_comma agent_string)) site_string1 state_string1 site_string2 state_string2
        end
      else
        error,()
@@ -358,7 +358,7 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
      then
        begin
 	 let error', site_string1 =
-	   Handler.string_of_site parameter error handler_kappa agent_type site1
+	   Handler.string_of_site_in_natural_language parameter error handler_kappa agent_type site1
 	 in
 	 let error = Exception.check warn parameter error error' (Some "line 200") Exit in
 	 let error', state_string1 =
@@ -367,7 +367,7 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	 in
 	 let error = Exception.check warn parameter error error' (Some "line 204") Exit in
 	 let error', site_string2 =
-	   Handler.string_of_site parameter error handler_kappa agent_type site2
+	   Handler.string_of_site_in_natural_language parameter error handler_kappa agent_type site2
 	 in
 	 let error = Exception.check warn parameter error error' (Some "line 208") Exit in
 	 let error', state_string2 =
@@ -375,7 +375,7 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	     handler_kappa agent_type site2 state2 in
 	 let error = Exception.check warn parameter error error' (Some "line 212") Exit in
 	 error,
-	 Printf.fprintf (Remanent_parameters.get_log parameter) "%s%sthe state of the site %s is %s whenever the state of the site %s is %s.\n"  (Remanent_parameters.get_prefix parameter) (cap (in_agent_comma agent_string)) site_string2 state_string2 site_string1 state_string1
+	 Printf.fprintf (Remanent_parameters.get_log parameter) "%s%s %s is %s whenever %s is %s.\n"  (Remanent_parameters.get_prefix parameter) (cap (in_agent_comma agent_string)) site_string2 state_string2 site_string1 state_string1
        end
      else
        error,()
@@ -385,7 +385,7 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	 "%s%s\n" (Remanent_parameters.get_prefix parameter) (cap (in_agent_colon agent_string)) 
      in
      let error, site_string = 
-	 Handler.string_of_site parameter error handler_kappa agent_type v 
+	 Handler.string_of_site_in_natural_language parameter error handler_kappa agent_type v 
      in
      let parameter = Remanent_parameters.update_prefix parameter "\t" in
      let error = 
@@ -394,7 +394,7 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	   let error, state_string =
 	       Handler.string_of_state_fully_deciphered parameter error handler_kappa agent_type v a
 	   in
-	   let () = Printf.fprintf (Remanent_parameters.get_log parameter) "%swhen the state of the site %s is equal to %s, then:\n" (Remanent_parameters.get_prefix parameter) site_string state_string in
+	   let () = Printf.fprintf (Remanent_parameters.get_log parameter) "%swhen %s is equal to %s, then:\n" (Remanent_parameters.get_prefix parameter) site_string state_string in
 	   let parameter = Remanent_parameters.update_prefix parameter "\t+ " in
 	   List.fold_left
 	     (fun error token -> 

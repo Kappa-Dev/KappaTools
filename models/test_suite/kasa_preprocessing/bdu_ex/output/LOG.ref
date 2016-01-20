@@ -363,7 +363,7 @@ Id=20
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-In agent A, the state of the site y~ is u whenever the state of the site x~ is u.
+In agent A,  the internal state of site y is u whenever the internal state of site x is u.
 
 ------------------------------------------------------------
 * Cartesian abstraction:
@@ -384,7 +384,7 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The state of the site x~ in agent A ranges over u and p.
+The internal state of site x in agent A ranges over u and p.
 INTENSIONAL DESCRIPTION:
 Id=17
  Node(site_type:2<0)
@@ -400,5 +400,5 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The state of the site y~ in agent A ranges over u and p.
+The internal state of site y in agent A ranges over u and p.
 execution finished without any exception

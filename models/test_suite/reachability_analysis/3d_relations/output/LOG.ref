@@ -18,14 +18,14 @@ Reachability analysis result ....
 * Cartesian decomposition:
 ------------------------------------------------------------
 In agent A: 
-	when the state of the site z~ is equal to p, then:
-		+ the state of the site x~is always p.
-		+ the state of the site y~is always p.
+	when the internal state of site z is equal to p, then:
+		+ the internal state of site x is always p.
+		+ the internal state of site y is always p.
 
 ------------------------------------------------------------
 * Cartesian abstraction:
 ------------------------------------------------------------
-The state of the site x~ in agent A ranges over u and p.
-The state of the site y~ in agent A ranges over u and p.
-The state of the site z~ in agent A ranges over u and p.
+The internal state of site x in agent A ranges over u and p.
+The internal state of site y in agent A ranges over u and p.
+The internal state of site z in agent A ranges over u and p.
 execution finished without any exception

@@ -78,7 +78,7 @@ In agent A, , the sites ... are entangled by the following 3-d relationship:
 ------------------------------------------------------------
 * Cartesian abstraction:
 ------------------------------------------------------------
-The state of the site x~ in agent A ranges over u, p, 0, and q.
-The state of the site y~ in agent A ranges over u, p, and q.
-The state of the site z~ in agent A ranges over u and q.
+The internal state of site x in agent A ranges over u, p, 0, and q.
+The internal state of site y in agent A ranges over u, p, and q.
+The internal state of site z in agent A ranges over u and q.
 execution finished without any exception

@@ -808,7 +808,7 @@ Id=20
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The state of the site x~ in agent A ranges over u and p.
+The internal state of site x in agent A ranges over u and p.
 INTENSIONAL DESCRIPTION:
 Id=5
  Node(site_type:2<0)
@@ -824,7 +824,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The state of the site x! in agent A is always free.
+The binding state of site x in agent A is always free.
 agent_type:1:B:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=18
@@ -841,5 +841,5 @@ Id=18
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The state of the site x~ in agent B ranges over u and p.
+The internal state of site x in agent B ranges over u and p.
 execution finished without any exception

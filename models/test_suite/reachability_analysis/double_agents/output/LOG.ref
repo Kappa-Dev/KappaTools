@@ -1384,7 +1384,7 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The state of the site x! in agent A ranges over free and B@x.
+The binding state of site x in agent A ranges over free and B@x.
 agent_type:0:A:cv_id:1
 INTENSIONAL DESCRIPTION:
 Id=6
@@ -1401,7 +1401,7 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The state of the site y~ in agent A ranges over p and u.
+The internal state of site y in agent A ranges over p and u.
 agent_type:0:A:cv_id:2
 INTENSIONAL DESCRIPTION:
 Id=6
@@ -1418,7 +1418,7 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The state of the site x~ in agent A ranges over u and p.
+The internal state of site x in agent A ranges over u and p.
 agent_type:1:B:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=93
@@ -1435,7 +1435,7 @@ Id=93
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The state of the site x~ in agent B ranges over p, q, and u.
+The internal state of site x in agent B ranges over p, q, and u.
 INTENSIONAL DESCRIPTION:
 Id=99
  Node(site_type:2<0)
@@ -1451,7 +1451,7 @@ Id=99
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The state of the site y~ in agent B ranges over u, p, and q.
+The internal state of site y in agent B ranges over u, p, and q.
 INTENSIONAL DESCRIPTION:
 Id=68
  Node(site_type:3<0)
@@ -1467,7 +1467,7 @@ Id=68
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The state of the site x! in agent B ranges over free, A@x, and C@x.
+The binding state of site x in agent B ranges over free, A@x, and C@x.
 agent_type:2:C:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=6
@@ -1484,5 +1484,5 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The state of the site x! in agent C ranges over free and B@x.
+The binding state of site x in agent C ranges over free and B@x.
 execution finished without any exception

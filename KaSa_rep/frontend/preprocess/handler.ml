@@ -200,12 +200,24 @@ let string_of_site parameter error handler_kappa agent_type site_int =
   in
   error, (print_site_compact site_type)
 
+let string_of_site_in_natural_language parameter error handler_kapp agent_type site_int =
+  let error, site_type = 
+    string_of_site_aux parameter error handler_kapp agent_type site_int
+  in
+  match 
+    site_type
+  with 
+  | Ckappa_sig.Internal x -> error, ("the internal state of site "^x)
+  | Ckappa_sig.Binding x -> error, ("the binding state of site "^x)
+
 (*print function for contact map*)
 
 let print_site_contact_map site =
   match site with
   | Ckappa_sig.Internal a -> a
   | Ckappa_sig.Binding a -> a
+
+
 
 let string_of_site_contact_map parameter error handler_kappa agent_type site_int =
   let error, site_type = 
