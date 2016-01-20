@@ -1,0 +1,8 @@
+%init: 1 A(x~u,y~u,z~u)
+
+A(x~u)->A(x~p)
+A(y~u)->A(y~p)
+A(x~p,y~p,z~u) -> A(x~p,y~p,z~p)
+A(x~p,z~u) -> A(x~u,z~u)
+A(y~p,z~u) -> A(y~u,z~u)
+A(z~p) -> A(z~u)

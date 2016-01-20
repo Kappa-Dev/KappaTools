@@ -1,0 +1,5 @@
+#Command-line:
+"${KAPPABIN}"KaSa relations.ka --output-directory output || exit 0 
+
+
+

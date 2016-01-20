@@ -1329,9 +1329,10 @@ Id=106
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-B(x~u,y~u)
-B(x~q,y~q)
-B(x~p,y~p)
+In agent B, , the sites ... are entangled by the following 2-d relationship:
+	B(x~u,y~u)
+	B(x~q,y~q)
+	B(x~p,y~p)
 INTENSIONAL DESCRIPTION:
 Id=68
  Node(site_type:3<0)

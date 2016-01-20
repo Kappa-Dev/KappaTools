@@ -1420,11 +1420,12 @@ Id=89
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-C(x1~p,x2~u,x1!free,x2!free)
-C(x1~p,x2~u,x1!free,x2!A@c)
-C(x1~p,x2~p,x1!free,x2!free)
-C(x1~u,x2~u,x1!A@c,x2!free)
-C(x1~u,x2~u,x1!free,x2!free)
+In agent C, , the sites ... are entangled by the following 4-d relationship:
+	C(x1~p,x2~u,x1!free,x2!free)
+	C(x1~p,x2~u,x1!free,x2!A@c)
+	C(x1~p,x2~p,x1!free,x2!free)
+	C(x1~u,x2~u,x1!A@c,x2!free)
+	C(x1~u,x2~u,x1!free,x2!free)
 
 ------------------------------------------------------------
 * Cartesian abstraction:

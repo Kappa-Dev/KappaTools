@@ -439,8 +439,8 @@ covering_class_id:0
 Sites that may/must occurs side-effects:
 ------------------------------------------------------------
 agent_type:0:A:site_type:1:x!@list of pair (rule_id, binding state):
-(rule 7 * state:1:(1))
-(rule 6 * state:1:(1))
+(rule 7 * state:1:())
+(rule 6 * state:1:())
 agent_type:3:E:site_type:0:x!@list of pair (rule_id, binding state):
 (rule 9 * state:no_information)
 ------------------------------------------------------------

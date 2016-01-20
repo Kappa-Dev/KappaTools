@@ -973,13 +973,14 @@ Id=80
            Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-A(x~q,y~u,z~u)
-A(x~q,y~q,z~q)
-A(x~q,y~q,z~u)
-A(x~0,y~p,z~q)
-A(x~p,y~u,z~u)
-A(x~p,y~p,z~u)
-A(x~u,y~u,z~u)
+In agent A, , the sites ... are entangled by the following 3-d relationship:
+	A(x~q,y~u,z~u)
+	A(x~q,y~q,z~q)
+	A(x~q,y~q,z~u)
+	A(x~0,y~p,z~q)
+	A(x~p,y~u,z~u)
+	A(x~p,y~p,z~u)
+	A(x~u,y~u,z~u)
 
 ------------------------------------------------------------
 * Cartesian abstraction:

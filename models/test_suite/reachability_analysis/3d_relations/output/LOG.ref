@@ -1,4 +1,4 @@
-Parsing verbosity.ka...
+Parsing relations.ka...
 done
 Compiling...
 Generating the raw contact map...
@@ -11,26 +11,21 @@ Reachability analysis result ....
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------
-rule 7: KO will never be applied.
 
 Reachability analysis result ....
 
 ------------------------------------------------------------
 * Cartesian decomposition:
 ------------------------------------------------------------
-In agent A, , the sites ... are entangled by the following 3-d relationship:
-	A(x~q,y~u,z~u)
-	A(x~q,y~q,z~q)
-	A(x~q,y~q,z~u)
-	A(x~0,y~p,z~q)
-	A(x~p,y~u,z~u)
-	A(x~p,y~p,z~u)
-	A(x~u,y~u,z~u)
+In agent A: 
+	when the state of the site z~ is equal to p, then:
+		+ the state of the site x~is always p.
+		+ the state of the site y~is always p.
 
 ------------------------------------------------------------
 * Cartesian abstraction:
 ------------------------------------------------------------
-The state of the site x~ in agent A ranges over u, p, 0, and q.
-The state of the site y~ in agent A ranges over u, p, and q.
-The state of the site z~ in agent A ranges over u and q.
+The state of the site x~ in agent A ranges over u and p.
+The state of the site y~ in agent A ranges over u and p.
+The state of the site z~ in agent A ranges over u and p.
 execution finished without any exception
