@@ -174,16 +174,9 @@ module Bdu_analysis_Dynamic =
         parameter error store_covering_classes_modification_update
         store_covering_classes_modification_side_effects store_result       
 
-    let scan_rule_dynamic parameter error 
-        (handler_kappa: Cckappa_sig.kappa_handler)
-        (rule_id: int)
-        (rule: Cckappa_sig.rule)
-        (compiled:Cckappa_sig.compil)
-        store_test_modification_map
-        store_covering_classes_id
-        store_potential_side_effects
-        covering_classes
-        store_result =
+    let scan_rule_dynamic parameter error handler_kappa rule_id rule compiled
+        store_test_modification_map store_covering_classes_id
+        store_potential_side_effects covering_classes store_result =
       (*------------------------------------------------------------------------------*)
       (*contact map dynamic*)
       let error, store_contact_map_full =
