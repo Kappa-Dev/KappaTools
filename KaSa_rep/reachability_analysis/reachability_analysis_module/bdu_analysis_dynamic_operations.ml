@@ -708,7 +708,7 @@ let print_covering_classes_modification_aux parameter error handler_kappa compil
           _ -> warn parameter error (Some "line 268") Exit (string_of_int agent_type)
       in
       let _ =
-        fprintf parameter.log
+        fprintf (Remanent_parameters.get_log parameter)
           "agent_type:%i:%s:covering_class_id:%i:@set of rule_id:\n" 
           agent_type agent_string y
       in
@@ -722,7 +722,7 @@ let print_covering_classes_modification_aux parameter error handler_kappa compil
             with
               _ -> warn parameter error (Some "line 283") Exit (string_of_int rule_id)
           in
-          fprintf parameter.log "%s\n" rule_id_string
+          fprintf (Remanent_parameters.get_log parameter) "%s\n" rule_id_string
         ) s2
     ) result
 

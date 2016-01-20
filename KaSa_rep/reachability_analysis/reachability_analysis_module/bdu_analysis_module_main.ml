@@ -51,9 +51,9 @@ let scan_rule parameter error handler_bdu (handler_kappa: Cckappa_sig.kappa_hand
       rule_id
       rule
       compiled
-      store_bdu_analysis_static.store_test_modif_map
-      store_bdu_analysis_static.store_covering_classes_id
-      store_bdu_analysis_static.store_potential_side_effects
+      store_bdu_analysis_static.Bdu_analysis_static_type.store_test_modif_map
+      store_bdu_analysis_static.Bdu_analysis_static_type.store_covering_classes_id
+      store_bdu_analysis_static.Bdu_analysis_static_type.store_potential_side_effects
       covering_classes
       store_result.store_bdu_analysis_dynamic
   in
