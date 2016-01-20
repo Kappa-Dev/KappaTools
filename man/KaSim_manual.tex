@@ -1237,13 +1237,14 @@ As an example, we consider the following model:
 \end{lstlisting}
 
 Typing the following instruction:
-
-\texttt{KaSa reachability.ka --reset-all --compute-reachability-analysis}
+\begin{verbatim}
+KaSa reachability.ka --reset-all --compute-reachability-analysis
+\end{verbatim}
 
 will perform the reachability analysis on the model \texttt{reachability.ka}. 
 
 
-The result (eg.~see Fig.~\ref{fig:reachability_low})is displayed in the standard output, and it is made of three parts:
+The result (eg.~see Fig.~\ref{fig:reachability_low}) is displayed in the standard output, and it is made of three parts:
 \begin{itemize}
 \item \textbf{Detection of dead rules.} A rule is called dead, if there is no trace starting from the initial state in which this rule is applied. The analysis reports the list of the rules it has detected to be dead. Due to the over-approximation, it may happen that a dead rule is not discovered by the analysis. Yet, any rule that is reported as dead, is dead indeed. 
   
@@ -1252,11 +1253,11 @@ The result (eg.~see Fig.~\ref{fig:reachability_low})is displayed in the standard
 \item \textbf{Non-relational properties.} The analysis detects for each kind of site, the set of states this site can take. This set is described in natural language. Due to the over-approximation, the analysis reports a super-set of the set of the potential states. Yet, we are sure that a given site only take states within this set. 
 \end{itemize}
 
-The option \texttt{--use-natural-language} can be used to switch on/off the translation of properties in natural language: when the option is disabled, each relationship is described in extension. 
+The option \verb?--use-natural-language? can be used to switch on/off the translation of properties in natural language: when the option is disabled, each relationship is described in extension. 
 
 It is possible to get more details about the computation of the analysis by tuning the verbosity level of the view analysis:
 \begin{itemize}
-\item With the option \texttt{--use-natural-language Mute}, nothing is displayed. Even the result of the analysis is omitted.
+\item With the option \verb?--use-natural-language Mute?, nothing is displayed. Even the result of the analysis is omitted.
 
 \begin{figure}[p]
 \input{generated_img/LOG_mute.txt}
@@ -1264,7 +1265,7 @@ It is possible to get more details about the computation of the analysis by tuni
 \end{figure}
 
 
-\item With the option \texttt{--use-natural-language Low}, only the result of the analysis is displayed. 
+\item With the option \verb?--use-natural-language Low?, only the result of the analysis is displayed. 
 
 \begin{figure}[p]
 \input{generated_img/LOG_low.txt}
