@@ -14,112 +14,223 @@ module Edge = struct
 end
 
 type t =
-  (Edge.t option array array * Int2Set.t) *
-    int Int2Map.t * IntSet.t IntMap.t * (int * int list)
+  {
+    mutable outdated : bool;
+    connect : Edge.t option array array;
+    missings : Int2Set.t;
+    state : int option array array;
+    sort : IntSet.t IntMap.t;
+    free_id : int * int list;
+  }
 (** (agent,site -> binding_state; missings);
     agent,site -> internal_state; sort -> agents; free_id *)
 
-let empty = (([|[||]|],Int2Set.empty), Int2Map.empty, IntMap.empty,(0,[]))
+let empty =
+  {
+    outdated = false;
+    connect = [|[||]|];
+    missings = Int2Set.empty;
+    state = [|[||]|];
+    sort = IntMap.empty;
+    free_id =(0,[]);
+  }
 
-let add_agent sigs ty ((connect,missings),state,sort,free_id) =
+let add_agent sigs ty graph =
   let ar = Signature.arity sigs ty in
-  let ag = Array.make ar None in
-  match free_id with
+  let al = Array.make ar None in
+  let ai = Array.make ar None in
+  let () = assert (not graph.outdated) in
+  let () = graph.outdated <- true in
+  match graph.free_id with
   | new_id,h :: t ->
      let missings' = Tools.recti (fun s a -> Int2Set.add (h,s) a)
-				 missings ar in
-     let () = connect.(h) <- ag in
+				 graph.missings ar in
+     let () = graph.connect.(h) <- al in
+     let () = graph.state.(h) <- ai in
      h,
-     ((connect,missings'),state,
-      IntMap.add ty (IntSet.add
-		       h (IntMap.find_default IntSet.empty ty sort)) sort,
-      (new_id,t))
+     {
+       outdated = false;
+       connect = graph.connect;
+       missings = missings';
+       state = graph.state;
+       sort =
+	 IntMap.add
+	   ty (IntSet.add
+		 h (IntMap.find_default IntSet.empty ty graph.sort)) graph.sort;
+       free_id = (new_id,t);
+     }
   | new_id,[] ->
      let missings' = Tools.recti (fun s a -> Int2Set.add (new_id,s) a)
-				 missings ar in
-     let connect' =
-       if Array.length connect = new_id
-       then Array.append connect (Array.make new_id [||])
-       else connect in
-     let () = connect'.(new_id) <- ag in
+				 graph.missings ar in
+     let connect',state' =
+       if Array.length graph.connect = new_id
+       then Array.append graph.connect (Array.make new_id [||]),
+	    Array.append graph.state (Array.make new_id [||])
+       else graph.connect,graph.state in
+     let () = connect'.(new_id) <- al in
+     let () = state'.(new_id) <- ai in
      new_id,
-     ((connect',missings'),state,
-      IntMap.add ty (IntSet.add
-		       new_id (IntMap.find_default IntSet.empty ty sort)) sort,
-      (succ new_id,[]))
+     {
+       outdated = false;
+       connect = connect';
+       missings = missings';
+       state = state';
+       sort =
+	 IntMap.add
+	   ty (IntSet.add
+		 new_id (IntMap.find_default IntSet.empty ty graph.sort))
+	   graph.sort;
+       free_id = (succ new_id,[])
+     }
 
-let add_free ag s ((connect,missings),state,sort,free_id) =
-  let () = connect.(ag).(s) <- None in
-  ((connect,Int2Set.remove (ag,s) missings),state,sort,free_id)
-let add_internal ag s i (connect,state,sort,free_id) =
-  (connect,Int2Map.add (ag,s) i state,sort,free_id)
+let add_free ag s graph =
+  let () = assert (not graph.outdated) in
+  let () = graph.outdated <- true in
+  let () = graph.connect.(ag).(s) <- None in
+  {
+    outdated = false;
+    connect = graph.connect;
+    missings = Int2Set.remove (ag,s) graph.missings;
+    state = graph.state;
+    sort = graph.sort;
+    free_id = graph.free_id;
+  }
+let add_internal ag s i graph =
+  let () = assert (not graph.outdated) in
+  let () = graph.outdated <- true in
+  let () = graph.state.(ag).(s) <- Some i in
+  {
+    outdated = false;
+    connect = graph.connect;
+    missings = graph.missings;
+    state = graph.state;
+    sort = graph.sort;
+    free_id = graph.free_id;
+  }
 
-let add_link (ag,ty) s (ag',ty') s' ((connect,missings),state,sort,free_id) =
-  let () = connect.(ag).(s) <- Some ((ag',ty'),s') in
-  let () = connect.(ag').(s') <- Some ((ag,ty),s) in
-  ((connect,Int2Set.remove (ag,s) (Int2Set.remove (ag',s') missings)),
-   state,sort,free_id)
+let add_link (ag,ty) s (ag',ty') s' graph =
+  let () = assert (not graph.outdated) in
+  let () = graph.outdated <- true in
+  let () = graph.connect.(ag).(s) <- Some ((ag',ty'),s') in
+  let () = graph.connect.(ag').(s') <- Some ((ag,ty),s) in
+  {
+    outdated = false;
+    connect = graph.connect;
+    missings = Int2Set.remove (ag,s) (Int2Set.remove (ag',s') graph.missings);
+    state = graph.state;
+    sort = graph.sort;
+    free_id = graph.free_id;
+  }
 
-let remove_agent (ag,ty) ((connect,missings),state,sort,(new_id,ids)) =
-  let () = connect.(ag) <- [||] in
-  ((connect,Int2Set.filter (fun (ag',_) -> ag <> ag') missings),state,
-   IntMap.add ty (IntSet.remove ag (IntMap.find_default IntSet.empty ty sort)) sort,
-  (new_id,ag::ids))
-let remove_free ag s ((connect,missings),state,sort,free_id) =
-  let () = assert (connect.(ag).(s) = None) in
-  ((connect,Int2Set.add (ag,s) missings),state,sort,free_id)
-let remove_internal ag s (connect,state,sort,free_id) =
-  match Int2Map.pop (ag,s) state with
-  | Some i, state' -> (connect,state',sort,free_id),i
-  | None, _ ->
+let remove_agent (ag,ty) graph =
+  let () = assert (not graph.outdated) in
+  let () = graph.outdated <- true in
+  let () = graph.connect.(ag) <- [||] in
+  let () = graph.state.(ag) <- [||] in
+  {
+    outdated = false;
+    connect = graph.connect;
+    missings = Int2Set.filter (fun (ag',_) -> ag <> ag') graph.missings;
+    state = graph.state;
+    sort =
+      IntMap.add
+	ty (IntSet.remove
+	      ag (IntMap.find_default IntSet.empty ty graph.sort)) graph.sort;
+    free_id = let new_id,ids = graph.free_id in (new_id,ag::ids);
+  }
+let remove_free ag s graph =
+  let () = assert (not graph.outdated) in
+  let () = graph.outdated <- true in
+  let () = assert (graph.connect.(ag).(s) = None) in
+  {
+    outdated = false;
+    connect = graph.connect;
+    missings = Int2Set.add (ag,s) graph.missings;
+    state = graph.state;
+    sort = graph.sort;
+    free_id = graph.free_id
+  }
+let get_internal ag s graph =
+  let () = assert (not graph.outdated) in
+  match graph.state.(ag).(s) with
+  | Some i -> i
+  | None ->
      failwith ("Site "^string_of_int s^ " of agent "^string_of_int ag^
 		 " has no internal state to remove in the current graph.")
-let remove_link ag s ag' s' ((connect,missings),state,sort,free_id) =
-  let () = connect.(ag).(s) <- None in
-  let () = connect.(ag').(s') <- None in
-  ((connect, Int2Set.add (ag,s) (Int2Set.add (ag',s') missings)),state,sort,free_id)
 
-let is_agent (ag,ty) (_,_,s,_) =
-  IntSet.mem ag (IntMap.find_default IntSet.empty ty s)
-let is_free ag s ((t,m),_,_,_) =
-  t.(ag).(s) = None && not @@ Int2Set.mem (ag,s) m
-let is_internal i ag s (_,t,_,_) =
-  match Int2Map.find_option (ag,s) t with
+let remove_internal ag s graph =
+  let () = assert (not graph.outdated) in
+  let () = graph.outdated <- true in
+  let () = graph.state.(ag).(s) <- None in
+  {
+    outdated = false;
+    connect = graph.connect;
+    missings = graph.missings;
+    state = graph.state;
+    sort = graph.sort;
+    free_id = graph.free_id
+  }
+
+let remove_link ag s ag' s' graph =
+  let () = assert (not graph.outdated) in
+  let () = graph.outdated <- true in
+  let () = graph.connect.(ag).(s) <- None in
+  let () = graph.connect.(ag').(s') <- None in
+  {
+    outdated = false;
+    connect = graph.connect;
+    missings = Int2Set.add (ag,s) (Int2Set.add (ag',s') graph.missings);
+    state = graph.state;
+    sort = graph.sort;
+    free_id = graph.free_id;
+  }
+
+let is_agent (ag,ty) graph =
+  let () = assert (not graph.outdated) in
+  IntSet.mem ag (IntMap.find_default IntSet.empty ty graph.sort)
+let is_free ag s graph =
+  let () = assert (not graph.outdated) in
+  graph.connect.(ag).(s) = None && not @@ Int2Set.mem (ag,s) graph.missings
+let is_internal i ag s graph =
+  let () = assert (not graph.outdated) in
+  match graph.state.(ag).(s) with
   | Some j -> j = i
   | None -> false
-let link_exists ag s ag' s' ((t,_),_,_,_) =
-  match t.(ag).(s) with
+let link_exists ag s ag' s' graph =
+  let () = assert (not graph.outdated) in
+  match graph.connect.(ag).(s) with
   | Some ((ag'',_),s'') -> ag'=ag'' && s'=s''
   | None -> false
 
-let exists_fresh ag s ty s' ((t,_),_,_,_) =
-  match t.(ag).(s) with
+let exists_fresh ag s ty s' graph =
+  let () = assert (not graph.outdated) in
+  match graph.connect.(ag).(s) with
   | Some ((ag',ty'),s'') ->
     if ty'=ty && s'=s'' then Some ag' else None
   | None -> None
 
-let link_destination ag s ((t,_),_,_,_) = t.(ag).(s)
+let link_destination ag s graph =
+  let () = assert (not graph.outdated) in
+  graph.connect.(ag).(s)
 
 (** The snapshot machinery *)
-let one_connected_component sigs ty node graph =
-  let rec build acc free_id dangling
-		((links,missings),internals,sorts,free_ag as graph) =
+let one_connected_component sigs ty node rsorts graph =
+  let rec build acc free_id dangling sorts =
     function
-    | [] -> acc,free_id,graph
+    | [] -> acc,free_id,sorts
     | (ty,node) :: todos ->
        let nodes_of_type = IntMap.find_default IntSet.empty ty sorts in
        let nodes_of_type' = IntSet.remove node nodes_of_type in
        if nodes_of_type == nodes_of_type' then
-	 build acc free_id dangling graph todos
+	 build acc free_id dangling sorts todos
        else
 	 let sorts' = IntMap.add ty nodes_of_type' sorts in
 	 let arity = Signature.arity sigs ty in
 	 let ports = Array.make arity Raw_mixture.FREE in
-	 let ints = Array.make arity None in
 	 let (free_id',dangling',todos'),ports =
 	   Tools.array_fold_left_mapi
 	     (fun i (free_id,dangling,todos) _ ->
-	      match links.(node).(i) with
+	      match graph.connect.(node).(i) with
 	      | None ->
 		 (free_id,dangling,todos),Raw_mixture.FREE
 	      | Some ((n',ty'),s') ->
@@ -134,35 +245,31 @@ let one_connected_component sigs ty node graph =
 		 | Some id, dangling' ->
 		    (free_id,dangling',todos), Raw_mixture.VAL id)
 	     (free_id,dangling,todos) ports in
-	 let internals',ints =
-	   Tools.array_fold_left_mapi
-	     (fun i internals _ ->
-	      let (a,b) = Int2Map.pop (node,i) internals in (b,a))
-	     internals ints in
 	 let skel =
 	   { Raw_mixture.a_id = node; Raw_mixture.a_type = ty;
-	     Raw_mixture.a_ports = ports; Raw_mixture.a_ints = ints; } in
-	 build (skel::acc) free_id' dangling'
-	       ((links,missings),internals',sorts',free_ag) todos'
-  in build [] 1 Int2Map.empty graph [ty,node]
+	     Raw_mixture.a_ports = ports;
+	     Raw_mixture.a_ints = graph.state.(node); } in
+	 build (skel::acc) free_id' dangling' sorts' todos'
+  in build [] 1 Int2Map.empty rsorts [ty,node]
 
 let build_snapshot sigs graph =
+  let () = assert (not graph.outdated) in
   let rec increment x = function
     | [] -> [1,x]
     | (n,y as h)::t ->
        if Raw_mixture.equal x y then (succ n,y)::t
        else h::increment x t in
-  let rec aux ccs (e,i,sorts,free_id as graph) =
+  let rec aux ccs sorts =
     match IntMap.root sorts with
     | None -> ccs
     | Some (ty,nodes) ->
        match IntSet.choose nodes with
-       | None -> aux ccs (e,i,IntMap.remove ty sorts,free_id)
+       | None -> aux ccs (IntMap.remove ty sorts)
        | Some node ->
-	  let (out,_,graph') =
-	    one_connected_component sigs ty node graph in
-	  aux (increment out ccs) graph' in
-  aux [] graph
+	  let (out,_,sorts') =
+	    one_connected_component sigs ty node sorts graph in
+	  aux (increment out ccs) sorts' in
+  aux [] graph.sort
 
 let print sigs f graph =
   Pp.list Pp.space (fun f (i,mix) ->
@@ -180,18 +287,18 @@ let print_dot sigs f graph =
        i nb (Raw_mixture.print_dot sigs i) mix)
     f (build_snapshot sigs graph)
 
-let debug_print f ((links,missings),ints,sorts,_) =
+let debug_print f graph =
   let print_sites ag =
     (Pp.array Pp.comma
 	      (fun s f l ->
 	       Format.fprintf
 		 f "%i%t%t" s
-		 (match Int2Map.find_option (ag,s) ints with
+		 (match graph.state.(ag).(s) with
 		  | Some int -> fun f -> Format.fprintf f "~%i" int
 		  | None -> fun _ -> ())
 		 (fun f -> match l with
 			   | None ->
-			      if Int2Set.mem (ag,s) missings
+			      if Int2Set.mem (ag,s) graph.missings
 			      then Format.pp_print_string f "?"
 			   | Some ((ag',ty'),s') ->
 			      Format.fprintf f "->%i:%i.%i" ag' ty' s'))) in
@@ -204,7 +311,7 @@ let debug_print f ((links,missings),ints,sorts,_) =
 			      if IntSet.mem ag nodes then Some ty else None
 			   | Some _ as x ->
 			      if IntSet.mem ag nodes then Some (-42) else x)
-	     sorts None with
+	     graph.sort None with
      | Some ty ->
 	Format.fprintf
 	  f "%i:%i(@[%a@])@ " ag ty (print_sites ag) a
@@ -212,23 +319,8 @@ let debug_print f ((links,missings),ints,sorts,_) =
 	       else Format.fprintf
 			  f "%i:NOTYPE(@[%a@])@ " ag (print_sites ag) a
 )
-    f links
-(*
-    ~trailing:(fun f -> Format.fprintf f "@])")
-    (fun f ((ag,s),((ag',ty'),s')) ->
-     let () =
-       if s=0 then
-	 let () = if ag <> 1 then Format.fprintf f "@])%t" Pp.space in
+    f graph.connect
 
-
-	 Format.fprintf
-       f "%i%t->%i:%i.%i" s
-       (match Int2Map.find_option (ag,s) ints with
-       | Some int -> fun f -> Format.fprintf f "~%i" int
-       | None -> fun _ -> ())
-       ag' ty' s')
-    f (Int2Set.fold (fun x y -> Int2Map.add x Edge.dummy_link y) missings links)
- *)
 type path = ((agent * int) * (agent * int)) list
 (** ((agent_id, agent_name),site_name) *)
 
@@ -270,22 +362,24 @@ let breath_first_traversal stop_on_find is_interresting sigs links =
   aux
 
 let pathes_of_interrest
-      is_interresting sigs ((links,_),_,_,_) start_ty start_point done_path =
+      is_interresting sigs graph start_ty start_point done_path =
   let don = List.fold_left (fun s (_,((x,_),_)) -> IntSet.add x s)
 			   (IntSet.singleton start_point) done_path in
+  let () = assert (not graph.outdated) in
   let acc = match is_interresting start_point with
     | None -> []
     | Some x -> [(x,start_point),done_path] in
-  breath_first_traversal
-    false is_interresting sigs links don acc [] [start_point,start_ty,done_path]
+  breath_first_traversal false is_interresting sigs graph.connect don acc
+			 [] [start_point,start_ty,done_path]
 
-let are_connected ?candidate sigs ((links,_),_,_,_ as graph) ty_x x y =
+let are_connected ?candidate sigs graph ty_x x y =
+  let () = assert (not graph.outdated) in
   match candidate with
   | Some p when is_valid_path graph p -> Some p
   | (Some _ | None) ->
      match breath_first_traversal
 	     true (fun z -> if z = y then Some () else None)
-	     sigs links (IntSet.singleton x) [] [] [x,ty_x,[]] with
+	     sigs graph.connect (IntSet.singleton x) [] [] [x,ty_x,[]] with
      | [] -> None
      | [ _,p ] -> Some p
      | _ :: _ -> failwith "Edges.are_they_connected completely broken"

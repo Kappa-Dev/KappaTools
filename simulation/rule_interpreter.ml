@@ -153,10 +153,11 @@ let apply_negative_transformation domain inj2graph side_effects edges = function
 	  (Location.dummy_annot "PositiveInternalized in negative update"))
   | Primitives.Transformation.NegativeInternalized (n,s) ->
      let (id,_ as nc) = from_place inj2graph n in
-     let edges',i = Edges.remove_internal id s edges in
+     let i  = Edges.get_internal id s edges in
      let new_obs =
        Connected_component.Matching.observables_from_internal
 	 domain edges nc s i in
+     let edges' = Edges.remove_internal id s edges in
      (side_effects,edges',new_obs)
 
 let apply_positive_transformation
@@ -425,7 +426,7 @@ let update_edges
 	   match
 	     Edges.pathes_of_interrest
 	       (potential_root_of_unary_ccs unary_ccs roots')
-	       sigs state.edges ty id Edges.empty_path with
+	       sigs edges'' ty id Edges.empty_path with
 	   | [] -> acc
 	   | l -> ((id,ty),l) :: unary_cands,false) unary_pack unaries_to_explore
       else unary_pack in

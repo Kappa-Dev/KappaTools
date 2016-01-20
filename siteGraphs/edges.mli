@@ -19,10 +19,9 @@ val add_internal : int -> int -> int -> t -> t
 val add_link : agent -> int -> agent -> int -> t -> t
 (** [add_link ag1 s1 ag2 s2 t] *)
 
-
 val remove_agent : agent -> t -> t
 val remove_free : int -> int -> t -> t
-val remove_internal : int -> int -> t -> (t * int)
+val remove_internal : int -> int -> t -> t
 val remove_link : int -> int -> int -> int -> t -> t
 
 val is_agent : agent -> t -> bool
@@ -42,6 +41,9 @@ val exists_fresh : int -> int -> int -> int -> t -> int option
 
 val link_destination : int -> int -> t -> (agent * int) option
 (** [link_destination ag site graph] *)
+
+val get_internal : int -> int -> t -> int
+(** [get_internal ag site graph] *)
 
 type path = ((agent * int) * (agent * int)) list
 val empty_path : path
