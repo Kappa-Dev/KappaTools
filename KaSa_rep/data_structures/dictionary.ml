@@ -110,12 +110,21 @@ module Dictionary =
 	    Association_is_existing_already_with_a_different_value
             
       let pretranslate parameters error key stabilized = 
-	match stabilized.(key)
-	with 
+	if key>=0 && key<Array.length stabilized
+	then 
+	  match stabilized.(key)
+	  with 
           | Some a -> error, Some a
           | None -> invalid_arg parameters error
 	    (Some "missing entry, line 101") Association_is_not_defined    
-	    
+	else 
+	  if key<0 then
+	  invalid_arg parameters error
+	    (Some "negative key are not allowed") Association_is_not_defined
+	  else
+	    invalid_arg parameters error
+	      (Some "missing entry, line 126") Association_is_not_defined
+
       let prestabilize in_construction = 
 	let array = Array.make in_construction.fresh None in 
 	let _ = 
