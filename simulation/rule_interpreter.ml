@@ -664,12 +664,13 @@ let apply_rule
   match inj with
   | None -> Clash
   | Some inj ->
-     let out =
-       transform_by_a_rule
-	 ~get_alg env domain unary_ccs counter state event_kind rule inj
-     in
      match rule.Primitives.unary_rate with
-     | None -> Success out
+     | None ->
+	let out =
+	  transform_by_a_rule
+	    ~get_alg env domain unary_ccs counter state event_kind rule inj
+	in
+	Success out
      | Some _ ->
 	try
 	  let point = (min roots.(0) roots.(1), max roots.(0) roots.(1)) in
@@ -702,7 +703,12 @@ let apply_rule
 		      unary_pathes =
 			Mods.Int2Map.add point (nb_use_cand,p) state.unary_pathes}
 	     in Corrected state'
-	with Not_found -> Success out
+	with Not_found ->
+	  let out =
+	    transform_by_a_rule
+	      ~get_alg env domain unary_ccs counter state event_kind rule inj
+	  in
+	  Success out
 
 let force_rule
     ~get_alg env domain unary_ccs counter state event_kind rule =
