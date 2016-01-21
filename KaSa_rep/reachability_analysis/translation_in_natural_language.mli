@@ -9,12 +9,13 @@ val translate: Remanent_parameters_sig.parameters ->
 val print: 
   ?beginning_of_sentence:bool ->
   ?prompt_agent_type:bool ->
+  ?html_mode:bool ->
   show_dep_with_dimmension_higher_than:int
   -> Remanent_parameters_sig.parameters ->
   Cckappa_sig.kappa_handler ->
   Exception.method_handler ->
   string ->
-  Cckappa_sig.agent_name -> 
+  Cckappa_sig.agent_name ->
   token ->
   Exception.method_handler
 	     

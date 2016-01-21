@@ -94,7 +94,7 @@ let try_partitioning parameter handler error rename_site_inverse mvbdu =
 	      else
 	       	let error,handler,list =
 		  Mvbdu_wrapper.Mvbdu.mvbdu_cartesian_abstraction parameter handler error away
-		in	
+		in
 		let error,handler,list =
 		  List.fold_left
 		    (fun (error,handler,list) elt ->
@@ -278,7 +278,13 @@ let translate parameter handler error rename_site_inverse mvbdu =
   else
     error, (handler, No_known_translation list)
 
-let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt_agent_type=true) ~show_dep_with_dimmension_higher_than:dim_min parameter handler_kappa error agent_string agent_type translation =
+let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt_agent_type=true) ?html_mode:(html_mode=false) ~show_dep_with_dimmension_higher_than:dim_min parameter handler_kappa error agent_string agent_type translation =
+  let tab = if html_mode then "<PRE>         </PRE>" else "\t" in
+  let endofline = if html_mode then "<Br>\n" else "\n" in
+  let beginenumeration = if html_mode then "<UL>\n" else "" in
+  let endenumeration = if html_mode then "</UL>\n" else "" in
+  let beginenum = if html_mode then "<LI>" else "+" in
+  let endenum = if html_mode then "</LI>\n" else "" in
   let cap s = if beggining then String.capitalize s else s in
   let in_agent s = if prompt_agent_type then "in agent "^s^" " else "" in
   let in_agent_comma s = if prompt_agent_type then "in agent "^s^", " else "" in
@@ -306,7 +312,7 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 		  handler_kappa agent_type site_type state
 	      in
 	      let error = Exception.check warn parameter error error' (Some "line 121") Exit in
-	      error, Printf.fprintf (Remanent_parameters.get_log parameter) " and %s.\n" state_string
+	      error, Printf.fprintf (Remanent_parameters.get_log parameter) " and %s.%s" state_string endofline
 	    | state::tail ->
 	      let error', state_string =
 		Handler.string_of_state_fully_deciphered parameter error
@@ -329,8 +335,8 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	    error,
 	    Printf.fprintf
 	      (Remanent_parameters.get_log parameter)
-	      "%s%s %sis always %s.\n"
-	      (Remanent_parameters.get_prefix parameter) (cap site_string) (in_agent agent_string) state_string
+	      "%s%s %sis always %s.%s"
+	      (Remanent_parameters.get_prefix parameter) (cap site_string) (in_agent agent_string) state_string endofline
 	  | [state1;state2] ->
 	    let error', state_string1 =
 	      Handler.string_of_state_fully_deciphered parameter error
@@ -343,8 +349,8 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	    in
 	    let error = Exception.check warn parameter error error' (Some "line 154") Exit in
 	    error, Printf.fprintf (Remanent_parameters.get_log parameter)
-	      "%s%s %sranges over %s and %s.\n"
-	      (Remanent_parameters.get_prefix parameter) (cap site_string) (in_agent agent_string) state_string1 state_string2
+	      "%s%s %sranges over %s and %s.%s"
+	      (Remanent_parameters.get_prefix parameter) (cap site_string) (in_agent agent_string) state_string1 state_string2 endofline
 	  | list ->
 	    let () = Printf.fprintf (Remanent_parameters.get_log parameter)
 	      "%s%s %sranges over"
@@ -378,7 +384,7 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	 in
 	 let error = Exception.check warn parameter error error' (Some "line 187") Exit in
 	 error,
-	 Printf.fprintf (Remanent_parameters.get_log parameter) "%s%s%s is %s, if and only if, %s is %s.\n" (Remanent_parameters.get_prefix parameter) (cap (in_agent_comma agent_string)) site_string1 state_string1 site_string2 state_string2
+	 Printf.fprintf (Remanent_parameters.get_log parameter) "%s%s%s is %s, if and only if, %s is %s.%s" (Remanent_parameters.get_prefix parameter) (cap (in_agent_comma agent_string)) site_string1 state_string1 site_string2 state_string2 endofline
        end
      else
        error,()
@@ -404,32 +410,50 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	     handler_kappa agent_type site2 state2 in
 	 let error = Exception.check warn parameter error error' (Some "line 212") Exit in
 	 error,
-	 Printf.fprintf (Remanent_parameters.get_log parameter) "%s%s%s is %s whenever %s is %s.\n"  (Remanent_parameters.get_prefix parameter) (cap (in_agent_comma agent_string)) site_string2 state_string2 site_string1 state_string1
+	 Printf.fprintf (Remanent_parameters.get_log parameter) "%s%s%s is %s whenever %s is %s.%s"  (Remanent_parameters.get_prefix parameter) (cap (in_agent_comma agent_string)) site_string2 state_string2 site_string1 state_string1 endofline
        end
      else
        error,()
    | Partition (v, list) ->
      let () =
        Printf.fprintf (Remanent_parameters.get_log parameter)
-	 "%s%s\n" (Remanent_parameters.get_prefix parameter) (cap (in_agent_colon agent_string))
+	 "%s%s%s" (Remanent_parameters.get_prefix parameter) (cap (in_agent_colon agent_string)) endofline
      in
      let error, site_string =
 	 Handler.string_of_site_in_natural_language parameter error handler_kappa agent_type v
      in
-     let parameter = Remanent_parameters.update_prefix parameter "\t" in
+     let parameter = Remanent_parameters.update_prefix parameter tab in
      let error =
        List.fold_left
 	 (fun error (a,list) ->
 	   let error, state_string =
 	       Handler.string_of_state_fully_deciphered parameter error handler_kappa agent_type v a
 	   in
-	   let () = Printf.fprintf (Remanent_parameters.get_log parameter) "%swhen %s is equal to %s, then:\n" (Remanent_parameters.get_prefix parameter) site_string state_string in
-	   let parameter = Remanent_parameters.update_prefix parameter "\t+ " in
-	   List.fold_left
-	     (fun error token ->
-	       print ~beginning_of_sentence:false ~prompt_agent_type:false ~show_dep_with_dimmension_higher_than:0 parameter  handler_kappa error agent_string agent_type token)
-	     error list)
-	 error list
+	   let () = Printf.fprintf (Remanent_parameters.get_log parameter) "%swhen %s is equal to %s, then:%s%s" (Remanent_parameters.get_prefix parameter) site_string state_string endofline beginenumeration in
+	   let parameter = Remanent_parameters.update_prefix parameter (tab^beginenum^" ") in
+	   let error =
+	     List.fold_left
+	       (fun error token ->
+		 let error =
+		   print
+		     ~beginning_of_sentence:false
+		     ~prompt_agent_type:false
+		     ~html_mode
+		     ~show_dep_with_dimmension_higher_than:0
+		     parameter
+		     handler_kappa
+		     error
+		     agent_string
+		     agent_type
+		     token
+		 in
+		 let () = Printf.fprintf (Remanent_parameters.get_log parameter) "%s" endenum in
+	       error)
+	       error list
+	   in
+	   let () = Printf.fprintf (Remanent_parameters.get_log parameter) "%s" endenumeration in
+	   error)
+     error list
      in error,()
    | No_known_translation list ->
      begin
@@ -465,7 +489,7 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	       let () = Printf.fprintf (Remanent_parameters.get_log parameter) "%s" string in
 	       aux b error
 	   in
-	   let () = Printf.fprintf (Remanent_parameters.get_log parameter) "are entangled by the following %i-d relationship:\n" n in
+	   let () = Printf.fprintf (Remanent_parameters.get_log parameter) "are entangled by the following %i-d relationship:%s" n endofline in
 	   let parameter = Remanent_parameters.update_prefix parameter "\t" in
 	   List.fold_left
 	     (fun error l ->
@@ -498,11 +522,11 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 		(*-----------------------------------------------------------*)
 	       let () =
 		 if bool
-		 then Printf.fprintf (Remanent_parameters.get_log parameter) ")\n"
+		 then Printf.fprintf (Remanent_parameters.get_log parameter) ")%s" endofline
 	       in error)
 	     error list,()
 	 else
 	   error,()
-     end	
+     end
  in
  error
