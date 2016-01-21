@@ -54,13 +54,13 @@ let print_dot sigs nb_cc f mix =
 	    | FREE -> acc
 	    | VAL i ->
 	       match Mods.IntMap.pop i acc with
-	       | None,acc -> Mods.IntMap.add i (a,s) acc
-	       | Some (a',s'),acc' ->
+	       | None,acc -> Mods.IntMap.add i (a,ag,s) acc
+	       | Some (a',ag',s'),acc' ->
 		  Format.fprintf
 		    f
 		    "node%d_%d -> node%d_%d [taillabel=\"%a\", headlabel=\"%a\", dir=none];@,"
 		    nb_cc a nb_cc a' (Signature.print_site sigs ag.a_type) s
-		    (Signature.print_site sigs ag.a_type) s';
+		    (Signature.print_site sigs ag'.a_type) s';
 		  acc')
 	   acc ag.a_ports in
        (succ a,acc'))

@@ -22,7 +22,7 @@ subgraph cluster2{
   node2_2 [label = "A(x,c)", color = "#2bc26f", style=filled];
   node2_2 -> counter2 [style=invis];
   node2_2 -> node2_0 [taillabel="x", headlabel="x", dir=none];
-  node2_2 -> node2_1 [taillabel="c", headlabel="c", dir=none];
+  node2_2 -> node2_1 [taillabel="c", headlabel="x2", dir=none];
   }
 subgraph cluster3{
   counter3 [label = "268 instance(s)", shape=none];
