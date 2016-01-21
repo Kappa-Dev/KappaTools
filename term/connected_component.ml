@@ -959,8 +959,8 @@ returns the roots of observables that are above in the domain*)
 	      match Navigation.injection_for_one_more_edge
 		      inj_point2graph graph son.next with
 	      | None ->
-		 (re, update_cache (IntSet.union son.above_obs)
-				   concrete_root cache)
+		 (re, (*update_cache (IntSet.union son.above_obs)
+				   concrete_root*) cache)
 	      | Some inj' ->
 		 let p' = Env.get domain son.dst in
 		 (List.fold_left
