@@ -1253,31 +1253,16 @@ The result (eg.~see Fig.~\ref{fig:reachability_low}) is displayed in the standar
 \item \textbf{Non-relational properties.} The analysis detects for each kind of site, the set of states this site can take. This set is described in natural language. Due to the over-approximation, the analysis reports a super-set of the set of the potential states. Yet, we are sure that a given site only take states within this set. 
 \end{itemize}
 
-The option \verb?--use-natural-language? can be used to switch on/off the translation of properties in natural language: when the option is disabled, each relationship is described in extension. 
-
-It is possible to get more details about the computation of the analysis by tuning the verbosity level of the view analysis:
-\begin{itemize}
-\item With the option \verb?--use-natural-language Mute?, nothing is displayed. Even the result of the analysis is omitted (eg.~see Fig.~\ref{fig:reachability_mute}).
-
-\begin{figure}[p]
+\begin{figure}[t]
 \input{generated_img/LOG_mute.txt}
 \caption{Reachability analysis of the model \texttt{reachbility.ka} with verbosity level ``Mute''.}
 \label{fig:reachability_mute}
 \end{figure}
-
-
-\item With the option \verb?--use-natural-language Low?, only the result of the analysis is displayed (eg.~see Fig.~\ref{fig:reachability_low}). 
-
 \begin{figure}[p]
 \input{generated_img/LOG_low.txt}
 \caption{Reachability analysis of the model \texttt{reachbility.ka} with verbosity level ``Low''.}
 \label{fig:reachability_low}
 \end{figure}
-
-\item With the option \verb?--use-natural-language Medium?, the analysis also describes which rules are applied and in which order. 
-
-When trying to apply a rule, the analysis may detect that the rule cannot be applied yet because the precondition is not satisfied at the current state of the iteration (eg.~see Fig.~\ref{fig:reachability_medium_ko}). Otherwise, the analysis can apply the rule and update the state of the iteration accordingly (eg.~see Fig.~\ref{fig:reachability_medium_ok}).
-
 \begin{figure}[p]
 \input{generated_img/LOG_medium_KO.txt}
 \caption{Reachability analysis: one rule that cannot be applied yet, according to the bio-molecular species already constructed.}
@@ -1289,8 +1274,6 @@ When trying to apply a rule, the analysis may detect that the rule cannot be app
 \caption{Reachability analysis: one rule successfully applied}
 \label{fig:reachability_medium_ok}
 \end{figure}
-
-\item With the option \verb?--use-natural-language High?, the analysis also describes which views are discovered. 
 
 \begin{figure}[p]
 \input{generated_img/LOG_high_init.txt}
@@ -1304,13 +1287,40 @@ When trying to apply a rule, the analysis may detect that the rule cannot be app
 \label{fig:reachability_high_rule}
 \end{figure}
 
-\item With the option \verb?--use-natural-language Full?, the analysis also describes which rules are awaken by the discovery of a new view. 
-
 \begin{figure}[p]
 \input{generated_img/LOG_full.txt}
 \caption{Reachability analysis: discovering new views force the analysis to apply some rules again, until reaching a fix-point.}
 \label{fig:reachability_full}
 \end{figure}
+
+The option \verb?--use-natural-language? can be used to switch on/off the translation of properties in natural language: when the option is disabled, each relationship is described in extension. 
+
+It is possible to get more details about the computation of the analysis by tuning the verbosity level of the view analysis:
+\begin{itemize}
+\item With the option \verb?--use-natural-language Mute?, nothing is displayed. Even the result of the analysis is omitted (eg.~see Fig.~\ref{fig:reachability_mute}).
+
+
+
+
+\item With the option \verb?--use-natural-language Low?, only the result of the analysis is displayed (eg.~see Fig.~\ref{fig:reachability_low}). 
+
+
+
+\item With the option \verb?--use-natural-language Medium?, the analysis also describes which rules are applied and in which order. 
+
+When trying to apply a rule, the analysis may detect that the rule cannot be applied yet because the precondition is not satisfied at the current state of the iteration (eg.~see Fig.~\ref{fig:reachability_medium_ko}). Otherwise, the analysis can apply the rule and update the state of the iteration accordingly (eg.~see Fig.~\ref{fig:reachability_medium_ok}).
+
+
+
+\item With the option \verb?--use-natural-language High?, the analysis also describes which views are discovered.
+
+In particular, at the beginning of the iteration, the analysis prompts the views that occur in initial state (eg.~see Fig.~\ref{fig:reachability_high_init}). Then, each time a rule is applied successfully, the analysis shows which new views have been discovered (eg.~see Fig.~\ref{fig:reachability_high_rule}).
+
+
+
+\item When new views are discovered, then, it is necessary to apply again any rule that may operate over these views. With the option \verb?--use-natural-language Full?, the analysis also describes which rules are awaken by the discovery of a new view (see Fig.~\ref{fig:reachability_full}). 
+
+
 
 \end{itemize}
 
