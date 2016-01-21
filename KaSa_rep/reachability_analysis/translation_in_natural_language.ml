@@ -1,5 +1,5 @@
 let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "Translation_in_natural_language.ml") message exn (fun () -> default)  
+  Exception.warn parameters mh (Some "Translation_in_natural_language.ml") message exn (fun () -> default)
 
 let trace = false
 
@@ -10,16 +10,16 @@ type token =
   | Partition of (int * (int * token list) list)
   | No_known_translation of (int * int) list list
 
-type rename_sites =   (Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.Site_map_and_set.Map.elt -> Exception.method_handler * Cckappa_sig.Site_map_and_set.Map.elt) 
+type rename_sites =   (Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.Site_map_and_set.Map.elt -> Exception.method_handler * Cckappa_sig.Site_map_and_set.Map.elt)
 
-let non_relational parameter handler error mvbdu = 
-  let error, handler, list = 
-    Mvbdu_wrapper.Mvbdu.mvbdu_cartesian_abstraction parameter handler error mvbdu 
+let non_relational parameter handler error mvbdu =
+  let error, handler, list =
+    Mvbdu_wrapper.Mvbdu.mvbdu_cartesian_abstraction parameter handler error mvbdu
   in
-  let error, handler, mvbdu_true = 
+  let error, handler, mvbdu_true =
     Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error
   in
-  let error, handler, recomposition = 
+  let error, handler, recomposition =
     List.fold_left
       (fun (error,handler,conjunct) term ->
 	  Mvbdu_wrapper.Mvbdu.mvbdu_and parameter handler error conjunct term)
@@ -27,7 +27,7 @@ let non_relational parameter handler error mvbdu =
   in
   error, handler, Mvbdu_wrapper.Mvbdu.equal mvbdu recomposition
 
-let try_partitioning parameter handler error rename_site_inverse mvbdu = 
+let try_partitioning parameter handler error rename_site_inverse mvbdu =
   let error, handler, mvbdu_true =
     Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error
   in
@@ -38,61 +38,61 @@ let try_partitioning parameter handler error rename_site_inverse mvbdu =
     Mvbdu_wrapper.Mvbdu.extensional_of_variables_list parameter handler error var_hconsed_list
   in
   let rec aux l (error,handler) =
-    match 
+    match
       l
-    with 
+    with
     | [] -> error, handler, None
     | head::tail ->
       let error, handler, singleton = Mvbdu_wrapper.Mvbdu.build_variables_list parameter handler error [head] in
       let error, hnadler, mvbdu_ref = Mvbdu_wrapper.Mvbdu.mvbdu_project_abstract_away parameter handler error mvbdu singleton in
       let error, handler, proj_in = Mvbdu_wrapper.Mvbdu.mvbdu_project_keep_only parameter handler error mvbdu singleton in
       let error, handler, list_asso = Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu parameter handler error proj_in in
-      let error, range = 
-	let rec aux2 list (error,output) = 
-	  match 
+      let error, range =
+	let rec aux2 list (error,output) =
+	  match
 	    list
 	  with
 	  | [] -> (error,output)
-	  | [(x,i)]::tail when x=head -> 
+	  | [(x,i)]::tail when x=head ->
 	      aux2 tail (error,(i::output))
-	  | _::tail -> 
+	  | _::tail ->
 	    aux2 tail (warn parameter error (Some "line 54") Exit output)
 	in aux2 list_asso (error,[])
       in
       let rec aux3 list (error,handler,output) =
-	match 
+	match
 	  list
-	with 
+	with
 	| [] -> error, handler, Some output
-	| h::t -> 
+	| h::t ->
 	  begin
-	    let error,handler,select = 
+	    let error,handler,select =
 	      Mvbdu_wrapper.Mvbdu.build_association_list
 		parameter handler error [head,h]
 	    in
-	    let error,handler,mvbdu_case = 
-	      Mvbdu_wrapper.Mvbdu.mvbdu_redefine 
+	    let error,handler,mvbdu_case =
+	      Mvbdu_wrapper.Mvbdu.mvbdu_redefine
 		parameter handler error mvbdu_true select
 	    in
-	    let error,handler,case = 
-	      Mvbdu_wrapper.Mvbdu.mvbdu_and 
+	    let error,handler,case =
+	      Mvbdu_wrapper.Mvbdu.mvbdu_and
 		parameter handler error mvbdu_case mvbdu
 	    in
 	    let error,handler,bool =
 	      non_relational parameter handler error case
 	    in
-	    if bool 
-	    then 
+	    if bool
+	    then
 	      let error,handler,away =
 		Mvbdu_wrapper.Mvbdu.mvbdu_project_abstract_away
 		  parameter handler error case singleton
 	      in
-	      if 
+	      if
 		Mvbdu_wrapper.Mvbdu.equal away mvbdu_ref
 	      then
 		aux3 t (error,handler,output)
 	      else
-	       	let error,handler,list = 
+	       	let error,handler,list =
 		  Mvbdu_wrapper.Mvbdu.mvbdu_cartesian_abstraction parameter handler error away
 		in	
 		let error,handler,list =
@@ -102,19 +102,19 @@ let try_partitioning parameter handler error rename_site_inverse mvbdu =
 			Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu parameter handler error elt
 		      in
 		      begin
-			let error,var_list_opt = 
-			  match 
+			let error,var_list_opt =
+			  match
 			    elt
-			  with 
-			  | [] | []::_ | ((_,_)::_::_)::_ 
+			  with
+			  | [] | []::_ | ((_,_)::_::_)::_
 			  -> error,None
-			  | [(a,b)]::q -> 
+			  | [(a,b)]::q ->
 			    begin
-				let rec aux4 q output = 
+				let rec aux4 q output =
 				  match q
-				  with 
+				  with
 				  | [] -> error,Some (a,output)
-				  | [(c,d)]::q when c=a -> 
+				  | [(c,d)]::q when c=a ->
 				      aux4 q (d::output)
 				  | _ -> error,None
 				in aux4 q [b]
@@ -123,37 +123,37 @@ let try_partitioning parameter handler error rename_site_inverse mvbdu =
 			match
 			  var_list_opt
 			with
-			| None -> 
+			| None ->
 			  let error,() = warn parameter error (Some "line 127") Exit () in
 			  error,handler,list
 			| Some (a,l) ->
 			  let error,a' = rename_site_inverse parameter error a in
-			  (error,handler, 
+			  (error,handler,
 			     ((Range (a',l))::list))
 		      end)
 		    (error,handler,[])
 		    (List.rev list)
 		in
 		aux3 t (error,handler,((h,list)::output))
-	    else 
+	    else
 	      error,handler,None
 	  end
-      in 
+      in
       let error, handler, output = aux3 range (error,handler,[]) in
-      match output with 
-      | None -> 
+      match output with
+      | None ->
 	aux tail (error,handler)
-      | Some l -> 
+      | Some l ->
 	let error,head = rename_site_inverse parameter error head in
 	error,handler,Some (head,l)
   in
   aux var_list (error,handler)
-    
+
 
 
 let translate parameter handler error rename_site_inverse mvbdu =
-  let error, handler, list = 
-    Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu parameter handler error mvbdu 
+  let error, handler, list =
+    Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu parameter handler error mvbdu
   in
   let error,list =
     List.fold_left
@@ -212,9 +212,9 @@ let translate parameter handler error rename_site_inverse mvbdu =
 		 if site1 = site1' && site2 = site2'
 		 then
 		   if state1 > state1'
-		   then 
+		   then
 		     error, (handler, Equiv ((site1, state1), (site2, state2)))
-		   else 
+		   else
 		     error, (handler, Equiv ((site1, state1'), (site2, state2')))
 		 else
 		   warn parameter error (Some "line 144") Exit (handler, No_known_translation list)
@@ -224,20 +224,20 @@ let translate parameter handler error rename_site_inverse mvbdu =
 		 if site1 = site1' && site1 = site1'' && site2 = site2' && site2 = site2''
 		 then
 		   if state1 = state1'
-		   then  
-		     if state1 < state1'' 
+		   then
+		     if state1 < state1''
 		     then error, (handler, Imply ((site1,state1''),(site2,state2'')))
 		     else error, (handler, Imply ((site2,if state2=state2'' then state2' else state2)
 						     ,((site1,state1))))
 		   else if state1 = state1''
-		   then  
+		   then
 		     if state1 < state1'
 		     then error, (handler, Imply ((site1,state1'),(site2,state2')))
 		     else error, (handler, Imply ((site2,if state2=state2' then state2'' else state2),(site1,state1)))
 		   else if state1' = state1''
-		   then 
-		     if state1' < state1 
-		     then 
+		   then
+		     if state1' < state1
+		     then
 		       error, (handler, Imply ((site1,state1),(site2,state2)))
 		     else
 		       error, (handler, Imply ((site2,if state2=state2'' then state2' else state2''),(site1,state1')))
@@ -245,7 +245,7 @@ let translate parameter handler error rename_site_inverse mvbdu =
 		 else
 		   warn parameter error (Some "line 159") Exit (handler, No_known_translation list)
 	       end
-	    | _ -> 
+	    | _ ->
 	      begin
 		let error, handler, output =
 		  try_partitioning parameter handler error rename_site_inverse mvbdu
@@ -254,35 +254,35 @@ let translate parameter handler error rename_site_inverse mvbdu =
 		  output
 		with
 		| None -> error, (handler, No_known_translation list)
-		| Some (var,l) -> 
+		| Some (var,l) ->
 		  error,
 		  (handler,
 		   Partition (var,l))
-	      end 
+	      end
 	  end
-       | _ -> 
+       | _ ->
 	 begin
-	   let error, handler, output = 
-	     try_partitioning parameter handler error rename_site_inverse mvbdu 
+	   let error, handler, output =
+	     try_partitioning parameter handler error rename_site_inverse mvbdu
 	   in
-	   match 
+	   match
 	     output
-	   with 
+	   with
 	   | None -> error, (handler, No_known_translation list)
-	   | Some (var,l) -> 
+	   | Some (var,l) ->
 	     error,
-	     (handler, 
+	     (handler,
 	     Partition (var, l))
 	 end
     end
   else
     error, (handler, No_known_translation list)
-    
+
 let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt_agent_type=true) ~show_dep_with_dimmension_higher_than:dim_min parameter handler_kappa error agent_string agent_type translation =
   let cap s = if beggining then String.capitalize s else s in
   let in_agent s = if prompt_agent_type then "in agent "^s^" " else "" in
   let in_agent_comma s = if prompt_agent_type then "in agent "^s^", " else "" in
-  let in_agent_colon s = if prompt_agent_type then "in agent "^s^": " else "" in 
+  let in_agent_colon s = if prompt_agent_type then "in agent "^s^": " else "" in
   let error, () =
     match
       translation
@@ -294,7 +294,7 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	  let error', site_string =
 	    Handler.string_of_site_in_natural_language parameter error handler_kappa
 	      agent_type site_type
-	  in 
+	  in
           let error = Exception.check warn parameter error error' (Some "line 111") Exit in
 	  let rec aux list error =
 	    match list
@@ -326,10 +326,10 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 		handler_kappa agent_type site_type state
 	    in
 	    let error = Exception.check warn parameter error error' (Some "line 141") Exit in
-	    error, 
-	    Printf.fprintf 
-	      (Remanent_parameters.get_log parameter) 
-	      "%s%s %sis always %s.\n" 
+	    error,
+	    Printf.fprintf
+	      (Remanent_parameters.get_log parameter)
+	      "%s%s %sis always %s.\n"
 	      (Remanent_parameters.get_prefix parameter) (cap site_string) (in_agent agent_string) state_string
 	  | [state1;state2] ->
 	    let error', state_string1 =
@@ -342,12 +342,12 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 		handler_kappa agent_type site_type state2
 	    in
 	    let error = Exception.check warn parameter error error' (Some "line 154") Exit in
-	    error, Printf.fprintf (Remanent_parameters.get_log parameter) 
-	      "%s%s %sranges over %s and %s.\n" 
+	    error, Printf.fprintf (Remanent_parameters.get_log parameter)
+	      "%s%s %sranges over %s and %s.\n"
 	      (Remanent_parameters.get_prefix parameter) (cap site_string) (in_agent agent_string) state_string1 state_string2
 	  | list ->
 	    let () = Printf.fprintf (Remanent_parameters.get_log parameter)
-	      "%s%s %sranges over" 
+	      "%s%s %sranges over"
 	      (Remanent_parameters.get_prefix parameter) (cap site_string)  (in_agent agent_string)
 	    in
 	    aux list error
@@ -408,26 +408,26 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
        end
      else
        error,()
-   | Partition (v, list) -> 
-     let () = 
-       Printf.fprintf (Remanent_parameters.get_log parameter) 
-	 "%s%s\n" (Remanent_parameters.get_prefix parameter) (cap (in_agent_colon agent_string)) 
+   | Partition (v, list) ->
+     let () =
+       Printf.fprintf (Remanent_parameters.get_log parameter)
+	 "%s%s\n" (Remanent_parameters.get_prefix parameter) (cap (in_agent_colon agent_string))
      in
-     let error, site_string = 
-	 Handler.string_of_site_in_natural_language parameter error handler_kappa agent_type v 
+     let error, site_string =
+	 Handler.string_of_site_in_natural_language parameter error handler_kappa agent_type v
      in
      let parameter = Remanent_parameters.update_prefix parameter "\t" in
-     let error = 
+     let error =
        List.fold_left
-	 (fun error (a,list) -> 
+	 (fun error (a,list) ->
 	   let error, state_string =
 	       Handler.string_of_state_fully_deciphered parameter error handler_kappa agent_type v a
 	   in
 	   let () = Printf.fprintf (Remanent_parameters.get_log parameter) "%swhen %s is equal to %s, then:\n" (Remanent_parameters.get_prefix parameter) site_string state_string in
 	   let parameter = Remanent_parameters.update_prefix parameter "\t+ " in
 	   List.fold_left
-	     (fun error token -> 
-	       print ~beginning_of_sentence:false ~prompt_agent_type:false ~show_dep_with_dimmension_higher_than:0 parameter  handler_kappa error agent_string agent_type token) 
+	     (fun error token ->
+	       print ~beginning_of_sentence:false ~prompt_agent_type:false ~show_dep_with_dimmension_higher_than:0 parameter  handler_kappa error agent_string agent_type token)
 	     error list)
 	 error list
      in error,()
@@ -439,28 +439,28 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
        | head::_ ->
 	 let n = List.length head in
 	 if List.length head >= dim_min
-	 then 
+	 then
 	   let () = Printf.fprintf (Remanent_parameters.get_log parameter) "%s%s" (Remanent_parameters.get_prefix parameter) (cap (in_agent_comma agent_string)) in
-	   let error,() = 
-	     let rec aux l error = 
-	       match 
+	   let error,() =
+	     let rec aux l error =
+	       match
 		 l
-	       with 
-	       | [a,_] -> 
+	       with
+	       | [a,_] ->
 		 let error,string = Handler.string_of_site_in_natural_language parameter error handler_kappa agent_type a in
 		 let () = Printf.fprintf (Remanent_parameters.get_log parameter) ", and %s, " string in
 		 error,()
 	       | [] -> warn parameter error (Some "line 439") Exit ()
-	       | (a,_)::b -> 
+	       | (a,_)::b ->
 		 let error,string = Handler.string_of_site_in_natural_language parameter error handler_kappa agent_type a in
 		 let () = Printf.fprintf (Remanent_parameters.get_log parameter) ", %s" string in
 		 aux b error
 	     in
-	     match 
-	       head 
-	     with 
+	     match
+	       head
+	     with
 	     | [] | [_] -> warn parameter error (Some "Line 441") Exit ()
-	     | (a,_)::b -> 
+	     | (a,_)::b ->
 	       let error, string = Handler.string_of_site_in_natural_language parameter error handler_kappa agent_type a in
 	       let () = Printf.fprintf (Remanent_parameters.get_log parameter) "%s" string in
 	       aux b error
@@ -484,11 +484,11 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 		     let error = Exception.check warn parameter error error' (Some "line 240") Exit in
 		     (*-----------------------------------------------------------*)
 		     let () =
-		       if bool 
+		       if bool
 		       then Printf.fprintf (Remanent_parameters.get_log parameter) ","
 		       else Printf.fprintf (Remanent_parameters.get_log parameter) "%s%s(" (Remanent_parameters.get_prefix parameter) agent_string
                      in
-		     let () = Printf.fprintf (Remanent_parameters.get_log parameter) 
+		     let () = Printf.fprintf (Remanent_parameters.get_log parameter)
 		       "%s%s" site_string state_string
 		     in
 		     error,true
@@ -496,13 +496,13 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 		   (error,false) l
 	       in
 		(*-----------------------------------------------------------*)
-	       let () = 
-		 if bool 
+	       let () =
+		 if bool
 		 then Printf.fprintf (Remanent_parameters.get_log parameter) ")\n"
 	       in error)
 	     error list,()
 	 else
 	   error,()
-     end	     
+     end	
  in
  error
