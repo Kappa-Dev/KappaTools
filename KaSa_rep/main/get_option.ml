@@ -2,23 +2,23 @@
   * get_option.ml
   * openkappa
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
-  * 
+  *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <2015-04-17 20:53:09 feret>
-  * * 
-  * primitive to parse command-line options 
-  *  
-  * Copyright 2010 Institut National de Recherche en Informatique et   
-  * en Automatique.  All rights reserved.  This file is distributed     
+  * Last modification: Time-stamp: <2016-01-21 15:24:58 feret>
+  * *
+  * primitive to parse command-line options
+  *
+  * Copyright 2010 Institut National de Recherche en Informatique et
+  * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
 open Superarg
-open SuperargTk 
+open SuperargTk
 
-let options = 
-  List.rev 
+let options =
+  List.rev
     [
-      "--do-all", 
+      "--do-all",
       Multi(
 	[
 	  "--compute-contact-map";
@@ -38,19 +38,19 @@ let options =
 	],[]),"launch nothing",["0_Actions"],Normal;
 
       "--compute-contact-map",
-      Bool Config.do_contact_map, 
+      Bool Config.do_contact_map,
       "compute the contact map",
       ["0_Actions";"3_Contact_map"],
       Normal;
-      
+
       "--compute-influence-map",
       Bool Config.do_influence_map,
       "compute the influence map",
       ["0_Actions";"4_Influence_map"],
-      Normal; 
+      Normal;
 
        "--influence-map-accuracy-level",
-        (Choice 
+        (Choice
            (["Low","Ignore relations among site";
              "Medium","Ignore reachable states";
 (*    "High",""*) ],
@@ -58,13 +58,13 @@ let options =
         "Tune the accuracy level of the influence map",
 	["4_Influence_map"],
 	Normal;
-       
-      "--compute-ODE-flow-of-information", 
+
+      "--compute-ODE-flow-of-information",
       Bool Config.do_ODE_flow_of_information,
       "Compute an approximation of the flow of information in the ODE semantics",
       ["0_Actions";"5_Flow_of_information"],
       Expert;
-      
+
       "--compute-stochastic-flow-of-information",
       Bool Config.do_stochastic_flow_of_information,
       "Compute an approximation of the flow of information in the stochastic semantics",
@@ -78,7 +78,7 @@ let options =
       Normal;
 
       "--view-analysis",
-      (Choice 
+      (Choice
          ([(*"None","No view analysis";*)
 	   (*"Low","Non relational site analysis";*)
 	   "High","Relational view analysis"],
@@ -111,49 +111,47 @@ let options =
       "Recombine relations to get a more precise & compact output",
       ["2_Reachability_analysis"],
       Developper;
-      
+
       "--use-natural-language",
       Bool Config.use_natural_language,
       "translate relations in sentences when it is possible",
       ["2_Reachability_analysis"],
       Normal;
 
-      
-		      
       "--output-directory",
       String Config.output_directory,
       "put output files in this directory",
-      ["1_Output";"2_Reachability_analysis";"3_Contact_map";"4_Influence_map"], 
+      ["1_Output";"2_Reachability_analysis";"3_Contact_map";"4_Influence_map"],
       Normal;
 
       "--contact-map-accuracy-level",
-        (Choice 
+        (Choice
            (["Low","Collect info from rhs of rules and initial state";
              (*    "High","Only consider reachable rules";*)
              ],
             Config.contact_map_accuracy_level)),
-        "Tune the accuracy level of the influence map",
+        "Tune the accuracy level of the contact map",
 	["3_Contact_map"],
 	Normal;
-       
+
       "--pure-contact",
       Bool Config.pure_contact,
       "show in the contact map  only the sites with a binding state",
       ["3_Contact_map"],
       Expert;
-      
+
       "--output-contact-map",
       String Config.contact_map_file,
       "file name for the contact map output",
       ["1_Output";"3_Contact_map"],
       Normal;
-      
-      "--output-influence-map", 
+
+      "--output-influence-map",
       String Config.influence_map_file,
       "file name for the influence map",
       ["1_Output";"4_Influence_map"],
       Normal;
-      
+
       "--debugging-mode",
       Bool Config.trace,
       "dump debugging information",
@@ -161,9 +159,9 @@ let options =
       Expert;
     ]
 
-let get_option error = 
- let parameters = Remanent_parameters.get_parameters ~called_from:Remanent_parameters_sig.Internalised () in   
- let _ = SuperargTk.parse parameters options FileNames.input in 
+let get_option error =
+ let parameters = Remanent_parameters.get_parameters ~called_from:Remanent_parameters_sig.Internalised () in
+ let _ = SuperargTk.parse parameters options FileNames.input in
  let parameters = Remanent_parameters.get_parameters () in
- error,parameters,!FileNames.input 
-  
+ error,parameters,!FileNames.input
+
