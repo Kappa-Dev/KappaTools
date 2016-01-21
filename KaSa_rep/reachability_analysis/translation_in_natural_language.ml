@@ -245,7 +245,20 @@ let translate parameter handler error rename_site_inverse mvbdu =
 		 else
 		   warn parameter error (Some "line 159") Exit (handler, No_known_translation list)
 	       end
-	    | _ -> error, (handler, No_known_translation list)
+	    | _ -> 
+	      begin
+		let error, handler, output =
+		  try_partitioning parameter handler error rename_site_inverse mvbdu
+		in
+		match
+		  output
+		with
+		| None -> error, (handler, No_known_translation list)
+		| Some (var,l) -> 
+		  error,
+		  (handler,
+		   Partition (var,l))
+	      end 
 	  end
        | _ -> 
 	 begin
