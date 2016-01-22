@@ -31,6 +31,26 @@ let dot_of_flux env (file,flux) =
   in
   Kappa_files.with_flux file printer
 
+let json_of_flux env (file,flux) =
+  Kappa_files.with_flux
+    file
+    (fun f ->
+     Format.fprintf
+       f "@[<v>{@ @[\"matrix\" :@ @[[%a]@]@],@ @[\"rules\" :@ @[[%a]@]@]@ }@]"
+       (Pp.array
+	  Pp.comma
+	  (fun _ f x ->
+	   Format.fprintf
+	     f "@[[%a]@]"
+	     (Pp.array Pp.comma (fun _ f y -> Format.pp_print_float f y))
+	     x))
+       flux
+       (Pp.array Pp.comma
+		 (fun i f _ ->
+		  Format.fprintf
+		    f "\"%a\"" (Environment.print_ast_rule ~env) i))
+       flux)
+
 let html_of_flux env (file,flux) =
   Kappa_files.with_flux
     file
@@ -168,4 +188,6 @@ let html_of_flux env (file,flux) =
 let output_flux env (file,_ as b) =
   if Filename.check_suffix file ".html"
   then html_of_flux env b
+  else if Filename.check_suffix file ".json"
+  then json_of_flux env b
   else dot_of_flux env b
