@@ -10,15 +10,15 @@ module Edge = struct
     let c = int_compare n n' in
     if c <> 0 then c else int_compare s s'
 
-  let dummy_link = ((-1,-1),-1)
+  (* let dummy_link = ((-1,-1),-1) *)
 end
 
 type t =
   {
     mutable outdated : bool;
-    connect : Edge.t option array array;
+    connect : Edge.t option array LargeArray.t;
     missings : Int2Set.t;
-    state : int option array array;
+    state : int option array LargeArray.t;
     sort : IntSet.t IntMap.t;
     free_id : int * int list;
   }
@@ -28,9 +28,9 @@ type t =
 let empty =
   {
     outdated = false;
-    connect = [|[||]|];
+    connect = LargeArray.make 1 [||];
     missings = Int2Set.empty;
-    state = [|[||]|];
+    state = LargeArray.make 1 [||];
     sort = IntMap.empty;
     free_id =(0,[]);
   }
@@ -45,8 +45,8 @@ let add_agent sigs ty graph =
   | new_id,h :: t ->
      let missings' = Tools.recti (fun s a -> Int2Set.add (h,s) a)
 				 graph.missings ar in
-     let () = graph.connect.(h) <- al in
-     let () = graph.state.(h) <- ai in
+     let () = LargeArray.set graph.connect h al in
+     let () = LargeArray.set graph.state h ai in
      h,
      {
        outdated = false;
@@ -63,12 +63,12 @@ let add_agent sigs ty graph =
      let missings' = Tools.recti (fun s a -> Int2Set.add (new_id,s) a)
 				 graph.missings ar in
      let connect',state' =
-       if Array.length graph.connect = new_id
-       then Array.append graph.connect (Array.make new_id [||]),
-	    Array.append graph.state (Array.make new_id [||])
+       if LargeArray.length graph.connect = new_id
+       then LargeArray.append graph.connect (LargeArray.make new_id [||]),
+	    LargeArray.append graph.state (LargeArray.make new_id [||])
        else graph.connect,graph.state in
-     let () = connect'.(new_id) <- al in
-     let () = state'.(new_id) <- ai in
+     let () = LargeArray.set connect' new_id al in
+     let () = LargeArray.set state' new_id ai in
      new_id,
      {
        outdated = false;
@@ -86,7 +86,7 @@ let add_agent sigs ty graph =
 let add_free ag s graph =
   let () = assert (not graph.outdated) in
   let () = graph.outdated <- true in
-  let () = graph.connect.(ag).(s) <- None in
+  let () = (LargeArray.get graph.connect ag).(s) <- None in
   {
     outdated = false;
     connect = graph.connect;
@@ -98,7 +98,7 @@ let add_free ag s graph =
 let add_internal ag s i graph =
   let () = assert (not graph.outdated) in
   let () = graph.outdated <- true in
-  let () = graph.state.(ag).(s) <- Some i in
+  let () = (LargeArray.get graph.state ag).(s) <- Some i in
   {
     outdated = false;
     connect = graph.connect;
@@ -111,8 +111,8 @@ let add_internal ag s i graph =
 let add_link (ag,ty) s (ag',ty') s' graph =
   let () = assert (not graph.outdated) in
   let () = graph.outdated <- true in
-  let () = graph.connect.(ag).(s) <- Some ((ag',ty'),s') in
-  let () = graph.connect.(ag').(s') <- Some ((ag,ty),s) in
+  let () = (LargeArray.get graph.connect ag).(s) <- Some ((ag',ty'),s') in
+  let () = (LargeArray.get graph.connect ag').(s') <- Some ((ag,ty),s) in
   {
     outdated = false;
     connect = graph.connect;
@@ -125,8 +125,8 @@ let add_link (ag,ty) s (ag',ty') s' graph =
 let remove_agent (ag,ty) graph =
   let () = assert (not graph.outdated) in
   let () = graph.outdated <- true in
-  let () = graph.connect.(ag) <- [||] in
-  let () = graph.state.(ag) <- [||] in
+  let () = LargeArray.set graph.connect ag [||] in
+  let () = LargeArray.set graph.state ag [||] in
   {
     outdated = false;
     connect = graph.connect;
@@ -141,7 +141,7 @@ let remove_agent (ag,ty) graph =
 let remove_free ag s graph =
   let () = assert (not graph.outdated) in
   let () = graph.outdated <- true in
-  let () = assert (graph.connect.(ag).(s) = None) in
+  let () = assert ((LargeArray.get graph.connect ag).(s) = None) in
   {
     outdated = false;
     connect = graph.connect;
@@ -152,7 +152,7 @@ let remove_free ag s graph =
   }
 let get_internal ag s graph =
   let () = assert (not graph.outdated) in
-  match graph.state.(ag).(s) with
+  match (LargeArray.get graph.state ag).(s) with
   | Some i -> i
   | None ->
      failwith ("Site "^string_of_int s^ " of agent "^string_of_int ag^
@@ -161,7 +161,7 @@ let get_internal ag s graph =
 let remove_internal ag s graph =
   let () = assert (not graph.outdated) in
   let () = graph.outdated <- true in
-  let () = graph.state.(ag).(s) <- None in
+  let () = (LargeArray.get graph.state ag).(s) <- None in
   {
     outdated = false;
     connect = graph.connect;
@@ -174,8 +174,8 @@ let remove_internal ag s graph =
 let remove_link ag s ag' s' graph =
   let () = assert (not graph.outdated) in
   let () = graph.outdated <- true in
-  let () = graph.connect.(ag).(s) <- None in
-  let () = graph.connect.(ag').(s') <- None in
+  let () = (LargeArray.get graph.connect ag).(s) <- None in
+  let () = (LargeArray.get graph.connect ag').(s') <- None in
   {
     outdated = false;
     connect = graph.connect;
@@ -190,28 +190,29 @@ let is_agent (ag,ty) graph =
   IntSet.mem ag (IntMap.find_default IntSet.empty ty graph.sort)
 let is_free ag s graph =
   let () = assert (not graph.outdated) in
-  graph.connect.(ag).(s) = None && not @@ Int2Set.mem (ag,s) graph.missings
+  (LargeArray.get graph.connect ag).(s) = None
+  && not @@ Int2Set.mem (ag,s) graph.missings
 let is_internal i ag s graph =
   let () = assert (not graph.outdated) in
-  match graph.state.(ag).(s) with
+  match (LargeArray.get graph.state ag).(s) with
   | Some j -> j = i
   | None -> false
 let link_exists ag s ag' s' graph =
   let () = assert (not graph.outdated) in
-  match graph.connect.(ag).(s) with
+  match (LargeArray.get graph.connect ag).(s) with
   | Some ((ag'',_),s'') -> ag'=ag'' && s'=s''
   | None -> false
 
 let exists_fresh ag s ty s' graph =
   let () = assert (not graph.outdated) in
-  match graph.connect.(ag).(s) with
+  match (LargeArray.get graph.connect ag).(s) with
   | Some ((ag',ty'),s'') ->
     if ty'=ty && s'=s'' then Some ag' else None
   | None -> None
 
 let link_destination ag s graph =
   let () = assert (not graph.outdated) in
-  graph.connect.(ag).(s)
+  (LargeArray.get graph.connect ag).(s)
 
 (** The snapshot machinery *)
 let one_connected_component sigs ty node rsorts graph =
@@ -230,7 +231,7 @@ let one_connected_component sigs ty node rsorts graph =
 	 let (free_id',dangling',todos'),ports =
 	   Tools.array_fold_left_mapi
 	     (fun i (free_id,dangling,todos) _ ->
-	      match graph.connect.(node).(i) with
+	      match (LargeArray.get graph.connect node).(i) with
 	      | None ->
 		 (free_id,dangling,todos),Raw_mixture.FREE
 	      | Some ((n',ty'),s') ->
@@ -248,7 +249,7 @@ let one_connected_component sigs ty node rsorts graph =
 	 let skel =
 	   { Raw_mixture.a_id = node; Raw_mixture.a_type = ty;
 	     Raw_mixture.a_ports = ports;
-	     Raw_mixture.a_ints = graph.state.(node); } in
+	     Raw_mixture.a_ints = LargeArray.get graph.state node; } in
 	 build (skel::acc) free_id' dangling' sorts' todos'
   in build [] 1 Int2Map.empty rsorts [ty,node]
 
@@ -293,7 +294,7 @@ let debug_print f graph =
 	      (fun s f l ->
 	       Format.fprintf
 		 f "%i%t%t" s
-		 (match graph.state.(ag).(s) with
+		 (match (LargeArray.get graph.state ag).(s) with
 		  | Some int -> fun f -> Format.fprintf f "~%i" int
 		  | None -> fun _ -> ())
 		 (fun f -> match l with
@@ -302,7 +303,7 @@ let debug_print f graph =
 			      then Format.pp_print_string f "?"
 			   | Some ((ag',ty'),s') ->
 			      Format.fprintf f "->%i:%i.%i" ag' ty' s'))) in
-  Pp.array
+  LargeArray.print
     Pp.empty
     (fun ag f a ->
      match IntMap.fold
@@ -339,7 +340,7 @@ let is_valid_path graph l =
 let breath_first_traversal stop_on_find is_interresting sigs links =
   let rec look_each_site (id,ty,path as x) site (stop,don,out,next as acc) =
     if site = 0 then acc else
-    match links.(id).(pred site) with
+    match (LargeArray.get links id).(pred site) with
     | None -> look_each_site x (pred site) acc
     | Some ((id',ty'),site') ->
        if (stop&&stop_on_find) then acc

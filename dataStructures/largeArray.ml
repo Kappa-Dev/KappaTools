@@ -199,3 +199,12 @@ let fold_right f a init  =
 let fold_righti f a init =
   let g k (i,current) = (i-1,f i k current) in
   snd (fold_right g a (length a-1,init))
+
+let print ?(trailing=(fun _ -> ())) pr_sep pr_el f a =
+  let rec aux i f =
+    if i < length a then
+      let () = pr_el i f (get a i) in
+      if i < length a - 1 then
+	let () = pr_sep f in aux (succ i) f
+      else if i > 0 then trailing f
+  in aux 0 f

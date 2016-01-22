@@ -173,5 +173,8 @@ module DynArray =
 	    for i = 0 to len - 1 do
 	      G.set !(a2.array) (ofs2 + i) (G.get !(a1.array) (ofs1 + i))
 	    done
-				
+
+      let print ?trailing pr_s pr_a f a =
+	G.print ?trailing pr_s pr_a f !(a.array)
+
 	end:GenArray.GenArray))
