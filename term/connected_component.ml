@@ -105,6 +105,8 @@ let identity_injection cc =
   Renaming.identity
     (Array.fold_left (fun x y -> List.rev_append y x) [] cc.nodes_by_type)
 
+(** pick a root in the CC. Any root works.
+In this case pick the last node of smallest type *)
 let find_root cc =
   let rec aux ty =
     if ty = Array.length cc.nodes_by_type
@@ -905,8 +907,11 @@ module Matching = struct
 	 else
 	   Some (NodeMap.add (cc.id,find_ty cc src,src) dst acc, IntSet.add dst co))
 
+  (*- rm - reconstruct: Edges.t -> t -> int -> cc -> int -> t option*)
   let reconstruct graph inj id cc root =
+    (* -rm - full_rename: Renaming.t option *)
     let _,full_rename =
+      (*- rm - to_navigation: bool -> cc -> list *)
       match to_navigation false cc with
       | _::_ as nav ->
 	 List.fold_left
@@ -916,8 +921,10 @@ module Matching = struct
             | Some inj ->
 	       None,Navigation.injection_for_one_more_edge ?root inj graph nav)
            (Some root,Some Renaming.empty) nav
+	   (*- rm - find_root: cc -> (type, node) option *)
       | [] -> match find_root cc with
 	      | None -> failwith "Matching.reconstruct cc error"
+	      (*- rm - add : int -> int -> Renaming.t -> Renaming.t *)
 	      | Some (_,id) -> None, Some (Renaming.add id root Renaming.empty) in
     match full_rename with
     | None -> failwith "Matching.reconstruct renaming error"
@@ -926,13 +933,31 @@ module Matching = struct
        | None -> None
        | Some (inj',co) -> Some (IntMap.add id inj' (fst inj),co)
 
+  (* get : (ContentAgent.t * int) -> t -> int *)
   let get (node,id) (t,_) =
     match NodeMap.find_option node (IntMap.find_default NodeMap.empty id t) with
     | Some x -> x
     | None -> raise Not_found
 
-(*edges: list of concrete edges,
+  (*edges: list of concrete edges,
 returns the roots of observables that are above in the domain*)
+	
+  (* get_all : Edges.t -> t -> cc -> int -> int list *)
+  let get_all graph inj cc root =
+    let cc_id_in_rule = 1 in
+    match reconstruct graph inj cc_id_in_rule cc root with
+    | None -> []
+    | Some match_nodes_cc_graph ->
+       let rec aux ty =
+	 if ty = Array.length cc.nodes_by_type then []
+	 else List.append
+		(List.map (fun node_id ->
+			   let node = (cc.id, ty, node_id) in
+			   get (node, cc_id_in_rule) match_nodes_cc_graph)
+			  cc.nodes_by_type.(ty))
+		(aux (succ ty))
+       in aux 0
+	      
   let from_edge domain graph edges =
     let update_cache update id cache =
       IntMap.add id (update (IntMap.find_default IntSet.empty id cache)) cache

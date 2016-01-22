@@ -17,6 +17,7 @@ let tokenify contact_map counter domain l =
      (domain',(alg,id)::out)
     ) l (domain,[])
 
+(* transform an LKappa rule into a Primitives rule *)
 let rules_of_ast ?deps_machinery contact_map counter domain ~syntax_ref (rule,_) =
   let domain',rm_toks =
     tokenify contact_map counter domain rule.LKappa.r_rm_tokens in
@@ -32,13 +33,20 @@ let rules_of_ast ?deps_machinery contact_map counter domain ~syntax_ref (rule,_)
   let unary_infos =
     match rule.LKappa.r_un_rate with
     | None -> fun _ uncc -> crate,None,uncc
-    | Some (_,pos as rate) ->
+    | Some ((_,pos as rate),dist) ->
+       let dist' = match dist with
+	 | None -> None
+	 | Some (dist, pos_dist) ->
+	    if dist = 0 then
+	      raise (ExceptionDefn.Malformed_Decl
+		      ("Unary rule caanot be applied at distance 0. ",pos_dist))
+	    else Some dist in
        let (unrate,_) = Expr.compile_pure_alg counter rate in
        fun ccs uncc ->
        match Array.length ccs with
        | (0 | 1) -> unrate,None,uncc
        | 2 ->
-	  crate,Some unrate,
+	  crate,Some (unrate, dist'),
 	  Connected_component.Set.add
 	    ccs.(0) (Connected_component.Set.add ccs.(1) uncc)
        | n ->

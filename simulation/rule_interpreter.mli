@@ -26,14 +26,14 @@ val apply_rule :
   Connected_component.Env.t -> Connected_component.Set.t -> Counter.t ->
   t -> Causal.event_kind -> Primitives.elementary_rule -> result
 (** Returns the graph obtained by applying the rule.
- [rule_id] is mandatory if the rula has an unary rate.*)
+ [rule_id] is mandatory if the rule has an unary rate.*)
 
 val apply_unary_rule :
   rule_id:int -> get_alg:(int -> Alg_expr.t) -> Environment.t ->
   Connected_component.Env.t -> Connected_component.Set.t -> Counter.t ->
   t -> Causal.event_kind -> Primitives.elementary_rule -> result
 (** Returns the graph obtained by applying the rule.
- [rule_id] is mandatory if the rula has an unary rate.*)
+ [rule_id] is mandatory if the rule has an unary rate.*)
 
 val force_rule :
   get_alg:(int -> Alg_expr.t) -> Environment.t ->

@@ -4,7 +4,8 @@ type agent = int * int
 (** agent_id * agent_type *)
 
 module Edge = struct
-  type t = agent * int (** agent * site *)
+  type t = agent * int
+  (** agent * site *)
 
   let _compare ((n,_),s) ((n',_),s') =
     let c = int_compare n n' in
@@ -23,7 +24,8 @@ type t =
     free_id : int * int list;
   }
 (** (agent,site -> binding_state; missings);
-    agent,site -> internal_state; sort -> agents; free_id *)
+    agent,site -> internal_state; sort -> agents; free_id 
+    the free sites are neither in missings nor in linking_destination *)
 
 let empty =
   {
@@ -337,7 +339,8 @@ let rev_path l = List.rev_map (fun (x,y) -> (y,x)) l
 let is_valid_path graph l =
   List.for_all (fun (((a,_),s),((a',_),s')) -> link_exists a s a' s' graph) l
 
-let breath_first_traversal stop_on_find is_interresting sigs links =
+(* depth = number of edges between root and node*)
+let breath_first_traversal dist stop_on_find is_interresting sigs links =
   let rec look_each_site (id,ty,path as x) site (stop,don,out,next as acc) =
     if site = 0 then acc else
     match (LargeArray.get links id).(pred site) with
@@ -354,13 +357,20 @@ let breath_first_traversal stop_on_find is_interresting sigs links =
 	   | None -> out,false in
 	 let next' = (id',ty',path')::next in
 	 look_each_site x (pred site) (stop||store,don',out',next') in
-  let rec aux don out next = function
+  let rec aux depth don out next = function
     | (_,ty,_ as x)::todos ->
        let stop,don',out',next' =
 	 look_each_site x (Signature.arity sigs ty) (false,don,out,next) in
-       if stop&&stop_on_find then out' else aux don' out' next' todos
-    | [] -> match next with [] -> out | _ -> aux don out [] next in
-  aux
+       if stop&&stop_on_find then out' else aux depth don' out' next' todos 
+    | [] -> match next with
+	    | [] -> out 
+	    (* end when all graph traversed and return the list of paths *)
+	    | _ -> match dist with 
+		   | Some d when d <= depth -> [] 
+		   (* stop when the max distance is reached *)
+		   | Some _ -> aux (depth+1) don out [] next
+		   | None -> aux depth don out [] next
+  in aux 1 
 
 let pathes_of_interrest
       is_interresting sigs graph start_ty start_point done_path =
@@ -370,17 +380,32 @@ let pathes_of_interrest
   let acc = match is_interresting start_point with
     | None -> []
     | Some x -> [(x,start_point),done_path] in
-  breath_first_traversal false is_interresting sigs graph.connect don acc
+  breath_first_traversal None false is_interresting sigs graph.connect don acc
 			 [] [start_point,start_ty,done_path]
-
-let are_connected ?candidate sigs graph ty_x x y =
+			 
+let are_connected ?candidate sigs graph ty_x x y nodes_x nodes_y dist =
   let () = assert (not graph.outdated) in
-  match candidate with
-  | Some p when is_valid_path graph p -> Some p
-  | (Some _ | None) ->
-     match breath_first_traversal
+  let rec is_in_nodes_y nodes_y z = match nodes_y with
+    | [] -> None
+    | y::nds -> if z = y then Some () else is_in_nodes_y nds z in
+  match dist with 
+  | None ->
+     (match candidate with
+      | Some p when is_valid_path graph p -> Some p
+      | (Some _ | None) ->
+	 (match breath_first_traversal dist
 	     true (fun z -> if z = y then Some () else None)
 	     sigs graph.connect (IntSet.singleton x) [] [] [x,ty_x,[]] with
-     | [] -> None
-     | [ _,p ] -> Some p
-     | _ :: _ -> failwith "Edges.are_they_connected completely broken"
+	 | [] -> None
+	 | [ _,p ] -> Some p
+	 | _ :: _ -> failwith "Edges.are_they_connected completely broken"))
+  | Some d -> 
+     let rec aux nodes_x = match nodes_x with 
+       | x'::nds -> 
+	  (match breath_first_traversal dist true (is_in_nodes_y nodes_y)
+	     sigs graph.connect (IntSet.singleton x') [] [] [x',ty_x,[]] with
+	     [] -> aux nds 
+	   | [ _,p ] -> Some p
+	   | _ :: _ -> failwith "Edges.are_they_connected completely broken")
+       | [] -> None in
+     aux nodes_x

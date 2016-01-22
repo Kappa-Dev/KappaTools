@@ -71,8 +71,11 @@ let elementary_rule ?env f r =
     (alg_expr ?env) r.Primitives.rate
     (fun f -> match r.Primitives.unary_rate with
 	      | None -> ()
-	      | Some rate -> Format.fprintf f " (%a)" (alg_expr ?env) rate)
-
+	      | Some (rate, dist) 
+		-> Format.fprintf f " (%a%a)" (alg_expr ?env) rate
+		   (Pp.option (fun f md-> 
+			       Format.fprintf f ":%a" Format.pp_print_int md))
+		   dist)
 let modification ?env f m =
   let sigs = match env with
     | None -> None

@@ -50,7 +50,7 @@ type rule = {
     k_absolute: bool;
     k_un:
       ((mixture,string) ast_alg_expr Location.annot *
-	 (mixture,string) ast_alg_expr Location.annot option) option;
+	 int Location.annot option) option;
     (*k_1:radius_opt*)
     k_op: (mixture,string) ast_alg_expr Location.annot option ;
     (*rate for backward rule*)

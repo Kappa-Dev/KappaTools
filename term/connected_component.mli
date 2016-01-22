@@ -66,6 +66,10 @@ module Matching : sig
   val debug_print : Format.formatter -> t -> unit
   val get : (ContentAgent.t * int) -> t -> int
   val reconstruct : Edges.t -> t -> int -> cc -> int -> t option
+  (** [reconstruct graph matching_of_previous_cc cc_id_in_rule cc root ]*)
+
+  val get_all : Edges.t -> t -> cc -> int -> int list
+  (** [get_all graph matching_of_previous_cc cc root ]*)
 
   val observables_from_agent :
     Env.t -> Edges.t -> Edges.agent ->

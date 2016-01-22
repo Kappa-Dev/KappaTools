@@ -27,7 +27,8 @@ type rule =
       ((rule_mixture,int) Ast.ast_alg_expr Location.annot * int) list;
     r_rate : (rule_mixture,int) Ast.ast_alg_expr Location.annot;
     r_rate_absolute : bool;
-    r_un_rate : (rule_mixture,int) Ast.ast_alg_expr Location.annot option;
+    r_un_rate : ((rule_mixture,int) Ast.ast_alg_expr Location.annot 
+		 * int Location.annot option) option;
   }
 
 let print_link_annot ~ltypes sigs f (s,a) =
@@ -198,8 +199,12 @@ let print_rates sigs pr_tok pr_var f r =
     (Ast.print_ast_alg (print_rule_mixture sigs) pr_tok pr_var) (fst r.r_rate)
     (fun f -> match r.r_un_rate with
 		None -> ()
-	      | Some (ra,_) ->
-		 Ast.print_ast_alg (print_rule_mixture sigs) pr_tok pr_var f ra)
+	      | Some ((ra,_),max_dist) -> 
+		 Format.fprintf
+		   f "(%a%a)"	 
+		   (Ast.print_ast_alg (print_rule_mixture sigs) pr_tok pr_var) ra
+		   (Pp.option (fun f (md,_) -> 
+			       Format.fprintf f ":%a" Format.pp_print_int md)) max_dist) 
 
 let print_rule ~ltypes ~rates sigs pr_tok pr_var f r =
   Format.fprintf
@@ -665,9 +670,9 @@ let name_and_purify_rule (label_opt,(r,r_pos)) (id,acc,rules) =
       ((Location.dummy_annot rate_var,r.Ast.k_def)::acc,
        Location.dummy_annot (Ast.OBS_VAR rate_var))
     else (acc,r.Ast.k_def) in
-  let acc'',k_un,k_un_op = match r.Ast.k_un with
-    | None -> (acc',None,None)
-    | Some ((_,pos as k),k_op_op) ->
+  let acc'',k_un = match r.Ast.k_un with
+    | None -> (acc',None)
+    | Some ((_,pos as k),dist) ->
        let () =
 	 if r.Ast.k_absolute then
 	   raise (ExceptionDefn.Malformed_Decl
@@ -678,18 +683,7 @@ let name_and_purify_rule (label_opt,(r,r_pos)) (id,acc,rules) =
 	   ((Location.dummy_annot rate_var,k)::acc',
 	    Location.dummy_annot (Ast.OBS_VAR rate_var))
 	 else (acc',k) in
-       let acc_un',k_op' =
-	 match k_op_op,r.Ast.k_op with
-	 | Some k_op, Some _ when ast_alg_has_mix k_op ->
-	    let rate_var = (Ast.flip_label label)^"_un_rate" in
-	    ((Location.dummy_annot rate_var,k_op)::acc_un,
-	     Some (Location.dummy_annot (Ast.OBS_VAR rate_var)))
-	 | (Some _, None) | (Some _, Some _) | (None, None) ->
-						      (acc_un,k_op_op)
-	 | (None, Some (_,pos)) ->
-	    raise (ExceptionDefn.Malformed_Decl
-		     ("Missing rate for reverse rule",pos)) in
-       (acc_un',Some k',k_op') in
+       (acc_un,Some (k',dist)) in
   let acc''',rules' =
     match r.Ast.arrow,r.Ast.k_op with
     | Ast.LRAR, Some k when ast_alg_has_mix k ->
@@ -697,12 +691,13 @@ let name_and_purify_rule (label_opt,(r,r_pos)) (id,acc,rules) =
        ((Location.dummy_annot rate_var,k)::acc'',
 	(Tools.option_map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
 	 r.Ast.rhs,r.Ast.lhs,r.Ast.add_token,r.Ast.rm_token,
-	 Location.dummy_annot (Ast.OBS_VAR rate_var),r.Ast.k_absolute,k_un_op,r_pos)::rules)
+	 (* note to self: modify None in k_un_op once added in the syntax*)
+	 Location.dummy_annot (Ast.OBS_VAR rate_var),r.Ast.k_absolute,None,r_pos)::rules)
     | Ast.LRAR, Some rate ->
        (acc'',
 	(Tools.option_map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
 	 r.Ast.rhs,r.Ast.lhs,r.Ast.add_token,r.Ast.rm_token,
-	 rate,r.Ast.k_absolute,k_un_op,r_pos)::rules)
+	 rate,r.Ast.k_absolute,None,r_pos)::rules)
     | Ast.RAR, None -> (acc'',rules)
     | (Ast.RAR, Some _ | Ast.LRAR, None) ->
        raise
@@ -866,9 +861,11 @@ let compil_of_ast overwrite c =
 		   r_rate = alg_expr_of_ast sigs tok algs rate;
 		   r_rate_absolute = absolute;
 		   r_un_rate =
-		     Tools.option_map
-		       (alg_expr_of_ast sigs tok algs ?max_allowed_var:None)
-		       un_rate;
+		     Tools.option_map 
+		       (fun (un_rate',dist) ->
+			((alg_expr_of_ast sigs tok algs ?max_allowed_var:None)
+			   un_rate', dist))
+		   un_rate;
 		 },r_pos)) cleaned_rules;
     Ast.observables =
       List.map (fun expr -> alg_expr_of_ast sigs tok algs expr)

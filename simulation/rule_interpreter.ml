@@ -546,7 +546,7 @@ let update_outdated_activities ~get_alg store env counter state =
 	(fun i state rule ->
 	 match rule.Primitives.unary_rate with
 	 | None -> state
-	 | Some unrate ->
+	 | Some (unrate, _) ->
 	    let state' =
 	      new_unary_instances
 		(Environment.signatures env)
@@ -587,7 +587,7 @@ let transform_by_a_rule
 
 let apply_unary_rule
       ~rule_id ~get_alg env domain unary_ccs counter state event_kind rule =
-  let  (root1,root2 as roots) =
+  let (root1,root2 as roots) =
     match
       Mods.Int2Set.random
 	(Mods.IntMap.find_default
@@ -620,8 +620,15 @@ let apply_unary_rule
 			       Mods.IntSet.empty cc2 state.roots_of_ccs) in
   let root1_ty = match Connected_component.find_root_type cc1 with
     | None -> assert false | Some x -> x in
+  let nodes1 = Connected_component.Matching.get_all state.edges 
+	       Connected_component.Matching.empty cc1 root1 in
+  let nodes2 = Connected_component.Matching.get_all state.edges 
+	       Connected_component.Matching.empty cc2 root2 in
+  let dist = match rule.Primitives.unary_rate with
+     | None -> None
+     | Some (_, dist_opt) -> dist_opt in
   match Edges.are_connected ~candidate (Environment.signatures env)
-			    state.edges root1_ty root1 root2 with
+			    state.edges root1_ty root1 root2 nodes1 nodes2 dist with
   | None -> Corrected state'
   | Some _ when missing_ccs -> Corrected state'
   | Some _ as path ->
@@ -682,9 +689,21 @@ let apply_rule
 	    match Connected_component.find_root_type
 		    rule.Primitives.connected_components.(0) with
 	    | None -> assert false | Some x -> x in
+	  let nodes1 = Connected_component.Matching.get_all state.edges
+	               Connected_component.Matching.empty
+		       rule.Primitives.connected_components.(0)
+		       roots.(1) in
+	  let nodes2 = Connected_component.Matching.get_all state.edges
+	               Connected_component.Matching.empty
+		       rule.Primitives.connected_components.(1)
+		       roots.(1) in
+	  let dist = match rule.Primitives.unary_rate with
+	    | None -> None
+	    | Some (_, dist_opt) -> dist_opt in
 	  match
 	    Edges.are_connected ~candidate (Environment.signatures env)
-				state.edges root0_ty roots.(0) roots.(1) with
+				state.edges root0_ty roots.(0) roots.(1)
+                                nodes1 nodes2 dist with
 	  | None ->
 	     let rid =
 	       match rule_id with None -> assert false | Some rid -> rid in
