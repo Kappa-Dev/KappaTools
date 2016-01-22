@@ -19,10 +19,10 @@
   * under the terms of the GNU Library General Public License *)
 
 module DynArray =
-  (functor (G:LargeArray.GenArray) -> 
-    (struct
-      type 'a t = 
-          {
+  (functor (G:GenArray.GenArray) ->
+  (struct
+      type 'a t =
+        {
            array: 'a G.t ref;
            current_size: int ref;
            default: 'a
@@ -174,5 +174,4 @@ module DynArray =
 	      G.set !(a2.array) (ofs2 + i) (G.get !(a1.array) (ofs1 + i))
 	    done
 				
-	end: LargeArray.GenArray))
-
+	end:GenArray.GenArray))

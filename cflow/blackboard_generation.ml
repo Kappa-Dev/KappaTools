@@ -22,7 +22,7 @@ let debug_mode = false
 
 module type PreBlackboard = 
 sig 
-  module A:LargeArray.GenArray
+  module A:GenArray.GenArray
   module CI:Pseudo_inverse.Cut_pseudo_inverse 
 
   type step_id = int 

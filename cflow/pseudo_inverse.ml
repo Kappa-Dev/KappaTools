@@ -23,7 +23,7 @@
  module type Cut_pseudo_inverse =
    sig
      module Po:Po_cut.Po_cut 
-     module A:LargeArray.GenArray 
+     module A:GenArray.GenArray
 
      val cut:
        (Po.K.refined_step list, ( (Po.K.refined_step list) * int)) Po.K.H.unary 
