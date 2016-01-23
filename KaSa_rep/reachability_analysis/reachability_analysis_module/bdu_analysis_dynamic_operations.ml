@@ -2,14 +2,14 @@
   * bdu_analysis_dynamic_operations.ml
   * openkappa
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
-  * 
+  *
   * Creation: 2015, the 20th of January
-  * Last modification: 
-  * 
+  * Last modification:
+  *
   * Bdu analysis dynamic operations
-  * 
-  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et   
-  * en Automatique.  All rights reserved.  This file is distributed     
+  *
+  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et
+  * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
 open Bdu_analysis_dynamic_type
@@ -21,7 +21,7 @@ open Int_storage
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Bdu analysis dynamic operations") message exn
-    (fun () -> default)                
+    (fun () -> default)
 
 let trace = false
 
@@ -31,7 +31,7 @@ let trace = false
 let compute_contact_map_full parameter error handler_kappa =
   let add_link (agent, site, state) set store_result =
     let error, old =
-      match Int2Map_CM_state.Map.find_option_without_logs parameter error 
+      match Int2Map_CM_state.Map.find_option_without_logs parameter error
         (agent, site, state) store_result
       with
       | error, None -> error, Set_triple.Set.empty
@@ -50,9 +50,9 @@ let compute_contact_map_full parameter error handler_kappa =
     Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
       parameter error
       (fun parameter error (agent, (site, state)) (agent', site', state') store_result ->
-        let error, set = 
+        let error, set =
           Set_triple.Set.add_when_not_in parameter error
-            (agent', site', state') Set_triple.Set.empty 
+            (agent', site', state') Set_triple.Set.empty
         in
         let error, store_result =
           add_link (agent, site, state) set store_result
@@ -72,7 +72,7 @@ let compute_contact_map_full parameter error handler_kappa =
 
   The result is:
   - A bond to B; B bond to A
-  and 
+  and
   - A bond to C; C bond to A.
 *)
 
@@ -83,7 +83,7 @@ let compute_contact_map parameter error rule store_result =
   let add_link set1 set2 store_result =
     let error, old =
       match Int2Map_CM_Syntactic.Map.find_option_without_logs
-        parameter error set1 store_result 
+        parameter error set1 store_result
       with
       | error, None -> error, Set_triple.Set.empty
       | error, Some s -> error, s
@@ -119,7 +119,7 @@ let compute_contact_map parameter error rule store_result =
     (*---------------------------------------------------------------------*)
     let error, set1 =
       match agent1 with
-      | Ghost | Unknown_agent _ 
+      | Ghost | Unknown_agent _
       | Dead_agent _ -> warn parameter error (Some "line 102") Exit Set_triple.Set.empty
       | Agent agent1 ->
         let error, state1 =
@@ -127,7 +127,7 @@ let compute_contact_map parameter error rule store_result =
             site1 agent1.agent_interface
           with
           | error, None -> warn parameter error (Some "line 105") Exit 0
-          | error, Some port -> 
+          | error, Some port ->
             if port.site_state.max > 0
           then error, port.site_state.max
             else warn parameter error (Some "line 109") Exit 0
@@ -141,7 +141,7 @@ let compute_contact_map parameter error rule store_result =
     (*---------------------------------------------------------------------*)
     let error, set2 =
       match agent2 with
-      | Ghost | Unknown_agent _ 
+      | Ghost | Unknown_agent _
       | Dead_agent _ -> warn parameter error (Some "line 140") Exit Set_triple.Set.empty
       | Agent agent2 ->
         let error, state2 =
@@ -155,7 +155,7 @@ let compute_contact_map parameter error rule store_result =
             else warn parameter error (Some "line 139") Exit 0
         in
         let error, set2 =
-          Set_triple.Set.add_when_not_in parameter error 
+          Set_triple.Set.add_when_not_in parameter error
             (agent_type2, site2, state2) Set_triple.Set.empty
         in
         error, set2
@@ -163,7 +163,7 @@ let compute_contact_map parameter error rule store_result =
     (*---------------------------------------------------------------------*)
     let error, store_result = add_link set1 set2 store_result in
     error, store_result
-  ) (error, store_result) rule.actions.bind      
+  ) (error, store_result) rule.actions.bind
 
 (************************************************************************************)
 (*get the binding in initial state*)
@@ -171,7 +171,7 @@ let compute_contact_map parameter error rule store_result =
 let collect_init_map parameter error compiled store_result =
   let add_link set1 set2 store_result =
     let error, old =
-      match 
+      match
         Int2Map_CM_Syntactic.Map.find_option_without_logs parameter error set1 store_result
       with
       | error, None -> error, Set_triple.Set.empty
@@ -198,7 +198,7 @@ let collect_init_map parameter error compiled store_result =
                 (*get agent_source*)
                 let error, agent_source =
                   match AgentMap.get parameter error agent_id
-                    init.e_init_c_mixture.views 
+                    init.e_init_c_mixture.views
                   with
                   | error, None -> warn parameter error (Some "line 218") Exit Ghost
                   | error, Some agent -> error, agent
@@ -215,13 +215,13 @@ let collect_init_map parameter error compiled store_result =
                 (*---------------------------------------------------------------------*)
                 let error, set1 =
                   match agent_source with
-                  | Ghost | Unknown_agent _ | Dead_agent _ -> 
+                  | Ghost | Unknown_agent _ | Dead_agent _ ->
                     warn parameter error (Some "line 209") Exit Set_triple.Set.empty
                   | Agent agent1 ->
                     let agent_type1 = agent1.agent_name in
                     let error, state1 =
                       match Site_map_and_set.Map.find_option_without_logs
-                        parameter error site_type_source 
+                        parameter error site_type_source
                         agent1.agent_interface
                       with
                       | error, None -> warn parameter error (Some "line 217") Exit 0
@@ -265,8 +265,8 @@ let collect_init_map parameter error compiled store_result =
                 error, store_result
               ) bonds_map (error, store_result)
           in
-          error, store_result         
-        ) 
+          error, store_result
+        )
         init.e_init_c_mixture.bonds
         store_result
     ) compiled.init store_result
@@ -277,9 +277,9 @@ let collect_init_map parameter error compiled store_result =
 let compute_syn_contact_map_full parameter error rule compiled store_result =
   let add_link triple_set1 triple_set2 store_result =
     let error, old_set =
-      match 
+      match
         Int2Map_CM_Syntactic.Map.find_option_without_logs parameter error
-          triple_set1 store_result 
+          triple_set1 store_result
       with
       | error, None -> error, Set_triple.Set.empty
       | error, Some s -> error, s
@@ -341,7 +341,7 @@ let compute_syn_contact_map_full parameter error rule compiled store_result =
   'r2' A(x!B.x) -> A(x)
   'r3' A(x), B(x) -> A(x!1), B(x!1)
   'r4' A(x,y), C(y) -> A(x,y!1), C(y!1)
-  
+
   'r3' has a bond on the rhs, for any (rule_id, state) belong to side
   effects of A(x); state is compatible with B(x!1), add rule_id into update
   function.
@@ -386,7 +386,7 @@ let store_covering_classes_modification_update_aux parameter error agent_type_cv
     Int2Map_CV_Modif.Map.map (fun (l, x) -> List.rev l, x) result
   in
   error, store_result
-    
+
 (************************************************************************************)
 
 let collect_covering_classes_modification_update parameter error
@@ -420,7 +420,7 @@ let collect_covering_classes_modification_update parameter error
 (************************************************************************************)
 (*update function added information of rule_id in side effects*)
 
-let collect_covering_classes_modification_side_effects parameter error 
+let collect_covering_classes_modification_side_effects parameter error
     store_test_modification_map
     store_potential_side_effects
     covering_classes
@@ -438,7 +438,7 @@ let collect_covering_classes_modification_side_effects parameter error
     in
     let error = Exception.check warn parameter error error' (Some "line 169") Exit in
     let error, result =
-      Int2Map_CV_Modif.Map.add_or_overwrite parameter error (agent_type, cv_id) (l, new_set) 
+      Int2Map_CV_Modif.Map.add_or_overwrite parameter error (agent_type, cv_id) (l, new_set)
         store_result
     in
     error, result
@@ -446,7 +446,7 @@ let collect_covering_classes_modification_side_effects parameter error
   (*-------------------------------------------------------------------------------*)
   let _, store_potential_side_effects_bind = store_potential_side_effects in
   let error, store_result =
-    Int2Map_potential_effect.Map.fold 
+    Int2Map_potential_effect.Map.fold
       (fun (agent_type_partner, rule_id_effect) pair_list (error, store_result) ->
         List.fold_left (fun (error, store_result) (site_type_partner, state) ->
           let error, store_result =
@@ -589,26 +589,31 @@ let print_contact_map_full_aux parameter error handler_kappa result =
         with
           _ -> warn parameter error (Some "line 117") Exit (string_of_int state2)
       in
-      fprintf stdout 
-        "agent_type:%i:%s@site_type:%i:%s:state:%i(%s)--agent_type':%i:%s@site_type':%i:%s:state':%i(%s)\n" 
-        agent1 agent_string1 
-        site1 site_string1 
+      fprintf stdout
+        "agent_type:%i:%s@site_type:%i:%s:state:%i(%s)--agent_type':%i:%s@site_type':%i:%s:state':%i(%s)\n"
+        agent1 agent_string1
+        site1 site_string1
         state1 state_string1
-        agent2 agent_string2 
+        agent2 agent_string2
         site2 site_string2
         state2 state_string2
     ) set
   ) result
 
 let print_contact_map_full parameter error handler_kappa result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "\n------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "(Full) Contact map and initital state:\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "Sites are annotated with the id of binding type:\n";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "(Full) Contact map and initital state:";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "Sites are annotated with the id of binding type:";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   let () =
     print_contact_map_full_aux
       parameter
@@ -622,7 +627,7 @@ let print_contact_map_full parameter error handler_kappa result =
 (*syntactic contact map and init map*)
 
 let print_syn_map_aux parameter error handler_kappa result =
-  Int2Map_CM_Syntactic.Map.iter 
+  Int2Map_CM_Syntactic.Map.iter
     (fun set1 set2 ->
       Set_triple.Set.iter (fun (agent_type, site_type, state) ->
         let error, agent_string =
@@ -665,7 +670,7 @@ let print_syn_map_aux parameter error handler_kappa result =
             with
               _ -> warn parameter error (Some "line 226") Exit (string_of_int state')
           in
-          fprintf stdout 
+          fprintf stdout
             "agent_type:%i:%s:site_type:%i:%s:state:%i(%s) - > agent_type':%i:%s:site_type':%i:%s:state':%i(%s)\n"
             agent_type agent_string
             site_type site_string
@@ -678,14 +683,19 @@ let print_syn_map_aux parameter error handler_kappa result =
     ) result
 
 let print_syn_contact_map_full parameter error handler_kappa result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "\n------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "(Syntactic) Contact map and initital state:\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "Sites are annotated with the id of binding type:\n";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "(Syntactic) Contact map and initital state:";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "Sites are annotated with the id of binding type:";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   let () =
     print_syn_map_aux
       parameter
@@ -694,7 +704,7 @@ let print_syn_contact_map_full parameter error handler_kappa result =
       result
   in
   ()
-    
+
 (************************************************************************************)
 (*update (c) function*)
 
@@ -708,9 +718,12 @@ let print_covering_classes_modification_aux parameter error handler_kappa compil
           _ -> warn parameter error (Some "line 268") Exit (string_of_int agent_type)
       in
       let _ =
-        fprintf (Remanent_parameters.get_log parameter)
-          "agent_type:%i:%s:covering_class_id:%i:@set of rule_id:\n" 
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "agent_type:%i:%s:covering_class_id:%i:@set of rule_id:"
           agent_type agent_string y
+      in
+      let _ =
+	Loggers.print_newline (Remanent_parameters.get_logger parameter)
       in
       Site_map_and_set.Set.iter
         (fun rule_id ->
@@ -722,17 +735,22 @@ let print_covering_classes_modification_aux parameter error handler_kappa compil
             with
               _ -> warn parameter error (Some "line 283") Exit (string_of_int rule_id)
           in
-          fprintf (Remanent_parameters.get_log parameter) "%s\n" rule_id_string
+          let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "%s" rule_id_string in
+	  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in ()
         ) s2
     ) result
 
 let print_covering_classes_modification_update parameter error handler_kappa compiled result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "\n------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "List of rules to awake when the state of a site is modified and tested:\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "List of rules to awake when the state of a site is modified and tested:";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   let () =
     print_covering_classes_modification_aux
       parameter
@@ -741,18 +759,22 @@ let print_covering_classes_modification_update parameter error handler_kappa com
       compiled
       result
   in
-  ()      
-    
+  ()
+
 (************************************************************************************)
 (*update(c'), when discovered a bond for the first time*)
 
 let print_covering_classes_modification_side_effects parameter error handler_kappa compiled result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "\n------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "List of rules to awake when the state of a site is modified and tested and side effects:\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "List of rules to awake when the state of a site is modified and tested and side effects:";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   let () =
     print_covering_classes_modification_aux
       parameter
@@ -767,12 +789,16 @@ let print_covering_classes_modification_side_effects parameter error handler_kap
 (*Final update function*)
 
 let print_covering_classes_modification_update_full parameter error handler_kappa compiled result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "\n------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "Final list of rules to awake when the state of a site is modified and tested and side effects:\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "Final list of rules to awake when the state of a site is modified and tested and side effects:";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   let () =
     print_covering_classes_modification_aux
       parameter

@@ -2,14 +2,14 @@
   * bdu_fixpoint_iteration.ml
   * openkappa
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
-  * 
+  *
   * Creation: 2015, the 9th of October
-  * Last modification: 
-  * 
+  * Last modification:
+  *
   * Compute the relations between sites in the BDU data structures
-  * 
-  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et   
-  * en Automatique.  All rights reserved.  This file is distributed     
+  *
+  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et
+  * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
 open Cckappa_sig
@@ -25,29 +25,29 @@ open Fifo
 open Printf
 open Mvbdu_wrapper
 
-let warn parameters mh message exn default = 
+let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Bdu_fixpoint_iteration") message exn
-    (fun () -> default) 
+    (fun () -> default)
 
 let local_trace = false
 
-let dump_channel parameter  f =
-  if local_trace 
+(*let dump_channel parameter  f =
+  if local_trace
     || Remanent_parameters.get_trace parameter
-  then f (Remanent_parameters.get_log parameter)
+  then f (Remanent_parameters.get_logger parameter)*)
 
 let dump_formatter parameter  f =
-  if local_trace 
+  if local_trace
     || Remanent_parameters.get_trace parameter
-  then f (Remanent_parameters.get_formatter parameter) 
+  then f (Remanent_parameters.get_logger parameter)
 
 (************************************************************************************)
 (*print different views*)
 
-let dump_view_diff parameter handler_kappa handler_bdu error 
+let dump_view_diff parameter handler_kappa handler_bdu error
     site_correspondence agent_type cv_id old_bdu new_bdu =
-  if trace 
-    || Remanent_parameters.get_dump_reachability_analysis_diff parameter 
+  if trace
+    || Remanent_parameters.get_dump_reachability_analysis_diff parameter
     || Remanent_parameters.get_trace parameter
   then
     let prefix = Remanent_parameters.get_prefix parameter in
@@ -56,7 +56,7 @@ let dump_view_diff parameter handler_kappa handler_bdu error
     in
     (*-----------------------------------------------------------------------*)
     let error, agent_string =
-      try 
+      try
         Handler.string_of_agent parameter error handler_kappa agent_type
       with
         _ -> warn parameter error (Some "line 56") Exit (string_of_int agent_type)
@@ -77,39 +77,44 @@ let dump_view_diff parameter handler_kappa handler_bdu error
       in aux site_correspondence
     in
     (*-----------------------------------------------------------------------*)
-    (*build a pair of coresspondence map: 
+    (*build a pair of coresspondence map:
       - map1: global -> local; map2: local -> global*)
     let error, (map1, map2) =
-      Bdu_build.new_index_pair_map parameter error site_correspondence 
+      Bdu_build.new_index_pair_map parameter error site_correspondence
     in
     (*-----------------------------------------------------------------------*)
-    let () = Printf.fprintf (Remanent_parameters.get_log parameter) "\n" in
+    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter)  in
     (*-----------------------------------------------------------------------*)
     let error, handler_bdu =
       if trace
         || Remanent_parameters.get_trace parameter
       then
-	let () = 
-          Printf.fprintf (Remanent_parameters.get_log parameter) 
-            "%sINTENSIONAL DESCRIPTION:\n" prefix
+	let () =
+          Loggers.fprintf (Remanent_parameters.get_logger parameter)
+            "%sINTENSIONAL DESCRIPTION:" prefix
         in
+	let () =
+	  Loggers.print_newline (Remanent_parameters.get_logger parameter)
+	in
         (*print bdu different: this will print in a format of bdu*)
 	let () =
-          Mvbdu_wrapper.Mvbdu.print (Remanent_parameters.get_log parameter) 
-            prefix bdu_diff 
+          Mvbdu_wrapper.Mvbdu.print stdout prefix bdu_diff
         in
         (*print a list of relations: this will print in a format readable*)
-	let () = 
-          Printf.fprintf (Remanent_parameters.get_log parameter) 
-            "%sEXTENSIONAL DESCRIPTION:\n" prefix
+	let () =
+          Loggers.fprintf (Remanent_parameters.get_logger parameter)
+            "%sEXTENSIONAL DESCRIPTION:" prefix
         in
+	let () =
+	  Loggers.print_newline (Remanent_parameters.get_logger parameter)
+	in
 	error, handler_bdu
       else
 	error, handler_bdu
     in
     (*this is a function to convert a bdu of diff into a list.
       return a pair: (bdu, and a pair of (site, state) list of list)*)
-    let error, handler_bdu, list = 
+    let error, handler_bdu, list =
       Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu parameter handler_bdu error bdu_diff
     in
     (*-----------------------------------------------------------------------*)
@@ -127,11 +132,11 @@ let dump_view_diff parameter handler_kappa handler_bdu error
                in
                (*-----------------------------------------------------------------------*)
 	       let error, site_string =
-		 try 
+		 try
                    Handler.string_of_site parameter error handler_kappa
 		     agent_type site_type
 		 with
-		   _ -> warn parameter error (Some "line 136") 
+		   _ -> warn parameter error (Some "line 136")
                      Exit (string_of_int site_type)
 	       in
 	       let error, state_string =
@@ -143,13 +148,13 @@ let dump_view_diff parameter handler_kappa handler_bdu error
                in
                (*-----------------------------------------------------------------------*)
                let () =
-		 if bool 
-                 then Printf.fprintf (Remanent_parameters.get_log parameter) ","
-		 else Printf.fprintf (Remanent_parameters.get_log parameter)
+		 if bool
+                 then Loggers.fprintf (Remanent_parameters.get_logger parameter) ","
+		 else Loggers.fprintf (Remanent_parameters.get_logger parameter)
                    "%s%s(" prefix agent_string
                in
-	       let () = 
-                 Printf.fprintf (Remanent_parameters.get_log parameter) 
+	       let () =
+                 Loggers.fprintf (Remanent_parameters.get_logger parameter)
 		   "%s%s" site_string state_string
                in
                error, true
@@ -157,12 +162,15 @@ let dump_view_diff parameter handler_kappa handler_bdu error
 	     (error, false) l
 	 in
          (*-----------------------------------------------------------------------*)
-	 let () = 
+	 let () =
 	   if bool
-           then Printf.fprintf (Remanent_parameters.get_log parameter) ")\n"
+           then
+	     let () =
+	       Loggers.fprintf (Remanent_parameters.get_logger parameter) ")" in
+	     Loggers.print_newline (Remanent_parameters.get_logger parameter)
 	 in error)
 	error list
-    in error, handler_bdu    
+    in error, handler_bdu
   else error, handler_bdu
 
 (************************************************************************************)
@@ -202,22 +210,28 @@ let dump_valuation parameter handler_kappa handler_bdu error
       Bdu_build.new_index_pair_map parameter error site_correspondence
     in
     (*-----------------------------------------------------------------------*)
-    let () = Printf.fprintf (Remanent_parameters.get_log parameter) "\n" in
+    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
     (*-----------------------------------------------------------------------*)
     let error, handler_bdu =
       if trace
         || Remanent_parameters.get_trace parameter
       then
 	let () =
-          Printf.fprintf (Remanent_parameters.get_log parameter)
-            "%sINTENSIONAL DESCRIPTION:\n" prefix
+          Loggers.fprintf (Remanent_parameters.get_logger parameter)
+            "%sINTENSIONAL DESCRIPTION:" prefix
         in
 	let () =
-          Mvbdu_wrapper.Mvbdu.print_association_list 
-            (Remanent_parameters.get_log parameter) prefix valuation in
+	  Loggers.print_newline (Remanent_parameters.get_logger parameter)
+	in
 	let () =
-          Printf.fprintf (Remanent_parameters.get_log parameter)
-            "%sEXTENSIONAL DESCRIPTION:\n" prefix
+          Mvbdu_wrapper.Mvbdu.print_association_list
+            stdout prefix valuation in
+	let () =
+          Loggers.fprintf (Remanent_parameters.get_logger parameter)
+            "%sEXTENSIONAL DESCRIPTION:" prefix
+	in
+	let () =
+	  Loggers.print_newline (Remanent_parameters.get_logger parameter)
         in
 	error, handler_bdu
       else
@@ -226,7 +240,7 @@ let dump_valuation parameter handler_kappa handler_bdu error
     (*-----------------------------------------------------------------------*)
     (*build a list*)
     let error, handler_bdu, list =
-      Mvbdu_wrapper.Mvbdu.extensional_of_association_list 
+      Mvbdu_wrapper.Mvbdu.extensional_of_association_list
         parameter handler_bdu error valuation
     in
     (*-----------------------------------------------------------------------*)
@@ -256,12 +270,12 @@ let dump_valuation parameter handler_kappa handler_bdu error
           (*-----------------------------------------------------------------------*)
           let () =
 	    if bool
-            then Printf.fprintf (Remanent_parameters.get_log parameter) ","
-	    else Printf.fprintf (Remanent_parameters.get_log parameter)
+            then Loggers.fprintf (Remanent_parameters.get_logger parameter) ","
+	    else Loggers.fprintf (Remanent_parameters.get_logger parameter)
               "%s%s(" prefix agent_string
           in
 	  let () =
-            Printf.fprintf (Remanent_parameters.get_log parameter)
+            Loggers.fprintf (Remanent_parameters.get_logger parameter)
 	      "%s%s" site_string state_string
           in
           error, true
@@ -270,8 +284,11 @@ let dump_valuation parameter handler_kappa handler_bdu error
 	list
     in
     let () =
-      if bool 
-      then Printf.fprintf (Remanent_parameters.get_log parameter) ")\n"
+      if bool
+      then
+	let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) ")" in
+	let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+	()
     in
     error,handler_bdu
   else
@@ -280,22 +297,22 @@ let dump_valuation parameter handler_kappa handler_bdu error
 (************************************************************************************)
 
 let dump_cv_label bool parameter handler_kappa error site_correspondence agent_type cv_id =
-  if trace 
+  if trace
     || Remanent_parameters.get_trace parameter
     || bool
   then
-    let log = Remanent_parameters.get_log parameter in
+    let log = Remanent_parameters.get_logger parameter in
     let prefix = Remanent_parameters.get_prefix parameter in
     (*-----------------------------------------------------------------------*)
     let error, agent_string =
-      try 
+      try
         Handler.string_of_agent parameter error handler_kappa agent_type
       with
         _ -> warn parameter error (Some "line 56") Exit (string_of_int agent_type)
     in
     (*-----------------------------------------------------------------------*)
     let error, site_correspondence =
-      AgentMap.get parameter error agent_type site_correspondence 
+      AgentMap.get parameter error agent_type site_correspondence
     in
     let error, site_correspondence =
       match site_correspondence with
@@ -313,24 +330,25 @@ let dump_cv_label bool parameter handler_kappa error site_correspondence agent_t
     in
     (*-----------------------------------------------------------------------*)
     (*output*)
-    let () = Printf.fprintf log "%s %s(" prefix agent_string in
+    let () = Loggers.fprintf log "%s %s(" prefix agent_string in
     let error, _ =
-      List.fold_left 
+      List.fold_left
 	(fun (error, bool) site_type ->
 	    let error, site_string =
-	      try 
+	      try
                 Handler.string_of_site parameter error handler_kappa
 		  agent_type site_type
 	      with
 		_ -> warn parameter error (Some "line 210") Exit (string_of_int site_type)
 	    in
-	    let () = 
-	      Printf.fprintf log "%s%s" (if bool then "," else "") site_string 
+	    let () =
+	      Loggers.fprintf log "%s%s" (if bool then "," else "") site_string
 	    in
 	    error, true)
 	(error, false) site_correspondence
     in
-    let () = Printf.fprintf log ")\n" in
+    let () = Loggers.fprintf log ")" in
+    let () = Loggers.print_newline log  in
     error
   else
     error
@@ -348,7 +366,7 @@ let compute_bdu_update_aux parameter handler error bdu_test list_a bdu_X =
     Mvbdu_wrapper.Mvbdu.mvbdu_and parameter handler error bdu_X bdu_test
   in
   (*redefine with modification list*)
-  let error, handler, bdu_redefine = 
+  let error, handler, bdu_redefine =
     Mvbdu_wrapper.Mvbdu.mvbdu_redefine parameter handler error bdu_inter list_a
   in
   (*do the union of bdu_redefine and bdu_X*)
@@ -395,30 +413,30 @@ let compute_bdu_update_side_effects parameter handler error bdu_test list_a bdu_
       bdu_X
   in
   error, handler, bdu_result
-    
+
 (************************************************************************************)
 (*write a function add update(c) into working list*)
 
 let add_update_to_wl ?title:(title="") parameter error handler_kappa compiled
-    site_correspondence agent_type cv_id 
+    site_correspondence agent_type cv_id
     store_covering_classes_modification_update_full wl =
   (*-----------------------------------------------------------------------*)
   (*get a set of sites that are needed to add into working list*)
-  let error, (_, s1) = 
+  let error, (_, s1) =
     match Int2Map_CV_Modif.Map.find_option_without_logs parameter error (agent_type, cv_id)
       store_covering_classes_modification_update_full
     with
     | error, None -> error, ([], Site_map_and_set.Set.empty)
     | error, Some (l, s) -> error, (l, s)
-  in 
+  in
   (*-----------------------------------------------------------------------*)
   (*print working list information*)
   let error =
-    if trace 
+    if trace
       || Remanent_parameters.get_dump_reachability_analysis_wl parameter
     then
       begin
-	let log = Remanent_parameters.get_log parameter in
+	let log = Remanent_parameters.get_logger parameter in
         (*-----------------------------------------------------------------------*)
 	let error, agent_string =
 	  try
@@ -430,19 +448,19 @@ let add_update_to_wl ?title:(title="") parameter error handler_kappa compiled
         (*dump covering class label*)
 	let error =
 	  if title <> ""
-	  then 
+	  then
 	    let parameter_cv = Remanent_parameters.update_prefix parameter ("\t"^title) in
 	    let error =
               (*true: print the site type inside covering class*)
-              dump_cv_label true parameter_cv handler_kappa error 
-                site_correspondence agent_type cv_id 
-            in 
+              dump_cv_label true parameter_cv handler_kappa error
+                site_correspondence agent_type cv_id
+            in
 	    error
 	  else
 	    error
 	in
         (*-----------------------------------------------------------------------*)
-	let () = 
+	let () =
           Site_map_and_set.Set.iter (fun rule_id ->
 	    (*mapping rule_id of type int -> string*)
 	    let error, rule_id_string =
@@ -453,11 +471,12 @@ let add_update_to_wl ?title:(title="") parameter error handler_kappa compiled
 		_ -> warn parameter error (Some "line 250") Exit (string_of_int rule_id)
 	    in
 	    let tab =
-	      if title = "" then "\t" else "\t\t" 
+	      if title = "" then "\t" else "\t\t"
 	    in
-	    Printf.fprintf log "%s%s(%s) should be investigated \n" 
-              (Remanent_parameters.get_prefix parameter) tab rule_id_string) s1;
-	in
+	    let () = Loggers.fprintf log "%s%s(%s) should be investigated "
+              (Remanent_parameters.get_prefix parameter) tab rule_id_string in
+	    let () = Loggers.print_newline log in ())
+	    s1 in
 	error
       end
     else error
@@ -467,7 +486,7 @@ let add_update_to_wl ?title:(title="") parameter error handler_kappa compiled
     let error, wl = IntWL.push parameter error rule_id wl in
     error, wl
   ) s1 (error, wl)
-    
+
 (************************************************************************************)
 (*fixpoint*)
 
@@ -482,24 +501,24 @@ let collect_map_views_creation_test_potential parameter error rule_id
     | None -> error, Map_triple_views.Map.empty
     | Some m -> error, m
   in
-  let error, bdu_creation_map = 
+  let error, bdu_creation_map =
     match Map_final_creation_bdu.Map.find_option rule_id
       store_proj_bdu_creation_restriction_map
     with
     | None -> error, Map_agent_type_creation_bdu.Map.empty
     | Some map -> error, map
   in
-  let error, bdu_test_map = 
-    match 
-      Map_final_test_bdu.Map.find_option rule_id 
+  let error, bdu_test_map =
+    match
+      Map_final_test_bdu.Map.find_option rule_id
         store_proj_bdu_test_restriction_map
     with
     | None -> error, Map_agent_id_test_bdu.Map.empty
     | Some map -> error, map
   in
   let error, bdu_potential_map =
-    match Map_final_potential_bdu.Map.find_option rule_id 
-      store_proj_bdu_potential_restriction_map 
+    match Map_final_potential_bdu.Map.find_option rule_id
+      store_proj_bdu_potential_restriction_map
     with
     | None -> error, Map_agent_type_potential_bdu.Map.empty
     | Some map -> error, map
@@ -509,10 +528,10 @@ let collect_map_views_creation_test_potential parameter error rule_id
 (************************************************************************************)
 (*check is_enable*)
 
-exception False of Exception.method_handler * Mvbdu_wrapper.Mvbdu.handler 
+exception False of Exception.method_handler * Mvbdu_wrapper.Mvbdu.handler
 (* TO DO, do the thing cleanly with a forall in wrapped map module *)
-		     
-let is_enable parameter handler error bdu_false rule_id 
+
+let is_enable parameter handler error bdu_false rule_id
     bdu_proj_views store_bdu_update_map =
   try
     let error,handler =
@@ -535,18 +554,18 @@ let is_enable parameter handler error bdu_false rule_id
           else error, handler
 	) bdu_proj_views (error, handler)
     in error, handler, true
-  with False (error, handler) -> error, handler, false 
+  with False (error, handler) -> error, handler, false
 
 (************************************************************************************)
 (*compute view that has new view and new bond*)
 
 let compute_new_views parameter handler error
-    handler_kappa 
+    handler_kappa
     compiled
     site_correspondence
     agent_type
-    cv_id 
-    is_new_view 
+    cv_id
+    is_new_view
     store_covering_classes_modification_update_full
     wl_tl
     store_result =
@@ -561,7 +580,7 @@ let compute_new_views parameter handler error
           compiled
 	  site_correspondence
 	  agent_type
-	  cv_id 
+	  cv_id
           store_covering_classes_modification_update_full
           wl_tl
       in
@@ -578,12 +597,12 @@ let compute_views_enabled parameter handler error
     handler_kappa
     compiled
     correspondence
-    bdu_true 
+    bdu_true
     bdu_false
     rule_id
     bdu_test_map
-    bdu_creation_map 
-    modif_list_map 
+    bdu_creation_map
+    modif_list_map
     bdu_and_list_potential_map
     wl_tl
     store_covering_classes_modification_update_full
@@ -604,7 +623,7 @@ let compute_views_enabled parameter handler error
     in
     let error, handler, bdu_union =
       Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_update bdu_old
-    in  
+    in
     (*-----------------------------------------------------------------------*)
     if Mvbdu_wrapper.Mvbdu.equal bdu_union bdu_old
     then
@@ -612,9 +631,9 @@ let compute_views_enabled parameter handler error
     else
       (*print different views*)
       let parameter_view_diff = Remanent_parameters.update_prefix parameter "\t" in
-      let error, handler = 
-        dump_view_diff parameter_view_diff handler_kappa 
-          handler error correspondence agent_type cv_id bdu_old bdu_union 
+      let error, handler =
+        dump_view_diff parameter_view_diff handler_kappa
+          handler error correspondence agent_type cv_id bdu_old bdu_union
       in
       (*add bdu union inside the result, return true if it discovers a new views*)
       let error, store_result =
@@ -625,7 +644,7 @@ let compute_views_enabled parameter handler error
   in
   (*-----------------------------------------------------------------------*)
   (*deal with views*)
-  let parameter_cv = 
+  let parameter_cv =
     Remanent_parameters.update_prefix parameter "\t\tUpdating the views for"
   in
   let parameter_views = Remanent_parameters.update_prefix parameter "\t\t\t" in
@@ -635,13 +654,13 @@ let compute_views_enabled parameter handler error
         (*-----------------------------------------------------------------------*)
         (*print covering class label. Ex: A(x!,y!)*)
 	let error =
-          dump_cv_label (Remanent_parameters.get_dump_reachability_analysis_diff parameter) 
-            parameter_cv handler_kappa error correspondence agent_type cv_id 
-        in 
+          dump_cv_label (Remanent_parameters.get_dump_reachability_analysis_diff parameter)
+            parameter_cv handler_kappa error correspondence agent_type cv_id
+        in
 	(*-----------------------------------------------------------------------*)
         let error, bdu_X =
           match Map_bdu_update.Map.find_option_without_logs parameter error
-            (agent_type, cv_id) store_result 
+            (agent_type, cv_id) store_result
           with
           | error, None -> error, bdu_false
           | error, Some bdu -> error, bdu
@@ -654,7 +673,7 @@ let compute_views_enabled parameter handler error
           | Some bdu -> error, bdu
         in
 	let error, handler, bdu_update =
-          match Map_modif_list.Map.find_option_without_logs parameter error 
+          match Map_modif_list.Map.find_option_without_logs parameter error
             (agent_id, agent_type, rule_id, cv_id) modif_list_map
 	  with
           | error, None -> error, handler, bdu_X
@@ -688,7 +707,7 @@ let compute_views_enabled parameter handler error
             wl_tl
             store_result
         in
-        error, (handler, new_wl, store_result)   
+        error, (handler, new_wl, store_result)
       )
       bdu_proj_views
       (error, (handler, wl_tl, store_bdu_update_map))
@@ -727,24 +746,24 @@ let compute_views_enabled parameter handler error
             compiled
 	    correspondence
 	    agent_type
-	    cv_id 
+	    cv_id
             is_new_view
             store_covering_classes_modification_update_full
             wl_tl
             store_result
         in
-        error, (handler, wl_tl, store_result)          
+        error, (handler, wl_tl, store_result)
       )
       bdu_creation_map
       (error, (handler, wl_tl, store_result))
-  in 
+  in
   (*-----------------------------------------------------------------------*)
   (*start fo deal with side effects*)
   let error, (handler, wl_tl, store_result) =
-    Map_agent_type_potential_bdu.Map.fold 
+    Map_agent_type_potential_bdu.Map.fold
       (* JF: to do use a fold2 *)
-      (fun (agent_type, new_site_id, cv_id) (bdu_test,list) 
-        (error, (handler, wl_tl, store_result)) -> 
+      (fun (agent_type, new_site_id, cv_id) (bdu_test,list)
+        (error, (handler, wl_tl, store_result)) ->
         let error, bdu_X =
 	  match Map_bdu_update.Map.find_option_without_logs parameter error
             (agent_type, cv_id) store_result
@@ -781,17 +800,17 @@ let compute_views_enabled parameter handler error
 	    wl_tl
 	    store_result
 	in
-	error, (handler, wl_tl, store_result)          
+	error, (handler, wl_tl, store_result)
       )
       bdu_and_list_potential_map
       (error, (handler, wl_tl, store_result))
-  in 
+  in
   error, (handler, wl_tl, store_result)
 
 (************************************************************************************)
 (*fixpoint iteration with/without initial state*)
 
-let collect_bdu_fixpoint_with_init parameter handler error 
+let collect_bdu_fixpoint_with_init parameter handler error
     handler_kappa
     compiled
     bdu_true
@@ -810,8 +829,8 @@ let collect_bdu_fixpoint_with_init parameter handler error
     dead_rule_array
     =
   (*-----------------------------------------------------------------------*)
-    let log = Remanent_parameters.get_log parameter in
-    let add_link parameter handler error correspondence (agent_type, cv_id) 
+    let log = Remanent_parameters.get_logger parameter in
+    let add_link parameter handler error correspondence (agent_type, cv_id)
         bdu store_result =
       let error, bdu_old =
 	match Map_bdu_update.Map.find_option_without_logs parameter error
@@ -842,17 +861,20 @@ let collect_bdu_fixpoint_with_init parameter handler error
   let error, bool, handler, store_bdu_fixpoint_init_map =
     Map_init_bdu.Map.fold
       (fun (agent_type, cv_id) bdu (error, bool, handler, store_result) ->
-	let () = 
-	  if not bool 
+	let () =
+	  if not bool
 	    &&
-	      (trace 
-	       || Remanent_parameters.get_dump_reachability_analysis_diff parameter 
+	      (trace
+	       || Remanent_parameters.get_dump_reachability_analysis_diff parameter
 	       || Remanent_parameters.get_trace parameter)
 	  then
-	    Printf.fprintf log "\tViews in initial state\n\n"
-	in 
+	    let () = Loggers.fprintf log "\tViews in initial state" in
+	    let () = Loggers.print_newline log in
+	    let () = Loggers.print_newline log in
+	    ()
+	in
 	let error, handler, store_result =
-          add_link parameter handler error 
+          add_link parameter handler error
             site_correspondence_in_covering_classes (agent_type, cv_id) bdu store_result
         in
         error, true, handler, store_result
@@ -861,36 +883,43 @@ let collect_bdu_fixpoint_with_init parameter handler error
       (error, false, handler, Map_bdu_update.Map.empty)
   in
   let () =
-    if not bool 
+    if not bool
       &&
-	(trace 
-	 || Remanent_parameters.get_dump_reachability_analysis_diff parameter 
+	(trace
+	 || Remanent_parameters.get_dump_reachability_analysis_diff parameter
 	 || Remanent_parameters.get_trace parameter)
     then
-      Printf.fprintf log "\tInitial state is empty\n\n"
-  in 
+      let () =
+	Loggers.fprintf log "\tInitial state is empty"
+      in
+      let () = Loggers.print_newline log in
+      let () = Loggers.print_newline log in
+      ()
+  in
   let () =
-    if 
+    if
       trace
       || Remanent_parameters.get_trace parameter
       || Remanent_parameters.get_dump_reachability_analysis_wl parameter
     then
-      Printf.fprintf log "\tWake-up rules\n"
+      let () = Loggers.fprintf log "\tWake-up rules" in
+      let () = Loggers.print_newline log in
+      ()
   in
   (*-----------------------------------------------------------------------*)
   (*add update(c) into working list*)
-  let error, wl_init_creation = 
+  let error, wl_init_creation =
     Map_bdu_update.Map.fold
-      (fun (agent_type, cv_id) _ (error, wl_init_creation) -> 
+      (fun (agent_type, cv_id) _ (error, wl_init_creation) ->
 	add_update_to_wl
 	  ~title:"Dealing with"
 	  parameter
-          error 
+          error
           handler_kappa
           compiled
 	  site_correspondence_in_covering_classes
 	  agent_type
-          cv_id 
+          cv_id
           store_covering_classes_modification_update_full
           wl_init_creation)
       store_bdu_fixpoint_init_map
@@ -907,13 +936,13 @@ let collect_bdu_fixpoint_with_init parameter handler error
       (*pop the first element (rule_id) in this working list*)
       let error, (rule_id_op, wl_tl) = IntWL.pop parameter error acc_wl in
       match rule_id_op with
-      | None -> 
-        warn parameter error (Some "888") Exit 
+      | None ->
+        warn parameter error (Some "888") Exit
           (handler, store_bdu_fixpoint_init_map, dead_rule_array)
       | Some rule_id ->
         (*----------------------------------------------------------------------*)
         (*output of rule that is enabled*)
-    	let _ = 
+    	let _ =
           if
 	    trace
 	    || (Remanent_parameters.get_dump_reachability_analysis_iteration parameter)
@@ -921,15 +950,17 @@ let collect_bdu_fixpoint_with_init parameter handler error
           then
             (*mapping rule_id of type int -> string*)
             let error, rule_id_string =
-              try 
+              try
                 Handler.string_of_rule parameter error handler_kappa
 		  compiled rule_id
               with
-                _ -> warn parameter error (Some "line 795") Exit 
+                _ -> warn parameter error (Some "line 795") Exit
 		  (string_of_int rule_id)
             in
-            let () = Printf.fprintf log "\n\tApplying %s:\n" rule_id_string in
-	    ()
+	    let () = Loggers.print_newline log in
+            let () = Loggers.fprintf log "\tApplying %s:" rule_id_string in
+	    let () = Loggers.print_newline log in
+	     ()
         in
         (*--------------------------------------------------------------------*)
         let error,
@@ -945,7 +976,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
         in
         (*--------------------------------------------------------------------*)
         (*is for all bdu_test satisfy a covering_class?*)
-        let error, handler, is_enable = 
+        let error, handler, is_enable =
           is_enable
             parameter
             handler
@@ -972,7 +1003,8 @@ let collect_bdu_fixpoint_with_init parameter handler error
 		|| Remanent_parameters.get_trace parameter
 		|| Remanent_parameters.get_dump_reachability_analysis_iteration parameter
               then
-		Printf.fprintf log "\t\tthe precondition is satisfied\n"
+		let () = Loggers.fprintf log "\t\tthe precondition is satisfied" in
+		let () = Loggers.print_newline log in ()
             in
             (*-----------------------------------------------------------------------*)
             let error, (handler, new_wl, store_new_result) =
@@ -985,7 +1017,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
 		site_correspondence_in_covering_classes
                 bdu_true
                 bdu_false
-		rule_id 
+		rule_id
 		bdu_proj_views
                 bdu_creation_map
                 modif_list_map
@@ -1004,7 +1036,8 @@ let collect_bdu_fixpoint_with_init parameter handler error
 		 || (Remanent_parameters.get_dump_reachability_analysis_iteration parameter)
 		 || (Remanent_parameters.get_trace parameter)
               then
-                Printf.fprintf log "\t\tthe predcondition is not satisfied yet\n"
+                let () = Loggers.fprintf log "\t\tthe predcondition is not satisfied yet" in
+		let () = Loggers.print_newline log in ()
             in
             (*-----------------------------------------------------------------------*)
             aux wl_tl (error, handler, store_bdu_fixpoint_init_map, dead_rule_array)
@@ -1016,7 +1049,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
 (************************************************************************************)
 (*final fixpoint iteration*)
 
-let collect_bdu_fixpoint_map parameter handler error 
+let collect_bdu_fixpoint_map parameter handler error
     handler_kappa
     compiled
     site_correspondence_in_covering_classes
@@ -1031,11 +1064,11 @@ let collect_bdu_fixpoint_map parameter handler error
     store_bdu_init_restriction_map
     init_dead_rule_array
   =
-  let error, handler, bdu_false = 
+  let error, handler, bdu_false =
     Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error
-  in 
-  let error, handler, bdu_true = 
-    Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error 
+  in
+  let error, handler, bdu_true =
+    Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error
   in
   (*-----------------------------------------------------------------------*)
   (*fixpoint*)
@@ -1071,7 +1104,7 @@ let collect_bdu_fixpoint_map parameter handler error
 
 (*let store_new_result_hb_map
     parameter
-    error 
+    error
     half_break_map
     store_covering_classes_modification_update
     store_contact_map
@@ -1099,7 +1132,7 @@ let collect_bdu_fixpoint_map parameter handler error
      List.fold_left (fun (error, store_result) (rule_id_eff, state) ->
        Int2Map_syn.Map.fold
          (fun rule_id set (error, store_result) ->
-           Set_pair.Set.fold 
+           Set_pair.Set.fold
              (fun ((agent_type1, site_type1, state1),(agent_type2,site_type2, state2))
                (error, store_result) ->
                  if state = state2
@@ -1108,7 +1141,7 @@ let collect_bdu_fixpoint_map parameter handler error
                      site_type1 = site_type_eff
                    then
                      Int2Map_CV_Modif.Map.fold
-                       (fun (agent_type, cv_id) 
+                       (fun (agent_type, cv_id)
                          (l', rule_id_set) (error, store_result) ->
                            Site_map_and_set.Set.fold
                              (fun rule_id_update (error, current_result) ->
@@ -1132,7 +1165,7 @@ let collect_bdu_fixpoint_map parameter handler error
          ) store_contact_map (error, store_result)
      ) (error, store_result) l2
    ) half_break_map (error, store_result_map)
- *)   
+ *)
 
 (************************************************************************************)
 (*side effects in the case of remove*)
@@ -1170,7 +1203,7 @@ let collect_bdu_fixpoint_map parameter handler error
             Set_pair.Set.fold
               (fun ((agent_type1, site_type1, state1),(agent_type2, site_type2, state2))
                 (error, store_result) ->
-                  if agent_type1 = agent_type_eff && 
+                  if agent_type1 = agent_type_eff &&
                     site_type1 = site_type_eff
                   then
                     let error, store_result =
@@ -1203,7 +1236,7 @@ let collect_bdu_fixpoint_map parameter handler error
 (************************************************************************************)
 (*combine the result of half break and remove*)
 
-(*let collect_hb_remove_map parameter error 
+(*let collect_hb_remove_map parameter error
     store_side_effects
     store_covering_classes_modification_update
     store_contact_map
@@ -1276,13 +1309,13 @@ let collect_bdu_fixpoint_map parameter handler error
     store_hb_map
     store_remove_map
     store_result_map
-  *)    
+  *)
 
 (************************************************************************************)
 (*combine the result of update(c) and half break and remove side
   effects. This is final update function for side effect*)
 
-(*let collect_update_hb_remove_map parameter error 
+(*let collect_update_hb_remove_map parameter error
     store_side_effects
     store_contact_map
     store_covering_classes_modification_update
@@ -1351,8 +1384,8 @@ let collect_bdu_fixpoint_map parameter handler error
 
 (*let compute_new_views parameter handler error
     agent_type
-    cv_id 
-    is_new_view 
+    cv_id
+    is_new_view
     store_covering_classes_modification_update_full
     wl_tl
     store_result =
@@ -1364,7 +1397,7 @@ let collect_bdu_fixpoint_map parameter handler error
           parameter
           error
 	  agent_type
-	  cv_id 
+	  cv_id
           store_covering_classes_modification_update_full
           wl_tl
       in
@@ -1377,8 +1410,8 @@ let collect_bdu_fixpoint_map parameter handler error
        add_update_to_wl
        parameter
        error
-       agent_type 
-       cv_id 
+       agent_type
+       cv_id
        store_new_result_map
        wl_tl
        in
@@ -1389,7 +1422,7 @@ let collect_bdu_fixpoint_map parameter handler error
        parameter
        error
        agent_type
-       cv_id 
+       cv_id
        store_covering_classes_modification_update
        wl_tl
        in
