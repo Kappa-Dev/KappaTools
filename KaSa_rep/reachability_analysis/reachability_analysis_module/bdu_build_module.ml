@@ -2,20 +2,20 @@
   * bdu_analysis_main.ml
   * openkappa
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
-  * 
+  *
   * Creation: 2016, the 20th of January
-  * Last modification: 
-  * 
+  * Last modification:
+  *
   * Compute the relations between sites in the BDU data structures
-  * 
-  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et   
-  * en Automatique.  All rights reserved.  This file is distributed     
+  *
+  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et
+  * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
 open Bdu_build_type
 
 let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "BDU analysis") message exn (fun () -> default)  
+  Exception.warn parameters mh (Some "BDU analysis") message exn (fun () -> default)
 
 let trace = false
 
@@ -25,7 +25,7 @@ let trace = false
 module type Bdu_Build =
 sig
 
-  val init_bdu_build : Remanent_parameters_sig.parameters 
+  val init_bdu_build : Remanent_parameters_sig.parameters
     -> Exception.method_handler
     -> Exception.method_handler * bdu_build
 
@@ -33,7 +33,7 @@ sig
     -> Exception.method_handler
     -> Covering_classes_type.remanent Covering_classes_type.AgentMap.t
     -> ((int * int list * Cckappa_sig.Site_map_and_set.Set.t) list) AgentMap.t
-    -> Exception.method_handler * 
+    -> Exception.method_handler *
     ((int * int list * Cckappa_sig.Site_map_and_set.Set.t) list) AgentMap.t
 
   val collect_wl_creation : Remanent_parameters_sig.parameters
@@ -50,7 +50,7 @@ sig
     -> Cckappa_sig.rule
     -> ((int * int list * Cckappa_sig.Site_map_and_set.Set.t) list) AgentMap.t
     -> Mvbdu_wrapper.Mvbdu.mvbdu Map_test_bdu.Map.t
-    -> Exception.method_handler * 
+    -> Exception.method_handler *
     (Mvbdu_wrapper.Mvbdu.handler * Mvbdu_wrapper.Mvbdu.mvbdu Map_test_bdu.Map.t)
 
   val collect_proj_bdu_test_restriction_map : Remanent_parameters_sig.parameters
@@ -65,19 +65,19 @@ sig
     -> Exception.method_handler
     -> int
     -> Cckappa_sig.rule
-    -> ((int * Cckappa_sig.Site_map_and_set.Map.elt list * 
+    -> ((int * Cckappa_sig.Site_map_and_set.Map.elt list *
            Cckappa_sig.Site_map_and_set.Set.t) list) AgentMap.t
     -> Mvbdu_wrapper.Mvbdu.mvbdu Map_creation_bdu.Map.t
-    -> Exception.method_handler * 
+    -> Exception.method_handler *
     (Mvbdu_wrapper.Mvbdu.handler * Mvbdu_wrapper.Mvbdu.mvbdu Map_creation_bdu.Map.t)
 
   val collect_proj_bdu_creation_restriction_map : Remanent_parameters_sig.parameters
     -> Mvbdu_wrapper.Mvbdu.handler
     -> Exception.method_handler
     -> Mvbdu_wrapper.Mvbdu.mvbdu Map_creation_bdu.Map.t
-    -> (Exception.method_handler * Mvbdu_wrapper.Mvbdu.handler) * 
+    -> (Exception.method_handler * Mvbdu_wrapper.Mvbdu.handler) *
     Mvbdu_wrapper.Mvbdu.mvbdu Map_agent_type_creation_bdu.Map.t Map_final_creation_bdu.Map.t
-      
+
   val collect_bdu_init_restriction_map : Remanent_parameters_sig.parameters
     -> Mvbdu_wrapper.Mvbdu.handler
     -> Exception.method_handler
@@ -85,9 +85,9 @@ sig
     -> ((int *  Cckappa_sig.Site_map_and_set.Map.elt list *
            Cckappa_sig.Site_map_and_set.Set.t) list) AgentMap.t
     -> Mvbdu_wrapper.Mvbdu.mvbdu Map_init_bdu.Map.t
-    -> Exception.method_handler * 
+    -> Exception.method_handler *
     (Mvbdu_wrapper.Mvbdu.handler * Mvbdu_wrapper.Mvbdu.mvbdu Map_init_bdu.Map.t)
-      
+
   val collect_modif_list_restriction_map : Remanent_parameters_sig.parameters
     -> Mvbdu_wrapper.Mvbdu.handler
     -> Exception.method_handler
@@ -96,16 +96,16 @@ sig
     -> ((int * Cckappa_sig.Site_map_and_set.Map.elt list *
            Cckappa_sig.Site_map_and_set.Set.t) list) AgentMap.t
     -> Mvbdu_wrapper.Mvbdu.hconsed_association_list Map_modif_list.Map.t
-    -> Exception.method_handler * 
+    -> Exception.method_handler *
     (Mvbdu_wrapper.Mvbdu.handler *
        Mvbdu_wrapper.Mvbdu.hconsed_association_list Map_modif_list.Map.t)
 
-  val collect_bdu_potential_effect_restriction_map : Remanent_parameters_sig.parameters 
+  val collect_bdu_potential_effect_restriction_map : Remanent_parameters_sig.parameters
     -> Mvbdu_wrapper.Mvbdu.handler
-    -> Exception.method_handler 
+    -> Exception.method_handler
     -> (int * Cckappa_sig.Site_map_and_set.Map.elt list *
-          Cckappa_sig.Site_map_and_set.Set.t) list AgentMap.t 
-    -> Bdu_analysis_static_type.potential_partner_free * 
+          Cckappa_sig.Site_map_and_set.Set.t) list AgentMap.t
+    -> Bdu_analysis_static_type.potential_partner_free *
     Bdu_analysis_static_type.potential_partner_bind
     -> (Mvbdu_wrapper.Mvbdu.mvbdu * Mvbdu_wrapper.Mvbdu.hconsed_association_list)
     Map_potential_bdu.Map.t
@@ -130,19 +130,19 @@ sig
     -> Mvbdu_wrapper.Mvbdu.mvbdu Map_test_bdu.Map.t
     -> (Exception.method_handler * Mvbdu_wrapper.Mvbdu.handler) *
     Mvbdu_wrapper.Mvbdu.mvbdu Map_triple_views.Map.t Map_rule_id_views.Map.t
-      
-  val scan_rule_bdu_build : Remanent_parameters_sig.parameters 
-    -> Mvbdu_wrapper.Mvbdu.handler 
+
+  val scan_rule_bdu_build : Remanent_parameters_sig.parameters
+    -> Mvbdu_wrapper.Mvbdu.handler
     -> Exception.method_handler
-    -> Fifo.IntWL.WSet.elt 
-    -> Cckappa_sig.rule 
-    -> Cckappa_sig.compil 
-    -> Covering_classes_type.remanent Bdu_build_type.AgentMap.t 
-    -> Bdu_analysis_static_type.potential_partner_free * 
+    -> Fifo.IntWL.WSet.elt
+    -> Cckappa_sig.rule
+    -> Cckappa_sig.compil
+    -> Covering_classes_type.remanent Bdu_build_type.AgentMap.t
+    -> Bdu_analysis_static_type.potential_partner_free *
     Bdu_analysis_static_type.potential_partner_bind
     -> bdu_build
     -> Exception.method_handler * Mvbdu_wrapper.Mvbdu.handler * bdu_build
-    
+
   val print_remanent_triple : Remanent_parameters_sig.parameters
     -> Exception.method_handler
     -> (int * Cckappa_sig.Site_map_and_set.Map.elt list *
@@ -152,7 +152,7 @@ sig
   val print_wl_creation : Remanent_parameters_sig.parameters
     -> wl_int
     -> unit
-    
+
   val print_bdu_test_restriction_map : Remanent_parameters_sig.parameters
     -> Exception.method_handler
     -> Mvbdu_wrapper.Mvbdu.mvbdu Map_test_bdu.Map.t
@@ -162,7 +162,7 @@ sig
     -> Exception.method_handler
     -> Mvbdu_wrapper.Mvbdu.mvbdu Map_agent_id_test_bdu.Map.t Map_final_test_bdu.Map.t
     -> unit
-    
+
   val print_bdu_creation_restriction_map : Remanent_parameters_sig.parameters
     -> Exception.method_handler
     -> Mvbdu_wrapper.Mvbdu.mvbdu Map_creation_bdu.Map.t
@@ -173,7 +173,7 @@ sig
     -> Mvbdu_wrapper.Mvbdu.mvbdu Map_agent_type_creation_bdu.Map.t
     Map_final_creation_bdu.Map.t
       -> unit
-    
+
   val print_bdu_init_restriction_map : Remanent_parameters_sig.parameters
     -> Exception.method_handler
     -> Mvbdu_wrapper.Mvbdu.mvbdu Map_init_bdu.Map.t
@@ -195,7 +195,7 @@ sig
     -> (Mvbdu_wrapper.Mvbdu.mvbdu * Mvbdu_wrapper.Mvbdu.hconsed_association_list)
     Map_agent_type_potential_bdu.Map.t Map_final_potential_bdu.Map.t
     -> unit
-    
+
   val print_proj_bdu_views : Remanent_parameters_sig.parameters
     -> Exception.method_handler
     -> Mvbdu_wrapper.Mvbdu.mvbdu Map_triple_views.Map.t Map_rule_id_views.Map.t
@@ -246,7 +246,7 @@ module Bdu_Build =
 
     let collect_bdu_test_restriction_map parameter handler_bdu error rule_id rule
         store_remanent_triple store_result =
-      Bdu_build_operations.collect_bdu_test_restriction_map parameter handler_bdu error 
+      Bdu_build_operations.collect_bdu_test_restriction_map parameter handler_bdu error
         rule_id rule store_remanent_triple store_result
 
     let collect_proj_bdu_test_restriction_map parameter handler_bdu error
@@ -276,20 +276,20 @@ module Bdu_Build =
 
     let collect_bdu_potential_effect_restriction_map parameter handler_bdu error
         store_remanent_triple store_potential_side_effects store_result =
-      Bdu_build_operations.collect_bdu_potential_effect_restriction_map parameter 
+      Bdu_build_operations.collect_bdu_potential_effect_restriction_map parameter
         handler_bdu error store_remanent_triple store_potential_side_effects store_result
 
     let collect_proj_bdu_potential_restriction_map parameter handler_bdu error
         store_bdu_potential_restriction_map =
-      Bdu_build_operations.collect_proj_bdu_potential_restriction_map parameter 
+      Bdu_build_operations.collect_proj_bdu_potential_restriction_map parameter
         handler_bdu error store_bdu_potential_restriction_map
 
     let collect_proj_bdu_views parameter handler_bdu error store_bdu_test_restriction_map =
-      Bdu_build_operations.collect_proj_bdu_views parameter handler_bdu error 
+      Bdu_build_operations.collect_proj_bdu_views parameter handler_bdu error
         store_bdu_test_restriction_map
 
     let scan_rule_bdu_build parameter handler_bdu error rule_id rule compil
-        covering_classes store_potential_side_effects 
+        covering_classes store_potential_side_effects
         store_result =
       (*------------------------------------------------------------------------------*)
       let error, store_remanent_triple =
@@ -311,7 +311,7 @@ module Bdu_Build =
           store_result.store_wl_creation
       in
       (*-------------------------------------------------------------------------------*)
-      let error, (handler_bdu, store_bdu_test_restriction_map) = 
+      let error, (handler_bdu, store_bdu_test_restriction_map) =
         collect_bdu_test_restriction_map
           parameter
           handler_bdu
@@ -394,7 +394,7 @@ module Bdu_Build =
           store_bdu_test_restriction_map
       in
       (*-------------------------------------------------------------------------------*)
-      error, handler_bdu, 
+      error, handler_bdu,
       {
         store_remanent_triple                   = store_remanent_triple;
         store_wl_creation                       = store_wl_creation;
@@ -404,9 +404,9 @@ module Bdu_Build =
         store_proj_bdu_creation_restriction_map = store_proj_bdu_creation_restriction_map;
         store_bdu_init_restriction_map          = store_bdu_init_restriction_map;
         store_modif_list_restriction_map        = store_modif_list_restriction_map;
-        store_bdu_potential_effect_restriction_map = 
+        store_bdu_potential_effect_restriction_map =
           store_bdu_potential_effect_restriction_map;
-        store_proj_bdu_potential_restriction_map   = 
+        store_proj_bdu_potential_restriction_map   =
           store_proj_bdu_potential_restriction_map;
         store_proj_bdu_views                       = store_proj_bdu_views;
       }
@@ -415,13 +415,13 @@ module Bdu_Build =
 
     let print_remanent_triple parameter error result =
       Bdu_build_operations.print_remanent_triple parameter error result
-        
+
     let print_wl_creation parameter result =
       Bdu_build_operations.print_wl_creation parameter result
 
     let print_bdu_test_restriction_map parameter error result =
       Bdu_build_operations.print_bdu_test_restriction_map parameter error result
-        
+
     let print_proj_bdu_test_restriction_map parameter error result =
       Bdu_build_operations.print_proj_bdu_test_restriction_map parameter error result
 
@@ -449,12 +449,16 @@ module Bdu_Build =
 
     let print_bdu_build parameter error result =
       let () =
-        Printf.fprintf (Remanent_parameters.get_log parameter)
-          "\n------------------------------------------------------------\n";
-        Printf.fprintf (Remanent_parameters.get_log parameter)
-          "* Covering classes with new indexes:\n";
-        Printf.fprintf (Remanent_parameters.get_log parameter)
-          "------------------------------------------------------------\n";
+	Loggers.print_newline (Remanent_parameters.get_logger parameter);
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "------------------------------------------------------------";
+	Loggers.print_newline (Remanent_parameters.get_logger parameter);
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "* Covering classes with new indexes:";
+	Loggers.print_newline (Remanent_parameters.get_logger parameter);
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "------------------------------------------------------------";
+	Loggers.print_newline (Remanent_parameters.get_logger parameter)
       in
       let () =
         print_wl_creation
@@ -485,7 +489,7 @@ module Bdu_Build =
           error
           result.store_proj_bdu_potential_restriction_map
       in
-      let () =   
+      let () =
         print_proj_bdu_views
           parameter
           error

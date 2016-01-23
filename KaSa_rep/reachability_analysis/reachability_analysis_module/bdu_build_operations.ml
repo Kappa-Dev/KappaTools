@@ -2,14 +2,14 @@
   * bdu_analysis_type.ml
   * openkappa
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
-  * 
+  *
   * Creation: 2016, the 20th of January
-  * Last modification: 
-  * 
+  * Last modification:
+  *
   * Compute the relations between sites in the BDU data structures
-  * 
-  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et   
-  * en Automatique.  All rights reserved.  This file is distributed     
+  *
+  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et
+  * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
 open Cckappa_sig
@@ -37,14 +37,14 @@ let list2set parameter error list =
   error, set
 
 (************************************************************************************)
-(* From each covering class, with their new index for sites, build 
+(* From each covering class, with their new index for sites, build
    (bdu_test, bdu_creation and list of modification).
    Note: not taking sites in the local, because it will be longer.
    - Convert type set of sites into map restriction
 *)
 
 let collect_remanent_triple parameter error store_remanent store_result =
-  AgentMap.fold parameter error 
+  AgentMap.fold parameter error
     (fun parameter error agent_type remanent store_result ->
       let store_dic = remanent.store_dic in
       (*-----------------------------------------------------------------*)
@@ -60,7 +60,7 @@ let collect_remanent_triple parameter error store_remanent store_result =
       let error, store_result =
         AgentMap.set
           parameter
-          error 
+          error
           agent_type
           (List.rev triple_list)
           store_result
@@ -69,13 +69,13 @@ let collect_remanent_triple parameter error store_remanent store_result =
     ) store_remanent store_result
 
 (*----------------------------------------------------------------------------*)
-(*working list content only creation rule_id: this is the initial working list, 
+(*working list content only creation rule_id: this is the initial working list,
   this creation has no lhs.
   Only this case:
   'r1' -> A(x,y)
   will add 'r1' into a working list.
 
-  - There is case when it has a lhs and created a new agent. 
+  - There is case when it has a lhs and created a new agent.
     For instance:
     'r1' A(x,y) -> D(x,y)
   will also add 'r1' into a working list. (lhs of D is Ghost. Rhs of A is Ghost)
@@ -90,7 +90,7 @@ let collect_wl_creation parameter error rule_id rule store_result =
       | Some Dead_agent _ | Some Ghost  -> error, store_result
       | None ->  warn parameter error (Some "line 45") Exit store_result
       | Some Unknown_agent _
-      | Some Agent _ -> 
+      | Some Agent _ ->
         let error, wl = Fifo.IntWL.push parameter error rule_id store_result in
         error, wl
     ) (error, store_result) rule.actions.creation
@@ -121,10 +121,10 @@ let new_index_pair_map parameter error l = (*JF:  it should be computed only onc
     | [] -> error, (map1, map2)
     | h :: tl ->
       let error, map1 = Site_map_and_set.Map.add parameter error h k map1 in
-      let error, map2 = Site_map_and_set.Map.add parameter error k h map2 in   
+      let error, map2 = Site_map_and_set.Map.add parameter error k h map2 in
       aux tl (k+1) map1 map2 error
   in
-  let error', (map1, map2) = 
+  let error', (map1, map2) =
     aux l 1 Site_map_and_set.Map.empty Site_map_and_set.Map.empty error
   in
   let error = Exception.check warn parameter error error' (Some "line 49") Exit in
@@ -132,7 +132,7 @@ let new_index_pair_map parameter error l = (*JF:  it should be computed only onc
 
 (************************************************************************************)
 
-let collect_bdu_test_restriction_map parameter handler error rule_id rule 
+let collect_bdu_test_restriction_map parameter handler error rule_id rule
     store_remanent_triple store_result =
   let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in
   (*-----------------------------------------------------------------*)
@@ -148,7 +148,7 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
     (fun parameter error agent_id agent (handler,store_result) ->
       match agent with
       | Unknown_agent _ | Ghost -> error, (handler, store_result)
-      | Dead_agent (agent, _, _, _) 		  
+      | Dead_agent (agent, _, _, _)
       | Agent agent ->
         let agent_type = agent.agent_name in
 	let error, triple_list =
@@ -160,14 +160,14 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
 	in
 	(*-----------------------------------------------------------------*)
         (*get map restriction from covering classes*)
-	if Site_map_and_set.Map.is_empty agent.agent_interface 
-	then 
+	if Site_map_and_set.Map.is_empty agent.agent_interface
+	then
           (* IF the covering class is empty, put the bdu true since there is no test *)
 	  let error, store_result =
-	    add_link (agent_id, agent_type, rule_id, 0) bdu_true store_result 
-	  in 
+	    add_link (agent_id, agent_type, rule_id, 0) bdu_true store_result
+	  in
 	  error, (handler, store_result)
-	else 
+	else
           let error, get_pair_list =
             List.fold_left (fun (error, current_list) (cv_id, list, set) ->
               (*-----------------------------------------------------------------*)
@@ -181,12 +181,12 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
 		parameter error
 		  (fun site port (error, store_result) ->
                     let state = port.site_state.min in
-                    let error, site' = 
-                      Site_map_and_set.Map.find_default parameter error 
-                        0 site map_new_index_forward 
+                    let error, site' =
+                      Site_map_and_set.Map.find_default parameter error
+                        0 site map_new_index_forward
                     in
                     let error, map_res =
-                      Site_map_and_set.Map.add parameter error 
+                      Site_map_and_set.Map.add parameter error
 			site'
 			state
 			store_result
@@ -194,21 +194,21 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
                     error, map_res
 		  ) set agent.agent_interface Site_map_and_set.Map.empty
               in
-	      let error = Exception.check warn parameter error error' 
-                (Some "line 178") Exit 
+	      let error = Exception.check warn parameter error error'
+                (Some "line 178") Exit
               in
               error, (cv_id, map_res) :: current_list)
 	      (error, []) triple_list
           in
           (*-----------------------------------------------------------------*)
           let error, handler, store_result =
-            List.fold_left 
+            List.fold_left
               (fun (error, handler, store_result) (cv_id,map_res) ->
-		if Site_map_and_set.Map.is_empty map_res 
+		if Site_map_and_set.Map.is_empty map_res
 		then
 		  error, handler, store_result
 		else
-		  begin 
+		  begin
 		    let error, pair_list =
 		      Site_map_and_set.Map.fold
 			(fun site' state (error, current_list) ->
@@ -225,7 +225,7 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
 		    in
 		    error, handler, store_result
 		  end)
-            
+
 	      (error, handler, store_result) get_pair_list
         in
         error, (handler, store_result)
@@ -273,7 +273,7 @@ let collect_bdu_creation_restriction_map
     in
     (* In the case when the agent is created twice, we take the union *)
     let error, handler, bdu_new =
-      Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error old_bdu bdu 
+      Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error old_bdu bdu
     in
     let result_map =
       Map_creation_bdu.Map.add (agent_type, rule_id, cv_id) bdu_new store_result
@@ -286,11 +286,11 @@ let collect_bdu_creation_restriction_map
       List.fold_left (fun (error, (handler,store_result)) (agent_id, agent_type) ->
         let error, agent = AgentMap.get parameter error agent_id rule.rule_rhs.views in
         match agent with
-	| Some Unknown_agent _ | Some Dead_agent _ 
+	| Some Unknown_agent _ | Some Dead_agent _
         | None -> warn parameter error (Some "168") Exit (handler,store_result)
 	| Some Ghost -> error, (handler,store_result)
         | Some Agent agent ->
-          if agent_type' = agent_type 
+          if agent_type' = agent_type
           then
             (*-----------------------------------------------------------------*)
             (*get map restriction from covering classes*)
@@ -302,15 +302,15 @@ let collect_bdu_creation_restriction_map
                   new_index_pair_map parameter error list
                 in
                 (*-----------------------------------------------------------------*)
-		let add site state (error, store_result) = 
+		let add site state (error, store_result) =
                   let error, site' =
                     match Site_map_and_set.Map.find_option parameter error
-                      site map_new_index_forward 
+                      site map_new_index_forward
                     with
                     | error, None -> warn parameter error (Some "282") Exit 0
                     | error, Some s -> error, s
                   in
-                  Site_map_and_set.Map.add parameter error site' state store_result 
+                  Site_map_and_set.Map.add parameter error site' state store_result
 		in
                 (*-----------------------------------------------------------------*)
 		let error', map_res =
@@ -322,7 +322,7 @@ let collect_bdu_creation_restriction_map
 		    agent.agent_interface
 		    Site_map_and_set.Map.empty
                 in
-		let error = 
+		let error =
                   Exception.check warn parameter error error' (Some "line 212") Exit
                 in
                 error, (cv_id, map_res) :: current_list)
@@ -331,7 +331,7 @@ let collect_bdu_creation_restriction_map
             (*-----------------------------------------------------------------*)
             (*fold a list and get a pair of site and state and rule_id*)
             let error, handler, store_result  =
-              List.fold_left 
+              List.fold_left
                 (fun (error, handler, store_result) (cv_id,map_res) ->
                   let error, pair_list =
                     Site_map_and_set.Map.fold
@@ -346,7 +346,7 @@ let collect_bdu_creation_restriction_map
 		   let error, handler, store_result =
 		     add_link handler (agent_type, rule_id, cv_id) bdu_creation store_result
 		   in
-		   error, handler, store_result 
+		   error, handler, store_result
                 ) (error, handler, store_result) get_pair_list
             in
             error, (handler, store_result)
@@ -376,24 +376,24 @@ let collect_proj_bdu_creation_restriction_map parameter handler error
       store_bdu_creation_restriction_map
   in
   (error, handler), store_result
-		    
+		
 (************************************************************************************)
 (*build bdu in the case of initial state. Declare as %init in Kappa*)
 
-let collect_bdu_init_restriction_map parameter handler error compil store_remanent_triple 
+let collect_bdu_init_restriction_map parameter handler error compil store_remanent_triple
     store =
   let error, handler, bdu_false = Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error in
   (*-----------------------------------------------------------------*)
   let add_link handler (agent_type, cv_id) bdu store =
     let error, old_bdu =
       match Map_init_bdu.Map.find_option_without_logs parameter error
-        (agent_type, cv_id) store 
+        (agent_type, cv_id) store
       with
       | error, None -> error, bdu_false
       | error, Some bdu -> error, bdu
     in
     (* In the case when the agent is created twice, we take the union *)
-    let error, handler, bdu_new = 
+    let error, handler, bdu_new =
       Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error old_bdu bdu
     in
     let error, store =
@@ -425,7 +425,7 @@ let collect_bdu_init_restriction_map parameter handler error compil store_remane
 			  new_index_pair_map parameter error list
 			in
                         (*-----------------------------------------------------------------*)
-			let add site state (error, store) = 
+			let add site state (error, store) =
 			  let error, site' =
 			    match Site_map_and_set.Map.find_option parameter error site
 			      map_new_index_forward
@@ -434,21 +434,21 @@ let collect_bdu_init_restriction_map parameter handler error compil store_remane
 			    | error, Some s -> error, s
                           in
 		          Site_map_and_set.Map.add parameter error site' state store
-			in 
+			in
                         (*-----------------------------------------------------------------*)
 			let error', map_res =
-			  Site_map_and_set.Map.fold_restriction_with_missing_associations 
+			  Site_map_and_set.Map.fold_restriction_with_missing_associations
 			    parameter error
 			    (fun site port -> add site port.site_state.min)
-			    (* JF: we should check that port.site_state.min is 
+			    (* JF: we should check that port.site_state.min is
                                equal to port_site_state.max *)
-			    (fun site -> add site 0) 
+			    (fun site -> add site 0)
 			    set
 			    agent.agent_interface
 			    Site_map_and_set.Map.empty
 			in
 			let error = Exception.check warn parameter error error'
-			  (Some "line 370") Exit 
+			  (Some "line 370") Exit
 			in
 			error, ((cv_id, map_res) :: current_list)
 		      ) (error, []) triple_list
@@ -473,12 +473,12 @@ let collect_bdu_init_restriction_map parameter handler error compil store_remane
 		          in
 		          error, handler, store)
 		        (error, handler, store)
-		        get_pair_list 
+		        get_pair_list
 	            in
 	            error, (handler, store)
                   else
                     error, (handler, store)
-                ) store_remanent_triple (handler, store)          
+                ) store_remanent_triple (handler, store)
           ) init.e_init_c_mixture.views (handler, store)
       ) compil.init (handler, store)
   in
@@ -498,7 +498,7 @@ let collect_modif_list_restriction_map
     error, result_map
   in
   (*-----------------------------------------------------------------*)
-  AgentMap.fold parameter error 
+  AgentMap.fold parameter error
     (fun parameter error agent_id agent_modif (handler, store_result) ->
       if Site_map_and_set.Map.is_empty agent_modif.agent_interface
       then error, (handler, store_result)
@@ -525,12 +525,12 @@ let collect_modif_list_restriction_map
               Site_map_and_set.Map.fold_restriction parameter error
                 (fun site port (error, store_result) ->
                   let state = port.site_state.min in
-                  let error, site' = 
+                  let error, site' =
                     Site_map_and_set.Map.find_default_without_logs
-                      parameter error 0 site map_new_index_forward 
+                      parameter error 0 site map_new_index_forward
                   in
                   let error, map_res =
-                    Site_map_and_set.Map.add parameter error 
+                    Site_map_and_set.Map.add parameter error
                       site'
                       state
                       store_result
@@ -538,7 +538,7 @@ let collect_modif_list_restriction_map
                   error, map_res
                 ) set agent_modif.agent_interface Site_map_and_set.Map.empty
             in
-	    let error = Exception.check warn parameter error error' (Some "line 293") Exit 
+	    let error = Exception.check warn parameter error error' (Some "line 293") Exit
             in
             error, (cv_id, map_res) :: current_list
 	  ) (error, []) triple_list
@@ -546,7 +546,7 @@ let collect_modif_list_restriction_map
         (*-----------------------------------------------------------------*)
         (*fold a list and get a pair of site and state and rule_id*)
         let error, handler, store_result =
-          List.fold_left 
+          List.fold_left
             (fun (error, handler, store_result) (cv_id,map_res) ->
 	      if Site_map_and_set.Map.is_empty map_res
 	      then error, handler, store_result
@@ -583,18 +583,18 @@ let collect_modif_list_restriction_map
 (************************************************************************************)
 (*build bdu for potential side effects*)
 
-let collect_bdu_potential_restriction_map_aux parameter handler error store_remanent_triple 
+let collect_bdu_potential_restriction_map_aux parameter handler error store_remanent_triple
     store_potential_side_effects store_result =
   let error, handler, bdu_false = Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error in
   (*-----------------------------------------------------------------*)
   let add_link handler (agent_type, new_site_type, rule_id, cv_id) bdu store_result =
     (*build a list_a*)
     let error, handler, list =
-      Mvbdu_wrapper.Mvbdu.build_reverse_sorted_association_list 
+      Mvbdu_wrapper.Mvbdu.build_reverse_sorted_association_list
         parameter handler error [new_site_type, 0] (*state is 0*)
     in
     let result_map =
-      Map_potential_bdu.Map.add 
+      Map_potential_bdu.Map.add
         (agent_type, new_site_type, rule_id, cv_id) (bdu, list) store_result
     in
     error, handler, result_map
@@ -621,7 +621,7 @@ let collect_bdu_potential_restriction_map_aux parameter handler error store_rema
 		     if Site_map_and_set.Set.mem site set
 		     then
 		       let error, site' =
-			 Site_map_and_set.Map.find_default_without_logs 
+			 Site_map_and_set.Map.find_default_without_logs
                            parameter error 0 site map_new_index_forward
 		       in
 		       let error, old =
@@ -656,20 +656,20 @@ let collect_bdu_potential_restriction_map_aux parameter handler error store_rema
 	       (fun (error, handler, store_result) (cv_id, site', map_res) ->
 		 let error, handler, bdu =
 		   List.fold_left (fun (error, handler, bdu) state ->
-		     (*---------------------------------------------------------------*)     
+		     (*---------------------------------------------------------------*)
                      (*build bdu_potential side effects*)
 		     let error, handler, bdu_potential_effect =
 		       build_bdu parameter handler error [site', state]
 		     in
                      (*union of bdu and bdu effect*)
 		     let error, handler, bdu =
-		       Mvbdu_wrapper.Mvbdu.mvbdu_or 
+		       Mvbdu_wrapper.Mvbdu.mvbdu_or
                          parameter handler error bdu bdu_potential_effect
 		     in
 		     error, handler, bdu)
 		     (error, handler, bdu_false)
 		     map_res
-		 in 
+		 in
 		 let error, handler, store_result =
 		   add_link handler (agent_type, site', rule_id, cv_id) bdu store_result
 		 in
@@ -688,7 +688,7 @@ let collect_bdu_potential_restriction_map_aux parameter handler error store_rema
 (*build bdu_potential in the case of binding*)
 
 let collect_bdu_potential_effect_restriction_map parameter handler error
-    store_remanent_triple 
+    store_remanent_triple
     store_potential_side_effects store_result =
   let _, store_potential_bind = store_potential_side_effects in
   let error', (handler, store_result) =
@@ -701,7 +701,7 @@ let collect_bdu_potential_effect_restriction_map parameter handler error
       store_result
   in
   let error =
-    Exception.check warn parameter error error' (Some "line 675") Exit 
+    Exception.check warn parameter error error' (Some "line 675") Exit
   in
   error, (handler, store_result)
 
@@ -712,7 +712,7 @@ let collect_proj_bdu_potential_restriction_map parameter handler error
     store_bdu_potential_restriction_map =
   let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in
   (*an empty hconsed list*)
-  let error, handler, empty = 
+  let error, handler, empty =
     Mvbdu_wrapper.Mvbdu.build_reverse_sorted_association_list parameter handler error [] in
   let (error, handler), store_result =
     Project2bdu_potential.proj2_monadic
@@ -779,8 +779,9 @@ let print_remanent_triple parameter error result =
 (*working list*)
 
 let print_wl_creation parameter result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "- Working list creation:\n";
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "- Working list creation:";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   Fifo.IntWL.print_wl parameter result
 
 (************************************************************************************)
@@ -789,25 +790,34 @@ let print_wl_creation parameter result =
 let print_bdu_test_restriction_map parameter error result =
   Map_test_bdu.Map.iter
     (fun (agent_id, agent_type, rule_id, cv_id) bdu_test ->
-      let _ =
-        fprintf  (Remanent_parameters.get_log parameter)
-          "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i\n"
+      let () =
+        Loggers.fprintf  (Remanent_parameters.get_logger parameter)
+          "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i"
           agent_id agent_type rule_id cv_id
       in
-      Mvbdu_wrapper.Mvbdu.print  (Remanent_parameters.get_log parameter) "" bdu_test
+      let () =
+	Loggers.print_newline (Remanent_parameters.get_logger parameter)
+      in
+      Mvbdu_wrapper.Mvbdu.print stdout "" bdu_test
     ) result
 
 let print_proj_bdu_test_restriction_map parameter error result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "\n------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "- Bdu for the valuations of the views that are tested (projection per rule):\n\n";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "- Bdu for the valuations of the views that are tested (projection per rule):";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   Map_final_test_bdu.Map.iter
     (fun rule_id map_b ->
-      let _ = fprintf  (Remanent_parameters.get_log parameter) "rule_id:%i\n" rule_id in
+      let () = Loggers.fprintf  (Remanent_parameters.get_logger parameter) "rule_id:%i" rule_id in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
       Map_agent_id_test_bdu.Map.iter (fun agent_id bdu_test ->
-        let _ = fprintf  (Remanent_parameters.get_log parameter) "agent_id:%i\n" agent_id in
-        Mvbdu_wrapper.Mvbdu.print  (Remanent_parameters.get_log parameter) "" bdu_test
+        let () = Loggers.fprintf  (Remanent_parameters.get_logger parameter) "agent_id:%i" agent_id in
+	let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+        Mvbdu_wrapper.Mvbdu.print  stdout "" bdu_test
       ) map_b
     ) result
 
@@ -815,33 +825,46 @@ let print_proj_bdu_test_restriction_map parameter error result =
 (*creation rule*)
 
 let print_bdu_creation_restriction_map parameter error result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "\n------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "- Bdu for the valuations of the views that are created (per rule, agent and covering class):\n\n";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "- Bdu for the valuations of the views that are created (per rule, agent and covering class):";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   Map_creation_bdu.Map.iter
     (fun (agent_type, rule_id, cv_id) bdu_creation ->
-      let _ =
-        fprintf  (Remanent_parameters.get_log parameter) "agent_type:%i:rule_id:%i:covering_class_id:%i\n"
+      let () =
+        Loggers.fprintf  (Remanent_parameters.get_logger parameter) "agent_type:%i:rule_id:%i:covering_class_id:%i"
           agent_type rule_id cv_id
       in
-      Mvbdu_wrapper.Mvbdu.print  (Remanent_parameters.get_log parameter) "" bdu_creation
+      let () =
+	Loggers.print_newline (Remanent_parameters.get_logger parameter)
+      in
+      Mvbdu_wrapper.Mvbdu.print  stdout "" bdu_creation
     ) result
 
 let print_proj_bdu_creation_restriction_map parameter error result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "\n------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "- Bdu for the valuations of the views that are created (per rule_id; projection function):\n\n";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "- Bdu for the valuations of the views that are created (per rule_id; projection function):";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   Map_final_creation_bdu.Map.iter
     (fun rule_id map_b ->
-      let _ = fprintf (Remanent_parameters.get_log parameter) "rule_id:%i\n" rule_id in
+      let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "rule_id:%i" rule_id in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
       Map_agent_type_creation_bdu.Map.iter
         (fun (agent_type, cv_id) bdu_creation ->
-          let _ = fprintf (Remanent_parameters.get_log parameter) "agent_type:%i:cv_id:%i\n" 
+          let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter) "agent_type:%i:cv_id:%i"
             agent_type cv_id
           in
-          Mvbdu_wrapper.Mvbdu.print (Remanent_parameters.get_log parameter) "" bdu_creation
+	  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+          Mvbdu_wrapper.Mvbdu.print stdout "" bdu_creation
         ) map_b
     ) result
 
@@ -851,29 +874,36 @@ let print_proj_bdu_creation_restriction_map parameter error result =
 let print_bdu_init_restriction_map parameter error result =
   Map_init_bdu.Map.iter
     (fun (agent_type, cv_id) bdu_init ->
-      let _ =
-        fprintf (Remanent_parameters.get_log parameter) "agent_type:%i:covering_class_id:%i\n"
+      let () =
+        Loggers.fprintf (Remanent_parameters.get_logger parameter) "agent_type:%i:covering_class_id:%i"
           agent_type cv_id
       in
-      Mvbdu_wrapper.Mvbdu.print (Remanent_parameters.get_log parameter) "" bdu_init
+      let () =
+	Loggers.print_newline (Remanent_parameters.get_logger parameter)
+      in
+      Mvbdu_wrapper.Mvbdu.print stdout  "" bdu_init
     ) result
 
 (************************************************************************************)
 (*modification list, this is list_a*)
 
 let print_modif_list_restriction_map parameter error result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "\n------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "- List for update of the views due to modification (per rule, agent and covering class):\n";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "- List for update of the views due to modification (per rule, agent and covering class):";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   Map_modif_list.Map.iter
     (fun (agent_id, agent_type, rule_id, cv_id) list_a ->
-      let _ =
-        fprintf  (Remanent_parameters.get_log parameter) 
-          "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i\n"
+      let () =
+        Loggers.fprintf  (Remanent_parameters.get_logger parameter)
+          "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i"
           agent_id agent_type rule_id cv_id
       in
-      Mvbdu_wrapper.Mvbdu.print_association_list  (Remanent_parameters.get_log parameter) "" list_a
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+      Mvbdu_wrapper.Mvbdu.print_association_list parameter "" list_a
     ) result
 
 (************************************************************************************)
@@ -882,34 +912,43 @@ let print_modif_list_restriction_map parameter error result =
 let print_bdu_potential_effect_restriction_map parameter error result =
   Map_potential_bdu.Map.iter
     (fun (agent_type, site_type, rule_id, cv_id) (bdu_potential,list) ->
-      let _ =
-        fprintf  (Remanent_parameters.get_log parameter)
-          "agent_type:%i:new_site_name:%i:rule_id:%i:covering_class_id:%i\n"
+      let () =
+        Loggers.fprintf  (Remanent_parameters.get_logger parameter)
+          "agent_type:%i:new_site_name:%i:rule_id:%i:covering_class_id:%i"
           agent_type site_type rule_id cv_id
       in
-      Mvbdu_wrapper.Mvbdu.print  (Remanent_parameters.get_log parameter) "" bdu_potential;
-      Mvbdu_wrapper.Mvbdu.print_association_list  (Remanent_parameters.get_log parameter) "" list
+      let () =
+	Loggers.print_newline (Remanent_parameters.get_logger parameter)
+      in
+      Mvbdu_wrapper.Mvbdu.print stdout "" bdu_potential;
+      Mvbdu_wrapper.Mvbdu.print_association_list parameter "" list
     ) result
- 
+
 (*projection*)
 
 let print_proj_bdu_potential_restriction_map parameter error result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "\n------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "- Bdu for the valuations of the views that are created from potential partner in side effects (projection per rule):\n\n";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "- Bdu for the valuations of the views that are created from potential partner in side effects (projection per rule):";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   Map_final_potential_bdu.Map.iter
     (fun rule_id map_b ->
-      let _ = fprintf  (Remanent_parameters.get_log parameter) "rule_id:%i\n" rule_id in
+      let () = Loggers.fprintf  (Remanent_parameters.get_logger parameter) "rule_id:%i" rule_id in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
       Map_agent_type_potential_bdu.Map.iter
         (fun (agent_type, site_type, cv_id) (bdu_potential,list) ->
-          let _ = fprintf (Remanent_parameters.get_log parameter)
-            "agent_type:%i:new_site_name:%i:covering_class_id:%i\n" 
+          let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+            "agent_type:%i:new_site_name:%i:covering_class_id:%i"
             agent_type site_type cv_id
           in
-          Mvbdu_wrapper.Mvbdu.print (Remanent_parameters.get_log parameter) "" bdu_potential;
-	  Mvbdu_wrapper.Mvbdu.print_association_list 
-            (Remanent_parameters.get_log parameter) "" list
+	  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+          Mvbdu_wrapper.Mvbdu.print stdout "" bdu_potential;
+	  Mvbdu_wrapper.Mvbdu.print_association_list
+            parameter "" list
         ) map_b
     ) result
 
@@ -917,17 +956,22 @@ let print_proj_bdu_potential_restriction_map parameter error result =
 (*projection function will be used in is_enable function*)
 
 let print_proj_bdu_views parameter error result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "\n------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "- Bdu for the valuation of the views that are tested (projection per rule):\n";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "- Bdu for the valuation of the views that are tested (projection per rule):";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   Map_rule_id_views.Map.iter
     (fun rule_id map_b ->
-      let _ = fprintf  (Remanent_parameters.get_log parameter) "rule_id:%i\n" rule_id in
-      Map_triple_views.Map.iter 
+      let () = Loggers.fprintf  (Remanent_parameters.get_logger parameter) "rule_id:%i" rule_id in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+      Map_triple_views.Map.iter
         (fun (agent_id, agent_type, cv_id) bdu ->
-          let _ = fprintf (Remanent_parameters.get_log parameter) "agent_id:%i:agent_type:%i:cv_id:%i\n" 
+          let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "agent_id:%i:agent_type:%i:cv_id:%i"
             agent_id agent_type cv_id in
-          Mvbdu_wrapper.Mvbdu.print (Remanent_parameters.get_log parameter) "" bdu
+	  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+          Mvbdu_wrapper.Mvbdu.print stdout "" bdu
         ) map_b
     ) result

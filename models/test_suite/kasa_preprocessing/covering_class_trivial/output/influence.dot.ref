@@ -13,4 +13,5 @@ node [shape=box, style=filled, fillcolor=lightskyblue];
 edge [color=red, arrowhead=tee];
 "r0" -> "r2"[label ="[0->0]"] ; 
 "r1" -> "r2"[label ="[0->0]"] ; 
+
 }

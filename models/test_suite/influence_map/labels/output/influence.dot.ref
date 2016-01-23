@@ -12,12 +12,14 @@ node [shape=box, style=filled, fillcolor=lightskyblue];
 "\"0" ; 
 "\\0" ; 
 edge [color=green, arrowhead=normal];
-"veryveryveryveryverylonglonglonglabel" -> "otherotherveryveryveryverylonglabel"[label ="[0->0]"] ; 
-"otherotherveryveryveryverylonglabel" -> "\"0"[label ="[0->0]"] ; 
-"otherotherveryveryveryverylonglabel" -> "\\0"[label ="[0->0]"] ; 
-"\"0" -> "veryveryveryveryverylonglonglonglabel"[label ="[0->0]"] ; 
-"\\0" -> "otherotherveryveryveryverylonglabel"[label ="[0->0]"] ; 
+"veryveryveryveryverylonglonglonglabel" -> "otherotherveryveryveryverylonglabel"[label ="[0->0]"] ;
+"otherotherveryveryveryverylonglabel" -> "\"0"[label ="[0->0]"] ;
+"otherotherveryveryveryverylonglabel" -> "\\0"[label ="[0->0]"] ;
+"\"0" -> "veryveryveryveryverylonglonglonglabel"[label ="[0->0]"] ;
+"\\0" -> "otherotherveryveryveryverylonglabel"[label ="[0->0]"] ;
+
 edge [color=red, arrowhead=tee];
 "\"0" -> "\\0"[label ="[0->0]"] ; 
 "\\0" -> "\"0"[label ="[0->0]"] ; 
+
 }

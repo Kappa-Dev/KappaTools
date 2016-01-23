@@ -13,7 +13,8 @@ node [shape=box, style=filled, fillcolor=lightskyblue];
 "3:C()->D(x~u)" ; 
 "4:E()->F(x~u)" ; 
 edge [color=green, arrowhead=normal];
-"0:->A()" -> "1:A()->B()"[label ="[0->0]"] ; 
-"1:A()->B()" -> "2:B()->C()"[label ="[0->0]"] ; 
-"2:B()->C()" -> "3:C()->D(x~u)"[label ="[0->0]"] ; 
+"0:->A()" -> "1:A()->B()"[label ="[0->0]"] ;
+"1:A()->B()" -> "2:B()->C()"[label ="[0->0]"] ;
+"2:B()->C()" -> "3:C()->D(x~u)"[label ="[0->0]"] ;
+
 }

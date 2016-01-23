@@ -7,12 +7,12 @@
 #
 graph G{ 
 subgraph cluster0 {
-label =  "A";  shape = rectangle; color = red 
+label =  "A";  shape = rectangle; color = red
 } ; 
 subgraph cluster1 {
-label =  "B";  shape = rectangle; color = red 
+label =  "B";  shape = rectangle; color = red
 } ; 
 subgraph cluster2 {
-label =  "C";  shape = rectangle; color = red 
+label =  "C";  shape = rectangle; color = red
 } ; 
 }

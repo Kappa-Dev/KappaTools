@@ -10,5 +10,6 @@ node [shape=box, style=filled, fillcolor=lightskyblue];
 "r0" ; 
 "r1" ; 
 edge [color=green, arrowhead=normal];
-"r0" -> "r1"[label ="[1->0]"] ; 
+"r0" -> "r1"[label ="[1->0]"] ;
+
 }

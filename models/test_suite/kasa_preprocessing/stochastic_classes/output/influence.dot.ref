@@ -22,4 +22,5 @@ edge [color=red, arrowhead=tee];
 "r5" -> "r5"[label ="[0->1];[1->0]"] ; 
 "r6" -> "r7"[label ="[0->0]"] ; 
 "r7" -> "r6"[label ="[0->0]"] ; 
+
 }

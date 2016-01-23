@@ -12,12 +12,14 @@ node [shape=box, style=filled, fillcolor=lightskyblue];
 "2:B(x~u)->B(x~p)" ; 
 "3:B(x~p)->B(x~u)" ; 
 edge [color=green, arrowhead=normal];
-"0:A(x~u),B(x~p)->A(x~u),A(x~p)" -> "1:A(x~p)->A(x~u)"[label ="[1->0]"] ; 
-"1:A(x~p)->A(x~u)" -> "0:A(x~u),B(x~p)->A(x~u),A(x~p)"[label ="[0->0]"] ; 
-"2:B(x~u)->B(x~p)" -> "0:A(x~u),B(x~p)->A(x~u),A(x~p)"[label ="[0->1]"] ; 
-"2:B(x~u)->B(x~p)" -> "3:B(x~p)->B(x~u)"[label ="[0->0]"] ; 
-"3:B(x~p)->B(x~u)" -> "2:B(x~u)->B(x~p)"[label ="[0->0]"] ; 
+"0:A(x~u),B(x~p)->A(x~u),A(x~p)" -> "1:A(x~p)->A(x~u)"[label ="[1->0]"] ;
+"1:A(x~p)->A(x~u)" -> "0:A(x~u),B(x~p)->A(x~u),A(x~p)"[label ="[0->0]"] ;
+"2:B(x~u)->B(x~p)" -> "0:A(x~u),B(x~p)->A(x~u),A(x~p)"[label ="[0->1]"] ;
+"2:B(x~u)->B(x~p)" -> "3:B(x~p)->B(x~u)"[label ="[0->0]"] ;
+"3:B(x~p)->B(x~u)" -> "2:B(x~u)->B(x~p)"[label ="[0->0]"] ;
+
 edge [color=red, arrowhead=tee];
 "0:A(x~u),B(x~p)->A(x~u),A(x~p)" -> "3:B(x~p)->B(x~u)"[label ="[1->0]"] ; 
 "3:B(x~p)->B(x~u)" -> "0:A(x~u),B(x~p)->A(x~u),A(x~p)"[label ="[0->1]"] ; 
+
 }

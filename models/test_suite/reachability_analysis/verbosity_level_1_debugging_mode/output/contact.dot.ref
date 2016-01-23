@@ -10,6 +10,6 @@ subgraph cluster0 {
    0.0 [style = filled label = "x" shape =ellipse color = green size = "5"]
    0.1 [style = filled label = "y" shape =ellipse color = green size = "5"]
    0.2 [style = filled label = "z" shape =ellipse color = green size = "5"]
-label =  "A";  shape = rectangle; color = red 
+label =  "A";  shape = rectangle; color = red
 } ; 
 }

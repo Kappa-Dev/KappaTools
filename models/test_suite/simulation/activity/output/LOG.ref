@@ -8,8 +8,8 @@ done
 	 -agent signatures
 	 -sanity checks
 	 -KaSa tools initialization
-Some exceptions have been raised during the static analysis, please analyse your file with KaSa
 + Compute the contact map
+Some exceptions have been raised during the static analysis, please analyse your file with KaSa
 	 -variable declarations
 	 -rules
 	 -perturbations

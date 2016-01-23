@@ -2,10 +2,10 @@ Parsing dead_agents.ka...
 done
 Scan rules!
 Signature:
-Signature:agents: 
+Signature:agents:
 Signature:agents:agent_type:0:A
 Signature:agents:agent_type:1:B
-Signature:sites: 
+Signature:sites:
 Signature:sites:agent_type:0:
 Signature:sites:agent_type:0:site_type:0->x(internal state)
 Signature:sites:agent_type:1:
@@ -331,47 +331,89 @@ Quarks:dead_agent**:agent_type:D,rule_id:8->[0]
 Quarks:dead_agent**:agent_type:E,rule_id:9->[0]
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Influence_map:Wake_up_map:rule(0):'' A(x~q),B(x~u)->A(x~u),B(x~p) -> rule(2):'' B(x~p)->B(x~u)[1->0]
+
 Influence_map:Wake_up_map:rule(0):'' A(x~q),B(x~u)->A(x~u),B(x~p) -> rule(3):'' A(x~u?)->A(x~p?)[0->0]
+
 Influence_map:Wake_up_map:rule(0):'' A(x~q),B(x~u)->A(x~u),B(x~p) -> rule(5):'' A(x~u?)->A(x~p?)[0->0]
+
 Influence_map:Wake_up_map:rule(0):'' A(x~q),B(x~u)->A(x~u),B(x~p) -> rule(6):'' A(x~u!_)->A(x~p)[0->0]
+
 Influence_map:Wake_up_map:rule(0):'' A(x~q),B(x~u)->A(x~u),B(x~p) -> rule(7):'' A(x~u!_)->A(x~p)[0->0]
+
 Influence_map:Wake_up_map:rule(1):'' B(x~u)->B(x~p) -> rule(2):'' B(x~p)->B(x~u)[0->0]
+
 Influence_map:Wake_up_map:rule(2):'' B(x~p)->B(x~u) -> rule(0):'' A(x~q),B(x~u)->A(x~u),B(x~p)[0->1]
+
 Influence_map:Wake_up_map:rule(2):'' B(x~p)->B(x~u) -> rule(1):'' B(x~u)->B(x~p)[0->0]
+
 Influence_map:Wake_up_map:rule(3):'' A(x~u?)->A(x~p?) -> rule(4):'' A(x~p?)->A(x~u?)[0->0]
+
 Influence_map:Wake_up_map:rule(4):'' A(x~p?)->A(x~u?) -> rule(3):'' A(x~u?)->A(x~p?)[0->0]
+
 Influence_map:Wake_up_map:rule(4):'' A(x~p?)->A(x~u?) -> rule(5):'' A(x~u?)->A(x~p?)[0->0]
+
 Influence_map:Wake_up_map:rule(4):'' A(x~p?)->A(x~u?) -> rule(6):'' A(x~u!_)->A(x~p)[0->0]
+
 Influence_map:Wake_up_map:rule(4):'' A(x~p?)->A(x~u?) -> rule(7):'' A(x~u!_)->A(x~p)[0->0]
+
 Influence_map:Wake_up_map:rule(5):'' A(x~u?)->A(x~p?) -> rule(4):'' A(x~p?)->A(x~u?)[0->0]
+
 Influence_map:Wake_up_map:rule(6):'' A(x~u!_)->A(x~p) -> rule(4):'' A(x~p?)->A(x~u?)[0->0]
+
 Influence_map:Wake_up_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(4):'' A(x~p?)->A(x~u?)[0->0]
+
 Influence_map:Wake_up_map:rule(8):'' D(x)->A(x~u) -> rule(0):'' A(x~q),B(x~u)->A(x~u),B(x~p)[0->0]
+
 Influence_map:Wake_up_map:rule(8):'' D(x)->A(x~u) -> rule(3):'' A(x~u?)->A(x~p?)[0->0]
+
 Influence_map:Wake_up_map:rule(8):'' D(x)->A(x~u) -> rule(4):'' A(x~p?)->A(x~u?)[0->0]
+
 Influence_map:Wake_up_map:rule(8):'' D(x)->A(x~u) -> rule(5):'' A(x~u?)->A(x~p?)[0->0]
+
 Influence_map:Wake_up_map:rule(8):'' D(x)->A(x~u) -> rule(6):'' A(x~u!_)->A(x~p)[0->0]
+
 Influence_map:Wake_up_map:rule(8):'' D(x)->A(x~u) -> rule(7):'' A(x~u!_)->A(x~p)[0->0]
+
 Influence_map:Wake_up_map:rule(9):'' E(x!_)->A(x~u) -> rule(0):'' A(x~q),B(x~u)->A(x~u),B(x~p)[0->0]
+
 Influence_map:Wake_up_map:rule(9):'' E(x!_)->A(x~u) -> rule(3):'' A(x~u?)->A(x~p?)[0->0]
+
 Influence_map:Wake_up_map:rule(9):'' E(x!_)->A(x~u) -> rule(4):'' A(x~p?)->A(x~u?)[0->0]
+
 Influence_map:Wake_up_map:rule(9):'' E(x!_)->A(x~u) -> rule(5):'' A(x~u?)->A(x~p?)[0->0]
+
 Influence_map:Wake_up_map:rule(9):'' E(x!_)->A(x~u) -> rule(6):'' A(x~u!_)->A(x~p)[0->0]
+
 Influence_map:Wake_up_map:rule(9):'' E(x!_)->A(x~u) -> rule(7):'' A(x~u!_)->A(x~p)[0->0]
+
 Influence_map:Inhibition_map:rule(0):'' A(x~q),B(x~u)->A(x~u),B(x~p) -> rule(1):'' B(x~u)->B(x~p)[1->0]
+
 Influence_map:Inhibition_map:rule(1):'' B(x~u)->B(x~p) -> rule(0):'' A(x~q),B(x~u)->A(x~u),B(x~p)[0->1]
+
 Influence_map:Inhibition_map:rule(3):'' A(x~u?)->A(x~p?) -> rule(5):'' A(x~u?)->A(x~p?)[0->0]
+
 Influence_map:Inhibition_map:rule(3):'' A(x~u?)->A(x~p?) -> rule(6):'' A(x~u!_)->A(x~p)[0->0]
+
 Influence_map:Inhibition_map:rule(3):'' A(x~u?)->A(x~p?) -> rule(7):'' A(x~u!_)->A(x~p)[0->0]
+
 Influence_map:Inhibition_map:rule(5):'' A(x~u?)->A(x~p?) -> rule(3):'' A(x~u?)->A(x~p?)[0->0]
+
 Influence_map:Inhibition_map:rule(5):'' A(x~u?)->A(x~p?) -> rule(6):'' A(x~u!_)->A(x~p)[0->0]
+
 Influence_map:Inhibition_map:rule(5):'' A(x~u?)->A(x~p?) -> rule(7):'' A(x~u!_)->A(x~p)[0->0]
+
 Influence_map:Inhibition_map:rule(6):'' A(x~u!_)->A(x~p) -> rule(3):'' A(x~u?)->A(x~p?)[0->0]
+
 Influence_map:Inhibition_map:rule(6):'' A(x~u!_)->A(x~p) -> rule(5):'' A(x~u?)->A(x~p?)[0->0]
+
 Influence_map:Inhibition_map:rule(6):'' A(x~u!_)->A(x~p) -> rule(7):'' A(x~u!_)->A(x~p)[0->0]
+
 Influence_map:Inhibition_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(3):'' A(x~u?)->A(x~p?)[0->0]
+
 Influence_map:Inhibition_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(5):'' A(x~u?)->A(x~p?)[0->0]
+
 Influence_map:Inhibition_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(6):'' A(x~u!_)->A(x~p)[0->0]
+
 Reachability analysis...
 
 Reachability analysis static information ....
@@ -565,8 +607,6 @@ rule 0
 * Dead rule :
 ------------------------------------------------------------
 
-Reachability analysis result ....
-
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
@@ -635,8 +675,7 @@ Id=6
 
 EXTENSIONAL DESCRIPTION:
 
-------------------------------------------------------------
-* Cartesian abstraction:
+------------------------------------------------------------* Cartesian abstraction:
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:

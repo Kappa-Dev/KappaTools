@@ -2,11 +2,11 @@ Parsing create.ka...
 done
 Scan rules!
 Signature:
-Signature:agents: 
+Signature:agents:
 Signature:agents:agent_type:0:A
 Signature:agents:agent_type:1:B
 Signature:agents:agent_type:2:C
-Signature:sites: 
+Signature:sites:
 Signature:sites:agent_type:0:
 Signature:sites:agent_type:1:
 Signature:sites:agent_type:2:
@@ -74,9 +74,10 @@ Quarks:agent_modif+:agent_type:1,rule:0->[0]
 Quarks:agent_modif+:agent_type:2,rule:1->[0]
 Quarks:agent_modif-:agent_type:0,rule:0->[0]
 Quarks:agent_modif-:agent_type:1,rule:1->[0]
+Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Influence_map:Wake_up_map:rule(0):'r0' A()->B() -> rule(1):'r1' B()->C()[0->0]
-Refining the influence map...
+
 Reachability analysis...
 
 Reachability analysis static information ....
@@ -123,8 +124,6 @@ Set of rules that may test and modify a given site (excluding created agents):
 rule 0: r0 will never be applied.
 rule 1: r1 will never be applied.
 
-Reachability analysis result ....
-
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
@@ -133,7 +132,6 @@ Reachability analysis result ....
 * Cartesian decomposition:
 ------------------------------------------------------------
 
-------------------------------------------------------------
-* Cartesian abstraction:
+------------------------------------------------------------* Cartesian abstraction:
 ------------------------------------------------------------
 execution finished without any exception

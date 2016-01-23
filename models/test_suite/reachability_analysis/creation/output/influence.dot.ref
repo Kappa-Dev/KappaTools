@@ -13,11 +13,13 @@ node [shape=box, style=filled, fillcolor=lightskyblue];
 "3:A(x~p,y~u)->D(x~u)" ; 
 "4:D(x~u)->D(x~p)" ; 
 edge [color=green, arrowhead=normal];
-"0:->A(x~u,y~u)" -> "1:A(x~u,y~u)->A(x~p,y~u)"[label ="[0->0]"] ; 
-"0:->A(x~u,y~u)" -> "2:A(x~u,y~u)->A(x~u,y~p)"[label ="[0->0]"] ; 
-"1:A(x~u,y~u)->A(x~p,y~u)" -> "3:A(x~p,y~u)->D(x~u)"[label ="[0->0]"] ; 
-"3:A(x~p,y~u)->D(x~u)" -> "4:D(x~u)->D(x~p)"[label ="[0->0]"] ; 
+"0:->A(x~u,y~u)" -> "1:A(x~u,y~u)->A(x~p,y~u)"[label ="[0->0]"] ;
+"0:->A(x~u,y~u)" -> "2:A(x~u,y~u)->A(x~u,y~p)"[label ="[0->0]"] ;
+"1:A(x~u,y~u)->A(x~p,y~u)" -> "3:A(x~p,y~u)->D(x~u)"[label ="[0->0]"] ;
+"3:A(x~p,y~u)->D(x~u)" -> "4:D(x~u)->D(x~p)"[label ="[0->0]"] ;
+
 edge [color=red, arrowhead=tee];
 "1:A(x~u,y~u)->A(x~p,y~u)" -> "2:A(x~u,y~u)->A(x~u,y~p)"[label ="[0->0]"] ; 
 "2:A(x~u,y~u)->A(x~u,y~p)" -> "1:A(x~u,y~u)->A(x~p,y~u)"[label ="[0->0]"] ; 
+
 }

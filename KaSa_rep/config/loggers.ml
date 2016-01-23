@@ -12,7 +12,7 @@ type t =
 
 let dummy_html_logger =
   {
-    breakable = false;
+    breakable = true;
     formatter = None ;
     end_of_line_symbol = "<BR>" ;
     open_cell_symbol = "<TD>";
@@ -24,7 +24,7 @@ let dummy_html_logger =
 
 let dummy_txt_logger =
   {
-    breakable = false;
+    breakable = true;
     formatter = None ;
     end_of_line_symbol = "" ;
     open_cell_symbol = "";
@@ -42,7 +42,7 @@ let fprintf logger =
   | Some a -> Format.fprintf a
 
 let print_newline logger =
-  fprintf logger "%s%t" logger.end_of_line_symbol (fun f -> if logger.breakable then Format.pp_print_flush f () else ())
+  fprintf logger "%s%t" logger.end_of_line_symbol (fun f -> if logger.breakable then Format.pp_print_newline f () else ())
 
 let print_cell logger s =
   fprintf logger "%s%s%s" logger.open_cell_symbol s logger.close_cell_symbol

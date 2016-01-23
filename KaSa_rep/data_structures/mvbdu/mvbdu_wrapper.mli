@@ -62,8 +62,8 @@ module type Mvbdu =
     val variables_list_of_mvbdu: (mvbdu,hconsed_variables_list) unary
 								
     val print: out_channel -> string -> mvbdu -> unit 
-    val print_association_list: out_channel -> string -> hconsed_association_list -> unit 
-    val print_variables_list: out_channel -> string -> hconsed_variables_list -> unit
+    val print_association_list: Remanent_parameters_sig.parameters -> string -> hconsed_association_list -> unit 
+    val print_variables_list: Remanent_parameters_sig.parameters -> string -> hconsed_variables_list -> unit
   end
   
 module type Internalized_mvbdu =
@@ -121,8 +121,8 @@ module type Internalized_mvbdu =
     val variables_list_of_mvbdu: mvbdu -> hconsed_variables_list
 					    
     val print: out_channel -> string -> mvbdu -> unit 
-    val print_association_list: out_channel -> string -> hconsed_association_list -> unit 
-    val print_variables_list: out_channel -> string -> hconsed_variables_list -> unit
+    val print_association_list: Remanent_parameters_sig.parameters -> string -> hconsed_association_list -> unit 
+    val print_variables_list: Remanent_parameters_sig.parameters -> string -> hconsed_variables_list -> unit
   end
 
 module type Nul = 

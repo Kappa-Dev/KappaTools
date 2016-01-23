@@ -2,9 +2,9 @@ Parsing bdu_ex.ka...
 done
 Scan rules!
 Signature:
-Signature:agents: 
+Signature:agents:
 Signature:agents:agent_type:0:A
-Signature:sites: 
+Signature:sites:
 Signature:sites:agent_type:0:
 Signature:sites:agent_type:0:site_type:0->x(internal state)
 Signature:sites:agent_type:0:site_type:1->y(internal state)
@@ -106,10 +106,12 @@ Quarks:site_modif+:agent_type:0,site_type:0,state:1,rule:1->[0]
 Quarks:site_modif+:agent_type:0,site_type:1,state:1,rule:2->[0]
 Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:1->[0]
 Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:2->[0]
+Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Influence_map:Wake_up_map:rule(0):'create' ->A(x~u) -> rule(1):'x' A(x~u)->A(x~p)[0->0]
+
 Influence_map:Wake_up_map:rule(1):'x' A(x~u)->A(x~p) -> rule(2):'y' A(x~p,y~u)->A(x~p,y~p)[0->0]
-Refining the influence map...
+
 Reachability analysis...
 
 Reachability analysis static information ....
@@ -272,8 +274,6 @@ rule 2: y
 * Dead rule :
 ------------------------------------------------------------
 
-Reachability analysis result ....
-
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
@@ -363,8 +363,7 @@ Id=20
 EXTENSIONAL DESCRIPTION:
 In agent A, the internal state of site x is p whenever the internal state of site y is p.
 
-------------------------------------------------------------
-* Cartesian abstraction:
+------------------------------------------------------------* Cartesian abstraction:
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:

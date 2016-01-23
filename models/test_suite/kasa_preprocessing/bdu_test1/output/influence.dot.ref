@@ -19,4 +19,5 @@ edge [color=red, arrowhead=tee];
 "r1" -> "r0"[label ="[0->0]"] ; 
 "r1" -> "Auu"[label ="[0->0]"] ; 
 "r1" -> "Apu"[label ="[0->0]"] ; 
+
 }

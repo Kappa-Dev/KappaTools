@@ -85,14 +85,11 @@ Reachability analysis...
 * Dead rule :
 ------------------------------------------------------------
 
-Reachability analysis result ....
-
 ------------------------------------------------------------
 * Cartesian decomposition:
 ------------------------------------------------------------
 
-------------------------------------------------------------
-* Cartesian abstraction:
+------------------------------------------------------------* Cartesian abstraction:
 ------------------------------------------------------------
 The binding state of site x in agent A is always B@x.
 The internal state of site x in agent A is always u.

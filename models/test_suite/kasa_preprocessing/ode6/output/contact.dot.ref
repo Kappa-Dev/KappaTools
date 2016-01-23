@@ -8,13 +8,13 @@
 graph G{ 
 subgraph cluster0 {
    0.0 [style = filled label = "x" shape =circle color = yellow size = "5"]
-label =  "ab";  shape = rectangle; color = red 
+label =  "ab";  shape = rectangle; color = red
 } ; 
 subgraph cluster1 {
    1.0 [style = filled label = "x" shape =ellipse color = green size = "5"]
    1.1 [style = filled label = "x" shape =circle color = yellow size = "5"]
    1.2 [style = filled label = "y" shape =circle color = yellow size = "5"]
-label =  "Sh";  shape = rectangle; color = red 
+label =  "Sh";  shape = rectangle; color = red
 } ; 
 subgraph cluster2 {
    2.0 [style = filled label = "z" shape =circle color = yellow size = "5"]
@@ -22,12 +22,12 @@ subgraph cluster2 {
    2.2 [style = filled label = "k" shape =circle color = yellow size = "5"]
    2.3 [style = filled label = "t" shape =circle color = yellow size = "5"]
    2.4 [style = filled label = "x" shape =circle color = yellow size = "5"]
-label =  "R";  shape = rectangle; color = red 
+label =  "R";  shape = rectangle; color = red
 } ; 
 subgraph cluster3 {
    3.0 [style = filled label = "y" shape =circle color = yellow size = "5"]
    3.1 [style = filled label = "x" shape =circle color = yellow size = "5"]
-label =  "E";  shape = rectangle; color = red 
+label =  "E";  shape = rectangle; color = red
 } ; 
 1.2 -- 2.0
 0.0 -- 1.1

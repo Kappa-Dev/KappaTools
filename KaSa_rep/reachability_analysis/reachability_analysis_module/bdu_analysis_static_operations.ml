@@ -2,14 +2,14 @@
   * bdu_side_effects.ml
   * openkappa
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
-  * 
+  *
   * Creation: 2015, the 30th of September
-  * Last modification: 
-  * 
+  * Last modification:
+  *
   * Compute the relations between sites in the BDU data structures
-  * 
-  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et   
-  * en Automatique.  All rights reserved.  This file is distributed     
+  *
+  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et
+  * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
 open Cckappa_sig
@@ -21,7 +21,7 @@ open Bdu_analysis_static_type
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "BDU analysis static operations") message exn
     (fun () -> default)
-    
+
 let trace = false
 
 (************************************************************************************)
@@ -32,7 +32,7 @@ let collect_covering_classes_id parameter error covering_classes =
   let add_link (agent_type, site_type) cv_id store_result =
     let error, (l, old) =
       match Int2Map_CV.Map.find_option_without_logs
-        parameter error (agent_type, site_type) store_result 
+        parameter error (agent_type, site_type) store_result
       with
       | error, None -> error, ([], [])
       | error, Some (l, l') -> error, (l, l')
@@ -57,7 +57,7 @@ let collect_covering_classes_id parameter error covering_classes =
               List.fold_left (fun (error, store_result) site_type_cv ->
                 let error, result =
                   add_link (agent_type_cv, site_type_cv) cv_id store_result
-                in 
+                in
                 error, result
               ) (error, store_result) list_of_site_type
             ) cv_dic (error, store_result)
@@ -79,7 +79,7 @@ let collect_covering_classes_id parameter error covering_classes =
   'r1' A(x) ->
   'r2' A(x!B.x) -> A(x)
   'r3' A(x,y), C(y) -> A(x,y!1), C(y!1)
-  
+
   The result of this function is:
   - A(x): [(r0, _); (r2, B.x)]
   - A(y): [(r0, _); (r1, _)]
@@ -135,7 +135,7 @@ let half_break_action parameter error handler rule_id half_break store_result =
       let error, store_result =
         add_link (agent_type, site) (rule_id, state_min) store_result
       in
-      error, store_result  
+      error, store_result
   ) (error, store_result) half_break
   in
   (*-------------------------------------------------------------------------------*)
@@ -238,7 +238,7 @@ let store_potential_half_break parameter error handler rule_id half_break store_
     (*state*)
     let error, (state_min, state_max) =
       match state_op with
-      | None -> 
+      | None ->
         begin
           let error, state_value =
             Misc_sa.unsome
@@ -247,7 +247,7 @@ let store_potential_half_break parameter error handler rule_id half_break store_
                  error
                  (agent_type, site)
                  handler.states_dic)
-              (fun error -> warn parameter error (Some "line 109") Exit 
+              (fun error -> warn parameter error (Some "line 109") Exit
                 (Dictionary_of_States.init()))
                in
               let error, last_entry =
@@ -335,7 +335,7 @@ let store_potential_remove parameter error handler rule_id remove store_result =
                   error, (store_potential_free, store_potential_bind)
             in
             aux 1 (error, store_result)
-          end          
+          end
         else
           error, store_result
       ) (error, store_result) list_undoc
@@ -346,7 +346,7 @@ let store_potential_remove parameter error handler rule_id remove store_result =
 (************************************************************************************)
 (*potential side effects*)
 
-let collect_potential_side_effects_free parameter error handler rule_id 
+let collect_potential_side_effects_free parameter error handler rule_id
     half_break remove store_result_map =
   let error, store_result_hb =
     store_potential_half_break
@@ -414,7 +414,7 @@ let collect_potential_side_effects_free parameter error handler rule_id
 
 (************************************************************************************)
 
-let collect_potential_side_effects_bind parameter error handler rule_id 
+let collect_potential_side_effects_bind parameter error handler rule_id
     half_break remove store_result_map =
   let error, store_result_hb =
     store_potential_half_break
@@ -438,7 +438,7 @@ let collect_potential_side_effects_bind parameter error handler rule_id
   let add_link error (agent_type, rule_id) l store_result =
     let error, old =
       match Int2Map_potential_effect.Map.find_option_without_logs
-        parameter error (agent_type, rule_id) store_result 
+        parameter error (agent_type, rule_id) store_result
       with
       | error, None -> error, []
       | error, Some l -> error, l
@@ -531,12 +531,12 @@ let collect_modification_sites parameter error rule_id rule store_result =
       | error, None -> error, ([], Site_map_and_set.Set.empty)
       | error, Some (l, s) -> error, (l, s)
     in
-    let error', current_set = Site_map_and_set.Set.add parameter error rule_id 
-      Site_map_and_set.Set.empty 
+    let error', current_set = Site_map_and_set.Set.add parameter error rule_id
+      Site_map_and_set.Set.empty
     in
     let error = Exception.check warn parameter error error' (Some "line 65") Exit in
     let error, result =
-      Int2Map_Modif.Map.add_or_overwrite parameter error (agent_id, agent_type, site_type) 
+      Int2Map_Modif.Map.add_or_overwrite parameter error (agent_id, agent_type, site_type)
         (l, current_set) store_result
     in
     error, result
@@ -625,7 +625,7 @@ let collect_test_modification_sites
     parameter error store_modification_sites store_test_sites store_result =
   let add_link error (agent_id, agent_type, site_type) rule_id_set store_result =
     let error, (l, old) =
-      match Int2Map_Modif.Map.find_option_without_logs parameter error 
+      match Int2Map_Modif.Map.find_option_without_logs parameter error
         (agent_id, agent_type, site_type) store_result
       with
       | error, None -> error, ([], Site_map_and_set.Set.empty)
@@ -657,7 +657,7 @@ let collect_test_modification_sites
     (*exists in both*)
     (fun parameter error (agent_id, agent_type, site_type) (l1, s1) (l2, s2) store_result ->
       let error',union = Site_map_and_set.Set.union parameter error s1 s2 in
-      let error = Exception.check warn parameter error error' (Some "line 212") Exit in   
+      let error = Exception.check warn parameter error error' (Some "line 212") Exit in
       let error, store_result =
         add_link error (agent_id, agent_type, site_type) union store_result
       in
@@ -726,7 +726,7 @@ let print_covering_classes_id_aux parameter error handler_kappa result =
   Int2Map_CV.Map.iter
     ( fun (agent_type, site_type) (l1, l2) ->
       let error, agent_string =
-        try 
+        try
           Handler.string_of_agent parameter error handler_kappa agent_type
         with
           _ -> warn parameter error (Some "line 36") Exit (string_of_int agent_type)
@@ -737,23 +737,32 @@ let print_covering_classes_id_aux parameter error handler_kappa result =
         with
           _ -> warn parameter error (Some "line 39") Exit (string_of_int site_type)
       in
-      let _ =
-        fprintf (Remanent_parameters.get_log parameter)
-          "agent_type:%i:%s:site_type:%i:%s@list of covering_class_id:\n"
+      let () =
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "agent_type:%i:%s:site_type:%i:%s@list of covering_class_id:"
           agent_type agent_string site_type site_string
       in
-      List.iter (fun id -> fprintf (Remanent_parameters.get_log parameter)
-        "covering_class_id:%i\n" id)
+      let () =
+	Loggers.print_newline (Remanent_parameters.get_logger parameter)
+      in
+      List.iter
+	(fun id ->
+	let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "covering_class_id:%i" id in
+	Loggers.print_newline (Remanent_parameters.get_logger parameter))
         l2
     ) result
 
 let print_covering_classes_id parameter error handler_kappa result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "\n------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "Mapping between sites and the covering classes they belong to:\n";
-  fprintf (Remanent_parameters.get_log parameter)
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "Mapping between sites and the covering classes they belong to:";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
     "------------------------------------------------------------\n";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   let () =
     print_covering_classes_id_aux
       parameter
@@ -776,17 +785,20 @@ let print_half_break_effect parameter error handler_kappa compiled result =
           _ -> warn parameter error (Some "79") Exit (string_of_int agent_type)
       in
       let error, site_string =
-        try 
+        try
           Handler.string_of_site parameter error handler_kappa agent_type site_type
         with
           _ -> warn parameter error (Some "line 85") Exit (string_of_int site_type)
       in
-      let _ =
-        fprintf (Remanent_parameters.get_log parameter)
-          "agent_type:%i:%s:site_type:%i:%s@list of pair (rule_id, binding state):\n"
+      let () =
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "agent_type:%i:%s:site_type:%i:%s@list of pair (rule_id, binding state):"
           agent_type agent_string site_type site_string
       in
-      List.iter (fun (rule_id, state) -> 
+      let () =
+	Loggers.print_newline (Remanent_parameters.get_logger parameter)
+      in
+      List.iter (fun (rule_id, state) ->
         (*mapping rule_id of type int to string*)
         let error, rule_id_string =
           try
@@ -801,8 +813,11 @@ let print_half_break_effect parameter error handler_kappa compiled result =
           with
             _ -> warn parameter error (Some "line 105") Exit (string_of_int state)
         in
-        fprintf (Remanent_parameters.get_log parameter) "(%s * state:%i:(%s))\n"
-          rule_id_string state state_string) l2
+	let () =
+          Loggers.fprintf (Remanent_parameters.get_logger parameter) "(%s * state:%i:(%s))"
+            rule_id_string state state_string
+	in
+	Loggers.print_newline (Remanent_parameters.get_logger parameter)) l2
     ) result
 
 let print_remove_effect parameter error handler_kappa compiled result =
@@ -820,10 +835,13 @@ let print_remove_effect parameter error handler_kappa compiled result =
         with
           _ -> warn parameter error (Some "line 124") Exit (string_of_int site_type)
       in
-      let _ =
-        fprintf (Remanent_parameters.get_log parameter) 
-          "agent_type:%i:%s:site_type:%i:%s@list of pair (rule_id, binding state):\n"
+      let () =
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "agent_type:%i:%s:site_type:%i:%s@list of pair (rule_id, binding state):"
           agent_type agent_string site_type site_string
+      in
+      let () =
+	Loggers.print_newline (Remanent_parameters.get_logger parameter)
       in
       List.iter (fun rule_id ->
         let error, rule_id_string =
@@ -833,8 +851,10 @@ let print_remove_effect parameter error handler_kappa compiled result =
           with
             _ -> warn parameter error (Some "line 137") Exit (string_of_int rule_id)
         in
-        fprintf (Remanent_parameters.get_log parameter) "(%s * state:no_information)\n" rule_id_string
-      ) l2
+        let () =
+	  Loggers.fprintf (Remanent_parameters.get_logger parameter) "(%s * state:no_information)" rule_id_string
+	in
+	Loggers.print_newline (Remanent_parameters.get_logger parameter)) l2
     ) result
 
 let print_side_effects_aux parameter error handler_kappa compiled result =
@@ -855,16 +875,20 @@ let print_side_effects_aux parameter error handler_kappa compiled result =
     result_remove
 
 let print_side_effects parameter error handler_kappa compiled result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter) 
-    "Sites that may/must occurs side-effects:\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "Sites that may/must occurs side-effects:";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   let error =
     print_side_effects_aux
       parameter
-      error 
+      error
       handler_kappa
       compiled
       result
@@ -875,7 +899,7 @@ let print_side_effects parameter error handler_kappa compiled result =
 (*Potential partner side-effects*)
 
 let print_potential_partner_free parameter error handler_kappa compiled result =
-  Int2Map_potential_effect.Map.iter 
+  Int2Map_potential_effect.Map.iter
     (fun (agent_type, rule_id) l ->
       let error, rule_id_string =
         try
@@ -890,9 +914,12 @@ let print_potential_partner_free parameter error handler_kappa compiled result =
         with
           _ -> warn parameter error (Some "line 194") Exit (string_of_int agent_type)
       in
-      let _ =
-        fprintf stdout "agent_type:%i:%s:%s@(site, free state)\n"
+      let () =
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)  "agent_type:%i:%s:%s@(site, free state)"
           agent_type agent_string rule_id_string
+      in
+      let () =
+	Loggers.print_newline (Remanent_parameters.get_logger parameter)
       in
       List.iter (fun (site_type, state) ->
         let error, site_string =
@@ -907,13 +934,13 @@ let print_potential_partner_free parameter error handler_kappa compiled result =
           with
             _ -> warn parameter error (Some "line 211") Exit (string_of_int state)
         in
-        fprintf (Remanent_parameters.get_log parameter) "(site_type:%i:%s * state:%i(%s))\n" site_type site_string
-          state state_string
+        let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "(site_type:%i:%s * state:%i(%s))\n" site_type site_string state state_string in
+	Loggers.print_newline (Remanent_parameters.get_logger parameter)
       ) l
     ) result
 
 let print_potential_partner_bind parameter error handler_kappa compiled result =
-  Int2Map_potential_effect.Map.iter 
+  Int2Map_potential_effect.Map.iter
     (fun (agent_type, rule_id) l ->
       let error, rule_id_string =
         try
@@ -928,9 +955,12 @@ let print_potential_partner_bind parameter error handler_kappa compiled result =
         with
           _ -> warn parameter error (Some "line 232") Exit (string_of_int agent_type)
       in
-      let _ =
-        fprintf (Remanent_parameters.get_log parameter) "agent_type:%i:%s:%s@(site, binding state)\n"
+      let () =
+        Loggers.fprintf (Remanent_parameters.get_logger parameter) "agent_type:%i:%s:%s@(site, binding state)"
           agent_type agent_string rule_id_string
+      in
+      let () =
+	Loggers.print_newline (Remanent_parameters.get_logger parameter)
       in
       List.iter (fun (site_type, state) ->
         let error, site_string =
@@ -939,35 +969,42 @@ let print_potential_partner_bind parameter error handler_kappa compiled result =
           with
             _ -> warn parameter error (Some "line 243") Exit (string_of_int site_type)
         in
-         let error, state_string =
-           try
-             Handler.string_of_state parameter error handler_kappa agent_type site_type state
+        let error, state_string =
+          try
+            Handler.string_of_state parameter error handler_kappa agent_type site_type state
            with
              _ -> warn parameter error (Some "line 249") Exit (string_of_int state)
         in
-        fprintf (Remanent_parameters.get_log parameter) "(site_type:%i:%s * state:%i(%s))\n" 
-          site_type site_string state state_string
+        let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "(site_type:%i:%s * state:%i(%s))"
+           site_type site_string state state_string in
+	Loggers.print_newline (Remanent_parameters.get_logger parameter)
       ) l
     ) result
 
 let print_potential_side_effects parameter error handler_kappa compiled result =
   let result1, result2 = result in
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter) 
-    "Sites that may/must occurs in the potential partner side-effects:\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  fprintf stdout "- Potential partner has site that is free:\n";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "Sites that may/must occurs in the potential partner side-effects:";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter) "- Potential partner has site that is free:";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   let _ =
     print_potential_partner_free
       parameter
-      error 
+      error
       handler_kappa
       compiled
       result1
   in
-  fprintf stdout "- Potential partner has site that is bind:\n";
+  Loggers.fprintf (Remanent_parameters.get_logger parameter) "- Potential partner has site that is bind:\n";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   print_potential_partner_bind
     parameter
     error
@@ -995,10 +1032,13 @@ let print_modification_sites_aux parameter error handler_kappa compiled result =
         with
           _ -> warn parameter error (Some "line 299") Exit (string_of_int site_type)
       in
-      let _ =
-        fprintf (Remanent_parameters.get_log parameter) 
-          "agent_id:%i:agent_type:%i:%s:site_type:%i:%s@set of rule_id:\n"
-          agent_id agent_type agent_string site_type site_string 
+      let () =
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "agent_id:%i:agent_type:%i:%s:site_type:%i:%s@set of rule_id:"
+          agent_id agent_type agent_string site_type site_string
+      in
+      let () =
+	Loggers.print_newline (Remanent_parameters.get_logger parameter)
       in
       Site_map_and_set.Set.iter
         (fun rule_id ->
@@ -1009,17 +1049,21 @@ let print_modification_sites_aux parameter error handler_kappa compiled result =
             with
               _ -> warn parameter error (Some "line 313") Exit (string_of_int rule_id)
           in
-          fprintf (Remanent_parameters.get_log parameter) "%s\n" rule_id_string
+          let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "%s\n" rule_id_string in
+	  Loggers.print_newline (Remanent_parameters.get_logger parameter)
         ) s2
     ) result
 
 let print_modification_sites parameter error handler_kappa compiled result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "Set of rules that may modify a given site (excluding created agents):\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "Set of rules that may modify a given site (excluding created agents):";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   let () =
     print_modification_sites_aux
       parameter
@@ -1046,10 +1090,13 @@ let print_modification_map_aux parameter error handler_kappa compiled result =
         with
           _ -> warn parameter error (Some "line 350") Exit (string_of_int site_type)
       in
-      let _ =
-        fprintf (Remanent_parameters.get_log parameter)  
-          "agent_type:%i:%s:site_type:%i:%s@set of rules:\n"
+      let () =
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "agent_type:%i:%s:site_type:%i:%s@set of rules:"
           agent_type agent_string site_type site_string
+      in
+      let () =
+	 Loggers.print_newline (Remanent_parameters.get_logger parameter)
       in
       Site_map_and_set.Set.iter
         (fun rule_id ->
@@ -1060,17 +1107,21 @@ let print_modification_map_aux parameter error handler_kappa compiled result =
             with
               _ -> warn parameter error (Some "line 364") Exit (string_of_int rule_id)
           in
-          fprintf (Remanent_parameters.get_log parameter) "%s\n" rule_id_string
+          let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "%s" rule_id_string in
+	  Loggers.print_newline (Remanent_parameters.get_logger parameter)
         ) s2
     ) result
 
 let print_modification_map parameter error handler_kappa compiled result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "Set of rules that may modify a given site (excluding created agents, without agent_id):\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "Set of rules that may modify a given site (excluding created agents, without agent_id):";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   let () =
     print_modification_map_aux
       parameter
@@ -1086,14 +1137,17 @@ let print_modification_map parameter error handler_kappa compiled result =
 
 (*with agent_id*)
 let print_test_sites parameter error handler_kappa compiled result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "Set of rules that may test a given site:\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "Set of rules that may test a given site:";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   let () =
-    print_modification_sites_aux 
+    print_modification_sites_aux
       parameter
       error
       handler_kappa
@@ -1104,14 +1158,17 @@ let print_test_sites parameter error handler_kappa compiled result =
 
 (*without agent_id*)
 let print_test_map parameter error handler_kappa compiled result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "Set of rules that may test a given site (without agent_id):\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "Set of rules that may test a given site (without agent_id):";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   let () =
-    print_modification_map_aux 
+    print_modification_map_aux
       parameter
       error
       handler_kappa
@@ -1125,12 +1182,15 @@ let print_test_map parameter error handler_kappa compiled result =
 
 (*with agent_id*)
 let print_test_modification_sites parameter error handler_kappa compiled result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "Set of rules that may test and modify a given site (excluding created agents):\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "Set of rules that may test and modify a given site (excluding created agents):";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   let () =
     print_modification_sites_aux
       parameter
@@ -1144,12 +1204,15 @@ let print_test_modification_sites parameter error handler_kappa compiled result 
 (*without agent_id*)
 
 let print_test_modification_map parameter error handler_kappa compiled result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "Set of rules that may test and modify a given site (excluding created agents, without agent_id):\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "Set of rules that may test and modify a given site (excluding created agents, without agent_id):";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   let () =
     print_modification_map_aux
       parameter

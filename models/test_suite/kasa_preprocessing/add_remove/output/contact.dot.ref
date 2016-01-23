@@ -8,10 +8,10 @@
 graph G{ 
 subgraph cluster0 {
    0.0 [style = filled label = "x" shape =ellipse color = green size = "5"]
-label =  "A";  shape = rectangle; color = red 
+label =  "A";  shape = rectangle; color = red
 } ; 
 subgraph cluster1 {
    1.0 [style = filled label = "x" shape =ellipse color = green size = "5"]
-label =  "B";  shape = rectangle; color = red 
+label =  "B";  shape = rectangle; color = red
 } ; 
 }

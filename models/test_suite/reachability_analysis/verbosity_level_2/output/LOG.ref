@@ -59,8 +59,6 @@ Reachability analysis...
 ------------------------------------------------------------
 rule 7: KO will never be applied.
 
-Reachability analysis result ....
-
 ------------------------------------------------------------
 * Cartesian decomposition:
 ------------------------------------------------------------
@@ -73,8 +71,7 @@ In agent A, the internal state of site x, the internal state of site y, and the 
 	A(x~p,y~p,z~u)
 	A(x~u,y~u,z~u)
 
-------------------------------------------------------------
-* Cartesian abstraction:
+------------------------------------------------------------* Cartesian abstraction:
 ------------------------------------------------------------
 The internal state of site x in agent A ranges over u, p, 0, and q.
 The internal state of site y in agent A ranges over u, p, and q.

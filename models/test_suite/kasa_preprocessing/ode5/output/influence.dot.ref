@@ -13,10 +13,11 @@ node [shape=box, style=filled, fillcolor=lightskyblue];
 "r3" ; 
 "r4" ; 
 edge [color=green, arrowhead=normal];
-"r0" -> "r2"[label ="[1->0]"] ; 
-"r0" -> "r4"[label ="[0->1]"] ; 
-"r1" -> "r3"[label ="[1->0]"] ; 
-"r1" -> "r4"[label ="[0->1]"] ; 
-"r2" -> "r4"[label ="[1->0]"] ; 
-"r3" -> "r4"[label ="[1->0]"] ; 
+"r0" -> "r2"[label ="[1->0]"] ;
+"r0" -> "r4"[label ="[0->1]"] ;
+"r1" -> "r3"[label ="[1->0]"] ;
+"r1" -> "r4"[label ="[0->1]"] ;
+"r2" -> "r4"[label ="[1->0]"] ;
+"r3" -> "r4"[label ="[1->0]"] ;
+
 }

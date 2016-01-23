@@ -225,7 +225,7 @@ let dump_valuation parameter handler_kappa handler_bdu error
 	in
 	let () =
           Mvbdu_wrapper.Mvbdu.print_association_list
-            stdout prefix valuation in
+            parameter prefix valuation in
 	let () =
           Loggers.fprintf (Remanent_parameters.get_logger parameter)
             "%sEXTENSIONAL DESCRIPTION:" prefix

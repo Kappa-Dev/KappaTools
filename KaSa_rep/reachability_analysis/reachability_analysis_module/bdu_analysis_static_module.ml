@@ -2,18 +2,18 @@
   * bdu_analysis_main.ml
   * openkappa
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
-  * 
+  *
   * Creation: 2016, the 19th of Januaray
-  * Last modification: 
-  * 
+  * Last modification:
+  *
   * Compute the relations between sites in the BDU data structures
-  * 
-  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et   
-  * en Automatique.  All rights reserved.  This file is distributed     
+  *
+  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et
+  * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
 let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "BDU analysis") message exn (fun () -> default)  
+  Exception.warn parameters mh (Some "BDU analysis") message exn (fun () -> default)
 
 let trace = false
 
@@ -24,15 +24,15 @@ open Bdu_analysis_static_type
 
 module type Bdu_analysis_Static =
 sig
-  
+
   val init_bdu_analysis_static : Exception.method_handler
     -> Exception.method_handler * bdu_analysis_static
 
   val collect_covering_classes_id : Remanent_parameters_sig.parameters
-    -> Exception.method_handler 
+    -> Exception.method_handler
     -> Covering_classes_type.remanent Covering_classes_type.AgentMap.t
     -> Exception.method_handler * (int list * int list) Int2Map_CV.Map.t
-      
+
   val collect_side_effects : Remanent_parameters_sig.parameters
     -> Exception.method_handler
     -> Cckappa_sig.kappa_handler
@@ -54,7 +54,7 @@ sig
     -> int
     -> Cckappa_sig.rule
     -> (int list * Cckappa_sig.Site_map_and_set.Set.t) Int2Map_Modif.Map.t
-    -> Exception.method_handler * 
+    -> Exception.method_handler *
     (int list * Cckappa_sig.Site_map_and_set.Set.t) Int2Map_Modif.Map.t
 
   val collect_test_sites : Remanent_parameters_sig.parameters
@@ -62,7 +62,7 @@ sig
     -> int
     -> Cckappa_sig.rule
     -> (int list * Cckappa_sig.Site_map_and_set.Set.t) Int2Map_Modif.Map.t
-    -> Exception.method_handler * 
+    -> Exception.method_handler *
     (int list * Cckappa_sig.Site_map_and_set.Set.t) Int2Map_Modif.Map.t
 
   val collect_test_modification_sites : Remanent_parameters_sig.parameters
@@ -84,12 +84,12 @@ sig
     -> (int list * Cckappa_sig.Site_map_and_set.Set.t) Int2Map_Modif.Map.t
     -> Exception.method_handler *
     (int list * Cckappa_sig.Site_map_and_set.Set.t) Int2Map_Test_Modif.Map.t
-      
+
   val collect_test_modif_map : Remanent_parameters_sig.parameters
     -> Exception.method_handler
     -> (int list * Cckappa_sig.Site_map_and_set.Set.t) Int2Map_Modif.Map.t
     -> Exception.method_handler *
-    (int list * Cckappa_sig.Site_map_and_set.Set.t) Int2Map_Test_Modif.Map.t      
+    (int list * Cckappa_sig.Site_map_and_set.Set.t) Int2Map_Test_Modif.Map.t
 
   val scan_rule_static : Remanent_parameters_sig.parameters
     -> Exception.method_handler
@@ -189,7 +189,7 @@ module Bdu_analysis_Static =
       let init_modif_map           = Int2Map_Test_Modif.Map.empty in
       let init_test_map            = Int2Map_Test_Modif.Map.empty in
       let init_test_modif_map      = Int2Map_Test_Modif.Map.empty in
-      error, 
+      error,
       {
         store_covering_classes_id    = init_covering_classes_id;
         store_side_effects           = (init_half_break, init_remove);
@@ -205,11 +205,11 @@ module Bdu_analysis_Static =
     let collect_covering_classes_id parameter error covering_classes =
       Bdu_analysis_static_operations.collect_covering_classes_id
         parameter error covering_classes
-        
+
     let collect_side_effects parameter error handler_kappa rule_id rule store_result =
       Bdu_analysis_static_operations.collect_side_effects parameter error
         handler_kappa rule_id rule store_result
-        
+
     let collect_potential_side_effects parameter error handler_kappa rule_id rule
         store_result =
       Bdu_analysis_static_operations.collect_potential_side_effects
@@ -231,7 +231,7 @@ module Bdu_analysis_Static =
     let collect_modif_map parameter error store_modification_sites =
       Bdu_analysis_static_operations.collect_modif_map
         parameter error store_modification_sites
-        
+
     let collect_test_map parameter error store_test_sites =
       Bdu_analysis_static_operations.collect_test_map
         parameter error store_test_sites
@@ -242,7 +242,7 @@ module Bdu_analysis_Static =
 
     let scan_rule_static parameter error handler_kappa rule_id rule covering_classes
         store_result=
-      let error, store_covering_classes_id = 
+      let error, store_covering_classes_id =
         collect_covering_classes_id
           parameter
           error
@@ -308,7 +308,7 @@ module Bdu_analysis_Static =
           error
           store_test_modification_sites
       in
-      error, 
+      error,
       {
         store_covering_classes_id    = store_covering_classes_id;
         store_side_effects           = store_side_effects;
@@ -326,7 +326,7 @@ module Bdu_analysis_Static =
     let print_covering_classes_id parameter error handler_kappa result =
       Bdu_analysis_static_operations.print_covering_classes_id
         parameter error handler_kappa result
-        
+
     let print_side_effects parameter error handler_kappa compiled result =
       Bdu_analysis_static_operations.print_side_effects
         parameter error handler_kappa compiled result
@@ -350,7 +350,7 @@ module Bdu_analysis_Static =
     let print_modif_map parameter error handler_kappa compiled result =
       Bdu_analysis_static_operations.print_modification_map
         parameter error handler_kappa compiled result
-        
+
     let print_test_map parameter error handler_kappa compiled result =
       Bdu_analysis_static_operations.print_test_map
         parameter error handler_kappa compiled result
@@ -361,16 +361,21 @@ module Bdu_analysis_Static =
 
     let print_bdu_analysis_static parameter error handler_kappa compiled result =
       let () =
-        Printf.fprintf (Remanent_parameters.get_log parameter)
-          "============================================================\n";
-        Printf.fprintf (Remanent_parameters.get_log parameter) "* BDU Analysis:\n";
-        Printf.fprintf (Remanent_parameters.get_log parameter)
-          "============================================================\n";
-        Printf.fprintf (Remanent_parameters.get_log parameter)
-          "\n** Static information:\n";
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "============================================================";
+	Loggers.print_newline (Remanent_parameters.get_logger parameter);
+        Loggers.fprintf (Remanent_parameters.get_logger parameter) "* BDU Analysis:";
+	Loggers.print_newline (Remanent_parameters.get_logger parameter);
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "============================================================";
+        Loggers.print_newline (Remanent_parameters.get_logger parameter);
+	Loggers.print_newline (Remanent_parameters.get_logger parameter);
+	Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "** Static information:";
+	Loggers.print_newline (Remanent_parameters.get_logger parameter)
       in
       let () =
-        print_covering_classes_id parameter error handler_kappa 
+        print_covering_classes_id parameter error handler_kappa
           result.store_covering_classes_id
       in
       let () =

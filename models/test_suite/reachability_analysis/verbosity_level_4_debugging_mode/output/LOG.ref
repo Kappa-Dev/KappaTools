@@ -2,9 +2,9 @@ Parsing verbosity.ka...
 done
 Scan rules!
 Signature:
-Signature:agents: 
+Signature:agents:
 Signature:agents:agent_type:0:A
-Signature:sites: 
+Signature:sites:
 Signature:sites:agent_type:0:
 Signature:sites:agent_type:0:site_type:0->x(internal state)
 Signature:sites:agent_type:0:site_type:1->y(internal state)
@@ -295,18 +295,28 @@ Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:5->[0]
 Quarks:site_modif-:agent_type:0,site_type:1,state:2,rule:7->[0]
 Quarks:site_modif-:agent_type:0,site_type:2,state:0,rule:3->[0]
 Quarks:site_modif-:agent_type:0,site_type:2,state:0,rule:6->[0]
+Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Influence_map:Wake_up_map:rule(0):'' ->A(x~u,y~u,z~u) -> rule(1):'' A(x~u)->A(x~p)[0->0]
+
 Influence_map:Wake_up_map:rule(0):'' ->A(x~u,y~u,z~u) -> rule(4):'' A(x~u)->A(x~q)[0->0]
+
 Influence_map:Wake_up_map:rule(1):'' A(x~u)->A(x~p) -> rule(2):'' A(x~p,y~u)->A(x~p,y~p)[0->0]
+
 Influence_map:Wake_up_map:rule(1):'' A(x~u)->A(x~p) -> rule(3):'' A(x~p,y~p,z~u)->A(x~0,y~p,z~q)[0->0]
+
 Influence_map:Wake_up_map:rule(2):'' A(x~p,y~u)->A(x~p,y~p) -> rule(3):'' A(x~p,y~p,z~u)->A(x~0,y~p,z~q)[0->0]
+
 Influence_map:Wake_up_map:rule(4):'' A(x~u)->A(x~q) -> rule(5):'' A(x~q,y~u)->A(x~q,y~q)[0->0]
+
 Influence_map:Wake_up_map:rule(5):'' A(x~q,y~u)->A(x~q,y~q) -> rule(6):'' A(y~q,z~u)->A(y~q,z~q)[0->0]
+
 Influence_map:Inhibition_map:rule(1):'' A(x~u)->A(x~p) -> rule(4):'' A(x~u)->A(x~q)[0->0]
+
 Influence_map:Inhibition_map:rule(4):'' A(x~u)->A(x~q) -> rule(1):'' A(x~u)->A(x~p)[0->0]
+
 Influence_map:Inhibition_map:rule(7):'KO' A(x~0,y~q)->A(x~1,y~0) -> rule(6):'' A(y~q,z~u)->A(y~q,z~q)[0->0]
-Refining the influence map...
+
 Reachability analysis...
 
 Reachability analysis static information ....
@@ -758,8 +768,6 @@ rule 6
 ------------------------------------------------------------
 rule 7: KO will never be applied.
 
-Reachability analysis result ....
-
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
@@ -1036,8 +1044,7 @@ In agent A, the internal state of site x, the internal state of site y, and the 
 	A(x~p,y~p,z~u)
 	A(x~u,y~u,z~u)
 
-------------------------------------------------------------
-* Cartesian abstraction:
+------------------------------------------------------------* Cartesian abstraction:
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:

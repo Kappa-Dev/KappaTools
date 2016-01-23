@@ -137,7 +137,7 @@ let print_modif_list_map parameter error result =
       let () =
 	Loggers.print_newline (Remanent_parameters.get_logger parameter)
       in
-      Mvbdu_wrapper.Mvbdu.print_association_list stdout "" list_a
+      Mvbdu_wrapper.Mvbdu.print_association_list parameter "" list_a
     ) result
 
 (************************************************************************************)
@@ -152,7 +152,7 @@ let print_potential_bdu_map parameter error result =
           agent_type site_type rule_id cv_id
       in
       Mvbdu_wrapper.Mvbdu.print stdout "" bdu_potential;
-      Mvbdu_wrapper.Mvbdu.print_association_list stdout "" list
+      Mvbdu_wrapper.Mvbdu.print_association_list parameter "" list
     ) result
 
 (*projection*)
@@ -170,7 +170,7 @@ let print_proj_potential_bdu_map parameter error result =
           in
 	  let _ = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
           Mvbdu_wrapper.Mvbdu.print stdout "" bdu_potential;
-	  Mvbdu_wrapper.Mvbdu.print_association_list stdout "" list
+	  Mvbdu_wrapper.Mvbdu.print_association_list parameter "" list
         ) map_b
     ) result
 

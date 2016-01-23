@@ -13,7 +13,9 @@ node [shape=ellipse, style=filled, fillcolor=palegreen3];
 "Apu" ; 
 "App" ; 
 edge [color=green, arrowhead=normal];
-"r0" -> "App"[label ="[0->0]"] ; 
+"r0" -> "App"[label ="[0->0]"] ;
+
 edge [color=red, arrowhead=tee];
 "r0" -> "Auu"[label ="[0->0]"] ; 
+
 }

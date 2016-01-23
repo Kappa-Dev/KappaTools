@@ -11,8 +11,10 @@ node [shape=box, style=filled, fillcolor=lightskyblue];
 "1:A(x~u,y~u)->A(x~u,y~p)" ; 
 "2:A(x~p,y~u)->D(x~u)" ; 
 edge [color=green, arrowhead=normal];
-"0:A(x~u,y~u)->A(x~p,y~u)" -> "2:A(x~p,y~u)->D(x~u)"[label ="[0->0]"] ; 
+"0:A(x~u,y~u)->A(x~p,y~u)" -> "2:A(x~p,y~u)->D(x~u)"[label ="[0->0]"] ;
+
 edge [color=red, arrowhead=tee];
 "0:A(x~u,y~u)->A(x~p,y~u)" -> "1:A(x~u,y~u)->A(x~u,y~p)"[label ="[0->0]"] ; 
 "1:A(x~u,y~u)->A(x~u,y~p)" -> "0:A(x~u,y~u)->A(x~p,y~u)"[label ="[0->0]"] ; 
+
 }

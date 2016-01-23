@@ -9,17 +9,17 @@ graph G{
 subgraph cluster0 {
    0.0 [style = filled label = "x" shape =ellipse color = green size = "5"]
    0.1 [style = filled label = "x" shape =circle color = yellow size = "5"]
-label =  "A";  shape = rectangle; color = red 
+label =  "A";  shape = rectangle; color = red
 } ; 
 subgraph cluster1 {
    1.0 [style = filled label = "x" shape =ellipse color = green size = "5"]
-label =  "B";  shape = rectangle; color = red 
+label =  "B";  shape = rectangle; color = red
 } ; 
 subgraph cluster2 {
-label =  "D";  shape = rectangle; color = red 
+label =  "D";  shape = rectangle; color = red
 } ; 
 subgraph cluster3 {
    3.0 [style = filled label = "x" shape =circle color = yellow size = "5"]
-label =  "E";  shape = rectangle; color = red 
+label =  "E";  shape = rectangle; color = red
 } ; 
 }
