@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <2016-01-21 16:45:00 feret>
+  * Last modification: Time-stamp: <2016-01-22 17:49:39 feret>
   * *
   * Configuration parameters which are passed through functions computation
 
@@ -188,22 +188,23 @@ let open_tasks_profiling =
   in
   f
 
-let get_parameters ?called_from:(called_from=Remanent_parameters_sig.KaSa) () =
-  let channel =
+let get_parameters ?html_mode:(html_mode=true) ?called_from:(called_from=Remanent_parameters_sig.KaSa) () =
+  let channel,html_mode =
     match
       called_from
     with
-    | Remanent_parameters_sig.Internalised -> stdout
-    | Remanent_parameters_sig.KaSim -> open_tasks_profiling ()
+    | Remanent_parameters_sig.JS -> None,true
+    | Remanent_parameters_sig.Internalised -> Some stdout,false || html_mode
+    | Remanent_parameters_sig.KaSim -> Some (open_tasks_profiling ()), false || html_mode
     | Remanent_parameters_sig.KaSa ->
        begin
 	 match
-	   !Config.output_directory,"profiling.txt" (*temporary, to do: provide a parameterisable filename*)
+	   !Config.output_directory,"profiling.html" (*temporary, to do: provide a parameterisable filename*)
 	 with
-	 | _,"" -> stdout
-	 | "",a -> open_out a
-	 | a,b -> open_out (a^"/"^b)
-       end
+	 | _,"" -> Some stdout
+	 | "",a -> Some (open_out a)
+	 | a,b -> Some (open_out (a^"/"^b))
+       end, false || html_mode
   in
   { Remanent_parameters_sig.marshalisable_parameters =
       {
@@ -245,12 +246,17 @@ let get_parameters ?called_from:(called_from=Remanent_parameters_sig.KaSa) () =
 	Remanent_parameters_sig.contact_map_accuracy_level = fetch_accuracy_level Config.contact_map_accuracy_level ;
 	Remanent_parameters_sig.view_accuracy_level = fetch_accuracy_level Config.view_accuracy_level ;
         Remanent_parameters_sig.called_from = called_from ;
-      } ;
-    Remanent_parameters_sig.log    = !Config.log ;
-    Remanent_parameters_sig.formatter = !Config.formatter ;
-    Remanent_parameters_sig.profiling_info_channel = channel ;
-    Remanent_parameters_sig.profiling_info_formatter =
-      Format.formatter_of_out_channel channel
+	Remanent_parameters_sig.html_mode = html_mode ;
+     } ;
+    Remanent_parameters_sig.logger = Loggers.open_logger_from_formatter !Config.formatter ;
+    Remanent_parameters_sig.compression_status = Loggers.dummy_txt_logger;
+    Remanent_parameters_sig.profiler =
+      match
+	channel
+      with
+      | None -> Loggers.dummy_txt_logger
+      | Some a ->
+	Loggers.open_logger_from_channel a
   }
 
 let dummy_parameters =
@@ -376,9 +382,10 @@ let get_command_line_1                               marshalisable =
   marshalisable.Remanent_parameters_sig.command_line
 
 let get_marshalisable parameter = parameter.Remanent_parameters_sig.marshalisable_parameters
-let get_log parameter = parameter.Remanent_parameters_sig.log
-let get_formatter parameter = parameter.Remanent_parameters_sig.formatter
-let set_formatter parameter logger = {parameter with Remanent_parameters_sig.formatter = logger}
+let get_logger parameter = parameter.Remanent_parameters_sig.logger
+
+(*let get_formatter parameter = parameter.Remanent_parameters_sig.formatter
+let set_formatter parameter logger = {parameter with Remanent_parameters_sig.formatter = logger}*)
 
 let upgrade_from_marshal_field f = compose f get_marshalisable
 
@@ -415,7 +422,7 @@ let get_link_mode = upgrade_from_marshal_field get_link_mode_1
 let get_contact_map_accuracy_level = upgrade_from_marshal_field get_contact_map_accuracy_level_1
 let get_influence_map_accuracy_level = upgrade_from_marshal_field get_influence_map_accuracy_level_1
 let get_view_accuracy_level = upgrade_from_marshal_field get_view_accuracy_level_1
-							
+
 let upgrade_from_influence_map_field f = compose f get_influence_map
 let upgrade_from_contact_map_field f = compose f get_contact_map
 let upgrade_from_symbols_field f = compose f get_symbols
@@ -513,23 +520,29 @@ let update_call_stack parameters bool name =
 	  (set_trace parameters rep_bool)
 	  (x::(get_call_stack parameters))
 
-let open_file parameters error =
+(*let open_file parameters error =
   let error,channel =
     match get_file parameters
     with
-      | None -> error,stdout
-      | Some a -> error,open_out a
+    | None -> error,stdout
+    | Some a -> error,open_out a
   in
-  error,{parameters with Remanent_parameters_sig.log = channel}
+  error,{parameters with Remanent_parameters_sig.log = Some channel}
 
 let close_file parameters error =
-  let channel = get_log parameters in
-  if channel = stdout
-  then
-    error,parameters
-  else
-    let _ = close_out channel in
-    error, {parameters with Remanent_parameters_sig.log = !Config.log}
+  let channel_opt = get_log parameters in
+  match channel_opt
+  with
+  | None -> error, parameters
+  | Some channel ->
+    begin
+      if channel = stdout
+      then
+	error, parameters
+      else
+	let () = close_out channel in
+	error, {parameters with Remanent_parameters_sig.log = Some !Config.log}
+    end*)
 
 let open_influence_map_file parameters error =
   let error,channel =
@@ -539,10 +552,12 @@ let open_influence_map_file parameters error =
       | Some a,None -> error,open_out a
       | Some a,Some d -> error,open_out (d^a)
   in
-    error,
-    {parameters with Remanent_parameters_sig.log = channel}
+  let logger = Loggers.open_logger_from_channel channel
+  in
+  error,
+  {parameters with Remanent_parameters_sig.logger = logger}
 
- let open_contact_map_file parameters error =
+let open_contact_map_file parameters error =
   let error,channel =
     match get_cm_file parameters,get_cm_directory parameters
     with
@@ -551,10 +566,14 @@ let open_influence_map_file parameters error =
       | Some a,Some d -> error,open_out (d^a)
   in
     error,
-    {parameters with Remanent_parameters_sig.log = channel}
+    {
+      parameters
+     with
+       Remanent_parameters_sig.logger =
+	Loggers.open_logger_from_channel channel}
 
  let persistent_mode = false
-			
+
  let lexical_analysis_of_tested_only_patterns_is_required_by_the_influence_map parameter =
    (get_influence_map_accuracy_level parameter = Remanent_parameters_sig.Medium) &&
      (get_do_influence_map parameter)
@@ -572,5 +591,8 @@ let open_influence_map_file parameters error =
    || lexical_analysis_of_tested_only_patterns_is_required_by_the_influence_map parameter
 
 
-let get_tasks_profiling_info_logger parameter = parameter.Remanent_parameters_sig.profiling_info_formatter
-let get_tasks_profiling_info_channel parameter = parameter.Remanent_parameters_sig.profiling_info_channel
+ let get_profiler parameter = parameter.Remanent_parameters_sig.profiler
+ let get_compression_status_logger parameter = parameter.Remanent_parameters_sig.compression_status
+
+ let set_logger parameter logger =
+   { parameter with Remanent_parameters_sig.logger = logger}

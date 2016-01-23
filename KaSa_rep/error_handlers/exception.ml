@@ -2,39 +2,39 @@
     * exception.ml
     * openkappa
     * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
-    * 
+    *
     * Creation: 08/03/2010
     * Last modification: 05/02/2015
-    * * 
-    * This library declares exceptions 
-    *  
-    * Copyright 2010 Institut National de Recherche en Informatique et   
-    * en Automatique.  All rights reserved.  This file is distributed     
+    * *
+    * This library declares exceptions
+    *
+    * Copyright 2010 Institut National de Recherche en Informatique et
+    * en Automatique.  All rights reserved.  This file is distributed
     *  under the terms of the GNU Library General Public License *)
 
 
-type uncaught_exception = 
+type uncaught_exception =
     {file_name:string option;
      message:string option;
      alarm: exn}
-     
+
 exception Uncaught_exception of uncaught_exception
-  
-type caught_exception =  
+
+type caught_exception =
   {uncaught_exception: uncaught_exception;
    calling_stack: string list}
-  
+
 exception Caught_exception of caught_exception
-  
-let raise_exception file_name key message exn = 
-  raise 
-    (Uncaught_exception 
+
+let raise_exception file_name key message exn =
+  raise
+    (Uncaught_exception
       {file_name=file_name;
         message=message;
         alarm=exn})
-  
-let rec stringlist_of_exception x stack = 
-  match x with 
+
+let rec stringlist_of_exception x stack =
+  match x with
       Exit -> "Exit"::stack
     | Not_found -> "Not_found"::stack
     | Arg.Bad x -> "Arg.Bad("::x::")"::stack
@@ -51,130 +51,141 @@ let rec stringlist_of_exception x stack =
     | Unix.Unix_error _ -> "Unix.Unix.error"::stack
     | Failure x -> "Failure("::x::")"::stack
     | Stack_overflow -> "Stack_overflow"::stack
-    | Caught_exception x  -> "Caught_exception("::(stringlist_of_caught x (")"::stack)) 
+    | Caught_exception x  -> "Caught_exception("::(stringlist_of_caught x (")"::stack))
     | Uncaught_exception x  -> "Uncaught_exception("::(stringlist_of_uncaught x (")"::stack))
     | _ -> "Unknown"::stack
-and stringlist_of_uncaught x stack = 
-    (match x.file_name with 
+and stringlist_of_uncaught x stack =
+    (match x.file_name with
         None -> ""
     | Some file_name -> "file_name: "^file_name^"; ")
-    ::(match x.message with 
+    ::(match x.message with
         None -> ""
     | Some message -> "message: "^message^"; ")
     ::"exception:"
-    ::(stringlist_of_exception x.alarm stack) 
-and stringlist_of_caught x stack = 
+    ::(stringlist_of_exception x.alarm stack)
+and stringlist_of_caught x stack =
   "calling_stack: "
-  ::(List.fold_left 
-      (fun sol string -> string::", "::sol) 
+  ::(List.fold_left
+      (fun sol string -> string::", "::sol)
       ("; "::(stringlist_of_uncaught x.uncaught_exception ("; "::stack))))
-      x.calling_stack  
+      x.calling_stack
 
-and stringlist_of_uncaught_light x stack = 
-    (match x.file_name with 
+and stringlist_of_uncaught_light x stack =
+    (match x.file_name with
         None -> ""
     | Some file_name -> "file_name: "^file_name^"; ")
-    ::(match x.message with 
+    ::(match x.message with
         None -> ""
     | Some message -> "message: "^message^"; ")
     ::"exception:"
-    ::(stringlist_of_exception x.alarm stack) 
-and stringlist_of_caught_light x stack = 
+    ::(stringlist_of_exception x.alarm stack)
+and stringlist_of_caught_light x stack =
   "calling_stack: "
-  ::(List.fold_left 
-      (fun sol string -> string::", "::sol) 
+  ::(List.fold_left
+      (fun sol string -> string::", "::sol)
       ("; "::(stringlist_of_uncaught x.uncaught_exception ("; "::stack))))
-      x.calling_stack 
-  
-type method_handler = 
+      x.calling_stack
+
+type method_handler =
   {mh_caught_error_list:caught_exception list;
    mh_uncaught_error_list:uncaught_exception list;
    mh_calling_stack: string list}
 
-let empty_error_handler = 
+let empty_error_handler =
   {mh_caught_error_list=[];
    mh_uncaught_error_list=[];
    mh_calling_stack=[]}
-  
-let handle_errors method_handler f x default = 
-  try 
-    f x,method_handler 
-  with 
+
+let handle_errors method_handler f x default =
+  try
+    f x,method_handler
+  with
      Uncaught_exception exn ->
-      let error = 
-        {calling_stack = method_handler.mh_calling_stack; 
-         uncaught_exception = exn} in 
+      let error =
+        {calling_stack = method_handler.mh_calling_stack;
+         uncaught_exception = exn} in
     default,
     {method_handler with  mh_caught_error_list = error::method_handler.mh_caught_error_list}
-    
-    
-let safe_warn parameters error_handler file message exn default = 
+
+
+let safe_warn parameters error_handler file message exn default =
   let uncaught = {file_name = file;
                             message = message;
                             alarm = exn}
-  in 
-  let stringlist = stringlist_of_uncaught uncaught [Remanent_parameters.get_prefix parameters] in 
-  let _ = List.iter (Printf.fprintf (Remanent_parameters.get_log parameters) "%s") stringlist in 
-  let _ = Printf.fprintf  (Remanent_parameters.get_log parameters) "\n" in 
-    raise (Uncaught_exception {file_name = file;
-                            message = message;
-                            alarm = exn})
- 
+  in
+  let stringlist = stringlist_of_uncaught uncaught [Remanent_parameters.get_prefix parameters] in
+  let _ =
+    List.iter
+      (Loggers.fprintf
+	 (Remanent_parameters.get_logger parameters) "%s")
+      stringlist
+  in
+  let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
+  raise (Uncaught_exception
+	   {
+	     file_name = file;
+             message = message;
+             alarm = exn
+	   })
+
 let unsafe_warn parameters error_handler file message exn default =
-  {error_handler 
-  with mh_uncaught_error_list = 
+  {error_handler
+  with
+    mh_uncaught_error_list =
       {file_name = file;
        message = message;
-       alarm = exn}::error_handler.mh_uncaught_error_list},default ()  
-    
+       alarm = exn}::error_handler.mh_uncaught_error_list},default ()
+
 let warn parameters =
-  if Remanent_parameters.get_unsafe parameters 
-  then unsafe_warn parameters 
-  else safe_warn parameters 
+  if Remanent_parameters.get_unsafe parameters
+  then unsafe_warn parameters
+  else safe_warn parameters
 
 let print_for_KaSim parameters handlers =
-  let parameters = Remanent_parameters.update_prefix parameters "error: " in   
-  let _ = 
-    List.iter 
-      (fun caught -> 
-       let stringlist = (Remanent_parameters.get_prefix parameters)::(stringlist_of_caught caught []) in 
-       let _ = List.iter (Printf.fprintf (Remanent_parameters.get_log parameters) "%s") stringlist in 
-       let _ = Printf.fprintf  (Remanent_parameters.get_log parameters) "\n" in 
+  let parameters = Remanent_parameters.update_prefix parameters "error: " in
+  let _ =
+    List.iter
+      (fun caught ->
+       let stringlist = (Remanent_parameters.get_prefix parameters)::(stringlist_of_caught caught []) in
+       let _ = List.iter
+	 (Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s") stringlist in
+       let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
        ())
       (List.rev (handlers.mh_caught_error_list))
-  in 
-  let _ = 
-    List.iter 
-      (fun uncaught -> 
-       let stringlist =  (Remanent_parameters.get_prefix parameters)::(stringlist_of_uncaught uncaught []) in 
-       let _ = List.iter (Printf.fprintf (Remanent_parameters.get_log parameters) "%s") stringlist in 
-       let _ = Printf.fprintf  (Remanent_parameters.get_log parameters) "\n" in 
+  in
+  let _ =
+    List.iter
+      (fun uncaught ->
+       let stringlist =  (Remanent_parameters.get_prefix parameters)::(stringlist_of_uncaught uncaught []) in
+       let _ = List.iter (Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s") stringlist in
+       let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
        ())
       (List.rev (handlers.mh_uncaught_error_list))
-  in 
+  in
   ()
-    
-let print parameters handlers =
-  if handlers.mh_caught_error_list = [] && handlers.mh_uncaught_error_list = [] 
-  then 
-    Printf.fprintf (Remanent_parameters.get_log parameters) "%sexecution finished without any exception\n" (Remanent_parameters.get_prefix parameters)
-  else 
-    let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%sSome exceptions have been raised\n" (Remanent_parameters.get_prefix parameters) in 
-    print_for_KaSim parameters handlers
-		    
 
-	
+let print parameters handlers =
+  if handlers.mh_caught_error_list = [] && handlers.mh_uncaught_error_list = []
+  then
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%sexecution finished without any exception" (Remanent_parameters.get_prefix parameters) in
+    let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
+    ()
+  else
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%sSome exceptions have been raised" (Remanent_parameters.get_prefix parameters) in
+    print_for_KaSim parameters handlers
+
 let print_errors_light_for_kasim parameters handlers =
-  if handlers.mh_caught_error_list = [] && handlers.mh_uncaught_error_list = [] 
-  then () 
-  else 
-    let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%sSome exceptions have been raised during the static analysis, please analyse your file with KaSa\n" (Remanent_parameters.get_prefix parameters) in 
+  if handlers.mh_caught_error_list = [] && handlers.mh_uncaught_error_list = []
+  then ()
+  else
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%sSome exceptions have been raised during the static analysis, please analyse your file with KaSa" (Remanent_parameters.get_prefix parameters) in
+    let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
     ()
 
 
 
 let wrap = (fun parameters error string string_opt exn -> fst (warn parameters error (Some string) string_opt exn (fun  () -> ())))
-	      
+
 let lift_error_logs_for_KaSa f = f (fun parameters error string string_opt exn -> fst (warn parameters error (Some string) string_opt exn (fun  () -> ())))
 
 let check warn parameter error error' s exn =

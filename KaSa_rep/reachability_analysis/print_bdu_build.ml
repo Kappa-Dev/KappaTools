@@ -2,14 +2,14 @@
   * print_bdu_build.ml
   * openkappa
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
-  * 
+  *
   * Creation: 2015, the 28th of October
-  * Last modification: 
-  * 
+  * Last modification:
+  *
   * Print relations between sites in the BDU data structures
-  * 
-  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et   
-  * en Automatique.  All rights reserved.  This file is distributed     
+  *
+  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et
+  * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
 open Printf
@@ -19,7 +19,7 @@ open Cckappa_sig
 open Remanent_parameters_sig
 
 let warn parameters mh message exn default =
-  Exception.warn parameters mh (Some "BDU creation") message exn (fun () -> default)  
+  Exception.warn parameters mh (Some "BDU creation") message exn (fun () -> default)
 
 let trace = false
 
@@ -58,20 +58,25 @@ let print_test_bdu_map parameter error result =
   Map_test_bdu.Map.iter
     (fun (agent_id, agent_type, rule_id, cv_id) bdu_test ->
       let _ =
-        fprintf parameter.log
-          "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i\n"
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i"
           agent_id agent_type rule_id cv_id
       in
-      Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_test
+      let _ =
+	Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      in
+      Mvbdu_wrapper.Mvbdu.print stdout "" bdu_test
     ) result
 
 let print_proj_test_bdu_map parameter error result =
   Map_final_test_bdu.Map.iter
     (fun rule_id map_b ->
-      let _ = fprintf parameter.log "rule_id:%i\n" rule_id in
+      let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "rule_id:%i" rule_id in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
       Map_agent_id_test_bdu.Map.iter (fun agent_id bdu_test ->
-        let _ = fprintf parameter.log "agent_id:%i\n" agent_id in
-        Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_test
+        let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter) "agent_id:%i" agent_id in
+	let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+        Mvbdu_wrapper.Mvbdu.print stdout "" bdu_test
       ) map_b
     ) result
 
@@ -82,22 +87,27 @@ let print_creation_bdu_map parameter error result =
   Map_creation_bdu.Map.iter
     (fun (agent_type, rule_id, cv_id) bdu_creation ->
       let _ =
-        fprintf parameter.log "agent_type:%i:rule_id:%i:covering_class_id:%i\n"
+        Loggers.fprintf (Remanent_parameters.get_logger parameter) "agent_type:%i:rule_id:%i:covering_class_id:%i"
           agent_type rule_id cv_id
       in
-      Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_creation
+      let () =
+	Loggers.print_newline (Remanent_parameters.get_logger parameter)
+      in
+      Mvbdu_wrapper.Mvbdu.print stdout "" bdu_creation
     ) result
 
 let print_proj_creation_bdu_map parameter error result =
   Map_final_creation_bdu.Map.iter
     (fun rule_id map_b ->
-      let _ = fprintf parameter.log "rule_id:%i\n" rule_id in
+      let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter) "rule_id:%i" rule_id in
       Map_agent_type_creation_bdu.Map.iter
         (fun (agent_type, cv_id) bdu_creation ->
-          let _ = fprintf parameter.log "agent_type:%i:cv_id:%i\n" 
+          let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter) "agent_type:%i:cv_id:%i"
             agent_type cv_id
           in
-          Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_creation
+	  let _ = Loggers.print_newline (Remanent_parameters.get_logger parameter)
+	  in
+          Mvbdu_wrapper.Mvbdu.print stdout "" bdu_creation
         ) map_b
     ) result
 
@@ -108,10 +118,10 @@ let print_init_bdu_map parameter error result =
   Map_init_bdu.Map.iter
     (fun (agent_type, cv_id) bdu_init ->
       let _ =
-        fprintf parameter.log "agent_type:%i:covering_class_id:%i\n"
+        Loggers.fprintf (Remanent_parameters.get_logger parameter) "agent_type:%i:covering_class_id:%i\n"
           agent_type cv_id
       in
-      Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_init
+      Mvbdu_wrapper.Mvbdu.print stdout "" bdu_init
     ) result
 
 (************************************************************************************)
@@ -120,12 +130,14 @@ let print_init_bdu_map parameter error result =
 let print_modif_list_map parameter error result =
   Map_modif_list.Map.iter
     (fun (agent_id, agent_type, rule_id, cv_id) list_a ->
-      let _ =
-        fprintf parameter.log 
-          "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i\n"
+      let () =
+        Loggers.fprintf (Remanent_parameters.get_logger parameter) "agent_id:%i:agent_type:%i:rule_id:%i:covering_class_id:%i"
           agent_id agent_type rule_id cv_id
       in
-      Mvbdu_wrapper.Mvbdu.print_association_list parameter.log "" list_a
+      let () =
+	Loggers.print_newline (Remanent_parameters.get_logger parameter)
+      in
+      Mvbdu_wrapper.Mvbdu.print_association_list stdout "" list_a
     ) result
 
 (************************************************************************************)
@@ -135,28 +147,30 @@ let print_potential_bdu_map parameter error result =
   Map_potential_bdu.Map.iter
     (fun (agent_type, site_type, rule_id, cv_id) (bdu_potential,list) ->
       let _ =
-        fprintf parameter.log
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)
           "agent_type:%i:new_site_name:%i:rule_id:%i:covering_class_id:%i\n"
           agent_type site_type rule_id cv_id
       in
-      Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_potential;
-      Mvbdu_wrapper.Mvbdu.print_association_list parameter.log "" list
+      Mvbdu_wrapper.Mvbdu.print stdout "" bdu_potential;
+      Mvbdu_wrapper.Mvbdu.print_association_list stdout "" list
     ) result
- 
+
 (*projection*)
 
 let print_proj_potential_bdu_map parameter error result =
   Map_final_potential_bdu.Map.iter
     (fun rule_id map_b ->
-      let _ = fprintf parameter.log "rule_id:%i\n" rule_id in
+      let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter)  "rule_id:%i" rule_id in
+      let _ = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
       Map_agent_type_potential_bdu.Map.iter
         (fun (agent_type, site_type, cv_id) (bdu_potential,list) ->
-          let _ = fprintf parameter.log
-            "agent_type:%i:new_site_name:%i:covering_class_id:%i\n" 
+          let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+            "agent_type:%i:new_site_name:%i:covering_class_id:%i"
             agent_type site_type cv_id
           in
-          Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu_potential;
-	  Mvbdu_wrapper.Mvbdu.print_association_list parameter.log "" list
+	  let _ = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+          Mvbdu_wrapper.Mvbdu.print stdout "" bdu_potential;
+	  Mvbdu_wrapper.Mvbdu.print_association_list stdout "" list
         ) map_b
     ) result
 
@@ -172,7 +186,7 @@ let print_proj_potential_bdu_map parameter error result =
       in
       List.iter (fun list_a ->
         Mvbdu_wrapper.Mvbdu.print_association_list parameter.log "" list_a
-      ) l        
+      ) l
     ) result*)
 
 (*projection*)
@@ -189,19 +203,20 @@ let print_proj_potential_bdu_map parameter error result =
           ) l
         ) map_b
     ) result*)
-  
+
 (************************************************************************************)
 (*TODO: projection function will be used in is_enable function*)
 
 let print_proj_bdu_views parameter error result =
   Map_rule_id_views.Map.iter
     (fun rule_id map_b ->
-      let _ = fprintf parameter.log "rule_id:%i\n" rule_id in
-      Map_triple_views.Map.iter 
+      let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter) "rule_id:%i" rule_id in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+      Map_triple_views.Map.iter
         (fun (agent_id, agent_type, cv_id) bdu ->
-          let _ = fprintf parameter.log "agent_id:%i:agent_type:%i:cv_id:%i\n" 
-            agent_id agent_type cv_id in
-          Mvbdu_wrapper.Mvbdu.print parameter.log "" bdu
+          let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter) "agent_id:%i:agent_type:%i:cv_id:%i" agent_id agent_type cv_id in
+	  let _ = Loggers.print_newline (Remanent_parameters.get_logger parameter)  in
+	  Mvbdu_wrapper.Mvbdu.print stdout "" bdu
         ) map_b
     ) result
 
@@ -211,20 +226,25 @@ let print_proj_bdu_views parameter error result =
 
 let print_bdu_build parameter error result =
   let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "\n------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "* Covering classes with new indexes:\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
+    Loggers.print_newline (Remanent_parameters.get_logger parameter) ;
+    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "------------------------------------------------------------";
+    Loggers.print_newline (Remanent_parameters.get_logger parameter);
+    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "* Covering classes with new indexes:";
+    Loggers.print_newline (Remanent_parameters.get_logger parameter);
+    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "------------------------------------------------------------";
+    Loggers.print_newline (Remanent_parameters.get_logger parameter);
   in
   let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "- Working list creation:\n";
+    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "- Working list creation:";
     print_wl_creation
       parameter
       result.store_wl_creation
   in
+   Loggers.print_newline (Remanent_parameters.get_logger parameter);
   (*print if one wants to debug*)
   (*let _ =
      fprintf (Remanent_parameters.get_log parameter)
@@ -237,9 +257,9 @@ let print_bdu_build parameter error result =
       result.store_bdu_potential_effect_restriction_map
   in*)
   let _ =
-    fprintf (Remanent_parameters.get_log parameter)
+    Loggers.fprintf (Remanent_parameters.get_logger parameter)
       "\n------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter)
+    Loggers.fprintf (Remanent_parameters.get_logger parameter)
       "- Bdu for the valuations of the views that are created from potential partner in side effects (projection per rule):\n\n";
     print_proj_potential_bdu_map
       parameter
@@ -278,37 +298,53 @@ let print_bdu_build parameter error result =
       error
       result.store_bdu_test_restriction_map
   in*)
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
   let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "\n------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "- Bdu for the valuations of the views that are tested (projection per rule):\n\n";
+    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "------------------------------------------------------------" in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+  let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "- Bdu for the valuations of the views that are tested (projection per rule):" in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+  let () =
     print_proj_test_bdu_map
       parameter
       error
       result.store_proj_bdu_test_restriction_map
   in
-  (*print if one wants to debug*)
+(*print if one wants to debug*)
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
   let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "\n------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "- Bdu for the valuations of the views that are created (per rule, agent and covering class):\n\n";
+    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "------------------------------------------------------------" in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+  let () =
+    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "- Bdu for the valuations of the views that are created (per rule, agent and covering class):" in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+  let () =
     print_creation_bdu_map
       parameter
       error
       result.store_bdu_creation_restriction_map
   in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
   let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "\n------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "- Bdu for the valuations of the views that are created (per rule_id; projection function):\n\n";
-    print_proj_creation_bdu_map
-      parameter
-      error
-      result.store_proj_bdu_creation_restriction_map
-  in
+    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "------------------------------------------------------------" in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+  let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "- Bdu for the valuations of the views that are created (per rule_id; projection function):" in
+    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+    let () =
+      print_proj_creation_bdu_map
+	parameter
+	error
+	result.store_proj_bdu_creation_restriction_map
+    in
   (*print if one wants to debug*)
   (*let _ =
     fprintf (Remanent_parameters.get_log parameter)
@@ -320,24 +356,34 @@ let print_bdu_build parameter error result =
       error
       result.store_bdu_init_restriction_map
   in*)
-  let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "\n------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "- List for update of the views due to modification (per rule, agent and covering class):\n";
-    print_modif_list_map
-      parameter
-      error
-      result.store_modif_list_restriction_map
-  in
-  let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "\n------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "- Bdu for the valuation of the views that are tested (projection per rule):\n";
-    print_proj_bdu_views
-      parameter
-      error
-      result.store_proj_bdu_views
-  in
-  error
+    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+    let () =
+      Loggers.fprintf (Remanent_parameters.get_logger parameter)
+	"------------------------------------------------------------" in
+    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+    let () =
+      Loggers.fprintf (Remanent_parameters.get_logger parameter)
+	"- List for update of the views due to modification (per rule, agent and covering class):" in
+    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+    let () =
+      print_modif_list_map
+	parameter
+	error
+	result.store_modif_list_restriction_map
+    in
+    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+    let _ =
+      Loggers.fprintf (Remanent_parameters.get_logger parameter)
+	"------------------------------------------------------------" in
+    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+    let () =
+      Loggers.fprintf (Remanent_parameters.get_logger parameter)
+	"- Bdu for the valuation of the views that are tested (projection per rule):" in
+    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+    let () =
+      print_proj_bdu_views
+	parameter
+	error
+	result.store_proj_bdu_views
+    in
+    error

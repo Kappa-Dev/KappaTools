@@ -2,14 +2,14 @@
   * print_bdu_analysis.ml
   * openkappa
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
-  * 
+  *
   * Creation: 2015, the 28th of October
-  * Last modification: 
-  * 
+  * Last modification:
+  *
   * Print relations between sites in the BDU data structures
-  * 
-  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et   
-  * en Automatique.  All rights reserved.  This file is distributed     
+  *
+  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et
+  * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
 open Printf
@@ -20,7 +20,7 @@ open Fifo
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "BDU fixpoint iteration") message exn
-    (fun () -> default)  
+    (fun () -> default)
 
 let trace = false
 
@@ -54,7 +54,7 @@ let trace = false
           agent2 agent_string2 site2 site_string2 state2 state_string2
       ) set2
     )set1
-  ) result    
+  ) result
 
 let print_contact_map parameter error handler_kappa result =
   fprintf (Remanent_parameters.get_log parameter)
@@ -116,26 +116,29 @@ let print_contact_map_full_aux parameter error handler_kappa result =
         with
           _ -> warn parameter error (Some "line 117") Exit (string_of_int state2)
       in
-      fprintf stdout 
-        "agent_type:%i:%s@site_type:%i:%s:state:%i(%s)--agent_type':%i:%s@site_type':%i:%s:state':%i(%s)\n" 
-        agent1 agent_string1 
-        site1 site_string1 
+      fprintf stdout
+        "agent_type:%i:%s@site_type:%i:%s:state:%i(%s)--agent_type':%i:%s@site_type':%i:%s:state':%i(%s)\n"
+        agent1 agent_string1
+        site1 site_string1
         state1 state_string1
-        agent2 agent_string2 
+        agent2 agent_string2
         site2 site_string2
         state2 state_string2
     ) set
   ) result
 
 let print_contact_map_full parameter error handler_kappa result =
-  fprintf (Remanent_parameters.get_log parameter)
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
     "\n------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "(Full) Contact map and initital state:\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "Sites are annotated with the id of binding type:\n";
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "(Full) Contact map and initital state:";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "Sites are annotated with the id of binding type:";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   let error =
     print_contact_map_full_aux
       parameter
@@ -149,11 +152,11 @@ let print_contact_map_full parameter error handler_kappa result =
 (*print init map*)
 
 (*let print_init_map_aux parameter error handler_kappa result =
-  Int2Map_CM_Syntactic.Map.iter 
+  Int2Map_CM_Syntactic.Map.iter
     (fun set1 set2 ->
       Set_triple.Set.iter (fun (agent_type, site_type, state) ->
         Set_triple.Set.iter (fun (agent_type', site_type', state') ->
-          fprintf stdout "agent_type:%i:site_type:%i:state:%i - > agent_type':%i:site_type':%i:state':%i\n"
+          Loggers.fprintf stdout "agent_type:%i:site_type:%i:state:%i - > agent_type':%i:site_type':%i:state':%i\n"
             agent_type site_type state
             agent_type' site_type' state'
         ) set2
@@ -161,13 +164,13 @@ let print_contact_map_full parameter error handler_kappa result =
     ) result
 
 let print_init_map parameter error handler_kappa result =
-  fprintf (Remanent_parameters.get_log parameter)
+  Loggers.fprintf (Remanent_parameters.get_log parameter)
     "\n------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
+  Loggers.fprintf (Remanent_parameters.get_log parameter)
     " Contact map in the initital state:\n";
-  fprintf (Remanent_parameters.get_log parameter)
+  Loggers.fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
+  Loggers.fprintf (Remanent_parameters.get_log parameter)
     "Sites are annotated with the id of binding type:\n";
   let error =
     print_init_map_aux
@@ -182,7 +185,7 @@ let print_init_map parameter error handler_kappa result =
 (*syntactic contact map and init map*)
 
 let print_syn_map_aux parameter error handler_kappa result =
-  Int2Map_CM_Syntactic.Map.iter 
+  Int2Map_CM_Syntactic.Map.iter
     (fun set1 set2 ->
       Set_triple.Set.iter (fun (agent_type, site_type, state) ->
         let error, agent_string =
@@ -225,27 +228,35 @@ let print_syn_map_aux parameter error handler_kappa result =
             with
               _ -> warn parameter error (Some "line 226") Exit (string_of_int state')
           in
-          fprintf stdout 
-            "agent_type:%i:%s:site_type:%i:%s:state:%i(%s) - > agent_type':%i:%s:site_type':%i:%s:state':%i(%s)\n"
+          let () =
+	    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+            "agent_type:%i:%s:site_type:%i:%s:state:%i(%s) - > agent_type':%i:%s:site_type':%i:%s:state':%i(%s)"
             agent_type agent_string
             site_type site_string
             state state_string
             agent_type' agent_string'
             site_type' site_string'
             state' state_string'
+	  in
+	  Loggers.print_newline (Remanent_parameters.get_logger parameter)
         ) set2
       ) set1
     ) result
 
 let print_syn_map parameter error handler_kappa result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "\n------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "(Syntactic) Contact map and initital state:\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "Sites are annotated with the id of binding type:\n";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "(Syntactic) Contact map and initital state:";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "Sites are annotated with the id of binding type:";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   let error =
     print_syn_map_aux
       parameter
@@ -267,12 +278,14 @@ let print_covering_classes_modification_aux parameter error handler_kappa compil
         with
           _ -> warn parameter error (Some "line 268") Exit (string_of_int agent_type)
       in
-      let _ =
-        fprintf parameter.log
-          "agent_type:%i:%s:covering_class_id:%i:@set of rule_id:\n" 
+      let () =
+        Loggers.fprintf
+	  (Remanent_parameters.get_logger parameter)
+          "agent_type:%i:%s:covering_class_id:%i:@set of rule_id:"
           agent_type agent_string y
       in
-      Site_map_and_set.Set.iter
+      let () =Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+     Site_map_and_set.Set.iter
         (fun rule_id ->
         (*mapping rule_id of type int to string*)
           let error, rule_id_string =
@@ -282,35 +295,44 @@ let print_covering_classes_modification_aux parameter error handler_kappa compil
             with
               _ -> warn parameter error (Some "line 283") Exit (string_of_int rule_id)
           in
-          fprintf parameter.log "%s\n" rule_id_string
+          let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "%s" rule_id_string in
+	  Loggers.print_newline (Remanent_parameters.get_logger parameter)
         ) s2
     ) result
 
 let print_covering_classes_modification parameter error handler_kappa compiled result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "\n------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "List of rules to awake when the state of a site is modified and tested:\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "List of rules to awake when the state of a site is modified and tested:";
+   Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   print_covering_classes_modification_aux
     parameter
     error
     handler_kappa
     compiled
     result
-    
+
 (************************************************************************************)
 (*update(c'), when discovered a bond for the first time*)
 
 let print_covering_classes_side_effects parameter error handler_kappa compiled result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "\n------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "List of rules to awake when the state of a site is modified and tested and side effects:\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  print_covering_classes_modification_aux
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "List of rules to awake when the state of a site is modified and tested and side effects:";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+Loggers.print_newline (Remanent_parameters.get_logger parameter);
+print_covering_classes_modification_aux
     parameter
     error
     handler_kappa
@@ -321,12 +343,16 @@ let print_covering_classes_side_effects parameter error handler_kappa compiled r
 (*Final update function*)
 
 let print_covering_classes_update_full parameter error handler_kappa compiled result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "\n------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "Final list of rules to awake when the state of a site is modified and tested and side effects:\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "Final list of rules to awake when the state of a site is modified and tested and side effects:";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   print_covering_classes_modification_aux
     parameter
     error
@@ -338,57 +364,63 @@ let print_covering_classes_update_full parameter error handler_kappa compiled re
 (*main print*)
 
 let print_result_dynamic parameter error handler_kappa compiled result =
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
   let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "============================================================\n";
-    fprintf (Remanent_parameters.get_log parameter) "* BDU Analysis:\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "============================================================\n";
-    fprintf (Remanent_parameters.get_log parameter) 
-      "\n** Dynamic information:\n";
+    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "============================================================";
+    Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter) "* BDU Analysis:";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "============================================================";
+   Loggers.print_newline (Remanent_parameters.get_logger parameter); Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "** Dynamic information:";
     (*------------------------------------------------------------------------------*)
-    let _ =
-      print_contact_map_full
-        parameter
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  let _ =
+    print_contact_map_full
+      parameter
         error
-        handler_kappa
-        result.store_contact_map_full
-    in
+      handler_kappa
+      result.store_contact_map_full
+  in
     (*------------------------------------------------------------------------------*)
-    let _ =
+  let _ =
       print_syn_map
         parameter
         error
         handler_kappa
         result.store_syn_contact_map_full
-    in
+  in
     (*------------------------------------------------------------------------------*)
-    let _ =
-      print_covering_classes_modification
-        parameter
-        error
-        handler_kappa
-        compiled
+  let _ =
+    print_covering_classes_modification
+      parameter
+      error
+      handler_kappa
+      compiled
         result.store_covering_classes_modification_update
-    in
+  in
     (*------------------------------------------------------------------------------*)
-    let _ =
-      print_covering_classes_side_effects
-        parameter
+  let _ =
+    print_covering_classes_side_effects
+      parameter
         error
-        handler_kappa
-        compiled
-        result.store_covering_classes_modification_side_effects
-    in
+      handler_kappa
+      compiled
+      result.store_covering_classes_modification_side_effects
+  in
     (*------------------------------------------------------------------------------*)
-    let _ =
-      print_covering_classes_update_full
+  let _ =
+    print_covering_classes_update_full
         parameter
-        error
-        handler_kappa
-        compiled
-        result.store_covering_classes_modification_update_full
-    in
-    error
+      error
+      handler_kappa
+      compiled
+      result.store_covering_classes_modification_update_full
   in
   error
+  in
+  error
+    

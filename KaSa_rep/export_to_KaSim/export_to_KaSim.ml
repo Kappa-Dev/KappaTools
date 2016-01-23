@@ -15,40 +15,40 @@
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Export_to_KaSim")
     message exn (fun () -> default)
-    
+
 (*******************************************************************************)
 (*type abstraction*)
 
 type rule_id = string
-  
+
 type var_id = string
-  
+
 type compilation = Cckappa_sig.compil
 
 type influence_node =
 | Rule of rule_id
 | Var of var_id
-    
+
 module InfluenceNodeSetMap =
   SetMap.Make
     (struct
-      type t = influence_node 
+      type t = influence_node
       let compare = compare
      end)
-    
+
 module InfluenceNodeMap = InfluenceNodeSetMap.Map
-  
+
 module String2SetMap =
-  SetMap.Make 
+  SetMap.Make
     (struct
-      type t = string * string 
-      let compare = compare 
+      type t = string * string
+      let compare = compare
      end)
-    
+
 module String2Map = String2SetMap.Map
-  
+
 module StringMap = Mods.StringMap
-  
+
 type influence_map =
   {
     positive: influence_node InfluenceNodeMap.t ;
@@ -64,13 +64,13 @@ module type Export_to_KaSim =
     type state
 
     val init: Format.formatter -> ((string Location.annot) * Ast.port list, Ast.mixture, string, Ast.rule) Ast.compil -> state
-      
+
     val flush_errors: state -> state
 
     val get_contact_map: state -> state * (string list * (string*string) list) String2Map.t
 
     val get_influence_map: state -> state * influence_map
-      
+
     val get_signature: state -> state * Signature.s
 
     val dump_influence_map: state -> unit
@@ -90,54 +90,70 @@ module type Export_to_KaSim =
 
 module Export_to_KaSim =
   (struct
-      
+
     let string_of_influence_node x =
       match x with
       | Rule i -> "Rule "^i
       | Var i -> "Var "^i
-        
+
     let print_influence_map parameters influence_map =
-      Printf.fprintf parameters.Remanent_parameters_sig.log "Influence map: \n";
+      Loggers.fprintf (Remanent_parameters.get_logger parameters)  "Influence map:";
+      Loggers.print_newline (Remanent_parameters.get_logger parameters); 
       InfluenceNodeMap.iter
 	(fun x y ->
-	  Printf.fprintf parameters.Remanent_parameters_sig.log"  %s->%s \n"
-	    (string_of_influence_node x) (string_of_influence_node y))
+	  let () =
+	    Loggers.fprintf
+	      (Remanent_parameters.get_logger parameters)
+	      "  %s->%s"
+	    (string_of_influence_node x) (string_of_influence_node y) in
+	  let () = Loggers.print_newline
+	    (Remanent_parameters.get_logger parameters) in
+	  ())
 	influence_map.positive;
       InfluenceNodeMap.iter
 	(fun x y ->
-	  Printf.fprintf parameters.Remanent_parameters_sig.log " %s-|%s \n"
-	    (string_of_influence_node x) (string_of_influence_node y))
+	  let () =
+	    Loggers.fprintf
+	      (Remanent_parameters.get_logger parameters)
+	      " %s-|%s"
+	      (string_of_influence_node x) (string_of_influence_node y) in
+	  let () = Loggers.print_newline
+	    (Remanent_parameters.get_logger parameters) in
+	  ())
 	influence_map.negative;
-      Printf.fprintf parameters.Remanent_parameters_sig.log "\n"
+      Loggers.print_newline
+	(Remanent_parameters.get_logger parameters)
 
     let print_contact_map parameters contact_map =
-      Printf.fprintf parameters.Remanent_parameters_sig.log  "Contact map: \n";
+      Loggers.fprintf (Remanent_parameters.get_logger parameters)  "Contact map: ";
+      Loggers.print_newline (Remanent_parameters.get_logger parameters) ;
       String2Map.iter
 	(fun (x,y) (l1,l2) ->
 	  if l1<>[]
 	  then
 	    begin
-	      let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s@%s: " x y in 
+	      let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s@%s: " x y in
 	      let _ = List.fold_left
 		(fun bool x ->
-		  (if bool then 
-		      Printf.fprintf parameters.Remanent_parameters_sig.log ", ");
-		  Printf.fprintf parameters.Remanent_parameters_sig.log "%s" x;
+		  (if bool then
+		      Loggers.fprintf (Remanent_parameters.get_logger parameters) ", ");
+		  Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" x;
 		  true)
 		false l1 in
-	      Printf.fprintf parameters.Remanent_parameters_sig.log "\n"
+	      Loggers.print_newline (Remanent_parameters.get_logger parameters)
 	    end
 	  else ();
 	  List.iter
 	    (fun (z,t) ->
-	      Printf.fprintf parameters.Remanent_parameters_sig.log "%s@%s--%s@%s\n" x y z t 
+	      Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s@%s--%s@%s" x y z t;
+	      Loggers.print_newline (Remanent_parameters.get_logger parameters)
 	    ) l2
 	)
 	contact_map
 
     (*-------------------------------------------------------------------------------*)
     (*type abstraction*)
-        
+
     type contact_map = ((string list) * (string*string) list) String2Map.t
 
     type errors = Exception.method_handler
@@ -155,27 +171,29 @@ module Export_to_KaSim =
 
     (*-------------------------------------------------------------------------------*)
     (*operations of module signatuares*)
-        
+
     let init logger compil  =
       let errors = Exception.empty_error_handler in
       let parameters =
-        Remanent_parameters.get_parameters 
-          ~called_from:Remanent_parameters_sig.Internalised () 
+        Remanent_parameters.get_parameters
+          ~called_from:Remanent_parameters_sig.Internalised ()
       in
-      let parameters = Remanent_parameters.set_formatter parameters logger in 
+      let parameters = Remanent_parameters.set_logger parameters
+	(Loggers.redirect (Remanent_parameters.get_logger parameters) logger)
+      in
       let parameters_compil =
 	Remanent_parameters.update_call_stack
 	  parameters Preprocess.local_trace (Some "Prepreprocess.translate_compil")
       in
       let errors,refined_compil =
-	Prepreprocess.translate_compil parameters_compil errors compil 
+	Prepreprocess.translate_compil parameters_compil errors compil
       in
       let parameters_list_tokens =
 	Remanent_parameters.update_call_stack
 	  parameters List_tokens.local_trace (Some "List_tokens.scan_compil")
       in
       let errors,handler =
-	List_tokens.scan_compil parameters_list_tokens errors refined_compil 
+	List_tokens.scan_compil parameters_list_tokens errors refined_compil
       in
       let parameters_sig =
 	Remanent_parameters.update_prefix parameters "Signature:"
@@ -187,11 +205,11 @@ module Export_to_KaSim =
       in
       let parameters_c_compil =
 	Remanent_parameters.update_call_stack
-	  parameters Preprocess.local_trace (Some "Preprocess.translate_c_compil") 
+	  parameters Preprocess.local_trace (Some "Preprocess.translate_c_compil")
       in
       let errors, handler, c_compil =
 	Preprocess.translate_c_compil
-	  parameters_c_compil errors handler refined_compil 
+	  parameters_c_compil errors handler refined_compil
       in
       {
 	handler       = handler ;
@@ -205,7 +223,7 @@ module Export_to_KaSim =
 
     let flush_errors state =
       {
-        state with 
+        state with
           errors = Exception.empty_error_handler
       }
 
@@ -214,10 +232,12 @@ module Export_to_KaSim =
       let handler    = state.handler in
       let parameters = state.parameters in
       let error      = state.errors in
-      let _ = 
-        Format.fprintf (Remanent_parameters.get_formatter parameters) 
-          "+ Compute the contact map@," 
+      let () =
+        Loggers.fprintf (Remanent_parameters.get_logger parameters)
+          "+ Compute the contact map"
       in
+      let () =
+	Loggers.print_newline (Remanent_parameters.get_logger parameters) in
       (*----------------------------------------------------------------*)
       let add_link (a,b) (c,d) sol =
 	let l,old =
@@ -321,7 +341,7 @@ module Export_to_KaSim =
       {state with contact_map = Some sol ; errors = error }
 
     let compute_influence_map state = state
-      
+
     let rec get_contact_map state =
       match state.contact_map with
       | Some x -> state,x
@@ -334,40 +354,40 @@ module Export_to_KaSim =
       | None ->
 	get_influence_map (compute_influence_map state)
 
-    let compute_signature state = 
-      let state,contact_map = get_contact_map state in 
-      let add a x states map = 
-	let old = 
-	  StringMap.find_default [] a map 
-	in 
+    let compute_signature state =
+      let state,contact_map = get_contact_map state in
+      let add a x states map =
+	let old =
+	  StringMap.find_default [] a map
+	in
 	StringMap.add a ((x,states)::old) map
-      in 
-      let l = 
-	String2Map.fold 
-	  (fun (a,x) (states,binding) map -> 
+      in
+      let l =
+	String2Map.fold
+	  (fun (a,x) (states,binding) map ->
 	    add a x (states,binding) map
 	  )
 	  contact_map
 	  StringMap.empty
-      in 
-      let l = 
-	StringMap.fold 
-	  (fun a interface list -> 
+      in
+      let l =
+	StringMap.fold
+	  (fun a interface list ->
 	    (Location.dummy_annot a ,
-	     
-	     List.rev_map 
-	       (fun (x,(states,binding)) -> 
-		 { 
+	
+	     List.rev_map
+	       (fun (x,(states,binding)) ->
+		 {
 		   Ast.port_nme = Location.dummy_annot x ;
-		   Ast.port_int = 
+		   Ast.port_int =
 		     List.rev_map
 		       (fun s -> Location.dummy_annot s)
 		       (List.rev states);
 		   Ast.port_lnk = Location.dummy_annot Ast.FREE})
 	       (List.rev interface))::list)
-	  l 
+	  l
 	  []
-      in 
+      in
       {state with signature = Some (Signature.create l)}
 	
     let rec get_signature state =
@@ -387,15 +407,15 @@ module Export_to_KaSim =
       | Some contact_map ->
 	print_contact_map state.parameters contact_map
 
-    let dump_signature state = 
-      match state.signature with 
+    let dump_signature state =
+      match state.signature with
       | None -> ()
       | Some signature -> ()
-        
+
     let dump_errors state =
       Exception.print state.parameters state.errors
 
-    let dump_errors_light state = 
-      Exception.print_errors_light_for_kasim state.parameters state.errors 
+    let dump_errors_light state =
+      Exception.print_errors_light_for_kasim state.parameters state.errors
 
    end:Export_to_KaSim)
