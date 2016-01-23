@@ -1,30 +1,29 @@
-class type t = object end
+(* Js util *)
+(* references
+   http://toss.sourceforge.net/ocaml.html
+   http://peppermint.jp/temp/ao/ao.ml
+x*)
+open Js
+module Html5 = Tyxml_js.Html5
 
-let create e =
-  Js.Unsafe.fun_call
-    (Js.Unsafe.js_expr "CodeMirror") [| Js.Unsafe.inject e|]
+class type configuration = object
+  val value : int Js.t Js.prop
+  val lineNumbers : bool Js.t Js.prop
+  val gutters : Js.string_array Js.t Js.prop
+end
+let constructor_configuration : configuration Js.t Js.constr = (Js.Unsafe.variable "Object")
+let create_configuration () : configuration Js.t  = jsnew constructor_configuration ()
 
-let get_editor_value editor =
-  Js.Unsafe.fun_call
-    (Js.Unsafe.coerce editor)##getValue
-    [| Js.Unsafe.inject () |]
+class type codemirror = object
+ method getValue : Js.js_string Js.t meth
+ method setValue : Js.js_string Js.t -> unit meth
+end;;
 
-let set_editor_value editor str =
+let fromTextArea
+      (dom : Dom_html.element Js.t)
+      (configuration : configuration Js.t)
+    : codemirror Js.t =
+  (* let () = Js.debugger() in *)
   Js.Unsafe.fun_call
-    (Js.Unsafe.coerce editor)##setValue
-    [| Js.Unsafe.inject str |]
-
-let starter editor x =
-  (*  let script = Dom_html.createScript Dom_html.document in
-  let () =
-    script##text <- Js.string "var editor = ace.edit(\"editor\");
-editor.setTheme(\"ace/theme/eclipse\");" in*)
-  Js.Unsafe.fun_call
-    (Js.Unsafe.coerce editor)##on
-    [|Js.Unsafe.inject (Js.string "change");
-      Js.Unsafe.inject
-	(Dom_html.handler (fun _ ->
-			   let () = x := true in
-			   let () = Storage.set_model_text
-				      (Js.to_string (get_editor_value editor)) in
-			   Js._true))|]
+    (Js.Unsafe.js_expr "CodeMirror")##fromTextArea
+    [| Js.Unsafe.inject dom ; Js.Unsafe.inject configuration |]
