@@ -156,42 +156,48 @@ let split_memo error handler =
     "Boolean_mvbdu+extensional_description_of_mvbdu:",x.boolean_mvbdu_extensional_description_of_mvbdu;
   ]
 
-let rec print_cell log prefix cell =
+let rec print_cell parameter cell =
   match cell with
     | Mvbdu_sig.Leaf x ->
       let s = "Leaf "^(if x then "True" else "False")^" \n" in
-      let _ = Printf.fprintf log "%s%s\n" prefix s in
+      let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "%s%s" (Remanent_parameters.get_prefix parameter) s in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
       ()
     | Mvbdu_sig.Node x ->
-      let _ = Printf.fprintf log "%sNode(site_type:%i<%i)\n"
-        prefix
+      let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "%sNode(site_type:%i<%i)"
+        (Remanent_parameters.get_prefix parameter)
         x.Mvbdu_sig.variable
         (x.Mvbdu_sig.upper_bound + 1)
       in
-      let prefix' = prefix^" " in
-      let _ = print_mvbdu log prefix' x.Mvbdu_sig.branch_true in
-      let _ = print_mvbdu log prefix' x.Mvbdu_sig.branch_false in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+      let parameter = Remanent_parameters.update_prefix parameter " " in
+      let _ = print_mvbdu parameter x.Mvbdu_sig.branch_true in
+      let _ = print_mvbdu parameter x.Mvbdu_sig.branch_false in
       ()
 
-and print_mvbdu log prefix mvbdu =
-  let _ = Printf.fprintf log "%sId=%i\n" prefix mvbdu.Mvbdu_sig.id in
-  let _ = print_cell log (prefix^" ") mvbdu.Mvbdu_sig.value in
+and print_mvbdu parameter mvbdu =
+  let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "%sId=%i" (Remanent_parameters.get_prefix parameter) mvbdu.Mvbdu_sig.id in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+  let parameter = Remanent_parameters.update_prefix parameter " " in
+  let _ = print_cell parameter mvbdu.Mvbdu_sig.value in
   ()
 
-and print_skeleton log prefix skel =
+and print_skeleton parameter skel =
   match skel with
     | Mvbdu_sig.Leaf x ->
       let s = "Leaf "^(if x then "True" else "False")^" \n" in
-      let _ = Printf.fprintf log "%s%s\n" prefix s in
+      let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "%s%s" (Remanent_parameters.get_prefix parameter) s in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
       ()
     | Mvbdu_sig.Node x ->
-      let _ = Printf.fprintf log "%sNode(site_type:%i<%i,branch_true:%i,branch_false:%i)\n"
-        prefix
+      let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "%sNode(site_type:%i<%i,branch_true:%i,branch_false:%i)"
+        (Remanent_parameters.get_prefix parameter)
         x.Mvbdu_sig.variable
         (x.Mvbdu_sig.upper_bound + 1)
         x.Mvbdu_sig.branch_true
         x.Mvbdu_sig.branch_false
       in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
       ()
 
 let init_data parameters error =
@@ -1018,7 +1024,7 @@ let print_hash2 error log =
   Hash_2.print error print_boolean_mvbdu log
 
 let lift f a b c =
-  let () = f b b.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix c
+  let () = f b c
   in a
 
 let print_hash3 error log =
@@ -1091,3 +1097,4 @@ let print_memo (error:Exception.method_handler) handler parameters =
   let error = print_gen stdout parameters error ("Print Hash_7",print_hash7,l7) in
   let error = print_gen stdout parameters error ("Print Hash_8",print_hash8,l8) in
   error
+

@@ -99,7 +99,7 @@ let print_bdu_update_map parameter error handler_kappa result =
       Loggers.print_newline (Remanent_parameters.get_logger parameter)
     in
     let () =
-      Mvbdu_wrapper.Mvbdu.print stdout "" bdu_update
+      Mvbdu_wrapper.Mvbdu.print parameter bdu_update
     in
     error)
     result error
@@ -162,7 +162,7 @@ let print_bdu_update_map_gen_decomposition decomposition
 	     then
 	       let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "INTENSIONAL DESCRIPTION:" in
 	       let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-	       let () = Mvbdu_wrapper.Mvbdu.print stdout "" mvbdu in
+	       let () = Mvbdu_wrapper.Mvbdu.print parameter mvbdu in
 	       let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "EXTENSIONAL DESCRIPTION:" in
 	       let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
 	       error,handler

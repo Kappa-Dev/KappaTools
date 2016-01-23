@@ -75,49 +75,48 @@ let build_list allocate parameters error handler list =
   build_reversed_sorted_list allocate error parameters handler (List.sort sort list)
 
 
-let rec print_cell log prefix cell =
+let rec print_cell parameter cell =
   match cell with
     | List_sig.Empty ->
        let s = "[]" in
-       let () = Loggers.fprintf (Remanent_parameters.get_logger log) "%s%s" prefix s in
-       let () = Loggers.print_newline (Remanent_parameters.get_logger log) in
+       let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "%s%s" (Remanent_parameters.get_prefix parameter) s in
+       let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
        ()
     | List_sig.Cons x ->
-      let () = Loggers.fprintf (Remanent_parameters.get_logger log) "%s(site_type:%i = %i)"
-			     prefix
+      let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "%s(site_type:%i = %i)"
+			     (Remanent_parameters.get_prefix parameter)
 			     x.List_sig.variable
 			     x.List_sig.association
       in
-      let () = Loggers.print_newline (Remanent_parameters.get_logger log) in
-     let prefix' = prefix^" " in
-     let _ = print_association_list log prefix' x.List_sig.tail in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+     let parameter = Remanent_parameters.update_prefix parameter " " in
+     let _ = print_association_list parameter x.List_sig.tail in
       ()
-and print_association_list log prefix list =
-  let _ = Loggers.fprintf (Remanent_parameters.get_logger log) "%sId=%i" prefix list.List_sig.id in
-  let _ = Loggers.print_newline (Remanent_parameters.get_logger log) in
-  let _ = print_cell log (prefix^" ") list.List_sig.value in
+and print_association_list parameter list =
+  let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter) "%sId=%i" (Remanent_parameters.get_prefix parameter) list.List_sig.id in
+  let _ = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+  let _ = print_cell (Remanent_parameters.update_prefix parameter" ") list.List_sig.value in
   ()
 
-let rec print_cell log prefix cell =
+let rec print_cell parameter cell =
   match cell with
     | List_sig.Empty ->
        let s = "[]" in
-       let () = Loggers.fprintf (Remanent_parameters.get_logger log) "%s%s" prefix s in
-       let () = Loggers.print_newline (Remanent_parameters.get_logger log) in
+       let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "%s%s" (Remanent_parameters.get_prefix parameter) s in
+       let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
        ()
     | List_sig.Cons x ->
-      let () = Loggers.fprintf (Remanent_parameters.get_logger log) "%s(site_type:%i)"
-	prefix
+      let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "%s(site_type:%i)"
+	(Remanent_parameters.get_prefix parameter)
 	x.List_sig.variable
       in
-      let () = Loggers.print_newline (Remanent_parameters.get_logger log) in
-      let prefix' = prefix^" " in
-      let _ = print_variables_list log prefix' x.List_sig.tail in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+      let _ = print_variables_list (Remanent_parameters.update_prefix parameter " ") x.List_sig.tail in
       ()
-and print_variables_list log prefix list =
-  let () = Loggers.fprintf (Remanent_parameters.get_logger log) "%sId=%i" prefix list.List_sig.id in
-  let () = Loggers.print_newline (Remanent_parameters.get_logger log) in
-  let () = print_cell log (prefix^" ") list.List_sig.value in
+and print_variables_list parameter list =
+  let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "%sId=%i" (Remanent_parameters.get_prefix parameter) list.List_sig.id in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+  let () = print_cell (Remanent_parameters.update_prefix parameter " ") list.List_sig.value in
   ()
 
 let rec extensional_gen f get set error parameters handler list =
@@ -151,7 +150,7 @@ let extensional_with_asso get set error parameters handler list =
 
 let extensional_without_asso get set error parameters handler list =
   extensional_gen (fun a1 -> (a1.List_sig.variable)) get set error parameters handler list
-		
+
 
 let rec overwrite allocate get set error parameters handler list1 list2 =
   match get parameters error handler (list1,list2)

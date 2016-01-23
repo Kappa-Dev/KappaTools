@@ -62,9 +62,9 @@ module type Mvbdu =
 
     val variables_list_of_mvbdu: (mvbdu,hconsed_variables_list) unary
 
-    val print: out_channel -> string -> mvbdu -> unit
-    val print_association_list: Remanent_parameters_sig.parameters -> string -> hconsed_association_list -> unit
-    val print_variables_list: Remanent_parameters_sig.parameters -> string -> hconsed_variables_list -> unit
+    val print: Remanent_parameters_sig.parameters -> mvbdu -> unit
+    val print_association_list: Remanent_parameters_sig.parameters -> hconsed_association_list -> unit
+    val print_variables_list: Remanent_parameters_sig.parameters -> hconsed_variables_list -> unit
   end
 
 
@@ -127,9 +127,9 @@ module type Internalized_mvbdu =
 
     val variables_list_of_mvbdu: mvbdu -> hconsed_variables_list
 
-    val print: out_channel -> string -> mvbdu -> unit
-    val print_association_list: Remanent_parameters_sig.parameters -> string -> hconsed_association_list -> unit
-    val print_variables_list: Remanent_parameters_sig.parameters -> string -> hconsed_variables_list -> unit
+    val print: Remanent_parameters_sig.parameters -> mvbdu -> unit
+    val print_association_list: Remanent_parameters_sig.parameters -> hconsed_association_list -> unit
+    val print_variables_list: Remanent_parameters_sig.parameters -> hconsed_variables_list -> unit
 
 
 
@@ -390,7 +390,7 @@ module Make (M:Nul)  =
     let extensional_of_mvbdu parameters handler error mvbdu =
       lift1__ "line 383"
 	Boolean_mvbdu.extensional_description_of_mvbdu parameters handler error mvbdu
-		
+
     let print = Boolean_mvbdu.print_mvbdu
     let print_association_list = List_algebra.print_association_list
     let print_variables_list = List_algebra.print_variables_list

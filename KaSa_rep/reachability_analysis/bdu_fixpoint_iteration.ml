@@ -98,7 +98,7 @@ let dump_view_diff parameter handler_kappa handler_bdu error
 	in
         (*print bdu different: this will print in a format of bdu*)
 	let () =
-          Mvbdu_wrapper.Mvbdu.print stdout prefix bdu_diff
+          Mvbdu_wrapper.Mvbdu.print parameter bdu_diff
         in
         (*print a list of relations: this will print in a format readable*)
 	let () =
@@ -225,7 +225,7 @@ let dump_valuation parameter handler_kappa handler_bdu error
 	in
 	let () =
           Mvbdu_wrapper.Mvbdu.print_association_list
-            parameter prefix valuation in
+            parameter valuation in
 	let () =
           Loggers.fprintf (Remanent_parameters.get_logger parameter)
             "%sEXTENSIONAL DESCRIPTION:" prefix

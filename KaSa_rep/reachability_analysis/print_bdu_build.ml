@@ -65,7 +65,7 @@ let print_test_bdu_map parameter error result =
       let _ =
 	Loggers.fprintf (Remanent_parameters.get_logger parameter)
       in
-      Mvbdu_wrapper.Mvbdu.print stdout "" bdu_test
+      Mvbdu_wrapper.Mvbdu.print parameter bdu_test
     ) result
 
 let print_proj_test_bdu_map parameter error result =
@@ -76,7 +76,7 @@ let print_proj_test_bdu_map parameter error result =
       Map_agent_id_test_bdu.Map.iter (fun agent_id bdu_test ->
         let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter) "agent_id:%i" agent_id in
 	let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-        Mvbdu_wrapper.Mvbdu.print stdout "" bdu_test
+        Mvbdu_wrapper.Mvbdu.print parameter bdu_test
       ) map_b
     ) result
 
@@ -93,7 +93,7 @@ let print_creation_bdu_map parameter error result =
       let () =
 	Loggers.print_newline (Remanent_parameters.get_logger parameter)
       in
-      Mvbdu_wrapper.Mvbdu.print stdout "" bdu_creation
+      Mvbdu_wrapper.Mvbdu.print parameter bdu_creation
     ) result
 
 let print_proj_creation_bdu_map parameter error result =
@@ -107,7 +107,7 @@ let print_proj_creation_bdu_map parameter error result =
           in
 	  let _ = Loggers.print_newline (Remanent_parameters.get_logger parameter)
 	  in
-          Mvbdu_wrapper.Mvbdu.print stdout "" bdu_creation
+          Mvbdu_wrapper.Mvbdu.print parameter bdu_creation
         ) map_b
     ) result
 
@@ -121,7 +121,7 @@ let print_init_bdu_map parameter error result =
         Loggers.fprintf (Remanent_parameters.get_logger parameter) "agent_type:%i:covering_class_id:%i\n"
           agent_type cv_id
       in
-      Mvbdu_wrapper.Mvbdu.print stdout "" bdu_init
+      Mvbdu_wrapper.Mvbdu.print parameter bdu_init
     ) result
 
 (************************************************************************************)
@@ -137,7 +137,7 @@ let print_modif_list_map parameter error result =
       let () =
 	Loggers.print_newline (Remanent_parameters.get_logger parameter)
       in
-      Mvbdu_wrapper.Mvbdu.print_association_list parameter "" list_a
+      Mvbdu_wrapper.Mvbdu.print_association_list parameter list_a
     ) result
 
 (************************************************************************************)
@@ -151,8 +151,8 @@ let print_potential_bdu_map parameter error result =
           "agent_type:%i:new_site_name:%i:rule_id:%i:covering_class_id:%i\n"
           agent_type site_type rule_id cv_id
       in
-      Mvbdu_wrapper.Mvbdu.print stdout "" bdu_potential;
-      Mvbdu_wrapper.Mvbdu.print_association_list parameter "" list
+      Mvbdu_wrapper.Mvbdu.print parameter bdu_potential;
+      Mvbdu_wrapper.Mvbdu.print_association_list parameter list
     ) result
 
 (*projection*)
@@ -169,8 +169,8 @@ let print_proj_potential_bdu_map parameter error result =
             agent_type site_type cv_id
           in
 	  let _ = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-          Mvbdu_wrapper.Mvbdu.print stdout "" bdu_potential;
-	  Mvbdu_wrapper.Mvbdu.print_association_list parameter "" list
+          Mvbdu_wrapper.Mvbdu.print parameter bdu_potential;
+	  Mvbdu_wrapper.Mvbdu.print_association_list parameter list
         ) map_b
     ) result
 
@@ -216,7 +216,7 @@ let print_proj_bdu_views parameter error result =
         (fun (agent_id, agent_type, cv_id) bdu ->
           let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter) "agent_id:%i:agent_type:%i:cv_id:%i" agent_id agent_type cv_id in
 	  let _ = Loggers.print_newline (Remanent_parameters.get_logger parameter)  in
-	  Mvbdu_wrapper.Mvbdu.print stdout "" bdu
+	  Mvbdu_wrapper.Mvbdu.print parameter bdu
         ) map_b
     ) result
 
