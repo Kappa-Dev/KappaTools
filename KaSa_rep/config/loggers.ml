@@ -1,100 +1,178 @@
+type encoding =
+| HTML | HTML_Tabular | DOT | TXT | TXT_Tabular
+
+type token =
+| String of string
+| FLUSH
+
+type logger_kind =
+| DEVNUL
+| Formatter of Format.formatter
+| Circular_buffer of string Circular_buffers.Buffers.t
+| Infinite_buffer of string Infinite_buffers.Buffers.t
+
+let breakable x =
+  match
+    x
+  with
+    | HTML_Tabular | HTML | TXT -> true
+    | DOT | TXT_Tabular -> false
+
 type t =
   {
-    breakable: bool;
-    formatter: Format.formatter option;
-    end_of_line_symbol: string;
-    open_cell_symbol: string;
-    close_cell_symbol: string;
-    open_row_symbol: string;
-    close_row_symbol: string;
-    tab:string;
+    encoding:encoding;
+    logger: logger_kind;
+    mutable current_line: token list;
   }
+
 
 let dummy_html_logger =
   {
-    breakable = true;
-    formatter = None ;
-    end_of_line_symbol = "<BR>" ;
-    open_cell_symbol = "<TD>";
-    close_cell_symbol = "</TD>";
-    open_row_symbol = "<TR>";
-    close_row_symbol = "</TR>";
-    tab = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-  }
+    encoding = HTML;
+    logger = DEVNUL;
+    current_line = [];}
 
 let dummy_txt_logger =
   {
-    breakable = true;
-    formatter = None ;
-    end_of_line_symbol = "" ;
-    open_cell_symbol = "";
-    close_cell_symbol = "";
-    open_row_symbol = "";
-    close_row_symbol = "";
-    tab = "";
+    encoding = TXT;
+    logger = DEVNUL;
+    current_line = []
   }
 
 let fprintf logger =
   match
-    logger.formatter
+    logger.logger
   with
-  | None -> Format.ikfprintf (fun _ -> ()) Format.std_formatter
-  | Some a -> Format.fprintf a
+  | DEVNUL -> Format.ifprintf Format.std_formatter
+  | Formatter fmt -> Format.fprintf fmt
+  | Circular_buffer _
+  | Infinite_buffer _ ->
+    Format.kfprintf
+      (fun _ -> logger.current_line <- (String (Format.flush_str_formatter ()))::logger.current_line)
+      Format.str_formatter
+
+let end_of_line_symbol logger =
+  match
+    logger.encoding
+  with
+  | HTML | HTML_Tabular -> "<Br>"
+  | DOT | TXT | TXT_Tabular -> ""
 
 let print_newline logger =
-  fprintf logger "%s%t" logger.end_of_line_symbol (fun f -> if logger.breakable then Format.pp_print_newline f () else ())
+  let () =
+    fprintf logger "%s%t"
+      (end_of_line_symbol logger)
+      (fun f -> Format.pp_print_newline f ())
+  in
+  match
+    logger.logger
+  with
+  | DEVNUL
+  | Formatter _ -> ()
+  | Circular_buffer bf ->
+    begin
+      let () =
+	Circular_buffers.Buffers.add
+	  (Format.asprintf "%a"
+	     (Pp.list
+		(fun _ -> ())
+		(fun f x ->
+		  match
+		    x
+		  with
+		  | String s ->
+		    Format.pp_print_string
+		      f s
+		  | FLUSH -> Format.pp_print_flush f ()))
+		(List.rev logger.current_line))
+	  bf
+      in
+      let () = logger.current_line <- [] in
+      ()
+    end
+  | Infinite_buffer bf ->
+      begin
+      let () =
+	Infinite_buffers.Buffers.add
+	  (Format.asprintf "%a"
+	     (Pp.list
+		(fun _ -> ())
+		(fun f x ->
+		  match
+		    x
+		  with
+		  | String s ->
+		    Format.pp_print_string
+		      f s
+		  | FLUSH -> Format.pp_print_flush f ()))
+		(List.rev logger.current_line))
+	  bf
+      in
+      let () = logger.current_line <- [] in
+      ()
+    end
 
 let print_cell logger s =
-  fprintf logger "%s%s%s" logger.open_cell_symbol s logger.close_cell_symbol
+  let open_cell_symbol,close_cell_symbol =
+    match
+      logger.encoding
+    with
+    | HTML_Tabular -> "<TD>","</TD>"
+    | TXT_Tabular -> "","\t"
+    | HTML | DOT | TXT -> "",""
+  in
+  fprintf logger "%s%s%s" open_cell_symbol s close_cell_symbol
 
 
 let close_logger logger =
-  match
-    logger.formatter
-  with
-  | None -> ()
-  | Some a -> Format.pp_print_flush a ()
-
-let open_logger_from_channel ?html_mode:(html_mode=false) channel =
-  let dummy =
-    if html_mode
-    then
-      dummy_html_logger
-    else
-      dummy_txt_logger
+  let () =
+    match
+      logger.encoding
+    with
+    | HTML ->
+      fprintf logger "</div>\n</body>\n"
+    | HTML_Tabular | DOT | TXT | TXT_Tabular -> ()
   in
+  let () =
+    match
+      logger.logger
+    with
+    | DEVNUL -> ()
+    | Formatter fmt -> Format.pp_print_flush fmt ()
+    | Circular_buffer _
+    | Infinite_buffer _ -> ()
+  in
+  ()
+
+let open_logger_from_channel ?mode:(mode=TXT) channel =
   let formatter = Format.formatter_of_out_channel channel in
   {
-    dummy
-   with
-     formatter = Some formatter
+    logger = Formatter formatter;
+     encoding = mode;
+     current_line = []
   }
 
-let open_logger_from_formatter ?html_mode:(html_mode=false) formatter =
-  let dummy =
-    if html_mode
-    then
-      dummy_html_logger
-    else
-      dummy_txt_logger
-  in
-  {
-    dummy
-   with
-     formatter = Some formatter
-  }
+let open_logger_from_formatter ?mode:(mode=TXT) formatter =
+    {
+      logger = Formatter formatter;
+      encoding = mode;
+      current_line = []
+    }
 
 let open_row logger =
-  fprintf logger "%s" logger.open_row_symbol
+  fprintf logger "<tr>"
 
 let close_row logger =
-  fprintf logger "%s" logger.close_row_symbol
+  fprintf logger "</tr>"
 
-let redirect logger formatter =
-  {
-    logger
-   with
-     formatter = Some formatter
-  }
+let formatter_of_logger logger =
+  match
+    logger.logger
+  with
+  | Formatter fmt -> Some fmt
+  | DEVNUL
+  | Circular_buffer _
+  | Infinite_buffer _ -> None
 
-let formatter_of_logger logger = logger.formatter
+let redirect logger fmt =
+  {logger with logger = Formatter fmt}
