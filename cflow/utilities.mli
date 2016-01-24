@@ -2,7 +2,7 @@
   * utilities.mli
   *
   * Creation:                      <2015-08-10 09:21:53 feret>
-  * Last modification: Time-stamp: <2016-01-24 17:21:32 feret>
+  * Last modification: Time-stamp: <2016-01-24 17:26:06 feret>
   *
   * Causal flow compression: a module for KaSim
   * Jerome Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -166,7 +166,7 @@ val enrich_grid_with_transitive_past_of_each_node_without_a_progress_bar:
   (cflow_grid,enriched_cflow_grid) unary
 
 (** Cannonic forms *)
-type canonical_form = Dag.canonical_form
+type canonical_form
 val compare_canonical_form: canonical_form -> canonical_form -> int
 val compute_canonical_form: (trace, canonical_form) unary
 
