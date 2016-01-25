@@ -8,7 +8,8 @@ module type Mvbdu =
     type hconsed_variables_list
     type 'output constant = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> Exception.method_handler * handler * 'output
     type ('input,'output) unary =  Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input -> Exception.method_handler * handler * 'output
-    type ('input1,'input2,'output) binary = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input1 -> 'input2 -> Exception.method_handler * handler * 'output
+    type ('input1,'input2,'output) binary = Remanent_parameters_sig.parameters -> handler ->  Exception.method_handler -> 'input1 -> 'input2 -> Exception.method_handler * handler * 'output
+    type ('input1,'input2,'input3,'output) ternary = Remanent_parameters_sig.parameters -> handler -> Exception.method_handler -> 'input1 -> 'input2 -> 'input3 -> Exception.method_handler * handler * 'output
 
     val init: Remanent_parameters_sig.parameters -> Exception.method_handler -> Exception.method_handler * handler
     val is_init: unit -> bool
@@ -65,6 +66,40 @@ module type Mvbdu =
     val print: Remanent_parameters_sig.parameters -> mvbdu -> unit
     val print_association_list: Remanent_parameters_sig.parameters -> hconsed_association_list -> unit
     val print_variables_list: Remanent_parameters_sig.parameters -> hconsed_variables_list -> unit
+
+ (*get set default join parameters handler error hash_consed_object data storage =*)
+    val store_by_variables_list:
+      ( Remanent_parameters_sig.parameters ->
+	Exception.method_handler ->
+	List_sig.hash_key ->
+	'map ->
+	Exception.method_handler * 'data) ->
+      ( Remanent_parameters_sig.parameters ->
+	Exception.method_handler ->
+	List_sig.hash_key ->
+	'data ->
+	'map ->
+	Exception.method_handler * 'map) ->
+      'data ->
+      ('data,'data,'data) binary ->
+       (int List_sig.list,'data,'map,'map) ternary
+
+    val store_by_mvbdu:
+      ( Remanent_parameters_sig.parameters ->
+	Exception.method_handler ->
+	Mvbdu_sig.hash_key ->
+	'map ->
+	Exception.method_handler * 'data) ->
+      ( Remanent_parameters_sig.parameters ->
+	Exception.method_handler ->
+	Mvbdu_sig.hash_key ->
+	'data ->
+	'map ->
+	Exception.method_handler * 'map) ->
+      'data ->
+      ('data,'data,'data) binary ->
+       (mvbdu,'data,'map,'map) ternary
+
   end
 
 
@@ -73,7 +108,6 @@ module type Internalized_mvbdu =
     type mvbdu
     type hconsed_association_list
     type hconsed_variables_list
-
 
     val init: Remanent_parameters_sig.parameters -> unit
     val is_init: unit -> bool
@@ -150,6 +184,7 @@ module Make (M:Nul)  =
     type 'output constant = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> Exception.method_handler * handler * 'output
     type ('input,'output) unary =  Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input -> Exception.method_handler * handler * 'output
     type ('input1,'input2,'output) binary = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input1 -> 'input2 -> Exception.method_handler * handler * 'output
+    type ('input1,'input2,'input3,'output) ternary = Remanent_parameters_sig.parameters -> handler -> Exception.method_handler -> 'input1 -> 'input2 -> 'input3 -> Exception.method_handler * handler * 'output
 
     let init,is_init =
       let used = ref None in
@@ -169,7 +204,7 @@ module Make (M:Nul)  =
       let is_init () = !used != None
       in
       init,is_init
-	
+
     let equal = Mvbdu_core.mvbdu_equal
     let equal_with_logs p h e a b = e,h,equal a b
     let lift0 string f parameters handler error =
@@ -206,7 +241,7 @@ module Make (M:Nul)  =
           Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> a)
         in
 	error, handler, a
-			
+
     let lift1bis string f parameters handler error a =
       let a,(b,c) =
 	 f (Boolean_mvbdu.association_list_allocate parameters) error parameters handler a
@@ -325,8 +360,6 @@ module Make (M:Nul)  =
         in
 	error, handler, a
 
-	
-
     let (mvbdu_not: (mvbdu,mvbdu) unary) = lift1 "line 80, bdd_not" Boolean_mvbdu.boolean_mvbdu_not
 
     let mvbdu_id parameters handler error a = error, handler, a
@@ -365,7 +398,6 @@ module Make (M:Nul)  =
     let build_variables_list 	=
       liftvbis "line 257, build_list"
 	List_algebra.build_list
-	
 
     let build_sorted_variables_list = liftvter "line 259, build_list" List_algebra.build_reversed_sorted_list
 
@@ -411,8 +443,8 @@ module Make (M:Nul)  =
       in aux error handler bdu []
 
     let mvbdu_cartesian_decomposition_depth parameters handler error bdu int =
-      Boolean_mvbdu.mvbdu_cartesian_decomposition_depth variables_list_of_mvbdu extensional_of_variables_list build_sorted_variables_list mvbdu_project_keep_only mvbdu_project_abstract_away mvbdu_and equal parameters handler error bdu int							
-	
+      Boolean_mvbdu.mvbdu_cartesian_decomposition_depth variables_list_of_mvbdu extensional_of_variables_list build_sorted_variables_list mvbdu_project_keep_only mvbdu_project_abstract_away mvbdu_and equal parameters handler error bdu int
+
     let mvbdu_full_cartesian_decomposition parameters handler error bdu =
       let error,handler,l = variables_list_of_mvbdu parameters handler error bdu in
       let error,handler,list = extensional_of_variables_list parameters handler error l in
@@ -423,15 +455,48 @@ module Make (M:Nul)  =
       with
       | None -> error,handler,list
       | Some bdu -> error,handler,bdu::list
-	
+
     let merge_variables_lists parameters handler error l1 l2 =
       lift2four "line 332" Boolean_mvbdu.merge_variables_lists parameters handler error l1 l2
 
     let overwrite_association_lists parameters handler error l1 l2 =
       lift2five "line 335" Boolean_mvbdu.overwrite_association_lists parameters handler error l1 l2
 
+    let store_by_gen get_id get set default join parameters handler error hash_consed_object data storage  =
+      let id = get_id hash_consed_object in
+      let error, old_data = get parameters error id storage in
+      let error, handler, data = join parameters handler error old_data data in
+      let error, storage = set parameters error id data storage in
+      error, handler, storage
 
-		
+    let store_by_variables_list get set default join parameters handler error hash_consed_object data storage =
+      store_by_gen List_core.id_of_list
+	get
+	set
+	default
+	join
+	parameters
+	handler
+	error
+	hash_consed_object
+	data
+	storage
+
+    let store_by_mvbdu get set default join parameters handler error hash_consed_object data storage =
+      store_by_gen Mvbdu_core.id_of_mvbdu
+	get
+	set
+	default
+	join
+	parameters
+	handler
+	error
+	hash_consed_object
+	data
+	storage
+
+
+
   end: Mvbdu)
 
 module Internalize(M:Mvbdu) =
@@ -598,21 +663,24 @@ module Internalize(M:Mvbdu) =
 module Optimize(M:Mvbdu) =
 	 (struct
 	     module Mvbdu = M
-	     type handler = Mvbdu.handler 	
+	     type handler = Mvbdu.handler
 	     type mvbdu = Mvbdu.mvbdu
 	     type hconsed_association_list = Mvbdu.hconsed_association_list
 	     type hconsed_variables_list = Mvbdu.hconsed_variables_list
 	     type 'output constant = 'output Mvbdu.constant
 	     type ('input,'output) unary =  ('input,'output) Mvbdu.unary
 	     type ('input1,'input2,'output) binary = ('input1,'input2,'output) Mvbdu.binary
-										
+	     type ('input1,'input2,'input3,'output) ternary = ('input1,'input2,'input3,'output) Mvbdu.ternary
+
+
 
 	     let init = Mvbdu.init
 	     let is_init = Mvbdu.is_init
 	     let equal = Mvbdu.equal
 	     let equal_with_logs = Mvbdu.equal_with_logs
 	     let mvbdu_nand  = Mvbdu.mvbdu_nand
-	     let mvbdu_not parameters handler error a = mvbdu_nand parameters handler error a a					       	
+	     let mvbdu_not parameters handler error a = mvbdu_nand parameters handler error a a
+
 	     let mvbdu_id = Mvbdu.mvbdu_id
 	     let mvbdu_true = Mvbdu.mvbdu_true
 	     let mvbdu_false = Mvbdu.mvbdu_false
@@ -654,7 +722,7 @@ module Optimize(M:Mvbdu) =
 	     let mvbdu_fst = M.mvbdu_fst
 	     let mvbdu_snd = M.mvbdu_snd
 	     let mvbdu_nfst parameters handler error a _ = mvbdu_not parameters handler error a
-	     let mvbdu_nsnd parameters handler error _ a = mvbdu_not parameters handler error a						
+	     let mvbdu_nsnd parameters handler error _ a = mvbdu_not parameters handler error a
 
 	     let mvbdu_cartesian_abstraction = M.mvbdu_cartesian_abstraction
 	     let mvbdu_redefine = M.mvbdu_redefine
@@ -672,15 +740,15 @@ module Optimize(M:Mvbdu) =
 
 	     let merge_variables_lists = M.merge_variables_lists
 	     let overwrite_association_lists = M.overwrite_association_lists
-						
+
 	     let extensional_of_association_list = M.extensional_of_association_list
 	     let extensional_of_variables_list = M.extensional_of_variables_list
 	     let extensional_of_mvbdu = M.extensional_of_mvbdu
 	     let variables_list_of_mvbdu = M.variables_list_of_mvbdu
-						
+
 	     let mvbdu_cartesian_decomposition_depth parameters handler error bdu int =
-	       Boolean_mvbdu.mvbdu_cartesian_decomposition_depth variables_list_of_mvbdu extensional_of_variables_list build_sorted_variables_list mvbdu_project_keep_only mvbdu_project_abstract_away mvbdu_and equal parameters handler error bdu int							
-								
+	       Boolean_mvbdu.mvbdu_cartesian_decomposition_depth variables_list_of_mvbdu extensional_of_variables_list build_sorted_variables_list mvbdu_project_keep_only mvbdu_project_abstract_away mvbdu_and equal parameters handler error bdu int
+
 	     let mvbdu_full_cartesian_decomposition parameters handler error bdu =
 	       let error,handler,l = variables_list_of_mvbdu parameters handler error bdu in
 	       let error,handler,list = extensional_of_variables_list parameters handler error l in
@@ -691,11 +759,13 @@ module Optimize(M:Mvbdu) =
 	       with
 	       | None -> error,handler,list
 	       | Some bdu -> error,handler,bdu::list
-						
+
 	     let print = M.print
 	     let print_association_list = M.print_association_list
 	     let print_variables_list = M.print_variables_list
-	
+
+	     let store_by_variables_list = M.store_by_variables_list
+	     let store_by_mvbdu = M.store_by_mvbdu
 	   end:Mvbdu)
 
 module Optimize'(M:Internalized_mvbdu) =

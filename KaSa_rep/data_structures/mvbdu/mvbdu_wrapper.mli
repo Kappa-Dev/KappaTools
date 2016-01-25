@@ -8,6 +8,7 @@ module type Mvbdu =
     type 'output constant = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> Exception.method_handler * handler * 'output
     type ('input,'output) unary =  Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input -> Exception.method_handler * handler * 'output
     type ('input1,'input2,'output) binary = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input1 -> 'input2 -> Exception.method_handler * handler * 'output
+    type ('input1,'input2,'input3,'output) ternary = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input1 -> 'input2 -> 'input3 -> Exception.method_handler * handler * 'output
 
     val init: Remanent_parameters_sig.parameters -> Exception.method_handler -> Exception.method_handler * handler
     val is_init: unit -> bool
@@ -64,6 +65,39 @@ module type Mvbdu =
     val print: Remanent_parameters_sig.parameters -> mvbdu -> unit
     val print_association_list: Remanent_parameters_sig.parameters -> hconsed_association_list -> unit
     val print_variables_list: Remanent_parameters_sig.parameters -> hconsed_variables_list -> unit
+
+    val store_by_variables_list:
+      ( Remanent_parameters_sig.parameters ->
+	Exception.method_handler ->
+	List_sig.hash_key ->
+	'map ->
+	Exception.method_handler * 'data) ->
+      ( Remanent_parameters_sig.parameters ->
+	Exception.method_handler ->
+	List_sig.hash_key ->
+	'data ->
+	'map ->
+	Exception.method_handler * 'map) ->
+      'data ->
+      ('data,'data,'data) binary ->
+       (int List_sig.list,'data,'map,'map) ternary
+
+    val store_by_mvbdu:
+      ( Remanent_parameters_sig.parameters ->
+	Exception.method_handler ->
+	Mvbdu_sig.hash_key ->
+	'map ->
+	Exception.method_handler * 'data) ->
+      ( Remanent_parameters_sig.parameters ->
+	Exception.method_handler ->
+	Mvbdu_sig.hash_key ->
+	'data ->
+	'map ->
+	Exception.method_handler * 'map) ->
+      'data ->
+      ('data,'data,'data) binary ->
+       (mvbdu,'data,'map,'map) ternary
+
   end
 
 module type Internalized_mvbdu =
