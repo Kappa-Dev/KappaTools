@@ -8,8 +8,8 @@ type token =
 type logger_kind =
 | DEVNUL
 | Formatter of Format.formatter
-| Circular_buffer of string Circular_buffers.Buffers.t ref
-| Infinite_buffer of string Infinite_buffers.Buffers.t ref
+| Circular_buffer of string Circular_buffers.t ref
+| Infinite_buffer of string Infinite_buffers.t ref
 
 let breakable x =
   match
@@ -72,7 +72,7 @@ let print_newline logger =
   | Circular_buffer bf ->
     begin
       let bf' =
-	Circular_buffers.Buffers.add
+	Circular_buffers.add
 	  (Format.asprintf "%a"
 	     (Pp.list
 		(fun _ -> ())
@@ -94,7 +94,7 @@ let print_newline logger =
   | Infinite_buffer bf ->
       begin
       let bf' =
-	Infinite_buffers.Buffers.add
+	Infinite_buffers.add
 	  (Format.asprintf "%a"
 	     (Pp.list
 		(fun _ -> ())

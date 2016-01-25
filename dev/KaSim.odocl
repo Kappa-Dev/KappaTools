@@ -6,6 +6,11 @@ GenArray
 LargeArray
 SetMap
 
+Buffers
+Infinite_buffers
+Circular_buffers
+Loggers
+
 Nbr
 NamedDecls
 Location

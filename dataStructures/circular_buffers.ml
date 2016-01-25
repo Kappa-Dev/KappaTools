@@ -1,7 +1,5 @@
-module Buffers =
-struct
-  type 'a t =
-    {
+type 'a t =
+  {
     size: int;
     mutable start: int;
     mutable final: int;
@@ -18,28 +16,14 @@ let create i default =
   }
 
 let succ i t =
-  if i = t.size-1
-  then
-    0
-  else
-    succ i
+  if i = t.size-1 then 0 else succ i
 
-let full t =
-  if
-    succ t.final t = t.start
-  then
-    true
-  else
-    false
+let full t = succ t.final t = t.start
 
 let free_one t = t.start <- succ t.start t
 
 let add x t =
-  let () =
-    if full t
-    then
-      free_one t
-  in
+  let () = if full t then free_one t in
   let () = t.content.(t.final) <- x in
   let () = t.final <- succ t.final t in
   t
@@ -52,4 +36,3 @@ let iter f t =
       aux (succ i t)
   in
   aux t.start
-end

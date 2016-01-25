@@ -1,5 +1,3 @@
-open LargeArray
-
 module type Content =
   sig
     type t
@@ -31,13 +29,13 @@ module Make(C:Content) =
     type t = {
       mutable next_address : int ;
       mutable cemetery : content list ; (*where to put keys that points to addresses that can be recycled*)
-      ar: content option GenArray.t ; (*Unfragmented array*)
+      ar: content option LargeArray.t ; (*Unfragmented array*)
     }
 
     let bury h value = C.allocate value (-1) ; h.cemetery <- value::h.cemetery
 
-    let get = GenArray.get
-    let set = GenArray.set
+    let get = LargeArray.get
+    let set = LargeArray.set
 
     let safe_get txt = fun ar i ->
       try get ar i with Invalid_argument msg -> invalid_arg (txt^": "^msg)
@@ -45,13 +43,13 @@ module Make(C:Content) =
       try set ar i j with Invalid_argument msg -> invalid_arg (txt^": "^msg)
 
     let size h = h.next_address (*virtual size of the extensible array*)
-    let dimension h = GenArray.length h.ar (*real length of the array*)
+    let dimension h = LargeArray.length h.ar (*real length of the array*)
 
     let create size =
       if (size < 0) || (size >= Sys.max_array_length)
       then invalid_arg "Heap.create"
       else
-	{ar = GenArray.create size None ;
+	{ar = LargeArray.create size None ;
 	 next_address = 0 ;
 	 cemetery = [] ; (*shouldn't be too big*)
 	}
@@ -80,9 +78,9 @@ module Make(C:Content) =
       let i = h.next_address in
       C.allocate v i ;
       let ar =
-	if (i = GenArray.length h.ar) then (*h.ar is full*)
+	if (i = LargeArray.length h.ar) then (*h.ar is full*)
 	  let size' = 2 * (i + 1) in
-	  GenArray.init
+	  LargeArray.init
 	    size'
 	    (fun j -> if j < i
 		      then safe_get "Heap.alloc 0" h.ar j (*copying old values*)
@@ -109,7 +107,7 @@ module Make(C:Content) =
 
     let iteri f h =
       try
-	GenArray.iteri
+	LargeArray.iteri
 	  (fun cpt -> function
 		   | None -> raise End_of_Array
 		   | Some content ->

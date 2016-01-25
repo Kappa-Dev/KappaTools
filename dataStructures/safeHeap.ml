@@ -1,4 +1,3 @@
-open LargeArray
 (**Heap with no fragmentation and an equality test for content*)
 
 module type Content = 
@@ -38,7 +37,7 @@ module Make(C:Content) =
 	type t = {
 		mutable next_address : int ; 
 		mutable cemetery : content list ; (*where to put keys that points to addresses that can be recycled*)
-		ar: content option GenArray.t ; (*Unfragmented array*)
+		ar: content option LargeArray.t ; (*Unfragmented array*)
 		hash: (C.key, content list) Hashtbl.t
 		}
    	
@@ -50,19 +49,19 @@ module Make(C:Content) =
 		if values' = [] then Hashtbl.remove h.hash key else Hashtbl.replace h.hash key values' ;
 		C.allocate value (-1) ; h.cemetery <- value::h.cemetery
 	
-	let get = GenArray.get
-	let set = GenArray.set
+	let get = LargeArray.get
+	let set = LargeArray.set
   
 	let safe_get txt = fun ar i -> (try get ar i with Invalid_argument msg -> invalid_arg (txt^": "^msg))   
 	let safe_set txt = fun ar i j -> (try set ar i j with Invalid_argument msg -> invalid_arg (txt^": "^msg))
 		
 	let size h = h.next_address (*virtual size of the extensible array*)
-	let dimension h = GenArray.length h.ar (*real length of the array*)
+	let dimension h = LargeArray.length h.ar (*real length of the array*)
   
 	let create size = 
      if (size < 0) || (size >= Sys.max_array_length) then invalid_arg "Heap.create" 
      else 
-       {ar = GenArray.create size None ; 
+       {ar = LargeArray.create size None ;
 				next_address = 0 ; 
 				cemetery = [] ; (*shouldn't be too big*)
 				hash = Hashtbl.create 2
@@ -90,7 +89,7 @@ module Make(C:Content) =
 	
 	let gc h f =
 		let collect = ref [] in
-			GenArray.iteri 
+			LargeArray.iteri
 			(fun i content_opt -> match content_opt with None -> () | Some content -> if f content then collect := i::!collect) h.ar ;
 			List.fold_left (fun h i -> remove i h) h !collect
 				
@@ -109,10 +108,10 @@ module Make(C:Content) =
 			let i = h.next_address in
 			C.allocate v i ;
 			let ar = 
-				if (i = GenArray.length h.ar) then (*h.ar is full*)
+				if (i = LargeArray.length h.ar) then (*h.ar is full*)
 					let size' = 2 * (i + 1)
 					in
-					GenArray.init size' 
+					LargeArray.init size'
 					(fun j -> if j < i then safe_get "Heap.alloc 0" h.ar j (*copying old values*)
 										else None (*default value*)
 					)
@@ -142,7 +141,7 @@ module Make(C:Content) =
   let iteri f h = 
 		let cpt = ref 0 in
 	    try 
-	      GenArray.iter 
+	      LargeArray.iter
 				(fun v -> match v with 
 					| None -> raise End_of_Array
 					| Some content -> if !cpt = h.next_address then raise End_of_Array else (cpt:=!cpt+1 ; f (C.get_address content) content)) h.ar

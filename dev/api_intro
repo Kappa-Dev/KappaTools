@@ -5,8 +5,11 @@ describe the API bottom-up.
 
 The folder dataStructures/ has a transparent name. You can find there:
 {!modules: LargeArray SetMap Operator Nbr NamedDecls Location}
-Some pretty printing utilities are Here too:
+Some pretty printing utilities are here too:
 {!modules: Pp Pp_svg Pp_html}
+Including the KaSa machinery:
+{!modules: Loggers}
+
 
 In term/ directory stands all definitions the simulator works on.
 {!modules: Agent_place Signature Connected_component
