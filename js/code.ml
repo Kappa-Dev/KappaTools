@@ -52,7 +52,7 @@ let panel_heading = <:html5<<div class="row">
                             </div> >>
 
 
-let code_column = <:html5<<div class="col-md-6">
+let xml = <:html5<<div class="col-md-6">
                              <div class="panel panel-default">
 
                                 <div class="panel-heading">
@@ -67,7 +67,7 @@ let code_column = <:html5<<div class="col-md-6">
 
                                 <!-- configuration panel -->
                                 <div id="configuration-panel">
-                                   $ConfigurationPanel.xml$
+                                   $Settings.xml$
                                 </div> <!-- configuration panel -->
 
                                 <!-- simulation panel -->
@@ -76,7 +76,7 @@ let code_column = <:html5<<div class="col-md-6">
 
                              </div>
                           </div> >>
-let code_on_load () =
+let onload () =
   let configuration : configuration Js.t = Codemirror.create_configuration () in
   let gutter_option : Js.string_array Js.t = (Js.string "CodeMirror-linenumbers,breakpoints")##split(Js.string ",") in
   let textarea : Dom_html.element Js.t =
@@ -84,10 +84,14 @@ let code_on_load () =
                (fun () -> assert false) in
   let () = (Js.Unsafe.coerce configuration)##lineNumbers <- Js._true;
            (Js.Unsafe.coerce configuration)##gutters <- gutter_option;
+           (Js.Unsafe.coerce configuration)##mode <- (Js.string "Kappa");
            Js.Unsafe.fun_call
              (Js.Unsafe.js_expr "id")
              [|Js.Unsafe.inject configuration |] in
   let codemirror : codemirror Js.t = Codemirror.fromTextArea textarea configuration in
+  let _ = Js.Unsafe.fun_call
+            (Js.Unsafe.js_expr "id")
+            [|Js.Unsafe.inject codemirror |] in
   let file_select_dom : Dom_html.inputElement Js.t =
     Js.Unsafe.coerce
     ((Js.Opt.get (document##getElementById (Js.string file_selector_id))
@@ -124,6 +128,5 @@ let code_on_load () =
               in
               return_unit
              )
-
   in
- ()
+  Settings.onload ()

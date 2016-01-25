@@ -10,6 +10,7 @@ class type configuration = object
   val value : int Js.t Js.prop
   val lineNumbers : bool Js.t Js.prop
   val gutters : Js.string_array Js.t Js.prop
+  val mode : Js.js_string Js.t Js.prop
 end
 let constructor_configuration : configuration Js.t Js.constr = (Js.Unsafe.variable "Object")
 let create_configuration () : configuration Js.t  = jsnew constructor_configuration ()
