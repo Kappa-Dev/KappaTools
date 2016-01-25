@@ -1,54 +1,10 @@
 module Buffers =
 struct
-  type 'a t =
-    {
-    size: int;
-    mutable start: int;
-    mutable final: int;
-    content: 'a array
-  }
+  type 'a t = 'a list
 
-let create i default =
-  let size = max i 2 in
-  {
-    size = size;
-    start = 0;
-    final = 0;
-    content = Array.make size default
-  }
+let create i default = []
 
-let succ i t =
-  if i = t.size-1
-  then
-    0
-  else
-    succ i
+let add x t = x::t
 
-let full t =
-  if
-    succ t.final t = t.start
-  then
-    true
-  else
-    false
-
-let free_one t = t.start <- succ t.start t
-
-let add x t =
-  let () =
-    if full t
-    then
-      free_one t
-  in
-  let () = t.content.(t.final) <- x in
-  t.final <- succ t.final t
-
-let iter f t =
-  let rec aux i =
-    if i <> t.final
-    then
-      let () = f (t.content.(i)) in
-      aux (succ i t)
-  in
-  aux t.start
+let iter f t = List.iter f (List.rev t)
 end

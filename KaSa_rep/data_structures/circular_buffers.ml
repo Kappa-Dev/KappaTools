@@ -41,7 +41,8 @@ let add x t =
       free_one t
   in
   let () = t.content.(t.final) <- x in
-  t.final <- succ t.final t
+  let () = t.final <- succ t.final t in
+  t
 
 let iter f t =
   let rec aux i =
