@@ -293,7 +293,7 @@ let print_result_fixpoint parameter handler error handler_kappa site_corresponde
       Loggers.fprintf (Remanent_parameters.get_logger parameter)
         "------------------------------------------------------------" in
     let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "* Cartesian decomposition:" in
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "* Relational properties:" in
     let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "------------------------------------------------------------" in
     let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
@@ -310,7 +310,10 @@ let print_result_fixpoint parameter handler error handler_kappa site_corresponde
     let () =
       Loggers.fprintf (Remanent_parameters.get_logger parameter)
         "------------------------------------------------------------" in
-    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "* Cartesian abstraction:" in
+    let () =
+      Loggers.print_newline (Remanent_parameters.get_logger parameter)
+    in
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "* Non relational properties:" in
     let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "------------------------------------------------------------" in
     let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
