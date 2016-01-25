@@ -81,7 +81,7 @@ type memo_tables =
     boolean_mvbdu_clean_head  : bool Mvbdu_sig.mvbdu Hash_1.t;
     boolean_mvbdu_keep_head_only: bool Mvbdu_sig.mvbdu Hash_1.t;
     boolean_mvbdu_redefine    : bool Mvbdu_sig.mvbdu Hash_2.t;
-    boolean_mvbdu_monotonic_rename: bool Mvbdu_sig.mvbdu Hash_2.t;
+    boolean_mvbdu_monotonicaly_rename: bool Mvbdu_sig.mvbdu Hash_2.t;
     boolean_mvbdu_project_keep_only: bool Mvbdu_sig.mvbdu Hash_2.t;
     boolean_mvbdu_project_abstract_away: bool Mvbdu_sig.mvbdu Hash_2.t;
 
@@ -136,7 +136,7 @@ let split_memo error handler =
     "snd:",     x.boolean_mvbdu_snd;
     "not snd:", x.boolean_mvbdu_nsnd;
     "reset:",   x.boolean_mvbdu_redefine;
-    "rename:",  x.boolean_mvbdu_monotonic_rename;
+    "rename:",  x.boolean_mvbdu_monotonicaly_rename;
     "project_onto:", x.boolean_mvbdu_project_keep_only;
     "project_away:", x.boolean_mvbdu_project_abstract_away;],
   [ (* _ -> variables_list *)
@@ -252,7 +252,7 @@ let init_data parameters error =
       boolean_mvbdu_nis_implied = mvbdu_nis_implied;
       boolean_mvbdu_nimply = mvbdu_nimply;
       boolean_mvbdu_redefine = mvbdu_redefine;
-      boolean_mvbdu_monotonic_rename = mvbdu_rename;
+      boolean_mvbdu_monotonicaly_rename = mvbdu_rename;
       boolean_mvbdu_project_keep_only = mvbdu_project_keep_only;
       boolean_mvbdu_project_abstract_away = mvbdu_project_abstract_away;
       boolean_mvbdu_merge_variables_lists = mvbdu_merge;
@@ -763,6 +763,14 @@ let redefine parameters error handler mvbdu_input list_input =
     (fun x -> x.Memo_sig.data.boolean_mvbdu_redefine)
     (fun x h ->
       {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_redefine = x}})
+    parameters error handler mvbdu_input list_input
+
+let monotonicaly_rename parameters error handler mvbdu_input list_input =
+  gen_bin_mvbdu_list
+    Mvbdu_algebra.monotonicaly_rename
+    (fun x -> x.Memo_sig.data.boolean_mvbdu_monotonicaly_rename)
+    (fun x h ->
+      {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_monotonicaly_rename = x}})
     parameters error handler mvbdu_input list_input
 
 let project_keep_only parameters error handler mvbdu_input list_input =
