@@ -81,6 +81,7 @@ type memo_tables =
     boolean_mvbdu_clean_head  : bool Mvbdu_sig.mvbdu Hash_1.t;
     boolean_mvbdu_keep_head_only: bool Mvbdu_sig.mvbdu Hash_1.t;
     boolean_mvbdu_redefine    : bool Mvbdu_sig.mvbdu Hash_2.t;
+    boolean_mvbdu_monotonic_rename: bool Mvbdu_sig.mvbdu Hash_2.t;
     boolean_mvbdu_project_keep_only: bool Mvbdu_sig.mvbdu Hash_2.t;
     boolean_mvbdu_project_abstract_away: bool Mvbdu_sig.mvbdu Hash_2.t;
 
@@ -97,7 +98,7 @@ type memo_tables =
 
 type mvbdu_dic = (bool Mvbdu_sig.cell, bool Mvbdu_sig.mvbdu) D_mvbdu_skeleton.dictionary
 type association_list_dic  = (int List_sig.cell, int List_sig.list) D_Association_list_skeleton.dictionary
-type variables_list_dic = (unit List_sig.cell, unit List_sig.list) D_Variables_list_skeleton.dictionary					
+type variables_list_dic = (unit List_sig.cell, unit List_sig.list) D_Variables_list_skeleton.dictionary
 type handler   = (memo_tables, mvbdu_dic, association_list_dic, variables_list_dic, bool, int) Memo_sig.handler
 
 type unary_memoized_fun =
@@ -135,6 +136,7 @@ let split_memo error handler =
     "snd:",     x.boolean_mvbdu_snd;
     "not snd:", x.boolean_mvbdu_nsnd;
     "reset:",   x.boolean_mvbdu_redefine;
+    "rename:",  x.boolean_mvbdu_monotonic_rename;
     "project_onto:", x.boolean_mvbdu_project_keep_only;
     "project_away:", x.boolean_mvbdu_project_abstract_away;],
   [ (* _ -> variables_list *)
@@ -228,6 +230,7 @@ let init_data parameters error =
   let error,mvbdu_extensional_association_list = Hash_1.create parameters error 0 in
   let error,mvbdu_variables_of = Hash_1.create parameters error 0 in
   let error,mvbdu_extensional_description_of_mvbdu = Hash_1.create parameters error 0 in
+  let error,mvbdu_rename = Hash_2.create parameters error (0,0) in
   error,
     {
       boolean_mvbdu_clean_head = mvbdu_clean_head ;
@@ -249,6 +252,7 @@ let init_data parameters error =
       boolean_mvbdu_nis_implied = mvbdu_nis_implied;
       boolean_mvbdu_nimply = mvbdu_nimply;
       boolean_mvbdu_redefine = mvbdu_redefine;
+      boolean_mvbdu_monotonic_rename = mvbdu_rename;
       boolean_mvbdu_project_keep_only = mvbdu_project_keep_only;
       boolean_mvbdu_project_abstract_away = mvbdu_project_abstract_away;
       boolean_mvbdu_merge_variables_lists = mvbdu_merge;
