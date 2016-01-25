@@ -2096,7 +2096,7 @@ Id=26
 
 
 ------------------------------------------------------------
-* Cartesian decomposition:
+* Relational properties:
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
@@ -2329,7 +2329,8 @@ Id=26
 EXTENSIONAL DESCRIPTION:
 In agent C, the internal state of site x is p, if and only if, the binding state of site x is A@x.
 
-------------------------------------------------------------* Cartesian abstraction:
+------------------------------------------------------------
+* Non relational properties:
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:

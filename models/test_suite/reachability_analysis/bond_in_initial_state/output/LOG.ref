@@ -86,10 +86,11 @@ Reachability analysis...
 ------------------------------------------------------------
 
 ------------------------------------------------------------
-* Cartesian decomposition:
+* Relational properties:
 ------------------------------------------------------------
 
-------------------------------------------------------------* Cartesian abstraction:
+------------------------------------------------------------
+* Non relational properties:
 ------------------------------------------------------------
 The binding state of site x in agent A is always B@x.
 The internal state of site x in agent A is always u.

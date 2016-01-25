@@ -405,7 +405,7 @@ Id=3
 
 
 ------------------------------------------------------------
-* Cartesian decomposition:
+* Relational properties:
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
@@ -466,7 +466,8 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 
-------------------------------------------------------------* Cartesian abstraction:
+------------------------------------------------------------
+* Non relational properties:
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:

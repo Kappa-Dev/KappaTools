@@ -1282,7 +1282,7 @@ Id=89
 
 
 ------------------------------------------------------------
-* Cartesian decomposition:
+* Relational properties:
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
@@ -1444,7 +1444,8 @@ In agent C, the internal state of site x1, the internal state of site x2, the bi
 	C(x1~u,x2~u,x1!A@c,x2!free)
 	C(x1~u,x2~u,x1!free,x2!free)
 
-------------------------------------------------------------* Cartesian abstraction:
+------------------------------------------------------------
+* Non relational properties:
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:

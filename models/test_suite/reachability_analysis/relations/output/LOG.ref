@@ -798,7 +798,7 @@ Id=76
 
 
 ------------------------------------------------------------
-* Cartesian decomposition:
+* Relational properties:
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
@@ -940,7 +940,8 @@ In agent A, the internal state of site x, the internal state of site y, and the 
 	A(x~p,y~p,z~u)
 	A(x~u,y~u,z~u)
 
-------------------------------------------------------------* Cartesian abstraction:
+------------------------------------------------------------
+* Non relational properties:
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
