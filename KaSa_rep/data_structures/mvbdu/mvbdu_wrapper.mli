@@ -37,6 +37,7 @@ module type Mvbdu =
     val mvbdu_nfst: (mvbdu,mvbdu,mvbdu) binary
     val mvbdu_nsnd: (mvbdu,mvbdu,mvbdu) binary
     val mvbdu_redefine: (mvbdu,hconsed_association_list,mvbdu) binary
+    val mvbdu_rename: (mvbdu,hconsed_association_list,mvbdu) binary
     val mvbdu_project_keep_only: (mvbdu,hconsed_variables_list,mvbdu) binary
     val mvbdu_project_abstract_away: (mvbdu,hconsed_variables_list,mvbdu) binary
     val mvbdu_cartesian_decomposition_depth: (mvbdu,int,mvbdu option * mvbdu list) binary
@@ -69,6 +70,7 @@ module type Mvbdu =
     val store_by_variables_list:
       ( Remanent_parameters_sig.parameters ->
 	Exception.method_handler ->
+	'data -> 
 	List_sig.hash_key ->
 	'map ->
 	Exception.method_handler * 'data) ->
@@ -80,11 +82,12 @@ module type Mvbdu =
 	Exception.method_handler * 'map) ->
       'data ->
       ('data,'data,'data) binary ->
-       (int List_sig.list,'data,'map,'map) ternary
+       (hconsed_variables_list,'data,'map,'map) ternary
 
     val store_by_mvbdu:
       ( Remanent_parameters_sig.parameters ->
 	Exception.method_handler ->
+	'data ->
 	Mvbdu_sig.hash_key ->
 	'map ->
 	Exception.method_handler * 'data) ->
@@ -131,6 +134,7 @@ module type Internalized_mvbdu =
     val mvbdu_nfst:  mvbdu -> mvbdu -> mvbdu
     val mvbdu_nsnd:  mvbdu -> mvbdu -> mvbdu
     val mvbdu_redefine:  mvbdu -> hconsed_association_list -> mvbdu
+    val mvbdu_rename: mvbdu -> hconsed_association_list -> mvbdu
     val mvbdu_project_abstract_away: mvbdu -> hconsed_variables_list -> mvbdu
     val mvbdu_project_keep_only: mvbdu -> hconsed_variables_list -> mvbdu
     val mvbdu_cartesian_abstraction: mvbdu -> mvbdu list

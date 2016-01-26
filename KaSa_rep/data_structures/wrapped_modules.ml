@@ -1,3 +1,4 @@
+open Mods
 (* versions of the module with logging primitives *)
 (* type are shared among both versions *) 
 module LoggedStringSetMap = Map_wrapper.Make(StringSetMap) 
@@ -16,8 +17,8 @@ module LoggedCharMap = LoggedCharSetMap.Map
 (* versions of the module with logging primitives *)
 (* type are hidden, cannot be used with not logged versions *)
 module ParanoStringSetMap = Map_wrapper.Make (SetMap.Make (String))
-module ParanoStringSet = Parano.StringSetMap.Set
-module ParanoStringMap = Parano.StringSetMap.Map
+module ParanoStringSet = ParanoStringSetMap.Set
+module ParanoStringMap = ParanoStringSetMap.Map
 module ParanoIntSetMap =
   Map_wrapper.Make (SetMap.Make (struct type t = int let compare = int_compare end))
 module ParanoIntSet = ParanoIntSetMap.Set			

@@ -38,6 +38,7 @@ module type Mvbdu =
     val mvbdu_nfst: (mvbdu,mvbdu,mvbdu) binary
     val mvbdu_nsnd: (mvbdu,mvbdu,mvbdu) binary
     val mvbdu_redefine: (mvbdu,hconsed_association_list,mvbdu) binary
+    val mvbdu_rename: (mvbdu,hconsed_association_list,mvbdu) binary
     val mvbdu_project_keep_only: (mvbdu,hconsed_variables_list,mvbdu) binary
     val mvbdu_project_abstract_away: (mvbdu,hconsed_variables_list,mvbdu) binary
     val mvbdu_cartesian_decomposition_depth: (mvbdu,int,mvbdu option * mvbdu list) binary
@@ -71,6 +72,7 @@ module type Mvbdu =
     val store_by_variables_list:
       ( Remanent_parameters_sig.parameters ->
 	Exception.method_handler ->
+	'data ->
 	List_sig.hash_key ->
 	'map ->
 	Exception.method_handler * 'data) ->
@@ -82,11 +84,12 @@ module type Mvbdu =
 	Exception.method_handler * 'map) ->
       'data ->
       ('data,'data,'data) binary ->
-       (int List_sig.list,'data,'map,'map) ternary
+       (hconsed_variables_list,'data,'map,'map) ternary
 
     val store_by_mvbdu:
       ( Remanent_parameters_sig.parameters ->
 	Exception.method_handler ->
+	'data ->
 	Mvbdu_sig.hash_key ->
 	'map ->
 	Exception.method_handler * 'data) ->
@@ -135,6 +138,7 @@ module type Internalized_mvbdu =
     val mvbdu_nfst:  mvbdu -> mvbdu -> mvbdu
     val mvbdu_nsnd:  mvbdu -> mvbdu -> mvbdu
     val mvbdu_redefine: mvbdu -> hconsed_association_list -> mvbdu
+    val mvbdu_rename: mvbdu -> hconsed_association_list -> mvbdu
     val mvbdu_project_abstract_away: mvbdu -> hconsed_variables_list -> mvbdu
     val mvbdu_project_keep_only: mvbdu -> hconsed_variables_list -> mvbdu
     val mvbdu_cartesian_abstraction: mvbdu -> mvbdu list
@@ -165,7 +169,7 @@ module type Internalized_mvbdu =
     val print_association_list: Remanent_parameters_sig.parameters -> hconsed_association_list -> unit
     val print_variables_list: Remanent_parameters_sig.parameters -> hconsed_variables_list -> unit
 
-
+      
 
 end
 
@@ -384,6 +388,7 @@ module Make (M:Nul)  =
     let mvbdu_nfst = lift2 "line 100, bdd_nfst" Boolean_mvbdu.boolean_mvbdu_nfst
     let mvbdu_nsnd = lift2 "line 101, bdd_nsnd" Boolean_mvbdu.boolean_mvbdu_nsnd
     let mvbdu_redefine = lift2bis "line 102, bdd_redefine" Boolean_mvbdu.redefine
+    let mvbdu_rename = lift2bis "line 389, bdd rename" Boolean_mvbdu.monotonicaly_rename
     let mvbdu_project_keep_only = lift2ter "line 246, bdd_project_keep_only" Boolean_mvbdu.project_keep_only
     let mvbdu_project_abstract_away = lift2ter "line 247, bdd_project_abstract_away" Boolean_mvbdu.project_abstract_away
 
@@ -464,7 +469,7 @@ module Make (M:Nul)  =
 
     let store_by_gen get_id get set default join parameters handler error hash_consed_object data storage  =
       let id = get_id hash_consed_object in
-      let error, old_data = get parameters error id storage in
+      let error, old_data = get parameters error default id storage in
       let error, handler, data = join parameters handler error old_data data in
       let error, storage = set parameters error id data storage in
       error, handler, storage
@@ -495,7 +500,12 @@ module Make (M:Nul)  =
 	data
 	storage
 
-
+    let mvbdu_rename parameters handler error mvbdu list =
+      let () = print parameters mvbdu in
+      let () = print_association_list parameters list in
+      let error,handler,output = mvbdu_rename parameters handler error mvbdu list in
+      let () = print parameters output in
+      error,handler,output
 
   end: Mvbdu)
 
@@ -616,8 +626,8 @@ module Internalize(M:Mvbdu) =
     let mvbdu_rev_imply = lift_binary "line 255, mvbdu_imply" M.mvbdu_rev_imply
     let mvbdu_nrev_imply = lift_binary "line 256, mvbdu_nrev_imply" M.mvbdu_nrev_imply
     let mvbdu_equiv = lift_binary "line 256, mvbdu_nrev_imply" M.mvbdu_equiv
-			
     let mvbdu_redefine = lift_binary "line 258, mvbdu_redefine" M.mvbdu_redefine
+    let mvbdu_rename = lift_binary "line 624, mvbdu_rename" Mvbdu.mvbdu_rename
     let mvbdu_project_keep_only = lift_binary "line 380, mvbdu_project_keep_only" M.mvbdu_project_keep_only
     let mvbdu_project_abstract_away = lift_binary "line 381, mvbdu_project_abstract_away" M.mvbdu_project_abstract_away
 
@@ -726,6 +736,7 @@ module Optimize(M:Mvbdu) =
 
 	     let mvbdu_cartesian_abstraction = M.mvbdu_cartesian_abstraction
 	     let mvbdu_redefine = M.mvbdu_redefine
+	     let mvbdu_rename = M.mvbdu_rename
 	     let mvbdu_project_keep_only = M.mvbdu_project_keep_only
 	     let mvbdu_project_abstract_away = M.mvbdu_project_abstract_away
 	     let build_association_list = M.build_association_list
@@ -775,12 +786,12 @@ module Optimize'(M:Internalized_mvbdu) =
 	     type mvbdu = Mvbdu.mvbdu
 	     type hconsed_association_list = Mvbdu.hconsed_association_list
 	     type hconsed_variables_list = Mvbdu.hconsed_variables_list
-	
+
 	     let init = Mvbdu.init
 	     let is_init = Mvbdu.is_init
 	     let equal = Mvbdu.equal
 	     let mvbdu_nand a = Mvbdu.mvbdu_nand a
-	     let mvbdu_not a = mvbdu_nand  a a					       	
+	     let mvbdu_not a = mvbdu_nand  a a
 	     let mvbdu_id = Mvbdu.mvbdu_id
 	     let mvbdu_true = Mvbdu.mvbdu_true
 	     let mvbdu_false = Mvbdu.mvbdu_false
@@ -798,13 +809,15 @@ module Optimize'(M:Internalized_mvbdu) =
 	     let mvbdu_bi_true _ _ = M.mvbdu_true ()
 	     let mvbdu_bi_false _ _ = M.mvbdu_false ()
 	     let mvbdu_fst a _ = a
-	     let mvbdu_snd _ b = b			
+	     let mvbdu_snd _ b = b
 	     let mvbdu_nfst a _ = mvbdu_not a
-	     let mvbdu_nsnd _ a = mvbdu_not a						
+	     let mvbdu_nsnd _ a = mvbdu_not a
+
 	     let build_association_list = M.build_association_list
 	     let build_sorted_association_list = M.build_sorted_association_list
 	     let build_reverse_sorted_association_list = M.build_reverse_sorted_association_list
 	     let mvbdu_redefine = M.mvbdu_redefine
+	     let mvbdu_rename = M.mvbdu_rename
 	     let mvbdu_project_keep_only = M.mvbdu_project_keep_only
 	     let mvbdu_project_abstract_away = M.mvbdu_project_abstract_away
 	     let build_variables_list = M.build_variables_list
