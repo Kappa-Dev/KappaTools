@@ -640,10 +640,12 @@ let apply_unary_rule
 			       Mods.IntSet.empty cc2 state.roots_of_ccs) in
   let root1_ty = match Connected_component.find_root_type cc1 with
     | None -> assert false | Some x -> x in
-  let nodes1 = Connected_component.Matching.get_all state.edges 
-	       Connected_component.Matching.empty cc1 root1 in
-  let nodes2 = Connected_component.Matching.get_all state.edges 
-	       Connected_component.Matching.empty cc2 root2 in
+  let nodes1 = Connected_component.Matching.get_all
+		 state.edges
+		 Connected_component.Matching.empty cc1 root1 in
+  let nodes2 = Connected_component.Matching.get_all
+		 state.edges
+		 Connected_component.Matching.empty cc2 root2 in
   let dist = match rule.Primitives.unary_rate with
      | None -> None
      | Some (_, dist_opt) -> dist_opt in
@@ -722,7 +724,7 @@ let apply_rule
 	  let nodes1 = Connected_component.Matching.get_all state.edges
 	               Connected_component.Matching.empty
 		       rule.Primitives.connected_components.(0)
-		       roots.(1) in
+		       roots.(0) in
 	  let nodes2 = Connected_component.Matching.get_all state.edges
 	               Connected_component.Matching.empty
 		       rule.Primitives.connected_components.(1)
