@@ -587,7 +587,7 @@ let rec monotonicaly_rename allocate memoized_fun error parameters handler mvbdu
 	      | List_sig.Cons(list) ->
 		  begin
 		    let cmp = compare list.List_sig.variable mvbdu.Mvbdu_sig.variable in
-		    if cmp < -1
+		    if cmp < 0
 		    then
 		      monotonicaly_rename allocate memoized_fun error parameters handler mvbdu_input list.List_sig.tail
 		    else if cmp = 0
