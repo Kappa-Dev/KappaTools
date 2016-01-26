@@ -51,26 +51,30 @@ let update_roots is_add map cc root =
   Connected_component.Map.add
     cc ((if is_add then Mods.IntSet.add else Mods.IntSet.remove) root va) map
 
-let remove_path (x,y) pathes =
-  let pair = (min x y, max x y) in
-  match Mods.Int2Map.find_option pair pathes with
-   | None -> pathes
-   | Some (1,_) -> Mods.Int2Map.remove pair pathes
-   | Some (i,p) -> Mods.Int2Map.add pair (pred i,p) pathes
+let add_path x y p pathes =
+  let add pair pathes =
+    match Mods.Int2Map.find_option pair pathes with
+   | None -> Mods.Int2Map.add pair (1,p) pathes
+   | Some (i,_) -> Mods.Int2Map.add pair (succ i,p) pathes in
+  if x = y then add (x,y) (add (y,x) pathes) else add (min x y, max x y) pathes
 let add_candidate cands pathes rule_id x y p =
-  let a = min x y in
-  let b = max x y in
   let va = Mods.IntMap.find_default Mods.Int2Set.empty rule_id cands in
   (Mods.IntMap.add rule_id (Mods.Int2Set.add (x,y) va) cands,
-   match Mods.Int2Map.find_option (a,b) pathes with
-   | None -> Mods.Int2Map.add (a,b) (1,p) pathes
-   | Some (i,_) -> Mods.Int2Map.add (a,b) (succ i,p) pathes)
-let remove_candidate cands pathes rule_id pair =
+   add_path x y p pathes)
+let remove_path (x,y) pathes =
+  let del pair pathes =
+    match Mods.Int2Map.find_option pair pathes with
+    | None -> pathes
+    | Some (1,_) -> Mods.Int2Map.remove pair pathes
+    | Some (i,p) -> Mods.Int2Map.add pair (pred i,p) pathes in
+  if x = y then del (x,y) (del (y,x) pathes) else del (min x y, max x y) pathes
+let remove_candidate cands pathes rule_id (x,y as pair) =
   let va =
     Mods.Int2Set.remove
       pair (Mods.IntMap.find_default Mods.Int2Set.empty rule_id cands) in
-  ((if Mods.Int2Set.is_empty va then Mods.IntMap.remove rule_id cands
-    else Mods.IntMap.add rule_id va cands), remove_path pair pathes)
+  let va' = if x = y then Mods.Int2Set.remove (y,x) va else va in
+  ((if Mods.Int2Set.is_empty va' then Mods.IntMap.remove rule_id cands
+    else Mods.IntMap.add rule_id va' cands), remove_path pair pathes)
 
 let from_place (inj_nodes,inj_fresh) = function
   | Agent_place.Existing (n,id) ->
@@ -348,7 +352,7 @@ let potential_root_of_unary_ccs unary_ccs roots i =
 
 let remove_unary_instances unaries obs deps =
   Operator.DepSet.fold
-    (fun x (cands,pathes as acc) ->
+    (fun x (cands,pathes,no_unaries as acc) ->
      match x with
      | (Operator.ALG _ | Operator.PERT _) -> acc
      | Operator.RULE i ->
@@ -361,14 +365,15 @@ let remove_unary_instances unaries obs deps =
 	       l in
 	   ((if Mods.Int2Set.is_empty stay then Mods.IntMap.remove i cands
 	     else Mods.IntMap.add i stay cands),
-	    Mods.Int2Set.fold remove_path byebye pathes)
+	    Mods.Int2Set.fold remove_path byebye pathes,
+	    no_unaries&&Mods.Int2Set.is_empty byebye)
     ) deps unaries
 
 let update_edges
       sigs counter domain unary_ccs inj_nodes state event_kind ?path rule =
   let former_deps,unary_cands,no_unary = state.outdated_elements in
   (*Negative update*)
-  let aux,side_effects,(unary_candidates',unary_pathes') =
+  let aux,side_effects,(unary_candidates',unary_pathes',no_unary') =
     List.fold_left
       (fun ((inj2graph,edges,roots,(deps,unaries_to_expl)),sides,unaries)
 	   transf ->
@@ -381,7 +386,7 @@ let update_edges
       (((inj_nodes,Mods.IntMap.empty), (*initial inj2graph: (existing,new) *)
 	state.edges,state.roots_of_ccs,(former_deps,[])),
        [],
-       (state.unary_candidates,state.unary_pathes))
+       (state.unary_candidates,state.unary_pathes,no_unary))
       rule.Primitives.removed (*removed: statically defined edges*)
   in
   let ((final_inj2graph,edges',roots',(rev_deps',unaries_to_explore)),
@@ -407,9 +412,9 @@ let update_edges
 	match new_obs with [] -> all_nobs | l -> l::all_nobs))
       (edges',roots',rev_deps',new_tracked_obs_instances,all_new_obs)
       remaining_side_effects in
-  let unary_cands',no_unary' =
+  let unary_cands',no_unary'' =
     if Connected_component.Set.is_empty unary_ccs
-    then (unary_cands,no_unary)
+    then (unary_cands,no_unary')
     else
       let unary_pack =
 	List.fold_left
@@ -418,7 +423,7 @@ let update_edges
 	      if Connected_component.Set.mem cc unary_ccs then
 		(root,[(Connected_component.Set.singleton cc,fst root),
 		       Edges.empty_path])::unary_cands,false
-	      else acc)) (unary_cands,no_unary) all_new_obs' in
+	      else acc)) (unary_cands,no_unary') all_new_obs' in
       if exists_root_of_unary_ccs unary_ccs roots''
       then
 	List.fold_left
@@ -438,7 +443,7 @@ let update_edges
 
   { roots_of_ccs = roots''; unary_candidates = unary_candidates';
     unary_pathes = unary_pathes'; edges = edges''; tokens = state.tokens;
-    outdated_elements = (rev_deps'',unary_cands',no_unary');
+    outdated_elements = (rev_deps'',unary_cands',no_unary'');
     story_machinery = story_machinery'; }
 
 let raw_instance_number state ccs_l =
