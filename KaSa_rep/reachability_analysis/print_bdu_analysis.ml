@@ -170,11 +170,9 @@ let smash_map decomposition
 	    let error,handler,hconsed_asso =
 	      Mvbdu_wrapper.Mvbdu.build_association_list parameter handler error asso
 	    in
-	    let _ = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
 	    let error,handler,renamed_mvbdu =
 	      Mvbdu_wrapper.Mvbdu.mvbdu_rename parameter handler error bdu hconsed_asso
 	    in
-	    let _ = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
 	    let error,handler,hconsed_vars =
 	      Mvbdu_wrapper.Mvbdu.variables_list_of_mvbdu parameter handler error renamed_mvbdu
 	    in
