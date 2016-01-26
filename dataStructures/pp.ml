@@ -34,6 +34,18 @@ let option pr f = function
   | None -> ()
   | Some x -> fprintf f "@ %a" pr x
 
+let array_with_empty ?(trailing=(fun _ -> ())) pr_sep pr_el f a =
+  let rec aux has_pred i f =
+    if i < Array.length a then
+      match pr_el i a.(i) with
+      | None -> aux has_pred (succ i) f
+      | Some pr ->
+	 let () = if has_pred then pr_sep f in
+	 let () = pr f in
+	 aux true (succ i) f
+    else if has_pred then trailing f
+  in aux false 0 f
+
 let array ?(trailing=(fun _ -> ())) pr_sep pr_el f a =
   let rec aux i f =
     if i < Array.length a then
@@ -42,6 +54,7 @@ let array ?(trailing=(fun _ -> ())) pr_sep pr_el f a =
 	let () = pr_sep f in aux (succ i) f
       else if i > 0 then trailing f
   in aux 0 f
+
 
 let plain_array pr_el f a =
   let rec aux i f =

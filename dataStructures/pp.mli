@@ -30,6 +30,12 @@ val array :
   ?trailing:(formatter -> unit) ->
   (formatter -> unit) -> (int -> formatter -> 'a -> unit) ->
   formatter -> 'a array -> unit
+
+val array_with_empty :
+  ?trailing:(formatter -> unit) ->
+  (formatter -> unit) -> (int -> 'a -> (Format.formatter -> unit) option) ->
+  formatter -> 'a array -> unit
+
 val plain_array : (formatter -> 'a -> unit) -> formatter -> 'a array -> unit
 
 val error : (formatter -> 'a -> unit) -> 'a Location.annot -> unit
