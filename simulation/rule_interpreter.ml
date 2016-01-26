@@ -434,7 +434,7 @@ let update_edges
 	List.fold_left
 	  (fun (unary_cands,_ as acc) (id,ty) ->
 	   match
-	     Edges.pathes_of_interrest
+	     Edges.paths_of_interest
 	       (potential_root_of_unary_ccs unary_ccs roots')
 	       sigs edges'' ty id Edges.empty_path with
 	   | [] -> acc
@@ -510,7 +510,7 @@ let new_unary_instances sigs rule_id cc1 cc2 created_obs state =
 		  then add_candidate cands pathes rule_id d id p
 		  else add_candidate cands pathes rule_id id d p)
 		 acc
-		 (Edges.pathes_of_interrest
+		 (Edges.paths_of_interest
 		    (fun x -> if Mods.IntSet.mem x goals then Some () else None)
 		    sigs state.edges restart_ty restart path)
 	     with Not_found -> acc)

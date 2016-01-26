@@ -56,9 +56,9 @@ val are_connected :
   ?candidate:path -> Signature.s -> t -> int -> int -> int -> int list -> int list -> int option -> path option
 (** [are_connected ?candidate sigs graph x_name x y nodes_x nodes_y dist] *)
 
-val pathes_of_interrest : (int -> 'a option) -> Signature.s -> t -> int ->
+val paths_of_interest : (int -> 'a option) -> Signature.s -> t -> int ->
 			  int -> path -> (('a*int) * path) list
-(** [pathes_of_interrest
+(** [paths_of_interest
          is_interesting sigs graph agent_name agent_id done_path] *)
 
 val print : Signature.s -> Format.formatter -> t -> unit

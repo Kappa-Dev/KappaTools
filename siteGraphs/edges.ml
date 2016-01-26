@@ -340,7 +340,7 @@ let is_valid_path graph l =
   List.for_all (fun (((a,_),s),((a',_),s')) -> link_exists a s a' s' graph) l
 
 (* depth = number of edges between root and node*)
-let breath_first_traversal dist stop_on_find is_interresting sigs links =
+let breadth_first_traversal dist stop_on_find is_interesting sigs links =
   let rec look_each_site (id,ty,path as x) site (stop,don,out,next as acc) =
     if site = 0 then acc else
     match (LargeArray.get links id).(pred site) with
@@ -352,7 +352,7 @@ let breath_first_traversal dist stop_on_find is_interresting sigs links =
 	 let don' = IntSet.add id' don in
 	 let path' = (((id',ty'),site'),((id,ty),pred site))::path in
 	 let out',store =
-	   match is_interresting id' with
+	   match is_interesting id' with
 	   | Some x -> ((x,id'),path')::out,true
 	   | None -> out,false in
 	 let next' = (id',ty',path')::next in
@@ -372,15 +372,15 @@ let breath_first_traversal dist stop_on_find is_interresting sigs links =
 		   | None -> aux depth don out [] next
   in aux 1 
 
-let pathes_of_interrest
-      is_interresting sigs graph start_ty start_point done_path =
+let paths_of_interest
+      is_interesting sigs graph start_ty start_point done_path =
   let don = List.fold_left (fun s (_,((x,_),_)) -> IntSet.add x s)
 			   (IntSet.singleton start_point) done_path in
   let () = assert (not graph.outdated) in
-  let acc = match is_interresting start_point with
+  let acc = match is_interesting start_point with
     | None -> []
     | Some x -> [(x,start_point),done_path] in
-  breath_first_traversal None false is_interresting sigs graph.connect don acc
+  breadth_first_traversal None false is_interesting sigs graph.connect don acc
 			 [] [start_point,start_ty,done_path]
 			 
 let are_connected ?candidate sigs graph ty_x x y nodes_x nodes_y dist =
@@ -393,16 +393,16 @@ let are_connected ?candidate sigs graph ty_x x y nodes_x nodes_y dist =
      (match candidate with
       | Some p when is_valid_path graph p -> Some p
       | (Some _ | None) ->
-	 (match breath_first_traversal dist
+	 (match breadth_first_traversal dist
 	     true (fun z -> if z = y then Some () else None)
 	     sigs graph.connect (IntSet.singleton x) [] [] [x,ty_x,[]] with
 	 | [] -> None
 	 | [ _,p ] -> Some p
 	 | _ :: _ -> failwith "Edges.are_they_connected completely broken"))
-  | Some d -> 
+  | Some _ -> 
      let rec aux nodes_x = match nodes_x with 
        | x'::nds -> 
-	  (match breath_first_traversal dist true (is_in_nodes_y nodes_y)
+	  (match breadth_first_traversal dist true (is_in_nodes_y nodes_y)
 	     sigs graph.connect (IntSet.singleton x') [] [] [x',ty_x,[]] with
 	     [] -> aux nds 
 	   | [ _,p ] -> Some p
