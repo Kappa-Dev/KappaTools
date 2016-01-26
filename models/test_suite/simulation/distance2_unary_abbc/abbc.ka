@@ -1,0 +1,16 @@
+%agent: A(a~u~p)
+%agent: B(a,b,c)
+%agent: C(c)
+
+'ab' A(a), B(a) -> A(a!1), B(a!1) @ 0.01
+'bb' B(b), B(b) -> B(b!1), B(b!1) @ 0.01
+'bc' B(c), C(c) -> B(c!1), C(c!1) @ 0.01
+'up' A(a~u?), C() -> A(a~p?), C() @ 0 (100:3) 
+
+%obs: 'Ap' |A(a~p?)|
+
+%mod: [E]=[Emax] do $SNAPSHOT "abc.ka"
+
+%init: 100 A(a~u)
+%init: 100 B()
+%init: 100 C()

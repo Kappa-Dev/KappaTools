@@ -1,0 +1,1 @@
+"${KAPPABIN}"KaSim -e 200 -seed 656095496 -o data.svg -d output -p 100 a_bn_c.ka || exit 0

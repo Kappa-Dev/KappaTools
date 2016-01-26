@@ -1,0 +1,20 @@
++ Command line is: 'KaSim' '-e' '200' '-seed' '438438234' '-o' 'data.svg' '-d' 'output' '-p' '100' 'abbc.ka'
+Parsing abbc.ka...
+done
++ Initialized random number generator with seed 438438234
++ Building initial simulation conditions...
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -sanity checks
+	 -KaSa tools initialization
++ Compute the contact map
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -initial conditions
+	 Done
+____________________________________________________________
+############################################################
+Simulation ended

@@ -1,0 +1,23 @@
+%agent: A(a~u~p,d)
+%agent: B(a,b,c,d)
+%agent: C(c,d)
+%agent: D(a,d)
+
+'ab' A(a), B(a) -> A(a!1), B(a!1) @ 0.01
+'ad' A(d), D(a) -> A(d!1), D(a!1) @ 0.01
+'bb' B(b), B(b) -> B(b!1), B(b!1) @ 0.01
+'bc' B(c), C(c) -> B(c!1), C(c!1) @ 0.01
+'bd' B(d), D(d) -> B(d!1), D(d!1) @ 0.01
+'cd' C(d), D(d) -> C(d!1), D(d!1) @ 0.01
+
+'up' A(a~u?,d!1), D(a!1), C(d!2), D(d!2) -> A(a~p?,d!1), D(a!1), C(d!2), D(d!2) @ 0 (100:2) 
+
+%obs: 'Ap' |A(a~p?)|
+%mod: [true] do $TRACK 'Ap' [true] 
+
+%mod: [E]=[Emax] do $SNAPSHOT "abc.ka"
+
+%init: 100 A(a~u)
+%init: 100 B()
+%init: 100 C()
+%init: 100 D()
