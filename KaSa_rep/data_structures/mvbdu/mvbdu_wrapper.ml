@@ -500,13 +500,6 @@ module Make (M:Nul)  =
 	data
 	storage
 
-    let mvbdu_rename parameters handler error mvbdu list =
-      let () = print parameters mvbdu in
-      let () = print_association_list parameters list in
-      let error,handler,output = mvbdu_rename parameters handler error mvbdu list in
-      let () = print parameters output in
-      error,handler,output
-
   end: Mvbdu)
 
 module Internalize(M:Mvbdu) =

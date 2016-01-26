@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <2016-01-22 17:49:39 feret>
+  * Last modification: Time-stamp: <2016-01-26 14:14:21 feret>
   * *
   * Configuration parameters which are passed through functions computation
 
@@ -199,7 +199,7 @@ let get_parameters ?html_mode:(html_mode=true) ?called_from:(called_from=Remanen
     | Remanent_parameters_sig.KaSa ->
        begin
 	 match
-	   !Config.output_directory,"profiling.html" (*temporary, to do: provide a parameterisable filename*)
+	   !Config.output_directory,"profiling.txt" (*temporary, to do: provide a parameterisable filename*)
 	 with
 	 | _,"" -> Some stdout
 	 | "",a -> Some (open_out a)

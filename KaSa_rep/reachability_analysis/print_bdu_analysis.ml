@@ -110,7 +110,7 @@ let smash_map decomposition
     ~show_dep_with_dimmension_higher_than:dim_min
     parameter handler error handler_kappa site_correspondence result =
   let error,handler,mvbdu_true =
-    Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error 
+    Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error
   in
   Map_bdu_update.Map.fold
     (fun (agent_type, cv_id) bdu (error,handler,output) ->
@@ -170,11 +170,13 @@ let smash_map decomposition
 	    let error,handler,hconsed_asso =
 	      Mvbdu_wrapper.Mvbdu.build_association_list parameter handler error asso
 	    in
-	    let error,handler,hconsed_vars =
-	      Mvbdu_wrapper.Mvbdu.build_variables_list parameter handler error site_correspondence
-	    in
+	    let _ = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
 	    let error,handler,renamed_mvbdu =
 	      Mvbdu_wrapper.Mvbdu.mvbdu_rename parameter handler error bdu hconsed_asso
+	    in
+	    let _ = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+	    let error,handler,hconsed_vars =
+	      Mvbdu_wrapper.Mvbdu.variables_list_of_mvbdu parameter handler error renamed_mvbdu
 	    in
             let error,cv_map_opt =
 	      AgentMap.unsafe_get parameter error agent_type output
@@ -220,11 +222,9 @@ let print_bdu_update_map_gen_decomposition decomposition
   if
     smash
   then
-    let _ = Printf.fprintf stdout "SMASH\n" in
    let error,(hander:Mvbdu_wrapper.Mvbdu.handler),output =
       smash_map decomposition ~show_dep_with_dimmension_higher_than:dim_min parameter handler error handler_kappa site_correspondence result
     in
-    let _ = Printf.fprintf stdout "ENDSMASH\n" in
     AgentMap.fold
       parameter
       error 
@@ -257,13 +257,11 @@ let print_bdu_update_map_gen_decomposition decomposition
 		parameter handler error (fun _ e i -> e,i) mvbdu
 	    in
 	   (*-----------------------------------------------------------------------*)
-	    let _ = Printf.fprintf stdout "KO\n" in
 	    let error =
 	      Translation_in_natural_language.print
 		~show_dep_with_dimmension_higher_than:dim_min parameter
 		handler_kappa error agent_string agent_type translation
-	    in 
-	    let _ = Printf.fprintf stdout "OK\n" in
+	    in
 	    error, handler
 	  )
 	  map
