@@ -35,7 +35,7 @@ let print_binding_state parameter error binding_state =
     | Ckappa_sig.Free -> error
     | Ckappa_sig.Lnk_type (agent_name,site_name) ->
         let error = print_agent_name parameter error agent_name in
-        let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter) "@" in
+        let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter) "@@" in
         let error = print_site_name parameter error site_name in
           error
 

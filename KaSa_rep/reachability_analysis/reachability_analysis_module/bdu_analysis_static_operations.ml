@@ -739,7 +739,7 @@ let print_covering_classes_id_aux parameter error handler_kappa result =
       in
       let () =
         Loggers.fprintf (Remanent_parameters.get_logger parameter)
-          "agent_type:%i:%s:site_type:%i:%s@list of covering_class_id:"
+          "agent_type:%i:%s:site_type:%i:%s@@list of covering_class_id:"
           agent_type agent_string site_type site_string
       in
       let () =
@@ -792,7 +792,7 @@ let print_half_break_effect parameter error handler_kappa compiled result =
       in
       let () =
         Loggers.fprintf (Remanent_parameters.get_logger parameter)
-          "agent_type:%i:%s:site_type:%i:%s@list of pair (rule_id, binding state):"
+          "agent_type:%i:%s:site_type:%i:%s@@list of pair (rule_id, binding state):"
           agent_type agent_string site_type site_string
       in
       let () =
@@ -837,7 +837,7 @@ let print_remove_effect parameter error handler_kappa compiled result =
       in
       let () =
         Loggers.fprintf (Remanent_parameters.get_logger parameter)
-          "agent_type:%i:%s:site_type:%i:%s@list of pair (rule_id, binding state):"
+          "agent_type:%i:%s:site_type:%i:%s@@list of pair (rule_id, binding state):"
           agent_type agent_string site_type site_string
       in
       let () =
@@ -915,7 +915,7 @@ let print_potential_partner_free parameter error handler_kappa compiled result =
           _ -> warn parameter error (Some "line 194") Exit (string_of_int agent_type)
       in
       let () =
-        Loggers.fprintf (Remanent_parameters.get_logger parameter)  "agent_type:%i:%s:%s@(site, free state)"
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)  "agent_type:%i:%s:%s@@(site, free state)"
           agent_type agent_string rule_id_string
       in
       let () =
@@ -956,7 +956,7 @@ let print_potential_partner_bind parameter error handler_kappa compiled result =
           _ -> warn parameter error (Some "line 232") Exit (string_of_int agent_type)
       in
       let () =
-        Loggers.fprintf (Remanent_parameters.get_logger parameter) "agent_type:%i:%s:%s@(site, binding state)"
+        Loggers.fprintf (Remanent_parameters.get_logger parameter) "agent_type:%i:%s:%s@@(site, binding state)"
           agent_type agent_string rule_id_string
       in
       let () =
@@ -1034,7 +1034,7 @@ let print_modification_sites_aux parameter error handler_kappa compiled result =
       in
       let () =
         Loggers.fprintf (Remanent_parameters.get_logger parameter)
-          "agent_id:%i:agent_type:%i:%s:site_type:%i:%s@set of rule_id:"
+          "agent_id:%i:agent_type:%i:%s:site_type:%i:%s@@set of rule_id:"
           agent_id agent_type agent_string site_type site_string
       in
       let () =
@@ -1092,7 +1092,7 @@ let print_modification_map_aux parameter error handler_kappa compiled result =
       in
       let () =
         Loggers.fprintf (Remanent_parameters.get_logger parameter)
-          "agent_type:%i:%s:site_type:%i:%s@set of rules:"
+          "agent_type:%i:%s:site_type:%i:%s@@set of rules:"
           agent_type agent_string site_type site_string
       in
       let () =

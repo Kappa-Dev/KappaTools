@@ -49,7 +49,7 @@ let trace = false
         let error, state_string2 =
           Handler.string_of_state parameter error handler_kappa agent2 site2 state2
         in
-        fprintf stdout "agent_type:%i:%s@site_type:%i:%s:state:%i(%s)--agent_type':%i:%s@site_type':%i:%s:state':%i(%s)\n"
+        fprintf stdout "agent_type:%i:%s@@site_type:%i:%s:state:%i(%s)--agent_type':%i:%s@@site_type':%i:%s:state':%i(%s)\n"
           agent1 agent_string1 site1 site_string1 state1 state_string1
           agent2 agent_string2 site2 site_string2 state2 state_string2
       ) set2
@@ -117,7 +117,7 @@ let print_contact_map_full_aux parameter error handler_kappa result =
           _ -> warn parameter error (Some "line 117") Exit (string_of_int state2)
       in
       fprintf stdout
-        "agent_type:%i:%s@site_type:%i:%s:state:%i(%s)--agent_type':%i:%s@site_type':%i:%s:state':%i(%s)\n"
+        "agent_type:%i:%s@@site_type:%i:%s:state:%i(%s)--agent_type':%i:%s@@site_type':%i:%s:state':%i(%s)\n"
         agent1 agent_string1
         site1 site_string1
         state1 state_string1

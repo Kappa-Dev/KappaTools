@@ -590,7 +590,7 @@ let print_contact_map_full_aux parameter error handler_kappa result =
           _ -> warn parameter error (Some "line 117") Exit (string_of_int state2)
       in
       fprintf stdout
-        "agent_type:%i:%s@site_type:%i:%s:state:%i(%s)--agent_type':%i:%s@site_type':%i:%s:state':%i(%s)\n"
+        "agent_type:%i:%s@@site_type:%i:%s:state:%i(%s)--agent_type':%i:%s@@site_type':%i:%s:state':%i(%s)\n"
         agent1 agent_string1
         site1 site_string1
         state1 state_string1
@@ -719,7 +719,7 @@ let print_covering_classes_modification_aux parameter error handler_kappa compil
       in
       let _ =
         Loggers.fprintf (Remanent_parameters.get_logger parameter)
-          "agent_type:%i:%s:covering_class_id:%i:@set of rule_id:"
+          "agent_type:%i:%s:covering_class_id:%i:@@set of rule_id:"
           agent_type agent_string y
       in
       let _ =

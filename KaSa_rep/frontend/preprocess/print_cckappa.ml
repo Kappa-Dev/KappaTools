@@ -299,7 +299,7 @@ let print_diffview parameters error handler diff =
  let print_bond parameters relation (add1,add2) =
    let () = Loggers.fprintf
      (Remanent_parameters.get_logger parameters)
-     "%s(agent_id_%d,agent_type_%d)@site_type_%d%s(agent_id_%d,agent_type_%d)@site_type_%d"
+     "%s(agent_id_%d,agent_type_%d)@@site_type_%d%s(agent_id_%d,agent_type_%d)@@site_type_%d"
      (Remanent_parameters.get_prefix parameters)
      add1.Cckappa_sig.agent_index
      add1.Cckappa_sig.agent_type
@@ -315,7 +315,7 @@ let print_diffview parameters error handler diff =
    let () =
      Loggers.fprintf
        (Remanent_parameters.get_logger parameters)
-       "%s(agent_id_%d,agent_type_%d)@site_type_%d"
+       "%s(agent_id_%d,agent_type_%d)@@site_type_%d"
        (Remanent_parameters.get_prefix parameters)
        add1.Cckappa_sig.agent_index
        add1.Cckappa_sig.agent_type
@@ -340,7 +340,7 @@ let print_diffview parameters error handler diff =
           let () =
 	    Loggers.fprintf
               (Remanent_parameters.get_logger parameters_doc)
-	      "%s(agent_id_%d,agent_type_%d)@site_type_%d"
+	      "%s(agent_id_%d,agent_type_%d)@@site_type_%d"
               (Remanent_parameters.get_prefix parameters_doc)
               index
               agent.Cckappa_sig.agent_name
@@ -356,7 +356,7 @@ let print_diffview parameters error handler diff =
          let () =
 	   Loggers.fprintf
              (Remanent_parameters.get_logger parameters)
-             "%s(agent_id_%d,agent_type_%d)@site_type_%d"
+             "%s(agent_id_%d,agent_type_%d)@@site_type_%d"
              (Remanent_parameters.get_prefix parameters)
              index
              agent.Cckappa_sig.agent_name
