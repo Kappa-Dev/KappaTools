@@ -44,20 +44,20 @@ end =
     let print_detail f t =
       let () = Format.pp_open_vbox f 0 in
       let () = Format.fprintf
-		 f "\tValid embedding but no longer unary when required: %f@,"
-		 ((float_of_int t.(no_more_unary)) /. (float_of_int t.(all))) in
+                 f "\tValid embedding but no longer unary when required: %f@,"
+                 ((float_of_int t.(no_more_unary)) /. (float_of_int t.(all))) in
       let () = Format.fprintf
-		 f "\tValid embedding but not binary when required: %f@,"
-		 ((float_of_int t.(no_more_binary)) /. (float_of_int t.(all))) in
+                 f "\tValid embedding but not binary when required: %f@,"
+                 ((float_of_int t.(no_more_binary)) /. (float_of_int t.(all))) in
       let () = Format.fprintf
-		 f "\tClashing instance: %f@,"
-		 ((float_of_int t.(clashing_instance)) /. (float_of_int t.(all))) in
+                 f "\tClashing instance: %f@,"
+                 ((float_of_int t.(clashing_instance)) /. (float_of_int t.(all))) in
       (*let () =
-	Format.fprintf f "\tLazy negative update of non local instances: %f@,"
-		       ((float_of_int n) /. (float_of_int t.(all))) in*)
+        Format.fprintf f "\tLazy negative update of non local instances: %f@,"
+                       ((float_of_int n) /. (float_of_int t.(all))) in*)
       Format.fprintf
-	f "\tPerturbation interrupting time advance: %f@]@."
-	((float_of_int t.(time_correction)) /. (float_of_int t.(all)))
+        f "\tPerturbation interrupting time advance: %f@]@."
+        ((float_of_int t.(time_correction)) /. (float_of_int t.(all)))
   end
 
 type t = {
@@ -122,6 +122,18 @@ let max_time c = c.max_time
 let max_events c = c.max_events
 let plot_points c = c.plot_points
 let set_tick c (i,x) = c.last_tick <- (i,x)
+let event_percentage (counter : t) : int option =
+  match counter.max_events with
+  | None -> None
+  | Some va -> Some (100 * (counter.events - counter.init_event)
+                     / (va - counter.init_event))
+
+let time_percentage (counter : t) : int option =
+  match counter.max_time with
+  | None -> None
+  | Some va -> Some (int_of_float (100. *. (counter.time -. counter.init_time)
+                                   /. (va -. counter.init_time)))
+let counter_stories (counter : t) : int = counter.stories
 
 let compute_dT points mx_t =
   if points <= 0 then None else
@@ -136,44 +148,13 @@ let compute_dE points mx_e =
     | Some max_e ->
        Some (max (max_e / points) 1)
 
-let to_bootstrap_html counter =
-  let print_event_va f =
-    match counter.max_events with
-    | None -> Format.pp_print_int f counter.events
-    | Some va ->
-       let progress =
-	 100 * (counter.events - counter.init_event)
-	 / (va - counter.init_event) in
-       let () = Format.pp_print_string f "<div class=\"progress\">" in
-       let () =
-	 Format.fprintf
-	   f "<div class=\"progress-bar\" role=\"progressbar\" style=\"width: %i%%;\">"
-	   progress in
-       Format.fprintf f "%i</div></div>" counter.events in
-  let print_time_va f =
-    match counter.max_time with
-    | None -> Format.pp_print_float f counter.time
-    | Some va ->
-       let progress =
-	 100. *. (counter.time -. counter.init_time)
-	 /. (va -. counter.init_time) in
-       let () = Format.pp_print_string f "<div class=\"progress\">" in
-       let () =
-	 Format.fprintf
-	   f "<div class=\"progress-bar\" role=\"progressbar\" style=\"width: %i%%;\">"
-	   (int_of_float progress) in
-       Format.fprintf f "%f</div></div>" counter.time in
-  Format.asprintf
-    "<dl class=\"dl-horizontal\"><dt>Event</dt><dd>%t</dd><dt>Time</dt><dd>%t</dd><dt>Tracked event</dt><dd>%i</dd></dl>"
-    print_event_va print_time_va (succ counter.stories)
-
 let tick f counter =
   let () =
     if not counter.initialized then
       let c = ref !Parameter.progressBarSize in
       while !c > 0 do
-	Format.pp_print_string f "_" ;
-	c:=!c-1
+        Format.pp_print_string f "_" ;
+        c:=!c-1
       done ;
       Format.pp_print_newline f () ;
       counter.initialized <- true
@@ -184,18 +165,18 @@ let tick f counter =
     | None -> 0
     | Some tmax ->
        int_of_float
-	 ((counter.time -. last_time) *.
-	    (float_of_int !Parameter.progressBarSize) /. tmax)
+         ((counter.time -. last_time) *.
+            (float_of_int !Parameter.progressBarSize) /. tmax)
   and n_e =
     match counter.max_events with
     | None -> 0
     | Some emax ->
        if emax = 0 then 0
        else
-	 let nplus =
-	   (counter.events * !Parameter.progressBarSize) / emax in
+         let nplus =
+           (counter.events * !Parameter.progressBarSize) / emax in
          let nminus =
-	   (last_event * !Parameter.progressBarSize) / emax in
+           (last_event * !Parameter.progressBarSize) / emax in
          nplus-nminus
   in
   let n = ref (max n_t n_e) in
@@ -211,9 +192,9 @@ let tick f counter =
 let complete_progress_bar form counter =
   let n = ref (!Parameter.progressBarSize - counter.ticks) in
   let () = while !n > 0 do
-	     Format.fprintf form "%c" !Parameter.progressBarSymbol ;
-	     n := !n-1
-	   done in
+             Format.fprintf form "%c" !Parameter.progressBarSymbol ;
+             n := !n-1
+           done in
   Format.pp_print_newline form ()
 
 let create nb_points init_t init_e mx_t mx_e =
@@ -253,12 +234,12 @@ let next_point counter =
   | Some dT ->
      int_of_float
        ((current_time counter -. counter.init_time)
-	/. dT)
+        /. dT)
   | None ->
      match counter.dE with
      | None -> 0
      | Some dE ->
-	(current_event counter - counter.init_event) / dE
+        (current_event counter - counter.init_event) / dE
 
 let to_plot_points counter =
   let next = next_point counter in
@@ -279,9 +260,9 @@ let to_plot_points counter =
   | None ->
      match max_events counter with
      | Some _ ->
-	if n>1 then
-	  invalid_arg
-	    ("Counter.to_plot_points: invalid increment "^string_of_int n)
-	else
-	  (if n <> 0 then [counter.time] else []),counter
+        if n>1 then
+          invalid_arg
+            ("Counter.to_plot_points: invalid increment "^string_of_int n)
+        else
+          (if n <> 0 then [counter.time] else []),counter
      | None -> [],counter

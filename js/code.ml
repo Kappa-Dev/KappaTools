@@ -11,6 +11,7 @@ let rec list_last = function
 
 open Lwt
 let document = Dom_html.window##document
+let has_been_modified = ref (false)
 
 module Html5 = Tyxml_js.Html5
 let file_selector_id = "file-selector"
@@ -89,6 +90,12 @@ let onload () =
              (Js.Unsafe.js_expr "id")
              [|Js.Unsafe.inject configuration |] in
   let codemirror : codemirror Js.t = Codemirror.fromTextArea textarea configuration in
+  let codemirror_handler _ =
+    has_been_modified := true;
+    Firebug.console##debug("change");
+    Storage.set_model_text (Js.to_string codemirror##getValue()) in
+  let () = codemirror##on((Js.string "change"),
+                          (codemirror_handler)) in
   let _ = Js.Unsafe.fun_call
             (Js.Unsafe.js_expr "id")
             [|Js.Unsafe.inject codemirror |] in

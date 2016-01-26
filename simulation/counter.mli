@@ -11,8 +11,6 @@ val tick : Format.formatter -> t -> unit
 val to_plot_points : t -> float list * t
 val complete_progress_bar : Format.formatter -> t -> unit
 
-val to_bootstrap_html : t -> string
-
 val one_constructive_event : t -> float -> bool
 val one_clashing_instance_event : t -> float -> bool
 val one_no_more_unary_event : t -> float -> bool
@@ -21,6 +19,10 @@ val one_time_correction_event : t -> Nbr.t -> bool
 
 val max_time : t -> float option
 val max_events : t -> int option
+val event_percentage : t -> int option
+val time_percentage : t -> int option
+val counter_stories : t -> int
+
 val plot_points : t -> int
 val current_time : t -> float
 val current_event : t -> int

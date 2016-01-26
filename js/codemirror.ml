@@ -6,8 +6,9 @@ x*)
 open Js
 module Html5 = Tyxml_js.Html5
 
+class type event = object
+end
 class type configuration = object
-  val value : int Js.t Js.prop
   val lineNumbers : bool Js.t Js.prop
   val gutters : Js.string_array Js.t Js.prop
   val mode : Js.js_string Js.t Js.prop
@@ -18,6 +19,7 @@ let create_configuration () : configuration Js.t  = jsnew constructor_configurat
 class type codemirror = object
  method getValue : Js.js_string Js.t meth
  method setValue : Js.js_string Js.t -> unit meth
+ method on : (Js.js_string Js.t) -> (event Js.t -> unit) -> unit Js.meth
 end;;
 
 let fromTextArea
