@@ -689,8 +689,10 @@ let apply_rule
     | None -> from_ccs ()
     | Some id ->
        match Mods.IntMap.find_option id state.matchings_of_rule with
-       | Some ((inj,rev_roots) :: _) -> Some inj, Tools.array_rev_of_list rev_roots
        | Some [] -> assert false
+       | Some l ->
+	  let (inj,rev_roots) = Tools.list_random l in
+	  Some inj, Tools.array_rev_of_list rev_roots
        | None -> from_ccs () in
   let () =
     if !Parameter.debugModeOn then
@@ -760,16 +762,16 @@ let apply_rule
 let force_rule
     ~get_alg env domain unary_ccs counter state event_kind rule =
   match apply_rule ~get_alg env domain unary_ccs counter state event_kind rule with
-  | (Success out | Corrected out) -> out,None
+  | (Success out | Corrected out) -> out
   | Clash ->
      match all_injections
 	     state.edges state.roots_of_ccs rule.Primitives.connected_components
      with
-     | [] -> state,Some []
-     | (h,_) :: t ->
+     | [] -> state
+     | l ->
+	let (h,_) = Tools.list_random l in
 	(transform_by_a_rule
-	   ~get_alg env domain unary_ccs counter state event_kind rule h),
-	Some t
+	   ~get_alg env domain unary_ccs counter state event_kind rule h)
 
 let adjust_rule_instances ~rule_id ~get_alg store env counter state rule =
   let matches =

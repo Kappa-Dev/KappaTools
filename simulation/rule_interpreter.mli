@@ -38,8 +38,7 @@ val apply_unary_rule :
 val force_rule :
   get_alg:(int -> Alg_expr.t) -> Environment.t ->
   Connected_component.Env.t -> Connected_component.Set.t -> Counter.t ->
-  t -> Causal.event_kind -> Primitives.elementary_rule ->
-  (t * (Connected_component.Matching.t * int list) list option)
+  t -> Causal.event_kind -> Primitives.elementary_rule -> t
 (** Apply the rule for sure if it is possible. Try [apply_rule] but in
 case of null_event, it computes the exact injections of the left hand
 side to do apply the rule and returns the remaining exact injections. *)

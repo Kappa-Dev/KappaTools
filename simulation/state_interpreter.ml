@@ -84,10 +84,10 @@ let do_it env domain counter graph state modification =
      (false,
       Nbr.iteri
 	(fun _ g ->
-	 fst (Rule_interpreter.force_rule
+	 Rule_interpreter.force_rule
 		~get_alg env domain
 		(Environment.connected_components_of_unary_rules env)
-		counter g (Causal.PERT "pert") r))
+		counter g (Causal.PERT "pert") r)
 	graph n,state)
   | Primitives.UPDATE (i,(expr,_)) ->
      let () =

@@ -16,19 +16,6 @@ let pow64 x n =
   in
   aux x n Int64.one
 
-(*number of bits used to represent n in base 2*)
-let bit_rep_size n = 
-	let rec aux p acc = 
-		if p = 0 then acc
-		else
-			let p' = p/2 in
-			aux p' (acc+1)
-	in
-		aux n 0  
-
-let replace_space str =
-  String.map (fun c -> if c=' ' then '_' else c) str
-
 let read_input () =
 	let rec parse acc input =
 		match Stream.next input with
@@ -101,6 +88,8 @@ let rec list_fold_left2 f x l1 l2 =
   | [], [] -> x
   | [], _ :: _ | _ :: _, [] -> raise (Invalid_argument "list_fold_left2")
   | h1::t1, h2::t2 -> list_fold_left2 f (f x h1 h2) t1 t2
+
+let list_random l = List.nth l (Random.int (List.length l))
 
 let array_fold_left_mapi f x a =
   let y = ref x in

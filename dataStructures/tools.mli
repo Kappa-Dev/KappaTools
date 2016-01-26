@@ -23,15 +23,13 @@ val list_fold_right_map :
 val list_fold_left2 :
   ('a -> 'b -> 'c -> 'a) -> 'a -> 'b list -> 'c list -> 'a
 val list_mapi : (int -> 'a -> 'b) -> 'a list -> 'b list
+val list_random : 'a list -> 'a
 
 (** not tail rec but don't allocate if unecessary *)
 val list_smart_filter : ('a -> bool) -> 'a list -> 'a list
 val list_smart_map : ('a -> 'a) -> 'a list -> 'a list
 
 (** {5 Misc utilities } *)
-val bit_rep_size : int -> int (**number of bits used to represent n in base 2*)
-
 val pow : int -> int -> int
 val pow64 : Int64.t -> Int64.t -> Int64.t
 val read_input : unit -> string
-val replace_space : string -> string
