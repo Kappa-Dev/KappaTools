@@ -24,7 +24,7 @@ let print_state parameters state =
   match state with
     | Ckappa_sig.Internal a -> Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s%s" (Remanent_parameters.get_prefix parameters) a
     | Ckappa_sig.Binding Cckappa_sig.Free -> Loggers.fprintf (Remanent_parameters.get_logger parameters) "%sfree" (Remanent_parameters.get_prefix parameters)
-    | Ckappa_sig.Binding Cckappa_sig.Lnk_type (a,b) -> Loggers.fprintf (Remanent_parameters.get_logger parameters) "%sagent_type:%d@site_type:%d" (Remanent_parameters.get_prefix parameters) a b
+    | Ckappa_sig.Binding Cckappa_sig.Lnk_type (a,b) -> Loggers.fprintf (Remanent_parameters.get_logger parameters) "%sagent_type:%d@@site_type:%d" (Remanent_parameters.get_prefix parameters) a b
 
 let print_site parameters site =
   match site with

@@ -225,7 +225,7 @@ let print_bdu_update_map_gen_decomposition decomposition
     in
     AgentMap.fold
       parameter
-      error 
+      error
       (fun parameter error agent_type map (handler:Mvbdu_wrapper.Mvbdu.handler) ->
 	let error', agent_string =
           try
