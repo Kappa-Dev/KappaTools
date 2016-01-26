@@ -230,21 +230,13 @@ let one_rule _form dt stop env domain counter graph state =
      then
        (not (Counter.one_clashing_instance_event counter dt)||stop,graph,state)
      else
-       (*let graph' =
-	   match Rule_interpreter.force_rule
-		   ~get_alg domain counter graph cause rule with
-	   | graph',Some [] ->
-	      let () = Random_tree.add (2*rule_id) 0.0 state.activities in graph'
-	   | graph',(None | Some (_::_)) -> graph' in
-	 let graph'' =
-	   Rule_interpreter.update_outdated_activities
-	     ~get_alg register_new_activity  env counter graph' in
-	 let () =
-	   if !Parameter.debugModeOn then
-	     Format.printf "@[<v>Obtained after forcing rule@ %a@]@."
-			   (Rule_interpreter.print env) graph' in
-	 Some (graph'',state)*)
-       (not (Counter.one_clashing_instance_event counter dt)||stop,graph,state)
+       (not (Counter.one_clashing_instance_event counter dt)||stop,
+	(if choice mod 2 = 1
+	 then Rule_interpreter.adjust_unary_rule_instances
+		~rule_id ~get_alg register_new_activity env counter graph rule
+	 else Rule_interpreter.adjust_rule_instances
+		~rule_id ~get_alg register_new_activity env counter graph rule),
+	state)
   | Rule_interpreter.Corrected graph' ->
      let graph'' =
        Rule_interpreter.update_outdated_activities

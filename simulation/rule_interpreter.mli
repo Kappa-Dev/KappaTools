@@ -39,10 +39,18 @@ val force_rule :
   get_alg:(int -> Alg_expr.t) -> Environment.t ->
   Connected_component.Env.t -> Connected_component.Set.t -> Counter.t ->
   t -> Causal.event_kind -> Primitives.elementary_rule ->
-  (t * Connected_component.Matching.t list option)
+  (t * (Connected_component.Matching.t * int list) list option)
 (** Apply the rule for sure if it is possible. Try [apply_rule] but in
 case of null_event, it computes the exact injections of the left hand
 side to do apply the rule and returns the remaining exact injections. *)
+
+val adjust_rule_instances :
+  rule_id:int -> get_alg:(int -> Alg_expr.t) -> (int -> int -> float -> unit) ->
+  Environment.t -> Counter.t -> t -> Primitives.elementary_rule -> t
+
+val adjust_unary_rule_instances :
+  rule_id:int -> get_alg:(int -> Alg_expr.t) -> (int -> int -> float -> unit) ->
+  Environment.t -> Counter.t -> t -> Primitives.elementary_rule -> t
 
 val extra_outdated_var : int -> t -> t
 val update_outdated_activities :

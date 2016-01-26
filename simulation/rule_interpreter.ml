@@ -1,26 +1,31 @@
 type jf_data =
   Compression_main.secret_log_info * Compression_main.secret_step list
 
-type t = {
-  roots_of_ccs: Mods.IntSet.t Connected_component.Map.t;
-  unary_candidates: Mods.Int2Set.t Mods.IntMap.t;
-  unary_pathes: (int * Edges.path) Mods.Int2Map.t;
-  edges: Edges.t;
-  tokens: Nbr.t array;
-  outdated_elements:
-    Operator.DepSet.t *
-    (Edges.agent * ((Connected_component.Set.t *int) * Edges.path) list) list * bool;
-  story_machinery :
-    ((Causal.event_kind * Connected_component.t array *
-	Instantiation.abstract Instantiation.test list) list
-       Connected_component.Map.t (*currently tracked ccs *)
-     * jf_data) option;
-}
+type t =
+  {
+    roots_of_ccs: Mods.IntSet.t Connected_component.Map.t;
+    matchings_of_rule:
+      (Connected_component.Matching.t * int list) list Mods.IntMap.t;
+    unary_candidates: Mods.Int2Set.t Mods.IntMap.t;
+    unary_pathes: (int * Edges.path) Mods.Int2Map.t;
+    edges: Edges.t;
+    tokens: Nbr.t array;
+    outdated_elements:
+      Operator.DepSet.t *
+	(Edges.agent * ((Connected_component.Set.t *int) * Edges.path) list) list
+	* bool;
+    story_machinery :
+      ((Causal.event_kind * Connected_component.t array *
+	  Instantiation.abstract Instantiation.test list)
+	 list Connected_component.Map.t (*currently tracked ccs *)
+       * jf_data) option;
+  }
 
 type result = Clash | Success of t | Corrected of t
 
 let empty ~has_tracking env = {
     roots_of_ccs = Connected_component.Map.empty;
+    matchings_of_rule = Mods.IntMap.empty;
     unary_candidates = Mods.IntMap.empty;
     unary_pathes = Mods.Int2Map.empty;
     edges = Edges.empty;
@@ -105,14 +110,14 @@ let all_injections ?excp edges roots cca =
       Mods.IntSet.fold
        (fun root new_injs ->
         List.fold_left
-          (fun corrects inj ->
+          (fun corrects (inj,roots) ->
            match Connected_component.Matching.reconstruct
                    edges inj id cc root with
            | None -> corrects
-           | Some new_inj -> new_inj :: corrects)
+           | Some new_inj -> (new_inj,root::roots) :: corrects)
           new_injs inj_list)
        cands []))
-    (excp,[Connected_component.Matching.empty]) cca
+    (excp,[Connected_component.Matching.empty,[]]) cca
 
 let apply_negative_transformation domain inj2graph side_effects edges = function
   | Primitives.Transformation.Agent n ->
@@ -320,7 +325,7 @@ let store_obs edges roots obs acc = function
 	  List.fold_left
 	    (fun acc (ev,ccs,tests) ->
 	     List.fold_left
-	       (fun acc inj ->
+	       (fun acc (inj,_) ->
 		let tests' =
 		  List.map (Instantiation.concretize_test
 			      (fun p ->
@@ -442,6 +447,7 @@ let update_edges
       ?path remaining_side_effects rule state.story_machinery in
 
   { roots_of_ccs = roots''; unary_candidates = unary_candidates';
+    matchings_of_rule = state.matchings_of_rule;
     unary_pathes = unary_pathes'; edges = edges''; tokens = state.tokens;
     outdated_elements = (rev_deps'',unary_cands',no_unary'');
     story_machinery = story_machinery'; }
@@ -513,26 +519,27 @@ let new_unary_instances sigs rule_id cc1 cc2 created_obs state =
   {state with unary_candidates = unary_candidates;
 	      unary_pathes = unary_pathes }
 
+let store_activity ~get_alg store env counter state id syntax_id rate cc_va =
+  let rate =
+    Nbr.to_float @@ value_alg counter state ~get_alg rate in
+  let () =
+    if !Parameter.debugModeOn then
+      Format.printf "@[%sule %a has now %i instances.@]@."
+		    (if id mod 2 = 1 then "Unary r" else "R")
+		    (Environment.print_rule ~env) (id/2) cc_va in
+  let act =
+    if cc_va = 0 then 0. else rate *. float_of_int cc_va in
+  store id syntax_id act
+
 let update_outdated_activities ~get_alg store env counter state =
   let deps,unary_cands,no_unary = state.outdated_elements in
-  let store_activity id syntax_id rate cc_va =
-    let rate =
-      Nbr.to_float @@ value_alg counter state ~get_alg rate in
-    let () =
-      if !Parameter.debugModeOn then
-	Format.printf "@[%sule %a has now %i instances.@]@."
-		      (if id mod 2 = 1 then "Unary r" else "R")
-		      (Environment.print_rule ~env) (id/2) cc_va in
-    let act =
-      if cc_va = 0 then 0. else rate *. float_of_int cc_va in
-    store id syntax_id act in
-  let rec aux deps =
-    Operator.DepSet.iter
-      (fun dep ->
+  let rec aux state deps =
+    Operator.DepSet.fold
+      (fun dep state ->
        match dep with
 	| Operator.ALG j ->
-	   aux (Environment.get_alg_reverse_dependencies env j)
-	| Operator.PERT (-1) -> () (* TODO *)
+	   aux state (Environment.get_alg_reverse_dependencies env j)
+	| Operator.PERT (-1) -> state (* TODO *)
 	| Operator.PERT _ -> assert false
 	| Operator.RULE i ->
 	   let rule = Environment.get_rule env i in
@@ -541,12 +548,18 @@ let update_outdated_activities ~get_alg store env counter state =
 	     else
 	       raw_instance_number
 		 state [rule.Primitives.connected_components] in
-	   store_activity (2*i) rule.Primitives.syntactic_rule
-			  rule.Primitives.rate cc_va) deps in
-  let () = aux (Environment.get_always_outdated env) in
-  let () = aux deps in
-  let state' =
-    if no_unary then state else
+	   let () =
+	     store_activity
+	       ~get_alg store env counter state (2*i)
+	       rule.Primitives.syntactic_rule rule.Primitives.rate cc_va in
+           match Mods.IntMap.pop i state.matchings_of_rule with
+	   | None,_ -> state
+	   | Some _, match' -> { state with matchings_of_rule = match'})
+      deps state in
+  let state' = aux state (Environment.get_always_outdated env) in
+  let state'' = aux state' deps in
+  let state''' =
+    if no_unary then state'' else
       Environment.fold_rules
 	(fun i state rule ->
 	 match rule.Primitives.unary_rate with
@@ -561,9 +574,11 @@ let update_outdated_activities ~get_alg store env counter state =
 	      Mods.Int2Set.size
 		(Mods.IntMap.find_default Mods.Int2Set.empty i state'.unary_candidates) in
 	    let () =
-	      store_activity (2*i+1) rule.Primitives.syntactic_rule unrate va in
-	    state') state env in
-  {state' with outdated_elements = (Operator.DepSet.empty,[],true) }
+	      store_activity
+		~get_alg store env counter state' (2*i+1)
+		rule.Primitives.syntactic_rule unrate va in
+	    state') state'' env in
+  {state''' with outdated_elements = (Operator.DepSet.empty,[],true) }
 
 let update_tokens ~get_alg env counter state consumed injected =
   let do_op op state l =
@@ -654,7 +669,7 @@ let apply_unary_rule
 
 let apply_rule
       ?rule_id ~get_alg env domain unary_ccs counter state event_kind rule =
-  let inj,roots =
+  let from_ccs () =
     Tools.array_fold_left_mapi
       (fun id inj cc ->
        let root =
@@ -664,11 +679,19 @@ let apply_rule
 	 | None -> failwith "Tried to apply_rule with no root"
 	 | Some x -> x in
        (match inj with
-       | Some inj ->
-	  Connected_component.Matching.reconstruct state.edges inj id cc root
-       | None -> None),root)
+	| Some inj ->
+	   Connected_component.Matching.reconstruct state.edges inj id cc root
+	| None -> None),root)
       (Some Connected_component.Matching.empty)
       rule.Primitives.connected_components in
+  let inj,roots =
+    match rule_id with
+    | None -> from_ccs ()
+    | Some id ->
+       match Mods.IntMap.find_option id state.matchings_of_rule with
+       | Some ((inj,rev_roots) :: _) -> Some inj, Tools.array_rev_of_list rev_roots
+       | Some [] -> assert false
+       | None -> from_ccs () in
   let () =
     if !Parameter.debugModeOn then
       Format.printf "@[On roots:@ @[%a@]@]@."
@@ -743,10 +766,49 @@ let force_rule
 	     state.edges state.roots_of_ccs rule.Primitives.connected_components
      with
      | [] -> state,Some []
-     | h :: t ->
+     | (h,_) :: t ->
 	(transform_by_a_rule
 	   ~get_alg env domain unary_ccs counter state event_kind rule h),
 	Some t
+
+let adjust_rule_instances ~rule_id ~get_alg store env counter state rule =
+  let matches =
+    all_injections
+      state.edges state.roots_of_ccs rule.Primitives.connected_components in
+  let () =
+    store_activity
+      ~get_alg store env counter state (2*rule_id) rule.Primitives.syntactic_rule
+      rule.Primitives.rate (List.length matches) in
+  { state with
+    matchings_of_rule = Mods.IntMap.add rule_id matches state.matchings_of_rule }
+
+let adjust_unary_rule_instances ~rule_id ~get_alg store env counter state rule =
+  let cands =
+    Mods.IntMap.find_default Mods.Int2Set.empty rule_id state.unary_candidates in
+  let cc1 = rule.Primitives.connected_components.(0) in
+  let cc2 = rule.Primitives.connected_components.(1) in
+  let byebye,stay =
+    Mods.Int2Set.partition
+      (fun (root1,root2) ->
+       let inj1 =
+	 Connected_component.Matching.reconstruct
+	   state.edges Connected_component.Matching.empty 0 cc1 root1 in
+       match inj1 with
+       | None -> true
+       | Some inj -> None =
+		       Connected_component.Matching.reconstruct
+			 state.edges inj 1 cc2 root2)
+      cands in
+  let () =
+    store_activity
+      ~get_alg store env counter state (2*rule_id+1) rule.Primitives.syntactic_rule
+      rule.Primitives.rate (Mods.Int2Set.size stay) in
+  { state with
+    unary_candidates =
+      if Mods.Int2Set.is_empty stay
+      then Mods.IntMap.remove rule_id state.unary_candidates
+      else Mods.IntMap.add rule_id stay state.unary_candidates;
+    unary_pathes = Mods.Int2Set.fold remove_path byebye state.unary_pathes; }
 
 let print env f state =
   Format.fprintf
