@@ -1,0 +1,19 @@
+Environment:
+  Signatures:
+    A(x)
+  Tokens: 
+  Alg_expr:
+    
+  Plot: 
+  Rules:
+    0: 0: /*cc1*/ A/*1*/(), 1: /*cc2*/ A/*1*/(x)
+      -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/ ++  @1
+  Perturbations:
+    
+Domain:
+  /*cc1*/ A/*1*/() [rate_of_rule [0]]
+  () -> /*cc0*/  -> (-!A-1_x-⊥->() 2[2])
+  (0) -> /*cc2*/ A/*1*/(x) [rate_of_rule [0]] -> ()
+Intial graph;
+  %init: 100 A(x)
+  

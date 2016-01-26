@@ -1,0 +1,1 @@
+"${KAPPABIN}"KaSim -e 120 -d output clashing_instances.ka -seed 923639563 --debug || exit 0
