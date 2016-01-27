@@ -3,9 +3,9 @@ type encoding =
 
 type token =
 | String of string
-| FLUSH
+| Breakable_space
 
-type logger_kind =
+type logger =
 | DEVNUL
 | Formatter of Format.formatter
 | Circular_buffer of string Circular_buffers.t ref
@@ -21,7 +21,7 @@ let breakable x =
 type t =
   {
     encoding:encoding;
-    logger: logger_kind;
+    logger: logger;
     mutable current_line: token list;
   }
 
@@ -51,12 +51,38 @@ let fprintf logger =
       (fun _ -> logger.current_line <- (String (Format.flush_str_formatter ()))::logger.current_line)
       Format.str_formatter
 
+let print_breakable_space logger =
+  if breakable logger.encoding
+  then
+    match
+      logger.logger
+    with
+  | DEVNUL
+  | Formatter _ ->
+    fprintf logger "@ "
+  | Circular_buffer _
+  | Infinite_buffer _ ->
+    logger.current_line <- Breakable_space::logger.current_line
+  else
+    fprintf logger " "
+
 let end_of_line_symbol logger =
   match
     logger.encoding
   with
   | HTML | HTML_Tabular -> "<Br>"
   | DOT | TXT | TXT_Tabular -> ""
+
+
+let dump_token f x =
+   match
+     x
+   with
+   | String s ->
+     Format.pp_print_string
+       f s
+   | Breakable_space ->
+     Format.fprintf f "@ " (* Check with Pierre *)
 
 let print_newline logger =
   let () =
@@ -76,15 +102,8 @@ let print_newline logger =
 	  (Format.asprintf "%a"
 	     (Pp.list
 		(fun _ -> ())
-		(fun f x ->
-		  match
-		    x
-		  with
-		  | String s ->
-		    Format.pp_print_string
-		      f s
-		  | FLUSH -> Format.pp_print_flush f ()))
-		(List.rev logger.current_line))
+		dump_token)
+	  (List.rev logger.current_line))
 	  !bf
       in
       let () = bf:=bf' in
@@ -98,21 +117,14 @@ let print_newline logger =
 	  (Format.asprintf "%a"
 	     (Pp.list
 		(fun _ -> ())
-		(fun f x ->
-		  match
-		    x
-		  with
-		  | String s ->
-		    Format.pp_print_string
-		      f s
-		  | FLUSH -> Format.pp_print_flush f ()))
-		(List.rev logger.current_line))
+		dump_token)
+	     (List.rev logger.current_line))
 	  !bf
       in
       let () = bf:=bf' in
       let () = logger.current_line <- [] in
       ()
-    end
+      end
 
 let print_cell logger s =
   let open_cell_symbol,close_cell_symbol =
@@ -161,6 +173,21 @@ let open_logger_from_formatter ?mode:(mode=TXT) formatter =
       current_line = []
     }
 
+
+let open_circular_buffer ?mode:(mode=TXT) ?size:(size=10) () =
+  {
+    logger = Circular_buffer (ref (Circular_buffers.create size "" ));
+    encoding = mode;
+    current_line = [];
+  }
+
+let open_infinite_buffer ?mode:(mode=TXT) () =
+  {
+    logger = Infinite_buffer (ref (Infinite_buffers.create 0 ""));
+    encoding = mode;
+    current_line = [];
+  }
+
 let open_row logger =
   fprintf logger "<tr>"
 
@@ -178,3 +205,12 @@ let formatter_of_logger logger =
 
 let redirect logger fmt =
   {logger with logger = Formatter fmt}
+
+let flush_buffer logger fmt =
+  match
+    logger.logger
+  with
+  | DEVNUL
+  | Formatter _ -> ()
+  | Circular_buffer a -> Circular_buffers.iter (Format.fprintf fmt "%s") !a
+  | Infinite_buffer b -> Infinite_buffers.iter (Format.fprintf fmt "%s") !b
