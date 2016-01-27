@@ -749,25 +749,39 @@ Id=18
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=20
+Id=9
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=19
+  Id=8
    Node(site_type:1<1)
     Id=0
      Leaf True 
 
-    Id=13
-     Node(site_type:1<2)
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=24
+ Node(site_type:0<0)
+  Id=1
+   Leaf False 
+
+  Id=23
+   Node(site_type:0<1)
+    Id=0
+     Leaf True 
+
+    Id=22
+     Node(site_type:0<2)
       Id=1
        Leaf False 
 
-      Id=12
-       Node(site_type:1<3)
+      Id=21
+       Node(site_type:0<3)
         Id=0
          Leaf True 
 
@@ -776,29 +790,13 @@ Id=20
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=5
- Node(site_type:2<0)
+Id=26
+ Node(site_type:0<0)
   Id=1
    Leaf False 
 
-  Id=4
-   Node(site_type:2<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-agent_type:1:B:cv_id:0
-INTENSIONAL DESCRIPTION:
-Id=18
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
+  Id=25
+   Node(site_type:0<2)
     Id=0
      Leaf True 
 
@@ -810,25 +808,40 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=20
+Id=9
  Node(site_type:1<0)
   Id=1
    Leaf False 
 
-  Id=19
+  Id=8
    Node(site_type:1<1)
     Id=0
      Leaf True 
 
-    Id=13
-     Node(site_type:1<2)
+    Id=1
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+The binding state of site x in agent A is always free.
+INTENSIONAL DESCRIPTION:
+Id=24
+ Node(site_type:0<0)
+  Id=1
+   Leaf False 
+
+  Id=23
+   Node(site_type:0<1)
+    Id=0
+     Leaf True 
+
+    Id=22
+     Node(site_type:0<2)
       Id=1
        Leaf False 
 
-      Id=12
-       Node(site_type:1<3)
+      Id=21
+       Node(site_type:0<3)
         Id=0
          Leaf True 
 
@@ -838,30 +851,13 @@ Id=20
 EXTENSIONAL DESCRIPTION:
 The internal state of site x in agent A ranges over u and p.
 INTENSIONAL DESCRIPTION:
-Id=5
- Node(site_type:2<0)
+Id=26
+ Node(site_type:0<0)
   Id=1
    Leaf False 
 
-  Id=4
-   Node(site_type:2<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-The binding state of site x in agent A is always free.
-agent_type:1:B:cv_id:0
-INTENSIONAL DESCRIPTION:
-Id=18
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<2)
+  Id=25
+   Node(site_type:0<2)
     Id=0
      Leaf True 
 

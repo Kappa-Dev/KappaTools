@@ -407,37 +407,36 @@ Id=3
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=19
- Node(site_type:1<0)
+Id=25
+ Node(site_type:0<0)
   Id=1
    Leaf False 
 
-  Id=18
-   Node(site_type:1<1)
-    Id=17
-     Node(site_type:2<0)
+  Id=24
+   Node(site_type:0<1)
+    Id=20
+     Node(site_type:1<0)
       Id=1
        Leaf False 
 
-      Id=13
-       Node(site_type:2<2)
+      Id=8
+       Node(site_type:1<2)
         Id=0
          Leaf True 
 
         Id=1
          Leaf False 
 
-    Id=10
-     Node(site_type:1<2)
-      Id=5
-       Node(site_type:2<0)
+    Id=23
+     Node(site_type:0<2)
+      Id=3
+       Node(site_type:1<0)
         Id=1
          Leaf False 
 
-        Id=4
-         Node(site_type:2<1)
+        Id=2
+         Node(site_type:1<1)
           Id=0
            Leaf True 
 
@@ -449,15 +448,14 @@ Id=19
 
 EXTENSIONAL DESCRIPTION:
 In agent A, the internal state of site y is u whenever the internal state of site x is p.
-agent_type:1:D:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=3
- Node(site_type:1<0)
+Id=27
+ Node(site_type:0<0)
   Id=1
    Leaf False 
 
-  Id=2
-   Node(site_type:1<1)
+  Id=26
+   Node(site_type:0<1)
     Id=0
      Leaf True 
 
@@ -469,7 +467,6 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=20
  Node(site_type:1<0)
@@ -485,15 +482,15 @@ Id=20
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent A ranges over u and p.
+The internal state of site y in agent A ranges over u and p.
 INTENSIONAL DESCRIPTION:
-Id=17
- Node(site_type:2<0)
+Id=29
+ Node(site_type:0<0)
   Id=1
    Leaf False 
 
-  Id=13
-   Node(site_type:2<2)
+  Id=28
+   Node(site_type:0<2)
     Id=0
      Leaf True 
 
@@ -501,16 +498,15 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site y in agent A ranges over u and p.
-agent_type:1:D:cv_id:0
+The internal state of site x in agent A ranges over u and p.
 INTENSIONAL DESCRIPTION:
-Id=3
- Node(site_type:1<0)
+Id=27
+ Node(site_type:0<0)
   Id=1
    Leaf False 
 
-  Id=2
-   Node(site_type:1<1)
+  Id=26
+   Node(site_type:0<1)
     Id=0
      Leaf True 
 

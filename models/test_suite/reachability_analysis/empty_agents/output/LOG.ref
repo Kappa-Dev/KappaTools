@@ -320,33 +320,29 @@ Id=3
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-agent_type:0:A:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=0
  Leaf True 
 
 EXTENSIONAL DESCRIPTION:
-agent_type:1:B:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=0
  Leaf True 
 
 EXTENSIONAL DESCRIPTION:
-agent_type:2:C:cv_id:0
 INTENSIONAL DESCRIPTION:
 Id=0
  Leaf True 
 
 EXTENSIONAL DESCRIPTION:
-agent_type:3:D:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=3
- Node(site_type:1<0)
+Id=5
+ Node(site_type:0<0)
   Id=1
    Leaf False 
 
-  Id=2
-   Node(site_type:1<1)
+  Id=4
+   Node(site_type:0<1)
     Id=0
      Leaf True 
 
@@ -358,18 +354,14 @@ EXTENSIONAL DESCRIPTION:
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-agent_type:0:A:cv_id:0
-agent_type:1:B:cv_id:0
-agent_type:2:C:cv_id:0
-agent_type:3:D:cv_id:0
 INTENSIONAL DESCRIPTION:
-Id=3
- Node(site_type:1<0)
+Id=5
+ Node(site_type:0<0)
   Id=1
    Leaf False 
 
-  Id=2
-   Node(site_type:1<1)
+  Id=4
+   Node(site_type:0<1)
     Id=0
      Leaf True 
 
