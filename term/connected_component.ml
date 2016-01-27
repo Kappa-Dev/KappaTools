@@ -941,7 +941,7 @@ module Matching = struct
 
   (*edges: list of concrete edges,
 returns the roots of observables that are above in the domain*)
-	
+
   (* get_all : Edges.t -> t -> cc -> int -> int list *)
   let get_all graph inj cc root =
     let cc_id_in_rule = 1 in
@@ -957,49 +957,49 @@ returns the roots of observables that are above in the domain*)
 			  cc.nodes_by_type.(ty))
 		(aux (succ ty))
        in aux 0
-	      
+
+  module Cache =
+    struct
+      type t = int * point * Renaming.t
+      let compare (a,_,a') (b,_,b') =
+	let c = Mods.int_compare a b in
+	if c = 0 then Renaming.compare a' b' else c
+    end
+  module CacheSetMap = SetMap.Make(Cache)
+
   let from_edge domain graph edges =
-    let update_cache update id cache =
-      IntMap.add id (update (IntMap.find_default IntSet.empty id cache)) cache
-    in
     let get_root inj point =
       match find_root point.content with
       | None -> assert false
       | Some (root_type,root) -> Renaming.apply inj root,root_type in
     let rec aux cache (obs,rev_deps as acc) = function
       | [] -> cache,acc
-      | (pid,point,inj_point2graph) :: remains ->
-	 let (concrete_root,_ as root_bundle) =
+      | (_pid,point,inj_point2graph as current) :: remains ->
+	 let root_bundle =
 	   get_root inj_point2graph point in
-	 let cache',acc' =
+	 let acc' =
 	   match point.is_obs_of with
-	   | None -> cache,acc
+	   | None -> acc
 	   | Some ndeps ->
-	      (update_cache (IntSet.add pid) concrete_root cache,
 	       ((point.content,root_bundle) :: obs,
-		Operator.DepSet.union rev_deps ndeps)) in
-	 let remains',cache'' =
+		Operator.DepSet.union rev_deps ndeps) in
+	 let remains' =
 	   List.fold_left
-	     (fun (re,cache) son ->
+	     (fun re son ->
 	      match Navigation.injection_for_one_more_edge
 		      inj_point2graph graph son.next with
-	      | None ->
-		 (re, (*update_cache (IntSet.union son.above_obs)
-				   concrete_root*) cache)
+	      | None -> re
 	      | Some inj' ->
 		 let p' = Env.get domain son.dst in
-		 (List.fold_left
-		    (fun remains renaming ->
-		     let rename = Renaming.compose renaming inj' in
-		     if IntSet.subset
-			  son.above_obs
-			  (IntMap.find_default
-			     IntSet.empty (fst @@ get_root rename p') cache)
-		     then remains
-		     else (son.dst,p',rename)::remains) re son.inj,
-		  cache))
-	     (remains,cache') point.sons in
-	 aux cache'' acc' remains' in
+		 List.fold_left
+		   (fun remains renaming ->
+		    let rename = Renaming.compose renaming inj' in
+		    let next = (son.dst,p',rename) in
+		    if CacheSetMap.Set.mem next cache
+		    then remains
+		    else next::remains) re son.inj)
+	     remains point.sons in
+	 aux (CacheSetMap.Set.add current cache) acc' remains' in
     if List.for_all (Navigation.check_edge graph) edges then
       match Env.navigate domain edges with
       | None -> ([],Operator.DepSet.empty)
@@ -1007,7 +1007,7 @@ returns the roots of observables that are above in the domain*)
 	 snd @@
 	   List.fold_left
 	     (fun (cache,out) inj -> aux cache out [(pid,point,inj)])
-	     (Mods.IntMap.empty,([],Operator.DepSet.empty)) injs
+	     (CacheSetMap.Set.empty,([],Operator.DepSet.empty)) injs
     else ([],Operator.DepSet.empty)
 
   let observables_from_agent domain graph (_,ty as node) =
