@@ -1,4 +1,7 @@
+js/external
 main/version.ml
+todo.org
+index.html
 *.cm*
 *.o
 *.annot

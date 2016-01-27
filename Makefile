@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := all
-
+TEMPDIR := $(shell mktemp -d)
 LABLTKLIBREP?=$(CAML_LD_LIBRARY_PATH)/../labltk
 
 MANREP= man/
@@ -43,33 +43,38 @@ main/version.ml: main/version.ml.skel $(wildcard .git/refs/heads/*)
 %.cma %.native %.byte %.docdir/index.html: main/version.ml $(filter-out _build/,$(wildcard */*.ml*)) $(wildcard $(KASAREP)*/*.ml*) $(wildcard $(KASAREP)*/*/*.ml*)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) $@
 
-JaSim.byte: $(filter-out _build/,$(wildcard */*.ml*))
+JaSim.byte: $(filter-out _build/,$(wildcard */*.ml*)) main/version.ml
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) -I js \
 	-tag-line "<js/**> : thread, package(js_of_ocaml.tyxml), package(js_of_ocaml.syntax), package(tyxml.syntax), package(lwt), syntax(camlp4o)" \
 	$@
 
-ifeq ($(USE_LOCAL),1)
 js/external:
-	mkdir -p external ;\
+ifeq ($(USE_CDN),0)
+	mkdir -p $@ ;\
 	mkdir -p $(TEMPDIR) ;\
 	wget -O $(TEMPDIR)/bootstrap.zip   https://github.com/twbs/bootstrap/releases/download/v3.3.5/bootstrap-3.3.5-dist.zip ;\
 	wget -O $(TEMPDIR)/codemirror.zip  http://codemirror.net/codemirror.zip ;\
 	wget -O $(TEMPDIR)/mathjax.zip     https://github.com/mathjax/MathJax/archive/v2.5-latest.zip ;\
 	wget -O $(TEMPDIR)/jquery.js       https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js ;\
-	mkdir -p external ;\
-	unzip -d external $(TEMPDIR)/bootstrap.zip ;\
-	unzip -d external $(TEMPDIR)/codemirror.zip ;\
-	unzip -d external $(TEMPDIR)/mathjax.zip ;\
-	mkdir -p external/jquery ;\
-	cp  $(TEMPDIR)/jquery.js external/jquery ;\
-	rm -rf $(TEMPDIR)
-JS_EXTERNAL="js/external"
+	mkdir -p $@ ;\
+	unzip -d $@ $(TEMPDIR)/bootstrap.zip ;\
+	unzip -d $@ $(TEMPDIR)/codemirror.zip ;\
+	unzip -d $@ $(TEMPDIR)/mathjax.zip ;\
+	mkdir -p $@/jquery ;\
+	cp  $(TEMPDIR)/jquery.js $@/jquery ;\
+else
 endif
 
-
-js/JaSim.js: JaSim.byte $(JS_EXTERNAL)
+js/JaSim.js: JaSim.byte js/external js/index.html
 	js_of_ocaml "+weak.js" "+nat.js" _build/js/$< -o $@
 
+js/index.html:
+ifeq ($(USE_CDN),0)
+	cp js/use-cdn.html js/index.html
+else
+	cp js/no-cdn.html js/index.html
+endif
+	chmod -w js/index.html
 
 bin/%: %.native Makefile
 	[ -d bin ] || mkdir bin && cp $< $@
@@ -121,6 +126,8 @@ clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch clean_doc
 	rm -f js/JaSim.js
 	find . -name \*~ -delete
 	+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite clean
+	rm -rf js/external
+	rm -f js/index.html
 
 check: bin/sanity_test
 	@+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite clean
