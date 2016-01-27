@@ -32,7 +32,7 @@ let trace = false
 
 let print_result parameter error handler_kappa compiled result =
   let parameter = Remanent_parameters.update_prefix parameter "agent_type_" in
-  let _ =
+  let error =
     if trace
       || Remanent_parameters.get_trace parameter
       || Remanent_parameters.get_dump_reachability_analysis_static parameter
@@ -45,31 +45,39 @@ let print_result parameter error handler_kappa compiled result =
       in
       if (Remanent_parameters.get_trace parameters_cv)
       then
-        Loggers.fprintf (Remanent_parameters.get_logger parameters_cv) "\n";
-      print_result_static
-        parameter
-        error
-        handler_kappa
-        compiled
-        result.store_bdu_analysis_static
-    else error
+	let _ =
+          Loggers.print_newline (Remanent_parameters.get_logger parameters_cv)
+	in
+	print_result_static
+          parameter
+          error
+          handler_kappa
+          compiled
+          result.store_bdu_analysis_static
+      else error
+    else
+      error
   in
   (*------------------------------------------------------------------------------*)
-  let _ =
+  let error =
     if  Remanent_parameters.get_dump_reachability_analysis_dynamic parameter
     then
-      let _ = Format.printf "\nReachability analysis dynamic information ....@." in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+      let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "Reachability analysis dynamic information ...." in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
       let parameters_cv =
         Remanent_parameters.update_prefix parameter ""
       in
       if (Remanent_parameters.get_trace parameters_cv)
-      then Loggers.print_newline  (Remanent_parameters.get_logger parameters_cv) ;
-      print_result_dynamic
-        parameter
-        error
-        handler_kappa
-        compiled
-        result.store_bdu_analysis_dynamic
+      then
+	let () = Loggers.print_newline  (Remanent_parameters.get_logger parameters_cv) in
+	print_result_dynamic
+          parameter
+          error
+          handler_kappa
+          compiled
+          result.store_bdu_analysis_dynamic
+      else error
     else error
   in
   (*------------------------------------------------------------------------------*)
@@ -136,13 +144,13 @@ let smash_map decomposition
       let error,(map1, map2) =
         Bdu_build.new_index_pair_map parameter error site_correspondence
       in
-       let rename_site parameter error site_type =
-             let error, site_type =
-               match Map.find_option parameter error site_type map2 with
-               | error, None -> warn parameter error (Some "line 165") Exit (-1)
-               | error, Some i -> error, i
-             in
-             error, site_type
+      let rename_site parameter error site_type =
+        let error, site_type =
+          match Map.find_option parameter error site_type map2 with
+          | error, None -> warn parameter error (Some "line 165") Exit (-1)
+          | error, Some i -> error, i
+        in
+        error, site_type
        in
       List.fold_left
 	(fun (error,handler,output) bdu ->
@@ -212,21 +220,21 @@ let smash_map decomposition
     (let error,agent_map =
        AgentMap.create parameter error 0
      in
-       (error,handler,agent_map))
+     (error,handler,agent_map))
 
-let print_bdu_update_map_gen_decomposition decomposition
-    ~smash:smash ~show_dep_with_dimmension_higher_than:dim_min
+  let print_bdu_update_map_gen_decomposition decomposition
+      ~smash:smash ~show_dep_with_dimmension_higher_than:dim_min
     parameter handler error handler_kappa site_correspondence result =
   if
     smash
   then
-   let error,(hander:Mvbdu_wrapper.Mvbdu.handler),output =
+   let error,handler,output =
       smash_map decomposition ~show_dep_with_dimmension_higher_than:dim_min parameter handler error handler_kappa site_correspondence result
-    in
-    AgentMap.fold
-      parameter
-      error
-      (fun parameter error agent_type map (handler:Mvbdu_wrapper.Mvbdu.handler) ->
+   in
+   AgentMap.fold
+     parameter
+     error
+     (fun parameter error agent_type map (handler:Mvbdu_wrapper.Mvbdu.handler) ->
 	let error', agent_string =
           try
             Handler.string_of_agent parameter error handler_kappa agent_type
@@ -234,7 +242,7 @@ let print_bdu_update_map_gen_decomposition decomposition
             _ -> warn parameter error (Some "line 111") Exit (string_of_int agent_type)
 	in
 	let error = Exception.check warn parameter error error' (Some "line 110") Exit in
-      (*-----------------------------------------------------------------------*)
+	(*-----------------------------------------------------------------------*)
 	Wrapped_modules.LoggedIntMap.fold
 	  (fun _ mvbdu (error,handler)
 	  ->
@@ -254,7 +262,7 @@ let print_bdu_update_map_gen_decomposition decomposition
 	      Translation_in_natural_language.translate
 		parameter handler error (fun _ e i -> e,i) mvbdu
 	    in
-	   (*-----------------------------------------------------------------------*)
+	    (*-----------------------------------------------------------------------*)
 	    let error =
 	      Translation_in_natural_language.print
 		~show_dep_with_dimmension_higher_than:dim_min parameter
@@ -268,105 +276,104 @@ let print_bdu_update_map_gen_decomposition decomposition
   else
     begin
       Map_bdu_update.Map.fold
-    (fun (agent_type, cv_id) bdu_update (error,handler) ->
-      let error', agent_string =
-        try
-          Handler.string_of_agent parameter error handler_kappa agent_type
-        with
-          _ -> warn parameter error (Some "line 111") Exit (string_of_int agent_type)
-      in
-      let error = Exception.check warn parameter error error' (Some "line 110") Exit in
-      (*-----------------------------------------------------------------------*)
-      let () =
-	if trace || Remanent_parameters.get_trace parameter
-	then
-	  let () =
-	    Loggers.fprintf (Remanent_parameters.get_logger parameter) "agent_type:%i:%s:cv_id:%i"
-	      agent_type agent_string cv_id
+	(fun (agent_type, cv_id) bdu_update (error,handler) ->
+	  let error', agent_string =
+            try
+              Handler.string_of_agent parameter error handler_kappa agent_type
+            with
+              _ -> warn parameter error (Some "line 111") Exit (string_of_int agent_type)
 	  in
-	  Loggers.print_newline (Remanent_parameters.get_logger parameter)
-      in
+	  let error = Exception.check warn parameter error error' (Some "line 110") Exit in
       (*-----------------------------------------------------------------------*)
-      let error, site_correspondence =
-        AgentMap.get parameter error agent_type site_correspondence
-      in
-      let error, site_correspondence =
-	match site_correspondence with
-	| None -> warn parameter error (Some "line 58") Exit []
-	| Some a -> error, a
-      in
-      let error, site_correspondence =
-	let rec aux list =
-	  match list with
-	  | [] -> warn parameter error (Some "line 68") Exit []
-	  | (h, list, _) :: _ when h = cv_id -> error, list
-	  | _ :: tail -> aux tail
-	in aux site_correspondence
-      in
+	  let () =
+	    if trace || Remanent_parameters.get_trace parameter
+	    then
+	      let () =
+		Loggers.fprintf (Remanent_parameters.get_logger parameter) "agent_type:%i:%s:cv_id:%i"
+		  agent_type agent_string cv_id
+	      in
+	      Loggers.print_newline (Remanent_parameters.get_logger parameter)
+	  in
       (*-----------------------------------------------------------------------*)
-      let error,(map1, map2) =
-        Bdu_build.new_index_pair_map parameter error site_correspondence
-      in
+	  let error, site_correspondence =
+            AgentMap.get parameter error agent_type site_correspondence
+	  in
+	  let error, site_correspondence =
+	    match site_correspondence with
+	    | None -> warn parameter error (Some "line 58") Exit []
+	    | Some a -> error, a
+	  in
+	  let error, site_correspondence =
+	    let rec aux list =
+	      match list with
+	      | [] -> warn parameter error (Some "line 68") Exit []
+	      | (h, list, _) :: _ when h = cv_id -> error, list
+	      | _ :: tail -> aux tail
+	    in aux site_correspondence
+	  in
       (*-----------------------------------------------------------------------*)
-      let error, handler, list =
-        decomposition parameter handler error bdu_update
-      in
+	  let error,(map1, map2) =
+            Bdu_build.new_index_pair_map parameter error site_correspondence
+	  in
       (*-----------------------------------------------------------------------*)
-      let error, handler =
-	List.fold_left
-	  (fun (error, handler) mvbdu ->
-	   let error, handler =
-	     if trace || Remanent_parameters.get_trace parameter
-	     then
-	       let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "INTENSIONAL DESCRIPTION:" in
-	       let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-	       let () = Mvbdu_wrapper.Mvbdu.print parameter mvbdu in
-	       let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "EXTENSIONAL DESCRIPTION:" in
-	       let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-	       error,handler
-	     else
-	       error,handler
-	   in
-	   let rename_site parameter error site_type =
-             let error, site_type =
-               match Map.find_option parameter error site_type map2 with
-               | error, None -> warn parameter error (Some "line 165") Exit (-1)
-               | error, Some i -> error, i
-             in
-             error, site_type
-	   in
-	   let error, (handler, translation) =
-	     Translation_in_natural_language.translate
-               parameter handler error rename_site mvbdu
-	   in
+	  let error, handler, list =
+            decomposition parameter handler error bdu_update
+	  in
+      (*-----------------------------------------------------------------------*)
+	  let error, handler =
+	    List.fold_left
+	      (fun (error, handler) mvbdu ->
+		let error, handler =
+		  if trace || Remanent_parameters.get_trace parameter
+		  then
+		    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "INTENSIONAL DESCRIPTION:" in
+		    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+		    let () = Mvbdu_wrapper.Mvbdu.print parameter mvbdu in
+		    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "EXTENSIONAL DESCRIPTION:" in
+		    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+		    error,handler
+		  else
+		    error,handler
+		in
+		let rename_site parameter error site_type =
+		  let error, site_type =
+		    match Map.find_option parameter error site_type map2 with
+		    | error, None -> warn parameter error (Some "line 165") Exit (-1)
+		    | error, Some i -> error, i
+		  in
+		  error, site_type
+		in
+		let error, (handler, translation) =
+		  Translation_in_natural_language.translate
+		    parameter handler error rename_site mvbdu
+		in
 	   (*-----------------------------------------------------------------------*)
-	   let error =
-	     Translation_in_natural_language.print
-               ~show_dep_with_dimmension_higher_than:dim_min parameter
-               handler_kappa error agent_string agent_type translation
-	   in error, handler
-	  )
-	  (error, handler)
-	  list
-      in
-      error, handler)
-    result (error, handler)
+		let error =
+		  Translation_in_natural_language.print
+		    ~show_dep_with_dimmension_higher_than:dim_min parameter
+		    handler_kappa error agent_string agent_type translation
+		in error, handler
+	      )
+	      (error, handler)
+	      list
+	  in
+	  error, handler)
+	result (error, handler)
     end
-
 (************************************************************************************)
 
 let print_bdu_update_map_cartesian_abstraction a b c d =
   print_bdu_update_map_gen_decomposition
-    ~smash:false
+    ~smash:true
     ~show_dep_with_dimmension_higher_than:1
     Mvbdu_wrapper.Mvbdu.mvbdu_cartesian_abstraction a b c d
 
 (************************************************************************************)
 
 let print_bdu_update_map_cartesian_decomposition a b c d =
-  print_bdu_update_map_gen_decomposition ~smash:false ~show_dep_with_dimmension_higher_than:(if Remanent_parameters.get_hide_one_d_relations_from_cartesian_decomposition a
-     then 2
-     else 1)
+  print_bdu_update_map_gen_decomposition
+    ~smash:true
+    ~show_dep_with_dimmension_higher_than:(if Remanent_parameters.get_hide_one_d_relations_from_cartesian_decomposition a then 2 else 1)
     Mvbdu_wrapper.Mvbdu.mvbdu_full_cartesian_decomposition a b c d
 
 (************************************************************************************)
