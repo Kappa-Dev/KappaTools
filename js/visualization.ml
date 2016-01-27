@@ -22,19 +22,37 @@ let xml =
                             ; Html5.Unsafe.string_attrib "role" "tablist" ]
                          [ navli "graph" true ; navli "flux" false ; navli "log" false ] in
   let navcontent = Html5.div ~a:[ Html5.a_class ["tab-content"]]
-                             [ navcontent "graph" true [ Html5.div ~a:[ Html5.a_id  plot_div_id ] [ Html5.cdata "graph" ] ]
-                             ; navcontent "flux" false [ Html5.cdata "flux" ]
-                             ; navcontent "log" false [ Html5.cdata "log" ] ] in
-                              <:html5<<div class="col-md-6">
-                                      <!-- Nav tabs -->
-                                      $navtabs$
-                                      <!-- Tab panes -->
-                                      $navcontent$
-                                   </div> >>
+                             [ navcontent "graph" true
+                                          [ Html5.div ~a:[ Html5.a_id  plot_div_id ] [ Html5.cdata "graph" ] ]
+                             ; navcontent "flux" false
+                                          [ Html5.cdata "flux" ]
+                             ; navcontent "log" false
+                                          [ Html5.div
+                                              ~a:[Html5.a_class ["panel-pre" ]]
+                                              [ Tyxml_js.R.Html5.pcdata
+                                                  (React.S.bind
+                                                     Storage.model_runtime_state
+                                                     (fun state -> React.S.const (match Storage.get_log_buffer state with
+                                                                                    Some buffer -> buffer
+                                                                                  | None -> ""
+                                                                                 ))) ]
+                                          ]
+                             ] in
+  Html5.div
+    ~a:[Tyxml_js.R.Html5.a_class (React.S.bind
+                                     Storage.model_runtime_state
+                                     (fun state -> React.S.const (match state with
+                                                                    Some _ -> ["col-md-6";"show"]
+                                                                  | None  -> ["col-md-6";"hidden"]
+                                                                 ))
+                                 )]
+    [navtabs;navcontent]
+
 let onload () =
   let plot_div : Dom_html.element Js.t =
     Js.Opt.get (document##getElementById (Js.string plot_div_id))
                (fun () -> assert false) in
-  React.S.l1 (function
-                 None -> ()
-               | Some x -> plot_div##innerHTML <- Js.string x) Storage.model_plot
+  React.S.l1 (fun state -> match Storage.get_plot state with
+                             None -> ()
+                           | Some x -> plot_div##innerHTML <- Js.string x )
+             Storage.model_runtime_state

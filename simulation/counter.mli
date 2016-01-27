@@ -21,7 +21,7 @@ val max_time : t -> float option
 val max_events : t -> int option
 val event_percentage : t -> int option
 val time_percentage : t -> int option
-val counter_stories : t -> int
+val tracked_events : t -> int
 
 val plot_points : t -> int
 val current_time : t -> float

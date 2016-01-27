@@ -133,7 +133,7 @@ let time_percentage (counter : t) : int option =
   | None -> None
   | Some va -> Some (int_of_float (100. *. (counter.time -. counter.init_time)
                                    /. (va -. counter.init_time)))
-let counter_stories (counter : t) : int = counter.stories
+let tracked_events (counter : t) : int = counter.stories
 
 let compute_dT points mx_t =
   if points <= 0 then None else

@@ -48,8 +48,28 @@ JaSim.byte: $(filter-out _build/,$(wildcard */*.ml*))
 	-tag-line "<js/**> : thread, package(js_of_ocaml.tyxml), package(js_of_ocaml.syntax), package(tyxml.syntax), package(lwt), syntax(camlp4o)" \
 	$@
 
-js/JaSim.js: JaSim.byte
+ifeq ($(USE_LOCAL),1)
+js/external:
+	mkdir -p external ;\
+	mkdir -p $(TEMPDIR) ;\
+	wget -O $(TEMPDIR)/bootstrap.zip   https://github.com/twbs/bootstrap/releases/download/v3.3.5/bootstrap-3.3.5-dist.zip ;\
+	wget -O $(TEMPDIR)/codemirror.zip  http://codemirror.net/codemirror.zip ;\
+	wget -O $(TEMPDIR)/mathjax.zip     https://github.com/mathjax/MathJax/archive/v2.5-latest.zip ;\
+	wget -O $(TEMPDIR)/jquery.js       https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js ;\
+	mkdir -p external ;\
+	unzip -d external $(TEMPDIR)/bootstrap.zip ;\
+	unzip -d external $(TEMPDIR)/codemirror.zip ;\
+	unzip -d external $(TEMPDIR)/mathjax.zip ;\
+	mkdir -p external/jquery ;\
+	cp  $(TEMPDIR)/jquery.js external/jquery ;\
+	rm -rf $(TEMPDIR)
+JS_EXTERNAL="js/external"
+endif
+
+
+js/JaSim.js: JaSim.byte $(JS_EXTERNAL)
 	js_of_ocaml "+weak.js" "+nat.js" _build/js/$< -o $@
+
 
 bin/%: %.native Makefile
 	[ -d bin ] || mkdir bin && cp $< $@

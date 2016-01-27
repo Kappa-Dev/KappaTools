@@ -3,6 +3,7 @@ open Firebug;;
 open Lwt
 open Visualization
 open Codemirror
+open Firebug
 
 let rec list_last = function
   | [] -> failwith "list_last"
