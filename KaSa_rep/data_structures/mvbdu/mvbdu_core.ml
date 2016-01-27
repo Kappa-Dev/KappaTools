@@ -147,3 +147,7 @@ let update_dictionary handler dictionary =
     handler
   else
     {handler with Memo_sig.mvbdu_dictionary = dictionary}
+
+let last_entry parameter handler error last_entry =
+  let dic = handler.Memo_sig.mvbdu_dictionary in
+  last_entry parameter error dic

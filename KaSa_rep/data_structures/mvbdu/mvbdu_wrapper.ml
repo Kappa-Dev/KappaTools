@@ -103,6 +103,7 @@ module type Mvbdu =
       ('data,'data,'data) binary ->
        (mvbdu,'data,'map,'map) ternary
 
+    val last_entry: (unit,int) unary
   end
 
 
@@ -220,6 +221,10 @@ module Make (M:Nul)  =
         let error, a =
           Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun _ -> failwith "Cannot recover from bugs in constant initilization") in
         error, handler, a
+
+    let last_entry parameters handler error () =
+      let error,int = Boolean_mvbdu.last_entry parameters handler error in
+      error,handler,int
 
     let mvbdu_true = lift0 "line 55, bdd_true" Boolean_mvbdu.boolean_mvbdu_true
     let mvbdu_false = lift0 "line 56, bdd_false" Boolean_mvbdu.boolean_mvbdu_false
@@ -676,7 +681,7 @@ module Optimize(M:Mvbdu) =
 	     type ('input1,'input2,'input3,'output) ternary = ('input1,'input2,'input3,'output) Mvbdu.ternary
 
 
-
+	     let last_entry = Mvbdu.last_entry
 	     let init = Mvbdu.init
 	     let is_init = Mvbdu.is_init
 	     let equal = Mvbdu.equal

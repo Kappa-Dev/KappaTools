@@ -101,6 +101,8 @@ module type Mvbdu =
       ('data,'data,'data) binary ->
        (mvbdu,'data,'map,'map) ternary
 
+    val last_entry: (unit,int) unary
+
   end
 
 module type Internalized_mvbdu =

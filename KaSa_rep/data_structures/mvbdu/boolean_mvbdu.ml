@@ -15,6 +15,7 @@
 
 let sanity_check = false
 let test_workbench = false
+let trace_mvbdu_allocation = false
 
 let invalid_arg parameters mh message exn value =
      Exception.warn parameters mh (Some "Mvbdu_bool") message exn (fun () -> value)
@@ -292,7 +293,28 @@ let mvbdu_allocate =
     match output with
       | None -> error,None
       | Some ((i:int), a, b, new_dic) ->
-        let new_handler =
+	let error =
+	  if Remanent_parameters.get_trace parameters
+	    && trace_mvbdu_allocation
+	  then
+	    let error,int =
+	      D_mvbdu_skeleton.last_entry
+		parameters
+		error
+		new_dic
+	    in
+	    if i=int
+	    then
+	      let () =
+		Loggers.fprintf (Remanent_parameters.get_logger parameters) "LAST ENTRY: %i" int in
+	      let () =
+		Loggers.print_newline (Remanent_parameters.get_logger parameters)
+	      in
+	      error
+	    else error
+	  else error
+	in
+	let new_handler =
           Mvbdu_core.update_dictionary
             old_handler
             new_dic
@@ -1111,3 +1133,7 @@ let print_memo (error:Exception.method_handler) handler parameters =
   let error = print_gen stdout parameters error ("Print Hash_8",print_hash8,l8) in
   error
 
+let last_entry parameter handler error =
+  Mvbdu_core.last_entry parameter
+    handler error
+    D_mvbdu_skeleton.last_entry
