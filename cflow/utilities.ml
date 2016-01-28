@@ -569,7 +569,7 @@ let compress parameter ?(shall_we_compute=always) ?(shall_we_compute_profiling_i
      let error,log_info = P.close_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error event (Some  (fun () -> size_of_pretrace trace)) log_info in
 
      let error =
-       if debug_mode or true
+       if debug_mode
        then
 	 let _ =  Debug.tag parameter.S.PH.B.PB.CI.Po.K.H.out_channel_err "\t\t * result"  in
 	 let _ =

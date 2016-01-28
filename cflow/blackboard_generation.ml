@@ -18,7 +18,7 @@
   * et en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-let debug_mode = true
+let debug_mode = false
 
 module type PreBlackboard =
 sig
@@ -1508,19 +1508,19 @@ module Preblackboard =
                  let error,log_info,blackboard,mixture_agent_id_rectangular_mutex,set,init_step =
                    List.fold_left
                      (fun (error,log_info,blackboard,mixture_agent_id_rectangular_mutex,set,init_step) id ->
-		      let () = Loggers.fprintf (Remanent_parameters.get_logger (CI.Po.K.H.get_kasa_parameters parameter)) "%i" id in
-		      let () = Loggers.print_newline (Remanent_parameters.get_logger (CI.Po.K.H.get_kasa_parameters parameter)) in
+		   (*   let () = Loggers.fprintf (Remanent_parameters.get_logger (CI.Po.K.H.get_kasa_parameters parameter)) "%i" id in
+		      let () = Loggers.print_newline (Remanent_parameters.get_logger (CI.Po.K.H.get_kasa_parameters parameter)) in*)
 		      let set' = AgentIdSet.add id set in
                        if set == set'
                        then
                          if AgentIdMap.mem id mixture_agent_id_rectangular_mutex then
-			   let () = Loggers.fprintf (Remanent_parameters.get_logger (CI.Po.K.H.get_kasa_parameters parameter)) "Mutex already exists" in
-			   let () = Loggers.print_newline (Remanent_parameters.get_logger (CI.Po.K.H.get_kasa_parameters parameter)) in
+			 (*  let () = Loggers.fprintf (Remanent_parameters.get_logger (CI.Po.K.H.get_kasa_parameters parameter)) "Mutex already exists" in
+			   let () = Loggers.print_newline (Remanent_parameters.get_logger (CI.Po.K.H.get_kasa_parameters parameter)) in*)
 			   (error,log_info,blackboard,mixture_agent_id_rectangular_mutex,set,init_step)
 			 else
                              begin
-			       let () = Loggers.fprintf (Remanent_parameters.get_logger (CI.Po.K.H.get_kasa_parameters parameter)) "Create Mutex" in
-			       let () = Loggers.print_newline (Remanent_parameters.get_logger (CI.Po.K.H.get_kasa_parameters parameter)) in
+			     (*  let () = Loggers.fprintf (Remanent_parameters.get_logger (CI.Po.K.H.get_kasa_parameters parameter)) "Create Mutex" in
+			       let () = Loggers.print_newline (Remanent_parameters.get_logger (CI.Po.K.H.get_kasa_parameters parameter)) in*)
 			       let predicate_info = Mutex (Lock_rectangular (step_id,id)) in
                                let error,log_info,blackboard,predicate_id = allocate parameter handler log_info error blackboard predicate_info in
                                let mixture_agent_id_rectangular_mutex = AgentIdMap.add x predicate_id mixture_agent_id_rectangular_mutex in
@@ -1528,8 +1528,8 @@ module Preblackboard =
                                error,log_info,blackboard,mixture_agent_id_rectangular_mutex,set',init_step
                              end
                        else
-			 let () = Loggers.fprintf (Remanent_parameters.get_logger (CI.Po.K.H.get_kasa_parameters parameter)) "This agent is seen for the first time, no need for mutex yet" in
-			 let () = Loggers.print_newline (Remanent_parameters.get_logger (CI.Po.K.H.get_kasa_parameters parameter)) in
+			(* let () = Loggers.fprintf (Remanent_parameters.get_logger (CI.Po.K.H.get_kasa_parameters parameter)) "This agent is seen for the first time, no need for mutex yet" in
+			 let () = Loggers.print_newline (Remanent_parameters.get_logger (CI.Po.K.H.get_kasa_parameters parameter)) in*)
 			 (error,log_info,blackboard,mixture_agent_id_rectangular_mutex,set',init_step))
                      (error,log_info,blackboard,mixture_agent_id_rectangular_mutex
 						,set,init_step)
