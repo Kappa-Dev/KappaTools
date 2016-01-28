@@ -259,14 +259,14 @@ let onload () : unit Lwt.t =
                 let () = Storage.set_model_is_running true in
                 let _ = start_button_dom##disabled <- Js._true in
                 let _ = Storage.start
-                          (fun stopper -> stop_button_dom##disabled <- Js._false;
-                                          start_button_dom##disabled <- Js._false;
-                                          stop_button_dom##onclick <-
-                                            Dom.handler
-                                              (fun _ ->
-                                               let _ = stop_button_dom##disabled <- Js._true in
-                                               let _ = Lwt.wakeup stopper ()
-                                               in Js._true)
+                          (fun thread_is_running -> stop_button_dom##disabled <- Js._false;
+                                                    start_button_dom##disabled <- Js._false;
+                                                    Lwt_js_events.async
+                                                      (fun _ -> Lwt_js_events.clicks
+                                                                  stop_button_dom
+                                                                  (fun _ _ ->
+                                                                   let _ = stop_button_dom##disabled <- Js._true in
+                                                                   Lwt_switch.turn_off thread_is_running))
                           )
                           (fun _ -> stop_button_dom##disabled <- Js._true;
                                     start_button_dom##disabled <- Js._false)

@@ -38,17 +38,23 @@ let model_runtime_state , set_model_runtime_state = React.S.create (None : runti
 let model_is_running , set_model_is_running = React.S.create false
 let opened_filename, set_opened_filename = React.S.create "model.ka"
 
-let show_graph stop =
+let show_graph thread_is_running label =
   let rec aux () =
+    let () = Firebug.console##debug(Js.string label) in
     let () = match React.S.value model_runtime_state with
         Some state -> set_model_runtime_state (Some { state with plot = Some (Plot.value 555) })
       | None -> ()
     in
-    stop <?> (Lwt_js.sleep 5. >>= aux) in
+    if Lwt_switch.is_on thread_is_running then
+      Lwt_js.sleep 5. >>= aux
+    else
+      return_unit
+  in
   aux ()
 
-let write_out stop counter =
+let write_out thread_is_running counter label =
   let rec aux () =
+    let () = Firebug.console##debug(Js.string label) in
     let () = match React.S.value model_runtime_state with
         Some state -> set_model_runtime_state (Some { state with time_percentage = Counter.time_percentage counter
                                                                ; event_percentage = Counter.event_percentage counter
@@ -56,7 +62,10 @@ let write_out stop counter =
                                                                ; log_buffer = Buffer.contents log_buffer })
       | None -> ()
     in
-    stop <?> (Lwt_js.sleep 2. >>= aux) in
+    if Lwt_switch.is_on thread_is_running then
+      Lwt_js.sleep 2. >>= aux
+    else
+      return_unit in
   aux ()
 
 let fake_env =
@@ -91,7 +100,8 @@ let start start_continuation
     Some error -> set_model_runtime_error_message (Some (format_error_message error));
                   return_unit
   | None ->
-     let stop, stopper = Lwt.task () in
+     let label = string_of_float (Unix.time ()) in
+     let thread_is_running = Lwt_switch.create () in
      catch
        (fun () ->
         let result = React.S.value model_ast in
@@ -103,7 +113,7 @@ let start start_continuation
                                                   tracked_events = None ;
                                                   log_buffer = Buffer.contents log_buffer
                                                 }) in
-        let () = start_continuation stopper in
+        let () = start_continuation thread_is_running in
         let () = set_model_is_running true in
         wrap4 (Eval.initialize ?rescale_init:None) log_form [] counter result
         >>= fun (_kasa_state,env,domain,graph,state) ->
@@ -112,16 +122,16 @@ let start start_continuation
                            Plot.plot_now
                              env (Counter.current_time counter)
                              (State_interpreter.observables_values env counter graph state) in
-                Lwt.join [ show_graph stop;
-                           write_out stop counter;
+                Lwt.join [ show_graph thread_is_running label;
+                           write_out thread_is_running counter label;
                            State_interpreter.loop_cps
                              log_form
-                             (fun f -> if Lwt.is_sleeping stop
+                             (fun f -> if Lwt_switch.is_on thread_is_running
                                        then Lwt.bind (Lwt_js.yield ()) f
                                        else Lwt.return_unit)
                              (fun f _ _ _ _ ->
-                              let () = Lwt.wakeup stopper () in
-                              let () = ExceptionDefn.flush_warning f in Lwt.return_unit)
+                              let () = ExceptionDefn.flush_warning f in
+                              Lwt_switch.turn_off thread_is_running)
                              env domain counter graph state] >>= (fun _ ->
                                                                   stop_continuation ();
                                                                   set_model_is_running false;
@@ -131,19 +141,15 @@ let start start_continuation
        (function
          | ExceptionDefn.Malformed_Decl error ->
             let () = set_model_runtime_error_message (Some (format_error_message error)) in
-            let () = Lwt.wakeup stopper () in
-            return_unit
+            Lwt_switch.turn_off thread_is_running
          | ExceptionDefn.Internal_Error error ->
             let () = set_model_runtime_error_message (Some (format_error_message error)) in
-            let () = Lwt.wakeup stopper () in
-            return_unit
+            Lwt_switch.turn_off thread_is_running
          | Invalid_argument error ->
             let message = Format.sprintf "Runtime error %s" error in
             let () = set_model_runtime_error_message (Some message) in
-            let () = Lwt.wakeup stopper () in
-            return_unit
+            Lwt_switch.turn_off thread_is_running
          | Sys_error message ->
             let () = set_model_runtime_error_message (Some message) in
-            let () = Lwt.wakeup stopper () in
-            return_unit
+            Lwt_switch.turn_off thread_is_running
          | e -> fail e)

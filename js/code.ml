@@ -77,7 +77,9 @@ let xml = <:html5<<div class="col-md-6">
                                 </div> <!-- simulation panel -->
 
                              </div>
-                          </div> >>
+                  </div> >>
+
+
 let onload () =
   let configuration : configuration Js.t = Codemirror.create_configuration () in
   let gutter_option : Js.string_array Js.t = (Js.string "CodeMirror-linenumbers,breakpoints")##split(Js.string ",") in
