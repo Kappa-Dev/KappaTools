@@ -93,7 +93,6 @@ let print_result parameter error handler_kappa compiled result =
 (************************************************************************************)
 (*main print of fixpoint*)
 
-
 let print_bdu_update_map parameter error handler_kappa result =
   Map_bdu_update.Map.fold (fun (agent_type, cv_id) bdu_update error ->
     let error', agent_string =
@@ -284,7 +283,7 @@ let smash_map decomposition
               _ -> warn parameter error (Some "line 111") Exit (string_of_int agent_type)
 	  in
 	  let error = Exception.check warn parameter error error' (Some "line 110") Exit in
-      (*-----------------------------------------------------------------------*)
+          (*-----------------------------------------------------------------------*)
 	  let () =
 	    if trace || Remanent_parameters.get_trace parameter
 	    then
@@ -294,7 +293,7 @@ let smash_map decomposition
 	      in
 	      Loggers.print_newline (Remanent_parameters.get_logger parameter)
 	  in
-      (*-----------------------------------------------------------------------*)
+          (*-----------------------------------------------------------------------*)
 	  let error, site_correspondence =
             AgentMap.get parameter error agent_type site_correspondence
 	  in
@@ -311,15 +310,15 @@ let smash_map decomposition
 	      | _ :: tail -> aux tail
 	    in aux site_correspondence
 	  in
-      (*-----------------------------------------------------------------------*)
+          (*-----------------------------------------------------------------------*)
 	  let error,(map1, map2) =
             Bdu_build.new_index_pair_map parameter error site_correspondence
 	  in
-      (*-----------------------------------------------------------------------*)
+          (*-----------------------------------------------------------------------*)
 	  let error, handler, list =
             decomposition parameter handler error bdu_update
 	  in
-      (*-----------------------------------------------------------------------*)
+          (*-----------------------------------------------------------------------*)
 	  let error, handler =
 	    List.fold_left
 	      (fun (error, handler) mvbdu ->
@@ -347,7 +346,7 @@ let smash_map decomposition
 		  Translation_in_natural_language.translate
 		    parameter handler error rename_site mvbdu
 		in
-	   (*-----------------------------------------------------------------------*)
+	        (*-----------------------------------------------------------------------*)
 		let error =
 		  Translation_in_natural_language.print
 		    ~show_dep_with_dimmension_higher_than:dim_min parameter

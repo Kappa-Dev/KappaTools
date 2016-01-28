@@ -77,22 +77,25 @@ type ('a,'b,'blist,'vlist,'c,'d,'e) unary_other_memoized_fun =
         'c,
         'e
     ) memoized_fun
-
+ 
 type ('a,'b,'blist,'vlist,'c,'d,'e) reset =
-    {
-      empty_association_list   : (Exception.method_handler * ('a,'b,'blist,'vlist,'c,'d,'e) unary_memoized_fun);
-      empty_variables_list     : (Exception.method_handler * ('a,'b,'blist,'vlist,'c,'d,'e) unary_memoized_fun);
-      leaf         : 'a -> (Exception.method_handler *
-                              (Exception.method_handler ->
-                               Exception.method_handler * 'a Mvbdu_sig.cell));
-      clean_head  : Exception.method_handler * ('a,'b,'blist,'vlist,'c,'d,'e) unary_memoized_fun;
-      build_false : int -> int ->
-                    (Exception.method_handler *
-                       (Exception.method_handler ->
-                        Exception.method_handler * 'a Mvbdu_sig.cell));
-      build_true  : int -> int ->
-                    'a Mvbdu_sig.mvbdu -> 'a Mvbdu_sig.mvbdu ->
-                    (Exception.method_handler *
-                       (Exception.method_handler ->
-                        Exception.method_handler * 'a Mvbdu_sig.cell))
-    }
+  {
+    empty_association_list :
+    (Exception.method_handler * ('a,'b,'blist,'vlist,'c,'d,'e) unary_memoized_fun);
+    empty_variables_list :
+      (Exception.method_handler * ('a,'b,'blist,'vlist,'c,'d,'e) unary_memoized_fun);
+    leaf : 'a -> (Exception.method_handler *
+                    (Exception.method_handler ->
+                     Exception.method_handler * 'a Mvbdu_sig.cell));
+    clean_head :
+      Exception.method_handler * ('a,'b,'blist,'vlist,'c,'d,'e) unary_memoized_fun;
+    build_false : int -> int ->
+                  (Exception.method_handler *
+                     (Exception.method_handler ->
+                      Exception.method_handler * 'a Mvbdu_sig.cell));
+    build_true : int -> int ->
+                 'a Mvbdu_sig.mvbdu -> 'a Mvbdu_sig.mvbdu ->
+                 (Exception.method_handler *
+                    (Exception.method_handler ->
+                     Exception.method_handler * 'a Mvbdu_sig.cell))
+  }
