@@ -9,9 +9,20 @@ module Html5 = Tyxml_js.Html5
 class type event = object
 end
 class type configuration = object
-  val lineNumbers : bool Js.t Js.prop
-  val gutters : Js.string_array Js.t Js.prop
-  val mode : Js.js_string Js.t Js.prop
+                             (* The starting value of the editor. *)
+                             val value: string Js.t Js.prop
+                             (* The mode to use. *)
+                             val mode : Js.js_string Js.t Js.prop
+                             (* Explicitly set the line separator for the editor.  *)
+                             val lineSeparator : Js.js_string Js.t Js.prop
+                             (* The theme to style the editor with. *)
+                             val theme: Js.js_string Js.t Js.prop
+                             (* How many spaces a block should be indented.  *)
+                             val indentUnit: int Js.t Js.prop
+                             (* *)
+                             val lineNumbers : bool Js.t Js.prop
+                             val gutters : Js.string_array Js.t Js.prop
+
 end
 let constructor_configuration : configuration Js.t Js.constr = (Js.Unsafe.variable "Object")
 let create_configuration () : configuration Js.t  = jsnew constructor_configuration ()

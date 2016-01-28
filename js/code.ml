@@ -1,9 +1,5 @@
 open Js;;
-open Firebug;;
-open Lwt
-open Visualization
 open Codemirror
-open Firebug
 
 let rec list_last = function
   | [] -> failwith "list_last"
@@ -109,7 +105,7 @@ let initialize codemirror () =
          let () = codemirror##setValue(Js.string content.XmlHttpRequest.content) in
          return_unit)
   with Not_found ->
-       try
+    try
          let text = List.assoc "model_text" args in
          let () = codemirror##setValue(Js.string text) in
          return_unit
@@ -132,7 +128,6 @@ let onload () =
   let _ = Lwt_js_events.async (initialize codemirror) in
   let codemirror_handler _ =
     has_been_modified := true;
-    Firebug.console##debug("change");
     Storage.set_model_text (Js.to_string codemirror##getValue()) in
   let () = codemirror##on((Js.string "change"),
                           (codemirror_handler)) in
@@ -165,12 +160,11 @@ let onload () =
               let file = Js.Opt.get (files##item (0)) (fun () -> assert false) in
               let filename = file##name in
               let () = set_file_label (to_string filename) ;
-                       ignore (Firebug.console##debug(to_string filename);
-                               File.readAsText file >>=
-                                 (fun (va : Js.js_string Js.t) ->
-                                  codemirror##setValue(va);
-                                  return_unit
-                                 ));
+                       Lwt_js_events.async (fun _ -> File.readAsText file >>=
+                                                       (fun (va : Js.js_string Js.t) ->
+                                                        codemirror##setValue(va);
+                                                        return_unit
+                                                       ));
                        ()
               in
               return_unit
