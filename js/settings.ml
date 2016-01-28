@@ -80,23 +80,9 @@ let error_messages signal formatter =
 
 let code_messages = error_messages model_syntax_error Storage.format_error_message
 let start_button_id = "start-button"
-let start_button = Html5.button ~a:(R.filter_attrib (Html5.a_disabled `Disabled)
-                                                    (React.S.map
-                                                       (function None -> false
-                                                            | Some _ -> true)
-                                                       model_syntax_error
-                                                    )
-                                    ::
-                                    [ Html5.a_id start_button_id
+let start_button = Html5.button ~a:([ Html5.a_id start_button_id
                                     ; Html5.Unsafe.string_attrib "type" "button"
-                                    ; Tyxml_js.R.Html5.a_class
-                                        (React.S.bind
-                                           model_syntax_error
-                                           (fun e -> React.S.const (match e with
-                                                                      Some (message,location) -> ["btn";"btn-default";"disabled"]
-                                                                    | None -> ["btn";"btn-default"]
-                                                                   ))
-                                        )])
+                                    ])
                                 [ Html5.cdata "start" ]
 let configuration_settings =
   <:html5<<div class="panel-footer panel-footer-white">
@@ -137,11 +123,13 @@ let configuration_xml =
   Html5.div
     ~a:[ Html5.a_id configuration_id
        ; Tyxml_js.R.Html5.a_class (React.S.bind
-                                     model_runtime_state
-                                     (fun state -> React.S.const (match state with
-                                                                    Some _ -> ["hidden"]
-                                                                  | None  -> ["visible"]
-                                                                 ))
+                                     model_is_running
+                                     (fun is_running -> React.S.const (if is_running then
+                                                                         ["hidden"]
+                                                                       else
+                                                                         ["visible"]
+                                                                      )
+                                     )
                                   )
        ]
     [code_messages; configuration_settings; configuration_button ]
@@ -241,10 +229,11 @@ let simulation_xml =
   Html5.div
     ~a:[ Html5.a_id simulation_id
        ; Tyxml_js.R.Html5.a_class (React.S.bind
-                                     model_runtime_state
-                                     (fun state -> React.S.const (match state with
-                                                                    Some _ -> ["visible"]
-                                                                  | None  -> ["hidden"]
+                                     model_is_running
+                                     (fun model_is_running -> React.S.const (if model_is_running then
+                                                                               ["visible"]
+                                                                             else
+                                                                               ["hidden"]
                                                                  ))
                                   )
        ]
@@ -266,16 +255,26 @@ let onload () : unit Lwt.t =
                   (fun () -> assert false)) in
   let () = start_button_dom##onclick <-
              Dom.handler
-               (fun _ -> let _ = Storage.start () in
-                         Js._true) in
-  let () = stop_button_dom##onclick <-
-             Dom.handler
-               (fun _ -> Storage.stop ();
-                         Js._true) in
+               (fun _ ->
+                let () = Storage.set_model_is_running true in
+                let _ = start_button_dom##disabled <- Js._true in
+                let _ = Storage.start
+                          (fun stopper -> stop_button_dom##disabled <- Js._false;
+                                          start_button_dom##disabled <- Js._false;
+                                          stop_button_dom##onclick <-
+                                            Dom.handler
+                                              (fun _ ->
+                                               let _ = stop_button_dom##disabled <- Js._true in
+                                               let _ = Lwt.wakeup stopper ()
+                                               in Js._true)
+                          )
+                          (fun _ -> stop_button_dom##disabled <- Js._true;
+                                    start_button_dom##disabled <- Js._false)
+                in Js._true)
+  in
   let () = signal_change number_events_id (fun value -> Storage.set_model_max_events
                                                           (try Some (int_of_string value)
                                                            with Failure _ -> None)
-
                                           ) in
   let () = signal_change time_limit_id    (fun value -> Storage.set_model_max_time
                                                           (try Some (float_of_string value)

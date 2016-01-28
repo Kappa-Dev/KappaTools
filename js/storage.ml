@@ -35,7 +35,7 @@ let model_max_time, set_model_max_time = React.S.create None
 let model_text, set_model_text = React.S.create ""
 let model_runtime_error_message, set_model_runtime_error_message = React.S.create (None : string option)
 let model_runtime_state , set_model_runtime_state = React.S.create (None : runtime_state option)
-let stop, stopper = Lwt.task ()
+let model_is_running , set_model_is_running = React.S.create false
 let opened_filename, set_opened_filename = React.S.create "model.ka"
 
 let show_graph stop =
@@ -85,11 +85,13 @@ let parse text =
 let model_ast =
   React.S.fmap parse Ast.empty_compil (React.S.l1 Lexing.from_string model_text)
 
-let start () =
+let start start_continuation
+          stop_continuation =
   match React.S.value model_syntax_error with
     Some error -> set_model_runtime_error_message (Some (format_error_message error));
                   return_unit
   | None ->
+     let stop, stopper = Lwt.task () in
      catch
        (fun () ->
         let result = React.S.value model_ast in
@@ -101,6 +103,8 @@ let start () =
                                                   tracked_events = None ;
                                                   log_buffer = Buffer.contents log_buffer
                                                 }) in
+        let () = start_continuation stopper in
+        let () = set_model_is_running true in
         wrap4 (Eval.initialize ?rescale_init:None) log_form [] counter result
         >>= fun (_kasa_state,env,domain,graph,state) ->
                 let () = Plot.create "foo.svg" in
@@ -118,7 +122,11 @@ let start () =
                              (fun f _ _ _ _ ->
                               let () = Lwt.wakeup stopper () in
                               let () = ExceptionDefn.flush_warning f in Lwt.return_unit)
-                   env domain counter graph state]
+                             env domain counter graph state] >>= (fun _ ->
+                                                                  stop_continuation ();
+                                                                  set_model_is_running false;
+                                                                  Lwt.return_unit
+                                                                 )
        )
        (function
          | ExceptionDefn.Malformed_Decl error ->
@@ -139,6 +147,3 @@ let start () =
             let () = Lwt.wakeup stopper () in
             return_unit
          | e -> fail e)
-let stop () =
-  Lwt.wakeup stopper ();
-  set_model_runtime_state None
