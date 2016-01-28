@@ -543,10 +543,7 @@ let update_outdated_activities ~get_alg store env counter state =
 	| Operator.PERT _ -> assert false
 	| Operator.RULE i ->
 	   let rule = Environment.get_rule env i in
-	   let cc_va =
-	     if rule.Primitives.rate_absolute then 1
-	     else
-	       raw_instance_number
+	   let cc_va = raw_instance_number
 		 state [rule.Primitives.connected_components] in
 	   let () =
 	     store_activity

@@ -20,7 +20,6 @@ end
 
 type elementary_rule = {
   rate : Alg_expr.t;
-  rate_absolute : bool;
   unary_rate : (Alg_expr.t * int option) option;
   connected_components : Connected_component.t array;
   removed : Transformation.t list;
