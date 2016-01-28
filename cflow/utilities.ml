@@ -2,7 +2,7 @@
  * utilities.ml
  *
  * Creation:                      <2015-03-28 feret>
- * Last modification: Time-stamp: <2016-01-24 17:24:09 feret>
+ * Last modification: Time-stamp: <2016-01-27 23:23:00 feret>
  *
  * API for causal compression
  * Jerome Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -569,12 +569,13 @@ let compress parameter ?(shall_we_compute=always) ?(shall_we_compute_profiling_i
      let error,log_info = P.close_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error event (Some  (fun () -> size_of_pretrace trace)) log_info in
 
      let error =
-       if debug_mode
+       if debug_mode or true
        then
 	 let _ =  Debug.tag parameter.S.PH.B.PB.CI.Po.K.H.out_channel_err "\t\t * result"  in
 	 let _ =
 	   if S.PH.B.is_failed output
            then
+	     let _ = S.PH.B.export_blackboard_to_xls parameter handler log_info error "FAIL" 0 0 blackboard in
              let _ = Format.fprintf parameter.S.PH.B.PB.CI.Po.K.H.out_channel_err "Fail_to_compress" in  error
 	   else
 	     let _ = Format.fprintf parameter.S.PH.B.PB.CI.Po.K.H.out_channel_err "Succeed_to_compress" in
