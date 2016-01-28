@@ -1482,9 +1482,9 @@ module Preblackboard =
                       AgentIdSet.empty)}
            in
            let init_step = None in
-           let error,log_info,blackboard,rule_agent_id_mutex,rule_agent_id_subs,mixture_agent_id_mutex,fictitious_list,fictitious_local_list,_,init_step =
+           let error,log_info,blackboard,rule_agent_id_mutex,rule_agent_id_subs,mixture_agent_id_mutex,mixture_agent_id_rectangular_mutex,fictitious_list,fictitious_local_list,_,init_step =
              AgentIdMap.fold
-               (fun x l (error,log_info,blackboard,rule_agent_id_mutex,rule_agent_id_subs,mixture_agent_id_mutex,fictitious_list,fictitious_local_list,set,init_step) ->
+               (fun x l (error,log_info,blackboard,rule_agent_id_mutex,rule_agent_id_subs,mixture_agent_id_mutex,mixture_agent_id_rectangular_mutex,fictitious_list,fictitious_local_list,set,init_step) ->
                  let predicate_info = Mutex (Lock_agent (step_id,x)) in
                  let error,log_info,blackboard,predicate_id = allocate parameter handler log_info error blackboard predicate_info in
                  let error,log_info,blackboard,init_step = init_fictitious_action log_info error predicate_id blackboard init_step
@@ -1505,30 +1505,39 @@ module Preblackboard =
                    else
                      error,log_info,blackboard,rule_agent_id_subs,init_step
                  in
-                 let error,log_info,blackboard,mixture_agent_id_mutex,set,init_step =
+                 let error,log_info,blackboard,mixture_agent_id_rectangular_mutex,set,init_step =
                    List.fold_left
-                     (fun (error,log_info,blackboard,mixture_agent_id_mutex,set,init_step) id ->
-                       let set' = AgentIdSet.add id set in
+                     (fun (error,log_info,blackboard,mixture_agent_id_rectangular_mutex,set,init_step) id ->
+		      let () = Loggers.fprintf (Remanent_parameters.get_logger (CI.Po.K.H.get_kasa_parameters parameter)) "%i" id in
+		      let () = Loggers.print_newline (Remanent_parameters.get_logger (CI.Po.K.H.get_kasa_parameters parameter)) in
+		      let set' = AgentIdSet.add id set in
                        if set == set'
                        then
-                         if AgentIdMap.mem id mixture_agent_id_mutex then
-                           (error,log_info,blackboard,mixture_agent_id_mutex,set,init_step)
+                         if AgentIdMap.mem id mixture_agent_id_rectangular_mutex then
+			   let () = Loggers.fprintf (Remanent_parameters.get_logger (CI.Po.K.H.get_kasa_parameters parameter)) "Mutex already exists" in
+			   let () = Loggers.print_newline (Remanent_parameters.get_logger (CI.Po.K.H.get_kasa_parameters parameter)) in
+			   (error,log_info,blackboard,mixture_agent_id_rectangular_mutex,set,init_step)
 			 else
                              begin
-                               let predicate_info = Mutex (Lock_rectangular (step_id,id)) in
+			       let () = Loggers.fprintf (Remanent_parameters.get_logger (CI.Po.K.H.get_kasa_parameters parameter)) "Create Mutex" in
+			       let () = Loggers.print_newline (Remanent_parameters.get_logger (CI.Po.K.H.get_kasa_parameters parameter)) in
+			       let predicate_info = Mutex (Lock_rectangular (step_id,id)) in
                                let error,log_info,blackboard,predicate_id = allocate parameter handler log_info error blackboard predicate_info in
-                               let mixture_agent_id_mutex = AgentIdMap.add x predicate_id mixture_agent_id_mutex in
+                               let mixture_agent_id_rectangular_mutex = AgentIdMap.add x predicate_id mixture_agent_id_rectangular_mutex in
                                let error,log_info,blackboard,init_step = init_fictitious_action log_info error predicate_id blackboard init_step in
-                               error,log_info,blackboard,mixture_agent_id_mutex,set',init_step
+                               error,log_info,blackboard,mixture_agent_id_rectangular_mutex,set',init_step
                              end
                        else
-                         (error,log_info,blackboard,mixture_agent_id_mutex,set',init_step))
-                     (error,log_info,blackboard,mixture_agent_id_mutex,set,init_step)
+			 let () = Loggers.fprintf (Remanent_parameters.get_logger (CI.Po.K.H.get_kasa_parameters parameter)) "This agent is seen for the first time, no need for mutex yet" in
+			 let () = Loggers.print_newline (Remanent_parameters.get_logger (CI.Po.K.H.get_kasa_parameters parameter)) in
+			 (error,log_info,blackboard,mixture_agent_id_rectangular_mutex,set',init_step))
+                     (error,log_info,blackboard,mixture_agent_id_rectangular_mutex
+						,set,init_step)
                      l
                  in
-                 (error,log_info,blackboard,rule_agent_id_mutex,rule_agent_id_subs,mixture_agent_id_mutex,fictitious_list,fictitious_local_list,set,init_step))
+                 (error,log_info,blackboard,rule_agent_id_mutex,rule_agent_id_subs,mixture_agent_id_mutex,mixture_agent_id_rectangular_mutex,fictitious_list,fictitious_local_list,set,init_step))
                data_structure.old_agents_potential_substitution
-               (error,log_info,blackboard,AgentIdMap.empty,AgentIdMap.empty,AgentIdMap.empty,blackboard.pre_fictitious_list,[],AgentIdSet.empty,init_step)
+               (error,log_info,blackboard,AgentIdMap.empty,AgentIdMap.empty,AgentIdMap.empty,AgentIdMap.empty,blackboard.pre_fictitious_list,[],AgentIdSet.empty,init_step)
            in
            let links_mutex = AgentId2Map.empty in
            let error,log_info,blackboard,links_mutex,fictitious_list,fictitious_local_list,init_step =
