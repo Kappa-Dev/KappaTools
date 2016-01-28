@@ -951,7 +951,7 @@ let mvbdu_cartesian_decomposition_depth variables_list_of_mvbdu extensional_of_v
 		   then
 		     aux n_var t handler error bdu_to_decompose list_of_decomposed_bdu decomposed_var
 		   else
-		     let error,hadnler,list = build_sorted_variables_list parameters handler error h in
+		     let error,handler,list = build_sorted_variables_list parameters handler error h in
 		     let error,handler,restriction = mvbdu_project_keep_only parameters handler error bdu_to_decompose list in
 		     let error,handler,abstract_away = mvbdu_project_abstract_away parameters handler error bdu_to_decompose list in
 		     let error,handler,cartesian_abstraction = mvbdu_and parameters handler error restriction abstract_away in
