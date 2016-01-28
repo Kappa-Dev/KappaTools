@@ -382,13 +382,13 @@ let paths_of_interest
     | Some x -> [(x,start_point),done_path] in
   breadth_first_traversal None false is_interesting sigs graph.connect don acc
 			 [] [start_point,start_ty,done_path]
-			 
+
 let are_connected ?candidate sigs graph ty_x x y nodes_x nodes_y dist =
   let () = assert (not graph.outdated) in
   let rec is_in_nodes_y nodes_y z = match nodes_y with
     | [] -> None
     | y::nds -> if z = y then Some () else is_in_nodes_y nds z in
-  match dist with 
+  match dist with
   | None ->
      (match candidate with
       | Some p when is_valid_path graph p -> Some p
@@ -399,12 +399,12 @@ let are_connected ?candidate sigs graph ty_x x y nodes_x nodes_y dist =
 	 | [] -> None
 	 | [ _,p ] -> Some p
 	 | _ :: _ -> failwith "Edges.are_they_connected completely broken"))
-  | Some _ -> 
-     let rec aux nodes_x = match nodes_x with 
-       | x'::nds -> 
+  | Some _ ->
+     let rec aux nodes_x = match nodes_x with
+       | x'::nds ->
 	  (match breadth_first_traversal dist true (is_in_nodes_y nodes_y)
 	     sigs graph.connect (IntSet.singleton x') [] [] [x',ty_x,[]] with
-	     [] -> aux nds 
+	     [] -> aux nds
 	   | [ _,p ] -> Some p
 	   | _ :: _ -> failwith "Edges.are_they_connected completely broken")
        | [] -> None in

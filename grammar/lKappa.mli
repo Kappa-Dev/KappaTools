@@ -45,7 +45,7 @@ type rule =
     r_add_tokens :
       ((rule_mixture,int) Ast.ast_alg_expr Location.annot * int) list;
     r_rate : (rule_mixture,int) Ast.ast_alg_expr Location.annot;
-    r_un_rate : ((rule_mixture,int) Ast.ast_alg_expr Location.annot 
+    r_un_rate : ((rule_mixture,int) Ast.ast_alg_expr Location.annot
 		 * int Location.annot option) option;
   }
 
@@ -74,6 +74,7 @@ lot of sanity on mixtures:
 - unique internal_state / site
 - links appear exactly twice
 
-The sanity checks on rates consists in ensuring that if the algebraic
-expression of the rate contains a mixture then a new variable is declared
-called rulelabel_un_rate; it is necessary in the update phase.*)
+The sanity checks on rates consists in ensuring that
+- either absolute or unary rates are provided;
+- if the algebraic expression of the rate contains a mixture then a new variable
+ is declared called rulelabel_un_rate; it is necessary in the update phase.*)
