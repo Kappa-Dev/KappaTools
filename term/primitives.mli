@@ -3,27 +3,29 @@
 (** Elementary rule transformations *)
 module Transformation :
 sig
-  type t =
-    | Agent of Agent_place.t
-    | Freed of Agent_place.t * int
-    | Linked of (Agent_place.t * int) * (Agent_place.t * int)
-    | NegativeWhatEver of Agent_place.t * int
-    | PositiveInternalized of Agent_place.t * int * int
-    | NegativeInternalized of Agent_place.t * int
+  type 'a t =
+    | Agent of 'a
+    | Freed of 'a Instantiation.site
+    | Linked of 'a Instantiation.site * 'a Instantiation.site
+    | NegativeWhatEver of 'a Instantiation.site
+    | PositiveInternalized of
+	'a * Instantiation.site_name * Instantiation.internal_state
+    | NegativeInternalized of 'a Instantiation.site
 
   val rename :
-    Connected_component.work -> int ->
-    Connected_component.cc -> Renaming.t -> t -> t
+    Connected_component.work -> int -> Connected_component.cc ->
+    Renaming.t -> Instantiation.abstract t -> Instantiation.abstract t
 
-  val print : ?sigs:Signature.s -> Format.formatter -> t -> unit
+  val print :
+    ?sigs:Signature.s -> Format.formatter -> Instantiation.abstract t -> unit
 end
 
 type elementary_rule = {
   rate : Alg_expr.t;
   unary_rate : (Alg_expr.t * int option) option;
   connected_components : Connected_component.t array;
-  removed : Transformation.t list;
-  inserted : Transformation.t list;
+  removed : Instantiation.abstract Transformation.t list;
+  inserted : Instantiation.abstract Transformation.t list;
   consumed_tokens : (Alg_expr.t * int) list;
   injected_tokens : (Alg_expr.t * int) list;
   syntactic_rule : int;

@@ -16,5 +16,6 @@ val connected_components_sum_of_ambiguous_rule :
   (Connected_component.Env.t * Operator.rev_dep option) *
     (Operator.rev_dep option * Connected_component.t array *
        (Instantiation.abstract Instantiation.event) *
-	 (Primitives.Transformation.t list * Primitives.Transformation.t list))
+	 (Instantiation.abstract Primitives.Transformation.t list *
+	    Instantiation.abstract Primitives.Transformation.t list))
       list
