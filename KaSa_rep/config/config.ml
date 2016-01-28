@@ -1,4 +1,4 @@
- (**
+(**
   * config.ml
   * openkappa
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
@@ -99,4 +99,3 @@ let do_reachability_analysis_module = ref false
 let view_accuracy_level = ref "High"
 let influence_map_accuracy_level = ref "Medium"
 let contact_map_accuracy_level = ref "Low"
-			    
