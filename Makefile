@@ -70,9 +70,9 @@ js/JaSim.js: JaSim.byte js/external js/index.html
 
 js/index.html:
 ifeq ($(USE_CDN),0)
-	cp js/use-cdn.html js/index.html
-else
 	cp js/no-cdn.html js/index.html
+else
+	cp js/use-cdn.html js/index.html
 endif
 	chmod -w js/index.html
 

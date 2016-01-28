@@ -53,7 +53,6 @@ let panel_heading = <:html5<<div class="row">
                             </div>
                             </div> >>
 
-
 let xml = <:html5<<div class="col-md-6">
                              <div class="panel panel-default">
 
@@ -79,6 +78,43 @@ let xml = <:html5<<div class="col-md-6">
                              </div>
                   </div> >>
 
+let initialize codemirror () =
+  let args = Url.Current.arguments in
+  let () =
+    try Storage.set_model_max_events
+          (Some (int_of_string (List.assoc "nb_events" args)))
+    with Not_found | Failure "int_of_string" -> () in
+  let () =
+    try Storage.set_model_nb_plot
+          (int_of_string (List.assoc "plot_points" args))
+    with Not_found | Failure "int_of_string" -> () in
+  let () =
+    try Storage.set_model_max_time
+          (Some (float_of_string (List.assoc "time_limit" args)))
+    with Not_found | Failure "float_of_string" -> () in
+  try
+    let url = List.assoc "model" args in
+    XmlHttpRequest.get url >>=
+      (fun content ->
+       if content.XmlHttpRequest.code <> 200 then return_unit
+       else
+         let () = match Url.url_of_string content.XmlHttpRequest.url with
+           | None -> ()
+           | Some u ->
+              let filename =
+                Tools.list_last (match u with
+                                 | (Url.Http h | Url.Https h) -> h.Url.hu_path
+                                 | Url.File f -> f.Url.fu_path) in
+              Storage.set_opened_filename filename in
+         let () = codemirror##setValue(Js.string content.XmlHttpRequest.content) in
+         return_unit)
+  with Not_found ->
+       try
+         let text = List.assoc "model_text" args in
+         let () = codemirror##setValue(Js.string text) in
+         return_unit
+       with Not_found ->
+         return_unit
 
 let onload () =
   let configuration : configuration Js.t = Codemirror.create_configuration () in
@@ -93,6 +129,7 @@ let onload () =
              (Js.Unsafe.js_expr "id")
              [|Js.Unsafe.inject configuration |] in
   let codemirror : codemirror Js.t = Codemirror.fromTextArea textarea configuration in
+  let _ = Lwt_js_events.async (initialize codemirror) in
   let codemirror_handler _ =
     has_been_modified := true;
     Firebug.console##debug("change");
