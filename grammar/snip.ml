@@ -552,7 +552,7 @@ let incr_origin = function
   | ( Operator.ALG _ | Operator.PERT _  as x) -> x
   | Operator.RULE i -> Operator.RULE (succ i)
 
-let connected_components_of_mixture created (env,origin) mix =
+let connected_components_of_mixture created mix (env,origin) =
   let sigs = Connected_component.Env.sigs env in
   let rec aux env transformations instantiations links_transf acc id = function
     | [] ->
@@ -577,9 +577,9 @@ let connected_components_of_mixture created (env,origin) mix =
        let actions'',transformations'' =
 	 complete_with_creation
 	   sigs transformations' links_transf [] actions' 0 created in
-       ((env,Tools.option_map incr_origin origin),
-	(origin,Tools.array_rev_of_list acc,
-	 (tests,(actions'',side_sites,side_effects)), transformations''))
+       ((origin,Tools.array_rev_of_list acc,
+	 (tests,(actions'',side_sites,side_effects)), transformations''),
+       (env,Tools.option_map incr_origin origin))
     | h :: t ->
        let wk = Connected_component.begin_new env in
        let (wk_out,(removed,added),l_t,event, remains) =
@@ -634,10 +634,10 @@ let connected_components_sum_of_ambiguous_rule
 				     (List.rev created))))
 		     all_mixs in
   Tools.list_fold_right_map (connected_components_of_mixture created)
-			    (env,origin) all_mixs
+			    all_mixs (env,origin)
 
 let connected_components_sum_of_ambiguous_mixture contact_map env ?origin mix =
-  let (cc_env,_),rules =
+  let rules,(cc_env,_) =
     connected_components_sum_of_ambiguous_rule
       contact_map env ?origin mix [] in
   (cc_env, List.map

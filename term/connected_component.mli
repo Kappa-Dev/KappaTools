@@ -71,26 +71,36 @@ module Matching : sig
   val get_all : Edges.t -> t -> cc -> int -> int list
   (** [get_all graph matching_of_previous_cc cc root ]*)
 
+  type cache
+  val empty_cache : cache
+
   val observables_from_agent :
-    Env.t -> Edges.t -> Edges.agent ->
-    ((cc * (int * int)) list * Operator.DepSet.t)
+    Env.t -> Edges.t ->
+    (((cc * (int * int)) list * Operator.DepSet.t) * cache) -> Edges.agent ->
+    (((cc * (int * int)) list * Operator.DepSet.t) * cache)
   (** [observables_from_free domain graph sort agent]
     the int * int in the return list and the following ones
     is a Instantiation.concrete *)
 
   val observables_from_free :
-    Env.t -> Edges.t -> Edges.agent -> int ->
-    ((cc * (int * int)) list * Operator.DepSet.t)
+    Env.t -> Edges.t ->
+    (((cc * (int * int)) list * Operator.DepSet.t) * cache) ->
+    Edges.agent -> int ->
+    (((cc * (int * int)) list * Operator.DepSet.t) * cache)
   (** [observables_from_free domain graph sort agent site] *)
 
   val observables_from_internal :
-    Env.t -> Edges.t -> Edges.agent -> int -> int ->
-    ((cc * (int * int)) list * Operator.DepSet.t)
+    Env.t -> Edges.t ->
+    (((cc * (int * int)) list * Operator.DepSet.t) * cache) ->
+     Edges.agent -> int -> int ->
+    (((cc * (int * int)) list * Operator.DepSet.t) * cache)
   (** [observables_from_internal domain graph sort agent site internal_state] *)
 
   val observables_from_link :
-    Env.t -> Edges.t -> Edges.agent -> int -> Edges.agent -> int ->
-    ((cc * (int * int)) list * Operator.DepSet.t)
+    Env.t -> Edges.t ->
+    (((cc * (int * int)) list * Operator.DepSet.t) * cache) ->
+     Edges.agent -> int -> Edges.agent -> int ->
+    (((cc * (int * int)) list * Operator.DepSet.t) * cache)
   (** [observables_from_link domain graph sort ag site sort' ag' site'] *)
 end
 

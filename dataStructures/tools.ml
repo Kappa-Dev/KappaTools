@@ -77,11 +77,19 @@ let rec list_map_flatten f = function (* list_bind *)
     (List.fold_left (fun x y -> List.rev_append y x) [] (List.rev_map f l))
  *)
 
-let rec list_fold_right_map f x = function
+let rec list_fold_right_map f l x =
+  match l with
+  | [] -> ([],x)
+  | h :: t ->
+     let (t',x') = list_fold_right_map f t x in
+     let (h',x'') = f h x' in ( h'::t',x'')
+
+let rec list_fold_left_map f x = function
   | [] -> (x,[])
   | h :: t ->
-     let (x',t') = list_fold_right_map f x t in
-     let (x'', h') = f x' h in (x'', h'::t')
+     let (x', h') = f x h in
+     let (x'',t') = list_fold_left_map f x' t in
+     (x'', h'::t')
 
 let rec list_fold_left2 f x l1 l2 =
   match l1, l2 with

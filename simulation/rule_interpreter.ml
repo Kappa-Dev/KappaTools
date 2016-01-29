@@ -119,86 +119,55 @@ let all_injections ?excp edges roots cca =
        cands []))
     (excp,[Connected_component.Matching.empty,[]]) cca
 
-let apply_negative_transformation domain inj2graph side_effects edges = function
-  | Primitives.Transformation.Agent n ->
-     let nc = from_place inj2graph n in (*(A,23)*)
-     let new_obs =
-       Connected_component.Matching.observables_from_agent domain edges nc in
-     (*this hack should disappear when chekcing O\H only*)
-     let edges' =
-       Edges.remove_agent nc edges in
-     (side_effects,edges',new_obs)
-  | Primitives.Transformation.Freed (n,s) -> (*(n,s)-bottom*)
-     let (id,_ as nc) = from_place inj2graph n in (*(A,23)*)
-     let new_obs =
-       Connected_component.Matching.observables_from_free domain edges nc s in
-     (*this hack should disappear when chekcing O\H only*)
+let apply_negative_transformation (side_effects,edges) = function
+  | Primitives.Transformation.Agent nc ->
+     let edges' = Edges.remove_agent nc edges in
+     (side_effects,edges')
+  | Primitives.Transformation.Freed ((id,_),s) -> (*(n,s)-bottom*)
      let edges' = Edges.remove_free id s edges in
-     (side_effects,edges',new_obs)
-  | Primitives.Transformation.Linked ((n,s),(n',s')) ->
-     let (id,_ as nc) = from_place inj2graph n in
-     let (id',_ as nc') = from_place inj2graph n' in
-     let new_obs =
-       Connected_component.Matching.observables_from_link
-	 domain edges nc s nc' s' in
+     (side_effects,edges')
+  | Primitives.Transformation.Linked (((id,_),s),((id',_),s')) ->
      let edges' = Edges.remove_link id s id' s' edges in
-     (side_effects,edges',new_obs)
-  | Primitives.Transformation.NegativeWhatEver (n,s) ->
-     let (id,_ as nc) = from_place inj2graph n in
+     (side_effects,edges')
+  | Primitives.Transformation.NegativeWhatEver ((id,_),s) ->
      begin
        match Edges.link_destination id s edges with
-       | None ->
-	  let new_obs = Connected_component.Matching.observables_from_free
-			  domain edges nc s in
-	  (side_effects,Edges.remove_free id s edges,new_obs)
+       | None -> (side_effects,Edges.remove_free id s edges)
        | Some ((id',_ as nc'),s') ->
-	  let new_obs = Connected_component.Matching.observables_from_link
-			  domain edges nc s nc' s' in
-	  ((nc',s')::side_effects,Edges.remove_link id s id' s' edges, new_obs)
+	  ((nc',s')::side_effects,Edges.remove_link id s id' s' edges)
      end
   | Primitives.Transformation.PositiveInternalized _ ->
      raise
        (ExceptionDefn.Internal_Error
 	  (Location.dummy_annot "PositiveInternalized in negative update"))
-  | Primitives.Transformation.NegativeInternalized (n,s) ->
-     let (id,_ as nc) = from_place inj2graph n in
-     let i  = Edges.get_internal id s edges in
-     let new_obs =
-       Connected_component.Matching.observables_from_internal
-	 domain edges nc s i in
+  | Primitives.Transformation.NegativeInternalized ((id,_),s) ->
      let edges' = Edges.remove_internal id s edges in
-     (side_effects,edges',new_obs)
+     (side_effects,edges')
 
 let apply_positive_transformation
-      sigs domain inj2graph side_effects edges = function
+      sigs (inj2graph,side_effects,edges) = function
   | Primitives.Transformation.Agent n ->
      let nc, inj2graph',edges' =
        let ty = Agent_place.get_type n in
        let id,edges' = Edges.add_agent sigs ty edges in
        (id,ty),new_place id inj2graph n,edges' in
-     let new_obs =
-       Connected_component.Matching.observables_from_agent domain edges' nc in
-     (*this hack should disappear when chekcing O\H only*)
-     (inj2graph',side_effects,edges',new_obs)
+     (inj2graph',side_effects,edges'),
+     Primitives.Transformation.Agent nc
   | Primitives.Transformation.Freed (n,s) -> (*(n,s)-bottom*)
      let (id,_ as nc) = from_place inj2graph n in (*(A,23)*)
      let edges' = Edges.add_free id s edges in
-     let new_obs =
-       Connected_component.Matching.observables_from_free domain edges' nc s in
-     (*this hack should disappear when chekcing O\H only*)
      let side_effects' =
        Tools.list_smart_filter (fun x -> x <> (nc,s)) side_effects in
-     (inj2graph,side_effects',edges',new_obs)
+     (inj2graph,side_effects',edges'),
+     Primitives.Transformation.Freed (nc,s)
   | Primitives.Transformation.Linked ((n,s),(n',s')) ->
      let nc = from_place inj2graph n in
      let nc' = from_place inj2graph n' in
      let edges' = Edges.add_link nc s nc' s' edges in
-     let new_obs =
-       Connected_component.Matching.observables_from_link
-	 domain edges' nc s nc' s' in
      let side_effects' = Tools.list_smart_filter
 			   (fun x -> x<>(nc,s) && x<>(nc',s')) side_effects in
-     (inj2graph,side_effects',edges',new_obs)
+     (inj2graph,side_effects',edges'),
+     Primitives.Transformation.Linked ((nc,s),(nc',s'))
   | Primitives.Transformation.NegativeWhatEver _ ->
      raise
        (ExceptionDefn.Internal_Error
@@ -206,59 +175,35 @@ let apply_positive_transformation
   | Primitives.Transformation.PositiveInternalized (n,s,i) ->
      let (id,_ as nc) = from_place inj2graph n in
      let edges' = Edges.add_internal id s i edges in
-     let new_obs =
-       Connected_component.Matching.observables_from_internal
-	 domain edges' nc s i in
-     (inj2graph,side_effects,edges',new_obs)
+     (inj2graph,side_effects,edges'),
+     Primitives.Transformation.PositiveInternalized (nc,s,i)
   | Primitives.Transformation.NegativeInternalized _ ->
      raise
        (ExceptionDefn.Internal_Error
 	  (Location.dummy_annot "NegativeInternalized in positive update"))
 
-let deal_transformation is_add sigs domain to_explore_unaries
-			inj2graph side_effects edges roots transf =
-  (*transf: abstract edge to be added or removed*)
-  let inj,sides,graph,(obs,deps) =
-    (*inj: inj2graph', graph: edges', obs: delta_roots*)
-    if is_add then apply_positive_transformation
-		     sigs domain inj2graph side_effects edges transf
-    else
-      let a,b,c = apply_negative_transformation
-		    domain inj2graph side_effects edges transf in
-      (inj2graph,a,b,c) in
-  let roots' =
-    List.fold_left
-      (fun r' (cc,(root,_)) ->
-       (* let () = *)
-       (* 	 Format.eprintf *)
-       (* 	   "@[add:%b %a in %i@]@." is_add *)
-       (* 	   (Connected_component.print true ~sigs:!Debug.global_sigs) cc root in *)
-       update_roots is_add r' cc root) roots obs in
-  let to_explore' =
-    if not is_add then to_explore_unaries
-    else
-      match transf with
-      | (Primitives.Transformation.Freed _ |
-	 Primitives.Transformation.Agent _ |
-	 Primitives.Transformation.PositiveInternalized _) -> to_explore_unaries
-      | (Primitives.Transformation.NegativeWhatEver _ |
-	 Primitives.Transformation.NegativeInternalized _) -> assert false
-      | Primitives.Transformation.Linked ((n,_),(n',_)) ->
-	 if Agent_place.same_connected_component n n'
-	 then to_explore_unaries
-	 else
-	   let nc = from_place inj n in
-	   nc::to_explore_unaries in
-  ((inj,sides,graph,to_explore',roots',deps),obs)
-
-let deal_remaining_side_effect domain edges roots ((id,_ as nc),s) =
-  let graph = Edges.add_free id s edges in
-  let obs,deps =
-    Connected_component.Matching.observables_from_free domain graph nc s in
-  let roots' =
-    List.fold_left
-      (fun r' (cc,(root,_)) -> update_roots true r' cc root) roots obs in
-  ((graph,roots',deps),obs)
+let obs_from_transformation domain edges acc = function
+  | Primitives.Transformation.Agent nc ->
+     Connected_component.Matching.observables_from_agent domain edges acc nc
+  | Primitives.Transformation.Freed (nc,s) -> (*(n,s)-bottom*)
+     Connected_component.Matching.observables_from_free domain edges acc nc s
+  | Primitives.Transformation.Linked ((nc,s),(nc',s')) ->
+     Connected_component.Matching.observables_from_link
+       domain edges acc nc s nc' s'
+  | Primitives.Transformation.PositiveInternalized (nc,s,i) ->
+     Connected_component.Matching.observables_from_internal
+	 domain edges acc nc s i
+  | Primitives.Transformation.NegativeInternalized ((id,_ as nc),s) ->
+     let i  = Edges.get_internal id s edges in
+     Connected_component.Matching.observables_from_internal
+       domain edges acc nc s i
+  | Primitives.Transformation.NegativeWhatEver ((id,_ as nc),s) ->
+     match Edges.link_destination id s edges with
+     | None ->
+	Connected_component.Matching.observables_from_free domain edges acc nc s
+     | Some (nc',s') ->
+	Connected_component.Matching.observables_from_link
+	  domain edges acc nc s nc' s'
 
 let add_path_to_tests path tests =
   let path_agents,path_tests =
@@ -378,78 +323,100 @@ let update_edges
       sigs counter domain unary_ccs inj_nodes state event_kind ?path rule =
   let former_deps,unary_cands,no_unary = state.outdated_elements in
   (*Negative update*)
-  let aux,side_effects,(unary_candidates',unary_pathes',no_unary') =
+  let concrete_removed =
+    List.map (Primitives.Transformation.concretize
+		(inj_nodes,Mods.IntMap.empty)) rule.Primitives.removed in
+  let ((del_obs,del_deps),_) =
     List.fold_left
-      (fun ((inj2graph,edges,roots,(deps,unaries_to_expl)),sides,unaries)
-	   transf ->
-       (*inj2graph: abs -> conc, roots define the injection that is used*)
-       let ((a,sides',b,_,c,new_deps),new_obs) =
-	 deal_transformation
-	   false sigs domain unaries_to_expl inj2graph sides edges roots transf in
-       ((a,b,c,(Operator.DepSet.union new_deps deps,unaries_to_expl)),
-	sides',remove_unary_instances unaries new_obs new_deps))
-      (((inj_nodes,Mods.IntMap.empty), (*initial inj2graph: (existing,new) *)
-	state.edges,state.roots_of_ccs,(former_deps,[])),
-       [],
-       (state.unary_candidates,state.unary_pathes,no_unary))
-      rule.Primitives.removed (*removed: statically defined edges*)
-  in
-  let ((final_inj2graph,edges',roots',(rev_deps',unaries_to_explore)),
-       remaining_side_effects,new_tracked_obs_instances,all_new_obs) =
+      (obs_from_transformation domain state.edges)
+      (([],Operator.DepSet.empty),Connected_component.Matching.empty_cache)
+      concrete_removed in
+  let roots' =
     List.fold_left
-      (fun ((inj2graph,edges,roots,(deps,unaries_to_expl)),
-	    sides,tracked_inst,all_nobs) transf ->
-       let (a,sides',b,unaries_to_expl',c,new_deps),new_obs =
-	 deal_transformation
-	   true sigs domain unaries_to_expl inj2graph sides edges roots transf in
-       ((a,b,c,(Operator.DepSet.union deps new_deps,unaries_to_expl')),sides',
-	store_obs b c new_obs tracked_inst state.story_machinery,
-	match new_obs with [] -> all_nobs | l -> l::all_nobs))
-      (aux,side_effects,[],[])
-      rule.Primitives.inserted (*statically defined edges*) in
-  let (edges'',roots'',rev_deps'',new_tracked_obs_instances',all_new_obs') =
+      (fun r' (cc,(root,_)) -> update_roots false r' cc root)
+      state.roots_of_ccs del_obs in
+  let (side_effects,edges_after_neg) =
     List.fold_left
-      (fun (edges,roots,deps,tracked_inst,all_nobs) side ->
-       let (b,c,new_deps),new_obs =
-	 deal_remaining_side_effect domain edges roots side in
-       (b,c,Operator.DepSet.union deps new_deps,
-	store_obs b c new_obs tracked_inst state.story_machinery,
-	match new_obs with [] -> all_nobs | l -> l::all_nobs))
-      (edges',roots',rev_deps',new_tracked_obs_instances,all_new_obs)
-      remaining_side_effects in
+      apply_negative_transformation ([],state.edges) concrete_removed in
+  (*Negative unary*)
+  let (unary_candidates',unary_pathes',no_unary') =
+    remove_unary_instances
+      (state.unary_candidates,state.unary_pathes,no_unary) del_obs del_deps in
+  (*Positive update*)
+  let (final_inj2graph,remaining_side_effects,edges'),concrete_inserted =
+    Tools.list_fold_left_map
+      (apply_positive_transformation sigs)
+      ((inj_nodes,Mods.IntMap.empty),side_effects,edges_after_neg)
+      rule.Primitives.inserted in
+  let (edges'',concrete_inserted') =
+    List.fold_left
+      (fun (e,i)  ((id,_ as nc),s) ->
+       Edges.add_free id s e,Primitives.Transformation.Freed (nc,s)::i)
+      (edges',concrete_inserted) remaining_side_effects in
+  let ((new_obs,new_deps),_) =
+    List.fold_left
+      (obs_from_transformation domain edges'')
+      (([],Operator.DepSet.empty),Connected_component.Matching.empty_cache)
+      concrete_inserted' in
+  let roots'' =
+    List.fold_left
+      (fun r' (cc,(root,_)) -> update_roots true r' cc root) roots' new_obs in
+  (*Positive unary*)
   let unary_cands',no_unary'' =
     if Connected_component.Set.is_empty unary_ccs
     then (unary_cands,no_unary')
     else
       let unary_pack =
 	List.fold_left
-	  (List.fold_left
 	     (fun (unary_cands,_ as acc) (cc,root) ->
 	      if Connected_component.Set.mem cc unary_ccs then
 		(root,[(Connected_component.Set.singleton cc,fst root),
 		       Edges.empty_path])::unary_cands,false
-	      else acc)) (unary_cands,no_unary') all_new_obs' in
+	      else acc) (unary_cands,no_unary') new_obs in
       if exists_root_of_unary_ccs unary_ccs roots''
       then
+	let unaries_to_explore =
+	  List.fold_left
+	    (fun unaries_to_expl ->
+	     function
+	     | (Primitives.Transformation.Freed _ |
+		Primitives.Transformation.Agent _ |
+		Primitives.Transformation.PositiveInternalized _) -> unaries_to_expl
+	     | (Primitives.Transformation.NegativeWhatEver _ |
+		Primitives.Transformation.NegativeInternalized _) -> assert false
+	     | Primitives.Transformation.Linked ((n,_),(n',_)) ->
+		if Agent_place.same_connected_component n n'
+		then unaries_to_expl
+		else
+		  let nc = from_place final_inj2graph n in
+		  nc::unaries_to_expl)
+	    [] rule.Primitives.inserted in
 	List.fold_left
 	  (fun (unary_cands,_ as acc) (id,ty) ->
 	   match
 	     Edges.paths_of_interest
-	       (potential_root_of_unary_ccs unary_ccs roots')
+	       (potential_root_of_unary_ccs unary_ccs roots'')
 	       sigs edges'' ty id Edges.empty_path with
 	   | [] -> acc
-	   | l -> ((id,ty),l) :: unary_cands,false) unary_pack unaries_to_explore
+	   | l -> ((id,ty),l) :: unary_cands,false)
+	  unary_pack unaries_to_explore
       else unary_pack in
   (*Store event*)
+  let new_tracked_obs_instances =
+    store_obs edges'' roots'' new_obs [] state.story_machinery in
   let story_machinery' =
     store_event
-      counter final_inj2graph new_tracked_obs_instances' event_kind
+      counter final_inj2graph new_tracked_obs_instances event_kind
       ?path remaining_side_effects rule state.story_machinery in
+
+  let rev_deps = Operator.DepSet.union
+		   former_deps (Operator.DepSet.union del_deps new_deps) in
+
 
   { roots_of_ccs = roots''; unary_candidates = unary_candidates';
     matchings_of_rule = state.matchings_of_rule;
     unary_pathes = unary_pathes'; edges = edges''; tokens = state.tokens;
-    outdated_elements = (rev_deps'',unary_cands',no_unary'');
+    outdated_elements = (rev_deps,unary_cands',no_unary'');
     story_machinery = story_machinery'; }
 
 let raw_instance_number state ccs_l =

@@ -71,7 +71,7 @@ let rules_of_ast ?deps_machinery contact_map counter domain ~syntax_ref (rule,_)
 	Primitives.syntactic_rule = syntax_ref;
 	Primitives.instantiations = syntax;
       } in
-  let (domain',origin'),rule_mixtures =
+  let rule_mixtures,(domain',origin') =
     Snip.connected_components_sum_of_ambiguous_rule
       contact_map domain'' ?origin rule.LKappa.r_mix rule.LKappa.r_created in
   let deps_algs',unary_ccs',rules_l =

@@ -967,13 +967,16 @@ returns the roots of observables that are above in the domain*)
     end
   module CacheSetMap = SetMap.Make(Cache)
 
-  let from_edge domain graph edges =
+  type cache = CacheSetMap.Set.t
+  let empty_cache = CacheSetMap.Set.empty
+
+  let from_edge domain graph acc edges =
     let get_root inj point =
       match find_root point.content with
       | None -> assert false
       | Some (root_type,root) -> Renaming.apply inj root,root_type in
     let rec aux cache (obs,rev_deps as acc) = function
-      | [] -> cache,acc
+      | [] -> acc,cache
       | (_pid,point,inj_point2graph as current) :: remains ->
 	 let root_bundle =
 	   get_root inj_point2graph point in
@@ -1000,31 +1003,30 @@ returns the roots of observables that are above in the domain*)
 		    else next::remains) re son.inj)
 	     remains point.sons in
 	 aux (CacheSetMap.Set.add current cache) acc' remains' in
-    if List.for_all (Navigation.check_edge graph) edges then
-      match Env.navigate domain edges with
-      | None -> ([],Operator.DepSet.empty)
-      | Some (pid,injs,point) ->
-	 snd @@
-	   List.fold_left
-	     (fun (cache,out) inj -> aux cache out [(pid,point,inj)])
-	     (CacheSetMap.Set.empty,([],Operator.DepSet.empty)) injs
-    else ([],Operator.DepSet.empty)
+    match Env.navigate domain edges with
+    | None -> acc
+    | Some (pid,injs,point) ->
+       List.fold_left
+	 (fun (out,cache) inj -> aux cache out [(pid,point,inj)])
+	 acc injs
 
-  let observables_from_agent domain graph (_,ty as node) =
+  let observables_from_agent
+	domain graph ((obs,rdeps),cache as acc) (_,ty as node) =
     if Edges.is_agent node graph
     then match Env.get_single_agent ty domain with
-	 | Some (cc,deps) -> ([cc,node],deps)
-	 | None -> ([],Operator.DepSet.empty)
-    else ([],Operator.DepSet.empty)
+	 | Some (cc,deps) ->
+	    ((cc,node)::obs,Operator.DepSet.union rdeps deps),cache
+	 | None -> acc
+    else acc
 
-  let observables_from_free domain graph node site =
-    from_edge domain graph
+  let observables_from_free domain graph acc node site =
+    from_edge domain graph acc
 	      [(Navigation.Fresh node,site),Navigation.ToNothing]
-  let observables_from_internal domain graph node site id =
-    from_edge domain graph
+  let observables_from_internal domain graph acc node site id =
+    from_edge domain graph acc
 	      [(Navigation.Fresh node,site),Navigation.ToInternal id]
-  let observables_from_link domain graph n site  n' site' =
-    from_edge domain graph
+  let observables_from_link domain graph acc n site  n' site' =
+    from_edge domain graph acc
 	      [(Navigation.Fresh n,site),
 	       Navigation.ToNode (Navigation.Fresh n',site')]
 end
