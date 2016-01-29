@@ -52,11 +52,15 @@ val rename_abstract_side_effect:
   Connected_component.work -> int -> Connected_component.cc -> Renaming.t ->
   (Agent_place.t * 'a) * Agent_place.t binding_state ->
   (Agent_place.t * 'a) * Agent_place.t binding_state
-val concretize_test : (Agent_place.t -> int) -> abstract test -> concrete test
+val concretize_test :
+  (Connected_component.Matching.t * int Mods.IntMap.t) ->
+  abstract test -> concrete test
 val concretize_action :
-  (Agent_place.t -> int) -> abstract action -> concrete action
+  (Connected_component.Matching.t * int Mods.IntMap.t) ->
+  abstract action -> concrete action
 val concretize_event :
-  (Agent_place.t -> int) -> abstract event -> concrete event
+  (Connected_component.Matching.t * int Mods.IntMap.t) ->
+  abstract event -> concrete event
 
 val subst_map_agent_in_concrete_test :
   (int -> int) -> concrete test -> concrete test

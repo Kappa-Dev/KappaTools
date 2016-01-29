@@ -30,25 +30,18 @@ module Transformation =
 	 let p' = Agent_place.rename wk id cc inj p in
 	 if p == p' then x else Agent p'
 
-    let from_place (inj_nodes,inj_fresh) = function
-      | Agent_place.Existing (n,id) ->
-	 (Connected_component.Matching.get (n,id) inj_nodes,
-	  Connected_component.ContentAgent.get_sort n)
-      | Agent_place.Fresh (ty,id) ->
-	 match Mods.IntMap.find_option id inj_fresh with
-	 | Some x -> (x,ty)
-	 | None -> failwith "Rule_interpreter.from_place"
-
     let concretize inj2graph = function
-      | Agent n -> Agent (from_place inj2graph n)
-      | Freed (n,s) -> Freed (from_place inj2graph n,s)
+      | Agent n -> Agent (Agent_place.concretize inj2graph n)
+      | Freed (n,s) -> Freed (Agent_place.concretize inj2graph n,s)
       | Linked ((n,s),(n',s')) ->
-	 Linked ((from_place inj2graph n,s),(from_place inj2graph n',s'))
-      | NegativeWhatEver (n,s) -> NegativeWhatEver (from_place inj2graph n,s)
+	 Linked ((Agent_place.concretize inj2graph n,s),
+		 (Agent_place.concretize inj2graph n',s'))
+      | NegativeWhatEver (n,s) ->
+	 NegativeWhatEver (Agent_place.concretize inj2graph n,s)
       | PositiveInternalized (n,s,i) ->
-	 PositiveInternalized (from_place inj2graph n,s,i)
+	 PositiveInternalized (Agent_place.concretize inj2graph n,s,i)
       | NegativeInternalized (n,s) ->
-	 NegativeInternalized (from_place inj2graph n,s)
+	 NegativeInternalized (Agent_place.concretize inj2graph n,s)
 
     let print ?sigs f = function
       | Agent p ->

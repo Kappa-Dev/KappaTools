@@ -36,41 +36,48 @@ type 'a event =
   'a test list *
     ('a action list * ('a site * 'a binding_state) list * 'a site list)
 
-let concretize_binding_state f = function
+let concretize_binding_state inj2graph = function
   | ANY -> ANY
   | FREE -> FREE
   | BOUND -> BOUND
   | BOUND_TYPE bt -> BOUND_TYPE bt
-  | BOUND_to (pl,s) -> BOUND_to ((f pl,Agent_place.get_type pl),s)
+  | BOUND_to (pl,s) -> BOUND_to (Agent_place.concretize inj2graph pl,s)
 
-let concretize_test f = function
-  | Is_Here pl -> Is_Here (f pl,Agent_place.get_type pl)
-  | Has_Internal ((pl,s),i) -> Has_Internal(((f pl,Agent_place.get_type pl),s),i)
-  | Is_Free (pl,s) -> Is_Free ((f pl,Agent_place.get_type pl),s)
-  | Is_Bound (pl,s) -> Is_Bound ((f pl,Agent_place.get_type pl),s)
+let concretize_test inj2graph = function
+  | Is_Here pl -> Is_Here (Agent_place.concretize inj2graph  pl)
+  | Has_Internal ((pl,s),i) ->
+     Has_Internal((Agent_place.concretize inj2graph pl,s),i)
+  | Is_Free (pl,s) -> Is_Free (Agent_place.concretize inj2graph pl,s)
+  | Is_Bound (pl,s) -> Is_Bound (Agent_place.concretize inj2graph pl,s)
   | Has_Binding_type ((pl,s),t) ->
-     Has_Binding_type (((f pl,Agent_place.get_type pl),s),t)
+     Has_Binding_type ((Agent_place.concretize inj2graph pl,s),t)
   | Is_Bound_to ((pl,s),(pl',s')) ->
-     Is_Bound_to (((f pl,Agent_place.get_type pl),s),
-		  ((f pl',Agent_place.get_type pl'),s'))
+     Is_Bound_to ((Agent_place.concretize inj2graph pl,s),
+		  (Agent_place.concretize inj2graph pl',s'))
 
-let concretize_action f = function
-  | Create (pl,i) -> Create ((f pl,Agent_place.get_type pl),i)
-  | Mod_internal ((pl,s),i) -> Mod_internal (((f pl,Agent_place.get_type pl),s),i)
+let concretize_action inj2graph = function
+  | Create (pl,i) -> Create (Agent_place.concretize inj2graph pl,i)
+  | Mod_internal ((pl,s),i) ->
+     Mod_internal ((Agent_place.concretize inj2graph pl,s),i)
   | Bind ((pl,s),(pl',s')) ->
-     Bind (((f pl,Agent_place.get_type pl),s),((f pl',Agent_place.get_type pl'),s'))
+     Bind ((Agent_place.concretize inj2graph pl,s),
+	   (Agent_place.concretize inj2graph pl',s'))
   | Bind_to ((pl,s),(pl',s')) ->
-     Bind_to (((f pl,Agent_place.get_type pl),s),((f pl',Agent_place.get_type pl'),s'))
-  | Free (pl,s) -> Free ((f pl,Agent_place.get_type pl),s)
-  | Remove pl -> Remove (f pl,Agent_place.get_type pl)
+     Bind_to ((Agent_place.concretize inj2graph pl,s),
+	      (Agent_place.concretize inj2graph pl',s'))
+  | Free (pl,s) -> Free (Agent_place.concretize inj2graph pl,s)
+  | Remove pl -> Remove (Agent_place.concretize inj2graph pl)
 
-let concretize_event f (tests,(actions,kasa_side,kasim_side)) =
-  (List.map (concretize_test f) tests,
-   (List.map (concretize_action f) actions,
-    List.map (fun ((pl,s),b) ->
-	      (((f pl, Agent_place.get_type pl),s),concretize_binding_state f b))
-	     kasa_side,
-    List.map (fun (pl,s) -> ((f pl, Agent_place.get_type pl),s)) kasim_side))
+let concretize_event inj2graph (tests,(actions,kasa_side,kasim_side)) =
+  (List.map (concretize_test inj2graph) tests,
+   (List.map (concretize_action inj2graph) actions,
+    List.map
+      (fun ((pl,s),b) ->
+       ((Agent_place.concretize inj2graph pl,s),
+	concretize_binding_state inj2graph b))
+      kasa_side,
+    List.map
+      (fun (pl,s) -> (Agent_place.concretize inj2graph pl,s)) kasim_side))
 
 let subst_map_concrete_agent f (id,na as agent) =
   try if f id == id then agent else (f id,na)

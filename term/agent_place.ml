@@ -51,3 +51,12 @@ let same_connected_component p p' =
 let is_site_from_fresh = function
   | (Existing _,_) -> false
   | (Fresh _, _) -> true
+
+let concretize (inj_nodes,inj_fresh) = function
+  | Existing (n,id) ->
+     (Connected_component.Matching.get (n,id) inj_nodes,
+      Connected_component.ContentAgent.get_sort n)
+  | Fresh (ty,id) ->
+     match Mods.IntMap.find_option id inj_fresh with
+     | Some x -> (x,ty)
+     | None -> failwith "Instantiation.from_place"

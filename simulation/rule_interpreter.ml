@@ -81,15 +81,6 @@ let remove_candidate cands pathes rule_id (x,y as pair) =
   ((if Mods.Int2Set.is_empty va' then Mods.IntMap.remove rule_id cands
     else Mods.IntMap.add rule_id va' cands), remove_path pair pathes)
 
-let from_place (inj_nodes,inj_fresh) = function
-  | Agent_place.Existing (n,id) ->
-     (Connected_component.Matching.get (n,id) inj_nodes,
-     Connected_component.ContentAgent.get_sort n)
-  | Agent_place.Fresh (ty,id) ->
-     match Mods.IntMap.find_option id inj_fresh with
-     | Some x -> (x,ty)
-     | None -> failwith "Rule_interpreter.from_place"
-
 let new_place free_id (inj_nodes,inj_fresh) = function
   | Agent_place.Existing _ -> failwith "Rule_interpreter.new_place"
   | Agent_place.Fresh (_,id) ->
@@ -154,15 +145,15 @@ let apply_positive_transformation
      (inj2graph',side_effects,edges'),
      Primitives.Transformation.Agent nc
   | Primitives.Transformation.Freed (n,s) -> (*(n,s)-bottom*)
-     let (id,_ as nc) = from_place inj2graph n in (*(A,23)*)
+     let (id,_ as nc) = Agent_place.concretize inj2graph n in (*(A,23)*)
      let edges' = Edges.add_free id s edges in
      let side_effects' =
        Tools.list_smart_filter (fun x -> x <> (nc,s)) side_effects in
      (inj2graph,side_effects',edges'),
      Primitives.Transformation.Freed (nc,s)
   | Primitives.Transformation.Linked ((n,s),(n',s')) ->
-     let nc = from_place inj2graph n in
-     let nc' = from_place inj2graph n' in
+     let nc = Agent_place.concretize inj2graph n in
+     let nc' = Agent_place.concretize inj2graph n' in
      let edges' = Edges.add_link nc s nc' s' edges in
      let side_effects' = Tools.list_smart_filter
 			   (fun x -> x<>(nc,s) && x<>(nc',s')) side_effects in
@@ -173,7 +164,7 @@ let apply_positive_transformation
        (ExceptionDefn.Internal_Error
 	  (Location.dummy_annot "NegativeWhatEver in positive update"))
   | Primitives.Transformation.PositiveInternalized (n,s,i) ->
-     let (id,_ as nc) = from_place inj2graph n in
+     let (id,_ as nc) = Agent_place.concretize inj2graph n in
      let edges' = Edges.add_internal id s i edges in
      (inj2graph,side_effects,edges'),
      Primitives.Transformation.PositiveInternalized (nc,s,i)
@@ -236,8 +227,7 @@ let store_event counter inj2graph new_tracked_obs_instances event_kind
   | Some (x,(info,steps)) ->
      let (ctests,(ctransfs,cside_sites,csides)) =
        Instantiation.concretize_event
-	 (fun p -> let (x,_) = from_place inj2graph p in x)
-	 rule.Primitives.instantiations in
+	 inj2graph rule.Primitives.instantiations in
      let cactions =
        (ctransfs,cside_sites,List.rev_append extra_side_effects csides) in
      let full_concrete_event =
@@ -273,10 +263,7 @@ let store_obs edges roots obs acc = function
 	       (fun acc (inj,_) ->
 		let tests' =
 		  List.map (Instantiation.concretize_test
-			      (fun p ->
-			       let (x,_) =
-				 from_place (inj,Mods.IntMap.empty) p in x))
-			   tests in
+			      (inj,Mods.IntMap.empty)) tests in
 		(ev,tests') :: acc)
 	       acc (all_injections ~excp:(cc,root) edges roots ccs))
 	    acc (Connected_component.Map.find_default [] cc tracked)
@@ -381,14 +368,16 @@ let update_edges
 	     function
 	     | (Primitives.Transformation.Freed _ |
 		Primitives.Transformation.Agent _ |
-		Primitives.Transformation.PositiveInternalized _) -> unaries_to_expl
+		Primitives.Transformation.PositiveInternalized _) ->
+		unaries_to_expl
 	     | (Primitives.Transformation.NegativeWhatEver _ |
-		Primitives.Transformation.NegativeInternalized _) -> assert false
+		Primitives.Transformation.NegativeInternalized _) ->
+		assert false
 	     | Primitives.Transformation.Linked ((n,_),(n',_)) ->
 		if Agent_place.same_connected_component n n'
 		then unaries_to_expl
 		else
-		  let nc = from_place final_inj2graph n in
+		  let nc = Agent_place.concretize final_inj2graph n in
 		  nc::unaries_to_expl)
 	    [] rule.Primitives.inserted in
 	List.fold_left
@@ -411,7 +400,6 @@ let update_edges
 
   let rev_deps = Operator.DepSet.union
 		   former_deps (Operator.DepSet.union del_deps new_deps) in
-
 
   { roots_of_ccs = roots''; unary_candidates = unary_candidates';
     matchings_of_rule = state.matchings_of_rule;
@@ -685,14 +673,12 @@ let apply_rule
 	    match Connected_component.find_root_type
 		    rule.Primitives.connected_components.(0) with
 	    | None -> assert false | Some x -> x in
-	  let nodes1 = Connected_component.Matching.get_all state.edges
-	               Connected_component.Matching.empty
-		       rule.Primitives.connected_components.(0)
-		       roots.(0) in
-	  let nodes2 = Connected_component.Matching.get_all state.edges
-	               Connected_component.Matching.empty
-		       rule.Primitives.connected_components.(1)
-		       roots.(1) in
+	  let nodes1 = Connected_component.Matching.get_all
+			 state.edges Connected_component.Matching.empty
+			 rule.Primitives.connected_components.(0) roots.(0) in
+	  let nodes2 = Connected_component.Matching.get_all
+			 state.edges Connected_component.Matching.empty
+			 rule.Primitives.connected_components.(1) roots.(1) in
 	  let dist = match rule.Primitives.unary_rate with
 	    | None -> None
 	    | Some (_, dist_opt) -> dist_opt in
