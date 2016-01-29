@@ -24,10 +24,10 @@ type t =
     free_id : int * int list;
   }
 (** (agent,site -> binding_state; missings);
-    agent,site -> internal_state; sort -> agents; free_id 
+    agent,site -> internal_state; sort -> agents; free_id
     the free sites are neither in missings nor in linking_destination *)
 
-let empty =
+let empty () =
   {
     outdated = false;
     connect = LargeArray.make 1 [||];
