@@ -1,10 +1,8 @@
 #Command-line:
-"${KAPPABIN}"KaSim -i create.ka -seed 611463625 -e 500 -d output --time-independent || exit 0 
+"${KAPPABIN}"KaSim -i create.ka -seed 931056658 -e 500 -d output --time-independent || exit 0
 
-#In this example, each A has two sites. 
-#Site x of a A can connect to site y of another A.
-#Then it can get phosphorylated while simultaneously removing the other A and creating two new ones. 
+#In this example, each A has two sites.  Site x of a A can connect to
+#site y of another A.  Then it can get phosphorylated while
+#simultaneously removing the other A and creating two new ones.
 
-#There is only one strongly compressed story. 
-
-
+#There is only one strongly compressed story.

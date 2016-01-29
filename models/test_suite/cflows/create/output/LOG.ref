@@ -1,7 +1,7 @@
-+ Command line is: 'KaSim' '-i' 'create.ka' '-seed' '611463625' '-e' '500' '-d' 'output' '--time-independent'
++ Command line is: 'KaSim' '-i' 'create.ka' '-seed' '931056658' '-e' '500' '-d' 'output' '--time-independent'
 Parsing create.ka...
 done
-+ Initialized random number generator with seed 611463625
++ Initialized random number generator with seed 931056658
 + Building initial simulation conditions...
 + Compiling...
 	 -simulation parameters
@@ -18,24 +18,17 @@ done
 ____________________________________________________________
 ############################################################
 	 - removing events occurring after the last observable:
- (-3 events)
+ (-4 events)
 + Producing causal compressions
 	 - splitting initial events (no change)
-	 - detecting siphons (+191 events)
-	 - cutting concurrent events (-1422 events)
-	 - detecting pseudo inverse events (-2 events)
-	 - detecting siphons (+67 events)
-	 - cutting concurrent events (-68 events)
+	 - detecting siphons (+176 events)
+	 - cutting concurrent events (-1440 events)
 	 - detecting pseudo inverse events (no change)
-	 - detecting siphons (+67 events)
-	 - cutting concurrent events (-67 events)
+	 - detecting siphons (+59 events)
+	 - cutting concurrent events (-59 events)
 	 - detecting pseudo inverse events (no change)
 	 - blackboard generation
-	 - computing causal past of each observed events (68)
-
-____________________________________________________________
-############################################################
-
+	 - computing causal past of each observed events (59)
 
 
 	 - weak flow compression (2)
@@ -50,8 +43,4 @@ ____________________________________________________________
 
 + Pretty printing 2 weakly compressed flows
 + Pretty printing 1 strongly compressed flow
-Simulation ended (eff.: 0.998004, detail below)
-	Valid embedding but no longer unary when required: 0.000000
-	Valid embedding but not binary when required: 0.000000
-	Clashing instance: 1.000000
-	Perturbation interrupting time advance: 0.000000
+Simulation ended
