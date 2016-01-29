@@ -1,5 +1,4 @@
 open Lwt
-open Firebug
 type runtime_state = { plot : string option ;
                        time_percentage : int option;
                        event_percentage : int option;
@@ -38,9 +37,8 @@ let model_runtime_state , set_model_runtime_state = React.S.create (None : runti
 let model_is_running , set_model_is_running = React.S.create false
 let opened_filename, set_opened_filename = React.S.create "model.ka"
 
-let show_graph thread_is_running label =
+let show_graph thread_is_running =
   let rec aux () =
-    let () = Firebug.console##debug(Js.string label) in
     let () = match React.S.value model_runtime_state with
         Some state -> set_model_runtime_state (Some { state with plot = Some (Plot.value 555) })
       | None -> ()
@@ -52,9 +50,8 @@ let show_graph thread_is_running label =
   in
   aux ()
 
-let write_out thread_is_running counter label =
+let write_out thread_is_running counter =
   let rec aux () =
-    let () = Firebug.console##debug(Js.string label) in
     let () = match React.S.value model_runtime_state with
         Some state -> set_model_runtime_state (Some { state with time_percentage = Counter.time_percentage counter
                                                                ; event_percentage = Counter.event_percentage counter
@@ -100,7 +97,6 @@ let start start_continuation
     Some error -> set_model_runtime_error_message (Some (format_error_message error));
                   return_unit
   | None ->
-     let label = string_of_float (Unix.time ()) in
      let thread_is_running = Lwt_switch.create () in
      catch
        (fun () ->
@@ -122,8 +118,8 @@ let start start_continuation
                            Plot.plot_now
                              env (Counter.current_time counter)
                              (State_interpreter.observables_values env counter graph state) in
-                Lwt.join [ show_graph thread_is_running label;
-                           write_out thread_is_running counter label;
+                Lwt.join [ show_graph thread_is_running;
+                           write_out thread_is_running counter;
                            State_interpreter.loop_cps
                              log_form
                              (fun f -> if Lwt_switch.is_on thread_is_running
@@ -131,7 +127,21 @@ let start start_continuation
                                        else Lwt.return_unit)
                              (fun f _ _ _ _ ->
                               let () = ExceptionDefn.flush_warning f in
-                              Lwt_switch.turn_off thread_is_running)
+			      let () =
+				Format.fprintf log_form "Simulation ended" in
+			      let () =
+				if Counter.nb_null_event counter = 0
+				then Format.pp_print_newline log_form ()
+				else
+				  let () =
+				    Format.fprintf
+				      log_form " (eff.: %f, detail below)@."
+				      ((float_of_int (Counter.current_event counter)) /.
+					 (float_of_int
+					    (Counter.nb_null_event counter +
+					       Counter.current_event counter))) in
+				  Counter.print_efficiency log_form counter in
+			      Lwt_switch.turn_off thread_is_running)
                              env domain counter graph state] >>= (fun _ ->
                                                                   stop_continuation ();
                                                                   set_model_is_running false;
