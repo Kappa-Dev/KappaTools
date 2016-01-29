@@ -27,20 +27,24 @@ let get_log_buffer state = match state with
 let log_buffer = Buffer.create 512
 let log_form = Format.formatter_of_buffer log_buffer
 
-let format_error_message (message,linenumber) = Format.sprintf "Error at %s : %s" (Location.to_string linenumber) message
+let format_error_message (message,linenumber) =
+  Format.sprintf "Error at %s : %s" (Location.to_string linenumber) message
 let model_nb_plot, set_model_nb_plot = React.S.create 0
 let model_max_events, set_model_max_events = React.S.create None
 let model_max_time, set_model_max_time = React.S.create None
 let model_text, set_model_text = React.S.create ""
-let model_runtime_error_message, set_model_runtime_error_message = React.S.create (None : string option)
-let model_runtime_state , set_model_runtime_state = React.S.create (None : runtime_state option)
+let model_runtime_error_message, set_model_runtime_error_message =
+  React.S.create (None : string option)
+let model_runtime_state , set_model_runtime_state =
+  React.S.create (None : runtime_state option)
 let model_is_running , set_model_is_running = React.S.create false
 let opened_filename, set_opened_filename = React.S.create "model.ka"
 
 let show_graph thread_is_running =
   let rec aux () =
     let () = match React.S.value model_runtime_state with
-        Some state -> set_model_runtime_state (Some { state with plot = Some (Plot.value 555) })
+      | Some state ->
+	 set_model_runtime_state (Some { state with plot = Some (Plot.value 555) })
       | None -> ()
     in
     if Lwt_switch.is_on thread_is_running then
@@ -51,12 +55,16 @@ let show_graph thread_is_running =
   aux ()
 
 let write_out thread_is_running counter =
+  let () = Buffer.clear log_buffer in
   let rec aux () =
     let () = match React.S.value model_runtime_state with
-        Some state -> set_model_runtime_state (Some { state with time_percentage = Counter.time_percentage counter
-                                                               ; event_percentage = Counter.event_percentage counter
-                                                               ; tracked_events = Some (Counter.tracked_events counter)
-                                                               ; log_buffer = Buffer.contents log_buffer })
+      | Some state ->
+	 set_model_runtime_state
+	   (Some { plot = state.plot;
+		   time_percentage = Counter.time_percentage counter;
+		   event_percentage = Counter.event_percentage counter;
+		   tracked_events = Some (Counter.tracked_events counter);
+		   log_buffer = Buffer.contents log_buffer })
       | None -> ()
     in
     if Lwt_switch.is_on thread_is_running then
