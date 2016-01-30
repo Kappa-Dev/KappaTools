@@ -596,7 +596,7 @@ let initialize logger ?rescale_init overwrite counter result =
       Format.eprintf
 	"@[<v>@[<v 2>Environment:@,%a@]@,@[<v 2>Domain:@,@[%a@]@]@,@[<v 2>Intial graph;@,%a@]@]@."
 	Kappa_printer.env env
-	Connected_component.Env.print domain
+	(fun m n -> Connected_component.Env.print m n) domain 
 	(Rule_interpreter.print env) graph in
   let graph',state = State_interpreter.initial env counter graph stops in
   let () =
