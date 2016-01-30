@@ -55,15 +55,10 @@ module ContentAgent = struct
 
   let get_sort (_,ty,_) = ty
 
-  let print ?sigs ?with_id:(with_id=true) f (cc,ty,i) =
+  let print ?sigs f (cc,ty,i) =
     match sigs with
     | Some sigs ->
-       if
-	 with_id
-       then
-	 Format.fprintf f "%a/*%i*/" (Signature.print_agent sigs) ty i
-       else
-	 Format.fprintf f "%a" (Signature.print_agent sigs) ty
+       Format.fprintf f "%a/*%i*/" (Signature.print_agent sigs) ty i
     | None -> Format.fprintf f "cc%in%i" cc i
 
   let print_site ?sigs (cc,agent,i) f id =
@@ -96,7 +91,7 @@ let already_specified ?sigs x i =
   ExceptionDefn.Malformed_Decl
     (Location.dummy_annot
        (Format.asprintf "Site %a of agent %a already specified"
-			(ContentAgent.print_site ?sigs x) i (ContentAgent.print ?sigs ~with_id:false) x))
+			(ContentAgent.print_site ?sigs x) i (ContentAgent.print ?sigs) x))
 
 let dangling_node ~sigs tys x =
   ExceptionDefn.Malformed_Decl
@@ -181,7 +176,7 @@ let to_navigation (full:bool) cc =
   | Some (_,x) -> (*(ag_sort,ag_id)*)
      build_for (true,[]) (*wip*) [] (*already_done*) [x] (*todo*)
 
-let print ?sigs with_id ?with_ag_type_id:(with_ag_id=true) f cc =
+let print ?sigs with_id f cc =
   let print_intf (_,_,ag_i as ag) link_ids internals neigh =
     snd
       (Tools.array_fold_lefti
@@ -220,7 +215,7 @@ let print ?sigs with_id ?with_ag_type_id:(with_ag_id=true) f cc =
 	 Format.fprintf
 	   f "%t@[<h>%a("
 	   (if not_empty then Pp.comma else Pp.empty)
-	   (ContentAgent.print ?sigs ~with_id:with_ag_id) ag_x in
+	   (ContentAgent.print ?sigs) ag_x in
        let out = print_intf ag_x link_ids (IntMap.find_default [||] x cc.internals) el in
        let () = Format.fprintf f ")@]" in
        true,out) cc.links (false,(1,Int2Map.empty)) in
@@ -238,7 +233,7 @@ let print_dot sigs f cc =
 	 Format.fprintf f ",@ margin=\".05,.02\",@ fontsize=\"11\"];@]@," in
        let () = Format.fprintf
 		  f "@[<b>%a ->@ %a@ @[[headlabel=\"%a\",@ weight=\"25\""
-		  (ContentAgent.print_site ?sigs:None n) i (fun n -> ContentAgent.print ?sigs:None n) n
+		  (ContentAgent.print_site ?sigs:None n) i (ContentAgent.print ?sigs:None) n
 		  (ContentAgent.print_site ~sigs n) i in
        Format.fprintf f",@ arrowhead=\"odot\",@ minlen=\".1\"]@];@]@,"
     | Link (y,j) ->
@@ -248,7 +243,7 @@ let print_dot sigs f cc =
 	 let () = Format.fprintf
 		    f
 		    "@[<b>%a ->@ %a@ @[[taillabel=\"%a\",@ headlabel=\"%a\""
-		    (fun n -> ContentAgent.print ?sigs:None n) n (fun n -> ContentAgent.print ?sigs:None n) n'
+		    (ContentAgent.print ?sigs:None) n (ContentAgent.print ?sigs:None) n'
 		    (ContentAgent.print_site ~sigs n) i (ContentAgent.print_site ~sigs n') j in
 	 Format.fprintf
 	   f ",@ arrowhead=\"odot\",@ arrowtail=\"odot\",@ dir=\"both\"]@];@]@,"
@@ -265,7 +260,7 @@ let print_dot sigs f cc =
       let () = Format.fprintf
 		 f "@[<b>%ai ->@ %a@ @[[headlabel=\"%a\",@ weight=25"
 		 (ContentAgent.print_site ?sigs:None n) i
-		 (fun n -> ContentAgent.print ?sigs:None n) n
+		 (ContentAgent.print ?sigs:None) n
 		 (ContentAgent.print_site ~sigs n) i in
       Format.fprintf f ",@ arrowhead=\"odot\",@ minlen=\".1\"]@];@]@," in
   let pp_slot pp_el f (x,a) =
@@ -277,8 +272,8 @@ let print_dot sigs f cc =
 				(fun f x ->
 				 let n = (cc.id,find_ty cc x,x) in
 				 Format.fprintf f "@[%a [label=\"%a\"]@];@,"
-						(fun n -> ContentAgent.print ?sigs:None n) n
-						(fun n -> ContentAgent.print ~sigs n) n)))
+						(ContentAgent.print ?sigs:None) n
+						(ContentAgent.print ~sigs) n)))
     cc.nodes_by_type
     (Pp.set ~trailing:(fun f -> Format.pp_print_cut f ())
 	    IntMap.bindings (fun f -> Format.pp_print_cut f ())
@@ -298,7 +293,7 @@ let print_sons_dot sigs cc_id cc f sons =
 let print_point_dot sigs f (id,point) =
   let style = match point.is_obs_of with | Some _ -> "octagon" | None -> "box" in
   Format.fprintf f "@[cc%i [label=\"%a\", shape=\"%s\"];@]@,%a"
-		 point.content.id (fun n -> print ~sigs false n) point.content
+		 point.content.id (print ~sigs false) point.content
 		 style (print_sons_dot sigs id point.content) point.sons
 
 module Env : sig
@@ -369,7 +364,7 @@ let print f env =
     Format.fprintf
       f "@[<hov 2>(%a)@ -> @[<h>%a@]@ %t-> @[(%a)@]@]"
       (Pp.list Pp.space Format.pp_print_int) p.fathers
-      (fun n -> print ~sigs:env.sig_decl true n) p.content
+      (print ~sigs:env.sig_decl true) p.content
       (fun f ->
        match p.is_obs_of with
        | None -> ()
@@ -396,7 +391,7 @@ let print f env =
     (Pp.set IntMap.bindings Pp.space ~trailing:Pp.space
 	    (fun f (_,(cc,deps)) ->
 	     Format.fprintf f "@[<h>%a@] @[[%a]@]"
-			    (fun n -> print ~sigs:env.sig_decl true n) cc
+			    (print ~sigs:env.sig_decl true) cc
 			    (Pp.set Operator.DepSet.elements Pp.space Operator.print_rev_dep)
 			    deps))
     env.single_agent_points
@@ -899,7 +894,7 @@ module Matching = struct
 	       Pp.set NodeMap.bindings Pp.comma
 		      (fun f (node,dst) ->
 		       Format.fprintf f "%i:%a->%i" ccid
-				      (fun n -> ContentAgent.print ?sigs:None n) node dst
+				      (ContentAgent.print ?sigs:None) node dst
 		      ) f nm)) m
 
   (**)

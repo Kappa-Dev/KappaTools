@@ -125,7 +125,7 @@ let do_it env domain counter graph state modification =
 	  let sigs = Environment.signatures env in
 	  Format.asprintf
 	    "@[<h>%a@]"
-	    (Pp.array Pp.comma (fun _ -> Connected_component.print ~sigs false ~with_ag_type_id:false))
+	    (Pp.array Pp.comma (fun _ -> Connected_component.print ~sigs false))
 	    cc in
      (false,
       Rule_interpreter.add_tracked cc (Causal.OBS name) tests graph,

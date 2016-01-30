@@ -20,7 +20,7 @@ let alg_expr ?env f alg =
 	    (fun _ f cc ->
 	     Format.fprintf
 	       f "|%a|"
-	       (fun n -> Connected_component.print ?sigs false n) cc) f ccs)
+	       (Connected_component.print ?sigs false) cc) f ccs)
 	 f ccs
     | Alg_expr.TOKEN_ID i ->
        Format.fprintf f "|%a|" (Environment.print_token ?env) i
@@ -121,11 +121,11 @@ let modification ?env f m =
   | Primitives.CFLOW (_name,cc,_) ->
      Format.fprintf
        f "$TRACK @[%a@] [true]"
-       (Pp.array Pp.comma (fun _ n -> Connected_component.print ?sigs false n)) cc
+       (Pp.array Pp.comma (fun _ -> Connected_component.print ?sigs false)) cc
   | Primitives.CFLOWOFF cc ->
      Format.fprintf
        f "$TRACK %a [false]"
-       (Pp.array Pp.comma (fun _ n -> Connected_component.print ?sigs false n)) cc
+       (Pp.array Pp.comma (fun _ -> Connected_component.print ?sigs false)) cc
 
 let perturbation ?env f pert =
   let aux f =

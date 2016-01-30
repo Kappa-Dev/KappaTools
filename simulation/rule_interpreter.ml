@@ -45,7 +45,7 @@ let print_injections ?sigs pr f roots_of_ccs =
 	    (fun f (cc,roots) ->
 	     Format.fprintf
 	       f "@[# @[%a@] ==>@ @[%a@]@]"
-	       (fun n -> Connected_component.print ?sigs true n) cc
+	       (Connected_component.print ?sigs true) cc
 	       (Pp.set Mods.IntSet.elements Pp.comma pr) roots
 	    )
     ) roots_of_ccs
