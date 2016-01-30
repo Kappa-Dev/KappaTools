@@ -170,7 +170,7 @@ module Propagation_heuristic =
                   else 
                     aux (step+1) best_grade best_predicate 
               in 
-              let p_id = aux 1 (B.get_n_unresolved_events_of_pid_by_level blackboard 0 0) 0 in 
+              let p_id = aux 0 (B.get_n_unresolved_events_of_pid_by_level blackboard 0 0) 0 in 
               let error,log_info,event_id = 
                 get_last_unresolved_event 
                   parameter 
