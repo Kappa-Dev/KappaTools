@@ -69,12 +69,25 @@ let print_dot sigs nb_cc f mix =
 let print ~compact sigs f mix =
   Pp.list Pp.comma (print_agent compact true sigs) f mix
 
-let agent_is_linked_on_port me i id = function
-  | VAL j when i = j -> id <> me
-  | (VAL _ | FREE) -> false
-
-let agent_is_linked_on forbidden i ag =
-  Tools.array_filter (agent_is_linked_on_port forbidden i) ag.a_ports <> []
+let get_destination_of i l =
+  let get_port_linked_on i ports =
+    Tools.array_fold_lefti
+      (fun s acc ->
+       function
+       | FREE -> acc
+       | VAL j ->
+	  if i = j then
+	    match acc with
+	    | None -> Some s
+	    | Some _ ->
+	       failwith "Raw_mixture.get_destination_of"
+	  else acc)
+      None ports in
+  List.fold_left
+    (fun (oui,non) ag ->
+     match get_port_linked_on i ag.a_ports with
+     | None -> (oui,ag::non)
+     | Some s -> ((s,ag)::oui,non)) ([],[]) l
 
 let rec agents_are_compatibles remains = function
   | [] -> remains = ([],[])
@@ -97,10 +110,10 @@ let rec agents_are_compatibles remains = function
 		     | (FREE, VAL _ | VAL _, FREE) -> None
 		     | FREE, FREE -> c
 		     | VAL a, VAL b ->
-			match List.partition (agent_is_linked_on (-1) a) g,
-			      List.partition (agent_is_linked_on (-1) b) h with
+			match get_destination_of a g,get_destination_of b h with
 			| ([],_), ([],_) -> c
-			| ([x],g'), ([y],h') -> Some ((x,y)::todo,(g',h'))
+			| ([s,x],g'), ([s',y],h')
+			  when s = s' -> Some ((x,y)::todo,(g',h'))
 			| _, _ -> None
 		 )
 		 (Some (q,remains)) o.a_ports p.a_ports with
