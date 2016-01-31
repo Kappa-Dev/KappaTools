@@ -15,7 +15,7 @@
 
   
 
-  module Product (New_domain:Analyzer_sig.Analyzer)(Underlying_domain:Analyzer_sig.Analyzer) =
+  module Product (New_domain:Analyzer_domain_sig.Domain)(Underlying_domain:Analyzer_domain_sig.Domain) =
   (struct
     type ('a,'b) pair =
 		   {
@@ -27,49 +27,51 @@
     type dynamic_information = (New_domain.dynamic_information,Underlying_domain.dynamic_information) pair
    	   
     let initialize global_static_information global_dynamic_information error =
-      let underlying_static_information,underlying_global_information,error = Underlying_domain.initialize global_static_information global_dynamic_information error in
-      let new_domain_static_information,new_domain_global_information,error = New_domain.initialize global_static_information global_dynamic_information error in
+      let error,underlying_static_information,underlying_dynamic_information = Underlying_domain.initialize global_static_information global_dynamic_information error in
+      let error,new_domain_static_information,new_domain_dynamic_information = New_domain.initialize global_static_information global_dynamic_information error in
       error,
-      {new_domain = make_pair nd_static_information underlying_static_information;
-       underlying_domain = make_pair nd_global_information underlying_global_information}
+      {new_domain = new_domain_static_information; underlying_domain = underlying_static_information},
+      {new_domain = new_domain_dynamic_information; underlying_domain = underlying_dynamic_information}
 							       
     type 'a zeroary = static_information -> dynamic_information -> Exception.method_handler -> Exception.method_handler * dynamic_information * 'a
     type ('a,'b) unary   = static_information -> dynamic_information -> Exception.method_handler -> 'a -> Exception.method_handler * dynamic_information * 'b
-    type ('a,'b,'c) binary = static_information -> dynamic_information -> Exception.method_handler -> 'a -> 'b -> Exception.method_handler * dynamic_information 'c
+    type ('a,'b,'c) binary = static_information -> dynamic_information -> Exception.method_handler -> 'a -> 'b -> Exception.method_handler * dynamic_information * 'c
 
-    let add_initial_state static dynamic error =
-	  let error,underlying_domain_dynamic = Underlying_domain.add_initial_state static.underlying_domain dynamic.underlying_domain error in
-	  let error,new_domain_dynamic = New_domain.add_initial_state static.new_domain dynamic.new_domain error in
-	  error,{new_domain=new_domain_dynamic;underlying_domain=underlying_domain_dynamic}
+    let add_initial_state static dynamic error initial_state =
+	  let error,underlying_domain_dynamic,event_list = Underlying_domain.add_initial_state static.underlying_domain dynamic.underlying_domain error initial_state in
+	  let error,new_domain_dynamic,event_list' = New_domain.add_initial_state static.new_domain dynamic.new_domain error initial_state in
+	  error,
+	  {new_domain=new_domain_dynamic;underlying_domain=underlying_domain_dynamic},
+	  List.fold_left (fun list a -> a::list) event_list event_list' (* be careful, the concatenation should be done in the correct order to get a linear time complexity instead of a quadratic one*)
 		  
     let is_enabled static dynamic error rule_id precondition =
-      let error,under_dynamic_information,output_opt = Underlying_domain.is_enabled static.underlying_domain dynamic.underlying_domain error in
+      let error,under_dynamic_information,output_opt = Underlying_domain.is_enabled static.underlying_domain dynamic.underlying_domain error rule_id precondition in
       let dynamic = {dynamic with underlying_domain = under_dynamic_information} in
       match
 	output_opt
       with
       | None -> error,dynamic,None
       | Some precondition ->
-	 let error,new_domain_dynamic_information,output_opt = New_domain.is_enabled static.new_domain dynamic.new_domain error in
+	 let error,new_domain_dynamic_information,output_opt = New_domain.is_enabled static.new_domain dynamic.new_domain error rule_id precondition in
 	 let dynamic = {dynamic with new_domain = new_domain_dynamic_information} in
 	 error,dynamic,output_opt
 
-    let apply_rule static dynamic error r_id precondition =
-        let error,under_dynamic_information,event_list = Underlying_domain.apply_rule static.underlying_domain dynamic.underlying_domain error precondition in
-	let error,new_domain_dynamic_information,event_list' = New_domain.apply_rule static.new_domain dynamic.new_domain error precondition in
+    let apply_rule static dynamic error rule_id precondition =
+        let error,under_dynamic_information,event_list = Underlying_domain.apply_rule static.underlying_domain dynamic.underlying_domain error rule_id precondition in
+	let error,new_domain_dynamic_information,event_list' = New_domain.apply_rule static.new_domain dynamic.new_domain error rule_id precondition in
 	error,
 	{
 	  underlying_domain = under_dynamic_information ;
 	  new_domain = new_domain_dynamic_information
 	},
-	List.fold_left (fun list a -> a::list) event_list event_list' (* be careful, the concatenation should be done in the correct order *)
+	List.fold_left (fun list a -> a::list) event_list event_list' (* be careful, the concatenation should be done in the correct order to get a linear time complexity instead of a quadratic one*)
 
     
       
     let apply_event_list static dynamic error event_list =
-      let error,under_dynamic_information,event_list' = Underlying_domain.apply_event static.underlying_domain dynamic.underlying_domain error event_list in
-      let error,new_domain_dynamic_information,event_list'' = New_domain.apply_event static.new_domain dynamic.new_domain error event_list in
-      let event_list = List.fold_left (fun list a -> a::list) event_list' event_list'' in (* be careful, the concatenation should be done in the correct order *)
+      let error,under_dynamic_information,event_list' = Underlying_domain.apply_event_list static.underlying_domain dynamic.underlying_domain error event_list in
+      let error,new_domain_dynamic_information,event_list'' = New_domain.apply_event_list static.new_domain dynamic.new_domain error event_list in
+      let event_list = List.fold_left (fun list a -> a::list) event_list' event_list'' in (* be careful, the concatenation should be done in the correct order to get a linear time complexity instead of a quadratic one*)
       error,
       {
 	underlying_domain = under_dynamic_information ;
@@ -78,8 +80,8 @@
       event_list
       
     let export static dynamic error kasa_state =
-      let error,under_dynamic,kasa_state = Underlying_domain.export static.underlying_domain dynamic.underlying_domain error kasa_state in
-      let error,new_domain_dynamic,kasa_state = New_domain.export static.new_domain dynamic.new_domain error kasa_state in
+      let error,under_dynamic_information,kasa_state = Underlying_domain.export static.underlying_domain dynamic.underlying_domain error kasa_state in
+      let error,new_domain_dynamic_information,kasa_state = New_domain.export static.new_domain dynamic.new_domain error kasa_state in
       error,
        {
 	underlying_domain = under_dynamic_information ;
@@ -88,13 +90,13 @@
        kasa_state
 	 
     let print static dynamic error loggers =
-      let error,under_dynamic,() = Underlying.print static.underlying_domain dynamic.underlying_domain error loggers in
-      let error,new_domain_dynamic,() = New_domain.print static.new_domain dynamic.new_domain error loggers in
+      let error,under_dynamic_information,() = Underlying_domain.print static.underlying_domain dynamic.underlying_domain error loggers in
+      let error,new_domain_dynamic_information,() = New_domain.print static.new_domain dynamic.new_domain error loggers in
       error,
       {
 	underlying_domain = under_dynamic_information ;
 	new_domain = new_domain_dynamic_information
       },
       ()
-  end:Analyzer_sig.Analyzer)
+  end:Analyzer_domain_sig.Domain)
     
