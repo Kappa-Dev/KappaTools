@@ -693,7 +693,7 @@ let name_and_purify_rule (label_opt,(r,r_pos)) (id,acc,rules) =
     | Ast.LRAR, Some rate ->
        let rate_var_un = (Ast.flip_label label)^"_un_rate" in
        let acc_un, k_op_un = add_un_variable r.Ast.k_op_un acc'' rate_var_un in
-       (acc'',
+       (acc_un,
 	(Tools.option_map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
 	 r.Ast.rhs,r.Ast.lhs,r.Ast.add_token,r.Ast.rm_token,
 	 rate,k_op_un,r_pos)::rules)

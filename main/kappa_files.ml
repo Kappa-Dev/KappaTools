@@ -135,13 +135,6 @@ let set_flux nme event =
 let with_flux str f =
   with_formatter (match str with "" -> !fluxFileName | _ -> str) f
 
-let open_snapshot str event ext =
-  let str = if str="" then !snapshotFileName else str in
-  let desc =
-    open_out_fresh_filename
-      str [] (string_of_int event) ext in
-  let () = add_out_desc desc in
-  desc
 let with_snapshot str event ext f =
   let str = if str="" then !snapshotFileName else str in
   let desc =

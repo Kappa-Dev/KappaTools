@@ -20,7 +20,6 @@ val open_branch_and_cut_engine_profiling: unit -> out_channel
 val set_flux : string -> int -> unit
 val with_flux : string -> (Format.formatter -> unit) -> unit
 
-val open_snapshot : string -> int -> string -> out_channel
 val with_snapshot :
   string -> int -> string -> (Format.formatter -> unit) -> unit
 
