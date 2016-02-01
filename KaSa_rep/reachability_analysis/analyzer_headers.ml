@@ -14,18 +14,29 @@
   * under the terms of the GNU Library General Public License *)
 
 type compilation_result = unit
+
 type rule_id = int
+
 type global_static_information = compilation_result * Remanent_parameters_sig.parameters
+
 type global_dynamic_information = ()
+
 type event =
   | Check_rule of rule_id
+
 type precondition = unit
+
 type kasa_state = unit
+
 type initial_state = unit
 
-let initialize_global_information parameter error compilation = error,(compilation,parameter),()
+let initialize_global_information parameter error compilation = 
+  error, (compilation, parameter), ()
+
 let dummy_precondition = (():precondition)
 			   							       
 let get_parameter = snd
+
 let get_compilation_information = fst
+
 let get_initial_state _ = []

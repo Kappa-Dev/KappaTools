@@ -14,22 +14,33 @@
   * under the terms of the GNU Library General Public License *)
 
 type compilation_result = unit
+
 type rule_id = int
-type global_static_information = compilation_result * Remanent_parameters_sig.parameters
+
+type global_static_information =
+  compilation_result * Remanent_parameters_sig.parameters
+
 type global_dynamic_information = ()
+
 type event =
   | Check_rule of rule_id
+
 type precondition = unit
+
 type kasa_state = unit
+
 type initial_state = unit
 
 val initialize_global_information:
-      Remanent_parameters_sig.parameters ->
-      Exception.method_handler ->
-      compilation_result ->
-      Exception.method_handler * global_static_information * global_dynamic_information
-
-val dummy_precondition: precondition							       
+  Remanent_parameters_sig.parameters ->
+  Exception.method_handler ->
+  compilation_result ->
+  Exception.method_handler * global_static_information * global_dynamic_information
+    
+val dummy_precondition: precondition					      
+ 
 val get_parameter: global_static_information -> Remanent_parameters_sig.parameters
+
 val get_compilation_information: global_static_information -> compilation_result
+
 val get_initial_state: global_static_information -> initial_state list

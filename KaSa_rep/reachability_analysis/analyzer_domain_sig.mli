@@ -15,7 +15,9 @@
 
 module type Domain =
   sig
+
     type static_information
+
     type dynamic_information
    	   
     val initialize:
@@ -24,15 +26,43 @@ module type Domain =
       Exception.method_handler ->
       Exception.method_handler * static_information * dynamic_information
    							       
-    type 'a zeroary = static_information -> dynamic_information -> Exception.method_handler -> Exception.method_handler * dynamic_information * 'a
-    type ('a,'b) unary   = static_information -> dynamic_information -> Exception.method_handler -> 'a -> Exception.method_handler * dynamic_information * 'b
-    type ('a,'b,'c) binary = static_information -> dynamic_information -> Exception.method_handler -> 'a -> 'b -> Exception.method_handler * dynamic_information * 'c
+    type 'a zeroary = 
+      static_information 
+      -> dynamic_information
+      -> Exception.method_handler
+      -> Exception.method_handler * dynamic_information * 'a
+      
+    type ('a, 'b) unary =
+      static_information
+      -> dynamic_information
+      -> Exception.method_handler 
+      -> 'a 
+      -> Exception.method_handler * dynamic_information * 'b
 
-    val add_initial_state: (Analyzer_headers.initial_state,Analyzer_headers.event list) unary
-    val is_enabled: (Analyzer_headers.rule_id,Analyzer_headers.precondition,Analyzer_headers.precondition option) binary
-    val apply_rule: (Analyzer_headers.rule_id,Analyzer_headers.precondition,Analyzer_headers.event list) binary
-    val apply_event_list: (Analyzer_headers.event list,Analyzer_headers.event list) unary
-    val export: (Analyzer_headers.kasa_state,Analyzer_headers.kasa_state) unary
-    val print: (Loggers.t list,unit) unary
+    type ('a, 'b, 'c) binary =
+      static_information 
+      -> dynamic_information
+      -> Exception.method_handler 
+      -> 'a 
+      -> 'b -> Exception.method_handler * dynamic_information * 'c
+
+    val add_initial_state:
+      (Analyzer_headers.initial_state, Analyzer_headers.event list) unary
+
+    val is_enabled:
+      (Analyzer_headers.rule_id,
+       Analyzer_headers.precondition, Analyzer_headers.precondition option) binary
+
+    val apply_rule: 
+      (Analyzer_headers.rule_id,
+       Analyzer_headers.precondition,Analyzer_headers.event list) binary
+
+    val apply_event_list:
+      (Analyzer_headers.event list, Analyzer_headers.event list) unary
+
+    val export:
+      (Analyzer_headers.kasa_state, Analyzer_headers.kasa_state) unary
+
+    val print: (Loggers.t list, unit) unary
   end
     
