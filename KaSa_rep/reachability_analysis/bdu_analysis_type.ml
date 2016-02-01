@@ -313,16 +313,19 @@ type bind_partner = (int * int) list Int2Map_potential_effect.Map.t
 type potential_partner_free = free_partner
 type potential_partner_bind = bind_partner
 
+(*rules has no static information*)
+
 type bdu_analysis_static =
   {
-    store_covering_classes_id : (int list * int list) Int2Map_CV.Map.t;
-    store_side_effects        : half_break_action * remove_action;
-    store_potential_side_effects : potential_partner_free *  potential_partner_bind;
+    store_covering_classes_id : (int list * int list) Int2Map_CV.Map.t; (*static views*)
+    store_side_effects        : half_break_action * remove_action; (*common static info*)
+    store_potential_side_effects : potential_partner_free *  potential_partner_bind; 
+    (*common static*)
     (* views that are tested and modificated with agent_id*)
     store_modification_sites  :
-      (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t;
+      (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t; (*common static*)
     store_test_sites :
-      (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t;
+      (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t; (*common static*)
     store_test_modification_sites :
       (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t;
     (*views that are tested and modificated without agent_id, will be used in
@@ -339,16 +342,16 @@ type wl_int = IntWL.WSetMap.elt list * IntWL.WSetMap.elt list * IntWL.WSetMap.Se
 
 type bdu_analysis_dynamic =
   {
-    store_contact_map_full     : Set_triple.Set.t Int2Map_CM_state.Map.t;
+    store_contact_map_full     : Set_triple.Set.t Int2Map_CM_state.Map.t; (*contact sig*)
     (*syntactic contact map included initial bonds*)
-    store_syn_contact_map_full : Set_triple.Set.t Int2Map_CM_Syntactic.Map.t;
+    store_syn_contact_map_full : Set_triple.Set.t Int2Map_CM_Syntactic.Map.t; (*contact sig*)
     store_covering_classes_modification_update : (*update(c)*)
-      (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;
+      (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t; (*dynamic views*)
     (*update(c) with side effect information*)
     store_covering_classes_modification_side_effects :
-      (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;
+      (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t; (*dynamic views*)
     (*final update function*)
-    store_covering_classes_modification_update_full :
+    store_covering_classes_modification_update_full : (*dynamic views*)
       (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;
   }
 
@@ -357,8 +360,11 @@ type bdu_analysis_dynamic =
 
 type bdu_build =
   {
+    (*rewrite this function ?*)
     store_remanent_triple: ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;
-    store_wl_creation: wl_int;
+
+    store_wl_creation: wl_int; (*common static*)
+    (*common static for all projections*)
     store_bdu_test_restriction_map:  Mvbdu_wrapper.Mvbdu.mvbdu Map_test_bdu.Map.t;
     store_proj_bdu_test_restriction_map: 
       Mvbdu_wrapper.Mvbdu.mvbdu Map_agent_id_test_bdu.Map.t Map_final_test_bdu.Map.t;

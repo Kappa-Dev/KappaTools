@@ -42,7 +42,12 @@ let dump_formatter parameter  f =
   then f (Remanent_parameters.get_logger parameter)
 
 (************************************************************************************)
-(*print different views*)
+(** [dump_view_diff handler_bdu old_bdu new_bdu] returns a pretty print of
+    the xor of the two input bdus according to its agent and the covering
+    class that its belong to. The list of sites in each covering class is
+    computed by their news indexes. This function also convert a xor_bdu in
+    bdu data structure into a list type. The printer will print the format
+    of bdu and the format that easy to read.*)
 
 let dump_view_diff parameter handler_kappa handler_bdu error
     site_correspondence agent_type cv_id old_bdu new_bdu =
@@ -174,7 +179,12 @@ let dump_view_diff parameter handler_kappa handler_bdu error
   else error, handler_bdu
 
 (************************************************************************************)
-(* This function is useful for debugging purpose, please do not digest it *)
+(** [dump_valuation handler_bdu valuation] returns a pretty print of a
+    valuation, according to its agent and the covering class that its
+    belong to. The list of sites in each covering class is computed by
+    their new indexes. This function also convert a valuation in bdu data
+    structure into a list type. The printer will print the format of bdu
+    and the format that easy to read*)
 
 let dump_valuation parameter handler_kappa handler_bdu error
     site_correspondence agent_type cv_id valuation =
@@ -295,6 +305,8 @@ let dump_valuation parameter handler_kappa handler_bdu error
     error,handler_bdu
 
 (************************************************************************************)
+(** [dump_cv_label site_correspondence] returns a pretty print of each
+    covering class (the information of a list of sites) of each agent. *)
 
 let dump_cv_label bool parameter handler_kappa error site_correspondence agent_type cv_id =
   if trace
@@ -354,9 +366,10 @@ let dump_cv_label bool parameter handler_kappa error site_correspondence agent_t
     error
 
 (************************************************************************************)
-(*update bdu:
-  - (bdu_X U bdu_creation) U [\rho[update_views] | \rho \in bdu_X (inter) bdu_test views]
-*)
+(** [update handler_bdu bdu_test list_a bdu_X] returns the union of the bdu
+    after redefine (the bdu redefine is the result of the intersection of
+    bdu at a fixpoint with bdu that is tested with a list modified) with
+    the bdu at a fixpoint. *)
 
 (*Xn intersection with bdu_test and modif and then union with X_n*)
 
@@ -376,7 +389,8 @@ let compute_bdu_update_aux parameter handler error bdu_test list_a bdu_X =
   error, handler, bdu_result
 
 (************************************************************************************)
-(*bdu update function for views*)
+(** [update_views handler_bdu bdu_test list_a bdu_X] is the computation of
+    a bdu fixpoint when its views is tested. *)
 
 let compute_bdu_update_views parameter handler error bdu_test list_a bdu_X =
   let error, handler, bdu_result =
@@ -391,7 +405,8 @@ let compute_bdu_update_views parameter handler error bdu_test list_a bdu_X =
   error, handler, bdu_result
 
 (************************************************************************************)
-(*bdu update function deal with agent creation*)
+(** [update_creation handler_bdu bdu_creation bdu_X] is the computaion of a
+    bdu fixpoint when exists creation action. *)
 
 let compute_bdu_update_creation parameter handler error bdu_creation bdu_X =
   let error, handler, bdu_result =
@@ -400,7 +415,8 @@ let compute_bdu_update_creation parameter handler error bdu_creation bdu_X =
   error, handler, bdu_result
 
 (************************************************************************************)
-(*bdu update function deal with side effects*)
+(** [update_side_effects handler_bdu bdu_test list_a bdu_X] is the
+    computation of a bdu fixpoint when exists side effects properties. *)
 
 let compute_bdu_update_side_effects parameter handler error bdu_test list_a bdu_X =
   let error, handler, bdu_result =
@@ -415,7 +431,11 @@ let compute_bdu_update_side_effects parameter handler error bdu_test list_a bdu_
   error, handler, bdu_result
 
 (************************************************************************************)
-(*write a function add update(c) into working list*)
+(** [update_wl list_of_rules wl] returns a working list contents a list of
+    rules that is tested/modified/both, according to its agent and the
+    covering class that its belong to. This function also print out the
+    information which rule should be investigated at each step of the
+    iteration. *)
 
 let add_update_to_wl ?title:(title="") parameter error handler_kappa compiled
     site_correspondence agent_type cv_id
@@ -488,7 +508,8 @@ let add_update_to_wl ?title:(title="") parameter error handler_kappa compiled
   ) s1 (error, wl)
 
 (************************************************************************************)
-(*fixpoint*)
+(** [views_creation_test_potienal rule_id views creation test potential] returns 
+    a map of bdu depending on the kind of agent at each rule. *)
 
 let collect_map_views_creation_test_potential parameter error rule_id
     store_proj_bdu_views
@@ -526,7 +547,10 @@ let collect_map_views_creation_test_potential parameter error rule_id
   error, (bdu_proj_views, bdu_creation_map, bdu_test_map, bdu_potential_map)
 
 (************************************************************************************)
-(*check is_enable*)
+(** [is_enable rule_id views map] returns true if the intersection of bdu
+    of views that is tested and bdu at a fixpoint is not equal to the bdu
+    of branch false at each rule, according to its agent and covering
+    class. *)
 
 exception False of Exception.method_handler * Mvbdu_wrapper.Mvbdu.handler
 (* TO DO, do the thing cleanly with a forall in wrapped map module *)
@@ -557,7 +581,7 @@ let is_enable parameter handler error bdu_false rule_id
   with False (error, handler) -> error, handler, false
 
 (************************************************************************************)
-(*compute view that has new view and new bond*)
+(** [new_views handler_bdu map wl] returns the new views information. *)
 
 let compute_new_views parameter handler error
     handler_kappa
@@ -591,7 +615,13 @@ let compute_new_views parameter handler error
   error, (handler, new_wl, store_result)
 
 (************************************************************************************)
-(*compute views that is enabled*)
+(** [views_enabled handler_bdu rule_id map] returns the result of a views
+    that is enabled at each rule according to its agent and the covering
+    class that its belong to. It deals with three different aspects: when
+    the views is tested, when it has creation action and when side effects
+    occurs. Add a new views when the old views is different than the
+    current views. If it is a new views also print the information of the
+    views difference at each iteration. *)
 
 let compute_views_enabled parameter handler error
     handler_kappa
@@ -808,7 +838,9 @@ let compute_views_enabled parameter handler error
   error, (handler, wl_tl, store_result)
 
 (************************************************************************************)
-(*fixpoint iteration with/without initial state*)
+(** [fixpoint_init handler_bdu wl dead_rule map] starts the iteration 
+
+fixpoint iteration with/without initial state*)
 
 let collect_bdu_fixpoint_with_init parameter handler error
     handler_kappa
