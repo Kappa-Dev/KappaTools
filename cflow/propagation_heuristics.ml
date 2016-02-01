@@ -120,16 +120,15 @@ module Propagation_heuristic =
         
   
     let next_choice parameter handler log_info error blackboard = 
-      let bool,string = 
+      let bool,string= 
           begin 
             match 
               parameter.B.PB.CI.Po.K.H.current_compression_mode 
             with 
             | None | Some Parameter.Causal-> false,""
             | Some Parameter.Weak -> Parameter.dump_grid_after_branching_during_weak_compression,Parameter.xlsweakFileName
-            
             | Some Parameter.Strong -> Parameter.dump_grid_after_branching_during_strong_compression,Parameter.xlsstrongFileName
-          end
+	  end
       in 
       let error,log_info = 
         if bool
@@ -139,63 +138,89 @@ module Propagation_heuristic =
           error,log_info
 	else
 	  error,log_info
-      in 
-      let error,priority_max = 
-           match 
-             B.PB.CI.Po.K.H.get_priorities parameter 
-           with 
-           | Some x -> error,x.Priority.max_level
-           | None -> 
-             warn parameter error (Some "next_choice, line 145, Compression mode has to been selected") (Failure "Compression mode has not been selected") Priority.zero
-      in 
+      in
+      let error, priority =
+	match
+	  B.PB.CI.Po.K.H.get_priorities parameter
+	with
+	| Some x -> error,x
+	| None -> warn parameter error (Some "next_choice, line 147, Compression mode has to been selected") (Failure "Compression mode has not been selected") Priority.causal
+      in
       let n_p_id = B.get_npredicate_id blackboard in 
+      let error,() =
+	match
+	  priority.Priority.candidate_set_of_events
+	with
+	| Priority.All_remaining_events -> warn parameter error (Some "All_remaining_events strategy is not implemented yet") (Failure "All remaining events strategy is not implemented yet") ()
+	| Priority.Wire_with_the_least_number_of_events -> error,()
+	| Priority.Wire_with_the_most_number_of_events -> error,()
+      in
+      let best_pair x a b =
+	match
+	  priority.Priority.candidate_set_of_events
+	with
+	| Priority.All_remaining_events 
+	| Priority.Wire_with_the_most_number_of_events -> Priority.min_level_not_zero a b
+	| Priority.Wire_with_the_least_number_of_events -> Priority.max_level_not_zero a b
+      in
+      let get_unresolved_event x parameter handler log_info error blackboard p_id level =
+	match
+	  x.Priority.try_to_remove_first
+	with
+	| Priority.Late_events -> get_last_unresolved_event parameter handler log_info error blackboard p_id level
+	| Priority.Early_events -> (*get_first_unresolved_event*) get_last_unresolved_event parameter handler log_info error blackboard p_id level
+      in
       let error,list  = 
         if n_p_id = 0 
         then 
           error,[]
         else 
           let rec try_level level error = 
-            if level > priority_max  
+            if level > priority.Priority.max_level 
             then error,[]
             else 
-              let rec aux step best_grade best_predicate = 
+              let rec aux step best = 
                 if step=n_p_id 
                 then 
-                  best_predicate 
+                  best
                 else 
                   let grade = B.get_n_unresolved_events_of_pid_by_level blackboard step level in 
-                  if compare_int grade best_grade  
-                  then 
-                    aux (step+1) grade step 
-                  else 
-                    aux (step+1) best_grade best_predicate 
+                  aux (step+1) (best_pair priority best (grade,step))
               in 
-              let p_id = aux 1 (B.get_n_unresolved_events_of_pid_by_level blackboard 0 0) 0 in 
-              let error,log_info,event_id = 
-                get_last_unresolved_event 
-                  parameter 
-                  handler
-		  log_info
-                  error 
-                  blackboard 
-                  p_id 
-                  level 
-              in 
-              match event_id 
-              with 
-              | None -> try_level (level+1) error
-              | Some event_id -> 
-                error,[Discard_event event_id;Keep_event event_id]
-          in try_level 0 error
+	      let n,p_id = aux 1 (B.get_n_unresolved_events_of_pid_by_level blackboard 0 0,0)
+	      in 
+	      if n = 0
+	      then
+		try_level (level+1) error
+	      else
+		let error,log_info,event_id = 
+                  get_unresolved_event
+		    priority
+                    parameter 
+                    handler
+		    log_info
+                    error 
+                    blackboard 
+                    p_id 
+                    level 
+		in 
+		match event_id 
+		with 
+		| None ->
+		   let error,() = warn parameter error (Some "next_choice, line 210, An empty wire has been selected") (Failure "An empty wire has been selected") () in
+     		   try_level (level+1) error
+		| Some event_id -> 
+                   error,[Discard_event event_id;Keep_event event_id]
+	  in try_level 0 error
       in 
       error,log_info,list
-      
-
+						 
+						 
     let print_event_case_address parameter handler log_info error blackboard  case = 
       let error,log_info,(_,eid,_,_) = B.get_static parameter handler log_info error blackboard case in 
       let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err  "Event: %i, Predicate: %i\n" eid (B.predicate_id_of_case_address case) in 
       error,log_info,() 
-             
+		       
     let propagate_down parameter handler log_info error blackboard event_case_address instruction_list propagate_list = 
       begin 
         let error,log_info,bool = B.exist_case parameter handler log_info error blackboard event_case_address in 

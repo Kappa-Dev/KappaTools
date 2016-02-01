@@ -127,7 +127,7 @@ module Cflow_handler =
       {
         current_compression_mode = None ;
         priorities_weak = Priority.weak ;
-        priorities_strong = Priority.strong2 ;
+        priorities_strong = Priority.strong ;
         priorities_causal = Priority.causal ;
 	compute_all_stories = false ; 
 	sort_algo_for_stories = Parameter.Bucket;
