@@ -40,11 +40,6 @@ let plot_points =
         Tyxml_js.R.Html5.a_value
           (React.S.l1 string_of_int Storage.model_nb_plot)]
     ()
-(*
-let number_events_id = "number_events"
-let time_limit_id = "time_limit"
-let plot_points_id = "plot_points"
- *)
 let signal_change id signal_handler =
     let input_dom : Dom_html.inputElement Js.t =
     Js.Unsafe.coerce
@@ -253,23 +248,37 @@ let onload () : unit Lwt.t =
     Js.Unsafe.coerce
       (Js.Opt.get (document##getElementById (Js.string stop_button_id))
                   (fun () -> assert false)) in
+  let init_ui () =
+    let _ = start_button_dom##disabled <- Js._true in
+    let _ = stop_button_dom##disabled <- Js._true in
+    ()
+  in
+  let stop_ui () =
+    let _ = start_button_dom##disabled <- Js._false in
+    let _ = stop_button_dom##disabled <- Js._true in
+    ()
+  in
+  let start_ui () =
+    let _ = start_button_dom##disabled <- Js._true in
+    let _ = stop_button_dom##disabled <- Js._false in
+    ()
+  in
   let () = start_button_dom##onclick <-
              Dom.handler
                (fun _ ->
                 let () = Storage.set_model_is_running true in
-                let _ = start_button_dom##disabled <- Js._true in
+                let _ = init_ui () in
                 let _ = Storage.start
-                          (fun thread_is_running -> stop_button_dom##disabled <- Js._false;
-                                                    start_button_dom##disabled <- Js._false;
-                                                    Lwt_js_events.async
-                                                      (fun _ -> Lwt_js_events.clicks
-                                                                  stop_button_dom
-                                                                  (fun _ _ ->
-                                                                   let _ = stop_button_dom##disabled <- Js._true in
-                                                                   Lwt_switch.turn_off thread_is_running))
+                          ~start_continuation:(fun thread_is_running ->
+                                               stop_ui ();
+                                               Lwt_js_events.async
+                                                 (fun _ -> Lwt_js_events.clicks
+                                                             stop_button_dom
+                                                             (fun _ _ ->
+                                                              let _ = init_ui () in
+                                                              Lwt_switch.turn_off thread_is_running))
                           )
-                          (fun _ -> stop_button_dom##disabled <- Js._true;
-                                    start_button_dom##disabled <- Js._false)
+                          ~stop_continuation:start_ui
                 in Js._true)
   in
   let () = signal_change number_events_id (fun value -> Storage.set_model_max_events

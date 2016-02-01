@@ -44,7 +44,7 @@ let show_graph thread_is_running =
   let rec aux () =
     let () = match React.S.value model_runtime_state with
       | Some state ->
-	 set_model_runtime_state (Some { state with plot = Some (Plot.value 555) })
+         set_model_runtime_state (Some { state with plot = Some (Plot.value 555) })
       | None -> ()
     in
     if Lwt_switch.is_on thread_is_running then
@@ -59,12 +59,12 @@ let write_out thread_is_running counter =
   let rec aux () =
     let () = match React.S.value model_runtime_state with
       | Some state ->
-	 set_model_runtime_state
-	   (Some { plot = state.plot;
-		   time_percentage = Counter.time_percentage counter;
-		   event_percentage = Counter.event_percentage counter;
-		   tracked_events = Some (Counter.tracked_events counter);
-		   log_buffer = Buffer.contents log_buffer })
+         set_model_runtime_state
+           (Some { plot = state.plot;
+                   time_percentage = Counter.time_percentage counter;
+                   event_percentage = Counter.event_percentage counter;
+                   tracked_events = Some (Counter.tracked_events counter);
+                   log_buffer = Buffer.contents log_buffer })
       | None -> ()
     in
     if Lwt_switch.is_on thread_is_running then
@@ -99,11 +99,16 @@ let parse text =
 let model_ast =
   React.S.fmap parse Ast.empty_compil (React.S.l1 Lexing.from_string model_text)
 
-let start start_continuation
-          stop_continuation =
+let start ~start_continuation
+          ~stop_continuation =
+  let on_error () = set_model_is_running false;
+                    stop_continuation ();
+                    return_unit
+  in
   match React.S.value model_syntax_error with
-    Some error -> set_model_runtime_error_message (Some (format_error_message error));
-                  return_unit
+    Some error -> set_model_syntax_error (Some error);
+                  set_model_runtime_error_message (Some (format_error_message error));
+                  on_error ()
   | None ->
      let thread_is_running = Lwt_switch.create () in
      catch
@@ -135,39 +140,52 @@ let start start_continuation
                                        else Lwt.return_unit)
                              (fun f _ _ _ _ ->
                               let () = ExceptionDefn.flush_warning f in
-			      let () =
-				Format.fprintf log_form "Simulation ended" in
-			      let () =
-				if Counter.nb_null_event counter = 0
-				then Format.pp_print_newline log_form ()
-				else
-				  let () =
-				    Format.fprintf
-				      log_form " (eff.: %f, detail below)@."
-				      ((float_of_int (Counter.current_event counter)) /.
-					 (float_of_int
-					    (Counter.nb_null_event counter +
-					       Counter.current_event counter))) in
-				  Counter.print_efficiency log_form counter in
-			      Lwt_switch.turn_off thread_is_running)
-                             env domain counter graph state] >>= (fun _ ->
-                                                                  stop_continuation ();
-                                                                  set_model_is_running false;
-                                                                  Lwt.return_unit
-                                                                 )
+                              let () =
+                                Format.fprintf log_form "Simulation ended" in
+                              let () =
+                                if Counter.nb_null_event counter = 0
+                                then Format.pp_print_newline log_form ()
+                                else
+                                  let () =
+                                    Format.fprintf
+                                      log_form " (eff.: %f, detail below)@."
+                                      ((float_of_int (Counter.current_event counter)) /.
+                                         (float_of_int
+                                            (Counter.nb_null_event counter +
+                                               Counter.current_event counter))) in
+                                  Counter.print_efficiency log_form counter in
+                              Lwt_switch.turn_off thread_is_running)
+                             env domain counter graph state]
+                >>= (fun _ -> Lwt_js.sleep 1.)
+                >>= (fun _ -> stop_continuation ();
+                              set_model_is_running false;
+                              Lwt.return_unit
+                    )
        )
        (function
          | ExceptionDefn.Malformed_Decl error ->
             let () = set_model_runtime_error_message (Some (format_error_message error)) in
+            let () = set_model_syntax_error (Some error) in
             Lwt_switch.turn_off thread_is_running
+            >>=
+              (fun _ -> on_error ())
          | ExceptionDefn.Internal_Error error ->
             let () = set_model_runtime_error_message (Some (format_error_message error)) in
+            let () = set_model_syntax_error (Some error) in
             Lwt_switch.turn_off thread_is_running
+            >>=
+              (fun _ -> on_error ())
          | Invalid_argument error ->
             let message = Format.sprintf "Runtime error %s" error in
             let () = set_model_runtime_error_message (Some message) in
             Lwt_switch.turn_off thread_is_running
+            >>=
+              (fun _ -> on_error ())
          | Sys_error message ->
             let () = set_model_runtime_error_message (Some message) in
             Lwt_switch.turn_off thread_is_running
-         | e -> fail e)
+            >>=
+              (fun _ -> on_error ())
+         | e -> on_error ()
+                >>= (fun _ -> fail e)
+            )
