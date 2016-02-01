@@ -151,23 +151,32 @@ let onload () =
                 let editor_text :  Js.js_string Js.t = codemirror##getValue() in
                 let () = save_button_dom##href <- header##concat((Js.escape editor_text)) in
                 Js._true) in
-
+  let file_select_handler () = let files = Js.Optdef.get (file_select_dom##files)
+                                                         (fun () -> assert false)
+                               in
+                               let file = Js.Opt.get (files##item (0))
+                                                     (fun () -> assert false)
+                               in
+                               let filename = file##name in
+                               let () = set_file_label (to_string filename) ;
+                                        Lwt_js_events.async (fun _ -> File.readAsText file >>=
+                                                                        (fun (va : Js.js_string Js.t) ->
+                                                                         codemirror##setValue(va);
+                                                                         return_unit
+                                                                 ));
+                                        ()
+                               in
+                               let () = has_been_modified := false in
+                               return_unit
+  in
   let _  = Lwt_js_events.changes
              file_select_dom
              (fun _ _ ->
-              let files =
-                Js.Optdef.get (file_select_dom##files) (fun () -> assert false) in
-              let file = Js.Opt.get (files##item (0)) (fun () -> assert false) in
-              let filename = file##name in
-              let () = set_file_label (to_string filename) ;
-                       Lwt_js_events.async (fun _ -> File.readAsText file >>=
-                                                       (fun (va : Js.js_string Js.t) ->
-                                                        codemirror##setValue(va);
-                                                        return_unit
-                                                       ));
-                       ()
-              in
-              return_unit
-             )
-  in
-  Settings.onload ()
+              if not !has_been_modified ||
+                   Js.to_bool
+                     (Dom_html.window##confirm
+                                     (Js.string "Modifications will be lost, do you wish to continue?"))
+              then file_select_handler ()
+              else return_unit)
+      in
+      Settings.onload ()
