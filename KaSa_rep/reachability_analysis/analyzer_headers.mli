@@ -15,6 +15,9 @@
 
 type compilation_result = unit
 
+type compilation_result' =
+  Exception.method_handler * (Mvbdu_wrapper.Mvbdu.handler * Bdu_analysis_type.bdu_analysis)
+
 type rule_id = int
 
 type global_static_information =

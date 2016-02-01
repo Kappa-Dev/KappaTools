@@ -43,7 +43,6 @@ module type Analyzer =
     type ('a, 'b, 'c) binary =
       static_information 
       -> dynamic_information
-
       -> Exception.method_handler 
       -> 'a 
       -> 'b 
