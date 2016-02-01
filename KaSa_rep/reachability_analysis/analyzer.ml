@@ -24,94 +24,204 @@ module type Analyzer =
       Exception.method_handler ->
       Exception.method_handler * static_information * dynamic_information
    							       
-    type 'a zeroary = static_information -> dynamic_information -> Exception.method_handler -> Exception.method_handler * dynamic_information * 'a
-    type ('a,'b) unary   = static_information -> dynamic_information -> Exception.method_handler -> 'a -> Exception.method_handler * dynamic_information * 'b
-    type ('a,'b,'c) binary = static_information -> dynamic_information -> Exception.method_handler -> 'a -> 'b -> Exception.method_handler * dynamic_information * 'c
+    type 'a zeroary = 
+      static_information 
+      -> dynamic_information
+      -> Exception.method_handler
+      -> Exception.method_handler * dynamic_information * 'a
+      
+    type ('a,'b) unary = 
+      static_information
+      -> dynamic_information
+      -> Exception.method_handler
+      -> 'a 
+      -> Exception.method_handler * dynamic_information * 'b
+      
+    type ('a,'b,'c) binary =
+      static_information
+      -> dynamic_information
+      -> Exception.method_handler
+      -> 'a
+      -> 'b
+      -> Exception.method_handler * dynamic_information * 'c
 
     val next_rule: Analyzer_headers.rule_id option zeroary
-    val add_initial_state: (Analyzer_headers.initial_state,unit) unary
-    val is_enabled: (Analyzer_headers.rule_id,Analyzer_headers.precondition option) unary
-    val apply_rule: (Analyzer_headers.rule_id,Analyzer_headers.precondition,unit) binary
-    val export: (Analyzer_headers.kasa_state,Analyzer_headers.kasa_state) unary
-    val print: (Loggers.t list,unit) unary
+
+    val add_initial_state: (Analyzer_headers.initial_state, unit) unary
+
+    val is_enabled: (Analyzer_headers.rule_id, Analyzer_headers.precondition option) unary
+
+    val apply_rule: (Analyzer_headers.rule_id, Analyzer_headers.precondition,unit) binary
+
+    val export: (Analyzer_headers.kasa_state, Analyzer_headers.kasa_state) unary
+
+    val print: (Loggers.t list, unit) unary
 						       
   end
+
+(*****************************************************************************************)
+(*Analyzer is a functor takes a module Domain as its parameter.*)
     
 module Make (Domain:Analyzer_domain_sig.Domain) =
   (struct
-      type static_information = Domain.static_information
+
+      type static_information =
+        Analyzer_headers.global_static_information * Domain.static_information
+
+      type working_list = 
+        Fifo.IntWL.WSetMap.elt list * Fifo.IntWL.WSetMap.elt list * Fifo.IntWL.WSetMap.Set.t
+
       type dynamic_information =
 	{
-	  rule_working_list: unit (* put the type of the working list here *);
-	  domain:Domain.dynamic_information
+	  rule_working_list: working_list;
+	  domain           : Domain.dynamic_information
 	}
 	  
-      let initialize static dynamic error =
-	let error,static,dynamic =
-	  Domain.initialize static dynamic error
+      let get_parameter static =
+        Analyzer_headers.get_parameter (fst static)
+
+      let empty_working_list = Fifo.IntWL.empty
+          
+      let initialize global_static dynamic error =
+	let error, domain_static, dynamic =
+	  Domain.initialize global_static dynamic error
 	in
-	error,
-	static,
+        let static_information = global_static, domain_static in
+	error, static_information,
 	{
-	  rule_working_list = () (* put an empty working list here *) ;
-	  domain = dynamic
+	  rule_working_list = empty_working_list;
+	  domain            = dynamic
 	}
 
-    type 'a zeroary = static_information -> dynamic_information -> Exception.method_handler -> Exception.method_handler * dynamic_information * 'a
-    type ('a,'b) unary   = static_information -> dynamic_information -> Exception.method_handler -> 'a -> Exception.method_handler * dynamic_information * 'b
-    type ('a,'b,'c) binary = static_information -> dynamic_information -> Exception.method_handler -> 'a -> 'b -> Exception.method_handler * dynamic_information * 'c
+    type 'a zeroary =
+      static_information 
+      -> dynamic_information
+      -> Exception.method_handler
+      -> Exception.method_handler * dynamic_information * 'a
 
-    let push_rule static dynamic error r_id = error,dynamic (* push r_id in the working_list *)
-																				 
+    type ('a,'b) unary = 
+      static_information 
+      -> dynamic_information
+      -> Exception.method_handler
+      -> 'a
+      -> Exception.method_handler * dynamic_information * 'b
+      
+    type ('a,'b,'c) binary =
+      static_information 
+      -> dynamic_information
+      -> Exception.method_handler 
+      -> 'a 
+      -> 'b -> Exception.method_handler * dynamic_information * 'c
+
+    (* push r_id in the working_list *)
+    let push_rule (static:static_information) dynamic error r_id =
+      let working_list = dynamic.rule_working_list in
+      let parameter = get_parameter static in
+      let error, rule_working_list =
+        Fifo.IntWL.push parameter error r_id working_list
+      in
+      error,
+      {
+        dynamic with rule_working_list = rule_working_list
+      }
+
     let next_rule static dynamic error =
       let working_list = dynamic.rule_working_list in
       (* see if the working list is empty, if not pop an element *)
-      error,dynamic,None
+      if Fifo.IntWL.is_empty working_list
+      then error, dynamic, None
+      else
+        let parameter = get_parameter static in
+        let error, (rule_id_op, working_list_tail) = 
+          Fifo.IntWL.pop parameter error working_list
+        in
+        error, 
+        {
+          dynamic with rule_working_list = working_list_tail (*CHECK ME*)
+        }, rule_id_op
 
-    let lift_unary f static dynamic error a =
-      let error,domain_dynamic,output = f static dynamic.domain error a in
-      error,{dynamic with domain = domain_dynamic},output
+    let lift_unary f (static:static_information) dynamic error a =
+      let error, domain_dynamic, output = f (snd static) dynamic.domain error a in
+      error,
+      {
+        dynamic with domain = domain_dynamic
+      }, output
 						     
     let pre_add_initial_state static dynamic error a =
       lift_unary Domain.add_initial_state static dynamic error a
-    
-    let lift_binary f static dynamic error a b =
-      let error,domain_dynamic,output = f static dynamic.domain error a b in
-      error,{dynamic with domain = domain_dynamic},output
+        
+    let lift_binary f (static:static_information) dynamic error a b =
+      let error, domain_dynamic, output = f (snd static) dynamic.domain error a b in
+      error,
+      {
+        dynamic with domain = domain_dynamic
+      }, output
 						     
     let is_enabled static dynamic error a =
-      lift_binary Domain.is_enabled static dynamic error a Analyzer_headers.dummy_precondition
-
+      lift_binary 
+        Domain.is_enabled 
+        static
+        dynamic        
+        error
+        a 
+        Analyzer_headers.dummy_precondition
+        
     let pre_apply_rule static dynamic error a b =
-      lift_binary Domain.apply_rule static dynamic error a b
+      lift_binary
+        Domain.apply_rule 
+        static 
+        dynamic        
+        error
+        a
+        b
 		  
-    let rec apply_event_list static dynamic error event_list =
+    let rec apply_event_list (static:static_information) dynamic error event_list =
       if event_list = []
       then
-	error,dynamic,()
+	error, dynamic, ()
       else
-	let error,dynamic,event_list' = lift_unary Domain.apply_event_list static dynamic error event_list in
-	let error,dynamic =
-	  List.fold_left
-	    (fun (error,dynamic) event ->
-	     match
-	       event
-	     with
-	     | Analyzer_headers.Check_rule rule_id -> push_rule static dynamic error rule_id
-	     | _ -> error,dynamic)
-	    (error,dynamic)
-	    event_list
+	let error, dynamic, event_list' =
+          lift_unary
+            Domain.apply_event_list
+            static
+            dynamic            
+            error
+            event_list 
+        in
+	let error, dynamic =
+	  List.fold_left (fun (error, dynamic) event ->
+	    match event with
+	    | Analyzer_headers.Check_rule rule_id ->
+              push_rule
+                static
+                dynamic
+                error
+                rule_id
+	    | _ -> error, dynamic
+          )(error, dynamic) event_list
 	in
 	apply_event_list static dynamic error event_list'
 
     let add_initial_state static dynamic error initial_state =
-      let error,dynamic,event_list = pre_add_initial_state static dynamic error initial_state in
+      let error, dynamic, event_list =
+        pre_add_initial_state
+          static
+          dynamic          
+          error
+          initial_state
+      in
       apply_event_list static dynamic error event_list
 		       
     let apply_rule static dynamic error r_id precondition =
-      let error,dynamic,event_list = pre_apply_rule static dynamic error r_id precondition in
+      let error, dynamic, event_list =
+        pre_apply_rule
+          static 
+          dynamic          
+          error
+          r_id
+          precondition
+      in
       apply_event_list static dynamic error event_list
-
 		       
     let export static dynamic error kasa_state =
       lift_unary Domain.export static dynamic error kasa_state
@@ -119,7 +229,7 @@ module Make (Domain:Analyzer_domain_sig.Domain) =
     let print static dynamic error loggers =
       lift_unary Domain.print static dynamic error loggers
 
-    end:Analyzer)
+   end:Analyzer)
     
 let () = print_int 2      
        
