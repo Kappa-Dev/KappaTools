@@ -55,6 +55,9 @@ type rule = {
        int Location.annot option) option;
   (*k_1:radius_opt*)
   k_op: (mixture,string) ast_alg_expr Location.annot option ;
+  k_op_un:
+    ((mixture,string) ast_alg_expr Location.annot *
+       int Location.annot option) option;
   (*rate for backward rule*)
 }
 

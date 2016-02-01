@@ -658,6 +658,16 @@ let annotate_lhs_with_diff sigs lhs rhs =
 	    succ id, annotate_created_agent id sigs x::acc) (0,[]) added in
   aux (Mods.IntMap.empty,Mods.IntMap.empty) [] lhs rhs
 
+let add_un_variable k_un acc rate_var =
+  match k_un with
+    | None -> (acc,None)
+    | Some (k,dist) ->
+       let acc_un,k' = if ast_alg_has_mix k then
+			 ((Location.dummy_annot rate_var,k)::acc,
+			  Location.dummy_annot (Ast.OBS_VAR rate_var))
+		       else (acc,k) in
+       (acc_un,Some (k',dist))
+
 let name_and_purify_rule (label_opt,(r,r_pos)) (id,acc,rules) =
   let id',label = match label_opt with
     | None ->
@@ -669,29 +679,24 @@ let name_and_purify_rule (label_opt,(r,r_pos)) (id,acc,rules) =
       ((Location.dummy_annot rate_var,r.Ast.k_def)::acc,
        Location.dummy_annot (Ast.OBS_VAR rate_var))
     else (acc,r.Ast.k_def) in
-  let acc'',k_un = match r.Ast.k_un with
-    | None -> (acc',None)
-    | Some (k,dist) ->
-       let acc_un,k' =
-	 if ast_alg_has_mix k then
-	   let rate_var = label^"_un_rate" in
-	   ((Location.dummy_annot rate_var,k)::acc',
-	    Location.dummy_annot (Ast.OBS_VAR rate_var))
-	 else (acc',k) in
-       (acc_un,Some (k',dist)) in
+  let acc'',k_un = add_un_variable r.Ast.k_un acc' (label^"_un_rate") in
   let acc''',rules' =
     match r.Ast.arrow,r.Ast.k_op with
     | Ast.LRAR, Some k when ast_alg_has_mix k ->
        let rate_var = (Ast.flip_label label)^"_rate" in
-       ((Location.dummy_annot rate_var,k)::acc'',
+       let rate_var_un = (Ast.flip_label label)^"_un_rate" in
+       let acc_un, k_op_un = add_un_variable r.Ast.k_op_un acc'' rate_var_un in
+       ((Location.dummy_annot rate_var,k)::acc_un,
 	(Tools.option_map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
 	 r.Ast.rhs,r.Ast.lhs,r.Ast.add_token,r.Ast.rm_token,
-	 Location.dummy_annot (Ast.OBS_VAR rate_var),None,r_pos)::rules)
+	 Location.dummy_annot (Ast.OBS_VAR rate_var),k_op_un,r_pos)::rules)
     | Ast.LRAR, Some rate ->
+       let rate_var_un = (Ast.flip_label label)^"_un_rate" in
+       let acc_un, k_op_un = add_un_variable r.Ast.k_op_un acc'' rate_var_un in
        (acc'',
 	(Tools.option_map (fun (l,p) -> (Ast.flip_label l,p)) label_opt,
 	 r.Ast.rhs,r.Ast.lhs,r.Ast.add_token,r.Ast.rm_token,
-	 rate,None,r_pos)::rules)
+	 rate,k_op_un,r_pos)::rules)
     | Ast.RAR, None -> (acc'',rules)
     | (Ast.RAR, Some _ | Ast.LRAR, None) ->
        raise
