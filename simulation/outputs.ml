@@ -97,19 +97,26 @@ let html_of_flux env counter flux =
        Format.fprintf
 	 f "stroke: #000;@ stroke-width: .5px;@ })@]@,</style>")
        (fun f ->
-	let () = Format.fprintf f "@[<v 2><form id=\"menu\"></form>@," in
 	let () =
-	  Format.fprintf f "<script>@,\"use strict\"@,@[var flux =@ %a;@]@,"
-			 (print_json_of_flux env counter) flux in
-
+	  Format.fprintf
+	    f "@[<hv 2><form id=\"menu\">@,<div class=\"checkbox\">" in
 	let () =
 	  Format.fprintf
 	    f
-	    "var selectedRules=flux.rules.map(function () {return true;});@," in
+	    "<input type=\"checkbox\" onclick=\"toggleSelfInfluence()\">@," in
+	let () = Format.fprintf f "Rules self influence</div>@]@,</form>@," in
+	let () = Format.fprintf
+		   f "@[<v 2><script>@,\"use strict\"@,@[var flux =@ %a;@]@,"
+		   (print_json_of_flux env counter) flux in
 	let () =
 	  Format.fprintf
 	    f
-	    "function filterRules (val,id,a) { return selectedRules[id]; }@," in
+	    "var selectedRules=flux.rules.map(function () {return true;}),@," in
+	let () = Format.fprintf f "selfInfluence = false;@," in
+	let () =
+	  Format.fprintf
+	    f
+	    "function filterRules (val,id) { return selectedRules[id]; }@,@," in
 	let () =
 	  Format.fprintf
 	    f
@@ -117,19 +124,21 @@ let html_of_flux env counter flux =
 	let () =
 	  Format.fprintf
 	    f
-	    "var matrix = flux.fluxs.map(function(a)@," in
+	    "var @[matrix = @[flux.fluxs.map(@[function(a,i)@ " in
 	let () =
 	  Format.fprintf
 	    f
-	    "{return a.map(Math.abs).filter(filterRules);}).filter(filterRules),@," in
+	    "{return a.map(function (e,j)@ { @[if (selfInfluence || i !== j) {return Math.abs(e);}@ else@ {return 0;}@]}@])" in
+	let () = Format.fprintf
+		   f ".filter(filterRules);}).filter(filterRules),@]@ " in
 	let () =
 	  Format.fprintf
 	    f
-	    "rules = flux.rules.filter(filterRules),@," in
+	    "rules = flux.rules.filter(filterRules),@ " in
 	let () =
 	  Format.fprintf
 	    f
-	    "color = flux.fluxs.map(function(a)@," in
+	    "color = @[flux.fluxs.map(function(a)@ " in
 	let () =
 	  Format.fprintf
 	    f
@@ -137,7 +146,7 @@ let html_of_flux env counter flux =
 	let () =
 	  Format.fprintf
 	    f
-            ".filter(filterRules);}).filter(filterRules);@," in
+            ".filter(filterRules);}).filter(filterRules)@];@]@," in
 
 	let () =
 	  Format.fprintf
@@ -205,10 +214,10 @@ let html_of_flux env counter flux =
 	    f "@,.text(function(d) { return rules[d.index]; });@]@," in
 	let () =
 	  Format.fprintf
-	    f "legends@,.append(\"path\")@,.style(\"fill\", \"#222222\")"in
+	    f "legends@[@,.append(\"path\")@,.style(\"fill\", \"#222222\")"in
 	let () =
 	  Format.fprintf
-	    f "@,.attr(\"d\", arc)@,.on(\"mouseover\", fade(svg,.1))@,.on(\"mouseout\", fade(svg,1));@]@,}@]@," in
+	    f "@,.attr(\"d\", arc)@,.on(\"mouseover\", fade(svg,.1))@,.on(\"mouseout\", fade(svg,1));@]@]@,}@," in
 	let () =
 	  Format.fprintf
 	    f "// Returns an event handler for fading a given chord group.@," in
@@ -231,6 +240,15 @@ let html_of_flux env counter flux =
 	    f "selectedRules[id] = (selectedRules[id]) ? false : true;@," in
 	let () =
 	  Format.fprintf
+	    f "drawDIM();@]@,}@," in
+	let () =
+	  Format.fprintf
+	    f "@[<v 2>function toggleSelfInfluence () {@," in
+	let () =
+	  Format.fprintf
+	    f "selfInfluence = (selfInfluence) ? false : true;@," in
+	let () =
+	  Format.fprintf
 	    f "drawDIM();@]@,}@,@," in
 
 	let () =
@@ -241,7 +259,7 @@ let html_of_flux env counter flux =
 	    f "var menu = document.getElementById(\"menu\");@," in
 	let () =
 	  Format.fprintf
-	    f "selectedRules.forEach(function (val,id,a) {@," in
+	    f "@[<v 2>selectedRules.forEach(function (val,id,a) {@," in
 	let () =
 	  Format.fprintf
 	    f "var boxbox = document.createElement(\"div\"),@," in
@@ -268,7 +286,7 @@ let html_of_flux env counter flux =
 	    f "boxbox.appendChild(document.createTextNode(flux.rules[id]));@," in
 	let () =
 	  Format.fprintf
-	    f "menu.appendChild(boxbox)@,});@," in
+	    f "menu.appendChild(boxbox)@]@,});@," in
 	let () =
 	  Format.fprintf
 	    f "drawDIM();@]@,}@," in
@@ -276,7 +294,7 @@ let () =
 	  Format.fprintf
 	    f "populate();" in
 
-	Format.fprintf f "@]@,</script>@,"))
+	Format.fprintf f "@]@,</script>"))
 
 let output_flux env counter b =
   if Filename.check_suffix b.flux_name ".html"
