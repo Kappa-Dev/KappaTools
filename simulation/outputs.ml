@@ -1,4 +1,4 @@
-let dot_of_flux env (file,interresting,flux) =
+let dot_of_flux env (file,flux) =
   let printer desc =
     let () = Format.fprintf
 	       desc "@[<v>digraph G{ label=\"Flux map\" ; labelloc=\"t\" ; " in
@@ -21,7 +21,6 @@ let dot_of_flux env (file,interresting,flux) =
 	    else
 	      let color,arrowhead =
 		if v<0. then ("red3","tee") else ("green3","normal") in
-	      if interresting.(s) && interresting.(d) then
 	      Format.fprintf
 		f
 		"@[<h>\"%a\" -> \"%a\" [weight=%d,label=\"%.3f\",color=%s,arrowhead=%s];@]@,"
@@ -32,40 +31,27 @@ let dot_of_flux env (file,interresting,flux) =
   in
   Kappa_files.with_flux file printer
 
-let json_of_flux env (file,interresting,flux) =
+let json_of_flux env (file,flux) =
   Kappa_files.with_flux
     file
     (fun f ->
      Format.fprintf
        f "@[<v>{@ @[\"matrix\" :@ @[[%a]@]@],@ @[\"rules\" :@ @[[%a]@]@]@ }@]"
-       (Pp.array_with_empty
+       (Pp.array
 	  Pp.comma
-	  (fun s x ->
-	   if interresting.(s) then
-	     Some
-	       (fun f ->
-		Format.fprintf
-		  f "@[[%a]@]"
-		  (Pp.array_with_empty
-		     Pp.comma (fun d y ->
-			       if interresting.(d) then
-				 Some
-				   (fun f -> Format.pp_print_float f y)
-			       else None))
-		  x)
-	   else None))
+	  (fun _ f x ->
+	   Format.fprintf
+	     f "@[[%a]@]"
+	     (Pp.array Pp.comma (fun _ f y -> Format.pp_print_float f y))
+	     x))
        flux
-       (Pp.array_with_empty
-	  Pp.comma
-	  (fun i _ ->
-	   if interresting.(i) then
-	     Some (fun f ->
-		   Format.fprintf
-		     f "\"%a\"" (Environment.print_ast_rule ~env) i)
-	   else None))
+       (Pp.array Pp.comma
+		 (fun i f _ ->
+		  Format.fprintf
+		    f "\"%a\"" (Environment.print_ast_rule ~env) i))
        flux)
 
-let html_of_flux env (file,interresting,flux) =
+let html_of_flux env (file,flux) =
   Kappa_files.with_flux
     file
     (Pp_html.graph_page
@@ -81,58 +67,39 @@ let html_of_flux env (file,interresting,flux) =
 	let () =
 	  Format.fprintf
 	    f "@[<v 2><script>@,var matrix = @[[%a];@]@,"
-	    (Pp.array_with_empty
+	    (Pp.array
 	       Pp.comma
-	       (fun s x ->
-		if interresting.(s) then
-		  Some
-		    (fun f ->
-		     Format.fprintf
-		       f "@[[%a]@]"
-		       (Pp.array_with_empty
-			  Pp.comma
-			  (fun d y ->
-			   if interresting.(d) then
-			     Some (fun f -> Format.pp_print_float f (abs_float y))
-			   else None))
-		       x)
-		else None))
+	       (fun _ f x ->
+		Format.fprintf
+		  f "@[[%a]@]"
+		  (Pp.array
+		     Pp.comma
+		     (fun _ f y -> Format.pp_print_float f (abs_float y)))
+		  x))
 	    flux in
 	let () =
 	  Format.fprintf
 	    f "var fill = @[[%a];@]@,"
-	    (Pp.array_with_empty
+	    (Pp.array
 	       Pp.comma
-	       (fun s x ->
-		if interresting.(s) then
-		  Some (fun f ->
-			Format.fprintf
-			  f "@[[%a]@]"
-			  (Pp.array_with_empty
-			     Pp.comma
-			     (fun d y ->
-			      if interresting.(d) then
-				Some
-				  (fun f ->
-				   Format.pp_print_string
-				     f
-				     (if y < 0. then "\"#FF0000\"" else "\"#00FF00\""))
-			      else None))
-			  x)
-		else None))
+	       (fun _ f x ->
+		Format.fprintf
+		  f "@[[%a]@]"
+		  (Pp.array
+		     Pp.comma
+		     (fun _ f y ->
+		      Format.pp_print_string
+			f
+			(if y < 0. then "\"#FF0000\"" else "\"#00FF00\"")))
+		  x))
 	    flux in
 	let () =
 	  Format.fprintf
 	    f "var labels = @[[%a];@]@,"
-	    (Pp.array_with_empty
-	       Pp.comma
-	       (fun i _ ->
-		if interresting.(i) then
-		  Some
-		    (fun f ->
-		     Format.fprintf
-		       f "\"%a\"" (Environment.print_ast_rule ~env) i)
-		else None))
+	    (Pp.array Pp.comma
+		      (fun i f _ ->
+		       Format.fprintf
+			 f "\"%a\"" (Environment.print_ast_rule ~env) i))
 	    flux in
 	let () =
 	  Format.fprintf
@@ -218,7 +185,7 @@ let html_of_flux env (file,interresting,flux) =
 	    f "@,.transition()@,.style(\"opacity\", opacity);@ };@ }@]" in
 	Format.fprintf f "@]@,</script>@,"))
 
-let output_flux env (file,_,_ as b) =
+let output_flux env (file,_ as b) =
   if Filename.check_suffix file ".html"
   then html_of_flux env b
   else if Filename.check_suffix file ".json"

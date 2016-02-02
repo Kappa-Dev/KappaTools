@@ -3,7 +3,7 @@ type t = {
   perturbations_alive : bool array;
   activities : Random_tree.tree;(* pair numbers are binary rule, odd unary *)
   variables_overwrite: Alg_expr.t option array;
-  flux: (string * bool array * float array array) list;
+  flux: (string * float array array) list;
   print_desc: (string,out_channel * Format.formatter) Hashtbl.t;
 }
 
@@ -137,18 +137,18 @@ let do_it env domain counter graph state modification =
      let file = Format.asprintf "@[<h>%a@]" print_expr_val s in
      let size = Environment.nb_syntactic_rules env + 1 in
      let () =
-       if List.exists (fun (x,_,_) -> x = file) state.flux
+       if List.exists (fun (x,_) -> x = file) state.flux
        then ExceptionDefn.warning
 	      (fun f ->
 	       Format.fprintf
 		 f "At t=%f, e=%i: tracking FLUX into \"%s\" was already on"
 		 (Counter.current_time counter) (Counter.current_event counter) file)
      in
-     let el = file,Array.make size true,Array.make_matrix size size 0. in
+     let el = file,Array.make_matrix size size 0. in
      (false, graph, {state with flux = el::state.flux})
   | Primitives.FLUXOFF s ->
      let file = Format.asprintf "@[<h>%a@]" print_expr_val s in
-     let (these,others) = List.partition (fun (x,_,_) -> x = file) state.flux in
+     let (these,others) = List.partition (fun (x,_) -> x = file) state.flux in
      let () = List.iter (Outputs.output_flux env) these in
      (false, graph, {state with flux = others})
 
@@ -194,7 +194,7 @@ let one_rule _form dt stop env domain counter graph state =
     let () =
       if state.flux <> [] then
 	let old_act = Random_tree.find rd_id state.activities in
-	List.iter (fun (_,_,flux) ->
+	List.iter (fun (_,flux) ->
 		   flux.(rule.Primitives.syntactic_rule).(syntax_rd_id) <-
 		     flux.(rule.Primitives.syntactic_rule).(syntax_rd_id) +.
 		       (new_act -. old_act)) state.flux
@@ -323,7 +323,7 @@ let finalize form env counter graph state =
   let () = close_desc state in
   let () =
     List.iter
-      (fun (file,_,_ as e) ->
+      (fun (file,_ as e) ->
        let () =
 	 ExceptionDefn.warning
 	   (fun f ->
