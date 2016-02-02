@@ -1,7 +1,9 @@
 #file-selector {
     display:none;
 }
-
+.panel-content {
+    min-height: 50% !important;
+}
 .panel-pre {
     white-space : pre;
 }

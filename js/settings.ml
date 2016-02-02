@@ -50,7 +50,7 @@ let signal_change id signal_handler =
       Dom_html.handler
         (fun _ ->
          let () = signal_handler (Js.to_string (input_dom##value))
-         in Js._false)
+         in Js._true)
 
 let error_messages signal formatter =
   Html5.div
@@ -77,7 +77,7 @@ let code_messages = error_messages model_syntax_error Storage.format_error_messa
 let start_button_id = "start-button"
 let start_button = Html5.button ~a:([ Html5.a_id start_button_id
                                     ; Html5.Unsafe.string_attrib "type" "button"
-                                    ])
+                                    ; Html5.a_class ["btn";"btn-default"] ])
                                 [ Html5.cdata "start" ]
 let configuration_settings =
   <:html5<<div class="panel-footer panel-footer-white">
@@ -128,30 +128,56 @@ let configuration_xml =
                                   )
        ]
     [code_messages; configuration_settings; configuration_button ]
-  (*
 
-   *)
-let map_events (f : Storage.runtime_state option -> int option) : int React.signal
-  = React.S.map
-      (fun (state : Storage.runtime_state option) ->
-       match f state with
-       | None -> 0
-       | Some va -> va)
+let map_events (f : Storage.runtime_state option -> 'a option)
+               (format : 'a -> 'b)
+               (identity : 'a)
+    : 'b React.signal
+    = React.S.map
+        (fun (state : Storage.runtime_state option) ->
+         let v : 'a = match (f state : 'a option) with
+                          None -> identity
+                        | Some va -> va in
+         (format v : 'b))
       (model_runtime_state : (Storage.runtime_state option) React.signal)
 
-let progress_bar signal =
+let progress_bar percent_signal value_signal =
   Html5.div ~a:[ Html5.a_id start_button_id
-                                   ; Html5.Unsafe.string_attrib "role" "progressbar"
-                                   ; Tyxml_js.R.Html5.Unsafe.int_attrib "aria-valuenow" signal
-                                   ; Html5.Unsafe.int_attrib "aria-valuemin" 0
-                                   ; Html5.Unsafe.int_attrib "aria-valuemax" 100
-                                   ; Tyxml_js.R.Html5.Unsafe.string_attrib "style"
-                                                                           (React.S.map (fun s -> Format.sprintf "width: %d;" s)
-                                                                                        signal)
-                                   ; Html5.a_class ["progress-bar"] ] []
+               ; Html5.Unsafe.string_attrib "role" "progressbar"
+               ; Tyxml_js.R.Html5.Unsafe.int_attrib "aria-valuenow" percent_signal
+               ; Html5.Unsafe.int_attrib "aria-valuemin" 0
+               ; Html5.Unsafe.int_attrib "aria-valuemax" 100
+               ; Tyxml_js.R.Html5.Unsafe.string_attrib "style"
+                                                       (React.S.map (fun s -> Format.sprintf
+                                                                                "width: %d%%;" s)
+                                                                    percent_signal)
+               ; Html5.a_class ["progress-bar"] ]
+            [ Tyxml_js.R.Html5.pcdata
+                (React.S.bind
+                   value_signal
+                   (fun value -> React.S.const value)
+                )
+            ]
 
-let time_progress_bar = progress_bar (map_events Storage.get_time_percentage)
-let event_progress_bar = progress_bar (map_events Storage.get_event_percentage)
+let time_progress_bar = progress_bar
+                          (map_events
+                             (Storage.get_time_percentage : Storage.runtime_state option -> int option)
+                             (fun x -> x)
+                             0)
+                          (map_events
+                             Storage.get_time
+                             string_of_float
+                             0.0)
+
+let event_progress_bar = progress_bar
+                           (map_events
+                              (Storage.get_event_percentage : Storage.runtime_state option -> int option)
+                              (fun x -> x)
+                              0)
+                           (map_events
+                              Storage.get_event
+                              string_of_int
+                              0)
 
 let stop_button_id = "stop_button"
 let stop_button = Html5.button ~a:[ Html5.a_id stop_button_id
@@ -254,13 +280,13 @@ let onload () : unit Lwt.t =
     ()
   in
   let stop_ui () =
-    let _ = start_button_dom##disabled <- Js._false in
-    let _ = stop_button_dom##disabled <- Js._true in
+    let _ = start_button_dom##disabled <- Js._true in
+    let _ = stop_button_dom##disabled <- Js._false in
     ()
   in
   let start_ui () =
-    let _ = start_button_dom##disabled <- Js._true in
-    let _ = stop_button_dom##disabled <- Js._false in
+    let _ = start_button_dom##disabled <- Js._false in
+    let _ = stop_button_dom##disabled <- Js._true in
     ()
   in
   let () = start_button_dom##onclick <-
@@ -279,6 +305,16 @@ let onload () : unit Lwt.t =
                                                               Lwt_switch.turn_off thread_is_running))
                           )
                           ~stop_continuation:start_ui
+                          ~size:(fun _ ->
+                                   let plot_div_dom : Dom_html.linkElement Js.t =
+                                     Js.Unsafe.coerce
+                                       (Js.Opt.get (document##getElementById (Js.string Visualization.nav_tab_id))
+                                                   (fun () -> assert false)) in
+                                   let width = plot_div_dom##offsetWidth in
+                                   let margin = min 20 (2*plot_div_dom##offsetWidth/10) in
+                                   width - margin
+                                )
+                          (* document.getElementById("mydiv") *)
                 in Js._true)
   in
   let () = signal_change number_events_id (fun value -> Storage.set_model_max_events

@@ -1,22 +1,39 @@
 open Lwt
 type runtime_state = { plot : string option ;
+                       time : float;
                        time_percentage : int option;
+                       event : int;
                        event_percentage : int option;
                        tracked_events : int option;
                        log_buffer : string
                      }
-let get_plot state = match state with
+let get_time (state : runtime_state option) : float option =
+  match state with
+    None -> None
+  | Some state -> Some state.time
+
+let get_plot (state : runtime_state option) : string option =
+  match state with
     None -> None
   | Some state -> state.plot
-let get_time_percentage state = match state with
+
+let get_time_percentage (state : runtime_state option) : int option =
+  match state with
     None -> None
   | Some state -> state.time_percentage
 
-let get_event_percentage state = match state with
+let get_event (state : runtime_state option) : int option =
+  match state with
+    None -> None
+  | Some state -> Some state.event
+
+let get_event_percentage (state : runtime_state option) : int option =
+  match state with
     None -> None
   | Some state -> state.event_percentage
 
-let get_tracked_events state = match state with
+let get_tracked_events (state : runtime_state option) : int option =
+  match state with
     None -> None
   | Some state -> state.tracked_events
 
@@ -24,8 +41,6 @@ let get_log_buffer state = match state with
     None -> None
   | Some state -> Some state.log_buffer
 
-let log_buffer = Buffer.create 512
-let log_form = Format.formatter_of_buffer log_buffer
 
 let format_error_message (message,linenumber) =
   Format.sprintf "Error at %s : %s" (Location.to_string linenumber) message
@@ -40,11 +55,10 @@ let model_runtime_state , set_model_runtime_state =
 let model_is_running , set_model_is_running = React.S.create false
 let opened_filename, set_opened_filename = React.S.create "model.ka"
 
-let show_graph thread_is_running =
+let show_graph thread_is_running size=
   let rec aux () =
     let () = match React.S.value model_runtime_state with
-      | Some state ->
-         set_model_runtime_state (Some { state with plot = Some (Plot.value 555) })
+        Some state -> set_model_runtime_state (Some { state with plot = Some (Plot.value (size ())) })
       | None -> ()
     in
     if Lwt_switch.is_on thread_is_running then
@@ -54,17 +68,18 @@ let show_graph thread_is_running =
   in
   aux ()
 
-let write_out thread_is_running counter =
-  let () = Buffer.clear log_buffer in
+let update_counter counter state log_buffer=
+  { state with time_percentage = Counter.time_percentage counter
+             ; time = Counter.time counter
+             ; event_percentage = Counter.event_percentage counter
+             ; event = Counter.event counter
+             ; tracked_events = Some (Counter.tracked_events counter)
+             ; log_buffer = Buffer.contents log_buffer }
+let write_out thread_is_running counter label log_buffer =
   let rec aux () =
     let () = match React.S.value model_runtime_state with
-      | Some state ->
-         set_model_runtime_state
-           (Some { plot = state.plot;
-                   time_percentage = Counter.time_percentage counter;
-                   event_percentage = Counter.event_percentage counter;
-                   tracked_events = Some (Counter.tracked_events counter);
-                   log_buffer = Buffer.contents log_buffer })
+        Some state -> set_model_runtime_state
+                        (Some (update_counter counter state log_buffer))
       | None -> ()
     in
     if Lwt_switch.is_on thread_is_running then
@@ -100,7 +115,8 @@ let model_ast =
   React.S.fmap parse Ast.empty_compil (React.S.l1 Lexing.from_string model_text)
 
 let start ~start_continuation
-          ~stop_continuation =
+          ~stop_continuation
+          ~size =
   let on_error () = set_model_is_running false;
                     stop_continuation ();
                     return_unit
@@ -110,6 +126,9 @@ let start ~start_continuation
                   set_model_runtime_error_message (Some (format_error_message error));
                   on_error ()
   | None ->
+     let log_buffer = Buffer.create 512 in
+     let log_form = Format.formatter_of_buffer log_buffer in
+     let label = string_of_float (Unix.time ()) in
      let thread_is_running = Lwt_switch.create () in
      catch
        (fun () ->
@@ -117,8 +136,10 @@ let start ~start_continuation
         let (counter : Counter.t) = React.S.value model_counter in
         let () = Counter.reinitialize counter in
         let () = set_model_runtime_state (Some  { plot = None;
+                                                  time = 0.0;
                                                   time_percentage = None;
                                                   event_percentage = None;
+                                                  event = 0;
                                                   tracked_events = None ;
                                                   log_buffer = Buffer.contents log_buffer
                                                 }) in
@@ -131,8 +152,8 @@ let start ~start_continuation
                            Plot.plot_now
                              env (Counter.current_time counter)
                              (State_interpreter.observables_values env counter graph state) in
-                Lwt.join [ show_graph thread_is_running;
-                           write_out thread_is_running counter;
+                Lwt.join [ show_graph thread_is_running size;
+                           write_out thread_is_running counter label log_buffer;
                            State_interpreter.loop_cps
                              log_form
                              (fun f -> if Lwt_switch.is_on thread_is_running

@@ -21,6 +21,6 @@ let onload _ =
   let _ = Code.onload ();
           Visualization.onload ()
   in
-  Js._false
+  Js._true
 
 let _ = Dom_html.window##onload <- Dom_html.handler onload

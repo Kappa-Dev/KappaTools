@@ -20,7 +20,9 @@ val one_time_correction_event : t -> Nbr.t -> bool
 val max_time : t -> float option
 val max_events : t -> int option
 val event_percentage : t -> int option
+val event : t -> int
 val time_percentage : t -> int option
+val time : t -> float
 val tracked_events : t -> int
 
 val plot_points : t -> int

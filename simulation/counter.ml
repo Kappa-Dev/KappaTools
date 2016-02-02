@@ -127,12 +127,15 @@ let event_percentage (counter : t) : int option =
   | None -> None
   | Some va -> Some (100 * (counter.events - counter.init_event)
                      / (va - counter.init_event))
-
+let event (counter : t) : int =
+    counter.events
 let time_percentage (counter : t) : int option =
   match counter.max_time with
   | None -> None
   | Some va -> Some (int_of_float (100. *. (counter.time -. counter.init_time)
                                    /. (va -. counter.init_time)))
+let time (counter : t) : float =
+    counter.time
 let tracked_events (counter : t) : int = counter.stories
 
 let compute_dT points mx_t =

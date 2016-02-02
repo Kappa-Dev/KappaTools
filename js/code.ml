@@ -27,7 +27,7 @@ let save_button_id = "save_button"
 let save_button =  Html5.a ~a:[ Html5.a_id save_button_id
                               ; Tyxml_js.R.Html5.Unsafe.string_attrib "download" Storage.opened_filename
                               ; Html5.Unsafe.string_attrib "role" "button"
-                              ; Html5.a_class ["btn";"btn-default"]
+                              ; Html5.a_class ["btn";"btn-default";"pull-right"]
                               ]
                            [ Html5.cdata "save" ]
 
