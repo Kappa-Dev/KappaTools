@@ -1,4 +1,30 @@
-let dot_of_flux env (file,flux) =
+type flux = {
+    flux_name : string;
+    flux_start : float;
+    flux_hits : int array;
+    flux_fluxs : float array array;
+  }
+
+let create_flux env counter name =
+  let size = Environment.nb_syntactic_rules env + 1 in
+  {
+    flux_name = name;
+    flux_start = Counter.current_time counter;
+    flux_hits = Array.make size 0;
+    flux_fluxs = Array.make_matrix size size 0.;
+  }
+
+let incr_flux_flux of_rule on_rule v flux =
+  flux.flux_fluxs.(of_rule).(on_rule) <-
+    flux.flux_fluxs.(of_rule).(on_rule) +. v
+
+let incr_flux_hit of_rule flux =
+  flux.flux_hits.(of_rule) <- succ flux.flux_hits.(of_rule)
+
+let get_flux_name flux = flux.flux_name
+let flux_has_name name flux = flux.flux_name = name
+
+let dot_of_flux env flux =
   let printer desc =
     let () = Format.fprintf
 	       desc "@[<v>digraph G{ label=\"Flux map\" ; labelloc=\"t\" ; " in
@@ -26,34 +52,41 @@ let dot_of_flux env (file,flux) =
 		"@[<h>\"%a\" -> \"%a\" [weight=%d,label=\"%.3f\",color=%s,arrowhead=%s];@]@,"
 		(Environment.print_ast_rule ~env) s
 		(Environment.print_ast_rule ~env) d
-		(abs (int_of_float v)) v color arrowhead)) desc flux in
+		(abs (int_of_float v)) v color arrowhead))
+	desc flux.flux_fluxs in
     Format.fprintf desc "}@]@."
   in
-  Kappa_files.with_flux file printer
+  Kappa_files.with_flux flux.flux_name printer
 
-let json_of_flux env (file,flux) =
-  Kappa_files.with_flux
-    file
-    (fun f ->
-     Format.fprintf
-       f "@[<v>{@ @[\"matrix\" :@ @[[%a]@]@],@ @[\"rules\" :@ @[[%a]@]@]@ }@]"
-       (Pp.array
-	  Pp.comma
-	  (fun _ f x ->
-	   Format.fprintf
-	     f "@[[%a]@]"
-	     (Pp.array Pp.comma (fun _ f y -> Format.pp_print_float f y))
-	     x))
-       flux
-       (Pp.array Pp.comma
-		 (fun i f _ ->
-		  Format.fprintf
-		    f "\"%a\"" (Environment.print_ast_rule ~env) i))
-       flux)
+let print_json_of_flux env counter f flux =
+  let () = Format.fprintf
+	     f "@[<v>{@ \"bio_begin_time\" : %f,@ \"bio_end_time\" : %f,@ "
+	     flux.flux_start (Counter.current_time counter) in
+  let () =
+    Format.fprintf
+      f "@[\"rules\" :@ @[[%a]@]@],@ \"hits\" :@ @[[%a]@]@],@ "
+      (Pp.array Pp.comma
+		(fun i f _ ->
+		 Format.fprintf f "\"%a\"" (Environment.print_ast_rule ~env) i))
+      flux.flux_fluxs
+      (Pp.array Pp.comma (fun _ -> Format.pp_print_int)) flux.flux_hits in
+  Format.fprintf
+    f "\"fluxs\" :@ @[[%a]@]@]@ }@]"
+    (Pp.array
+       Pp.comma
+       (fun _ f x ->
+	Format.fprintf
+	  f "@[[%a]@]"
+	  (Pp.array Pp.comma (fun _ f y -> Format.pp_print_float f y)) x))
+    flux.flux_fluxs
 
-let html_of_flux env (file,flux) =
+let json_of_flux env counter flux =
   Kappa_files.with_flux
-    file
+    flux.flux_name (fun f -> print_json_of_flux env counter f flux)
+
+let html_of_flux env counter flux =
+  Kappa_files.with_flux
+    flux.flux_name
     (Pp_html.graph_page
        (fun f -> Format.pp_print_string f "Flux map")
        ["http://d3js.org/d3.v3.min.js"]
@@ -65,42 +98,12 @@ let html_of_flux env (file,flux) =
 	 f "stroke: #000;@ stroke-width: .5px;@ })@]@,</style>")
        (fun f ->
 	let () =
-	  Format.fprintf
-	    f "@[<v 2><script>@,var matrix = @[[%a];@]@,"
-	    (Pp.array
-	       Pp.comma
-	       (fun _ f x ->
-		Format.fprintf
-		  f "@[[%a]@]"
-		  (Pp.array
-		     Pp.comma
-		     (fun _ f y -> Format.pp_print_float f (abs_float y)))
-		  x))
-	    flux in
+	  Format.fprintf f "@[<v 2><script>@,var flux = %a;@,"
+			 (print_json_of_flux env counter) flux in
 	let () =
 	  Format.fprintf
-	    f "var fill = @[[%a];@]@,"
-	    (Pp.array
-	       Pp.comma
-	       (fun _ f x ->
-		Format.fprintf
-		  f "@[[%a]@]"
-		  (Pp.array
-		     Pp.comma
-		     (fun _ f y ->
-		      Format.pp_print_string
-			f
-			(if y < 0. then "\"#FF0000\"" else "\"#00FF00\"")))
-		  x))
-	    flux in
-	let () =
-	  Format.fprintf
-	    f "var labels = @[[%a];@]@,"
-	    (Pp.array Pp.comma
-		      (fun i f _ ->
-		       Format.fprintf
-			 f "\"%a\"" (Environment.print_ast_rule ~env) i))
-	    flux in
+	    f "@[var matrix =@ flux.fluxs.map(function(a) {return a.map(Math.abs);});@]@,"
+	    in
 	let () =
 	  Format.fprintf
 	    f "var chord = @[d3.@,layout.@,chord()@,.padding(.01)" in
@@ -139,7 +142,7 @@ let html_of_flux env (file,flux) =
 	    f "@,.append(\"path\")@,.attr(\"d\", d3.svg.chord().radius(innerRadius))" in
 	let () =
 	  Format.fprintf
-	    f "@,.style(\"fill\", function(d) { return fill[d.source.index][d.target.index]; })@,.style(\"opacity\", 1);@]@," in
+	    f "@,.style(\"fill\", function(d) { if (flux.fluxs[d.source.index][d.target.index] < 0) {return \"#FF0000\";} else {return \"#00FF00\";} })@,.style(\"opacity\", 1);@]@," in
 	let () =
 	  Format.fprintf
 	    f "var legends = @[svg@,.append(\"g\")@,.selectAll(\"g\")@,.data(chord.groups)" in
@@ -163,7 +166,7 @@ let html_of_flux env (file,flux) =
 	    f "@,.style(\"text-anchor\", function(d) { return d.angle > Math.PI ? \"end\" : null; })" in
 	let () =
 	  Format.fprintf
-	    f "@,.text(function(d) { return labels[d.index]; });@]@," in
+	    f "@,.text(function(d) { return flux.rules[d.index]; });@]@," in
 	let () =
 	  Format.fprintf
 	    f "legends@,.append(\"path\")@,.style(\"fill\", \"#222222\")"in
@@ -185,9 +188,9 @@ let html_of_flux env (file,flux) =
 	    f "@,.transition()@,.style(\"opacity\", opacity);@ };@ }@]" in
 	Format.fprintf f "@]@,</script>@,"))
 
-let output_flux env (file,_ as b) =
-  if Filename.check_suffix file ".html"
-  then html_of_flux env b
-  else if Filename.check_suffix file ".json"
-  then json_of_flux env b
+let output_flux env counter b =
+  if Filename.check_suffix b.flux_name ".html"
+  then html_of_flux env counter b
+  else if Filename.check_suffix b.flux_name ".json"
+  then json_of_flux env counter b
   else dot_of_flux env b
