@@ -64,14 +64,14 @@ let print_json_of_flux env counter f flux =
 	     flux.flux_start (Counter.current_time counter) in
   let () =
     Format.fprintf
-      f "@[\"rules\" :@ @[[%a]@]@],@ \"hits\" :@ @[[%a]@]@],@ "
+      f "@[\"rules\" :@ @[[%a]@]@],@ @[\"hits\" :@ @[[%a]@]@],@ "
       (Pp.array Pp.comma
 		(fun i f _ ->
 		 Format.fprintf f "\"%a\"" (Environment.print_ast_rule ~env) i))
       flux.flux_fluxs
       (Pp.array Pp.comma (fun _ -> Format.pp_print_int)) flux.flux_hits in
   Format.fprintf
-    f "\"fluxs\" :@ @[[%a]@]@]@ }@]"
+    f "@[\"fluxs\" :@ @[[%a]@]@]@ }@]"
     (Pp.array
        Pp.comma
        (fun _ f x ->
@@ -97,13 +97,48 @@ let html_of_flux env counter flux =
        Format.fprintf
 	 f "stroke: #000;@ stroke-width: .5px;@ })@]@,</style>")
        (fun f ->
+	let () = Format.fprintf f "@[<v 2><form id=\"menu\"></form>@," in
 	let () =
-	  Format.fprintf f "@[<v 2><script>@,var flux = %a;@,"
+	  Format.fprintf f "<script>@,\"use strict\"@,@[var flux =@ %a;@]@,"
 			 (print_json_of_flux env counter) flux in
+
 	let () =
 	  Format.fprintf
-	    f "@[var matrix =@ flux.fluxs.map(function(a) {return a.map(Math.abs);});@]@,"
-	    in
+	    f
+	    "var selectedRules=flux.rules.map(function () {return true;});@," in
+	let () =
+	  Format.fprintf
+	    f
+	    "function filterRules (val,id,a) { return selectedRules[id]; }@," in
+	let () =
+	  Format.fprintf
+	    f
+	    "@[<v 2>function drawDIM () {@," in
+	let () =
+	  Format.fprintf
+	    f
+	    "var matrix = flux.fluxs.map(function(a)@," in
+	let () =
+	  Format.fprintf
+	    f
+	    "{return a.map(Math.abs).filter(filterRules);}).filter(filterRules),@," in
+	let () =
+	  Format.fprintf
+	    f
+	    "rules = flux.rules.filter(filterRules),@," in
+	let () =
+	  Format.fprintf
+	    f
+	    "color = flux.fluxs.map(function(a)@," in
+	let () =
+	  Format.fprintf
+	    f
+	    "{return a.map(function (x) {return (x < 0) ? \"#FF0000\" : \"#00FF00\";})@," in
+	let () =
+	  Format.fprintf
+	    f
+            ".filter(filterRules);}).filter(filterRules);@," in
+
 	let () =
 	  Format.fprintf
 	    f "var chord = @[d3.@,layout.@,chord()@,.padding(.01)" in
@@ -131,6 +166,7 @@ let html_of_flux env counter flux =
 	let () =
 	  Format.fprintf
 	    f "@,.select(\"g\").attr(\"transform\", \"translate(\" + width / 2 + \",\" + height / 2 + \")\");@]@," in
+	let () = Format.fprintf f "svg.selectAll(\"*\").remove();@," in
 	let () =
 	  Format.fprintf
 	    f "@[svg.append(\"g\")@,.attr(\"class\", \"chord\")" in
@@ -142,7 +178,7 @@ let html_of_flux env counter flux =
 	    f "@,.append(\"path\")@,.attr(\"d\", d3.svg.chord().radius(innerRadius))" in
 	let () =
 	  Format.fprintf
-	    f "@,.style(\"fill\", function(d) { if (flux.fluxs[d.source.index][d.target.index] < 0) {return \"#FF0000\";} else {return \"#00FF00\";} })@,.style(\"opacity\", 1);@]@," in
+	    f "@,.style(\"fill\", function(d) { return color[d.source.index][d.target.index]; })@,.style(\"opacity\", 1);@]@," in
 	let () =
 	  Format.fprintf
 	    f "var legends = @[svg@,.append(\"g\")@,.selectAll(\"g\")@,.data(chord.groups)" in
@@ -166,26 +202,80 @@ let html_of_flux env counter flux =
 	    f "@,.style(\"text-anchor\", function(d) { return d.angle > Math.PI ? \"end\" : null; })" in
 	let () =
 	  Format.fprintf
-	    f "@,.text(function(d) { return flux.rules[d.index]; });@]@," in
+	    f "@,.text(function(d) { return rules[d.index]; });@]@," in
 	let () =
 	  Format.fprintf
 	    f "legends@,.append(\"path\")@,.style(\"fill\", \"#222222\")"in
 	let () =
 	  Format.fprintf
-	    f "@,.attr(\"d\", arc)@,.on(\"mouseover\", fade(.1))@,.on(\"mouseout\", fade(1));@]@," in
+	    f "@,.attr(\"d\", arc)@,.on(\"mouseover\", fade(svg,.1))@,.on(\"mouseout\", fade(svg,1));@]@,}@]@," in
 	let () =
 	  Format.fprintf
 	    f "// Returns an event handler for fading a given chord group.@," in
 	let () =
 	  Format.fprintf
-	    f "@[function fade(opacity) {@ return function(g, i) {@ " in
+	    f "@[function fade(svg,opacity) {@ return function(g, i) {@ " in
 	let () = Format.fprintf f "svg@,.selectAll(\".chord path\")@,." in
 	let () =
 	  Format.fprintf
 	    f "filter(function(d) { return d.source.index != i && d.target.index != i; })" in
 	let () =
 	  Format.fprintf
-	    f "@,.transition()@,.style(\"opacity\", opacity);@ };@ }@]" in
+	    f "@,.transition()@,.style(\"opacity\", opacity);@ };@ }@]@,@," in
+
+	let () =
+	  Format.fprintf
+	    f "@[<v 2>function aClick (id) {@," in
+	let () =
+	  Format.fprintf
+	    f "selectedRules[id] = (selectedRules[id]) ? false : true;@," in
+	let () =
+	  Format.fprintf
+	    f "drawDIM();@]@,}@,@," in
+
+	let () =
+	  Format.fprintf
+	    f "@[<v 2>function populate() {@," in
+	let () =
+	  Format.fprintf
+	    f "var menu = document.getElementById(\"menu\");@," in
+	let () =
+	  Format.fprintf
+	    f "selectedRules.forEach(function (val,id,a) {@," in
+	let () =
+	  Format.fprintf
+	    f "var boxbox = document.createElement(\"div\"),@," in
+	let () =
+	  Format.fprintf
+	    f "box = document.createElement(\"input\");@," in
+	let () =
+	  Format.fprintf
+	    f "boxbox.setAttribute(\"class\",\"checkbox\")@," in
+	let () =
+	  Format.fprintf
+	    f "box.setAttribute(\"type\", \"checkbox\");@," in
+	let () =
+	  Format.fprintf
+	    f "box.setAttribute(\"checked\", val);@," in
+	let () =
+	  Format.fprintf
+	    f "box.addEventListener(\"change\",function () { aClick(id);});@," in
+	let () =
+	  Format.fprintf
+	    f "boxbox.appendChild(box);@," in
+	let () =
+	  Format.fprintf
+	    f "boxbox.appendChild(document.createTextNode(flux.rules[id]));@," in
+	let () =
+	  Format.fprintf
+	    f "menu.appendChild(boxbox)@,});@," in
+	let () =
+	  Format.fprintf
+	    f "drawDIM();@]@,}@," in
+let () =
+	  Format.fprintf
+	    f "populate();" in
+
 	Format.fprintf f "@]@,</script>@,"))
 
 let output_flux env counter b =
