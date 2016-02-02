@@ -117,7 +117,7 @@ module Make (Domain:Analyzer_domain_sig.Domain) =
       -> 'a 
       -> 'b -> Exception.method_handler * dynamic_information * 'c
 
-    (* push r_id in the working_list *)
+    (** push r_id in the working_list *)
     let push_rule (static:static_information) dynamic error r_id =
       let working_list = dynamic.rule_working_list in
       let parameter = get_parameter static in
@@ -128,6 +128,9 @@ module Make (Domain:Analyzer_domain_sig.Domain) =
       {
         dynamic with rule_working_list = rule_working_list
       }
+
+    (**[next_rule static dynamic] returns a rule_id inside a working list
+       if it is not empty*)
 
     let next_rule static dynamic error =
       let working_list = dynamic.rule_working_list in
@@ -144,6 +147,9 @@ module Make (Domain:Analyzer_domain_sig.Domain) =
           dynamic with rule_working_list = working_list_tail
         }, rule_id_op
 
+    (**[lift_unary f static dynamic] is a function lifted of unary type,
+       returns information of dynamic information and its output*)
+
     let lift_unary f (static:static_information) dynamic error a =
       let error, domain_dynamic, output =
         f (get_domain_static_information static) dynamic.domain error a 
@@ -152,7 +158,11 @@ module Make (Domain:Analyzer_domain_sig.Domain) =
       {
         dynamic with domain = domain_dynamic
       }, output
-						     
+
+    (**[pre_add_initial_state static dynamic error a] returns a pair of
+       type unary where the output of static information [a] is an initial state
+       of analyzer header, and the dynamic output [a list of event] is unit. *)
+
     let pre_add_initial_state static dynamic error a =
       lift_unary Domain.add_initial_state static dynamic error a
         
@@ -164,7 +174,10 @@ module Make (Domain:Analyzer_domain_sig.Domain) =
       {
         dynamic with domain = domain_dynamic
       }, output
-						     
+
+    (**[is_enabled static dynamic error a] returns a triple of type binary
+       when given a rule_id [a], check that if this rule is enable or not *)
+
     let is_enabled static dynamic error a =
       lift_binary 
         Domain.is_enabled 
@@ -173,7 +186,8 @@ module Make (Domain:Analyzer_domain_sig.Domain) =
         error
         a 
         Analyzer_headers.dummy_precondition
-        
+
+    (**[pre_apply_rule static dynamic error a b] *)
     let pre_apply_rule static dynamic error a b =
       lift_binary
         Domain.apply_rule 
@@ -182,7 +196,11 @@ module Make (Domain:Analyzer_domain_sig.Domain) =
         error
         a
         b
-		  
+
+    (**apply a list of event if it is empty then do nothing, otherwise go
+       through this list and at each event push rule_id inside a working list
+       and apply this list of event with new dynamic information*)
+
     let rec apply_event_list (static:static_information) dynamic error event_list =
       if event_list = []
       then
@@ -210,6 +228,9 @@ module Make (Domain:Analyzer_domain_sig.Domain) =
 	in
 	apply_event_list static dynamic error event_list'
 
+    (** add initial state then apply a list of event starts from this new
+        list*)
+
     let add_initial_state static dynamic error initial_state =
       let error, dynamic, event_list =
         pre_add_initial_state
@@ -219,7 +240,10 @@ module Make (Domain:Analyzer_domain_sig.Domain) =
           initial_state
       in
       apply_event_list static dynamic error event_list
-		       
+
+    (**if it has a precondition for this rule_id then apply a list of
+       event starts from this new list*)
+
     let apply_rule static dynamic error r_id precondition =
       let error, dynamic, event_list =
         pre_apply_rule
@@ -230,10 +254,10 @@ module Make (Domain:Analyzer_domain_sig.Domain) =
           precondition
       in
       apply_event_list static dynamic error event_list
-		       
+
     let export static dynamic error kasa_state =
       lift_unary Domain.export static dynamic error kasa_state
-		 
+
     let print static dynamic error loggers =
       lift_unary Domain.print static dynamic error loggers
 

@@ -51,7 +51,7 @@ let dump_formatter parameter  f =
 
 let dump_view_diff parameter handler_kappa handler_bdu error
     site_correspondence agent_type cv_id old_bdu new_bdu =
-  if trace
+  if local_trace
     || Remanent_parameters.get_dump_reachability_analysis_diff parameter
     || Remanent_parameters.get_trace parameter
   then
@@ -91,7 +91,7 @@ let dump_view_diff parameter handler_kappa handler_bdu error
     let () = Loggers.print_newline (Remanent_parameters.get_logger parameter)  in
     (*-----------------------------------------------------------------------*)
     let error, handler_bdu =
-      if trace
+      if local_trace
         || Remanent_parameters.get_trace parameter
       then
 	let () =
@@ -188,7 +188,7 @@ let dump_view_diff parameter handler_kappa handler_bdu error
 
 let dump_valuation parameter handler_kappa handler_bdu error
     site_correspondence agent_type cv_id valuation =
-  if trace
+  if local_trace
     || Remanent_parameters.get_dump_reachability_analysis_diff parameter
     || Remanent_parameters.get_trace parameter
   then
@@ -223,7 +223,7 @@ let dump_valuation parameter handler_kappa handler_bdu error
     let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
     (*-----------------------------------------------------------------------*)
     let error, handler_bdu =
-      if trace
+      if local_trace
         || Remanent_parameters.get_trace parameter
       then
 	let () =
@@ -309,7 +309,7 @@ let dump_valuation parameter handler_kappa handler_bdu error
     covering class (the information of a list of sites) of each agent. *)
 
 let dump_cv_label bool parameter handler_kappa error site_correspondence agent_type cv_id =
-  if trace
+  if local_trace
     || Remanent_parameters.get_trace parameter
     || bool
   then
@@ -452,7 +452,7 @@ let add_update_to_wl ?title:(title="") parameter error handler_kappa compiled
   (*-----------------------------------------------------------------------*)
   (*print working list information*)
   let error =
-    if trace
+    if local_trace
       || Remanent_parameters.get_dump_reachability_analysis_wl parameter
     then
       begin
@@ -896,7 +896,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
 	let () =
 	  if not bool
 	    &&
-	      (trace
+	      (local_trace
 	       || Remanent_parameters.get_dump_reachability_analysis_diff parameter
 	       || Remanent_parameters.get_trace parameter)
 	  then
@@ -917,7 +917,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
   let () =
     if not bool
       &&
-	(trace
+	(local_trace
 	 || Remanent_parameters.get_dump_reachability_analysis_diff parameter
 	 || Remanent_parameters.get_trace parameter)
     then
@@ -930,7 +930,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
   in
   let () =
     if
-      trace
+      local_trace
       || Remanent_parameters.get_trace parameter
       || Remanent_parameters.get_dump_reachability_analysis_wl parameter
     then
@@ -976,7 +976,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
         (*output of rule that is enabled*)
     	let _ =
           if
-	    trace
+	    local_trace
 	    || (Remanent_parameters.get_dump_reachability_analysis_iteration parameter)
 	    || (Remanent_parameters.get_trace parameter)
           then
@@ -1031,7 +1031,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
             (*output of rule that is enabled*)
             let _ =
               if
-		trace
+		local_trace
 		|| Remanent_parameters.get_trace parameter
 		|| Remanent_parameters.get_dump_reachability_analysis_iteration parameter
               then
@@ -1064,7 +1064,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
             (*-----------------------------------------------------------------------*)
             (*output of rule that is disabled*)
             let _ =
-              if trace
+              if local_trace
 		 || (Remanent_parameters.get_dump_reachability_analysis_iteration parameter)
 		 || (Remanent_parameters.get_trace parameter)
               then

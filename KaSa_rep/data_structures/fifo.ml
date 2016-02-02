@@ -17,7 +17,7 @@ open SetMap
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "FIFO") message exn (fun () -> default)
 
-let trace = false
+let local_trace = false
 
 module type Work_list =
 sig
