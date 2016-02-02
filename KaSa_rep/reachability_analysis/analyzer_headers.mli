@@ -15,8 +15,8 @@
 
 type compilation_result = unit
 
-type compilation_result' =
-  Exception.method_handler * (Mvbdu_wrapper.Mvbdu.handler * Bdu_analysis_type.bdu_analysis)
+(*type compilation_result' =
+  Exception.method_handler * (Mvbdu_wrapper.Mvbdu.handler * Bdu_analysis_type.bdu_analysic)*)
 
 type rule_id = int
 

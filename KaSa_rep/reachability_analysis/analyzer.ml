@@ -76,12 +76,11 @@ module Make (Domain:Analyzer_domain_sig.Domain) =
 	  rule_working_list: working_list;
 	  domain           : Domain.dynamic_information
 	}
-
-
+  
       let get_global_static_information = fst
 
       let get_domain_static_information = snd
-
+        
       let get_parameter static =
         Analyzer_headers.get_parameter (get_global_static_information static)
 
@@ -142,11 +141,13 @@ module Make (Domain:Analyzer_domain_sig.Domain) =
         in
         error, 
         {
-          dynamic with rule_working_list = working_list_tail (*CHECK ME*)
+          dynamic with rule_working_list = working_list_tail
         }, rule_id_op
 
     let lift_unary f (static:static_information) dynamic error a =
-      let error, domain_dynamic, output = f (get_domain_static_information static) dynamic.domain error a in
+      let error, domain_dynamic, output =
+        f (get_domain_static_information static) dynamic.domain error a 
+      in
       error,
       {
         dynamic with domain = domain_dynamic
@@ -156,7 +157,9 @@ module Make (Domain:Analyzer_domain_sig.Domain) =
       lift_unary Domain.add_initial_state static dynamic error a
         
     let lift_binary f (static:static_information) dynamic error a b =
-      let error, domain_dynamic, output = f (get_domain_static_information static) dynamic.domain error a b in
+      let error, domain_dynamic, output = 
+        f (get_domain_static_information static) dynamic.domain error a b 
+      in
       error,
       {
         dynamic with domain = domain_dynamic
@@ -235,4 +238,3 @@ module Make (Domain:Analyzer_domain_sig.Domain) =
       lift_unary Domain.print static dynamic error loggers
 
    end:Analyzer)
-       
