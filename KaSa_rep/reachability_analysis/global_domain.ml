@@ -19,7 +19,7 @@ We introduce one monolithic domain that collect everything
 
 
 module Domain =
-  sig
+  struct
     type static_information =
          {
 	   global_static_information: Analyzer_headers.global_static_information;	   
@@ -33,8 +33,8 @@ module Domain =
 	domain_dynamic_information: unit (* put here the type of the struct that contains the rest of the dynamic information, including the result of the analysis *)
       }
 
-    let get_kappa_handler static = unit (* explain how to extract the handler for kappa expressions from a value of type static_information *)
-    let get_mvbdu_handler dynamic = unit (* explain how to extract the handler for mvbdu *)
+    let get_kappa_handler static = () (* explain how to extract the handler for kappa expressions from a value of type static_information *)
+    let get_mvbdu_handler dynamic = () (* explain how to extract the handler for mvbdu *)
     let set_mvbdu_handler handler dynamic = dynamic (* explain how to overwritte the previous handler *)
 
     let initialize static dynamic error =

@@ -13,7 +13,7 @@
   * All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
-type compilation_result = unit
+type compilation_result = Cckappa_sig.compil
 
 type rule_id = int
 
