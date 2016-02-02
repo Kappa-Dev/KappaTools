@@ -11,8 +11,9 @@ let rename wk id cc inj = function
 
 let print ?sigs f = function
   | Existing (n,id) ->
-     Format.fprintf f "%a/*%i*/"
-		    (Connected_component.ContentAgent.print ?sigs) n id
+     Format.fprintf
+       f "%a/*%i*/"
+       (Connected_component.ContentAgent.print ?sigs ~with_id:()) n id
   | Fresh (ty,i) ->
      Format.fprintf f "%a/*%t %i*/"
 		    (match sigs with

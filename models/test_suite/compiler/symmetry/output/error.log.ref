@@ -17,8 +17,8 @@ Environment:
     A(x~a~b,y)
   Tokens: 
   Alg_expr:
-    0:tourne: |A/*1*/(x~b, y!1), A/*2*/(x!1, y!2), A/*3*/(x!2)|
-  Plot: |A/*1*/(x~a!1), A/*2*/(y!1)|
+    0:tourne: |A(x~b, y!1), A(x!1, y!2), A(x!2)|
+  Plot: |A(x~a!1), A(y!1)|
   Rules:
     0: 0: /*cc6*/ A/*1*/(x), 1: /*cc12*/ A/*1*/(y)
       -- A/*1*//*1*/.y = ⊥, A/*1*//*0*/.x = ⊥

@@ -97,8 +97,6 @@ let with_formatter str f =
 
 let (openOutDescriptors:out_channel list ref) = ref []
 
-let add_out_desc d = openOutDescriptors := d::!openOutDescriptors
-
 let set_dir s =
   let () = try
       if not (Sys.is_directory s)

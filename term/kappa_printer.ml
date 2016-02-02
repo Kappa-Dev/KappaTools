@@ -20,7 +20,7 @@ let alg_expr ?env f alg =
 	    (fun _ f cc ->
 	     Format.fprintf
 	       f "|%a|"
-	       (Connected_component.print ?sigs false) cc) f ccs)
+	       (Connected_component.print ?sigs ?with_id:None) cc) f ccs)
 	 f ccs
     | Alg_expr.TOKEN_ID i ->
        Format.fprintf f "|%a|" (Environment.print_token ?env) i
@@ -55,7 +55,7 @@ let elementary_rule ?env f r =
     let () = Format.pp_open_box f 2 in
     let () = Format.pp_print_int f i in
     let () = Format.pp_print_string f ": " in
-    let () = Connected_component.print ?sigs true f cc in
+    let () = Connected_component.print ?sigs ~with_id:() f cc in
     Format.pp_close_box f () in
   Format.fprintf
     f "@[%a@]@ -- @[@[%a@]%t@[%a@]@]@ ++ @[@[%a@]%t@[%a@]@]@ @@%a%t"
@@ -99,7 +99,7 @@ let modification ?env f m =
 	   let () = Format.pp_open_box f 2 in
 	   let () = Format.pp_print_int f i in
 	   let () = Format.pp_print_string f ": " in
-	   let () = Connected_component.print ?sigs false f cc in
+	   let () = Connected_component.print ?sigs ?with_id:None f cc in
 	   Format.pp_close_box f () in
 	 Format.fprintf f "$DEL %a %a" (alg_expr ?env) n
 			(Pp.array Pp.comma boxed_cc)
@@ -121,11 +121,13 @@ let modification ?env f m =
   | Primitives.CFLOW (_name,cc,_) ->
      Format.fprintf
        f "$TRACK @[%a@] [true]"
-       (Pp.array Pp.comma (fun _ -> Connected_component.print ?sigs false)) cc
+       (Pp.array
+	  Pp.comma (fun _ -> Connected_component.print ?sigs ?with_id:None)) cc
   | Primitives.CFLOWOFF cc ->
      Format.fprintf
        f "$TRACK %a [false]"
-       (Pp.array Pp.comma (fun _ -> Connected_component.print ?sigs false)) cc
+       (Pp.array
+	  Pp.comma (fun _ -> Connected_component.print ?sigs ?with_id:None)) cc
 
 let perturbation ?env f pert =
   let aux f =

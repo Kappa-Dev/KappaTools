@@ -18,7 +18,7 @@ Environment:
     3: 0: /*cc8*/ A/*1*/(x!1), A/*2*/(y!1) -- A/*2*//*0*/.y = A/*1*//*0*/.x
       ++ A/*2*//*0*/.y = ⊥, A/*1*//*0*/.x = ⊥ @1
   Perturbations:
-    /*0*/%mod: [true] do $TRACK A/*1*/(x!1), A/*2*/(y!1) [true]
+    /*0*/%mod: [true] do $TRACK A(x!1), A(y!1) [true]
 Domain:
   () -> /*cc0*/ 
     -> (-!A-1_x-⊥->() 1[1] -!A-1_y-⊥->() 4[2]

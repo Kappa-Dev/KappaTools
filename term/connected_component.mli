@@ -10,7 +10,8 @@ module ContentAgent  : sig
 
   val get_sort : t -> int
 
-  val print : ?sigs:Signature.s -> Format.formatter -> t -> unit
+  val print :
+    ?sigs:Signature.s -> ?with_id:unit -> Format.formatter -> t -> unit
   val print_site :
     ?sigs:Signature.s -> t -> Format.formatter -> int -> unit
   val print_internal :
@@ -53,8 +54,8 @@ val finish_new : ?origin:Operator.rev_dep -> work -> (Env.t*Renaming.t*t)
 (** {6 Use a connected component } *)
 
 val is_equal_canonicals : t -> t -> bool
-val print : ?sigs:Signature.s -> bool -> Format.formatter -> t -> unit
-(** [print ~sigs print_id form cc] *)
+val print : ?sigs:Signature.s -> ?with_id:unit -> Format.formatter -> t -> unit
+(** [print ~sigs ?with_id:None form cc] *)
 
 val print_dot : Signature.s -> Format.formatter -> t -> unit
 

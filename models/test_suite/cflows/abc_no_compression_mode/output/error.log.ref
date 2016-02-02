@@ -38,10 +38,10 @@ Environment:
     0:on_rate: 1.000000E-03
     1:off_rate: 1.000000E-01
     2:mod_rate: 1
-    3:AB: |A/*1*/(x!1), B/*2*/(x!1)|
-    4:Cuu: |C/*3*/(x1~u?, x2~u?)|
-    5:Cpu: |C/*3*/(x1~p?, x2~u?)|
-    6:Cpp: |C/*3*/(x1~p?, x2~p?)|
+    3:AB: |A(x!1), B(x!1)|
+    4:Cuu: |C(x1~u?, x2~u?)|
+    5:Cpu: |C(x1~p?, x2~u?)|
+    6:Cpp: |C(x1~p?, x2~p?)|
     7:n_ab: 1000
     8:n_c: 10000
   Plot: 'AB' 'Cuu' 'Cpu' 'Cpp'
@@ -66,9 +66,9 @@ Environment:
       ++ C/*3*//*0*/.x2 = ⊥, C/*3*//*0*/.x2~p =, A/*1*//*0*/.c = ⊥
       @'mod_rate'
   Perturbations:
-    /*0*/%mod: [true] do $TRACK C/*3*/(x1~u?, x2~u?) [true]
-    /*1*/%mod: [true] do $TRACK C/*3*/(x1~p?, x2~u?) [true]
-    /*2*/%mod: [true] do $TRACK C/*3*/(x1~p?, x2~p?) [true]
+    /*0*/%mod: [true] do $TRACK C(x1~u?, x2~u?) [true]
+    /*1*/%mod: [true] do $TRACK C(x1~p?, x2~u?) [true]
+    /*2*/%mod: [true] do $TRACK C(x1~p?, x2~p?) [true]
     /*3*/%mod: [true] do $FLUX "flux_map.dot" [true]
     /*4*/%mod: ([E] = INF) do $FLUX "flux_map.dot" [false]
 Domain:
