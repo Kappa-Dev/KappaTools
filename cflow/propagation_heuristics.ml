@@ -82,16 +82,17 @@ module Propagation_heuristic =
 
     let forbidden_events paramter handler log_info error list = 
       error,log_info,List.rev_map (fun x -> Cut_event x) (List.rev list)
-     
-    let get_last_unresolved_event parameter handler log_info error blackboard p_id level  = 
-      let k = B.get_last_linked_event blackboard p_id in 
-      match k 
+
+    let get_gen_unresolved_event first last succ stop parameter handler log_info error blackboard p_id level =
+      let k_init = first blackboard p_id in
+      let k_end = last blackboard p_id in
+      match k_init,k_end
       with 
-        | None -> error,log_info,k 
-        | Some i -> 
+        | None,_|_,None-> error,log_info,k_init
+        | Some i,Some j ->
           begin
             let rec aux i log_info error = 
-              if i<0 
+              if stop i j
               then error,log_info,None 
               else 
                 let event_case_address = B.build_event_case_address p_id (B.build_pointer i) in 
@@ -107,12 +108,18 @@ module Propagation_heuristic =
                     then 
                       error,log_info,Some eid 
                     else 
-                      aux (i-1) log_info error 
-                  | Some true | Some false -> aux (i-1) log_info error 
+                      aux (succ i) log_info error
+                  | Some true | Some false -> aux (succ i) log_info error
             in 
             aux i log_info error 
-          end 
-          
+          end
+
+    let get_last_unresolved_event parameter handler log_info error blackboard p_id level =
+      get_gen_unresolved_event B.get_last_linked_event B.get_first_linked_event pred (fun i j -> i<j) parameter handler log_info error blackboard p_id level
+
+    let get_first_unresolved_event parameter handler log_info error blackboard p_id level =
+      get_gen_unresolved_event B.get_first_linked_event B.get_last_linked_event succ (fun i j -> i>j) parameter handler log_info error blackboard p_id level
+
     let compare_int i j = 
       if i=0 then false
       else if j=0 then true 
@@ -168,7 +175,7 @@ module Propagation_heuristic =
 	  x.Priority.try_to_remove_first
 	with
 	| Priority.Late_events -> get_last_unresolved_event parameter handler log_info error blackboard p_id level
-	| Priority.Early_events -> (*get_first_unresolved_event*) get_last_unresolved_event parameter handler log_info error blackboard p_id level
+	| Priority.Early_events -> get_first_unresolved_event (*get_last_unresolved_event*) parameter handler log_info error blackboard p_id level
       in
       let error,list  = 
         if n_p_id = 0 
