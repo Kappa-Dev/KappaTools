@@ -2,18 +2,22 @@
   * analyzer_headers.mli
   * openkappa
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
-  * 
+  *
   * Creation: 2016, the 30th of January
-  * Last modification: 
-  * 
+  * Last modification:
+  *
   * Compute the relations between sites in the BDU data structures
-  * 
-  * Copyright 2010,2011,2012,2013,2014,2015,2016 Institut National de Recherche 
-  * en Informatique et en Automatique.  
-  * All rights reserved.  This file is distributed     
+  *
+  * Copyright 2010,2011,2012,2013,2014,2015,2016 Institut National de Recherche
+  * en Informatique et en Automatique.
+  * All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-type compilation_result = Cckappa_sig.compil
+type compilation_result =
+  {
+    cc_code:Cckappa_sig.compil;
+    kappa_handler:Ckappa_sig.kappa_handler
+  }
 
 type rule_id = int
 
@@ -30,11 +34,11 @@ type kasa_state = unit
 
 type initial_state = unit
 
-let initialize_global_information parameter error compilation = 
+let initialize_global_information parameter error compilation =
   error, (compilation, parameter), ()
 
 let dummy_precondition = (():precondition)
-			   							       
+
 let get_parameter = snd
 
 let get_compilation_information = fst
