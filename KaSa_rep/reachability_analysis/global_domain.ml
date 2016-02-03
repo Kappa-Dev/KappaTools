@@ -36,6 +36,7 @@ struct
 
   let get_parameter static = Analyzer_headers.get_parameter static
 
+  (*--------------------------------------------------------------------*)
   (* put here the type of the struct that contains the rest of the
      dynamic information, including the result of the analysis *)
 
@@ -57,96 +58,110 @@ struct
       domain_dynamic_information : domain_dynamic_information
       }
 
-    (* explain how to extract the handler for kappa expressions from a
-       value of type static_information *)
+  (*--------------------------------------------------------------------*)
+  (* explain how to extract the handler for kappa expressions from a value
+     of type static_information. Kappa handler is static and thus it should
+     never updated. *)
+      
+  let get_kappa_handler static =
+    let compilation_result = get_compilation_information static in
+    let kappa_handler      = compilation_result.Analyzer_headers.kappa_handler in
+    kappa_handler
+      
+  let get_cc_code compilation_result = compilation_result.Analyzer_headers.cc_code
 
-    let get_kappa_handler static =
-      let parameter = get_parameter static in
-      let error = Exception.empty_error_handler in
-      let error, parameters, files = Get_option.get_option error in
-      let compil = 
-        List.fold_left (KappaLexer.compile Format.std_formatter) Ast.empty_compil files 
-      in
-      let parameters_compil = Remanent_parameters.update_call_stack parameter
-        Preprocess.local_trace (Some "Prepreprocess.translate_compil")
-      in
-      let error, refined_compil = 
-        Prepreprocess.translate_compil parameters_compil error compil 
-      in
-      let parameters_list_tokens = Remanent_parameters.update_call_stack
-        parameter List_tokens.local_trace (Some "List_tokens.scan_compil") 
-      in
-      let error, handler_kappa =
-        List_tokens.scan_compil parameters_list_tokens error refined_compil
-      in
-      error, handler_kappa
+  (* explain how to extract the handler for mvbdu *)
 
-    (* explain how to extract the handler for mvbdu *)
+  let get_mvbdu_handler dynamic = dynamic.mvbdu_handler
 
-    let get_mvbdu_handler dynamic = ()
+  (* explain how to overwritte the previous handler *)
 
-    (* explain how to overwritte the previous handler *)
+  let set_mvbdu_handler handler dynamic = dynamic
 
-    let set_mvbdu_handler handler dynamic = dynamic
+  (*--------------------------------------------------------------------*)
+  (** intialization function of global static & dynamic information of this
+      domain*)
 
-    let initialize static dynamic error =
-      let parameter = get_parameter static in
-      let compilation_result = get_compilation_information static in
-      let error, init_bdu_build =
-        Bdu_analysis_main.init_bdu_build parameter error
-      in
-      let init_domain_static_information =
-        Bdu_analysis_main.init_bdu_analysis_static, init_bdu_build
-      in
-      let error, init_global_static_information, init_global_dynamic_information =
-        Analyzer_headers.initialize_global_information
-          parameter error
-          compilation_result
-      in
-      error,
-      {
-	global_static_information = init_global_static_information;
-	domain_static_information = init_domain_static_information
-      }
-			       
-    type 'a zeroary =
-      static_information
-      -> dynamic_information
-      -> Exception.method_handler
-      -> Exception.method_handler * dynamic_information * 'a
+  let initialize static dynamic error =
+    let parameter = get_parameter static in
+    let compilation_result = get_compilation_information static in
+    let error, init_bdu_build =
+      Bdu_analysis_main.init_bdu_build parameter error
+    in
+    let init_domain_static_information =
+      Bdu_analysis_main.init_bdu_analysis_static, init_bdu_build
+    in
+    let error, init_global_static_information, init_global_dynamic_information =
+      Analyzer_headers.initialize_global_information
+        parameter error
+        compilation_result
+    in
+    (*--------------------------------------------------------------------*)
+    let error, handler_bdu = Boolean_mvbdu.init_remanent parameter error in
+    let error, init_bdu_analysis_dynamic = 
+      Bdu_analysis_main.init_bdu_analysis_dynamic parameter error
+    in
+    let init_fixpoint =
+      handler_bdu, Bdu_analysis_type.Map_bdu_update.Map.empty
+    in
+    let kappa_handler = get_kappa_handler static in
+    let nrules = Handler.nrules parameter error kappa_handler in
+    let init_dead_rule_array = Array.make nrules false in
+    let init_result_of_analysis =
+      error, init_fixpoint, init_dead_rule_array 
+    in
+    let init_domain_dynamic_information =
+      init_bdu_analysis_dynamic, init_result_of_analysis
+    in
+    error,
+    {
+      global_static_information = init_global_static_information;
+      domain_static_information = init_domain_static_information
+    },
+    {
+      global_dynamic_information = init_global_dynamic_information;
+      mvbdu_handler              = handler_bdu;
+      domain_dynamic_information = init_domain_dynamic_information
+    }
+      
+  type 'a zeroary =
+    static_information
+    -> dynamic_information
+    -> Exception.method_handler
+    -> Exception.method_handler * dynamic_information * 'a
 
-    type ('a, 'b) unary =
-      static_information
-      -> dynamic_information 
-      -> Exception.method_handler
-      -> 'a 
-      -> Exception.method_handler * dynamic_information * 'b
+  type ('a, 'b) unary =
+    static_information
+    -> dynamic_information 
+    -> Exception.method_handler
+    -> 'a 
+    -> Exception.method_handler * dynamic_information * 'b
 
-    type ('a, 'b, 'c) binary =
-      static_information
-      -> dynamic_information 
-      -> Exception.method_handler 
-      -> 'a 
-      -> 'b 
-      -> Exception.method_handler * dynamic_information * 'c
+  type ('a, 'b, 'c) binary =
+    static_information
+    -> dynamic_information 
+    -> Exception.method_handler 
+    -> 'a 
+    -> 'b 
+    -> Exception.method_handler * dynamic_information * 'c
 
-    let add_initial_state static dynamic error state =
-      error, dynamic, []
+  let add_initial_state static dynamic error state =
+    error, dynamic, []
 
-    let is_enabled static dynamic error r_id =
-      error, dynamic, None
+  let is_enabled static dynamic error r_id =
+    error, dynamic, None
 
-    let apply_rule static dynamic error r_id precondition =
-      error, dynamic, []
-		      
-    let apply_event_list static dynamic error event_list =
-      error, dynamic, []
+  let apply_rule static dynamic error r_id precondition =
+    error, dynamic, []
+      
+  let apply_event_list static dynamic error event_list =
+    error, dynamic, []
 
-    let export static dynamic error kasa_state =
-      error, dynamic, kasa_state
-		      
-    let print static dynamic error loggers =
-      error, dynamic, ()
+  let export static dynamic error kasa_state =
+    error, dynamic, kasa_state
+      
+  let print static dynamic error loggers =
+    error, dynamic, ()
 
-  end
-    
+end
+  

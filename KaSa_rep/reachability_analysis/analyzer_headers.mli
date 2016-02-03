@@ -17,8 +17,8 @@
 
 type compilation_result =
   {
-    cc_code: Cckappa_sig.compil;
-    kappa_handler: Ckappa_sig.kappa_handler
+    cc_code       : Cckappa_sig.compil;
+    kappa_handler : Cckappa_sig.kappa_handler
   }
 
 type rule_id = int
@@ -46,7 +46,7 @@ type kasa_state = unit
 (** This is the type of the encoding of a chemical mixture as a result of
     compilation *)
 
-type initial_state = unit
+type initial_state = Cckappa_sig.enriched_init
 
 val initialize_global_information:
   Remanent_parameters_sig.parameters ->

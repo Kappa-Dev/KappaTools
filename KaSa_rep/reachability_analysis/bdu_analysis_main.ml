@@ -549,11 +549,6 @@ let bdu_main parameter error handler_kappa store_covering_classes compiled =
       init_dead_rule_array
   in
   (*-----------------------------------------------------------------------*)
-  (*TEST*)
-  (*let _ =
-    Common_sig.main parameter error handler_kappa compiled    
-  in*)
-  (*-----------------------------------------------------------------------*)
   let error, handler_bdu =
     if  Remanent_parameters.get_dump_reachability_analysis_result parameter
     then

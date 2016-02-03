@@ -15,8 +15,8 @@
 
 type compilation_result =
   {
-    cc_code:Cckappa_sig.compil;
-    kappa_handler:Ckappa_sig.kappa_handler
+    cc_code       : Cckappa_sig.compil;
+    kappa_handler : Cckappa_sig.kappa_handler
   }
 
 type rule_id = int
@@ -32,7 +32,7 @@ type precondition = unit
 
 type kasa_state = unit
 
-type initial_state = unit
+type initial_state = Cckappa_sig.enriched_init
 
 let initialize_global_information parameter error compilation =
   error, (compilation, parameter), ()
