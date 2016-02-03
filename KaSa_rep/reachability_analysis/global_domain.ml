@@ -204,22 +204,6 @@ struct
   in
   *)
 
-  (** [get_scan_rule_set static] *)
-  let get_scan_rule_set static error covering_classes =
-    let parameter, kappa_handler, compiled = get_common_static static  in
-    let error, handler_bdu = Boolean_mvbdu.init_remanent parameter error in
-    let error, (handler_bdu, result) =
-      Bdu_analysis_main.scan_rule_set
-        parameter
-        handler_bdu
-        error
-        kappa_handler
-        compiled
-        covering_classes
-        compiled.Cckappa_sig.rules
-    in
-    error, (handler_bdu, result)
-
   (**[bdu_main static error]*)
   (*let get_bdu_main static error =
     let parameter, kappa_handler, compiled = get_common_static static in
@@ -260,11 +244,125 @@ struct
   (*--------------------------------------------------------------------*)
   (** [add_initial_state static dynamic error state] takes an initial state
       and returns the information of the dynamic and a list of event*)
-
+      
   let add_initial_state static dynamic error state =
     error, dynamic, []
 
-  let is_enabled static dynamic error r_id =
+  (**[get_bdu_false/true] from dynamic*)
+  let get_mvbdu_false static dynamic error =
+    let parameter = get_parameter static in
+    let handler_bdu = get_mvbdu_handler dynamic in
+    let error, handler_bdu, bdu_false =
+      Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler_bdu error
+    in
+    error, handler_bdu, bdu_false
+
+  let get_mvbdu_true static dynamic error =
+    let parameter = get_parameter static in
+    let handler_bdu = get_mvbdu_handler dynamic in
+    let error, handler_bdu, bdu_true =
+      Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler_bdu error
+    in
+    error, handler_bdu, bdu_true
+
+  (**get bdu_analysis_static*)
+  let get_bdu_analysis_static static = fst
+
+  let get_bdu_build static = snd 
+
+  (** [get_scan_rule_set static] *)
+  let get_scan_rule_set static error covering_classes =
+    let parameter, kappa_handler, compiled = get_common_static static  in
+    let error, handler_bdu = Boolean_mvbdu.init_remanent parameter error in
+    let error, (handler_bdu, result) =
+      Bdu_analysis_main.scan_rule_set
+        parameter
+        handler_bdu
+        error
+        kappa_handler
+        compiled
+        covering_classes
+        compiled.Cckappa_sig.rules
+    in
+    error, (handler_bdu, result)
+
+  let get_store_remanent_triple static error covering_classes =
+    let error, (handler_bdu, result) =
+      get_scan_rule_set static error covering_classes
+    in
+    error, 
+    (handler_bdu,
+     result.Bdu_analysis_type.store_bdu_build.Bdu_analysis_type.store_remanent_triple)
+
+  let get_store_bdu_init_restriction_map static error covering_classes =
+    let error, (handler_bdu, result) =
+      get_scan_rule_set static error covering_classes
+    in
+    error,
+    (handler_bdu,
+     result.Bdu_analysis_type.store_bdu_build.Bdu_analysis_type.store_bdu_init_restriction_map)
+      
+  let get_store_proj_bdu_views static error covering_classes =
+    let error, (handler_bdu, result) =
+      get_scan_rule_set static error covering_classes
+    in
+    error, 
+    (handler_bdu, 
+     result.Bdu_analysis_type.store_bdu_build.Bdu_analysis_type.store_proj_bdu_views)
+
+  let get_bdu_proj_views static error covering_classes rule_id =
+    let error, (handler_bdu, store_proj_bdu_views) =
+      get_store_proj_bdu_views static error covering_classes
+    in
+    error,
+    (handler_bdu, 
+     Bdu_fixpoint_iteration.collect_bdu_proj_views error rule_id store_proj_bdu_views)
+
+  let get_store_bdu_fixpoint_init_map static dynamic error bdu_false covering_classes =
+    let parameter, kappa_handler, _ = get_common_static static in
+    (*let bdu_false = get_mvbdu_false static dynamic error in*)
+    let error, (handler_bdu, site_corresponce_in_covering_classes) =
+      get_store_remanent_triple static error covering_classes
+    in
+    let error, (handler_bdu, store_bdu_init_restriction_map) =
+      get_store_bdu_init_restriction_map static error covering_classes
+    in
+    let error, bool, handler_bdu, store_bdu_fixpoint_init_map =
+      Bdu_fixpoint_iteration.store_bdu_fixpoint_init_map
+        parameter
+        handler_bdu
+        error
+        kappa_handler
+        bdu_false
+        site_corresponce_in_covering_classes
+        store_bdu_init_restriction_map
+    in
+    error, bool, handler_bdu, store_bdu_fixpoint_init_map
+
+  (*let is_enabled' static dynamic error rule_id bdu_false covering_classes =
+    let parameter = get_parameter static in
+    (*let error, handler_bdu, bdu_false = get_mvbdu_false static dynamic error in*)
+    let error, (handler_bdu, bdu_proj_views) =
+      get_bdu_proj_views static error covering_classes rule_id
+    in
+    let error, bool, handler_bdu, store_bdu_update_map =
+      get_store_bdu_fixpoint_init_map static dynamic error covering_classes
+    in
+    let error, handler_bdu, is_enable =
+      Bdu_fixpoint_iteration.is_enable
+        parameter
+        handler_bdu
+        error
+        bdu_false
+        rule_id
+        bdu_proj_views
+        store_bdu_update_map
+    in
+    if is_enable
+    then
+    else*)
+      
+  let is_enabled static dynamic error rule_id =
     error, dynamic, None
 
   let apply_rule static dynamic error r_id precondition =

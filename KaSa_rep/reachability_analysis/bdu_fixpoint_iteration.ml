@@ -511,6 +511,16 @@ let add_update_to_wl ?title:(title="") parameter error handler_kappa compiled
 (** [views_creation_test_potienal rule_id views creation test potential] returns 
     a map of bdu depending on the kind of agent at each rule. *)
 
+let collect_bdu_proj_views error rule_id store_proj_bdu_views =
+  let error, bdu_proj_views =
+    match Bdu_analysis_type.Map_rule_id_views.Map.find_option
+      rule_id store_proj_bdu_views
+    with
+    | None -> error, Bdu_analysis_type.Map_triple_views.Map.empty
+    | Some m -> error, m
+  in
+  error, bdu_proj_views
+
 let collect_map_views_creation_test_potential parameter error rule_id
     store_proj_bdu_views
     store_proj_bdu_creation_restriction_map
@@ -695,7 +705,7 @@ let compute_views_enabled parameter handler error
           | error, None -> error, bdu_false
           | error, Some bdu -> error, bdu
         in
-        let error, bdu_test =
+        let error, bdu_test =  (*CHECK ME*)
           match Map_triple_views.Map.find_option
             (agent_id, agent_type, cv_id) bdu_test_map
           with
@@ -842,6 +852,65 @@ let compute_views_enabled parameter handler error
 
 fixpoint iteration with/without initial state*)
 
+let store_bdu_fixpoint_init_map parameter handler error handler_kappa bdu_false
+    site_correspondence_in_covering_classes
+    store_bdu_init_restriction_map =
+  let log = Remanent_parameters.get_logger parameter in
+  let add_link parameter handler error correspondence (agent_type, cv_id)
+      bdu store_result =
+    let error, bdu_old =
+      match Map_bdu_update.Map.find_option_without_logs parameter error
+        (agent_type, cv_id) store_result
+      with
+      | error, None -> error, bdu_false
+      | error, Some bdu -> error, bdu
+    in
+    let error, handler, bdu_union =
+      Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_old bdu
+      (*JF: this is a computation, thus you have to pass the handler *)
+    in
+    let parameter_views = Remanent_parameters.update_prefix parameter "\t" in
+      (*print bdu different in views*)
+    let error, handler =
+      dump_view_diff parameter_views handler_kappa handler error
+        correspondence agent_type cv_id bdu_old bdu_union
+    in
+    let error, result_map =
+      Map_bdu_update.Map.add_or_overwrite parameter error
+        (agent_type, cv_id) bdu_union store_result
+    in
+    error, handler, result_map
+  in
+  (*-----------------------------------------------------------------------*)
+  (*in case having initial state the bdu_iter will be the union of bdu_init
+    and bdu_iter*)
+  let error, bool, handler, store_bdu_fixpoint_init_map =
+    Map_init_bdu.Map.fold
+      (fun (agent_type, cv_id) bdu (error, bool, handler, store_result) ->
+	let () =
+	  if not bool
+	    &&
+	      (local_trace
+	       || Remanent_parameters.get_dump_reachability_analysis_diff parameter
+	       || Remanent_parameters.get_trace parameter)
+	  then
+	    let () = Loggers.fprintf log "\tViews in initial state" in
+	    let () = Loggers.print_newline log in
+	    let () = Loggers.print_newline log in
+	    ()
+	in
+	let error, handler, store_result =
+          add_link parameter handler error
+            site_correspondence_in_covering_classes (agent_type, cv_id) bdu store_result
+        in
+        error, true, handler, store_result
+      )
+      store_bdu_init_restriction_map
+      (error, false, handler, Map_bdu_update.Map.empty)
+  in
+  error, bool, handler, store_bdu_fixpoint_init_map
+    
+(*********************************************************************************)
 let collect_bdu_fixpoint_with_init parameter handler error
     handler_kappa
     compiled
@@ -1050,7 +1119,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
                 bdu_true
                 bdu_false
 		rule_id
-		bdu_proj_views
+		bdu_proj_views (*CHECK ME*)
                 bdu_creation_map
                 modif_list_map
                 bdu_and_list_potential_map
