@@ -9,4 +9,3 @@ let graph_page title deps header core f =
   let () = Format.fprintf f "@[<v 2><body>@,<h1>%t</h1>@," title in
   let () = Format.fprintf f "<svg width=960 height=600><g/></svg>@," in
   Format.fprintf f "%t@]@,</body>@,</html>@]@." core
-

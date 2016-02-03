@@ -88,23 +88,36 @@ let html_of_flux env counter flux =
   Kappa_files.with_flux
     flux.flux_name
     (Pp_html.graph_page
-       (fun f -> Format.pp_print_string f "Flux map")
+       (fun f -> Format.pp_print_string f "Dynamic influence map")
        ["http://d3js.org/d3.v3.min.js"]
        (fun f ->
        let () =
 	  Format.fprintf
 	    f "@[<v 2><style>@,.chord path {@ fill-opacity: .67;@ " in
        Format.fprintf
-	 f "stroke: #000;@ stroke-width: .5px;@ })@]@,</style>")
+	 f "stroke: #000;@ stroke-width: .5px;@ }@]@,</style>")
        (fun f ->
+	let () = Format.fprintf f "@[<hv 2><form id=\"menu\">@," in
+	let () = Format.fprintf f "@[<v 2><div class=\"form-group\">@," in
+	let () =
+	  Format.fprintf f "<label for=\"correction\">Correction</label>@," in
 	let () =
 	  Format.fprintf
-	    f "@[<hv 2><form id=\"menu\">@,<div class=\"checkbox\">" in
+	    f
+	    "<select class=\"form-control\" id=\"correction\" onchange=\"drawDIM()\">@," in
+	let () =
+	  Format.fprintf f "<option value=\"none\">None</option>@," in
+	let () = Format.fprintf
+		   f "<option value=\"hits\">Rule occurences</option>@," in
+	let () = Format.fprintf
+		   f "<option value=\"time\">Time</option>@]@,</select>@,</div>@," in
+	let () = Format.fprintf f "@[<v 2><label class=\"checkbox-inline\">@," in
 	let () =
 	  Format.fprintf
 	    f
 	    "<input type=\"checkbox\" onclick=\"toggleSelfInfluence()\">@," in
-	let () = Format.fprintf f "Rules self influence</div>@]@,</form>@," in
+	let () =
+	  Format.fprintf f "Rules self influence@]@,</label>@]@,</form>@," in
 	let () = Format.fprintf
 		   f "@[<v 2><script>@,\"use strict\"@,@[var flux =@ %a;@]@,"
 		   (print_json_of_flux env counter) flux in
@@ -116,21 +129,41 @@ let html_of_flux env counter flux =
 	let () =
 	  Format.fprintf
 	    f
-	    "function filterRules (val,id) { return selectedRules[id]; }@,@," in
+	    "function filterRules (val,id) { return selectedRules[id]; }@," in
 	let () =
 	  Format.fprintf
 	    f
-	    "@[<v 2>function drawDIM () {@," in
+	    "function pointValue (i,j,e) {@," in
 	let () =
 	  Format.fprintf
 	    f
-	    "var @[matrix = @[flux.fluxs.map(@[function(a,i)@ " in
+	    "var correction = document.getElementById(\"correction\").value;@," in
+	let () = Format.fprintf f "if (selfInfluence || i !== j)@,{@," in
+	let () = Format.fprintf f "if (correction === \"hits\")@," in
 	let () =
 	  Format.fprintf
 	    f
-	    "{return a.map(function (e,j)@ { @[if (selfInfluence || i !== j) {return Math.abs(e);}@ else@ {return 0;}@]}@])" in
+	    "{return (flux.hits[i] === 0.) ? 0 : Math.abs(e) / flux.hits[i];}@," in
+	let () = Format.fprintf f "else if (correction === \"time\")@," in
+	let () =
+	  Format.fprintf
+	    f
+	    "{return Math.abs(e) / (flux.bio_end_time - flux.bio_begin_time);}@," in
+	let () =
+	  Format.fprintf
+	    f
+	    "else {return Math.abs(e);}@,}@,else {return 0;}@,}@,@," in
+	let () = Format.fprintf f "@[<v 2>function drawDIM () {@," in
+	let () =
+	  Format.fprintf
+	    f
+	    "var @[matrix = @[flux@,.fluxs@,.map(@[function(a,i)" in
+	let () =
+	  Format.fprintf
+	    f
+	    "{return a.map(function (e,j)@ {return pointValue (i,j,e)}@])" in
 	let () = Format.fprintf
-		   f ".filter(filterRules);}).filter(filterRules),@]@ " in
+		   f "@,.filter(filterRules);})@,.filter(filterRules),@]@ " in
 	let () =
 	  Format.fprintf
 	    f
@@ -262,13 +295,13 @@ let html_of_flux env counter flux =
 	    f "@[<v 2>selectedRules.forEach(function (val,id,a) {@," in
 	let () =
 	  Format.fprintf
-	    f "var boxbox = document.createElement(\"div\"),@," in
+	    f "var boxbox = document.createElement(\"label\"),@," in
 	let () =
 	  Format.fprintf
 	    f "box = document.createElement(\"input\");@," in
 	let () =
 	  Format.fprintf
-	    f "boxbox.setAttribute(\"class\",\"checkbox\")@," in
+	    f "boxbox.setAttribute(\"class\",\"checkbox-inline\")@," in
 	let () =
 	  Format.fprintf
 	    f "box.setAttribute(\"type\", \"checkbox\");@," in
