@@ -1,6 +1,9 @@
 (**
   * blackboard.ml
   *
+  * Creation:                      <2011-09-05 feret>
+  * Last modification: Time-stamp: <2016-02-03 20:48:34 feret>
+  *
   * Causal flow compression: a module for KaSim
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   * Jean Krivine, Université Paris-Diderot, CNRS
@@ -8,8 +11,6 @@
   * KaSim
   * Jean Krivine, Université Paris-Diderot, CNRS
   *
-  * Creation: 06/09/2011
-  * Last modification: 03/08/2013
   * *
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation
@@ -76,7 +77,7 @@ sig
   val reset_init: (blackboard, blackboard) PB.CI.Po.K.H.unary
 
   (** initialisation*)
-  val import:  (PB.CI.Po.K.refined_step list,  blackboard) PB.CI.Po.K.H.unary
+  val import:  ?heuristic:Priority.priorities -> (PB.CI.Po.K.refined_step list,  blackboard) PB.CI.Po.K.H.unary
 
 
   (** output result*)
@@ -172,20 +173,20 @@ module Blackboard =
       }
 
     type case_address =
-    | N_unresolved_events_in_column_at_level of int*int
+    | N_unresolved_events_in_column_at_level of int * Priority.level
     | N_unresolved_events_in_column of int
     | Pointer_to_next of event_case_address
     | Value_after of event_case_address
     | Value_before of event_case_address
     | Pointer_to_previous of event_case_address
     | N_unresolved_events
-    | N_unresolved_events_at_level of int
+    | N_unresolved_events_at_level of Priority.level
     | Exist of event_case_address
     | Keep_event of PB.step_id
 
     let is_exist_event i = Keep_event i
     let n_unresolved_events_in_column i = N_unresolved_events_in_column (i.column_predicate_id)
-    let n_unresolved_events_in_column_at_level i j = N_unresolved_events_in_column_at_level ((i.column_predicate_id),j)
+    let n_unresolved_events_in_column_at_level i j = N_unresolved_events_in_column_at_level (i.column_predicate_id,j)
     let pointer_to_next e = Pointer_to_next e
     let value_after e = Value_after e
     let value_before e = Value_before e
@@ -369,7 +370,7 @@ module Blackboard =
          error,log_info,PB.A.get blackboard.level_of_event eid
        with
          Not_found ->
-         warn parameter log_info error (Some "level_of_event, line 373, Unknown event id") (Failure "Unknown event id") Priority.default
+         warn parameter log_info error (Some "level_of_event, line 373, Unknown event id") (Failure "Unknown event id") Priority.highest
 
      let get_event blackboard k = PB.A.get blackboard.event k
      let get_n_eid blackboard = blackboard.n_eid
@@ -407,7 +408,13 @@ module Blackboard =
       match x
       with
       | N_unresolved_events_in_column_at_level (i,j) ->
-        let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "n_unresolved_events_in_pred %i %i@." i j in
+        let _ =
+	  Format.fprintf
+	    parameter.PB.CI.Po.K.H.out_channel_err
+	    "n_unresolved_events_in_pred %i %s@."
+	    i
+	    (Priority.string_of_level j)
+	in
          error,log_info,()
        | N_unresolved_events_in_column i ->
          let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "n_unresolved_events_in_pred %i @." i in
@@ -425,7 +432,12 @@ module Blackboard =
         let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Pointer_before " in
         print_event_case_address parameter handler log_info error blackboard e
       | N_unresolved_events_at_level i ->
-        let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Unresolved_events_at_level %i" i in
+        let _ =
+	  Format.fprintf
+	    parameter.PB.CI.Po.K.H.out_channel_err
+	    "Unresolved_events_at_level %s"
+	    (Priority.string_of_level i)
+	in
         error,log_info,()
       | N_unresolved_events ->
         let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Unresolved_events" in
@@ -508,7 +520,13 @@ module Blackboard =
            let _ = Format.fprintf log "selected ? " in
            error,log_info,()
          | N_unresolved_events_in_column_at_level (i,j) ->
-           let _ = Format.fprintf log "Number of unresolved events for the predicate %i at level %i" i j in
+           let _ =
+	     Format.fprintf
+	       log
+	       "Number of unresolved events for the predicate %i at level %s"
+	       i
+	       (Priority.string_of_level j)
+	   in
            error,log_info,()
          | N_unresolved_events_in_column i ->
            let _ = Format.fprintf log "Number of unresolved events for the predicate %i" i in
@@ -529,7 +547,7 @@ module Blackboard =
            let _ = Format.fprintf log "Nombre d'événements non résolu" in
            error,log_info,()
          | N_unresolved_events_at_level i ->
-           let _ = Format.fprintf log "Nombre d'événements non résolu at level %i" i in
+           let _ = Format.fprintf log "Nombre d'événements non résolu at level %s" (Priority.string_of_level i) in
            error,log_info,()
 
 
@@ -582,12 +600,11 @@ module Blackboard =
                  let _ = Format.fprintf log "*wires %i:@. " i in
                  let rec aux j error =
 		       let _ = Format.fprintf log "* %i:@. " j in
-		
-                   let case = PB.A.get array j in
-                   let _ = print_case log case in
-                   let j' = get_pointer_next case in
-                   if j=j' then error
-                 else aux j' error
+                       let case = PB.A.get array j in
+                       let _ = print_case log case in
+                       let j' = get_pointer_next case in
+                       if j=j' then error
+                       else aux j' error
                  in
                  let error = aux pointer_before_blackboard (!err) in
                  let _ = err := error in
@@ -633,7 +650,7 @@ module Blackboard =
        let _ =
          Priority.LevelMap.iter
            (fun l  ->
-             let _ = Format.fprintf log " Level:%i@." l in
+             let _ = Format.fprintf log " Level:%s@." (Priority.string_of_level l) in
              PB.A.iteri
                (Format.fprintf log " %i:%i@.")
            )
@@ -656,7 +673,7 @@ module Blackboard =
 
      let empty_stack = []
 
-     let import parameter handler log_info error pre_blackboard =
+     let import ?heuristic parameter handler log_info error pre_blackboard =
        let error,log_info,n_predicates = PB.n_predicates parameter handler log_info error pre_blackboard in
        let error,log_info,n_events = PB.n_events parameter handler log_info error pre_blackboard in
        let stack = [] in
@@ -666,20 +683,15 @@ module Blackboard =
        let unsolved_by_level = Priority.LevelMap.empty in
        let blackboard = PB.A.make n_predicates (PB.A.make 1 dummy_case_info) in
        let weigth_of_predicate_id_by_level =
-         let rec aux k map =
-           if k<0 then map
-           else
-             aux (k-1) (Priority.LevelMap.add k (PB.A.make 0 0) map)
-         in
-         let error,log_info,priority_max =
+         let rec aux level_opt map =
            match
-             PB.CI.Po.K.H.get_priorities parameter
-           with
-           | Some x -> error,log_info,x.Priority.max_level
-           | None ->
-             warn parameter log_info error (Some "import, line 694, Compression mode has to been selected") (Failure "Compression mode has not been selected") Priority.zero
+	     level_opt
+	   with
+	   | None -> map
+	   | Some level ->
+             aux (Priority.higher level) (Priority.LevelMap.add level (PB.A.make 0 0) map)
          in
-         aux priority_max Priority.LevelMap.empty
+         aux (Some Priority.lowest) Priority.LevelMap.empty
        in
        let inc_depth level p_id =
 	 match Priority.LevelMap.find_option
@@ -828,11 +840,15 @@ module Blackboard =
              with
                | Counter int2 ->
                  begin
-                   match Priority.LevelMap.find_option
-			   level blackboard.weigth_of_predicate_id_by_level with
+                   match
+		     Priority.LevelMap.find_option
+			   level
+			   blackboard.weigth_of_predicate_id_by_level
+		   with
 		   | Some a ->
                      let _ =
-                       PB.A.set a int int2 in
+                       PB.A.set a int int2
+		     in
                      error,log_info,blackboard
 		   | None ->
                        begin
@@ -879,7 +895,7 @@ module Blackboard =
            end
          | Value_before case_address ->
 	    warn parameter log_info error (Some "set, line 884, set should not be called with value_before") (Failure "Incompatible address and value in function Blackboard.set") blackboard
-		
+
          | Pointer_to_previous case_address ->
                begin
                 match case_value
@@ -1375,7 +1391,7 @@ module Blackboard =
           List.fold_left (fun (error,log_info) -> print_assignment parameter handler log_info error blackboard) (error,log_info) (List.rev x))
          (error,log_info) (List.rev blackboard.stack)
      in error,log_info,()
-			
+
    let is_fictitious_obs blackboard eid =
      Some eid = blackboard.fictitious_observable
 
@@ -1482,7 +1498,7 @@ module Blackboard =
      let log_info = StoryProfiling.StoryStats.inc_k_cut_events n_events_removed log_info in
      error,log_info,(blackboard,cut_causal_flow)
 
-   let import parameter handler log_info error list =
+   let import ?heuristic parameter handler log_info error list =
      let error,log_info,preblackboard = PB.init parameter handler log_info error in
      let error,log_info,(preblackboard,step_id,string,to_xls) =
        match
@@ -1510,7 +1526,7 @@ module Blackboard =
          error,log_info,(preblackboard,int,Parameter.xlsweakFileName,Parameter.dump_grid_before_weak_compression)
      in
      let error,log_info,preblackboard =
-       PB.finalize parameter handler log_info error preblackboard
+       PB.finalize heuristic parameter handler log_info error preblackboard
      in
      let error,log_info,blackboard = import parameter handler log_info error preblackboard in
      let _ = Priority.n_story:=(!Priority.n_story)+1 in

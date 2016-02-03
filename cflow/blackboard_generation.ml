@@ -56,7 +56,7 @@ sig
   val init:  pre_blackboard CI.Po.K.H.zeroary
   val add_step: (CI.Po.K.refined_step,pre_blackboard,step_id,pre_blackboard * step_id) CI.Po.K.H.ternary
   val add_step_up_to_iso: (CI.Po.K.refined_step,pre_blackboard,step_id,pre_blackboard * step_id) CI.Po.K.H.ternary
-  val finalize: (pre_blackboard,pre_blackboard) CI.Po.K.H.unary
+  val finalize: Priority.priorities option -> (pre_blackboard,pre_blackboard) CI.Po.K.H.unary
 
   (**pretty printing*)
   val string_of_predicate_value: predicate_value -> string
@@ -88,7 +88,7 @@ module Preblackboard =
      let warn parameter log_info error option exn default =
        let error,x = Exception.warn (CI.Po.K.H.get_kasa_parameters parameter) error (Some "blackboard_generation.ml") option exn (fun () -> default) in
        error,log_info,x
-		
+
      (** blackboard matrix*)
 
      type step_id = int       (** global id of an event *)
@@ -460,7 +460,7 @@ module Preblackboard =
                      bind parameter handler log_info error blackboard predicate sid' ag_id
 		in
 		error,log_info,blackboard,sid'
-				
+
          let create_agent _parameter _handler error blackboard agent_name agent_id  =
            let old_list =
              try
@@ -472,8 +472,6 @@ module Preblackboard =
            let new_list = agent_id::old_list in
            let _ = A.set blackboard.history_of_agent_ids_of_type agent_name new_list in
            error,blackboard
-		
-		
 
          let free_agent parameter handler log_info error blackboard agent_id =
            let error,log_info,blackboard,predicate_id =
@@ -730,7 +728,7 @@ module Preblackboard =
              predicate_id_list_related_to_predicate_id = A.make 1 PredicateidSet.empty;
              pre_observable_list = [];
              pre_fictitious_observable = None ;
-             pre_level_of_event = A.make 1 0 ;
+             pre_level_of_event = A.make 1 Priority.highest ;
            }
 
          let get_level_of_event parameter handler log_info error blackboard eid =
@@ -738,8 +736,8 @@ module Preblackboard =
              error,log_info,A.get blackboard.pre_level_of_event eid
            with
              Not_found ->
-             warn parameter log_info error (Some "get_level_of_event, line 736") (Failure "UNknown event") Priority.default
-		
+             warn parameter log_info error (Some "get_level_of_event, line 736") (Failure "UNknown event") Priority.highest
+
          let init_fictitious_action log_info error predicate_id blackboard =
            let nsid = blackboard.pre_nsteps+1 in
            let log_info = StoryProfiling.StoryStats.inc_n_side_events log_info in
@@ -795,7 +793,7 @@ module Preblackboard =
 		error,log_info,Bound_to_type (CI.Po.K.agent_name_of_binding_type bt,CI.Po.K.site_name_of_binding_type bt)
              | Instantiation.BOUND_to _ ->
 		warn parameter log_info error (Some "predicate_value_of_binding_state, line 794, Illegal binding state in predicate_value_of_binding_state") (Failure "predicate_value_of_binding_state") Unknown
-	
+
          let potential_target parameter handler log_info error blackboard site binding_state =
            let agent_id = CI.Po.K.agent_id_of_site site in
            let site_name = CI.Po.K.site_name_of_site site in
@@ -1352,9 +1350,9 @@ module Preblackboard =
                    else
                     begin
                       let site_id1 = ag_id,CI.Po.K.site_name_of_site site in
-		      match 
+		      match
 			SiteIdMap.find_option
-			      site_id1 data_structure.other_links_action_sites 
+			      site_id1 data_structure.other_links_action_sites
 		      with
                       | Some ag_id2 ->
                          add_subs_test_link test (ag_id,ag_id2) data_structure
@@ -1486,7 +1484,7 @@ module Preblackboard =
              AgentIdMap.fold
                (fun x l (error,log_info,blackboard,rule_agent_id_mutex,rule_agent_id_subs,mixture_agent_id_mutex,fictitious_list,fictitious_local_list,set,init_step) ->
 		(* the following mutex is used to encode the fact that the agent x in the lhs of the rule must be associated with exactely one agent in the mixture *)
-                let predicate_info = Mutex (Lock_agent (step_id,x)) in 
+                let predicate_info = Mutex (Lock_agent (step_id,x)) in
                  let error,log_info,blackboard,predicate_id = allocate parameter handler log_info error blackboard predicate_info in
                  let error,log_info,blackboard,init_step = init_fictitious_action log_info error predicate_id blackboard init_step in
                  let rule_agent_id_mutex = AgentIdMap.add x predicate_id rule_agent_id_mutex in
@@ -1518,7 +1516,7 @@ module Preblackboard =
 		      let set' = AgentIdSet.add id set in
                        if set == set'
                        then
-                         if AgentIdMap.mem id mixture_agent_id_mutex then 
+                         if AgentIdMap.mem id mixture_agent_id_mutex then
 			   (* The mutex is already declared, nothing to do *)
 			   let () =
 			     if Remanent_parameters.get_trace (CI.Po.K.H.get_kasa_parameters parameter) || debug_mode
@@ -2653,7 +2651,7 @@ according to the corresponding substitution *)
                error,log_info,(blackboard,step_id+1)
              end
 
-         let finalize parameter handler log_info error blackboard =
+         let finalize heuristic parameter handler log_info error blackboard =
            let l = blackboard.pre_fictitious_list in
            match l
            with
@@ -2698,7 +2696,7 @@ according to the corresponding substitution *)
                let _ =
                  A.iteri
                    (fun i step  ->
-                     let _,_,level = CI.Po.K.level_of_event parameter handler log_info error step set in
+                     let _,_,level = CI.Po.K.level_of_event heuristic parameter handler log_info error step set in
                      A.set
                        blackboard.pre_level_of_event
                        i
@@ -2725,14 +2723,14 @@ according to the corresponding substitution *)
            with
              | _ ->
 		warn parameter log_info error (Some "event_list_of_predicate, line 2690, Unknown predicate id")  (Failure "event_list_of_predicate") []
-	
+
          let n_events_per_predicate parameter handler log_info error blackboard predicate_id =
            try
              error,log_info,fst (A.get blackboard.pre_steps_by_column predicate_id)
            with
              | _ ->
 		warn parameter log_info error (Some "n_events_per_predicate, line 2696, Unknown predicate id") (Failure "n_events_per_predicate") 0
-	
+
          let n_events _parameter _handler log_info error blackboard =
            error,log_info,blackboard.pre_nsteps+1
 

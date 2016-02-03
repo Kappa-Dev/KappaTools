@@ -2,7 +2,7 @@
  * utilities.ml
  *
  * Creation:                      <2015-03-28 feret>
- * Last modification: Time-stamp: <2016-01-27 23:23:00 feret>
+ * Last modification: Time-stamp: <2016-02-03 20:53:14 feret>
  *
  * API for causal compression
  * Jerome Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -530,7 +530,7 @@ let flatten_story_table parameter ?(shall_we_compute=we_shall) ?(shall_we_comput
 let always = (fun _ -> true)
 
 
-let compress parameter ?(shall_we_compute=always) ?(shall_we_compute_profiling_information=we_shall) handler log_info error trace =
+let compress ?heuristic parameter ?(shall_we_compute=always) ?(shall_we_compute_profiling_information=we_shall) handler log_info error trace =
   match
     parameter.S.PH.B.PB.CI.Po.K.H.current_compression_mode
   with
@@ -545,8 +545,8 @@ let compress parameter ?(shall_we_compute=always) ?(shall_we_compute_profiling_i
 	  | _ -> StoryProfiling.Strong_compression
      in
      let error, log_info = P.add_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error event (Some (fun () -> size_of_pretrace trace)) log_info in
-    let event_list = get_pretrace_of_trace trace in
-     let error,log_info,blackboard = S.PH.B.import parameter handler log_info error event_list in
+     let event_list = get_pretrace_of_trace trace in
+     let error,log_info,blackboard = S.PH.B.import ?heuristic parameter handler log_info error event_list in
      let error,log_info,list = S.PH.forced_events parameter handler log_info error blackboard in
      let list_order =
        match list
@@ -594,8 +594,8 @@ let set_compression_mode p x =
   | Parameter.Strong -> S.PH.B.PB.CI.Po.K.H.set_compression_strong p
   | Parameter.Weak -> S.PH.B.PB.CI.Po.K.H.set_compression_weak p
 
-let strongly_compress parameter = compress (set_compression_mode parameter Parameter.Strong)
-let weakly_compress parameter = compress (set_compression_mode parameter Parameter.Weak)
+let strongly_compress ?heuristic parameter = compress ?heuristic (set_compression_mode parameter Parameter.Strong)
+let weakly_compress ?heuristic parameter = compress ?heuristic (set_compression_mode parameter Parameter.Weak)
 
 let convert_trace_into_grid trace handler =
     let event_list = get_compressed_trace trace in

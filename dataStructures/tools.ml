@@ -156,3 +156,16 @@ let recti f x i =
   let rec aux j =
     if j < i then f j (aux (succ j)) else x
   in aux 0
+
+let gen_level_not_zero (keya,dataa) (keyb,datab) =
+  if keya = 0
+  then
+    keyb,datab
+  else if keyb = 0
+  then keya,dataa
+  else if compare keya keyb < 0
+  then keya,dataa
+  else keyb,datab
+
+let min_pos_int_not_zero a b = gen_level_not_zero a b
+let max_pos_int_not_zero a b = gen_level_not_zero b a

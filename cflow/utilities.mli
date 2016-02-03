@@ -2,7 +2,7 @@
   * utilities.mli
   *
   * Creation:                      <2015-08-10 09:21:53 feret>
-  * Last modification: Time-stamp: <2016-01-24 17:26:06 feret>
+  * Last modification: Time-stamp: <2016-02-03 20:29:44 feret>
   *
   * Causal flow compression: a module for KaSim
   * Jerome Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -96,13 +96,19 @@ val make_unambiguous: (trace,trace) unary
 
 (** compute the weak compression of a given trace,
     if parameter.compute_all_stories, then each minimal stories is computed,
-    otherwise, only the first found one is provided *)
-val weakly_compress: (trace,trace list) unary
+    otherwise, only the first found one is provided;
+    the optional argument heuristic can be used to redefined the heuristic that
+    select which event to try to discard first. *)
+val weakly_compress:
+  ?heuristic:Priority.priorities -> (trace,trace list) unary
 
 (** compute the strong compression of a given trace,
     if parameter.compute_all_stories, then each minimal stories is computed,
-    otherwise, only the first found one is provided *)
-val strongly_compress: (trace,trace list) unary
+    otherwise, only the first found one is provided;
+    the optional argument heuristic can be used to redefined the heuristic that
+    select which event to try to discard first. *)
+val strongly_compress:
+  ?heuristic:Priority.priorities -> (trace,trace list) unary
 
 (** fold over the causal past of each observable in a given trace,
     the first argument indicates whether we display the current steps on the err output;
@@ -144,8 +150,11 @@ val export_story_table: (story_table,(Causal.grid*trace_runtime_info list) list)
 
 
 (** The following functions are for expert only *)
-(** compress a trace with the level of abstraction defined in the argument parameter *)
-val compress: (trace,trace list) unary
+(** compress a trace with the level of abstraction defined in the argument parameter.
+    The optional argument heuristic can be used to tune the heuristic that select which
+    event will be tried to be discarded first. *)
+val compress:
+  ?heuristic:Priority.priorities -> (trace,trace list) unary
 
 (** change the default level of oabstraction for compression (when used with compress) *)
 val set_compression_mode: parameter -> Parameter.current_compression_mode -> parameter

@@ -29,6 +29,7 @@ and some storage and rendering
 {!modules: Counter Plot Outputs}
 
 The machinary to cook stories from an execution trace is in cflow/
-{!modules: Compression_main Utilities}
+{!modules: Compression_main Utilities Priorities}
 
 The code of the static analyser is in KaSa_rep/
+{!modules: Mvbdu_wrapper}

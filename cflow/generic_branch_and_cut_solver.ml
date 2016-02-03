@@ -156,7 +156,7 @@ struct
        if PH.B.PB.CI.Po.K.H.get_all_stories_per_obs parameter
        then
 	 begin
-	   let story_list = list::story_list in	
+	   let story_list = list::story_list in
 	   let error,() =
 	     if choice_list.current <> []
 	     then
@@ -169,12 +169,12 @@ struct
 	     with [] -> choice_list
 		| t::q -> { current=t;stack=q}
 	   in
-	   let error,log_info,(blackboard,choice_list) = backtrack parameter handler log_info error blackboard choice_list in 	
+	   let error,log_info,(blackboard,choice_list) = backtrack parameter handler log_info error blackboard choice_list in
 	   begin
              match choice_list
              with
              | Some choice_list -> iter parameter handler log_info error blackboard choice_list story_list (*(update_first_story first_story list)*)
-             | None -> 
+             | None ->
 	       let _ = PH.B.export_blackboard_to_xls parameter handler log_info error "FAIL" (1+List.length story_list) 0 blackboard in
 	       error,log_info,(blackboard,story_list)
 	   end

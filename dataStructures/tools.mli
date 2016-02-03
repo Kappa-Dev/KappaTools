@@ -35,3 +35,5 @@ val list_smart_map : ('a -> 'a) -> 'a list -> 'a list
 val pow : int -> int -> int
 val pow64 : Int64.t -> Int64.t -> Int64.t
 val read_input : unit -> string
+val min_pos_int_not_zero: (int*'a) -> (int*'a) -> (int*'a)
+val max_pos_int_not_zero: (int*'a) -> (int*'a) -> (int*'a)

@@ -84,7 +84,7 @@ sig
 
   val get_kasim_side_effects: refined_step -> side_effect
 
-  val level_of_event: (refined_step,(agent_id -> bool),Priority.level) H.binary
+  val level_of_event: Priority.priorities option -> (refined_step,(agent_id -> bool),Priority.level) H.binary
   val disambiguate: refined_step list -> refined_step list
   val clean_events: refined_step list -> refined_step list
   val agent_id_in_obs: (refined_step, AgentIdSet.t) H.unary
@@ -360,10 +360,10 @@ module Cflow_linker =
     Pp.list Pp.comma (fun f ((a,_),b) -> Format.fprintf f "(%i,%i)," a b)
   let side_effect_of_list l = l
 
-  let level_of_event parameter handler log_info error e set =
-    match H.get_priorities parameter with
-    | None -> error,log_info,0
-    | Some priorities ->
+  let level_of_event priority_opt parameter handler log_info error e set =
+    match priority_opt,H.get_priorities parameter with
+    | None,None -> error,log_info,Priority.highest
+    | Some priorities,_ | None,Some priorities ->
        match e with
        | Obs _ -> error,log_info,priorities.Priority.other_events
        | Event _ ->
