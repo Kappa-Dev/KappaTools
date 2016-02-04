@@ -22,9 +22,6 @@ struct
   (* the type of the struct that contains all static information as in the
      previous version of the analysis *)
 
-  (*type domain_static_information =
-    Bdu_analysis_type.bdu_analysis_static * Bdu_analysis_type.bdu_build*)
-
   type static_information =
     {
       global_static_information : Analyzer_headers.global_static_information;	   
@@ -168,7 +165,88 @@ struct
   (*Instantiate of functions that store the static and dynamic information
     accordingly from the previous analyzer *)
 
-  (**the initial build for mvbdu_false*)
+  (*let get_bdu_analysis_static static error rule_id rule covering_classes =
+    let parameter, kappa_handler, compiled = get_common_static static in
+    let error, bdu_analysis_static =
+      Bdu_analysis_main.scan_rule_static
+        parameter
+        error
+        kappa_handler
+        rule_id
+        rule
+        rule
+        covering_classes
+        store
+    in
+    error, bdu_analysis_static*)
+
+  (*let get_bdu_build static error rule_id covering_classes =
+    let parameter, kappa_handler, compiled = get_common_static static in
+    let error, bdu_build =
+      Bdu_analysis_main.scan_rule_bdu_build
+        parameter
+        handler_bdu
+        error
+        rule_id
+        rule
+        compiled
+        covering_classes
+        store_potential_side_effects
+        store
+    in
+    error, bdu_build*)
+
+  (** [get_domain_static_information static] *)
+  (*let get_domain_static_information static =
+  in
+  *)
+
+  (**[bdu_main static error]*)
+  (*let get_bdu_main static error =
+    let parameter, kappa_handler, compiled = get_common_static static in
+    let error, handler_bdu, result =
+      Bdu_analysis_main.bdu_main
+        parameter
+        error
+        kappa_handler
+        store_covering_classes
+        compiled
+    in
+    error, handler_bdu, result*)
+
+  (** get the implementation of dynamic *)
+  (*let get_bdu_analysis_dynamic static dynamic error store =
+    let parameter, kappa_handler, compiled = get_common_static static in
+    (*get result of domain_static_information*)
+    let domain_static_information =
+      
+    in
+    let bdu_analysis_dynamic =
+      Bdu_analysis_main.scan_rule_dynamic
+        parameter
+        error
+        kappa_handler
+        rule_id
+        rule
+        compiled
+        store_test_modification_map
+        store_covering_classes_id
+        store_side_effects
+        store_potential_side_effects
+        covering_classes
+        store
+    in
+    error, bdu_analysis_dynamic*)
+
+  (*--------------------------------------------------------------------*)
+  (** [add_initial_state static dynamic error state] takes an initial state
+      and returns the information of the dynamic and a list of event*)
+      
+  let add_initial_state static dynamic error state =
+    error, dynamic, []
+
+  (**[get_bdu_false/true] from dynamic*)
+
   let get_mvbdu_false static dynamic error =
     let parameter = get_parameter static in
     let handler_bdu = get_mvbdu_handler dynamic in
@@ -186,7 +264,8 @@ struct
     in
     error, handler_bdu, bdu_true
 
-  (** returns the result of static and dynamic information *)
+
+  (** [get_scan_rule_set static] *)
   let get_scan_rule_set static error covering_classes =
     let parameter, kappa_handler, compiled = get_common_static static  in
     let error, handler_bdu = Boolean_mvbdu.init_remanent parameter error in
@@ -202,7 +281,6 @@ struct
     in
     error, (handler_bdu, result)
 
-  (**return a field that store the remanent of covering classes*)
   let get_store_remanent_triple static error covering_classes =
     let error, (handler_bdu, result) =
       get_scan_rule_set static error covering_classes
@@ -211,7 +289,6 @@ struct
     (handler_bdu,
      result.Bdu_analysis_type.store_bdu_analysis_static.Bdu_analysis_type.store_remanent_triple)
 
-  (** returns a field that store information of an initial state*)
   let get_store_bdu_init_restriction_map static error covering_classes =
     let error, (handler_bdu, result) =
       get_scan_rule_set static error covering_classes
@@ -223,7 +300,6 @@ struct
   (**[get_store_proj_bdu_views] from a result of static information,
      returns a function point to a field that store the static information
      of views after projection*)
-
   let get_store_proj_bdu_views static error covering_classes =
     let error, (handler_bdu, result) =
       get_scan_rule_set static error covering_classes
@@ -232,8 +308,6 @@ struct
     (handler_bdu, 
      result.Bdu_analysis_type.store_bdu_analysis_static.Bdu_analysis_type.store_proj_bdu_views)
 
-  (**[get_bdu_proj_views] returns the information of static information of
-     views after projection*)
 
   let get_bdu_proj_views static error covering_classes rule_id =
     let error, (handler_bdu, store_proj_bdu_views) =
@@ -274,8 +348,6 @@ struct
     
     (*error, bool, handler_bdu, store_bdu_fixpoint_init_map*)
 
-
-  (*----------------------------------------------------------------------*)
   (*let is_enabled' static dynamic error rule_id bdu_false covering_classes =
     let parameter = get_parameter static in
     (*let error, handler_bdu, bdu_false = get_mvbdu_false static dynamic error in*)
@@ -325,4 +397,3 @@ end
 
 (**A functor that takes a module Analyzer.Analyzer, and implement a
    function: main, export, and print*)
-
