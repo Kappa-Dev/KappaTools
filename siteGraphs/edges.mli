@@ -5,7 +5,7 @@ type agent = int * int
 
 type t
 
-val empty : unit -> t
+val empty : Signature.s -> t
 
 val add_agent : Signature.s -> int -> t -> int * t
 (** [add_agent sigs agent_type graph] *)
