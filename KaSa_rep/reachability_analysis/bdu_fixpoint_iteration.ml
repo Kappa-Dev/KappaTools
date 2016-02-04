@@ -524,7 +524,7 @@ let collect_bdu_proj_views error rule_id store_proj_bdu_views =
 let collect_map_views_creation_test_potential parameter error rule_id
     store_proj_bdu_views
     store_proj_bdu_creation_restriction_map
-    store_proj_bdu_test_restriction_map
+    (*store_proj_bdu_test_restriction_map*)
     store_proj_bdu_potential_restriction_map
     =
   let error, bdu_proj_views =
@@ -539,14 +539,14 @@ let collect_map_views_creation_test_potential parameter error rule_id
     | None -> error, Map_agent_type_creation_bdu.Map.empty
     | Some map -> error, map
   in
-  let error, bdu_test_map =
+  (*let error, bdu_test_map =
     match
       Map_final_test_bdu.Map.find_option rule_id
         store_proj_bdu_test_restriction_map
     with
     | None -> error, Map_agent_id_test_bdu.Map.empty
     | Some map -> error, map
-  in
+  in*)
   let error, bdu_potential_map =
     match Map_final_potential_bdu.Map.find_option rule_id
       store_proj_bdu_potential_restriction_map
@@ -554,7 +554,7 @@ let collect_map_views_creation_test_potential parameter error rule_id
     | None -> error, Map_agent_type_potential_bdu.Map.empty
     | Some map -> error, map
   in
-  error, (bdu_proj_views, bdu_creation_map, bdu_test_map, bdu_potential_map)
+  error, (bdu_proj_views, bdu_creation_map, (*bdu_test_map,*) bdu_potential_map)
 
 (************************************************************************************)
 (** [is_enable rule_id views map] returns true if the intersection of bdu
@@ -640,7 +640,7 @@ let compute_views_enabled parameter handler error
     bdu_true
     bdu_false
     rule_id
-    bdu_test_map
+    (*bdu_test_map*)
     bdu_creation_map
     modif_list_map
     bdu_and_list_potential_map
@@ -707,7 +707,7 @@ let compute_views_enabled parameter handler error
         in
         let error, bdu_test =  (*CHECK ME*)
           match Map_triple_views.Map.find_option
-            (agent_id, agent_type, cv_id) bdu_test_map
+            (agent_id, agent_type, cv_id) (*bdu_test_map*) bdu_proj_views
           with
           | None -> error, bdu_true
           | Some bdu -> error, bdu
@@ -802,7 +802,7 @@ let compute_views_enabled parameter handler error
   let error, (handler, wl_tl, store_result) =
     Map_agent_type_potential_bdu.Map.fold
       (* JF: to do use a fold2 *)
-      (fun (agent_type, new_site_id, cv_id) (bdu_test,list)
+      (fun (agent_type, new_site_id, cv_id) (bdu_test, list)
         (error, (handler, wl_tl, store_result)) ->
         let error, bdu_X =
 	  match Map_bdu_update.Map.find_option_without_logs parameter error
@@ -911,7 +911,181 @@ let store_bdu_fixpoint_init_map parameter handler error handler_kappa bdu_false
   error, bool, handler, store_bdu_fixpoint_init_map
     
 (*********************************************************************************)
+
 let collect_bdu_fixpoint_with_init parameter handler error
+    handler_kappa
+    compiled
+    bdu_true
+    bdu_false
+    site_correspondence_in_covering_classes
+    (wl_creation:Fifo.IntWL.WSet.elt list * Fifo.IntWL.WSet.elt list *
+       Fifo.IntWL.WSet.t)
+    store_proj_bdu_creation_restriction_map
+    modif_list_map
+    (*store_proj_bdu_test_restriction_map*)
+    store_proj_bdu_potential_restriction_map
+    store_bdu_test_restriction_map
+    store_proj_bdu_views
+    store_covering_classes_modification_update_full
+    store_bdu_init_restriction_map
+    dead_rule_array
+    =
+  let log = Remanent_parameters.get_logger parameter in
+  (*-----------------------------------------------------------------------*)
+  (*in case having initial state the bdu_iter will be the union of bdu_init
+    and bdu_iter*)
+  let error, bool, handler, store_bdu_fixpoint_init_map =
+    store_bdu_fixpoint_init_map
+      parameter
+      handler
+      error
+      handler_kappa
+      bdu_false
+      site_correspondence_in_covering_classes
+      store_bdu_init_restriction_map
+  in
+  (*-----------------------------------------------------------------------*)
+  (*add update(c) into working list*)
+  let error, wl_init_creation =
+    Map_bdu_update.Map.fold
+      (fun (agent_type, cv_id) _ (error, wl_init_creation) ->
+	add_update_to_wl
+	  ~title:"Dealing with"
+	  parameter
+          error
+          handler_kappa
+          compiled
+	  site_correspondence_in_covering_classes
+	  agent_type
+          cv_id
+          store_covering_classes_modification_update_full
+          wl_init_creation)
+      store_bdu_fixpoint_init_map
+      (error, wl_creation)
+  in
+  (*-----------------------------------------------------------------------*)
+  (*iterate function*)
+  let rec aux acc_wl (error, handler, store_bdu_fixpoint_init_map, dead_rule_array) =
+    if IntWL.is_empty acc_wl
+    then
+      error, (handler, store_bdu_fixpoint_init_map, dead_rule_array)
+    else
+      (*-----------------------------------------------------------------------*)
+      (*pop the first element (rule_id) in this working list*)
+      let error, (rule_id_op, wl_tl) = IntWL.pop parameter error acc_wl in
+      match rule_id_op with
+      | None ->
+        warn parameter error (Some "888") Exit
+          (handler, store_bdu_fixpoint_init_map, dead_rule_array)
+      | Some rule_id ->
+        (*----------------------------------------------------------------------*)
+        (*output of rule that is enabled*)
+    	let _ =
+          if
+	    local_trace
+	    || (Remanent_parameters.get_dump_reachability_analysis_iteration parameter)
+	    || (Remanent_parameters.get_trace parameter)
+          then
+            (*mapping rule_id of type int -> string*)
+            let error, rule_id_string =
+              try
+                Handler.string_of_rule parameter error handler_kappa
+		  compiled rule_id
+              with
+                _ -> warn parameter error (Some "line 795") Exit
+		  (string_of_int rule_id)
+            in
+	    let () = Loggers.print_newline log in
+            let () = Loggers.fprintf log "\tApplying %s:" rule_id_string in
+	    let () = Loggers.print_newline log in
+	     ()
+        in
+        (*--------------------------------------------------------------------*)
+        let error,
+          (bdu_proj_views, bdu_creation_map, (*bdu_test_map,*) bdu_and_list_potential_map) =
+          collect_map_views_creation_test_potential
+            parameter
+            error
+            rule_id
+            store_proj_bdu_views
+            store_proj_bdu_creation_restriction_map
+            (*store_proj_bdu_test_restriction_map*)
+            store_proj_bdu_potential_restriction_map
+        in
+        (*--------------------------------------------------------------------*)
+        (*is for all bdu_test satisfy a covering_class?*)
+        let error, handler, is_enable =
+          is_enable
+            parameter
+            handler
+            error
+            bdu_false
+            rule_id
+            bdu_proj_views
+            store_bdu_fixpoint_init_map
+        in
+        (*-----------------------------------------------------------------------*)
+        begin
+          if is_enable
+          then
+            (*dead_rule_array:when it is an enable rule set dead_rule_array is true*)
+            let dead_rule_array =
+              dead_rule_array.(rule_id) <- true;
+              dead_rule_array
+            in
+            (*-----------------------------------------------------------------------*)
+            (*output of rule that is enabled*)
+            let _ =
+              if
+		local_trace
+		|| Remanent_parameters.get_trace parameter
+		|| Remanent_parameters.get_dump_reachability_analysis_iteration parameter
+              then
+		let () = Loggers.fprintf log "\t\tthe precondition is satisfied" in
+		let () = Loggers.print_newline log in ()
+            in
+            (*-----------------------------------------------------------------------*)
+            let error, (handler, new_wl, store_new_result) =
+              compute_views_enabled
+                parameter
+                handler
+                error
+                handler_kappa
+                compiled
+		site_correspondence_in_covering_classes
+                bdu_true
+                bdu_false
+		rule_id
+		(*bdu_proj_views*) (*CHECK ME*)
+                bdu_creation_map
+                modif_list_map
+                bdu_and_list_potential_map
+                wl_tl
+                store_covering_classes_modification_update_full
+                bdu_proj_views
+                store_bdu_fixpoint_init_map
+            in
+            aux new_wl (error, handler, store_new_result, dead_rule_array)
+          else
+            (*-----------------------------------------------------------------------*)
+            (*output of rule that is disabled*)
+            let _ =
+              if local_trace
+		 || (Remanent_parameters.get_dump_reachability_analysis_iteration parameter)
+		 || (Remanent_parameters.get_trace parameter)
+              then
+                let () = Loggers.fprintf log "\t\tthe predcondition is not satisfied yet" in
+		let () = Loggers.print_newline log in ()
+            in
+            (*-----------------------------------------------------------------------*)
+            aux wl_tl (error, handler, store_bdu_fixpoint_init_map, dead_rule_array)
+        end
+  in
+  (*start with init_map and union with initial state*)
+  aux wl_init_creation (error, handler, store_bdu_fixpoint_init_map, dead_rule_array)
+
+
+(*let collect_bdu_fixpoint_with_init parameter handler error
     handler_kappa
     compiled
     bdu_true
@@ -1145,7 +1319,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
         end
   in
   (*start with init_map and union with initial state*)
-  aux wl_init_creation (error, handler, store_bdu_fixpoint_init_map, dead_rule_array)
+  aux wl_init_creation (error, handler, store_bdu_fixpoint_init_map, dead_rule_array)*)
 
 (************************************************************************************)
 (*final fixpoint iteration*)
@@ -1157,7 +1331,7 @@ let collect_bdu_fixpoint_map parameter handler error
     wl_creation
     store_proj_bdu_creation_restriction_map
     store_proj_modif_list_restriction_map
-    store_proj_bdu_test_restriction_map
+    (*store_proj_bdu_test_restriction_map*)
     store_proj_bdu_potential_restriction_map
     store_bdu_test_restriction_map
     store_proj_bdu_views
@@ -1186,7 +1360,7 @@ let collect_bdu_fixpoint_map parameter handler error
        wl_creation
        store_proj_bdu_creation_restriction_map
        store_proj_modif_list_restriction_map
-       store_proj_bdu_test_restriction_map
+       (*store_proj_bdu_test_restriction_map*)
        store_proj_bdu_potential_restriction_map
        store_bdu_test_restriction_map
        store_proj_bdu_views
