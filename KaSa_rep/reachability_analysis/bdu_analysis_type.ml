@@ -201,7 +201,7 @@ module Map_init_bdu =
 (************************************************************************************)
 (*test*)
 
-module Map_test_bdu =
+(*module Map_test_bdu =
   SetMap.Make (
     struct
       type t = int * int * int * int
@@ -224,10 +224,17 @@ module Map_agent_id_test_bdu =
     end)
 
 module Project2bdu_test =
-  SetMap.Proj2 (Map_test_bdu)(Map_final_test_bdu)(Map_agent_id_test_bdu)
+  SetMap.Proj2 (Map_test_bdu)(Map_final_test_bdu)(Map_agent_id_test_bdu)*)
 
 (************************************************************************************)
-(*TODO:projection for views used in is_enable*)
+(*projection for views test used in is_enable*)
+
+module Map_test_bdu =
+  SetMap.Make (
+    struct
+      type t = int * int * int * int
+      let compare = compare
+    end)
 
 module Map_rule_id_views =
   SetMap.Make
@@ -329,58 +336,32 @@ type bdu_common_static =
 type pre_static =
   {
     store_modification_sites  :
-      (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t; (*remove views static*)
+      (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t; (*views static*)
     store_test_sites :
-      (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t; (*remove views static*)
+      (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t; (*views static*)
     store_test_modification_sites :
-      (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t; (*remove later views static*)
+      (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t; (*views static*)
     (*views that are tested and modificated without agent_id, will be used in
       update function*)
     store_modif_map      : (int list * Site_map_and_set.Set.t) Int2Map_Test_Modif.Map.t;
     store_test_map       : (int list * Site_map_and_set.Set.t) Int2Map_Test_Modif.Map.t;
     store_test_modif_map : (int list * Site_map_and_set.Set.t) Int2Map_Test_Modif.Map.t;
-    (*store_bdu_test_restriction_map:  Mvbdu_wrapper.Mvbdu.mvbdu Map_test_bdu.Map.t; 
-    store_bdu_creation_restriction_map: Mvbdu_wrapper.Mvbdu.mvbdu Map_creation_bdu.Map.t;
-    store_bdu_potential_effect_restriction_map : 
-      (Mvbdu_wrapper.Mvbdu.mvbdu* Mvbdu_wrapper.Mvbdu.hconsed_association_list)*)
   }
 
 (** views static information*)
 type bdu_analysis_static =
   {
     store_covering_classes_id : (int list * int list) Int2Map_CV.Map.t; (*static views*)
-    (* views that are tested and modificated with agent_id*)
-    (*store_modification_sites  :
-      (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t; (*remove views static*)
-    store_test_sites :
-      (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t; (*remove views static*)
-    store_test_modification_sites :
-      (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t; (*remove later views static*)
-    (*views that are tested and modificated without agent_id, will be used in
-      update function*)
-    store_modif_map      : (int list * Site_map_and_set.Set.t) Int2Map_Test_Modif.Map.t;
-    store_test_map       : (int list * Site_map_and_set.Set.t) Int2Map_Test_Modif.Map.t;
-    store_test_modif_map : (int list * Site_map_and_set.Set.t) Int2Map_Test_Modif.Map.t;*)
-    (**********************************************************************************)
-    (*build bdu*)
     (*rewrite/ change type of this function ?*)(*views static*)
     store_remanent_triple: ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;
     store_wl_creation: wl_int; (*remove later*)
-    (*views static for all projections*)
-    (*store_bdu_test_restriction_map:  Mvbdu_wrapper.Mvbdu.mvbdu Map_test_bdu.Map.t; *)
-    (*store_proj_bdu_test_restriction_map:  (*remove this*)
-      Mvbdu_wrapper.Mvbdu.mvbdu Map_agent_id_test_bdu.Map.t Map_final_test_bdu.Map.t;*)
-    (*store_bdu_creation_restriction_map: Mvbdu_wrapper.Mvbdu.mvbdu Map_creation_bdu.Map.t;*)
     store_proj_bdu_creation_restriction_map: 
       Mvbdu_wrapper.Mvbdu.mvbdu Map_agent_type_creation_bdu.Map.t
       Map_final_creation_bdu.Map.t;
-    store_bdu_init_restriction_map: Mvbdu_wrapper.Mvbdu.mvbdu Map_init_bdu.Map.t; (*remove later*)
+    (*remove later*)    
+    store_bdu_init_restriction_map: Mvbdu_wrapper.Mvbdu.mvbdu Map_init_bdu.Map.t;
     store_modif_list_restriction_map: (*projection in the name*)
       Mvbdu_wrapper.Mvbdu.hconsed_association_list Map_modif_list.Map.t;
-    (*potential partner of side effects*)
-    (*store_bdu_potential_effect_restriction_map : 
-      (Mvbdu_wrapper.Mvbdu.mvbdu* Mvbdu_wrapper.Mvbdu.hconsed_association_list)
-      Map_potential_bdu.Map.t;*)
     store_proj_bdu_potential_restriction_map :
       (Mvbdu_wrapper.Mvbdu.mvbdu * Mvbdu_wrapper.Mvbdu.hconsed_association_list)
       Map_agent_type_potential_bdu.Map.t Map_final_potential_bdu.Map.t;
@@ -396,12 +377,6 @@ type bdu_analysis_dynamic =
     store_contact_map_full     : Set_triple.Set.t Int2Map_CM_state.Map.t; (*contact sig*)
     (*syntactic contact map included initial bonds*)
     store_syn_contact_map_full : Set_triple.Set.t Int2Map_CM_Syntactic.Map.t; (*contact sig*)
-    (*store_covering_classes_modification_update : (*update(c)*)
-      (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t; (*dynamic views*)
-    (*update(c) with side effect information*)
-    store_covering_classes_modification_side_effects :
-      (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t; (*dynamic views*)*)
-    (*final update function*)
     store_covering_classes_modification_update_full : (*dynamic views*)
       (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;
   }

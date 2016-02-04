@@ -394,24 +394,6 @@ let print_result_dynamic parameter error handler_kappa compiled result =
         result.store_syn_contact_map_full
   in
   (*------------------------------------------------------------------------------*)
-  (*let _ =
-    print_covering_classes_modification
-      parameter
-      error
-      handler_kappa
-      compiled
-      result.store_covering_classes_modification_update
-  in
-  (*------------------------------------------------------------------------------*)
-  let _ =
-    print_covering_classes_side_effects
-      parameter
-        error
-      handler_kappa
-      compiled
-      result.store_covering_classes_modification_side_effects
-  in*)
-  (*------------------------------------------------------------------------------*)
   let _ =
     print_covering_classes_update_full
         parameter

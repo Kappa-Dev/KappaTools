@@ -68,7 +68,7 @@ let print_test_bdu_map parameter error result =
       Mvbdu_wrapper.Mvbdu.print parameter bdu_test
     ) result
 
-let print_proj_test_bdu_map parameter error result =
+(*let print_proj_test_bdu_map parameter error result =
   Map_final_test_bdu.Map.iter
     (fun rule_id map_b ->
       let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "rule_id:%i" rule_id in
@@ -78,7 +78,7 @@ let print_proj_test_bdu_map parameter error result =
 	let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
         Mvbdu_wrapper.Mvbdu.print parameter bdu_test
       ) map_b
-    ) result
+    ) result*)
 
 (************************************************************************************)
 (*creation rule*)

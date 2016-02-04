@@ -213,7 +213,7 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
 
 (*projection with (rule_id), from map (rule_id -> map (agent_id -> bdu)) *)
 (*REMOVE*)
-let collect_proj_bdu_test_restriction_map parameter handler_bdu error
+(*let collect_proj_bdu_test_restriction_map parameter handler_bdu error
     rule_id rule store_remanent_triple
       (*store_bdu_test_restriction_map*) =
   let store_init_bdu_test_restriction_map = Map_test_bdu.Map.empty in
@@ -247,7 +247,7 @@ let collect_proj_bdu_test_restriction_map parameter handler_bdu error
       )
       store_bdu_test_restriction_map
   in
-  (error, handler_bdu), store_result
+  (error, handler_bdu), store_result*)
 
 (************************************************************************************)
 (*creation rules*)

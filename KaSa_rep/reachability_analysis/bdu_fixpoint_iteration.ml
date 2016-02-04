@@ -524,7 +524,6 @@ let collect_bdu_proj_views error rule_id store_proj_bdu_views =
 let collect_map_views_creation_test_potential parameter error rule_id
     store_proj_bdu_views
     store_proj_bdu_creation_restriction_map
-    (*store_proj_bdu_test_restriction_map*)
     store_proj_bdu_potential_restriction_map
     =
   let error, bdu_proj_views =
@@ -539,14 +538,6 @@ let collect_map_views_creation_test_potential parameter error rule_id
     | None -> error, Map_agent_type_creation_bdu.Map.empty
     | Some map -> error, map
   in
-  (*let error, bdu_test_map =
-    match
-      Map_final_test_bdu.Map.find_option rule_id
-        store_proj_bdu_test_restriction_map
-    with
-    | None -> error, Map_agent_id_test_bdu.Map.empty
-    | Some map -> error, map
-  in*)
   let error, bdu_potential_map =
     match Map_final_potential_bdu.Map.find_option rule_id
       store_proj_bdu_potential_restriction_map
@@ -640,7 +631,6 @@ let compute_views_enabled parameter handler error
     bdu_true
     bdu_false
     rule_id
-    (*bdu_test_map*)
     bdu_creation_map
     modif_list_map
     bdu_and_list_potential_map
@@ -705,9 +695,9 @@ let compute_views_enabled parameter handler error
           | error, None -> error, bdu_false
           | error, Some bdu -> error, bdu
         in
-        let error, bdu_test =  (*CHECK ME*)
+        let error, bdu_test =
           match Map_triple_views.Map.find_option
-            (agent_id, agent_type, cv_id) (*bdu_test_map*) bdu_proj_views
+            (agent_id, agent_type, cv_id) bdu_proj_views
           with
           | None -> error, bdu_true
           | Some bdu -> error, bdu
@@ -925,7 +915,6 @@ let collect_bdu_fixpoint_with_init parameter handler error
     store_proj_bdu_creation_restriction_map
     modif_list_map
     store_proj_bdu_potential_restriction_map
-    (*store_bdu_test_restriction_map*)
     store_proj_bdu_views
     store_covering_classes_modification_update_full
     store_bdu_init_restriction_map
@@ -1157,9 +1146,7 @@ let collect_bdu_fixpoint_map parameter handler error
     wl_creation
     store_proj_bdu_creation_restriction_map
     store_proj_modif_list_restriction_map
-    (*store_proj_bdu_test_restriction_map*)
     store_proj_bdu_potential_restriction_map
-    (*store_bdu_test_restriction_map*)
     store_proj_bdu_views
     store_covering_classes_modification_update_full
     store_bdu_init_restriction_map
@@ -1186,9 +1173,7 @@ let collect_bdu_fixpoint_map parameter handler error
        wl_creation
        store_proj_bdu_creation_restriction_map
        store_proj_modif_list_restriction_map
-       (*store_proj_bdu_test_restriction_map*)
        store_proj_bdu_potential_restriction_map
-       (*store_bdu_test_restriction_map*)
        store_proj_bdu_views
        store_covering_classes_modification_update_full
        store_bdu_init_restriction_map
