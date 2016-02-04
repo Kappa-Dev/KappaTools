@@ -272,7 +272,7 @@ struct
 
 
   (** [get_scan_rule_set static] *)
-  let get_scan_rule_set static error covering_classes =
+  let get_scan_rule_set static error =
     let parameter, kappa_handler, compiled = get_common_static static  in
     let error, handler_bdu = Boolean_mvbdu.init_remanent parameter error in
     let error, (handler_bdu, result) =
@@ -282,22 +282,21 @@ struct
         error
         kappa_handler
         compiled
-        covering_classes
         compiled.Cckappa_sig.rules
     in
     error, (handler_bdu, result)
 
-  let get_store_remanent_triple static error covering_classes =
+  let get_store_remanent_triple static error =
     let error, (handler_bdu, result) =
-      get_scan_rule_set static error covering_classes
+      get_scan_rule_set static error 
     in
     error, 
     (handler_bdu,
      result.Bdu_analysis_type.store_bdu_analysis_static.Bdu_analysis_type.store_remanent_triple)
 
-  let get_store_bdu_init_restriction_map static error covering_classes =
+  let get_store_bdu_init_restriction_map static error =
     let error, (handler_bdu, result) =
-      get_scan_rule_set static error covering_classes
+      get_scan_rule_set static error
     in
     error,
     (handler_bdu,
@@ -306,33 +305,33 @@ struct
   (**[get_store_proj_bdu_views] from a result of static information,
      returns a function point to a field that store the static information
      of views after projection*)
-  let get_store_proj_bdu_views static error covering_classes =
+  let get_store_proj_bdu_views static error =
     let error, (handler_bdu, result) =
-      get_scan_rule_set static error covering_classes
+      get_scan_rule_set static error
     in
     error, 
     (handler_bdu, 
      result.Bdu_analysis_type.store_bdu_analysis_static.Bdu_analysis_type.store_proj_bdu_test_restriction)
 
 
-  let get_bdu_proj_views static error covering_classes rule_id =
+  let get_bdu_proj_views static error rule_id =
     let error, (handler_bdu, store_proj_bdu_views) =
-      get_store_proj_bdu_views static error covering_classes
+      get_store_proj_bdu_views static error
     in
     error,
     (handler_bdu, 
      Bdu_fixpoint_iteration.collect_bdu_proj_views error rule_id store_proj_bdu_views)
 
-  let get_store_bdu_fixpoint_init_map static dynamic error bdu_false covering_classes =
+  let get_store_bdu_fixpoint_init_map static dynamic error bdu_false =
     let error, (handler_bdu, result) =
-      get_scan_rule_set static error covering_classes
+      get_scan_rule_set static error
     in
     let parameter, kappa_handler, _ = get_common_static static in
     let error, (handler_bdu, site_corresponce_in_covering_classes) =
-      get_store_remanent_triple static error covering_classes
+      get_store_remanent_triple static error
     in
     let error, (handler_bdu, store_bdu_init_restriction_map) =
-      get_store_bdu_init_restriction_map static error covering_classes
+      get_store_bdu_init_restriction_map static error
     in
     let error, bool, handler_bdu, store_bdu_fixpoint_init_map =
       Bdu_fixpoint_iteration.store_bdu_fixpoint_init_map

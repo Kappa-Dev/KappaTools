@@ -356,6 +356,7 @@ type pre_static =
 
 type bdu_analysis_static =
   {
+    store_covering_classes : Covering_classes_type.remanent Covering_classes_type.AgentMap.t;
     store_covering_classes_id : (int list * int list) Int2Map_CV.Map.t; (*static views*)
     (*rewrite/ change type of this function ?*)(*views static*)
     store_remanent_triple: ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;

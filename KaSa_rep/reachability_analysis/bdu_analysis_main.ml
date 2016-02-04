@@ -135,16 +135,23 @@ let scan_rule_pre_static parameter error rule_id rule handler_bdu store_result =
 
 (************************************************************************************)
 
-let scan_rule_static parameter error handler_bdu rule_id rule covering_classes
-    store_potential_side_effects
-    compil store_result =
+let scan_rule_static parameter error handler_kappa handler_bdu rule_id rule
+    store_potential_side_effects compil store_result =
+  (*------------------------------------------------------------------------------*)
+  let error, store_covering_classes =
+    Covering_classes_main.covering_classes
+      parameter
+      error
+      handler_kappa
+      compil
+  in
   (*------------------------------------------------------------------------------*)
   (*static information of covering classes: from sites -> covering_class id list*)
   let error, store_covering_classes_id =
     Bdu_modification_sites.site_covering_classes
       parameter
       error
-      covering_classes
+      store_covering_classes
   in
   (*-------------------------------------------------------------------------------*)
   let error, store_remanent_triple =
@@ -152,7 +159,7 @@ let scan_rule_static parameter error handler_bdu rule_id rule covering_classes
     Bdu_build.collect_remanent_triple
       parameter
       error
-      covering_classes
+      store_covering_classes
       store_result.store_remanent_triple
   in
   (*------------------------------------------------------------------------------*)
@@ -174,7 +181,6 @@ let scan_rule_static parameter error handler_bdu rule_id rule covering_classes
       rule_id
       rule
       store_remanent_triple
-      (*store_result.store_proj_bdu_creation_restriction_map*)
   in
   (*-------------------------------------------------------------------------------*)
   let error, (handler_bdu, store_bdu_init_restriction_map) =
@@ -220,9 +226,10 @@ let scan_rule_static parameter error handler_bdu rule_id rule covering_classes
   (*-------------------------------------------------------------------------------*)
   error, handler_bdu,
   {
-    store_covering_classes_id     = store_covering_classes_id;
-    store_remanent_triple                   = store_remanent_triple;
-    store_wl_creation                       = store_wl_creation;
+    store_covering_classes = store_covering_classes;
+    store_covering_classes_id = store_covering_classes_id;
+    store_remanent_triple     = store_remanent_triple;
+    store_wl_creation         = store_wl_creation;
     store_proj_bdu_creation_restriction_map = store_proj_bdu_creation_restriction_map;
     store_bdu_init_restriction_map          = store_bdu_init_restriction_map;
     store_modif_list_restriction_map        = store_modif_list_restriction_map;
@@ -236,10 +243,10 @@ let scan_rule_static parameter error handler_bdu rule_id rule covering_classes
 
 let scan_rule_dynamic parameter error handler rule_id rule compiled
     store_test_modification_map
+    covering_classes
     store_covering_classes_id
     store_side_effects
     store_potential_side_effects
-    covering_classes
     store_result =
   (*------------------------------------------------------------------------------*)
   (*contact map dynamic*)
@@ -285,7 +292,7 @@ let scan_rule_dynamic parameter error handler rule_id rule compiled
 (*rule*)
 
 let scan_rule parameter handler_bdu error handler_kappa rule_id rule compiled 
-    covering_classes store_result =
+    store_result =
   (*-------------------------------------------------------------------------------*)
   let error, store_bdu_common_static =
     scan_rule_common
@@ -311,10 +318,10 @@ let scan_rule parameter handler_bdu error handler_kappa rule_id rule compiled
     scan_rule_static 
       parameter
       error 
+      handler_kappa
       handler_bdu
-      rule_id 
+      rule_id
       rule 
-      covering_classes
       store_bdu_common_static.store_potential_side_effects
       compiled
       store_result.store_bdu_analysis_static
@@ -329,10 +336,10 @@ let scan_rule parameter handler_bdu error handler_kappa rule_id rule compiled
       rule
       compiled
       store_pre_static.store_test_modif_map
+      store_bdu_analysis_static.store_covering_classes
       store_bdu_analysis_static.store_covering_classes_id
       store_bdu_common_static.store_side_effects
       store_bdu_common_static.store_potential_side_effects
-      covering_classes
       store_result.store_bdu_analysis_dynamic
   in
   error, (handler_bdu, 
@@ -380,8 +387,10 @@ let init_pre_static =
 (**initial of static views information*)
 
 let init_bdu_analysis_static parameter error =
+  let error, init_covering_classes =
+    Covering_classes_type.AgentMap.create parameter error 0 
+  in
   let init_covering_classes_id = Int2Map_CV.Map.empty in
-  (*init bdu*)
   let error, init_remanent_triple            = AgentMap.create parameter error 0 in
   let init_wl_creation                       = IntWL.empty in
   let init_proj_bdu_creation_restriction_map = Map_final_creation_bdu.Map.empty in
@@ -391,14 +400,14 @@ let init_bdu_analysis_static parameter error =
   let init_proj_bdu_test_restriction           = Map_rule_id_views.Map.empty in
   let init_bdu_analysis_static =
     {
-      store_covering_classes_id     = init_covering_classes_id;
-      (*bdu build*)
-      store_remanent_triple                   = init_remanent_triple;
-      store_wl_creation                       = init_wl_creation;
+      store_covering_classes = init_covering_classes;
+      store_covering_classes_id = init_covering_classes_id;
+      store_remanent_triple     = init_remanent_triple;
+      store_wl_creation         = init_wl_creation;
       store_proj_bdu_creation_restriction_map = init_proj_bdu_creation_restriction_map;
       store_bdu_init_restriction_map          = init_bdu_init_restriction_map;
       store_modif_list_restriction_map        = init_modif_list_restriction_map;
-      store_proj_bdu_potential_restriction_map   = init_proj_bdu_potential_restriction_map;
+      store_proj_bdu_potential_restriction_map = init_proj_bdu_potential_restriction_map;
       store_proj_bdu_test_restriction = init_proj_bdu_test_restriction;
     }
   in
@@ -410,7 +419,7 @@ let init_bdu_analysis_static parameter error =
 let init_bdu_analysis_dynamic parameter error =
   let init_contact_map_full = Int2Map_CM_state.Map.empty in
   let init_syn_contact_map  = Int2Map_CM_Syntactic.Map.empty in
-  let init_cv_modification_full          = Int2Map_CV_Modif.Map.empty in
+  let init_cv_modification_full = Int2Map_CV_Modif.Map.empty in
   let init_bdu_analysis_dynamic =
     {
       store_contact_map_full     = init_contact_map_full;
@@ -423,8 +432,7 @@ let init_bdu_analysis_dynamic parameter error =
 (************************************************************************************)
 (*rules*)
 
-let scan_rule_set parameter handler_bdu error handler_kappa compiled store_covering_classes
-    rules =
+let scan_rule_set parameter handler_bdu error handler_kappa compiled rules =
   let error, init_bdu_analysis_static  = init_bdu_analysis_static parameter error in
   let error, init_bdu_analysis_dynamic = init_bdu_analysis_dynamic parameter error in
   let init_bdu =
@@ -449,7 +457,6 @@ let scan_rule_set parameter handler_bdu error handler_kappa compiled store_cover
             rule_id
             rule.e_rule_c_rule
             compiled
-            store_covering_classes
             store_result
       ) rules (handler_bdu,init_bdu)
   in
@@ -458,7 +465,7 @@ let scan_rule_set parameter handler_bdu error handler_kappa compiled store_cover
 (************************************************************************************)
 (*MAIN*)
 
-let bdu_main parameter error handler_kappa store_covering_classes compiled =
+let bdu_main parameter error handler_kappa compiled =
   let error,handler_bdu = Boolean_mvbdu.init_remanent parameter error in
   let error, (handler_bdu, result) =
     scan_rule_set
@@ -467,7 +474,6 @@ let bdu_main parameter error handler_kappa store_covering_classes compiled =
       error 
       handler_kappa 
       compiled
-      store_covering_classes
       compiled.rules 
   in
   (*-------------------------------------------------------------------------------*)

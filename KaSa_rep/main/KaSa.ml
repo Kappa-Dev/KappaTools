@@ -120,11 +120,11 @@ let main () =
 	then Loggers.fprintf (Remanent_parameters.get_logger parameters_cv) ""
       in
       (*getting covering classes*)
-      let error, covering_classes =
+      (*let error, covering_classes =
         Covering_classes_main.covering_classes parameters_cv error handler c_compil
-       in
+      in*)
        let error, handler_bdu, dep =
-	 Bdu_analysis_main.bdu_main parameters_cv  error handler covering_classes c_compil
+	 Bdu_analysis_main.bdu_main parameters_cv  error handler c_compil
        in error, Some handler_bdu, Some dep
     else
       error, None, None
