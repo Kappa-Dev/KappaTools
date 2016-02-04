@@ -573,6 +573,48 @@ let print_result_common_static parameter error handler_kappa compiled result =
   in
   error
 
+let print_pre_static parameter error handler_kappa compiled result =
+  let _ =
+    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "============================================================";
+    Loggers.print_newline (Remanent_parameters.get_logger parameter);Loggers.fprintf (Remanent_parameters.get_logger parameter) "* BDU Analysis:";
+    Loggers.print_newline (Remanent_parameters.get_logger parameter);
+    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "============================================================";
+    Loggers.print_newline (Remanent_parameters.get_logger parameter);
+    Loggers.print_newline (Remanent_parameters.get_logger parameter);
+    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "** Static information:";
+    Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  in
+
+  let _ =
+    print_modification_sites
+      parameter
+      error
+      handler_kappa
+      compiled
+      result.store_modification_sites
+  in
+  let _ =
+    print_test_sites
+      parameter
+      error
+      handler_kappa
+      compiled
+      result.store_test_sites
+  in
+  let _ =
+    print_test_modification_sites
+      parameter
+      error
+      handler_kappa
+      compiled
+      result.store_test_modification_sites
+  in
+  error
+    
+
 let print_result_static parameter error handler_kappa compiled result =
   let _ =
     Loggers.fprintf (Remanent_parameters.get_logger parameter)
@@ -610,7 +652,7 @@ let print_result_static parameter error handler_kappa compiled result =
       compiled
       result.store_potential_side_effects
   in*)
-  let _ =
+  (*let _ =
     print_modification_sites
       parameter
       error
@@ -633,7 +675,7 @@ let print_result_static parameter error handler_kappa compiled result =
       handler_kappa
       compiled
       result.store_test_modification_sites
-  in
+  in*)
   (*print if one wants to debug*)
   (*let _ =
     print_modification_map

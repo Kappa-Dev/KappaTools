@@ -212,27 +212,42 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
     ) rule.rule_lhs.views  (handler,store_result)
 
 (*projection with (rule_id), from map (rule_id -> map (agent_id -> bdu)) *)
-
-let collect_proj_bdu_test_restriction_map parameter handler error
-    store_bdu_test_restriction_map =
-  let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in
+(*REMOVE*)
+let collect_proj_bdu_test_restriction_map parameter handler_bdu error
+    rule_id rule store_remanent_triple
+      (*store_bdu_test_restriction_map*) =
+  let store_init_bdu_test_restriction_map = Map_test_bdu.Map.empty in
+  let error, (handler_bdu, store_bdu_test_restriction_map) =
+    collect_bdu_test_restriction_map
+      parameter
+      handler_bdu
+      error
+      rule_id
+      rule
+      store_remanent_triple
+      (*store_result of bdu_test_restriction_map init*)
+      store_init_bdu_test_restriction_map
+  in
+  let error, handler_bdu, bdu_true =
+    Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler_bdu error
+  in
   (*do the projection*)
-  let (error, handler), store_result =
+  let (error, handler_bdu), store_result =
     Project2bdu_test.proj2_monadic
       parameter
-      (error, handler)
+      (error, handler_bdu)
       (fun (agent_id, agent_type, rule_id, cv_id) -> rule_id)
       (fun (agent_id, agent_type, rule_id, cv_id) -> agent_id)
       bdu_true (*default value of bdu_test*)
-      (fun parameter (error, handler) bdu bdu' ->
-        let error, handler, bdu_union = Mvbdu_wrapper.Mvbdu.mvbdu_and
-          parameter handler error bdu bdu'
+      (fun parameter (error, handler_bdu) bdu bdu' ->
+        let error, handler_bdu, bdu_union = Mvbdu_wrapper.Mvbdu.mvbdu_and
+          parameter handler_bdu error bdu bdu'
         in
-        (error, handler), bdu_union
+        (error, handler_bdu), bdu_union
       )
       store_bdu_test_restriction_map
   in
-  (error, handler), store_result
+  (error, handler_bdu), store_result
 
 (************************************************************************************)
 (*creation rules*)
@@ -341,25 +356,41 @@ let collect_bdu_creation_restriction_map
 (*projection with rule_id*)
 (*FIXME: return handler*)
 
-let collect_proj_bdu_creation_restriction_map parameter handler error
-    store_bdu_creation_restriction_map =
-  let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in
-  let (error, handler), store_result =
+let collect_proj_bdu_creation_restriction_map parameter handler_bdu error
+    rule_id rule store_remanent_triple 
+    (*store_bdu_creation_restriction_map*) =
+  let store_init_bdu_creation_restriction_map =
+    Map_creation_bdu.Map.empty
+  in
+  let error, (handler_bdu, store_bdu_creation_restriction_map) =
+    collect_bdu_creation_restriction_map
+      parameter
+      handler_bdu
+      error
+      rule_id
+      rule
+      store_remanent_triple
+      store_init_bdu_creation_restriction_map
+  in
+  let error, handler_bdu, bdu_true = 
+    Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler_bdu error 
+  in
+  let (error, handler_bdu), store_result =
     Project2bdu_creation.proj2_monadic
       parameter
-      (error, handler)
+      (error, handler_bdu)
       (fun (agent_type, rule_id, cv_id) -> rule_id)
       (fun (agent_type, rule_id, cv_id) -> agent_type, cv_id)
       bdu_true
-      (fun parameter (error, handler) bdu bdu' ->
-        let error, handler, bdu_union = Mvbdu_wrapper.Mvbdu.mvbdu_and
-          parameter handler error bdu bdu'
+      (fun parameter (error, handler_bdu) bdu bdu' ->
+        let error, handler_bdu, bdu_union = Mvbdu_wrapper.Mvbdu.mvbdu_and
+          parameter handler_bdu error bdu bdu'
         in
-        (error, handler), bdu_union
+        (error, handler_bdu), bdu_union
       )
       store_bdu_creation_restriction_map
   in
-  (error, handler), store_result
+  (error, handler_bdu), store_result
 		    
 (************************************************************************************)
 (*build bdu in the case of initial state. Declare as %init in Kappa*)
@@ -692,7 +723,21 @@ let store_bdu_potential_effect_restriction_map parameter handler error store_rem
 (*projection with rule_id*)
 
 let collect_proj_bdu_potential_restriction_map parameter handler error
-    store_bdu_potential_restriction_map =
+    store_remanent_triple
+    store_potential_side_effects 
+    (*store_bdu_potential_restriction_map*) =
+  let store_init_bdu_potential_restriction_map =
+    Map_potential_bdu.Map.empty
+  in
+  let error, (handler, store_bdu_potential_restriction_map) =
+    store_bdu_potential_effect_restriction_map
+      parameter
+      handler
+      error
+      store_remanent_triple
+      store_potential_side_effects
+      store_init_bdu_potential_restriction_map
+  in
   let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in
   (*an empty hconsed list*)
   let error, handler, empty = 
@@ -712,7 +757,22 @@ let collect_proj_bdu_potential_restriction_map parameter handler error
 (************************************************************************************)
 (*REMOVE: used in is_enable*)
 
-let collect_proj_bdu_test_restriction parameter handler error store_bdu_test_restriction_map =
+let collect_proj_bdu_test_restriction parameter handler error
+    rule_id rule store_remanent_triple 
+    (*store_bdu_test_restriction_map*) =
+  let store_init_bdu_test_restriction_map =
+    Map_test_bdu.Map.empty
+  in
+  let error, (handler, store_bdu_test_restriction_map) =
+    collect_bdu_test_restriction_map
+      parameter
+      handler
+      error
+      rule_id
+      rule
+      store_remanent_triple
+      store_init_bdu_test_restriction_map
+  in
   let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in
   let (error, handler), store_result =
     Project2_bdu_views.proj2_monadic

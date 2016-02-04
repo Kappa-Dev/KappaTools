@@ -170,40 +170,6 @@ agent_type:0:A:site_type:0:x!@list of covering_class_id:
 covering_class_id:0
 agent_type:1:B:site_type:0:x!@list of covering_class_id:
 covering_class_id:0
-------------------------------------------------------------
-Set of rules that may modify a given site (excluding created agents):
-------------------------------------------------------------
-agent_id:0:agent_type:0:A:site_type:0:x!@set of rule_id:
-rule 0: bind
-agent_id:1:agent_type:1:B:site_type:0:x!@set of rule_id:
-rule 0: bind
-agent_id:2:agent_type:1:B:site_type:0:x!@set of rule_id:
-rule 1: remove
-agent_id:3:agent_type:0:A:site_type:0:x!@set of rule_id:
-rule 1: remove
-------------------------------------------------------------
-Set of rules that may test a given site:
-------------------------------------------------------------
-agent_id:0:agent_type:0:A:site_type:0:x!@set of rule_id:
-rule 1: remove
-agent_id:1:agent_type:0:A:site_type:0:x!@set of rule_id:
-rule 1: remove
-agent_id:1:agent_type:1:B:site_type:0:x!@set of rule_id:
-rule 0: bind
-------------------------------------------------------------
-Set of rules that may test and modify a given site (excluding created agents):
-------------------------------------------------------------
-agent_id:0:agent_type:0:A:site_type:0:x!@set of rule_id:
-rule 0: bind
-rule 1: remove
-agent_id:1:agent_type:0:A:site_type:0:x!@set of rule_id:
-rule 1: remove
-agent_id:1:agent_type:1:B:site_type:0:x!@set of rule_id:
-rule 0: bind
-agent_id:2:agent_type:1:B:site_type:0:x!@set of rule_id:
-rule 1: remove
-agent_id:3:agent_type:0:A:site_type:0:x!@set of rule_id:
-rule 1: remove
 	Initial state is empty
 
 	Wake-up rules

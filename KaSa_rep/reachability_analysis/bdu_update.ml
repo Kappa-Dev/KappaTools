@@ -182,8 +182,10 @@ let store_covering_classes_modification_side_effects parameter error
 (*combine update(c) and update(c') of side effects together*)
 
 let store_covering_classes_modification_update_full parameter error
-    store_update_modification
-    store_update_with_side_effects
+    store_test_modification_map
+    store_potential_side_effects
+    store_covering_classes_id
+    covering_classes
     store_result
     =
   let add_link error (agent_type, cv_id) rule_id_set store_result =
@@ -203,6 +205,23 @@ let store_covering_classes_modification_update_full parameter error
         parameter error (agent_type, cv_id) (l, new_set) store_result
     in
     error, result
+  in
+  let error, store_update_modification =
+    store_covering_classes_modification_update
+      parameter
+      error
+      store_test_modification_map
+      store_covering_classes_id
+  in
+  let init_cv_modification_side_effects  = Int2Map_CV_Modif.Map.empty in
+  let error, store_update_with_side_effects =
+    store_covering_classes_modification_side_effects
+      parameter
+      error
+      store_test_modification_map
+      store_potential_side_effects
+      covering_classes
+      init_cv_modification_side_effects
   in
   (*---------------------------------------------------------------------------*)
   (*fold 2 map*)

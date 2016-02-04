@@ -392,40 +392,6 @@ agent_type:0:A:site_type:0:x~@list of covering_class_id:
 covering_class_id:0
 agent_type:0:A:site_type:1:x!@list of covering_class_id:
 covering_class_id:0
-------------------------------------------------------------
-Set of rules that may modify a given site (excluding created agents):
-------------------------------------------------------------
-agent_id:0:agent_type:0:A:site_type:0:x~@set of rule_id:
-rule 4
-agent_id:0:agent_type:0:A:site_type:1:x!@set of rule_id:
-rule 6
-agent_id:1:agent_type:0:A:site_type:1:x!@set of rule_id:
-rule 6
-------------------------------------------------------------
-Set of rules that may test a given site:
-------------------------------------------------------------
-agent_id:0:agent_type:0:A:site_type:0:x~@set of rule_id:
-rule 4
-agent_id:0:agent_type:0:A:site_type:1:x!@set of rule_id:
-rule 6
-agent_id:1:agent_type:0:A:site_type:1:x!@set of rule_id:
-rule 6
-------------------------------------------------------------
-Set of rules that may test and modify a given site (excluding created agents):
-------------------------------------------------------------
-agent_id:0:agent_type:0:A:site_type:0:x~@set of rule_id:
-rule 0
-rule 3
-rule 4
-agent_id:0:agent_type:0:A:site_type:1:x!@set of rule_id:
-rule 1
-rule 2
-rule 3
-rule 4
-rule 6
-agent_id:1:agent_type:0:A:site_type:1:x!@set of rule_id:
-rule 2
-rule 6
 	Initial state is empty
 
 	Wake-up rules

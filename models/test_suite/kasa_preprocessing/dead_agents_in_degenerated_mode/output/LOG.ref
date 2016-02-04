@@ -431,59 +431,21 @@ agent_type:0:A:site_type:0:x~@list of covering_class_id:
 covering_class_id:0
 agent_type:1:B:site_type:0:x~@list of covering_class_id:
 covering_class_id:0
-------------------------------------------------------------
-Set of rules that may modify a given site (excluding created agents):
-------------------------------------------------------------
-agent_id:0:agent_type:0:A:site_type:0:x~@set of rule_id:
-rule 7
-agent_id:0:agent_type:1:B:site_type:0:x~@set of rule_id:
-rule 2
-agent_id:1:agent_type:0:A:site_type:0:x~@set of rule_id:
-rule 9
-agent_id:1:agent_type:1:B:site_type:0:x~@set of rule_id:
-rule 0
-------------------------------------------------------------
-Set of rules that may test a given site:
-------------------------------------------------------------
-agent_id:0:agent_type:0:A:site_type:0:x~@set of rule_id:
-rule 7
-agent_id:0:agent_type:1:B:site_type:0:x~@set of rule_id:
-rule 2
-agent_id:1:agent_type:1:B:site_type:0:x~@set of rule_id:
-rule 0
-------------------------------------------------------------
-Set of rules that may test and modify a given site (excluding created agents):
-------------------------------------------------------------
-agent_id:0:agent_type:0:A:site_type:0:x~@set of rule_id:
-rule 0
-rule 3
-rule 4
-rule 5
-rule 6
-rule 7
-agent_id:0:agent_type:1:B:site_type:0:x~@set of rule_id:
-rule 1
-rule 2
-agent_id:1:agent_type:0:A:site_type:0:x~@set of rule_id:
-rule 8
-rule 9
-agent_id:1:agent_type:1:B:site_type:0:x~@set of rule_id:
-rule 0
 	Views in initial state
 
 
 	INTENSIONAL DESCRIPTION:
 	Id=3
 	 Node(site_type:1<0)
-	  Id=1
+	  Id=0
 	   Leaf False 
 
 	  Id=2
 	   Node(site_type:1<1)
-	    Id=0
+	    Id=1
 	     Leaf True 
 
-	    Id=1
+	    Id=0
 	     Leaf False 
 
 	EXTENSIONAL DESCRIPTION:
@@ -492,15 +454,15 @@ rule 0
 	INTENSIONAL DESCRIPTION:
 	Id=3
 	 Node(site_type:1<0)
-	  Id=1
+	  Id=0
 	   Leaf False 
 
 	  Id=2
 	   Node(site_type:1<1)
-	    Id=0
+	    Id=1
 	     Leaf True 
 
-	    Id=1
+	    Id=0
 	     Leaf False 
 
 	EXTENSIONAL DESCRIPTION:
@@ -515,84 +477,26 @@ rule 0
 
 	Applying rule 0:
 		the precondition is satisfied
-		Updating the views for A(x~)
-		Updating the views for B(x~)
-
-				INTENSIONAL DESCRIPTION:
-				Id=5
-				 Node(site_type:1<1)
-				  Id=1
-				   Leaf False 
-
-				  Id=4
-				   Node(site_type:1<2)
-				    Id=0
-				     Leaf True 
-
-				    Id=1
-				     Leaf False 
-
-				EXTENSIONAL DESCRIPTION:
-				B(x~p)
 
 	Applying rule 3:
 		the precondition is satisfied
-		Updating the views for A(x~)
-
-				INTENSIONAL DESCRIPTION:
-				Id=5
-				 Node(site_type:1<1)
-				  Id=1
-				   Leaf False 
-
-				  Id=4
-				   Node(site_type:1<2)
-				    Id=0
-				     Leaf True 
-
-				    Id=1
-				     Leaf False 
-
-				EXTENSIONAL DESCRIPTION:
-				A(x~p)
 
 	Applying rule 4:
 		the precondition is satisfied
-		Updating the views for A(x~)
 
 	Applying rule 5:
 		the precondition is satisfied
-		Updating the views for A(x~)
 
 	Applying rule 6:
 		the precondition is satisfied
-		Updating the views for A(x~)
 
 	Applying rule 7:
 		the precondition is satisfied
-		Updating the views for A(x~)
 
 	Applying rule 1:
 		the precondition is satisfied
-		Updating the views for B(x~)
 
 	Applying rule 2:
-		the precondition is satisfied
-		Updating the views for B(x~)
-
-	Applying rule 0:
-		the precondition is satisfied
-		Updating the views for A(x~)
-		Updating the views for B(x~)
-
-	Applying rule 3:
-		the precondition is satisfied
-		Updating the views for A(x~)
-
-	Applying rule 8:
-		the precondition is satisfied
-
-	Applying rule 9:
 		the precondition is satisfied
 
 ------------------------------------------------------------
@@ -603,31 +507,31 @@ rule 0
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=6
+Id=3
  Node(site_type:1<0)
-  Id=1
+  Id=0
    Leaf False 
 
-  Id=4
-   Node(site_type:1<2)
-    Id=0
+  Id=2
+   Node(site_type:1<1)
+    Id=1
      Leaf True 
 
-    Id=1
+    Id=0
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=6
+Id=3
  Node(site_type:1<0)
-  Id=1
+  Id=0
    Leaf False 
 
-  Id=4
-   Node(site_type:1<2)
-    Id=0
+  Id=2
+   Node(site_type:1<1)
+    Id=1
      Leaf True 
 
-    Id=1
+    Id=0
      Leaf False 
 
 
@@ -635,32 +539,32 @@ Id=6
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=8
+Id=7
  Node(site_type:0<0)
-  Id=1
+  Id=0
    Leaf False 
 
-  Id=7
-   Node(site_type:0<2)
-    Id=0
+  Id=6
+   Node(site_type:0<1)
+    Id=1
      Leaf True 
 
-    Id=1
+    Id=0
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=8
+Id=7
  Node(site_type:0<0)
-  Id=1
+  Id=0
    Leaf False 
 
-  Id=7
-   Node(site_type:0<2)
-    Id=0
+  Id=6
+   Node(site_type:0<1)
+    Id=1
      Leaf True 
 
-    Id=1
+    Id=0
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
@@ -669,35 +573,35 @@ EXTENSIONAL DESCRIPTION:
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=8
+Id=7
  Node(site_type:0<0)
-  Id=1
+  Id=0
    Leaf False 
 
-  Id=7
-   Node(site_type:0<2)
-    Id=0
+  Id=6
+   Node(site_type:0<1)
+    Id=1
      Leaf True 
 
-    Id=1
+    Id=0
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent A ranges over u and p.
+The internal state of site x in agent A is always u.
 INTENSIONAL DESCRIPTION:
-Id=8
+Id=7
  Node(site_type:0<0)
-  Id=1
+  Id=0
    Leaf False 
 
-  Id=7
-   Node(site_type:0<2)
-    Id=0
+  Id=6
+   Node(site_type:0<1)
+    Id=1
      Leaf True 
 
-    Id=1
+    Id=0
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent B ranges over u and p.
+The internal state of site x in agent B is always u.
 execution finished without any exception

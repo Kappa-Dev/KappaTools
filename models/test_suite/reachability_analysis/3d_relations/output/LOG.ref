@@ -9,22 +9,16 @@ Reachability analysis...
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------
+rule 5 will never be applied.
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-In agent A: 
-	when the internal state of site z is equal to p, then:
-		+ the internal state of site x is always p.
-		+ the internal state of site y is always p.
-	when the internal state of site z is equal to u, then:
-		+ the internal state of site x ranges over u and p.
-		+ the internal state of site y ranges over u and p.
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-The internal state of site z in agent A ranges over u and p.
-The internal state of site y in agent A ranges over u and p.
-The internal state of site x in agent A ranges over u and p.
+The internal state of site z in agent A is always u.
+The internal state of site y in agent A is always u.
+The internal state of site x in agent A is always u.
 execution finished without any exception

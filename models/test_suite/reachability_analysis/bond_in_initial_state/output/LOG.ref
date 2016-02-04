@@ -29,11 +29,10 @@ Reachability analysis...
 		the precondition is satisfied
 
 	Applying rule 2:
-		the predcondition is not satisfied yet
+		the precondition is satisfied
 
 	Applying rule 1:
 		the precondition is satisfied
-		Updating the views for A(x!)
 
 				B(x!free,x~u)
 				(rule 0) should be investigated 
@@ -57,7 +56,6 @@ Reachability analysis...
 
 	Applying rule 1:
 		the precondition is satisfied
-		Updating the views for A(x!)
 
 				B(x!free,x~p)
 				(rule 0) should be investigated 
@@ -67,7 +65,6 @@ Reachability analysis...
 
 	Applying rule 2:
 		the precondition is satisfied
-		Updating the views for B(x!,x~)
 
 	Applying rule 3:
 		the precondition is satisfied
@@ -79,7 +76,6 @@ Reachability analysis...
 
 	Applying rule 1:
 		the precondition is satisfied
-		Updating the views for A(x!)
 
 ------------------------------------------------------------
 * Dead rule :

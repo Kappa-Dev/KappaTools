@@ -224,6 +224,25 @@ let print_proj_bdu_views parameter error result =
 (************************************************************************************)
 (*main print*)
 
+(*let print_bdu_pre_static parameter error result =
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+  let _ =
+    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "------------------------------------------------------------" in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+  let () =
+    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "- Bdu for the valuations of the views that are created (per rule, agent and covering class):" in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+  let () =
+    print_creation_bdu_map
+      parameter
+      error
+      result.store_bdu_creation_restriction_map
+  in
+  error*)
+
 let print_bdu_build parameter error result =
   let _ =
     Loggers.print_newline (Remanent_parameters.get_logger parameter) ;
@@ -298,7 +317,8 @@ let print_bdu_build parameter error result =
       error
       result.store_bdu_test_restriction_map
   in*)
-  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+  (*REMOVE*)
+  (*let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
   let _ =
     Loggers.fprintf (Remanent_parameters.get_logger parameter)
       "------------------------------------------------------------" in
@@ -312,9 +332,9 @@ let print_bdu_build parameter error result =
       parameter
       error
       result.store_proj_bdu_test_restriction_map
-  in
+  in*)
 (*print if one wants to debug*)
-  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+  (*let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
   let _ =
     Loggers.fprintf (Remanent_parameters.get_logger parameter)
       "------------------------------------------------------------" in
@@ -329,7 +349,7 @@ let print_bdu_build parameter error result =
       parameter
       error
       result.store_bdu_creation_restriction_map
-  in
+  in*)
   let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
   let _ =
     Loggers.fprintf (Remanent_parameters.get_logger parameter)

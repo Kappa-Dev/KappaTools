@@ -925,7 +925,7 @@ let collect_bdu_fixpoint_with_init parameter handler error
     store_proj_bdu_creation_restriction_map
     modif_list_map
     store_proj_bdu_potential_restriction_map
-    store_bdu_test_restriction_map
+    (*store_bdu_test_restriction_map*)
     store_proj_bdu_views
     store_covering_classes_modification_update_full
     store_bdu_init_restriction_map
@@ -1159,7 +1159,7 @@ let collect_bdu_fixpoint_map parameter handler error
     store_proj_modif_list_restriction_map
     (*store_proj_bdu_test_restriction_map*)
     store_proj_bdu_potential_restriction_map
-    store_bdu_test_restriction_map
+    (*store_bdu_test_restriction_map*)
     store_proj_bdu_views
     store_covering_classes_modification_update_full
     store_bdu_init_restriction_map
@@ -1188,7 +1188,7 @@ let collect_bdu_fixpoint_map parameter handler error
        store_proj_modif_list_restriction_map
        (*store_proj_bdu_test_restriction_map*)
        store_proj_bdu_potential_restriction_map
-       store_bdu_test_restriction_map
+       (*store_bdu_test_restriction_map*)
        store_proj_bdu_views
        store_covering_classes_modification_update_full
        store_bdu_init_restriction_map

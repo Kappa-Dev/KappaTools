@@ -196,23 +196,6 @@ agent_type:3:D:site_type:0:x~@list of covering_class_id:
 covering_class_id:0
 agent_type:5:F:site_type:0:x~@list of covering_class_id:
 covering_class_id:0
-------------------------------------------------------------
-Set of rules that may modify a given site (excluding created agents):
-------------------------------------------------------------
-agent_id:1:agent_type:3:D:site_type:0:x~@set of rule_id:
-rule 3
-agent_id:1:agent_type:5:F:site_type:0:x~@set of rule_id:
-rule 4
-------------------------------------------------------------
-Set of rules that may test a given site:
-------------------------------------------------------------
-------------------------------------------------------------
-Set of rules that may test and modify a given site (excluding created agents):
-------------------------------------------------------------
-agent_id:1:agent_type:3:D:site_type:0:x~@set of rule_id:
-rule 3
-agent_id:1:agent_type:5:F:site_type:0:x~@set of rule_id:
-rule 4
 	Initial state is empty
 
 	Wake-up rules
@@ -220,59 +203,17 @@ rule 4
 	Applying rule 0:
 		the precondition is satisfied
 
-				INTENSIONAL DESCRIPTION:
-				Id=0
-				 Leaf True 
-
-				EXTENSIONAL DESCRIPTION:
-
 	Applying rule 1:
 		the precondition is satisfied
-		Updating the views for A()
-
-				INTENSIONAL DESCRIPTION:
-				Id=0
-				 Leaf True 
-
-				EXTENSIONAL DESCRIPTION:
 
 	Applying rule 2:
 		the precondition is satisfied
-		Updating the views for B()
-
-				INTENSIONAL DESCRIPTION:
-				Id=0
-				 Leaf True 
-
-				EXTENSIONAL DESCRIPTION:
 
 	Applying rule 3:
 		the precondition is satisfied
-		Updating the views for C()
-
-				INTENSIONAL DESCRIPTION:
-				Id=3
-				 Node(site_type:1<0)
-				  Id=1
-				   Leaf False 
-
-				  Id=2
-				   Node(site_type:1<1)
-				    Id=0
-				     Leaf True 
-
-				    Id=1
-				     Leaf False 
-
-				EXTENSIONAL DESCRIPTION:
-				D(x~u)
 
 	Applying rule 4:
 		the predcondition is not satisfied yet
-
-	Applying rule 3:
-		the precondition is satisfied
-		Updating the views for C()
 
 ------------------------------------------------------------
 * Dead rule :
@@ -282,84 +223,12 @@ rule 4 will never be applied.
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
-agent_type:0:A:cv_id:0
-Id=0
- Leaf True 
-
-agent_type:1:B:cv_id:0
-Id=0
- Leaf True 
-
-agent_type:2:C:cv_id:0
-Id=0
- Leaf True 
-
-agent_type:3:D:cv_id:0
-Id=3
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=0
- Leaf True 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=0
- Leaf True 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=0
- Leaf True 
-
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=5
- Node(site_type:0<0)
-  Id=1
-   Leaf False 
-
-  Id=4
-   Node(site_type:0<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-INTENSIONAL DESCRIPTION:
-Id=5
- Node(site_type:0<0)
-  Id=1
-   Leaf False 
-
-  Id=4
-   Node(site_type:0<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent D is always u.
 execution finished without any exception
