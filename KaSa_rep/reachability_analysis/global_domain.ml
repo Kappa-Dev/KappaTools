@@ -217,6 +217,24 @@ struct
     in
     error, static_information, dynamic_information
       
+  (** get type bdu_analysis_static*)
+  let get_bdu_analysis_static static dynamic error =
+    let error, static_information, dynamic_information =
+      get_scan_rule_set static dynamic error
+    in
+    let result = static_information.domain_static_information in
+    error, result
+
+  (**get type bdu_analysis_dynamic*)
+  let get_bdu_analysis_dynamic static dynamic error =
+    let error, static_information, dynamic_information =
+      get_scan_rule_set static dynamic error
+    in
+    let result = dynamic_information.domain_dynamic_information in
+    error, result
+
+  (**get the result for fixpoint and dead_rule_array*)
+      
   (*let is_enabled' static dynamic error rule_id =
     let parameter = get_parameter static in
     let error, handler_bdu, bdu_false = get_mvbdu_false static dynamic error in
