@@ -969,6 +969,22 @@ returns the roots of observables that are above in the domain*)
 		(aux (succ ty))
        in aux 0
 
+  (* get_all_with_types : Edges.t -> t -> cc -> int -> int *int list *)
+  let get_all_with_types graph inj cc root =
+    let cc_id_in_rule = 1 in
+    match reconstruct graph inj cc_id_in_rule cc root with
+    | None -> []
+    | Some match_nodes_cc_graph ->
+       let rec aux ty =
+	 if ty = Array.length cc.nodes_by_type then []
+	 else List.append
+		(List.map (fun node_id ->
+			   let node = (cc.id, ty, node_id) in
+			   (get (node, cc_id_in_rule) match_nodes_cc_graph,ty))
+			  cc.nodes_by_type.(ty))
+		(aux (succ ty))
+       in aux 0
+
   module Cache =
     struct
       type t = int * point * Renaming.t

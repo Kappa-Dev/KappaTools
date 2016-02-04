@@ -339,7 +339,7 @@ let rev_path l = List.rev_map (fun (x,y) -> (y,x)) l
 let is_valid_path graph l =
   List.for_all (fun (((a,_),s),((a',_),s')) -> link_exists a s a' s' graph) l
 
-(* depth = number of edges between root and node*)
+(* depth = number of edges between root and node *)
 let breadth_first_traversal dist stop_on_find is_interesting sigs links =
   let rec look_each_site (id,ty,path as x) site (stop,don,out,next as acc) =
     if site = 0 then acc else
@@ -383,29 +383,47 @@ let paths_of_interest
   breadth_first_traversal None false is_interesting sigs graph.connect don acc
 			 [] [start_point,start_ty,done_path]
 
+(* nodes_x: agent_id list = int * int list
+   nodes_y: adent_id list = int list *)
 let are_connected ?candidate sigs graph ty_x x y nodes_x nodes_y dist =
   let () = assert (not graph.outdated) in
+  (* look for the closest node in nodes_y *)
   let rec is_in_nodes_y nodes_y z = match nodes_y with
     | [] -> None
     | y::nds -> if z = y then Some () else is_in_nodes_y nds z in
+  let rec prepare_node x ty site acc =
+    if site = 0 then acc else
+      match (LargeArray.get graph.connect x).(pred site) with
+      | None -> prepare_node x ty (pred site) acc
+      | Some ((id',ty'),_) ->
+	 if (List.mem (id',ty') nodes_x) then prepare_node x ty (pred site) acc
+	 else prepare_node x ty (pred site) ((x,ty,[])::acc) in
+  (* breadth first search is called on a list of sites;
+     start the breadth first search with the boundaries of nodes_x,
+     that is all sites that are connected to other nodes in x
+     and with all nodes in nodes_x marked as done *)
+  let rec prepare nodes_x = match nodes_x with
+    | (x,ty)::nds -> prepare_node x ty (Signature.arity sigs ty) (prepare nds)
+    | [] -> [] in
+  let rec done_nodes nodes_x = match nodes_x with
+    | [] -> IntSet.empty
+    | (x,_)::nds -> IntSet.add x (done_nodes nds) in
   match dist with
   | None ->
      (match candidate with
       | Some p when is_valid_path graph p -> Some p
       | (Some _ | None) ->
-	 (match breadth_first_traversal dist
-	     true (fun z -> if z = y then Some () else None)
-	     sigs graph.connect (IntSet.singleton x) [] [] [x,ty_x,[]] with
-	 | [] -> None
-	 | [ _,p ] -> Some p
-	 | _ :: _ -> failwith "Edges.are_they_connected completely broken"))
-  | Some _ ->
-     let rec aux nodes_x = match nodes_x with
-       | x'::nds ->
-	  (match breadth_first_traversal dist true (is_in_nodes_y nodes_y)
-	     sigs graph.connect (IntSet.singleton x') [] [] [x',ty_x,[]] with
-	     [] -> aux nds
+	 (match
+	     breadth_first_traversal dist true
+				     (fun z -> if z = y then Some () else None)
+				     sigs graph.connect (IntSet.singleton x)
+				     [] [] [x,ty_x,[]] with
+	   | [] -> None
 	   | [ _,p ] -> Some p
-	   | _ :: _ -> failwith "Edges.are_they_connected completely broken")
-       | [] -> None in
-     aux nodes_x
+	   | _ :: _ -> failwith "Edges.are_they_connected completely broken"))
+  | Some _ ->
+     match breadth_first_traversal dist true (is_in_nodes_y nodes_y) sigs
+				   graph.connect (done_nodes nodes_x) [] [] (prepare nodes_x)
+     with [] -> None
+	| [ _,p ] -> Some p
+	| _ :: _ -> failwith "Edges.are_they_connected completely broken"
