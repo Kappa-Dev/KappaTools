@@ -305,56 +305,6 @@ Reachability analysis static information ....
 ============================================================
 
 ** Static information:
-
-------------------------------------------------------------
-Mapping between sites and the covering classes they belong to:
-------------------------------------------------------------
-agent_type:0:A:site_type:0:x!@list of covering_class_id:
-covering_class_id:1
-agent_type:0:A:site_type:1:y!@list of covering_class_id:
-covering_class_id:0
-agent_type:1:B:site_type:0:x!@list of covering_class_id:
-covering_class_id:0
-agent_type:2:C:site_type:0:x!@list of covering_class_id:
-covering_class_id:0
-------------------------------------------------------------
-Sites that may/must occurs side-effects:
-------------------------------------------------------------
-agent_type:0:A:site_type:0:x!@list of pair (rule_id, binding state):
-(rule 1: r1 * state:1:(1@0))
-(rule 0: r0 * state:1:(1@0))
-agent_type:1:B:site_type:0:x!@list of pair (rule_id, binding state):
-(rule 1: r1 * state:1:(0@0))
-agent_type:0:A:site_type:0:x!@list of pair (rule_id, binding state):
-(rule 3: r3 * state:no_information)
-agent_type:0:A:site_type:1:y!@list of pair (rule_id, binding state):
-(rule 2: r2 * state:no_information)
-(rule 0: r0 * state:no_information)
-------------------------------------------------------------
-Sites that may/must occurs in the potential partner side-effects:
-------------------------------------------------------------
-- Potential partner has site that is free:
-agent_type:0:A:rule 1: r1@(site, free state)
-(site_type:0:x! * state:0(free))
-agent_type:1:B:rule 0: r0@(site, free state)
-(site_type:0:x! * state:0(free))
-agent_type:1:B:rule 3: r3@(site, free state)
-(site_type:0:x! * state:0(free))
-agent_type:2:C:rule 0: r0@(site, free state)
-(site_type:0:x! * state:0(free))
-agent_type:2:C:rule 2: r2@(site, free state)
-(site_type:0:x! * state:0(free))
-- Potential partner has site that is bind:
-agent_type:0:A:rule 1: r1@(site, binding state)
-(site_type:0:x! * state:1(1@0))
-agent_type:1:B:rule 0: r0@(site, binding state)
-(site_type:0:x! * state:1(0@0))
-agent_type:1:B:rule 3: r3@(site, binding state)
-(site_type:0:x! * state:1(0@0))
-agent_type:2:C:rule 0: r0@(site, binding state)
-(site_type:0:x! * state:1(0@1))
-agent_type:2:C:rule 2: r2@(site, binding state)
-(site_type:0:x! * state:1(0@1))
 ------------------------------------------------------------
 Set of rules that may modify a given site (excluding created agents):
 ------------------------------------------------------------
@@ -395,6 +345,9 @@ agent_id:2:agent_type:1:B:site_type:0:x!@set of rule_id:
 rule 2: r2
 agent_id:2:agent_type:2:C:site_type:0:x!@set of rule_id:
 rule 3: r3
+	Initial state is empty
+
+	Wake-up rules
 
 	Applying rule 2: r2:
 		the predcondition is not satisfied yet

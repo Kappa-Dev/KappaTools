@@ -32,13 +32,14 @@ struct
   (* put here the type of the struct that contains the rest of the
      dynamic information, including the result of the analysis *)
 
-  type fixpoint = Mvbdu_wrapper.Mvbdu.handler *
-    Mvbdu_wrapper.Mvbdu.mvbdu Bdu_analysis_type.Map_bdu_update.Map.t
+  type fixpoint = 
+    Mvbdu_wrapper.Mvbdu.handler *
+      Mvbdu_wrapper.Mvbdu.mvbdu Bdu_analysis_type.Map_bdu_update.Map.t
     
   type dead_rule_array = bool array
 
   type result_of_analysis =
-    Exception.method_handler * fixpoint * dead_rule_array
+    (*Exception.method_handler *) fixpoint * dead_rule_array
       
   type domain_dynamic_information =
     Bdu_analysis_type.bdu_analysis_dynamic * result_of_analysis
@@ -47,6 +48,8 @@ struct
     {
       global_dynamic_information : Analyzer_headers.global_dynamic_information;
       mvbdu_handler              : Mvbdu_wrapper.Mvbdu.handler;
+      (*dead_rule: ;
+      result_fixpoint: ;*)
       domain_dynamic_information : domain_dynamic_information
       }
 
@@ -114,7 +117,7 @@ struct
       handler_bdu, Bdu_analysis_type.Map_bdu_update.Map.empty
     in
     let init_result_of_analysis =
-      error, init_fixpoint, init_dead_rule_array
+      init_fixpoint, init_dead_rule_array
     in
     let error, init_bdu_analysis_dynamic = 
       Bdu_analysis_main.init_bdu_analysis_dynamic parameter error
@@ -164,6 +167,9 @@ struct
   (*----------------------------------------------------------------------*)
   (*Instantiate of functions that store the static and dynamic information
     accordingly from the previous analyzer *)
+
+  (**returns static_information from the previous version*)
+
 
   (*let get_bdu_analysis_static static error rule_id rule covering_classes =
     let parameter, kappa_handler, compiled = get_common_static static in
@@ -306,7 +312,7 @@ struct
     in
     error, 
     (handler_bdu, 
-     result.Bdu_analysis_type.store_bdu_analysis_static.Bdu_analysis_type.store_proj_bdu_views)
+     result.Bdu_analysis_type.store_bdu_analysis_static.Bdu_analysis_type.store_proj_bdu_test_restriction)
 
 
   let get_bdu_proj_views static error covering_classes rule_id =
@@ -371,6 +377,7 @@ struct
     then
     else*)
       
+  (*update by setting handler_bdu*)
   let is_enabled static dynamic error rule_id =
     error, dynamic, None
 

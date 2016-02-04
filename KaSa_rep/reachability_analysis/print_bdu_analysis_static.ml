@@ -534,6 +534,45 @@ let print_test_modification_map parameter error handler_kappa compiled result =
 (************************************************************************************)
 (*main print*)
 
+let print_result_common_static parameter error handler_kappa compiled result =
+  let _ =
+    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "============================================================";
+     Loggers.print_newline (Remanent_parameters.get_logger parameter);Loggers.fprintf (Remanent_parameters.get_logger parameter) "* BDU Analysis:";
+     Loggers.print_newline (Remanent_parameters.get_logger parameter);
+    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "============================================================";
+    Loggers.print_newline (Remanent_parameters.get_logger parameter);
+    Loggers.print_newline (Remanent_parameters.get_logger parameter);
+    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "** Common static information:";
+    Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  in
+  (*let _ =
+    print_covering_classes_id
+      parameter
+      error
+      handler_kappa
+      result.store_covering_classes_id
+  in*)
+  let _ =
+    print_side_effects
+      parameter
+      error
+      handler_kappa
+      compiled
+      result.store_side_effects
+  in
+  let _ =
+    print_potential_side_effects
+      parameter
+      error
+      handler_kappa
+      compiled
+      result.store_potential_side_effects
+  in
+  error
+
 let print_result_static parameter error handler_kappa compiled result =
   let _ =
     Loggers.fprintf (Remanent_parameters.get_logger parameter)
@@ -555,7 +594,7 @@ let print_result_static parameter error handler_kappa compiled result =
       handler_kappa
       result.store_covering_classes_id
   in
-  let _ =
+  (*let _ =
     print_side_effects
       parameter
       error
@@ -570,7 +609,7 @@ let print_result_static parameter error handler_kappa compiled result =
       handler_kappa
       compiled
       result.store_potential_side_effects
-  in
+  in*)
   let _ =
     print_modification_sites
       parameter

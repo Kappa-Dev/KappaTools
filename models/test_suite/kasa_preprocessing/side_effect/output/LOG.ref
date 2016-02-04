@@ -244,40 +244,6 @@ Reachability analysis static information ....
 ============================================================
 
 ** Static information:
-
-------------------------------------------------------------
-Mapping between sites and the covering classes they belong to:
-------------------------------------------------------------
-agent_type:0:A:site_type:0:x!@list of covering_class_id:
-covering_class_id:0
-agent_type:1:B:site_type:0:x!@list of covering_class_id:
-covering_class_id:0
-------------------------------------------------------------
-Sites that may/must occurs side-effects:
-------------------------------------------------------------
-agent_type:0:A:site_type:0:x!@list of pair (rule_id, binding state):
-(rule 1 * state:1:(1@0))
-agent_type:1:B:site_type:0:x!@list of pair (rule_id, binding state):
-(rule 2 * state:1:(0@0))
-agent_type:0:A:site_type:0:x!@list of pair (rule_id, binding state):
-(rule 3 * state:no_information)
-------------------------------------------------------------
-Sites that may/must occurs in the potential partner side-effects:
-------------------------------------------------------------
-- Potential partner has site that is free:
-agent_type:0:A:rule 2@(site, free state)
-(site_type:0:x! * state:0(free))
-agent_type:1:B:rule 1@(site, free state)
-(site_type:0:x! * state:0(free))
-agent_type:1:B:rule 3@(site, free state)
-(site_type:0:x! * state:0(free))
-- Potential partner has site that is bind:
-agent_type:0:A:rule 2@(site, binding state)
-(site_type:0:x! * state:1(1@0))
-agent_type:1:B:rule 1@(site, binding state)
-(site_type:0:x! * state:1(0@0))
-agent_type:1:B:rule 3@(site, binding state)
-(site_type:0:x! * state:1(0@0))
 ------------------------------------------------------------
 Set of rules that may modify a given site (excluding created agents):
 ------------------------------------------------------------
@@ -307,6 +273,9 @@ rule 2
 rule 4
 agent_id:1:agent_type:1:B:site_type:0:x!@set of rule_id:
 rule 0
+	Initial state is empty
+
+	Wake-up rules
 
 ------------------------------------------------------------
 * Dead rule :

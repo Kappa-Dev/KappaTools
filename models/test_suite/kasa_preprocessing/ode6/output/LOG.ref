@@ -437,40 +437,6 @@ Reachability analysis static information ....
 ============================================================
 
 ** Static information:
-
-------------------------------------------------------------
-Mapping between sites and the covering classes they belong to:
-------------------------------------------------------------
-agent_type:0:ab:site_type:0:x!@list of covering_class_id:
-covering_class_id:0
-agent_type:1:Sh:site_type:0:x~@list of covering_class_id:
-covering_class_id:0
-agent_type:1:Sh:site_type:1:x!@list of covering_class_id:
-covering_class_id:0
-agent_type:1:Sh:site_type:2:y!@list of covering_class_id:
-covering_class_id:0
-agent_type:2:R:site_type:0:z!@list of covering_class_id:
-covering_class_id:0
-agent_type:2:R:site_type:1:y!@list of covering_class_id:
-covering_class_id:0
-agent_type:2:R:site_type:2:k!@list of covering_class_id:
-covering_class_id:1
-agent_type:2:R:site_type:3:t!@list of covering_class_id:
-covering_class_id:1
-agent_type:2:R:site_type:4:x!@list of covering_class_id:
-covering_class_id:0
-agent_type:3:E:site_type:0:y!@list of covering_class_id:
-covering_class_id:1
-agent_type:3:E:site_type:1:x!@list of covering_class_id:
-covering_class_id:0
-------------------------------------------------------------
-Sites that may/must occurs side-effects:
-------------------------------------------------------------
-------------------------------------------------------------
-Sites that may/must occurs in the potential partner side-effects:
-------------------------------------------------------------
-- Potential partner has site that is free:
-- Potential partner has site that is bind:
 ------------------------------------------------------------
 Set of rules that may modify a given site (excluding created agents):
 ------------------------------------------------------------
@@ -572,6 +538,9 @@ agent_id:1:agent_type:3:E:site_type:0:y!@set of rule_id:
 rule 3: r3
 agent_id:1:agent_type:3:E:site_type:1:x!@set of rule_id:
 rule 4: r4
+	Initial state is empty
+
+	Wake-up rules
 
 ------------------------------------------------------------
 * Dead rule :

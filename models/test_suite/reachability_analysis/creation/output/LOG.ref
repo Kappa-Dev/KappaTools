@@ -220,28 +220,6 @@ Reachability analysis static information ....
 ============================================================
 
 ** Static information:
-
-------------------------------------------------------------
-Mapping between sites and the covering classes they belong to:
-------------------------------------------------------------
-agent_type:0:A:site_type:0:x~@list of covering_class_id:
-covering_class_id:0
-agent_type:0:A:site_type:1:y~@list of covering_class_id:
-covering_class_id:0
-agent_type:1:D:site_type:0:x~@list of covering_class_id:
-covering_class_id:0
-------------------------------------------------------------
-Sites that may/must occurs side-effects:
-------------------------------------------------------------
-agent_type:0:A:site_type:0:x~@list of pair (rule_id, binding state):
-(rule 3 * state:1:(p))
-agent_type:0:A:site_type:1:y~@list of pair (rule_id, binding state):
-(rule 3 * state:0:(u))
-------------------------------------------------------------
-Sites that may/must occurs in the potential partner side-effects:
-------------------------------------------------------------
-- Potential partner has site that is free:
-- Potential partner has site that is bind:
 ------------------------------------------------------------
 Set of rules that may modify a given site (excluding created agents):
 ------------------------------------------------------------
@@ -279,6 +257,9 @@ agent_id:0:agent_type:1:D:site_type:0:x~@set of rule_id:
 rule 4
 agent_id:1:agent_type:1:D:site_type:0:x~@set of rule_id:
 rule 3
+	Initial state is empty
+
+	Wake-up rules
 
 	Applying rule 0:
 		the precondition is satisfied

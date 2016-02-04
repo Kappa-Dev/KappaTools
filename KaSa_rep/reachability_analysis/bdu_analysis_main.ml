@@ -31,18 +31,9 @@ let warn parameters mh message exn default =
 let trace = false
 
 (************************************************************************************)
-(*static analysis*)
+(*global static information*)
 
-let scan_rule_static parameter error handler_kappa handler_bdu rule_id rule covering_classes
-    compil store_result =
-  (*------------------------------------------------------------------------------*)
-  (*static information of covering classes: from sites -> covering_class id list*)
-  let error, store_covering_classes_id =
-    Bdu_modification_sites.site_covering_classes
-      parameter
-      error
-      covering_classes
-  in
+let scan_rule_common parameter error handler_kappa rule_id rule covering_classes store_result =
   (*------------------------------------------------------------------------------*)
   (*side effects*)
   let error, store_side_effects =
@@ -66,6 +57,26 @@ let scan_rule_static parameter error handler_kappa handler_bdu rule_id rule cove
       rule.actions.half_break
       rule.actions.remove
       store_result.store_potential_side_effects
+  in
+  error,
+  {
+    (*store_covering_classes_id = store_covering_classes_id;*)
+    store_side_effects = store_side_effects;
+    store_potential_side_effects = store_potential_side_effects
+  }
+
+(************************************************************************************)
+(**static views information*)
+
+let scan_rule_static parameter error handler_bdu rule_id rule covering_classes
+    store_potential_side_effects compil store_result =
+  (*------------------------------------------------------------------------------*)
+  (*static information of covering classes: from sites -> covering_class id list*)
+  let error, store_covering_classes_id =
+    Bdu_modification_sites.site_covering_classes
+      parameter
+      error
+      covering_classes
   in
   (*-------------------------------------------------------------------------------*)
   (*update of the views due to modification with agent_id*)
@@ -219,8 +230,8 @@ let scan_rule_static parameter error handler_kappa handler_bdu rule_id rule cove
       store_bdu_potential_restriction_map
   in
   (*-------------------------------------------------------------------------------*)
-  let (error, handler_bdu), store_proj_bdu_views =
-    Bdu_build.collect_proj_bdu_views
+  let (error, handler_bdu), store_proj_bdu_test_restriction =
+    Bdu_build.collect_proj_bdu_test_restriction
       parameter
       handler_bdu
       error
@@ -230,8 +241,6 @@ let scan_rule_static parameter error handler_kappa handler_bdu rule_id rule cove
   error, handler_bdu,
   {
     store_covering_classes_id     = store_covering_classes_id;
-    store_side_effects            = store_side_effects;
-    store_potential_side_effects  = store_potential_side_effects;
     store_modification_sites      = store_modification_sites;
     store_test_sites              = store_test_sites;
     store_test_modification_sites = store_test_modification_sites;
@@ -248,13 +257,13 @@ let scan_rule_static parameter error handler_kappa handler_bdu rule_id rule cove
     store_bdu_init_restriction_map          = store_bdu_init_restriction_map;
     store_modif_list_restriction_map        = store_modif_list_restriction_map;
     store_bdu_potential_effect_restriction_map = store_bdu_potential_restriction_map;
-    store_proj_bdu_potential_restriction_map   = store_proj_bdu_potential_restriction_map;
-    store_proj_bdu_views                       = store_proj_bdu_views;
+    store_proj_bdu_potential_restriction_map = store_proj_bdu_potential_restriction_map;
+    store_proj_bdu_test_restriction          = store_proj_bdu_test_restriction;
 
   }
 
 (************************************************************************************)
-(*dynamic analysis*)
+(*dynamic views information*)
 
 let scan_rule_dynamic parameter error handler rule_id rule compiled
     store_test_modification_map
@@ -455,15 +464,26 @@ let scan_rule_dynamic parameter error handler rule_id rule compiled
 let scan_rule parameter handler_bdu error handler_kappa rule_id rule compiled 
     covering_classes store_result =
   (*-------------------------------------------------------------------------------*)
+  let error, store_bdu_common_static =
+    scan_rule_common
+      parameter
+      error
+      handler_kappa
+      rule_id
+      rule
+      covering_classes
+      store_result.store_bdu_common_static
+  in
+  (*-------------------------------------------------------------------------------*)
   let error, handler_bdu, store_bdu_analysis_static =
     scan_rule_static 
       parameter
       error 
-      handler_kappa 
-      handler_bdu (*added*)
+      handler_bdu
       rule_id 
       rule 
       covering_classes
+      store_bdu_common_static.store_potential_side_effects
       compiled
       store_result.store_bdu_analysis_static
   in
@@ -478,8 +498,8 @@ let scan_rule parameter handler_bdu error handler_kappa rule_id rule compiled
       compiled
       store_bdu_analysis_static.store_test_modif_map
       store_bdu_analysis_static.store_covering_classes_id
-      store_bdu_analysis_static.store_side_effects
-      store_bdu_analysis_static.store_potential_side_effects
+      store_bdu_common_static.store_side_effects
+      store_bdu_common_static.store_potential_side_effects
       covering_classes
       store_result.store_bdu_analysis_dynamic
   in
@@ -498,20 +518,32 @@ let scan_rule parameter handler_bdu error handler_kappa rule_id rule compiled
   in*)
   error, (handler_bdu, 
   {
+    store_bdu_common_static    = store_bdu_common_static;
     store_bdu_analysis_static  = store_bdu_analysis_static;
     store_bdu_analysis_dynamic = store_bdu_analysis_dynamic;
     (*store_bdu_build            = store_bdu_build;*)
   })
  
 (************************************************************************************)
-(*intitial state of static analysis*)
+(*intitial state of global static information*)
 
-let init_bdu_analysis_static parameter error =
-  let init_covering_classes_id = Int2Map_CV.Map.empty in
+let init_bdu_common_static =
   let init_half_break          = Int2Map_HalfBreak_effect.Map.empty  in
   let init_remove              = Int2Map_Remove_effect.Map.empty  in
   let init_potential_free      = Int2Map_potential_effect.Map.empty in
   let init_potential_bind      = Int2Map_potential_effect.Map.empty in
+  let init_common_static =
+    {
+      store_side_effects            = (init_half_break, init_remove);
+      store_potential_side_effects  = (init_potential_free, init_potential_bind); 
+    }
+  in
+  init_common_static
+
+(**initial of static views information*)
+
+let init_bdu_analysis_static parameter error =
+  let init_covering_classes_id = Int2Map_CV.Map.empty in
   let init_modification        = Int2Map_Modif.Map.empty in
   let init_test                = Int2Map_Modif.Map.empty in
   let init_test_modification   = Int2Map_Modif.Map.empty in
@@ -529,12 +561,10 @@ let init_bdu_analysis_static parameter error =
   let init_modif_list_restriction_map        = Map_modif_list.Map.empty in
   let init_bdu_potential_restriction_map       = Map_potential_bdu.Map.empty in
   let init_proj_bdu_potential_restriction_map  = Map_final_potential_bdu.Map.empty in
-  let init_proj_bdu_views                      = Map_rule_id_views.Map.empty in
+  let init_proj_bdu_test_restriction           = Map_rule_id_views.Map.empty in
   let init_bdu_analysis_static =
     {
       store_covering_classes_id     = init_covering_classes_id;
-      store_side_effects            = (init_half_break, init_remove);
-      store_potential_side_effects  = (init_potential_free, init_potential_bind);      
       store_modification_sites      = init_modification;
       store_test_sites              = init_test;
       store_test_modification_sites = init_test_modification;
@@ -552,7 +582,7 @@ let init_bdu_analysis_static parameter error =
       store_modif_list_restriction_map        = init_modif_list_restriction_map;
       store_bdu_potential_effect_restriction_map = init_bdu_potential_restriction_map;
       store_proj_bdu_potential_restriction_map   = init_proj_bdu_potential_restriction_map;
-      store_proj_bdu_views                       = init_proj_bdu_views;
+      store_proj_bdu_test_restriction = init_proj_bdu_test_restriction;
     }
   in
   error, init_bdu_analysis_static
@@ -618,9 +648,9 @@ let scan_rule_set parameter handler_bdu error handler_kappa compiled store_cover
   let error, init_bdu_analysis_dynamic = init_bdu_analysis_dynamic parameter error in
   let init_bdu =
     {
+      store_bdu_common_static    = init_bdu_common_static;
       store_bdu_analysis_static  = init_bdu_analysis_static;
       store_bdu_analysis_dynamic = init_bdu_analysis_dynamic;
-      (*store_bdu_build            = init_bdu_build;*)
     }
   in
   (*------------------------------------------------------------------------------*)
@@ -683,22 +713,11 @@ let bdu_main parameter error handler_kappa store_covering_classes compiled =
       result.store_bdu_analysis_static.store_wl_creation
       result.store_bdu_analysis_static.store_proj_bdu_creation_restriction_map
       result.store_bdu_analysis_static.store_modif_list_restriction_map
-      (*result.store_bdu_build.store_proj_bdu_test_restriction_map*)
       result.store_bdu_analysis_static.store_proj_bdu_potential_restriction_map
       result.store_bdu_analysis_static.store_bdu_test_restriction_map
-      result.store_bdu_analysis_static.store_proj_bdu_views
+      result.store_bdu_analysis_static.store_proj_bdu_test_restriction
       result.store_bdu_analysis_dynamic.store_covering_classes_modification_update_full
       result.store_bdu_analysis_static.store_bdu_init_restriction_map
-      (*result.store_bdu_build.store_remanent_triple
-      result.store_bdu_build.store_wl_creation
-      result.store_bdu_build.store_proj_bdu_creation_restriction_map
-      result.store_bdu_build.store_modif_list_restriction_map
-      (*result.store_bdu_build.store_proj_bdu_test_restriction_map*)
-      result.store_bdu_build.store_proj_bdu_potential_restriction_map
-      result.store_bdu_build.store_bdu_test_restriction_map
-      result.store_bdu_build.store_proj_bdu_views
-      result.store_bdu_analysis_dynamic.store_covering_classes_modification_update_full
-      result.store_bdu_build.store_bdu_init_restriction_map*)
       init_dead_rule_array
   in
   (*-----------------------------------------------------------------------*)
@@ -715,7 +734,6 @@ let bdu_main parameter error handler_kappa store_covering_classes compiled =
         error 
         handler_kappa
 	result.store_bdu_analysis_static.store_remanent_triple
-	(*result.store_bdu_build.store_remanent_triple*)
 	store_bdu_fixpoint
     else error, handler_bdu
   in

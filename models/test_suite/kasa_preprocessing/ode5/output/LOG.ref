@@ -418,44 +418,6 @@ Reachability analysis static information ....
 ============================================================
 
 ** Static information:
-
-------------------------------------------------------------
-Mapping between sites and the covering classes they belong to:
-------------------------------------------------------------
-agent_type:0:A:site_type:0:x~@list of covering_class_id:
-covering_class_id:2
-agent_type:0:A:site_type:1:y~@list of covering_class_id:
-covering_class_id:1
-agent_type:0:A:site_type:2:x!@list of covering_class_id:
-covering_class_id:0
-covering_class_id:2
-agent_type:0:A:site_type:3:y!@list of covering_class_id:
-covering_class_id:0
-covering_class_id:1
-agent_type:0:A:site_type:4:z!@list of covering_class_id:
-covering_class_id:0
-agent_type:1:B:site_type:0:x!@list of covering_class_id:
-covering_class_id:0
-agent_type:1:B:site_type:1:y!@list of covering_class_id:
-covering_class_id:0
-agent_type:2:C:site_type:0:x!@list of covering_class_id:
-covering_class_id:0
-agent_type:2:C:site_type:1:y!@list of covering_class_id:
-covering_class_id:0
-agent_type:3:D:site_type:0:x!@list of covering_class_id:
-covering_class_id:0
-agent_type:3:D:site_type:1:y!@list of covering_class_id:
-covering_class_id:0
-agent_type:3:D:site_type:2:z!@list of covering_class_id:
-covering_class_id:0
-------------------------------------------------------------
-Sites that may/must occurs side-effects:
-------------------------------------------------------------
-------------------------------------------------------------
-Sites that may/must occurs in the potential partner side-effects:
-------------------------------------------------------------
-- Potential partner has site that is free:
-- Potential partner has site that is bind:
 ------------------------------------------------------------
 Set of rules that may modify a given site (excluding created agents):
 ------------------------------------------------------------
@@ -561,6 +523,9 @@ agent_id:1:agent_type:3:D:site_type:0:x!@set of rule_id:
 rule 2: r2
 agent_id:1:agent_type:3:D:site_type:1:y!@set of rule_id:
 rule 3: r3
+	Initial state is empty
+
+	Wake-up rules
 
 ------------------------------------------------------------
 * Dead rule :

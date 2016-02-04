@@ -384,6 +384,6 @@ let print_bdu_build parameter error result =
       print_proj_bdu_views
 	parameter
 	error
-	result.store_proj_bdu_views
+	result.store_proj_bdu_test_restriction
     in
     error

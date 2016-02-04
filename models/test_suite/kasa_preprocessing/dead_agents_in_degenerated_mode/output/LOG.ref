@@ -423,22 +423,6 @@ Reachability analysis static information ....
 ============================================================
 
 ** Static information:
-
-------------------------------------------------------------
-Mapping between sites and the covering classes they belong to:
-------------------------------------------------------------
-agent_type:0:A:site_type:0:x~@list of covering_class_id:
-covering_class_id:0
-agent_type:1:B:site_type:0:x~@list of covering_class_id:
-covering_class_id:0
-------------------------------------------------------------
-Sites that may/must occurs side-effects:
-------------------------------------------------------------
-------------------------------------------------------------
-Sites that may/must occurs in the potential partner side-effects:
-------------------------------------------------------------
-- Potential partner has site that is free:
-- Potential partner has site that is bind:
 ------------------------------------------------------------
 Set of rules that may modify a given site (excluding created agents):
 ------------------------------------------------------------
@@ -513,6 +497,7 @@ rule 0
 
 	EXTENSIONAL DESCRIPTION:
 	B(x~u)
+	Wake-up rules
 
 	Applying rule 8:
 		the precondition is satisfied
