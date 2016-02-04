@@ -221,6 +221,71 @@ let html_of_flux env counter flux =
 	let () =
 	  Format.fprintf
 	    f "@,.style(\"fill\", function(d) { return color[d.source.index][d.target.index]; })@,.style(\"opacity\", 1);@]@," in
+
+	let () =
+	  Format.fprintf
+	    f "svg.append(\"g\").attr(\"id\", \"values\").selectAll(\".sources\")@," in
+	let () =
+	  Format.fprintf
+	    f ".data(chord.chords).enter().append(\"text\").attr(\"class\",\"sources\")@," in
+	let () =
+	  Format.fprintf
+	    f ".each(function(d) { d.angle = ( d.source.startAngle + d.source.endAngle) / 2; })@," in
+	let () =
+	  Format.fprintf
+	    f ".attr(\"dy\", \".1em\")@," in
+	let () =
+	  Format.fprintf
+	    f ".attr(\"transform\", function(d) {@," in
+        let () =
+	  Format.fprintf
+	    f "return \"rotate(\" + (d.angle * 180 / Math.PI - 90) + \")\"@," in
+        let () =
+	  Format.fprintf
+	    f "+ \"translate(\" + (innerRadius - 10) + \")\"@," in
+        let () =
+	  Format.fprintf
+	    f "+ (d.angle > Math.PI ? \"rotate(180)\" : \"\"); })@," in
+	let () =
+	  Format.fprintf
+	    f ".style(\"text-anchor\", function(d) { return d.angle > Math.PI ? null : \"end\" ; })@," in
+	let () =
+	  Format.fprintf
+	    f ".text(function (d) { return d.source.value;});@," in
+	let () =
+	  Format.fprintf
+	    f "svg.select(\"#values\").selectAll(\".targets\")@," in
+	let () =
+	  Format.fprintf
+	    f ".data(chord.chords).enter()@," in
+	let () =
+	  Format.fprintf
+	    f ".append(\"text\").attr(\"class\",\"targets\")@," in
+	let () =
+	  Format.fprintf
+	    f ".each(function(d) { d.angle = ( d.target.startAngle + d.target.endAngle) / 2; })@," in
+	let () =
+	  Format.fprintf
+	    f ".attr(\"dy\", \".1em\")@," in
+	let () =
+	  Format.fprintf
+	    f ".attr(\"transform\", function(d) {@," in
+        let () =
+	  Format.fprintf
+	    f "return \"rotate(\" + (d.angle * 180 / Math.PI - 90) + \")\"@," in
+        let () =
+	  Format.fprintf
+	    f "+ \"translate(\" + (innerRadius - 10) + \")\"@," in
+        let () =
+	  Format.fprintf
+	    f "+ (d.angle > Math.PI ? \"rotate(180)\" : \"\"); })@," in
+	let () =
+	  Format.fprintf
+	    f ".style(\"text-anchor\", function(d) { return d.angle > Math.PI ? null : \"end\" ; })@," in
+	let () =
+	  Format.fprintf
+	    f ".text(function (d) { return d.target.value;});@," in
+
 	let () =
 	  Format.fprintf
 	    f "var legends = @[svg@,.append(\"g\")@,.selectAll(\"g\")@,.data(chord.groups)" in
