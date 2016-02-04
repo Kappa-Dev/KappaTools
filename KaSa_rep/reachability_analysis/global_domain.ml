@@ -31,26 +31,15 @@ struct
   (*--------------------------------------------------------------------*)
   (* put here the type of the struct that contains the rest of the
      dynamic information, including the result of the analysis *)
-
-  type fixpoint = 
-    Mvbdu_wrapper.Mvbdu.handler *
-      Mvbdu_wrapper.Mvbdu.mvbdu Bdu_analysis_type.Map_bdu_update.Map.t
-    
-  type dead_rule_array = bool array
-
-  type result_of_analysis =
-    (*Exception.method_handler *) fixpoint * dead_rule_array
-      
-  type domain_dynamic_information =
-    Bdu_analysis_type.bdu_analysis_dynamic * result_of_analysis
-
+  
   type dynamic_information =
     {
       global_dynamic_information : Analyzer_headers.global_dynamic_information;
       mvbdu_handler              : Mvbdu_wrapper.Mvbdu.handler;
-      (*dead_rule: ;
-      result_fixpoint: ;*)
-      domain_dynamic_information : domain_dynamic_information
+      dead_rule                  : bool array;
+      fixpoint_result            : Mvbdu_wrapper.Mvbdu.handler * Mvbdu_wrapper.Mvbdu.mvbdu
+        Bdu_analysis_type.Map_bdu_update.Map.t;
+      domain_dynamic_information : Bdu_analysis_type.bdu_analysis_dynamic
       }
 
   (*--------------------------------------------------------------------*)
@@ -58,25 +47,28 @@ struct
       of type static_information. Kappa handler is static and thus it should
       never updated. *)
       
-  let get_compilation_information static = 
-    Analyzer_headers.get_compilation_information static
+  let get_compilation_information global_static =
+    Analyzer_headers.get_compilation_information global_static
 
-  let get_kappa_handler static =
-    let compilation_result = get_compilation_information static in
+  let get_kappa_handler global_static =
+    let compilation_result = get_compilation_information global_static in
     let kappa_handler = compilation_result.Analyzer_headers.kappa_handler in
     kappa_handler
       
-  let get_parameter static = Analyzer_headers.get_parameter static
+  let get_parameter global_static = Analyzer_headers.get_parameter global_static
 
   let get_cc_code compilation_result = compilation_result.Analyzer_headers.cc_code
+
+  let get_bdu_common_static global_static =
+    Analyzer_headers.get_common_static global_static
 
   (**[get_common_static static] returns information about parameter,
      kappa_handler, and compiled*)
 
-  let get_common_static static =
-    let parameter = get_parameter static in
-    let kappa_handler = get_kappa_handler static in
-    let compilation_result = get_compilation_information static in
+  let get_common_static global_static =
+    let parameter = get_parameter global_static in
+    let kappa_handler = get_kappa_handler global_static in
+    let compilation_result = get_compilation_information global_static in
     let compiled = get_cc_code compilation_result in
     parameter, kappa_handler, compiled
 
@@ -89,7 +81,7 @@ struct
 
   let set_mvbdu_handler handler dynamic = 
     {
-      dynamic with mvbdu_handler = handler (*CHECK ME*)
+      dynamic with mvbdu_handler = handler
     }
       
   (*--------------------------------------------------------------------*)
@@ -101,10 +93,15 @@ struct
     let error, init_bdu_analysis_static =
       Bdu_analysis_main.init_bdu_analysis_static parameter error
     in
+    let compilation_result = get_compilation_information static.global_static_information in
+    let error, init_global_static_information, _ =
+      Analyzer_headers.initialize_global_information parameter
+        error compilation_result
+    in
     error,
     {
-      static with
-        domain_static_information = init_bdu_analysis_static
+      global_static_information = init_global_static_information;
+      domain_static_information = init_bdu_analysis_static
     }
 
   let initialize_domain_dynamic_information static dynamic error =
@@ -116,20 +113,16 @@ struct
     let init_fixpoint =
       handler_bdu, Bdu_analysis_type.Map_bdu_update.Map.empty
     in
-    let init_result_of_analysis =
-      init_fixpoint, init_dead_rule_array
-    in
     let error, init_bdu_analysis_dynamic = 
       Bdu_analysis_main.init_bdu_analysis_dynamic parameter error
-    in
-    let init_domain_dynamic_information =
-      init_bdu_analysis_dynamic, init_result_of_analysis
     in
     error,
     {
       dynamic with
-        mvbdu_handler = handler_bdu;
-        domain_dynamic_information = init_domain_dynamic_information;
+        mvbdu_handler   = handler_bdu;
+        dead_rule       = init_dead_rule_array;
+        fixpoint_result = init_fixpoint;
+        domain_dynamic_information = init_bdu_analysis_dynamic
     }
 
   let initialize static dynamic error =
@@ -248,6 +241,13 @@ struct
   (** [add_initial_state static dynamic error state] takes an initial state
       and returns the information of the dynamic and a list of event*)
       
+  (**compute covering classes from static information*)
+  (*let get_covering_classes static error =
+
+    let kappa_handler = get_kappa_handler static in
+    let parameter = get_parameter static in
+    let compil*)
+
   let add_initial_state static dynamic error state =
     error, dynamic, []
 

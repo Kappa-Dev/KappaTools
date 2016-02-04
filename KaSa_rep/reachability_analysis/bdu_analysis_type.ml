@@ -322,15 +322,18 @@ type potential_partner_bind = bind_partner
 
 type wl_int = IntWL.WSetMap.elt list * IntWL.WSetMap.elt list * IntWL.WSetMap.Set.t
 
+(************************************************************************************)
 (*REMARK: rule has no static information*)
 
 (**global static information*)
+
 type bdu_common_static =
   {
-    store_side_effects        : half_break_action * remove_action; 
+    store_side_effects           : half_break_action * remove_action; 
     store_potential_side_effects : potential_partner_free *  potential_partner_bind;
   }
 
+(************************************************************************************)
 (**these types will use in the projection for views *)
 
 type pre_static =
@@ -348,7 +351,9 @@ type pre_static =
     store_test_modif_map : (int list * Site_map_and_set.Set.t) Int2Map_Test_Modif.Map.t;
   }
 
+(************************************************************************************)
 (** views static information*)
+
 type bdu_analysis_static =
   {
     store_covering_classes_id : (int list * int list) Int2Map_CV.Map.t; (*static views*)

@@ -21,7 +21,13 @@ type compilation_result =
 
 type rule_id = int
 
-type global_static_information = compilation_result * Remanent_parameters_sig.parameters
+type global_static_information =
+  {
+    global_compilation_result : compilation_result;
+    global_parameter     : Remanent_parameters_sig.parameters;
+    global_common_static : Bdu_analysis_type.bdu_common_static 
+  }
+(*compilation_result * Remanent_parameters_sig.parameters * Bdu_analysis_type.bdu_common_static*)
 
 type global_dynamic_information = ()
 
@@ -35,12 +41,20 @@ type kasa_state = unit
 type initial_state = Cckappa_sig.enriched_init
 
 let initialize_global_information parameter error compilation =
-  error, (compilation, parameter), ()
-
+  let init_static = Bdu_analysis_main.init_bdu_common_static in
+  error, 
+  {
+    global_compilation_result = compilation;
+    global_parameter     = parameter;
+    global_common_static = init_static
+  }, ()
+    
 let dummy_precondition = (():precondition)
 
-let get_parameter = snd
+let get_parameter static = static.global_parameter
 
-let get_compilation_information = fst
+let get_compilation_information static = static.global_compilation_result
+
+let get_common_static static = static.global_common_static
 
 let get_initial_state _ = []

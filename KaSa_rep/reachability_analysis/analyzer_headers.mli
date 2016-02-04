@@ -32,7 +32,13 @@ type rule_id = int
     domain.*)
 
 type global_static_information =
-  compilation_result * Remanent_parameters_sig.parameters
+  {
+    global_compilation_result : compilation_result;
+    global_parameter : Remanent_parameters_sig.parameters;
+    global_common_static : Bdu_analysis_type.bdu_common_static 
+  }
+
+  (*compilation_result * Remanent_parameters_sig.parameters * Bdu_analysis_type.bdu_common_static*)
 
 type global_dynamic_information = ()
 
@@ -59,5 +65,7 @@ val dummy_precondition: precondition
 val get_parameter: global_static_information -> Remanent_parameters_sig.parameters
 
 val get_compilation_information: global_static_information -> compilation_result
+
+val get_common_static : global_static_information -> Bdu_analysis_type.bdu_common_static
 
 val get_initial_state: global_static_information -> initial_state list
