@@ -844,6 +844,34 @@ Reachability analysis static information ....
 ============================================================
 
 ** Static information:
+
+------------------------------------------------------------
+Mapping between sites and the covering classes they belong to:
+------------------------------------------------------------
+agent_type:0:A:site_type:0:x~@list of covering_class_id:
+covering_class_id:1
+agent_type:0:A:site_type:1:y~@list of covering_class_id:
+covering_class_id:0
+agent_type:0:A:site_type:2:x!@list of covering_class_id:
+covering_class_id:1
+agent_type:0:A:site_type:3:y!@list of covering_class_id:
+covering_class_id:0
+agent_type:1:B:site_type:0:x~@list of covering_class_id:
+covering_class_id:1
+agent_type:1:B:site_type:1:y~@list of covering_class_id:
+covering_class_id:0
+agent_type:1:B:site_type:2:x!@list of covering_class_id:
+covering_class_id:1
+agent_type:1:B:site_type:3:y!@list of covering_class_id:
+covering_class_id:0
+agent_type:2:C:site_type:0:x~@list of covering_class_id:
+covering_class_id:1
+agent_type:2:C:site_type:1:y~@list of covering_class_id:
+covering_class_id:0
+agent_type:2:C:site_type:2:x!@list of covering_class_id:
+covering_class_id:1
+agent_type:2:C:site_type:3:y!@list of covering_class_id:
+covering_class_id:0
 ------------------------------------------------------------
 Set of rules that may modify a given site (excluding created agents):
 ------------------------------------------------------------

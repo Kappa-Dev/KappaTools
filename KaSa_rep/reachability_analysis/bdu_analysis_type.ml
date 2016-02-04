@@ -315,7 +315,7 @@ type potential_partner_bind = bind_partner
 
 type wl_int = IntWL.WSetMap.elt list * IntWL.WSetMap.elt list * IntWL.WSetMap.Set.t
 
-(*rules has no static information*)
+(*REMARK: rule has no static information*)
 
 (**global static information*)
 type bdu_common_static =
@@ -328,7 +328,6 @@ type bdu_common_static =
 type bdu_analysis_static =
   {
     store_covering_classes_id : (int list * int list) Int2Map_CV.Map.t; (*static views*)
-    (*common global static*)
     (* views that are tested and modificated with agent_id*)
     store_modification_sites  :
       (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t; (*remove views static*)
@@ -343,7 +342,7 @@ type bdu_analysis_static =
     store_test_modif_map : (int list * Site_map_and_set.Set.t) Int2Map_Test_Modif.Map.t;
     (**********************************************************************************)
     (*build bdu*)
-    (*rewrite this function ?*)(*views static*)
+    (*rewrite/ change type of this function ?*)(*views static*)
     store_remanent_triple: ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;
     store_wl_creation: wl_int; (*remove later*)
     (*views static for all projections*)
@@ -364,14 +363,13 @@ type bdu_analysis_static =
     store_proj_bdu_potential_restriction_map :
       (Mvbdu_wrapper.Mvbdu.mvbdu * Mvbdu_wrapper.Mvbdu.hconsed_association_list)
       Map_agent_type_potential_bdu.Map.t Map_final_potential_bdu.Map.t;
-    store_proj_bdu_test_restriction : (*change name test_restriction*)
+    store_proj_bdu_test_restriction :
       Mvbdu_wrapper.Mvbdu.mvbdu Map_triple_views.Map.t Map_rule_id_views.Map.t;
   }
 
 (************************************************************************************)
-(*dynamic information*)
-
 (**views dynamic information*)
+
 type bdu_analysis_dynamic =
   {
     store_contact_map_full     : Set_triple.Set.t Int2Map_CM_state.Map.t; (*contact sig*)
@@ -388,37 +386,6 @@ type bdu_analysis_dynamic =
   }
 
 (************************************************************************************)
-(*build covering classes with new indexes*)
-
-(*type bdu_build =
-  {
-    (*rewrite this function ?*)
-    store_remanent_triple: ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;
-
-    store_wl_creation: wl_int; (*common static*)
-    (*common static for all projections*)
-    store_bdu_test_restriction_map:  Mvbdu_wrapper.Mvbdu.mvbdu Map_test_bdu.Map.t;
-    store_proj_bdu_test_restriction_map: 
-      Mvbdu_wrapper.Mvbdu.mvbdu Map_agent_id_test_bdu.Map.t Map_final_test_bdu.Map.t;
-    store_bdu_creation_restriction_map: Mvbdu_wrapper.Mvbdu.mvbdu Map_creation_bdu.Map.t;
-    store_proj_bdu_creation_restriction_map: 
-      Mvbdu_wrapper.Mvbdu.mvbdu Map_agent_type_creation_bdu.Map.t
-      Map_final_creation_bdu.Map.t;
-    store_bdu_init_restriction_map: Mvbdu_wrapper.Mvbdu.mvbdu Map_init_bdu.Map.t;
-    store_modif_list_restriction_map: 
-      Mvbdu_wrapper.Mvbdu.hconsed_association_list Map_modif_list.Map.t;
-    (*potential partner of side effects*)
-    store_bdu_potential_effect_restriction_map : 
-      (Mvbdu_wrapper.Mvbdu.mvbdu* Mvbdu_wrapper.Mvbdu.hconsed_association_list)
-      Map_potential_bdu.Map.t;
-    store_proj_bdu_potential_restriction_map :
-      (Mvbdu_wrapper.Mvbdu.mvbdu * Mvbdu_wrapper.Mvbdu.hconsed_association_list)
-      Map_agent_type_potential_bdu.Map.t Map_final_potential_bdu.Map.t;
-    store_proj_bdu_views :
-      Mvbdu_wrapper.Mvbdu.mvbdu Map_triple_views.Map.t Map_rule_id_views.Map.t;
-  }*)
-
-(************************************************************************************)
 (*main*)
 
 type bdu_analysic =
@@ -426,5 +393,4 @@ type bdu_analysic =
       store_bdu_common_static    : bdu_common_static;
       store_bdu_analysis_static  : bdu_analysis_static;
       store_bdu_analysis_dynamic : bdu_analysis_dynamic;
-      (*store_bdu_build            : bdu_build;*)
     }

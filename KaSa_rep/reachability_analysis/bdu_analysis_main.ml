@@ -33,7 +33,7 @@ let trace = false
 (************************************************************************************)
 (*global static information*)
 
-let scan_rule_common parameter error handler_kappa rule_id rule covering_classes store_result =
+let scan_rule_common parameter error handler_kappa rule_id rule store_result =
   (*------------------------------------------------------------------------------*)
   (*side effects*)
   let error, store_side_effects =
@@ -60,7 +60,6 @@ let scan_rule_common parameter error handler_kappa rule_id rule covering_classes
   in
   error,
   {
-    (*store_covering_classes_id = store_covering_classes_id;*)
     store_side_effects = store_side_effects;
     store_potential_side_effects = store_potential_side_effects
   }
@@ -247,7 +246,6 @@ let scan_rule_static parameter error handler_bdu rule_id rule covering_classes
     store_modif_map               = store_modif_map;
     store_test_map                = store_test_map;
     store_test_modif_map          = store_test_modif_map;
-    (*build bdu*)
     store_remanent_triple                   = store_remanent_triple;
     store_wl_creation                       = store_wl_creation;
     store_bdu_test_restriction_map          = store_bdu_test_restriction_map;
@@ -471,7 +469,6 @@ let scan_rule parameter handler_bdu error handler_kappa rule_id rule compiled
       handler_kappa
       rule_id
       rule
-      covering_classes
       store_result.store_bdu_common_static
   in
   (*-------------------------------------------------------------------------------*)
