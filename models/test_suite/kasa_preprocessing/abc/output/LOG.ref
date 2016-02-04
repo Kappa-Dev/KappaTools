@@ -719,7 +719,6 @@ rule 5: mod x2
 
 	EXTENSIONAL DESCRIPTION:
 	C(x1~u,x2~u,x1!free,x2!free)
-	Wake-up rules
 
 	Applying rule 0: a.b:
 		the precondition is satisfied

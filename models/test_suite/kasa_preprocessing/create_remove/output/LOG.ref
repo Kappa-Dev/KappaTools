@@ -108,9 +108,6 @@ Set of rules that may test a given site:
 ------------------------------------------------------------
 Set of rules that may test and modify a given site (excluding created agents):
 ------------------------------------------------------------
-	Initial state is empty
-
-	Wake-up rules
 
 	Applying rule 0: r0:
 		the predcondition is not satisfied yet

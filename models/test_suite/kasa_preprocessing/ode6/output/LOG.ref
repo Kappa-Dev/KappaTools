@@ -572,9 +572,6 @@ agent_id:1:agent_type:3:E:site_type:0:y!@set of rule_id:
 rule 3: r3
 agent_id:1:agent_type:3:E:site_type:1:x!@set of rule_id:
 rule 4: r4
-	Initial state is empty
-
-	Wake-up rules
 
 ------------------------------------------------------------
 * Dead rule :

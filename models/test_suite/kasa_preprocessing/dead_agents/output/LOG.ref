@@ -577,7 +577,6 @@ rule 0
 
 	EXTENSIONAL DESCRIPTION:
 	B(x~u)
-	Wake-up rules
 
 	Applying rule 8:
 		the predcondition is not satisfied yet

@@ -13,7 +13,6 @@ Reachability analysis...
 	A(x~u)
 
 	B(x!A@x,x~u)
-	Wake-up rules
 	Dealing with A(x!)
 		(rule 0) should be investigated 
 		(rule 1) should be investigated 

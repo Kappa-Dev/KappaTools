@@ -189,9 +189,6 @@ rule 0: veryveryveryveryverylonglonglonglabel
 rule 1: otherotherveryveryveryverylonglabel
 rule 2: "0
 rule 3: \0
-	Initial state is empty
-
-	Wake-up rules
 
 ------------------------------------------------------------
 * Dead rule :

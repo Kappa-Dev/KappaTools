@@ -279,9 +279,6 @@ agent_id:0:agent_type:1:D:site_type:0:x~@set of rule_id:
 rule 4
 agent_id:1:agent_type:1:D:site_type:0:x~@set of rule_id:
 rule 3
-	Initial state is empty
-
-	Wake-up rules
 
 	Applying rule 0:
 		the precondition is satisfied

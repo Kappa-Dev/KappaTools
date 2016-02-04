@@ -543,9 +543,6 @@ rule 6: r6
 agent_id:1:agent_type:2:C:site_type:0:x!@set of rule_id:
 rule 2: r2
 rule 7: r7
-	Initial state is empty
-
-	Wake-up rules
 
 	Applying rule 0: r0:
 		the precondition is satisfied
