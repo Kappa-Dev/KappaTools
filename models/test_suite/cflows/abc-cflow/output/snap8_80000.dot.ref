@@ -1,21 +1,21 @@
 # Snapshot [Event: 80000]
 digraph G{
 subgraph cluster0{
-  counter0 [label = "254 instance(s)", shape=none];
-  node0_0 [label = "A(x,c)", color = "#2bc26f", style=filled];
+  counter0 [label = "746 instance(s)", shape=none];
+  node0_0 [label = "B(x)", color = "#60191f", style=filled];
   node0_0 -> counter0 [style=invis];
+  node0_1 [label = "A(x,c)", color = "#2bc26f", style=filled];
+  node0_1 -> counter0 [style=invis];
+  node0_1 -> node0_0 [taillabel="x", headlabel="x", dir=none];
   }
 subgraph cluster1{
-  counter1 [label = "746 instance(s)", shape=none];
+  counter1 [label = "254 instance(s)", shape=none];
   node1_0 [label = "B(x)", color = "#60191f", style=filled];
   node1_0 -> counter1 [style=invis];
-  node1_1 [label = "A(x,c)", color = "#2bc26f", style=filled];
-  node1_1 -> counter1 [style=invis];
-  node1_1 -> node1_0 [taillabel="x", headlabel="x", dir=none];
   }
 subgraph cluster2{
   counter2 [label = "254 instance(s)", shape=none];
-  node2_0 [label = "B(x)", color = "#60191f", style=filled];
+  node2_0 [label = "A(x,c)", color = "#2bc26f", style=filled];
   node2_0 -> counter2 [style=invis];
   }
 subgraph cluster3{

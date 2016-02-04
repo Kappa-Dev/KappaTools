@@ -20,20 +20,20 @@ type t =
     connect : Edge.t option array LargeArray.t;
     missings : Int2Set.t;
     state : int option array LargeArray.t;
-    sort : IntSet.t array;
+    sort : int option LargeArray.t;
     free_id : int * int list;
   }
 (** (agent,site -> binding_state; missings);
-    agent,site -> internal_state; sort -> agents; free_id
+    agent,site -> internal_state; agent -> sort; free_id
     the free sites are neither in missings nor in linking_destination *)
 
-let empty sigs =
+let empty () =
   {
     outdated = false;
     connect = LargeArray.make 1 [||];
     missings = Int2Set.empty;
     state = LargeArray.make 1 [||];
-    sort = Array.make (Signature.size sigs) IntSet.empty;
+    sort = LargeArray.make 1 None;
     free_id =(0,[]);
   }
 
@@ -49,8 +49,7 @@ let add_agent sigs ty graph =
 				 graph.missings ar in
      let () = LargeArray.set graph.connect h al in
      let () = LargeArray.set graph.state h ai in
-     let () =
-       Array.set graph.sort ty (IntSet.add h (Array.get graph.sort ty)) in
+     let () = LargeArray.set graph.sort h (Some ty) in
      h,
      {
        outdated = false;
@@ -63,22 +62,22 @@ let add_agent sigs ty graph =
   | new_id,[] ->
      let missings' = Tools.recti (fun s a -> Int2Set.add (new_id,s) a)
 				 graph.missings ar in
-     let connect',state' =
+     let connect',state',sort' =
        if LargeArray.length graph.connect = new_id
        then LargeArray.append graph.connect (LargeArray.make new_id [||]),
-	    LargeArray.append graph.state (LargeArray.make new_id [||])
-       else graph.connect,graph.state in
+	    LargeArray.append graph.state (LargeArray.make new_id [||]),
+	    LargeArray.append graph.sort (LargeArray.make new_id None)
+       else graph.connect,graph.state,graph.sort in
      let () = LargeArray.set connect' new_id al in
      let () = LargeArray.set state' new_id ai in
-     let () =
-       Array.set graph.sort ty (IntSet.add new_id (Array.get graph.sort ty)) in
+     let () = LargeArray.set sort' new_id (Some ty) in
      new_id,
      {
        outdated = false;
        connect = connect';
        missings = missings';
        state = state';
-       sort = graph.sort;
+       sort = sort';
        free_id = (succ new_id,[])
      }
 
@@ -126,9 +125,7 @@ let remove_agent (ag,ty) graph =
   let () = graph.outdated <- true in
   let () = LargeArray.set graph.connect ag [||] in
   let () = LargeArray.set graph.state ag [||] in
-  let () =
-    Array.set graph.sort ty (IntSet.remove ag (Array.get graph.sort ty)) in
-
+  let () = LargeArray.set graph.sort ag None in
   {
     outdated = false;
     connect = graph.connect;
@@ -186,7 +183,9 @@ let remove_link ag s ag' s' graph =
 
 let is_agent (ag,ty) graph =
   let () = assert (not graph.outdated) in
-  IntSet.mem ag (Array.get graph.sort ty)
+  match LargeArray.get graph.sort ag with
+  | Some ty' -> let () = assert (ty = ty') in true
+  | None -> false
 let is_free ag s graph =
   let () = assert (not graph.outdated) in
   (LargeArray.get graph.connect ag).(s) = None
@@ -219,12 +218,10 @@ let one_connected_component sigs ty node rsorts graph =
     function
     | [] -> acc,free_id,sorts
     | (ty,node) :: todos ->
-       let nodes_of_type = Array.get sorts ty in
-       let nodes_of_type' = IntSet.remove node nodes_of_type in
-       if nodes_of_type == nodes_of_type' then
-	 build acc free_id dangling sorts todos
-       else
-	 let () = Array.set sorts ty nodes_of_type' in
+       match LargeArray.get sorts node with
+       | None -> build acc free_id dangling sorts todos
+       | Some _ ->
+	 let () = LargeArray.set sorts node None in
 	 let arity = Signature.arity sigs ty in
 	 let ports = Array.make arity Raw_mixture.FREE in
 	 let (free_id',dangling',todos'),ports =
@@ -259,16 +256,16 @@ let build_snapshot sigs graph =
     | (n,y as h)::t ->
        if Raw_mixture.equal x y then (succ n,y)::t
        else h::increment x t in
-  let rec aux ccs sorts ty =
-    if ty = Array.length sorts then ccs
+  let rec aux ccs sorts node =
+    if node = LargeArray.length sorts then ccs
     else
-      match IntSet.choose sorts.(ty) with
-      | None -> aux ccs sorts (succ ty)
-       | Some node ->
-	  let (out,_,sorts') =
-	    one_connected_component sigs ty node sorts graph in
-	  aux (increment out ccs) sorts' ty in
-  aux [] (Array.copy graph.sort) 0
+      match LargeArray.get sorts node with
+      | None -> aux ccs sorts (succ node)
+      | Some ty ->
+	let (out,_,sorts') =
+	  one_connected_component sigs ty node sorts graph in
+	aux (increment out ccs) sorts' (succ node) in
+  aux [] (LargeArray.copy graph.sort) 0
 
 let print sigs f graph =
   Pp.list Pp.space (fun f (i,mix) ->
@@ -304,20 +301,14 @@ let debug_print f graph =
   LargeArray.print
     Pp.empty
     (fun ag f a ->
-     match Tools.array_fold_lefti
-	     (fun ty acc nodes -> match acc with
-			   | None ->
-			      if IntSet.mem ag nodes then Some ty else None
-			   | Some _ as x ->
-			      if IntSet.mem ag nodes then Some (-42) else x)
-	     None graph.sort with
-     | Some ty ->
+      match LargeArray.get graph.sort ag with
+      | Some ty ->
 	Format.fprintf
 	  f "%i:%i(@[%a@])@ " ag ty (print_sites ag) a
-     | None -> if a = [||] then ()
-	       else Format.fprintf
-			  f "%i:NOTYPE(@[%a@])@ " ag (print_sites ag) a
-)
+      | None -> if a = [||] then ()
+	else Format.fprintf
+	  f "%i:NOTYPE(@[%a@])@ " ag (print_sites ag) a
+    )
     f graph.connect
 
 type path = ((agent * int) * (agent * int)) list

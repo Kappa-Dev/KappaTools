@@ -10,12 +10,12 @@ subgraph cluster0{
   }
 subgraph cluster1{
   counter1 [label = "280 instance(s)", shape=none];
-  node1_0 [label = "A(x,c)", color = "#2bc26f", style=filled];
+  node1_0 [label = "B(x)", color = "#60191f", style=filled];
   node1_0 -> counter1 [style=invis];
   }
 subgraph cluster2{
   counter2 [label = "280 instance(s)", shape=none];
-  node2_0 [label = "B(x)", color = "#60191f", style=filled];
+  node2_0 [label = "A(x,c)", color = "#2bc26f", style=filled];
   node2_0 -> counter2 [style=invis];
   }
 subgraph cluster3{
