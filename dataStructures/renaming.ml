@@ -34,23 +34,23 @@ let mem x i = IntMap.mem x i.sigma
 let fold f i = IntMap.fold f i.sigma
 
 let apply i x =
-        let app () = match IntMap.find_option x i.sigma with
-	  | Some x  -> x
-	  | None -> raise Undefined in
-        if not i.is_identity then app ()
-        else
-           if !Parameter.debugModeOn then app () else x
+  if not i.is_identity || !Parameter.debugModeOn then
+    match IntMap.find_option x i.sigma with
+    | Some x -> x
+    | None -> raise Undefined
+ else x
 
-let compose i i' =
-  let sigma,is_id =
-          IntMap.fold (fun x y (out,is_id) ->
-	       if mem y i' then
-                  let z =  apply i' y in
-                  (IntMap.add x z out,is_id && x==z) 
-               else (out,is_id && x==y)
-               ) i.sigma (i.sigma,true)
-  in
-  {sigma=sigma ; is_identity=is_id}
+let compose extensible i i' =
+  if not i.is_identity || extensible || !Parameter.debugModeOn then
+    let sigma,is_id =
+      IntMap.fold (fun x y (out,is_id) ->
+	match IntMap.find_option y i'.sigma with
+	| Some z -> (IntMap.add x z out,is_id && x==z)
+	| None -> (out,is_id && x==y)
+      ) i.sigma (i.sigma,true)
+    in
+    {sigma=sigma ; is_identity=is_id}
+  else i'
 
 let inverse i =
    if i.is_identity then i

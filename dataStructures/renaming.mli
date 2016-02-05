@@ -16,7 +16,7 @@ val cyclic_permutation_from_list : stop_at:int -> int list -> t
 val add : int -> int -> t -> t
 (** @raise Clashing in debug mode *)
 
-val compose : t -> t -> t
+val compose : bool -> t -> t -> t
 (** @raise Undefined *)
 
 val apply : t -> int -> int

@@ -491,7 +491,7 @@ let navigate env nav =
 	    | [] ->  find_good_edge tail
 	    | inj' ->
 	       aux (Tools.list_map_flatten
-		      (fun x -> List.map (Renaming.compose x) inj') s.inj) s.dst t
+		      (fun x -> List.map (Renaming.compose false x) inj') s.inj) s.dst t
        in find_good_edge (get env pt_i).sons
   in aux [Renaming.empty] 0 nav
 
@@ -543,7 +543,7 @@ let remove_ag_cc inj2cc cc_id cc ag_id =
      let cycle =
        Renaming.cyclic_permutation_from_list
 	 ~stop_at:ag_id list in
-     let to_subst = Renaming.compose inj2cc cycle in
+     let to_subst = Renaming.compose true inj2cc cycle in
      let new_nbt =
        Array.mapi (fun i l -> if i = ty then tail else l) cc.nodes_by_type in
      if Renaming.is_identity to_subst then
@@ -736,10 +736,10 @@ let rec complete_domain_with obs_id dst env free_id cc edge inj_dst2cc =
     | [] ->
        [{ dst = dst;
 	  next = Navigation.rename_step inj_cc2found edge;
-	  inj = [Renaming.compose inj_dst2cc inj_cc2found];
+	  inj = [Renaming.compose true inj_dst2cc inj_cc2found];
 	  above_obs = IntSet.singleton obs_id;}]
     | h :: t when h.dst = dst && (h.next = edge) ->
-       {h with inj = (Renaming.compose inj_dst2cc inj_cc2found) :: h.inj} :: t
+       {h with inj = (Renaming.compose true inj_dst2cc inj_cc2found) :: h.inj} :: t
     | h :: t -> h :: new_son inj_cc2found t in
   let known_cc = Env.find env cc in
   match known_cc with
@@ -1023,7 +1023,7 @@ returns the roots of observables that are above in the domain*)
 		 let p' = Env.get domain son.dst in
 		 List.fold_left
 		   (fun remains renaming ->
-		    let rename = Renaming.compose renaming inj' in
+		    let rename = Renaming.compose false renaming inj' in
 		    let next = (son.dst,p',rename) in
 		    if CacheSetMap.Set.mem next cache
 		    then remains
