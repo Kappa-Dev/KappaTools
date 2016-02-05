@@ -58,6 +58,7 @@ let strongCompression = ref false
 let mazCompression = ref false
 let showIntroEvents = ref false
 let time_independent = ref false
+let store_unary_distance = ref false
 
 (*XLS output for the grids during compression*)
 let dump_grid_before_weak_compression = false
@@ -66,6 +67,7 @@ let dump_grid_after_branching_during_weak_compression = false
 let dump_grid_after_branching_during_strong_compression = false
 let xlsweakFileName = "grid_weak_compression"
 let xlsstrongFileName = "grid_strong_compression"
+
 
 (*Computed values*)
 let cpuTime = ref 0.0

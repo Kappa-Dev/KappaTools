@@ -430,7 +430,7 @@ let configurations_of_result result =
 	  in
 	  parse value_list
 	end
-     | "store_unary_distance" -> 
+     | "store_unary_distance" ->
 	(match value_list with
 	| ("true",_)::_ -> Parameter.store_unary_distance := true
 	| ("false",_)::_ -> Parameter.store_unary_distance := false

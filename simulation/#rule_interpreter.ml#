@@ -45,7 +45,7 @@ let print_injections ?sigs pr f roots_of_ccs =
 	    (fun f (cc,roots) ->
 	     Format.fprintf
 	       f "@[# @[%a@] ==>@ @[%a@]@]"
-	       (Connected_component.print ?sigs ~with_id:()) cc
+	       (Connected_component.print ?sigs true) cc
 	       (Pp.set Mods.IntSet.elements Pp.comma pr) roots
 	    )
     ) roots_of_ccs
@@ -602,7 +602,7 @@ let apply_unary_rule
      | None -> None
      | Some (_, dist_opt) -> dist_opt in
   match Edges.are_connected ~candidate (Environment.signatures env)
-			    state.edges root1_ty root1 root2 nodes1 nodes2 
+			    state.edges root1_ty root1 root2 nodes1 nodes2
 			    dist Parameter.store_unary_distance with
   | None -> Corrected state'
   | Some _ when missing_ccs -> Corrected state'

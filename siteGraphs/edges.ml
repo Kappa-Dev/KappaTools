@@ -385,7 +385,8 @@ let paths_of_interest
 
 (* nodes_x: agent_id list = int * int list
    nodes_y: adent_id list = int list *)
-let are_connected ?candidate sigs graph ty_x x y nodes_x nodes_y dist =
+let are_connected 
+      ?candidate sigs graph ty_x x y nodes_x nodes_y dist store_dist =
   let () = assert (not graph.outdated) in
   (* look for the closest node in nodes_y *)
   let rec is_in_nodes_y nodes_y z = match nodes_y with
@@ -409,7 +410,7 @@ let are_connected ?candidate sigs graph ty_x x y nodes_x nodes_y dist =
     | [] -> IntSet.empty
     | (x,_)::nds -> IntSet.add x (done_nodes nds) in
   match dist with
-  | None ->
+  | None when !store_dist ->
      (match candidate with
       | Some p when is_valid_path graph p -> Some p
       | (Some _ | None) ->
@@ -421,7 +422,7 @@ let are_connected ?candidate sigs graph ty_x x y nodes_x nodes_y dist =
 	   | [] -> None
 	   | [ _,p ] -> Some p
 	   | _ :: _ -> failwith "Edges.are_they_connected completely broken"))
-  | Some _ ->
+  | _ ->
      match breadth_first_traversal dist true (is_in_nodes_y nodes_y) sigs
 				   graph.connect (done_nodes nodes_x) [] [] (prepare nodes_x)
      with [] -> None

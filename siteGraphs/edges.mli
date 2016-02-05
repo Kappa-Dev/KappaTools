@@ -53,8 +53,9 @@ val print_path :
   ?sigs:Signature.s -> ?graph:t -> Format.formatter -> path -> unit
 
 val are_connected :
-  ?candidate:path -> Signature.s -> t -> int -> int -> int -> (int * int) list -> int list -> int option -> path option
-(** [are_connected ?candidate sigs graph x_name x y nodes_x nodes_y dist] *)
+  ?candidate:path -> Signature.s -> t -> int -> int -> int -> (int * int) list
+  -> int list -> int option -> bool ref -> path option
+(** [are_connected ?candidate sigs graph x_name x y nodes_x nodes_y dist store_dist] *)
 
 val paths_of_interest : (int -> 'a option) -> Signature.s -> t -> int ->
 			  int -> path -> (('a*int) * path) list
