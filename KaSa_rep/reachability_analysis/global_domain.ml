@@ -111,6 +111,19 @@ module Domain =
         fixpoint_result = result
     }
 
+  let set_handler_domain handler domain dynamic =
+    {
+      dynamic with
+        mvbdu_handler = handler;
+        domain_dynamic_information = domain
+    }
+
+  let set_domain_static domain static =
+    {
+      static with
+        domain_static_information = domain
+    }
+
   (*--------------------------------------------------------------------*)
   (** intialization function of global static & dynamic information of this
       domain*)
@@ -387,84 +400,74 @@ module Domain =
           store_bdu_init_restriction_map
           (error, false, handler, Bdu_analysis_type.Map_bdu_update.Map.empty)
       in
-      let () =
-	if not bool
-           &&
-	     (Bdu_fixpoint_iteration.local_trace
-	      || Remanent_parameters.get_dump_reachability_analysis_diff parameter
-	      || Remanent_parameters.get_trace parameter)
-	then
-          let () =
-	    Loggers.fprintf log "\tInitial state is empty"
-          in
-          let () = Loggers.print_newline log in
-          let () = Loggers.print_newline log in
-          ()
-      in
-      let () =
-	if
-          Bdu_fixpoint_iteration.local_trace
-          || Remanent_parameters.get_trace parameter
-          || Remanent_parameters.get_dump_reachability_analysis_wl parameter
-	then
-          let () = Loggers.fprintf log "\tWake-up rules" in
-          let () = Loggers.print_newline log in
-          ()
-      in
-      error, bool, handler, store_bdu_fixpoint_init_map
-			      
-    (**[get_bdu_false/true] from dynamic*)
-    let get_mvbdu_false global_static dynamic error =
-      let parameter = get_parameter global_static in
-      let handler_bdu = get_mvbdu_handler dynamic in
-      let error, handler_bdu, bdu_false =
-	Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler_bdu error
-      in
-      error,
-      set_mvbdu_handler handler_bdu dynamic,
-      bdu_false
-	
-    (** the initial build for mvbdu_true*)
-    let get_mvbdu_true global_static dynamic error =
-      let parameter = get_parameter global_static in
-      let handler_bdu = get_mvbdu_handler dynamic in
-      let error, handler_bdu, bdu_true =
-	Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler_bdu error
-      in
-      error,
-      set_mvbdu_handler handler_bdu dynamic,
-      bdu_true
-	
-    (** [get_scan_rule_set static] *)
-    let get_scan_rule_set (static: static_information) dynamic error =
-      let parameter, kappa_handler, compiled = 
-	get_common_static static
-      in
-      let error, handler_bdu = Boolean_mvbdu.init_remanent parameter error in
-      let error, (handler_bdu, result) =
-	Bdu_analysis_main.scan_rule_set
-          parameter
-          handler_bdu
-          error
-          kappa_handler
-          compiled
-          compiled.Cckappa_sig.rules
-      in
-      let static_information =
-	{
-          static with
-          domain_static_information = result.Bdu_analysis_type.store_bdu_analysis_static
-	}
-      in
-      let dynamic_information =
-	{
-          dynamic with
-          mvbdu_handler = handler_bdu;
-          domain_dynamic_information = result.Bdu_analysis_type.store_bdu_analysis_dynamic
-
-      }
+       let () =
+      if not bool
+        &&
+	  (Bdu_fixpoint_iteration.local_trace
+	   || Remanent_parameters.get_dump_reachability_analysis_diff parameter
+	   || Remanent_parameters.get_trace parameter)
+      then
+        let () =
+	  Loggers.fprintf log "\tInitial state is empty"
+        in
+        let () = Loggers.print_newline log in
+        let () = Loggers.print_newline log in
+        ()
     in
-    error, static_information, dynamic_information
+    let () =
+      if
+        Bdu_fixpoint_iteration.local_trace
+        || Remanent_parameters.get_trace parameter
+        || Remanent_parameters.get_dump_reachability_analysis_wl parameter
+      then
+        let () = Loggers.fprintf log "\tWake-up rules" in
+        let () = Loggers.print_newline log in
+        ()
+    in
+    error, bool, handler, store_bdu_fixpoint_init_map
+
+  (**[get_bdu_false/true] from dynamic*)
+  let get_mvbdu_false global_static dynamic error =
+    let parameter = get_parameter global_static in
+    let handler_bdu = get_mvbdu_handler dynamic in
+    let error, handler_bdu, bdu_false =
+      Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler_bdu error
+    in
+    error,
+    set_mvbdu_handler handler_bdu dynamic,
+    bdu_false
+
+  (** the initial build for mvbdu_true*)
+  let get_mvbdu_true global_static dynamic error =
+    let parameter = get_parameter global_static in
+    let handler_bdu = get_mvbdu_handler dynamic in
+    let error, handler_bdu, bdu_true =
+      Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler_bdu error
+    in
+    error,
+    set_mvbdu_handler handler_bdu dynamic,
+    bdu_true
+    
+  (** [get_scan_rule_set static] *)
+  let get_scan_rule_set (static: static_information) dynamic error =
+    let parameter, kappa_handler, compiled = 
+      get_common_static static
+    in
+    let error, handler_bdu = Boolean_mvbdu.init_remanent parameter error in
+    let error, (handler_bdu, result) =
+      Bdu_analysis_main.scan_rule_set
+        parameter
+        handler_bdu
+        error
+        kappa_handler
+        compiled
+        compiled.Cckappa_sig.rules
+    in
+    error,
+    set_domain_static result.Bdu_analysis_type.store_bdu_analysis_static static,
+    set_handler_domain
+      handler_bdu 
+      result.Bdu_analysis_type.store_bdu_analysis_dynamic dynamic
       
   (** get type bdu_analysis_static*)
   let get_bdu_analysis_static (static:static_information) dynamic error =
@@ -613,65 +616,46 @@ module Domain =
       (* to be pushed in apply_rule in the rule domain 
     (when we will split the domain concept-wise) *)
       (*let dead_rule_array =                     
-        dead_rule_array.(rule_id) <- true;
-        dead_rule_array       
-      in*) 
-     (* From here: this code should not belong to the function is_enable, 
-        it implements the application of the rule *)
-     (* compute views that is enabled*) 
-      let error, (handler_bdu, new_wl, store_new_result) =
-        Bdu_fixpoint_iteration.compute_views_enabled
-          parameter
-          handler_bdu
-          error
-          bdu_false
-          rule_id
-          proj_bdu_test_restriction
-          fixpoint_result
-      in
-      if is_enable
-      then 
-	let dead_rule_array = dynamic.dead_rule in (* to be pushed in apply_rule in the rule domain (when we will split the domain concept-wise) *)
-	let dead_rule_array =                      (* to be pushed in apply_rule in the rule domain (when we will split the domain concept-wise) *)
-          dead_rule_array.(rule_id) <- true;       (* to be pushed in apply_rule in the rule domain (when we will split the domain concept-wise) *)
-          dead_rule_array                          (* to be pushed in apply_rule in the rule domain (when we will split the domain concept-wise) *)
-	in                                         (* to be pushed in apply_rule in the rule domain (when we will split the domain concept-wise) *)
-	(* From here: this code should not belong to the function is_enable, it implements the application of the rule *)
-	(* compute views that is enabled*) 
-	let error, (handler_bdu, new_wl, store_new_result) =
-          Bdu_fixpoint_iteration.compute_views_enabled
-            parameter
-            handler_bdu
-            error
-            handler_kappa
-            compiled
-            result_static.Bdu_analysis_type.store_remanent_triple
-            bdu_true
-            bdu_false
-            rule_id
-            bdu_creation_map
-            result_static.Bdu_analysis_type.store_modif_list_restriction_map
-            bdu_and_list_potential_map
-            result_static.Bdu_analysis_type.store_wl_creation (*FIXME*)
-            result_dynamic.Bdu_analysis_type.store_covering_classes_modification_update_full
-            proj_bdu_test_restriction
-            fixpoint_result (*FIXME*)
-	in
-	(*store*)
-	let dynamic_information =
-          {
-            dynamic with
-            mvbdu_handler = handler_bdu;
-            dead_rule     = dead_rule_array;
-            fixpoint_result = store_new_result
 
-        }
-      in
+    dead_rule_array.(rule_id) <- true;
+    dead_rule_array       
+    in*) 
+      (* From here: this code should not belong to the function is_enable, 
+    it implements the application of the rule *)
+      (* compute views that is enabled*) 
+    let error, (handler_bdu, new_wl, store_new_result) =
+    Bdu_fixpoint_iteration.compute_views_enabled
+    parameter
+    handler_bdu
+    error
+    handler_kappa
+    compiled
+    result_static.Bdu_analysis_type.store_remanent_triple
+    bdu_true
+    bdu_false
+    rule_id
+    bdu_creation_map
+    result_static.Bdu_analysis_type.store_modif_list_restriction_map
+    bdu_and_list_potential_map
+    result_static.Bdu_analysis_type.store_wl_creation (*FIXME*)
+    result_dynamic.Bdu_analysis_type.store_covering_classes_modification_update_full
+    proj_bdu_test_restriction
+    fixpoint_result (*FIXME*)
+    in
+    (*store*)
+    let dynamic_information =
+    {
+    dynamic with
+    mvbdu_handler = handler_bdu;
+    dead_rule     = dead_rule_array;
+    fixpoint_result = store_new_result
+    }
+    in
       (** To here *)
-      error, dynamic_information, Some () (* precondition is empty for the moment, we will add information when necessary *)
+    error, dynamic_information, Some () (* precondition is empty for the moment, we will add information when necessary *)
     else
-  error, dynamic, None*)
-      
+    error, dynamic, None*)
+        
   (*update by setting handler_bdu*)
   (*let is_enabled static dynamic error rule_id =
     error, dynamic, None*)
