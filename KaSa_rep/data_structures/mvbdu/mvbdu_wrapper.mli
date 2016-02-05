@@ -1,3 +1,5 @@
+(* API of the multi-valued binary decision driagram library *)
+
 module type Mvbdu =
   sig
     type handler = (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.association_list_dic,Boolean_mvbdu.variables_list_dic,bool,int) Memo_sig.handler
