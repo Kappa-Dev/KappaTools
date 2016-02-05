@@ -47,16 +47,21 @@ struct
   (** explain how to extract the handler for kappa expressions from a value
       of type static_information. Kappa handler is static and thus it should
       never updated. *)
-      
-  let get_compilation_information global_static =
-    Analyzer_headers.get_compilation_information global_static
 
-  let get_kappa_handler global_static =
-    let compilation_result = get_compilation_information global_static in
+  let get_global_static_information static =
+    static.global_static_information
+
+  let lift f x = f (get_global_static_information x)
+		   
+  let get_compilation_information static =
+    lift Analyzer_headers.get_compilation_information static
+
+  let get_kappa_handler static =
+    let compilation_result = get_compilation_information static in
     let kappa_handler = compilation_result.Analyzer_headers.kappa_handler in
     kappa_handler
       
-  let get_parameter global_static = Analyzer_headers.get_parameter global_static
+  let get_parameter static = lift Analyzer_headers.get_parameter static
 
   let get_cc_code compilation_result = compilation_result.Analyzer_headers.cc_code
 
@@ -90,11 +95,11 @@ struct
       domain*)
 
   let initialize_domain_static_information (static:static_information) error =
-    let parameter = get_parameter static.global_static_information in
+    let parameter = get_parameter static in
     let error, init_bdu_analysis_static =
       Bdu_analysis_main.init_bdu_analysis_static parameter error
     in
-    let compilation_result = get_compilation_information static.global_static_information in
+    let compilation_result = get_compilation_information static in
     let error, init_global_static_information, _ =
       Analyzer_headers.initialize_global_information parameter
         error compilation_result
@@ -106,8 +111,8 @@ struct
     }
 
   let initialize_domain_dynamic_information static dynamic error =
-    let parameter = get_parameter static.global_static_information in
-    let kappa_handler = get_kappa_handler static.global_static_information in
+    let parameter = get_parameter static in
+    let kappa_handler = get_kappa_handler static in
     let error, handler_bdu = Boolean_mvbdu.init_remanent parameter error in
     let nrules = Handler.nrules parameter error kappa_handler in
     let init_dead_rule_array = Array.make nrules false in
@@ -371,7 +376,9 @@ struct
     let error, handler_bdu, bdu_false =
       Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler_bdu error
     in
-    error, handler_bdu, bdu_false
+    error,
+    set_mvbdu_handler handler_bdu dynamic,
+    bdu_false
 
   (** the initial build for mvbdu_true*)
   let get_mvbdu_true global_static dynamic error =
@@ -380,12 +387,14 @@ struct
     let error, handler_bdu, bdu_true =
       Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler_bdu error
     in
-    error, handler_bdu, bdu_true
+    error,
+    set_mvbdu_handler handler_bdu dynamic,
+    bdu_true
     
   (** [get_scan_rule_set static] *)
   let get_scan_rule_set (static: static_information) dynamic error =
     let parameter, kappa_handler, compiled = 
-      get_common_static static.global_static_information 
+      get_common_static static
     in
     let error, handler_bdu = Boolean_mvbdu.init_remanent parameter error in
     let error, (handler_bdu, result) =
@@ -431,10 +440,10 @@ struct
   (**add initial state of kappa*)
   let add_initial_state (static:static_information) dynamic error init_state =
     let parameter, handler_kappa, _ = 
-      get_common_static static.global_static_information 
+      get_common_static static 
     in
-    let error, handler_bdu, bdu_false = 
-      get_mvbdu_false static.global_static_information dynamic error 
+    let error, dynamic, bdu_false = 
+      get_mvbdu_false static dynamic error 
     in
     (*get store_remanent_triple*)
     let error, result_static =
@@ -443,9 +452,15 @@ struct
     let store_remanent_triple =
       result_static.Bdu_analysis_type.store_remanent_triple
     in
+    let handler_bdu = get_mvbdu_handler dynamic in
     (*NOTE: where should I store bool?*)
     let error, bool, handler_bdu, store_bdu_fixpoint_init_map =
       compute_bdu_fixpoint_init_map
+	(*JF: this function should not call the fixpoint machinery, it should just abstract the chemical species povided in argument, 
+           and store it in the mvbdu map *)
+	(*JF: Here you just need the part of the function, that takes into account one chemical species *)
+	(*JF: moreover, try not to seperate the field of the struct (dynamic and static), pass each of them as a single argument, and return 
+        the updated value of the struct dynamic, it will lighter your core *)
         parameter
         error
         handler_bdu
@@ -465,13 +480,16 @@ struct
       
   let is_enabled (static:static_information) dynamic error rule_id =
     let parameter, handler_kappa, compiled =
-      get_common_static static.global_static_information
+      get_common_static static
     in
-    let error, handler_bdu, bdu_false =
-      get_mvbdu_false static.global_static_information dynamic error 
+    let error, dynamic, bdu_false =
+      get_mvbdu_false static dynamic error 
     in
-    let error, handler_bdu, bdu_true =
-      get_mvbdu_true static.global_static_information dynamic error 
+    let error, dynamic, bdu_true =
+      get_mvbdu_true static dynamic error 
+    in
+    let handler_bdu =
+      get_mvbdu_handler dynamic
     in
     let error, result_static =
       get_bdu_analysis_static static dynamic error
@@ -485,12 +503,12 @@ struct
         parameter
         error
         rule_id
-        result_static.Bdu_analysis_type.store_proj_bdu_test_restriction
-        result_static.Bdu_analysis_type.store_proj_bdu_creation_restriction_map
-        result_static.Bdu_analysis_type.store_proj_bdu_potential_restriction_map
+        result_static.Bdu_analysis_type.store_proj_bdu_test_restriction (* JF: all accesses to the field of the struct should pass by a function get_foo *)
+        result_static.Bdu_analysis_type.store_proj_bdu_creation_restriction_map (* JF: all accesses to the field of the struct should pass by a function get_foo *)
+        result_static.Bdu_analysis_type.store_proj_bdu_potential_restriction_map (* JF: all accesses to the field of the struct should pass by a function get_foo *)
     in
     (*FIXME: get the result of fixpoint in the initial state bdu_X?*)
-    let fixpoint_result = dynamic.fixpoint_result in
+    let fixpoint_result = dynamic.fixpoint_result in (* JF: all accesses to the field of the struct should pass by a function get_foo *)
     let error, handler_bdu, is_enable =
       Bdu_fixpoint_iteration.is_enable
         parameter
@@ -503,12 +521,13 @@ struct
     in
     if is_enable
     then 
-      let dead_rule_array = dynamic.dead_rule in
-      let dead_rule_array =
-        dead_rule_array.(rule_id) <- true;
-        dead_rule_array
-      in
-      (*compute views that is enabled*)
+      let dead_rule_array = dynamic.dead_rule in (* to be pushed in apply_rule in the rule domain (when we will split the domain concept-wise) *)
+      let dead_rule_array =                      (* to be pushed in apply_rule in the rule domain (when we will split the domain concept-wise) *)
+        dead_rule_array.(rule_id) <- true;       (* to be pushed in apply_rule in the rule domain (when we will split the domain concept-wise) *)
+        dead_rule_array                          (* to be pushed in apply_rule in the rule domain (when we will split the domain concept-wise) *)
+      in                                         (* to be pushed in apply_rule in the rule domain (when we will split the domain concept-wise) *)
+     (* From here: this code should not belong to the function is_enable, it implements the application of the rule *)
+     (* compute views that is enabled*) 
       let error, (handler_bdu, new_wl, store_new_result) =
         Bdu_fixpoint_iteration.compute_views_enabled
           parameter
@@ -537,7 +556,8 @@ struct
             fixpoint_result = store_new_result
         }
       in
-      error, dynamic_information, Some rule_id (*FIXME:return Some what?*)
+      (** To here *)
+      error, dynamic_information, Some () (* precondition is empty for the moment, we will add information when necessary *)
     else
       error, dynamic, None
       
