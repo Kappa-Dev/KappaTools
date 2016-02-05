@@ -32,4 +32,6 @@ The machinary to cook stories from an execution trace is in cflow/
 {!modules: Compression_main Utilities Priority}
 
 The code of the static analyser is in KaSa_rep/
+{!modules: Analyzer Analyzer_headers Analyzer_domain_sig Product}
+The library to deal with multi-valued decision diagrams
 {!modules: Mvbdu_wrapper}
