@@ -728,3 +728,153 @@ end
 
 (**A functor that takes a module Analyzer.Analyzer, and implement a
    function: main, export, and print*)
+(*module Analyzer_main =
+  functor (Analyzer_domain:Analyzer.Analyzer) ->
+    struct
+
+      type static_information = Analyzer_domain.static_information
+      type dynamic_information = Analyzer_domain.dynamic_information
+
+
+      let fixpoint static dynamic error init_state =
+        (*-------------------------------------------------*)
+        (*active static information and dynamic information*)
+        let error, static, dynamic =
+         get_scan_rule_set static dynamic error
+        in
+        let error, result_static =
+          get_bdu_analysis_static static dynamic error
+        in
+        let error, result_dynamic =
+          get_bdu_analysis_dynamic static dynamic error
+        in
+        let parameter, handler_kappa, compiled =
+          get_common_static static.global_static_information
+        in
+        let error, handler_bdu, bdu_false =
+          get_mvbdu_false static_information.global_static_information
+            dynamic_information error 
+        in
+        let error, handler_bdu, bdu_true =
+          get_mvbdu_true static_information.global_static_information
+            dynamic_information error 
+        in
+        (*-------------------------------------------------*)
+        (*get initial_state *)
+        let error, dynamic_with_init, _ =
+          add_initial_state static dynamic init_state
+        in
+        let store_bdu_fixpoint_init_map = dynamic_with_init.fixpoint_result in
+        let dead_rule_array = dynamic.dead_rule in
+        (*-------------------------------------------------*)
+        (*build working list*)
+        let error, dynamic_with_working_list, rule_id_op =
+          Analyzer.next_rule static dynamic_with_init error
+        in
+        let working_list = dynamic.rule_working_list in
+        let wl_creation = result_static.store_wl_creation in
+        (*-------------------------------------------------*)
+        (*push init_fixpoint into working list*)
+        let error, working_list_init_creation =
+          Bdu_analysis_type.Map_bdu_update.Map.fold
+            (fun (agent_type, cv_id) _ (error, wl_init_creation) ->
+              Bdu_fixpoint_iteration.add_update_to_wl
+                ~title:"Dealing with"
+                parameter 
+                error
+                handler_kappa
+                compiled
+                result_static.Bdu_analysis_type.store_remanent_triple
+                agent_type
+                cv_id
+                result_dynamic.Bdu_analysis_type.store_covering_classes_modification_update_full
+                wl_init_creation
+            )
+            store_bdu_fixpoint_init_map
+            (error, wl_creation)
+        in
+        let working_list_tail = dynamic_with_working_list.rule_working_list in
+        (*-------------------------------------------------*)
+        (*Loop function*)
+        let rec aux acc_wl (error, dynamic_result) =
+          if Fifo.IntWL.is_empty acc_wl
+          then 
+            error,
+            {
+              dynamic with
+                mvbdu_handler = handler_bdu;
+                fixpoint_result = store_bdu_fixpoint_init_map;
+                dead_rule = dead_rule_array
+            }
+          else
+            match rule_id_op with
+            | Some rule_id ->
+              (*-------------------------------------------------*)
+              (*check if this rule is enable*)
+              let error, dynamic_enable, is_enabled_op =
+                is_enabled static dynamic_with_init error rule_id
+              in
+              (match is_enable_op with
+              | Some true ->
+                let error,
+                  (proj_bdu_test_restriction, bdu_creation_map, bdu_and_list_potential_map) =
+                  Bdu_fixpoint_iteration.collect_map_views_creation_test_potential
+                    parameter
+                    error
+                    rule_id
+                    result_static.Bdu_analysis_type.store_proj_bdu_test_restriction
+                    result_static.Bdu_analysis_type.store_proj_bdu_creation_restriction_map
+                    result_static.Bdu_analysis_type.store_proj_bdu_potential_restriction_map
+                in
+                (*compute views that is enabled*)
+                let error, (handler_bdu, new_wl, store_new_result) =
+                  Bdu_fixpoint_iteration.compute_views_enabled
+                    parameter
+                    handler_bdu
+                    error
+                    handler_kappa
+                    compiled
+                    result_static.Bdu_analysis_type.store_remanent_triple
+                    bdu_true
+                    bdu_false
+                    rule_id
+                    bdu_creation_map
+                    result_static.Bdu_analysis_type.store_modif_list_restriction_map
+                    bdu_and_list_potential_map
+                    working_list_tail
+                    result_dynamic.Bdu_analysis_type.store_covering_classes_modification_update_full
+                    proj_bdu_test_restriction
+                    store_bdu_fixpoint_init_map
+                in
+                aux new_wl (error, 
+                            {
+                              dynamic_information with
+                                fixpoint_result = store_new_result;
+                                mvbdu_handler = handler_bdu
+                                dead_rule = dead_rule_array
+                            })
+
+              | None -> 
+                aux working_list_tail (error, dynamic_result)
+              ) 
+            | None -> Bdu_fixpoint_iteration.warn parameter error (Some "") Exit 
+              {
+                dynamic_information with
+                  mvbdu_handler = handler_bdu;
+                  fixpoint_result = store_bdu_fixpoint_init_map
+                  dead_rule = dead_rule_array
+              }
+        in 
+        aux working_list_init_creation
+          (error, 
+           {
+             dynamic_information with
+               mvbdu_handler = handler_bdu;
+               fixpoint_result = store_bdu_fixpoint_init_map;
+               dead_rule = dead_rule_array
+           })
+
+      let print static dynamic error loggers = error, dynamic, ()
+
+
+    end*)
