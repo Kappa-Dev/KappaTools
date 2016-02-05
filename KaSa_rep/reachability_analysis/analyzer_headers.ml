@@ -55,6 +55,10 @@ let get_parameter static = static.global_parameter
 
 let get_compilation_information static = static.global_compilation_result
 
+let get_kappa_handler static = (get_compilation_information static).kappa_handler
+
+let get_cc_code static = (get_compilation_information static).cc_code
+							     
 let get_common_static static = static.global_common_static
 
 let get_initial_state _ = []

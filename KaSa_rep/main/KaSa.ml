@@ -11,6 +11,10 @@
  * en Automatique.  All rights reserved.  This file is distributed
  * under the terms of the GNU Library General Public License *)
 
+module A = Analyzer.Make
+	     (Product.Product
+		(Global_domain.Domain)
+		(Global_domain.Domain))
 let main () =
   let error = Exception.empty_error_handler in
   let error,parameters,files  = Get_option.get_option error in

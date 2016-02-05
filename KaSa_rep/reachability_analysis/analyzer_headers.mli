@@ -15,11 +15,7 @@
 
 (** type of the argument of the main function *)
 
-type compilation_result =
-  {
-    cc_code       : Cckappa_sig.compil;
-    kappa_handler : Cckappa_sig.kappa_handler
-  }
+type compilation_result
 
 type rule_id = int
 
@@ -31,16 +27,8 @@ type rule_id = int
     information between what is common, and what is specific to each
     domain.*)
 
-type global_static_information =
-  {
-    global_compilation_result : compilation_result;
-    global_parameter : Remanent_parameters_sig.parameters;
-    global_common_static : Bdu_analysis_type.bdu_common_static 
-  }
-
-  (*compilation_result * Remanent_parameters_sig.parameters * Bdu_analysis_type.bdu_common_static*)
-
-type global_dynamic_information = ()
+type global_static_information
+type global_dynamic_information 
 
 type event =
 | Check_rule of rule_id
@@ -69,3 +57,7 @@ val get_compilation_information: global_static_information -> compilation_result
 val get_common_static : global_static_information -> Bdu_analysis_type.bdu_common_static
 
 val get_initial_state: global_static_information -> initial_state list
+
+val get_kappa_handler: global_static_information -> Cckappa_sig.kappa_handler
+
+val get_cc_code: global_static_information -> Cckappa_sig.compil
