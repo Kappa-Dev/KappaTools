@@ -16,6 +16,7 @@
 (* Before properly achieving separation of concepts. We introduce one
    monolithic domain that collect everything (as in the previous analyzer).*)
 
+
 module Domain =
 struct
 
@@ -37,8 +38,8 @@ struct
       global_dynamic_information : Analyzer_headers.global_dynamic_information;
       mvbdu_handler              : Mvbdu_wrapper.Mvbdu.handler;
       dead_rule                  : bool array;
-      fixpoint_result            : Mvbdu_wrapper.Mvbdu.handler * Mvbdu_wrapper.Mvbdu.mvbdu
-        Bdu_analysis_type.Map_bdu_update.Map.t;
+      fixpoint_result            : 
+        Mvbdu_wrapper.Mvbdu.mvbdu Bdu_analysis_type.Map_bdu_update.Map.t;
       domain_dynamic_information : Bdu_analysis_type.bdu_analysis_dynamic
       }
 
@@ -110,10 +111,8 @@ struct
     let error, handler_bdu = Boolean_mvbdu.init_remanent parameter error in
     let nrules = Handler.nrules parameter error kappa_handler in
     let init_dead_rule_array = Array.make nrules false in
-    let init_fixpoint =
-      handler_bdu, Bdu_analysis_type.Map_bdu_update.Map.empty
-    in
-    let error, init_bdu_analysis_dynamic = 
+    let init_fixpoint = Bdu_analysis_type.Map_bdu_update.Map.empty in
+    let error, init_bdu_analysis_dynamic =
       Bdu_analysis_main.init_bdu_analysis_dynamic parameter error
     in
     error,
@@ -165,13 +164,209 @@ struct
   (** [add_initial_state static dynamic error state] takes an initial state
       and returns the information of the dynamic and a list of event*)
 
-  let add_initial_state static dynamic error state =
-    error, dynamic, []
+  (*get map restriction from covering classes*)
+  let get_pair_list parameter error agent triple_list =
+    let error, get_pair_list =
+      List.fold_left (fun (error, current_list) (cv_id, list, set) ->
+        (*------------------------------------------------------------*)
+        (*new index for site type in covering class*)
+	let error, (map_new_index_forward, _) =
+	  Bdu_build.new_index_pair_map parameter error list
+	in
+        (*-------------------------------------------------------------*)
+	let add site state (error, store) = 
+	  let error, site' =
+	    match 
+              Cckappa_sig.Site_map_and_set.Map.find_option
+                parameter error site map_new_index_forward
+	    with
+	    | error, None -> Bdu_build.warn parameter error (Some "398") Exit 0
+	    | error, Some s -> error, s
+          in
+	  Cckappa_sig.Site_map_and_set.Map.add
+            parameter error site' state store
+	in
+        let error', map_res =
+          Cckappa_sig.Site_map_and_set.Map.fold_restriction_with_missing_associations
+            parameter error 
+            (fun site port -> add site port.Cckappa_sig.site_state.Cckappa_sig.min)
+            (*JF: we should check that port.site_state.min is equal to
+              port.site_state.max*)
+            (fun site -> add site 0)
+            set
+            agent.Cckappa_sig.agent_interface
+            Cckappa_sig.Site_map_and_set.Map.empty
+        in
+        let error = Exception.check Bdu_build.warn parameter error error'
+	  (Some "line 370") Exit 
+	in
+	error, ((cv_id, map_res) :: current_list)
+      ) (error, []) triple_list
+    in
+    error, get_pair_list
+
+  let build_init_restriction parameter handler error bdu_false
+      init store_remanent_triple store =
+    let add_link handler (agent_type, cv_id) bdu store =
+      (*NOTE: build bdu_false later*)
+      (*let error, handler, bdu_false = Mvbdu_wrapper.Mvbdu.mvbdu_false 
+        parameter handler error in*)
+      let error, old_bdu =
+        match Bdu_analysis_type.Map_init_bdu.Map.find_option_without_logs parameter error
+          (agent_type, cv_id) store 
+        with
+        | error, None -> error, bdu_false
+        | error, Some bdu -> error, bdu
+      in
+      (* In the case when the agent is created twice, we take the union *)
+      let error, handler, bdu_new = 
+        Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error old_bdu bdu
+      in
+      let error, store =
+        Bdu_analysis_type.Map_init_bdu.Map.add_or_overwrite
+          parameter error (agent_type, cv_id) bdu_new store
+      in
+      error, handler, store
+    in
+    let error, (handler, store) =
+      Bdu_analysis_type.AgentMap.fold parameter error
+        (fun parameter error agent_id agent (handler, store) ->
+          match agent with
+          | Cckappa_sig.Unknown_agent _
+          | Cckappa_sig.Ghost -> error, (handler, store)
+          | Cckappa_sig.Dead_agent _ ->
+            Bdu_build.warn parameter error (Some "373") Exit (handler, store)
+          | Cckappa_sig.Agent agent ->
+            let agent_type = agent.Cckappa_sig.agent_name in
+            Bdu_analysis_type.AgentMap.fold parameter error
+              (fun parameter error agent_type' triple_list (handler, store) ->
+                if agent_type = agent_type'
+                then
+                  let error, get_pair_list =
+                    get_pair_list parameter error agent triple_list
+                  in
+                  (*-----------------------------------------------------------------*)
+                  let error, handler, store =
+                    List.fold_left
+		      (fun (error, handler, store) (cv_id,map_res) ->
+		        let error, pair_list =
+		          Cckappa_sig.Site_map_and_set.Map.fold
+		            (fun site' state (error, current_list) ->
+			      let pair_list = (site', state) :: current_list in
+			      error, pair_list
+		            ) map_res (error, [])
+		        in
+                        (*build bdu for initial state*)
+		        let error, handler, bdu_init =
+		          Bdu_build.build_bdu parameter handler error pair_list
+		        in
+		        let error, handler, store =
+		          add_link handler (agent_type, cv_id) bdu_init store
+		        in
+		        error, handler, store)
+		      (error, handler, store)
+		      get_pair_list 
+	          in
+	          error, (handler, store)
+                else
+                  error, (handler, store)
+              ) store_remanent_triple (handler, store)       
+        ) init.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views (handler, store)
+    in
+    error, (handler, store)
+  
+  let compute_bdu_fixpoint_init_map parameter error handler handler_kappa init
+      store_remanent_triple 
+      (*build bdu_false from handler dynamic*)
+      bdu_false
+      =
+    let store_init = Bdu_analysis_type.Map_init_bdu.Map.empty in
+    let error, (handler, store_bdu_init_restriction_map) =
+      build_init_restriction parameter handler error bdu_false init store_remanent_triple 
+        store_init
+    in
+    (*-----------------------------------------------------------------------*)
+    let log = Remanent_parameters.get_logger parameter in
+    let add_link parameter handler error correspondence (agent_type, cv_id) 
+        bdu store_result =
+      let error, bdu_old =
+	match Bdu_analysis_type.Map_bdu_update.Map.find_option_without_logs parameter error
+          (agent_type, cv_id) store_result
+	with
+	| error, None -> error, bdu_false
+	| error, Some bdu -> error, bdu
+      in
+      let error, handler, bdu_union =
+	Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_old bdu
+      (*JF: this is a computation, thus you have to pass the handler *)
+      in
+      let parameter_views = Remanent_parameters.update_prefix parameter "\t" in
+      (*print bdu different in views*)
+      let error, handler =
+	Bdu_fixpoint_iteration.dump_view_diff parameter_views handler_kappa handler error
+          correspondence agent_type cv_id bdu_old bdu_union
+      in
+      let error, result_map =
+	Bdu_analysis_type.Map_bdu_update.Map.add_or_overwrite parameter error
+          (agent_type, cv_id) bdu_union store_result
+      in
+      error, handler, result_map
+    in
+    (*-----------------------------------------------------------------------*)
+    let error, bool, handler, store_bdu_fixpoint_init_map =
+      Bdu_analysis_type.Map_init_bdu.Map.fold
+        (fun (agent_type, cv_id) bdu (error, bool, handler, store_result) ->
+	  let () =
+	    if not bool
+	      &&
+	        (Bdu_fixpoint_iteration.local_trace
+	         || Remanent_parameters.get_dump_reachability_analysis_diff parameter
+	         || Remanent_parameters.get_trace parameter)
+	    then
+	      let () = Loggers.fprintf log "\tViews in initial state" in
+	      let () = Loggers.print_newline log in
+	      let () = Loggers.print_newline log in
+	      ()
+	  in
+	  let error, handler, store_result =
+            add_link parameter handler error
+              store_remanent_triple
+              (agent_type, cv_id) bdu store_result
+          in
+          error, true, handler, store_result
+        )
+        store_bdu_init_restriction_map
+        (error, false, handler, Bdu_analysis_type.Map_bdu_update.Map.empty)
+    in
+    let () =
+      if not bool
+        &&
+	  (Bdu_fixpoint_iteration.local_trace
+	   || Remanent_parameters.get_dump_reachability_analysis_diff parameter
+	   || Remanent_parameters.get_trace parameter)
+      then
+        let () =
+	  Loggers.fprintf log "\tInitial state is empty"
+        in
+        let () = Loggers.print_newline log in
+        let () = Loggers.print_newline log in
+        ()
+    in
+    let () =
+      if
+        Bdu_fixpoint_iteration.local_trace
+        || Remanent_parameters.get_trace parameter
+        || Remanent_parameters.get_dump_reachability_analysis_wl parameter
+      then
+        let () = Loggers.fprintf log "\tWake-up rules" in
+        let () = Loggers.print_newline log in
+        ()
+    in
+    error, bool, handler, store_bdu_fixpoint_init_map
 
   (**[get_bdu_false/true] from dynamic*)
-
-  let get_mvbdu_false static dynamic error =
-    let parameter = get_parameter static in
+  let get_mvbdu_false global_static dynamic error =
+    let parameter = get_parameter global_static in
     let handler_bdu = get_mvbdu_handler dynamic in
     let error, handler_bdu, bdu_false =
       Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler_bdu error
@@ -179,14 +374,14 @@ struct
     error, handler_bdu, bdu_false
 
   (** the initial build for mvbdu_true*)
-  let get_mvbdu_true static dynamic error =
-    let parameter = get_parameter static in
+  let get_mvbdu_true global_static dynamic error =
+    let parameter = get_parameter global_static in
     let handler_bdu = get_mvbdu_handler dynamic in
     let error, handler_bdu, bdu_true =
       Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler_bdu error
     in
     error, handler_bdu, bdu_true
-
+    
   (** [get_scan_rule_set static] *)
   let get_scan_rule_set (static: static_information) dynamic error =
     let parameter, kappa_handler, compiled = 
@@ -218,7 +413,7 @@ struct
     error, static_information, dynamic_information
       
   (** get type bdu_analysis_static*)
-  let get_bdu_analysis_static static dynamic error =
+  let get_bdu_analysis_static (static:static_information) dynamic error =
     let error, static_information, dynamic_information =
       get_scan_rule_set static dynamic error
     in
@@ -226,24 +421,76 @@ struct
     error, result
 
   (**get type bdu_analysis_dynamic*)
-  let get_bdu_analysis_dynamic static dynamic error =
+  let get_bdu_analysis_dynamic (static:static_information) dynamic error =
     let error, static_information, dynamic_information =
       get_scan_rule_set static dynamic error
     in
     let result = dynamic_information.domain_dynamic_information in
     error, result
 
-  (**get the result for fixpoint and dead_rule_array*)
+  (**add initial state of kappa*)
+  let add_initial_state (static:static_information) dynamic error init_state =
+    let parameter, handler_kappa, _ = 
+      get_common_static static.global_static_information 
+    in
+    let error, handler_bdu, bdu_false = 
+      get_mvbdu_false static.global_static_information dynamic error 
+    in
+    (*get store_remanent_triple*)
+    let error, result_static =
+      get_bdu_analysis_static static dynamic error
+    in
+    let store_remanent_triple =
+      result_static.Bdu_analysis_type.store_remanent_triple
+    in
+    (*NOTE: where should I store bool?*)
+    let error, bool, handler_bdu, store_bdu_fixpoint_init_map =
+      compute_bdu_fixpoint_init_map
+        parameter
+        error
+        handler_bdu
+        handler_kappa
+        init_state
+        store_remanent_triple
+        bdu_false
+    in
+    let dynamic_information =
+      {
+        dynamic with 
+          mvbdu_handler   = handler_bdu;
+          fixpoint_result = store_bdu_fixpoint_init_map
+      }
+    in
+    error, dynamic_information, []
       
-  (*let is_enabled' static dynamic error rule_id =
-    let parameter = get_parameter static in
-    let error, handler_bdu, bdu_false = get_mvbdu_false static dynamic error in
-    let error, (handler_bdu, bdu_proj_views) =
-      get_bdu_proj_views static error rule_id
+  let is_enabled (static:static_information) dynamic error rule_id =
+    let parameter, handler_kappa, compiled =
+      get_common_static static.global_static_information
     in
-    let error, bool, handler_bdu, store_bdu_update_map =
-      get_store_bdu_fixpoint_init_map static dynamic error covering_classes
+    let error, handler_bdu, bdu_false =
+      get_mvbdu_false static.global_static_information dynamic error 
     in
+    let error, handler_bdu, bdu_true =
+      get_mvbdu_true static.global_static_information dynamic error 
+    in
+    let error, result_static =
+      get_bdu_analysis_static static dynamic error
+    in
+    let error, result_dynamic =
+      get_bdu_analysis_dynamic static dynamic error
+    in
+    let error,
+      (proj_bdu_test_restriction, bdu_creation_map, bdu_and_list_potential_map) =
+      Bdu_fixpoint_iteration.collect_map_views_creation_test_potential
+        parameter
+        error
+        rule_id
+        result_static.Bdu_analysis_type.store_proj_bdu_test_restriction
+        result_static.Bdu_analysis_type.store_proj_bdu_creation_restriction_map
+        result_static.Bdu_analysis_type.store_proj_bdu_potential_restriction_map
+    in
+    (*FIXME: get the result of fixpoint in the initial state bdu_X?*)
+    let fixpoint_result = dynamic.fixpoint_result in
     let error, handler_bdu, is_enable =
       Bdu_fixpoint_iteration.is_enable
         parameter
@@ -251,29 +498,57 @@ struct
         error
         bdu_false
         rule_id
-        bdu_proj_views
-        store_bdu_update_map
+        proj_bdu_test_restriction
+        fixpoint_result
     in
     if is_enable
-    then
-    error, dynamic
-    else*)
+    then 
+      let dead_rule_array = dynamic.dead_rule in
+      let dead_rule_array =
+        dead_rule_array.(rule_id) <- true;
+        dead_rule_array
+      in
+      (*compute views that is enabled*)
+      let error, (handler_bdu, new_wl, store_new_result) =
+        Bdu_fixpoint_iteration.compute_views_enabled
+          parameter
+          handler_bdu
+          error
+          handler_kappa
+          compiled
+          result_static.Bdu_analysis_type.store_remanent_triple
+          bdu_true
+          bdu_false
+          rule_id
+          bdu_creation_map
+          result_static.Bdu_analysis_type.store_modif_list_restriction_map
+          bdu_and_list_potential_map
+          result_static.Bdu_analysis_type.store_wl_creation (*FIXME*)
+          result_dynamic.Bdu_analysis_type.store_covering_classes_modification_update_full
+          proj_bdu_test_restriction
+          fixpoint_result (*FIXME*)
+      in
+      (*store*)
+      let dynamic_information =
+        {
+          dynamic with
+            mvbdu_handler = handler_bdu;
+            dead_rule     = dead_rule_array;
+            fixpoint_result = store_new_result
+        }
+      in
+      error, dynamic_information, Some rule_id (*FIXME:return Some what?*)
+    else
+      error, dynamic, None
       
   (*update by setting handler_bdu*)
-  let is_enabled static dynamic error rule_id =
-    error, dynamic, None
+  (*let is_enabled static dynamic error rule_id =
+    error, dynamic, None*)
 
   let apply_rule static dynamic error r_id precondition =
     error, dynamic, []
       
   let apply_event_list static dynamic error event_list =
-    error, dynamic, []
-
-  (*--------------------------------------------------------------------*)
-  (** [add_initial_state static dynamic error state] takes an initial state
-      and returns the information of the dynamic and a list of event*)
-      
-  let add_initial_state static dynamic error state =
     error, dynamic, []
 
   let export static dynamic error kasa_state =
