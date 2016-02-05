@@ -336,9 +336,10 @@ let update_edges
       (state.unary_candidates,state.unary_pathes,no_unary) del_obs del_deps in
   (*Positive update*)
   let (final_inj2graph,remaining_side_effects,edges'),concrete_inserted =
-    Tools.list_fold_left_map
-      (apply_positive_transformation sigs)
-      ((inj_nodes,Mods.IntMap.empty),side_effects,edges_after_neg)
+    List.fold_left
+      (fun (x,p) h ->
+       let (x', h') = apply_positive_transformation sigs x h in
+       (x',h'::p)) (((inj_nodes,Mods.IntMap.empty),side_effects,edges_after_neg),[])
       rule.Primitives.inserted in
   let (edges'',concrete_inserted') =
     List.fold_left

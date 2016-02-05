@@ -20,8 +20,6 @@ val list_rev_map_append : ('a -> 'b) -> 'a list -> 'b list -> 'b list
 val list_map_flatten : ('a -> 'b list) -> 'a list -> 'b list
 val list_fold_right_map :
   ('a -> 'b -> 'c * 'b) -> 'a list -> 'b -> 'c list * 'b
-val list_fold_left_map :
-  ('a -> 'b -> 'a * 'c) -> 'a -> 'b list -> 'a * 'c list
 val list_fold_left2 :
   ('a -> 'b -> 'c -> 'a) -> 'a -> 'b list -> 'c list -> 'a
 val list_mapi : (int -> 'a -> 'b) -> 'a list -> 'b list

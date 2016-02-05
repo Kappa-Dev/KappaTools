@@ -84,12 +84,6 @@ let rec list_fold_right_map f l x =
      let (t',x') = list_fold_right_map f t x in
      let (h',x'') = f h x' in ( h'::t',x'')
 
-let list_fold_left_map f x l =
-  let out,l' =
-    List.fold_left
-      (fun (x,p) h -> let (x', h') = f x h in (x',h'::p)) (x,[]) l in
-  out, List.rev l'
-
 let rec list_fold_left2 f x l1 l2 =
   match l1, l2 with
   | [], [] -> x
