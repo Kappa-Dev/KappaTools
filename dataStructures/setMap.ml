@@ -262,7 +262,9 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
               | Node(_,_,_,_,s) -> s
 
 	    let node left value right =
-	      Node(left,value,right,(max (height left) (height right))+1,
+	      let hl = height left in
+	      let hr = height right in
+	      Node(left,value,right,(if hl > hr then hl else hr)+1,
 		  size left + size right + 1)
 	  end
 
@@ -926,7 +928,9 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
               | Empty -> 0
               | Node(_,_,_,_,_,s) -> s
 	    let node left key0 data right  =
-	      Node (left,key0,data,right, 1 + max (height left) (height right),
+	      let hl = height left in
+	      let hr = height right in
+	      Node (left,key0,data,right, 1 + (if hl > hr then hl else hr),
 		    1 + size left + size right)
 	  end
 
