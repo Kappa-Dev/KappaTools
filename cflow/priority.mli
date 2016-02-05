@@ -22,6 +22,8 @@
   * under the terms of the GNU Library General Public
   * License *)
 
+(** parameters to tune which events is discarded next *)
+
 type selection_strategy = All_remaining_events | Wire_with_the_least_number_of_events | Wire_with_the_most_number_of_events
 type try_to_remove_first = Late_events | Early_events
 

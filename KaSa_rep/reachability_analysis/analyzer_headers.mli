@@ -1,4 +1,4 @@
-(**
+(*
   * analyzer_headers.mli
   * openkappa
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
@@ -13,7 +13,7 @@
   * All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-(** type of the argument of the main function *)
+(** type of the arguments of the main function *)
 
 type compilation_result
 

@@ -1,3 +1,5 @@
+(** Functor to combine several abstract domains *)
+
 module Product:
 functor
   (New_domain:Analyzer_domain_sig.Domain) ->

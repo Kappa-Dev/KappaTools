@@ -1,4 +1,4 @@
-(**
+(*
   * analyzer_sig.mli
   * openkappa
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
@@ -13,6 +13,7 @@
   * All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
+(** signature of abstract domains (with communication channels) *)
 module type Domain =
   sig
 
