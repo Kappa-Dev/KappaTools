@@ -64,17 +64,7 @@ module Domain =
     let get_cc_code static = lift Analyzer_headers.get_cc_code static
 				  
     let get_bdu_common_static global_static =
-      Analyzer_headers.get_common_static global_static
-					 
-    (**[get_common_static static] returns information about parameter,
-     kappa_handler, and compiled*)
-
-    let get_common_static global_static = (* please avoid to combine get functions (ie get only one field of the struct per get function) *)
-    let parameter = get_parameter global_static in
-    let kappa_handler = get_kappa_handler global_static in
-    let compilation_result = get_compilation_information global_static in
-    let compiled = get_cc_code global_static in
-    parameter, kappa_handler, compiled
+      Analyzer_headers.get_common_static global_static					
 
   (*--------------------------------------------------------------------*)
   (* explain how to extract the handler for mvbdu *)
@@ -95,35 +85,23 @@ module Domain =
       dynamic with fixpoint_result = result
     }
 
-  let set_dynamic handler dead_rule result domain dynamic = (* please avoid to set multiple fields at once (ie set only one field of the structr per set function) *)
+  let get_domain_dynamic_information dynamic = dynamic.domain_dynamic_information
+    
+  let set_domain_dynamic_information domain dynamic =
     {
       dynamic with
-        mvbdu_handler = handler;
-        dead_rule = dead_rule;
-        fixpoint_result = result;
         domain_dynamic_information = domain
-    }
-      
-  let set_handler_result handler result dynamic =
-    {
-      dynamic with
-        mvbdu_handler = handler;
-        fixpoint_result = result
     }
 
-  let set_handler_domain handler domain dynamic =
-    {
-      dynamic with
-        mvbdu_handler = handler;
-        domain_dynamic_information = domain
-    }
+  let get_dead_rule dynamic = dynamic.dead_rule
+  let set_dead_rule dead_rule dynamic = {dynamic with dead_rule = dead_rule}
 
   let set_domain_static domain static =
     {
       static with
         domain_static_information = domain
     }
-
+      
   (*--------------------------------------------------------------------*)
   (** intialization function of global static & dynamic information of this
       domain*)
@@ -450,9 +428,9 @@ module Domain =
     
   (** [get_scan_rule_set static] *)
   let get_scan_rule_set (static: static_information) dynamic error =
-    let parameter, kappa_handler, compiled = 
-      get_common_static static
-    in
+    let parameter = get_parameter static in
+    let kappa_handler = get_kappa_handler static in
+    let compiled = get_cc_code static in
     let error, handler_bdu = Boolean_mvbdu.init_remanent parameter error in
     let error, (handler_bdu, result) =
       Bdu_analysis_main.scan_rule_set
@@ -463,12 +441,12 @@ module Domain =
         compiled
         compiled.Cckappa_sig.rules
     in
+    let dynamic_handler = set_mvbdu_handler handler_bdu dynamic in
+    let dynamic = set_domain_dynamic_information result.Bdu_analysis_type.store_bdu_analysis_dynamic dynamic_handler in
     error,
-    set_domain_static result.Bdu_analysis_type.store_bdu_analysis_static static,
-    set_handler_domain
-      handler_bdu 
-      result.Bdu_analysis_type.store_bdu_analysis_dynamic dynamic
-      
+    set_domain_static result.Bdu_analysis_type.store_bdu_analysis_static static, dynamic
+
+    
   (** get type bdu_analysis_static*)
   let get_bdu_analysis_static (static:static_information) dynamic error =
     let error, static_information, dynamic_information =
@@ -496,7 +474,8 @@ module Domain =
 
   (**add initial state of kappa*)
   let add_initial_state (static:static_information) dynamic error init_state =
-    let parameter, handler_kappa, _ = get_common_static static in
+    let parameter = get_parameter static in
+    (*let handler_kappa = get_kappa_handler static in*)
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     let error, store_remanent_triple = get_store_remanent_triple static dynamic error in
     let handler_bdu = get_mvbdu_handler dynamic in
@@ -584,7 +563,9 @@ module Domain =
     error, result_dynamic.Bdu_analysis_type.store_covering_classes_modification_update_full
 
   let is_enabled (static:static_information) dynamic error rule_id precondition =
-    let parameter, handler_kappa, compiled = get_common_static static in
+    let parameter = get_parameter static in
+   (* let handler_kappa = get_kappa_handler static in*)
+   (* let compiled = get_cc_code static in*)
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     let handler_bdu = get_mvbdu_handler dynamic in
     let error, result_static = get_bdu_analysis_static static dynamic error in
@@ -661,7 +642,9 @@ module Domain =
     error, dynamic, None*)
 
   let apply_rule static dynamic error rule_id precondition =
-    let parameter, handler_kappa, compiled = get_common_static static in
+    let parameter = get_parameter static in
+    let handler_kappa = get_kappa_handler static in
+    let compiled = get_cc_code static in
     (*FIXME: the order of getting handler_bdu from dynamic before bdu_false/true?*)
     let error, handler_bdu, bdu_false = get_mvbdu_false static dynamic error in
     let error, handler_bdu, bdu_true = get_mvbdu_true static dynamic error in
@@ -697,7 +680,10 @@ module Domain =
         proj_bdu_test_restriction
         fixpoint_result
     in
-    error, set_handler_result handler_bdu store_new_result dynamic, []   
+    let dynamic_handler = set_mvbdu_handler handler_bdu dynamic
+    in
+    let dynamic = set_fixpoint_result store_new_result dynamic_handler in
+    error, dynamic, []   
       
   let rec apply_event_list static dynamic error event_list =
     error, dynamic, [] (* events enable communication between domains. At this moment, the global domain does not collect information *)
