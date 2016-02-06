@@ -29,7 +29,10 @@ type global_static_information =
   }
 (*compilation_result * Remanent_parameters_sig.parameters * Bdu_analysis_type.bdu_common_static*)
 
-type global_dynamic_information = ()
+type global_dynamic_information =
+  {
+    mvbdu_handler: Mvbdu_wrapper.Mvbdu.handler
+  }
 
 type event =
   | Check_rule of rule_id
@@ -40,14 +43,17 @@ type kasa_state = unit
 
 type initial_state = Cckappa_sig.enriched_init
 
-let initialize_global_information parameter error compilation =
+let initialize_global_information parameter error mvbdu_handler compilation =
   let init_static = Bdu_analysis_main.init_bdu_common_static in
   error, 
   {
     global_compilation_result = compilation;
     global_parameter     = parameter;
     global_common_static = init_static
-  }, ()
+  },
+  {
+    mvbdu_handler = mvbdu_handler
+  }
     
 let dummy_precondition = (():precondition)
 
@@ -61,4 +67,18 @@ let get_cc_code static = (get_compilation_information static).cc_code
 							     
 let get_common_static static = static.global_common_static
 
-let get_initial_state _ = []
+let compute_initial_state error static =
+  let parameter = get_parameter static in
+  let compil = get_cc_code static in
+  let error,init =
+    (Int_storage.Nearly_inf_Imperatif.fold
+       parameter
+       error
+       (fun parameter error _ i l -> error,i::l)
+       compil.Cckappa_sig.init
+       [])
+  in
+  error,List.rev init
+
+let get_mvbdu_handler dynamic = dynamic.mvbdu_handler
+let set_mvbdu_handler handler dynamic = {dynamic with mvbdu_handler = handler}

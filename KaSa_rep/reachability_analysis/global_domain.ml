@@ -33,14 +33,18 @@ module Domain =
     (* put here the type of the struct that contains the rest of the
      dynamic information, including the result of the analysis *)
 	
-    type dynamic_information =
+    type local_dynamic_information =
       {
-	  global_dynamic_information : Analyzer_headers.global_dynamic_information;
-	  mvbdu_handler              : Mvbdu_wrapper.Mvbdu.handler;
 	  dead_rule                  : bool array;
 	  fixpoint_result            : 
             Mvbdu_wrapper.Mvbdu.mvbdu Bdu_analysis_type.Map_bdu_update.Map.t;
 	  domain_dynamic_information : Bdu_analysis_type.bdu_analysis_dynamic
+      }
+
+    type dynamic_information =
+      {
+	local  : local_dynamic_information;
+	global : Analyzer_headers.global_dynamic_information
       }
 	
     (*--------------------------------------------------------------------*)
@@ -69,29 +73,28 @@ module Domain =
   (*--------------------------------------------------------------------*)
   (* explain how to extract the handler for mvbdu *)
 
-  let get_mvbdu_handler dynamic = dynamic.mvbdu_handler
+    let get_global_dynamic_information dynamic = dynamic.global
+    let get_local_dynamic_information dynamic = dynamic.local
+    let get_mvbdu_handler dynamic = Analyzer_headers.get_mvbdu_handler (get_global_dynamic_information dynamic)
+								       
+    (* explain how to overwritte the previous handler *)
 
-  (* explain how to overwritte the previous handler *)
+    let set_mvbdu_handler handler dynamic = 
+      {
+	dynamic with global = Analyzer_headers.set_mvbdu_handler handler (get_global_dynamic_information dynamic)
+      }
+	
+    let set_local_dynamic_information local dynamic = {dynamic with local = local}
 
-  let set_mvbdu_handler handler dynamic = 
-    {
-      dynamic with mvbdu_handler = handler
-    }
-      
-  let get_fixpoint_result dynamic = dynamic.fixpoint_result
-
-  let set_fixpoint_result result dynamic =
-    {
-      dynamic with fixpoint_result = result
-    }
-
-  let get_domain_dynamic_information dynamic = dynamic.domain_dynamic_information
-    
-  let set_domain_dynamic_information domain dynamic =
-    {
-      dynamic with
-        domain_dynamic_information = domain
-    }
+    let get_fixpoint_result dynamic = (get_local_dynamic_information dynamic).fixpoint_result
+					
+    let set_fixpoint_result result dynamic =
+      set_local_dynamic_information {(get_local_dynamic_information dynamic) with fixpoint_result = result} dynamic
+	
+    let get_domain_dynamic_information dynamic = (get_local_dynamic_information dynamic).domain_dynamic_information
+											
+    let set_domain_dynamic_information domain dynamic =
+      set_local_dynamic_information {(get_local_dynamic_information dynamic) with domain_dynamic_information = domain} dynamic 
 
   let get_dead_rule dynamic = dynamic.dead_rule
   let set_dead_rule dead_rule dynamic = {dynamic with dead_rule = dead_rule}
@@ -105,51 +108,40 @@ module Domain =
   (*--------------------------------------------------------------------*)
   (** intialization function of global static & dynamic information of this
       domain*)
-
-  let initialize_domain_static_information static error =
+      
+  let initialize static dynamic error =
     let parameter = Analyzer_headers.get_parameter static in
     let error, init_bdu_analysis_static =
       Bdu_analysis_main.init_bdu_analysis_static parameter error
     in
     let compilation_result = Analyzer_headers.get_compilation_information static in
-    let error, init_global_static_information, _ =
-      Analyzer_headers.initialize_global_information parameter
-        error compilation_result
-    in
-    error,
+    let init_global_static_information =
     {
-      global_static_information = init_global_static_information;
+      global_static_information = static;
       domain_static_information = init_bdu_analysis_static
     }
-
-  let initialize_domain_dynamic_information static dynamic error =
-    let parameter = Analyzer_headers.get_parameter static in
+    in
     let kappa_handler = Analyzer_headers.get_kappa_handler static in
-    let error, handler_bdu = Boolean_mvbdu.init_remanent parameter error in
     let nrules = Handler.nrules parameter error kappa_handler in
     let init_dead_rule_array = Array.make nrules false in
     let init_fixpoint = Bdu_analysis_type.Map_bdu_update.Map.empty in
     let error, init_bdu_analysis_dynamic =
       Bdu_analysis_main.init_bdu_analysis_dynamic parameter error
     in
+    let init_global_dynamic_information =
+      {
+	global = dynamic;
+	local =
+	  { dead_rule = init_dead_rule_array;
+	    fixpoint_result = init_fixpoint;
+	    domain_dynamic_information = init_bdu_analysis_dynamic;
+	  }}
+    in
     error,
-    {
-      global_dynamic_information = dynamic;
-      mvbdu_handler = handler_bdu;
-      dead_rule = init_dead_rule_array;
-      fixpoint_result = init_fixpoint;
-      domain_dynamic_information = init_bdu_analysis_dynamic;
-    }
-      
-  let initialize static dynamic error =
-    let error, domain_static_information =
-      initialize_domain_static_information static error
-    in
-    let error, domain_dynamic_information =
-      initialize_domain_dynamic_information static dynamic error
-    in
-    error, domain_static_information, domain_dynamic_information
-      
+    init_global_static_information,
+    init_global_dynamic_information
+
+ 
   (*--------------------------------------------------------------------*)
 
   type 'a zeroary =
@@ -441,8 +433,8 @@ module Domain =
         compiled
         compiled.Cckappa_sig.rules
     in
-    let dynamic_handler = set_mvbdu_handler handler_bdu dynamic in
-    let dynamic = set_domain_dynamic_information result.Bdu_analysis_type.store_bdu_analysis_dynamic dynamic_handler in
+    let dynamic = set_mvbdu_handler handler_bdu dynamic in
+    let dynamic = set_domain_dynamic_information result.Bdu_analysis_type.store_bdu_analysis_dynamic dynamic in
     error,
     set_domain_static result.Bdu_analysis_type.store_bdu_analysis_static static, dynamic
 
@@ -460,7 +452,7 @@ module Domain =
     let error, static_information, dynamic_information =
       get_scan_rule_set static dynamic error
     in
-    let result = dynamic_information.domain_dynamic_information in
+    let result = get_domain_dynamic_information dynamic in
     error, result
 
   let get_store_remanent_triple static dynamic error =
@@ -573,7 +565,7 @@ module Domain =
     let error, (proj_bdu_test_restriction, _, _) =
       get_triple_restriction_map static dynamic error rule_id
     in
-    let fixpoint_result = dynamic.fixpoint_result in 
+    let fixpoint_result = get_fixpoint_result dynamic in 
     let error, handler_bdu, is_enable =
       Bdu_fixpoint_iteration.is_enable
         parameter
@@ -680,9 +672,9 @@ module Domain =
         proj_bdu_test_restriction
         fixpoint_result
     in
-    let dynamic_handler = set_mvbdu_handler handler_bdu dynamic
+    let dynamic = set_mvbdu_handler handler_bdu dynamic
     in
-    let dynamic = set_fixpoint_result store_new_result dynamic_handler in
+    let dynamic = set_fixpoint_result store_new_result dynamic in
     error, dynamic, []   
       
   let rec apply_event_list static dynamic error event_list =

@@ -45,6 +45,7 @@ type initial_state = Cckappa_sig.enriched_init
 val initialize_global_information:
   Remanent_parameters_sig.parameters ->
   Exception.method_handler ->
+  Mvbdu_wrapper.Mvbdu.handler ->
   compilation_result ->
   Exception.method_handler * global_static_information * global_dynamic_information
 
@@ -56,8 +57,15 @@ val get_compilation_information: global_static_information -> compilation_result
 
 val get_common_static : global_static_information -> Bdu_analysis_type.bdu_common_static
 
-val get_initial_state: global_static_information -> initial_state list
+val compute_initial_state:
+  Exception.method_handler ->
+  global_static_information ->
+  Exception.method_handler * initial_state list
 
 val get_kappa_handler: global_static_information -> Cckappa_sig.kappa_handler
 
 val get_cc_code: global_static_information -> Cckappa_sig.compil
+
+val get_mvbdu_handler: global_dynamic_information -> Mvbdu_wrapper.Mvbdu.handler
+
+val set_mvbdu_handler: Mvbdu_wrapper.Mvbdu.handler -> global_dynamic_information -> global_dynamic_information
