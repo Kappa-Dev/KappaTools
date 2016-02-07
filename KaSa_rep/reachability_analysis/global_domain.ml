@@ -246,7 +246,7 @@ module Domain =
       (*If the bdu has changed, it should log the string (if given) *)
       (*If the bdu has changed, it should log the diff (if the parameters request it)*)
       (*If the bdu has changed, the pair (agent_type,cv_id) should be recorded in the list updates_list*)
-      error dynamic,updated_list
+      error dynamic,updates_list
 
 
   (* merge build_init_restiction and compute_bdu_fixpoint_init and avoid useless computation *)
@@ -293,7 +293,7 @@ module Domain =
                   (*-----------------------------------------------------------------*)
                   let error, handler, store =
                     List.fold_left
-		      (fun (error, handler, store) (cv_id,map_res) 
+		      (fun (error, handler, store) (cv_id,map_res) ->
 		        let error, pair_list =
 		          Cckappa_sig.Site_map_and_set.Map.fold
 		            (fun site' state (error, current_list) ->
