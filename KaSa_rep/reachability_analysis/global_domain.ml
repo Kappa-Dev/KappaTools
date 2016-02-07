@@ -242,7 +242,9 @@ module Domain =
 
   let build_init_restriction parameter handler error bdu_false
       init store_remanent_triple store =
-    let add_link handler (agent_type, cv_id) bdu store =
+    (* the function add_link should be defined out of the scope of the functions *)
+    (* A unique version of it is required *)
+    let add_link handler (agent_type, cv_id) bdu store = (* add_link should also take a list to record with views have been updated *)
       let error, old_bdu =
         match Bdu_analysis_type.Map_init_bdu.Map.find_option_without_logs parameter error
           (agent_type, cv_id) store 
@@ -254,6 +256,7 @@ module Domain =
       let error, handler, bdu_new = 
         Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error old_bdu bdu
       in
+      (* We should test whether or not there are new views, in such a case promp them and update the recording list accordingly *)
       let error, store =
         Bdu_analysis_type.Map_init_bdu.Map.add_or_overwrite
           parameter error (agent_type, cv_id) bdu_new store
@@ -272,7 +275,7 @@ module Domain =
             let agent_type = agent.Cckappa_sig.agent_name in
             Bdu_analysis_type.AgentMap.fold parameter error
               (fun parameter error agent_type' triple_list (handler, store) ->
-                if agent_type = agent_type'
+                if agent_type = agent_type' (* please use find instead of fold *)
                 then
                   let error, get_pair_list =
                     get_pair_list parameter error agent triple_list
@@ -312,7 +315,7 @@ module Domain =
       (*build bdu_false from handler dynamic*)
       bdu_false
       =
-      let store_init = Bdu_analysis_type.Map_init_bdu.Map.empty in
+      let store_init = Bdu_analysis_type.Map_init_bdu.Map.empty in (* the map should not be empty, it should be the current map in dynamic *)
       let error, (handler, store_bdu_init_restriction_map) =
 	build_init_restriction parameter handler error bdu_false init store_remanent_triple 
 			       store_init
@@ -320,7 +323,7 @@ module Domain =
       (*-----------------------------------------------------------------------*)
       let log = Remanent_parameters.get_logger parameter in
       let add_link parameter handler error correspondence (agent_type, cv_id) 
-		   bdu store_result =
+		   bdu store_result = (* this version of add_link is better, but you still miss the list of updated pairs (agent_type,cv_id)*)
 	let error, bdu_old =
 	  match Bdu_analysis_type.Map_bdu_update.Map.find_option_without_logs parameter error
 									      (agent_type, cv_id) store_result
@@ -345,7 +348,8 @@ module Domain =
 	error, handler, result_map
       in
       (*-----------------------------------------------------------------------*)
-      let error, bool, handler, store_bdu_fixpoint_init_map =
+      let error, bool, handler, store_bdu_fixpoint_init_map = (* this fold is useless, the map has already been dealt with the function bdu_init_restriction *)
+                                                              (* Please rather complete bdu_init_restriction with logging messages *)
 	Bdu_analysis_type.Map_init_bdu.Map.fold
           (fun (agent_type, cv_id) bdu (error, bool, handler, store_result) ->
 	   let () =
