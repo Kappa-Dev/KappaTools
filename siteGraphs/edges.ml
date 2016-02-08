@@ -225,15 +225,20 @@ let link_destination ag s graph =
   (LargeArray.get graph.connect ag).(s)
 
 (** The snapshot machinery *)
-let one_connected_component sigs ty node rsorts graph =
-  let rec build acc free_id dangling sorts =
+let clean_cache cache =
+  LargeArray.fill cache 0 (LargeArray.length cache) false
+
+let one_connected_component sigs ty node graph =
+  let rec build acc free_id dangling =
     function
-    | [] -> acc,free_id,sorts
+    | [] -> acc,free_id
     | (ty,node) :: todos ->
-       match LargeArray.get sorts node with
-       | None -> build acc free_id dangling sorts todos
+       if LargeArray.get graph.cache node
+       then build acc free_id dangling todos
+       else match LargeArray.get graph.sort node with
+       | None -> build acc free_id dangling todos
        | Some _ ->
-	 let () = LargeArray.set sorts node None in
+	 let () = LargeArray.set graph.cache node true in
 	 let arity = Signature.arity sigs ty in
 	 let ports = Array.make arity Raw_mixture.FREE in
 	 let (free_id',dangling',todos'),ports =
@@ -258,8 +263,8 @@ let one_connected_component sigs ty node rsorts graph =
 	   { Raw_mixture.a_id = node; Raw_mixture.a_type = ty;
 	     Raw_mixture.a_ports = ports;
 	     Raw_mixture.a_ints = LargeArray.get graph.state node; } in
-	 build (skel::acc) free_id' dangling' sorts todos'
-  in build [] 1 Int2Map.empty rsorts [ty,node]
+	 build (skel::acc) free_id' dangling' todos'
+  in build [] 1 Int2Map.empty [ty,node]
 
 let build_snapshot sigs graph =
   let () = assert (not graph.outdated) in
@@ -268,16 +273,19 @@ let build_snapshot sigs graph =
     | (n,y as h)::t ->
        if Raw_mixture.equal x y then (succ n,y)::t
        else h::increment x t in
-  let rec aux ccs sorts node =
-    if node = LargeArray.length sorts then ccs
+  let rec aux ccs node =
+    if node = LargeArray.length graph.sort
+    then let () = clean_cache graph.cache in ccs
     else
-      match LargeArray.get sorts node with
-      | None -> aux ccs sorts (succ node)
-      | Some ty ->
-	let (out,_,sorts') =
-	  one_connected_component sigs ty node sorts graph in
-	aux (increment out ccs) sorts' (succ node) in
-  aux [] (LargeArray.copy graph.sort) 0
+      if LargeArray.get graph.cache node
+      then aux ccs (succ node)
+      else match LargeArray.get graph.sort node with
+	| None -> aux ccs (succ node)
+	| Some ty ->
+	   let (out,_) =
+	     one_connected_component sigs ty node graph in
+	aux (increment out ccs) (succ node) in
+  aux [] 0
 
 let print sigs f graph =
   Pp.list Pp.space (fun f (i,mix) ->
@@ -322,9 +330,6 @@ let debug_print f graph =
 	  f "%i:NOTYPE(@[%a@])@ " ag (print_sites ag) a
     )
     f graph.connect
-
-let clean_cache cache =
-  LargeArray.fill cache 0 (LargeArray.length cache) false
 
 type path = ((agent * int) * (agent * int)) list
 (** ((agent_id, agent_name),site_name) *)
