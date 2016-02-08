@@ -14,6 +14,20 @@ module Edge = struct
   (* let dummy_link = ((-1,-1),-1) *)
 end
 
+module Cache = struct
+    type t = int DynArray.t
+    let int_l = 30
+
+    let create () = DynArray.make 1 0
+
+    let mark t i =
+      DynArray.set t (i / int_l)
+		   ((DynArray.get t (i / int_l)) lor (1 lsl (i mod int_l)))
+    let test t i = (DynArray.get t (i / int_l)) land (1 lsl (i mod int_l)) <> 0
+
+    let reset t = DynArray.fill t 0 (DynArray.length t) 0
+  end
+
 type t =
   {
     mutable outdated : bool;
@@ -21,7 +35,7 @@ type t =
     missings : Int2Set.t;
     state : int option array DynArray.t;
     sort : int option DynArray.t;
-    cache : bool DynArray.t;
+    cache : Cache.t;
     free_id : int * int list;
   }
 (** (agent,site -> binding_state; missings);
@@ -35,7 +49,7 @@ let empty () =
     missings = Int2Set.empty;
     state = DynArray.make 1 [||];
     sort = DynArray.make 1 None;
-    cache = DynArray.make 1 false;
+    cache = Cache.create ();
     free_id =(0,[]);
   }
 
@@ -218,20 +232,17 @@ let link_destination ag s graph =
   (DynArray.get graph.connect ag).(s)
 
 (** The snapshot machinery *)
-let clean_cache cache =
-  DynArray.fill cache 0 (DynArray.length cache) false
-
 let one_connected_component sigs ty node graph =
   let rec build acc free_id dangling =
     function
     | [] -> acc,free_id
     | (ty,node) :: todos ->
-       if DynArray.get graph.cache node
+       if Cache.test graph.cache node
        then build acc free_id dangling todos
        else match DynArray.get graph.sort node with
        | None -> failwith "Edges.one_connected_component"
        | Some _ ->
-	 let () = DynArray.set graph.cache node true in
+	 let () = Cache.mark graph.cache node in
 	 let arity = Signature.arity sigs ty in
 	 let ports = Array.make arity Raw_mixture.FREE in
 	 let (free_id',dangling',todos'),ports =
@@ -268,12 +279,12 @@ let build_snapshot sigs graph =
        else h::increment x t in
   let rec aux ccs node =
     if node = DynArray.length graph.sort
-    then let () = clean_cache graph.cache in ccs
+    then let () = Cache.reset graph.cache in ccs
     else
-      if DynArray.get graph.cache node
+      if Cache.test graph.cache node
       then aux ccs (succ node)
       else match DynArray.get graph.sort node with
-	| None -> failwith "Edges.build_snapshot"
+	| None -> aux ccs (succ node)
 	| Some ty ->
 	   let (out,_) =
 	     one_connected_component sigs ty node graph in
@@ -346,10 +357,10 @@ let breadth_first_traversal dist stop_on_find is_interesting sigs links cache =
     match (DynArray.get links id).(pred site) with
     | None -> look_each_site x (pred site) acc
     | Some ((id',ty'),site') ->
-       if (stop&&stop_on_find) then let () = clean_cache cache in acc
-       else if DynArray.get cache id' then look_each_site x (pred site) acc
+       if (stop&&stop_on_find) then let () = Cache.reset cache in acc
+       else if Cache.test cache id' then look_each_site x (pred site) acc
        else
-	 let () = DynArray.set cache id' true in
+	 let () = Cache.mark cache id' in
 	 let path' = (((id',ty'),site'),((id,ty),pred site))::path in
 	 let out',store =
 	   match is_interesting id' with
@@ -363,10 +374,10 @@ let breadth_first_traversal dist stop_on_find is_interesting sigs links cache =
 	 look_each_site x (Signature.arity sigs ty) (false,out,next) in
        if stop&&stop_on_find then out' else aux depth out' next' todos
     | [] -> match next with
-	    | [] -> let () = clean_cache cache in out
+	    | [] -> let () = Cache.reset cache in out
 	    (* end when all graph traversed and return the list of paths *)
 	    | _ -> match dist with
-		   | Some d when d <= depth -> let () = clean_cache cache in []
+		   | Some d when d <= depth -> let () = Cache.reset cache in []
 		   (* stop when the max distance is reached *)
 		   | Some _ -> aux (depth+1) out [] next
 		   | None -> aux depth out [] next
@@ -374,8 +385,8 @@ let breadth_first_traversal dist stop_on_find is_interesting sigs links cache =
 
 let paths_of_interest
       is_interesting sigs graph start_ty start_point done_path =
-  let () = DynArray.set graph.cache start_point true in
-  let () = List.iter (fun (_,((x,_),_)) -> DynArray.set graph.cache x true)
+  let () = Cache.mark graph.cache start_point in
+  let () = List.iter (fun (_,((x,_),_)) -> Cache.mark graph.cache x)
 		     done_path in
   let () = assert (not graph.outdated) in
   let acc = match is_interesting start_point with
@@ -409,7 +420,7 @@ let are_connected
      (match candidate with
       | Some p when is_valid_path graph p -> Some p
       | (Some _ | None) ->
-	 let () = DynArray.set graph.cache x true in
+	 let () = Cache.mark graph.cache x in
 	 (match
 	     breadth_first_traversal dist true
 				     (fun z -> if z = y then Some () else None)
@@ -420,7 +431,7 @@ let are_connected
 	   | _ :: _ -> failwith "Edges.are_they_connected completely broken"))
   | _ ->
      let () =
-       List.iter (fun (x,_) -> DynArray.set graph.cache x true) nodes_x in
+       List.iter (fun (x,_) -> Cache.mark graph.cache x) nodes_x in
      let prepare =
        List.fold_left
 	 (fun acc (x,ty) -> prepare_node x ty (Signature.arity sigs ty) acc)
