@@ -126,16 +126,17 @@ let main () =
 	if (Remanent_parameters.get_trace parameters_cv)
 	then Loggers.fprintf (Remanent_parameters.get_logger parameters_cv) ""
       in
-      (*getting covering classes*)
-      (*let error, covering_classes =
-        Covering_classes_main.covering_classes parameters_cv error handler c_compil
-      in*)
        let error, handler_bdu, dep =
 	 Bdu_analysis_main.bdu_main parameters_cv  error handler c_compil
        in error, Some handler_bdu, Some dep
     else
       error, None, None
   in
+  (*-----------------------------------------------------------------------*)
+  (*call analyzer in module*)
+  (*let error, static_information, dynamic_information =
+    A.main parameters error handler_bdu c_compil handler
+  in*)
   (*-----------------------------------------------------------------------*)
   (*Stochastic flow of information*)
   let error, stochastic_flow =

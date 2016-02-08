@@ -198,10 +198,6 @@ module Domain =
   (*Instantiate of functions that store the static and dynamic information
     accordingly from the previous analyzer *)
 							    
-  (*--------------------------------------------------------------------*)
-  (** [add_initial_state static dynamic error state] takes an initial state
-      and returns the information of the dynamic and a list of event*)
-
   (**[get_bdu_false/true] from dynamic*)
   let get_mvbdu_false global_static dynamic error =
     let parameter = get_parameter global_static in
@@ -226,6 +222,7 @@ module Domain =
 
   (**************************************************************************)
   (** [get_scan_rule_set static] *)
+
   let get_scan_rule_set (static: static_information) dynamic error =
     let parameter = get_parameter static in
     let kappa_handler = get_kappa_handler static in
@@ -274,16 +271,8 @@ module Domain =
     error, store_remanent_triple
 
   (**************************************************************************)
-  (* add_link ?string error static dynamic (agent_type, cv_id) bdu store
-     (updates_list: (int * int) list) =
-     this function should update the bdu associated with the pair
-     (agent_type, cv_id) in the store:
-     - If the bdu has changed, it should log the string (if given) 
-     - If the bdu has changed, it should log the diff (if the parameters request it) 
-     - If the  bdu has changed, the pair (agent_type,cv_id) should be recorded in
-     the list updates_list*)
-
   (**get type bdu_analysis_dynamic*)
+
   let get_store_covering_classes_modification_update_full static dynamic error =
     let error, static_information, dynamic_information =
       get_scan_rule_set static dynamic error
@@ -382,7 +371,7 @@ module Domain =
   (**************************************************************************)
 
   let add_link ?string_opt error static dynamic (agent_type, cv_id) bdu store
-      (updates_list : (int * int) list) (*add into event list*) =
+      (updates_list : (int * int) list) =
     let parameter = get_parameter static in
     let log = Remanent_parameters.get_logger parameter in
     let kappa_handler = get_kappa_handler static in
@@ -442,6 +431,7 @@ module Domain =
     let dynamic = set_mvbdu_handler handler dynamic in  
     let dynamic = set_fixpoint_result store dynamic in
     (*-----------------------------------------------------------------------*)
+    (*add updates_list into event list*)
     let error, event_list =
       List.fold_left (fun (error, event_list) (agent_type, cv_id) ->
         updates_list2event_list
@@ -500,8 +490,7 @@ module Domain =
     error, get_pair_list
 
   (***************************************************************************)
-  (* merge build_init_restiction and compute_bdu_fixpoint_init and avoid
-     useless computation *)
+  (*build bdu restriction for initial state *)
 
   let build_init_restriction static dynamic error init_state =
     let parameter = get_parameter static in
@@ -560,18 +549,19 @@ module Domain =
     in
     error, dynamic, event_list
 
-  (***************************************************************************)
-  (* we should not start from an empty map *)
-  (* we should take the current state of the bdu_map in dynamic *)
-  (*JF: this function should not call the fixpoint machinery, it should
-    just abstract the chemical species provided in argument, and store it
-    in the mvbdu map *)
-  (*JF: Here you just need the part of the function, 
-    that takes into account one chemical species *)
-  (*JF: moreover, try not to seperate the field of the struct 
-    (dynamic and static), pass each of them as a single argument, and return 
-    the updated value of the struct dynamic, it will lighter your core *)    
-     
+  (**************************************************************************)
+  (**add initial state of kappa*)
+
+  let add_initial_state static dynamic error init_state =   
+    let error, dynamic, event_list =
+      build_init_restriction
+        static
+        dynamic
+        error
+        init_state
+    in
+    error, dynamic, event_list
+
   (**************************************************************************)
 
   let get_store_proj_bdu_test_restriction static dynamic error =
@@ -599,26 +589,11 @@ module Domain =
     error, result_static.Bdu_analysis_type.store_modif_list_restriction_map
 
   (**************************************************************************)
-  (**add initial state of kappa*)
-
-  let add_initial_state static dynamic error init_state =   
-    let error, dynamic, event_list =
-      build_init_restriction
-        static
-        dynamic
-        error
-        init_state
-    in
-    error, dynamic, event_list
-
-  (**************************************************************************)
       
   let is_enabled static dynamic error rule_id precondition =
     let parameter = get_parameter static in
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     let handler_bdu = get_mvbdu_handler dynamic in
-    (*let error, result_static = get_bdu_analysis_static static dynamic error in
-    let error, result_dynamic = get_bdu_analysis_dynamic static dynamic error in*)
     let error, store_proj_bdu_test_restriction =
       get_store_proj_bdu_test_restriction static dynamic error
     in
@@ -655,6 +630,7 @@ module Domain =
 
   (**************************************************************************)
   (*compute new views *)
+
   let compute_new_views static dynamic error is_new_views agent_type cv_id event_list =
     if is_new_views
     then
@@ -789,6 +765,7 @@ module Domain =
       | Some map -> error, map
     in
     let handler = get_mvbdu_handler dynamic in
+    (*-----------------------------------------------------------------------*) 
     let error, dynamic, event_list =
       Bdu_analysis_type.Map_agent_type_creation_bdu.Map.fold
         (fun (agent_type, cv_id) bdu_creation (error, dynamic, event_list) ->
@@ -853,6 +830,7 @@ module Domain =
       | None -> error, Bdu_analysis_type.Map_agent_type_potential_bdu.Map.empty
       | Some map -> error, map
     in
+    (*-----------------------------------------------------------------------*)
     let error, dynamic, event_list =
       Bdu_analysis_type.Map_agent_type_potential_bdu.Map.fold
         (fun (agent_type, new_site_id, cv_id)(bdu_test, list)(error, dynamic, event_list) ->
@@ -900,6 +878,7 @@ module Domain =
     error, dynamic, event_list
 
   (**************************************************************************)
+  (*compute enable in different cases*)
   let compute_views_enabled static dynamic error rule_id =
     (*-----------------------------------------------------------------------*)
     (*deal with views*)

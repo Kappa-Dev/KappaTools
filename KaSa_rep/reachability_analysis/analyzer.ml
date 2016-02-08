@@ -49,11 +49,9 @@ module type Analyzer =
 module Make (Domain:Composite_domain.Composite_domain) =
 struct
 
-  type static_information =
-    Domain.static_information
+  type static_information = Domain.static_information
 
-  type dynamic_information =
-    Domain.dynamic_information
+  type dynamic_information = Domain.dynamic_information
 
   let main parameter error mvbdu_handler compil kappa_handler =
     let error, static, dynamic = 
