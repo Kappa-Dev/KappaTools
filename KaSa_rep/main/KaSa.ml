@@ -4,17 +4,20 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <2016-01-24 10:12:49 feret>
+ * Last modification: Time-stamp: <2016-02-08 14:00:10 feret>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
  * en Automatique.  All rights reserved.  This file is distributed
  * under the terms of the GNU Library General Public License *)
 
-module A = Analyzer.Make
-	     (Product.Product
-		(Global_domain.Domain)
-		(Global_domain.Domain))
+module A =
+  Analyzer.Make
+    (Composite_domain.Make
+       (Product.Product
+	  (Global_domain.Domain)
+	  (Global_domain.Domain)))
+
 let main () =
   let error = Exception.empty_error_handler in
   let error,parameters,files  = Get_option.get_option error in
