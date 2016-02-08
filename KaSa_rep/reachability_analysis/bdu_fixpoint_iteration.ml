@@ -511,16 +511,6 @@ let add_update_to_wl ?title:(title="") parameter error handler_kappa compiled
 (** [views_creation_test_potienal rule_id views creation test potential] returns 
     a map of bdu depending on the kind of agent at each rule. *)
 
-let collect_bdu_proj_views error rule_id store_proj_bdu_views =
-  let error, bdu_proj_views =
-    match Bdu_analysis_type.Map_rule_id_views.Map.find_option
-      rule_id store_proj_bdu_views
-    with
-    | None -> error, Bdu_analysis_type.Map_triple_views.Map.empty
-    | Some m -> error, m
-  in
-  error, bdu_proj_views
-
 let collect_map_views_creation_test_potential parameter error rule_id
     store_proj_bdu_views
     store_proj_bdu_creation_restriction_map
