@@ -21,6 +21,7 @@ type t =
     missings : Int2Set.t;
     state : int option array LargeArray.t;
     sort : int option LargeArray.t;
+    cache : bool LargeArray.t;
     free_id : int * int list;
   }
 (** (agent,site -> binding_state; missings);
@@ -34,6 +35,7 @@ let empty () =
     missings = Int2Set.empty;
     state = LargeArray.make 1 [||];
     sort = LargeArray.make 1 None;
+    cache = LargeArray.make 1 false;
     free_id =(0,[]);
   }
 
@@ -57,17 +59,19 @@ let add_agent sigs ty graph =
        missings = missings';
        state = graph.state;
        sort = graph.sort;
+       cache = graph.cache;
        free_id = (new_id,t);
      }
   | new_id,[] ->
      let missings' = Tools.recti (fun s a -> Int2Set.add (new_id,s) a)
 				 graph.missings ar in
-     let connect',state',sort' =
+     let connect',state',sort',cache' =
        if LargeArray.length graph.connect = new_id
        then LargeArray.append graph.connect (LargeArray.make new_id [||]),
 	    LargeArray.append graph.state (LargeArray.make new_id [||]),
-	    LargeArray.append graph.sort (LargeArray.make new_id None)
-       else graph.connect,graph.state,graph.sort in
+	    LargeArray.append graph.sort (LargeArray.make new_id None),
+	    LargeArray.append graph.cache (LargeArray.make new_id false)
+       else graph.connect,graph.state,graph.sort,graph.cache in
      let () = LargeArray.set connect' new_id al in
      let () = LargeArray.set state' new_id ai in
      let () = LargeArray.set sort' new_id (Some ty) in
@@ -78,6 +82,7 @@ let add_agent sigs ty graph =
        missings = missings';
        state = state';
        sort = sort';
+       cache = cache';
        free_id = (succ new_id,[])
      }
 
@@ -91,6 +96,7 @@ let add_free ag s graph =
     missings = Int2Set.remove (ag,s) graph.missings;
     state = graph.state;
     sort = graph.sort;
+    cache = graph.cache;
     free_id = graph.free_id;
   }
 let add_internal ag s i graph =
@@ -103,6 +109,7 @@ let add_internal ag s i graph =
     missings = graph.missings;
     state = graph.state;
     sort = graph.sort;
+    cache = graph.cache;
     free_id = graph.free_id;
   }
 
@@ -117,6 +124,7 @@ let add_link (ag,ty) s (ag',ty') s' graph =
     missings = Int2Set.remove (ag,s) (Int2Set.remove (ag',s') graph.missings);
     state = graph.state;
     sort = graph.sort;
+    cache = graph.cache;
     free_id = graph.free_id;
   }
 
@@ -132,6 +140,7 @@ let remove_agent ag graph =
     missings = Int2Set.filter (fun (ag',_) -> ag <> ag') graph.missings;
     state = graph.state;
     sort = graph.sort;
+    cache = graph.cache;
     free_id = let new_id,ids = graph.free_id in (new_id,ag::ids);
   }
 let remove_free ag s graph =
@@ -144,6 +153,7 @@ let remove_free ag s graph =
     missings = Int2Set.add (ag,s) graph.missings;
     state = graph.state;
     sort = graph.sort;
+    cache = graph.cache;
     free_id = graph.free_id
   }
 let get_internal ag s graph =
@@ -164,6 +174,7 @@ let remove_internal ag s graph =
     missings = graph.missings;
     state = graph.state;
     sort = graph.sort;
+    cache = graph.cache;
     free_id = graph.free_id
   }
 
@@ -178,6 +189,7 @@ let remove_link ag s ag' s' graph =
     missings = Int2Set.add (ag,s) (Int2Set.add (ag',s') graph.missings);
     state = graph.state;
     sort = graph.sort;
+    cache = graph.cache;
     free_id = graph.free_id;
   }
 
@@ -311,6 +323,9 @@ let debug_print f graph =
     )
     f graph.connect
 
+let clean_cache cache =
+  LargeArray.fill cache 0 (LargeArray.length cache) false
+
 type path = ((agent * int) * (agent * int)) list
 (** ((agent_id, agent_name),site_name) *)
 
@@ -327,52 +342,53 @@ let is_valid_path graph l =
   List.for_all (fun (((a,_),s),((a',_),s')) -> link_exists a s a' s' graph) l
 
 (* depth = number of edges between root and node *)
-let breadth_first_traversal dist stop_on_find is_interesting sigs links =
-  let rec look_each_site (id,ty,path as x) site (stop,don,out,next as acc) =
+let breadth_first_traversal dist stop_on_find is_interesting sigs links cache =
+  let rec look_each_site (id,ty,path as x) site (stop,out,next as acc) =
     if site = 0 then acc else
     match (LargeArray.get links id).(pred site) with
     | None -> look_each_site x (pred site) acc
     | Some ((id',ty'),site') ->
-       if (stop&&stop_on_find) then acc
-       else if IntSet.mem id' don then look_each_site x (pred site) acc
+       if (stop&&stop_on_find) then let () = clean_cache cache in acc
+       else if LargeArray.get cache id' then look_each_site x (pred site) acc
        else
-	 let don' = IntSet.add id' don in
+	 let () = LargeArray.set cache id' true in
 	 let path' = (((id',ty'),site'),((id,ty),pred site))::path in
 	 let out',store =
 	   match is_interesting id' with
 	   | Some x -> ((x,id'),path')::out,true
 	   | None -> out,false in
 	 let next' = (id',ty',path')::next in
-	 look_each_site x (pred site) (stop||store,don',out',next') in
-  let rec aux depth don out next = function
+	 look_each_site x (pred site) (stop||store,out',next') in
+  let rec aux depth out next = function
     | (_,ty,_ as x)::todos ->
-       let stop,don',out',next' =
-	 look_each_site x (Signature.arity sigs ty) (false,don,out,next) in
-       if stop&&stop_on_find then out' else aux depth don' out' next' todos 
+       let stop,out',next' =
+	 look_each_site x (Signature.arity sigs ty) (false,out,next) in
+       if stop&&stop_on_find then out' else aux depth out' next' todos
     | [] -> match next with
-	    | [] -> out 
+	    | [] -> let () = clean_cache cache in out
 	    (* end when all graph traversed and return the list of paths *)
-	    | _ -> match dist with 
-		   | Some d when d <= depth -> [] 
+	    | _ -> match dist with
+		   | Some d when d <= depth -> let () = clean_cache cache in []
 		   (* stop when the max distance is reached *)
-		   | Some _ -> aux (depth+1) don out [] next
-		   | None -> aux depth don out [] next
-  in aux 1 
+		   | Some _ -> aux (depth+1) out [] next
+		   | None -> aux depth out [] next
+  in aux 1
 
 let paths_of_interest
       is_interesting sigs graph start_ty start_point done_path =
-  let don = List.fold_left (fun s (_,((x,_),_)) -> IntSet.add x s)
-			   (IntSet.singleton start_point) done_path in
+  let () = LargeArray.set graph.cache start_point true in
+  let () = List.iter (fun (_,((x,_),_)) -> LargeArray.set graph.cache x true)
+		     done_path in
   let () = assert (not graph.outdated) in
   let acc = match is_interesting start_point with
     | None -> []
     | Some x -> [(x,start_point),done_path] in
-  breadth_first_traversal None false is_interesting sigs graph.connect don acc
-			 [] [start_point,start_ty,done_path]
+  breadth_first_traversal None false is_interesting sigs graph.connect
+			  graph.cache acc [] [start_point,start_ty,done_path]
 
 (* nodes_x: agent_id list = int * int list
    nodes_y: adent_id list = int list *)
-let are_connected 
+let are_connected
       ?candidate sigs graph ty_x x y nodes_x nodes_y dist store_dist =
   let () = assert (not graph.outdated) in
   (* look for the closest node in nodes_y *)
@@ -390,28 +406,29 @@ let are_connected
      start the breadth first search with the boundaries of nodes_x,
      that is all sites that are connected to other nodes in x
      and with all nodes in nodes_x marked as done *)
-  let rec prepare nodes_x = match nodes_x with
-    | (x,ty)::nds -> prepare_node x ty (Signature.arity sigs ty) (prepare nds)
-    | [] -> [] in
-  let rec done_nodes nodes_x = match nodes_x with
-    | [] -> IntSet.empty
-    | (x,_)::nds -> IntSet.add x (done_nodes nds) in
   match dist with
   | None when !store_dist ->
      (match candidate with
       | Some p when is_valid_path graph p -> Some p
       | (Some _ | None) ->
+	 let () = LargeArray.set graph.cache x true in
 	 (match
 	     breadth_first_traversal dist true
 				     (fun z -> if z = y then Some () else None)
-				     sigs graph.connect (IntSet.singleton x)
+				     sigs graph.connect graph.cache
 				     [] [] [x,ty_x,[]] with
 	   | [] -> None
 	   | [ _,p ] -> Some p
 	   | _ :: _ -> failwith "Edges.are_they_connected completely broken"))
   | _ ->
+     let () =
+       List.iter (fun (x,_) -> LargeArray.set graph.cache x true) nodes_x in
+     let prepare =
+       List.fold_left
+	 (fun acc (x,ty) -> prepare_node x ty (Signature.arity sigs ty) acc)
+	 [] nodes_x in
      match breadth_first_traversal dist true (is_in_nodes_y nodes_y) sigs
-				   graph.connect (done_nodes nodes_x) [] [] (prepare nodes_x)
+				   graph.connect graph.cache [] [] prepare
      with [] -> None
 	| [ _,p ] -> Some p
 	| _ :: _ -> failwith "Edges.are_they_connected completely broken"
