@@ -19,7 +19,7 @@ val add_internal : int -> int -> int -> t -> t
 val add_link : agent -> int -> agent -> int -> t -> t
 (** [add_link ag1 s1 ag2 s2 t] *)
 
-val remove_agent : agent -> t -> t
+val remove_agent : int -> t -> t
 val remove_free : int -> int -> t -> t
 val remove_internal : int -> int -> t -> t
 val remove_link : int -> int -> int -> int -> t -> t

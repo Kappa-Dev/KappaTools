@@ -111,8 +111,8 @@ let all_injections ?excp edges roots cca =
     (excp,[Connected_component.Matching.empty,[]]) cca
 
 let apply_negative_transformation (side_effects,edges) = function
-  | Primitives.Transformation.Agent nc ->
-     let edges' = Edges.remove_agent nc edges in
+  | Primitives.Transformation.Agent (id,_) ->
+     let edges' = Edges.remove_agent id edges in
      (side_effects,edges')
   | Primitives.Transformation.Freed ((id,_),s) -> (*(n,s)-bottom*)
      let edges' = Edges.remove_free id s edges in

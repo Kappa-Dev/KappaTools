@@ -120,7 +120,7 @@ let add_link (ag,ty) s (ag',ty') s' graph =
     free_id = graph.free_id;
   }
 
-let remove_agent (ag,ty) graph =
+let remove_agent ag graph =
   let () = assert (not graph.outdated) in
   let () = graph.outdated <- true in
   let () = LargeArray.set graph.connect ag [||] in

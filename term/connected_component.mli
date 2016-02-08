@@ -71,8 +71,8 @@ module Matching : sig
 
   val get_all : Edges.t -> t -> cc -> int -> int list
   (** [get_all graph matching_of_previous_cc cc root ]*)
-  val get_all_with_types : Edges.t -> t -> cc -> int -> (int * int) list
 
+  val get_all_with_types : Edges.t -> t -> cc -> int -> (int * int) list
 
   type cache
   val empty_cache : cache
