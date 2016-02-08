@@ -24,10 +24,9 @@ type rule_id = int
 type global_static_information =
   {
     global_compilation_result : compilation_result;
-    global_parameter     : Remanent_parameters_sig.parameters;
-    global_common_static : Bdu_analysis_type.bdu_common_static 
+    global_parameter : Remanent_parameters_sig.parameters;
+    global_bdu_common_static : Bdu_analysis_type.bdu_common_static 
   }
-(*compilation_result * Remanent_parameters_sig.parameters * Bdu_analysis_type.bdu_common_static*)
 
 type global_dynamic_information =
   {
@@ -49,7 +48,7 @@ let initialize_global_information parameter error mvbdu_handler compilation =
   {
     global_compilation_result = compilation;
     global_parameter     = parameter;
-    global_common_static = init_static
+    global_bdu_common_static = init_static
   },
   {
     mvbdu_handler = mvbdu_handler
@@ -65,7 +64,7 @@ let get_kappa_handler static = (get_compilation_information static).kappa_handle
 
 let get_cc_code static = (get_compilation_information static).cc_code
 							     
-let get_common_static static = static.global_common_static
+let get_bdu_common_static static = static.global_bdu_common_static
 
 let compute_initial_state error static =
   let parameter = get_parameter static in

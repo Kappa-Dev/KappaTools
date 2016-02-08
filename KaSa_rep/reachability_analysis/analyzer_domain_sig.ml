@@ -16,12 +16,15 @@
 module type Domain =
   sig
     type static_information
+
     type local_dynamic_information
+
     type dynamic_information =
       {
-	local:local_dynamic_information;
-	global:Analyzer_headers.global_dynamic_information
+	local : local_dynamic_information;
+	global: Analyzer_headers.global_dynamic_information
       }
+
     val initialize:
       Analyzer_headers.global_static_information ->
       Analyzer_headers.global_dynamic_information ->

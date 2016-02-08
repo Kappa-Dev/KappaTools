@@ -55,7 +55,7 @@ val get_parameter: global_static_information -> Remanent_parameters_sig.paramete
 
 val get_compilation_information: global_static_information -> compilation_result
 
-val get_common_static : global_static_information -> Bdu_analysis_type.bdu_common_static
+val get_bdu_common_static : global_static_information -> Bdu_analysis_type.bdu_common_static
 
 val compute_initial_state:
   Exception.method_handler ->
