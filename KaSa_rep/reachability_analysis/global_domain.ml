@@ -303,10 +303,10 @@ module Domain =
     let error, handler, bdu_union =
       Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_old bdu
     in
-    let error, handler, string_opt, updates_list =
+    let error, handler, string_opt, is_new_views, updates_list =
       if Mvbdu_wrapper.Mvbdu.equal bdu_old bdu_union
       then 
-        error, handler, string_opt, updates_list
+        error, handler, string_opt, false, updates_list
       else
         let () = 
           match string_opt with
@@ -334,7 +334,7 @@ module Domain =
             bdu_old 
             bdu_union
         in
-        error, handler, None, (agent_type, cv_id) :: updates_list
+        error, handler, None, true, (agent_type, cv_id) :: updates_list
     in
     let error, store =
       Bdu_analysis_type.Map_bdu_update.Map.add_or_overwrite parameter error
@@ -342,10 +342,22 @@ module Domain =
     in
     let dynamic = set_mvbdu_handler handler dynamic in  
     let dynamic = set_fixpoint_result store dynamic in
-    error, dynamic, updates_list
+    (*let error, event_list =
+      List.fold_left (fun (error, event_list) (agent_type, cv_id) ->
+        updates_list2event_list
+          ~string_opt:""
+          static
+          dynamic
+          agent_type
+          cv_id
+          event_list
+      ) (error, []) updates_list
+    in*)
+    error, is_new_views, dynamic, updates_list
 
   (***************************************************************************)
   (*get map restriction from covering classes*)
+
   let get_pair_list parameter error agent triple_list =
     let error, get_pair_list =
       List.fold_left (fun (error, current_list) (cv_id, list, set) ->
@@ -423,7 +435,7 @@ module Domain =
                     let error, handler, bdu_init =
                       Bdu_build.build_bdu parameter handler error pair_list
                     in
-                    let error, dynamic, updates_list =
+                    let error, is_new_views, dynamic, updates_list =
                       add_link 
                         ~string_opt:"Initial state\n"
                         error 
@@ -432,8 +444,7 @@ module Domain =
                         (agent_type, cv_id)
                         bdu_init
                         store 
-                        updates_list
-                        
+                        updates_list 
                     in
                     error, (dynamic, updates_list)
                   ) (error, (dynamic, updates_list)) get_pair_list
@@ -580,6 +591,7 @@ module Domain =
     error, dynamic, event_list
       
   (**************************************************************************)
+
   let get_store_proj_bdu_test_restriction static dynamic error =
     let error, result_static = 
       get_bdu_analysis_static static dynamic error
@@ -630,21 +642,8 @@ module Domain =
     in
     error, result_static.Bdu_analysis_type.store_modif_list_restriction_map
 
-  let get_store_wl_creation static dynamic error = 
-    (* the value dynamic should not contain the working list, it is at the
-       top of the hierarchy of modules *)
-    let error, result_static =
-      get_bdu_analysis_static static dynamic error
-    in
-    error, result_static.Bdu_analysis_type.store_wl_creation
-      
-  let get_store_covering_classes_modification_update_full static dynamic error =
-    let error, result_dynamic =
-      get_bdu_analysis_dynamic static dynamic error
-    in
-    error, result_dynamic.Bdu_analysis_type.store_covering_classes_modification_update_full
-
   (**************************************************************************)
+
   let is_enabled (static:static_information) dynamic error rule_id precondition =
     let parameter = get_parameter static in
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
@@ -673,71 +672,42 @@ module Domain =
     else 
       error, dynamic, None
 
-  (*
-    let dead_rule_array = dynamic.dead_rule in 
-    (* to be pushed in apply_rule in the rule domain 
-    (when we will split the domain concept-wise) *)
-      (*let dead_rule_array =                     
-
-    dead_rule_array.(rule_id) <- true;
-    dead_rule_array       
-    in*) 
-      (* From here: this code should not belong to the function is_enable, 
-    it implements the application of the rule *)
-      (* compute views that is enabled*) 
-    let error, (handler_bdu, new_wl, store_new_result) =
-    Bdu_fixpoint_iteration.compute_views_enabled
-    parameter
-    handler_bdu
-    error
-    handler_kappa
-    compiled
-    result_static.Bdu_analysis_type.store_remanent_triple
-    bdu_true
-    bdu_false
-    rule_id
-    bdu_creation_map
-    result_static.Bdu_analysis_type.store_modif_list_restriction_map
-    bdu_and_list_potential_map
-    result_static.Bdu_analysis_type.store_wl_creation (*FIXME*)
-    result_dynamic.Bdu_analysis_type.store_covering_classes_modification_update_full
-    proj_bdu_test_restriction
-    fixpoint_result (*FIXME*)
-    in
-    (*store*)
-    let dynamic_information =
-    {
-    dynamic with
-    mvbdu_handler = handler_bdu;
-    dead_rule     = dead_rule_array;
-    fixpoint_result = store_new_result
-    }
-    in
-      (** To here *)
-    error, dynamic_information, Some () 
-    (* precondition is empty for the moment, we will add information when necessary *)
-    else
-    error, dynamic, None*)
-        
-  (*update by setting handler_bdu*)
-  (*let is_enabled static dynamic error rule_id =
-    error, dynamic, None*)
+  (*  let dead_rule_array = dynamic.dead_rule in 
+      to be pushed in apply_rule in the rule domain 
+      (when we will split the domain concept-wise) *)
 
   (**************************************************************************)
-  let apply_rule static dynamic error rule_id precondition =
+
+ (* let compute_new_views static dynamic is_new_views updates_list event_list =
+    if is_new_views
+    then
+      let error, event_list =
+        List.fold_left (fun (error, event_list) (agent_type, cv_id) ->
+          updates_list2event_list
+            ~string_opt:""
+            static
+            dynamic
+            error
+            agent_type
+            cv_id
+            event_list
+        ) (error, []) updates_list
+      in
+      error, dynamic, event_list
+    else
+      error, dynamic, event_list
+
+  let compute_views_enabled static dynamic error rule_id =
     let parameter = get_parameter static in
-    let handler_kappa = get_kappa_handler static in
+    let kappa_handler = get_kappa_handler static in
     let compiled = get_cc_code static in
-    (*FIXME: the order of getting handler_bdu from dynamic before bdu_false/true?*)
-    let error, handler_bdu, bdu_false = get_mvbdu_false static dynamic error in
-    let error, handler_bdu, bdu_true = get_mvbdu_true static dynamic error in
-    let handler_bdu = get_mvbdu_handler dynamic in
+    let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
+    let error, dynamic, bdu_true = get_mvbdu_true static dynamic error in
+    let handler = get_mvbdu_handler dynamic in
     let error, store_remanent_triple = get_store_remanent_triple static dynamic error in
     let error, store_modif_list_restriction_map =
       get_store_modif_list_restriction_map static dynamic error
     in
-    let error, store_wl_creation = get_store_wl_creation static dynamic error in 
-    (* this should not exist *)
     let error, store_covering_classes_modification_update_full =
       get_store_covering_classes_modification_update_full static dynamic error
     in
@@ -745,7 +715,74 @@ module Domain =
       get_triple_restriction_map static dynamic error rule_id
     in
     let fixpoint_result = get_fixpoint_result dynamic in
-    let error, (handler_bdu, new_wl, store_new_result) =
+    (*--------------------------------------------------------------*)
+    let parameter_cv =
+      Remanent_parameters.update_prefix parameter "\t\tUpdating the views for"
+    in
+    let parameter_views = Remanent_parameters.update_prefix parameter "\t\t\t" in
+    let error, dynamic, event_list =
+      (*-----------------------------------------------------------------------*)
+      (*deal with views*)
+      Bdu_analysis_type.Map_triple_views.Map.fold
+        (fun (agent_id, agent_type, cv_id) _ (error, dynamic, updates_list) ->
+          let error =
+            Bdu_fixpoint_iteration.dump_cv_label
+              (Remanent_parameters.get_dump_reachability_analysis_diff parameter)
+              parameter_cv kappa_handler error store_remanent_triple
+              agent_type cv_id
+          in
+          (*-----------------------------------------------------------------------*)
+          let error, bdu_X =
+            match Bdu_analysis_type.Map_bdu_update.Map.find_option_without_logs
+              parameter error (agent_type, cv_id) fixpoint_result
+            with
+            | error, None -> error, bdu_false
+            | error, Some bdu -> error, bdu
+          in
+          let error, bdu_test =
+            match Bdu_analysis_type.Map_triple_views.Map.find_option
+              (agent_id, agent_type, cv_id) proj_bdu_test_restriction
+            with
+            | None -> error, bdu_true
+            | Some bdu -> error, bdu
+          in
+	  let error, handler, bdu_update =
+            match Bdu_analysis_type.Map_modif_list.Map.find_option_without_logs
+              parameter error
+              (agent_id, agent_type, rule_id, cv_id)
+              store_modif_list_restriction_map
+	    with
+            | error, None -> error, handler, bdu_X
+	    | error, Some list_a ->
+              Bdu_fixpoint_iteration.compute_bdu_update_views
+	        parameter_views
+	        handler
+	        error
+	        bdu_test
+	        list_a
+	        bdu_X
+          in
+          let error, is_new_views, dynamic, updates_list =
+            add_link 
+              ~string_opt:""
+              error
+              static
+              dynamic
+              (agent_type, cv_id)
+              bdu_update
+              fixpoint_result
+              updates_list
+          in
+          let error, dynamic, event_list =
+            
+          in
+          error, dynamic, event_list
+        ) proj_bdu_test_restriction (error, dynamic, [])
+    in
+    error, dynamic, event_list*)
+
+  let apply_rule static dynamic error rule_id precondition =
+    (*let error, (handler_bdu, new_wl, store_new_result) =
       Bdu_fixpoint_iteration.compute_views_enabled
         parameter
         handler_bdu
@@ -769,7 +806,7 @@ module Domain =
     in
     let dynamic = set_mvbdu_handler handler_bdu dynamic
     in
-    let dynamic = set_fixpoint_result store_new_result dynamic in
+    let dynamic = set_fixpoint_result store_new_result dynamic in*)
     error, dynamic, []   
       
   let rec apply_event_list static dynamic error event_list =
