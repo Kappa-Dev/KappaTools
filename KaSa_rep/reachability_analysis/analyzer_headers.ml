@@ -42,11 +42,15 @@ type kasa_state = unit
 
 type initial_state = Cckappa_sig.enriched_init
 
-let initialize_global_information parameter error mvbdu_handler compilation =
+let initialize_global_information parameter error mvbdu_handler compilation kappa_handler =
   let init_static = Bdu_analysis_main.init_bdu_common_static in
-  error, 
+  error,
   {
-    global_compilation_result = compilation;
+    global_compilation_result =
+      {
+	cc_code = compilation;
+	kappa_handler = kappa_handler;
+      };
     global_parameter     = parameter;
     global_bdu_common_static = init_static
   },

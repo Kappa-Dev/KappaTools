@@ -46,7 +46,8 @@ val initialize_global_information:
   Remanent_parameters_sig.parameters ->
   Exception.method_handler ->
   Mvbdu_wrapper.Mvbdu.handler ->
-  compilation_result ->
+  Cckappa_sig.compil ->
+  Cckappa_sig.kappa_handler ->
   Exception.method_handler * global_static_information * global_dynamic_information
 
 val dummy_precondition: precondition

@@ -20,9 +20,11 @@ module type Analyzer =
     type dynamic_information
 
     val main:
-      Analyzer_headers.global_static_information ->
-      Analyzer_headers.global_dynamic_information ->
+      Remanent_parameters_sig.parameters ->
       Exception.method_handler ->
+      Mvbdu_wrapper.Mvbdu.handler ->
+      Cckappa_sig.compil ->
+      Cckappa_sig.kappa_handler ->
       Exception.method_handler * static_information * dynamic_information
 
     val export:
@@ -53,7 +55,8 @@ struct
       type dynamic_information =
 	Domain.dynamic_information
 
-      let main static dynamic error =
+      let main parameter error mvbdu_handler compil kappa_handler =
+	let error, static, dynamic = Analyzer_headers.initialize_global_information parameter error mvbdu_handler compil kappa_handler in
 	let error, static, dynamic = Domain.initialize static dynamic error in
 	let rec aux error dynamic =
 	  let error, dynamic, next_opt = Domain.next_rule static dynamic error in

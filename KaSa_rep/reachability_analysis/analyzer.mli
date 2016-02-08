@@ -22,9 +22,11 @@ module type Analyzer =
     type dynamic_information
 
     val main:
-      Analyzer_headers.global_static_information ->
-      Analyzer_headers.global_dynamic_information ->
+      Remanent_parameters_sig.parameters ->
       Exception.method_handler ->
+      Mvbdu_wrapper.Mvbdu.handler ->
+      Cckappa_sig.compil ->
+      Cckappa_sig.kappa_handler ->
       Exception.method_handler * static_information * dynamic_information
 
     val export:
