@@ -73,11 +73,11 @@ val trace_of_pretrace: S.PH.B.PB.CI.Po.K.refined_step list -> trace
 val get_pretrace_of_trace: trace -> S.PH.B.PB.CI.Po.K.refined_step list
 
 (** get the date of an event in the simulation 
-    only proper events have a time *)
+    (only proper events have a time) *)
 val get_simulation_time_of_event: S.PH.B.PB.CI.Po.K.refined_step -> float option
 
 (** get the id of an event in the simulation
-    only proper events have an id *)
+    (only proper events have an id) *)
 val get_id_of_event: S.PH.B.PB.CI.Po.K.refined_step -> int option							       
 								
 (** remove the events after the last observable *)
