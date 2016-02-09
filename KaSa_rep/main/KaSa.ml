@@ -116,7 +116,7 @@ let main () =
   in
   (*-----------------------------------------------------------------------*)
   (*BDU of fixpoint iteration function*)
-  let error,handler_bdu, bdu_analysic =
+  let error,handler_bdu_opt, bdu_analysis =
     if Remanent_parameters.get_do_reachability_analysis parameters
     then
       let _ = Format.printf "Reachability analysis...@." in
@@ -134,7 +134,14 @@ let main () =
   in
   (*-----------------------------------------------------------------------*)
   (*call analyzer in module*)
-  (*let error, static_information, dynamic_information =
+  (*let error, handler_bdu =
+    match
+      handler_bdu_opt
+    with
+    | None -> Mvbdu_wrapper.Mvbdu.init parameters error
+    | Some handler_bdu -> error, handler_bdu
+  in       
+  let error, static_information, dynamic_information =
     A.main parameters error handler_bdu c_compil handler
   in*)
   (*-----------------------------------------------------------------------*)
