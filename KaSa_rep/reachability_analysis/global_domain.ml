@@ -73,8 +73,7 @@ module Domain =
 
     let get_bdu_common_static static = Analyzer_headers.get_bdu_common_static static   
 
-    (**get Cckappa_sig.compil type*)
-    let get_cc_code static = lift Analyzer_headers.get_cc_code static
+    let get_compil static = lift Analyzer_headers.get_cc_code static
 
     (*--------------------------------------------------------------------*)
     (** global dynamic information*)
@@ -102,7 +101,6 @@ module Domain =
       }
 
     (** dead rule local dynamic information*)
-
     let get_dead_rule dynamic = dynamic.dead_rule
       
     let set_dead_rule dead_rule dynamic = 
@@ -111,7 +109,6 @@ module Domain =
       }
       
     (** fixpoint result local dynamic information*)
-
     let get_fixpoint_result dynamic =
       (get_local_dynamic_information dynamic).fixpoint_result
 					
@@ -123,7 +120,6 @@ module Domain =
         } dynamic
 	
     (** bdu analysis dynamic in local dynamic information*)
-
     let get_domain_dynamic_information dynamic =
       (get_local_dynamic_information dynamic).domain_dynamic_information
 	
@@ -226,7 +222,7 @@ module Domain =
   let get_scan_rule_set (static: static_information) dynamic error =
     let parameter = get_parameter static in
     let kappa_handler = get_kappa_handler static in
-    let compiled = get_cc_code static in
+    let compiled = get_compil static in
     let error, handler_bdu = Boolean_mvbdu.init_remanent parameter error in
     let error, (handler_bdu, result) =
       Bdu_analysis_main.scan_rule_set
@@ -246,16 +242,16 @@ module Domain =
     set_domain_static result.Bdu_analysis_type.store_bdu_analysis_static static, dynamic
 
   (** get type bdu_analysis_static*)
-  let get_bdu_analysis_static (static:static_information) dynamic error =
-    let error, static_information, dynamic_information =
+  let get_bdu_analysis_static static dynamic error =
+    let error, static, dynamic =
       get_scan_rule_set static dynamic error
     in
-    let result = static_information.domain_static_information in
+    let result = static.domain_static_information in
     error, result
 
   (**get type bdu_analysis_dynamic*)
-  let get_bdu_analysis_dynamic (static:static_information) dynamic error =
-    let error, static_information, dynamic_information =
+  let get_bdu_analysis_dynamic static dynamic error =
+    let error, static, dynamic =
       get_scan_rule_set static dynamic error
     in
     let result = get_domain_dynamic_information dynamic in
@@ -274,7 +270,7 @@ module Domain =
   (**get type bdu_analysis_dynamic*)
 
   let get_store_covering_classes_modification_update_full static dynamic error =
-    let error, static_information, dynamic_information =
+    let error, static, dynamic =
       get_scan_rule_set static dynamic error
     in
     let result = get_domain_dynamic_information dynamic in
@@ -285,8 +281,6 @@ module Domain =
 
   let updates_list2event_list ?title:(title="") static dynamic error agent_type cv_id 
       event_list =
-    (*-----------------------------------------------------------------------*)
-    (*get a set of sites that are needed to add into working list*)
     let parameter = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let error, store_covering_classes_modification_update_full =
@@ -341,7 +335,7 @@ module Domain =
 	let () =
           Cckappa_sig.Site_map_and_set.Set.iter (fun rule_id ->
 	    (*mapping rule_id of type int -> string*)
-            let compiled = get_cc_code static in
+            let compiled = get_compil static in
 	    let error, rule_id_string =
 	      try
 		Handler.string_of_rule parameter error kappa_handler
@@ -362,6 +356,7 @@ module Domain =
     else error
   in
   (*-----------------------------------------------------------------------*)
+  (*convert into an event list*)
   error,
   Cckappa_sig.Site_map_and_set.Set.fold 
     (fun rule_id event_list ->
@@ -536,7 +531,7 @@ module Domain =
                         (agent_type, cv_id)
                         bdu_init
                         store 
-                        [] (*updates_list*)
+                        [] (*initial updates_list*)
                     in
                     error, (dynamic, event_list)
                   ) (error, (dynamic, event_list)) get_pair_list
@@ -729,7 +724,7 @@ module Domain =
               (agent_type, cv_id)
               bdu_update
               fixpoint_result
-              [] (*updates_list*)
+              [] (*initial updates_list*)
           in
           let error, dynamic, event_list =
             compute_new_views
@@ -793,7 +788,7 @@ module Domain =
               (agent_type, cv_id)
               bdu_update
               fixpoint_result
-              []
+              [] (*initial updates_list*)
           in
           let error, dynamic, event_list =
             compute_new_views
@@ -859,7 +854,7 @@ module Domain =
               (agent_type, cv_id)
               bdu_update
               fixpoint_result
-              []
+              [] (*initial updates_list*)
           in
           (*-----------------------------------------------------------------------*)
           let error, dynamic, event_list =
@@ -879,6 +874,7 @@ module Domain =
 
   (**************************************************************************)
   (*compute enable in different cases*)
+
   let compute_views_enabled static dynamic error rule_id =
     (*-----------------------------------------------------------------------*)
     (*deal with views*)
@@ -924,8 +920,112 @@ module Domain =
 
   let export static dynamic error kasa_state =
     error, dynamic, kasa_state
+
+  (**************************************************************************)
+
+  let print_static_information static dynamic error loggers =
+    let parameter = get_parameter static in
+    let kappa_handler = get_kappa_handler static in
+    let compiled = get_compil static in
+    let error, result = get_bdu_analysis_static static dynamic error in
+    let parameter = Remanent_parameters.update_prefix parameter "agent_type_" in
+    let error =
+      if Print_bdu_analysis_static.trace
+        || Remanent_parameters.get_trace parameter
+        || Remanent_parameters.get_dump_reachability_analysis_static parameter
+      then
+        let _ = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+        let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter) 
+          "Reachability analysis static information ...."
+        in
+        let _ = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+        let parameters_cv =
+          Remanent_parameters.update_prefix parameter ""
+        in
+        if (Remanent_parameters.get_trace parameters_cv)
+        then
+	  let _ =
+            Loggers.print_newline (Remanent_parameters.get_logger parameters_cv)
+	  in
+	  Print_bdu_analysis_static.print_result_static
+            parameter
+            error
+            kappa_handler
+            compiled
+            result
+        else error
+      else
+        error
+    in
+    error
       
+  (**************************************************************************)
+  let print_dynamic_information static dynamic error loggers =
+    let parameter = get_parameter static in
+    let kappa_handler = get_kappa_handler static in
+    let compiled = get_compil static in
+    let error, result = get_bdu_analysis_dynamic static dynamic error in
+    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+    let _ =
+      Loggers.fprintf (Remanent_parameters.get_logger parameter)
+        "============================================================";
+      Loggers.print_newline (Remanent_parameters.get_logger parameter);
+      Loggers.fprintf (Remanent_parameters.get_logger parameter) "* BDU Analysis:";
+      Loggers.print_newline (Remanent_parameters.get_logger parameter);
+      Loggers.fprintf (Remanent_parameters.get_logger parameter)
+        "============================================================";
+      Loggers.print_newline (Remanent_parameters.get_logger parameter); 
+      Loggers.print_newline (Remanent_parameters.get_logger parameter);
+      Loggers.fprintf (Remanent_parameters.get_logger parameter)
+        "** Dynamic information:";
+      (*------------------------------------------------------------------------------*)
+      Loggers.print_newline (Remanent_parameters.get_logger parameter);
+      let _ =
+        Print_bdu_analysis_dynamic.print_result_dynamic
+          parameter
+          error
+          kappa_handler
+          compiled
+          result
+      in
+      error
+    in
+    error
+
+  let print_fixpoint_result static dynamic error loggers =
+    let parameter = get_parameter static in
+    let kappa_handler = get_kappa_handler static in
+    let error, store_remanent_triple = get_store_remanent_triple static dynamic error in
+    let fixpoint_result = get_fixpoint_result dynamic in
+    let handler = get_mvbdu_handler dynamic in
+    let error, handler =
+      if  Remanent_parameters.get_dump_reachability_analysis_result parameter
+      then
+        Print_bdu_analysis.print_result_fixpoint 
+          parameter
+          handler
+          error 
+          kappa_handler
+	  store_remanent_triple
+	  fixpoint_result
+      else error, handler
+    in
+    let dynamic = set_mvbdu_handler handler dynamic in
+    error, dynamic, ()
+    
   let print static dynamic error loggers =
+    (*print static information*)
+    let error =
+      print_static_information static dynamic error loggers
+    in
+    (*print dynamic information*)
+    let error =
+      print_dynamic_information static dynamic error loggers
+    in
+    (*print result fixpoint*)
+    let error, dynamic, () =
+      print_fixpoint_result static dynamic error loggers
+    in
     error, dynamic, ()
 
   end

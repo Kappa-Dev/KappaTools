@@ -373,7 +373,8 @@ let print_result_dynamic parameter error handler_kappa compiled result =
   Loggers.print_newline (Remanent_parameters.get_logger parameter);
   Loggers.fprintf (Remanent_parameters.get_logger parameter)
     "============================================================";
-   Loggers.print_newline (Remanent_parameters.get_logger parameter); Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.print_newline (Remanent_parameters.get_logger parameter); 
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
   Loggers.fprintf (Remanent_parameters.get_logger parameter)
     "** Dynamic information:";
     (*------------------------------------------------------------------------------*)
@@ -385,7 +386,7 @@ let print_result_dynamic parameter error handler_kappa compiled result =
       handler_kappa
       result.store_contact_map_full
   in
-    (*------------------------------------------------------------------------------*)
+  (*------------------------------------------------------------------------------*)
   let _ =
       print_syn_map
         parameter

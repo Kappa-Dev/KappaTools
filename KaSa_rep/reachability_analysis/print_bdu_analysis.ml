@@ -113,6 +113,7 @@ let print_bdu_update_map parameter error handler_kappa result =
     result error
 
 (************************************************************************************)
+
 let smash_map decomposition
     ~show_dep_with_dimmension_higher_than:dim_min
     parameter handler error handler_kappa site_correspondence result =
@@ -181,7 +182,8 @@ let smash_map decomposition
 	      Mvbdu_wrapper.Mvbdu.mvbdu_rename parameter handler error bdu hconsed_asso
 	    in
 	    let error,handler,hconsed_vars =
-	      Mvbdu_wrapper.Mvbdu.variables_list_of_mvbdu parameter handler error renamed_mvbdu
+	      Mvbdu_wrapper.Mvbdu.variables_list_of_mvbdu 
+                parameter handler error renamed_mvbdu
 	    in
             let error,cv_map_opt =
 	      AgentMap.unsafe_get parameter error agent_type output
@@ -221,6 +223,8 @@ let smash_map decomposition
      in
      (error,handler,agent_map))
 
+  (**************************************************************************)
+
   let print_bdu_update_map_gen_decomposition decomposition
       ~smash:smash ~show_dep_with_dimmension_higher_than:dim_min
     parameter handler error handler_kappa site_correspondence result =
@@ -228,7 +232,9 @@ let smash_map decomposition
     smash
   then
    let error,handler,output =
-      smash_map decomposition ~show_dep_with_dimmension_higher_than:dim_min parameter handler error handler_kappa site_correspondence result
+      smash_map 
+        decomposition 
+        ~show_dep_with_dimmension_higher_than:dim_min parameter handler error handler_kappa site_correspondence result
    in
    AgentMap.fold
      parameter
@@ -248,10 +254,14 @@ let smash_map decomposition
 	    let error, handler =
 	      if trace || Remanent_parameters.get_trace parameter
 	      then
-		let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "INTENSIONAL DESCRIPTION:" in
+		let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                  "INTENSIONAL DESCRIPTION:" 
+                in
 		let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
 		let () = Mvbdu_wrapper.Mvbdu.print parameter mvbdu in
-		let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "EXTENSIONAL DESCRIPTION:" in
+		let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                  "EXTENSIONAL DESCRIPTION:" 
+                in
 		let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
 		error,handler
 	      else
@@ -288,7 +298,8 @@ let smash_map decomposition
 	    if trace || Remanent_parameters.get_trace parameter
 	    then
 	      let () =
-		Loggers.fprintf (Remanent_parameters.get_logger parameter) "agent_type:%i:%s:cv_id:%i"
+		Loggers.fprintf (Remanent_parameters.get_logger parameter) 
+                  "agent_type:%i:%s:cv_id:%i"
 		  agent_type agent_string cv_id
 	      in
 	      Loggers.print_newline (Remanent_parameters.get_logger parameter)
@@ -325,11 +336,19 @@ let smash_map decomposition
 		let error, handler =
 		  if trace || Remanent_parameters.get_trace parameter
 		  then
-		    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "INTENSIONAL DESCRIPTION:" in
-		    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+		    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                      "INTENSIONAL DESCRIPTION:" in
+		    let () = Loggers.print_newline 
+                      (Remanent_parameters.get_logger parameter) 
+                    in
 		    let () = Mvbdu_wrapper.Mvbdu.print parameter mvbdu in
-		    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "EXTENSIONAL DESCRIPTION:" in
-		    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+		    let () = Loggers.fprintf 
+                      (Remanent_parameters.get_logger parameter) 
+                      "EXTENSIONAL DESCRIPTION:" 
+                    in
+		    let () = Loggers.print_newline 
+                      (Remanent_parameters.get_logger parameter) 
+                    in
 		    error,handler
 		  else
 		    error,handler
@@ -439,9 +458,13 @@ let print_result_fixpoint parameter handler error handler_kappa site_corresponde
             Loggers.fprintf (Remanent_parameters.get_logger parameter)
 	      "------------------------------------------------------------" in
 	  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-          let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "* Fixpoint iteration :" in
+          let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+            "* Fixpoint iteration :"
+          in
 	  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-	  let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "------------------------------------------------------------" in
+	  let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+            "------------------------------------------------------------"
+          in
 	  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
 	  let error =
             print_bdu_update_map
@@ -459,9 +482,13 @@ let print_result_fixpoint parameter handler error handler_kappa site_corresponde
       Loggers.fprintf (Remanent_parameters.get_logger parameter)
         "------------------------------------------------------------" in
     let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "* Relational properties:" in
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "* Relational properties:" 
+    in
     let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "------------------------------------------------------------" in
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "------------------------------------------------------------" 
+    in
     let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
     let error, handler =
       print_bdu_update_map_cartesian_decomposition
@@ -479,9 +506,13 @@ let print_result_fixpoint parameter handler error handler_kappa site_corresponde
     let () =
       Loggers.print_newline (Remanent_parameters.get_logger parameter)
     in
-    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "* Non relational properties:" in
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) 
+      "* Non relational properties:" 
+    in
     let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "------------------------------------------------------------" in
+    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) 
+      "------------------------------------------------------------" 
+    in
     let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
     let error, handler =
       print_bdu_update_map_cartesian_abstraction

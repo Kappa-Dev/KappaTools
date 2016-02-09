@@ -78,6 +78,9 @@ let print_covering_classes_id parameter error handler_kappa result =
   error
 
 (************************************************************************************)
+(*print functions for bdu_common_static*)
+
+(************************************************************************************)
 (*side effects*)
 
 let print_half_break_effect parameter error handler_kappa compiled result =
@@ -322,6 +325,43 @@ let print_potential_side_effects parameter error handler_kappa compiled result =
     result2
 
 (************************************************************************************)
+
+let print_result_common_static parameter error handler_kappa compiled result =
+  let _ =
+    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "============================================================";
+     Loggers.print_newline (Remanent_parameters.get_logger parameter);
+     Loggers.fprintf (Remanent_parameters.get_logger parameter) "* BDU Analysis:";
+     Loggers.print_newline (Remanent_parameters.get_logger parameter);
+    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "============================================================";
+    Loggers.print_newline (Remanent_parameters.get_logger parameter);
+    Loggers.print_newline (Remanent_parameters.get_logger parameter);
+    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+      "** Common static information:";
+    Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  in
+  let _ =
+    print_side_effects
+      parameter
+      error
+      handler_kappa
+      compiled
+      result.store_side_effects
+  in
+  let _ =
+    print_potential_side_effects
+      parameter
+      error
+      handler_kappa
+      compiled
+      result.store_potential_side_effects
+  in
+  error
+
+(************************************************************************************)
+(*print functions of pre_static type*)
+(************************************************************************************)
 (*update of the views due to modification*)
 
 (*with agent_id*)
@@ -383,6 +423,49 @@ let print_modification_sites parameter error handler_kappa compiled result =
   in
   error
 
+(*with agent_id*)
+let print_test_sites parameter error handler_kappa compiled result =
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "Set of rules that may test a given site:";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  let error =
+    print_modification_sites_aux
+      parameter
+      error
+      handler_kappa
+      compiled
+      result
+  in
+  error
+
+(*with agent_id*)
+let print_test_modification_sites parameter error handler_kappa compiled result =
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "Set of rules that may test and modify a given site (excluding created agents):";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+    "------------------------------------------------------------";
+  Loggers.print_newline (Remanent_parameters.get_logger parameter);
+  let error =
+    print_modification_sites_aux
+      parameter
+      error
+      handler_kappa
+      compiled
+      result
+  in
+  error
+
+(*map*)
 (*without agent_id*)
 let print_modification_map_aux parameter error handler_kappa compiled result =
   Int2Map_Test_Modif.Map.iter
@@ -443,26 +526,7 @@ let print_modification_map parameter error handler_kappa compiled result =
 (************************************************************************************)
 (*valuation of the views that are tested*)
 
-(*with agent_id*)
-let print_test_sites parameter error handler_kappa compiled result =
-  Loggers.fprintf (Remanent_parameters.get_logger parameter)
-    "------------------------------------------------------------";
-  Loggers.print_newline (Remanent_parameters.get_logger parameter);
-  Loggers.fprintf (Remanent_parameters.get_logger parameter)
-    "Set of rules that may test a given site:";
-  Loggers.print_newline (Remanent_parameters.get_logger parameter);
-  Loggers.fprintf (Remanent_parameters.get_logger parameter)
-    "------------------------------------------------------------";
-  Loggers.print_newline (Remanent_parameters.get_logger parameter);
-  let error =
-    print_modification_sites_aux
-      parameter
-      error
-      handler_kappa
-      compiled
-      result
-  in
-  error
+
 
 (*without agent_id*)
 let print_test_map parameter error handler_kappa compiled result =
@@ -488,27 +552,6 @@ let print_test_map parameter error handler_kappa compiled result =
 (************************************************************************************)
 (*update and valuations of the views that are tested and modified.*)
 
-(*with agent_id*)
-let print_test_modification_sites parameter error handler_kappa compiled result =
-  Loggers.fprintf (Remanent_parameters.get_logger parameter)
-    "------------------------------------------------------------";
-  Loggers.print_newline (Remanent_parameters.get_logger parameter);
-  Loggers.fprintf (Remanent_parameters.get_logger parameter)
-    "Set of rules that may test and modify a given site (excluding created agents):";
-  Loggers.print_newline (Remanent_parameters.get_logger parameter);
-  Loggers.fprintf (Remanent_parameters.get_logger parameter)
-    "------------------------------------------------------------";
-  Loggers.print_newline (Remanent_parameters.get_logger parameter);
-  let error =
-    print_modification_sites_aux
-      parameter
-      error
-      handler_kappa
-      compiled
-      result
-  in
-  error
-
 (*without agent_id*)
 
 let print_test_modification_map parameter error handler_kappa compiled result =
@@ -531,53 +574,12 @@ let print_test_modification_map parameter error handler_kappa compiled result =
   in
   error
 
-(************************************************************************************)
-(*main print*)
-
-let print_result_common_static parameter error handler_kappa compiled result =
-  let _ =
-    Loggers.fprintf (Remanent_parameters.get_logger parameter)
-      "============================================================";
-     Loggers.print_newline (Remanent_parameters.get_logger parameter);Loggers.fprintf (Remanent_parameters.get_logger parameter) "* BDU Analysis:";
-     Loggers.print_newline (Remanent_parameters.get_logger parameter);
-    Loggers.fprintf (Remanent_parameters.get_logger parameter)
-      "============================================================";
-    Loggers.print_newline (Remanent_parameters.get_logger parameter);
-    Loggers.print_newline (Remanent_parameters.get_logger parameter);
-    Loggers.fprintf (Remanent_parameters.get_logger parameter)
-      "** Common static information:";
-    Loggers.print_newline (Remanent_parameters.get_logger parameter);
-  in
-  (*let _ =
-    print_covering_classes_id
-      parameter
-      error
-      handler_kappa
-      result.store_covering_classes_id
-  in*)
-  let _ =
-    print_side_effects
-      parameter
-      error
-      handler_kappa
-      compiled
-      result.store_side_effects
-  in
-  let _ =
-    print_potential_side_effects
-      parameter
-      error
-      handler_kappa
-      compiled
-      result.store_potential_side_effects
-  in
-  error
-
 let print_pre_static parameter error handler_kappa compiled result =
   let _ =
     Loggers.fprintf (Remanent_parameters.get_logger parameter)
       "============================================================";
-    Loggers.print_newline (Remanent_parameters.get_logger parameter);Loggers.fprintf (Remanent_parameters.get_logger parameter) "* BDU Analysis:";
+    Loggers.print_newline (Remanent_parameters.get_logger parameter);
+    Loggers.fprintf (Remanent_parameters.get_logger parameter) "* BDU Analysis:";
     Loggers.print_newline (Remanent_parameters.get_logger parameter);
     Loggers.fprintf (Remanent_parameters.get_logger parameter)
       "============================================================";
@@ -613,21 +615,148 @@ let print_pre_static parameter error handler_kappa compiled result =
       result.store_test_modification_sites
   in
   error
-    
+
+(************************************************************************************)  
+
+let print_proj_bdu_creation_restriction_map parameter error handler_kappa compiled result =
+  Map_final_creation_bdu.Map.iter
+    (fun rule_id map ->
+      let error, rule_id_string =
+        try
+          Handler.string_of_rule parameter error handler_kappa
+            compiled rule_id
+        with
+          _ -> warn parameter error (Some "line 364") Exit (string_of_int rule_id)
+      in
+      let _ =
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "%s\n" rule_id_string
+      in
+      Map_agent_type_creation_bdu.Map.iter
+        (fun (agent_type, cv_id) bdu ->
+          let error, agent_string =
+            try
+              Handler.string_of_agent parameter error handler_kappa agent_type
+            with
+              _ -> warn parameter error (Some "line 344") Exit (string_of_int agent_type)
+          in
+          let _ =
+            Loggers.fprintf (Remanent_parameters.get_logger parameter)
+              "agent_type:%i:%s:cv_id:%i\n" 
+              agent_type agent_string cv_id
+          in
+          Mvbdu_wrapper.Mvbdu.print parameter bdu
+        ) map
+    ) result
+
+let print_modif_list_restriction_map parameter error handler_kappa compiled result =
+  Map_modif_list.Map.iter
+    (fun (agent_id, agent_type, rule_id, cv_id) list_a ->
+      let error, rule_id_string =
+        try
+          Handler.string_of_rule parameter error handler_kappa
+            compiled rule_id
+        with
+          _ -> warn parameter error (Some "line 364") Exit (string_of_int rule_id)
+      in
+      let error, agent_string =
+        try
+          Handler.string_of_agent parameter error handler_kappa agent_type
+        with
+          _ -> warn parameter error (Some "line 344") Exit (string_of_int agent_type)
+      in
+      let _ =
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "%s\nagent_type:%i:%s:cv_id:%i\n" 
+          rule_id_string agent_type agent_string cv_id
+      in
+      Mvbdu_wrapper.Mvbdu.print_association_list parameter list_a      
+    ) result
+
+let print_proj_bdu_potential_restriction_map parameter error handler_kappa compiled result =
+  Map_final_potential_bdu.Map.iter
+    (fun rule_id map ->
+      let error, rule_id_string =
+        try
+          Handler.string_of_rule parameter error handler_kappa
+            compiled rule_id
+        with
+          _ -> warn parameter error (Some "line 364") Exit (string_of_int rule_id)
+      in
+      let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+        "%s\n"
+        rule_id_string
+      in
+      Map_agent_type_potential_bdu.Map.iter 
+        (fun (agent_type, new_site_name, cv_id) (bdu, list_a) ->
+          let error, agent_string =
+            try
+              Handler.string_of_agent parameter error handler_kappa agent_type
+            with
+              _ -> warn parameter error (Some "line 344") Exit (string_of_int agent_type)
+          in
+          let error, site_string =
+            try
+              Handler.string_of_site parameter error handler_kappa agent_type new_site_name
+            with
+              _ -> warn parameter error (Some "line 350") Exit (string_of_int new_site_name)
+          in
+          let _ =
+            Loggers.fprintf (Remanent_parameters.get_logger parameter)
+              "agent_type:%i:%s:new_site_name:%i:%s:cv_id:%i\n"
+              agent_type agent_string new_site_name site_string cv_id
+          in
+          Mvbdu_wrapper.Mvbdu.print parameter bdu;
+          Mvbdu_wrapper.Mvbdu.print_association_list parameter list_a
+        )
+        map
+    ) result
+
+let print_proj_bdu_test_restriction parameter error handler_kappa compiled result =
+  Map_rule_id_views.Map.iter
+    (fun rule_id map ->
+      let error, rule_id_string =
+        try
+          Handler.string_of_rule parameter error handler_kappa
+            compiled rule_id
+        with
+          _ -> warn parameter error (Some "line 364") Exit (string_of_int rule_id)
+      in
+      let _ =
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "%s\n"  rule_id_string
+      in
+      Map_triple_views.Map.iter
+        (fun (agent_id, agent_type, cv_id) bdu ->
+          let error, agent_string =
+            try
+              Handler.string_of_agent parameter error handler_kappa agent_type
+            with
+              _ -> warn parameter error (Some "line 344") Exit (string_of_int agent_type)
+          in
+          let _ =
+            Loggers.fprintf (Remanent_parameters.get_logger parameter)
+              "agent_type:%i:%s:cv_id:%i\n"
+              agent_type agent_string cv_id
+          in
+          Mvbdu_wrapper.Mvbdu.print parameter bdu
+        ) map      
+    ) result
 
 let print_result_static parameter error handler_kappa compiled result =
   let _ =
     Loggers.fprintf (Remanent_parameters.get_logger parameter)
       "============================================================";
-     Loggers.print_newline (Remanent_parameters.get_logger parameter);Loggers.fprintf (Remanent_parameters.get_logger parameter) "* BDU Analysis:";
      Loggers.print_newline (Remanent_parameters.get_logger parameter);
-    Loggers.fprintf (Remanent_parameters.get_logger parameter)
-      "============================================================";
-    Loggers.print_newline (Remanent_parameters.get_logger parameter);
-    Loggers.print_newline (Remanent_parameters.get_logger parameter);
-    Loggers.fprintf (Remanent_parameters.get_logger parameter)
-      "** Static information:";
-    Loggers.print_newline (Remanent_parameters.get_logger parameter);
+     Loggers.fprintf (Remanent_parameters.get_logger parameter) "* BDU Analysis:";
+     Loggers.print_newline (Remanent_parameters.get_logger parameter);
+     Loggers.fprintf (Remanent_parameters.get_logger parameter)
+       "============================================================";
+     Loggers.print_newline (Remanent_parameters.get_logger parameter);
+     Loggers.print_newline (Remanent_parameters.get_logger parameter);
+     Loggers.fprintf (Remanent_parameters.get_logger parameter)
+       "** Static information:";
+     Loggers.print_newline (Remanent_parameters.get_logger parameter);
   in
   let _ =
     print_covering_classes_id
@@ -636,69 +765,38 @@ let print_result_static parameter error handler_kappa compiled result =
       handler_kappa
       result.store_covering_classes_id
   in
-  (*let _ =
-    print_side_effects
-      parameter
-      error
-      handler_kappa
-      compiled
-      result.store_side_effects
-  in
   let _ =
-    print_potential_side_effects
-      parameter
+    print_proj_bdu_creation_restriction_map
+      parameter 
       error
-      handler_kappa
-      compiled
-      result.store_potential_side_effects
-  in*)
-  (*let _ =
-    print_modification_sites
-      parameter
-      error
-      handler_kappa
-      compiled
-      result.store_modification_sites
+      handler_kappa 
+      compiled result.store_proj_bdu_creation_restriction_map
   in
+  (*store_modif_list_restriction_map*)
   let _ =
-    print_test_sites
+    print_modif_list_restriction_map
       parameter
       error
       handler_kappa
       compiled
-      result.store_test_sites
+      result.store_modif_list_restriction_map
   in
+  (*store_proj_bdu_potential_restriction_map*)
   let _ =
-    print_test_modification_sites
+    print_proj_bdu_potential_restriction_map
       parameter
       error
       handler_kappa
       compiled
-      result.store_test_modification_sites
-  in*)
-  (*print if one wants to debug*)
-  (*let _ =
-    print_modification_map
+      result.store_proj_bdu_potential_restriction_map
+  in
+  (*store_proj_bdu_test_restriction*)
+  let _ =
+    print_proj_bdu_test_restriction
       parameter
       error
-    handler_kappa
-    compiled
-      result.store_modif_map
-  in*)
-  (*let _ =
-    print_test_map
-      parameter
-      error
-    handler_kappa
-    compiled
-      result.store_test_map
-  in*)
- (*let _ =
-    print_test_modification_map
-      parameter
-      error
-   handler_kappa
-   compiled
-      result.store_test_modif_map
-  in*)
+      handler_kappa
+      compiled
+      result.store_proj_bdu_test_restriction
+  in
   error

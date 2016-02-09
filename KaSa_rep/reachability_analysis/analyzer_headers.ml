@@ -73,7 +73,7 @@ let get_bdu_common_static static = static.global_bdu_common_static
 let compute_initial_state error static =
   let parameter = get_parameter static in
   let compil = get_cc_code static in
-  let error,init =
+  let error, init =
     (Int_storage.Nearly_inf_Imperatif.fold
        parameter
        error
@@ -81,7 +81,7 @@ let compute_initial_state error static =
        compil.Cckappa_sig.init
        [])
   in
-  error,List.rev init
+  error, List.rev init
 
 let get_mvbdu_handler dynamic = dynamic.mvbdu_handler
 let set_mvbdu_handler handler dynamic = {dynamic with mvbdu_handler = handler}

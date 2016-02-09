@@ -1,25 +1,26 @@
 (**
-  * analyzer_sig.mli
-  * openkappa
-  * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
-  * 
-  * Creation: 2016, the 30th of January
-  * Last modification: 
-  * 
-  * Compute the relations between sites in the BDU data structures
-  * 
-  * Copyright 2010,2011,2012,2013,2014,2015,2016 Institut National de Recherche 
-  * en Informatique et en Automatique.  
-  * All rights reserved.  This file is distributed     
-  * under the terms of the GNU Library General Public License *)
+   * analyzer_sig.mli
+   * openkappa
+   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
+   * 
+   * Creation: 2016, the 30th of January
+   * Last modification: 
+   * 
+   * Compute the relations between sites in the BDU data structures
+   * 
+   * Copyright 2010,2011,2012,2013,2014,2015,2016 Institut National de Recherche 
+   * en Informatique et en Automatique.  
+   * All rights reserved.  This file is distributed     
+   * under the terms of the GNU Library General Public License *)
 
 
 module Product 
   (New_domain:Analyzer_domain_sig.Domain)
   (Underlying_domain:Analyzer_domain_sig.Domain) =
+  
   (struct
       
-    type ('a,'b) pair =
+    type ('a, 'b) pair =
       {
 	new_domain       : 'a;
 	underlying_domain: 'b
@@ -29,13 +30,14 @@ module Product
       (New_domain.static_information, Underlying_domain.static_information) pair
 
     type local_dynamic_information =
-      (New_domain.local_dynamic_information, Underlying_domain.local_dynamic_information) pair
-
+      (New_domain.local_dynamic_information,
+       Underlying_domain.local_dynamic_information) pair
+        
     type dynamic_information =
       {
 	local : local_dynamic_information;
 	global: Analyzer_headers.global_dynamic_information;
-    }
+      }
 
     let smash_dynamic underlying_domain new_domain =
       {
@@ -58,7 +60,8 @@ module Product
       }
 
     let initialize global_static_information global_dynamic_information error =
-      let error, underlying_domain_static_information, underlying_domain_dynamic_information =
+      let error, underlying_domain_static_information,
+        underlying_domain_dynamic_information =
         Underlying_domain.initialize global_static_information 
           global_dynamic_information 
           error 
@@ -74,7 +77,6 @@ module Product
         underlying_domain = underlying_domain_static_information
       },
       smash_dynamic underlying_domain_dynamic_information new_domain_dynamic_information
-		    
 	
     type 'a zeroary =
       static_information
@@ -118,7 +120,6 @@ module Product
     (* be careful, the concatenation should be done in the correct order to
        get a linear time complexity instead of a quadratic one*)
 
-  
     let is_enabled static dynamic error rule_id precondition =
       let error, underlying_domain_dynamic_information, output_opt =
         Underlying_domain.is_enabled
@@ -133,9 +134,9 @@ module Product
       in
       match output_opt with
       | None ->
-	 error,
-	 smash_dynamic underlying_domain_dynamic_information new_domain_dynamic_information,
-	 None
+	error,
+	smash_dynamic underlying_domain_dynamic_information new_domain_dynamic_information,
+	None
       | Some precondition ->
 	let error, new_domain_dynamic_information, output_opt =
           New_domain.is_enabled
@@ -145,7 +146,11 @@ module Product
             rule_id
             precondition
         in
-	let dynamic = smash_dynamic underlying_domain_dynamic_information new_domain_dynamic_information in
+	let dynamic = 
+          smash_dynamic 
+            underlying_domain_dynamic_information 
+            new_domain_dynamic_information 
+        in
 	error, dynamic, output_opt
 
     let apply_rule static dynamic error rule_id precondition =
@@ -160,13 +165,17 @@ module Product
       let error, new_domain_dynamic_information, event_list' =
         New_domain.apply_rule 
           static.new_domain
-          (new_domain_dynamic_information underlying_domain_dynamic_information dynamic)
+          (new_domain_dynamic_information
+             underlying_domain_dynamic_information 
+             dynamic)
 	  error 
           rule_id
           precondition 
       in
       error,
-      smash_dynamic underlying_domain_dynamic_information new_domain_dynamic_information,
+      smash_dynamic
+        underlying_domain_dynamic_information 
+        new_domain_dynamic_information,
       List.fold_left (fun list a -> a :: list) event_list event_list'
     (* be careful, the concatenation should be done in the correct order to get
        a linear time complexity instead of a quadratic one*)       
@@ -182,7 +191,9 @@ module Product
       let error, new_domain_dynamic_information, event_list'' = 
         New_domain.apply_event_list 
           static.new_domain
-          (new_domain_dynamic_information underlying_domain_dynamic_information dynamic)
+          (new_domain_dynamic_information
+             underlying_domain_dynamic_information 
+             dynamic)
 	  error
           event_list
       in
@@ -190,7 +201,9 @@ module Product
       (* be careful, the concatenation should be done in the correct order to get
          a linear time complexity instead of a quadratic one*)
       error,
-      smash_dynamic underlying_domain_dynamic_information new_domain_dynamic_information,
+      smash_dynamic
+        underlying_domain_dynamic_information 
+        new_domain_dynamic_information,
       event_list
         
     let export static dynamic error kasa_state =
@@ -204,12 +217,16 @@ module Product
       let error, new_domain_dynamic_information, kasa_state =
         New_domain.export
           static.new_domain 
-          (new_domain_dynamic_information underlying_domain_dynamic_information dynamic)
+          (new_domain_dynamic_information 
+             underlying_domain_dynamic_information 
+             dynamic)
 	  error
           kasa_state
       in
       error,
-      smash_dynamic underlying_domain_dynamic_information new_domain_dynamic_information,
+      smash_dynamic 
+        underlying_domain_dynamic_information 
+        new_domain_dynamic_information,
       kasa_state
 	
     let print static dynamic error loggers =
@@ -223,15 +240,19 @@ module Product
       let error, new_domain_dynamic_information, () =
         New_domain.print 
           static.new_domain
-          (new_domain_dynamic_information underlying_domain_dynamic_information dynamic)
+          (new_domain_dynamic_information 
+             underlying_domain_dynamic_information 
+             dynamic)
 	  error
           loggers
       in
       error,
-      smash_dynamic underlying_domain_dynamic_information new_domain_dynamic_information,
+      smash_dynamic
+        underlying_domain_dynamic_information 
+        new_domain_dynamic_information,
       ()
-
-	end:Analyzer_domain_sig.Domain)
-	
-	
+        
+   end:Analyzer_domain_sig.Domain)
+    
+    
     
