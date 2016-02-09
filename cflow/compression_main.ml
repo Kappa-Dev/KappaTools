@@ -250,7 +250,7 @@ let compress_and_print logger env log_info step_list =
 	  let error,log_info,causal_story_table = 
             if weak_compression_on || strong_compression_on 
             then
-	      let error,log_info,causal_story_list = (* in progress *)
+	      let error,log_info,causal_story_list = 
 		Utilities_expert.fold_over_the_causal_past_of_observables_with_a_progress_bar_while_reshaking_the_trace
 		  parameter ~shall_we_compute:always ~shall_we_compute_profiling_information:always 
 		  handler log_info error
@@ -271,32 +271,6 @@ let compress_and_print logger env log_info step_list =
 		  step_list
 		  table2
 	      in 
-
-	  (*    (* Firstly, run the causal compression *)
-	      let error,log_info,simplified_event_list = aux 0 (error,log_info,step_list) in 
-	      (* Then we fold over each trace that end in an observable, and store the causal compression in a table *)
-	      let error,log_info,causal_story_list =
-		U.fold_over_the_causal_past_of_observables_with_a_progress_bar
-		  parameter ~shall_we_compute:always ~shall_we_compute_profiling_information:always 
-		  handler log_info error
-		  always never
-		  (fun parameter  ?(shall_we_compute=always) ?(shall_we_compute_profiling_information=always) handler log_info error trace info story_list -> 
-		   (* we remove pseudo inverse events *)
-		      let error,log_info,trace = 
-                      	U.remove_pseudo_inverse_events (do_not_log parameter)  ~shall_we_compute:always ~shall_we_compute_profiling_information:always handler log_info error trace
-		      in
-		      (* we compute causal compression *)
-		      let error,log_info,trace = 
-			U.cut (do_not_log parameter) ~shall_we_compute:always ~shall_we_compute_profiling_information:always handler log_info error trace
-		      in
-		      (* we store the trace *)
-		      let error,log_info,causal_story_array = 
-			U.store_trace parameter  ~shall_we_compute:always ~shall_we_compute_profiling_information:always handler log_info error trace info story_list 
-		      in 
-		      error,log_info,Stop.success causal_story_array)
-		  simplified_event_list
-		  table2
-	      in*)
 	      let error,log_info,causal_story_list = 
 		U.flatten_story_table  parameter handler log_info error causal_story_list 
 	      in 
