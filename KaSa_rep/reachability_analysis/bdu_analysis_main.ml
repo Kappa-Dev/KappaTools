@@ -212,6 +212,7 @@ let scan_rule_static parameter error handler_kappa handler_bdu rule_id rule
       error
       store_remanent_triple
       store_potential_side_effects
+      store_result.store_proj_bdu_potential_restriction_map
   in
   (*-------------------------------------------------------------------------------*)
   let (error, handler_bdu), store_proj_bdu_test_restriction =
@@ -222,6 +223,7 @@ let scan_rule_static parameter error handler_kappa handler_bdu rule_id rule
       rule_id
       rule
       store_remanent_triple
+      store_result.store_proj_bdu_test_restriction
   in
   (*-------------------------------------------------------------------------------*)
   error, handler_bdu,

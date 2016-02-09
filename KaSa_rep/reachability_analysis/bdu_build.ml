@@ -725,12 +725,12 @@ let store_bdu_potential_effect_restriction_map parameter handler error store_rem
 let collect_proj_bdu_potential_restriction_map parameter handler error
     store_remanent_triple
     store_potential_side_effects 
-    (*store_bdu_potential_restriction_map*) =
+    store_result =
   let store_init_bdu_potential_restriction_map =
     Map_potential_bdu.Map.empty
   in
   let error, (handler, store_bdu_potential_restriction_map) =
-    store_bdu_potential_effect_restriction_map
+    store_bdu_potential_effect_restriction_map (* this function should work directly on the partitioned map (store_result) *)
       parameter
       handler
       error
@@ -742,7 +742,7 @@ let collect_proj_bdu_potential_restriction_map parameter handler error
   (*an empty hconsed list*)
   let error, handler, empty = 
     Mvbdu_wrapper.Mvbdu.build_reverse_sorted_association_list parameter handler error [] in
-  let (error, handler), store_result =
+  let (error, handler), store_result' =
     Project2bdu_potential.proj2_monadic
       parameter
       (error, handler)
@@ -752,6 +752,12 @@ let collect_proj_bdu_potential_restriction_map parameter handler error
       (fun _ (error, handler) _ pair' -> (error, handler), pair')
       store_bdu_potential_restriction_map
   in
+  let store_result =
+    Map_final_potential_bdu.Map.fold
+      Map_final_potential_bdu.Map.add
+      store_result'
+      store_result
+  in
   (error, handler), store_result
 
 (************************************************************************************)
@@ -759,12 +765,12 @@ let collect_proj_bdu_potential_restriction_map parameter handler error
 
 let collect_proj_bdu_test_restriction parameter handler error
     rule_id rule store_remanent_triple 
-    (*store_bdu_test_restriction_map*) =
+    store_result =
   let store_init_bdu_test_restriction_map =
     Map_test_bdu.Map.empty
   in
   let error, (handler, store_bdu_test_restriction_map) =
-    collect_bdu_test_restriction_map
+    collect_bdu_test_restriction_map (* collect should work directly on the partitioned map (store_result) *)
       parameter
       handler
       error
@@ -774,7 +780,7 @@ let collect_proj_bdu_test_restriction parameter handler error
       store_init_bdu_test_restriction_map
   in
   let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in
-  let (error, handler), store_result =
+  let (error, handler), store_result' =
     Project2_bdu_views.proj2_monadic
       parameter
       (error, handler)
@@ -788,5 +794,11 @@ let collect_proj_bdu_test_restriction parameter handler error
         (error, handler), bdu_union
       )
       store_bdu_test_restriction_map
+  in
+  let store_result =
+     Map_rule_id_views.Map.fold
+      Map_rule_id_views.Map.add
+      store_result'
+      store_result
   in
   (error, handler), store_result
