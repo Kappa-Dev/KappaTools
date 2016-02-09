@@ -358,12 +358,12 @@ let collect_bdu_creation_restriction_map
 
 let collect_proj_bdu_creation_restriction_map parameter handler_bdu error
     rule_id rule store_remanent_triple 
-    (*store_bdu_creation_restriction_map*) =
+    store_result =
   let store_init_bdu_creation_restriction_map =
     Map_creation_bdu.Map.empty
   in
   let error, (handler_bdu, store_bdu_creation_restriction_map) =
-    collect_bdu_creation_restriction_map
+    collect_bdu_creation_restriction_map (* collect should work directly on the partitioned map (store_result) *)
       parameter
       handler_bdu
       error
@@ -375,7 +375,7 @@ let collect_proj_bdu_creation_restriction_map parameter handler_bdu error
   let error, handler_bdu, bdu_true = 
     Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler_bdu error 
   in
-  let (error, handler_bdu), store_result =
+  let (error, handler_bdu), store_result' =
     Project2bdu_creation.proj2_monadic
       parameter
       (error, handler_bdu)
@@ -389,6 +389,12 @@ let collect_proj_bdu_creation_restriction_map parameter handler_bdu error
         (error, handler_bdu), bdu_union
       )
       store_bdu_creation_restriction_map
+  in
+  let store_result =
+     Map_final_creation_bdu.Map.fold
+      Map_final_creation_bdu.Map.add
+      store_result'
+      store_result
   in
   (error, handler_bdu), store_result
 		    

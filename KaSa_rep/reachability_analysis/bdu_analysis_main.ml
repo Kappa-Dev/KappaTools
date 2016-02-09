@@ -181,6 +181,7 @@ let scan_rule_static parameter error handler_kappa handler_bdu rule_id rule
       rule_id
       rule
       store_remanent_triple
+      store_result.store_proj_bdu_creation_restriction_map
   in
   (*-------------------------------------------------------------------------------*)
   let error, (handler_bdu, store_bdu_init_restriction_map) =
