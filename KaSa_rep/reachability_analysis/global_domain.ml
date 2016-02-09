@@ -619,10 +619,6 @@ module Domain =
     else 
       error, dynamic, None
 
-  (*  let dead_rule_array = dynamic.dead_rule in 
-      to be pushed in apply_rule in the rule domain 
-      (when we will split the domain concept-wise) *)
-
   (**************************************************************************)
   (*compute new views *)
 
@@ -906,17 +902,21 @@ module Domain =
     error, dynamic, event_list
 
   (**************************************************************************)
+  (*  let dead_rule_array = dynamic.dead_rule in 
+      to be pushed in apply_rule in the rule domain 
+      (when we will split the domain concept-wise) *)
 
   let apply_rule static dynamic error rule_id precondition =
     let error, dynamic, event_list =
       compute_views_enabled static dynamic error rule_id
     in
     error, dynamic, event_list
+
+  (* events enable communication between domains. At this moment, the
+     global domain does not collect information *)
       
   let rec apply_event_list static dynamic error event_list =
     error, dynamic, [] 
-  (* events enable communication between domains. At this moment, the
-     global domain does not collect information *)
 
   let export static dynamic error kasa_state =
     error, dynamic, kasa_state
@@ -934,63 +934,72 @@ module Domain =
         || Remanent_parameters.get_trace parameter
         || Remanent_parameters.get_dump_reachability_analysis_static parameter
       then
-        let _ = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-        let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter) 
-          "Reachability analysis static information ...."
-        in
-        let _ = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-        let parameters_cv =
-          Remanent_parameters.update_prefix parameter ""
-        in
-        if (Remanent_parameters.get_trace parameters_cv)
-        then
-	  let _ =
-            Loggers.print_newline (Remanent_parameters.get_logger parameters_cv)
-	  in
-	  Print_bdu_analysis_static.print_result_static
-            parameter
-            error
-            kappa_handler
-            compiled
-            result
-        else error
+        List.fold_left (fun error log ->
+          let _ = Loggers.print_newline log in
+          let _ = Loggers.fprintf log "Reachability analysis static information ...." in
+          let _ = Loggers.print_newline log in
+          let parameters_cv = Remanent_parameters.update_prefix parameter "" in
+          begin
+            if (Remanent_parameters.get_trace parameters_cv)
+            then
+	      let _ =
+                Loggers.print_newline log (*(Remanent_parameters.get_logger parameters_cv)*)
+	      in
+	      let error =
+                Print_bdu_analysis_static.print_result_static
+                  parameter
+                  error
+                  kappa_handler
+                  compiled
+                  result
+              in error
+            else error
+          end
+        ) error loggers
       else
         error
     in
-    error
+    error, dynamic, ()
       
   (**************************************************************************)
+
   let print_dynamic_information static dynamic error loggers =
     let parameter = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let compiled = get_compil static in
     let error, result = get_bdu_analysis_dynamic static dynamic error in
-    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-    let _ =
-      Loggers.fprintf (Remanent_parameters.get_logger parameter)
-        "============================================================";
-      Loggers.print_newline (Remanent_parameters.get_logger parameter);
-      Loggers.fprintf (Remanent_parameters.get_logger parameter) "* BDU Analysis:";
-      Loggers.print_newline (Remanent_parameters.get_logger parameter);
-      Loggers.fprintf (Remanent_parameters.get_logger parameter)
-        "============================================================";
-      Loggers.print_newline (Remanent_parameters.get_logger parameter); 
-      Loggers.print_newline (Remanent_parameters.get_logger parameter);
-      Loggers.fprintf (Remanent_parameters.get_logger parameter)
-        "** Dynamic information:";
-      (*------------------------------------------------------------------------------*)
-      Loggers.print_newline (Remanent_parameters.get_logger parameter);
-      let _ =
-        Print_bdu_analysis_dynamic.print_result_dynamic
-          parameter
-          error
-          kappa_handler
-          compiled
-          result
-      in
-      error
+    let error =
+      List.fold_left (fun error log ->
+        let () = Loggers.print_newline log in
+        let _ =
+          Loggers.fprintf (*(Remanent_parameters.get_logger parameter)*) log
+            "============================================================";
+          Loggers.print_newline log;
+          Loggers.fprintf log "* BDU Analysis:";
+          Loggers.print_newline log;
+          Loggers.fprintf log
+            "============================================================";
+          Loggers.print_newline log; 
+          Loggers.print_newline log;
+          Loggers.fprintf log
+            "** Dynamic information:";
+          (*------------------------------------------------------------------------------*)
+          Loggers.print_newline log
+        in
+        let _ =
+          Print_bdu_analysis_dynamic.print_result_dynamic
+            parameter
+            error
+            kappa_handler
+            compiled
+            result
+        in
+        error
+      ) error loggers
     in
-    error
+    error, set_domain_dynamic_information result dynamic, ()
+      
+  (**************************************************************************)
 
   let print_fixpoint_result static dynamic error loggers =
     let parameter = get_parameter static in
@@ -1012,17 +1021,19 @@ module Domain =
     in
     let dynamic = set_mvbdu_handler handler dynamic in
     error, dynamic, ()
-    
+
+  (**************************************************************************)
+
   let print static dynamic error loggers =
     (*print static information*)
-    let error =
+    let error, dynamic, () =
       print_static_information static dynamic error loggers
     in
     (*print dynamic information*)
-    let error =
+    let error, dynamic, () =
       print_dynamic_information static dynamic error loggers
     in
-    (*print result fixpoint*)
+    (*print fixpoint result*)
     let error, dynamic, () =
       print_fixpoint_result static dynamic error loggers
     in

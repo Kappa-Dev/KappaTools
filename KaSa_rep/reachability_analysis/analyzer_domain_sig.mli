@@ -18,7 +18,9 @@ module type Domain =
   sig
 
     type static_information
+
     type local_dynamic_information
+
     type dynamic_information =
       {
 	local:local_dynamic_information;

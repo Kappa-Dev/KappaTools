@@ -193,6 +193,45 @@ agent_type:0:A:site_type:0:x~@list of covering_class_id:
 covering_class_id:0
 agent_type:1:B:site_type:0:x~@list of covering_class_id:
 covering_class_id:0
+rule 1
+agent_type:0:A:cv_id:0
+agent_type_Id=2
+agent_type_ (site_type:1 = 0)
+agent_type_  Id=0
+agent_type_   []
+rule 2
+agent_type:1:B:cv_id:0
+agent_type_Id=1
+agent_type_ (site_type:1 = 1)
+agent_type_  Id=0
+agent_type_   []
+rule 3
+agent_type:1:B:cv_id:0
+agent_type_Id=2
+agent_type_ (site_type:1 = 0)
+agent_type_  Id=0
+agent_type_   []
+rule 0
+agent_type:0:A:cv_id:0
+agent_type_Id=1
+agent_type_ (site_type:1 = 1)
+agent_type_  Id=0
+agent_type_   []
+rule 3
+agent_type:1:B:cv_id:0
+agent_type_Id=3
+agent_type_ Node(site_type:1<1)
+agent_type_  Id=0
+agent_type_   Leaf False 
+
+agent_type_  Id=2
+agent_type_   Node(site_type:1<2)
+agent_type_    Id=1
+agent_type_     Leaf True 
+
+agent_type_    Id=0
+agent_type_     Leaf False 
+
 	Initial state is empty
 
 	Wake-up rules

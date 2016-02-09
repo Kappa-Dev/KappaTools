@@ -538,6 +538,151 @@ agent_type:2:C:site_type:2:x1!@list of covering_class_id:
 covering_class_id:0
 agent_type:2:C:site_type:3:x2!@list of covering_class_id:
 covering_class_id:0
+rule 0: a.b
+agent_type:0:A:cv_id:0
+agent_type_Id=8
+agent_type_ (site_type:1 = 1)
+agent_type_  Id=0
+agent_type_   []
+rule 1: a.b_op
+agent_type:0:A:cv_id:0
+agent_type_Id=3
+agent_type_ (site_type:1 = 0)
+agent_type_  Id=0
+agent_type_   []
+rule 2: ab.c
+agent_type:0:A:cv_id:0
+agent_type_Id=9
+agent_type_ (site_type:2 = 1)
+agent_type_  Id=0
+agent_type_   []
+rule 4: a.c
+agent_type:0:A:cv_id:0
+agent_type_Id=16
+agent_type_ (site_type:2 = 2)
+agent_type_  Id=0
+agent_type_   []
+rule 5: mod x2
+agent_type:0:A:cv_id:0
+agent_type_Id=1
+agent_type_ (site_type:2 = 0)
+agent_type_  Id=0
+agent_type_   []
+rule 3: mod x1
+agent_type:2:C:cv_id:0
+agent_type_Id=14
+agent_type_ (site_type:1 = 1)
+agent_type_  Id=12
+agent_type_   (site_type:3 = 0)
+agent_type_    Id=0
+agent_type_     []
+rule 3: mod x1
+agent_type:0:A:cv_id:0
+agent_type_Id=1
+agent_type_ (site_type:2 = 0)
+agent_type_  Id=0
+agent_type_   []
+rule 0: a.b
+agent_type:1:B:cv_id:0
+agent_type_Id=8
+agent_type_ (site_type:1 = 1)
+agent_type_  Id=0
+agent_type_   []
+rule 1: a.b_op
+agent_type:1:B:cv_id:0
+agent_type_Id=3
+agent_type_ (site_type:1 = 0)
+agent_type_  Id=0
+agent_type_   []
+rule 2: ab.c
+agent_type:2:C:cv_id:0
+agent_type_Id=10
+agent_type_ (site_type:3 = 1)
+agent_type_  Id=0
+agent_type_   []
+rule 4: a.c
+agent_type:2:C:cv_id:0
+agent_type_Id=17
+agent_type_ (site_type:4 = 1)
+agent_type_  Id=0
+agent_type_   []
+rule 5: mod x2
+agent_type:2:C:cv_id:0
+agent_type_Id=19
+agent_type_ (site_type:2 = 1)
+agent_type_  Id=4
+agent_type_   (site_type:4 = 0)
+agent_type_    Id=0
+agent_type_     []
+rule 5: mod x2
+agent_type:0:A:cv_id:0
+agent_type_Id=35
+agent_type_ Node(site_type:1<0)
+agent_type_  Id=0
+agent_type_   Leaf False 
+
+agent_type_  Id=34
+agent_type_   Node(site_type:1<1)
+agent_type_    Id=33
+agent_type_     Node(site_type:2<2)
+agent_type_      Id=0
+agent_type_       Leaf False 
+
+agent_type_      Id=32
+agent_type_       Node(site_type:2<3)
+agent_type_        Id=1
+agent_type_         Leaf True 
+
+agent_type_        Id=0
+agent_type_         Leaf False 
+
+agent_type_    Id=0
+agent_type_     Leaf False 
+
+agent_type:2:C:cv_id:0
+agent_type_Id=43
+agent_type_ Node(site_type:1<1)
+agent_type_  Id=0
+agent_type_   Leaf False 
+
+agent_type_  Id=42
+agent_type_   Node(site_type:1<2)
+agent_type_    Id=41
+agent_type_     Node(site_type:2<0)
+agent_type_      Id=0
+agent_type_       Leaf False 
+
+agent_type_      Id=40
+agent_type_       Node(site_type:2<1)
+agent_type_        Id=39
+agent_type_         Node(site_type:3<0)
+agent_type_          Id=0
+agent_type_           Leaf False 
+
+agent_type_          Id=38
+agent_type_           Node(site_type:3<1)
+agent_type_            Id=37
+agent_type_             Node(site_type:4<1)
+agent_type_              Id=0
+agent_type_               Leaf False 
+
+agent_type_              Id=36
+agent_type_               Node(site_type:4<2)
+agent_type_                Id=1
+agent_type_                 Leaf True 
+
+agent_type_                Id=0
+agent_type_                 Leaf False 
+
+agent_type_            Id=0
+agent_type_             Leaf False 
+
+agent_type_        Id=0
+agent_type_         Leaf False 
+
+agent_type_    Id=0
+agent_type_     Leaf False 
+
 	Views in initial state
 
 

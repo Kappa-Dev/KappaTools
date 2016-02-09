@@ -467,6 +467,110 @@ agent_type:1:B:site_type:0:x~@list of covering_class_id:
 covering_class_id:0
 agent_type:3:E:site_type:0:x!@list of covering_class_id:
 covering_class_id:0
+rule 9
+agent_type:0:A:cv_id:0
+agent_type_Id=7
+agent_type_ Node(site_type:1<0)
+agent_type_  Id=0
+agent_type_   Leaf False 
+
+agent_type_  Id=6
+agent_type_   Node(site_type:1<1)
+agent_type_    Id=5
+agent_type_     Node(site_type:2<0)
+agent_type_      Id=0
+agent_type_       Leaf False 
+
+agent_type_      Id=4
+agent_type_       Node(site_type:2<1)
+agent_type_        Id=1
+agent_type_         Leaf True 
+
+agent_type_        Id=0
+agent_type_         Leaf False 
+
+agent_type_    Id=0
+agent_type_     Leaf False 
+
+rule 0
+agent_type:0:A:cv_id:0
+agent_type_Id=3
+agent_type_ (site_type:1 = 0)
+agent_type_  Id=0
+agent_type_   []
+rule 3
+agent_type:0:A:cv_id:0
+agent_type_Id=6
+agent_type_ (site_type:1 = 2)
+agent_type_  Id=0
+agent_type_   []
+rule 4
+agent_type:0:A:cv_id:0
+agent_type_Id=3
+agent_type_ (site_type:1 = 0)
+agent_type_  Id=0
+agent_type_   []
+rule 5
+agent_type:0:A:cv_id:0
+agent_type_Id=6
+agent_type_ (site_type:1 = 2)
+agent_type_  Id=0
+agent_type_   []
+rule 6
+agent_type:0:A:cv_id:0
+agent_type_Id=7
+agent_type_ (site_type:1 = 2)
+agent_type_  Id=1
+agent_type_   (site_type:2 = 0)
+agent_type_    Id=0
+agent_type_     []
+rule 7
+agent_type:0:A:cv_id:0
+agent_type_Id=7
+agent_type_ (site_type:1 = 2)
+agent_type_  Id=1
+agent_type_   (site_type:2 = 0)
+agent_type_    Id=0
+agent_type_     []
+rule 1
+agent_type:1:B:cv_id:0
+agent_type_Id=4
+agent_type_ (site_type:1 = 1)
+agent_type_  Id=0
+agent_type_   []
+rule 2
+agent_type:1:B:cv_id:0
+agent_type_Id=3
+agent_type_ (site_type:1 = 0)
+agent_type_  Id=0
+agent_type_   []
+rule 8
+agent_type:0:A:cv_id:0
+agent_type_Id=2
+agent_type_ (site_type:1 = 0)
+agent_type_  Id=1
+agent_type_   (site_type:2 = 0)
+agent_type_    Id=0
+agent_type_     []
+rule 9
+agent_type:0:A:cv_id:0
+agent_type_Id=2
+agent_type_ (site_type:1 = 0)
+agent_type_  Id=1
+agent_type_   (site_type:2 = 0)
+agent_type_    Id=0
+agent_type_     []
+rule 0
+agent_type:1:B:cv_id:0
+agent_type_Id=4
+agent_type_ (site_type:1 = 1)
+agent_type_  Id=0
+agent_type_   []
+rule 9
+agent_type:3:E:cv_id:0
+agent_type_Id=1
+agent_type_ Leaf True 
+
 	Views in initial state
 
 
