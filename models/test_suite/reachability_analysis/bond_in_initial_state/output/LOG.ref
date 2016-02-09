@@ -29,10 +29,11 @@ Reachability analysis...
 		the precondition is satisfied
 
 	Applying rule 2:
-		the precondition is satisfied
+		the predcondition is not satisfied yet
 
 	Applying rule 1:
 		the precondition is satisfied
+		Updating the views for A(x!)
 
 				B(x!free,x~u)
 				(rule 0) should be investigated 
@@ -56,6 +57,7 @@ Reachability analysis...
 
 	Applying rule 1:
 		the precondition is satisfied
+		Updating the views for A(x!)
 
 				B(x!free,x~p)
 				(rule 0) should be investigated 
@@ -65,6 +67,7 @@ Reachability analysis...
 
 	Applying rule 2:
 		the precondition is satisfied
+		Updating the views for B(x!,x~)
 
 	Applying rule 3:
 		the precondition is satisfied
@@ -76,6 +79,7 @@ Reachability analysis...
 
 	Applying rule 1:
 		the precondition is satisfied
+		Updating the views for A(x!)
 
 ------------------------------------------------------------
 * Dead rule :
@@ -92,4 +96,76 @@ The binding state of site x in agent A is always B@x.
 The internal state of site x in agent A is always u.
 The internal state of site x in agent B ranges over u and p.
 The binding state of site x in agent B ranges over free and A@x.
+Initial state
+
+
+
+	A(x!B@x)
+	(rule 0) should be investigated 
+	(rule 1) should be investigated 
+Initial state
+
+
+
+	A(x~u)
+	(rule 0) should be investigated 
+Initial state
+
+
+
+	B(x!A@x,x~u)
+	(rule 0) should be investigated 
+	(rule 1) should be investigated 
+	(rule 2) should be investigated 
+	(rule 3) should be investigated 
+Initial state
+
+
+
+	A(x!B@x)
+	(rule 0) should be investigated 
+	(rule 1) should be investigated 
+Initial state
+
+
+
+	A(x~u)
+	(rule 0) should be investigated 
+Initial state
+
+
+
+	B(x!A@x,x~u)
+	(rule 0) should be investigated 
+	(rule 1) should be investigated 
+	(rule 2) should be investigated 
+	(rule 3) should be investigated 
+
+
+
+	A(x!B@x)
+	(rule 0) should be investigated 
+	(rule 1) should be investigated 
+	(rule 0) should be investigated 
+	(rule 1) should be investigated 
+
+
+
+	A(x~u)
+	(rule 0) should be investigated 
+	(rule 0) should be investigated 
+
+
+
+	A(x!B@x)
+	(rule 0) should be investigated 
+	(rule 1) should be investigated 
+	(rule 0) should be investigated 
+	(rule 1) should be investigated 
+
+
+
+	A(x~u)
+	(rule 0) should be investigated 
+	(rule 0) should be investigated 
 execution finished without any exception

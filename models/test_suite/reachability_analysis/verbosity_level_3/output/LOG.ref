@@ -11,22 +11,98 @@ Reachability analysis...
 	Applying rule 0:
 		the precondition is satisfied
 
+				A(x~u,y~u,z~u)
+
+	Applying rule 0:
+		the precondition is satisfied
+
+	Applying rule 1:
+		the precondition is satisfied
+		Updating the views for A(x~,y~,z~)
+
+				A(x~p,y~u,z~u)
+
+	Applying rule 2:
+		the precondition is satisfied
+		Updating the views for A(x~,y~,z~)
+
+				A(x~p,y~p,z~u)
+
+	Applying rule 3:
+		the precondition is satisfied
+		Updating the views for A(x~,y~,z~)
+
+				A(x~0,y~p,z~q)
+
+	Applying rule 4:
+		the precondition is satisfied
+		Updating the views for A(x~,y~,z~)
+
+				A(x~q,y~u,z~u)
+
+	Applying rule 5:
+		the precondition is satisfied
+		Updating the views for A(x~,y~,z~)
+
+				A(x~q,y~q,z~u)
+
+	Applying rule 6:
+		the precondition is satisfied
+		Updating the views for A(x~,y~,z~)
+
+				A(x~q,y~q,z~q)
+
+	Applying rule 7: KO:
+		the predcondition is not satisfied yet
+
+	Applying rule 0:
+		the precondition is satisfied
+
+	Applying rule 1:
+		the precondition is satisfied
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule 2:
+		the precondition is satisfied
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule 3:
+		the precondition is satisfied
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule 4:
+		the precondition is satisfied
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule 5:
+		the precondition is satisfied
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule 6:
+		the precondition is satisfied
+		Updating the views for A(x~,y~,z~)
+
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------
-rule 1 will never be applied.
-rule 2 will never be applied.
-rule 3 will never be applied.
-rule 4 will never be applied.
-rule 5 will never be applied.
-rule 6 will never be applied.
 rule 7: KO will never be applied.
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
+In agent A, the internal state of site x, the internal state of site y, and the internal state of site z, are entangled by the following 3-d relationship:
+	A(x~q,y~u,z~u)
+	A(x~q,y~q,z~q)
+	A(x~q,y~q,z~u)
+	A(x~0,y~p,z~q)
+	A(x~p,y~u,z~u)
+	A(x~p,y~p,z~u)
+	A(x~u,y~u,z~u)
 
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
+The internal state of site z in agent A ranges over u and q.
+The internal state of site y in agent A ranges over u, p, and q.
+The internal state of site x in agent A ranges over u, p, 0, and q.
 execution finished without any exception

@@ -148,6 +148,31 @@ agent_type_Id=1
 agent_type_ (site_type:2 = 1)
 agent_type_  Id=0
 agent_type_   []
+rule 0: r0
+agent_type:0:A:cv_id:0
+agent_type_Id=7
+agent_type_ Node(site_type:1<0)
+agent_type_  Id=0
+agent_type_   Leaf False 
+
+agent_type_  Id=6
+agent_type_   Node(site_type:1<1)
+agent_type_    Id=5
+agent_type_     Node(site_type:2<0)
+agent_type_      Id=0
+agent_type_       Leaf False 
+
+agent_type_      Id=4
+agent_type_       Node(site_type:2<1)
+agent_type_        Id=1
+agent_type_         Leaf True 
+
+agent_type_        Id=0
+agent_type_         Leaf False 
+
+agent_type_    Id=0
+agent_type_     Leaf False 
+
 rule 1: r1
 agent_type:0:A:cv_id:0
 agent_type_Id=5

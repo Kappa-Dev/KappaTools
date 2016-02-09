@@ -431,6 +431,21 @@ agent_type:0:A:site_type:0:x~@list of covering_class_id:
 covering_class_id:0
 agent_type:1:B:site_type:0:x~@list of covering_class_id:
 covering_class_id:0
+rule 8
+agent_type:0:A:cv_id:0
+agent_type_Id=3
+agent_type_ Node(site_type:1<0)
+agent_type_  Id=0
+agent_type_   Leaf False 
+
+agent_type_  Id=2
+agent_type_   Node(site_type:1<1)
+agent_type_    Id=1
+agent_type_     Leaf True 
+
+agent_type_    Id=0
+agent_type_     Leaf False 
+
 rule 9
 agent_type:0:A:cv_id:0
 agent_type_Id=3
@@ -512,6 +527,130 @@ agent_type_Id=2
 agent_type_ (site_type:1 = 1)
 agent_type_  Id=0
 agent_type_   []
+rule 0
+agent_type:0:A:cv_id:0
+agent_type_Id=1
+agent_type_ Leaf True 
+
+agent_type:1:B:cv_id:0
+agent_type_Id=3
+agent_type_ Node(site_type:1<0)
+agent_type_  Id=0
+agent_type_   Leaf False 
+
+agent_type_  Id=2
+agent_type_   Node(site_type:1<1)
+agent_type_    Id=1
+agent_type_     Leaf True 
+
+agent_type_    Id=0
+agent_type_     Leaf False 
+
+rule 1
+agent_type:1:B:cv_id:0
+agent_type_Id=3
+agent_type_ Node(site_type:1<0)
+agent_type_  Id=0
+agent_type_   Leaf False 
+
+agent_type_  Id=2
+agent_type_   Node(site_type:1<1)
+agent_type_    Id=1
+agent_type_     Leaf True 
+
+agent_type_    Id=0
+agent_type_     Leaf False 
+
+rule 2
+agent_type:1:B:cv_id:0
+agent_type_Id=5
+agent_type_ Node(site_type:1<1)
+agent_type_  Id=0
+agent_type_   Leaf False 
+
+agent_type_  Id=4
+agent_type_   Node(site_type:1<2)
+agent_type_    Id=1
+agent_type_     Leaf True 
+
+agent_type_    Id=0
+agent_type_     Leaf False 
+
+rule 3
+agent_type:0:A:cv_id:0
+agent_type_Id=3
+agent_type_ Node(site_type:1<0)
+agent_type_  Id=0
+agent_type_   Leaf False 
+
+agent_type_  Id=2
+agent_type_   Node(site_type:1<1)
+agent_type_    Id=1
+agent_type_     Leaf True 
+
+agent_type_    Id=0
+agent_type_     Leaf False 
+
+rule 4
+agent_type:0:A:cv_id:0
+agent_type_Id=5
+agent_type_ Node(site_type:1<1)
+agent_type_  Id=0
+agent_type_   Leaf False 
+
+agent_type_  Id=4
+agent_type_   Node(site_type:1<2)
+agent_type_    Id=1
+agent_type_     Leaf True 
+
+agent_type_    Id=0
+agent_type_     Leaf False 
+
+rule 5
+agent_type:0:A:cv_id:0
+agent_type_Id=3
+agent_type_ Node(site_type:1<0)
+agent_type_  Id=0
+agent_type_   Leaf False 
+
+agent_type_  Id=2
+agent_type_   Node(site_type:1<1)
+agent_type_    Id=1
+agent_type_     Leaf True 
+
+agent_type_    Id=0
+agent_type_     Leaf False 
+
+rule 6
+agent_type:0:A:cv_id:0
+agent_type_Id=3
+agent_type_ Node(site_type:1<0)
+agent_type_  Id=0
+agent_type_   Leaf False 
+
+agent_type_  Id=2
+agent_type_   Node(site_type:1<1)
+agent_type_    Id=1
+agent_type_     Leaf True 
+
+agent_type_    Id=0
+agent_type_     Leaf False 
+
+rule 7
+agent_type:0:A:cv_id:0
+agent_type_Id=3
+agent_type_ Node(site_type:1<0)
+agent_type_  Id=0
+agent_type_   Leaf False 
+
+agent_type_  Id=2
+agent_type_   Node(site_type:1<1)
+agent_type_    Id=1
+agent_type_     Leaf True 
+
+agent_type_    Id=0
+agent_type_     Leaf False 
+
 	Views in initial state
 
 
@@ -558,26 +697,84 @@ agent_type_   []
 
 	Applying rule 0:
 		the precondition is satisfied
+		Updating the views for A(x~)
+		Updating the views for B(x~)
+
+				INTENSIONAL DESCRIPTION:
+				Id=5
+				 Node(site_type:1<1)
+				  Id=0
+				   Leaf False 
+
+				  Id=4
+				   Node(site_type:1<2)
+				    Id=1
+				     Leaf True 
+
+				    Id=0
+				     Leaf False 
+
+				EXTENSIONAL DESCRIPTION:
+				B(x~p)
 
 	Applying rule 3:
 		the precondition is satisfied
+		Updating the views for A(x~)
+
+				INTENSIONAL DESCRIPTION:
+				Id=5
+				 Node(site_type:1<1)
+				  Id=0
+				   Leaf False 
+
+				  Id=4
+				   Node(site_type:1<2)
+				    Id=1
+				     Leaf True 
+
+				    Id=0
+				     Leaf False 
+
+				EXTENSIONAL DESCRIPTION:
+				A(x~p)
 
 	Applying rule 4:
 		the precondition is satisfied
+		Updating the views for A(x~)
 
 	Applying rule 5:
 		the precondition is satisfied
+		Updating the views for A(x~)
 
 	Applying rule 6:
 		the precondition is satisfied
+		Updating the views for A(x~)
 
 	Applying rule 7:
 		the precondition is satisfied
+		Updating the views for A(x~)
 
 	Applying rule 1:
 		the precondition is satisfied
+		Updating the views for B(x~)
 
 	Applying rule 2:
+		the precondition is satisfied
+		Updating the views for B(x~)
+
+	Applying rule 0:
+		the precondition is satisfied
+		Updating the views for A(x~)
+		Updating the views for B(x~)
+
+	Applying rule 3:
+		the precondition is satisfied
+		Updating the views for A(x~)
+
+	Applying rule 8:
+		the precondition is satisfied
+
+	Applying rule 9:
 		the precondition is satisfied
 
 ------------------------------------------------------------
@@ -588,13 +785,13 @@ agent_type_   []
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=3
+Id=6
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=2
-   Node(site_type:1<1)
+  Id=4
+   Node(site_type:1<2)
     Id=1
      Leaf True 
 
@@ -602,13 +799,13 @@ Id=3
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=3
+Id=6
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=2
-   Node(site_type:1<1)
+  Id=4
+   Node(site_type:1<2)
     Id=1
      Leaf True 
 
@@ -620,13 +817,13 @@ Id=3
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=7
+Id=8
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=6
-   Node(site_type:0<1)
+  Id=7
+   Node(site_type:0<2)
     Id=1
      Leaf True 
 
@@ -635,13 +832,13 @@ Id=7
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=7
+Id=8
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=6
-   Node(site_type:0<1)
+  Id=7
+   Node(site_type:0<2)
     Id=1
      Leaf True 
 
@@ -654,13 +851,13 @@ EXTENSIONAL DESCRIPTION:
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=7
+Id=8
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=6
-   Node(site_type:0<1)
+  Id=7
+   Node(site_type:0<2)
     Id=1
      Leaf True 
 
@@ -668,15 +865,15 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent A is always u.
+The internal state of site x in agent A ranges over u and p.
 INTENSIONAL DESCRIPTION:
-Id=7
+Id=8
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=6
-   Node(site_type:0<1)
+  Id=7
+   Node(site_type:0<2)
     Id=1
      Leaf True 
 
@@ -684,5 +881,179 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent B is always u.
+The internal state of site x in agent B ranges over u and p.
+Initial state
+
+
+
+	INTENSIONAL DESCRIPTION:
+	Id=3
+	 Node(site_type:1<0)
+	  Id=0
+	   Leaf False 
+
+	  Id=2
+	   Node(site_type:1<1)
+	    Id=1
+	     Leaf True 
+
+	    Id=0
+	     Leaf False 
+
+	EXTENSIONAL DESCRIPTION:
+	A(x~u)
+Initial state
+
+
+
+	INTENSIONAL DESCRIPTION:
+	Id=3
+	 Node(site_type:1<0)
+	  Id=0
+	   Leaf False 
+
+	  Id=2
+	   Node(site_type:1<1)
+	    Id=1
+	     Leaf True 
+
+	    Id=0
+	     Leaf False 
+
+	EXTENSIONAL DESCRIPTION:
+	A(x~u)
+Initial state
+
+
+
+	INTENSIONAL DESCRIPTION:
+	Id=3
+	 Node(site_type:1<0)
+	  Id=0
+	   Leaf False 
+
+	  Id=2
+	   Node(site_type:1<1)
+	    Id=1
+	     Leaf True 
+
+	    Id=0
+	     Leaf False 
+
+	EXTENSIONAL DESCRIPTION:
+	B(x~u)
+Initial state
+
+
+
+	INTENSIONAL DESCRIPTION:
+	Id=3
+	 Node(site_type:1<0)
+	  Id=0
+	   Leaf False 
+
+	  Id=2
+	   Node(site_type:1<1)
+	    Id=1
+	     Leaf True 
+
+	    Id=0
+	     Leaf False 
+
+	EXTENSIONAL DESCRIPTION:
+	B(x~u)
+		Updating the views for A(x~)
+		Updating the views for B(x~)
+
+
+
+	INTENSIONAL DESCRIPTION:
+	Id=5
+	 Node(site_type:1<1)
+	  Id=0
+	   Leaf False 
+
+	  Id=4
+	   Node(site_type:1<2)
+	    Id=1
+	     Leaf True 
+
+	    Id=0
+	     Leaf False 
+
+	EXTENSIONAL DESCRIPTION:
+	B(x~p)
+		Updating the views for A(x~)
+		Updating the views for B(x~)
+
+
+
+	INTENSIONAL DESCRIPTION:
+	Id=5
+	 Node(site_type:1<1)
+	  Id=0
+	   Leaf False 
+
+	  Id=4
+	   Node(site_type:1<2)
+	    Id=1
+	     Leaf True 
+
+	    Id=0
+	     Leaf False 
+
+	EXTENSIONAL DESCRIPTION:
+	B(x~p)
+		Updating the views for A(x~)
+
+
+
+	INTENSIONAL DESCRIPTION:
+	Id=5
+	 Node(site_type:1<1)
+	  Id=0
+	   Leaf False 
+
+	  Id=4
+	   Node(site_type:1<2)
+	    Id=1
+	     Leaf True 
+
+	    Id=0
+	     Leaf False 
+
+	EXTENSIONAL DESCRIPTION:
+	A(x~p)
+		Updating the views for A(x~)
+
+
+
+	INTENSIONAL DESCRIPTION:
+	Id=5
+	 Node(site_type:1<1)
+	  Id=0
+	   Leaf False 
+
+	  Id=4
+	   Node(site_type:1<2)
+	    Id=1
+	     Leaf True 
+
+	    Id=0
+	     Leaf False 
+
+	EXTENSIONAL DESCRIPTION:
+	A(x~p)
+		Updating the views for A(x~)
+		Updating the views for A(x~)
+		Updating the views for A(x~)
+		Updating the views for A(x~)
+		Updating the views for A(x~)
+		Updating the views for A(x~)
+		Updating the views for A(x~)
+		Updating the views for A(x~)
+		Updating the views for B(x~)
+		Updating the views for B(x~)
+		Updating the views for B(x~)
+		Updating the views for B(x~)
 execution finished without any exception
