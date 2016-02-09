@@ -134,16 +134,14 @@ let main () =
   in
   (*-----------------------------------------------------------------------*)
   (*call analyzer in module*)
-  (*let error, handler_bdu =
-    match
-      handler_bdu_opt
-    with
+  let error, handler_bdu =
+    match handler_bdu_opt with
     | None -> Mvbdu_wrapper.Mvbdu.init parameters error
     | Some handler_bdu -> error, handler_bdu
   in       
   let error, static_information, dynamic_information =
     A.main parameters error handler_bdu c_compil handler
-  in*)
+  in
   (*-----------------------------------------------------------------------*)
   (*Stochastic flow of information*)
   let error, stochastic_flow =
