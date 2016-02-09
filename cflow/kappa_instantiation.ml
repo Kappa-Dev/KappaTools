@@ -36,7 +36,7 @@ sig
   type internal_state = int
 
   type side_effect = Instantiation.concrete Instantiation.site list
-  type refined_event = Causal.event_kind * Instantiation.concrete Instantiation.event
+  type refined_event = Causal.event_kind * Instantiation.concrete Instantiation.event * unit Mods.simulation_info
   type refined_obs =
       Causal.event_kind * Instantiation.concrete Instantiation.test list * unit Mods.simulation_info
   type refined_step
@@ -61,7 +61,7 @@ sig
   val is_obs_of_refined_step: refined_step -> bool
   val is_init_of_refined_step: refined_step -> bool
   val is_subs_of_refined_step: refined_step -> bool
-  val is_event_of_refined_step: refined_step -> bool
+  val is_event_of_refined_step: refined_step -> bool						  
   val simulation_info_of_refined_step:
     refined_step -> unit Mods.simulation_info option
   val print_side:
@@ -83,7 +83,9 @@ sig
   val side_effect_of_list: Instantiation.concrete Instantiation.site list -> side_effect
 
   val get_kasim_side_effects: refined_step -> side_effect
-
+  val get_id_of_refined_step: refined_step -> int option
+  val get_time_of_refined_step: refined_step -> float option
+						
   val level_of_event: Priority.priorities option -> (refined_step,(agent_id -> bool),Priority.level) H.binary
   val disambiguate: refined_step list -> refined_step list
   val clean_events: refined_step list -> refined_step list
@@ -114,7 +116,7 @@ module Cflow_linker =
   type internal_state  = int
 
   type refined_event =
-      Causal.event_kind * PI.concrete PI.event
+      Causal.event_kind * PI.concrete PI.event * unit Mods.simulation_info
   type refined_obs =
       Causal.event_kind *
 	PI.concrete PI.test list *
@@ -128,7 +130,7 @@ module Cflow_linker =
 
   let build_subs_refined_step a b = Subs (a,b)
   let get_kasim_side_effects = function
-    | Event ((_,(_,(_,_,a)))) -> a
+    | Event ((_,(_,(_,_,a)),_)) -> a
     | Subs _ | Obs _ | Dummy _ | Init _ -> []
 
   let dummy_refined_step x = Dummy x
@@ -241,14 +243,14 @@ module Cflow_linker =
   let gen f0 f1 f2 f3 f4 (p:H.parameter) h l e step =
     match step with
     | Subs (a,b) -> f0 p h l e a b
-    | Event (x,y) -> f1 p h l e (x,y)
+    | Event (x,y,_) -> f1 p h l e (x,y)
     | Init a -> f2 p h l e a
     | Obs a -> f3 p h l e a
     | Dummy x  -> f4 p h l e x
 
   let print_refined_step ?compact:(compact=false) ?handler f = function
     | Subs (a,b) -> print_refined_subs f (a,b)
-    | Event (x,y) -> print_refined_event ~compact ?handler f (x,y)
+    | Event (x,y,z) -> print_refined_event ~compact ?handler f (x,y)
     | Init a -> print_refined_init ~compact ?handler f a
     | Obs a -> print_refined_obs ~compact ?handler f a
     | Dummy _  -> ()
@@ -278,10 +280,23 @@ module Cflow_linker =
     | Event _ -> true
     | Init _ | Subs _ | Dummy _ | Obs _ -> false
 
+  let dummy = {Mods.story_id = 0 ; Mods.story_time = 0. ; Mods.story_event = 0 ; Mods.profiling_info = () }
   let simulation_info_of_refined_step x =
     match x with
-    | Obs (_,_,info) -> Some info
-    | Event _ | Subs _ | Dummy _ | Init _ -> None
+    | Obs (_,_,info) | Event (_,_,info) -> Some info
+    | Init _ -> Some dummy 
+    | Subs _ | Dummy _ -> None
+
+			    
+  let get_gen_of_refined_step f x =
+    match
+      simulation_info_of_refined_step x
+    with
+    | None -> None
+    | Some a -> Some (f a)
+		  
+  let get_time_of_refined_step x = get_gen_of_refined_step (fun x -> x.Mods.story_time) x
+  let get_id_of_refined_step x = get_gen_of_refined_step (fun x -> x.Mods.story_event) x
 
   let actions_of_refined_step =
     gen
@@ -292,11 +307,11 @@ module Cflow_linker =
       (fun _ _ l error _ -> error,l,([],[]))
   let store_event log_info (event:refined_event) (step_list:refined_step list) =
     match event with
-    | Causal.INIT _,(_,(actions,_,_)) ->
+    | Causal.INIT _,(_,(actions,_,_)),_ ->
        P.inc_n_kasim_events log_info,(Init actions)::step_list
-    | Causal.OBS _,_ -> assert false
-    | (Causal.RULE _ | Causal.PERT _ as k),x ->
-       P.inc_n_kasim_events log_info,(Event (k,x))::step_list
+    | Causal.OBS _,_,_ -> assert false
+    | (Causal.RULE _ | Causal.PERT _ as k),x,info ->
+       P.inc_n_kasim_events log_info,(Event (k,x,info))::step_list
   let store_obs log_info (i,x,c) step_list =
     P.inc_n_obs_events log_info,Obs(i,x,c)::step_list
 
@@ -307,7 +322,7 @@ module Cflow_linker =
 	     | PI.Mod_internal _ | PI.Bind _ | PI.Bind_to _ | PI.Free _
 	     | PI.Remove _ -> l) [] actions
   let creation_of_event = function
-    | (Event (_,(_,(ac,_,_))) | Init ac) -> creation_of_actions fst ac
+    | (Event (_,(_,(ac,_,_)),_) | Init ac) -> creation_of_actions fst ac
     | Obs _ | Dummy _ | Subs _ -> []
 
   let build_grid list bool handler =
@@ -322,12 +337,12 @@ module Cflow_linker =
 	   else fun _ -> List.rev_append side_effect side in
 	 let translate y = Mods.IntMap.find_default y y subs in
          match (k:refined_step) with
-         | Event (id,event) ->
+         | Event (id,event,info) ->
 	    let (tests,(actions,side_effects,kappa_side)) =
 	      PI.subst_map_agent_in_concrete_event translate event in
             let kasim_side_effect = maybe_side_effect kappa_side in
             Causal.record
-	      (id,(tests,(actions,side_effects,kasim_side_effect)))
+	      (id,(tests,(actions,side_effects,kasim_side_effect)),info)
 	      counter env grid,
             empty_set,counter+1,Mods.IntMap.empty
          | Obs (id,tests,info) ->
@@ -395,13 +410,14 @@ module Cflow_linker =
 	  error,log_info,priorities.Priority.substitution
 
   let subs_agent_in_event mapping mapping' = function
-    | Event (a,event) ->
+    | Event (a,event,info) ->
        Event
 	 (a,
 	  PI.subst_map2_agent_in_concrete_event
 	    (fun x -> AgentIdMap.find_default x x mapping)
 	    (fun x -> AgentIdMap.find_default x x mapping')
-	    event)
+	    event,
+	 info)
     | Obs (a,b,c) ->
        Obs(a,
 	   Tools.list_smart_map
@@ -615,7 +631,7 @@ module Cflow_linker =
 	(fun (step_list,remanent) refined_step ->
 	 match refined_step with
 	 | Init init -> convert_init remanent step_list init
-	 | Event (_,(_,(action,_,kasim_side))) ->
+	 | Event (_,(_,(action,_,kasim_side)),_) ->
 	    let remanent,set =
 	      List.fold_left
 		(fun recur ->

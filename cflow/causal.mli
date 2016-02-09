@@ -50,7 +50,7 @@ val empty_grid : unit -> grid
 
 val record :
   (event_kind *
-     Instantiation.concrete Instantiation.event) -> int -> Environment.t -> grid -> grid
+     Instantiation.concrete Instantiation.event * unit Mods.simulation_info) -> int -> Environment.t -> grid -> grid
 val record_obs :
   (event_kind *
      Instantiation.concrete Instantiation.test list

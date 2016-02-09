@@ -251,7 +251,7 @@ let add_tests grid event_number kind tests =
        aux (add site1 true atom_tested grid' event_number kind) q
   in aux grid tests
 
-let record (kind,(tests,(actions,_,side_effects)))
+let record (kind,(tests,(actions,_,side_effects)),_)
 	   event_number env grid =
   let grid = add_tests grid event_number kind tests in
   let grid = add_actions env grid event_number kind actions in

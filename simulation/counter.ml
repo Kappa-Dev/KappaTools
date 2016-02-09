@@ -114,10 +114,12 @@ let one_time_correction_event c ti =
   let () = c.stat_null <- Stat_null_events.incr_time_correction c.stat_null in
   check_time c && check_events c
 let print_efficiency f c = Stat_null_events.print_detail f c.stat_null
+let current_story c =
+   { Mods.story_id = c.stories; Mods.story_time = current_time c;
+     Mods.story_event = current_event c; Mods.profiling_info = (); }
 let next_story c =
   let () = inc_stories c in
-  { Mods.story_id = c.stories; Mods.story_time = current_time c;
-    Mods.story_event = current_event c; Mods.profiling_info = (); }
+  current_story c
 let max_time c = c.max_time
 let max_events c = c.max_events
 let plot_points c = c.plot_points

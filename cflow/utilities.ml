@@ -90,6 +90,9 @@ let build_compressed_trace x y =
 let get_log_step = S.PH.B.PB.CI.Po.K.H.get_log_step
 let get_debugging_mode = S.PH.B.PB.CI.Po.K.H.get_debugging_mode
 let get_logger = S.PH.B.PB.CI.Po.K.H.get_logger
+let get_id_of_event = S.PH.B.PB.CI.Po.K.get_id_of_refined_step
+let get_simulation_time_of_event = S.PH.B.PB.CI.Po.K.get_time_of_refined_step
+			  
 let dummy_log = fun p -> p
 
 let extend_trace_with_dummy_side_effects l = List.rev_map (fun a -> a,[]) (List.rev l)

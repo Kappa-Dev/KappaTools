@@ -10,7 +10,7 @@ val init_secret_log_info :
 val secret_store_event :
   secret_log_info ->
   Causal.event_kind *
-    Instantiation.concrete Instantiation.event ->
+    Instantiation.concrete Instantiation.event * unit Mods.simulation_info ->
   secret_step list -> secret_log_info * secret_step list
 val secret_store_obs :
   secret_log_info ->

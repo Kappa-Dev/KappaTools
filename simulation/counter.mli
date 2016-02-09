@@ -33,4 +33,5 @@ val consecutive_null_event : t -> int
 
 val print_efficiency : Format.formatter -> t -> unit
 
+val current_story : t -> unit Mods.simulation_info
 val next_story : t -> unit Mods.simulation_info

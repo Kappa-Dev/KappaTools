@@ -237,7 +237,7 @@ let store_event counter inj2graph new_tracked_obs_instances event_kind
 	  add_path_to_tests path ctests,cactions in
      let infos',steps' =
        Compression_main.secret_store_event
-	 info (event_kind,full_concrete_event) steps in
+	 info (event_kind,full_concrete_event,Counter.current_story counter) steps in
      let infos'',steps'' =
        List.fold_left
 	 (fun (infos,steps) (ev,obs_tests) ->
