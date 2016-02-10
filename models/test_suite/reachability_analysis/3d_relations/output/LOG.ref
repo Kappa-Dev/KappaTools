@@ -29,4 +29,72 @@ The internal state of site y in agent A ranges over u and p.
 The internal state of site x in agent A ranges over u and p.
 
 Reachability analysis modular...
+
+	Applying rule 5:
+		the predcondition is not satsified yet
+
+	Applying rule 4:
+		the predcondition is not satsified yet
+
+	Applying rule 3:
+		the predcondition is not satsified yet
+
+	Applying rule 2:
+		the predcondition is not satsified yet
+
+	Applying rule 1:
+		the predcondition is satisfied
+
+	Applying rule 0:
+		the predcondition is satisfied
+
+	Applying rule 5:
+		the predcondition is not satsified yet
+
+	Applying rule 4:
+		the predcondition is satisfied
+
+	Applying rule 3:
+		the predcondition is satisfied
+
+	Applying rule 2:
+		the predcondition is satisfied
+
+	Applying rule 1:
+		the predcondition is satisfied
+
+	Applying rule 0:
+		the predcondition is satisfied
+
+	Applying rule 5:
+		the predcondition is satisfied
+
+	Applying rule 4:
+		the predcondition is satisfied
+
+	Applying rule 3:
+		the predcondition is satisfied
+
+	Applying rule 2:
+		the predcondition is satisfied
+
+** Dynamic information fixpoint result module:
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+In agent A: 
+	when the internal state of site z is equal to p, then:
+		+ the internal state of site x is always p.
+		+ the internal state of site y is always p.
+	when the internal state of site z is equal to u, then:
+		+ the internal state of site x ranges over u and p.
+		+ the internal state of site y ranges over u and p.
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+The internal state of site z in agent A ranges over u and p.
+The internal state of site y in agent A ranges over u and p.
+The internal state of site x in agent A ranges over u and p.
 execution finished without any exception

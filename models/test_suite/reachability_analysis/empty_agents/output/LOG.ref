@@ -424,4 +424,18 @@ EXTENSIONAL DESCRIPTION:
 The internal state of site x in agent D is always u.
 
 Reachability analysis modular...
+
+** Dynamic information fixpoint result module:
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
 execution finished without any exception

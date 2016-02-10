@@ -62,6 +62,7 @@ struct
       Analyzer_headers.initialize_global_information
         parameter error mvbdu_handler compil kappa_handler 
     in
+    (*let handler_kappa = get_kappa_handler static in*)
     let error, init = Analyzer_headers.compute_initial_state error static in
     let error, static, dynamic = Domain.initialize static dynamic error in
     let error, dynamic =
@@ -72,29 +73,53 @@ struct
           in
 	  error, dynamic)
 	(error, dynamic)
-	init
+        init
     in
+    let log = Remanent_parameters.get_logger parameter in
     let error, static, dynamic =
       let rec aux error dynamic =
         let error, dynamic, next_opt = Domain.next_rule static dynamic error in
         match next_opt with
         | None -> error, static, dynamic
-        | Some r_id ->
+        | Some rule_id ->
+          let error, rule_id_string =
+            try
+              Handler.string_of_rule parameter error kappa_handler
+		compil rule_id
+            with
+              _ -> Bdu_fixpoint_iteration.warn parameter error (Some "line 795") Exit
+		(string_of_int rule_id)
+          in
+          let _ =
+            Loggers.print_newline log;
+            Loggers.fprintf log "\tApplying %s:" rule_id_string ;
+            Loggers.print_newline log
+          in
 	  begin
 	    let error, dynamic, is_enabled =
-              Domain.is_enabled static dynamic error r_id 
+              Domain.is_enabled static dynamic error rule_id 
             in
 	    match is_enabled with
-	    | None -> aux error dynamic
+	    | None -> 
+              let _ =
+                let () = Loggers.fprintf log "\t\tthe predcondition is not satsified yet" in
+                Loggers.print_newline log
+              in
+              aux error dynamic
 	    | Some precondition ->
+              let _ =
+                Loggers.fprintf log "\t\tthe predcondition is satisfied";
+                Loggers.print_newline log 
+              in
 	      let error, dynamic, () =
-                Domain.apply_rule static dynamic error r_id precondition 
+                Domain.apply_rule static dynamic error rule_id precondition 
               in
               aux error dynamic
 	  end
       in aux error dynamic       
     in
-    (*let _ = print static dynamic error [] in*)
+    (*print test*)
+    let _ = print static dynamic error [] in
     error, static, dynamic
 
   let export static dynamic error kasa_state =

@@ -11,12 +11,16 @@
  * en Automatique.  All rights reserved.  This file is distributed
  * under the terms of the GNU Library General Public License *)
 
-module A =
+module B =
   Analyzer.Make
     (Composite_domain.Make
        (Product.Product
 	  (Global_domain.Domain)
 	  (Global_domain.Domain)))
+module A =
+  Analyzer.Make
+    (Composite_domain.Make
+      	  (Global_domain.Domain))
 
 let main () =
   let error = Exception.empty_error_handler in
