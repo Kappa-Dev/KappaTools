@@ -92,6 +92,10 @@ let hide_one_d_relations_from_cartesian_decomposition = ref true
 let smash_relations = ref false
 let use_natural_language = ref true
 
+(*modular reachability*)
+let do_reachability_analysis_module = ref true
+
+
 (** accuracy *)
 let view_accuracy_level = ref "High"
 let influence_map_accuracy_level = ref "Medium"

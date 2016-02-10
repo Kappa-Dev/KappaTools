@@ -365,7 +365,7 @@ module Domain =
 
   (**************************************************************************)
 
-  let add_link ?string_opt error static dynamic (agent_type, cv_id) bdu store
+  let add_link ?title error static dynamic (agent_type, cv_id) bdu store
       (updates_list : (int * int) list) =
     let parameter = get_parameter static in
     let log = Remanent_parameters.get_logger parameter in
@@ -386,13 +386,14 @@ module Domain =
       Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_old bdu
     in
     (*-----------------------------------------------------------*)
-    let error, handler, string_opt, is_new_views, updates_list =
+    let error, handler, title, is_new_views, store, updates_list =
       if Mvbdu_wrapper.Mvbdu.equal bdu_old bdu_union
       then 
-        error, handler, string_opt, false, updates_list
+        error, handler, title, false, store, updates_list
       else
+        (*print different views*)
         let () = 
-          match string_opt with
+          match title with
           | None -> ()
           | Some s ->
             if            
@@ -417,11 +418,11 @@ module Domain =
             bdu_old 
             bdu_union
         in
-        error, handler, None, true, (agent_type, cv_id) :: updates_list
-    in
-    let error, store =
-      Bdu_analysis_type.Map_bdu_update.Map.add_or_overwrite parameter error
-        (agent_type, cv_id) bdu_union store
+          let error, store =
+            Bdu_analysis_type.Map_bdu_update.Map.add_or_overwrite parameter error
+              (agent_type, cv_id) bdu_union store
+          in
+          error, handler, None, true, store, (agent_type, cv_id) :: updates_list
     in
     let dynamic = set_mvbdu_handler handler dynamic in  
     let dynamic = set_fixpoint_result store dynamic in
@@ -444,7 +445,9 @@ module Domain =
   (***************************************************************************)
   (*get map restriction from covering classes*)
 
-  let get_pair_list parameter error agent triple_list =
+  let get_pair_list static error agent triple_list =
+    let parameter = get_parameter static in
+    let kappa_handler = get_kappa_handler static in
     let error, get_pair_list =
       List.fold_left (fun (error, current_list) (cv_id, list, set) ->
 	(*------------------------------------------------------------*)
@@ -468,7 +471,8 @@ module Domain =
 	let error', map_res =
 	  Cckappa_sig.Site_map_and_set.Map.fold_restriction_with_missing_associations
 	    parameter error 
-	    (fun site port -> add site port.Cckappa_sig.site_state.Cckappa_sig.min)
+	    (fun site port ->
+              add site port.Cckappa_sig.site_state.Cckappa_sig.min)
 	    (*JF: we should check that port.site_state.min is equal to
               port.site_state.max*)
 	    (fun site -> add site 0)
@@ -490,8 +494,10 @@ module Domain =
   let build_init_restriction static dynamic error init_state =
     let parameter = get_parameter static in
     let handler = get_mvbdu_handler dynamic in
-    let error, store_remanent_triple = get_store_remanent_triple static dynamic error in
     let store = get_fixpoint_result dynamic in
+    let error, store_remanent_triple =
+      get_store_remanent_triple static dynamic error 
+    in
     let error, (dynamic, event_list) =
       Bdu_analysis_type.AgentMap.fold parameter error
         (fun parameter error agent_id agent (dynamic, event_list) ->
@@ -508,7 +514,9 @@ module Domain =
                 store_remanent_triple
               with
               | error, Some l ->
-                let error, get_pair_list = get_pair_list parameter error agent l in
+                let error, get_pair_list =
+                  get_pair_list static error agent l
+                in
                 let error, (dynamic, event_list) =
                   List.fold_left (fun (error, (dynamic, event_list)) (cv_id, map_res) ->
                     let error, pair_list =
@@ -524,14 +532,14 @@ module Domain =
                     (*----------------------------------------------------------------*)
                     let error, is_new_views, dynamic, event_list =
                       add_link
-                        ~string_opt:"Initial state\n"
+                        ~title:"Initial state\n"
                         error 
                         static
                         dynamic
                         (agent_type, cv_id)
                         bdu_init
                         store 
-                        [] (*initial updates_list*)
+                        []
                     in
                     error, (dynamic, event_list)
                   ) (error, (dynamic, event_list)) get_pair_list
@@ -627,7 +635,7 @@ module Domain =
     then
       let error, event_list =
         updates_list2event_list
-          ~title:""
+          ~title:"compute_new_views"
           static
           dynamic
           error
@@ -645,13 +653,6 @@ module Domain =
   let compute_views_test_enabled static dynamic error rule_id =
     let parameter = get_parameter static in
     let kappa_handler = get_kappa_handler static in
-    let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
-    let error, dynamic, bdu_true = get_mvbdu_true static dynamic error in
-    let handler = get_mvbdu_handler dynamic in
-    let error, store_remanent_triple = get_store_remanent_triple static dynamic error in
-    let error, store_modif_list_restriction_map =
-      get_store_modif_list_restriction_map static dynamic error
-    in
     let error, store_proj_bdu_test_restriction =
       get_store_proj_bdu_test_restriction static dynamic error
     in
@@ -663,7 +664,6 @@ module Domain =
       | None -> error, Bdu_analysis_type.Map_triple_views.Map.empty
       | Some map -> error, map
     in
-    let fixpoint_result = get_fixpoint_result dynamic in
     (*--------------------------------------------------------------*)
     let parameter_cv =
       Remanent_parameters.update_prefix parameter "\t\tUpdating the views for"
@@ -674,6 +674,17 @@ module Domain =
       (*deal with views*)
       Bdu_analysis_type.Map_triple_views.Map.fold
         (fun (agent_id, agent_type, cv_id) _ (error, dynamic, event_list) ->
+          let store_result = get_fixpoint_result dynamic in
+          let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
+          let error, dynamic, bdu_true = get_mvbdu_true static dynamic error in
+          let handler = get_mvbdu_handler dynamic in
+          let error, store_remanent_triple = 
+            get_store_remanent_triple static dynamic error 
+          in
+          let error, store_modif_list_restriction_map =
+            get_store_modif_list_restriction_map static dynamic error
+          in
+          (**)
           let error =
             Bdu_fixpoint_iteration.dump_cv_label
               (Remanent_parameters.get_dump_reachability_analysis_diff parameter)
@@ -683,7 +694,7 @@ module Domain =
           (*-----------------------------------------------------------------------*)
           let error, bdu_X =
             match Bdu_analysis_type.Map_bdu_update.Map.find_option_without_logs
-              parameter error (agent_type, cv_id) fixpoint_result
+              parameter error (agent_type, cv_id) store_result
             with
             | error, None -> error, bdu_false
             | error, Some bdu -> error, bdu
@@ -713,14 +724,14 @@ module Domain =
           in
           let error, is_new_views, dynamic, event_list =
             add_link 
-              ~string_opt:""
+              ~title:""
               error
               static
               dynamic
               (agent_type, cv_id)
               bdu_update
-              fixpoint_result
-              [] (*initial updates_list*)
+              store_result
+              []
           in
           let error, dynamic, event_list =
             compute_new_views
@@ -743,8 +754,7 @@ module Domain =
   let compute_views_creation_enabled static dynamic error rule_id =
     let parameter = get_parameter static in
     let parameter_views = Remanent_parameters.update_prefix parameter "\t\t\t" in
-    let fixpoint_result = get_fixpoint_result dynamic in
-    let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
+    (*let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in*)
     let error, store_bdu_creation =
       get_store_proj_bdu_creation_restriction static dynamic error
     in
@@ -755,11 +765,15 @@ module Domain =
       | None -> error, Bdu_analysis_type.Map_agent_type_creation_bdu.Map.empty
       | Some map -> error, map
     in
-    let handler = get_mvbdu_handler dynamic in
+    (*let handler = get_mvbdu_handler dynamic in*)
     (*-----------------------------------------------------------------------*) 
     let error, dynamic, event_list =
       Bdu_analysis_type.Map_agent_type_creation_bdu.Map.fold
         (fun (agent_type, cv_id) bdu_creation (error, dynamic, event_list) ->
+          let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
+          let handler = get_mvbdu_handler dynamic in
+          (**)
+          let fixpoint_result = get_fixpoint_result dynamic in
           let error, bdu_X =
             match Bdu_analysis_type.Map_bdu_update.Map.find_option_without_logs
               parameter error (agent_type, cv_id) fixpoint_result
@@ -777,15 +791,15 @@ module Domain =
           in
           let error, is_new_views, dynamic, event_list =
             add_link 
-              ~string_opt:""
+              ~title:""
               error
               static
               dynamic
               (agent_type, cv_id)
               bdu_update
               fixpoint_result
-              [] (*initial updates_list*)
-          in
+              []
+          in        
           let error, dynamic, event_list =
             compute_new_views
               static
@@ -808,9 +822,6 @@ module Domain =
   let compute_side_effects_enabled static dynamic error rule_id =
     let parameter = get_parameter static in
     let parameter_views = Remanent_parameters.update_prefix parameter "\t\t\t" in
-    let fixpoint_result = get_fixpoint_result dynamic in
-    let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
-    let handler = get_mvbdu_handler dynamic in
     let error, store_bdu_potential =
       get_store_proj_bdu_potential_restriction static dynamic error
     in
@@ -824,46 +835,51 @@ module Domain =
     (*-----------------------------------------------------------------------*)
     let error, dynamic, event_list =
       Bdu_analysis_type.Map_agent_type_potential_bdu.Map.fold
-        (fun (agent_type, new_site_id, cv_id)(bdu_test, list)(error, dynamic, event_list) ->
-          let error, bdu_X =
-	    match Bdu_analysis_type.Map_bdu_update.Map.find_option_without_logs
-              parameter error (agent_type, cv_id) fixpoint_result
-	    with
-	    | error, None -> error, bdu_false
-	    | error, Some bdu -> error, bdu
-	  in
-	  let error, handler, bdu_update =
-	    Bdu_fixpoint_iteration.compute_bdu_update_side_effects
-	      parameter_views
-	      handler
-	      error
-	      bdu_test
-	      list
-	      bdu_X
-          in
-          let error, is_new_views, dynamic, event_list =
-            add_link
-              ~string_opt:""
-              error
-              static
-              dynamic
-              (agent_type, cv_id)
-              bdu_update
-              fixpoint_result
-              [] (*initial updates_list*)
-          in
-          (*-----------------------------------------------------------------------*)
-          let error, dynamic, event_list =
-	    compute_new_views
-              static
-              dynamic
-              error
-              is_new_views
-              agent_type
-              cv_id
-              event_list
-	  in
-	  error, dynamic, event_list
+        (fun (agent_type, new_site_id, cv_id)(bdu_test, list)
+          (error, dynamic, event_list) ->
+            let fixpoint_result = get_fixpoint_result dynamic in
+            let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
+            let handler = get_mvbdu_handler dynamic in
+            (**)
+            let error, bdu_X =
+	      match Bdu_analysis_type.Map_bdu_update.Map.find_option_without_logs
+                parameter error (agent_type, cv_id) fixpoint_result
+	      with
+	      | error, None -> error, bdu_false
+	      | error, Some bdu -> error, bdu
+	    in
+	    let error, handler, bdu_update =
+	      Bdu_fixpoint_iteration.compute_bdu_update_side_effects
+	        parameter_views
+	        handler
+	        error
+	        bdu_test
+	        list
+	        bdu_X
+            in
+            let error, is_new_views, dynamic, updates_list =
+              add_link
+                ~title:""
+                error
+                static
+                dynamic
+                (agent_type, cv_id)
+                bdu_update
+                fixpoint_result
+                []
+            in
+            (*-----------------------------------------------------------------------*)
+            let error, dynamic, event_list =
+	      compute_new_views
+                static
+                dynamic
+                error
+                is_new_views
+                agent_type
+                cv_id
+                event_list
+	    in
+	    error, dynamic, event_list
         ) proj_bdu_potential_restriction (error, dynamic, [])
     in
     error, dynamic, event_list
@@ -925,6 +941,7 @@ module Domain =
 
   let print_static_information static dynamic error loggers =
     let parameter = get_parameter static in
+    let log = Remanent_parameters.get_logger parameter in
     let kappa_handler = get_kappa_handler static in
     let compiled = get_compil static in
     let error, result = get_bdu_analysis_static static dynamic error in
@@ -934,16 +951,18 @@ module Domain =
         || Remanent_parameters.get_trace parameter
         || Remanent_parameters.get_dump_reachability_analysis_static parameter
       then
-        List.fold_left (fun error log ->
+        (*List.fold_left (fun error log ->*)
           let _ = Loggers.print_newline log in
-          let _ = Loggers.fprintf log "Reachability analysis static information ...." in
+          let _ = Loggers.fprintf log 
+            "Reachability analysis static information module...." 
+          in
           let _ = Loggers.print_newline log in
           let parameters_cv = Remanent_parameters.update_prefix parameter "" in
           begin
             if (Remanent_parameters.get_trace parameters_cv)
             then
 	      let _ =
-                Loggers.print_newline log (*(Remanent_parameters.get_logger parameters_cv)*)
+                Loggers.print_newline log
 	      in
 	      let error =
                 Print_bdu_analysis_static.print_result_static
@@ -955,7 +974,7 @@ module Domain =
               in error
             else error
           end
-        ) error loggers
+      (* ) error loggers*)
       else
         error
     in
@@ -965,27 +984,13 @@ module Domain =
 
   let print_dynamic_information static dynamic error loggers =
     let parameter = get_parameter static in
+    let log = Remanent_parameters.get_logger parameter in
     let kappa_handler = get_kappa_handler static in
     let compiled = get_compil static in
     let error, result = get_bdu_analysis_dynamic static dynamic error in
     let error =
-      List.fold_left (fun error log ->
+      (*List.fold_left (fun error log ->*)
         let () = Loggers.print_newline log in
-        let _ =
-          Loggers.fprintf (*(Remanent_parameters.get_logger parameter)*) log
-            "============================================================";
-          Loggers.print_newline log;
-          Loggers.fprintf log "* BDU Analysis:";
-          Loggers.print_newline log;
-          Loggers.fprintf log
-            "============================================================";
-          Loggers.print_newline log; 
-          Loggers.print_newline log;
-          Loggers.fprintf log
-            "** Dynamic information:";
-          (*------------------------------------------------------------------------------*)
-          Loggers.print_newline log
-        in
         let _ =
           Print_bdu_analysis_dynamic.print_result_dynamic
             parameter
@@ -995,7 +1000,7 @@ module Domain =
             result
         in
         error
-      ) error loggers
+    (* ) error loggers*)
     in
     error, set_domain_dynamic_information result dynamic, ()
       
@@ -1003,6 +1008,7 @@ module Domain =
 
   let print_fixpoint_result static dynamic error loggers =
     let parameter = get_parameter static in
+    let log = Remanent_parameters.get_logger parameter in
     let kappa_handler = get_kappa_handler static in
     let error, store_remanent_triple = get_store_remanent_triple static dynamic error in
     let fixpoint_result = get_fixpoint_result dynamic in
@@ -1010,13 +1016,28 @@ module Domain =
     let error, handler =
       if  Remanent_parameters.get_dump_reachability_analysis_result parameter
       then
-        Print_bdu_analysis.print_result_fixpoint 
-          parameter
-          handler
-          error 
-          kappa_handler
-	  store_remanent_triple
-	  fixpoint_result
+        let error =
+            (*List.fold_left (fun error log ->*)
+          let _ =
+            Loggers.print_newline log;
+            Loggers.fprintf log
+              "** Dynamic information fixpoint result module:";
+            (*-----------------------------------------------------------------*)
+            Loggers.print_newline log
+          in
+          let _ =
+            Print_bdu_analysis.print_result_fixpoint 
+              parameter
+              handler
+              error 
+              kappa_handler
+	      store_remanent_triple
+	      fixpoint_result
+          in
+          error
+        (* ) error loggers*)
+        in
+        error, handler
       else error, handler
     in
     let dynamic = set_mvbdu_handler handler dynamic in
@@ -1026,13 +1047,13 @@ module Domain =
 
   let print static dynamic error loggers =
     (*print static information*)
-    let error, dynamic, () =
+    (*let error, dynamic, () =
       print_static_information static dynamic error loggers
     in
     (*print dynamic information*)
     let error, dynamic, () =
       print_dynamic_information static dynamic error loggers
-    in
+    in*)
     (*print fixpoint result*)
     let error, dynamic, () =
       print_fixpoint_result static dynamic error loggers

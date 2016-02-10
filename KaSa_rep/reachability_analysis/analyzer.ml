@@ -53,6 +53,10 @@ struct
 
   type dynamic_information = Domain.dynamic_information
 
+  let print static dynamic error loggers =
+    let error, dynamic, () = Domain.print static dynamic error loggers in
+    error, dynamic
+
   let main parameter error mvbdu_handler compil kappa_handler =
     let error, static, dynamic = 
       Analyzer_headers.initialize_global_information
@@ -70,29 +74,30 @@ struct
 	(error, dynamic)
 	init
     in
-    let rec aux error dynamic =
-      let error, dynamic, next_opt = Domain.next_rule static dynamic error in
-      match next_opt with
-      | None -> error, static, dynamic
-      | Some r_id ->
-	begin
-	  let error, dynamic, is_enabled =
-            Domain.is_enabled static dynamic error r_id 
-          in
-	  match is_enabled with
-	  | None -> aux error dynamic
-	  | Some precondition ->
-	    let error, dynamic, () =
-              Domain.apply_rule static dynamic error r_id precondition 
+    let error, static, dynamic =
+      let rec aux error dynamic =
+        let error, dynamic, next_opt = Domain.next_rule static dynamic error in
+        match next_opt with
+        | None -> error, static, dynamic
+        | Some r_id ->
+	  begin
+	    let error, dynamic, is_enabled =
+              Domain.is_enabled static dynamic error r_id 
             in
-	    aux error dynamic
-	end
-    in aux error dynamic
-    
+	    match is_enabled with
+	    | None -> aux error dynamic
+	    | Some precondition ->
+	      let error, dynamic, () =
+                Domain.apply_rule static dynamic error r_id precondition 
+              in
+              aux error dynamic
+	  end
+      in aux error dynamic       
+    in
+    (*let _ = print static dynamic error [] in*)
+    error, static, dynamic
+
   let export static dynamic error kasa_state =
     Domain.export static dynamic error kasa_state
-      
-  let print static dynamic error loggers =
-    let error, dynamic, () = Domain.print static dynamic error loggers in
-    error, dynamic
+
 end

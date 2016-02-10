@@ -38,7 +38,9 @@ let print_result parameter error handler_kappa compiled result =
       || Remanent_parameters.get_dump_reachability_analysis_static parameter
     then
       let _ = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-      let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter) "Reachability analysis static information ...." in
+      let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter) 
+        "Reachability analysis static information ...." 
+      in
       let _ = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
       let parameters_cv =
         Remanent_parameters.update_prefix parameter ""
@@ -63,7 +65,9 @@ let print_result parameter error handler_kappa compiled result =
     if  Remanent_parameters.get_dump_reachability_analysis_dynamic parameter
     then
       let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-      let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "Reachability analysis dynamic information ...." in
+      let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) 
+        "Reachability analysis dynamic information ...." 
+      in
       let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
       let parameters_cv =
         Remanent_parameters.update_prefix parameter ""
@@ -141,7 +145,7 @@ let smash_map decomposition
 	  | _ :: tail -> aux tail
 	in aux site_correspondence
       in
-      let error,(map1, map2) =
+      let error, (map1, map2) =
         Bdu_build.new_index_pair_map parameter error site_correspondence
       in
       let rename_site parameter error site_type =
@@ -153,26 +157,26 @@ let smash_map decomposition
         error, site_type
        in
       List.fold_left
-	(fun (error,handler,output) bdu ->
+	(fun (error, handler, output) bdu ->
 	  begin
-	    let error,handler,lvar =
+	    let error, handler, lvar =
 	      Mvbdu_wrapper.Mvbdu.variables_list_of_mvbdu
 		parameter handler error
 		bdu
 	    in
-	    let error,handler,list =
+	    let error, handler, list =
 	      Mvbdu_wrapper.Mvbdu.extensional_of_variables_list
 		parameter handler error
 		lvar
 	    in
 	    let error,asso =
 	      List.fold_left
-		(fun (error,list) i ->
-		  let error,new_name =
+		(fun (error, list) i ->
+		  let error, new_name =
 		    rename_site parameter error i
 		  in
-		  error,(i,new_name)::list)
-		(error,[])
+		  error,(i, new_name) :: list)
+		(error, [])
 		(List.rev list)
 	    in
 	    let error,handler,hconsed_asso =
@@ -193,10 +197,10 @@ let smash_map decomposition
 		cv_map_opt
 	      with
 	      | None ->
-		error,Wrapped_modules.LoggedIntMap.empty
-	      | Some map -> error,map
+		error, Wrapped_modules.LoggedIntMap.empty
+	      | Some map -> error, map
 	    in
-	    let error,handler,cv_map' =
+	    let error, handler, cv_map' =
 	      Mvbdu_wrapper.Mvbdu.store_by_variables_list
        		Wrapped_modules.LoggedIntMap.find_default_without_logs
 		Wrapped_modules.LoggedIntMap.add_or_overwrite
@@ -213,15 +217,15 @@ let smash_map decomposition
 	      AgentMap.set parameter error agent_type cv_map'
 		output
 	    in
-	    error,handler,output
+	    error, handler, output
 	  end)
-	(error,handler,output)
+	(error, handler, output)
 	list)
     result
-    (let error,agent_map =
+    (let error, agent_map =
        AgentMap.create parameter error 0
      in
-     (error,handler,agent_map))
+     (error, handler, agent_map))
 
   (**************************************************************************)
 
@@ -263,13 +267,13 @@ let smash_map decomposition
                   "EXTENSIONAL DESCRIPTION:" 
                 in
 		let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-		error,handler
+		error, handler
 	      else
-		error,handler
+		error, handler
 	    in
 	    let error, (handler, translation) =
 	      Translation_in_natural_language.translate
-		parameter handler error (fun _ e i -> e,i) mvbdu
+		parameter handler error (fun _ e i -> e, i) mvbdu
 	    in
 	    (*-----------------------------------------------------------------------*)
 	    let error =
@@ -349,9 +353,9 @@ let smash_map decomposition
 		    let () = Loggers.print_newline 
                       (Remanent_parameters.get_logger parameter) 
                     in
-		    error,handler
+		    error, handler
 		  else
-		    error,handler
+		    error, handler
 		in
 		let rename_site parameter error site_type =
 		  let error, site_type =
@@ -379,6 +383,7 @@ let smash_map decomposition
 	result (error, handler)
     end
 (************************************************************************************)
+(*non relational properties*)
 
 let print_bdu_update_map_cartesian_abstraction a b c d =
   print_bdu_update_map_gen_decomposition
@@ -387,11 +392,16 @@ let print_bdu_update_map_cartesian_abstraction a b c d =
     Mvbdu_wrapper.Mvbdu.mvbdu_cartesian_abstraction a b c d
 
 (************************************************************************************)
+(*relational properties*)
 
 let print_bdu_update_map_cartesian_decomposition a b c d =
   print_bdu_update_map_gen_decomposition
     ~smash:true
-    ~show_dep_with_dimmension_higher_than:(if Remanent_parameters.get_hide_one_d_relations_from_cartesian_decomposition a then 2 else 1)
+    ~show_dep_with_dimmension_higher_than:
+    (if Remanent_parameters.get_hide_one_d_relations_from_cartesian_decomposition a 
+     then 2 
+     else 1
+    )
     Mvbdu_wrapper.Mvbdu.mvbdu_full_cartesian_decomposition a b c d
 
 (************************************************************************************)
@@ -433,7 +443,8 @@ let print_result_dead_rule parameter error handler compiled result =
               _ -> warn parameter error (Some "line 238") Exit (string_of_int k)
 	    in
 	    let error = Exception.check warn parameter error error' (Some "line 234") Exit in
-            let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "%s will never be applied." rule_string
+            let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+              "%s will never be applied." rule_string
 	    in
 	    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
 	    error

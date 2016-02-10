@@ -138,9 +138,27 @@ let main () =
     match handler_bdu_opt with
     | None -> Mvbdu_wrapper.Mvbdu.init parameters error
     | Some handler_bdu -> error, handler_bdu
-  in       
-  let error, static_information, dynamic_information =
-    A.main parameters error handler_bdu c_compil handler
+  in
+  let error, static_opt, dynamic_opt =
+    if Remanent_parameters.get_do_reachability_analysis_module parameters
+    then
+      let _ = Format.printf "\nReachability analysis modular...@." in
+      let parameters_cv =
+        Remanent_parameters.update_prefix parameters "" in
+      let _ =
+        if (Remanent_parameters.get_trace parameters_cv) 
+        then Loggers.fprintf (Remanent_parameters.get_logger parameters_cv) ""
+      in
+      let error, static, dynamic =
+        A.main parameters error handler_bdu c_compil handler
+      in
+      (*print*)
+      (*let error, dynamic =
+        A.print static dynamic error []
+      in*)
+      error, Some static, Some dynamic
+    else
+      error, None, None
   in
   (*-----------------------------------------------------------------------*)
   (*Stochastic flow of information*)
