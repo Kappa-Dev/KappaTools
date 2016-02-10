@@ -731,4 +731,6 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 The internal state of site x in agent D ranges over u and p.
+
+Reachability analysis modular...
 execution finished without any exception

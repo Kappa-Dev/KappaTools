@@ -96,6 +96,8 @@ The binding state of site x in agent A is always B@x.
 The internal state of site x in agent A is always u.
 The internal state of site x in agent B ranges over u and p.
 The binding state of site x in agent B ranges over free and A@x.
+
+Reachability analysis modular...
 Initial state
 
 
@@ -146,26 +148,124 @@ Initial state
 	A(x!B@x)
 	(rule 0) should be investigated 
 	(rule 1) should be investigated 
-	(rule 0) should be investigated 
-	(rule 1) should be investigated 
+	compute_new_views A(x!)
+		(rule 0) should be investigated 
+		(rule 1) should be investigated 
 
 
 
 	A(x~u)
 	(rule 0) should be investigated 
-	(rule 0) should be investigated 
+	compute_new_views A(x~)
+		(rule 0) should be investigated 
 
 
 
 	A(x!B@x)
 	(rule 0) should be investigated 
 	(rule 1) should be investigated 
-	(rule 0) should be investigated 
-	(rule 1) should be investigated 
+	compute_new_views A(x!)
+		(rule 0) should be investigated 
+		(rule 1) should be investigated 
 
 
 
 	A(x~u)
 	(rule 0) should be investigated 
+	compute_new_views A(x~)
+		(rule 0) should be investigated 
+		Updating the views for A(x!)
+
+
+
+	B(x!free,x~u)
 	(rule 0) should be investigated 
+	(rule 1) should be investigated 
+	(rule 2) should be investigated 
+	(rule 3) should be investigated 
+	compute_new_views B(x!,x~)
+		(rule 0) should be investigated 
+		(rule 1) should be investigated 
+		(rule 2) should be investigated 
+		(rule 3) should be investigated 
+		Updating the views for A(x!)
+
+
+
+	B(x!free,x~u)
+	(rule 0) should be investigated 
+	(rule 1) should be investigated 
+	(rule 2) should be investigated 
+	(rule 3) should be investigated 
+	compute_new_views B(x!,x~)
+		(rule 0) should be investigated 
+		(rule 1) should be investigated 
+		(rule 2) should be investigated 
+		(rule 3) should be investigated 
+		Updating the views for B(x!,x~)
+		Updating the views for B(x!,x~)
+
+
+
+	B(x!A@x,x~p)
+	(rule 0) should be investigated 
+	(rule 1) should be investigated 
+	(rule 2) should be investigated 
+	(rule 3) should be investigated 
+	compute_new_views B(x!,x~)
+		(rule 0) should be investigated 
+		(rule 1) should be investigated 
+		(rule 2) should be investigated 
+		(rule 3) should be investigated 
+		Updating the views for B(x!,x~)
+		Updating the views for B(x!,x~)
+
+
+
+	B(x!A@x,x~p)
+	(rule 0) should be investigated 
+	(rule 1) should be investigated 
+	(rule 2) should be investigated 
+	(rule 3) should be investigated 
+	compute_new_views B(x!,x~)
+		(rule 0) should be investigated 
+		(rule 1) should be investigated 
+		(rule 2) should be investigated 
+		(rule 3) should be investigated 
+		Updating the views for A(x!)
+
+
+
+	B(x!free,x~p)
+	(rule 0) should be investigated 
+	(rule 1) should be investigated 
+	(rule 2) should be investigated 
+	(rule 3) should be investigated 
+	compute_new_views B(x!,x~)
+		(rule 0) should be investigated 
+		(rule 1) should be investigated 
+		(rule 2) should be investigated 
+		(rule 3) should be investigated 
+		Updating the views for A(x!)
+
+
+
+	B(x!free,x~p)
+	(rule 0) should be investigated 
+	(rule 1) should be investigated 
+	(rule 2) should be investigated 
+	(rule 3) should be investigated 
+	compute_new_views B(x!,x~)
+		(rule 0) should be investigated 
+		(rule 1) should be investigated 
+		(rule 2) should be investigated 
+		(rule 3) should be investigated 
+		Updating the views for A(x!)
+		Updating the views for A(x!)
+		Updating the views for B(x!,x~)
+		Updating the views for B(x!,x~)
+		Updating the views for B(x!,x~)
+		Updating the views for B(x!,x~)
+		Updating the views for B(x!,x~)
+		Updating the views for B(x!,x~)
 execution finished without any exception

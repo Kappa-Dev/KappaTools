@@ -1447,4 +1447,6 @@ Id=33
 
 EXTENSIONAL DESCRIPTION:
 The binding state of site x in agent C ranges over free and A@y.
+
+Reachability analysis modular...
 execution finished without any exception

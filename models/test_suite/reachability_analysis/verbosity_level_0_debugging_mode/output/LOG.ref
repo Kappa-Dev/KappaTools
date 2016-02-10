@@ -914,4 +914,6 @@ agent_type_     Leaf False
 	Applying rule 6:
 		the precondition is satisfied
 		Updating the views for A(x~,y~,z~)
+
+Reachability analysis modular...
 execution finished without any exception

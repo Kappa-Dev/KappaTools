@@ -772,4 +772,6 @@ rule 3: r1_op will never be applied.
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
+
+Reachability analysis modular...
 execution finished without any exception

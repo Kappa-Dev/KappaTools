@@ -422,4 +422,6 @@ Id=5
 
 EXTENSIONAL DESCRIPTION:
 The internal state of site x in agent D is always u.
+
+Reachability analysis modular...
 execution finished without any exception

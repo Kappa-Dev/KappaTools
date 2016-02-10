@@ -582,6 +582,8 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 The internal state of site x in agent D is always u.
+
+Reachability analysis modular...
 Initial state
 
 

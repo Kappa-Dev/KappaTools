@@ -252,4 +252,6 @@ rule 1: r1 will never be applied.
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
+
+Reachability analysis modular...
 execution finished without any exception

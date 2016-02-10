@@ -596,4 +596,6 @@ rule 3: r3 will never be applied.
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
+
+Reachability analysis modular...
 execution finished without any exception

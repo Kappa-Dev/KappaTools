@@ -1828,6 +1828,8 @@ Id=127
 
 EXTENSIONAL DESCRIPTION:
 The binding state of site x2 in agent C ranges over free and A@c.
+
+Reachability analysis modular...
 Initial state
 
 

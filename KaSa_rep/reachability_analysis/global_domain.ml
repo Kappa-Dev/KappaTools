@@ -765,7 +765,6 @@ module Domain =
       | None -> error, Bdu_analysis_type.Map_agent_type_creation_bdu.Map.empty
       | Some map -> error, map
     in
-    (*let handler = get_mvbdu_handler dynamic in*)
     (*-----------------------------------------------------------------------*) 
     let error, dynamic, event_list =
       Bdu_analysis_type.Map_agent_type_creation_bdu.Map.fold
