@@ -152,7 +152,7 @@ struct
     (* for each rule with no lhs, push the rule in the working list *)
     error, static_information,
     {
-      rule_working_list = empty_working_list;
+      rule_working_list = working_list;
       domain            = dynamic
     }
 	   
