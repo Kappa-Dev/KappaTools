@@ -86,16 +86,7 @@ struct
 
   let empty_working_list = Fifo.IntWL.empty
 
-  let initialize global_static dynamic error =
-    let error, domain_static, dynamic =
-      Domain.initialize global_static dynamic error
-    in
-    let static_information = global_static, domain_static in
-    error, static_information,
-    {
-      rule_working_list = empty_working_list;
-      domain            = dynamic
-    }
+  
 
   type 'a zeroary =
     static_information
@@ -151,6 +142,20 @@ struct
   (**[lift_unary f static dynamic] is a function lifted of unary type,
      returns information of dynamic information and its output*)
 
+  let initialize global_static dynamic error =
+    let error, domain_static, dynamic =
+      Domain.initialize global_static dynamic error
+    in
+    let static_information = global_static, domain_static in
+    let working_list = empty_working_list in
+    (* to do *)
+    (* for each rule with no lhs, push the rule in the working list *)
+    error, static_information,
+    {
+      rule_working_list = empty_working_list;
+      domain            = dynamic
+    }
+	   
   let lift_unary f (static:static_information) dynamic error a =
     let error, domain_dynamic, output =
       f (get_domain_static_information static) dynamic.domain error a
