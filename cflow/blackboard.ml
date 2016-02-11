@@ -35,7 +35,7 @@ sig
   (** blackboard*)
 
   type blackboard      (*blackboard, once finalized*)
-  type assign_result (*= Fail | Success | Ignore *)
+  type assign_result 
 
   val is_failed: assign_result -> bool
   val is_succeeded: assign_result -> bool
@@ -52,11 +52,11 @@ sig
   val get_npredicate_id: blackboard -> int
   val get_n_unresolved_events_of_pid_by_level: blackboard -> PB.predicate_id -> Priority.level -> int
   val get_n_unresolved_events_of_pid: blackboard -> PB.predicate_id  -> int
-
   val get_n_unresolved_events: blackboard -> int
   val get_first_linked_event: blackboard -> PB.predicate_id -> int option
   val get_last_linked_event: blackboard -> PB.predicate_id -> int option
   val get_stack_depth: blackboard -> int
+  val is_selected_event: (int,blackboard,bool option) PB.CI.Po.K.H.binary
   val case_address_of_case_event_address : event_case_address -> case_address
   val predicate_value_of_case_value: (case_value, PB.predicate_value) PB.CI.Po.K.H.unary
   val follow_pointer_up: (blackboard, event_case_address, event_case_address) PB.CI.Po.K.H.binary
@@ -363,6 +363,7 @@ module Blackboard =
            fictitious_observable: PB.step_id option;
            level_of_event: Priority.level PB.A.t;
          }
+
 
      let tick profiling_info = StoryProfiling.StoryStats.tick profiling_info
      let level_of_event parameter handler log_info error blackboard eid =
@@ -952,6 +953,9 @@ module Blackboard =
 		  warn parameter log_info error (Some "set, line 939, Incompatible address and value in function set") (Failure "Incompatible address and value in function Blackboard.set") blackboard
            end
 
+     let is_selected_event parameter handler log_info error step_id blackboard =
+       error, log_info, PB.A.get blackboard.selected_events step_id
+				 
      let rec get parameter handler log_info error case_address blackboard =
        match
          case_address

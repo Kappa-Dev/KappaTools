@@ -83,7 +83,7 @@ module Propagation_heuristic =
     let forbidden_events paramter handler log_info error list =
       error,log_info,List.rev_map (fun x -> Cut_event x) (List.rev list)
 
-    let get_gen_unresolved_event first last succ stop parameter handler log_info error blackboard p_id level =
+    let get_gen_unresolved_event_on_pid first last succ stop parameter handler log_info error blackboard p_id level =
       let k_init = first blackboard p_id in
       let k_end = last blackboard p_id in
       match k_init,k_end
@@ -114,12 +114,42 @@ module Propagation_heuristic =
             aux i log_info error
           end
 
-    let get_last_unresolved_event parameter handler log_info error blackboard p_id level =
-      get_gen_unresolved_event B.get_last_linked_event B.get_first_linked_event pred (fun i j -> i<j) parameter handler log_info error blackboard p_id level
+	    
+    let get_last_unresolved_event_on_pid parameter handler log_info error blackboard p_id level =
+      get_gen_unresolved_event_on_pid B.get_last_linked_event B.get_first_linked_event pred (fun i j -> i<j) parameter handler log_info error blackboard p_id level
 
-    let get_first_unresolved_event parameter handler log_info error blackboard p_id level =
-      get_gen_unresolved_event B.get_first_linked_event B.get_last_linked_event succ (fun i j -> i>j) parameter handler log_info error blackboard p_id level
+    let get_first_unresolved_event_on_pid parameter handler log_info error blackboard p_id level =
+      get_gen_unresolved_event_on_pid B.get_first_linked_event B.get_last_linked_event succ (fun i j -> i>j) parameter handler log_info error blackboard p_id level
 
+    let get_gen_unresolved_event first last succ stop parameter handler log_info error blackboard level =
+      begin
+            let rec aux i log_info error =
+              if stop i last
+              then error,log_info,None
+              else
+                let error, log_info, exist = B.is_selected_event parameter handler log_info error i blackboard in
+                match exist
+                with
+                  | None ->
+                    let error,log_info,level_of_event = B.level_of_event parameter handler log_info error blackboard i in
+                    if level_of_event = level
+                    then
+                      error,log_info,Some i
+                    else
+                      aux (succ i) log_info error
+                  | Some true | Some false -> aux (succ i) log_info error
+            in
+            aux first log_info error
+      end
+
+	    
+    let get_last_unresolved_event parameter handler log_info error blackboard level =
+      get_gen_unresolved_event (B.get_n_eid blackboard) 0 pred (fun i j -> i<j) parameter handler log_info error blackboard level
+
+    let get_first_unresolved_event parameter handler log_info error blackboard level =
+      get_gen_unresolved_event 0 (B.get_n_eid blackboard) succ (fun i j -> i>j) parameter handler log_info error blackboard level
+
+			       
     let compare_int i j =
       if i=0 then false
       else if j=0 then true
@@ -164,7 +194,7 @@ module Propagation_heuristic =
       in
       let best_pair x a b =
 	match
-	  priority.Priority.candidate_set_of_events
+	  x.Priority.candidate_set_of_events
 	with
 	| Priority.All_remaining_events
 	| Priority.Wire_with_the_most_number_of_events -> Tools.min_pos_int_not_zero a b
@@ -174,8 +204,26 @@ module Propagation_heuristic =
 	match
 	  x.Priority.try_to_remove_first
 	with
-	| Priority.Late_events -> get_last_unresolved_event parameter handler log_info error blackboard p_id level
-	| Priority.Early_events -> get_first_unresolved_event (*get_last_unresolved_event*) parameter handler log_info error blackboard p_id level
+	| Priority.Late_events ->
+	   begin
+	     match
+	       x.Priority.candidate_set_of_events
+	     with
+	     | Priority.All_remaining_events -> get_last_unresolved_event parameter handler log_info error blackboard level
+	     | Priority.Wire_with_the_most_number_of_events 
+	     | Priority.Wire_with_the_least_number_of_events ->
+	       get_last_unresolved_event_on_pid parameter handler log_info error blackboard p_id level
+	   end
+	| Priority.Early_events ->
+	   begin
+	     match
+	       x.Priority.candidate_set_of_events
+	     with
+	     | Priority.All_remaining_events -> get_first_unresolved_event parameter handler log_info error blackboard level
+	     | Priority.Wire_with_the_most_number_of_events 
+	     | Priority.Wire_with_the_least_number_of_events ->
+		get_first_unresolved_event_on_pid parameter handler log_info error blackboard p_id level
+	   end
       in
       let error,list  =
         if n_p_id = 0
