@@ -1455,71 +1455,71 @@ Reachability analysis modular...
 	Dealing with creation
 
 
-	INTENSIONAL DESCRIPTION:
-	Id=7
-	 Node(site_type:1<0)
-	  Id=0
-	   Leaf False 
+INTENSIONAL DESCRIPTION:
+Id=7
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
 
-	  Id=6
-	   Node(site_type:1<1)
-	    Id=5
-	     Node(site_type:2<0)
-	      Id=0
-	       Leaf False 
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
 
-	      Id=4
-	       Node(site_type:2<1)
-	        Id=1
-	         Leaf True 
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
 
-	        Id=0
-	         Leaf False 
+        Id=0
+         Leaf False 
 
-	    Id=0
-	     Leaf False 
+    Id=0
+     Leaf False 
 
-	EXTENSIONAL DESCRIPTION:
+EXTENSIONAL DESCRIPTION:
 	A(x!free,y!free)
 	Wake-up rules
 	Dealing with creation
 
 
-	INTENSIONAL DESCRIPTION:
-	Id=3
-	 Node(site_type:1<0)
-	  Id=0
-	   Leaf False 
+INTENSIONAL DESCRIPTION:
+Id=3
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
 
-	  Id=2
-	   Node(site_type:1<1)
-	    Id=1
-	     Leaf True 
+  Id=2
+   Node(site_type:1<1)
+    Id=1
+     Leaf True 
 
-	    Id=0
-	     Leaf False 
+    Id=0
+     Leaf False 
 
-	EXTENSIONAL DESCRIPTION:
+EXTENSIONAL DESCRIPTION:
 	A(y~u)
 	Wake-up rules
 	Dealing with creation
 
 
-	INTENSIONAL DESCRIPTION:
-	Id=3
-	 Node(site_type:1<0)
-	  Id=0
-	   Leaf False 
+INTENSIONAL DESCRIPTION:
+Id=3
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
 
-	  Id=2
-	   Node(site_type:1<1)
-	    Id=1
-	     Leaf True 
+  Id=2
+   Node(site_type:1<1)
+    Id=1
+     Leaf True 
 
-	    Id=0
-	     Leaf False 
+    Id=0
+     Leaf False 
 
-	EXTENSIONAL DESCRIPTION:
+EXTENSIONAL DESCRIPTION:
 	A(x~u)
 	Wake-up rules
 
@@ -1528,51 +1528,51 @@ Reachability analysis modular...
 	Dealing with creation
 
 
-	INTENSIONAL DESCRIPTION:
-	Id=11
-	 Node(site_type:1<1)
-	  Id=0
-	   Leaf False 
+INTENSIONAL DESCRIPTION:
+Id=11
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
 
-	  Id=10
-	   Node(site_type:1<2)
-	    Id=5
-	     Node(site_type:2<0)
-	      Id=0
-	       Leaf False 
+  Id=10
+   Node(site_type:1<2)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
 
-	      Id=4
-	       Node(site_type:2<1)
-	        Id=1
-	         Leaf True 
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
 
-	        Id=0
-	         Leaf False 
+        Id=0
+         Leaf False 
 
-	    Id=0
-	     Leaf False 
+    Id=0
+     Leaf False 
 
-	EXTENSIONAL DESCRIPTION:
+EXTENSIONAL DESCRIPTION:
 	A(x!B@x,y!free)
 	Wake-up rules
 	Dealing with creation
 
 
-	INTENSIONAL DESCRIPTION:
-	Id=9
-	 Node(site_type:1<1)
-	  Id=0
-	   Leaf False 
+INTENSIONAL DESCRIPTION:
+Id=9
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
 
-	  Id=8
-	   Node(site_type:1<2)
-	    Id=1
-	     Leaf True 
+  Id=8
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
 
-	    Id=0
-	     Leaf False 
+    Id=0
+     Leaf False 
 
-	EXTENSIONAL DESCRIPTION:
+EXTENSIONAL DESCRIPTION:
 	B(x!A@x)
 	Wake-up rules
 
@@ -1581,51 +1581,51 @@ Reachability analysis modular...
 	Dealing with creation
 
 
-	INTENSIONAL DESCRIPTION:
-	Id=15
-	 Node(site_type:1<0)
-	  Id=0
-	   Leaf False 
+INTENSIONAL DESCRIPTION:
+Id=15
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
 
-	  Id=14
-	   Node(site_type:1<1)
-	    Id=13
-	     Node(site_type:2<1)
-	      Id=0
-	       Leaf False 
+  Id=14
+   Node(site_type:1<1)
+    Id=13
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
 
-	      Id=12
-	       Node(site_type:2<2)
-	        Id=1
-	         Leaf True 
+      Id=12
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
 
-	        Id=0
-	         Leaf False 
+        Id=0
+         Leaf False 
 
-	    Id=0
-	     Leaf False 
+    Id=0
+     Leaf False 
 
-	EXTENSIONAL DESCRIPTION:
+EXTENSIONAL DESCRIPTION:
 	A(x!free,y!C@x)
 	Wake-up rules
 	Dealing with creation
 
 
-	INTENSIONAL DESCRIPTION:
-	Id=9
-	 Node(site_type:1<1)
-	  Id=0
-	   Leaf False 
+INTENSIONAL DESCRIPTION:
+Id=9
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
 
-	  Id=8
-	   Node(site_type:1<2)
-	    Id=1
-	     Leaf True 
+  Id=8
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
 
-	    Id=0
-	     Leaf False 
+    Id=0
+     Leaf False 
 
-	EXTENSIONAL DESCRIPTION:
+EXTENSIONAL DESCRIPTION:
 	C(x!A@y)
 	Wake-up rules
 
@@ -1644,21 +1644,21 @@ Reachability analysis modular...
 	Dealing with side effects
 
 
-	INTENSIONAL DESCRIPTION:
-	Id=3
-	 Node(site_type:1<0)
-	  Id=0
-	   Leaf False 
+INTENSIONAL DESCRIPTION:
+Id=3
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
 
-	  Id=2
-	   Node(site_type:1<1)
-	    Id=1
-	     Leaf True 
+  Id=2
+   Node(site_type:1<1)
+    Id=1
+     Leaf True 
 
-	    Id=0
-	     Leaf False 
+    Id=0
+     Leaf False 
 
-	EXTENSIONAL DESCRIPTION:
+EXTENSIONAL DESCRIPTION:
 	B(x!free)
 	Wake-up rules
 
@@ -1668,21 +1668,21 @@ Reachability analysis modular...
 	Dealing with side effects
 
 
-	INTENSIONAL DESCRIPTION:
-	Id=3
-	 Node(site_type:1<0)
-	  Id=0
-	   Leaf False 
+INTENSIONAL DESCRIPTION:
+Id=3
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
 
-	  Id=2
-	   Node(site_type:1<1)
-	    Id=1
-	     Leaf True 
+  Id=2
+   Node(site_type:1<1)
+    Id=1
+     Leaf True 
 
-	    Id=0
-	     Leaf False 
+    Id=0
+     Leaf False 
 
-	EXTENSIONAL DESCRIPTION:
+EXTENSIONAL DESCRIPTION:
 	C(x!free)
 	Wake-up rules
 
@@ -1702,31 +1702,31 @@ Reachability analysis modular...
 			
 
 
-	INTENSIONAL DESCRIPTION:
-	Id=27
-	 Node(site_type:1<1)
-	  Id=0
-	   Leaf False 
+INTENSIONAL DESCRIPTION:
+Id=27
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
 
-	  Id=26
-	   Node(site_type:1<2)
-	    Id=13
-	     Node(site_type:2<1)
-	      Id=0
-	       Leaf False 
+  Id=26
+   Node(site_type:1<2)
+    Id=13
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
 
-	      Id=12
-	       Node(site_type:2<2)
-	        Id=1
-	         Leaf True 
+      Id=12
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
 
-	        Id=0
-	         Leaf False 
+        Id=0
+         Leaf False 
 
-	    Id=0
-	     Leaf False 
+    Id=0
+     Leaf False 
 
-	EXTENSIONAL DESCRIPTION:
+EXTENSIONAL DESCRIPTION:
 	A(x!B@x,y!C@x)
 	Wake-up rules
 		Updating the views for B(x!)

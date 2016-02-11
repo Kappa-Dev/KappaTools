@@ -103,7 +103,7 @@ Reachability analysis modular...
 
 	A(x!B@x)
 	Wake-up rules
-	Dealing with A(x!)
+	 A(x!)
 		(rule 0) should be investigated 
 		(rule 1) should be investigated 
 	Views in initial state
@@ -111,14 +111,14 @@ Reachability analysis modular...
 
 	A(x~u)
 	Wake-up rules
-	Dealing with A(x~)
+	 A(x~)
 		(rule 0) should be investigated 
 	Views in initial state
 
 
 	B(x!A@x,x~u)
 	Wake-up rules
-	Dealing with B(x!,x~)
+	 B(x!,x~)
 		(rule 0) should be investigated 
 		(rule 1) should be investigated 
 		(rule 2) should be investigated 
@@ -141,7 +141,7 @@ Reachability analysis modular...
 
 	B(x!free,x~u)
 	Wake-up rules
-	Dealing with B(x!,x~)
+	 B(x!,x~)
 		(rule 0) should be investigated 
 		(rule 1) should be investigated 
 		(rule 2) should be investigated 
@@ -156,7 +156,7 @@ Reachability analysis modular...
 
 	B(x!A@x,x~p)
 	Wake-up rules
-	Dealing with B(x!,x~)
+	 B(x!,x~)
 		(rule 0) should be investigated 
 		(rule 1) should be investigated 
 		(rule 2) should be investigated 
@@ -173,7 +173,7 @@ Reachability analysis modular...
 
 	B(x!free,x~p)
 	Wake-up rules
-	Dealing with B(x!,x~)
+	 B(x!,x~)
 		(rule 0) should be investigated 
 		(rule 1) should be investigated 
 		(rule 2) should be investigated 

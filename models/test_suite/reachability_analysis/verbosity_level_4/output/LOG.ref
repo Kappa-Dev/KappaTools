@@ -172,7 +172,7 @@ Reachability analysis modular...
 
 	A(x~u,y~u,z~u)
 	Wake-up rules
-	Dealing with A(x~,y~,z~)
+	 A(x~,y~,z~)
 		(rule 0) should be investigated 
 		(rule 1) should be investigated 
 		(rule 2) should be investigated 
@@ -199,7 +199,7 @@ Reachability analysis modular...
 
 	A(x~q,y~u,z~u)
 	Wake-up rules
-	Dealing with A(x~,y~,z~)
+	 A(x~,y~,z~)
 		(rule 0) should be investigated 
 		(rule 1) should be investigated 
 		(rule 2) should be investigated 
@@ -223,7 +223,7 @@ Reachability analysis modular...
 
 	A(x~p,y~u,z~u)
 	Wake-up rules
-	Dealing with A(x~,y~,z~)
+	 A(x~,y~,z~)
 		(rule 0) should be investigated 
 		(rule 1) should be investigated 
 		(rule 2) should be investigated 
@@ -250,7 +250,7 @@ Reachability analysis modular...
 
 	A(x~q,y~q,z~u)
 	Wake-up rules
-	Dealing with A(x~,y~,z~)
+	 A(x~,y~,z~)
 		(rule 0) should be investigated 
 		(rule 1) should be investigated 
 		(rule 2) should be investigated 
@@ -275,7 +275,7 @@ Reachability analysis modular...
 
 	A(x~p,y~p,z~u)
 	Wake-up rules
-	Dealing with A(x~,y~,z~)
+	 A(x~,y~,z~)
 		(rule 0) should be investigated 
 		(rule 1) should be investigated 
 		(rule 2) should be investigated 
@@ -300,7 +300,7 @@ Reachability analysis modular...
 
 	A(x~q,y~q,z~q)
 	Wake-up rules
-	Dealing with A(x~,y~,z~)
+	 A(x~,y~,z~)
 		(rule 0) should be investigated 
 		(rule 1) should be investigated 
 		(rule 2) should be investigated 
@@ -329,7 +329,7 @@ Reachability analysis modular...
 
 	A(x~0,y~p,z~q)
 	Wake-up rules
-	Dealing with A(x~,y~,z~)
+	 A(x~,y~,z~)
 		(rule 0) should be investigated 
 		(rule 1) should be investigated 
 		(rule 2) should be investigated 

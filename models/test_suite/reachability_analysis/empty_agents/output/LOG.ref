@@ -430,11 +430,11 @@ Reachability analysis modular...
 	Dealing with creation
 
 
-	INTENSIONAL DESCRIPTION:
-	Id=1
-	 Leaf True 
+INTENSIONAL DESCRIPTION:
+Id=1
+ Leaf True 
 
-	EXTENSIONAL DESCRIPTION:
+EXTENSIONAL DESCRIPTION:
 	Wake-up rules
 
 	Applying rule 1:
@@ -443,11 +443,11 @@ Reachability analysis modular...
 	Dealing with creation
 
 
-	INTENSIONAL DESCRIPTION:
-	Id=1
-	 Leaf True 
+INTENSIONAL DESCRIPTION:
+Id=1
+ Leaf True 
 
-	EXTENSIONAL DESCRIPTION:
+EXTENSIONAL DESCRIPTION:
 	Wake-up rules
 
 	Applying rule 2:
@@ -456,11 +456,11 @@ Reachability analysis modular...
 	Dealing with creation
 
 
-	INTENSIONAL DESCRIPTION:
-	Id=1
-	 Leaf True 
+INTENSIONAL DESCRIPTION:
+Id=1
+ Leaf True 
 
-	EXTENSIONAL DESCRIPTION:
+EXTENSIONAL DESCRIPTION:
 	Wake-up rules
 
 	Applying rule 3:
@@ -469,21 +469,21 @@ Reachability analysis modular...
 	Dealing with creation
 
 
-	INTENSIONAL DESCRIPTION:
-	Id=3
-	 Node(site_type:1<0)
-	  Id=0
-	   Leaf False 
+INTENSIONAL DESCRIPTION:
+Id=3
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
 
-	  Id=2
-	   Node(site_type:1<1)
-	    Id=1
-	     Leaf True 
+  Id=2
+   Node(site_type:1<1)
+    Id=1
+     Leaf True 
 
-	    Id=0
-	     Leaf False 
+    Id=0
+     Leaf False 
 
-	EXTENSIONAL DESCRIPTION:
+EXTENSIONAL DESCRIPTION:
 	D(x~u)
 	Wake-up rules
 
