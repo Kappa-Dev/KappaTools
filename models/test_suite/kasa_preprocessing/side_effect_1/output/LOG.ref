@@ -599,6 +599,12 @@ rule 3: r3 will never be applied.
 
 Reachability analysis modular...
 
+	Applying rule 2: r2:
+		the predcondition is not satsified yet
+
+	Applying rule 3: r3:
+		the predcondition is not satsified yet
+
 ** Dynamic information fixpoint result module:
 
 ------------------------------------------------------------

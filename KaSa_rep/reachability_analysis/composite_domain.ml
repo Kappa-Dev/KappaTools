@@ -81,12 +81,13 @@ struct
 
   let get_domain_static_information = snd
 
-  let get_parameter static =
-    Analyzer_headers.get_parameter (get_global_static_information static)
+  let lift f x = f (get_global_static_information x)
 
-  let empty_working_list = Fifo.IntWL.empty
+  let get_parameter static = lift Analyzer_headers.get_parameter static
+      
+  let get_compil static = lift Analyzer_headers.get_cc_code static
 
-  
+  let empty_working_list = Fifo.IntWL.empty  
 
   type 'a zeroary =
     static_information
@@ -110,22 +111,35 @@ struct
     -> Exception.method_handler * dynamic_information * 'c
 
   (** push r_id in the working_list *)
-  let push_rule (static:static_information) dynamic error r_id =
-    let working_list = dynamic.rule_working_list in
+    
+  let get_working_list dynamic = dynamic.rule_working_list
+
+  let set_working_list rule_working_list dynamic =
+    {
+      dynamic with rule_working_list = rule_working_list
+    }
+
+  let get_domain dynamic = dynamic.domain
+    
+  let set_domain domain dynamic =
+    {
+      dynamic with domain = domain
+    }
+    
+  let push_rule static dynamic error r_id =
+    let working_list = get_working_list dynamic in
     let parameter = get_parameter static in
     let error, rule_working_list =
       Fifo.IntWL.push parameter error r_id working_list
     in
-    error,
-    {
-      dynamic with rule_working_list = rule_working_list
-    }
+    let dynamic = set_working_list rule_working_list dynamic in
+    error, dynamic
 
   (**[next_rule static dynamic] returns a rule_id inside a working list
      if it is not empty*)
 
   let next_rule static dynamic error =
-    let working_list = dynamic.rule_working_list in
+    let working_list = get_working_list dynamic in
     (* see if the working list is empty, if not pop an element *)
     if Fifo.IntWL.is_empty working_list
     then error, dynamic, None
@@ -134,37 +148,84 @@ struct
       let error, (rule_id_op, working_list_tail) =
         Fifo.IntWL.pop parameter error working_list
       in
-      error,
-      {
-        dynamic with rule_working_list = working_list_tail
-      }, rule_id_op
+      let dynamic = set_working_list working_list_tail dynamic in
+      error, dynamic, rule_id_op
 
+  (*for each rule with no lhs, push the rule in the working list *)
+  let push_rule_creation static dynamic error rule_id rule =
+    let parameter = get_parameter static in
+    let error, dynamic =
+      List.fold_left (fun (error, dynamic) (agent_id, agent_type) ->
+        let error, agent = 
+          Bdu_analysis_type.AgentMap.get parameter error agent_id 
+            rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
+        in
+        match agent with
+        | Some Cckappa_sig.Dead_agent _ 
+        | Some Cckappa_sig.Ghost -> error, dynamic
+        | None -> Bdu_fixpoint_iteration.warn parameter error (Some "line 156") Exit dynamic
+        | Some Cckappa_sig.Unknown_agent _ 
+        | Some Cckappa_sig.Agent _ ->
+          let error, dynamic =
+            push_rule static dynamic error rule_id
+          in
+          error, dynamic 
+      ) (error, dynamic) rule.Cckappa_sig.actions.Cckappa_sig.creation
+    in
+    error, dynamic
+    
+  let scan_rule_creation static dynamic error =
+    let parameter = get_parameter static in
+    let compil = get_compil static in
+    let rules = compil.Cckappa_sig.rules in
+    let error, dynamic =
+      Int_storage.Nearly_inf_Imperatif.fold
+        parameter error
+        (fun parameter error rule_id rule dynamic ->
+          let error, dynamic =
+            push_rule_creation
+              static
+              dynamic
+              error
+              rule_id
+              rule.Cckappa_sig.e_rule_c_rule
+          in
+          error, dynamic
+        )
+        rules dynamic
+    in
+    error, dynamic
+
+  let initialize static dynamic error =
+    let error, domain_static, domain_dynamic =
+      Domain.initialize static dynamic error
+    in
+    let static = static, domain_static in
+    let working_list = empty_working_list in
+    let dynamic = 
+      {
+        rule_working_list = working_list;
+        domain = domain_dynamic
+      }
+    in
+    let error, dynamic =
+      scan_rule_creation
+        static
+        dynamic
+        error
+    in
+    error, static, dynamic 
+	   
   (**[lift_unary f static dynamic] is a function lifted of unary type,
      returns information of dynamic information and its output*)
 
-  let initialize global_static dynamic error =
-    let error, domain_static, dynamic =
-      Domain.initialize global_static dynamic error
-    in
-    let static_information = global_static, domain_static in
-    let working_list = empty_working_list in
-    (* to do *)
-    (* for each rule with no lhs, push the rule in the working list *)
-    error, static_information,
-    {
-      rule_working_list = working_list;
-      domain            = dynamic
-    }
-	   
-  let lift_unary f (static:static_information) dynamic error a =
+  let lift_unary f static dynamic error a =
     let error, domain_dynamic, output =
       f (get_domain_static_information static) dynamic.domain error a
     in
-    error,
-    {
-      dynamic with domain = domain_dynamic
-      }, output
-
+    let dynamic = set_domain domain_dynamic dynamic in
+    error, dynamic, output
+      
   (**[pre_add_initial_state static dynamic error a] returns a pair of
      type unary where the output of static information [a] is an initial state
      of analyzer header, and the dynamic output [a list of event] is unit. *)
@@ -172,14 +233,12 @@ struct
   let pre_add_initial_state static dynamic error a =
     lift_unary Domain.add_initial_state static dynamic error a
 
-  let lift_binary f (static:static_information) dynamic error a b =
+  let lift_binary f static dynamic error a b =
     let error, domain_dynamic, output =
       f (get_domain_static_information static) dynamic.domain error a b
     in
-    error,
-    {
-      dynamic with domain = domain_dynamic
-    }, output
+    let dynamic = set_domain domain_dynamic dynamic in
+    error, dynamic, output
 
   (**[is_enabled static dynamic error a] returns a triple of type binary
      when given a rule_id [a], check that if this rule is enable or not *)

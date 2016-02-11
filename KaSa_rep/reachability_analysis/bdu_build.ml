@@ -363,7 +363,8 @@ let collect_proj_bdu_creation_restriction_map parameter handler_bdu error
     Map_creation_bdu.Map.empty
   in
   let error, (handler_bdu, store_bdu_creation_restriction_map) =
-    collect_bdu_creation_restriction_map (* collect should work directly on the partitioned map (store_result) *)
+    collect_bdu_creation_restriction_map
+      (* collect should work directly on the partitioned map (store_result) *)
       parameter
       handler_bdu
       error

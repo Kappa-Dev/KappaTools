@@ -308,6 +308,9 @@ rule 1: remove will never be applied.
 
 Reachability analysis modular...
 
+	Applying rule 1: remove:
+		the predcondition is not satsified yet
+
 ** Dynamic information fixpoint result module:
 
 ------------------------------------------------------------

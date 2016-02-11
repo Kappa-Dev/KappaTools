@@ -124,10 +124,13 @@ Reachability analysis modular...
 		(rule 2) should be investigated 
 		(rule 3) should be investigated 
 
-	Applying rule 3:
-		the predcondition is not satsified yet
+	Applying rule 0:
+		the predcondition is satisfied
 
 	Applying rule 2:
+		the predcondition is not satsified yet
+
+	Applying rule 3:
 		the predcondition is not satsified yet
 
 	Applying rule 1:
@@ -143,9 +146,6 @@ Reachability analysis modular...
 		(rule 1) should be investigated 
 		(rule 2) should be investigated 
 		(rule 3) should be investigated 
-
-	Applying rule 0:
-		the predcondition is satisfied
 
 	Applying rule 3:
 		the predcondition is satisfied
@@ -179,13 +179,13 @@ Reachability analysis modular...
 		(rule 2) should be investigated 
 		(rule 3) should be investigated 
 
+	Applying rule 0:
+		the predcondition is satisfied
+
 	Applying rule 3:
 		the predcondition is satisfied
 		Updating the views for B(x!,x~)
 		Updating the views for B(x!,x~)
-
-	Applying rule 0:
-		the predcondition is satisfied
 
 	Applying rule 2:
 		the predcondition is satisfied

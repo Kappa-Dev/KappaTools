@@ -335,6 +335,9 @@ rule 3 will never be applied.
 
 Reachability analysis modular...
 
+	Applying rule 0:
+		the predcondition is not satsified yet
+
 ** Dynamic information fixpoint result module:
 
 ------------------------------------------------------------
