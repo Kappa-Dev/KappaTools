@@ -139,38 +139,7 @@ struct
   (** intialization function of global static & dynamic information of this
       domain*)
       
-  let initialize static dynamic error =
-    let parameter = Analyzer_headers.get_parameter static in
-    (*global static information*)
-    let error, init_bdu_analysis_static =
-      Bdu_analysis_main.init_bdu_analysis_static parameter error
-    in
-    let init_global_static_information =
-      {
-        global_static_information = static;
-        domain_static_information = init_bdu_analysis_static
-      }
-    in
-    let kappa_handler = Analyzer_headers.get_kappa_handler static in
-    (*global dynamic information*)
-    let nrules = Handler.nrules parameter error kappa_handler in
-    let init_dead_rule_array = Array.make nrules false in
-    let init_fixpoint = Bdu_analysis_type.Map_bdu_update.Map.empty in
-    let error, init_bdu_analysis_dynamic =
-      Bdu_analysis_main.init_bdu_analysis_dynamic parameter error
-    in
-    let init_global_dynamic_information =
-      {
-	global = dynamic;
-	local =
-	  { dead_rule = init_dead_rule_array;
-	    fixpoint_result = init_fixpoint;
-	    domain_dynamic_information = init_bdu_analysis_dynamic;
-	  }}
-    in
-    error,
-    init_global_static_information,
-    init_global_dynamic_information
+  
 
   (*--------------------------------------------------------------------*)
 
@@ -224,11 +193,12 @@ struct
   (**************************************************************************)
   (** [get_scan_rule_set static] *)
 
-  let get_scan_rule_set (static: static_information) dynamic error =
+  let scan_rule_set (static: static_information) dynamic error = (* get functions should not to computations, this is a misleading name *)
     let parameter = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let compiled = get_compil static in
-    let error, handler_bdu = Boolean_mvbdu.init_remanent parameter error in
+    (*let error, handler_bdu = Boolean_mvbdu.init_remanent parameter error in*) (* Reseting memoisations tables are forbidden *)
+    let handler_bdu = get_mvbdu_handler dynamic in
     let error, (handler_bdu, result) =
       Bdu_analysis_main.scan_rule_set
         parameter
@@ -246,19 +216,50 @@ struct
     error,
     set_domain_static result.Bdu_analysis_type.store_bdu_analysis_static static, dynamic
 
+  let initialize static dynamic error =
+    let parameter = Analyzer_headers.get_parameter static in
+    (*global static information*)
+    let error, init_bdu_analysis_static =
+      Bdu_analysis_main.init_bdu_analysis_static parameter error
+    in
+    let init_global_static_information =
+      {
+        global_static_information = static;
+        domain_static_information = init_bdu_analysis_static
+      }
+    in
+    let kappa_handler = Analyzer_headers.get_kappa_handler static in
+    (*global dynamic information*)
+    let nrules = Handler.nrules parameter error kappa_handler in
+    let init_dead_rule_array = Array.make nrules false in
+    let init_fixpoint = Bdu_analysis_type.Map_bdu_update.Map.empty in
+    let error, init_bdu_analysis_dynamic =
+      Bdu_analysis_main.init_bdu_analysis_dynamic parameter error
+    in
+    let init_global_dynamic_information =
+      {
+	global = dynamic;
+	local =
+	  { dead_rule = init_dead_rule_array;
+	    fixpoint_result = init_fixpoint;
+	    domain_dynamic_information = init_bdu_analysis_dynamic;
+	  }}
+    in
+    scan_rule_set init_global_static_information init_global_dynamic_information error
+										   
   (** get type bdu_analysis_static*)
   let get_bdu_analysis_static static dynamic error =
-    let error, static, dynamic =
+   (* let error, static, dynamic =
       get_scan_rule_set static dynamic error
-    in
+    in*) (* You cannot recompile the whole model each time you need to access static information *)
     let result = static.domain_static_information in
     error, result
 
   (**get type bdu_analysis_dynamic*)
   let get_bdu_analysis_dynamic static dynamic error =
-    let error, static, dynamic =
+    (*let error, static, dynamic =
       get_scan_rule_set static dynamic error
-    in
+    in*) (* You cannot recompile the whole model each time you need to access dynamic information *)
     let result = get_domain_dynamic_information dynamic in
     error, result
 
@@ -275,9 +276,9 @@ struct
   (**get type bdu_analysis_dynamic*)
 
   let get_store_covering_classes_modification_update_full static dynamic error =
-    let error, static, dynamic =
+   (*let error, static, dynamic =
       get_scan_rule_set static dynamic error
-    in
+    in*) (* You cannot recompile the whole model each time you need to access dynamic information *)
     let result = get_domain_dynamic_information dynamic in
     error, result.Bdu_analysis_type.store_covering_classes_modification_update_full
 
