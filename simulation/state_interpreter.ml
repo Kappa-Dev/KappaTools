@@ -200,9 +200,14 @@ let one_rule _form dt stop env domain counter graph state =
     in Random_tree.add rd_id new_act state.activities in
   let () =
     if !Parameter.debugModeOn then
-      Format.printf "@[<v>@[Applied@ %t%i:@]@ @[%a@]@]@."
-		    (fun f -> if choice mod 2 = 1 then Format.fprintf f "unary@ ")
-		    rule_id (Kappa_printer.elementary_rule ~env) rule in
+      begin
+	Format.printf "@[<v>@[Applied@ %t%i:@]@ @[%a@]@]@."
+		      (fun f -> if choice mod 2 = 1 then Format.fprintf f "unary@ ")
+		      rule_id (Kappa_printer.elementary_rule ~env) rule;
+	if !Parameter.store_unary_distance
+	(*&&(choice mod 2 = 1)*) then
+	  Rule_interpreter.print_dist env graph rule_id
+      end in
   let get_alg i = get_alg env state i in
   (* let () = *)
   (*   Format.eprintf "%a@." (Rule_interpreter.print_injections env) graph in *)
@@ -323,6 +328,8 @@ let finalize form env counter graph state =
   let () = Plot.close () in
   let () = Counter.complete_progress_bar form counter in
   let () = close_desc state in
+  let () = if !Parameter.store_unary_distance then
+	     Kappa_files.with_unary_dist (Counter.current_event counter) (Rule_interpreter.print_all_dist graph) in
   let () =
     List.iter
       (fun e ->

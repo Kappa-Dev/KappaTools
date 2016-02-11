@@ -66,6 +66,8 @@ resynchronizing. (This is what initial state and perturbations do.) *)
 
 val print : Environment.t -> Format.formatter -> t -> unit
 val print_dot : Environment.t -> Format.formatter -> t -> unit
+val print_dist : Environment.t -> t -> int -> unit
+val print_all_dist : t -> Format.formatter -> unit
 
 (** {6 Stories} *)
 

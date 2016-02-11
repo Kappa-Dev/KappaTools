@@ -416,7 +416,7 @@ let are_connected
      that is all sites that are connected to other nodes in x
      and with all nodes in nodes_x marked as done *)
   match dist with
-  | None when !store_dist ->
+  | None when (store_dist = false) ->
      (match candidate with
       | Some p when is_valid_path graph p -> Some p
       | (Some _ | None) ->

@@ -1,3 +1,5 @@
+open Mods
+
 type jf_data =
   Compression_main.secret_log_info * Compression_main.secret_step list
 
@@ -19,6 +21,8 @@ type t =
 	  Instantiation.abstract Instantiation.test list)
 	 list Connected_component.Map.t (*currently tracked ccs *)
        * jf_data) option;
+    store_unary_dist: int DynArray.t option array;
+    (* nb_occurence for each distance and for each rule *)
   }
 
 type result = Clash | Success of t | Corrected of t
@@ -36,6 +40,7 @@ let empty ~has_tracking env = {
       then Some (Connected_component.Map.empty,
 		 (Compression_main.init_secret_log_info (), []))
       else None;
+    store_unary_dist = Array.make ((Environment.nb_syntactic_rules env)+1) None;
 }
 
 let print_injections ?sigs pr f roots_of_ccs =
@@ -405,7 +410,8 @@ let update_edges
     matchings_of_rule = state.matchings_of_rule;
     unary_pathes = unary_pathes'; edges = edges''; tokens = state.tokens;
     outdated_elements = (rev_deps,unary_cands',no_unary'');
-    story_machinery = story_machinery'; }
+    story_machinery = story_machinery';
+    store_unary_dist = state.store_unary_dist; }
 
 let raw_instance_number state ccs_l =
   let size cc =
@@ -479,9 +485,9 @@ let store_activity ~get_alg store env counter state id syntax_id rate cc_va =
     Nbr.to_float @@ value_alg counter state ~get_alg rate in
   let () =
     if !Parameter.debugModeOn then
-      Format.printf "@[%sule %a has now %i instances.@]@."
-		    (if id mod 2 = 1 then "Unary r" else "R")
-		    (Environment.print_rule ~env) (id/2) cc_va in
+	Format.printf "@[%sule %a has now %i instances.@]@."
+		      (if id mod 2 = 1 then "Unary r" else "R")
+		      (Environment.print_rule ~env) (id/2) cc_va in
   let act =
     if cc_va = 0 then 0. else rate *. float_of_int cc_va in
   store id syntax_id act
@@ -603,10 +609,19 @@ let apply_unary_rule
      | Some (_, dist_opt) -> dist_opt in
   match Edges.are_connected ~candidate (Environment.signatures env)
 			    state.edges root1_ty root1 root2 nodes1 nodes2 
-			    dist Parameter.store_unary_distance with
+			    dist !Parameter.store_unary_distance with
   | None -> Corrected state'
   | Some _ when missing_ccs -> Corrected state'
-  | Some _ as path ->
+  | Some p as path ->
+     let () = if !Parameter.store_unary_distance then
+		let n = List.length p in
+		let rule = Environment.get_rule env rule_id in
+		let syntactic_id = rule.Primitives.syntactic_rule in
+		let rule_arr = state'.store_unary_dist in
+		match rule_arr.(syntactic_id) with
+		| None -> rule_arr.(syntactic_id) <- Some (DynArray.init (n+1) (fun i-> if (i==n) then 1 else 0))
+		| Some arr -> let old_val = DynArray.get arr n in
+			      DynArray.set arr n (old_val+1) in
      let inj1 =
        Connected_component.Matching.reconstruct
 	 state'.edges Connected_component.Matching.empty 0 cc1 root1 in
@@ -687,7 +702,7 @@ let apply_rule
 	    Edges.are_connected ~candidate (Environment.signatures env)
 				state.edges root0_ty roots.(0) roots.(1)
                                 nodes1 nodes2 dist
-				Parameter.store_unary_distance with
+				false with
 	  | None ->
 	     let rid =
 	       match rule_id with None -> assert false | Some rid -> rid in
@@ -786,6 +801,25 @@ let print_dot env f state =
 			"token_%d [label = \"%a (%a)\" , shape=none]"
 			i (Environment.print_token ~env) i Nbr.print el))
     state.tokens
+
+(* print distances for one unary rule *)
+let print_dist env state rule_id =
+  let () =  Format.printf " Distances at which rule %i applied: " rule_id in
+  let rule = Environment.get_rule env rule_id in
+  let syntactic_id = rule.Primitives.syntactic_rule in
+  match state.store_unary_dist.(syntactic_id) with
+  | None -> Format.printf "Not a unary rule or unary rule never applied."
+  | Some arr -> DynArray.iter (fun i -> Format.printf " %i " i) arr
+
+let print_all_dist state f =
+  Array.iteri
+    (fun id dist_arr ->
+     match dist_arr with None -> ()
+		       | Some arr ->
+			  let () =  Format.fprintf f "Rule %i: " id in
+			  DynArray.iter
+			    (fun i -> Format.fprintf f " %i " i) arr)
+    state.store_unary_dist
 
 let debug_print f state =
   Format.fprintf f "@[<v>%a@,%a@,%a@,%a@]"
