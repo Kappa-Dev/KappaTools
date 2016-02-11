@@ -13,6 +13,12 @@
   * All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
+let warn parameters mh message exn default =
+  Exception.warn parameters mh (Some "Bdu_fixpoint_iteration") message exn
+    (fun () -> default)
+
+let local_trace = false
+
 module type Analyzer =
   sig
 
@@ -82,18 +88,23 @@ struct
         match next_opt with
         | None -> error, static, dynamic
         | Some rule_id ->
-          let error, rule_id_string =
-            try
-              Handler.string_of_rule parameter error kappa_handler
-		compil rule_id
-            with
-              _ -> Bdu_fixpoint_iteration.warn parameter error (Some "line 795") Exit
-		(string_of_int rule_id)
-          in
           let _ =
-            Loggers.print_newline log;
-            Loggers.fprintf log "\tApplying %s:" rule_id_string ;
-            Loggers.print_newline log
+            if local_trace
+              || Remanent_parameters.get_dump_reachability_analysis_iteration parameter
+              || Remanent_parameters.get_trace parameter
+            then
+              let error, rule_id_string =
+                try
+                  Handler.string_of_rule parameter error kappa_handler
+		    compil rule_id
+                with
+                  _ -> Bdu_fixpoint_iteration.warn parameter error (Some "line 795") Exit
+		    (string_of_int rule_id)
+              in
+              let () = Loggers.print_newline log in
+              let () = Loggers.fprintf log "\tApplying %s:" rule_id_string in
+              let () = Loggers.print_newline log in
+              ()
           in
 	  begin
 	    let error, dynamic, is_enabled =
@@ -102,14 +113,27 @@ struct
 	    match is_enabled with
 	    | None -> 
               let _ =
-                let () = Loggers.fprintf log "\t\tthe predcondition is not satsified yet" in
-                Loggers.print_newline log
+                if local_trace
+                  || Remanent_parameters.get_dump_reachability_analysis_iteration parameter
+                  || Remanent_parameters.get_trace parameter
+                then
+                  let () =
+                    Loggers.fprintf log "\t\tthe predcondition is not satsified yet" 
+                  in
+                  let () = Loggers.print_newline log
+                  in
+                  ()
               in
               aux error dynamic
 	    | Some precondition ->
               let _ =
-                Loggers.fprintf log "\t\tthe predcondition is satisfied";
-                Loggers.print_newline log 
+                if local_trace
+                  || Remanent_parameters.get_dump_reachability_analysis_iteration parameter
+                  || Remanent_parameters.get_trace parameter
+                then
+                  let () = Loggers.fprintf log "\t\tthe predcondition is satisfied" in
+                  let () = Loggers.print_newline log in
+                  ()
               in
 	      let error, dynamic, () =
                 Domain.apply_rule static dynamic error rule_id precondition 

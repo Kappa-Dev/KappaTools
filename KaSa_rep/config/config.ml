@@ -93,7 +93,7 @@ let smash_relations = ref false
 let use_natural_language = ref true
 
 (*modular reachability*)
-let do_reachability_analysis_module = ref true
+let do_reachability_analysis_module = ref false
 
 
 (** accuracy *)

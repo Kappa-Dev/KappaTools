@@ -144,7 +144,7 @@ let main () =
     | Some handler_bdu -> error, handler_bdu
   in
   let error, static_opt, dynamic_opt =
-    if Remanent_parameters.get_do_reachability_analysis_module parameters
+    if Remanent_parameters.get_do_reachability_analysis parameters
     then
       let _ = Format.printf "\nReachability analysis modular...@." in
       let parameters_cv =
