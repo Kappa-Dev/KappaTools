@@ -1168,10 +1168,13 @@ Id=131
 EXTENSIONAL DESCRIPTION:
 The internal state of site x in agent A ranges over u, p, 0, and q.
 
-Reachability analysis modular...
+Reachability analysis...
 
 	Applying rule 0:
 		the predcondition is satisfied
+
+		rule 0 apply for the first time
+
 	Dealing with creation
 
 
@@ -1218,6 +1221,9 @@ EXTENSIONAL DESCRIPTION:
 
 	Applying rule 1:
 		the predcondition is satisfied
+
+		rule 1 apply for the first time
+
 		Updating the views for A(x~,y~,z~)
 			
 
@@ -1262,6 +1268,9 @@ EXTENSIONAL DESCRIPTION:
 
 	Applying rule 2:
 		the predcondition is satisfied
+
+		rule 2 apply for the first time
+
 		Updating the views for A(x~,y~,z~)
 			
 
@@ -1306,6 +1315,9 @@ EXTENSIONAL DESCRIPTION:
 
 	Applying rule 3:
 		the predcondition is satisfied
+
+		rule 3 apply for the first time
+
 		Updating the views for A(x~,y~,z~)
 			
 
@@ -1350,6 +1362,9 @@ EXTENSIONAL DESCRIPTION:
 
 	Applying rule 4:
 		the predcondition is satisfied
+
+		rule 4 apply for the first time
+
 		Updating the views for A(x~,y~,z~)
 			
 
@@ -1394,6 +1409,9 @@ EXTENSIONAL DESCRIPTION:
 
 	Applying rule 5:
 		the predcondition is satisfied
+
+		rule 5 apply for the first time
+
 		Updating the views for A(x~,y~,z~)
 			
 
@@ -1438,6 +1456,9 @@ EXTENSIONAL DESCRIPTION:
 
 	Applying rule 6:
 		the predcondition is satisfied
+
+		rule 6 apply for the first time
+
 		Updating the views for A(x~,y~,z~)
 			
 
@@ -1507,7 +1528,9 @@ EXTENSIONAL DESCRIPTION:
 		the predcondition is satisfied
 		Updating the views for A(x~,y~,z~)
 
-** Dynamic information fixpoint result module:
+------------------------------------------------------------
+* Dead rule :
+------------------------------------------------------------
 
 ------------------------------------------------------------
 * Fixpoint iteration :

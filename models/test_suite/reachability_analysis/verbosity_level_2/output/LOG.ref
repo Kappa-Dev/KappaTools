@@ -78,10 +78,13 @@ The internal state of site z in agent A ranges over u and q.
 The internal state of site y in agent A ranges over u, p, and q.
 The internal state of site x in agent A ranges over u, p, 0, and q.
 
-Reachability analysis modular...
+Reachability analysis...
 
 	Applying rule 0:
 		the predcondition is satisfied
+
+		rule 0 apply for the first time
+
 
 	Applying rule 0:
 		the predcondition is satisfied
@@ -89,20 +92,38 @@ Reachability analysis modular...
 	Applying rule 1:
 		the predcondition is satisfied
 
+		rule 1 apply for the first time
+
+
 	Applying rule 2:
 		the predcondition is satisfied
+
+		rule 2 apply for the first time
+
 
 	Applying rule 3:
 		the predcondition is satisfied
 
+		rule 3 apply for the first time
+
+
 	Applying rule 4:
 		the predcondition is satisfied
+
+		rule 4 apply for the first time
+
 
 	Applying rule 5:
 		the predcondition is satisfied
 
+		rule 5 apply for the first time
+
+
 	Applying rule 6:
 		the predcondition is satisfied
+
+		rule 6 apply for the first time
+
 
 	Applying rule 7: KO:
 		the predcondition is not satsified yet
@@ -128,7 +149,10 @@ Reachability analysis modular...
 	Applying rule 6:
 		the predcondition is satisfied
 
-** Dynamic information fixpoint result module:
+------------------------------------------------------------
+* Dead rule :
+------------------------------------------------------------
+rule 7: KO will never be applied.
 
 ------------------------------------------------------------
 * Relational properties:

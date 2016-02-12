@@ -144,7 +144,7 @@ let main () =
   let error, static_opt, dynamic_opt =
     if Remanent_parameters.get_do_reachability_analysis parameters
     then
-      let _ = Format.printf "\nReachability analysis modular...@." in
+      let _ = Format.printf "\nReachability analysis...@." in
       let parameters_cv =
         Remanent_parameters.update_prefix parameters "" in
       let _ =
@@ -154,10 +154,6 @@ let main () =
       let error, static, dynamic =
         A.main parameters error handler_bdu c_compil handler
       in
-      (*print*)
-      (*let error, dynamic =
-        A.print static dynamic error []
-      in*)
       error, Some static, Some dynamic
     else
       error, None, None

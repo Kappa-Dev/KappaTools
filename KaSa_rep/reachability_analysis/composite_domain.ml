@@ -13,6 +13,10 @@
   * All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
+let warn parameters mh message exn default =
+  Exception.warn parameters mh (Some "Composite domain") message exn
+    (fun () -> default)
+
 module type Composite_domain =
   sig
     type static_information
@@ -163,7 +167,7 @@ struct
         match agent with
         | Some Cckappa_sig.Dead_agent _ 
         | Some Cckappa_sig.Ghost -> error, dynamic
-        | None -> Bdu_fixpoint_iteration.warn parameter error (Some "line 156") Exit dynamic
+        | None -> warn parameter error (Some "line 156") Exit dynamic
         | Some Cckappa_sig.Unknown_agent _ 
         | Some Cckappa_sig.Agent _ ->
           let error, dynamic =

@@ -162,9 +162,12 @@ rule 0: r0 will never be applied.
 * Non relational properties:
 ------------------------------------------------------------
 
-Reachability analysis modular...
+Reachability analysis...
 
-** Dynamic information fixpoint result module:
+------------------------------------------------------------
+* Dead rule :
+------------------------------------------------------------
+rule 0: r0 will never be applied.
 
 ------------------------------------------------------------
 * Fixpoint iteration :

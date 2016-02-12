@@ -28,9 +28,11 @@ The internal state of site z in agent A ranges over u and p.
 The internal state of site y in agent A ranges over u and p.
 The internal state of site x in agent A ranges over u and p.
 
-Reachability analysis modular...
+Reachability analysis...
 
-** Dynamic information fixpoint result module:
+------------------------------------------------------------
+* Dead rule :
+------------------------------------------------------------
 
 ------------------------------------------------------------
 * Relational properties:

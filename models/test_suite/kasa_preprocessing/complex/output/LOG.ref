@@ -773,9 +773,15 @@ rule 3: r1_op will never be applied.
 * Non relational properties:
 ------------------------------------------------------------
 
-Reachability analysis modular...
+Reachability analysis...
 
-** Dynamic information fixpoint result module:
+------------------------------------------------------------
+* Dead rule :
+------------------------------------------------------------
+rule 0: r0 will never be applied.
+rule 1: r0_op will never be applied.
+rule 2: r1 will never be applied.
+rule 3: r1_op will never be applied.
 
 ------------------------------------------------------------
 * Fixpoint iteration :

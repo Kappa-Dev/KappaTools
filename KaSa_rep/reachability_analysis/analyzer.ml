@@ -68,7 +68,6 @@ struct
       Analyzer_headers.initialize_global_information
         parameter error mvbdu_handler compil kappa_handler 
     in
-    (*let handler_kappa = get_kappa_handler static in*)
     let error, init = Analyzer_headers.compute_initial_state error static in
     let error, static, dynamic = Domain.initialize static dynamic error in
     let error, dynamic =

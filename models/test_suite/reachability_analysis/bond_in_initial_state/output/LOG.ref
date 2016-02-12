@@ -97,7 +97,7 @@ The internal state of site x in agent A is always u.
 The internal state of site x in agent B ranges over u and p.
 The binding state of site x in agent B ranges over free and A@x.
 
-Reachability analysis modular...
+Reachability analysis...
 	Views in initial state
 
 
@@ -127,11 +127,17 @@ Reachability analysis modular...
 	Applying rule 0:
 		the predcondition is satisfied
 
+		rule 0 apply for the first time
+
+
 	Applying rule 2:
 		the predcondition is not satsified yet
 
 	Applying rule 1:
 		the predcondition is satisfied
+
+		rule 1 apply for the first time
+
 		Updating the views for A(x!)
 	Dealing with side effects
 
@@ -146,6 +152,9 @@ Reachability analysis modular...
 
 	Applying rule 3:
 		the predcondition is satisfied
+
+		rule 3 apply for the first time
+
 		Updating the views for B(x!,x~)
 		Updating the views for B(x!,x~)
 			
@@ -178,6 +187,9 @@ Reachability analysis modular...
 
 	Applying rule 2:
 		the predcondition is satisfied
+
+		rule 2 apply for the first time
+
 		Updating the views for B(x!,x~)
 
 	Applying rule 3:
@@ -192,7 +204,9 @@ Reachability analysis modular...
 		the predcondition is satisfied
 		Updating the views for A(x!)
 
-** Dynamic information fixpoint result module:
+------------------------------------------------------------
+* Dead rule :
+------------------------------------------------------------
 
 ------------------------------------------------------------
 * Relational properties:
