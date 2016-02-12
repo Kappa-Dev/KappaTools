@@ -928,19 +928,19 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 8:
 		the predcondition is satisfied
 
-		rule 8 apply for the first time
+		rule 8 is applied for the first time
 
 
 	Applying rule 9:
 		the predcondition is satisfied
 
-		rule 9 apply for the first time
+		rule 9 is applied for the first time
 
 
 	Applying rule 0:
 		the predcondition is satisfied
 
-		rule 0 apply for the first time
+		rule 0 is applied for the first time
 
 		Updating the views for A(x~)
 		Updating the views for B(x~)
@@ -968,7 +968,7 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 3:
 		the predcondition is satisfied
 
-		rule 3 apply for the first time
+		rule 3 is applied for the first time
 
 		Updating the views for A(x~)
 			
@@ -995,42 +995,42 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 4:
 		the predcondition is satisfied
 
-		rule 4 apply for the first time
+		rule 4 is applied for the first time
 
 		Updating the views for A(x~)
 
 	Applying rule 5:
 		the predcondition is satisfied
 
-		rule 5 apply for the first time
+		rule 5 is applied for the first time
 
 		Updating the views for A(x~)
 
 	Applying rule 6:
 		the predcondition is satisfied
 
-		rule 6 apply for the first time
+		rule 6 is applied for the first time
 
 		Updating the views for A(x~)
 
 	Applying rule 7:
 		the predcondition is satisfied
 
-		rule 7 apply for the first time
+		rule 7 is applied for the first time
 
 		Updating the views for A(x~)
 
 	Applying rule 1:
 		the predcondition is satisfied
 
-		rule 1 apply for the first time
+		rule 1 is applied for the first time
 
 		Updating the views for B(x~)
 
 	Applying rule 2:
 		the predcondition is satisfied
 
-		rule 2 apply for the first time
+		rule 2 is applied for the first time
 
 		Updating the views for B(x~)
 

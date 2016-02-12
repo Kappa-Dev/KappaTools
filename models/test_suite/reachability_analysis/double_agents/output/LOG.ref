@@ -1790,7 +1790,7 @@ Reachability analysis...
 	Applying rule 0: r0:
 		the predcondition is satisfied
 
-		rule 0: r0 apply for the first time
+		rule 0: r0 is applied for the first time
 
 	Dealing with creation
 
@@ -1858,7 +1858,7 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 1: r1:
 		the predcondition is satisfied
 
-		rule 1: r1 apply for the first time
+		rule 1: r1 is applied for the first time
 
 	Dealing with creation
 
@@ -1935,7 +1935,7 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 5: r5:
 		the predcondition is satisfied
 
-		rule 5: r5 apply for the first time
+		rule 5: r5 is applied for the first time
 
 	Dealing with creation
 
@@ -1964,7 +1964,7 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 3: r3:
 		the predcondition is satisfied
 
-		rule 3: r3 apply for the first time
+		rule 3: r3 is applied for the first time
 
 		Updating the views for A(x!)
 			
@@ -2063,7 +2063,7 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 4: r4:
 		the predcondition is satisfied
 
-		rule 4: r4 apply for the first time
+		rule 4: r4 is applied for the first time
 
 		Updating the views for A(x!)
 		Updating the views for A(x!)
@@ -2077,7 +2077,7 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 2: r2:
 		the predcondition is satisfied
 
-		rule 2: r2 apply for the first time
+		rule 2: r2 is applied for the first time
 
 		Updating the views for B(x~,y~,x!)
 			
@@ -2124,7 +2124,7 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 6: r6:
 		the predcondition is satisfied
 
-		rule 6: r6 apply for the first time
+		rule 6: r6 is applied for the first time
 
 		Updating the views for C(x!)
 			
@@ -2307,7 +2307,7 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 7: r7:
 		the predcondition is satisfied
 
-		rule 7: r7 apply for the first time
+		rule 7: r7 is applied for the first time
 
 		Updating the views for B(x~,y~,x!)
 		Updating the views for B(x~,y~,x!)

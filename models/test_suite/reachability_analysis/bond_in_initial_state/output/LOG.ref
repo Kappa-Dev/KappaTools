@@ -127,7 +127,7 @@ Reachability analysis...
 	Applying rule 0:
 		the predcondition is satisfied
 
-		rule 0 apply for the first time
+		rule 0 is applied for the first time
 
 
 	Applying rule 2:
@@ -136,7 +136,7 @@ Reachability analysis...
 	Applying rule 1:
 		the predcondition is satisfied
 
-		rule 1 apply for the first time
+		rule 1 is applied for the first time
 
 		Updating the views for A(x!)
 	Dealing with side effects
@@ -153,7 +153,7 @@ Reachability analysis...
 	Applying rule 3:
 		the predcondition is satisfied
 
-		rule 3 apply for the first time
+		rule 3 is applied for the first time
 
 		Updating the views for B(x!,x~)
 		Updating the views for B(x!,x~)
@@ -188,7 +188,7 @@ Reachability analysis...
 	Applying rule 2:
 		the predcondition is satisfied
 
-		rule 2 apply for the first time
+		rule 2 is applied for the first time
 
 		Updating the views for B(x!,x~)
 
