@@ -22,32 +22,39 @@ let local_trace = false
 module Domain =
 struct
 
-  (* the type of the struct that contains all static information as in the
-     previous version of the analysis *)
-
   (*type of agents in the lhs after minus created agents: type (tested *
     created\tested): use list less space, because the array below will
     control everything*)
+  (* TO DO, for each rule, the set of agent types of agents in the lhs,
+     and the set of the agent types of created agents minus the set of the
+     agent types of agents in the lhs *)
 
-  type agents_lhs = (int list * int list) Bdu_analysis_type.Int2Map_Modif.Map.t
+  module Int2Map_Agent =
+    Map_wrapper.Make
+      (SetMap.Make
+         (struct
+           type t = int (*rule_id*)
+           let compare = compare
+          end
+         ))
+
+  type store_agents_test = (int * int) list Int2Map_Agent.Map.t
+
+  type store_agents_test_without_created = (int * int) list Int2Map_Agent.Map.t
+  
+  type store_agents = store_agents_test * store_agents_test_without_created
     
   type static_information =
     {
       global_static_information : Analyzer_headers.global_static_information;
-      domain_static_information : agents_lhs
-
-    (* TO DO, for each rule, the set of agent types of agents in the lhs,
-       and the set of the agent types of created agents minus the set of the
-       agent types of agents in the lhs *)
+      domain_static_information : store_agents
     }
 
   (*--------------------------------------------------------------------*)
-  (* put here the type of the struct that contains the rest of the dynamic
-     information, including the result of the analysis *)
-
-  type local_dynamic_information = bool array 
   (* array that indicates whether an agent type is already discovered, or
      not: from the beginning everything will be set to false*)
+
+  type local_dynamic_information = bool array 
 
   type dynamic_information =
     {
@@ -63,11 +70,15 @@ struct
 
   let get_global_static_information static = static.global_static_information
 
+  let get_domain_static_information static = static.domain_static_information
+
   let lift f x = f (get_global_static_information x)
 
   let get_parameter static = lift Analyzer_headers.get_parameter static
 
   let get_kappa_handler static = lift Analyzer_headers.get_kappa_handler static
+    
+  let get_compil static = lift Analyzer_headers.get_cc_code static
 
   (*--------------------------------------------------------------------*)
   (** global dynamic information*)
@@ -113,7 +124,7 @@ struct
     let init_global_static_information =
       {
         global_static_information = static;
-        domain_static_information = Bdu_analysis_type.Int2Map_Modif.Map.empty;
+        domain_static_information = Int2Map_Agent.Map.empty, Int2Map_Agent.Map.empty
       }
     in
     let kappa_handler = Analyzer_headers.get_kappa_handler static in
@@ -128,10 +139,65 @@ struct
     in
     error, init_global_static_information, init_global_dynamic_information
 
+  (*collect agents test*)
+  let get_store_agents_test static = fst (get_domain_static_information static)
+
+  let get_store_agents_test_without_created static = snd (get_domain_static_information static)
+
+  let set_store_agents_test agents static =
+    let agents_test' = get_store_agents_test_without_created static in
+    {
+      static with
+        domain_static_information = agents, agents_test'
+    }
+
+  let set_store_agents_test_without_created agents static =
+    let agents_test' = get_store_agents_test static in
+    {
+      static with
+        domain_static_information = agents_test', agents
+    }
+    
+  let add_link rule_id (agent_id, agent_type) static error =
+    let parameter = get_parameter static in
+    let result = get_store_agents_test static in
+    let error, old_list =
+      match Int2Map_Agent.Map.find_option_without_logs parameter error rule_id result with
+      | error, None -> error, []
+      | error, Some l -> error, l
+    in
+    let list = (agent_id, agent_type) :: old_list in
+    let error, result =
+      Int2Map_Agent.Map.add_or_overwrite parameter error rule_id list result
+    in
+    let static = set_store_agents_test result static in
+    error, static
+
+  let collect_agents_test static dynamic error rule_id rule =
+    let parameter = get_parameter static in
+    let error, static =
+      Bdu_analysis_type.AgentMap.fold parameter error
+        (fun parameter error agent_id agent static ->
+          match agent with
+          | Cckappa_sig.Unknown_agent _ 
+          | Cckappa_sig.Ghost -> error, static
+          | Cckappa_sig.Dead_agent (agent, _, _, _)
+          | Cckappa_sig.Agent agent ->
+            let agent_type = agent.Cckappa_sig.agent_name in
+            let error, static =
+              add_link rule_id (agent_id, agent_type) static error
+            in 
+            error, static
+        ) rule.Cckappa_sig.rule_lhs.Cckappa_sig.views static
+    in
+    error, static
+      
+  (* to do: collect the agent type of the agents of the species and declare
+     them seen *)
+
   let add_initial_state static dynamic error species =
     let event_list = [] in
     error, dynamic, event_list
-  (* to do: collect the agent type of the agents of the species and declare them seen *)
 
   let is_enabled static dynamic error rule_id precondition =
     (* TO DO, check that the type of each agent in the lhs has been already seen
