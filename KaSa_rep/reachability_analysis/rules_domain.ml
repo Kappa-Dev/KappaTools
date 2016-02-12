@@ -36,7 +36,7 @@ struct
   (* this array indicates whether a rule has already be applied, or not *)
 
   type local_dynamic_information = bool array
-    
+
   type dynamic_information =
     {
       local  : local_dynamic_information ;
@@ -137,7 +137,7 @@ struct
     let error, rule_id_string =
       try Handler.string_of_rule parameter error kappa_handler compil rule_id
       with
-        _ -> warn parameter error (Some "line 140") Exit (string_of_int rule_id)          
+        _ -> warn parameter error (Some "line 140") Exit (string_of_int rule_id)
     in
     (*print*)
     let dynamic =
@@ -221,7 +221,7 @@ struct
                 with
                   _ -> warn parameter error (Some "line 238") Exit (string_of_int k)
 	      in
-	      let error = 
+	      let error =
                 Exception.check warn parameter error error' (Some "line 234") Exit
               in
               let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)

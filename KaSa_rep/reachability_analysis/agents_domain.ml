@@ -41,9 +41,9 @@ struct
   type store_agents_test = (int * int) list Int2Map_Agent.Map.t
 
   type store_agents_test_without_created = (int * int) list Int2Map_Agent.Map.t
-  
+
   type store_agents = store_agents_test * store_agents_test_without_created
-    
+
   type static_information =
     {
       global_static_information : Analyzer_headers.global_static_information;
@@ -54,7 +54,7 @@ struct
   (* array that indicates whether an agent type is already discovered, or
      not: from the beginning everything will be set to false*)
 
-  type local_dynamic_information = bool array 
+  type local_dynamic_information = bool array
 
   type dynamic_information =
     {
@@ -77,7 +77,7 @@ struct
   let get_parameter static = lift Analyzer_headers.get_parameter static
 
   let get_kappa_handler static = lift Analyzer_headers.get_kappa_handler static
-    
+
   let get_compil static = lift Analyzer_headers.get_cc_code static
 
   (*--------------------------------------------------------------------*)
@@ -157,7 +157,7 @@ struct
       static with
         domain_static_information = agents_test', agents
     }
-    
+
   let add_link rule_id (agent_id, agent_type) static error =
     let parameter = get_parameter static in
     let result = get_store_agents_test static in
@@ -179,19 +179,19 @@ struct
       Bdu_analysis_type.AgentMap.fold parameter error
         (fun parameter error agent_id agent static ->
           match agent with
-          | Cckappa_sig.Unknown_agent _ 
+          | Cckappa_sig.Unknown_agent _
           | Cckappa_sig.Ghost -> error, static
           | Cckappa_sig.Dead_agent (agent, _, _, _)
           | Cckappa_sig.Agent agent ->
             let agent_type = agent.Cckappa_sig.agent_name in
             let error, static =
               add_link rule_id (agent_id, agent_type) static error
-            in 
+            in
             error, static
         ) rule.Cckappa_sig.rule_lhs.Cckappa_sig.views static
     in
     error, static
-      
+
   (* to do: collect the agent type of the agents of the species and declare
      them seen *)
 

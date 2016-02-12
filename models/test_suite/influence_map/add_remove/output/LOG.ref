@@ -332,4 +332,32 @@ rule 3 will never be applied.
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
+<<<<<<< HEAD
+=======
+
+Reachability analysis...
+
+	Applying rule 0:
+		the predcondition is not satsified yet
+
+------------------------------------------------------------
+* Dead rule :
+------------------------------------------------------------
+rule 0 will never be applied.
+rule 1 will never be applied.
+rule 2 will never be applied.
+rule 3 will never be applied.
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+>>>>>>> 6cba1f4... update test-suits with rule_domain implemented
 execution finished without any exception

@@ -19,6 +19,7 @@
 (*TODO:
   Do the copy for views_domain. Only remove the information of rule_domain
 *)
+
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Bdu_fixpoint_iteration") message exn
     (fun () -> default)
