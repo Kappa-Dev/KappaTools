@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <2016-02-12 10:31:38 feret>
+ * Last modification: Time-stamp: <2016-02-12 15:29:41 feret>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -15,10 +15,15 @@ module A =
   Analyzer.Make
     (Composite_domain.Make
        (Product.Product
-	  (Global_domain.Domain)
+	  (Views_domain.Domain)
 	  (Product.Product
-	     (Agent_domain.Domain)
-	     (Rule_domain.Domain))))
+	     (Agents_domain.Domain)
+	     (Rules_domain.Domain))))
+
+module B =
+  Analyzer.Make
+    (Composite_domain.Make
+       (Global_domain.Domain))
 
 let main () =
   let error = Exception.empty_error_handler in
