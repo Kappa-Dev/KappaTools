@@ -83,91 +83,49 @@ Reachability analysis modular...
 	Applying rule 0:
 		the predcondition is satisfied
 
-	Applying rule 7: KO:
-		the predcondition is not satsified yet
-
-	Applying rule 6:
-		the predcondition is not satsified yet
-
-	Applying rule 5:
-		the predcondition is not satsified yet
-
-	Applying rule 4:
-		the predcondition is satisfied
-
-	Applying rule 3:
-		the predcondition is not satsified yet
-
-	Applying rule 2:
-		the predcondition is not satsified yet
-
-	Applying rule 1:
-		the predcondition is satisfied
-
 	Applying rule 0:
-		the predcondition is satisfied
-
-	Applying rule 7: KO:
-		the predcondition is not satsified yet
-
-	Applying rule 6:
-		the predcondition is not satsified yet
-
-	Applying rule 5:
-		the predcondition is satisfied
-
-	Applying rule 4:
-		the predcondition is satisfied
-
-	Applying rule 3:
-		the predcondition is not satsified yet
-
-	Applying rule 2:
 		the predcondition is satisfied
 
 	Applying rule 1:
 		the predcondition is satisfied
 
-	Applying rule 7: KO:
-		the predcondition is not satsified yet
-
-	Applying rule 6:
-		the predcondition is satisfied
-
-	Applying rule 5:
-		the predcondition is satisfied
-
-	Applying rule 0:
-		the predcondition is satisfied
-
-	Applying rule 4:
+	Applying rule 2:
 		the predcondition is satisfied
 
 	Applying rule 3:
 		the predcondition is satisfied
 
-	Applying rule 2:
+	Applying rule 4:
+		the predcondition is satisfied
+
+	Applying rule 5:
+		the predcondition is satisfied
+
+	Applying rule 6:
 		the predcondition is satisfied
 
 	Applying rule 7: KO:
 		the predcondition is not satsified yet
 
-	Applying rule 6:
+	Applying rule 0:
 		the predcondition is satisfied
 
 	Applying rule 1:
 		the predcondition is satisfied
 
-	Applying rule 5:
-		the predcondition is satisfied
-
-	Applying rule 4:
+	Applying rule 2:
 		the predcondition is satisfied
 
 	Applying rule 3:
 		the predcondition is satisfied
 
-	Applying rule 0:
+	Applying rule 4:
+		the predcondition is satisfied
+
+	Applying rule 5:
+		the predcondition is satisfied
+
+	Applying rule 6:
 		the predcondition is satisfied
 
 ** Dynamic information fixpoint result module:

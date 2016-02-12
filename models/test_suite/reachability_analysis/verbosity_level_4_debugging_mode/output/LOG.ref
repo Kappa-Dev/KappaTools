@@ -1357,73 +1357,8 @@ EXTENSIONAL DESCRIPTION:
 		(rule 6) should be investigated 
 		(rule 7: KO) should be investigated 
 
-	Applying rule 7: KO:
-		the predcondition is not satsified yet
-
-	Applying rule 6:
-		the predcondition is not satsified yet
-
-	Applying rule 5:
-		the predcondition is not satsified yet
-
-	Applying rule 4:
+	Applying rule 0:
 		the predcondition is satisfied
-		Updating the views for A(x~,y~,z~)
-			
-
-
-INTENSIONAL DESCRIPTION:
-Id=53
- Node(site_type:1<3)
-  Id=0
-   Leaf False 
-
-  Id=52
-   Node(site_type:1<4)
-    Id=9
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=8
-       Node(site_type:2<1)
-        Id=7
-         Node(site_type:3<0)
-          Id=0
-           Leaf False 
-
-          Id=6
-           Node(site_type:3<1)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-	A(x~q,y~u,z~u)
-	Wake-up rules
-	 A(x~,y~,z~)
-		(rule 0) should be investigated 
-		(rule 1) should be investigated 
-		(rule 2) should be investigated 
-		(rule 3) should be investigated 
-		(rule 4) should be investigated 
-		(rule 5) should be investigated 
-		(rule 6) should be investigated 
-		(rule 7: KO) should be investigated 
-
-	Applying rule 3:
-		the predcondition is not satsified yet
-
-	Applying rule 2:
-		the predcondition is not satsified yet
 
 	Applying rule 1:
 		the predcondition is satisfied
@@ -1478,75 +1413,6 @@ EXTENSIONAL DESCRIPTION:
 		(rule 6) should be investigated 
 		(rule 7: KO) should be investigated 
 
-	Applying rule 0:
-		the predcondition is satisfied
-
-	Applying rule 7: KO:
-		the predcondition is not satsified yet
-
-	Applying rule 6:
-		the predcondition is not satsified yet
-
-	Applying rule 5:
-		the predcondition is satisfied
-		Updating the views for A(x~,y~,z~)
-			
-
-
-INTENSIONAL DESCRIPTION:
-Id=59
- Node(site_type:1<3)
-  Id=0
-   Leaf False 
-
-  Id=58
-   Node(site_type:1<4)
-    Id=29
-     Node(site_type:2<2)
-      Id=0
-       Leaf False 
-
-      Id=28
-       Node(site_type:2<3)
-        Id=7
-         Node(site_type:3<0)
-          Id=0
-           Leaf False 
-
-          Id=6
-           Node(site_type:3<1)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-	A(x~q,y~q,z~u)
-	Wake-up rules
-	 A(x~,y~,z~)
-		(rule 0) should be investigated 
-		(rule 1) should be investigated 
-		(rule 2) should be investigated 
-		(rule 3) should be investigated 
-		(rule 4) should be investigated 
-		(rule 5) should be investigated 
-		(rule 6) should be investigated 
-		(rule 7: KO) should be investigated 
-
-	Applying rule 4:
-		the predcondition is satisfied
-		Updating the views for A(x~,y~,z~)
-
-	Applying rule 3:
-		the predcondition is not satsified yet
-
 	Applying rule 2:
 		the predcondition is satisfied
 		Updating the views for A(x~,y~,z~)
@@ -1599,77 +1465,6 @@ EXTENSIONAL DESCRIPTION:
 		(rule 5) should be investigated 
 		(rule 6) should be investigated 
 		(rule 7: KO) should be investigated 
-
-	Applying rule 1:
-		the predcondition is satisfied
-		Updating the views for A(x~,y~,z~)
-
-	Applying rule 7: KO:
-		the predcondition is not satsified yet
-
-	Applying rule 6:
-		the predcondition is satisfied
-		Updating the views for A(x~,y~,z~)
-			
-
-
-INTENSIONAL DESCRIPTION:
-Id=70
- Node(site_type:1<3)
-  Id=0
-   Leaf False 
-
-  Id=69
-   Node(site_type:1<4)
-    Id=68
-     Node(site_type:2<2)
-      Id=0
-       Leaf False 
-
-      Id=67
-       Node(site_type:2<3)
-        Id=44
-         Node(site_type:3<1)
-          Id=0
-           Leaf False 
-
-          Id=43
-           Node(site_type:3<2)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-	A(x~q,y~q,z~q)
-	Wake-up rules
-	 A(x~,y~,z~)
-		(rule 0) should be investigated 
-		(rule 1) should be investigated 
-		(rule 2) should be investigated 
-		(rule 3) should be investigated 
-		(rule 4) should be investigated 
-		(rule 5) should be investigated 
-		(rule 6) should be investigated 
-		(rule 7: KO) should be investigated 
-
-	Applying rule 5:
-		the predcondition is satisfied
-		Updating the views for A(x~,y~,z~)
-
-	Applying rule 0:
-		the predcondition is satisfied
-
-	Applying rule 4:
-		the predcondition is satisfied
-		Updating the views for A(x~,y~,z~)
 
 	Applying rule 3:
 		the predcondition is satisfied
@@ -1724,26 +1519,176 @@ EXTENSIONAL DESCRIPTION:
 		(rule 6) should be investigated 
 		(rule 7: KO) should be investigated 
 
-	Applying rule 2:
+	Applying rule 4:
 		the predcondition is satisfied
 		Updating the views for A(x~,y~,z~)
+			
 
-	Applying rule 7: KO:
-		the predcondition is not satsified yet
+
+INTENSIONAL DESCRIPTION:
+Id=53
+ Node(site_type:1<3)
+  Id=0
+   Leaf False 
+
+  Id=52
+   Node(site_type:1<4)
+    Id=9
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<1)
+        Id=7
+         Node(site_type:3<0)
+          Id=0
+           Leaf False 
+
+          Id=6
+           Node(site_type:3<1)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	A(x~q,y~u,z~u)
+	Wake-up rules
+	 A(x~,y~,z~)
+		(rule 0) should be investigated 
+		(rule 1) should be investigated 
+		(rule 2) should be investigated 
+		(rule 3) should be investigated 
+		(rule 4) should be investigated 
+		(rule 5) should be investigated 
+		(rule 6) should be investigated 
+		(rule 7: KO) should be investigated 
+
+	Applying rule 5:
+		the predcondition is satisfied
+		Updating the views for A(x~,y~,z~)
+			
+
+
+INTENSIONAL DESCRIPTION:
+Id=59
+ Node(site_type:1<3)
+  Id=0
+   Leaf False 
+
+  Id=58
+   Node(site_type:1<4)
+    Id=29
+     Node(site_type:2<2)
+      Id=0
+       Leaf False 
+
+      Id=28
+       Node(site_type:2<3)
+        Id=7
+         Node(site_type:3<0)
+          Id=0
+           Leaf False 
+
+          Id=6
+           Node(site_type:3<1)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	A(x~q,y~q,z~u)
+	Wake-up rules
+	 A(x~,y~,z~)
+		(rule 0) should be investigated 
+		(rule 1) should be investigated 
+		(rule 2) should be investigated 
+		(rule 3) should be investigated 
+		(rule 4) should be investigated 
+		(rule 5) should be investigated 
+		(rule 6) should be investigated 
+		(rule 7: KO) should be investigated 
 
 	Applying rule 6:
 		the predcondition is satisfied
 		Updating the views for A(x~,y~,z~)
+			
+
+
+INTENSIONAL DESCRIPTION:
+Id=70
+ Node(site_type:1<3)
+  Id=0
+   Leaf False 
+
+  Id=69
+   Node(site_type:1<4)
+    Id=68
+     Node(site_type:2<2)
+      Id=0
+       Leaf False 
+
+      Id=67
+       Node(site_type:2<3)
+        Id=44
+         Node(site_type:3<1)
+          Id=0
+           Leaf False 
+
+          Id=43
+           Node(site_type:3<2)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	A(x~q,y~q,z~q)
+	Wake-up rules
+	 A(x~,y~,z~)
+		(rule 0) should be investigated 
+		(rule 1) should be investigated 
+		(rule 2) should be investigated 
+		(rule 3) should be investigated 
+		(rule 4) should be investigated 
+		(rule 5) should be investigated 
+		(rule 6) should be investigated 
+		(rule 7: KO) should be investigated 
+
+	Applying rule 7: KO:
+		the predcondition is not satsified yet
+
+	Applying rule 0:
+		the predcondition is satisfied
 
 	Applying rule 1:
 		the predcondition is satisfied
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule 5:
-		the predcondition is satisfied
-		Updating the views for A(x~,y~,z~)
-
-	Applying rule 4:
+	Applying rule 2:
 		the predcondition is satisfied
 		Updating the views for A(x~,y~,z~)
 
@@ -1751,8 +1696,17 @@ EXTENSIONAL DESCRIPTION:
 		the predcondition is satisfied
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule 0:
+	Applying rule 4:
 		the predcondition is satisfied
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule 5:
+		the predcondition is satisfied
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule 6:
+		the predcondition is satisfied
+		Updating the views for A(x~,y~,z~)
 
 ** Dynamic information fixpoint result module:
 

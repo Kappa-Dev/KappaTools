@@ -485,8 +485,8 @@ EXTENSIONAL DESCRIPTION:
 	A(x~u,y~u)
 	Wake-up rules
 
-	Applying rule 2: y:
-		the predcondition is not satsified yet
+	Applying rule 0: create:
+		the predcondition is satisfied
 
 	Applying rule 1: x:
 		the predcondition is satisfied
@@ -522,9 +522,6 @@ EXTENSIONAL DESCRIPTION:
 	A(x~p,y~u)
 	Wake-up rules
 
-	Applying rule 0: create:
-		the predcondition is satisfied
-
 	Applying rule 2: y:
 		the predcondition is satisfied
 		Updating the views for A(x~,y~)
@@ -559,6 +556,9 @@ EXTENSIONAL DESCRIPTION:
 	A(x~p,y~p)
 	Wake-up rules
 
+	Applying rule 0: create:
+		the predcondition is satisfied
+
 	Applying rule 1: x:
 		the predcondition is satisfied
 		Updating the views for A(x~,y~)
@@ -566,9 +566,6 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 2: y:
 		the predcondition is satisfied
 		Updating the views for A(x~,y~)
-
-	Applying rule 0: create:
-		the predcondition is satisfied
 
 ** Dynamic information fixpoint result module:
 

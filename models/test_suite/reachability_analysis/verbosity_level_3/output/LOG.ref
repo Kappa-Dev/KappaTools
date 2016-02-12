@@ -115,28 +115,8 @@ Reachability analysis modular...
 
 	A(x~u,y~u,z~u)
 
-	Applying rule 7: KO:
-		the predcondition is not satsified yet
-
-	Applying rule 6:
-		the predcondition is not satsified yet
-
-	Applying rule 5:
-		the predcondition is not satsified yet
-
-	Applying rule 4:
+	Applying rule 0:
 		the predcondition is satisfied
-		Updating the views for A(x~,y~,z~)
-			
-
-
-	A(x~q,y~u,z~u)
-
-	Applying rule 3:
-		the predcondition is not satsified yet
-
-	Applying rule 2:
-		the predcondition is not satsified yet
 
 	Applying rule 1:
 		the predcondition is satisfied
@@ -146,30 +126,6 @@ Reachability analysis modular...
 
 	A(x~p,y~u,z~u)
 
-	Applying rule 0:
-		the predcondition is satisfied
-
-	Applying rule 7: KO:
-		the predcondition is not satsified yet
-
-	Applying rule 6:
-		the predcondition is not satsified yet
-
-	Applying rule 5:
-		the predcondition is satisfied
-		Updating the views for A(x~,y~,z~)
-			
-
-
-	A(x~q,y~q,z~u)
-
-	Applying rule 4:
-		the predcondition is satisfied
-		Updating the views for A(x~,y~,z~)
-
-	Applying rule 3:
-		the predcondition is not satsified yet
-
 	Applying rule 2:
 		the predcondition is satisfied
 		Updating the views for A(x~,y~,z~)
@@ -177,32 +133,6 @@ Reachability analysis modular...
 
 
 	A(x~p,y~p,z~u)
-
-	Applying rule 1:
-		the predcondition is satisfied
-		Updating the views for A(x~,y~,z~)
-
-	Applying rule 7: KO:
-		the predcondition is not satsified yet
-
-	Applying rule 6:
-		the predcondition is satisfied
-		Updating the views for A(x~,y~,z~)
-			
-
-
-	A(x~q,y~q,z~q)
-
-	Applying rule 5:
-		the predcondition is satisfied
-		Updating the views for A(x~,y~,z~)
-
-	Applying rule 0:
-		the predcondition is satisfied
-
-	Applying rule 4:
-		the predcondition is satisfied
-		Updating the views for A(x~,y~,z~)
 
 	Applying rule 3:
 		the predcondition is satisfied
@@ -212,26 +142,41 @@ Reachability analysis modular...
 
 	A(x~0,y~p,z~q)
 
-	Applying rule 2:
+	Applying rule 4:
 		the predcondition is satisfied
 		Updating the views for A(x~,y~,z~)
+			
 
-	Applying rule 7: KO:
-		the predcondition is not satsified yet
+
+	A(x~q,y~u,z~u)
+
+	Applying rule 5:
+		the predcondition is satisfied
+		Updating the views for A(x~,y~,z~)
+			
+
+
+	A(x~q,y~q,z~u)
 
 	Applying rule 6:
 		the predcondition is satisfied
 		Updating the views for A(x~,y~,z~)
+			
+
+
+	A(x~q,y~q,z~q)
+
+	Applying rule 7: KO:
+		the predcondition is not satsified yet
+
+	Applying rule 0:
+		the predcondition is satisfied
 
 	Applying rule 1:
 		the predcondition is satisfied
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule 5:
-		the predcondition is satisfied
-		Updating the views for A(x~,y~,z~)
-
-	Applying rule 4:
+	Applying rule 2:
 		the predcondition is satisfied
 		Updating the views for A(x~,y~,z~)
 
@@ -239,8 +184,17 @@ Reachability analysis modular...
 		the predcondition is satisfied
 		Updating the views for A(x~,y~,z~)
 
-	Applying rule 0:
+	Applying rule 4:
 		the predcondition is satisfied
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule 5:
+		the predcondition is satisfied
+		Updating the views for A(x~,y~,z~)
+
+	Applying rule 6:
+		the predcondition is satisfied
+		Updating the views for A(x~,y~,z~)
 
 ** Dynamic information fixpoint result module:
 

@@ -1139,7 +1139,10 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 9:
 		the predcondition is not satsified yet
 
-	Applying rule 7:
+	Applying rule 0:
+		the predcondition is not satsified yet
+
+	Applying rule 3:
 		the predcondition is satisfied
 		Updating the views for A(x~,x!)
 			
@@ -1173,7 +1176,7 @@ EXTENSIONAL DESCRIPTION:
 	A(x~p,x!free)
 	Wake-up rules
 
-	Applying rule 6:
+	Applying rule 4:
 		the predcondition is satisfied
 		Updating the views for A(x~,x!)
 
@@ -1181,19 +1184,13 @@ EXTENSIONAL DESCRIPTION:
 		the predcondition is satisfied
 		Updating the views for A(x~,x!)
 
-	Applying rule 4:
+	Applying rule 6:
 		the predcondition is satisfied
 		Updating the views for A(x~,x!)
 
-	Applying rule 3:
+	Applying rule 7:
 		the predcondition is satisfied
 		Updating the views for A(x~,x!)
-
-	Applying rule 0:
-		the predcondition is not satsified yet
-
-	Applying rule 2:
-		the predcondition is not satsified yet
 
 	Applying rule 1:
 		the predcondition is satisfied
@@ -1219,26 +1216,26 @@ EXTENSIONAL DESCRIPTION:
 	B(x~p)
 	Wake-up rules
 
-	Applying rule 9:
-		the predcondition is not satsified yet
-
-	Applying rule 8:
-		the predcondition is not satsified yet
-
-	Applying rule 7:
-		the predcondition is satisfied
-		Updating the views for A(x~,x!)
-
 	Applying rule 2:
-		the predcondition is satisfied
-		Updating the views for B(x~)
-
-	Applying rule 1:
 		the predcondition is satisfied
 		Updating the views for B(x~)
 
 	Applying rule 0:
 		the predcondition is not satsified yet
+
+	Applying rule 3:
+		the predcondition is satisfied
+		Updating the views for A(x~,x!)
+
+	Applying rule 8:
+		the predcondition is not satsified yet
+
+	Applying rule 9:
+		the predcondition is not satsified yet
+
+	Applying rule 1:
+		the predcondition is satisfied
+		Updating the views for B(x~)
 
 ** Dynamic information fixpoint result module:
 

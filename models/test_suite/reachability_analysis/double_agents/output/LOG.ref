@@ -1949,11 +1949,8 @@ EXTENSIONAL DESCRIPTION:
 	C(x!free)
 	Wake-up rules
 
-	Applying rule 7: r7:
-		the predcondition is not satsified yet
-
-	Applying rule 4: r4:
-		the predcondition is not satsified yet
+	Applying rule 0: r0:
+		the predcondition is satisfied
 
 	Applying rule 3: r3:
 		the predcondition is satisfied
@@ -2051,104 +2048,16 @@ EXTENSIONAL DESCRIPTION:
 	B(x~p,y~p,x!A@x)
 	Wake-up rules
 
-	Applying rule 0: r0:
+	Applying rule 4: r4:
 		the predcondition is satisfied
+		Updating the views for A(x!)
+		Updating the views for A(x!)
 
-	Applying rule 6: r6:
+	Applying rule 7: r7:
+		the predcondition is not satsified yet
+
+	Applying rule 1: r1:
 		the predcondition is satisfied
-		Updating the views for C(x!)
-			
-
-
-INTENSIONAL DESCRIPTION:
-Id=5
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=4
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-	C(x!B@x)
-	Wake-up rules
-		Updating the views for B(x~,y~,x!)
-			
-
-
-INTENSIONAL DESCRIPTION:
-Id=118
- Node(site_type:1<0)
-  Id=0
-   Leaf False 
-
-  Id=117
-   Node(site_type:1<1)
-    Id=59
-     Node(site_type:2<1)
-      Id=0
-       Leaf False 
-
-      Id=58
-       Node(site_type:2<2)
-        Id=28
-         Node(site_type:3<2)
-          Id=0
-           Leaf False 
-
-          Id=27
-           Node(site_type:3<3)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=116
-     Node(site_type:1<2)
-      Id=0
-       Leaf False 
-
-      Id=64
-       Node(site_type:1<3)
-        Id=63
-         Node(site_type:2<0)
-          Id=0
-           Leaf False 
-
-          Id=62
-           Node(site_type:2<1)
-            Id=28
-             Node(site_type:3<2)
-              Id=0
-               Leaf False 
-
-              Id=27
-               Node(site_type:3<3)
-                Id=1
-                 Leaf True 
-
-                Id=0
-                 Leaf False 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-	B(x~u,y~u,x!C@x)
-	B(x~p,y~p,x!C@x)
-	Wake-up rules
 
 	Applying rule 2: r2:
 		the predcondition is satisfied
@@ -2194,22 +2103,128 @@ EXTENSIONAL DESCRIPTION:
 	B(x~q,y~q,x!free)
 	Wake-up rules
 
-	Applying rule 1: r1:
+	Applying rule 6: r6:
 		the predcondition is satisfied
+		Updating the views for C(x!)
+			
+
+
+INTENSIONAL DESCRIPTION:
+Id=5
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=4
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	C(x!B@x)
+	Wake-up rules
+		Updating the views for B(x~,y~,x!)
+			
+
+
+INTENSIONAL DESCRIPTION:
+Id=67
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=66
+   Node(site_type:1<1)
+    Id=59
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=58
+       Node(site_type:2<2)
+        Id=28
+         Node(site_type:3<2)
+          Id=0
+           Leaf False 
+
+          Id=27
+           Node(site_type:3<3)
+            Id=1
+             Leaf True 
+
+            Id=0
+             Leaf False 
+
+        Id=0
+         Leaf False 
+
+    Id=65
+     Node(site_type:1<2)
+      Id=61
+       Node(site_type:2<2)
+        Id=0
+         Leaf False 
+
+        Id=60
+         Node(site_type:2<3)
+          Id=28
+           Node(site_type:3<2)
+            Id=0
+             Leaf False 
+
+            Id=27
+             Node(site_type:3<3)
+              Id=1
+               Leaf True 
+
+              Id=0
+               Leaf False 
+
+          Id=0
+           Leaf False 
+
+      Id=64
+       Node(site_type:1<3)
+        Id=63
+         Node(site_type:2<0)
+          Id=0
+           Leaf False 
+
+          Id=62
+           Node(site_type:2<1)
+            Id=28
+             Node(site_type:3<2)
+              Id=0
+               Leaf False 
+
+              Id=27
+               Node(site_type:3<3)
+                Id=1
+                 Leaf True 
+
+                Id=0
+                 Leaf False 
+
+            Id=0
+             Leaf False 
+
+        Id=0
+         Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	B(x~u,y~u,x!C@x)
+	B(x~q,y~q,x!C@x)
+	B(x~p,y~p,x!C@x)
+	Wake-up rules
 
 	Applying rule 5: r5:
 		the predcondition is satisfied
 
-	Applying rule 7: r7:
+	Applying rule 0: r0:
 		the predcondition is satisfied
-		Updating the views for B(x~,y~,x!)
-		Updating the views for B(x~,y~,x!)
-		Updating the views for B(x~,y~,x!)
-
-	Applying rule 4: r4:
-		the predcondition is satisfied
-		Updating the views for A(x!)
-		Updating the views for A(x!)
 
 	Applying rule 3: r3:
 		the predcondition is satisfied
@@ -2256,59 +2271,11 @@ EXTENSIONAL DESCRIPTION:
 	B(x~q,y~q,x!A@x)
 	Wake-up rules
 
-	Applying rule 6: r6:
+	Applying rule 1: r1:
 		the predcondition is satisfied
-		Updating the views for C(x!)
-		Updating the views for B(x~,y~,x!)
-			
-
-
-INTENSIONAL DESCRIPTION:
-Id=131
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=130
-   Node(site_type:1<2)
-    Id=61
-     Node(site_type:2<2)
-      Id=0
-       Leaf False 
-
-      Id=60
-       Node(site_type:2<3)
-        Id=28
-         Node(site_type:3<2)
-          Id=0
-           Leaf False 
-
-          Id=27
-           Node(site_type:3<3)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-	B(x~q,y~q,x!C@x)
-	Wake-up rules
 
 	Applying rule 2: r2:
 		the predcondition is satisfied
-		Updating the views for B(x~,y~,x!)
-
-	Applying rule 7: r7:
-		the predcondition is satisfied
-		Updating the views for B(x~,y~,x!)
-		Updating the views for B(x~,y~,x!)
 		Updating the views for B(x~,y~,x!)
 
 	Applying rule 4: r4:
@@ -2316,17 +2283,20 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x!)
 		Updating the views for A(x!)
 
-	Applying rule 3: r3:
+	Applying rule 7: r7:
 		the predcondition is satisfied
-		Updating the views for A(x!)
 		Updating the views for B(x~,y~,x!)
-
-	Applying rule 1: r1:
-		the predcondition is satisfied
+		Updating the views for B(x~,y~,x!)
+		Updating the views for B(x~,y~,x!)
 
 	Applying rule 6: r6:
 		the predcondition is satisfied
 		Updating the views for C(x!)
+		Updating the views for B(x~,y~,x!)
+
+	Applying rule 3: r3:
+		the predcondition is satisfied
+		Updating the views for A(x!)
 		Updating the views for B(x~,y~,x!)
 
 ** Dynamic information fixpoint result module:
