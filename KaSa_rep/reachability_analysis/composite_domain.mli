@@ -1,5 +1,5 @@
 (*
-  * analyzer.mli
+  * composite_domain.mli
   * openkappa
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   *
@@ -13,7 +13,7 @@
   * All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-(** Analyzer domain (no longer with communications which have been internalized) *)
+(** composite abstract domain (no longer with communications which have been internalized) *)
 
 module type Composite_domain =
   sig
