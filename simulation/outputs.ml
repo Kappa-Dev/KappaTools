@@ -1,8 +1,13 @@
-type flux = {
+type flux_data = {
     flux_name : string;
     flux_start : float;
     flux_hits : int array;
     flux_fluxs : float array array;
+  }
+type flux_plot =
+  { flux_rules : string array;
+    flux_data : flux_data;
+    flux_end : float;
   }
 
 let create_flux env counter name =
@@ -24,18 +29,21 @@ let incr_flux_hit of_rule flux =
 let get_flux_name flux = flux.flux_name
 let flux_has_name name flux = flux.flux_name = name
 
-let dot_of_flux env flux =
+let stop_flux env counter flux =
+  let size = Environment.nb_syntactic_rules env + 1 in
+  let flux_rules =
+    Array.init size
+	       (Format.asprintf "%a" (Environment.print_ast_rule ~env))
+  in
+  { flux_rules = flux_rules; flux_data = flux ;
+    flux_end = Counter.current_time counter }
+
+let dot_of_flux flux =
   let printer desc =
     let () = Format.fprintf
 	       desc "@[<v>digraph G{ label=\"Flux map\" ; labelloc=\"t\" ; " in
     let () = Format.fprintf
 	       desc "node [shape=box,style=filled,fillcolor=lightskyblue]@," in
-    (*let () =
-      Pp.array
-	Pp.space
-	(fun i f _ ->
-	 Format.fprintf
-	   f "\"%a\" ;" (Environment.print_ast_rule ~env) (p i)) desc flux in*)
     let () =
       Pp.array
 	(fun _ -> ())
@@ -49,27 +57,24 @@ let dot_of_flux env flux =
 		if v<0. then ("red3","tee") else ("green3","normal") in
 	      Format.fprintf
 		f
-		"@[<h>\"%a\" -> \"%a\" [weight=%d,label=\"%.3f\",color=%s,arrowhead=%s];@]@,"
-		(Environment.print_ast_rule ~env) s
-		(Environment.print_ast_rule ~env) d
+		"@[<h>\"%s\" -> \"%s\" [weight=%d,label=\"%.3f\",color=%s,arrowhead=%s];@]@,"
+		flux.flux_rules.(s)
+		flux.flux_rules.(d)
 		(abs (int_of_float v)) v color arrowhead))
-	desc flux.flux_fluxs in
+	desc flux.flux_data.flux_fluxs in
     Format.fprintf desc "}@]@."
   in
-  Kappa_files.with_flux flux.flux_name printer
+  Kappa_files.with_flux flux.flux_data.flux_name printer
 
-let print_json_of_flux env counter f flux =
+let print_json_of_flux f flux =
   let () = Format.fprintf
 	     f "@[<v>{@ \"bio_begin_time\" : %f,@ \"bio_end_time\" : %f,@ "
-	     flux.flux_start (Counter.current_time counter) in
+	     flux.flux_data.flux_start flux.flux_end in
   let () =
     Format.fprintf
       f "@[\"rules\" :@ @[[%a]@]@],@ @[\"hits\" :@ @[[%a]@]@],@ "
-      (Pp.array Pp.comma
-		(fun i f _ ->
-		 Format.fprintf f "\"%a\"" (Environment.print_ast_rule ~env) i))
-      flux.flux_fluxs
-      (Pp.array Pp.comma (fun _ -> Format.pp_print_int)) flux.flux_hits in
+      (Pp.array Pp.comma (fun _ -> Format.pp_print_string)) flux.flux_rules
+      (Pp.array Pp.comma (fun _ -> Format.pp_print_int)) flux.flux_data.flux_hits in
   Format.fprintf
     f "@[\"fluxs\" :@ @[[%a]@]@]@ }@]"
     (Pp.array
@@ -78,15 +83,15 @@ let print_json_of_flux env counter f flux =
 	Format.fprintf
 	  f "@[[%a]@]"
 	  (Pp.array Pp.comma (fun _ f y -> Format.pp_print_float f y)) x))
-    flux.flux_fluxs
+    flux.flux_data.flux_fluxs
 
-let json_of_flux env counter flux =
+let json_of_flux flux =
   Kappa_files.with_flux
-    flux.flux_name (fun f -> print_json_of_flux env counter f flux)
+    flux.flux_data.flux_name (fun f -> print_json_of_flux f flux)
 
-let html_of_flux env counter flux =
+let html_of_flux flux =
   Kappa_files.with_flux
-    flux.flux_name
+    flux.flux_data.flux_name
     (Pp_html.graph_page
        (fun f -> Format.pp_print_string f "Dynamic influence map")
        ["http://d3js.org/d3.v3.min.js"]
@@ -120,7 +125,7 @@ let html_of_flux env counter flux =
 	  Format.fprintf f "Rules self influence@]@,</label>@]@,</form>@," in
 	let () = Format.fprintf
 		   f "@[<v 2><script>@,\"use strict\"@,@[var flux =@ %a;@]@,"
-		   (print_json_of_flux env counter) flux in
+		   print_json_of_flux flux in
 	let () =
 	  Format.fprintf
 	    f
@@ -395,8 +400,9 @@ let () =
 	Format.fprintf f "@]@,</script>"))
 
 let output_flux env counter b =
-  if Filename.check_suffix b.flux_name ".html"
-  then html_of_flux env counter b
-  else if Filename.check_suffix b.flux_name ".json"
-  then json_of_flux env counter b
-  else dot_of_flux env b
+  let out = stop_flux env counter b in
+  if Filename.check_suffix out.flux_data.flux_name ".html"
+  then html_of_flux out
+  else if Filename.check_suffix out.flux_data.flux_name ".json"
+  then json_of_flux out
+  else dot_of_flux out

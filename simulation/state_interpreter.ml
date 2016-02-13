@@ -3,7 +3,7 @@ type t = {
   perturbations_alive : bool array;
   activities : Random_tree.tree;(* pair numbers are binary rule, odd unary *)
   variables_overwrite: Alg_expr.t option array;
-  flux: Outputs.flux list;
+  flux: Outputs.flux_data list;
   print_desc: (string,out_channel * Format.formatter) Hashtbl.t;
 }
 
