@@ -165,8 +165,8 @@ let start ~start_continuation
                              (fun f -> if Lwt_switch.is_on thread_is_running
                                        then Lwt.bind (Lwt_js.yield ()) f
                                        else Lwt.return_unit)
-                             (fun ~outputs f _ _ _ _ ->
-                              let () = ExceptionDefn.flush_warning f in
+                             (fun _ _ ->
+                              let () = ExceptionDefn.flush_warning log_form in
                               let () =
                                 Format.fprintf log_form "Simulation ended" in
                               let () =

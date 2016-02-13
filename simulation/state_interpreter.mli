@@ -18,8 +18,7 @@ val activity : t -> float
 val loop_cps :
   outputs:(Data.t -> unit) ->
   Format.formatter -> ((unit -> 'a) -> 'a) ->
-  (outputs:(Data.t -> unit) -> Format.formatter -> Environment.t ->
-   Counter.t -> Rule_interpreter.t -> t -> 'a) ->
+  (Rule_interpreter.t -> t -> 'a) ->
   Environment.t -> Connected_component.Env.t ->
   Counter.t -> Rule_interpreter.t -> t -> 'a
 (**Event loop for javascript*)

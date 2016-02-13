@@ -185,7 +185,7 @@ let perturbate ~outputs env domain counter graph state =
 	do_until_noop (succ i) graph state stop in
   do_until_noop 0 graph state false
 
-let one_rule _form dt stop env domain counter graph state =
+let one_rule dt stop env domain counter graph state =
   let choice,_ = Random_tree.random state.activities in
   let rule_id = choice/2 in
   let rule = Environment.get_rule env rule_id in
@@ -296,7 +296,7 @@ let a_loop ~outputs form env domain counter graph state =
     | _ ->
        let (stop,graph',state') =
 	 perturbate ~outputs env domain counter graph state in
-       one_rule form dt stop env domain counter graph' state'
+       one_rule dt stop env domain counter graph' state'
 
 let loop_cps ~outputs form hook return env domain counter graph state =
   let rec iter graph state =
@@ -323,7 +323,7 @@ let loop_cps ~outputs form hook return env domain counter graph state =
 		   | ("y" | "yes") -> snapshot env counter "dump.ka" graph
 		   | _ -> () in
 	(true,graph,state) in
-    if stop then return ~outputs form env counter graph' state'
+    if stop then return graph' state'
     else hook (fun () -> iter graph' state')
   in iter graph state
 
@@ -351,4 +351,4 @@ let go form counter f =
   f ()
 
 let loop ~outputs form env domain counter graph state =
-  loop_cps ~outputs form (go form counter) finalize env domain counter graph state
+  loop_cps ~outputs form (go form counter) (finalize ~outputs form env counter) env domain counter graph state
