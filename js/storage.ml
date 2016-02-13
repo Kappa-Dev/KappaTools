@@ -147,10 +147,15 @@ let start ~start_continuation
         let () = set_model_is_running true in
         wrap4 (Eval.initialize ?rescale_init:None) log_form [] counter result
         >>= fun (_kasa_state,env,domain,graph,state) ->
-                let () = Plot.create "foo.svg" in
+        let () =
+	  let head =
+	    Environment.map_observables
+	      (Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
+	      env in
+	  Plot.create "foo.svg" head in
                 let () = if (React.S.value model_nb_plot) > 0 then
                            Plot.plot_now
-                             env (Counter.current_time counter)
+                             (Counter.current_time counter)
                              (State_interpreter.observables_values env counter graph state) in
                 Lwt.join [ show_graph thread_is_running size;
                            write_out thread_is_running counter label log_buffer;

@@ -176,11 +176,17 @@ let () =
 
     Kappa_files.setCheckFileExists() ;
 
-    let () = Plot.create (Kappa_files.get_data ()) in
+    let () =
+      let head =
+	Environment.map_observables
+	  (Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
+	  env in
+      if !pointNumberValue > 0 || head <> [||] then
+	Plot.create (Kappa_files.get_data ()) head in
     let () =
       if !pointNumberValue > 0 then
 	Plot.plot_now
-	  env (Counter.current_time counter)
+	  (Counter.current_time counter)
 	  (State_interpreter.observables_values env counter graph new_state) in
 
     Parameter.initSimTime () ;
