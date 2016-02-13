@@ -47,6 +47,13 @@ Priority
 Analyzer
 Analyzer_headers
 Analyzer_domain_sig
+Composite_domain
 Product
+
+Global_domain
+Rules_domain
+Views_domain
+Agents_domain
+
 
 Mvbdu_wrapper

@@ -1,4 +1,6 @@
-(**
+(** Monolithic abstract domain that combine views and rules *)
+
+(*
   * global_domain.mli
   * openkappa
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
@@ -14,9 +16,6 @@
   * en Informatique et en Automatique.  
   * All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
-
-(* Before properly achieving separation of concepts. We introduce one
-   monolithic domain that collect everything (as in the previous analyzer).*)
 
 
 module Domain:Analyzer_domain_sig.Domain

@@ -1,4 +1,4 @@
-(**
+(*
   * agent!_domain.mli
   * openkappa
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
@@ -15,7 +15,7 @@
   * All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-(* This domain abstracts away the interface of agents, and see each rule as a multiset-rewriting reaction over typed agents *)
+(** Abstract domain that abstracts away the interface of agents, and see each rule as a multiset-rewriting reaction over typed agents *)
 
 module Domain:Analyzer_domain_sig.Domain
 
