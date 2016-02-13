@@ -3,7 +3,7 @@ type t = {
   perturbations_alive : bool array;
   activities : Random_tree.tree;(* pair numbers are binary rule, odd unary *)
   variables_overwrite: Alg_expr.t option array;
-  flux: Outputs.flux_data list;
+  flux: Data.flux_data list;
   print_desc: (string,out_channel * Format.formatter) Hashtbl.t;
 }
 
@@ -73,7 +73,7 @@ let snapshot env counter file graph =
       (fun f -> Format.fprintf f "%a@." (Rule_interpreter.print env) graph)
 
 
-let do_it env domain counter graph state modification =
+let do_it ~outputs env domain counter graph state modification =
   let get_alg i = get_alg env state i in
   let print_expr_val =
     Kappa_printer.print_expr_val
@@ -136,7 +136,7 @@ let do_it env domain counter graph state modification =
   | Primitives.FLUX s ->
      let file = Format.asprintf "@[<h>%a@]" print_expr_val s in
      let () =
-       if List.exists (Outputs.flux_has_name file) state.flux
+       if List.exists (Fluxmap.flux_has_name file) state.flux
        then ExceptionDefn.warning
 	      (fun f ->
 	       Format.fprintf
@@ -144,14 +144,14 @@ let do_it env domain counter graph state modification =
 		 (Counter.current_time counter) (Counter.current_event counter) file)
      in
      (false, graph, {state with
-		      flux = Outputs.create_flux env counter file::state.flux})
+		      flux = Fluxmap.create_flux env counter file::state.flux})
   | Primitives.FLUXOFF s ->
      let file = Format.asprintf "@[<h>%a@]" print_expr_val s in
-     let (these,others) = List.partition (Outputs.flux_has_name file) state.flux in
-     let () = List.iter (Outputs.output_flux env counter) these in
+     let (these,others) = List.partition (Fluxmap.flux_has_name file) state.flux in
+     let () = List.iter (fun x -> outputs (Data.Flux (Fluxmap.stop_flux env counter x))) these in
      (false, graph, {state with flux = others})
 
-let perturbate env domain counter graph state =
+let perturbate ~outputs env domain counter graph state =
   let not_done_yet =
     Array.make (Environment.nb_perturbations env) true in
   let get_alg i = get_alg env state i in
@@ -171,7 +171,7 @@ let perturbate env domain counter graph state =
 	let stop,graph,state =
 	  List.fold_left (fun (stop,graph,state as acc) effect ->
 			  if stop then acc else
-			    do_it env domain counter graph state effect)
+			    do_it ~outputs env domain counter graph state effect)
 			 (stop,graph,state) pert.Primitives.effect in
 	let () = not_done_yet.(i) <- false in
 	let () =
@@ -194,7 +194,7 @@ let one_rule _form dt stop env domain counter graph state =
       if state.flux <> [] then
 	let old_act = Random_tree.find rd_id state.activities in
 	List.iter
-	  (Outputs.incr_flux_flux
+	  (Fluxmap.incr_flux_flux
 	     rule.Primitives.syntactic_rule syntax_rd_id (new_act -. old_act))
 	  state.flux
     in Random_tree.add rd_id new_act state.activities in
@@ -226,7 +226,7 @@ let one_rule _form dt stop env domain counter graph state =
 	 ~get_alg register_new_activity env counter graph' in
      let () =
        List.iter
-	 (Outputs.incr_flux_hit rule.Primitives.syntactic_rule) state.flux in
+	 (Fluxmap.incr_flux_hit rule.Primitives.syntactic_rule) state.flux in
      let () =
        if !Parameter.debugModeOn then
 	 Format.printf "@[<v>Obtained@ %a@]@."
@@ -258,7 +258,7 @@ let one_rule _form dt stop env domain counter graph state =
 let activity state =
   Random_tree.total state.activities
 
-let a_loop form env domain counter graph state =
+let a_loop ~outputs form env domain counter graph state =
   let activity = activity state in
   let rd = Random.float 1.0 in
   let dt = abs_float (log rd /. activity) in
@@ -274,12 +274,14 @@ let a_loop form env domain counter graph state =
 	 Format.fprintf
 	   form
 	   "?@.A deadlock was reached after %d events and %Es (Activity = %.5f)"
-	   (Counter.current_event counter) (Counter.current_time counter) activity in
+	   (Counter.current_event counter)
+	   (Counter.current_time counter) activity in
        (true,graph,state)
     | (ti,_) :: tail ->
        let () = state.stopping_times := tail in
        let continue = Counter.one_time_correction_event counter ti in
-       let stop,graph',state' = perturbate env domain counter graph state in
+       let stop,graph',state' =
+	 perturbate ~outputs env domain counter graph state in
        (not continue||stop,graph',state')
   else
 (*activity is positive*)
@@ -288,24 +290,25 @@ let a_loop form env domain counter graph state =
 	 when Nbr.is_smaller ti (Nbr.F (Counter.current_time counter +. dt)) ->
        let () = state.stopping_times := tail in
        let continue = Counter.one_time_correction_event counter ti in
-       let stop,graph',state' = perturbate env domain counter graph state in
+       let stop,graph',state' =
+	 perturbate ~outputs env domain counter graph state in
        (not continue||stop,graph',state')
     | _ ->
        let (stop,graph',state') =
-	 perturbate env domain counter graph state in
+	 perturbate ~outputs env domain counter graph state in
        one_rule form dt stop env domain counter graph' state'
 
-let loop_cps form hook return env domain counter graph state =
+let loop_cps ~outputs form hook return env domain counter graph state =
   let rec iter graph state =
     let stop,graph',state' =
       try
 	let (stop,graph',state') as out =
-	  a_loop form env domain counter graph state in
+	  a_loop ~outputs form env domain counter graph state in
 	let () =
 	  Plot.fill
 	    counter (observables_values env counter graph' state') in
 	let () = if stop then
-		   ignore (perturbate env domain counter graph' state') in
+		   ignore (perturbate ~outputs env domain counter graph' state') in
 	out
       with ExceptionDefn.UserInterrupted f ->
 	let () = Format.pp_print_newline form () in
@@ -320,11 +323,11 @@ let loop_cps form hook return env domain counter graph state =
 		   | ("y" | "yes") -> snapshot env counter "dump.ka" graph
 		   | _ -> () in
 	(true,graph,state) in
-    if stop then return form env counter graph' state'
+    if stop then return ~outputs form env counter graph' state'
     else hook (fun () -> iter graph' state')
   in iter graph state
 
-let finalize form env counter graph state =
+let finalize ~outputs form env counter graph state =
   let () = Plot.close () in
   let () = Counter.complete_progress_bar form counter in
   let () = close_desc state in
@@ -338,8 +341,8 @@ let finalize form env counter graph state =
 	   (fun f ->
 	    Format.fprintf
 	      f "Tracking FLUX into \"%s\" was not stopped before end of simulation"
-	      (Outputs.get_flux_name e)) in
-       Outputs.output_flux env counter e) state.flux in
+	      (Fluxmap.get_flux_name e)) in
+       outputs (Data.Flux (Fluxmap.stop_flux env counter e))) state.flux in
   let () = ExceptionDefn.flush_warning form in
   Rule_interpreter.generate_stories form env graph
 
@@ -347,5 +350,5 @@ let go form counter f =
   let () = Counter.tick form counter in
   f ()
 
-let loop form env domain counter graph state =
-  loop_cps form (go form counter) finalize env domain counter graph state
+let loop ~outputs form env domain counter graph state =
+  loop_cps ~outputs form (go form counter) finalize env domain counter graph state

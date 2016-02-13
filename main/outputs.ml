@@ -1,43 +1,3 @@
-type flux_data = {
-    flux_name : string;
-    flux_start : float;
-    flux_hits : int array;
-    flux_fluxs : float array array;
-  }
-type flux_plot =
-  { flux_rules : string array;
-    flux_data : flux_data;
-    flux_end : float;
-  }
-
-let create_flux env counter name =
-  let size = Environment.nb_syntactic_rules env + 1 in
-  {
-    flux_name = name;
-    flux_start = Counter.current_time counter;
-    flux_hits = Array.make size 0;
-    flux_fluxs = Array.make_matrix size size 0.;
-  }
-
-let incr_flux_flux of_rule on_rule v flux =
-  flux.flux_fluxs.(of_rule).(on_rule) <-
-    flux.flux_fluxs.(of_rule).(on_rule) +. v
-
-let incr_flux_hit of_rule flux =
-  flux.flux_hits.(of_rule) <- succ flux.flux_hits.(of_rule)
-
-let get_flux_name flux = flux.flux_name
-let flux_has_name name flux = flux.flux_name = name
-
-let stop_flux env counter flux =
-  let size = Environment.nb_syntactic_rules env + 1 in
-  let flux_rules =
-    Array.init size
-	       (Format.asprintf "%a" (Environment.print_ast_rule ~env))
-  in
-  { flux_rules = flux_rules; flux_data = flux ;
-    flux_end = Counter.current_time counter }
-
 let dot_of_flux flux =
   let printer desc =
     let () = Format.fprintf
@@ -58,23 +18,24 @@ let dot_of_flux flux =
 	      Format.fprintf
 		f
 		"@[<h>\"%s\" -> \"%s\" [weight=%d,label=\"%.3f\",color=%s,arrowhead=%s];@]@,"
-		flux.flux_rules.(s)
-		flux.flux_rules.(d)
+		flux.Data.flux_rules.(s)
+		flux.Data.flux_rules.(d)
 		(abs (int_of_float v)) v color arrowhead))
-	desc flux.flux_data.flux_fluxs in
+	desc flux.Data.flux_data.Data.flux_fluxs in
     Format.fprintf desc "}@]@."
   in
-  Kappa_files.with_flux flux.flux_data.flux_name printer
+  Kappa_files.with_flux flux.Data.flux_data.Data.flux_name printer
 
 let print_json_of_flux f flux =
   let () = Format.fprintf
 	     f "@[<v>{@ \"bio_begin_time\" : %f,@ \"bio_end_time\" : %f,@ "
-	     flux.flux_data.flux_start flux.flux_end in
+	     flux.Data.flux_data.Data.flux_start flux.Data.flux_end in
   let () =
     Format.fprintf
       f "@[\"rules\" :@ @[[%a]@]@],@ @[\"hits\" :@ @[[%a]@]@],@ "
-      (Pp.array Pp.comma (fun _ -> Format.pp_print_string)) flux.flux_rules
-      (Pp.array Pp.comma (fun _ -> Format.pp_print_int)) flux.flux_data.flux_hits in
+      (Pp.array Pp.comma (fun _ -> Format.pp_print_string)) flux.Data.flux_rules
+      (Pp.array Pp.comma (fun _ -> Format.pp_print_int))
+      flux.Data.flux_data.Data.flux_hits in
   Format.fprintf
     f "@[\"fluxs\" :@ @[[%a]@]@]@ }@]"
     (Pp.array
@@ -83,15 +44,15 @@ let print_json_of_flux f flux =
 	Format.fprintf
 	  f "@[[%a]@]"
 	  (Pp.array Pp.comma (fun _ f y -> Format.pp_print_float f y)) x))
-    flux.flux_data.flux_fluxs
+    flux.Data.flux_data.Data.flux_fluxs
 
 let json_of_flux flux =
   Kappa_files.with_flux
-    flux.flux_data.flux_name (fun f -> print_json_of_flux f flux)
+    flux.Data.flux_data.Data.flux_name (fun f -> print_json_of_flux f flux)
 
 let html_of_flux flux =
   Kappa_files.with_flux
-    flux.flux_data.flux_name
+    flux.Data.flux_data.Data.flux_name
     (Pp_html.graph_page
        (fun f -> Format.pp_print_string f "Dynamic influence map")
        ["http://d3js.org/d3.v3.min.js"]
@@ -399,10 +360,12 @@ let () =
 
 	Format.fprintf f "@]@,</script>"))
 
-let output_flux env counter b =
-  let out = stop_flux env counter b in
-  if Filename.check_suffix out.flux_data.flux_name ".html"
+let output_flux out =
+  if Filename.check_suffix out.Data.flux_data.Data.flux_name ".html"
   then html_of_flux out
-  else if Filename.check_suffix out.flux_data.flux_name ".json"
+  else if Filename.check_suffix out.Data.flux_data.Data.flux_name ".json"
   then json_of_flux out
   else dot_of_flux out
+
+let go = function
+  | Data.Flux f -> output_flux f

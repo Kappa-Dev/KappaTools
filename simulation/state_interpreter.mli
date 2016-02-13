@@ -16,14 +16,16 @@ val activity : t -> float
 (** Returns the current activity *)
 
 val loop_cps :
+  outputs:(Data.t -> unit) ->
   Format.formatter -> ((unit -> 'a) -> 'a) ->
-  (Format.formatter -> Environment.t ->
+  (outputs:(Data.t -> unit) -> Format.formatter -> Environment.t ->
    Counter.t -> Rule_interpreter.t -> t -> 'a) ->
   Environment.t -> Connected_component.Env.t ->
   Counter.t -> Rule_interpreter.t -> t -> 'a
 (**Event loop for javascript*)
 
 val loop :
+  outputs:(Data.t -> unit) ->
   Format.formatter -> Environment.t -> Connected_component.Env.t ->
   Counter.t -> Rule_interpreter.t -> t -> unit
 (** [loop message_formatter env domain counter graph] does one event

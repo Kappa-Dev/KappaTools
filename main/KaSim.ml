@@ -191,7 +191,8 @@ let () =
 
     Parameter.initSimTime () ;
     let () =
-      State_interpreter.loop Format.std_formatter env cc_env counter graph new_state
+      State_interpreter.loop
+	~outputs:Outputs.go Format.std_formatter env cc_env counter graph new_state
     in
     Format.printf "Simulation ended";
     if Counter.nb_null_event counter = 0 then Format.print_newline()
