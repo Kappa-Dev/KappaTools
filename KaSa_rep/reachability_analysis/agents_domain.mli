@@ -15,9 +15,7 @@
   * All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-(* Before properly achieving separation of concepts. We introduce one
-   monolithic domain that collect everything (as in the previous analyzer).*)
-
+(* This domain abstracts away the interface of agents, and see each rule as a multiset-rewriting reaction over typed agents *)
 
 module Domain:Analyzer_domain_sig.Domain
 

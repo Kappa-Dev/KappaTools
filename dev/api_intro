@@ -32,16 +32,9 @@ The machinary to cook stories from an execution trace is in cflow/
 {!modules: Compression_main Utilities Priority}
 
 The code of the static analyser is in KaSa_rep/reachability_analysis/
-Functor that convert a domain with internalized communications to a top-level module
-{!modules: Analyzer}
-Types and values shared among the abstract domains
-{!modules: Analyzer_headers}
-Functor that internalize the communication of an abstract domain
-{!modules: Composite_domain}
-Signature of an abstract domain with explicit communication
-{!modules: Analyzer_domain_sig}
-Functor to combine to abstract domains with explicit communication
-{!modules: Product}
+{!modules: Analyzer Analyzer_headers Composite_domain Analyzer_domain_sig Product}
+Several abstract domains are available:
+{!modules: Global_domain Rules_domain Agents_domain Views_domain}
 
 
 The library to deal with multi-valued decision diagrams is in KaSa_rep/data_structures/mvbdu/

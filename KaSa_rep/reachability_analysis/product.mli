@@ -1,4 +1,4 @@
-(** Functor to combine several abstract domains *)
+(** Functor to combine several abstract domains (with explicit communiaction among them) *)
 
 module Product:
 functor

@@ -13,7 +13,7 @@
   * All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-(** Analyzer domain (without communication channels which have been internalized) *)
+(** Analyzer entry point *)
 
 module type Analyzer =
   sig

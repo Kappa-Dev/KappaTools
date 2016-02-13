@@ -1,4 +1,4 @@
-(**
+(*
   * rule_domain.mli
   * openkappa
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
@@ -15,9 +15,7 @@
   * All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-(* Before properly achieving separation of concepts. We introduce one
-   monolithic domain that collect everything (as in the previous analyzer).*)
-
+(** This domain tracks which rules can be applied, and warns other domains at the first application *)
 
 module Domain:Analyzer_domain_sig.Domain
 

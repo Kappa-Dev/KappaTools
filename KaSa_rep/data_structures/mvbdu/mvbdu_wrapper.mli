@@ -1,4 +1,4 @@
-(* API of the multi-valued binary decision driagram library *)
+(** API of the multi-valued binary decision diagrams library *)
 
 module type Mvbdu =
   sig
