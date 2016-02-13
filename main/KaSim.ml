@@ -182,12 +182,13 @@ let () =
 	  (Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
 	  env in
       if !pointNumberValue > 0 || head <> [||] then
-	Plot.create (Kappa_files.get_data ()) head in
+	Outputs.create_plot (Kappa_files.get_data ()) head in
     let () =
       if !pointNumberValue > 0 then
-	Plot.plot_now
-	  (Counter.current_time counter)
-	  (State_interpreter.observables_values env counter graph new_state) in
+	Outputs.go
+	  (Data.Plot
+	     (Counter.current_time counter,
+	      State_interpreter.observables_values env counter graph new_state)) in
 
     Parameter.initSimTime () ;
     let () =

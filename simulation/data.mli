@@ -11,3 +11,4 @@ type flux_map =
   }
 
 type t = Flux of flux_map
+       | Plot of float * Nbr.t array

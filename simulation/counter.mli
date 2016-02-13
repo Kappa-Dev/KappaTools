@@ -8,7 +8,7 @@ val create : int -> float -> int -> float option -> int option -> t
 val reinitialize : t -> unit
 
 val tick : Format.formatter -> t -> unit
-val to_plot_points : t -> float list * t
+val fill : outputs:(Data.t -> unit) -> t -> Nbr.t array -> unit
 val complete_progress_bar : Format.formatter -> t -> unit
 
 val one_constructive_event : t -> float -> bool

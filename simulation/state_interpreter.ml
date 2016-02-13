@@ -111,8 +111,8 @@ let do_it ~outputs env domain counter graph state modification =
      let () = Format.fprintf desc "%a@." print_expr_val pe_expr in
      (false, graph, state)
   | Primitives.PLOTENTRY ->
-     let () = Plot.plot_now (Counter.current_time counter)
-			    (observables_values env counter graph state) in
+     let () = outputs (Data.Plot (Counter.current_time counter,
+				 observables_values env counter graph state)) in
      (false, graph, state)
   | Primitives.SNAPSHOT pexpr  ->
      let file = Format.asprintf "@[<h>%a@]" print_expr_val pexpr in
@@ -305,7 +305,7 @@ let loop_cps ~outputs form hook return env domain counter graph state =
 	let (stop,graph',state') as out =
 	  a_loop ~outputs form env domain counter graph state in
 	let () =
-	  Plot.fill
+	  Counter.fill ~outputs
 	    counter (observables_values env counter graph' state') in
 	let () = if stop then
 		   ignore (perturbate ~outputs env domain counter graph' state') in
@@ -328,7 +328,7 @@ let loop_cps ~outputs form hook return env domain counter graph state =
   in iter graph state
 
 let finalize ~outputs form env counter graph state =
-  let () = Plot.close () in
+  let () = Outputs.close () in
   let () = Counter.complete_progress_bar form counter in
   let () = close_desc state in
   let () = if !Parameter.store_unary_distance then
