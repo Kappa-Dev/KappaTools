@@ -1,4 +1,4 @@
-(** Monolithic abstract domain that combine views and rules *)
+(** Monolithic abstract domain that combines views and rules *)
 
 (*
   * global_domain.mli

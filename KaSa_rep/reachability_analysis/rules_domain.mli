@@ -15,7 +15,7 @@
   * All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-(** This domain tracks which rules can be applied, and warns other domains at the first application *)
+(** This domain tracks which rules can be applied, and warns other domains at the first application of a rule *)
 
 module Domain:Analyzer_domain_sig.Domain
 
