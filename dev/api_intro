@@ -25,11 +25,14 @@ siteGraph/
 The simulation engine is in simulation/
 The core of the interpreter
 {!modules: Expr_interpreter Rule_interpreter State_interpreter}
-and some storage and rendering
-{!modules: Counter Plot Outputs}
+and some storage
+{!modules: Counter Data}
 
 The machinary to cook stories from an execution trace is in cflow/
 {!modules: Compression_main Utilities Priority}
+
+The code specific to the command line backend is in main/. It consists in file handler and renderers
+{!modules: Outputs Kappa_files}
 
 The code of the static analyser is in KaSa_rep/reachability_analysis/
 {!modules: Analyzer Analyzer_headers Composite_domain Analyzer_domain_sig Product}

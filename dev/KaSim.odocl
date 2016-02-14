@@ -4,6 +4,7 @@ Pp_html
 
 GenArray
 LargeArray
+DynamicArray
 SetMap
 
 Buffers
@@ -34,8 +35,7 @@ Snip
 Edges
 
 Counter
-Plot
-Outputs
+Data
 Expr_interpreter
 Rule_interpreter
 State_interpreter
@@ -43,6 +43,9 @@ State_interpreter
 Utilities
 Compression_main
 Priority
+
+Outputs
+Kappa_files
 
 Analyzer
 Analyzer_headers
