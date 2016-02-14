@@ -4,7 +4,6 @@ type t = {
   activities : Random_tree.tree;(* pair numbers are binary rule, odd unary *)
   variables_overwrite: Alg_expr.t option array;
   flux: Data.flux_data list;
-  print_desc: (string,out_channel * Format.formatter) Hashtbl.t;
 }
 
 let initial_activity get_alg env counter graph activities =
@@ -37,19 +36,7 @@ let initial env counter graph stopping_times =
     variables_overwrite =
       Array.make (Environment.nb_algs env) None;
     flux = [];
-    print_desc = Hashtbl.create 2;
-
 }
-
-let get_desc file state =
-  try snd (Hashtbl.find state.print_desc file)
-  with Not_found ->
-       let d_chan = Kappa_files.open_out file in
-    let d = Format.formatter_of_out_channel d_chan in
-    (Hashtbl.add state.print_desc file (d_chan,d) ; d)
-
-let close_desc state =
-  Hashtbl.iter (fun _file (d_chan,_d) -> close_out d_chan) state.print_desc
 
 let get_alg env state i =
   match state.variables_overwrite.(i) with
@@ -105,10 +92,8 @@ let do_it ~outputs env domain counter graph state modification =
 		 (Mods.Counter.event counter) (Mods.Counter.time counter))) *)
   | Primitives.PRINT (pe_file,pe_expr) ->
      let file = Format.asprintf "@[<h>%a@]" print_expr_val pe_file in
-     let desc =
-       match file with "" -> Format.std_formatter
-		     | _ -> get_desc file state in
-     let () = Format.fprintf desc "%a@." print_expr_val pe_expr in
+     let line = Format.asprintf "%a" print_expr_val pe_expr in
+     let () = outputs (Data.Print {Data.file_name = file; Data.line = line;}) in
      (false, graph, state)
   | Primitives.PLOTENTRY ->
      let () = outputs (Data.Plot (Counter.current_time counter,
@@ -330,7 +315,6 @@ let loop_cps ~outputs form hook return env domain counter graph state =
 let finalize ~outputs form env counter graph state =
   let () = Outputs.close () in
   let () = Counter.complete_progress_bar form counter in
-  let () = close_desc state in
   let () = if !Parameter.store_unary_distance then
 	     Kappa_files.with_unary_dist (Counter.current_event counter) (Rule_interpreter.print_all_dist graph) in
   let () =

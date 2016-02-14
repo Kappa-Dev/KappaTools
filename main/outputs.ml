@@ -1,3 +1,17 @@
+let print_desc : (string,out_channel * Format.formatter) Hashtbl.t =
+  Hashtbl.create 2
+
+let get_desc file =
+  try snd (Hashtbl.find print_desc file)
+  with Not_found ->
+    let d_chan = Kappa_files.open_out file in
+    let d = Format.formatter_of_out_channel d_chan in
+    (Hashtbl.add print_desc file (d_chan,d) ; d)
+
+let close_desc () =
+  Hashtbl.iter (fun _file (d_chan,_d) -> close_out d_chan) print_desc
+
+
 let dot_of_flux flux =
   let printer desc =
     let () = Format.fprintf
@@ -428,6 +442,9 @@ let plot_now l =
 let go = function
   | Data.Flux f -> output_flux f
   | Data.Plot (x,y) -> plot_now (x,y)
+  | Data.Print p ->
+     Format.fprintf (get_desc p.Data.file_name) "%s@." p.Data.line
 
 let close () =
-  close_plot ()
+  let () = close_plot () in
+  close_desc ()
