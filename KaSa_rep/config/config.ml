@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 08/03/2010
-  * Last modification: Time-stamp: <2016-02-14 10:21:13 feret>
+  * Last modification: Time-stamp: <2016-02-14 10:24:38 feret>
   * *
   * Some parameters
   * references can be tuned thanks to command-line options
@@ -93,7 +93,7 @@ let smash_relations = ref false
 let use_natural_language = ref true
 
 (*modular reachability*)
-let do_reachability_analysis_module = ref false
+let do_reachability_analysis_module = ref true
 
 
 (** accuracy *)
