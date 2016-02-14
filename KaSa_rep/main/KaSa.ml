@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  *
  * Creation: December, the 18th of 2010
- * Last modification: Time-stamp: <2016-02-12 15:29:41 feret>
+ * Last modification: Time-stamp: <2016-02-14 10:20:44 feret>
  * *
  *
  * Copyright 2010,2011 Institut National de Recherche en Informatique et
@@ -153,7 +153,7 @@ let main () =
       let parameters_cv =
         Remanent_parameters.update_prefix parameters "" in
       let _ =
-        if (Remanent_parameters.get_trace parameters_cv) 
+        if (Remanent_parameters.get_trace parameters_cv)
         then Loggers.fprintf (Remanent_parameters.get_logger parameters_cv) ""
       in
       let error, static, dynamic =
