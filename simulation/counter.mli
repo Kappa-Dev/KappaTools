@@ -2,8 +2,8 @@
 
 type t
 
-val create : int -> float -> int -> float option -> int option -> t
-(** [create nb_plot_point init_t init_event max_t max_event] *)
+val create : ?init_t:float -> ?init_e:int -> ?max_t:float -> ?max_e:int ->
+	     nb_points:int -> t
 
 val reinitialize : t -> unit
 

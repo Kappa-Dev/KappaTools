@@ -202,18 +202,18 @@ let complete_progress_bar form counter =
            done in
   Format.pp_print_newline form ()
 
-let create nb_points init_t init_e mx_t mx_e =
+let create ?(init_t=0.) ?(init_e=0) ?max_t ?max_e ~nb_points =
   let dE =
-    compute_dE nb_points (Tools.option_map (fun x -> x - init_e) mx_e) in
+    compute_dE nb_points (Tools.option_map (fun x -> x - init_e) max_e) in
   let dT =
-    compute_dT nb_points (Tools.option_map (fun x -> x -. init_t) mx_t)
+    compute_dT nb_points (Tools.option_map (fun x -> x -. init_t) max_t)
   in
   {time = init_t ;
    events = init_e ;
    stories = -1 ;
    stat_null = Stat_null_events.init () ;
-   max_time = mx_t ;
-   max_events = mx_e ;
+   max_time = max_t ;
+   max_events = max_e ;
    plot_points = nb_points;
    last_tick = (init_e,init_t);
    dE = dE ;

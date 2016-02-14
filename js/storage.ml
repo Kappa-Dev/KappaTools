@@ -85,9 +85,10 @@ let model_env, set_model_env = React.S.create fake_env
 let model_domain, set_model_domain =
   React.S.create Connected_component.Env.empty
 let model_counter =
-  React.S.l5 Counter.create
-             model_nb_plot  (React.S.const 0.) (React.S.const 0)
-             model_max_time model_max_events
+  React.S.l3
+    (fun max_t max_e nb_points ->
+     Counter.create ?init_t:None ?init_e:None ?max_t ?max_e ~nb_points)
+    model_max_time model_max_events model_nb_plot
 
 let model_syntax_error, set_model_syntax_error = React.S.create (None : (string * Location.t) option)
 let parse text =

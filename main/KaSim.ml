@@ -131,8 +131,9 @@ let () =
       "+ Initialized random number generator with seed %d@." theSeed;
 
     let counter =
-      Counter.create !pointNumberValue 0.0 0
-		     !maxTimeValue !maxEventValue in
+      Counter.create
+	~init_t:0. ~init_e:0 ?max_t:!maxTimeValue ?max_e:!maxEventValue
+	~nb_points:!pointNumberValue in
     let (kasa_state,env, cc_env, graph, new_state) =
       match !Parameter.marshalizedInFile with
       | "" ->
