@@ -376,14 +376,6 @@ type format = Raw of fd | Svg of Pp_svg.store
 
 let plotDescr = ref None
 
-let plot_value width =
-  match !plotDescr with
-  | None -> ""
-  | Some plot ->
-     match plot with
-     | Raw _ ->  ""
-     | Svg s -> Pp_svg.to_string ~width s
-
 let close_plot () =
   match !plotDescr with
   | None -> ()

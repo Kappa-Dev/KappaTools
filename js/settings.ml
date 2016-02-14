@@ -305,15 +305,6 @@ let onload () : unit Lwt.t =
                                                               Lwt_switch.turn_off thread_is_running))
                           )
                           ~stop_continuation:start_ui
-                          ~size:(fun _ ->
-                                   let plot_div_dom : Dom_html.linkElement Js.t =
-                                     Js.Unsafe.coerce
-                                       (Js.Opt.get (document##getElementById (Js.string Visualization.nav_tab_id))
-                                                   (fun () -> assert false)) in
-                                   let width = plot_div_dom##offsetWidth in
-                                   let margin = min 20 (2*plot_div_dom##offsetWidth/10) in
-                                   width - margin
-                                )
                           (* document.getElementById("mydiv") *)
                 in Js._true)
   in

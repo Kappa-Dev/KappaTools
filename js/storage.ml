@@ -1,5 +1,5 @@
 open Lwt
-type runtime_state = { plot : string option ;
+type runtime_state = { plot : Pp_svg.store;
                        time : float;
                        time_percentage : int option;
                        event : int;
@@ -12,10 +12,10 @@ let get_time (state : runtime_state option) : float option =
     None -> None
   | Some state -> Some state.time
 
-let get_plot (state : runtime_state option) : string option =
+let get_plot size (state : runtime_state option) : string option =
   match state with
     None -> None
-  | Some state -> state.plot
+  | Some state -> Some (Pp_svg.to_string ~width:(size ()) state.plot)
 
 let get_time_percentage (state : runtime_state option) : int option =
   match state with
@@ -54,19 +54,6 @@ let model_runtime_state , set_model_runtime_state =
   React.S.create (None : runtime_state option)
 let model_is_running , set_model_is_running = React.S.create false
 let opened_filename, set_opened_filename = React.S.create "model.ka"
-
-let show_graph thread_is_running size=
-  let rec aux () =
-    let () = match React.S.value model_runtime_state with
-        Some state -> set_model_runtime_state (Some { state with plot = Some (Plot.value (size ())) })
-      | None -> ()
-    in
-    if Lwt_switch.is_on thread_is_running then
-      Lwt_js.sleep 5. >>= aux
-    else
-      return_unit
-  in
-  aux ()
 
 let update_counter counter state log_buffer=
   { state with time_percentage = Counter.time_percentage counter
@@ -114,9 +101,7 @@ let parse text =
 let model_ast =
   React.S.fmap parse Ast.empty_compil (React.S.l1 Lexing.from_string model_text)
 
-let start ~start_continuation
-          ~stop_continuation
-          ~size =
+let start ~start_continuation ~stop_continuation =
   let on_error () = set_model_is_running false;
                     stop_continuation ();
                     return_unit
@@ -135,14 +120,6 @@ let start ~start_continuation
         let result = React.S.value model_ast in
         let (counter : Counter.t) = React.S.value model_counter in
         let () = Counter.reinitialize counter in
-        let () = set_model_runtime_state (Some  { plot = None;
-                                                  time = 0.0;
-                                                  time_percentage = None;
-                                                  event_percentage = None;
-                                                  event = 0;
-                                                  tracked_events = None ;
-                                                  log_buffer = Buffer.contents log_buffer
-                                                }) in
         let () = start_continuation thread_is_running in
         let () = set_model_is_running true in
         wrap4 (Eval.initialize ?rescale_init:None) log_form [] counter result
@@ -152,15 +129,33 @@ let start ~start_continuation
 	    Environment.map_observables
 	      (Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
 	      env in
-	  Plot.create "foo.svg" head in
-                let () = if (React.S.value model_nb_plot) > 0 then
-                           Plot.plot_now
-                             (Counter.current_time counter)
-                             (State_interpreter.observables_values env counter graph state) in
-                Lwt.join [ show_graph thread_is_running size;
-                           write_out thread_is_running counter label log_buffer;
+          set_model_runtime_state
+	    (Some  {
+		 plot =
+		   {Pp_svg.file = "foo.svg";
+		    Pp_svg.title = "KaSim output";
+		    Pp_svg.descr = "";
+		    Pp_svg.legend = head;
+		    Pp_svg.points = [Counter.current_time counter,
+				     State_interpreter.observables_values env counter graph state];
+		   };
+                 time = 0.0;
+                 time_percentage = None;
+                 event_percentage = None;
+                 event = 0;
+                 tracked_events = None ;
+                 log_buffer = Buffer.contents log_buffer
+               }) in
+        Lwt.join [ write_out thread_is_running counter label log_buffer;
                            State_interpreter.loop_cps
-			     ~outputs:(fun _ -> ())
+			     ~outputs:(function
+					| Data.Flux _ -> ()
+					| Data.Plot (t,v) ->
+					   match React.S.value model_runtime_state with
+					   | None -> ()
+					   | Some s ->
+					      s.plot.Pp_svg.points <- (t,v) :: s.plot.Pp_svg.points
+				      )
                              log_form
                              (fun f -> if Lwt_switch.is_on thread_is_running
                                        then Lwt.bind (Lwt_js.yield ()) f
