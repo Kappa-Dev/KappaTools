@@ -98,6 +98,7 @@ type priorities =
     side_effects: level ;
     candidate_set_of_events: selection_strategy;
     try_to_remove_first: try_to_remove_first;
+    blacklist_already_used_events: bool;
   }
 (** each event is associated with a level corresponding of its actions (if multiple action, then, the least corresponding level is selected *)
 (** Events with the least level of priority are removed first *)
@@ -113,6 +114,7 @@ let causal =
     side_effects = Highest ;
     candidate_set_of_events = Wire_with_the_least_number_of_events;
     try_to_remove_first = Late_events;
+    blacklist_already_used_events = false;
   }
 
 let weak =
@@ -125,6 +127,7 @@ let weak =
     side_effects = High ;
     candidate_set_of_events = Wire_with_the_least_number_of_events;
     try_to_remove_first = Late_events;
+    blacklist_already_used_events = true;
   }
 
 let strong =
@@ -137,6 +140,7 @@ let strong =
     side_effects = Low ;
     candidate_set_of_events = Wire_with_the_least_number_of_events;
     try_to_remove_first = Late_events;
+    blacklist_already_used_events = false;
   }
 
 let n_story = ref 1
