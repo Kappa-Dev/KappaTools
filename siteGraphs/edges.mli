@@ -62,6 +62,6 @@ val paths_of_interest : (int -> 'a option) -> Signature.s -> t -> int ->
 (** [paths_of_interest
          is_interesting sigs graph agent_name agent_id done_path] *)
 
-val print : Signature.s -> Format.formatter -> t -> unit
-val print_dot : Signature.s -> Format.formatter -> t -> unit
+val build_snapshot : Signature.s -> t -> (int * Raw_mixture.t) list
+
 val debug_print : Format.formatter -> t -> unit

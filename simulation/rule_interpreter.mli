@@ -64,8 +64,9 @@ As long as you don't use any algebraic variable (that include don't
 pick a rule randomly), you can apply several rules in row before
 resynchronizing. (This is what initial state and perturbations do.) *)
 
+val snapshot: Environment.t -> Counter.t -> string -> t -> Data.snapshot
+
 val print : Environment.t -> Format.formatter -> t -> unit
-val print_dot : Environment.t -> Format.formatter -> t -> unit
 val print_dist : Environment.t -> t -> int -> unit
 val print_all_dist : t -> Format.formatter -> unit
 

@@ -49,17 +49,6 @@ let observables_values env counter graph state =
      (Rule_interpreter.value_alg counter graph ~get_alg)
      env
 
-let snapshot env counter file graph =
-  if Filename.check_suffix file ".dot" then
-    Kappa_files.with_snapshot
-      file (Counter.current_event counter) "dot"
-      (fun f -> Format.fprintf f "%a@." (Rule_interpreter.print_dot env) graph)
-  else
-    Kappa_files.with_snapshot
-      file (Counter.current_event counter) "ka"
-      (fun f -> Format.fprintf f "%a@." (Rule_interpreter.print env) graph)
-
-
 let do_it ~outputs env domain counter graph state modification =
   let get_alg i = get_alg env state i in
   let print_expr_val =
@@ -84,7 +73,8 @@ let do_it ~outputs env domain counter graph state modification =
      (false, Rule_interpreter.extra_outdated_var i graph, state)
   | Primitives.STOP pexpr ->
      let file = Format.asprintf "@[<h>%a@]" print_expr_val pexpr in
-     let () = snapshot env counter file graph in
+     let () = outputs (Data.Snapshot
+			 (Rule_interpreter.snapshot env counter file graph)) in
      (true,graph,state)
   (*     raise (ExceptionDefn.StopReached
 	      (Format.sprintf
@@ -101,7 +91,8 @@ let do_it ~outputs env domain counter graph state modification =
      (false, graph, state)
   | Primitives.SNAPSHOT pexpr  ->
      let file = Format.asprintf "@[<h>%a@]" print_expr_val pexpr in
-     let () = snapshot env counter file graph in
+     let () = outputs (Data.Snapshot
+			 (Rule_interpreter.snapshot env counter file graph)) in
      (false, graph, state)
   | Primitives.CFLOW (name,cc,tests) ->
      let name = match name with
@@ -254,7 +245,8 @@ let a_loop ~outputs form env domain counter graph state =
     | [] ->
        let () =
 	 if !Parameter.dumpIfDeadlocked then
-	   snapshot env counter "deadlock.ka" graph in
+	   outputs (Data.Snapshot
+		     (Rule_interpreter.snapshot env counter "deadlock.ka" graph)) in
        let () =
 	 Format.fprintf
 	   form
@@ -305,7 +297,8 @@ let loop_cps ~outputs form hook return env domain counter graph state =
 	    msg in
 	let () = if not !Parameter.batchmode then
 		   match String.lowercase (Tools.read_input ()) with
-		   | ("y" | "yes") -> snapshot env counter "dump.ka" graph
+		   | ("y" | "yes") ->
+		      outputs (Data.Snapshot (Rule_interpreter.snapshot env counter "dump.ka" graph))
 		   | _ -> () in
 	(true,graph,state) in
     if stop then return graph' state'

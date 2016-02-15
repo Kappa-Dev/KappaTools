@@ -186,7 +186,7 @@ let () =
 	Outputs.create_plot (Kappa_files.get_data ()) head in
     let () =
       if !pointNumberValue > 0 then
-	Outputs.go
+	Outputs.go (Environment.signatures env)
 	  (Data.Plot
 	     (Counter.current_time counter,
 	      State_interpreter.observables_values env counter graph new_state)) in
@@ -194,7 +194,7 @@ let () =
     Parameter.initSimTime () ;
     let () =
       State_interpreter.loop
-	~outputs:Outputs.go Format.std_formatter env cc_env counter graph new_state
+	~outputs:(Outputs.go  (Environment.signatures env)) Format.std_formatter env cc_env counter graph new_state
     in
     Format.printf "Simulation ended";
     if Counter.nb_null_event counter = 0 then Format.print_newline()

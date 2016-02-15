@@ -782,25 +782,26 @@ let adjust_unary_rule_instances ~rule_id ~get_alg store env counter state rule =
       else Mods.IntMap.add rule_id stay state.unary_candidates;
     unary_pathes = Mods.Int2Set.fold remove_path byebye state.unary_pathes; }
 
+let snapshot env counter fn state = {
+    Data.snap_file = fn;
+    Data.snap_event = Counter.current_event counter;
+    Data.agents = Edges.build_snapshot (Environment.signatures env) state.edges;
+    Data.tokens = Array.mapi (fun i x ->
+			      (Format.asprintf "%a" (Environment.print_token ~env) i,x)) state.tokens;
+  }
+
 let print env f state =
+  let sigs = Environment.signatures env in
   Format.fprintf
     f "@[<v>%a@,%a@]"
-    (Edges.print (Environment.signatures env)) state.edges
+    (Pp.list Pp.space (fun f (i,mix) ->
+		       Format.fprintf f "%%init: %i @[<h>%a@]" i
+				      (Raw_mixture.print ~compact:false sigs) mix))
+    (Edges.build_snapshot sigs state.edges)
     (Pp.array Pp.space (fun i f el ->
 			Format.fprintf
 			  f "%%init: %a <- %a"
-			  (Environment.print_token ~env) i Nbr.print el))
-    state.tokens
-
-let print_dot env f state =
-  Format.fprintf
-    f "@[<v>digraph G{@,%a@,%a}@]"
-    (Edges.print_dot (Environment.signatures env)) state.edges
-    (Pp.array Pp.cut (fun i f el ->
-		      Format.fprintf
-			f
-			"token_%d [label = \"%a (%a)\" , shape=none]"
-			i (Environment.print_token ~env) i Nbr.print el))
+			   (Environment.print_token ~env) i Nbr.print el))
     state.tokens
 
 (* print distances for one unary rule *)

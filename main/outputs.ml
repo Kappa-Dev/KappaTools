@@ -439,7 +439,48 @@ let plot_now l =
   | Some (Raw fd) -> print_values_raw fd.form l
   | Some (Svg s) -> s.Pp_svg.points <- l :: s.Pp_svg.points
 
-let go = function
+let print_snapshot sigs f s =
+  Format.fprintf
+    f "@[<v>%a@,%a@]"
+    (Pp.list Pp.space (fun f (i,mix) ->
+		       Format.fprintf f "%%init: %i @[<h>%a@]" i
+				      (Raw_mixture.print ~compact:false sigs) mix))
+    s.Data.agents
+    (Pp.array Pp.space (fun _ f (na,el) ->
+			Format.fprintf
+			  f "%%init: %s <- %a" na Nbr.print el))
+    s.Data.tokens
+
+let print_dot_snapshot sigs f s =
+  Format.fprintf
+    f "@[<v>digraph G{@,%a@,%a}@]"
+    (Pp.listi
+       Pp.cut
+       (fun i f (nb,mix) ->
+	Format.fprintf f "@[<v 2>subgraph cluster%d{@," i;
+	Format.fprintf
+	  f "counter%d [label = \"%d instance(s)\", shape=none];@,%a}@]"
+	  i nb (Raw_mixture.print_dot sigs i) mix))
+    s.Data.agents
+    (Pp.array Pp.cut (fun i f (na,el) ->
+		      Format.fprintf
+			f
+			"token_%d [label = \"%s (%a)\" , shape=none]"
+			i na Nbr.print el))
+    s.Data.tokens
+
+let snapshot env s =
+  if Filename.check_suffix s.Data.snap_file ".dot" then
+    Kappa_files.with_snapshot
+      s.Data.snap_file s.Data.snap_event "dot"
+      (fun f -> Format.fprintf f "%a@." (print_dot_snapshot env) s)
+  else
+    Kappa_files.with_snapshot
+      s.Data.snap_file s.Data.snap_event "ka"
+      (fun f -> Format.fprintf f "%a@." (print_snapshot env) s)
+
+let go env = function
+  | Data.Snapshot s -> snapshot env s
   | Data.Flux f -> output_flux f
   | Data.Plot (x,y) -> plot_now (x,y)
   | Data.Print p ->

@@ -291,22 +291,6 @@ let build_snapshot sigs graph =
 	aux (increment out ccs) (succ node) in
   aux [] 0
 
-let print sigs f graph =
-  Pp.list Pp.space (fun f (i,mix) ->
-		    Format.fprintf f "%%init: %i @[<h>%a@]" i
-				   (Raw_mixture.print ~compact:false sigs) mix)
-	  f (build_snapshot sigs graph)
-
-let print_dot sigs f graph =
-  Pp.listi
-    Pp.cut
-    (fun i f (nb,mix) ->
-     Format.fprintf f "@[<v 2>subgraph cluster%d{@," i;
-     Format.fprintf
-       f "counter%d [label = \"%d instance(s)\", shape=none];@,%a}@]"
-       i nb (Raw_mixture.print_dot sigs i) mix)
-    f (build_snapshot sigs graph)
-
 let debug_print f graph =
   let print_sites ag =
     (Pp.array Pp.comma

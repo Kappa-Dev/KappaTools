@@ -150,6 +150,7 @@ let start ~start_continuation ~stop_continuation =
         Lwt.join [ write_out thread_is_running counter label log_buffer;
                            State_interpreter.loop_cps
 			     ~outputs:(function
+					| Data.Snapshot _ -> ()
 					| Data.Print p ->
 					   Format.fprintf log_form "%s: %s@." p.Data.file_name p.Data.line
 					| Data.Flux _ -> ()
