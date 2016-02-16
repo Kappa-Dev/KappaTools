@@ -201,15 +201,15 @@ struct
       | error, None -> error, []
       | error, Some l -> error, l
     in
-    List.fold_left (fun (error, dynamic, _) agent_type ->
+    List.fold_left (fun (error, dynamic, s) agent_type ->
       let local = get_seen_agent dynamic in
       let bool = Array.get local agent_type in
       if bool
       then
-        error, dynamic, Some precondition
+        error, dynamic, s
       else
         error, dynamic, None
-    ) (error, dynamic, None) l
+    ) (error, dynamic, Some precondition) l
 
   (************************************************************************************)
   (** fold a list of creation each time update the array when agent is

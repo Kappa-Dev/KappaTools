@@ -1194,10 +1194,18 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x~,x!)
 
 	Applying rule 6:
-		the predcondition is not satsified yet
+		the predcondition is satisfied
+
+		rule 6 is applied for the first time
+
+		Updating the views for A(x~,x!)
 
 	Applying rule 7:
-		the predcondition is not satsified yet
+		the predcondition is satisfied
+
+		rule 7 is applied for the first time
+
+		Updating the views for A(x~,x!)
 
 	Applying rule 1:
 		the predcondition is satisfied
@@ -1254,8 +1262,6 @@ EXTENSIONAL DESCRIPTION:
 * Dead rule :
 ------------------------------------------------------------
 rule 0 will never be applied.
-rule 6 will never be applied.
-rule 7 will never be applied.
 rule 8 will never be applied.
 rule 9 will never be applied.
 

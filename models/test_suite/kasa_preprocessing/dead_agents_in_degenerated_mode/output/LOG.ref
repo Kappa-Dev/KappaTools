@@ -926,10 +926,16 @@ EXTENSIONAL DESCRIPTION:
 	Wake-up rules
 
 	Applying rule 8:
-		the predcondition is not satsified yet
+		the predcondition is satisfied
+
+		rule 8 is applied for the first time
+
 
 	Applying rule 9:
-		the predcondition is not satsified yet
+		the predcondition is satisfied
+
+		rule 9 is applied for the first time
+
 
 	Applying rule 0:
 		the predcondition is satisfied
@@ -1001,10 +1007,18 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x~)
 
 	Applying rule 6:
-		the predcondition is not satsified yet
+		the predcondition is satisfied
+
+		rule 6 is applied for the first time
+
+		Updating the views for A(x~)
 
 	Applying rule 7:
-		the predcondition is not satsified yet
+		the predcondition is satisfied
+
+		rule 7 is applied for the first time
+
+		Updating the views for A(x~)
 
 	Applying rule 1:
 		the predcondition is satisfied
@@ -1030,18 +1044,14 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x~)
 
 	Applying rule 8:
-		the predcondition is not satsified yet
+		the predcondition is satisfied
 
 	Applying rule 9:
-		the predcondition is not satsified yet
+		the predcondition is satisfied
 
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------
-rule 6 will never be applied.
-rule 7 will never be applied.
-rule 8 will never be applied.
-rule 9 will never be applied.
 
 ------------------------------------------------------------
 * Dead agent :
