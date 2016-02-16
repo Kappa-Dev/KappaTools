@@ -148,14 +148,15 @@ struct
           dead_rule_array.(rule_id) <- true;
           dead_rule_array
         in
-        let _ =
+        let dynamic =
           let log = Remanent_parameters.get_logger parameter in
           if local_trace
             || Remanent_parameters.get_trace parameter
             || Remanent_parameters.get_dump_reachability_analysis_iteration parameter
           then
             let () = Loggers.print_newline log in
-            let () = Loggers.fprintf log "\t\t%s is applied for the first time" rule_id_string
+            let () =
+              Loggers.fprintf log "\t\t%s is applied for the first time" rule_id_string
             in
             let () = Loggers.print_newline log in
             let () = Loggers.print_newline log in

@@ -211,6 +211,13 @@ rule 0: r0 will never be applied.
 rule 1: r1 will never be applied.
 
 ------------------------------------------------------------
+* Dead agent :
+------------------------------------------------------------
+A is a dead agent.
+B is a dead agent.
+C is a dead agent.
+
+------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
 
@@ -221,4 +228,5 @@ rule 1: r1 will never be applied.
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-execution finished without any exception
+Some exceptions have been raisederror: file_name: Rule domain; message: line 49; exception:Exit
+error: file_name: Rule domain; message: line 49; exception:Exit

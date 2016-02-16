@@ -22,32 +22,10 @@ let local_trace = false
 module Domain =
 struct
 
-  (*type of agents in the lhs after minus created agents: type (tested *
-    created\tested): use list less space, because the array below will
-    control everything*)
-  (* TO DO, for each rule, the set of agent types of agents in the lhs,
-     and the set of the agent types of created agents minus the set of the
-     agent types of agents in the lhs *)
-
-  module Int2Map_Agent =
-    Map_wrapper.Make
-      (SetMap.Make
-         (struct
-           type t = int (*rule_id*)
-           let compare = compare
-          end
-         ))
-
-  type store_agents_test = (int * int) list Int2Map_Agent.Map.t
-
-  type store_agents_test_without_created = (int * int) list Int2Map_Agent.Map.t
-
-  type store_agents = store_agents_test * store_agents_test_without_created
-
   type static_information =
     {
       global_static_information : Analyzer_headers.global_static_information;
-      domain_static_information : store_agents
+      domain_static_information : Agents_domain_test.domain_static_information
     }
 
   (*--------------------------------------------------------------------*)
@@ -58,8 +36,8 @@ struct
 
   type dynamic_information =
     {
-      local  : local_dynamic_information ;
-      global : Analyzer_headers.global_dynamic_information ;
+      local  : local_dynamic_information;
+      global : Analyzer_headers.global_dynamic_information;
     }
 
   (*--------------------------------------------------------------------*)
@@ -70,8 +48,6 @@ struct
 
   let get_global_static_information static = static.global_static_information
 
-  let get_domain_static_information static = static.domain_static_information
-
   let lift f x = f (get_global_static_information x)
 
   let get_parameter static = lift Analyzer_headers.get_parameter static
@@ -80,8 +56,30 @@ struct
 
   let get_compil static = lift Analyzer_headers.get_cc_code static
 
+  (**domain *)
+
+  let get_domain_static_information static = static.domain_static_information
+
+  let set_domain_static_information domain static =
+    {
+      static with
+        domain_static_information = domain
+    }
+
+  let get_agents_test static =
+    let domain = get_domain_static_information static in
+    domain.Agents_domain_test.agents_test
+
+  let get_agents_created static =
+    let domain = get_domain_static_information static in
+    domain.Agents_domain_test.agents_created
+
+  let get_agents_test_rule static =
+    let domain = get_domain_static_information static in
+    domain.Agents_domain_test.agents_test_rule
+
   (*--------------------------------------------------------------------*)
-  (** global dynamic information*)
+  (** global static/dynamic information*)
 
   let get_global_dynamic_information dynamic = dynamic.global
 
@@ -117,103 +115,206 @@ struct
     -> Exception.method_handler * dynamic_information * 'c
 
   (**************************************************************************)
+  (**initialize*)
 
+  let scan_rule_set static dynamic error =
+    let parameter = get_parameter static in
+    let compil = get_compil static in
+    let error, result = 
+      Agents_domain_test.scan_rule_set
+        parameter
+        error
+        compil
+        compil.Cckappa_sig.rules
+    in
+    let static = set_domain_static_information result static in
+    error, static, dynamic
+    
   let initialize static dynamic error =
     let parameter = Analyzer_headers.get_parameter static in
-    (*global static information*)
     let init_global_static_information =
       {
         global_static_information = static;
-        domain_static_information = Int2Map_Agent.Map.empty, Int2Map_Agent.Map.empty
+        domain_static_information = Agents_domain_test.init
       }
     in
     let kappa_handler = Analyzer_headers.get_kappa_handler static in
-    (*global dynamic information*)
-    let nagent_types = Handler.nagents parameter error kappa_handler in
-    let init_seen_agents_array = Array.make nagent_types false in
+    let nagents = Handler.nagents parameter error kappa_handler in
+    let init_seen_agents_array = Array.make (nagents+1) false in (*FIXME*)
     let init_global_dynamic_information =
       {
 	global = dynamic;
-	local = init_seen_agents_array;
+	local  = init_seen_agents_array;
       }
     in
-    error, init_global_static_information, init_global_dynamic_information
+    scan_rule_set init_global_static_information init_global_dynamic_information error
 
-  (*collect agents test*)
-  let get_store_agents_test static = fst (get_domain_static_information static)
+  (**************************************************************************)
+  (** collect the agent type of the agents of the species and declare
+     them seen *)
 
-  let get_store_agents_test_without_created static = snd (get_domain_static_information static)
-
-  let set_store_agents_test agents static =
-    let agents_test' = get_store_agents_test_without_created static in
-    {
-      static with
-        domain_static_information = agents, agents_test'
-    }
-
-  let set_store_agents_test_without_created agents static =
-    let agents_test' = get_store_agents_test static in
-    {
-      static with
-        domain_static_information = agents_test', agents
-    }
-
-  let add_link rule_id (agent_id, agent_type) static error =
+  let init_agents static dynamic error init_state =
     let parameter = get_parameter static in
-    let result = get_store_agents_test static in
-    let error, old_list =
-      match Int2Map_Agent.Map.find_option_without_logs parameter error rule_id result with
-      | error, None -> error, []
-      | error, Some l -> error, l
-    in
-    let list = (agent_id, agent_type) :: old_list in
-    let error, result =
-      Int2Map_Agent.Map.add_or_overwrite parameter error rule_id list result
-    in
-    let static = set_store_agents_test result static in
-    error, static
-
-  let collect_agents_test static dynamic error rule_id rule =
-    let parameter = get_parameter static in
-    let error, static =
+    let handler = get_kappa_handler static in
+    let error, dynamic =
       Bdu_analysis_type.AgentMap.fold parameter error
-        (fun parameter error agent_id agent static ->
+        (fun parameter error agent_id agent dynamic ->
           match agent with
           | Cckappa_sig.Unknown_agent _
-          | Cckappa_sig.Ghost -> error, static
-          | Cckappa_sig.Dead_agent (agent, _, _, _)
+          | Cckappa_sig.Ghost -> error, dynamic
+          | Cckappa_sig.Dead_agent _ -> warn parameter error (Some "line 331") Exit dynamic
           | Cckappa_sig.Agent agent ->
-            let agent_type = agent.Cckappa_sig.agent_name in
-            let error, static =
-              add_link rule_id (agent_id, agent_type) static error
+            let local = get_seen_agent dynamic in
+            let size = Array.length local in
+            let rec aux k (error, dynamic) =
+              if k = size then (error, dynamic)
+              else
+                let bool = Array.get local agent_id in
+                if not bool
+                then
+                  begin
+                    let local = 
+                      local.(k) <- true;
+                      local
+                    in
+                    let log = Remanent_parameters.get_logger parameter in
+                    if local_trace
+                      || Remanent_parameters.get_trace parameter
+                      || Remanent_parameters.get_dump_reachability_analysis_iteration 
+                        parameter
+                    then
+                      let error, agent_string = 
+                        try
+                          Handler.string_of_agent parameter error handler k
+                        with
+                          _ -> warn parameter error (Some "line 238") Exit 
+                            (string_of_int k)
+                      in
+                      let () = Loggers.print_newline log in
+                      let () = Loggers.fprintf log 
+                        "\t%s is an agent has been seen for the first time in the initial state"
+                        agent_string
+                      in
+                      let () = Loggers.print_newline log in
+                      let () = Loggers.print_newline log in
+                      let dynamic = set_seen_agent local dynamic in
+                      aux (k + 1) (error, dynamic)
+                    else
+                      error, dynamic
+                  end
+                else
+                  error, dynamic
             in
-            error, static
-        ) rule.Cckappa_sig.rule_lhs.Cckappa_sig.views static
+            aux agent_id (error, dynamic)
+        ) init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views dynamic
     in
-    error, static
+    error, dynamic
 
-  (* to do: collect the agent type of the agents of the species and declare
-     them seen *)
+  (************************************************************************************)
 
   let add_initial_state static dynamic error species =
     let event_list = [] in
+    let error, dynamic = init_agents static dynamic error species in
     error, dynamic, event_list
 
-  let is_enabled static dynamic error rule_id precondition =
-    (* TO DO, check that the type of each agent in the lhs has been already seen
-       forall to test
-    *)
-    error, dynamic, Some precondition
+  (************************************************************************************)
+  (** check that the type of each agent in the lhs has been already seen
+      forall to test *)
 
-  let apply_rule static dynamic error rule_id precondition =
-    (*TO DO: fold list of creation each time update the array when agent is
+  let is_enabled static dynamic error rule_id precondition =
+    let parameter   = get_parameter static in
+    let agents_test = get_agents_test static in
+    let local       = get_seen_agent dynamic in
+    let size = Array.length local in
+    let error, l =
+      match Agents_domain_test.Int2Map_Agent.Map.find_option_without_logs parameter error
+        rule_id agents_test
+      with
+      | error, None -> error, []
+      | error, Some l -> error, l
+    in
+    List.fold_left (fun (error, dynamic, _) agent_id ->
+      let size = Array.length local in
+      let rec aux k (error, dynamic, op) =
+        if k = size then (error, dynamic, op)
+        else
+          let bool = Array.get local k in
+          if bool
+          then
+            (*agent_id test that is not seen, update to seen*)
+            let local =
+              local.(k) <- true;
+              local
+            in
+            let dynamic = set_seen_agent local dynamic in
+            aux (k + 1) (error, dynamic, Some precondition)         
+          else
+            error, dynamic, None
+      in aux agent_id (error, dynamic, None)
+    ) (error, dynamic, None) l
+
+  (************************************************************************************)
+  (** fold a list of creation each time update the array when agent is
       seen for the first time, add list of rule inside event list that
       contain the list of rules in the lhs.  a map from agent to
       rule. event_list need to be updated, add rules that this agents
       apply. *)
-    let event_list = [] in
-    error, dynamic, event_list
 
+  let apply_rule static dynamic error rule_id precondition =
+    let parameter = get_parameter static in
+    let kappa_handler = get_kappa_handler static in
+    let agents_created = get_agents_created static in
+    let error, l =
+      match Agents_domain_test.Int2Map_Agent.Map.find_option_without_logs
+        parameter error rule_id agents_created
+      with
+      | error, None -> error, []
+      | error, Some l -> error, l
+    in
+    let dynamic =
+      List.fold_left (fun dynamic agent_id ->
+        (*update array when agent is seen for the first time*)
+        let local = get_seen_agent dynamic in
+        let size = Array.length local in
+        let rec aux k dynamic =
+          if k = size then dynamic
+          else
+            let bool = Array.get local k in
+            if bool
+            then
+              (*if agent is seen for the first time, update*)
+              let local =
+                local.(k) <- true;
+                local
+              in
+              let dynamic = set_seen_agent local dynamic in
+              aux (k +1) dynamic
+            else
+              dynamic
+        in
+        aux agent_id dynamic
+      ) dynamic l
+    in
+    (*add a list of rules inside event list that contain the list of rules in the lhs*)
+    (*let agents_rule = get_agents_test_rule static in
+    let event_list =
+      Agents_domain_test.Int2Map_Agent.Map.fold 
+        (fun agent_id l event_list ->
+          let event_list =
+            List.fold_left (fun event_list rule_id' ->
+              if rule_id = rule_id'
+              then
+                (Analyzer_headers.Check_rule rule_id) :: event_list
+              else
+                event_list
+            ) event_list l
+          in
+          event_list
+        ) agents_rule []
+    in*)
+    error, dynamic, []
+
+  (************************************************************************************)
   (* events enable communication between domains. At this moment, the
      global domain does not collect information *)
 
@@ -226,8 +327,62 @@ struct
 
   (**************************************************************************)
 
+  let print_dead_agent static dynamic error =
+    let parameter = get_parameter static in
+    let local = get_seen_agent dynamic in
+    let handler = get_kappa_handler static in
+    if Remanent_parameters.get_dump_reachability_analysis_result parameter
+    then
+      let parameter = Remanent_parameters.update_prefix parameter "" in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+      let () = 
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "------------------------------------------------------------"
+      in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+      let () =
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "* Dead agent :"
+      in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+      let () =
+        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+          "------------------------------------------------------------" 
+      in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+      let size = Array.length local in
+      let rec aux k error =
+        if k = size then error
+        else
+	  let bool = Array.get local k in
+	  let error =
+	    if bool
+	    then
+	      error
+	    else
+	      let error', agent_string =
+                try
+                  Handler.string_of_agent parameter error handler k
+                with
+                  _ -> warn parameter error (Some "line 238") Exit (string_of_int k)
+	      in
+	      let error =
+                Exception.check warn parameter error error' (Some "line 234") Exit
+              in
+              let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                "%s is a dead agent." agent_string
+	      in
+	      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
+	      error
+	  in aux (k+1) error
+      in aux 0 error
+    else
+      error
+
   let print static dynamic error loggers =
-    (* TO DO: as in dead rules. dead agents *)
+    let error =
+      print_dead_agent static dynamic error
+    in
     error, dynamic, ()
 
 end

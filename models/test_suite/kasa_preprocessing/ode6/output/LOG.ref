@@ -829,6 +829,14 @@ rule 3: r3 will never be applied.
 rule 4: r4 will never be applied.
 
 ------------------------------------------------------------
+* Dead agent :
+------------------------------------------------------------
+ab is a dead agent.
+Sh is a dead agent.
+R is a dead agent.
+E is a dead agent.
+
+------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
 

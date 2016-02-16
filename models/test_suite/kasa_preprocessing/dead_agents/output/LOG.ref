@@ -1082,6 +1082,9 @@ EXTENSIONAL DESCRIPTION:
 The internal state of site x in agent B ranges over u and p.
 
 Reachability analysis...
+
+	A is an agent has been seen for the first time in the initial state
+
 	Views in initial state
 
 
@@ -1143,138 +1146,57 @@ EXTENSIONAL DESCRIPTION:
 		the predcondition is not satsified yet
 
 	Applying rule 3:
-		the predcondition is satisfied
-
-		rule 3 is applied for the first time
-
-		Updating the views for A(x~,x!)
-			
-
-
-INTENSIONAL DESCRIPTION:
-Id=15
- Node(site_type:1<2)
-  Id=0
-   Leaf False 
-
-  Id=14
-   Node(site_type:1<3)
-    Id=5
-     Node(site_type:2<0)
-      Id=0
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-	A(x~p,x!free)
-	Wake-up rules
+		the predcondition is not satsified yet
 
 	Applying rule 4:
-		the predcondition is satisfied
-
-		rule 4 is applied for the first time
-
-		Updating the views for A(x~,x!)
+		the predcondition is not satsified yet
 
 	Applying rule 5:
-		the predcondition is satisfied
-
-		rule 5 is applied for the first time
-
-		Updating the views for A(x~,x!)
+		the predcondition is not satsified yet
 
 	Applying rule 6:
-		the predcondition is satisfied
-
-		rule 6 is applied for the first time
-
-		Updating the views for A(x~,x!)
+		the predcondition is not satsified yet
 
 	Applying rule 7:
-		the predcondition is satisfied
-
-		rule 7 is applied for the first time
-
-		Updating the views for A(x~,x!)
+		the predcondition is not satsified yet
 
 	Applying rule 1:
-		the predcondition is satisfied
-
-		rule 1 is applied for the first time
-
-		Updating the views for B(x~)
-			
-
-
-INTENSIONAL DESCRIPTION:
-Id=9
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=8
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-	B(x~p)
-	Wake-up rules
+		the predcondition is not satsified yet
 
 	Applying rule 2:
-		the predcondition is satisfied
-
-		rule 2 is applied for the first time
-
-		Updating the views for B(x~)
-
-	Applying rule 0:
 		the predcondition is not satsified yet
-
-	Applying rule 3:
-		the predcondition is satisfied
-		Updating the views for A(x~,x!)
-
-	Applying rule 8:
-		the predcondition is not satsified yet
-
-	Applying rule 9:
-		the predcondition is not satsified yet
-
-	Applying rule 1:
-		the predcondition is satisfied
-		Updating the views for B(x~)
 
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------
 rule 0 will never be applied.
+rule 1 will never be applied.
+rule 2 will never be applied.
+rule 3 will never be applied.
+rule 4 will never be applied.
+rule 5 will never be applied.
+rule 6 will never be applied.
+rule 7 will never be applied.
 rule 8 will never be applied.
 rule 9 will never be applied.
+
+------------------------------------------------------------
+* Dead agent :
+------------------------------------------------------------
+B is a dead agent.
+D is a dead agent.
+E is a dead agent.
 
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=17
+Id=7
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=16
+  Id=6
    Node(site_type:1<1)
     Id=5
      Node(site_type:2<0)
@@ -1289,37 +1211,17 @@ Id=17
         Id=0
          Leaf False 
 
-    Id=15
-     Node(site_type:1<2)
-      Id=0
-       Leaf False 
-
-      Id=14
-       Node(site_type:1<3)
-        Id=5
-         Node(site_type:2<0)
-          Id=0
-           Leaf False 
-
-          Id=4
-           Node(site_type:2<1)
-            Id=1
-             Leaf True 
-
-            Id=0
-             Leaf False 
-
-        Id=0
-         Leaf False 
+    Id=0
+     Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=18
+Id=3
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=8
-   Node(site_type:1<2)
+  Id=2
+   Node(site_type:1<1)
     Id=1
      Leaf True 
 
@@ -1346,38 +1248,28 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=24
+Id=28
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=23
+  Id=27
    Node(site_type:0<1)
     Id=1
      Leaf True 
 
-    Id=22
-     Node(site_type:0<2)
-      Id=0
-       Leaf False 
-
-      Id=21
-       Node(site_type:0<3)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
+    Id=0
+     Leaf False 
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=26
+Id=28
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=25
-   Node(site_type:0<2)
+  Id=27
+   Node(site_type:0<1)
     Id=1
      Leaf True 
 
@@ -1406,39 +1298,13 @@ Id=3
 EXTENSIONAL DESCRIPTION:
 The binding state of site x in agent A is always free.
 INTENSIONAL DESCRIPTION:
-Id=24
+Id=28
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=23
+  Id=27
    Node(site_type:0<1)
-    Id=1
-     Leaf True 
-
-    Id=22
-     Node(site_type:0<2)
-      Id=0
-       Leaf False 
-
-      Id=21
-       Node(site_type:0<3)
-        Id=1
-         Leaf True 
-
-        Id=0
-         Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent A ranges over u and p.
-INTENSIONAL DESCRIPTION:
-Id=26
- Node(site_type:0<0)
-  Id=0
-   Leaf False 
-
-  Id=25
-   Node(site_type:0<2)
     Id=1
      Leaf True 
 
@@ -1446,5 +1312,26 @@ Id=26
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent B ranges over u and p.
-execution finished without any exception
+The internal state of site x in agent A is always u.
+INTENSIONAL DESCRIPTION:
+Id=28
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=27
+   Node(site_type:0<1)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+The internal state of site x in agent B is always u.
+Some exceptions have been raisederror: file_name: Rule domain; message: line 49; exception:Exit
+error: file_name: Rule domain; message: line 49; exception:Exit
+error: file_name: Rule domain; message: line 49; exception:Exit
+error: file_name: Rule domain; message: line 49; exception:Exit
+error: file_name: Rule domain; message: line 49; exception:Exit
+error: file_name: Rule domain; message: line 49; exception:Exit

@@ -884,6 +884,9 @@ EXTENSIONAL DESCRIPTION:
 The internal state of site x in agent B ranges over u and p.
 
 Reachability analysis...
+
+	A is an agent has been seen for the first time in the initial state
+
 	Views in initial state
 
 
@@ -926,144 +929,65 @@ EXTENSIONAL DESCRIPTION:
 	Wake-up rules
 
 	Applying rule 8:
-		the predcondition is satisfied
-
-		rule 8 is applied for the first time
-
+		the predcondition is not satsified yet
 
 	Applying rule 9:
-		the predcondition is satisfied
-
-		rule 9 is applied for the first time
-
+		the predcondition is not satsified yet
 
 	Applying rule 0:
-		the predcondition is satisfied
-
-		rule 0 is applied for the first time
-
-		Updating the views for A(x~)
-		Updating the views for B(x~)
-			
-
-
-INTENSIONAL DESCRIPTION:
-Id=5
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=4
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-	B(x~p)
-	Wake-up rules
+		the predcondition is not satsified yet
 
 	Applying rule 3:
-		the predcondition is satisfied
-
-		rule 3 is applied for the first time
-
-		Updating the views for A(x~)
-			
-
-
-INTENSIONAL DESCRIPTION:
-Id=5
- Node(site_type:1<1)
-  Id=0
-   Leaf False 
-
-  Id=4
-   Node(site_type:1<2)
-    Id=1
-     Leaf True 
-
-    Id=0
-     Leaf False 
-
-EXTENSIONAL DESCRIPTION:
-	A(x~p)
-	Wake-up rules
+		the predcondition is not satsified yet
 
 	Applying rule 4:
-		the predcondition is satisfied
-
-		rule 4 is applied for the first time
-
-		Updating the views for A(x~)
+		the predcondition is not satsified yet
 
 	Applying rule 5:
-		the predcondition is satisfied
-
-		rule 5 is applied for the first time
-
-		Updating the views for A(x~)
+		the predcondition is not satsified yet
 
 	Applying rule 6:
-		the predcondition is satisfied
-
-		rule 6 is applied for the first time
-
-		Updating the views for A(x~)
+		the predcondition is not satsified yet
 
 	Applying rule 7:
-		the predcondition is satisfied
-
-		rule 7 is applied for the first time
-
-		Updating the views for A(x~)
+		the predcondition is not satsified yet
 
 	Applying rule 1:
-		the predcondition is satisfied
-
-		rule 1 is applied for the first time
-
-		Updating the views for B(x~)
+		the predcondition is not satsified yet
 
 	Applying rule 2:
-		the predcondition is satisfied
-
-		rule 2 is applied for the first time
-
-		Updating the views for B(x~)
-
-	Applying rule 0:
-		the predcondition is satisfied
-		Updating the views for A(x~)
-		Updating the views for B(x~)
-
-	Applying rule 3:
-		the predcondition is satisfied
-		Updating the views for A(x~)
-
-	Applying rule 8:
-		the predcondition is satisfied
-
-	Applying rule 9:
-		the predcondition is satisfied
+		the predcondition is not satsified yet
 
 ------------------------------------------------------------
 * Dead rule :
 ------------------------------------------------------------
+rule 0 will never be applied.
+rule 1 will never be applied.
+rule 2 will never be applied.
+rule 3 will never be applied.
+rule 4 will never be applied.
+rule 5 will never be applied.
+rule 6 will never be applied.
+rule 7 will never be applied.
+rule 8 will never be applied.
+rule 9 will never be applied.
+
+------------------------------------------------------------
+* Dead agent :
+------------------------------------------------------------
+B is a dead agent.
 
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=6
+Id=3
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=4
-   Node(site_type:1<2)
+  Id=2
+   Node(site_type:1<1)
     Id=1
      Leaf True 
 
@@ -1071,13 +995,13 @@ Id=6
      Leaf False 
 
 agent_type:1:B:cv_id:0
-Id=6
+Id=3
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=4
-   Node(site_type:1<2)
+  Id=2
+   Node(site_type:1<1)
     Id=1
      Leaf True 
 
@@ -1089,13 +1013,13 @@ Id=6
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=8
+Id=10
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=7
-   Node(site_type:0<2)
+  Id=9
+   Node(site_type:0<1)
     Id=1
      Leaf True 
 
@@ -1104,13 +1028,13 @@ Id=8
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=8
+Id=10
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=7
-   Node(site_type:0<2)
+  Id=9
+   Node(site_type:0<1)
     Id=1
      Leaf True 
 
@@ -1123,13 +1047,13 @@ EXTENSIONAL DESCRIPTION:
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=8
+Id=10
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=7
-   Node(site_type:0<2)
+  Id=9
+   Node(site_type:0<1)
     Id=1
      Leaf True 
 
@@ -1137,15 +1061,15 @@ Id=8
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent A ranges over u and p.
+The internal state of site x in agent A is always u.
 INTENSIONAL DESCRIPTION:
-Id=8
+Id=10
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=7
-   Node(site_type:0<2)
+  Id=9
+   Node(site_type:0<1)
     Id=1
      Leaf True 
 
@@ -1153,5 +1077,8 @@ Id=8
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent B ranges over u and p.
-execution finished without any exception
+The internal state of site x in agent B is always u.
+Some exceptions have been raisederror: file_name: Rule domain; message: line 49; exception:Exit
+error: file_name: Rule domain; message: line 49; exception:Exit
+error: file_name: Rule domain; message: line 49; exception:Exit
+error: file_name: Rule domain; message: line 49; exception:Exit
