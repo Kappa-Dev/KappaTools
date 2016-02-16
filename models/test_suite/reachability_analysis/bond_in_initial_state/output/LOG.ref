@@ -98,12 +98,6 @@ The internal state of site x in agent B ranges over u and p.
 The binding state of site x in agent B ranges over free and A@x.
 
 Reachability analysis...
-
-	A is an agent has been seen for the first time in the initial state
-
-
-	B is an agent has been seen for the first time in the initial state
-
 	Views in initial state
 
 

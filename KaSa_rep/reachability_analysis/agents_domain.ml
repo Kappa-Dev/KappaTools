@@ -74,10 +74,6 @@ struct
     let domain = get_domain_static_information static in
     domain.Agents_domain_test.agents_created
 
-  let get_agents_test_rule static =
-    let domain = get_domain_static_information static in
-    domain.Agents_domain_test.agents_test_rule
-
   (*--------------------------------------------------------------------*)
   (** global static/dynamic information*)
 
@@ -155,7 +151,6 @@ struct
 
   let init_agents static dynamic error init_state =
     let parameter = get_parameter static in
-    let handler = get_kappa_handler static in
     let error, dynamic =
       Bdu_analysis_type.AgentMap.fold parameter error
         (fun parameter error agent_id agent dynamic ->
@@ -164,50 +159,14 @@ struct
           | Cckappa_sig.Ghost -> error, dynamic
           | Cckappa_sig.Dead_agent _ -> warn parameter error (Some "line 331") Exit dynamic
           | Cckappa_sig.Agent agent ->
-             let local = get_seen_agent dynamic in (*JF: I do not understand what you do here *)
-	     (*You have to get the type of the agent and to declare it as seen *)
-	     (*Why doing a recursive loop ? *)
-            let size = Array.length local in
-            let rec aux k (error, dynamic) =
-              if k = size then (error, dynamic)
-              else
-                let bool = Array.get local agent_id in
-                if not bool
-                then
-                  begin
-                    let local = 
-                      local.(k) <- true;
-                      local
-                    in
-                    let log = Remanent_parameters.get_logger parameter in
-                    if local_trace
-                      || Remanent_parameters.get_trace parameter
-                      || Remanent_parameters.get_dump_reachability_analysis_iteration 
-                        parameter
-                    then
-                      let error, agent_string = 
-                        try
-                          Handler.string_of_agent parameter error handler k
-                        with
-                          _ -> warn parameter error (Some "line 238") Exit 
-                            (string_of_int k)
-                      in
-                      let () = Loggers.print_newline log in
-                      let () = Loggers.fprintf log 
-                        "\t%s is an agent has been seen for the first time in the initial state"
-                        agent_string
-                      in
-                      let () = Loggers.print_newline log in
-                      let () = Loggers.print_newline log in
-                      let dynamic = set_seen_agent local dynamic in
-                      aux (k + 1) (error, dynamic)
-                    else
-                      error, dynamic
-                  end
-                else
-                  error, dynamic
+            let agent_type = agent.Cckappa_sig.agent_name in
+            let local = get_seen_agent dynamic in
+            let local =
+              local.(agent_type) <- true;
+              local
             in
-            aux agent_id (error, dynamic)
+            let dynamic = set_seen_agent local dynamic in
+            error, dynamic
         ) init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views dynamic
     in
     error, dynamic
@@ -223,11 +182,18 @@ struct
   (** check that the type of each agent in the lhs has been already seen
       forall to test *)
 
+  (* JF: The fold should start with the value Some Precondition *)
+  (* If one requested agent type has not been seen, then this value
+     should be replaced with None *)
+  (* JF: agent_id test that is not seen, update to seen*)
+  (* No, the primitive is_enabled aims at checking that required
+     agent types have already been seen by the domain *)
+  (* This primitive should not change the list of the agent type
+     which have been seen*)
+
   let is_enabled static dynamic error rule_id precondition =
-    let parameter   = get_parameter static in
+    let parameter = get_parameter static in
     let agents_test = get_agents_test static in
-    let local       = get_seen_agent dynamic in
-    let size = Array.length local in
     let error, l =
       match Agents_domain_test.Int2Map_Agent.Map.find_option_without_logs parameter error
         rule_id agents_test
@@ -235,30 +201,14 @@ struct
       | error, None -> error, []
       | error, Some l -> error, l
     in
-    (* JF: The fold should start with the value Some Precondition *)
-    (* If one requested agent type has not been seen, then this value should be replaced with None *)    
-    List.fold_left (fun (error, dynamic, _) agent_id ->
-      let size = Array.length local in
-      (* JF: No need for recursion here *)
-      (* You just have to check that all agent_types in the list have already been seen *)
-      let rec aux k (error, dynamic, op) =
-        if k = size then (error, dynamic, op)
-        else
-          let bool = Array.get local k in
-          if bool
-          then
-            (* JF: agent_id test that is not seen, update to seen*)
-	    (* No, the primitive is_enabled aims at checking that required agent types have already been seen by the domain *)
-	    (* This primitive should not change the list of the agent type which have been seen*)
-	    let local =
-              local.(k) <- true;
-              local
-            in
-            let dynamic = set_seen_agent local dynamic in
-            aux (k + 1) (error, dynamic, Some precondition)         
-          else
-            error, dynamic, None
-      in aux agent_id (error, dynamic, None)
+    List.fold_left (fun (error, dynamic, _) agent_type ->
+      let local = get_seen_agent dynamic in
+      let bool = Array.get local agent_type in
+      if bool
+      then
+        error, dynamic, Some precondition
+      else
+        error, dynamic, None
     ) (error, dynamic, None) l
 
   (************************************************************************************)
@@ -268,9 +218,11 @@ struct
       rule. event_list need to be updated, add rules that this agents
       apply. *)
 
+  (*JF: just declare each agent types in that list to be seen *)
+
   let apply_rule static dynamic error rule_id precondition =
     let parameter = get_parameter static in
-    let kappa_handler = get_kappa_handler static in
+    let event_list = [] in
     let agents_created = get_agents_created static in
     let error, l =
       match Agents_domain_test.Int2Map_Agent.Map.find_option_without_logs
@@ -280,28 +232,19 @@ struct
       | error, Some l -> error, l
     in
     let dynamic =
-      List.fold_left (fun dynamic agent_id ->
-        (*update array when agent is seen for the first time*)
+      List.fold_left (fun dynamic agent_type ->
         let local = get_seen_agent dynamic in
-        let size = Array.length local in
-	(*JF: Here again, no need for recursion, just declare each agent types in that list to be seen *)
-	let rec aux k dynamic =
-          if k = size then dynamic
-          else
-            let bool = Array.get local k in
-            if bool
-            then
-              (*if agent is seen for the first time, update*)
-              let local =
-                local.(k) <- true;
-                local
-              in
-              let dynamic = set_seen_agent local dynamic in
-              aux (k +1) dynamic
-            else
-              dynamic
-        in
-        aux agent_id dynamic
+        let bool = Array.get local agent_type in
+        if not bool
+        then
+          let local =
+            local.(agent_type) <- true;
+            local
+          in
+          let dynamic = set_seen_agent local dynamic in
+          dynamic
+        else
+          dynamic
       ) dynamic l
     in
     (*add a list of rules inside event list that contain the list of rules in the lhs*)
@@ -321,7 +264,7 @@ struct
           event_list
         ) agents_rule []
     in*)
-    error, dynamic, []
+    error, dynamic, event_list
 
   (************************************************************************************)
   (* events enable communication between domains. At this moment, the
