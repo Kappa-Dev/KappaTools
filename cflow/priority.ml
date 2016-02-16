@@ -127,7 +127,7 @@ let weak =
     side_effects = High ;
     candidate_set_of_events = Wire_with_the_least_number_of_events;
     try_to_remove_first = Late_events;
-    blacklist_already_used_events = true;
+    blacklist_already_used_events = false;
   }
 
 let strong =

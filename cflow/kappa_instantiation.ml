@@ -62,6 +62,7 @@ sig
   val is_init_of_refined_step: refined_step -> bool
   val is_subs_of_refined_step: refined_step -> bool
   val is_event_of_refined_step: refined_step -> bool						  
+  val has_creation_of_refined_step: refined_step -> bool
   val simulation_info_of_refined_step:
     refined_step -> unit Mods.simulation_info option
   val print_side:
@@ -325,6 +326,7 @@ module Cflow_linker =
     | (Event (_,(_,(ac,_,_)),_) | Init ac) -> creation_of_actions fst ac
     | Obs _ | Dummy _ | Subs _ -> []
 
+  let has_creation_of_refined_step x = creation_of_event x <> []
   let build_grid list bool handler =
     let env = handler.H.env in
     let empty_set = [] in

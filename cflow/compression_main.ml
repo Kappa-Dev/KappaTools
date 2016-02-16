@@ -103,6 +103,7 @@ let compress_and_print logger env log_info step_list =
             then Debug.tag logger "+ Producing causal compressions"
             else Debug.tag logger "+ Producing causal traces"
           in
+	  let last_eid = U.last_eid_in_pretrace step_list in
 	  let error,log_info,step_list = U.split_init parameter handler log_info error step_list in 
 	  (* causal compression without any simplification (just partial order compression)*)
 	  (* this is very costly, and mainly for teaching purpose *)
@@ -283,12 +284,19 @@ let compress_and_print logger env log_info step_list =
             then 
               begin
 		let () = Format.fprintf logger "\t - weak flow compression (%i)@." n_causal_stories in 
-		let blacklist = U.create_black_list 0 (* to do: compute the index of the last event in the whole causal trace *) in
+		let blacklist = U.create_black_list (last_eid+1) in
 		let parameter = S.PH.B.PB.CI.Po.K.H.set_compression_weak parameter in
 		let error,log_info,(black_list,weakly_story_table) = 
 		  U.fold_story_table_with_progress_bar parameter handler log_info error "weak compression" 
 						       (fun parameter ?(shall_we_compute=always) ?(shall_we_compute_profiling_information=always) handler log_info error trace list_info (black_list,story_list) ->
-							let error,log_info,trace = U.remove_blacklisted_event parameter handler log_info error black_list trace in
+							let error,log_info,trace =
+							  if
+							    Priority.weak.Priority.blacklist_already_used_events
+							  then
+							    U.remove_blacklisted_event parameter handler log_info error black_list trace
+							  else
+							    error,log_info,trace
+							in
 							let error,log_info,list = U.weakly_compress parameter handler log_info error trace in 
 							let error,log_info,black_list,story_list =
 							  List.fold_left
@@ -296,7 +304,7 @@ let compress_and_print logger env log_info step_list =
 							     let error,log_info,story_list = U.store_trace parameter handler log_info error trace list_info story_list in
 							     let error,log_info,black_list =
 							       if
-								 false (* to do, check the field in the struct priority *)
+								 Priority.weak.Priority.blacklist_already_used_events
 							       then
 								 U.black_list parameter handler log_info error trace black_list
 							       else

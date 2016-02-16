@@ -60,6 +60,8 @@ type trace_runtime_info = profiling_info Mods.simulation_info
 
 val size_of_pretrace: trace -> int
 
+val last_eid_in_pretrace: trace -> int
+				     
 val print_trace: parameter -> kappa_handler -> trace -> unit
 
 (** check wether there is an observable in a trace *)

@@ -60,6 +60,7 @@ let (we_shall_not:shall_we) = (fun _ -> false)
 
 let get_pretrace_of_trace trace = trace.pretrace
 let size_of_pretrace trace = List.length (get_pretrace_of_trace trace)
+
 let may_initial_sites_be_ambiguous trace = trace.with_potential_ambiguity
 let set_ambiguity_level trace x = {trace with with_potential_ambiguity=x}
 let set_pretrace trace x = {trace with pretrace = x}
@@ -777,10 +778,12 @@ module Event =
     type 'a t = 'a array
 
     let key_of_event event =
-      match
-	event
-      with
-      | _ -> None
+      if
+	S.PH.B.PB.CI.Po.K.is_event_of_refined_step event && not (S.PH.B.PB.CI.Po.K.has_creation_of_refined_step event)
+      then
+	get_id_of_event event
+      else
+	None
 
     let init eid default = Array.make eid default
     let set t eid value =
@@ -800,12 +803,7 @@ let black_list parameter ?(shall_we_compute=we_shall) ?(shall_we_compute_profili
   let blacklist =
     List.fold_left
       (fun blacklist (event,_) ->
-       if
-	 false
-       then
-	 BlackList.black_list event blacklist
-       else
-	 blacklist)
+	 BlackList.black_list event blacklist)
       blacklist
       (get_compressed_trace trace)
   in
@@ -833,3 +831,20 @@ let remove_blacklisted_event parameter ?(shall_we_compute=we_shall) ?(shall_we_c
     Do_not_care
     Neutral
     parameter handler log_info error trace
+
+let last_eid_in_pretrace trace =
+  let l = List.rev (get_pretrace_of_trace trace) in
+  let rec aux list =
+    match
+      l
+    with
+    | [] -> 0
+    | h::t ->
+       begin
+	 match
+	   get_id_of_event h
+	 with
+	 | None -> aux t
+	 | Some eid -> eid
+       end
+  in aux l
