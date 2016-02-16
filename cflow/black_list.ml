@@ -42,7 +42,7 @@ module type Blacklist =
 
 module Make =
   functor (Event:Event) ->
-    (struct
+    struct
       module Event = Event
       type t = bool Event.t
       let init n = Event.init n false
@@ -63,4 +63,4 @@ module Make =
 	| None -> false
 	| Some eid -> Event.get t eid
 
-     end)
+     end

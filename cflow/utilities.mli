@@ -29,7 +29,6 @@ val error_init: error_log
 type parameter = S.PH.B.PB.CI.Po.K.H.parameter
 type kappa_handler = S.PH.B.PB.CI.Po.K.H.handler
 type profiling_info = StoryProfiling.StoryStats.log_info
-
 type shall_we = (parameter -> bool)
 
 (** enriched types for functions: *)
@@ -129,6 +128,12 @@ val fold_over_the_causal_past_of_observables_with_a_progress_bar:
    (trace,trace_runtime_info list,'a,('a,'b) Stop.stop) ternary,
    trace,'a,('a,'b*int) Stop.stop) sexternary
 
+type black_list				   
+val create_black_list: int -> black_list
+val black_list: (trace,black_list,black_list) binary
+val remove_blacklisted_event: (black_list,trace,trace) binary
+									
+				   
 (** Story table *)
 type story_table
 

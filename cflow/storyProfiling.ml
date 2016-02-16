@@ -46,6 +46,8 @@ type step_kind =
   | Graph_conversion
   | Cannonic_form_computation
   | Store_trace
+  | Removing_blacklisted_events
+  | Blacklisting_events
 
 let string_of_step_kind x =
   match
@@ -73,6 +75,8 @@ let string_of_step_kind x =
     | Graph_conversion -> "Graph conversion"
     | Cannonic_form_computation -> "Computing the cannonic form"
     | Store_trace -> "Store trace"
+    | Removing_blacklisted_events -> "Removing black-listed events"
+    | Blacklisting_events -> "Blaklisting events"
 
 let print_step_kind parameters x =
   Loggers.print_cell (Remanent_parameters.get_profiler parameters)

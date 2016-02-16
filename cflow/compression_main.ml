@@ -169,7 +169,6 @@ let compress_and_print logger env log_info step_list =
 		      ?(shall_we_compute=always) 
 		      ?(shall_we_compute_profiling_information=always) 
 		      handler log_info error story_list observable_id -> 
-		   (*		    let log_info = S.PH.B.PB.CI.Po.K.P.reset_log log_info in *)
 		    let () = 
                       if debug_mode
                       then 
@@ -254,12 +253,10 @@ let compress_and_print logger env log_info step_list =
 		Utilities_expert.fold_over_the_causal_past_of_observables_with_a_progress_bar_while_reshaking_the_trace
 		  parameter ~shall_we_compute:always ~shall_we_compute_profiling_information:always 
 		  handler log_info error
-		  always never		  
+		  always never
 		  Utilities_expert.parameters
 		  aux
-		  (fun
-		      parameter  (*?(shall_we_compute=always) ?(shall_we_compute_profiling_information=always)*)
-		      handler log_info error trace  -> 
+		  (fun parameter handler log_info error trace  ->
 		   (* we remove pseudo inverse events *)
 		   let error,log_info,trace = 
                      U.remove_pseudo_inverse_events (do_not_log parameter)  ~shall_we_compute:always ~shall_we_compute_profiling_information:always handler log_info error trace
@@ -286,20 +283,31 @@ let compress_and_print logger env log_info step_list =
             then 
               begin
 		let () = Format.fprintf logger "\t - weak flow compression (%i)@." n_causal_stories in 
-		let parameter = S.PH.B.PB.CI.Po.K.H.set_compression_weak parameter in 
-		let error,log_info,weakly_story_table = 
+		let blacklist = U.create_black_list 0 (* to do: compute the index of the last event in the whole causal trace *) in
+		let parameter = S.PH.B.PB.CI.Po.K.H.set_compression_weak parameter in
+		let error,log_info,(black_list,weakly_story_table) = 
 		  U.fold_story_table_with_progress_bar parameter handler log_info error "weak compression" 
-						       (fun parameter ?(shall_we_compute=always) ?(shall_we_compute_profiling_information=always) handler log_info error trace list_info story_list ->
+						       (fun parameter ?(shall_we_compute=always) ?(shall_we_compute_profiling_information=always) handler log_info error trace list_info (black_list,story_list) ->
+							let error,log_info,trace = U.remove_blacklisted_event parameter handler log_info error black_list trace in
 							let error,log_info,list = U.weakly_compress parameter handler log_info error trace in 
-							let error,log_info,story_list =
+							let error,log_info,black_list,story_list =
 							  List.fold_left
-							    (fun (error,log_info,story_list) trace -> 
-							     U.store_trace parameter handler log_info error trace list_info story_list)
-							    (error,log_info,story_list)
+							    (fun (error,log_info,black_list,story_list) trace ->
+							     let error,log_info,story_list = U.store_trace parameter handler log_info error trace list_info story_list in
+							     let error,log_info,black_list =
+							       if
+								 false (* to do, check the field in the struct priority *)
+							       then
+								 U.black_list parameter handler log_info error trace black_list
+							       else
+								 error, log_info, black_list
+							     in
+							     error,log_info,black_list,story_list)
+							    (error,log_info,black_list,story_list)
 							    list
-							in error,log_info,story_list)
+							in error,log_info,(black_list,story_list))
 						       causal_story_table 
-						       table3
+						       (blacklist,table3)
 		in 
 		U.flatten_story_table parameter handler log_info error weakly_story_table
 	      end

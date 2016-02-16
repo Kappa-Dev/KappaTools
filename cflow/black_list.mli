@@ -42,4 +42,4 @@ module type Blacklist =
   end
 
 module Make:
-  functor (Event:Event) -> Blacklist
+  functor (Event:Event) -> (Blacklist with type Event.event = Event.event)

@@ -255,7 +255,7 @@ let cut =
 let remove_obs_before parameter handler log_info error last_eid trace =
    error,log_info,
    (let _ = Printf.fprintf stdout "last eid %i \n" last_eid in
-    let rec aux l score output =
+     let rec aux l score output =
      match l with
        [] -> List.rev output,score
      | t::q ->
@@ -769,3 +769,67 @@ let compute_canonical_form  parameter ?(shall_we_compute=we_shall) ?(shall_we_co
   let error, log_info, graph = Dag.graph_of_grid parameter handler log_info error grid in
   let error, log_info, canonic = Dag.canonicalize parameter handler log_info error graph in
   (error:error_log),(log_info:profiling_info),(canonic:canonical_form)
+
+module Event =
+  (struct
+    type event = step
+    type eid = int
+    type 'a t = 'a array
+
+    let key_of_event event =
+      match
+	event
+      with
+      | _ -> None
+
+    let init eid default = Array.make eid default
+    let set t eid value =
+      let () = Array.set t eid value in
+      t
+	
+    let get t eid = Array.get t eid
+  end: Black_list.Event with type event = step)
+
+module BlackList =
+  (Black_list.Make((Event: Black_list.Event with type event = step)): Black_list.Blacklist with type Event.event = step)
+type black_list = BlackList.t
+
+let create_black_list n = BlackList.init n
+					
+let black_list parameter ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall) handler log_info error trace blacklist =
+  let blacklist =
+    List.fold_left
+      (fun blacklist (event,_) ->
+       if
+	 false
+       then
+	 BlackList.black_list event blacklist
+       else
+	 blacklist)
+      blacklist
+      (get_compressed_trace trace)
+  in
+  error, log_info, blacklist
+
+let remove_blacklisted_event handler log_info error blacklist trace =
+  let list,int =
+    List.fold_left
+       (fun (trace,int) event ->
+	if BlackList.is_black_listed event blacklist
+	then (trace,succ int)
+	else (event::trace,int))
+       ([],0)
+       trace
+  in
+  error, log_info, ((List.rev list), int)
+
+let remove_blacklisted_event parameter ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall) handler log_info error blacklist trace =
+  lift_to_care_about_ambiguities
+    (transform_trace_gen
+       (fun parameter handler log_info error -> remove_blacklisted_event handler log_info error blacklist)
+       None
+       ""
+       StoryProfiling.Removing_blacklisted_events)
+    Do_not_care
+    Neutral
+    parameter handler log_info error trace
