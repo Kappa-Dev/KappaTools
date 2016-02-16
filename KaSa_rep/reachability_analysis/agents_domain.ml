@@ -247,7 +247,8 @@ struct
           dynamic
       ) dynamic l
     in
-    (*add a list of rules inside event list that contain the list of rules in the lhs*)
+    (*JF:  Here, you should add in the event list, each rule that test for an agent with a type among the ones you have 
+newly see, and with an empty interface (no test) *)
     (*let agents_rule = get_agents_test_rule static in
     let event_list =
       Agents_domain_test.Int2Map_Agent.Map.fold 
@@ -294,7 +295,7 @@ struct
       let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
       let () =
         Loggers.fprintf (Remanent_parameters.get_logger parameter)
-          "* Dead agent :"
+          "* Dead agents :"
       in
       let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
       let () =

@@ -419,7 +419,7 @@ let print_result_dead_rule parameter error handler compiled result =
     let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
     let () =
       Loggers.fprintf (Remanent_parameters.get_logger parameter)
-        "* Dead rule :"
+        "* Dead rules :"
     in
     let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
     let () =
