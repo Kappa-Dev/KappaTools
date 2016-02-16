@@ -67,8 +67,6 @@ let collect_agents_test parameter error rule_id rule store_result =
   in
   error, store_result
 
-(*a map from agent_id to rule_id*)
-
 let collect_agents_created parameter error rule_id rule store_result =
   let error, store_result =
     List.fold_left (fun (error, store_result) (agent_id, agent_type) ->

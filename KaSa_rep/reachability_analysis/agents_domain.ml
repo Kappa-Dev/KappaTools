@@ -231,8 +231,8 @@ struct
       | error, None -> error, []
       | error, Some l -> error, l
     in
-    let dynamic =
-      List.fold_left (fun dynamic agent_type ->
+    let dynamic, event_list =
+      List.fold_left (fun (dynamic, event_list) agent_type ->
         let local = get_seen_agent dynamic in
         let bool = Array.get local agent_type in
         if not bool
@@ -242,28 +242,36 @@ struct
             local
           in
           let dynamic = set_seen_agent local dynamic in
-          dynamic
-        else
-          dynamic
-      ) dynamic l
-    in
-    (*JF:  Here, you should add in the event list, each rule that test for an agent with a type among the ones you have 
-newly see, and with an empty interface (no test) *)
-    (*let agents_rule = get_agents_test_rule static in
-    let event_list =
-      Agents_domain_test.Int2Map_Agent.Map.fold 
-        (fun agent_id l event_list ->
           let event_list =
-            List.fold_left (fun event_list rule_id' ->
-              if rule_id = rule_id'
-              then
-                (Analyzer_headers.Check_rule rule_id) :: event_list
-              else
-                event_list
-            ) event_list l
+            Analyzer_headers.Check_rule rule_id :: event_list
           in
+          dynamic, event_list
+        else
+          dynamic, event_list
+      ) (dynamic, event_list) l
+    in
+    (*JF: Here, you should add in the event list, each rule that test for
+      an agent with a type among the ones you have newly see, and with an empty
+      interface (no test) *)
+    (*let agents_test = get_agents_test static in
+    let error, list =
+      match Agents_domain_test.Int2Map_Agent.Map.find_option_without_logs
+        parameter error rule_id agents_test
+      with
+      | error, None -> error, []
+      | error, Some l -> error, l
+    in
+    let local = get_seen_agent dynamic in
+    let event_list =
+      List.fold_left (fun event_list agent_type ->
+        let bool = Array.get local agent_type in
+        if bool
+        then
+        (*seen*)
+          Analyzer_headers.Check_rule rule_id :: event_list
+        else
           event_list
-        ) agents_rule []
+      ) event_list list
     in*)
     error, dynamic, event_list
 

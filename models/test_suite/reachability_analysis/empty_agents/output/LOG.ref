@@ -502,6 +502,17 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 4:
 		the predcondition is not satsified yet
 
+	Applying rule 0:
+		the predcondition is satisfied
+
+	Applying rule 1:
+		the predcondition is satisfied
+		Updating the views for A()
+
+	Applying rule 2:
+		the predcondition is satisfied
+		Updating the views for B()
+
 	Applying rule 3:
 		the predcondition is satisfied
 		Updating the views for C()
