@@ -314,7 +314,7 @@ agent_type_     Leaf False
 		the predcondition is not satisfied yet
 
 ------------------------------------------------------------
-* Dead rule :
+* Dead rules :
 ------------------------------------------------------------
 rule 0 will never be applied.
 rule 1 will never be applied.
@@ -339,7 +339,7 @@ Reachability analysis...
 		the predcondition is not satsified yet
 
 ------------------------------------------------------------
-* Dead rule :
+* Dead rules :
 ------------------------------------------------------------
 rule 0 will never be applied.
 rule 1 will never be applied.
@@ -347,7 +347,7 @@ rule 2 will never be applied.
 rule 3 will never be applied.
 
 ------------------------------------------------------------
-* Dead agent :
+* Dead agents :
 ------------------------------------------------------------
 A is a dead agent.
 B is a dead agent.

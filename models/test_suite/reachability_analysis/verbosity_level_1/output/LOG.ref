@@ -7,7 +7,7 @@ Refining the influence map...
 Reachability analysis...
 
 ------------------------------------------------------------
-* Dead rule :
+* Dead rules :
 ------------------------------------------------------------
 rule 7: KO will never be applied.
 
@@ -33,12 +33,12 @@ The internal state of site x in agent A ranges over u, p, 0, and q.
 Reachability analysis...
 
 ------------------------------------------------------------
-* Dead rule :
+* Dead rules :
 ------------------------------------------------------------
 rule 7: KO will never be applied.
 
 ------------------------------------------------------------
-* Dead agent :
+* Dead agents :
 ------------------------------------------------------------
 
 ------------------------------------------------------------

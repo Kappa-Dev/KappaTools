@@ -335,7 +335,7 @@ agent_type_ Leaf True
 		Updating the views for C()
 
 ------------------------------------------------------------
-* Dead rule :
+* Dead rules :
 ------------------------------------------------------------
 rule 4 will never be applied.
 
@@ -507,12 +507,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for C()
 
 ------------------------------------------------------------
-* Dead rule :
+* Dead rules :
 ------------------------------------------------------------
 rule 4 will never be applied.
 
 ------------------------------------------------------------
-* Dead agent :
+* Dead agents :
 ------------------------------------------------------------
 E is a dead agent.
 F is a dead agent.

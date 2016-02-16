@@ -252,7 +252,7 @@ agent_type_     Leaf False
 	Wake-up rules
 
 ------------------------------------------------------------
-* Dead rule :
+* Dead rules :
 ------------------------------------------------------------
 rule 0: veryveryveryveryverylonglonglonglabel will never be applied.
 rule 1: otherotherveryveryveryverylonglabel will never be applied.
@@ -274,7 +274,7 @@ rule 3: \0 will never be applied.
 Reachability analysis...
 
 ------------------------------------------------------------
-* Dead rule :
+* Dead rules :
 ------------------------------------------------------------
 rule 0: veryveryveryveryverylonglonglonglabel will never be applied.
 rule 1: otherotherveryveryveryverylonglabel will never be applied.
@@ -282,7 +282,7 @@ rule 2: "0 will never be applied.
 rule 3: \0 will never be applied.
 
 ------------------------------------------------------------
-* Dead agent :
+* Dead agents :
 ------------------------------------------------------------
 A is a dead agent.
 

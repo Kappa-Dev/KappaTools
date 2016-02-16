@@ -892,7 +892,7 @@ agent_type_ Leaf True
 		Updating the views for B(x~)
 
 ------------------------------------------------------------
-* Dead rule :
+* Dead rules :
 ------------------------------------------------------------
 rule 0 will never be applied.
 rule 8 will never be applied.
@@ -1259,14 +1259,14 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(x~)
 
 ------------------------------------------------------------
-* Dead rule :
+* Dead rules :
 ------------------------------------------------------------
 rule 0 will never be applied.
 rule 8 will never be applied.
 rule 9 will never be applied.
 
 ------------------------------------------------------------
-* Dead agent :
+* Dead agents :
 ------------------------------------------------------------
 D is a dead agent.
 E is a dead agent.

@@ -811,7 +811,7 @@ agent_type_     Leaf False
 		the precondition is satisfied
 
 ------------------------------------------------------------
-* Dead rule :
+* Dead rules :
 ------------------------------------------------------------
 rule 0: r0 will never be applied.
 rule 2: r2 will never be applied.
@@ -1114,7 +1114,7 @@ EXTENSIONAL DESCRIPTION:
 		the predcondition is satisfied
 
 ------------------------------------------------------------
-* Dead rule :
+* Dead rules :
 ------------------------------------------------------------
 rule 0: r0 will never be applied.
 rule 2: r2 will never be applied.
@@ -1125,7 +1125,7 @@ rule 7: r7 will never be applied.
 rule 8: r8 will never be applied.
 
 ------------------------------------------------------------
-* Dead agent :
+* Dead agents :
 ------------------------------------------------------------
 A is a dead agent.
 C is a dead agent.
