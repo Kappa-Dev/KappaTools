@@ -34,8 +34,10 @@ type domain_static_information =
     agents_created : int list Int2Map_Agent.Map.t;
     agents_test_rule : int list Int2Map_Agent.Map.t
   }
-    
-let add_link parameter error rule_id agent_id store_result =
+(* JF: What is the differentce between agents_test and agents_test_rule ? *)
+
+(* we do not care about agent id, what we care is about the type of agents *)
+let add_link parameter error rule_id agent_id (*JF: It should be agent_type*) store_result =
   let error, old_list =
     match Int2Map_Agent.Map.find_option_without_logs parameter error
       rule_id store_result
@@ -60,7 +62,7 @@ let collect_agents_test parameter error rule_id rule store_result =
         | Cckappa_sig.Dead_agent _ -> warn parameter error (Some "line 49") Exit store_result
         | Cckappa_sig.Agent agent ->
           let error, store_result =
-            add_link parameter error rule_id agent_id store_result
+            add_link parameter error rule_id agent_id (* JF: we should get the type of the agent, we do not care about its identifier*) store_result
           in
           error, store_result
       ) rule.Cckappa_sig.rule_lhs.Cckappa_sig.views store_result
@@ -69,6 +71,7 @@ let collect_agents_test parameter error rule_id rule store_result =
 
 (*a map from agent_id to rule_id*)
 
+(* JF: same as collect_agent, no ? *)
 let collect_agents_test_rule parameter error rule_id rule store_result =
   let error, store_result =
     Bdu_analysis_type.AgentMap.fold parameter error
@@ -90,7 +93,7 @@ let collect_agents_created parameter error rule_id rule store_result =
   let error, store_result =
     List.fold_left (fun (error, store_result) (agent_id, agent_type) ->
       let error, store_result =
-        add_link parameter error rule_id agent_id store_result
+        add_link parameter error rule_id agent_id (* only the agent type is relevant... *) store_result
       in
       error, store_result
     ) (error, store_result) rule.Cckappa_sig.actions.Cckappa_sig.creation
@@ -98,6 +101,10 @@ let collect_agents_created parameter error rule_id rule store_result =
   error, store_result
 
 let scan_rule parameter error rule_id rule store_result =
+  (* JF: it would be simpler not to pass the rule_id to these functions and to collect three lists of agent_types *)
+  (* JF: and then associate these lists to the key rule_id in the main maps *)
+  (* JF: This is something that you can do in each of your module *)
+  (* JF: You should simplify the function that you call scan_rule in other modules accordingly *)
   let error, agents_test =
     collect_agents_test
       parameter
@@ -160,14 +167,14 @@ let scan_rule_set parameter error compile rules =
 let print_agents_test result =
   Int2Map_Agent.Map.iter (fun rule_id l ->
     List.iter (fun agent_id ->
-      Printf.fprintf stdout "TEST rule_id:%i:agent_id:%i\n" rule_id agent_id
+	       Printf.fprintf stdout "TEST rule_id:%i:agent_id:%i\n" rule_id agent_id (* JF: we are interested in agent types *)
     ) l      
   ) result
 
 let print_agents_created result =
   Int2Map_Agent.Map.iter (fun rule_id l ->
     List.iter (fun agent_id ->
-      Printf.fprintf stdout "CREATED rule_id:%i:agent_id:%i\n" rule_id agent_id
+	       Printf.fprintf stdout "CREATED rule_id:%i:agent_id:%i\n" rule_id agent_id (* JF: we are interested in agent types *)
     ) l      
   ) result
 
