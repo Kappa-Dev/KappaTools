@@ -3,8 +3,9 @@
 type t (** Abstract state *)
 
 val initial : Environment.t -> Counter.t -> Rule_interpreter.t ->
-	      (Nbr.t * int) list -> Rule_interpreter.t * t
-(** [initial env c graph stopping_times] builds up the initial state *)
+	      (Nbr.t * int) list -> bool -> Rule_interpreter.t * t
+(** [initial env c graph stopping_times relative_fluxmaps]
+ builds up the initial state *)
 
 val observables_values :
   Environment.t -> Counter.t -> Rule_interpreter.t ->

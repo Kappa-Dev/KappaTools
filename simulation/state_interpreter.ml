@@ -3,7 +3,7 @@ type t = {
   perturbations_alive : bool array;
   activities : Random_tree.tree;(* pair numbers are binary rule, odd unary *)
   variables_overwrite: Alg_expr.t option array;
-  flux: Data.flux_data list;
+  flux: bool * Data.flux_data list;
 }
 
 let initial_activity get_alg env counter graph activities =
@@ -15,7 +15,7 @@ let initial_activity get_alg env counter graph activities =
        Random_tree.add (2*i) (Nbr.to_float rate) activities)
     () env
 
-let initial env counter graph stopping_times =
+let initial env counter graph stopping_times relative_fluxs =
   let activity_tree =
     Random_tree.create (2*Environment.nb_rules env) in
   let () =
@@ -35,7 +35,7 @@ let initial env counter graph stopping_times =
     activities = activity_tree;
     variables_overwrite =
       Array.make (Environment.nb_algs env) None;
-    flux = [];
+    flux = (relative_fluxs,[]);
 }
 
 let get_alg env state i =
@@ -111,21 +111,26 @@ let do_it ~outputs env domain counter graph state modification =
      (false, Rule_interpreter.remove_tracked cc graph, state)
   | Primitives.FLUX s ->
      let file = Format.asprintf "@[<h>%a@]" print_expr_val s in
+     let rel,fluxs = state.flux in
      let () =
-       if List.exists (Fluxmap.flux_has_name file) state.flux
+       if List.exists (Fluxmap.flux_has_name file) fluxs
        then ExceptionDefn.warning
 	      (fun f ->
 	       Format.fprintf
 		 f "At t=%f, e=%i: tracking FLUX into \"%s\" was already on"
-		 (Counter.current_time counter) (Counter.current_event counter) file)
+		 (Counter.current_time counter)
+		 (Counter.current_event counter) file)
      in
      (false, graph, {state with
-		      flux = Fluxmap.create_flux env counter file::state.flux})
+		      flux = (rel,Fluxmap.create_flux env counter file::fluxs)})
   | Primitives.FLUXOFF s ->
      let file = Format.asprintf "@[<h>%a@]" print_expr_val s in
-     let (these,others) = List.partition (Fluxmap.flux_has_name file) state.flux in
-     let () = List.iter (fun x -> outputs (Data.Flux (Fluxmap.stop_flux env counter x))) these in
-     (false, graph, {state with flux = others})
+     let rel,fluxs = state.flux in
+     let (these,others) = List.partition (Fluxmap.flux_has_name file) fluxs in
+     let () = List.iter
+		(fun x -> outputs (Data.Flux (Fluxmap.stop_flux env counter x)))
+		these in
+     (false, graph, {state with flux = rel,others})
 
 let perturbate ~outputs env domain counter graph state =
   let not_done_yet =
@@ -167,19 +172,24 @@ let one_rule dt stop env domain counter graph state =
   let rule = Environment.get_rule env rule_id in
   let register_new_activity rd_id syntax_rd_id new_act =
     let () =
-      if state.flux <> [] then
-	let old_act = Random_tree.find rd_id state.activities in
+      match state.flux with
+      | _, [] -> ()
+      | relative, l ->
+	 let old_act = Random_tree.find rd_id state.activities in
 	List.iter
 	  (Fluxmap.incr_flux_flux
-	     rule.Primitives.syntactic_rule syntax_rd_id (new_act -. old_act))
-	  state.flux
+	     rule.Primitives.syntactic_rule syntax_rd_id
+	     (if relative then (new_act -. old_act) /. old_act
+	      else (new_act -. old_act)))
+	  l
     in Random_tree.add rd_id new_act state.activities in
   let () =
     if !Parameter.debugModeOn then
       begin
-	Format.printf "@[<v>@[Applied@ %t%i:@]@ @[%a@]@]@."
-		      (fun f -> if choice mod 2 = 1 then Format.fprintf f "unary@ ")
-		      rule_id (Kappa_printer.elementary_rule ~env) rule;
+	Format.printf
+	  "@[<v>@[Applied@ %t%i:@]@ @[%a@]@]@."
+	  (fun f -> if choice mod 2 = 1 then Format.fprintf f "unary@ ")
+	  rule_id (Kappa_printer.elementary_rule ~env) rule;
 	if !Parameter.store_unary_distance
 	(*&&(choice mod 2 = 1)*) then
 	  Rule_interpreter.print_dist env graph rule_id
@@ -202,7 +212,8 @@ let one_rule dt stop env domain counter graph state =
 	 ~get_alg register_new_activity env counter graph' in
      let () =
        List.iter
-	 (Fluxmap.incr_flux_hit rule.Primitives.syntactic_rule) state.flux in
+	 (Fluxmap.incr_flux_hit rule.Primitives.syntactic_rule)
+	 (snd state.flux) in
      let () =
        if !Parameter.debugModeOn then
 	 Format.printf "@[<v>Obtained@ %a@]@."
@@ -245,8 +256,9 @@ let a_loop ~outputs form env domain counter graph state =
     | [] ->
        let () =
 	 if !Parameter.dumpIfDeadlocked then
-	   outputs (Data.Snapshot
-		     (Rule_interpreter.snapshot env counter "deadlock.ka" graph)) in
+	   outputs
+	     (Data.Snapshot
+		(Rule_interpreter.snapshot env counter "deadlock.ka" graph)) in
        let () =
 	 Format.fprintf
 	   form
@@ -295,11 +307,14 @@ let loop_cps ~outputs form hook return env domain counter graph state =
 	    form
 	    "@.***%s: would you like to record the current state? (y/N)***@."
 	    msg in
-	let () = if not !Parameter.batchmode then
-		   match String.lowercase (Tools.read_input ()) with
-		   | ("y" | "yes") ->
-		      outputs (Data.Snapshot (Rule_interpreter.snapshot env counter "dump.ka" graph))
-		   | _ -> () in
+	let () =
+	  if not !Parameter.batchmode then
+	    match String.lowercase (Tools.read_input ()) with
+	    | ("y" | "yes") ->
+	       outputs
+		 (Data.Snapshot
+		    (Rule_interpreter.snapshot env counter "dump.ka" graph))
+	    | _ -> () in
 	(true,graph,state) in
     if stop then return graph' state'
     else hook (fun () -> iter graph' state')
@@ -309,7 +324,9 @@ let finalize ~outputs form env counter graph state =
   let () = Outputs.close () in
   let () = Counter.complete_progress_bar form counter in
   let () = if !Parameter.store_unary_distance then
-	     Kappa_files.with_unary_dist (Counter.current_event counter) (Rule_interpreter.print_all_dist graph) in
+	     Kappa_files.with_unary_dist
+	       (Counter.current_event counter)
+	       (Rule_interpreter.print_all_dist graph) in
   let () =
     List.iter
       (fun e ->
@@ -319,7 +336,8 @@ let finalize ~outputs form env counter graph state =
 	    Format.fprintf
 	      f "Tracking FLUX into \"%s\" was not stopped before end of simulation"
 	      (Fluxmap.get_flux_name e)) in
-       outputs (Data.Flux (Fluxmap.stop_flux env counter e))) state.flux in
+       outputs (Data.Flux (Fluxmap.stop_flux env counter e)))
+      (snd state.flux) in
   let () = ExceptionDefn.flush_warning form in
   Rule_interpreter.generate_stories form env graph
 
