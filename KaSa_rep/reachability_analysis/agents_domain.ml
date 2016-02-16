@@ -140,7 +140,7 @@ struct
     in
     let kappa_handler = Analyzer_headers.get_kappa_handler static in
     let nagents = Handler.nagents parameter error kappa_handler in
-    let init_seen_agents_array = Array.make (nagents+1) false in (*FIXME*)
+    let init_seen_agents_array = Array.make (nagents+1) false in
     let init_global_dynamic_information =
       {
 	global = dynamic;
@@ -164,7 +164,9 @@ struct
           | Cckappa_sig.Ghost -> error, dynamic
           | Cckappa_sig.Dead_agent _ -> warn parameter error (Some "line 331") Exit dynamic
           | Cckappa_sig.Agent agent ->
-            let local = get_seen_agent dynamic in
+             let local = get_seen_agent dynamic in (*JF: I do not understand what you do here *)
+	     (*You have to get the type of the agent and to declare it as seen *)
+	     (*Why doing a recursive loop ? *)
             let size = Array.length local in
             let rec aux k (error, dynamic) =
               if k = size then (error, dynamic)
@@ -233,16 +235,22 @@ struct
       | error, None -> error, []
       | error, Some l -> error, l
     in
+    (* JF: The fold should start with the value Some Precondition *)
+    (* If one requested agent type has not been seen, then this value should be replaced with None *)    
     List.fold_left (fun (error, dynamic, _) agent_id ->
       let size = Array.length local in
+      (* JF: No need for recursion here *)
+      (* You just have to check that all agent_types in the list have already been seen *)
       let rec aux k (error, dynamic, op) =
         if k = size then (error, dynamic, op)
         else
           let bool = Array.get local k in
           if bool
           then
-            (*agent_id test that is not seen, update to seen*)
-            let local =
+            (* JF: agent_id test that is not seen, update to seen*)
+	    (* No, the primitive is_enabled aims at checking that required agent types have already been seen by the domain *)
+	    (* This primitive should not change the list of the agent type which have been seen*)
+	    let local =
               local.(k) <- true;
               local
             in
@@ -276,7 +284,8 @@ struct
         (*update array when agent is seen for the first time*)
         let local = get_seen_agent dynamic in
         let size = Array.length local in
-        let rec aux k dynamic =
+	(*JF: Here again, no need for recursion, just declare each agent types in that list to be seen *)
+	let rec aux k dynamic =
           if k = size then dynamic
           else
             let bool = Array.get local k in
