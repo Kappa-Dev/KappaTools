@@ -14,6 +14,7 @@
   </style>
 </head>
 <body>
+  <div class="container">
   <h1>none compressed story number 2</h1>
   <svg width=960 height=600><g/></svg>
   <p><dl>
@@ -52,5 +53,6 @@
     .event(svg);
     svg.attr('height', g.graph().height * initialScale + 40);
   </script>
+  </div>
 </body>
 </html>

@@ -69,6 +69,8 @@ let html_of_flux flux =
     flux.Data.flux_data.Data.flux_name
     (Pp_html.graph_page
        (fun f -> Format.pp_print_string f "Dynamic influence map")
+       ~subtitle:(fun f -> Format.pp_print_string
+			     f "between t = <span id=\"begin_time\"></span>s and t = <span id=\"end_time\"></span>s (<span id=\"nb_events\"></span> events)")
        ["http://d3js.org/d3.v3.min.js"]
        (fun f ->
        let () =
@@ -351,27 +353,23 @@ let html_of_flux flux =
 	  Format.fprintf
 	    f "box.setAttribute(\"type\", \"checkbox\");@," in
 	let () =
-	  Format.fprintf
-	    f "box.setAttribute(\"checked\", val);@," in
+	  Format.fprintf f "box.setAttribute(\"checked\", val);@," in
 	let () =
 	  Format.fprintf
 	    f "box.addEventListener(\"change\",function () { aClick(id);});@," in
-	let () =
-	  Format.fprintf
-	    f "boxbox.appendChild(box);@," in
+	let () = Format.fprintf f "boxbox.appendChild(box);@," in
 	let () =
 	  Format.fprintf
 	    f "boxbox.appendChild(document.createTextNode(flux.rules[id]));@," in
-	let () =
-	  Format.fprintf
-	    f "menu.appendChild(boxbox)@]@,});@," in
-	let () =
-	  Format.fprintf
-	    f "drawDIM();@]@,}@," in
-let () =
-	  Format.fprintf
-	    f "populate();" in
-
+	let () = Format.fprintf f "menu.appendChild(boxbox)@]@,});@," in
+	let () = Format.fprintf f "drawDIM();@]@,}@," in
+	let () = Format.fprintf f "populate();@," in
+	let () = Format.fprintf
+		   f "d3.select(\"#begin_time\").text(flux.bio_begin_time);@," in
+	let () = Format.fprintf
+		   f "d3.select(\"#end_time\").text(flux.bio_end_time);" in
+	let () = Format.fprintf
+		   f "d3.select(\"#nb_events\").text(flux.hits.reduce(function (acc,v) {return acc + v;},0));" in
 	Format.fprintf f "@]@,</script>"))
 
 let output_flux out =
