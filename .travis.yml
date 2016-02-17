@@ -8,6 +8,14 @@ env:
 
 matrix:
   include:
+  - env: CHECKED=webserver
+    addons:
+      apt:
+        sources:
+          - avsm
+        packages:
+          - ocaml-nox
+          - opam
   - env: CHECKED=js
     addons:
       apt:
@@ -46,14 +54,16 @@ before_install:
 install:
   - opam init -a git://github.com/ocaml/opam-repository && eval $(opam config env)
   - opam install ocamlfind
-  - sh -c "if [ '$CHECKED' = js ] ; then opam install -y reactiveData tyxml js_of_ocaml ; fi"
+  - sh -c "if [ '$CHECKED' = js ] ; then opam install -y reactiveData tyxml js_of_ocaml yojson atdgen ; fi"
+  - sh -c "if [ '$CHECKED' = webserver ] ; then opam install -y yojson atdgen lwt cohttp ; fi"
   - sh -c "if [ '$USE_TK' = 1 ] ; then opam install -y labltk ; fi"
 
 script:
   - make all
   - sh -c "if [ '$CHECKED' = native ] ; then make doc_html ; fi"
   - sh -c "if [ '$CHECKED' = native ] ; then make -j2 check ; fi"
-  - sh -c "if [ '$CHECKED' = js ] ; then make js/JaSim.js ; fi"
+  - sh -c "if [ '$CHECKED' = native ] ; then make WebSim.native ; fi"
+  - sh -c "if [ '$CHECKED' = js ] ; then make site/index.html ; fi"
 
 after_success:
  sh -c "if [ '$TRAVIS_BRANCH' = master ] ; then dev/update-web.sh $CHECKED ; fi"

@@ -16,7 +16,9 @@ case $1 in
     js )
         [ -d ${PLAYGROUND}/try ] || \
             mkdir ${PLAYGROUND}/try
-        cp js/index.html js/JaSim.js js/Kappa.js js/harness.js js/JaSim.css ${PLAYGROUND}/try/
+        cp site/* ${PLAYGROUND}/try/
+        ;;
+    webserver )
         ;;
 esac
 COMMITNAME=$(git show --pretty=oneline -s --no-color)

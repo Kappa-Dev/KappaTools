@@ -111,8 +111,6 @@ let configuration_settings =
                      </div>
           </div> >>
 
-
-
 let select_runtime_id = "select_runtime_id"
 let select_runtime = Html5.select
                        ~a:[Html5.a_id select_runtime_id ]
@@ -120,9 +118,8 @@ let select_runtime = Html5.select
                                                    ~a:[Html5.a_value (UIState.runtime_value runtime)]
                                                    (Html5.pcdata (UIState.runtime_label runtime)))
                                  [ UIState.WebWorker
-                                 ; UIState.Embedded
-                                 ; UIState.Remote { label = "Localhost" ; url = "http://localhost:8080" }
-                                 ; UIState.Remote { label = "Blockfreie" ; url = "http://kasim.blockfreie.org" } ])
+                                 ; UIState.Embedded ])
+
 let configuration_button =
     <:html5<<div class="panel-footer">
                  <div class="row">
@@ -299,6 +296,12 @@ let xml = <:html5<<div>
                   </div> >>
 
 let onload () : unit =
+  let args = Url.Current.arguments in
+  let () = try let hosts = Str.split (Str.regexp "[ \t]+") (List.assoc "hosts" args) in
+               let urls = List.map (fun host -> (host,Url.url_of_string host)) hosts in
+               ()
+    with Not_found | Failure "int_of_string" -> () in
+
   let select_runtime_dom : Dom_html.selectElement Js.t =
     Js.Unsafe.coerce
       (Js.Opt.get (document##getElementById (Js.string select_runtime_id))
