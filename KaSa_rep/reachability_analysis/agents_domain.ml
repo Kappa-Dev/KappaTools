@@ -22,10 +22,19 @@ let local_trace = false
 module Domain =
 struct
 
+  module Int2Map_Agent =
+    Map_wrapper.Make
+      (SetMap.Make
+         (struct
+           type t = int
+           let compare = compare
+          end
+         ))
+
   type static_information =
     {
       global_static_information : Analyzer_headers.global_static_information;
-      domain_static_information : Agents_domain_test.domain_static_information
+      domain_static_information : (int list * int list) Int2Map_Agent.Map.t
     }
 
   (*--------------------------------------------------------------------*)
@@ -66,14 +75,6 @@ struct
         domain_static_information = domain
     }
 
-  let get_agents_test static =
-    let domain = get_domain_static_information static in
-    domain.Agents_domain_test.agents_test
-
-  let get_agents_created static =
-    let domain = get_domain_static_information static in
-    domain.Agents_domain_test.agents_created
-
   (*--------------------------------------------------------------------*)
   (** global static/dynamic information*)
 
@@ -113,25 +114,61 @@ struct
   (**************************************************************************)
   (**initialize*)
 
+  let collect_agents parameter error rule =
+    let error, agents_test_list =
+      Bdu_analysis_type.AgentMap.fold parameter error
+        (fun parameter error agent_id agent current_list ->
+          match agent with
+          | Cckappa_sig.Unknown_agent _
+          | Cckappa_sig.Ghost -> error, current_list
+          | Cckappa_sig.Dead_agent _ ->
+            warn parameter error (Some "line 49") Exit current_list
+          | Cckappa_sig.Agent agent ->
+            let agent_type = agent.Cckappa_sig.agent_name in
+            let agent_list = agent_type :: current_list in
+            error, agent_list
+        ) rule.Cckappa_sig.rule_lhs.Cckappa_sig.views []
+    in
+    let error, agents_created_list =
+      List.fold_left (fun (error, current_list) (agent_id, agent_type) ->
+        let agent_list = agent_type :: current_list in
+        error, agent_list
+      ) (error, []) rule.Cckappa_sig.actions.Cckappa_sig.creation
+    in
+    error, (agents_test_list, agents_created_list)
+
   let scan_rule_set static dynamic error =
     let parameter = get_parameter static in
     let compil = get_compil static in
-    let error, result = 
-      Agents_domain_test.scan_rule_set
-        parameter
-        error
-        compil
-        compil.Cckappa_sig.rules
+    let error, result =
+      Int_storage.Nearly_inf_Imperatif.fold
+        parameter error
+        (fun parameter error rule_id rule store_result ->
+          let error, (agents_test_list, agents_created_list) =
+            collect_agents
+              parameter
+              error
+              rule.Cckappa_sig.e_rule_c_rule
+          in
+          (*add rule_id in map*)
+          let error, map =
+            Int2Map_Agent.Map.add_or_overwrite parameter error rule_id 
+              (agents_test_list, agents_created_list) store_result
+          in
+          error, map
+        ) compil.Cckappa_sig.rules Int2Map_Agent.Map.empty
     in
     let static = set_domain_static_information result static in
     error, static, dynamic
     
+  (**************************************************************************)
+
   let initialize static dynamic error =
     let parameter = Analyzer_headers.get_parameter static in
     let init_global_static_information =
       {
         global_static_information = static;
-        domain_static_information = Agents_domain_test.init
+        domain_static_information = Int2Map_Agent.Map.empty
       }
     in
     let kappa_handler = Analyzer_headers.get_kappa_handler static in
@@ -193,13 +230,13 @@ struct
 
   let is_enabled static dynamic error rule_id precondition =
     let parameter = get_parameter static in
-    let agents_test = get_agents_test static in
-    let error, l =
-      match Agents_domain_test.Int2Map_Agent.Map.find_option_without_logs parameter error
-        rule_id agents_test
+    let domain_static = get_domain_static_information static in
+    let error, (l, _) =
+      match Int2Map_Agent.Map.find_option_without_logs parameter error
+        rule_id domain_static
       with
-      | error, None -> error, []
-      | error, Some l -> error, l
+      | error, None -> error, ([], [])
+      | error, Some (l1, l2) -> error, (l1, l2)
     in
     List.fold_left (fun (error, dynamic, s) agent_type ->
       let local = get_seen_agent dynamic in
@@ -223,13 +260,13 @@ struct
   let apply_rule static dynamic error rule_id precondition =
     let parameter = get_parameter static in
     let event_list = [] in
-    let agents_created = get_agents_created static in
-    let error, l =
-      match Agents_domain_test.Int2Map_Agent.Map.find_option_without_logs
-        parameter error rule_id agents_created
+    let domain_static = get_domain_static_information static in
+    let error, (_, l) =
+      match Int2Map_Agent.Map.find_option_without_logs
+        parameter error rule_id domain_static
       with
-      | error, None -> error, []
-      | error, Some l -> error, l
+      | error, None -> error, ([], [])
+      | error, Some (l1, l2) -> error, (l1, l2)
     in
     let dynamic, event_list =
       List.fold_left (fun (dynamic, event_list) agent_type ->
