@@ -34,7 +34,8 @@ struct
   type static_information =
     {
       global_static_information : Analyzer_headers.global_static_information;
-      domain_static_information : (int list * int list) Int2Map_Agent.Map.t
+      domain_static_information : (int list * int list) Int2Map_Agent.Map.t;
+      agents_without_interface  : int list Int2Map_Agent.Map.t
     }
 
   (*--------------------------------------------------------------------*)
@@ -73,6 +74,14 @@ struct
     {
       static with
         domain_static_information = domain
+    }
+
+  let get_agents_without_interface static = static.agents_without_interface
+    
+  let set_agents_without_interface agents static =
+    {
+      static with
+        agents_without_interface = agents
     }
 
   (*--------------------------------------------------------------------*)
@@ -137,6 +146,48 @@ struct
     in
     error, (agents_test_list, agents_created_list)
 
+  let collect_agents_without_interface static dynamic error =
+    let parameter = get_parameter static in
+    let compil = get_compil static in
+    let error, store_result =
+      Int_storage.Nearly_inf_Imperatif.fold
+        parameter error
+        (fun parameter error rule_id rule store_result ->
+          Bdu_analysis_type.AgentMap.fold parameter error
+            (fun parameter error agent_id agent store_result ->
+              match agent with
+              | Cckappa_sig.Unknown_agent _
+              | Cckappa_sig.Ghost -> error, store_result
+              | Cckappa_sig.Dead_agent _ ->
+                warn parameter error (Some "line 49") Exit store_result
+              | Cckappa_sig.Agent agent ->
+                let agent_type = agent.Cckappa_sig.agent_name in
+                let agent_interface = agent.Cckappa_sig.agent_interface in
+                if Cckappa_sig.Site_map_and_set.Map.is_empty agent_interface
+                then
+                  (*empty interface*)
+                  let error, old_list =
+                    match Int2Map_Agent.Map.find_option_without_logs parameter error
+                      agent_type store_result
+                    with
+                    | error, None -> error, []
+                    | error, Some l -> error, l
+                  in
+                  let rule_id_list = rule_id :: old_list in
+                  let error, map = 
+                    Int2Map_Agent.Map.add_or_overwrite parameter error
+                      agent_type rule_id_list store_result
+                  in
+                  error, map
+                else
+                  error, store_result
+            ) rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
+            store_result
+        ) compil.Cckappa_sig.rules Int2Map_Agent.Map.empty
+    in
+    let static = set_agents_without_interface store_result static in
+    error, static, dynamic
+
   let scan_rule_set static dynamic error =
     let parameter = get_parameter static in
     let compil = get_compil static in
@@ -168,7 +219,8 @@ struct
     let init_global_static_information =
       {
         global_static_information = static;
-        domain_static_information = Int2Map_Agent.Map.empty
+        domain_static_information = Int2Map_Agent.Map.empty;
+        agents_without_interface  = Int2Map_Agent.Map.empty
       }
     in
     let kappa_handler = Analyzer_headers.get_kappa_handler static in
@@ -180,7 +232,13 @@ struct
 	local  = init_seen_agents_array;
       }
     in
-    scan_rule_set init_global_static_information init_global_dynamic_information error
+    let error, static, dynamic =
+      scan_rule_set init_global_static_information init_global_dynamic_information error
+    in
+    let error, static, dynamic =
+      collect_agents_without_interface static dynamic error
+    in
+    error, static, dynamic
 
   (**************************************************************************)
   (** collect the agent type of the agents of the species and declare
@@ -190,7 +248,7 @@ struct
     let parameter = get_parameter static in
     let error, dynamic =
       Bdu_analysis_type.AgentMap.fold parameter error
-        (fun parameter error agent_id agent dynamic ->
+        (fun parameter error init agent dynamic ->
           match agent with
           | Cckappa_sig.Unknown_agent _
           | Cckappa_sig.Ghost -> error, dynamic
@@ -261,7 +319,7 @@ struct
     let parameter = get_parameter static in
     let event_list = [] in
     let domain_static = get_domain_static_information static in
-    let error, (_, l) =
+    let error, (l1, l2) =
       match Int2Map_Agent.Map.find_option_without_logs
         parameter error rule_id domain_static
       with
@@ -285,7 +343,7 @@ struct
           dynamic, event_list
         else
           dynamic, event_list
-      ) (dynamic, event_list) l
+      ) (dynamic, event_list) l2
     in
     (*JF: Here, you should add in the event list, each rule that test for
       an agent with a type among the ones you have newly see, and with an empty
@@ -300,27 +358,46 @@ struct
     (* For this, you need to add a map in the struct static, to map each
        agent type to the list of rules an agent of this type and with an
        empty interface occur in the lhs of the rule *)
-
-    (*let agents_test = get_agents_test static in
-      let error, list =
-      match Agents_domain_test.Int2Map_Agent.Map.find_option_without_logs
-      parameter error rule_id agents_test
-      with
-      | error, None -> error, []
-      | error, Some l -> error, l
-      in
-      let local = get_seen_agent dynamic in
-      let event_list =
-      List.fold_left (fun event_list agent_type ->
-      let bool = Array.get local agent_type in
-      if bool
-      then
-          (*seen*)
-          Analyzer_headers.Check_rule rule_id :: event_list
-        else
-          event_list
-      ) event_list list
-    in*)
+    (*a list of test agents *)
+    let dynamic, event_list =
+      List.fold_left (fun (dynamic, event_list) agent_type ->
+        let local = get_seen_agent dynamic in
+        let size = Array.length local in
+        let rec aux k (dynamic, event_list) =
+          if k = size then dynamic, event_list
+          else
+            (*if this agent already seen*)
+            let bool = Array.get local k in
+            if bool
+            then
+              (*yes*)
+              dynamic, event_list
+            else
+              (*not seen, add them seen and add agents_without_interface into event_list?*)
+              let local =
+                local.(k) <- true;
+                local
+              in
+              let dynamic = set_seen_agent local dynamic in
+              let agents_without_interface_map = get_agents_without_interface static in
+              (*add all the rules that requires this agent in their lhs with no tests*)
+              let error, list =
+                match Int2Map_Agent.Map.find_option_without_logs parameter error
+                  k agents_without_interface_map
+                with
+                | error, None -> error, []
+                | error, Some l -> error, l
+              in
+              let event_list =
+                List.fold_left (fun event_list rule_id ->
+                  Analyzer_headers.Check_rule rule_id :: event_list
+                ) event_list list
+              in
+              aux (k + 1) (dynamic, event_list)
+        in
+        aux agent_type (dynamic, event_list)
+      ) (dynamic, event_list) l1
+    in
     error, dynamic, event_list
 
   (************************************************************************************)
