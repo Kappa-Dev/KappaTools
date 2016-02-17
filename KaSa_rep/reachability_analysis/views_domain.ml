@@ -192,12 +192,9 @@ struct
   (** [scan_rule_set static] *)
 
   let scan_rule_set static dynamic error = 
-    (* get functions should not to computations, this is a misleading name *)
     let parameter = get_parameter static in
     let kappa_handler = get_kappa_handler static in
     let compiled = get_compil static in
-    (*let error, handler_bdu = Boolean_mvbdu.init_remanent parameter error in*) 
-    (* Reseting memoisations tables are forbidden *)
     let handler_bdu = get_mvbdu_handler dynamic in
     let error, (handler_bdu, result) =
       Bdu_analysis_main.scan_rule_set
@@ -218,7 +215,6 @@ struct
 
   let initialize static dynamic error =
     let parameter = Analyzer_headers.get_parameter static in
-    (*global static information*)
     let error, init_bdu_analysis_static =
       Bdu_analysis_main.init_bdu_analysis_static parameter error
     in
@@ -229,7 +225,6 @@ struct
       }
     in
     let kappa_handler = Analyzer_headers.get_kappa_handler static in
-    (*global dynamic information*)
     let nrules = Handler.nrules parameter error kappa_handler in
     let init_dead_rule_array = Array.make nrules false in
     let init_fixpoint = Bdu_analysis_type.Map_bdu_update.Map.empty in
@@ -729,6 +724,7 @@ struct
     error, dynamic, bdu_result
 
   (************************************************************************************)
+
   let build_init_restriction static dynamic error init_state =
     let parameter = get_parameter static in
     let error, store_remanent_triple =
@@ -886,40 +882,6 @@ struct
       error, dynamic, Some precondition
     else
       error, dynamic, None
-
-  (*let is_enabled static dynamic error rule_id precondition =
-    let parameter = get_parameter static in
-    let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
-    let handler_bdu = get_mvbdu_handler dynamic in
-    let error, store_proj_bdu_test_restriction =
-      get_store_proj_bdu_test_restriction static dynamic error
-    in
-    let error, proj_bdu_test_restriction =
-      match
-        Bdu_analysis_type.Map_rule_id_views.Map.find_option rule_id
-          store_proj_bdu_test_restriction
-      with
-      | None -> error, Bdu_analysis_type.Map_triple_views.Map.empty
-      | Some map -> error, map
-    in
-    let fixpoint_result = get_fixpoint_result dynamic in 
-    let error, handler_bdu, is_enable =
-      Bdu_fixpoint_iteration.is_enable
-        parameter
-        handler_bdu
-        error
-        bdu_false
-        rule_id
-        proj_bdu_test_restriction
-        fixpoint_result
-    in
-    if is_enable
-    then 
-      (* precondition is empty for the moment, we will add information when
-         necessary *)
-      error, set_mvbdu_handler handler_bdu dynamic, Some precondition
-    else 
-      error, dynamic, None*)
         
   (**************************************************************************)
   (*deal with views*)

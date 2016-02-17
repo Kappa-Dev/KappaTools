@@ -290,30 +290,32 @@ struct
     (*JF: Here, you should add in the event list, each rule that test for
       an agent with a type among the ones you have newly see, and with an empty
       interface (no test) *)
-    (* For instance, if you see an agent of type A for the first time, then a rule like
-       B(x~u),A() -> B(x~p),A() should be awaken *)
-    (* You also have to do this, when you add an initial state, thus it is worth
-       using an auxilliary function, that check whether an agant type has been already seen,
-       if not, declared it as seen, then add all the rules that requires this agent in their lhs
-       and with no tests, in the working list, via the event_list argument *)
-    (* For this, you need to add a map in the struct static, to map each agent type to the list of rules
-       an agent of this type and with an empty interface occur in the lhs of the rule *)
+    (* For instance, if you see an agent of type A for the first time, then
+       a rule like B(x~u),A() -> B(x~p),A() should be awaken *)
+    (* You also have to do this, when you add an initial state, thus it is
+       worth using an auxilliary function, that check whether an agant type
+       has been already seen, if not, declared it as seen, then add all the
+       rules that requires this agent in their lhs and with no tests, in
+       the working list, via the event_list argument *)
+    (* For this, you need to add a map in the struct static, to map each
+       agent type to the list of rules an agent of this type and with an
+       empty interface occur in the lhs of the rule *)
 
     (*let agents_test = get_agents_test static in
-    let error, list =
+      let error, list =
       match Agents_domain_test.Int2Map_Agent.Map.find_option_without_logs
-        parameter error rule_id agents_test
+      parameter error rule_id agents_test
       with
       | error, None -> error, []
       | error, Some l -> error, l
-    in
-    let local = get_seen_agent dynamic in
-    let event_list =
+      in
+      let local = get_seen_agent dynamic in
+      let event_list =
       List.fold_left (fun event_list agent_type ->
-        let bool = Array.get local agent_type in
-        if bool
-        then
-        (*seen*)
+      let bool = Array.get local agent_type in
+      if bool
+      then
+          (*seen*)
           Analyzer_headers.Check_rule rule_id :: event_list
         else
           event_list
