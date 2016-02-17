@@ -2,6 +2,4 @@ PKG js_of_ocaml.tyxml
 PKG lwt
 EXT js
 
-B ../_build/js/
-
 REC

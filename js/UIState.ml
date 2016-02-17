@@ -2,7 +2,6 @@ module ApiTypes = ApiTypes_j
 
 open ApiTypes
 open Lwt
-open XmlHttpRequest
 
 exception InvalidState of string
 
@@ -47,11 +46,12 @@ let set_runtime_url (url : string) (continuation : bool -> unit) : unit =
                                      version_url)
                                   >>=
                                     (fun frame ->
-                                     let is_valid_server : bool = frame.code = 200 in
+                                     let is_valid_server : bool = frame.XmlHttpRequest.code = 200 in
                                      let () = if is_valid_server then
                                                 runtime_state := Some (new JsRemote.runtime url :> Api.runtime)
                                               else
-                                                let error_msg : string = Format.sprintf "Bad Response : %d" frame.code in
+                                                let error_msg =
+						  Format.sprintf "Bad Response : %d" frame.XmlHttpRequest.code in
                                                 set_model_error [error_msg]
                                      in
                                      let () = continuation is_valid_server in
@@ -122,7 +122,7 @@ let start_model ~start_continuation
      let thread_is_running = Lwt_switch.create () in
      catch
        (fun () ->
-               (runtime_state#start { code = React.S.value model_text;
+               (runtime_state#start { ApiTypes_j.code = React.S.value model_text;
                                       nb_plot = React.S.value model_nb_plot;
                                       max_time = React.S.value model_max_time;
                                       max_events = React.S.value model_max_events

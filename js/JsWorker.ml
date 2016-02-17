@@ -3,7 +3,6 @@ module WebMessage = WebMessage_j
 module ApiTypes = ApiTypes_j
 
 open WebMessage
-open ApiTypes
 open Lwt
 
 type context = { worker : (string, string) Worker.worker Js.t
@@ -23,7 +22,7 @@ object(self)
     let () = Lwt.async (fun () -> Lwt_js.sleep timeout >>= (fun _ -> Lwt_mvar.put var None)) in
     let () = context <- { context with id = context.id + 1 } in
     let message :  WebMessage.request WebMessage.message =
-      { id = context.id ; data = request } in
+      { WebMessage.id = context.id ; data = request } in
     let message_text : string =
       WebMessage.string_of_message
         WebMessage.write_request
@@ -38,7 +37,7 @@ object(self)
                                  WebMessage.read_response
                                  response_text in
                              try let value : WebMessage.response option Lwt_mvar.t =
-                                   IntMap.find message.id context.mailboxes in
+                                   IntMap.find message.WebMessage.id context.mailboxes in
                                  let () = Lwt.async (fun () -> Lwt_mvar.put value (Some message.data)) in
                                  Js._true
                              with Not_found -> Js._true
@@ -107,4 +106,4 @@ object(self)
        | Some (`Stop unit) -> Lwt.return unit
        | Some response -> Lwt.fail (BadResponse response)
       )
-end;;
+end

@@ -70,14 +70,15 @@ end = struct
            let svg_store : Pp_svg.store option ref = ref None in
            let outputs (data : Data.t) =
              match data with
-               Data.Flux flux_map -> ()
+               Data.Flux _flux_map -> ()
              | Data.Plot (time,observables) ->
                 (match !svg_store with
                    Some svg_store-> (svg_store.points <- ((time,observables) :: svg_store.points))
                  | None -> ()
                 )
-             | Data.Print file_line -> ()
-             | Data.Snapshot snapshot -> ()
+             | Data.Print _file_line -> ()
+             | Data.Snapshot _snapshot -> ()
+	     | Data.UnaryDistances _ -> ()
            in
            let simulation = { switch = Lwt_switch.create ()
                             ; counter = Counter.create

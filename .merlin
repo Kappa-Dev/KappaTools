@@ -1,35 +1,22 @@
 FLG -w +a -strict-formats -safe-string
 
 S cflow
-B _build/cflow
 S dataStructures
-B _build/dataStructures
 S grammar
-B _build/grammar
 S term
-B _build/term
 S pattern
-B _build/pattern
 S simulation
-B _build/simulation
 S siteGraphs
-B _build/siteGraphs
 S Error
-B _build/Error
+S generated
 S main
-B _build/main
 
 S KaSa_rep/export_to_KaSim
-B _build/KaSa_rep/export_to_KaSim
 S KaSa_rep/tools
-B _build/KaSa_rep/tools
 S KaSa_rep/data_structures
-B _build/KaSa_rep/data_structures
 S KaSa_rep/config
-B _build/KaSa_rep/config
 S KaSa_rep/error_handlers
-B _build/KaSa_rep/error_handlers
 S KaSa_rep/frontend/preprocess
-B _build/KaSa_rep/frontend/preprocess
 S KaSa_rep/reachability_analysis
-B _build/KaSa_rep/reachability_analysis
+
+B _build/**
