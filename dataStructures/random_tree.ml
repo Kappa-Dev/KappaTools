@@ -152,7 +152,7 @@ let total t =
     infinity
 
 let random t =
-  match IntSet.choose t.inf_list with
+  match IntSet.random t.inf_list with
   | Some x -> (unmask t x,infinity)
   | None ->
     let t = update_structure t in
