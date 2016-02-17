@@ -885,7 +885,9 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	(*      else if k = s then Some key *)
         (*      else find_acc (k - s - 1) r *)
 
-	let random m = find_acc (Random.int (size m)) m
+	let random m =
+	  let s = size m in
+	  if s = 0 then None else find_acc (Random.int (size m)) m
 
 (*	let add = Lift_error_logs.lift_generic_binary_for_KaSim add_with_logs
 	let split = Lift_error_logs.lift_generic_binary_for_KaSim split_with_logs
