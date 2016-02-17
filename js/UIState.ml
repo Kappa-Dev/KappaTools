@@ -130,11 +130,9 @@ let start_model ~start_continuation
                >>= (fun result ->
                     match result with
                       `Left error ->
-                      let () = Firebug.console##log (Js.string "Runtime error") in
                       let () = set_model_error error in
                                     on_error ()
                     | `Right token ->
-                       let () = Firebug.console##log (Js.string (Format.sprintf "Token %d"  token)) in
                        Lwt.join [ update_runtime_state thread_is_running on_error token ]
                        >>=
                        (fun _ -> Lwt_js.sleep 1.)

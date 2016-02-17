@@ -51,7 +51,6 @@ object(self)
     (Lwt_mvar.take var)
     >>=
       (fun (response : WebMessage.response option) ->
-       let () = Firebug.console##log (Js.string "Parse ...") in
        match response with
          None -> Lwt.fail TimeOut
        | Some (`Parse error) -> Lwt.return error
@@ -63,11 +62,8 @@ object(self)
     (Lwt_mvar.take var)
     >>=
       (fun (response : WebMessage.response option) ->
-       let () = Firebug.console##log (Js.string "Start ...") in
        match response with
-         None ->
-         let () = Firebug.console##log (Js.string "Timeout ...") in
-         Lwt.fail TimeOut
+         None -> Lwt.fail TimeOut
        | Some (`Start token) -> Lwt.return token
        | Some response -> Lwt.fail (BadResponse response)
       )
@@ -77,7 +73,6 @@ object(self)
     (Lwt_mvar.take var)
     >>=
       (fun (response : WebMessage.response option) ->
-       let () = Firebug.console##log (Js.string "Status ...") in
        match response with
          None -> Lwt.fail TimeOut
        | Some (`Status state) -> Lwt.return state
@@ -89,7 +84,6 @@ object(self)
     (Lwt_mvar.take var)
     >>=
       (fun (response : WebMessage.response option) ->
-       let () = Firebug.console##log (Js.string "List ...") in
        match response with
          None -> Lwt.fail TimeOut
        | Some (`List catalog) -> Lwt.return catalog
@@ -101,7 +95,6 @@ object(self)
     (Lwt_mvar.take var)
     >>=
       (fun (response : WebMessage.response option) ->
-       let () = Firebug.console##log (Js.string "Stop ...") in
        match response with
          None -> Lwt.fail TimeOut
        | Some (`Stop unit) -> Lwt.return unit

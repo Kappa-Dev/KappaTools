@@ -2,7 +2,6 @@ module WebMessage = WebMessage_j
 
 open Lwt
 open Worker
-open Firebug
 open WebMessage
 
 
@@ -14,7 +13,6 @@ let request_handler
       (api_call : 'a -> 'b Lwt.t)
       (response : 'b -> WebMessage.response) : unit
   =
-  let () = Firebug.console##log (Js.string "work in ...") in
   let () = Lwt.async (fun () -> (api_call request)
                                 >>=
                                   (fun (result : 'b) ->
@@ -25,7 +23,6 @@ let request_handler
                                        WebMessage.write_response
                                        message in
                                    let () = Worker.post_message message_text in
-                                   let () = Firebug.console##log (Js.string "work out ...") in
                                    return_unit)
                      )
   in ()

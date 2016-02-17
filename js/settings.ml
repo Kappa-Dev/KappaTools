@@ -297,10 +297,10 @@ let xml = <:html5<<div>
 
 let onload () : unit =
   let args = Url.Current.arguments in
-  let () = try let hosts = Str.split (Str.regexp "[ \t]+") (List.assoc "hosts" args) in
-               let urls = List.map (fun host -> (host,Url.url_of_string host)) hosts in
+  let () = try let hosts = List.map fst (List.filter (fun (key,value) -> key = "hosts") args) in
+               let () = List.iter (fun url -> ()) hosts in
                ()
-    with Not_found | Failure "int_of_string" -> () in
+           with Not_found | Failure "int_of_string" -> () in
 
   let select_runtime_dom : Dom_html.selectElement Js.t =
     Js.Unsafe.coerce
