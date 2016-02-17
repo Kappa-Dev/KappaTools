@@ -1,4 +1,3 @@
-open Mods
 
 type jf_data =
   Compression_main.secret_log_info * Compression_main.secret_step list
@@ -21,7 +20,7 @@ type t =
 	  Instantiation.abstract Instantiation.test list)
 	 list Connected_component.Map.t (*currently tracked ccs *)
        * jf_data) option;
-    store_unary_dist: int DynArray.t option array;
+    store_unary_dist: (int * int) list array;
     (* nb_occurence for each distance and for each rule *)
   }
 
@@ -40,7 +39,7 @@ let empty ~has_tracking env = {
       then Some (Connected_component.Map.empty,
 		 (Compression_main.init_secret_log_info (), []))
       else None;
-    store_unary_dist = Array.make ((Environment.nb_syntactic_rules env)+1) None;
+    store_unary_dist = Array.make ((Environment.nb_syntactic_rules env)+1) [];
 }
 
 let print_injections ?sigs pr f roots_of_ccs =
@@ -619,10 +618,8 @@ let apply_unary_rule
 		let rule = Environment.get_rule env rule_id in
 		let syntactic_id = rule.Primitives.syntactic_rule in
 		let rule_arr = state'.store_unary_dist in
-		match rule_arr.(syntactic_id) with
-		| None -> rule_arr.(syntactic_id) <- Some (DynArray.init (n+1) (fun i-> if (i==n) then 1 else 0))
-		| Some arr -> let old_val = DynArray.get arr n in
-			      DynArray.set arr n (old_val+1) in
+		let time = Counter.current_event counter in
+		rule_arr.(syntactic_id) <- (n,time)::(rule_arr.(syntactic_id)) in
      let inj1 =
        Connected_component.Matching.reconstruct
 	 state'.edges Connected_component.Matching.empty 0 cc1 root1 in
@@ -804,23 +801,27 @@ let print env f state =
 			   (Environment.print_token ~env) i Nbr.print el))
     state.tokens
 
-(* print distances for one unary rule *)
+(* print distances for one unary rule - used for debug mode*)
 let print_dist env state rule_id =
   let () =  Format.printf " Distances at which rule %i applied: " rule_id in
   let rule = Environment.get_rule env rule_id in
   let syntactic_id = rule.Primitives.syntactic_rule in
   match state.store_unary_dist.(syntactic_id) with
-  | None -> Format.printf "Not a unary rule or unary rule never applied."
-  | Some arr -> DynArray.iter (fun i -> Format.printf " %i " i) arr
-
+  | [] -> Format.printf "Not a unary rule or unary rule never applied."
+  | dist_ls -> List.iter (fun (n,time) ->
+			  Format.printf "%i " n)
+			 dist_ls
+			 
 let print_all_dist state f =
   Array.iteri
     (fun id dist_arr ->
-     match dist_arr with None -> ()
-		       | Some arr ->
+     match dist_arr with [] -> ()
+		       | dist_ls ->
 			  let () =  Format.fprintf f "Rule %i: " id in
-			  DynArray.iter
-			    (fun i -> Format.fprintf f " %i " i) arr)
+			  List.iter
+			    (fun (n,time) ->
+			     Format.fprintf f " time: %i, distance: %i " time n)
+			    dist_ls)
     state.store_unary_dist
 
 let debug_print f state =
