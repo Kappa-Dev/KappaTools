@@ -1,0 +1,76 @@
+swagger: '2.0'
+info:
+  title: Kasim API
+  description: Move your app forward with the Uber API
+  version: "1.0.0"
+# the domain of the service
+host: localhost:8080
+# array of all schemes that your API supports
+schemes:
+  - http
+# will be prefixed to all paths
+basePath: /v1
+produces:
+  - application/json
+paths:
+  /version:
+    get:
+      summary: Version of api
+      description: |
+        Returns version information the api.  It also
+        returns information about the build.
+      tags:
+        - Version
+      responses:
+        200:
+          description: Version information
+          schema:
+            $ref: '#/definitions/Version'
+
+  /parse:
+    get:
+      summary: Parse code
+      description: |
+        Parse code and return any errors that may
+        occur.
+      tags:
+        - Parse
+      parameters:
+        - name: code
+          in: query
+          description: Kappa source code
+          required: true
+          type: string
+      responses:
+        200:
+          description: Parse errors if any
+          schema:
+            type: [string]
+
+  /process:
+    get:
+      summary: List running simulations
+      description: |
+        Returns a list of all running simulations as identified
+        by their tokens
+      tags:
+        - Process
+      responses:
+        200:
+          description: An array of tokens
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Token'
+definitions:
+
+  Token:
+    type: string
+  
+  Version:
+    type: object
+    properties:
+      build:
+        type: string
+      version:
+        type: string

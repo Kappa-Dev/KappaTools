@@ -51,3 +51,8 @@ models/test_suite/*/*/error
 models/test_suite/error
 models/test_suite/*/*/output/profiling.txt
 models/test_suite/*/*/output/compression_status.txt
+
+# generated code
+generated
+site
+*.byte

@@ -35,20 +35,37 @@ MODELS = $(wildcard $(MANKAPPAMODELSREP)*.ka)
 $(MANGENREP): $(SCRIPTSSOURCE) $(MODELS)
 	rm -rf $@
 	mkdir $@
+VERSION=main/version.ml
+GENERATED=$(VERSION) \
+	  generated/ApiTypes_t.ml generated/ApiTypes_j.ml \
+	  generated/WebMessage_t.ml generated/WebMessage_j.ml
 
-main/version.ml: main/version.ml.skel $(wildcard .git/refs/heads/*)
+generated:
+	mkdir -p generated
+
+generated/ApiTypes_t.ml: api/ApiTypes.atd generated
+	atdgen -t -o generated/ApiTypes api/ApiTypes.atd
+
+generated/ApiTypes_j.ml: api/ApiTypes.atd generated
+	atdgen -j -j-std -o generated/ApiTypes api/ApiTypes.atd
+
+generated/WebMessage_t.ml: js/WebMessage.atd generated
+	atdgen -t -o generated/WebMessage js/WebMessage.atd
+
+generated/WebMessage_j.ml: js/WebMessage.atd generated
+	atdgen -j -j-std -o generated/WebMessage js/WebMessage.atd
+
+$(VERSION): main/version.ml.skel $(wildcard .git/refs/heads/*) generated
 	sed -e s/'\(.*\)\".*tag: \([^,\"]*\)[,\"].*/\1\"\2\"'/g $< | \
 	sed -e 's/\$$Format:%D\$$'/"$$(git describe --always --dirty || echo unkown)"/ > $@
 
-%.cma %.native %.byte %.docdir/index.html: main/version.ml $(filter-out _build/,$(wildcard */*.ml*)) $(wildcard $(KASAREP)*/*.ml*) $(wildcard $(KASAREP)*/*/*.ml*)
+%.cma %.native %.byte %.docdir/index.html: $(filter-out _build/,$(wildcard */*.ml*)) $(wildcard $(KASAREP)*/*.ml*) $(wildcard $(KASAREP)*/*/*.ml*) $(VERSION)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) $@
 
-JaSim.byte: $(filter-out _build/,$(wildcard */*.ml*)) main/version.ml
-	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) -I js \
-	-tag-line "<js/**> : thread, package(js_of_ocaml.tyxml), package(js_of_ocaml.syntax), package(tyxml.syntax), package(lwt), syntax(camlp4o)" \
-	$@
+site:
+	mkdir site
 
-js/external:
+site/external: site
 ifeq ($(USE_CDN),0)
 	mkdir -p $@ ;\
 	mkdir -p $(TEMPDIR) ;\
@@ -65,16 +82,42 @@ ifeq ($(USE_CDN),0)
 else
 endif
 
-js/JaSim.js: JaSim.byte js/external js/index.html
-	js_of_ocaml "+weak.js" "+nat.js" _build/js/$< -o $@
 
-js/index.html:
+site/JsSim.js: JsSim.byte site/external
+	js_of_ocaml --debuginfo --pretty "+weak.js" "+nat.js" _build/js/$< -o $@
+
+site/WebWorker.js: WebWorker.byte
+	js_of_ocaml --debuginfo --pretty "+weak.js" "+nat.js" _build/js/$< -o $@
+
+site/index.html: site js/no-cdn.html js/use-cdn.html site/JsSim.js site/WebWorker.js js/*.js js/favicon.ico js/*.css
 ifeq ($(USE_CDN),0)
-	cp js/no-cdn.html js/index.html
+	cp -f js/no-cdn.html site/index.html
 else
-	cp js/use-cdn.html js/index.html
+	cp -f js/use-cdn.html site/index.html
 endif
-	chmod -w js/index.html
+	cp -f js/*.js js/*.css js/favicon.ico site
+
+JsSim.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(GENERATED)
+	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
+	-tag debug \
+	-I js -I api -I generated \
+	-pkg biniou -pkg lwt -pkg atdgen -tag-line "<js/**> : thread, package(yojson), package(biniou), package(js_of_ocaml.tyxml), package(js_of_ocaml.syntax), package(tyxml.syntax), package(lwt), syntax(camlp4o)" \
+	$@
+
+WebWorker.byte: $(filter-out webapp/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
+	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
+	-tag debug \
+	-I term -I js -I api -I generated \
+	-pkg biniou -pkg lwt -pkg atdgen -tag-line "<js/**> : thread, package(yojson), package(biniou), package(js_of_ocaml), package(js_of_ocaml.syntax), package(lwt), syntax(camlp4o)" \
+	$@
+
+WebSim.byte: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
+	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
+	-tag debug \
+	-I term -I webapp -I api -I generated \
+	-pkg biniou -pkg cohttp.lwt -pkg atdgen \
+	-tag-line "<webapp/**> : thread, package(yojson), package(biniou), package(js_of_ocaml.tyxml), package(js_of_ocaml.syntax), package(tyxml.syntax), package(lwt), package(yojson), package(biniou), syntax(camlp4o)" \
+	$@
 
 bin/%: %.native Makefile
 	[ -d bin ] || mkdir bin && cp $< $@
@@ -120,14 +163,12 @@ clean_doc:
 
 clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch clean_doc
 	"$(OCAMLBINPATH)ocamlbuild" -clean
-	rm -f main/version.ml
+	rm -f $(VERSION)
 	rm -f sanity_test bin/sanity_test
 	rm -f KaSim bin/KaSim KaSa bin/KaSa
-	rm -f js/JaSim.js
+	rm -rf site generated
 	find . -name \*~ -delete
 	+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite clean
-	rm -rf js/external
-	rm -f js/index.html
 
 check: bin/sanity_test
 	@+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite clean

@@ -1,13 +1,15 @@
-open Js
+module ApiTypes = ApiTypes_j
+module Html5 = Tyxml_js.Html5
+module R = Tyxml_js.R
 
+open Js
+open ApiTypes
 open Lwt
 open Visualization
 open Codemirror
-open Storage
 open Counter
+open UIState
 
-module Html5 = Tyxml_js.Html5
-module R = Tyxml_js.R
 let document = Dom_html.window##document
 let number_events_id = "number_events"
 let number_events =
@@ -18,7 +20,7 @@ let number_events =
         Tyxml_js.R.Html5.a_value
           (React.S.l1 (fun x -> match x with
                                 | Some va -> string_of_int va
-                                | None -> "") Storage.model_max_events)]
+                                | None -> "") UIState.model_max_events)]
     ()
 let time_limit_id = "time_limit"
 let time_limit =
@@ -29,7 +31,7 @@ let time_limit =
         Tyxml_js.R.Html5.a_value
           (React.S.l1 (fun x -> match x with
                                 | Some va -> string_of_float va
-                                | None -> "") Storage.model_max_time)]
+                                | None -> "") UIState.model_max_time)]
     ()
 let plot_points_id = "plot_points"
 let plot_points =
@@ -38,7 +40,7 @@ let plot_points =
         Html5.a_input_type `Number; Html5.a_class ["form-control"];
         Html5.a_placeholder "Expected number";
         Tyxml_js.R.Html5.a_value
-          (React.S.l1 string_of_int Storage.model_nb_plot)]
+          (React.S.l1 string_of_int UIState.model_nb_plot)]
     ()
 let signal_change id signal_handler =
     let input_dom : Dom_html.inputElement Js.t =
@@ -52,14 +54,14 @@ let signal_change id signal_handler =
          let () = signal_handler (Js.to_string (input_dom##value))
          in Js._true)
 
-let error_messages signal formatter =
+let error_messages signal =
   Html5.div
     ~a:[Tyxml_js.R.Html5.a_class
           (React.S.bind
              signal
              (fun e -> React.S.const (match e with
-                                        Some _ -> ["panel-footer";"error-footer"]
-                                      | None -> ["panel-footer";"panel-pre"]
+                                        [] -> ["panel-footer";"panel-pre"]
+                                      | _ -> ["panel-footer";"error-footer"]
                                      ))
           )
        ]
@@ -67,13 +69,13 @@ let error_messages signal formatter =
        (React.S.bind
           signal
           (fun error -> React.S.const (match error with
-                                         Some error -> formatter error
-                                       | None -> ""
+                                         [] -> ""
+                                       | h::t -> h
                                       ))
        )
     ]
 
-let code_messages = error_messages model_syntax_error Storage.format_error_message
+let code_messages = error_messages UIState.model_error
 let start_button_id = "start-button"
 let start_button = Html5.button ~a:([ Html5.a_id start_button_id
                                     ; Html5.Unsafe.string_attrib "type" "button"
@@ -107,10 +109,30 @@ let configuration_settings =
                            points
                         </div>
                      </div>
-                  </div> >>
+          </div> >>
+
+
+
+let select_runtime_id = "select_runtime_id"
+let select_runtime = Html5.select
+                       ~a:[Html5.a_id select_runtime_id ]
+                       (List.map (fun runtime -> Html5.option
+                                                   ~a:[Html5.a_value (UIState.runtime_value runtime)]
+                                                   (Html5.pcdata (UIState.runtime_label runtime)))
+                                 [ UIState.WebWorker
+                                 ; UIState.Embedded
+                                 ; UIState.Remote { label = "Localhost" ; url = "http://localhost:8080" }
+                                 ; UIState.Remote { label = "Blockfreie" ; url = "http://kasim.blockfreie.org" } ])
 let configuration_button =
     <:html5<<div class="panel-footer">
-                    $start_button$
+                 <div class="row">
+                    <div class="col-md-4">
+                       $start_button$
+                    </div>
+                    <div class="col-md-2">
+                       $select_runtime$
+                    </div>
+                 </div>
             </div> >>
 
 let configuration_id = "configuration-id"
@@ -118,7 +140,7 @@ let configuration_xml =
   Html5.div
     ~a:[ Html5.a_id configuration_id
        ; Tyxml_js.R.Html5.a_class (React.S.bind
-                                     model_is_running
+                                     UIState.model_is_running
                                      (fun is_running -> React.S.const (if is_running then
                                                                          ["hidden"]
                                                                        else
@@ -129,17 +151,17 @@ let configuration_xml =
        ]
     [code_messages; configuration_settings; configuration_button ]
 
-let map_events (f : Storage.runtime_state option -> 'a option)
+let map_events (f)
                (format : 'a -> 'b)
                (identity : 'a)
     : 'b React.signal
     = React.S.map
-        (fun (state : Storage.runtime_state option) ->
-         let v : 'a = match (f state : 'a option) with
+        (fun state ->
+         let v : 'a = match state with
                           None -> identity
-                        | Some va -> va in
+                        | Some va -> f va in
          (format v : 'b))
-      (model_runtime_state : (Storage.runtime_state option) React.signal)
+      (UIState.model_runtime_state)
 
 let progress_bar percent_signal value_signal =
   Html5.div ~a:[ Html5.a_id start_button_id
@@ -158,54 +180,65 @@ let progress_bar percent_signal value_signal =
                    (fun value -> React.S.const value)
                 )
             ]
-
+let lift f x = match x with None -> None | Some x -> f x
+let default x d = match x with None -> d | Some x -> x
 let time_progress_bar = progress_bar
-                          (map_events
-                             (Storage.get_time_percentage : Storage.runtime_state option -> int option)
-                             (fun x -> x)
-                             0)
-                          (map_events
-                             Storage.get_time
-                             string_of_float
-                             0.0)
+                          (React.S.map (fun state ->
+                                        let time_percent : int option = lift (fun (state : ApiTypes.state) -> state.time_percentage) state in
+                                        let time_percent : int = default time_percent 0 in
+                                        time_percent
+                                       )
+                                       UIState.model_runtime_state)
+                          (React.S.map (fun state ->
+                                        let time : float option = lift (fun (state : ApiTypes.state) ->
+
+                                                                        Some state.time) state in
+                                        let time : float = default time 0.0 in
+                                        string_of_float time
+                                       )
+                                       UIState.model_runtime_state)
 
 let event_progress_bar = progress_bar
-                           (map_events
-                              (Storage.get_event_percentage : Storage.runtime_state option -> int option)
-                              (fun x -> x)
-                              0)
-                           (map_events
-                              Storage.get_event
-                              string_of_int
-                              0)
-
+                           (React.S.map (fun state ->
+                                         let event_percentage : int option = lift (fun (state : ApiTypes.state) ->
+                                                                                   let () = Visualization.update_plot state.plot in
+                                                                                   state.event_percentage) state in
+                                         let event_percentage : int = default event_percentage 0 in
+                                         event_percentage
+                                        )
+                                       UIState.model_runtime_state)
+                           (React.S.map (fun state ->
+                                         let event : int option = lift (fun (state : ApiTypes.state) -> Some state.event) state in
+                                         let event : int = default event 0 in
+                                         string_of_int event
+                                        )
+                                       UIState.model_runtime_state)
 let stop_button_id = "stop_button"
 let stop_button = Html5.button ~a:[ Html5.a_id stop_button_id
                                    ; Html5.Unsafe.string_attrib "type" "button"
                                    ; Html5.a_class ["btn";"btn-default"] ] [ Html5.cdata "stop" ]
-
+let tracked_events state =  let tracked_events : int option = lift (fun (state : ApiTypes.state) -> state.tracked_events) state in
+                            match tracked_events with
+                              None -> None
+                            | Some tracked_events -> if tracked_events > 0 then
+                                                       Some tracked_events
+                                                     else
+                                                       None
 let tracked_events_count = Tyxml_js.R.Html5.pcdata
-                        (React.S.bind
-                           model_runtime_state
-                           (fun state -> match get_tracked_events state with
-                                           Some c -> React.S.const
-                                                       (if c > 0 then
-                                                          string_of_int c
-                                                        else " ")
-                                         | None -> React.S.const "")
-                        )
-let tracked_events_label = Tyxml_js.R.Html5.pcdata
-                        (React.S.bind
-                           model_runtime_state
-                           (fun state -> match get_tracked_events state with
-                                           Some c -> React.S.const
-                                                       (if c > 0 then
-                                                          "tracked events"
-                                                        else " ")
-                                         | None -> React.S.const "")
-                        )
+                             (React.S.map (fun state -> match tracked_events state with
+                                                          Some tracked_events -> string_of_int tracked_events
+                                                        | None -> " "
+                                          )
+                                       UIState.model_runtime_state)
 
-let simulation_messages = error_messages Storage.model_runtime_error_message (fun i -> i)
+let tracked_events_label = Tyxml_js.R.Html5.pcdata
+                             (React.S.map (fun state -> match tracked_events state with
+                                                          Some _ -> "tracked events"
+                                                        | None -> " "
+                                          )
+                                       UIState.model_runtime_state)
+
+let simulation_messages = error_messages UIState.model_error
 let simulation_progress =
     <:html5<<div class="panel-footer panel-footer-white">
                 <div class="row">
@@ -250,7 +283,7 @@ let simulation_xml =
   Html5.div
     ~a:[ Html5.a_id simulation_id
        ; Tyxml_js.R.Html5.a_class (React.S.bind
-                                     model_is_running
+                                     UIState.model_is_running
                                      (fun model_is_running -> React.S.const (if model_is_running then
                                                                                ["visible"]
                                                                              else
@@ -265,7 +298,11 @@ let xml = <:html5<<div>
                   $simulation_xml$
                   </div> >>
 
-let onload () : unit Lwt.t =
+let onload () : unit =
+  let select_runtime_dom : Dom_html.selectElement Js.t =
+    Js.Unsafe.coerce
+      (Js.Opt.get (document##getElementById (Js.string select_runtime_id))
+                  (fun () -> assert false)) in
   let start_button_dom : Dom_html.linkElement Js.t =
     Js.Unsafe.coerce
       (Js.Opt.get (document##getElementById (Js.string start_button_id))
@@ -292,9 +329,9 @@ let onload () : unit Lwt.t =
   let () = start_button_dom##onclick <-
              Dom.handler
                (fun _ ->
-                let () = Storage.set_model_is_running true in
+                let () = UIState.set_model_is_running true in
                 let _ = init_ui () in
-                let _ = Storage.start
+                let _ = UIState.start_model
                           ~start_continuation:(fun thread_is_running ->
                                                stop_ui ();
                                                Lwt_js_events.async
@@ -305,18 +342,29 @@ let onload () : unit Lwt.t =
                                                               Lwt_switch.turn_off thread_is_running))
                           )
                           ~stop_continuation:start_ui
-                          (* document.getElementById("mydiv") *)
                 in Js._true)
   in
-  let () = signal_change number_events_id (fun value -> Storage.set_model_max_events
+  let () = select_runtime_dom##onchange <-
+             Dom.handler
+               (fun _ -> let () = UIState.set_runtime_url
+                                    (Js.to_string select_runtime_dom##value)
+                                    (fun success -> if success then
+                                                      ()
+                                                    else
+                                                      select_runtime_dom##value <- Js.string (UIState.runtime_value UIState.default_runtime)
+                                    ) in
+                         Js._true
+               )
+  in
+  let () = signal_change number_events_id (fun value -> UIState.set_model_max_events
                                                           (try Some (int_of_string value)
                                                            with Failure _ -> None)
                                           ) in
-  let () = signal_change time_limit_id    (fun value -> Storage.set_model_max_time
+  let () = signal_change time_limit_id    (fun value -> UIState.set_model_max_time
                                                           (try Some (float_of_string value)
                                                            with Failure _ -> None)) in
-  let () = signal_change plot_points_id   (fun value -> try Storage.set_model_nb_plot
+  let () = signal_change plot_points_id   (fun value -> try UIState.set_model_nb_plot
                                                               (int_of_string value)
                                                         with Not_found
                                                            | Failure "int_of_string" -> ()) in
-  Lwt.return_unit
+  ()

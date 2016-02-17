@@ -25,7 +25,7 @@ let file_label =
 
 let save_button_id = "save_button"
 let save_button =  Html5.a ~a:[ Html5.a_id save_button_id
-                              ; Tyxml_js.R.Html5.Unsafe.string_attrib "download" Storage.opened_filename
+                              ; Tyxml_js.R.Html5.Unsafe.string_attrib "download" UIState.opened_filename
                               ; Html5.Unsafe.string_attrib "role" "button"
                               ; Html5.a_class ["btn";"btn-default";"pull-right"]
                               ]
@@ -77,15 +77,15 @@ let xml = <:html5<<div class="col-md-6">
 let initialize codemirror () =
   let args = Url.Current.arguments in
   let () =
-    try Storage.set_model_max_events
+    try UIState.set_model_max_events
           (Some (int_of_string (List.assoc "nb_events" args)))
     with Not_found | Failure "int_of_string" -> () in
   let () =
-    try Storage.set_model_nb_plot
+    try UIState.set_model_nb_plot
           (int_of_string (List.assoc "plot_points" args))
     with Not_found | Failure "int_of_string" -> () in
   let () =
-    try Storage.set_model_max_time
+    try UIState.set_model_max_time
           (Some (float_of_string (List.assoc "time_limit" args)))
     with Not_found | Failure "float_of_string" -> () in
   try
@@ -101,7 +101,7 @@ let initialize codemirror () =
                 Tools.list_last (match u with
                                  | (Url.Http h | Url.Https h) -> h.Url.hu_path
                                  | Url.File f -> f.Url.fu_path) in
-              Storage.set_opened_filename filename in
+              UIState.set_opened_filename filename in
          let () = codemirror##setValue(Js.string content.XmlHttpRequest.content) in
          return_unit)
   with Not_found ->
@@ -112,7 +112,7 @@ let initialize codemirror () =
        with Not_found ->
          return_unit
 
-let onload () =
+let onload () : unit =
   let configuration : configuration Js.t = Codemirror.create_configuration () in
   let gutter_option : Js.string_array Js.t = (Js.string "CodeMirror-linenumbers,breakpoints")##split(Js.string ",") in
   let textarea : Dom_html.element Js.t =
@@ -120,20 +120,20 @@ let onload () =
                (fun () -> assert false) in
   let () = (Js.Unsafe.coerce configuration)##lineNumbers <- Js._true;
            (Js.Unsafe.coerce configuration)##gutters <- gutter_option;
-           (Js.Unsafe.coerce configuration)##mode <- (Js.string "Kappa");
-           Js.Unsafe.fun_call
-             (Js.Unsafe.js_expr "id")
-             [|Js.Unsafe.inject configuration |] in
+           (Js.Unsafe.coerce configuration)##mode <- (Js.string "Kappa")
+  in
   let codemirror : codemirror Js.t = Codemirror.fromTextArea textarea configuration in
   let _ = Lwt_js_events.async (initialize codemirror) in
   let codemirror_handler _ =
     has_been_modified := true;
-    Storage.set_model_text (Js.to_string codemirror##getValue()) in
+    UIState.update_text (Js.to_string codemirror##getValue()) in
   let () = codemirror##on((Js.string "change"),
                           (codemirror_handler)) in
+  (*
   let _ = Js.Unsafe.fun_call
             (Js.Unsafe.js_expr "id")
             [|Js.Unsafe.inject codemirror |] in
+   *)
   let file_select_dom : Dom_html.inputElement Js.t =
     Js.Unsafe.coerce
     ((Js.Opt.get (document##getElementById (Js.string file_selector_id))
@@ -169,14 +169,15 @@ let onload () =
                                let () = has_been_modified := false in
                                return_unit
   in
-  let _  = Lwt_js_events.changes
-             file_select_dom
-             (fun _ _ ->
-              if not !has_been_modified ||
-                   Js.to_bool
-                     (Dom_html.window##confirm
-                                     (Js.string "Modifications will be lost, do you wish to continue?"))
-              then file_select_handler ()
-              else return_unit)
-      in
-      Settings.onload ()
+  let ()  = Lwt.async (fun () -> Lwt_js_events.changes
+                                   file_select_dom
+                                   (fun _ _ ->
+                                    if not !has_been_modified ||
+                                         Js.to_bool
+                                           (Dom_html.window##confirm
+                                                           (Js.string "Modifications will be lost, do you wish to continue?"))
+                                    then file_select_handler ()
+                                    else return_unit))
+  in
+  let () = Settings.onload () in
+  ()

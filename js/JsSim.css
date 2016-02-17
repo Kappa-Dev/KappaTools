@@ -1,0 +1,41 @@
+#file-selector {
+    display:none;
+}
+.panel-content {
+    min-height: 50% !important;
+}
+.panel-pre {
+    white-space : pre;
+}
+.panel-footer-white {
+    background:white;
+}
+.tab-pane {
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    border-radius: 0px 0px 5px 5px;
+    padding: 10px;
+}
+
+.nav-tabs {
+    margin-bottom: 0;
+}
+.filename {
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    background: rgb(245, 245, 245);
+    border : 0px;
+    cursor : default;
+}
+.error-footer {
+    color: rgb(169, 68, 66);
+    background-color: rgb(242, 222, 222);
+}
