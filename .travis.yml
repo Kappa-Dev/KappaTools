@@ -62,7 +62,7 @@ script:
   - make all
   - sh -c "if [ '$CHECKED' = native ] ; then make doc_html ; fi"
   - sh -c "if [ '$CHECKED' = native ] ; then make -j2 check ; fi"
-  - sh -c "if [ '$CHECKED' = native ] ; then make WebSim.native ; fi"
+  - sh -c "if [ '$CHECKED' = webserver ] ; then make WebSim.native ; fi"
   - sh -c "if [ '$CHECKED' = js ] ; then make site/index.html ; fi"
 
 after_success:

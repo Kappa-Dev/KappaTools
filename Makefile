@@ -116,7 +116,7 @@ WebSim.native: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GEN
 	-tag debug \
 	-I term -I webapp -I api \
 	-pkg biniou -pkg cohttp.lwt -pkg atdgen \
-	-tag-line "<webapp/**> : thread, package(yojson), package(biniou), package(js_of_ocaml.tyxml), package(js_of_ocaml.syntax), package(tyxml.syntax), package(lwt), package(yojson), package(biniou), syntax(camlp4o)" \
+	-tag-line "<webapp/**> : thread, package(yojson), package(biniou), package(lwt), package(yojson), package(biniou)" \
 	$@
 
 bin/%: %.native Makefile
