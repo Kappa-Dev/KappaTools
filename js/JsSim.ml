@@ -19,6 +19,7 @@ let onload _ =
   let skeleton = Tyxml_js.To_dom.of_div main_container in
   let () = Dom.appendChild main skeleton in
   let _ = Code.onload ();
+          UIState.onload ();
           Visualization.onload ()
   in
   Js._true

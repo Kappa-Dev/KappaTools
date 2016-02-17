@@ -60,3 +60,12 @@ let update_plot (plot : string) : unit =
         Js.Opt.get (document##getElementById (Js.string plot_div_id))
                    (fun () -> assert false) in
   plot_div##innerHTML <- Js.string (Harness.id plot)
+
+let onload () =
+  let plot_div : Dom_html.element Js.t =
+    Js.Opt.get (document##getElementById (Js.string plot_div_id))
+               (fun () -> assert false) in
+  React.S.l1 (fun state -> match state with
+                             None -> ()
+                           | Some state -> update_plot state.plot)
+             UIState.model_runtime_state
