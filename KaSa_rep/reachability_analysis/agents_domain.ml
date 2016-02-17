@@ -77,7 +77,7 @@ struct
     }
 
   let get_agents_without_interface static = static.agents_without_interface
-    
+
   let set_agents_without_interface agents static =
     {
       static with
@@ -129,10 +129,19 @@ struct
         (fun parameter error agent_id agent current_list ->
           match agent with
           | Cckappa_sig.Unknown_agent _
-          | Cckappa_sig.Ghost 
+          | Cckappa_sig.Ghost
           | Cckappa_sig.Dead_agent _ -> error, current_list
             (*FIXME: should I deal with Dead_agent or warn them*)
             (*warn parameter error (Some "line 49") Exit current_list*)
+	    (*you should use the following type constructor:
+	      type 'a Bot_or_not = Bot | Not_bot 'a
+	      if a dead agent occurs in a lhs, output Bot
+	      otherwise Not_bot list *)
+	    (*In is_enable, Bot is unsatisfiable *)
+	    (*Be careful, dead agents and Ghosts agents are different *)
+	    (*Ghost agents must be ignored *)
+	    (*Dead agents, generates Bot elements *)
+	    (*I think that unknown agents must be dealt with as dead agents *)
           | Cckappa_sig.Agent agent ->
             let agent_type = agent.Cckappa_sig.agent_name in
             let agent_list = agent_type :: current_list in
@@ -160,6 +169,7 @@ struct
               | Cckappa_sig.Unknown_agent _
               | Cckappa_sig.Ghost
               | Cckappa_sig.Dead_agent _ -> error, store_result
+		(This is correct, no need to deal with Dead, Ghost, unknown agents *)
               (*FIXME*)
               (*warn parameter error (Some "line 49") Exit store_result*)
               | Cckappa_sig.Agent agent ->
@@ -176,7 +186,7 @@ struct
                     | error, Some l -> error, l
                   in
                   let rule_id_list = rule_id :: old_list in
-                  let error, map = 
+                  let error, map =
                     Int2Map_Agent.Map.add_or_overwrite parameter error
                       agent_type rule_id_list store_result
                   in
@@ -257,6 +267,7 @@ struct
           | Cckappa_sig.Dead_agent _ ->
             error, dynamic
           (*FIXME*)
+	  (*JF: warn: dead,unknown,ghost should not occur in initial states *)
           (*warn parameter error (Some "line 331") Exit dynamic*)
           | Cckappa_sig.Agent agent ->
             let agent_type = agent.Cckappa_sig.agent_name in
@@ -397,7 +408,7 @@ struct
                 List.fold_left (fun event_list rule_id ->
                   Analyzer_headers.Check_rule rule_id :: event_list
                 ) event_list list
-              in
+              in (* JF: it looks good, I lack of time to check carefully *)
               aux (k + 1) (dynamic, event_list)
         in
         aux agent_type (dynamic, event_list)
