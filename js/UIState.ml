@@ -31,6 +31,7 @@ let runtime_value runtime = match runtime with
 let default_runtime = WebWorker
 let runtime_state : Api.runtime option ref = ref None
 let set_runtime_url (url : string) (continuation : bool -> unit) : unit =
+  let () = set_model_error [] in
   if url = "WebWorker" then
     let () = runtime_state := Some (new JsWorker.runtime () :> Api.runtime) in
     let () = continuation true in
