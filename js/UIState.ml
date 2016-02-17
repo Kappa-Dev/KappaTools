@@ -47,7 +47,6 @@ let set_runtime_url (url : string) (continuation : bool -> unit) : unit =
                                      version_url)
                                   >>=
                                     (fun frame ->
-                                     let () = Harness.source frame in
                                      let is_valid_server : bool = frame.code = 200 in
                                      let () = if is_valid_server then
                                                 runtime_state := Some (new JsRemote.runtime url :> Api.runtime)
@@ -75,7 +74,6 @@ let update_text text =
                         | Some runtime_state -> runtime_state#parse text)
                       >>=
                         (fun (error) ->
-                         let () = Harness.id error in
                          let () = set_model_error error in
                                           Lwt.return_unit)
                      )

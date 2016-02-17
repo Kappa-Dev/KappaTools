@@ -59,7 +59,7 @@ let update_plot (plot : string) : unit =
   let plot_div : Dom_html.element Js.t =
         Js.Opt.get (document##getElementById (Js.string plot_div_id))
                    (fun () -> assert false) in
-  plot_div##innerHTML <- Js.string (Harness.id plot)
+  plot_div##innerHTML <- Js.string plot
 
 let onload () =
   let plot_div : Dom_html.element Js.t =
