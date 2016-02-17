@@ -47,7 +47,7 @@ let print_json_of_flux f flux =
   let () =
     Format.fprintf
       f "@[\"rules\" :@ @[[%a]@]@],@ @[\"hits\" :@ @[[%a]@]@],@ "
-      (Pp.array Pp.comma (fun _ -> Format.pp_print_string)) flux.Data.flux_rules
+      (Pp.array Pp.comma (fun _ f x -> Format.fprintf f "\"%s\"" x)) flux.Data.flux_rules
       (Pp.array Pp.comma (fun _ -> Format.pp_print_int))
       flux.Data.flux_data.Data.flux_hits in
   Format.fprintf
