@@ -882,4 +882,283 @@ Id=8
 
 EXTENSIONAL DESCRIPTION:
 The internal state of site x in agent B ranges over u and p.
+<<<<<<< a41905d8f39a09d6cf3629bcb52a6ec6c6348fd7
+=======
+
+Reachability analysis...
+	Views in initial state
+
+
+INTENSIONAL DESCRIPTION:
+Id=3
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	A(x~u)
+	Wake-up rules
+	Views in initial state
+
+
+INTENSIONAL DESCRIPTION:
+Id=3
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	B(x~u)
+	Wake-up rules
+
+	Applying rule 8:
+		the predcondition is satisfied
+
+		rule 8 is applied for the first time
+
+
+	Applying rule 9:
+		the predcondition is satisfied
+
+		rule 9 is applied for the first time
+
+
+	Applying rule 0:
+		the predcondition is satisfied
+
+		rule 0 is applied for the first time
+
+		Updating the views for A(x~)
+		Updating the views for B(x~)
+			
+
+
+INTENSIONAL DESCRIPTION:
+Id=5
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=4
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	B(x~p)
+	Wake-up rules
+
+	Applying rule 3:
+		the predcondition is satisfied
+
+		rule 3 is applied for the first time
+
+		Updating the views for A(x~)
+			
+
+
+INTENSIONAL DESCRIPTION:
+Id=5
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=4
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	A(x~p)
+	Wake-up rules
+
+	Applying rule 4:
+		the predcondition is satisfied
+
+		rule 4 is applied for the first time
+
+		Updating the views for A(x~)
+
+	Applying rule 5:
+		the predcondition is satisfied
+
+		rule 5 is applied for the first time
+
+		Updating the views for A(x~)
+
+	Applying rule 6:
+		the predcondition is satisfied
+
+		rule 6 is applied for the first time
+
+		Updating the views for A(x~)
+
+	Applying rule 7:
+		the predcondition is satisfied
+
+		rule 7 is applied for the first time
+
+		Updating the views for A(x~)
+
+	Applying rule 1:
+		the predcondition is satisfied
+
+		rule 1 is applied for the first time
+
+		Updating the views for B(x~)
+
+	Applying rule 2:
+		the predcondition is satisfied
+
+		rule 2 is applied for the first time
+
+		Updating the views for B(x~)
+
+	Applying rule 0:
+		the predcondition is satisfied
+		Updating the views for A(x~)
+		Updating the views for B(x~)
+
+	Applying rule 3:
+		the predcondition is satisfied
+		Updating the views for A(x~)
+
+	Applying rule 8:
+		the predcondition is satisfied
+
+	Applying rule 9:
+		the predcondition is satisfied
+
+------------------------------------------------------------
+* Dead rules :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Dead agents :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+agent_type:0:A:cv_id:0
+Id=6
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=4
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+agent_type:1:B:cv_id:0
+Id=6
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=4
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Id=8
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=7
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=8
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=7
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+INTENSIONAL DESCRIPTION:
+Id=8
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=7
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+The internal state of site x in agent A ranges over u and p.
+INTENSIONAL DESCRIPTION:
+Id=8
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=7
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+The internal state of site x in agent B ranges over u and p.
+>>>>>>> fixme: how can I deal with Cckappa_sig.Dead_agent
 execution finished without any exception

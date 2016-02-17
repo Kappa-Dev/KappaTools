@@ -129,9 +129,10 @@ struct
         (fun parameter error agent_id agent current_list ->
           match agent with
           | Cckappa_sig.Unknown_agent _
-          | Cckappa_sig.Ghost -> error, current_list
-          | Cckappa_sig.Dead_agent _ ->
-            warn parameter error (Some "line 49") Exit current_list
+          | Cckappa_sig.Ghost 
+          | Cckappa_sig.Dead_agent _ -> error, current_list
+            (*FIXME: should I deal with Dead_agent or warn them*)
+            (*warn parameter error (Some "line 49") Exit current_list*)
           | Cckappa_sig.Agent agent ->
             let agent_type = agent.Cckappa_sig.agent_name in
             let agent_list = agent_type :: current_list in
@@ -157,9 +158,10 @@ struct
             (fun parameter error agent_id agent store_result ->
               match agent with
               | Cckappa_sig.Unknown_agent _
-              | Cckappa_sig.Ghost -> error, store_result
-              | Cckappa_sig.Dead_agent _ ->
-                warn parameter error (Some "line 49") Exit store_result
+              | Cckappa_sig.Ghost
+              | Cckappa_sig.Dead_agent _ -> error, store_result
+              (*FIXME*)
+              (*warn parameter error (Some "line 49") Exit store_result*)
               | Cckappa_sig.Agent agent ->
                 let agent_type = agent.Cckappa_sig.agent_name in
                 let agent_interface = agent.Cckappa_sig.agent_interface in
@@ -251,8 +253,11 @@ struct
         (fun parameter error init agent dynamic ->
           match agent with
           | Cckappa_sig.Unknown_agent _
-          | Cckappa_sig.Ghost -> error, dynamic
-          | Cckappa_sig.Dead_agent _ -> warn parameter error (Some "line 331") Exit dynamic
+          | Cckappa_sig.Ghost
+          | Cckappa_sig.Dead_agent _ ->
+            error, dynamic
+          (*FIXME*)
+          (*warn parameter error (Some "line 331") Exit dynamic*)
           | Cckappa_sig.Agent agent ->
             let agent_type = agent.Cckappa_sig.agent_name in
             let local = get_seen_agent dynamic in
