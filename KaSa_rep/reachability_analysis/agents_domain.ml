@@ -169,7 +169,7 @@ struct
               | Cckappa_sig.Unknown_agent _
               | Cckappa_sig.Ghost
               | Cckappa_sig.Dead_agent _ -> error, store_result
-		(This is correct, no need to deal with Dead, Ghost, unknown agents *)
+		(*This is correct, no need to deal with Dead, Ghost, unknown agents *)
               (*FIXME*)
               (*warn parameter error (Some "line 49") Exit store_result*)
               | Cckappa_sig.Agent agent ->
