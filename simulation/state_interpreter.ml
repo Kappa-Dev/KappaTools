@@ -327,10 +327,8 @@ let loop_cps ~outputs form hook return env domain counter graph state =
 let finalize ~outputs form env counter graph state =
   let () = Outputs.close () in
   let () = Counter.complete_progress_bar form counter in
-(*  let () = if !Parameter.store_unary_distance then
-	     Kappa_files.with_unary_dist
-	       (Counter.current_event counter)
-	       (Rule_interpreter.print_all_dist graph) in *)
+  let () = if !Parameter.store_unary_distance then
+	     outputs (Data.UnaryDistances (Rule_interpreter.unary_distances counter graph)) in
   let () =
     List.iter
       (fun e ->

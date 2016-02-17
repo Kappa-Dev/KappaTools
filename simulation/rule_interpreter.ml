@@ -258,7 +258,7 @@ let store_event counter inj2graph new_tracked_obs_instances event_kind
 let store_obs edges roots obs acc = function
   | None -> acc
   | Some (tracked,_) ->
-     List.fold_left
+    List.fold_left
        (fun acc (cc,(root,_)) ->
 	try
 	  List.fold_left
@@ -812,17 +812,11 @@ let print_dist env state rule_id =
 			  Format.printf "%i " n)
 			 dist_ls
 			 
-let print_all_dist state f =
-  Array.iteri
-    (fun id dist_arr ->
-     match dist_arr with [] -> ()
-		       | dist_ls ->
-			  let () =  Format.fprintf f "Rule %i: " id in
-			  List.iter
-			    (fun (n,time) ->
-			     Format.fprintf f " time: %i, distance: %i " time n)
-			    dist_ls)
-    state.store_unary_dist
+let unary_distances counter state = {
+  Data.dist_file = "aaa";
+  Data.event = Counter.current_event counter;
+  Data.arr_rules = state.store_unary_dist;
+}
 
 let debug_print f state =
   Format.fprintf f "@[<v>%a@,%a@,%a@,%a@]"

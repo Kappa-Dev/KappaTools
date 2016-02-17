@@ -18,7 +18,14 @@ type snapshot = {
     tokens : (string * Nbr.t) array;
   }
 
+type unary_distances = {
+    dist_file : string;
+    arr_rules : (int * int) list array;
+    event : int;
+  }
+
 type t = Flux of flux_map
        | Plot of float * Nbr.t array
        | Print of file_line
        | Snapshot of snapshot
+       | UnaryDistances of unary_distances
