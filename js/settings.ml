@@ -110,15 +110,16 @@ let configuration_settings =
                         </div>
                      </div>
           </div> >>
-
+let select_default_runtime = [ UIState.WebWorker ; UIState.Embedded ]
 let select_runtime_id = "select_runtime_id"
-let select_runtime = Html5.select
+let select_runtime_options, select_runtime_options_handle = ReactiveData.RList.create select_default_runtime
+let select_runtime = Tyxml_js.R.Html5.select
                        ~a:[Html5.a_id select_runtime_id ]
-                       (List.map (fun runtime -> Html5.option
-                                                   ~a:[Html5.a_value (UIState.runtime_value runtime)]
-                                                   (Html5.pcdata (UIState.runtime_label runtime)))
-                                 [ UIState.WebWorker
-                                 ; UIState.Embedded ])
+                       (ReactiveData.RList.map
+                          (fun runtime -> Html5.option
+                                            ~a:[Html5.a_value (UIState.runtime_value runtime)]
+                                            (Html5.pcdata (UIState.runtime_label runtime)))
+                          select_runtime_options)
 
 let configuration_button =
     <:html5<<div class="panel-footer">
@@ -296,12 +297,6 @@ let xml = <:html5<<div>
                   </div> >>
 
 let onload () : unit =
-  let args = Url.Current.arguments in
-  let () = try let hosts = List.map fst (List.filter (fun (key,value) -> key = "hosts") args) in
-               let () = List.iter (fun url -> ()) hosts in
-               ()
-           with Not_found | Failure "int_of_string" -> () in
-
   let select_runtime_dom : Dom_html.selectElement Js.t =
     Js.Unsafe.coerce
       (Js.Opt.get (document##getElementById (Js.string select_runtime_id))
@@ -314,6 +309,42 @@ let onload () : unit =
     Js.Unsafe.coerce
       (Js.Opt.get (document##getElementById (Js.string stop_button_id))
                   (fun () -> assert false)) in
+  let args = Url.Current.arguments in
+  let set_runtime runtime continuation =
+    set_runtime runtime
+                (fun success -> if success then
+                                  select_runtime_dom##value <- Js.string (UIState.runtime_value runtime)
+                                else
+                                  continuation ())
+  in
+  let default_embedded () = set_runtime Embedded (fun _ -> ()) in
+  let () = try let hosts = args in
+               let hosts = List.filter (fun (key,value) -> key = "host") hosts in
+               let hosts = List.map snd hosts in
+               let hosts = List.map (fun h -> (h,Url.url_of_string h)) hosts in
+               let hosts = List.map (fun x -> match x with
+                                                (_,None) -> None
+                                              | (url,Some parsed) ->
+                                                 let label = (match parsed with
+                                                                Url.Http http -> http.Url.hu_host                                                                                                                                                           | Url.Https https -> https.Url.hu_host                                                                                                                                                        | Url.File file -> url
+                                                             ) in
+                                                 Some (Remote { label = label; url = url })
+                                    ) hosts in
+               let hosts = List.fold_left (fun acc value -> match value with
+                                                              Some remote -> remote::acc
+                                                            | None -> acc)
+                                          []
+                                          hosts
+               in
+               let hosts = List.concat [select_default_runtime;hosts] in
+               let () = ReactiveData.RList.set select_runtime_options_handle hosts in
+               let selected_runtime : runtime = (match hosts with
+                                                   head::_ -> head
+                                                 | _ -> Embedded) in
+               let () = set_runtime selected_runtime (default_embedded) in
+               ()
+           with _ -> default_embedded () in
+
   let init_ui () =
     let _ = start_button_dom##disabled <- Js._true in
     let _ = stop_button_dom##disabled <- Js._true in

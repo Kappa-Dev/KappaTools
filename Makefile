@@ -10,7 +10,7 @@ GENIMG = generated_img
 MANGENREP = $(MANREP)$(GENIMG)/
 
 KASAREP = KaSa_rep/
-
+RANDOM_NUMBER = $(shell bash -c 'echo $$RANDOM')
 TERM = $(shell echo $$TERM)
 
 OCAMLBUILDFLAGS = $(EXTRAFLAGS)
@@ -66,7 +66,7 @@ site:
 	mkdir site
 
 site/external: site
-ifeq ($(USE_CDN),0)
+ifeq ($(NO_CDN),1)
 	mkdir -p $@ ;\
 	mkdir -p $(TEMPDIR) ;\
 	wget -O $(TEMPDIR)/bootstrap.zip   https://github.com/twbs/bootstrap/releases/download/v3.3.5/bootstrap-3.3.5-dist.zip ;\
@@ -89,11 +89,14 @@ site/JsSim.js: JsSim.byte site/external
 site/WebWorker.js: WebWorker.byte
 	js_of_ocaml --debuginfo --pretty "+weak.js" "+nat.js" _build/js/$< -o $@
 
+test:
+	cat js/no-cdn.html | sed s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g > site/index.html
+
 site/index.html: site js/no-cdn.html js/use-cdn.html site/JsSim.js site/WebWorker.js js/*.js js/favicon.ico js/*.css
-ifeq ($(USE_CDN),0)
-	cp -f js/no-cdn.html site/index.html
+ifeq ($(NO_CDN),1)
+	cat js/no-cdn.html | sed "s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g" > site/index.html
 else
-	cp -f js/use-cdn.html site/index.html
+	cat js/use-cdn.html | sed "s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g" > site/index.html
 endif
 	cp -f js/*.js js/*.css js/favicon.ico site
 

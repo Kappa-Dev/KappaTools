@@ -31,6 +31,7 @@ let runtime_value runtime = match runtime with
 let default_runtime = WebWorker
 let runtime_state : Api.runtime option ref = ref None
 let set_runtime_url (url : string) (continuation : bool -> unit) : unit =
+  try
   let () = set_model_error [] in
   if url = "WebWorker" then
     let () = runtime_state := Some (new JsWorker.runtime () :> Api.runtime) in
@@ -51,7 +52,7 @@ let set_runtime_url (url : string) (continuation : bool -> unit) : unit =
                                      let () = if is_valid_server then
                                                 runtime_state := Some (new JsRemote.runtime url :> Api.runtime)
                                               else
-                                                let error_msg : string = Format.sprintf "Bad Response : %d" frame.code in
+                                                let error_msg : string = Format.sprintf "Bad Response %d from %s " frame.code version_url in
                                                 set_model_error [error_msg]
                                      in
                                      let () = continuation is_valid_server in
@@ -60,12 +61,19 @@ let set_runtime_url (url : string) (continuation : bool -> unit) : unit =
                        )
     in
     ()
-
-let onload () : unit =
+  with _ -> continuation false
+let set_runtime (runtime : runtime) (continuation : bool -> unit) : unit =
+  set_runtime_url (runtime_value runtime) continuation
+let onload () : unit = ()
+                         (*
   match !runtime_state with
-    None -> let () = runtime_state := Some (new JsWorker.runtime () :> Api.runtime) in ()
+    None -> let () = runtime_state :=
+                       try
+                         Some (new JsWorker.runtime () :> Api.runtime)
+                       with _ -> Some (new Api.Base.runtime Lwt_js.yield :> Api.runtime)
+            in ()
   | Some _ -> ()
-
+                          *)
 let update_text text =
   let () = set_model_text text in
   let () = Lwt.async (fun () ->
