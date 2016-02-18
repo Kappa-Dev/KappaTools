@@ -477,21 +477,6 @@ let snapshot env s =
       s.Data.snap_file s.Data.snap_event "ka"
       (fun f -> Format.fprintf f "%a@." (print_snapshot env) s)
 
-let unary_distances s = 
-  Kappa_files.with_unary_dist
-    (s.Data.event)
-    (fun f ->
-    (Array.iteri
-       (fun id dist_arr ->
-	match dist_arr with [] -> ()
-			  | dist_ls ->
-			     let () =  Format.fprintf f "Rule %i\n" id in
-			     List.iter
-			       (fun (d,t) ->
-				Format.fprintf f " time: %i, distance: %i\n" t d)
-			       dist_ls)
-       s.Data.arr_rules))
-
 let go env = function
   | Data.Snapshot s -> snapshot env s
   | Data.Flux f -> output_flux f
@@ -503,7 +488,6 @@ let go env = function
        | Some file -> get_desc file
      in
      Format.fprintf desc "%s@." p.Data.line
-  | Data.UnaryDistances s -> unary_distances s
 
 let close () =
   let () = close_plot () in

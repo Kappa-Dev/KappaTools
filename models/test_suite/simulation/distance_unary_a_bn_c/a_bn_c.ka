@@ -15,7 +15,6 @@
 %obs: 'Ap' |A(a~p?)|
 
 %mod: [E]=[Emax] do $SNAPSHOT "abc.ka"
-%def: "storeUnaryDistance" "true"
 
 %init: 100 A(a~u)
 %init: 100 B()

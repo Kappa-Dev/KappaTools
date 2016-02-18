@@ -65,10 +65,10 @@ pick a rule randomly), you can apply several rules in row before
 resynchronizing. (This is what initial state and perturbations do.) *)
 
 val snapshot: Environment.t -> Counter.t -> string -> t -> Data.snapshot
-val unary_distances : Counter.t -> t -> Data.unary_distances
 
 val print : Environment.t -> Format.formatter -> t -> unit
 val print_dist : Environment.t -> t -> int -> unit
+(*val print_all_dist : t -> Format.formatter -> unit*)
 
 (** {6 Stories} *)
 
