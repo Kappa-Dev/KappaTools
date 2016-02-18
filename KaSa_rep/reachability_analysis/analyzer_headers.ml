@@ -60,6 +60,28 @@ let set_bdu_common_static common static =
       global_bdu_common_static = common
   }
 
+let get_side_effects static =
+  (get_bdu_common_static static).Common_static.store_side_effects
+
+let set_side_effects eff static =
+  set_bdu_common_static
+    {
+      (get_bdu_common_static static) with
+        Common_static.store_side_effects = eff
+    }
+    static
+
+let get_potential_side_effects static =
+  (get_bdu_common_static static).Common_static.store_potential_side_effects
+
+let set_potential_side_effects eff static =
+  set_bdu_common_static
+    {
+      (get_bdu_common_static static) with
+        Common_static.store_potential_side_effects = eff
+    }
+    static
+
 let compute_initial_state error static =
   let parameter = get_parameter static in
   let compil = get_cc_code static in

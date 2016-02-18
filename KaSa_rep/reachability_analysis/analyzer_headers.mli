@@ -60,6 +60,12 @@ val get_bdu_common_static : global_static_information -> Common_static.bdu_commo
 
 val set_bdu_common_static : Common_static.bdu_common_static -> global_static_information -> global_static_information
 
+val get_side_effects : global_static_information -> Common_static.half_break_action * Common_static.remove_action
+val set_side_effects : Common_static.half_break_action * Common_static.remove_action -> global_static_information -> global_static_information
+
+val get_potential_side_effects : global_static_information -> Common_static.potential_partner_free * Common_static.potential_partner_bind
+val set_potential_side_effects : Common_static.potential_partner_free * Common_static.potential_partner_bind -> global_static_information -> global_static_information
+
 val compute_initial_state:
   Exception.method_handler ->
   global_static_information ->
