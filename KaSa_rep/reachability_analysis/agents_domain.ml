@@ -122,31 +122,41 @@ struct
 
   (**************************************************************************)
   (**initialize*)
+  (*you should use the following type constructor:
+    type 'a Bot_or_not = Bot | Not_bot 'a
+    if a dead agent occurs in a lhs, output Bot
+    otherwise Not_bot list *)
+  (*In is_enable, Bot is unsatisfiable *)
+  (*Be careful, dead agents and Ghosts agents are different *)
+  (*Ghost agents must be ignored *)
+  (*Dead agents, generates Bot elements *)
+  (*I think that unknown agents must be dealt with as dead agents *)
 
+  type 'a bot_or_not =
+  | Bot
+  | Not_bot of 'a
+  
   let collect_agents parameter error rule =
-    let error, agents_test_list =
+    let error, agents_test_list_op =
       Bdu_analysis_type.AgentMap.fold parameter error
-        (fun parameter error agent_id agent current_list ->
+        (fun parameter error agent_id agent op ->
           match agent with
+          | Cckappa_sig.Ghost -> error, op
           | Cckappa_sig.Unknown_agent _
-          | Cckappa_sig.Ghost
-          | Cckappa_sig.Dead_agent _ -> error, current_list
-            (*FIXME: should I deal with Dead_agent or warn them*)
-            (*warn parameter error (Some "line 49") Exit current_list*)
-	    (*you should use the following type constructor:
-	      type 'a Bot_or_not = Bot | Not_bot 'a
-	      if a dead agent occurs in a lhs, output Bot
-	      otherwise Not_bot list *)
-	    (*In is_enable, Bot is unsatisfiable *)
-	    (*Be careful, dead agents and Ghosts agents are different *)
-	    (*Ghost agents must be ignored *)
-	    (*Dead agents, generates Bot elements *)
-	    (*I think that unknown agents must be dealt with as dead agents *)
+          | Cckappa_sig.Dead_agent _ -> error, Bot
           | Cckappa_sig.Agent agent ->
             let agent_type = agent.Cckappa_sig.agent_name in
-            let agent_list = agent_type :: current_list in
-            error, agent_list
-        ) rule.Cckappa_sig.rule_lhs.Cckappa_sig.views []
+            match op with
+            | Bot -> error, Bot
+            | Not_bot current_list ->
+              let agent_list = agent_type :: current_list in
+              error, Not_bot agent_list
+        ) rule.Cckappa_sig.rule_lhs.Cckappa_sig.views Bot
+    in
+    let agents_test_list =
+      match agents_test_list_op with
+      | Bot -> []
+      | Not_bot agent_list -> agent_list
     in
     let error, agents_created_list =
       List.fold_left (fun (error, current_list) (agent_id, agent_type) ->
@@ -156,57 +166,46 @@ struct
     in
     error, (agents_test_list, agents_created_list)
 
-  let collect_agents_without_interface static dynamic error =
-    let parameter = get_parameter static in
-    let compil = get_compil static in
+  let collect_agents_without_interface parameter error rule_id rule store_result =
     let error, store_result =
-      Int_storage.Nearly_inf_Imperatif.fold
-        parameter error
-        (fun parameter error rule_id rule store_result ->
-          Bdu_analysis_type.AgentMap.fold parameter error
-            (fun parameter error agent_id agent store_result ->
-              match agent with
-              | Cckappa_sig.Unknown_agent _
-              | Cckappa_sig.Ghost
-              | Cckappa_sig.Dead_agent _ -> error, store_result
-		(*This is correct, no need to deal with Dead, Ghost, unknown agents *)
-              (*FIXME*)
-              (*warn parameter error (Some "line 49") Exit store_result*)
-              | Cckappa_sig.Agent agent ->
-                let agent_type = agent.Cckappa_sig.agent_name in
-                let agent_interface = agent.Cckappa_sig.agent_interface in
-                if Cckappa_sig.Site_map_and_set.Map.is_empty agent_interface
-                then
-                  (*empty interface*)
-                  let error, old_list =
-                    match Int2Map_Agent.Map.find_option_without_logs parameter error
-                      agent_type store_result
-                    with
-                    | error, None -> error, []
-                    | error, Some l -> error, l
-                  in
-                  let rule_id_list = rule_id :: old_list in
-                  let error, map =
-                    Int2Map_Agent.Map.add_or_overwrite parameter error
-                      agent_type rule_id_list store_result
-                  in
-                  error, map
-                else
-                  error, store_result
-            ) rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
-            store_result
-        ) compil.Cckappa_sig.rules Int2Map_Agent.Map.empty
+      Bdu_analysis_type.AgentMap.fold parameter error
+        (fun parameter error agent_id agent store_result ->
+          match agent with
+          | Cckappa_sig.Unknown_agent _
+          | Cckappa_sig.Ghost
+          | Cckappa_sig.Dead_agent _ -> error, store_result
+          | Cckappa_sig.Agent agent ->
+            let agent_type = agent.Cckappa_sig.agent_name in
+            let agent_interface = agent.Cckappa_sig.agent_interface in
+            if Cckappa_sig.Site_map_and_set.Map.is_empty agent_interface
+            then
+              (*empty interface*)
+              let error, old_list =
+                match Int2Map_Agent.Map.find_option_without_logs parameter error
+                  agent_type store_result
+                with
+                | error, None -> error, []
+                | error, Some l -> error, l
+              in
+              let rule_id_list = rule_id :: old_list in
+              let error, store_result =
+                Int2Map_Agent.Map.add_or_overwrite parameter error
+                  agent_type rule_id_list store_result
+              in
+              error, store_result
+            else
+              error, store_result
+        ) rule.Cckappa_sig.rule_lhs.Cckappa_sig.views store_result
     in
-    let static = set_agents_without_interface store_result static in
-    error, static, dynamic
+    error, store_result
 
   let scan_rule_set static dynamic error =
     let parameter = get_parameter static in
     let compil = get_compil static in
-    let error, result =
+    let error, (result, agents) =
       Int_storage.Nearly_inf_Imperatif.fold
         parameter error
-        (fun parameter error rule_id rule store_result ->
+        (fun parameter error rule_id rule (store_result, agents_store) ->
           let error, (agents_test_list, agents_created_list) =
             collect_agents
               parameter
@@ -214,14 +213,24 @@ struct
               rule.Cckappa_sig.e_rule_c_rule
           in
           (*add rule_id in map*)
-          let error, map =
+          let error, result =
             Int2Map_Agent.Map.add_or_overwrite parameter error rule_id
               (agents_test_list, agents_created_list) store_result
           in
-          error, map
-        ) compil.Cckappa_sig.rules Int2Map_Agent.Map.empty
+          (*agents without interface*)
+          let error, agents_without_interface =
+            collect_agents_without_interface
+              parameter
+              error
+              rule_id
+              rule.Cckappa_sig.e_rule_c_rule
+              agents_store
+          in
+          error, (result, agents_without_interface)
+        ) compil.Cckappa_sig.rules (Int2Map_Agent.Map.empty, Int2Map_Agent.Map.empty)
     in
     let static = set_domain_static_information result static in
+    let static = set_agents_without_interface agents static in
     error, static, dynamic
 
   (**************************************************************************)
@@ -247,9 +256,6 @@ struct
     let error, static, dynamic =
       scan_rule_set init_global_static_information init_global_dynamic_information error
     in
-    let error, static, dynamic =
-      collect_agents_without_interface static dynamic error
-    in
     error, static, dynamic
 
   (**************************************************************************)
@@ -262,13 +268,11 @@ struct
       Bdu_analysis_type.AgentMap.fold parameter error
         (fun parameter error init agent dynamic ->
           match agent with
+	  (*JF: warn: dead,unknown,ghost should not occur in initial states *)
           | Cckappa_sig.Unknown_agent _
           | Cckappa_sig.Ghost
           | Cckappa_sig.Dead_agent _ ->
-            error, dynamic
-          (*FIXME*)
-	  (*JF: warn: dead,unknown,ghost should not occur in initial states *)
-          (*warn parameter error (Some "line 331") Exit dynamic*)
+            warn parameter error (Some "line 275") Exit dynamic
           | Cckappa_sig.Agent agent ->
             let agent_type = agent.Cckappa_sig.agent_name in
             let local = get_seen_agent dynamic in
