@@ -10,7 +10,7 @@ let model_error, set_model_error = React.S.create ([] : Api_types.error)
 let model_is_running , set_model_is_running = React.S.create false
 let model_max_events, set_model_max_events = React.S.create None
 let model_max_time, set_model_max_time = React.S.create None
-let model_nb_plot, set_model_nb_plot = React.S.create 0
+let model_nb_plot, set_model_nb_plot = React.S.create 150
 let opened_filename, set_opened_filename = React.S.create "model.ka"
 let model_runtime_state , set_model_runtime_state =
   React.S.create (None : ApiTypes.state option)

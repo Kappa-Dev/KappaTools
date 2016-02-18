@@ -87,7 +87,7 @@ site/JsSim.js: JsSim.byte site/external
 	js_of_ocaml --debuginfo --pretty "+weak.js" "+nat.js" _build/js/$< -o $@
 
 site/WebWorker.js: WebWorker.byte
-	js_of_ocaml --debuginfo --pretty "+weak.js" "+nat.js" _build/js/$< -o $@
+	js_of_ocaml --debuginfo --pretty "+nat.js" _build/js/$< -o $@
 
 site/index.html: site js/no-cdn.html js/use-cdn.html site/JsSim.js site/WebWorker.js js/*.js js/favicon.ico js/*.css
 ifeq ($(USE_CDN),0)

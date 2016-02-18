@@ -107,11 +107,16 @@ end = struct
                                                                  points = [];
                                                                }
                                     in
+				    let lastyield = ref (Sys.time ()) in
                                     State_interpreter.loop_cps
                                       ~outputs:outputs
                                       log_form
                                       (fun f -> if Lwt_switch.is_on simulation.switch
-                                                then Lwt.bind (yield ()) f
+                                                then let t = Sys.time () in
+						     if t -. !lastyield > 0.01 then
+						       let () = lastyield := t in
+						       Lwt.bind (yield ()) f
+						     else f ()
                                                 else Lwt.return_unit
                                       )
                                       (fun (_ : Rule_interpreter.t)(_ : State_interpreter.t)  ->
