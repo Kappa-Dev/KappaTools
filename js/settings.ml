@@ -15,7 +15,8 @@ let number_events_id = "number_events"
 let number_events =
   Html5.input
     ~a:[Html5.a_id number_events_id ;
-        Html5.a_input_type `Number; Html5.a_class ["form-control"];
+        Html5.a_input_type `Number;
+        Html5.a_class ["form-control"];
         Html5.a_placeholder "Max number";
         Tyxml_js.R.Html5.a_value
           (React.S.l1 (fun x -> match x with
@@ -26,7 +27,8 @@ let time_limit_id = "time_limit"
 let time_limit =
   Html5.input
     ~a:[Html5.a_id time_limit_id ;
-        Html5.a_input_type `Number; Html5.a_class ["form-control"];
+        Html5.a_input_type `Number;
+        Html5.a_class ["form-control"];
         Html5.a_placeholder "Time limit";
         Tyxml_js.R.Html5.a_value
           (React.S.l1 (fun x -> match x with
@@ -37,7 +39,9 @@ let plot_points_id = "plot_points"
 let plot_points =
   Html5.input
     ~a:[Html5.a_id plot_points_id;
-        Html5.a_input_type `Number; Html5.a_class ["form-control"];
+        Html5.a_input_type `Number;
+        Html5.Unsafe.int_attrib "min" 1 ;
+        Html5.a_class ["form-control"];
         Html5.a_placeholder "Expected number";
         Tyxml_js.R.Html5.a_value
           (React.S.l1 string_of_int UIState.model_nb_plot)]
@@ -317,6 +321,13 @@ let onload () : unit =
                                 else
                                   continuation ())
   in
+  let format_url url =
+    let length = String.length url in
+    if length > 0 && String.get url (length - 1) == '/' then
+      String.sub url 0 (length - 1)
+    else
+      url
+  in
   let default_embedded () = set_runtime Embedded (fun _ -> ()) in
   let () = try let hosts = args in
                let hosts = List.filter (fun (key,value) -> key = "host") hosts in
@@ -326,9 +337,9 @@ let onload () : unit =
                                                 (_,None) -> None
                                               | (url,Some parsed) ->
                                                  let label = (match parsed with
-                                                                Url.Http http -> http.Url.hu_host                                                                                                                                                           | Url.Https https -> https.Url.hu_host                                                                                                                                                        | Url.File file -> url
+                                                                Url.Http http -> http.Url.hu_host                                                                                                                                                            | Url.Https https -> https.Url.hu_host                                                                                                                                                         | Url.File file -> url
                                                              ) in
-                                                 Some (Remote { label = label; url = url })
+                                                 Some (Remote { label = label; url = format_url url })
                                     ) hosts in
                let hosts = List.fold_left (fun acc value -> match value with
                                                               Some remote -> remote::acc

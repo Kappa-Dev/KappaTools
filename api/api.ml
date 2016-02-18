@@ -58,6 +58,7 @@ end = struct
       result
 
     method start (parameter : ApiTypes.parameter) : ApiTypes.token ApiTypes.result Lwt.t =
+      if parameter.nb_plot > 0 then
       catch
         (fun () ->
          match
@@ -132,6 +133,8 @@ end = struct
              Lwt.return (`Left [message])
           | e -> fail e
         )
+      else
+        Lwt.return (`Left ["Plot points must be greater than zero"])
 
     method status (token : ApiTypes.token) : ApiTypes.state ApiTypes.result Lwt.t =
       Lwt.catch
