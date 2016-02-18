@@ -68,7 +68,7 @@ val snapshot: Environment.t -> Counter.t -> string -> t -> Data.snapshot
 
 val print : Environment.t -> Format.formatter -> t -> unit
 val print_dist : Environment.t -> t -> int -> unit
-(*val print_all_dist : t -> Format.formatter -> unit*)
+val print_all_dist : t -> Format.formatter -> unit
 
 (** {6 Stories} *)
 
