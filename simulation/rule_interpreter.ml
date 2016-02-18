@@ -808,7 +808,7 @@ let print_dist env state rule_id =
   let syntactic_id = rule.Primitives.syntactic_rule in
   match state.store_unary_dist.(syntactic_id) with
   | [] -> Format.printf "Not a unary rule or unary rule never applied."
-  | dist_ls -> List.iter (fun (n,_) ->
+  | dist_ls -> List.iter (fun (n,time) ->
 			  Format.printf "%i " n)
 			 dist_ls
 			 
