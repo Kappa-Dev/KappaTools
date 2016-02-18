@@ -168,7 +168,7 @@ struct
         dynamic
       else dynamic
     in
-    error, dynamic, event_list
+    error, dynamic, (precondition, event_list)
 
   (* events enable communication between domains. At this moment, the
      global domain does not collect information *)

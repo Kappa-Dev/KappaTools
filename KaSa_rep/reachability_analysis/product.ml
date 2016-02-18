@@ -154,7 +154,7 @@ module Product
 	error, dynamic, output_opt
 
     let apply_rule static dynamic error rule_id precondition =
-      let error, underlying_domain_dynamic_information, event_list =
+      let error, underlying_domain_dynamic_information, (precondition, event_list) =
         Underlying_domain.apply_rule
           static.underlying_domain 
           (underlying_domain_dynamic_information dynamic)
@@ -162,7 +162,7 @@ module Product
           rule_id
           precondition
       in
-      let error, new_domain_dynamic_information, event_list' =
+      let error, new_domain_dynamic_information, (precondition', event_list') =
         New_domain.apply_rule 
           static.new_domain
           (new_domain_dynamic_information
@@ -176,7 +176,8 @@ module Product
       smash_dynamic
         underlying_domain_dynamic_information 
         new_domain_dynamic_information,
-      List.fold_left (fun list a -> a :: list) event_list event_list'
+      (precondition',
+      List.fold_left (fun list a -> a :: list) event_list event_list')
     (* be careful, the concatenation should be done in the correct order to get
        a linear time complexity instead of a quadratic one*)       
         

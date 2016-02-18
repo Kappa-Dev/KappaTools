@@ -314,7 +314,7 @@ struct
      starts from this new list*)
 
   let apply_rule static dynamic error r_id precondition =
-    let error, dynamic, event_list =
+    let error, dynamic, (_, event_list) =
       pre_apply_rule
         static
         dynamic

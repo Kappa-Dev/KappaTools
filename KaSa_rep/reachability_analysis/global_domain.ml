@@ -1220,7 +1220,7 @@ struct
     let error, dynamic, event_list =
       compute_views_enabled static dynamic error rule_id
     in
-    error, dynamic, event_list
+    error, dynamic, (precondition, event_list)
 
   (* events enable communication between domains. At this moment, the
      global domain does not collect information *)

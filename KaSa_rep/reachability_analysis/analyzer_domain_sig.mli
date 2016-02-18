@@ -58,11 +58,13 @@ module type Domain =
 
     val is_enabled:
       (Analyzer_headers.rule_id,
-       Analyzer_headers.precondition, Analyzer_headers.precondition option) binary
+       Analyzer_headers.precondition,
+       Analyzer_headers.precondition option) binary
 
     val apply_rule: 
       (Analyzer_headers.rule_id,
-       Analyzer_headers.precondition,Analyzer_headers.event list) binary
+       Analyzer_headers.precondition,
+       Analyzer_headers.precondition * Analyzer_headers.event list) binary
 
     val apply_event_list:
       (Analyzer_headers.event list, Analyzer_headers.event list) unary

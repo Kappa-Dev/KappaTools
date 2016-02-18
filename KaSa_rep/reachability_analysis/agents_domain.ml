@@ -418,7 +418,7 @@ struct
         aux agent_type (dynamic, event_list)
       ) (dynamic, event_list) l1
     in
-    error, dynamic, event_list
+    error, dynamic, (precondition, event_list)
 
   (************************************************************************************)
   (* events enable communication between domains. At this moment, the
