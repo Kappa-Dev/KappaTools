@@ -28,12 +28,24 @@ type rule_id = int
     domain.*)
 
 type global_static_information
-type global_dynamic_information 
+type global_dynamic_information
 
 type event =
 | Check_rule of rule_id
 
-type precondition = unit
+type 'a bot_or_not =
+| Bot
+| Not_bot of 'a
+
+type maybe_bool =
+| Sure_value of bool
+| Maybe
+
+type precondition =
+ {
+   the_rule_is_applied_for_the_first_time: maybe_bool;
+ }
+
 
 type kasa_state = unit
 

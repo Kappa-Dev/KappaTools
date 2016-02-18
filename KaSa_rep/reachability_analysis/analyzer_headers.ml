@@ -36,13 +36,25 @@ type rule_id = int
 type event =
   | Check_rule of rule_id
 
-type precondition = unit
+type 'a bot_or_not =
+| Bot
+| Not_bot of 'a
+
+type maybe_bool =
+| Sure_value of bool
+| Maybe
+
+type precondition =
+ {
+   the_rule_is_applied_for_the_first_time: maybe_bool;
+ }
 
 type kasa_state = unit
 
 type initial_state = Cckappa_sig.enriched_init
 
-let dummy_precondition = (():precondition)
+let dummy_precondition =
+  {the_rule_is_applied_for_the_first_time= Maybe}
 
 let get_parameter static = static.global_parameter
 
