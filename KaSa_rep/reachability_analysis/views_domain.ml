@@ -25,8 +25,6 @@ let local_trace = false
 module Domain =
 struct
   
-  module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif
-
   (* the type of the struct that contains all static information as in the
      previous version of the analysis *)
   
@@ -779,7 +777,7 @@ struct
       get_store_remanent_triple static dynamic error 
     in
     let error, (dynamic, event_list) =
-      AgentMap.fold parameter error
+      Int_storage.Quick_Nearly_inf_Imperatif.fold parameter error
         (fun parameter error agent_id agent (dynamic, event_list) ->
           match agent with
           | Cckappa_sig.Unknown_agent _
