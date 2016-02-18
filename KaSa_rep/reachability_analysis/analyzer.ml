@@ -97,7 +97,7 @@ struct
                   Handler.string_of_rule parameter error kappa_handler
 		    compil rule_id
                 with
-                  _ -> Bdu_fixpoint_iteration.warn parameter error (Some "line 795") Exit
+                  _ -> warn parameter error (Some "line 99") Exit
 		    (string_of_int rule_id)
               in
               let () = Loggers.print_newline log in

@@ -19,19 +19,19 @@ type compilation_result =
     kappa_handler : Cckappa_sig.kappa_handler
   }
 
-type rule_id = int
-
 type global_static_information =
   {
     global_compilation_result : compilation_result;
     global_parameter : Remanent_parameters_sig.parameters;
-    global_bdu_common_static : Bdu_analysis_type.bdu_common_static 
+    global_bdu_common_static : Common_static.bdu_common_static
   }
 
 type global_dynamic_information =
   {
     mvbdu_handler: Mvbdu_wrapper.Mvbdu.handler
   }
+
+type rule_id = int
 
 type event =
   | Check_rule of rule_id
@@ -42,22 +42,6 @@ type kasa_state = unit
 
 type initial_state = Cckappa_sig.enriched_init
 
-let initialize_global_information parameter error mvbdu_handler compilation kappa_handler =
-  let init_static = Bdu_analysis_main.init_bdu_common_static in
-  error,
-  {
-    global_compilation_result =
-      {
-	cc_code = compilation;
-	kappa_handler = kappa_handler;
-      };
-    global_parameter     = parameter;
-    global_bdu_common_static = init_static
-  },
-  {
-    mvbdu_handler = mvbdu_handler
-  }
-    
 let dummy_precondition = (():precondition)
 
 let get_parameter static = static.global_parameter
@@ -69,6 +53,12 @@ let get_kappa_handler static = (get_compilation_information static).kappa_handle
 let get_cc_code static = (get_compilation_information static).cc_code
 							     
 let get_bdu_common_static static = static.global_bdu_common_static
+
+let set_bdu_common_static common static =
+  {
+    static with
+      global_bdu_common_static = common
+  }
 
 let compute_initial_state error static =
   let parameter = get_parameter static in
@@ -85,3 +75,51 @@ let compute_initial_state error static =
 
 let get_mvbdu_handler dynamic = dynamic.mvbdu_handler
 let set_mvbdu_handler handler dynamic = {dynamic with mvbdu_handler = handler}
+
+let scan_rule static error =
+  let parameter = get_parameter static in
+  let kappa_handler = get_kappa_handler static in
+  let compilation = get_cc_code static in
+  let error, store_result =
+    Common_static.scan_rule_set parameter error kappa_handler compilation
+  in
+  let static = set_bdu_common_static store_result static in
+  error, static
+
+let initialize_global_information parameter error mvbdu_handler compilation kappa_handler =
+  let init_common = Common_static.init_bdu_common_static in
+  let init_global_static =
+    {
+      global_compilation_result =
+        {
+	  cc_code = compilation;
+	  kappa_handler = kappa_handler;
+        };
+      global_parameter     = parameter;
+      global_bdu_common_static = init_common
+    }
+  in
+  let init_dynamic =
+    {
+      mvbdu_handler = mvbdu_handler
+    }
+  in
+  let error, static = scan_rule init_global_static error in
+  error, static, init_dynamic
+
+(*let initialize_global_information parameter error mvbdu_handler compilation kappa_handler =
+  let init_static = Common_static.init_bdu_common_static in
+  error,
+  {
+    global_compilation_result =
+      {
+	cc_code = compilation;
+	kappa_handler = kappa_handler;
+      };
+    global_parameter     = parameter;
+    global_bdu_common_static = init_static
+  },
+  {
+    mvbdu_handler = mvbdu_handler
+  }*)
+
