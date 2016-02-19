@@ -31,6 +31,7 @@ type global_static_information
 type global_dynamic_information
 
 type event =
+| Dummy (* to avoid compilation warning *)
 | Check_rule of rule_id
 
 type 'a bot_or_not =
@@ -43,6 +44,7 @@ type maybe_bool =
 
 type precondition =
  {
+   precondition_dummy: unit (* to avoid compilation warning *);
    the_rule_is_applied_for_the_first_time: maybe_bool;
  }
 

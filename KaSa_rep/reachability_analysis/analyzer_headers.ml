@@ -28,13 +28,15 @@ type global_static_information =
 
 type global_dynamic_information =
   {
+    dynamic_dummy: unit;
     mvbdu_handler: Mvbdu_wrapper.Mvbdu.handler
   }
 
 type rule_id = int
 
 type event =
-  | Check_rule of rule_id
+| Dummy
+| Check_rule of rule_id
 
 type 'a bot_or_not =
 | Bot
@@ -46,6 +48,7 @@ type maybe_bool =
 
 type precondition =
  {
+   precondition_dummy: unit;
    the_rule_is_applied_for_the_first_time: maybe_bool;
  }
 
@@ -55,6 +58,7 @@ type initial_state = Cckappa_sig.enriched_init
 
 let dummy_precondition =
   {
+    precondition_dummy = ();
     the_rule_is_applied_for_the_first_time = Maybe
   }
 
@@ -65,7 +69,7 @@ let get_compilation_information static = static.global_compilation_result
 let get_kappa_handler static = (get_compilation_information static).kappa_handler
 
 let get_cc_code static = (get_compilation_information static).cc_code
-							     
+
 let get_bdu_common_static static = static.global_bdu_common_static
 
 let set_bdu_common_static common static =
@@ -137,7 +141,8 @@ let initialize_global_information parameter error mvbdu_handler compilation kapp
   in
   let init_dynamic =
     {
-      mvbdu_handler = mvbdu_handler
+      dynamic_dummy = () ;
+      mvbdu_handler = mvbdu_handler ;
     }
   in
   let error, static = scan_rule init_global_static error in

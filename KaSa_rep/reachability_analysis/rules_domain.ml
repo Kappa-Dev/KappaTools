@@ -137,19 +137,21 @@ struct
     let bool = Array.get bool_array rule_id in
     if not bool
     then
-    (*it is false in dynamic*)
-      error, dynamic, 
-      Some 
-        { Analyzer_headers.the_rule_is_applied_for_the_first_time =
-            Analyzer_headers.Sure_value true
+      (*it is false in dynamic*)
+      error, dynamic,
+      Some
+        { precondition
+	  with
+	    Analyzer_headers.the_rule_is_applied_for_the_first_time = Analyzer_headers.Sure_value true
         }
     else
       (*it is true in dynamic*)
       error, dynamic,
-      Some 
+      Some
         {
-          Analyzer_headers.the_rule_is_applied_for_the_first_time =
-            Analyzer_headers.Sure_value false
+	  precondition
+	 with
+           Analyzer_headers.the_rule_is_applied_for_the_first_time = Analyzer_headers.Sure_value false
         }
 
   let apply_rule static dynamic error rule_id precondition =
