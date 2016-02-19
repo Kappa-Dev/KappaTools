@@ -426,7 +426,6 @@ let onload () : unit =
                                                            with Failure _ -> None)
                                           ) in
   let () = signal_change time_limit_id    (fun value ->
-                                           let () = Firebug.console##log(value) in
                                            UIState.set_model_max_time
                                                           (try Some (float_of_string value)
                                                            with Failure _ -> None)) in
