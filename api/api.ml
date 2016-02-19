@@ -58,6 +58,7 @@ end = struct
       result
 
     method start (parameter : ApiTypes.parameter) : ApiTypes.token ApiTypes.result Lwt.t =
+      if parameter.nb_plot > 0 then
       catch
         (fun () ->
          match
@@ -78,7 +79,7 @@ end = struct
                 )
              | Data.Print _file_line -> ()
              | Data.Snapshot _snapshot -> ()
-	     | Data.UnaryDistances _ -> ()
+             | Data.UnaryDistances _ -> ()
            in
            let simulation = { switch = Lwt_switch.create ()
                             ; counter = Counter.create
@@ -107,16 +108,11 @@ end = struct
                                                                  points = [];
                                                                }
                                     in
-				    let lastyield = ref (Sys.time ()) in
                                     State_interpreter.loop_cps
                                       ~outputs:outputs
                                       log_form
                                       (fun f -> if Lwt_switch.is_on simulation.switch
-                                                then let t = Sys.time () in
-						     if t -. !lastyield > 0.01 then
-						       let () = lastyield := t in
-						       Lwt.bind (yield ()) f
-						     else f ()
+                                                then Lwt.bind (yield ()) f
                                                 else Lwt.return_unit
                                       )
                                       (fun (_ : Rule_interpreter.t)(_ : State_interpreter.t)  ->
@@ -138,6 +134,8 @@ end = struct
              Lwt.return (`Left [message])
           | e -> fail e
         )
+      else
+        Lwt.return (`Left ["Plot points must be greater than zero"])
 
     method status (token : ApiTypes.token) : ApiTypes.state ApiTypes.result Lwt.t =
       Lwt.catch

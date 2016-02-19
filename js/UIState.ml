@@ -30,6 +30,7 @@ let runtime_value runtime = match runtime with
 let default_runtime = WebWorker
 let runtime_state : Api.runtime option ref = ref None
 let set_runtime_url (url : string) (continuation : bool -> unit) : unit =
+  try
   let () = set_model_error [] in
   if url = "WebWorker" then
     let () = runtime_state := Some (new JsWorker.runtime () :> Api.runtime) in
@@ -50,8 +51,7 @@ let set_runtime_url (url : string) (continuation : bool -> unit) : unit =
                                      let () = if is_valid_server then
                                                 runtime_state := Some (new JsRemote.runtime url :> Api.runtime)
                                               else
-                                                let error_msg =
-						  Format.sprintf "Bad Response : %d" frame.XmlHttpRequest.code in
+                                                let error_msg : string = Format.sprintf "Bad Response %d from %s " frame.XmlHttpRequest.code url in
                                                 set_model_error [error_msg]
                                      in
                                      let () = continuation is_valid_server in
@@ -60,11 +60,9 @@ let set_runtime_url (url : string) (continuation : bool -> unit) : unit =
                        )
     in
     ()
-
-let onload () : unit =
-  match !runtime_state with
-    None -> let () = runtime_state := Some (new JsWorker.runtime () :> Api.runtime) in ()
-  | Some _ -> ()
+  with _ -> continuation false
+let set_runtime (runtime : runtime) (continuation : bool -> unit) : unit =
+  set_runtime_url (runtime_value runtime) continuation
 
 let update_text text =
   let () = set_model_text text in
@@ -87,6 +85,7 @@ let update_runtime_state
       None -> set_model_error ["Runtime not available"];
     | Some runtime_state ->
        Lwt.async (fun () ->
+                  if Lwt_switch.is_on thread_is_running then
                   (runtime_state#status token)
                   >>=
                     (fun result -> match result with
@@ -99,13 +98,15 @@ let update_runtime_state
                                                        (Lwt_switch.turn_off thread_is_running)
                                                        >>=
                                                          (fun _ -> Lwt.return_unit))
+                  else
+                    return_unit
                  ) in
   let rec aux () =
     let () = do_update () in
     if Lwt_switch.is_on thread_is_running then
       Lwt_js.sleep 5. >>= aux
     else
-      return_unit
+      Lwt.return_unit
   in aux ()
 
 
@@ -122,28 +123,35 @@ let start_model ~start_continuation
      let thread_is_running = Lwt_switch.create () in
      catch
        (fun () ->
-               (runtime_state#start { ApiTypes_j.code = React.S.value model_text;
-                                      nb_plot = React.S.value model_nb_plot;
-                                      max_time = React.S.value model_max_time;
-                                      max_events = React.S.value model_max_events
-                                    })
-               >>= (fun result ->
-                    match result with
-                      `Left error ->
-                      let () = Firebug.console##log (Js.string "Runtime error") in
-                      let () = set_model_error error in
-                                    on_error ()
-                    | `Right token ->
-                       let () = Firebug.console##log (Js.string (Format.sprintf "Token %d"  token)) in
-                       Lwt.join [ update_runtime_state thread_is_running on_error token ]
-                       >>=
-                       (fun _ -> Lwt_js.sleep 1.)
-                       >>=
-                         (fun _ -> stop_continuation ();
-                                   set_model_is_running false;
-                                   Lwt.return_unit
-                         )
-                   )
+        let () = start_continuation thread_is_running in
+        let () = set_model_runtime_state (Some { plot = "";
+                                                 time = 0.0;
+                                                 time_percentage = None;
+                                                 event = 0;
+                                                 event_percentage = None;
+                                                 tracked_events = None;
+                                                 log_messages = [];
+                                                 is_running = true
+                                               }) in
+        (runtime_state#start { code = React.S.value model_text;
+                               nb_plot = React.S.value model_nb_plot;
+                               max_time = React.S.value model_max_time;
+                               max_events = React.S.value model_max_events
+                             })
+        >>= (fun result ->
+             match result with
+               `Left error ->
+               let () = set_model_error error in
+               on_error ()
+             | `Right token ->
+                Lwt.join [ update_runtime_state thread_is_running on_error token ]
+                >>=
+                  (fun _ -> Lwt_js.sleep 1.)
+                >>=
+                  (fun _ -> stop_continuation ();
+                            set_model_is_running false;
+                            Lwt.return_unit)
+            )
        )
        (function
 
@@ -161,3 +169,17 @@ let start_model ~start_continuation
          | e -> on_error ()
                 >>= (fun _ -> fail e)
        )
+
+let stop_model token = match !runtime_state with
+    None -> set_model_error ["Runtime not available"];
+  | Some runtime_state ->
+     let () = Lwt.async (fun () -> (runtime_state#stop token)
+                                   >>=
+                                     (fun result ->
+                                      match result with
+                                        `Left error ->
+                                        let () = set_model_error error in
+                                        Lwt.return_unit
+                                      | `Right () ->
+                                         Lwt.return_unit))
+     in ()
