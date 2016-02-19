@@ -131,10 +131,6 @@ struct
   (*Ghost agents must be ignored *)
   (*Dead agents, generates Bot elements *)
   (*I think that unknown agents must be dealt with as dead agents *)
-
-  type 'a bot_or_not =
-  | Bot
-  | Not_bot of 'a
   
   let collect_agents parameter error rule =
     let error, agents_test_list_op =
@@ -143,20 +139,20 @@ struct
           match agent with
           | Cckappa_sig.Ghost -> error, op
           | Cckappa_sig.Unknown_agent _
-          | Cckappa_sig.Dead_agent _ -> error, Bot
+          | Cckappa_sig.Dead_agent _ -> error, Analyzer_headers.Bot
           | Cckappa_sig.Agent agent ->
             let agent_type = agent.Cckappa_sig.agent_name in
             match op with
-            | Bot -> error, Bot
-            | Not_bot current_list ->
+            | Analyzer_headers.Bot -> error, Analyzer_headers.Bot
+            | Analyzer_headers.Not_bot current_list ->
               let agent_list = agent_type :: current_list in
-              error, Not_bot agent_list
-        ) rule.Cckappa_sig.rule_lhs.Cckappa_sig.views Bot
+              error, Analyzer_headers.Not_bot agent_list
+        ) rule.Cckappa_sig.rule_lhs.Cckappa_sig.views Analyzer_headers.Bot
     in
     let agents_test_list =
       match agents_test_list_op with
-      | Bot -> []
-      | Not_bot agent_list -> agent_list
+      | Analyzer_headers.Bot -> []
+      | Analyzer_headers.Not_bot agent_list -> agent_list
     in
     let error, agents_created_list =
       List.fold_left (fun (error, current_list) (agent_id, agent_type) ->
@@ -316,7 +312,7 @@ struct
       | error, None -> error, ([], [])
       | error, Some (l1, l2) -> error, (l1, l2)
     in
-    List.fold_left (fun (error, dynamic, s) agent_type ->
+     List.fold_left (fun (error, dynamic, s) agent_type ->
       let local = get_seen_agent dynamic in
       let bool = Array.get local agent_type in
       if bool
@@ -325,6 +321,55 @@ struct
       else
         error, dynamic, None
     ) (error, dynamic, Some precondition) l
+
+  (************************************************************************************)
+  (*JF: Here, you should add in the event list, each rule that test for an
+    agent with a type among the ones you have newly see, and with an empty
+    interface (no test).  For instance, if you see an agent of type A for
+    the first time, then a rule like B(x~u),A() -> B(x~p),A() should be
+    awaken. You also have to do this, when you add an initial state, thus
+    it is worth using an auxilliary function, that check whether an agant
+    type has been already seen, if not, declared it as seen, then add all
+    the rules that requires this agent in their lhs and with no tests, in
+    the working list, via the event_list argument For this, you need to add
+    a map in the struct static, to map each agent type to the list of rules
+    an agent of this type and with an empty interface occur in the lhs of
+    the rule *)
+
+  let add_event_list static dynamic error list event_list =
+    let parameter = get_parameter static in
+    let rec aux acc (dynamic, event_list) =
+      match acc with
+      | [] -> dynamic, event_list
+      | agent_type :: tl ->
+        let local = get_seen_agent dynamic in
+        let bool = Array.get local agent_type in
+        if bool
+        then aux tl (dynamic, event_list)
+        else
+          let local =
+            local.(agent_type) <- true;
+            local
+          in
+          let dynamic = set_seen_agent local dynamic in
+          let agents_without_interface_map =
+            get_agents_without_interface static
+          in
+          let error, l =
+            match Int2Map_Agent.Map.find_option_without_logs parameter error
+              agent_type agents_without_interface_map
+            with
+            | error, None -> error, []
+            | error, Some l -> error, l
+          in
+          let event_list =
+            List.fold_left (fun event_list rule_id ->
+              Analyzer_headers.Check_rule rule_id :: event_list
+            ) event_list l
+          in
+          aux tl (dynamic, event_list)
+    in
+    aux list (dynamic, event_list)
 
   (************************************************************************************)
   (** fold a list of creation each time update the array when agent is
@@ -339,84 +384,37 @@ struct
     let parameter = get_parameter static in
     let event_list = [] in
     let domain_static = get_domain_static_information static in
-    let error, (l1, l2) =
+    let error, (list_lhs, list_created) =
       match Int2Map_Agent.Map.find_option_without_logs
         parameter error rule_id domain_static
       with
       | error, None -> error, ([], [])
       | error, Some (l1, l2) -> error, (l1, l2)
     in
-    let dynamic, event_list =
-      List.fold_left (fun (dynamic, event_list) agent_type ->
+    let dynamic =
+      List.fold_left (fun dynamic agent_type ->
         let local = get_seen_agent dynamic in
         let bool = Array.get local agent_type in
         if not bool
         then
+          (*not seen, add to seen*)
           let local =
             local.(agent_type) <- true;
             local
           in
           let dynamic = set_seen_agent local dynamic in
-          let event_list =
-            Analyzer_headers.Check_rule rule_id :: event_list
-          in
-          dynamic, event_list
+          dynamic
         else
-          dynamic, event_list
-      ) (dynamic, event_list) l2
+          dynamic
+      ) dynamic list_created
     in
-    (*JF: Here, you should add in the event list, each rule that test for
-      an agent with a type among the ones you have newly see, and with an empty
-      interface (no test) *)
-    (* For instance, if you see an agent of type A for the first time, then
-       a rule like B(x~u),A() -> B(x~p),A() should be awaken *)
-    (* You also have to do this, when you add an initial state, thus it is
-       worth using an auxilliary function, that check whether an agant type
-       has been already seen, if not, declared it as seen, then add all the
-       rules that requires this agent in their lhs and with no tests, in
-       the working list, via the event_list argument *)
-    (* For this, you need to add a map in the struct static, to map each
-       agent type to the list of rules an agent of this type and with an
-       empty interface occur in the lhs of the rule *)
-    (*a list of test agents *)
     let dynamic, event_list =
-      List.fold_left (fun (dynamic, event_list) agent_type ->
-        let local = get_seen_agent dynamic in
-        let size = Array.length local in
-        let rec aux k (dynamic, event_list) =
-          if k = size then dynamic, event_list
-          else
-            (*if this agent already seen*)
-            let bool = Array.get local k in
-            if bool
-            then
-              (*yes*)
-              dynamic, event_list
-            else
-              (*not seen, add them seen and add agents_without_interface into event_list?*)
-              let local =
-                local.(k) <- true;
-                local
-              in
-              let dynamic = set_seen_agent local dynamic in
-              let agents_without_interface_map = get_agents_without_interface static in
-              (*add all the rules that requires this agent in their lhs with no tests*)
-              let error, list =
-                match Int2Map_Agent.Map.find_option_without_logs parameter error
-                  k agents_without_interface_map
-                with
-                | error, None -> error, []
-                | error, Some l -> error, l
-              in
-              let event_list =
-                List.fold_left (fun event_list rule_id ->
-                  Analyzer_headers.Check_rule rule_id :: event_list
-                ) event_list list
-              in (* JF: it looks good, I lack of time to check carefully *)
-              aux (k + 1) (dynamic, event_list)
-        in
-        aux agent_type (dynamic, event_list)
-      ) (dynamic, event_list) l1
+      add_event_list
+        static
+        dynamic
+        error
+        list_lhs
+        event_list
     in
     error, dynamic, (precondition, event_list)
 
