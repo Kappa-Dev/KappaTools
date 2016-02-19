@@ -254,39 +254,101 @@ struct
     in
     error, static, dynamic
 
+  (************************************************************************************)
+  (*JF: Here, you should add in the event list, each rule that test for an
+    agent with a type among the ones you have newly see, and with an empty
+    interface (no test).  For instance, if you see an agent of type A for
+    the first time, then a rule like B(x~u),A() -> B(x~p),A() should be
+    awaken. You also have to do this, when you add an initial state, thus
+    it is worth using an auxilliary function, that check whether an agant
+    type has been already seen, if not, declared it as seen, then add all
+    the rules that requires this agent in their lhs and with no tests, in
+    the working list, via the event_list argument For this, you need to add
+    a map in the struct static, to map each agent type to the list of rules
+    an agent of this type and with an empty interface occur in the lhs of
+    the rule *)
+
+  let add_event_list dynamic list agent_type event_list =
+    let rec aux acc (dynamic, event_list) =
+      match acc with
+      | [] -> dynamic, event_list
+      | rule_id :: tl ->
+        let local = get_seen_agent dynamic in
+        let bool = Array.get local agent_type in
+        if bool
+        (*if seen*)
+        then aux tl (dynamic, event_list)
+        else
+          (*not, set it to be seen*)
+          let local =
+            local.(agent_type) <- true;
+            local
+          in
+          let dynamic = set_seen_agent local dynamic in
+          let event_list =
+            Analyzer_headers.Check_rule rule_id :: event_list
+          in
+          aux tl (dynamic, event_list)
+    in
+    aux list (dynamic, event_list)
+
   (**************************************************************************)
   (** collect the agent type of the agents of the species and declare
      them seen *)
 
-  let init_agents static dynamic error init_state =
+  let init_agents static dynamic error init_state event_list =
     let parameter = get_parameter static in
-    let error, dynamic =
+    let error, (dynamic, event_list) =
       Bdu_analysis_type.AgentMap.fold parameter error
-        (fun parameter error init agent dynamic ->
+        (fun parameter error index_init agent (dynamic, event_list) ->
           match agent with
 	  (*JF: warn: dead,unknown,ghost should not occur in initial states *)
           | Cckappa_sig.Unknown_agent _
           | Cckappa_sig.Ghost
           | Cckappa_sig.Dead_agent _ ->
-            warn parameter error (Some "line 275") Exit dynamic
+            warn parameter error (Some "line 275") Exit (dynamic, event_list)
           | Cckappa_sig.Agent agent ->
             let agent_type = agent.Cckappa_sig.agent_name in
             let local = get_seen_agent dynamic in
-            let local =
-              local.(agent_type) <- true;
-              local
-            in
-            let dynamic = set_seen_agent local dynamic in
-            error, dynamic
-        ) init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views dynamic
+            (*check if this agent has already been seen*)
+            let bool = Array.get local agent_type in
+            if not bool
+            then
+              (*initial agent is not seen, then set it to be seen*)
+              let local =
+                local.(agent_type) <- true;
+                local
+              in
+              let dynamic = set_seen_agent local dynamic in
+              let agents_without_interface_map = get_agents_without_interface static in
+              (*list of rule_id of agents_without_interface*)
+              let error, rule_id_list =
+                match Int2Map_Agent.Map.find_option_without_logs parameter error
+                  agent_type agents_without_interface_map
+                with
+                | error, None -> error, []
+                | error, Some l -> error, l
+              in
+              let (dynamic, event_list) =
+                add_event_list
+                  dynamic
+                  rule_id_list
+                  agent_type
+                  event_list
+              in
+              error, (dynamic, event_list)
+            else error, (dynamic, event_list)
+        ) init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views (dynamic, event_list)
     in
-    error, dynamic
+    error, (dynamic, event_list)
 
   (************************************************************************************)
 
   let add_initial_state static dynamic error species =
     let event_list = [] in
-    let error, dynamic = init_agents static dynamic error species in
+    let error, (dynamic, event_list) =
+      init_agents static dynamic error species event_list 
+    in
     error, dynamic, event_list
 
   (************************************************************************************)
@@ -323,55 +385,6 @@ struct
     ) (error, dynamic, Some precondition) l
 
   (************************************************************************************)
-  (*JF: Here, you should add in the event list, each rule that test for an
-    agent with a type among the ones you have newly see, and with an empty
-    interface (no test).  For instance, if you see an agent of type A for
-    the first time, then a rule like B(x~u),A() -> B(x~p),A() should be
-    awaken. You also have to do this, when you add an initial state, thus
-    it is worth using an auxilliary function, that check whether an agant
-    type has been already seen, if not, declared it as seen, then add all
-    the rules that requires this agent in their lhs and with no tests, in
-    the working list, via the event_list argument For this, you need to add
-    a map in the struct static, to map each agent type to the list of rules
-    an agent of this type and with an empty interface occur in the lhs of
-    the rule *)
-
-  let add_event_list static dynamic error list event_list =
-    let parameter = get_parameter static in
-    let rec aux acc (dynamic, event_list) =
-      match acc with
-      | [] -> dynamic, event_list
-      | agent_type :: tl ->
-        let local = get_seen_agent dynamic in
-        let bool = Array.get local agent_type in
-        if bool
-        then aux tl (dynamic, event_list)
-        else
-          let local =
-            local.(agent_type) <- true;
-            local
-          in
-          let dynamic = set_seen_agent local dynamic in
-          let agents_without_interface_map =
-            get_agents_without_interface static
-          in
-          let error, l =
-            match Int2Map_Agent.Map.find_option_without_logs parameter error
-              agent_type agents_without_interface_map
-            with
-            | error, None -> error, []
-            | error, Some l -> error, l
-          in
-          let event_list =
-            List.fold_left (fun event_list rule_id ->
-              Analyzer_headers.Check_rule rule_id :: event_list
-            ) event_list l
-          in
-          aux tl (dynamic, event_list)
-    in
-    aux list (dynamic, event_list)
-
-  (************************************************************************************)
   (** fold a list of creation each time update the array when agent is
       seen for the first time, add list of rule inside event list that
       contain the list of rules in the lhs.  a map from agent to
@@ -384,37 +397,45 @@ struct
     let parameter = get_parameter static in
     let event_list = [] in
     let domain_static = get_domain_static_information static in
-    let error, (list_lhs, list_created) =
+    let error, (_, list_created) =
       match Int2Map_Agent.Map.find_option_without_logs
         parameter error rule_id domain_static
       with
       | error, None -> error, ([], [])
       | error, Some (l1, l2) -> error, (l1, l2)
     in
-    let dynamic =
-      List.fold_left (fun dynamic agent_type ->
+    let dynamic, event_list =
+      List.fold_left (fun (dynamic, event_list) agent_type ->
         let local = get_seen_agent dynamic in
         let bool = Array.get local agent_type in
         if not bool
         then
-          (*not seen, add to seen*)
+          (*not seen, set it to be seen*)
           let local =
             local.(agent_type) <- true;
             local
           in
           let dynamic = set_seen_agent local dynamic in
-          dynamic
+          let agents_without_interface_map = get_agents_without_interface static in
+          (*a list of rule_id of agents_without_interface*)
+          let error, rule_id_list =
+            match Int2Map_Agent.Map.find_option_without_logs parameter error
+              agent_type agents_without_interface_map
+            with
+            | error, None -> error, []
+            | error, Some l -> error, l
+          in
+          let dynamic, event_list =
+            add_event_list
+              dynamic
+              rule_id_list
+              agent_type
+              event_list
+          in
+          dynamic, event_list
         else
-          dynamic
-      ) dynamic list_created
-    in
-    let dynamic, event_list =
-      add_event_list
-        static
-        dynamic
-        error
-        list_lhs
-        event_list
+          dynamic, event_list
+      ) (dynamic, event_list) list_created
     in
     error, dynamic, (precondition, event_list)
 

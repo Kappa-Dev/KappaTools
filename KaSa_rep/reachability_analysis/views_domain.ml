@@ -1196,7 +1196,18 @@ struct
   (**************************************************************************)
   (*compute enable in different cases*)
 
-  let compute_views_enabled static dynamic error rule_id =
+  let get_sure_value precondition =
+    let maybe_bool = 
+      precondition.Analyzer_headers.the_rule_is_applied_for_the_first_time 
+    in
+    match maybe_bool with
+    | Analyzer_headers.Sure_value b ->
+      if b 
+      then true
+      else false
+    | Analyzer_headers.Maybe -> false
+    
+  let compute_views_enabled static dynamic error rule_id precondition =
     (*-----------------------------------------------------------------------*)
     (*deal with views*)
     let error, dynamic, event_list =
@@ -1210,12 +1221,22 @@ struct
     (*-----------------------------------------------------------------------*)
     (*deal with creation*)
     let error, dynamic, event_list =
-      compute_views_creation_enabled
-        static
-        dynamic
-        error
-        rule_id
-        event_list
+      let b = get_sure_value precondition in
+      if b
+      then
+        (*if Sure_value is true then compute creation_enabled*)
+        let error, dynamic, event_list =
+          compute_views_creation_enabled
+            static
+            dynamic
+            error
+            rule_id
+            event_list
+        in
+        error, dynamic, event_list
+      else
+        (*Sure_value is false*)
+        error, dynamic, event_list
     in
     (*-----------------------------------------------------------------------*)
     (*deal with side effects*)
@@ -1236,7 +1257,7 @@ struct
 
   let apply_rule static dynamic error rule_id precondition =
     let error, dynamic, event_list =
-      compute_views_enabled static dynamic error rule_id
+      compute_views_enabled static dynamic error rule_id precondition
     in
     error, dynamic, (precondition, event_list)
 

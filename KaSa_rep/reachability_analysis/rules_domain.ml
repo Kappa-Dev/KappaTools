@@ -123,8 +123,34 @@ struct
     let event_list = [] in
     error, dynamic, event_list
 
+  (*only change the precondition*)
+  (*check the preconditon of rule, is this the first time this rule apply*)
+  (*{
+    Analyzer_headers.Sure_value true
+    (*if rule_id apply for the first time, false in dynamic.
+    otherwise sure_value false. no maybe
+  *)
+    }
+  *)
   let is_enabled static dynamic error rule_id precondition =
-    error, dynamic, Some precondition
+    let bool_array = get_dead_rule dynamic in
+    let bool = Array.get bool_array rule_id in
+    if not bool
+    then
+    (*it is false in dynamic*)
+      error, dynamic, 
+      Some 
+        { Analyzer_headers.the_rule_is_applied_for_the_first_time =
+            Analyzer_headers.Sure_value true
+        }
+    else
+      (*it is true in dynamic*)
+      error, dynamic,
+      Some 
+        {
+          Analyzer_headers.the_rule_is_applied_for_the_first_time =
+            Analyzer_headers.Sure_value false
+        }
 
   let apply_rule static dynamic error rule_id precondition =
     (*false -> true: print the information that rule apply for the first

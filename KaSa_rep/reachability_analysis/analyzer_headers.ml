@@ -54,7 +54,9 @@ type kasa_state = unit
 type initial_state = Cckappa_sig.enriched_init
 
 let dummy_precondition =
-  {the_rule_is_applied_for_the_first_time= Maybe}
+  {
+    the_rule_is_applied_for_the_first_time = Maybe
+  }
 
 let get_parameter static = static.global_parameter
 
@@ -140,20 +142,3 @@ let initialize_global_information parameter error mvbdu_handler compilation kapp
   in
   let error, static = scan_rule init_global_static error in
   error, static, init_dynamic
-
-(*let initialize_global_information parameter error mvbdu_handler compilation kappa_handler =
-  let init_static = Common_static.init_bdu_common_static in
-  error,
-  {
-    global_compilation_result =
-      {
-	cc_code = compilation;
-	kappa_handler = kappa_handler;
-      };
-    global_parameter     = parameter;
-    global_bdu_common_static = init_static
-  },
-  {
-    mvbdu_handler = mvbdu_handler
-  }*)
-
