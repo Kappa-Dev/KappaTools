@@ -1196,7 +1196,7 @@ struct
   (**************************************************************************)
   (*compute enable in different cases*)
 
-  let get_sure_value precondition =
+  let can_we_prove_this_is_the_first_application precondition =
     let maybe_bool = 
       precondition.Analyzer_headers.the_rule_is_applied_for_the_first_time 
     in
@@ -1221,7 +1221,7 @@ struct
     (*-----------------------------------------------------------------------*)
     (*deal with creation*)
     let error, dynamic, event_list =
-      let b = get_sure_value precondition in
+      let b = can_we_prove_this_is_the_first_application precondition in
       if b
       then
         (*if Sure_value is true then compute creation_enabled*)
