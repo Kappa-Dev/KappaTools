@@ -2,7 +2,7 @@
   * priority.mli
   *
   * Creation: 03/02/2016
-  * Last modification: Time-stamp: <2016-02-03 20:19:15 feret>
+  * Last modification: Time-stamp: <2016-02-19 14:21:39 feret>
   *
   * Causal flow compression: a module for KaSim
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -57,7 +57,6 @@ type priorities =
     side_effects: level ;
     candidate_set_of_events: selection_strategy;
     try_to_remove_first: try_to_remove_first;
-    blacklist_already_used_events: bool;
   }
 
 (** each event is associated with a level corresponding of its actions (if multiple action, then, the least corresponding level is selected *)
