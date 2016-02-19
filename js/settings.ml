@@ -2,13 +2,7 @@ module ApiTypes = ApiTypes_j
 module Html5 = Tyxml_js.Html5
 module R = Tyxml_js.R
 
-open Js
 open ApiTypes
-open Lwt
-open Visualization
-open Codemirror
-open Counter
-open UIState
 
 let document = Dom_html.window##document
 let number_events_id = "number_events"
@@ -32,8 +26,19 @@ let time_limit =
         Html5.a_placeholder "Time limit";
         Tyxml_js.R.Html5.a_value
           (React.S.l1 (fun x -> match x with
-                                | Some va -> string_of_float va
-                                | None -> "") UIState.model_max_time)]
+                                | Some value ->
+                                   let value = string_of_float value in
+                                   let format_float n =
+                                     let length = String.length n in
+                                     if length > 0 && String.get n (length - 1) == '.' then
+                                       n^"0"
+                                     else
+                                       n
+                                   in
+                                   let value = format_float value in
+                                   value
+                                | None -> "") UIState.model_max_time)
+                            ]
     ()
 let plot_points_id = "plot_points"
 let plot_points =
@@ -326,11 +331,11 @@ let onload () : unit =
                   (fun () -> assert false)) in
   let args = Url.Current.arguments in
   let set_runtime runtime continuation =
-    set_runtime runtime
-                (fun success -> if success then
-                                  select_runtime_dom##value <- Js.string (UIState.runtime_value runtime)
-                                else
-                                  continuation ())
+    UIState.set_runtime runtime
+                        (fun success -> if success then
+                                          select_runtime_dom##value <- Js.string (UIState.runtime_value runtime)
+                                        else
+                                          continuation ())
   in
   let format_url url =
     let length = String.length url in
@@ -339,7 +344,7 @@ let onload () : unit =
     else
       url
   in
-  let default_embedded () = set_runtime Embedded (fun _ -> ()) in
+  let default_embedded () = set_runtime UIState.Embedded (fun _ -> ()) in
   let () = try let hosts = args in
                let hosts = List.filter (fun (key,value) -> key = "host") hosts in
                let hosts = List.map snd hosts in
@@ -350,7 +355,7 @@ let onload () : unit =
                                                  let label = (match parsed with
                                                                 Url.Http http -> http.Url.hu_host                                                                                                                                                            | Url.Https https -> https.Url.hu_host                                                                                                                                                         | Url.File file -> url
                                                              ) in
-                                                 Some (Remote { label = label; url = format_url url })
+                                                 Some (UIState.Remote { UIState.label = label; UIState.url = format_url url })
                                     ) hosts in
                let hosts = List.fold_left (fun acc value -> match value with
                                                               Some remote -> remote::acc
@@ -360,9 +365,9 @@ let onload () : unit =
                in
                let hosts = List.concat [select_default_runtime;hosts] in
                let () = ReactiveData.RList.set select_runtime_options_handle hosts in
-               let selected_runtime : runtime = (match hosts with
-                                                   head::_ -> head
-                                                 | _ -> Embedded) in
+               let selected_runtime : UIState.runtime = (match hosts with
+                                                           head::_ -> head
+                                                         | _ -> UIState.Embedded) in
                let () = set_runtime selected_runtime (default_embedded) in
                ()
            with _ -> default_embedded () in
@@ -416,7 +421,9 @@ let onload () : unit =
                                                           (try Some (int_of_string value)
                                                            with Failure _ -> None)
                                           ) in
-  let () = signal_change time_limit_id    (fun value -> UIState.set_model_max_time
+  let () = signal_change time_limit_id    (fun value ->
+                                           let () = Firebug.console##log(value) in
+                                           UIState.set_model_max_time
                                                           (try Some (float_of_string value)
                                                            with Failure _ -> None)) in
   let () = signal_change plot_points_id   (fun value -> try UIState.set_model_nb_plot
