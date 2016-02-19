@@ -172,7 +172,7 @@ struct
     in
     error, (agents_test_list, agents_created_list)
 
-  (*TODO*)
+  (*FIXME*)
   let collect_agents_without_interface parameter error rule_id rule  =
     let error, agents_lhs_list =
       map_to_list parameter error rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
@@ -315,6 +315,7 @@ struct
     an agent of this type and with an empty interface occur in the lhs of
     the rule *)
 
+  (*FIXME*)
   let add_event_list static dynamic error agent_type event_list =
     let parameter = get_parameter static in
     let bot_or_not = get_agents_without_interface static in
