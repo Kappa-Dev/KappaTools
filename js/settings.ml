@@ -186,7 +186,11 @@ let lift f x = match x with None -> None | Some x -> f x
 let default x d = match x with None -> d | Some x -> x
 let time_progress_bar = progress_bar
                           (React.S.map (fun state ->
-                                        let time_percent : int option = lift (fun (state : ApiTypes.state) -> state.time_percentage) state in
+                                        let time_percent : int option =
+                                          lift
+                                            (fun (state : ApiTypes.state) -> state.time_percentage)
+                                            state
+                                        in
                                         let time_percent : int = default time_percent 0 in
                                         time_percent
                                        )
@@ -203,14 +207,19 @@ let time_progress_bar = progress_bar
 let event_progress_bar = progress_bar
                            (React.S.map (fun state ->
                                          let event_percentage : int option = lift (fun (state : ApiTypes.state) ->
-                                                                                   let () = Visualization.update_plot state.plot in
-                                                                                   state.event_percentage) state in
+                                                                                   let () = Visualization.update_plot
+                                                                                              state.plot
+                                                                                   in
+                                                                                   state.event_percentage) state
+                                         in
                                          let event_percentage : int = default event_percentage 0 in
                                          event_percentage
                                         )
                                        UIState.model_runtime_state)
                            (React.S.map (fun state ->
-                                         let event : int option = lift (fun (state : ApiTypes.state) -> Some state.event) state in
+                                         let event : int option = lift (fun (state : ApiTypes.state) -> Some state.event)
+                                                                       state
+                                         in
                                          let event : int = default event 0 in
                                          string_of_int event
                                         )
@@ -219,13 +228,15 @@ let stop_button_id = "stop_button"
 let stop_button = Html5.button ~a:[ Html5.a_id stop_button_id
                                    ; Html5.Unsafe.string_attrib "type" "button"
                                    ; Html5.a_class ["btn";"btn-default"] ] [ Html5.cdata "stop" ]
-let tracked_events state =  let tracked_events : int option = lift (fun (state : ApiTypes.state) -> state.tracked_events) state in
-                            match tracked_events with
-                              None -> None
-                            | Some tracked_events -> if tracked_events > 0 then
-                                                       Some tracked_events
-                                                     else
-                                                       None
+let tracked_events state = let tracked_events : int option = lift (fun (state : ApiTypes.state) -> state.tracked_events)
+                                                                  state
+                           in
+                           match tracked_events with
+                             None -> None
+                           | Some tracked_events -> if tracked_events > 0 then
+                                                      Some tracked_events
+                                                    else
+                                                      None
 let tracked_events_count = Tyxml_js.R.Html5.pcdata
                              (React.S.map (fun state -> match tracked_events state with
                                                           Some tracked_events -> string_of_int tracked_events
