@@ -317,42 +317,34 @@ struct
 
   let add_event_list static dynamic error agent_type event_list =
     let parameter = get_parameter static in
-    let local = get_seen_agent dynamic in
-    let bool = Array.get local agent_type in
-    if not bool
-    then
-      let local = 
-        local.(agent_type) <- true;
-        local
-      in
-      let dynamic = set_seen_agent local dynamic in
-      let bot_or_not = get_agents_without_interface static in
-      (*list of rule_id of agents_without_interface*)
-      (*let error, bot_or_not =
-        match Int2Map_Agent.Map.find_option_without_logs parameter error
-          agent_type agents_without_interface_map
-        with
-        | error, None -> error, Analyzer_headers.Bot
-        | error, Some l -> error, l
-      in*)
+    let bot_or_not = get_agents_without_interface static in
       match bot_or_not with
       | Analyzer_headers.Bot -> error, (dynamic, event_list)
       | Analyzer_headers.Not_bot map ->
-        let error, rule_id_list = 
-          match Int2Map_Agent.Map.find_option_without_logs parameter error
-            agent_type map
-          with
-          | error, None -> error, []
-          | error, Some l -> error, l
-        in
-        let event_list =          
-          List.fold_left (fun event_list rule_id ->
-            Analyzer_headers.Check_rule rule_id :: event_list
-          ) event_list rule_id_list
-        in
-        error, (dynamic, event_list)
-    else
-      error, (dynamic, event_list)
+        let local = get_seen_agent dynamic in
+        let bool = Array.get local agent_type in
+        if not bool
+        then
+          let local = 
+            local.(agent_type) <- true;
+            local
+          in
+          let dynamic = set_seen_agent local dynamic in
+          let error, rule_id_list = 
+            match Int2Map_Agent.Map.find_option_without_logs parameter error
+              agent_type map
+            with
+            | error, None -> error, []
+            | error, Some l -> error, l
+          in
+          let event_list =          
+            List.fold_left (fun event_list rule_id ->
+              Analyzer_headers.Check_rule rule_id :: event_list
+            ) event_list rule_id_list
+          in
+          error, (dynamic, event_list)
+        else
+          error, (dynamic, event_list)
 
   (**************************************************************************)
   (** collect the agent type of the agents of the species and declare
