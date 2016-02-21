@@ -176,7 +176,21 @@ let dot_of_contact_map parameters (error:Exception.method_handler) handler =
               site_dic
           in
           let error,n_sites = Ckappa_sig.Dictionary_of_sites.last_entry parameters_dot error site_dic  in
-          let color =
+	  let () =
+	    if n_sites = -1
+	    then
+	      let () =
+		Loggers.fprintf
+		  (Remanent_parameters.get_logger parameters_dot)
+		  "   %d.0 [shape = plaintext label = \"\"]"
+		  i
+	      in
+	      let () =
+		Loggers.print_newline
+		  (Remanent_parameters.get_logger parameters_dot)
+	      in ()
+	  in
+	  let color =
             Misc_sa.fetch_array
               n_sites
               (Remanent_parameters.get_agent_color_array parameters_dot)
