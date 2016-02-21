@@ -419,12 +419,10 @@ struct
     in
     match bot_or_not with
     | Analyzer_headers.Bot ->
-       let _ = Printf.fprintf stdout "BOT\n" in
        error, dynamic, None
     | Analyzer_headers.Not_bot l ->
        List.fold_left
 	 (fun (error, dynamic, s) agent_type ->
-	  let _ = Printf.fprintf stdout "NOT BOT\n" in
 	  let local = get_seen_agent dynamic in
 	  let bool = Array.get local agent_type in
 	  if bool
