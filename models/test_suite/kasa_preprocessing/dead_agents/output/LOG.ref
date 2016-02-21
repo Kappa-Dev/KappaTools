@@ -707,33 +707,13 @@ agent_type_     Leaf False
 
 rule 6
 agent_type:0:A:cv_id:0
-agent_type_Id=3
-agent_type_ Node(site_type:1<0)
-agent_type_  Id=0
-agent_type_   Leaf False 
-
-agent_type_  Id=2
-agent_type_   Node(site_type:1<1)
-agent_type_    Id=1
-agent_type_     Leaf True 
-
-agent_type_    Id=0
-agent_type_     Leaf False 
+agent_type_Id=0
+agent_type_ Leaf False 
 
 rule 7
 agent_type:0:A:cv_id:0
-agent_type_Id=3
-agent_type_ Node(site_type:1<0)
-agent_type_  Id=0
-agent_type_   Leaf False 
-
-agent_type_  Id=2
-agent_type_   Node(site_type:1<1)
-agent_type_    Id=1
-agent_type_     Leaf True 
-
-agent_type_    Id=0
-agent_type_     Leaf False 
+agent_type_Id=0
+agent_type_ Leaf False 
 
 rule 8
 agent_type:2:D:cv_id:0
@@ -742,8 +722,8 @@ agent_type_ Leaf True
 
 rule 9
 agent_type:3:E:cv_id:0
-agent_type_Id=1
-agent_type_ Leaf True 
+agent_type_Id=0
+agent_type_ Leaf False 
 
 	Views in initial state
 
@@ -842,12 +822,10 @@ agent_type_ Leaf True
 		Updating the views for A(x~,x!)
 
 	Applying rule 6:
-		the precondition is satisfied
-		Updating the views for A(x~,x!)
+		the predcondition is not satisfied yet
 
 	Applying rule 7:
-		the precondition is satisfied
-		Updating the views for A(x~,x!)
+		the predcondition is not satisfied yet
 
 	Applying rule 1:
 		the precondition is satisfied
@@ -895,6 +873,8 @@ agent_type_ Leaf True
 * Dead rules :
 ------------------------------------------------------------
 rule 0 will never be applied.
+rule 6 will never be applied.
+rule 7 will never be applied.
 rule 8 will never be applied.
 rule 9 will never be applied.
 

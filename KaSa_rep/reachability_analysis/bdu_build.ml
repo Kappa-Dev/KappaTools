@@ -115,20 +115,33 @@ let build_bdu parameter handler error pair_list =
 let collect_bdu_test_restriction_map parameter handler error rule_id rule 
     store_remanent_triple store_result =
   let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in
-  (*-----------------------------------------------------------------*)
-  let add_link (agent_id, agent_type, rule_id, cv_id) bdu store_result =
-    (* JF: add_link should assign views uniquely *)
-    let result_map =
-      Map_test_bdu.Map.add (agent_id, agent_type, rule_id, cv_id) bdu store_result
-    in
-    error, result_map
-  in
-  (*-----------------------------------------------------------------*)
+  let error, handler, bdu_false = Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error in
   AgentMap.fold parameter error
     (fun parameter error agent_id agent (handler,store_result) ->
       match agent with
-      | Unknown_agent _ | Ghost -> error, (handler, store_result)
-      | Dead_agent (agent, _, _, _) 		  
+      | Unknown_agent _
+      (* Unfortunately, we can do nothing with unknown agent in the view domains *)
+      (* Unknown agent will be catch up in the agents_domain *)
+      | Ghost -> error, (handler, store_result)
+      | Dead_agent (agent, _, _, _) ->
+	  let agent_type = agent.agent_name in
+	  let error, triple_list =
+	    match
+	      AgentMap.get parameter error agent_type store_remanent_triple
+	    with
+	    | error, None -> warn parameter error (Some "Line 136") Exit []
+	    | error, Some x -> error, x
+	  in
+	  (*-----------------------------------------------------------------*)
+          let error, store_result =
+	    List.fold_left
+	      (fun (error, store_result) (cv_id, _, _) ->
+	       error, Map_test_bdu.Map.add (agent_id, agent_type, rule_id, cv_id) bdu_false store_result
+	      )
+	      (error, store_result)
+	      triple_list
+	  in
+	  error, (handler, store_result)
       | Agent agent ->
         let agent_type = agent.agent_name in
 	let error, triple_list =
@@ -144,7 +157,7 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
 	then 
           (* IF the covering class is empty, put the bdu true since there is no test *)
 	  let error, store_result =
-	    add_link (agent_id, agent_type, rule_id, 0) bdu_true store_result 
+	    error, Map_test_bdu.Map.add (agent_id, agent_type, rule_id, 0) bdu_true store_result 
 	  in 
 	  error, (handler, store_result)
 	else 
@@ -201,7 +214,7 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
 		      build_bdu parameter handler error pair_list
 		    in
 		    let error, store_result =
-		      add_link (agent_id, agent_type, rule_id, cv_id) bdu_test store_result
+		      error, Map_test_bdu.Map.add (agent_id, agent_type, rule_id, cv_id) bdu_test store_result
 		    in
 		    error, handler, store_result
 		  end)
