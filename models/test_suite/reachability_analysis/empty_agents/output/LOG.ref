@@ -196,21 +196,6 @@ agent_type:3:D:site_type:0:x~@list of covering_class_id:
 covering_class_id:0
 agent_type:5:F:site_type:0:x~@list of covering_class_id:
 covering_class_id:0
-rule 0
-agent_type:0:A:cv_id:0
-agent_type_Id=1
-agent_type_ Leaf True 
-
-rule 1
-agent_type:1:B:cv_id:0
-agent_type_Id=1
-agent_type_ Leaf True 
-
-rule 2
-agent_type:2:C:cv_id:0
-agent_type_Id=1
-agent_type_ Leaf True 
-
 rule 3
 agent_type:3:D:cv_id:0
 agent_type_Id=3
@@ -253,26 +238,6 @@ agent_type_Id=1
 agent_type_ (site_type:1 = 0)
 agent_type_  Id=0
 agent_type_   []
-rule 1
-agent_type:0:A:cv_id:0
-agent_type_Id=1
-agent_type_ Leaf True 
-
-rule 2
-agent_type:1:B:cv_id:0
-agent_type_Id=1
-agent_type_ Leaf True 
-
-rule 3
-agent_type:2:C:cv_id:0
-agent_type_Id=1
-agent_type_ Leaf True 
-
-rule 4
-agent_type:4:E:cv_id:0
-agent_type_Id=1
-agent_type_ Leaf True 
-
 	Initial state is empty
 
 	Wake-up rules
@@ -280,35 +245,14 @@ agent_type_ Leaf True
 	Applying rule 0:
 		the precondition is satisfied
 
-				INTENSIONAL DESCRIPTION:
-				Id=1
-				 Leaf True 
-
-				EXTENSIONAL DESCRIPTION:
-
 	Applying rule 1:
 		the precondition is satisfied
-		Updating the views for A()
-
-				INTENSIONAL DESCRIPTION:
-				Id=1
-				 Leaf True 
-
-				EXTENSIONAL DESCRIPTION:
 
 	Applying rule 2:
 		the precondition is satisfied
-		Updating the views for B()
-
-				INTENSIONAL DESCRIPTION:
-				Id=1
-				 Leaf True 
-
-				EXTENSIONAL DESCRIPTION:
 
 	Applying rule 3:
 		the precondition is satisfied
-		Updating the views for C()
 
 				INTENSIONAL DESCRIPTION:
 				Id=3
@@ -328,33 +272,53 @@ agent_type_ Leaf True
 				D(x~u)
 
 	Applying rule 4:
-		the predcondition is not satisfied yet
+		the precondition is satisfied
+
+				INTENSIONAL DESCRIPTION:
+				Id=3
+				 Node(site_type:1<0)
+				  Id=0
+				   Leaf False 
+
+				  Id=2
+				   Node(site_type:1<1)
+				    Id=1
+				     Leaf True 
+
+				    Id=0
+				     Leaf False 
+
+				EXTENSIONAL DESCRIPTION:
+				F(x~u)
 
 	Applying rule 3:
 		the precondition is satisfied
-		Updating the views for C()
+
+	Applying rule 4:
+		the precondition is satisfied
 
 ------------------------------------------------------------
 * Dead rules :
 ------------------------------------------------------------
-rule 4 will never be applied.
 
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
-agent_type:0:A:cv_id:0
-Id=1
- Leaf True 
-
-agent_type:1:B:cv_id:0
-Id=1
- Leaf True 
-
-agent_type:2:C:cv_id:0
-Id=1
- Leaf True 
-
 agent_type:3:D:cv_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+agent_type:5:F:cv_id:0
 Id=3
  Node(site_type:1<0)
   Id=0
@@ -373,18 +337,18 @@ Id=3
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=1
- Leaf True 
+Id=5
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
 
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=1
- Leaf True 
+  Id=4
+   Node(site_type:0<1)
+    Id=1
+     Leaf True 
 
-EXTENSIONAL DESCRIPTION:
-INTENSIONAL DESCRIPTION:
-Id=1
- Leaf True 
+    Id=0
+     Leaf False 
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
@@ -422,4 +386,20 @@ Id=5
 
 EXTENSIONAL DESCRIPTION:
 The internal state of site x in agent D is always u.
+INTENSIONAL DESCRIPTION:
+Id=5
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=4
+   Node(site_type:0<1)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+The internal state of site x in agent F is always u.
 execution finished without any exception

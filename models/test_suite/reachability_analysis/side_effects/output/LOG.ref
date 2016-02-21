@@ -1091,11 +1091,6 @@ agent_type_         Leaf False
 agent_type_    Id=0
 agent_type_     Leaf False 
 
-rule 9: r9
-agent_type:2:C:cv_id:0
-agent_type_Id=1
-agent_type_ Leaf True 
-
 rule 10: r10
 agent_type:3:D:cv_id:0
 agent_type_Id=7
@@ -1387,7 +1382,6 @@ agent_type_     Leaf False
 
 	Applying rule 9: r9:
 		the precondition is satisfied
-		Updating the views for C(x~,x!)
 
 	Applying rule 1: r1:
 		the precondition is satisfied
@@ -1688,7 +1682,6 @@ agent_type_     Leaf False
 
 	Applying rule 9: r9:
 		the precondition is satisfied
-		Updating the views for C(x~,x!)
 
 				INTENSIONAL DESCRIPTION:
 				Id=13
@@ -1772,7 +1765,6 @@ agent_type_     Leaf False
 
 	Applying rule 9: r9:
 		the precondition is satisfied
-		Updating the views for C(x~,x!)
 
 	Applying rule 0: r0:
 		the precondition is satisfied

@@ -793,11 +793,6 @@ agent_type_Id=3
 agent_type_ (site_type:1 = 0)
 agent_type_  Id=0
 agent_type_   []
-rule 3: r3
-agent_type:0:A:cv_id:0
-agent_type_Id=1
-agent_type_ Leaf True 
-
 rule 4: r4
 agent_type:0:A:cv_id:0
 agent_type_Id=3
@@ -1145,7 +1140,6 @@ agent_type_     Leaf False
 
 	Applying rule 3: r3:
 		the precondition is satisfied
-		Updating the views for A(x!,y!)
 
 	Applying rule 2: r2:
 		the precondition is satisfied

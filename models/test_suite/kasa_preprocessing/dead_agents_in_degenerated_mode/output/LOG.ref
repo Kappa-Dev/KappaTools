@@ -528,10 +528,6 @@ agent_type_ (site_type:1 = 1)
 agent_type_  Id=0
 agent_type_   []
 rule 0
-agent_type:0:A:cv_id:0
-agent_type_Id=1
-agent_type_ Leaf True 
-
 agent_type:1:B:cv_id:0
 agent_type_Id=3
 agent_type_ Node(site_type:1<0)
@@ -677,7 +673,6 @@ agent_type_ Leaf False
 
 	Applying rule 0:
 		the precondition is satisfied
-		Updating the views for A(x~)
 		Updating the views for B(x~)
 
 				INTENSIONAL DESCRIPTION:
@@ -742,7 +737,6 @@ agent_type_ Leaf False
 
 	Applying rule 0:
 		the precondition is satisfied
-		Updating the views for A(x~)
 		Updating the views for B(x~)
 
 	Applying rule 3:

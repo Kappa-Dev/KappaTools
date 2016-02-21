@@ -7,12 +7,15 @@
 #
 graph G{ 
 subgraph cluster0 {
+   0.0 [shape = plaintext label = ""]
 label =  "A";  shape = rectangle; color = red
 } ; 
 subgraph cluster1 {
+   1.0 [shape = plaintext label = ""]
 label =  "B";  shape = rectangle; color = red
 } ; 
 subgraph cluster2 {
+   2.0 [shape = plaintext label = ""]
 label =  "C";  shape = rectangle; color = red
 } ; 
 subgraph cluster3 {
@@ -20,6 +23,7 @@ subgraph cluster3 {
 label =  "D";  shape = rectangle; color = red
 } ; 
 subgraph cluster4 {
+   4.0 [shape = plaintext label = ""]
 label =  "E";  shape = rectangle; color = red
 } ; 
 subgraph cluster5 {

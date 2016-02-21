@@ -148,11 +148,6 @@ agent_type:0:A:site_type:0:x!@list of covering_class_id:
 covering_class_id:0
 agent_type:1:B:site_type:0:x!@list of covering_class_id:
 covering_class_id:0
-rule 1: r1
-agent_type:2:C:cv_id:0
-agent_type_Id=1
-agent_type_ Leaf True 
-
 rule 0: r0
 agent_type:0:A:cv_id:0
 agent_type_Id=1

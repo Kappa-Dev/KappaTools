@@ -834,10 +834,6 @@ agent_type_     Leaf True
 agent_type_    Id=0
 agent_type_     Leaf False 
 
-agent_type:0:A:cv_id:0
-agent_type_Id=1
-agent_type_ Leaf True 
-
 rule 6: r6
 agent_type:2:C:cv_id:0
 agent_type_Id=3
@@ -868,10 +864,6 @@ agent_type_    Id=0
 agent_type_     Leaf False 
 
 rule 7: r7
-agent_type:1:B:cv_id:0
-agent_type_Id=1
-agent_type_ Leaf True 
-
 agent_type:1:B:cv_id:0
 agent_type_Id=26
 agent_type_ Node(site_type:3<1)
@@ -1147,7 +1139,6 @@ agent_type_     Leaf False
 	Applying rule 4: r4:
 		the precondition is satisfied
 		Updating the views for A(x!)
-		Updating the views for A(x!)
 
 	Applying rule 7: r7:
 		the predcondition is not satisfied yet
@@ -1365,11 +1356,9 @@ agent_type_     Leaf False
 	Applying rule 4: r4:
 		the precondition is satisfied
 		Updating the views for A(x!)
-		Updating the views for A(x!)
 
 	Applying rule 7: r7:
 		the precondition is satisfied
-		Updating the views for B(x~,y~,x!)
 		Updating the views for B(x~,y~,x!)
 		Updating the views for B(x~,y~,x!)
 

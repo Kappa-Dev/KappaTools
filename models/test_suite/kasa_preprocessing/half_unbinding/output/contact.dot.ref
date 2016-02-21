@@ -11,6 +11,7 @@ subgraph cluster0 {
 label =  "A";  shape = rectangle; color = red
 } ; 
 subgraph cluster1 {
+   1.0 [shape = plaintext label = ""]
 label =  "B";  shape = rectangle; color = red
 } ; 
 subgraph cluster2 {

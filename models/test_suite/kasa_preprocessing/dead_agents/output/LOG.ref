@@ -715,11 +715,6 @@ agent_type:0:A:cv_id:0
 agent_type_Id=0
 agent_type_ Leaf False 
 
-rule 8
-agent_type:2:D:cv_id:0
-agent_type_Id=1
-agent_type_ Leaf True 
-
 rule 9
 agent_type:3:E:cv_id:0
 agent_type_Id=0
@@ -774,7 +769,7 @@ agent_type_ Leaf False
 	Wake-up rules
 
 	Applying rule 8:
-		the predcondition is not satisfied yet
+		the precondition is satisfied
 
 	Applying rule 9:
 		the predcondition is not satisfied yet
@@ -860,7 +855,7 @@ agent_type_ Leaf False
 		Updating the views for A(x~,x!)
 
 	Applying rule 8:
-		the predcondition is not satisfied yet
+		the precondition is satisfied
 
 	Applying rule 9:
 		the predcondition is not satisfied yet
@@ -875,7 +870,6 @@ agent_type_ Leaf False
 rule 0 will never be applied.
 rule 6 will never be applied.
 rule 7 will never be applied.
-rule 8 will never be applied.
 rule 9 will never be applied.
 
 ------------------------------------------------------------
