@@ -125,13 +125,14 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
       | Ghost -> error, (handler, store_result)
       | Dead_agent (agent, _, _, _) ->
 	  let agent_type = agent.agent_name in
-	  let error, triple_list =
+	  let error', triple_list =
 	    match
 	      AgentMap.get parameter error agent_type store_remanent_triple
 	    with
-	    | error, None -> warn parameter error (Some "Line 136") Exit []
+	    | error, None -> error, []
 	    | error, Some x -> error, x
 	  in
+	  let error = Exception.check warn parameter error error' (Some "line 135") Exit in
 	  (*-----------------------------------------------------------------*)
           let error, store_result =
 	    List.fold_left
@@ -144,81 +145,75 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
 	  error, (handler, store_result)
       | Agent agent ->
         let agent_type = agent.agent_name in
-	let error, triple_list =
+	let error', triple_list =
 	  match
-	    AgentMap.get parameter error agent_type store_remanent_triple
+	    AgentMap.unsafe_get parameter error agent_type store_remanent_triple
 	  with
-	  | error, None -> warn parameter error (Some "Line 136") Exit []
+	  | error, None -> error, []
 	  | error, Some x -> error, x
 	in
+	let error = Exception.check warn parameter error error' (Some "line 155") Exit in
 	(*-----------------------------------------------------------------*)
         (*get map restriction from covering classes*)
-	if Site_map_and_set.Map.is_empty agent.agent_interface 
-	then 
-          (* IF the covering class is empty, put the bdu true since there is no test *)
-	  let error, store_result =
-	    error, Map_test_bdu.Map.add (agent_id, agent_type, rule_id, 0) bdu_true store_result 
-	  in 
-	  error, (handler, store_result)
-	else 
-          let error, get_pair_list =
-            List.fold_left (fun (error, current_list) (cv_id, list, set) ->
-              (*-----------------------------------------------------------------*)
-              (*new index for site type in covering class*)
-              let error, (map_new_index_forward, _) =
-		new_index_pair_map parameter error list
-              in
-              (*-----------------------------------------------------------------*)
-              let error', map_res =
-		Site_map_and_set.Map.fold_restriction
-		parameter error
-		  (fun site port (error, store_result) ->
-                    let state = port.site_state.min in
-                    let error, site' = 
-                      Site_map_and_set.Map.find_default parameter error 
-                        0 site map_new_index_forward 
+        let error, get_pair_list =
+          List.fold_left
+	    (fun (error, current_list) (cv_id, list, set) ->
+             (*-----------------------------------------------------------------*)
+	     (*new index for site type in covering class*)
+	     let error, (map_new_index_forward, _) =
+	       new_index_pair_map parameter error list
+	     in
+	     (*-----------------------------------------------------------------*)
+	     let error', map_res =
+	       Site_map_and_set.Map.fold_restriction
+		 parameter error
+		 (fun site port (error, store_result) ->
+                  let state = port.site_state.min in
+                  let error, site' = 
+                    Site_map_and_set.Map.find_default parameter error 
+						      0 site map_new_index_forward 
                     in
                     let error, map_res =
                       Site_map_and_set.Map.add parameter error 
-			site'
-			state
-			store_result
+					       site'
+					       state
+					       store_result
                     in
                     error, map_res
-		  ) set agent.agent_interface Site_map_and_set.Map.empty
-              in
-	      let error = Exception.check warn parameter error error' 
-                (Some "line 178") Exit 
-              in
-              error, (cv_id, map_res) :: current_list)
-	      (error, []) triple_list
-          in
-          (*-----------------------------------------------------------------*)
-          let error, handler, store_result =
-            List.fold_left 
+		 ) set agent.agent_interface Site_map_and_set.Map.empty
+             in
+	     let error = Exception.check warn parameter error error' 
+					 (Some "line 178") Exit 
+             in
+             error, (cv_id, map_res) :: current_list)
+	    (error, []) triple_list
+        in
+        (*-----------------------------------------------------------------*)
+        let error, handler, store_result =
+          List.fold_left 
               (fun (error, handler, store_result) (cv_id,map_res) ->
-		if Site_map_and_set.Map.is_empty map_res 
-		then
-		  error, handler, store_result
-		else
-		  begin 
-		    let error, pair_list =
-		      Site_map_and_set.Map.fold
-			(fun site' state (error, current_list) ->
-			  let pair_list = (site', state) :: current_list in
-			  error, pair_list
-			) map_res (error, [])
-		    in
-		    (*build bdu_test*)
-		    let error, handler, bdu_test =
-		      build_bdu parameter handler error pair_list
-		    in
-		    let error, store_result =
-		      error, Map_test_bdu.Map.add (agent_id, agent_type, rule_id, cv_id) bdu_test store_result
-		    in
-		    error, handler, store_result
-		  end)
-            
+	       if Site_map_and_set.Map.is_empty map_res 
+	       then
+		 error, handler, store_result
+	       else
+		 begin 
+		   let error, pair_list =
+		     Site_map_and_set.Map.fold
+		       (fun site' state (error, current_list) ->
+			let pair_list = (site', state) :: current_list in
+			error, pair_list
+		       ) map_res (error, [])
+		   in
+		   (*build bdu_test*)
+		   let error, handler, bdu_test =
+		     build_bdu parameter handler error pair_list
+		   in
+		   let error, store_result =
+		     error, Map_test_bdu.Map.add (agent_id, agent_type, rule_id, cv_id) bdu_test store_result
+		   in
+		   error, handler, store_result
+		 end)
+              
 	      (error, handler, store_result) get_pair_list
         in
         error, (handler, store_result)
@@ -443,7 +438,7 @@ let collect_bdu_init_restriction_map parameter handler error compil store_remane
         AgentMap.fold parameter error
           (fun parameter error agent_id agent (handler, store) ->
             match agent with
-            | Unknown_agent _ | Ghost -> error, (handler, store)
+            | Unknown_agent _ | Ghost
             | Dead_agent _ -> warn parameter error (Some "373") Exit (handler, store)
             | Agent agent ->
               let agent_type = agent.agent_name in

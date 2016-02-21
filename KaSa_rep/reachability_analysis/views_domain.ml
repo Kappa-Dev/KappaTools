@@ -898,7 +898,7 @@ struct
                 Map_bdu_update.Map.find_option_without_logs parameter
                   error (agent_type, cv_id) fixpoint_result
               with
-              | error, None -> error, bdu_false
+              | error, None -> Printf.fprintf stdout "cv_id %i\n" cv_id; error, bdu_false
               | error, Some bdu -> error, bdu
             in
             let handler = get_mvbdu_handler dynamic in

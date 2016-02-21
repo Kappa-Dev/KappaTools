@@ -207,18 +207,7 @@ let clean_classes parameter error covering_classes modified_map =
   let is_empty_set = Site_map_and_set.Set.is_empty in
   List.fold_left (fun (error, remanent) covering_class ->
     match covering_class with
-      | [] -> 
-	if current_covering_classes = [[]] 
-        (* if the agent has only an empty covering class, keep it *)
-	then 
-	  store_remanent 
-            parameter 
-            error
-            covering_class
-            modified_map
-            remanent
-	else 
-	  error,remanent
+      | [] -> error,remanent
       | t :: tl ->
         let pointer_backward = remanent.store_pointer_backward in
         (* return the set of list(id) containing t.
