@@ -102,24 +102,26 @@ endif
 
 JsSim.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(GENERATED)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
-	-tag debug \
-	-I js -I api \
-	-pkg biniou -pkg lwt -pkg atdgen -tag-line "<js/**> : thread, package(yojson), package(biniou), package(js_of_ocaml.tyxml), package(js_of_ocaml.syntax), package(tyxml.syntax), package(lwt), syntax(camlp4o)" \
+	-tag debug -I js -I api \
+	-tag-line "<generated/*> : package(atdgen)" \
+	-tag-line "<api/*> : package(lwt)" \
+	-tag-line "<js/*> : thread, package(atdgen), package(js_of_ocaml.tyxml), package(js_of_ocaml.syntax), package(tyxml.syntax), package(lwt), syntax(camlp4o)" \
 	$@
 
 WebWorker.byte: $(filter-out webapp/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
-	-tag debug \
-	-I term -I js -I api \
-	-pkg biniou -pkg lwt -pkg atdgen -tag-line "<js/**> : thread, package(yojson), package(biniou), package(js_of_ocaml), package(js_of_ocaml.syntax), package(lwt), syntax(camlp4o)" \
+	-tag debug -I js -I api \
+	-tag-line "<generated/*> : package(atdgen)" \
+	-tag-line "<api/*> : package(lwt)" \
+	-tag-line "<js/*> : thread, package(atdgen), package(js_of_ocaml), package(js_of_ocaml.syntax), package(lwt), syntax(camlp4o)" \
 	$@
 
 WebSim.native: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
-	-tag debug \
-	-I term -I webapp -I api \
-	-pkg biniou -pkg cohttp.lwt -pkg atdgen \
-	-tag-line "<webapp/**> : thread, package(yojson), package(biniou), package(lwt), package(yojson), package(biniou)" \
+	-tag debug -I webapp -I api \
+	-tag-line "<generated/*> : package(atdgen)" \
+	-tag-line "<api/*> : package(lwt)" \
+	-tag-line "<webapp/*> : thread, package(atdgen), package(cohttp.lwt)" \
 	$@
 
 bin/%: %.native Makefile
