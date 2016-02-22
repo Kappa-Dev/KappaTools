@@ -37,7 +37,7 @@ The code specific to the command line backend is in main/. It consists in file h
 The code of the static analyser is in KaSa_rep/reachability_analysis/
 {!modules: Analyzer Analyzer_headers Composite_domain Analyzer_domain_sig Product}
 Several abstract domains are available:
-{!modules: Global_domain Rules_domain Agents_domain Views_domain}
+{!modules: Rules_domain Agents_domain Contact_map_domain Views_domain}
 
 
 The library to deal with multi-valued decision diagrams is in KaSa_rep/data_structures/mvbdu/

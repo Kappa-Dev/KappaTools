@@ -53,10 +53,9 @@ Analyzer_domain_sig
 Composite_domain
 Product
 
-Global_domain
 Rules_domain
 Views_domain
 Agents_domain
-
+Contact_map_domain
 
 Mvbdu_wrapper
