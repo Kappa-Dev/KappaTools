@@ -69,17 +69,17 @@ type bdu_common_static =
 
 let half_break_action parameter error handler rule_id half_break store_result =
   (*module (agent_type, site) -> (rule_id, binding_state) list*)
-  let add_link (a, b) (r, state) store_result =
+  let add_link (agent_type, site_type) (r, state) store_result =
     let error, (l, old) =
       match Int2Map_HalfBreak_effect.Map.find_option_without_logs parameter error
-        (a, b) store_result
+        (agent_type, site_type) store_result
       with
       | error, None -> error, ([], [])
       | error, Some (l, l') -> error, (l, l')
     in
     let error, result =
       Int2Map_HalfBreak_effect.Map.add_or_overwrite
-        parameter error (a, b) (l, (r, state) :: old)
+        parameter error (agent_type, site_type) (l, (r, state) :: old)
         store_result
     in
     error, result
@@ -89,7 +89,7 @@ let half_break_action parameter error handler rule_id half_break store_result =
     List.fold_left (fun (error, store_result) (site_address, state_op) ->
       (*site_address: {agent_index, site, agent_type}*)
       let agent_type = site_address.Cckappa_sig.agent_type in
-      let site = site_address.Cckappa_sig.site in
+      let site_type = site_address.Cckappa_sig.site in
       (*state*)
       let error, (state_min, state_max) =
         match state_op with
@@ -100,7 +100,7 @@ let half_break_action parameter error handler rule_id half_break store_result =
                 (Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
                    parameter
                    error
-                   (agent_type, site)
+                   (agent_type, site_type)
                    handler.Cckappa_sig.states_dic)
                 (fun error -> warn parameter error (Some "line 54") Exit
                   (Cckappa_sig.Dictionary_of_States.init()))
@@ -114,7 +114,7 @@ let half_break_action parameter error handler rule_id half_break store_result =
       (*-------------------------------------------------------------------------------*)
       (*return result*)
       let error, store_result =
-        add_link (agent_type, site) (rule_id, state_min) store_result
+        add_link (agent_type, site_type) (rule_id, state_min) store_result
       in
       error, store_result  
   ) (error, store_result) half_break
@@ -130,17 +130,17 @@ let half_break_action parameter error handler rule_id half_break store_result =
 (*compute remove action: r0 and r1 are remove action *)
 
 let remove_action parameter error rule_id remove store_result =
-  let add_link (a, b) r store_result =
+  let add_link (agent_type, site_type) r store_result =
     let error, (l, old) =
       match Int2Map_Remove_effect.Map.find_option_without_logs
-        parameter error (a, b) store_result
+        parameter error (agent_type, site_type) store_result
       with
       | error, None -> error, ([], [])
       | error, Some (l, l') -> error, (l, l')
     in
     let error, result =
       Int2Map_Remove_effect.Map.add_or_overwrite
-        parameter error (a, b) (l, r :: old) store_result
+        parameter error (agent_type, site_type) (l, r :: old) store_result
     in
     error, result
   in
@@ -151,9 +151,9 @@ let remove_action parameter error rule_id remove store_result =
       (*NOTE: if it is a site_free then do not consider this case.*)
       (*result*)
       let store_result =
-        List.fold_left (fun store_result site ->
+        List.fold_left (fun store_result site_type ->
           let error, result =
-            add_link (agent_type, site) rule_id store_result
+            add_link (agent_type, site_type) rule_id store_result
           in
           result
         ) store_result list_undoc
@@ -172,7 +172,7 @@ let remove_action parameter error rule_id remove store_result =
 
 let store_potential_half_break parameter error handler rule_id half_break store_result =
   (*map of potential partner that is bond/free*)
-  let add_link (agent_type, rule_id) (site, state) store_result =
+  let add_link (agent_type, rule_id) (site_type, state) store_result =
     let error, old =
       match Int2Map_potential_effect.Map.find_option_without_logs
         parameter error (agent_type, rule_id) store_result
@@ -182,14 +182,14 @@ let store_potential_half_break parameter error handler rule_id half_break store_
     in
     let error, result =
       Int2Map_potential_effect.Map.add_or_overwrite parameter error
-        (agent_type, rule_id) ((site, state) :: old) store_result
+        (agent_type, rule_id) ((site_type, state) :: old) store_result
     in
     error, result
   in
   (*-------------------------------------------------------------------------------*)
   List.fold_left (fun (error, store_modif_minus) (add, state_op) ->
     let agent_type = add.Cckappa_sig.agent_type in
-    let site = add.Cckappa_sig.site in
+    let site_type = add.Cckappa_sig.site in
     (*state*)
     let error, (state_min, state_max) =
       match state_op with
@@ -200,7 +200,7 @@ let store_potential_half_break parameter error handler rule_id half_break store_
               (Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
                  parameter
                  error
-                 (agent_type, site)
+                 (agent_type, site_type)
                  handler.Cckappa_sig.states_dic)
               (fun error -> warn parameter error (Some "line 109") Exit 
                 (Cckappa_sig.Dictionary_of_States.init()))
@@ -219,7 +219,7 @@ let store_potential_half_break parameter error handler rule_id half_break store_
         error, store_result
       else
         (*potential partner*)
-        match Handler.dual parameter error handler agent_type site k with
+        match Handler.dual parameter error handler agent_type site_type k with
         | error, None -> error, store_result
         | error, Some (agent_type2, site2, state2) ->
           let error, store_potential_free =

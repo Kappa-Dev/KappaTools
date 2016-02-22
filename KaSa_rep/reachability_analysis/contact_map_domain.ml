@@ -361,6 +361,10 @@ struct
 
   let apply_rule static dynamic error rule_id precondition =
     let event_list = [] in
+   (*check if rule_id is apply for the first time,
+      if yes, then add bond in the rhs of the rule.
+     then do the potential partner, add rule into event_list
+    *)
     error, dynamic, (precondition, event_list)
       
   let rec apply_event_list static dynamic error event_list =
