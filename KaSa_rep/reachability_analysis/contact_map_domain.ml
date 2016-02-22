@@ -30,26 +30,28 @@ struct
           let compare = compare
         end))
 
-  module Int2Map_CM_state =
+  module Int2Map_CM =
     Map_wrapper.Make 
       (SetMap.Make
          (struct 
-           type t = int * int * int
+           type t = Set_triple.Set.t
            let compare = compare
           end))
+
+  type local_static_information =
+    {
+      bond_rhs : Set_triple.Set.t Int2Map_CM.Map.t;
+      bond_lhs : Set_triple.Set.t Int2Map_CM.Map.t
+    }
 
   type static_information =
     {
       global_static_information : Analyzer_headers.global_static_information;
-      domain_static_information : unit
+      local_static_information : local_static_information
     }
-  
-  type local_dynamic_information =
-    {
-      contact_map_dynamic   : Set_triple.Set.t Int2Map_CM_state.Map.t;
-      contact_map_syntactic : Set_triple.Set.t Int2Map_CM_state.Map.t
-    }
-      
+
+  type local_dynamic_information = Set_triple.Set.t Int2Map_CM.Map.t
+    
   type dynamic_information =
     {
       local  : local_dynamic_information;
@@ -57,6 +59,7 @@ struct
     }
 
   (**************************************************************************)
+  (*local static information*)
 
   let get_global_static_information static = static.global_static_information
 
@@ -68,8 +71,36 @@ struct
 
   let get_compil static = lift Analyzer_headers.get_cc_code static
 
+  let get_local_static_information static = static.local_static_information
+
+  let set_local_static_information local static =
+    {
+      static with
+        local_static_information = local
+    }
+
+  let get_bond_rhs static = 
+    (get_local_static_information static).bond_rhs
+
+  let set_bond_rhs bond static =
+    set_local_static_information
+      {
+        (get_local_static_information static) with
+          bond_rhs = bond
+      } static
+    
+  let get_bond_lhs static =
+    (get_local_static_information static).bond_lhs
+
+  let set_bond_lhs bond static =
+    set_local_static_information
+      {
+        (get_local_static_information static) with
+          bond_lhs = bond
+      } static
+      
   (*--------------------------------------------------------------------*)
-  (** global dynamic information*)
+  (** dynamic information*)
     
   let get_local_dynamic_information dynamic = dynamic.local
 
@@ -77,52 +108,202 @@ struct
     {
       dynamic with local = local
     }
-    
-  let get_contact_map_dynamic dynamic =
-    (get_local_dynamic_information dynamic).contact_map_dynamic
 
-  let set_contact_map_dynamic contact dynamic =
-    set_local_dynamic_information
-      {
-        (get_local_dynamic_information dynamic) with
-          contact_map_dynamic = contact
-      } dynamic
+  (**************************************************************************)
+  (*implementations*)
+      
+  let collect_set parameter error agent site_type =
+    match agent with
+    | Cckappa_sig.Ghost
+    | Cckappa_sig.Unknown_agent _
+    | Cckappa_sig.Dead_agent _ ->
+      warn parameter error (Some "line 199") Exit Set_triple.Set.empty
+    | Cckappa_sig.Agent agent1 ->
+      let agent_type1 = agent1.Cckappa_sig.agent_name in
+      let error, state1 =
+        match Cckappa_sig.Site_map_and_set.Map.find_option_without_logs
+          parameter error site_type
+          agent1.Cckappa_sig.agent_interface
+        with
+        | error, None ->
+          warn parameter error (Some "line 138") Exit 0
+        | error, Some port ->
+          let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
+          if state > 0
+          then error, state
+          else warn parameter error (Some "line 142") Exit 0
+      in
+      let error, set1 = 
+        Set_triple.Set.add_when_not_in parameter error 
+          (agent_type1, site_type, state1) Set_triple.Set.empty
+      in
+      error, set1
 
-  let get_contact_map_syntactic dynamic =
-    (get_local_dynamic_information dynamic).contact_map_syntactic
+  let add_link_bonds parameter error set1 set2 store_result =
+    let error, old_set =
+      match Int2Map_CM.Map.find_option_without_logs parameter error set1 store_result
+      with
+      | error, None -> error, Set_triple.Set.empty
+      | error, Some s -> error, s
+    in
+    let error, union = Set_triple.Set.union parameter error set2 old_set in
+    let error, store_result =
+      Int2Map_CM.Map.add_or_overwrite parameter error set1 union store_result
+    in
+    error, store_result
 
-  let set_contact_map_syntactic contact dynamic =
-    set_local_dynamic_information
-      {
-        (get_local_dynamic_information dynamic) with
-          contact_map_syntactic = contact
-      } dynamic
+  let collect_bonds parameter error rule views bonds store_result =
+    let error, store_result =
+      Int_storage.Quick_Nearly_inf_Imperatif.fold parameter error
+        (fun parameter error agent_id bonds_map store_result ->
+          let error, store_result =
+            Cckappa_sig.Site_map_and_set.Map.fold
+              (fun site_type_source site_add (error, store_result) ->
+                let agent_index_target = site_add.Cckappa_sig.agent_index in
+                let site_type_target = site_add.Cckappa_sig.site in
+                let error, agent_source =
+                  match Int_storage.Quick_Nearly_inf_Imperatif.get
+                    parameter error agent_id views
+                  with
+                  | error, None -> warn parameter error (Some "line 304") Exit
+                    Cckappa_sig.Ghost
+                  | error, Some agent -> error, agent
+                in
+                let error, agent_target = 
+                  match Int_storage.Quick_Nearly_inf_Imperatif.get
+                    parameter error agent_index_target views
+                  with
+                  | error, None -> warn parameter error (Some "line 313") Exit
+                    Cckappa_sig.Ghost
+                  | error, Some agent -> error, agent
+                in
+                let error, set1 =
+                  collect_set
+                    parameter
+                    error
+                    agent_source
+                    site_type_source
+                in
+                let error, set2 =
+                  collect_set
+                    parameter
+                    error
+                    agent_target
+                    site_type_target
+                in
+                (*let _ =
+                  Set_triple.Set.iter (fun (agent_type, site_type, state) ->
+                    Set_triple.Set.iter (fun (agent_type', site_type', state') ->
+                      Printf.fprintf stdout "agent_type:%i:site_type:%i:state:%i -> agent_type':%i:site_type':%i:state':%i\n"
+                        agent_type site_type state
+                        agent_type' site_type' state'
+                    ) set2
+                  ) set1
+                in*)
+                let error, store_result =
+                  add_link_bonds
+                    parameter
+                    error
+                    set1
+                    set2
+                    store_result
+                in
+                error, store_result
+              ) bonds_map (error, store_result)           
+          in
+          error, store_result
+        ) bonds store_result
+    in
+    error, store_result
+
+  (*collect bonds rhs*)
+  let collect_bonds_rhs parameter error rule store_result =
+    let error, store_result =
+      collect_bonds
+        parameter
+        error
+        rule
+        rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
+        rule.Cckappa_sig.rule_rhs.Cckappa_sig.bonds
+        store_result      
+    in
+    error, store_result
+
+  (*collect bonds lhs*)
+
+  let collect_bonds_lhs parameter error rule store_result =
+    let error, store_result =
+      collect_bonds
+        parameter
+        error
+        rule
+        rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
+        rule.Cckappa_sig.rule_lhs.Cckappa_sig.bonds
+        store_result
+    in
+    error, store_result
+
+  (**************************************************************************)
+      
+  let scan_rule_set static dynamic error =
+    let parameter = get_parameter static in
+    let compil = get_compil static in
+    let error, static =
+      Int_storage.Nearly_inf_Imperatif.fold
+        parameter
+        error
+        (fun parameter error rule_id rule static ->
+          let store_rhs = get_bond_rhs static in
+          (*bond rhs*)
+          let error, store_rhs =
+            collect_bonds_rhs
+              parameter
+              error
+              rule.Cckappa_sig.e_rule_c_rule
+              store_rhs
+          in
+          let static = set_bond_rhs store_rhs static in
+          (*bond lhs*)
+          let store_lhs = get_bond_lhs static in
+          let error, store_lhs =
+            collect_bonds_lhs
+              parameter
+              error
+              rule.Cckappa_sig.e_rule_c_rule
+              store_lhs
+          in
+          let static = set_bond_lhs store_lhs static in
+          error, static
+        ) compil.Cckappa_sig.rules static
+    in
+    error, static, dynamic
 
   (**************************************************************************)
 
-  let init_local_dynamic_information =
-    let init_contact_map_dynamic = Int2Map_CM_state.Map.empty in
-    let init_contact_map_syntactic = Int2Map_CM_state.Map.empty in
-    {
-      contact_map_dynamic   = init_contact_map_dynamic;
-      contact_map_syntactic = init_contact_map_syntactic
-    }
-
   let initialize static dynamic error =
+    let init_domain_static =
+      {
+        bond_rhs = Int2Map_CM.Map.empty;
+        bond_lhs = Int2Map_CM.Map.empty;
+      }
+    in
     let init_global_static_information =
       {
         global_static_information = static;
-        domain_static_information = ()
+        local_static_information = init_domain_static
       }
     in
     let init_global_dynamic_information =
       {
-        local  = init_local_dynamic_information;
+        local  = Int2Map_CM.Map.empty;
         global = dynamic
       }
     in
-    error, init_global_static_information, init_global_dynamic_information
-      
+    let error, static, dynamic =
+      scan_rule_set init_global_static_information init_global_dynamic_information error
+    in
+    error, static, dynamic
+
   (**************************************************************************)
 
   type 'a zeroary =
@@ -147,9 +328,32 @@ struct
     -> Exception.method_handler * dynamic_information * 'c
 
   (**************************************************************************)
+  (*Implementation*)
+    
+  (**bond occurs in the initial state*)
+
+  let collect_bonds_initial static dynamic error init_state =
+    let parameter = get_parameter static in
+    let store_result = get_local_dynamic_information dynamic in
+    let error, store_result =
+      collect_bonds
+        parameter
+        error
+        init_state
+        init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views
+        init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.bonds
+        store_result
+    in
+    let dynamic = set_local_dynamic_information store_result dynamic in
+    error, dynamic
+
+  (**************************************************************************)
 
   let add_initial_state static dynamic error species =
     let event_list = [] in
+    let error, dynamic =
+      collect_bonds_initial static dynamic error species
+    in
     error, dynamic, event_list
 
   let is_enabled static dynamic error rule_id precondition =

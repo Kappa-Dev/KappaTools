@@ -163,7 +163,7 @@ struct
     let error, rule_id_string =
       try Handler.string_of_rule parameter error kappa_handler compil rule_id
       with
-        _ -> warn parameter error (Some "line 140") Exit (string_of_int rule_id)
+        _ -> warn parameter error (Some "line 166") Exit (string_of_int rule_id)
     in
     (*print*)
     let dynamic =
@@ -246,10 +246,10 @@ struct
                 try
                   Handler.string_of_rule parameter error handler compiled k
                 with
-                  _ -> warn parameter error (Some "line 238") Exit (string_of_int k)
+                  _ -> warn parameter error (Some "line 249") Exit (string_of_int k)
 	      in
 	      let error =
-                Exception.check warn parameter error error' (Some "line 234") Exit
+                Exception.check warn parameter error error' (Some "line 252") Exit
               in
               let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
                 "%s will never be applied." rule_string
