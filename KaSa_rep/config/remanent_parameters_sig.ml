@@ -103,7 +103,7 @@ type marshalisable_parameters =
    do_site_dependencies : bool ;
    dump_site_dependencies : bool ;
    do_reachability_analysis : bool ;
-   do_reachability_analysis_module : bool ;
+   (*do_reachability_analysis_module : bool ;*)
    called_from : called_from;
    dump_error_as_soon_as_they_occur : bool ;
    file : string option ;

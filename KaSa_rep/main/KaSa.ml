@@ -131,7 +131,7 @@ let main () =
   (*-----------------------------------------------------------------------*)
   let error, handler_bdu = Mvbdu_wrapper.Mvbdu.init parameters error in
   let error, static_opt, dynamic_opt =
-    if Remanent_parameters.get_do_reachability_analysis_module parameters
+    if Remanent_parameters.get_do_reachability_analysis parameters
     then
       let _ = Format.printf "\nReachability analysis...@." in
       let parameters_cv =

@@ -216,7 +216,7 @@ let get_parameters ?html_mode:(html_mode=true) ?called_from:(called_from=Remanen
 	Remanent_parameters_sig.dump_site_dependencies = !Config.dump_site_dependencies ;
         (*different reachability output*)
 	Remanent_parameters_sig.do_reachability_analysis = !Config.do_reachability_analysis ;
-	Remanent_parameters_sig.do_reachability_analysis_module = !Config.do_reachability_analysis_module ;
+	(*Remanent_parameters_sig.do_reachability_analysis_module = !Config.do_reachability_analysis_module ;*)
 
         (**)
 	Remanent_parameters_sig.file = !Config.file ;
@@ -356,7 +356,7 @@ let get_dump_site_dependencies_1          marshalisable = marshalisable.Remanent
 (*reachability different output*)
 let get_do_reachability_analysis_1        marshalisable = marshalisable.Remanent_parameters_sig.do_reachability_analysis
 
-let get_do_reachability_analysis_module_1        marshalisable = marshalisable.Remanent_parameters_sig.do_reachability_analysis_module
+(*let get_do_reachability_analysis_module_1        marshalisable = marshalisable.Remanent_parameters_sig.do_reachability_analysis_module*)
 
 (**)
 let get_influence_map_accuracy_level_1     marshalisable = marshalisable.Remanent_parameters_sig.influence_map_accuracy_level
@@ -402,7 +402,7 @@ let get_do_site_dependencies = upgrade_from_marshal_field get_do_site_dependenci
 let get_dump_site_dependencies = upgrade_from_marshal_field get_dump_site_dependencies_1
 (*reachability analysis in different output*)
 let get_do_reachability_analysis = upgrade_from_marshal_field get_do_reachability_analysis_1
-let get_do_reachability_analysis_module = upgrade_from_marshal_field get_do_reachability_analysis_module_1
+(*let get_do_reachability_analysis_module = upgrade_from_marshal_field get_do_reachability_analysis_module_1*)
 
 (**)
 let get_symbols = upgrade_from_marshal_field get_symbols_1
