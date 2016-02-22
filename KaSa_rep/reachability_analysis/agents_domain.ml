@@ -172,7 +172,6 @@ struct
     in
     error, (agents_test_list, agents_created_list)
 
-  (*FIXME*)
   let collect_agents_without_interface parameter error rule_id rule map =
     let error, agents_lhs_list =
       map_to_list parameter error rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
@@ -191,18 +190,16 @@ struct
 	      let agent_interface = agent.Cckappa_sig.agent_interface in
               if Cckappa_sig.Site_map_and_set.Map.is_empty agent_interface
 	      then
-		aux tl (error, agent_type::output)
+		aux tl (error, agent_type :: output)
 	      else
 		aux tl (error, output)
 	 end
     in
-    match
-      aux agents_lhs_list (error, []) 
-    with
+    match aux agents_lhs_list (error, []) with
     | error, Analyzer_headers.Bot -> error, map
     | error, Analyzer_headers.Not_bot l ->
-       List.fold_left
-	 (fun (error,map) agent_type ->
+      List.fold_left
+	(fun (error, map) agent_type ->
 	  let error, old_list =
             match
 	      Int2Map_Agent.Map.find_option_without_logs
@@ -216,42 +213,9 @@ struct
           in
           let rule_id_list = rule_id :: old_list in
           Int2Map_Agent.Map.add_or_overwrite parameter error agent_type
-					     rule_id_list map
-	 )
-         (error,map) l
-	 
-  (*let collect_agents_without_interface' parameter error rule_id rule store_result =
-    let error, store_result =
-      Bdu_analysis_type.AgentMap.fold parameter error
-        (fun parameter error agent_id agent store_result ->
-          match agent with
-          | Cckappa_sig.Unknown_agent _
-          | Cckappa_sig.Ghost
-          | Cckappa_sig.Dead_agent _ -> error, store_result (*output bot*)
-          | Cckappa_sig.Agent agent ->
-            let agent_type = agent.Cckappa_sig.agent_name in
-            let agent_interface = agent.Cckappa_sig.agent_interface in
-            if Cckappa_sig.Site_map_and_set.Map.is_empty agent_interface
-            then
-              (*empty interface*)
-              let error, old_list =
-                match Int2Map_Agent.Map.find_option_without_logs parameter error
-                  agent_type store_result
-                with
-                | error, None -> error, []
-                | error, Some l -> error, l
-              in
-              let rule_id_list = rule_id :: old_list in
-              let error, store_result =
-                Int2Map_Agent.Map.add_or_overwrite parameter error
-                  agent_type rule_id_list store_result
-              in
-              error, store_result
-            else
-              error, store_result
-        ) rule.Cckappa_sig.rule_lhs.Cckappa_sig.views store_result
-    in
-    error, store_result*)
+	    rule_id_list map
+	)
+        (error, map) l
 
   let scan_rule_set static dynamic error =
     let parameter = get_parameter static in
@@ -326,7 +290,6 @@ struct
     an agent of this type and with an empty interface occur in the lhs of
     the rule *)
 
-  (*FIXME*)
   let add_event_list static dynamic error agent_type event_list =
     let parameter = get_parameter static in
     let map = get_agents_without_interface static in
@@ -340,21 +303,21 @@ struct
       in
       let dynamic = set_seen_agent local dynamic in
       let error, rule_id_list = 
-            match Int2Map_Agent.Map.find_option_without_logs parameter error
-							     agent_type map
-            with
-            | error, None -> error, []
-            | error, Some l -> error, l
+        match Int2Map_Agent.Map.find_option_without_logs parameter error
+	  agent_type map
+        with
+        | error, None -> error, []
+        | error, Some l -> error, l
       in
       let event_list =          
         List.fold_left (fun event_list rule_id ->
-			Analyzer_headers.Check_rule rule_id :: event_list
-		       ) event_list rule_id_list
+	  Analyzer_headers.Check_rule rule_id :: event_list
+	) event_list rule_id_list
       in
       error, (dynamic, event_list)
     else
       error, (dynamic, event_list)
-	       
+	
   (**************************************************************************)
   (** collect the agent type of the agents of the species and declare
      them seen *)
@@ -418,11 +381,10 @@ struct
       | error, Some (l1, l2) -> error, (l1, l2)
     in
     match bot_or_not with
-    | Analyzer_headers.Bot ->
-       error, dynamic, None
+    | Analyzer_headers.Bot -> error, dynamic, None
     | Analyzer_headers.Not_bot l ->
-       List.fold_left
-	 (fun (error, dynamic, s) agent_type ->
+      List.fold_left
+	(fun (error, dynamic, s) agent_type ->
 	  let local = get_seen_agent dynamic in
 	  let bool = Array.get local agent_type in
 	  if bool
@@ -430,9 +392,9 @@ struct
 	    error, dynamic, s
 	  else
 	    error, dynamic, None
-	 )
-	 (error, dynamic, Some precondition) l
-
+	)
+	(error, dynamic, Some precondition) l
+        
   (************************************************************************************)
   (** fold a list of creation each time update the array when agent is
       seen for the first time, add list of rule inside event list that
@@ -450,7 +412,7 @@ struct
       match Int2Map_Agent.Map.find_option_without_logs
         parameter error rule_id domain_static
       with
-      | error, None -> error, (Analyzer_headers.Bot, [])
+      | error, None -> error, (Analyzer_headers.Not_bot [], [])
       | error, Some (l1, l2) -> error, (l1, l2)
     in
     let error, (dynamic, event_list) =
