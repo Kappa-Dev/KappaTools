@@ -160,6 +160,7 @@ struct
     error, dynamic, (precondition, event_list)
       
   let rec apply_event_list static dynamic error event_list =
+    let event_list = [] in
     error, dynamic, event_list
 
   let export static dynamic error kasa_state =

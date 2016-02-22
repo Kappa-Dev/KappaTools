@@ -17,7 +17,7 @@ module A =
        (Product.Product
 	  (Views_domain.Domain)
 	  (Product.Product
-             (Agents_domain.Domain)
+             (Contact_map_domain.Domain)
              (Product.Product
 	        (Agents_domain.Domain)
 	        (Rules_domain.Domain)
