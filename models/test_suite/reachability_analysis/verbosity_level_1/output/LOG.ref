@@ -4,6 +4,7 @@ Compiling...
 Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
+
 Reachability analysis...
 
 ------------------------------------------------------------
@@ -12,6 +13,17 @@ Reachability analysis...
 rule 7: KO will never be applied.
 
 ------------------------------------------------------------
+<<<<<<< HEAD
+=======
+* Dead agents :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Dead agents :
+------------------------------------------------------------
+
+------------------------------------------------------------
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
 * Relational properties:
 ------------------------------------------------------------
 In agent A, the internal state of site x, the internal state of site y, and the internal state of site z, are entangled by the following 3-d relationship:

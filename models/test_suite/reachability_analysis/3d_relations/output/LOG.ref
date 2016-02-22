@@ -4,6 +4,7 @@ Compiling...
 Generating the raw contact map...
 Generating the raw influence map...
 Refining the influence map...
+
 Reachability analysis...
 
 ------------------------------------------------------------
@@ -11,6 +12,17 @@ Reachability analysis...
 ------------------------------------------------------------
 
 ------------------------------------------------------------
+<<<<<<< HEAD
+=======
+* Dead agents :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Dead agents :
+------------------------------------------------------------
+
+------------------------------------------------------------
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
 * Relational properties:
 ------------------------------------------------------------
 In agent A: 

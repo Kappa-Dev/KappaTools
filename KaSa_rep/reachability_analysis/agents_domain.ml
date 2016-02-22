@@ -137,7 +137,7 @@ struct
 
   let map_to_list parameter error map =
     let error, list =
-      Bdu_analysis_type.AgentMap.fold parameter error
+      Int_storage.Quick_Nearly_inf_Imperatif.fold parameter error
         (fun parameter error key a current_list ->
           let list = a :: current_list in
           error, list
@@ -325,7 +325,7 @@ struct
   let init_agents static dynamic error init_state event_list =
     let parameter = get_parameter static in
     let error, (dynamic, event_list) =
-      Bdu_analysis_type.AgentMap.fold parameter error
+      Int_storage.Quick_Nearly_inf_Imperatif.fold parameter error
         (fun parameter error index_init agent (dynamic, event_list) ->
           match agent with
 	  (*JF: warn: dead,unknown,ghost should not occur in initial states *)

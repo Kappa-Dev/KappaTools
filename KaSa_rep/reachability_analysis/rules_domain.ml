@@ -99,7 +99,6 @@ struct
   (** [get_scan_rule_set static] *)
 
   let initialize static dynamic error =
-    (*global static information*)
     let init_global_static_information =
       {
         global_static_information = static;
@@ -107,7 +106,6 @@ struct
       }
     in
     let kappa_handler = Analyzer_headers.get_kappa_handler static in
-    (*global dynamic information*)
     let parameter = Analyzer_headers.get_parameter static in
     let nrules = Handler.nrules parameter error kappa_handler in
     let init_dead_rule_array = Array.make nrules false in

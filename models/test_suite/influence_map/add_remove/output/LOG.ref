@@ -176,142 +176,11 @@ Influence_map:Inhibition_map:rule(0):'' A(x~u),B(x~p)->A(x~u),A(x~p) -> rule(3):
 
 Influence_map:Inhibition_map:rule(3):'' B(x~p)->B(x~u) -> rule(0):'' A(x~u),B(x~p)->A(x~u),A(x~p)[0->1]
 
+
 Reachability analysis...
 
-Reachability analysis static information ....
-
-============================================================
-* BDU Analysis:
-============================================================
-
-** Static information:
-
-------------------------------------------------------------
-Mapping between sites and the covering classes they belong to:
-------------------------------------------------------------
-agent_type:0:A:site_type:0:x~@list of covering_class_id:
-covering_class_id:0
-agent_type:1:B:site_type:0:x~@list of covering_class_id:
-covering_class_id:0
-rule 0
-agent_type:0:A:cv_id:0
-agent_type_Id=3
-agent_type_ Node(site_type:1<1)
-agent_type_  Id=0
-agent_type_   Leaf False 
-
-agent_type_  Id=2
-agent_type_   Node(site_type:1<2)
-agent_type_    Id=1
-agent_type_     Leaf True 
-
-agent_type_    Id=0
-agent_type_     Leaf False 
-
-rule 1
-agent_type:0:A:cv_id:0
-agent_type_Id=2
-agent_type_ (site_type:1 = 0)
-agent_type_  Id=0
-agent_type_   []
-rule 2
-agent_type:1:B:cv_id:0
-agent_type_Id=1
-agent_type_ (site_type:1 = 1)
-agent_type_  Id=0
-agent_type_   []
-rule 3
-agent_type:1:B:cv_id:0
-agent_type_Id=2
-agent_type_ (site_type:1 = 0)
-agent_type_  Id=0
-agent_type_   []
-rule 0
-agent_type:0:A:cv_id:0
-agent_type_Id=1
-agent_type_ (site_type:1 = 1)
-agent_type_  Id=0
-agent_type_   []
-rule 0
-agent_type:0:A:cv_id:0
-agent_type_Id=5
-agent_type_ Node(site_type:1<0)
-agent_type_  Id=0
-agent_type_   Leaf False 
-
-agent_type_  Id=4
-agent_type_   Node(site_type:1<1)
-agent_type_    Id=1
-agent_type_     Leaf True 
-
-agent_type_    Id=0
-agent_type_     Leaf False 
-
-agent_type:1:B:cv_id:0
-agent_type_Id=3
-agent_type_ Node(site_type:1<1)
-agent_type_  Id=0
-agent_type_   Leaf False 
-
-agent_type_  Id=2
-agent_type_   Node(site_type:1<2)
-agent_type_    Id=1
-agent_type_     Leaf True 
-
-agent_type_    Id=0
-agent_type_     Leaf False 
-
-rule 1
-agent_type:0:A:cv_id:0
-agent_type_Id=3
-agent_type_ Node(site_type:1<1)
-agent_type_  Id=0
-agent_type_   Leaf False 
-
-agent_type_  Id=2
-agent_type_   Node(site_type:1<2)
-agent_type_    Id=1
-agent_type_     Leaf True 
-
-agent_type_    Id=0
-agent_type_     Leaf False 
-
-rule 2
-agent_type:1:B:cv_id:0
-agent_type_Id=5
-agent_type_ Node(site_type:1<0)
-agent_type_  Id=0
-agent_type_   Leaf False 
-
-agent_type_  Id=4
-agent_type_   Node(site_type:1<1)
-agent_type_    Id=1
-agent_type_     Leaf True 
-
-agent_type_    Id=0
-agent_type_     Leaf False 
-
-rule 3
-agent_type:1:B:cv_id:0
-agent_type_Id=3
-agent_type_ Node(site_type:1<1)
-agent_type_  Id=0
-agent_type_   Leaf False 
-
-agent_type_  Id=2
-agent_type_   Node(site_type:1<2)
-agent_type_    Id=1
-agent_type_     Leaf True 
-
-agent_type_    Id=0
-agent_type_     Leaf False 
-
-	Initial state is empty
-
-	Wake-up rules
-
 	Applying rule 0:
-		the predcondition is not satisfied yet
+		the predcondition is not satsified yet
 
 ------------------------------------------------------------
 * Dead rules :
@@ -322,6 +191,21 @@ rule 2 will never be applied.
 rule 3 will never be applied.
 
 ------------------------------------------------------------
+<<<<<<< HEAD
+=======
+* Dead agents :
+------------------------------------------------------------
+A is a dead agent.
+B is a dead agent.
+
+------------------------------------------------------------
+* Dead agents :
+------------------------------------------------------------
+A is a dead agent.
+B is a dead agent.
+
+------------------------------------------------------------
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
 * Fixpoint iteration :
 ------------------------------------------------------------
 

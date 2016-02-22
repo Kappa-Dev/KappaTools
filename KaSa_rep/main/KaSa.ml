@@ -17,13 +17,20 @@ module A =
        (Product.Product
 	  (Views_domain.Domain)
 	  (Product.Product
-	     (Agents_domain.Domain)
-	     (Rules_domain.Domain))))
+             (Agents_domain.Domain)
+             (Product.Product
+	        (Agents_domain.Domain)
+	        (Rules_domain.Domain)
+             )
+          )
+       )
+    )
 
-module B =
+
+(*module B =
   Analyzer.Make
     (Composite_domain.Make
-       (Global_domain.Domain))
+       (Global_domain.Domain))*)
 
 let main () =
   let error = Exception.empty_error_handler in
@@ -122,30 +129,7 @@ let main () =
       error, None
   in
   (*-----------------------------------------------------------------------*)
-  (*BDU of fixpoint iteration function*)
-  let error,handler_bdu_opt, bdu_analysis =
-    if Remanent_parameters.get_do_reachability_analysis parameters
-    then
-      let _ = Format.printf "Reachability analysis...@." in
-      let parameters_cv =
-	Remanent_parameters.update_prefix parameters "" in
-      let _ =
-	if (Remanent_parameters.get_trace parameters_cv)
-	then Loggers.fprintf (Remanent_parameters.get_logger parameters_cv) ""
-      in
-       let error, handler_bdu, dep =
-	 Bdu_analysis_main.bdu_main parameters_cv  error handler c_compil
-       in error, Some handler_bdu, Some dep
-    else
-      error, None, None
-  in
-  (*-----------------------------------------------------------------------*)
-  (*call analyzer in module*)
-  let error, handler_bdu =
-    match handler_bdu_opt with
-    | None -> Mvbdu_wrapper.Mvbdu.init parameters error
-    | Some handler_bdu -> error, handler_bdu
-  in
+  let error, handler_bdu = Mvbdu_wrapper.Mvbdu.init parameters error in
   let error, static_opt, dynamic_opt =
     if Remanent_parameters.get_do_reachability_analysis_module parameters
     then

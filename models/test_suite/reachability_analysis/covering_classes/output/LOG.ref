@@ -835,6 +835,7 @@ Influence_map:Inhibition_map:rule(12):'r12' C(y!_)-> -> rule(7):'r7' C(x!_)->[0-
 
 Influence_map:Inhibition_map:rule(12):'r12' C(y!_)-> -> rule(11):'r11' C(y~p!1),A(y~u!1)->C(y~p!1),A(y~p!1)[0*->1];[0->0]
 
+<<<<<<< HEAD
 Reachability analysis...
 
 Reachability analysis static information ....
@@ -2034,10 +2035,455 @@ agent_type_     Leaf False
 
 	Applying rule 4: r4:
 		the precondition is satisfied
+=======
+
+Reachability analysis...
+
+	Applying rule 0: r0:
+		the predcondition is satisfied
+
+		rule 0: r0 is applied for the first time
+
+	Dealing with creation
+
+
+INTENSIONAL DESCRIPTION:
+Id=7
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	A(y~u,y!free)
+	Wake-up rules
+	Dealing with creation
+
+
+INTENSIONAL DESCRIPTION:
+Id=7
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	A(x~u,x!free)
+	Wake-up rules
+
+	Applying rule 1: r1:
+		the predcondition is satisfied
+
+		rule 1: r1 is applied for the first time
+
+	Dealing with creation
+
+
+INTENSIONAL DESCRIPTION:
+Id=7
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	B(y~u,y!free)
+	Wake-up rules
+	Dealing with creation
+
+
+INTENSIONAL DESCRIPTION:
+Id=7
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	B(x~u,x!free)
+	Wake-up rules
+
+	Applying rule 2: r2:
+		the predcondition is satisfied
+
+		rule 2: r2 is applied for the first time
+
+	Dealing with creation
+
+
+INTENSIONAL DESCRIPTION:
+Id=7
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	C(y~u,y!free)
+	Wake-up rules
+	Dealing with creation
+
+
+INTENSIONAL DESCRIPTION:
+Id=7
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	C(x~u,x!free)
+	Wake-up rules
+
+	Applying rule 0: r0:
+		the predcondition is satisfied
+
+	Applying rule 3: r3:
+		the predcondition is not satsified yet
+
+	Applying rule 4: r4:
+		the predcondition is satisfied
+
+		rule 4: r4 is applied for the first time
+
+		Updating the views for A(x~,x!)
+			
+
+
+INTENSIONAL DESCRIPTION:
+Id=21
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=20
+   Node(site_type:1<1)
+    Id=11
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=10
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	A(x~u,x!B@x)
+	Wake-up rules
+		Updating the views for B(x~,x!)
+			
+
+
+INTENSIONAL DESCRIPTION:
+Id=17
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=11
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=10
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	B(x~p,x!A@x)
+	Wake-up rules
+
+	Applying rule 5: r5:
+		the predcondition is not satsified yet
+
+	Applying rule 6: r6:
+		the predcondition is not satsified yet
+
+	Applying rule 7: r7:
+		the predcondition is not satsified yet
+
+	Applying rule 8: r8:
+		the predcondition is not satsified yet
+
+	Applying rule 9: r9:
+		the predcondition is satisfied
+
+		rule 9: r9 is applied for the first time
+
+		Updating the views for A(y~,y!)
+			
+
+
+INTENSIONAL DESCRIPTION:
+Id=21
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=20
+   Node(site_type:1<1)
+    Id=11
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=10
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	A(y~u,y!B@y)
+	Wake-up rules
+		Updating the views for B(y~,y!)
+			
+
+
+INTENSIONAL DESCRIPTION:
+Id=17
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=11
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=10
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	B(y~p,y!A@y)
+	Wake-up rules
+
+	Applying rule 10: r10:
+		the predcondition is not satsified yet
+
+	Applying rule 11: r11:
+		the predcondition is not satsified yet
+
+	Applying rule 12: r12:
+		the predcondition is not satsified yet
+
+	Applying rule 1: r1:
+		the predcondition is satisfied
+
+	Applying rule 2: r2:
+		the predcondition is satisfied
+
+	Applying rule 0: r0:
+		the predcondition is satisfied
+
+	Applying rule 3: r3:
+		the predcondition is satisfied
+
+		rule 3: r3 is applied for the first time
+
+		Updating the views for A(x~,x!)
+	Dealing with side effects
+
+
+INTENSIONAL DESCRIPTION:
+Id=15
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=14
+   Node(site_type:1<2)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	B(y~p,y!free)
+	Wake-up rules
+	Dealing with side effects
+
+
+INTENSIONAL DESCRIPTION:
+Id=15
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=14
+   Node(site_type:1<2)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	B(x~p,x!free)
+	Wake-up rules
+
+	Applying rule 4: r4:
+		the predcondition is satisfied
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
 		Updating the views for A(x~,x!)
 		Updating the views for B(x~,x!)
 
 	Applying rule 5: r5:
+<<<<<<< HEAD
 		the precondition is satisfied
 		Updating the views for A(x~,x!)
 
@@ -2166,10 +2612,165 @@ agent_type_     Leaf False
 
 	Applying rule 9: r9:
 		the precondition is satisfied
+=======
+		the predcondition is satisfied
+
+		rule 5: r5 is applied for the first time
+
+		Updating the views for A(x~,x!)
+			
+
+
+INTENSIONAL DESCRIPTION:
+Id=19
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=18
+   Node(site_type:1<1)
+    Id=9
+     Node(site_type:2<2)
+      Id=0
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<3)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	A(x~u,x!C@x)
+	Wake-up rules
+		Updating the views for B(x~,x!)
+		Updating the views for C(x~,x!)
+			
+
+
+INTENSIONAL DESCRIPTION:
+Id=17
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=11
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=10
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	C(x~p,x!A@x)
+	Wake-up rules
+
+	Applying rule 6: r6:
+		the predcondition is satisfied
+
+		rule 6: r6 is applied for the first time
+
+		Updating the views for C(x~,x!)
+		Updating the views for A(x~,x!)
+			
+
+
+INTENSIONAL DESCRIPTION:
+Id=34
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=33
+   Node(site_type:1<2)
+    Id=9
+     Node(site_type:2<2)
+      Id=0
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<3)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	A(x~p,x!C@x)
+	Wake-up rules
+
+	Applying rule 7: r7:
+		the predcondition is satisfied
+
+		rule 7: r7 is applied for the first time
+
+		Updating the views for C(x~,x!)
+	Dealing with side effects
+
+
+INTENSIONAL DESCRIPTION:
+Id=15
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=14
+   Node(site_type:1<2)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	A(x~p,x!free)
+	Wake-up rules
+
+	Applying rule 8: r8:
+		the predcondition is satisfied
+
+		rule 8: r8 is applied for the first time
+
+		Updating the views for A(y~,y!)
+
+	Applying rule 9: r9:
+		the predcondition is satisfied
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
 		Updating the views for A(y~,y!)
 		Updating the views for B(y~,y!)
 
 	Applying rule 1: r1:
+<<<<<<< HEAD
 		the precondition is satisfied
 
 	Applying rule 3: r3:
@@ -2273,11 +2874,129 @@ agent_type_     Leaf False
 
 	Applying rule 5: r5:
 		the precondition is satisfied
+=======
+		the predcondition is satisfied
+
+	Applying rule 3: r3:
+		the predcondition is satisfied
+		Updating the views for A(x~,x!)
+
+	Applying rule 10: r10:
+		the predcondition is satisfied
+
+		rule 10: r10 is applied for the first time
+
+		Updating the views for A(y~,y!)
+			
+
+
+INTENSIONAL DESCRIPTION:
+Id=19
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=18
+   Node(site_type:1<1)
+    Id=9
+     Node(site_type:2<2)
+      Id=0
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<3)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	A(y~u,y!C@y)
+	Wake-up rules
+		Updating the views for B(y~,y!)
+		Updating the views for C(y~,y!)
+			
+
+
+INTENSIONAL DESCRIPTION:
+Id=17
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=11
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=10
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	C(y~p,y!A@y)
+	Wake-up rules
+
+	Applying rule 0: r0:
+		the predcondition is satisfied
+
+	Applying rule 4: r4:
+		the predcondition is satisfied
+		Updating the views for A(x~,x!)
+			
+
+
+INTENSIONAL DESCRIPTION:
+Id=17
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=11
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=10
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	A(x~p,x!B@x)
+	Wake-up rules
+		Updating the views for B(x~,x!)
+
+	Applying rule 5: r5:
+		the predcondition is satisfied
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
 		Updating the views for A(x~,x!)
 		Updating the views for B(x~,x!)
 		Updating the views for C(x~,x!)
 
 	Applying rule 11: r11:
+<<<<<<< HEAD
 		the precondition is satisfied
 		Updating the views for C(y~,y!)
 		Updating the views for A(y~,y!)
@@ -2345,10 +3064,92 @@ agent_type_     Leaf False
 
 	Applying rule 6: r6:
 		the precondition is satisfied
+=======
+		the predcondition is satisfied
+
+		rule 11: r11 is applied for the first time
+
+		Updating the views for C(y~,y!)
+		Updating the views for A(y~,y!)
+			
+
+
+INTENSIONAL DESCRIPTION:
+Id=34
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=33
+   Node(site_type:1<2)
+    Id=9
+     Node(site_type:2<2)
+      Id=0
+       Leaf False 
+
+      Id=8
+       Node(site_type:2<3)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	A(y~p,y!C@y)
+	Wake-up rules
+
+	Applying rule 12: r12:
+		the predcondition is satisfied
+
+		rule 12: r12 is applied for the first time
+
+		Updating the views for C(y~,y!)
+	Dealing with side effects
+
+
+INTENSIONAL DESCRIPTION:
+Id=15
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=14
+   Node(site_type:1<2)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	A(y~p,y!free)
+	Wake-up rules
+
+	Applying rule 2: r2:
+		the predcondition is satisfied
+
+	Applying rule 6: r6:
+		the predcondition is satisfied
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
 		Updating the views for C(x~,x!)
 		Updating the views for A(x~,x!)
 
 	Applying rule 7: r7:
+<<<<<<< HEAD
 		the precondition is satisfied
 		Updating the views for C(x~,x!)
 
@@ -2394,30 +3195,96 @@ agent_type_     Leaf False
 
 	Applying rule 10: r10:
 		the precondition is satisfied
+=======
+		the predcondition is satisfied
+		Updating the views for C(x~,x!)
+
+	Applying rule 3: r3:
+		the predcondition is satisfied
+		Updating the views for A(x~,x!)
+
+	Applying rule 8: r8:
+		the predcondition is satisfied
+		Updating the views for A(y~,y!)
+
+	Applying rule 9: r9:
+		the predcondition is satisfied
+		Updating the views for A(y~,y!)
+			
+
+
+INTENSIONAL DESCRIPTION:
+Id=17
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=16
+   Node(site_type:1<2)
+    Id=11
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=10
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	A(y~p,y!B@y)
+	Wake-up rules
+		Updating the views for B(y~,y!)
+
+	Applying rule 10: r10:
+		the predcondition is satisfied
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
 		Updating the views for A(y~,y!)
 		Updating the views for B(y~,y!)
 		Updating the views for C(y~,y!)
 
 	Applying rule 0: r0:
+<<<<<<< HEAD
 		the precondition is satisfied
 
 	Applying rule 4: r4:
 		the precondition is satisfied
+=======
+		the predcondition is satisfied
+
+	Applying rule 4: r4:
+		the predcondition is satisfied
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
 		Updating the views for A(x~,x!)
 		Updating the views for B(x~,x!)
 
 	Applying rule 5: r5:
+<<<<<<< HEAD
 		the precondition is satisfied
+=======
+		the predcondition is satisfied
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
 		Updating the views for A(x~,x!)
 		Updating the views for B(x~,x!)
 		Updating the views for C(x~,x!)
 
 	Applying rule 11: r11:
+<<<<<<< HEAD
 		the precondition is satisfied
+=======
+		the predcondition is satisfied
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
 		Updating the views for C(y~,y!)
 		Updating the views for A(y~,y!)
 
 	Applying rule 12: r12:
+<<<<<<< HEAD
 		the precondition is satisfied
 		Updating the views for C(y~,y!)
 
@@ -2427,10 +3294,22 @@ agent_type_     Leaf False
 
 	Applying rule 6: r6:
 		the precondition is satisfied
+=======
+		the predcondition is satisfied
+		Updating the views for C(y~,y!)
+
+	Applying rule 3: r3:
+		the predcondition is satisfied
+		Updating the views for A(x~,x!)
+
+	Applying rule 6: r6:
+		the predcondition is satisfied
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
 		Updating the views for C(x~,x!)
 		Updating the views for A(x~,x!)
 
 	Applying rule 7: r7:
+<<<<<<< HEAD
 		the precondition is satisfied
 		Updating the views for C(x~,x!)
 
@@ -2440,6 +3319,17 @@ agent_type_     Leaf False
 
 	Applying rule 9: r9:
 		the precondition is satisfied
+=======
+		the predcondition is satisfied
+		Updating the views for C(x~,x!)
+
+	Applying rule 8: r8:
+		the predcondition is satisfied
+		Updating the views for A(y~,y!)
+
+	Applying rule 9: r9:
+		the predcondition is satisfied
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
 		Updating the views for A(y~,y!)
 		Updating the views for B(y~,y!)
 
@@ -2448,6 +3338,17 @@ agent_type_     Leaf False
 ------------------------------------------------------------
 
 ------------------------------------------------------------
+<<<<<<< HEAD
+=======
+* Dead agents :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Dead agents :
+------------------------------------------------------------
+
+------------------------------------------------------------
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
@@ -2463,7 +3364,11 @@ Id=46
       Id=0
        Leaf False 
 
+<<<<<<< HEAD
       Id=16
+=======
+      Id=8
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
        Node(site_type:2<3)
         Id=1
          Leaf True 
@@ -2487,7 +3392,11 @@ Id=46
       Id=0
        Leaf False 
 
+<<<<<<< HEAD
       Id=16
+=======
+      Id=8
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
        Node(site_type:2<3)
         Id=1
          Leaf True 
@@ -2526,7 +3435,11 @@ Id=29
         Id=0
          Leaf False 
 
+<<<<<<< HEAD
         Id=8
+=======
+        Id=10
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
          Node(site_type:2<2)
           Id=1
            Leaf True 
@@ -2565,7 +3478,11 @@ Id=29
         Id=0
          Leaf False 
 
+<<<<<<< HEAD
         Id=8
+=======
+        Id=10
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
          Node(site_type:2<2)
           Id=1
            Leaf True 
@@ -2597,14 +3514,24 @@ Id=26
         Id=0
          Leaf False 
 
+<<<<<<< HEAD
     Id=14
      Node(site_type:1<2)
       Id=9
+=======
+    Id=16
+     Node(site_type:1<2)
+      Id=11
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
        Node(site_type:2<1)
         Id=0
          Leaf False 
 
+<<<<<<< HEAD
         Id=8
+=======
+        Id=10
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
          Node(site_type:2<2)
           Id=1
            Leaf True 
@@ -2636,14 +3563,24 @@ Id=26
         Id=0
          Leaf False 
 
+<<<<<<< HEAD
     Id=14
      Node(site_type:1<2)
       Id=9
+=======
+    Id=16
+     Node(site_type:1<2)
+      Id=11
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
        Node(site_type:2<1)
         Id=0
          Leaf False 
 
+<<<<<<< HEAD
         Id=8
+=======
+        Id=10
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
          Node(site_type:2<2)
           Id=1
            Leaf True 
@@ -2664,7 +3601,11 @@ Id=30
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=16
+=======
+  Id=8
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
    Node(site_type:2<3)
     Id=1
      Leaf True 
@@ -2679,7 +3620,11 @@ Id=47
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=10
+=======
+  Id=12
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
    Node(site_type:1<2)
     Id=1
      Leaf True 
@@ -2787,7 +3732,11 @@ Id=62
         Id=0
          Leaf False 
 
+<<<<<<< HEAD
         Id=8
+=======
+        Id=10
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
          Node(site_type:2<2)
           Id=1
            Leaf True 
@@ -2864,12 +3813,20 @@ Id=69
 
     Id=67
      Node(site_type:0<2)
+<<<<<<< HEAD
       Id=9
+=======
+      Id=11
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
        Node(site_type:2<1)
         Id=0
          Leaf False 
 
+<<<<<<< HEAD
         Id=8
+=======
+        Id=10
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
          Node(site_type:2<2)
           Id=1
            Leaf True 
@@ -2892,7 +3849,11 @@ Id=30
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=16
+=======
+  Id=8
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
    Node(site_type:2<3)
     Id=1
      Leaf True 
@@ -2908,7 +3869,11 @@ Id=47
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=10
+=======
+  Id=12
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
    Node(site_type:1<2)
     Id=1
      Leaf True 
@@ -2956,7 +3921,11 @@ Id=22
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=8
+=======
+  Id=10
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
    Node(site_type:2<2)
     Id=1
      Leaf True 
@@ -2972,7 +3941,11 @@ Id=47
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=10
+=======
+  Id=12
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
    Node(site_type:1<2)
     Id=1
      Leaf True 
@@ -3020,7 +3993,11 @@ Id=22
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=8
+=======
+  Id=10
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
    Node(site_type:2<2)
     Id=1
      Leaf True 
@@ -3036,7 +4013,11 @@ Id=47
   Id=0
    Leaf False 
 
+<<<<<<< HEAD
   Id=10
+=======
+  Id=12
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
    Node(site_type:1<2)
     Id=1
      Leaf True 

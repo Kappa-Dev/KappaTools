@@ -154,6 +154,7 @@ Influence_map:Inhibition_map:rule(0):'' A(x~u,y~u)->A(x~p,y~u) -> rule(1):'' A(x
 
 Influence_map:Inhibition_map:rule(1):'' A(x~u,y~u)->A(x~u,y~p) -> rule(0):'' A(x~u,y~u)->A(x~p,y~u)[0->0]
 
+<<<<<<< HEAD
 Reachability analysis...
 
 Reachability analysis static information ....
@@ -309,10 +310,43 @@ agent_type_     Leaf False
 	     Leaf False 
 
 	EXTENSIONAL DESCRIPTION:
+=======
+
+Reachability analysis...
+	Views in initial state
+
+
+INTENSIONAL DESCRIPTION:
+Id=7
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=6
+   Node(site_type:1<1)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
 	A(x~u,y~u)
 	Wake-up rules
 
 	Applying rule 2:
+<<<<<<< HEAD
 		the predcondition is not satisfied yet
 
 	Applying rule 0:
@@ -408,6 +442,121 @@ agent_type_     Leaf False
 
 	Applying rule 2:
 		the precondition is satisfied
+=======
+		the predcondition is not satsified yet
+
+	Applying rule 0:
+		the predcondition is satisfied
+
+		rule 0 is applied for the first time
+
+		Updating the views for A(x~,y~)
+			
+
+
+INTENSIONAL DESCRIPTION:
+Id=11
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=10
+   Node(site_type:1<2)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	A(x~p,y~u)
+	Wake-up rules
+
+	Applying rule 1:
+		the predcondition is satisfied
+
+		rule 1 is applied for the first time
+
+		Updating the views for A(x~,y~)
+			
+
+
+INTENSIONAL DESCRIPTION:
+Id=16
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=15
+   Node(site_type:1<1)
+    Id=14
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=13
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	A(x~u,y~p)
+	Wake-up rules
+
+	Applying rule 0:
+		the predcondition is satisfied
+		Updating the views for A(x~,y~)
+
+	Applying rule 2:
+		the predcondition is satisfied
+
+		rule 2 is applied for the first time
+
+		Updating the views for A(x~,y~)
+	Dealing with creation
+
+
+INTENSIONAL DESCRIPTION:
+Id=3
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	D(x~u)
+	Wake-up rules
+
+	Applying rule 1:
+		the predcondition is satisfied
+		Updating the views for A(x~,y~)
+
+	Applying rule 2:
+		the predcondition is satisfied
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
 		Updating the views for A(x~,y~)
 
 ------------------------------------------------------------
@@ -415,6 +564,17 @@ agent_type_     Leaf False
 ------------------------------------------------------------
 
 ------------------------------------------------------------
+<<<<<<< HEAD
+=======
+* Dead agents :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Dead agents :
+------------------------------------------------------------
+
+------------------------------------------------------------
+>>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
