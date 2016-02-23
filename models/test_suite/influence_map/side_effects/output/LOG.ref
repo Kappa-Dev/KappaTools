@@ -235,42 +235,4 @@ Influence_map:Inhibition_map:rule(3):'' A()-> -> rule(2):'' B(x!_)->B(x)[0*->0]
 
 Influence_map:Inhibition_map:rule(4):'' B(x)-> -> rule(0):'' A(x),B(x)->A(x!1),B(x!1)[0->1]
 
-
-Reachability analysis...
-
-------------------------------------------------------------
-* Dead rules :
-------------------------------------------------------------
-rule 0 will never be applied.
-rule 1 will never be applied.
-rule 2 will never be applied.
-rule 3 will never be applied.
-rule 4 will never be applied.
-
-------------------------------------------------------------
-<<<<<<< HEAD
-=======
-* Dead agents :
-------------------------------------------------------------
-A is a dead agent.
-B is a dead agent.
-
-------------------------------------------------------------
-* Dead agents :
-------------------------------------------------------------
-A is a dead agent.
-B is a dead agent.
-
-------------------------------------------------------------
->>>>>>> ffd2477... remove files that belong to the previous analyzer that are not use anymore, update test-suits
-* Fixpoint iteration :
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Relational properties:
-------------------------------------------------------------
-
-------------------------------------------------------------
-* Non relational properties:
-------------------------------------------------------------
 execution finished without any exception
