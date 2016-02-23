@@ -31,7 +31,7 @@
 %var: 'nCG' DNA(base~C!_)
 %var: 'n5mCG' DNA(init~mC!_, base~C!_)
 
-%mod: [T]>2 do ($UPDATE 'k_deam' 10000000000000 ; $PRINT <".">)
+%mod: [T]>2 do ($UPDATE 'k_deam' 10000000000000)
 
 %mod: 'damaged' > ('deam_percent' * 'bp') do \
       ($UPDATE 'k_deam' 0.0)

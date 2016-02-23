@@ -497,7 +497,12 @@ let go env = function
   | Data.Flux f -> output_flux f
   | Data.Plot (x,y) -> plot_now (x,y)
   | Data.Print p ->
-     Format.fprintf (get_desc p.Data.file_name) "%s@." p.Data.line
+     let desc = 
+       match p.Data.file_name with
+	 None -> Format.formatter_of_out_channel stdout
+       | Some file -> get_desc file
+     in
+     Format.fprintf desc "%s@." p.Data.line
   | Data.UnaryDistances s -> unary_distances s
 
 let close () =

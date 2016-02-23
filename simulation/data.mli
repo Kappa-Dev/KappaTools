@@ -9,7 +9,7 @@ type flux_map =
     flux_data : flux_data;
     flux_end : float;
   }
-type file_line = { file_name : string ; line : string }
+type file_line = { file_name : string option ; line : string }
 
 type snapshot = {
     snap_file : string;

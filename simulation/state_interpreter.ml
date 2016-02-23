@@ -81,9 +81,13 @@ let do_it ~outputs env domain counter graph state modification =
 		 "STOP instruction was satisfied at (%d e,%f t.u)"
 		 (Mods.Counter.event counter) (Mods.Counter.time counter))) *)
   | Primitives.PRINT (pe_file,pe_expr) ->
-     let file = Format.asprintf "@[<h>%a@]" print_expr_val pe_file in
+     let file_opt =
+       match pe_file with
+	 [] -> None
+       | _ -> Some (Format.asprintf "@[<h>%a@]" print_expr_val pe_file)
+     in
      let line = Format.asprintf "%a" print_expr_val pe_expr in
-     let () = outputs (Data.Print {Data.file_name = file; Data.line = line;}) in
+     let () = outputs (Data.Print {Data.file_name = file_opt ; Data.line = line;}) in
      (false, graph, state)
   | Primitives.PLOTENTRY ->
      let () = outputs (Data.Plot (Counter.current_time counter,
