@@ -37,6 +37,7 @@ type rule_id = int
 type event =
 | Dummy
 | Check_rule of rule_id
+| See_a_new_bond of (int * int * int) * (int * int * int)
 
 type 'a bot_or_not =
 | Bot
@@ -59,7 +60,7 @@ type initial_state = Cckappa_sig.enriched_init
 let dummy_precondition =
   {
     precondition_dummy = ();
-    the_rule_is_applied_for_the_first_time = Maybe
+    the_rule_is_applied_for_the_first_time = Maybe;
   }
 
 let get_parameter static = static.global_parameter

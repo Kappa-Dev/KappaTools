@@ -1262,9 +1262,10 @@ struct
     error, dynamic, (precondition, event_list)
 
   (* events enable communication between domains. At this moment, the
-     global domain does not collect information *)
-      
+     global domain does not collect information *)     
+
   let rec apply_event_list static dynamic error event_list =
+    (*TODO:if see an event new bond, do the check of potential*)
     error, dynamic, [] 
 
   let export static dynamic error kasa_state =

@@ -33,6 +33,7 @@ type global_dynamic_information
 type event =
 | Dummy (* to avoid compilation warning *)
 | Check_rule of rule_id
+| See_a_new_bond of (int * int * int) * (int * int * int)
 
 type 'a bot_or_not =
 | Bot
@@ -45,9 +46,8 @@ type maybe_bool =
 type precondition =
  {
    precondition_dummy: unit (* to avoid compilation warning *);
-   the_rule_is_applied_for_the_first_time: maybe_bool;
+   the_rule_is_applied_for_the_first_time: maybe_bool
  }
-
 
 type kasa_state = unit
 

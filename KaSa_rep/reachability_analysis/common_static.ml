@@ -116,6 +116,10 @@ let half_break_action parameter error handler rule_id half_break store_result =
       let error, store_result =
         add_link (agent_type, site_type) (rule_id, state_min) store_result
       in
+      (*let _ =
+        Printf.fprintf stdout "HALF ACTION: agent_type:%i:site_type:%i:rule_id:%i:state:%i\n"
+          agent_type site_type rule_id state_min
+      in*)
       error, store_result  
   ) (error, store_result) half_break
   in
@@ -155,6 +159,10 @@ let remove_action parameter error rule_id remove store_result =
           let error, result =
             add_link (agent_type, site_type) rule_id store_result
           in
+          (*let _ =
+            Printf.fprintf stdout "REMOVE ACTION: agent_type:%i:site_type:%i:rule_id:%i\n"
+              agent_type site_type rule_id
+          in*)
           result
         ) store_result list_undoc
       in
@@ -225,9 +233,27 @@ let store_potential_half_break parameter error handler rule_id half_break store_
           let error, store_potential_free =
             add_link (agent_type2, rule_id) (site2, 0) (fst store_result)
           in
+          (*Print*)
+          (*let _ =
+            Int2Map_potential_effect.Map.iter (fun (agent_type, rule_id) l ->
+              List.iter (fun (site_type, state) ->
+                Printf.fprintf stdout "FREE:rule_id:%i:agent_type:%i:site_type:%i:state:%i\n" 
+                  rule_id agent_type site_type state
+              ) l
+            ) store_potential_free
+          in*)
           let error, store_potential_bind =
             add_link (agent_type2, rule_id) (site2, state2) (snd store_result)
           in
+          (*Print*)
+          (*let _ =
+            Int2Map_potential_effect.Map.iter (fun (agent_type, rule_id) l ->
+              List.iter (fun (site_type, state) ->
+                Printf.fprintf stdout "BIND:rule_id:%i:agent_type:%i:site_type:%i:state:%i\n" 
+                  rule_id agent_type site_type state
+              ) l
+            ) store_potential_bind
+          in*)
           error, (store_potential_free, store_potential_bind)
     in aux state_min (error, store_result)
   ) (error, store_result) half_break
@@ -284,9 +310,29 @@ let store_potential_remove parameter error handler rule_id remove store_result =
                   let error, store_potential_free =
                     add_link (agent_type2, rule_id) (site2, 0) (fst store_result)
                   in
+                  (*Print*)
+                  (*let _ =
+                    Int2Map_potential_effect.Map.iter (fun (agent_type, rule_id) l ->
+                      List.iter (fun (site_type, state) ->
+                        Printf.fprintf stdout "REMOVE: FREE\n";
+                        Printf.fprintf stdout "rule_id:%i:agent_type:%i:site_type:%i:state:%i\n" 
+                          rule_id agent_type site_type state
+                      ) l
+                    ) store_potential_free
+                  in*)
                   let error, store_potential_bind =
                     add_link (agent_type2, rule_id) (site2, state2) (snd store_result)
                   in
+                  (*Print*)
+                  (*let _ =
+                    Int2Map_potential_effect.Map.iter (fun (agent_type, rule_id) l ->
+                      List.iter (fun (site_type, state) ->
+                        Printf.fprintf stdout "REMOVE: BIND\n";
+                        Printf.fprintf stdout "rule_id:%i:agent_type:%i:site_type:%i:state:%i\n" 
+                          rule_id agent_type site_type state
+                      ) l
+                    ) store_potential_bind
+                  in*)
                   error, (store_potential_free, store_potential_bind)
             in
             aux 1 (error, store_result)
