@@ -153,4 +153,33 @@ Influence_map:Inhibition_map:rule(1):'remove' A(x),A(x)->A(x),B(x),A(x) -> rule(
 
 Influence_map:Inhibition_map:rule(1):'remove' A(x),A(x)->A(x),B(x),A(x) -> rule(1):'remove' A(x),A(x)->A(x),B(x),A(x)[1->0]
 
+
+Reachability analysis...
+
+	Applying rule 1: remove:
+		the predcondition is not satsified yet
+
+------------------------------------------------------------
+* Dead rules :
+------------------------------------------------------------
+rule 0: bind will never be applied.
+rule 1: remove will never be applied.
+
+------------------------------------------------------------
+* Dead agents :
+------------------------------------------------------------
+A is a dead agent.
+B is a dead agent.
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
 execution finished without any exception

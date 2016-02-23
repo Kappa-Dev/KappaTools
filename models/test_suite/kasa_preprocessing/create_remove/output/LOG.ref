@@ -78,4 +78,37 @@ Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Influence_map:Wake_up_map:rule(0):'r0' A()->B() -> rule(1):'r1' B()->C()[0->0]
 
+
+Reachability analysis...
+
+	Applying rule 0: r0:
+		the predcondition is not satsified yet
+
+	Applying rule 1: r1:
+		the predcondition is not satsified yet
+
+------------------------------------------------------------
+* Dead rules :
+------------------------------------------------------------
+rule 0: r0 will never be applied.
+rule 1: r1 will never be applied.
+
+------------------------------------------------------------
+* Dead agents :
+------------------------------------------------------------
+A is a dead agent.
+B is a dead agent.
+C is a dead agent.
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
 execution finished without any exception

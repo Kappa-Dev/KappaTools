@@ -176,4 +176,35 @@ Influence_map:Inhibition_map:rule(0):'' A(x~u),B(x~p)->A(x~u),A(x~p) -> rule(3):
 
 Influence_map:Inhibition_map:rule(3):'' B(x~p)->B(x~u) -> rule(0):'' A(x~u),B(x~p)->A(x~u),A(x~p)[0->1]
 
+
+Reachability analysis...
+
+	Applying rule 0:
+		the predcondition is not satsified yet
+
+------------------------------------------------------------
+* Dead rules :
+------------------------------------------------------------
+rule 0 will never be applied.
+rule 1 will never be applied.
+rule 2 will never be applied.
+rule 3 will never be applied.
+
+------------------------------------------------------------
+* Dead agents :
+------------------------------------------------------------
+A is a dead agent.
+B is a dead agent.
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
 execution finished without any exception
