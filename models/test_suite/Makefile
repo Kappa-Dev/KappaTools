@@ -26,6 +26,9 @@ help:
 %/profiling.txt.diff:
 	@touch $(basename $@).txt.diff
 
+%/profiling.html.diff:
+	@touch $(basename $@).html.diff
+
 %/compression_status.txt.diff:
 	@touch $(basename $@).txt.diff
 
@@ -54,8 +57,8 @@ all: error
 build:
 	@+$(MAKE) clean_all
 	@+$(MAKE) $(DIRS_OF_TEST:=/$(OUTPUT_PATH)/LOG)
-	find "$(CURDIR)" \( -path \*/\*/$(OUTPUT_PATH)/\* -and -not -name \*.diff -and -not -name \*profiling.* \
-		-and -not -name \*compression_status.txt -and -not -name \*.ref \) -exec mv \{\} \{\}.ref \;
+	find "$(CURDIR)" \( -path \*/\*/$(OUTPUT_PATH)/\* -and -not -name \*.diff -and -not -name \*profiling.txt \
+		-and -not -name \*profiling.html -and -not -name \*compression_status.txt -and -not -name \*.ref \) -exec mv \{\} \{\}.ref \;
 	find "$(CURDIR)" -name \*.ref -exec sed -i"" -e '/generation time/d;/Kappa Static Analyzer/d;/Analysis launched at/d' \{\} \;
 	@+$(MAKE) clean
 
