@@ -528,37 +528,35 @@ let compile_rules alg_deps contact_map counter domain rules =
   | _, _, None, _, _ ->
      failwith "The origin of Eval.compile_rules has been lost"
 
-let initialize logger ?rescale_init overwrite counter result =
-  Debug.tag logger "+ Building initial simulation conditions...";
-  Debug.tag logger "+ Compiling..." ;
-  Debug.tag logger "\t -simulation parameters" ;
-  let relative_fluxmaps = configurations_of_result result in
-
-  Debug.tag logger "\t -agent signatures" ;
-  Debug.tag logger "\t -sanity checks";
-  let (sigs_nd,tk_nd,result') = LKappa.compil_of_ast overwrite result in
-  Debug.tag logger "\t -KaSa tools initialization";
+let init_kasa logger result =
   let pre_kasa_state = Export_to_KaSim.Export_to_KaSim.init logger result in
   let kasa_state,contact_map =
     Export_to_KaSim.Export_to_KaSim.get_contact_map pre_kasa_state in
   let () = Export_to_KaSim.Export_to_KaSim.dump_errors_light kasa_state in
-  let kasa_state = Export_to_KaSim.Export_to_KaSim.flush_errors kasa_state in
+  contact_map,Export_to_KaSim.Export_to_KaSim.flush_errors kasa_state
+
+
+let initialize logger ?rescale_init sigs_nd tk_nd contact_map counter result =
+  Debug.tag logger "+ Building initial simulation conditions...";
+  Debug.tag logger "\t -simulation parameters" ;
+  let relative_fluxmaps = configurations_of_result result in
+
   let domain = Connected_component.Env.empty sigs_nd in
   Debug.tag logger "\t -variable declarations";
   let domain',alg_a =
-    compile_alg_vars contact_map counter domain result'.Ast.variables in
+    compile_alg_vars contact_map counter domain result.Ast.variables in
   let alg_nd = NamedDecls.create alg_a in
   let alg_deps = Alg_expr.setup_alg_vars_rev_dep tk_nd alg_a in
 
   Debug.tag logger "\t -rules";
   let (domain',alg_deps',compiled_rules,cc_unaries) =
-    compile_rules alg_deps contact_map counter domain' result'.Ast.rules in
+    compile_rules alg_deps contact_map counter domain' result.Ast.rules in
   let rule_nd = Array.of_list compiled_rules in
 
   Debug.tag logger "\t -perturbations" ;
   let (domain,pert,stops,tracking_enabled) =
-    pert_of_result alg_nd alg_deps' result'.variables result'.rules
-		   contact_map counter domain' result' in
+    pert_of_result alg_nd alg_deps' result.variables result.rules
+		   contact_map counter domain' result in
   let () =
     if Counter.max_time counter = None && Counter.max_events counter = None &&
 	 not @@
@@ -574,7 +572,7 @@ let initialize logger ?rescale_init overwrite counter result =
 
   Debug.tag logger "\t -observables";
   let domain,obs =
-    obs_of_result contact_map counter domain result' in
+    obs_of_result contact_map counter domain result in
   let () =
     match obs with
     | (_,pos) :: _ when Counter.plot_points counter = 0
@@ -586,14 +584,14 @@ let initialize logger ?rescale_init overwrite counter result =
 
   let env =
     Environment.init sigs_nd tk_nd alg_nd alg_deps'
-		     (Array.of_list result'.rules,rule_nd,cc_unaries)
+		     (Array.of_list result.rules,rule_nd,cc_unaries)
 		     (Array.of_list (List.rev obs)) (Array.of_list pert) in
 
   Debug.tag logger "\t -initial conditions";
   let domain,graph =
     init_graph_of_result
       ?rescale:rescale_init alg_nd tracking_enabled contact_map
-      counter env domain result' in
+      counter env domain result in
   let () =
     if !Parameter.compileModeOn || !Parameter.debugModeOn then
       Format.eprintf
@@ -615,4 +613,4 @@ let initialize logger ?rescale_init overwrite counter result =
 	   "An observable may be tracked but no compression level to render stories has been specified")
   in
   (Debug.tag logger "\t Done";
-   (kasa_state,env, Connected_component.Env.finalize domain, graph', state))
+   (env, Connected_component.Env.finalize domain, graph', state))

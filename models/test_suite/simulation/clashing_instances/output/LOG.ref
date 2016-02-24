@@ -2,13 +2,12 @@
 Parsing clashing_instances.ka...
 done
 + Initialized random number generator with seed 923639563
-+ Building initial simulation conditions...
-+ Compiling...
-	 -simulation parameters
-	 -agent signatures
-	 -sanity checks
-	 -KaSa tools initialization
++ Sanity checks
++ KaSa tools initialization
 + Compute the contact map
++ Compiling...
++ Building initial simulation conditions...
+	 -simulation parameters
 	 -variable declarations
 	 -rules
 	 -perturbations

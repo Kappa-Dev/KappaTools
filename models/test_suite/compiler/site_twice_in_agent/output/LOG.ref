@@ -2,35 +2,19 @@
 Parsing lhs.ka...
 done
 + Initialized random number generator with seed 924556145
-+ Building initial simulation conditions...
-+ Compiling...
-	 -simulation parameters
-	 -agent signatures
-	 -sanity checks
++ Sanity checks
 + Command line is: 'KaSim' 'rhs.ka' '-seed' '924556145' '-d' 'output' '--compile'
 Parsing rhs.ka...
 done
 + Initialized random number generator with seed 924556145
-+ Building initial simulation conditions...
-+ Compiling...
-	 -simulation parameters
-	 -agent signatures
-	 -sanity checks
++ Sanity checks
 + Command line is: 'KaSim' 'internal.ka' '-seed' '924556145' '-d' 'output' '--compile'
 Parsing internal.ka...
 done
 + Initialized random number generator with seed 924556145
-+ Building initial simulation conditions...
-+ Compiling...
-	 -simulation parameters
-	 -agent signatures
-	 -sanity checks
++ Sanity checks
 + Command line is: 'KaSim' 'remove.ka' '-seed' '924556145' '-d' 'output' '--compile'
 Parsing remove.ka...
 done
 + Initialized random number generator with seed 924556145
-+ Building initial simulation conditions...
-+ Compiling...
-	 -simulation parameters
-	 -agent signatures
-	 -sanity checks
++ Sanity checks

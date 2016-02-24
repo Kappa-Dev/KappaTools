@@ -134,12 +134,19 @@ let () =
       Counter.create
 	~init_t:0. ~init_e:0 ?max_t:!maxTimeValue ?max_e:!maxEventValue
 	~nb_points:!pointNumberValue in
-    let (kasa_state,env, cc_env, graph, new_state) =
+    let (env, cc_env, graph, new_state) =
       match !Parameter.marshalizedInFile with
       | "" ->
-	 Eval.initialize
-	   ?rescale_init:!rescale Format.std_formatter
-	   !Parameter.alg_var_overwrite counter result
+	let () = Format.printf "+ Sanity checks@." in
+	let (sigs_nd,tk_nd,result') =
+	  LKappa.compil_of_ast !Parameter.alg_var_overwrite result in
+	let () = Format.printf "+ KaSa tools initialization@." in
+	let contact_map,_kasa_state =
+	  Eval.init_kasa Format.std_formatter result in
+	let () = Format.printf "+ Compiling...@." in
+	Eval.initialize
+	  ?rescale_init:!rescale Format.std_formatter
+	  sigs_nd tk_nd contact_map counter result'
       | marshalized_file ->
 	 try
 	   let d = open_in_bin marshalized_file in
@@ -151,13 +158,13 @@ let () =
 	     else
 	       Format.printf "+Loading simulation package %s...@."
 			     marshalized_file in
-	   let kasa_state,env,cc_env,graph,new_state =
+	   let env,cc_env,graph,new_state =
 	     (Marshal.from_channel d :
-		Export_to_KaSim.Export_to_KaSim.state*Environment.t*Connected_component.Env.t*
+		Environment.t*Connected_component.Env.t*
 		  Rule_interpreter.t * State_interpreter.t) in
 	   let () = Pervasives.close_in d  in
 	   let () = Format.printf "Done@." in
-	   (kasa_state,env,cc_env,graph,new_state)
+	   (env,cc_env,graph,new_state)
 	 with
 	 | _exn ->
 	    Debug.tag
@@ -170,8 +177,6 @@ let () =
 			   d (env,cc_env,counter) [Marshal.Closures]) in
     let () = Kappa_files.with_ccFile
 	       (fun f -> Connected_component.Env.print_dot f cc_env) in
-    let () = Export_to_KaSim.Export_to_KaSim.dump_errors_light kasa_state in
-    let _kasa_state = Export_to_KaSim.Export_to_KaSim.flush_errors kasa_state in
     ExceptionDefn.flush_warning Format.err_formatter ;
     if !Parameter.compileModeOn then exit 0 else ();
 

@@ -32,13 +32,16 @@ end = struct
                    message
   let build_ast code success failure =
     let lexbuf : Lexing.lexbuf = Lexing.from_string code in
-    try let ast :
-              (Ast.agent, Ast.mixture, string, Ast.rule) Ast.compil
-          = KappaParser.start_rule
-              KappaLexer.token
-              lexbuf
-              Ast.empty_compil
-        in success ast
+    try
+      let raw_ast =
+	KappaParser.start_rule KappaLexer.token lexbuf Ast.empty_compil in
+      let ast :
+            Signature.s * unit NamedDecls.t *
+	      (Ast.agent, LKappa.rule_agent list, int, LKappa.rule) Ast.compil
+        = LKappa.compil_of_ast [] raw_ast in
+      let contact_map,_kasa_state =
+	Eval.init_kasa Format.std_formatter raw_ast
+      in success (ast,contact_map)
     with ExceptionDefn.Syntax_Error e ->
       failure (format_error_message e)
 
@@ -66,7 +69,7 @@ end = struct
                      (fun ast -> `Right ast)
                      (fun e -> `Left [e])
          with
-           `Right result ->
+           `Right ((sig_nd,tk_nd,result),contact_map) ->
            let current_id = self#new_id () in
            let svg_store : Pp_svg.store option ref = ref None in
            let outputs (data : Data.t) =
@@ -94,9 +97,10 @@ end = struct
            let log_form = Format.formatter_of_buffer simulation.log_buffer in
            let () = Counter.reinitialize simulation.counter in
            let () = Lwt.async (fun () ->
-                               wrap4 (Eval.initialize ?rescale_init:None)
-                                     log_form [] simulation.counter result
-                               >>= (fun (_kasa_state,env,domain,graph,state) ->
+                               wrap6 (Eval.initialize ?rescale_init:None)
+                                 log_form sig_nd tk_nd contact_map
+				 simulation.counter result
+                               >>= (fun (env,domain,graph,state) ->
                                     let legend =
                                       Environment.map_observables
                                         (Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
