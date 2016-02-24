@@ -1048,7 +1048,7 @@ returns the roots of observables that are above in the domain*)
       match find_root point.content with
       | None -> assert false
       | Some (root_type,root) -> Renaming.apply inj root,root_type in
-    let rec aux cache (obs,rev_deps as acc) = function
+    let rec aux_from_edges cache (obs,rev_deps as acc) = function
       | [] -> acc,cache
       | (_pid,point,inj_point2graph as current) :: remains ->
 	 let root_bundle =
@@ -1075,12 +1075,12 @@ returns the roots of observables that are above in the domain*)
 		    then remains
 		    else next::remains) re son.inj)
 	     remains point.sons in
-	 aux (CacheSetMap.Set.add current cache) acc' remains' in
+	 aux_from_edges (CacheSetMap.Set.add current cache) acc' remains' in
     match Env.navigate domain edges with
     | None -> acc
     | Some (pid,injs,point) ->
        List.fold_left
-	 (fun (out,cache) inj -> aux cache out [(pid,point,inj)])
+	 (fun (out,cache) inj -> aux_from_edges cache out [(pid,point,inj)])
 	 acc injs
 
   let observables_from_agent
