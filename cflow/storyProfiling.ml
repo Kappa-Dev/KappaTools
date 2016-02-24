@@ -167,7 +167,6 @@ module StoryStats =
 	 in aux k l []
 
        let print_task parameter (a,b) =
-	 let _ = Loggers.open_row (Remanent_parameters.get_profiler parameter) in
 	 let _ = print_step_kind parameter a.tag in
 	 let tab,b = k_first parameter 4 b in
 	 let _ =
@@ -205,9 +204,6 @@ module StoryStats =
 	       | None -> ""
 	       | Some time -> (string_of_float time)
 	     end
-	 in
-	 let _ =
-	   Loggers.close_row (Remanent_parameters.get_profiler parameter)
 	 in
 	 ()
 
@@ -256,11 +252,13 @@ module StoryStats =
 	       depth = next_depth ;
 	     }
 	   in
+	   let _ = Loggers.open_row (Remanent_parameters.get_profiler parameter) in
 	   let _ = Loggers.print_cell (Remanent_parameters.get_profiler parameter) "Start" in
 	   let terminated_task =
 	     (task,List.rev_map (fun x -> x.tag) (List.rev log_info.current_task))
 	   in
 	   let _ = print_task parameter terminated_task in
+	   let _ = Loggers.close_row (Remanent_parameters.get_profiler parameter) in
 	   let _ = flush_logger  parameter in
 	   let current_task = task::log_info.current_task in
 

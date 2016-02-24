@@ -254,7 +254,7 @@ let get_parameters ?html_mode:(html_mode=true) ?called_from:(called_from=Remanen
       with
       | None -> Loggers.dummy_txt_logger
       | Some a ->
-	Loggers.open_logger_from_channel a
+	Loggers.open_logger_from_channel ~mode:Loggers.HTML_Tabular a
   }
 
 let dummy_parameters =

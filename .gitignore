@@ -50,6 +50,7 @@ models/test_suite/*/*/output/error.log
 models/test_suite/*/*/error
 models/test_suite/error
 models/test_suite/*/*/output/profiling.txt
+models/test_suite/*/*/output/profiling.html
 models/test_suite/*/*/output/compression_status.txt
 
 # generated code

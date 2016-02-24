@@ -70,8 +70,8 @@ let end_of_line_symbol logger =
   match
     logger.encoding
   with
-  | HTML | HTML_Tabular -> "<Br>"
-  | DOT | TXT | TXT_Tabular -> ""
+  | HTML -> "<Br>"
+  | HTML_Tabular | DOT | TXT | TXT_Tabular -> ""
 
 
 let dump_token f x =
@@ -189,11 +189,19 @@ let open_infinite_buffer ?mode:(mode=TXT) () =
   }
 
 let open_row logger =
-  fprintf logger "<tr>"
+   match
+    logger.encoding
+   with
+   | HTML_Tabular -> fprintf logger "<tr>"
+   | HTML | DOT | TXT | TXT_Tabular -> ()
 
 let close_row logger =
-  fprintf logger "</tr>"
-
+  match
+    logger.encoding
+   with
+   | HTML_Tabular -> fprintf logger "<tr>@."
+   | HTML | DOT | TXT | TXT_Tabular -> fprintf logger "@."
+					       
 let formatter_of_logger logger =
   match
     logger.logger
