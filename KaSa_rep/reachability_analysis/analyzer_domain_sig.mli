@@ -2,15 +2,15 @@
   * analyzer_sig.mli
   * openkappa
   * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
-  * 
+  *
   * Creation: 2016, the 30th of January
-  * Last modification: 
-  * 
+  * Last modification:
+  *
   * Compute the relations between sites in the BDU data structures
-  * 
-  * Copyright 2010,2011,2012,2013,2014,2015,2016 Institut National de Recherche 
-  * en Informatique et en Automatique.  
-  * All rights reserved.  This file is distributed     
+  *
+  * Copyright 2010,2011,2012,2013,2014,2015,2016 Institut National de Recherche
+  * en Informatique et en Automatique.
+  * All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
 (** signature of abstract domains (with explicit communication) *)
@@ -32,46 +32,46 @@ module type Domain =
       Analyzer_headers.global_dynamic_information ->
       Exception.method_handler ->
       Exception.method_handler * static_information * dynamic_information
-   							       
-    type 'a zeroary = 
-      static_information 
+   							
+    type 'a zeroary =
+      static_information
       -> dynamic_information
       -> Exception.method_handler
       -> Exception.method_handler * dynamic_information * 'a
-      
+
     type ('a, 'b) unary =
       static_information
       -> dynamic_information
-      -> Exception.method_handler 
-      -> 'a 
+      -> Exception.method_handler
+      -> 'a
       -> Exception.method_handler * dynamic_information * 'b
 
     type ('a, 'b, 'c) binary =
-      static_information 
+      static_information
       -> dynamic_information
-      -> Exception.method_handler 
-      -> 'a 
+      -> Exception.method_handler
+      -> 'a
       -> 'b -> Exception.method_handler * dynamic_information * 'c
 
     val add_initial_state:
-      (Analyzer_headers.initial_state, Analyzer_headers.event list) unary
+      (Analyzer_headers.initial_state, Communication.event list) unary
 
     val is_enabled:
-      (Analyzer_headers.rule_id,
-       Analyzer_headers.precondition,
-       Analyzer_headers.precondition option) binary
+      (Communication.rule_id,
+       Communication.precondition,
+       Communication.precondition option) binary
 
-    val apply_rule: 
-      (Analyzer_headers.rule_id,
-       Analyzer_headers.precondition,
-       Analyzer_headers.precondition * Analyzer_headers.event list) binary
+    val apply_rule:
+      (Communication.rule_id,
+       Communication.precondition,
+       Communication.precondition * Communication.event list) binary
 
     val apply_event_list:
-      (Analyzer_headers.event list, Analyzer_headers.event list) unary
+      (Communication.event list, Communication.event list) unary
 
     val export:
       (Analyzer_headers.kasa_state, Analyzer_headers.kasa_state) unary
 
     val print: (Loggers.t list, unit) unary
   end
-    
+

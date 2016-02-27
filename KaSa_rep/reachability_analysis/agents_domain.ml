@@ -35,8 +35,8 @@ struct
     {
       global_static_information : Analyzer_headers.global_static_information;
       domain_static_information :
-        (int list Analyzer_headers.bot_or_not * int list) Int2Map_Agent.Map.t;
-      agents_without_interface  : int list Int2Map_Agent.Map.t 
+        (int list Usual_domains.bot_or_not * int list) Int2Map_Agent.Map.t;
+      agents_without_interface  : int list Int2Map_Agent.Map.t
     }
 
   (*--------------------------------------------------------------------*)
@@ -132,7 +132,7 @@ struct
   (*Ghost agents must be ignored *)
   (*Dead agents, generates Bot elements *)
   (*I think that unknown agents must be dealt with as dead agents *)
-  
+
   (*convert a fold into a list*)
 
   let map_to_list parameter error map =
@@ -146,18 +146,18 @@ struct
     error, list
 
   let collect_agents parameter error rule =
-    let error, list_lhs_views = 
-      map_to_list parameter error rule.Cckappa_sig.rule_lhs.Cckappa_sig.views 
+    let error, list_lhs_views =
+      map_to_list parameter error rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
     in
     let error, agents_test_list =
       let rec aux l (error, output) =
         match l with
-        | [] -> error, Analyzer_headers.Not_bot output
+        | [] -> error, Usual_domains.Not_bot output
         | agent :: tl ->
           match agent with
           | Cckappa_sig.Ghost -> aux tl (error, output)
           | Cckappa_sig.Unknown_agent _
-          | Cckappa_sig.Dead_agent _ -> error, Analyzer_headers.Bot
+          | Cckappa_sig.Dead_agent _ -> error, Usual_domains.Bot
           | Cckappa_sig.Agent agent ->
             let agent_type = agent.Cckappa_sig.agent_name in
             aux tl (error, agent_type :: output)
@@ -178,13 +178,13 @@ struct
     in
     let rec aux l (error, output) =
       match l with
-      | [] -> error, Analyzer_headers.Not_bot output
+      | [] -> error, Usual_domains.Not_bot output
       | agent :: tl ->
 	 begin
 	   match agent with
            | Cckappa_sig.Ghost -> aux tl (error, output)
            | Cckappa_sig.Unknown_agent _
-           | Cckappa_sig.Dead_agent _ -> error, Analyzer_headers.Bot
+           | Cckappa_sig.Dead_agent _ -> error, Usual_domains.Bot
            | Cckappa_sig.Agent agent ->
               let agent_type = agent.Cckappa_sig.agent_name in
 	      let agent_interface = agent.Cckappa_sig.agent_interface in
@@ -196,8 +196,8 @@ struct
 	 end
     in
     match aux agents_lhs_list (error, []) with
-    | error, Analyzer_headers.Bot -> error, map
-    | error, Analyzer_headers.Not_bot l ->
+    | error, Usual_domains.Bot -> error, map
+    | error, Usual_domains.Not_bot l ->
       List.fold_left
 	(fun (error, map) agent_type ->
 	  let error, old_list =
@@ -297,27 +297,27 @@ struct
     let bool = Array.get local agent_type in
     if not bool
     then
-      let local = 
+      let local =
         local.(agent_type) <- true;
         local
       in
       let dynamic = set_seen_agent local dynamic in
-      let error, rule_id_list = 
+      let error, rule_id_list =
         match Int2Map_Agent.Map.find_option_without_logs parameter error
 	  agent_type map
         with
         | error, None -> error, []
         | error, Some l -> error, l
       in
-      let event_list =          
+      let event_list =
         List.fold_left (fun event_list rule_id ->
-	  Analyzer_headers.Check_rule rule_id :: event_list
+	  Communication.Check_rule rule_id :: event_list
 	) event_list rule_id_list
       in
       error, (dynamic, event_list)
     else
       error, (dynamic, event_list)
-	
+
   (**************************************************************************)
   (** collect the agent type of the agents of the species and declare
      them seen *)
@@ -353,7 +353,7 @@ struct
   let add_initial_state static dynamic error species =
     let event_list = [] in
     let error, (dynamic, event_list) =
-      init_agents static dynamic error species event_list 
+      init_agents static dynamic error species event_list
     in
     error, dynamic, event_list
 
@@ -377,12 +377,12 @@ struct
       match Int2Map_Agent.Map.find_option_without_logs parameter error
         rule_id domain_static
       with
-      | error, None -> error, (Analyzer_headers.Not_bot [], [])
+      | error, None -> error, (Usual_domains.Not_bot [], [])
       | error, Some (l1, l2) -> error, (l1, l2)
     in
     match bot_or_not with
-    | Analyzer_headers.Bot -> error, dynamic, None
-    | Analyzer_headers.Not_bot l ->
+    | Usual_domains.Bot -> error, dynamic, None
+    | Usual_domains.Not_bot l ->
       List.fold_left
 	(fun (error, dynamic, s) agent_type ->
 	  let local = get_seen_agent dynamic in
@@ -394,7 +394,7 @@ struct
 	    error, dynamic, None
 	)
 	(error, dynamic, Some precondition) l
-        
+
   (************************************************************************************)
   (** fold a list of creation each time update the array when agent is
       seen for the first time, add list of rule inside event list that
@@ -408,12 +408,12 @@ struct
     let parameter = get_parameter static in
     let event_list = [] in
     let domain_static = get_domain_static_information static in
-    let error, (_, list_created) =
+    let error, list_created =
       match Int2Map_Agent.Map.find_option_without_logs
         parameter error rule_id domain_static
       with
-      | error, None -> error, (Analyzer_headers.Not_bot [], [])
-      | error, Some (l1, l2) -> error, (l1, l2)
+      | error, None -> error, []
+      | error, Some (_, l2) -> error, l2
     in
     let error, (dynamic, event_list) =
       List.fold_left (fun (error, (dynamic, event_list)) agent_type ->
@@ -451,7 +451,7 @@ struct
     then
       let parameter = Remanent_parameters.update_prefix parameter "" in
       let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-      let () = 
+      let () =
         Loggers.fprintf (Remanent_parameters.get_logger parameter)
           "------------------------------------------------------------"
       in
@@ -463,7 +463,7 @@ struct
       let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
       let () =
         Loggers.fprintf (Remanent_parameters.get_logger parameter)
-          "------------------------------------------------------------" 
+          "------------------------------------------------------------"
       in
       let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
       let size = Array.length local in

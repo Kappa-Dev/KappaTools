@@ -43,25 +43,48 @@ type 'a bot_or_not =
 | Bot
 | Not_bot of 'a
 
+type 'a top_or_not =
+| Top
+| Not_top of 'a
+
 type maybe_bool =
 | Sure_value of bool
 | Maybe
 
-type precondition =
- {
-   precondition_dummy: unit;
-   the_rule_is_applied_for_the_first_time: maybe_bool;
- }
+type step =
+  {
+    site_out: int;
+    site_in: int;
+    agent_type_out: int
+  }
+type path =
+  {
+    agent_id: int;
+    relative_address: step list;
+    site: int;
+  }
+
+module type PathMap =
+sig
+  type 'a t
+  val empty: 'a -> 'a t
+  val add: path -> 'a -> 'a t -> 'a t
+  val find: path -> 'a t -> 'a option
+end
+
+module PathSetMap = 
+  SetMap.Make (struct type t = path let compare = compare end)
+module PathMap =
+(struct
+  type 'a t = 'a PathSetMap.Map.t
+  let empty _ = PathSetMap.Map.empty
+  let add = PathSetMap.Map.add
+  let find = PathSetMap.Map.find_option
+ end:PathMap)
 
 type kasa_state = unit
 
 type initial_state = Cckappa_sig.enriched_init
-
-let dummy_precondition =
-  {
-    precondition_dummy = ();
-    the_rule_is_applied_for_the_first_time = Maybe;
-  }
 
 let get_parameter static = static.global_parameter
 

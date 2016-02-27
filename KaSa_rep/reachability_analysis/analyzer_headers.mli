@@ -30,24 +30,7 @@ type rule_id = int
 type global_static_information
 type global_dynamic_information
 
-type event =
-| Dummy (* to avoid compilation warning *)
-| Check_rule of rule_id
-| See_a_new_bond of (int * int * int) * (int * int * int)
 
-type 'a bot_or_not =
-| Bot
-| Not_bot of 'a
-
-type maybe_bool =
-| Sure_value of bool
-| Maybe
-
-type precondition =
- {
-   precondition_dummy: unit (* to avoid compilation warning *);
-   the_rule_is_applied_for_the_first_time: maybe_bool
- }
 
 type kasa_state = unit
 
@@ -63,8 +46,6 @@ val initialize_global_information:
   Cckappa_sig.compil ->
   Cckappa_sig.kappa_handler ->
   Exception.method_handler * global_static_information * global_dynamic_information
-
-val dummy_precondition: precondition
 
 val get_parameter: global_static_information -> Remanent_parameters_sig.parameters
 

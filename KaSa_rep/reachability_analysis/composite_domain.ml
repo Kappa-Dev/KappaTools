@@ -53,13 +53,18 @@ module type Composite_domain =
 
     val add_initial_state: (Analyzer_headers.initial_state, unit) unary
 
-    val is_enabled: (Analyzer_headers.rule_id, Analyzer_headers.precondition option) unary
+    val is_enabled: (Communication.rule_id, Communication.precondition option) unary
 
-    val apply_rule: (Analyzer_headers.rule_id, Analyzer_headers.precondition,unit) binary
+    val apply_rule: (Communication.rule_id, Communication.precondition,unit) binary
 
     val export: (Analyzer_headers.kasa_state, Analyzer_headers.kasa_state) unary
 
     val print: (Loggers.t list, unit) unary
+
+    val ast_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
+    val c_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
+    val cc_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
+    val lkappa_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
 
   end
 
@@ -88,10 +93,10 @@ struct
   let lift f x = f (get_global_static_information x)
 
   let get_parameter static = lift Analyzer_headers.get_parameter static
-      
+
   let get_compil static = lift Analyzer_headers.get_cc_code static
 
-  let empty_working_list = Fifo.IntWL.empty  
+  let empty_working_list = Fifo.IntWL.empty
 
   type 'a zeroary =
     static_information
@@ -115,7 +120,7 @@ struct
     -> Exception.method_handler * dynamic_information * 'c
 
   (** push r_id in the working_list *)
-    
+
   let get_working_list dynamic = dynamic.rule_working_list
 
   let set_working_list rule_working_list dynamic =
@@ -124,12 +129,12 @@ struct
     }
 
   let get_domain dynamic = dynamic.domain
-    
+
   let set_domain domain dynamic =
     {
       dynamic with domain = domain
     }
-    
+
   let push_rule static dynamic error r_id =
     let working_list = get_working_list dynamic in
     let parameter = get_parameter static in
@@ -160,24 +165,24 @@ struct
     let parameter = get_parameter static in
     let error, dynamic =
       List.fold_left (fun (error, dynamic) (agent_id, agent_type) ->
-        let error, agent = 
-          Int_storage.Quick_Nearly_inf_Imperatif.get parameter error agent_id 
+        let error, agent =
+          Int_storage.Quick_Nearly_inf_Imperatif.get parameter error agent_id
             rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
         in
         match agent with
-        | Some Cckappa_sig.Dead_agent _ 
+        | Some Cckappa_sig.Dead_agent _
         | Some Cckappa_sig.Ghost -> error, dynamic
         | None -> warn parameter error (Some "line 156") Exit dynamic
-        | Some Cckappa_sig.Unknown_agent _ 
+        | Some Cckappa_sig.Unknown_agent _
         | Some Cckappa_sig.Agent _ ->
           let error, dynamic =
             push_rule static dynamic error rule_id
           in
-          error, dynamic 
+          error, dynamic
       ) (error, dynamic) rule.Cckappa_sig.actions.Cckappa_sig.creation
     in
     error, dynamic
-    
+
   let scan_rule_creation static dynamic error =
     let parameter = get_parameter static in
     let compil = get_compil static in
@@ -206,7 +211,7 @@ struct
     in
     let static = static, domain_static in
     let working_list = empty_working_list in
-    let dynamic = 
+    let dynamic =
       {
         rule_working_list = working_list;
         domain = domain_dynamic
@@ -218,8 +223,8 @@ struct
         dynamic
         error
     in
-    error, static, dynamic 
-	   
+    error, static, dynamic
+
   (**[lift_unary f static dynamic] is a function lifted of unary type,
      returns information of dynamic information and its output*)
 
@@ -229,7 +234,7 @@ struct
     in
     let dynamic = set_domain domain_dynamic dynamic in
     error, dynamic, output
-      
+
   (**[pre_add_initial_state static dynamic error a] returns a pair of
      type unary where the output of static information [a] is an initial state
      of analyzer header, and the dynamic output [a list of event] is unit. *)
@@ -254,7 +259,7 @@ struct
       dynamic
       error
       a
-      Analyzer_headers.dummy_precondition
+      Communication.dummy_precondition
 
   (**[pre_apply_rule static dynamic error a b] *)
   let pre_apply_rule static dynamic error a b =
@@ -286,7 +291,7 @@ struct
       let error, dynamic =
 	List.fold_left (fun (error, dynamic) event ->
 	  match event with
-	  | Analyzer_headers.Check_rule rule_id ->
+	  | Communication.Check_rule rule_id ->
             push_rule
               static
               dynamic
@@ -329,5 +334,17 @@ struct
 
   let print static dynamic error loggers =
     lift_unary Domain.print static dynamic error loggers
+
+  let lkappa_is_reachable static dynamic error lkappa =
+    error, dynamic, Usual_domains.Maybe (* to do, via domains.ml *)
+
+  let cc_is_reachable static dynamic error lkappa =
+    error, dynamic, Usual_domains.Maybe (* to do, via domains.ml  *)
+
+  let c_is_reachable static dynamic error lkappa =
+    error, dynamic, Usual_domains.Maybe (* to do via cc_is_reachable *)
+
+  let ast_is_reachable static dynamic error lkappa =
+    error, dynamic, Usual_domains.Maybe (* to do via c_is_reachable *)
 
 end
