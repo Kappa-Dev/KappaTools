@@ -32,15 +32,7 @@ end
 
 module PathMap:PathMap
 
-type precondition =
- {
-   precondition_dummy: unit (* to avoid compilation warning *);
-   the_rule_is_applied_for_the_first_time: Usual_domains.maybe_bool ;
-   state_of_site:
-     Exception.method_handler ->
-     path -> Exception.method_handler * int list Usual_domains.top_or_not ;
-   cache_state_of_site: int list Usual_domains.top_or_not PathMap.t ;
- }
+type precondition
 
 val dummy_precondition: precondition
 
@@ -49,6 +41,14 @@ val get_state_of_site:
   precondition ->
   path ->
   Exception.method_handler * precondition * int list Usual_domains.top_or_not
+
+val refine_information_about_state_of_site:
+  precondition ->
+  (Exception.method_handler ->
+   path ->
+   int list Usual_domains.top_or_not ->
+   Exception.method_handler * int list Usual_domains.top_or_not) ->
+  precondition
 
 val the_rule_is_applied_for_the_first_time:
   Remanent_parameters_sig.parameters ->
