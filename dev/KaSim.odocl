@@ -50,8 +50,10 @@ Kappa_files
 Analyzer
 Analyzer_headers
 Analyzer_domain_sig
+Communication
 Composite_domain
 Product
+Usual_domains
 
 Rules_domain
 Views_domain

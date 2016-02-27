@@ -35,7 +35,7 @@ The code specific to the command line backend is in main/. It consists in file h
 {!modules: Outputs Kappa_files}
 
 The code of the static analyser is in KaSa_rep/reachability_analysis/
-{!modules: Analyzer Analyzer_headers Composite_domain Analyzer_domain_sig Product}
+{!modules: Analyzer Analyzer_headers Composite_domain Communication Analyzer_domain_sig Product Usual_domains}
 Several abstract domains are available:
 {!modules: Rules_domain Agents_domain Contact_map_domain Views_domain}
 
