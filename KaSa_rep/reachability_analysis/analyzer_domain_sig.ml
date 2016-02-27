@@ -25,6 +25,8 @@ module type Domain =
 	global: Analyzer_headers.global_dynamic_information
       }
 
+    val get_parameter: static_information -> Remanent_parameters_sig.parameters
+
     val initialize:
       Analyzer_headers.global_static_information ->
       Analyzer_headers.global_dynamic_information ->
@@ -70,6 +72,9 @@ module type Domain =
       (Analyzer_headers.kasa_state, Analyzer_headers.kasa_state) unary
 
     val print: (Loggers.t list, unit) unary
+
+    val cc_mixture_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
+    val lkappa_mixture_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
 
   end
 

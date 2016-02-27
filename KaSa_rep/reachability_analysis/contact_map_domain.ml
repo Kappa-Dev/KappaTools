@@ -20,7 +20,7 @@ let warn parameters mh message exn default =
 let local_trace = false
 
 module Domain =
-struct 
+struct
 
   module Set_triple =
     Map_wrapper.Make
@@ -29,7 +29,7 @@ struct
           type t = int * int * int
           let compare = compare
         end))
-      
+
 
   type local_static_information =
     {
@@ -44,7 +44,7 @@ struct
     }
 
   type local_dynamic_information = Set_triple.Set.t * Set_triple.Set.t
-    
+
   type dynamic_information =
     {
       local  : local_dynamic_information;
@@ -72,7 +72,7 @@ struct
         local_static_information = local
     }
 
-  let get_bond_rhs static = 
+  let get_bond_rhs static =
     (get_local_static_information static).bond_rhs
 
   let set_bond_rhs bond static =
@@ -81,7 +81,7 @@ struct
         (get_local_static_information static) with
           bond_rhs = bond
       } static
-    
+
   let get_bond_lhs static =
     (get_local_static_information static).bond_lhs
 
@@ -91,10 +91,10 @@ struct
         (get_local_static_information static) with
           bond_lhs = bond
       } static
-      
+
   (*--------------------------------------------------------------------*)
   (** dynamic information*)
-    
+
   let get_local_dynamic_information dynamic = dynamic.local
 
   let set_local_dynamic_information local dynamic =
@@ -104,7 +104,7 @@ struct
 
   (**************************************************************************)
   (*implementations*)
-      
+
   let collect_set parameter error agent site_type store_result =
     match agent with
     | Cckappa_sig.Ghost
@@ -125,7 +125,7 @@ struct
           then error, state
           else warn parameter error (Some "line 125") Exit 0
       in
-      let error', set1 = 
+      let error', set1 =
         Set_triple.Set.add_when_not_in
           parameter error (agent_type1, site_type, state1) store_result
       in
@@ -150,7 +150,7 @@ struct
                     Cckappa_sig.Ghost
                   | error, Some agent -> error, agent
                 in
-                let error, agent_target = 
+                let error, agent_target =
                   match Int_storage.Quick_Nearly_inf_Imperatif.get
                     parameter error agent_index_target views
                   with
@@ -175,7 +175,7 @@ struct
                     store_result2
                 in
                 error, (set1, set2)
-              ) bonds_map (error, (store_result1, store_result2))           
+              ) bonds_map (error, (store_result1, store_result2))
           in
           error, (store_result1, store_result2)
         ) bonds store_result
@@ -191,7 +191,7 @@ struct
         rule
         rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
         rule.Cckappa_sig.rule_rhs.Cckappa_sig.bonds
-        store_result      
+        store_result
     in
     error, store_result
 
@@ -210,7 +210,7 @@ struct
     error, store_result
 
   (**************************************************************************)
-      
+
   let scan_rule_set static dynamic error =
     let parameter = get_parameter static in
     let compil = get_compil static in
@@ -280,22 +280,22 @@ struct
 
   type ('a, 'b) unary =
     static_information
-    -> dynamic_information 
+    -> dynamic_information
     -> Exception.method_handler
-    -> 'a 
+    -> 'a
     -> Exception.method_handler * dynamic_information * 'b
 
   type ('a, 'b, 'c) binary =
     static_information
-    -> dynamic_information 
-    -> Exception.method_handler 
-    -> 'a 
-    -> 'b 
+    -> dynamic_information
+    -> Exception.method_handler
+    -> 'a
+    -> 'b
     -> Exception.method_handler * dynamic_information * 'c
 
   (**************************************************************************)
   (*Implementation*)
-    
+
   (**bond occurs in the initial state*)
 
   let collect_bonds_initial static dynamic error init_state =
@@ -328,13 +328,13 @@ struct
     (*test if the bond in the lhs has already in the contact map, if not
       None, *)
     (*let (contact_map1, contact_map2) = get_local_dynamic_information dynamic in
-    let (bonds_lhs_set1, bonds_lhs_set2) = get_bond_lhs static in      
+    let (bonds_lhs_set1, bonds_lhs_set2) = get_bond_lhs static in
     let b1 =
       Set_triple.Set.for_all (fun (agent_type, site_type, state) ->
         if Set_triple.Set.mem (agent_type, site_type, state) contact_map1
         then true
         else false
-      ) bonds_lhs_set1 
+      ) bonds_lhs_set1
     in
     let b2 =
       Set_triple.Set.for_all (fun (agent_type', site_type', state') ->
@@ -375,8 +375,8 @@ struct
       let event_list =
         Set_triple.Set.fold (fun (agent_type, site_type, state) event_list ->
           Set_triple.Set.fold (fun (agent_type', site_type', state') event_list ->
-            (Analyzer_headers.See_a_new_bond 
-               ((agent_type, site_type, state), 
+            (Analyzer_headers.See_a_new_bond
+               ((agent_type, site_type, state),
                 (agent_type', site_type', state'))
             ) :: event_list
           ) contact_map_update2 event_list
@@ -385,15 +385,21 @@ struct
       error, dynamic, (precondition, event_list)
     else*)
       error, dynamic, (precondition, event_list)
-      
+
   let rec apply_event_list static dynamic error event_list =
     let event_list = [] in
     error, dynamic, event_list
 
   let export static dynamic error kasa_state =
     error, dynamic, kasa_state
-      
+
   let print static dynamic error loggers =
     error, dynamic, ()
+
+  let lkappa_mixture_is_reachable static dynamic error lkappa =
+    error, dynamic, Usual_domains.Maybe (* to do *)
+
+  let cc_mixture_is_reachable static dynamic error lkappa =
+    error, dynamic, Usual_domains.Maybe (* to do *)
 
 end

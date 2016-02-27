@@ -2,42 +2,47 @@
    * analyzer_sig.mli
    * openkappa
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
-   * 
+   *
    * Creation: 2016, the 30th of January
-   * Last modification: 
-   * 
+   * Last modification:
+   *
    * Compute the relations between sites in the BDU data structures
-   * 
-   * Copyright 2010,2011,2012,2013,2014,2015,2016 Institut National de Recherche 
-   * en Informatique et en Automatique.  
-   * All rights reserved.  This file is distributed     
+   *
+   * Copyright 2010,2011,2012,2013,2014,2015,2016 Institut National de Recherche
+   * en Informatique et en Automatique.
+   * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
 
-module Product 
+module Product
   (New_domain:Analyzer_domain_sig.Domain)
   (Underlying_domain:Analyzer_domain_sig.Domain) =
-  
+
   (struct
-      
+
     type ('a, 'b) pair =
       {
 	new_domain       : 'a;
 	underlying_domain: 'b
       }
-   	
+
     type static_information =
       (New_domain.static_information, Underlying_domain.static_information) pair
 
     type local_dynamic_information =
       (New_domain.local_dynamic_information,
        Underlying_domain.local_dynamic_information) pair
-        
+
     type dynamic_information =
       {
 	local : local_dynamic_information;
 	global: Analyzer_headers.global_dynamic_information;
       }
+
+    let get_parameter static = Underlying_domain.get_parameter static.underlying_domain
+
+    let warn static mh message exn default =
+  Exception.warn (get_parameter static) mh (Some "product_domain") message exn (fun () -> default)
 
     let smash_dynamic underlying_domain new_domain =
       {
@@ -62,14 +67,14 @@ module Product
     let initialize global_static_information global_dynamic_information error =
       let error, underlying_domain_static_information,
         underlying_domain_dynamic_information =
-        Underlying_domain.initialize global_static_information 
-          global_dynamic_information 
-          error 
+        Underlying_domain.initialize global_static_information
+          global_dynamic_information
+          error
       in
       let error, new_domain_static_information, new_domain_dynamic_information =
         New_domain.initialize global_static_information
-          underlying_domain_dynamic_information.Underlying_domain.global 
-          error 
+          underlying_domain_dynamic_information.Underlying_domain.global
+          error
       in
       error,
       {
@@ -77,10 +82,10 @@ module Product
         underlying_domain = underlying_domain_static_information
       },
       smash_dynamic underlying_domain_dynamic_information new_domain_dynamic_information
-	
+
     type 'a zeroary =
       static_information
-      -> dynamic_information 
+      -> dynamic_information
       -> Exception.method_handler
       -> Exception.method_handler * dynamic_information * 'a
 
@@ -88,23 +93,23 @@ module Product
       static_information
       -> dynamic_information
       -> Exception.method_handler
-      -> 'a 
+      -> 'a
       -> Exception.method_handler * dynamic_information * 'b
 
     type ('a, 'b, 'c) binary =
-      static_information 
+      static_information
       -> dynamic_information
       -> Exception.method_handler
       -> 'a
-      -> 'b 
+      -> 'b
       -> Exception.method_handler * dynamic_information * 'c
 
     let add_initial_state static dynamic error initial_state =
       let error, underlying_domain_dynamic, event_list =
-        Underlying_domain.add_initial_state 
+        Underlying_domain.add_initial_state
           static.underlying_domain
           (underlying_domain_dynamic_information dynamic)
-          error 
+          error
           initial_state
       in
       let error, new_domain_dynamic, event_list' =
@@ -146,114 +151,163 @@ module Product
             rule_id
             precondition
         in
-	let dynamic = 
-          smash_dynamic 
-            underlying_domain_dynamic_information 
-            new_domain_dynamic_information 
+	let dynamic =
+          smash_dynamic
+            underlying_domain_dynamic_information
+            new_domain_dynamic_information
         in
 	error, dynamic, output_opt
 
     let apply_rule static dynamic error rule_id precondition =
       let error, underlying_domain_dynamic_information, (precondition, event_list) =
         Underlying_domain.apply_rule
-          static.underlying_domain 
+          static.underlying_domain
           (underlying_domain_dynamic_information dynamic)
 	  error
           rule_id
           precondition
       in
       let error, new_domain_dynamic_information, (precondition', event_list') =
-        New_domain.apply_rule 
+        New_domain.apply_rule
           static.new_domain
           (new_domain_dynamic_information
-             underlying_domain_dynamic_information 
+             underlying_domain_dynamic_information
              dynamic)
-	  error 
+	  error
           rule_id
-          precondition 
+          precondition
       in
       error,
       smash_dynamic
-        underlying_domain_dynamic_information 
+        underlying_domain_dynamic_information
         new_domain_dynamic_information,
       (precondition',
       List.fold_left (fun list a -> a :: list) event_list event_list')
     (* be careful, the concatenation should be done in the correct order to get
-       a linear time complexity instead of a quadratic one*)       
-        
+       a linear time complexity instead of a quadratic one*)
+
     let apply_event_list static dynamic error event_list =
-      let error, underlying_domain_dynamic_information, event_list' = 
+      let error, underlying_domain_dynamic_information, event_list' =
         Underlying_domain.apply_event_list
           static.underlying_domain
           (underlying_domain_dynamic_information dynamic)
 	  error
           event_list
       in
-      let error, new_domain_dynamic_information, event_list'' = 
-        New_domain.apply_event_list 
+      let error, new_domain_dynamic_information, event_list'' =
+        New_domain.apply_event_list
           static.new_domain
           (new_domain_dynamic_information
-             underlying_domain_dynamic_information 
+             underlying_domain_dynamic_information
              dynamic)
 	  error
           event_list
       in
-      let event_list = List.fold_left (fun list a -> a :: list) event_list' event_list'' in 
+      let event_list = List.fold_left (fun list a -> a :: list) event_list' event_list'' in
       (* be careful, the concatenation should be done in the correct order to get
          a linear time complexity instead of a quadratic one*)
       error,
       smash_dynamic
-        underlying_domain_dynamic_information 
+        underlying_domain_dynamic_information
         new_domain_dynamic_information,
       event_list
-        
+
     let export static dynamic error kasa_state =
       let error, underlying_domain_dynamic_information, kasa_state =
-        Underlying_domain.export 
+        Underlying_domain.export
           static.underlying_domain
           (underlying_domain_dynamic_information dynamic)
-	  error 
+	  error
           kasa_state
       in
       let error, new_domain_dynamic_information, kasa_state =
         New_domain.export
-          static.new_domain 
-          (new_domain_dynamic_information 
-             underlying_domain_dynamic_information 
+          static.new_domain
+          (new_domain_dynamic_information
+             underlying_domain_dynamic_information
              dynamic)
 	  error
           kasa_state
       in
       error,
-      smash_dynamic 
-        underlying_domain_dynamic_information 
+      smash_dynamic
+        underlying_domain_dynamic_information
         new_domain_dynamic_information,
       kasa_state
-	
+
     let print static dynamic error loggers =
       let error, underlying_domain_dynamic_information, () =
         Underlying_domain.print
-          static.underlying_domain 
+          static.underlying_domain
           (underlying_domain_dynamic_information dynamic)
 	  error
           loggers
       in
       let error, new_domain_dynamic_information, () =
-        New_domain.print 
+        New_domain.print
           static.new_domain
-          (new_domain_dynamic_information 
-             underlying_domain_dynamic_information 
+          (new_domain_dynamic_information
+             underlying_domain_dynamic_information
              dynamic)
 	  error
           loggers
       in
       error,
       smash_dynamic
-        underlying_domain_dynamic_information 
+        underlying_domain_dynamic_information
         new_domain_dynamic_information,
       ()
-        
+
+    let mixture_is_reachable_gen get_under get_new_d static dynamic error lkappa_mixture =
+    let error, underlying_domain_dynamic_information, maybe_under =
+      get_under
+        static.underlying_domain
+        (underlying_domain_dynamic_information dynamic)
+	error
+        lkappa_mixture
+    in
+    let error, new_domain_dynamic_information, maybe_new =
+      get_new_d
+        static.new_domain
+        (new_domain_dynamic_information
+           underlying_domain_dynamic_information
+           dynamic)
+	error
+        lkappa_mixture
+    in
+    let error, output =
+      match maybe_under, maybe_new
+      with
+      | Usual_domains.Maybe,_ -> error, maybe_new
+      | _,Usual_domains.Maybe -> error, maybe_under
+      | _ ->
+	if maybe_under = maybe_new
+	then error, maybe_under
+	else
+	  warn
+	    static error
+	    (Some "line 289, inconsistent computation in three-values logic")
+	    Exit (Usual_domains.Sure_value false)
+    in
+    error,
+    smash_dynamic
+      underlying_domain_dynamic_information
+      new_domain_dynamic_information,
+    output
+
+    let lkappa_mixture_is_reachable static dynamic error lkappa =
+      mixture_is_reachable_gen
+	Underlying_domain.lkappa_mixture_is_reachable
+	New_domain.lkappa_mixture_is_reachable
+	static dynamic error lkappa
+
+    let cc_mixture_is_reachable static dynamic error ccmixture =
+      mixture_is_reachable_gen
+	Underlying_domain.cc_mixture_is_reachable
+	New_domain.cc_mixture_is_reachable
+	static dynamic error ccmixture
+
    end:Analyzer_domain_sig.Domain)
-    
-    
-    
+
+
+

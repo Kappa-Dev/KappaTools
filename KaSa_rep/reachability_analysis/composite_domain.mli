@@ -61,10 +61,10 @@ module type Composite_domain =
 
     val print: (Loggers.t list, unit) unary
 
-    val ast_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
-    val c_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
-    val cc_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
-    val lkappa_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
+    val ast_mixture_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
+    val c_mixture_is_reachable: (Ckappa_sig.mixture, Usual_domains.maybe_bool) unary
+    val cc_mixture_is_reachable: (Cckappa_sig.mixture, Usual_domains.maybe_bool) unary
+    val lkappa_mixture_is_reachable: (LKappa.rule_mixture, Usual_domains.maybe_bool) unary
 
 
   end

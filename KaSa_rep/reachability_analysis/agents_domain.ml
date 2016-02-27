@@ -501,4 +501,10 @@ struct
     in
     error, dynamic, ()
 
+  let lkappa_mixture_is_reachable static dynamic error lkappa =
+    error, dynamic, Usual_domains.Maybe (* to do *)
+
+  let cc_mixture_is_reachable static dynamic error ccmixture =
+    error, dynamic, Usual_domains.Maybe (* to do *)
+
 end

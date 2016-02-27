@@ -61,10 +61,11 @@ module type Composite_domain =
 
     val print: (Loggers.t list, unit) unary
 
-    val ast_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
-    val c_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
-    val cc_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
-    val lkappa_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
+    val ast_mixture_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
+    val c_mixture_is_reachable: (Ckappa_sig.mixture, Usual_domains.maybe_bool) unary
+    val cc_mixture_is_reachable: (Cckappa_sig.mixture, Usual_domains.maybe_bool) unary
+    val lkappa_mixture_is_reachable: (LKappa.rule_mixture, Usual_domains.maybe_bool) unary
+
 
   end
 
@@ -335,16 +336,17 @@ struct
   let print static dynamic error loggers =
     lift_unary Domain.print static dynamic error loggers
 
-  let lkappa_is_reachable static dynamic error lkappa =
+
+  let lkappa_mixture_is_reachable static dynamic error lkappa =
     error, dynamic, Usual_domains.Maybe (* to do, via domains.ml *)
 
-  let cc_is_reachable static dynamic error lkappa =
+  let cc_mixture_is_reachable static dynamic error lkappa =
     error, dynamic, Usual_domains.Maybe (* to do, via domains.ml  *)
 
-  let c_is_reachable static dynamic error lkappa =
+  let c_mixture_is_reachable static dynamic error lkappa =
     error, dynamic, Usual_domains.Maybe (* to do via cc_is_reachable *)
 
-  let ast_is_reachable static dynamic error lkappa =
+  let ast_mixture_is_reachable static dynamic error lkappa =
     error, dynamic, Usual_domains.Maybe (* to do via c_is_reachable *)
 
 end
