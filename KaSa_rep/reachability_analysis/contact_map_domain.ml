@@ -57,7 +57,7 @@ struct
       local_static_information  : local_static_information
     }
 
-  type local_dynamic_information = Set_pair_triple.Set.t
+  type local_dynamic_information = Set_pair_triple.Set.t (*TODO*)
     
 
   type dynamic_information =
@@ -525,7 +525,7 @@ struct
       | error, None -> error, []
       | error, Some l -> error, l
     in
-    let b =
+    let b = (*TODO: change to set, inter set*)
       List.for_all (fun pair ->
         if Set_pair_triple.Set.mem pair contact_map
         then true
@@ -541,7 +541,7 @@ struct
   let apply_rule static dynamic error rule_id precondition =
     let event_list = [] in
     let parameter = get_parameter static in
-    (*add the bonds in the rhs into the contact map, by doing different set
+    (*add the bonds in the rhs into the contact map, by doing union set
       with contact map*)
     let contact_map = get_local_dynamic_information dynamic in
     let bond_rhs_map = get_bond_rhs static in
@@ -552,18 +552,23 @@ struct
       | error, None -> error, Set_pair_triple.Set.empty
       | error, Some s -> error, s
     in
+    let error', union =
+      Set_pair_triple.Set.union parameter error contact_map bond_rhs_set
+    in
+    let error = Exception.check warn parameter error error' (Some "line 558") Exit in
+    let dynamic = set_local_dynamic_information union dynamic in
+    let new_contact_map = get_local_dynamic_information dynamic in
     (*check if it is seen for the first time, if not update the contact
       map, and raise an event*)
     let error', map_diff =
-      Set_pair_triple.Set.diff parameter error contact_map bond_rhs_set
+      Set_pair_triple.Set.diff parameter error new_contact_map contact_map
     in
-    let error = Exception.check warn parameter error error' (Some "line 523") Exit in
-    let dynamic = set_local_dynamic_information map_diff dynamic in
-    let new_contact_map = get_local_dynamic_information dynamic in
+    let error = Exception.check warn parameter error error' (Some "line 566") Exit in
+    let dynamic = set_local_dynamic_information new_contact_map dynamic in
     let event_list =
       Set_pair_triple.Set.fold (fun pair event_list ->
         (Communication.See_a_new_bond pair) :: event_list
-      ) new_contact_map event_list
+      ) map_diff event_list
     in
     error, dynamic, (precondition, event_list)
 
