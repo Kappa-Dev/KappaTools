@@ -9,3 +9,8 @@ type maybe_bool =
 type 'a top_or_not =
 | Top
 | Not_top of 'a
+
+type 'a flat_lattice =
+| Val of 'a
+| Any
+| Undefined
