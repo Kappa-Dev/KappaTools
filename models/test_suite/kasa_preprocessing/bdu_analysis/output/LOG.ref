@@ -510,10 +510,116 @@ EXTENSIONAL DESCRIPTION:
 	Wake-up rules
 
 	Applying rule 1: r1:
-		the predcondition is not satsified yet
+		the predcondition is satisfied
+
+		rule 1: r1 is applied for the first time
+
+	Dealing with creation
+
+
+INTENSIONAL DESCRIPTION:
+Id=11
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=10
+   Node(site_type:1<2)
+    Id=5
+     Node(site_type:2<0)
+      Id=0
+       Leaf False 
+
+      Id=4
+       Node(site_type:2<1)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	A(x!B@x,y!free)
+	Wake-up rules
+	Dealing with creation
+
+
+INTENSIONAL DESCRIPTION:
+Id=9
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	B(x!A@x)
+	Wake-up rules
 
 	Applying rule 2: r2:
-		the predcondition is not satsified yet
+		the predcondition is satisfied
+
+		rule 2: r2 is applied for the first time
+
+	Dealing with creation
+
+
+INTENSIONAL DESCRIPTION:
+Id=15
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=14
+   Node(site_type:1<1)
+    Id=13
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	A(x!free,y!C@x)
+	Wake-up rules
+	Dealing with creation
+
+
+INTENSIONAL DESCRIPTION:
+Id=9
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	C(x!A@y)
+	Wake-up rules
 
 	Applying rule 0: r0:
 		the predcondition is satisfied
@@ -524,15 +630,99 @@ EXTENSIONAL DESCRIPTION:
 		rule 4: r4 is applied for the first time
 
 		Updating the views for A(x!,y!)
+	Dealing with side effects
+
+
+INTENSIONAL DESCRIPTION:
+Id=3
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	C(x!free)
+	Wake-up rules
 
 	Applying rule 5: r5:
-		the predcondition is not satsified yet
+		the predcondition is satisfied
+
+		rule 5: r5 is applied for the first time
+
+		Updating the views for A(x!,y!)
+	Dealing with side effects
+
+
+INTENSIONAL DESCRIPTION:
+Id=3
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	B(x!free)
+	Wake-up rules
 
 	Applying rule 6: r6:
-		the predcondition is not satsified yet
+		the predcondition is satisfied
+
+		rule 6: r6 is applied for the first time
+
+		Updating the views for A(x!,y!)
+			
+
+
+INTENSIONAL DESCRIPTION:
+Id=27
+ Node(site_type:1<1)
+  Id=0
+   Leaf False 
+
+  Id=26
+   Node(site_type:1<2)
+    Id=13
+     Node(site_type:2<1)
+      Id=0
+       Leaf False 
+
+      Id=12
+       Node(site_type:2<2)
+        Id=1
+         Leaf True 
+
+        Id=0
+         Leaf False 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+	A(x!B@x,y!C@x)
+	Wake-up rules
+		Updating the views for B(x!)
 
 	Applying rule 7: r7:
-		the predcondition is not satsified yet
+		the predcondition is satisfied
+
+		rule 7: r7 is applied for the first time
+
+		Updating the views for A(x!,y!)
+		Updating the views for C(x!)
 
 	Applying rule 3: r3:
 		the predcondition is satisfied
@@ -540,39 +730,54 @@ EXTENSIONAL DESCRIPTION:
 		rule 3: r3 is applied for the first time
 
 
+	Applying rule 1: r1:
+		the predcondition is satisfied
+
+	Applying rule 2: r2:
+		the predcondition is satisfied
+
+	Applying rule 4: r4:
+		the predcondition is satisfied
+		Updating the views for A(x!,y!)
+
+	Applying rule 5: r5:
+		the predcondition is satisfied
+		Updating the views for A(x!,y!)
+
+	Applying rule 0: r0:
+		the predcondition is satisfied
+
+	Applying rule 6: r6:
+		the predcondition is satisfied
+		Updating the views for A(x!,y!)
+		Updating the views for B(x!)
+
 ------------------------------------------------------------
 * Dead rules :
 ------------------------------------------------------------
-rule 1: r1 will never be applied.
-rule 2: r2 will never be applied.
-rule 5: r5 will never be applied.
-rule 6: r6 will never be applied.
-rule 7: r7 will never be applied.
 
 ------------------------------------------------------------
 * Dead agents :
 ------------------------------------------------------------
-B is a dead agent.
-C is a dead agent.
 
 ------------------------------------------------------------
 * Fixpoint iteration :
 ------------------------------------------------------------
 agent_type:0:A:cv_id:0
-Id=7
+Id=25
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=6
-   Node(site_type:1<1)
-    Id=5
+  Id=23
+   Node(site_type:1<2)
+    Id=17
      Node(site_type:2<0)
       Id=0
        Leaf False 
 
-      Id=4
-       Node(site_type:2<1)
+      Id=12
+       Node(site_type:2<2)
         Id=1
          Leaf True 
 
@@ -610,18 +815,46 @@ Id=3
     Id=0
      Leaf False 
 
+agent_type:1:B:cv_id:0
+Id=22
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+agent_type:2:C:cv_id:0
+Id=22
+ Node(site_type:1<0)
+  Id=0
+   Leaf False 
+
+  Id=8
+   Node(site_type:1<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
 
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=5
+Id=17
  Node(site_type:2<0)
   Id=0
    Leaf False 
 
-  Id=4
-   Node(site_type:2<1)
+  Id=12
+   Node(site_type:2<2)
     Id=1
      Leaf True 
 
@@ -645,13 +878,13 @@ Id=3
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=17
+Id=29
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
-  Id=16
-   Node(site_type:3<1)
+  Id=28
+   Node(site_type:3<2)
     Id=1
      Leaf True 
 
@@ -660,13 +893,43 @@ Id=17
 
 EXTENSIONAL DESCRIPTION:
 INTENSIONAL DESCRIPTION:
-Id=19
+Id=31
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=18
+  Id=30
    Node(site_type:0<1)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=33
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=32
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+INTENSIONAL DESCRIPTION:
+Id=33
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=32
+   Node(site_type:0<2)
     Id=1
      Leaf True 
 
@@ -679,13 +942,13 @@ EXTENSIONAL DESCRIPTION:
 * Non relational properties:
 ------------------------------------------------------------
 INTENSIONAL DESCRIPTION:
-Id=5
+Id=17
  Node(site_type:2<0)
   Id=0
    Leaf False 
 
-  Id=4
-   Node(site_type:2<1)
+  Id=12
+   Node(site_type:2<2)
     Id=1
      Leaf True 
 
@@ -693,7 +956,7 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site x in agent A is always free.
+The binding state of site x in agent A ranges over free and B@x.
 INTENSIONAL DESCRIPTION:
 Id=3
  Node(site_type:1<0)
@@ -711,13 +974,13 @@ Id=3
 EXTENSIONAL DESCRIPTION:
 The internal state of site y in agent A is always u.
 INTENSIONAL DESCRIPTION:
-Id=17
+Id=29
  Node(site_type:3<0)
   Id=0
    Leaf False 
 
-  Id=16
-   Node(site_type:3<1)
+  Id=28
+   Node(site_type:3<2)
     Id=1
      Leaf True 
 
@@ -725,14 +988,14 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site y in agent A is always free.
+The binding state of site y in agent A ranges over free and C@x.
 INTENSIONAL DESCRIPTION:
-Id=19
+Id=31
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=18
+  Id=30
    Node(site_type:0<1)
     Id=1
      Leaf True 
@@ -742,4 +1005,36 @@ Id=19
 
 EXTENSIONAL DESCRIPTION:
 The internal state of site x in agent A is always u.
+INTENSIONAL DESCRIPTION:
+Id=33
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=32
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+The binding state of site x in agent B ranges over free and A@x.
+INTENSIONAL DESCRIPTION:
+Id=33
+ Node(site_type:0<0)
+  Id=0
+   Leaf False 
+
+  Id=32
+   Node(site_type:0<2)
+    Id=1
+     Leaf True 
+
+    Id=0
+     Leaf False 
+
+EXTENSIONAL DESCRIPTION:
+The binding state of site x in agent C ranges over free and A@y.
 execution finished without any exception

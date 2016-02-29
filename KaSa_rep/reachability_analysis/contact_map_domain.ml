@@ -48,7 +48,7 @@ struct
   type local_static_information =
     {
       bond_rhs : Set_pair_triple.Set.t Map_pair_triple.Map.t;
-      bond_lhs : pair list Map_pair_triple.Map.t
+      bond_lhs : Set_pair_triple.Set.t Map_pair_triple.Map.t
     }
 
   type static_information =
@@ -213,24 +213,8 @@ struct
     in
     error, store_result
 
-  let add_link_list parameter error rule_id ((a, b, c), (d, e, f)) store_result =
-     let error, old_list =
-      match Map_pair_triple.Map.find_option_without_logs parameter error 
-        rule_id store_result
-      with
-      | error, None -> error, []
-      | error, Some l -> error, l
-     in
+   let collect_bonds parameter error (rule_id:int) bonds views store_result =
      let error, store_result =
-       Map_pair_triple.Map.add_or_overwrite parameter error rule_id 
-         (((a, b, c), (d, e, f)) :: old_list) store_result
-     in
-     error, store_result
-
-  let collect_bonds_rhs parameter error (rule_id:int) rule store_result =
-    let views = rule.Cckappa_sig.rule_rhs.Cckappa_sig.views in
-    let bonds = rule.Cckappa_sig.rule_rhs.Cckappa_sig.bonds in
-    let error, store_result =
       Int_storage.Quick_Nearly_inf_Imperatif.fold parameter error
         (fun parameter error agent_id bonds_map store_result ->
           let error, store_result =
@@ -283,59 +267,19 @@ struct
     error, store_result
 
   (*collect bonds lhs*)
-
-  let collect_bonds_lhs parameter error rule_id rule store_result =
+   let collect_bonds_rhs parameter error rule_id rule store_result =
     let views = rule.Cckappa_sig.rule_rhs.Cckappa_sig.views in
     let bonds = rule.Cckappa_sig.rule_rhs.Cckappa_sig.bonds in
     let error, store_result =
-      Int_storage.Quick_Nearly_inf_Imperatif.fold parameter error
-        (fun parameter error agent_id bonds_map store_result ->
-          let error, store_result =
-            Cckappa_sig.Site_map_and_set.Map.fold
-              (fun site_type_source site_add (error, store_result) ->
-                let agent_index_target = site_add.Cckappa_sig.agent_index in
-                let site_type_target = site_add.Cckappa_sig.site in
-                let error, agent_source =
-                  match Int_storage.Quick_Nearly_inf_Imperatif.get
-                    parameter error agent_id views
-                  with
-                  | error, None -> warn parameter error (Some "line 202") Exit
-                    Cckappa_sig.Ghost
-                  | error, Some agent -> error, agent
-                in
-                let error, agent_target =
-                  match Int_storage.Quick_Nearly_inf_Imperatif.get
-                    parameter error agent_index_target views
-                  with
-                  | error, None -> warn parameter error (Some "line 211") Exit
-                    Cckappa_sig.Ghost
-                  | error, Some agent -> error, agent
-                in
-                let error, (agent_type1, state1) =
-                  collect_agent_type_state
-                    parameter
-                    error
-                    agent_source
-                    site_type_source
-                in
-                let error, (agent_type2, state2) =
-                  collect_agent_type_state
-                    parameter
-                    error
-                    agent_target
-                    site_type_target
-                in
-                let pair = ((agent_type1, site_type_source, state1),
-                            (agent_type2, site_type_target, state2)) 
-                in
-                let error, store_result =
-                  add_link_list parameter error rule_id pair store_result 
-                in
-                error, store_result
-              ) bonds_map (error, store_result)
-          in
-          error, store_result
-        ) bonds store_result
+      collect_bonds parameter error rule_id bonds views store_result
+    in
+    error, store_result
+
+   let collect_bonds_lhs parameter error rule_id rule store_result =
+    let views = rule.Cckappa_sig.rule_lhs.Cckappa_sig.views in
+    let bonds = rule.Cckappa_sig.rule_lhs.Cckappa_sig.bonds in
+    let error, store_result =
+      collect_bonds parameter error rule_id bonds views store_result
     in
     error, store_result
 
@@ -518,24 +462,20 @@ struct
     let parameter = get_parameter static in
     let bond_lhs = get_bond_lhs static in
     let contact_map = get_local_dynamic_information dynamic in
-    let error, bond_lhs_list =
+    let error, bond_lhs_set =
       match Map_pair_triple.Map.find_option_without_logs parameter error
         rule_id bond_lhs
       with
-      | error, None -> error, []
+      | error, None -> error, Set_pair_triple.Set.empty
       | error, Some l -> error, l
     in
-    let b = (*TODO: change to set, inter set*)
-      List.for_all (fun pair ->
-        if Set_pair_triple.Set.mem pair contact_map
-        then true
-        else false
-      ) bond_lhs_list
+    let error, inter =
+      Set_pair_triple.Set.inter parameter error contact_map bond_lhs_set
     in
-    if b
+    if Set_pair_triple.Set.is_empty inter
     then error, dynamic, Some precondition
     else error, dynamic, None
-
+    
   (**************************************************************************)
 
   let apply_rule static dynamic error rule_id precondition =
