@@ -141,8 +141,7 @@ struct
 	  error
 	  precondition
       in
-      error, dynamic,
-      Some precondition
+      error, dynamic, Some precondition
     else
       let error, precondition =
 	Communication.the_rule_is_not_applied_for_the_first_time
@@ -150,8 +149,7 @@ struct
 	  error
 	  precondition
       in
-      error, dynamic,
-      Some precondition
+      error, dynamic, Some precondition
 
   let apply_rule static dynamic error rule_id precondition =
     (*false -> true: print the information that rule apply for the first
@@ -164,7 +162,7 @@ struct
     let error, rule_id_string =
       try Handler.string_of_rule parameter error kappa_handler compil rule_id
       with
-        _ -> warn parameter error (Some "line 166") Exit (string_of_int rule_id)
+        _ -> warn parameter error (Some "line 165") Exit (string_of_int rule_id)
     in
     (*print*)
     let dynamic =
@@ -270,7 +268,6 @@ struct
         error
     in
     error, dynamic, ()
-
 
   let lkappa_mixture_is_reachable static dynamic error lkappa =
     error, dynamic, Usual_domains.Maybe (* to do *)

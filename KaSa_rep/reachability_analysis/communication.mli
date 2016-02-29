@@ -6,13 +6,13 @@ type state = int
 type event =
 | Dummy (* to avoid compilation warning *)
 | Check_rule of rule_id
-| See_a_new_bond of (agent_type * site * state) * (agent_type * site * state)
+| See_a_new_bond of ((agent_type * site * state) * (agent_type * site * state))
 
 type step =
   {
     site_out: site;
     site_in: site;
-    agent_type_out: agent_type
+    agent_type_in: agent_type
   }
 
 type path =
@@ -42,6 +42,9 @@ val get_state_of_site:
   path ->
   Exception.method_handler * precondition * int list Usual_domains.top_or_not
 
+(*fill in is_enable where it output the precondition, take the
+  precondition, refine, the previous result, and output the new
+  precondition*)
 val refine_information_about_state_of_site:
   precondition ->
   (Exception.method_handler ->

@@ -77,7 +77,7 @@ Reachability analysis...
 		(rule 3) should be investigated 
 
 	Applying rule 0:
-		the predcondition is satisfied
+		the predcondition is not satsified yet
 
 	Applying rule 1:
 		the predcondition is satisfied
@@ -106,7 +106,7 @@ Reachability analysis...
 		Updating the views for B(x!,x~)
 
 	Applying rule 0:
-		the predcondition is satisfied
+		the predcondition is not satsified yet
 
 	Applying rule 1:
 		the predcondition is satisfied

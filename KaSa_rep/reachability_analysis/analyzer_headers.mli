@@ -30,8 +30,6 @@ type rule_id = int
 type global_static_information
 type global_dynamic_information
 
-
-
 type kasa_state = unit
 
 (** This is the type of the encoding of a chemical mixture as a result of
@@ -53,13 +51,28 @@ val get_compilation_information: global_static_information -> compilation_result
 
 val get_bdu_common_static : global_static_information -> Common_static.bdu_common_static
 
-val set_bdu_common_static : Common_static.bdu_common_static -> global_static_information -> global_static_information
+val set_bdu_common_static:
+  Common_static.bdu_common_static ->
+  global_static_information ->
+  global_static_information
 
-val get_side_effects : global_static_information -> Common_static.half_break_action * Common_static.remove_action
-val set_side_effects : Common_static.half_break_action * Common_static.remove_action -> global_static_information -> global_static_information
+val get_side_effects:
+  global_static_information ->
+  Common_static.half_break_action * Common_static.remove_action
 
-val get_potential_side_effects : global_static_information -> Common_static.potential_partner_free * Common_static.potential_partner_bind
-val set_potential_side_effects : Common_static.potential_partner_free * Common_static.potential_partner_bind -> global_static_information -> global_static_information
+val set_side_effects :
+  Common_static.half_break_action * Common_static.remove_action -> 
+  global_static_information ->
+  global_static_information
+
+val get_potential_side_effects :
+  global_static_information -> 
+  Common_static.potential_partner_free * Common_static.potential_partner_bind
+
+val set_potential_side_effects:
+  Common_static.potential_partner_free * Common_static.potential_partner_bind -> 
+  global_static_information ->
+  global_static_information
 
 val compute_initial_state:
   Exception.method_handler ->
@@ -72,4 +85,7 @@ val get_cc_code: global_static_information -> Cckappa_sig.compil
 
 val get_mvbdu_handler: global_dynamic_information -> Mvbdu_wrapper.Mvbdu.handler
 
-val set_mvbdu_handler: Mvbdu_wrapper.Mvbdu.handler -> global_dynamic_information -> global_dynamic_information
+val set_mvbdu_handler: 
+  Mvbdu_wrapper.Mvbdu.handler ->
+  global_dynamic_information ->
+  global_dynamic_information

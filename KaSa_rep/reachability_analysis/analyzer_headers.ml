@@ -37,7 +37,7 @@ type rule_id = int
 type event =
 | Dummy
 | Check_rule of rule_id
-| See_a_new_bond of (int * int * int) * (int * int * int)
+| See_a_new_bond of ((int * int * int) * (int * int * int))
 
 type 'a bot_or_not =
 | Bot
@@ -55,7 +55,7 @@ type step =
   {
     site_out: int;
     site_in: int;
-    agent_type_out: int
+    agent_type_in: int
   }
 type path =
   {
@@ -74,13 +74,17 @@ end
 
 module PathSetMap = 
   SetMap.Make (struct type t = path let compare = compare end)
+
 module PathMap =
-(struct
-  type 'a t = 'a PathSetMap.Map.t
-  let empty _ = PathSetMap.Map.empty
-  let add = PathSetMap.Map.add
-  let find = PathSetMap.Map.find_option
- end:PathMap)
+  (struct
+
+    type 'a t   = 'a PathSetMap.Map.t
+    
+    let empty _ = PathSetMap.Map.empty
+    let add     = PathSetMap.Map.add
+    let find    = PathSetMap.Map.find_option
+      
+   end:PathMap)
 
 type kasa_state = unit
 
