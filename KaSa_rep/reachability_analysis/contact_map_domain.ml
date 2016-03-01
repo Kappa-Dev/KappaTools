@@ -26,7 +26,7 @@ struct
   type agent_type = int
   type site_type = int
   type state_index = int
-
+		       
   type pair_triple =
     (agent_type * site_type * state_index)*(agent_type * site_type * state_index)
 
@@ -78,7 +78,7 @@ struct
   type local_dynamic_information = 
     {
       contact_map_dynamic : Set_pair_triple.Set.t;
-      contact_map_communicate :
+      contact_map_communicate : (* this is a bad field name, why not set_of_bonds & bonds_per_site *)
         (agent_type * site_type * state_index) State_map.Map.t Sites_map.Map.t
     }
 
@@ -436,11 +436,18 @@ struct
     in
     let dynamic = set_contact_map_dynamic contact_map_dynamic dynamic in
     (*contact map communicate*)
+    let error, old_map =
+      Sites_map.Map.find_default_without_logs
+	parameter error
+	State_map.Map.empty
+	(agent_type, site_type)
+	contact_map_communicate
+    in
     let error, state_map =
       State_map.Map.add_or_overwrite parameter error
         state
         (agent_type', site_type', state')
-        State_map.Map.empty (*FIXME: empty*)
+        old_map
     in
     let error, contact_map_communicate =
       Sites_map.Map.add_or_overwrite parameter error
