@@ -69,6 +69,13 @@ module Site_map_and_set = Map_wrapper.Make(SetMap.Make
     let compare = compare
    end))
 
+module AgentSite_map_and_set =
+  Map_wrapper.Make(SetMap.Make
+		     (struct
+			 type t = agent_name * site_name
+			 let compare = compare
+		       end))
+		  
 type 'state interface = 'state port Site_map_and_set.Map.t
                                                                            
 type 'interface proper_agent = 

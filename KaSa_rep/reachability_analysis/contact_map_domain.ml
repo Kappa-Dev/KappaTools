@@ -23,9 +23,9 @@ module Domain =
 struct
 
   type rule_id = int
-  type agent_type = int
-  type site_type = int
-  type state_index = int
+  type agent_type = Cckappa_sig.agent_name (* this is better to use Cckappa_sig types, they are here for that, and eventually, we want to make these type definitions abstract *)
+  type site_type = Cckappa_sig.site_name
+  type state_index = Cckappa_sig.state_index
 		       
   type pair_triple =
     (agent_type * site_type * state_index)*(agent_type * site_type * state_index)
@@ -58,13 +58,7 @@ struct
       local_static_information  : local_static_information
     }
 
-  module Sites_map =
-    Map_wrapper.Make
-      (SetMap.Make
-         (struct
-           type t = (agent_type * site_type)
-           let compare = compare
-          end))
+  module Sites_map = Cckappa_sig.AgentSite_map_and_set (* It is always better to share the definition of these modules (once for each type) *)
       
   module State_map =
     Map_wrapper.Make
@@ -444,9 +438,6 @@ struct
   let add_oriented_bond_in_map_of_bonds static dynamic error 
       ((agent_type, site_type, state), (agent_type', site_type', state')) =
     let parameter = get_parameter static in
-    let pair_triple =
-      ((agent_type, site_type, state), (agent_type', site_type', state'))
-    in
     (*current value of the variable dynamic*)
     let contact_map_communicate = get_contact_map_communicate dynamic in
     (*contact map communicate*)
