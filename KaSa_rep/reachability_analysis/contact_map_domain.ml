@@ -574,6 +574,29 @@ struct
       Set_pair_triple.Set.diff parameter error new_contact_map contact_map
     in
     let error = Exception.check warn parameter error error' (Some "line 569") Exit in
+    (*update the second field, by fold over the diff and for each bond in
+      the diff add it in the second field*)
+    let error, dynamic =
+      Set_pair_triple.Set.fold
+        (fun ((agent_type, site_type, state), (agent_type', site_type', state'))
+          (error, dynamic) ->
+            let contact_map_communicate = get_contact_map_communicate dynamic in
+            let error, state_map =
+              State_map.Map.add_or_overwrite parameter error
+                state 
+                (agent_type', site_type', state')
+                State_map.Map.empty (*FIXME: do I start from empty map is correct?*)
+            in
+            let error, contact_map_communicate = 
+              Sites_map.Map.add_or_overwrite parameter error
+                (agent_type, site_type)
+                state_map
+                contact_map_communicate
+            in
+            let dynamic = set_contact_map_communicate contact_map_communicate dynamic in
+            error, dynamic
+        ) map_diff (error, dynamic)
+    in
     let dynamic = set_contact_map_dynamic new_contact_map dynamic in
     let event_list =
       Set_pair_triple.Set.fold (fun pair event_list ->
