@@ -419,22 +419,36 @@ struct
 
   (**************************************************************************)
   (*Implementation*)
-     
-  let add_bond static dynamic error 
-      ((agent_type, site_type, state), (agent_type', site_type', state')) =
+
+ 							  
+  let add_oriented_bond_in_set_of_bonds static dynamic error
+			       ((agent_type, site_type, state), (agent_type', site_type', state')) =
     let parameter = get_parameter static in
     let pair_triple =
       ((agent_type, site_type, state), (agent_type', site_type', state'))
     in
     (*current value of the variable dynamic*)
     let contact_map_dynamic = get_contact_map_dynamic dynamic in
-    let contact_map_communicate = get_contact_map_communicate dynamic in
     (*add a bond (a pair of triples) of does what is neccessary *)
     let error, contact_map_dynamic =
       Set_pair_triple.Set.add_when_not_in parameter error pair_triple
         contact_map_dynamic
     in
     let dynamic = set_contact_map_dynamic contact_map_dynamic dynamic in
+    error, dynamic		       
+
+  let add_bond_in_set_of_bonds static dynamic error (x,y) =
+    let error, dynamic = add_oriented_bond_in_set_of_bonds static dynamic error (x,y) in
+    add_oriented_bond_in_set_of_bonds static dynamic error (y,x)
+				      
+  let add_oriented_bond_in_map_of_bonds static dynamic error 
+      ((agent_type, site_type, state), (agent_type', site_type', state')) =
+    let parameter = get_parameter static in
+    let pair_triple =
+      ((agent_type, site_type, state), (agent_type', site_type', state'))
+    in
+    (*current value of the variable dynamic*)
+    let contact_map_communicate = get_contact_map_communicate dynamic in
     (*contact map communicate*)
     let error, old_map =
       Sites_map.Map.find_default_without_logs
@@ -459,6 +473,22 @@ struct
     let dynamic = set_contact_map_communicate contact_map_communicate dynamic in
     error, dynamic
 
+  let add_bond_in_map_of_bonds static dynamic error (x,y) =
+    let error, dynamic = add_oriented_bond_in_map_of_bonds static dynamic error (x,y) in
+    add_oriented_bond_in_map_of_bonds static dynamic error (y,x)
+
+  let add_oriented_bond static dynamic error bond =
+    let error, dynamic = add_oriented_bond_in_set_of_bonds static dynamic error bond in
+    add_oriented_bond_in_map_of_bonds static dynamic error bond
+				      
+  let add_bond static dynamic error bond =
+    let error, dynamic = add_bond_in_set_of_bonds static dynamic error bond in
+    add_bond_in_map_of_bonds static dynamic error bond
+
+  (* make sure the appropriate version among oriented and unoriented, is used each one (the result must be unenrioted) *)
+  (* basically, either the input is unoriented, which means that each time the bond (x,y) is given, the bond (y,x) is given as well, and we can use the oriented version *)
+  (* but if this is not the case, we have to use the unoriented version *)
+			     
   (**bond occurs in the initial state*)
 
   let collect_bonds_initial static dynamic error init_state =
@@ -578,24 +608,10 @@ struct
       the diff add it in the second field*)
     let error, dynamic =
       Set_pair_triple.Set.fold
-        (fun ((agent_type, site_type, state), (agent_type', site_type', state'))
-          (error, dynamic) ->
-            let contact_map_communicate = get_contact_map_communicate dynamic in
-            let error, state_map =
-              State_map.Map.add_or_overwrite parameter error
-                state 
-                (agent_type', site_type', state')
-                State_map.Map.empty (*FIXME: do I start from empty map is correct?*)
-            in
-            let error, contact_map_communicate = 
-              Sites_map.Map.add_or_overwrite parameter error
-                (agent_type, site_type)
-                state_map
-                contact_map_communicate
-            in
-            let dynamic = set_contact_map_communicate contact_map_communicate dynamic in
-            error, dynamic
-        ) map_diff (error, dynamic)
+        (fun bond (error, dynamic) ->
+         add_bond_in_map_of_bonds static dynamic error bond
+	)
+	map_diff (error, dynamic)
     in
     let dynamic = set_contact_map_dynamic new_contact_map dynamic in
     let event_list =
