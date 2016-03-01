@@ -27,13 +27,14 @@ struct
   type site_name = int
   type state_index = int
 
-  type pair = (agent_name * site_name * state_index)*(agent_name * site_name * state_index)
+  type pair_triple =
+    (agent_name * site_name * state_index)*(agent_name * site_name * state_index)
 
   module Set_pair_triple =
     Map_wrapper.Make
       (SetMap.Make
          (struct
-           type t = pair
+           type t = pair_triple
            let compare = compare
           end))
 
@@ -57,8 +58,30 @@ struct
       local_static_information  : local_static_information
     }
 
-  type local_dynamic_information = Set_pair_triple.Set.t (*TODO*)
-    
+  type pair_tuples = (agent_name * site_name) * (agent_name * site_name)
+
+  module Sites_map =
+    Map_wrapper.Make
+      (SetMap.Make
+         (struct
+           type t = pair_tuples
+           let compare = compare
+          end))
+      
+  module State_map =
+    Map_wrapper.Make
+      (SetMap.Make
+         (struct
+           type t = state_index * state_index
+           let compare = compare
+          end))
+      
+      
+  type local_dynamic_information = 
+    {
+      contact_map_dynamic : Set_pair_triple.Set.t;
+      contact_map_communicate : pair_tuples State_map.Map.t Sites_map.Map.t
+    }
 
   type dynamic_information =
     {
@@ -115,10 +138,30 @@ struct
       dynamic with local = local
     }
 
+  let get_contact_map_dynamic dynamic =
+    (get_local_dynamic_information dynamic).contact_map_dynamic
+
+  let set_contact_map_dynamic contact_map dynamic =
+    set_local_dynamic_information
+      {
+        (get_local_dynamic_information dynamic) with
+          contact_map_dynamic = contact_map
+      } dynamic
+  
+  let get_contact_map_communicate dynamic =
+    (get_local_dynamic_information dynamic).contact_map_communicate
+
+  let set_contact_map_communicate contact_map dynamic =
+    set_local_dynamic_information
+      {
+        (get_local_dynamic_information dynamic) with
+          contact_map_communicate = contact_map
+      } dynamic
+      
   (**************************************************************************)
   (*implementations*)
 
-  (*dual: contact map including initial state*)
+  (*dual: contact map including initial state, use in views_domain*)
   
   module Map_dual =
     Map_wrapper.Make
@@ -335,9 +378,15 @@ struct
         local_static_information = init_domain_static
       }
     in
+    let init_local =
+      {
+        contact_map_dynamic = Set_pair_triple.Set.empty;
+        contact_map_communicate = Sites_map.Map.empty
+      }
+    in
     let init_global_dynamic_information =
       {
-        local  = Set_pair_triple.Set.empty;
+        local  = init_local;
         global = dynamic
       }
     in
@@ -432,17 +481,48 @@ struct
     in
     error, store_result
 
+  (*implementation of contact_map_communicate*)
+
+  let collect_communicate static dynamic error =
+    let parameter = get_parameter static in
+    let contact_map_dynamic = get_contact_map_dynamic dynamic in
+    let contact_map_communicate = get_contact_map_communicate dynamic in
+    let error, contact_map_communicate =
+      Set_pair_triple.Set.fold 
+        (fun ((agent_type, site_type, state), (agent_type', site_type', state'))
+          (error, contact_map_communicate) ->
+            let pair_tuples = ((agent_type, site_type), (agent_type', site_type')) in
+            let pair_state = (state, state') in
+            let error, state_map =
+              State_map.Map.add_or_overwrite parameter error
+                pair_state
+                pair_tuples
+                State_map.Map.empty
+            in
+            let error, store_result =
+              Sites_map.Map.add_or_overwrite parameter error
+                pair_tuples
+                state_map
+                contact_map_communicate
+            in
+            error, store_result
+        ) contact_map_dynamic (error, contact_map_communicate)
+    in
+    let dynamic = set_contact_map_communicate contact_map_communicate dynamic in
+    error, dynamic
+
   let collect_bonds_initial static dynamic error init_state =
     let parameter = get_parameter static in
-    let store_result = get_local_dynamic_information dynamic in
-    let error, store_result =
+    let contact_map_dynamic = get_contact_map_dynamic dynamic in
+    let error, contact_map_dynamic =
       collect_bonds_initial_aux
         parameter
         error
         init_state
-        store_result
+        contact_map_dynamic
     in
-    let dynamic = set_local_dynamic_information store_result dynamic in
+    let dynamic = set_contact_map_dynamic contact_map_dynamic dynamic in
+    let error, dynamic = collect_communicate static dynamic error in
     error, dynamic
 
   (**************************************************************************)
@@ -461,7 +541,7 @@ struct
       None, *)
     let parameter = get_parameter static in
     let bond_lhs = get_bond_lhs static in
-    let contact_map = get_local_dynamic_information dynamic in
+    let contact_map = get_contact_map_dynamic dynamic in
     let error, bond_lhs_set =
       match Map_pair_triple.Map.find_option_without_logs parameter error
         rule_id bond_lhs
@@ -483,7 +563,7 @@ struct
     let parameter = get_parameter static in
     (*add the bonds in the rhs into the contact map, by doing union set
       with contact map*)
-    let contact_map = get_local_dynamic_information dynamic in
+    let contact_map = get_contact_map_dynamic dynamic in
     let bond_rhs_map = get_bond_rhs static in
     let error, bond_rhs_set =
       match Map_pair_triple.Map.find_option_without_logs parameter error rule_id
@@ -495,16 +575,16 @@ struct
     let error', union =
       Set_pair_triple.Set.union parameter error contact_map bond_rhs_set
     in
-    let error = Exception.check warn parameter error error' (Some "line 558") Exit in
-    let dynamic = set_local_dynamic_information union dynamic in
-    let new_contact_map = get_local_dynamic_information dynamic in
+    let error = Exception.check warn parameter error error' (Some "line 578") Exit in
+    let dynamic = set_contact_map_dynamic union dynamic in
+    let new_contact_map = get_contact_map_dynamic dynamic in
     (*check if it is seen for the first time, if not update the contact
       map, and raise an event*)
     let error', map_diff =
       Set_pair_triple.Set.diff parameter error new_contact_map contact_map
     in
-    let error = Exception.check warn parameter error error' (Some "line 566") Exit in
-    let dynamic = set_local_dynamic_information new_contact_map dynamic in
+    let error = Exception.check warn parameter error error' (Some "line 586") Exit in
+    let dynamic = set_contact_map_dynamic new_contact_map dynamic in
     let event_list =
       Set_pair_triple.Set.fold (fun pair event_list ->
         (Communication.See_a_new_bond pair) :: event_list
