@@ -38,11 +38,14 @@ struct
   (* put here the type of the struct that contains the rest of the
      dynamic information, including the result of the analysis *)
 
+  type agent_type = int
+  type cv_id = int
+
   module Map_bdu_update =
     Map_wrapper.Make
       (SetMap.Make
          (struct
-           type t = int * int
+           type t = agent_type * cv_id
            let compare = compare
           end))
 

@@ -23,11 +23,17 @@ let local_trace = false
 
 module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif
 
+type agent_type = int
+type agent_id = int
+type site_type = int
+type cv_id = int
+type rule_id = int
+
 module Int2Map_CV =
   Map_wrapper.Make
     (SetMap.Make
        (struct
-         type t = int * int
+         type t = agent_type * site_type
          let compare = compare
         end))
 
@@ -35,21 +41,21 @@ module Int2Map_CV =
 module Map_creation_bdu =
   SetMap.Make (
     struct
-      type t = int * int * int
+      type t = agent_type * rule_id * cv_id
       let compare = compare
     end)
 
 module Map_final_creation_bdu =
   SetMap.Make (
     struct
-      type t = int
+      type t = rule_id
       let compare = compare
     end)
 
 module Map_agent_type_creation_bdu =
   SetMap.Make (
     struct
-      type t = int * int (*agent_type, cv_id*)
+      type t = agent_type * cv_id
       let compare = compare
     end)
 
@@ -60,7 +66,7 @@ module Map_modif_list =
   Map_wrapper.Make
     (SetMap.Make (
       struct
-        type t = int * int * int * int
+        type t = agent_id * agent_type * rule_id * cv_id
         let compare = compare
       end))
 
@@ -69,7 +75,7 @@ module Map_modif_list =
 module Map_potential_bdu =
   SetMap.Make (
     struct
-      type t = int * int * int * int
+      type t = agent_type * site_type * rule_id * cv_id
       let compare = compare
     end)
 
@@ -77,14 +83,14 @@ module Map_potential_bdu =
 module Map_final_potential_bdu =
   SetMap.Make (
     struct
-      type t = int
+      type t = rule_id
       let compare = compare
     end)
 
 module Map_agent_type_potential_bdu =
   SetMap.Make (
     struct
-      type t = int * int * int (*agent_type, site_type, cv_id*)
+      type t = agent_type * site_type * cv_id
       let compare = compare
     end)
 
@@ -95,21 +101,21 @@ module Project2bdu_potential =
 module Map_test_bdu =
   SetMap.Make (
     struct
-      type t = int * int * int * int
+      type t = agent_id * agent_type * rule_id * cv_id
       let compare = compare
     end)
 
 module Map_rule_id_views =
   SetMap.Make
     (struct
-      type t = int
+      type t = rule_id
       let compare = compare
      end)
     
 module Map_triple_views =
   SetMap.Make
     (struct 
-      type t = int * int * int
+      type t = agent_id * agent_type * cv_id
       let compare = compare
      end)
     
@@ -123,7 +129,7 @@ module Int2Map_Modif =
   Map_wrapper.Make
     (SetMap.Make
        (struct
-         type t = int * int * int
+         type t = agent_id * agent_type * site_type
          let compare = compare
         end))
 
@@ -131,7 +137,7 @@ module Int2Map_Test_Modif =
   Map_wrapper.Make
     (SetMap.Make
        (struct 
-         type t = int * int
+         type t = agent_type * site_type
          let compare = compare
         end))
 

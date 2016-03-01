@@ -21,11 +21,14 @@ let warn parameters mh message exn default =
 
 let local_trace = false
 
+type agent_type = int
+type cv_id = int
+
 module Int2Map_CV_Modif =
   Map_wrapper.Make
     (SetMap.Make
        (struct
-         type t = int * int
+         type t = agent_type * cv_id
          let compare = compare
         end))
 

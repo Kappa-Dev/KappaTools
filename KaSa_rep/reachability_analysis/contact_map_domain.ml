@@ -23,12 +23,12 @@ module Domain =
 struct
 
   type rule_id = int
-  type agent_name = int
-  type site_name = int
+  type agent_type = int
+  type site_type = int
   type state_index = int
 
   type pair_triple =
-    (agent_name * site_name * state_index)*(agent_name * site_name * state_index)
+    (agent_type * site_type * state_index)*(agent_type * site_type * state_index)
 
   module Set_pair_triple =
     Map_wrapper.Make
@@ -62,7 +62,7 @@ struct
     Map_wrapper.Make
       (SetMap.Make
          (struct
-           type t = (agent_name * site_name)
+           type t = (agent_type * site_type)
            let compare = compare
           end))
       
@@ -79,7 +79,7 @@ struct
     {
       contact_map_dynamic : Set_pair_triple.Set.t;
       contact_map_communicate :
-        (agent_name * site_name * state_index) State_map.Map.t Sites_map.Map.t
+        (agent_type * site_type * state_index) State_map.Map.t Sites_map.Map.t
     }
 
   type dynamic_information =
@@ -166,7 +166,7 @@ struct
     Map_wrapper.Make
       (SetMap.Make
          (struct
-           type t = agent_name * site_name * state_index
+           type t = agent_type * site_type * state_index
            let compare = compare
           end))
 
@@ -174,7 +174,7 @@ struct
     Map_wrapper.Make
       (SetMap.Make
          (struct
-           type t = agent_name * site_name * state_index
+           type t = agent_type * site_type * state_index
            let compare = compare
           end))
 
@@ -226,12 +226,12 @@ struct
           parameter error site_type
           agent1.Cckappa_sig.agent_interface
         with
-        | error, None ->  warn parameter error (Some "line 120") Exit 0
+        | error, None ->  warn parameter error (Some "line 228") Exit 0
         | error, Some port ->
           let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
           if state > 0
           then error, state
-          else warn parameter error (Some "line 125") Exit 0
+          else warn parameter error (Some "line 234") Exit 0
       in
       error, (agent_type1, state1) 
 
@@ -268,7 +268,7 @@ struct
                   match Int_storage.Quick_Nearly_inf_Imperatif.get
                     parameter error agent_id views
                   with
-                  | error, None -> warn parameter error (Some "line 202") Exit
+                  | error, None -> warn parameter error (Some "line 271") Exit
                     Cckappa_sig.Ghost
                   | error, Some agent -> error, agent
                 in
@@ -276,7 +276,7 @@ struct
                   match Int_storage.Quick_Nearly_inf_Imperatif.get
                     parameter error agent_index_target views
                   with
-                  | error, None -> warn parameter error (Some "line 211") Exit
+                  | error, None -> warn parameter error (Some "line 279") Exit
                     Cckappa_sig.Ghost
                   | error, Some agent -> error, agent
                 in
@@ -440,7 +440,7 @@ struct
       State_map.Map.add_or_overwrite parameter error
         state
         (agent_type', site_type', state')
-        State_map.Map.empty
+        State_map.Map.empty (*FIXME: empty*)
     in
     let error, contact_map_communicate =
       Sites_map.Map.add_or_overwrite parameter error
@@ -470,7 +470,7 @@ struct
                   match Int_storage.Quick_Nearly_inf_Imperatif.get
                     parameter error agent_id views
                   with
-                  | error, None -> warn parameter error (Some "line 202") Exit
+                  | error, None -> warn parameter error (Some "line 473") Exit
                     Cckappa_sig.Ghost
                   | error, Some agent -> error, agent
                 in
@@ -478,7 +478,7 @@ struct
                   match Int_storage.Quick_Nearly_inf_Imperatif.get
                     parameter error agent_index_target views
                   with
-                  | error, None -> warn parameter error (Some "line 211") Exit
+                  | error, None -> warn parameter error (Some "line 480") Exit
                     Cckappa_sig.Ghost
                   | error, Some agent -> error, agent
                 in
@@ -558,7 +558,7 @@ struct
     let error', union =
       Set_pair_triple.Set.union parameter error contact_map bond_rhs_set
     in
-    let error = Exception.check warn parameter error error' (Some "line 558") Exit in
+    let error = Exception.check warn parameter error error' (Some "line 561") Exit in
     let dynamic = set_contact_map_dynamic union dynamic in
     let new_contact_map = get_contact_map_dynamic dynamic in
     (*check if it is seen for the first time, if not update the contact
@@ -566,7 +566,7 @@ struct
     let error', map_diff =
       Set_pair_triple.Set.diff parameter error new_contact_map contact_map
     in
-    let error = Exception.check warn parameter error error' (Some "line 568") Exit in
+    let error = Exception.check warn parameter error error' (Some "line 569") Exit in
     let dynamic = set_contact_map_dynamic new_contact_map dynamic in
     let event_list =
       Set_pair_triple.Set.fold (fun pair event_list ->
