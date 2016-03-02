@@ -63,19 +63,47 @@ type 'state port =
     site_state    : 'state
   }
 
-module Site_map_and_set = Map_wrapper.Make(SetMap.Make 
-  (struct
-    type t      = site_name
-    let compare = compare
-   end))
+module Site_map_and_set = 
+  Map_wrapper.Make
+    (SetMap.Make 
+       (struct
+         type t      = site_name
+         let compare = compare
+        end))
 
 module AgentSite_map_and_set =
-  Map_wrapper.Make(SetMap.Make
-		     (struct
-			 type t = agent_name * site_name
-			 let compare = compare
-		       end))
-		  
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+	 type t = agent_name * site_name
+	 let compare = compare
+	end))
+
+module State_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = state_index
+         let compare = compare
+        end))
+
+module AgentSiteState_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = agent_name * site_name * state_index
+         let compare = compare
+        end))
+    
+module PairAgentSiteState_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = (agent_name * site_name * state_index) *
+           (agent_name * site_name * state_index)
+         let compare = compare
+        end))
+
 type 'state interface = 'state port Site_map_and_set.Map.t
                                                                            
 type 'interface proper_agent = 
