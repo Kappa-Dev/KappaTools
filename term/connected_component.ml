@@ -358,15 +358,6 @@ let empty sigs =
   let nbt' = Array.make (Signature.size sigs) [] in
   fresh sigs nbt' 1 (IntMap.add 0 (empty_point sigs) IntMap.empty) IntMap.empty
 
-let finalize env =
-  match env.domain with
-  | Final _ -> env
-  | Provisional s ->
-     let si = match IntMap.max_key s with Some i -> succ i | None -> 0 in
-     let out = Array.make si (empty_point env.sig_decl) in
-     let () = IntMap.iter (fun i p -> out.(i) <- p) s in
-     { env with domain = Final out}
-
 let check_vitality env = assert (env.used_by_a_begin_new = false)
 
 let print f env =
@@ -516,6 +507,61 @@ let print_dot f env =
 		(fun i f s -> print_point_dot (sigs env) f (i,s)) f a
   in
   Format.fprintf f "}@]@."
+
+let rec remove_from_sons level1 set to_keep cc_id = function
+  | [] -> to_keep,set
+  | id :: tail ->
+     match IntMap.find_option id set with
+     | None -> remove_from_sons level1 set to_keep cc_id tail
+     | Some cc ->
+	let sons = List.filter (fun t -> t.dst <> cc_id) cc.sons in
+	match cc.is_obs_of,sons with
+	| Some _, _ -> remove_from_sons level1 set true cc_id tail
+	| None, _ when List.mem id level1 ->
+	   remove_from_sons level1 set true cc_id tail
+	| None, [] ->
+	   let to_keep',set' = remove_from_sons level1 set false id cc.fathers in
+	   let set'' = if to_keep' then set' else IntMap.remove id set' in
+	     remove_from_sons level1 set'' (to_keep || to_keep') cc_id tail
+	| None, _ :: _ ->
+	   let set' =
+	     scan_sons level1 (IntMap.add id {cc with sons = sons} set)
+		       true id cc.fathers in
+	   remove_from_sons level1 set' to_keep cc_id tail
+and scan_sons level1 set keep_last cc_id = function
+  | [] -> set
+  | [ _ ] when keep_last -> set
+  | id :: tail ->
+     match IntMap.find_option id set with
+     | None -> set
+     | Some cc ->
+	match cc.is_obs_of, cc.sons with
+	| Some _, _ -> scan_sons level1 set false cc_id tail
+	| None, _ :: _ :: _ -> scan_sons level1 set false cc_id tail
+	| None, [] -> assert false
+	| None, [ son ] ->
+	   let () = assert (son.dst = cc_id) in
+	   if List.mem id level1 then scan_sons level1 set false cc_id tail
+	   else
+	     let to_keep,set' =
+	       remove_from_sons level1 set false id cc.fathers in
+	     let set'' = if to_keep then set' else IntMap.remove id set' in
+	     scan_sons level1 set'' keep_last cc_id tail
+
+let finalize env =
+  let level1 = let zero = get env 0 in List.map (fun p -> p.dst) zero.sons in
+  let f id p env =
+    if p.sons = []
+    then scan_sons level1 env true id p.fathers
+    else env in
+  match env.domain with
+  | Final _ -> env
+  | Provisional s ->
+     let s' = IntMap.fold f s s in
+     let si = match IntMap.max_key s' with Some i -> succ i | None -> 0 in
+     let out = Array.make si (empty_point env.sig_decl) in
+     let () = IntMap.iter (fun i p -> out.(i) <- p) s' in
+     { env with domain = Final out}
 end
 
 let propagate_add_obs obs_id env cc_id =
