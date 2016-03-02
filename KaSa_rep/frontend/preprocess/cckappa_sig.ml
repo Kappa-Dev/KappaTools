@@ -67,6 +67,14 @@ type cv_id = int
 type rule_id = int
 type agent_id = int
 
+module Rule_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = rule_id
+         let compare = compare
+        end))
+
 module Site_map_and_set = 
   Map_wrapper.Make
     (SetMap.Make 

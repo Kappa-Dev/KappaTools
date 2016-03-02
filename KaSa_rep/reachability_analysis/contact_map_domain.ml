@@ -25,7 +25,7 @@ struct
   (* this is better to use Cckappa_sig types, they are here for that, and
      eventually, we want to make these type definitions abstract *)
 
-  type rule_id = int
+  type rule_id = Cckappa_sig.rule_id
   type agent_type = Cckappa_sig.agent_name   
   type site_type = Cckappa_sig.site_name
   type state_index = Cckappa_sig.state_index
@@ -35,21 +35,8 @@ struct
 
   module PairAgentSiteState_map_and_set = Cckappa_sig.PairAgentSiteState_map_and_set
 
-    (*Map_wrapper.Make
-      (SetMap.Make
-         (struct
-           type t = pair_triple
-           let compare = compare
-          end))*)
+  module Rule_map_and_set = Cckappa_sig.Rule_map_and_set
 
-  module Rule_map_and_set =
-    Map_wrapper.Make
-      (SetMap.Make
-         (struct
-           type t = rule_id
-           let compare = compare
-          end))
-      
   type local_static_information =
     {
       bond_rhs : PairAgentSiteState_map_and_set.Set.t Rule_map_and_set.Map.t;
@@ -157,21 +144,7 @@ struct
   (*dual: contact map including initial state, use in views_domain*)
   
   module AgentSiteState_map_and_set = Cckappa_sig.AgentSiteState_map_and_set
-    (*Map_wrapper.Make
-      (SetMap.Make
-         (struct
-           type t = agent_type * site_type * state_index
-           let compare = compare
-          end))
-
-  module Set_triple =
-    Map_wrapper.Make
-      (SetMap.Make
-         (struct
-           type t = agent_type * site_type * state_index
-           let compare = compare
-          end))*)
-
+ 
   let collect_dual_map parameter error handler store_result =
     let error, store_result =
       Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
