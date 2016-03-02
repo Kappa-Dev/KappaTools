@@ -63,11 +63,23 @@ type 'state port =
     site_state    : 'state
   }
 
+type cv_id = int
+type rule_id = int
+type agent_id = int
+
 module Site_map_and_set = 
   Map_wrapper.Make
     (SetMap.Make 
        (struct
          type t      = site_name
+         let compare = compare
+        end))
+
+module State_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = state_index
          let compare = compare
         end))
 
@@ -79,11 +91,27 @@ module AgentSite_map_and_set =
 	 let compare = compare
 	end))
 
-module State_map_and_set =
+module AgentCV_map_and_set =
+  Map_wrapper.Make (
+    SetMap.Make (
+      struct
+        type t = agent_name * cv_id
+        let compare = compare
+      end))
+
+module AgentRule_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
        (struct
-         type t = state_index
+         type t = agent_name * rule_id
+         let compare = compare
+        end))
+
+module AgentsSite_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = agent_id * agent_name * site_name
          let compare = compare
         end))
 
@@ -94,7 +122,15 @@ module AgentSiteState_map_and_set =
          type t = agent_name * site_name * state_index
          let compare = compare
         end))
-    
+
+module AgentsRuleCV_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make (
+      struct
+        type t = agent_id * agent_name * rule_id * cv_id
+        let compare = compare
+      end))
+
 module PairAgentSiteState_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
@@ -103,6 +139,70 @@ module PairAgentSiteState_map_and_set =
            (agent_name * site_name * state_index)
          let compare = compare
         end))
+
+(*TODO: implement Proj2 in Map_wrapper.ml*)
+
+module Rule_setmap =
+  SetMap.Make (
+    struct
+      type t = rule_id
+      let compare = compare
+    end)
+
+module AgentCV_setmap =
+  SetMap.Make (
+    struct
+      type t = agent_name * cv_id
+      let compare = compare
+    end)
+
+module AgentsCV_setmap =
+  SetMap.Make
+    (struct 
+      type t = agent_id * agent_name * cv_id
+      let compare = compare
+     end)
+
+module AgentSiteCV_setmap =
+  SetMap.Make (
+    struct
+      type t = agent_name * site_name * cv_id
+      let compare = compare
+    end)
+
+module AgentRuleCV_setmap =
+  SetMap.Make (
+    struct
+      type t = agent_name * rule_id * cv_id
+      let compare = compare
+    end)
+
+module AgentsRuleCV_setmap =
+  (SetMap.Make (
+    struct
+      type t = agent_id * agent_name * rule_id * cv_id
+      let compare = compare
+    end))
+
+module AgentSiteRuleCV_setmap =
+  SetMap.Make (
+    struct
+      type t = agent_name * site_name * rule_id * cv_id
+      let compare = compare
+    end)
+
+module Project2bdu_creation =
+  SetMap.Proj2 (AgentRuleCV_setmap)(Rule_setmap)(AgentCV_setmap)
+
+module Project2bdu_potential =
+  SetMap.Proj2 (AgentSiteRuleCV_setmap)(Rule_setmap)(AgentSiteCV_setmap)
+    
+module Project2_bdu_views =
+  SetMap.Proj2 (AgentsRuleCV_setmap)(Rule_setmap)(AgentsCV_setmap)
+
+module Project2_modif =
+  Map_wrapper.Proj (AgentsSite_map_and_set) (AgentSite_map_and_set)
+
 
 type 'state interface = 'state port Site_map_and_set.Map.t
                                                                            

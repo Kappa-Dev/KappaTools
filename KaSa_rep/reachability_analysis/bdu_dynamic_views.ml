@@ -21,20 +21,11 @@ let warn parameters mh message exn default =
 
 let local_trace = false
 
-type agent_type = int
-type cv_id = int
-
-module Int2Map_CV_Modif =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = agent_type * cv_id
-         let compare = compare
-        end))
+module AgentCV_map_and_set = Cckappa_sig.AgentCV_map_and_set
 
 type bdu_analysis_dynamic =
   {
-    store_update : (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;
+    store_update : (int list * Site_map_and_set.Set.t) AgentCV_map_and_set.Map.t;
   }
 
 (************************************************************************************)
@@ -45,7 +36,7 @@ let store_covering_classes_modification_update_aux parameter error agent_type_cv
     site_type_cv cv_id store_test_modification_map store_result =
   let add_link (agent_type, cv_id) rule_id_set store_result =
     let error, (l, old) =
-      match Int2Map_CV_Modif.Map.find_option_without_logs parameter error
+      match AgentCV_map_and_set.Map.find_option_without_logs parameter error
         (agent_type, cv_id) store_result
       with
       | error, None -> error, ([], Site_map_and_set.Set.empty)
@@ -56,15 +47,18 @@ let store_covering_classes_modification_update_aux parameter error agent_type_cv
     in
     let error = Exception.check warn parameter error error' (Some "line 75") Exit in
     let error, result =
-      Int2Map_CV_Modif.Map.add_or_overwrite parameter error (agent_type, cv_id) (l, new_set)
+      AgentCV_map_and_set.Map.add_or_overwrite parameter error (agent_type, cv_id) 
+        (l, new_set)
         store_result
     in
     error, result
   in
   (*-------------------------------------------------------------------------------*)
   let error, (l, rule_id_set) =
-    match Bdu_static_views.Int2Map_Test_Modif.Map.find_option_without_logs parameter error
-      (agent_type_cv, site_type_cv) store_test_modification_map
+    match Bdu_static_views.AgentSite_map_and_set.Map.find_option_without_logs
+      parameter error
+      (agent_type_cv, site_type_cv)
+      store_test_modification_map
     with
     | error, None -> error, ([], Site_map_and_set.Set.empty)
     | error, Some (l, s) -> error, (l, s)
@@ -75,7 +69,7 @@ let store_covering_classes_modification_update_aux parameter error agent_type_cv
     (*-------------------------------------------------------------------------------*)
     (*map this map*)
   let store_result =
-    Int2Map_CV_Modif.Map.map (fun (l, x) -> List.rev l, x) result
+    AgentCV_map_and_set.Map.map (fun (l, x) -> List.rev l, x) result
   in
   error, store_result
     
@@ -85,7 +79,7 @@ let store_covering_classes_modification_update parameter error
     store_test_modification_map
     store_covering_classes_id =
   let error, store_result =
-    Bdu_static_views.Int2Map_CV.Map.fold
+    Bdu_static_views.AgentSite_map_and_set.Map.fold
       (fun (agent_type_cv, site_type_cv) (l1, l2) store_result ->
         List.fold_left (fun (error, store_current_result) cv_id ->
           let error, result =
@@ -102,13 +96,13 @@ let store_covering_classes_modification_update parameter error
         ) store_result l2
       (*REMARK: when it is folding inside a list, start with empty result,
         because the add_link function has already called the old result.*)
-      ) store_covering_classes_id (error, Int2Map_CV_Modif.Map.empty)
+      ) store_covering_classes_id (error, AgentCV_map_and_set.Map.empty)
   in
   let store_result =
-    Int2Map_CV_Modif.Map.map (fun (l, x) -> List.rev l, x) store_result
+    AgentCV_map_and_set.Map.map (fun (l, x) -> List.rev l, x) store_result
   in
   error, store_result
-
+ 
 (************************************************************************************)
 (*combine update(c) and update(c') of side effects together*)
 
@@ -122,7 +116,7 @@ let store_covering_classes_modification_side_effects parameter error
     store_result =
   let add_link (agent_type, cv_id) rule_id_set store_result =
     let error, (l, old) =
-      match Int2Map_CV_Modif.Map.find_option_without_logs parameter error
+      match AgentCV_map_and_set.Map.find_option_without_logs parameter error
         (agent_type, cv_id) store_result
       with
       | error, None -> error, ([], Site_map_and_set.Set.empty)
@@ -133,7 +127,9 @@ let store_covering_classes_modification_side_effects parameter error
     in
     let error = Exception.check warn parameter error error' (Some "line 169") Exit in
     let error, result =
-      Int2Map_CV_Modif.Map.add_or_overwrite parameter error (agent_type, cv_id) (l, new_set) 
+      AgentCV_map_and_set.Map.add_or_overwrite parameter error 
+        (agent_type, cv_id) 
+        (l, new_set) 
         store_result
     in
     error, result
@@ -141,7 +137,7 @@ let store_covering_classes_modification_side_effects parameter error
   (*-------------------------------------------------------------------------------*)
   let _, store_potential_side_effects_bind = store_potential_side_effects in
   let error, store_result =
-    Common_static.Int2Map_potential_effect.Map.fold 
+    Common_static.AgentRule_map_and_set.Map.fold 
       (fun (agent_type_partner, rule_id_effect) pair_list (error, store_result) ->
         List.fold_left (fun (error, store_result) (site_type_partner, state) ->
           let error, store_result =
@@ -154,7 +150,7 @@ let store_covering_classes_modification_side_effects parameter error
                     (*get a set of rule_id in update(c)*)
                       let error, (l, rule_id_set) =
                         match 
-                          Bdu_static_views.Int2Map_Test_Modif.Map.find_option_without_logs
+                          Bdu_static_views.AgentSite_map_and_set.Map.find_option_without_logs
                             parameter error
                             (agent_type_partner, site_type_partner)
                             store_test_modification_map
@@ -187,7 +183,7 @@ let store_update parameter error store_test_modification_map store_potential_sid
     store_covering_classes_id covering_classes store_result =
   let add_link error (agent_type, cv_id) rule_id_set store_result =
     let error, (l, old) =
-      match Int2Map_CV_Modif.Map.find_option_without_logs parameter error
+      match AgentCV_map_and_set.Map.find_option_without_logs parameter error
         (agent_type, cv_id) store_result
       with
       | error, None -> error, ([], Site_map_and_set.Set.empty)
@@ -198,7 +194,7 @@ let store_update parameter error store_test_modification_map store_potential_sid
     in
     let error = Exception.check warn parameter error error' (Some "line 251") Exit in
     let error, result =
-      Int2Map_CV_Modif.Map.add_or_overwrite
+      AgentCV_map_and_set.Map.add_or_overwrite
         parameter error (agent_type, cv_id) (l, new_set) store_result
     in
     error, result
@@ -210,7 +206,7 @@ let store_update parameter error store_test_modification_map store_potential_sid
       store_test_modification_map
       store_covering_classes_id
   in
-  let init_cv_modification_side_effects  = Int2Map_CV_Modif.Map.empty in
+  let init_cv_modification_side_effects  = AgentCV_map_and_set.Map.empty in
   let error, store_update_with_side_effects =
     store_covering_classes_modification_side_effects
       parameter
@@ -222,7 +218,7 @@ let store_update parameter error store_test_modification_map store_potential_sid
   in
   (*---------------------------------------------------------------------------*)
   (*fold 2 map*)
-  Int2Map_CV_Modif.Map.fold2
+  AgentCV_map_and_set.Map.fold2
     parameter
     error
     (*exists in 'a t*)
@@ -283,7 +279,7 @@ let scan_rule_dynamic parameter error rule_id rule compiled
 let init_bdu_analysis_dynamic =
   let init_bdu_analysis_dynamic =
     {
-      store_update  = Int2Map_CV_Modif.Map.empty
+      store_update  = AgentCV_map_and_set.Map.empty
     }
   in
   init_bdu_analysis_dynamic

@@ -18,42 +18,21 @@ let warn parameters mh message exn default =
 
 let trace = false
 
-module Int2Map_HalfBreak_effect =
-  Map_wrapper.Make 
-    (SetMap.Make
-       (struct 
-         type t = int * int
-         let compare = compare
-        end))
+module AgentSite_map_and_set = Cckappa_sig.AgentSite_map_and_set
+module AgentRule_map_and_set = Cckappa_sig.AgentRule_map_and_set
 
-module Int2Map_Remove_effect =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = int * int
-         let compare = compare
-        end))
-
-(*potential partner side effects*)
-
-module Int2Map_potential_effect =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = int * int
-         let compare = compare
-        end))
+type rule_id = Cckappa_sig.rule_id
+type state_index = Cckappa_sig.state_index
+type site_name = Cckappa_sig.site_name
 
 type half_break_action = 
-  (int list * (int * int) list) Int2Map_HalfBreak_effect.Map.t
+  (int list * (rule_id * state_index) list) AgentSite_map_and_set.Map.t
 
-(*do not consider the case where site has state free.*)
 type remove_action =
-  (int list * int list) Int2Map_Remove_effect.Map.t
+  (int list * rule_id list) AgentSite_map_and_set.Map.t
 
-(*potential side effects*)
-type free_partner = (int * int) list Int2Map_potential_effect.Map.t
-type bind_partner = (int * int) list Int2Map_potential_effect.Map.t
+type free_partner = (site_name * state_index) list AgentRule_map_and_set.Map.t
+type bind_partner = (site_name * state_index) list AgentRule_map_and_set.Map.t
 
 type potential_partner_free = free_partner
 type potential_partner_bind = bind_partner
@@ -71,14 +50,14 @@ let half_break_action parameter error handler rule_id half_break store_result =
   (*module (agent_type, site) -> (rule_id, binding_state) list*)
   let add_link (agent_type, site_type) (r, state) store_result =
     let error, (l, old) =
-      match Int2Map_HalfBreak_effect.Map.find_option_without_logs parameter error
+      match AgentSite_map_and_set.Map.find_option_without_logs parameter error
         (agent_type, site_type) store_result
       with
       | error, None -> error, ([], [])
       | error, Some (l, l') -> error, (l, l')
     in
     let error, result =
-      Int2Map_HalfBreak_effect.Map.add_or_overwrite
+      AgentSite_map_and_set.Map.add_or_overwrite
         parameter error (agent_type, site_type) (l, (r, state) :: old)
         store_result
     in
@@ -126,7 +105,7 @@ let half_break_action parameter error handler rule_id half_break store_result =
   (*-------------------------------------------------------------------------------*)
   (*map function*)
   let store_result =
-    Int2Map_HalfBreak_effect.Map.map (fun (l, x) -> List.rev l, x) store_result
+    AgentSite_map_and_set.Map.map (fun (l, x) -> List.rev l, x) store_result
   in
   error, store_result
 
@@ -136,14 +115,14 @@ let half_break_action parameter error handler rule_id half_break store_result =
 let remove_action parameter error rule_id remove store_result =
   let add_link (agent_type, site_type) r store_result =
     let error, (l, old) =
-      match Int2Map_Remove_effect.Map.find_option_without_logs
+      match AgentSite_map_and_set.Map.find_option_without_logs
         parameter error (agent_type, site_type) store_result
       with
       | error, None -> error, ([], [])
       | error, Some (l, l') -> error, (l, l')
     in
     let error, result =
-      Int2Map_Remove_effect.Map.add_or_overwrite
+      AgentSite_map_and_set.Map.add_or_overwrite
         parameter error (agent_type, site_type) (l, r :: old) store_result
     in
     error, result
@@ -171,7 +150,7 @@ let remove_action parameter error rule_id remove store_result =
   in
   (*-------------------------------------------------------------------------------*)
   let store_result =
-    Int2Map_Remove_effect.Map.map (fun (l, x) -> List.rev l, x) store_result
+    AgentSite_map_and_set.Map.map (fun (l, x) -> List.rev l, x) store_result
   in
   error, store_result
 
@@ -182,14 +161,14 @@ let store_potential_half_break parameter error handler rule_id half_break store_
   (*map of potential partner that is bond/free*)
   let add_link (agent_type, rule_id) (site_type, state) store_result =
     let error, old =
-      match Int2Map_potential_effect.Map.find_option_without_logs
+      match AgentRule_map_and_set.Map.find_option_without_logs
         parameter error (agent_type, rule_id) store_result
       with
       | error, None -> error, []
       | error, Some l -> error, l
     in
     let error, result =
-      Int2Map_potential_effect.Map.add_or_overwrite parameter error
+      AgentRule_map_and_set.Map.add_or_overwrite parameter error
         (agent_type, rule_id) ((site_type, state) :: old) store_result
     in
     error, result
@@ -235,7 +214,7 @@ let store_potential_half_break parameter error handler rule_id half_break store_
           in
           (*Print*)
           (*let _ =
-            Int2Map_potential_effect.Map.iter (fun (agent_type, rule_id) l ->
+            AgentRule_map_and_set.Map.iter (fun (agent_type, rule_id) l ->
               List.iter (fun (site_type, state) ->
                 Printf.fprintf stdout "FREE:rule_id:%i:agent_type:%i:site_type:%i:state:%i\n" 
                   rule_id agent_type site_type state
@@ -247,7 +226,7 @@ let store_potential_half_break parameter error handler rule_id half_break store_
           in
           (*Print*)
           (*let _ =
-            Int2Map_potential_effect.Map.iter (fun (agent_type, rule_id) l ->
+            AgentRule_map_and_set.Map.iter (fun (agent_type, rule_id) l ->
               List.iter (fun (site_type, state) ->
                 Printf.fprintf stdout "BIND:rule_id:%i:agent_type:%i:site_type:%i:state:%i\n" 
                   rule_id agent_type site_type state
@@ -264,14 +243,14 @@ let store_potential_half_break parameter error handler rule_id half_break store_
 let store_potential_remove parameter error handler rule_id remove store_result =
   let add_link (agent_type, rule_id) (site, state) store_result =
     let error, old =
-      match Int2Map_potential_effect.Map.find_option_without_logs
+      match AgentRule_map_and_set.Map.find_option_without_logs
         parameter error (agent_type, rule_id) store_result
       with
       | error, None -> error, []
       | error, Some l -> error, l
     in
     let error, result =
-      Int2Map_potential_effect.Map.add_or_overwrite parameter error (agent_type, rule_id)
+      AgentRule_map_and_set.Map.add_or_overwrite parameter error (agent_type, rule_id)
         ((site, state) :: old) store_result
     in
     error, result
@@ -312,7 +291,7 @@ let store_potential_remove parameter error handler rule_id remove store_result =
                   in
                   (*Print*)
                   (*let _ =
-                    Int2Map_potential_effect.Map.iter (fun (agent_type, rule_id) l ->
+                    AgentRule_map_and_set.Map.iter (fun (agent_type, rule_id) l ->
                       List.iter (fun (site_type, state) ->
                         Printf.fprintf stdout "REMOVE: FREE\n";
                         Printf.fprintf stdout "rule_id:%i:agent_type:%i:site_type:%i:state:%i\n" 
@@ -325,7 +304,7 @@ let store_potential_remove parameter error handler rule_id remove store_result =
                   in
                   (*Print*)
                   (*let _ =
-                    Int2Map_potential_effect.Map.iter (fun (agent_type, rule_id) l ->
+                    AgentRule_map_and_set.Map.iter (fun (agent_type, rule_id) l ->
                       List.iter (fun (site_type, state) ->
                         Printf.fprintf stdout "REMOVE: BIND\n";
                         Printf.fprintf stdout "rule_id:%i:agent_type:%i:site_type:%i:state:%i\n" 
@@ -355,7 +334,7 @@ let collect_potential_side_effects_free parameter error handler rule_id
       handler
       rule_id
       half_break
-      (Int2Map_potential_effect.Map.empty, Int2Map_potential_effect.Map.empty)
+      (AgentRule_map_and_set.Map.empty, AgentRule_map_and_set.Map.empty)
   in
   let error, store_result_remove =
     store_potential_remove
@@ -364,12 +343,12 @@ let collect_potential_side_effects_free parameter error handler rule_id
       handler
       rule_id
       remove
-      (Int2Map_potential_effect.Map.empty, Int2Map_potential_effect.Map.empty)
+      (AgentRule_map_and_set.Map.empty, AgentRule_map_and_set.Map.empty)
   in
   (*-------------------------------------------------------------------------------*)
   let add_link error (agent_type, rule_id) l store_result =
     let error, old =
-      match Int2Map_potential_effect.Map.find_option_without_logs parameter error
+      match AgentRule_map_and_set.Map.find_option_without_logs parameter error
         (agent_type, rule_id) store_result
       with
       | error, None -> error, []
@@ -377,13 +356,13 @@ let collect_potential_side_effects_free parameter error handler rule_id
     in
     let new_list = List.concat [l; old] in
     let error, result =
-      Int2Map_potential_effect.Map.add parameter error (agent_type, rule_id)
+      AgentRule_map_and_set.Map.add parameter error (agent_type, rule_id)
         new_list store_result
     in
     error, result
   in
   (*-------------------------------------------------------------------------------*)
-  Int2Map_potential_effect.Map.fold2
+  AgentRule_map_and_set.Map.fold2
     parameter
     error
     (*exists in 'a t*)
@@ -423,7 +402,7 @@ let collect_potential_side_effects_bind parameter error handler rule_id
       handler
       rule_id
       half_break
-      (Int2Map_potential_effect.Map.empty, Int2Map_potential_effect.Map.empty)
+      (AgentRule_map_and_set.Map.empty, AgentRule_map_and_set.Map.empty)
   in
   let error, store_result_remove =
     store_potential_remove
@@ -432,12 +411,12 @@ let collect_potential_side_effects_bind parameter error handler rule_id
       handler
       rule_id
       remove
-      (Int2Map_potential_effect.Map.empty, Int2Map_potential_effect.Map.empty)
+      (AgentRule_map_and_set.Map.empty, AgentRule_map_and_set.Map.empty)
   in
   (*-------------------------------------------------------------------------------*)
   let add_link error (agent_type, rule_id) l store_result =
     let error, old =
-      match Int2Map_potential_effect.Map.find_option_without_logs
+      match AgentRule_map_and_set.Map.find_option_without_logs
         parameter error (agent_type, rule_id) store_result 
       with
       | error, None -> error, []
@@ -445,13 +424,13 @@ let collect_potential_side_effects_bind parameter error handler rule_id
     in
     let new_list = List.concat [l; old] in
     let error, result =
-      Int2Map_potential_effect.Map.add parameter error (agent_type, rule_id)
+      AgentRule_map_and_set.Map.add parameter error (agent_type, rule_id)
         new_list store_result
     in
     error, result
   in
   (*-------------------------------------------------------------------------------*)
-  Int2Map_potential_effect.Map.fold2
+  AgentRule_map_and_set.Map.fold2
     parameter
     error
     (*exists in 'a t*)
@@ -568,10 +547,10 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
 (************************************************************************************)
 
 let init_bdu_common_static =
-  let init_half_break     = Int2Map_HalfBreak_effect.Map.empty  in
-  let init_remove         = Int2Map_Remove_effect.Map.empty  in
-  let init_potential_free = Int2Map_potential_effect.Map.empty in
-  let init_potential_bind = Int2Map_potential_effect.Map.empty in
+  let init_half_break     = AgentSite_map_and_set.Map.empty  in
+  let init_remove         = AgentSite_map_and_set.Map.empty  in
+  let init_potential_free = AgentRule_map_and_set.Map.empty in
+  let init_potential_bind = AgentRule_map_and_set.Map.empty in
   let init_common_static =
     {
       store_side_effects            = (init_half_break, init_remove);

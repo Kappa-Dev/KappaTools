@@ -23,170 +23,75 @@ let local_trace = false
 
 module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif
 
-type agent_type = int
-type agent_id = int
-type site_type = int
-type cv_id = int
-type rule_id = int
+module AgentSite_map_and_set = Cckappa_sig.AgentSite_map_and_set
 
-module Int2Map_CV =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = agent_type * site_type
-         let compare = compare
-        end))
+module AgentRuleCV_setmap = Cckappa_sig.AgentRuleCV_setmap
 
-(*creation*)
-module Map_creation_bdu =
-  SetMap.Make (
-    struct
-      type t = agent_type * rule_id * cv_id
-      let compare = compare
-    end)
+module Rule_setmap = Cckappa_sig.Rule_setmap
 
-module Map_final_creation_bdu =
-  SetMap.Make (
-    struct
-      type t = rule_id
-      let compare = compare
-    end)
+module AgentCV_setmap = Cckappa_sig.AgentCV_setmap
 
-module Map_agent_type_creation_bdu =
-  SetMap.Make (
-    struct
-      type t = agent_type * cv_id
-      let compare = compare
-    end)
+module Project2bdu_creation = Cckappa_sig.Project2bdu_creation
 
-module Project2bdu_creation =
-  SetMap.Proj2 (Map_creation_bdu)(Map_final_creation_bdu)(Map_agent_type_creation_bdu)
+module AgentsRuleCV_map_and_set = Cckappa_sig.AgentsRuleCV_map_and_set
 
-module Map_modif_list =
-  Map_wrapper.Make
-    (SetMap.Make (
-      struct
-        type t = agent_id * agent_type * rule_id * cv_id
-        let compare = compare
-      end))
+module AgentsRuleCV_setmap = Cckappa_sig.AgentsRuleCV_setmap
 
-(*potential side effect*)
+module AgentSiteRuleCV_setmap = Cckappa_sig.AgentSiteRuleCV_setmap
 
-module Map_potential_bdu =
-  SetMap.Make (
-    struct
-      type t = agent_type * site_type * rule_id * cv_id
-      let compare = compare
-    end)
+module AgentSiteCV_setmap = Cckappa_sig.AgentSiteCV_setmap
 
-(*with projection*)
-module Map_final_potential_bdu =
-  SetMap.Make (
-    struct
-      type t = rule_id
-      let compare = compare
-    end)
-
-module Map_agent_type_potential_bdu =
-  SetMap.Make (
-    struct
-      type t = agent_type * site_type * cv_id
-      let compare = compare
-    end)
-
-module Project2bdu_potential =
-  SetMap.Proj2 (Map_potential_bdu)(Map_final_potential_bdu)(Map_agent_type_potential_bdu)
-
-(*test*)
-module Map_test_bdu =
-  SetMap.Make (
-    struct
-      type t = agent_id * agent_type * rule_id * cv_id
-      let compare = compare
-    end)
-
-module Map_rule_id_views =
-  SetMap.Make
-    (struct
-      type t = rule_id
-      let compare = compare
-     end)
+module Project2bdu_potential = Cckappa_sig.Project2bdu_potential
     
-module Map_triple_views =
-  SetMap.Make
-    (struct 
-      type t = agent_id * agent_type * cv_id
-      let compare = compare
-     end)
+module AgentsCV_setmap = Cckappa_sig.AgentsCV_setmap
     
-module Project2_bdu_views =
-  SetMap.Proj2 (Map_test_bdu) (Map_rule_id_views) (Map_triple_views)
+module Project2_bdu_views = Cckappa_sig.Project2_bdu_views
 
-
-(*views that are tested and modified without agent_id*)
-
-module Int2Map_Modif =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = agent_id * agent_type * site_type
-         let compare = compare
-        end))
-
-module Int2Map_Test_Modif =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct 
-         type t = agent_type * site_type
-         let compare = compare
-        end))
-
-module Project2_modif =
-  Map_wrapper.Proj (Int2Map_Modif) (Int2Map_Test_Modif)
+module AgentsSite_map_and_set = Cckappa_sig.AgentsSite_map_and_set
+ 
+module Project2_modif = Cckappa_sig.Project2_modif
 
 type pre_static =
   {
     store_modification_sites  :
-    (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t; (*views static*)
+    (int list * Site_map_and_set.Set.t) AgentsSite_map_and_set.Map.t;
     store_test_sites :
-      (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t; (*views static*)
+      (int list * Site_map_and_set.Set.t) AgentsSite_map_and_set.Map.t;
     store_test_modification_sites :
-      (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t; (*views static*)
+      (int list * Site_map_and_set.Set.t) AgentsSite_map_and_set.Map.t;
     (*views that are tested and modificated without agent_id, will be used in
       update function*)
-    store_modif_map      : (int list * Site_map_and_set.Set.t) Int2Map_Test_Modif.Map.t;
-    store_test_map       : (int list * Site_map_and_set.Set.t) Int2Map_Test_Modif.Map.t;
-    store_test_modif_map : (int list * Site_map_and_set.Set.t) Int2Map_Test_Modif.Map.t;
+    store_modif_map      : (int list * Site_map_and_set.Set.t) AgentSite_map_and_set.Map.t;
+    store_test_map       : (int list * Site_map_and_set.Set.t) AgentSite_map_and_set.Map.t;
+    store_test_modif_map : (int list * Site_map_and_set.Set.t) AgentSite_map_and_set.Map.t;
   }
 
 type bdu_analysis_static =
   {
     store_pre_static : pre_static;
-    store_covering_classes : Covering_classes_type.remanent Covering_classes_type.AgentMap.t;
-    store_covering_classes_id : (int list * int list) Int2Map_CV.Map.t;
+    store_covering_classes: Covering_classes_type.remanent Covering_classes_type.AgentMap.t;
+    store_covering_classes_id : (int list * int list) AgentSite_map_and_set.Map.t;
     (*rewrite/ change type of this function ?*)
     store_remanent_triple: ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;
     store_proj_bdu_creation_restriction_map: 
-      Mvbdu_wrapper.Mvbdu.mvbdu Map_agent_type_creation_bdu.Map.t
-      Map_final_creation_bdu.Map.t;
-    store_modif_list_restriction_map: (*projection in the name*)
-      Mvbdu_wrapper.Mvbdu.hconsed_association_list Map_modif_list.Map.t;
+      Mvbdu_wrapper.Mvbdu.mvbdu AgentCV_setmap.Map.t Rule_setmap.Map.t;
+    store_modif_list_restriction_map:
+      Mvbdu_wrapper.Mvbdu.hconsed_association_list AgentsRuleCV_map_and_set.Map.t;
     store_proj_bdu_potential_restriction_map :
       (Mvbdu_wrapper.Mvbdu.mvbdu * Mvbdu_wrapper.Mvbdu.hconsed_association_list)
-      Map_agent_type_potential_bdu.Map.t Map_final_potential_bdu.Map.t;
+      AgentSiteCV_setmap.Map.t Rule_setmap.Map.t;
     store_proj_bdu_test_restriction :
-      Mvbdu_wrapper.Mvbdu.mvbdu Map_triple_views.Map.t Map_rule_id_views.Map.t;
+      Mvbdu_wrapper.Mvbdu.mvbdu AgentsCV_setmap.Map.t Rule_setmap.Map.t;
   }
 
 (************************************************************************************)
 (*implementation of pre_static*)
 
-
 let collect_modification_sites parameter error rule_id diff_direct store_result =
   (*from a pair of Map (agent_id, agent_type, site) -> rule_id :: old_result)*)
   let add_link error (agent_id, agent_type, site_type) rule_id store_result =
     let error, (l, old) =
-      match Int2Map_Modif.Map.find_option_without_logs parameter error
+      match AgentsSite_map_and_set.Map.find_option_without_logs parameter error
         (agent_id, agent_type, site_type) store_result
       with
       | error, None -> error, ([], Site_map_and_set.Set.empty)
@@ -197,7 +102,8 @@ let collect_modification_sites parameter error rule_id diff_direct store_result 
     in
     let error = Exception.check warn parameter error error' (Some "line 65") Exit in
     let error, result =
-      Int2Map_Modif.Map.add_or_overwrite parameter error (agent_id, agent_type, site_type) 
+      AgentsSite_map_and_set.Map.add_or_overwrite parameter error
+        (agent_id, agent_type, site_type) 
         (l, current_set) store_result
     in
     error, result
@@ -223,7 +129,7 @@ let collect_modification_sites parameter error rule_id diff_direct store_result 
       ) diff_direct store_result
   in
   let store_result =
-    Int2Map_Modif.Map.map (fun (l, x) -> List.rev l, x) store_result
+    AgentsSite_map_and_set.Map.map (fun (l, x) -> List.rev l, x) store_result
   in
   error, store_result
 
@@ -249,7 +155,7 @@ let collect_test_sites parameter error rule_id viewslhs
     store_result =
   let add_link (agent_id, agent_type, site_type) rule_id store_result =
     let error, (l, old) =
-      match Int2Map_Modif.Map.find_option_without_logs parameter error
+      match AgentsSite_map_and_set.Map.find_option_without_logs parameter error
         (agent_id, agent_type, site_type) store_result
       with
       | error, None -> error, ([], Site_map_and_set.Set.empty)
@@ -260,7 +166,9 @@ let collect_test_sites parameter error rule_id viewslhs
     in
     let error = Exception.check warn parameter error error' (Some "line 137") Exit in
     let error, result =
-      Int2Map_Modif.Map.add_or_overwrite parameter error (agent_id, agent_type, site_type)
+      AgentsSite_map_and_set.Map.add_or_overwrite
+        parameter error
+        (agent_id, agent_type, site_type)
         (l, current_set) store_result
     in
     error, result
@@ -286,7 +194,7 @@ let collect_test_sites parameter error rule_id viewslhs
       ) viewslhs store_result
   in
   let store_result =
-    Int2Map_Modif.Map.map (fun (l, x) -> List.rev l, x) store_result
+    AgentsSite_map_and_set.Map.map (fun (l, x) -> List.rev l, x) store_result
   in
   error, store_result
 
@@ -317,7 +225,7 @@ let collect_test_modification_sites
     parameter error store_modification_map store_test_map store_result =
   let add_link error (agent_id, agent_type, site_type) rule_id_set store_result =
     let error, (l, old) =
-      match Int2Map_Modif.Map.find_option_without_logs parameter error 
+      match AgentsSite_map_and_set.Map.find_option_without_logs parameter error 
         (agent_id, agent_type, site_type) store_result
       with
       | error, None -> error, ([], Site_map_and_set.Set.empty)
@@ -325,12 +233,14 @@ let collect_test_modification_sites
     in
     let error, union = Site_map_and_set.Set.union parameter error old rule_id_set in
     let error, result =
-      Int2Map_Modif.Map.add_or_overwrite parameter error (agent_id, agent_type, site_type)
+      AgentsSite_map_and_set.Map.add_or_overwrite
+        parameter error 
+        (agent_id, agent_type, site_type)
         (l, union) store_result
     in
     error, result
   in
-  Int2Map_Modif.Map.fold2
+  AgentsSite_map_and_set.Map.fold2
     parameter error
     (*exists in 'a t*)
     (fun parameter error (agent_id, agent_type, site_type) (l1, s1) store_result ->
@@ -446,14 +356,14 @@ let scan_rule_pre_static parameter error rule_id rule handler_bdu store_result =
 let site_covering_classes parameter error covering_classes =
   let add_link (agent_type, site_type) cv_id store_result =
     let error, (l, old) =
-      match Int2Map_CV.Map.find_option_without_logs parameter error
+      match AgentSite_map_and_set.Map.find_option_without_logs parameter error
         (agent_type, site_type) store_result 
       with
       | error, None -> error, ([], [])
       | error, Some (l, l') -> error, (l, l')
     in
     let error, result =
-      Int2Map_CV.Map.add_or_overwrite parameter error
+      AgentSite_map_and_set.Map.add_or_overwrite parameter error
         (agent_type, site_type) (l, cv_id :: old) store_result
     in
     error, result
@@ -480,10 +390,10 @@ let site_covering_classes parameter error covering_classes =
         error, store_result
       (*REMARK: when it is folding inside a list, start with empty result,
         because the add_link function has already called the old result.*)
-      ) covering_classes Int2Map_CV.Map.empty
+      ) covering_classes AgentSite_map_and_set.Map.empty
   in
   let store_result =
-    Int2Map_CV.Map.map (fun (l, x) -> List.rev l, x) store_result
+    AgentSite_map_and_set.Map.map (fun (l, x) -> List.rev l, x) store_result
   in
   error, store_result
 
@@ -571,7 +481,7 @@ let collect_bdu_creation_restriction_map parameter handler error rule_id rule
   let add_link handler (agent_type, rule_id, cv_id) bdu store_result =
     let error, old_bdu =
       match
-        Map_creation_bdu.Map.find_option
+        AgentRuleCV_setmap.Map.find_option
           (agent_type, rule_id, cv_id) store_result
       with
       | None -> error, bdu_false
@@ -583,7 +493,7 @@ let collect_bdu_creation_restriction_map parameter handler error rule_id rule
       Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error old_bdu bdu 
     in
     let result_map =
-      Map_creation_bdu.Map.add (agent_type, rule_id, cv_id) bdu_new store_result
+      AgentRuleCV_setmap.Map.add (agent_type, rule_id, cv_id) bdu_new store_result
     in
     error, handler, result_map
   in
@@ -666,7 +576,7 @@ let collect_proj_bdu_creation_restriction_map parameter handler_bdu error
     rule_id rule store_remanent_triple 
     store_result =
   let store_init_bdu_creation_restriction_map =
-    Map_creation_bdu.Map.empty
+    AgentRuleCV_setmap.Map.empty
   in
   let error, (handler_bdu, store_bdu_creation_restriction_map) =
     collect_bdu_creation_restriction_map
@@ -698,8 +608,8 @@ let collect_proj_bdu_creation_restriction_map parameter handler_bdu error
       store_bdu_creation_restriction_map
   in
   let store_result =
-     Map_final_creation_bdu.Map.fold
-      Map_final_creation_bdu.Map.add
+     Rule_setmap.Map.fold
+      Rule_setmap.Map.add
       store_result'
       store_result
   in
@@ -713,7 +623,7 @@ let collect_modif_list_restriction_map
   let add_link (agent_id, agent_type, rule_id, cv_id) list_a store_result =
     (*the association must be unique *)
     let error, result_map =
-      Map_modif_list.Map.add_or_overwrite parameter error
+      AgentsRuleCV_map_and_set.Map.add_or_overwrite parameter error
         (agent_id, agent_type, rule_id, cv_id) list_a store_result
     in
     error, result_map
@@ -816,7 +726,7 @@ let store_bdu_potential_restriction_map_aux parameter handler error store_remane
         parameter handler error [new_site_type, 0] (*state is 0*)
     in
     let result_map =
-      Map_potential_bdu.Map.add 
+      AgentSiteRuleCV_setmap.Map.add 
         (agent_type, new_site_type, rule_id, cv_id) (bdu, list) store_result
     in
     error, handler, result_map
@@ -825,7 +735,7 @@ let store_bdu_potential_restriction_map_aux parameter handler error store_remane
   AgentMap.fold parameter error
     (fun parameter error agent_type' triple_list (handler, store_result) ->
       (*map of potential partner side_effect with site is bond*)
-      Common_static.Int2Map_potential_effect.Map.fold
+      Common_static.AgentRule_map_and_set.Map.fold
         (fun (agent_type, rule_id) pair_list (error, (handler, store_result)) ->
 	 if agent_type' = agent_type
          then
@@ -935,7 +845,7 @@ let collect_proj_bdu_potential_restriction_map parameter handler error
     store_potential_side_effects 
     store_result =
   let store_init_bdu_potential_restriction_map =
-    Map_potential_bdu.Map.empty
+    AgentSiteRuleCV_setmap.Map.empty
   in
   let error, (handler, store_bdu_potential_restriction_map) =
     (* this function should work directly on the partitioned map (store_result) *)
@@ -962,8 +872,8 @@ let collect_proj_bdu_potential_restriction_map parameter handler error
       store_bdu_potential_restriction_map
   in
   let store_result =
-    Map_final_potential_bdu.Map.fold
-      Map_final_potential_bdu.Map.add
+    Rule_setmap.Map.fold
+      Rule_setmap.Map.add
       store_result'
       store_result
   in
@@ -996,7 +906,8 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
 	    List.fold_left
 	      (fun (error, store_result) (cv_id, _, _) ->
 	       error,
-	       Map_test_bdu.Map.add (agent_id, agent_type, rule_id, cv_id) bdu_false store_result
+	       AgentsRuleCV_setmap.Map.add 
+                 (agent_id, agent_type, rule_id, cv_id) bdu_false store_result
 	      )
 	      (error, store_result) triple_list
 	  in
@@ -1028,15 +939,15 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
                   let state = port.site_state.min in
                   let error, site' = 
                     Site_map_and_set.Map.find_default parameter error 
-						      0 site map_new_index_forward 
+		      0 site map_new_index_forward 
                   in
                   let error, map_res =
                     Site_map_and_set.Map.add parameter error 
-					     site'
-					     state
-			store_result
+		      site'
+		      state
+		      store_result
                   in
-                    error, map_res
+                  error, map_res
 		 ) set agent.agent_interface Site_map_and_set.Map.empty
              in
 	     let error = Exception.check warn parameter error error' 
@@ -1066,7 +977,10 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
 		   build_bdu parameter handler error pair_list
 		 in
 		 let error, store_result =
-		   error, Map_test_bdu.Map.add (agent_id, agent_type, rule_id, cv_id) bdu_test store_result
+		   error, AgentsRuleCV_setmap.Map.add
+                     (agent_id, agent_type, rule_id, cv_id) 
+                     bdu_test 
+                     store_result
 		 in
 		 error, handler, store_result
 	       end)
@@ -1082,7 +996,7 @@ let collect_proj_bdu_test_restriction parameter handler error
     rule_id rule store_remanent_triple 
     store_result =
   let store_init_bdu_test_restriction_map =
-    Map_test_bdu.Map.empty
+    AgentsRuleCV_setmap.Map.empty
   in
   let error, (handler, store_bdu_test_restriction_map) =
     (* collect should work directly on the partitioned map (store_result) *)
@@ -1112,8 +1026,8 @@ let collect_proj_bdu_test_restriction parameter handler error
       store_bdu_test_restriction_map
   in
   let store_result =
-     Map_rule_id_views.Map.fold
-      Map_rule_id_views.Map.add
+     Rule_setmap.Map.fold
+      Rule_setmap.Map.add
       store_result'
       store_result
   in
@@ -1220,12 +1134,12 @@ let scan_rule_static parameter error handler_kappa handler_bdu rule_id rule
 (*rule*)
 
 let init_pre_static =
-  let init_modification        = Int2Map_Modif.Map.empty in
-  let init_test                = Int2Map_Modif.Map.empty in
-  let init_test_modification   = Int2Map_Modif.Map.empty in
-  let init_modif_map           = Int2Map_Test_Modif.Map.empty in
-  let init_test_map            = Int2Map_Test_Modif.Map.empty in
-  let init_test_modif_map      = Int2Map_Test_Modif.Map.empty in
+  let init_modification        = AgentsSite_map_and_set.Map.empty in
+  let init_test                = AgentsSite_map_and_set.Map.empty in
+  let init_test_modification   = AgentsSite_map_and_set.Map.empty in
+  let init_modif_map           = AgentSite_map_and_set.Map.empty in
+  let init_test_map            = AgentSite_map_and_set.Map.empty in
+  let init_test_modif_map      = AgentSite_map_and_set.Map.empty in
   let init_pre_static =
     {
       store_modification_sites      = init_modification;
@@ -1241,12 +1155,12 @@ let init_bdu_analysis_static parameter error =
   let error, init_covering_classes =
     Covering_classes_type.AgentMap.create parameter error 0 
   in
-  let init_covering_classes_id = Int2Map_CV.Map.empty in
+  let init_covering_classes_id = AgentSite_map_and_set.Map.empty in
   let error, init_remanent_triple            = AgentMap.create parameter error 0 in
-  let init_proj_bdu_creation_restriction_map = Map_final_creation_bdu.Map.empty in
-  let init_modif_list_restriction_map        = Map_modif_list.Map.empty in
-  let init_proj_bdu_potential_restriction_map  = Map_final_potential_bdu.Map.empty in
-  let init_proj_bdu_test_restriction           = Map_rule_id_views.Map.empty in
+  let init_proj_bdu_creation_restriction_map = Rule_setmap.Map.empty in
+  let init_modif_list_restriction_map        = AgentsRuleCV_map_and_set.Map.empty in
+  let init_proj_bdu_potential_restriction_map  = Rule_setmap.Map.empty in
+  let init_proj_bdu_test_restriction           = Rule_setmap.Map.empty in
   let init_bdu_analysis_static =
     {
       store_pre_static = init_pre_static;

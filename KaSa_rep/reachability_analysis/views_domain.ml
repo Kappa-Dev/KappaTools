@@ -38,21 +38,12 @@ struct
   (* put here the type of the struct that contains the rest of the
      dynamic information, including the result of the analysis *)
 
-  type agent_type = int
-  type cv_id = int
-
-  module Map_bdu_update =
-    Map_wrapper.Make
-      (SetMap.Make
-         (struct
-           type t = agent_type * cv_id
-           let compare = compare
-          end))
+  module AgentCV_map_and_set = Cckappa_sig.AgentCV_map_and_set
 
   type local_dynamic_information =
     {
       dead_rule       : bool array;
-      fixpoint_result : Mvbdu_wrapper.Mvbdu.mvbdu Map_bdu_update.Map.t;
+      fixpoint_result : Mvbdu_wrapper.Mvbdu.mvbdu AgentCV_map_and_set.Map.t;
       domain_dynamic_information : Bdu_dynamic_views.bdu_analysis_dynamic
     }
 
@@ -271,7 +262,7 @@ struct
     let kappa_handler = Analyzer_headers.get_kappa_handler static in
     let nrules = Handler.nrules parameter error kappa_handler in
     let init_dead_rule_array = Array.make nrules false in
-    let init_fixpoint = Map_bdu_update.Map.empty in
+    let init_fixpoint = AgentCV_map_and_set.Map.empty in
     let init_bdu_analysis_dynamic = Bdu_dynamic_views.init_bdu_analysis_dynamic
     in
     let init_global_dynamic =
@@ -394,7 +385,7 @@ struct
     in
     let error, (_, s1) =
       match
-        Bdu_dynamic_views.Int2Map_CV_Modif.Map.find_option_without_logs
+        Bdu_dynamic_views.AgentCV_map_and_set.Map.find_option_without_logs
           parameter
           error
           (agent_type, cv_id)
@@ -622,7 +613,7 @@ struct
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     let store = get_fixpoint_result dynamic in
     let error, bdu_old =
-      match Map_bdu_update.Map.find_option_without_logs parameter error
+      match AgentCV_map_and_set.Map.find_option_without_logs parameter error
         (agent_type, cv_id) store
       with
       | error, None -> error, bdu_false
@@ -665,7 +656,7 @@ struct
             bdu_union
         in
         let error, store =
-          Map_bdu_update.Map.add_or_overwrite parameter error
+          AgentCV_map_and_set.Map.add_or_overwrite parameter error
             (agent_type, cv_id) bdu_union store
         in
         let dynamic = set_fixpoint_result store dynamic in
@@ -886,19 +877,19 @@ struct
     in
     let error, proj_bdu_test_restriction =
       match
-        Bdu_static_views.Map_rule_id_views.Map.find_option rule_id
+        Bdu_static_views.Rule_setmap.Map.find_option rule_id
           store_proj_bdu_test_restriction
       with
-      | None -> error, Bdu_static_views.Map_triple_views.Map.empty
+      | None -> error, Bdu_static_views.AgentsCV_setmap.Map.empty
       | Some map -> error, map
     in
     try
       let error, dynamic =
-        Bdu_static_views.Map_triple_views.Map.fold
+        Bdu_static_views.AgentsCV_setmap.Map.fold
           (fun (agent_id, agent_type, cv_id) bdu_test (error, dynamic) ->
             let error, bdu_X =
               match
-                Map_bdu_update.Map.find_option_without_logs parameter
+                AgentCV_map_and_set.Map.find_option_without_logs parameter
                   error (agent_type, cv_id) fixpoint_result
               with
               | error, None -> Printf.fprintf stdout "cv_id %i\n" cv_id; error, bdu_false
@@ -1003,17 +994,17 @@ struct
     in
     let error, proj_bdu_test_restriction =
       match
-        Bdu_static_views.Map_rule_id_views.Map.find_option rule_id
+        Bdu_static_views.Rule_setmap.Map.find_option rule_id
           store_proj_bdu_test_restriction
       with
-      | None -> error, Bdu_static_views.Map_triple_views.Map.empty
+      | None -> error, Bdu_static_views.AgentsCV_setmap.Map.empty
       | Some map -> error, map
     in
     (*-----------------------------------------------------------------------*)
     let error, dynamic, event_list =
       (*-----------------------------------------------------------------------*)
       (*deal with views*)
-      Bdu_static_views.Map_triple_views.Map.fold
+      Bdu_static_views.AgentsCV_setmap.Map.fold
         (fun (agent_id, agent_type, cv_id) _ (error, dynamic, event_list) ->
           let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
           let error, dynamic, bdu_true = get_mvbdu_true static dynamic error in
@@ -1045,21 +1036,21 @@ struct
           (*-----------------------------------------------------------------------*)
           let store_result = get_fixpoint_result dynamic in
           let error, bdu_X =
-            match Map_bdu_update.Map.find_option_without_logs
+            match AgentCV_map_and_set.Map.find_option_without_logs
               parameter error (agent_type, cv_id) store_result
             with
             | error, None -> error, bdu_false
             | error, Some bdu -> error, bdu
           in
           let error, bdu_test =
-            match Bdu_static_views.Map_triple_views.Map.find_option
+            match Bdu_static_views.AgentsCV_setmap.Map.find_option
               (agent_id, agent_type, cv_id) proj_bdu_test_restriction
             with
             | None -> error, bdu_true
             | Some bdu -> error, bdu
           in
 	  let error, dynamic, bdu_update =
-            match Bdu_static_views.Map_modif_list.Map.find_option_without_logs
+            match Bdu_static_views.AgentsRuleCV_map_and_set.Map.find_option_without_logs
               parameter error
               (agent_id, agent_type, rule_id, cv_id)
               store_modif_list_restriction_map
@@ -1101,20 +1092,20 @@ struct
       get_store_proj_bdu_creation_restriction static dynamic error
     in
     let error, bdu_creation_map =
-      match Bdu_static_views.Map_final_creation_bdu.Map.find_option rule_id
+      match Bdu_static_views.Rule_setmap.Map.find_option rule_id
         store_bdu_creation
       with
-      | None -> error, Bdu_static_views.Map_agent_type_creation_bdu.Map.empty
+      | None -> error, Bdu_static_views.AgentCV_setmap.Map.empty
       | Some map -> error, map
     in
     (*-----------------------------------------------------------------------*)
     let error, dynamic, event_list =
-      Bdu_static_views.Map_agent_type_creation_bdu.Map.fold
+      Bdu_static_views.AgentCV_setmap.Map.fold
         (fun (agent_type, cv_id) bdu_creation (error, dynamic, event_list) ->
           let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
           let fixpoint_result = get_fixpoint_result dynamic in
           let error, bdu_X =
-            match Map_bdu_update.Map.find_option_without_logs
+            match AgentCV_map_and_set.Map.find_option_without_logs
               parameter error (agent_type, cv_id) fixpoint_result
             with
             | error, None -> error, bdu_false
@@ -1153,21 +1144,21 @@ struct
       get_store_proj_bdu_potential_restriction static dynamic error
     in
     let error, proj_bdu_potential_restriction =
-      match Bdu_static_views.Map_final_potential_bdu.Map.find_option rule_id
+      match Bdu_static_views.Rule_setmap.Map.find_option rule_id
         store_bdu_potential
       with
-      | None -> error, Bdu_static_views.Map_agent_type_potential_bdu.Map.empty
+      | None -> error, Bdu_static_views.AgentSiteCV_setmap.Map.empty
       | Some map -> error, map
     in
     (*-----------------------------------------------------------------------*)
     let error, dynamic, event_list =
-      Bdu_static_views.Map_agent_type_potential_bdu.Map.fold
+      Bdu_static_views.AgentSiteCV_setmap.Map.fold
         (fun (agent_type, new_site_id, cv_id)(bdu_test, list)
           (error, dynamic, event_list) ->
             let fixpoint_result = get_fixpoint_result dynamic in
             let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
             let error, bdu_X =
-	      match Map_bdu_update.Map.find_option_without_logs
+	      match AgentCV_map_and_set.Map.find_option_without_logs
                 parameter error (agent_type, cv_id) fixpoint_result
 	      with
 	      | error, None -> error, bdu_false
@@ -1345,7 +1336,7 @@ struct
 (*main print of fixpoint*)
 
   let print_bdu_update_map parameter error handler_kappa result =
-    Map_bdu_update.Map.fold (fun (agent_type, cv_id) bdu_update error ->
+    AgentCV_map_and_set.Map.fold (fun (agent_type, cv_id) bdu_update error ->
       let error', agent_string =
         Handler.string_of_agent parameter error handler_kappa agent_type
       in
@@ -1372,7 +1363,7 @@ struct
     let error,handler,mvbdu_true =
       Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error
     in
-    Map_bdu_update.Map.fold
+    AgentCV_map_and_set.Map.fold
       (fun (agent_type, cv_id) bdu (error,handler,output) ->
         let error, handler, list =
           decomposition parameter handler error bdu
@@ -1542,7 +1533,7 @@ struct
         output handler
     else
       begin
-        Map_bdu_update.Map.fold
+        AgentCV_map_and_set.Map.fold
 	  (fun (agent_type, cv_id) bdu_update (error,handler) ->
 	    let error', agent_string =
               try
