@@ -71,3 +71,86 @@ type remanent =
       store_test_new_index_dic  : test_dic;
       store_modif_new_index_dic : modif_dic;
     }
+
+(************************************************************************************)
+(* cckappa_sig is the signature for an intermediary representation of
+   Kappa, there is no covering class, thus this type should not be defined
+   here *)
+(* Please put any type/module definition related to covering class in a
+   file reachability/covergin_class_sig.ml *)
+
+type cv_id = int
+type agent_id = Cckappa_sig.agent_id
+type agent_name = Cckappa_sig.agent_name
+type rule_id = Cckappa_sig.rule_id
+type site_name = Cckappa_sig.site_name
+
+module AgentCV_map_and_set =
+  Map_wrapper.Make (
+    SetMap.Make (
+      struct
+        type t = agent_name * cv_id
+        let compare = compare
+      end))
+
+module AgentsRuleCV_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make (
+      struct
+        type t = agent_id * agent_name * rule_id * cv_id
+        let compare = compare
+      end))
+
+module AgentCV_setmap =
+  SetMap.Make (
+    struct
+      type t = agent_name * cv_id
+      let compare = compare
+    end)
+
+module AgentsCV_setmap =
+  SetMap.Make
+    (struct 
+      type t = agent_id * agent_name * cv_id
+      let compare = compare
+     end)
+
+module AgentSiteCV_setmap =
+  SetMap.Make (
+    struct
+      type t = agent_name * site_name * cv_id
+      let compare = compare
+    end)
+
+module AgentRuleCV_setmap =
+  SetMap.Make (
+    struct
+      type t = agent_name * rule_id * cv_id
+      let compare = compare
+    end)
+
+module AgentsRuleCV_setmap =
+  (SetMap.Make (
+    struct
+      type t = agent_id * agent_name * rule_id * cv_id
+      let compare = compare
+    end))
+
+module AgentSiteRuleCV_setmap =
+  SetMap.Make (
+    struct
+      type t = agent_name * site_name * rule_id * cv_id
+      let compare = compare
+    end)
+
+module Project2bdu_creation =
+  SetMap.Proj2 (AgentRuleCV_setmap)(Rule_setmap)(AgentCV_setmap)
+
+module Project2bdu_potential =
+  SetMap.Proj2 (AgentSiteRuleCV_setmap)(Rule_setmap)(AgentSiteCV_setmap)
+    
+module Project2_bdu_views =
+  SetMap.Proj2 (AgentsRuleCV_setmap)(Rule_setmap)(AgentsCV_setmap)
+
+module Project2_modif =
+  Map_wrapper.Proj (AgentsSite_map_and_set) (AgentSite_map_and_set)

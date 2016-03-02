@@ -19,9 +19,19 @@ type position   = Ckappa_sig.position
 type agent_name = int 
 type site_name  = int
 
-module Agent_type_storage_nearly_inf_Imperatif = (Int_storage.Nearly_inf_Imperatif: Int_storage.Storage with type key = agent_name and type dimension = int)
+module Agent_type_storage_nearly_inf_Imperatif =
+  (
+    Int_storage.Nearly_inf_Imperatif: Int_storage.Storage 
+   with type key = agent_name 
+   and type dimension = int
+  )
+
 module Agent_type_site_storage_nearly_Inf_Int_Int_storage_Imperatif_Imperatif =
-  (Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif: Int_storage.Storage with type key = agent_name * site_name and type dimension = int * int)
+  (
+    Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif: Int_storage.Storage 
+   with type key = agent_name * site_name 
+   and type dimension = int * int
+  )
     
 type binding_state = 
     | Free 
@@ -67,8 +77,6 @@ type 'state port =
     site_state    : 'state
   }
 
-type cv_id = int (* cckappa_sig is the signature for an intermediary representation of Kappa, there is no covering class, thus this type should not be defined here *)
-                 (* Please put any type/module definition related to covering class in a file reachability/covergin_class_sig.ml *)
 type rule_id = int
 type agent_id = int
 
@@ -104,14 +112,6 @@ module AgentSite_map_and_set =
 	 let compare = compare
 	end))
 
-module AgentCV_map_and_set =
-  Map_wrapper.Make (
-    SetMap.Make (
-      struct
-        type t = agent_name * cv_id
-        let compare = compare
-      end))
-
 module AgentRule_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
@@ -136,14 +136,6 @@ module AgentSiteState_map_and_set =
          let compare = compare
         end))
 
-module AgentsRuleCV_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make (
-      struct
-        type t = agent_id * agent_name * rule_id * cv_id
-        let compare = compare
-      end))
-
 module PairAgentSiteState_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
@@ -153,69 +145,12 @@ module PairAgentSiteState_map_and_set =
          let compare = compare
         end))
 
-(*TODO: implement Proj2 in Map_wrapper.ml*)
-
 module Rule_setmap =
   SetMap.Make (
     struct
       type t = rule_id
       let compare = compare
     end)
-
-module AgentCV_setmap =
-  SetMap.Make (
-    struct
-      type t = agent_name * cv_id
-      let compare = compare
-    end)
-
-module AgentsCV_setmap =
-  SetMap.Make
-    (struct 
-      type t = agent_id * agent_name * cv_id
-      let compare = compare
-     end)
-
-module AgentSiteCV_setmap =
-  SetMap.Make (
-    struct
-      type t = agent_name * site_name * cv_id
-      let compare = compare
-    end)
-
-module AgentRuleCV_setmap =
-  SetMap.Make (
-    struct
-      type t = agent_name * rule_id * cv_id
-      let compare = compare
-    end)
-
-module AgentsRuleCV_setmap =
-  (SetMap.Make (
-    struct
-      type t = agent_id * agent_name * rule_id * cv_id
-      let compare = compare
-    end))
-
-module AgentSiteRuleCV_setmap =
-  SetMap.Make (
-    struct
-      type t = agent_name * site_name * rule_id * cv_id
-      let compare = compare
-    end)
-
-module Project2bdu_creation =
-  SetMap.Proj2 (AgentRuleCV_setmap)(Rule_setmap)(AgentCV_setmap)
-
-module Project2bdu_potential =
-  SetMap.Proj2 (AgentSiteRuleCV_setmap)(Rule_setmap)(AgentSiteCV_setmap)
-    
-module Project2_bdu_views =
-  SetMap.Proj2 (AgentsRuleCV_setmap)(Rule_setmap)(AgentsCV_setmap)
-
-module Project2_modif =
-  Map_wrapper.Proj (AgentsSite_map_and_set) (AgentSite_map_and_set)
-
 
 type 'state interface = 'state port Site_map_and_set.Map.t
                                                                            

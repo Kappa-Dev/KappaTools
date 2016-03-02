@@ -21,7 +21,7 @@ let warn parameters mh message exn default =
 
 let local_trace = false
 
-module AgentCV_map_and_set = Cckappa_sig.AgentCV_map_and_set
+module AgentCV_map_and_set = Covering_classes_type.AgentCV_map_and_set
 
 type bdu_analysis_dynamic =
   {

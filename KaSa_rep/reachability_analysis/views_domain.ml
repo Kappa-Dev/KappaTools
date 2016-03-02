@@ -38,7 +38,7 @@ struct
   (* put here the type of the struct that contains the rest of the
      dynamic information, including the result of the analysis *)
 
-  module AgentCV_map_and_set = Cckappa_sig.AgentCV_map_and_set
+  module AgentCV_map_and_set = Covering_classes_type.AgentCV_map_and_set
 
   type local_dynamic_information =
     {

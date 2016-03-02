@@ -18,8 +18,14 @@ type position   = Ckappa_sig.position
 type agent_name = int
 type site_name  = int
 
-module Agent_type_storage_nearly_inf_Imperatif:  Int_storage.Storage with type key = agent_name and type dimension = int
-module Agent_type_site_storage_nearly_Inf_Int_Int_storage_Imperatif_Imperatif: Int_storage.Storage with type key = agent_name * site_name and type dimension = int * int
+module Agent_type_storage_nearly_inf_Imperatif: Int_storage.Storage
+  with type key = agent_name 
+  and type dimension = int
+
+module Agent_type_site_storage_nearly_Inf_Int_Int_storage_Imperatif_Imperatif: 
+  Int_storage.Storage 
+  with type key = agent_name * site_name 
+  and type dimension = int * int
     
 type binding_state = 
     | Free 
@@ -34,7 +40,7 @@ module Dictionary_of_States: Dictionary.Dictionary with type value = state
   
 type state_dic = (unit,unit) Dictionary_of_States.dictionary
   
-type kappa_handler = 
+type kappa_handler =
     {
       nrules                : int; 
       nvars                 : int; 
@@ -59,8 +65,6 @@ type 'state port =
     site_state    : 'state
   }
 
-type cv_id = int (* cckappa_sig is the signature for an intermediary representation of Kappa, there is no covering class, thus this type should not be defined here *)
-                 (* Please put any type/module definition related to covering class in a file reachability/covergin_class_sig.ml *)
 type rule_id = int
 type agent_id = int
 
@@ -68,51 +72,12 @@ module Rule_map_and_set: Map_wrapper.S_with_logs with type elt = rule_id
 module Site_map_and_set: Map_wrapper.S_with_logs with type elt = site_name
 module State_map_and_set: Map_wrapper.S_with_logs with type elt = state_index
 module AgentSite_map_and_set: Map_wrapper.S_with_logs with type elt = agent_name * site_name
-module AgentCV_map_and_set: Map_wrapper.S_with_logs with type elt = agent_name * cv_id
 module AgentRule_map_and_set: Map_wrapper.S_with_logs with type elt = agent_name * rule_id
 module AgentsSite_map_and_set: Map_wrapper.S_with_logs with type elt = agent_id * agent_name * rule_id
 module AgentSiteState_map_and_set: Map_wrapper.S_with_logs with type elt = agent_name * site_name * state_index
-module AgentsRuleCV_map_and_set: Map_wrapper.S_with_logs with type elt = agent_id * agent_name * rule_id * cv_id
 module PairAgentSiteState_map_and_set: Map_wrapper.S_with_logs with type elt = (agent_name * site_name * state_index) * (agent_name * site_name * state_index)
 
-(*TODO: implement Proj2 in Map_wrapper.ml*)
-
 module Rule_setmap: SetMap.S with type elt = rule_id
-module AgentCV_setmap: SetMap.S with type elt = agent_name * cv_id
-module AgentsCV_setmap: SetMap.S with type elt = agent_id * agent_name * cv_id
-module AgentSiteCV_setmap: SetMap.S with type elt = agent_name * site_name * cv_id
-module AgentRuleCV_setmap: SetMap.S with type elt = agent_name * rule_id * cv_id
-module AgentsRuleCV_setmap: SetMap.S with type elt = agent_id * agent_name * rule_id * cv_id
-module AgentSiteRuleCV_setmap: SetMap.S with type elt = agent_name * site_name * rule_id * cv_id
-module Project2bdu_creation: SetMap.Projection2
- with type elt_a = int * int * int
-  and type elt_b = rule_id
-  and type elt_c = int * int
-  and type 'a map_a = 'a AgentRuleCV_setmap.Map.t
-  and type 'a map_b = 'a Rule_setmap.Map.t
-  and type 'a map_c = 'a AgentCV_setmap.Map.t
-module Project2bdu_potential: SetMap.Projection2
-       with type elt_a = int * int * int * int
-	and type elt_b = rule_id
-	and type 'a map_a = 'a AgentSiteRuleCV_setmap.Map.t
-	and type 'a map_b = 'a Rule_setmap.Map.t
-	and type elt_c = int * int * int
-	and type 'a map_c = 'a AgentSiteCV_setmap.Map.t
-module Project2_bdu_views: SetMap.Projection2
-       with type elt_a = int * int * int * int
-	and type elt_b = rule_id
-	and type 'a map_a = 'a AgentsRuleCV_setmap.Map.t
-	and type 'a map_b = 'a Rule_setmap.Map.t
-	and type elt_c = int * int * int
-	and type 'a map_c = 'a AgentsCV_setmap.Map.t
-
-module Project2_modif: Map_wrapper.Projection
-       with type elt_a = int * int * int
-	and type elt_b = agent_name * site_name
-	and type 'a map_a = 'a AgentsSite_map_and_set.Map.t
-	and type 'a map_b = 'a AgentSite_map_and_set.Map.t
-												     
-
 
 type 'state interface = 'state port Site_map_and_set.Map.t
                                                                            
@@ -142,34 +107,38 @@ type bond = site_address * site_address
 val build_address: agent_id -> agent_name -> site_name -> site_address
 		     
 module Address_map_and_set: Map_wrapper.S_with_logs with type elt = site_address 
-module KaSim_Site_map_and_set: Map_wrapper.S_with_logs with type elt = (string,string) Ckappa_sig.site_type
+
+module KaSim_Site_map_and_set: Map_wrapper.S_with_logs
+  with type elt = (string, string) Ckappa_sig.site_type
     
 type agent = 
 | Ghost
 | Agent of state_index interval interface proper_agent 
 | Dead_agent of state_index interval interface proper_agent * KaSim_Site_map_and_set.Set.t * ((string, unit) Ckappa_sig.site_type) Site_map_and_set.Map.t  * Ckappa_sig.link Site_map_and_set.Map.t
-   (* agent with a site or state that never occur in the rhs or an initial state, 
-      set of the undefined sites, map of sites with undefined internal states, map of sites with undefined binding states*)																   
-| Unknown_agent of (string*int) (* agent with a type that never occur in rhs or initial states *)
+(* agent with a site or state that never occur in the rhs or an initial
+   state, set of the undefined sites, map of sites with undefined
+   internal states, map of sites with undefined binding states*)
+| Unknown_agent of (string*int)
+(* agent with a type that never occur in rhs or initial states *)
     
 type agent_sig = state_index list interface proper_agent 
   
 type views = agent Int_storage.Quick_Nearly_inf_Imperatif.t 
 
 type diff_views =
-    state_index
-      interval
-      port
-      Site_map_and_set.Map.t
-      proper_agent
-      Int_storage.Quick_Nearly_inf_Imperatif.t
+  state_index
+    interval
+    port
+    Site_map_and_set.Map.t
+    proper_agent
+    Int_storage.Quick_Nearly_inf_Imperatif.t
 
 type mixture = 
-    { 
-      c_mixture : Ckappa_sig.mixture; 
-      views     : views;
-      bonds     : site_address Site_map_and_set.Map.t Int_storage.Quick_Nearly_inf_Imperatif.t; 
-      plus      : (int * int) list; (* should be replaced with the appropriate type *)
+  { 
+    c_mixture : Ckappa_sig.mixture; 
+    views     : views;
+    bonds     : site_address Site_map_and_set.Map.t Int_storage.Quick_Nearly_inf_Imperatif.t; 
+    plus      : (int * int) list; (* should be replaced with the appropriate type *)
       dot       : (int * int) list  (* should be replaced with the appropriate type *)
     }
       
@@ -182,14 +151,14 @@ type enriched_variable =
     }
       
 type actions =
-    {
-      creation   : (int * agent_name) list; (* should be replaced with the appropriate type *)
-      remove     : (int * unit interface proper_agent * int list) list; (* should be replaced with the appropriate type *)
-      release    : bond list;
-      bind       : bond list;
-      half_break : (site_address * (state_index interval option)) list 
-    }
-      
+  {
+    creation   : (int * agent_name) list; (* should be replaced with the appropriate type *)
+    remove     : (int * unit interface proper_agent * int list) list; (* should be replaced with the appropriate type *)
+    release    : bond list;
+    bind       : bond list;
+    half_break : (site_address * (state_index interval option)) list 
+  }
+    
 val empty_actions: actions
     
 type rule = 

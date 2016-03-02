@@ -127,7 +127,7 @@ struct
         (get_local_dynamic_information dynamic) with
           contact_map_dynamic = contact_map
       } dynamic
-  
+      
   let get_bonds_per_site dynamic =
     (get_local_dynamic_information dynamic).bonds_per_site
 
@@ -142,9 +142,9 @@ struct
   (*implementations*)
 
   (*dual: contact map including initial state, use in views_domain*)
-  
+      
   module AgentSiteState_map_and_set = Cckappa_sig.AgentSiteState_map_and_set
- 
+    
   let collect_dual_map parameter error handler store_result =
     let error, store_result =
       Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
@@ -226,8 +226,8 @@ struct
     in
     error, store_result
 
-   let collect_bonds parameter error (rule_id:int) bonds views store_result =
-     let error, store_result =
+  let collect_bonds parameter error (rule_id:int) bonds views store_result =
+    let error, store_result =
       Int_storage.Quick_Nearly_inf_Imperatif.fold parameter error
         (fun parameter error agent_id bonds_map store_result ->
           let error, store_result =
@@ -279,8 +279,8 @@ struct
     in
     error, store_result
 
-  (*collect bonds lhs*)
-   let collect_bonds_rhs parameter error rule_id rule store_result =
+   (*collect bonds lhs*)
+  let collect_bonds_rhs parameter error rule_id rule store_result =
     let views = rule.Cckappa_sig.rule_rhs.Cckappa_sig.views in
     let bonds = rule.Cckappa_sig.rule_rhs.Cckappa_sig.bonds in
     let error, store_result =
@@ -288,7 +288,7 @@ struct
     in
     error, store_result
 
-   let collect_bonds_lhs parameter error rule_id rule store_result =
+  let collect_bonds_lhs parameter error rule_id rule store_result =
     let views = rule.Cckappa_sig.rule_lhs.Cckappa_sig.views in
     let bonds = rule.Cckappa_sig.rule_lhs.Cckappa_sig.bonds in
     let error, store_result =
@@ -390,7 +390,7 @@ struct
 
   (**************************************************************************)
   (*Implementation*)
-					  
+    
   let add_oriented_bond_in_set_of_bonds static dynamic error (x, y) =
     let parameter = get_parameter static in
     let contact_map_dynamic = get_contact_map_dynamic dynamic in
@@ -444,7 +444,7 @@ struct
   let add_oriented_bond static dynamic error bond =
     let error, dynamic = add_oriented_bond_in_set_of_bonds static dynamic error bond in
     add_oriented_bond_in_map_of_bonds static dynamic error bond
-				      
+      
   let add_bond static dynamic error bond =
     let error, dynamic = add_bond_in_set_of_bonds static dynamic error bond in
     add_bond_in_map_of_bonds static dynamic error bond
@@ -455,7 +455,7 @@ struct
      the bond (x,y) is given, the bond (y,x) is given as well, and we can use
      the oriented version *)
   (* but if this is not the case, we have to use the unoriented version *)
-			     
+      
   (**bond occurs in the initial state*)
 
   let collect_bonds_initial static dynamic error init_state =
@@ -501,7 +501,7 @@ struct
                     site_type_target
                 in
                 let pair_triple = ((agent_type1, site_type_source, state1),
-                            (agent_type2, site_type_target, state2)) 
+                                   (agent_type2, site_type_target, state2)) 
                 in
                 (*use the oriented bonds, when given the bond (x, y), the
                   bond (y, x) is given as well*)
@@ -543,11 +543,11 @@ struct
     in
     if PairAgentSiteState_map_and_set.Set.is_empty inter
     then error, dynamic,
-	 Some precondition (* use the function Communication.overwrite_potential_partners_map to fill the two fields related to the dynamic contact map *)
-	      (* then use the functions get_potential_partner and/or fold_over_potential_partners in the views domain to use the incremental (dynamic) contact map *)
-	      (* instead of the static one *)
+      Some precondition (* use the function Communication.overwrite_potential_partners_map to fill the two fields related to the dynamic contact map *)
+    (* then use the functions get_potential_partner and/or fold_over_potential_partners in the views domain to use the incremental (dynamic) contact map *)
+    (* instead of the static one *)
     else error, dynamic, None
-    
+      
   (**************************************************************************)
 
   let apply_rule static dynamic error rule_id precondition =
