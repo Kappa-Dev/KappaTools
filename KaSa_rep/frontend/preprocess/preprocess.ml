@@ -742,7 +742,7 @@ let translate_mixture parameters error handler mixture =
 	   | Some Cckappa_sig.Dead_agent (lagk,_,_,_), Some Cckappa_sig.Ghost -> (*suppression*)
 	      begin
                 let agent_type = lagk.Cckappa_sig.agent_name in 
-                let error,reverse = Int_storage.Quick_Nearly_inf_Imperatif.set parameters error k (Cckappa_sig.upgrade_some_interface lagk) reverse in
+                let error,reverse = Int_storage.Quick_Nearly_inf_Imperatif.set parameters error k ((*Cckappa_sig.upgrade_some_interface*) lagk) reverse in
                 let error,lbondk = Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get parameters error k c_rule_lhs.Cckappa_sig.bonds in  
                 let lbondk = 
                   match lbondk with 
@@ -769,7 +769,7 @@ let translate_mixture parameters error handler mixture =
 	   | Some Cckappa_sig.Ghost, Some Cckappa_sig.Agent ragk -> (*creation*)
 	      begin 
 		let agent_type = ragk.Cckappa_sig.agent_name in 
-		let error,direct = Int_storage.Quick_Nearly_inf_Imperatif.set parameters error k (Cckappa_sig.upgrade_some_interface ragk) direct in  
+		let error,direct = Int_storage.Quick_Nearly_inf_Imperatif.set parameters error k ((*Cckappa_sig.upgrade_some_interface*) ragk) direct in  
 		let error,rbondk = Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get parameters error k c_rule_rhs.Cckappa_sig.bonds in  
 		let rbondk  = 
                   match rbondk with 

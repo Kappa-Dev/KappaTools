@@ -19,6 +19,10 @@ type position   = Ckappa_sig.position
 type agent_name = int 
 type site_name  = int
 
+module Agent_type_storage_nearly_inf_Imperatif = (Int_storage.Nearly_inf_Imperatif: Int_storage.Storage with type key = agent_name and type dimension = int)
+module Agent_type_site_storage_nearly_Inf_Int_Int_storage_Imperatif_Imperatif =
+  (Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif: Int_storage.Storage with type key = agent_name * site_name and type dimension = int * int)
+    
 type binding_state = 
     | Free 
     | Lnk_type of agent_name * site_name 
@@ -45,7 +49,7 @@ type kappa_handler =
       nagents               : int;
       agents_dic            : Ckappa_sig.agent_dic; 
       interface_constraints : Ckappa_sig.agent_specification
-                              Int_storage.Nearly_inf_Imperatif.t;
+                              Agent_type_storage_nearly_inf_Imperatif.t;
       sites                 : Ckappa_sig.site_dic Int_storage.Nearly_inf_Imperatif.t;
       states_dic            : state_dic
                               Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.t;
@@ -63,7 +67,8 @@ type 'state port =
     site_state    : 'state
   }
 
-type cv_id = int
+type cv_id = int (* cckappa_sig is the signature for an intermediary representation of Kappa, there is no covering class, thus this type should not be defined here *)
+                 (* Please put any type/module definition related to covering class in a file reachability/covergin_class_sig.ml *)
 type rule_id = int
 type agent_id = int
 
@@ -216,7 +221,7 @@ type 'state interface = 'state port Site_map_and_set.Map.t
                                                                            
 type 'interface proper_agent = 
   { 
-    agent_kasim_id  : int; 
+    agent_kasim_id  : int; (* should be replaced with the appropriate type *)
     agent_name      : agent_name;
     agent_interface : 'interface;
     agent_position  : position
@@ -248,12 +253,12 @@ let map_agent f ag =
 let upgrade_some_interface ag =
   upgrade_interface ag 
     begin
-      Site_map_and_set.Map.map (fun x -> (*Some*) x) ag.agent_interface
+      Site_map_and_set.Map.map (fun x -> Some x) ag.agent_interface
     end 
 
 type site_address =
     {
-      agent_index : int;
+      agent_index : int; (* should be replaced with the appropriate type *)
       site        : site_name;
       agent_type  : agent_name
     }
@@ -306,8 +311,8 @@ type mixture =
       c_mixture : Ckappa_sig.mixture; 
       views     : views;
       bonds     : site_address Site_map_and_set.Map.t Int_storage.Quick_Nearly_inf_Imperatif.t; 
-      plus      : (int * int) list;
-      dot       : (int * int) list
+      plus      : (int * int) list; (* should be replaced with the appropriate type *)
+      dot       : (int * int) list  (* should be replaced with the appropriate type *)
     }
       
 type enriched_variable = 
@@ -320,8 +325,8 @@ type enriched_variable =
       
 type actions =
     {
-      creation   : (int * agent_name) list;
-      remove     : (int * unit interface proper_agent * int list) list; 
+      creation   : (int * agent_name) list; (* should be replaced with the appropriate type *)
+      remove     : (int * unit interface proper_agent * int list) list; (* should be replaced with the appropriate type *)
       release    : bond list;
       bind       : bond list;
       half_break : (site_address * (state_index interval option)) list 
@@ -340,12 +345,12 @@ type rule =
   {
     prefix         : int;
     delta        : int;
-      rule_lhs     : mixture; 
-      rule_arrow   : Ast.arrow; 
-      rule_rhs     : mixture; 
-      diff_direct  : diff_views; 
-      diff_reverse : diff_views;
-      actions      : actions
+    rule_lhs     : mixture; 
+    rule_arrow   : Ast.arrow; 
+    rule_rhs     : mixture; 
+    diff_direct  : diff_views; 
+    diff_reverse : diff_views;
+    actions      : actions
     }
   
 type perturbation =

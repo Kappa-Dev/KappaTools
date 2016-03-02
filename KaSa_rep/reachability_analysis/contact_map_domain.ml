@@ -542,7 +542,10 @@ struct
       PairAgentSiteState_map_and_set.Set.inter parameter error contact_map bond_lhs_set
     in
     if PairAgentSiteState_map_and_set.Set.is_empty inter
-    then error, dynamic, Some precondition
+    then error, dynamic,
+	 Some precondition (* use the function Communication.overwrite_potential_partners_map to fill the two fields related to the dynamic contact map *)
+	      (* then use the functions get_potential_partner and/or fold_over_potential_partners in the views domain to use the incremental (dynamic) contact map *)
+	      (* instead of the static one *)
     else error, dynamic, None
     
   (**************************************************************************)

@@ -29,7 +29,7 @@ let empty_agent_specification =
         }
 
 let empty_handler parameters error =
-  let error,int_constraints =  Int_storage.Nearly_inf_Imperatif.create parameters error 0 in
+  let error,int_constraints =  Cckappa_sig.Agent_type_storage_nearly_inf_Imperatif.create parameters error 0 in
   let error,sites = Int_storage.Nearly_inf_Imperatif.create parameters error 0 in
   let error,states_dic = Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.create parameters error (0,0) in
   let error,dual = Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.create parameters error (0,(0,0)) in
@@ -67,7 +67,7 @@ let declare_agent parameters error handler agent_name =
     | Some (k,_,_,dic) ->
      if bool
       then
-        let error,int_constraints = Int_storage.Nearly_inf_Imperatif.set parameters error k empty_agent_specification handler.Cckappa_sig.interface_constraints in
+        let error,int_constraints = Cckappa_sig.Agent_type_storage_nearly_inf_Imperatif.set parameters error k empty_agent_specification handler.Cckappa_sig.interface_constraints in
         let error,sites = Int_storage.Nearly_inf_Imperatif.set parameters error k (Ckappa_sig.Dictionary_of_sites.init ()) handler.Cckappa_sig.sites in
         error,
           ({handler with
