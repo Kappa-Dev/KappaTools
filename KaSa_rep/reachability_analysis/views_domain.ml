@@ -988,7 +988,6 @@ struct
 
   let compute_views_test_enabled static dynamic error rule_id event_list =
     let parameter = get_parameter static in
-    (*let kappa_handler = get_kappa_handler static in*)
     let error, store_proj_bdu_test_restriction =
       get_store_proj_bdu_test_restriction static dynamic error
     in
@@ -1259,7 +1258,7 @@ struct
      global domain does not collect information *)
 
   let rec apply_event_list static dynamic error event_list =
-    (*TODO:if see an event new bond, do the check of potential*)
+    (*TODO?*)
     error, dynamic, []
 
   let export static dynamic error kasa_state =

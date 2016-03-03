@@ -74,7 +74,10 @@ type 'a fold =
    'a ->
    Exception.method_handler * 'a) Usual_domains.flat_lattice
 
-type prefold = { fold: 'a. 'a fold}
+type prefold = 
+  {
+    fold: 'a. 'a fold
+  }
 
 type precondition =
  {
@@ -117,6 +120,11 @@ let dummy_precondition =
     partner_fold = (fun _ _ _ _ -> Usual_domains.Any);
   }
 
+let dummy_prefold =
+  {
+    fold = (fun _ _ _ _ -> Usual_domains.Any)
+  }
+    
 let get_state_of_site error precondition path =
   match
     PathMap.find path precondition.cache_state_of_site
@@ -140,12 +148,14 @@ let refine_information_about_state_of_site precondition f =
     let error, _ ,old_output = get_state_of_site error precondition path in
     f error path old_output
   in
-  {precondition with
-    cache_state_of_site = PathMap.empty Usual_domains.Any;
-    state_of_site = new_f}
+  {
+    precondition with
+      cache_state_of_site = PathMap.empty Usual_domains.Any;
+      state_of_site = new_f
+  }
 
 let get_potential_partner precondition agent_type site state =
-  precondition,precondition.partner_map agent_type site state
+  precondition, precondition.partner_map agent_type site state
 
 let fold_over_potential_partners parameter error precondition agent_type site f init =
   match
@@ -166,15 +176,15 @@ let fold_over_potential_partners parameter error precondition agent_type site f 
 let overwrite_potential_partners_map
     (parameters:Remanent_parameters_sig.parameters)
     (error:Exception.method_handler)
-    precondition f fold =
+    precondition 
+    (f: agent_type -> site -> state -> (agent_type * site * state) 
+     Usual_domains.flat_lattice) 
+    (fold: prefold) =
   error,
   {
-    precondition
-   with
-     partner_fold =
+    precondition with
+      partner_map = f;
+      partner_fold =
       (fun parameters error agent_type site_type ->
-	fold.fold parameters error agent_type site_type)
-	;
-	partner_map = f
+        fold.fold parameters error agent_type site_type)
   }
-

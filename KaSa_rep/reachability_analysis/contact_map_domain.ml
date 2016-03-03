@@ -525,6 +525,7 @@ struct
 
   (**************************************************************************)
 
+  
   let is_enabled static dynamic error rule_id precondition =
     (*test if the bond in the lhs has already in the contact map, if not
       None, *)
@@ -542,10 +543,41 @@ struct
       PairAgentSiteState_map_and_set.Set.inter parameter error contact_map bond_lhs_set
     in
     if PairAgentSiteState_map_and_set.Set.is_empty inter
-    then error, dynamic,
-      Some precondition (* use the function Communication.overwrite_potential_partners_map to fill the two fields related to the dynamic contact map *)
-    (* then use the functions get_potential_partner and/or fold_over_potential_partners in the views domain to use the incremental (dynamic) contact map *)
-    (* instead of the static one *)
+    then 
+      (* use the function Communication.overwrite_potential_partners_map to
+         fill the two fields related to the dynamic contact map *)
+      (* then use the functions get_potential_partner and/or
+         fold_over_potential_partners in the views domain to use the incremental
+         (dynamic) contact map *)
+      (* instead of the static one *)
+
+      (* the variable dynamic in the module contact map, contain the
+         information to fill the two fields of the variable precondition
+         related to the contact map*)
+      let error, (fold, precondition) =
+        PairAgentSiteState_map_and_set.Set.fold
+          (fun ((agent_type, site_type, state), (agent_type', site_type', state')) 
+            (error, (fold, precondition)) ->
+              let fold =
+                {
+                  Communication.fold = 
+                    (fun parameter error _ _ ->
+                      fold.Communication.fold parameter error agent_type site_type)
+                }
+              in
+              let error, precondition =
+                Communication.overwrite_potential_partners_map 
+                  parameter 
+                  error
+                  precondition
+                  (fun _ _ _ ->
+                    Usual_domains.Val (agent_type, site_type, state))
+                  fold
+              in
+              error, (fold, precondition)
+          ) contact_map (error, (Communication.dummy_prefold, precondition))
+      in
+      error, dynamic, Some precondition
     else error, dynamic, None
       
   (**************************************************************************)
