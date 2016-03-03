@@ -22,17 +22,10 @@ let local_trace = false
 module Domain =
 struct
 
-  (* this is better to use Cckappa_sig types, they are here for that, and
-     eventually, we want to make these type definitions abstract *)
-
-  type rule_id = Cckappa_sig.rule_id
-  type agent_type = Cckappa_sig.agent_name   
+  type agent_type = Cckappa_sig.agent_name
   type site_type = Cckappa_sig.site_name
   type state_index = Cckappa_sig.state_index
     
-  type pair_triple =
-    (agent_type * site_type * state_index)*(agent_type * site_type * state_index)
-
   module PairAgentSiteState_map_and_set = Cckappa_sig.PairAgentSiteState_map_and_set
 
   module Rule_map_and_set = Cckappa_sig.Rule_map_and_set
@@ -48,9 +41,6 @@ struct
       global_static_information : Analyzer_headers.global_static_information;
       local_static_information  : local_static_information
     }
-
-  (* It is always better to share the definition of these modules (once for
-     each type) *)
 
   module AgentSite_map_and_set = Cckappa_sig.AgentSite_map_and_set
     

@@ -31,8 +31,7 @@ struct
   type static_information =
     {
       global_static_information : Analyzer_headers.global_static_information;	
-      domain_static_information : Bdu_static_views.bdu_analysis_static;
-      (*contact_map_static : Contact_map_domain.static_information*)
+      domain_static_information : Bdu_static_views.bdu_analysis_static
     }
 
   (*--------------------------------------------------------------------*)
@@ -46,7 +45,6 @@ struct
       dead_rule       : bool array;
       fixpoint_result : Mvbdu_wrapper.Mvbdu.mvbdu AgentCV_map_and_set.Map.t;
       domain_dynamic_information : Bdu_dynamic_views.bdu_analysis_dynamic;
-      (*contact_map_dynamic : Contact_map_domain.dynamic_information*)
     }
 
   type dynamic_information =
@@ -870,7 +868,7 @@ struct
 
   exception False of Exception.method_handler * dynamic_information
 
-  let is_enable_aux static dynamic error rule_id =
+  let is_enable_aux static dynamic error rule_id precondition =
     let parameter = get_parameter static in
     let fixpoint_result = get_fixpoint_result dynamic in
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
@@ -886,6 +884,19 @@ struct
       | Some map -> error, map
     in
     try
+      (*precondition?*)
+      (*let error, precondition, _ =
+        Communication.fold_over_potential_partners
+        parameter
+        error
+        precondition
+        agent_type
+        site
+        (fun parameter state (agent_type, site, state) (error, a) ->
+        error, a
+        )
+        a
+        in*)
       let error, dynamic =
         Bdu_static_views.AgentsCV_setmap.Map.fold
           (fun (agent_id, agent_type, cv_id) bdu_test (error, dynamic) ->
@@ -912,7 +923,10 @@ struct
       False (error, dynamic) -> error, dynamic, false
 
   (*get contact_map from dynamic*)
-        
+  (* then use the functions get_potential_partner and/or
+     fold_over_potential_partners in the views domain to use the incremental
+     (dynamic) contact map *)
+  (* instead of the static one *)
 
   let is_enabled static dynamic error rule_id precondition =
     let error, dynamic, is_enable =
@@ -921,6 +935,7 @@ struct
         dynamic
         error
         rule_id
+        precondition
     in
     if is_enable
     then
