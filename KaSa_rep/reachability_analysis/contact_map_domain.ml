@@ -539,39 +539,36 @@ struct
          fold_over_potential_partners in the views domain to use the incremental
          (dynamic) contact map *)
       (* instead of the static one *)
-
-      (* the variable dynamic in the module contact map, contain the
-         information to fill the two fields of the variable precondition
-         related to the contact map*)
       let error, precondition =
         Communication.overwrite_potential_partners_map 
           parameter 
           error
           precondition
           (fun agent_type site_type state ->
-           Usual_domains.Val (agent_type, site_type, state)
+            Usual_domains.Val (agent_type, site_type, state)
 	  (* Here you should fetch the partner in the dynamic contact map, if defined, *)
 	  )
           {
             Communication.fold =
 	      begin
 		fun parameter error agent_type site_type ->
-		let error,statemap_bottop = AgentSite_map_and_set.Map.find_option_without_logs parameter error (agent_type,site_type) dynamic.local.bonds_per_site in
-		match
-		  statemap_bottop
-		with
+		let error, statemap_bottop = 
+                  AgentSite_map_and_set.Map.find_option_without_logs parameter error
+                    (agent_type, site_type) dynamic.local.bonds_per_site
+                in
+		match statemap_bottop with
 		| None -> error,
-			  (Usual_domains.Val
-			     (fun f error init -> error,init))
+		  (Usual_domains.Val
+		     (fun f error init -> error, init))
 		| Some statemap ->
-		   error,
-		   Usual_domains.Val
-		     (fun f error init ->
+		  error,
+		  Usual_domains.Val
+		    (fun f error init ->
 		      State_map_and_set.Map.fold
 			(f parameter)
 		       	statemap
-			(error,init)
-		     )
+			(error, init)
+		    )
 	      end
           }
       in
