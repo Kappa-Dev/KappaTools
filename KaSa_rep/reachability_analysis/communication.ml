@@ -119,11 +119,6 @@ let dummy_precondition =
     partner_map = (fun _ _ _ -> Usual_domains.Any);
     partner_fold = (fun _ _ _ _ -> Usual_domains.Any);
   }
-
-let dummy_prefold =
-  {
-    fold = (fun _ _ _ _ -> Usual_domains.Any)
-  }
     
 let get_state_of_site error precondition path =
   match
@@ -162,16 +157,16 @@ let fold_over_potential_partners parameter error precondition agent_type site f 
     precondition.partner_fold parameter error agent_type site
   with
   | Usual_domains.Any -> error, precondition, Usual_domains.Top
-  | Usual_domains.Undefined -> (* In theory, this could happen, but it would be worth being warned about it *)
+  | Usual_domains.Undefined ->
+    (* In theory, this could happen, but it would be worth being warned
+       about it *)
     let error, () =
-      warn parameter error (Some "line 142, bottom propagation")
-	Exit ()
+      warn parameter error (Some "line 142, bottom propagation") Exit ()
     in
     error, precondition, Usual_domains.Not_top init
   | Usual_domains.Val v ->
-    let error, output =
-      v f init
-    in error, precondition, Usual_domains.Not_top output
+    let error, output = v f init in 
+    error, precondition, Usual_domains.Not_top output
 
 let overwrite_potential_partners_map
     (parameters:Remanent_parameters_sig.parameters)

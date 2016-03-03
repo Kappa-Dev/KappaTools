@@ -48,7 +48,7 @@ end
 
 module PathMap:PathMap
 
-(*type precondition*)
+type precondition
 
 type 'a fold =
   Remanent_parameters_sig.parameters ->
@@ -63,25 +63,7 @@ type 'a fold =
    'a ->
    Exception.method_handler * 'a) Usual_domains.flat_lattice
 
-type prefold = 
-  { 
-    fold: 'a. 'a fold
-  }
-    
-type precondition =
-  {
-    precondition_dummy: unit (* to avoid compilation warning *);
-    the_rule_is_applied_for_the_first_time: Usual_domains.maybe_bool ;
-    state_of_site:
-      Exception.method_handler ->
-      path -> Exception.method_handler * int list Usual_domains.flat_lattice ;
-    cache_state_of_site: int list Usual_domains.flat_lattice PathMap.t ;
-    partner_map: agent_type -> site -> state -> (agent_type * site * state) Usual_domains.flat_lattice;
-    partner_fold: 'a. 'a fold }
-
 val dummy_precondition: precondition
-
-val dummy_prefold : prefold
 
 val is_the_rule_applied_for_the_first_time:
   precondition -> Usual_domains.maybe_bool
@@ -104,24 +86,12 @@ val get_state_of_site:
   path ->
   Exception.method_handler * precondition * int list Usual_domains.flat_lattice
 
-(*type 'a fold =
-  Remanent_parameters_sig.parameters ->
-  Exception.method_handler ->
-  agent_type ->
-  site ->
-  ((Remanent_parameters_sig.parameters ->
-    state ->
-    agent_type * site * state ->
-    Exception.method_handler * 'a ->
-    Exception.method_handler * 'a) ->
-   'a ->
-   Exception.method_handler * 'a) Usual_domains.flat_lattice*)
-
-(*type prefold = { fold: 'a. 'a fold}*)
+type prefold = { fold: 'a. 'a fold}
 
 (*fill in is_enable where it output the precondition, take the
   precondition, refine, the previous result, and output the new
   precondition*)
+
 val refine_information_about_state_of_site:
   precondition ->
   (Exception.method_handler ->

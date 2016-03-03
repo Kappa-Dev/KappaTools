@@ -31,7 +31,8 @@ struct
   type static_information =
     {
       global_static_information : Analyzer_headers.global_static_information;	
-      domain_static_information : Bdu_static_views.bdu_analysis_static
+      domain_static_information : Bdu_static_views.bdu_analysis_static;
+      (*contact_map_static : Contact_map_domain.static_information*)
     }
 
   (*--------------------------------------------------------------------*)
@@ -44,7 +45,8 @@ struct
     {
       dead_rule       : bool array;
       fixpoint_result : Mvbdu_wrapper.Mvbdu.mvbdu AgentCV_map_and_set.Map.t;
-      domain_dynamic_information : Bdu_dynamic_views.bdu_analysis_dynamic
+      domain_dynamic_information : Bdu_dynamic_views.bdu_analysis_dynamic;
+      (*contact_map_dynamic : Contact_map_domain.dynamic_information*)
     }
 
   type dynamic_information =
@@ -909,6 +911,9 @@ struct
     with
       False (error, dynamic) -> error, dynamic, false
 
+  (*get contact_map from dynamic*)
+        
+
   let is_enabled static dynamic error rule_id precondition =
     let error, dynamic, is_enable =
       is_enable_aux
@@ -919,8 +924,10 @@ struct
     in
     if is_enable
     then
+      (*the information about the dynamic contact map is available?, if
+        yes, use them, otherwise use the static contact map instead*)
       error, dynamic, Some precondition
-	(* TO DO, update the function state_of_site in precondition *)
+    (* TO DO, update the function state_of_site in precondition *)
     else
       error, dynamic, None
 
