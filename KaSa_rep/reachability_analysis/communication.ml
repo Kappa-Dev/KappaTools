@@ -17,21 +17,22 @@ let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "communication") message exn
     (fun () -> default)
 
-type rule_id = int
-type agent_id = int
-type agent_type = int
-type site = int
-type state = int
+type rule_id = Cckappa_sig.rule_id
+type agent_id = Cckappa_sig.agent_id
+type agent_type = Cckappa_sig.agent_name
+type site_name = Cckappa_sig.site_name
+type state_index = Cckappa_sig.state_index
 
 type event =
 | Dummy (* to avoid compilation warning *)
 | Check_rule of rule_id
-| See_a_new_bond of ((agent_type * site * state) * (agent_type * site * state))
+| See_a_new_bond of ((agent_type * site_name * state_index) * 
+                        (agent_type * site_name * state_index))
 
 type step =
   {
-    site_out: site;
-    site_in: site;
+    site_out: site_name;
+    site_in: site_name;
     agent_type_in: agent_type
   }
 
@@ -39,7 +40,7 @@ type path =
   {
     agent_id: agent_id;
     relative_address: step list;
-    site: site;
+    site: site_name;
   }
 
 module type PathMap =
@@ -65,11 +66,11 @@ type 'a fold =
   Remanent_parameters_sig.parameters ->
   Exception.method_handler ->
   agent_type ->
-  site ->
+  site_name ->
   Exception.method_handler *
     ((Remanent_parameters_sig.parameters ->
-    state ->
-    agent_type * site * state ->
+    state_index ->
+    agent_type * site_name * state_index ->
     Exception.method_handler * 'a ->
     Exception.method_handler * 'a) ->
      Exception.method_handler ->  'a ->
@@ -88,7 +89,7 @@ type precondition =
      Exception.method_handler ->
      path -> Exception.method_handler * int list Usual_domains.flat_lattice ;
    cache_state_of_site: int list Usual_domains.flat_lattice PathMap.t ;
-   partner_map: agent_type -> site -> state -> (agent_type * site * state) Usual_domains.flat_lattice;
+   partner_map: agent_type -> site_name -> state_index -> (agent_type * site_name * state_index) Usual_domains.flat_lattice;
    partner_fold: 'a. 'a fold }
 
 let is_the_rule_applied_for_the_first_time precondition =
@@ -172,8 +173,8 @@ let fold_over_potential_partners parameter error precondition agent_type site f 
 let overwrite_potential_partners_map
     (parameters:Remanent_parameters_sig.parameters)
     (error:Exception.method_handler)
-    precondition 
-    (f: agent_type -> site -> state -> (agent_type * site * state) 
+    precondition
+    (f: agent_type -> site_name -> state_index -> (agent_type * site_name * state_index) 
      Usual_domains.flat_lattice) 
     (fold: prefold) =
   error,
