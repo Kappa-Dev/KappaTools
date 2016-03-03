@@ -66,13 +66,14 @@ type 'a fold =
   Exception.method_handler ->
   agent_type ->
   site ->
-  ((Remanent_parameters_sig.parameters ->
+  Exception.method_handler *
+    ((Remanent_parameters_sig.parameters ->
     state ->
     agent_type * site * state ->
     Exception.method_handler * 'a ->
     Exception.method_handler * 'a) ->
-   'a ->
-   Exception.method_handler * 'a) Usual_domains.flat_lattice
+     Exception.method_handler ->  'a ->
+     Exception.method_handler * 'a) Usual_domains.flat_lattice
 
 type prefold = 
   {
@@ -117,7 +118,7 @@ let dummy_precondition =
     state_of_site = (fun error _ -> error, Usual_domains.Any);
     cache_state_of_site = PathMap.empty Usual_domains.Any;
     partner_map = (fun _ _ _ -> Usual_domains.Any);
-    partner_fold = (fun _ _ _ _ -> Usual_domains.Any);
+    partner_fold = (fun _ error _ _ -> error,Usual_domains.Any);
   }
     
 let get_state_of_site error precondition path =
@@ -156,16 +157,16 @@ let fold_over_potential_partners parameter error precondition agent_type site f 
   match
     precondition.partner_fold parameter error agent_type site
   with
-  | Usual_domains.Any -> error, precondition, Usual_domains.Top
-  | Usual_domains.Undefined ->
+  | error, Usual_domains.Any -> error, precondition, Usual_domains.Top
+  | error, Usual_domains.Undefined ->
     (* In theory, this could happen, but it would be worth being warned
        about it *)
     let error, () =
       warn parameter error (Some "line 142, bottom propagation") Exit ()
     in
     error, precondition, Usual_domains.Not_top init
-  | Usual_domains.Val v ->
-    let error, output = v f init in 
+  | error, Usual_domains.Val v ->
+    let error, output = v f error init in 
     error, precondition, Usual_domains.Not_top output
 
 let overwrite_potential_partners_map

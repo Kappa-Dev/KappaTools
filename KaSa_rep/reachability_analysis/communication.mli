@@ -55,14 +55,15 @@ type 'a fold =
   Exception.method_handler ->
   agent_type ->
   site ->
-  ((Remanent_parameters_sig.parameters ->
-    state ->
-    agent_type * site * state ->
-    Exception.method_handler * 'a ->
-    Exception.method_handler * 'a) ->
-   'a ->
-   Exception.method_handler * 'a) Usual_domains.flat_lattice
-
+  Exception.method_handler *
+    ((Remanent_parameters_sig.parameters ->
+      state ->
+      agent_type * site * state ->
+      Exception.method_handler * 'a ->
+      Exception.method_handler * 'a) ->
+     Exception.method_handler -> 'a ->
+     Exception.method_handler * 'a) Usual_domains.flat_lattice
+				    
 val dummy_precondition: precondition
 
 val is_the_rule_applied_for_the_first_time:
@@ -116,7 +117,7 @@ val fold_over_potential_partners:
    Exception.method_handler * 'a -> Exception.method_handler * 'a) ->
   'a ->
   Exception.method_handler * precondition * 'a Usual_domains.top_or_not
-
+					       
 val overwrite_potential_partners_map:
   Remanent_parameters_sig.parameters ->
   Exception.method_handler ->
