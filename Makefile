@@ -113,7 +113,7 @@ WebWorker.byte: $(filter-out webapp/,$(filter-out _build/,$(wildcard */*.ml*))) 
 	-tag debug -I js -I api \
 	-tag-line "<generated/*> : package(atdgen)" \
 	-tag-line "<api/*> : package(lwt)" \
-	-tag-line "<js/*> : thread, package(atdgen), package(js_of_ocaml), package(js_of_ocaml.syntax), package(lwt), syntax(camlp4o)" \
+	-tag-line "<js/*> : thread, package(atdgen), package(js_of_ocaml), package(js_of_ocaml.syntax), package(lwt), syntax(camlp4o), package(lwt.log)" \
 	$@
 
 WebSim.native: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)

@@ -58,3 +58,6 @@ generated
 site
 *.byte
 *.native
+
+# python
+*.pyc

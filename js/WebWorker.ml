@@ -3,15 +3,14 @@ module WebMessage = WebMessage_j
 open Lwt
 open WebMessage
 
-let time_yield (seconds : float) (yield : (unit -> unit Lwt.t)) : (unit -> unit Lwt.t) =
-  let lastyield = ref (Sys.time ()) in
-  fun () -> let t = Sys.time () in
-            if t -. !lastyield > seconds then
-              let () = lastyield := t in
-              yield ()
-            else Lwt.return_unit
+class webworker ()  = object
+  val delayed_yield : unit -> unit Lwt.t = Api.time_yield 0.01 Lwt_js.yield
+  method yield () = delayed_yield ()
+  method log (_: string) = Lwt.return_unit
+  inherit Api.Base.runtime
+end
 
-let runtime = (new Api.Base.runtime (time_yield 0.01 Lwt_js.yield) :> Api.runtime)
+let runtime = (new webworker () :> Api.runtime)
 
 let request_handler
       (id : WebMessage.id)
