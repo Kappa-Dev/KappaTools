@@ -45,7 +45,7 @@ object(self)
                              in
     var
 
-  method parse (code : ApiTypes.code) : ApiTypes.error Lwt.t =
+  method parse (code : ApiTypes.code) : ApiTypes_j.parse ApiTypes_j.result Lwt.t =
     let var : WebMessage.response option Lwt_mvar.t = self#send (`Parse code) in
     (Lwt_mvar.take var)
     >>=

@@ -83,7 +83,7 @@ let error_messages signal =
           signal
           (fun error -> React.S.const (match error with
                                          [] -> ""
-                                       | h::t -> h
+                                       | h::_ -> h
                                       ))
        )
     ]
@@ -394,6 +394,7 @@ let onload () : unit =
   let () = start_button_dom##onclick <-
              Dom.handler
                (fun _ ->
+                let () = UIState.set_model_error [] in
                 let () = UIState.set_model_is_running true in
                 let _ = init_ui () in
                 let _ = UIState.start_model

@@ -55,11 +55,25 @@ let xml =
                                  )]
     [navtabs;navcontent]
 
-let update_plot (plot : string) : unit =
-  let plot_div : Dom_html.element Js.t =
-        Js.Opt.get (document##getElementById (Js.string plot_div_id))
-                   (fun () -> assert false) in
-  plot_div##innerHTML <- Js.string plot
+let update_plot (plot : ApiTypes.plot option) : unit =
+  match plot with
+    None -> ()
+  | Some plot ->
+     let plot_div : Dom_html.element Js.t =
+       Js.Opt.get (document##getElementById (Js.string plot_div_id))
+                  (fun () -> assert false) in
+     let width = plot_div##offsetWidth - 20 in
+     let svg_store : Pp_svg.store = Api_data.plot_pg_store ~plot:plot
+                                                           ~file:(React.S.value UIState.opened_filename)
+                                                           ~title:"plot"
+                                                           ~descr:(Printf.sprintf "{ model_max_time : %s , model_max_time : %d }"
+                                                                                  (match React.S.value UIState.model_max_time with
+                                                                                     None -> "None"
+                                                                                   | Some model_max_time -> string_of_float model_max_time)
+                                                                                  (React.S.value UIState.model_nb_plot))
+     in
+     let svg_text :string = Pp_svg.to_string ~width:width svg_store in
+     plot_div##innerHTML <- Js.string svg_text
 
 let onload () =
   let plot_div : Dom_html.element Js.t =

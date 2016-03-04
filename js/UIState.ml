@@ -27,6 +27,14 @@ let runtime_value runtime = match runtime with
                              WebWorker -> "WebWorker"
                            | Embedded -> "Embedded"
                            | Remote remote -> remote.url
+
+class embedded_runtime ()  = object
+  val delayed_yield : unit -> unit Lwt.t = Api.time_yield 0.1 Lwt_js.yield
+  method yield () = delayed_yield ()
+  method log (_: string) = Lwt.return_unit
+  inherit Api.Base.runtime
+end
+
 let default_runtime = WebWorker
 let runtime_state : Api.runtime option ref = ref None
 let set_runtime_url (url : string) (continuation : bool -> unit) : unit =
@@ -37,13 +45,13 @@ let set_runtime_url (url : string) (continuation : bool -> unit) : unit =
     let () = continuation true in
     ()
   else if url = "Embedded" then
-    let () = runtime_state := Some (new Api.Base.runtime Lwt_js.yield :> Api.runtime) in
+    let () = runtime_state := Some (new embedded_runtime () :> Api.runtime) in
     let () = continuation true in
     ()
   else
     let version_url : string = Format.sprintf "%s/v1/version" url  in
     let () = Lwt.async (fun () -> (XmlHttpRequest.perform_raw
-                                     XmlHttpRequest.Text
+                                     ~response_type:XmlHttpRequest.Text
                                      version_url)
                                   >>=
                                     (fun frame ->
@@ -71,9 +79,11 @@ let update_text text =
                           None -> Lwt.fail (InvalidState "Runtime state not available")
                         | Some runtime_state -> runtime_state#parse text)
                       >>=
-                        (fun (error) ->
-                         let () = set_model_error error in
-                                          Lwt.return_unit)
+                        (fun error -> match error with
+                                        `Left error -> let () = set_model_error error in
+                                                       Lwt.return_unit
+                                      | `Right _ -> Lwt.return_unit
+                        )
                      )
   in
   ()
@@ -124,13 +134,17 @@ let start_model ~start_continuation
      catch
        (fun () ->
         let () = start_continuation thread_is_running in
-        let () = set_model_runtime_state (Some { plot = "";
+        let () = set_model_runtime_state (Some { plot = None;
                                                  time = 0.0;
                                                  time_percentage = None;
                                                  event = 0;
                                                  event_percentage = None;
                                                  tracked_events = None;
                                                  log_messages = [];
+                                                 unary_distances = [];
+                                                 snapshots = [];
+                                                 flux_maps = [];
+                                                 files = [];
                                                  is_running = true
                                                }) in
         (runtime_state#start { code = React.S.value model_text;
@@ -142,6 +156,7 @@ let start_model ~start_continuation
              match result with
                `Left error ->
                let () = set_model_error error in
+               set_model_is_running false;
                on_error ()
              | `Right token ->
                 Lwt.join [ update_runtime_state thread_is_running on_error token ]

@@ -7,11 +7,14 @@ exception BadResponseCode of int
 exception TimeOut
 
 let hydrate (type a)
-            (type b)
-            (frame : (Js.js_string Js.t) XmlHttpRequest.generic_http_frame)
-            (h : string -> b) : b Lwt.t =
+            (frame:((Js.js_string Js.t) XmlHttpRequest.generic_http_frame))
+            (success:(string -> a))
+            (fail:(string -> ApiTypes.error))
+    : a ApiTypes_j.result Lwt.t =
      if frame.code = 200 then
-       Lwt.return (h (Js.to_string frame.content))
+       Lwt.return (`Right (success (Js.to_string frame.content)))
+     else if frame.code = 400 then
+       Lwt.return (`Left (fail (Js.to_string frame.content)))
      else
        Lwt.fail (BadResponseCode frame.code)
 
@@ -38,15 +41,17 @@ let post (timeout : float)
 class runtime ?(timeout:float = 10.0) (url:string) =
 object(self)
 
-  method parse (code : ApiTypes.code) : ApiTypes.error Lwt.t =
+  method parse (code : ApiTypes.code) : ApiTypes_j.parse ApiTypes_j.result Lwt.t =
     let url : string = Format.sprintf "%s/v1/parse" url  in
     (XmlHttpRequest.perform_raw
-       ~get_args:[]
+       ~get_args:[("code",code)]
        ~override_method:`GET
        ~response_type:Text
        url)
     >>=
-      (fun frame -> hydrate frame ApiTypes.error_of_string)
+      (fun frame -> hydrate frame
+                            ApiTypes.parse_of_string
+                            ApiTypes.error_of_string)
 
   method start (parameter : ApiTypes.parameter) : ApiTypes.token ApiTypes.result Lwt.t =
     let url : string = Format.sprintf "%s/v1/process" url in
@@ -62,7 +67,9 @@ object(self)
        ~response_type:Text
        url)
     >>=
-      (fun frame -> hydrate frame (fun s -> ApiTypes.result_of_string ApiTypes.read_state s))
+      (fun frame -> hydrate frame
+                            ApiTypes.state_of_string
+                            ApiTypes.error_of_string)
 
   method list () : ApiTypes.catalog ApiTypes.result Lwt.t =
     let url : string = Format.sprintf "%s/v1/process" url in
@@ -72,7 +79,10 @@ object(self)
        ~response_type:Text
        url)
     >>=
-      (fun frame -> hydrate frame (fun s -> ApiTypes.result_of_string ApiTypes.read_catalog s))
+      (fun frame -> hydrate
+                      frame
+                      ApiTypes.catalog_of_string
+                      ApiTypes.error_of_string)
 
   method stop (token : ApiTypes.token) : unit ApiTypes.result Lwt.t =
     let url : string = Format.sprintf "%s/v1/process/%d" url token in
@@ -82,5 +92,8 @@ object(self)
        ~response_type:Text
        url)
     >>=
-      (fun frame -> hydrate frame (fun s -> ApiTypes.result_of_string ApiTypes.read_alias_unit s))
+      (fun frame -> hydrate
+                      frame
+                      ApiTypes.alias_unit_of_string
+                      ApiTypes.error_of_string)
 end;;

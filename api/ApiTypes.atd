@@ -8,19 +8,74 @@ type version = { build : string ;
 
 type parameter = { code : code;
                    nb_plot : int;
-                   max_time : float option;
-                   max_events : int option
+                   max_time : float nullable;
+                   max_events : int nullable
                    }
 type ('l,'r) either = [ Left of 'l | Right of 'r ] <json repr="object">
 type ('r) result = (error,'r) either
 
+type observable = { time : float; values : float list }
+
+type plot = { legend: string list;
+              observables : observable list }
+
+type flux_data = {
+    flux_name : string;
+    flux_start : float;
+    flux_hits : int list;
+    flux_fluxs : float list list;
+}
+
+type flux_map =
+  { flux_rules : string list;
+    flux_data : flux_data;
+    flux_end : float;
+  }
+
+type file_line = { file_name : string nullable ; line : string }
+
+type internal = int nullable
+type link = int nullable
+type agent = { a_id: int;
+               a_type: int;
+               a_ports: link list;
+               a_ints: internal list }
+type raw_mixture = agent list
+type agent_state = {
+     agent : int;
+     mixture : raw_mixture
+}
+
+type taken_state = {
+     token : string;
+     value : float
+}
+
+type snapshot = {
+    snap_file : string;
+    snap_event : int;
+    agents : agent_state list;
+    tokens : taken_state list;
+}
+
+type unary_distances = {
+    dist_file : string;
+    arr_rules : (int * int) list list;
+    event : int;
+}
+
+type parse = { observables : string list }
 type alias_unit = unit
-type state = { plot : string ;
+type state = { plot : plot nullable;
                time : float;
-               time_percentage : int option;
+               time_percentage : int nullable;
                event : int;
-               event_percentage : int option;
-               tracked_events : int option;
+               event_percentage : int nullable;
+               tracked_events : int nullable;
                log_messages : string list;
+               unary_distances : unary_distances list;
+               snapshots : snapshot list;
+               flux_maps : flux_map list;
+               files : file_line list;
                is_running : bool
              }
