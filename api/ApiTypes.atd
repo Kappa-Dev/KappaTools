@@ -58,12 +58,6 @@ type snapshot = {
     tokens : taken_state list;
 }
 
-type unary_distances = {
-    dist_file : string;
-    arr_rules : (int * int) list list;
-    event : int;
-}
-
 type parse = { observables : string list }
 type alias_unit = unit
 type state = { plot : plot nullable;
@@ -73,7 +67,6 @@ type state = { plot : plot nullable;
                event_percentage : int nullable;
                tracked_events : int nullable;
                log_messages : string list;
-               unary_distances : unary_distances list;
                snapshots : snapshot list;
                flux_maps : flux_map list;
                files : file_line list;

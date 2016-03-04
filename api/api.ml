@@ -35,7 +35,6 @@ end = struct
                          ; counter : Counter.t
                          ; log_buffer : Buffer.t
                          ; plot : Api_types.plot ref
-                         ; unary_distances : Api_types.unary_distances list ref
                          ; snapshots : Api_types.snapshot list ref
                          ; flux_maps : Api_types.flux_map list ref
                          ; files : Api_types.file_line list ref
@@ -113,7 +112,6 @@ end = struct
            let plot : Api_types.plot ref = ref { Api_types.legend = [];
                                                  Api_types.observables = [] } in
            let error_messages : string list ref = ref [] in
-           let unary_distances : Api_types.unary_distances list ref = ref [] in
            let snapshots : Api_types.snapshot list ref = ref [] in
            let flux_maps : Api_types.flux_map list ref = ref [] in
            let files : Api_types.file_line list ref = ref [] in
@@ -129,8 +127,7 @@ end = struct
                 files := ((Api_data.api_file_line file_line)::!files)
              | Data.Snapshot snapshot ->
                 snapshots := ((Api_data.api_snapshot snapshot)::!snapshots)
-             | Data.UnaryDistances u ->
-                unary_distances := (Api_data.api_unary_distances u) :: !unary_distances
+             | Data.UnaryDistances _ -> ()
            in
            let simulation = { switch = Lwt_switch.create ()
                             ; counter = Counter.create
@@ -142,7 +139,6 @@ end = struct
                             ; log_buffer = Buffer.create 512
                             ; plot = plot
                             ; error_messages = error_messages
-                            ; unary_distances = unary_distances
                             ; snapshots = snapshots
                             ; flux_maps = flux_maps
                             ; files = files
@@ -235,7 +231,6 @@ end = struct
                        Api_types.event_percentage = Counter.event_percentage state.counter;
                        Api_types.tracked_events = Some (Counter.tracked_events state.counter);
                        Api_types.log_messages = [Buffer.contents state.log_buffer] ;
-                       Api_types.unary_distances = !(state.unary_distances);
                        Api_types.snapshots = !(state.snapshots);
                        Api_types.flux_maps = !(state.flux_maps);
                        Api_types.files = !(state.files);

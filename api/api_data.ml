@@ -57,9 +57,3 @@ let api_snapshot (snapshot : Data.snapshot) : Api_types.snapshot =
   ; Api_types.agents = List.map (fun (agent,mixture) -> { Api_types.agent = agent ; Api_types.mixture = api_mixture mixture } ) snapshot.Data.agents
   ; Api_types.tokens = List.map (fun (token,value) ->  { token = token; value = Nbr.to_float value}) (Array.to_list snapshot.Data.tokens)
 }
-
-let api_unary_distances (unary_distances : Data.unary_distances) : Api_types.unary_distances =
-  { Api_types.dist_file = unary_distances.Data.dist_file;
-    Api_types.arr_rules = Array.to_list unary_distances.Data.arr_rules;
-    Api_types.event = unary_distances.Data.event;
-  }
