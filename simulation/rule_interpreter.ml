@@ -804,7 +804,7 @@ let print env f state =
 			   (Environment.print_token ~env) i Nbr.print el))
     state.tokens
 
-(* print distances for one unary rule *)
+(* print distances for one unary rule - debug mode*)
 let print_dist env state rule_id =
   let () =  Format.printf " Distances at which rule %i applied: " rule_id in
   let rule = Environment.get_rule env rule_id in
@@ -813,15 +813,7 @@ let print_dist env state rule_id =
   | None -> Format.printf "Not a unary rule or unary rule never applied."
   | Some arr -> DynArray.iter (fun i -> Format.printf " %i " i) arr
 
-let print_all_dist state f =
-  Array.iteri
-    (fun id dist_arr ->
-     match dist_arr with None -> ()
-		       | Some arr ->
-			  let () =  Format.fprintf f "Rule %i: " id in
-			  DynArray.iter
-			    (fun i -> Format.fprintf f " %i " i) arr)
-    state.store_unary_dist
+let unary_distances state = state.store_unary_dist
 
 let debug_print f state =
   Format.fprintf f "@[<v>%a@,%a@,%a@,%a@]"

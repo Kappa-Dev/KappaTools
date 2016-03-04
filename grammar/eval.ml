@@ -39,7 +39,7 @@ let rules_of_ast ?deps_machinery contact_map counter domain ~syntax_ref (rule,_)
 	 | Some (dist, pos_dist) ->
 	    if dist = 0 then
 	      raise (ExceptionDefn.Malformed_Decl
-		      ("Unary rule caanot be applied at distance 0. ",pos_dist))
+		      ("Unary rule canot be applied at distance 0. ",pos_dist))
 	    else Some dist in
        let (unrate,_) = Expr.compile_pure_alg counter rate in
        fun ccs uncc ->

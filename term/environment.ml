@@ -1,3 +1,4 @@
+open Mods 
 type t = {
   signatures : Signature.s;
   tokens : unit NamedDecls.t;
@@ -10,6 +11,7 @@ type t = {
   need_update_each_loop : Operator.DepSet.t;
   algs_reverse_dependencies : Operator.DepSet.t array;
   tokens_reverse_dependencies : Operator.DepSet.t array;
+  unary_distances : int DynArray.t option array option;
 }
 
 let init sigs tokens algs (deps_in_t,deps_in_e,tok_rd,alg_rd)
@@ -19,6 +21,7 @@ let init sigs tokens algs (deps_in_t,deps_in_e,tok_rd,alg_rd)
     observables = obs; perturbations = perts;
     algs_reverse_dependencies = alg_rd; tokens_reverse_dependencies = tok_rd;
     need_update_each_loop = Operator.DepSet.union deps_in_t deps_in_e;
+    unary_distances = None;
   }
 
 let signatures env = env.signatures

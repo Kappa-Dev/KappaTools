@@ -1,3 +1,5 @@
+open Mods
+
 let print_desc : (string,out_channel * Format.formatter) Hashtbl.t =
   Hashtbl.create 2
 
@@ -437,6 +439,100 @@ let plot_now l =
   | Some (Raw fd) -> print_values_raw fd.form l
   | Some (Svg s) -> s.Pp_svg.points <- l :: s.Pp_svg.points
 
+let unary_distances_list = ref None
+
+type fd_distances = {
+  id:int;
+  desc:out_channel;
+  form:Format.formatter;
+}
+let distancesDescr = ref None
+
+let print_header_distances f rule_id distance =
+  let () = Format.fprintf f "Rule %i: " rule_id in
+  let () = Format.fprintf f "@[<h>%s%t"
+			  (if !Parameter.emacsMode then "time" else "# time")
+			  !Parameter.plotSepChar in
+  let rec print_nb i = if (i <= distance) then
+			 let () = Format.fprintf f "%i%t" i !Parameter.plotSepChar in
+			 print_nb (i+1)
+		       else Format.fprintf f "@]@." in
+  print_nb 0 
+
+let create_files_list ids_list filename = 
+  let files_list = 
+    List.map (fun (id,dist) ->
+	      let filename_string = filename^(string_of_int id)^".out" in
+	      let d = Kappa_files.open_out filename_string in
+	      let f = Format.formatter_of_out_channel d in
+	      let () = print_header_distances f id dist in
+	      {id=id; desc=d; form=f}) 
+	     ids_list in
+  distancesDescr := Some files_list
+		
+let print_distances f time arr =
+  let () = Format.fprintf f "@[<h>%t%E%t"
+			  !Parameter.plotSepChar time !Parameter.plotSepChar in
+  let () = DynArray.iter 
+	     (fun i -> Format.fprintf f "%i%t" i !Parameter.plotSepChar) arr in
+  Format.fprintf f " @]@."
+	 
+let print_time_distances time_distances files_list= 
+  List.iter (fun (time, rules_arr) ->
+	     List.iter (fun fd -> 
+			match rules_arr.(fd.id) with 
+			| None -> assert false
+			| Some distances ->
+			   print_distances fd.form time distances)
+		       files_list)
+	    time_distances
+
+(* format the list time_distances in order to have max_distance columns for all rules at all times*)	    
+let format_unary_distances time_distances max_distances =
+  List.map
+    (fun (time,rules_arr) ->
+     let () =
+       List.iter (fun (id, maxd) ->
+		 match rules_arr.(id) with
+		 | Some dyn_arr -> if ((DynArray.length dyn_arr) < maxd) then
+				     DynArray.set dyn_arr (maxd-1) 0
+		 | None -> rules_arr.(id) <-
+			     Some (DynArray.make maxd 0)) max_distances in
+     (time, rules_arr)) time_distances
+
+let close_distances () =
+  let rec ids_max_list rules_arr i =
+    if (i < (Array.length rules_arr)) then
+      let new_list = ids_max_list rules_arr (i+1) in
+      match rules_arr.(i) with Some dyn_arr ->
+			       (i,DynArray.length dyn_arr)::new_list
+			     | None -> new_list
+    else [] in
+  match !unary_distances_list with
+  | None ->  ()
+  | Some time_distances ->
+     let (_,last_rules_arr) = List.hd time_distances in
+     let ids_max_dist = ids_max_list last_rules_arr 0 in
+     let formatted = format_unary_distances time_distances ids_max_dist in
+     let () = create_files_list ids_max_dist (Kappa_files.get_distances ()) in
+     match !distancesDescr with
+     | None -> assert false
+     | Some files_list ->
+	let () = print_time_distances formatted files_list in
+	List.iter (fun fd -> close_out fd.desc) files_list
+
+let unary_distances time arr =
+  let deepcopy arr =
+    let arr' = Array.copy arr in 
+    Array.map (fun dist_arr ->
+	       match dist_arr with
+	       | None -> None
+	       | Some dyn_arr -> Some (DynArray.copy dyn_arr)) arr' in    
+  let new_list = match !unary_distances_list with
+  | None ->  (time, (deepcopy arr))::[]
+  | Some distances -> (time, (deepcopy arr))::distances in 
+  unary_distances_list := Some new_list
+ 
 let print_snapshot sigs f s =
   Format.fprintf
     f "@[<v>%a@,%a@]"
@@ -488,7 +584,9 @@ let go env = function
        | Some file -> get_desc file
      in
      Format.fprintf desc "%s@." p.Data.line
+  | Data.UnaryDistances (x,y) -> unary_distances x y
 
 let close () =
   let () = close_plot () in
+  let () = close_distances () in
   close_desc ()

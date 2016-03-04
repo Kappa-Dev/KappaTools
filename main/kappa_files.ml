@@ -8,7 +8,7 @@ let tasks_profilingName = ref "profiling.html"
 let influenceFileName = ref ""
 let fluxFileName = ref ""
 let outputDataName = ref "data.out"
-let distanceFileName = ref "distances"
+let distancesFileName = ref "distances"
 
 let path f =
   if Filename.is_relative f && Filename.dirname f = Filename.current_dir_name
@@ -108,6 +108,9 @@ let set_dir s =
 let set_data f = outputDataName := f
 let get_data () = !outputDataName
 
+let set_distances f = distancesFileName := f
+let get_distances () = !distancesFileName
+
 let set_marshalized f = marshalizedOutFile := f
 let with_marshalized f =
   match !marshalizedOutFile with
@@ -143,14 +146,6 @@ let with_snapshot str event ext f =
     let () =
       Format.fprintf fr "# Snapshot [Event: %d]@.%t@?"(*", Time: %f"*)event f in
     close_out desc
-
-let with_unary_dist event f =
-  let desc = open_out_fresh_filename
-	       !distanceFileName [] (string_of_int event) "out" in
-  let fr = Format.formatter_of_out_channel desc in
-  let () =
-    Format.fprintf fr "%t@?" f in
-  close_out desc
 
 let set_influence s = influenceFileName := s
 let set_up_influence () =

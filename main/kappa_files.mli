@@ -7,6 +7,9 @@ val set_dir : string -> unit
 val set_data : string -> unit
 val get_data : unit -> string
 
+val set_distances : string -> unit
+val get_distances : unit -> string
+
 val set_marshalized : string -> unit
 val with_marshalized : (out_channel -> unit) -> unit
 
@@ -22,8 +25,6 @@ val with_flux : string -> (Format.formatter -> unit) -> unit
 
 val with_snapshot :
   string -> int -> string -> (Format.formatter -> unit) -> unit
-
-val with_unary_dist : int -> (Format.formatter -> unit) -> unit
 
 val set_influence : string -> unit
 val set_up_influence : unit -> unit

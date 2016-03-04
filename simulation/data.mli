@@ -1,3 +1,5 @@
+open Mods
+
 type flux_data = {
     flux_name : string;
     flux_start : float;
@@ -22,3 +24,4 @@ type t = Flux of flux_map
        | Plot of float * Nbr.t array
        | Print of file_line
        | Snapshot of snapshot
+       | UnaryDistances of float * int DynArray.t option array
