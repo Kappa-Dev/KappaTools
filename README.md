@@ -2,6 +2,8 @@
 src="https://rawgithub.com/Kappa-Dev/KaSim/master/man/img/KaSim-Logo.svg"
 alt="KaSim logo" title="Stochastic Kappa Simulator" align="right" height="90"/>
 # KaSim
+[![Gitter chat channel](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Kappa-Dev?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
 
 KaSim is a stochastic simulator for rule-based models written in Kappa. KaSa is a static analyser for Kappa models.
 
