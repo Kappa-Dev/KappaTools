@@ -138,7 +138,11 @@ let handler
           (try let parameter : ApiTypes.parameter = ApiTypes.parameter_of_string body in
                runtime_state#start parameter
            with  Yojson.Json_error error ->
-             Lwt.return (`Left [error])
+                 Lwt.return (`Left [error])
+               | Ag_oj_run.Error error ->
+                  Lwt.return (`Left [error])
+               | e ->
+                  Lwt.return (`Left [Printexc.to_string e])
           )
           >>=
             (fun token -> result_response ApiTypes.string_of_token token)

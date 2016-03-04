@@ -123,7 +123,7 @@ end = struct
                flux_maps := ((Api_data.api_flux_map flux_map)::!flux_maps)
              | Data.Plot (time,new_observables) ->
                 let new_values : float list = List.map (fun nbr -> Nbr.to_float nbr) (Array.to_list new_observables) in
-                plot := {!plot with Api_types.observables = { time = time ; values = new_values }
+                plot := {!plot with Api_types.observables = { Api_types.time = time ; values = new_values }
                                                             :: !plot.Api_types.observables }
              | Data.Print file_line ->
                 files := ((Api_data.api_file_line file_line)::!files)
@@ -211,7 +211,7 @@ end = struct
           | Sys_error message ->
              Lwt.return (`Left [message])
           | e -> (self#log (Printexc.get_backtrace ()))
-                 >>= (fun _ -> fail e)
+                 >>= (fun _ -> Lwt.return (`Left [Printexc.to_string e]))
         )
       else
         Lwt.return (`Left ["Plot observables must be greater than zero"])
@@ -245,7 +245,7 @@ end = struct
         )
         (function Not_found -> Lwt.return (`Left ["token not found"])
                 | e -> (self#log (Printexc.get_backtrace ()))
-                       >>= (fun _ -> fail e)
+                       >>= (fun _ -> Lwt.return (`Left [Printexc.to_string e]))
         )
     method list () : Api_types.catalog Api_types.result Lwt.t =
       Lwt.return (`Right (List.map fst (IntMap.bindings context.states)))
@@ -260,7 +260,7 @@ end = struct
        else
          Lwt.return (`Left ["process not running"]))
       (function Not_found -> Lwt.return (`Left ["token not found"])
-              | e -> fail e
+              | e -> Lwt.return (`Left [Printexc.to_string e])
       )
   end;;
 end;;
