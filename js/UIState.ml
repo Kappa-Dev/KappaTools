@@ -141,7 +141,6 @@ let start_model ~start_continuation
                                                  event_percentage = None;
                                                  tracked_events = None;
                                                  log_messages = [];
-                                                 unary_distances = [];
                                                  snapshots = [];
                                                  flux_maps = [];
                                                  files = [];
