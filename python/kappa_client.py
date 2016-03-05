@@ -159,7 +159,7 @@ if __name__ == "__main__":
             data = f.read()
             runtime = KappaRuntime("http://localhost:8080")
             token = runtime.start({ 'code': data
-                                    , 'nb_plot': 150 })
+                                   , 'nb_plot': 150 })
             print runtime.status(token)
             #print runtime.shutdown('6666')
         except RuntimeError as e:
