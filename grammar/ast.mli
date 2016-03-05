@@ -146,6 +146,10 @@ val empty_compil : (agent,mixture,string,rule) compil
 
 val no_more_site_on_right : bool -> port list -> port list -> bool
 
+val implicit_signature :
+  (agent,mixture,string,rule) compil -> (agent,mixture,string,rule) compil
+(** Infer agent signatures and tokens from init, rules and perturbations *)
+
 (** {6 Printers} *)
 
 val print_link :

@@ -291,3 +291,74 @@ let rec print_bool p_alg f = function
 
 let print_ast_bool pr_mix pr_tok pr_var =
   print_bool (print_ast_alg pr_mix pr_tok pr_var)
+
+let merge_internals =
+  List.fold_left
+    (fun acc (x,_ as y) ->
+      if List.exists (fun (x',_) -> String.compare x x' = 0) acc then acc else y::acc)
+
+let merge_ports =
+  List.fold_left
+    (fun acc p ->
+      let rec aux = function
+	| [] -> [{p with port_lnk = Location.dummy_annot FREE}]
+	| h :: t when fst p.port_nme = fst h.port_nme ->
+	  {h with port_int = merge_internals h.port_int p.port_int}::t
+	| h :: t -> h :: aux t in
+      aux acc)
+
+let merge_agents =
+  List.fold_left
+    (fun acc ((na,_ as x),s) ->
+      let rec aux = function
+	| [] -> [x,List.map
+	  (fun p -> {p with port_lnk = Location.dummy_annot FREE}) s]
+	| ((na',_),s') :: t when String.compare na na' = 0 ->
+	  (x,merge_ports s' s)::t
+	| h :: t -> h :: aux t in
+      aux acc)
+
+let merge_tokens =
+  List.fold_left
+  (fun acc (_,(na,_ as tok)) ->
+      let rec aux = function
+	| [] -> [ tok ]
+	| (na',_) :: _ as l when String.compare na na' = 0 -> l
+	| h :: t as l ->
+	  let o = aux t in
+	  if t == o then l else h::o in
+      aux acc)
+
+let sig_from_inits =
+  List.fold_left
+    (fun (ags,toks) -> function
+    | _,INIT_MIX (_,(m,_)) -> (merge_agents ags m,toks)
+    | _,INIT_TOK (na,t) -> (ags,merge_tokens toks [na,t]))
+
+let sig_from_rules =
+  List.fold_left
+    (fun (ags,toks) (_,(r,_)) ->
+      let (ags',toks') =
+	match r.arrow with
+	| RAR -> (ags,toks)
+	| LRAR -> (merge_agents ags r.rhs, merge_tokens toks r.add_token) in
+      (merge_agents ags' r.lhs, merge_tokens toks' r.rm_token))
+
+let sig_from_perts =
+  List.fold_left
+    (fun acc ((_,p,_),_) ->
+      List.fold_left
+	(fun (ags,toks) -> function
+	| INTRO (_,(m,_)) ->
+	  (merge_agents ags m,toks)
+	| UPDATE_TOK (t,na) ->
+	  (ags,merge_tokens toks [na,t])
+	| (DELETE _ | UPDATE _ | STOP _ | SNAPSHOT _ | PRINT _ | PLOTENTRY |
+	    CFLOWLABEL _ | CFLOWMIX _ | FLUX _ | FLUXOFF _) -> (ags,toks))
+	acc p)
+
+let implicit_signature r =
+  let acc = sig_from_inits (r.signatures,r.tokens) r.init in
+  let acc' = sig_from_rules acc r.rules in
+  let ags,toks = sig_from_perts acc' r.perturbations in
+  { r with signatures = ags; tokens = toks }

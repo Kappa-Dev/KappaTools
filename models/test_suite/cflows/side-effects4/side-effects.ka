@@ -14,7 +14,3 @@ A(x),B(x) -> A(x!1),B(x!1) @1
 
 %mod: [true] do $TRACK 'GOAL' [true]
 %mod: [T]>10 do ($UPDATE 'bad' 0;$UPDATE 'goal' 1)
-
-%agent: A(x)
-%agent: B(x~0~1)
-%agent: C()

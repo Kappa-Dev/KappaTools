@@ -50,9 +50,7 @@ let () =
     ("-dump-cc", Arg.String Kappa_files.set_ccFile,
      "file name for dumping the domain of observables") ;
     ("--implicit-signature",
-     Arg.Unit (fun () ->
-	       Format.eprintf "--implicitSignature is currently unplugged.@.";
-	       Parameter.implicitSignature := true),
+     Arg.Unit (fun () -> Parameter.implicitSignature := true),
      "Program will guess agent signatures automatically") ;
     ("-seed", Arg.Int (fun i -> Parameter.seedValue := Some i),
      "Seed for the random number generator") ;
@@ -137,6 +135,10 @@ let () =
     let (env, cc_env, graph, new_state) =
       match !Parameter.marshalizedInFile with
       | "" ->
+	let result =
+	  if !Parameter.implicitSignature
+	  then Ast.implicit_signature result
+	  else result in
 	let () = Format.printf "+ Sanity checks@." in
 	let (sigs_nd,tk_nd,result') =
 	  LKappa.compil_of_ast !Parameter.alg_var_overwrite result in

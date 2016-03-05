@@ -1,4 +1,4 @@
-+ Command line is: 'KaSim' '-i' 'side-effects.ka' '-e' '25' '-seed' '253329392' '-d' 'output' '--time-independent'
++ Command line is: 'KaSim' '--implicit-signature' 'side-effects.ka' '-e' '25' '-seed' '253329392' '-d' 'output' '--time-independent'
 Parsing side-effects.ka...
 done
 + Initialized random number generator with seed 253329392
