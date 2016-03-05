@@ -42,8 +42,8 @@ let check parameters error handler mixture1 mixture2 (i,j) =
   | (h1,h2)::t ->
      begin
        (* check agent type *)
-       let error,view1 = Int_storage.Quick_Nearly_inf_Imperatif.get parameters error h1 mixture1.Cckappa_sig.views in
-       let error,view2 = Int_storage.Quick_Nearly_inf_Imperatif.get parameters error h2 mixture2.Cckappa_sig.views in
+       let error,view1 = Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.get parameters error h1 mixture1.Cckappa_sig.views in
+       let error,view2 = Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.get parameters error h2 mixture2.Cckappa_sig.views in
        let error,bonds1 = Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get parameters error h1 mixture1.Cckappa_sig.bonds in 
        let error,bonds2 = Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get parameters error h2 mixture2.Cckappa_sig.bonds in
        check_interface error view1 view2 bonds1 bonds2 t already_done 

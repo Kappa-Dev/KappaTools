@@ -69,7 +69,7 @@ type pre_static =
 type bdu_analysis_static =
   {
     store_pre_static : pre_static;
-    store_covering_classes: Covering_classes_type.remanent Covering_classes_type.AgentMap.t;
+    store_covering_classes: Covering_classes_type.remanent Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.t;
     store_covering_classes_id : (int list * int list) AgentSite_map_and_set.Map.t;
     (*rewrite/ change type of this function ?*)
     store_remanent_triple: ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;
@@ -109,7 +109,7 @@ let collect_modification_sites parameter error rule_id diff_direct store_result 
     error, result
   in
   let error, store_result =
-    AgentMap.fold parameter error
+    Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.fold parameter error
       (fun parameter error agent_id agent_modif store_result ->
         if Site_map_and_set.Map.is_empty agent_modif.agent_interface
         then error, store_result
@@ -174,7 +174,7 @@ let collect_test_sites parameter error rule_id viewslhs
     error, result
   in
   let error, store_result =
-    AgentMap.fold parameter error
+    Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.fold parameter error
       (fun parameter error agent_id agent store_result ->
        match agent with
        | Unknown_agent _ | Ghost -> error, store_result
@@ -370,7 +370,7 @@ let site_covering_classes parameter error covering_classes =
   in
   let error, store_result =
     (*From sites return a list of covering_class_id*)
-    AgentMap.fold parameter error
+    Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.fold parameter error
       (fun parameter error agent_type_cv remanent store_result ->
         (*get a list of covering_class_id from remanent*)
         let cv_dic = remanent.Covering_classes_type.store_dic in
@@ -433,7 +433,7 @@ let list2set parameter error list =
 *)
 
 let collect_remanent_triple parameter error store_remanent store_result =
-  AgentMap.fold parameter error 
+  Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.fold parameter error 
     (fun parameter error agent_type remanent store_result ->
       let store_dic = remanent.Covering_classes_type.store_dic in
       (*-----------------------------------------------------------------*)
@@ -501,7 +501,7 @@ let collect_bdu_creation_restriction_map parameter handler error rule_id rule
   AgentMap.fold parameter error
     (fun parameter error agent_type' triple_list (handler,store_result) ->
       List.fold_left (fun (error, (handler,store_result)) (agent_id, agent_type) ->
-        let error, agent = AgentMap.get parameter error agent_id rule.rule_rhs.views in
+        let error, agent = Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.get parameter error agent_id rule.rule_rhs.views in
         match agent with
 	| Some Unknown_agent _ | Some Dead_agent _ 
         | None -> warn parameter error (Some "168") Exit (handler,store_result)
@@ -629,7 +629,7 @@ let collect_modif_list_restriction_map
     error, result_map
   in
   (*-----------------------------------------------------------------*)
-  AgentMap.fold parameter error 
+  Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.fold parameter error 
     (fun parameter error agent_id agent_modif (handler, store_result) ->
       if Site_map_and_set.Map.is_empty agent_modif.agent_interface
       then error, (handler, store_result)
@@ -886,7 +886,7 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
   let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in
   let error, handler, bdu_false = Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error in
   (*-----------------------------------------------------------------*)
-  AgentMap.fold parameter error
+  Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.fold parameter error
     (fun parameter error agent_id agent (handler,store_result) ->
       match agent with
       | Unknown_agent _
@@ -1153,7 +1153,7 @@ let init_pre_static =
 
 let init_bdu_analysis_static parameter error =
   let error, init_covering_classes =
-    Covering_classes_type.AgentMap.create parameter error 0 
+    Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.create parameter error 0 
   in
   let init_covering_classes_id = AgentSite_map_and_set.Map.empty in
   let error, init_remanent_triple            = AgentMap.create parameter error 0 in

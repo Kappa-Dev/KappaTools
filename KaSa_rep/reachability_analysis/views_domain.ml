@@ -771,7 +771,7 @@ struct
       get_store_remanent_triple static dynamic error
     in
     let error, (dynamic, event_list) =
-      Int_storage.Quick_Nearly_inf_Imperatif.fold parameter error
+      Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.fold parameter error
         (fun parameter error agent_id agent (dynamic, event_list) ->
           match agent with
           | Cckappa_sig.Unknown_agent _

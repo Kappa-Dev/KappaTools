@@ -29,7 +29,7 @@ let trace = false
 
 let collect_sites_modified_set parameter error rule handler_kappa store_result =
   let error, store_result =
-    AgentMap.fold parameter error
+    Agent_id_storage_quick_nearly_inf_Imperatif.fold parameter error
       (fun parameter error agent_id site_modif store_result ->
         if Site_map_and_set.Map.is_empty site_modif.agent_interface
         then
@@ -368,7 +368,7 @@ let collect_sites_bond_pair_set_external parameter error rule store_result =
 
 let collect_sites_lhs parameter error rule store_result =
   let error, store_result =
-    AgentMap.fold parameter error
+    Agent_id_storage_quick_nearly_inf_Imperatif.fold parameter error
       (fun parameter error agent_id agent store_result ->
         match agent with
         | Ghost | Unknown_agent _ -> error, store_result
@@ -411,7 +411,7 @@ let collect_sites_anchor_set parameter error handler_kappa rule
     store_sites_bond_pair_set
     store_sites_lhs
     store_result =
-  AgentMap.fold parameter error
+  Agent_id_storage_quick_nearly_inf_Imperatif.fold parameter error
     (fun parameter error agent_id agent store_result ->
       let store_result1, store_result2 = store_result in
       match agent with
@@ -593,7 +593,7 @@ let collect_internal_flow parameter error handler_kappa rule
     error, result
   in
   (*----------------------------------------------------------------------*)
-  AgentMap.fold parameter error
+  Agent_id_storage_quick_nearly_inf_Imperatif.fold parameter error
     (fun parameter error agent_id agent store_result ->
       let store_result1, store_result2 = store_result in
       match agent with
@@ -1075,7 +1075,7 @@ let scan_rule_set parameter error handler_kappa compiled =
 (*
 let get_site_common_list parameter error agent_type store_sites_common =
   let error, get_sites =
-    AgentMap.unsafe_get
+    Agent_id_storage_quick_nearly_inf_Imperatif.unsafe_get
       parameter
       error
       agent_type
@@ -1092,7 +1092,7 @@ let get_site_common_list parameter error agent_type store_sites_common =
 
 let get_site_common_set parameter error agent_type store_sites_common =
   let error, get_set =
-    AgentMap.unsafe_get
+    Agent_id_storage_quick_nearly_inf_Imperatif.unsafe_get
       parameter
       error
       agent_type
@@ -1128,7 +1128,7 @@ let anchor_set parameter error agent_type store_sites_anchor1 store_sites_anchor
 (* A set of anchors site (combine two cases) fold*)
 
 let get_anchor_common parameter error store_sites_anchor =
-  AgentMap.fold
+  Agent_id_storage_quick_nearly_inf_Imperatif.fold
      parameter
      error
      (fun parameter error agent_type site_set old_set ->
@@ -1196,7 +1196,7 @@ let collect_sites_modified_set parameter error rule handler store_sites_modified
           (*------------------------------------------------------------------------------*)
           (*store only site_set*)
           let error, store_sites_modified_set =
-            AgentMap.set
+            Agent_id_storage_quick_nearly_inf_Imperatif.set
               parameter
               error
               agent_type
@@ -1246,7 +1246,7 @@ let collect_store_bond_set_each_rule parameter error bond_lhs
   in
   (*store*)
   let error, store_sites_bond_set =
-    AgentMap.set
+    Agent_id_storage_quick_nearly_inf_Imperatif.set
       parameter
       error
       agent_type
@@ -1295,7 +1295,7 @@ let collect_store_bond_set parameter error bond_lhs site_address store_sites_bon
   in
   (*store*)
   let error, store_sites_bond_set =
-    AgentMap.set
+    Agent_id_storage_quick_nearly_inf_Imperatif.set
       parameter
       error
       agent_type
@@ -1436,7 +1436,7 @@ let store_sites_lhs parameter error rule store_sites_lhs =
           in
           (*store*)
           let error, sites_list =
-            AgentMap.set
+            Agent_id_storage_quick_nearly_inf_Imperatif.set
               parameter
               error
               agent_type
@@ -1549,7 +1549,7 @@ let collect_sites_anchor_set parameter error handler get_rule
           let _ =
             (*get a set of anchor1*)
             let error, out_anchor_set1 =
-              AgentMap.unsafe_get
+              Agent_id_storage_quick_nearly_inf_Imperatif.unsafe_get
                 parameter
                 error
                 agent_type
@@ -1562,7 +1562,7 @@ let collect_sites_anchor_set parameter error handler get_rule
             in
             (*get a set of anchor2*)
             let error, out_anchor_set2 =
-              AgentMap.unsafe_get
+              Agent_id_storage_quick_nearly_inf_Imperatif.unsafe_get
                 parameter
                 error
                 agent_type
@@ -1711,7 +1711,7 @@ let collect_internal_flow parameter error handler get_rule
           in
           (*store*)
           let error, internal_flow1 =
-            AgentMap.set
+            Agent_id_storage_quick_nearly_inf_Imperatif.set
               parameter
               error
               agent_type
@@ -1750,7 +1750,7 @@ let collect_internal_flow parameter error handler get_rule
           in
           (*store*)
           let error, internal_flow2 =
-            AgentMap.set
+            Agent_id_storage_quick_nearly_inf_Imperatif.set
               parameter
               error
               agent_type
@@ -2001,12 +2001,12 @@ let scan_rule parameter error handler get_rule ode_class =
 (*RULES*)
 
 let scan_rule_set parameter error handler compiled =
-  let error, init           = AgentMap.create parameter error 0 in
+  let error, init           = Agent_id_storage_quick_nearly_inf_Imperatif.create parameter error 0 in
   let init_pair             = (init, init) in
-  let error, init_lhs       = AgentMap.create parameter error 0 in
-  let error, init_internal1 = AgentMap.create parameter error 0 in
-  let error, init_internal2 = AgentMap.create parameter error 0 in
-  let error, init_external  = AgentMap.create parameter error 0 in
+  let error, init_lhs       = Agent_id_storage_quick_nearly_inf_Imperatif.create parameter error 0 in
+  let error, init_internal1 = Agent_id_storage_quick_nearly_inf_Imperatif.create parameter error 0 in
+  let error, init_internal2 = Agent_id_storage_quick_nearly_inf_Imperatif.create parameter error 0 in
+  let error, init_external  = Agent_id_storage_quick_nearly_inf_Imperatif.create parameter error 0 in
   (*init state of ode_class*)
   let init_ode =
     {
@@ -2020,7 +2020,7 @@ let scan_rule_set parameter error handler compiled =
     }
   in
   let error, ode_class =
-    AgentMap.fold
+    Agent_id_storage_quick_nearly_inf_Imperatif.fold
       parameter error
       (fun parameter error rule_id rule ode_class ->
         (*map rule of type int to rule of type string*)

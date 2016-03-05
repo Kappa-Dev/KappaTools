@@ -69,8 +69,8 @@ let list2set parameter error list =
 (************************************************************************************)
 
 let collect_remanent_list2set parameter error handler_kappa store_remanent  =
-  let error, init = AgentMap.create parameter error 0 in
-  AgentMap.fold parameter error 
+  let error, init = Agent_type_storage_quick_nearly_inf_Imperatif.create parameter error 0 in
+  Agent_type_storage_quick_nearly_inf_Imperatif.fold parameter error 
     (fun paramter error agent_type remanent store_result ->
      (*-------------------------------------------------------------------------*)
      (*get covering classes dictionary*)
@@ -197,7 +197,7 @@ let collect_remanent_list2set parameter error handler_kappa store_remanent  =
      (*-------------------------------------------------------------------------*)
      (*store*)
      let error, store_result =
-       AgentMap.set
+       Agent_type_storage_quick_nearly_inf_Imperatif.set
          parameter
          error
          agent_type

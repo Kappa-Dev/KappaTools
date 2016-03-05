@@ -197,7 +197,7 @@ let scan_mixture_in_var bool parameter error handler var_id mixture quarks =
       quarks.Quark_type.dead_states_minus 
   in
   let error,(agent_var,site_var,dead_agents,dead_sites,dead_states) = (*what is tested in the mixture*)
-    Int_storage.Quick_Nearly_inf_Imperatif.fold 
+    Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.fold 
       parameter
       error 
       (fun parameter error agent_id agent (agent_var,site_var,dead_agents,dead_sites,dead_states) -> 
@@ -322,7 +322,7 @@ let scan_rule parameter error handler rule_id rule quarks =
     let site_modif_minus = quarks.Quark_type.site_modif_minus in
     let _ = Misc_sa.trace parameter (fun () -> "TEST\n") in 
     let error,(agent_test,site_test,dead_agents,dead_sites,dead_states) = (*what is tested in the lhs*)
-     Int_storage.Quick_Nearly_inf_Imperatif.fold 
+     Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.fold 
          parameter
          error 
          (fun parameter error agent_id agent (agent_test,site_test,dead_agents,dead_sites,dead_states) -> 
@@ -393,7 +393,7 @@ let scan_rule parameter error handler rule_id rule quarks =
     let error,agent_modif_plus = (*the agents that are created*)
       List.fold_left 
         (fun (error,agent_modif_plus) (agent_id,agent_type) -> 
-            let error,agent = Int_storage.Quick_Nearly_inf_Imperatif.get parameter error agent_id viewsrhs in 
+            let error,agent = Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.get parameter error agent_id viewsrhs in 
               match agent with 
                | None -> warn parameter error (Some "line 111") Exit agent_modif_plus  
 	       | Some Cckappa_sig.Unknown_agent _ | Some Cckappa_sig.Ghost -> error,agent_modif_plus
@@ -448,7 +448,7 @@ let scan_rule parameter error handler rule_id rule quarks =
   in 
   let _ = Misc_sa.trace parameter (fun () -> "MODIFICATION+\n") in 
   let error,site_modif_plus = (*the sites that are directly modified (excluding side-effects)*)
-    Int_storage.Quick_Nearly_inf_Imperatif.fold 
+    Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.fold 
         parameter
         error 
         (fun parameter error agent_id agent site_modif_plus -> 
@@ -475,7 +475,7 @@ let scan_rule parameter error handler rule_id rule quarks =
   in   
   let _ = Misc_sa.trace parameter (fun () -> "MODIFICATION-\n") in 
   let error,site_modif_minus = (*the sites that are directly modified (excluding side-effects)*)
-    Int_storage.Quick_Nearly_inf_Imperatif.fold 
+    Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.fold 
        parameter
        error 
        (fun parameter error agent_id agent site_modif_minus -> 

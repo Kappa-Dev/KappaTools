@@ -26,6 +26,13 @@ module Agent_type_storage_nearly_inf_Imperatif =
    and type dimension = int
   )
 
+module Agent_type_storage_quick_nearly_inf_Imperatif =
+  (
+    Int_storage.Quick_key_list (Agent_type_storage_nearly_inf_Imperatif): Int_storage.Storage
+    with type key = agent_name 
+     and type dimension = int
+  )
+
 module Agent_type_site_storage_nearly_Inf_Int_Int_storage_Imperatif_Imperatif =
   (
     Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif: Int_storage.Storage 
@@ -79,6 +86,21 @@ type 'state port =
 
 type rule_id = int
 type agent_id = int
+
+module Agent_id_storage_nearly_inf_Imperatif =
+  (
+    Int_storage.Nearly_inf_Imperatif : Int_storage.Storage 
+   with type key = agent_id
+   and type dimension = int
+  )		  
+
+		  
+module Agent_id_storage_quick_nearly_inf_Imperatif =
+  (
+    Int_storage.Quick_key_list(Agent_id_storage_nearly_inf_Imperatif) : Int_storage.Storage 
+   with type key = agent_id
+   and type dimension = int
+  )
 
 module Rule_map_and_set =
   Map_wrapper.Make
@@ -231,7 +253,7 @@ type agent =
     
 type agent_sig = state_index list interface proper_agent 
   
-type views = agent Int_storage.Quick_Nearly_inf_Imperatif.t 
+type views = agent Agent_id_storage_quick_nearly_inf_Imperatif.t
 
 type diff_views =
     state_index
@@ -239,7 +261,7 @@ type diff_views =
       port
       Site_map_and_set.Map.t
       proper_agent
-      Int_storage.Quick_Nearly_inf_Imperatif.t
+      Agent_id_storage_quick_nearly_inf_Imperatif.t
 
 type mixture = 
     { 
@@ -321,7 +343,7 @@ type enriched_init =
     }
       
 let dummy_init parameters error =
-  let error,views = Int_storage.Quick_Nearly_inf_Imperatif.create parameters error 0 in 
+  let error,views = Agent_id_storage_quick_nearly_inf_Imperatif.create parameters error 0 in 
   let error,bonds = Int_storage.Quick_Nearly_inf_Imperatif.create parameters error 0 in 
   error,
   {

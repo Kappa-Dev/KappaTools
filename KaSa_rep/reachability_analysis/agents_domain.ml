@@ -137,8 +137,8 @@ struct
 
   let map_to_list parameter error map =
     let error, list =
-      Int_storage.Quick_Nearly_inf_Imperatif.fold parameter error
-        (fun parameter error key a current_list ->
+      Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.fold parameter error
+        (fun _ error _ a current_list ->
           let list = a :: current_list in
           error, list
         ) map []
@@ -325,8 +325,8 @@ struct
   let init_agents static dynamic error init_state event_list =
     let parameter = get_parameter static in
     let error, (dynamic, event_list) =
-      Int_storage.Quick_Nearly_inf_Imperatif.fold parameter error
-        (fun parameter error index_init agent (dynamic, event_list) ->
+      Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.fold parameter error
+        (fun parameter error _ agent (dynamic, event_list) ->
           match agent with
 	  (*JF: warn: dead,unknown,ghost should not occur in initial states *)
           | Cckappa_sig.Unknown_agent _

@@ -21,15 +21,13 @@ let warn parameters mh message exn default =
 
 let local_trace = false
 
-module AgentMap = Quick_Nearly_inf_Imperatif
-
 type 'a map = 'a Site_map_and_set.Map.t
 type set    = Site_map_and_set.Set.t
 
 type covering_classes =
   {
-    store_modified_map     : int map AgentMap.t;
-    store_covering_classes : int list list AgentMap.t;
+    store_modified_map     : int map Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.t;
+    store_covering_classes : int list list Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.t;
   }
 
 (************************************************************************************)

@@ -97,7 +97,7 @@ let print_mixture parameters error handler mixture =
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" (Remanent_parameters.get_prefix parameters) in
     let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
     let error =
-      Int_storage.Quick_Nearly_inf_Imperatif.print
+      Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.print
        error
        (fun error parameters a ->
         let _ = print_agent parameters error handler a in
@@ -147,7 +147,7 @@ let print_diffview parameters error handler diff =
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" (Remanent_parameters.get_prefix parameters) in
     let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
     let error =
-      Int_storage.Quick_Nearly_inf_Imperatif.print
+      Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.print
        error
        (fun error parameters a ->
           let _ = print_diffagent parameters error handler a in
