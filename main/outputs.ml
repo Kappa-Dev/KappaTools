@@ -395,7 +395,7 @@ let close_plot () =
   | None -> ()
   | Some plot ->
      match plot with
-     | Raw plot ->  close_out plot.desc
+     | Raw plot -> close_out plot.desc
      | Svg s -> Pp_svg.to_file s
 
 let print_header_raw f a =
@@ -439,14 +439,7 @@ let plot_now l =
   | Some (Raw fd) -> print_values_raw fd.form l
   | Some (Svg s) -> s.Pp_svg.points <- l :: s.Pp_svg.points
 
-let unary_distances_list = ref None
-
-type fd_distances = {
-  id:int;
-  desc:out_channel;
-  form:Format.formatter;
-}
-let distancesDescr = ref None
+let unary_distances_list = ref []
 
 let print_header_distances f rule_id distance =
   let () = Format.fprintf f "Rule %i: " rule_id in
@@ -460,16 +453,14 @@ let print_header_distances f rule_id distance =
   print_nb 0 
 
 let create_files_list ids_list filename = 
-  let files_list = 
-    List.map (fun (id,dist) ->
-	      let filename_string = filename^(string_of_int id)^".out" in
-	      let d = Kappa_files.open_out filename_string in
-	      let f = Format.formatter_of_out_channel d in
-	      let () = print_header_distances f id dist in
-	      {id=id; desc=d; form=f}) 
-	     ids_list in
-  distancesDescr := Some files_list
-		
+  List.map (fun (id,dist) ->
+    let filename_string = filename^(string_of_int id)^".out" in
+    let d = Kappa_files.open_out filename_string in
+    let f = Format.formatter_of_out_channel d in
+    let () = print_header_distances f id dist in
+    (id,{desc=d; form=f}))
+    ids_list
+
 let print_distances f time arr =
   let () = Format.fprintf f "@[<h>%t%E%t"
 			  !Parameter.plotSepChar time !Parameter.plotSepChar in
@@ -479,8 +470,8 @@ let print_distances f time arr =
 	 
 let print_time_distances time_distances files_list= 
   List.iter (fun (time, rules_arr) ->
-	     List.iter (fun fd -> 
-			match rules_arr.(fd.id) with 
+	     List.iter (fun (id,fd) ->
+			match rules_arr.(id) with
 			| None -> assert false
 			| Some distances ->
 			   print_distances fd.form time distances)
@@ -509,17 +500,14 @@ let close_distances () =
 			     | None -> new_list
     else [] in
   match !unary_distances_list with
-  | None ->  ()
-  | Some time_distances ->
-     let (_,last_rules_arr) = List.hd time_distances in
+  | [] ->  ()
+  | (_,last_rules_arr) :: _ as time_distances ->
      let ids_max_dist = ids_max_list last_rules_arr 0 in
      let formatted = format_unary_distances time_distances ids_max_dist in
-     let () = create_files_list ids_max_dist (Kappa_files.get_distances ()) in
-     match !distancesDescr with
-     | None -> assert false
-     | Some files_list ->
-	let () = print_time_distances formatted files_list in
-	List.iter (fun fd -> close_out fd.desc) files_list
+     let files_list =
+       create_files_list ids_max_dist (Kappa_files.get_distances ()) in
+     let () = print_time_distances formatted files_list in
+     List.iter (fun (_,fd) -> close_out fd.desc) files_list
 
 let unary_distances time arr =
   let deepcopy arr =
@@ -528,10 +516,7 @@ let unary_distances time arr =
 	       match dist_arr with
 	       | None -> None
 	       | Some dyn_arr -> Some (DynArray.copy dyn_arr)) arr' in    
-  let new_list = match !unary_distances_list with
-  | None ->  (time, (deepcopy arr))::[]
-  | Some distances -> (time, (deepcopy arr))::distances in 
-  unary_distances_list := Some new_list
+  unary_distances_list := (time, (deepcopy arr))::!unary_distances_list
  
 let print_snapshot sigs f s =
   Format.fprintf
