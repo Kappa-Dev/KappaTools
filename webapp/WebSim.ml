@@ -123,7 +123,7 @@ let handler
                     | Some code ->
                        (log code)
                        >>=
-                           (fun _ -> runtime_state#parse code)
+                           (fun () -> runtime_state#parse code)
                        >>=
                            (fun parse -> result_response ApiTypes.string_of_parse parse)
        )(* GET /process *)
@@ -171,6 +171,7 @@ let handler
 
 let server =
   let parameter_port : int ref = ref 8080 in
+  let parameter_cert_dir : string option ref = ref None in
   let parameter_shutdown_key : string option ref = ref None in
   let options  : (string * Arg.spec * string) list = [ ("--port",
                                                         Arg.Int (fun port -> parameter_port := port),
@@ -178,6 +179,9 @@ let server =
                                                        ("--shutdown-key",
                                                         Arg.String (fun key -> parameter_shutdown_key := Some key),
                                                         "key to shutdown server");
+						       ("--cert-dir",
+                                                        Arg.String (fun key -> parameter_cert_dir := Some key),
+                                                        "Directory where to find cert.pem and privkey.pem");
                                                        ("--log",
                                                         Arg.String (fun file_name -> if file_name = "-" then
                                                                                        let _ = Lwt_log.channel ~close_mode:(`Keep) ~channel:(Lwt_io.stdout) () in
@@ -204,6 +208,11 @@ let server =
                                                      ] in
   let usage : string = "WebSim --port port --shutdown-key key\n" in
   let () = Arg.parse options (fun _ -> ()) usage in
-  Server.create ~mode:(`TCP (`Port !parameter_port)) (Server.make (logger (handler ~shutdown_key:!parameter_shutdown_key)) ())
+  let mode = match !parameter_cert_dir with
+    | None -> `TCP (`Port !parameter_port)
+    | Some dir ->
+       `TLS (`Crt_file_path (dir^"cert.pem"), `Key_file_path (dir^"privkey.pem"),
+	     `No_password, `Port !parameter_port) in
+  Server.create ~mode (Server.make (logger (handler ~shutdown_key:!parameter_shutdown_key)) ())
 
 let () = ignore (Lwt_main.run server)
