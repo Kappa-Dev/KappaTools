@@ -88,7 +88,9 @@ type precondition =
    the_rule_is_applied_for_the_first_time: Usual_domains.maybe_bool ;
    state_of_site:
      Exception.method_handler ->
-     path -> Exception.method_handler * int list Usual_domains.flat_lattice ;
+     Analyzer_headers.global_dynamic_information ->
+     path ->
+     Exception.method_handler * Analyzer_headers.global_dynamic_information * int list Usual_domains.flat_lattice ;
    cache_state_of_site: int list Usual_domains.flat_lattice PathMap.t ;
    partner_map: agent_type -> site_name -> state_index -> (agent_type * site_name * state_index) Usual_domains.flat_lattice;
    partner_fold: 'a. 'a fold }
@@ -117,20 +119,20 @@ let dummy_precondition =
   {
     precondition_dummy = ();
     the_rule_is_applied_for_the_first_time = Usual_domains.Maybe;
-    state_of_site = (fun error _ -> error, Usual_domains.Any);
+    state_of_site = (fun error dynamic _ -> error, dynamic, Usual_domains.Any);
     cache_state_of_site = PathMap.empty Usual_domains.Any;
     partner_map = (fun _ _ _ -> Usual_domains.Any);
     partner_fold = (fun _ error _ _ -> error,Usual_domains.Any);
   }
     
-let get_state_of_site error precondition path =
+let get_state_of_site error dynamic precondition path =
   match
     PathMap.find path precondition.cache_state_of_site
   with
-  | Some output -> error, precondition, output
+  | Some output -> error, dynamic, precondition, output
   | None ->
     begin
-      let error, output = precondition.state_of_site error path in
+      let error, dynamic, output = precondition.state_of_site error dynamic path in
       let precondition =
 	{
           precondition with
@@ -138,13 +140,13 @@ let get_state_of_site error precondition path =
 	    PathMap.add path output precondition.cache_state_of_site
         }
       in
-      error, precondition, output
+      error, dynamic, precondition, output
     end
 
 let refine_information_about_state_of_site precondition f =
-  let new_f error path =
-    let error, _ ,old_output = get_state_of_site error precondition path in
-    f error path old_output
+  let new_f error dynamic path =
+    let error, dynamic, _ ,old_output = get_state_of_site error dynamic precondition path in
+    f error dynamic path old_output
   in
   {
     precondition with

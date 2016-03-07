@@ -944,7 +944,7 @@ struct
   (**************************************************************************)
   (*projection the result of bdu_fixpoint from:
     [map (agent_type, cv_id) bdu] to [map (agent_id, cv_id) bdu]*)
-        
+
   let proj_fixpoint_result static dynamic error rule_id =
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     let parameter = get_parameter static in
@@ -962,7 +962,7 @@ struct
       | Some map -> error, map
     in
     let error, dynamic =
-      Bdu_static_views.AgentsCV_setmap.Map.fold 
+      Bdu_static_views.AgentsCV_setmap.Map.fold
         (fun (agent_id, agent_type, cv_id) bdu_test (error, dynamic) ->
           let error, map =
             Covering_classes_type.Project_agent.monadic_proj
@@ -1035,7 +1035,7 @@ struct
             let dynamic = set_mvbdu_handler handler dynamic in
             if Mvbdu_wrapper.Mvbdu.equal bdu_inter bdu_false
             then raise (False (error, dynamic))
-            else 
+            else
               let error, map =
                 AgentIDCV_map_and_set.Map.add parameter error
                   (agent_id, cv_id) bdu_inter map
@@ -1054,12 +1054,12 @@ struct
       let precondition =
         Communication.refine_information_about_state_of_site
           precondition
-          (fun error path former_answer ->
+          (fun error dynamic path former_answer ->
             let step_list = path.Communication.relative_address in
             match
               step_list
             with
-              _::_ -> error, former_answer
+              _::_ -> error, dynamic, former_answer
             | [] ->
               begin
                 let agent_id = path.Communication.agent_id in
@@ -1087,7 +1087,7 @@ struct
                          aux site_correspondence
                        in
                        let error, (map1, map2) =
-                         Bdu_static_views.new_index_pair_map parameter error 
+                         Bdu_static_views.new_index_pair_map parameter error
                            site_correspondence
                        in
                        let error, new_site_name =
@@ -1106,11 +1106,11 @@ struct
                     (error, bdu_true)
                     cv_list
                 in
-                
 
-                
+
+
 (*              let error, handler, renamed_mvbdu =
-                Mvbdu_wrapper.Mvbdu.mvbdu_rename parameter handler error 
+                Mvbdu_wrapper.Mvbdu.mvbdu_rename parameter handler error
                   bdu hconsed_asso
               in
               let error, handler, singleton =
@@ -1121,33 +1121,33 @@ struct
                 Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu parameter handler error
                   renamed_mvbdu singleton
               in*)
-                let handler = get_mvbdu_handler dynamic in
+                let handler = Analyzer_headers.get_mvbdu_handler dynamic in
                 let error, handler, list =
                 Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu parameter handler error
                   bdu
                 in
-                let dynamic = set_mvbdu_handler handler dynamic in
-              let error, state_list =
-                List.fold_left
-                  (fun (error,output) list ->
-                    match 
-                      list
-                    with
-                  | [_,state] -> error,state::output
-                  | _ -> 
+                let dynamic = Analyzer_headers.set_mvbdu_handler handler dynamic in
+		let error, state_list =
+                  List.fold_left
+                    (fun (error,output) list ->
+                      match
+			list
+                      with
+                      | [_,state] -> error,state::output
+                      | _ ->
                     warn parameter error (Some "line 1134") Exit output)
-                  (error,[]) 
-                  list
-              in
-              error, Usual_domains.Val (List.rev state_list)
+                    (error,[])
+                    list
+		in
+		error, dynamic, Usual_domains.Val (List.rev state_list)
               end
           )
-      in   
+      in
       error, (dynamic, precondition), true
     with
       False (error, dynamic) -> error, (dynamic, precondition), false
 
-                      (*let empty_path = 
+                      (*let empty_path =
                         {
                           Communication.agent_id = 0;
                           Communication.relative_address = [];
@@ -1157,7 +1157,7 @@ struct
                       let is_empty_path path =
                         if path = empty_path
                         then true
-                        else false                       
+                        else false
                       in
                       if is_empty_path path
                       then error, usual
@@ -1195,7 +1195,7 @@ struct
                         let site_list =
                           List.fold_left (fun current_list l ->
                             List.fold_left (fun current_list (site, state) ->
-                              if site = site_path 
+                              if site = site_path
                               then site :: current_list
                               else current_list
                             ) current_list l

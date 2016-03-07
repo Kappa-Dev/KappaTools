@@ -84,9 +84,10 @@ val the_rule_is_not_applied_for_the_first_time:
 
 val get_state_of_site:
   Exception.method_handler ->
+  Analyzer_headers.global_dynamic_information ->
   precondition ->
   path ->
-  Exception.method_handler * precondition * int list Usual_domains.flat_lattice
+  Exception.method_handler * Analyzer_headers.global_dynamic_information * precondition * int list Usual_domains.flat_lattice
 
 type prefold = { fold: 'a. 'a fold}
 
@@ -97,9 +98,10 @@ type prefold = { fold: 'a. 'a fold}
 val refine_information_about_state_of_site:
   precondition ->
   (Exception.method_handler ->
+   Analyzer_headers.global_dynamic_information ->
    path ->
    int list Usual_domains.flat_lattice ->
-   Exception.method_handler * int list Usual_domains.flat_lattice) ->
+   Exception.method_handler * Analyzer_headers.global_dynamic_information * int list Usual_domains.flat_lattice) ->
   precondition
 
 val get_potential_partner:
