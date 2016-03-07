@@ -891,7 +891,7 @@ let overwrite_association_lists parameters error handler list1 list2 =
 let extensional_description_of_variables_list parameters error handler list =
   List_algebra.extensional_without_asso
     (fun parameter error handler x ->
-      let error, output = 
+      let error, output =
         Hash_1.unsafe_get parameter error
           x.List_sig.id 
           handler.Memo_sig.data.boolean_mvbdu_extensional_description_of_variables_list 

@@ -882,8 +882,25 @@ struct
   (**************************************************************************)
 
   exception False of Exception.method_handler * dynamic_information
-     
-  let is_enable_aux static dynamic error rule_id =
+
+  exception False' of Exception.method_handler *
+      (Mvbdu_wrapper.Mvbdu.mvbdu AgentIDCV_map_and_set.Map.t)
+
+  (*precondition?*)
+  (*let error, precondition, _ =
+    Communication.fold_over_potential_partners
+    parameter
+    error
+    precondition
+    agent_type
+    site
+    (fun parameter state (agent_type, site, state) (error, a) ->
+    error, a
+    )
+    a
+    in*)
+
+  let is_enable_aux static dynamic error rule_id = (*REMOVE later*)
     let parameter = get_parameter static in
     let fixpoint_result = get_fixpoint_result dynamic in
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
@@ -899,19 +916,6 @@ struct
       | Some map -> error, map
     in
     try
-      (*precondition?*)
-      (*let error, precondition, _ =
-        Communication.fold_over_potential_partners
-        parameter
-        error
-        precondition
-        agent_type
-        site
-        (fun parameter state (agent_type, site, state) (error, a) ->
-        error, a
-        )
-        a
-        in*)
       let error, dynamic =
         Bdu_static_views.AgentsCV_setmap.Map.fold
           (fun (agent_id, agent_type, cv_id) bdu_test (error, dynamic) ->
@@ -937,6 +941,51 @@ struct
     with
       False (error, dynamic) -> error, dynamic, false
 
+  (**************************************************************************)
+  (*projection the result of bdu_fixpoint from:
+    [map (agent_type, cv_id) bdu] to [map (agent_id, cv_id) bdu]*)
+        
+  let proj_fixpoint_result static dynamic error rule_id =
+    let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
+    let parameter = get_parameter static in
+    let fixpoint_result = get_fixpoint_result dynamic in
+    let handler = get_mvbdu_handler dynamic in
+    let error, store_proj_bdu_test_restriction =
+      get_store_proj_bdu_test_restriction static dynamic error
+    in
+    let error, proj_bdu_test_restriction =
+      match
+        Bdu_static_views.Rule_setmap.Map.find_option rule_id
+          store_proj_bdu_test_restriction
+      with
+      | None -> error, Bdu_static_views.AgentsCV_setmap.Map.empty
+      | Some map -> error, map
+    in
+    let error, dynamic =
+      Bdu_static_views.AgentsCV_setmap.Map.fold 
+        (fun (agent_id, agent_type, cv_id) bdu_test (error, dynamic) ->
+          let error, map =
+            Covering_classes_type.Project_agent.monadic_proj
+              (fun parameter error (agent_type, cv_id) ->
+                error, (agent_id, cv_id))
+              parameter
+              error
+              bdu_false
+              (fun parameter error bdu bdu' ->
+                let error, handler, bdu =
+                  Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu bdu'
+                in
+                error, bdu)
+              fixpoint_result
+          in
+          let dynamic = set_proj_fixpoint_result map dynamic in
+          error, dynamic
+        ) proj_bdu_test_restriction (error, dynamic)
+    in
+    error, dynamic
+
+  (**************************************************************************)
+
   let init_path =
     {
       Communication.agent_id = 0;
@@ -944,34 +993,16 @@ struct
       Communication.site = 0
     }
 
-  let proj_fixpoint_result static dynamic error =
-    let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
-    let parameter = get_parameter static in
-    let fixpoint_result = get_fixpoint_result dynamic in
-    let handler = get_mvbdu_handler dynamic in
-    let error, map =
-      Covering_classes_type.Project_agent.monadic_proj
-        (fun parameter error (agent_type, cv_id) ->
-          error, (0, cv_id)) (*TODO*)
-        parameter
-        error
-        bdu_false
-        (fun parameter error bdu bdu' ->
-          let error, handler, bdu =
-            Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu bdu'
-          in
-          error, bdu)
-        fixpoint_result
-    in
-    let dynamic = set_proj_fixpoint_result map dynamic in
-    error, dynamic
-
   let is_enable_aux' static dynamic error rule_id precondition =
     let parameter = get_parameter static in
-    let proj_fixpoint_result = get_proj_fixpoint_result dynamic in
+    let fixpoint_result = get_fixpoint_result dynamic in
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
+    let error, dynamic, bdu_true = get_mvbdu_true static dynamic error in
     let error, store_proj_bdu_test_restriction =
       get_store_proj_bdu_test_restriction static dynamic error
+    in
+    let error, site_correspondence =
+      get_store_remanent_triple static dynamic error
     in
     let error, proj_bdu_test_restriction =
       match
@@ -985,38 +1016,218 @@ struct
       let error, dynamic, map =
         Bdu_static_views.AgentsCV_setmap.Map.fold
           (fun (agent_id, agent_type, cv_id) bdu_test (error, dynamic, map) ->
+            (*---------------------------------------------------------------------*)
+            (*for each (agent_id, cv_id) a bdu*)
             let error, bdu_X =
               match
-                AgentIDCV_map_and_set.Map.find_option_without_logs parameter
-                  error (agent_id, cv_id) proj_fixpoint_result
+                AgentCV_map_and_set.Map.find_option_without_logs parameter
+                  error (agent_type, cv_id) fixpoint_result
               with
               | error, None -> Printf.fprintf stdout "cv_id %i\n" cv_id; error, bdu_false
               | error, Some bdu -> error, bdu
             in
+            (*---------------------------------------------------------------------*)
+            (*bdu intersection*)
             let handler = get_mvbdu_handler dynamic in
             let error, handler, bdu_inter =
               Mvbdu_wrapper.Mvbdu.mvbdu_and parameter handler error bdu_test bdu_X
             in
             let dynamic = set_mvbdu_handler handler dynamic in
-            (*do the bdu_rename, extensional_of_mvbdu, then state list*)
-            (*get list_a*)
-            
-            (*let error, handler, bdu =
-              Mvbdu_wrapper.Mvbdu.mvbdu_rename parameter handler error b list_a
+            if Mvbdu_wrapper.Mvbdu.equal bdu_inter bdu_false
+            then raise (False (error, dynamic))
+            else 
+              let error, map =
+                AgentIDCV_map_and_set.Map.add parameter error
+                  (agent_id, cv_id) bdu_inter map
+              in
+              error, dynamic, map
+          ) proj_bdu_test_restriction (error, dynamic,AgentIDCV_map_and_set.Map.empty)
+      in
+      (*---------------------------------------------------------------------*)
+      (*get a set of sites in a covering class: later with state list*)
+(*      let precondition = *)
+        (*AgentIDCV_map_and_set.Map.fold
+          (fun (agent_id, cv_id) bdu precondition ->
+            let error, handler, list =
+              Mvbdu_warpper.Mvbdu.extensional_of_mvbdu parameter handler error bdu
             in*)
+      let precondition =
+        Communication.refine_information_about_state_of_site
+          precondition
+          (fun error path former_answer ->
+            let step_list = path.Communication.relative_address in
+            match
+              step_list
+            with
+              _::_ -> error, former_answer
+            | [] ->
+              begin
+                let agent_id = path.Communication.agent_id in
+                let agent_type = 1 in (* to do, get the agent type from the agent id *)
+                let site_name = path.Communication.site in
+                let error, site_correspondence =
+                  match Bdu_static_views.AgentMap.get parameter error
+                    agent_type site_correspondence
+                  with
+                  | error, None -> warn parameter error (Some "") Exit []
+                  | error, Some a -> error, a
+                in
+                let cv_list = [] (* compute the list of cv_id documenting site_name *)
+                in
+                let error, bdu =
+                  List.fold_left
+                    (fun (error, bdu) cv_id ->
+                       let error, site_correspondence =
+                         let rec aux list =
+                           match list with
+                           | [] -> warn parameter error (Some "") Exit []
+                           | (h, list, _) :: _ when h = cv_id -> error, list
+                           | _ :: tail -> aux tail
+                         in
+                         aux site_correspondence
+                       in
+                       let error, (map1, map2) =
+                         Bdu_static_views.new_index_pair_map parameter error 
+                           site_correspondence
+                       in
+                       let error, new_site_name =
+                         match Cckappa_sig.Site_map_and_set.Map.find_option
+                           parameter error site_name map2
+                         with
+                         | error, None -> warn parameter error (Some "") Exit (-1)
+                         | error, Some i -> error, i
+                       in
+                       let error, bdu' = error, bdu_true (* fetch the bdu for the qgent type and the cv_id in the current state of the iteration *)
+                       in
+                       let error, bdu' = error, bdu' (* to do compute the projection over new_site_name *) in
+                       let error, bdu' = error, bdu' (* to do. rename new_site_name into 1 *) in
+                       let error, bdu = error, bdu (* to do conjunction between bdu and bdu'*) in
+                       error, bdu)
+                    (error, bdu_true)
+                    cv_list
+                in
+                
 
-            (*get a set of sites in a covering class: later with state list*)
-            (*let precondition =
-              Communication.refine_information_about_state_of_site
-                precondition
-                (fun error path usual ->
-                  
-                  error,
-                )
-            in*)
-            
+                
+(*              let error, handler, renamed_mvbdu =
+                Mvbdu_wrapper.Mvbdu.mvbdu_rename parameter handler error 
+                  bdu hconsed_asso
+              in
+              let error, handler, singleton =
+                Mvbdu_wrapper.Mvbdu.build_variables_list parameter handler error
+                  site_correspondence
+              in
+              let error, handler, proj_in =
+                Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu parameter handler error
+                  renamed_mvbdu singleton
+              in*)
+                let handler = get_mvbdu_handler dynamic in
+                let error, handler, list =
+                Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu parameter handler error
+                  bdu
+                in
+                let dynamic = set_mvbdu_handler handler dynamic in
+              let error, state_list =
+                List.fold_left
+                  (fun (error,output) list ->
+                    match 
+                      list
+                    with
+                  | [_,state] -> error,state::output
+                  | _ -> 
+                    warn parameter error (Some "line 1134") Exit output)
+                  (error,[]) 
+                  list
+              in
+              error, Usual_domains.Val (List.rev state_list)
+              end
+          )
+      in   
+      error, (dynamic, precondition), true
+    with
+      False (error, dynamic) -> error, (dynamic, precondition), false
 
-            (*, intersection of bdu and projection of bdu*)
+                      (*let empty_path = 
+                        {
+                          Communication.agent_id = 0;
+                          Communication.relative_address = [];
+                          Communication.site = 0
+                        }
+                      in
+                      let is_empty_path path =
+                        if path = empty_path
+                        then true
+                        else false                       
+                      in
+                      if is_empty_path path
+                      then error, usual
+                      else*)
+                        (*------------------------------------------------------------*)
+                        (*do the bdu_rename for bdu*)
+                      (*let handler = get_mvbdu_handler dynamic in
+                        let error, handler, list =
+                          Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu parameter handler error
+                            bdu
+                        in
+                        let site_path = path.Communication.site in
+                        let pair_list =
+                          List.fold_left (fun current_list l ->
+                            List.fold_left (fun current_list (site, state) ->
+                              if site_path = site
+                              then (site, state) :: current_list
+                              else current_list
+                            ) current_list l
+                          ) [] list
+                        in
+                        let error, handler, list_a =
+                          Mvbdu_wrapper.Mvbdu.build_association_list
+                            parameter
+                            handler
+                            error
+                            pair_list
+                        in
+                        let error, handler, bdu =
+                          Mvbdu_wrapper.Mvbdu.mvbdu_rename parameter handler error
+                            bdu list_a
+                        in
+                        (*------------------------------------------------------------*)
+                        (*do the projection*)
+                        let site_list =
+                          List.fold_left (fun current_list l ->
+                            List.fold_left (fun current_list (site, state) ->
+                              if site = site_path 
+                              then site :: current_list
+                              else current_list
+                            ) current_list l
+                          ) [] list
+                        in
+                        let error, handler, singleton =
+                          Mvbdu_wrapper.Mvbdu.build_variables_list parameter handler error
+                            site_list
+                        in
+                        let error, handler, proj_in =
+                          Mvbdu_wrapper.Mvbdu.mvbdu_project_keep_only parameter handler
+                            error bdu singleton
+                        in
+                        let error, handler, list =
+                          Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu parameter handler error
+                            proj_in
+                        in
+                        (*store dynamic*)
+                        (*let dynamic = set_mvbdu_handler handler dynamic in*)
+                        let state_list =
+                          List.fold_left (fun current_list l ->
+                            let (_, state_list) = List.split l in
+                            List.concat [state_list; current_list]
+                          ) [] list
+                         in
+                        let precondition = Usual_domains.Val state_list in
+                        error, precondition*)
+(* )
+                ) map precondition
+            in
+            (*---------------------------------------------------------------------*)
+            (*FIXME: intersection of bdu and projection of bdu*)
             if Mvbdu_wrapper.Mvbdu.equal bdu_inter bdu_false
             then raise (False (error, dynamic))
             else error, dynamic, map
@@ -1025,9 +1236,9 @@ struct
       in
       error, dynamic, true, map
     with
-      False (error, dynamic) -> 
-        error, dynamic, false, AgentIDCV_map_and_set.Map.empty
+      False (error, dynamic) -> error, dynamic, false, AgentIDCV_map_and_set.Map.empty*)
 
+  (**************************************************************************)
   (*get contact_map from dynamic*)
   (* then use the functions get_potential_partner and/or
      fold_over_potential_partners in the views domain to use the incremental
