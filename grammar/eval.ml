@@ -588,17 +588,17 @@ let initialize logger ?rescale_init sigs_nd tk_nd contact_map counter result =
 		     (Array.of_list (List.rev obs)) (Array.of_list pert) in
 
   Debug.tag logger "\t -initial conditions";
+  let domain = Connected_component.Env.finalize domain in
   let domain,graph =
     init_graph_of_result
       ?rescale:rescale_init alg_nd tracking_enabled contact_map
       counter env domain result in
-  let final_domain = Connected_component.Env.finalize domain in
   let () =
     if !Parameter.compileModeOn || !Parameter.debugModeOn then
       Format.eprintf
 	"@[<v>@[<v 2>Environment:@,%a@]@,@[<v 2>Domain:@,@[%a@]@]@,@[<v 2>Intial graph;@,%a@]@]@."
 	Kappa_printer.env env
-	Connected_component.Env.print final_domain
+	Connected_component.Env.print domain
 	(Rule_interpreter.print env) graph in
   let graph',state =
     State_interpreter.initial env counter graph stops relative_fluxmaps in
@@ -614,4 +614,4 @@ let initialize logger ?rescale_init sigs_nd tk_nd contact_map counter result =
 	   "An observable may be tracked but no compression level to render stories has been specified")
   in
   (Debug.tag logger "\t Done";
-   (env, final_domain, graph', state))
+   (env, domain, graph', state))

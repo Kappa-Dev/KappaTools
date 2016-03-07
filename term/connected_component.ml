@@ -551,7 +551,7 @@ and scan_sons level1 set keep_last cc_id = function
 let finalize env =
   let level1 = let zero = get env 0 in List.map (fun p -> p.dst) zero.sons in
   let f id p env =
-    if p.sons = []
+    if p.sons = [] && not (List.mem id level1)
     then scan_sons level1 env true id p.fathers
     else env in
   match env.domain with
