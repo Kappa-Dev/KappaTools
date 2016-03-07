@@ -153,6 +153,15 @@ struct
           domain_dynamic_information = domain
       } dynamic
 
+  let get_store_update dynamic =
+    (get_domain_dynamic_information dynamic).Bdu_dynamic_views.store_update
+
+  let set_store_update update dynamic =
+    set_domain_dynamic_information
+      {
+        Bdu_dynamic_views.store_update = update
+      } dynamic
+
   (*--------------------------------------------------------------------*)
 
   type 'a zeroary =
@@ -1393,15 +1402,51 @@ struct
     error, dynamic, (precondition, event_list)
 
   (* events enable communication between domains. At this moment, the
-     global domain does not collect information *)
+     global domain does not collect information *)      
 
-  let apply_event static (error,dynamic,event_list) event =
+  (*TODO*)
+  let apply_event static (error, dynamic, event_list) event =
+    let parameter = get_parameter static in
+    let side_effects = get_side_effects static in
+    let store_update = get_store_update dynamic in
+    let (half_break, remove) = side_effects in
     match event with
-    | Communication.See_a_new_bond (_,_) ->
-      (* get the the pairs (r,state) compatible with the second site *)
+    | Communication.See_a_new_bond ((agent_type, site_type, state), 
+                                    (agent_type', site_type', state')) ->
+      (* get the the pairs (r, state) compatible with the second site *)
+      let error, pair_list =
+        match Common_static.AgentSite_map_and_set.Map.find_option_without_logs
+          parameter error (agent_type, site_type)
+          half_break
+        with
+        | error, None -> error, []
+        | error, Some (_, l) -> error, l
+      in
       (* for each add the rule r in update of (c) for any covering class
          that documents this second site *)
+      let error, update =
+        Bdu_dynamic_views.AgentCV_map_and_set.Map.fold (*FIXME: map?*)
+          (fun (agent_type, cv_id) (l, rule_id_set) (error, store_result) ->
+            let error, new_rule_id_set =
+              List.fold_left (fun (error, store) (rule, state) ->
+                let error, new_update = Cckappa_sig.Site_map_and_set.Set.add
+                  parameter error rule store
+                in
+                error, new_update
+              ) (error, rule_id_set) pair_list
+            in
+            let error, store_result =
+              Bdu_dynamic_views.AgentCV_map_and_set.Map.add_or_overwrite
+                parameter error 
+                (agent_type, cv_id) 
+                (l, new_rule_id_set)
+                store_result
+            in
+            error, store_result
+          ) store_update (error, Bdu_dynamic_views.AgentCV_map_and_set.Map.empty)
+      in
       (* update is in local dynamic information *)
+      let dynamic = set_store_update update dynamic in
       (* when doing so, add any such rules r in the event list with an
          event of kind Check_rule *)
       error, dynamic, event_list

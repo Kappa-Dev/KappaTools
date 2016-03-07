@@ -29,7 +29,7 @@ type half_break_action =
   (int list * (rule_id * state_index) list) AgentSite_map_and_set.Map.t
 
 type remove_action =
-  (int list * rule_id list) AgentSite_map_and_set.Map.t
+  (int list * (rule_id * state_index) list) AgentSite_map_and_set.Map.t
 
 type free_partner = (site_name * state_index) list AgentRule_map_and_set.Map.t
 type bind_partner = (site_name * state_index) list AgentRule_map_and_set.Map.t
@@ -112,8 +112,10 @@ let half_break_action parameter error handler rule_id half_break store_result =
 (************************************************************************************)
 (*compute remove action: r0 and r1 are remove action *)
 
+(*FIXME: state = 0 or there is no state?*)
+
 let remove_action parameter error rule_id remove store_result =
-  let add_link (agent_type, site_type) r store_result =
+  let add_link (agent_type, site_type) (r, state) store_result =
     let error, (l, old) =
       match AgentSite_map_and_set.Map.find_option_without_logs
         parameter error (agent_type, site_type) store_result
@@ -123,7 +125,7 @@ let remove_action parameter error rule_id remove store_result =
     in
     let error, result =
       AgentSite_map_and_set.Map.add_or_overwrite
-        parameter error (agent_type, site_type) (l, r :: old) store_result
+        parameter error (agent_type, site_type) (l, (r, state) :: old) store_result
     in
     error, result
   in
@@ -136,7 +138,7 @@ let remove_action parameter error rule_id remove store_result =
       let store_result =
         List.fold_left (fun store_result site_type ->
           let error, result =
-            add_link (agent_type, site_type) rule_id store_result
+            add_link (agent_type, site_type) (rule_id, 0) store_result
           in
           (*let _ =
             Printf.fprintf stdout "REMOVE ACTION: agent_type:%i:site_type:%i:rule_id:%i\n"
