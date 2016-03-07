@@ -55,14 +55,14 @@ install:
   - opam init -a git://github.com/ocaml/opam-repository && eval $(opam config env)
   - opam install -y ocamlfind
   - sh -c "if [ '$CHECKED' = js ] ; then opam install -y reactiveData tyxml js_of_ocaml yojson atdgen ; fi"
-  - sh -c "if [ '$CHECKED' = webserver ] ; then opam install -y yojson atdgen lwt cohttp ; fi"
+  - sh -c "if [ '$CHECKED' = webserver ] ; then opam install -y atdgen lwt cohttp ; fi"
   - sh -c "if [ '$USE_TK' = 1 ] ; then opam install -y labltk ; fi"
 
 script:
   - make all
   - sh -c "if [ '$CHECKED' = native ] ; then make doc_html ; fi"
   - sh -c "if [ '$CHECKED' = native ] ; then make -j2 check ; fi"
-  - sh -c "if [ '$CHECKED' = webserver ] ; then make WebSim.native ; fi"
+  - sh -c "if [ '$CHECKED' = webserver ] ; then make WebSim.native && cd python && python test_kappa_client.py ; fi"
   - sh -c "if [ '$CHECKED' = js ] ; then make site/index.html ; fi"
 
 after_success:
