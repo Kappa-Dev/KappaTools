@@ -91,6 +91,14 @@ module AgentCV_map_and_set =
         let compare = compare
       end))
 
+module AgentIDCV_map_and_set =
+  Map_wrapper.Make (
+    SetMap.Make (
+      struct
+        type t = agent_id * cv_id
+        let compare = compare
+      end))
+
 module AgentsRuleCV_map_and_set =
   Map_wrapper.Make
     (SetMap.Make (
@@ -152,3 +160,6 @@ module Project2_bdu_views =
 
 module Project2_modif =
   Map_wrapper.Proj (AgentsSite_map_and_set) (AgentSite_map_and_set)
+
+module Project_agent =
+  Map_wrapper.Proj (AgentCV_map_and_set) (AgentIDCV_map_and_set)

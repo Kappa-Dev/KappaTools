@@ -39,11 +39,13 @@ struct
      dynamic information, including the result of the analysis *)
 
   module AgentCV_map_and_set = Covering_classes_type.AgentCV_map_and_set
+  module AgentIDCV_map_and_set = Covering_classes_type.AgentIDCV_map_and_set
 
   type local_dynamic_information =
     {
       dead_rule       : bool array;
       fixpoint_result : Mvbdu_wrapper.Mvbdu.mvbdu AgentCV_map_and_set.Map.t;
+      proj_fixpoint_result : Mvbdu_wrapper.Mvbdu.mvbdu AgentIDCV_map_and_set.Map.t;
       domain_dynamic_information : Bdu_dynamic_views.bdu_analysis_dynamic;
     }
 
@@ -139,6 +141,17 @@ struct
       {
         (get_local_dynamic_information dynamic) with
           fixpoint_result = result
+      } dynamic
+
+  (*get projection for fixpoint result*)
+  let get_proj_fixpoint_result dynamic =
+    (get_local_dynamic_information dynamic).proj_fixpoint_result
+
+  let set_proj_fixpoint_result result dynamic =
+    set_local_dynamic_information
+      {
+        (get_local_dynamic_information dynamic) with
+          proj_fixpoint_result = result
       } dynamic
 
   (** bdu analysis dynamic in local dynamic information*)
@@ -263,6 +276,7 @@ struct
     let nrules = Handler.nrules parameter error kappa_handler in
     let init_dead_rule_array = Array.make nrules false in
     let init_fixpoint = AgentCV_map_and_set.Map.empty in
+    let init_proj = AgentIDCV_map_and_set.Map.empty in
     let init_bdu_analysis_dynamic = Bdu_dynamic_views.init_bdu_analysis_dynamic
     in
     let init_global_dynamic =
@@ -271,6 +285,7 @@ struct
 	local =
 	  { dead_rule = init_dead_rule_array;
 	    fixpoint_result = init_fixpoint;
+            proj_fixpoint_result = init_proj;
 	    domain_dynamic_information = init_bdu_analysis_dynamic;
 	  }}
     in
@@ -867,8 +882,8 @@ struct
   (**************************************************************************)
 
   exception False of Exception.method_handler * dynamic_information
-
-  let is_enable_aux static dynamic error rule_id precondition =
+     
+  let is_enable_aux static dynamic error rule_id =
     let parameter = get_parameter static in
     let fixpoint_result = get_fixpoint_result dynamic in
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
@@ -922,6 +937,97 @@ struct
     with
       False (error, dynamic) -> error, dynamic, false
 
+  let init_path =
+    {
+      Communication.agent_id = 0;
+      Communication.relative_address = [];
+      Communication.site = 0
+    }
+
+  let proj_fixpoint_result static dynamic error =
+    let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
+    let parameter = get_parameter static in
+    let fixpoint_result = get_fixpoint_result dynamic in
+    let handler = get_mvbdu_handler dynamic in
+    let error, map =
+      Covering_classes_type.Project_agent.monadic_proj
+        (fun parameter error (agent_type, cv_id) ->
+          error, (0, cv_id)) (*TODO*)
+        parameter
+        error
+        bdu_false
+        (fun parameter error bdu bdu' ->
+          let error, handler, bdu =
+            Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu bdu'
+          in
+          error, bdu)
+        fixpoint_result
+    in
+    let dynamic = set_proj_fixpoint_result map dynamic in
+    error, dynamic
+
+  let is_enable_aux' static dynamic error rule_id precondition =
+    let parameter = get_parameter static in
+    let proj_fixpoint_result = get_proj_fixpoint_result dynamic in
+    let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
+    let error, store_proj_bdu_test_restriction =
+      get_store_proj_bdu_test_restriction static dynamic error
+    in
+    let error, proj_bdu_test_restriction =
+      match
+        Bdu_static_views.Rule_setmap.Map.find_option rule_id
+          store_proj_bdu_test_restriction
+      with
+      | None -> error, Bdu_static_views.AgentsCV_setmap.Map.empty
+      | Some map -> error, map
+    in
+    try
+      let error, dynamic, map =
+        Bdu_static_views.AgentsCV_setmap.Map.fold
+          (fun (agent_id, agent_type, cv_id) bdu_test (error, dynamic, map) ->
+            let error, bdu_X =
+              match
+                AgentIDCV_map_and_set.Map.find_option_without_logs parameter
+                  error (agent_id, cv_id) proj_fixpoint_result
+              with
+              | error, None -> Printf.fprintf stdout "cv_id %i\n" cv_id; error, bdu_false
+              | error, Some bdu -> error, bdu
+            in
+            let handler = get_mvbdu_handler dynamic in
+            let error, handler, bdu_inter =
+              Mvbdu_wrapper.Mvbdu.mvbdu_and parameter handler error bdu_test bdu_X
+            in
+            let dynamic = set_mvbdu_handler handler dynamic in
+            (*do the bdu_rename, extensional_of_mvbdu, then state list*)
+            (*get list_a*)
+            
+            (*let error, handler, bdu =
+              Mvbdu_wrapper.Mvbdu.mvbdu_rename parameter handler error b list_a
+            in*)
+
+            (*get a set of sites in a covering class: later with state list*)
+            (*let precondition =
+              Communication.refine_information_about_state_of_site
+                precondition
+                (fun error path usual ->
+                  
+                  error,
+                )
+            in*)
+            
+
+            (*, intersection of bdu and projection of bdu*)
+            if Mvbdu_wrapper.Mvbdu.equal bdu_inter bdu_false
+            then raise (False (error, dynamic))
+            else error, dynamic, map
+          ) proj_bdu_test_restriction
+          (error, dynamic, AgentIDCV_map_and_set.Map.empty)
+      in
+      error, dynamic, true, map
+    with
+      False (error, dynamic) -> 
+        error, dynamic, false, AgentIDCV_map_and_set.Map.empty
+
   (*get contact_map from dynamic*)
   (* then use the functions get_potential_partner and/or
      fold_over_potential_partners in the views domain to use the incremental
@@ -935,7 +1041,6 @@ struct
         dynamic
         error
         rule_id
-        precondition
     in
     if is_enable
     then

@@ -548,30 +548,40 @@ struct
           error
           precondition
           (fun agent_type site_type state ->
-            Usual_domains.Val (agent_type, site_type, state)
-	  (* Here you should fetch the partner in the dynamic contact map, if defined, *)
-	  )
+	    (* Here you should fetch the partner in the dynamic contact
+	       map, if defined, *)
+            let error, statemap_bottop =
+              AgentSite_map_and_set.Map.find_option_without_logs parameter error
+                (agent_type, site_type) dynamic.local.bonds_per_site
+            in
+            match statemap_bottop with
+            | None -> Usual_domains.Val (agent_type, site_type, state)
+            | Some statemap ->
+              State_map_and_set.Map.fold
+                (fun state (agent_type', site_type', state') _ ->
+                  Usual_domains.Val (agent_type', site_type', state')
+                ) statemap Usual_domains.Any)
           {
             Communication.fold =
 	      begin
 		fun parameter error agent_type site_type ->
-		let error, statemap_bottop = 
-                  AgentSite_map_and_set.Map.find_option_without_logs parameter error
-                    (agent_type, site_type) dynamic.local.bonds_per_site
-                in
-		match statemap_bottop with
-		| None -> error,
-		  (Usual_domains.Val
-		     (fun f error init -> error, init))
-		| Some statemap ->
-		  error,
-		  Usual_domains.Val
-		    (fun f error init ->
-		      State_map_and_set.Map.fold
-			(f parameter)
-		       	statemap
-			(error, init)
-		    )
+		  let error, statemap_bottop = 
+                    AgentSite_map_and_set.Map.find_option_without_logs parameter error
+                      (agent_type, site_type) dynamic.local.bonds_per_site
+                  in
+		  match statemap_bottop with
+		  | None -> error,
+		    (Usual_domains.Val
+		       (fun f error init -> error, init))
+		  | Some statemap ->
+		    error,
+		    Usual_domains.Val
+		      (fun f error init ->
+		        State_map_and_set.Map.fold
+			  (f parameter)
+		       	  statemap
+			  (error, init)
+		      )
 	      end
           }
       in

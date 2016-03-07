@@ -81,6 +81,7 @@ type prefold =
     fold: 'a. 'a fold
   }
 
+(*precondition is used to get the information between domains*)
 type precondition =
  {
    precondition_dummy: unit (* to avoid compilation warning *);

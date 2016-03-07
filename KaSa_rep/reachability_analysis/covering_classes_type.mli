@@ -47,6 +47,8 @@ type site_name = Cckappa_sig.site_name*)
 
 module AgentCV_map_and_set: Map_wrapper.S_with_logs with type elt = Cckappa_sig.agent_name * cv_id
 
+module AgentIDCV_map_and_set: Map_wrapper.S_with_logs with type elt = agent_id * cv_id
+
 module AgentsRuleCV_map_and_set: Map_wrapper.S_with_logs 
   with type elt = Cckappa_sig.agent_id * Cckappa_sig.agent_name * Cckappa_sig.rule_id * cv_id
 
@@ -91,3 +93,9 @@ module Project2_modif: Map_wrapper.Projection
   and type elt_b = Cckappa_sig.agent_name * Cckappa_sig.site_name
   and type 'a map_a = 'a Cckappa_sig.AgentsSite_map_and_set.Map.t
   and type 'a map_b = 'a Cckappa_sig.AgentSite_map_and_set.Map.t
+
+module Project_agent: Map_wrapper.Projection
+  with type elt_a = int * int
+  and type elt_b = agent_id * cv_id
+  and type 'a map_a = 'a AgentCV_map_and_set.Map.t
+  and type 'a map_b = 'a AgentIDCV_map_and_set.Map.t
