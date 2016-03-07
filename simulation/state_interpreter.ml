@@ -258,76 +258,50 @@ let a_loop ~outputs form env domain counter graph state =
   let rd = Random.float 1.0 in
   let dt = abs_float (log rd /. activity) in
 
-(*Activity is null or dt is infinite*)
-  if not (activity > 0.) || dt = infinity then
-    match !(state.stopping_times) with
-    | [] ->
-       let () =
-	 if !Parameter.dumpIfDeadlocked then
-	   outputs
-	     (Data.Snapshot
-		(Rule_interpreter.snapshot env counter "deadlock.ka" graph)) in
-       let () =
-	 Format.fprintf
-	   form
-	   "?@.A deadlock was reached after %d events and %Es (Activity = %.5f)"
-	   (Counter.current_event counter)
-	   (Counter.current_time counter) activity in
-       (true,graph,state)
-    | (ti,_) :: tail ->
-       let () = state.stopping_times := tail in
-       let continue = Counter.one_time_correction_event counter ti in
-       let stop,graph',state' =
-	 perturbate ~outputs env domain counter graph state in
-       (not continue||stop,graph',state')
-  else
-(*activity is positive*)
-    match !(state.stopping_times) with
-    | (ti,_) :: tail
-	 when Nbr.is_smaller ti (Nbr.F (Counter.current_time counter +. dt)) ->
-       let () = state.stopping_times := tail in
-       let continue = Counter.one_time_correction_event counter ti in
-       let stop,graph',state' =
-	 perturbate ~outputs env domain counter graph state in
-       (not continue||stop,graph',state')
-    | _ ->
-       let (stop,graph',state') =
-	 perturbate ~outputs env domain counter graph state in
-       one_rule dt stop env domain counter graph' state'
-
-let loop_cps ~outputs form hook return env domain counter graph state =
-  let rec iter graph state =
-    let stop,graph',state' =
-      try
-	let (stop,graph',state') as out =
-	  a_loop ~outputs form env domain counter graph state in
-	let () =
-	  Counter.fill ~outputs
-	    counter (observables_values env counter graph' state')
-	    (Rule_interpreter.unary_distances graph') in
-	let () = if stop then
-		   ignore (perturbate ~outputs env domain counter graph' state') in
-	out
-      with ExceptionDefn.UserInterrupted f ->
-	let () = Format.pp_print_newline form () in
-	let msg = f (Counter.current_time counter) (Counter.current_event counter) in
-	let () =
-	  Format.fprintf
-	    form
-	    "@.***%s: would you like to record the current state? (y/N)***@."
-	    msg in
-	let () =
-	  if not !Parameter.batchmode then
-	    match String.lowercase (Tools.read_input ()) with
-	    | ("y" | "yes") ->
-	       outputs
-		 (Data.Snapshot
-		    (Rule_interpreter.snapshot env counter "dump.ka" graph))
-	    | _ -> () in
-	(true,graph,state) in
-    if stop then return graph' state'
-    else hook (fun () -> iter graph' state')
-  in iter graph state
+  let (stop,graph',state' as out) =
+    (*Activity is null or dt is infinite*)
+    if not (activity > 0.) || dt = infinity then
+      match !(state.stopping_times) with
+      | [] ->
+	 let () =
+	   if !Parameter.dumpIfDeadlocked then
+	     outputs
+	       (Data.Snapshot
+		  (Rule_interpreter.snapshot env counter "deadlock.ka" graph)) in
+	 let () =
+	   Format.fprintf
+	     form
+	     "?@.A deadlock was reached after %d events and %Es (Activity = %.5f)"
+	     (Counter.current_event counter)
+	     (Counter.current_time counter) activity in
+	 (true,graph,state)
+      | (ti,_) :: tail ->
+	 let () = state.stopping_times := tail in
+	 let continue = Counter.one_time_correction_event counter ti in
+	 let stop,graph',state' =
+	   perturbate ~outputs env domain counter graph state in
+	 (not continue||stop,graph',state')
+    else
+      (*activity is positive*)
+      match !(state.stopping_times) with
+      | (ti,_) :: tail
+	   when Nbr.is_smaller ti (Nbr.F (Counter.current_time counter +. dt)) ->
+	 let () = state.stopping_times := tail in
+	 let continue = Counter.one_time_correction_event counter ti in
+	 let stop,graph',state' =
+	   perturbate ~outputs env domain counter graph state in
+	 (not continue||stop,graph',state')
+      | _ ->
+	 let (stop,graph',state') =
+	   perturbate ~outputs env domain counter graph state in
+	 one_rule dt stop env domain counter graph' state' in
+  let () =
+    Counter.fill ~outputs
+		 counter (observables_values env counter graph' state')
+		 (Rule_interpreter.unary_distances graph') in
+  let () = if stop then
+	     ignore (perturbate ~outputs env domain counter graph' state') in
+  out
 
 let finalize ~outputs form env counter graph state =
   let () = Outputs.close () in
@@ -346,9 +320,28 @@ let finalize ~outputs form env counter graph state =
   let () = ExceptionDefn.flush_warning form in
   Rule_interpreter.generate_stories form env graph
 
-let go form counter f =
-  let () = Counter.tick form counter in
-  f ()
-
 let loop ~outputs form env domain counter graph state =
-  loop_cps ~outputs form (go form counter) (finalize ~outputs form env counter) env domain counter graph state
+  let rec iter graph state =
+    let stop,graph',state' =
+      try
+	a_loop ~outputs form env domain counter graph state
+      with ExceptionDefn.UserInterrupted f ->
+	let () = Format.pp_print_newline form () in
+	let msg = f (Counter.current_time counter) (Counter.current_event counter) in
+	let () =
+	  Format.fprintf
+	    form
+	    "@.***%s: would you like to record the current state? (y/N)***@."
+	    msg in
+	let () =
+	  if not !Parameter.batchmode then
+	    match String.lowercase (Tools.read_input ()) with
+	    | ("y" | "yes") ->
+	       outputs
+		 (Data.Snapshot
+		    (Rule_interpreter.snapshot env counter "dump.ka" graph))
+	    | _ -> () in
+	(true,graph,state) in
+    if stop then finalize ~outputs form env counter graph' state'
+    else let () = Counter.tick form counter in iter graph' state'
+  in iter graph state

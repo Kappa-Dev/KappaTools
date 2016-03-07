@@ -159,17 +159,19 @@ end = struct
                                                env
                                 in
                                 let () = plot := { !plot with legend = Array.to_list legend} in
-                                State_interpreter.loop_cps
-                                  ~outputs:outputs
-                                  log_form
-                                  (fun f -> if Lwt_switch.is_on simulation.switch
-                                            then Lwt.bind (self#yield ()) f
-                                            else Lwt.return_unit
-                                  )
-                                  (fun (_ : Rule_interpreter.t)(_ : State_interpreter.t)  ->
-                                   let () = ExceptionDefn.flush_warning log_form in
-                                   Lwt_switch.turn_off simulation.switch)
-                                  env domain simulation.counter graph state)
+				let rec iter graph state =
+				  let (stop,graph',state') =
+                                    State_interpreter.a_loop
+                                      ~outputs:outputs log_form
+				      env domain simulation.counter graph state in
+				  if stop then
+				    let () = ExceptionDefn.flush_warning log_form in
+                                    Lwt_switch.turn_off simulation.switch
+				  else
+                                    if Lwt_switch.is_on simulation.switch
+                                    then Lwt.bind (self#yield ()) (fun () -> iter graph' state')
+                                    else Lwt.return_unit in
+				iter graph state)
                           )
                           (function
                             | ExceptionDefn.Malformed_Decl error ->

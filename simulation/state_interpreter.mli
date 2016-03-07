@@ -16,12 +16,10 @@ values of observables) *)
 val activity : t -> float
 (** Returns the current activity *)
 
-val loop_cps :
-  outputs:(Data.t -> unit) ->
-  Format.formatter -> ((unit -> 'a) -> 'a) ->
-  (Rule_interpreter.t -> t -> 'a) ->
+val a_loop :
+  outputs:(Data.t -> unit) -> Format.formatter ->
   Environment.t -> Connected_component.Env.t ->
-  Counter.t -> Rule_interpreter.t -> t -> 'a
+  Counter.t -> Rule_interpreter.t -> t -> (bool * Rule_interpreter.t * t)
 (**Event loop for javascript*)
 
 val loop :
