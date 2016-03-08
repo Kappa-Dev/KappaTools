@@ -26,8 +26,8 @@ type set    = Site_map_and_set.Set.t
 
 type covering_classes =
   {
-    store_modified_map     : int map Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.t;
-    store_covering_classes : int list list Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.t;
+    store_modified_map     : Cckappa_sig.site_name map Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.t;
+    store_covering_classes : Cckappa_sig.site_name list list Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.t;
   }
 
 (************************************************************************************)
