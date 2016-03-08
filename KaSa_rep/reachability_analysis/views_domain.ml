@@ -1429,7 +1429,7 @@ struct
           (fun (agent_type, cv_id) (l, rule_id_set) (error, store_result) ->
             let error, new_rule_id_set =
               List.fold_left (fun (error, store) (rule, state) ->
-                let error, new_update = Cckappa_sig.Site_map_and_set.Set.add
+			      let error, new_update = Cckappa_sig.Site_map_and_set.Set.add_when_not_in (* A rule may be added several time *)
                   parameter error rule store
                 in
                 error, new_update

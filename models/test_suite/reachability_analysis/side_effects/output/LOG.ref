@@ -1187,6 +1187,10 @@ EXTENSIONAL DESCRIPTION:
 	Applying rule 9: r9:
 		the predcondition is satisfied
 
+	Applying rule 11: r11:
+		the predcondition is satisfied
+		Updating the views for D(x~,x!)
+
 	Applying rule 2: r2:
 		the predcondition is satisfied
 
