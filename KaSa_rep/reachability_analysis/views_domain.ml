@@ -878,6 +878,39 @@ struct
 
   exception False of Exception.method_handler * dynamic_information
 
+  (*let scan_rule_set static dynamic error =
+    let parameter = get_parameter static in
+    let compil = get_compil static in
+    let error, static =
+      Int_storage.Nearly_inf_Imperatif.fold
+        parameter
+        error
+        (fun parameter error rule_id rule static ->
+          let collect_agent_type =
+            
+          in
+        )
+        compil.Cckapp_sig.rules static
+    in
+    error, static, dynamic
+
+    let error, agent =
+      Misc_sa.unsome
+        (Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.get 
+           handler
+           error
+           agent_id
+           _)
+        (fun error -> warn parameter error (Some "") Exit Cckappa_sig.Ghost)
+    in
+    match agent with
+    | Cckappa_sig.Unknow_agent _
+    | Cckappa_sig.Ghost
+    | CCkappa_sig.Dead_agent _ -> warn parameter error (Some "") Exit 0
+    | Cckappa_sig.Agent agent -> 
+      error, agent.Cckappa_sig.agent_name*)
+
+
   let is_enable_aux static dynamic error rule_id precondition =
     let parameter = get_parameter static in
     let fixpoint_result = get_fixpoint_result dynamic in

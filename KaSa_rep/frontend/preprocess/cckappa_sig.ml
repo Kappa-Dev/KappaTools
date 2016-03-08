@@ -178,7 +178,7 @@ type 'state interface = 'state port Site_map_and_set.Map.t
                                                                            
 type 'interface proper_agent = 
   { 
-    agent_kasim_id  : int; (* should be replaced with the appropriate type *)
+    agent_kasim_id  : agent_id; (* should be replaced with the appropriate type *)
     agent_name      : agent_name;
     agent_interface : 'interface;
     agent_position  : position
@@ -215,7 +215,7 @@ let upgrade_some_interface ag =
 
 type site_address =
     {
-      agent_index : int; (* should be replaced with the appropriate type *)
+      agent_index : agent_id; (* should be replaced with the appropriate type *)
       site        : site_name;
       agent_type  : agent_name
     }
@@ -282,8 +282,8 @@ type enriched_variable =
       
 type actions =
     {
-      creation   : (int * agent_name) list; (* should be replaced with the appropriate type *)
-      remove     : (int * unit interface proper_agent * int list) list; (* should be replaced with the appropriate type *)
+      creation   : (agent_id * agent_name) list; (* should be replaced with the appropriate type *)
+      remove     : (agent_id * unit interface proper_agent * int list) list; (* should be replaced with the appropriate type *)
       release    : bond list;
       bind       : bond list;
       half_break : (site_address * (state_index interval option)) list 
