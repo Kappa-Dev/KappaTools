@@ -508,51 +508,65 @@ let print_dot f env =
   in
   Format.fprintf f "}@]@."
 
-let rec remove_from_sons level1 set to_keep cc_id = function
-  | [] -> to_keep,set
+let rec remove_from_sons level1 set rfathers cc_id = function
+  | [] -> rfathers,set
   | id :: tail ->
      match IntMap.find_option id set with
-     | None -> remove_from_sons level1 set to_keep cc_id tail
+     | None -> remove_from_sons level1 set rfathers cc_id tail
      | Some cc ->
-	let sons = List.filter (fun t -> t.dst <> cc_id) cc.sons in
-	match cc.is_obs_of,sons with
-	| Some _, _ -> remove_from_sons level1 set true cc_id tail
-	| None, _ when List.mem id level1 ->
-	   remove_from_sons level1 set true cc_id tail
-	| None, [] ->
-	   let to_keep',set' = remove_from_sons level1 set false id cc.fathers in
-	   let set'' = if to_keep' then set' else IntMap.remove id set' in
-	     remove_from_sons level1 set'' (to_keep || to_keep') cc_id tail
-	| None, _ :: _ ->
-	   let set' =
-	     scan_sons level1 (IntMap.add id {cc with sons = sons} set)
-		       true id cc.fathers in
-	   remove_from_sons level1 set' to_keep cc_id tail
-and scan_sons level1 set keep_last cc_id = function
-  | [] -> set
-  | [ _ ] when keep_last -> set
+	match List.partition (fun t -> t.dst = cc_id) cc.sons with
+	| [], _ -> remove_from_sons level1 set rfathers cc_id tail
+	| x::_,sons ->
+	let missings = List.fold_left
+			 (fun acc t -> IntSet.minus acc t.above_obs) x.above_obs
+			 sons in
+	if sons <> [] || cc.is_obs_of <> None || List.mem id level1 then
+	  let rfathers',set' = scan_sons level1 set [] id cc.fathers in
+	  let sons' =  if IntSet.is_empty missings then sons else cc.sons in
+	  let rfathers'' =
+	    if IntSet.is_empty missings then rfathers else id::rfathers in
+	  remove_from_sons
+	    level1
+	    (IntMap.add id {cc with fathers = rfathers'; sons = sons'} set')
+	    rfathers'' cc_id tail
+	else
+	  let rfathers',set' = remove_from_sons level1 set [] id cc.fathers in
+	  let rfathers,set'' =
+	    match rfathers' with
+	    | _ :: _ ->
+	       id::rfathers,IntMap.add id {cc with fathers = rfathers'} set'
+	    | [] -> rfathers,IntMap.remove id set' in
+	  remove_from_sons level1 set'' rfathers cc_id tail
+and scan_sons level1 set rfathers cc_id = function
+  | [] -> rfathers,set
+  | [ _ ] as l when rfathers = [] -> l,set
   | id :: tail ->
      match IntMap.find_option id set with
-     | None -> set
+     | None -> scan_sons level1 set rfathers cc_id tail
      | Some cc ->
-	match cc.is_obs_of, cc.sons with
-	| Some _, _ -> scan_sons level1 set false cc_id tail
-	| None, _ :: _ :: _ -> scan_sons level1 set false cc_id tail
-	| None, [] -> assert false
-	| None, [ son ] ->
-	   let () = assert (son.dst = cc_id) in
-	   if List.mem id level1 then scan_sons level1 set false cc_id tail
-	   else
-	     let to_keep,set' =
-	       remove_from_sons level1 set false id cc.fathers in
-	     let set'' = if to_keep then set' else IntMap.remove id set' in
-	     scan_sons level1 set'' keep_last cc_id tail
+	if List.length cc.sons > 1 || cc.is_obs_of <> None || List.mem id level1
+	then
+	  let rfathers',set' = scan_sons level1 set [] id cc.fathers in
+	  scan_sons level1
+		    (IntMap.add id {cc with fathers = rfathers'} set')
+		    (id::rfathers) cc_id tail
+	else
+	  let rfathers',set' =
+	    remove_from_sons level1 set [] id cc.fathers in
+	  let rfathers,set'' =
+	    match rfathers' with
+	    | _ :: _ ->
+	       id::rfathers,IntMap.add id {cc with fathers = rfathers'} set'
+	    | [] -> rfathers,IntMap.remove id set' in
+	  scan_sons level1 set'' rfathers cc_id tail
 
 let finalize env =
   let level1 = let zero = get env 0 in List.map (fun p -> p.dst) zero.sons in
   let f id p env =
     if p.sons = [] && not (List.mem id level1)
-    then scan_sons level1 env true id p.fathers
+    then
+      let rfathers,set = scan_sons level1 env [] id p.fathers in
+      IntMap.add id {p with fathers = rfathers} set
     else env in
   match env.domain with
   | Final _ -> env
