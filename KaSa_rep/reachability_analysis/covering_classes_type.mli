@@ -17,12 +17,12 @@ type set    = Cckappa_sig.Site_map_and_set.Set.t
 
 type covering_classes =
   {
-    store_modified_map     : int map Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.t;
-    store_covering_classes : int list list Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.t;
+    store_modified_map     : Cckappa_sig.site_name map Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.t;
+    store_covering_classes : Cckappa_sig.site_name list list Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.t;
   }
 
-module Dictionary_of_Covering_class : Dictionary.Dictionary with type value = int list
-module Dictionary_of_Modified_class : Dictionary.Dictionary with type value = int list
+module Dictionary_of_Covering_class : Dictionary.Dictionary with type value = Cckappa_sig.site_name list
+module Dictionary_of_Modified_class : Dictionary.Dictionary with type value = Cckappa_sig.site_name list
 
 type pair_dic   = (unit, unit) Dictionary_of_Covering_class.dictionary
 type index_dic  = (unit, unit) Dictionary_of_Covering_class.dictionary
@@ -65,37 +65,31 @@ module AgentsRuleCV_setmap: SetMap.S with type elt = Cckappa_sig.agent_id * Ccka
 module AgentSiteRuleCV_setmap: SetMap.S with type elt = Cckappa_sig.agent_name * Cckappa_sig.site_name * Cckappa_sig.rule_id * cv_id
 
 module Project2bdu_creation: SetMap.Projection2
-       with type elt_a = int * int * int (* find the appropriate type names *)
+       with type elt_a = Cckappa_sig.agent_name * Cckappa_sig.rule_id * cv_id (* find the appropriate type names *)
   and type elt_b = Cckappa_sig.rule_id
-  and type elt_c = int * int (* find the appropriate type names *)
+  and type elt_c = Cckappa_sig.agent_name * cv_id (* find the appropriate type names *)
   and type 'a map_a = 'a AgentRuleCV_setmap.Map.t
   and type 'a map_b = 'a Cckappa_sig.Rule_setmap.Map.t
   and type 'a map_c = 'a AgentCV_setmap.Map.t
 
 module Project2bdu_potential: SetMap.Projection2
-  with type elt_a = int * int * int * int (* find the appropriate type names *)
+  with type elt_a = Cckappa_sig.agent_name * Cckappa_sig.site_name * Cckappa_sig.rule_id * cv_id (* find the appropriate type names *)
   and type elt_b = Cckappa_sig.rule_id
   and type 'a map_a = 'a AgentSiteRuleCV_setmap.Map.t
   and type 'a map_b = 'a Cckappa_sig.Rule_setmap.Map.t
-  and type elt_c = int * int * int (* find the appropriate type names *)
+  and type elt_c = Cckappa_sig.agent_name * Cckappa_sig.site_name * cv_id (* find the appropriate type names *)
   and type 'a map_c = 'a AgentSiteCV_setmap.Map.t
 
 module Project2_bdu_views: SetMap.Projection2
-  with type elt_a = int * int * int * int (* find the appropriate type names *)
+  with type elt_a = Cckappa_sig.agent_id * Cckappa_sig.agent_name * Cckappa_sig.rule_id * cv_id (* find the appropriate type names *)
   and type elt_b = Cckappa_sig.rule_id
   and type 'a map_a = 'a AgentsRuleCV_setmap.Map.t
   and type 'a map_b = 'a Cckappa_sig.Rule_setmap.Map.t
-  and type elt_c = int * int * int (* find the appropriate type names *)
+  and type elt_c = Cckappa_sig.agent_id * Cckappa_sig.agent_name * cv_id (* find the appropriate type names *)
   and type 'a map_c = 'a AgentsCV_setmap.Map.t
 
 module Project2_modif: Map_wrapper.Projection
-  with type elt_a = int * int * int (* find the appropriate type names *)
+  with type elt_a = Cckappa_sig.agent_id * Cckappa_sig.agent_name * Cckappa_sig.site_name (* find the appropriate type names *)
   and type elt_b = Cckappa_sig.agent_name * Cckappa_sig.site_name
   and type 'a map_a = 'a Cckappa_sig.AgentsSite_map_and_set.Map.t
   and type 'a map_b = 'a Cckappa_sig.AgentSite_map_and_set.Map.t
-
-module Project_agent: Map_wrapper.Projection
-  with type elt_a = int * int
-  and type elt_b = Cckappa_sig.agent_id * cv_id
-  and type 'a map_a = 'a AgentCV_map_and_set.Map.t
-  and type 'a map_b = 'a AgentIDCV_map_and_set.Map.t

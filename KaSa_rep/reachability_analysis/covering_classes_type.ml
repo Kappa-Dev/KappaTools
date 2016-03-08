@@ -39,15 +39,21 @@ type covering_classes =
 
 module Inf_array = Nearly_inf_Imperatif
 
+type cv_id = int
+type agent_id = Cckappa_sig.agent_id
+type agent_name = Cckappa_sig.agent_name
+type rule_id = Cckappa_sig.rule_id
+type site_name = Cckappa_sig.site_name
+
 module Covering_class =
   struct
-    type t = int list
+    type t = site_name list
     let compare = compare
   end
 
 module Modified_class =
   struct
-    type t = int list
+    type t = site_name list
     let compare = compare
   end
   
@@ -77,11 +83,6 @@ type remanent =
 (* Please put any type/module definition related to covering class in a
    file reachability/covergin_class_sig.ml *)
 
-type cv_id = int
-type agent_id = Cckappa_sig.agent_id
-type agent_name = Cckappa_sig.agent_name
-type rule_id = Cckappa_sig.rule_id
-type site_name = Cckappa_sig.site_name
 
 module AgentCV_map_and_set =
   Map_wrapper.Make (
@@ -160,6 +161,3 @@ module Project2_bdu_views =
 
 module Project2_modif =
   Map_wrapper.Proj (AgentsSite_map_and_set) (AgentSite_map_and_set)
-
-module Project_agent =
-  Map_wrapper.Proj (AgentCV_map_and_set) (AgentIDCV_map_and_set)
