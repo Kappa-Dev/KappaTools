@@ -1401,10 +1401,10 @@ struct
     in
     error, dynamic, (precondition, event_list)
 
+  (**************************************************************************)
   (* events enable communication between domains. At this moment, the
-     global domain does not collect information *)      
+     global domain does not collect information *)
 
-  (*TODO*)
   let apply_event static (error, dynamic, event_list) event =
     let parameter = get_parameter static in
     let side_effects = get_side_effects static in
@@ -1413,7 +1413,8 @@ struct
     match event with
     | Communication.See_a_new_bond ((agent_type, site_type, state), 
                                     (agent_type', site_type', state')) ->
-      (* get the the pairs (r, state) compatible with the second site *)
+      (*-----------------------------------------------------------------------*)
+      (* get the pairs (r, state) compatible with the second site:half_break *)
       let error, pair_list =
         match Common_static.AgentSite_map_and_set.Map.find_option_without_logs
           parameter error (agent_type, site_type)
@@ -1422,35 +1423,127 @@ struct
         | error, None -> error, []
         | error, Some (_, l) -> error, l
       in
-      (* for each add the rule r in update of (c) for any covering class
-         that documents this second site *)
-      let error, update =
-        Bdu_dynamic_views.AgentCV_map_and_set.Map.fold (*FIXME: map?*)
+      (*-----------------------------------------------------------------------*)
+      (*get rule_id in remove side effects *)
+      let error, rule_list =
+        match Common_static.AgentSite_map_and_set.Map.find_option_without_logs
+          parameter error (agent_type, site_type)
+          remove
+        with
+        | error, None -> error, []
+        | error, Some (_, l) -> error, l
+      in
+      (*-----------------------------------------------------------------------*)
+      (* store result with half_break action: for each add the rule r in
+         update of (c) for any covering class that documents this second
+         site *)
+      let error, store_update_half_break =
+        Bdu_dynamic_views.AgentCV_map_and_set.Map.fold
           (fun (agent_type, cv_id) (l, rule_id_set) (error, store_result) ->
             let error, new_rule_id_set =
               List.fold_left (fun (error, store) (rule, state) ->
-			      let error, new_update = Cckappa_sig.Site_map_and_set.Set.add_when_not_in (* A rule may be added several time *)
-                  parameter error rule store
-                in
-                error, new_update
+                (*state is compatible with B.x*)
+                if state = state'
+                then
+                  (* A rule may be added several time *)
+		  let error, new_update =
+                    Cckappa_sig.Site_map_and_set.Set.add_when_not_in
+                      parameter error rule store
+                  in
+                  error, new_update
+                else error, store
               ) (error, rule_id_set) pair_list
             in
             let error, store_result =
               Bdu_dynamic_views.AgentCV_map_and_set.Map.add_or_overwrite
                 parameter error 
-                (agent_type, cv_id) 
+                (agent_type, cv_id)
                 (l, new_rule_id_set)
                 store_result
             in
             error, store_result
           ) store_update (error, Bdu_dynamic_views.AgentCV_map_and_set.Map.empty)
       in
+      (*-----------------------------------------------------------------------*)
+      (*store result with remove action*)
+      let error, store_update_remove =
+        Bdu_dynamic_views.AgentCV_map_and_set.Map.fold
+          (fun (agent_type, cv_id) (l, rule_id_set) (error, store_result) ->
+            let error, new_rule_id_set =
+              List.fold_left (fun (error, store) rule ->
+                let error, new_update =
+                  Cckappa_sig.Site_map_and_set.Set.add_when_not_in
+                    parameter error rule store
+                in
+                error, new_update
+              ) (error, rule_id_set) rule_list
+            in
+            let error, store_result =
+              Bdu_dynamic_views.AgentCV_map_and_set.Map.add_or_overwrite
+                parameter error
+                (agent_type, cv_id)
+                (l, new_rule_id_set)
+                store_result
+            in
+            error, store_result
+          ) store_update (error, Bdu_dynamic_views.AgentCV_map_and_set.Map.empty)
+      in
+      (*-----------------------------------------------------------------------*)
+      (*fold2*)
+      let error, store_update =
+        Bdu_dynamic_views.AgentCV_map_and_set.Map.fold2
+          parameter
+          error
+          (fun parameter error (agent_type, cv_id) (_, rule_id_set) store_result ->
+            let error, store_result =
+              Bdu_dynamic_views.add_link parameter error (agent_type, cv_id)
+                rule_id_set store_result
+            in
+            error, store_result
+          )
+          (fun parameter error (agent_type, cv_id) (_, rule_id_set) store_result ->
+            let error, store_result =
+              Bdu_dynamic_views.add_link parameter error (agent_type, cv_id)
+                rule_id_set store_result
+            in
+            error, store_result
+          )
+          (fun parameter error (agent_type, cv_id) (_, s1) (_, s2) store_result ->
+            let error', union_set =
+              Cckappa_sig.Site_map_and_set.Set.union parameter error s1 s2
+            in
+            let error = Exception.check warn parameter error error' (Some "line 1515")
+              Exit
+            in
+            let error, store_result =
+              Bdu_dynamic_views.add_link parameter error (agent_type, cv_id)
+                union_set store_result
+            in
+            error, store_result
+          )
+          store_update_half_break
+          store_update_remove
+          store_update
+      in
       (* update is in local dynamic information *)
-      let dynamic = set_store_update update dynamic in
+      let dynamic = set_store_update store_update dynamic in
+      (*-----------------------------------------------------------------------*)
       (* when doing so, add any such rules r in the event list with an
          event of kind Check_rule *)
+      let store_update = get_store_update dynamic in
+      let event_list =
+        Bdu_dynamic_views.AgentCV_map_and_set.Map.fold
+          (fun (agent_type, cv_id) (_, rule_id_set) event_list ->
+            Cckappa_sig.Site_map_and_set.Set.fold
+              (fun rule_id event_list ->
+                (Communication.Check_rule rule_id) :: event_list
+              ) rule_id_set event_list
+          ) store_update event_list
+      in
       error, dynamic, event_list
     | _ -> error, dynamic, event_list
+
+  (**************************************************************************)
 
   let rec apply_event_list static dynamic error event_list =
     let error, dynamic, event_list =
@@ -1464,13 +1557,6 @@ struct
       ) (error, dynamic, []) event_list
     in
     error, dynamic, event_list
-    (*let error, dynamic =
-      List.fold_left 
-        (apply_event static)
-        (error, dynamic, event_list)
-        event_list
-    in
-    error, dynamic, []*)
 
   let export static dynamic error kasa_state =
     error, dynamic, kasa_state

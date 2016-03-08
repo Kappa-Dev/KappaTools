@@ -31,10 +31,30 @@ type bdu_analysis_dynamic =
 (************************************************************************************)
 (*implementation*)
 
+let add_link parameter error (agent_type, cv_id) rule_id_set store_result =
+  let error, (l, old_set) =
+    match AgentCV_map_and_set.Map.find_option_without_logs parameter error
+      (agent_type, cv_id) store_result
+    with
+    | error, None -> error, ([], Site_map_and_set.Set.empty)
+    | error, Some (l, s) -> error, (l, s)
+  in
+  let error', new_set =
+    Site_map_and_set.Set.union parameter error rule_id_set old_set
+  in
+  let error =
+    Exception.check warn parameter error error' (Some "line 46") Exit
+  in
+  let error, store_result =
+    AgentCV_map_and_set.Map.add_or_overwrite parameter error (agent_type, cv_id)
+      (l, new_set)
+      store_result
+  in
+  error, store_result
 
 let store_covering_classes_modification_update_aux parameter error agent_type_cv
     site_type_cv cv_id store_test_modification_map store_result =
-  let add_link (agent_type, cv_id) rule_id_set store_result =
+  (*let add_link (agent_type, cv_id) rule_id_set store_result =
     let error, (l, old) =
       match AgentCV_map_and_set.Map.find_option_without_logs parameter error
         (agent_type, cv_id) store_result
@@ -52,7 +72,7 @@ let store_covering_classes_modification_update_aux parameter error agent_type_cv
         store_result
     in
     error, result
-  in
+  in*)
   (*-------------------------------------------------------------------------------*)
   let error, (l, rule_id_set) =
     match Bdu_static_views.AgentSite_map_and_set.Map.find_option_without_logs
@@ -64,7 +84,7 @@ let store_covering_classes_modification_update_aux parameter error agent_type_cv
     | error, Some (l, s) -> error, (l, s)
   in
   let error, result =
-    add_link (agent_type_cv, cv_id) rule_id_set store_result
+    add_link parameter error (agent_type_cv, cv_id) rule_id_set store_result
   in
     (*-------------------------------------------------------------------------------*)
     (*map this map*)
@@ -114,7 +134,7 @@ let store_covering_classes_modification_side_effects parameter error
     store_potential_side_effects
     covering_classes
     store_result =
-  let add_link (agent_type, cv_id) rule_id_set store_result =
+  (*let add_link (agent_type, cv_id) rule_id_set store_result =
     let error, (l, old) =
       match AgentCV_map_and_set.Map.find_option_without_logs parameter error
         (agent_type, cv_id) store_result
@@ -133,7 +153,7 @@ let store_covering_classes_modification_side_effects parameter error
         store_result
     in
     error, result
-  in
+  in*)
   (*-------------------------------------------------------------------------------*)
   let _, store_potential_side_effects_bind = store_potential_side_effects in
   let error, store_result =
@@ -158,12 +178,12 @@ let store_covering_classes_modification_side_effects parameter error
                         | error, None -> error, ([], Site_map_and_set.Set.empty)
                         | error, Some (l, s) -> error, (l, s)
                       in
-                      (*add rule_id_effect into rule_id_set*)
+                      (*FIXME:add rule_id_effect into rule_id_set*)
                       let error, new_rule_id_set =
-                        Site_map_and_set.Set.add parameter error rule_id_effect rule_id_set
+                        Site_map_and_set.Set.add_when_not_in parameter error rule_id_effect rule_id_set
                       in
                       let error, store_result =
-                        add_link (agent_type_partner, cv_id) new_rule_id_set store_result
+                        add_link parameter error (agent_type_partner, cv_id) new_rule_id_set store_result
                       in
                       error, store_result
                     ) cv_dic (error, store_result)
@@ -181,7 +201,7 @@ let store_covering_classes_modification_side_effects parameter error
 
 let store_update parameter error store_test_modification_map store_potential_side_effects
     store_covering_classes_id covering_classes store_result =
-  let add_link error (agent_type, cv_id) rule_id_set store_result =
+  (*let add_link error (agent_type, cv_id) rule_id_set store_result =
     let error, (l, old) =
       match AgentCV_map_and_set.Map.find_option_without_logs parameter error
         (agent_type, cv_id) store_result
@@ -198,7 +218,7 @@ let store_update parameter error store_test_modification_map store_potential_sid
         parameter error (agent_type, cv_id) (l, new_set) store_result
     in
     error, result
-  in
+  in*)
   let error, store_update_modification =
     store_covering_classes_modification_update
       parameter
@@ -224,14 +244,14 @@ let store_update parameter error store_test_modification_map store_potential_sid
     (*exists in 'a t*)
     (fun parameter error (agent_type, cv_id) (_, rule_id_set) store_result ->
       let error, store_result =
-        add_link error (agent_type, cv_id) rule_id_set store_result
+        add_link parameter error (agent_type, cv_id) rule_id_set store_result
       in
       error, store_result
     )
     (*exists in 'b t*)
     (fun parameter error (agent_type, cv_id) (_, rule_id_set) store_result ->
       let error, store_result =
-        add_link error (agent_type, cv_id) rule_id_set store_result
+        add_link parameter error (agent_type, cv_id) rule_id_set store_result
       in
       error, store_result
     )
@@ -241,7 +261,7 @@ let store_update parameter error store_test_modification_map store_potential_sid
         Site_map_and_set.Set.union parameter error s1 s2
       in
       let error, store_result =
-        add_link error (agent_type, cv_id) union_set store_result
+        add_link parameter error (agent_type, cv_id) union_set store_result
       in
       error, store_result
     )

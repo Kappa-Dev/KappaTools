@@ -1500,6 +1500,9 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(y~,y!)
 		Updating the views for C(y~,y!)
 
+	Applying rule 1: r1:
+		the predcondition is satisfied
+
 ------------------------------------------------------------
 * Dead rules :
 ------------------------------------------------------------
