@@ -56,6 +56,15 @@ val set_bdu_common_static:
   global_static_information ->
   global_static_information
 
+val get_agent_name :
+  global_static_information ->
+  Common_static.agent_name_map
+    
+val set_agent_name :
+  Common_static.agent_name_map ->
+  global_static_information ->
+  global_static_information
+    
 val get_side_effects:
   global_static_information ->
   Common_static.half_break_action * Common_static.remove_action

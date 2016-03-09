@@ -84,6 +84,8 @@ struct
 
   let get_compil static = lift Analyzer_headers.get_cc_code static
 
+  let get_agent_name static = lift Analyzer_headers.get_agent_name static
+
   let get_side_effects static = lift Analyzer_headers.get_side_effects static
 
   let get_potential_side_effects static =
@@ -878,39 +880,6 @@ struct
 
   exception False of Exception.method_handler * dynamic_information
 
-  (*let scan_rule_set static dynamic error =
-    let parameter = get_parameter static in
-    let compil = get_compil static in
-    let error, static =
-      Int_storage.Nearly_inf_Imperatif.fold
-        parameter
-        error
-        (fun parameter error rule_id rule static ->
-          let collect_agent_type =
-            
-          in
-        )
-        compil.Cckapp_sig.rules static
-    in
-    error, static, dynamic
-
-    let error, agent =
-      Misc_sa.unsome
-        (Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.get 
-           handler
-           error
-           agent_id
-           _)
-        (fun error -> warn parameter error (Some "") Exit Cckappa_sig.Ghost)
-    in
-    match agent with
-    | Cckappa_sig.Unknow_agent _
-    | Cckappa_sig.Ghost
-    | CCkappa_sig.Dead_agent _ -> warn parameter error (Some "") Exit 0
-    | Cckappa_sig.Agent agent -> 
-      error, agent.Cckappa_sig.agent_name*)
-
-
   let is_enable_aux static dynamic error rule_id precondition =
     let parameter = get_parameter static in
     let fixpoint_result = get_fixpoint_result dynamic in
@@ -919,6 +888,7 @@ struct
     let error, store_proj_bdu_test_restriction =
       get_store_proj_bdu_test_restriction static dynamic error
     in
+    let store_agent_name = get_agent_name static in
     let error, site_correspondence =
       get_store_remanent_triple static dynamic error
     in
@@ -975,7 +945,13 @@ struct
             | [] ->
               begin
                 let agent_id = path.Communication.agent_id in
-                let agent_type = 1 in (* to do, get the agent type from the agent id *)
+                let error, agent_type =
+                  match Common_static.RuleAgent_map_and_set.Map.find_option_without_logs
+                    parameter error (rule_id, agent_id) store_agent_name
+                  with
+                  | error, None -> error, 0
+                  | error, Some a -> error, a
+                in           
                 let site_name = path.Communication.site in
                 let error, site_correspondence =
                   match Bdu_static_views.AgentMap.get parameter error

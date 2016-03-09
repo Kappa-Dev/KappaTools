@@ -20,6 +20,7 @@ let trace = false
 
 module AgentSite_map_and_set = Cckappa_sig.AgentSite_map_and_set
 module AgentRule_map_and_set = Cckappa_sig.AgentRule_map_and_set
+module RuleAgent_map_and_set = Cckappa_sig.RuleAgent_map_and_set
 
 type rule_id = Cckappa_sig.rule_id
 type state_index = Cckappa_sig.state_index
@@ -36,12 +37,43 @@ type bind_partner = (site_name * state_index) list AgentRule_map_and_set.Map.t
 
 type potential_partner_free = free_partner
 type potential_partner_bind = bind_partner
+type agent_name_map = int RuleAgent_map_and_set.Map.t
 
 type bdu_common_static =
   {
+    store_agent_name             : agent_name_map;
     store_side_effects           : half_break_action * remove_action; 
     store_potential_side_effects : potential_partner_free *  potential_partner_bind;
   }
+
+(**********************************************************************************)
+(*get agent_name from (rule_id and agent_id) in the lhs*)
+
+let collect_agent_name parameter error rule_id rule store_result =
+  let error, store_result =
+    Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.fold
+      parameter
+      error
+      (fun parameter error agent_id agent store_result ->
+        match agent with
+        | Cckappa_sig.Ghost
+        | Cckappa_sig.Unknown_agent _ -> error, store_result
+          (*warn parameter error (Some "line 62") Exit store_result*)
+        | Cckappa_sig.Dead_agent (agent, _, _, _)
+        | Cckappa_sig.Agent agent -> 
+          let agent_type = agent.Cckappa_sig.agent_name in
+          let error, store_result =
+            RuleAgent_map_and_set.Map.add_or_overwrite
+              parameter
+              error
+              (rule_id, agent_id)
+              agent_type
+              store_result
+          in
+          error, store_result        
+      ) rule.Cckappa_sig.rule_lhs.Cckappa_sig.views store_result
+  in
+  error, store_result
 
 (**********************************************************************************)
 (*Implementation*)
@@ -517,6 +549,16 @@ let collect_side_effects parameter error handler rule_id half_break remove store
 
 let scan_rule parameter error handler_kappa rule_id rule store_result =
   (*------------------------------------------------------------------------------*)
+  (*get agent_name*)
+  let error, store_agent_name =
+    collect_agent_name
+      parameter
+      error
+      rule_id
+      rule
+      store_result.store_agent_name
+  in
+  (*------------------------------------------------------------------------------*)
   (*side effects*)
   let error, store_side_effects =
     collect_side_effects
@@ -542,6 +584,7 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
   in
   error,
   {
+    store_agent_name = store_agent_name;
     store_side_effects = store_side_effects;
     store_potential_side_effects = store_potential_side_effects
   }
@@ -549,12 +592,14 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
 (************************************************************************************)
 
 let init_bdu_common_static =
+  let init_agent_name = RuleAgent_map_and_set.Map.empty in
   let init_half_break     = AgentSite_map_and_set.Map.empty  in
   let init_remove         = AgentSite_map_and_set.Map.empty  in
   let init_potential_free = AgentRule_map_and_set.Map.empty in
   let init_potential_bind = AgentRule_map_and_set.Map.empty in
   let init_common_static =
     {
+      store_agent_name              = init_agent_name;
       store_side_effects            = (init_half_break, init_remove);
       store_potential_side_effects  = (init_potential_free, init_potential_bind); 
     }

@@ -93,9 +93,11 @@ let rename_rule_rlhs handler error id_agent tab =
     | Cckappa_sig.Unknown_agent _ | Cckappa_sig.Ghost | Cckappa_sig.Dead_agent _ -> warn handler error (Some "line 51") Exit 0
     | Cckappa_sig.Agent ag -> error,ag.Cckappa_sig.agent_kasim_id 
   
-let rename_rule_rhs handler error id_agent rule = rename_rule_rlhs handler error id_agent rule.Cckappa_sig.rule_rhs.Cckappa_sig.views 
-let rename_rule_lhs handler error id_agent rule = rename_rule_rlhs handler error id_agent rule.Cckappa_sig.rule_lhs.Cckappa_sig.views 
-    
+let rename_rule_rhs handler error id_agent rule = 
+  rename_rule_rlhs handler error id_agent rule.Cckappa_sig.rule_rhs.Cckappa_sig.views 
+
+let rename_rule_lhs handler error id_agent rule =
+  rename_rule_rlhs handler error id_agent rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
   
 let length_mixture mixture = 
   let rec aux mixture size = 

@@ -16,7 +16,12 @@
 
 type position   = Ckappa_sig.position
 type agent_name = int
+(*type agent_name*)
 type site_name  = int
+
+(*val string_of_agent_name : agent_name -> string
+val int_of_agent_name : agent_name -> int
+val agent_name_of_int: int -> agent_name*)
 
 module Agent_type_storage_nearly_inf_Imperatif: Int_storage.Storage
   with type key = agent_name 
@@ -81,6 +86,7 @@ module Site_map_and_set: Map_wrapper.S_with_logs with type elt = site_name
 module State_map_and_set: Map_wrapper.S_with_logs with type elt = state_index
 module AgentSite_map_and_set: Map_wrapper.S_with_logs with type elt = agent_name * site_name
 module AgentRule_map_and_set: Map_wrapper.S_with_logs with type elt = agent_name * rule_id
+module RuleAgent_map_and_set: Map_wrapper.S_with_logs with type elt = rule_id * agent_id
 module AgentsSite_map_and_set: Map_wrapper.S_with_logs with type elt = agent_id * agent_name * rule_id
 module AgentSiteState_map_and_set: Map_wrapper.S_with_logs with type elt = agent_name * site_name * state_index
 module PairAgentSiteState_map_and_set: Map_wrapper.S_with_logs with type elt = (agent_name * site_name * state_index) * (agent_name * site_name * state_index)

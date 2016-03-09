@@ -106,6 +106,17 @@ let set_bdu_common_static common static =
       global_bdu_common_static = common
   }
 
+let get_agent_name static =
+  (get_bdu_common_static static).Common_static.store_agent_name
+
+let set_agent_name agent_name static =
+  set_bdu_common_static
+    {
+      (get_bdu_common_static static) with
+        Common_static.store_agent_name = agent_name
+    }
+    static
+
 let get_side_effects static =
   (get_bdu_common_static static).Common_static.store_side_effects
 

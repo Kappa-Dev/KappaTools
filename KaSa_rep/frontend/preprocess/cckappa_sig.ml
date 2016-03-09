@@ -19,6 +19,10 @@ type position   = Ckappa_sig.position
 type agent_name = int 
 type site_name  = int
 
+let string_of_agent_name (a: agent_name) = string_of_int a
+let int_of_agent_name (a: agent_name) : int = a
+let agent_name_of_int (a: int) : agent_name = a
+
 module Agent_type_storage_nearly_inf_Imperatif =
   (
     Int_storage.Nearly_inf_Imperatif: Int_storage.Storage 
@@ -139,6 +143,14 @@ module AgentRule_map_and_set =
     (SetMap.Make
        (struct
          type t = agent_name * rule_id
+         let compare = compare
+        end))
+
+module RuleAgent_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = rule_id * agent_id
          let compare = compare
         end))
 
