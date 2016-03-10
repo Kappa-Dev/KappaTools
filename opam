@@ -2,7 +2,10 @@ opam-version: "1.2"
 name: "KaSim"
 version: "dev"
 maintainer: "Pierre Boutillier <pierre.boutillier@laposte.net>"
-authors: [ "Jean Krivine" "Jérôme Feret" "Pierre Boutillier" "Lý Kim Quyên"]
+authors: [
+  "Jean Krivine" "Jérôme Feret" "Pierre Boutillier"
+  "Ioana Cristescu" "Mutaamba Maasha" "Lý Kim Quyên"
+]
 license: "LGPL-3.0"
 homepage: "http://dev.executableknowledge.org/"
 bug-reports: "https://github.com/Kappa-Dev/KaSim/issues"
@@ -13,9 +16,16 @@ depends : [
   "ocamlbuild" {build}
 ]
 
-depopts: [ "labltk" ]
+depopts: [
+  "labltk" "lwt" "cohttp"
+  "atdgen" {build}
+]
 
-build: [ [ make "USE_TK=1" {labltk:installed} "all"] ]
+build: [
+  [ make "USE_TK=1" {labltk:installed} "all" ]
+  [ make "bin/WebSim" ] {atdgen:installed & lwt:installed & cohttp:installed}
+]
+
 build-test: [ [ make "check" ] ]
 
 available: [ ocaml-version >= "4.01.1" ]
