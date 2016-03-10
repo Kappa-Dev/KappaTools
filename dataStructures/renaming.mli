@@ -28,7 +28,7 @@ val inverse : t -> t
 
 val compare : t -> t -> int
 val equal : t -> t -> bool
-
+val min_elt : t -> (int * int) option
 val fold : (int -> int -> 'a -> 'a) -> t -> 'a -> 'a
 val to_list : t -> (int*int) list
 

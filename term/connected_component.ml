@@ -1047,10 +1047,16 @@ returns the roots of observables that are above in the domain*)
 
   module Cache =
     struct
-      type t = int * point * Renaming.t
-      let compare (a,_,a') (b,_,b') =
+      type t = int * (int * int) option
+      let compare (a,a') (b,b') =
 	let c = Mods.int_compare a b in
-	if c = 0 then Renaming.compare a' b' else c
+	if c = 0 then
+	  match a',b' with
+	  | None, None -> 0
+	  | None,Some _ -> 1
+	  | Some _, None -> -1
+	  | Some x, Some y -> Mods.int_pair_compare x y
+	else c
     end
   module CacheSetMap = SetMap.Make(Cache)
 
@@ -1064,7 +1070,7 @@ returns the roots of observables that are above in the domain*)
       | Some (root_type,root) -> Renaming.apply inj root,root_type in
     let rec aux_from_edges cache (obs,rev_deps as acc) = function
       | [] -> acc,cache
-      | (_pid,point,inj_point2graph as current) :: remains ->
+      | (pid,point,inj_point2graph) :: remains ->
 	 let root_bundle =
 	   get_root inj_point2graph point in
 	 let acc' =
@@ -1085,11 +1091,13 @@ returns the roots of observables that are above in the domain*)
 		   (fun remains renaming ->
 		    let rename = Renaming.compose false renaming inj' in
 		    let next = (son.dst,p',rename) in
-		    if CacheSetMap.Set.mem next cache
+		    if CacheSetMap.Set.mem (son.dst,Renaming.min_elt rename) cache
 		    then remains
 		    else next::remains) re son.inj)
 	     remains point.sons in
-	 aux_from_edges (CacheSetMap.Set.add current cache) acc' remains' in
+	 aux_from_edges
+	   (CacheSetMap.Set.add (pid,Renaming.min_elt inj_point2graph) cache)
+	   acc' remains' in
     match Env.navigate domain edges with
     | None -> acc
     | Some (pid,injs,point) ->

@@ -55,7 +55,7 @@ let compose extensible i i' =
 let inverse i =
    if i.is_identity then i
    else
-   let sigma = 
+   let sigma =
        IntMap.fold (fun x y out ->
         if IntMap.mem y out then raise NotBijective
         else IntMap.add y x out) i.sigma IntMap.empty
@@ -64,6 +64,7 @@ let inverse i =
 
 let compare i i' = IntMap.compare int_compare i.sigma i'.sigma
 let equal i i' = (compare i i') = 0
+let min_elt i = IntMap.min_elt i.sigma
 
 let print f i =
   ignore
