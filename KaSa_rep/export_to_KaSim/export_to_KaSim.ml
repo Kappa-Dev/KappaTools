@@ -268,8 +268,12 @@ module Export_to_KaSim =
           (fun parameters error i agent_name () () ->
             let error,site_dic =
 	      Misc_sa.unsome
-	        (Int_storage.Nearly_inf_Imperatif.get
-		   parameters error i handler.Cckappa_sig.sites)
+	        ((*Int_storage.Nearly_inf_Imperatif.get*)
+                  Cckappa_sig.Agent_type_nearly_inf_Imperatif.get
+		   parameters
+                   error
+                   i 
+                   handler.Cckappa_sig.sites)
 	        (fun error ->
 		  warn parameters error (Some "line 103") Exit
 		    (Ckappa_sig.Dictionary_of_sites.init ()))
@@ -279,7 +283,7 @@ module Export_to_KaSim =
 	        parameters error
 	        (fun parameters_dot error j site () () ->
                   let _ =
-                    sol:=String2Map.add (agent_name,simplify_site site) ([],[]) (!sol)
+                    sol := String2Map.add (agent_name,simplify_site site) ([],[]) (!sol)
                   in
                   error)
 	        site_dic
@@ -288,7 +292,8 @@ module Export_to_KaSim =
       in
       (*----------------------------------------------------------------*)
       let error =
-	Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.iter
+	(*Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.iter*)
+        Cckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.iter
 	  parameters error
 	  (fun parameters error (i,j) s  ->
 	    let error,ag =
@@ -303,7 +308,7 @@ module Export_to_KaSim =
 	        parameters error
 	        (fun parameters error s state  () () ->
 		  let () =
-		    sol:=add_internal_state (ag,site) state (!sol)
+		    sol := add_internal_state (ag,site) state (!sol)
 		  in
 		  error)
 	        s
@@ -314,7 +319,8 @@ module Export_to_KaSim =
       (*----------------------------------------------------------------*)
       let sol = !sol in
       let error, sol =
-        Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
+        (*Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold*)
+        Cckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
           parameters error
           (fun parameters error (i, (j , k)) (i', j', k') sol ->
 	    let error, ag_i =

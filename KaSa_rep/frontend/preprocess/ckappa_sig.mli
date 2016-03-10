@@ -12,30 +12,19 @@
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
-let warn parameters mh message exn default = 
-     Exception.warn parameters mh (Some "ckappa_sig") message exn (fun () -> default) 
-  
-module Int_Set_and_Map = 
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct 
-         type t = int 
-         let compare = compare 
-        end))
-
-let local_trace = true 
+module Int_Set_and_Map : Map_wrapper.S_with_logs with type elt = int
 
 type position       = Location.t
 type agent_name     = string
 type site_name      = string 
 type internal_state = string 
-
-type c_agent_name = int
-type c_site_name  = int
+    
+type c_agent_name = int (*FIXME*)
+type c_site_name  = int 
 type c_state      = int
 
-let string_of_agent_name (a:c_agent_name) : string = string_of_int a
-let int_of_agent_name (a: c_agent_name) : int = a
+val string_of_agent_name : c_agent_name -> string
+val int_of_agent_name : c_agent_name -> int
 
 type binding_state = 
   | Free 
@@ -99,62 +88,31 @@ type direction = Direct | Reverse
 type ('agent,'mixture,'rule) compil =
   ('agent, 'mixture, string, 'rule) Ast.compil
   
-type ('a, 'b) site_type = 
+type ('a,'b) site_type = 
   | Internal of 'a 
   | Binding  of 'b 
       
-type site = (site_name, site_name) site_type     
+type site  = (site_name, site_name) site_type     
 
-type state = (internal_state, binding_state) site_type  
+type state = (internal_state, binding_state) site_type
 
-module State = 
-struct
-  type t = state 
-  let compare = compare
-end 
-
-module Dictionary_of_States = 
-  (
-    Dictionary.Dictionary_of_Ord (State) : Dictionary.Dictionary
-   with type key = c_state
-   and type value = state
-  )
+module Dictionary_of_States: Dictionary.Dictionary 
+  with type key = c_state
+  and type value = state
  
 type internal_state_specification =
   {
     string : internal_state;
   }
 
-module Site = 
-struct 
-  type t = site 
-  let compare = compare 
-end
+module Dictionary_of_agents: Dictionary.Dictionary 
+  with type key = c_agent_name 
+  and type value = agent_name
 
-module Kasim_agent_name =
-struct
-  type t = agent_name
-  let compare = compare
-end
+module Dictionary_of_sites : Dictionary.Dictionary 
+  with type key = c_site_name 
+  and type value = site
 
-(*module Dictionary_of_agents = Dictionary.Dictionary_of_Ord(Kasim_agent_name)*)
-
-module Dictionary_of_agents =
-  (
-    Dictionary.Dictionary_of_Ord (Kasim_agent_name): Dictionary.Dictionary
-   with type key = c_agent_name
-   and type value = agent_name
-  )
-
-(*module Dictionary_of_sites  = Dictionary.Dictionary_of_Ord(Site) *)
-
-module Dictionary_of_sites =
-  (
-    Dictionary.Dictionary_of_Ord (Site): Dictionary.Dictionary
-   with type key = c_site_name
-   and type value = site
-  )
-  
 type site_list = 
     {
       used     : (site_name list * position) list;
@@ -190,11 +148,7 @@ type c_port =
       c_site_interval : c_state interval
     }
 
-module C_site_map_and_set = SetMap.Make
-  (struct
-    type t = c_site_name
-    let compare = compare
-   end)
+module C_site_map_and_set : SetMap.S with type elt = c_site_name
 
 type c_interface = c_port C_site_map_and_set.Map.t
                                                                            

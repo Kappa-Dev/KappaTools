@@ -51,7 +51,7 @@ type bdu_common_static =
 
 let collect_agent_name parameter error rule_id rule store_result =
   let error, store_result =
-    Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.fold
+    Cckappa_sig.Agent_id_quick_nearly_inf_Imperatif.fold
       parameter
       error
       (fun parameter error agent_id agent store_result ->
@@ -108,7 +108,9 @@ let half_break_action parameter error handler rule_id half_break store_result =
           begin
             let error, state_value =
               Misc_sa.unsome
-                (Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+                (
+                  (*Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get*)
+                  Cckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
                    parameter
                    error
                    (agent_type, site_type)
@@ -218,7 +220,8 @@ let store_potential_half_break parameter error handler rule_id half_break store_
         begin
           let error, state_value =
             Misc_sa.unsome
-              (Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+              ((*Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get*)
+                Cckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
                  parameter
                  error
                  (agent_type, site_type)
@@ -302,8 +305,13 @@ let store_potential_remove parameter error handler rule_id remove store_result =
           begin
             let error, state_dic =
               Misc_sa.unsome
-                (Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
-                   parameter error (agent_type, site) handler.Cckappa_sig.states_dic)
+                (
+                  (*Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get*)
+                  Cckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+                   parameter
+                    error 
+                    (agent_type, site)
+                    handler.Cckappa_sig.states_dic)
                 (fun error -> warn parameter error (Some "line 196") Exit
                   (Cckappa_sig.Dictionary_of_States.init()))
             in

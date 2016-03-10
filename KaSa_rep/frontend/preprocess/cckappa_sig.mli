@@ -15,39 +15,57 @@
 (* eventually, each type will be abtract, no int will appear in type declaration *)
 
 type position   = Ckappa_sig.position
-type agent_name = int
-(*type agent_name*)
-type site_name  = int
+type agent_name = Ckappa_sig.c_agent_name
+type site_name  = Ckappa_sig.c_site_name
+type state_index    = Ckappa_sig.c_state
+type rule_id = int
+type agent_id = int
 
-(*val string_of_agent_name : agent_name -> string
+val const_zero : agent_name
+
+val string_of_agent_name : agent_name -> string
 val int_of_agent_name : agent_name -> int
-val agent_name_of_int: int -> agent_name*)
 
-module Agent_type_storage_nearly_inf_Imperatif: Int_storage.Storage
-  with type key = agent_name 
+(*sites_dic*)
+module Agent_type_nearly_inf_Imperatif: Int_storage.Storage
+  with type key = agent_name
   and type dimension = int
 
-module Agent_type_storage_quick_nearly_inf_Imperatif: Int_storage.Storage
+module Agent_type_quick_nearly_inf_Imperatif: Int_storage.Storage
   with type key = agent_name 
    and type dimension = int
-			  
-module Agent_type_site_storage_nearly_Inf_Int_Int_storage_Imperatif_Imperatif: 
+	
+(*state_dic*)		  
+module Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif: 
   Int_storage.Storage 
   with type key = agent_name * site_name 
   and type dimension = int * int
-    
+
+(*dual*)
+module Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif: Int_storage.Storage
+  with type key = agent_name * (site_name * state_index)
+  and type dimension = int * (int * int)
+
+module Agent_id_nearly_inf_Imperatif : Int_storage.Storage
+  with type key = agent_id
+  and type dimension = int
+         
+module Agent_id_quick_nearly_inf_Imperatif: Int_storage.Storage
+  with type key = agent_id 
+  and type dimension = int
+
 type binding_state = 
-    | Free 
-    | Lnk_type of agent_name * site_name 
+| Free 
+| Lnk_type of agent_name * site_name 
 
 type site  = (site_name,site_name) Ckappa_sig.site_type
+
 type state = (Ckappa_sig.internal_state,binding_state) Ckappa_sig.site_type  
  
-type state_index = int
+module Dictionary_of_States: Dictionary.Dictionary with type key = state_index
+                                                   and type value = state
 
-module Dictionary_of_States: Dictionary.Dictionary with type value = state
-  
-type state_dic = (unit,unit) Dictionary_of_States.dictionary
+type state_dic = (unit, unit) Dictionary_of_States.dictionary
   
 type kappa_handler =
     {
@@ -56,12 +74,11 @@ type kappa_handler =
       nagents               : int;
       agents_dic            : Ckappa_sig.agent_dic; 
       interface_constraints : Ckappa_sig.agent_specification
-                              Agent_type_storage_nearly_inf_Imperatif.t;
-      sites                 : Ckappa_sig.site_dic Int_storage.Nearly_inf_Imperatif.t;
-      states_dic            : state_dic
-                              Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.t;
+                              Agent_type_nearly_inf_Imperatif.t;
+      sites                 : Ckappa_sig.site_dic Agent_type_nearly_inf_Imperatif.t; 
+      states_dic            : state_dic Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.t;
       dual                  : (agent_name * site_name * state_index)
-                 Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.t;
+        Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.t
     }
      
 type 'a interval = {min:'a; max:'a}
@@ -74,13 +91,6 @@ type 'state port =
     site_state    : 'state
   }
 
-type rule_id = int
-type agent_id = int
-
-module Agent_id_storage_quick_nearly_inf_Imperatif: Int_storage.Storage
-  with type key = agent_id 
-   and type dimension = int
-		  
 module Rule_map_and_set: Map_wrapper.S_with_logs with type elt = rule_id
 module Site_map_and_set: Map_wrapper.S_with_logs with type elt = site_name
 module State_map_and_set: Map_wrapper.S_with_logs with type elt = state_index
@@ -106,8 +116,8 @@ type 'interface proper_agent =
 val upgrade_interface: 'a interface proper_agent -> 'b interface -> 'b interface proper_agent
 val map_agent: ('a -> 'b) -> 'a interface proper_agent -> 'b interface proper_agent
 val upgrade_some_interface: 
-           'a Site_map_and_set.Map.t proper_agent ->
-           'a option Site_map_and_set.Map.t proper_agent
+  'a Site_map_and_set.Map.t proper_agent ->
+  'a option Site_map_and_set.Map.t proper_agent
 	      		      
 type site_address =
     {
@@ -137,7 +147,7 @@ type agent =
     
 type agent_sig = state_index list interface proper_agent 
   
-type views = agent Agent_id_storage_quick_nearly_inf_Imperatif.t
+type views = agent Agent_id_quick_nearly_inf_Imperatif.t
 
 type diff_views =
   state_index
@@ -145,7 +155,7 @@ type diff_views =
     port
     Site_map_and_set.Map.t
     proper_agent
-    Agent_id_storage_quick_nearly_inf_Imperatif.t
+    Agent_id_quick_nearly_inf_Imperatif.t
     
 type mixture = 
   { 
@@ -177,7 +187,7 @@ val empty_actions: actions
     
 type rule = 
   {
-    prefix         : int;
+    prefix       : int;
     delta        : int;
     rule_lhs     : mixture; 
     rule_arrow   : Ast.arrow; 

@@ -17,12 +17,18 @@ type set    = Cckappa_sig.Site_map_and_set.Set.t
 
 type covering_classes =
   {
-    store_modified_map     : Cckappa_sig.site_name map Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.t;
-    store_covering_classes : Cckappa_sig.site_name list list Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.t;
+    store_modified_map     : Cckappa_sig.site_name map Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t;
+    store_covering_classes : Cckappa_sig.site_name list list Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t;
   }
 
-module Dictionary_of_Covering_class : Dictionary.Dictionary with type value = Cckappa_sig.site_name list
-module Dictionary_of_Modified_class : Dictionary.Dictionary with type value = Cckappa_sig.site_name list
+module Dictionary_of_Covering_class : 
+  Dictionary.Dictionary 
+  with type key = int
+  and type value = Cckappa_sig.site_name list
+
+module Dictionary_of_Modified_class : Dictionary.Dictionary 
+  with type key = int
+  and type value = Cckappa_sig.site_name list
 
 type pair_dic   = (unit, unit) Dictionary_of_Covering_class.dictionary
 type index_dic  = (unit, unit) Dictionary_of_Covering_class.dictionary

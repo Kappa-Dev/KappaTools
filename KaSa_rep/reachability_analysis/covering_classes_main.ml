@@ -72,12 +72,13 @@ let scan_rule_covering_classes parameter error handler rule classes =
 
 let scan_rule_set_covering_classes parameter error handler rules =
   let n_agents = handler.nagents in
-  let error, init_modif_map =  Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.create parameter error n_agents in
-  let error, init_class     =  Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.create parameter error n_agents in
+  let error, init_modif_map =  Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.create parameter error n_agents in
+  let error, init_class     =  Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.create parameter error n_agents in
   (*------------------------------------------------------------------------------*)
   (* add each singleton as a covering class *)
   let error, init_class = 
-    Int_storage.Nearly_inf_Imperatif.fold
+      (*Int_storage.Nearly_inf_Imperatif.fold*)
+    Cckappa_sig.Agent_type_nearly_inf_Imperatif.fold
       parameter 
       error
       (fun parameters error a b init_class -> 
@@ -85,12 +86,17 @@ let scan_rule_set_covering_classes parameter error handler rules =
 	 (fun _ _ b (error,init_class) ->
 	  let error,l' =
 	    match
-	      Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.unsafe_get parameters error a init_class
+	      Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get parameters error a init_class
 	    with 
 	    | error,None -> error,[[b]]
 	    | error,Some l -> error,[b]::l
 	  in
-	  Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.set parameters error a l' init_class
+	  Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.set
+            parameters 
+            error
+            a 
+            l' 
+            init_class
 	 )
 	 b (error,init_class)
       )
@@ -129,19 +135,19 @@ let scan_rule_set_covering_classes parameter error handler rules =
 
 let scan_rule_set_remanent parameter error handler rules =
   (*create a new initial state to store after cleaning the covering classes*)
-  let error, init_result = Agent_type_storage_quick_nearly_inf_Imperatif.create parameter error 0 in
+  let error, init_result = Agent_type_quick_nearly_inf_Imperatif.create parameter error 0 in
   let error, store_covering_classes = 
     scan_rule_set_covering_classes parameter error handler rules
   in
   let result_covering_classes = store_covering_classes.store_covering_classes in
   let error, remanent_dictionary =
-    Agent_type_storage_quick_nearly_inf_Imperatif.fold parameter error
+    Agent_type_quick_nearly_inf_Imperatif.fold parameter error
       (fun parameters error agent_type covering_class init_remanent ->
         (*------------------------------------------------------------------------------*)
         (*get modified site*)
         let error, modified_map =
           match
-            Agent_type_storage_quick_nearly_inf_Imperatif.unsafe_get
+            Agent_type_quick_nearly_inf_Imperatif.unsafe_get
               parameter 
               error 
               agent_type
@@ -206,7 +212,7 @@ let scan_rule_set_remanent parameter error handler rules =
         (*------------------------------------------------------------------------------*)
         (*store the covering classes after cleaning theirs duplicate classes*)
         let error, store_remanent =
-          Agent_type_storage_quick_nearly_inf_Imperatif.set 
+          Agent_type_quick_nearly_inf_Imperatif.set 
             parameters
             error
             agent_type
@@ -226,7 +232,7 @@ let scan_rule_set_remanent parameter error handler rules =
 (*MAIN*)
 
 let covering_classes parameter error handler cc_compil =
-  let error, init = Agent_type_storage_quick_nearly_inf_Imperatif.create parameter error 0 in
+  let error, init = Agent_type_quick_nearly_inf_Imperatif.create parameter error 0 in
   let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in 
   let error, result = scan_rule_set_remanent parameter error handler cc_compil.rules in
   (*convert a list of site inside result [remanent] to a set of site*)

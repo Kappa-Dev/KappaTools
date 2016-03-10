@@ -137,7 +137,8 @@ struct
     
   let collect_dual_map parameter error handler store_result =
     let error, store_result =
-      Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
+      (*Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold*)
+      Cckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
         parameter error
         (fun parameter error (agent_type, (site_type, state))
           (agent_type', site_type', state') store_result ->
@@ -226,7 +227,7 @@ struct
                 let agent_index_target = site_add.Cckappa_sig.agent_index in
                 let site_type_target = site_add.Cckappa_sig.site in
                 let error, agent_source =
-                  match Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.get
+                  match Cckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get
                     parameter error agent_id views
                   with
                   | error, None -> warn parameter error (Some "line 271") Exit
@@ -234,7 +235,7 @@ struct
                   | error, Some agent -> error, agent
                 in
                 let error, agent_target =
-                  match Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.get
+                  match Cckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get
                     parameter error agent_index_target views
                   with
                   | error, None -> warn parameter error (Some "line 279") Exit
@@ -464,7 +465,7 @@ struct
                 let agent_index_target = site_add.Cckappa_sig.agent_index in
                 let site_type_target = site_add.Cckappa_sig.site in
                 let error, agent_source =
-                  match Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.get
+                  match Cckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get
                     parameter error agent_id views
                   with
                   | error, None -> warn parameter error (Some "line 473") Exit
@@ -472,7 +473,7 @@ struct
                   | error, Some agent -> error, agent
                 in
                 let error, agent_target =
-                  match Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.get
+                  match Cckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get
                     parameter error agent_index_target views
                   with
                   | error, None -> warn parameter error (Some "line 480") Exit

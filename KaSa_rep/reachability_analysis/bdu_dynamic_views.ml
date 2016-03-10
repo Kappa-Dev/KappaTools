@@ -161,7 +161,7 @@ let store_covering_classes_modification_side_effects parameter error
       (fun (agent_type_partner, rule_id_effect) pair_list (error, store_result) ->
         List.fold_left (fun (error, store_result) (site_type_partner, state) ->
           let error, store_result =
-            Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.fold parameter error
+            Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.fold parameter error
               (fun parameter error agent_type_cv remanent store_result ->
                 let cv_dic = remanent.Covering_classes_type.store_dic in
                 let error, store_result =

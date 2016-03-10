@@ -23,20 +23,20 @@ let trace = false
 
 type stochastic_class =
   {
-    stochastic_class : int list Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.t
+    stochastic_class : int list Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t
   }
 
 (************************************************************************************)   
 (*RULE*)
             
 let scan_rule parameter error handler rule classes =
-  let error, store_result = Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.create parameter error 0 in
+  let error, store_result = Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.create parameter error 0 in
   (*Compute the stochastic class in the case there is a new agent is created in the rhs*)
   let error, stochastic_class_rhs =
     List.fold_left
       (fun (error, store_result) (agent_id, agent_type) ->
 	let error, agent =
-          Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.get
+          Cckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get
 	    parameter
 	    error
 	    agent_id
@@ -56,13 +56,13 @@ let scan_rule parameter error handler rule classes =
                 ) agent.Cckappa_sig.agent_interface (error, [])
             in
             let error, old_list =
-              match Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.unsafe_get parameter error agent_type store_result with
+              match Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get parameter error agent_type store_result with
               | error, None -> error, []
               | error, Some l -> error, l
             in
             let new_list = List.concat [site_list; old_list] in
             let error, store_result =
-              Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.set
+              Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.set
                 parameter
                 error
                 agent_type
@@ -74,7 +74,7 @@ let scan_rule parameter error handler rule classes =
   in
   (*compute the stochastic class *)
   let error, stochastic_classes =
-    Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.fold
+    Cckappa_sig.Agent_id_quick_nearly_inf_Imperatif.fold
       parameter error
       (fun parameter error agent_id agent store_result ->
        match agent with
@@ -91,13 +91,13 @@ let scan_rule parameter error handler rule classes =
               ) agent.Cckappa_sig.agent_interface (error, [])
           in
           let error, old_list =
-            match Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.unsafe_get parameter error agent_type store_result with
+            match Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get parameter error agent_type store_result with
             | error, None -> error, []
             | error, Some l -> error, l
           in
           let new_list = List.concat [site_list; old_list] in
           let error, store_result =
-            Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.set
+            Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.set
               parameter
               error
               agent_type
@@ -121,7 +121,8 @@ let scan_rule parameter error handler rule classes =
 
 let get_nsites parameter error key handler =
   let error, get_nsites =
-    Int_storage.Nearly_inf_Imperatif.unsafe_get
+    (*Int_storage.Nearly_inf_Imperatif.unsafe_get*)
+    Cckappa_sig.Agent_type_nearly_inf_Imperatif.unsafe_get
       parameter
       error
       key
@@ -130,7 +131,7 @@ let get_nsites parameter error key handler =
   let error, sites_dic =
     match get_nsites with
     | None -> warn parameter error (Some "line 143") Exit
-                   (Ckappa_sig.Dictionary_of_sites.init())
+      (Ckappa_sig.Dictionary_of_sites.init())
     | Some dic -> error, dic
   in                  
   let error, nsites =
@@ -145,8 +146,12 @@ let get_nsites parameter error key handler =
 
 let scan_rule_set parameter error handler rules =
   let nagents = handler.Cckappa_sig.nagents in
-  let error, init_stochastic_class = Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.create parameter error nagents in
-  let error, init                  = Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.create parameter error 0 in
+  let error, init_stochastic_class = 
+    Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.create parameter error nagents 
+  in
+  let error, init =
+    Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.create parameter error 0
+  in
   let init_stochastic =
     {
       stochastic_class = init_stochastic_class
@@ -168,7 +173,7 @@ let scan_rule_set parameter error handler rules =
        in
        (*------------------------------------------------------------------------*)
        let error, store_result =
-         Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.fold
+         Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.fold
            parameter error
            (fun parameter error agent_type sites_list store_result ->
             let nsites = 
@@ -183,7 +188,7 @@ let scan_rule_set parameter error handler rules =
             | _ ->
               (*getting an array in the old_result*)
                let error, get_array =
-                 Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.unsafe_get
+                 Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get
                    parameter
                    error
                    agent_type
@@ -204,7 +209,7 @@ let scan_rule_set parameter error handler rules =
                in
                (*store*)
                let error, store_result =
-                 Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.set
+                 Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.set
                    parameter
                    error
                    agent_type
@@ -240,7 +245,7 @@ let print_array parameter error handler agent_type array =
   Printf.fprintf stdout "%s\n" output
 
 let print_stochastic_class parameter error handler result =
-  Cckappa_sig.Agent_type_storage_quick_nearly_inf_Imperatif.iter
+  Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.iter
     parameter
     error
     (fun parameter error agent_type array_site_type ->

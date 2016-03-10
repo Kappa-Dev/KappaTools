@@ -97,7 +97,7 @@ let print_mixture parameters error handler mixture =
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" (Remanent_parameters.get_prefix parameters) in
     let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
     let error =
-      Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.print
+      Cckappa_sig.Agent_id_quick_nearly_inf_Imperatif.print
        error
        (fun error parameters a ->
         let _ = print_agent parameters error handler a in
@@ -147,7 +147,7 @@ let print_diffview parameters error handler diff =
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" (Remanent_parameters.get_prefix parameters) in
     let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
     let error =
-      Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.print
+      Cckappa_sig.Agent_id_quick_nearly_inf_Imperatif.print
        error
        (fun error parameters a ->
           let _ = print_diffagent parameters error handler a in
@@ -434,7 +434,9 @@ let print_diffview parameters error handler diff =
  let print_perturbations parameters error handler perturbations = error
 
  let print_compil parameters error handler compil =
-   let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" (Remanent_parameters.get_prefix parameters) in
+   let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" 
+     (Remanent_parameters.get_prefix parameters) 
+   in
    let parameters' =  Remanent_parameters.update_prefix parameters "variables:" in
    let error = print_variables parameters' error handler compil.Cckappa_sig.variables in
    let parameters' =  Remanent_parameters.update_prefix parameters "signature:" in
@@ -446,6 +448,7 @@ let print_diffview parameters error handler diff =
    let parameters' =  Remanent_parameters.update_prefix parameters "initial_states:" in
    let error = print_inits parameters' error handler compil.Cckappa_sig.init in
    let parameters' =  Remanent_parameters.update_prefix parameters "perturbations:" in
-   let error = print_perturbations parameters' error handler compil.Cckappa_sig.perturbations in
-     error
-
+   let error = print_perturbations parameters' error handler
+     compil.Cckappa_sig.perturbations 
+   in
+   error

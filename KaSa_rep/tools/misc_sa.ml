@@ -13,6 +13,8 @@
   * under the terms of the GNU Library General Public License *)
 
 let compare_unit _ _ = 0
+let compare_unit_agent_name _ _ = Cckappa_sig.const_zero
+
 let const_unit _ = ()
 
 let array_of_list create set parameters error list =

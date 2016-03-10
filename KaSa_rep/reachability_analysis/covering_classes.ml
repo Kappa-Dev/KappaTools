@@ -32,7 +32,7 @@ let warn parameters mh message exn default =
 (*compute modified (actions) site*)
 
 let collect_modified_map parameter error diff_reverse store_modified_map =
-  Agent_id_storage_quick_nearly_inf_Imperatif.fold parameter error
+  Agent_id_quick_nearly_inf_Imperatif.fold parameter error
     (fun parameter error agent_id site_modif store_modified_map ->
       (*if there is no modified sites then do nothing*)
       if Map.is_empty
@@ -59,7 +59,7 @@ let collect_modified_map parameter error diff_reverse store_modified_map =
         (*compute site_map*)
         let error, old_map =
           match
-            Agent_type_storage_quick_nearly_inf_Imperatif.unsafe_get
+            Agent_type_quick_nearly_inf_Imperatif.unsafe_get
             parameter
             error
             agent_type
@@ -75,7 +75,7 @@ let collect_modified_map parameter error diff_reverse store_modified_map =
             store_site
         in
         let error', store_modified_map =
-          Agent_type_storage_quick_nearly_inf_Imperatif.set
+          Agent_type_quick_nearly_inf_Imperatif.set
             parameter
             error
             agent_type
@@ -97,7 +97,7 @@ let add_covering_class parameter error agent_type list store_covering_classes =
     | _ ->
       let error, old_list =
         match 
-          Agent_type_storage_quick_nearly_inf_Imperatif.unsafe_get
+          Agent_type_quick_nearly_inf_Imperatif.unsafe_get
             parameter 
             error
             agent_type
@@ -108,7 +108,7 @@ let add_covering_class parameter error agent_type list store_covering_classes =
       in
       (* store the new list of covering classes *)
       let new_pair_list = (List.rev list) :: old_list in
-      Agent_type_storage_quick_nearly_inf_Imperatif.set 
+      Agent_type_quick_nearly_inf_Imperatif.set 
         parameter
         error
         agent_type
@@ -120,7 +120,7 @@ let add_covering_class parameter error agent_type list store_covering_classes =
 
 let collect_covering_classes parameter error views diff_reverse store_covering_classes =
   let error, store_covering_classes =
-    Cckappa_sig.Agent_id_storage_quick_nearly_inf_Imperatif.fold2_common parameter error
+    Cckappa_sig.Agent_id_quick_nearly_inf_Imperatif.fold2_common parameter error
       (fun parameter error agent_id agent site_modif store_covering_classes ->
         (* if in the interface there is no site modified then do nothing *)
         if Map.is_empty site_modif.agent_interface

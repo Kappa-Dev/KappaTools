@@ -46,15 +46,18 @@ end
 
 module D_mvbdu_skeleton =
   (Dictionary.Dictionary_of_Ord (Mvbdu_Skeleton):Dictionary.Dictionary
-   with type value = bool Mvbdu_sig.skeleton)
+   with type key = int
+  and type value = bool Mvbdu_sig.skeleton)
 
 module D_Association_list_skeleton =
   (Dictionary.Dictionary_of_Ord (Association_List_Skeleton):Dictionary.Dictionary
-   with type value = int List_sig.skeleton)
+   with type key = int
+   and type value = int List_sig.skeleton)
 
 module D_Variables_list_skeleton =
   (Dictionary.Dictionary_of_Ord (Variables_List_Skeleton):Dictionary.Dictionary
-   with type value = unit List_sig.skeleton)
+   with type key = int
+   and type value = unit List_sig.skeleton)
 
 module Hash_1 = Int_storage.Nearly_inf_Imperatif
 module Hash_2 = Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif

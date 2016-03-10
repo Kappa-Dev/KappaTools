@@ -29,7 +29,7 @@ let trace = false
 
 let collect_sites_modified_set parameter error rule handler_kappa store_result =
   let error, store_result =
-    Agent_id_storage_quick_nearly_inf_Imperatif.fold parameter error
+    Agent_id_quick_nearly_inf_Imperatif.fold parameter error
       (fun parameter error agent_id site_modif store_result ->
         if Site_map_and_set.Map.is_empty site_modif.agent_interface
         then
@@ -368,7 +368,7 @@ let collect_sites_bond_pair_set_external parameter error rule store_result =
 
 let collect_sites_lhs parameter error rule store_result =
   let error, store_result =
-    Agent_id_storage_quick_nearly_inf_Imperatif.fold parameter error
+    Agent_id_quick_nearly_inf_Imperatif.fold parameter error
       (fun parameter error agent_id agent store_result ->
         match agent with
         | Ghost | Unknown_agent _ -> error, store_result
@@ -411,7 +411,7 @@ let collect_sites_anchor_set parameter error handler_kappa rule
     store_sites_bond_pair_set
     store_sites_lhs
     store_result =
-  Agent_id_storage_quick_nearly_inf_Imperatif.fold parameter error
+  Agent_id_quick_nearly_inf_Imperatif.fold parameter error
     (fun parameter error agent_id agent store_result ->
       let store_result1, store_result2 = store_result in
       match agent with
@@ -593,7 +593,7 @@ let collect_internal_flow parameter error handler_kappa rule
     error, result
   in
   (*----------------------------------------------------------------------*)
-  Agent_id_storage_quick_nearly_inf_Imperatif.fold parameter error
+  Agent_id_quick_nearly_inf_Imperatif.fold parameter error
     (fun parameter error agent_id agent store_result ->
       let store_result1, store_result2 = store_result in
       match agent with

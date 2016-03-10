@@ -16,70 +16,100 @@ let warn parameters mh message exn default =
      Exception.warn parameters mh (Some "cckappa.sig") message exn (fun () -> default) 
   
 type position   = Ckappa_sig.position
-type agent_name = int 
-type site_name  = int
+type agent_name = Ckappa_sig.c_agent_name 
+type site_name  = Ckappa_sig.c_site_name
+type state_index = Ckappa_sig.c_state
 
-let string_of_agent_name (a: agent_name) = string_of_int a
-let int_of_agent_name (a: agent_name) : int = a
-let agent_name_of_int (a: int) : agent_name = a
+type rule_id = int
+type agent_id = int
 
-module Agent_type_storage_nearly_inf_Imperatif =
+let const_zero = 0
+
+let string_of_agent_name a = Ckappa_sig.string_of_agent_name a
+let int_of_agent_name a = Ckappa_sig.int_of_agent_name a
+
+module Agent_type_nearly_inf_Imperatif =
   (
-    Int_storage.Nearly_inf_Imperatif: Int_storage.Storage 
-   with type key = agent_name 
+    Int_storage.Nearly_inf_Imperatif: Int_storage.Storage
+   with type key = agent_name
    and type dimension = int
   )
 
-module Agent_type_storage_quick_nearly_inf_Imperatif =
+module Agent_type_quick_nearly_inf_Imperatif =
   (
-    Int_storage.Quick_key_list (Agent_type_storage_nearly_inf_Imperatif): Int_storage.Storage
+    Int_storage.Quick_key_list (Agent_type_nearly_inf_Imperatif): Int_storage.Storage
     with type key = agent_name 
-     and type dimension = int
+    and type dimension = int
   )
 
-module Agent_type_site_storage_nearly_Inf_Int_Int_storage_Imperatif_Imperatif =
+module Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif =
   (
     Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif: Int_storage.Storage 
    with type key = agent_name * site_name 
    and type dimension = int * int
   )
     
-type binding_state = 
-    | Free 
-    | Lnk_type of agent_name * site_name 
+module Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif =
+  (
+    Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif : Int_storage.Storage
+   with type key = (agent_name * (site_name * state_index))
+   and type dimension = (int * (int * int))
+  )
 
-type site  = (site_name,site_name) Ckappa_sig.site_type
-type state = (Ckappa_sig.internal_state,binding_state) Ckappa_sig.site_type  
+module Agent_id_nearly_inf_Imperatif =
+  (
+    Int_storage.Nearly_inf_Imperatif : Int_storage.Storage 
+   with type key = agent_id
+   and type dimension = int
+  )		  
+
+module Agent_id_quick_nearly_inf_Imperatif =
+  (
+    Int_storage.Quick_key_list (Agent_id_nearly_inf_Imperatif) : Int_storage.Storage 
+   with type key = agent_id
+   and type dimension = int
+  )
+
+type binding_state = 
+| Free 
+| Lnk_type of agent_name * site_name 
+
+type site  = (site_name, site_name) Ckappa_sig.site_type
+type state = (Ckappa_sig.internal_state, binding_state) Ckappa_sig.site_type  
  
 module State = 
 struct
   type t = state 
   let compare = compare
 end 
-    
-type state_index = int
 
-module Dictionary_of_States = Dictionary.Dictionary_of_Ord (State)
-  
-type state_dic = (unit,unit) Dictionary_of_States.dictionary
+module Dictionary_of_States = 
+  (
+    Dictionary.Dictionary_of_Ord (State) : Dictionary.Dictionary
+   with type key = state_index
+   and type value = state
+  )
+
+type state_dic = (unit, unit) Dictionary_of_States.dictionary
   
 type kappa_handler = 
-    {
+  {
       nrules                : int; 
       nvars                 : int; 
       nagents               : int;
       agents_dic            : Ckappa_sig.agent_dic; 
       interface_constraints : Ckappa_sig.agent_specification
-                              Agent_type_storage_nearly_inf_Imperatif.t;
-      sites                 : Ckappa_sig.site_dic Int_storage.Nearly_inf_Imperatif.t;
-      states_dic            : state_dic
-                              Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.t;
+        Agent_type_nearly_inf_Imperatif.t;
+      sites                 : Ckappa_sig.site_dic 
+        Agent_type_nearly_inf_Imperatif.t;
+      states_dic            : state_dic 
+        Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.t;
       dual                  : (agent_name * site_name * state_index)
-                 Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.t;
-    }
-     
+        Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.t
+  }
+
 type 'a interval = {min:'a; max:'a}
-  
+
 type 'state port = 
   { 
     site_name     : site_name; 
@@ -87,24 +117,6 @@ type 'state port =
     site_free     : bool option; 
     site_state    : 'state
   }
-
-type rule_id = int
-type agent_id = int
-
-module Agent_id_storage_nearly_inf_Imperatif =
-  (
-    Int_storage.Nearly_inf_Imperatif : Int_storage.Storage 
-   with type key = agent_id
-   and type dimension = int
-  )		  
-
-		  
-module Agent_id_storage_quick_nearly_inf_Imperatif =
-  (
-    Int_storage.Quick_key_list(Agent_id_storage_nearly_inf_Imperatif) : Int_storage.Storage 
-   with type key = agent_id
-   and type dimension = int
-  )
 
 module Rule_map_and_set =
   Map_wrapper.Make
@@ -265,7 +277,7 @@ type agent =
     
 type agent_sig = state_index list interface proper_agent 
   
-type views = agent Agent_id_storage_quick_nearly_inf_Imperatif.t
+type views = agent Agent_id_quick_nearly_inf_Imperatif.t
 
 type diff_views =
     state_index
@@ -273,7 +285,7 @@ type diff_views =
       port
       Site_map_and_set.Map.t
       proper_agent
-      Agent_id_storage_quick_nearly_inf_Imperatif.t
+      Agent_id_quick_nearly_inf_Imperatif.t
 
 type mixture = 
     { 
@@ -312,7 +324,7 @@ let empty_actions =
     
 type rule = 
   {
-    prefix         : int;
+    prefix       : int;
     delta        : int;
     rule_lhs     : mixture; 
     rule_arrow   : Ast.arrow; 
@@ -347,15 +359,15 @@ type enriched_rule =
       
 type enriched_init = 
     {
-      e_init_factor     : (Ckappa_sig.mixture,string) Ast.ast_alg_expr;
-      e_init_c_factor   : (mixture,string) Ast.ast_alg_expr;
+      e_init_factor     : (Ckappa_sig.mixture, string) Ast.ast_alg_expr;
+      e_init_c_factor   : (mixture, string) Ast.ast_alg_expr;
       e_init_string_pos : string Location.annot option;
       e_init_mixture    : Ckappa_sig.mixture;
       e_init_c_mixture  : mixture
     }
       
 let dummy_init parameters error =
-  let error,views = Agent_id_storage_quick_nearly_inf_Imperatif.create parameters error 0 in 
+  let error,views = Agent_id_quick_nearly_inf_Imperatif.create parameters error 0 in 
   let error,bonds = Int_storage.Quick_Nearly_inf_Imperatif.create parameters error 0 in 
   error,
   {
