@@ -50,7 +50,7 @@ sig
   
   val empty: 'a t
   val is_empty: 'a t -> bool
-  val min_elt: (elt -> 'a -> bool) -> 'a t -> elt option
+  val min_elt: 'a t -> (elt * 'a) option
   val mem: (elt -> 'a t -> bool)
 
   val find_option:  Remanent_parameters_sig.parameters -> Exception.method_handler  -> elt -> 'a t -> Exception.method_handler  * 'a option
@@ -97,6 +97,8 @@ sig
   val map: ('a -> 'b) -> 'a t -> 'b t 
 
   val for_all: (elt -> 'a -> bool) -> 'a t -> bool
+
+  val filter: (elt -> 'a -> bool) -> 'a t -> 'a t
 
   val compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
 
@@ -223,6 +225,7 @@ module Make (S_both: (SetMap.S)): S_with_logs
 	      let mapi = S_both.Map.mapi
 	      let map = S_both.Map.map
 	      let for_all = S_both.Map.for_all
+	      let filter = S_both.Map.filter
 	      let compare = S_both.Map.compare
 	      let equal = S_both.Map.equal
 	      let bindings = S_both.Map.bindings 		

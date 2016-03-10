@@ -116,7 +116,7 @@ module type Map =
 
     val pop: elt -> 'a t -> ('a option * 'a t)
     val merge: 'a t -> 'a t -> 'a t
-    val min_elt: (elt -> 'a -> bool) -> 'a t -> elt option
+    val min_elt: 'a t -> (elt * 'a) option
     val find_option: elt -> 'a t -> 'a option
     val find_default: 'a -> elt -> 'a t -> 'a
     val find_option_with_logs:
@@ -223,6 +223,7 @@ module type Map =
     val map2: ('a -> 'a -> 'a) -> 'a t -> 'a t -> 'a t
 
     val for_all: (elt -> 'a -> bool) -> 'a t -> bool
+    val filter: (elt -> 'a -> bool) -> 'a t -> 'a t
     val compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
     val equal: ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
     val bindings : 'a t -> (elt * 'a) list
@@ -458,11 +459,11 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
             Private.Node(rightleft,rightvalue,rightright,rightheight,_) ->
             if leftheight > rightheight + 2 then
               let error, right' =
-	        join_with_logs warn parameters error leftright value right in
+		join_with_logs warn parameters error leftright value right in
               balance_with_logs warn parameters error leftleft leftvalue right'
             else if rightheight > leftheight +2 then
               let error, left' =
-	        join_with_logs warn parameters error left value rightleft in
+		join_with_logs warn parameters error left value rightleft in
               balance_with_logs warn parameters error left' rightvalue rightright
             else
               error,node left value right
@@ -1104,7 +1105,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  | Private.Empty ->
 	       error, false, empty
 	  | Private.Node (left,key_map,data,right,_,_) ->
-             let cmp = compare key key_map in
+             let cmp = Ord.compare key key_map in
 	     if cmp = 0 then
 	       let error, map =
 		 merge_with_logs warn parameters error left right in
@@ -1340,12 +1341,10 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              | None ->
                 join oleft1 key1 data1 oright1, merge oleft2 oright2
 
-	let rec min_elt p = function
+	let rec min_elt = function
           | Private.Empty -> None
-          | Private.Node(left,key,data,right,_,_) ->
-             match min_elt p left with
-             | None -> if p key data then Some key else min_elt p right
-             | some -> some
+          | Private.Node(Private.Empty,key,data,_,_,_) -> Some (key,data)
+          | Private.Node(left,_,_,_,_,_) -> min_elt left
 
 	let rec find_option key = function
 	  | Private.Empty -> None
@@ -1390,6 +1389,15 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              let cmp = Ord.compare key key_map in
              cmp == 0 ||
 	       if cmp>0 then mem key right else mem key left
+
+	let filter p set =
+	  let rec filt accu = function
+            | Private.Empty -> accu
+            | Private.Node(left,key,value,right,_,_) ->
+               filt (filt (if p key value
+			   then add key value accu
+			   else accu) left) right
+	  in filt empty set
 
 	let rec iter f = function
           | Private.Empty -> ()

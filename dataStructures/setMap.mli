@@ -100,7 +100,7 @@ module type Map =
 
     val pop: elt -> 'a t -> ('a option * 'a t)
     val merge: 'a t -> 'a t -> 'a t
-    val min_elt: (elt -> 'a -> bool) -> 'a t -> elt option
+    val min_elt: 'a t -> (elt * 'a) option
     val find_option: elt -> 'a t -> 'a option
     val find_default: 'a -> elt -> 'a t -> 'a
     val find_option_with_logs:
@@ -208,6 +208,7 @@ module type Map =
     val map2: ('a -> 'a -> 'a) -> 'a t -> 'a t -> 'a t
 
     val for_all: (elt -> 'a -> bool) -> 'a t -> bool
+    val filter: (elt -> 'a -> bool) -> 'a t -> 'a t
     val compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
     val equal: ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
     val bindings : 'a t -> (elt * 'a) list
