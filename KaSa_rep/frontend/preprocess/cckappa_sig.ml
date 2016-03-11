@@ -23,15 +23,19 @@ type state_index = Ckappa_sig.c_state
 type rule_id = int
 type agent_id = int
 
-let const_zero = 0
+let const_zero = 0 (* Must be define in ckappa_sig.ml instead (we should no longer know that agent_names are int in cckappa_sig.ml *)
 
 let string_of_agent_name a = Ckappa_sig.string_of_agent_name a
 let int_of_agent_name a = Ckappa_sig.int_of_agent_name a
 
-module Agent_type_nearly_inf_Imperatif =
+module Agent_type_nearly_inf_Imperatif = 
   (
     Int_storage.Nearly_inf_Imperatif: Int_storage.Storage
-   with type key = agent_name
+    with type key = agent_name (* Here we use the fact that agent_name and int are aliased *)
+                               (* Thus, this module defintiion should be put in Ckappa_sig.ml *)
+                               (* which is the last place, when we want this alias to be usable *)
+                               (* So you have to push the type definition of these modules from cckappa_sig.mli into ckappa_sig.mli *)
+                               (* as well as the module defintions from cckappa_sig.ml into ckappa_sig.ml *) 
    and type dimension = int
   )
 
