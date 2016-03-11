@@ -164,13 +164,11 @@ end = struct
                                     State_interpreter.a_loop
                                       ~outputs:outputs log_form
 				      env domain simulation.counter graph state in
-				  if stop then
-				    let () = ExceptionDefn.flush_warning log_form in
-                                    Lwt_switch.turn_off simulation.switch
-				  else
-                                    if Lwt_switch.is_on simulation.switch
-                                    then Lwt.bind (self#yield ()) (fun () -> iter graph' state')
-                                    else Lwt.return_unit in
+				  if not (Lwt_switch.is_on simulation.switch) || stop then
+				    let () = State_interpreter.end_of_simulation
+                                      ~outputs:outputs log_form env simulation.counter graph state in
+				    Lwt_switch.turn_off simulation.switch
+				  else Lwt.bind (self#yield ()) (fun () -> iter graph' state') in
 				iter graph state)
                           )
                           (function

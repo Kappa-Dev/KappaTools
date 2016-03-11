@@ -20,7 +20,12 @@ val a_loop :
   outputs:(Data.t -> unit) -> Format.formatter ->
   Environment.t -> Connected_component.Env.t ->
   Counter.t -> Rule_interpreter.t -> t -> (bool * Rule_interpreter.t * t)
-(**Event loop for javascript*)
+(** One event loop *)
+
+val end_of_simulation :
+  outputs:(Data.t -> unit) -> Format.formatter ->
+  Environment.t -> Counter.t -> Rule_interpreter.t -> t -> unit
+(** What to do after stopping simulation *)
 
 val loop :
   outputs:(Data.t -> unit) ->

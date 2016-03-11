@@ -303,9 +303,7 @@ let a_loop ~outputs form env domain counter graph state =
 	     ignore (perturbate ~outputs env domain counter graph' state') in
   out
 
-let finalize ~outputs form env counter graph state =
-  let () = Outputs.close () in
-  let () = Counter.complete_progress_bar form counter in
+let end_of_simulation ~outputs form env counter graph state =
   let () =
     List.iter
       (fun e ->
@@ -319,6 +317,11 @@ let finalize ~outputs form env counter graph state =
       (snd state.flux) in
   let () = ExceptionDefn.flush_warning form in
   Rule_interpreter.generate_stories form env graph
+
+let finalize ~outputs form env counter graph state =
+  let () = Outputs.close () in
+  let () = Counter.complete_progress_bar form counter in
+  end_of_simulation ~outputs form env counter graph state
 
 let loop ~outputs form env domain counter graph state =
   let rec iter graph state =
