@@ -508,70 +508,81 @@ let print_dot f env =
   in
   Format.fprintf f "}@]@."
 
-let rec remove_from_sons level1 set rfathers cc_id = function
-  | [] -> rfathers,set
+let rec remove_from_sons level1 todos set rfathers cc_id = function
+  | [] -> todos,rfathers,set
   | id :: tail ->
      match IntMap.find_option id set with
-     | None -> remove_from_sons level1 set rfathers cc_id tail
+     | None -> remove_from_sons level1 todos set rfathers cc_id tail
      | Some cc ->
 	match List.partition (fun t -> t.dst = cc_id) cc.sons with
-	| [], _ -> remove_from_sons level1 set rfathers cc_id tail
+	| [], _ -> remove_from_sons level1 todos set rfathers cc_id tail
 	| x::_,sons ->
 	let missings = List.fold_left
 			 (fun acc t -> IntSet.minus acc t.above_obs) x.above_obs
 			 sons in
 	if sons <> [] || cc.is_obs_of <> None || List.mem id level1 then
-	  let rfathers',set' = scan_sons level1 set [] id cc.fathers in
 	  let sons' =  if IntSet.is_empty missings then sons else cc.sons in
 	  let rfathers'' =
 	    if IntSet.is_empty missings then rfathers else id::rfathers in
 	  remove_from_sons
-	    level1
-	    (IntMap.add id {cc with fathers = rfathers'; sons = sons'} set')
+	    level1 (IntMap.add id cc.fathers todos)
+	    (IntMap.add id {cc with sons = sons'} set)
 	    rfathers'' cc_id tail
 	else
-	  let rfathers',set' = remove_from_sons level1 set [] id cc.fathers in
+	  let todos',rfathers',set' =
+	    remove_from_sons
+	      level1 (IntMap.remove id todos) set [] id cc.fathers in
 	  let rfathers,set'' =
 	    match rfathers' with
 	    | _ :: _ ->
 	       id::rfathers,IntMap.add id {cc with fathers = rfathers'} set'
 	    | [] -> rfathers,IntMap.remove id set' in
-	  remove_from_sons level1 set'' rfathers cc_id tail
-and scan_sons level1 set rfathers cc_id = function
-  | [] -> rfathers,set
-  | [ _ ] as l when rfathers = [] -> l,set
+	  remove_from_sons level1 todos' set'' rfathers cc_id tail
+let rec scan_sons level1 todos set rfathers cc_id p = function
+  | [] -> todos,IntMap.add cc_id {p with fathers = rfathers} set
+  | [ _ ] as l when rfathers = [] ->
+     todos,IntMap.add cc_id {p with fathers = l} set
   | id :: tail ->
      match IntMap.find_option id set with
-     | None -> scan_sons level1 set rfathers cc_id tail
+     | None -> scan_sons level1 todos set rfathers cc_id p tail
      | Some cc ->
 	if List.length cc.sons > 1 || cc.is_obs_of <> None || List.mem id level1
 	then
-	  let rfathers',set' = scan_sons level1 set [] id cc.fathers in
-	  scan_sons level1
-		    (IntMap.add id {cc with fathers = rfathers'} set')
-		    (id::rfathers) cc_id tail
+	  scan_sons level1 (IntMap.add id cc.fathers todos) set
+		    (id::rfathers) cc_id p tail
 	else
-	  let rfathers',set' =
-	    remove_from_sons level1 set [] id cc.fathers in
+	  let todos',rfathers',set' =
+	    remove_from_sons
+	      level1 (IntMap.remove id todos) set [] id cc.fathers in
 	  let rfathers,set'' =
 	    match rfathers' with
 	    | _ :: _ ->
 	       id::rfathers,IntMap.add id {cc with fathers = rfathers'} set'
 	    | [] -> rfathers,IntMap.remove id set' in
-	  scan_sons level1 set'' rfathers cc_id tail
+	  scan_sons level1 todos' set'' rfathers cc_id p tail
 
 let finalize env =
   let level1 = let zero = get env 0 in List.map (fun p -> p.dst) zero.sons in
-  let f id p env =
-    if p.sons = [] && not (List.mem id level1)
-    then
-      let rfathers,set = scan_sons level1 env [] id p.fathers in
-      IntMap.add id {p with fathers = rfathers} set
-    else env in
+  let rec iter (todos,env) =
+    if IntMap.is_empty todos then env else
+      let out =
+	IntMap.fold
+	  (fun id fa (todos,s) ->
+	     match IntMap.find_option id s with
+	     | None -> (todos,s)
+	     | Some p -> scan_sons level1 todos s [] id p fa)
+	  todos (IntMap.empty,env) in
+      iter out in
   match env.domain with
   | Final _ -> env
   | Provisional s ->
-     let s' = IntMap.fold f s s in
+     let tops =
+       IntMap.fold
+	 (fun id p s ->
+	  if p.sons = [] && not (List.mem id level1)
+	  then IntMap.add id p.fathers s else s)
+	 s IntMap.empty in
+     let s' = iter (tops,s) in
      let si = match IntMap.max_key s' with Some i -> succ i | None -> 0 in
      let out = Array.make si (empty_point env.sig_decl) in
      let () = IntMap.iter (fun i p -> out.(i) <- p) s' in
