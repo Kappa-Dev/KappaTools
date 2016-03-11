@@ -37,7 +37,7 @@ type bind_partner = (site_name * state_index) list AgentRule_map_and_set.Map.t
 
 type potential_partner_free = free_partner
 type potential_partner_bind = bind_partner
-type agent_name_map = int RuleAgent_map_and_set.Map.t
+type agent_name_map = Cckappa_sig.agent_name RuleAgent_map_and_set.Map.t
 
 type bdu_common_static =
   {

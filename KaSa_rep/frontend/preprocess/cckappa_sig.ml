@@ -23,42 +23,21 @@ type state_index = Ckappa_sig.c_state
 type rule_id = int
 type agent_id = int
 
-let const_zero = 0 (* Must be define in ckappa_sig.ml instead (we should no longer know that agent_names are int in cckappa_sig.ml *)
+let dummy_agent_name = Ckappa_sig.dummy_agent_name
 
 let string_of_agent_name a = Ckappa_sig.string_of_agent_name a
 let int_of_agent_name a = Ckappa_sig.int_of_agent_name a
+let agent_name_of_int a = Ckappa_sig.agent_name_of_int a
 
-module Agent_type_nearly_inf_Imperatif = 
-  (
-    Int_storage.Nearly_inf_Imperatif: Int_storage.Storage
-    with type key = agent_name (* Here we use the fact that agent_name and int are aliased *)
-                               (* Thus, this module defintiion should be put in Ckappa_sig.ml *)
-                               (* which is the last place, when we want this alias to be usable *)
-                               (* So you have to push the type definition of these modules from cckappa_sig.mli into ckappa_sig.mli *)
-                               (* as well as the module defintions from cckappa_sig.ml into ckappa_sig.ml *) 
-   and type dimension = int
-  )
+module Agent_type_nearly_inf_Imperatif = Ckappa_sig.Agent_type_nearly_inf_Imperatif
 
-module Agent_type_quick_nearly_inf_Imperatif =
-  (
-    Int_storage.Quick_key_list (Agent_type_nearly_inf_Imperatif): Int_storage.Storage
-    with type key = agent_name 
-    and type dimension = int
-  )
+module Agent_type_quick_nearly_inf_Imperatif = Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif
 
 module Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif =
-  (
-    Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif: Int_storage.Storage 
-   with type key = agent_name * site_name 
-   and type dimension = int * int
-  )
+  Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
     
 module Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif =
-  (
-    Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif : Int_storage.Storage
-   with type key = (agent_name * (site_name * state_index))
-   and type dimension = (int * (int * int))
-  )
+  Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif
 
 module Agent_id_nearly_inf_Imperatif =
   (

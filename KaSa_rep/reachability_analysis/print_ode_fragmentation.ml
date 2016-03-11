@@ -29,16 +29,18 @@ let trace = false
 (*Print sites that modified*)
 
 let print_sites_modified_set parameter error handler_kappa result =
-  AgentMap.iter parameter error
+  Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.iter parameter error
     (fun parameter error agent_type site_set ->
       let error, agent_name =
         try
           Handler.string_of_agent parameter error handler_kappa agent_type
         with
-          _ -> warn parameter error (Some "line 38") Exit (string_of_int agent_type)
+          _ -> warn parameter error (Some "line 38") Exit (string_of_agent_name agent_type)
       in
       let () =
-        Loggers.fprintf (Remanent_parameters.get_logger parameter)  "agent_type:%i:%s" agent_type agent_name
+        Loggers.fprintf (Remanent_parameters.get_logger parameter) 
+          "agent_type:%i:%s" 
+          (Cckappa_sig.int_of_agent_name agent_type) agent_name
       in
       let () =
 	Loggers.print_newline (Remanent_parameters.get_logger parameter)
@@ -52,7 +54,10 @@ let print_sites_modified_set parameter error handler_kappa result =
             with
               _ -> warn parameter error (Some "line 50") Exit (string_of_int site_type)
           in
-          let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)  "site_type:%i:%s" site_type site_string in
+          let () = Loggers.fprintf 
+            (Remanent_parameters.get_logger parameter)  "site_type:%i:%s"
+            site_type site_string 
+          in
 	  Loggers.print_newline (Remanent_parameters.get_logger parameter)
         ) site_set
       in
@@ -97,16 +102,18 @@ let print_internal_flow parameter error handler_kappa result =
           in
           let _ =
             List.iter (fun (agent_type, site_type, site_modif) ->
-              let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)  "Flow of information in the ODE semantics:Internal flow\n-agent_type:%i:site_type:%i -> agent_type:%i:site_type_modified:%i"
-                  agent_type site_type
-                  agent_type site_modif
+              let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                "Flow of information in the ODE semantics:Internal flow\n-agent_type:%i:site_type:%i -> agent_type:%i:site_type_modified:%i"
+                  (int_of_agent_name agent_type)
+                  site_type
+                  (int_of_agent_name agent_type)
+                  site_modif
 	      in
 	      Loggers.print_newline (Remanent_parameters.get_logger parameter)
             ) cartesian_output
           in
           ()
         ) store_result1
-
 
 (************************************************************************************)
 (*MAIN*)

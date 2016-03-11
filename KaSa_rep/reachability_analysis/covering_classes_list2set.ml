@@ -115,13 +115,17 @@ let collect_remanent_list2set parameter error handler_kappa store_remanent  =
              try
                Handler.string_of_agent parameter error handler_kappa agent_type
              with
-               _ -> warn parameter error (Some "line 118") Exit (string_of_int agent_type)
+               _ -> warn parameter error (Some "line 118") Exit 
+                 (Cckappa_sig.string_of_agent_name agent_type)
            in
            List.iter (fun id ->
              List.iter (fun site_set ->
                let _ =
                  Printf.fprintf stdout 
-                   "Potential dependencies between sites:\nagent_type:%i:%s:covering_class_id:%i\n" agent_type agent_string id
+                   "Potential dependencies between sites:\nagent_type:%i:%s:covering_class_id:%i\n" 
+                   (Cckappa_sig.int_of_agent_name agent_type)
+                   agent_string
+                   id
                in
                Site_map_and_set.Set.iter (fun site_type ->
                  let error, site_string =
@@ -150,15 +154,19 @@ let collect_remanent_list2set parameter error handler_kappa store_remanent  =
           then
             let error, agent_string = 
               try
-                Handler.string_of_agent parameter error handler_kappa agent_type
+                Handler.string_of_agent parameter error handler_kappa 
+                  agent_type
               with
-                _ -> warn parameter error (Some "line 155") Exit (string_of_int agent_type)
+                _ -> warn parameter error (Some "line 155") Exit 
+                  ((Cckappa_sig.string_of_agent_name agent_type))
             in
             List.iter (fun id ->
               let _ =
                 Printf.fprintf stdout
                   "Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):\nagent_type:%i:%s:covering_class_id:%i\n" 
-                  agent_type agent_string id
+                  (Cckappa_sig.int_of_agent_name agent_type)
+                  agent_string
+                  id
               in
               List.iter (fun (map1, map2) ->
                 let _ =

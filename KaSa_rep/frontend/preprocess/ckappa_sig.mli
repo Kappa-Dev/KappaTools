@@ -19,12 +19,32 @@ type agent_name     = string
 type site_name      = string 
 type internal_state = string 
     
-type c_agent_name = int (*FIXME*)
+type c_agent_name (*FIXME*)
 type c_site_name  = int 
 type c_state      = int
 
 val string_of_agent_name : c_agent_name -> string
 val int_of_agent_name : c_agent_name -> int
+val agent_name_of_int : int -> c_agent_name
+
+val dummy_agent_name : c_agent_name
+
+module Agent_type_nearly_inf_Imperatif: Int_storage.Storage
+  with type key = c_agent_name
+  and type dimension = int
+
+module Agent_type_quick_nearly_inf_Imperatif: Int_storage.Storage
+  with type key = c_agent_name 
+  and type dimension = int
+
+module Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif: 
+  Int_storage.Storage 
+  with type key = c_agent_name * c_site_name 
+  and type dimension = int * int
+
+module Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif: Int_storage.Storage
+  with type key = c_agent_name * (c_site_name * c_state)
+  and type dimension = int * (int * int)
 
 type binding_state = 
   | Free 

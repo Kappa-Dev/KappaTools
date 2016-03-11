@@ -31,7 +31,7 @@ let empty_agent handler error =
   let error, interface = Int_storage.Quick_Nearly_inf_Imperatif.create handler error 0 in 
   error, {
     Cckappa_sig.agent_kasim_id = 0  ; 
-    Cckappa_sig.agent_name = Cckappa_sig.const_zero ;
+    Cckappa_sig.agent_name = Cckappa_sig.dummy_agent_name;
     Cckappa_sig.agent_interface =  interface ;
     Cckappa_sig.agent_position = Location.dummy
   }
@@ -152,7 +152,7 @@ let translate_agent_sig parameters error handler agent kasim_id =
   let error, agent_name = 
     match bool, output with
     | _ , None  
-    | true, _  -> warn parameters error (Some "line 45") Exit Cckappa_sig.const_zero
+    | true, _  -> warn parameters error (Some "line 45") Exit Cckappa_sig.dummy_agent_name
     | _ , Some (i, _, _, _) -> 
       error, i
   in 
@@ -626,7 +626,7 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
 			  match bool,output with
 			  | _ , None  
                           | true, _  -> warn parameters error (Some "line 285") 
-                            Exit Cckappa_sig.const_zero
+                            Exit Cckappa_sig.dummy_agent_name
 			  | _ , Some (i,_,_,_) -> error, i
 			in
 			let error, site_dic' = 
@@ -748,7 +748,7 @@ let translate_view parameters error handler k kasim_id agent bond_list question_
                   match bool, output with
                   | _ , None
                   | true, _  -> warn parameters error (Some "line 349") 
-                    Exit Cckappa_sig.const_zero
+                    Exit Cckappa_sig.dummy_agent_name
                   | _ , Some (i, _, _, _) -> error, i
 		in
 		let error, site_dic' =

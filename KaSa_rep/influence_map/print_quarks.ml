@@ -21,10 +21,10 @@ let local_trace = false
 
 let string_of_port port = "["^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.min)^";"^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.max)^"]"
 
-
 let print_agent_map parameters error handler map =
   let error =
-    Quark_type.AgentMap.iter
+    (*Quark_type.AgentMap.iter*)
+    Quark_type.Agent_type_quick_nearly_inf_Imperatif.iter
       parameters
       error
       (fun parameters error key im ->
@@ -32,7 +32,12 @@ let print_agent_map parameters error handler map =
           parameters
           error
           (fun parameters error key' im' ->
-              let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%sagent_type:%i,rule:%i->" (Remanent_parameters.get_prefix parameters) key key' in
+              let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) 
+                "%sagent_type:%i,rule:%i->" 
+                (Remanent_parameters.get_prefix parameters) 
+                (Cckappa_sig.int_of_agent_name key)
+                key'
+              in
               let _ = Quark_type.Labels.dump parameters error handler im' in
               let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
             error)
@@ -42,7 +47,8 @@ let print_agent_map parameters error handler map =
 
 let print_agent_var_map parameters error handler map =
   let error =
-    Quark_type.AgentMap.iter
+    (*Quark_type.AgentMap.iter*)
+    Quark_type.Agent_type_quick_nearly_inf_Imperatif.iter
       parameters
       error
       (fun parameters error key im ->
@@ -50,7 +56,12 @@ let print_agent_var_map parameters error handler map =
           parameters
           error
           (fun parameters error key' im' ->
-              let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%sagent_type:%i,var:%i->" (Remanent_parameters.get_prefix parameters) key key' in
+              let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                "%sagent_type:%i,var:%i->" 
+                (Remanent_parameters.get_prefix parameters)
+                (Cckappa_sig.int_of_agent_name key)
+                key' 
+              in
               let _ = Quark_type.Labels.dump parameters error handler im' in
               let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
             error)
@@ -67,7 +78,12 @@ let print_string_map parameters error handler map =
           parameters
           error
           (fun parameters error key' im' ->
-           let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%sagent_type:%s,rule_id:%i->" (Remanent_parameters.get_prefix parameters) key key' in
+           let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) 
+             "%sagent_type:%s,rule_id:%i->"
+             (Remanent_parameters.get_prefix parameters)
+             key
+             key' 
+           in
            let _ = Quark_type.Labels.dump parameters error handler im' in
            let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
            error)
@@ -76,6 +92,7 @@ let print_string_map parameters error handler map =
       map
       error
   in error
+
 let print_var_string_map parameters error handler map =
   let error =
     Quark_type.StringMap.Map.fold
@@ -117,13 +134,19 @@ let print_site_map parameter error handler map =
           parameter
           error
           (fun parameters error rule im' ->
-               let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter) "%sagent_type:%i,site_type:%i,state:%i,rule:%i->" (Remanent_parameters.get_prefix parameter) agent_type site_type state rule  in
+               let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                 "%sagent_type:%i,site_type:%i,state:%i,rule:%i->"
+                 (Remanent_parameters.get_prefix parameter) 
+                 (Cckappa_sig.int_of_agent_name agent_type)
+                 site_type
+                 state
+                 rule
+               in
                let _ = Quark_type.Labels.dump parameter error handler im' in
                let _ = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
                  error)
           im
-      )
-      map
+      ) map
 
 let print_site_var_map parameter error handler map =
      Quark_type.SiteMap.iter
@@ -134,13 +157,19 @@ let print_site_var_map parameter error handler map =
           parameter
           error
           (fun parameters error rule im' ->
-               let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter) "%sagent_type:%i,site_type:%i,state:%i,var:%i->" (Remanent_parameters.get_prefix parameter) agent_type site_type state rule  in
+               let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                 "%sagent_type:%i,site_type:%i,state:%i,var:%i->" 
+                 (Remanent_parameters.get_prefix parameter)
+                 (Cckappa_sig.int_of_agent_name agent_type)
+                 site_type
+                 state
+                 rule 
+               in
                let _ = Quark_type.Labels.dump parameter error handler im' in
                let _ = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
-                 error)
+               error)
           im
-      )
-      map
+      ) map
 
 let print_sites parameter error handler quark =
   let parameter_var = Remanent_parameters.update_prefix parameter "site_vars++**:" in

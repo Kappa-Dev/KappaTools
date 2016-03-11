@@ -194,7 +194,8 @@ let scan_rule_set_remanent parameter error handler rules =
                   let _ =
                     (*print covering_class_id*)
                     Printf.fprintf stdout "Potential dependencies between sites:\nagent_type:%i:%s:covering_class_id:%i\n"
-                      agent_type agent_string elt_id
+                      (Cckappa_sig.int_of_agent_name agent_type)
+                      agent_string elt_id
                   in
                   let _ =
                     List.iter (fun site_type ->

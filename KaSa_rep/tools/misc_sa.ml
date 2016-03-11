@@ -13,7 +13,7 @@
   * under the terms of the GNU Library General Public License *)
 
 let compare_unit _ _ = 0
-let compare_unit_agent_name _ _ = Cckappa_sig.const_zero
+let compare_unit_agent_name _ _ = Cckappa_sig.dummy_agent_name
 
 let const_unit _ = ()
 

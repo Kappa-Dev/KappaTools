@@ -264,9 +264,11 @@ let print_stochastic_class parameter error handler result =
                     Handler.string_of_agent parameter error handler agent_type
                   with
                     _ -> warn parameter error (Some "line 263") Exit 
-                      (string_of_int agent_type)
+                      (Cckappa_sig.string_of_agent_name agent_type)
                 in
-                Printf.fprintf stdout "agent_type:%i:%s\n" agent_type agent_string
+                Printf.fprintf stdout "agent_type:%i:%s\n"
+                  (Cckappa_sig.int_of_agent_name agent_type)
+                  agent_string
               in
               print_string "site_type:";
               print_array parameter error handler agent_type array_site_type

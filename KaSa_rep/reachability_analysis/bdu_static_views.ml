@@ -21,7 +21,7 @@ let warn parameters mh message exn default =
 
 let local_trace = false
 
-module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif
+module AgentMap = (*Int_storage.Quick_Nearly_inf_Imperatif*) Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif
 
 module AgentSite_map_and_set = Cckappa_sig.AgentSite_map_and_set
 
@@ -69,10 +69,13 @@ type pre_static =
 type bdu_analysis_static =
   {
     store_pre_static : pre_static;
-    store_covering_classes: Covering_classes_type.remanent Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t;
+    store_covering_classes: Covering_classes_type.remanent 
+      Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t;
     store_covering_classes_id : (int list * int list) AgentSite_map_and_set.Map.t;
     (*rewrite/ change type of this function ?*)
-    store_remanent_triple: ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;
+    store_remanent_triple:
+      ((int * int list * Site_map_and_set.Set.t) list)
+      Agent_type_quick_nearly_inf_Imperatif.t;
     store_proj_bdu_creation_restriction_map: 
       Mvbdu_wrapper.Mvbdu.mvbdu AgentCV_setmap.Map.t Rule_setmap.Map.t;
     store_modif_list_restriction_map:
@@ -447,7 +450,7 @@ let collect_remanent_triple parameter error store_remanent store_result =
       in
       (*-----------------------------------------------------------------*)
       let error, store_result =
-        AgentMap.set
+        Agent_type_quick_nearly_inf_Imperatif.set
           parameter
           error 
           agent_type
@@ -498,10 +501,13 @@ let collect_bdu_creation_restriction_map parameter handler error rule_id rule
     error, handler, result_map
   in
   (*-----------------------------------------------------------------*)
-  AgentMap.fold parameter error
+  Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.fold parameter error
     (fun parameter error agent_type' triple_list (handler,store_result) ->
       List.fold_left (fun (error, (handler,store_result)) (agent_id, agent_type) ->
-        let error, agent = Cckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get parameter error agent_id rule.rule_rhs.views in
+        let error, agent = 
+          Cckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get
+            parameter error agent_id rule.rule_rhs.views 
+        in
         match agent with
 	| Some Unknown_agent _ | Some Dead_agent _ 
         | None -> warn parameter error (Some "168") Exit (handler,store_result)
@@ -559,7 +565,9 @@ let collect_bdu_creation_restriction_map parameter handler error rule_id rule
 		    build_bdu parameter handler error pair_list
 		  in
 		   let error, handler, store_result =
-		     add_link handler (agent_type, rule_id, cv_id) bdu_creation store_result
+		     add_link handler
+                       (agent_type, rule_id, cv_id)
+                       bdu_creation store_result
 		   in
 		   error, handler, store_result 
                 ) (error, handler, store_result) get_pair_list
@@ -637,7 +645,11 @@ let collect_modif_list_restriction_map
         let agent_type = agent_modif.agent_name in
 	let error, triple_list =
 	  match
-	    AgentMap.get parameter error agent_type store_remanent_triple
+	    Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.get
+              parameter
+              error
+              agent_type
+              store_remanent_triple
 	  with
 	  | error, None -> warn parameter error (Some "Line 476") Exit []
 	  | error, Some x -> error, x
@@ -732,7 +744,7 @@ let store_bdu_potential_restriction_map_aux parameter handler error store_remane
     error, handler, result_map
   in
   (*-----------------------------------------------------------------*)
-  AgentMap.fold parameter error
+  Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.fold parameter error
     (fun parameter error agent_type' triple_list (handler, store_result) ->
       (*map of potential partner side_effect with site is bond*)
       Common_static.AgentRule_map_and_set.Map.fold
@@ -897,7 +909,8 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
 	  let agent_type = agent.agent_name in
 	  let error, triple_list =
 	    match
-	      AgentMap.unsafe_get parameter error agent_type store_remanent_triple
+	      Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get
+                parameter error agent_type store_remanent_triple
 	    with
 	    | error, None -> error, []
 	    | error, Some x -> error, x
@@ -916,7 +929,8 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
         let agent_type = agent.agent_name in
 	let error, triple_list =
 	  match
-	    AgentMap.unsafe_get parameter error agent_type store_remanent_triple
+	    Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get
+              parameter error agent_type store_remanent_triple
 	  with
 	  | error, None ->  error, []
 	  | error, Some x -> error, x
@@ -1156,7 +1170,9 @@ let init_bdu_analysis_static parameter error =
     Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.create parameter error 0 
   in
   let init_covering_classes_id = AgentSite_map_and_set.Map.empty in
-  let error, init_remanent_triple            = AgentMap.create parameter error 0 in
+  let error, init_remanent_triple = 
+    Agent_type_quick_nearly_inf_Imperatif.create parameter error 0 
+  in
   let init_proj_bdu_creation_restriction_map = Rule_setmap.Map.empty in
   let init_modif_list_restriction_map        = AgentsRuleCV_map_and_set.Map.empty in
   let init_proj_bdu_potential_restriction_map  = Rule_setmap.Map.empty in

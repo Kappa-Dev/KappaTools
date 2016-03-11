@@ -21,10 +21,11 @@ type state_index    = Ckappa_sig.c_state
 type rule_id = int
 type agent_id = int
 
-val const_zero : agent_name
+val dummy_agent_name : agent_name
 
 val string_of_agent_name : agent_name -> string
 val int_of_agent_name : agent_name -> int
+val agent_name_of_int : int -> agent_name
 
 (*sites_dic*)
 module Agent_type_nearly_inf_Imperatif: Int_storage.Storage

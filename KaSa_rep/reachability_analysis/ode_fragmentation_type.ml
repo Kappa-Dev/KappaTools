@@ -26,32 +26,32 @@ let trace = false
 (************************************************************************************)
 (*TYPE*)
 
-module AgentMap = Quick_Nearly_inf_Imperatif
+(*module AgentMap = Quick_Nearly_inf_Imperatif*)
 
 module Internal_flow_map =
   SetMap.Make (
     struct 
-      type t = int
+      type t = Cckappa_sig.agent_name
       let compare = compare
     end)
 
 module External_flow_map =
   SetMap.Make (
     struct
-      type t = int * int
+      type t = Cckappa_sig.agent_name * Cckappa_sig.agent_name
       let compare = compare
     end)
 
 type ode_frag =
     {
-      store_sites_modified_set            : Site_map_and_set.Set.t AgentMap.t;
+      store_sites_modified_set            : Site_map_and_set.Set.t Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t;
       store_sites_bond_pair_set           : 
-        Site_map_and_set.Set.t AgentMap.t * Site_map_and_set.Set.t AgentMap.t;
+        Site_map_and_set.Set.t Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t * Site_map_and_set.Set.t Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t;
       store_sites_bond_pair_set_external  : 
-        Site_map_and_set.Set.t AgentMap.t * Site_map_and_set.Set.t AgentMap.t;
-      store_sites_lhs                     : int list AgentMap.t;
+        Site_map_and_set.Set.t Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t * Site_map_and_set.Set.t Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t;
+      store_sites_lhs                     : int list Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t;
       store_sites_anchor_set              : 
-        Site_map_and_set.Set.t AgentMap.t * Site_map_and_set.Set.t AgentMap.t;
+        Site_map_and_set.Set.t Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t * Site_map_and_set.Set.t Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t;
       store_internal_flow                 : 
         (int list * Site_map_and_set.Set.t) Internal_flow_map.Map.t *
         (int list * Site_map_and_set.Set.t) Internal_flow_map.Map.t;

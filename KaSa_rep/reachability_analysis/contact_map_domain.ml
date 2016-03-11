@@ -176,12 +176,14 @@ struct
     | Cckappa_sig.Ghost
     | Cckappa_sig.Unknown_agent _
     | Cckappa_sig.Dead_agent _ ->
-      warn parameter error (Some "line 199") Exit (0, 0)
+      warn parameter error (Some "line 199") Exit (Cckappa_sig.dummy_agent_name, 0)
     | Cckappa_sig.Agent agent1 ->
       let agent_type1 = agent1.Cckappa_sig.agent_name in
       let error, state1 =
         match Cckappa_sig.Site_map_and_set.Map.find_option_without_logs
-          parameter error site_type
+          parameter
+          error
+          site_type
           agent1.Cckappa_sig.agent_interface
         with
         | error, None ->  warn parameter error (Some "line 228") Exit 0
@@ -275,10 +277,13 @@ struct
     let views = rule.Cckappa_sig.rule_rhs.Cckappa_sig.views in
     let bonds = rule.Cckappa_sig.rule_rhs.Cckappa_sig.bonds in
     let error, store_result =
-      collect_bonds parameter error rule_id
-		    bonds
-		    views
-		    store_result
+      collect_bonds 
+        parameter 
+        error
+        rule_id
+	bonds
+	views
+	store_result
     in
     error, store_result
 

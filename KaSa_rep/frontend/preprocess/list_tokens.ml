@@ -95,7 +95,7 @@ let declare_agent parameters error handler agent_name =
       agents_dic
   in
   match output with
-  | None -> warn parameters error (Some "line 61") Exit (handler, Cckappa_sig.const_zero)
+  | None -> warn parameters error (Some "line 61") Exit (handler, Cckappa_sig.dummy_agent_name)
   | Some (k, _, _, dic) ->
     if bool
     then

@@ -343,11 +343,13 @@ struct
         try
           Handler.string_of_agent parameter error handler_kappa agent_type
         with
-          _ -> warn parameter error (Some "line 56") Exit (string_of_int agent_type)
+          _ -> warn parameter error (Some "line 56") Exit 
+            (Cckappa_sig.string_of_agent_name agent_type)
       in
       (*-----------------------------------------------------------------------*)
       let error, site_correspondence =
-        Bdu_static_views.AgentMap.get parameter error agent_type site_correspondence
+        Bdu_static_views.AgentMap.get
+          parameter error agent_type site_correspondence
       in
       let error, site_correspondence =
         match site_correspondence with
@@ -420,7 +422,8 @@ struct
               Handler.string_of_agent parameter error kappa_handler agent_type
             with
               _ -> warn
-                parameter error (Some "line 460") Exit (string_of_int agent_type)
+                parameter error (Some "line 460") Exit 
+                (Cckappa_sig.string_of_agent_name agent_type)
 	  in
         (*-----------------------------------------------------------------------*)
         (*dump covering class label*)
@@ -494,7 +497,8 @@ struct
         try
           Handler.string_of_agent parameter error handler_kappa agent_type
         with
-          _ -> warn parameter error (Some "line 56") Exit (string_of_int agent_type)
+          _ -> warn parameter error (Some "line 56") Exit
+            (Cckappa_sig.string_of_agent_name agent_type)
       in
     (*-----------------------------------------------------------------------*)
     (*list of sites in a covering class*)
@@ -949,7 +953,7 @@ struct
                   match Common_static.RuleAgent_map_and_set.Map.find_option_without_logs
                     parameter error (rule_id, agent_id) store_agent_name
                   with
-                  | error, None -> error, 0
+                  | error, None -> error, Cckappa_sig.dummy_agent_name
                   | error, Some a -> error, a
                 in           
                 let site_name = path.Communication.site in
@@ -1645,11 +1649,12 @@ struct
       let error', agent_string =
         Handler.string_of_agent parameter error handler_kappa agent_type
       in
-      let error = Exception.check warn parameter error error' (Some "line 95") Exit in
+      let error = Exception.check warn parameter error error' (Some "line 1651") Exit in
       let () =
         Loggers.fprintf (Remanent_parameters.get_logger parameter)
           "agent_type:%i:%s:cv_id:%i"
-          agent_type agent_string cv_id
+          (Cckappa_sig.int_of_agent_name agent_type)
+          agent_string cv_id
       in
       let () =
         Loggers.print_newline (Remanent_parameters.get_logger parameter)
@@ -1794,7 +1799,8 @@ struct
             try
               Handler.string_of_agent parameter error handler_kappa agent_type
             with
-              _ -> warn parameter error (Some "line 111") Exit (string_of_int agent_type)
+              _ -> warn parameter error (Some "line 111") Exit 
+                (Cckappa_sig.string_of_agent_name agent_type)
 	  in
 	  let error = Exception.check warn parameter error error' (Some "line 110") Exit in
 	  (*-----------------------------------------------------------------------*)
@@ -1844,10 +1850,11 @@ struct
               try
                 Handler.string_of_agent parameter error handler_kappa agent_type
               with
-                _ -> warn parameter error (Some "line 111") Exit (string_of_int agent_type)
+                _ -> warn parameter error (Some "line 1853") Exit 
+                  (Cckappa_sig.string_of_agent_name agent_type)
 	    in
 	    let error = Exception.check warn parameter error error'
-              (Some "line 110") Exit
+              (Some "line 1857") Exit
             in
             (*-----------------------------------------------------------------------*)
 	    let () =
@@ -1856,7 +1863,8 @@ struct
 	        let () =
 		  Loggers.fprintf (Remanent_parameters.get_logger parameter)
                     "agent_type:%i:%s:cv_id:%i"
-		    agent_type agent_string cv_id
+		    (Cckappa_sig.int_of_agent_name agent_type)
+                    agent_string cv_id
 	        in
 	        Loggers.print_newline (Remanent_parameters.get_logger parameter)
 	    in
@@ -1866,13 +1874,13 @@ struct
 	    in
 	    let error, site_correspondence =
 	      match site_correspondence with
-	      | None -> warn parameter error (Some "line 58") Exit []
+	      | None -> warn parameter error (Some "line 1877") Exit []
 	      | Some a -> error, a
 	    in
 	    let error, site_correspondence =
 	      let rec aux list =
 	        match list with
-	        | [] -> warn parameter error (Some "line 68") Exit []
+	        | [] -> warn parameter error (Some "line 1883") Exit []
 	        | (h, list, _) :: _ when h = cv_id -> error, list
 	        | _ :: tail -> aux tail
 	      in aux site_correspondence

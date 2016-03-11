@@ -12,8 +12,8 @@
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
-let warn parameters mh message exn default = 
-     Exception.warn parameters mh (Some "ckappa_sig") message exn (fun () -> default) 
+(*let warn parameters mh message exn default = 
+  Exception.warn parameters mh (Some "ckappa_sig") message exn (fun () -> default) *)
   
 module Int_Set_and_Map = 
   Map_wrapper.Make
@@ -36,6 +36,37 @@ type c_state      = int
 
 let string_of_agent_name (a:c_agent_name) : string = string_of_int a
 let int_of_agent_name (a: c_agent_name) : int = a
+let agent_name_of_int (a: int) : c_agent_name = a
+
+let dummy_agent_name = 0 (*TODO:dummy_agent_name*)
+
+module Agent_type_nearly_inf_Imperatif =
+  (
+    Int_storage.Nearly_inf_Imperatif: Int_storage.Storage
+   with type key = c_agent_name
+   and type dimension = int
+  )
+
+module Agent_type_quick_nearly_inf_Imperatif =
+  (
+    Int_storage.Quick_key_list (Agent_type_nearly_inf_Imperatif): Int_storage.Storage
+    with type key = c_agent_name
+    and type dimension = int
+  )
+
+module Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif =
+  (
+    Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif: Int_storage.Storage 
+   with type key = c_agent_name * c_site_name 
+   and type dimension = int * int
+  )
+
+module Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif =
+  (
+    Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif : Int_storage.Storage
+   with type key = (c_agent_name * (c_site_name * c_state))
+   and type dimension = (int * (int * int))
+  )
 
 type binding_state = 
   | Free 

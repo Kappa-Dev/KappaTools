@@ -32,7 +32,8 @@ let print_agent parameters error handler agent =
 	let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
 	error
      | Cckappa_sig.Dead_agent (agent,s,l,l') ->
-	let parameters = Remanent_parameters.update_prefix parameters ("agent_type_"^(string_of_int agent.Cckappa_sig.agent_name)^":") in
+	let parameters = Remanent_parameters.update_prefix parameters 
+          ("agent_type_"^(Cckappa_sig.string_of_agent_name agent.Cckappa_sig.agent_name)^":") in
 	let error =
 	  Cckappa_sig.Site_map_and_set.Map.fold
             (fun a b error ->
@@ -70,7 +71,8 @@ let print_agent parameters error handler agent =
 	in
 	error
      | Cckappa_sig.Agent agent ->
-       let parameters = Remanent_parameters.update_prefix parameters ("agent_type_"^(string_of_int agent.Cckappa_sig.agent_name)^":") in
+       let parameters = Remanent_parameters.update_prefix parameters 
+         ("agent_type_"^(Cckappa_sig.string_of_agent_name agent.Cckappa_sig.agent_name)^":") in
        Cckappa_sig.Site_map_and_set.Map.fold
          (fun a b error ->
           let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%ssite_type_%i->state:%s" (Remanent_parameters.get_prefix parameters) a (string_of_port b)  in
@@ -84,7 +86,8 @@ let print_agent parameters error handler agent =
       error
 
 let print_diffagent parameters error handler agent =
-  let parameters = Remanent_parameters.update_prefix parameters ("agent_type_"^(string_of_int agent.Cckappa_sig.agent_name)^":") in
+  let parameters = Remanent_parameters.update_prefix parameters 
+    ("agent_type_"^(Cckappa_sig.string_of_agent_name agent.Cckappa_sig.agent_name)^":") in
   Cckappa_sig.Site_map_and_set.Map.fold
    (fun a b error ->
      let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%ssite_type_%i->state:%s" (Remanent_parameters.get_prefix parameters) a (string_of_port b) in
@@ -302,11 +305,11 @@ let print_diffview parameters error handler diff =
      "%s(agent_id_%d,agent_type_%d)@@site_type_%d%s(agent_id_%d,agent_type_%d)@@site_type_%d"
      (Remanent_parameters.get_prefix parameters)
      add1.Cckappa_sig.agent_index
-     add1.Cckappa_sig.agent_type
+     (Cckappa_sig.int_of_agent_name add1.Cckappa_sig.agent_type)
      add1.Cckappa_sig.site
      relation
      add2.Cckappa_sig.agent_index
-     add2.Cckappa_sig.agent_type
+     (Cckappa_sig.int_of_agent_name add2.Cckappa_sig.agent_type)
      add2.Cckappa_sig.site in
    let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
    ()
@@ -318,7 +321,7 @@ let print_diffview parameters error handler diff =
        "%s(agent_id_%d,agent_type_%d)@@site_type_%d"
        (Remanent_parameters.get_prefix parameters)
        add1.Cckappa_sig.agent_index
-       add1.Cckappa_sig.agent_type
+       (Cckappa_sig.int_of_agent_name add1.Cckappa_sig.agent_type)
        add1.Cckappa_sig.site
    in
    let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
@@ -330,7 +333,7 @@ let print_diffview parameters error handler diff =
      "%s(agent_id_%d,agent_type_%d)"
      (Remanent_parameters.get_prefix parameters)
      index
-     agent.Cckappa_sig.agent_name
+     (Cckappa_sig.int_of_agent_name agent.Cckappa_sig.agent_name)
    in
    let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
    let parameters_doc =  Remanent_parameters.update_prefix parameters "documented_site:" in
@@ -343,7 +346,7 @@ let print_diffview parameters error handler diff =
 	      "%s(agent_id_%d,agent_type_%d)@@site_type_%d"
               (Remanent_parameters.get_prefix parameters_doc)
               index
-              agent.Cckappa_sig.agent_name
+              (Cckappa_sig.int_of_agent_name agent.Cckappa_sig.agent_name)
               site in
 	  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
 	  ())
@@ -359,7 +362,7 @@ let print_diffview parameters error handler diff =
              "%s(agent_id_%d,agent_type_%d)@@site_type_%d"
              (Remanent_parameters.get_prefix parameters)
              index
-             agent.Cckappa_sig.agent_name
+             (Cckappa_sig.int_of_agent_name agent.Cckappa_sig.agent_name)
              site
 	 in
 	 let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
@@ -368,14 +371,14 @@ let print_diffview parameters error handler diff =
        list
    in  ()
 
- let print_created_agent parameters (index,agent) =
+ let print_created_agent parameters (index, agent_name) =
    let () =
      Loggers.fprintf
        (Remanent_parameters.get_logger parameters)
        "%s(agent_id_%d,agent_type_%d)"
        (Remanent_parameters.get_prefix parameters)
        index
-       agent
+       (Cckappa_sig.int_of_agent_name agent_name)
    in
    let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
    ()

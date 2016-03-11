@@ -68,10 +68,12 @@ let collect_sites_modified_set parameter error rule handler_kappa store_result =
                     Handler.string_of_agent parameter error handler_kappa agent_type
                   with
                     _ -> warn parameter error (Some "line 67") Exit
-                      (string_of_int agent_type)
+                      (Cckappa_sig.string_of_agent_name agent_type)
                 in
                 let _ =
-                  fprintf stdout "\tagent_type:%i:%s\n" agent_type agent_string
+                  fprintf stdout "\tagent_type:%i:%s\n" 
+                    (Cckappa_sig.int_of_agent_name agent_type)
+                    agent_string
                 in
                 Site_map_and_set.Set.iter (fun site_type ->
                   let error, site_string =
@@ -82,7 +84,9 @@ let collect_sites_modified_set parameter error rule handler_kappa store_result =
                       _ -> warn parameter error (Some "line 79") Exit
                         (string_of_int site_type)
                   in
-                  let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "\t\tsite_type:%i:%s" site_type site_string
+                  let () = Loggers.fprintf 
+                    (Remanent_parameters.get_logger parameter) 
+                    "\t\tsite_type:%i:%s" site_type site_string
 		  in
 		  Loggers.print_newline (Remanent_parameters.get_logger parameter)
                 ) site_set
@@ -91,7 +95,10 @@ let collect_sites_modified_set parameter error rule handler_kappa store_result =
           (*----------------------------------------------------------------------*)
           (*get old?*)
           let error, old_set =
-            match AgentMap.unsafe_get parameter error agent_type store_result with
+            match 
+              Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get
+                parameter error agent_type store_result 
+            with
             | error, None -> error, Site_map_and_set.Set.empty
             | error, Some s -> error, s
           in
@@ -102,7 +109,7 @@ let collect_sites_modified_set parameter error rule handler_kappa store_result =
           (*----------------------------------------------------------------------*)
           (*store*)
           let error, store_result =
-            AgentMap.set
+            Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.set
               parameter
               error
               agent_type
@@ -127,7 +134,10 @@ let collect_sites_bond_pair_set parameter error handler_kappa rule store_result 
     let agent_type1 = site_add1.agent_type in
     (*get site_address_map from bond_lhs*)
     let error, site_add_map1 =
-      match AgentMap.unsafe_get parameter error agent_id1 bond_lhs with
+      match 
+        Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get
+          parameter error agent_id1 bond_lhs 
+      with
       | error, None -> error, Site_map_and_set.Map.empty
       | error, Some map -> error, map
     in
@@ -163,10 +173,14 @@ let collect_sites_bond_pair_set parameter error handler_kappa rule store_result 
             try
               Handler.string_of_agent parameter error handler_kappa agent_type1
             with
-              _ -> warn parameter error (Some "line 158") Exit (string_of_int agent_type1)
+              _ -> warn parameter error (Some "line 158") Exit 
+                ((Cckappa_sig.string_of_agent_name agent_type1))
           in
           let () =
-            Loggers.fprintf (Remanent_parameters.get_logger parameter) "\tagent_type:%i:%s" agent_type1 agent_string1
+            Loggers.fprintf (Remanent_parameters.get_logger parameter)
+              "\tagent_type:%i:%s" 
+              (Cckappa_sig.int_of_agent_name agent_type1 )
+              agent_string1
           in
 	  let () =
 	    Loggers.print_newline (Remanent_parameters.get_logger parameter)
@@ -189,7 +203,7 @@ let collect_sites_bond_pair_set parameter error handler_kappa rule store_result 
     (*----------------------------------------------------------------------*)
     (*compute first pair*)
     let error, store_result1 =
-      AgentMap.set
+      Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.set
         parameter
         error
         agent_type1
@@ -201,7 +215,9 @@ let collect_sites_bond_pair_set parameter error handler_kappa rule store_result 
     let agent_id2 = site_add2.agent_index in
     let agent_type2 = site_add2.agent_type in
     let error, site_add_map2 =
-      match AgentMap.unsafe_get parameter error agent_id2 bond_lhs with
+      match Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get
+        parameter error agent_id2 bond_lhs 
+      with
       | error, None -> error, Site_map_and_set.Map.empty
       | error, Some map -> error, map
     in
@@ -237,10 +253,14 @@ let collect_sites_bond_pair_set parameter error handler_kappa rule store_result 
             try
               Handler.string_of_agent parameter error handler_kappa agent_type2
             with
-              _ -> warn parameter error (Some "line 223") Exit (string_of_int agent_type2)
+              _ -> warn parameter error (Some "line 223") Exit 
+                ((Cckappa_sig.string_of_agent_name agent_type2))
           in
           let () =
-            Loggers.fprintf (Remanent_parameters.get_logger parameter) "\tagent_type:%i:%s" agent_type2 agent_string2
+            Loggers.fprintf (Remanent_parameters.get_logger parameter)
+              "\tagent_type:%i:%s"
+              (Cckappa_sig.int_of_agent_name agent_type2 )
+              agent_string2
           in
 	  let () =
 	    Loggers.print_newline (Remanent_parameters.get_logger parameter)
@@ -263,7 +283,9 @@ let collect_sites_bond_pair_set parameter error handler_kappa rule store_result 
     (*----------------------------------------------------------------------*)
     (*get old*)
     let error, old_set2 =
-      match AgentMap.unsafe_get parameter error agent_type2 store_result2 with
+      match Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get
+        parameter error agent_type2 store_result2 
+      with
       | error, None -> error, Site_map_and_set.Set.empty
       | error, Some s -> error, s
     in
@@ -273,7 +295,7 @@ let collect_sites_bond_pair_set parameter error handler_kappa rule store_result 
     in
     (*store*)
     let error, store_result2 =
-      AgentMap.set
+      Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.set
         parameter
         error
         agent_type2
@@ -300,7 +322,9 @@ let collect_sites_bond_pair_set_external parameter error rule store_result =
     let agent_id1 = site_add1.agent_index in
     let agent_type1 = site_add1.agent_type in
     let error, site_add_map1 =
-      match AgentMap.unsafe_get parameter error agent_id1 bond_lhs with
+      match Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get
+        parameter error agent_id1 bond_lhs 
+      with
       | error, None -> error, Site_map_and_set.Map.empty
       | error, Some map -> error, map
     in
@@ -319,7 +343,7 @@ let collect_sites_bond_pair_set_external parameter error rule store_result =
     in
     (*store*)
     let error, store_result1 =
-      AgentMap.set
+      Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.set
         parameter
         error
         agent_type1
@@ -331,7 +355,9 @@ let collect_sites_bond_pair_set_external parameter error rule store_result =
     let agent_id2 = site_add2.agent_index in
     let agent_type2 = site_add2.agent_type in
     let error, site_add_map2 =
-      match AgentMap.unsafe_get parameter error agent_id2 bond_lhs with
+      match Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get
+        parameter error agent_id2 bond_lhs 
+      with
       | error, None -> error, Site_map_and_set.Map.empty
       | error, Some map -> error, map
     in
@@ -349,7 +375,7 @@ let collect_sites_bond_pair_set_external parameter error rule store_result =
         ) site_add_map2 (error, Site_map_and_set.Set.empty)
     in
     let error, store_result2 =
-      AgentMap.set
+      Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.set
         parameter
         error
         agent_type2
@@ -384,14 +410,17 @@ let collect_sites_lhs parameter error rule store_result =
           in
           (*get old?*)
           let error, old_list =
-            match AgentMap.unsafe_get parameter error agent_type store_result with
+            match
+              Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get
+                parameter error agent_type store_result 
+            with
             | error, None -> error, []
             | error, Some l -> error, l
           in
           let new_list = List.concat [site_list; old_list] in
           (*store*)
           let error, store_result =
-            AgentMap.set
+            Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.set
               parameter
               error
               agent_type
@@ -422,7 +451,10 @@ let collect_sites_anchor_set parameter error handler_kappa rule
         (*----------------------------------------------------------------------*)
         (*get sites that is modified*)
         let error, modified_set =
-          match AgentMap.unsafe_get parameter error agent_type
+          match Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get
+            parameter 
+            error
+            agent_type
             store_sites_modified_set
           with
           | error, None -> error, Site_map_and_set.Set.empty
@@ -431,7 +463,10 @@ let collect_sites_anchor_set parameter error handler_kappa rule
         (*----------------------------------------------------------------------*)
         (*get a set of sites in the lhs that are bond*)
         let error, site_lhs_bond_fst_set =
-          match AgentMap.unsafe_get parameter error agent_type
+          match Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get 
+            parameter
+            error
+            agent_type
             (fst store_sites_bond_pair_set)
           with
           | error, None -> error, Site_map_and_set.Set.empty
@@ -440,7 +475,12 @@ let collect_sites_anchor_set parameter error handler_kappa rule
         (*----------------------------------------------------------------------*)
         (*get a list of sites in the lsh*)
         let error, sites_lhs_list =
-          match AgentMap.unsafe_get parameter error agent_type store_sites_lhs with
+          match Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get 
+            parameter 
+            error
+            agent_type 
+            store_sites_lhs
+          with
           | error, None -> error, []
           | error, Some l -> error, l
         in
@@ -465,14 +505,20 @@ let collect_sites_anchor_set parameter error handler_kappa rule
         (*second result*)
         (*get a set of anchor sites*)
         let error, anchor_set1 =
-          match AgentMap.unsafe_get parameter error agent_type
+          match Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get
+            parameter
+            error
+            agent_type
             (fst store_sites_bond_pair_set)
           with
           | error, None -> error, Site_map_and_set.Set.empty
           | error, Some s -> error, s
         in
         let error, anchor_set2 =
-          match AgentMap.unsafe_get parameter error agent_type
+          match Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get
+            parameter
+            error 
+            agent_type
             (snd store_sites_bond_pair_set)
           with
           | error, None -> error, Site_map_and_set.Set.empty
@@ -503,12 +549,16 @@ let collect_sites_anchor_set parameter error handler_kappa rule
         (*----------------------------------------------------------------------*)
         (*get union both result*)
         let error, get_set1 =
-          match AgentMap.unsafe_get parameter error agent_type store_result1 with
+          match Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get
+            parameter error agent_type store_result1 
+          with
           | error, None -> error, Site_map_and_set.Set.empty
           | error, Some s -> error, s
         in
         let error, get_set2 =
-          match AgentMap.unsafe_get parameter error agent_type store_result2 with
+          match Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get
+            parameter error agent_type store_result2 
+          with
           | error, None -> error, Site_map_and_set.Set.empty
           | error, Some s -> error, s
         in
@@ -534,10 +584,14 @@ let collect_sites_anchor_set parameter error handler_kappa rule
                   Handler.string_of_agent parameter error handler_kappa agent_type
                 with
                   _ -> warn parameter error (Some "line 510") Exit
-                    (string_of_int agent_type)
+                    (Cckappa_sig.string_of_agent_name agent_type)
               in
               let () =
-                Loggers.fprintf (Remanent_parameters.get_logger parameter) "\tagent_type:%i:%s" agent_type agent_string
+                Loggers.fprintf 
+                  (Remanent_parameters.get_logger parameter) 
+                  "\tagent_type:%i:%s" 
+                  (Cckappa_sig.int_of_agent_name agent_type)
+                  agent_string
               in
 	      let () =
 		Loggers.print_newline (Remanent_parameters.get_logger parameter)
@@ -551,7 +605,8 @@ let collect_sites_anchor_set parameter error handler_kappa rule
                     _ -> warn parameter error (Some "line 522") Exit
                       (string_of_int site_type)
                 in
-                let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)  "\t\tsite_type:%i:%s" site_type site_string in
+                let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                  "\t\tsite_type:%i:%s" site_type site_string in
 		Loggers.print_newline (Remanent_parameters.get_logger parameter)
               ) union_set
             else ()
@@ -604,7 +659,8 @@ let collect_internal_flow parameter error handler_kappa rule
         (*let agent_type_modif = agent_modif.agent_name in*)
         (*get modified set*)
         let error, modified_set =
-          match AgentMap.unsafe_get parameter error agent_type
+          match Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get
+            parameter error agent_type
             store_sites_modified_set
           with
           | error, None -> error, Site_map_and_set.Set.empty
@@ -612,14 +668,16 @@ let collect_internal_flow parameter error handler_kappa rule
         in
         (*get anchor set*)
         let error, anchor_set1 =
-          match AgentMap.unsafe_get parameter error agent_type
+          match Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get
+            parameter error agent_type
             (fst store_sites_anchor_set)
           with
           | error, None -> error, Site_map_and_set.Set.empty
           | error, Some s -> error, s
         in
         let error, anchor_set2 =
-          match AgentMap.unsafe_get parameter error agent_type
+          match Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get
+            parameter error agent_type
             (snd store_sites_anchor_set)
           with
           | error, None -> error, Site_map_and_set.Set.empty
@@ -631,7 +689,8 @@ let collect_internal_flow parameter error handler_kappa rule
         (*----------------------------------------------------------------------*)
         (*first result: site -> modified site*)
         let error, site_list =
-          match AgentMap.unsafe_get parameter error agent_type store_sites_lhs with
+          match Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get
+            parameter error agent_type store_sites_lhs with
           | error, None -> error, []
           | error, Some l -> error, l
         in
@@ -659,7 +718,7 @@ let collect_internal_flow parameter error handler_kappa rule
                       Handler.string_of_agent parameter error handler_kappa agent_type
                     with
                       _ -> warn parameter error (Some "line 631") Exit
-                        (string_of_int agent_type)
+                        (Cckappa_sig.string_of_agent_name agent_type)
                   in
                   let error, site_string =
                     try
@@ -676,9 +735,11 @@ let collect_internal_flow parameter error handler_kappa rule
                   let () =
 		    Loggers.fprintf (Remanent_parameters.get_logger parameter)
                     "Flow of information in the ODE semantics:Internal flow\n-agent_type:%i:%s:site_type:%i:%s -> agent_type:%i:%s:site_type_modified:%i:%s"
-                    agent_type agent_string
-                    site_type site_string
-                    agent_type agent_string
+                      (Cckappa_sig.int_of_agent_name agent_type)
+                      agent_string
+                      site_type site_string
+                      (Cckappa_sig.int_of_agent_name agent_type)
+                      agent_string
                     site_modif site_modif_string
 		  in
 		  Loggers.print_newline (Remanent_parameters.get_logger parameter)
@@ -711,7 +772,7 @@ let collect_internal_flow parameter error handler_kappa rule
                       Handler.string_of_agent parameter error handler_kappa agent_type
                     with
                       _ -> warn parameter error (Some "line 678") Exit
-                        (string_of_int agent_type)
+                        (Cckappa_sig.string_of_agent_name agent_type)
                   in
                   let error, site_string =
                     try
@@ -730,9 +791,11 @@ let collect_internal_flow parameter error handler_kappa rule
                         (string_of_int site_anchor)
                   in
                   let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "Flow of information in the ODE semantics:Internal flow\n-agent_type:%i:%s:site_type:%i:%s -> agent_type:%i:%s:site_type_anchor:%i:%s"
-                    agent_type agent_string
+                    (Cckappa_sig.int_of_agent_name agent_type)
+                    agent_string
                     site_type site_string
-                    agent_type agent_string
+                    (Cckappa_sig.int_of_agent_name agent_type)
+                    agent_string
                     site_anchor site_anchor_string
 		  in
 		  Loggers.print_newline (Remanent_parameters.get_logger parameter)
@@ -794,7 +857,8 @@ let collect_external_flow parameter error handler_kappa rule
     (*------------------------------------------------------------------------------*)
     (*get sites that are bond on the lhs*)
     let error, bond_fst_set =
-      match AgentMap.unsafe_get parameter error agent_type1
+      match Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get
+        parameter error agent_type1
         (fst store_sites_bond_pair_set_external)
       with
       | error, None -> error, Site_map_and_set.Set.empty
@@ -802,7 +866,8 @@ let collect_external_flow parameter error handler_kappa rule
     in
     (*------------------------------------------------------------------------------*)
     let error, bond_snd_set =
-      match AgentMap.unsafe_get parameter error agent_type2
+      match Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get
+        parameter error agent_type2
         (snd store_sites_bond_pair_set_external)
       with
       | error, None -> error, Site_map_and_set.Set.empty
@@ -811,7 +876,7 @@ let collect_external_flow parameter error handler_kappa rule
     (*------------------------------------------------------------------------------*)
     (*get anchor set*)
     let error, anchor_set1 =
-      AgentMap.fold parameter error
+      Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.fold parameter error
         (fun parameter error agent_type site_set old_set ->
           let error, set =
             Site_map_and_set.Set.union
@@ -824,7 +889,7 @@ let collect_external_flow parameter error handler_kappa rule
         ) (fst store_sites_anchor_set) Site_map_and_set.Set.empty
     in
     let error, anchor_set2 =
-      AgentMap.fold parameter error
+      Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.fold parameter error
         (fun parameter error agent_type site_set old_set ->
           let error, set =
             Site_map_and_set.Set.union
@@ -870,13 +935,15 @@ let collect_external_flow parameter error handler_kappa rule
               try
                 Handler.string_of_agent parameter error handler_kappa agent_type
               with
-                _ -> warn parameter error (Some "line 835") Exit (string_of_int agent_type)
+                _ -> warn parameter error (Some "line 835") Exit 
+                  (Cckappa_sig.string_of_agent_name agent_type)
             in
             let error, agent_string' =
               try
                 Handler.string_of_agent parameter error handler_kappa agent_type'
               with
-                _ -> warn parameter error (Some "line 841") Exit (string_of_int agent_type')
+                _ -> warn parameter error (Some "line 841") Exit 
+                  (Cckappa_sig.string_of_agent_name agent_type')
             in
             let error, anchor_site_type_string =
               try
@@ -894,9 +961,11 @@ let collect_external_flow parameter error handler_kappa rule
                 _ -> warn parameter error (Some "line 856") Exit (string_of_int site_modif)
             in
             let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "Flow of information in the ODE semantics:External flow:\n-agent-type:%i:%s:site_type_anchor:%i:%s -> agent_type:%i:%s:site_type_modified:%i:%s"
-              agent_type agent_string
+              (Cckappa_sig.int_of_agent_name agent_type)
+              agent_string
               anchor_site_type anchor_site_type_string
-              agent_type' agent_string'
+              (Cckappa_sig.int_of_agent_name agent_type')
+              agent_string'
               site_modif site_modif_string in
 	    Loggers.print_newline (Remanent_parameters.get_logger parameter)
           ) cartesian_output
@@ -1007,11 +1076,14 @@ let scan_rule parameter error handler_kappa rule store_result =
 (*RULES*)
 
 let scan_rule_set parameter error handler_kappa compiled =
-  let error, init_store_sites_modified_set    = AgentMap.create parameter error 0 in
-  let error, init                             = AgentMap.create parameter error 0 in
+  let error, init_store_sites_modified_set    = 
+    Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.create parameter error 0 in
+  let error, init                             = 
+    Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.create parameter error 0 in
   let init_store_sites_bond_pair_set          = (init, init) in
   let init_store_sites_bond_pair_set_external = (init, init) in
-  let error, init_store_sites_lhs             = AgentMap.create parameter error 0 in
+  let error, init_store_sites_lhs             = 
+    Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.create parameter error 0 in
   let init_store_sites_anchor                 = (init, init) in
   let init_internal1                          = Internal_flow_map.Map.empty in
   let init_internal2                          = Internal_flow_map.Map.empty in
