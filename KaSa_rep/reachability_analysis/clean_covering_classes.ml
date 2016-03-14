@@ -12,15 +12,9 @@
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
-open Covering_classes_type
-open Cckappa_sig
-open Int_storage
-open Site_map_and_set
-open Covering_classes_new_index
-
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Covering classes") message exn
-                 (fun () -> default)                
+    (fun () -> default)               
 
 let trace = false
 
@@ -35,19 +29,21 @@ let length_sorted (l: int list list): int list list =
 (************************************************************************************)
 (*port information for site (state)*)
 
-let int_of_port port = port.site_state.min
+let int_of_port port = port.Cckappa_sig.site_state.Cckappa_sig.min
     
 (************************************************************************************)
 (*common function for getting an id in pointer backward*)
 
 let get_id_common_set parameter error t set =
-  match Nearly_inf_Imperatif.unsafe_get
+  match 
+    (*Nearly_inf_Imperatif.unsafe_get*)
+    Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.unsafe_get
     parameter
     error 
     t 
     set
   with
-    | error, None -> error, Set.empty
+    | error, None -> error, Ckappa_sig.Site_map_and_set.Set.empty
     | error, Some id -> error, id
 
 (************************************************************************************)
@@ -67,15 +63,22 @@ let store_pointer_backward parameter error id pointer_backward covering_class =
         pointer_backward
     in
     (*add the current set of elt into the old set*)
-    let error',new_id_set = Set.add parameter error id old_id_set in
+    let error', new_id_set = 
+      Ckappa_sig.Site_map_and_set.Set.add 
+        parameter
+        error
+        id (*site_name*)
+        old_id_set
+    in
     let error = Exception.check warn parameter error error' (Some "line 71") Exit in 
     (*store the result into pointer backward*)
-    Nearly_inf_Imperatif.set
+    Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.set
       parameter
       error
-      old_id
+      old_id (*site_name*)
       new_id_set
-      pointer_backward)
+      pointer_backward
+  )
     (error, pointer_backward)
     covering_class
   
@@ -84,10 +87,10 @@ let store_pointer_backward parameter error id pointer_backward covering_class =
 
 let covering_class_dic parameter error covering_class good_covering_class =
   let error, output =
-    Dictionary_of_Covering_class.allocate
+    Covering_classes_type.Dictionary_of_Covering_class.allocate
       parameter
       error
-      Misc_sa.compare_unit
+      Misc_sa.compare_unit_site_name
       covering_class
       ()
       Misc_sa.const_unit
@@ -97,7 +100,8 @@ let covering_class_dic parameter error covering_class good_covering_class =
   let error, (id_dic, store_dic) =
     match output with
       | Some (id, _, _, dic) -> error, (id, dic)
-      | None -> warn parameter error (Some "line 197") Exit (0, good_covering_class)
+      | None -> warn parameter error (Some "line 105") Exit
+        (0, good_covering_class)
   in
   error, (id_dic, store_dic)
 
@@ -105,11 +109,11 @@ let covering_class_dic parameter error covering_class good_covering_class =
 
 let store_remanent parameter error covering_class modified_map remanent =
   (* current state of remanent*)
-  let pointer_backward    = remanent.store_pointer_backward in
-  let good_covering_class = remanent.store_dic in
-  let good_index          = remanent.store_new_index_dic in
-  let good_test_dic       = remanent.store_test_new_index_dic in
-  let good_modif_dic      = remanent.store_modif_new_index_dic in
+  let pointer_backward    = remanent.Covering_classes_type.store_pointer_backward in
+  let good_covering_class = remanent.Covering_classes_type.store_dic in
+  let good_index          = remanent.Covering_classes_type.store_new_index_dic in
+  let good_test_dic       = remanent.Covering_classes_type.store_test_new_index_dic in
+  let good_modif_dic      = remanent.Covering_classes_type.store_modif_new_index_dic in
   (*------------------------------------------------------------------------------*)
   (*covering class dictionary*)
   let error, (covering_class_id, store_dic) =
@@ -131,9 +135,12 @@ let store_remanent parameter error covering_class modified_map remanent =
   in
   (*------------------------------------------------------------------------------*)
   (*PART II: compute new_index in covering_class*)
-  let new_index_covering_class = re_index_value_list covering_class in
+  let new_index_covering_class = 
+    Covering_classes_new_index.re_index_value_list 
+      covering_class
+  in
   let error, (new_id, new_dic) =
-    new_index_dic 
+    Covering_classes_new_index.new_index_dic 
       parameter 
       error 
       new_index_covering_class 
@@ -142,7 +149,7 @@ let store_remanent parameter error covering_class modified_map remanent =
   (*------------------------------------------------------------------------------*)
   (*PART II: site test with new index*)
   let error, (new_test_id, test_new_index_dic) =
-    test_new_index_dic 
+    Covering_classes_new_index.test_new_index_dic 
       parameter 
       error
       new_id 
@@ -152,7 +159,7 @@ let store_remanent parameter error covering_class modified_map remanent =
   (*------------------------------------------------------------------------------*)
   (*PART II: site modified with new_index*)
   let error, (new_modif_id, modif_index_dic) =
-    modified_index_dic 
+    Covering_classes_new_index.modified_index_dic 
       parameter
       error 
       covering_class
@@ -163,11 +170,11 @@ let store_remanent parameter error covering_class modified_map remanent =
   (*result*)
   error,
   {
-    store_pointer_backward    = pointer_backward;
-    store_dic                 = store_dic;
-    store_new_index_dic       = new_dic;
-    store_test_new_index_dic  = test_new_index_dic;
-    store_modif_new_index_dic = modif_index_dic;
+    Covering_classes_type.store_pointer_backward    = pointer_backward;
+    Covering_classes_type.store_dic                 = store_dic;
+    Covering_classes_type.store_new_index_dic       = new_dic;
+    Covering_classes_type.store_test_new_index_dic  = test_new_index_dic;
+    Covering_classes_type.store_modif_new_index_dic = modif_index_dic;
   }
     
 (*------------------------------------------------------------------------------*)
@@ -180,36 +187,35 @@ let store_remanent parameter error covering_class modified_map remanent =
   => Then do the intersection of two covering classes of agent A:
   (0) inter (0,1) -> 0
 *)
-    
-    
-let init_dic = Dictionary_of_Covering_class.init ()
   
 let clean_classes parameter error covering_classes modified_map =
-  let error, init_pointer = Nearly_inf_Imperatif.create parameter error 0 in
-  let init_index          = init_dic in
-  let init_store_dic      = init_dic in
-  let init_test_index     = init_dic in
-  let init_modif_index    = Dictionary_of_Modified_class.init() in
+  let error, init_pointer = 
+    Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.create parameter error 0 
+  in
+  let init_index          = Covering_classes_type.Dictionary_of_Covering_class.init () in
+  let init_store_dic      = Covering_classes_type.Dictionary_of_Covering_class.init () in
+  let init_test_index     = Covering_classes_type.Dictionary_of_Covering_class.init () in
+  let init_modif_index    = Covering_classes_type.Dictionary_of_Modified_class.init() in
   (*------------------------------------------------------------------------------*)
   (*init state of dictionary*)
   let init_remanent = 
     {
-      store_pointer_backward    = init_pointer;
-      store_dic                 = init_store_dic;
-      store_new_index_dic       = init_index;
-      store_test_new_index_dic  = init_test_index;
-      store_modif_new_index_dic = init_modif_index;
+      Covering_classes_type.store_pointer_backward    = init_pointer;
+      Covering_classes_type.store_dic                 = init_store_dic;
+      Covering_classes_type.store_new_index_dic       = init_index;
+      Covering_classes_type.store_test_new_index_dic  = init_test_index;
+      Covering_classes_type.store_modif_new_index_dic = init_modif_index;
     }
   in
   (*------------------------------------------------------------------------------*)
   (*cleaning*)
   let current_covering_classes = length_sorted covering_classes in
-  let is_empty_set = Site_map_and_set.Set.is_empty in
+  let is_empty_set = Ckappa_sig.Site_map_and_set.Set.is_empty in
   List.fold_left (fun (error, remanent) covering_class ->
     match covering_class with
       | [] -> error,remanent
       | t :: tl ->
-        let pointer_backward = remanent.store_pointer_backward in
+        let pointer_backward = remanent.Covering_classes_type.store_pointer_backward in
         (* return the set of list(id) containing t.
            For example: current_covering_classes: [[0;1];[0]]
            t = 0 => (id:1;id:2) of type set;
@@ -238,7 +244,9 @@ let clean_classes parameter error covering_classes modified_map =
               (*-------------------------------------------------------------------*)
               (* intersection of two sets *)
               let error',potential_superset =
-                Site_map_and_set.Set.inter parameter error 
+                Ckappa_sig.Site_map_and_set.Set.inter 
+                  parameter 
+                  error 
                   potential_supersets
                   potential_supersets'
               in

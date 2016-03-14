@@ -53,9 +53,9 @@ module type Composite_domain =
 
     val add_initial_state: (Analyzer_headers.initial_state, unit) unary
 
-    val is_enabled: (Communication.rule_id, Communication.precondition option) unary
+    val is_enabled: (Ckappa_sig.c_rule_id, Communication.precondition option) unary
 
-    val apply_rule: (Communication.rule_id, Communication.precondition,unit) binary
+    val apply_rule: (Ckappa_sig.c_rule_id, Communication.precondition,unit) binary
 
     val export: (Analyzer_headers.kasa_state, Analyzer_headers.kasa_state) unary
 
@@ -167,7 +167,7 @@ struct
     let error, dynamic =
       List.fold_left (fun (error, dynamic) (agent_id, agent_type) ->
         let error, agent =
-          Cckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get parameter error agent_id
+          Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get parameter error agent_id
             rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
         in
         match agent with

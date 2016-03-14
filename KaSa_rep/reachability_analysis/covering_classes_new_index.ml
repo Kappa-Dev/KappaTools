@@ -12,12 +12,6 @@
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
-open Covering_classes_type
-open Cckappa_sig
-open Int_storage
-open Printf
-open Site_map_and_set
-
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Covering classes") message exn
                  (fun () -> default)                
@@ -43,25 +37,33 @@ let is_empty_list l =
     | _ -> false
 
 let re_index_value_list list = (*TO BE FIXED*)
-  let rec aux acc =
-    match acc with
+  let l =
+    let rec aux acc =
+      match acc with
       | [] -> acc
       | x :: tl ->
         let nth = position x list in
         (nth + 1) :: aux tl
-  in aux list
+    in aux list
+  in
+  l
+  (*List.fold_left (fun l x ->
+    (Cckappa_sig.site_name_of_int x) :: l
+  ) [] l*)
 
 (*------------------------------------------------------------------------------*)
 (*projection site that are modified with new index*)
 
-let project_modified_site value_list modified_map = (*TODO:add state information*)
-  let rec aux acc =
-    match acc with
+let project_modified_site value_list modified_map =
+  (*TODO:add state information*)
+  let l =
+    let rec aux acc =
+      match acc with
       | [] -> []
       | x :: tl ->
-        if not (Map.is_empty modified_map)
+        if not (Ckappa_sig.Site_map_and_set.Map.is_empty modified_map)
         then
-          if Map.mem x modified_map
+          if Ckappa_sig.Site_map_and_set.Map.mem x modified_map
           then
             begin
               if not (is_empty_list value_list)
@@ -73,14 +75,19 @@ let project_modified_site value_list modified_map = (*TODO:add state information
             end
           else aux tl
         else [] (*if modified_set is empty then nothing*)
-  in aux value_list
+    in aux value_list
+  in
+  l
+  (*List.fold_left (fun l x ->
+    (Cckappa_sig.site_name_of_int x) :: l
+  ) [] l*)
     
 (*------------------------------------------------------------------------------*)
 (*compute new index dictionary*)
 
 let new_index_dic parameter error new_index_covering_class good_index =
   let error, output =
-    Dictionary_of_Covering_class.allocate
+    Covering_classes_type.Dictionary_of_Covering_class.allocate
       parameter
       error
       Misc_sa.compare_unit
@@ -92,7 +99,8 @@ let new_index_dic parameter error new_index_covering_class good_index =
   let error, (id_dic, store_dic) =
     match output with
     | Some (id, _, _, dic) -> error, (id, dic)
-    | None -> warn parameter error (Some "95") Exit (0, good_index)
+    | None -> warn parameter error (Some "95") Exit 
+      (0, good_index)
   in
   error, (id_dic, store_dic)
 
@@ -102,7 +110,7 @@ let new_index_dic parameter error new_index_covering_class good_index =
 let test_new_index_dic parameter error new_id new_dic good_test_dic =
   let error, (value_index_dic, _, _) =
     Misc_sa.unsome
-      (Dictionary_of_Covering_class.translate
+      (Covering_classes_type.Dictionary_of_Covering_class.translate
          parameter
          error
          new_id
@@ -111,7 +119,7 @@ let test_new_index_dic parameter error new_id new_dic good_test_dic =
   in
   (*return site_test_dic*)
   let error, output =
-    Dictionary_of_Covering_class.allocate
+    Covering_classes_type.Dictionary_of_Covering_class.allocate
       parameter
       error
       Misc_sa.compare_unit
@@ -123,7 +131,8 @@ let test_new_index_dic parameter error new_id new_dic good_test_dic =
   let error, (id_dic, store_dic) =
     match output with
     | Some (id, _, _, dic) -> error, (id, dic)
-    | None -> warn parameter error (Some "131") Exit (0, good_test_dic)
+    | None -> warn parameter error (Some "131") Exit
+      (0, good_test_dic)
   in
   error, (id_dic, store_dic)
 
@@ -133,8 +142,12 @@ let test_new_index_dic parameter error new_id new_dic good_test_dic =
 let modified_index_dic parameter error covering_class modified_map 
     good_new_index_modif_dic =
   let modified_value = project_modified_site covering_class modified_map in
+  (*let modified_value = List.fold_left (fun l x ->
+    (Cckappa_sig.site_name_of_int x) :: l
+  ) [] modified_value
+  in*)
   let error, out_modif_dic =
-    Dictionary_of_Modified_class.allocate
+    Covering_classes_type.Dictionary_of_Modified_class.allocate
       parameter
       error
       Misc_sa.compare_unit
@@ -145,7 +158,8 @@ let modified_index_dic parameter error covering_class modified_map
   in
   let error, (new_modif_id, modif_index_dic) =
     match out_modif_dic with
-      | None -> warn parameter error (Some "line 252") Exit (0, good_new_index_modif_dic)
+      | None -> warn parameter error (Some "line 155") Exit
+        (0, good_new_index_modif_dic)
       | Some (id, _, _, dic) -> error, (id, dic)        
   in
   error, (new_modif_id, modif_index_dic)
@@ -158,6 +172,6 @@ let modified_index_dic parameter error covering_class modified_map
 
 let number_of_covering_classes parameter error store_dic =
   let error, num =
-    Dictionary_of_Covering_class.last_entry
+    Covering_classes_type.Dictionary_of_Covering_class.last_entry
       parameter error store_dic
   in num + 1

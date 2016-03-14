@@ -58,7 +58,7 @@ let compute_influence_map parameters error handler quark_maps nrules =
   let error,wake_up_map = 
     generic_add 
       (*Quark_type.AgentMap.fold2_common*)
-      Quark_type.Agent_type_quick_nearly_inf_Imperatif.fold2_common
+      Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.fold2_common
       true
       true
       parameters 
@@ -72,7 +72,7 @@ let compute_influence_map parameters error handler quark_maps nrules =
   let error,wake_up_map = 
     generic_add 
       (*Quark_type.AgentMap.fold2_common*)
-      Quark_type.Agent_type_quick_nearly_inf_Imperatif.fold2_common
+      Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.fold2_common
       true
       true
       parameters 
@@ -86,7 +86,7 @@ let compute_influence_map parameters error handler quark_maps nrules =
    let error,inhibition_map = 
     generic_add 
       (*Quark_type.AgentMap.fold2_common*)
-      Quark_type.Agent_type_quick_nearly_inf_Imperatif.fold2_common
+      Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.fold2_common
       true
       true
       parameters 
@@ -139,7 +139,7 @@ let compute_influence_map parameters error handler quark_maps nrules =
   let error,inhibition_map = 
     generic_add 
       (*Quark_type.AgentMap.fold2_common*)
-      Quark_type.Agent_type_quick_nearly_inf_Imperatif.fold2_common
+      Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.fold2_common
       false
       true
       parameters 
@@ -166,7 +166,7 @@ let compute_influence_map parameters error handler quark_maps nrules =
   let error,inhibition_map = 
     generic_add 
       (*Quark_type.AgentMap.fold2_common*)
-      Quark_type.Agent_type_quick_nearly_inf_Imperatif.fold2_common
+      Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.fold2_common
       false
       true 
       parameters 
@@ -193,7 +193,7 @@ let compute_influence_map parameters error handler quark_maps nrules =
    let error,wake_up_map = 
     generic_add 
       (*Quark_type.AgentMap.fold2_common*)
-      Quark_type.Agent_type_quick_nearly_inf_Imperatif.fold2_common
+      Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.fold2_common
       true
       true
       parameters 
@@ -258,7 +258,7 @@ let compute_influence_map parameters error handler quark_maps nrules =
   in
   let fold_site parameters error f  =
     (*Quark_type.AgentMap.fold2_common*)
-    Quark_type.Agent_type_quick_nearly_inf_Imperatif.fold2_common
+    Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.fold2_common
       parameters
       error
       (fun parameters error _ a b   ->

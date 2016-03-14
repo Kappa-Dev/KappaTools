@@ -20,7 +20,12 @@ module Int_Set_and_Map = SetMap.Make (struct type t = int let compare = compare 
 
 let local_trace = false
 
-let empty_site_list = { Ckappa_sig.used = [] ; Ckappa_sig.declared = [] ; Ckappa_sig.creation = []}
+let empty_site_list =
+  {
+    Ckappa_sig.used = [];
+    Ckappa_sig.declared = []; 
+    Ckappa_sig.creation = []
+  }
 
 let empty_agent_specification =
   {
@@ -30,23 +35,20 @@ let empty_agent_specification =
 
 let empty_handler parameters error =
   let error, int_constraints =
-    Cckappa_sig.Agent_type_nearly_inf_Imperatif.create parameters error 0
+    Ckappa_sig.Agent_type_nearly_inf_Imperatif.create parameters error 0
   in
   let error,sites = 
-    (*Int_storage.Nearly_inf_Imperatif.create *)
-    Cckappa_sig.Agent_type_nearly_inf_Imperatif.create
+    Ckappa_sig.Agent_type_nearly_inf_Imperatif.create
       parameters
       error 
       0 (*dimension*)
   in
   let error, states_dic =
-    (*Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.create*)
-    Cckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.create
+    Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.create
       parameters error (0, 0)
   in
   let error,dual =
-    (*Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.create*)
-    Cckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.create
+    Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.create
       parameters error
       (0, (0, 0))
   in
@@ -76,7 +78,7 @@ let create_binding_state_dictionary parameters error =
   in
   match output with
   | None -> error,dic
-  | Some (_,_,_,x) -> error,x
+  | Some (_, _, _, x) -> error,x
 
 let create_internal_state_dictionary parameters error =
   let dic = Cckappa_sig.Dictionary_of_States.init () in
@@ -95,13 +97,13 @@ let declare_agent parameters error handler agent_name =
       agents_dic
   in
   match output with
-  | None -> warn parameters error (Some "line 61") Exit (handler, Cckappa_sig.dummy_agent_name)
+  | None -> warn parameters error (Some "line 61") 
+    Exit (handler, Ckappa_sig.dummy_agent_name)
   | Some (k, _, _, dic) ->
     if bool
     then
       let error, int_constraints =
-        (*Int_storage.Nearly_inf_Imperatif.set*)
-        Cckappa_sig.Agent_type_nearly_inf_Imperatif.set
+        Ckappa_sig.Agent_type_nearly_inf_Imperatif.set
           parameters 
           error 
           k
@@ -109,8 +111,7 @@ let declare_agent parameters error handler agent_name =
           handler.Cckappa_sig.interface_constraints 
       in
       let error, sites = 
-        (*Int_storage.Nearly_inf_Imperatif.set*)
-        Cckappa_sig.Agent_type_nearly_inf_Imperatif.set
+        Ckappa_sig.Agent_type_nearly_inf_Imperatif.set
           parameters
           error
           k 
@@ -120,7 +121,7 @@ let declare_agent parameters error handler agent_name =
       error,
       ({handler with
         Cckappa_sig.nrules = 0 ;
-        Cckappa_sig.nagents = max (Cckappa_sig.int_of_agent_name k) 
+        Cckappa_sig.nagents = max (Ckappa_sig.int_of_agent_name k) 
           handler.Cckappa_sig.nagents;
         Cckappa_sig.agents_dic = dic ;
         Cckappa_sig.interface_constraints = int_constraints;
@@ -129,25 +130,26 @@ let declare_agent parameters error handler agent_name =
     else
       error, (handler, k)
 
-let declare_site create parameters make_site make_state (error, handler) agent_name site_name list =
+let declare_site create parameters make_site make_state (error, handler) 
+    agent_name site_name list =
   let site = make_site site_name in
   let states_dic = handler.Cckappa_sig.states_dic in
   let error, sites =
-    (*Int_storage.Nearly_inf_Imperatif.get *)
-    Cckappa_sig.Agent_type_nearly_inf_Imperatif.get
+    Ckappa_sig.Agent_type_nearly_inf_Imperatif.get
       parameters
       error 
       agent_name
       handler.Cckappa_sig.sites
   in
   match sites with
-  | None  -> warn parameters error (Some "line 87") Exit (handler, [], 0)
+  | None  -> warn parameters error (Some "line 87") Exit
+    (handler, [], Ckappa_sig.dummy_site_name)
   | Some sites ->
     let error, (bool, output) =
       Ckappa_sig.Dictionary_of_sites.allocate_bool 
         parameters
         error
-        Misc_sa.compare_unit 
+        Misc_sa.compare_unit_site_name 
         site 
         () 
         Misc_sa.const_unit 
@@ -155,15 +157,15 @@ let declare_site create parameters make_site make_state (error, handler) agent_n
     in
     begin
       match output with
-      | None -> warn parameters error (Some "line 92") Exit (handler, [], 0)
+      | None -> warn parameters error (Some "line 92") Exit
+        (handler, [], Ckappa_sig.dummy_site_name)
       | Some (k, _, _, sites) ->
         let error, (states_dic, dic_states, handler) =
           if bool
           then
             let error, dic_states = create parameters error in
             let error, states_dic =  
-              Cckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set
-              (*Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set*)
+              Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set
                 parameters
                 error 
                 (agent_name, k)
@@ -171,22 +173,21 @@ let declare_site create parameters make_site make_state (error, handler) agent_n
                 states_dic 
             in
             let error, new_sites = 
-              (*Int_storage.Nearly_inf_Imperatif.set *)
-              Cckappa_sig.Agent_type_nearly_inf_Imperatif.set
+              Ckappa_sig.Agent_type_nearly_inf_Imperatif.set
                 parameters 
                 error
                 agent_name
                 sites
                 handler.Cckappa_sig.sites 
             in
-            error, (states_dic, dic_states, 
-                    {
-                      handler with Cckappa_sig.sites = new_sites
-                    })
+            error,
+            (states_dic, dic_states, 
+             {
+               handler with Cckappa_sig.sites = new_sites
+             })
           else
             match 
-              (*Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get *)
-              Cckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+              Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
                 parameters
                 error
                 (agent_name, k) 
@@ -198,8 +199,7 @@ let declare_site create parameters make_site make_state (error, handler) agent_n
             | error, Some u ->
               let error, dic_states =
                 match 
-                  (*Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get*)
-                  Cckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+                  Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
                     parameters 
                     error 
                     (agent_name, k)
@@ -207,7 +207,7 @@ let declare_site create parameters make_site make_state (error, handler) agent_n
                 with
                 | error, None ->
                   let error, dic_states = (create parameters error) in
-                  warn parameters error (Some "line 111") Exit dic_states
+                  warn parameters error (Some "line 216") Exit dic_states
                 | error, Some dic_states -> error, dic_states
               in
               error, (states_dic, dic_states, handler)
@@ -223,7 +223,8 @@ let declare_site create parameters make_site make_state (error, handler) agent_n
                   Misc_sa.compare_unit 
                   state
                   () 
-                  Misc_sa.const_unit dic_states
+                  Misc_sa.const_unit 
+                  dic_states
               in
               begin
                 match output with
@@ -244,8 +245,7 @@ let declare_site create parameters make_site make_state (error, handler) agent_n
           if bool
           then
             let error, states_dic =
-              (*Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set*)
-              Cckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set
+              Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.set
                 parameters
                 error
                 (agent_name, k)
@@ -278,17 +278,10 @@ let declare_site_with_binding_states parameters =
     (fun x -> Ckappa_sig.Binding x)
     (fun x -> Ckappa_sig.Binding x)
 
-let declare_dual parameter error handler 
-    ag
-    site
-    state
-    ag'
-    site'
-    state'=
+let declare_dual parameter error handler ag site state ag' site' state'=
   let dual = handler.Cckappa_sig.dual in
-  let error, dual = 
-    (*Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.set *)
-    Cckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.set
+  let error, dual =
+    Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.set
       parameter 
       error 
       (ag, (site, state))
@@ -296,8 +289,7 @@ let declare_dual parameter error handler
       dual
   in
   let error, dual =
-    (*Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.set*)
-    Cckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.set
+    Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.set
       parameter
       error 
       (ag', (site', state')) 
@@ -307,8 +299,12 @@ let declare_dual parameter error handler
   error, {handler with Cckappa_sig.dual = dual}
 
 let scan_agent parameters (error, handler) agent =
-  let error, (handler, ag_id) = (*FIXME*)
-    declare_agent parameters error handler agent.Ckappa_sig.ag_nme 
+  let error, (handler, ag_id) =
+    declare_agent
+      parameters 
+      error
+      handler
+      agent.Ckappa_sig.ag_nme 
   in
   let rec aux error interface handler =
     match interface with
@@ -324,7 +320,7 @@ let scan_agent parameters (error, handler) agent =
               declare_site_with_internal_states 
                 parameters 
                 (error, handler)
-                ag_id (*FIXME*)
+                ag_id
                 site_name 
                 list
             in

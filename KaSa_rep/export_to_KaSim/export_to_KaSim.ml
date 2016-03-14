@@ -268,8 +268,7 @@ module Export_to_KaSim =
           (fun parameters error i agent_name () () ->
             let error,site_dic =
 	      Misc_sa.unsome
-	        ((*Int_storage.Nearly_inf_Imperatif.get*)
-                  Cckappa_sig.Agent_type_nearly_inf_Imperatif.get
+	        (Ckappa_sig.Agent_type_nearly_inf_Imperatif.get
 		   parameters
                    error
                    i 
@@ -292,8 +291,7 @@ module Export_to_KaSim =
       in
       (*----------------------------------------------------------------*)
       let error =
-	(*Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.iter*)
-        Cckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.iter
+        Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.iter
 	  parameters error
 	  (fun parameters error (i,j) s  ->
 	    let error,ag =
@@ -319,8 +317,7 @@ module Export_to_KaSim =
       (*----------------------------------------------------------------*)
       let sol = !sol in
       let error, sol =
-        (*Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold*)
-        Cckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
+        Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
           parameters error
           (fun parameters error (i, (j , k)) (i', j', k') sol ->
 	    let error, ag_i =

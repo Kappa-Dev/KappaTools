@@ -22,18 +22,18 @@ let local_trace = false
 module Domain =
 struct
 
-  type agent_type = Cckappa_sig.agent_name
+  (*type agent_type = Cckappa_sig.agent_name
   type site_type = Cckappa_sig.site_name
   type state_index = Cckappa_sig.state_index
     
   module PairAgentSiteState_map_and_set = Cckappa_sig.PairAgentSiteState_map_and_set
 
-  module Rule_map_and_set = Cckappa_sig.Rule_map_and_set
+  module Rule_map_and_set = Cckappa_sig.Rule_map_and_set*)
 
   type local_static_information =
     {
-      bond_rhs : PairAgentSiteState_map_and_set.Set.t Rule_map_and_set.Map.t;
-      bond_lhs : PairAgentSiteState_map_and_set.Set.t Rule_map_and_set.Map.t
+      bond_rhs : Ckappa_sig.PairAgentSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
+      bond_lhs : Ckappa_sig.PairAgentSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t
     }
 
   type static_information =
@@ -42,15 +42,16 @@ struct
       local_static_information  : local_static_information
     }
 
-  module AgentSite_map_and_set = Cckappa_sig.AgentSite_map_and_set
+  (*module AgentSite_map_and_set = Cckappa_sig.AgentSite_map_and_set
     
-  module State_map_and_set = Cckappa_sig.State_map_and_set
+  module State_map_and_set = Cckappa_sig.State_map_and_set*)
     
   type local_dynamic_information = 
     {
-      contact_map_dynamic : PairAgentSiteState_map_and_set.Set.t;
-      bonds_per_site : (agent_type * site_type * state_index)
-        State_map_and_set.Map.t AgentSite_map_and_set.Map.t
+      contact_map_dynamic : Ckappa_sig.PairAgentSiteState_map_and_set.Set.t;
+      bonds_per_site : (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * 
+                          Ckappa_sig.c_state)
+        Ckappa_sig.State_map_and_set.Map.t Ckappa_sig.AgentSite_map_and_set.Map.t
     }
 
   type dynamic_information =
@@ -133,37 +134,38 @@ struct
 
   (*dual: contact map including initial state, use in views_domain*)
       
-  module AgentSiteState_map_and_set = Cckappa_sig.AgentSiteState_map_and_set
+  (*module AgentSiteState_map_and_set = Cckappa_sig.AgentSiteState_map_and_set*)
     
   let collect_dual_map parameter error handler store_result =
     let error, store_result =
       (*Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold*)
-      Cckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
+      Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
         parameter error
         (fun parameter error (agent_type, (site_type, state))
           (agent_type', site_type', state') store_result ->
             let error, old_set =
-              match AgentSiteState_map_and_set.Map.find_option_without_logs parameter error
+              match Ckappa_sig.AgentSiteState_map_and_set.Map.find_option_without_logs parameter error
                 (agent_type, site_type, state) store_result
               with
-              | error, None -> error, AgentSiteState_map_and_set.Set.empty
+              | error, None -> error, Ckappa_sig.AgentSiteState_map_and_set.Set.empty
               | error, Some s -> error, s
             in
             let error', set =
-              AgentSiteState_map_and_set.Set.add_when_not_in parameter error
-                (agent_type', site_type', state') AgentSiteState_map_and_set.Set.empty
+              Ckappa_sig.AgentSiteState_map_and_set.Set.add_when_not_in parameter error
+                (agent_type', site_type', state') 
+                Ckappa_sig.AgentSiteState_map_and_set.Set.empty
             in
             let error = Exception.check warn parameter error error'
               (Some "line 446") Exit 
             in
             let error'', new_set = 
-              AgentSiteState_map_and_set.Set.union parameter error set old_set
+              Ckappa_sig.AgentSiteState_map_and_set.Set.union parameter error set old_set
             in
             let error = Exception.check warn parameter error error''
               (Some "line 446") Exit 
             in
             let error, store_result = 
-              AgentSiteState_map_and_set.Map.add_or_overwrite parameter error
+              Ckappa_sig.AgentSiteState_map_and_set.Map.add_or_overwrite parameter error
                 (agent_type, site_type, state) new_set store_result
             in
             error, store_result
@@ -176,11 +178,11 @@ struct
     | Cckappa_sig.Ghost
     | Cckappa_sig.Unknown_agent _
     | Cckappa_sig.Dead_agent _ ->
-      warn parameter error (Some "line 199") Exit (Cckappa_sig.dummy_agent_name, 0)
+      warn parameter error (Some "line 199") Exit (Ckappa_sig.dummy_agent_name, 0)
     | Cckappa_sig.Agent agent1 ->
       let agent_type1 = agent1.Cckappa_sig.agent_name in
       let error, state1 =
-        match Cckappa_sig.Site_map_and_set.Map.find_option_without_logs
+        match Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
           parameter
           error
           site_type
@@ -197,25 +199,25 @@ struct
 
   let add_link_set parameter error rule_id (x, y) store_result =
     let error, old_set =
-      match Rule_map_and_set.Map.find_option_without_logs parameter error 
+      match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error 
         rule_id store_result
       with
-      | error, None -> error, PairAgentSiteState_map_and_set.Set.empty
+      | error, None -> error, Ckappa_sig.PairAgentSiteState_map_and_set.Set.empty
       | error, Some p -> error, p
     in
     let error', set = 
-      PairAgentSiteState_map_and_set.Set.add_when_not_in
+      Ckappa_sig.PairAgentSiteState_map_and_set.Set.add_when_not_in
         parameter error 
         (x, y)
         old_set
     in    
     let error = Exception.check warn parameter error error' (Some "line 246") Exit in
     let error'', union_set =
-      PairAgentSiteState_map_and_set.Set.union parameter error set old_set 
+      Ckappa_sig.PairAgentSiteState_map_and_set.Set.union parameter error set old_set 
     in
     let error = Exception.check warn parameter error error'' (Some "line 250") Exit in
     let error, store_result =
-      Rule_map_and_set.Map.add_or_overwrite parameter error rule_id union_set store_result
+      Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite parameter error rule_id union_set store_result
     in
     error, store_result
 
@@ -224,12 +226,12 @@ struct
       Int_storage.Quick_Nearly_inf_Imperatif.fold parameter error
         (fun parameter error agent_id bonds_map store_result ->
           let error, store_result =
-            Cckappa_sig.Site_map_and_set.Map.fold
+            Ckappa_sig.Site_map_and_set.Map.fold
               (fun site_type_source site_add (error, store_result) ->
                 let agent_index_target = site_add.Cckappa_sig.agent_index in
                 let site_type_target = site_add.Cckappa_sig.site in
                 let error, agent_source =
-                  match Cckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get
+                  match Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get
                     parameter error agent_id views
                   with
                   | error, None -> warn parameter error (Some "line 271") Exit
@@ -237,7 +239,7 @@ struct
                   | error, Some agent -> error, agent
                 in
                 let error, agent_target =
-                  match Cckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get
+                  match Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get
                     parameter error agent_index_target views
                   with
                   | error, None -> warn parameter error (Some "line 279") Exit
@@ -337,8 +339,8 @@ struct
   let initialize static dynamic error =
     let init_domain_static =
       {
-        bond_rhs = Rule_map_and_set.Map.empty;
-        bond_lhs = Rule_map_and_set.Map.empty;
+        bond_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
+        bond_lhs = Ckappa_sig.Rule_map_and_set.Map.empty;
       }
     in
     let init_global_static_information =
@@ -349,8 +351,8 @@ struct
     in
     let init_local =
       {
-        contact_map_dynamic = PairAgentSiteState_map_and_set.Set.empty;
-        bonds_per_site      = AgentSite_map_and_set.Map.empty
+        contact_map_dynamic = Ckappa_sig.PairAgentSiteState_map_and_set.Set.empty;
+        bonds_per_site      = Ckappa_sig.AgentSite_map_and_set.Map.empty
       }
     in
     let init_global_dynamic_information =
@@ -394,7 +396,7 @@ struct
     let parameter = get_parameter static in
     let contact_map_dynamic = get_contact_map_dynamic dynamic in
     let error, contact_map_dynamic =
-      PairAgentSiteState_map_and_set.Set.add_when_not_in
+      Ckappa_sig.PairAgentSiteState_map_and_set.Set.add_when_not_in
         parameter error 
         (x, y)
         contact_map_dynamic
@@ -413,22 +415,22 @@ struct
     let bonds_per_site = get_bonds_per_site dynamic in
     let error, old_map =
       match 
-        AgentSite_map_and_set.Map.find_option_without_logs
+        Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
 	  parameter error
 	  (agent_type, site_type)
 	  bonds_per_site
       with
-      | error, None -> error, State_map_and_set.Map.empty
+      | error, None -> error, Ckappa_sig.State_map_and_set.Map.empty
       | error, Some m -> error, m
     in
     let error, state_map =
-      State_map_and_set.Map.add_or_overwrite parameter error
+      Ckappa_sig.State_map_and_set.Map.add_or_overwrite parameter error
         state
         (agent_type', site_type', state')
         old_map
     in
     let error, bonds_per_site =
-      AgentSite_map_and_set.Map.add_or_overwrite parameter error
+      Ckappa_sig.AgentSite_map_and_set.Map.add_or_overwrite parameter error
         (agent_type, site_type)
         state_map
         bonds_per_site
@@ -465,12 +467,12 @@ struct
       Int_storage.Quick_Nearly_inf_Imperatif.fold parameter error
         (fun parameter error agent_id bonds_map dynamic ->
           let error, store_result =
-            Cckappa_sig.Site_map_and_set.Map.fold
+            Ckappa_sig.Site_map_and_set.Map.fold
               (fun site_type_source site_add (error, dynamic) ->
                 let agent_index_target = site_add.Cckappa_sig.agent_index in
                 let site_type_target = site_add.Cckappa_sig.site in
                 let error, agent_source =
-                  match Cckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get
+                  match Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get
                     parameter error agent_id views
                   with
                   | error, None -> warn parameter error (Some "line 473") Exit
@@ -478,7 +480,7 @@ struct
                   | error, Some agent -> error, agent
                 in
                 let error, agent_target =
-                  match Cckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get
+                  match Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get
                     parameter error agent_index_target views
                   with
                   | error, None -> warn parameter error (Some "line 480") Exit
@@ -531,16 +533,17 @@ struct
     let bond_lhs = get_bond_lhs static in
     let contact_map = get_contact_map_dynamic dynamic in
     let error, bond_lhs_set =
-      match Rule_map_and_set.Map.find_option_without_logs parameter error
+      match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error
         rule_id bond_lhs
       with
-      | error, None -> error, PairAgentSiteState_map_and_set.Set.empty
+      | error, None -> error, Ckappa_sig.PairAgentSiteState_map_and_set.Set.empty
       | error, Some l -> error, l
     in
     let error, inter =
-      PairAgentSiteState_map_and_set.Set.inter parameter error contact_map bond_lhs_set
+      Ckappa_sig.PairAgentSiteState_map_and_set.Set.inter
+        parameter error contact_map bond_lhs_set
     in
-    if PairAgentSiteState_map_and_set.Set.is_empty inter
+    if Ckappa_sig.PairAgentSiteState_map_and_set.Set.is_empty inter
     then 
       (* use the function Communication.overwrite_potential_partners_map to
          fill the two fields related to the dynamic contact map *)
@@ -557,13 +560,13 @@ struct
 	    (* Here you should fetch the partner in the dynamic contact
 	       map, if defined, *)
             let error, statemap_bottop =
-              AgentSite_map_and_set.Map.find_option_without_logs parameter error
+              Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs parameter error
                 (agent_type, site_type) dynamic.local.bonds_per_site
             in
             match statemap_bottop with
             | None -> Usual_domains.Val (agent_type, site_type, state)
             | Some statemap ->
-              State_map_and_set.Map.fold
+              Ckappa_sig.State_map_and_set.Map.fold
                 (fun state (agent_type', site_type', state') _ ->
                   Usual_domains.Val (agent_type', site_type', state')
                 ) statemap Usual_domains.Any)
@@ -572,7 +575,8 @@ struct
 	      begin
 		fun parameter error agent_type site_type ->
 		  let error, statemap_bottop = 
-                    AgentSite_map_and_set.Map.find_option_without_logs parameter error
+                    Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs 
+                      parameter error
                       (agent_type, site_type) dynamic.local.bonds_per_site
                   in
 		  match statemap_bottop with
@@ -583,7 +587,7 @@ struct
 		    error,
 		    Usual_domains.Val
 		      (fun f error init ->
-		        State_map_and_set.Map.fold
+		        Ckappa_sig.State_map_and_set.Map.fold
 			  (f parameter)
 		       	  statemap
 			  (error, init)
@@ -603,25 +607,27 @@ struct
     let contact_map = get_contact_map_dynamic dynamic in
     let bond_rhs_map = get_bond_rhs static in
     let error, bond_rhs_set =
-      match Rule_map_and_set.Map.find_option_without_logs parameter error rule_id
+      match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error rule_id
         bond_rhs_map
       with
-      | error, None -> error, PairAgentSiteState_map_and_set.Set.empty
+      | error, None -> error, Ckappa_sig.PairAgentSiteState_map_and_set.Set.empty
       | error, Some s -> error, s
     in
     let error', union =
-      PairAgentSiteState_map_and_set.Set.union parameter error contact_map bond_rhs_set
+      Ckappa_sig.PairAgentSiteState_map_and_set.Set.union 
+        parameter error contact_map bond_rhs_set
     in
     let error = Exception.check warn parameter error error' (Some "line 590") Exit in
     let dynamic = set_contact_map_dynamic union dynamic in
     let new_contact_map = get_contact_map_dynamic dynamic in
     let error', map_diff =
-      PairAgentSiteState_map_and_set.Set.diff parameter error new_contact_map contact_map
+      Ckappa_sig.PairAgentSiteState_map_and_set.Set.diff 
+        parameter error new_contact_map contact_map
     in
     let error = Exception.check warn parameter error error' (Some "line 569") Exit in
     (*update the second field*)
     let error, dynamic =
-      PairAgentSiteState_map_and_set.Set.fold
+      Ckappa_sig.PairAgentSiteState_map_and_set.Set.fold
         (fun bond (error, dynamic) ->
           add_bond_in_map_of_bonds static dynamic error bond
 	) map_diff (error, dynamic)
@@ -630,7 +636,7 @@ struct
       map, and raise an event*)
     let dynamic = set_contact_map_dynamic new_contact_map dynamic in
     let event_list =
-      PairAgentSiteState_map_and_set.Set.fold (fun pair event_list ->
+      Ckappa_sig.PairAgentSiteState_map_and_set.Set.fold (fun pair event_list ->
         (Communication.See_a_new_bond pair) :: event_list
       ) map_diff event_list
     in

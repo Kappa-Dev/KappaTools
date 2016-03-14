@@ -14,50 +14,15 @@
 
 let warn parameters mh message exn default = 
      Exception.warn parameters mh (Some "cckappa.sig") message exn (fun () -> default) 
-  
-type position   = Ckappa_sig.position
-type agent_name = Ckappa_sig.c_agent_name 
-type site_name  = Ckappa_sig.c_site_name
-type state_index = Ckappa_sig.c_state
-
-type rule_id = int
-type agent_id = int
-
-let dummy_agent_name = Ckappa_sig.dummy_agent_name
-
-let string_of_agent_name a = Ckappa_sig.string_of_agent_name a
-let int_of_agent_name a = Ckappa_sig.int_of_agent_name a
-let agent_name_of_int a = Ckappa_sig.agent_name_of_int a
-
-module Agent_type_nearly_inf_Imperatif = Ckappa_sig.Agent_type_nearly_inf_Imperatif
-
-module Agent_type_quick_nearly_inf_Imperatif = Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif
-
-module Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif =
-  Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif
-    
-module Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif =
-  Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif
-
-module Agent_id_nearly_inf_Imperatif =
-  (
-    Int_storage.Nearly_inf_Imperatif : Int_storage.Storage 
-   with type key = agent_id
-   and type dimension = int
-  )		  
-
-module Agent_id_quick_nearly_inf_Imperatif =
-  (
-    Int_storage.Quick_key_list (Agent_id_nearly_inf_Imperatif) : Int_storage.Storage 
-   with type key = agent_id
-   and type dimension = int
-  )
+ 
+(****************************************************************************************)
 
 type binding_state = 
 | Free 
-| Lnk_type of agent_name * site_name 
+| Lnk_type of Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name 
 
-type site  = (site_name, site_name) Ckappa_sig.site_type
+type site  = (Ckappa_sig.c_site_name, Ckappa_sig.c_site_name) Ckappa_sig.site_type
+
 type state = (Ckappa_sig.internal_state, binding_state) Ckappa_sig.site_type  
  
 module State = 
@@ -69,7 +34,7 @@ end
 module Dictionary_of_States = 
   (
     Dictionary.Dictionary_of_Ord (State) : Dictionary.Dictionary
-   with type key = state_index
+   with type key = Ckappa_sig.c_state
    and type value = state
   )
 
@@ -82,113 +47,34 @@ type kappa_handler =
       nagents               : int;
       agents_dic            : Ckappa_sig.agent_dic; 
       interface_constraints : Ckappa_sig.agent_specification
-        Agent_type_nearly_inf_Imperatif.t;
+        Ckappa_sig.Agent_type_nearly_inf_Imperatif.t;
       sites                 : Ckappa_sig.site_dic 
-        Agent_type_nearly_inf_Imperatif.t;
+        Ckappa_sig.Agent_type_nearly_inf_Imperatif.t;
       states_dic            : state_dic 
-        Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.t;
-      dual                  : (agent_name * site_name * state_index)
-        Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.t
+        Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.t;
+      dual                  : 
+        (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+        Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.t
   }
 
 type 'a interval = {min:'a; max:'a}
 
 type 'state port = 
   { 
-    site_name     : site_name; 
-    site_position : position;
+    site_name     : Ckappa_sig.c_site_name; 
+    site_position : Ckappa_sig.position;
     site_free     : bool option; 
     site_state    : 'state
   }
 
-module Rule_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = rule_id
-         let compare = compare
-        end))
-
-module Site_map_and_set = 
-  Map_wrapper.Make
-    (SetMap.Make 
-       (struct
-         type t      = site_name
-         let compare = compare
-        end))
-
-module State_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = state_index
-         let compare = compare
-        end))
-
-module AgentSite_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-	 type t = agent_name * site_name
-	 let compare = compare
-	end))
-
-module AgentRule_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = agent_name * rule_id
-         let compare = compare
-        end))
-
-module RuleAgent_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = rule_id * agent_id
-         let compare = compare
-        end))
-
-module AgentsSite_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = agent_id * agent_name * site_name
-         let compare = compare
-        end))
-
-module AgentSiteState_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = agent_name * site_name * state_index
-         let compare = compare
-        end))
-
-module PairAgentSiteState_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = (agent_name * site_name * state_index) *
-           (agent_name * site_name * state_index)
-         let compare = compare
-        end))
-
-module Rule_setmap =
-  SetMap.Make (
-    struct
-      type t = rule_id
-      let compare = compare
-    end)
-
-type 'state interface = 'state port Site_map_and_set.Map.t
+type 'state interface = 'state port Ckappa_sig.Site_map_and_set.Map.t
                                                                            
 type 'interface proper_agent = 
   { 
-    agent_kasim_id  : agent_id; (* should be replaced with the appropriate type *)
-    agent_name      : agent_name;
+    agent_kasim_id  : Ckappa_sig.c_agent_id; (* should be replaced with the appropriate type *)
+    agent_name      : Ckappa_sig.c_agent_name;
     agent_interface : 'interface;
-    agent_position  : position
+    agent_position  : Ckappa_sig.position
   }
 
 let upgrade_interface ag interface  = 
@@ -203,7 +89,7 @@ let map_agent f ag =
   upgrade_interface 
     ag  
     begin 
-      Site_map_and_set.Map.map
+      Ckappa_sig.Site_map_and_set.Map.map
          (fun port ->
            {
              site_free     = port.site_free; 
@@ -217,14 +103,14 @@ let map_agent f ag =
 let upgrade_some_interface ag =
   upgrade_interface ag 
     begin
-      Site_map_and_set.Map.map (fun x -> Some x) ag.agent_interface
+      Ckappa_sig.Site_map_and_set.Map.map (fun x -> Some x) ag.agent_interface
     end 
 
 type site_address =
     {
-      agent_index : agent_id; (* should be replaced with the appropriate type *)
-      site        : site_name;
-      agent_type  : agent_name
+      agent_index : Ckappa_sig.c_agent_id; (* should be replaced with the appropriate type *)
+      site        : Ckappa_sig.c_site_name;
+      agent_type  : Ckappa_sig.c_agent_name
     }
 
 type bond = site_address * site_address 
@@ -252,30 +138,32 @@ module KaSim_Site_map_and_set =
     
 type agent = 
 | Ghost
-| Agent of state_index interval interface proper_agent 
-| Dead_agent of state_index interval interface proper_agent * KaSim_Site_map_and_set.Set.t * ((string, unit) Ckappa_sig.site_type) Site_map_and_set.Map.t  * Ckappa_sig.link Site_map_and_set.Map.t
-   (* agent with a site or state that never occur in the rhs or an initial state, 
-      set of the undefined sites, map of sites with undefined internal states, map of sites with undefined binding states*)																   
-| Unknown_agent of (string*int) (* agent with a type that never occur in rhs or initial states *)
+| Agent of Ckappa_sig.c_state interval interface proper_agent 
+| Dead_agent of Ckappa_sig.c_state interval interface proper_agent * KaSim_Site_map_and_set.Set.t * ((string, unit) Ckappa_sig.site_type) Ckappa_sig.Site_map_and_set.Map.t  * Ckappa_sig.link Ckappa_sig.Site_map_and_set.Map.t
+(* agent with a site or state that never occur in the rhs or an initial
+   state, set of the undefined sites, map of sites with undefined
+   internal states, map of sites with undefined binding states*)
+| Unknown_agent of (string*int) 
+(* agent with a type that never occur in rhs or initial states *)
     
-type agent_sig = state_index list interface proper_agent 
+type agent_sig = Ckappa_sig.c_state list interface proper_agent 
   
-type views = agent Agent_id_quick_nearly_inf_Imperatif.t
+type views = agent Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.t
 
 type diff_views =
-    state_index
-      interval
-      port
-      Site_map_and_set.Map.t
-      proper_agent
-      Agent_id_quick_nearly_inf_Imperatif.t
+  Ckappa_sig.c_state
+    interval
+    port
+    Ckappa_sig.Site_map_and_set.Map.t
+    proper_agent
+    Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.t
 
 type mixture = 
-    { 
-      c_mixture : Ckappa_sig.mixture; 
-      views     : views;
-      bonds     : site_address Site_map_and_set.Map.t Int_storage.Quick_Nearly_inf_Imperatif.t; 
-      plus      : (int * int) list; (* should be replaced with the appropriate type *)
+  { 
+    c_mixture : Ckappa_sig.mixture; 
+    views     : views;
+    bonds     : site_address Ckappa_sig.Site_map_and_set.Map.t Int_storage.Quick_Nearly_inf_Imperatif.t; 
+    plus      : (int * int) list; (* should be replaced with the appropriate type *)
       dot       : (int * int) list  (* should be replaced with the appropriate type *)
     }
       
@@ -289,11 +177,11 @@ type enriched_variable =
       
 type actions =
     {
-      creation   : (agent_id * agent_name) list; (* should be replaced with the appropriate type *)
-      remove     : (agent_id * unit interface proper_agent * int list) list; (* should be replaced with the appropriate type *)
+      creation   : (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name) list; (* should be replaced with the appropriate type *)
+      remove     : (Ckappa_sig.c_agent_id * unit interface proper_agent * Ckappa_sig.c_site_name list) list; (* should be replaced with the appropriate type *)
       release    : bond list;
       bind       : bond list;
-      half_break : (site_address * (state_index interval option)) list 
+      half_break : (site_address * (Ckappa_sig.c_state interval option)) list 
     }
       
 let empty_actions = 
@@ -318,23 +206,23 @@ type rule =
     }
   
 type perturbation =
-  ((((mixture,string) Ast.ast_alg_expr Ast.bool_expr) * position) *
+  ((((mixture,string) Ast.ast_alg_expr Ast.bool_expr) * Ckappa_sig.position) *
      (modif_expr list) *
-       (((mixture,string) Ast.ast_alg_expr Ast.bool_expr*position)  option)) *
-    position
+       (((mixture,string) Ast.ast_alg_expr Ast.bool_expr * Ckappa_sig.position)  option)) *
+    Ckappa_sig.position
 
 and modif_expr =
-  | INTRO    of ((mixture,string) Ast.ast_alg_expr * mixture * position)
-  | DELETE   of ((mixture,string) Ast.ast_alg_expr * mixture * position)
-  | UPDATE   of (string * position * (mixture,string) Ast.ast_alg_expr * position)
+  | INTRO    of ((mixture,string) Ast.ast_alg_expr * mixture * Ckappa_sig.position)
+  | DELETE   of ((mixture,string) Ast.ast_alg_expr * mixture * Ckappa_sig.position)
+  | UPDATE   of (string * Ckappa_sig.position * (mixture,string) Ast.ast_alg_expr * Ckappa_sig.position)
   (*TODO: pause*)
-  | STOP     of position
-  | SNAPSHOT of position (*maybe later of mixture too*)
+  | STOP     of Ckappa_sig.position
+  | SNAPSHOT of Ckappa_sig.position (*maybe later of mixture too*)
 
 type enriched_rule = 
     {
-      e_rule_label             : (string * position) option; 
-      e_rule_label_dot         : (string * position) option;
+      e_rule_label             : (string * Ckappa_sig.position) option; 
+      e_rule_label_dot         : (string * Ckappa_sig.position) option;
       e_rule_initial_direction : Ckappa_sig.direction; 
       e_rule_rule              : Ckappa_sig.mixture Ckappa_sig.rule;
       e_rule_c_rule            : rule
@@ -350,7 +238,7 @@ type enriched_init =
     }
       
 let dummy_init parameters error =
-  let error,views = Agent_id_quick_nearly_inf_Imperatif.create parameters error 0 in 
+  let error,views = Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.create parameters error 0 in 
   let error,bonds = Int_storage.Quick_Nearly_inf_Imperatif.create parameters error 0 in 
   error,
   {
@@ -377,7 +265,7 @@ type compil =
     rules : enriched_rule Int_storage.Nearly_inf_Imperatif.t  ;
     (*rules (possibly named)*)
     observables :
-      (mixture,string) Ast.ast_alg_expr Location.annot Int_storage.Nearly_inf_Imperatif.t;
+      (mixture, string) Ast.ast_alg_expr Location.annot Int_storage.Nearly_inf_Imperatif.t;
     (*list of patterns to plot*)
     init : enriched_init Int_storage.Nearly_inf_Imperatif.t  ;
     (*initial graph declaration*)

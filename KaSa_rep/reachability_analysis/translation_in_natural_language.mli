@@ -1,11 +1,27 @@
+ (**
+  * translation_in_natural_language.ml
+  * openkappa
+  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
+  * 
+  * Creation: 2016
+  * Last modification: 
+  * * 
+  * Signature for prepreprocessing language ckappa 
+  *  
+  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et   
+  * en Automatique.  All rights reserved.  This file is distributed     
+  * under the terms of the GNU Library General Public License *)
+
 type token
-type rename_sites =   (Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.site_name -> Exception.method_handler * Cckappa_sig.site_name) 
+type rename_sites =   (Remanent_parameters_sig.parameters -> Exception.method_handler -> 
+                       Ckappa_sig.c_site_name -> Exception.method_handler * Ckappa_sig.c_site_name) 
        
 val translate: Remanent_parameters_sig.parameters ->
 	       Mvbdu_wrapper.Mvbdu.handler ->
 	       Exception.method_handler ->
 	       rename_sites -> 
-	       Mvbdu_wrapper.Mvbdu.mvbdu -> Exception.method_handler * (Mvbdu_wrapper.Mvbdu.handler * token)
+	       Mvbdu_wrapper.Mvbdu.mvbdu -> Exception.method_handler * 
+  (Mvbdu_wrapper.Mvbdu.handler * token)
 val print: 
   ?beginning_of_sentence:bool ->
   ?prompt_agent_type:bool ->
@@ -15,7 +31,7 @@ val print:
   Cckappa_sig.kappa_handler ->
   Exception.method_handler ->
   string ->
-  Cckappa_sig.agent_name ->
+  Ckappa_sig.c_agent_name ->
   token ->
   Exception.method_handler
 	     

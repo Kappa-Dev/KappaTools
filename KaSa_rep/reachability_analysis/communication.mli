@@ -13,30 +13,31 @@
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
-type rule_id = Cckappa_sig.rule_id
+(*type rule_id = Cckappa_sig.rule_id
 type agent_id = Cckappa_sig.agent_id
 type agent_type = Cckappa_sig.agent_name
 type site_name = Cckappa_sig.site_name
-type state_index = Cckappa_sig.state_index
+type state_index = Cckappa_sig.state_index*)
 
 type event =
 | Dummy (* to avoid compilation warning *)
-| Check_rule of rule_id
-| See_a_new_bond of ((agent_type * site_name * state_index) * 
-                        (agent_type * site_name * state_index))
+| Check_rule of Ckappa_sig.c_rule_id
+| See_a_new_bond of
+    ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) * 
+        (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state))
 
 type step =
   {
-    site_out: site_name;
-    site_in: site_name;
-    agent_type_in: agent_type
+    site_out: Ckappa_sig.c_site_name;
+    site_in: Ckappa_sig.c_site_name;
+    agent_type_in: Ckappa_sig.c_agent_name
   }
 
 type path =
   {
-    agent_id: agent_id;
+    agent_id: Ckappa_sig.c_agent_id;
     relative_address: step list;
-    site: site_name;
+    site: Ckappa_sig.c_site_name;
   }
 
 module type PathMap =
@@ -54,12 +55,12 @@ type precondition
 type 'a fold =
   Remanent_parameters_sig.parameters ->
   Exception.method_handler ->
-  agent_type ->
-  site_name ->
+  Ckappa_sig.c_agent_name ->
+  Ckappa_sig.c_site_name ->
   Exception.method_handler *
     ((Remanent_parameters_sig.parameters ->
-      state_index ->
-      agent_type * site_name * state_index ->
+      Ckappa_sig.c_state ->
+      Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state ->
       Exception.method_handler * 'a ->
       Exception.method_handler * 'a) ->
      Exception.method_handler -> 'a ->
@@ -106,18 +107,18 @@ val refine_information_about_state_of_site:
 
 val get_potential_partner:
   precondition ->
-  (agent_type -> site_name -> state_index -> precondition *
-   (((agent_type * site_name * state_index) Usual_domains.flat_lattice)))
+  (Ckappa_sig.c_agent_name -> Ckappa_sig.c_site_name -> Ckappa_sig.c_state -> precondition *
+   (((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) Usual_domains.flat_lattice)))
 
 val fold_over_potential_partners:
   Remanent_parameters_sig.parameters ->
   Exception.method_handler ->
   precondition ->
-  agent_type ->
-  site_name ->
+  Ckappa_sig.c_agent_name ->
+  Ckappa_sig.c_site_name ->
   (Remanent_parameters_sig.parameters ->
-   state_index ->
-   agent_type * site_name * state_index ->
+   Ckappa_sig.c_state ->
+   Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state ->
    Exception.method_handler * 'a -> Exception.method_handler * 'a) ->
   'a ->
   Exception.method_handler * precondition * 'a Usual_domains.top_or_not
@@ -126,10 +127,10 @@ val overwrite_potential_partners_map:
   Remanent_parameters_sig.parameters ->
   Exception.method_handler ->
   precondition ->
-  (agent_type ->
-   site_name ->
-   state_index ->
-   (agent_type * site_name * state_index) Usual_domains.flat_lattice)
+  (Ckappa_sig.c_agent_name ->
+   Ckappa_sig.c_site_name ->
+   Ckappa_sig.c_state ->
+   (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) Usual_domains.flat_lattice)
   -> prefold ->
   Exception.method_handler * precondition
 

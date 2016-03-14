@@ -13,12 +13,6 @@
     * en Automatique.  All rights reserved.  This file is distributed
     *  under the terms of the GNU Library General Public License *)
 
-open Int_storage
-open Cckappa_sig
-open Printf
-open Ode_fragmentation_type
-open Ode_fragmentation
-
 let warn parameter mh message exn default =
   Exception.warn parameter mh (Some "print ODE fragmentation") message exn
     (fun () -> default)
@@ -29,34 +23,37 @@ let trace = false
 (*Print sites that modified*)
 
 let print_sites_modified_set parameter error handler_kappa result =
-  Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.iter parameter error
+  Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.iter parameter error
     (fun parameter error agent_type site_set ->
       let error, agent_name =
         try
           Handler.string_of_agent parameter error handler_kappa agent_type
         with
-          _ -> warn parameter error (Some "line 38") Exit (string_of_agent_name agent_type)
+          _ -> warn parameter error (Some "line 38") Exit 
+            (Ckappa_sig.string_of_agent_name agent_type)
       in
       let () =
         Loggers.fprintf (Remanent_parameters.get_logger parameter) 
           "agent_type:%i:%s" 
-          (Cckappa_sig.int_of_agent_name agent_type) agent_name
+          (Ckappa_sig.int_of_agent_name agent_type) agent_name
       in
       let () =
 	Loggers.print_newline (Remanent_parameters.get_logger parameter)
       in
       (*convert site of type int to string*)
       let _ =
-        Site_map_and_set.Set.iter (fun site_type ->
+        Ckappa_sig.Site_map_and_set.Set.iter (fun site_type ->
           let error, site_string =
             try
               Handler.string_of_site parameter error handler_kappa agent_type site_type
             with
-              _ -> warn parameter error (Some "line 50") Exit (string_of_int site_type)
+              _ -> warn parameter error (Some "line 50") Exit 
+                (Ckappa_sig.string_of_site_name site_type)
           in
           let () = Loggers.fprintf 
             (Remanent_parameters.get_logger parameter)  "site_type:%i:%s"
-            site_type site_string 
+            (Ckappa_sig.int_of_site_name site_type)
+            site_string 
           in
 	  Loggers.print_newline (Remanent_parameters.get_logger parameter)
         ) site_set
@@ -92,10 +89,10 @@ let print_internal_flow parameter error handler_kappa result =
       let () =
 	Loggers.print_newline (Remanent_parameters.get_logger parameter)
       in
-      Internal_flow_map.Map.iter
+      Ode_fragmentation_type.Internal_flow_map.Map.iter
         (fun agent_type (site_list, modified_set) ->
           let modified_list =
-            Site_map_and_set.Set.elements modified_set
+            Ckappa_sig.Site_map_and_set.Set.elements modified_set
           in
           let cartesian_output =
             cartesian_prod_eq agent_type site_list modified_list
@@ -104,10 +101,10 @@ let print_internal_flow parameter error handler_kappa result =
             List.iter (fun (agent_type, site_type, site_modif) ->
               let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
                 "Flow of information in the ODE semantics:Internal flow\n-agent_type:%i:site_type:%i -> agent_type:%i:site_type_modified:%i"
-                  (int_of_agent_name agent_type)
-                  site_type
-                  (int_of_agent_name agent_type)
-                  site_modif
+                (Ckappa_sig.int_of_agent_name agent_type)
+                (Ckappa_sig.int_of_site_name site_type)
+                (Ckappa_sig.int_of_agent_name agent_type)
+                (Ckappa_sig.int_of_site_name site_modif)
 	      in
 	      Loggers.print_newline (Remanent_parameters.get_logger parameter)
             ) cartesian_output
@@ -120,13 +117,14 @@ let print_internal_flow parameter error handler_kappa result =
 
 let print_result parameter error handler_kappa result =
   let _ =
-    Loggers.fprintf (Remanent_parameters.get_logger parameter) "Flow of information in the ODE semantics:Internal flow\n";
+    Loggers.fprintf (Remanent_parameters.get_logger parameter) 
+      "Flow of information in the ODE semantics:Internal flow\n";
     let error =
       print_internal_flow
         parameter
         error
         handler_kappa
-        result.store_internal_flow
+        result.Ode_fragmentation_type.store_internal_flow
     in
     error
   in

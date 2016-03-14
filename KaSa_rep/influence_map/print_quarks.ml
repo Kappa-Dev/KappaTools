@@ -24,7 +24,7 @@ let string_of_port port = "["^(string_of_int port.Cckappa_sig.site_state.Cckappa
 let print_agent_map parameters error handler map =
   let error =
     (*Quark_type.AgentMap.iter*)
-    Quark_type.Agent_type_quick_nearly_inf_Imperatif.iter
+    Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.iter
       parameters
       error
       (fun parameters error key im ->
@@ -35,7 +35,7 @@ let print_agent_map parameters error handler map =
               let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) 
                 "%sagent_type:%i,rule:%i->" 
                 (Remanent_parameters.get_prefix parameters) 
-                (Cckappa_sig.int_of_agent_name key)
+                (Ckappa_sig.int_of_agent_name key)
                 key'
               in
               let _ = Quark_type.Labels.dump parameters error handler im' in
@@ -48,7 +48,7 @@ let print_agent_map parameters error handler map =
 let print_agent_var_map parameters error handler map =
   let error =
     (*Quark_type.AgentMap.iter*)
-    Quark_type.Agent_type_quick_nearly_inf_Imperatif.iter
+    Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.iter
       parameters
       error
       (fun parameters error key im ->
@@ -59,7 +59,7 @@ let print_agent_var_map parameters error handler map =
               let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters)
                 "%sagent_type:%i,var:%i->" 
                 (Remanent_parameters.get_prefix parameters)
-                (Cckappa_sig.int_of_agent_name key)
+                (Ckappa_sig.int_of_agent_name key)
                 key' 
               in
               let _ = Quark_type.Labels.dump parameters error handler im' in
@@ -137,7 +137,7 @@ let print_site_map parameter error handler map =
                let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter)
                  "%sagent_type:%i,site_type:%i,state:%i,rule:%i->"
                  (Remanent_parameters.get_prefix parameter) 
-                 (Cckappa_sig.int_of_agent_name agent_type)
+                 (Ckappa_sig.int_of_agent_name agent_type)
                  site_type
                  state
                  rule
@@ -160,7 +160,7 @@ let print_site_var_map parameter error handler map =
                let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter)
                  "%sagent_type:%i,site_type:%i,state:%i,var:%i->" 
                  (Remanent_parameters.get_prefix parameter)
-                 (Cckappa_sig.int_of_agent_name agent_type)
+                 (Ckappa_sig.int_of_agent_name agent_type)
                  site_type
                  state
                  rule 
@@ -348,4 +348,3 @@ let dot_of_influence_map parameters error handler compilation (wake_up_map,inhib
     let () = Loggers.print_newline (Remanent_parameters.get_logger parameters_dot) in
     let () = Loggers.close_logger (Remanent_parameters.get_logger  parameters_dot)
     in error
-

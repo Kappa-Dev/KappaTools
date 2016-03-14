@@ -344,11 +344,11 @@ struct
           Handler.string_of_agent parameter error handler_kappa agent_type
         with
           _ -> warn parameter error (Some "line 56") Exit 
-            (Cckappa_sig.string_of_agent_name agent_type)
+            (Ckappa_sig.string_of_agent_name agent_type)
       in
       (*-----------------------------------------------------------------------*)
       let error, site_correspondence =
-        Bdu_static_views.AgentMap.get
+        Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.get
           parameter error agent_type site_correspondence
       in
       let error, site_correspondence =
@@ -399,13 +399,13 @@ struct
     in
     let error, (_, s1) =
       match
-        Bdu_dynamic_views.AgentCV_map_and_set.Map.find_option_without_logs
+        Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
           parameter
           error
           (agent_type, cv_id)
           store_covering_classes_modification_update_full
       with
-      | error, None -> error, ([], Cckappa_sig.Site_map_and_set.Set.empty)
+      | error, None -> error, ([], Ckappa_sig.Site_map_and_set.Set.empty)
       | error, Some (l, s) -> error, (l, s)
     in
   (*-----------------------------------------------------------------------*)
@@ -423,7 +423,7 @@ struct
             with
               _ -> warn
                 parameter error (Some "line 460") Exit 
-                (Cckappa_sig.string_of_agent_name agent_type)
+                (Ckappa_sig.string_of_agent_name agent_type)
 	  in
         (*-----------------------------------------------------------------------*)
         (*dump covering class label*)
@@ -444,7 +444,7 @@ struct
 	  in
         (*-----------------------------------------------------------------------*)
 	  let () =
-            Cckappa_sig.Site_map_and_set.Set.iter (fun rule_id ->
+            Ckappa_sig.Site_map_and_set.Set.iter (fun rule_id ->
               let compiled = get_compil static in
 	      let error, rule_id_string =
 	        try
@@ -469,7 +469,7 @@ struct
   (*-----------------------------------------------------------------------*)
   (*convert into an event list*)
     error,
-    Cckappa_sig.Site_map_and_set.Set.fold
+    Ckappa_sig.Site_map_and_set.Set.fold
       (fun rule_id event_list ->
         (Communication.Check_rule rule_id) :: event_list)
       s1 event_list
@@ -498,12 +498,12 @@ struct
           Handler.string_of_agent parameter error handler_kappa agent_type
         with
           _ -> warn parameter error (Some "line 56") Exit
-            (Cckappa_sig.string_of_agent_name agent_type)
+            (Ckappa_sig.string_of_agent_name agent_type)
       in
     (*-----------------------------------------------------------------------*)
     (*list of sites in a covering class*)
       let error, site_correspondence =
-        match Bdu_static_views.AgentMap.get parameter
+        match Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.get parameter
           error agent_type site_correspondence
         with
         | error, None -> warn parameter error (Some "73") Exit []
@@ -569,7 +569,7 @@ struct
 	   List.fold_left
 	     (fun (error, bool) (site_type, state) ->
                let error, site_type =
-                 match Cckappa_sig.Site_map_and_set.Map.find_option
+                 match Ckappa_sig.Site_map_and_set.Map.find_option
                    parameter error site_type map2
                  with
                  | error, None -> warn parameter error (Some "line 100") Exit (-1)
@@ -629,7 +629,8 @@ struct
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     let store = get_fixpoint_result dynamic in
     let error, bdu_old =
-      match AgentCV_map_and_set.Map.find_option_without_logs parameter error
+      match Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs 
+        parameter error
         (agent_type, cv_id) store
       with
       | error, None -> error, bdu_false
@@ -672,7 +673,7 @@ struct
             bdu_union
         in
         let error, store =
-          AgentCV_map_and_set.Map.add_or_overwrite parameter error
+          Covering_classes_type.AgentCV_map_and_set.Map.add_or_overwrite parameter error
             (agent_type, cv_id) bdu_union store
         in
         let dynamic = set_fixpoint_result store dynamic in
@@ -733,17 +734,17 @@ struct
 	let add site state (error, store) =
 	  let error, site' =
 	    match
-	      Cckappa_sig.Site_map_and_set.Map.find_option
+	      Ckappa_sig.Site_map_and_set.Map.find_option
 		parameter error site map_new_index_forward
 	    with
 	    | error, None -> warn parameter error (Some "398") Exit 0
 	    | error, Some s -> error, s
 	  in
-	  Cckappa_sig.Site_map_and_set.Map.add
+	  Ckappa_sig.Site_map_and_set.Map.add
 	    parameter error site' state store
 	in
 	let error', map_res =
-	  Cckappa_sig.Site_map_and_set.Map.fold_restriction_with_missing_associations
+	  Ckappa_sig.Site_map_and_set.Map.fold_restriction_with_missing_associations
 	    parameter error
 	    (fun site port ->
               add site port.Cckappa_sig.site_state.Cckappa_sig.min)
@@ -752,7 +753,7 @@ struct
 	    (fun site -> add site 0)
 	    set
 	    agent.Cckappa_sig.agent_interface
-	    Cckappa_sig.Site_map_and_set.Map.empty
+	    Ckappa_sig.Site_map_and_set.Map.empty
 	in
 	let error = Exception.check warn parameter error error'
 	  (Some "line 370") Exit
@@ -787,7 +788,7 @@ struct
       get_store_remanent_triple static dynamic error
     in
     let error, (dynamic, event_list) =
-      Cckappa_sig.Agent_id_quick_nearly_inf_Imperatif.fold parameter error
+      Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.fold parameter error
         (fun parameter error agent_id agent (dynamic, event_list) ->
           match agent with
           | Cckappa_sig.Unknown_agent _
@@ -798,7 +799,8 @@ struct
             let agent_type = agent.Cckappa_sig.agent_name in
             (*----------------------------------------------------------------*)
             let error, (dynamic, event_list) =
-              match Bdu_static_views.AgentMap.unsafe_get parameter error agent_type
+              match Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get
+                parameter error agent_type
                 store_remanent_triple
               with
               | error, Some l ->
@@ -806,7 +808,7 @@ struct
                 let error, (dynamic, event_list) =
                   List.fold_left (fun (error, (dynamic, event_list)) (cv_id, map_res) ->
                     let error, pair_list =
-                      Cckappa_sig.Site_map_and_set.Map.fold
+                      Ckappa_sig.Site_map_and_set.Map.fold
 		        (fun site' state (error, current_list) ->
 			  let pair_list = (site', state) :: current_list in
 			  error, pair_list
@@ -898,21 +900,22 @@ struct
     in
     let error, proj_bdu_test_restriction =
       match
-        Bdu_static_views.Rule_setmap.Map.find_option rule_id
+        Ckappa_sig.Rule_setmap.Map.find_option rule_id
           store_proj_bdu_test_restriction
       with
-      | None -> error, Bdu_static_views.AgentsCV_setmap.Map.empty
+      | None -> error, Covering_classes_type.AgentsCV_setmap.Map.empty
       | Some map -> error, map
     in
     try
       let error, dynamic, map =
-        Bdu_static_views.AgentsCV_setmap.Map.fold
+        Covering_classes_type.AgentsCV_setmap.Map.fold
           (fun (agent_id, agent_type, cv_id) bdu_test (error, dynamic, map) ->
             (*---------------------------------------------------------------------*)
             (*for each (agent_id, cv_id) a bdu*)
             let error, bdu_X =
               match
-                AgentCV_map_and_set.Map.find_option_without_logs parameter
+                Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
+                  parameter
                   error (agent_type, cv_id) fixpoint_result
               with
               | error, None -> Printf.fprintf stdout "cv_id %i\n" cv_id; error, bdu_false
@@ -929,11 +932,13 @@ struct
             then raise (False (error, dynamic))
             else
               let error, map =
-                AgentIDCV_map_and_set.Map.add parameter error
+                Covering_classes_type.AgentIDCV_map_and_set.Map.add parameter error
                   (agent_id, cv_id) bdu_inter map
               in
               error, dynamic, map
-          ) proj_bdu_test_restriction (error, dynamic, AgentIDCV_map_and_set.Map.empty)
+          ) proj_bdu_test_restriction 
+          (error, dynamic,
+           Covering_classes_type.AgentIDCV_map_and_set.Map.empty)
       in
       (*---------------------------------------------------------------------*)
       (*get a set of sites in a covering class: later with state list*)
@@ -950,15 +955,15 @@ struct
               begin
                 let agent_id = path.Communication.agent_id in
                 let error, agent_type =
-                  match Common_static.RuleAgent_map_and_set.Map.find_option_without_logs
+                  match Ckappa_sig.RuleAgent_map_and_set.Map.find_option_without_logs
                     parameter error (rule_id, agent_id) store_agent_name
                   with
-                  | error, None -> error, Cckappa_sig.dummy_agent_name
+                  | error, None -> error, Ckappa_sig.dummy_agent_name
                   | error, Some a -> error, a
                 in           
                 let site_name = path.Communication.site in
                 let error, site_correspondence =
-                  match Bdu_static_views.AgentMap.get parameter error
+                  match Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.get parameter error
                     agent_type site_correspondence
                   with
                   | error, None -> warn parameter error (Some "") Exit []
@@ -967,7 +972,7 @@ struct
                 (* compute the list of cv_id documenting site_name *)
                 let store_covering_classes_id = get_covering_classes_id static in
                 let error, cv_list = 
-                  match Bdu_static_views.AgentSite_map_and_set.Map.find_option_without_logs
+                  match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
                     parameter error (agent_type, site_name)
                     store_covering_classes_id
                   with
@@ -991,7 +996,7 @@ struct
                            site_correspondence
                        in
                        let error, new_site_name =
-                         match Cckappa_sig.Site_map_and_set.Map.find_option
+                         match Ckappa_sig.Site_map_and_set.Map.find_option
                            parameter error site_name map2
                          with
                          | error, None -> warn parameter error (Some "") Exit (-1)
@@ -1000,7 +1005,7 @@ struct
                        (* fetch the bdu for the agent type and the cv_id in
                           the current state of the iteration *)
                        let error, bdu_X = 
-                         match AgentCV_map_and_set.Map.find_option_without_logs
+                         match Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
                            parameter error (agent_type, cv_id) fixpoint_result
                          with
                          | error, None -> error, bdu_false
@@ -1153,17 +1158,17 @@ struct
     in
     let error, proj_bdu_test_restriction =
       match
-        Bdu_static_views.Rule_setmap.Map.find_option rule_id
+        Ckappa_sig.Rule_setmap.Map.find_option rule_id
           store_proj_bdu_test_restriction
       with
-      | None -> error, Bdu_static_views.AgentsCV_setmap.Map.empty
+      | None -> error, Covering_classes_type.AgentsCV_setmap.Map.empty
       | Some map -> error, map
     in
     (*-----------------------------------------------------------------------*)
     let error, dynamic, event_list =
       (*-----------------------------------------------------------------------*)
       (*deal with views*)
-      Bdu_static_views.AgentsCV_setmap.Map.fold
+      Covering_classes_type.AgentsCV_setmap.Map.fold
         (fun (agent_id, agent_type, cv_id) _ (error, dynamic, event_list) ->
           let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
           let error, dynamic, bdu_true = get_mvbdu_true static dynamic error in
@@ -1195,21 +1200,21 @@ struct
           (*-----------------------------------------------------------------------*)
           let store_result = get_fixpoint_result dynamic in
           let error, bdu_X =
-            match AgentCV_map_and_set.Map.find_option_without_logs
+            match Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
               parameter error (agent_type, cv_id) store_result
             with
             | error, None -> error, bdu_false
             | error, Some bdu -> error, bdu
           in
           let error, bdu_test =
-            match Bdu_static_views.AgentsCV_setmap.Map.find_option
+            match Covering_classes_type.AgentsCV_setmap.Map.find_option
               (agent_id, agent_type, cv_id) proj_bdu_test_restriction
             with
             | None -> error, bdu_true
             | Some bdu -> error, bdu
           in
 	  let error, dynamic, bdu_update =
-            match Bdu_static_views.AgentsRuleCV_map_and_set.Map.find_option_without_logs
+            match Covering_classes_type.AgentsRuleCV_map_and_set.Map.find_option_without_logs
               parameter error
               (agent_id, agent_type, rule_id, cv_id)
               store_modif_list_restriction_map
@@ -1251,20 +1256,20 @@ struct
       get_store_proj_bdu_creation_restriction static dynamic error
     in
     let error, bdu_creation_map =
-      match Bdu_static_views.Rule_setmap.Map.find_option rule_id
+      match Ckappa_sig.Rule_setmap.Map.find_option rule_id
         store_bdu_creation
       with
-      | None -> error, Bdu_static_views.AgentCV_setmap.Map.empty
+      | None -> error, Covering_classes_type.AgentCV_setmap.Map.empty
       | Some map -> error, map
     in
     (*-----------------------------------------------------------------------*)
     let error, dynamic, event_list =
-      Bdu_static_views.AgentCV_setmap.Map.fold
+      Covering_classes_type.AgentCV_setmap.Map.fold
         (fun (agent_type, cv_id) bdu_creation (error, dynamic, event_list) ->
           let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
           let fixpoint_result = get_fixpoint_result dynamic in
           let error, bdu_X =
-            match AgentCV_map_and_set.Map.find_option_without_logs
+            match Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
               parameter error (agent_type, cv_id) fixpoint_result
             with
             | error, None -> error, bdu_false
@@ -1303,21 +1308,21 @@ struct
       get_store_proj_bdu_potential_restriction static dynamic error
     in
     let error, proj_bdu_potential_restriction =
-      match Bdu_static_views.Rule_setmap.Map.find_option rule_id
+      match Ckappa_sig.Rule_setmap.Map.find_option rule_id
         store_bdu_potential
       with
-      | None -> error, Bdu_static_views.AgentSiteCV_setmap.Map.empty
+      | None -> error, Covering_classes_type.AgentSiteCV_setmap.Map.empty
       | Some map -> error, map
     in
     (*-----------------------------------------------------------------------*)
     let error, dynamic, event_list =
-      Bdu_static_views.AgentSiteCV_setmap.Map.fold
+      Covering_classes_type.AgentSiteCV_setmap.Map.fold
         (fun (agent_type, new_site_id, cv_id)(bdu_test, list)
           (error, dynamic, event_list) ->
             let fixpoint_result = get_fixpoint_result dynamic in
             let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
             let error, bdu_X =
-	      match AgentCV_map_and_set.Map.find_option_without_logs
+	      match Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
                 parameter error (agent_type, cv_id) fixpoint_result
 	      with
 	      | error, None -> error, bdu_false
@@ -1429,7 +1434,7 @@ struct
       (*-----------------------------------------------------------------------*)
       (* get the pairs (r, state) compatible with the second site:half_break *)
       let error, pair_list =
-        match Common_static.AgentSite_map_and_set.Map.find_option_without_logs
+        match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
           parameter error (agent_type, site_type)
           half_break
         with
@@ -1439,7 +1444,7 @@ struct
       (*-----------------------------------------------------------------------*)
       (*get rule_id in remove side effects *)
       let error, rule_list =
-        match Common_static.AgentSite_map_and_set.Map.find_option_without_logs
+        match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
           parameter error (agent_type, site_type)
           remove
         with
@@ -1451,7 +1456,7 @@ struct
          update of (c) for any covering class that documents this second
          site *)
       let error, store_update_half_break =
-        Bdu_dynamic_views.AgentCV_map_and_set.Map.fold
+        Covering_classes_type.AgentCV_map_and_set.Map.fold
           (fun (agent_type, cv_id) (l, rule_id_set) (error, store_result) ->
             let error, new_rule_id_set =
               List.fold_left (fun (error, store) (rule, state) ->
@@ -1460,7 +1465,7 @@ struct
                 then
                   (* A rule may be added several time *)
 		  let error, new_update =
-                    Cckappa_sig.Site_map_and_set.Set.add_when_not_in
+                    Ckappa_sig.Site_map_and_set.Set.add_when_not_in
                       parameter error rule store
                   in
                   error, new_update
@@ -1468,43 +1473,43 @@ struct
               ) (error, rule_id_set) pair_list
             in
             let error, store_result =
-              Bdu_dynamic_views.AgentCV_map_and_set.Map.add_or_overwrite
+              Covering_classes_type.AgentCV_map_and_set.Map.add_or_overwrite
                 parameter error 
                 (agent_type, cv_id)
                 (l, new_rule_id_set)
                 store_result
             in
             error, store_result
-          ) store_update (error, Bdu_dynamic_views.AgentCV_map_and_set.Map.empty)
+          ) store_update (error, Covering_classes_type.AgentCV_map_and_set.Map.empty)
       in
       (*-----------------------------------------------------------------------*)
       (*store result with remove action*)
       let error, store_update_remove =
-        Bdu_dynamic_views.AgentCV_map_and_set.Map.fold
+        Covering_classes_type.AgentCV_map_and_set.Map.fold
           (fun (agent_type, cv_id) (l, rule_id_set) (error, store_result) ->
             let error, new_rule_id_set =
               List.fold_left (fun (error, store) rule ->
                 let error, new_update =
-                  Cckappa_sig.Site_map_and_set.Set.add_when_not_in
+                  Ckappa_sig.Site_map_and_set.Set.add_when_not_in
                     parameter error rule store
                 in
                 error, new_update
               ) (error, rule_id_set) rule_list
             in
             let error, store_result =
-              Bdu_dynamic_views.AgentCV_map_and_set.Map.add_or_overwrite
+              Covering_classes_type.AgentCV_map_and_set.Map.add_or_overwrite
                 parameter error
                 (agent_type, cv_id)
                 (l, new_rule_id_set)
                 store_result
             in
             error, store_result
-          ) store_update (error, Bdu_dynamic_views.AgentCV_map_and_set.Map.empty)
+          ) store_update (error, Covering_classes_type.AgentCV_map_and_set.Map.empty)
       in
       (*-----------------------------------------------------------------------*)
       (*fold2*)
       let error, store_update =
-        Bdu_dynamic_views.AgentCV_map_and_set.Map.fold2
+        Covering_classes_type.AgentCV_map_and_set.Map.fold2
           parameter
           error
           (fun parameter error (agent_type, cv_id) (_, rule_id_set) store_result ->
@@ -1523,7 +1528,7 @@ struct
           )
           (fun parameter error (agent_type, cv_id) (_, s1) (_, s2) store_result ->
             let error', union_set =
-              Cckappa_sig.Site_map_and_set.Set.union parameter error s1 s2
+              Ckappa_sig.Site_map_and_set.Set.union parameter error s1 s2
             in
             let error = Exception.check warn parameter error error' (Some "line 1515")
               Exit
@@ -1545,9 +1550,9 @@ struct
          event of kind Check_rule *)
       let store_update = get_store_update dynamic in
       let event_list =
-        Bdu_dynamic_views.AgentCV_map_and_set.Map.fold
+        Covering_classes_type.AgentCV_map_and_set.Map.fold
           (fun (agent_type, cv_id) (_, rule_id_set) event_list ->
-            Cckappa_sig.Site_map_and_set.Set.fold
+            Ckappa_sig.Site_map_and_set.Set.fold
               (fun rule_id event_list ->
                 (Communication.Check_rule rule_id) :: event_list
               ) rule_id_set event_list
@@ -1653,7 +1658,7 @@ struct
       let () =
         Loggers.fprintf (Remanent_parameters.get_logger parameter)
           "agent_type:%i:%s:cv_id:%i"
-          (Cckappa_sig.int_of_agent_name agent_type)
+          (Ckappa_sig.int_of_agent_name agent_type)
           agent_string cv_id
       in
       let () =
@@ -1673,13 +1678,14 @@ struct
     let error,handler,mvbdu_true =
       Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error
     in
-    AgentCV_map_and_set.Map.fold
+    Covering_classes_type.AgentCV_map_and_set.Map.fold
       (fun (agent_type, cv_id) bdu (error,handler,output) ->
         let error, handler, list =
           decomposition parameter handler error bdu
         in
         let error, site_correspondence =
-          Bdu_static_views.AgentMap.get parameter error agent_type site_correspondence
+          Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.get
+            parameter error agent_type site_correspondence
         in
         let error, site_correspondence =
 	  match site_correspondence with
@@ -1699,7 +1705,7 @@ struct
         in
         let rename_site parameter error site_type =
           let error, site_type =
-            match Cckappa_sig.Site_map_and_set.Map.find_option
+            match Ckappa_sig.Site_map_and_set.Map.find_option
               parameter error site_type map2
             with
             | error, None -> warn parameter error (Some "line 165") Exit (-1)
@@ -1741,7 +1747,8 @@ struct
                   parameter handler error renamed_mvbdu
 	      in
               let error, cv_map_opt =
-	        Bdu_static_views.AgentMap.unsafe_get parameter error agent_type output
+                Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get 
+                  parameter error agent_type output
 	      in
 	      let error,cv_map =
 	        match
@@ -1765,7 +1772,8 @@ struct
 		  cv_map
 	      in
 	      let error,output =
-	        Bdu_static_views.AgentMap.set parameter error agent_type cv_map'
+                Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.set 
+                  parameter error agent_type cv_map'
 		  output
 	      in
 	      error, handler, output
@@ -1774,7 +1782,7 @@ struct
 	  list)
       result
       (let error, agent_map =
-         Bdu_static_views.AgentMap.create parameter error 0
+         Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.create parameter error 0
        in
        (error, handler, agent_map))
 
@@ -1791,7 +1799,7 @@ struct
           decomposition
           ~show_dep_with_dimmension_higher_than:dim_min parameter handler error handler_kappa site_correspondence result
       in
-      Bdu_static_views.AgentMap.fold
+      Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.fold
         parameter
         error
         (fun parameter error agent_type map (handler:Mvbdu_wrapper.Mvbdu.handler) ->
@@ -1800,7 +1808,7 @@ struct
               Handler.string_of_agent parameter error handler_kappa agent_type
             with
               _ -> warn parameter error (Some "line 111") Exit 
-                (Cckappa_sig.string_of_agent_name agent_type)
+                (Ckappa_sig.string_of_agent_name agent_type)
 	  in
 	  let error = Exception.check warn parameter error error' (Some "line 110") Exit in
 	  (*-----------------------------------------------------------------------*)
@@ -1844,14 +1852,14 @@ struct
         output handler
     else
       begin
-        AgentCV_map_and_set.Map.fold
+        Covering_classes_type.AgentCV_map_and_set.Map.fold
 	  (fun (agent_type, cv_id) bdu_update (error,handler) ->
 	    let error', agent_string =
               try
                 Handler.string_of_agent parameter error handler_kappa agent_type
               with
                 _ -> warn parameter error (Some "line 1853") Exit 
-                  (Cckappa_sig.string_of_agent_name agent_type)
+                  (Ckappa_sig.string_of_agent_name agent_type)
 	    in
 	    let error = Exception.check warn parameter error error'
               (Some "line 1857") Exit
@@ -1863,14 +1871,15 @@ struct
 	        let () =
 		  Loggers.fprintf (Remanent_parameters.get_logger parameter)
                     "agent_type:%i:%s:cv_id:%i"
-		    (Cckappa_sig.int_of_agent_name agent_type)
+		    (Ckappa_sig.int_of_agent_name agent_type)
                     agent_string cv_id
 	        in
 	        Loggers.print_newline (Remanent_parameters.get_logger parameter)
 	    in
             (*-----------------------------------------------------------------------*)
 	    let error, site_correspondence =
-              Bdu_static_views.AgentMap.get parameter error agent_type site_correspondence
+              Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.get 
+                parameter error agent_type site_correspondence
 	    in
 	    let error, site_correspondence =
 	      match site_correspondence with
@@ -1919,7 +1928,7 @@ struct
 		  in
 		  let rename_site parameter error site_type =
 		    let error, site_type =
-		      match Cckappa_sig.Site_map_and_set.Map.find_option
+		      match Ckappa_sig.Site_map_and_set.Map.find_option
                         parameter error site_type map2
                       with
 		      | error, None -> warn parameter error (Some "line 165") Exit (-1)

@@ -109,6 +109,17 @@ let union parameter error x y t =
 
 (*let eq_classes_map parameter error a =
 (*  let classes = Cckappa_sig.Site_map_and_set.Map.empty in*)
+=======
+let union x y a =
+  let root_x = findSet x a in
+  let root_y = findSet y a in
+  let _ = a.(root_x) <- root_y in
+  (*let _ = print_string "dump: "; dump a; print_string "\n" in*)
+  a
+              
+let eq_classes_map parameter error a =
+  let classes = Ckappa_sig.Site_map_and_set.Map.empty in
+>>>>>>> remove doublicate module, todo: hidden type site_name
   let size = Array.length a in
   let rec aux k (classes,union_list) =
     if  k < 0 
@@ -118,12 +129,27 @@ let union parameter error x y t =
       (*find the parent of the union*)
       let rep = findSet k a in
       (*check if inside classes has already has this parent*)
+<<<<<<< HEAD
       let error',get_rep =
 (*        Cckappa_sig.Site_map_and_set.Map.find_default parameter error [] rep classes in*)
       let error = Exception.check warn parameter error error' (Some "line 73") Exit in 
       (*store the result inside classes*)
 (*      let error,classes =
 	Cckappa_sig.Site_map_and_set.Map.add_or_overwrite
+=======
+      let error', get_rep =
+        Ckappa_sig.Site_map_and_set.Map.find_default 
+          parameter
+          error
+          [] 
+          rep
+          classes 
+      in
+      let error = Exception.check warn parameter error error' (Some "line 73") Exit in 
+      (*store the result inside classes*)
+      let error,classes =
+	Ckappa_sig.Site_map_and_set.Map.add_or_overwrite
+>>>>>>> remove doublicate module, todo: hidden type site_name
 	  parameter
 	  error 
           rep

@@ -58,11 +58,11 @@ module type Domain =
       (Analyzer_headers.initial_state, Communication.event list) unary
 
     val is_enabled:
-      (Communication.rule_id,
+      (Ckappa_sig.c_rule_id,
        Communication.precondition, Communication.precondition option) binary
 
     val apply_rule:
-      (Communication.rule_id,
+      (Ckappa_sig.c_rule_id,
        Communication.precondition, Communication.precondition * Communication.event list) binary
 
     val apply_event_list:

@@ -49,13 +49,13 @@ module type Composite_domain =
       -> 'b
       -> Exception.method_handler * dynamic_information * 'c
 
-    val next_rule: Communication.rule_id option zeroary
+    val next_rule: Ckappa_sig.c_rule_id option zeroary
 
     val add_initial_state: (Analyzer_headers.initial_state, unit) unary
 
-    val is_enabled: (Communication.rule_id, Communication.precondition option) unary
+    val is_enabled: (Ckappa_sig.c_rule_id, Communication.precondition option) unary
 
-    val apply_rule: (Communication.rule_id, Communication.precondition, unit) binary
+    val apply_rule: (Ckappa_sig.c_rule_id, Communication.precondition, unit) binary
 
     val export: (Analyzer_headers.kasa_state, Analyzer_headers.kasa_state) unary
 
@@ -65,7 +65,6 @@ module type Composite_domain =
     val c_mixture_is_reachable: (Ckappa_sig.mixture, Usual_domains.maybe_bool) unary
     val cc_mixture_is_reachable: (Cckappa_sig.mixture, Usual_domains.maybe_bool) unary
     val lkappa_mixture_is_reachable: (LKappa.rule_mixture, Usual_domains.maybe_bool) unary
-
 
   end
 

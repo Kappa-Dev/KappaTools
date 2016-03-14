@@ -36,8 +36,7 @@ let translate_agent parameter error handler ag =
 let translate_site parameter error handler agent_name site =
   let error, dic =
     Misc_sa.unsome
-      ((*Int_storage.Nearly_inf_Imperatif.get*)
-        Cckappa_sig.Agent_type_nearly_inf_Imperatif.get
+      (Ckappa_sig.Agent_type_nearly_inf_Imperatif.get
           parameter
           error 
           agent_name
@@ -56,8 +55,7 @@ let translate_site parameter error handler agent_name site =
 let translate_state parameter error handler agent site state =
   let error, dic =
     Misc_sa.unsome
-      ((*Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get*)
-        Cckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+      (Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
           parameter 
           error 
           (agent, site) 
@@ -74,8 +72,7 @@ let translate_state parameter error handler agent site state =
   error, a
 
 let dual parameter error handler agent site state =
-  (*Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.unsafe_get*)
-  Cckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.unsafe_get
+  Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.unsafe_get
     parameter 
     error 
     (agent, (site, state))
@@ -94,20 +91,26 @@ let is_internal_site parameter error handler agent site =
   | Ckappa_sig.Binding _ -> error,false
 
 let complementary_interface parameters error handler agent_name interface =
-  let error,dic =
+  let error, dic =
     Misc_sa.unsome
-      ((*Int_storage.Nearly_inf_Imperatif.get*)
-        Cckappa_sig.Agent_type_nearly_inf_Imperatif.get
-         parameters 
-         error 
-         agent_name
-         handler.Cckappa_sig.sites)
+      (
+        Ckappa_sig.Agent_type_nearly_inf_Imperatif.get
+          parameters 
+          error 
+          agent_name
+          handler.Cckappa_sig.sites)
       (fun error -> warn parameters error (Some "line 89") Exit
         (Ckappa_sig.Dictionary_of_sites.init ()))
   in
-  let error,last_entry = Ckappa_sig.Dictionary_of_sites.last_entry parameters error dic in
-  let l = Misc_sa.list_0_n last_entry in
-  error,Misc_sa.list_minus l interface
+  let error, last_entry = 
+    Ckappa_sig.Dictionary_of_sites.last_entry parameters error dic 
+  in
+  let l = Misc_sa.list_0_n (Ckappa_sig.int_of_site_name last_entry) in
+  let l = List.fold_left (fun l i ->
+    (Ckappa_sig.site_name_of_int i) :: l
+  ) [] l
+  in
+  error, Misc_sa.list_minus l interface
 
 let string_of_rule parameters error handler compiled rule_id =
   let rules = compiled.Cckappa_sig.rules in
@@ -157,7 +160,8 @@ let string_of_rule parameters error handler compiled rule_id =
       in
       match var
       with
-      | None  -> warn parameters error (Some "line 12299") Exit ("VAR "^(string_of_int var_id))
+      | None  -> warn parameters error (Some "line 12299") Exit
+        ("VAR "^(string_of_int var_id))
       | Some _ ->
            (*TO DO*)
         error,"ALG"
@@ -172,7 +176,7 @@ let string_of_rule parameters error handler compiled rule_id =
     end
 
 (*mapping agent of type int to string*)
-let string_of_agent parameter error handler_kappa (agent_type:Cckappa_sig.agent_name) =
+let string_of_agent parameter error handler_kappa (agent_type:Ckappa_sig.c_agent_name) =
   let agents_dic = handler_kappa.Cckappa_sig.agents_dic in
   (*get sites dictionary*)
   let error, output =
@@ -193,11 +197,9 @@ let print_site_compact site =
   | Ckappa_sig.Binding a -> a ^ "!"
 
 let string_of_site_aux parameter error handler_kappa agent_name site_int = 
-  (*FIXME: agent_id instead of agent_name*)
   let error, sites_dic =
     match
-      (*Int_storage.Nearly_inf_Imperatif.get*)
-      Cckappa_sig.Agent_type_nearly_inf_Imperatif.get
+      Ckappa_sig.Agent_type_nearly_inf_Imperatif.get
         parameter
         error
         agent_name
@@ -243,7 +245,7 @@ let print_site_contact_map site =
   | Ckappa_sig.Internal a -> a
   | Ckappa_sig.Binding a -> a
 
-let string_of_site_contact_map parameter error handler_kappa agent_name site_int = (*FIXME*)
+let string_of_site_contact_map parameter error handler_kappa agent_name site_int =
   let error, site_type =
     string_of_site_aux parameter error handler_kappa agent_name site_int
   in
@@ -256,7 +258,8 @@ let print_state parameter error handler_kappa state =
   | Ckappa_sig.Internal a -> error, a
   | Ckappa_sig.Binding Cckappa_sig.Free -> error, "free"
   | Ckappa_sig.Binding Cckappa_sig.Lnk_type (a, b) ->
-    error, (Cckappa_sig.string_of_agent_name a) ^ "@" ^ (string_of_int b)
+    error, (Ckappa_sig.string_of_agent_name a) ^ "@" ^
+      (Ckappa_sig.string_of_site_name b)
 
 let print_state_fully_deciphered parameter error handler_kappa state =
   match state with
@@ -267,13 +270,12 @@ let print_state_fully_deciphered parameter error handler_kappa state =
     let error, site = 
       string_of_site_contact_map parameter error handler_kappa agent_name b 
     in 
-    (*FIXME*)
     error, ag ^ "@" ^ site
 
 let string_of_state_gen print_state parameter error handler_kappa agent_name site_name state =
   let error, state_dic =
-    match (*Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get*)
-      Cckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+    match
+      Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
         parameter
         error
         (agent_name, site_name)

@@ -10,7 +10,7 @@ type token =
   | Partition of (int * (int * token list) list)
   | No_known_translation of (int * int) list list
 
-type rename_sites =   (Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.Site_map_and_set.Map.elt -> Exception.method_handler * Cckappa_sig.Site_map_and_set.Map.elt)
+type rename_sites = (Remanent_parameters_sig.parameters -> Exception.method_handler -> Ckappa_sig.Site_map_and_set.Map.elt -> Exception.method_handler * Ckappa_sig.Site_map_and_set.Map.elt)
 
 let non_relational parameter handler error mvbdu =
   let error, handler, list =

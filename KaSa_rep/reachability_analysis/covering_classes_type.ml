@@ -21,13 +21,13 @@ let warn parameters mh message exn default =
 
 let local_trace = false
 
-type 'a map = 'a Site_map_and_set.Map.t
-type set    = Site_map_and_set.Set.t
-
+(*TODO*)
 type covering_classes =
   {
-    store_modified_map     : Cckappa_sig.site_name map Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t;
-    store_covering_classes : Cckappa_sig.site_name list list Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t;
+    store_modified_map : int Ckappa_sig.Site_map_and_set.Map.t 
+    Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t;
+    store_covering_classes : int list list 
+      Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t;
   }
 
 (************************************************************************************)
@@ -37,23 +37,17 @@ type covering_classes =
 (* TYPE REMANENT:
    key(t): int; 'a t = infinite array of list(#id) *)
 
-module Inf_array = Nearly_inf_Imperatif
-
 type cv_id = int
-type agent_id = Cckappa_sig.agent_id
-type agent_name = Cckappa_sig.agent_name
-type rule_id = Cckappa_sig.rule_id
-type site_name = Cckappa_sig.site_name
 
 module Covering_class =
   struct
-    type t = site_name list
+    type t = int list
     let compare = compare
   end
 
 module Modified_class =
   struct
-    type t = site_name list
+    type t = int list
     let compare = compare
   end
   
@@ -62,6 +56,11 @@ module Modified_class =
 module Dictionary_of_Covering_class = Dictionary_of_Ord (Covering_class)
 module Dictionary_of_Modified_class = Dictionary_of_Ord (Modified_class)
 
+(*module Covering_class = Ckappa_sig.Covering_class
+module Modified_class = Ckappa_sig.Modified_class
+module Dictionary_of_Covering_class = Cckappa_sig.Dictionary_of_Covering_class
+module Dictionary_of_Modified_class = Cckappa_sig.Dictionary_of_Modified_class*)
+
 type pair_dic   = (unit, unit) Dictionary_of_Covering_class.dictionary
 type index_dic  = (unit, unit) Dictionary_of_Covering_class.dictionary
 type test_dic   = (unit, unit) Dictionary_of_Covering_class.dictionary
@@ -69,7 +68,8 @@ type modif_dic  = (unit, unit) Dictionary_of_Modified_class.dictionary
 
 type remanent =
     {
-      store_pointer_backward    : set Inf_array.t;
+      store_pointer_backward    : Ckappa_sig.Site_map_and_set.Set.t 
+      Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.t;
       store_dic                 : pair_dic;
       store_new_index_dic       : index_dic;
       store_test_new_index_dic  : test_dic;
@@ -88,7 +88,7 @@ module AgentCV_map_and_set =
   Map_wrapper.Make (
     SetMap.Make (
       struct
-        type t = agent_name * cv_id
+        type t = Ckappa_sig.c_agent_name * cv_id
         let compare = compare
       end))
 
@@ -96,7 +96,7 @@ module AgentIDCV_map_and_set =
   Map_wrapper.Make (
     SetMap.Make (
       struct
-        type t = agent_id * cv_id
+        type t = Ckappa_sig.c_agent_id * cv_id
         let compare = compare
       end))
 
@@ -104,60 +104,60 @@ module AgentsRuleCV_map_and_set =
   Map_wrapper.Make
     (SetMap.Make (
       struct
-        type t = agent_id * agent_name * rule_id * cv_id
+        type t = Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_rule_id * cv_id
         let compare = compare
       end))
 
 module AgentCV_setmap =
   SetMap.Make (
     struct
-      type t = agent_name * cv_id
+      type t = Ckappa_sig.c_agent_name * cv_id
       let compare = compare
     end)
 
 module AgentsCV_setmap =
   SetMap.Make
     (struct 
-      type t = agent_id * agent_name * cv_id
+      type t = Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * cv_id
       let compare = compare
      end)
 
 module AgentSiteCV_setmap =
   SetMap.Make (
     struct
-      type t = agent_name * site_name * cv_id
+      type t = Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * cv_id
       let compare = compare
     end)
 
 module AgentRuleCV_setmap =
   SetMap.Make (
     struct
-      type t = agent_name * rule_id * cv_id
+      type t = Ckappa_sig.c_agent_name * Ckappa_sig.c_rule_id * cv_id
       let compare = compare
     end)
 
 module AgentsRuleCV_setmap =
   (SetMap.Make (
     struct
-      type t = agent_id * agent_name * rule_id * cv_id
+      type t = Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_rule_id * cv_id
       let compare = compare
     end))
 
 module AgentSiteRuleCV_setmap =
   SetMap.Make (
     struct
-      type t = agent_name * site_name * rule_id * cv_id
+      type t = Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_rule_id * cv_id
       let compare = compare
     end)
 
 module Project2bdu_creation =
-  SetMap.Proj2 (AgentRuleCV_setmap)(Rule_setmap)(AgentCV_setmap)
+  SetMap.Proj2 (AgentRuleCV_setmap)(Ckappa_sig.Rule_setmap)(AgentCV_setmap)
 
 module Project2bdu_potential =
-  SetMap.Proj2 (AgentSiteRuleCV_setmap)(Rule_setmap)(AgentSiteCV_setmap)
+  SetMap.Proj2 (AgentSiteRuleCV_setmap)(Ckappa_sig.Rule_setmap)(AgentSiteCV_setmap)
     
 module Project2_bdu_views =
-  SetMap.Proj2 (AgentsRuleCV_setmap)(Rule_setmap)(AgentsCV_setmap)
+  SetMap.Proj2 (AgentsRuleCV_setmap)(Ckappa_sig.Rule_setmap)(AgentsCV_setmap)
 
 module Project2_modif =
-  Map_wrapper.Proj (AgentsSite_map_and_set) (AgentSite_map_and_set)
+  Map_wrapper.Proj (Ckappa_sig.AgentsSite_map_and_set) (Ckappa_sig.AgentSite_map_and_set)

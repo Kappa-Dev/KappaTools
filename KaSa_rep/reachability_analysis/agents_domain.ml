@@ -21,32 +21,14 @@ let local_trace = false
 
 module Domain =
 struct
-
-  module Int2Map_Agent =
-    Map_wrapper.Make
-      (SetMap.Make
-         (struct
-           type t = Cckappa_sig.agent_name
-           let compare = compare
-          end
-         ))
-
-  module Int2Map_Rule =
-    Map_wrapper.Make
-      (SetMap.Make
-         (struct
-           type t = int
-           let compare = compare
-          end
-         ))
           
   type static_information =
     {
       global_static_information : Analyzer_headers.global_static_information;
       domain_static_information :
-        (Cckappa_sig.agent_name list Usual_domains.bot_or_not *
-           Cckappa_sig.agent_name list) Int2Map_Rule.Map.t;
-      agents_without_interface  : int list Int2Map_Agent.Map.t
+        (Ckappa_sig.c_agent_name list Usual_domains.bot_or_not *
+           Ckappa_sig.c_agent_name list) Ckappa_sig.Rule_map_and_set.Map.t;
+      agents_without_interface  : int list Ckappa_sig.Agent_map_and_set.Map.t
     }
 
   (*--------------------------------------------------------------------*)
@@ -147,7 +129,7 @@ struct
 
   let map_to_list parameter error map =
     let error, list =
-      Cckappa_sig.Agent_id_quick_nearly_inf_Imperatif.fold parameter error
+      Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.fold parameter error
         (fun _ error _ a current_list ->
           let list = a :: current_list in
           error, list
@@ -198,7 +180,7 @@ struct
            | Cckappa_sig.Agent agent ->
               let agent_type = agent.Cckappa_sig.agent_name in
 	      let agent_interface = agent.Cckappa_sig.agent_interface in
-              if Cckappa_sig.Site_map_and_set.Map.is_empty agent_interface
+              if Ckappa_sig.Site_map_and_set.Map.is_empty agent_interface
 	      then
 		aux tl (error, agent_type :: output)
 	      else
@@ -212,7 +194,7 @@ struct
 	(fun (error, map) agent_type ->
 	  let error, old_list =
             match
-	      Int2Map_Agent.Map.find_option_without_logs
+	      Ckappa_sig.Agent_map_and_set.Map.find_option_without_logs
 		parameter
 		error
 		agent_type
@@ -222,7 +204,7 @@ struct
             | error, Some l -> error, l
           in
           let rule_id_list = rule_id :: old_list in
-          Int2Map_Agent.Map.add_or_overwrite 
+          Ckappa_sig.Agent_map_and_set.Map.add_or_overwrite 
             parameter
             error
             agent_type
@@ -246,7 +228,7 @@ struct
           in
           (*add rule_id in map*)
           let error, result =
-            Int2Map_Rule.Map.add_or_overwrite (*FIXME*)
+            Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite (*FIXME*)
               parameter 
               error 
               rule_id
@@ -263,7 +245,8 @@ struct
 	      agents_without_interface
           in
           error, (result, agents_without_interface)
-        ) compil.Cckappa_sig.rules (Int2Map_Rule.Map.empty, Int2Map_Agent.Map.empty)
+        ) compil.Cckappa_sig.rules (Ckappa_sig.Rule_map_and_set.Map.empty, 
+                                    Ckappa_sig.Agent_map_and_set.Map.empty)
     in
     let static = set_agents_without_interface agents static in
     let static = set_domain_static_information result static in
@@ -276,8 +259,8 @@ struct
     let init_global_static_information =
       {
         global_static_information = static;
-        domain_static_information = Int2Map_Rule.Map.empty;
-        agents_without_interface  = Int2Map_Agent.Map.empty;
+        domain_static_information = Ckappa_sig.Rule_map_and_set.Map.empty;
+        agents_without_interface  = Ckappa_sig.Agent_map_and_set.Map.empty;
       }
     in
     let kappa_handler = Analyzer_headers.get_kappa_handler static in
@@ -308,20 +291,20 @@ struct
     an agent of this type and with an empty interface occur in the lhs of
     the rule *)
 
-  let add_event_list static dynamic error (agent_type: Cckappa_sig.agent_name) event_list =
+  let add_event_list static dynamic error (agent_type: Ckappa_sig.c_agent_name) event_list =
     let parameter = get_parameter static in
     let map = get_agents_without_interface static in
     let local = get_seen_agent dynamic in
-    let bool = Array.get local (Cckappa_sig.int_of_agent_name agent_type) in
+    let bool = Array.get local (Ckappa_sig.int_of_agent_name agent_type) in
     if not bool
     then
       let local =
-        local.((Cckappa_sig.int_of_agent_name agent_type)) <- true;
+        local.((Ckappa_sig.int_of_agent_name agent_type)) <- true;
         local
       in
       let dynamic = set_seen_agent local dynamic in
       let error, rule_id_list =
-        match Int2Map_Agent.Map.find_option_without_logs
+        match Ckappa_sig.Agent_map_and_set.Map.find_option_without_logs
           parameter 
           error
 	  agent_type
@@ -346,7 +329,7 @@ struct
   let init_agents static dynamic error init_state event_list =
     let parameter = get_parameter static in
     let error, (dynamic, event_list) =
-      Cckappa_sig.Agent_id_quick_nearly_inf_Imperatif.fold parameter error
+      Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.fold parameter error
         (fun parameter error _ agent (dynamic, event_list) ->
           match agent with
 	  (*JF: warn: dead,unknown,ghost should not occur in initial states *)
@@ -395,7 +378,7 @@ struct
     let parameter = get_parameter static in
     let domain_static = get_domain_static_information static in
     let error, (bot_or_not, _) =
-      match Int2Map_Rule.Map.find_option_without_logs parameter error
+      match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error
         rule_id domain_static
       with
       | error, None -> error, (Usual_domains.Not_bot [], [])
@@ -407,7 +390,7 @@ struct
       List.fold_left
 	(fun (error, dynamic, s) agent_type ->
 	  let local = get_seen_agent dynamic in
-	  let bool = Array.get local (Cckappa_sig.int_of_agent_name agent_type) in
+	  let bool = Array.get local (Ckappa_sig.int_of_agent_name agent_type) in
 	  if bool
 	  then
 	    error, dynamic, s
@@ -430,7 +413,7 @@ struct
     let event_list = [] in
     let domain_static = get_domain_static_information static in
     let error, list_created =
-      match Int2Map_Rule.Map.find_option_without_logs
+      match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
         parameter
         error
         rule_id 
@@ -503,7 +486,7 @@ struct
 	      let error', agent_string =
                 try
                   Handler.string_of_agent parameter error handler
-                    (Cckappa_sig.agent_name_of_int k)
+                    (Ckappa_sig.agent_name_of_int k)
                 with
                   _ -> warn parameter error (Some "line 238") Exit (string_of_int k)
 	      in

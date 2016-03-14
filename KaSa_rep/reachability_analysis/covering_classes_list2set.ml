@@ -14,14 +14,10 @@
 
 (*convert a list of covering class, new_index of covering class into a set*)
 
-open Covering_classes_type
-open Cckappa_sig
-open Site_map_and_set
-
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Covering classes") message exn
-                 (fun () -> default)                
-
+    (fun () -> default)                
+    
 let trace = false
 
 (************************************************************************************)
@@ -41,14 +37,39 @@ let new_index_pair_map parameter error l =
     match acc with
     | [] -> error, (map1, map2)
     | h :: tl ->
-      let error,map1 = Map.add parameter error h k map1 in
-      let error,map2 = Map.add parameter error k h map2 in
-      aux tl (k+1) map1 map2 error 
+      let error, map1 = 
+        Ckappa_sig.Site_map_and_set.Map.add 
+          parameter
+          error
+          h 
+          k
+          map1 
+      in
+      let error, map2 =
+        Ckappa_sig.Site_map_and_set.Map.add
+          parameter
+          error
+          k 
+          h
+          map2 
+      in
+      aux
+        tl
+        (k + 1)
+        map1
+        map2
+        error 
   in
-  let error',(map1,map2) = aux l 1 Map.empty Map.empty error in
+  let error', (map1, map2) = 
+    aux 
+      l
+      1
+      Ckappa_sig.Site_map_and_set.Map.empty 
+      Ckappa_sig.Site_map_and_set.Map.empty 
+      error
+  in
   let error = Exception.check warn parameter error error' (Some "line 49") Exit in
-  error,(map1,map2)
- 
+  error, (map1, map2)
 
 (************************************************************************************)
 (*convert a list to a set*)
@@ -58,29 +79,33 @@ let list2set parameter error list =
     List.fold_left
       (fun (error, current_set) elt ->
        let error, add_set =
-	 Set.add parameter error elt current_set
+	 Ckappa_sig.Site_map_and_set.Set.add 
+           parameter
+           error
+           elt 
+           current_set
        in
        error, add_set
-      ) (error, Set.empty) list
+      ) (error, Ckappa_sig.Site_map_and_set.Set.empty) list
   in
   let error = Exception.check warn parameter error error' (Some "line 66") Exit in
-  error,list 
+  error, list 
 
 (************************************************************************************)
 
 let collect_remanent_list2set parameter error handler_kappa store_remanent  =
-  let error, init = Agent_type_quick_nearly_inf_Imperatif.create parameter error 0 in
-  Agent_type_quick_nearly_inf_Imperatif.fold parameter error 
+  let error, init = 
+    Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.create parameter error 0 
+  in
+  Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.fold parameter error 
     (fun paramter error agent_type remanent store_result ->
      (*-------------------------------------------------------------------------*)
      (*get covering classes dictionary*)
-     let store_dic = remanent.store_dic in
+     let store_dic = remanent.Covering_classes_type.store_dic in
      let error, (id_list, site_set_list) =
-       Dictionary_of_Covering_class.fold
+       Covering_classes_type.Dictionary_of_Covering_class.fold
 	 (fun list _ index (error, (index_list, current_list)) ->
-	  let error, list2set =
-	    list2set parameter error list
-	  in
+	  let error, list2set = list2set parameter error list in
 	  let list_set = list2set :: current_list in
 	  let list_index = index :: index_list in
 	  error, (List.rev list_index, List.rev list_set)
@@ -90,10 +115,13 @@ let collect_remanent_list2set parameter error handler_kappa store_remanent  =
       (*store a mapping function from a list of covering class into a list
         of new index and a pair of map*)
      let error, (id_list_map, list_of_map) =
-       Dictionary_of_Covering_class.fold
+       Covering_classes_type.Dictionary_of_Covering_class.fold
          (fun list _ index (error, (index_list, current_list)) ->
            let error, store_map =
-             new_index_pair_map parameter error list
+             new_index_pair_map
+               parameter
+               error 
+               list
            in
            let new_list = store_map :: current_list in
            let index_list = index :: index_list in
@@ -116,18 +144,18 @@ let collect_remanent_list2set parameter error handler_kappa store_remanent  =
                Handler.string_of_agent parameter error handler_kappa agent_type
              with
                _ -> warn parameter error (Some "line 118") Exit 
-                 (Cckappa_sig.string_of_agent_name agent_type)
+                 (Ckappa_sig.string_of_agent_name agent_type)
            in
            List.iter (fun id ->
              List.iter (fun site_set ->
                let _ =
                  Printf.fprintf stdout 
                    "Potential dependencies between sites:\nagent_type:%i:%s:covering_class_id:%i\n" 
-                   (Cckappa_sig.int_of_agent_name agent_type)
+                   (Ckappa_sig.int_of_agent_name agent_type)
                    agent_string
                    id
                in
-               Site_map_and_set.Set.iter (fun site_type ->
+               Ckappa_sig.Site_map_and_set.Set.iter (fun site_type ->
                  let error, site_string =
                    try
                      Handler.string_of_site parameter error handler_kappa 
@@ -158,19 +186,19 @@ let collect_remanent_list2set parameter error handler_kappa store_remanent  =
                   agent_type
               with
                 _ -> warn parameter error (Some "line 155") Exit 
-                  ((Cckappa_sig.string_of_agent_name agent_type))
+                  ((Ckappa_sig.string_of_agent_name agent_type))
             in
             List.iter (fun id ->
               let _ =
                 Printf.fprintf stdout
                   "Mapping between global identifier of sites (per agent) and local identifier of sites (per covering classes):\nagent_type:%i:%s:covering_class_id:%i\n" 
-                  (Cckappa_sig.int_of_agent_name agent_type)
+                  (Ckappa_sig.int_of_agent_name agent_type)
                   agent_string
                   id
               in
               List.iter (fun (map1, map2) ->
                 let _ =
-                  Site_map_and_set.Map.iter
+                  Ckappa_sig.Site_map_and_set.Map.iter
                     (fun site site_new ->
                       let error, site_string =
                         try
@@ -185,7 +213,7 @@ let collect_remanent_list2set parameter error handler_kappa store_remanent  =
                         site site_string site_new site_string
                     ) map1
                 in
-                Site_map_and_set.Map.iter
+                Ckappa_sig.Site_map_and_set.Map.iter
                   (fun site_new site ->
                     let error, site_string =
                       try
@@ -205,7 +233,7 @@ let collect_remanent_list2set parameter error handler_kappa store_remanent  =
      (*-------------------------------------------------------------------------*)
      (*store*)
      let error, store_result =
-       Agent_type_quick_nearly_inf_Imperatif.set
+       Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.set
          parameter
          error
          agent_type

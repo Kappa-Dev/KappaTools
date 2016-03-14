@@ -14,20 +14,35 @@
 
 module Int_Set_and_Map : Map_wrapper.S_with_logs with type elt = int
 
+(****************************************************************************************)
+
 type position       = Location.t
 type agent_name     = string
 type site_name      = string 
 type internal_state = string 
+
+(****************************************************************************************)
     
-type c_agent_name (*FIXME*)
-type c_site_name  = int 
-type c_state      = int
+type c_agent_name
+type c_site_name = int (*TODO*)
+type c_state = int
+type c_agent_id = int
+type c_rule_id = int
+
+(****************************************************************************************)
+
+val dummy_agent_name : c_agent_name
+val dummy_site_name : c_site_name
 
 val string_of_agent_name : c_agent_name -> string
 val int_of_agent_name : c_agent_name -> int
 val agent_name_of_int : int -> c_agent_name
 
-val dummy_agent_name : c_agent_name
+val site_name_of_int : int -> c_site_name
+val int_of_site_name : c_site_name -> int
+val string_of_site_name : c_site_name -> string
+
+(****************************************************************************************)
 
 module Agent_type_nearly_inf_Imperatif: Int_storage.Storage
   with type key = c_agent_name
@@ -46,15 +61,73 @@ module Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_
   with type key = c_agent_name * (c_site_name * c_state)
   and type dimension = int * (int * int)
 
-module Site_nearly_Inf_Int_storage_Imperatif:
-  Int_storage.Storage
+module Site_type_nearly_Inf_Int_storage_Imperatif: Int_storage.Storage
   with type key = c_site_name
   and type dimension = int
 
 module Site_union_find: Union_find.Union_find
-  with type t = c_site_name Site_nearly_Inf_Int_storage_Imperatif.t   
+  with type t = c_site_name Site_type_nearly_Inf_Int_storage_Imperatif.t   
   and type dimension = int
   and type key = c_site_name
+
+(****************************************************************************************)
+
+module Agent_id_nearly_inf_Imperatif : Int_storage.Storage
+  with type key = c_agent_id
+  and type dimension = int
+         
+module Agent_id_quick_nearly_inf_Imperatif: Int_storage.Storage
+  with type key = c_agent_id 
+  and type dimension = int
+
+(****************************************************************************************)
+
+module Agent_map_and_set: Map_wrapper.S_with_logs
+  with type elt = c_agent_name
+
+module Rule_map_and_set: Map_wrapper.S_with_logs
+  with type elt = c_rule_id
+
+module State_map_and_set: Map_wrapper.S_with_logs
+  with type elt = c_state
+
+module AgentRule_map_and_set: Map_wrapper.S_with_logs
+  with type elt = c_agent_name * c_rule_id
+
+module RuleAgent_map_and_set: Map_wrapper.S_with_logs 
+  with type elt = c_rule_id * c_agent_id
+
+module AgentSiteState_map_and_set: Map_wrapper.S_with_logs 
+  with type elt = c_agent_name * c_site_name * c_state
+
+module PairAgentSiteState_map_and_set: Map_wrapper.S_with_logs
+  with type elt = 
+  (c_agent_name * c_site_name * c_state) * (c_agent_name * c_site_name * c_state)
+
+module Rule_setmap: SetMap.S with type elt = c_rule_id
+
+(****************************************************************************************)
+
+module Site_map_and_set: Map_wrapper.S_with_logs 
+  with type elt = c_site_name
+
+module AgentSite_map_and_set: Map_wrapper.S_with_logs 
+  with type elt = c_agent_name * c_site_name
+
+module AgentsSite_map_and_set: Map_wrapper.S_with_logs 
+  with type elt = c_agent_id * c_agent_name * c_site_name
+
+(*module Dictionary_of_Covering_class : 
+  Dictionary.Dictionary 
+  with type key = c_site_name
+  and type value = int list
+
+module Dictionary_of_Modified_class : Dictionary.Dictionary 
+  with type key = c_site_name
+  and type value = int list
+*)
+
+(****************************************************************************************)
 
 type binding_state = 
   | Free 

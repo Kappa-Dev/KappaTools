@@ -42,18 +42,18 @@ let check parameters error handler mixture1 mixture2 (i,j) =
   | (h1,h2)::t ->
      begin
        (* check agent type *)
-       let error,view1 = Cckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get parameters error h1 mixture1.Cckappa_sig.views in
-       let error,view2 = Cckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get parameters error h2 mixture2.Cckappa_sig.views in
+       let error,view1 = Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get parameters error h1 mixture1.Cckappa_sig.views in
+       let error,view2 = Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get parameters error h2 mixture2.Cckappa_sig.views in
        let error,bonds1 = Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get parameters error h1 mixture1.Cckappa_sig.bonds in 
        let error,bonds2 = Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get parameters error h2 mixture2.Cckappa_sig.bonds in
        check_interface error view1 view2 bonds1 bonds2 t already_done 
      end
   and deal_with error iter2 ag1 ag2 bonds1 bonds2 (to_do,already_done) =
     let bonds1 =
-      match bonds1 with Some bonds1 -> bonds1 | None -> Cckappa_sig.Site_map_and_set.Map.empty
+      match bonds1 with Some bonds1 -> bonds1 | None -> Ckappa_sig.Site_map_and_set.Map.empty
     in 
     let bonds2 =
-      match bonds2 with Some bonds2 -> bonds2 | None -> Cckappa_sig.Site_map_and_set.Map.empty
+      match bonds2 with Some bonds2 -> bonds2 | None -> Ckappa_sig.Site_map_and_set.Map.empty
     in 
     let error,bool = 
       try
@@ -77,26 +77,26 @@ let check parameters error handler mixture1 mixture2 (i,j) =
       try
 	let error,(to_do,already_done)
 	  =
-	  Cckappa_sig.Site_map_and_set.Map.fold2_sparse parameters error 
-							(fun _ error _ port1 port2 (to_do,already_done) ->
-							 if port1.Cckappa_sig.site = port2.Cckappa_sig.site
-							 then
-							   match
-							     add
-							       (port1.Cckappa_sig.agent_index,
-								port2.Cckappa_sig.agent_index)
-							       error
-							       to_do
-							       already_done
-							   with
-							   | error,None -> raise (False error)
-							   | error,Some (todo,inj1,inj2) -> (error,(todo,(inj1,inj2)))
-							 else
-							   raise (False error) 
-							)
-							bonds1
-							bonds2
-							(to_do,already_done)
+	  Ckappa_sig.Site_map_and_set.Map.fold2_sparse parameters error 
+	    (fun _ error _ port1 port2 (to_do,already_done) ->
+	      if port1.Cckappa_sig.site = port2.Cckappa_sig.site
+	      then
+		match
+		  add
+		    (port1.Cckappa_sig.agent_index,
+		     port2.Cckappa_sig.agent_index)
+		    error
+		    to_do
+		    already_done
+		with
+		| error,None -> raise (False error)
+		| error,Some (todo,inj1,inj2) -> (error,(todo,(inj1,inj2)))
+	      else
+		raise (False error) 
+	    )
+	    bonds1
+	    bonds2
+	    (to_do,already_done)
 	in error,(true,(to_do,already_done))
       with
 	False error -> error,(false,(to_do,already_done))
@@ -120,20 +120,23 @@ let check parameters error handler mixture1 mixture2 (i,j) =
 	      begin
 		match ag2 with
 		| Cckappa_sig.Unknown_agent _ -> raise (False error)
-		| Cckappa_sig.Ghost -> warn parameters error (Some "Should not scan ghost agents...") Exit (true,(to_do,already_done))
+		| Cckappa_sig.Ghost -> warn parameters error 
+                  (Some "Should not scan ghost agents...") Exit (true,(to_do,already_done))
 		| Cckappa_sig.Dead_agent (ag2,s2,l21,l22) ->
 		   begin
 		     let error,(bool,(to_do,already_done)) =
 		       deal_with error
 				 (fun parameter error ->
-				  Cckappa_sig.Site_map_and_set.Map.iter2
+				  Ckappa_sig.Site_map_and_set.Map.iter2
 				    parameter error 
 				    (fun parameter error site _ ->
-				     if Cckappa_sig.Site_map_and_set.Map.mem site l22 || Cckappa_sig.Site_map_and_set.Map.mem site l21
+				     if Ckappa_sig.Site_map_and_set.Map.mem site l22 ||
+                                       Ckappa_sig.Site_map_and_set.Map.mem site l21
 				     then raise (False error)
 				     else error)
 				    (fun parameter error site _  ->
-				     if Cckappa_sig.Site_map_and_set.Map.mem site l12 || Cckappa_sig.Site_map_and_set.Map.mem site l22
+				     if Ckappa_sig.Site_map_and_set.Map.mem site l12 ||
+                                       Ckappa_sig.Site_map_and_set.Map.mem site l22
 				     then raise (False error)
 				     else error))
 				 ag1
@@ -147,11 +150,12 @@ let check parameters error handler mixture1 mixture2 (i,j) =
 		| Cckappa_sig.Agent ag2 ->
 		    deal_with error
 				 (fun parameter error ->
-				  Cckappa_sig.Site_map_and_set.Map.iter2
+				  Ckappa_sig.Site_map_and_set.Map.iter2
 				    parameter error 
 				    (fun _ error _ _ -> error)
 				     (fun parameter error site _  ->
-				     if Cckappa_sig.Site_map_and_set.Map.mem site l11 || Cckappa_sig.Site_map_and_set.Map.mem site l12
+				       if Ckappa_sig.Site_map_and_set.Map.mem site l11 ||
+                                         Ckappa_sig.Site_map_and_set.Map.mem site l12
 				     then raise (False error)
 				     else error))
 				 ag1
@@ -171,10 +175,11 @@ let check parameters error handler mixture1 mixture2 (i,j) =
 		     begin
 		        deal_with error
 				 (fun parameter error ->
-				  Cckappa_sig.Site_map_and_set.Map.iter2
+				  Ckappa_sig.Site_map_and_set.Map.iter2
 				    parameter error 
 				    (fun parameter error site _ ->
-				     if Cckappa_sig.Site_map_and_set.Map.mem site l22 || Cckappa_sig.Site_map_and_set.Map.mem site l21
+				     if Ckappa_sig.Site_map_and_set.Map.mem site l22 || 
+                                       Ckappa_sig.Site_map_and_set.Map.mem site l21
 				     then raise (False error)
 				     else error)
 				    (fun _ error _ _  -> error))
@@ -185,8 +190,8 @@ let check parameters error handler mixture1 mixture2 (i,j) =
 				    (to_do,already_done)
 				  end
 		   end
-		| Cckappa_sig.Agent ag2 -> deal_with error Cckappa_sig.Site_map_and_set.Map.iter2_sparse ag1 ag2 bonds1 bonds2 (to_do,already_done)
-						     (*
+		| Cckappa_sig.Agent ag2 -> deal_with error Ckappa_sig.Site_map_and_set.Map.iter2_sparse ag1 ag2 bonds1 bonds2 (to_do,already_done)
+	       (*
 	     	   begin
 		     let bonds1 =
 		       match bonds1 with Some bonds1 -> bonds1 | None -> Cckappa_sig.Site_map_and_set.Map.empty
@@ -338,8 +343,7 @@ let filter_influence parameters error handler compilation map bool =
 	 then  error,map'
 	 else error,Quark_type.Int2SetMap.Map.add (a,b) couple' map'
      end
-	 with Pass error -> (error,map')
-	)
-	map 
-	(error,Quark_type.Int2SetMap.Map.empty)
-	
+     with Pass error -> (error,map')
+    )
+    map 
+    (error,Quark_type.Int2SetMap.Map.empty)

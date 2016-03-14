@@ -25,20 +25,33 @@ module Int_Set_and_Map =
 
 let local_trace = true 
 
+(****************************************************************************************)
+
 type position       = Location.t
 type agent_name     = string
 type site_name      = string 
 type internal_state = string 
 
 type c_agent_name = int
+type c_agent_id   = int
 type c_site_name  = int
 type c_state      = int
+type c_rule_id    = int
 
-let string_of_agent_name (a:c_agent_name) : string = string_of_int a
+(****************************************************************************************)
+
+let dummy_agent_name = 0
+let dummy_site_name = 0
+
+let string_of_agent_name (a: c_agent_name) : string = string_of_int a
 let int_of_agent_name (a: c_agent_name) : int = a
 let agent_name_of_int (a: int) : c_agent_name = a
 
-let dummy_agent_name = 0 (*TODO:dummy_agent_name*)
+let site_name_of_int (a: int) : c_site_name = a
+let int_of_site_name (a : c_site_name) : int = a
+let string_of_site_name (a: c_site_name) : string = string_of_int a
+
+(****************************************************************************************)
 
 module Agent_type_nearly_inf_Imperatif =
   (
@@ -68,7 +81,7 @@ module Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_
    and type dimension = (int * (int * int))
   )
 
-module Site_nearly_Inf_Int_storage_Imperatif =
+module Site_type_nearly_Inf_Int_storage_Imperatif =
   (
     Int_storage.Nearly_inf_Imperatif: Int_storage.Storage
    with type key = c_site_name
@@ -84,8 +97,147 @@ module C_site_map_and_set = SetMap.Make
 module C_site_map_and_set_with_logs = 
   Map_wrapper.Make(C_site_map_and_set)
 
-module Site_union_find =
-  Union_find.Make(Site_nearly_Inf_Int_storage_Imperatif)(*(C_site_map_and_set_with_logs.Map)*)
+module Site_union_find = 
+  Union_find.Make(Site_type_nearly_Inf_Int_storage_Imperatif)(*(C_site_map_and_set_with_logs.Map)*)
+
+(****************************************************************************************)
+
+module Agent_id_nearly_inf_Imperatif =
+  (
+    Int_storage.Nearly_inf_Imperatif : Int_storage.Storage 
+   with type key = c_agent_id
+   and type dimension = int
+  )		  
+
+module Agent_id_quick_nearly_inf_Imperatif =
+  (
+    Int_storage.Quick_key_list (Agent_id_nearly_inf_Imperatif) : Int_storage.Storage 
+   with type key = c_agent_id
+   and type dimension = int
+  )
+
+(****************************************************************************************)
+
+module Agent_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_agent_name
+         let compare = compare
+        end
+       ))
+
+module Rule_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_rule_id
+         let compare = compare
+        end))
+
+module State_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_state
+         let compare = compare
+        end))
+
+module AgentRule_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_agent_name * c_rule_id
+         let compare = compare
+        end))
+
+module RuleAgent_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_rule_id * c_agent_id
+         let compare = compare
+        end))
+
+module AgentSiteState_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_agent_name * c_site_name * c_state
+         let compare = compare
+        end))
+
+module PairAgentSiteState_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = (c_agent_name * c_site_name * c_state) *
+           (c_agent_name * c_site_name * c_state)
+         let compare = compare
+        end))
+
+module Rule_setmap =
+  SetMap.Make (
+    struct
+      type t = c_rule_id
+      let compare = compare
+    end)
+
+(****************************************************************************************)
+
+module Site_map_and_set = 
+  Map_wrapper.Make
+    (SetMap.Make 
+       (struct
+         type t      = c_site_name
+         let compare = compare
+        end))
+
+module AgentSite_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+	 type t = c_agent_name * c_site_name
+	 let compare = compare
+	end))
+
+module AgentsSite_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_agent_id * c_agent_name * c_site_name
+         let compare = compare
+        end))
+
+(****************************************************************************************)
+
+(*module Covering_class =
+  struct
+    type t = c_site_name list
+    let compare = compare
+  end
+
+module Modified_class =
+  struct
+    type t = c_site_name list
+    let compare = compare
+  end
+
+module Dictionary_of_Covering_class =
+  (
+    Dictionary.Dictionary_of_Ord (Covering_class) : Dictionary.Dictionary
+   with type key = c_site_name
+   and type value = int list
+  )
+
+module Dictionary_of_Modified_class = 
+  (
+    Dictionary.Dictionary_of_Ord (Modified_class) : Dictionary.Dictionary
+   with type key = c_site_name
+   and type value = int list
+  )*)
+
+(****************************************************************************************)
 
 type binding_state = 
   | Free 
@@ -187,16 +339,12 @@ struct
   let compare = compare
 end
 
-(*module Dictionary_of_agents = Dictionary.Dictionary_of_Ord(Kasim_agent_name)*)
-
 module Dictionary_of_agents =
   (
     Dictionary.Dictionary_of_Ord (Kasim_agent_name): Dictionary.Dictionary
    with type key = c_agent_name
    and type value = agent_name
   )
-
-(*module Dictionary_of_sites  = Dictionary.Dictionary_of_Ord(Site) *)
 
 module Dictionary_of_sites =
   (
