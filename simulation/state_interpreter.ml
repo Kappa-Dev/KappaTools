@@ -184,10 +184,12 @@ let one_rule dt stop env domain counter graph state =
 	  (Fluxmap.incr_flux_flux
 	     rule.Primitives.syntactic_rule syntax_rd_id
 	     (if relative
-	      then match classify_float old_act with
-		   | FP_zero -> 0.
-		   | (FP_normal | FP_subnormal |FP_infinite | FP_nan) ->
-		      (new_act -. old_act) /. old_act
+	      then
+		let old_act' =
+		  match classify_float old_act with
+		  | FP_zero -> min_float
+		  | (FP_normal | FP_subnormal |FP_infinite | FP_nan) -> old_act
+		in (new_act -. old_act') /. old_act'
 	      else (new_act -. old_act)))
 	  l
     in Random_tree.add rd_id new_act state.activities in
