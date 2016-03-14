@@ -2,7 +2,7 @@
    * int_storage.ml
    *
    * Creation:                      <2010-07-27 feret>
-   * Last modification: Time-stamp: <2016-03-14 10:15:17 feret>
+   * Last modification: Time-stamp: <2016-03-14 16:00:36 feret>
    *
    * openkappa
    * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
@@ -15,15 +15,12 @@
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
- let create_diag_gen create set  parameters error size =
-	let rec aux k (error,t) =
-	  if k = size
-	  then
-	    (error, t)
-	  else
-	    aux (k+1) (set parameters error k k t)
-	in
-	aux 0 (create parameters error size)
+let create_diag_gen keys create set  parameters error size =
+  let error, t = create parameters error size in
+  List.fold_left
+    (fun (error,t) key ->
+      set parameters error key key t)
+    (create parameters error size) (keys size)
 
 module type Storage =
 sig
@@ -31,6 +28,7 @@ sig
   type key
   type dimension
 
+  val keys: dimension -> key list
   val create: Remanent_parameters_sig.parameters -> Exception.method_handler -> dimension -> Exception.method_handler * 'a t
   val init: Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a t -> dimension -> Exception.method_handler * 'a t
   val create_diag: Remanent_parameters_sig.parameters -> Exception.method_handler -> dimension -> Exception.method_handler * key t
@@ -64,6 +62,12 @@ module Int_storage_imperatif =
         }
 
     let dimension error a = error, a.size
+    let keys n =
+      let rec aux k output =
+	if k<0 then output
+	else aux (k-1) (k::output)
+      in aux (n-1) []
+
 
     let imperatif = true
     let ordered _ = true
@@ -118,7 +122,7 @@ module Int_storage_imperatif =
           | a -> error,a
 
     let create_diag parameters error size =
-      create_diag_gen create set parameters error size
+      create_diag_gen keys create set parameters error size
 
     let unsafe_get parameters error key array =
       if key>array.size || key<0 then
@@ -310,6 +314,7 @@ module Nearly_infinite_arrays =
       type 'a t = 'a Basic.t
 
       let create = Basic.create
+      let keys = Basic.keys 
       let dimension = Basic.dimension
       let key_list = Basic.key_list
 
@@ -340,7 +345,7 @@ module Nearly_infinite_arrays =
           Basic.set parameters error key value array
 
       let create_diag parameters error size =
-	create_diag_gen create set parameters error size
+	create_diag_gen keys create set parameters error size
 
       let print = Basic.print
       let print_var_f = Basic.print_var_f
@@ -366,6 +371,16 @@ module Extend =
               matrix : 'a Underlying.t Extension.t ;
               dimension : dimension;
             }
+
+	let keys (a,b) =
+	  let ext = Extension.keys a in
+	  let under = Underlying.keys b in
+	  List.fold_left
+	    (fun sol a ->
+	      List.fold_left
+	       (fun sol b -> (a,b)::sol)
+		sol under)
+	    [] ext
 
         let create parameters error dimension =
           let error,matrix = Extension.create parameters error (fst dimension) in
@@ -408,8 +423,7 @@ module Extend =
           error,{array with matrix = new_matrix}
 
 	let create_diag parameters error size =
-	  let error, t = create parameters error size in
-	  Exception.warn parameters error (Some "Int_storage") (Some "create_diag in not yet defined for matrix") Exit (fun () -> t )
+	  create_diag_gen keys create set parameters error size
 
         let get parameters error (i,j) array =
           let error,underlying = Extension.get parameters error i array.matrix in
@@ -501,6 +515,7 @@ module Quick_key_list =
             keys: key list
           }
 
+      let keys = Basic.keys
       let create parameters error i =
         let error,basic = Basic.create parameters error i in
         error,{basic = basic ; keys = []}
