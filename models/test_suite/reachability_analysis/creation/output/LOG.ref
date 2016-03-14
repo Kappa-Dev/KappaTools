@@ -94,6 +94,7 @@ Compilation:rules:3:actions:1/2unbinding:(agent_id_0,agent_type_0)@site_type_0
 Compilation:rules:3:actions:deletion:(agent_id_0,agent_type_0)
 Compilation:rules:3:actions:deletion:documented_site:(agent_id_0,agent_type_0)@site_type_0
 Compilation:rules:3:actions:deletion:documented_site:(agent_id_0,agent_type_0)@site_type_1
+Compilation:rules:3:actions:deletion:undocumented_site:(agent_id_0,agent_type_0)@site_type_1
 Compilation:rules:3:actions:creation:(agent_id_1,agent_type_1)
 
 Compilation:rules:4:lhs:

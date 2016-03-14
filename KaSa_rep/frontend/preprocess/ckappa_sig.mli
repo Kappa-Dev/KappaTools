@@ -251,9 +251,9 @@ type c_port =
       c_site_interval : c_state interval
     }
 
-module C_site_map_and_set : SetMap.S with type elt = c_site_name
+(*module C_site_map_and_set : SetMap.S with type elt = c_site_name*)
 
-type c_interface = c_port C_site_map_and_set.Map.t
+type c_interface = c_port Site_map_and_set.Map.t
                                                                            
 type c_proper_agent = 
     { 
@@ -279,7 +279,7 @@ type c_mixture =
   {
     c_views : c_agent Int_storage.Quick_Nearly_inf_Imperatif.t;
     c_bonds :
-      site_address C_site_map_and_set.Map.t Int_storage.Nearly_inf_Imperatif.t;
+      site_address Site_map_and_set.Map.t Int_storage.Nearly_inf_Imperatif.t;
     c_plus  : (int * int) list;
     c_dot   : (int * int) list
   }

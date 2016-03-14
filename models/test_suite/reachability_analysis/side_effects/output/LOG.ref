@@ -280,8 +280,8 @@ Compilation:rules:9:direct:
 Compilation:rules:9:reverse:
 Compilation:rules:9:reverse:agent_id_0:
 Compilation:rules:9:actions:deletion:(agent_id_0,agent_type_2)
-Compilation:rules:9:actions:deletion:undocumented_site:(agent_id_0,agent_type_2)@site_type_0
 Compilation:rules:9:actions:deletion:undocumented_site:(agent_id_0,agent_type_2)@site_type_1
+Compilation:rules:9:actions:deletion:undocumented_site:(agent_id_0,agent_type_2)@site_type_0
 
 Compilation:rules:10:lhs:
 Compilation:rules:10:lhs:agent_id_0:

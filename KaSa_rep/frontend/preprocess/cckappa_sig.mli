@@ -42,9 +42,8 @@ type kappa_handler =
         Ckappa_sig.Agent_type_nearly_inf_Imperatif.t; 
       states_dic            : state_dic 
         Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.t;
-      dual                  : (Ckappa_sig.c_agent_name *
-                                 Ckappa_sig.c_site_name * 
-                                 Ckappa_sig.c_state)
+      dual                  :
+        (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
         Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.t
     }
      

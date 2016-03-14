@@ -39,18 +39,18 @@ module Dictionary_of_Modified_class : Dictionary.Dictionary
   and type value = int list*)
 
 type pair_dic   = (unit, unit) Dictionary_of_Covering_class.dictionary
-type index_dic  = (unit, unit) Dictionary_of_Covering_class.dictionary
+(*type index_dic  = (unit, unit) Dictionary_of_Covering_class.dictionary
 type test_dic   = (unit, unit) Dictionary_of_Covering_class.dictionary
-type modif_dic  = (unit, unit) Dictionary_of_Modified_class.dictionary
+type modif_dic  = (unit, unit) Dictionary_of_Modified_class.dictionary*)
 
 type remanent =
     {
       store_pointer_backward    : Ckappa_sig.Site_map_and_set.Set.t
       Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.t; (*site_name*)
       store_dic                 : pair_dic;
-      store_new_index_dic       : index_dic;
+      (*store_new_index_dic       : index_dic;
       store_test_new_index_dic  : test_dic;
-      store_modif_new_index_dic : modif_dic;
+      store_modif_new_index_dic : modif_dic;*)
     }
 
 (****************************************************************************************)

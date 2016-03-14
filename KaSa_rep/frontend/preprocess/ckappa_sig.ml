@@ -88,17 +88,8 @@ module Site_type_nearly_Inf_Int_storage_Imperatif =
    and type dimension = int
   )
 
-module C_site_map_and_set = SetMap.Make
-  (struct
-    type t = c_site_name
-    let compare = compare
-   end)
-
-module C_site_map_and_set_with_logs = 
-  Map_wrapper.Make(C_site_map_and_set)
-
 module Site_union_find = 
-  Union_find.Make(Site_type_nearly_Inf_Int_storage_Imperatif)(*(C_site_map_and_set_with_logs.Map)*)
+  Union_find.Make(Site_type_nearly_Inf_Int_storage_Imperatif)
 
 (****************************************************************************************)
 
@@ -388,7 +379,7 @@ type c_port =
       c_site_interval : c_state interval
     }
 
-type c_interface = c_port C_site_map_and_set.Map.t
+type c_interface = c_port Site_map_and_set.Map.t
                                                                            
 type c_proper_agent = 
     { 
@@ -414,7 +405,7 @@ type c_mixture =
   {
     c_views : c_agent Int_storage.Quick_Nearly_inf_Imperatif.t;
     c_bonds :
-      site_address C_site_map_and_set.Map.t Int_storage.Nearly_inf_Imperatif.t;
+      site_address Site_map_and_set.Map.t Int_storage.Nearly_inf_Imperatif.t;
     c_plus  : (int * int) list;
     c_dot   : (int * int) list
   }
