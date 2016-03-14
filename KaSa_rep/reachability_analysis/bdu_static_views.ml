@@ -19,36 +19,6 @@ let warn parameters mh message exn default =
 
 let local_trace = false
 
-(*module AgentMap = (*Int_storage.Quick_Nearly_inf_Imperatif*) Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif
-
-module AgentSite_map_and_set = Cckappa_sig.AgentSite_map_and_set
-
-module AgentRuleCV_setmap = Covering_classes_type.AgentRuleCV_setmap
-
-module Rule_setmap = Cckappa_sig.Rule_setmap
-
-module AgentCV_setmap = Covering_classes_type.AgentCV_setmap
-
-module Project2bdu_creation = Covering_classes_type.Project2bdu_creation
-
-module AgentsRuleCV_map_and_set = Covering_classes_type.AgentsRuleCV_map_and_set
-
-module AgentsRuleCV_setmap = Covering_classes_type.AgentsRuleCV_setmap
-
-module AgentSiteRuleCV_setmap = Covering_classes_type.AgentSiteRuleCV_setmap
-
-module AgentSiteCV_setmap = Covering_classes_type.AgentSiteCV_setmap
-
-module Project2bdu_potential = Covering_classes_type.Project2bdu_potential
-    
-module AgentsCV_setmap = Covering_classes_type.AgentsCV_setmap
-    
-module Project2_bdu_views = Covering_classes_type.Project2_bdu_views
-
-module AgentsSite_map_and_set = Cckappa_sig.AgentsSite_map_and_set
- 
-module Project2_modif = Covering_classes_type.Project2_modif*)
-
 type pre_static =
   {
     store_modification_sites  :

@@ -792,7 +792,7 @@ let scan_rule_set_remanent parameter error handler rules =
 (************************************************************************************)
 (*list to set*)
 
-let new_index_pair_map parameter error l =
+(*let new_index_pair_map parameter error l =
   let rec aux acc k map1 map2 error =
     match acc with
     | [] -> error, (map1, map2)
@@ -829,12 +829,12 @@ let new_index_pair_map parameter error l =
       error
   in
   let error = Exception.check warn parameter error error' (Some "line 49") Exit in
-  error, (map1, map2)
+  error, (map1, map2)*)
 
 (************************************************************************************)
 (*convert a list to a set*)
 
-let list2set parameter error list =
+(*let list2set parameter error list =
   let error',list =
     List.fold_left
       (fun (error, current_set) elt ->
@@ -849,10 +849,10 @@ let list2set parameter error list =
       ) (error, Ckappa_sig.Site_map_and_set.Set.empty) list
   in
   let error = Exception.check warn parameter error error' (Some "line 66") Exit in
-  error, list 
+  error, list *)
 
 (************************************************************************************)
-
+(*
 let collect_remanent_list2set parameter error handler_kappa store_remanent  =
   let error, init = 
     Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.create parameter error 0 
@@ -1002,7 +1002,7 @@ let collect_remanent_list2set parameter error handler_kappa store_remanent  =
          store_result
      in
      error, store_result
-    ) store_remanent init
+    ) store_remanent init*)
 
 (************************************************************************************)   
 (*MAIN*)
@@ -1016,7 +1016,7 @@ let covering_classes parameter error handler cc_compil =
     cc_compil.Cckappa_sig.rules 
   in
   (*convert a list of site inside result [remanent] to a set of site*)
-  let error =
+  (*let error =
     if (Remanent_parameters.get_trace parameter) || trace
     then
       let error, covering_classes_set2list =
@@ -1029,5 +1029,5 @@ let covering_classes parameter error handler cc_compil =
       error
     else
       error
-  in
+  in*)
   error, result
