@@ -85,7 +85,7 @@ module C_site_map_and_set_with_logs =
   Map_wrapper.Make(C_site_map_and_set)
 
 module Site_union_find =
-  Union_find.Make(Site_nearly_Inf_Int_storage_Imperatif)(C_site_map_and_set_with_logs.Map)
+  Union_find.Make(Site_nearly_Inf_Int_storage_Imperatif)(*(C_site_map_and_set_with_logs.Map)*)
 
 type binding_state = 
   | Free 

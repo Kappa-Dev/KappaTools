@@ -46,7 +46,7 @@ module type Union_find =
 
 module Make =
   functor (Storage:Int_storage.Storage) ->
-    functor (Map: Map_wrapper.Map_with_logs) ->
+(*    functor (Map: Map_wrapper.Map_with_logs) ->*)
     (struct
 
       type key = Storage.key
