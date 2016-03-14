@@ -46,6 +46,16 @@ module Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_
   with type key = c_agent_name * (c_site_name * c_state)
   and type dimension = int * (int * int)
 
+module Site_nearly_Inf_Int_storage_Imperatif:
+  Int_storage.Storage
+  with type key = c_site_name
+  and type dimension = int
+
+module Site_union_find: Union_find.Union_find
+  with type t = c_site_name Site_nearly_Inf_Int_storage_Imperatif.t   
+  and type dimension = int
+  and type key = c_site_name
+
 type binding_state = 
   | Free 
   | Lnk_type of agent_name * site_name 

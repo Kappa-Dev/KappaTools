@@ -68,6 +68,25 @@ module Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_
    and type dimension = (int * (int * int))
   )
 
+module Site_nearly_Inf_Int_storage_Imperatif =
+  (
+    Int_storage.Nearly_inf_Imperatif: Int_storage.Storage
+   with type key = c_site_name
+   and type dimension = int
+  )
+
+module C_site_map_and_set = SetMap.Make
+  (struct
+    type t = c_site_name
+    let compare = compare
+   end)
+
+module C_site_map_and_set_with_logs = 
+  Map_wrapper.Make(C_site_map_and_set)
+
+module Site_union_find =
+  Union_find.Make(Site_nearly_Inf_Int_storage_Imperatif)(C_site_map_and_set_with_logs.Map)
+
 type binding_state = 
   | Free 
   | Lnk_type of agent_name * site_name 
@@ -220,12 +239,6 @@ type c_port =
       c_site_position : position;
       c_site_interval : c_state interval
     }
-
-module C_site_map_and_set = SetMap.Make
-  (struct
-    type t = c_site_name
-    let compare = compare
-   end)
 
 type c_interface = c_port C_site_map_and_set.Map.t
                                                                            

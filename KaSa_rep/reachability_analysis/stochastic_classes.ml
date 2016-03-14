@@ -23,7 +23,7 @@ let trace = false
 
 type stochastic_class =
   {
-    stochastic_class : int list Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t
+    stochastic_class : Ckappa_sig.c_site_name list Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t
   }
 
 (************************************************************************************)   
@@ -194,14 +194,14 @@ let scan_rule_set parameter error handler rules =
                    agent_type
                    store_result
                in
-               let array =
+               let error, array =
                  match get_array with
-                 | None -> Union_find.create nsites
-                 | Some a -> a
+                 | None -> Ckappa_sig.Site_union_find.create parameter error nsites
+                 | Some a -> error, a
                in
                (*compute the union for the list of site*)
                let error, union_array =
-                 Union_find.union_list
+                 Ckappa_sig.Site_union_find.union_list
                    parameter
                    error
                    array
@@ -226,30 +226,38 @@ let scan_rule_set parameter error handler rules =
 
 let sprintf_array parameter error handler agent_type array =
   let acc = ref "[|" in
-  Array.iteri (fun i site_type ->
-    let error, site_string = 
-      try
-        Handler.string_of_site parameter error handler agent_type site_type
-      with
-        _ -> warn parameter error (Some "line 231") Exit (string_of_int site_type)
-    in
-    acc := !acc ^
-      if i <> 0
-      then Printf.sprintf "; %d:%s" site_type site_string
-      else Printf.sprintf "%d:%s" site_type site_string
-  ) array;
+  let error = 
+    Ckappa_sig.Site_union_find.iteri 
+      parameter error
+      (fun parameter error i site_type ->
+	let error, site_string = 
+	  try
+            Handler.string_of_site parameter error handler agent_type site_type
+	  with
+            _ -> warn parameter error (Some "line 231") Exit (string_of_int site_type)
+	in
+	let _ = 
+	  acc := !acc ^ (* avoid this, this is very slow, Use Printf.fprintf directly *)
+	    if i <> 0
+	    then Printf.sprintf "; %d:%s" site_type site_string
+	    else Printf.sprintf "%d:%s" site_type site_string
+	in
+	error
+      ) array in
+  error,
   !acc ^ "|]"
   
 let print_array parameter error handler agent_type array =
-  let output = sprintf_array parameter error handler agent_type array in
-  Printf.fprintf stdout "%s\n" output
+  let error, output = sprintf_array parameter error handler agent_type array in
+  let _ = Printf.fprintf stdout "%s\n" output in
+  error
 
 let print_stochastic_class parameter error handler result =
   Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif.iter
     parameter
     error
     (fun parameter error agent_type array_site_type ->
-      let _ =
+      let error =
         if Remanent_parameters.get_do_stochastic_flow_of_information parameter
         then
           let parameter =
@@ -258,7 +266,7 @@ let print_stochastic_class parameter error handler result =
           begin
             if Remanent_parameters.get_trace parameter
             then
-              let _ =
+              let error =
                 let error, agent_string =
                   try
                     Handler.string_of_agent parameter error handler agent_type
@@ -266,14 +274,19 @@ let print_stochastic_class parameter error handler result =
                     _ -> warn parameter error (Some "line 263") Exit 
                       (Cckappa_sig.string_of_agent_name agent_type)
                 in
-                Printf.fprintf stdout "agent_type:%i:%s\n"
-                  (Cckappa_sig.int_of_agent_name agent_type)
-                  agent_string
-              in
-              print_string "site_type:";
+                let _ = 
+		  Printf.fprintf stdout "agent_type:%i:%s\n"
+                    (Cckappa_sig.int_of_agent_name agent_type)
+                    agent_string
+		in
+		error
+	      in
+              let _ = print_string "site_type:" in
               print_array parameter error handler agent_type array_site_type
-            else ()
+            else error
           end
+	else
+	  error
       in
       error)
     result
