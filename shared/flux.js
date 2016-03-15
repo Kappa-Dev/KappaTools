@@ -7,7 +7,7 @@ function fluxMap(ids) {
 
     this.setFlux = function(flux){
         that.flux = flux;
-        that.selectedRules = flux.rules.map(function () {return true;});
+        that.selectedRules = flux.rules.map(function (v,i) {return (i !== 0);});
         that.render();
     };
 
@@ -43,16 +43,15 @@ function fluxMap(ids) {
                               .transition().style("opacity", opacity); }; };
 
     this.drawDIM = function(){
-        var matrix = that.flux.data
+        var matrix = that.flux.fluxs
             .map(function(a,i){return a.map(function (e,j)
                                             {return that.pointValue (i,j,e)})
                                .filter(that.filterRules);}).filter(that.filterRules),
             rules = that.flux.rules.filter(that.filterRules),
-            color = that.flux.data.map(function(a)
+            color = that.flux.fluxs.map(function(a)
                                    {return a.map(function (x) {return (x < 0) ? "#FF0000" : "#00FF00";})
                                     .filter(that.filterRules);}).filter(that.filterRules);
-        var chord = d3.layout.chord().padding(.01).sortSubgroups(d3.descending)
-            .matrix(matrix);
+        var chord = d3.layout.chord().padding(.01).matrix(matrix);
         var width = 960, height = 700,
             innerRadius = Math.min(width, height) * .37;
         var arc = d3.svg.arc().innerRadius(innerRadius)
@@ -63,7 +62,7 @@ function fluxMap(ids) {
         svg.selectAll("*").remove();
         svg.append("g").attr("class", "chord").selectAll("path")
             .data(chord.chords).enter().append("path")
-            .attr("d", d3.svg.chord().radius(innerRadius))
+            .filter(function (v) {return (v.source.value != 0); }).attr("d", d3.svg.chord().radius(innerRadius))
             .style("fill", function(d) { return color[d.source.index][d.target.index]; })
             .style("opacity", 1);
         svg.append("g").attr("id", "values").selectAll(".sources")
@@ -75,10 +74,10 @@ function fluxMap(ids) {
                     + "translate(" + (innerRadius - 10) + ")"
                 + (d.angle > Math.PI ? "rotate(180)" : ""); })
             .style("text-anchor", function(d) { return d.angle > Math.PI ? null : "end" ; })
-            .text(function (d) { return d.source.value;});
+            .text(function (d) { return d.source.value.toExponential(2);});
         svg.select("#values").selectAll(".targets")
-            .data(chord.chords).enter()
-            .append("text").attr("class","targets")
+            .data(chord.chords).enter().append("text")
+	    .filter(function (v) {return (v.target.value != 0); }).attr("class","targets")
             .each(function(d) { d.angle = ( d.target.startAngle + d.target.endAngle) / 2; })
                 .attr("dy", ".1em")
             .attr("transform", function(d) {
@@ -86,7 +85,7 @@ function fluxMap(ids) {
                     + "translate(" + (innerRadius - 10) + ")"
                     + (d.angle > Math.PI ? "rotate(180)" : ""); })
             .style("text-anchor", function(d) { return d.angle > Math.PI ? null : "end" ; })
-            .text(function (d) { return d.target.value;});
+            .text(function (d) { return d.target.value.toExponential(2);});
         var legends = svg.append("g").selectAll("g").data(chord.groups).enter()
             .append("g");
         legends.append("text")
@@ -112,7 +111,7 @@ function fluxMap(ids) {
                 box = document.createElement("input");
             boxbox.setAttribute("class","checkbox-inline")
             box.setAttribute("type", "checkbox");
-            box.setAttribute("checked", val);
+            if (val) {box.setAttribute("checked")};
             box.addEventListener("change",function () { that.aClick(id);});
             boxbox.appendChild(box);
             boxbox.appendChild(document.createTextNode(that.flux.rules[id]));
