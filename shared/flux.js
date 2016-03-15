@@ -111,7 +111,7 @@ function fluxMap(ids) {
                 box = document.createElement("input");
             boxbox.setAttribute("class","checkbox-inline")
             box.setAttribute("type", "checkbox");
-            if (val) {box.setAttribute("checked")};
+            if (val) {box.setAttribute("checked","")};
             box.addEventListener("change",function () { that.aClick(id);});
             boxbox.appendChild(box);
             boxbox.appendChild(document.createTextNode(that.flux.rules[id]));
@@ -120,8 +120,8 @@ function fluxMap(ids) {
     };
 
     this.render_labels = function(){
-        d3.select("#"+that.ids.beginTimeId).text(that.flux.beginTime);
-        d3.select("#"+that.ids.endTimeId).text(that.flux.endTime);
+        d3.select("#"+that.ids.beginTimeId).text(that.flux.bio_begin_time);
+        d3.select("#"+that.ids.endTimeId).text(that.flux.bio_end_time);
         d3.select("#"+that.ids.nbEventsId).text(that.flux.hits.reduce(function (acc,v) {return acc + v;},0));
 
     };

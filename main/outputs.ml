@@ -109,7 +109,7 @@ let html_of_flux flux =
                    f "@[<v 2><script>@,\"use strict\"@,@[var flux =@ %a;@]@,"
                    print_json_of_flux flux in
         let () = Format.fprintf f "var ids = {@[@," in
-        let () = Format.fprintf f "\"beginTimeId\" : \"start_time\", @," in
+        let () = Format.fprintf f "\"beginTimeId\" : \"begin_time\", @," in
         let () = Format.fprintf f "\"endTimeId\" : \"end_time\", @," in
         let () = Format.fprintf f "\"selectCorrectionId\" : \"select_correction\", @," in
         let () = Format.fprintf f "\"nbEventsId\" : \"nb_events\", @," in
