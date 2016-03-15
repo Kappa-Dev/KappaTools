@@ -1,11 +1,10 @@
 #!/usr/bin/env ocaml
-#use "topfind";;
-#require "str";;
-open Printf;;
-open Str;;
+open Printf
+let alpha = ['a';'b';'c';'d';'e';'f';'g';'h';'i';'l';'j';'k';'m';'n';'o';'p';'q';'r';'s';'t';'u';'v';'w';'x';'y';'z';
+             'A';'B';'C';'D';'E';'F';'G';'H';'I';'L';'J';'K';'M';'N';'O';'P';'Q';'R';'S';'T';'U';'V';'W';'X';'Y';'Z';
+             '0';'1';'2';'3';'4';'5';'6';'7';'8';'9']
 
-(* http://www.codecodex.com/wiki/Remove_non-letters_from_a_string#OCaml *)
-let strip_nonalpha = Str.global_replace (Str.regexp "[^a-zA-Z]+") "_";;
+let strip_nonalpha = String.map (fun c -> if List.mem c alpha then c else '_');;
 (* https://www.rosettacode.org/wiki/Read_entire_file#OCaml *)
 let read_file filename =
     let ic = open_in filename in
