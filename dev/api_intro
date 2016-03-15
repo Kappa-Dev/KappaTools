@@ -34,11 +34,16 @@ The machinary to cook stories from an execution trace is in cflow/
 The code specific to the command line backend is in main/. It consists in file handler and renderers
 {!modules: Outputs Kappa_files}
 
+Some data_structures used in KaSa.
+This library that proposes different implementations for arrays can be found in KaSa_rep/data_structures/
+{!modules: Int_storage}
+The library to deal with multi-valued decision diagrams is in KaSa_rep/data_structures/mvbdu/
+{!modules: Mvbdu_wrapper}
+
 The code of the static analyser is in KaSa_rep/reachability_analysis/
 {!modules: Analyzer Analyzer_headers Composite_domain Communication Analyzer_domain_sig Product Usual_domains}
 Several abstract domains are available:
 {!modules: Rules_domain Agents_domain Contact_map_domain Views_domain}
 
 
-The library to deal with multi-valued decision diagrams is in KaSa_rep/data_structures/mvbdu/
-{!modules: Mvbdu_wrapper}
+

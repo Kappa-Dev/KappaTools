@@ -15,13 +15,6 @@
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
-let create_diag_gen keys create set  parameters error size =
-  let error, t = create parameters error size in
-  List.fold_left
-    (fun (error,t) key ->
-      set parameters error key key t)
-    (create parameters error size) (keys size)
-
 type ('a,'b) unary = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> Exception.method_handler * 'b
 type ('a,'b,'c) binary = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'b -> Exception.method_handler * 'c
 type ('a,'b,'c,'d) ternary = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'b -> 'c -> Exception.method_handler * 'd
