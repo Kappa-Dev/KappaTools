@@ -31,14 +31,14 @@ sig
   type dimension
 																       
   val create: (dimension,'a t) unary
-  (* val expand_and_copy: ('a t,dimension,'a t) binary *)
+  val expand_and_copy: ('a t,dimension,'a t) binary 
   val init: (dimension, (key, 'a) unary, 'a t) binary
   val set: (key,'a,'a t,'a t) ternary
   val get: (key,'a t,'a option) binary
   val unsafe_get: (key,'a t,'a option) binary
   val dimension: ('a t, dimension) unary
   val print: ('a unary_no_output,'a t) binary_no_output
-  (* val key_list: ('a t, key list) unary *)
+  val key_list: ('a t, key list) unary
   val iter:((key,'a) binary_no_output, 'a t) binary_no_output
   val fold_with_interruption: ((key,'a,'b,'b) ternary,'a t,'b,'b) ternary
   val fold: ((key,'a,'b,'b) ternary,'a t,'b,'b) ternary						
