@@ -109,10 +109,11 @@ let print_handler parameters error handler =
   let () = Loggers.fprintf log "%s" (Remanent_parameters.get_prefix parameters_sites) in
   let () = Loggers.print_newline log in
   let error =
-    Ckappa_sig.Agent_type_nearly_inf_Imperatif.print_site_f
+    Ckappa_sig.Agent_type_nearly_inf_Imperatif.print
+      parameters_sites
       error
-      (fun error parameters a ->
-       let _ = 
+      (fun parameters error a ->
+       let error = 
          Ckappa_sig.Dictionary_of_sites.print 
            parameters
            error 
@@ -120,29 +121,29 @@ let print_handler parameters error handler =
            a
        in
        error)
-      parameters_sites
       handler.Cckappa_sig.sites
   in
   let parameters_states = Remanent_parameters.update_prefix parameters "states:" in
   let () = Loggers.fprintf log "%s \n" (Remanent_parameters.get_prefix parameters_states) in
   let error =
     Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.print
+      parameters_states
       error
-      (fun error parameters a ->
+      (fun parameters error a ->
        Cckappa_sig.Dictionary_of_States.print
          parameters
          error
          (print_state_f print_state)
          a)
-      parameters_states
       handler.Cckappa_sig.states_dic
   in
   let parameters_duals = Remanent_parameters.update_prefix parameters "duals:" in
   let () = Loggers.fprintf log "%s \n" (Remanent_parameters.get_prefix parameters_duals) in
   let error =
     Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.print
+      parameters_duals
       error
-      (fun error parameters (a, b, c) ->
+      (fun parameters error (a, b, c) ->
           let _ = 
             Loggers.fprintf 
               log 
@@ -153,7 +154,6 @@ let print_handler parameters error handler =
               c 
           in
           error)
-      parameters_duals
       handler.Cckappa_sig.dual
   in
   error

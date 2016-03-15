@@ -15,43 +15,36 @@
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
+type ('a,'b) unary = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> Exception.method_handler * 'b
+type ('a,'b,'c) binary = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'b -> Exception.method_handler * 'c
+type ('a,'b,'c,'d) ternary = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'b -> 'c -> Exception.method_handler * 'd
+type ('a,'b,'c,'d,'e) quaternary = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'b -> 'c -> 'd -> Exception.method_handler * 'e
+																			  
+type 'a unary_no_output = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> Exception.method_handler
+type ('a,'b) binary_no_output = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'b -> Exception.method_handler
+														
 
 module type Storage =
 sig
   type 'a t
   type key
   type dimension
-
-  val keys: dimension -> key list
-  val create: Remanent_parameters_sig.parameters -> Exception.method_handler -> dimension -> Exception.method_handler * 'a t
-  val init: Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a t -> dimension -> Exception.method_handler * 'a t
-  val create_diag: Remanent_parameters_sig.parameters -> Exception.method_handler -> dimension -> Exception.method_handler * key t
-  val set: Remanent_parameters_sig.parameters -> Exception.method_handler -> key -> 'a -> 'a t -> Exception.method_handler * 'a t
-  val get: Remanent_parameters_sig.parameters -> Exception.method_handler -> key -> 'a t -> Exception.method_handler * 'a option
-  val unsafe_get: Remanent_parameters_sig.parameters ->Exception.method_handler -> key -> 'a t -> Exception.method_handler * 'a option
-  val dimension: Exception.method_handler -> 'a t -> Exception.method_handler * dimension
-  val print: Exception.method_handler -> (Exception.method_handler -> Remanent_parameters_sig.parameters -> 'a -> Exception.method_handler) -> Remanent_parameters_sig.parameters -> 'a t -> Exception.method_handler
-  val print_var_f: Exception.method_handler -> (Exception.method_handler -> Remanent_parameters_sig.parameters -> 'a -> Exception.method_handler) -> Remanent_parameters_sig.parameters -> 'a t -> Exception.method_handler
-  val print_site_f: Exception.method_handler -> (Exception.method_handler -> Remanent_parameters_sig.parameters -> 'a -> Exception.method_handler) -> Remanent_parameters_sig.parameters -> 'a t -> Exception.method_handler
-
-  val key_list: Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a t -> (Exception.method_handler * key list)
-  val iter:Remanent_parameters_sig.parameters -> Exception.method_handler -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> key  -> 'a  ->  Exception.method_handler ) -> 'a t ->  Exception.method_handler
-  val fold_with_interruption: Remanent_parameters_sig.parameters -> Exception.method_handler -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> key  -> 'a  -> 'b-> Exception.method_handler  * 'b ) -> 'a t -> 'b ->  Exception.method_handler * 'b
-  val fold: Remanent_parameters_sig.parameters -> Exception.method_handler -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> key  -> 'a  -> 'b-> Exception.method_handler  * 'b ) -> 'a t -> 'b ->  Exception.method_handler * 'b
-  val fold2_common:Remanent_parameters_sig.parameters -> Exception.method_handler -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> key -> 'a -> 'b -> 'c ->  Exception.method_handler  * 'c ) -> 'a t -> 'b t ->  'c ->  Exception.method_handler * 'c
-
+																       
+  val create: (dimension,'a t) unary
+  (* val expand_and_copy: ('a t,dimension,'a t) binary *)
+  val init: (dimension, (key, 'a) unary, 'a t) binary
+  val set: (key,'a,'a t,'a t) ternary
+  val get: (key,'a t,'a option) binary
+  val unsafe_get: (key,'a t,'a option) binary
+  val dimension: ('a t, dimension) unary
+  val print: ('a unary_no_output,'a t) binary_no_output
+  (* val key_list: ('a t, key list) unary *)
+  val iter:((key,'a) binary_no_output, 'a t) binary_no_output
+  val fold_with_interruption: ((key,'a,'b,'b) ternary,'a t,'b,'b) ternary
+  val fold: ((key,'a,'b,'b) ternary,'a t,'b,'b) ternary						
+  val fold2_common: ((key,'a,'b,'c,'c) quaternary,'a t,'b t, 'c, 'c) quaternary
+								     
 end
-
-(** simple array implementation *)
-module Int_storage_imperatif:
-  Storage with type key = int and type dimension = int
-
-(** expandable arrays (the size is still limited by max_int *)
-module Nearly_infinite_arrays
-  (Basic:Storage
-   with type dimension = int
-   and type key = int) :
-  Storage with type key = int and type dimension = int
 
 (** Cartesian product *)
 module Extend
@@ -66,7 +59,20 @@ module Quick_key_list
   (Basic:Storage) :
   Storage
   with type key = Basic.key
-  and type dimension = Basic.dimension
+   and type dimension = Basic.dimension
+
+(** simple array implementation *)
+module Int_storage_imperatif:
+  Storage with type key = int and type dimension = int
+
+(** expandable arrays (the size is still limited by max_int *)
+module Nearly_infinite_arrays
+  (Basic:Storage
+   with type dimension = int
+   and type key = int) :
+  Storage with type key = int and type dimension = int
+
+
 
 (** expandable 1-dim array *)
 module Nearly_inf_Imperatif:

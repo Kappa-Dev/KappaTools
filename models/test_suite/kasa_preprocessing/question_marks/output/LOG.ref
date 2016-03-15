@@ -5,9 +5,9 @@ Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
 Signature:sites:
-Signature:sites:agent_type:0:
-Signature:sites:agent_type:0:site_type:0->x(internal state)
-Signature:sites:agent_type:0:site_type:1->x(binding state)
+Signature:sites:0:
+Signature:sites:0:site_type:0->x(internal state)
+Signature:sites:0:site_type:1->x(binding state)
 Signature:states: 
 Signature:states:0:
 Signature:states:0:0:
@@ -23,7 +23,7 @@ Signature:duals:0:1:1:
 Signature:duals:0:1:1:agent_type:0,site_type:1,state_id:1
 Compiling...
 Generating the raw contact map...
-Compilation:
+Compilation:Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
@@ -36,7 +36,7 @@ Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_0->state:[state_min
 Compilation:rules:0:reverse:
 Compilation:rules:0:reverse:agent_id_0:
 Compilation:rules:0:reverse:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
-
+Compilation:rules:1:
 Compilation:rules:1:lhs:
 Compilation:rules:1:lhs:agent_id_0:
 Compilation:rules:1:lhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:1]
@@ -50,7 +50,7 @@ Compilation:rules:1:reverse:
 Compilation:rules:1:reverse:agent_id_0:
 Compilation:rules:1:reverse:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:1]
 Compilation:rules:1:actions:1/2unbinding:(agent_id_0,agent_type_0)@site_type_1
-
+Compilation:rules:2:
 Compilation:rules:2:lhs:
 Compilation:rules:2:lhs:agent_id_0:
 Compilation:rules:2:lhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
@@ -76,7 +76,7 @@ Compilation:rules:2:reverse:agent_id_0:agent_type_0:site_type_1->state:[state_mi
 Compilation:rules:2:reverse:agent_id_1:
 Compilation:rules:2:reverse:agent_id_1:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
 Compilation:rules:2:actions:binding:(agent_id_0,agent_type_0)@site_type_1----(agent_id_1,agent_type_0)@site_type_1
-
+Compilation:rules:3:
 Compilation:rules:3:lhs:
 Compilation:rules:3:lhs:agent_id_0:
 Compilation:rules:3:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
@@ -92,7 +92,7 @@ Compilation:rules:3:reverse:
 Compilation:rules:3:reverse:agent_id_0:
 Compilation:rules:3:reverse:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:1]
 Compilation:rules:3:actions:1/2unbinding:(agent_id_0,agent_type_0)@site_type_1
-
+Compilation:rules:4:
 Compilation:rules:4:lhs:
 Compilation:rules:4:lhs:agent_id_0:
 Compilation:rules:4:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
@@ -107,7 +107,7 @@ Compilation:rules:4:direct:agent_id_0:agent_type_0:site_type_0->state:[state_min
 Compilation:rules:4:reverse:
 Compilation:rules:4:reverse:agent_id_0:
 Compilation:rules:4:reverse:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
-
+Compilation:rules:5:
 Compilation:rules:5:lhs:
 Compilation:rules:5:lhs:agent_id_0:
 Compilation:rules:5:rhs:
@@ -119,7 +119,7 @@ Compilation:rules:5:reverse:agent_id_0:
 Compilation:rules:5:actions:deletion:(agent_id_0,agent_type_0)
 Compilation:rules:5:actions:deletion:undocumented_site:(agent_id_0,agent_type_0)@site_type_1
 Compilation:rules:5:actions:deletion:undocumented_site:(agent_id_0,agent_type_0)@site_type_0
-
+Compilation:rules:6:
 Compilation:rules:6:lhs:
 Compilation:rules:6:lhs:agent_id_0:
 Compilation:rules:6:lhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:1]

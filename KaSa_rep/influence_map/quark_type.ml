@@ -53,9 +53,9 @@ module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif
   Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif*)
 
 (*module SiteMap = Int_storage.Extend (AgentMap)(Int_storage.Extend (AgentMap)(AgentMap))*)
-
 module SiteMap =
-  Int_storage.Extend (Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif)
+  Int_storage.Extend
+    (Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif)
     (Int_storage.Extend (AgentMap)(AgentMap))
 
 (*module DeadSiteMap= Int_storage.Extend (AgentMap)(AgentMap)*)

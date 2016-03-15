@@ -22,29 +22,33 @@ let create_diag_gen keys create set  parameters error size =
       set parameters error key key t)
     (create parameters error size) (keys size)
 
+type ('a,'b) unary = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> Exception.method_handler * 'b
+type ('a,'b,'c) binary = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'b -> Exception.method_handler * 'c
+type ('a,'b,'c,'d) ternary = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'b -> 'c -> Exception.method_handler * 'd
+type ('a,'b,'c,'d,'e) quaternary = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'b -> 'c -> 'd -> Exception.method_handler * 'e
+																			  
+type 'a unary_no_output = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> Exception.method_handler
+type ('a,'b) binary_no_output = Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a -> 'b -> Exception.method_handler
+														
 module type Storage =
 sig
   type 'a t
   type key
   type dimension
-
-  val keys: dimension -> key list
-  val create: Remanent_parameters_sig.parameters -> Exception.method_handler -> dimension -> Exception.method_handler * 'a t
-  val init: Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a t -> dimension -> Exception.method_handler * 'a t
-  val create_diag: Remanent_parameters_sig.parameters -> Exception.method_handler -> dimension -> Exception.method_handler * key t
-  val set: Remanent_parameters_sig.parameters -> Exception.method_handler -> key -> 'a -> 'a t -> Exception.method_handler * 'a t
-  val get: Remanent_parameters_sig.parameters -> Exception.method_handler -> key -> 'a t -> Exception.method_handler * 'a option
-  val unsafe_get: Remanent_parameters_sig.parameters ->Exception.method_handler -> key -> 'a t -> Exception.method_handler * 'a option
-  val dimension: Exception.method_handler -> 'a t -> Exception.method_handler * dimension
-  val print: Exception.method_handler -> (Exception.method_handler -> Remanent_parameters_sig.parameters -> 'a -> Exception.method_handler) -> Remanent_parameters_sig.parameters -> 'a t -> Exception.method_handler
-  val print_var_f: Exception.method_handler -> (Exception.method_handler -> Remanent_parameters_sig.parameters -> 'a -> Exception.method_handler) -> Remanent_parameters_sig.parameters -> 'a t -> Exception.method_handler
-  val print_site_f: Exception.method_handler -> (Exception.method_handler -> Remanent_parameters_sig.parameters -> 'a -> Exception.method_handler) -> Remanent_parameters_sig.parameters -> 'a t -> Exception.method_handler
-
-  val key_list: Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a t -> (Exception.method_handler * key list)
-  val iter:Remanent_parameters_sig.parameters -> Exception.method_handler -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> key  -> 'a  ->  Exception.method_handler ) -> 'a t ->  Exception.method_handler
-  val fold_with_interruption: Remanent_parameters_sig.parameters -> Exception.method_handler -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> key  -> 'a  -> 'b-> Exception.method_handler  * 'b ) -> 'a t -> 'b ->  Exception.method_handler * 'b
-  val fold: Remanent_parameters_sig.parameters -> Exception.method_handler -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> key  -> 'a  -> 'b-> Exception.method_handler  * 'b ) -> 'a t -> 'b ->  Exception.method_handler * 'b
-  val fold2_common:Remanent_parameters_sig.parameters -> Exception.method_handler -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> key -> 'a -> 'b -> 'c ->  Exception.method_handler  * 'c ) -> 'a t -> 'b t ->  'c ->  Exception.method_handler * 'c
+																       
+  val create: (dimension,'a t) unary
+  val expand_and_copy: ('a t,dimension,'a t) binary
+  val init: (dimension, (key, 'a) unary, 'a t) binary
+  val set: (key,'a,'a t,'a t) ternary
+  val get: (key,'a t,'a option) binary
+  val unsafe_get: (key,'a t,'a option) binary
+  val dimension: ('a t, dimension) unary
+  val print: ('a unary_no_output,'a t) binary_no_output
+  val key_list: ('a t, key list) unary
+  val iter:((key,'a) binary_no_output, 'a t) binary_no_output
+  val fold_with_interruption: ((key,'a,'b,'b) ternary,'a t,'b,'b) ternary
+  val fold: ((key,'a,'b,'b) ternary,'a t,'b,'b) ternary						
+  val fold2_common: ((key,'a,'b,'c,'c) quaternary,'a t,'b t, 'c, 'c) quaternary
 
 end
 
@@ -61,13 +65,7 @@ module Int_storage_imperatif =
           size:int ;
         }
 
-    let dimension error a = error, a.size
-    let keys n =
-      let rec aux k output =
-	if k<0 then output
-	else aux (k-1) (k::output)
-      in aux (n-1) []
-
+    let dimension _ error a = error, a.size
 
     let imperatif = true
     let ordered _ = true
@@ -94,9 +92,8 @@ module Int_storage_imperatif =
           size = size;
         }
 
-  
-    let init parameters error array size =
-      let error,dimension = dimension error array in
+    let expand_and_copy parameters error array size =
+      let error,dimension = dimension parameters error array in
       if dimension < size
       then
         let error,array' = create parameters error size in
@@ -113,6 +110,22 @@ module Int_storage_imperatif =
         let _ = array.array.(key)<-Some value in
         error,array
 
+    let rec init parameters error size f =
+      if size < 0
+      then
+	let error,array = init parameters error 0 f in
+        invalid_arg parameters error (Some "create, line 60") Exit array
+      else
+	let error, array = create parameters error size in
+	let rec aux k error array =
+	  if k>size then error,array
+	  else
+	    let error, value = f parameters error k in
+	    let error, array = set parameters error k value array in 
+	    aux (k+1) error array
+	in
+	aux 0 error array
+		
     let get parameters error key array =
       if key>array.size || key<0 then
         invalid_arg parameters error (Some "get, line 88") Exit None
@@ -121,16 +134,13 @@ module Int_storage_imperatif =
           | None -> invalid_arg parameters error (Some "get, line 92") Exit None
           | a -> error,a
 
-    let create_diag parameters error size =
-      create_diag_gen keys create set parameters error size
-
     let unsafe_get parameters error key array =
       if key>array.size || key<0 then
         error,None
       else
         error,array.array.(key)
 
-    let print error print_elt parameters array =
+    let print parameters error print_elt array =
       let rec aux i error =
         if i>array.size then error
         else
@@ -146,12 +156,12 @@ module Int_storage_imperatif =
 		in
                 let parameters = Remanent_parameters.update_prefix parameters
                   ((string_of_int i)^":") in
-                let error = print_elt error parameters elt in
+                let error = print_elt parameters error elt in
                 error
           in aux (i+1) error
       in aux 0 error
 
-    let print_var_f error print_elt parameters array =
+  (*  let print_var_f error print_elt parameters array =
       let rec aux i error =
         if i>array.size then error
         else
@@ -189,15 +199,15 @@ module Int_storage_imperatif =
                 let error = print_elt error parameters elt in
                 error
           in aux (i+1) error
-      in aux 0 error
+      in aux 0 error*)
 
     let equal parameters error p a b =
       if a==b
       then error,true
       else
         begin
-          let error,size_a = dimension error a in
-          let error,size_b = dimension error b in
+          let error,size_a = dimension parameters error a in
+          let error,size_b = dimension parameters error b in
           let size_min = min size_a size_b in
           let array_a = a.array in
           let array_b = b.array in
@@ -314,25 +324,25 @@ module Nearly_infinite_arrays =
       type 'a t = 'a Basic.t
 
       let create = Basic.create
-      let keys = Basic.keys 
       let dimension = Basic.dimension
       let key_list = Basic.key_list
 
       let expand parameters error array =
-        let error,old_dimension = dimension error array in
+        let error,old_dimension = dimension parameters error array in
         if old_dimension = Sys.max_array_length
         then
           invalid_arg parameters error (Some "expand, line 170") Exit array
         else
-          Basic.init parameters error array
+          Basic.expand_and_copy parameters error array
             (max 1 (min Sys.max_array_length (2*old_dimension)))
 
       let get = Basic.get
       let unsafe_get = Basic.unsafe_get
+      let expand_and_copy = Basic.expand_and_copy
       let init = Basic.init
 
       let rec set parameters error key value array =
-        let error,dimension = dimension error array in
+        let error,dimension = dimension parameters error array in
         if key>=dimension
         then
           let error,array' = expand parameters error array in
@@ -344,12 +354,9 @@ module Nearly_infinite_arrays =
         else
           Basic.set parameters error key value array
 
-      let create_diag parameters error size =
-	create_diag_gen keys create set parameters error size
-
       let print = Basic.print
-      let print_var_f = Basic.print_var_f
-      let print_site_f = Basic.print_site_f
+(*      let print_var_f = Basic.print_var_f
+      let print_site_f = Basic.print_site_f*)
       let iter = Basic.iter
       let fold = Basic.fold
       let fold_with_interruption = Basic.fold_with_interruption
@@ -371,16 +378,6 @@ module Extend =
               matrix : 'a Underlying.t Extension.t ;
               dimension : dimension;
             }
-
-	let keys (a,b) =
-	  let ext = Extension.keys a in
-	  let under = Underlying.keys b in
-	  List.fold_left
-	    (fun sol a ->
-	      List.fold_left
-	       (fun sol b -> (a,b)::sol)
-		sol under)
-	    [] ext
 
         let create parameters error dimension =
           let error,matrix = Extension.create parameters error (fst dimension) in
@@ -407,10 +404,22 @@ module Extend =
             (error,[])
             (List.rev ext_list)
 
-        let init parameters error array dimension =
-          invalid_arg parameters error (Some "init, line 196") Exit array
-
-        let set parameters error (i,j) value array =
+        let expand_and_copy parameters error array dimension =
+          invalid_arg parameters error (Some "expand_and_copy, line 196") Exit array
+		      
+	let init parameters error dim  f =
+	  let error, array =
+	    Extension.init parameters error (fst dim)
+			   (fun p e i ->
+			     Underlying.init p e (snd dim) (fun p' e' j -> f p' e' (i,j)))
+	  in
+	  error,
+	  {
+	    matrix = array;
+	    dimension = dim
+	  }
+	    
+	let set parameters error (i,j) value array =
           let error,old_underlying = Extension.unsafe_get parameters error i array.matrix in
           let error,old_underlying =
             match old_underlying with
@@ -422,10 +431,7 @@ module Extend =
           (* let ordered = ordered && Extension.ordered new_matrix in*)
           error,{array with matrix = new_matrix}
 
-	let create_diag parameters error size =
-	  create_diag_gen keys create set parameters error size
-
-        let get parameters error (i,j) array =
+	let get parameters error (i,j) array =
           let error,underlying = Extension.get parameters error i array.matrix in
           match underlying with
             | Some underlying -> Underlying.get parameters error j underlying
@@ -437,15 +443,16 @@ module Extend =
             | Some underlying -> Underlying.unsafe_get parameters error j underlying
             | _ -> error,None
 
-        let dimension error a = error,a.dimension
+        let dimension _ error a = error,a.dimension
 
-        let print error print_of parameters a =
-          Extension.print error
-            (fun error -> Underlying.print error print_of)
-            parameters
+        let print parameters error print_of a =
+          Extension.print
+	    parameters
+	    error
+            (fun p error -> Underlying.print p error print_of)
             a.matrix
 
-        let print_var_f error print_of parameters a =
+    (*    let print_var_f error print_of parameters a =
           Extension.print error
             (fun error -> Underlying.print error print_of)
             parameters
@@ -455,7 +462,7 @@ module Extend =
           Extension.print error
             (fun error -> Underlying.print error print_of)
             parameters
-            a.matrix
+            a.matrix*)
 
         let iter parameter error f a =
           Extension.iter
@@ -515,17 +522,25 @@ module Quick_key_list =
             keys: key list
           }
 
-      let keys = Basic.keys
       let create parameters error i =
         let error,basic = Basic.create parameters error i in
         error,{basic = basic ; keys = []}
 
       let key_list parameters error t = error,t.keys
 
-      let init parameters error array j =
-        let error,basic = Basic.init parameters error array.basic j in
+      let expand_and_copy parameters error array j =
+        let error, basic = Basic.expand_and_copy parameters error array.basic j in
         error,{basic = basic ; keys = array.keys}
 
+      let init parameters error n f =
+	let error, basic = Basic.init parameters error n f in
+	let error, keys =
+	  Basic.fold parameters error
+		     (fun _ e k _ list -> e,k::list)
+		     basic []
+	in
+	error, {basic = basic; keys = keys}
+		 
       let set parameters error key value array =
         let error,old = Basic.unsafe_get parameters error key array.basic in
         let new_array =
@@ -536,31 +551,21 @@ module Quick_key_list =
         let error,new_basic = Basic.set parameters error key value new_array.basic in
         error, {new_array with basic = new_basic}
 
-      let create_diag parameters error dim  =
-	let error, basic = Basic.create_diag parameters error dim in
-	let error, list =
-	  Basic.fold parameters error
-	    (fun _ error k _ l -> error, k::l)
-	    basic
-	    []
-	in
-	error, {basic=basic; keys=list}
-
       let get parameters error key array =
         Basic.get parameters error key array.basic
 
       let unsafe_get parameters error key array =
         Basic.unsafe_get parameters error key array.basic
 
-      let dimension error a = Basic.dimension error a.basic
+      let dimension parameters error a = Basic.dimension parameters error a.basic
 
       let print error f parameters a = Basic.print error f parameters a.basic
 
-      let print_var_f error f parameters a =
+    (*  let print_var_f error f parameters a =
         Basic.print_var_f error f parameters a.basic
 
       let print_site_f error f parameters a =
-        Basic.print_site_f error f parameters a.basic
+        Basic.print_site_f error f parameters a.basic*)
 
       let iter parameters error f a =
         let error,list = key_list parameters error a in

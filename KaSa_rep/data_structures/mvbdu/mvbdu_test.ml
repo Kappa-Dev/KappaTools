@@ -694,20 +694,20 @@ let bdu_test remanent parameters =
     f (Boolean_mvbdu.clean_head parameters error handler) l'' in 
   let error =
     Boolean_mvbdu.print_boolean_mvbdu
-      error
       (Remanent_parameters.update_prefix parameters "l': ")
+      error
       l''
   in  
   let error =
     Boolean_mvbdu.print_boolean_mvbdu
-      error
       (Remanent_parameters.update_prefix parameters "l'': ")
+      error
       l''' 
   in 
   let error =
     Boolean_mvbdu.print_boolean_mvbdu 
-      error 
       (Remanent_parameters.update_prefix parameters "mvbdu:")
+      error
       mvbdu
   in 
   let error =

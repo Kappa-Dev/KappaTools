@@ -8,21 +8,21 @@ Signature:agents:agent_type:1:Sh
 Signature:agents:agent_type:2:R
 Signature:agents:agent_type:3:E
 Signature:sites:
-Signature:sites:agent_type:0:
-Signature:sites:agent_type:0:site_type:0->x(binding state)
-Signature:sites:agent_type:1:
-Signature:sites:agent_type:1:site_type:0->x(internal state)
-Signature:sites:agent_type:1:site_type:1->x(binding state)
-Signature:sites:agent_type:1:site_type:2->y(binding state)
-Signature:sites:agent_type:2:
-Signature:sites:agent_type:2:site_type:0->z(binding state)
-Signature:sites:agent_type:2:site_type:1->y(binding state)
-Signature:sites:agent_type:2:site_type:2->k(binding state)
-Signature:sites:agent_type:2:site_type:3->t(binding state)
-Signature:sites:agent_type:2:site_type:4->x(binding state)
-Signature:sites:agent_type:3:
-Signature:sites:agent_type:3:site_type:0->y(binding state)
-Signature:sites:agent_type:3:site_type:1->x(binding state)
+Signature:sites:0:
+Signature:sites:0:site_type:0->x(binding state)
+Signature:sites:1:
+Signature:sites:1:site_type:0->x(internal state)
+Signature:sites:1:site_type:1->x(binding state)
+Signature:sites:1:site_type:2->y(binding state)
+Signature:sites:2:
+Signature:sites:2:site_type:0->z(binding state)
+Signature:sites:2:site_type:1->y(binding state)
+Signature:sites:2:site_type:2->k(binding state)
+Signature:sites:2:site_type:3->t(binding state)
+Signature:sites:2:site_type:4->x(binding state)
+Signature:sites:3:
+Signature:sites:3:site_type:0->y(binding state)
+Signature:sites:3:site_type:1->x(binding state)
 Signature:states: 
 Signature:states:0:
 Signature:states:0:0:
@@ -98,7 +98,7 @@ Signature:duals:3:1:1:
 Signature:duals:3:1:1:agent_type:2,site_type:4,state_id:1
 Compiling...
 Generating the raw contact map...
-Compilation:
+Compilation:Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:agent_type_1:site_type_0->state:[state_min:0;state_max:0]
@@ -130,7 +130,7 @@ Compilation:rules:0:reverse:agent_id_0:agent_type_1:site_type_1->state:[state_mi
 Compilation:rules:0:reverse:agent_id_1:
 Compilation:rules:0:reverse:agent_id_1:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
 Compilation:rules:0:actions:binding:(agent_id_0,agent_type_1)@site_type_1----(agent_id_1,agent_type_0)@site_type_0
-
+Compilation:rules:1:
 Compilation:rules:1:lhs:
 Compilation:rules:1:lhs:agent_id_0:
 Compilation:rules:1:lhs:agent_id_0:agent_type_1:site_type_0->state:[state_min:0;state_max:0]
@@ -166,7 +166,7 @@ Compilation:rules:1:reverse:agent_id_0:agent_type_1:site_type_2->state:[state_mi
 Compilation:rules:1:reverse:agent_id_1:
 Compilation:rules:1:reverse:agent_id_1:agent_type_2:site_type_0->state:[state_min:0;state_max:0]
 Compilation:rules:1:actions:binding:(agent_id_0,agent_type_1)@site_type_2----(agent_id_1,agent_type_2)@site_type_0
-
+Compilation:rules:2:
 Compilation:rules:2:lhs:
 Compilation:rules:2:lhs:agent_id_0:
 Compilation:rules:2:lhs:agent_id_0:agent_type_2:site_type_0->state:[state_min:0;state_max:0]
@@ -198,7 +198,7 @@ Compilation:rules:2:reverse:agent_id_0:agent_type_2:site_type_1->state:[state_mi
 Compilation:rules:2:reverse:agent_id_1:
 Compilation:rules:2:reverse:agent_id_1:agent_type_2:site_type_2->state:[state_min:0;state_max:0]
 Compilation:rules:2:actions:binding:(agent_id_0,agent_type_2)@site_type_1----(agent_id_1,agent_type_2)@site_type_2
-
+Compilation:rules:3:
 Compilation:rules:3:lhs:
 Compilation:rules:3:lhs:agent_id_0:
 Compilation:rules:3:lhs:agent_id_0:agent_type_2:site_type_2->state:[state_min:0;state_max:0]
@@ -226,7 +226,7 @@ Compilation:rules:3:reverse:agent_id_0:agent_type_2:site_type_3->state:[state_mi
 Compilation:rules:3:reverse:agent_id_1:
 Compilation:rules:3:reverse:agent_id_1:agent_type_3:site_type_0->state:[state_min:0;state_max:0]
 Compilation:rules:3:actions:binding:(agent_id_0,agent_type_2)@site_type_3----(agent_id_1,agent_type_3)@site_type_0
-
+Compilation:rules:4:
 Compilation:rules:4:lhs:
 Compilation:rules:4:lhs:agent_id_0:
 Compilation:rules:4:lhs:agent_id_0:agent_type_2:site_type_0->state:[state_min:0;state_max:0]

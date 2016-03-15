@@ -1180,7 +1180,7 @@ let rec extensional_description_of_mvbdu parameters handler error mvbdu =
       }, output)
     end
 
-let print_boolean_mvbdu (error:Exception.method_handler) =
+let print_boolean_mvbdu parameters (error:Exception.method_handler) =
   Mvbdu_core.print_mvbdu error
     (fun error parameters a ->
       let _ =
@@ -1191,57 +1191,57 @@ let print_boolean_mvbdu (error:Exception.method_handler) =
       let _ =
 	Loggers.print_newline (Remanent_parameters.get_logger parameters) in
       error)
-    (fun i -> "x" ^ (string_of_int i))
+    (fun i -> "x" ^ (string_of_int i)) parameters
 
-let (f:Exception.method_handler ->
-     Remanent_parameters_sig.parameters ->
+let (f:Remanent_parameters_sig.parameters ->
+     Exception.method_handler ->
      bool Mvbdu_sig.mvbdu -> Exception.method_handler) = print_boolean_mvbdu
 
-let print_hash1 error log  =
-  Hash_1.print error print_boolean_mvbdu log
+let print_hash1 p error log  =
+  Hash_1.print p error print_boolean_mvbdu log
 
-let print_hash2 error log =
-  Hash_2.print error print_boolean_mvbdu log
+let print_hash2 p error log =
+  Hash_2.print p error print_boolean_mvbdu log
 
-let lift f a b c =
-  let () = f b c
-  in a
+let lift f a b c  =
+  let () = f a c
+  in b
 
-let print_hash3 error log =
-  Hash_1.print error (lift List_algebra.print_variables_list) log
+let print_hash3 p error log =
+  Hash_1.print p error (lift List_algebra.print_variables_list) log
 
-let print_hash4 error log =
-  Hash_2.print error (lift List_algebra.print_variables_list) log
+let print_hash4 p error log =
+  Hash_2.print p error (lift List_algebra.print_variables_list) log
 
-let print_hash5 error log =
-  Hash_2.print error
+let print_hash5 p error log =
+  Hash_2.print p error
     (lift List_algebra.print_association_list)
     log
 
-let print_hash6 error log =
-  Hash_1.print error
+let print_hash6 p error log =
+  Hash_1.print p error
     (fun a b c ->
-      let log = Remanent_parameters.get_logger b in
-      let prefix = b.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix in
+      let log = Remanent_parameters.get_logger a in
+      let prefix = a.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix in
       let () = Loggers.fprintf log "%s" prefix in
       let () = List.iter (Loggers.fprintf log "%i;") c in
-      let () = Loggers.print_newline log in a)
+      let () = Loggers.print_newline log in b)
     log
 
-let print_hash7 error log =
-  Hash_1.print error (fun a b c ->
-    let log = Remanent_parameters.get_logger b in
-    let prefix = b.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix in
+let print_hash7 p error log =
+  Hash_1.print p error (fun a b c ->
+    let log = Remanent_parameters.get_logger a in
+    let prefix = a.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix in
     let () = Loggers.fprintf log "%s" prefix in
     let () = List.iter (fun (a,b) -> Loggers.fprintf log "%i,%i;" a b) c in
-    let () = Loggers.print_newline log in a)
+    let () = Loggers.print_newline log in b)
     log
 
-let print_hash8 error log =
-  Hash_1.print error
+let print_hash8 p error log =
+  Hash_1.print p error
     (fun a b c ->
-      let log = Remanent_parameters.get_logger b in
-      let prefix = b.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix in
+      let log = Remanent_parameters.get_logger a in
+      let prefix = a.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix in
       let () = Loggers.fprintf log "%s" prefix in
       let () =
 	List.iter
@@ -1254,14 +1254,14 @@ let print_hash8 error log =
 	    Loggers.fprintf log "\n")
 	  c
       in
-      let () = Loggers.fprintf log "\n" in a)
+      let () = Loggers.fprintf log "\n" in b)
     log
 
 let print_gen log parameters error (title,print_hash,l) =
   let () = Printf.fprintf log "%s:\n" title in
   List.fold_left
     (fun error (pref,x) ->
-      print_hash error (Remanent_parameters.update_prefix parameters pref) x)
+      print_hash (Remanent_parameters.update_prefix parameters pref) error x)
     error l
 
 let print_memo (error:Exception.method_handler) handler parameters =

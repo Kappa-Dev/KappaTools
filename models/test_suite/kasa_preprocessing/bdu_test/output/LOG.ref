@@ -5,9 +5,9 @@ Signature:
 Signature:agents:
 Signature:agents:agent_type:0:A
 Signature:sites:
-Signature:sites:agent_type:0:
-Signature:sites:agent_type:0:site_type:0->x(internal state)
-Signature:sites:agent_type:0:site_type:1->y(internal state)
+Signature:sites:0:
+Signature:sites:0:site_type:0->x(internal state)
+Signature:sites:0:site_type:1->y(internal state)
 Signature:states: 
 Signature:states:0:
 Signature:states:0:0:
@@ -19,10 +19,10 @@ Signature:states:0:1:state_id:1->p
 Signature:duals: 
 Compiling...
 Generating the raw contact map...
-Compilation:
-Compilation:variables:0:Auu: 
-Compilation:variables:1:Apu: 
-Compilation:variables:2:App: 
+Compilation:Compilation:variables:0:
+Compilation:variables:0:Auu: Compilation:variables:1:
+Compilation:variables:1:Apu: Compilation:variables:2:
+Compilation:variables:2:App: Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]

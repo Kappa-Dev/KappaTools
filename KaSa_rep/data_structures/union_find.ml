@@ -54,7 +54,7 @@ module Make =
       type dimension = Storage.dimension
 
       let create parameters error n =
-	Storage.create_diag parameters error n
+	Storage.init parameters error n (fun p e x -> e,x)
 
 (************************************************************************************) 
 (* findSet(e): which return a pointer to the representative of the set

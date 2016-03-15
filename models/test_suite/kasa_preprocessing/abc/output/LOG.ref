@@ -7,16 +7,16 @@ Signature:agents:agent_type:0:A
 Signature:agents:agent_type:1:B
 Signature:agents:agent_type:2:C
 Signature:sites:
-Signature:sites:agent_type:0:
-Signature:sites:agent_type:0:site_type:0->x(binding state)
-Signature:sites:agent_type:0:site_type:1->c(binding state)
-Signature:sites:agent_type:1:
-Signature:sites:agent_type:1:site_type:0->x(binding state)
-Signature:sites:agent_type:2:
-Signature:sites:agent_type:2:site_type:0->x1(internal state)
-Signature:sites:agent_type:2:site_type:1->x2(internal state)
-Signature:sites:agent_type:2:site_type:2->x1(binding state)
-Signature:sites:agent_type:2:site_type:3->x2(binding state)
+Signature:sites:0:
+Signature:sites:0:site_type:0->x(binding state)
+Signature:sites:0:site_type:1->c(binding state)
+Signature:sites:1:
+Signature:sites:1:site_type:0->x(binding state)
+Signature:sites:2:
+Signature:sites:2:site_type:0->x1(internal state)
+Signature:sites:2:site_type:1->x2(internal state)
+Signature:sites:2:site_type:2->x1(binding state)
+Signature:sites:2:site_type:3->x2(binding state)
 Signature:states: 
 Signature:states:0:
 Signature:states:0:0:
@@ -66,16 +66,16 @@ Signature:duals:2:3:1:
 Signature:duals:2:3:1:agent_type:0,site_type:1,state_id:2
 Compiling...
 Generating the raw contact map...
-Compilation:
-Compilation:variables:0:on_rate: 0.000100 
-Compilation:variables:1:off_rate: 0.100000 
-Compilation:variables:2:mod_rate: 1 
-Compilation:variables:3:AB: 
-Compilation:variables:4:Cuu: 
-Compilation:variables:5:Cpu: 
-Compilation:variables:6:Cpp: 
-Compilation:variables:7:n_ab: 1000 
-Compilation:variables:8:n_c: 10000 
+Compilation:Compilation:variables:0:
+Compilation:variables:0:on_rate: 0.000100 Compilation:variables:1:
+Compilation:variables:1:off_rate: 0.100000 Compilation:variables:2:
+Compilation:variables:2:mod_rate: 1 Compilation:variables:3:
+Compilation:variables:3:AB: Compilation:variables:4:
+Compilation:variables:4:Cuu: Compilation:variables:5:
+Compilation:variables:5:Cpu: Compilation:variables:6:
+Compilation:variables:6:Cpp: Compilation:variables:7:
+Compilation:variables:7:n_ab: 1000 Compilation:variables:8:
+Compilation:variables:8:n_c: 10000 Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
@@ -101,7 +101,7 @@ Compilation:rules:0:reverse:agent_id_0:agent_type_0:site_type_0->state:[state_mi
 Compilation:rules:0:reverse:agent_id_1:
 Compilation:rules:0:reverse:agent_id_1:agent_type_1:site_type_0->state:[state_min:0;state_max:0]
 Compilation:rules:0:actions:binding:(agent_id_0,agent_type_0)@site_type_0----(agent_id_1,agent_type_1)@site_type_0
-
+Compilation:rules:1:
 Compilation:rules:1:lhs:
 Compilation:rules:1:lhs:agent_id_0:
 Compilation:rules:1:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
@@ -127,7 +127,7 @@ Compilation:rules:1:reverse:agent_id_0:agent_type_0:site_type_0->state:[state_mi
 Compilation:rules:1:reverse:agent_id_1:
 Compilation:rules:1:reverse:agent_id_1:agent_type_1:site_type_0->state:[state_min:1;state_max:1]
 Compilation:rules:1:actions:unbinding:(agent_id_0,agent_type_0)@site_type_0....(agent_id_1,agent_type_1)@site_type_0
-
+Compilation:rules:2:
 Compilation:rules:2:lhs:
 Compilation:rules:2:lhs:agent_id_0:
 Compilation:rules:2:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
@@ -157,7 +157,7 @@ Compilation:rules:2:reverse:agent_id_0:agent_type_0:site_type_1->state:[state_mi
 Compilation:rules:2:reverse:agent_id_1:
 Compilation:rules:2:reverse:agent_id_1:agent_type_2:site_type_2->state:[state_min:0;state_max:0]
 Compilation:rules:2:actions:binding:(agent_id_0,agent_type_0)@site_type_1----(agent_id_1,agent_type_2)@site_type_2
-
+Compilation:rules:3:
 Compilation:rules:3:lhs:
 Compilation:rules:3:lhs:agent_id_0:
 Compilation:rules:3:lhs:agent_id_0:agent_type_2:site_type_0->state:[state_min:0;state_max:0]
@@ -187,7 +187,7 @@ Compilation:rules:3:reverse:agent_id_0:agent_type_2:site_type_2->state:[state_mi
 Compilation:rules:3:reverse:agent_id_1:
 Compilation:rules:3:reverse:agent_id_1:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
 Compilation:rules:3:actions:unbinding:(agent_id_0,agent_type_2)@site_type_2....(agent_id_1,agent_type_0)@site_type_1
-
+Compilation:rules:4:
 Compilation:rules:4:lhs:
 Compilation:rules:4:lhs:agent_id_0:
 Compilation:rules:4:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
@@ -221,7 +221,7 @@ Compilation:rules:4:reverse:agent_id_0:agent_type_0:site_type_1->state:[state_mi
 Compilation:rules:4:reverse:agent_id_1:
 Compilation:rules:4:reverse:agent_id_1:agent_type_2:site_type_3->state:[state_min:0;state_max:0]
 Compilation:rules:4:actions:binding:(agent_id_0,agent_type_0)@site_type_1----(agent_id_1,agent_type_2)@site_type_3
-
+Compilation:rules:5:
 Compilation:rules:5:lhs:
 Compilation:rules:5:lhs:agent_id_0:
 Compilation:rules:5:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]

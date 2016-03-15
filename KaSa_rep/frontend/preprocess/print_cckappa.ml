@@ -101,30 +101,30 @@ let print_mixture parameters error handler mixture =
     let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
     let error =
       Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.print
-       error
-       (fun error parameters a ->
-        let _ = print_agent parameters error handler a in
-            error
+	(Remanent_parameters.update_prefix parameters "agent_id_")
+	error
+	(fun parameters error a ->
+         let _ = print_agent parameters error handler a in
+         error
        )
-       (Remanent_parameters.update_prefix parameters "agent_id_")
        mixture.Cckappa_sig.views
     in
     let error =
       Int_storage.Quick_Nearly_inf_Imperatif.print
-        error
-        (fun error parameters a ->
+	(Remanent_parameters.update_prefix parameters "bonds:agent_id_")
+	error
+        (fun parameters error a ->
          let error =
            Ckappa_sig.Site_map_and_set.Map.fold
-              (fun k a error ->
-                let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%ssite_type_%i->agent_id_%i.site_type_%i" (Remanent_parameters.get_prefix parameters) k a.Cckappa_sig.agent_index a.Cckappa_sig.site
-                in
-		let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
-		error
-                )
+             (fun k a error ->
+              let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%ssite_type_%i->agent_id_%i.site_type_%i" (Remanent_parameters.get_prefix parameters) k a.Cckappa_sig.agent_index a.Cckappa_sig.site
+              in
+	      let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
+	      error
+             )
                a
-              error
-          in error)
-        (Remanent_parameters.update_prefix parameters "bonds:agent_id_")
+               error
+         in error)
         mixture.Cckappa_sig.bonds
     in
     let error =
@@ -151,16 +151,16 @@ let print_diffview parameters error handler diff =
     let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
     let error =
       Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.print
-       error
-       (fun error parameters a ->
+	 (Remanent_parameters.update_prefix parameters "agent_id_")
+	 error
+	 (fun parameters error a ->
           let _ = print_diffagent parameters error handler a in
-            error
-       )
-       (Remanent_parameters.update_prefix parameters "agent_id_")
-       diff
+          error
+	 )
+         diff
     in
-      error
-
+    error
+      
  let rec print_short_alg parameters error handler alg =
     match alg with
      |Ast.BIN_ALG_OP(Operator.MULT,a1,a2),_ ->
@@ -290,12 +290,13 @@ let print_diffview parameters error handler diff =
 
 
  let print_variables parameters error handler var =
-   Int_storage.Nearly_inf_Imperatif.print_var_f
-       error
-       (fun error parameters var ->
-        let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" (Remanent_parameters.get_prefix parameters) in
-           print_var parameters error handler var)
-       parameters var
+   Int_storage.Nearly_inf_Imperatif.print
+     parameters
+     error
+     (fun parameters error var ->
+      let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" (Remanent_parameters.get_prefix parameters) in
+      print_var parameters error handler var)
+     var
 
  let print_signatures parameters error handler signature = error
 
@@ -410,30 +411,28 @@ let print_diffview parameters error handler diff =
      error
 
    let print_rules parameters error handler rules =
-     Int_storage.Nearly_inf_Imperatif.print_var_f
-       error
-       (fun error parameters rule ->
-        print_rule parameters error handler rule)
+     Int_storage.Nearly_inf_Imperatif.print
        parameters
+       error
+       (fun parameters error rule ->
+        print_rule parameters error handler rule)
        rules
 
  let print_observables parameters error handler obs = error
 
  let print_init parameters error handler init =
-(*  let parameters_init =  Remanent_parameters.update_prefix parameters "coef:" in
-  let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s%i\n" parameters_init.Remanent_parameters_sig.prefix init.Cckappa_sig.e_init_factor in *)
-  let parameters_rhs =  Remanent_parameters.update_prefix parameters "mixture:" in
-  let error = print_mixture parameters_rhs error handler init.Cckappa_sig.e_init_c_mixture  in
+   let parameters_rhs =  Remanent_parameters.update_prefix parameters "mixture:" in
+   let error = print_mixture parameters_rhs error handler init.Cckappa_sig.e_init_c_mixture  in
    error
 
  let print_inits parameters error handler init =
    Int_storage.Nearly_inf_Imperatif.print
-       error
-       (fun error parameters init ->
-           print_init parameters error handler init)
-       parameters
-       init
-
+     parameters
+     error
+     (fun parameters error init ->
+      print_init parameters error handler init)
+     init
+     
  let print_perturbations parameters error handler perturbations = error
 
  let print_compil parameters error handler compil =

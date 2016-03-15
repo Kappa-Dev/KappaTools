@@ -6,10 +6,10 @@ Signature:agents:
 Signature:agents:agent_type:0:A
 Signature:agents:agent_type:1:B
 Signature:sites:
-Signature:sites:agent_type:0:
-Signature:sites:agent_type:0:site_type:0->x(binding state)
-Signature:sites:agent_type:1:
-Signature:sites:agent_type:1:site_type:0->x(binding state)
+Signature:sites:0:
+Signature:sites:0:site_type:0->x(binding state)
+Signature:sites:1:
+Signature:sites:1:site_type:0->x(binding state)
 Signature:states: 
 Signature:states:0:
 Signature:states:0:0:
@@ -30,7 +30,7 @@ Signature:duals:1:0:1:
 Signature:duals:1:0:1:agent_type:0,site_type:0,state_id:1
 Compiling...
 Generating the raw contact map...
-Compilation:
+Compilation:Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
@@ -56,7 +56,7 @@ Compilation:rules:0:reverse:agent_id_0:agent_type_0:site_type_0->state:[state_mi
 Compilation:rules:0:reverse:agent_id_1:
 Compilation:rules:0:reverse:agent_id_1:agent_type_1:site_type_0->state:[state_min:0;state_max:0]
 Compilation:rules:0:actions:binding:(agent_id_0,agent_type_0)@site_type_0----(agent_id_1,agent_type_1)@site_type_0
-
+Compilation:rules:1:
 Compilation:rules:1:lhs:
 Compilation:rules:1:lhs:agent_id_0:
 Compilation:rules:1:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
