@@ -37,6 +37,7 @@ $(MANGENREP): $(SCRIPTSSOURCE) $(MODELS)
 	mkdir $@
 VERSION=generated/version.ml
 GENERATED=$(VERSION) \
+	  generated/resource_strings.ml \
 	  generated/ApiTypes_t.ml generated/ApiTypes_j.ml \
 	  generated/WebMessage_t.ml generated/WebMessage_j.ml
 
@@ -55,11 +56,14 @@ generated/WebMessage_t.ml: js/WebMessage.atd generated
 generated/WebMessage_j.ml: js/WebMessage.atd generated
 	atdgen -j -j-std -o generated/WebMessage js/WebMessage.atd
 
+generated/resource_strings.ml: shared/flux.js generated
+	./dev/generate-string.sh $<  > $@
+
 $(VERSION): main/version.ml.skel $(wildcard .git/refs/heads/*) generated
 	sed -e s/'\(.*\)\".*tag: \([^,\"]*\)[,\"].*/\1\"\2\"'/g $< | \
 	sed -e 's/\$$Format:%D\$$'/"$$(git describe --always --dirty || echo unkown)"/ > $@
 
-%.cma %.native %.byte %.docdir/index.html: $(filter-out _build/,$(wildcard */*.ml*)) $(wildcard $(KASAREP)*/*.ml*) $(wildcard $(KASAREP)*/*/*.ml*) $(VERSION)
+%.cma %.native %.byte %.docdir/index.html: $(filter-out _build/,$(wildcard */*.ml*)) $(wildcard $(KASAREP)*/*.ml*) $(wildcard $(KASAREP)*/*/*.ml*)  generated/resource_strings.ml $(VERSION)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) $@
 
 site:
