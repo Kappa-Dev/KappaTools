@@ -170,7 +170,7 @@ let html_of_flux flux =
 	    f "var chord = @[d3.@,layout.@,chord()@,.padding(.01)" in
 	let () =
 	  Format.fprintf
-	    f "@,.sortSubgroups(d3.descending)@,.matrix(matrix);@]@," in
+	    f "@,.matrix(matrix);@]@," in
 	let () =
 	  Format.fprintf
 	    f "@[var width = 960,@ height = 700,@ " in
