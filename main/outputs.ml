@@ -211,7 +211,10 @@ let html_of_flux flux =
 	    f "svg.append(\"g\").attr(\"id\", \"values\").selectAll(\".sources\")@," in
 	let () =
 	  Format.fprintf
-	    f ".data(chord.chords).enter().append(\"text\").attr(\"class\",\"sources\")@," in
+	    f ".data(chord.chords).enter().append(\"text\")@," in
+	let () =
+	  Format.fprintf
+	    f ".filter(function (v) {return (v.source.value != 0); }).attr(\"class\",\"sources\")@," in
 	let () =
 	  Format.fprintf
 	    f ".each(function(d) { d.angle = ( d.source.startAngle + d.source.endAngle) / 2; })@," in
@@ -235,16 +238,16 @@ let html_of_flux flux =
 	    f ".style(\"text-anchor\", function(d) { return d.angle > Math.PI ? null : \"end\" ; })@," in
 	let () =
 	  Format.fprintf
-	    f ".text(function (d) { return d.source.value;});@," in
+	    f ".text(function (d) { return d.source.value.toExponential(2);});@," in
 	let () =
 	  Format.fprintf
 	    f "svg.select(\"#values\").selectAll(\".targets\")@," in
 	let () =
 	  Format.fprintf
-	    f ".data(chord.chords).enter()@," in
+	    f ".data(chord.chords).enter().append(\"text\")@," in
 	let () =
 	  Format.fprintf
-	    f ".append(\"text\").attr(\"class\",\"targets\")@," in
+	    f ".filter(function (v) {return (v.target.value != 0); }).attr(\"class\",\"targets\")@," in
 	let () =
 	  Format.fprintf
 	    f ".each(function(d) { d.angle = ( d.target.startAngle + d.target.endAngle) / 2; })@," in
@@ -268,7 +271,7 @@ let html_of_flux flux =
 	    f ".style(\"text-anchor\", function(d) { return d.angle > Math.PI ? null : \"end\" ; })@," in
 	let () =
 	  Format.fprintf
-	    f ".text(function (d) { return d.target.value;});@," in
+	    f ".text(function (d) { return d.target.value.toExponential(2);});@," in
 
 	let () =
 	  Format.fprintf
