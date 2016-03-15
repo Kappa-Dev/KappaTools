@@ -82,7 +82,7 @@ let print_ast_rule ?env f i =
   | None -> Format.fprintf f "__ast_rule_%i" i
   | Some env ->
      let sigs = env.signatures in
-     if i = 0 then Format.pp_print_string f "A generated rule for perturbations"
+     if i = 0 then Format.pp_print_string f "Perturbations"
      else
        match env.ast_rules.(pred i) with
        | (Some (na,_),_) -> Format.pp_print_string f na

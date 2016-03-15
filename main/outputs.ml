@@ -108,7 +108,7 @@ let html_of_flux flux =
 	let () =
 	  Format.fprintf
 	    f
-	    "var selectedRules=flux.rules.map(function () {return true;}),@," in
+	    "var selectedRules=flux.rules.map(function (v,i) {return (i !== 0);}),@," in
 	let () = Format.fprintf f "selfInfluence = false;@," in
 	let () =
 	  Format.fprintf
@@ -358,7 +358,7 @@ let html_of_flux flux =
 	  Format.fprintf
 	    f "box.setAttribute(\"type\", \"checkbox\");@," in
 	let () =
-	  Format.fprintf f "box.setAttribute(\"checked\", val);@," in
+	  Format.fprintf f "if (val) {box.setAttribute(\"checked\")};@," in
 	let () =
 	  Format.fprintf
 	    f "box.addEventListener(\"change\",function () { aClick(id);});@," in
