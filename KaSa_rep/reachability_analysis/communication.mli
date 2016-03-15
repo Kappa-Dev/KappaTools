@@ -1,4 +1,4 @@
-(**
+(*
    * communication.ml
    * openkappa
    * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
