@@ -44,7 +44,7 @@ let dot_of_flux flux =
 
 let print_json_of_flux f flux =
   let () = Format.fprintf
-             f "@[<v>{@ \"bio_begin_time\" : %f,@ \"bio_end_time\" : %f,@ "
+             f "@[<v>{@ \"bio_begin_time\" : %e,@ \"bio_end_time\" : %e,@ "
              flux.Data.flux_data.Data.flux_start flux.Data.flux_end in
   let () =
     Format.fprintf
@@ -59,7 +59,7 @@ let print_json_of_flux f flux =
        (fun _ f x ->
         Format.fprintf
           f "@[[%a]@]"
-          (Pp.array Pp.comma (fun _ f y -> Format.pp_print_float f y)) x))
+          (Pp.array Pp.comma (fun _ f y -> Format.fprintf f "%e" y)) x))
     flux.Data.flux_data.Data.flux_fluxs
 
 let json_of_flux flux =
