@@ -85,18 +85,8 @@ module type Mvbdu =
 	'map ->
 	Exception.method_handler * 'map) ->
       'data ->
-      List_sig.hash_key ->
-      'map ->
-      Exception.method_handler * 'data) ->
-    ( Remanent_parameters_sig.parameters ->
-      Exception.method_handler ->
-      List_sig.hash_key ->
-      'data ->
-      'map ->
-      Exception.method_handler * 'map) ->
-    'data ->
-    ('data,'data,'data) binary ->
-    (hconsed_variables_list,'data,'map,'map) ternary
+      ('data,'data,'data) binary ->
+      (hconsed_variables_list,'data,'map,'map) ternary
 
   val store_by_mvbdu:
     ( Remanent_parameters_sig.parameters ->
@@ -525,12 +515,9 @@ module Internalize(M:Mvbdu
   (struct
 
     module Mvbdu = M
-<<<<<<< HEAD
 
-=======
     type key = int
     type value = int
->>>>>>> abstract types in mvbdu
     type mvbdu = Mvbdu.mvbdu
     type hconsed_association_list = Mvbdu.hconsed_association_list
     type hconsed_variables_list = Mvbdu.hconsed_variables_list
