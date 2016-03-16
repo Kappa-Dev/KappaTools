@@ -16,10 +16,7 @@ done
 	 Done
 ____________________________________________________________
 ############################################################
-	 - removing events occurring after the last observable:
- (-1 events)
 + Producing causal compressions
-	 - splitting initial events (no change)
 	 - blackboard generation
 	 - computing causal past of each observed events (106)
 Stats:
@@ -30,32 +27,9 @@ Stats:
 
 	 - causal flow compression (106)
 
-____________________________________________________________
-############################################################
-
-	 - detecting siphons (+281 events)
-	 - cutting concurrent events (-565 events)
-	 - detecting pseudo inverse events (-430 events)
-	 - detecting siphons (+20 events)
-	 - cutting concurrent events (-235 events)
-	 - detecting pseudo inverse events (no change)
-	 - detecting siphons (+20 events)
-	 - cutting concurrent events (-20 events)
-	 - detecting pseudo inverse events (no change)
-	 - blackboard generation
-	 - computing causal past of each observed events (106)
-
 
 	 - weak flow compression (1)
-
-____________________________________________________________
-############################################################
-
 	 - strong flow compression (1)
-
-____________________________________________________________
-############################################################
-
 + Pretty printing 106 flows
 + Pretty printing 1 weakly compressed flow
 + Pretty printing 1 strongly compressed flow

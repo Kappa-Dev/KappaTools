@@ -16,26 +16,10 @@ done
 	 Done
 ____________________________________________________________
 ############################################################
-	 - removing events occurring after the last observable:
- (-90 events)
 + Producing causal compressions
-	 - splitting initial events (no change)
-	 - detecting siphons (+2 events)
-	 - cutting concurrent events (-2 events)
-	 - detecting pseudo inverse events (no change)
-	 - blackboard generation
-	 - computing causal past of each observed events (1)
 
 
 	 - weak flow compression (1)
-
-____________________________________________________________
-############################################################
-
 	 - strong flow compression (1)
-
-____________________________________________________________
-############################################################
-
 + Pretty printing 1 strongly compressed flow
 Simulation ended
