@@ -11,12 +11,12 @@ module type Cflow_handler =
           priorities_causal : Priority.priorities ;
 	  compute_all_stories : bool ;
 	  sort_algo_for_stories: Parameter.sort_algo_for_stories;
-	  out_channel_err : Format.formatter ;
+	(*  out_channel_err : Format.formatter ;
           out_channel_profiling : Format.formatter ;
-          out_channel : Format.formatter ;
+          out_channel : Format.formatter ;*)
 	  log_step : bool ;
 	  debug_mode : bool ;
-	  log_step_channel: Format.formatter ;
+	  (*	  log_step_channel: Format.formatter ;*)
 	  kasa: Remanent_parameters_sig.parameters ;
 	  always_disambiguate_initial_states : bool  ;
 	  bound_on_itteration_number: int option ;
@@ -53,13 +53,13 @@ module type Cflow_handler =
     val get_log_step: parameter -> bool
     val set_debugging_mode: parameter -> bool -> parameter
     val get_debugging_mode: parameter -> bool
-    val get_profiling_logger: parameter -> Format.formatter
-    val get_logger: parameter -> Format.formatter
+    (*val get_profiling_logger: parameter -> Format.formatter
+      val get_logger: parameter -> Format.formatter
     val set_logger: parameter -> Format.formatter -> parameter
     val get_out_channel: parameter -> Format.formatter
     val set_out_channel: parameter -> Format.formatter -> parameter
     val get_debugging_channel: parameter -> Format.formatter
-    val set_debugging_channel: parameter -> Format.formatter -> parameter
+    val set_debugging_channel: parameter -> Format.formatter -> parameter*)
     val get_kasa_parameters: parameter -> Remanent_parameters_sig.parameters
     val set_kasa_parameters: Remanent_parameters_sig.parameters -> parameter -> parameter
     val do_we_use_bucket_sort: parameter -> bool

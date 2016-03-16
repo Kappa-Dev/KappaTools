@@ -246,7 +246,7 @@ module Preblackboard =
            ()
 
          let print_preblackboard parameter _handler log_info error blackboard =
-           let log = parameter.CI.Po.K.H.out_channel in
+        (*   let log = parameter.CI.Po.K.H.out_channel in
            let _ = Format.fprintf log "**@.PREBLACKBOARD@.**@." in
            let _ = Format.fprintf log "*@. agent types @.*@." in
            let _ =
@@ -329,7 +329,7 @@ module Preblackboard =
                blackboard.pre_observable_list
            in
 
-           let _ = Format.fprintf log "**@." in
+           let _ = Format.fprintf log "**@." in*)
            error,log_info,()
 
      (** information lattice *)
@@ -901,7 +901,7 @@ module Preblackboard =
            }
 
          let print_data_structure parameter handler error data =
-           let stderr = parameter.CI.Po.K.H.out_channel_err in
+         (*  let stderr = parameter.CI.Po.K.H.out_channel_err in
 	   let sigs = Environment.signatures handler.CI.Po.K.H.env in
            let _ = Format.fprintf stderr "New agents: @." in
            let _ =
@@ -995,7 +995,7 @@ module Preblackboard =
                      l
                  in ())
                data.other_agents_side_effects
-           in
+           in*)
            error
 
 

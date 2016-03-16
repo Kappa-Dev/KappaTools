@@ -75,7 +75,7 @@ let dummy_cannonical_form = []
 let dummy_prehash = []
 
 let print_graph parameter handler error graph =
-  let _ = Format.fprintf parameter.H.out_channel "****@\ngraph@\n****" in
+  (*let _ = Format.fprintf parameter.H.out_channel "****@\ngraph@\n****" in
   let _ = Format.fprintf parameter.H.out_channel "Root: %i@\n" graph.root in
   let _ = Format.fprintf parameter.H.out_channel "Labels:@\n" in
   let _ = A.iteri (fun i (_,j) -> Format.fprintf parameter.H.out_channel "Node %i,Label %s@\n" i j) graph.labels in
@@ -96,10 +96,10 @@ let print_graph parameter handler error graph =
       )
       graph.conflict_pred
   in
-  let _ = Format.fprintf parameter.H.out_channel "****@\n@\n" in
+  let _ = Format.fprintf parameter.H.out_channel "****@\n@\n" in*)
   error
 
-let print_elt log elt =
+let print_elt log elt = 
   match
     elt
   with
@@ -108,21 +108,21 @@ let print_elt log elt =
   | Fresh (_,s) -> Format.fprintf log "Event %s@\n" s
 
 let print_canonical_form parameter handler error dag =
-  let _ =
+  (*let _ =
     List.iter
       (print_elt parameter.H.out_channel_err)
       dag
   in
-  let _ = Format.fprintf parameter.H.out_channel_err "@." in
+  let _ = Format.fprintf parameter.H.out_channel_err "@." in*)
   error
 
 let print_prehash parameter handler error representation =
-  let _ =
+  (*let _ =
     List.iter
       (fun ((_,b),i) -> Format.fprintf parameter.H.out_channel_err "%s:%i," b i)
       representation
   in
-  let _ = Format.fprintf parameter.H.out_channel_err "@." in
+  let _ = Format.fprintf parameter.H.out_channel_err "@." in*)
   error
 
 let label handler x =
@@ -838,7 +838,7 @@ module BucketTable =
 	error,log_info,{table with tree = tree}
 
       let rec print_inner_tree parameter handler error prefix inner_tree =
-	match
+	(*match
 	  inner_tree
 	with
 	| Inner_node (map,assoc') ->
@@ -859,11 +859,11 @@ module BucketTable =
 	     map
 	| Inner_leave (l,id)  ->
 	   let () = Format.fprintf parameter.H.out_channel "%sLEAVE:\n" prefix in
-	   let _ = print_canonical_form parameter handler error l in
+	   let _ = print_canonical_form parameter handler error l in*)
 	   ()
 	
       let rec print_outer_tree parameter handler error prefix outer_tree =
-	match
+(*	match
 	  outer_tree
 	with
 	| Empty ->
@@ -897,7 +897,7 @@ module BucketTable =
 		       print_outer_tree parameter handler error prefix' map)
 		      map
 	   in
-	   print_inner_tree parameter handler error prefix' inner
+	   print_inner_tree parameter handler error prefix' inner*) ()
 	
       let hash_list parameter _  log_info error table =
 	let error,array =

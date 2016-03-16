@@ -243,10 +243,10 @@ struct
       aux 0 events_to_keep []
     in
     let error,log_info,forbidden_events = PH.forbidden_events parameter handler log_info error events_to_remove in
-    let _ =
+    (*let _ =
       if log_steps then
-        Format.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err "Start cutting@."
-    in
+	        Format.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err "Start cutting@." ()
+    in*)
     let error,log_info,(blackboard,output) =
       propagate parameter handler log_info error forbidden_events [] blackboard
     in
@@ -265,19 +265,19 @@ struct
     let error,log_info,blackboard = PH.B.branch parameter handler log_info error blackboard in
     let log_info = StoryProfiling.StoryStats.set_concurrent_event_deletion_time log_info in
     let log_info = StoryProfiling.StoryStats.set_step_time log_info in
-    let _ =
+   (* let _ =
       if log_steps then
         Format.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err
 		       "After Causal Cut  %i @." (PH.B.get_n_unresolved_events blackboard)
-    in
+    in*)
     let error,log_info,(blackboard,output) =
       propagate parameter handler log_info error list_order [] blackboard
     in
-    let _ =
+    (*let _ =
       if log_steps then
         Format.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err
 		       "After observable propagation  %i @." (PH.B.get_n_unresolved_events blackboard)
-    in
+    in*)
     let error,log_info,(blackboard,story_list) = iter parameter handler log_info error blackboard empty_choice_list []
     in
     let output =

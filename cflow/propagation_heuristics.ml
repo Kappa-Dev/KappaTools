@@ -279,7 +279,7 @@ module Propagation_heuristic =
 
     let print_event_case_address parameter handler log_info error blackboard  case =
       let error,log_info,(_,eid,_,_) = B.get_static parameter handler log_info error blackboard case in
-      let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err  "Event: %i, Predicate: %i\n" eid (B.predicate_id_of_case_address case) in
+      (*    let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err  "Event: %i, Predicate: %i\n" eid (B.predicate_id_of_case_address case) in*)
       error,log_info,()
 		
     let propagate_down parameter handler log_info error blackboard event_case_address instruction_list propagate_list =
@@ -332,11 +332,11 @@ module Propagation_heuristic =
                           let error,log_info =
                             if debug_mode
                             then
-                              let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_down (case 1):\n" in
+                            (*  let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_down (case 1):\n" in
                               let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "next event is kept but has no test and no action\n" in
                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "Value is propagated after the next event\n" in
-                              let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                              let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                               error,log_info
 			    else
 			      error,log_info
@@ -357,11 +357,11 @@ module Propagation_heuristic =
                           let error,log_info =
                             if debug_mode
                             then
-                              let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_down  (case 2):\n" in
+                            (*  let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_down  (case 2):\n" in
                               let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "next event is kept, no test, but an action \n" in
                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "Nothing to be done\n" in
-                              let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                              let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                               error,log_info
 			    else
 			      error,log_info
@@ -386,7 +386,7 @@ module Propagation_heuristic =
                             let error,log_info =
                               if debug_mode
                               then
-                                let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_down  (case 3):\n" in
+                               (* let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_down  (case 3):\n" in
                                 let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "next event is kept, a test but no action \n" in
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "Next event Test: " in
@@ -396,7 +396,7 @@ module Propagation_heuristic =
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate new predicate_value " in
                                 let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err conj in
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err " before and after next event \n" in
-                                let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                                let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                                 error,log_info
 			      else
 				error,log_info
@@ -416,7 +416,7 @@ module Propagation_heuristic =
                             let error,log_info =
                               if debug_mode
                               then
-                                let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_down  (case 4):\n" in
+                               (* let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_down  (case 4):\n" in
                                 let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "next event is kept, a test but no action \n" in
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "Next event Test: " in
@@ -424,7 +424,7 @@ module Propagation_heuristic =
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nWire_state: " in
                                 let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err predicate_value in
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nCut\n" in
-                                let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                                let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                                 error,log_info
 			      else
 				error,log_info
@@ -449,7 +449,7 @@ module Propagation_heuristic =
                             let error,log_info =
                               if debug_mode
                               then
-                                let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_down  (case 5):\n" in
+                                (*let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_down  (case 5):\n" in
                                 let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "next event is kept, a test but no action \n" in
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "next event Test: " in
@@ -461,7 +461,7 @@ module Propagation_heuristic =
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate new predicate_value " in
                                 let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err conj in
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err " before the next event \n" in
-                                let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                                let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                                 error,log_info
 			      else
 				error,log_info
@@ -481,7 +481,7 @@ module Propagation_heuristic =
                             let error,log_info =
                               if debug_mode
                               then
-                                let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_down  (case 6):\n" in
+                                (*let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_down  (case 6):\n" in
                                 let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "next event is kept, a test, an action \n" in
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "Next event Test: " in
@@ -491,7 +491,7 @@ module Propagation_heuristic =
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nWire_state: " in
                                 let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err predicate_value in
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nCut\n" in
-                                let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                                let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                                 error,log_info
 			      else
 				error,log_info
@@ -524,13 +524,13 @@ module Propagation_heuristic =
                                 let error,log_info =
                                   if debug_mode
                                   then
-                                    let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_down  (case 7):\n" in
+                                   (* let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_down  (case 7):\n" in
                                     let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                                     let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "we do not know if the next event is kept\n there is no test, no action \n " in
                                     let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nWire_state: " in
                                     let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err predicate_value in
                                     let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nThe value is propagated after and before the next event\n" in
-                                    let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                                    let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                                     error,log_info
 				  else
 				    error,log_info
@@ -554,7 +554,7 @@ module Propagation_heuristic =
                                   let error,log_info =
                                     if debug_mode
                                     then
-                                      let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_down  (case 8):\n" in
+                                     (* let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_down  (case 8):\n" in
                                       let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                                       let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "we do not know if the next event is kept\n there is a test, but no action \n " in
                                       let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "next event Test: " in
@@ -564,7 +564,7 @@ module Propagation_heuristic =
                                       let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nThe value " in
                                       let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err predicate_value in
                                       let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err " is propagated after and before the next event\n" in
-                                      let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                                      let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                                       error,log_info
 				    else
 				      error,log_info
@@ -585,7 +585,7 @@ module Propagation_heuristic =
                                   let error,log_info =
                                     if debug_mode
                                     then
-                                      let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_down  (case 9):\n" in
+                                     (* let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_down  (case 9):\n" in
                                       let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                                       let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "we do not know if the next event is kept\n there is a test, but no action \n " in
                                       let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "next event Test: " in
@@ -593,7 +593,7 @@ module Propagation_heuristic =
                                       let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nWire_state: " in
                                       let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err predicate_value in
                                       let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nWe discard the next event (%i) \n" next_eid in
-                                      let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                                      let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                                       error,log_info
 				    else
 				      error,log_info
@@ -622,7 +622,7 @@ module Propagation_heuristic =
                             let error,log_info =
                               if debug_mode
                               then
-                                let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_down  (case 10):\n" in
+                                (*let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_down  (case 10):\n" in
                                 let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "we do not know if the next event is kept\n there is an action \n " in
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "next event Action: " in
@@ -632,7 +632,7 @@ module Propagation_heuristic =
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nThe value " in
                                 let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err computed_next_predicate_value in
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err " is propagated after the next event\n" in
-                                let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                                let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                                 error,log_info
 			      else
 				error,log_info
@@ -660,7 +660,7 @@ module Propagation_heuristic =
                                     let error,log_info =
                                       if debug_mode
                                       then
-                                        let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_down  (case 11):\n" in
+                                      (*  let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_down  (case 11):\n" in
                                         let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                                         let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "we do not know if the next event is kept\n there is no test, but there is an action \n " in
                                         let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "next event Action: " in
@@ -670,7 +670,7 @@ module Propagation_heuristic =
                                         let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nThe value " in
                                         let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err computed_next_predicate_value in
                                         let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err " is propagated after the next event\n" in
-                                        let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                                        let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                                         error,log_info
 				      else
 					error,log_info
@@ -696,7 +696,7 @@ module Propagation_heuristic =
                                       let error,log_info =
                                         if debug_mode
                                         then
-                                          let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_down  (case 12):\n" in
+                                         (* let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_down  (case 12):\n" in
                                           let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                                           let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "we do not know if the next event is kept\n there is a test, but there is an action \n " in
                                           let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "next event Test: " in
@@ -708,7 +708,7 @@ module Propagation_heuristic =
                                           let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nThe value " in
                                           let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err computed_next_predicate_value in
                                           let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err " is propagated after the next event\n" in
-                                          let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                                          let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                                           error,log_info
 					else
 					  error,log_info
@@ -731,7 +731,7 @@ module Propagation_heuristic =
                                       let error,log_info =
                                         if debug_mode
                                         then
-                                          let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_down  (case 13):\n" in
+                                          (*let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_down  (case 13):\n" in
                                           let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                                           let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "we do not know if the next event is kept\n there is a test, but there is an action \n " in
                                           let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "next event Test: " in
@@ -741,7 +741,7 @@ module Propagation_heuristic =
                                           let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nWire_state: " in
                                           let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err predicate_value in
                                           let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nNext event (%i) is discarded \n " next_eid in
-                                          let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                                          let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                                           error,log_info
 					else
 					  error,log_info
@@ -788,8 +788,8 @@ module Propagation_heuristic =
                    if bool
                    then
                       let log_info = StoryProfiling.StoryStats.add_look_up_case 1 log_info in
-                      let _ = Format.pp_print_flush
-				parameter.B.PB.CI.Po.K.H.out_channel_err () in
+                     (* let _ = Format.pp_print_flush
+				parameter.B.PB.CI.Po.K.H.out_channel_err () in*)
                       error,not (B.PB.is_undefined predicate_value),log_info,blackboard
                    else
                      last_chance_up  parameter handler log_info error blackboard predicate_value preview_event_case_address
@@ -873,7 +873,7 @@ module Propagation_heuristic =
                     let error,log_info =
                       if debug_mode
                       then
-                        let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 1):\n" in
+                        (*let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 1):\n" in
                         let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                         let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "The event before is kept, there is no action \n " in
                         let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "before event Test: " in
@@ -883,7 +883,7 @@ module Propagation_heuristic =
                         let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nRefine before the event (before) with the state " in
                         let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err new_value in
                         let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\n" in
-                        let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                        let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                         error,log_info
 		      else
 			error,log_info
@@ -899,7 +899,7 @@ module Propagation_heuristic =
                     let error,log_info =
                       if debug_mode
                       then
-                        let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 2):\n" in
+                       (*let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 2):\n" in
                         let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                         let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "The event before is kept, there is no action \n " in
                         let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "before event Action: " in
@@ -907,7 +907,7 @@ module Propagation_heuristic =
                         let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nWire_state: " in
                         let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err predicate_value in
                         let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nCut\n" in
-                        let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                        let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                         error,log_info
 		      else
 			error,log_info
@@ -928,7 +928,7 @@ module Propagation_heuristic =
                     let error,log_info =
                       if debug_mode
                       then
-                        let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 3):\n" in
+                       (* let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 3):\n" in
                         let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                         let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "The event before is kept, there is an action and a test \n " in
                         let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "before event Test: " in
@@ -938,7 +938,7 @@ module Propagation_heuristic =
                         let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nWire_state: " in
                         let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err predicate_value in
                         let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nNothing to be done\n" in
-                        let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                        let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                         error,log_info
 		      else
 			error,log_info
@@ -958,7 +958,7 @@ module Propagation_heuristic =
                         let error,log_info =
                           if debug_mode
                           then
-                            let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 4):\n" in
+                            (*let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 4):\n" in
                             let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                             let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "The event before is kept, there is an action and a test \n " in
                             let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "before event Test: " in
@@ -970,7 +970,7 @@ module Propagation_heuristic =
                             let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nRefine before the event (before) with the state " in
                             let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err state in
                             let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\n" in
-                            let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                            let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                             error,log_info
 			  else
 			    error,log_info
@@ -988,7 +988,7 @@ module Propagation_heuristic =
                         let error,log_info =
                           if debug_mode
                           then
-                            let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 5):\n" in
+                           (* let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 5):\n" in
                             let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                             let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "The event before is kept, there is an action and a test \n " in
                             let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "before event Test: " in
@@ -998,7 +998,7 @@ module Propagation_heuristic =
                             let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nWire_state: " in
                             let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err predicate_value in
                             let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nCut\n" in
-                            let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                            let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                             error,log_info
 			  else
 			    error,log_info
@@ -1015,7 +1015,7 @@ module Propagation_heuristic =
                   let error,log_info =
                     if debug_mode
                     then
-                      let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 6):\n" in
+                     (* let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 6):\n" in
                       let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                       let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "The event before is kept, there is an action \n " in
                       let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nbefore event Action: " in
@@ -1023,7 +1023,7 @@ module Propagation_heuristic =
                       let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nWire_state: " in
                       let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err predicate_value in
                       let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nCut\n" in
-                      let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                      let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                       error,log_info
 		    else
 		      error,log_info
@@ -1055,7 +1055,7 @@ module Propagation_heuristic =
                           let error,log_info =
                             if debug_mode
                             then
-                              let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 7):\n" in
+                             (* let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 7):\n" in
                               let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "we do not know if the event before is kept,  there is neither a  test, nor  action \n " in
                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "Wire_state: " in
@@ -1063,7 +1063,7 @@ module Propagation_heuristic =
                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nRefine before the event (before) with the state " in
                               let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err predicate_value in
                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\n" in
-                              let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                              let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                               error,log_info
 			    else
 			      error,log_info
@@ -1083,7 +1083,7 @@ module Propagation_heuristic =
                             let error,log_info =
                               if debug_mode
                               then
-                                let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 8):\n" in
+                               (* let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 8):\n" in
                                 let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "we do not know if the event is kept, there is a  test, but no action \n " in
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "before event Test: " in
@@ -1093,7 +1093,7 @@ module Propagation_heuristic =
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nRefine before the event (before) with the state " in
                                 let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err predicate_value in
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\n" in
-                                let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                                let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                                 error,log_info
 			      else
 				error,log_info
@@ -1109,7 +1109,7 @@ module Propagation_heuristic =
                             let error,log_info =
                               if debug_mode
                               then
-                                let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 9):\n" in
+                               (* let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 9):\n" in
                                 let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "we do not know if the event before is kept, there is a  test, but no action \n " in
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "before event Test: " in
@@ -1117,7 +1117,7 @@ module Propagation_heuristic =
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nWire_state: " in
                                 let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err predicate_value in
                                 let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nEvent before (%i) is discarded \n " eid in
-                                let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                                let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                                 error,log_info
 			      else
 				error,log_info
@@ -1150,7 +1150,7 @@ module Propagation_heuristic =
                                 let error,log_info =
                                   if debug_mode
                                   then
-                                    let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 10):\n" in
+                                   (* let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 10):\n" in
                                     let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                                     let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "we do not know if the event before is kept, there is an action \n " in
                                     let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "before event Action: " in
@@ -1159,7 +1159,7 @@ module Propagation_heuristic =
                                     let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err predicate_value in
                                     let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nThis is the only opportunity to set up the wire, we keep the event" in
                                     let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\n" in
-                                    let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                                    let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                                     error,log_info
 				  else
 				    error,log_info
@@ -1183,7 +1183,7 @@ module Propagation_heuristic =
                                     let error,log_info =
                                       if debug_mode
                                       then
-                                        let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 11):\n" in
+                                      (*  let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 11):\n" in
                                         let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                                         let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "we do not know if the event before is kept, there is an action, but no test \n " in
                                         let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "before event Action: " in
@@ -1193,7 +1193,7 @@ module Propagation_heuristic =
                                         let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nRefine before the event (before) with the state " in
                                         let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err preview_predicate_value in
                                         let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\n" in
-                                        let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                                        let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                                         error,log_info
 				      else
 					error,log_info
@@ -1218,7 +1218,7 @@ module Propagation_heuristic =
                                           let error,log_info =
                                             if debug_mode
                                             then
-                                              let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 12):\n" in
+                                              (*let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 12):\n" in
                                               let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "we do not know if the event before is kept, there is an action and a test \n " in
                                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "before event Test:" in
@@ -1230,7 +1230,7 @@ module Propagation_heuristic =
                                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nRefine before the event (before) with the state " in
                                               let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err new_predicate_value in
                                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\n" in
-                                              let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                                              let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                                               error,log_info
 					    else
                                               error,log_info
@@ -1246,7 +1246,7 @@ module Propagation_heuristic =
                                           let error,log_info =
                                             if debug_mode
                                             then
-                                              let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 13):\n" in
+                                             (* let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 13):\n" in
                                               let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "we do not know if the event before is kept, there is an action and a test \n " in
                                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "before event Test:" in
@@ -1257,7 +1257,7 @@ module Propagation_heuristic =
                                               let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err predicate_value in
                                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nDiscard the event before (%i)" eid in
                                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\n" in
-                                              let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                                              let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                                               error,log_info
 					    else
 					      error,log_info
@@ -1275,7 +1275,7 @@ module Propagation_heuristic =
                                       let error,log_info =
                                         if debug_mode
                                         then
-                                          let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 14):\n" in
+                                          (*let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 14):\n" in
                                           let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                                           let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "we do not know if the event before is kept, there is an action and a test \n " in
                                           let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "before event Test:" in
@@ -1287,7 +1287,7 @@ module Propagation_heuristic =
                                           let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nRefine before the event (before) with the state " in
                                           let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err prev' in
                                           let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\n" in
-                                          let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                                          let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                                           error,log_info
 					else
                                           error,log_info
@@ -1306,7 +1306,7 @@ module Propagation_heuristic =
                           let error,log_info =
                             if debug_mode
                             then
-                              let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 15):\n" in
+                             (* let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 15):\n" in
                               let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "we do not know if the event before is kept, there is an action and maybe a test \n " in
                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nbefore event Action: " in
@@ -1315,7 +1315,7 @@ module Propagation_heuristic =
                               let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err predicate_value in
                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nDiscard the event before (%i)" eid in
                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\n" in
-                              let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                              let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                               error,log_info
 			    else
                               error,log_info
@@ -1333,7 +1333,7 @@ module Propagation_heuristic =
                         let error,log_info =
                             if debug_mode
                             then
-                              let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 16):\n" in
+                              (*let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 16):\n" in
                               let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "we do not know if the event before is kept, there is an action and a test \n " in
                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "before event Test:" in
@@ -1346,7 +1346,7 @@ module Propagation_heuristic =
                               let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err preview_predicate_value in
                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nSelect the event before (%i)" eid in
                               let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\n" in
-                              let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                              let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                               error,log_info
 			    else
                               error,log_info
@@ -1362,7 +1362,7 @@ module Propagation_heuristic =
                         let error,log_info =
                           if debug_mode
                           then
-                            let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 17):\n" in
+                           (* let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 17):\n" in
                             let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
                             let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "we do not know if the event before is kept, there is an action and a test \n " in
                             let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "before event Test:" in
@@ -1372,7 +1372,7 @@ module Propagation_heuristic =
                             let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nWire_state: " in
                             let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err predicate_value in
                             let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nCut\n" in
-                            let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in
+                            let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in*)
                             error,log_info
 			  else
                             error,log_info
@@ -1645,7 +1645,7 @@ module Propagation_heuristic =
         let _ =
           if debug_mode
           then
-            let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\n***\nWe keep event %i\n***\n" step_id in
+            (* let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\n***\nWe keep event %i\n***\n" step_id in*)
             ()
          in
         let error,log_info,blackboard = B.dec parameter handler log_info error (B.n_unresolved_events) blackboard  in
@@ -1687,7 +1687,7 @@ module Propagation_heuristic =
               let _ =
                 if debug_mode
                 then
-                  let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\n***\nWe remove event %i\n***\n" step_id in
+                  (*  let _ = Format.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\n***\nWe remove event %i\n***\n" step_id in*)
                   ()
               in
               let log_info = g log_info in

@@ -78,7 +78,7 @@
 
 
       let print_blackboard parameter handler error blackboard = 
-        let _ = Format.fprintf parameter.Po.K.H.out_channel_err "Blackboard for removing pseudo inverse element\n" in 
+       (* let _ = Format.fprintf parameter.Po.K.H.out_channel_err "Blackboard for removing pseudo inverse element\n" in 
         let _ = Format.fprintf parameter.Po.K.H.out_channel_err "n_events: %i\n" blackboard.nsteps in 
         let _ = Format.fprintf parameter.Po.K.H.out_channel_err "Steps_by_column:\n" in 
         let _ = 
@@ -137,7 +137,7 @@
             in 
             aux (k+1)
         in 
-        let error = aux 0 in 
+        let error = aux 0 in *)
         error 
 
       let predicates_of_action parameter handler error blackboard action  = 

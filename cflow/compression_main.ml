@@ -52,7 +52,7 @@ let compress_and_print logger env log_info step_list =
   let parameter = S.PH.B.PB.CI.Po.K.H.build_parameter () in
   let parameter = S.PH.B.PB.CI.Po.K.H.set_log_step parameter log_step in
   let parameter = S.PH.B.PB.CI.Po.K.H.set_debugging_mode parameter debug_mode in
-  let parameter = S.PH.B.PB.CI.Po.K.H.set_logger parameter logger in
+  (* let parameter = S.PH.B.PB.CI.Po.K.H.set_logger parameter logger in*)
   let parameter =
     match
       max_number_of_itterations
