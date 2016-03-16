@@ -2,6 +2,8 @@
 
 module type Mvbdu =
   sig
+    type key
+    type value
     type handler = (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.association_list_dic,Boolean_mvbdu.variables_list_dic,bool,int) Memo_sig.handler
     type mvbdu
     type hconsed_association_list
@@ -47,21 +49,21 @@ module type Mvbdu =
 
     val mvbdu_cartesian_abstraction: (mvbdu,mvbdu list) unary
 
-    val build_association_list: ((int * int) list,hconsed_association_list) unary
-    val build_sorted_association_list: ((int * int) list,hconsed_association_list) unary
-    val build_reverse_sorted_association_list: ((int * int) list,hconsed_association_list) unary
+    val build_association_list: ((key * value) list,hconsed_association_list) unary
+    val build_sorted_association_list: ((key * value) list,hconsed_association_list) unary
+    val build_reverse_sorted_association_list: ((key * value) list,hconsed_association_list) unary
     val empty_association_list : hconsed_association_list constant
-    val build_variables_list: (int list,hconsed_variables_list) unary
-    val build_sorted_variables_list: (int list,hconsed_variables_list) unary
-    val build_reverse_sorted_variables_list: (int list,hconsed_variables_list) unary
+    val build_variables_list: (key list,hconsed_variables_list) unary
+    val build_sorted_variables_list: (key list,hconsed_variables_list) unary
+    val build_reverse_sorted_variables_list: (key list,hconsed_variables_list) unary
     val empty_variables_list: hconsed_variables_list constant
 
     val overwrite_association_lists: (hconsed_association_list,hconsed_association_list,hconsed_association_list) binary
     val merge_variables_lists: (hconsed_variables_list,hconsed_variables_list,hconsed_variables_list) binary
 
-    val extensional_of_variables_list: (hconsed_variables_list,int list) unary
-    val extensional_of_association_list: (hconsed_association_list,(int*int) list) unary
-    val extensional_of_mvbdu: (mvbdu,(int * int) list list) unary
+    val extensional_of_variables_list: (hconsed_variables_list,key list) unary
+    val extensional_of_association_list: (hconsed_association_list,(key*value) list) unary
+    val extensional_of_mvbdu: (mvbdu,(key * value) list list) unary
 
     val variables_list_of_mvbdu: (mvbdu,hconsed_variables_list) unary
 
@@ -109,6 +111,8 @@ module type Mvbdu =
 
 module type Internalized_mvbdu =
   sig
+    type key
+    type value
     type mvbdu
     type hconsed_association_list
     type hconsed_variables_list
@@ -145,20 +149,20 @@ module type Internalized_mvbdu =
     val mvbdu_cartesian_decomposition_depth: mvbdu -> int -> mvbdu option * mvbdu list
     val mvbdu_full_cartesian_decomposition: mvbdu -> mvbdu list
 
-    val build_association_list: (int * int) list ->  hconsed_association_list
-    val build_sorted_association_list: (int * int) list -> hconsed_association_list
-    val build_reverse_sorted_association_list: (int * int) list -> hconsed_association_list
+    val build_association_list: (key * value) list ->  hconsed_association_list
+    val build_sorted_association_list: (key * value) list -> hconsed_association_list
+    val build_reverse_sorted_association_list: (key * value) list -> hconsed_association_list
     val empty_association_list : unit -> hconsed_association_list
-    val build_variables_list: int list ->  hconsed_variables_list
-    val build_sorted_variables_list: int list -> hconsed_variables_list
-    val build_reverse_sorted_variables_list: int list -> hconsed_variables_list
+    val build_variables_list: key list ->  hconsed_variables_list
+    val build_sorted_variables_list: key list -> hconsed_variables_list
+    val build_reverse_sorted_variables_list: key list -> hconsed_variables_list
     val empty_variables_list : unit -> hconsed_variables_list
     val overwrite_association_lists: hconsed_association_list -> hconsed_association_list -> hconsed_association_list
     val merge_variables_lists: hconsed_variables_list -> hconsed_variables_list -> hconsed_variables_list
 
-    val extensional_of_variables_list: hconsed_variables_list -> int list
-    val extensional_of_association_list: hconsed_association_list -> (int*int) list
-    val extensional_of_mvbdu: mvbdu -> (int * int) list list
+    val extensional_of_variables_list: hconsed_variables_list -> key list
+    val extensional_of_association_list: hconsed_association_list -> (key*value) list
+    val extensional_of_mvbdu: mvbdu -> (key * value) list list
 
     val variables_list_of_mvbdu: mvbdu -> hconsed_variables_list
 
@@ -170,10 +174,10 @@ module type Internalized_mvbdu =
 module type Nul =
   sig
   end
-module Make (M:Nul): Mvbdu
-module Mvbdu:Mvbdu
-module IntMvbdu:Internalized_mvbdu
-module Optimized_Mvbdu:Mvbdu
-module Optimized_IntMvbdu:Internalized_mvbdu
+module Make (M:Nul): Mvbdu with type key = int and type value = int
+module Mvbdu:Mvbdu with type key = int and type value = int
+module IntMvbdu:Internalized_mvbdu with type key = int and type value = int
+module Optimized_Mvbdu:Mvbdu with type key = int and type value = int
+module Optimized_IntMvbdu:Internalized_mvbdu with type key = int and type value = int
 
 
