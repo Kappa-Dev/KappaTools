@@ -36,7 +36,7 @@ let translate_agent parameter error handler ag =
 let translate_site parameter error handler agent_name site =
   let error, dic =
     Misc_sa.unsome
-      (Ckappa_sig.Agent_type_nearly_inf_Imperatif.get
+      (Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
           parameter
           error 
           agent_name
@@ -61,11 +61,11 @@ let translate_state parameter error handler agent site state =
           (agent, site) 
           handler.Cckappa_sig.states_dic)
       (fun error -> warn parameter error (Some "line 44") Exit 
-        (Cckappa_sig.Dictionary_of_States.init ()))
+        (Ckappa_sig.Dictionary_of_States.init ()))
   in
   let error, (a, _, _) =
     Misc_sa.unsome
-      (Cckappa_sig.Dictionary_of_States.translate parameter error state dic)
+      (Ckappa_sig.Dictionary_of_States.translate parameter error state dic)
       (fun error -> 
         warn parameter error (Some "line 36") Exit (Ckappa_sig.Internal "",(),()))
   in
@@ -94,7 +94,7 @@ let complementary_interface parameters error handler agent_name interface =
   let error, dic =
     Misc_sa.unsome
       (
-        Ckappa_sig.Agent_type_nearly_inf_Imperatif.get
+        Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
           parameters 
           error 
           agent_name
@@ -199,7 +199,7 @@ let print_site_compact site =
 let string_of_site_aux parameter error handler_kappa agent_name (site_int: Ckappa_sig.c_site_name) = 
   let error, sites_dic =
     match
-      Ckappa_sig.Agent_type_nearly_inf_Imperatif.get
+      Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
         parameter
         error
         agent_name
@@ -256,16 +256,16 @@ let string_of_site_contact_map parameter error handler_kappa agent_name site_int
 let print_state parameter error handler_kappa state =
   match state with
   | Ckappa_sig.Internal a -> error, a
-  | Ckappa_sig.Binding Cckappa_sig.Free -> error, "free"
-  | Ckappa_sig.Binding Cckappa_sig.Lnk_type (a, b) ->
+  | Ckappa_sig.Binding Ckappa_sig.C_Free -> error, "free"
+  | Ckappa_sig.Binding Ckappa_sig.C_Lnk_type (a, b) ->
     error, (Ckappa_sig.string_of_agent_name a) ^ "@" ^
       (Ckappa_sig.string_of_site_name b)
 
 let print_state_fully_deciphered parameter error handler_kappa state =
   match state with
   | Ckappa_sig.Internal a -> error,a
-  | Ckappa_sig.Binding Cckappa_sig.Free -> error, "free"
-  | Ckappa_sig.Binding Cckappa_sig.Lnk_type (agent_name, b) ->
+  | Ckappa_sig.Binding Ckappa_sig.C_Free -> error, "free"
+  | Ckappa_sig.Binding Ckappa_sig.C_Lnk_type (agent_name, b) ->
     let error, ag = string_of_agent parameter error handler_kappa agent_name in
     let error, site = 
       string_of_site_contact_map parameter error handler_kappa agent_name b 
@@ -282,12 +282,12 @@ let string_of_state_gen print_state parameter error handler_kappa agent_name sit
         handler_kappa.Cckappa_sig.states_dic
     with
     | error, None -> warn parameter error (Some "line 206") Exit
-      (Cckappa_sig.Dictionary_of_States.init())
+      (Ckappa_sig.Dictionary_of_States.init())
     | error, Some i -> error, i
   in
   let error, value =
     match
-      Cckappa_sig.Dictionary_of_States.translate
+      Ckappa_sig.Dictionary_of_States.translate
         parameter
         error
         state
@@ -299,6 +299,7 @@ let string_of_state_gen print_state parameter error handler_kappa agent_name sit
   print_state parameter error handler_kappa value
 
 let string_of_state = string_of_state_gen print_state
+
 let string_of_state_fully_deciphered = string_of_state_gen print_state_fully_deciphered
 
 let print_labels_txt parameters error handler couple =

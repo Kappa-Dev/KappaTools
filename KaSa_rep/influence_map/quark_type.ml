@@ -45,29 +45,31 @@ module StringMap =
 			       
 type agent_quark = Ckappa_sig.c_agent_name
 
-type site_quark = (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * int)
+type site_quark = (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
 
-module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif (*TODO: remove later*)
+(*module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif*) (*TODO: remove later*)
 
 (*module Agent_type_quick_nearly_inf_Imperatif =
   Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif*)
 
 (*module SiteMap = Int_storage.Extend (AgentMap)(Int_storage.Extend (AgentMap)(AgentMap))*)
 module SiteMap =
-  Int_storage.Extend (Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif)
-    (Int_storage.Extend (Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif)(AgentMap))
+  Int_storage.Extend (Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif)
+    (Int_storage.Extend (Ckappa_sig.Site_type_quick_nearly_Inf_Int_storage_Imperatif)
+       (Ckappa_sig.State_index_quick_nearly_Inf_Int_storage_Imperatif))
 
 (*module DeadSiteMap= Int_storage.Extend (AgentMap)(AgentMap)*)
 
 module DeadSiteMap= Int_storage.Extend
-  (Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif)(Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif)
+  (Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif)
+  (Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif)
 
 (*type agents_quarks = Labels.label_set Int_storage.Quick_Nearly_inf_Imperatif.t AgentMap.t*)
 
 type agents_quarks =
   Labels.label_set
     Int_storage.Quick_Nearly_inf_Imperatif.t
-    Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t  
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t  
     
 type sites_quarks = Labels.label_set Int_storage.Quick_Nearly_inf_Imperatif.t SiteMap.t 
   
@@ -79,7 +81,7 @@ type quarks =
      dead_sites: Labels.label_set 
        Int_storage.Quick_Nearly_inf_Imperatif.t
        Cckappa_sig.KaSim_Site_map_and_set.Map.t
-       Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t ;
+       Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t ;
      dead_states: Labels.label_set 
        Int_storage.Quick_Nearly_inf_Imperatif.t 
        DeadSiteMap.t;
@@ -89,7 +91,7 @@ type quarks =
      dead_sites_plus: Labels.label_set 
        Int_storage.Quick_Nearly_inf_Imperatif.t
        Cckappa_sig.KaSim_Site_map_and_set.Map.t
-       Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t ;
+       Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t ;
      dead_states_plus: Labels.label_set 
        Int_storage.Quick_Nearly_inf_Imperatif.t  
        DeadSiteMap.t;
@@ -99,7 +101,7 @@ type quarks =
      dead_sites_minus: Labels.label_set
        Int_storage.Quick_Nearly_inf_Imperatif.t
        Cckappa_sig.KaSim_Site_map_and_set.Map.t 
-       Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t ;
+       Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t ;
      dead_states_minus: Labels.label_set 
        Int_storage.Quick_Nearly_inf_Imperatif.t
        DeadSiteMap.t;

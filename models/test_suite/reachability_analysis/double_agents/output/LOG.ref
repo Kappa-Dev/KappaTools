@@ -388,20 +388,20 @@ Quarks:site_test**:agent_type:1,site_type:2,state:2,rule:7->[2]
 Quarks:site_test**:agent_type:0,site_type:2,state:0,rule:3->[0]
 Quarks:site_test**:agent_type:0,site_type:2,state:1,rule:4->[0]
 Quarks:site_test**:agent_type:2,site_type:0,state:0,rule:6->[0]
-Quarks:site_modif+:agent_type:0,site_type:0,state:1,rule:0->[1]
 Quarks:site_modif+:agent_type:0,site_type:1,state:1,rule:0->[0]
+Quarks:site_modif+:agent_type:0,site_type:0,state:1,rule:0->[1]
 Quarks:site_modif+:agent_type:0,site_type:2,state:0,rule:0->[1]
 Quarks:site_modif+:agent_type:0,site_type:2,state:0,rule:4->[0]
 Quarks:site_modif+:agent_type:0,site_type:2,state:0,rule:7->[1*;0*]
 Quarks:site_modif+:agent_type:0,site_type:2,state:1,rule:3->[0]
 Quarks:site_modif+:agent_type:1,site_type:0,state:2,rule:1->[0]
 Quarks:site_modif+:agent_type:1,site_type:0,state:1,rule:2->[0]
-Quarks:site_modif+:agent_type:1,site_type:1,state:1,rule:1->[1]
-Quarks:site_modif+:agent_type:1,site_type:1,state:2,rule:2->[0]
 Quarks:site_modif+:agent_type:1,site_type:2,state:0,rule:1->[0]
 Quarks:site_modif+:agent_type:1,site_type:2,state:0,rule:4->[1*;0*]
 Quarks:site_modif+:agent_type:1,site_type:2,state:1,rule:3->[1]
 Quarks:site_modif+:agent_type:1,site_type:2,state:2,rule:6->[1]
+Quarks:site_modif+:agent_type:1,site_type:1,state:1,rule:1->[1]
+Quarks:site_modif+:agent_type:1,site_type:1,state:2,rule:2->[0]
 Quarks:site_modif+:agent_type:2,site_type:0,state:0,rule:5->[0]
 Quarks:site_modif+:agent_type:2,site_type:0,state:0,rule:7->[2*]
 Quarks:site_modif+:agent_type:2,site_type:0,state:1,rule:6->[0]
@@ -519,8 +519,8 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(y~p)
 	A(y~u)
+	A(y~p)
 	Wake-up rules
 	Dealing with creation
 
@@ -540,8 +540,8 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~u)
 	A(x~p)
+	A(x~u)
 	Wake-up rules
 
 	Applying rule 1: r1:
@@ -617,8 +617,8 @@ Id=26
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(x!free,y~p,x~p)
 	B(x!free,y~u,x~u)
+	B(x!free,y~p,x~p)
 	Wake-up rules
 
 	Applying rule 5: r5:
@@ -745,8 +745,8 @@ Id=36
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(x!A@x,y~p,x~p)
 	B(x!A@x,y~u,x~u)
+	B(x!A@x,y~p,x~p)
 	Wake-up rules
 
 	Applying rule 4: r4:
@@ -924,9 +924,9 @@ Id=67
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(x!C@x,y~p,x~p)
-	B(x!C@x,y~q,x~q)
 	B(x!C@x,y~u,x~u)
+	B(x!C@x,y~q,x~q)
+	B(x!C@x,y~p,x~p)
 	Wake-up rules
 
 	Applying rule 5: r5:
@@ -1280,9 +1280,9 @@ Id=113
 
 EXTENSIONAL DESCRIPTION:
 In agent B, the internal state of site y, and the internal state of site x, are entangled by the following 2-d relationship:
-	B(y~p,x~p)
-	B(y~q,x~q)
 	B(y~u,x~u)
+	B(y~q,x~q)
+	B(y~p,x~p)
 INTENSIONAL DESCRIPTION:
 Id=95
  Node(site_type:0<0)
@@ -1317,7 +1317,7 @@ Id=6
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site y in agent A ranges over u and p.
+The internal state of site y in agent A ranges over p and u.
 INTENSIONAL DESCRIPTION:
 Id=93
  Node(site_type:2<0)
@@ -1333,7 +1333,7 @@ Id=93
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site x in agent A ranges over B@x and free.
+The binding state of site x in agent A ranges over free and B@x.
 INTENSIONAL DESCRIPTION:
 Id=95
  Node(site_type:0<0)
@@ -1349,7 +1349,7 @@ Id=95
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent A ranges over p and u.
+The internal state of site x in agent A ranges over u and p.
 INTENSIONAL DESCRIPTION:
 Id=96
  Node(site_type:1<0)
@@ -1365,7 +1365,7 @@ Id=96
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site y in agent B ranges over q, p, and u.
+The internal state of site y in agent B ranges over u, p, and q.
 INTENSIONAL DESCRIPTION:
 Id=102
  Node(site_type:2<0)
@@ -1381,7 +1381,7 @@ Id=102
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site x in agent B ranges over C@x, A@x, and free.
+The binding state of site x in agent B ranges over free, A@x, and C@x.
 INTENSIONAL DESCRIPTION:
 Id=115
  Node(site_type:0<0)
@@ -1397,7 +1397,7 @@ Id=115
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent B ranges over u, q, and p.
+The internal state of site x in agent B ranges over p, q, and u.
 INTENSIONAL DESCRIPTION:
 Id=95
  Node(site_type:0<0)
@@ -1413,5 +1413,5 @@ Id=95
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site x in agent C ranges over B@x and free.
+The binding state of site x in agent C ranges over free and B@x.
 execution finished without any exception

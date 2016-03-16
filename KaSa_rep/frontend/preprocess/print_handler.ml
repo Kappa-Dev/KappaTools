@@ -27,12 +27,12 @@ let print_state parameters state =
         "%s%s"
         (Remanent_parameters.get_prefix parameters)
         a
-    | Ckappa_sig.Binding Cckappa_sig.Free ->
+    | Ckappa_sig.Binding Ckappa_sig.C_Free ->
       Loggers.fprintf
         (Remanent_parameters.get_logger parameters)
         "%sfree" 
         (Remanent_parameters.get_prefix parameters)
-    | Ckappa_sig.Binding Cckappa_sig.Lnk_type (a, b) ->
+    | Ckappa_sig.Binding Ckappa_sig.C_Lnk_type (a, b) ->
       Loggers.fprintf
         (Remanent_parameters.get_logger parameters)
         "%sagent_type:%d@@site_type:%d"
@@ -82,7 +82,7 @@ let print_handler parameters error handler =
     (fun parameters error i state () () ->
      let parameters = Remanent_parameters.update_prefix parameters
        ("state_id:" ^ 
-           (string_of_int i) ^ "->")
+           (Ckappa_sig.string_of_state_index i) ^ "->")
      in
      let () = print_aux parameters state in
      let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "\n" in
@@ -109,7 +109,7 @@ let print_handler parameters error handler =
   let () = Loggers.fprintf log "%s" (Remanent_parameters.get_prefix parameters_sites) in
   let () = Loggers.print_newline log in
   let error =
-    Ckappa_sig.Agent_type_nearly_inf_Imperatif.print
+    Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.print
       parameters_sites
       error
       (fun parameters error a ->
@@ -130,7 +130,7 @@ let print_handler parameters error handler =
       parameters_states
       error
       (fun parameters error a ->
-       Cckappa_sig.Dictionary_of_States.print
+       Ckappa_sig.Dictionary_of_States.print
          parameters
          error
          (print_state_f print_state)
@@ -143,7 +143,7 @@ let print_handler parameters error handler =
     Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.print
       parameters_duals
       error
-      (fun parameters error (a, b, c) ->
+      (fun parameters error (a, b, (c:Ckappa_sig.c_state)) ->
           let _ = 
             Loggers.fprintf 
               log 
@@ -151,7 +151,7 @@ let print_handler parameters error handler =
               (Remanent_parameters.get_prefix parameters) 
               (Ckappa_sig.int_of_agent_name a)
               (Ckappa_sig.int_of_site_name b) 
-              c 
+              (Ckappa_sig.int_of_state_index c)
           in
           error)
       handler.Cckappa_sig.dual
@@ -208,7 +208,7 @@ let dot_of_contact_map parameters (error:Exception.method_handler) handler =
           let error, site_dic =
              Misc_sa.unsome
               (
-                Ckappa_sig.Agent_type_nearly_inf_Imperatif.get
+                Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
                   parameters_dot 
                   error
                   i 

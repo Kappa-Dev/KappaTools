@@ -167,7 +167,7 @@ struct
     let error, dynamic =
       List.fold_left (fun (error, dynamic) (agent_id, agent_type) ->
         let error, agent =
-          Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get parameter error agent_id
+          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get parameter error agent_id
             rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
         in
         match agent with

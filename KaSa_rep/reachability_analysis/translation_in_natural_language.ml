@@ -18,11 +18,11 @@ let warn parameters mh message exn default =
 let trace = false
 
 type token =
-  | Range of Ckappa_sig.c_site_name * int list
-  | Equiv of (Ckappa_sig.c_site_name * int) * (Ckappa_sig.c_site_name * int)
-  | Imply of (Ckappa_sig.c_site_name * int) * (Ckappa_sig.c_site_name * int)
-  | Partition of (Ckappa_sig.c_site_name * (int * token list) list)
-  | No_known_translation of (Ckappa_sig.c_site_name * int) list list
+  | Range of Ckappa_sig.c_site_name * Ckappa_sig.c_state list
+  | Equiv of (Ckappa_sig.c_site_name * Ckappa_sig.c_state) * (Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+  | Imply of (Ckappa_sig.c_site_name * Ckappa_sig.c_state) * (Ckappa_sig.c_site_name * Ckappa_sig.c_state)
+  | Partition of (Ckappa_sig.c_site_name * (Ckappa_sig.c_state * token list) list)
+  | No_known_translation of (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list list
 
 type rename_sites =
   (Remanent_parameters_sig.parameters -> 
@@ -31,23 +31,30 @@ type rename_sites =
    Exception.method_handler * Ckappa_sig.Site_map_and_set.Map.elt)
 
 
-(*convert (int * int) list list --> (Ckappa_sig.c_site_name * int) list list*)
+(*convert (int * int) list list --> (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list list*)
 
-let convert_list_list_site_name_of_int error list = 
+let convert_list_list_site_state_of_int error list = 
   List.fold_left (fun (error, list) pair_list ->
     let error, pair_list = 
       List.fold_left (fun (error, list) (site, asso) ->
-        error, ((Ckappa_sig.site_name_of_int site), asso) :: list
+        error, ((Ckappa_sig.site_name_of_int site), (Ckappa_sig.state_index_of_int asso)) :: list
       ) (error, []) pair_list
     in
     error, pair_list :: list
-  ) (error, []) list
+  ) (error, []) (List.rev list)
 
 (*convert int list -> Ckappa_sig.c_site_name list*)
 
 let convert_var_list error var_list =
   List.fold_left (fun (error, list) site ->
     error, (Ckappa_sig.site_name_of_int site) :: list
+  ) (error, []) (List.rev var_list)
+
+(*convert int list -> Ckappa_sig.c_state list*)
+
+let convert_state_list error var_list =
+  List.fold_left (fun (error, list) state ->
+    error, (Ckappa_sig.state_index_of_int state) :: list
   ) (error, []) var_list
 
 
@@ -180,8 +187,14 @@ let try_partitioning parameter handler error (rename_site_inverse:rename_sites) 
 			  error, handler, list
 			| Some (a, l) ->
 			  let error, a' = rename_site_inverse parameter error (Ckappa_sig.site_name_of_int a) in
+                          (*convert int list -> Ckappa_sig.c_state list*)
+                          let error, l = convert_state_list error l in
 			  (error, handler,
-			     ((Range (a', l)) :: list))
+			     (
+                               (Range 
+                                  (a', 
+                                   l)) 
+                               :: list))
 		      end)
 		    (error, handler, [])
 		    (List.rev list)
@@ -195,6 +208,12 @@ let try_partitioning parameter handler error (rename_site_inverse:rename_sites) 
       match output with
       | None -> aux tail (error, handler)
       | Some l ->
+        (*Convert (int * token) list -> (Ckappa_sig.c_state * token) list*)
+        let l =
+          List.fold_left (fun l (state, token) ->
+            ((Ckappa_sig.state_index_of_int state), token) :: l
+          ) [] l
+        in
 	let error, head = rename_site_inverse parameter error (Ckappa_sig.site_name_of_int head) in
 	error, handler, Some (head, l)
   in
@@ -206,8 +225,8 @@ let translate parameter handler error (rename_site_inverse: rename_sites) mvbdu
   let error, handler, list =
     Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu parameter handler error mvbdu
   in
-  let error, list = convert_list_list_site_name_of_int error list in
-  (*change list: (Ckappa_sig.c_site_name * int) list list*)
+  let error, list = convert_list_list_site_state_of_int error list in
+  (*change list: (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list list*)
   let error, list =
     List.fold_left
       (fun (error, list) elt1 ->
@@ -333,10 +352,12 @@ let translate parameter handler error (rename_site_inverse: rename_sites) mvbdu
 		  output
 		with
 		| None -> error, (handler, No_known_translation list)
-		| Some (var,l) ->
+		| Some (var, l) ->
 		  error,
 		  (handler,
-		   Partition (var,l))
+		   Partition (
+                     var,
+                     l))
 	      end
 	  end
        | _ ->
@@ -348,7 +369,7 @@ let translate parameter handler error (rename_site_inverse: rename_sites) mvbdu
 	     output
 	   with
 	   | None -> error, (handler, No_known_translation list)
-	   | Some (var,l) ->
+	   | Some (var, l) ->
 	     error,
 	     (handler,
 	     Partition (var, l))

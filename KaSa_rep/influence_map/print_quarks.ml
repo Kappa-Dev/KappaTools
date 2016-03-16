@@ -24,7 +24,7 @@ let string_of_port port = "["^(string_of_int port.Cckappa_sig.site_state.Cckappa
 let print_agent_map parameters error handler map =
   let error =
     (*Quark_type.AgentMap.iter*)
-    Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.iter
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.iter
       parameters
       error
       (fun parameters error key im ->
@@ -48,7 +48,7 @@ let print_agent_map parameters error handler map =
 let print_agent_var_map parameters error handler map =
   let error =
     (*Quark_type.AgentMap.iter*)
-    Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.iter
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.iter
       parameters
       error
       (fun parameters error key im ->
@@ -139,7 +139,7 @@ let print_site_map parameter error handler map =
                  (Remanent_parameters.get_prefix parameter) 
                  (Ckappa_sig.int_of_agent_name agent_type)
                  (Ckappa_sig.int_of_site_name site_type)
-                 state
+                 (Ckappa_sig.int_of_state_index state)
                  rule
                in
                let _ = Quark_type.Labels.dump parameter error handler im' in
@@ -162,7 +162,7 @@ let print_site_var_map parameter error handler map =
                  (Remanent_parameters.get_prefix parameter)
                  (Ckappa_sig.int_of_agent_name agent_type)
                  (Ckappa_sig.int_of_site_name site_type)
-                 state
+                 (Ckappa_sig.int_of_state_index state)
                  rule 
                in
                let _ = Quark_type.Labels.dump parameter error handler im' in

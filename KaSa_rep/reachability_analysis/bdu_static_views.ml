@@ -43,7 +43,7 @@ type bdu_analysis_static =
   {
     store_pre_static : pre_static;
     store_covering_classes: Covering_classes_type.remanent 
-      Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t;
+      Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
     store_covering_classes_id : (int list * int list) 
       Ckappa_sig.AgentSite_map_and_set.Map.t;
     (*rewrite/ change type of this function ?*)
@@ -51,7 +51,7 @@ type bdu_analysis_static =
       ((Covering_classes_type.Dictionary_of_List_sites.key * 
           Covering_classes_type.Dictionary_of_List_sites.value *
           Ckappa_sig.Site_map_and_set.Set.t) list)
-      Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t;
+      Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
     store_proj_bdu_creation_restriction_map: 
       Mvbdu_wrapper.Mvbdu.mvbdu 
       Covering_classes_type.AgentCV_setmap.Map.t 
@@ -98,7 +98,7 @@ let collect_modification_sites parameter error rule_id diff_direct store_result 
     error, result
   in
   let error, store_result =
-    Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.fold parameter error
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
       (fun parameter error agent_id agent_modif store_result ->
         if Ckappa_sig.Site_map_and_set.Map.is_empty agent_modif.Cckappa_sig.agent_interface
         then error, store_result
@@ -167,7 +167,7 @@ let collect_test_sites parameter error rule_id viewslhs
     error, result
   in
   let error, store_result =
-    Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.fold parameter error
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
       (fun parameter error agent_id agent store_result ->
        match agent with
        | Cckappa_sig.Unknown_agent _ 
@@ -365,7 +365,7 @@ let site_covering_classes parameter error covering_classes =
   in
   let error, store_result =
     (*From sites return a list of covering_class_id*)
-    Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.fold parameter error
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
       (fun parameter error agent_type_cv remanent store_result ->
         (*get a list of covering_class_id from remanent*)
         let cv_dic = remanent.Covering_classes_type.store_dic in
@@ -438,7 +438,7 @@ let list2set parameter error list =
 *)
 
 let collect_remanent_triple parameter error store_remanent store_result =
-  Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.fold parameter error 
+  Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error 
     (fun parameter error agent_type remanent store_result ->
       let store_dic = remanent.Covering_classes_type.store_dic in
       (*-----------------------------------------------------------------*)
@@ -452,7 +452,7 @@ let collect_remanent_triple parameter error store_remanent store_result =
       in
       (*-----------------------------------------------------------------*)
       let error, store_result =
-        Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.set
+        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
           parameter
           error 
           agent_type
@@ -465,10 +465,10 @@ let collect_remanent_triple parameter error store_remanent store_result =
 (************************************************************************************)
 (*creation rules*)
 
-let build_bdu parameter handler error (pair_list: (Ckappa_sig.c_site_name * int) list) =
+let build_bdu parameter handler error (pair_list: (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list) =
   let pair_list =
     List.fold_left (fun l (site, state) ->
-      ((Ckappa_sig.int_of_site_name site), state) :: l
+      ((Ckappa_sig.int_of_site_name site), (Ckappa_sig.int_of_state_index state)) :: l
     ) [] pair_list
   in
   let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in
@@ -512,11 +512,11 @@ let collect_bdu_creation_restriction_map parameter handler error
     error, handler, result_map
   in
   (*-----------------------------------------------------------------*)
-  Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.fold parameter error
+  Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
     (fun parameter error agent_type' triple_list (handler,store_result) ->
       List.fold_left (fun (error, (handler,store_result)) (agent_id, agent_type) ->
         let error, agent = 
-          Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get
+          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
             parameter error agent_id rule.Cckappa_sig.rule_rhs.Cckappa_sig.views 
         in
         match agent with
@@ -557,7 +557,7 @@ let collect_bdu_creation_restriction_map parameter handler error
 		  Ckappa_sig.Site_map_and_set.Map.fold_restriction_with_missing_associations
                     parameter error
                     (fun site port -> add site port.Cckappa_sig.site_state.Cckappa_sig.min)
-		    (fun site -> add site 0)
+		    (fun site -> add site Ckappa_sig.dummy_state_index)
 		    set
 		    agent.Cckappa_sig.agent_interface
 		    Ckappa_sig.Site_map_and_set.Map.empty
@@ -656,7 +656,7 @@ let collect_modif_list_restriction_map
     error, result_map
   in
   (*-----------------------------------------------------------------*)
-  Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.fold parameter error 
+  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error 
     (fun parameter error agent_id agent_modif (handler, store_result) ->
       if Ckappa_sig.Site_map_and_set.Map.is_empty agent_modif.Cckappa_sig.agent_interface
       then error, (handler, store_result)
@@ -664,7 +664,7 @@ let collect_modif_list_restriction_map
         let agent_type = agent_modif.Cckappa_sig.agent_name in
 	let error, triple_list =
 	  match
-	    Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.get
+	    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
               parameter
               error
               agent_type
@@ -728,7 +728,7 @@ let collect_modif_list_restriction_map
 		  in
                   let pair_list =
                     List.fold_left (fun l (site, state) ->
-                      ((Ckappa_sig.int_of_site_name site), state) :: l
+                      ((Ckappa_sig.int_of_site_name site), (Ckappa_sig.int_of_state_index state)) :: l
                     ) [] pair_list
                   in
 		  (*-----------------------------------------------------------------*)
@@ -771,7 +771,7 @@ let store_bdu_potential_restriction_map_aux parameter handler error store_remane
     error, handler, result_map
   in
   (*-----------------------------------------------------------------*)
-  Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.fold parameter error
+  Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
     (fun parameter error agent_type' triple_list (handler, store_result) ->
       (*map of potential partner side_effect with site is bond*)
       Ckappa_sig.AgentRule_map_and_set.Map.fold
@@ -929,7 +929,7 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
   let error, handler, bdu_true = Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error in
   let error, handler, bdu_false = Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler error in
   (*-----------------------------------------------------------------*)
-  Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.fold parameter error
+  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
     (fun parameter error agent_id agent (handler,store_result) ->
       match agent with
       | Cckappa_sig.Unknown_agent _
@@ -940,7 +940,7 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
 	  let agent_type = agent.Cckappa_sig.agent_name in
 	  let error, triple_list =
 	    match
-	      Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get
+	      Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
                 parameter error agent_type store_remanent_triple
 	    with
 	    | error, None -> error, []
@@ -960,7 +960,7 @@ let collect_bdu_test_restriction_map parameter handler error rule_id rule
         let agent_type = agent.Cckappa_sig.agent_name in
 	let error, triple_list =
 	  match
-	    Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get
+	    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
               parameter error agent_type store_remanent_triple
 	  with
 	  | error, None ->  error, []
@@ -1201,11 +1201,11 @@ let init_pre_static =
 
 let init_bdu_analysis_static parameter error =
   let error, init_covering_classes =
-    Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.create parameter error 0 
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create parameter error 0 
   in
   let init_covering_classes_id = Ckappa_sig.AgentSite_map_and_set.Map.empty in
   let error, init_remanent_triple = 
-    Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.create parameter error 0 
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create parameter error 0 
   in
   let init_proj_bdu_creation_restriction_map = Ckappa_sig.Rule_setmap.Map.empty in
   let init_modif_list_restriction_map        = Covering_classes_type.AgentsRuleCV_map_and_set.Map.empty in

@@ -431,12 +431,12 @@ Quarks:site_test**:agent_type:2,site_type:0,state:0,rule:2->[1]
 Quarks:site_test**:agent_type:2,site_type:0,state:0,rule:3->[0]
 Quarks:site_test**:agent_type:2,site_type:0,state:1,rule:4->[1]
 Quarks:site_test**:agent_type:2,site_type:0,state:1,rule:5->[1]
-Quarks:site_test**:agent_type:2,site_type:1,state:0,rule:4->[1]
-Quarks:site_test**:agent_type:2,site_type:1,state:0,rule:5->[1]
 Quarks:site_test**:agent_type:2,site_type:2,state:0,rule:2->[1]
 Quarks:site_test**:agent_type:2,site_type:2,state:0,rule:4->[1]
 Quarks:site_test**:agent_type:2,site_type:2,state:0,rule:5->[1]
 Quarks:site_test**:agent_type:2,site_type:2,state:1,rule:3->[0]
+Quarks:site_test**:agent_type:2,site_type:1,state:0,rule:4->[1]
+Quarks:site_test**:agent_type:2,site_type:1,state:0,rule:5->[1]
 Quarks:site_test**:agent_type:2,site_type:3,state:0,rule:4->[1]
 Quarks:site_test**:agent_type:2,site_type:3,state:1,rule:5->[1]
 Quarks:site_modif+:agent_type:0,site_type:0,state:1,rule:0->[0]
@@ -447,12 +447,12 @@ Quarks:site_modif+:agent_type:0,site_type:1,state:0,rule:5->[0]
 Quarks:site_modif+:agent_type:0,site_type:1,state:2,rule:4->[0]
 Quarks:site_modif+:agent_type:1,site_type:0,state:1,rule:0->[1]
 Quarks:site_modif+:agent_type:1,site_type:0,state:0,rule:1->[1]
-Quarks:site_modif+:agent_type:2,site_type:0,state:1,rule:3->[0]
-Quarks:site_modif+:agent_type:2,site_type:1,state:1,rule:5->[1]
 Quarks:site_modif+:agent_type:2,site_type:2,state:1,rule:2->[1]
 Quarks:site_modif+:agent_type:2,site_type:2,state:0,rule:3->[0]
+Quarks:site_modif+:agent_type:2,site_type:0,state:1,rule:3->[0]
 Quarks:site_modif+:agent_type:2,site_type:3,state:1,rule:4->[1]
 Quarks:site_modif+:agent_type:2,site_type:3,state:0,rule:5->[1]
+Quarks:site_modif+:agent_type:2,site_type:1,state:1,rule:5->[1]
 Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:0->[0]
 Quarks:site_modif-:agent_type:0,site_type:0,state:1,rule:1->[0]
 Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:2->[0]
@@ -461,12 +461,12 @@ Quarks:site_modif-:agent_type:0,site_type:1,state:1,rule:3->[1]
 Quarks:site_modif-:agent_type:0,site_type:1,state:2,rule:5->[0]
 Quarks:site_modif-:agent_type:1,site_type:0,state:0,rule:0->[1]
 Quarks:site_modif-:agent_type:1,site_type:0,state:1,rule:1->[1]
-Quarks:site_modif-:agent_type:2,site_type:0,state:0,rule:3->[0]
-Quarks:site_modif-:agent_type:2,site_type:1,state:0,rule:5->[1]
 Quarks:site_modif-:agent_type:2,site_type:2,state:0,rule:2->[1]
 Quarks:site_modif-:agent_type:2,site_type:2,state:1,rule:3->[0]
+Quarks:site_modif-:agent_type:2,site_type:0,state:0,rule:3->[0]
 Quarks:site_modif-:agent_type:2,site_type:3,state:0,rule:4->[1]
 Quarks:site_modif-:agent_type:2,site_type:3,state:1,rule:5->[1]
+Quarks:site_modif-:agent_type:2,site_type:1,state:0,rule:5->[1]
 Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Influence_map:Wake_up_map:rule(0):'a.b' A(x),B(x)->A(x!1),B(x!1) -> rule(1):'a.b_op' A(x!1),B(x!1)->A(x),B(x)[0->0];[1->1]
@@ -1036,7 +1036,7 @@ Id=45
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site c in agent A ranges over C@x1 and free.
+The binding state of site c in agent A ranges over free and C@x1.
 INTENSIONAL DESCRIPTION:
 Id=68
  Node(site_type:0<0)
@@ -1052,7 +1052,7 @@ Id=68
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site x in agent A ranges over B@x and free.
+The binding state of site x in agent A ranges over free and B@x.
 INTENSIONAL DESCRIPTION:
 Id=68
  Node(site_type:0<0)
@@ -1068,7 +1068,7 @@ Id=68
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site x in agent B ranges over A@x and free.
+The binding state of site x in agent B ranges over free and A@x.
 INTENSIONAL DESCRIPTION:
 Id=48
  Node(site_type:2<0)
@@ -1084,7 +1084,7 @@ Id=48
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site x1 in agent C ranges over A@c and free.
+The binding state of site x1 in agent C ranges over free and A@c.
 INTENSIONAL DESCRIPTION:
 Id=3
  Node(site_type:1<0)

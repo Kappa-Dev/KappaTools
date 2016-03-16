@@ -515,11 +515,11 @@ Quarks:agent_modif+:agent_type:3,rule:3->[0]
 Quarks:agent_modif+:agent_type:4,rule:4->[0]
 Quarks:agent_modif-:agent_type:0,rule:5->[0]
 Quarks:agent_modif-:agent_type:2,rule:9->[0]
-Quarks:site_test**:agent_type:0,site_type:0,state:0,rule:8->[1]
 Quarks:site_test**:agent_type:0,site_type:1,state:1,rule:5->[0]
 Quarks:site_test**:agent_type:0,site_type:1,state:0,rule:6->[0]
 Quarks:site_test**:agent_type:0,site_type:1,state:0,rule:7->[0]
 Quarks:site_test**:agent_type:0,site_type:1,state:2,rule:8->[1]
+Quarks:site_test**:agent_type:0,site_type:0,state:0,rule:8->[1]
 Quarks:site_test**:agent_type:1,site_type:0,state:0,rule:6->[1]
 Quarks:site_test**:agent_type:1,site_type:0,state:1,rule:7->[1]
 Quarks:site_test**:agent_type:1,site_type:1,state:0,rule:6->[1]
@@ -558,14 +558,14 @@ Quarks:site_modif+:agent_type:4,site_type:0,state:1,rule:10->[1]
 Quarks:site_modif+:agent_type:4,site_type:1,state:0,rule:4->[0]
 Quarks:site_modif+:agent_type:4,site_type:1,state:0,rule:11->[0*]
 Quarks:site_modif+:agent_type:4,site_type:1,state:1,rule:10->[1]
-Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:8->[1]
 Quarks:site_modif-:agent_type:0,site_type:1,state:1,rule:5->[0]
 Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:6->[0]
 Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:7->[0]
 Quarks:site_modif-:agent_type:0,site_type:1,state:2,rule:9->[0*]
-Quarks:site_modif-:agent_type:1,site_type:0,state:0,rule:6->[1]
+Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:8->[1]
 Quarks:site_modif-:agent_type:1,site_type:1,state:1,rule:5->[0*]
 Quarks:site_modif-:agent_type:1,site_type:1,state:0,rule:6->[1]
+Quarks:site_modif-:agent_type:1,site_type:0,state:0,rule:6->[1]
 Quarks:site_modif-:agent_type:2,site_type:0,state:0,rule:7->[2]
 Quarks:site_modif-:agent_type:2,site_type:1,state:0,rule:7->[2]
 Quarks:site_modif-:agent_type:3,site_type:0,state:0,rule:10->[0]
@@ -1606,7 +1606,7 @@ Id=36
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site x in agent A ranges over C@x, B@x, and free.
+The binding state of site x in agent A ranges over free, B@x, and C@x.
 INTENSIONAL DESCRIPTION:
 Id=34
  Node(site_type:0<0)
@@ -1638,7 +1638,7 @@ Id=37
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site x in agent B ranges over A@x and free.
+The binding state of site x in agent B ranges over free and A@x.
 INTENSIONAL DESCRIPTION:
 Id=46
  Node(site_type:0<0)
@@ -1654,7 +1654,7 @@ Id=46
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent B ranges over p and u.
+The internal state of site x in agent B ranges over u and p.
 INTENSIONAL DESCRIPTION:
 Id=37
  Node(site_type:1<0)
@@ -1670,7 +1670,7 @@ Id=37
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site x in agent C ranges over A@x and free.
+The binding state of site x in agent C ranges over free and A@x.
 INTENSIONAL DESCRIPTION:
 Id=46
  Node(site_type:0<0)
@@ -1686,7 +1686,7 @@ Id=46
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent C ranges over p and u.
+The internal state of site x in agent C ranges over u and p.
 INTENSIONAL DESCRIPTION:
 Id=37
  Node(site_type:1<0)
@@ -1702,7 +1702,7 @@ Id=37
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site x in agent D ranges over E@x and free.
+The binding state of site x in agent D ranges over free and E@x.
 INTENSIONAL DESCRIPTION:
 Id=46
  Node(site_type:0<0)
@@ -1718,7 +1718,7 @@ Id=46
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent D ranges over p and u.
+The internal state of site x in agent D ranges over u and p.
 INTENSIONAL DESCRIPTION:
 Id=37
  Node(site_type:1<0)
@@ -1734,7 +1734,7 @@ Id=37
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site x in agent E ranges over D@x and free.
+The binding state of site x in agent E ranges over free and D@x.
 INTENSIONAL DESCRIPTION:
 Id=46
  Node(site_type:0<0)
@@ -1750,5 +1750,5 @@ Id=46
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent E ranges over p and u.
+The internal state of site x in agent E ranges over u and p.
 execution finished without any exception

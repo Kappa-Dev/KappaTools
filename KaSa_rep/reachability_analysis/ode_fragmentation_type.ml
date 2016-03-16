@@ -41,24 +41,24 @@ module External_flow_map =
 type ode_frag =
     {
       store_sites_modified_set:
-      Ckappa_sig.Site_map_and_set.Set.t Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t;
+      Ckappa_sig.Site_map_and_set.Set.t Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
       store_sites_bond_pair_set: 
         Ckappa_sig.Site_map_and_set.Set.t
-        Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t * 
+        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t * 
         Ckappa_sig.Site_map_and_set.Set.t 
-        Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t;
+        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
       store_sites_bond_pair_set_external  : 
         Ckappa_sig.Site_map_and_set.Set.t 
-        Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t * 
+        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t * 
         Ckappa_sig.Site_map_and_set.Set.t
-        Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t;
+        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
       store_sites_lhs                     : Ckappa_sig.c_site_name list
-        Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t;
+        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
       store_sites_anchor_set              : 
         Ckappa_sig.Site_map_and_set.Set.t
-        Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t *
+        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t *
         Ckappa_sig.Site_map_and_set.Set.t 
-        Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t;
+        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
       store_internal_flow                 : 
         (Ckappa_sig.c_site_name list * Ckappa_sig.Site_map_and_set.Set.t) Internal_flow_map.Map.t *
         (Ckappa_sig.c_site_name list * Ckappa_sig.Site_map_and_set.Set.t) Internal_flow_map.Map.t;

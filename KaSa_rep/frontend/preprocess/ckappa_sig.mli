@@ -25,7 +25,7 @@ type internal_state = string
     
 type c_agent_name
 type c_site_name
-type c_state = int (*TODO*)
+type c_state (*TODO*)
 type c_agent_id = int
 type c_rule_id = int
 
@@ -38,6 +38,8 @@ val dummy_state_index : c_state
 val dummy_site_name_1 : c_site_name
 val dummy_site_name_minus1 : c_site_name
 
+val dummy_state_index_1 : c_state
+
 val string_of_agent_name : c_agent_name -> string
 val int_of_agent_name : c_agent_name -> int
 val agent_name_of_int : int -> c_agent_name
@@ -46,13 +48,18 @@ val site_name_of_int : int -> c_site_name
 val int_of_site_name : c_site_name -> int
 val string_of_site_name : c_site_name -> string
 
+val state_index_of_int: int -> c_state
+val int_of_state_index: c_state -> int
+val string_of_state_index : c_state -> string
+
+
 (****************************************************************************************)
 
-module Agent_type_nearly_inf_Imperatif: Int_storage.Storage
+module Agent_type_nearly_Inf_Int_storage_Imperatif: Int_storage.Storage
   with type key = c_agent_name
   and type dimension = int
 
-module Agent_type_quick_nearly_inf_Imperatif: Int_storage.Storage
+module Agent_type_quick_nearly_Inf_Int_storage_Imperatif: Int_storage.Storage
   with type key = c_agent_name 
   and type dimension = int
 
@@ -69,6 +76,18 @@ module Site_type_nearly_Inf_Int_storage_Imperatif: Int_storage.Storage
   with type key = c_site_name
   and type dimension = int
 
+module Site_type_quick_nearly_Inf_Int_storage_Imperatif: Int_storage.Storage
+  with type key = c_site_name
+  and type dimension = int
+
+module State_index_nearly_Inf_Int_storage_Imperatif: Int_storage.Storage
+  with type key = c_state
+  and type dimension = int
+
+module State_index_quick_nearly_Inf_Int_storage_Imperatif: Int_storage.Storage
+  with type key = c_state
+  and type dimension = int
+
 module Site_union_find: Union_find.Union_find
   with type t = c_site_name Site_type_nearly_Inf_Int_storage_Imperatif.t   
   and type dimension = int
@@ -76,11 +95,11 @@ module Site_union_find: Union_find.Union_find
 
 (****************************************************************************************)
 
-module Agent_id_nearly_inf_Imperatif : Int_storage.Storage
+module Agent_id_nearly_Inf_Int_storage_Imperatif : Int_storage.Storage
   with type key = c_agent_id
   and type dimension = int
          
-module Agent_id_quick_nearly_inf_Imperatif: Int_storage.Storage
+module Agent_id_quick_nearly_Inf_Int_storage_Imperatif: Int_storage.Storage
   with type key = c_agent_id 
   and type dimension = int
 
@@ -193,9 +212,19 @@ type site  = (site_name, site_name) site_type
 
 type state = (internal_state, binding_state) site_type
 
+
+(**)
+type c_binding_state = 
+| C_Free 
+| C_Lnk_type of c_agent_name * c_site_name 
+
+type state' = (internal_state, c_binding_state) site_type  
+
 module Dictionary_of_States: Dictionary.Dictionary 
   with type key = c_state
-  and type value = state
+  and type value = state'
+
+(**)
  
 type internal_state_specification =
   {
@@ -251,7 +280,7 @@ type c_interface = c_port Site_map_and_set.Map.t
                                                                            
 type c_proper_agent = 
     { 
-      c_agent_kasim_id  : int; 
+      c_agent_kasim_id  : c_agent_id; 
       c_agent_name      : c_agent_name;
       c_agent_interface : c_interface;
       c_agent_position  : position
@@ -259,7 +288,7 @@ type c_proper_agent =
 
 type site_address =
     {
-      agent_index : int;
+      agent_index : c_agent_id;
       site        : c_site_name
     }
 

@@ -129,6 +129,6 @@ Reachability analysis...
 ------------------------------------------------------------
 The binding state of site x in agent A is always B@x.
 The internal state of site x in agent A is always u.
-The internal state of site x in agent B ranges over p and u.
-The binding state of site x in agent B ranges over A@x and free.
+The internal state of site x in agent B ranges over u and p.
+The binding state of site x in agent B ranges over free and A@x.
 execution finished without any exception

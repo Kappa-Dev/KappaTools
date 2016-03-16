@@ -18,7 +18,11 @@ let warn parameters mh message exn default =
 let trace = false
 let local_trace = false
 
-let string_of_port port = "[state_min:"^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.min)^";state_max:"^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.max)^"]"
+let string_of_port port =
+  "[state_min:" ^ 
+    (Ckappa_sig.string_of_state_index port.Cckappa_sig.site_state.Cckappa_sig.min) ^ 
+    ";state_max:" ^ 
+    (Ckappa_sig.string_of_state_index port.Cckappa_sig.site_state.Cckappa_sig.max) ^ "]"
 
 let print_kasim_site x =
   match
@@ -122,7 +126,7 @@ let print_mixture parameters error handler mixture =
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" (Remanent_parameters.get_prefix parameters) in
     let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
     let error =
-      Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.print
+      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.print
         (Remanent_parameters.update_prefix parameters "agent_id_")
         error
         (fun parameters error a ->
@@ -177,7 +181,7 @@ let print_diffview parameters error handler diff =
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" (Remanent_parameters.get_prefix parameters) in
     let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
     let error =
-      Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.print
+      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.print
 	 (Remanent_parameters.update_prefix parameters "agent_id_")
 	 error
 	 (fun parameters error a ->

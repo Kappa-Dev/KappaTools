@@ -17,28 +17,28 @@ let warn parameters mh message exn default =
  
 (****************************************************************************************)
 
-type binding_state = 
+(*type binding_state = 
 | Free 
-| Lnk_type of Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name 
+| Lnk_type of Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *)
 
 type site  = (Ckappa_sig.c_site_name, Ckappa_sig.c_site_name) Ckappa_sig.site_type
 
-type state = (Ckappa_sig.internal_state, binding_state) Ckappa_sig.site_type  
+(*type state = (Ckappa_sig.internal_state, binding_state) Ckappa_sig.site_type  *)
  
-module State = 
+(*module State = 
 struct
   type t = state 
   let compare = compare
-end 
+end *)
 
-module Dictionary_of_States = 
+(*module Dictionary_of_States = 
   (
     Dictionary.Dictionary_of_Ord (State) : Dictionary.Dictionary
    with type key = Ckappa_sig.c_state
    and type value = state
-  )
+  )*)
 
-type state_dic = (unit, unit) Dictionary_of_States.dictionary
+type state_dic = (unit, unit) Ckappa_sig.Dictionary_of_States.dictionary
   
 type kappa_handler = 
   {
@@ -47,9 +47,9 @@ type kappa_handler =
       nagents               : int;
       agents_dic            : Ckappa_sig.agent_dic; 
       interface_constraints : Ckappa_sig.agent_specification
-        Ckappa_sig.Agent_type_nearly_inf_Imperatif.t;
+        Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.t;
       sites                 : Ckappa_sig.site_dic 
-        Ckappa_sig.Agent_type_nearly_inf_Imperatif.t;
+        Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.t;
       states_dic            : state_dic 
         Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.t;
       dual                  : 
@@ -148,7 +148,7 @@ type agent =
     
 type agent_sig = Ckappa_sig.c_state list interface proper_agent 
   
-type views = agent Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.t
+type views = agent Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.t
 
 type diff_views =
   Ckappa_sig.c_state
@@ -156,7 +156,7 @@ type diff_views =
     port
     Ckappa_sig.Site_map_and_set.Map.t
     proper_agent
-    Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.t
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.t
 
 type mixture = 
   { 
@@ -238,7 +238,7 @@ type enriched_init =
     }
       
 let dummy_init parameters error =
-  let error,views = Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.create parameters error 0 in 
+  let error,views = Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.create parameters error 0 in 
   let error,bonds = Int_storage.Quick_Nearly_inf_Imperatif.create parameters error 0 in 
   error,
   {

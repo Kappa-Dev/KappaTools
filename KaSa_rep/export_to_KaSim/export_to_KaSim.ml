@@ -268,7 +268,7 @@ module Export_to_KaSim =
           (fun parameters error i agent_name () () ->
             let error,site_dic =
 	      Misc_sa.unsome
-	        (Ckappa_sig.Agent_type_nearly_inf_Imperatif.get
+	        (Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
 		   parameters
                    error
                    i 
@@ -302,7 +302,7 @@ module Export_to_KaSim =
 	    in
 	    let site = simplify_site site in
 	    let error =
-	      Cckappa_sig.Dictionary_of_States.print
+	      Ckappa_sig.Dictionary_of_States.print
 	        parameters error
 	        (fun parameters error s state  () () ->
 		  let () =

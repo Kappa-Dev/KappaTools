@@ -1020,13 +1020,13 @@ Id=133
 
 EXTENSIONAL DESCRIPTION:
 In agent A, the internal state of site z, the internal state of site y, and the internal state of site x, are entangled by the following 3-d relationship:
-	A(z~u,y~u,x~u)
-	A(z~u,y~p,x~p)
-	A(z~u,y~u,x~p)
-	A(z~q,y~p,x~0)
-	A(z~u,y~q,x~q)
-	A(z~q,y~q,x~q)
 	A(z~u,y~u,x~q)
+	A(z~q,y~q,x~q)
+	A(z~u,y~q,x~q)
+	A(z~q,y~p,x~0)
+	A(z~u,y~u,x~p)
+	A(z~u,y~p,x~p)
+	A(z~u,y~u,x~u)
 
 ------------------------------------------------------------
 * Non relational properties:
@@ -1046,7 +1046,7 @@ Id=101
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site z in agent A ranges over q and u.
+The internal state of site z in agent A ranges over u and q.
 INTENSIONAL DESCRIPTION:
 Id=166
  Node(site_type:1<0)
@@ -1062,7 +1062,7 @@ Id=166
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site y in agent A ranges over q, p, and u.
+The internal state of site y in agent A ranges over u, p, and q.
 INTENSIONAL DESCRIPTION:
 Id=135
  Node(site_type:0<0)
@@ -1078,5 +1078,5 @@ Id=135
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent A ranges over q, 0, p, and u.
+The internal state of site x in agent A ranges over u, p, 0, and q.
 execution finished without any exception

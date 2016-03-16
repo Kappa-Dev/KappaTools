@@ -35,10 +35,10 @@ let empty_agent_specification =
 
 let empty_handler parameters error =
   let error, int_constraints =
-    Ckappa_sig.Agent_type_nearly_inf_Imperatif.create parameters error 0
+    Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.create parameters error 0
   in
   let error,sites = 
-    Ckappa_sig.Agent_type_nearly_inf_Imperatif.create
+    Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.create
       parameters
       error 
       0 (*dimension*)
@@ -65,13 +65,13 @@ let empty_handler parameters error =
   }
 
 let create_binding_state_dictionary parameters error =
-  let dic = Cckappa_sig.Dictionary_of_States.init () in
+  let dic = Ckappa_sig.Dictionary_of_States.init () in
   let error, output= 
-    Cckappa_sig.Dictionary_of_States.allocate
+    Ckappa_sig.Dictionary_of_States.allocate
       parameters
       error 
       Misc_sa.compare_unit_state_index
-      (Ckappa_sig.Binding Cckappa_sig.Free)
+      (Ckappa_sig.Binding Ckappa_sig.C_Free)
       () 
       Misc_sa.const_unit
       dic 
@@ -81,7 +81,7 @@ let create_binding_state_dictionary parameters error =
   | Some (_, _, _, x) -> error,x
 
 let create_internal_state_dictionary parameters error =
-  let dic = Cckappa_sig.Dictionary_of_States.init () in
+  let dic = Ckappa_sig.Dictionary_of_States.init () in
   error, dic
 
 let declare_agent parameters error handler agent_name =
@@ -103,7 +103,7 @@ let declare_agent parameters error handler agent_name =
     if bool
     then
       let error, int_constraints =
-        Ckappa_sig.Agent_type_nearly_inf_Imperatif.set
+        Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.set
           parameters 
           error 
           k
@@ -111,7 +111,7 @@ let declare_agent parameters error handler agent_name =
           handler.Cckappa_sig.interface_constraints 
       in
       let error, sites = 
-        Ckappa_sig.Agent_type_nearly_inf_Imperatif.set
+        Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.set
           parameters
           error
           k 
@@ -135,7 +135,7 @@ let declare_site create parameters make_site make_state (error, handler)
   let site = make_site site_name in
   let states_dic = handler.Cckappa_sig.states_dic in
   let error, sites =
-    Ckappa_sig.Agent_type_nearly_inf_Imperatif.get
+    Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
       parameters
       error 
       agent_name
@@ -173,7 +173,7 @@ let declare_site create parameters make_site make_state (error, handler)
                 states_dic 
             in
             let error, new_sites = 
-              Ckappa_sig.Agent_type_nearly_inf_Imperatif.set
+              Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.set
                 parameters 
                 error
                 agent_name
@@ -217,7 +217,7 @@ let declare_site create parameters make_site make_state (error, handler)
             (fun (error, (dic_states, l, bool)) internal ->
               let state = make_state internal in
               let error, (bool2, output) =
-                Cckappa_sig.Dictionary_of_States.allocate_bool 
+                Ckappa_sig.Dictionary_of_States.allocate_bool 
                   parameters
                   error
                   Misc_sa.compare_unit_state_index 
@@ -357,7 +357,7 @@ let scan_agent parameters (error, handler) agent =
                 (error, handler)
                 ag_id
                 site_name
-                [Cckappa_sig.Lnk_type (ag_id', site_id')] 
+                [Ckappa_sig.C_Lnk_type (ag_id', site_id')] 
             in
             let error, (handler, l2, site_id') =
               declare_site_with_binding_states 
@@ -365,7 +365,7 @@ let scan_agent parameters (error, handler) agent =
                 (error, handler)
                 ag_id' 
                 site'
-                [Cckappa_sig.Lnk_type (ag_id, site_id)] 
+                [Ckappa_sig.C_Lnk_type (ag_id, site_id)] 
             in
             let error, handler =
               begin

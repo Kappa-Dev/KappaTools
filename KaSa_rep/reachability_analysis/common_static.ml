@@ -18,10 +18,6 @@ let warn parameters mh message exn default =
 
 let trace = false
 
-(*type rule_id = Cckappa_sig.rule_id
-type state_index = Cckappa_sig.state_index
-type site_name = Cckappa_sig.site_name*)
-
 type half_break_action = 
   (int list * (Ckappa_sig.c_rule_id * Ckappa_sig.c_state) list) Ckappa_sig.AgentSite_map_and_set.Map.t
 
@@ -51,7 +47,7 @@ type bdu_common_static =
 
 let collect_agent_name parameter error rule_id rule store_result =
   let error, store_result =
-    Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.fold
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
       parameter
       error
       (fun parameter error agent_id agent store_result ->
@@ -114,11 +110,11 @@ let half_break_action parameter error handler rule_id half_break store_result =
                    (agent_type, site_type)
                    handler.Cckappa_sig.states_dic)
                 (fun error -> warn parameter error (Some "line 84") Exit
-                  (Cckappa_sig.Dictionary_of_States.init()))
+                  (Ckappa_sig.Dictionary_of_States.init()))
             in
             let error, last_entry =
-              Cckappa_sig.Dictionary_of_States.last_entry parameter error state_value in
-            error, (1, last_entry)
+              Ckappa_sig.Dictionary_of_States.last_entry parameter error state_value in
+            error, (Ckappa_sig.dummy_state_index_1, last_entry)
           end
         | Some interval -> error, (interval.Cckappa_sig.min, interval.Cckappa_sig.max)
       in
@@ -224,12 +220,12 @@ let store_potential_half_break parameter error handler rule_id half_break store_
                  (agent_type, site_type)
                  handler.Cckappa_sig.states_dic)
               (fun error -> warn parameter error (Some "line 109") Exit 
-                (Cckappa_sig.Dictionary_of_States.init()))
+                (Ckappa_sig.Dictionary_of_States.init()))
                in
               let error, last_entry =
-                Cckappa_sig.Dictionary_of_States.last_entry parameter error state_value
+                Ckappa_sig.Dictionary_of_States.last_entry parameter error state_value
               in
-              error, (1, last_entry)
+              error, (Ckappa_sig.dummy_state_index_1, last_entry)
         end
       | Some interval -> error, (interval.Cckappa_sig.min, interval.Cckappa_sig.max)
     in
@@ -244,7 +240,7 @@ let store_potential_half_break parameter error handler rule_id half_break store_
         | error, None -> error, store_result
         | error, Some (agent_type2, site2, state2) ->
           let error, store_potential_free =
-            add_link (agent_type2, rule_id) (site2, 0) (fst store_result)
+            add_link (agent_type2, rule_id) (site2, Ckappa_sig.dummy_state_index) (fst store_result)
           in
           (*Print*)
           (*let _ =
@@ -309,14 +305,14 @@ let store_potential_remove parameter error handler rule_id remove store_result =
                     (agent_type, site)
                     handler.Cckappa_sig.states_dic)
                 (fun error -> warn parameter error (Some "line 196") Exit
-                  (Cckappa_sig.Dictionary_of_States.init()))
+                  (Ckappa_sig.Dictionary_of_States.init()))
             in
             let error, last_entry =
-              Cckappa_sig.Dictionary_of_States.last_entry parameter error state_dic
+              Ckappa_sig.Dictionary_of_States.last_entry parameter error state_dic
             in
             (*---------------------------------------------------------------------------*)
             let rec aux k (error, store_result) =
-              if k > last_entry
+              if (Ckappa_sig.int_of_state_index k) > (Ckappa_sig.int_of_state_index last_entry)
               then error, store_result
               else
                 (*potential partner*)
@@ -325,7 +321,7 @@ let store_potential_remove parameter error handler rule_id remove store_result =
                 | error, Some (agent_type2, site2, state2) ->
                   (*---------------------------------------------------------------------*)
                   let error, store_potential_free =
-                    add_link (agent_type2, rule_id) (site2, 0) (fst store_result)
+                    add_link (agent_type2, rule_id) (site2, Ckappa_sig.dummy_state_index) (fst store_result)
                   in
                   (*Print*)
                   (*let _ =
@@ -352,7 +348,7 @@ let store_potential_remove parameter error handler rule_id remove store_result =
                   in*)
                   error, (store_potential_free, store_potential_bind)
             in
-            aux 1 (error, store_result)
+            aux Ckappa_sig.dummy_state_index_1 (error, store_result)
           end          
         else
           error, store_result

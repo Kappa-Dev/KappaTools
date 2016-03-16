@@ -23,7 +23,7 @@ let trace = false
 (*Print sites that modified*)
 
 let print_sites_modified_set parameter error handler_kappa result =
-  Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.iter parameter error
+  Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.iter parameter error
     (fun parameter error agent_type site_set ->
       let error, agent_name =
         try

@@ -348,7 +348,7 @@ struct
       in
       (*-----------------------------------------------------------------------*)
       let error, site_correspondence =
-        Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.get
+        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
           parameter error agent_type site_correspondence
       in
       let error, site_correspondence =
@@ -504,7 +504,7 @@ struct
     (*-----------------------------------------------------------------------*)
     (*list of sites in a covering class*)
       let error, site_correspondence =
-        match Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.get parameter
+        match Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get parameter
           error agent_type site_correspondence
         with
         | error, None -> warn parameter error (Some "73") Exit []
@@ -560,19 +560,17 @@ struct
     let error, handler, list =
       Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu parameter handler error bdu_diff
     in
-    (*TODO: Convert*)
-    let list =
-      List.fold_left (fun list l ->
-        let p = 
-          List.fold_left (fun list (site, state) ->
-            let site =
-              (Ckappa_sig.site_name_of_int site)
-            in
-            (site, state):: list
-          ) [] l
+    (*Convert*)
+    let error, list =
+      List.fold_left (fun (error, list) l ->
+        let error, p = 
+          List.fold_left (fun (error, list) (site, state) ->
+            error, 
+            ((Ckappa_sig.site_name_of_int site), (Ckappa_sig.state_index_of_int state)) :: list
+          ) (error, []) l
         in
-        p :: list
-      ) [] list
+        error, p :: list
+      ) (error, []) (List.rev list)
     in
     let dynamic = set_mvbdu_handler handler dynamic in
     (*-----------------------------------------------------------------------*)
@@ -606,7 +604,8 @@ struct
 		   Handler.string_of_state_fully_deciphered parameter error handler_kappa
 		     agent_type site_type state
 		 with
-		   _ -> warn parameter error (Some "line 595") Exit (string_of_int state)
+		   _ -> warn parameter error (Some "line 595") Exit
+                     (Ckappa_sig.string_of_state_index state)
                in
                (*-----------------------------------------------------------------------*)
                let () =
@@ -768,7 +767,7 @@ struct
               add site port.Cckappa_sig.site_state.Cckappa_sig.min)
 	    (*JF: we should check that port.site_state.min is equal to
               port.site_state.max*)
-	    (fun site -> add site 0)
+	    (fun site -> add site Ckappa_sig.dummy_state_index)
 	    set
 	    agent.Cckappa_sig.agent_interface
 	    Ckappa_sig.Site_map_and_set.Map.empty
@@ -784,7 +783,7 @@ struct
   (***************************************************************************)
   (*build bdu restriction for initial state *)
 
-  let bdu_build static dynamic error pair_list =
+  let bdu_build static dynamic error (pair_list: (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list) =
     let parameter = get_parameter static in
     let error, dynamic, bdu_true = get_mvbdu_true static dynamic error in
     let handler = get_mvbdu_handler dynamic in
@@ -806,7 +805,7 @@ struct
       get_store_remanent_triple static dynamic error
     in
     let error, (dynamic, event_list) =
-      Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.fold parameter error
+      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
         (fun parameter error agent_id agent (dynamic, event_list) ->
           match agent with
           | Cckappa_sig.Unknown_agent _
@@ -817,7 +816,7 @@ struct
             let agent_type = agent.Cckappa_sig.agent_name in
             (*----------------------------------------------------------------*)
             let error, (dynamic, event_list) =
-              match Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get
+              match Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
                 parameter error agent_type
                 store_remanent_triple
               with
@@ -981,7 +980,7 @@ struct
                 in           
                 let site_name = path.Communication.site in
                 let error, site_correspondence =
-                  match Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.get parameter error
+                  match Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get parameter error
                     agent_type site_correspondence
                   with
                   | error, None -> warn parameter error (Some "") Exit []
@@ -1705,7 +1704,7 @@ struct
           decomposition parameter handler error bdu
         in
         let error, site_correspondence =
-          Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.get
+          Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
             parameter error agent_type site_correspondence
         in
         let error, site_correspondence =
@@ -1782,7 +1781,7 @@ struct
                   parameter handler error renamed_mvbdu
 	      in
               let error, cv_map_opt =
-                Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get 
+                Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get 
                   parameter error agent_type output
 	      in
 	      let error,cv_map =
@@ -1807,7 +1806,7 @@ struct
 		  cv_map
 	      in
 	      let error,output =
-                Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.set 
+                Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set 
                   parameter error agent_type cv_map'
 		  output
 	      in
@@ -1817,7 +1816,7 @@ struct
 	  list)
       result
       (let error, agent_map =
-         Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.create parameter error 0
+         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create parameter error 0
        in
        (error, handler, agent_map))
 
@@ -1834,7 +1833,7 @@ struct
           decomposition
           ~show_dep_with_dimmension_higher_than:dim_min parameter handler error handler_kappa site_correspondence result
       in
-      Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.fold
+      Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
         parameter
         error
         (fun parameter error agent_type map (handler:Mvbdu_wrapper.Mvbdu.handler) ->
@@ -1913,7 +1912,7 @@ struct
 	    in
             (*-----------------------------------------------------------------------*)
 	    let error, site_correspondence =
-              Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.get 
+              Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get 
                 parameter error agent_type site_correspondence
 	    in
 	    let error, site_correspondence =
@@ -2156,6 +2155,5 @@ struct
 
   let cc_mixture_is_reachable static dynamic error ccmixture =
     error, dynamic, Usual_domains.Maybe (* to do *)
-
 
 end

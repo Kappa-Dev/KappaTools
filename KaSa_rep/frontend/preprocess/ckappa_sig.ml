@@ -47,6 +47,8 @@ let dummy_state_index = 0
 let dummy_site_name_1 = 1
 let dummy_site_name_minus1 = -1 (*Use in views_domain*)
 
+let dummy_state_index_1 = 1
+
 let string_of_agent_name (a: c_agent_name) : string = string_of_int a
 let int_of_agent_name (a: c_agent_name) : int = a
 let agent_name_of_int (a: int) : c_agent_name = a
@@ -55,18 +57,23 @@ let site_name_of_int (a: int) : c_site_name = a
 let int_of_site_name (a : c_site_name) : int = a
 let string_of_site_name (a: c_site_name) : string = string_of_int a
 
+let state_index_of_int (a:int) : c_state = a
+let int_of_state_index (a:c_state) : int = a
+let string_of_state_index (a:c_state) : string = string_of_int a
+
+
 (****************************************************************************************)
 
-module Agent_type_nearly_inf_Imperatif =
+module Agent_type_nearly_Inf_Int_storage_Imperatif =
   (
     Int_storage.Nearly_inf_Imperatif: Int_storage.Storage
    with type key = c_agent_name
    and type dimension = int
   )
 
-module Agent_type_quick_nearly_inf_Imperatif =
+module Agent_type_quick_nearly_Inf_Int_storage_Imperatif =
   (
-    Int_storage.Quick_key_list (Agent_type_nearly_inf_Imperatif): Int_storage.Storage
+    Int_storage.Quick_key_list (Agent_type_nearly_Inf_Int_storage_Imperatif): Int_storage.Storage
     with type key = c_agent_name
     and type dimension = int
   )
@@ -85,6 +92,7 @@ module Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_
    and type dimension = (int * (int * int))
   )
 
+(*site*)
 module Site_type_nearly_Inf_Int_storage_Imperatif =
   (
     Int_storage.Nearly_inf_Imperatif: Int_storage.Storage
@@ -92,21 +100,43 @@ module Site_type_nearly_Inf_Int_storage_Imperatif =
    and type dimension = int
   )
 
+module Site_type_quick_nearly_Inf_Int_storage_Imperatif =
+  (
+    Int_storage.Quick_key_list (Site_type_nearly_Inf_Int_storage_Imperatif): Int_storage.Storage
+    with type key = c_site_name
+    and type dimension = int
+  )
+
+(*state*)
+module State_index_nearly_Inf_Int_storage_Imperatif =
+  (
+    Int_storage.Nearly_inf_Imperatif: Int_storage.Storage
+   with type key = c_state
+   and type dimension = int
+  )
+
+module State_index_quick_nearly_Inf_Int_storage_Imperatif =
+  (
+    Int_storage.Quick_key_list (State_index_nearly_Inf_Int_storage_Imperatif): Int_storage.Storage
+    with type key = c_state
+    and type dimension = int
+  )
+
 module Site_union_find = 
   Union_find.Make(Site_type_nearly_Inf_Int_storage_Imperatif)
 
 (****************************************************************************************)
 
-module Agent_id_nearly_inf_Imperatif =
+module Agent_id_nearly_Inf_Int_storage_Imperatif =
   (
     Int_storage.Nearly_inf_Imperatif : Int_storage.Storage 
    with type key = c_agent_id
    and type dimension = int
   )		  
 
-module Agent_id_quick_nearly_inf_Imperatif =
+module Agent_id_quick_nearly_Inf_Int_storage_Imperatif =
   (
-    Int_storage.Quick_key_list (Agent_id_nearly_inf_Imperatif) : Int_storage.Storage 
+    Int_storage.Quick_key_list (Agent_id_nearly_Inf_Int_storage_Imperatif) : Int_storage.Storage 
    with type key = c_agent_id
    and type dimension = int
   )
@@ -276,9 +306,17 @@ type site = (site_name, site_name) site_type
 
 type state = (internal_state, binding_state) site_type  
 
+
+(*move from cckappa_sig*)
+type c_binding_state = 
+| C_Free 
+| C_Lnk_type of c_agent_name * c_site_name 
+
+type state' = (internal_state, c_binding_state) site_type  
+
 module State = 
 struct
-  type t = state 
+  type t = state'
   let compare = compare
 end 
 
@@ -286,9 +324,11 @@ module Dictionary_of_States =
   (
     Dictionary.Dictionary_of_Ord (State) : Dictionary.Dictionary
    with type key = c_state
-   and type value = state
+   and type value = state'
   )
  
+(**)
+
 type internal_state_specification =
   {
     string : internal_state;

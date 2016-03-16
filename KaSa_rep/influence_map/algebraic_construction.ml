@@ -42,8 +42,8 @@ let check parameters error handler mixture1 mixture2 (i,j) =
   | (h1,h2)::t ->
      begin
        (* check agent type *)
-       let error,view1 = Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get parameters error h1 mixture1.Cckappa_sig.views in
-       let error,view2 = Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get parameters error h2 mixture2.Cckappa_sig.views in
+       let error,view1 = Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get parameters error h1 mixture1.Cckappa_sig.views in
+       let error,view2 = Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get parameters error h2 mixture2.Cckappa_sig.views in
        let error,bonds1 = Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get parameters error h1 mixture1.Cckappa_sig.bonds in 
        let error,bonds2 = Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get parameters error h2 mixture2.Cckappa_sig.bonds in
        check_interface error view1 view2 bonds1 bonds2 t already_done 
@@ -63,7 +63,8 @@ let check parameters error handler mixture1 mixture2 (i,j) =
 	    (fun _ error _ port1 port2 ->
 	     let range1 = port1.Cckappa_sig.site_state in
 	     let range2 = port2.Cckappa_sig.site_state in
-	     if not (range1.Cckappa_sig.max < range2.Cckappa_sig.min || range2.Cckappa_sig.max < range1.Cckappa_sig.min)
+	     if not (range1.Cckappa_sig.max < range2.Cckappa_sig.min || 
+                       range2.Cckappa_sig.max < range1.Cckappa_sig.min)
 	     then error
 	     else raise (False error))
 	    ag1.Cckappa_sig.agent_interface

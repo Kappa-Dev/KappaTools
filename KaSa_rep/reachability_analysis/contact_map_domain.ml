@@ -178,7 +178,7 @@ struct
     | Cckappa_sig.Ghost
     | Cckappa_sig.Unknown_agent _
     | Cckappa_sig.Dead_agent _ ->
-      warn parameter error (Some "line 199") Exit (Ckappa_sig.dummy_agent_name, 0)
+      warn parameter error (Some "line 199") Exit (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_state_index)
     | Cckappa_sig.Agent agent1 ->
       let agent_type1 = agent1.Cckappa_sig.agent_name in
       let error, state1 =
@@ -188,12 +188,12 @@ struct
           site_type
           agent1.Cckappa_sig.agent_interface
         with
-        | error, None ->  warn parameter error (Some "line 228") Exit 0
+        | error, None ->  warn parameter error (Some "line 228") Exit Ckappa_sig.dummy_state_index
         | error, Some port ->
           let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
-          if state > 0
+          if (Ckappa_sig.int_of_state_index state) > 0
           then error, state
-          else warn parameter error (Some "line 234") Exit 0
+          else warn parameter error (Some "line 196") Exit Ckappa_sig.dummy_state_index
       in
       error, (agent_type1, state1) 
 
@@ -231,7 +231,7 @@ struct
                 let agent_index_target = site_add.Cckappa_sig.agent_index in
                 let site_type_target = site_add.Cckappa_sig.site in
                 let error, agent_source =
-                  match Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get
+                  match Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
                     parameter error agent_id views
                   with
                   | error, None -> warn parameter error (Some "line 271") Exit
@@ -239,7 +239,7 @@ struct
                   | error, Some agent -> error, agent
                 in
                 let error, agent_target =
-                  match Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get
+                  match Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
                     parameter error agent_index_target views
                   with
                   | error, None -> warn parameter error (Some "line 279") Exit
@@ -472,7 +472,7 @@ struct
                 let agent_index_target = site_add.Cckappa_sig.agent_index in
                 let site_type_target = site_add.Cckappa_sig.site in
                 let error, agent_source =
-                  match Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get
+                  match Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
                     parameter error agent_id views
                   with
                   | error, None -> warn parameter error (Some "line 473") Exit
@@ -480,7 +480,7 @@ struct
                   | error, Some agent -> error, agent
                 in
                 let error, agent_target =
-                  match Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.get
+                  match Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
                     parameter error agent_index_target views
                   with
                   | error, None -> warn parameter error (Some "line 480") Exit
