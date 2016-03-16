@@ -59,7 +59,8 @@ module D_Variables_list_skeleton =
    with type key = int
    and type value = unit List_sig.skeleton)
 
-module Hash_1 = Int_storage.Nearly_inf_Imperatif
+module Hash_1 = Int_storage.Nearly_inf_Imperatif (*site_type*)
+
 module Hash_2 = Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif
 
 type memo_unary = bool Mvbdu_sig.mvbdu Hash_1.t
@@ -93,7 +94,8 @@ type memo_tables =
     boolean_mvbdu_overwrite_association_list: int List_sig.list Hash_2.t;
 
     boolean_mvbdu_extensional_description_of_variables_list: int list Hash_1.t;
-    boolean_mvbdu_extensional_description_of_association_list: (int*int) list Hash_1.t;
+
+    boolean_mvbdu_extensional_description_of_association_list: (int * int) list Hash_1.t; (*FIXME*)
 
     boolean_mvbdu_variables_of_mvbdu: unit List_sig.list Hash_1.t;
 
@@ -155,8 +157,9 @@ let split_memo error handler =
   [ (* _ -> int list *)
     "extensional_of_variables_list:", x.boolean_mvbdu_extensional_description_of_variables_list;
   ],
-  [ (* _ -> (int * int) list *)
-    "Boolean_mvbdu_extensional_description_of_association_list:", x.boolean_mvbdu_extensional_description_of_association_list;
+  [ (* _ -> (int * int) list *) (*FIXME*)
+    "Boolean_mvbdu_extensional_description_of_association_list:",
+    x.boolean_mvbdu_extensional_description_of_association_list;
   ],
   [ (* _ -> (int * int) list list *)
     "Boolean_mvbdu+extensional_description_of_mvbdu:",x.boolean_mvbdu_extensional_description_of_mvbdu;
@@ -896,7 +899,7 @@ let extensional_description_of_variables_list parameters error handler list =
     (fun parameter error handler x ->
       let error, output =
         Hash_1.unsafe_get parameter error
-          x.List_sig.id 
+          x.List_sig.id
           handler.Memo_sig.data.boolean_mvbdu_extensional_description_of_variables_list 
       in
       error, (handler, output))

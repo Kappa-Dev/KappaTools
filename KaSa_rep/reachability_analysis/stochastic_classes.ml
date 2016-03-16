@@ -141,7 +141,7 @@ let get_nsites parameter error key handler =
       parameter
       error
       sites_dic
-  in nsites + 1
+  in (Ckappa_sig.int_of_site_name nsites) + 1
 
 (*------------------------------------------------------------------------------*)
 (*RULES*)
@@ -236,13 +236,19 @@ let sprintf_array parameter error handler agent_type array =
 	  try
             Handler.string_of_site parameter error handler agent_type site_type
 	  with
-            _ -> warn parameter error (Some "line 231") Exit (string_of_int site_type)
+            _ -> warn parameter error (Some "line 231") Exit 
+              (Ckappa_sig.string_of_site_name site_type)
 	in
 	let _ = 
 	  acc := !acc ^ (* avoid this, this is very slow, Use Printf.fprintf directly *)
-	    if i <> 0
-	    then Printf.sprintf "; %d:%s" site_type site_string
-	    else Printf.sprintf "%d:%s" site_type site_string
+	    if (Ckappa_sig.int_of_site_name i) <> 0
+	    then Printf.sprintf "; %d:%s" 
+              (Ckappa_sig.int_of_site_name site_type)
+              site_string
+	    else 
+              Printf.sprintf "%d:%s" 
+                (Ckappa_sig.int_of_site_name site_type)
+                site_string
 	in
 	error
       ) array in

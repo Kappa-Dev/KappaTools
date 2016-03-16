@@ -138,7 +138,7 @@ let print_site_map parameter error handler map =
                  "%sagent_type:%i,site_type:%i,state:%i,rule:%i->"
                  (Remanent_parameters.get_prefix parameter) 
                  (Ckappa_sig.int_of_agent_name agent_type)
-                 site_type
+                 (Ckappa_sig.int_of_site_name site_type)
                  state
                  rule
                in
@@ -161,7 +161,7 @@ let print_site_var_map parameter error handler map =
                  "%sagent_type:%i,site_type:%i,state:%i,var:%i->" 
                  (Remanent_parameters.get_prefix parameter)
                  (Ckappa_sig.int_of_agent_name agent_type)
-                 site_type
+                 (Ckappa_sig.int_of_site_name site_type)
                  state
                  rule 
                in

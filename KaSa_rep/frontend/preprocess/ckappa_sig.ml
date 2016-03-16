@@ -42,6 +42,8 @@ type c_rule_id    = int
 
 let dummy_agent_name = 0
 let dummy_site_name = 0
+let dummy_site_name_1 = 1
+let dummy_site_name_minus1 = -1 (*Use in views_domain*)
 
 let string_of_agent_name (a: c_agent_name) : string = string_of_int a
 let int_of_agent_name (a: c_agent_name) : int = a
@@ -202,34 +204,6 @@ module AgentsSite_map_and_set =
 
 (****************************************************************************************)
 
-(*module Covering_class =
-  struct
-    type t = c_site_name list
-    let compare = compare
-  end
-
-module Modified_class =
-  struct
-    type t = c_site_name list
-    let compare = compare
-  end
-
-module Dictionary_of_Covering_class =
-  (
-    Dictionary.Dictionary_of_Ord (Covering_class) : Dictionary.Dictionary
-   with type key = c_site_name
-   and type value = int list
-  )
-
-module Dictionary_of_Modified_class = 
-  (
-    Dictionary.Dictionary_of_Ord (Modified_class) : Dictionary.Dictionary
-   with type key = c_site_name
-   and type value = int list
-  )*)
-
-(****************************************************************************************)
-
 type binding_state = 
   | Free 
   | Lnk_type of agent_name * site_name 
@@ -344,6 +318,22 @@ module Dictionary_of_sites =
    and type value = site
   )
   
+(*covering classes*)
+(*
+module List_sites =
+  struct
+    type t = c_site_name list
+    let compare = compare
+  end
+
+module Dictionary_of_List_sites =
+  (
+    Dictionary.Dictionary_of_Ord (List_sites) : Dictionary.Dictionary
+   with type key = (*c_site_name*) int
+   and type value = c_site_name list
+  )*)
+
+
 type site_list = 
     {
       used     : (site_name list * position) list;

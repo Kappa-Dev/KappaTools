@@ -23,7 +23,7 @@ let local_trace = false
 
 type bdu_analysis_dynamic =
   {
-    store_update : (int list * Ckappa_sig.Site_map_and_set.Set.t) 
+    store_update : (int list * Ckappa_sig.Rule_map_and_set.Set.t) 
     Covering_classes_type.AgentCV_map_and_set.Map.t;
   }
 
@@ -36,11 +36,11 @@ let add_link parameter error (agent_type, cv_id) rule_id_set store_result =
       parameter error
       (agent_type, cv_id) store_result
     with
-    | error, None -> error, ([], Ckappa_sig.Site_map_and_set.Set.empty)
+    | error, None -> error, ([], Ckappa_sig.Rule_map_and_set.Set.empty)
     | error, Some (l, s) -> error, (l, s)
   in
   let error', new_set =
-    Ckappa_sig.Site_map_and_set.Set.union parameter error rule_id_set old_set
+    Ckappa_sig.Rule_map_and_set.Set.union parameter error rule_id_set old_set
   in
   let error =
     Exception.check warn parameter error error' (Some "line 46") Exit
@@ -81,7 +81,7 @@ let store_covering_classes_modification_update_aux parameter error agent_type_cv
       (agent_type_cv, site_type_cv)
       store_test_modification_map
     with
-    | error, None -> error, ([], Ckappa_sig.Site_map_and_set.Set.empty)
+    | error, None -> error, ([], Ckappa_sig.Rule_map_and_set.Set.empty)
     | error, Some (l, s) -> error, (l, s)
   in
   let error, result =
@@ -117,10 +117,13 @@ let store_covering_classes_modification_update parameter error
         ) store_result l2
       (*REMARK: when it is folding inside a list, start with empty result,
         because the add_link function has already called the old result.*)
-      ) store_covering_classes_id (error, Covering_classes_type.AgentCV_map_and_set.Map.empty)
+      ) store_covering_classes_id 
+      (error, 
+       Covering_classes_type.AgentCV_map_and_set.Map.empty)
   in
   let store_result =
-    Covering_classes_type.AgentCV_map_and_set.Map.map (fun (l, x) -> List.rev l, x) store_result
+    Covering_classes_type.AgentCV_map_and_set.Map.map 
+      (fun (l, x) -> List.rev l, x) store_result
   in
   error, store_result
  
@@ -166,7 +169,7 @@ let store_covering_classes_modification_side_effects parameter error
               (fun parameter error agent_type_cv remanent store_result ->
                 let cv_dic = remanent.Covering_classes_type.store_dic in
                 let error, store_result =
-                  Covering_classes_type.Dictionary_of_Covering_class.fold
+                  Covering_classes_type.Dictionary_of_List_sites.fold
                     (fun list_of_site_type ((), ()) cv_id (error, store_result) ->
                     (*get a set of rule_id in update(c)*)
                       let error, (l, rule_id_set) =
@@ -176,13 +179,16 @@ let store_covering_classes_modification_side_effects parameter error
                             (agent_type_partner, site_type_partner)
                             store_test_modification_map
                         with
-                        | error, None -> error, ([], Ckappa_sig.Site_map_and_set.Set.empty)
+                        | error, None -> error, ([], Ckappa_sig.Rule_map_and_set.Set.empty)
                         | error, Some (l, s) -> error, (l, s)
                       in
                       (*FIXME:add rule_id_effect into rule_id_set*)
-                      let error, new_rule_id_set = (*FIXME*)
-                        Ckappa_sig.Site_map_and_set.Set.add_when_not_in parameter
-                          error rule_id_effect rule_id_set
+                      let error, new_rule_id_set =
+                        Ckappa_sig.Rule_map_and_set.Set.add_when_not_in
+                          parameter
+                          error 
+                          rule_id_effect
+                          rule_id_set
                       in
                       let error, store_result =
                         add_link parameter error 
@@ -262,7 +268,7 @@ let store_update parameter error store_test_modification_map store_potential_sid
     (*both*)
     (fun parameter error (agent_type, cv_id) (_, s1) (_, s2) store_result ->
       let error, union_set =
-        Ckappa_sig.Site_map_and_set.Set.union parameter error s1 s2
+        Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2
       in
       let error, store_result =
         add_link parameter error (agent_type, cv_id) union_set store_result

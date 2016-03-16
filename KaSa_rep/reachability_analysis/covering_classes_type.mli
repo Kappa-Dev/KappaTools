@@ -12,52 +12,34 @@
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
+type cv_id = int (*TODO: this type declaration should be hidden *)
+
 type covering_classes =
   {
-    store_modified_map : int Ckappa_sig.Site_map_and_set.Map.t
+    store_modified_map : Ckappa_sig.c_site_name Ckappa_sig.Site_map_and_set.Map.t
     Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t;
-    store_covering_classes : int list list 
+    store_covering_classes : Ckappa_sig.c_site_name list list 
       Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t;
   }
 
-module Dictionary_of_Covering_class : 
-  Dictionary.Dictionary 
-  with type key = int
-  and type value = int list
+module Dictionary_of_List_sites : Dictionary.Dictionary 
+  with type key = cv_id
+  and type value = Ckappa_sig.c_site_name list
 
-module Dictionary_of_Modified_class : Dictionary.Dictionary 
-  with type key = int
-  and type value = int list
+type pair_dic   = (unit, unit) Dictionary_of_List_sites.dictionary
 
-(*module Dictionary_of_Covering_class : 
-  Dictionary.Dictionary 
-  with type key = Cckappa_sig.site_name
-  and type value = int list
-
-module Dictionary_of_Modified_class : Dictionary.Dictionary 
-  with type key = Cckappa_sig.site_name
-  and type value = int list*)
-
-type pair_dic   = (unit, unit) Dictionary_of_Covering_class.dictionary
-(*type index_dic  = (unit, unit) Dictionary_of_Covering_class.dictionary
-type test_dic   = (unit, unit) Dictionary_of_Covering_class.dictionary
-type modif_dic  = (unit, unit) Dictionary_of_Modified_class.dictionary*)
+module CV_map_and_set: Map_wrapper.S_with_logs
+  with type elt = cv_id
 
 type remanent =
     {
-      store_pointer_backward    : Ckappa_sig.Site_map_and_set.Set.t
-      Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.t; (*site_name*)
-      store_dic                 : pair_dic;
-      (*store_new_index_dic       : index_dic;
-      store_test_new_index_dic  : test_dic;
-      store_modif_new_index_dic : modif_dic;*)
+      store_pointer_backward: CV_map_and_set.Set.t Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.t;
+      store_dic             : pair_dic;
     }
 
 (****************************************************************************************)
 
-type cv_id = int (*TODO: this type declaration should be hidden *)
-
-module AgentCV_map_and_set: Map_wrapper.S_with_logs 
+module AgentCV_map_and_set: Map_wrapper.S_with_logs
   with type elt = Ckappa_sig.c_agent_name * cv_id
 
 module AgentIDCV_map_and_set: Map_wrapper.S_with_logs
@@ -66,6 +48,8 @@ module AgentIDCV_map_and_set: Map_wrapper.S_with_logs
 module AgentsRuleCV_map_and_set: Map_wrapper.S_with_logs 
   with type elt = Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
   Ckappa_sig.c_rule_id * cv_id
+
+(****************************************************************************************)
 
 module AgentCV_setmap: SetMap.S 
   with type elt = Ckappa_sig.c_agent_name * cv_id
@@ -88,7 +72,7 @@ module AgentSiteRuleCV_setmap: SetMap.S
   Ckappa_sig.c_rule_id * cv_id
 
 module Project2bdu_creation: SetMap.Projection2
-  with type elt_a = Ckappa_sig.c_agent_name * Ckappa_sig.c_rule_id * cv_id 
+  with type elt_a = Ckappa_sig.c_agent_name * Ckappa_sig.c_rule_id * cv_id
   (* find the appropriate type names *)
   and type elt_b = Ckappa_sig.c_rule_id
   and type elt_c = Ckappa_sig.c_agent_name * cv_id (* find the appropriate type names *)

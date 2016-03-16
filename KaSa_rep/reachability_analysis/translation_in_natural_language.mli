@@ -13,15 +13,20 @@
   * under the terms of the GNU Library General Public License *)
 
 type token
-type rename_sites =   (Remanent_parameters_sig.parameters -> Exception.method_handler -> 
-                       Ckappa_sig.c_site_name -> Exception.method_handler * Ckappa_sig.c_site_name) 
-       
+
+type rename_sites = 
+  (Remanent_parameters_sig.parameters ->
+   Exception.method_handler -> 
+   Ckappa_sig.Site_map_and_set.Map.elt ->
+   Exception.method_handler * Ckappa_sig.Site_map_and_set.Map.elt) 
+    
 val translate: Remanent_parameters_sig.parameters ->
-	       Mvbdu_wrapper.Mvbdu.handler ->
-	       Exception.method_handler ->
-	       rename_sites -> 
-	       Mvbdu_wrapper.Mvbdu.mvbdu -> Exception.method_handler * 
+  Mvbdu_wrapper.Mvbdu.handler ->
+  Exception.method_handler ->
+  rename_sites -> 
+  Mvbdu_wrapper.Mvbdu.mvbdu -> Exception.method_handler * 
   (Mvbdu_wrapper.Mvbdu.handler * token)
+
 val print: 
   ?beginning_of_sentence:bool ->
   ?prompt_agent_type:bool ->

@@ -196,7 +196,7 @@ let print_site_compact site =
   | Ckappa_sig.Internal a -> a ^ "~"
   | Ckappa_sig.Binding a -> a ^ "!"
 
-let string_of_site_aux parameter error handler_kappa agent_name site_int = 
+let string_of_site_aux parameter error handler_kappa agent_name (site_int: Ckappa_sig.c_site_name) = 
   let error, sites_dic =
     match
       Ckappa_sig.Agent_type_nearly_inf_Imperatif.get
@@ -228,15 +228,15 @@ let string_of_site parameter error handler_kappa agent_type site_int =
   in
   error, (print_site_compact site_type)
 
-let string_of_site_in_natural_language parameter error handler_kapp agent_type site_int =
+let string_of_site_in_natural_language parameter error handler_kapp agent_type (site_int: Ckappa_sig.c_site_name) =
   let error, site_type =
     string_of_site_aux parameter error handler_kapp agent_type site_int
   in
   match
     site_type
   with
-  | Ckappa_sig.Internal x -> error, ("the internal state of site "^x)
-  | Ckappa_sig.Binding x -> error, ("the binding state of site "^x)
+  | Ckappa_sig.Internal x -> error, ("the internal state of site "^ x)
+  | Ckappa_sig.Binding x -> error, ("the binding state of site "^ x)
 
 (*print function for contact map*)
 

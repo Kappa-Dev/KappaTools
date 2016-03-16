@@ -47,21 +47,20 @@ type agent_quark = Ckappa_sig.c_agent_name
 
 type site_quark = (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * int)
 
-module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif
+module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif (*TODO: remove later*)
 
 (*module Agent_type_quick_nearly_inf_Imperatif =
   Cckappa_sig.Agent_type_quick_nearly_inf_Imperatif*)
 
 (*module SiteMap = Int_storage.Extend (AgentMap)(Int_storage.Extend (AgentMap)(AgentMap))*)
 module SiteMap =
-  Int_storage.Extend
-    (Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif)
-    (Int_storage.Extend (AgentMap)(AgentMap))
+  Int_storage.Extend (Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif)
+    (Int_storage.Extend (Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif)(AgentMap))
 
 (*module DeadSiteMap= Int_storage.Extend (AgentMap)(AgentMap)*)
 
 module DeadSiteMap= Int_storage.Extend
-  (Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif)(AgentMap)
+  (Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif)(Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif)
 
 (*type agents_quarks = Labels.label_set Int_storage.Quick_Nearly_inf_Imperatif.t AgentMap.t*)
 

@@ -37,7 +37,12 @@ let print_agent parameters error handler agent =
 	let error =
 	  Ckappa_sig.Site_map_and_set.Map.fold
             (fun a b error ->
-             let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%ssite_type_%i->state:%s" (Remanent_parameters.get_prefix parameters) a (string_of_port b)  in
+             let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
+               "%ssite_type_%i->state:%s"
+               (Remanent_parameters.get_prefix parameters)
+               (Ckappa_sig.int_of_site_name a)
+               (string_of_port b) 
+             in
 	     let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
              error)
             agent.Cckappa_sig.agent_interface
@@ -54,7 +59,10 @@ let print_agent parameters error handler agent =
 	let error =
 	  Ckappa_sig.Site_map_and_set.Map.fold
 	    (fun s _ error ->
-	      let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%sdead site type %i" (Remanent_parameters.get_prefix parameters) s in
+	      let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) 
+                "%sdead site type %i" (Remanent_parameters.get_prefix parameters)
+                (Ckappa_sig.int_of_site_name s)
+              in
 	      let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
 	      error)
 	    l
@@ -63,7 +71,10 @@ let print_agent parameters error handler agent =
 	let error =
 	  Ckappa_sig.Site_map_and_set.Map.fold
 	    (fun s _ error ->
-	     let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%sdead site type %i" (Remanent_parameters.get_prefix parameters) s in
+	     let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) 
+               "%sdead site type %i" (Remanent_parameters.get_prefix parameters) 
+               (Ckappa_sig.int_of_site_name s)
+             in
 	     let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
 	     error)
 	    l'
@@ -72,14 +83,21 @@ let print_agent parameters error handler agent =
 	error
      | Cckappa_sig.Agent agent ->
        let parameters = Remanent_parameters.update_prefix parameters 
-         ("agent_type_"^(Ckappa_sig.string_of_agent_name agent.Cckappa_sig.agent_name)^":") in
+         ("agent_type_" ^ 
+             (Ckappa_sig.string_of_agent_name agent.Cckappa_sig.agent_name)^":") 
+       in
        Ckappa_sig.Site_map_and_set.Map.fold
          (fun a b error ->
-          let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%ssite_type_%i->state:%s" (Remanent_parameters.get_prefix parameters) a (string_of_port b)  in
+          let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters)
+            "%ssite_type_%i->state:%s" 
+            (Remanent_parameters.get_prefix parameters)
+            (Ckappa_sig.int_of_site_name a)
+            (string_of_port b)  
+          in
 	  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
           error)
          agent.Cckappa_sig.agent_interface
-            error
+         error
     | Cckappa_sig.Ghost ->
       let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%sGhost" (Remanent_parameters.get_prefix parameters) in
       let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
@@ -90,7 +108,11 @@ let print_diffagent parameters error handler agent =
     ("agent_type_"^(Ckappa_sig.string_of_agent_name agent.Cckappa_sig.agent_name)^":") in
   Ckappa_sig.Site_map_and_set.Map.fold
    (fun a b error ->
-     let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%ssite_type_%i->state:%s" (Remanent_parameters.get_prefix parameters) a (string_of_port b) in
+     let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
+       "%ssite_type_%i->state:%s" (Remanent_parameters.get_prefix parameters)
+       (Ckappa_sig.int_of_site_name a)
+       (string_of_port b) 
+     in
      let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
     error)
    agent.Cckappa_sig.agent_interface
@@ -101,13 +123,13 @@ let print_mixture parameters error handler mixture =
     let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
     let error =
       Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.print
-	(Remanent_parameters.update_prefix parameters "agent_id_")
-	error
-	(fun parameters error a ->
-         let _ = print_agent parameters error handler a in
-         error
-       )
-       mixture.Cckappa_sig.views
+        error
+        (fun error parameters a ->
+          let _ = print_agent parameters error handler a in
+          error
+        )
+        (Remanent_parameters.update_prefix parameters "agent_id_")
+        mixture.Cckappa_sig.views
     in
     let error =
       Int_storage.Quick_Nearly_inf_Imperatif.print
@@ -116,12 +138,17 @@ let print_mixture parameters error handler mixture =
         (fun parameters error a ->
          let error =
            Ckappa_sig.Site_map_and_set.Map.fold
-             (fun k a error ->
-              let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%ssite_type_%i->agent_id_%i.site_type_%i" (Remanent_parameters.get_prefix parameters) k a.Cckappa_sig.agent_index a.Cckappa_sig.site
-              in
-	      let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
-	      error
-             )
+              (fun k a error ->
+                let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                  "%ssite_type_%i->agent_id_%i.site_type_%i" 
+                  (Remanent_parameters.get_prefix parameters)
+                  (Ckappa_sig.int_of_site_name k)
+                  a.Cckappa_sig.agent_index 
+                  (Ckappa_sig.int_of_site_name a.Cckappa_sig.site)
+                in
+		let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
+		error
+                )
                a
                error
          in error)
@@ -307,11 +334,12 @@ let print_diffview parameters error handler diff =
      (Remanent_parameters.get_prefix parameters)
      add1.Cckappa_sig.agent_index
      (Ckappa_sig.int_of_agent_name add1.Cckappa_sig.agent_type)
-     add1.Cckappa_sig.site
+     (Ckappa_sig.int_of_site_name add1.Cckappa_sig.site)
      relation
      add2.Cckappa_sig.agent_index
      (Ckappa_sig.int_of_agent_name add2.Cckappa_sig.agent_type)
-     add2.Cckappa_sig.site in
+     (Ckappa_sig.int_of_site_name add2.Cckappa_sig.site)
+   in
    let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
    ()
 
@@ -323,7 +351,7 @@ let print_diffview parameters error handler diff =
        (Remanent_parameters.get_prefix parameters)
        add1.Cckappa_sig.agent_index
        (Ckappa_sig.int_of_agent_name add1.Cckappa_sig.agent_type)
-       add1.Cckappa_sig.site
+       (Ckappa_sig.int_of_site_name add1.Cckappa_sig.site)
    in
    let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
    ()
@@ -348,7 +376,8 @@ let print_diffview parameters error handler diff =
               (Remanent_parameters.get_prefix parameters_doc)
               index
               (Ckappa_sig.int_of_agent_name agent.Cckappa_sig.agent_name)
-              site in
+              (Ckappa_sig.int_of_site_name site)
+          in
 	  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
 	  ())
          agent.Cckappa_sig.agent_interface
@@ -364,7 +393,7 @@ let print_diffview parameters error handler diff =
              (Remanent_parameters.get_prefix parameters)
              index
              (Ckappa_sig.int_of_agent_name agent.Cckappa_sig.agent_name)
-             site
+             (Ckappa_sig.int_of_site_name site)
 	 in
 	 let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
 	 ()

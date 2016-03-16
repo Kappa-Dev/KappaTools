@@ -16,7 +16,7 @@ let invalid_arg parameters mh message exn value =
   Exception.warn parameters mh (Some "Mvbdu_algebra") message exn (fun () -> value)
 
 (*TEST*)
-let test_print_boolean_mvbdu (error:Exception.method_handler) =
+(*let test_print_boolean_mvbdu (error:Exception.method_handler) =
   Mvbdu_core.print_mvbdu error
     (fun error parameters a ->
       let _ =
@@ -28,7 +28,7 @@ let test_print_boolean_mvbdu (error:Exception.method_handler) =
 	Loggers.print_newline (Remanent_parameters.get_logger parameters)
       in
       error)
-    (fun i -> "x" ^ (string_of_int i))
+    (fun i -> "x" ^ (string_of_int i))*)
 
 let downgrade parameters mh message value mvbdu =
   match mvbdu with

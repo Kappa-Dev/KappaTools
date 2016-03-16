@@ -98,8 +98,6 @@ let add_agent parameters error rule_id agent_id agent_type =
     (Ckappa_sig.string_of_agent_name agent_type)^"\n")
   in 
   add_generic 
-    (*Quark_type.AgentMap.unsafe_get
-    Quark_type.AgentMap.set*)
     Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get
     Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.set
     parameters
@@ -115,8 +113,6 @@ let add_var parameters error var_id agent_id agent_type =
       (Ckappa_sig.string_of_agent_name agent_type)^"\n")
   in 
   add_generic 
-    (*Quark_type.AgentMap.unsafe_get 
-    Quark_type.AgentMap.set*)
     Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.unsafe_get
     Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.set
     parameters
@@ -132,7 +128,7 @@ let add_site parameters error rule_id agent_id agent_type site_type state =
       ",agent_type:" ^ 
       (Ckappa_sig.string_of_agent_name agent_type) ^ 
       ",site_type:" ^ 
-      (string_of_int site_type) ^ 
+      (Ckappa_sig.string_of_site_name site_type) ^ 
       ",state:" ^ 
       (string_of_int state) ^ "\n")
   in 
@@ -146,7 +142,7 @@ let add_site parameters error rule_id agent_id agent_type site_type state =
     (agent_type, (site_type, state))
 
 let add_site_var parameters error var_id agent_id agent_type site_type state =
-  let _ = Misc_sa.trace parameters (fun () -> "var_id:"^(string_of_int var_id)^",agent_type:"^(Ckappa_sig.string_of_agent_name agent_type)^",site_type:"^(string_of_int site_type)^",state:"^(string_of_int state)^"\n")
+  let _ = Misc_sa.trace parameters (fun () -> "var_id:"^(string_of_int var_id)^",agent_type:"^(Ckappa_sig.string_of_agent_name agent_type)^",site_type:"^(Ckappa_sig.string_of_site_name site_type)^",state:"^(string_of_int state)^"\n")
   in
   add_generic Quark_type.SiteMap.unsafe_get Quark_type.SiteMap.set parameters error var_id agent_id (agent_type,(site_type,state))
 	      
@@ -170,7 +166,7 @@ let add_dead_state s parameters error var_id agent_id agent_type site_type =
       ",agent_type:" ^ 
       (Ckappa_sig.string_of_agent_name agent_type) ^ 
       ",site_type:" ^ 
-      (string_of_int site_type) ^ "\n")
+      (Ckappa_sig.string_of_site_name site_type) ^ "\n")
   in
   add_generic 
     Quark_type.DeadSiteMap.unsafe_get 

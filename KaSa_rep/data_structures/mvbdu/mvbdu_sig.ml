@@ -13,7 +13,7 @@
     * under the terms of the GNU Library General Public License *)
 
  
-type variable = int
+type variable = int (*Ckappa_sig.c_site_name*)
 type upper_bound = int
 type hash_key = int 
 

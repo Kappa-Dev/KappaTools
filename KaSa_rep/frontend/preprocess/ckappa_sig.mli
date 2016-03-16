@@ -24,7 +24,7 @@ type internal_state = string
 (****************************************************************************************)
     
 type c_agent_name
-type c_site_name = int (*TODO*)
+type c_site_name
 type c_state = int
 type c_agent_id = int
 type c_rule_id = int
@@ -33,6 +33,8 @@ type c_rule_id = int
 
 val dummy_agent_name : c_agent_name
 val dummy_site_name : c_site_name
+val dummy_site_name_1 : c_site_name
+val dummy_site_name_minus1 : c_site_name
 
 val string_of_agent_name : c_agent_name -> string
 val int_of_agent_name : c_agent_name -> int
@@ -116,16 +118,6 @@ module AgentSite_map_and_set: Map_wrapper.S_with_logs
 
 module AgentsSite_map_and_set: Map_wrapper.S_with_logs 
   with type elt = c_agent_id * c_agent_name * c_site_name
-
-(*module Dictionary_of_Covering_class : 
-  Dictionary.Dictionary 
-  with type key = c_site_name
-  and type value = int list
-
-module Dictionary_of_Modified_class : Dictionary.Dictionary 
-  with type key = c_site_name
-  and type value = int list
-*)
 
 (****************************************************************************************)
 

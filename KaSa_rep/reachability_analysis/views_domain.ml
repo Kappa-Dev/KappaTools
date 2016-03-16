@@ -374,7 +374,8 @@ struct
                 Handler.string_of_site parameter error handler_kappa
 		  agent_type site_type
 	      with
-		_ -> warn parameter error (Some "line 210") Exit (string_of_int site_type)
+		_ -> warn parameter error (Some "line 210") Exit 
+                  (Ckappa_sig.string_of_site_name site_type)
 	    in
 	    let () =
 	      Loggers.fprintf log "%s%s" (if bool then "," else "") site_string
@@ -405,7 +406,7 @@ struct
           (agent_type, cv_id)
           store_covering_classes_modification_update_full
       with
-      | error, None -> error, ([], Ckappa_sig.Site_map_and_set.Set.empty)
+      | error, None -> error, ([], Ckappa_sig.Rule_map_and_set.Set.empty)
       | error, Some (l, s) -> error, (l, s)
     in
   (*-----------------------------------------------------------------------*)
@@ -444,7 +445,7 @@ struct
 	  in
         (*-----------------------------------------------------------------------*)
 	  let () =
-            Ckappa_sig.Site_map_and_set.Set.iter (fun rule_id ->
+            Ckappa_sig.Rule_map_and_set.Set.iter (fun rule_id ->
               let compiled = get_compil static in
 	      let error, rule_id_string =
 	        try
@@ -469,7 +470,7 @@ struct
   (*-----------------------------------------------------------------------*)
   (*convert into an event list*)
     error,
-    Ckappa_sig.Site_map_and_set.Set.fold
+    Ckappa_sig.Rule_map_and_set.Set.fold
       (fun rule_id event_list ->
         (Communication.Check_rule rule_id) :: event_list)
       s1 event_list
@@ -559,6 +560,20 @@ struct
     let error, handler, list =
       Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu parameter handler error bdu_diff
     in
+    (*TODO: Convert*)
+    let list =
+      List.fold_left (fun list l ->
+        let p = 
+          List.fold_left (fun list (site, state) ->
+            let site =
+              (Ckappa_sig.site_name_of_int site)
+            in
+            (site, state):: list
+          ) [] l
+        in
+        p :: list
+      ) [] list
+    in
     let dynamic = set_mvbdu_handler handler dynamic in
     (*-----------------------------------------------------------------------*)
     (*print function for extentional description*)
@@ -572,7 +587,9 @@ struct
                  match Ckappa_sig.Site_map_and_set.Map.find_option
                    parameter error site_type map2
                  with
-                 | error, None -> warn parameter error (Some "line 100") Exit (-1)
+                 | error, None -> warn parameter error (Some "line 100") Exit
+                   (*(-1)*)
+                   Ckappa_sig.dummy_site_name_minus1
                  | error, Some i -> error, i
                in
                (*-----------------------------------------------------------------------*)
@@ -581,15 +598,15 @@ struct
                    Handler.string_of_site parameter error handler_kappa
 		     agent_type site_type
 		 with
-		   _ -> warn parameter error (Some "line 136")
-                     Exit (string_of_int site_type)
+		   _ -> warn parameter error (Some "line 587")
+                     Exit (Ckappa_sig.string_of_site_name site_type)
 	       in
 	       let error, state_string =
                  try
 		   Handler.string_of_state_fully_deciphered parameter error handler_kappa
 		     agent_type site_type state
 		 with
-		   _ -> warn parameter error (Some "line 146") Exit (string_of_int state)
+		   _ -> warn parameter error (Some "line 595") Exit (string_of_int state)
                in
                (*-----------------------------------------------------------------------*)
                let () =
@@ -737,7 +754,8 @@ struct
 	      Ckappa_sig.Site_map_and_set.Map.find_option
 		parameter error site map_new_index_forward
 	    with
-	    | error, None -> warn parameter error (Some "398") Exit 0
+	    | error, None -> warn parameter error (Some "398") Exit 
+              Ckappa_sig.dummy_site_name
 	    | error, Some s -> error, s
 	  in
 	  Ckappa_sig.Site_map_and_set.Map.add
@@ -999,7 +1017,9 @@ struct
                          match Ckappa_sig.Site_map_and_set.Map.find_option
                            parameter error site_name map2
                          with
-                         | error, None -> warn parameter error (Some "") Exit (-1)
+                         | error, None -> warn parameter error (Some "line 1020") Exit
+                           (*(-1)*)
+                           Ckappa_sig.dummy_site_name_minus1
                          | error, Some i -> error, i
                        in
                        (* fetch the bdu for the agent type and the cv_id in
@@ -1015,7 +1035,7 @@ struct
                        let handler = Analyzer_headers.get_mvbdu_handler dynamic in
                        let error, handler, singleton =
                          Mvbdu_wrapper.Mvbdu.build_variables_list parameter handler error
-                           [new_site_name]
+                           [Ckappa_sig.int_of_site_name new_site_name]
                        in
                        let error, handler, bdu_proj =
                          Mvbdu_wrapper.Mvbdu.mvbdu_project_keep_only
@@ -1024,7 +1044,8 @@ struct
                        (* rename new_site_name into 1 *)
                        let error, handler, new_site_name_1 =
                          Mvbdu_wrapper.Mvbdu.build_association_list
-                           parameter handler error [new_site_name, 1]
+                           parameter handler error 
+                           [Ckappa_sig.int_of_site_name new_site_name, 1]
                        in
                        let error, handler, bdu_renamed = 
                          Mvbdu_wrapper.Mvbdu.mvbdu_rename parameter handler error
@@ -1465,7 +1486,7 @@ struct
                 then
                   (* A rule may be added several time *)
 		  let error, new_update =
-                    Ckappa_sig.Site_map_and_set.Set.add_when_not_in
+                    Ckappa_sig.Rule_map_and_set.Set.add_when_not_in
                       parameter error rule store
                   in
                   error, new_update
@@ -1490,7 +1511,7 @@ struct
             let error, new_rule_id_set =
               List.fold_left (fun (error, store) rule ->
                 let error, new_update =
-                  Ckappa_sig.Site_map_and_set.Set.add_when_not_in
+                  Ckappa_sig.Rule_map_and_set.Set.add_when_not_in
                     parameter error rule store
                 in
                 error, new_update
@@ -1528,7 +1549,7 @@ struct
           )
           (fun parameter error (agent_type, cv_id) (_, s1) (_, s2) store_result ->
             let error', union_set =
-              Ckappa_sig.Site_map_and_set.Set.union parameter error s1 s2
+              Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2
             in
             let error = Exception.check warn parameter error error' (Some "line 1515")
               Exit
@@ -1552,7 +1573,7 @@ struct
       let event_list =
         Covering_classes_type.AgentCV_map_and_set.Map.fold
           (fun (agent_type, cv_id) (_, rule_id_set) event_list ->
-            Ckappa_sig.Site_map_and_set.Set.fold
+            Ckappa_sig.Rule_map_and_set.Set.fold
               (fun rule_id event_list ->
                 (Communication.Check_rule rule_id) :: event_list
               ) rule_id_set event_list
@@ -1708,7 +1729,8 @@ struct
             match Ckappa_sig.Site_map_and_set.Map.find_option
               parameter error site_type map2
             with
-            | error, None -> warn parameter error (Some "line 165") Exit (-1)
+            | error, None -> warn parameter error (Some "line 165") Exit
+            (*(-1)*) Ckappa_sig.dummy_site_name_minus1
             | error, Some i -> error, i
           in
           error, site_type
@@ -1726,7 +1748,13 @@ struct
 		  parameter handler error
 		  lvar
 	      in
-	      let error,asso =
+              (*TODO*)
+              let list = 
+                List.fold_left (fun list site ->
+                  (Ckappa_sig.site_name_of_int site) :: list
+                ) [] list
+              in
+	      let error, asso =
 	        List.fold_left
 		  (fun (error, list) i ->
 		    let error, new_name =
@@ -1736,6 +1764,13 @@ struct
 		  (error, [])
 		  (List.rev list)
 	      in
+              (**)
+              let asso = 
+                List.fold_left (fun list (site, s) ->
+                  ((Ckappa_sig.int_of_site_name site), Ckappa_sig.int_of_site_name s)
+                  :: list
+                ) [] asso
+              in
 	      let error,handler,hconsed_asso =
 	        Mvbdu_wrapper.Mvbdu.build_association_list parameter handler error asso
 	      in
@@ -1931,14 +1966,20 @@ struct
 		      match Ckappa_sig.Site_map_and_set.Map.find_option
                         parameter error site_type map2
                       with
-		      | error, None -> warn parameter error (Some "line 165") Exit (-1)
+		      | error, None -> warn parameter error (Some "line 165") Exit
+                        (*(-1)*)
+                        Ckappa_sig.dummy_site_name_minus1 (*FIXME*)
 		      | error, Some i -> error, i
 		    in
 		    error, site_type
 		  in
 		  let error, (handler, translation) =
 		    Translation_in_natural_language.translate
-		      parameter handler error rename_site mvbdu
+		      parameter
+                      handler
+                      error 
+                      rename_site
+                      mvbdu
 		  in
 	          (*--------------------------------------------------------------------*)
 		  let error =

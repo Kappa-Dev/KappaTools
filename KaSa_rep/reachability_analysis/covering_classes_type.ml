@@ -12,21 +12,16 @@
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
-open Int_storage
-open Cckappa_sig
-open Dictionary
-
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Covering_classes_type") message exn (fun () -> default)
 
 let local_trace = false
 
-(*TODO*)
 type covering_classes =
   {
-    store_modified_map : int Ckappa_sig.Site_map_and_set.Map.t 
+    store_modified_map : Ckappa_sig.c_site_name Ckappa_sig.Site_map_and_set.Map.t 
     Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t;
-    store_covering_classes : int list list 
+    store_covering_classes : Ckappa_sig.c_site_name list list 
       Ckappa_sig.Agent_type_quick_nearly_inf_Imperatif.t;
   }
 
@@ -39,41 +34,34 @@ type covering_classes =
 
 type cv_id = int
 
-module Covering_class =
+
+module List_sites =
   struct
-    type t = int list
+    type t = Ckappa_sig.c_site_name list (*value type*)
     let compare = compare
   end
 
-module Modified_class =
-  struct
-    type t = int list
-    let compare = compare
-  end
-  
-(*Dictionary*)
+module CV_map_and_set =
+  Map_wrapper.Make (
+    SetMap.Make (
+      struct
+        type t = cv_id
+        let compare = compare
+      end))
 
-module Dictionary_of_Covering_class = Dictionary_of_Ord (Covering_class)
-module Dictionary_of_Modified_class = Dictionary_of_Ord (Modified_class)
+module Dictionary_of_List_sites = 
+  (
+    Dictionary.Dictionary_of_Ord (List_sites) : Dictionary.Dictionary
+   with type key = cv_id
+   and type value = Ckappa_sig.c_site_name list
+  )
 
-(*module Covering_class = Ckappa_sig.Covering_class
-module Modified_class = Ckappa_sig.Modified_class
-module Dictionary_of_Covering_class = Cckappa_sig.Dictionary_of_Covering_class
-module Dictionary_of_Modified_class = Cckappa_sig.Dictionary_of_Modified_class*)
-
-type pair_dic   = (unit, unit) Dictionary_of_Covering_class.dictionary
-(*type index_dic  = (unit, unit) Dictionary_of_Covering_class.dictionary
-type test_dic   = (unit, unit) Dictionary_of_Covering_class.dictionary
-type modif_dic  = (unit, unit) Dictionary_of_Modified_class.dictionary*)
+type pair_dic   = (unit, unit) Dictionary_of_List_sites.dictionary
 
 type remanent =
     {
-      store_pointer_backward    : Ckappa_sig.Site_map_and_set.Set.t 
-      Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.t;
+      store_pointer_backward    : CV_map_and_set.Set.t Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.t;
       store_dic                 : pair_dic;
-      (*store_new_index_dic       : index_dic;
-      store_test_new_index_dic  : test_dic;
-      store_modif_new_index_dic : modif_dic;*)
     }
 
 (************************************************************************************)
@@ -82,7 +70,6 @@ type remanent =
    here *)
 (* Please put any type/module definition related to covering class in a
    file reachability/covergin_class_sig.ml *)
-
 
 module AgentCV_map_and_set =
   Map_wrapper.Make (
@@ -104,9 +91,12 @@ module AgentsRuleCV_map_and_set =
   Map_wrapper.Make
     (SetMap.Make (
       struct
-        type t = Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_rule_id * cv_id
+        type t = Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * 
+          Ckappa_sig.c_rule_id * cv_id
         let compare = compare
       end))
+
+(************************************************************************************)
 
 module AgentCV_setmap =
   SetMap.Make (
@@ -149,6 +139,8 @@ module AgentSiteRuleCV_setmap =
       type t = Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_rule_id * cv_id
       let compare = compare
     end)
+
+(************************************************************************************)
 
 module Project2bdu_creation =
   SetMap.Proj2 (AgentRuleCV_setmap)(Ckappa_sig.Rule_setmap)(AgentCV_setmap)
