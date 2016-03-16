@@ -129,6 +129,8 @@ module PairAgentSiteState_map_and_set: Map_wrapper.S_with_logs
 
 module Rule_setmap: SetMap.S with type elt = c_rule_id
 
+module Views_bdu: Mvbdu_wrapper.Mvbdu with type key = c_site_name and type value = c_state
+
 (****************************************************************************************)
 
 module Site_map_and_set: Map_wrapper.S_with_logs 

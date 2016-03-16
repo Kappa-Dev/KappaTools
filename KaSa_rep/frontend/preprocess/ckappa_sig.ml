@@ -234,6 +234,8 @@ module AgentsSite_map_and_set =
          let compare = compare
         end))
 
+module Views_bdu =  (Mvbdu_wrapper.Mvbdu: Mvbdu_wrapper.Mvbdu with type key = c_site_name and type value = c_state)
+
 (****************************************************************************************)
 
 type binding_state = 
