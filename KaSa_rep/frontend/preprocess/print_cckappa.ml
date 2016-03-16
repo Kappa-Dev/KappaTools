@@ -123,12 +123,12 @@ let print_mixture parameters error handler mixture =
     let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
     let error =
       Ckappa_sig.Agent_id_quick_nearly_inf_Imperatif.print
+        (Remanent_parameters.update_prefix parameters "agent_id_")
         error
-        (fun error parameters a ->
+        (fun parameters error a ->
           let _ = print_agent parameters error handler a in
           error
         )
-        (Remanent_parameters.update_prefix parameters "agent_id_")
         mixture.Cckappa_sig.views
     in
     let error =
