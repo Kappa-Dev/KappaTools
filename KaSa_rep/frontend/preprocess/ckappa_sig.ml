@@ -29,7 +29,7 @@ let local_trace = true
 
 type position       = Location.t
 type agent_name     = string
-type site_name      = string 
+type site_name      = string  
 type internal_state = string 
 
 type c_agent_name = int
@@ -42,6 +42,8 @@ type c_rule_id    = int
 
 let dummy_agent_name = 0
 let dummy_site_name = 0
+let dummy_state_index = 0
+
 let dummy_site_name_1 = 1
 let dummy_site_name_minus1 = -1 (*Use in views_domain*)
 

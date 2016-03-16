@@ -15,6 +15,7 @@
 let compare_unit _ _ = 0
 let compare_unit_agent_name _ _ = Ckappa_sig.dummy_agent_name
 let compare_unit_site_name _ _ = Ckappa_sig.dummy_site_name
+let compare_unit_state_index _ _ = Ckappa_sig.dummy_state_index
 
 let const_unit _ = ()
 

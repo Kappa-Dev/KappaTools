@@ -248,7 +248,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~u,y~u)
+	A(y~u,x~u)
 	Wake-up rules
 
 	Applying rule 3:
@@ -291,7 +291,7 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~p,y~u)
+	A(y~u,x~p)
 	Wake-up rules
 
 	Applying rule 2:
@@ -328,7 +328,7 @@ Id=16
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~u,y~p)
+	A(y~p,x~u)
 	Wake-up rules
 
 	Applying rule 0:
@@ -516,7 +516,7 @@ Id=25
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-In agent A, the internal state of site y is u whenever the internal state of site x is p.
+In agent A, the internal state of site x is u whenever the internal state of site y is p.
 INTENSIONAL DESCRIPTION:
 Id=27
  Node(site_type:0<0)
@@ -551,7 +551,7 @@ Id=20
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site y in agent A ranges over u and p.
+The internal state of site y in agent A ranges over p and u.
 INTENSIONAL DESCRIPTION:
 Id=27
  Node(site_type:0<0)
@@ -567,7 +567,7 @@ Id=27
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent A ranges over u and p.
+The internal state of site x in agent A ranges over p and u.
 INTENSIONAL DESCRIPTION:
 Id=27
  Node(site_type:0<0)
@@ -583,5 +583,5 @@ Id=27
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent D ranges over u and p.
+The internal state of site x in agent D ranges over p and u.
 execution finished without any exception

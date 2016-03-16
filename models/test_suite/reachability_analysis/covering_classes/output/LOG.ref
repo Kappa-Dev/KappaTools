@@ -645,31 +645,31 @@ Quarks:agent_modif-:agent_type:0,rule:3->[0]
 Quarks:agent_modif-:agent_type:0,rule:8->[0]
 Quarks:agent_modif-:agent_type:2,rule:7->[0]
 Quarks:agent_modif-:agent_type:2,rule:12->[0]
+Quarks:site_test**:agent_type:0,site_type:0,state:0,rule:6->[1]
+Quarks:site_test**:agent_type:0,site_type:1,state:0,rule:11->[1]
 Quarks:site_test**:agent_type:0,site_type:2,state:1,rule:3->[0]
 Quarks:site_test**:agent_type:0,site_type:2,state:0,rule:4->[0]
 Quarks:site_test**:agent_type:0,site_type:2,state:0,rule:5->[0]
 Quarks:site_test**:agent_type:0,site_type:2,state:2,rule:6->[1]
-Quarks:site_test**:agent_type:0,site_type:0,state:0,rule:6->[1]
 Quarks:site_test**:agent_type:0,site_type:3,state:1,rule:8->[0]
 Quarks:site_test**:agent_type:0,site_type:3,state:0,rule:9->[0]
 Quarks:site_test**:agent_type:0,site_type:3,state:0,rule:10->[0]
 Quarks:site_test**:agent_type:0,site_type:3,state:2,rule:11->[1]
-Quarks:site_test**:agent_type:0,site_type:1,state:0,rule:11->[1]
 Quarks:site_test**:agent_type:1,site_type:0,state:0,rule:4->[1]
 Quarks:site_test**:agent_type:1,site_type:0,state:1,rule:5->[1]
-Quarks:site_test**:agent_type:1,site_type:2,state:0,rule:4->[1]
-Quarks:site_test**:agent_type:1,site_type:2,state:0,rule:5->[1]
 Quarks:site_test**:agent_type:1,site_type:1,state:0,rule:9->[1]
 Quarks:site_test**:agent_type:1,site_type:1,state:1,rule:10->[1]
+Quarks:site_test**:agent_type:1,site_type:2,state:0,rule:4->[1]
+Quarks:site_test**:agent_type:1,site_type:2,state:0,rule:5->[1]
 Quarks:site_test**:agent_type:1,site_type:3,state:0,rule:9->[1]
 Quarks:site_test**:agent_type:1,site_type:3,state:0,rule:10->[1]
 Quarks:site_test**:agent_type:2,site_type:0,state:0,rule:5->[2]
 Quarks:site_test**:agent_type:2,site_type:0,state:1,rule:6->[0]
+Quarks:site_test**:agent_type:2,site_type:1,state:0,rule:10->[2]
+Quarks:site_test**:agent_type:2,site_type:1,state:1,rule:11->[0]
 Quarks:site_test**:agent_type:2,site_type:2,state:0,rule:5->[2]
 Quarks:site_test**:agent_type:2,site_type:2,state:1,rule:6->[0]
 Quarks:site_test**:agent_type:2,site_type:2,state:1,rule:7->[0]
-Quarks:site_test**:agent_type:2,site_type:1,state:0,rule:10->[2]
-Quarks:site_test**:agent_type:2,site_type:1,state:1,rule:11->[0]
 Quarks:site_test**:agent_type:2,site_type:3,state:0,rule:10->[2]
 Quarks:site_test**:agent_type:2,site_type:3,state:1,rule:11->[0]
 Quarks:site_test**:agent_type:2,site_type:3,state:1,rule:12->[0]
@@ -707,30 +707,30 @@ Quarks:site_modif+:agent_type:2,site_type:2,state:0,rule:2->[0]
 Quarks:site_modif+:agent_type:2,site_type:2,state:1,rule:5->[2]
 Quarks:site_modif+:agent_type:2,site_type:3,state:0,rule:2->[0]
 Quarks:site_modif+:agent_type:2,site_type:3,state:1,rule:10->[2]
-Quarks:site_modif-:agent_type:1,site_type:3,state:1,rule:3->[0*]
-Quarks:site_modif-:agent_type:1,site_type:3,state:1,rule:8->[0*]
-Quarks:site_modif-:agent_type:1,site_type:3,state:0,rule:9->[1]
+Quarks:site_modif-:agent_type:1,site_type:0,state:0,rule:4->[1]
+Quarks:site_modif-:agent_type:1,site_type:1,state:0,rule:9->[1]
 Quarks:site_modif-:agent_type:1,site_type:2,state:1,rule:3->[0*]
 Quarks:site_modif-:agent_type:1,site_type:2,state:1,rule:8->[0*]
 Quarks:site_modif-:agent_type:1,site_type:2,state:0,rule:4->[1]
-Quarks:site_modif-:agent_type:1,site_type:0,state:0,rule:4->[1]
-Quarks:site_modif-:agent_type:1,site_type:1,state:0,rule:9->[1]
+Quarks:site_modif-:agent_type:1,site_type:3,state:1,rule:3->[0*]
+Quarks:site_modif-:agent_type:1,site_type:3,state:1,rule:8->[0*]
+Quarks:site_modif-:agent_type:1,site_type:3,state:0,rule:9->[1]
+Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:6->[1]
+Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:11->[1]
 Quarks:site_modif-:agent_type:0,site_type:2,state:1,rule:3->[0]
 Quarks:site_modif-:agent_type:0,site_type:2,state:0,rule:4->[0]
 Quarks:site_modif-:agent_type:0,site_type:2,state:0,rule:5->[0]
 Quarks:site_modif-:agent_type:0,site_type:2,state:2,rule:7->[0*]
 Quarks:site_modif-:agent_type:0,site_type:2,state:2,rule:12->[0*]
-Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:6->[1]
 Quarks:site_modif-:agent_type:0,site_type:3,state:2,rule:7->[0*]
 Quarks:site_modif-:agent_type:0,site_type:3,state:2,rule:12->[0*]
 Quarks:site_modif-:agent_type:0,site_type:3,state:1,rule:8->[0]
 Quarks:site_modif-:agent_type:0,site_type:3,state:0,rule:9->[0]
 Quarks:site_modif-:agent_type:0,site_type:3,state:0,rule:10->[0]
-Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:11->[1]
 Quarks:site_modif-:agent_type:2,site_type:0,state:0,rule:5->[2]
+Quarks:site_modif-:agent_type:2,site_type:1,state:0,rule:10->[2]
 Quarks:site_modif-:agent_type:2,site_type:2,state:0,rule:5->[2]
 Quarks:site_modif-:agent_type:2,site_type:2,state:1,rule:7->[0]
-Quarks:site_modif-:agent_type:2,site_type:1,state:0,rule:10->[2]
 Quarks:site_modif-:agent_type:2,site_type:3,state:0,rule:10->[2]
 Quarks:site_modif-:agent_type:2,site_type:3,state:1,rule:12->[0]
 Refining the influence map...
@@ -871,7 +871,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(y~u,y!free)
+	A(y!free,y~u)
 	Wake-up rules
 	Dealing with creation
 
@@ -901,7 +901,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~u,x!free)
+	A(x!free,x~u)
 	Wake-up rules
 
 	Applying rule 1: r1:
@@ -937,7 +937,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(y~u,y!free)
+	B(y!free,y~u)
 	Wake-up rules
 	Dealing with creation
 
@@ -967,7 +967,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(x~u,x!free)
+	B(x!free,x~u)
 	Wake-up rules
 
 	Applying rule 2: r2:
@@ -1003,7 +1003,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	C(y~u,y!free)
+	C(y!free,y~u)
 	Wake-up rules
 	Dealing with creation
 
@@ -1033,7 +1033,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	C(x~u,x!free)
+	C(x!free,x~u)
 	Wake-up rules
 
 	Applying rule 0: r0:
@@ -1076,7 +1076,7 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~u,x!B@x)
+	A(x!B@x,x~u)
 	Wake-up rules
 		Updating the views for B(x~,x!)
 			
@@ -1107,7 +1107,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(x~p,x!A@x)
+	B(x!A@x,x~p)
 	Wake-up rules
 
 	Applying rule 5: r5:
@@ -1156,7 +1156,7 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(y~u,y!B@y)
+	A(y!B@y,y~u)
 	Wake-up rules
 		Updating the views for B(y~,y!)
 			
@@ -1187,7 +1187,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(y~p,y!A@y)
+	B(y!A@y,y~p)
 	Wake-up rules
 
 	Applying rule 10: r10:
@@ -1242,7 +1242,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(y~p,y!free)
+	B(y!free,y~p)
 	Wake-up rules
 	Dealing with side effects
 
@@ -1272,7 +1272,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(x~p,x!free)
+	B(x!free,x~p)
 	Wake-up rules
 
 	Applying rule 4: r4:
@@ -1314,7 +1314,7 @@ Id=19
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~u,x!C@x)
+	A(x!C@x,x~u)
 	Wake-up rules
 		Updating the views for B(x~,x!)
 		Updating the views for C(x~,x!)
@@ -1346,7 +1346,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	C(x~p,x!A@x)
+	C(x!A@x,x~p)
 	Wake-up rules
 
 	Applying rule 6: r6:
@@ -1412,7 +1412,7 @@ Id=19
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(y~u,y!C@y)
+	A(y!C@y,y~u)
 	Wake-up rules
 		Updating the views for B(y~,y!)
 		Updating the views for C(y~,y!)
@@ -1444,7 +1444,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	C(y~p,y!A@y)
+	C(y!A@y,y~p)
 	Wake-up rules
 
 	Applying rule 0: r0:
@@ -1906,7 +1906,7 @@ Id=52
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-In agent C, the internal state of site y is p, if and only if, the binding state of site y is A@y.
+In agent C, the binding state of site y is A@y, if and only if, the internal state of site y is p.
 INTENSIONAL DESCRIPTION:
 Id=55
  Node(site_type:0<0)
@@ -1947,7 +1947,7 @@ Id=55
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-In agent C, the internal state of site x is p, if and only if, the binding state of site x is A@x.
+In agent C, the binding state of site x is A@x, if and only if, the internal state of site x is p.
 
 ------------------------------------------------------------
 * Non relational properties:
@@ -1967,7 +1967,7 @@ Id=30
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site x in agent A ranges over free, B@x, and C@x.
+The binding state of site x in agent A ranges over C@x, B@x, and free.
 INTENSIONAL DESCRIPTION:
 Id=3
  Node(site_type:1<0)
@@ -1999,7 +1999,7 @@ Id=34
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site y in agent A ranges over free, B@y, and C@y.
+The binding state of site y in agent A ranges over C@y, B@y, and free.
 INTENSIONAL DESCRIPTION:
 Id=36
  Node(site_type:0<0)
@@ -2031,7 +2031,7 @@ Id=22
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site x in agent B ranges over free and A@x.
+The binding state of site x in agent B ranges over A@x and free.
 INTENSIONAL DESCRIPTION:
 Id=37
  Node(site_type:1<0)
@@ -2047,7 +2047,7 @@ Id=37
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site y in agent B ranges over u and p.
+The internal state of site y in agent B ranges over p and u.
 INTENSIONAL DESCRIPTION:
 Id=42
  Node(site_type:3<0)
@@ -2063,7 +2063,7 @@ Id=42
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site y in agent B ranges over free and A@y.
+The binding state of site y in agent B ranges over A@y and free.
 INTENSIONAL DESCRIPTION:
 Id=57
  Node(site_type:0<0)
@@ -2079,7 +2079,7 @@ Id=57
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent B ranges over u and p.
+The internal state of site x in agent B ranges over p and u.
 INTENSIONAL DESCRIPTION:
 Id=22
  Node(site_type:2<0)
@@ -2095,7 +2095,7 @@ Id=22
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site x in agent C ranges over free and A@x.
+The binding state of site x in agent C ranges over A@x and free.
 INTENSIONAL DESCRIPTION:
 Id=37
  Node(site_type:1<0)
@@ -2111,7 +2111,7 @@ Id=37
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site y in agent C ranges over u and p.
+The internal state of site y in agent C ranges over p and u.
 INTENSIONAL DESCRIPTION:
 Id=42
  Node(site_type:3<0)
@@ -2127,7 +2127,7 @@ Id=42
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The binding state of site y in agent C ranges over free and A@y.
+The binding state of site y in agent C ranges over A@y and free.
 INTENSIONAL DESCRIPTION:
 Id=57
  Node(site_type:0<0)
@@ -2143,5 +2143,5 @@ Id=57
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent C ranges over u and p.
+The internal state of site x in agent C ranges over p and u.
 execution finished without any exception

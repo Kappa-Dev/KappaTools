@@ -24,7 +24,7 @@ Reachability analysis...
 	Views in initial state
 
 
-	B(x!A@x,x~u)
+	B(x~u,x!A@x)
 	Wake-up rules
 		Updating the views for B(x!,x~)
 		(rule 0) should be investigated 
@@ -50,7 +50,7 @@ Reachability analysis...
 	Dealing with side effects
 
 
-	B(x!free,x~u)
+	B(x~u,x!free)
 	Wake-up rules
 		Updating the views for B(x!,x~)
 		(rule 0) should be investigated 
@@ -68,7 +68,7 @@ Reachability analysis...
 			
 
 
-	B(x!A@x,x~p)
+	B(x~p,x!A@x)
 	Wake-up rules
 		Updating the views for B(x!,x~)
 		(rule 0) should be investigated 
@@ -85,7 +85,7 @@ Reachability analysis...
 	Dealing with side effects
 
 
-	B(x!free,x~p)
+	B(x~p,x!free)
 	Wake-up rules
 		Updating the views for B(x!,x~)
 		(rule 0) should be investigated 
@@ -129,6 +129,6 @@ Reachability analysis...
 ------------------------------------------------------------
 The binding state of site x in agent A is always B@x.
 The internal state of site x in agent A is always u.
-The internal state of site x in agent B ranges over u and p.
-The binding state of site x in agent B ranges over free and A@x.
+The internal state of site x in agent B ranges over p and u.
+The binding state of site x in agent B ranges over A@x and free.
 execution finished without any exception

@@ -476,7 +476,7 @@ Id=13
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~u,x!free)
+	A(x!free,x~u)
 	Wake-up rules
 	Views in initial state
 
@@ -542,7 +542,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~p,x!free)
+	A(x!free,x~p)
 	Wake-up rules
 
 	Applying rule 4:
@@ -796,7 +796,7 @@ Id=24
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent A ranges over u and p.
+The internal state of site x in agent A ranges over p and u.
 INTENSIONAL DESCRIPTION:
 Id=26
  Node(site_type:0<0)
@@ -812,5 +812,5 @@ Id=26
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent B ranges over u and p.
+The internal state of site x in agent B ranges over p and u.
 execution finished without any exception

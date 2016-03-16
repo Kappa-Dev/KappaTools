@@ -25,7 +25,7 @@ type internal_state = string
     
 type c_agent_name
 type c_site_name
-type c_state = int
+type c_state = int (*TODO*)
 type c_agent_id = int
 type c_rule_id = int
 
@@ -33,6 +33,8 @@ type c_rule_id = int
 
 val dummy_agent_name : c_agent_name
 val dummy_site_name : c_site_name
+val dummy_state_index : c_state
+
 val dummy_site_name_1 : c_site_name
 val dummy_site_name_minus1 : c_site_name
 

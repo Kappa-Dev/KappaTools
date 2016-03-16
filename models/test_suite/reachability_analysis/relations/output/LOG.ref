@@ -321,7 +321,7 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~u,y~u,z~u)
+	A(z~u,y~u,x~u)
 	Wake-up rules
 
 	Applying rule 0:
@@ -371,7 +371,7 @@ Id=31
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~p,y~u,z~u)
+	A(z~u,y~u,x~p)
 	Wake-up rules
 
 	Applying rule 2:
@@ -418,7 +418,7 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~p,y~p,z~u)
+	A(z~u,y~p,x~p)
 	Wake-up rules
 
 	Applying rule 3:
@@ -465,7 +465,7 @@ Id=44
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~0,y~p,z~q)
+	A(z~q,y~p,x~0)
 	Wake-up rules
 
 	Applying rule 4:
@@ -512,7 +512,7 @@ Id=49
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~q,y~u,z~u)
+	A(z~u,y~u,x~q)
 	Wake-up rules
 
 	Applying rule 5:
@@ -559,7 +559,7 @@ Id=55
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~q,y~q,z~u)
+	A(z~u,y~q,x~q)
 	Wake-up rules
 
 	Applying rule 6:
@@ -606,7 +606,7 @@ Id=66
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~q,y~q,z~q)
+	A(z~q,y~q,x~q)
 	Wake-up rules
 
 	Applying rule 0:
@@ -910,14 +910,14 @@ Id=129
            Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-In agent A, the internal state of site x, the internal state of site y, and the internal state of site z, are entangled by the following 3-d relationship:
-	A(x~q,y~u,z~u)
-	A(x~q,y~q,z~q)
-	A(x~q,y~q,z~u)
-	A(x~0,y~p,z~q)
-	A(x~p,y~u,z~u)
-	A(x~p,y~p,z~u)
-	A(x~u,y~u,z~u)
+In agent A, the internal state of site z, the internal state of site y, and the internal state of site x, are entangled by the following 3-d relationship:
+	A(z~u,y~u,x~u)
+	A(z~u,y~p,x~p)
+	A(z~u,y~u,x~p)
+	A(z~q,y~p,x~0)
+	A(z~u,y~q,x~q)
+	A(z~q,y~q,x~q)
+	A(z~u,y~u,x~q)
 
 ------------------------------------------------------------
 * Non relational properties:
@@ -937,7 +937,7 @@ Id=97
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site z in agent A ranges over u and q.
+The internal state of site z in agent A ranges over q and u.
 INTENSIONAL DESCRIPTION:
 Id=163
  Node(site_type:1<0)
@@ -953,7 +953,7 @@ Id=163
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site y in agent A ranges over u, p, and q.
+The internal state of site y in agent A ranges over q, p, and u.
 INTENSIONAL DESCRIPTION:
 Id=131
  Node(site_type:0<0)
@@ -969,5 +969,5 @@ Id=131
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-The internal state of site x in agent A ranges over u, p, 0, and q.
+The internal state of site x in agent A ranges over q, 0, p, and u.
 execution finished without any exception

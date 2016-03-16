@@ -29,7 +29,7 @@ In agent A:
 ------------------------------------------------------------
 * Non relational properties:
 ------------------------------------------------------------
-The internal state of site z in agent A ranges over u and p.
-The internal state of site y in agent A ranges over u and p.
-The internal state of site x in agent A ranges over u and p.
+The internal state of site z in agent A ranges over p and u.
+The internal state of site y in agent A ranges over p and u.
+The internal state of site x in agent A ranges over p and u.
 execution finished without any exception

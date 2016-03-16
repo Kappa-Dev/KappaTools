@@ -70,7 +70,7 @@ let create_binding_state_dictionary parameters error =
     Cckappa_sig.Dictionary_of_States.allocate
       parameters
       error 
-      Misc_sa.compare_unit
+      Misc_sa.compare_unit_state_index
       (Ckappa_sig.Binding Cckappa_sig.Free)
       () 
       Misc_sa.const_unit
@@ -220,7 +220,7 @@ let declare_site create parameters make_site make_state (error, handler)
                 Cckappa_sig.Dictionary_of_States.allocate_bool 
                   parameters
                   error
-                  Misc_sa.compare_unit 
+                  Misc_sa.compare_unit_state_index 
                   state
                   () 
                   Misc_sa.const_unit 

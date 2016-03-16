@@ -217,7 +217,7 @@ let translate_agent_sig parameters error handler agent kasim_id =
                   Cckappa_sig.Dictionary_of_States.allocate_bool 
                     parameters 
                     error
-                    Misc_sa.compare_unit
+                    Misc_sa.compare_unit_state_index
                     (Ckappa_sig.Internal state)
                     () 
                     Misc_sa.const_unit 
@@ -226,7 +226,7 @@ let translate_agent_sig parameters error handler agent kasim_id =
                 let error, internal  =
                   match bool, output with
                   | _ , None 
-                  | true, _  -> warn parameters error (Some "line 137") Exit 0
+                  | true, _  -> warn parameters error (Some "line 137") Exit Ckappa_sig.dummy_state_index
                   | _ , Some (i, _, _, _) ->  
                     error, i
                 in
@@ -274,7 +274,7 @@ let translate_agent_sig parameters error handler agent kasim_id =
                   { 
                     Cckappa_sig.site_name = site_name ;
                     Cckappa_sig.site_position = Location.dummy ;
-                    Cckappa_sig.site_state = [0] ;
+                    Cckappa_sig.site_state = [Ckappa_sig.dummy_state_index] ;
                     Cckappa_sig.site_free = port.Ckappa_sig.port_free
                   }
                   c_interface
