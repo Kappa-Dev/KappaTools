@@ -11,6 +11,7 @@ type cc = {
   nodes_by_type: int list array;
   links: link array IntMap.t; (*pattern graph id -> [|... link_j...|] i.e agent_id on site_j has a link*)
   internals: int array IntMap.t; (*internal state id -> [|... state_j...|] i.e agent_id on site_j has internal state state_j*)
+  recogn_nav: Navigation.step list;
 }
 
 type t = cc
@@ -111,21 +112,21 @@ let identity_injection cc =
 
 (** pick a root in the CC. Any root works.
 In this case pick the last node of smallest type *)
-let find_root cc =
+let raw_find_root nodes_by_type =
   let rec aux ty =
-    if ty = Array.length cc.nodes_by_type
+    if ty = Array.length nodes_by_type
     then None
-    else match cc.nodes_by_type.(ty) with
+    else match nodes_by_type.(ty) with
 	 | [] -> aux (succ ty)
 	 | h::t ->
 	    let x = List.fold_left (fun _ x -> x) h t in
 	    Some(ty,x)
   in aux 0
-
+let find_root cc = raw_find_root cc.nodes_by_type
 let find_root_type cc = Tools.option_map fst (find_root cc)
 
 (*turns a cc into a path(:list) in the domain*)
-let to_navigation (full:bool) cc =
+let raw_to_navigation (full:bool) nodes_by_type internals links =
   let rec build_for (_,out as acc) don = function
     | [] -> List.rev out
     | h ::  t ->
@@ -135,11 +136,11 @@ let to_navigation (full:bool) cc =
 	      if (full || first) && v >= 0 then
 		(false,
 		 (((if first
-		    then Navigation.Fresh (h,find_ty cc h)
+		    then Navigation.Fresh (h,raw_find_ty nodes_by_type h)
 		    else Navigation.Existing h),i),
 		  Navigation.ToInternal v)::out)
 	      else acc)
-	     acc (IntMap.find_default [||] h cc.internals)
+	     acc (IntMap.find_default [||] h internals)
        in
        let first_lnk,out'',todo =
 	 Tools.array_fold_lefti
@@ -150,7 +151,7 @@ let to_navigation (full:bool) cc =
 	       if full || first
 	       then (false,
 		     (((if first
-			then Navigation.Fresh (h,find_ty cc h)
+			then Navigation.Fresh (h,raw_find_ty nodes_by_type h)
 			else Navigation.Existing h),i),
 		      Navigation.ToNothing)::ans,re)
 	       else acc
@@ -161,24 +162,27 @@ let to_navigation (full:bool) cc =
 		 if full
 		 then (false,
 		       (((if first
-			  then Navigation.Fresh (h,find_ty cc h)
+			  then Navigation.Fresh (h,raw_find_ty nodes_by_type h)
 			  else Navigation.Existing h),i),
 			Navigation.ToNode (Navigation.Existing n,l))::ans ,re)
 		 else acc
 	       else
 		 (false,
 		  (((if first
-		     then Navigation.Fresh (h,find_ty cc h)
+		     then Navigation.Fresh (h,raw_find_ty nodes_by_type h)
 		     else Navigation.Existing h),i),
-		   Navigation.ToNode(Navigation.Fresh(n,find_ty cc n),l))::ans,
+		   Navigation.ToNode(Navigation.Fresh(n,raw_find_ty nodes_by_type n),l))::ans,
 		  n::re))
-	   (first_ints,out_ints,t) (IntMap.find_default [||] h cc.links) in
+	   (first_ints,out_ints,t) (IntMap.find_default [||] h links) in
        build_for (first_lnk,out'') (h::don) todo
   in
-  match find_root cc with
+  match raw_find_root nodes_by_type with
   | None -> [] (*empty path for x0*)
   | Some (_,x) -> (*(ag_sort,ag_id)*)
      build_for (true,[]) (*wip*) [] (*already_done*) [x] (*todo*)
+
+let to_navigation cc =
+  raw_to_navigation true cc.nodes_by_type cc.internals cc.links
 
 let print ?sigs ?with_id f cc =
   let print_intf (_,_,ag_i as ag) link_ids internals neigh =
@@ -350,7 +354,7 @@ let fresh sigs id_by_type nb_id domain single_agent_points =
 
 let empty_point sigs =
   let nbt = Array.make (Signature.size sigs) [] in
-  let empty_cc = {id = 0; nodes_by_type = nbt;
+  let empty_cc = {id = 0; nodes_by_type = nbt; recogn_nav = [];
 		  links = IntMap.empty; internals = IntMap.empty;} in
   {content = empty_cc; is_obs_of = None; fathers = []; sons = [];}
 
@@ -487,7 +491,7 @@ let navigate env nav =
   in aux [Renaming.empty] 0 nav
 
 let find env cc =
-  let nav = to_navigation true cc in
+  let nav = to_navigation cc in
   (* let () = Format.eprintf *)
   (* 	     "@[[%a]@]@,%a@." (Pp.list Pp.space (print_edge (sigs env) cc)) nav *)
   (* 	     print env in *)
@@ -617,32 +621,32 @@ let remove_ag_cc inj2cc cc_id cc ag_id =
      let to_subst = Renaming.compose true inj2cc cycle in
      let new_nbt =
        Array.mapi (fun i l -> if i = ty then tail else l) cc.nodes_by_type in
-     if Renaming.is_identity to_subst then
-       { id = cc_id;
-	 nodes_by_type = new_nbt;
-	 links = IntMap.remove ag_id cc.links;
-	 internals = IntMap.remove ag_id cc.internals;},to_subst
-     else
-       let swip map =
-	 let map' =
-	   List.fold_right
-	     (fun (s,d) map ->
-	      if s = max || s = d then map else
-		let tmp = IntMap.find_default [||] max map in
-		let map' = IntMap.add max (IntMap.find_default [||] s map) map in
-		IntMap.add s tmp map') (Renaming.to_list cycle) map in
-	 IntMap.remove max map' in
-       let new_ints = swip cc.internals in
-       let prelinks = swip cc.links in
-       let new_links =
+     let new_ints,prelinks =
+       if Renaming.is_identity to_subst then
+	 IntMap.remove ag_id cc.internals, IntMap.remove ag_id cc.links
+       else
+	 let swip map =
+	   let map' =
+	     List.fold_right
+	       (fun (s,d) map ->
+		if s = max || s = d then map else
+		  let tmp = IntMap.find_default [||] max map in
+		  let map' = IntMap.add max (IntMap.find_default [||] s map) map in
+		  IntMap.add s tmp map') (Renaming.to_list cycle) map in
+	   IntMap.remove max map' in
+	 swip cc.internals,swip cc.links in
+     let new_links =
 	 IntMap.map
 	   (fun a -> Array.map (function
 				 | (UnSpec | Free) as x -> x
+				 | Link (n,_) when n = ag_id -> UnSpec
 				 | Link (n,s) as x ->
 				    try Link (Renaming.apply cycle n,s)
 				    with Renaming.Undefined -> x) a) prelinks in
-       { id = cc_id; nodes_by_type = new_nbt;
-	 links = new_links; internals = new_ints;},to_subst
+     { id = cc_id; nodes_by_type = new_nbt;
+       links = new_links; internals = new_ints;
+       recogn_nav = raw_to_navigation false new_nbt new_ints new_links},
+     to_subst
 
 let update_cc inj2cc cc_id cc ag_id links internals =
   if
@@ -651,10 +655,14 @@ let update_cc inj2cc cc_id cc ag_id links internals =
     && Array.fold_left (fun x i -> x && i < 0) true internals
   then true,remove_ag_cc inj2cc cc_id cc ag_id
   else
+    let new_ints = IntMap.add ag_id internals cc.internals in
+    let new_links = IntMap.add ag_id links cc.links in
     false,({ id = cc_id;
       nodes_by_type = cc.nodes_by_type;
-      internals = IntMap.add ag_id internals cc.internals;
-      links = IntMap.add ag_id links cc.links;}, inj2cc)
+      internals = new_ints;
+      links = new_links;
+      recogn_nav = raw_to_navigation false cc.nodes_by_type new_ints new_links},
+	   inj2cc)
 
 let compute_cycle_edges cc =
   let rec aux don acc path ag_id =
@@ -837,7 +845,7 @@ and add_new_point ~origin obs_id env free_id sons cc =
   ((free_id'',completed),cc.id)
 
 let add_domain ?origin env cc =
-  let nav = to_navigation true cc in
+  let nav = to_navigation cc in
   if nav = [] then
     match find_root cc with
     | None -> assert false
@@ -888,7 +896,9 @@ let finish_new ?origin wk =
       (Array.length wk.used_id) in
   let cc_candidate =
     { id = wk.cc_id; nodes_by_type = wk.used_id;
-      links = wk.cc_links; internals = wk.cc_internals; } in
+      links = wk.cc_links; internals = wk.cc_internals;
+      recogn_nav =
+	raw_to_navigation false wk.used_id wk.cc_internals wk.cc_links} in
   let env =
     Env.fresh wk.sigs wk.reserved_id wk.free_id wk.cc_env wk.cc_single_ag in
   add_domain ?origin env cc_candidate
@@ -994,7 +1004,7 @@ module Matching = struct
     (* -rm - full_rename: Renaming.t option *)
     let _,full_rename =
       (*- rm - to_navigation: bool -> cc -> list *)
-      match to_navigation false cc with
+      match cc.recogn_nav with
       | _::_ as nav ->
 	 List.fold_left
            (fun (root,inj_op) nav ->
