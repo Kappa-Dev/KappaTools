@@ -49,7 +49,7 @@ module type Composite_domain =
       -> 'b
       -> Exception.method_handler * dynamic_information * 'c
 
-    val next_rule: Analyzer_headers.rule_id option zeroary
+    val next_rule: Ckappa_sig.c_rule_id(*Analyzer_headers.rule_id*) option zeroary
 
     val add_initial_state: (Analyzer_headers.initial_state, unit) unary
 

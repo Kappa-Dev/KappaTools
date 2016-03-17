@@ -650,7 +650,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x!free,x~u)
+	A(x~u,x!free)
 	Wake-up rules
 
 	Applying rule 1: r1:
@@ -686,7 +686,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(x!free,x~u)
+	B(x~u,x!free)
 	Wake-up rules
 
 	Applying rule 2: r2:
@@ -722,7 +722,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	C(x!free,x~u)
+	C(x~u,x!free)
 	Wake-up rules
 
 	Applying rule 3: r3:
@@ -758,7 +758,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	D(x!free,x~u)
+	D(x~u,x!free)
 	Wake-up rules
 
 	Applying rule 4: r4:
@@ -794,7 +794,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	E(x!free,x~u)
+	E(x~u,x!free)
 	Wake-up rules
 
 	Applying rule 0: r0:
@@ -837,7 +837,7 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x!B@x,x~u)
+	A(x~u,x!B@x)
 	Wake-up rules
 		Updating the views for B(x~,x!)
 			
@@ -868,7 +868,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(x!A@x,x~p)
+	B(x~p,x!A@x)
 	Wake-up rules
 
 	Applying rule 7: r7:
@@ -926,7 +926,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	D(x!E@x,x~p)
+	D(x~p,x!E@x)
 	Wake-up rules
 		Updating the views for E(x~,x!)
 			
@@ -957,7 +957,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	E(x!D@x,x~p)
+	E(x~p,x!D@x)
 	Wake-up rules
 
 	Applying rule 11: r11:
@@ -994,7 +994,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	D(x!free,x~p)
+	D(x~p,x!free)
 	Wake-up rules
 	Dealing with side effects
 
@@ -1024,7 +1024,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	E(x!free,x~p)
+	E(x~p,x!free)
 	Wake-up rules
 
 	Applying rule 4: r4:
@@ -1067,7 +1067,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(x!free,x~p)
+	B(x~p,x!free)
 	Wake-up rules
 
 	Applying rule 6: r6:
@@ -1117,7 +1117,7 @@ Id=19
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x!C@x,x~u)
+	A(x~u,x!C@x)
 	Wake-up rules
 		Updating the views for B(x~,x!)
 		Updating the views for C(x~,x!)
@@ -1149,7 +1149,7 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	C(x!A@x,x~p)
+	C(x~p,x!A@x)
 	Wake-up rules
 
 	Applying rule 8: r8:
@@ -1504,7 +1504,7 @@ Id=44
        Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-In agent C, the binding state of site x is A@x, if and only if, the internal state of site x is p.
+In agent C, the internal state of site x is p, if and only if, the binding state of site x is A@x.
 INTENSIONAL DESCRIPTION:
 Id=41
  Node(site_type:0<0)

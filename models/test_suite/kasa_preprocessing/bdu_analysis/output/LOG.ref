@@ -466,7 +466,7 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(y!free,x!free)
+	A(x!free,y!free)
 	Wake-up rules
 	Dealing with creation
 
@@ -542,7 +542,7 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(y!free,x!B@x)
+	A(x!B@x,y!free)
 	Wake-up rules
 	Dealing with creation
 
@@ -598,7 +598,7 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(y!C@x,x!free)
+	A(x!free,y!C@x)
 	Wake-up rules
 	Dealing with creation
 
@@ -712,7 +712,7 @@ Id=27
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(y!C@x,x!B@x)
+	A(x!B@x,y!C@x)
 	Wake-up rules
 		Updating the views for B(x!)
 

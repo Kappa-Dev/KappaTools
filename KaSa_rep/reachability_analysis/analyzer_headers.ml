@@ -32,12 +32,13 @@ type global_dynamic_information =
     mvbdu_handler: Mvbdu_wrapper.Mvbdu.handler
   }
 
-type rule_id = int
+(*type rule_id = Ckappa_sig.c_rule_id*)
 
 type event =
 | Dummy
-| Check_rule of rule_id
-| See_a_new_bond of ((int * int * int) * (int * int * int))
+| Check_rule of Ckappa_sig.c_rule_id
+| See_a_new_bond of ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) 
+                     * (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)) (*change*)
 
 type 'a bot_or_not =
 | Bot
@@ -53,15 +54,15 @@ type maybe_bool =
 
 type step =
   {
-    site_out: int;
-    site_in: int;
-    agent_type_in: int
+    site_out: Ckappa_sig.c_site_name;
+    site_in: Ckappa_sig.c_site_name;
+    agent_type_in: Ckappa_sig.c_agent_name
   }
 type path =
   {
-    agent_id: int;
+    agent_id: Ckappa_sig.c_agent_id;
     relative_address: step list;
-    site: int;
+    site: Ckappa_sig.c_site_name;
   }
 
 module type PathMap =

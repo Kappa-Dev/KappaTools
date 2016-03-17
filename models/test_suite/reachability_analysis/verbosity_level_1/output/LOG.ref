@@ -19,14 +19,14 @@ rule 7: KO will never be applied.
 ------------------------------------------------------------
 * Relational properties:
 ------------------------------------------------------------
-In agent A, the internal state of site z, the internal state of site y, and the internal state of site x, are entangled by the following 3-d relationship:
-	A(z~u,y~u,x~q)
-	A(z~q,y~q,x~q)
-	A(z~u,y~q,x~q)
-	A(z~q,y~p,x~0)
-	A(z~u,y~u,x~p)
-	A(z~u,y~p,x~p)
-	A(z~u,y~u,x~u)
+In agent A, the internal state of site x, the internal state of site y, and the internal state of site z, are entangled by the following 3-d relationship:
+	A(x~q,y~u,z~u)
+	A(x~q,y~q,z~q)
+	A(x~q,y~q,z~u)
+	A(x~0,y~p,z~q)
+	A(x~p,y~u,z~u)
+	A(x~p,y~p,z~u)
+	A(x~u,y~u,z~u)
 
 ------------------------------------------------------------
 * Non relational properties:

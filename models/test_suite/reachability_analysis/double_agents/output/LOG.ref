@@ -617,8 +617,8 @@ Id=26
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(x!free,y~u,x~u)
-	B(x!free,y~p,x~p)
+	B(x~u,y~u,x!free)
+	B(x~p,y~p,x!free)
 	Wake-up rules
 
 	Applying rule 5: r5:
@@ -745,8 +745,8 @@ Id=36
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(x!A@x,y~u,x~u)
-	B(x!A@x,y~p,x~p)
+	B(x~u,y~u,x!A@x)
+	B(x~p,y~p,x!A@x)
 	Wake-up rules
 
 	Applying rule 4: r4:
@@ -806,7 +806,7 @@ Id=51
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(x!free,y~q,x~q)
+	B(x~q,y~q,x!free)
 	Wake-up rules
 
 	Applying rule 6: r6:
@@ -924,9 +924,9 @@ Id=67
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(x!C@x,y~u,x~u)
-	B(x!C@x,y~q,x~q)
-	B(x!C@x,y~p,x~p)
+	B(x~u,y~u,x!C@x)
+	B(x~q,y~q,x!C@x)
+	B(x~p,y~p,x!C@x)
 	Wake-up rules
 
 	Applying rule 5: r5:
@@ -977,7 +977,7 @@ Id=92
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(x!A@x,y~q,x~q)
+	B(x~q,y~q,x!A@x)
 	Wake-up rules
 
 	Applying rule 1: r1:
@@ -1279,10 +1279,10 @@ Id=113
          Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-In agent B, the internal state of site y, and the internal state of site x, are entangled by the following 2-d relationship:
-	B(y~u,x~u)
-	B(y~q,x~q)
-	B(y~p,x~p)
+In agent B, the internal state of site x, and the internal state of site y, are entangled by the following 2-d relationship:
+	B(x~u,y~u)
+	B(x~q,y~q)
+	B(x~p,y~p)
 INTENSIONAL DESCRIPTION:
 Id=95
  Node(site_type:0<0)

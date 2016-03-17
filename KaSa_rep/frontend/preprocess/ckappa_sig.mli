@@ -52,6 +52,8 @@ val state_index_of_int: int -> c_state
 val int_of_state_index: c_state -> int
 val string_of_state_index : c_state -> string
 
+(*use in views_domain.ml *)
+val state_index_of_site_name : c_site_name -> c_state
 
 (****************************************************************************************)
 
@@ -92,6 +94,13 @@ module Site_union_find: Union_find.Union_find
   with type t = c_site_name Site_type_nearly_Inf_Int_storage_Imperatif.t   
   and type dimension = int
   and type key = c_site_name
+
+(****************************************************************************************)
+(*define mvbdu where key = c_site_name and value = c_state*)
+
+module Mvbdu_ckappa_sig : Mvbdu_wrapper.Mvbdu
+  with type key = c_site_name
+  and type value = c_state
 
 (****************************************************************************************)
 

@@ -541,7 +541,7 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(c!free,x!free)
+	A(x!free,c!free)
 	Wake-up rules
 	Views in initial state
 
@@ -611,7 +611,7 @@ Id=43
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	C(x2!free,x1!free,x2~u,x1~u)
+	C(x1~u,x2~u,x1!free,x2!free)
 	Wake-up rules
 
 	Applying rule 0: a.b:
@@ -648,7 +648,7 @@ Id=9
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(c!free,x!B@x)
+	A(x!B@x,c!free)
 	Wake-up rules
 		Updating the views for B(x!)
 			
@@ -709,7 +709,7 @@ Id=47
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(c!C@x1,x!B@x)
+	A(x!B@x,c!C@x1)
 	Wake-up rules
 		Updating the views for C(x1~,x2~,x1!,x2!)
 			
@@ -760,7 +760,7 @@ Id=57
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	C(x2!free,x1!A@c,x2~u,x1~u)
+	C(x1~u,x2~u,x1!A@c,x2!free)
 	Wake-up rules
 
 	Applying rule 3: mod x1:

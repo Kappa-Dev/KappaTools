@@ -61,6 +61,14 @@ let state_index_of_int (a:int) : c_state = a
 let int_of_state_index (a:c_state) : int = a
 let string_of_state_index (a:c_state) : string = string_of_int a
 
+(*in views_domain at build_association_list, it takes a pair (key * value) list, but the asso list 
+  was take a pair (site_name * new_site_name) list.
+
+  A function convert a new_site_name => value (c_state)
+*)
+
+let state_index_of_site_name (a: c_site_name): c_state = a
+
 
 (****************************************************************************************)
 
@@ -124,6 +132,16 @@ module State_index_quick_nearly_Inf_Int_storage_Imperatif =
 
 module Site_union_find = 
   Union_find.Make(Site_type_nearly_Inf_Int_storage_Imperatif)
+
+(****************************************************************************************)
+(*define mvbdu where key = c_site_name and value = c_state*)
+
+module Mvbdu_ckappa_sig =
+  (
+    Mvbdu_wrapper.Mvbdu : Mvbdu_wrapper.Mvbdu
+   with type key = c_site_name
+   and type value = c_state
+  )
 
 (****************************************************************************************)
 

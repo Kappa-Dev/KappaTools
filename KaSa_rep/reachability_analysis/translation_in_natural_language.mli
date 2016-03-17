@@ -21,11 +21,16 @@ type rename_sites =
    Exception.method_handler * Ckappa_sig.Site_map_and_set.Map.elt) 
     
 val translate: Remanent_parameters_sig.parameters ->
-  Mvbdu_wrapper.Mvbdu.handler ->
+  (*Mvbdu_wrapper.Mvbdu.handler ->*)
+  Ckappa_sig.Mvbdu_ckappa_sig.handler ->
   Exception.method_handler ->
   rename_sites -> 
-  Mvbdu_wrapper.Mvbdu.mvbdu -> Exception.method_handler * 
-  (Mvbdu_wrapper.Mvbdu.handler * token)
+  (*Mvbdu_wrapper.Mvbdu.mvbdu ->*)
+  Ckappa_sig.Mvbdu_ckappa_sig.mvbdu ->
+  Exception.method_handler * 
+    (
+      (*Mvbdu_wrapper.Mvbdu.handler*)
+      Ckappa_sig.Mvbdu_ckappa_sig.handler * token)
 
 val print: 
   ?beginning_of_sentence:bool ->

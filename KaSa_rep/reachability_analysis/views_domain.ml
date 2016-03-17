@@ -44,7 +44,8 @@ struct
   type local_dynamic_information =
     {
       dead_rule       : bool array;
-      fixpoint_result : Mvbdu_wrapper.Mvbdu.mvbdu AgentCV_map_and_set.Map.t;
+      fixpoint_result : (*Mvbdu_wrapper.Mvbdu.mvbdu*) Ckappa_sig.Mvbdu_ckappa_sig.mvbdu
+        AgentCV_map_and_set.Map.t;
       domain_dynamic_information : Bdu_dynamic_views.bdu_analysis_dynamic;
     }
 
@@ -196,7 +197,9 @@ struct
     let parameter = get_parameter global_static in
     let handler_bdu = get_mvbdu_handler dynamic in
     let error, handler_bdu, bdu_false =
-      Mvbdu_wrapper.Mvbdu.mvbdu_false parameter handler_bdu error
+      (*Mvbdu_wrapper.Mvbdu.mvbdu_false*)
+      Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_false
+        parameter handler_bdu error
     in
     error,
     set_mvbdu_handler handler_bdu dynamic,
@@ -207,7 +210,9 @@ struct
     let parameter = get_parameter global_static in
     let handler_bdu = get_mvbdu_handler dynamic in
     let error, handler_bdu, bdu_true =
-      Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler_bdu error
+      (*Mvbdu_wrapper.Mvbdu.mvbdu_true*)
+      Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_true
+        parameter handler_bdu error
     in
     error,
     set_mvbdu_handler handler_bdu dynamic,
@@ -490,7 +495,9 @@ struct
       let prefix = Remanent_parameters.get_prefix parameter in
       let handler = get_mvbdu_handler dynamic in
       let error, handler, bdu_diff =
-        Mvbdu_wrapper.Mvbdu.mvbdu_xor parameter handler error bdu_old bdu_union
+        (*Mvbdu_wrapper.Mvbdu.mvbdu_xor*)
+        Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_xor
+          parameter handler error bdu_old bdu_union
       in
       let dynamic = set_mvbdu_handler handler dynamic in
       (*-----------------------------------------------------------------------*)
@@ -540,7 +547,9 @@ struct
 	in
         (*print bdu different: this will print in a format of bdu*)
 	let () =
-          Mvbdu_wrapper.Mvbdu.print parameter bdu_diff
+          (*Mvbdu_wrapper.Mvbdu.print*)
+          Ckappa_sig.Mvbdu_ckappa_sig.print
+            parameter bdu_diff
         in
         (*print a list of relations: this will print in a format readable*)
 	let () =
@@ -558,10 +567,12 @@ struct
       return a pair: (bdu, and a pair of (site, state) list of list)*)
     let handler = get_mvbdu_handler dynamic in
     let error, handler, list =
-      Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu parameter handler error bdu_diff
+      (*Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu*)
+      Ckappa_sig.Mvbdu_ckappa_sig.extensional_of_mvbdu
+        parameter handler error bdu_diff
     in
     (*Convert*)
-    let error, list =
+    (*let error, list =
       List.fold_left (fun (error, list) l ->
         let error, p = 
           List.fold_left (fun (error, list) (site, state) ->
@@ -571,7 +582,7 @@ struct
         in
         error, p :: list
       ) (error, []) (List.rev list)
-    in
+    in*)
     let dynamic = set_mvbdu_handler handler dynamic in
     (*-----------------------------------------------------------------------*)
     (*print function for extentional description*)
@@ -654,13 +665,17 @@ struct
     in
     let handler = get_mvbdu_handler dynamic in
     let error, handler, bdu_union =
-      Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_old bdu
+      (*Mvbdu_wrapper.Mvbdu.mvbdu_or*)
+      Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_or
+        parameter handler error bdu_old bdu
     in
     let dynamic = set_mvbdu_handler handler dynamic in
     let updates_list = [] in
     (*-----------------------------------------------------------*)
     let error, dynamic, title, is_new_views, updates_list =
-      if Mvbdu_wrapper.Mvbdu.equal bdu_old bdu_union
+      if(* Mvbdu_wrapper.Mvbdu.equal*)
+        Ckappa_sig.Mvbdu_ckappa_sig.equal
+        bdu_old bdu_union
       then
         error, dynamic, title, false, updates_list
       else
@@ -753,7 +768,7 @@ struct
 	      Ckappa_sig.Site_map_and_set.Map.find_option
 		parameter error site map_new_index_forward
 	    with
-	    | error, None -> warn parameter error (Some "398") Exit 
+	    | error, None -> warn parameter error (Some "770") Exit 
               Ckappa_sig.dummy_site_name
 	    | error, Some s -> error, s
 	  in
@@ -942,10 +957,14 @@ struct
             (*bdu intersection*)
             let handler = get_mvbdu_handler dynamic in
             let error, handler, bdu_inter =
-              Mvbdu_wrapper.Mvbdu.mvbdu_and parameter handler error bdu_test bdu_X
+              (*Mvbdu_wrapper.Mvbdu.mvbdu_and*)
+              Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_and
+                parameter handler error bdu_test bdu_X
             in
             let dynamic = set_mvbdu_handler handler dynamic in
-            if Mvbdu_wrapper.Mvbdu.equal bdu_inter bdu_false
+            if (*Mvbdu_wrapper.Mvbdu.equal*)
+              Ckappa_sig.Mvbdu_ckappa_sig.equal
+              bdu_inter bdu_false
             then raise (False (error, dynamic))
             else
               let error, map =
@@ -1033,26 +1052,34 @@ struct
                        (* compute the projection over new_site_name *)
                        let handler = Analyzer_headers.get_mvbdu_handler dynamic in
                        let error, handler, singleton =
-                         Mvbdu_wrapper.Mvbdu.build_variables_list parameter handler error
-                           [Ckappa_sig.int_of_site_name new_site_name]
+                         (*Mvbdu_wrapper.Mvbdu.build_variables_list*)
+                         Ckappa_sig.Mvbdu_ckappa_sig.build_variables_list
+                           parameter handler error
+                           [new_site_name]
                        in
                        let error, handler, bdu_proj =
-                         Mvbdu_wrapper.Mvbdu.mvbdu_project_keep_only
+                         (*Mvbdu_wrapper.Mvbdu.mvbdu_project_keep_only*)
+                         Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_project_keep_only
                            parameter handler error bdu_X singleton
                        in
                        (* rename new_site_name into 1 *)
                        let error, handler, new_site_name_1 =
-                         Mvbdu_wrapper.Mvbdu.build_association_list
+                         (*Mvbdu_wrapper.Mvbdu.build_association_list*)
+                         Ckappa_sig.Mvbdu_ckappa_sig.build_association_list
                            parameter handler error 
-                           [Ckappa_sig.int_of_site_name new_site_name, 1]
+                           [new_site_name, Ckappa_sig.dummy_state_index_1] (*state = 1*)
                        in
                        let error, handler, bdu_renamed = 
-                         Mvbdu_wrapper.Mvbdu.mvbdu_rename parameter handler error
+                         (*Mvbdu_wrapper.Mvbdu.mvbdu_rename*)
+                         Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_rename
+                           parameter handler error
                            bdu_proj new_site_name_1
                        in
                        (* conjunction between bdu and bdu'*)
                        let error, handler, bdu = 
-                         Mvbdu_wrapper.Mvbdu.mvbdu_and parameter handler error
+                         (*Mvbdu_wrapper.Mvbdu.mvbdu_and*)
+                         Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_and
+                           parameter handler error
                            bdu bdu_renamed
                        in
                        let dynamic = Analyzer_headers.set_mvbdu_handler handler dynamic in
@@ -1062,7 +1089,9 @@ struct
                 in
                 let handler = Analyzer_headers.get_mvbdu_handler dynamic in
                 let error, handler, list =
-                  Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu parameter handler error
+                  (*Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu*)
+                  Ckappa_sig.Mvbdu_ckappa_sig.extensional_of_mvbdu
+                    parameter handler error
                     bdu
                 in
                 let dynamic = Analyzer_headers.set_mvbdu_handler handler dynamic in
@@ -1072,7 +1101,7 @@ struct
                       match list with
                       | [_, state] -> error, state :: output
                       | _ ->
-                    warn parameter error (Some "line 1134") Exit output)
+                    warn parameter error (Some "line 1104") Exit output)
                     (error, [])
                     list
 		in
@@ -1117,15 +1146,21 @@ struct
     let parameter_views = Remanent_parameters.update_prefix parameter "\t\t\t" in
     let handler = get_mvbdu_handler dynamic in
     let error, handler, bdu_inter =
-      Mvbdu_wrapper.Mvbdu.mvbdu_and parameter_views handler error bdu_X bdu_test
+      (*Mvbdu_wrapper.Mvbdu.mvbdu_and*)
+      Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_and
+        parameter_views handler error bdu_X bdu_test
     in
     (*redefine with modification list*)
     let error, handler, bdu_redefine =
-      Mvbdu_wrapper.Mvbdu.mvbdu_redefine parameter_views handler error bdu_inter list_a
+      (*Mvbdu_wrapper.Mvbdu.mvbdu_redefine*)
+      Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_redefine
+        parameter_views handler error bdu_inter list_a
     in
     (*do the union of bdu_redefine and bdu_X*)
     let error, handler, bdu_result =
-      Mvbdu_wrapper.Mvbdu.mvbdu_or parameter_views handler error bdu_redefine bdu_X
+      (*Mvbdu_wrapper.Mvbdu.mvbdu_or*)
+      Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_or
+        parameter_views handler error bdu_redefine bdu_X
     in
     let dynamic = set_mvbdu_handler handler dynamic in
     error, dynamic, bdu_result
@@ -1150,7 +1185,9 @@ struct
     let parameter = get_parameter static in
     let handler = get_mvbdu_handler dynamic in
     let error, handler, bdu_result =
-      Mvbdu_wrapper.Mvbdu.mvbdu_or parameter handler error bdu_creation bdu_X
+      (*Mvbdu_wrapper.Mvbdu.mvbdu_or*)
+      Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_or
+        parameter handler error bdu_creation bdu_X
     in
     let dynamic = set_mvbdu_handler handler dynamic in
     error, dynamic, bdu_result
@@ -1685,7 +1722,9 @@ struct
         Loggers.print_newline (Remanent_parameters.get_logger parameter)
       in
       let () =
-        Mvbdu_wrapper.Mvbdu.print parameter bdu_update
+        (*Mvbdu_wrapper.Mvbdu.print*)
+        Ckappa_sig.Mvbdu_ckappa_sig.print
+          parameter bdu_update
       in
       error)
       result error
@@ -1696,7 +1735,9 @@ struct
       ~show_dep_with_dimmension_higher_than:dim_min
       parameter handler error handler_kappa site_correspondence result =
     let error,handler,mvbdu_true =
-      Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error
+      (*Mvbdu_wrapper.Mvbdu.mvbdu_true*)
+      Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_true
+        parameter handler error
     in
     Covering_classes_type.AgentCV_map_and_set.Map.fold
       (fun (agent_type, cv_id) bdu (error,handler,output) ->
@@ -1738,46 +1779,55 @@ struct
 	  (fun (error, handler, output) bdu ->
 	    begin
 	      let error, handler, lvar =
-	        Mvbdu_wrapper.Mvbdu.variables_list_of_mvbdu
+	        (*Mvbdu_wrapper.Mvbdu.variables_list_of_mvbdu*)
+                Ckappa_sig.Mvbdu_ckappa_sig.variables_list_of_mvbdu
 		  parameter handler error
 		  bdu
 	      in
+              (*list: ckappa_sig.c_site_name list*)
 	      let error, handler, list =
-	        Mvbdu_wrapper.Mvbdu.extensional_of_variables_list
+	        (*Mvbdu_wrapper.Mvbdu.extensional_of_variables_list*)
+                Ckappa_sig.Mvbdu_ckappa_sig.extensional_of_variables_list
 		  parameter handler error
 		  lvar
 	      in
               (*TODO*)
-              let list = 
+              (*let list = 
                 List.fold_left (fun list site ->
                   (Ckappa_sig.site_name_of_int site) :: list
                 ) [] list
-              in
-	      let error, asso =
+              in*)
+              (*asso take (key *value) list *)
+	      let error, asso = (*CHECK ME*)
 	        List.fold_left
 		  (fun (error, list) i ->
 		    let error, new_name =
 		      rename_site parameter error i
 		    in
-		    error,(i, new_name) :: list)
+		    error,(i, (Ckappa_sig.state_index_of_site_name new_name)) :: list)
 		  (error, [])
 		  (List.rev list)
 	      in
               (**)
-              let asso = 
+              (*let asso = 
                 List.fold_left (fun list (site, s) ->
                   ((Ckappa_sig.int_of_site_name site), Ckappa_sig.int_of_site_name s)
                   :: list
                 ) [] asso
-              in
+              in*)
 	      let error,handler,hconsed_asso =
-	        Mvbdu_wrapper.Mvbdu.build_association_list parameter handler error asso
+	        (*Mvbdu_wrapper.Mvbdu.build_association_list*)
+                Ckappa_sig.Mvbdu_ckappa_sig.build_association_list
+                  parameter handler error asso
 	      in
 	      let error,handler,renamed_mvbdu =
-	        Mvbdu_wrapper.Mvbdu.mvbdu_rename parameter handler error bdu hconsed_asso
+	        (*Mvbdu_wrapper.Mvbdu.mvbdu_rename*)
+                Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_rename
+                  parameter handler error bdu hconsed_asso
 	      in
 	      let error,handler,hconsed_vars =
-	        Mvbdu_wrapper.Mvbdu.variables_list_of_mvbdu
+	        (*Mvbdu_wrapper.Mvbdu.variables_list_of_mvbdu*)
+                Ckappa_sig.Mvbdu_ckappa_sig.variables_list_of_mvbdu
                   parameter handler error renamed_mvbdu
 	      in
               let error, cv_map_opt =
@@ -1793,11 +1843,13 @@ struct
 	        | Some map -> error, map
 	      in
 	      let error, handler, cv_map' =
-	        Mvbdu_wrapper.Mvbdu.store_by_variables_list
+	        (*Mvbdu_wrapper.Mvbdu.store_by_variables_list*)
+                Ckappa_sig.Mvbdu_ckappa_sig.store_by_variables_list
        		  Wrapped_modules.LoggedIntMap.find_default_without_logs
 		  Wrapped_modules.LoggedIntMap.add_or_overwrite
 		  mvbdu_true
-		  Mvbdu_wrapper.Mvbdu.mvbdu_and
+		  (*Mvbdu_wrapper.Mvbdu.mvbdu_and*)
+                  Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_and
 		  parameter
 		  handler
 		  error
@@ -1836,7 +1888,7 @@ struct
       Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
         parameter
         error
-        (fun parameter error agent_type map (handler:Mvbdu_wrapper.Mvbdu.handler) ->
+        (fun parameter error agent_type map (handler:Ckappa_sig.Mvbdu_ckappa_sig.handler) ->
 	  let error', agent_string =
             try
               Handler.string_of_agent parameter error handler_kappa agent_type
@@ -1858,7 +1910,11 @@ struct
 		  let () = Loggers.print_newline
                     (Remanent_parameters.get_logger parameter)
                   in
-		  let () = Mvbdu_wrapper.Mvbdu.print parameter mvbdu in
+		  let () =
+                    (*Mvbdu_wrapper.Mvbdu.print*)
+                    Ckappa_sig.Mvbdu_ckappa_sig.print
+                    parameter mvbdu
+                  in
 		  let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
                     "EXTENSIONAL DESCRIPTION:"
                   in
@@ -1948,7 +2004,11 @@ struct
 		      let () = Loggers.print_newline
                         (Remanent_parameters.get_logger parameter)
                       in
-		      let () = Mvbdu_wrapper.Mvbdu.print parameter mvbdu in
+		      let () = 
+                        (*Mvbdu_wrapper.Mvbdu.print*)
+                        Ckappa_sig.Mvbdu_ckappa_sig.print
+                          parameter mvbdu 
+                      in
 		      let () = Loggers.fprintf
                         (Remanent_parameters.get_logger parameter)
                         "EXTENSIONAL DESCRIPTION:"
@@ -2001,7 +2061,9 @@ struct
     print_bdu_update_map_gen_decomposition
       ~smash:true
       ~show_dep_with_dimmension_higher_than:1
-      Mvbdu_wrapper.Mvbdu.mvbdu_cartesian_abstraction a b c d
+      (*Mvbdu_wrapper.Mvbdu.mvbdu_cartesian_abstraction*)
+      Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_cartesian_abstraction
+      a b c d
 
   (************************************************************************************)
   (*relational properties*)
@@ -2014,7 +2076,9 @@ struct
        then 2
        else 1
       )
-      Mvbdu_wrapper.Mvbdu.mvbdu_full_cartesian_decomposition a b c d
+      (*Mvbdu_wrapper.Mvbdu.mvbdu_full_cartesian_decomposition*)
+      Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_full_cartesian_decomposition
+      a b c d
 
   (************************************************************************************)
 

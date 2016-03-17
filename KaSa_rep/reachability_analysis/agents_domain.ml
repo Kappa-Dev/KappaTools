@@ -28,7 +28,7 @@ struct
       domain_static_information :
         (Ckappa_sig.c_agent_name list Usual_domains.bot_or_not *
            Ckappa_sig.c_agent_name list) Ckappa_sig.Rule_map_and_set.Map.t;
-      agents_without_interface  : int list Ckappa_sig.Agent_map_and_set.Map.t
+      agents_without_interface  : Ckappa_sig.c_rule_id list Ckappa_sig.Agent_map_and_set.Map.t
     }
 
   (*--------------------------------------------------------------------*)

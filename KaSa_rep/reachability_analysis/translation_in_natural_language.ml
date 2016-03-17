@@ -30,7 +30,7 @@ type rename_sites =
    Ckappa_sig.Site_map_and_set.Map.elt -> 
    Exception.method_handler * Ckappa_sig.Site_map_and_set.Map.elt)
 
-
+(****************************************************************************************)
 (*convert (int * int) list list --> (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list list*)
 
 let convert_list_list_site_state_of_int error list = 
@@ -55,34 +55,44 @@ let convert_var_list error var_list =
 let convert_state_list error var_list =
   List.fold_left (fun (error, list) state ->
     error, (Ckappa_sig.state_index_of_int state) :: list
-  ) (error, []) var_list
+  ) (error, []) (List.rev var_list)
 
+(****************************************************************************************)
 
 let non_relational parameter handler error mvbdu =
   let error, handler, list =
-    Mvbdu_wrapper.Mvbdu.mvbdu_cartesian_abstraction parameter handler error mvbdu
+    (*Mvbdu_wrapper.Mvbdu.mvbdu_cartesian_abstraction parameter handler error mvbdu*)
+    Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_cartesian_abstraction parameter handler error mvbdu
   in
   let error, handler, mvbdu_true =
-    Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error
+    (*Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error*)
+    Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_true parameter handler error
   in
   let error, handler, recomposition =
     List.fold_left
       (fun (error,handler,conjunct) term ->
-	Mvbdu_wrapper.Mvbdu.mvbdu_and parameter handler error conjunct term)
+	(*Mvbdu_wrapper.Mvbdu.mvbdu_and parameter handler error conjunct term*)
+        Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_and parameter handler error conjunct term
+      )
       (error, handler, mvbdu_true) list
   in
-  error, handler, Mvbdu_wrapper.Mvbdu.equal mvbdu recomposition
+  error, handler, 
+  (*Mvbdu_wrapper.Mvbdu.equal mvbdu recomposition*)
+  Ckappa_sig.Mvbdu_ckappa_sig.equal mvbdu recomposition
 
 let try_partitioning parameter handler error (rename_site_inverse:rename_sites) mvbdu =
   let error, handler, mvbdu_true =
-    Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error
+    (*Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error*)
+    Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_true parameter handler error
   in
   let error, handler, var_hconsed_list =
-    Mvbdu_wrapper.Mvbdu.variables_list_of_mvbdu parameter handler error mvbdu
+    (*Mvbdu_wrapper.Mvbdu.variables_list_of_mvbdu parameter handler error mvbdu*)
+    Ckappa_sig.Mvbdu_ckappa_sig.variables_list_of_mvbdu parameter handler error mvbdu
   in
   (*var_list : int list*)
   let error, handler, var_list =
-    Mvbdu_wrapper.Mvbdu.extensional_of_variables_list
+    (*Mvbdu_wrapper.Mvbdu.extensional_of_variables_list*)
+    Ckappa_sig.Mvbdu_ckappa_sig.extensional_of_variables_list
       parameter handler error var_hconsed_list
   in
   let rec aux l (error, handler) =
@@ -93,18 +103,23 @@ let try_partitioning parameter handler error (rename_site_inverse:rename_sites) 
     | head :: tail ->
       (*[head]:int list*)
       let error, handler, singleton = 
-        Mvbdu_wrapper.Mvbdu.build_variables_list parameter handler error [head] 
+        (*Mvbdu_wrapper.Mvbdu.build_variables_list*)
+        Ckappa_sig.Mvbdu_ckappa_sig.build_variables_list
+          parameter handler error [head] 
       in
       let error, hnadler, mvbdu_ref = 
-        Mvbdu_wrapper.Mvbdu.mvbdu_project_abstract_away 
+        (*Mvbdu_wrapper.Mvbdu.mvbdu_project_abstract_away*)
+        Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_project_abstract_away
           parameter handler error mvbdu singleton 
       in
       let error, handler, proj_in =
-        Mvbdu_wrapper.Mvbdu.mvbdu_project_keep_only
+        (*Mvbdu_wrapper.Mvbdu.mvbdu_project_keep_only*)
+        Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_project_keep_only
           parameter handler error mvbdu singleton 
       in
       let error, handler, list_asso =
-        Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu 
+        (*Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu*)
+        Ckappa_sig.Mvbdu_ckappa_sig.extensional_of_mvbdu
           parameter handler error proj_in
       in
       let error, range =
@@ -128,15 +143,18 @@ let try_partitioning parameter handler error (rename_site_inverse:rename_sites) 
 	  begin
             (*head: int*)
 	    let error, handler, select =
-	      Mvbdu_wrapper.Mvbdu.build_association_list
+	      (*Mvbdu_wrapper.Mvbdu.build_association_list*)
+              Ckappa_sig.Mvbdu_ckappa_sig.build_association_list
 		parameter handler error [head, h]
 	    in
 	    let error, handler, mvbdu_case =
-	      Mvbdu_wrapper.Mvbdu.mvbdu_redefine
+	      (*Mvbdu_wrapper.Mvbdu.mvbdu_redefine*)
+              Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_redefine
 		parameter handler error mvbdu_true select
 	    in
 	    let error, handler, case =
-	      Mvbdu_wrapper.Mvbdu.mvbdu_and
+	      (*Mvbdu_wrapper.Mvbdu.mvbdu_and*)
+              Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_and
 		parameter handler error mvbdu_case mvbdu
 	    in
 	    let error, handler, bool =
@@ -145,16 +163,20 @@ let try_partitioning parameter handler error (rename_site_inverse:rename_sites) 
 	    if bool
 	    then
 	      let error, handler, away =
-		Mvbdu_wrapper.Mvbdu.mvbdu_project_abstract_away
+		(*Mvbdu_wrapper.Mvbdu.mvbdu_project_abstract_away*)
+                Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_project_abstract_away
 		  parameter handler error case singleton
 	      in
 	      if
-		Mvbdu_wrapper.Mvbdu.equal away mvbdu_ref
+		(*Mvbdu_wrapper.Mvbdu.equal*)
+                Ckappa_sig.Mvbdu_ckappa_sig.equal
+                  away mvbdu_ref
 	      then
 		aux3 t (error, handler, output)
 	      else
 	       	let error, handler, list =
-		  Mvbdu_wrapper.Mvbdu.mvbdu_cartesian_abstraction 
+		  (*Mvbdu_wrapper.Mvbdu.mvbdu_cartesian_abstraction*)
+                  Ckappa_sig.Mvbdu_ckappa_sig.mvbdu_cartesian_abstraction
                     parameter handler error away
 		in
 		let error, handler, list =
@@ -162,7 +184,9 @@ let try_partitioning parameter handler error (rename_site_inverse:rename_sites) 
 		    (fun (error, handler, list) elt ->
                       (*elt:(int * int) list list*)
 		      let error, handler, elt =
-			Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu parameter handler error elt
+			(*Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu*)
+                        Ckappa_sig.Mvbdu_ckappa_sig.extensional_of_mvbdu
+                          parameter handler error elt
 		      in
 		      begin
 			let error, var_list_opt =
@@ -186,9 +210,10 @@ let try_partitioning parameter handler error (rename_site_inverse:rename_sites) 
 			  let error, () = warn parameter error (Some "line 127") Exit () in
 			  error, handler, list
 			| Some (a, l) ->
-			  let error, a' = rename_site_inverse parameter error (Ckappa_sig.site_name_of_int a) in
+			  (*let error, a' = rename_site_inverse parameter error (Ckappa_sig.site_name_of_int a) in*)
+                          let error, a' = rename_site_inverse parameter error a in
                           (*convert int list -> Ckappa_sig.c_state list*)
-                          let error, l = convert_state_list error l in
+                          (* let error, l = convert_state_list error l in*)
 			  (error, handler,
 			     (
                                (Range 
@@ -209,23 +234,28 @@ let try_partitioning parameter handler error (rename_site_inverse:rename_sites) 
       | None -> aux tail (error, handler)
       | Some l ->
         (*Convert (int * token) list -> (Ckappa_sig.c_state * token) list*)
-        let l =
+        (*let l =
           List.fold_left (fun l (state, token) ->
             ((Ckappa_sig.state_index_of_int state), token) :: l
           ) [] l
-        in
-	let error, head = rename_site_inverse parameter error (Ckappa_sig.site_name_of_int head) in
+        in*)
+	(*let error, head = rename_site_inverse parameter error (Ckappa_sig.site_name_of_int head) in*)
+	let error, head = rename_site_inverse parameter error head in
 	error, handler, Some (head, l)
   in
   aux var_list (error, handler)
+
+(****************************************************************************************)
 
 let translate parameter handler error (rename_site_inverse: rename_sites) mvbdu
     =
   (*list: (int * int) list list*)
   let error, handler, list =
-    Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu parameter handler error mvbdu
+    (*Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu*)
+    Ckappa_sig.Mvbdu_ckappa_sig.extensional_of_mvbdu
+      parameter handler error mvbdu
   in
-  let error, list = convert_list_list_site_state_of_int error list in
+  (*let error, list = convert_list_list_site_state_of_int error list in*)
   (*change list: (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list list*)
   let error, list =
     List.fold_left
@@ -246,14 +276,18 @@ let translate parameter handler error (rename_site_inverse: rename_sites) mvbdu
   then
     begin
        let error, handler, vars =
-	 Mvbdu_wrapper.Mvbdu.variables_list_of_mvbdu parameter handler error mvbdu
+	 (*Mvbdu_wrapper.Mvbdu.variables_list_of_mvbdu*)
+         Ckappa_sig.Mvbdu_ckappa_sig.variables_list_of_mvbdu
+           parameter handler error mvbdu
        in
        (*var_list = int list*)
        let error, handler, var_list =
-	 Mvbdu_wrapper.Mvbdu.extensional_of_variables_list parameter handler error vars
+	 (*Mvbdu_wrapper.Mvbdu.extensional_of_variables_list*)
+         Ckappa_sig.Mvbdu_ckappa_sig.extensional_of_variables_list
+           parameter handler error vars
        in
        (*var_list = int list --> Ckappa_sig.c_site_name list*)
-       let error, var_list = convert_var_list error var_list in
+       (*let error, var_list = convert_var_list error var_list in*)
        let error, var_list =
 	 List.fold_left
 	   (fun (error, list) elt ->
@@ -377,6 +411,8 @@ let translate parameter handler error (rename_site_inverse: rename_sites) mvbdu
     end
   else
     error, (handler, No_known_translation list)
+
+(****************************************************************************************)
 
 let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt_agent_type=true) ?html_mode:(html_mode=false) 
     ~show_dep_with_dimmension_higher_than:dim_min parameter handler_kappa error agent_string agent_type translation =

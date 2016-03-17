@@ -363,7 +363,7 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(z~u,y~u,x~u)
+	A(x~u,y~u,z~u)
 	Wake-up rules
 
 	Applying rule 0:
@@ -413,7 +413,7 @@ Id=35
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(z~u,y~u,x~p)
+	A(x~p,y~u,z~u)
 	Wake-up rules
 
 	Applying rule 2:
@@ -460,7 +460,7 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(z~u,y~p,x~p)
+	A(x~p,y~p,z~u)
 	Wake-up rules
 
 	Applying rule 3:
@@ -507,7 +507,7 @@ Id=48
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(z~q,y~p,x~0)
+	A(x~0,y~p,z~q)
 	Wake-up rules
 
 	Applying rule 4:
@@ -554,7 +554,7 @@ Id=53
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(z~u,y~u,x~q)
+	A(x~q,y~u,z~u)
 	Wake-up rules
 
 	Applying rule 5:
@@ -601,7 +601,7 @@ Id=59
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(z~u,y~q,x~q)
+	A(x~q,y~q,z~u)
 	Wake-up rules
 
 	Applying rule 6:
@@ -648,7 +648,7 @@ Id=70
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(z~q,y~q,x~q)
+	A(x~q,y~q,z~q)
 	Wake-up rules
 
 	Applying rule 7: KO:

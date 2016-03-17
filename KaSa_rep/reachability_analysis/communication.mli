@@ -88,7 +88,8 @@ val get_state_of_site:
   Analyzer_headers.global_dynamic_information ->
   precondition ->
   path ->
-  Exception.method_handler * Analyzer_headers.global_dynamic_information * precondition * int list Usual_domains.flat_lattice
+  Exception.method_handler * Analyzer_headers.global_dynamic_information * precondition * 
+    Ckappa_sig.c_state list Usual_domains.flat_lattice (*change*)
 
 type prefold = { fold: 'a. 'a fold}
 
@@ -101,8 +102,9 @@ val refine_information_about_state_of_site:
   (Exception.method_handler ->
    Analyzer_headers.global_dynamic_information ->
    path ->
-   int list Usual_domains.flat_lattice ->
-   Exception.method_handler * Analyzer_headers.global_dynamic_information * int list Usual_domains.flat_lattice) ->
+   Ckappa_sig.c_state (*change*) list Usual_domains.flat_lattice ->
+   Exception.method_handler * Analyzer_headers.global_dynamic_information * 
+     Ckappa_sig.c_state list Usual_domains.flat_lattice) (*change*) ->
   precondition
 
 val get_potential_partner:

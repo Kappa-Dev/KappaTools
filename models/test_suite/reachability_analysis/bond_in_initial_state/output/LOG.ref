@@ -24,7 +24,7 @@ Reachability analysis...
 	Views in initial state
 
 
-	B(x~u,x!A@x)
+	B(x!A@x,x~u)
 	Wake-up rules
 		Updating the views for B(x!,x~)
 		(rule 0) should be investigated 
@@ -50,7 +50,7 @@ Reachability analysis...
 	Dealing with side effects
 
 
-	B(x~u,x!free)
+	B(x!free,x~u)
 	Wake-up rules
 		Updating the views for B(x!,x~)
 		(rule 0) should be investigated 
@@ -68,7 +68,7 @@ Reachability analysis...
 			
 
 
-	B(x~p,x!A@x)
+	B(x!A@x,x~p)
 	Wake-up rules
 		Updating the views for B(x!,x~)
 		(rule 0) should be investigated 
@@ -85,7 +85,7 @@ Reachability analysis...
 	Dealing with side effects
 
 
-	B(x~p,x!free)
+	B(x!free,x~p)
 	Wake-up rules
 		Updating the views for B(x!,x~)
 		(rule 0) should be investigated 

@@ -92,8 +92,9 @@ type precondition =
      Analyzer_headers.global_dynamic_information ->
      path ->
      Exception.method_handler * 
-       Analyzer_headers.global_dynamic_information * int list Usual_domains.flat_lattice ;
-   cache_state_of_site: int list Usual_domains.flat_lattice PathMap.t ;
+       Analyzer_headers.global_dynamic_information * 
+       Ckappa_sig.c_state list Usual_domains.flat_lattice ; (*change*)
+   cache_state_of_site: Ckappa_sig.c_state (*change*) list Usual_domains.flat_lattice PathMap.t ;
    partner_map: Ckappa_sig.c_agent_name -> Ckappa_sig.c_site_name -> 
                 Ckappa_sig.c_state -> (Ckappa_sig.c_agent_name * 
                                          Ckappa_sig.c_site_name * 
