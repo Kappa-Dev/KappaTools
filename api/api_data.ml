@@ -23,19 +23,14 @@ let api_file_line (file_line : Data.file_line) : Api_types.file_line =
   ; Api_types.line = file_line.Data.line
   }
 
-let api_flux_data (flux_data : Data.flux_data) : Api_types.flux_data =
-  { Api_types.flux_name = flux_data.Data.flux_name
-  ; Api_types.flux_start = flux_data.Data.flux_start
-  ; Api_types.flux_hits = Array.to_list flux_data.Data.flux_hits
-  ; Api_types.flux_fluxs = List.map Array.to_list (Array.to_list flux_data.Data.flux_fluxs)
-  }
-
 let api_flux_map (flux_map : Data.flux_map) : Api_types.flux_map =
-  { Api_types.flux_rules = Array.to_list flux_map.Data.flux_rules
-  ; Api_types.flux_data = api_flux_data flux_map.Data.flux_data
-  ; Api_types.flux_end = flux_map.Data.flux_end
+  { flux_begin_time = flux_map.Data.flux_data.Data.flux_start;
+    flux_end_time = flux_map.Data.flux_end ;
+    flux_rules = Array.to_list flux_map.Data.flux_rules;
+    flux_hits = Array.to_list flux_map.Data.flux_data.Data.flux_hits;
+    flux_fluxs = List.map Array.to_list (Array.to_list flux_map.Data.flux_data.Data.flux_fluxs);
+    flux_name = flux_map.Data.flux_data.Data.flux_name
   }
-
 let api_link (link : Raw_mixture.link) : Api_types.link =
   match link with
     Raw_mixture.FREE -> None

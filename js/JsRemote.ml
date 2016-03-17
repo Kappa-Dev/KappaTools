@@ -18,6 +18,7 @@ let hydrate (type a)
      else
        Lwt.fail (BadResponseCode frame.code)
 
+
 let post
       (type a)
       (timeout : float)
@@ -54,7 +55,20 @@ let post
 
 class runtime ?(timeout:float = 10.0) (url:string) =
 object(self)
-
+  method private hydrate : 'a. ((Js.js_string Js.t) XmlHttpRequest.generic_http_frame)
+                   -> (string -> 'a)
+                   -> (string -> ApiTypes.error)
+                   -> 'a ApiTypes_j.result Lwt.t =
+    fun frame success fail ->
+    try
+      if frame.code = 200 then
+        Lwt.return (`Right (success (Js.to_string frame.content)))
+      else if frame.code = 400 then
+        Lwt.return (`Left (fail (Js.to_string frame.content)))
+      else
+        Lwt.return (`Left [Format.sprintf "Unexpected Response code %d" frame.code])
+    with e ->
+      Lwt.return (`Left [Printexc.to_string e])
   method parse (code : ApiTypes.code) : ApiTypes_j.parse ApiTypes_j.result Lwt.t =
     let url : string = Format.sprintf "%s/v1/parse" url  in
     (XmlHttpRequest.perform_raw
@@ -63,7 +77,7 @@ object(self)
        ~response_type:Text
        url)
     >>=
-      (fun frame -> hydrate frame
+      (fun frame -> self#hydrate frame
                             ApiTypes.parse_of_string
                             ApiTypes.error_of_string)
 
@@ -84,7 +98,7 @@ object(self)
        ~response_type:Text
        url)
     >>=
-      (fun frame -> hydrate frame
+      (fun frame -> self#hydrate frame
                             ApiTypes.state_of_string
                             ApiTypes.error_of_string)
 
@@ -96,12 +110,13 @@ object(self)
        ~response_type:Text
        url)
     >>=
-      (fun frame -> hydrate
+      (fun frame -> self#hydrate
                       frame
                       ApiTypes.catalog_of_string
                       ApiTypes.error_of_string)
 
   method stop (token : ApiTypes.token) : unit ApiTypes.result Lwt.t =
+    let () = Common.debug "stopping" in
     let url : string = Format.sprintf "%s/v1/process/%d" url token in
     (XmlHttpRequest.perform_raw
        ~get_args:[]
@@ -109,7 +124,7 @@ object(self)
        ~response_type:Text
        url)
     >>=
-      (fun frame -> hydrate
+      (fun frame -> self#hydrate
                       frame
                       ApiTypes.alias_unit_of_string
                       ApiTypes.error_of_string)

@@ -11,6 +11,7 @@ type parameter = { code : code;
                    max_time : float nullable;
                    max_events : int nullable
                    }
+
 type ('l,'r) either = [ Left of 'l | Right of 'r ] <json repr="object">
 type ('r) result = (error,'r) either
 
@@ -19,17 +20,13 @@ type observable = { time : float; values : float list }
 type plot = { legend: string list;
               observables : observable list }
 
-type flux_data = {
-    flux_name : string;
-    flux_start : float;
+type flux_map =
+  { flux_begin_time : float;
+    flux_end_time : float;
+    flux_rules : string list;
     flux_hits : int list;
     flux_fluxs : float list list;
-}
-
-type flux_map =
-  { flux_rules : string list;
-    flux_data : flux_data;
-    flux_end : float;
+    flux_name : string
   }
 
 type file_line = { file_name : string nullable ; line : string }
@@ -40,6 +37,7 @@ type agent = { a_id: int;
                a_type: int;
                a_ports: link list;
                a_ints: internal list }
+
 type raw_mixture = agent list
 type agent_state = {
      agent : int;

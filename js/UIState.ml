@@ -29,7 +29,7 @@ let runtime_value runtime = match runtime with
                            | Remote remote -> remote.url
 
 class embedded_runtime ()  = object
-  val delayed_yield : unit -> unit Lwt.t = Api.time_yield 0.01 Lwt_js.yield
+  val delayed_yield : unit -> unit Lwt.t = Api.time_yield 0.1 Lwt_js.yield
   method yield () = delayed_yield ()
   method log (_: string) = Lwt.return_unit
   inherit Api.Base.runtime
@@ -59,7 +59,10 @@ let set_runtime_url (url : string) (continuation : bool -> unit) : unit =
                                      let () = if is_valid_server then
                                                 runtime_state := Some (new JsRemote.runtime url :> Api.runtime)
                                               else
-                                                let error_msg : string = Format.sprintf "Bad Response %d from %s " frame.XmlHttpRequest.code url in
+                                                let error_msg : string = Format.sprintf "Bad Response %d from %s "
+                                                                                        frame.XmlHttpRequest.code
+                                                                                        url
+                                                in
                                                 set_model_error [error_msg]
                                      in
                                      let () = continuation is_valid_server in
@@ -87,6 +90,7 @@ let update_text text =
                      )
   in
   ()
+let poll_interval : float = 2.
 let update_runtime_state
       thread_is_running
       on_error token =
@@ -100,6 +104,7 @@ let update_runtime_state
                   >>=
                     (fun result -> match result with
                                      `Left e -> let () = set_model_error e in
+                                                let () = List.iter Common.error e in
                                                 on_error ()
                                    | `Right state -> let () = set_model_runtime_state (Some state) in
                                                      if state.is_running then
@@ -112,9 +117,9 @@ let update_runtime_state
                     return_unit
                  ) in
   let rec aux () =
-    let () = do_update () in
+    let () = if Lwt_switch.is_on thread_is_running then do_update () else () in
     if Lwt_switch.is_on thread_is_running then
-      Lwt_js.sleep 5. >>= aux
+      Lwt_js.sleep poll_interval >>= aux
     else
       Lwt.return_unit
   in aux ()
@@ -122,18 +127,17 @@ let update_runtime_state
 
 let start_model ~start_continuation
                 ~stop_continuation =
+  let thread_is_running = Lwt_switch.create () in
   let on_error () = set_model_is_running false;
                     stop_continuation ();
-                    return_unit
+                    Lwt_switch.turn_off thread_is_running
   in
   match !runtime_state with
     None -> set_model_error ["Runtime not available"];
             on_error ()
   | Some runtime_state ->
-     let thread_is_running = Lwt_switch.create () in
      catch
        (fun () ->
-        let () = start_continuation thread_is_running in
         let () = set_model_runtime_state (Some { plot = None;
                                                  time = 0.0;
                                                  time_percentage = None;
@@ -158,6 +162,21 @@ let start_model ~start_continuation
                set_model_is_running false;
                on_error ()
              | `Right token ->
+                let stop_process () : unit Lwt.t =
+                  (Lwt_switch.turn_off thread_is_running)
+                  >>=
+                    (fun _ -> Lwt_js.sleep poll_interval)
+                  >>=
+                    (fun _ -> runtime_state#stop token)
+                  >>=
+                    (fun response ->
+                     let () = match response with
+                         `Left error -> set_model_error error
+                       | `Right _ -> ()
+                     in
+                     Lwt.return_unit)
+                in
+                let () = start_continuation stop_process in
                 Lwt.join [ update_runtime_state thread_is_running on_error token ]
                 >>=
                   (fun _ -> Lwt_js.sleep 1.)

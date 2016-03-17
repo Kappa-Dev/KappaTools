@@ -1,3 +1,33 @@
+.flux-header {
+    padding: 20px;
+}
+
+.numberCircle {
+    display:inline-block;
+
+    border-radius:50%;
+    border:2px solid;
+
+    font-size:32px;
+}
+
+.numberCircle:before,
+.numberCircle:after {
+    content:'\200B';
+    display:inline-block;
+    line-height:0px;
+
+    padding-top:50%;
+    padding-bottom:50%;
+}
+
+.numberCircle:before {
+    padding-left:8px;
+}
+.numberCircle:after {
+    padding-right:8px;
+}
+
 #file-selector {
     display:none;
 }
@@ -10,6 +40,7 @@
 .panel-footer-white {
     background:white;
 }
+/*
 .tab-pane {
     border-left: 1px solid #ddd;
     border-right: 1px solid #ddd;
@@ -21,6 +52,7 @@
 .nav-tabs {
     margin-bottom: 0;
 }
+*/
 .filename {
     display: inline-block;
     padding: 6px 12px;

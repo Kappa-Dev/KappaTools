@@ -398,14 +398,15 @@ let onload () : unit =
                 let () = UIState.set_model_is_running true in
                 let _ = init_ui () in
                 let _ = UIState.start_model
-                          ~start_continuation:(fun thread_is_running ->
+                          ~start_continuation:(fun stop_process ->
                                                stop_ui ();
                                                Lwt_js_events.async
                                                  (fun _ -> Lwt_js_events.clicks
                                                              stop_button_dom
                                                              (fun _ _ ->
                                                               let _ = init_ui () in
-                                                              Lwt_switch.turn_off thread_is_running))
+                                                              stop_process ()
+                                                              ))
                           )
                           ~stop_continuation:start_ui
                 in Js._true)

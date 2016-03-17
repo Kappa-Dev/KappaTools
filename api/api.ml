@@ -159,26 +159,31 @@ end = struct
                                                env
                                 in
                                 let () = plot := { !plot with legend = Array.to_list legend} in
-				let rec iter graph state =
-				  let (stop,graph',state') =
+                                let rec iter graph state =
+                                  let (stop,graph',state') =
                                     State_interpreter.a_loop
                                       ~outputs:outputs log_form
-				      env domain simulation.counter graph state in
-				  if not (Lwt_switch.is_on simulation.switch) || stop then
-				    let () = State_interpreter.end_of_simulation
-                                      ~outputs:outputs log_form env simulation.counter graph state in
-				    Lwt_switch.turn_off simulation.switch
-				  else Lwt.bind (self#yield ()) (fun () -> iter graph' state') in
-				iter graph state)
+                                      env domain simulation.counter graph state in
+                                  if stop then
+                                    let () = ExceptionDefn.flush_warning log_form in
+                                    Lwt_switch.turn_off simulation.switch
+                                  else
+                                    if Lwt_switch.is_on simulation.switch
+                                    then Lwt.bind (self#yield ()) (fun () -> iter graph' state')
+                                    else Lwt.return_unit in
+                                iter graph state)
                           )
                           (function
                             | ExceptionDefn.Malformed_Decl error ->
+                               let () = Lwt.async (fun () -> (self#log (Printexc.to_string (ExceptionDefn.Malformed_Decl error)))) in
                                let () = error_messages := [format_error_message error] in
                                Lwt.return_unit
                             | ExceptionDefn.Internal_Error error ->
+                               let () = Lwt.async (fun () -> (self#log (Printexc.to_string (ExceptionDefn.Internal_Error error)))) in
                                let () = error_messages := [format_error_message error] in
                                Lwt.return_unit
                             | Invalid_argument error ->
+                               let () = Lwt.async (fun () -> (self#log (Printexc.to_string (Invalid_argument error)))) in
                                let () = error_messages := [Format.sprintf "Runtime error %s" error] in
                                Lwt.return_unit
                             | e ->

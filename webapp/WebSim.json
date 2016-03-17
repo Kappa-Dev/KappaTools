@@ -1,5 +1,4 @@
-{
-    "swagger": "2.0",
+{   "swagger": "2.0",
     "info": {
         "title": "Kasim API",
         "description": "Kasim API",
@@ -103,10 +102,8 @@
         "/process/{token}": {
             "get": {
                 "summary": "Status of running simulation",
-                "description": "Status of simulation.\n",
-                "tags": [
-                    "Process"
-                ],
+                "description": "Status of simulation.\nThe process is deleted (token removed)\nAfter a status message is returned\nwith is_running = False.",
+                "tags": [ "Process" ],
                 "parameters": [
                     {
                         "name": "token",
@@ -119,17 +116,38 @@
                 "responses": {
                     "200": {
                         "description": "state of the running process",
-                        "schema": {
-                            "$ref": "#/definitions/Status"
-                        }
+                        "schema": { "$ref": "#/definitions/Status" }
                     },
                     "400": {
                         "description": "Errors",
-                        "schema": {
-                            "type": [
-                                "string"
-                            ]
-                        }
+                        "schema": { "type": [ "string" ] }
+                    }
+                }
+            }
+        }
+    },
+    "/process/{token}": {
+            "delete": {
+                "summary": "Stop running simulation",
+                "description": "Stop a running process",
+                "tags": [ "Process" ],
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "path",
+                        "type": "integer",
+                        "description": "id of simulation process",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "state of the running process",
+                        "type": "string"
+                    },
+                    "400": {
+                        "description": "Errors",
+                        "schema": { "type": [ "string" ] }
                     }
                 }
             }
@@ -152,30 +170,15 @@
         },
         "Parse": {
             "type": "object",
-            "properties": {
-                "observables": {
-                    "type": [
-                        "string"
-                    ]
-                }
-            }
+            "properties": { "observables": { "type": [ "string" ] } }
         },
         "Parameter": {
             "type": "object",
-            "properties": {
-                "code": {
-                    "type": "string"
-                },
-                "nb_plot": {
-                    "type": "integer"
-                },
-                "max_time": {
-                    "type": "number"
-                },
-                "max_events": {
-                    "type": "integer"
-                }
-            }
+            "properties": { "code": { "type": "string" },
+                            "nb_plot": { "type": "integer" },
+                            "max_time": { "type": "number" },
+                            "max_events": { "type": "integer" }
+                          }
         },
         "Observable": {
             "type": "object",

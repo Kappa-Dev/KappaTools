@@ -11,9 +11,11 @@ open ApiTypes
 open Conduit_lwt_unix
 open Unix
 open Lwt_log
+open Re
 
-(* let () = Lwt_log_core.append_rule "*" Lwt_log_core.Fatal *)
 let log (msg : string) : unit Lwt.t = Lwt_log_core.log Lwt_log_core.Info msg
+let unit_of_lwt lwt = Lwt.async (fun () -> lwt)
+
 let fatal (msg : string) : unit Lwt.t = Lwt_log_core.log Lwt_log_core.Fatal msg
 
 class runtime ()  = object
@@ -42,12 +44,12 @@ let result_response string_of_success result =
      let success_msg : string = string_of_success success in
      (Server.respond_string ?headers:(Some headers) ~status:`OK ~body:success_msg ())
 
+let process_url_pattern = Re.compile (Re_perl.re "^/v1/process/([0-9]+$)")
 let get_token path : int option =
-  let process_url_pattern = (Str.regexp "^/v1/process/\\([0-9]+\\)") in
-  if Str.string_match process_url_pattern path 0 then
-    Some (int_of_string (Str.matched_group 1 path))
-  else
-    None
+      try
+        let matches = Re.exec process_url_pattern path in
+        Some (int_of_string (Re.get matches 1))
+      with Failure _ | Not_found -> None
 
 let logger (handler : Cohttp_lwt_unix.Server.conn ->
                       Cohttp.Request.t ->
@@ -72,13 +74,26 @@ let logger (handler : Cohttp_lwt_unix.Server.conn ->
         | _ -> "unknown"
      in
      let t = Unix.localtime (Unix.time ()) in
-     let timestamp : string = Printf.sprintf "[%02d/%02d/%04d:%02d:%02d:%02d]" t.tm_mday t.tm_mon t.tm_year t.tm_hour t.tm_min t.tm_sec  in
+     let timestamp : string = Printf.sprintf "[%02d/%02d/%04d:%02d:%02d:%02d]"
+                                             t.tm_mday
+                                             t.tm_mon
+                                             t.tm_year
+                                             t.tm_hour
+                                             t.tm_min
+                                             t.tm_sec
+     in
      let request_method : string = Code.string_of_method request.meth in
      let uri : Uri.t = Request.uri request in
      let request_path : string = Uri.path uri in
      let response_code : string = Code.string_of_status response.Cohttp.Response.status in
      (* size_of_response *)
-     let log_entry : string = Printf.sprintf "%s\t%s\t\"%s %s\"\t%s" ip timestamp request_method request_path response_code  in
+     let log_entry : string = Printf.sprintf "%s\t%s\t\"%s %s\"\t%s"
+                                             ip
+                                             timestamp
+                                             request_method
+                                             request_path
+                                             response_code
+     in
      (log log_entry)
        >>=
          (fun _ -> Lwt.return (response,body))
@@ -91,14 +106,24 @@ let handler
       (body : Cohttp_lwt_body.t)
     : (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t =
   let uri = Request.uri request in
-  let bad_request = Server.respond_string ?headers:(Some headers) ~status:`Bad_request ~body:"" () in
+  let bad_request = Server.respond_string ?headers:(Some headers)
+                                          ~status:`Bad_request
+                                          ~body:""
+                                          () in
+  let not_found = Server.respond_string ?headers:(Some headers)
+                                        ~status:`Not_found
+                                        ~body:""
+                                        () in
   match Uri.path uri with
   (* SHUTDOWN *)
   | "/v1/shutdown" when request.meth = `POST  ->
      (Cohttp_lwt_body.to_string body)
      >>= (fun body ->
           let shutdown_okay = server_respond "shutting down" in
-          let shutdown_fail = Server.respond_string ?headers:(Some headers) ~status:`Unauthorized ~body:"unathorized" () in
+          let shutdown_fail = Server.respond_string ?headers:(Some headers)
+                                                    ~status:`Unauthorized
+                                                    ~body:"unathorized"
+                                                    () in
           match shutdown_key with
             None -> shutdown_fail
           | Some shutdown_key ->
@@ -148,6 +173,12 @@ let handler
             (fun token -> result_response ApiTypes.string_of_token token)
 
          )
+  (* OPTIONS /v1/process/[token] *)
+  | x when request.meth = `OPTIONS && None != get_token x ->
+       let h = Header.init_with "Access-Control-Allow-Origin" "*" in
+       let h = Header.add h "Access-Control-Allow-Methods" "POST, GET, OPTIONS, DELETE" in
+       let h = Header.add h "Access-Control-Request-Headers" "X-Custom-Header" in
+       Server.respond_string ?headers:(Some h) ~status:`OK ~body:"" ()
   (* DELETE /v1/process/[token] *)
   | x when request.meth = `DELETE && None != get_token x ->
      (match get_token x with
@@ -166,20 +197,33 @@ let handler
          >>=
            (fun status -> result_response ApiTypes.string_of_state status)
      )
-  | _ -> bad_request
-
+  | _ -> not_found
 
 let server =
+  let parameter_backtrace : bool ref = ref false in
+  let parameter_seed_value : int option ref = ref None in
   let parameter_port : int ref = ref 8080 in
   let parameter_cert_dir : string option ref = ref None in
   let parameter_shutdown_key : string option ref = ref None in
-  let options  : (string * Arg.spec * string) list = [ ("--port",
+  let options  : (string * Arg.spec * string) list = [ ("--version",
+                                                        Arg.Unit (fun () -> Format.print_string Version.version_msg;
+                                                                            Format.print_newline () ; exit 0),
+                                                        "display KaSim version");
+                                                       ("--backtrace", Arg.Set parameter_backtrace,
+                                                        "Backtracing exceptions") ;
+                                                       ("-seed", Arg.Int (fun i -> parameter_seed_value := Some i),
+                                                        "Seed for the random number generator") ;
+                                                       ("--gluttony",
+                                                        Arg.Unit (fun () -> Gc.set { (Gc.get()) with
+                                                                                     Gc.space_overhead = 500 (*default 80*) } ;),
+                                                        "Lower gc activity for a faster but memory intensive simulation") ;
+                                                       ("--port",
                                                         Arg.Int (fun port -> parameter_port := port),
                                                         "port to serve on");
                                                        ("--shutdown-key",
                                                         Arg.String (fun key -> parameter_shutdown_key := Some key),
                                                         "key to shutdown server");
-						       ("--cert-dir",
+                                                       ("--cert-dir",
                                                         Arg.String (fun key -> parameter_cert_dir := Some key),
                                                         "Directory where to find cert.pem and privkey.pem");
                                                        ("--log",
@@ -208,11 +252,24 @@ let server =
                                                      ] in
   let usage : string = "WebSim --port port --shutdown-key key\n" in
   let () = Arg.parse options (fun _ -> ()) usage in
+  let () = Printexc.record_backtrace !parameter_backtrace in
+  let theSeed =
+    match !parameter_seed_value with
+    | Some seed -> seed
+    | None ->
+       begin
+         unit_of_lwt (log "+ Self seeding...@.");
+         Random.self_init() ;
+         Random.bits ()
+       end
+  in
+  let () = Random.init theSeed ;
+           unit_of_lwt (log (Printf.sprintf "+ Initialized random number generator with seed %d@." theSeed)) in
   let mode = match !parameter_cert_dir with
     | None -> `TCP (`Port !parameter_port)
     | Some dir ->
        `TLS (`Crt_file_path (dir^"cert.pem"), `Key_file_path (dir^"privkey.pem"),
-	     `No_password, `Port !parameter_port) in
+             `No_password, `Port !parameter_port) in
   Server.create ~mode (Server.make (logger (handler ~shutdown_key:!parameter_shutdown_key)) ())
 
 let () = ignore (Lwt_main.run server)

@@ -36,8 +36,9 @@ $(MANGENREP): $(SCRIPTSSOURCE) $(MODELS)
 	rm -rf $@
 	mkdir $@
 VERSION=generated/version.ml
+RESOURCE=generated/resource_strings.ml
 GENERATED=$(VERSION) \
-	  generated/resource_strings.ml \
+	  $(RESOURCE) \
 	  generated/ApiTypes_t.ml generated/ApiTypes_j.ml \
 	  generated/WebMessage_t.ml generated/WebMessage_j.ml
 
@@ -56,14 +57,14 @@ generated/WebMessage_t.ml: js/WebMessage.atd generated
 generated/WebMessage_j.ml: js/WebMessage.atd generated
 	atdgen -j -j-std -o generated/WebMessage js/WebMessage.atd
 
-generated/resource_strings.ml: shared/flux.js generated
+$(RESOURCE): shared/flux.js
 	./dev/generate-string.sh $<  > $@
 
 $(VERSION): main/version.ml.skel $(wildcard .git/refs/heads/*) generated
 	sed -e s/'\(.*\)\".*tag: \([^,\"]*\)[,\"].*/\1\"\2\"'/g $< | \
 	sed -e 's/\$$Format:%D\$$'/"$$(git describe --always --dirty || echo unkown)"/ > $@
 
-%.cma %.native %.byte %.docdir/index.html: $(filter-out _build/,$(wildcard */*.ml*)) $(wildcard $(KASAREP)*/*.ml*) $(wildcard $(KASAREP)*/*/*.ml*)  generated/resource_strings.ml $(VERSION)
+%.cma %.native %.byte %.docdir/index.html: $(filter-out _build/,$(wildcard */*.ml*)) $(wildcard $(KASAREP)*/*.ml*) $(wildcard $(KASAREP)*/*/*.ml*) $(VERSION) $(RESOURCE)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) $@
 
 site:
@@ -83,6 +84,8 @@ ifeq ($(NO_CDN),1)
 	unzip -d $@ $(TEMPDIR)/mathjax.zip ;\
 	mkdir -p $@/jquery ;\
 	cp  $(TEMPDIR)/jquery.js $@/jquery ;\
+	mkdir -p $@/d3 ;\
+	wget -O $@/d3/d3.v3.min.js http://d3js.org/d3.v3.min.js
 else
 endif
 
@@ -102,6 +105,7 @@ ifeq ($(NO_CDN),1)
 else
 	cat js/use-cdn.html | sed "s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g" > site/index.html
 endif
+	cp shared/flux.js site/flux.js
 	cp -f js/*.js js/*.css js/favicon.ico site
 
 JsSim.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(GENERATED)
@@ -117,7 +121,7 @@ WebWorker.byte: $(filter-out webapp/,$(filter-out _build/,$(wildcard */*.ml*))) 
 	-tag debug -I js -I api \
 	-tag-line "<generated/*> : package(atdgen)" \
 	-tag-line "<api/*> : package(lwt)" \
-	-tag-line "<js/*> : thread, package(atdgen), package(js_of_ocaml), package(js_of_ocaml.syntax), package(lwt), syntax(camlp4o), package(lwt.log)" \
+	-tag-line "<js/*> : thread, package(atdgen), package(js_of_ocaml), package(js_of_ocaml.syntax), package(lwt), syntax(camlp4o)" \
 	$@
 
 WebSim.native: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
@@ -125,7 +129,7 @@ WebSim.native: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GEN
 	-tag debug -I webapp -I api \
 	-tag-line "<generated/*> : package(atdgen)" \
 	-tag-line "<api/*> : package(lwt)" \
-	-tag-line "<webapp/*> : thread, package(atdgen), package(cohttp.lwt)" \
+	-tag-line "<webapp/*> : thread, package(atdgen), package(cohttp.lwt), package(re), package(re.perl)" \
 	$@
 
 bin/%: %.native Makefile
@@ -172,7 +176,7 @@ clean_doc:
 
 clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch clean_doc
 	"$(OCAMLBINPATH)ocamlbuild" -clean
-	rm -f $(VERSION)
+	rm -f $(VERSION) $(RESOURCE)
 	rm -f sanity_test bin/sanity_test
 	rm -f KaSim bin/KaSim KaSa bin/KaSa
 	rm -rf site generated

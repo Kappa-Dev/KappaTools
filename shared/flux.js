@@ -52,13 +52,14 @@ function fluxMap(ids) {
                                    {return a.map(function (x) {return (x < 0) ? "#FF0000" : "#00FF00";})
                                     .filter(that.filterRules);}).filter(that.filterRules);
         var chord = d3.layout.chord().padding(.01).matrix(matrix);
-        var width = 960, height = 700,
+        var width = ids.width?ids.width:960,
+            height = ids.height?ids.height:700,
             innerRadius = Math.min(width, height) * .37;
         var arc = d3.svg.arc().innerRadius(innerRadius)
             .outerRadius(innerRadius + 8);
-        var svg = d3.select("body").select("svg").attr("width", width)
-            .attr("height", height)
-            .select("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+        var svg_element = (that.ids.svgId)?d3.select("#"+that.ids.svgId):d3.select("body").select("svg");
+        var svg = svg_element.attr("width", width)
+                  .attr("height", height).select("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
         svg.selectAll("*").remove();
         svg.append("g").attr("class", "chord").selectAll("path")
             .data(chord.chords).enter().append("path")
@@ -77,7 +78,7 @@ function fluxMap(ids) {
             .text(function (d) { return d.source.value.toExponential(2);});
         svg.select("#values").selectAll(".targets")
             .data(chord.chords).enter().append("text")
-	    .filter(function (v) {return (v.target.value != 0); }).attr("class","targets")
+            .filter(function (v) {return (v.target.value != 0); }).attr("class","targets")
             .each(function(d) { d.angle = ( d.target.startAngle + d.target.endAngle) / 2; })
                 .attr("dy", ".1em")
             .attr("transform", function(d) {
@@ -105,8 +106,13 @@ function fluxMap(ids) {
         that.drawDIM();
     };
     this.render_controls = function(){
-        var menu = document.getElementById("menu");
+        var rulesCheckboxes = document.getElementById(that.ids.rulesCheckboxesId);
+        while (rulesCheckboxes.hasChildNodes()){
+            rulesCheckboxes.removeChild(rulesCheckboxes.lastChild);
+        };
         that.selectedRules.forEach(function (val,id,a) {
+            var group = document.createElement("div")
+            group.setAttribute("class","input-group");
             var boxbox = document.createElement("label"),
                 box = document.createElement("input");
             boxbox.setAttribute("class","checkbox-inline")
@@ -115,13 +121,14 @@ function fluxMap(ids) {
             box.addEventListener("change",function () { that.aClick(id);});
             boxbox.appendChild(box);
             boxbox.appendChild(document.createTextNode(that.flux.rules[id]));
-            menu.appendChild(boxbox)
+            group.appendChild(boxbox);
+            rulesCheckboxes.appendChild(group);
         });
     };
 
     this.render_labels = function(){
-        d3.select("#"+that.ids.beginTimeId).text(that.flux.bio_begin_time);
-        d3.select("#"+that.ids.endTimeId).text(that.flux.bio_end_time);
+        d3.select("#"+that.ids.beginTimeId).text(that.flux.bioBeginTime);
+        d3.select("#"+that.ids.endTimeId).text(that.flux.bioEndTime);
         d3.select("#"+that.ids.nbEventsId).text(that.flux.hits.reduce(function (acc,v) {return acc + v;},0));
 
     };
