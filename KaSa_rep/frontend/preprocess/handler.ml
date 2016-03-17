@@ -112,15 +112,16 @@ let complementary_interface parameters error handler agent_name interface =
   in
   error, Misc_sa.list_minus l interface
 
-let string_of_rule parameters error handler compiled rule_id =
+let string_of_rule parameters error handler compiled (rule_id: Ckappa_sig.c_rule_id) =
   let rules = compiled.Cckappa_sig.rules in
   let vars = compiled.Cckappa_sig.variables in
   let nrules = nrules parameters error handler in
-  if rule_id<nrules
+  if (Ckappa_sig.int_of_rule_id rule_id) < nrules
   then
     begin
       let error,rule =
-        Int_storage.Nearly_inf_Imperatif.get
+        (*Int_storage.Nearly_inf_Imperatif.get*)
+        Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
           parameters
           error
           rule_id
@@ -144,24 +145,25 @@ let string_of_rule parameters error handler compiled rule_id =
 	in
 	error,
         (if m1 = ""
-         then ("rule "^ (string_of_int rule_id))
-         else ("rule "^ string_of_int rule_id)^": "^ m1
+         then ("rule "^ (Ckappa_sig.string_of_rule_id rule_id))
+         else ("rule "^ Ckappa_sig.string_of_rule_id rule_id)^": "^ m1
         )
     end
   else
     begin
-      let var_id = rule_id - nrules in
+      let var_id = (Ckappa_sig.int_of_rule_id rule_id) - nrules in
       let error,var =
-        Int_storage.Nearly_inf_Imperatif.get
+        (*Int_storage.Nearly_inf_Imperatif.get*)
+        Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
           parameters
           error
-          var_id
+          (Ckappa_sig.rule_id_of_int var_id)
           vars
       in
       match var
       with
       | None  -> warn parameters error (Some "line 12299") Exit
-        ("VAR "^(string_of_int var_id))
+        ("VAR " ^ (string_of_int var_id))
       | Some _ ->
            (*TO DO*)
         error,"ALG"
@@ -323,14 +325,21 @@ let print_rule_txt parameters error rule_id m1 m2 rule =
   let error, _ = error,
     Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s"
       (if m = ""
-       then ("rule(" ^ (string_of_int rule_id) ^ "): ")
-       else ("rule(" ^ string_of_int rule_id) ^ "):"^ m) in
+       then ("rule(" ^ (Ckappa_sig.string_of_rule_id rule_id) ^ "): ")
+       else ("rule(" ^ Ckappa_sig.string_of_rule_id rule_id) ^ "):"^ m) in
   let error = Print_ckappa.print_rule parameters error rule in
   error
 
 let print_var_txt parameters error var_id m1 m2 var =
   let m = "'"^m1^"' " in
-  let error,_ = error,Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" (if m="" then ("var("^(string_of_int var_id)^")") else ("var("^string_of_int var_id)^"):"^m) in
+  let error,_ =
+    error, Loggers.fprintf
+      (Remanent_parameters.get_logger parameters)
+      "%s" 
+      (if m="" 
+       then 
+          ("var(" ^ (string_of_int var_id)^")")
+       else ("var(" ^ string_of_int var_id)^"):"^m) in
   let error = Print_ckappa.print_alg parameters error var  in
   error
 
@@ -368,11 +377,12 @@ let print_rule_or_var parameters error handler compiled print_rule print_var get
   let rules = compiled.Cckappa_sig.rules in
   let vars = compiled.Cckappa_sig.variables in
   let nrules = nrules parameters error handler in
-  if rule_id<nrules
+  if (Ckappa_sig.int_of_rule_id rule_id) < nrules
   then
     begin
       let error,rule =
-        Int_storage.Nearly_inf_Imperatif.get
+        (*Int_storage.Nearly_inf_Imperatif.get*)
+        Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
           parameters
           error
           rule_id
@@ -401,19 +411,20 @@ let print_rule_or_var parameters error handler compiled print_rule print_var get
             error
             rule_id
             m1
-            (string_of_int rule_id)
+            (Ckappa_sig.string_of_rule_id rule_id)
             rule.Cckappa_sig.e_rule_rule
         in
         error,true,()
     end
   else
     begin
-      let var_id = rule_id - nrules in
+      let var_id = (Ckappa_sig.int_of_rule_id rule_id) - nrules in
       let error,var =
-        Int_storage.Nearly_inf_Imperatif.get
+        (*Int_storage.Nearly_inf_Imperatif.get*)
+        Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
           parameters
           error
-          var_id
+          (Ckappa_sig.rule_id_of_int var_id)
           vars
       in
       match var

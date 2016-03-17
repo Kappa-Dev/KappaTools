@@ -457,7 +457,8 @@ struct
 		  Handler.string_of_rule parameter error kappa_handler
 		    compiled rule_id
 	        with
-		  _ -> warn parameter error (Some "line 250") Exit (string_of_int rule_id)
+		  _ -> warn parameter error (Some "line 250") Exit 
+                    (Ckappa_sig.string_of_rule_id rule_id)
 	      in
 	      let tab =
 	        if title = "" then "\t" else "\t\t"

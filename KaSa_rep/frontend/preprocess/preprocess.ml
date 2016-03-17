@@ -1446,10 +1446,26 @@ let translate_c_compil parameters error handler compil =
       (error,[]) (List.rev c_rules) 
   in 
   let n_vars = List.length c_variables in 
-  let error,c_variables = Misc_sa.array_of_list Int_storage.Nearly_inf_Imperatif.create Int_storage.Nearly_inf_Imperatif.set parameters error (List.rev c_variables) in   
+  let error,c_variables =
+    Misc_sa.array_of_list_rule_id
+      (*Int_storage.Nearly_inf_Imperatif.create
+      Int_storage.Nearly_inf_Imperatif.set*)
+      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.create
+      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.set
+      parameters
+      error 
+      (List.rev c_variables) 
+  in   
   let error,c_signatures = Misc_sa.array_of_list Int_storage.Nearly_inf_Imperatif.create Int_storage.Nearly_inf_Imperatif.set parameters error (List.rev c_signatures) in  
   let n_rules = List.length c_rules in 
-  let error,c_rules = Misc_sa.array_of_list Int_storage.Nearly_inf_Imperatif.create Int_storage.Nearly_inf_Imperatif.set parameters error (List.rev c_rules) in  
+  let error,c_rules = 
+    Misc_sa.array_of_list_rule_id
+      (*Int_storage.Nearly_inf_Imperatif.create
+      Int_storage.Nearly_inf_Imperatif.set*)
+      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.create
+      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.set
+      parameters error (List.rev c_rules) 
+  in  
   let error,c_observables = Misc_sa.array_of_list Int_storage.Nearly_inf_Imperatif.create Int_storage.Nearly_inf_Imperatif.set parameters error (List.rev c_observables) in   
   let error,c_inits = Misc_sa.array_of_list Int_storage.Nearly_inf_Imperatif.create Int_storage.Nearly_inf_Imperatif.set parameters error (List.rev c_inits) in  
   let error,c_perturbations = Misc_sa.array_of_list Int_storage.Nearly_inf_Imperatif.create Int_storage.Nearly_inf_Imperatif.set parameters error (List.rev c_perturbations) in  

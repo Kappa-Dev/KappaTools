@@ -165,7 +165,8 @@ let scan_rule_set parameter error handler rules =
   in
   (*------------------------------------------------------------------------------*)
   let error, stochastic_class =
-    Int_storage.Nearly_inf_Imperatif.fold
+    (*Int_storage.Nearly_inf_Imperatif.fold*)
+    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
       parameter error
       (fun parameter error rule_id rule stochastic_class ->
        (*------------------------------------------------------------------------*)

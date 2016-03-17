@@ -288,11 +288,19 @@ let filter_influence parameters error handler compilation map bool =
     in
     check parameters error handler (get_bool rule1) mixt (updt_pos pos)
   in
-  Quark_type.Int2SetMap.Map.fold
+  (*Quark_type.Int2SetMap.Map.fold*)
+  Ckappa_sig.PairRule_setmap.Map.fold
     (fun (a,b) couple (error,map') ->
      try 
        begin 
-	 let error,rule1 = Int_storage.Nearly_inf_Imperatif.get parameters error a compilation.Cckappa_sig.rules in
+	 let error,rule1 =
+           (*Int_storage.Nearly_inf_Imperatif.get*)
+           Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
+             parameters 
+             error
+             a 
+             compilation.Cckappa_sig.rules 
+         in
 	 let error,r1 =
 	   match rule1
 	   with
@@ -303,22 +311,39 @@ let filter_influence parameters error handler compilation map bool =
 	 in
 	 let error,mixt =
 	   if
-	     b<nrules
+	     (Ckappa_sig.int_of_rule_id b) < nrules
 	   then
 	     begin
-	       let error,rule2 = Int_storage.Nearly_inf_Imperatif.get parameters error b compilation.Cckappa_sig.rules in 
+	       let error,rule2 =
+                 (*Int_storage.Nearly_inf_Imperatif.get*)
+                 Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
+                   parameters 
+                   error
+                   b 
+                   compilation.Cckappa_sig.rules
+               in 
 	       match rule2 with
 	       | None ->
-		  let error,() = warn parameters error (Some ("Missing rule"^(string_of_int b))) Exit ()
+		  let error,() = warn parameters error 
+                    (Some ("Missing rule"^ (Ckappa_sig.string_of_rule_id b))) Exit ()
 		  in raise (Pass error)
-	       | Some r -> error,get_lhs r 
+	       | Some r -> error, get_lhs r 
 	     end
 	   else
 	     begin
-	       let error,var = Int_storage.Nearly_inf_Imperatif.get parameters error (b-nrules) compilation.Cckappa_sig.variables in
+	       let error,var = 
+                 (*Int_storage.Nearly_inf_Imperatif.get*)
+                 Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
+                   parameters 
+                   error
+                   (Ckappa_sig.rule_id_of_int ((Ckappa_sig.int_of_rule_id b) - nrules))
+                   compilation.Cckappa_sig.variables
+               in
 	       match var with
 	       | None ->
-		  let error,() = warn parameters error (Some ("Missing var"^(string_of_int (b-nrules)))) Exit ()
+		  let error,() = warn parameters error
+                    (Some ("Missing var" ^ 
+                              (string_of_int ((Ckappa_sig.int_of_rule_id b) - nrules)))) Exit ()
 		  in raise (Pass error)
 	       | Some v -> get_var v
 	 end
@@ -342,9 +367,15 @@ let filter_influence parameters error handler compilation map bool =
 	 in 
 	 if Quark_type.Labels.is_empty_couple couple'
 	 then  error,map'
-	 else error,Quark_type.Int2SetMap.Map.add (a,b) couple' map'
+	 else error,
+           (*Quark_type.Int2SetMap.Map.add*)
+           Ckappa_sig.PairRule_setmap.Map.add
+             (a,b) couple' map'
      end
      with Pass error -> (error,map')
     )
     map 
-    (error,Quark_type.Int2SetMap.Map.empty)
+    (error, 
+     Ckappa_sig.PairRule_setmap.Map.empty
+     (*Quark_type.Int2SetMap.Map.empty*)
+    )

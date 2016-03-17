@@ -188,11 +188,13 @@ val dummy_init: Remanent_parameters_sig.parameters -> Exception.method_handler -
 
 type compil =
   {
-    variables : enriched_variable Int_storage.Nearly_inf_Imperatif.t ;
+    variables : enriched_variable Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t
+ (*Int_storage.Nearly_inf_Imperatif.t*) ;
     (*pattern declaration for reusing as variable in perturbations or kinetic rate*)
     signatures : (agent_sig (** position*)) Int_storage.Nearly_inf_Imperatif.t;
     (*agent signature declaration*)
-    rules : enriched_rule Int_storage.Nearly_inf_Imperatif.t  ;
+    rules : enriched_rule Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t
+      (*Int_storage.Nearly_inf_Imperatif.t*);
     (*rules (possibly named)*)
     observables :
       (mixture,string) Ast.ast_alg_expr Location.annot Int_storage.Nearly_inf_Imperatif.t;

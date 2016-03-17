@@ -99,7 +99,7 @@ struct
 		    compil rule_id
                 with
                   _ -> warn parameter error (Some "line 99") Exit
-		    (string_of_int rule_id)
+		    (Ckappa_sig.string_of_rule_id rule_id)
               in
               let () = Loggers.print_newline log in
               let () = Loggers.fprintf log "\tApplying %s:" rule_id_string in

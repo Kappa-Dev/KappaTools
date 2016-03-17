@@ -78,8 +78,11 @@ struct
   type static_information =
     Analyzer_headers.global_static_information * Domain.static_information
 
-  type working_list =
-    Fifo.IntWL.WSetMap.elt list * Fifo.IntWL.WSetMap.elt list * Fifo.IntWL.WSetMap.Set.t
+  type working_list = (*CHECK*)
+    (*Fifo.IntWL.WSetMap.elt list * Fifo.IntWL.WSetMap.elt list * Fifo.IntWL.WSetMap.Set.t*)
+    (*Ckappa_sig.Rule_FIFO.elt list * Ckappa_sig.Rule_FIFO.elt list **)
+      Ckappa_sig.Rule_FIFO.t
+      (*Fifo.IntWL.WSetMap.Set.t*)
 
   type dynamic_information =
     {
@@ -97,7 +100,7 @@ struct
 
   let get_compil static = lift Analyzer_headers.get_cc_code static
 
-  let empty_working_list = Fifo.IntWL.empty
+  let empty_working_list = Ckappa_sig.Rule_FIFO.empty
 
   type 'a zeroary =
     static_information
@@ -140,7 +143,12 @@ struct
     let working_list = get_working_list dynamic in
     let parameter = get_parameter static in
     let error, rule_working_list =
-      Fifo.IntWL.push parameter error r_id working_list
+      (*Fifo.IntWL.push*)
+      Ckappa_sig.Rule_FIFO.push
+        parameter
+        error
+        r_id
+        working_list
     in
     let dynamic = set_working_list rule_working_list dynamic in
     error, dynamic
@@ -151,12 +159,17 @@ struct
   let next_rule static dynamic error =
     let working_list = get_working_list dynamic in
     (* see if the working list is empty, if not pop an element *)
-    if Fifo.IntWL.is_empty working_list
+    if 
+      (*Fifo.IntWL.is_empty*)
+      Ckappa_sig.Rule_FIFO.is_empty
+        working_list
     then error, dynamic, None
     else
       let parameter = get_parameter static in
       let error, (rule_id_op, working_list_tail) =
-        Fifo.IntWL.pop parameter error working_list
+        (*Fifo.IntWL.pop*)
+        Ckappa_sig.Rule_FIFO.pop
+          parameter error working_list
       in
       let dynamic = set_working_list working_list_tail dynamic in
       error, dynamic, rule_id_op
@@ -167,7 +180,10 @@ struct
     let error, dynamic =
       List.fold_left (fun (error, dynamic) (agent_id, agent_type) ->
         let error, agent =
-          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get parameter error agent_id
+          Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
+            parameter
+            error
+            agent_id
             rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
         in
         match agent with
@@ -189,7 +205,8 @@ struct
     let compil = get_compil static in
     let rules = compil.Cckappa_sig.rules in
     let error, dynamic =
-      Int_storage.Nearly_inf_Imperatif.fold
+      (*Int_storage.Nearly_inf_Imperatif.fold*)
+      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
         parameter error
         (fun parameter error rule_id rule dynamic ->
           let error, dynamic =

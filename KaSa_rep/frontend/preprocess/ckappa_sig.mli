@@ -25,15 +25,16 @@ type internal_state = string
     
 type c_agent_name
 type c_site_name
-type c_state (*TODO*)
+type c_state
+type c_rule_id
 type c_agent_id = int
-type c_rule_id = int
 
 (****************************************************************************************)
 
 val dummy_agent_name : c_agent_name
 val dummy_site_name : c_site_name
 val dummy_state_index : c_state
+val dummy_rule_id : c_rule_id
 
 val dummy_site_name_1 : c_site_name
 val dummy_site_name_minus1 : c_site_name
@@ -51,6 +52,10 @@ val string_of_site_name : c_site_name -> string
 val state_index_of_int: int -> c_state
 val int_of_state_index: c_state -> int
 val string_of_state_index : c_state -> string
+
+val int_of_rule_id : c_rule_id -> int
+val rule_id_of_int : int -> c_rule_id
+val string_of_rule_id : c_rule_id -> string
 
 (*use in views_domain.ml *)
 val state_index_of_site_name : c_site_name -> c_state
@@ -90,6 +95,15 @@ module State_index_quick_nearly_Inf_Int_storage_Imperatif: Int_storage.Storage
   with type key = c_state
   and type dimension = int
 
+
+module Rule_nearly_Inf_Int_storage_Imperatif: Int_storage.Storage
+   with type key = c_rule_id
+   and type dimension = int
+
+module Rule_quick_nearly_Inf_Int_storage_Imperatif : Int_storage.Storage
+  with type key = c_rule_id
+  and type dimension = int
+
 module Site_union_find: Union_find.Union_find
   with type t = c_site_name Site_type_nearly_Inf_Int_storage_Imperatif.t   
   and type dimension = int
@@ -101,6 +115,12 @@ module Site_union_find: Union_find.Union_find
 module Mvbdu_ckappa_sig : Mvbdu_wrapper.Mvbdu
   with type key = c_site_name
   and type value = c_state
+
+(****************************************************************************************)
+(*FIFO*)
+
+module Rule_FIFO : Fifo.Work_list
+  with type elt = c_rule_id
 
 (****************************************************************************************)
 
@@ -137,6 +157,8 @@ module PairAgentSiteState_map_and_set: Map_wrapper.S_with_logs
   (c_agent_name * c_site_name * c_state) * (c_agent_name * c_site_name * c_state)
 
 module Rule_setmap: SetMap.S with type elt = c_rule_id
+
+module PairRule_setmap : SetMap.S with type elt = c_rule_id * c_rule_id
 
 module Views_bdu: Mvbdu_wrapper.Mvbdu with type key = c_site_name and type value = c_state
 

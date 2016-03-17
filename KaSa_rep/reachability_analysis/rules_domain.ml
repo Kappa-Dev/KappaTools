@@ -130,9 +130,9 @@ struct
   *)
     }
   *)
-  let is_enabled static dynamic error rule_id precondition =
+  let is_enabled static dynamic error (rule_id:Ckappa_sig.c_rule_id) precondition =
     let bool_array = get_dead_rule dynamic in
-    let bool = Array.get bool_array rule_id in
+    let bool = Array.get bool_array (Ckappa_sig.int_of_rule_id rule_id) in
     if not bool
     then
       let error, precondition =
@@ -162,15 +162,15 @@ struct
     let error, rule_id_string =
       try Handler.string_of_rule parameter error kappa_handler compil rule_id
       with
-        _ -> warn parameter error (Some "line 165") Exit (string_of_int rule_id)
+        _ -> warn parameter error (Some "line 165") Exit (Ckappa_sig.string_of_rule_id rule_id)
     in
     (*print*)
     let dynamic =
-      let bool = Array.get dead_rule_array rule_id in
+      let bool = Array.get dead_rule_array (Ckappa_sig.int_of_rule_id rule_id) in
       if not bool
       then
         let dead_rule_array =
-          dead_rule_array.(rule_id) <- true;
+          dead_rule_array.((Ckappa_sig.int_of_rule_id rule_id)) <- true;
           dead_rule_array
         in
         let dynamic =
@@ -233,9 +233,9 @@ struct
       let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
       let size = Array.length result in
       let rec aux k error =
-        if k = size then error
+        if (Ckappa_sig.int_of_rule_id k) = size then error
         else
-	  let bool = Array.get result k in
+	  let bool = Array.get result (Ckappa_sig.int_of_rule_id k) in
 	  let error =
 	    if bool
 	    then
@@ -245,7 +245,7 @@ struct
                 try
                   Handler.string_of_rule parameter error handler compiled k
                 with
-                  _ -> warn parameter error (Some "line 249") Exit (string_of_int k)
+                  _ -> warn parameter error (Some "line 249") Exit (Ckappa_sig.string_of_rule_id k)
 	      in
 	      let error =
                 Exception.check warn parameter error error' (Some "line 252") Exit
@@ -255,8 +255,11 @@ struct
 	      in
 	      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
 	      error
-	  in aux (k+1) error
-      in aux 0 error
+	  in 
+          aux
+            (Ckappa_sig.rule_id_of_int ((Ckappa_sig.int_of_rule_id k) + 1))
+            error
+      in aux Ckappa_sig.dummy_rule_id error
     else
       error
 

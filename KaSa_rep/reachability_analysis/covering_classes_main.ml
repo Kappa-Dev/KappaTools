@@ -225,7 +225,8 @@ let scan_rule_set_covering_classes parameter error handler rules =
   (*------------------------------------------------------------------------------*)
   (*map each agent to a list of covering classes*)
   let error, store_covering_classes =
-    Int_storage.Nearly_inf_Imperatif.fold
+    (*Int_storage.Nearly_inf_Imperatif.fold*)
+    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
       parameter error
       (fun parameter error rule_id rule classes ->
         let error, result =

@@ -217,7 +217,8 @@ struct
     let parameter = get_parameter static in
     let compil = get_compil static in
     let error, (result, agents) =
-      Int_storage.Nearly_inf_Imperatif.fold
+      (*Int_storage.Nearly_inf_Imperatif.fold*)
+      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
         parameter error
         (fun parameter error rule_id rule (store_result, agents_without_interface) ->
           let error, (agents_test_list, agents_created_list) =
@@ -228,7 +229,7 @@ struct
           in
           (*add rule_id in map*)
           let error, result =
-            Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite (*FIXME*)
+            Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
               parameter 
               error 
               rule_id

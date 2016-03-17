@@ -22,14 +22,14 @@ module Label = Influence_labels.Int_labels
 
 module Labels = Influence_labels.Extensive(Label)
 
-module IntSetMap = 
+module IntSetMap = (*REMOVE*)
   SetMap.Make
     (struct
       type t = int
       let compare = compare
      end)
 
-module Int2SetMap =
+module Int2SetMap = (*REMOVE*)
   SetMap.Make
     (struct 
       type t = int * int 
@@ -68,42 +68,67 @@ module DeadSiteMap= Int_storage.Extend
 
 type agents_quarks =
   Labels.label_set
-    Int_storage.Quick_Nearly_inf_Imperatif.t
+    (*Int_storage.Quick_Nearly_inf_Imperatif.t*)
+    Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.t
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t  
+
+(*for var*)
+(*type agents_var_quarks =
+  Labels.label_set
+    Int_storage.Quick_Nearly_inf_Imperatif.t
+    (*Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.t*)
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t *)
     
-type sites_quarks = Labels.label_set Int_storage.Quick_Nearly_inf_Imperatif.t SiteMap.t 
+type sites_quarks = Labels.label_set 
+  (*Int_storage.Quick_Nearly_inf_Imperatif.t*)
+  Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.t
+  SiteMap.t 
+
+(*type sites_var_quarks = Labels.label_set 
+  Int_storage.Quick_Nearly_inf_Imperatif.t
+  (*Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.t*)
+  SiteMap.t*)
   
 type quarks = 
   {
      dead_agent: Labels.label_set 
-     Int_storage.Quick_Nearly_inf_Imperatif.t  
+     (*Int_storage.Quick_Nearly_inf_Imperatif.t*)  
+     Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.t
      StringMap.Map.t ;
      dead_sites: Labels.label_set 
-       Int_storage.Quick_Nearly_inf_Imperatif.t
+       (*Int_storage.Quick_Nearly_inf_Imperatif.t*)
+       Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.t
        Cckappa_sig.KaSim_Site_map_and_set.Map.t
        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t ;
      dead_states: Labels.label_set 
-       Int_storage.Quick_Nearly_inf_Imperatif.t 
+       (*Int_storage.Quick_Nearly_inf_Imperatif.t*)
+       Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.t
        DeadSiteMap.t;
      dead_agent_plus: Labels.label_set 
-       Int_storage.Quick_Nearly_inf_Imperatif.t  
+       (*Int_storage.Quick_Nearly_inf_Imperatif.t*)
+       Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.t
        StringMap.Map.t ;
      dead_sites_plus: Labels.label_set 
-       Int_storage.Quick_Nearly_inf_Imperatif.t
+       (*Int_storage.Quick_Nearly_inf_Imperatif.t*)
+       Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.t
        Cckappa_sig.KaSim_Site_map_and_set.Map.t
        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t ;
      dead_states_plus: Labels.label_set 
-       Int_storage.Quick_Nearly_inf_Imperatif.t  
+       (*Int_storage.Quick_Nearly_inf_Imperatif.t*)  
+       Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.t
        DeadSiteMap.t;
      dead_agent_minus: Labels.label_set 
-       Int_storage.Quick_Nearly_inf_Imperatif.t  
+       (*Int_storage.Quick_Nearly_inf_Imperatif.t*)  
+       Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.t
        StringMap.Map.t ;
      dead_sites_minus: Labels.label_set
-       Int_storage.Quick_Nearly_inf_Imperatif.t
+       (*Int_storage.Quick_Nearly_inf_Imperatif.t*)
+       Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.t
        Cckappa_sig.KaSim_Site_map_and_set.Map.t 
        Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t ;
      dead_states_minus: Labels.label_set 
-       Int_storage.Quick_Nearly_inf_Imperatif.t
+       (*Int_storage.Quick_Nearly_inf_Imperatif.t*)
+       Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.t
        DeadSiteMap.t;
      agent_modif_plus:  agents_quarks ;
      agent_modif_minus: agents_quarks ; 
@@ -117,7 +142,7 @@ type quarks =
      site_var_plus : sites_quarks ; 
   }
 
-type influence_map = Labels.label_set_couple Int2SetMap.Map.t
+type influence_map = Labels.label_set_couple (*Int2SetMap.Map.t*)Ckappa_sig.PairRule_setmap.Map.t
 
 type influence_maps = 
   {

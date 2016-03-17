@@ -1121,7 +1121,9 @@ let scan_rule_set parameter error handler_kappa compiled =
   in
   (*----------------------------------------------------------------------*)
   let error, store_result =
-    Int_storage.Nearly_inf_Imperatif.fold parameter error
+    (*Int_storage.Nearly_inf_Imperatif.fold*)
+    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
+      parameter error
       (fun parameter error rule_id rule store_result ->
         (*----------------------------------------------------------------------*)
         (*PRINT*)
@@ -1138,7 +1140,7 @@ let scan_rule_set parameter error handler_kappa compiled =
                 try
                   Handler.string_of_rule parameter error handler_kappa compiled rule_id
                 with
-                  _ -> warn parameter error (Some "line 1010") Exit (string_of_int rule_id)
+                  _ -> warn parameter error (Some "line 1010") Exit (Ckappa_sig.string_of_rule_id rule_id)
               in
               Printf.fprintf stdout "%s\n" rule_string
             else ()

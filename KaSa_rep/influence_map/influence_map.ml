@@ -16,45 +16,68 @@ let warn parameters mh message exn default =
      Exception.warn parameters mh (Some "Influence_map") message exn (fun () -> default) 
 
 let local_trace = true
-                                                     
-let generic_add fold2_common agent_diag rule_diag parameters error handler n a b c = 
+  
+let generic_add fold2_common agent_diag rule_diag parameters error handler (n:int) a b c = 
   fold2_common
-     parameters 
-     error 
-     (fun parameters error _ a b map -> 
-        Int_storage.Quick_Nearly_inf_Imperatif.fold 
-           parameters 
-           error 
-           (fun parameters error rule a map -> 
-               Int_storage.Quick_Nearly_inf_Imperatif.fold 
-                    parameters 
-                    error 
-                    (fun parameters error rule' a' map -> 
-                        let rule' = n + rule' in 
-                        if (not rule_diag && rule = rule') 
-			then 
-                          (error,map) 
-                        else 
-                          let key = rule,rule' in 
-                          let old =
-			    Quark_type.Int2SetMap.Map.find_default
-			      Quark_type.Labels.empty_couple key map in
-			  let error,couple =
-			    Quark_type.Labels.add_couple
-			      parameters error (agent_diag || not (rule = rule')) a a' old in
-			  error,if Quark_type.Labels.is_empty_couple couple
-			  then map
-			  else 
-			    Quark_type.Int2SetMap.Map.add key couple map)
-                 b 
-                 map)
-          a
-          map)
+    parameters 
+    error 
+    (fun parameters error _ a b map -> 
+       (*Int_storage.Quick_Nearly_inf_Imperatif.fold*) 
+      Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.fold
+        parameters 
+        error 
+        (fun parameters error (rule:Ckappa_sig.c_rule_id) a map -> 
+             (*Int_storage.Quick_Nearly_inf_Imperatif.fold*)
+          Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.fold
+            parameters 
+            error 
+            (fun parameters error (rule':Ckappa_sig.c_rule_id) a' map -> 
+              let rule' = Ckappa_sig.rule_id_of_int (n + (Ckappa_sig.int_of_rule_id rule')) in 
+              if (not rule_diag && rule = rule') 
+	      then 
+                (error,map) 
+              else 
+                let key = rule, rule' in 
+                let old =
+			    (*Quark_type.Int2SetMap.Map.find_default*)
+                  Ckappa_sig.PairRule_setmap.Map.find_default
+		    Quark_type.Labels.empty_couple
+                    key 
+                    map 
+                in
+		let error,couple =
+		  Quark_type.Labels.add_couple
+		    parameters
+                    error
+                    (agent_diag ||
+                       not (rule = rule')) 
+                    a 
+                    a'
+                    old
+                in
+		error,if Quark_type.Labels.is_empty_couple couple
+		  then map
+		  else 
+		    (*Quark_type.Int2SetMap.Map.add*)
+                    Ckappa_sig.PairRule_setmap.Map.add
+                      key
+                      couple
+                      map)
+            b 
+            map)
+        a
+        map)
     a b c 
 
 let compute_influence_map parameters error handler quark_maps nrules = 
-  let wake_up_map = Quark_type.Int2SetMap.Map.empty in 
-  let inhibition_map  = Quark_type.Int2SetMap.Map.empty in 
+  let wake_up_map = 
+    (*Quark_type.Int2SetMap.Map.empty*)
+    Ckappa_sig.PairRule_setmap.Map.empty
+  in 
+  let inhibition_map =
+    (*Quark_type.Int2SetMap.Map.empty*)
+    Ckappa_sig.PairRule_setmap.Map.empty
+  in 
   let error,wake_up_map = 
     generic_add 
       (*Quark_type.AgentMap.fold2_common*)

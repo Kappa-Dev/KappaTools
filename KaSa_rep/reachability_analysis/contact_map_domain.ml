@@ -303,7 +303,8 @@ struct
     let parameter = get_parameter static in
     let compil = get_compil static in
     let error, static =
-      Int_storage.Nearly_inf_Imperatif.fold
+      (*Int_storage.Nearly_inf_Imperatif.fold*)
+      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
         parameter
         error
         (fun parameter error rule_id rule static ->

@@ -323,7 +323,9 @@ let scan_rule_set_dynamic parameter error compiled handler_bdu
     store_covering_classes_id
     store_potential_side_effects =
   let error, (handler_bdu, store_result) =
-    Int_storage.Nearly_inf_Imperatif.fold parameter error
+    (*Int_storage.Nearly_inf_Imperatif.fold parameter error*)
+    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
+      parameter error
       (fun parameter error rule_id rule (handler_bdu, store_result) ->
         let error, handler_bdu, store_result =
           scan_rule_dynamic

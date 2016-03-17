@@ -67,16 +67,24 @@ let empty_quarks parameter error handler =
   }
   
 let add_generic get set parameter error rule_id agent_id key map = 
-  let error,old_agent = 
-    match get parameter error key map 
-    with 
+  let error, old_agent = 
+    match get parameter error key map with 
       | error,None -> 
-        Int_storage.Quick_Nearly_inf_Imperatif.create parameter error 0
-      | error,Some x -> error, x
+        (*Int_storage.Quick_Nearly_inf_Imperatif.create*) (*TODO: agent_name*)
+        Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.create
+          parameter
+          error
+          0
+      | error, Some x -> error, x
   in 
   let error,old_label_set = 
-    match Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get 
-      parameter error rule_id old_agent 
+    match 
+      (*Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get*)
+      Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+      parameter
+        error
+        rule_id 
+        old_agent 
     with 
       | error,None -> error, Quark_type.Labels.empty 
       | error,Some x -> error,x 
@@ -87,14 +95,19 @@ let add_generic get set parameter error rule_id agent_id key map =
     error,map
   else 
     let error,new_agent = 
-       Int_storage.Quick_Nearly_inf_Imperatif.set
-         parameter error rule_id new_label_set old_agent
+      (*Int_storage.Quick_Nearly_inf_Imperatif.set*)
+      Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.set
+         parameter
+         error
+         rule_id
+         new_label_set
+         old_agent
     in 
       set parameter error key new_agent map  
             
 let add_agent parameters error rule_id agent_id agent_type =
   let _ = Misc_sa.trace parameters (fun () -> "rule_id:"^ 
-    (string_of_int rule_id)^",agent_type:"^
+    (Ckappa_sig.string_of_rule_id rule_id)^",agent_type:"^
     (Ckappa_sig.string_of_agent_name agent_type)^"\n")
   in 
   add_generic 
@@ -108,7 +121,7 @@ let add_agent parameters error rule_id agent_id agent_type =
 
 let add_var parameters error var_id agent_id agent_type =
   let _ = Misc_sa.trace parameters (fun () ->
-    "var_id:"^ (string_of_int var_id) ^
+    "var_id:"^ (Ckappa_sig.string_of_rule_id var_id) ^
       ",agent_type:" ^ 
       (Ckappa_sig.string_of_agent_name agent_type)^"\n")
   in 
@@ -124,7 +137,7 @@ let add_var parameters error var_id agent_id agent_type =
 let add_site parameters error rule_id agent_id agent_type site_type state =
   let _ = Misc_sa.trace parameters (fun () -> 
     "rule_id:" ^ 
-      (string_of_int rule_id) ^ 
+      (Ckappa_sig.string_of_rule_id rule_id) ^ 
       ",agent_type:" ^ 
       (Ckappa_sig.string_of_agent_name agent_type) ^ 
       ",site_type:" ^ 
@@ -142,7 +155,9 @@ let add_site parameters error rule_id agent_id agent_type site_type state =
     (agent_type, (site_type, state))
 
 let add_site_var parameters error var_id agent_id agent_type site_type state =
-  let _ = Misc_sa.trace parameters (fun () -> "var_id:"^(string_of_int var_id) ^ 
+  let _ = Misc_sa.trace parameters (fun () -> 
+    "var_id:" ^ 
+      (Ckappa_sig.string_of_rule_id var_id) ^ 
     ",agent_type:" ^ 
     (Ckappa_sig.string_of_agent_name agent_type) ^ 
     ",site_type:" ^ 
@@ -150,7 +165,14 @@ let add_site_var parameters error var_id agent_id agent_type site_type state =
     ",state:" ^
     (Ckappa_sig.string_of_state_index state)^"\n")
   in
-  add_generic Quark_type.SiteMap.unsafe_get Quark_type.SiteMap.set parameters error var_id agent_id (agent_type,(site_type,state))
+  add_generic 
+    Quark_type.SiteMap.unsafe_get
+    Quark_type.SiteMap.set 
+    parameters 
+    error
+    var_id
+    agent_id
+    (agent_type, (site_type, state))
 	      
 let add_half_bond_breaking parameter error handler rule_id agent_id 
     agent_type site k (site_modif_plus,site_modif_minus) = 
@@ -168,7 +190,7 @@ let add_half_bond_breaking parameter error handler rule_id agent_id
 let add_dead_state s parameters error var_id agent_id agent_type site_type =
   let _ = Misc_sa.trace parameters (fun () ->
     s ^ "_id:" ^ 
-      (string_of_int var_id) ^ 
+      (Ckappa_sig.string_of_rule_id var_id) ^ 
       ",agent_type:" ^ 
       (Ckappa_sig.string_of_agent_name agent_type) ^ 
       ",site_type:" ^ 
@@ -186,7 +208,7 @@ let add_dead_state s parameters error var_id agent_id agent_type site_type =
 let add_dead_agent s parameters error rule_id agent_id agent_type map =
   let _ = Misc_sa.trace parameters (fun () ->
     s ^"_id:"^ 
-      (string_of_int rule_id) ^ 
+      (Ckappa_sig.string_of_rule_id rule_id) ^ 
       ",agent_type:" ^ 
       agent_type ^ 
       "(Dead agent)\n")
@@ -195,13 +217,21 @@ let add_dead_agent s parameters error rule_id agent_id agent_type map =
     match Quark_type.StringMap.Map.find_option agent_type map 
     with 
       | None -> 
-        Int_storage.Quick_Nearly_inf_Imperatif.create parameters error 0
+        (*Int_storage.Quick_Nearly_inf_Imperatif.create*) (*TODO: agent_name*)
+        Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.create
+          parameters
+        error
+        0
       | Some x -> error,x
   in 
   let error,old_label_set = 
     match 
-      Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get
-        parameters error rule_id old_agent 
+      (*Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get*)
+      Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+        parameters
+        error
+        rule_id
+        old_agent 
     with 
       | error,None -> error, Quark_type.Labels.empty 
       | error,Some x -> error,x 
@@ -212,8 +242,13 @@ let add_dead_agent s parameters error rule_id agent_id agent_type map =
     error,map
   else 
     let error,new_agent = 
-       Int_storage.Quick_Nearly_inf_Imperatif.set 
-         parameters error rule_id new_label_set old_agent
+      (*Int_storage.Quick_Nearly_inf_Imperatif.set *)
+      Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.set
+         parameters 
+         error 
+         rule_id
+         new_label_set
+         old_agent
     in 
     error,
     Quark_type.StringMap.Map.add agent_type new_agent map
@@ -221,7 +256,7 @@ let add_dead_agent s parameters error rule_id agent_id agent_type map =
 let add_dead_sites s parameters error rule_id agent_id agent_type site map =
   let _ = Misc_sa.trace parameters (fun () ->
     s ^ "_id:"^ 
-      (string_of_int rule_id) ^ 
+      (Ckappa_sig.string_of_rule_id rule_id) ^ 
       ",agent_type:" ^ 
       (Ckappa_sig.string_of_agent_name agent_type) ^ 
       "site: todo (Dead site)\n")
@@ -249,11 +284,17 @@ let add_dead_sites s parameters error rule_id agent_id agent_type site map =
     (* this is a partial map, not associated key are implicitely associated
        to an empty map *)
     | error, None -> 
-      Int_storage.Quick_Nearly_inf_Imperatif.create parameters error 0
+      (*Int_storage.Quick_Nearly_inf_Imperatif.create*) (*TODO: agent_name*)
+      Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.create
+        parameters
+        error
+        0
     | error, Some x -> error, x
   in
   let error, old_label_set = 
-    match Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get
+    match 
+      (*Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get*)
+      Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
       parameters
       error 
       rule_id 
@@ -268,8 +309,13 @@ let add_dead_sites s parameters error rule_id agent_id agent_type site map =
     error, map
   else
     let error,new_site = 
-      Int_storage.Quick_Nearly_inf_Imperatif.set
-        parameters error rule_id new_label_set old_site
+      (*Int_storage.Quick_Nearly_inf_Imperatif.set*)
+      Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.set
+        parameters
+        error
+        rule_id 
+        new_label_set
+        old_site
     in
     let error, new_agent =
       Cckappa_sig.KaSim_Site_map_and_set.Map.add_or_overwrite
@@ -761,22 +807,30 @@ let scan_rule parameter error handler rule_id rule quarks =
     
 let scan_rule_set parameter error handler rules = 
   let error,init = empty_quarks parameter error handler in 
-  Int_storage.Nearly_inf_Imperatif.fold 
+  (*Int_storage.Nearly_inf_Imperatif.fold*) 
+  Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
     parameter 
     error 
     (fun parameter error rule_id rule quark_maps -> 
-      let _ = Misc_sa.trace parameter (fun () -> "Rule "^string_of_int rule_id^"\n") in 
-      scan_rule parameter error handler rule_id rule.Cckappa_sig.e_rule_c_rule  quark_maps)
+      let _ = Misc_sa.trace parameter (fun () -> "Rule "^ Ckappa_sig.string_of_rule_id rule_id^"\n") in 
+      scan_rule 
+        parameter
+        error
+        handler
+        rule_id 
+        rule.Cckappa_sig.e_rule_c_rule
+        quark_maps)
     rules
     init 
     
 let scan_var_set parameter error handler vars quarks = 
-  Int_storage.Nearly_inf_Imperatif.fold 
+  (*Int_storage.Nearly_inf_Imperatif.fold*)
+  Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
     parameter 
     error 
     (fun parameter error var_id var quark_maps -> 
       let (_,(var,_))=var.Cckappa_sig.e_variable in 
-      let _ = Misc_sa.trace parameter (fun () -> "Var "^string_of_int var_id^"\n") in 
+      let _ = Misc_sa.trace parameter (fun () -> "Var "^ Ckappa_sig.string_of_rule_id var_id^"\n") in 
       scan_var 
 	parameter
 	error 

@@ -43,6 +43,7 @@ type c_rule_id    = int
 let dummy_agent_name = 0
 let dummy_site_name = 0
 let dummy_state_index = 0
+let dummy_rule_id = 0
 
 let dummy_site_name_1 = 1
 let dummy_site_name_minus1 = -1 (*Use in views_domain*)
@@ -61,6 +62,10 @@ let state_index_of_int (a:int) : c_state = a
 let int_of_state_index (a:c_state) : int = a
 let string_of_state_index (a:c_state) : string = string_of_int a
 
+let int_of_rule_id (a: c_rule_id) : int = a
+let rule_id_of_int (a: int) : c_rule_id = a
+let string_of_rule_id (a: c_rule_id) : string = string_of_int a
+
 (*in views_domain at build_association_list, it takes a pair (key * value) list, but the asso list 
   was take a pair (site_name * new_site_name) list.
 
@@ -68,7 +73,6 @@ let string_of_state_index (a:c_state) : string = string_of_int a
 *)
 
 let state_index_of_site_name (a: c_site_name): c_state = a
-
 
 (****************************************************************************************)
 
@@ -130,18 +134,46 @@ module State_index_quick_nearly_Inf_Int_storage_Imperatif =
     and type dimension = int
   )
 
+(*rule_id*)
+module Rule_nearly_Inf_Int_storage_Imperatif =
+  (
+    Int_storage.Nearly_inf_Imperatif: Int_storage.Storage
+   with type key = c_rule_id
+   and type dimension = int
+  )
+
+module Rule_quick_nearly_Inf_Int_storage_Imperatif =
+  (
+    Int_storage.Quick_key_list (Rule_nearly_Inf_Int_storage_Imperatif) : Int_storage.Storage
+   with type key = c_rule_id
+   and type dimension = int
+  )
+
+
 module Site_union_find = 
   Union_find.Make(Site_type_nearly_Inf_Int_storage_Imperatif)
 
 (****************************************************************************************)
 (*define mvbdu where key = c_site_name and value = c_state*)
-
+(*TODO:already define below*)
 module Mvbdu_ckappa_sig =
   (
     Mvbdu_wrapper.Mvbdu : Mvbdu_wrapper.Mvbdu
    with type key = c_site_name
    and type value = c_state
   )
+
+(****************************************************************************************)
+(*Define module fifo take rule_id*)
+
+module Rule =
+  struct 
+    type t = c_rule_id
+    let compare = compare
+  end
+
+module Rule_FIFO = Fifo.WlMake (Rule)
+
 
 (****************************************************************************************)
 
@@ -226,6 +258,13 @@ module Rule_setmap =
       let compare = compare
     end)
 
+module PairRule_setmap =
+  SetMap.Make
+    (struct 
+      type t = c_rule_id * c_rule_id
+      let compare = compare
+     end)
+
 (****************************************************************************************)
 
 module Site_map_and_set = 
@@ -252,7 +291,9 @@ module AgentsSite_map_and_set =
          let compare = compare
         end))
 
-module Views_bdu =  (Mvbdu_wrapper.Mvbdu: Mvbdu_wrapper.Mvbdu with type key = c_site_name and type value = c_state)
+(*TODO: change name*)
+module Views_bdu =
+  (Mvbdu_wrapper.Mvbdu: Mvbdu_wrapper.Mvbdu with type key = c_site_name and type value = c_state)
 
 (****************************************************************************************)
 

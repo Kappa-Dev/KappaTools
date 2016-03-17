@@ -98,7 +98,18 @@ let main () =
       in
       let error =
 	if (Remanent_parameters.get_trace parameters_influence_map) || Print_quarks.trace
-	then Print_quarks.print_wake_up_map parameters_influence_map error handler c_compil Handler.print_rule_txt Handler.print_var_txt Handler.get_label_of_rule_txt Handler.get_label_of_var_txt Handler.print_labels_txt "\n" wake_up_map
+	then 
+          Print_quarks.print_wake_up_map
+            parameters_influence_map
+            error 
+            handler
+            c_compil
+            Handler.print_rule_txt
+            Handler.print_var_txt 
+            Handler.get_label_of_rule_txt
+            Handler.get_label_of_var_txt
+            Handler.print_labels_txt "\n"
+            wake_up_map
 	else error
       in
       let error =

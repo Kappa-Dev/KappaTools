@@ -28,7 +28,8 @@ let print_agent_map parameters error handler map =
       parameters
       error
       (fun parameters error key im ->
-        Int_storage.Quick_Nearly_inf_Imperatif.iter
+        (*Int_storage.Quick_Nearly_inf_Imperatif.iter*)
+        Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.iter
           parameters
           error
           (fun parameters error key' im' ->
@@ -36,7 +37,7 @@ let print_agent_map parameters error handler map =
                 "%sagent_type:%i,rule:%i->" 
                 (Remanent_parameters.get_prefix parameters) 
                 (Ckappa_sig.int_of_agent_name key)
-                key'
+                (Ckappa_sig.int_of_rule_id key')
               in
               let _ = Quark_type.Labels.dump parameters error handler im' in
               let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
@@ -52,7 +53,8 @@ let print_agent_var_map parameters error handler map =
       parameters
       error
       (fun parameters error key im ->
-        Int_storage.Quick_Nearly_inf_Imperatif.iter
+        (*Int_storage.Quick_Nearly_inf_Imperatif.iter*)
+        Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.iter
           parameters
           error
           (fun parameters error key' im' ->
@@ -60,7 +62,7 @@ let print_agent_var_map parameters error handler map =
                 "%sagent_type:%i,var:%i->" 
                 (Remanent_parameters.get_prefix parameters)
                 (Ckappa_sig.int_of_agent_name key)
-                key' 
+                (Ckappa_sig.int_of_rule_id key')
               in
               let _ = Quark_type.Labels.dump parameters error handler im' in
               let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
@@ -74,7 +76,8 @@ let print_string_map parameters error handler map =
     Quark_type.StringMap.Map.fold
       (fun key im error ->
        let error =
-	 Int_storage.Quick_Nearly_inf_Imperatif.iter
+	 (*Int_storage.Quick_Nearly_inf_Imperatif.iter*)
+         Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.iter
           parameters
           error
           (fun parameters error key' im' ->
@@ -82,7 +85,7 @@ let print_string_map parameters error handler map =
              "%sagent_type:%s,rule_id:%i->"
              (Remanent_parameters.get_prefix parameters)
              key
-             key' 
+             (Ckappa_sig.int_of_rule_id key')
            in
            let _ = Quark_type.Labels.dump parameters error handler im' in
            let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
@@ -98,11 +101,17 @@ let print_var_string_map parameters error handler map =
     Quark_type.StringMap.Map.fold
       (fun key im error ->
        let error =
-	 Int_storage.Quick_Nearly_inf_Imperatif.iter
+	 (*Int_storage.Quick_Nearly_inf_Imperatif.iter*)
+         Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.iter
           parameters
           error
           (fun parameters error key' im' ->
-           let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%sagent_type:%s,var_id:%i->" (Remanent_parameters.get_prefix parameters) key key' in
+           let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters)
+             "%sagent_type:%s,var_id:%i->" 
+             (Remanent_parameters.get_prefix parameters)
+             key 
+             (Ckappa_sig.int_of_rule_id key')
+           in
            let _ = Quark_type.Labels.dump parameters error handler im' in
            let _ = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
            error)
@@ -130,7 +139,8 @@ let print_site_map parameter error handler map =
       parameter
       error
       (fun parameters error (agent_type,(site_type,state)) im ->
-        Int_storage.Quick_Nearly_inf_Imperatif.iter
+        (*Int_storage.Quick_Nearly_inf_Imperatif.iter*)
+        Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.iter
           parameter
           error
           (fun parameters error rule im' ->
@@ -140,7 +150,7 @@ let print_site_map parameter error handler map =
                  (Ckappa_sig.int_of_agent_name agent_type)
                  (Ckappa_sig.int_of_site_name site_type)
                  (Ckappa_sig.int_of_state_index state)
-                 rule
+                 (Ckappa_sig.int_of_rule_id rule)
                in
                let _ = Quark_type.Labels.dump parameter error handler im' in
                let _ = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
@@ -153,7 +163,8 @@ let print_site_var_map parameter error handler map =
       parameter
       error
       (fun parameters error (agent_type,(site_type,state)) im ->
-        Int_storage.Quick_Nearly_inf_Imperatif.iter
+        (*Int_storage.Quick_Nearly_inf_Imperatif.iter*)
+        Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.iter
           parameter
           error
           (fun parameters error rule im' ->
@@ -163,7 +174,7 @@ let print_site_var_map parameter error handler map =
                  (Ckappa_sig.int_of_agent_name agent_type)
                  (Ckappa_sig.int_of_site_name site_type)
                  (Ckappa_sig.int_of_state_index state)
-                 rule 
+                 (Ckappa_sig.int_of_rule_id rule)
                in
                let _ = Quark_type.Labels.dump parameter error handler im' in
                let _ = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
@@ -204,7 +215,8 @@ let print_quarks parameters  error handler quark =
 
 let print_maps parameters error handler compilation print_rule print_var get_label_of_rule get_label_of_var print_labels prefix suffix map =
   let _  =
-    Quark_type.Int2SetMap.Map.fold
+    (*Quark_type.Int2SetMap.Map.fold*)
+    Ckappa_sig.PairRule_setmap.Map.fold
       (fun (a,b) couple error ->
        let error,ruleb = Handler.string_of_rule parameters error handler compilation b in
          let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" prefix in
@@ -265,7 +277,7 @@ let dot_of_influence_map parameters error handler compilation (wake_up_map,inhib
           in
 	  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters_dot) in
           let rec aux k error =
-             if k>= nrules then error
+             if (Ckappa_sig.int_of_rule_id k) >= nrules then error
              else
                let error,bool,_ =
 		 Handler.print_rule_or_var
@@ -282,8 +294,11 @@ let dot_of_influence_map parameters error handler compilation (wake_up_map,inhib
 		   in
 		   let () = Loggers.print_newline (Remanent_parameters.get_logger parameters_dot) in
 		   ()
-               in aux (k+1) error
-          in aux 0 error
+               in 
+               aux 
+                 (Ckappa_sig.rule_id_of_int (Ckappa_sig.int_of_rule_id k + 1))
+                 error
+          in aux Ckappa_sig.dummy_rule_id error
         else
            error
     in
@@ -300,9 +315,20 @@ let dot_of_influence_map parameters error handler compilation (wake_up_map,inhib
 	  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters_dot) in
           let ntot = nrules + nvars in
           let rec aux k error =
-             if k>= ntot then error
+             if k >= ntot then error
              else
-               let error,bool,_  = Handler.print_rule_or_var parameters_dot error handler compilation Handler.print_rule_dot Handler.print_var_dot Handler.get_label_of_rule_dot Handler.get_label_of_var_dot k in
+               let error,bool,_  =
+                 Handler.print_rule_or_var
+                   parameters_dot
+                   error 
+                   handler
+                   compilation
+                   Handler.print_rule_dot
+                   Handler.print_var_dot 
+                   Handler.get_label_of_rule_dot 
+                   Handler.get_label_of_var_dot 
+                   (Ckappa_sig.rule_id_of_int k) 
+               in
                let _ = if bool then
 		   let () =
                    Loggers.fprintf (Remanent_parameters.get_logger parameters_dot) " ; " in
@@ -313,7 +339,10 @@ let dot_of_influence_map parameters error handler compilation (wake_up_map,inhib
           error
     in
     let error =
-       if Quark_type.Int2SetMap.Map.is_empty wake_up_map
+       if 
+         (*Quark_type.Int2SetMap.Map.is_empty*)
+         Ckappa_sig.PairRule_setmap.Map.is_empty
+         wake_up_map
        then error
        else
          let _ =
@@ -329,7 +358,10 @@ let dot_of_influence_map parameters error handler compilation (wake_up_map,inhib
          error
     in
     let error =
-       if Quark_type.Int2SetMap.Map.is_empty inhibition_map
+       if 
+         (*Quark_type.Int2SetMap.Map.is_empty*)
+         Ckappa_sig.PairRule_setmap.Map.is_empty
+           inhibition_map
        then error
        else
          let () =

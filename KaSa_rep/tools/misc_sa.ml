@@ -19,6 +19,20 @@ let compare_unit_state_index _ _ = Ckappa_sig.dummy_state_index
 
 let const_unit _ = ()
 
+let array_of_list_rule_id create set parameters error list =
+  let n = List.length list in
+  let a = create parameters error n in
+  let rec aux l k a =
+    match l with
+      | [] -> a
+      | t::q ->
+        begin
+          aux q 
+            (Ckappa_sig.rule_id_of_int (Ckappa_sig.int_of_rule_id k+1))
+            (set parameters (fst a) k t (snd a))
+        end
+  in aux list Ckappa_sig.dummy_rule_id a
+
 let array_of_list create set parameters error list =
   let n = List.length list in
   let a = create parameters error n in

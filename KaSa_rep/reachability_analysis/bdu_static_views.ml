@@ -1284,7 +1284,8 @@ let scan_rule_set parameter handler_bdu error handler_kappa compiled
    store_potential_side_effects =
   let error, init = init_bdu_analysis_static parameter error in
   let error, (handler_bdu, store_results) =
-    Int_storage.Nearly_inf_Imperatif.fold
+    (*Int_storage.Nearly_inf_Imperatif.fold*)
+    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
       parameter error
       (fun parameter error rule_id rule (handler_bdu, store_result) ->
         let error, handler_bdu, store_result =
