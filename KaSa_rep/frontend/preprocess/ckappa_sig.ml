@@ -70,14 +70,6 @@ let string_of_rule_id (a: c_rule_id) : string = string_of_int a
 let int_of_agent_id (a: c_agent_id) : int = a
 let agent_id_of_int (a: int) : c_agent_id = a
 
-
-(*in views_domain at build_association_list, it takes a pair (key * value) list, but the asso list 
-  was take a pair (site_name * new_site_name) list.
-  A function convert a new_site_name => value (c_state)
-*)
-
-let state_index_of_site_name (a: c_site_name): c_state = a
-
 (****************************************************************************************)
 
 module Agent_type_nearly_Inf_Int_storage_Imperatif =
@@ -157,15 +149,6 @@ module Site_union_find =
   Union_find.Make(Site_type_nearly_Inf_Int_storage_Imperatif)
 
 (****************************************************************************************)
-(*define mvbdu where key = c_site_name and value = c_state*)
-(*module Mvbdu_ckappa_sig =
-  (
-    Mvbdu_wrapper.Mvbdu : Mvbdu_wrapper.Mvbdu
-   with type key = c_site_name
-   and type value = c_state
-  )*)
-
-(****************************************************************************************)
 (*Define module fifo take rule_id*)
 
 module Rule =
@@ -175,7 +158,6 @@ module Rule =
   end
 
 module Rule_FIFO = Fifo.WlMake (Rule)
-
 
 (****************************************************************************************)
 
@@ -350,7 +332,7 @@ and port =
 and internal = string list
     
 and link = 
-    | LNK_VALUE of ((*int*)c_agent_id * agent_name * site_name * (*int*) c_agent_id * position)
+    | LNK_VALUE of (c_agent_id * agent_name * site_name * c_agent_id * position)
     | FREE 
     | LNK_ANY   of position
     | LNK_SOME  of position
@@ -385,7 +367,6 @@ type ('a, 'b) site_type =
 type site = (site_name, site_name) site_type     
 
 type state = (internal_state, binding_state) site_type  
-
 
 (*move from cckappa_sig*)
 type c_binding_state = 
@@ -439,22 +420,6 @@ module Dictionary_of_sites =
    with type key = c_site_name
    and type value = site
   )
-  
-(*covering classes*)
-(*
-module List_sites =
-  struct
-    type t = c_site_name list
-    let compare = compare
-  end
-
-module Dictionary_of_List_sites =
-  (
-    Dictionary.Dictionary_of_Ord (List_sites) : Dictionary.Dictionary
-   with type key = (*c_site_name*) int
-   and type value = c_site_name list
-  )*)
-
 
 type site_list = 
     {
@@ -518,7 +483,7 @@ type c_mixture =
     c_views : c_agent Int_storage.Quick_Nearly_inf_Imperatif.t;
     c_bonds :
       site_address Site_map_and_set.Map.t Int_storage.Nearly_inf_Imperatif.t;
-    c_plus  : (int * int) list; (*TODO*)
+    c_plus  : (int * int) list;
     c_dot   : (int * int) list
   }
       

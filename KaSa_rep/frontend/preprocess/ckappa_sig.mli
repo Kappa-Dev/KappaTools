@@ -61,10 +61,6 @@ val string_of_rule_id : c_rule_id -> string
 val int_of_agent_id : c_agent_id -> int
 val agent_id_of_int : int -> c_agent_id
 
-
-(*use in views_domain.ml *)
-val state_index_of_site_name : c_site_name -> c_state
-
 (****************************************************************************************)
 
 module Agent_type_nearly_Inf_Int_storage_Imperatif: Int_storage.Storage
@@ -112,13 +108,6 @@ module Site_union_find: Union_find.Union_find
   with type t = c_site_name Site_type_nearly_Inf_Int_storage_Imperatif.t   
   and type dimension = int
   and type key = c_site_name
-
-(****************************************************************************************)
-(*define mvbdu where key = c_site_name and value = c_state*)
-
-(*module Mvbdu_ckappa_sig : Mvbdu_wrapper.Mvbdu
-  with type key = c_site_name
-  and type value = c_state*)
 
 (****************************************************************************************)
 (*FIFO*)
@@ -218,7 +207,7 @@ and port =
 and internal = string list
     
 and link = 
-    | LNK_VALUE of ((*int*)c_agent_id * agent_name * site_name * (*int*)c_agent_id * position)
+    | LNK_VALUE of (c_agent_id * agent_name * site_name * c_agent_id * position)
     | FREE 
     | LNK_ANY   of position
     | LNK_SOME  of position
@@ -254,8 +243,6 @@ type site  = (site_name, site_name) site_type
 
 type state = (internal_state, binding_state) site_type
 
-
-(**)
 type c_binding_state = 
 | C_Free 
 | C_Lnk_type of c_agent_name * c_site_name 
@@ -265,8 +252,6 @@ type state' = (internal_state, c_binding_state) site_type
 module Dictionary_of_States: Dictionary.Dictionary 
   with type key = c_state
   and type value = state'
-
-(**)
  
 type internal_state_specification =
   {
@@ -315,8 +300,6 @@ type c_port =
       c_site_position : position;
       c_site_interval : c_state interval
     }
-
-(*module C_site_map_and_set : SetMap.S with type elt = c_site_name*)
 
 type c_interface = c_port Site_map_and_set.Map.t
                                                                            

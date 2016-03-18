@@ -23,12 +23,10 @@ let string_of_port port = "["^(string_of_int port.Cckappa_sig.site_state.Cckappa
 
 let print_agent_map parameters error handler map =
   let error =
-    (*Quark_type.AgentMap.iter*)
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.iter
       parameters
       error
       (fun parameters error key im ->
-        (*Int_storage.Quick_Nearly_inf_Imperatif.iter*)
         Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.iter
           parameters
           error
@@ -48,12 +46,10 @@ let print_agent_map parameters error handler map =
 
 let print_agent_var_map parameters error handler map =
   let error =
-    (*Quark_type.AgentMap.iter*)
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.iter
       parameters
       error
       (fun parameters error key im ->
-        (*Int_storage.Quick_Nearly_inf_Imperatif.iter*)
         Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.iter
           parameters
           error
@@ -76,7 +72,6 @@ let print_string_map parameters error handler map =
     Quark_type.StringMap.Map.fold
       (fun key im error ->
        let error =
-	 (*Int_storage.Quick_Nearly_inf_Imperatif.iter*)
          Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.iter
           parameters
           error
@@ -101,7 +96,6 @@ let print_var_string_map parameters error handler map =
     Quark_type.StringMap.Map.fold
       (fun key im error ->
        let error =
-	 (*Int_storage.Quick_Nearly_inf_Imperatif.iter*)
          Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.iter
           parameters
           error
@@ -139,7 +133,6 @@ let print_site_map parameter error handler map =
       parameter
       error
       (fun parameters error (agent_type,(site_type,state)) im ->
-        (*Int_storage.Quick_Nearly_inf_Imperatif.iter*)
         Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.iter
           parameter
           error
@@ -163,7 +156,6 @@ let print_site_var_map parameter error handler map =
       parameter
       error
       (fun parameters error (agent_type,(site_type,state)) im ->
-        (*Int_storage.Quick_Nearly_inf_Imperatif.iter*)
         Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.iter
           parameter
           error
@@ -215,7 +207,6 @@ let print_quarks parameters  error handler quark =
 
 let print_maps parameters error handler compilation print_rule print_var get_label_of_rule get_label_of_var print_labels prefix suffix map =
   let _  =
-    (*Quark_type.Int2SetMap.Map.fold*)
     Ckappa_sig.PairRule_setmap.Map.fold
       (fun (a,b) couple error ->
        let error,ruleb = Handler.string_of_rule parameters error handler compilation b in
@@ -340,7 +331,6 @@ let dot_of_influence_map parameters error handler compilation (wake_up_map,inhib
     in
     let error =
        if 
-         (*Quark_type.Int2SetMap.Map.is_empty*)
          Ckappa_sig.PairRule_setmap.Map.is_empty
          wake_up_map
        then error
@@ -359,7 +349,6 @@ let dot_of_influence_map parameters error handler compilation (wake_up_map,inhib
     in
     let error =
        if 
-         (*Quark_type.Int2SetMap.Map.is_empty*)
          Ckappa_sig.PairRule_setmap.Map.is_empty
            inhibition_map
        then error

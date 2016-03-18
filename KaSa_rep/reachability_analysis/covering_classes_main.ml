@@ -225,7 +225,6 @@ let scan_rule_set_covering_classes parameter error handler rules =
   (*------------------------------------------------------------------------------*)
   (*map each agent to a list of covering classes*)
   let error, store_covering_classes =
-    (*Int_storage.Nearly_inf_Imperatif.fold*)
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
       parameter error
       (fun parameter error rule_id rule classes ->
@@ -251,18 +250,6 @@ let length_sorted (l: Ckappa_sig.c_site_name list list): Ckappa_sig.c_site_name 
   List.rev_map fst lists
 
 (************************************************************************************)
-(*port information for site (state)*)
-   
-(*------------------------------------------------------------------------------*)
-(*return the number of covering classes for each agent type*)
-
-(*let number_of_covering_classes parameter error store_dic =
-  let error, num =
-    Covering_classes_type.Dictionary_of_Covering_class.last_entry
-      parameter error store_dic
-  in num + 1*)
-
-(************************************************************************************)
 (*CLEANING*)
 
 let store_remanent parameter error covering_class modified_map remanent =
@@ -281,7 +268,7 @@ let store_remanent parameter error covering_class modified_map remanent =
       Misc_sa.const_unit
       good_covering_class
   in
-  let error, (cv_id, store_dic) = (*FIXME*)
+  let error, (cv_id, store_dic) =
     match output with
       | Some (id, _, _, dic) -> error, (id, dic)
       | None -> warn parameter error (Some "line 105") Exit

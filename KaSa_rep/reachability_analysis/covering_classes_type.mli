@@ -81,26 +81,24 @@ module AgentSiteRuleCV_setmap: SetMap.S
 
 module Project2bdu_creation: SetMap.Projection2
   with type elt_a = Ckappa_sig.c_agent_name * Ckappa_sig.c_rule_id * cv_id
-  (* find the appropriate type names *)
   and type elt_b = Ckappa_sig.c_rule_id
-  and type elt_c = Ckappa_sig.c_agent_name * cv_id (* find the appropriate type names *)
+  and type elt_c = Ckappa_sig.c_agent_name * cv_id
   and type 'a map_a = 'a AgentRuleCV_setmap.Map.t
   and type 'a map_b = 'a Ckappa_sig.Rule_setmap.Map.t
   and type 'a map_c = 'a AgentCV_setmap.Map.t
 
 module Project2bdu_potential: SetMap.Projection2
   with type elt_a = Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * 
-  Ckappa_sig.c_rule_id * cv_id (* find the appropriate type names *)
+  Ckappa_sig.c_rule_id * cv_id
   and type elt_b = Ckappa_sig.c_rule_id
   and type 'a map_a = 'a AgentSiteRuleCV_setmap.Map.t
   and type 'a map_b = 'a Ckappa_sig.Rule_setmap.Map.t
   and type elt_c = Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * cv_id
-  (* find the appropriate type names *)
   and type 'a map_c = 'a AgentSiteCV_setmap.Map.t
 
 module Project2_bdu_views: SetMap.Projection2
   with type elt_a = Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * 
-  Ckappa_sig.c_rule_id * cv_id (* find the appropriate type names *)
+  Ckappa_sig.c_rule_id * cv_id
   and type elt_b = Ckappa_sig.c_rule_id
   and type 'a map_a = 'a AgentsRuleCV_setmap.Map.t
   and type 'a map_b = 'a Ckappa_sig.Rule_setmap.Map.t
@@ -110,7 +108,7 @@ module Project2_bdu_views: SetMap.Projection2
 
 module Project2_modif: Map_wrapper.Projection
   with type elt_a = Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * 
-  Ckappa_sig.c_site_name (* find the appropriate type names *)
+  Ckappa_sig.c_site_name
   and type elt_b = Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name
   and type 'a map_a = 'a Ckappa_sig.AgentsSite_map_and_set.Map.t
   and type 'a map_b = 'a Ckappa_sig.AgentSite_map_and_set.Map.t

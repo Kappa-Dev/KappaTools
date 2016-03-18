@@ -141,7 +141,6 @@ let print_mixture parameters error handler mixture =
       mixture.Cckappa_sig.views
   in
   let error =
-    (*Int_storage.Quick_Nearly_inf_Imperatif.print*)
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.print
       (Remanent_parameters.update_prefix parameters "bonds:agent_id_")
       error
@@ -304,7 +303,7 @@ let rec print_short_alg parameters error handler alg =
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%f " f in
     error
 
-      (*MOD: add print integer at compilation variables*)
+  (*MOD: add print integer at compilation variables*)
   | Ast.CONST(Nbr.I(i)),_ ->
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%d " i in
     error
@@ -333,7 +332,6 @@ let print_var parameters error handler var =
 
 
 let print_variables parameters error handler var =
-  (*Int_storage.Nearly_inf_Imperatif.print*)
   Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.print
     parameters
     error
@@ -460,7 +458,6 @@ let print_rule parameters error handler rule =
   error
 
 let print_rules parameters error handler rules =
-     (*Int_storage.Nearly_inf_Imperatif.print*)
   Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.print
     parameters
     error

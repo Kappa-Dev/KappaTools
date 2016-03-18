@@ -54,24 +54,19 @@ type bdu_analysis_static =
           Ckappa_sig.Site_map_and_set.Set.t) list)
       Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
     store_proj_bdu_creation_restriction_map: 
-      (*Mvbdu_wrapper.Mvbdu.mvbdu*) 
       Ckappa_sig.Views_bdu.mvbdu
       Covering_classes_type.AgentCV_setmap.Map.t 
       Ckappa_sig.Rule_setmap.Map.t;
     store_modif_list_restriction_map:
-      (*Mvbdu_wrapper.Mvbdu.hconsed_association_list*)
       Ckappa_sig.Views_bdu.hconsed_association_list
       Covering_classes_type.AgentsRuleCV_map_and_set.Map.t;
     store_proj_bdu_potential_restriction_map :
-      (*(Mvbdu_wrapper.Mvbdu.mvbdu *
-         Mvbdu_wrapper.Mvbdu.hconsed_association_list)*)
       (Ckappa_sig.Views_bdu.mvbdu *
          Ckappa_sig.Views_bdu.hconsed_association_list
       )
       Covering_classes_type.AgentSiteCV_setmap.Map.t 
       Ckappa_sig.Rule_setmap.Map.t;
     store_proj_bdu_test_restriction :
-      (*Mvbdu_wrapper.Mvbdu.mvbdu *)
       Ckappa_sig.Views_bdu.mvbdu
       Covering_classes_type.AgentsCV_setmap.Map.t
       Ckappa_sig.Rule_setmap.Map.t;
@@ -90,7 +85,7 @@ let collect_modification_sites parameter error rule_id diff_direct store_result 
       | error, None -> error, ([], Ckappa_sig.Rule_map_and_set.Set.empty)
       | error, Some (l, s) -> error, (l, s)
     in
-    let error', current_set = (*TODO: rule_id CHANGE*)
+    let error', current_set =
       Ckappa_sig.Rule_map_and_set.Set.add 
         parameter
         error
@@ -158,7 +153,7 @@ let collect_test_sites parameter error rule_id viewslhs
       | error, None -> error, ([], Ckappa_sig.Rule_map_and_set.Set.empty)
       | error, Some (l, s) -> error, (l, s)
     in
-    let error', current_set = (*FIXME*)
+    let error', current_set =
       Ckappa_sig.Rule_map_and_set.Set.add
         parameter
         error
@@ -233,7 +228,7 @@ let collect_test_modification_sites
       | error, None -> error, ([], Ckappa_sig.Rule_map_and_set.Set.empty)
       | error, Some (l, s) -> error, (l, s)
     in
-    let error, union = (*FIXME*)
+    let error, union =
       Ckappa_sig.Rule_map_and_set.Set.union parameter error old rule_id_set in
     let error, result =
       Ckappa_sig.AgentsSite_map_and_set.Map.add_or_overwrite
@@ -474,18 +469,12 @@ let collect_remanent_triple parameter error store_remanent store_result =
 (*creation rules*)
 
 let build_bdu parameter handler error (pair_list: (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list) =
-  (*let pair_list =
-    List.fold_left (fun l (site, state) ->
-      ((Ckappa_sig.int_of_site_name site), (Ckappa_sig.int_of_state_index state)) :: l
-    ) [] pair_list
-  in*)
   let error, handler, bdu_true =
     (*Mvbdu_wrapper.Mvbdu.mvbdu_true*)
     Ckappa_sig.Views_bdu.mvbdu_true
       parameter handler error
   in
   let error, handler, list_a =
-    (*Mvbdu_wrapper.Mvbdu.build_association_list*)
     Ckappa_sig.Views_bdu.build_association_list
       parameter
       handler
@@ -493,7 +482,6 @@ let build_bdu parameter handler error (pair_list: (Ckappa_sig.c_site_name * Ckap
       pair_list
   in
   let error, handler, bdu_result =
-    (*Mvbdu_wrapper.Mvbdu.mvbdu_redefine*)
     Ckappa_sig.Views_bdu.mvbdu_redefine
       parameter handler error bdu_true list_a
   in
@@ -505,7 +493,6 @@ let collect_bdu_creation_restriction_map parameter handler error
     (rule_id: Ckappa_sig.c_rule_id) rule 
     store_remanent_triple store_result =
   let error, handler, bdu_false = 
-    (*Mvbdu_wrapper.Mvbdu.mvbdu_false*)
     Ckappa_sig.Views_bdu.mvbdu_false
       parameter handler error
   in
@@ -522,7 +509,6 @@ let collect_bdu_creation_restriction_map parameter handler error
     in
     (* In the case when the agent is created twice, we take the union *)
     let error, handler, bdu_new =
-      (*Mvbdu_wrapper.Mvbdu.mvbdu_or*)
       Ckappa_sig.Views_bdu.mvbdu_or
         parameter handler error old_bdu bdu 
     in
@@ -638,7 +624,6 @@ let collect_proj_bdu_creation_restriction_map parameter handler_bdu error
       store_init_bdu_creation_restriction_map
   in
   let error, handler_bdu, bdu_true = 
-    (*Mvbdu_wrapper.Mvbdu.mvbdu_true*)
     Ckappa_sig.Views_bdu.mvbdu_true
       parameter handler_bdu error 
   in
@@ -651,7 +636,6 @@ let collect_proj_bdu_creation_restriction_map parameter handler_bdu error
       bdu_true
       (fun parameter (error, handler_bdu) bdu bdu' ->
         let error, handler_bdu, bdu_union =
-          (*Mvbdu_wrapper.Mvbdu.mvbdu_and*)
           Ckappa_sig.Views_bdu.mvbdu_and
           parameter handler_bdu error bdu bdu'
         in
@@ -751,15 +735,9 @@ let collect_modif_list_restriction_map
 			error, pair_list
                       ) map_res (error, [])
 		  in
-                  (*let pair_list =
-                    List.fold_left (fun l (site, state) ->
-                      ((Ckappa_sig.int_of_site_name site), (Ckappa_sig.int_of_state_index state)) :: l
-                    ) [] pair_list
-                  in*)
 		  (*-----------------------------------------------------------------*)
 		  (*build list_a*)
 		  let error, handler, list_a =
-		    (*Mvbdu_wrapper.Mvbdu.build_association_list*)
                     Ckappa_sig.Views_bdu.build_association_list
 		      parameter
 		      handler
@@ -783,7 +761,6 @@ let collect_modif_list_restriction_map
 let store_bdu_potential_restriction_map_aux parameter handler error store_remanent_triple 
     store_potential_side_effects store_result =
   let error, handler, bdu_false = 
-    (*Mvbdu_wrapper.Mvbdu.mvbdu_false*)
     Ckappa_sig.Views_bdu.mvbdu_false
       parameter handler error 
   in
@@ -791,7 +768,6 @@ let store_bdu_potential_restriction_map_aux parameter handler error store_remane
   let add_link handler (agent_type, new_site_type, rule_id, cv_id) bdu store_result =
     (*build a list_a*)
     let error, handler, list =
-      (*Mvbdu_wrapper.Mvbdu.build_reverse_sorted_association_list*)
       Ckappa_sig.Views_bdu.build_reverse_sorted_association_list
         parameter handler error [new_site_type, Ckappa_sig.dummy_state_index] (*state is 0*)
     in
@@ -869,7 +845,6 @@ let store_bdu_potential_restriction_map_aux parameter handler error store_remane
 		     in
                      (*union of bdu and bdu effect*)
 		     let error, handler, bdu =
-		       (*Mvbdu_wrapper.Mvbdu.mvbdu_or*)
                        Ckappa_sig.Views_bdu.mvbdu_or
                          parameter handler error bdu bdu_potential_effect
 		     in
@@ -933,13 +908,11 @@ let collect_proj_bdu_potential_restriction_map parameter handler error
       store_init_bdu_potential_restriction_map
   in
   let error, handler, bdu_true =
-    (*Mvbdu_wrapper.Mvbdu.mvbdu_true*)
     Ckappa_sig.Views_bdu.mvbdu_true
       parameter handler error
   in
   (*an empty hconsed list*)
   let error, handler, empty = 
-    (*Mvbdu_wrapper.Mvbdu.build_reverse_sorted_association_list*)
     Ckappa_sig.Views_bdu.build_reverse_sorted_association_list
       parameter handler error []
   in
@@ -966,12 +939,10 @@ let collect_proj_bdu_potential_restriction_map parameter handler error
 let collect_bdu_test_restriction_map parameter handler error rule_id rule 
     store_remanent_triple store_result =
   let error, handler, bdu_true = 
-    (*Mvbdu_wrapper.Mvbdu.mvbdu_true*)
     Ckappa_sig.Views_bdu.mvbdu_true
       parameter handler error 
   in
   let error, handler, bdu_false =
-    (*Mvbdu_wrapper.Mvbdu.mvbdu_false*)
     Ckappa_sig.Views_bdu.mvbdu_false
       parameter handler error 
   in
@@ -1104,7 +1075,6 @@ let collect_proj_bdu_test_restriction parameter handler error
       store_init_bdu_test_restriction_map
   in
   let error, handler, bdu_true =
-    (*Mvbdu_wrapper.Mvbdu.mvbdu_true*)
     Ckappa_sig.Views_bdu.mvbdu_true
       parameter handler error 
   in
@@ -1117,7 +1087,6 @@ let collect_proj_bdu_test_restriction parameter handler error
       bdu_true
       (fun parameter (error, handler) bdu bdu' ->
         let error, handler, bdu_union = 
-          (*Mvbdu_wrapper.Mvbdu.mvbdu_and*)
           Ckappa_sig.Views_bdu.mvbdu_and
           parameter handler error bdu bdu'
         in
@@ -1284,7 +1253,6 @@ let scan_rule_set parameter handler_bdu error handler_kappa compiled
    store_potential_side_effects =
   let error, init = init_bdu_analysis_static parameter error in
   let error, (handler_bdu, store_results) =
-    (*Int_storage.Nearly_inf_Imperatif.fold*)
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
       parameter error
       (fun parameter error rule_id rule (handler_bdu, store_result) ->

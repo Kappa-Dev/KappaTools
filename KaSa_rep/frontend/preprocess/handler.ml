@@ -120,7 +120,6 @@ let string_of_rule parameters error handler compiled (rule_id: Ckappa_sig.c_rule
   then
     begin
       let error,rule =
-        (*Int_storage.Nearly_inf_Imperatif.get*)
         Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
           parameters
           error
@@ -153,7 +152,6 @@ let string_of_rule parameters error handler compiled (rule_id: Ckappa_sig.c_rule
     begin
       let var_id = (Ckappa_sig.int_of_rule_id rule_id) - nrules in
       let error,var =
-        (*Int_storage.Nearly_inf_Imperatif.get*)
         Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
           parameters
           error
@@ -169,11 +167,10 @@ let string_of_rule parameters error handler compiled (rule_id: Ckappa_sig.c_rule
         error,"ALG"
     (*
       warn parameters error (Some "line 122") Exit "ALG"*)
-    (*         | Some Cckappa_sig.VAR_KAPPA(a,(b,c)) ->
-               let m1 = b in
-               let m2 = string_of_int  var_id in
-               let m = m1^m2 in
-               error,(if m="" then ("var"^(string_of_int var_id)) else ("var"^(string_of_int var_id)^":"^m))*)
+    (* | Some Cckappa_sig.VAR_KAPPA(a,(b,c)) -> let m1 = b in let m2 =
+       string_of_int var_id in let m = m1^m2 in error,(if m="" then
+       ("var"^(string_of_int var_id)) else ("var"^(string_of_int
+       var_id)^":"^m))*)
 
     end
 
@@ -381,7 +378,6 @@ let print_rule_or_var parameters error handler compiled print_rule print_var get
   then
     begin
       let error,rule =
-        (*Int_storage.Nearly_inf_Imperatif.get*)
         Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
           parameters
           error
@@ -420,7 +416,6 @@ let print_rule_or_var parameters error handler compiled print_rule print_var get
     begin
       let var_id = (Ckappa_sig.int_of_rule_id rule_id) - nrules in
       let error,var =
-        (*Int_storage.Nearly_inf_Imperatif.get*)
         Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
           parameters
           error

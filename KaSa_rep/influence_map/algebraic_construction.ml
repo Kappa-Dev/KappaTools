@@ -20,7 +20,6 @@ exception False of Exception.method_handler
 let check parameters error handler mixture1 mixture2 (i,j) =
   let add (n1,n2) error to_do (inj1,inj2) =
     let im1 = 
-      (*Quark_type.IntSetMap.Map.find_option*)
       Ckappa_sig.Agent_id_setmap.Map.find_option
         n1
         inj1
@@ -32,7 +31,6 @@ let check parameters error handler mixture1 mixture2 (i,j) =
       | None ->
         begin
 	  let im2 = 
-            (*Quark_type.IntSetMap.Map.find_option*)
             Ckappa_sig.Agent_id_setmap.Map.find_option
               n2
               inj2
@@ -41,14 +39,12 @@ let check parameters error handler mixture1 mixture2 (i,j) =
 	  with Some _ -> None
 	  | None ->
 	    let inj1 = 
-              (*Quark_type.IntSetMap.Map.add*)
               Ckappa_sig.Agent_id_setmap.Map.add
                 n1
                 n2
                 inj1 
             in
 	    let inj2 =
-              (*Quark_type.IntSetMap.Map.add*)
               Ckappa_sig.Agent_id_setmap.Map.add
                 n2
                 n1 
@@ -66,7 +62,6 @@ let check parameters error handler mixture1 mixture2 (i,j) =
       check_agent error t already_done
     | (h1,h2)::t ->
       begin
-        (* check agent type *)
         let error,view1 = 
           Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get 
             parameters error h1 mixture1.Cckappa_sig.views 
@@ -76,12 +71,10 @@ let check parameters error handler mixture1 mixture2 (i,j) =
             parameters error h2 mixture2.Cckappa_sig.views 
         in
         let error,bonds1 = 
-         (*Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get*)
           Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
             parameters error h1 mixture1.Cckappa_sig.bonds 
         in 
         let error,bonds2 = 
-         (*Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get*)
           Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
             parameters error h2 mixture2.Cckappa_sig.bonds
         in
@@ -274,7 +267,6 @@ let check parameters error handler mixture1 mixture2 (i,j) =
       error,false
   in
   let error,ouput = add (i,j) error [] 
-    (*(Quark_type.IntSetMap.Map.empty,Quark_type.IntSetMap.Map.empty)*)
     (Ckappa_sig.Agent_id_setmap.Map.empty, Ckappa_sig.Agent_id_setmap.Map.empty)
   in
   match ouput
@@ -320,13 +312,11 @@ let filter_influence parameters error handler compilation map bool =
       mixt 
       (updt_pos pos)
   in
-  (*Quark_type.Int2SetMap.Map.fold*)
   Ckappa_sig.PairRule_setmap.Map.fold
     (fun (a,b) couple (error,map') ->
       try 
         begin 
 	  let error,rule1 =
-           (*Int_storage.Nearly_inf_Imperatif.get*)
             Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
               parameters 
               error
@@ -347,7 +337,6 @@ let filter_influence parameters error handler compilation map bool =
 	    then
 	      begin
 	        let error,rule2 =
-                 (*Int_storage.Nearly_inf_Imperatif.get*)
                   Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
                     parameters 
                     error
@@ -364,7 +353,6 @@ let filter_influence parameters error handler compilation map bool =
 	    else
 	      begin
 	        let error,var = 
-                 (*Int_storage.Nearly_inf_Imperatif.get*)
                   Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.get
                     parameters 
                     error
@@ -402,7 +390,6 @@ let filter_influence parameters error handler compilation map bool =
 	  if Quark_type.Labels.is_empty_couple couple'
 	  then  error,map'
 	  else error,
-           (*Quark_type.Int2SetMap.Map.add*)
             Ckappa_sig.PairRule_setmap.Map.add
               (a,b) couple' map'
         end
@@ -411,5 +398,4 @@ let filter_influence parameters error handler compilation map bool =
     map 
     (error, 
      Ckappa_sig.PairRule_setmap.Map.empty
-    (*Quark_type.Int2SetMap.Map.empty*)
     )

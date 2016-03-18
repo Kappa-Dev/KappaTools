@@ -17,26 +17,7 @@ let warn parameters mh message exn default =
  
 (****************************************************************************************)
 
-(*type binding_state = 
-| Free 
-| Lnk_type of Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name *)
-
 type site  = (Ckappa_sig.c_site_name, Ckappa_sig.c_site_name) Ckappa_sig.site_type
-
-(*type state = (Ckappa_sig.internal_state, binding_state) Ckappa_sig.site_type  *)
- 
-(*module State = 
-struct
-  type t = state 
-  let compare = compare
-end *)
-
-(*module Dictionary_of_States = 
-  (
-    Dictionary.Dictionary_of_Ord (State) : Dictionary.Dictionary
-   with type key = Ckappa_sig.c_state
-   and type value = state
-  )*)
 
 type state_dic = (unit, unit) Ckappa_sig.Dictionary_of_States.dictionary
   
@@ -71,7 +52,7 @@ type 'state interface = 'state port Ckappa_sig.Site_map_and_set.Map.t
                                                                            
 type 'interface proper_agent = 
   { 
-    agent_kasim_id  : Ckappa_sig.c_agent_id; (* should be replaced with the appropriate type *)
+    agent_kasim_id  : Ckappa_sig.c_agent_id;
     agent_name      : Ckappa_sig.c_agent_name;
     agent_interface : 'interface;
     agent_position  : Ckappa_sig.position
@@ -108,7 +89,7 @@ let upgrade_some_interface ag =
 
 type site_address =
     {
-      agent_index : Ckappa_sig.c_agent_id; (* should be replaced with the appropriate type *)
+      agent_index : Ckappa_sig.c_agent_id; 
       site        : Ckappa_sig.c_site_name;
       agent_type  : Ckappa_sig.c_agent_name
     }
@@ -163,11 +144,10 @@ type mixture =
     c_mixture : Ckappa_sig.mixture; 
     views     : views;
     bonds     : site_address Ckappa_sig.Site_map_and_set.Map.t
-      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.t
-      (*Int_storage.Quick_Nearly_inf_Imperatif.t*); 
-    plus      : (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_id) list; (* should be replaced with the appropriate type *)
-    dot       : (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_id) list  (* should be replaced with the appropriate type *)
-    }
+      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.t; 
+    plus      : (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_id) list;
+    dot       : (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_id) list
+  }
       
 type enriched_variable = 
     { 
@@ -179,8 +159,8 @@ type enriched_variable =
       
 type actions =
     {
-      creation   : (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name) list; (* should be replaced with the appropriate type *)
-      remove     : (Ckappa_sig.c_agent_id * unit interface proper_agent * Ckappa_sig.c_site_name list) list; (* should be replaced with the appropriate type *)
+      creation   : (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name) list;
+      remove     : (Ckappa_sig.c_agent_id * unit interface proper_agent * Ckappa_sig.c_site_name list) list;
       release    : bond list;
       bind       : bond list;
       half_break : (site_address * (Ckappa_sig.c_state interval option)) list 
@@ -242,7 +222,6 @@ type enriched_init =
 let dummy_init parameters error =
   let error,views = Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.create parameters error 0 in 
   let error,bonds = 
-      (*Int_storage.Quick_Nearly_inf_Imperatif.create*)
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.create
       parameters error 0 
   in 
@@ -264,13 +243,11 @@ let dummy_init parameters error =
 
 type compil =
   {
-    variables : enriched_variable (*Int_storage.Nearly_inf_Imperatif.t*)
-    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t ;
+    variables : enriched_variable Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t ;
     (*pattern declaration for reusing as variable in perturbations or kinetic rate*)
     signatures : (agent_sig (** position*)) Int_storage.Nearly_inf_Imperatif.t;
     (*agent signature declaration*)
-    rules : enriched_rule (*Int_storage.Nearly_inf_Imperatif.t*)
-      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t;
+    rules : enriched_rule Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.t;
     (*rules (possibly named)*)
     observables :
       (mixture, string) Ast.ast_alg_expr Location.annot Int_storage.Nearly_inf_Imperatif.t;

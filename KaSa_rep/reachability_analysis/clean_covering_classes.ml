@@ -36,7 +36,6 @@ let int_of_port port = port.Cckappa_sig.site_state.Cckappa_sig.min
 
 let get_id_common_set parameter error t set =
   match 
-    (*Nearly_inf_Imperatif.unsafe_get*)
     Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.unsafe_get
     parameter
     error 

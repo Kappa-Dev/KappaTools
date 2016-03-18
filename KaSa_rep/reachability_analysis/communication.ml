@@ -17,12 +17,6 @@ let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "communication") message exn
     (fun () -> default)
 
-(*type rule_id = Cckappa_sig.rule_id
-type agent_id = Cckappa_sig.agent_id
-type agent_type = Cckappa_sig.agent_name
-type site_name = Cckappa_sig.site_name
-type state_index = Cckappa_sig.state_index*)
-
 type event =
 | Dummy (* to avoid compilation warning *)
 | Check_rule of Ckappa_sig.c_rule_id
@@ -93,8 +87,8 @@ type precondition =
      path ->
      Exception.method_handler * 
        Analyzer_headers.global_dynamic_information * 
-       Ckappa_sig.c_state list Usual_domains.flat_lattice ; (*change*)
-   cache_state_of_site: Ckappa_sig.c_state (*change*) list Usual_domains.flat_lattice PathMap.t ;
+       Ckappa_sig.c_state list Usual_domains.flat_lattice;
+   cache_state_of_site: Ckappa_sig.c_state list Usual_domains.flat_lattice PathMap.t ;
    partner_map: Ckappa_sig.c_agent_name -> Ckappa_sig.c_site_name -> 
                 Ckappa_sig.c_state -> (Ckappa_sig.c_agent_name * 
                                          Ckappa_sig.c_site_name * 

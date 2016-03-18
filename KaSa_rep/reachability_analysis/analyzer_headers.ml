@@ -32,13 +32,11 @@ type global_dynamic_information =
     mvbdu_handler: Mvbdu_wrapper.Mvbdu.handler
   }
 
-(*type rule_id = Ckappa_sig.c_rule_id*)
-
 type event =
 | Dummy
 | Check_rule of Ckappa_sig.c_rule_id
 | See_a_new_bond of ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) 
-                     * (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)) (*change*)
+                     * (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state))
 
 type 'a bot_or_not =
 | Bot

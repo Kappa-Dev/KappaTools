@@ -31,67 +31,32 @@ type rename_sites =
    Exception.method_handler * Ckappa_sig.Site_map_and_set.Map.elt)
 
 (****************************************************************************************)
-(*convert (int * int) list list --> (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list list*)
-
-let convert_list_list_site_state_of_int error list = 
-  List.fold_left (fun (error, list) pair_list ->
-    let error, pair_list = 
-      List.fold_left (fun (error, list) (site, asso) ->
-        error, ((Ckappa_sig.site_name_of_int site), (Ckappa_sig.state_index_of_int asso)) :: list
-      ) (error, []) pair_list
-    in
-    error, pair_list :: list
-  ) (error, []) (List.rev list)
-
-(*convert int list -> Ckappa_sig.c_site_name list*)
-
-let convert_var_list error var_list =
-  List.fold_left (fun (error, list) site ->
-    error, (Ckappa_sig.site_name_of_int site) :: list
-  ) (error, []) (List.rev var_list)
-
-(*convert int list -> Ckappa_sig.c_state list*)
-
-let convert_state_list error var_list =
-  List.fold_left (fun (error, list) state ->
-    error, (Ckappa_sig.state_index_of_int state) :: list
-  ) (error, []) (List.rev var_list)
-
-(****************************************************************************************)
 
 let non_relational parameter handler error mvbdu =
   let error, handler, list =
-    (*Mvbdu_wrapper.Mvbdu.mvbdu_cartesian_abstraction parameter handler error mvbdu*)
     Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction parameter handler error mvbdu
   in
   let error, handler, mvbdu_true =
-    (*Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error*)
     Ckappa_sig.Views_bdu.mvbdu_true parameter handler error
   in
   let error, handler, recomposition =
     List.fold_left
       (fun (error,handler,conjunct) term ->
-	(*Mvbdu_wrapper.Mvbdu.mvbdu_and parameter handler error conjunct term*)
         Ckappa_sig.Views_bdu.mvbdu_and parameter handler error conjunct term
       )
       (error, handler, mvbdu_true) list
   in
   error, handler, 
-  (*Mvbdu_wrapper.Mvbdu.equal mvbdu recomposition*)
   Ckappa_sig.Views_bdu.equal mvbdu recomposition
 
 let try_partitioning parameter handler error (rename_site_inverse:rename_sites) mvbdu =
   let error, handler, mvbdu_true =
-    (*Mvbdu_wrapper.Mvbdu.mvbdu_true parameter handler error*)
     Ckappa_sig.Views_bdu.mvbdu_true parameter handler error
   in
   let error, handler, var_hconsed_list =
-    (*Mvbdu_wrapper.Mvbdu.variables_list_of_mvbdu parameter handler error mvbdu*)
     Ckappa_sig.Views_bdu.variables_list_of_mvbdu parameter handler error mvbdu
   in
-  (*var_list : int list*)
   let error, handler, var_list =
-    (*Mvbdu_wrapper.Mvbdu.extensional_of_variables_list*)
     Ckappa_sig.Views_bdu.extensional_of_variables_list
       parameter handler error var_hconsed_list
   in
@@ -101,24 +66,19 @@ let try_partitioning parameter handler error (rename_site_inverse:rename_sites) 
     with
     | [] -> error, handler, None
     | head :: tail ->
-      (*[head]:int list*)
       let error, handler, singleton = 
-        (*Mvbdu_wrapper.Mvbdu.build_variables_list*)
         Ckappa_sig.Views_bdu.build_variables_list
           parameter handler error [head] 
       in
       let error, hnadler, mvbdu_ref = 
-        (*Mvbdu_wrapper.Mvbdu.mvbdu_project_abstract_away*)
         Ckappa_sig.Views_bdu.mvbdu_project_abstract_away
           parameter handler error mvbdu singleton 
       in
       let error, handler, proj_in =
-        (*Mvbdu_wrapper.Mvbdu.mvbdu_project_keep_only*)
         Ckappa_sig.Views_bdu.mvbdu_project_keep_only
           parameter handler error mvbdu singleton 
       in
       let error, handler, list_asso =
-        (*Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu*)
         Ckappa_sig.Views_bdu.extensional_of_mvbdu
           parameter handler error proj_in
       in
@@ -141,19 +101,15 @@ let try_partitioning parameter handler error (rename_site_inverse:rename_sites) 
 	| [] -> error, handler, Some output
 	| h :: t ->
 	  begin
-            (*head: int*)
 	    let error, handler, select =
-	      (*Mvbdu_wrapper.Mvbdu.build_association_list*)
               Ckappa_sig.Views_bdu.build_association_list
 		parameter handler error [head, h]
 	    in
 	    let error, handler, mvbdu_case =
-	      (*Mvbdu_wrapper.Mvbdu.mvbdu_redefine*)
               Ckappa_sig.Views_bdu.mvbdu_redefine
 		parameter handler error mvbdu_true select
 	    in
 	    let error, handler, case =
-	      (*Mvbdu_wrapper.Mvbdu.mvbdu_and*)
               Ckappa_sig.Views_bdu.mvbdu_and
 		parameter handler error mvbdu_case mvbdu
 	    in
@@ -163,28 +119,23 @@ let try_partitioning parameter handler error (rename_site_inverse:rename_sites) 
 	    if bool
 	    then
 	      let error, handler, away =
-		(*Mvbdu_wrapper.Mvbdu.mvbdu_project_abstract_away*)
                 Ckappa_sig.Views_bdu.mvbdu_project_abstract_away
 		  parameter handler error case singleton
 	      in
 	      if
-		(*Mvbdu_wrapper.Mvbdu.equal*)
                 Ckappa_sig.Views_bdu.equal
                   away mvbdu_ref
 	      then
 		aux3 t (error, handler, output)
 	      else
 	       	let error, handler, list =
-		  (*Mvbdu_wrapper.Mvbdu.mvbdu_cartesian_abstraction*)
                   Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction
                     parameter handler error away
 		in
 		let error, handler, list =
 		  List.fold_left
 		    (fun (error, handler, list) elt ->
-                      (*elt:(int * int) list list*)
 		      let error, handler, elt =
-			(*Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu*)
                         Ckappa_sig.Views_bdu.extensional_of_mvbdu
                           parameter handler error elt
 		      in
@@ -210,10 +161,7 @@ let try_partitioning parameter handler error (rename_site_inverse:rename_sites) 
 			  let error, () = warn parameter error (Some "line 127") Exit () in
 			  error, handler, list
 			| Some (a, l) ->
-			  (*let error, a' = rename_site_inverse parameter error (Ckappa_sig.site_name_of_int a) in*)
                           let error, a' = rename_site_inverse parameter error a in
-                          (*convert int list -> Ckappa_sig.c_state list*)
-                          (* let error, l = convert_state_list error l in*)
 			  (error, handler,
 			     (
                                (Range 
@@ -233,13 +181,6 @@ let try_partitioning parameter handler error (rename_site_inverse:rename_sites) 
       match output with
       | None -> aux tail (error, handler)
       | Some l ->
-        (*Convert (int * token) list -> (Ckappa_sig.c_state * token) list*)
-        (*let l =
-          List.fold_left (fun l (state, token) ->
-            ((Ckappa_sig.state_index_of_int state), token) :: l
-          ) [] l
-        in*)
-	(*let error, head = rename_site_inverse parameter error (Ckappa_sig.site_name_of_int head) in*)
 	let error, head = rename_site_inverse parameter error head in
 	error, handler, Some (head, l)
   in
@@ -247,16 +188,11 @@ let try_partitioning parameter handler error (rename_site_inverse:rename_sites) 
 
 (****************************************************************************************)
 
-let translate parameter handler error (rename_site_inverse: rename_sites) mvbdu
-    =
-  (*list: (int * int) list list*)
+let translate parameter handler error (rename_site_inverse: rename_sites) mvbdu =
   let error, handler, list =
-    (*Mvbdu_wrapper.Mvbdu.extensional_of_mvbdu*)
     Ckappa_sig.Views_bdu.extensional_of_mvbdu
       parameter handler error mvbdu
   in
-  (*let error, list = convert_list_list_site_state_of_int error list in*)
-  (*change list: (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list list*)
   let error, list =
     List.fold_left
       (fun (error, list) elt1 ->
@@ -276,18 +212,13 @@ let translate parameter handler error (rename_site_inverse: rename_sites) mvbdu
   then
     begin
        let error, handler, vars =
-	 (*Mvbdu_wrapper.Mvbdu.variables_list_of_mvbdu*)
          Ckappa_sig.Views_bdu.variables_list_of_mvbdu
            parameter handler error mvbdu
        in
-       (*var_list = int list*)
        let error, handler, var_list =
-	 (*Mvbdu_wrapper.Mvbdu.extensional_of_variables_list*)
          Ckappa_sig.Views_bdu.extensional_of_variables_list
            parameter handler error vars
        in
-       (*var_list = int list --> Ckappa_sig.c_site_name list*)
-       (*let error, var_list = convert_var_list error var_list in*)
        let error, var_list =
 	 List.fold_left
 	   (fun (error, list) elt ->

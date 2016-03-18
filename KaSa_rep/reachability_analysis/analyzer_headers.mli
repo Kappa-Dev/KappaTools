@@ -17,8 +17,6 @@
 
 type compilation_result
 
-(*type rule_id = Ckappa_sig.c_rule_*)
-
 (** type of the static information to be passed to each domain, let us
     start by this signature at the moment. In a first step, we are going
     to use only one module, and provide it with all the static information

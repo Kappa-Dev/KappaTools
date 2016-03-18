@@ -22,8 +22,6 @@ let trace = false
 (************************************************************************************)
 (*TYPE*)
 
-(*module AgentMap = Quick_Nearly_inf_Imperatif*)
-
 module Internal_flow_map =
   SetMap.Make (
     struct 

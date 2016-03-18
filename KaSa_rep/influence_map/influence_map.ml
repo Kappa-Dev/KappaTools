@@ -22,12 +22,10 @@ let generic_add fold2_common agent_diag rule_diag parameters error handler (n:in
     parameters 
     error 
     (fun parameters error _ a b map -> 
-       (*Int_storage.Quick_Nearly_inf_Imperatif.fold*) 
       Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.fold
         parameters 
         error 
         (fun parameters error (rule:Ckappa_sig.c_rule_id) a map -> 
-             (*Int_storage.Quick_Nearly_inf_Imperatif.fold*)
           Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.fold
             parameters 
             error 
@@ -39,8 +37,7 @@ let generic_add fold2_common agent_diag rule_diag parameters error handler (n:in
               else 
                 let key = rule, rule' in 
                 let old =
-			    (*Quark_type.Int2SetMap.Map.find_default*)
-                  Ckappa_sig.PairRule_setmap.Map.find_default
+	          Ckappa_sig.PairRule_setmap.Map.find_default
 		    Quark_type.Labels.empty_couple
                     key 
                     map 
@@ -58,8 +55,7 @@ let generic_add fold2_common agent_diag rule_diag parameters error handler (n:in
 		error,if Quark_type.Labels.is_empty_couple couple
 		  then map
 		  else 
-		    (*Quark_type.Int2SetMap.Map.add*)
-                    Ckappa_sig.PairRule_setmap.Map.add
+		    Ckappa_sig.PairRule_setmap.Map.add
                       key
                       couple
                       map)
@@ -71,16 +67,13 @@ let generic_add fold2_common agent_diag rule_diag parameters error handler (n:in
 
 let compute_influence_map parameters error handler quark_maps nrules = 
   let wake_up_map = 
-    (*Quark_type.Int2SetMap.Map.empty*)
     Ckappa_sig.PairRule_setmap.Map.empty
   in 
   let inhibition_map =
-    (*Quark_type.Int2SetMap.Map.empty*)
     Ckappa_sig.PairRule_setmap.Map.empty
   in 
   let error,wake_up_map = 
     generic_add 
-      (*Quark_type.AgentMap.fold2_common*)
       Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold2_common
       true
       true
@@ -94,7 +87,6 @@ let compute_influence_map parameters error handler quark_maps nrules =
   in
   let error,wake_up_map = 
     generic_add 
-      (*Quark_type.AgentMap.fold2_common*)
       Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold2_common
       true
       true
@@ -108,7 +100,6 @@ let compute_influence_map parameters error handler quark_maps nrules =
   in
    let error,inhibition_map = 
     generic_add 
-      (*Quark_type.AgentMap.fold2_common*)
       Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold2_common
       true
       true
@@ -161,7 +152,6 @@ let compute_influence_map parameters error handler quark_maps nrules =
   in
   let error,inhibition_map = 
     generic_add 
-      (*Quark_type.AgentMap.fold2_common*)
       Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold2_common
       false
       true
@@ -188,7 +178,6 @@ let compute_influence_map parameters error handler quark_maps nrules =
   in
   let error,inhibition_map = 
     generic_add 
-      (*Quark_type.AgentMap.fold2_common*)
       Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold2_common
       false
       true 
@@ -215,7 +204,6 @@ let compute_influence_map parameters error handler quark_maps nrules =
   in
    let error,wake_up_map = 
     generic_add 
-      (*Quark_type.AgentMap.fold2_common*)
       Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold2_common
       true
       true
@@ -280,7 +268,6 @@ let compute_influence_map parameters error handler quark_maps nrules =
       wake_up_map
   in
   let fold_site parameters error f  =
-    (*Quark_type.AgentMap.fold2_common*)
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold2_common
       parameters
       error

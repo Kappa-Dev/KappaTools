@@ -24,8 +24,7 @@ module type Analyzer =
     val main:
       Remanent_parameters_sig.parameters ->
       Exception.method_handler ->
-      Ckappa_sig.Views_bdu.handler
-      (*Mvbdu_wrapper.Mvbdu.handler*) ->
+      Ckappa_sig.Views_bdu.handler ->
       Cckappa_sig.compil ->
       Cckappa_sig.kappa_handler ->
       Exception.method_handler * static_information * dynamic_information

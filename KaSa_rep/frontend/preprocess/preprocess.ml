@@ -41,7 +41,6 @@ let empty_mixture handler error =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.create handler error 0 
   in 
   let error, bonds = 
-    (*Int_storage.Quick_Nearly_inf_Imperatif.create *)
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.create
       handler 
       error 
@@ -91,7 +90,7 @@ let empty_e_rule handler error =
 	Ckappa_sig.arrow = Ast.RAR (*empty_pos*);
 	Ckappa_sig.rhs = Ckappa_sig.EMPTY_MIX; 
 	Ckappa_sig.k_def = Location.dummy_annot (Ast.CONST (Nbr.F 0.));
-          (*       Ckappa_sig.k_un_radius = None ; *)
+        (*Ckappa_sig.k_un_radius = None ; *)
 	Ckappa_sig.k_un = None};
     Cckappa_sig.e_rule_c_rule = rule }
 
@@ -126,7 +125,6 @@ let length_mixture mixture =
 let add_bond parameters error i id_agent agent site id_agent' agent' site' bond_list = 
   let error,old = 
     match 
-      (*Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get*)
       Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
         parameters
         error
@@ -148,7 +146,6 @@ let add_bond parameters error i id_agent agent site id_agent' agent' site' bond_
       } old
   in
   let error = check parameters error error' (Some "line 106, add_bond") Exit  in 
-  (*Int_storage.Quick_Nearly_inf_Imperatif.set*)
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.set
     parameters
     error
@@ -1040,7 +1037,6 @@ let translate_mixture parameters error handler mixture =
       size  
   in
   let error,bonds = 
-    (*Int_storage.Quick_Nearly_inf_Imperatif.create*)
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.create
       parameters
       error 
@@ -1244,7 +1240,6 @@ let translate_rule parameters error handler rule =
                   reverse 
               in
               let error,lbondk =
-                (*Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get*)
                 Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
                   parameters 
                   error
@@ -1281,7 +1276,6 @@ let translate_rule parameters error handler rule =
                   parameters error k ((*Cckappa_sig.upgrade_some_interface*) ragk) direct 
               in  
 	      let error,rbondk = 
-                (*Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get*)
                 Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
                   parameters error k c_rule_rhs.Cckappa_sig.bonds 
               in  
@@ -1320,7 +1314,6 @@ let translate_rule parameters error handler rule =
             in 
 	    let error = check parameters error error' (Some "line 617") Exit in 
 	    let error,lbondk = 
-              (*Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get*)
               Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
                 parameters 
                 error
@@ -1328,7 +1321,6 @@ let translate_rule parameters error handler rule =
                 c_rule_lhs.Cckappa_sig.bonds 
             in  
 	    let error,rbondk = 
-              (*Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get*)
               Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
                 parameters 
                 error
@@ -1657,8 +1649,6 @@ let translate_c_compil parameters error handler compil =
   let n_vars = List.length c_variables in 
   let error,c_variables =
     Misc_sa.array_of_list_rule_id
-      (*Int_storage.Nearly_inf_Imperatif.create
-      Int_storage.Nearly_inf_Imperatif.set*)
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.create
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.set
       parameters
@@ -1669,8 +1659,6 @@ let translate_c_compil parameters error handler compil =
   let n_rules = List.length c_rules in 
   let error,c_rules = 
     Misc_sa.array_of_list_rule_id
-      (*Int_storage.Nearly_inf_Imperatif.create
-      Int_storage.Nearly_inf_Imperatif.set*)
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.create
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.set
       parameters error (List.rev c_rules) 

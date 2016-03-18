@@ -19,8 +19,6 @@ let warn parameters mh message exn default =
 
 let local_trace = false
 
-(*module AgentCV_map_and_set = Covering_classes_type.AgentCV_map_and_set*)
-
 type bdu_analysis_dynamic =
   {
     store_update : (int list * Ckappa_sig.Rule_map_and_set.Set.t) 
@@ -53,27 +51,10 @@ let add_link parameter error (agent_type, cv_id) rule_id_set store_result =
   in
   error, store_result
 
+(************************************************************************************)
+
 let store_covering_classes_modification_update_aux parameter error agent_type_cv
     site_type_cv cv_id store_test_modification_map store_result =
-  (*let add_link (agent_type, cv_id) rule_id_set store_result =
-    let error, (l, old) =
-      match AgentCV_map_and_set.Map.find_option_without_logs parameter error
-        (agent_type, cv_id) store_result
-      with
-      | error, None -> error, ([], Site_map_and_set.Set.empty)
-      | error, Some (l, s) -> error, (l, s)
-    in
-    let error', new_set =
-      Site_map_and_set.Set.union parameter error rule_id_set old
-    in
-    let error = Exception.check warn parameter error error' (Some "line 75") Exit in
-    let error, result =
-      AgentCV_map_and_set.Map.add_or_overwrite parameter error (agent_type, cv_id) 
-        (l, new_set)
-        store_result
-    in
-    error, result
-  in*)
   (*-------------------------------------------------------------------------------*)
   let error, (l, rule_id_set) =
     match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
@@ -87,8 +68,8 @@ let store_covering_classes_modification_update_aux parameter error agent_type_cv
   let error, result =
     add_link parameter error (agent_type_cv, cv_id) rule_id_set store_result
   in
-    (*-------------------------------------------------------------------------------*)
-    (*map this map*)
+  (*-------------------------------------------------------------------------------*)
+  (*map this map*)
   let store_result =
     Covering_classes_type.AgentCV_map_and_set.Map.map (fun (l, x) -> List.rev l, x) result
   in
@@ -138,26 +119,6 @@ let store_covering_classes_modification_side_effects parameter error
     store_potential_side_effects
     covering_classes
     store_result =
-  (*let add_link (agent_type, cv_id) rule_id_set store_result =
-    let error, (l, old) =
-      match AgentCV_map_and_set.Map.find_option_without_logs parameter error
-        (agent_type, cv_id) store_result
-      with
-      | error, None -> error, ([], Site_map_and_set.Set.empty)
-      | error, Some (l, s) -> error, (l, s)
-    in
-    let error', new_set =
-      Site_map_and_set.Set.union parameter error rule_id_set old
-    in
-    let error = Exception.check warn parameter error error' (Some "line 169") Exit in
-    let error, result =
-      AgentCV_map_and_set.Map.add_or_overwrite parameter error 
-        (agent_type, cv_id) 
-        (l, new_set) 
-        store_result
-    in
-    error, result
-  in*)
   (*-------------------------------------------------------------------------------*)
   let _, store_potential_side_effects_bind = store_potential_side_effects in
   let error, store_result =
@@ -171,7 +132,7 @@ let store_covering_classes_modification_side_effects parameter error
                 let error, store_result =
                   Covering_classes_type.Dictionary_of_List_sites.fold
                     (fun list_of_site_type ((), ()) cv_id (error, store_result) ->
-                    (*get a set of rule_id in update(c)*)
+                      (*get a set of rule_id in update(c)*)
                       let error, (l, rule_id_set) =
                         match 
                           Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
@@ -182,7 +143,6 @@ let store_covering_classes_modification_side_effects parameter error
                         | error, None -> error, ([], Ckappa_sig.Rule_map_and_set.Set.empty)
                         | error, Some (l, s) -> error, (l, s)
                       in
-                      (*FIXME:add rule_id_effect into rule_id_set*)
                       let error, new_rule_id_set =
                         Ckappa_sig.Rule_map_and_set.Set.add_when_not_in
                           parameter
@@ -210,24 +170,6 @@ let store_covering_classes_modification_side_effects parameter error
 
 let store_update parameter error store_test_modification_map store_potential_side_effects
     store_covering_classes_id covering_classes store_result =
-  (*let add_link error (agent_type, cv_id) rule_id_set store_result =
-    let error, (l, old) =
-      match AgentCV_map_and_set.Map.find_option_without_logs parameter error
-        (agent_type, cv_id) store_result
-      with
-      | error, None -> error, ([], Site_map_and_set.Set.empty)
-      | error, Some (l, s) -> error, (l, s)
-    in
-    let error', new_set =
-      Site_map_and_set.Set.union parameter error rule_id_set old
-    in
-    let error = Exception.check warn parameter error error' (Some "line 251") Exit in
-    let error, result =
-      AgentCV_map_and_set.Map.add_or_overwrite
-        parameter error (agent_type, cv_id) (l, new_set) store_result
-    in
-    error, result
-  in*)
   let error, store_update_modification =
     store_covering_classes_modification_update
       parameter
@@ -323,7 +265,6 @@ let scan_rule_set_dynamic parameter error compiled handler_bdu
     store_covering_classes_id
     store_potential_side_effects =
   let error, (handler_bdu, store_result) =
-    (*Int_storage.Nearly_inf_Imperatif.fold parameter error*)
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
       parameter error
       (fun parameter error rule_id rule (handler_bdu, store_result) ->

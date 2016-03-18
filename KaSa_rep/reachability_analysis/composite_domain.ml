@@ -49,7 +49,7 @@ module type Composite_domain =
       -> 'b
       -> Exception.method_handler * dynamic_information * 'c
 
-    val next_rule: Ckappa_sig.c_rule_id(*Analyzer_headers.rule_id*) option zeroary
+    val next_rule: Ckappa_sig.c_rule_id option zeroary
 
     val add_initial_state: (Analyzer_headers.initial_state, unit) unary
 
@@ -78,11 +78,7 @@ struct
   type static_information =
     Analyzer_headers.global_static_information * Domain.static_information
 
-  type working_list = (*CHECK*)
-    (*Fifo.IntWL.WSetMap.elt list * Fifo.IntWL.WSetMap.elt list * Fifo.IntWL.WSetMap.Set.t*)
-    (*Ckappa_sig.Rule_FIFO.elt list * Ckappa_sig.Rule_FIFO.elt list **)
-      Ckappa_sig.Rule_FIFO.t
-      (*Fifo.IntWL.WSetMap.Set.t*)
+  type working_list = Ckappa_sig.Rule_FIFO.t
 
   type dynamic_information =
     {
@@ -143,7 +139,6 @@ struct
     let working_list = get_working_list dynamic in
     let parameter = get_parameter static in
     let error, rule_working_list =
-      (*Fifo.IntWL.push*)
       Ckappa_sig.Rule_FIFO.push
         parameter
         error
@@ -160,14 +155,12 @@ struct
     let working_list = get_working_list dynamic in
     (* see if the working list is empty, if not pop an element *)
     if 
-      (*Fifo.IntWL.is_empty*)
       Ckappa_sig.Rule_FIFO.is_empty
         working_list
     then error, dynamic, None
     else
       let parameter = get_parameter static in
       let error, (rule_id_op, working_list_tail) =
-        (*Fifo.IntWL.pop*)
         Ckappa_sig.Rule_FIFO.pop
           parameter error working_list
       in
@@ -205,7 +198,6 @@ struct
     let compil = get_compil static in
     let rules = compil.Cckappa_sig.rules in
     let error, dynamic =
-      (*Int_storage.Nearly_inf_Imperatif.fold*)
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
         parameter error
         (fun parameter error rule_id rule dynamic ->

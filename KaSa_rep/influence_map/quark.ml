@@ -15,7 +15,6 @@
 let warn parameters mh message exn default = 
      Exception.warn parameters mh (Some "Quark") message exn (fun () -> default) 
   
-(*module Int_Set_and_Map = SetMap.Make (struct type t = int let compare = compare end)*) 
 let local_trace = false
  
 let empty_quarks parameter error handler = 
@@ -70,7 +69,6 @@ let add_generic get set parameter error rule_id agent_id key map =
   let error, old_agent = 
     match get parameter error key map with 
       | error,None -> 
-        (*Int_storage.Quick_Nearly_inf_Imperatif.create*) (*TODO: agent_name*)
         Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.create
           parameter
           error
@@ -79,7 +77,6 @@ let add_generic get set parameter error rule_id agent_id key map =
   in 
   let error,old_label_set = 
     match 
-      (*Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get*)
       Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
       parameter
         error
@@ -95,7 +92,6 @@ let add_generic get set parameter error rule_id agent_id key map =
     error,map
   else 
     let error,new_agent = 
-      (*Int_storage.Quick_Nearly_inf_Imperatif.set*)
       Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.set
          parameter
          error
@@ -217,7 +213,6 @@ let add_dead_agent s parameters error rule_id agent_id agent_type map =
     match Quark_type.StringMap.Map.find_option agent_type map 
     with 
       | None -> 
-        (*Int_storage.Quick_Nearly_inf_Imperatif.create*) (*TODO: agent_name*)
         Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.create
           parameters
         error
@@ -226,7 +221,6 @@ let add_dead_agent s parameters error rule_id agent_id agent_type map =
   in 
   let error,old_label_set = 
     match 
-      (*Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get*)
       Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
         parameters
         error
@@ -242,7 +236,6 @@ let add_dead_agent s parameters error rule_id agent_id agent_type map =
     error,map
   else 
     let error,new_agent = 
-      (*Int_storage.Quick_Nearly_inf_Imperatif.set *)
       Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.set
          parameters 
          error 
@@ -263,7 +256,6 @@ let add_dead_sites s parameters error rule_id agent_id agent_type site map =
   in
   let error, old_agent = 
     match
-      (*Quark_type.AgentMap.unsafe_get *)
       Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
         parameters 
         error 
@@ -284,7 +276,6 @@ let add_dead_sites s parameters error rule_id agent_id agent_type site map =
     (* this is a partial map, not associated key are implicitely associated
        to an empty map *)
     | error, None -> 
-      (*Int_storage.Quick_Nearly_inf_Imperatif.create*) (*TODO: agent_name*)
       Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.create
         parameters
         error
@@ -293,7 +284,6 @@ let add_dead_sites s parameters error rule_id agent_id agent_type site map =
   in
   let error, old_label_set = 
     match 
-      (*Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get*)
       Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
       parameters
       error 
@@ -309,7 +299,6 @@ let add_dead_sites s parameters error rule_id agent_id agent_type site map =
     error, map
   else
     let error,new_site = 
-      (*Int_storage.Quick_Nearly_inf_Imperatif.set*)
       Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.set
         parameters
         error
@@ -321,7 +310,6 @@ let add_dead_sites s parameters error rule_id agent_id agent_type site map =
       Cckappa_sig.KaSim_Site_map_and_set.Map.add_or_overwrite
         parameters error site new_site old_agent 
     in
-    (*Quark_type.AgentMap.set*)
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
       parameters 
       error
@@ -375,7 +363,6 @@ let scan_mixture_in_var bool parameter error handler var_id mixture quarks =
                   let interval = port.Cckappa_sig.site_state in 
                   let max = interval.Cckappa_sig.max in 
                   let rec aux k (error,site_var) = 
-                    (*if (Ckappa_sig.int_of_state_index k) > (Ckappa_sig.int_of_state_index max)*)
                     if k > max
                     then 
                       error,site_var
@@ -576,7 +563,6 @@ let scan_rule parameter error handler rule_id rule quarks =
 		let interval = port.Cckappa_sig.site_state in 
 		let max = interval.Cckappa_sig.max in 
 		let rec aux k (error,site_test) = 
-		  (*if (Ckappa_sig.int_of_state_index k) > (Ckappa_sig.int_of_state_index max)*)
                   if k > max
 		  then
 		    error,site_test
@@ -682,7 +668,7 @@ let scan_rule parameter error handler rule_id rule quarks =
                 begin 
                   let error,state_dic = 
                     Misc_sa.unsome 
-                      ((*Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get*)
+                      (
                         Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
                           parameter 
                           error 
@@ -799,7 +785,7 @@ let scan_rule parameter error handler rule_id rule quarks =
             begin
               let error,state_dic = 
                 Misc_sa.unsome 
-                  ((*Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get*)
+                  (
                     Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
                       parameter
                       error
@@ -845,7 +831,6 @@ let scan_rule parameter error handler rule_id rule quarks =
     
 let scan_rule_set parameter error handler rules = 
   let error,init = empty_quarks parameter error handler in 
-  (*Int_storage.Nearly_inf_Imperatif.fold*) 
   Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
     parameter 
     error 
@@ -862,7 +847,6 @@ let scan_rule_set parameter error handler rules =
     init 
     
 let scan_var_set parameter error handler vars quarks = 
-  (*Int_storage.Nearly_inf_Imperatif.fold*)
   Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
     parameter 
     error 

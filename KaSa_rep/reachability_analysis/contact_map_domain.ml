@@ -22,14 +22,6 @@ let local_trace = false
 module Domain =
 struct
 
-  (*type agent_type = Cckappa_sig.agent_name
-  type site_type = Cckappa_sig.site_name
-  type state_index = Cckappa_sig.state_index
-    
-  module PairAgentSiteState_map_and_set = Cckappa_sig.PairAgentSiteState_map_and_set
-
-  module Rule_map_and_set = Cckappa_sig.Rule_map_and_set*)
-
   type local_static_information =
     {
       bond_rhs : Ckappa_sig.PairAgentSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
@@ -41,11 +33,7 @@ struct
       global_static_information : Analyzer_headers.global_static_information;
       local_static_information  : local_static_information
     }
-
-  (*module AgentSite_map_and_set = Cckappa_sig.AgentSite_map_and_set
-    
-  module State_map_and_set = Cckappa_sig.State_map_and_set*)
-    
+   
   type local_dynamic_information = 
     {
       contact_map_dynamic : Ckappa_sig.PairAgentSiteState_map_and_set.Set.t;
@@ -133,12 +121,9 @@ struct
   (*implementations*)
 
   (*dual: contact map including initial state, use in views_domain*)
-      
-  (*module AgentSiteState_map_and_set = Cckappa_sig.AgentSiteState_map_and_set*)
-    
+   
   let collect_dual_map parameter error handler store_result =
     let error, store_result =
-      (*Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold*)
       Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
         parameter error
         (fun parameter error (agent_type, (site_type, state))
@@ -223,7 +208,6 @@ struct
 
   let collect_bonds parameter error rule_id bonds views store_result =
     let error, store_result =
-      (*Int_storage.Quick_Nearly_inf_Imperatif.fold*)
       Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
         parameter error
         (fun parameter error agent_id bonds_map store_result ->
@@ -305,7 +289,6 @@ struct
     let parameter = get_parameter static in
     let compil = get_compil static in
     let error, static =
-      (*Int_storage.Nearly_inf_Imperatif.fold*)
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
         parameter
         error
@@ -467,7 +450,6 @@ struct
     let views = init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views in
     let bonds = init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.bonds in
     let error, dynamic =
-      (*Int_storage.Quick_Nearly_inf_Imperatif.fold*)
       Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
         parameter error
         (fun parameter error agent_id bonds_map dynamic ->

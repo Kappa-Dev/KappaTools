@@ -13,12 +13,6 @@
    * All rights reserved.  This file is distributed
    * under the terms of the GNU Library General Public License *)
 
-(*type rule_id = Cckappa_sig.rule_id
-type agent_id = Cckappa_sig.agent_id
-type agent_type = Cckappa_sig.agent_name
-type site_name = Cckappa_sig.site_name
-type state_index = Cckappa_sig.state_index*)
-
 type event =
 | Dummy (* to avoid compilation warning *)
 | Check_rule of Ckappa_sig.c_rule_id
@@ -89,7 +83,7 @@ val get_state_of_site:
   precondition ->
   path ->
   Exception.method_handler * Analyzer_headers.global_dynamic_information * precondition * 
-    Ckappa_sig.c_state list Usual_domains.flat_lattice (*change*)
+    Ckappa_sig.c_state list Usual_domains.flat_lattice
 
 type prefold = { fold: 'a. 'a fold}
 
@@ -102,9 +96,9 @@ val refine_information_about_state_of_site:
   (Exception.method_handler ->
    Analyzer_headers.global_dynamic_information ->
    path ->
-   Ckappa_sig.c_state (*change*) list Usual_domains.flat_lattice ->
+   Ckappa_sig.c_state list Usual_domains.flat_lattice ->
    Exception.method_handler * Analyzer_headers.global_dynamic_information * 
-     Ckappa_sig.c_state list Usual_domains.flat_lattice) (*change*) ->
+     Ckappa_sig.c_state list Usual_domains.flat_lattice) ->
   precondition
 
 val get_potential_partner:

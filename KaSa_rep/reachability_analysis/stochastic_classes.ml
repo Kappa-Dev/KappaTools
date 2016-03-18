@@ -127,7 +127,6 @@ let scan_rule parameter error handler rule classes =
 
 let get_nsites parameter error key handler =
   let error, get_nsites =
-    (*Int_storage.Nearly_inf_Imperatif.unsafe_get*)
     Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.unsafe_get
       parameter
       error
@@ -165,7 +164,6 @@ let scan_rule_set parameter error handler rules =
   in
   (*------------------------------------------------------------------------------*)
   let error, stochastic_class =
-    (*Int_storage.Nearly_inf_Imperatif.fold*)
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
       parameter error
       (fun parameter error rule_id rule stochastic_class ->
@@ -211,7 +209,7 @@ let scan_rule_set parameter error handler rules =
                  Ckappa_sig.Site_union_find.union_list
                    parameter
                    error
-                   array (*FIXME*)
+                   array
                    sites_list
                in
                (*store*)

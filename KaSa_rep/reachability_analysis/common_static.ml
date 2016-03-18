@@ -614,7 +614,6 @@ let init_bdu_common_static =
 
 let scan_rule_set parameter error handler_kappa compil =
   let error, store_result =
-    (*Int_storage.Nearly_inf_Imperatif.fold*)
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
       parameter error
       (fun parameter error rule_id rule store_result ->
