@@ -158,13 +158,13 @@ module Site_union_find =
 
 (****************************************************************************************)
 (*define mvbdu where key = c_site_name and value = c_state*)
-(*TODO:already define below*)
-module Mvbdu_ckappa_sig =
+(*module Mvbdu_ckappa_sig =
   (
     Mvbdu_wrapper.Mvbdu : Mvbdu_wrapper.Mvbdu
    with type key = c_site_name
    and type value = c_state
-  )
+  )*)
+
 (****************************************************************************************)
 (*Define module fifo take rule_id*)
 
@@ -309,7 +309,8 @@ module AgentsSite_map_and_set =
          let compare = compare
         end))
 
-(*TODO: change name*)
+(****************************************************************************************)
+
 module Views_bdu =
   (Mvbdu_wrapper.Mvbdu: Mvbdu_wrapper.Mvbdu with type key = c_site_name and type value = c_state)
 

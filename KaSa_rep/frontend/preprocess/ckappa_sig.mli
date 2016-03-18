@@ -116,9 +116,9 @@ module Site_union_find: Union_find.Union_find
 (****************************************************************************************)
 (*define mvbdu where key = c_site_name and value = c_state*)
 
-module Mvbdu_ckappa_sig : Mvbdu_wrapper.Mvbdu
+(*module Mvbdu_ckappa_sig : Mvbdu_wrapper.Mvbdu
   with type key = c_site_name
-  and type value = c_state
+  and type value = c_state*)
 
 (****************************************************************************************)
 (*FIFO*)
@@ -345,7 +345,7 @@ type c_mixture =
     c_views : c_agent Int_storage.Quick_Nearly_inf_Imperatif.t;
     c_bonds :
       site_address Site_map_and_set.Map.t Int_storage.Nearly_inf_Imperatif.t;
-    c_plus  : (int * int) list; (*TODO*)
+    c_plus  : (int * int) list;
     c_dot   : (int * int) list
   }
       

@@ -29,7 +29,7 @@ module type Analyzer =
       Remanent_parameters_sig.parameters ->
       Exception.method_handler ->
       (*Mvbdu_wrapper.Mvbdu.handler*) 
-      Ckappa_sig.Mvbdu_ckappa_sig.handler ->
+      Ckappa_sig.Views_bdu.handler ->
       Cckappa_sig.compil ->
       Cckappa_sig.kappa_handler ->
       Exception.method_handler * static_information * dynamic_information
