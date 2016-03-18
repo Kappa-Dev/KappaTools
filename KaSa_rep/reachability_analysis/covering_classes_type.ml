@@ -34,6 +34,12 @@ type covering_classes =
 
 type cv_id = int
 
+let dummy_cv_id = 0
+
+let int_of_cv_id (a: cv_id) : int = a
+let cv_id_of_int (a: int) : cv_id = a
+
+(************************************************************************************)
 
 module List_sites =
   struct

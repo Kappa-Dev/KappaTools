@@ -951,7 +951,8 @@ struct
                   parameter
                   error (agent_type, cv_id) fixpoint_result
               with
-              | error, None -> Printf.fprintf stdout "cv_id %i\n" cv_id; error, bdu_false
+              | error, None -> Printf.fprintf stdout "cv_id %i\n" (Covering_classes_type.int_of_cv_id cv_id);
+                error, bdu_false
               | error, Some bdu -> error, bdu
             in
             (*---------------------------------------------------------------------*)
@@ -1717,7 +1718,8 @@ struct
         Loggers.fprintf (Remanent_parameters.get_logger parameter)
           "agent_type:%i:%s:cv_id:%i"
           (Ckappa_sig.int_of_agent_name agent_type)
-          agent_string cv_id
+          agent_string
+          (Covering_classes_type.int_of_cv_id cv_id)
       in
       let () =
         Loggers.print_newline (Remanent_parameters.get_logger parameter)
@@ -1963,7 +1965,8 @@ struct
 		  Loggers.fprintf (Remanent_parameters.get_logger parameter)
                     "agent_type:%i:%s:cv_id:%i"
 		    (Ckappa_sig.int_of_agent_name agent_type)
-                    agent_string cv_id
+                    agent_string
+                    (Covering_classes_type.int_of_cv_id cv_id)
 	        in
 	        Loggers.print_newline (Remanent_parameters.get_logger parameter)
 	    in

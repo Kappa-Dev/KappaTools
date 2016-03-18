@@ -275,47 +275,47 @@ let store_remanent parameter error covering_class modified_map remanent =
     Covering_classes_type.Dictionary_of_List_sites.allocate
       parameter
       error
-      Misc_sa.compare_unit
+      Misc_sa.compare_unit_covering_class_id
       covering_class (*value: c_site_name list*)
       ()
       Misc_sa.const_unit
       good_covering_class
   in
-  let error, (site_id, store_dic) = (*FIXME*)
+  let error, (cv_id, store_dic) = (*FIXME*)
     match output with
       | Some (id, _, _, dic) -> error, (id, dic)
       | None -> warn parameter error (Some "line 105") Exit
-        (0, good_covering_class)
+        (Covering_classes_type.dummy_cv_id, good_covering_class)
   in
   (*------------------------------------------------------------------------------*)
   (*store pointer backward*)
   let error, pointer_backward =
-    List.fold_left (fun (error, pointer_backward) old_site ->
-      let error, old_site_set =
+    List.fold_left (fun (error, pointer_backward) old_cv_id ->
+      let error, old_cv_set =
         match 
           Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.unsafe_get
           parameter
           error
-          old_site
+          old_cv_id
           pointer_backward
         with
         | error, None -> error, Covering_classes_type.CV_map_and_set.Set.empty
         | error, Some s -> error, s
       in
-      let error', new_site_set =
+      let error', new_cv_set =
         Covering_classes_type.CV_map_and_set.Set.add
           parameter
           error
-          site_id
-          old_site_set
+          cv_id
+          old_cv_set
       in
       let error = Exception.check warn parameter error error' (Some "line 394") Exit in
       let error, pointer_backward =
         Ckappa_sig.Site_type_nearly_Inf_Int_storage_Imperatif.set
           parameter
           error
-          old_site (*int*)
-          new_site_set (*set of int*)
+          old_cv_id (*int*)
+          new_cv_set (*set of int*)
           pointer_backward
       in
       error, pointer_backward
@@ -488,7 +488,7 @@ let scan_rule_set_remanent parameter error handler rules =
              parameter error
             store_remanent_dic.Covering_classes_type.store_dic)
         in
-        let number_cv = get_number_cv + 1 in
+        let number_cv = (Covering_classes_type.int_of_cv_id get_number_cv) + 1 in
         (*------------------------------------------------------------------------------*)
         (*print covering classes*)
         let _ =
@@ -514,7 +514,7 @@ let scan_rule_set_remanent parameter error handler rules =
                       "Potential dependencies between sites:\nagent_type:%i:%s:covering_class_id:%i\n"
                       (Ckappa_sig.int_of_agent_name agent_type)
                       agent_string 
-                      elt_id
+                      (Covering_classes_type.int_of_cv_id elt_id)
                   in
                   let _ =
                     List.iter (fun site_type ->

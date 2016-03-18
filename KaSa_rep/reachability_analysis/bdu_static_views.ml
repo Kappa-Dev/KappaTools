@@ -45,7 +45,7 @@ type bdu_analysis_static =
     store_pre_static : pre_static;
     store_covering_classes: Covering_classes_type.remanent 
       Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
-    store_covering_classes_id : (int list * int list) 
+    store_covering_classes_id : (int list * Covering_classes_type.cv_id list) 
       Ckappa_sig.AgentSite_map_and_set.Map.t;
     (*rewrite/ change type of this function ?*)
     store_remanent_triple:

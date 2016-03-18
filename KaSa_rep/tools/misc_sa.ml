@@ -17,6 +17,8 @@ let compare_unit_agent_name _ _ = Ckappa_sig.dummy_agent_name
 let compare_unit_site_name _ _ = Ckappa_sig.dummy_site_name
 let compare_unit_state_index _ _ = Ckappa_sig.dummy_state_index
 
+let compare_unit_covering_class_id _ _ = Covering_classes_type.dummy_cv_id
+
 let const_unit _ = ()
 
 let array_of_list_rule_id create set parameters error list =

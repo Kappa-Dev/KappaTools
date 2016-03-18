@@ -11,8 +11,16 @@
   * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et   
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
+(****************************************************************************************)
 
-type cv_id = int (*TODO: this type declaration should be hidden *)
+type cv_id
+
+val dummy_cv_id: cv_id
+
+val int_of_cv_id: cv_id -> int
+val cv_id_of_int: int -> cv_id
+
+(****************************************************************************************)
 
 type covering_classes =
   {
