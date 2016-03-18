@@ -44,6 +44,7 @@ let dummy_agent_name = 0
 let dummy_site_name = 0
 let dummy_state_index = 0
 let dummy_rule_id = 0
+let dummy_agent_id = 0
 
 let dummy_site_name_1 = 1
 let dummy_site_name_minus1 = -1 (*Use in views_domain*)
@@ -66,9 +67,12 @@ let int_of_rule_id (a: c_rule_id) : int = a
 let rule_id_of_int (a: int) : c_rule_id = a
 let string_of_rule_id (a: c_rule_id) : string = string_of_int a
 
+let int_of_agent_id (a: c_agent_id) : int = a
+let agent_id_of_int (a: int) : c_agent_id = a
+
+
 (*in views_domain at build_association_list, it takes a pair (key * value) list, but the asso list 
   was take a pair (site_name * new_site_name) list.
-
   A function convert a new_site_name => value (c_state)
 *)
 
@@ -149,7 +153,6 @@ module Rule_quick_nearly_Inf_Int_storage_Imperatif =
    and type dimension = int
   )
 
-
 module Site_union_find = 
   Union_find.Make(Site_type_nearly_Inf_Int_storage_Imperatif)
 
@@ -162,7 +165,6 @@ module Mvbdu_ckappa_sig =
    with type key = c_site_name
    and type value = c_state
   )
-
 (****************************************************************************************)
 (*Define module fifo take rule_id*)
 
@@ -198,6 +200,15 @@ module Agent_map_and_set =
     (SetMap.Make
        (struct
          type t = c_agent_name
+         let compare = compare
+        end
+       ))
+
+module Agent_id_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_agent_id
          let compare = compare
         end
        ))
@@ -258,6 +269,13 @@ module Rule_setmap =
       let compare = compare
     end)
 
+module Agent_id_setmap =
+  SetMap.Make (
+    struct
+      type t = c_agent_id
+      let compare = compare
+    end)
+
 module PairRule_setmap =
   SetMap.Make
     (struct 
@@ -304,8 +322,8 @@ type binding_state =
 type mixture = 
   | SKIP  of mixture 
   | COMMA of agent * mixture 
-  | DOT   of int * agent * mixture 
-  | PLUS  of int * agent * mixture 
+  | DOT   of c_agent_id * agent * mixture 
+  | PLUS  of c_agent_id * agent * mixture 
   | EMPTY_MIX
       
 and agent =
@@ -331,7 +349,7 @@ and port =
 and internal = string list
     
 and link = 
-    | LNK_VALUE of (int * agent_name * site_name * int * position)
+    | LNK_VALUE of ((*int*)c_agent_id * agent_name * site_name * (*int*) c_agent_id * position)
     | FREE 
     | LNK_ANY   of position
     | LNK_SOME  of position
@@ -476,7 +494,7 @@ type c_interface = c_port Site_map_and_set.Map.t
                                                                            
 type c_proper_agent = 
     { 
-      c_agent_kasim_id  : int; 
+      c_agent_kasim_id  : c_agent_id; 
       c_agent_name      : c_agent_name;
       c_agent_interface : c_interface;
       c_agent_position  : position
@@ -484,7 +502,7 @@ type c_proper_agent =
 
 type site_address =
     {
-      agent_index : int;
+      agent_index : c_agent_id;
       site        : c_site_name
     }
 
@@ -499,7 +517,7 @@ type c_mixture =
     c_views : c_agent Int_storage.Quick_Nearly_inf_Imperatif.t;
     c_bonds :
       site_address Site_map_and_set.Map.t Int_storage.Nearly_inf_Imperatif.t;
-    c_plus  : (int * int) list;
+    c_plus  : (int * int) list; (*TODO*)
     c_dot   : (int * int) list
   }
       

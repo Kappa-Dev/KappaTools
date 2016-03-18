@@ -132,7 +132,8 @@ let collect_sites_bond_pair_set parameter error handler_kappa rule store_result 
     (*get site_address_map from bond_lhs*)
     let error, site_add_map1 =
       match 
-        Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get
+        (*Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get*)
+        Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
           parameter error agent_id1 bond_lhs 
       with
       | error, None -> error, Ckappa_sig.Site_map_and_set.Map.empty
@@ -216,7 +217,9 @@ let collect_sites_bond_pair_set parameter error handler_kappa rule store_result 
     let agent_id2 = site_add2.Cckappa_sig.agent_index in
     let agent_type2 = site_add2.Cckappa_sig.agent_type in
     let error, site_add_map2 =
-      match Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get
+      match 
+        (*Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get*)
+        Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
         parameter error agent_id2 bond_lhs 
       with
       | error, None -> error, Ckappa_sig.Site_map_and_set.Map.empty
@@ -327,7 +330,9 @@ let collect_sites_bond_pair_set_external parameter error rule store_result =
     let agent_id1 = site_add1.Cckappa_sig.agent_index in
     let agent_type1 = site_add1.Cckappa_sig.agent_type in
     let error, site_add_map1 =
-      match Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get
+      match 
+        (*Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get*)
+        Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
         parameter error agent_id1 bond_lhs 
       with
       | error, None -> error, Ckappa_sig.Site_map_and_set.Map.empty
@@ -360,7 +365,9 @@ let collect_sites_bond_pair_set_external parameter error rule store_result =
     let agent_id2 = site_add2.Cckappa_sig.agent_index in
     let agent_type2 = site_add2.Cckappa_sig.agent_type in
     let error, site_add_map2 =
-      match Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get
+      match 
+        (*Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get*)
+        Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
         parameter error agent_id2 bond_lhs 
       with
       | error, None -> error, Ckappa_sig.Site_map_and_set.Map.empty

@@ -143,7 +143,7 @@ type agent =
 (* agent with a site or state that never occur in the rhs or an initial
    state, set of the undefined sites, map of sites with undefined
    internal states, map of sites with undefined binding states*)
-| Unknown_agent of (string*int) 
+| Unknown_agent of (string * Ckappa_sig.c_agent_id) 
 (* agent with a type that never occur in rhs or initial states *)
     
 type agent_sig = Ckappa_sig.c_state list interface proper_agent 
@@ -162,9 +162,11 @@ type mixture =
   { 
     c_mixture : Ckappa_sig.mixture; 
     views     : views;
-    bonds     : site_address Ckappa_sig.Site_map_and_set.Map.t Int_storage.Quick_Nearly_inf_Imperatif.t; 
-    plus      : (int * int) list; (* should be replaced with the appropriate type *)
-      dot       : (int * int) list  (* should be replaced with the appropriate type *)
+    bonds     : site_address Ckappa_sig.Site_map_and_set.Map.t
+      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.t
+      (*Int_storage.Quick_Nearly_inf_Imperatif.t*); 
+    plus      : (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_id) list; (* should be replaced with the appropriate type *)
+    dot       : (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_id) list  (* should be replaced with the appropriate type *)
     }
       
 type enriched_variable = 
@@ -239,7 +241,11 @@ type enriched_init =
       
 let dummy_init parameters error =
   let error,views = Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.create parameters error 0 in 
-  let error,bonds = Int_storage.Quick_Nearly_inf_Imperatif.create parameters error 0 in 
+  let error,bonds = 
+      (*Int_storage.Quick_Nearly_inf_Imperatif.create*)
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.create
+      parameters error 0 
+  in 
   error,
   {
     e_init_factor     = Ast.CONST (Nbr.I 0);

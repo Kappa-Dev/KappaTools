@@ -48,7 +48,11 @@ let print_link_state parameter error link =
           match Remanent_parameters.get_link_mode parameter
           with
             | Remanent_parameters_sig.Bound_indices ->
-                let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter) "%s%i" (Remanent_parameters.get_bound_symbol parameter) link_index in
+                let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                  "%s%i" 
+                  (Remanent_parameters.get_bound_symbol parameter)
+                  (Ckappa_sig.int_of_agent_id link_index)
+                in
                   error
             | Remanent_parameters_sig.Site_address ->
                 let () = Loggers.fprintf
@@ -56,7 +60,7 @@ let print_link_state parameter error link =
                           "%s(%s,%i)%s%s"
                           (Remanent_parameters.get_bound_symbol parameter)
                           agent_name
-                          agent_index
+                          (Ckappa_sig.int_of_agent_id agent_index)
                           (Remanent_parameters.get_at_symbol parameter)
                           site_name
                 in
@@ -138,11 +142,27 @@ let print_mixture  parameter error mixture =
         let error = print_agent parameter error agent in
            aux error true mixture
     | Ckappa_sig.DOT (i,agent,mixture) ->
-         let () = if bool then Loggers.fprintf (Remanent_parameters.get_logger parameter) "%s%i" (Remanent_parameters.get_agent_sep_dot_symbol parameter) i in
+         let () = 
+           if bool
+           then
+             Loggers.fprintf 
+               (Remanent_parameters.get_logger parameter)
+               "%s%i"
+               (Remanent_parameters.get_agent_sep_dot_symbol parameter) 
+               (Ckappa_sig.int_of_agent_id i)
+         in
          let error = print_agent parameter error agent in
            aux error true mixture
     | Ckappa_sig.PLUS (i,agent,mixture) ->
-         let () = if bool then Loggers.fprintf (Remanent_parameters.get_logger parameter) "%s%i" (Remanent_parameters.get_agent_sep_plus_symbol parameter) i in
+         let () =
+           if bool 
+           then
+             Loggers.fprintf 
+               (Remanent_parameters.get_logger parameter)
+               "%s%i"
+               (Remanent_parameters.get_agent_sep_plus_symbol parameter) 
+               (Ckappa_sig.int_of_agent_id i)
+         in
          let error = print_agent parameter error agent in
            aux error true mixture
   in aux error false mixture

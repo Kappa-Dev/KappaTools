@@ -223,7 +223,9 @@ struct
 
   let collect_bonds parameter error rule_id bonds views store_result =
     let error, store_result =
-      Int_storage.Quick_Nearly_inf_Imperatif.fold parameter error
+      (*Int_storage.Quick_Nearly_inf_Imperatif.fold*)
+      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
+        parameter error
         (fun parameter error agent_id bonds_map store_result ->
           let error, store_result =
             Ckappa_sig.Site_map_and_set.Map.fold
@@ -465,7 +467,9 @@ struct
     let views = init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views in
     let bonds = init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.bonds in
     let error, dynamic =
-      Int_storage.Quick_Nearly_inf_Imperatif.fold parameter error
+      (*Int_storage.Quick_Nearly_inf_Imperatif.fold*)
+      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
+        parameter error
         (fun parameter error agent_id bonds_map dynamic ->
           let error, store_result =
             Ckappa_sig.Site_map_and_set.Map.fold

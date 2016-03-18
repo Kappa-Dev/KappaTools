@@ -988,6 +988,17 @@ struct
             match
               step_list
             with
+              (*TODO*)
+              (* if not an empty list *)
+              (* follow the path while it is within the pattern *)
+              (* 1) if you remain inside the pattern for ever, identify the
+                 target agent and apply the the [] case *)
+              (* 2) the path is inconstent with the pattern, return the empty
+                 list *)
+              (* 3) the path goes outside of the pattern, grab the agent
+                 type of the target and the site type of the target, and
+                 gather information (in the views) *)
+
               _::_ -> error, dynamic, former_answer
             | [] ->
               begin

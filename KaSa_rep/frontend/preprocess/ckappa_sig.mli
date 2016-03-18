@@ -27,7 +27,7 @@ type c_agent_name
 type c_site_name
 type c_state
 type c_rule_id
-type c_agent_id = int
+type c_agent_id
 
 (****************************************************************************************)
 
@@ -35,6 +35,7 @@ val dummy_agent_name : c_agent_name
 val dummy_site_name : c_site_name
 val dummy_state_index : c_state
 val dummy_rule_id : c_rule_id
+val dummy_agent_id : c_agent_id
 
 val dummy_site_name_1 : c_site_name
 val dummy_site_name_minus1 : c_site_name
@@ -56,6 +57,10 @@ val string_of_state_index : c_state -> string
 val int_of_rule_id : c_rule_id -> int
 val rule_id_of_int : int -> c_rule_id
 val string_of_rule_id : c_rule_id -> string
+
+val int_of_agent_id : c_agent_id -> int
+val agent_id_of_int : int -> c_agent_id
+
 
 (*use in views_domain.ml *)
 val state_index_of_site_name : c_site_name -> c_state
@@ -94,7 +99,6 @@ module State_index_nearly_Inf_Int_storage_Imperatif: Int_storage.Storage
 module State_index_quick_nearly_Inf_Int_storage_Imperatif: Int_storage.Storage
   with type key = c_state
   and type dimension = int
-
 
 module Rule_nearly_Inf_Int_storage_Imperatif: Int_storage.Storage
    with type key = c_rule_id
@@ -137,6 +141,9 @@ module Agent_id_quick_nearly_Inf_Int_storage_Imperatif: Int_storage.Storage
 module Agent_map_and_set: Map_wrapper.S_with_logs
   with type elt = c_agent_name
 
+module Agent_id_map_and_set: Map_wrapper.S_with_logs
+  with type elt = c_agent_id
+
 module Rule_map_and_set: Map_wrapper.S_with_logs
   with type elt = c_rule_id
 
@@ -157,6 +164,8 @@ module PairAgentSiteState_map_and_set: Map_wrapper.S_with_logs
   (c_agent_name * c_site_name * c_state) * (c_agent_name * c_site_name * c_state)
 
 module Rule_setmap: SetMap.S with type elt = c_rule_id
+
+module Agent_id_setmap: SetMap.S with type elt = c_agent_id
 
 module PairRule_setmap : SetMap.S with type elt = c_rule_id * c_rule_id
 
@@ -182,8 +191,8 @@ type binding_state =
 type mixture = 
   | SKIP  of mixture 
   | COMMA of agent * mixture 
-  | DOT   of int * agent * mixture 
-  | PLUS  of int * agent * mixture 
+  | DOT   of c_agent_id * agent * mixture 
+  | PLUS  of c_agent_id * agent * mixture 
   | EMPTY_MIX
       
 and agent =
@@ -209,7 +218,7 @@ and port =
 and internal = string list
     
 and link = 
-    | LNK_VALUE of (int * agent_name * site_name * int * position)
+    | LNK_VALUE of ((*int*)c_agent_id * agent_name * site_name * (*int*)c_agent_id * position)
     | FREE 
     | LNK_ANY   of position
     | LNK_SOME  of position
@@ -336,7 +345,7 @@ type c_mixture =
     c_views : c_agent Int_storage.Quick_Nearly_inf_Imperatif.t;
     c_bonds :
       site_address Site_map_and_set.Map.t Int_storage.Nearly_inf_Imperatif.t;
-    c_plus  : (int * int) list;
+    c_plus  : (int * int) list; (*TODO*)
     c_dot   : (int * int) list
   }
       

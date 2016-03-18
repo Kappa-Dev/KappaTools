@@ -74,6 +74,7 @@ module type Domain =
     val print: (Loggers.t list, unit) unary
 
     val cc_mixture_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
+
     val lkappa_mixture_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
 
   end
