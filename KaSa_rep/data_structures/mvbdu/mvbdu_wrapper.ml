@@ -8,6 +8,8 @@ module type Mvbdu =
     type mvbdu
     type hconsed_association_list
     type hconsed_variables_list
+    type hconsed_renaming_list
+
     type 'output constant = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> Exception.method_handler * handler * 'output
     type ('input,'output) unary =  Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input -> Exception.method_handler * handler * 'output
     type ('input1,'input2,'output) binary = Remanent_parameters_sig.parameters -> handler ->  Exception.method_handler -> 'input1 -> 'input2 -> Exception.method_handler * handler * 'output
@@ -55,6 +57,12 @@ module type Mvbdu =
     val build_sorted_variables_list: (key list,hconsed_variables_list) unary
     val build_reverse_sorted_variables_list: (key list,hconsed_variables_list) unary
     val empty_variables_list: hconsed_variables_list constant
+
+    val build_renaming_list: ((key * key) list,hconsed_renaming_list) unary
+    val build_sorted_renaming_list: ((key * key) list,hconsed_renaming_list) unary
+    val build_reverse_sorted_renaming_list: ((key * key) list,hconsed_renaming_list) unary
+    val empty_renaming_list : hconsed_renaming_list constant
+
 
     val overwrite_association_lists: (hconsed_association_list,hconsed_association_list,hconsed_association_list) binary
     val merge_variables_lists: (hconsed_variables_list,hconsed_variables_list,hconsed_variables_list) binary
@@ -116,6 +124,7 @@ module type Internalized_mvbdu =
     type mvbdu
     type hconsed_association_list
     type hconsed_variables_list
+    type hconsed_renaming_list
 
     val init: Remanent_parameters_sig.parameters -> unit
     val is_init: unit -> bool
@@ -158,6 +167,10 @@ module type Internalized_mvbdu =
     val build_sorted_variables_list: key list -> hconsed_variables_list
     val build_reverse_sorted_variables_list: key list -> hconsed_variables_list
     val empty_variables_list : unit -> hconsed_variables_list
+    val build_renaming_list: (key * key) list -> hconsed_renaming_list
+    val build_sorted_renaming_list: (key * key) list -> hconsed_renaming_list
+    val build_reverse_sorted_renaming_list: (key * key) list -> hconsed_renaming_list
+    val empty_renaming_list : unit -> hconsed_renaming_list
 
     val overwrite_association_lists: hconsed_association_list -> hconsed_association_list -> hconsed_association_list
     val merge_variables_lists: hconsed_variables_list -> hconsed_variables_list -> hconsed_variables_list
@@ -185,8 +198,10 @@ module Make (M:Nul)  =
     type value = int
     type handler = (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.association_list_dic,Boolean_mvbdu.variables_list_dic,bool,int) Memo_sig.handler
     type mvbdu = bool Mvbdu_sig.mvbdu
-    type hconsed_association_list = int List_sig.list
+    type hconsed_association_list = value List_sig.list
     type hconsed_variables_list = unit List_sig.list
+    type hconsed_renaming_list = key List_sig.list
+
     type 'output constant = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> Exception.method_handler * handler * 'output
     type ('input,'output) unary =  Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input -> Exception.method_handler * handler * 'output
     type ('input1,'input2,'output) binary = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input1 -> 'input2 -> Exception.method_handler * handler * 'output
@@ -406,6 +421,12 @@ module Make (M:Nul)  =
 
     let empty_association_list parameter handler error = build_association_list parameter handler error []
 
+
+    let build_renaming_list = build_association_list
+    let build_sorted_renaming_list = build_sorted_association_list
+    let build_reverse_sorted_renaming_list = build_sorted_renaming_list
+    let empty_renaming_list = empty_association_list
+
     let build_variables_list 	=
       liftvbis "line 257, build_list"
 	List_algebra.build_list
@@ -521,6 +542,8 @@ module Internalize(M:Mvbdu
     type mvbdu = Mvbdu.mvbdu
     type hconsed_association_list = Mvbdu.hconsed_association_list
     type hconsed_variables_list = Mvbdu.hconsed_variables_list
+    type hconsed_renaming_list = Mvbdu.hconsed_renaming_list
+
     type handler = Mvbdu.handler
     let handler = ref None
     let parameter = ref (Remanent_parameters.get_parameters ~called_from:Remanent_parameters_sig.Internalised ())
@@ -641,6 +664,12 @@ module Internalize(M:Mvbdu
     let build_reverse_sorted_association_list = lift_unary "line 299" M.build_reverse_sorted_association_list
     let empty_association_list () = build_association_list []
 
+    let build_renaming_list = lift_unary "line 297" M.build_renaming_list
+    let build_sorted_renaming_list = lift_unary "line 298" M.build_sorted_renaming_list
+    let build_reverse_sorted_renaming_list = lift_unary "line 299" M.build_reverse_sorted_renaming_list
+    let empty_renaming_list () = build_renaming_list []
+
+
     let build_variables_list = lift_unary "line 297" M.build_variables_list
     let build_sorted_variables_list = lift_unary "line 298" M.build_sorted_variables_list
     let build_reverse_sorted_variables_list = lift_unary "line 299" M.build_reverse_sorted_variables_list
@@ -681,13 +710,14 @@ module Optimize(M:Mvbdu with type key = int and type value = int) =
 	   type key = Mvbdu.key
 	   type value = Mvbdu.value
 	   type handler = Mvbdu.handler
-	     type mvbdu = Mvbdu.mvbdu
-	     type hconsed_association_list = Mvbdu.hconsed_association_list
-	     type hconsed_variables_list = Mvbdu.hconsed_variables_list
-	     type 'output constant = 'output Mvbdu.constant
-	     type ('input,'output) unary =  ('input,'output) Mvbdu.unary
-	     type ('input1,'input2,'output) binary = ('input1,'input2,'output) Mvbdu.binary
-	     type ('input1,'input2,'input3,'output) ternary = ('input1,'input2,'input3,'output) Mvbdu.ternary
+	   type mvbdu = Mvbdu.mvbdu
+	   type hconsed_association_list = Mvbdu.hconsed_association_list
+	   type hconsed_variables_list = Mvbdu.hconsed_variables_list
+	   type hconsed_renaming_list = Mvbdu.hconsed_renaming_list
+	   type 'output constant = 'output Mvbdu.constant
+	   type ('input,'output) unary =  ('input,'output) Mvbdu.unary
+	   type ('input1,'input2,'output) binary = ('input1,'input2,'output) Mvbdu.binary
+	   type ('input1,'input2,'input3,'output) ternary = ('input1,'input2,'input3,'output) Mvbdu.ternary
 
 
 	     let last_entry = Mvbdu.last_entry
@@ -752,9 +782,13 @@ module Optimize(M:Mvbdu with type key = int and type value = int) =
              let build_variables_list = M.build_variables_list
 	     let build_sorted_variables_list = M.build_sorted_variables_list
 	     let build_reverse_sorted_variables_list = M.build_reverse_sorted_variables_list
+	     let build_renaming_list = M.build_renaming_list
+	     let build_sorted_renaming_list = M.build_sorted_renaming_list
+	     let build_reverse_sorted_renaming_list = M.build_reverse_sorted_renaming_list
 
 	     let empty_association_list = M.empty_association_list
 	     let empty_variables_list = M.empty_variables_list
+	     let empty_renaming_list = M.empty_renaming_list
 
 	     let merge_variables_lists = M.merge_variables_lists
 	     let overwrite_association_lists = M.overwrite_association_lists
@@ -805,6 +839,7 @@ module Optimize'(M:Internalized_mvbdu with type key = int and type value = int) 
 	     type mvbdu = Mvbdu.mvbdu
 	     type hconsed_association_list = Mvbdu.hconsed_association_list
 	     type hconsed_variables_list = Mvbdu.hconsed_variables_list
+	     type hconsed_renaming_list = Mvbdu.hconsed_renaming_list
 
 	     let init = Mvbdu.init
 	     let is_init = Mvbdu.is_init
@@ -835,6 +870,9 @@ module Optimize'(M:Internalized_mvbdu with type key = int and type value = int) 
 	     let build_association_list = M.build_association_list
 	     let build_sorted_association_list = M.build_sorted_association_list
 	     let build_reverse_sorted_association_list = M.build_reverse_sorted_association_list
+	     let build_renaming_list = M.build_renaming_list
+	     let build_sorted_renaming_list = M.build_sorted_renaming_list
+	     let build_reverse_sorted_renaming_list = M.build_reverse_sorted_renaming_list
 	     let mvbdu_redefine = M.mvbdu_redefine
 	     let mvbdu_rename = M.mvbdu_rename
 	     let mvbdu_project_keep_only = M.mvbdu_project_keep_only
@@ -842,6 +880,7 @@ module Optimize'(M:Internalized_mvbdu with type key = int and type value = int) 
 	     let build_variables_list = M.build_variables_list
 	     let build_sorted_variables_list = M.build_sorted_variables_list
 	     let build_reverse_sorted_variables_list = M.build_reverse_sorted_variables_list
+	     let empty_renaming_list = M.empty_renaming_list
 	     let empty_variables_list = M.empty_variables_list
              let empty_association_list = M.empty_association_list
 	     let merge_variables_lists = M.merge_variables_lists

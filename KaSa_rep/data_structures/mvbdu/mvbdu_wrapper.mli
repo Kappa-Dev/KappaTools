@@ -8,6 +8,7 @@ module type Mvbdu =
     type mvbdu
     type hconsed_association_list
     type hconsed_variables_list
+    type hconsed_renaming_list
 
     type 'output constant = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> Exception.method_handler * handler * 'output
     type ('input,'output) unary =  Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input -> Exception.method_handler * handler * 'output
@@ -53,10 +54,16 @@ module type Mvbdu =
     val build_sorted_association_list: ((key * value) list,hconsed_association_list) unary
     val build_reverse_sorted_association_list: ((key * value) list,hconsed_association_list) unary
     val empty_association_list : hconsed_association_list constant
+
     val build_variables_list: (key list,hconsed_variables_list) unary
     val build_sorted_variables_list: (key list,hconsed_variables_list) unary
     val build_reverse_sorted_variables_list: (key list,hconsed_variables_list) unary
     val empty_variables_list: hconsed_variables_list constant
+
+    val build_renaming_list: ((key * key) list,hconsed_renaming_list) unary
+    val build_sorted_renaming_list: ((key * key) list,hconsed_renaming_list) unary
+    val build_reverse_sorted_renaming_list: ((key * key) list,hconsed_renaming_list) unary
+    val empty_renaming_list : hconsed_renaming_list constant
 
     val overwrite_association_lists: (hconsed_association_list,hconsed_association_list,hconsed_association_list) binary
     val merge_variables_lists: (hconsed_variables_list,hconsed_variables_list,hconsed_variables_list) binary
@@ -116,6 +123,8 @@ module type Internalized_mvbdu =
     type mvbdu
     type hconsed_association_list
     type hconsed_variables_list
+    type hconsed_renaming_list
+
     val init: Remanent_parameters_sig.parameters -> unit
     val is_init: unit -> bool
     val equal: mvbdu -> mvbdu -> bool
@@ -157,6 +166,11 @@ module type Internalized_mvbdu =
     val build_sorted_variables_list: key list -> hconsed_variables_list
     val build_reverse_sorted_variables_list: key list -> hconsed_variables_list
     val empty_variables_list : unit -> hconsed_variables_list
+    val build_renaming_list: (key * key) list ->  hconsed_renaming_list
+    val build_sorted_renaming_list: (key * key) list -> hconsed_renaming_list
+    val build_reverse_sorted_renaming_list: (key * key) list -> hconsed_renaming_list
+    val empty_renaming_list : unit -> hconsed_renaming_list
+
     val overwrite_association_lists: hconsed_association_list -> hconsed_association_list -> hconsed_association_list
     val merge_variables_lists: hconsed_variables_list -> hconsed_variables_list -> hconsed_variables_list
 
