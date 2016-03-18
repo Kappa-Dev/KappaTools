@@ -2,6 +2,10 @@ open Lwt
 module Api_types = ApiTypes_j
 open Api_types
 
+let msg_process_not_running = "process not running"
+let msg_token_not_found = "token not found"
+let msg_observables_less_than_zero = "Plot observables must be greater than zero"
+
 let time_yield (seconds : float)
                (yield : (unit -> unit Lwt.t)) : (unit -> unit Lwt.t) =
   let lastyield = ref (Sys.time ()) in
@@ -215,7 +219,7 @@ end = struct
                  >>= (fun _ -> Lwt.return (`Left [Printexc.to_string e]))
         )
       else
-        Lwt.return (`Left ["Plot observables must be greater than zero"])
+        Lwt.return (`Left [msg_observables_less_than_zero])
 
     method status (token : Api_types.token) : Api_types.state Api_types.result Lwt.t =
       Lwt.catch
@@ -243,7 +247,7 @@ end = struct
                     } : Api_types.state )
             | _ -> `Left !(state.error_messages))
         )
-        (function Not_found -> Lwt.return (`Left ["token not found"])
+        (function Not_found -> Lwt.return (`Left [msg_token_not_found])
                 | e -> (self#log (Printexc.get_backtrace ()))
                        >>= (fun _ -> Lwt.return (`Left [Printexc.to_string e]))
         )
@@ -258,8 +262,8 @@ end = struct
          Lwt_switch.turn_off state.switch
          >>= (fun _ -> Lwt.return (`Right ()))
        else
-         Lwt.return (`Left ["process not running"]))
-      (function Not_found -> Lwt.return (`Left ["token not found"])
+         Lwt.return (`Left [msg_process_not_running]))
+      (function Not_found -> Lwt.return (`Left [msg_token_not_found])
               | e -> Lwt.return (`Left [Printexc.to_string e])
       )
   end;;

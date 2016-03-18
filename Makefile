@@ -76,8 +76,7 @@ ifeq ($(NO_CDN),1)
 	mkdir -p $(TEMPDIR) ;\
 	wget -O $(TEMPDIR)/bootstrap.zip   https://github.com/twbs/bootstrap/releases/download/v3.3.5/bootstrap-3.3.5-dist.zip ;\
 	wget -O $(TEMPDIR)/codemirror.zip  http://codemirror.net/codemirror.zip ;\
-	wget -O $(TEMPDIR)/mathjax.zip     https://github.com/mathjax/MathJax/archive/v2.5-latest.zip ;\
-	wget -O $(TEMPDIR)/jquery.js       https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js ;\
+	wget -O $(TEMPDIR)/jquery.js       https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.js ;\
 	mkdir -p $@ ;\
 	unzip -d $@ $(TEMPDIR)/bootstrap.zip ;\
 	unzip -d $@ $(TEMPDIR)/codemirror.zip ;\

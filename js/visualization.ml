@@ -273,6 +273,14 @@ let onload () =
     Js.Opt.get (document##getElementById (Js.string fluxmap_div_id))
                (fun () -> assert false) in
   let () = fluxmap_div##innerHTML <- Js.string ("<svg id=\""^fluxmap_svg_id^"\" width=\"300\" height=\"300\"><g/></svg>") in
+  let () = Common.jquery_on "#navgraph"
+                            "shown.bs.tab"
+                            (fun _ ->
+                             let () = Common.debug("show log plot") in
+                             match (React.S.value UIState.model_runtime_state) with
+                               None -> ()
+                             | Some state -> update_plot state.plot)
+  in
   let plot_div : Dom_html.element Js.t =
     Js.Opt.get (document##getElementById (Js.string plot_div_id))
                (fun () -> assert false) in

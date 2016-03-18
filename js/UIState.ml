@@ -85,7 +85,9 @@ let update_text text =
                         (fun error -> match error with
                                         `Left error -> let () = set_model_error error in
                                                        Lwt.return_unit
-                                      | `Right _ -> Lwt.return_unit
+                                      | `Right _ ->
+                                         let () = set_model_error [] in
+                                         Lwt.return_unit
                         )
                      )
   in
@@ -103,16 +105,19 @@ let update_runtime_state
                   (runtime_state#status token)
                   >>=
                     (fun result -> match result with
-                                     `Left e -> let () = set_model_error e in
-                                                let () = List.iter Common.error e in
-                                                on_error ()
-                                   | `Right state -> let () = set_model_runtime_state (Some state) in
-                                                     if state.is_running then
-                                                       Lwt.return_unit
-                                                     else
-                                                       (Lwt_switch.turn_off thread_is_running)
-                                                       >>=
-                                                         (fun _ -> Lwt.return_unit))
+                                     `Left e ->
+                                     let () = set_model_error e in
+                                     let () = List.iter Common.error e in
+                                     on_error ()
+                                   | `Right state ->
+                                      let () = set_model_error [] in
+                                      let () = set_model_runtime_state (Some state) in
+                                      if state.is_running then
+                                        Lwt.return_unit
+                                      else
+                                        (Lwt_switch.turn_off thread_is_running)
+                                        >>=
+                                          (fun _ -> Lwt.return_unit))
                   else
                     return_unit
                  ) in
@@ -136,6 +141,7 @@ let start_model ~start_continuation
     None -> set_model_error ["Runtime not available"];
             on_error ()
   | Some runtime_state ->
+     let () = set_model_error [] in
      catch
        (fun () ->
         let () = set_model_runtime_state (Some { plot = None;
@@ -162,17 +168,22 @@ let start_model ~start_continuation
                set_model_is_running false;
                on_error ()
              | `Right token ->
+                let () = set_model_error [] in
                 let stop_process () : unit Lwt.t =
                   (Lwt_switch.turn_off thread_is_running)
                   >>=
-                    (fun _ -> Lwt_js.sleep poll_interval)
+                    (* sleep to give time for update to stop running *)
+                    (fun _ -> Lwt_js.sleep (1.5 *. poll_interval))
                   >>=
                     (fun _ -> runtime_state#stop token)
                   >>=
                     (fun response ->
                      let () = match response with
-                         `Left error -> set_model_error error
-                       | `Right _ -> ()
+                         (* safe to ignore as the process may have gone away
+                            after the sleep *)
+                         `Left error -> let () = Common.debug error in
+                                        set_model_error []
+                       | `Right _ -> set_model_error []
                      in
                      Lwt.return_unit)
                 in
@@ -214,5 +225,6 @@ let stop_model token = match !runtime_state with
                                         let () = set_model_error error in
                                         Lwt.return_unit
                                       | `Right () ->
+                                         let () = set_model_error [] in
                                          Lwt.return_unit))
      in ()

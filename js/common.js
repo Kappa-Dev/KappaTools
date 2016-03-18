@@ -1,4 +1,3 @@
-var write_log = false;
 // http://stackoverflow.com/questions/979975/how-to-get-the-value-from-the-url-parameter
 var args = function () {
     var query_string = {};
@@ -25,18 +24,23 @@ var args = function () {
         level = levels[i];
         if(args.level && args.level === level) { found = true; }
         if(found) {
-            window[level] = function(x){ console.log(x); }
+            window[level] = function(x){
+                console.log(x);
+                $("#console-div").html(String(x));
+            }
         } else {
             window[level] = function(x){ }
         }
     }
+    $( document ).ready(function() {
+        if(args.level && args.level === "debug") {
+            $("#footer").removeClass("hidden");
+        }
+    });
+
 })();
 
 function jqueryOn(selector,event,handler){
-    //$(selector).on(event,handler);
-    //$('#navflux').on('shown.bs.tab', function (e) {
-    //console.log(event);
     $(selector).on(event, function (e) {
-        console.log(e);
         handler(e); });
 }

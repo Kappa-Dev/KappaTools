@@ -32,9 +32,10 @@ let fatal value =
   Js.Unsafe.fun_call
     (Js.Unsafe.js_expr "fatal")
     [| Js.Unsafe.inject value |]
-let jquery_on selector event handler =
+let jquery_on (selector : string)
+              (event : string) handler =
   Js.Unsafe.fun_call
     (Js.Unsafe.js_expr "jqueryOn")
-    [| Js.Unsafe.inject selector;
-       Js.Unsafe.inject event;
+    [| Js.Unsafe.inject (Js.string selector);
+       Js.Unsafe.inject (Js.string event);
        Js.Unsafe.inject handler |]
