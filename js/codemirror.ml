@@ -2,7 +2,7 @@
 (* references
    http://toss.sourceforge.net/ocaml.html
    http://peppermint.jp/temp/ao/ao.ml
-x*)
+*)
 open Js
 module Html5 = Tyxml_js.Html5
 
