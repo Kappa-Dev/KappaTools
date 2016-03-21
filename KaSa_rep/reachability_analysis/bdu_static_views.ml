@@ -23,21 +23,18 @@ type pre_static =
   {
     store_modification_sites  :
     (int list * Ckappa_sig.Rule_map_and_set.Set.t)
-    Ckappa_sig.AgentsSite_map_and_set.Map.t;
+    Ckappa_sig.AgentsSite_map_and_set.Map.t; (*JF:  the int list seems to be useless, could you check and remove it ? *)
     store_test_sites :
       (int list * Ckappa_sig.Rule_map_and_set.Set.t) 
-      Ckappa_sig.AgentsSite_map_and_set.Map.t;
+      Ckappa_sig.AgentsSite_map_and_set.Map.t; (*JF:  the int list seems to be useless, could you check and remove it ? *)
     store_test_modification_sites :
       (int list * Ckappa_sig.Rule_map_and_set.Set.t) 
-      Ckappa_sig.AgentsSite_map_and_set.Map.t;
+      Ckappa_sig.AgentsSite_map_and_set.Map.t; (*JF:  the int list seems to be useless, could you check and remove it ? *)
     (*views that are tested and modificated without agent_id, will be used in
       update function*)
-    store_modif_map      : (int list * Ckappa_sig.Rule_map_and_set.Set.t)
-      Ckappa_sig.AgentSite_map_and_set.Map.t;
-    store_test_map       : (int list * Ckappa_sig.Rule_map_and_set.Set.t)
-      Ckappa_sig.AgentSite_map_and_set.Map.t;
-    store_test_modif_map : (int list * Ckappa_sig.Rule_map_and_set.Set.t)
-      Ckappa_sig.AgentSite_map_and_set.Map.t;
+    store_modif_map      : (int list * Ckappa_sig.Rule_map_and_set.Set.t) Ckappa_sig.AgentSite_map_and_set.Map.t; (*JF:  the int list seems to be useless, could you check and remove it ? *)
+    store_test_map       : (int list * Ckappa_sig.Rule_map_and_set.Set.t) Ckappa_sig.AgentSite_map_and_set.Map.t; (*JF:  the int list seems to be useless, could you check and remove it ? *)
+    store_test_modif_map : (int list * Ckappa_sig.Rule_map_and_set.Set.t) Ckappa_sig.AgentSite_map_and_set.Map.t; (*JF:  the int list seems to be useless, could you check and remove it ? *)
   }
 
 type bdu_analysis_static =
