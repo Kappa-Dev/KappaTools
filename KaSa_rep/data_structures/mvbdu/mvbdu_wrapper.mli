@@ -43,7 +43,6 @@ module type Mvbdu =
     val mvbdu_nsnd: (mvbdu,mvbdu,mvbdu) binary
     val mvbdu_redefine: (mvbdu,hconsed_association_list,mvbdu) binary
 
-    (*val mvbdu_rename: (mvbdu,hconsed_association_list,mvbdu) binary*)
     val mvbdu_rename: (mvbdu,hconsed_renaming_list,mvbdu) binary
 
     val mvbdu_project_keep_only: (mvbdu,hconsed_variables_list,mvbdu) binary
@@ -116,7 +115,7 @@ module type Mvbdu =
        (mvbdu,'data,'map,'map) ternary
 
     val last_entry: (unit,int) unary
-
+    val hash_of_association_list: hconsed_association_list -> int
   end
 
 module type Internalized_mvbdu =
@@ -186,6 +185,8 @@ module type Internalized_mvbdu =
     val print: Remanent_parameters_sig.parameters -> mvbdu -> unit
     val print_association_list: Remanent_parameters_sig.parameters -> hconsed_association_list -> unit
     val print_variables_list: Remanent_parameters_sig.parameters -> hconsed_variables_list -> unit
+    val hash_of_association_list: hconsed_association_list -> int
+
   end
 
 module type Nul =

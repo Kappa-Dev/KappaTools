@@ -116,6 +116,8 @@ module type Mvbdu =
     (mvbdu,'data,'map,'map) ternary
 
   val last_entry: (unit, int) unary
+  val hash_of_association_list: hconsed_association_list -> int
+
 end
 
 
@@ -188,6 +190,9 @@ module type Internalized_mvbdu =
     val print: Remanent_parameters_sig.parameters -> mvbdu -> unit
     val print_association_list: Remanent_parameters_sig.parameters -> hconsed_association_list -> unit
     val print_variables_list: Remanent_parameters_sig.parameters -> hconsed_variables_list -> unit
+    val hash_of_association_list: hconsed_association_list -> int
+
+
 end
 
 module type Nul =
@@ -530,6 +535,9 @@ module Make (M:Nul)  =
 	data
 	storage
 
+    let hash_of_association_list x = List_core.id_of_list x
+
+
   end: Mvbdu with type key = int and type value = int)
 
 module Internalize(M:Mvbdu
@@ -704,6 +712,8 @@ module Internalize(M:Mvbdu
     let print = M.print
     let print_association_list = M.print_association_list
     let print_variables_list = M.print_variables_list
+
+    let hash_of_association_list = M.hash_of_association_list
    end:Internalized_mvbdu with type key = int and type value = int)
 
 module Optimize(M:Mvbdu with type key = int and type value = int) =
@@ -830,6 +840,9 @@ module Optimize(M:Mvbdu with type key = int and type value = int) =
 
 	     let store_by_variables_list = M.store_by_variables_list
 	     let store_by_mvbdu = M.store_by_mvbdu
+	     let hash_of_association_list = M.hash_of_association_list
+ 
+
 	   end:Mvbdu with type key = int and type value = int)
 
 module Optimize'(M:Internalized_mvbdu with type key = int and type value = int) =
@@ -899,6 +912,9 @@ module Optimize'(M:Internalized_mvbdu with type key = int and type value = int) 
 	     let mvbdu_cartesian_decomposition_depth = M.mvbdu_cartesian_decomposition_depth
 							 	
 	     let mvbdu_full_cartesian_decomposition = M.mvbdu_full_cartesian_decomposition
+
+	     let hash_of_association_list = M.hash_of_association_list
+ 
 
 	   end:Internalized_mvbdu)
 

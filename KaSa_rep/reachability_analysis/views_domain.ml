@@ -21,6 +21,7 @@ let warn parameters mh message exn default =
     (fun () -> default)
 
 let local_trace = false
+let compute_local_trace = true
 
 module Domain =
 struct
@@ -1712,7 +1713,6 @@ struct
       ~show_dep_with_dimmension_higher_than:dim_min
       parameter handler error handler_kappa site_correspondence result =
     let error,handler,mvbdu_true =
-      (*Mvbdu_wrapper.Mvbdu.mvbdu_true*)
       Ckappa_sig.Views_bdu.mvbdu_true
         parameter handler error
     in
@@ -1833,7 +1833,11 @@ struct
 
   let print_bdu_update_map_gen_decomposition decomposition
       ~smash:smash ~show_dep_with_dimmension_higher_than:dim_min
-      parameter handler error handler_kappa site_correspondence result =
+      parameter handler error handler_kappa site_correspondence (static:static_information) result =
+    let error,handler,mvbdu_true =
+      Ckappa_sig.Views_bdu.mvbdu_true
+        parameter handler error
+    in
     if
       smash
     then
@@ -1842,61 +1846,72 @@ struct
           decomposition
           ~show_dep_with_dimmension_higher_than:dim_min parameter handler error handler_kappa site_correspondence result
       in
-      Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
-        parameter
-        error
-        (fun parameter error agent_type map (handler:Ckappa_sig.Views_bdu.handler) ->
-	  let error', agent_string =
-            try
-              Handler.string_of_agent parameter error handler_kappa agent_type
-            with
-              _ -> warn parameter error (Some "line 111") Exit 
-                (Ckappa_sig.string_of_agent_name agent_type)
+      let error, handler = 
+	Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
+          parameter
+          error
+          (fun parameter error agent_type map (handler:Ckappa_sig.Views_bdu.handler) ->
+	    let error', agent_string =
+              try
+		Handler.string_of_agent parameter error handler_kappa agent_type
+              with
+		_ -> warn parameter error (Some "line 111") Exit 
+                  (Ckappa_sig.string_of_agent_name agent_type)
 	  in
-	  let error = Exception.check warn parameter error error' (Some "line 110") Exit in
+	    let error = Exception.check warn parameter error error' (Some "line 110") Exit in
 	  (*-----------------------------------------------------------------------*)
-	  Wrapped_modules.LoggedIntMap.fold
-	    (fun _ mvbdu (error,handler)
-	    ->
-	      let error, handler =
-	        if local_trace || Remanent_parameters.get_trace parameter
-	        then
-		  let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                    "INTENSIONAL DESCRIPTION:"
-                  in
-		  let () = Loggers.print_newline
-                    (Remanent_parameters.get_logger parameter)
-                  in
-		  let () =
+	    Wrapped_modules.LoggedIntMap.fold
+	      (fun _ mvbdu (error,handler)
+	      ->
+		let error, handler =
+	          if local_trace || Remanent_parameters.get_trace parameter
+	          then
+		    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                      "INTENSIONAL DESCRIPTION:"
+                    in
+		    let () = Loggers.print_newline
+                      (Remanent_parameters.get_logger parameter)
+                    in
+		    let () =
                     (*Mvbdu_wrapper.Mvbdu.print*)
-                    Ckappa_sig.Views_bdu.print
-                    parameter mvbdu
-                  in
-		  let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                    "EXTENSIONAL DESCRIPTION:"
-                  in
-		  let () = Loggers.print_newline
-                    (Remanent_parameters.get_logger parameter)
-                  in
-		  error, handler
-	        else
-		  error, handler
-	      in
-	      let error, (handler, translation) =
-	        Translation_in_natural_language.translate
-		  parameter handler error (fun _ e i -> e, i) mvbdu
-	      in
-	    (*-----------------------------------------------------------------------*)
-	      let error =
-	        Translation_in_natural_language.print
-		  ~show_dep_with_dimmension_higher_than:dim_min parameter
-		  handler_kappa error agent_string agent_type translation
-	      in
-	      error, handler
-	    )
-	    map
-	    (error, handler))
-        output handler
+                      Ckappa_sig.Views_bdu.print
+			parameter mvbdu
+                    in
+		    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                      "EXTENSIONAL DESCRIPTION:"
+                    in
+		    let () = Loggers.print_newline
+                      (Remanent_parameters.get_logger parameter)
+                    in
+		    error, handler
+	          else
+		    error, handler
+		in
+		let error, (handler, translation) =
+	          Translation_in_natural_language.translate
+		    parameter handler error (fun _ e i -> e, i) mvbdu
+		in
+	      (*-----------------------------------------------------------------------*)
+		let error =
+	          Translation_in_natural_language.print
+		    ~show_dep_with_dimmension_higher_than:dim_min parameter
+		    handler_kappa error agent_string agent_type translation
+		in
+		error, handler
+	      )
+	      map
+	      (error, handler))
+          output handler
+      in 
+      let compil = get_compil static in
+      let error, handler = 
+	if compute_local_trace
+	then
+	 Agent_trace.agent_trace parameter error handler handler_kappa mvbdu_true compil output 
+	else
+	  error, handler
+      in
+      error, handler
     else
       begin
         Covering_classes_type.AgentCV_map_and_set.Map.fold
@@ -2013,17 +2028,17 @@ struct
   (************************************************************************************)
   (*non relational properties*)
 
-  let print_bdu_update_map_cartesian_abstraction a b c d =
+  let print_bdu_update_map_cartesian_abstraction a b c d e =
     print_bdu_update_map_gen_decomposition
       ~smash:true
       ~show_dep_with_dimmension_higher_than:1
       Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction
-      a b c d
+      a b c d e
 
   (************************************************************************************)
   (*relational properties*)
 
-  let print_bdu_update_map_cartesian_decomposition a b c d =
+  let print_bdu_update_map_cartesian_decomposition a b c d e =
     print_bdu_update_map_gen_decomposition
       ~smash:true
       ~show_dep_with_dimmension_higher_than:
@@ -2032,12 +2047,12 @@ struct
        else 1
       )
       Ckappa_sig.Views_bdu.mvbdu_full_cartesian_decomposition
-      a b c d
+      a b c d e
 
   (************************************************************************************)
 
   let print_result_fixpoint_aux
-      parameter handler error handler_kappa site_correspondence result =
+      parameter handler error handler_kappa site_correspondence result (static:static_information) =
     if Remanent_parameters.get_dump_reachability_analysis_result parameter
     then
       let error =
@@ -2090,6 +2105,7 @@ struct
           error
           handler_kappa
 	  site_correspondence
+	  static
           result
       in
       let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
@@ -2114,6 +2130,7 @@ struct
           error
           handler_kappa
 	  site_correspondence
+	  static
           result
       in
       error, handler
@@ -2141,6 +2158,7 @@ struct
               kappa_handler
 	      store_remanent_triple
 	      fixpoint_result
+	      (static:static_information)
           in
           error
         (* ) error loggers*)
