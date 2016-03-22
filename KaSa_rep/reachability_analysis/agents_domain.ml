@@ -336,7 +336,7 @@ struct
           | Cckappa_sig.Unknown_agent _
           | Cckappa_sig.Ghost
           | Cckappa_sig.Dead_agent _ ->
-            warn parameter error (Some "line 275") Exit (dynamic, event_list)
+            warn parameter error (Some "line 339") Exit (dynamic, event_list)
           | Cckappa_sig.Agent agent ->
             let agent_type = agent.Cckappa_sig.agent_name in
             let error, (dynamic, event_list) =
