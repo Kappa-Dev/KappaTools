@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <2016-03-22 09:51:40 feret>
+  * Last modification: Time-stamp: <2016-03-22 10:22:16 feret>
   * *
   * Configuration parameters which are passed through functions computation
 
@@ -24,6 +24,12 @@ let open_out a =
   open_out a
 
 let compose f g = fun x -> f (g x)
+let ext_format x =
+  match
+    x
+  with
+  | Remanent_parameters_sig.DOT -> ".dot"
+  | Remanent_parameters_sig.HTML -> ".html"
 
 let fetch_level_gen s r =
   match
@@ -318,6 +324,7 @@ let get_rev_arrow_symbol_1         symbol = symbol.Remanent_parameters_sig.rev_a
 let get_bi_arrow_symbol_1          symbol = symbol.Remanent_parameters_sig.bi_arrow
 let get_uni_arrow_no_poly_symbol_1 symbol = symbol.Remanent_parameters_sig.uni_arrow_nopoly
 
+let get_im_format_1            influence = influence.Remanent_parameters_sig.im_format
 let get_im_file_1              influence = influence.Remanent_parameters_sig.im_file
 let get_im_directory_1         influence = influence.Remanent_parameters_sig.im_directory
 let get_rule_shape_1           influence = influence.Remanent_parameters_sig.rule_shape
@@ -333,6 +340,7 @@ let get_prompt_full_rule_def_1 influence = influence.Remanent_parameters_sig.pro
 let get_make_labels_compatible_1 influence = influence.Remanent_parameters_sig.make_labels_compatible
 
 let get_pure_contact_1        cm = cm.Remanent_parameters_sig.pure_contact
+let get_cm_format_1           cm = cm.Remanent_parameters_sig.cm_format
 let get_cm_file_1             cm = cm.Remanent_parameters_sig.cm_file
 let get_cm_directory_1        cm = cm.Remanent_parameters_sig.cm_directory
 let get_binding_site_shape_1  cm = cm.Remanent_parameters_sig.binding_site_shape
@@ -474,6 +482,7 @@ let get_rev_arrow_symbol = upgrade_from_symbols_field get_rev_arrow_symbol_1
 let get_bi_arrow_symbol = upgrade_from_symbols_field get_bi_arrow_symbol_1
 let get_uni_arrow_no_poly_symbol = upgrade_from_symbols_field get_uni_arrow_no_poly_symbol_1
 
+let get_im_format = upgrade_from_influence_map_field get_im_format_1
 let get_im_file = upgrade_from_influence_map_field get_im_file_1
 let get_im_directory = upgrade_from_influence_map_field get_im_directory_1
 let get_rule_shape = upgrade_from_influence_map_field get_rule_shape_1
@@ -489,6 +498,7 @@ let get_prompt_full_rule_def = upgrade_from_influence_map_field get_prompt_full_
 let get_make_labels_compatible_with_dot = upgrade_from_influence_map_field get_make_labels_compatible_1
 
 let get_pure_contact = upgrade_from_contact_map_field get_pure_contact_1
+let get_cm_format = upgrade_from_contact_map_field get_cm_format_1
 let get_cm_file = upgrade_from_contact_map_field get_cm_file_1
 let get_cm_directory = upgrade_from_contact_map_field get_cm_directory_1
 let get_binding_site_shape = upgrade_from_contact_map_field get_binding_site_shape_1
@@ -575,11 +585,11 @@ let close_file parameters error =
 
 let open_influence_map_file parameters error =
   let error,channel =
-    match get_im_file parameters,get_im_directory parameters
+    match get_im_file parameters,get_im_directory parameters,ext_format (get_im_format parameters)
     with
-      | None,_  -> error,stdout
-      | Some a,None -> error,open_out a
-      | Some a,Some d -> error,open_out (d^a)
+      | None,_,ext  -> error,stdout
+      | Some a,None,ext -> error,open_out (a^ext)
+      | Some a,Some d,ext -> error,open_out (d^a^ext)
   in
   let logger = Loggers.open_logger_from_channel channel
   in
@@ -588,11 +598,12 @@ let open_influence_map_file parameters error =
 
 let open_contact_map_file parameters error =
   let error,channel =
-    match get_cm_file parameters,get_cm_directory parameters
+    match get_cm_file parameters,get_cm_directory parameters,
+      ext_format (get_cm_format parameters)
     with
-      | None,_ -> error,stdout
-      | Some a,None -> error,open_out a
-      | Some a,Some d -> error,open_out (d^a)
+      | None,_,ext -> error,stdout
+      | Some a,None,ext -> error,open_out (a^ext)
+      | Some a,Some d,ext -> error,open_out (d^a^ext)
   in
     error,
     {
