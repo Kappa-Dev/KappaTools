@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <2016-03-22 11:38:09 feret>
+  * Last modification: Time-stamp: <2016-03-22 12:38:21 feret>
   * *
   * Configuration parameters which are passed through functions computation
 
@@ -40,8 +40,8 @@ let fetch_level_gen s r =
   | "medium" -> Remanent_parameters_sig.Medium
   | "high" -> Remanent_parameters_sig.High
   | "complete" | "full" -> Remanent_parameters_sig.Full
-  | _ ->
-     let _ = Printf.fprintf stderr "This is not %s level !!!" in raise Exit
+  | x ->
+     let _ = Printf.fprintf stderr "%s is not a valid level !!!"  x in raise Exit
 
 let fetch_graph_format f = 
   match
@@ -49,7 +49,7 @@ let fetch_graph_format f =
   with
   | "dot" -> Remanent_parameters_sig.DOT
   | "html" -> Remanent_parameters_sig.HTML
-
+  | x -> let _ = Printf.fprintf stderr "%s is not a valid graph format !!!" x in raise Exit
 let fetch_accuracy_level r = fetch_level_gen "an accuracy" r
 let fetch_verbosity_level r = fetch_level_gen "a verbosity" r
 

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <2016-03-22 11:40:31 feret>
+  * Last modification: Time-stamp: <2016-03-22 13:56:14 feret>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -58,21 +58,32 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil   output
 		    error, handler
 		  in
 		  let print_label_of_asso error list =
-		    List.fold_left
-			 (fun error (site_type, state) ->
-			   let error, state_string =
-			     Handler.string_of_state_fully_deciphered parameter error
-			       handler_kappa agent_type site_type state
-			   in
-			   let error = Exception.check warn parameter error error'
-			     (Some "line 240") Exit in
-			(*-----------------------------------------------------------*)
-			   let () =
-			  Printf.fprintf fic "_%s" state_string
-			   in
-			   error
-			 )
-			 error list
+		    let () = Printf.fprintf fic "%s(" agent_string  in
+		    let error,_ = 
+		      List.fold_left
+			(fun (error,bool) (site_type, state) ->
+			  let () =
+			    if bool
+			    then
+			      Printf.fprintf fic ","
+			  in
+			  let error, site_string = Handler.string_of_site parameter error handler_kappa agent_type site_type in
+			  let error, state_string =
+			    Handler.string_of_state_fully_deciphered parameter error
+			      handler_kappa agent_type site_type state
+			  in
+			  let error = Exception.check warn parameter error error'
+			    (Some "line 240") Exit in
+			   (*-----------------------------------------------------------*)
+			  let () =
+			    Printf.fprintf fic "%s%s" site_string state_string
+			  in
+			  error,true
+			)
+			(error,false) list
+		    in
+		    let () = Printf.fprintf fic ")\n" in
+		    error
 		  in
 		  let _ =
 		    Printf.fprintf fic
