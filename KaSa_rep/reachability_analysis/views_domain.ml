@@ -401,7 +401,7 @@ struct
     let error, store_covering_classes_modification_update_full =
       get_store_covering_classes_modification_update_full static dynamic error
     in
-    let error, (_, s1) =
+    let error, s1 =
       match
         Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
           parameter
@@ -409,8 +409,8 @@ struct
           (agent_type, cv_id)
           store_covering_classes_modification_update_full
       with
-      | error, None -> error, ([], Ckappa_sig.Rule_map_and_set.Set.empty)
-      | error, Some (l, s) -> error, (l, s)
+      | error, None -> error, Ckappa_sig.Rule_map_and_set.Set.empty
+      | error, Some s -> error, s
     in
   (*-----------------------------------------------------------------------*)
   (*print working list information*)
@@ -1001,7 +1001,7 @@ struct
                     store_covering_classes_id
                   with
                   | error, None -> error, []
-                  | error, Some (_, l) -> error, l
+                  | error, Some l -> error, l
                 in
                 let error, dynamic, bdu =
                   List.fold_left
@@ -1492,7 +1492,7 @@ struct
          site *)
       let error, store_update_half_break =
         Covering_classes_type.AgentCV_map_and_set.Map.fold
-          (fun (agent_type, cv_id) (l, rule_id_set) (error, store_result) ->
+          (fun (agent_type, cv_id) rule_id_set (error, store_result) ->
             let error, new_rule_id_set =
               List.fold_left (fun (error, store) (rule, state) ->
                 (*state is compatible with B.x*)
@@ -1511,7 +1511,7 @@ struct
               Covering_classes_type.AgentCV_map_and_set.Map.add_or_overwrite
                 parameter error 
                 (agent_type, cv_id)
-                (l, new_rule_id_set)
+                new_rule_id_set
                 store_result
             in
             error, store_result
@@ -1521,7 +1521,7 @@ struct
       (*store result with remove action*)
       let error, store_update_remove =
         Covering_classes_type.AgentCV_map_and_set.Map.fold
-          (fun (agent_type, cv_id) (l, rule_id_set) (error, store_result) ->
+          (fun (agent_type, cv_id) rule_id_set (error, store_result) ->
             let error, new_rule_id_set =
               List.fold_left (fun (error, store) rule ->
                 let error, new_update =
@@ -1535,7 +1535,7 @@ struct
               Covering_classes_type.AgentCV_map_and_set.Map.add_or_overwrite
                 parameter error
                 (agent_type, cv_id)
-                (l, new_rule_id_set)
+                new_rule_id_set
                 store_result
             in
             error, store_result
@@ -1547,21 +1547,21 @@ struct
         Covering_classes_type.AgentCV_map_and_set.Map.fold2
           parameter
           error
-          (fun parameter error (agent_type, cv_id) (_, rule_id_set) store_result ->
+          (fun parameter error (agent_type, cv_id) rule_id_set store_result ->
             let error, store_result =
               Bdu_dynamic_views.add_link parameter error (agent_type, cv_id)
                 rule_id_set store_result
             in
             error, store_result
           )
-          (fun parameter error (agent_type, cv_id) (_, rule_id_set) store_result ->
+          (fun parameter error (agent_type, cv_id) rule_id_set store_result ->
             let error, store_result =
               Bdu_dynamic_views.add_link parameter error (agent_type, cv_id)
                 rule_id_set store_result
             in
             error, store_result
           )
-          (fun parameter error (agent_type, cv_id) (_, s1) (_, s2) store_result ->
+          (fun parameter error (agent_type, cv_id) s1 s2 store_result ->
             let error', union_set =
               Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2
             in
@@ -1586,7 +1586,7 @@ struct
       let store_update = get_store_update dynamic in
       let event_list =
         Covering_classes_type.AgentCV_map_and_set.Map.fold
-          (fun (agent_type, cv_id) (_, rule_id_set) event_list ->
+          (fun (agent_type, cv_id) rule_id_set event_list ->
             Ckappa_sig.Rule_map_and_set.Set.fold
               (fun rule_id event_list ->
                 (Communication.Check_rule rule_id) :: event_list
@@ -1642,7 +1642,7 @@ struct
               Loggers.print_newline log
 	    in
 	    let error =
-              Print_bdu_analysis_static.print_result_static (*FIXME*)
+              Print_static_views.print_result_static
                 parameter
                 error
                 kappa_handler
@@ -1844,7 +1844,8 @@ struct
       let error,handler,output =
         smash_map
           decomposition
-          ~show_dep_with_dimmension_higher_than:dim_min parameter handler error handler_kappa site_correspondence result
+          ~show_dep_with_dimmension_higher_than:dim_min parameter handler error
+          handler_kappa site_correspondence result
       in
       let error, handler = 
 	Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
@@ -1873,7 +1874,6 @@ struct
                       (Remanent_parameters.get_logger parameter)
                     in
 		    let () =
-                    (*Mvbdu_wrapper.Mvbdu.print*)
                       Ckappa_sig.Views_bdu.print
 			parameter mvbdu
                     in

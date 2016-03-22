@@ -21,29 +21,22 @@ let local_trace = false
 
 type pre_static =
   {
-    store_modification_sites  :
-    (int list * Ckappa_sig.Rule_map_and_set.Set.t)
-    Ckappa_sig.AgentsSite_map_and_set.Map.t; (*JF:  the int list seems to be useless, could you check and remove it ? *)
-    store_test_sites :
-      (int list * Ckappa_sig.Rule_map_and_set.Set.t) 
-      Ckappa_sig.AgentsSite_map_and_set.Map.t; (*JF:  the int list seems to be useless, could you check and remove it ? *)
-    store_test_modification_sites :
-      (int list * Ckappa_sig.Rule_map_and_set.Set.t) 
-      Ckappa_sig.AgentsSite_map_and_set.Map.t; (*JF:  the int list seems to be useless, could you check and remove it ? *)
+    store_modification_sites  : Ckappa_sig.Rule_map_and_set.Set.t Ckappa_sig.AgentsSite_map_and_set.Map.t;
+    store_test_sites : Ckappa_sig.Rule_map_and_set.Set.t Ckappa_sig.AgentsSite_map_and_set.Map.t;
+    store_test_modification_sites : Ckappa_sig.Rule_map_and_set.Set.t Ckappa_sig.AgentsSite_map_and_set.Map.t;
     (*views that are tested and modificated without agent_id, will be used in
       update function*)
-    store_modif_map      : (int list * Ckappa_sig.Rule_map_and_set.Set.t) Ckappa_sig.AgentSite_map_and_set.Map.t; (*JF:  the int list seems to be useless, could you check and remove it ? *)
-    store_test_map       : (int list * Ckappa_sig.Rule_map_and_set.Set.t) Ckappa_sig.AgentSite_map_and_set.Map.t; (*JF:  the int list seems to be useless, could you check and remove it ? *)
-    store_test_modif_map : (int list * Ckappa_sig.Rule_map_and_set.Set.t) Ckappa_sig.AgentSite_map_and_set.Map.t; (*JF:  the int list seems to be useless, could you check and remove it ? *)
+    store_modif_map: Ckappa_sig.Rule_map_and_set.Set.t Ckappa_sig.AgentSite_map_and_set.Map.t;
+    store_test_map : Ckappa_sig.Rule_map_and_set.Set.t Ckappa_sig.AgentSite_map_and_set.Map.t;
+    store_test_modif_map: Ckappa_sig.Rule_map_and_set.Set.t Ckappa_sig.AgentSite_map_and_set.Map.t;
   }
 
 type bdu_analysis_static =
   {
     store_pre_static : pre_static;
-    store_covering_classes: Covering_classes_type.remanent 
+    store_covering_classes: Covering_classes_type.remanent
       Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.t;
-    store_covering_classes_id : (int list * Covering_classes_type.cv_id list) 
-      Ckappa_sig.AgentSite_map_and_set.Map.t;
+    store_covering_classes_id : Covering_classes_type.cv_id list Ckappa_sig.AgentSite_map_and_set.Map.t;
     (*rewrite/ change type of this function ?*)
     store_remanent_triple:
       ((Covering_classes_type.Dictionary_of_List_sites.key * 
@@ -58,9 +51,7 @@ type bdu_analysis_static =
       Ckappa_sig.Views_bdu.hconsed_association_list
       Covering_classes_type.AgentsRuleCV_map_and_set.Map.t;
     store_proj_bdu_potential_restriction_map :
-      (Ckappa_sig.Views_bdu.mvbdu *
-         Ckappa_sig.Views_bdu.hconsed_association_list
-      )
+      (Ckappa_sig.Views_bdu.mvbdu * Ckappa_sig.Views_bdu.hconsed_association_list)
       Covering_classes_type.AgentSiteCV_setmap.Map.t 
       Ckappa_sig.Rule_setmap.Map.t;
     store_proj_bdu_test_restriction :
@@ -73,15 +64,7 @@ type bdu_analysis_static =
 (*implementation of pre_static*)
 
 let collect_modification_sites parameter error rule_id diff_direct store_result =
-  (*from a pair of Map (agent_id, agent_type, site) -> rule_id :: old_result)*)
   let add_link error (agent_id, agent_type, site_type) rule_id store_result =
-    let error, (l, old) =
-      match Ckappa_sig.AgentsSite_map_and_set.Map.find_option_without_logs parameter error
-        (agent_id, agent_type, site_type) store_result
-      with
-      | error, None -> error, ([], Ckappa_sig.Rule_map_and_set.Set.empty)
-      | error, Some (l, s) -> error, (l, s)
-    in
     let error', current_set =
       Ckappa_sig.Rule_map_and_set.Set.add 
         parameter
@@ -93,7 +76,7 @@ let collect_modification_sites parameter error rule_id diff_direct store_result 
     let error, result =
       Ckappa_sig.AgentsSite_map_and_set.Map.add_or_overwrite parameter error
         (agent_id, agent_type, site_type) 
-        (l, current_set) store_result
+        current_set store_result
     in
     error, result
   in
@@ -118,7 +101,7 @@ let collect_modification_sites parameter error rule_id diff_direct store_result 
       ) diff_direct store_result
   in
   let store_result =
-    Ckappa_sig.AgentsSite_map_and_set.Map.map (fun (l, x) -> List.rev l, x) store_result
+    Ckappa_sig.AgentsSite_map_and_set.Map.map (fun x -> x) store_result
   in
   error, store_result
 
@@ -130,11 +113,11 @@ let collect_modif_map parameter error store_modification_sites =
       error, (agent_type, site_type))
     parameter
     error
-    ([], Ckappa_sig.Rule_map_and_set.Set.empty)
-    (fun parameter error (l1, s1) (l2, s2) ->
+    Ckappa_sig.Rule_map_and_set.Set.empty
+    (fun parameter error s1 s2 ->
       let error', new_set = Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2 in
       let error = Exception.check warn parameter error error' (Some "line 118") Exit in
-      error, (List.concat [l1; l2], new_set)
+      error, new_set
     ) store_modification_sites
 
 (************************************************************************************)
@@ -143,13 +126,6 @@ let collect_modif_map parameter error store_modification_sites =
 let collect_test_sites parameter error rule_id viewslhs 
     store_result =
   let add_link (agent_id, agent_type, site_type) rule_id store_result =
-    let error, (l, old) =
-      match Ckappa_sig.AgentsSite_map_and_set.Map.find_option_without_logs parameter error
-        (agent_id, agent_type, site_type) store_result
-      with
-      | error, None -> error, ([], Ckappa_sig.Rule_map_and_set.Set.empty)
-      | error, Some (l, s) -> error, (l, s)
-    in
     let error', current_set =
       Ckappa_sig.Rule_map_and_set.Set.add
         parameter
@@ -162,7 +138,7 @@ let collect_test_sites parameter error rule_id viewslhs
       Ckappa_sig.AgentsSite_map_and_set.Map.add_or_overwrite
         parameter error
         (agent_id, agent_type, site_type)
-        (l, current_set) store_result
+        current_set store_result
     in
     error, result
   in
@@ -188,7 +164,7 @@ let collect_test_sites parameter error rule_id viewslhs
       ) viewslhs store_result
   in
   let store_result =
-    Ckappa_sig.AgentsSite_map_and_set.Map.map (fun (l, x) -> List.rev l, x) store_result
+    Ckappa_sig.AgentsSite_map_and_set.Map.map (fun x -> x) store_result
   in
   error, store_result
 
@@ -200,11 +176,11 @@ let collect_test_map parameter error store_test_sites =
       error, (agent_type, site_type))
     parameter
     error
-    ([], Ckappa_sig.Rule_map_and_set.Set.empty)
-    (fun parameter error (l1, s1) (l2, s2) ->
+    (Ckappa_sig.Rule_map_and_set.Set.empty)
+    (fun parameter error s1 s2 ->
       let error', new_set = Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2 in
       let error = Exception.check warn parameter error error' (Some "line 118") Exit in
-      error, (List.concat [l1; l2], new_set)
+      error, ( new_set)
     ) store_test_sites
 
 (************************************************************************************)
@@ -218,12 +194,12 @@ test: agent_type:0:site_type:0:[4;5;6;7]
 let collect_test_modification_sites
     parameter error store_modification_map store_test_map store_result =
   let add_link error (agent_id, agent_type, site_type) rule_id_set store_result =
-    let error, (l, old) =
+    let error, old =
       match Ckappa_sig.AgentsSite_map_and_set.Map.find_option_without_logs parameter error 
         (agent_id, agent_type, site_type) store_result
       with
-      | error, None -> error, ([], Ckappa_sig.Rule_map_and_set.Set.empty)
-      | error, Some (l, s) -> error, (l, s)
+      | error, None -> error, Ckappa_sig.Rule_map_and_set.Set.empty
+      | error, Some s -> error, s
     in
     let error, union =
       Ckappa_sig.Rule_map_and_set.Set.union parameter error old rule_id_set in
@@ -231,28 +207,28 @@ let collect_test_modification_sites
       Ckappa_sig.AgentsSite_map_and_set.Map.add_or_overwrite
         parameter error 
         (agent_id, agent_type, site_type)
-        (l, union) store_result
+        union store_result
     in
     error, result
   in
   Ckappa_sig.AgentsSite_map_and_set.Map.fold2
     parameter error
     (*exists in 'a t*)
-    (fun parameter error (agent_id, agent_type, site_type) (l1, s1) store_result ->
+    (fun parameter error (agent_id, agent_type, site_type) s1 store_result ->
       let error, store_result =
         add_link error (agent_id, agent_type, site_type) s1 store_result
       in
       error, store_result
     )
     (*exists in 'b t*)
-    (fun parameter error (agent_id, agent_type, site_type) (l2, s2) store_result ->
+    (fun parameter error (agent_id, agent_type, site_type) s2 store_result ->
       let error, store_result =
         add_link error (agent_id, agent_type, site_type) s2 store_result
       in
       error, store_result
     )
     (*exists in both*)
-    (fun parameter error (agent_id, agent_type, site_type) (l1, s1) (l2, s2) store_result ->
+    (fun parameter error (agent_id, agent_type, site_type) s1 s2 store_result ->
       let error',union = Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2 in
       let error = Exception.check warn parameter error error' (Some "line 212") Exit in   
       let error, store_result =
@@ -269,11 +245,11 @@ let collect_test_modif_map parameter error store_test_modification_sites =
       error, (agent_type, site_type)
     )
     parameter error
-    ([], Ckappa_sig.Rule_map_and_set.Set.empty)
-    (fun parameter error (l1, s1) (l2, s2) ->
+    (Ckappa_sig.Rule_map_and_set.Set.empty)
+    (fun parameter error s1 s2 ->
       let error', new_set = Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2 in
       let error = Exception.check warn parameter error error' (Some "line 118") Exit in
-      error, (List.concat [l1; l2], new_set)
+      error, (new_set)
     )
     store_test_modification_sites
 
@@ -350,16 +326,16 @@ let scan_rule_pre_static parameter error (rule_id:Ckappa_sig.c_rule_id) rule han
 
 let site_covering_classes parameter error covering_classes =
   let add_link (agent_type, site_type) cv_id store_result =
-    let error, (l, old) =
+    let error, old =
       match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs parameter error
         (agent_type, site_type) store_result 
       with
-      | error, None -> error, ([], [])
-      | error, Some (l, l') -> error, (l, l')
+      | error, None -> error, []
+      | error, Some l -> error, l
     in
     let error, result =
       Ckappa_sig.AgentSite_map_and_set.Map.add_or_overwrite parameter error
-        (agent_type, site_type) (l, cv_id :: old) store_result
+        (agent_type, site_type) (cv_id :: old) store_result
     in
     error, result
   in
@@ -388,7 +364,7 @@ let site_covering_classes parameter error covering_classes =
       ) covering_classes Ckappa_sig.AgentSite_map_and_set.Map.empty
   in
   let store_result =
-    Ckappa_sig.AgentSite_map_and_set.Map.map (fun (l, x) -> List.rev l, x) store_result
+    Ckappa_sig.AgentSite_map_and_set.Map.map (fun x -> x) store_result
   in
   error, store_result
 
@@ -467,7 +443,6 @@ let collect_remanent_triple parameter error store_remanent store_result =
 
 let build_bdu parameter handler error (pair_list: (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list) =
   let error, handler, bdu_true =
-    (*Mvbdu_wrapper.Mvbdu.mvbdu_true*)
     Ckappa_sig.Views_bdu.mvbdu_true
       parameter handler error
   in
