@@ -526,11 +526,11 @@ struct
       | error, None -> error, Ckappa_sig.PairAgentSiteState_map_and_set.Set.empty
       | error, Some l -> error, l
     in
-    let error, inter =
+(*    let error, inter =
       Ckappa_sig.PairAgentSiteState_map_and_set.Set.inter
         parameter error contact_map bond_lhs_set
-    in
-    if Ckappa_sig.PairAgentSiteState_map_and_set.Set.is_empty inter
+    in*)
+    if Ckappa_sig.PairAgentSiteState_map_and_set.Set.subset bond_lhs_set contact_map
     then 
       (* use the function Communication.overwrite_potential_partners_map to
          fill the two fields related to the dynamic contact map *)
@@ -621,7 +621,7 @@ struct
     in
     (*check if it is seen for the first time, if not update the contact
       map, and raise an event*)
-    let dynamic = set_contact_map_dynamic new_contact_map dynamic in
+(*    let dynamic = set_contact_map_dynamic new_contact_map dynamic in*)
     let event_list =
       Ckappa_sig.PairAgentSiteState_map_and_set.Set.fold (fun pair event_list ->
         (Communication.See_a_new_bond pair) :: event_list
