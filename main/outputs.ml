@@ -44,7 +44,7 @@ let dot_of_flux flux =
 
 let print_json_of_flux f flux =
   let () = Format.fprintf
-             f "@[<v>{@ \"bio_begin_time\" : %e,@ \"bio_end_time\" : %e,@ "
+             f "@[<v>{@ \"bioBeginTime\" : %e,@ \"bioEndTime\" : %e,@ "
              flux.Data.flux_data.Data.flux_start flux.Data.flux_end in
   let () =
     Format.fprintf
@@ -81,7 +81,7 @@ let html_of_flux flux =
        Format.fprintf
          f "stroke: #000;@ stroke-width: .5px;@ }@]@,</style>")
        (fun f ->
-        let () = Format.fprintf f "@[<hv 2><form id=\"menu\">@," in
+        let () = Format.fprintf f "@[<hv 2><form>@," in
         let () = Format.fprintf f "@[<v 2><div class=\"form-group\">@," in
         let () =
           Format.fprintf f "<label for=\"correction\">Correction</label>@," in
@@ -102,6 +102,7 @@ let html_of_flux flux =
             "<input id=\"checkbox_self_influence\" type=\"checkbox\">@," in
         let () =
           Format.fprintf f "Rules self influence@]@,</label>@]@,</form>@," in
+	let () = Format.fprintf f "<form id=\"menu\"></form>@," in
         let () = Format.fprintf
                    f "@[<v 2><script>@,%s@,</script>@]@," Resource_strings.flux_js in
 
@@ -109,14 +110,15 @@ let html_of_flux flux =
                    f "@[<v 2><script>@,\"use strict\"@,@[var flux =@ %a;@]@,"
                    print_json_of_flux flux in
         let () = Format.fprintf f "var ids = {@[@," in
-        let () = Format.fprintf f "\"beginTimeId\" : \"begin_time\", @," in
-        let () = Format.fprintf f "\"endTimeId\" : \"end_time\", @," in
-        let () = Format.fprintf f "\"selectCorrectionId\" : \"select_correction\", @," in
-        let () = Format.fprintf f "\"nbEventsId\" : \"nb_events\", @," in
-        let () = Format.fprintf f "\"checkboxSelfInfluenceId\" : \"checkbox_self_influence\"}; @] @," in
+        let () = Format.fprintf f "\"beginTimeId\" : \"begin_time\",@ " in
+        let () = Format.fprintf f "\"endTimeId\" : \"end_time\",@ " in
+        let () = Format.fprintf f "\"selectCorrectionId\" : \"select_correction\",@ " in
+        let () = Format.fprintf f "\"nbEventsId\" : \"nb_events\",@ " in
+        let () = Format.fprintf f "\"rulesCheckboxesId\" : \"menu\",@ " in
+        let () = Format.fprintf f "\"checkboxSelfInfluenceId\" : \"checkbox_self_influence\"};@]@ " in
         let () = Format.fprintf f "window.onload = function(){ @[@," in
-        let () = Format.fprintf f "var flux_map = new fluxMap(ids); @," in
-        let () = Format.fprintf f "flux_map.setFlux(flux); }; @]  @," in
+        let () = Format.fprintf f "var flux_map = new fluxMap(ids);@ " in
+        let () = Format.fprintf f "flux_map.setFlux(flux); }; @]@," in
         Format.fprintf f "@]@,</script>"))
 
 let output_flux out =
