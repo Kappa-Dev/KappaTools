@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <2016-03-22 10:22:16 feret>
+  * Last modification: Time-stamp: <2016-03-22 11:38:09 feret>
   * *
   * Configuration parameters which are passed through functions computation
 
@@ -183,8 +183,11 @@ let add_debugging_parameters_to_reachability_map reachability =
 	fetch_graph_format Config.local_trace_format ;
     Remanent_parameters_sig.trace_prefix = 
 	!Config.local_trace_prefix ;
-    Remanent_parameters_sig.trace_directory = "" ;
-        
+    Remanent_parameters_sig.trace_directory = 
+	match !Config.output_local_trace_directory 
+	with "" -> ""
+	| x -> x^"/"
+;
     }
   in
   if trace then
@@ -367,9 +370,12 @@ let get_dump_reachability_analysis_wl_1 r = r.Remanent_parameters_sig.dump_reach
 let get_smash_relations_1 r = r.Remanent_parameters_sig.smash_relations
 let get_hide_one_d_relations_from_cartesian_decomposition_1 r = r.Remanent_parameters_sig.hide_one_d_relations_from_cartesian_decomposition
 let get_use_natural_language_1 r = r.Remanent_parameters_sig.use_natural_language
+let get_local_trace_format_1 r = r.Remanent_parameters_sig.format_for_local_traces
 let get_compute_local_traces_1 r = r.Remanent_parameters_sig.compute_local_traces
 let get_show_rule_names_in_local_traces_1 r = r.Remanent_parameters_sig.show_rule_names_in_local_traces
 let get_use_por_in_local_traces_1 r = r.Remanent_parameters_sig.use_por_in_local_traces
+let get_local_trace_prefix_1 r = r.Remanent_parameters_sig.trace_prefix
+let get_local_trace_directory_1 r = r.Remanent_parameters_sig.trace_directory
 
 let get_symbols_1                          marshalisable = marshalisable.Remanent_parameters_sig.symbols
 let get_file_1                             marshalisable = marshalisable.Remanent_parameters_sig.file
@@ -525,10 +531,12 @@ let get_dump_reachability_analysis_wl = upgrade_from_reachability_map_field get_
 let get_use_natural_language = upgrade_from_reachability_map_field get_use_natural_language_1
 let get_hide_one_d_relations_from_cartesian_decomposition = upgrade_from_reachability_map_field get_hide_one_d_relations_from_cartesian_decomposition_1
 let get_smash_relations = upgrade_from_reachability_map_field get_smash_relations_1
+let get_local_trace_format = upgrade_from_reachability_map_field get_local_trace_format_1
 let get_compute_local_traces = upgrade_from_reachability_map_field get_compute_local_traces_1
 let get_show_rule_names_in_local_traces = upgrade_from_reachability_map_field get_show_rule_names_in_local_traces_1
 let get_use_por_in_local_traces = upgrade_from_reachability_map_field get_use_por_in_local_traces_1
-
+let get_local_trace_prefix = upgrade_from_reachability_map_field get_local_trace_prefix_1
+let get_local_trace_directory = upgrade_from_reachability_map_field get_local_trace_directory_1
 
 let set_prefix_1 marshalisable prefix =
   {marshalisable with Remanent_parameters_sig.prefix = prefix}

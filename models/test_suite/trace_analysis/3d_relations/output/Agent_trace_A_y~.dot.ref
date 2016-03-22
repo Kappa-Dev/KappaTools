@@ -1,0 +1,6 @@
+digraph G{
+Node_1 [label="_p"];
+Node_2 [label="_u"];
+Node_2 -> Node_1 [label=""];
+Node_1 -> Node_2 [label=""];
+}
