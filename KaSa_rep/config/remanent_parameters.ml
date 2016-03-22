@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <2016-01-26 14:14:21 feret>
+  * Last modification: Time-stamp: <2016-03-22 09:51:40 feret>
   * *
   * Configuration parameters which are passed through functions computation
 
@@ -37,6 +37,13 @@ let fetch_level_gen s r =
   | _ ->
      let _ = Printf.fprintf stderr "This is not %s level !!!" in raise Exit
 
+let fetch_graph_format f = 
+  match
+    String.lowercase !f
+  with
+  | "dot" -> Remanent_parameters_sig.DOT
+  | "html" -> Remanent_parameters_sig.HTML
+
 let fetch_accuracy_level r = fetch_level_gen "an accuracy" r
 let fetch_verbosity_level r = fetch_level_gen "a verbosity" r
 
@@ -65,6 +72,7 @@ let get_symbols () =
 
 let get_influence_map () =
   {
+    Remanent_parameters_sig.im_format = fetch_graph_format Config.influence_map_format ;
     Remanent_parameters_sig.im_file =
       (match !Config.influence_map_file
       with
@@ -72,7 +80,7 @@ let get_influence_map () =
       | x -> Some x) ;
 
     Remanent_parameters_sig.im_directory =
-      (match !Config.output_directory
+      (match !Config.output_im_directory
       with
       | "" -> Some ""
       | x -> Some (x^"/")) ;
@@ -96,6 +104,7 @@ let get_influence_map () =
 
 let get_contact_map () =
    {
+     Remanent_parameters_sig.cm_format = fetch_graph_format Config.contact_map_format;
      Remanent_parameters_sig.cm_file =
        (match !Config.contact_map_file
 	with
@@ -103,7 +112,7 @@ let get_contact_map () =
 	| x -> Some x) ;
 
      Remanent_parameters_sig.cm_directory =
-       (match !Config.output_directory
+       (match !Config.output_cm_directory
 	with
 	| "" -> Some ""
       | x -> Some (x^"/")) ;
@@ -131,9 +140,18 @@ let reachability_map_0 =
     Remanent_parameters_sig.dump_reachability_analysis_static = false;
     Remanent_parameters_sig.dump_reachability_analysis_dynamic = false;
     Remanent_parameters_sig.hide_one_d_relations_from_cartesian_decomposition = false;
+    Remanent_parameters_sig.compute_local_traces = false;
+    Remanent_parameters_sig.show_rule_names_in_local_traces = false;
+    Remanent_parameters_sig.use_por_in_local_traces = false;
     Remanent_parameters_sig.smash_relations = false;
     Remanent_parameters_sig.use_natural_language = false;
-
+    Remanent_parameters_sig.format_for_local_traces = Remanent_parameters_sig.DOT ;
+    Remanent_parameters_sig.trace_prefix = "Agent_trace_";
+    Remanent_parameters_sig.trace_directory = 
+      (match !Config.output_local_trace_directory
+	with
+	| "" -> ""
+	| x -> (x^"/")) ;
   }
 
 let reachability_map_1 = { reachability_map_0 with Remanent_parameters_sig.dump_reachability_analysis_result = true }
@@ -150,6 +168,17 @@ let add_debugging_parameters_to_reachability_map reachability =
       Remanent_parameters_sig.hide_one_d_relations_from_cartesian_decomposition = !Config.hide_one_d_relations_from_cartesian_decomposition;
       Remanent_parameters_sig.smash_relations = !Config.smash_relations;
       Remanent_parameters_sig.use_natural_language = !Config.use_natural_language;
+      Remanent_parameters_sig.compute_local_traces = !Config.compute_local_traces;
+      Remanent_parameters_sig.show_rule_names_in_local_traces =
+ !Config.show_rule_names_in_local_traces ;
+    Remanent_parameters_sig.use_por_in_local_traces =
+	!Config.use_por_in_local_traces ;
+    Remanent_parameters_sig.format_for_local_traces = 
+	fetch_graph_format Config.local_trace_format ;
+    Remanent_parameters_sig.trace_prefix = 
+	!Config.local_trace_prefix ;
+    Remanent_parameters_sig.trace_directory = "" ;
+        
     }
   in
   if trace then
@@ -330,6 +359,9 @@ let get_dump_reachability_analysis_wl_1 r = r.Remanent_parameters_sig.dump_reach
 let get_smash_relations_1 r = r.Remanent_parameters_sig.smash_relations
 let get_hide_one_d_relations_from_cartesian_decomposition_1 r = r.Remanent_parameters_sig.hide_one_d_relations_from_cartesian_decomposition
 let get_use_natural_language_1 r = r.Remanent_parameters_sig.use_natural_language
+let get_compute_local_traces_1 r = r.Remanent_parameters_sig.compute_local_traces
+let get_show_rule_names_in_local_traces_1 r = r.Remanent_parameters_sig.show_rule_names_in_local_traces
+let get_use_por_in_local_traces_1 r = r.Remanent_parameters_sig.use_por_in_local_traces
 
 let get_symbols_1                          marshalisable = marshalisable.Remanent_parameters_sig.symbols
 let get_file_1                             marshalisable = marshalisable.Remanent_parameters_sig.file
@@ -483,6 +515,9 @@ let get_dump_reachability_analysis_wl = upgrade_from_reachability_map_field get_
 let get_use_natural_language = upgrade_from_reachability_map_field get_use_natural_language_1
 let get_hide_one_d_relations_from_cartesian_decomposition = upgrade_from_reachability_map_field get_hide_one_d_relations_from_cartesian_decomposition_1
 let get_smash_relations = upgrade_from_reachability_map_field get_smash_relations_1
+let get_compute_local_traces = upgrade_from_reachability_map_field get_compute_local_traces_1
+let get_show_rule_names_in_local_traces = upgrade_from_reachability_map_field get_show_rule_names_in_local_traces_1
+let get_use_por_in_local_traces = upgrade_from_reachability_map_field get_use_por_in_local_traces_1
 
 
 let set_prefix_1 marshalisable prefix =

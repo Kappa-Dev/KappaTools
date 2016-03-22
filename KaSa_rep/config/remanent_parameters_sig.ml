@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <2016-01-22 14:31:36 feret>
+  * Last modification: Time-stamp: <2016-03-22 09:25:48 feret>
   * *
   * Configuration parameters which are passed through functions computation
   *
@@ -20,6 +20,7 @@ module CharMap = Mods.CharMap
 type called_from = KaSa | KaSim | Internalised | JS
 type accuracy_level = None | Low | Medium | High | Full
 type link_mode = Bound_indices | Site_address | Bound_type
+type graph_format = DOT | HTML
 
 type symbol_table =
   {
@@ -41,12 +42,13 @@ type symbol_table =
    rev_arrow : string ;
    bi_arrow : string ;
    uni_arrow_nopoly : string ;
-    }
+  }
 
 type influence_map_output =
   {
     im_directory : string option ;
     im_file : string option ;
+    im_format: graph_format ;
     rule_shape : string ;
     rule_color : string ;
     variable_shape : string ;
@@ -64,6 +66,7 @@ type contact_map_output =
   {
     cm_directory : string option ;
     cm_file : string option ;
+    cm_format: graph_format ;
     pure_contact : bool ;
     binding_site_shape : string ;
     binding_site_color : string ;
@@ -89,7 +92,13 @@ type reachability_map_output =
     dump_reachability_analysis_wl : bool;
     hide_one_d_relations_from_cartesian_decomposition : bool;
     smash_relations : bool;
+    compute_local_traces: bool;
+    show_rule_names_in_local_traces: bool;
+    format_for_local_traces: graph_format;
+    use_por_in_local_traces: bool;
     use_natural_language : bool;
+    trace_prefix: string;
+    trace_directory: string;
   }
 
 type marshalisable_parameters =

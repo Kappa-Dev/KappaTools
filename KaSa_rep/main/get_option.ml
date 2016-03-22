@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <2016-01-21 15:24:58 feret>
+  * Last modification: Time-stamp: <2016-03-22 10:09:04 feret>
   * *
   * primitive to parse command-line options
   *
@@ -40,13 +40,13 @@ let options =
       "--compute-contact-map",
       Bool Config.do_contact_map,
       "compute the contact map",
-      ["0_Actions";"3_Contact_map"],
+      ["0_Actions";"4_Contact_map"],
       Normal;
 
       "--compute-influence-map",
       Bool Config.do_influence_map,
       "compute the influence map",
-      ["0_Actions";"4_Influence_map"],
+      ["0_Actions";"5_Influence_map"],
       Normal;
 
        "--influence-map-accuracy-level",
@@ -56,24 +56,24 @@ let options =
 (*    "High",""*) ],
             Config.influence_map_accuracy_level)),
         "Tune the accuracy level of the influence map",
-	["4_Influence_map"],
+	["5_Influence_map"],
 	Normal;
 
       "--compute-ODE-flow-of-information",
       Bool Config.do_ODE_flow_of_information,
       "Compute an approximation of the flow of information in the ODE semantics",
-      ["0_Actions";"5_Flow_of_information"],
+      ["0_Actions";"6_Flow_of_information"],
       Expert;
 
       "--compute-stochastic-flow-of-information",
       Bool Config.do_stochastic_flow_of_information,
       "Compute an approximation of the flow of information in the stochastic semantics",
-      ["0_Actions";"5_Flow_of_information"],
+      ["0_Actions";"6_Flow_of_information"],
       Expert;
 
       "--compute-reachability-analysis",
       Bool Config.do_reachability_analysis,
-      "Compute iteration between the sites of agents",
+      "Compute an approximation of the states of agent sites",
       ["0_Actions";"2_Reachability_analysis"],
       Normal;
 
@@ -118,12 +118,69 @@ let options =
       ["2_Reachability_analysis"],
       Normal;
 
-      "--output-directory",
-      String Config.output_directory,
-      "put output files in this directory",
-      ["1_Output";"2_Reachability_analysis";"3_Contact_map";"4_Influence_map"],
+      "--compute-local-traces",
+      Bool Config.compute_local_traces,
+      "Compute the local traces of interesting parts of agent interfaces",
+      ["0_Actions";"3_Trace_analysis"],
       Normal;
 
+      "--show-rule-names-in-local-traces",
+      Bool Config.show_rule_names_in_local_traces,
+      "Annotate each transition with the name of the rules in trace abstraction",
+      ["0_Action";"3_Trace_analysis"],
+      Normal;
+
+      "--use_por_in_local_traces",
+      Bool Config.use_por_in_local_traces,
+      "Use partial order reduction to get a compact trace up to interleaving permutation",
+      ["0_Action";"3_Trace_analysis"],
+      Expert;
+
+      "--output-directory",
+       MultiExt
+	[
+	  "--output-contact-map-directory","";
+	  "--output-influence-map-directory","";
+	  "--output-local-traces-directory",""],
+      "Default repository for outputs",
+      ["1_Output"],
+      Normal;
+      "--output-contact-map-directory",
+      String Config.output_cm_directory,
+      "put the contact map file in this directory",
+      ["1_Output";"4_Contact_map"],
+      Normal;
+      "--output-influence-map-directory",
+      String Config.output_im_directory,
+      "put the influence map file in this directory",
+      ["1_Output";"5_Influence_map"],
+      Normal;
+       "--output-local-traces-directory",
+      String Config.output_local_trace_directory,
+      "put the files aboud local traces in this directory",
+      ["1_Output";"3_Trace_analysis"],
+      Normal;
+      "--contact-map-format",
+      (Choice (["DOT","dot format";
+	       "HTML","HTML format"],
+	       Config.contact_map_format)),
+      "Tune the output format for the contact map",
+      ["1_Output";"4_Contact_map"],
+      Normal;
+      "--influence-map-format",
+      (Choice (["DOT","dot format";
+	       "HTML","HTML format"],
+       Config.influence_map_format)),
+      "Tune the output format for the influence map",
+      ["1_Output";"5_Influence_map"],
+      Normal;
+      "--local_traces-map-format",
+      (Choice (["DOT","dot format";
+	       "HTML","HTML format"],
+       Config.local_trace_format)),
+      "Tune the output format for the local transition systems",
+      ["1_Output";"3_Trace_analysis"],
+      Normal;
       "--contact-map-accuracy-level",
         (Choice
            (["Low","Collect info from rhs of rules and initial state";
@@ -131,31 +188,31 @@ let options =
              ],
             Config.contact_map_accuracy_level)),
         "Tune the accuracy level of the contact map",
-	["3_Contact_map"],
+	["4_Contact_map"],
 	Normal;
 
       "--pure-contact",
       Bool Config.pure_contact,
       "show in the contact map  only the sites with a binding state",
-      ["3_Contact_map"],
+      ["4_Contact_map"],
       Expert;
 
       "--output-contact-map",
       String Config.contact_map_file,
       "file name for the contact map output",
-      ["1_Output";"3_Contact_map"],
+      ["1_Output";"4_Contact_map"],
       Normal;
 
       "--output-influence-map",
       String Config.influence_map_file,
       "file name for the influence map",
-      ["1_Output";"4_Influence_map"],
+      ["1_Output";"5_Influence_map"],
       Normal;
 
       "--debugging-mode",
       Bool Config.trace,
       "dump debugging information",
-      ["6_debugging_info"],
+      ["7_debugging_info"],
       Expert;
     ]
 

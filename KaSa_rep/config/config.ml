@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 08/03/2010
-  * Last modification: Time-stamp: <2016-02-14 10:21:13 feret>
+  * Last modification: Time-stamp: <2016-03-22 09:57:14 feret>
   * *
   * Some parameters
   * references can be tuned thanks to command-line options
@@ -21,7 +21,10 @@ let date="<2015.01.23"
 let date_commit=Git_commit_info.git_commit_date
 let version = "4.01"
 
-let output_directory = ref ""
+let output_directory = ref "output"
+let output_cm_directory = ref "output"
+let output_im_directory = ref "output"
+let output_local_trace_directory = ref "output"
 
 let unsafe = ref true
 let trace = ref false
@@ -42,7 +45,8 @@ let wake_up_color = ref "green"
 let inhibition_color = ref "red"
 let wake_up_arrow = ref "normal"
 let inhibition_arrow = ref "tee"
-let influence_map_file = ref "influence.dot"
+let influence_map_file = ref "influence"
+let influence_map_format = ref "DOT"
 let prompt_full_var_def = ref false
 let prompt_full_rule_def = ref false
 let make_labels_compatible_with_dot =
@@ -56,7 +60,8 @@ let make_labels_compatible_with_dot =
 (** contact map*)
 let do_contact_map = ref true
 let pure_contact = ref false
-let contact_map_file = ref "contact.dot"
+let contact_map_file = ref "contact"
+let contact_map_format = ref "DOT"
 let binding_site_shape = ref "circle"
 let binding_site_color = ref "yellow"
 let internal_site_shape = ref "ellipse"
@@ -89,9 +94,13 @@ let dump_reachability_analysis_dynamic = ref false
 let dump_reachability_analysis_diff = ref false
 let dump_reachability_analysis_wl = ref false
 let hide_one_d_relations_from_cartesian_decomposition = ref true
-let smash_relations = ref false
+let smash_relations = ref true
 let use_natural_language = ref true
-
+let compute_local_traces = ref false
+let show_rule_names_in_local_traces = ref true
+let use_por_in_local_traces = ref true
+let local_trace_prefix = ref "Agent_trace_"
+let local_trace_format = ref "DOT"
 
 (** accuracy *)
 let view_accuracy_level = ref "High"
