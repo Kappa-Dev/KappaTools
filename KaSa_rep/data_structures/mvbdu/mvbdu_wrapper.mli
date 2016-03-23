@@ -116,6 +116,8 @@ module type Mvbdu =
 
     val last_entry: (unit,int) unary
     val hash_of_association_list: hconsed_association_list -> int
+    val hash_of_variables_list: hconsed_variables_list -> int
+
   end
 
 module type Internalized_mvbdu =
@@ -186,6 +188,7 @@ module type Internalized_mvbdu =
     val print_association_list: Remanent_parameters_sig.parameters -> hconsed_association_list -> unit
     val print_variables_list: Remanent_parameters_sig.parameters -> hconsed_variables_list -> unit
     val hash_of_association_list: hconsed_association_list -> int
+    val hash_of_variables_list: hconsed_variables_list -> int
 
   end
 

@@ -1,0 +1,5 @@
+#Command-line:
+"${KAPPABIN}"KaSa relations.ka --compute-local-traces --output-directory output || exit 0 
+
+
+

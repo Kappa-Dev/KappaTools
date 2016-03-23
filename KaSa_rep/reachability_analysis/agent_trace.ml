@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <2016-03-22 13:56:14 feret>
+  * Last modification: Time-stamp: <2016-03-22 16:28:17 feret>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -15,9 +15,11 @@
   * All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
+
 let warn parameters mh message exn default =
      Exception.warn parameters mh (Some "Agent_trace.ml") message exn (fun () -> default)
 
+type node_type = Concrete | Main_abstract | Secondary_abstract of int
 
 let agent_trace parameter error handler handler_kappa mvbdu_true compil   output =
   Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
@@ -45,8 +47,41 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil   output
 		      (error, ((Remanent_parameters.get_local_trace_directory parameter)^(Remanent_parameters.get_local_trace_prefix parameter)^(agent_string)))
                       ext_list
 		  in
+		  let node_names = Wrapped_modules.LoggedIntMap.empty in
+		  let node_type = Wrapped_modules.LoggedIntMap.empty in
+		  let nodes_adj = Wrapped_modules.LoggedIntMap.empty, Wrapped_modules.LoggedIntMap.empty  in
+		  let add_edge error q q' label (nodes_adj,nodes_n) =
+		    let error, old = 
+		      match
+			Wrapped_modules.LoggedIntMap.find_option_without_logs
+			  parameter error q nodes_adj
+		      with
+		      | error, None -> error, [] 
+		      | error, Some l -> error, l
+		    in
+		    let error, nodes_adj = Wrapped_modules.LoggedIntMap.add_or_overwrite parameter error q ((label,q')::old) nodes_adj in
+		    let f error q nodes_n =
+		      let error,old = 
+			match 
+			  Wrapped_modules.LoggedIntMap.find_option_without_logs
+			    parameter error q nodes_n
+			with
+			| error, None -> error, []
+			| error, Some l -> error, l
+		      in
+		      Wrapped_modules.LoggedIntMap.add_or_overwrite parameter error q (label::old) nodes_n 
+		    in
+		    let error, nodes_n = f error q nodes_n in
+		    let error, nodes_n = f error q' nodes_n  in
+		    error, (nodes_adj, nodes_n)
+		  in
 		  let file_name = file_name^(Remanent_parameters.ext_format (Remanent_parameters.get_local_trace_format parameter)) in
 		  let fic = Remanent_parameters.open_out file_name in
+		  let hash_of_variables_list handler error list = 
+		    let error, handler, hconsed_list = Ckappa_sig.Views_bdu.build_variables_list parameter handler error list in
+		    let hash = Ckappa_sig.Views_bdu.hash_of_variables_list hconsed_list in
+		    error, handler, hash
+		  in
 		  let hash_of_association_list handler error list =
 		    let error, handler, hconsed_list = Ckappa_sig.Views_bdu.build_association_list parameter handler error list in
 		    let hash = Ckappa_sig.Views_bdu.hash_of_association_list hconsed_list in
@@ -82,23 +117,21 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil   output
 			)
 			(error,false) list
 		    in
-		    let () = Printf.fprintf fic ")\n" in
+		    let () = Printf.fprintf fic ")" in
 		    error
 		  in
 		  let _ =
 		    Printf.fprintf fic
 		      "digraph G{\n"
 		  in
-		  let error, handler =
+		  let error, handler, node_names, node_types =
 		    List.fold_left
-		      (fun (error, handler) list ->
-			let error, handler =
-			  print_key_of_asso handler error list in
-			let () = Printf.fprintf fic " [label=\"" in
-			let error = print_label_of_asso error list in
-			let () = Printf.fprintf fic "\"];\n" in
-			error, handler)
-		      (error, handler)
+		      (fun (error, handler,nodes,nodes') list ->
+			let error, handler, hash = hash_of_association_list handler error list in
+			let error, nodes = Wrapped_modules.LoggedIntMap.add parameter error hash list nodes in
+			let error, nodes' = Wrapped_modules.LoggedIntMap.add parameter error hash Concrete  nodes' in
+			error, handler, nodes, nodes')
+		      (error, handler,node_names,node_type)
 		      list
 		  in
 		  let max_site =
@@ -122,22 +155,27 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil   output
 		      post_list
 		  in
 		  let rules = compil.Cckappa_sig.rules in
-		  let error, handler =
+		  let error, (handler, nodes_adj) =
 		    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
 		      parameter
 		      error
-		      (fun parameter error  r_id rule handler ->
-			let error, rule_name =  error,"" in (*Handler.string_of_rule parameter error handler_kappa compil r_id in*)
+		      (fun parameter error r_id rule (handler,nodes_adj) ->
+			let error, rule_name =
+			  if Remanent_parameters.get_show_rule_names_in_local_traces parameter
+			  then
+			    Handler.string_of_rule parameter error handler_kappa compil r_id
+			  else error,""
+			in
 			let diff = rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.diff_direct in
 			let test = rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs in
-			let error, handler =
+			let error, (handler, nodes_adj) =
 			  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
 			    parameter
 			    error
-			    (fun parameter error ag_id diff handler ->
+			    (fun parameter error ag_id diff (handler,nodes_adj) ->
 			      begin
 				if diff.Cckappa_sig.agent_name <> agent_type then
-				  error, handler
+				  error, (handler, nodes_adj)
 				else
 				let error, handler, modif_list =
 				  List.fold_left
@@ -170,7 +208,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil   output
 				  modif_list
 				with
 				  [] ->
-				    error,handler
+				    error,(handler,nodes_adj)
 				| _ ->
 				  begin (* the view is modified by the rule *)
 				    let modif_list = List.rev modif_list in
@@ -253,9 +291,9 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil   output
 				    let post_site s =
 				      Ckappa_sig.int_of_site_name s >= max_site
 				    in
-				    let error =
+				    let error,nodes_adj =
 				      List.fold_left
-					(fun error list ->
+					(fun (error,nodes_adj) list ->
 					  let rec aux list output =
 					    match
 					      list
@@ -283,34 +321,177 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil   output
 					  let error,  handler, hash_init = hash_of_association_list handler error pre in
 					  let error, handler, hash_init' = hash_of_association_list handler error post in
 					  if hash_init = hash_init' then
-					    error
+					    error,nodes_adj
 					  else
-					    let error, handler = print_key_of_asso handler error pre in
+					    add_edge error hash_init hash_init' r_id nodes_adj)
+					    (*let error, handler = print_key_of_asso handler error pre in
 					    let () = Printf.fprintf fic " -> " in
 					    let error, handler = print_key_of_asso handler error post in
 					    let _ =
 					      Printf.fprintf fic " [label=\"%s\"];\n" rule_name in
-					    error)
-					error
-					list_edges
-				    in
-				    error,handler
+					    error*)
+			    
+			    (error,nodes_adj)
+			    list_edges
+			in
+			error,(handler,nodes_adj)
 				  end
 			      end
 			    )
 			    diff
-			    handler
+			    (handler, nodes_adj)
 			in
-			
-			error, handler
+		
+			error, (handler, nodes_adj)
 		      )
 		      rules
-		      handler
+		      (handler, nodes_adj)
 		  in
+		  let error = 
+		    if 
+		      Remanent_parameters.get_use_por_in_local_traces parameter
+		    then
+		      let error, handler, map_classes = 
+			  Wrapped_modules.LoggedIntMap.fold
+			    (fun
+			      i l (error,handler,map_classes) -> 
+				let l' = 
+				  List.map (fun r -> Ckappa_sig.site_name_of_int (Ckappa_sig.int_of_rule_id r))
+				    l
+				in
+				let error,handler,hash = hash_of_variables_list handler error l' in
+				let error, old = 
+				  match
+				    Wrapped_modules.LoggedIntMap.find_option_without_logs parameter error hash map_classes
+				  with
+				  | error, None -> error, []
+				  | error, Some l -> error, l
+				in
+				let error, map_classes = 
+				  Wrapped_modules.LoggedIntMap.add_or_overwrite parameter error hash (i::old) map_classes
+				in error, handler, map_classes)
+				  
+			      (snd nodes_adj)
+			    (error, handler, Wrapped_modules.LoggedIntMap.empty)
+		      in
+		      let error, node_types = 
+			Wrapped_modules.LoggedIntMap.fold
+			  (fun i l (error,node_types) ->
+			    match l with
+			      [_] -> error,node_types
+			    | t::q ->
+			      let error,node_types = Wrapped_modules.LoggedIntMap.overwrite parameter error t Main_abstract node_types in
+			      List.fold_left
+				(fun (error,node_types) i -> 
+				  Wrapped_modules.LoggedIntMap.overwrite parameter error i (Secondary_abstract t) node_types)
+				(error,node_types)
+				q
+			  )
+			  map_classes
+			  (error,node_types)
+		      in
+		       (* nodes *)
+		      let error,() =
+			Wrapped_modules.LoggedIntMap.fold2z
+			  parameter
+			  error
+			  (fun parameter error  key list typ () -> 
+			    match typ
+			    with
+			      Concrete -> 
+			    	let _ = print_key_of_asso handler error list in
+				let () = Printf.fprintf fic " [label=\"" in
+				let error = print_label_of_asso error list in
+				let () = Printf.fprintf fic "\"];\n" in
+				error,()
+			    | Main_abstract-> 
+				let _ = print_key_of_asso handler error list in
+				let () = Printf.fprintf fic " [style=\"dotted\" label=\"\"];\n" in
+				error,()
+			    | _ -> error,())
+			  node_names
+			  node_types
+			  ()
+		      in
+		      let kind_of error i = 
+			match 
+			  Wrapped_modules.LoggedIntMap.find_option
+			    parameter error
+			    i
+			    node_types
+			with error,None -> error, Concrete
+			| error,Some i -> error, i
+		      in
+		      let error = 
+			Wrapped_modules.LoggedIntMap.fold
+			  (fun key list error -> 
+			    let error, key = 
+			      match kind_of error key
+			      with
+			      | error, Secondary_abstract key -> error,key 
+			      | error,Concrete | error,Main_abstract -> error, key
+			    in
+			    List.fold_left
+			      (fun error (r_id,key') ->
+				let error, key' = 
+				  match kind_of error key'
+				  with
+				  | error,Secondary_abstract key' ->  error, key'
+				  | error,Concrete | error,Main_abstract -> error, key' 
+				in
+				  let error, rule_name =
+				    if Remanent_parameters.get_show_rule_names_in_local_traces parameter
+				    then
+				      Handler.string_of_rule parameter error handler_kappa compil r_id
+				    else error,""
+				  in
+				  let () = Printf.fprintf fic "Node_%i -> Node_%i [label=\"%s\"];\n" key key' rule_name in
+				  error)
+				error 
+				list)
+			  (fst nodes_adj)
+			  error
+		      in
+		      (* edges *)
+		      error
+		    else
+		      (* nodes *)
+		      let error =
+			Wrapped_modules.LoggedIntMap.fold
+			  (fun key list error -> 
+			    let _ = print_key_of_asso handler error list in
+			    let () = Printf.fprintf fic " [label=\"" in
+			    let error = print_label_of_asso error list in
+			    let () = Printf.fprintf fic "\"];\n" in
+			    error)
+			  node_names
+			  error
+		      in
+		      (* edges *)
+		      let error = 
+			Wrapped_modules.LoggedIntMap.fold
+			  (fun key list error -> 
+			    List.fold_left
+			      (fun error (r_id,key') ->
+				let error, rule_name =
+				  if Remanent_parameters.get_show_rule_names_in_local_traces parameter
+				  then
+				    Handler.string_of_rule parameter error handler_kappa compil r_id
+				  else error,""
+				in
+				let () = Printf.fprintf fic "Node_%i -> Node_%i [label=\"%s\"];\n" key key' rule_name in
+				error)
+			      error
+			      list)
+			  (fst nodes_adj)
+			  error
+		      in
+		      error
+		  in 
 		  let _ = Printf.fprintf fic "}\n" in
 		  let _ = close_out fic in
 		  error, handler
-	     )
+		)
 		map
 		(error, handler))
     output handler
