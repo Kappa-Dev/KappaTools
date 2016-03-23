@@ -21,6 +21,7 @@ let warn parameters mh message exn default =
     (fun () -> default)
 
 let local_trace = false
+let compute_local_trace = false
 
 module Domain =
 struct
@@ -581,8 +582,8 @@ struct
                  match Ckappa_sig.Site_map_and_set.Map.find_option
                    parameter error site_type map2
                  with
-                 | error, None -> warn parameter error (Some "line 100") Exit
-                   Ckappa_sig.dummy_site_name_minus1
+                 | error, None -> warn parameter error (Some "line 585") Exit
+                   (Ckappa_sig.site_name_of_int (-1))
                  | error, Some i -> error, i
                in
                (*-----------------------------------------------------------------------*)
@@ -806,7 +807,7 @@ struct
           | Cckappa_sig.Unknown_agent _
           | Cckappa_sig.Ghost -> error, (dynamic, event_list)
           | Cckappa_sig.Dead_agent _ ->
-            warn parameter error (Some "") Exit (dynamic, event_list)
+            warn parameter error (Some "line 810") Exit (dynamic, event_list)
           | Cckappa_sig.Agent agent ->
             let agent_type = agent.Cckappa_sig.agent_name in
             (*----------------------------------------------------------------*)
@@ -2227,7 +2228,7 @@ struct
       in 
       let compil = get_compil static in
       let error, handler = 
-	if Remanent_parameters.get_compute_local_traces parameter
+	if compute_local_trace
 	then
 	 Agent_trace.agent_trace parameter error handler handler_kappa mvbdu_true compil output 
 	else
