@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <2016-03-22 16:28:17 feret>
+  * Last modification: Time-stamp: <2016-03-23 10:38:31 feret>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -378,7 +378,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil   output
 			Wrapped_modules.LoggedIntMap.fold
 			  (fun i l (error,node_types) ->
 			    match l with
-			      [_] -> error,node_types
+			    | [] | [_] -> error,node_types
 			    | t::q ->
 			      let error,node_types = Wrapped_modules.LoggedIntMap.overwrite parameter error t Main_abstract node_types in
 			      List.fold_left

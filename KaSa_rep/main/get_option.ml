@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <2016-03-22 10:09:04 feret>
+  * Last modification: Time-stamp: <2016-03-23 10:48:08 feret>
   * *
   * primitive to parse command-line options
   *
@@ -127,13 +127,13 @@ let options =
       "--show-rule-names-in-local-traces",
       Bool Config.show_rule_names_in_local_traces,
       "Annotate each transition with the name of the rules in trace abstraction",
-      ["0_Action";"3_Trace_analysis"],
+      ["3_Trace_analysis"],
       Normal;
 
-      "--use_por_in_local_traces",
+      "--use-por-in-local-traces",
       Bool Config.use_por_in_local_traces,
       "Use partial order reduction to get a compact trace up to interleaving permutation",
-      ["0_Action";"3_Trace_analysis"],
+      ["3_Trace_analysis"],
       Expert;
 
       "--output-directory",

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation: 08/03/2010
-  * Last modification: Time-stamp: <2016-03-22 11:08:05 feret>
+  * Last modification: Time-stamp: <2016-03-23 10:37:32 feret>
   * *
   * Some parameters
   * references can be tuned thanks to command-line options
@@ -98,7 +98,7 @@ let smash_relations = ref true
 let use_natural_language = ref true
 let compute_local_traces = ref false
 let show_rule_names_in_local_traces = ref true
-let use_por_in_local_traces = ref true
+let use_por_in_local_traces = ref false
 let local_trace_prefix = ref "Agent_trace_"
 let local_trace_format = ref "DOT"
 

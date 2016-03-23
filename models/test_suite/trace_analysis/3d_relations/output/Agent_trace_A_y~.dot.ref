@@ -1,8 +1,6 @@
 digraph G{
-Node_1 [label="A(y~p)
-"];
-Node_2 [label="A(y~u)
-"];
-Node_2 -> Node_1 [label=""];
-Node_1 -> Node_2 [label=""];
+Node_1 [label="A(y~p)"];
+Node_2 [label="A(y~u)"];
+Node_1 -> Node_2 [label="rule 4"];
+Node_2 -> Node_1 [label="rule 1"];
 }
