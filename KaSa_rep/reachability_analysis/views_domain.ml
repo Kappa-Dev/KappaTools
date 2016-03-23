@@ -1177,6 +1177,14 @@ struct
                 in
                 if b 
                 then
+		  (* I do understand what is happening here. *)
+		  (* Where do you test whether the target of the bond belong to the pattern *)
+		  (* If it is the case, you should apply your fonction recursively to
+		     agent_id: target_agent;
+		     relative_address: tl;
+		     site: path.site *)
+		  (* It not, take the last element of the relative_adress, it could you the agent type of the target, take site, and collect the information you have about the potential state of this site in agents of this type.  *)
+		     
                   (*apply the [] case*)
                   let error, site_correspondence =
                     match Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
