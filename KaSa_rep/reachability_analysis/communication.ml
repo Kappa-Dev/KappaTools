@@ -24,10 +24,33 @@ type event =
     ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) * 
         (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state))
 
+(*For example:
+  E_1(x!1),R_2(x!1,y!2),R_3(y!2,x) -> E_1(x!1),R_2(x!1,y),R_3(y,x)
+  
+  - Agent_id: 1 (E)
+  - relative_addres: 
+     [{
+       site_out : x
+       agent_type_in: R2
+       site_in : x
+      };
+      {
+        site_out: y
+        agent_type_in: R3
+        site_in : y
+      }
+      ]
+  - site : y (denoted the site y of R3)
+
+  Go to agent_id 1:
+  Exit current agent E by site x, then enter an agent of type R2 via a site x.
+  Exit current agent R2 by site y, then enter an agent of type R3 via a site y.
+*)
+
 type step =
   {
     site_out: Ckappa_sig.c_site_name;
-    site_in: Ckappa_sig.c_site_name;
+    site_in: Ckappa_sig.c_site_name; 
     agent_type_in: Ckappa_sig.c_agent_name
   }
 

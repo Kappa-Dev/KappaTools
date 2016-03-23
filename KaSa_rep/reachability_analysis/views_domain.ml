@@ -86,6 +86,8 @@ struct
 
   let get_agent_name static = lift Analyzer_headers.get_agent_name static
 
+  let get_agent_id static = lift Analyzer_headers.get_agent_id static
+
   let get_side_effects static = lift Analyzer_headers.get_side_effects static
 
   let get_potential_side_effects static =
@@ -902,7 +904,7 @@ struct
     let error, site_correspondence =
       let rec aux list =
         match list with
-        | [] -> warn parameter error (Some "") Exit []
+        | [] -> warn parameter error (Some "line 906") Exit []
         | (h, list, _) :: _ when h = cv_id -> error, list
         | _ :: tail -> aux tail
       in
@@ -922,7 +924,7 @@ struct
           site_name
           map2
       with
-      | error, None -> warn parameter error (Some "line 1020") Exit
+      | error, None -> warn parameter error (Some "line 926") Exit
         (Ckappa_sig.site_name_of_int (-1))
       | error, Some i -> error, i
     in
@@ -931,45 +933,15 @@ struct
   (**************************************************************************)
 
   let step_list_empty dynamic parameter error rule_id 
+      agent_type
+      site_name
+      cv_list
       fixpoint_result
       store_covering_classes_id
       bdu_false
       bdu_true 
-      store_agent_name
       site_correspondence 
-      path =
-    (*---------------------------------------------------------------------*)
-    let agent_id = path.Communication.agent_id in
-    let error, agent_type =
-      match Ckappa_sig.RuleAgent_map_and_set.Map.find_option_without_logs
-        parameter error
-        (rule_id, agent_id)
-        store_agent_name
-      with
-      | error, None -> error, Ckappa_sig.dummy_agent_name
-      | error, Some a -> error, a
-    in           
-    let site_name = path.Communication.site in
-    (*---------------------------------------------------------------------*)
-    let error, site_correspondence =
-      match Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get parameter error
-        agent_type 
-        site_correspondence
-      with
-      | error, None -> warn parameter error (Some "line 922") Exit []
-      | error, Some a -> error, a
-    in
-    (* compute the list of cv_id documenting site_name *)
-    let error, cv_list = 
-      match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
-        parameter 
-        error
-        (agent_type, site_name)
-        store_covering_classes_id
-      with
-      | error, None -> error, []
-      | error, Some l -> error, l
-    in
+      =
     (*---------------------------------------------------------------------*)
     let error, dynamic, bdu =
       List.fold_left
@@ -1066,10 +1038,68 @@ struct
     in
     error, dynamic, Usual_domains.Val (List.rev state_list)
 
-  (*---------------------------------------------------------------------*)
+  (**************************************************************************)
+  (*compute condition of bdu whether or not it is enable by doing the
+    intersection of bdu_test and bdu_X*)
+
+  let collect_bdu_enabled parameter error dynamic bdu_false fixpoint_result proj_bdu_test_restriction =
+    let error, dynamic, map =
+      Covering_classes_type.AgentsCV_setmap.Map.fold
+        (fun (agent_id, agent_type, cv_id) bdu_test (error, dynamic, map) ->
+          (*---------------------------------------------------------------------*)
+          (*for each (agent_id, cv_id) a bdu*)
+          let error, bdu_X =
+            match
+              Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
+                parameter
+                error 
+                (agent_type, cv_id) 
+                fixpoint_result
+            with
+            | error, None -> Printf.fprintf stdout "cv_id %i\n" 
+              (Covering_classes_type.int_of_cv_id cv_id);
+              error, bdu_false
+            | error, Some bdu -> error, bdu
+          in
+          (*---------------------------------------------------------------------*)
+          (*bdu intersection*)
+          let handler = get_mvbdu_handler dynamic in
+          let error, handler, bdu_inter =
+            Ckappa_sig.Views_bdu.mvbdu_and
+              parameter handler error bdu_test bdu_X
+          in
+          let dynamic = set_mvbdu_handler handler dynamic in
+          if Ckappa_sig.Views_bdu.equal bdu_inter bdu_false
+          then raise (False (error, dynamic))
+          else
+            let error, map =
+              Covering_classes_type.AgentIDCV_map_and_set.Map.add parameter error
+                (agent_id, cv_id) bdu_inter map
+            in
+            error, dynamic, map
+        ) proj_bdu_test_restriction 
+        (error, dynamic, Covering_classes_type.AgentIDCV_map_and_set.Map.empty)
+    in
+    error, dynamic, map
+
+  (**************************************************************************)
 
   let is_enable_aux static dynamic error rule_id precondition =
     let parameter = get_parameter static in
+    let compil = get_compil static in
+    let rules = compil.Cckappa_sig.rules in
+    let error, rule =
+      match 
+        Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.unsafe_get
+          parameter
+          error
+          rule_id
+          rules
+      with
+      | error, None -> Preprocess.empty_rule parameter error
+      | error, Some rule -> error, rule.Cckappa_sig.e_rule_c_rule
+    in
+    (*---------------------------------------------------------------------*)
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     let error, dynamic, bdu_true = get_mvbdu_true static dynamic error in
     (*---------------------------------------------------------------------*)
@@ -1078,6 +1108,7 @@ struct
       get_store_proj_bdu_test_restriction static dynamic error
     in
     let store_agent_name = get_agent_name static in
+    let store_agent_id   = get_agent_id static in
     let error, site_correspondence =
       get_store_remanent_triple static dynamic error
     in
@@ -1092,43 +1123,16 @@ struct
     in
     (*---------------------------------------------------------------------*)
     try
+      (*check the condition whether or not the bdu is enabled, do the
+        intersection of bdu_test and bdu_X.*)
       let error, dynamic, map =
-        Covering_classes_type.AgentsCV_setmap.Map.fold
-          (fun (agent_id, agent_type, cv_id) bdu_test (error, dynamic, map) ->
-            (*---------------------------------------------------------------------*)
-            (*for each (agent_id, cv_id) a bdu*)
-            let error, bdu_X =
-              match
-                Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
-                  parameter
-                  error 
-                  (agent_type, cv_id) 
-                  fixpoint_result
-              with
-              | error, None -> Printf.fprintf stdout "cv_id %i\n" 
-                (Covering_classes_type.int_of_cv_id cv_id);
-                error, bdu_false
-              | error, Some bdu -> error, bdu
-            in
-            (*---------------------------------------------------------------------*)
-            (*bdu intersection*)
-            let handler = get_mvbdu_handler dynamic in
-            let error, handler, bdu_inter =
-              Ckappa_sig.Views_bdu.mvbdu_and
-                parameter handler error bdu_test bdu_X
-            in
-            let dynamic = set_mvbdu_handler handler dynamic in
-            if Ckappa_sig.Views_bdu.equal bdu_inter bdu_false
-            then raise (False (error, dynamic))
-            else
-              let error, map =
-                Covering_classes_type.AgentIDCV_map_and_set.Map.add parameter error
-                  (agent_id, cv_id) bdu_inter map
-              in
-              error, dynamic, map
-          ) proj_bdu_test_restriction 
-          (error, dynamic,
-           Covering_classes_type.AgentIDCV_map_and_set.Map.empty)
+        collect_bdu_enabled
+          parameter
+          error
+          dynamic
+          bdu_false
+          fixpoint_result
+          proj_bdu_test_restriction
       in
       (*---------------------------------------------------------------------*)
       (*get a set of sites in a covering class: later with state list*)
@@ -1137,53 +1141,276 @@ struct
           precondition
           (fun error dynamic path former_answer ->
             let step_list = path.Communication.relative_address in
-            match step_list with
+            let rec aux acc =
+              match acc with
               (*TODO*)
               (* if not an empty list *)
               (* follow the path while it is within the pattern *)
               (* 1) if you remain inside the pattern for ever, identify the
                  target agent and apply the the [] case *)
-              (* 2) the path is inconstent with the pattern, return the empty
+              (* 2) the path is inconsistent with the pattern, return the empty
                  list *)
               (* 3) the path goes outside of the pattern, grab the agent
                  type of the target and the site type of the target, and
                  gather information (in the views) *)
-
               (*_::_ -> error, dynamic, former_answer*)
-            | step :: tl ->
-              let site_out = step.Communication.site_out in
-              let site_in = step.Communication.site_in in
-              let agent_type_in = step.Communication.agent_type_in in
-              (*agent_id and site of path*)
-              let agent_id = path.Communication.agent_id in
-              let site_name = path.Communication.site in
-              (*get agent_type of path from agent_id*)
-              let error, agent_type =
-                match Ckappa_sig.RuleAgent_map_and_set.Map.find_option_without_logs
-                  parameter error (rule_id, agent_id) store_agent_name
-                with
-                | error, None -> error, Ckappa_sig.dummy_agent_name
-                | error, Some a -> error, a
-              in
-              (*TODO*)
-
-              error, dynamic, former_answer
-            | [] ->
-              let error, dynamic, new_answer =
-                step_list_empty
-                  dynamic
-                  parameter
-                  error
-                  rule_id
-                  fixpoint_result
-                  store_covering_classes_id
-                  bdu_false
-                  bdu_true
-                  store_agent_name
-                  site_correspondence
-                  path
-              in
-              error, dynamic, new_answer
+              | step :: tl ->
+                (*---------------------------------------------------------------------*)
+                (*compute the pattern: lhs of the rule*)
+                let error, site_address_map =
+                  match 
+                    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
+                      parameter
+                      error
+                      path.Communication.agent_id
+                      rule.Cckappa_sig.rule_lhs.Cckappa_sig.bonds
+                  with
+                  | error, None -> error, Ckappa_sig.Site_map_and_set.Map.empty
+                  | error, Some m -> error, m
+                in
+                (* 1) if site_out of current agent is bound to site_in of relative_add*)
+                let b = 
+                  Ckappa_sig.Site_map_and_set.Map.mem 
+                    step.Communication.site_out
+                    site_address_map
+                in
+                if b 
+                then
+                  (*apply the [] case*)
+                  let error, site_correspondence =
+                    match Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
+                      parameter
+                      error
+                      step.Communication.agent_type_in
+                      site_correspondence
+                    with
+                    | error, None -> warn parameter error (Some "line 1221") Exit []
+                    | error, Some a -> error, a
+                  in
+                  let error, cv_list =
+                    match
+                      Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
+                        parameter
+                        error
+                        (step.Communication.agent_type_in, step.Communication.site_in)
+                        store_covering_classes_id
+                    with
+                    | error, None -> error, []
+                    | error, Some l -> error, l
+                  in
+                  let error, dynamic, bdu =
+                    step_list_empty
+                      dynamic
+                      parameter
+                      error
+                      rule_id
+                      step.Communication.agent_type_in
+                      step.Communication.site_in
+                      cv_list
+                      fixpoint_result
+                      store_covering_classes_id
+                      bdu_false
+                      bdu_true
+                      site_correspondence
+                  in
+                  (*FIXME*)
+                  (error, dynamic, bdu); aux tl
+                else
+                  (*2) if the path is inconsistent with the pattern *)
+                  let error, agent =
+                    match
+                      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
+                        parameter
+                        error
+                        path.Communication.agent_id
+                        rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
+                    with
+                    | error, None -> warn parameter error (Some "line 1228") Exit Cckappa_sig.Ghost
+                    | error, Some a -> error, a
+                  in
+                  let error, state =
+                    match agent with
+                    | Cckappa_sig.Ghost
+                    | Cckappa_sig.Unknown_agent _
+                    | Cckappa_sig.Dead_agent _ ->
+                      warn parameter error (Some "line 1237") Exit Ckappa_sig.dummy_state_index
+                    | Cckappa_sig.Agent agent ->
+                      let error, state =
+                        match Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
+                          parameter
+                          error
+                          path.Communication.site
+                          agent.Cckappa_sig.agent_interface
+                        with
+                        | error, None -> warn parameter error (Some "line 1246") Exit
+                          Ckappa_sig.dummy_state_index
+                        | error, Some port ->
+                          let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
+                          error, state
+                      in
+                      error, state
+                  in
+                  (*---------------------------------------------------------------------*)
+                  (*get state of target agent*)
+                  let error, agent_id_target =
+                    match
+                      Ckappa_sig.AgentRule_map_and_set.Map.find_option_without_logs
+                        parameter
+                        error
+                        (step.Communication.agent_type_in, rule_id)
+                        store_agent_id
+                    with
+                    | error, None -> error, Ckappa_sig.dummy_agent_id
+                    | error, Some a -> error, a
+                  in
+                  let error, agent_target =
+                    match
+                      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
+                        parameter
+                        error
+                        agent_id_target
+                        rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
+                    with
+                    | error, None -> warn parameter error (Some "line 1228") Exit Cckappa_sig.Ghost
+                    | error, Some a -> error, a
+                  in
+                  let error, state_target =
+                    match agent with
+                    | Cckappa_sig.Ghost
+                    | Cckappa_sig.Unknown_agent _
+                    | Cckappa_sig.Dead_agent _ ->
+                      warn parameter error (Some "line 1271") Exit Ckappa_sig.dummy_state_index
+                    | Cckappa_sig.Agent agent ->
+                      let error, state =
+                        match Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
+                          parameter
+                          error
+                          step.Communication.site_out
+                          agent.Cckappa_sig.agent_interface
+                        with
+                        | error, None -> warn parameter error (Some "line 1246") Exit
+                          Ckappa_sig.dummy_state_index
+                        | error, Some port ->
+                          let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
+                          error, state
+                      in
+                      error, state
+                  in
+                  if state != state_target
+                  then
+                    (*return []*)
+                    let error, dynamic, new_result =
+                      error, dynamic, (Usual_domains.Val [])
+                    in
+                    aux tl
+                  else
+                    (*3) if the path go outside of the pattern, point out the pattern in the views*)
+                    let error, (dynamic, new_answer) =
+                      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
+                        parameter
+                        error
+                        (fun paramter error agent_id agent (dynamic, answer) ->
+                          match agent with
+                          | Cckappa_sig.Ghost
+                          | Cckappa_sig.Unknown_agent _ 
+                          | Cckappa_sig.Dead_agent _ -> error, (dynamic, answer)
+                          (*warn parameter error (Some "line 1246") Exit Ckappa_sig.dummy_agent_name*)
+                          | Cckappa_sig.Agent agent ->
+                            (*let agent_type = agent.Cckappa_sig.agent_name in*)
+                            let error, site_correspondence =
+                              match Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
+                                parameter
+                                error
+                                step.Communication.agent_type_in
+                                site_correspondence
+                              with
+                              | error, None -> warn parameter error (Some "line 922") Exit []
+                              | error, Some a -> error, a
+                            in
+                            (* compute the list of cv_id documenting site_name *)
+                            let error, cv_list = 
+                              match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
+                                parameter 
+                                error
+                                (step.Communication.agent_type_in, step.Communication.site_in)
+                                store_covering_classes_id
+                              with
+                              | error, None -> error, []
+                              | error, Some l -> error, l
+                            in
+                            let error, dynamic, new_answer =
+                              step_list_empty
+                                dynamic
+                                parameter
+                                error
+                                rule_id
+                                step.Communication.agent_type_in
+                                step.Communication.site_in
+                                cv_list
+                                fixpoint_result
+                                store_covering_classes_id
+                                bdu_false
+                                bdu_true
+                                site_correspondence
+                            in
+                            error, (dynamic, new_answer)                        
+                        )
+                        rule.Cckappa_sig.rule_lhs.Cckappa_sig.views (dynamic, Usual_domains.Any)
+                    in
+                    (*---------------------------------------------------------------------*)
+                    (*error, dynamic, new_answer*)
+                    aux tl
+              | [] ->
+                let error, agent_type =
+                  match Ckappa_sig.RuleAgent_map_and_set.Map.find_option_without_logs
+                    parameter error
+                    (rule_id, path.Communication.agent_id)
+                    store_agent_name
+                  with
+                  | error, None -> error, Ckappa_sig.dummy_agent_name
+                  | error, Some a -> error, a
+                in
+                (*---------------------------------------------------------------------*)
+                let error, site_correspondence =
+                  match Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
+                    parameter
+                    error
+                    agent_type 
+                    site_correspondence
+                  with
+                  | error, None -> warn parameter error (Some "line 922") Exit []
+                  | error, Some a -> error, a
+                in
+                (* compute the list of cv_id documenting site_name *)
+                let error, cv_list = 
+                  match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
+                    parameter 
+                    error
+                    (agent_type, path.Communication.site)
+                    store_covering_classes_id
+                  with
+                  | error, None -> error, []
+                  | error, Some l -> error, l
+                in
+                (*---------------------------------------------------------------------*)
+                let error, dynamic, new_answer =
+                  step_list_empty
+                    dynamic
+                    parameter
+                    error
+                    rule_id
+                    agent_type
+                    path.Communication.site
+                    cv_list
+                    fixpoint_result
+                    store_covering_classes_id
+                    bdu_false
+                    bdu_true
+                    site_correspondence
+                in
+                error, dynamic, new_answer
+            in
+            aux step_list
           )
       in
       error, (dynamic, precondition), true

@@ -54,10 +54,10 @@ let rev_ast = List.rev
 (*mixture = 
   let rec aux mixture sol = 
   match mixture with
-  | [] -> sol
-      (*      | Ast.DOT(i,agent,mixture) -> aux mixture (Ast.DOT(i,agent,sol))*)
-(*      | Ast.PLUS(i,agent,mixture) -> aux mixture (Ast.PLUS(i,agent,sol))*)
-      | agent :: mixture -> aux mixture (agent :: sol)
+   | [] -> sol
+(* | Ast.DOT(i,agent,mixture) -> aux mixture (Ast.DOT(i,agent,sol))*)
+(* | Ast.PLUS(i,agent,mixture) -> aux mixture (Ast.PLUS(i,agent,sol))*)
+   | agent :: mixture -> aux mixture (agent :: sol)
   in aux mixture []*)
   
 let pop_entry parameters error id (map,set) =

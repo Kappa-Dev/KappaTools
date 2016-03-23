@@ -62,6 +62,15 @@ val set_agent_name :
   Common_static.agent_name_map ->
   global_static_information ->
   global_static_information
+
+val get_agent_id :
+  global_static_information ->
+  Common_static.agent_id_map
+    
+val set_agent_id :
+  Common_static.agent_id_map ->
+  global_static_information ->
+  global_static_information
     
 val get_side_effects:
   global_static_information ->

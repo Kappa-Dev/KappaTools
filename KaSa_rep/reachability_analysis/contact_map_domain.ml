@@ -37,8 +37,7 @@ struct
   type local_dynamic_information = 
     {
       contact_map_dynamic : Ckappa_sig.PairAgentSiteState_map_and_set.Set.t;
-      bonds_per_site : (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * 
-                          Ckappa_sig.c_state)
+      bonds_per_site : (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
         Ckappa_sig.State_map_and_set.Map.t Ckappa_sig.AgentSite_map_and_set.Map.t
     }
 
