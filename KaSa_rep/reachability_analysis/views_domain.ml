@@ -2228,7 +2228,7 @@ struct
       in 
       let compil = get_compil static in
       let error, handler = 
-	if compute_local_trace
+	if (*compute_local_trace*) Remanent_parameters.get_compute_local_traces parameter
 	then
 	 Agent_trace.agent_trace parameter error handler handler_kappa mvbdu_true compil output 
 	else

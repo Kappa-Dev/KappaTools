@@ -1,0 +1,8 @@
+digraph G{
+Node_3 [label="A(z~p)
+"];
+Node_4 [label="A(z~u)
+"];
+Node_4 -> Node_3 [label=""];
+Node_3 -> Node_4 [label=""];
+}
