@@ -1153,7 +1153,6 @@ struct
 
   (**************************************************************************)
   (*compute the case when the relative address is outside the pattern*)
-      
 
   let compute_points_out_pattern dynamic parameter error rule_id
       tl
@@ -1203,7 +1202,8 @@ struct
     in
     let next_path =
       {
-        Communication.agent_id = Ckappa_sig.dummy_agent_id; (*TODO: agent.Cckappa_sig.kasim_agent_id*)
+        Communication.agent_id = Ckappa_sig.dummy_agent_id; (*TODO: agent_id of last_agent
+                                                              agent.Cckappa_sig.kasim_agent_id*)
         Communication.relative_address = tl;
         Communication.site = path.Communication.site
       }
@@ -1240,7 +1240,6 @@ struct
     
   (*test whether the target of the bond belong to the
     pattern, get information from contact map on the lhs*)
-
 
   let compute_precondition_enable parameter error
       kappa_handler
@@ -1308,7 +1307,8 @@ struct
                       in
                       aux dynamic next_path new_answer
                     | error, Some port ->
-                    (*get state' of step.agent_type_in and step.Communication.site_in *)
+                      (*get state' of step.agent_type_in and step.Communication.site_in *)
+                      let state_max = port.Cckappa_sig.site_state.Cckappa_sig.max in
                       let error, state_dic' =
                         Misc_sa.unsome
                           (Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
@@ -1324,8 +1324,63 @@ struct
                           parameter
                           error
                           state_dic'        
-                      in              
-                      aux dynamic path former_answer
+                      in
+                      if state_max = state_max'
+                      then
+                        (*go to the next agent*)
+                        let error, site_correspondence =
+                          match Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
+                            parameter
+                            error
+                            step.Communication.agent_type_in
+                            site_correspondence
+                          with
+                          | error, None -> warn parameter error (Some "line 1308") Exit []
+                          | error, Some a -> error, a
+                        in
+                        let error, cv_list =
+                          match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
+                            parameter 
+                            error
+                            (step.Communication.agent_type_in, step.Communication.site_in)
+                            store_covering_classes_id
+                          with
+                          | error, None -> error, []
+                          | error, Some l -> error, l
+                        in
+                        let error, dynamic, new_answer =
+                          step_list_empty
+                            dynamic
+                            parameter
+                            error
+                            rule_id
+                            step.Communication.agent_type_in
+                            step.Communication.site_in
+                            cv_list
+                            fixpoint_result
+                            bdu_false
+                            bdu_true
+                            site_correspondence
+                        in
+                        let next_path =
+                          {
+                            Communication.agent_id = Ckappa_sig.dummy_agent_id; (*id of target agent*)
+                            (*TODO: agent.Cckappa_sig.kasim_agent_id*)
+                            Communication.relative_address = tl;
+                            Communication.site = path.Communication.site
+                          }
+                        in
+                        aux dynamic next_path new_answer                        
+                      else
+                        (*return state_list []*)
+                        let next_path =
+                          {
+                            Communication.agent_id = path.Communication.agent_id; (*FIXME*)
+                            Communication.relative_address = tl;
+                            Communication.site = path.Communication.site
+                          }
+                        in
+                        aux dynamic next_path (Usual_domains.Val [])
                 in
                 error, dynamic, new_answer
               end
@@ -1373,7 +1428,7 @@ struct
     let error, dynamic, bdu_true = get_mvbdu_true static dynamic error in
     (*---------------------------------------------------------------------*)
     let fixpoint_result = get_fixpoint_result dynamic in
-    let dual_contact_map = get_store_dual_contact_map dynamic in
+    (*let dual_contact_map = get_store_dual_contact_map dynamic in*)
     let error, store_proj_bdu_test_restriction =
       get_store_proj_bdu_test_restriction static dynamic error
     in
