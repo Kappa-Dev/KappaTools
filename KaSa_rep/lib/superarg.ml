@@ -362,9 +362,11 @@ let parse_list parameters (a:t) (l:string list) : string list =
 		ignore (List.fold_left (fun accum l -> doit [] [l;v])
 			  accum y);
 		rem
-	    | MultiExt l,v::rem -> 
+	    | MultiExt l,v::rem when opt=key -> 
 		ignore (List.fold_left (fun accum (l,s) -> doit [] [l;v^s])
 			  accum l);rem
+	    | MultiExt l,rem -> 
+	      ignore (List.fold_left (fun accum (l,s) -> doit [] [nokey l;s]) accum l);rem
 	    | _ -> failwith "invalid option or argument"
 		  
 	    with _ ->

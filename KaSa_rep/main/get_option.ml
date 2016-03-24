@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   *
   * Creation: 18/12/2010
-  * Last modification: Time-stamp: <2016-03-23 10:48:08 feret>
+  * Last modification: Time-stamp: <2016-03-23 20:52:19 feret>
   * *
   * primitive to parse command-line options
   *
@@ -141,7 +141,8 @@ let options =
 	[
 	  "--output-contact-map-directory","";
 	  "--output-influence-map-directory","";
-	  "--output-local-traces-directory",""],
+	  "--output-local-traces-directory","";
+	  "--output-log-directory",""],
       "Default repository for outputs",
       ["1_Output"],
       Normal;
@@ -157,9 +158,14 @@ let options =
       Normal;
        "--output-local-traces-directory",
       String Config.output_local_trace_directory,
-      "put the files aboud local traces in this directory",
+      "put the files about local traces in this directory",
       ["1_Output";"3_Trace_analysis"],
       Normal;
+       "--output-log-directory",
+      String Config.output_directory,
+      "put the log files in this directory",
+      ["1_Output";"7_Debugging_info"],
+      Expert;
       "--contact-map-format",
       (Choice (["DOT","dot format";
 	       "HTML","HTML format"],
