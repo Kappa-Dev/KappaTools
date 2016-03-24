@@ -1393,7 +1393,7 @@ struct
                   let next_path =
                     {
                       Communication.agent_id = last_agent_id;
-                      Communication.relative_address = tl;
+                      Communication.relative_address = (List.tl (List.rev l));
                       Communication.site = path_acc.Communication.site
                     }
                   in
