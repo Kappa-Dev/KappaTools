@@ -1,4 +1,5 @@
 digraph G{
 Node_10 [style="dotted" label=""];
+Node_10 -> Node_10 [label="rule 9: t-"];
 Node_10 -> Node_10 [label="rule 4: t+"];
 }

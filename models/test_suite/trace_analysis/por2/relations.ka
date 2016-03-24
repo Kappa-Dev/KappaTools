@@ -9,3 +9,4 @@
 'y-' A(z~u,w~u,y~p) -> A(z~u,w~u,y~u)
 'z-' A(t~u,z~p) -> A(t~u,z~u)
 'w-' A(t~u,w~p) -> A(t~u,w~u)
+'t-' A(t~p) -> A(t~u)
