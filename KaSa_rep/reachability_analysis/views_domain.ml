@@ -1217,7 +1217,10 @@ struct
                         path_acc.Communication.site
                         agent.Cckappa_sig.agent_interface
                       with
-                      | error, None -> warn parameter error (Some "line 1220") Exit
+                      | error, None -> 
+			(* this is not an error, in this case, 
+			   it means that your address exits the pattern, and that you should only use the type information about the last agent *)
+			warn parameter error (Some "line 1220") Exit
                         Ckappa_sig.dummy_state_index
                       | error, Some port ->
                         error, port.Cckappa_sig.site_state.Cckappa_sig.max
@@ -1231,11 +1234,15 @@ struct
                     (rule_id, path_acc.Communication.agent_id)
                     store_agent_name
                   with
-                  | error, None -> error, Ckappa_sig.dummy_agent_name
+                  | error, None -> (* this is an error, it should be logged *)
+		    error, Ckappa_sig.dummy_agent_name
                   | error, Some a -> error, a
                 in
                 (*search these triple in dual contact map*)
-                let error, agent_bond_set =
+		(* the triple should not be looked in the contact map, but in the lhs of the rule *)
+		(* the contact map is type information *)
+		(* Here you really want to navigate within a pattern (that is to say between agent id *)
+		let error, agent_bond_set =
                   match Ckappa_sig.AgentSiteState_map_and_set.Map.find_option_without_logs
                     parameter
                     error
@@ -1245,7 +1252,9 @@ struct
                   | error, None -> error, Ckappa_sig.AgentSiteState_map_and_set.Set.empty
                   | error, Some s -> error, s
                 in
-                (*get information of state in the next agent*)
+                (* You do not want to recover the agent_id from the agent type, this is ambiguous *)
+
+		(*get information of state in the next agent*)
                 let error, agent_id' =
                     match
                       Ckappa_sig.AgentRule_map_and_set.Map.find_option_without_logs

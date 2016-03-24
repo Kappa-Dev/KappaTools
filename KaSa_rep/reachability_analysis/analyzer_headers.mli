@@ -63,10 +63,14 @@ val set_agent_name :
   global_static_information ->
   global_static_information
 
+(* this function does not make sense *)
+(* An agent type may occur twice in a lhs *)
 val get_agent_id :
   global_static_information ->
   Common_static.agent_id_map
-    
+
+(* this function does not make sense *)
+(* An agent type may occur twice in a lhs *)    
 val set_agent_id :
   Common_static.agent_id_map ->
   global_static_information ->

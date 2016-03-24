@@ -33,6 +33,9 @@ type bind_partner = (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list
 type potential_partner_free = free_partner
 type potential_partner_bind = bind_partner
 
+
+(* Please do not define the two following types *)
+(* the full type expression is more informative that the nickname *)
 type agent_name_map = Ckappa_sig.c_agent_name Ckappa_sig.RuleAgent_map_and_set.Map.t
 type agent_id_map = Ckappa_sig.c_agent_id Ckappa_sig.AgentRule_map_and_set.Map.t
 
