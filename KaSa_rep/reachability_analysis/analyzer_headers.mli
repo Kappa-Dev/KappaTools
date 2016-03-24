@@ -56,26 +56,13 @@ val set_bdu_common_static:
 
 val get_agent_name :
   global_static_information ->
-  Common_static.agent_name_map
+  Ckappa_sig.c_agent_name Ckappa_sig.RuleAgent_map_and_set.Map.t
     
 val set_agent_name :
-  Common_static.agent_name_map ->
+  Ckappa_sig.c_agent_name Ckappa_sig.RuleAgent_map_and_set.Map.t ->
   global_static_information ->
   global_static_information
 
-(* this function does not make sense *)
-(* An agent type may occur twice in a lhs *)
-val get_agent_id :
-  global_static_information ->
-  Common_static.agent_id_map
-
-(* this function does not make sense *)
-(* An agent type may occur twice in a lhs *)    
-val set_agent_id :
-  Common_static.agent_id_map ->
-  global_static_information ->
-  global_static_information
-    
 val get_side_effects:
   global_static_information ->
   Common_static.half_break_action * Common_static.remove_action

@@ -33,16 +33,9 @@ type bind_partner = (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list
 type potential_partner_free = free_partner
 type potential_partner_bind = bind_partner
 
-
-(* Please do not define the two following types *)
-(* the full type expression is more informative that the nickname *)
-type agent_name_map = Ckappa_sig.c_agent_name Ckappa_sig.RuleAgent_map_and_set.Map.t
-type agent_id_map = Ckappa_sig.c_agent_id Ckappa_sig.AgentRule_map_and_set.Map.t
-
 type bdu_common_static =
   {
-    store_agent_name             : agent_name_map;
-    store_agent_id               : agent_id_map;
+    store_agent_name             : Ckappa_sig.c_agent_name Ckappa_sig.RuleAgent_map_and_set.Map.t;
     store_side_effects           : half_break_action * remove_action; 
     store_potential_side_effects : potential_partner_free *  potential_partner_bind;
   }
@@ -68,34 +61,6 @@ let collect_agent_name parameter error rule_id rule store_result =
               error
               (rule_id, agent_id)
               agent_type
-              store_result
-          in
-          error, store_result        
-      ) rule.Cckappa_sig.rule_lhs.Cckappa_sig.views store_result
-  in
-  error, store_result
-
-(**********************************************************************************)
-(*get agent_id from (agent_type, rule_id) in the lhs *)
-
-let collect_agent_id parameter error rule_id rule store_result =
-  let error, store_result =
-    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
-      parameter
-      error
-      (fun parameter error agent_id agent store_result ->
-        match agent with
-        | Cckappa_sig.Ghost
-        | Cckappa_sig.Unknown_agent _ -> error, store_result
-        | Cckappa_sig.Dead_agent (agent, _, _, _)
-        | Cckappa_sig.Agent agent -> 
-          let agent_type = agent.Cckappa_sig.agent_name in
-          let error, store_result =
-            Ckappa_sig.AgentRule_map_and_set.Map.add_or_overwrite
-              parameter
-              error
-              (agent_type, rule_id)
-              agent_id
               store_result
           in
           error, store_result        
@@ -596,16 +561,6 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
       store_result.store_agent_name
   in
   (*------------------------------------------------------------------------------*)
-  (*get agent_id*)
-  let error, store_agent_id =
-    collect_agent_id
-      parameter
-      error
-      rule_id
-      rule
-      store_result.store_agent_id
-  in
-  (*------------------------------------------------------------------------------*)
   (*side effects*)
   let error, store_side_effects =
     collect_side_effects
@@ -632,7 +587,6 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
   error,
   {
     store_agent_name = store_agent_name;
-    store_agent_id   = store_agent_id;
     store_side_effects = store_side_effects;
     store_potential_side_effects = store_potential_side_effects
   }
@@ -641,7 +595,6 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
 
 let init_bdu_common_static =
   let init_agent_name = Ckappa_sig.RuleAgent_map_and_set.Map.empty in
-  let init_agent_id   = Ckappa_sig.AgentRule_map_and_set.Map.empty in
   let init_half_break     = Ckappa_sig.AgentSite_map_and_set.Map.empty  in
   let init_remove         = Ckappa_sig.AgentSite_map_and_set.Map.empty  in
   let init_potential_free = Ckappa_sig.AgentRule_map_and_set.Map.empty in
@@ -649,7 +602,6 @@ let init_bdu_common_static =
   let init_common_static =
     {
       store_agent_name              = init_agent_name;
-      store_agent_id                = init_agent_id;
       store_side_effects            = (init_half_break, init_remove);
       store_potential_side_effects  = (init_potential_free, init_potential_bind); 
     }

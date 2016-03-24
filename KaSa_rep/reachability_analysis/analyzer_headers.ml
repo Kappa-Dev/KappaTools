@@ -116,17 +116,6 @@ let set_agent_name agent_name static =
     }
     static
 
-let get_agent_id static =
-  (get_bdu_common_static static).Common_static.store_agent_id
-
-let set_agent_id agent_id static =
-  set_bdu_common_static
-    {
-      (get_bdu_common_static static) with
-        Common_static.store_agent_id = agent_id
-    }
-    static
-
 let get_side_effects static =
   (get_bdu_common_static static).Common_static.store_side_effects
 
