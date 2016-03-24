@@ -23,7 +23,7 @@ type global_static_information =
   {
     global_compilation_result : compilation_result;
     global_parameter : Remanent_parameters_sig.parameters;
-    global_bdu_common_static : Common_static.bdu_common_static
+    global_bdu_common_static : Common_static.bdu_common_static;
   }
 
 type global_dynamic_information =

@@ -121,7 +121,7 @@ struct
 
   (*dual: contact map including initial state, use in views_domain*)
    
-  let collect_dual_map parameter error handler store_result =
+  (*let collect_dual_map parameter error handler store_result =
     let error, store_result =
       Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
         parameter error
@@ -155,7 +155,7 @@ struct
             error, store_result
         ) handler.Cckappa_sig.dual store_result
     in
-    error, store_result
+    error, store_result*)
 
   let collect_agent_type_state parameter error agent site_type =
     match agent with
@@ -525,10 +525,6 @@ struct
       | error, None -> error, Ckappa_sig.PairAgentSiteState_map_and_set.Set.empty
       | error, Some l -> error, l
     in
-(*    let error, inter =
-      Ckappa_sig.PairAgentSiteState_map_and_set.Set.inter
-        parameter error contact_map bond_lhs_set
-    in*)
     if Ckappa_sig.PairAgentSiteState_map_and_set.Set.subset bond_lhs_set contact_map
     then 
       (* use the function Communication.overwrite_potential_partners_map to
@@ -620,7 +616,6 @@ struct
     in
     (*check if it is seen for the first time, if not update the contact
       map, and raise an event*)
-(*    let dynamic = set_contact_map_dynamic new_contact_map dynamic in*)
     let event_list =
       Ckappa_sig.PairAgentSiteState_map_and_set.Set.fold (fun pair event_list ->
         (Communication.See_a_new_bond pair) :: event_list

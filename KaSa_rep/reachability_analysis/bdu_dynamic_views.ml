@@ -22,6 +22,9 @@ let local_trace = false
 type bdu_analysis_dynamic =
   {
     store_update : Ckappa_sig.Rule_map_and_set.Set.t Covering_classes_type.AgentCV_map_and_set.Map.t;
+    (*FIXME: compute dual contact map here*)
+    store_dual_contact_map : 
+      Ckappa_sig.AgentSiteState_map_and_set.Set.t Ckappa_sig.AgentSiteState_map_and_set.Map.t
   }
 
 (************************************************************************************)
@@ -221,8 +224,54 @@ let store_update parameter error store_test_modification_map store_potential_sid
     store_result
 
 (************************************************************************************)
+(*compute dual contact map*)
+
+(*compute dual in contact map to be used to check the bond in the pattern
+  (lhs)*)
+
+let collect_dual_map parameter error handler store_result =
+  let error, store_result =
+    Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
+      parameter error
+      (fun parameter error (agent_type, (site_type, state))
+        (agent_type', site_type', state') store_result ->
+          let error, old_set =
+            match Ckappa_sig.AgentSiteState_map_and_set.Map.find_option_without_logs parameter error
+              (agent_type, site_type, state) store_result
+            with
+            | error, None -> error, Ckappa_sig.AgentSiteState_map_and_set.Set.empty
+            | error, Some s -> error, s
+          in
+          let error', set =
+            Ckappa_sig.AgentSiteState_map_and_set.Set.add_when_not_in parameter error
+              (agent_type', site_type', state') 
+              Ckappa_sig.AgentSiteState_map_and_set.Set.empty
+          in
+          let error = Exception.check warn parameter error error' (Some "line 1109") Exit 
+          in
+          let error', new_set = 
+            Ckappa_sig.AgentSiteState_map_and_set.Set.union parameter error set old_set
+          in
+          let error = Exception.check warn parameter error error' (Some "line 1115") Exit 
+          in
+          let error, store_result = 
+            Ckappa_sig.AgentSiteState_map_and_set.Map.add_or_overwrite 
+              parameter 
+              error
+              (agent_type, site_type, state) 
+              new_set
+              store_result
+          in
+          error, store_result
+      ) handler.Cckappa_sig.dual store_result
+  in
+  error, store_result
+
+
+(************************************************************************************)
 
 let scan_rule_dynamic parameter error rule_id rule compiled
+    kappa_handler
     handler_bdu
     covering_classes
     store_covering_classes_id
@@ -240,9 +289,17 @@ let scan_rule_dynamic parameter error rule_id rule compiled
       covering_classes
       store_result.store_update
   in
+  let error, store_dual_contact_map =
+    collect_dual_map
+      parameter
+      error
+      kappa_handler
+      store_result.store_dual_contact_map
+  in
   error, handler_bdu,
   {
-    store_update = store_update
+    store_update = store_update;
+    store_dual_contact_map = store_dual_contact_map
   }
 
 (************************************************************************************)
@@ -250,7 +307,8 @@ let scan_rule_dynamic parameter error rule_id rule compiled
 let init_bdu_analysis_dynamic =
   let init_bdu_analysis_dynamic =
     {
-      store_update  = Covering_classes_type.AgentCV_map_and_set.Map.empty
+      store_update  = Covering_classes_type.AgentCV_map_and_set.Map.empty;
+      store_dual_contact_map = Ckappa_sig.AgentSiteState_map_and_set.Map.empty
     }
   in
   init_bdu_analysis_dynamic
@@ -258,7 +316,9 @@ let init_bdu_analysis_dynamic =
 (************************************************************************************)
 (*rules*)
 
-let scan_rule_set_dynamic parameter error compiled handler_bdu
+let scan_rule_set_dynamic parameter error compiled
+    kappa_handler
+    handler_bdu
     store_pre_static
     covering_classes
     store_covering_classes_id
@@ -274,6 +334,7 @@ let scan_rule_set_dynamic parameter error compiled handler_bdu
             rule_id
             rule.Cckappa_sig.e_rule_c_rule
             compiled
+            kappa_handler
             handler_bdu
             covering_classes
             store_covering_classes_id

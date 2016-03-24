@@ -387,7 +387,7 @@ let new_index_pair_map parameter error l = (*JF:  it should be computed only onc
   let error', (map1, map2) = 
     aux
       l
-      Ckappa_sig.dummy_site_name_1
+      (Ckappa_sig.site_name_of_int 1)
       Ckappa_sig.Site_map_and_set.Map.empty
       Ckappa_sig.Site_map_and_set.Map.empty error 
   in
