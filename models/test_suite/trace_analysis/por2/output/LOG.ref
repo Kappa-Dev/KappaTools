@@ -1,0 +1,39 @@
+Parsing relations.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+
+Reachability analysis...
+
+------------------------------------------------------------
+* Dead rules :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Dead agents :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+In agent A, the internal state of site x, the internal state of site y, the internal state of site z, the internal state of site w, and the internal state of site t, are entangled by the following 5-d relationship:
+	A(x~p,y~u,z~u,w~u,t~u)
+	A(x~p,y~p,z~p,w~u,t~u)
+	A(x~p,y~p,z~p,w~p,t~p)
+	A(x~p,y~p,z~p,w~p,t~u)
+	A(x~p,y~p,z~u,w~u,t~u)
+	A(x~p,y~p,z~u,w~p,t~u)
+	A(x~u,y~u,z~u,w~u,t~u)
+	A(x~u,y~p,z~u,w~u,t~u)
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+The internal state of site t in agent A ranges over u and p.
+The internal state of site w in agent A ranges over u and p.
+The internal state of site z in agent A ranges over u and p.
+The internal state of site y in agent A ranges over u and p.
+The internal state of site x in agent A ranges over u and p.
+execution finished without any exception

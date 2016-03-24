@@ -1,0 +1,11 @@
+%init: 1 A(x~u,y~u,z~u,w~u,t~u)
+
+'x+' A(x~u)->A(x~p)
+'y+' A(y~u)->A(y~p)
+'z+' A(x~p,y~p,z~u) -> A(x~p,y~p,z~p)
+'w+' A(x~p,y~p,w~u) -> A(x~p,y~p,w~p)
+'t+' A(x~p,y~p,z~p,w~p,t~u) -> A(x~p,y~p,z~p,w~p,t~p)
+'x-' A(z~u,w~u,x~p) -> A(z~u,w~u,x~u)
+'y-' A(z~u,w~u,y~p) -> A(z~u,w~u,y~u)
+'z-' A(t~u,z~p) -> A(t~u,z~u)
+'w-' A(t~u,w~p) -> A(t~u,w~u)

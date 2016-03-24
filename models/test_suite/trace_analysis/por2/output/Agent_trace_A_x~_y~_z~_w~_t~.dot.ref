@@ -1,0 +1,24 @@
+digraph G{
+Node_42 [label="A(x~p,y~p,z~p,w~p,t~p)"];
+Node_46 [label="A(x~p,y~p,z~p,w~p,t~u)"];
+Node_48 [label="A(x~p,y~p,z~u,w~u,t~u)"];
+Node_51 [style="dotted" label=""];
+Node_53 [style="dotted" label=""];
+Node_53 -> Node_53 [label="rule 5: x-"];
+Node_53 -> Node_48 [label="rule 1: y+"];
+Node_51 -> Node_48 [label="rule 7: z-"];
+Node_51 -> Node_46 [label="rule 3: w+"];
+Node_46 -> Node_51 [label="rule 8: w-"];
+Node_46 -> Node_51 [label="rule 7: z-"];
+Node_46 -> Node_42 [label="rule 4: t+"];
+Node_48 -> Node_53 [label="rule 6: y-"];
+Node_48 -> Node_53 [label="rule 5: x-"];
+Node_48 -> Node_51 [label="rule 3: w+"];
+Node_48 -> Node_51 [label="rule 2: z+"];
+Node_51 -> Node_48 [label="rule 8: w-"];
+Node_51 -> Node_46 [label="rule 2: z+"];
+Node_53 -> Node_53 [label="rule 1: y+"];
+Node_53 -> Node_53 [label="rule 0: x+"];
+Node_53 -> Node_53 [label="rule 6: y-"];
+Node_53 -> Node_48 [label="rule 0: x+"];
+}

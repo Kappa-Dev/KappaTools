@@ -1,0 +1,55 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa relations.ka --compute-local-traces --output-directory output --use-por-in-local-traces
+#
+#This file contains the description of the influence map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+digraph G{ 
+node [shape=box, style=filled, fillcolor=lightskyblue];
+"x+" ; 
+"y+" ; 
+"z+" ; 
+"w+" ; 
+"t+" ; 
+"x-" ; 
+"y-" ; 
+"z-" ; 
+"w-" ; 
+edge [color=green, arrowhead=normal];
+"x+" -> "z+"[label ="[0->0]"] ;
+"x+" -> "w+"[label ="[0->0]"] ;
+"x+" -> "t+"[label ="[0->0]"] ;
+"x+" -> "x-"[label ="[0->0]"] ;
+"y+" -> "z+"[label ="[0->0]"] ;
+"y+" -> "w+"[label ="[0->0]"] ;
+"y+" -> "t+"[label ="[0->0]"] ;
+"y+" -> "y-"[label ="[0->0]"] ;
+"z+" -> "t+"[label ="[0->0]"] ;
+"z+" -> "z-"[label ="[0->0]"] ;
+"w+" -> "t+"[label ="[0->0]"] ;
+"w+" -> "w-"[label ="[0->0]"] ;
+"x-" -> "x+"[label ="[0->0]"] ;
+"y-" -> "y+"[label ="[0->0]"] ;
+"z-" -> "z+"[label ="[0->0]"] ;
+"z-" -> "x-"[label ="[0->0]"] ;
+"z-" -> "y-"[label ="[0->0]"] ;
+"w-" -> "w+"[label ="[0->0]"] ;
+"w-" -> "x-"[label ="[0->0]"] ;
+"w-" -> "y-"[label ="[0->0]"] ;
+
+edge [color=red, arrowhead=tee];
+"z+" -> "x-"[label ="[0->0]"] ; 
+"z+" -> "y-"[label ="[0->0]"] ; 
+"w+" -> "x-"[label ="[0->0]"] ; 
+"w+" -> "y-"[label ="[0->0]"] ; 
+"t+" -> "z-"[label ="[0->0]"] ; 
+"t+" -> "w-"[label ="[0->0]"] ; 
+"x-" -> "z+"[label ="[0->0]"] ; 
+"x-" -> "w+"[label ="[0->0]"] ; 
+"y-" -> "z+"[label ="[0->0]"] ; 
+"y-" -> "w+"[label ="[0->0]"] ; 
+"z-" -> "t+"[label ="[0->0]"] ; 
+"w-" -> "t+"[label ="[0->0]"] ; 
+
+}

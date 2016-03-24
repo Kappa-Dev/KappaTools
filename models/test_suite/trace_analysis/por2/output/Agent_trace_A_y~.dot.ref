@@ -1,0 +1,5 @@
+digraph G{
+Node_2 [style="dotted" label=""];
+Node_2 -> Node_2 [label="rule 6: y-"];
+Node_2 -> Node_2 [label="rule 1: y+"];
+}
