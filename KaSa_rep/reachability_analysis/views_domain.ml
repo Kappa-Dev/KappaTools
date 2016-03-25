@@ -1255,7 +1255,11 @@ struct
       Communication.refine_information_about_state_of_site
         precondition
         (fun error dynamic current_path former_answer ->
-          let rec aux dynamic path answer =
+	  (* The output should be more precise than former_answer:
+	     If the former_answer is any, do not change anything,
+	     If the former_answer is Val l, 
+	     then the answer must be Val l', with l' a sublist of l *)
+          let rec aux dynamic path (*answer*) =
             let step_list = path.Communication.relative_address in
             match step_list with
             | step :: tl ->
@@ -1303,12 +1307,19 @@ struct
                           bdu_true
                           site_correspondence
                       in
-                      let error, dynamic, new_answer =
+		      (* I do not understand why you do a recursive call *)
+		      (* You have exit the patten and you have already collected the information about the last element of the list *)
+                      (*JF let error, dynamic, new_answer =
                         aux dynamic next_path new_answer
-                      in
-                      error, (dynamic, new_answer)
+                      in*)
+		      error, (dynamic, new_answer)
                     | error, Some port ->
                       (*get state' of step.agent_type_in and step.Communication.site_in *)
+		      (* I do not understand this *)
+		      (* the state of the site in the lhs is an interval *)
+		      (* the state of the site in the path must be computed (we know that the site has to be
+			 bound to the site ? of an agent of type ?*)
+		      (* thus you have to check that the later state is in the former interval *)
                       let state_max = port.Cckappa_sig.site_state.Cckappa_sig.max in
                       let error, state_dic' =
                         Misc_sa.unsome
@@ -1326,10 +1337,11 @@ struct
                           error
                           state_dic'        
                       in
-                      if state_max = state_max'
+                      if state_max = state_max' (* no, see previous comment *)
                       then
                         (*go to the next agent*)
-                        let error, site_correspondence =
+			(* what do you do from here ... *)
+                        (* JF let error, site_correspondence =
                           match Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
                             parameter
                             error
@@ -1362,7 +1374,9 @@ struct
                             bdu_false
                             bdu_true
                             site_correspondence
-                        in
+                        in*)
+			(* to here ? *)
+			(* you should just jump to the tail of the list, and call aux recursively, as you do here *)
                         let next_path =
                           {
                             Communication.agent_id = Ckappa_sig.dummy_agent_id; (*id of target agent*)
@@ -1372,12 +1386,13 @@ struct
                           }
                         in
                         let error, dynamic, new_answer =
-                          aux dynamic next_path new_answer                        
+                          aux dynamic next_path (*new_answer*)
                         in
                         error, (dynamic, new_answer)
                       else
                         (*return state_list []*)
-                        let next_path =
+			(* no need to use a recursive call *)
+			(* JF let next_path =
                           {
                             Communication.agent_id = path.Communication.agent_id; (*FIXME*)
                             Communication.relative_address = tl;
@@ -1386,7 +1401,8 @@ struct
                         in
                         let error, dynamic, new_answer =
                           aux dynamic next_path (Usual_domains.Val [])
-                        in
+                        in*)
+			let new_answer = Usual_domains.Val [] in
                         error, (dynamic, new_answer)
                 in
                 error, dynamic, new_answer
@@ -1408,7 +1424,7 @@ struct
               in
               error, dynamic, new_answer
           in
-          aux dynamic current_path former_answer)
+          aux dynamic current_path (*former_answer*))
     in
     precondition
       
