@@ -1384,7 +1384,7 @@ module Blackboard =
      error,log_info,list
 
    let print_stack parameter handler log_info error blackboard =
-     let stack = blackboard.current_stack in
+     (*  let stack = blackboard.current_stack in*)
     (* let log = parameter.PB.CI.Po.K.H.out_channel_err in
      let _ = Format.fprintf log "Current_stack_level %i " (List.length stack) in
      let error,log_info = List.fold_left (fun (error,log_info) i -> let error = print_assignment parameter handler log_info error blackboard i in let _ = Format.fprintf log "@." in error ) (error,log_info) (List.rev stack)  in

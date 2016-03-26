@@ -113,7 +113,7 @@ let transform_trace_gen f log_message debug_message profiling_event =
    if shall_we_compute parameters
    then
      let error, profiling_info = StoryProfiling.StoryStats.add_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameters) error profiling_event (Some (fun () -> size_of_pretrace trace)) profiling_info in
-     let bool =
+     (*let bool =
        if
 	 S.PH.B.PB.CI.Po.K.H.get_log_step parameters
        then
@@ -125,7 +125,7 @@ let transform_trace_gen f log_message debug_message profiling_event =
 	 | None -> false
        else
 	 false
-     in
+     in*)
      let pretrace = get_pretrace_of_trace trace in
      let error,profiling_info,(pretrace',n) = f parameters kappa_handler profiling_info error pretrace in
      let trace' = trace_of_pretrace pretrace' in
@@ -627,7 +627,7 @@ let has_obs x = List.exists S.PH.B.PB.CI.Po.K.is_obs_of_refined_step (get_pretra
 let fold_left_with_progress_bar ?(event=StoryProfiling.Dummy)
       parameter ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall)
       handler profiling_information error  (f:('a,'b,'a) binary) a list =
-  let n = List.length list in
+  (* let n = List.length list in*)
   let string,(error,profiling_information) =
     if StoryProfiling.StoryStats.is_dummy event
     then "",(error,profiling_information)
@@ -701,7 +701,7 @@ let fold_over_the_causal_past_of_observables_with_a_progress_bar parameter  ?(sh
   in*)
   let error,log_info,blackboard = convert_trace_into_musical_notation parameter handler log_info error t in
   let error,log_info,list = extract_observable_hits_from_musical_notation parameter handler log_info error blackboard in
-  let n_stories = List.length list in
+  (* let n_stories = List.length list in*)
   (*let () =
     if log_step parameter
     then
