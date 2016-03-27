@@ -63,7 +63,7 @@ module type Export_to_KaSim =
 
     type state
 
-    val init: Format.formatter -> ((string Location.annot) * Ast.port list, Ast.mixture, string, Ast.rule) Ast.compil -> state
+    val init: ?called_from:Remanent_parameters_sig.called_from -> Format.formatter -> ((string Location.annot) * Ast.port list, Ast.mixture, string, Ast.rule) Ast.compil -> state
 
     val flush_errors: state -> state
 
@@ -172,14 +172,22 @@ module Export_to_KaSim =
     (*-------------------------------------------------------------------------------*)
     (*operations of module signatuares*)
 
-    let init logger compil  =
+    let init ?called_from:(called_from=Remanent_parameters_sig.Internalised) logger compil  =
       let errors = Exception.empty_error_handler in
       let parameters =
-        Remanent_parameters.get_parameters
-          ~called_from:Remanent_parameters_sig.Internalised ()
+        Remanent_parameters.get_parameters ~called_from ()
       in
-      let parameters = Remanent_parameters.set_logger parameters
-	(Loggers.redirect (Remanent_parameters.get_logger parameters) logger)
+      let parameters =
+	match
+	  called_from
+	with
+	| Remanent_parameters_sig.Internalised -> 
+	  Remanent_parameters.set_logger parameters
+					 (Loggers.redirect (Remanent_parameters.get_logger parameters) logger)
+	| Remanent_parameters_sig.KaSim
+	| Remanent_parameters_sig.JS
+	| Remanent_parameters_sig.KaSa ->
+	   parameters
       in
       let parameters_compil =
 	Remanent_parameters.update_call_stack
