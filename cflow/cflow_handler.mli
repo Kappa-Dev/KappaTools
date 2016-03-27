@@ -11,12 +11,12 @@ module type Cflow_handler =
           priorities_causal : Priority.priorities ;
 	  compute_all_stories : bool ;
 	  sort_algo_for_stories: Parameter.sort_algo_for_stories;
-	(*  out_channel_err : Format.formatter ;
-          out_channel_profiling : Format.formatter ;
-          out_channel : Format.formatter ;*)
+	  logger_err : Loggers.t ;
+	  logger_profiling : Loggers.t ;
+	  logger_out : Loggers.t ;
 	  log_step : bool ;
 	  debug_mode : bool ;
-	  (*	  log_step_channel: Format.formatter ;*)
+	  logger_step: Loggers.t ;
 	  kasa: Remanent_parameters_sig.parameters ;
 	  always_disambiguate_initial_states : bool  ;
 	  bound_on_itteration_number: int option ;
@@ -42,7 +42,7 @@ module type Cflow_handler =
     val get_bound_on_itteration_number: parameter -> int option
     val set_first_story_per_obs: parameter -> parameter
     val set_all_stories_per_obs: parameter -> parameter
-    val build_parameter: unit -> parameter
+    val build_parameter:  ?called_from:Remanent_parameters_sig.called_from -> unit -> parameter
     val string_of_exn: exn -> string option
     val set_compression_weak: parameter -> parameter
     val set_compression_strong: parameter -> parameter
@@ -53,13 +53,13 @@ module type Cflow_handler =
     val get_log_step: parameter -> bool
     val set_debugging_mode: parameter -> bool -> parameter
     val get_debugging_mode: parameter -> bool
-    (*val get_profiling_logger: parameter -> Format.formatter
-      val get_logger: parameter -> Format.formatter
-    val set_logger: parameter -> Format.formatter -> parameter
-    val get_out_channel: parameter -> Format.formatter
-    val set_out_channel: parameter -> Format.formatter -> parameter
-    val get_debugging_channel: parameter -> Format.formatter
-    val set_debugging_channel: parameter -> Format.formatter -> parameter*)
+    val get_profiling_logger: parameter -> Loggers.t
+    val get_logger: parameter -> Loggers.t
+    val set_logger: parameter -> Loggers.t -> parameter
+    val get_out_channel: parameter -> Loggers.t
+    val set_out_channel: parameter -> Loggers.t -> parameter
+    val get_debugging_channel: parameter -> Loggers.t
+    val set_debugging_channel: parameter -> Loggers.t-> parameter
     val get_kasa_parameters: parameter -> Remanent_parameters_sig.parameters
     val set_kasa_parameters: Remanent_parameters_sig.parameters -> parameter -> parameter
     val do_we_use_bucket_sort: parameter -> bool

@@ -34,12 +34,12 @@ module type Cflow_handler =
           priorities_causal : Priority.priorities ;
 	  compute_all_stories : bool ;
 	  sort_algo_for_stories: Parameter.sort_algo_for_stories;
-	 (* out_channel_err : Format.formatter ;
-          out_channel_profiling : Format.formatter ;
-          out_channel : Format.formatter ;*)
+	  logger_err : Loggers.t ;
+          logger_profiling : Loggers.t ;
+          logger_out : Loggers.t ;
 	  log_step : bool ;
 	  debug_mode : bool ;
-	  (*	  log_step_channel : Format.formatter ;*)
+	  logger_step : Loggers.t ;
 	  kasa : Remanent_parameters_sig.parameters ;
 	  always_disambiguate_initial_states : bool  ;
 	  bound_on_itteration_number: int option ;
@@ -65,7 +65,7 @@ module type Cflow_handler =
     val get_bound_on_itteration_number: parameter -> int option
     val set_first_story_per_obs: parameter -> parameter
     val set_all_stories_per_obs: parameter -> parameter
-    val build_parameter: unit -> parameter
+    val build_parameter: ?called_from:Remanent_parameters_sig.called_from -> unit -> parameter
     val string_of_exn: exn -> string option
     val set_compression_weak: parameter -> parameter
     val set_compression_strong: parameter -> parameter
@@ -76,13 +76,13 @@ module type Cflow_handler =
     val get_log_step: parameter -> bool
     val set_debugging_mode: parameter -> bool -> parameter
     val get_debugging_mode: parameter -> bool
-  (*val get_profiling_logger: parameter -> Format.formatter
-    val get_logger: parameter -> Format.formatter
-    val set_logger: parameter -> Format.formatter -> parameter
-    val get_out_channel: parameter -> Format.formatter
-    val set_out_channel: parameter -> Format.formatter -> parameter
-    val get_debugging_channel: parameter -> Format.formatter
-    val set_debugging_channel: parameter -> Format.formatter -> parameter*)
+    val get_profiling_logger: parameter -> Loggers.t
+    val get_logger: parameter -> Loggers.t
+    val set_logger: parameter -> Loggers.t -> parameter
+    val get_out_channel: parameter -> Loggers.t
+    val set_out_channel: parameter -> Loggers.t -> parameter
+    val get_debugging_channel: parameter -> Loggers.t
+    val set_debugging_channel: parameter -> Loggers.t -> parameter
     val get_kasa_parameters: parameter -> Remanent_parameters_sig.parameters
     val set_kasa_parameters: Remanent_parameters_sig.parameters -> parameter -> parameter
     val do_we_use_bucket_sort: parameter -> bool
@@ -111,12 +111,12 @@ module Cflow_handler =
           priorities_causal: Priority.priorities ;
 	  compute_all_stories : bool ;
 	  sort_algo_for_stories: Parameter.sort_algo_for_stories;
-	(*  out_channel_err : Format.formatter;
-          out_channel_profiling: Format.formatter;
-          out_channel : Format.formatter;*)
-	  log_step: bool ;
+	  logger_err : Loggers.t;
+          logger_profiling: Loggers.t;
+          logger_out : Loggers.t;
+	  log_step : bool ;
 	  debug_mode: bool ;
-	  (*	  log_step_channel : Format.formatter ;*)
+	  logger_step : Loggers.t ;
 	  kasa : Remanent_parameters_sig.parameters ;
 	  always_disambiguate_initial_states : bool  ;
 	  bound_on_itteration_number: int option ;
@@ -124,24 +124,43 @@ module Cflow_handler =
 	  blacklist_events: bool ;
 	}
 
-    let build_parameter () =
-      (*      let channel = Kappa_files.open_branch_and_cut_engine_profiling () in*)
+    let build_parameter ?called_from  () =
+      let out_channel,out_channel_err,out_channel_profiling,log_step_channel =
+	match
+	  called_from
+	with 
+	| Some Remanent_parameters_sig.JS ->
+	   Loggers.open_infinite_buffer ~mode:Loggers.HTML (),
+	   Loggers.open_infinite_buffer ~mode:Loggers.HTML (),
+	   Loggers.open_circular_buffer ~mode:Loggers.HTML (),
+	   Loggers.open_circular_buffer ~mode:Loggers.HTML_Tabular ()
+	   
+	| None
+	| Some Remanent_parameters_sig.KaSa
+	| Some Remanent_parameters_sig.KaSim
+	| Some Remanent_parameters_sig.Internalised  ->
+	   let channel = Kappa_files.open_branch_and_cut_engine_profiling () in
+	   Loggers.open_logger_from_formatter Format.err_formatter,
+	   Loggers.open_logger_from_formatter Format.err_formatter,
+	   Loggers.open_logger_from_formatter (Format.formatter_of_out_channel channel),
+	   Loggers.open_logger_from_formatter Format.std_formatter
+      in
       {
-        current_compression_mode = None ;
+	current_compression_mode = None ;
         priorities_weak = Priority.weak ;
         priorities_strong = Priority.strong ;
         priorities_causal = Priority.causal ;
 	compute_all_stories = false ;
 	sort_algo_for_stories = Parameter.Bucket;
-(*	out_channel = Format.err_formatter ;
-        out_channel_err = Format.err_formatter ;
-        out_channel_profiling = Format.formatter_of_out_channel channel ;*)
+	logger_out = out_channel ;
+        logger_err = out_channel_err ;
+        logger_profiling = out_channel_profiling ;
         compression_mode = Parameter.get_compression_mode () ;
         cache_size = Parameter.get_cache_size () ;
 	debug_mode = false ;
 	log_step = true ;
-	(*	log_step_channel = Format.std_formatter ;*)
-	kasa = Remanent_parameters.get_parameters ~called_from:Remanent_parameters_sig.KaSim () ;
+	logger_step = log_step_channel ;
+	kasa = Remanent_parameters.get_parameters ?called_from () ;
 	always_disambiguate_initial_states = true ;
 	bound_on_itteration_number = None ;
 	time_independent = !Parameter.time_independent ;
@@ -213,12 +232,12 @@ module Cflow_handler =
    let get_log_step parameter = parameter.log_step
    let set_log_step parameter bool = {parameter with log_step = bool}
 
-(*   let get_logger parameter = parameter.log_step_channel
-   let set_logger parameter fmt = {parameter with log_step_channel = fmt}
-   let get_out_channel parameter = parameter.out_channel
-   let set_out_channel parameter fmt = {parameter with out_channel = fmt}
-   let get_debugging_channel parameter = parameter.out_channel_err
-   let set_debugging_channel parameter fmt = {parameter with out_channel_err = fmt }*)
+   let get_logger parameter = parameter.logger_step
+   let set_logger parameter fmt = {parameter with logger_step = fmt}
+   let get_out_channel parameter = parameter.logger_out
+   let set_out_channel parameter fmt = {parameter with logger_out = fmt}
+   let get_debugging_channel parameter = parameter.logger_err
+   let set_debugging_channel parameter fmt = {parameter with logger_err = fmt }
 
    let get_kasa_parameters parameter = parameter.kasa
    let set_kasa_parameters parameter parameter' = {parameter' with kasa = parameter}
@@ -232,7 +251,7 @@ module Cflow_handler =
    let do_not_bound_itterations parameter = {parameter with bound_on_itteration_number = None}
    let set_itteration_bound parameter int = {parameter with bound_on_itteration_number = Some int}
    let get_bound_on_itteration_number parameter = parameter.bound_on_itteration_number
-   (* let get_profiling_logger parameter = parameter.out_channel_profiling*)
+   let get_profiling_logger parameter = parameter.logger_profiling
    let string_of_rule_id handler i = handler.rule_name_cache.(i)
    let string_of_agent_id handler i = handler.agent_name_cache.(i)
 
