@@ -71,10 +71,10 @@ let compatible_point injs e e' =
       ((Fresh(sid',ty'),ssite), ToNode (Existing sid,ssite'))
     | ((Fresh (id',ty),site),ToNode (Existing id,site')),
       ((Fresh(sid',ty'),ssite), ToNode (Existing sid,ssite'))) ->
-     List.map (Renaming.add id' sid')
-	      (List.filter
-		 (fun inj -> sid = Renaming.apply inj id && ssite = site
-			     && ty' = ty && ssite' = site') injs)
+     List.filter
+       (fun inj -> sid = Renaming.apply inj id && ssite = site
+		   && ty' = ty && ssite' = site')
+       (List.map (Renaming.add id' sid') injs)
   | ((Existing _,_), ToNode (Fresh _,_)),
     (((Fresh _ | Existing _), _), _) -> []
   | ((Fresh (id,ty),site), ToNothing), ((Fresh (id',ty'),site'),x) ->
@@ -103,14 +103,19 @@ let compatible_point injs e e' =
   | ((Fresh _,_), _), ((Fresh _,_),_) -> []
   | ((Fresh _,_), _), ((Existing _,_),_) -> []
 
-let rename_id inj2cc = function
+let rename_id ?but inj2cc = function
   | Fresh _ as x -> x
-  | Existing n -> Existing (Renaming.apply inj2cc n)
+  | Existing n as x ->
+     match but with
+     | Some n' when n = n' -> x
+     | _ -> Existing (Renaming.apply inj2cc n)
 
 let rename_step inj2cc = function
   | ((x,i), (ToNothing | ToInternal _ as a)) -> ((rename_id inj2cc x,i),a)
-  | ((x,i),ToNode (y,j)) ->
-     ((rename_id inj2cc x,i),ToNode (rename_id inj2cc y,j))
+  | ((Fresh (but,_) as x,i),ToNode (y,j)) ->
+     ((x,i),ToNode (rename_id ~but inj2cc y,j))
+  | ((Existing n,i),ToNode (y,j)) ->
+     ((Existing (Renaming.apply inj2cc n),i),ToNode (rename_id inj2cc y,j))
 
 let check_edge graph = function
   | ((Fresh (id,_),site),ToNothing) -> Edges.is_free id site graph
