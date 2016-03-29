@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <2016-03-24 09:48:26 feret>
+  * Last modification: Time-stamp: <2016-03-29 21:33:08 feret>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -16,14 +16,10 @@
   * under the terms of the GNU Library General Public License *)
 
 let losange_reduction = false
-			  
 let warn parameters mh message exn default =
      Exception.warn parameters mh (Some "Agent_trace.ml") message exn (fun () -> default)
 
 type node_type = Concrete | Main_abstract | Secondary_abstract of int
-
-
-
 
 type label = Ckappa_sig.c_rule_id * Ckappa_sig.c_agent_id
 module Label =
@@ -34,7 +30,14 @@ module Label =
 	   let compare = compare
 	 end))
 module LabelMap = Label.Map
-		    
+module Site =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+	 type t = Ckappa_sig.c_site_name
+	 let compare = compare
+	end))
+module SiteSet = Site.Set
 module Edge =
    Map_wrapper.Make
     (SetMap.Make
@@ -44,7 +47,6 @@ module Edge =
         end
        ))
 module EdgeSet = Edge.Set
-		   
 type nodes_adj =
   {
     outgoing_transitions: (label * Wrapped_modules.LoggedIntMap.elt) list Wrapped_modules.LoggedIntMap.t ;
@@ -89,7 +91,7 @@ let add_edge parameter error rule_id ag_id q q' label' nodes_adj =
   let error, nodes_adj = f error q nodes_adj in
   let error, nodes_adj = f error q' nodes_adj in
   error, nodes_adj
-    
+
 let add_creation parameter error rule_id ag_id q' nodes_adj =
 	   let error, old =
 	     match
@@ -116,8 +118,7 @@ let add_creation parameter error rule_id ag_id q' nodes_adj =
 	   let error, nodes_adj = f error q' nodes_adj in
 	   error, nodes_adj
 
-		    
-let dump_edge fic parameter error handler_kappa compil key key' label =  
+let dump_edge fic parameter error handler_kappa compil key key' label =
   let error, rule_name =
     if Remanent_parameters.get_show_rule_names_in_local_traces parameter
     then
@@ -127,26 +128,26 @@ let dump_edge fic parameter error handler_kappa compil key key' label =
   let () = Printf.fprintf fic "Node_%i -> Node_%i [label=\"%s\"];\n" key key' rule_name in
   error
 
- let hash_of_variables_list parameter handler error list =
-   let error, handler, hconsed_list = Ckappa_sig.Views_bdu.build_variables_list parameter handler error list in
-   let hash = Ckappa_sig.Views_bdu.hash_of_variables_list hconsed_list in
-   error, handler, hash
-		     
- let hash_of_association_list parameter handler error list =
-   let error, handler, hconsed_list = Ckappa_sig.Views_bdu.build_association_list parameter handler error list in
-   let hash = Ckappa_sig.Views_bdu.hash_of_association_list hconsed_list in
-   error, handler, hash
+let hash_of_variables_list parameter handler error list =
+  let error, handler, hconsed_list = Ckappa_sig.Views_bdu.build_variables_list parameter handler error list in
+  let hash = Ckappa_sig.Views_bdu.hash_of_variables_list hconsed_list in
+  error, handler, hash
 
- let dump_key_of_asso fic parameter handler error list =
-   let error, handler, hash = hash_of_association_list parameter handler error list in
-   let () = Printf.fprintf fic "Node_%i" hash in
-   error, handler
+let hash_of_association_list parameter handler error list =
+  let error, handler, hconsed_list = Ckappa_sig.Views_bdu.build_association_list parameter handler error list in
+  let hash = Ckappa_sig.Views_bdu.hash_of_association_list hconsed_list in
+  error, handler, hash
 
- let print_label_of_asso fic parameter error handler_kappa agent_type agent_string list =
-   let () = Printf.fprintf fic "%s(" agent_string  in
-   let error,_ =
-     List.fold_left
-       (fun (error,bool) (site_type, state) ->
+let dump_key_of_asso fic parameter handler error list =
+  let error, handler, hash = hash_of_association_list parameter handler error list in
+  let () = Printf.fprintf fic "Node_%i" hash in
+  error, handler
+
+let print_label_of_asso fic parameter error handler_kappa agent_type agent_string list =
+  let () = Printf.fprintf fic "%s(" agent_string  in
+  let error,_ =
+    List.fold_left
+      (fun (error,bool) (site_type, state) ->
 	let () =
 	  if bool
 	  then
@@ -155,7 +156,7 @@ let dump_edge fic parameter error handler_kappa compil key key' label =
 	let error, site_string = Handler.string_of_site parameter error handler_kappa agent_type site_type in
 	let error', state_string =
 	  Handler.string_of_state_fully_deciphered parameter error
-						   handler_kappa agent_type site_type state
+	    handler_kappa agent_type site_type state
 	in
 	let error = Exception.check warn parameter error error'
 				    (Some "line 240") Exit in
@@ -163,18 +164,138 @@ let dump_edge fic parameter error handler_kappa compil key key' label =
 	  Printf.fprintf fic "%s%s" site_string state_string
 	in
 	error,true
-       )
-       (error,false) list
-   in
-   let () = Printf.fprintf fic ")" in
-   error
+      )
+      (error,false) list
+  in
+  let () = Printf.fprintf fic ")" in
+  error
 
- let dump_graph_header fic =
+let dump_graph_header fic =
    Printf.fprintf fic "digraph G{\n"
 
- let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
-  let support = LabelMap.empty in
-  let error,support = error, support in
+let compute_full_support parameter error ag_id rule =
+  let test = rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs in
+  let error, agent =
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
+      parameter
+      error
+      ag_id
+      test.Cckappa_sig.views
+  in
+  let view =
+    match
+      agent
+    with
+    | None
+    | Some (Cckappa_sig.Dead_agent _)
+    | Some (Cckappa_sig.Unknown_agent _) -> None
+    | Some Cckappa_sig.Ghost ->
+      begin
+	let diff = rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.diff_direct in
+	let error, agent =
+	  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
+	    parameter
+	    error
+	    ag_id
+	    diff
+	in
+	match
+	  agent
+	with
+	| None -> None
+	| Some ag -> Some ag
+      end
+    | Some (Cckappa_sig.Agent ag) -> Some ag
+  in
+  let error, list =
+    match
+      view
+    with
+    | Some v ->
+      begin
+	Ckappa_sig.Site_map_and_set.Map.fold
+	  (fun site state (error,list) -> SiteSet.add parameter error site list)
+	  v.Cckappa_sig.agent_interface
+	  (error, SiteSet.empty)
+      end
+    | None -> error, SiteSet.empty
+  in
+  error, list
+
+let build_support parameter error rules =
+    Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
+      parameter
+      error
+      (fun parameter error r_id rule ->
+	Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
+	  parameter
+	  error
+	  (fun parameter error ag_id _  ->
+	    let error, set = compute_full_support parameter error ag_id rule in
+	    LabelMap.add parameter error (r_id,ag_id) set)
+	  rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
+	  )
+      rules LabelMap.empty
+
+      (* find a list of rules with pairwisely distinct support such that the support of each other rule meet each of the support of these rules *)
+
+let smash parameter error support label_list =
+  let error, list =
+    List.fold_left
+      (fun (error,l) label ->
+	let error, set = LabelMap.find_option parameter error label support in
+	match set with
+	| None -> (* error *) error,l
+	| Some set -> (error, (label,set,SiteSet.cardinal set)::l))
+      (error, [])
+      label_list
+  in
+  let list = List.sort (fun (_,_,a) (_,_,b) -> compare a b) list in
+  let rec aux list partition not_in_the_partition =
+    match list
+    with
+    | [] -> partition, not_in_the_partition
+    | (label,set,_)::tail ->
+      let error, bool =
+	let rec aux set list error = 
+	  match list with
+	  | (_,set')::tail -> 
+	      let error, inter = SiteSet.inter parameter error set set' in
+	      if SiteSet.is_empty inter
+	      then
+		aux set tail error
+	      else
+		error, false
+	  | [] -> error, true
+	in
+	aux set partition error
+      in
+      if bool
+      then
+	aux tail ((label,set)::partition) not_in_the_partition
+      else
+	aux tail partition ((label,set)::not_in_the_partition)
+  in
+  let partition,not_in_the_partition = aux list [] [] in
+  let bool =
+    List.for_all
+      (fun (_,set) ->
+	List.for_all
+	  (fun (_,set') ->
+	    not (SiteSet.is_empty (snd (SiteSet.inter parameter error set set'))) (* correct to trap errors *)
+	  )
+	  not_in_the_partition)
+      partition
+  in
+  if bool
+  then
+    Some (partition, not_in_the_partition)
+  else
+    None
+
+let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
+  let rules = compil.Cckappa_sig.rules in
+  let error, support = build_support parameter error rules in
   Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
     parameter
     error
@@ -215,8 +336,8 @@ let dump_edge fic parameter error handler_kappa compil key key' label =
 	   List.fold_left
 	     (fun (error, handler,nodes,nodes') list ->
 	      let error, handler, hash = hash_of_association_list parameter handler error list in
-	      let error, nodes = Wrapped_modules.LoggedIntMap.add parameter error hash list nodes in
-	      let error, nodes' = Wrapped_modules.LoggedIntMap.add parameter error hash Concrete  nodes' in
+	      let error, nodes         = Wrapped_modules.LoggedIntMap.add parameter error hash list nodes in
+	      let error, nodes'        = Wrapped_modules.LoggedIntMap.add parameter error hash Concrete  nodes' in
 	      error, handler, nodes, nodes')
 	     (error, handler,node_names,node_type)
 	     list
@@ -241,7 +362,6 @@ let dump_edge fic parameter error handler_kappa compil key key' label =
 	     mvbdu_true
 	     post_list
 	 in
-	 let rules = compil.Cckappa_sig.rules in
 	 let error, (handler, nodes_adj) =
 	   Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
 	     parameter
@@ -299,7 +419,7 @@ let dump_edge fic parameter error handler_kappa compil key key' label =
 			     parameter
 			     error
 			     ag_id
-					  views
+			     views
 			 with
 			 | error, Some (Cckappa_sig.Agent ag) -> error, Some ag.Cckappa_sig.agent_interface
 			 | error, _ -> error, None
@@ -320,9 +440,9 @@ let dump_edge fic parameter error handler_kappa compil key key' label =
 			    in
 			    let error, handler, nodes_adj =
 			      List.fold_left
-				(fun (error, handler, nodes_adj) post -> 
+				(fun (error, handler, nodes_adj) post ->
 				 let error, handler, hash_init' = hash_of_association_list parameter handler error post in
-				 let error, nodes_adj = 
+				 let error, nodes_adj =
 				   add_creation parameter error r_id ag_id hash_init' nodes_adj
 				 in
 				 error, handler, nodes_adj)
@@ -430,15 +550,15 @@ let dump_edge fic parameter error handler_kappa compil key key' label =
 					     aux q q' ((fst t,snd t')::output) (t::t'::update_list)
 					| (t,_)::_,(t',_)::q' ->
 					   aux pre q' output update_list
-					| [],[] -> List.rev output, List.rev update_list 
+					| [],[] -> List.rev output, List.rev update_list
 					| [],_ -> (* error *) List.rev output, List.rev update_list
 					| _,[] -> (* error *) List.rev output, List.rev update_list
 				      in
 				      let post,upd_list = aux pre post [] [] in
 				      let error, handler, hash_init = hash_of_association_list parameter handler error pre in
 				      let error, handler, hash_init' = hash_of_association_list parameter handler error post in
-				      let error, handler, hash_upd = hash_of_association_list parameter handler error upd_list in 
-				      let error, nodes_adj = 
+				      let error, handler, hash_upd = hash_of_association_list parameter handler error upd_list in
+				      let error, nodes_adj =
 					add_edge parameter error r_id ag_id hash_init hash_init' hash_upd nodes_adj
 				      in
 				      error, handler, nodes_adj)
@@ -578,7 +698,7 @@ let dump_edge fic parameter error handler_kappa compil key key' label =
 			Wrapped_modules.LoggedIntMap.iter
 			  (fun key _  ->
 			   Printf.fprintf fic "Init_%i [height=\"0cm\" width=\"0cm\" style=\"none\" label=\"\"];\n" key )
-			  
+			
 			  nodes_adj.creation
 		      in
 		      let kind_of error i =
@@ -609,7 +729,7 @@ let dump_edge fic parameter error handler_kappa compil key key' label =
 				| error,Concrete | error,Main_abstract -> error, key'
 			      in
 			      if EdgeSet.mem (key,key',label) edge_set
-			      then 
+			      then
 				error, edge_set
 			      else
 				let error = dump_edge fic parameter error handler_kappa compil key key' label in
@@ -657,7 +777,6 @@ let dump_edge fic parameter error handler_kappa compil key key' label =
 			Wrapped_modules.LoggedIntMap.iter
 			  (fun key _  ->
 			   Printf.fprintf fic "Init_%i [width=\"0cm\" height=\"0cm\" style=\"none\" label=\"\"];\n" key )
-			  
 			  nodes_adj.creation
 		      in
 		      let error, handler =
@@ -666,7 +785,7 @@ let dump_edge fic parameter error handler_kappa compil key key' label =
 			      let error, handler = dump_key_of_asso fic parameter handler error list in
 			      let () = Printf.fprintf fic " [label=\"" in
 			      let error = print_label_of_asso fic parameter error handler_kappa agent_type agent_string list in
-			   let () = Printf.fprintf fic "\"];\n" in
+			      let () = Printf.fprintf fic "\"];\n" in
 			      error, handler)
 			  node_names
 			  (error, handler)
