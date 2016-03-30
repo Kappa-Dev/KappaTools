@@ -30,6 +30,7 @@ module Label =
 	   let compare = compare
 	 end))
 module LabelMap = Label.Map
+module LabelSet = Label.Set
 module Site =
   Map_wrapper.Make
     (SetMap.Make
@@ -293,6 +294,15 @@ let smash parameter error support label_list =
   else
     None
 
+let collect_concurrent parameter error p =
+  List.fold_left
+    (fun (error, labelset, siteset) (label,set) ->
+     let error, labelset = LabelSet.add parameter error label labelset in
+     let error, siteset = SiteSet.union parameter error siteset set in
+     error, labelset, siteset)
+    (error, LabelSet.empty, SiteSet.empty)
+    p
+      
 let example list =
   let f int_list =
     List.rev_map Ckappa_sig.site_name_of_int (List.rev int_list)
@@ -329,25 +339,28 @@ let example list =
        begin
 	 let () = Printf.fprintf stdout "PARTITION: " in
 	 let () = List.iter (fun ((s,_),_) -> Printf.fprintf stdout "%i" (Ckappa_sig.int_of_rule_id s)) p in
-	 let () = Printf.fprintf stdout "SYNC: " in
+	 let () = Printf.fprintf stdout " SYNC: " in
      let () = List.iter (fun ((s,_),_) -> Printf.fprintf stdout "%i" (Ckappa_sig.int_of_rule_id s)) n_p  in
+     let () = Printf.fprintf stdout "\n" in
      ()
        end
   in
   ()
     
-let _ = example
+(*let _ = example (*PARTITION: 321 SYNC: 4*)
 	  [1, [1;2] ;
 	   2, [4;5] ;
 	   3, [7;8] ;
 	   4, [1;4;7]]
 
-let _ = example
+let _ = example (* NONE *)
 	  [1, [1;2] ;
 	   2, [2;3] ;
-	   3, [4;5]]
+	   3, [4;5]]*)
 	  
-       
+
+    
+	  
 let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
   let rules = compil.Cckappa_sig.rules in
   let error, support = build_support parameter error rules in
