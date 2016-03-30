@@ -124,16 +124,15 @@
                     }
                 }
             }
-        }
-    },
-    "/process/{token}": {
+        },
+	"/process/{tok}": {
             "delete": {
                 "summary": "Stop running simulation",
                 "description": "Stop a running process",
                 "tags": [ "Process" ],
                 "parameters": [
                     {
-                        "name": "token",
+                        "name": "tok",
                         "in": "path",
                         "type": "integer",
                         "description": "id of simulation process",
@@ -143,7 +142,7 @@
                 "responses": {
                     "200": {
                         "description": "state of the running process",
-                        "type": "string"
+                        "schema": { "type": "string" }
                     },
                     "400": {
                         "description": "Errors",
