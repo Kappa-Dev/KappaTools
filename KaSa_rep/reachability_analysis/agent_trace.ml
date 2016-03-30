@@ -293,6 +293,61 @@ let smash parameter error support label_list =
   else
     None
 
+let example list =
+  let f int_list =
+    List.rev_map Ckappa_sig.site_name_of_int (List.rev int_list)
+  in 
+  let label i = (Ckappa_sig.rule_id_of_int i,Ckappa_sig.agent_id_of_int i) in
+  let parameter =
+        Remanent_parameters.get_parameters ()
+  in
+  let error = Exception.empty_error_handler in
+  let input =
+    List.rev_map
+      (fun (lab, list) -> (label lab, f list))
+      (List.rev list)
+  in
+  let set_of_list =
+    List.fold_left
+      (fun (error,set) elt -> SiteSet.add parameter error elt set)
+      (error,SiteSet.empty)     
+  in
+  let error,support,list =
+    List.fold_left
+      (fun (error,support,list) (label,sites) ->
+	     let error,set = set_of_list sites in
+	     let error, support = LabelMap.add parameter error label set support in
+	     error,support,label::list)
+      (error,LabelMap.empty,[])
+      input
+  in      
+  let output = smash parameter error support list in
+  let _ =
+    match output with
+    | None -> Printf.fprintf stdout "NONE\n"
+    | Some (p,n_p) ->
+       begin
+	 let () = Printf.fprintf stdout "PARTITION: " in
+	 let () = List.iter (fun ((s,_),_) -> Printf.fprintf stdout "%i" (Ckappa_sig.int_of_rule_id s)) p in
+	 let () = Printf.fprintf stdout "SYNC: " in
+     let () = List.iter (fun ((s,_),_) -> Printf.fprintf stdout "%i" (Ckappa_sig.int_of_rule_id s)) n_p  in
+     ()
+       end
+  in
+  ()
+    
+let _ = example
+	  [1, [1;2] ;
+	   2, [4;5] ;
+	   3, [7;8] ;
+	   4, [1;4;7]]
+
+let _ = example
+	  [1, [1;2] ;
+	   2, [2;3] ;
+	   3, [4;5]]
+	  
+       
 let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
   let rules = compil.Cckappa_sig.rules in
   let error, support = build_support parameter error rules in
