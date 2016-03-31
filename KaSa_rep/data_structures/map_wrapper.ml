@@ -28,7 +28,7 @@ module type Set_with_logs =
     val partition: (elt -> bool) -> t -> t * t
 
     val compare: t -> t -> int
-    val equal: t -> t -> bool
+    val equal: t -> t -> bool 
     val subset: t -> t -> bool
 
     val iter: (elt -> unit) -> t -> unit
