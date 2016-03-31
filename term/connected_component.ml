@@ -527,49 +527,78 @@ let rec remove_from_sons level1 todos set rfathers cc_id = function
 	match List.partition (fun t -> t.dst = cc_id) cc.sons with
 	| [], _ -> remove_from_sons level1 todos set rfathers cc_id tail
 	| x::_,sons ->
-	let missings = List.fold_left
-			 (fun acc t -> IntSet.minus acc t.above_obs) x.above_obs
-			 sons in
-	if sons <> [] || cc.is_obs_of <> None || List.mem id level1 then
-	  let sons' =  if IntSet.is_empty missings then sons else cc.sons in
-	  let rfathers'' =
-	    if IntSet.is_empty missings then rfathers else id::rfathers in
-	  remove_from_sons
-	    level1 (IntMap.add id cc.fathers todos)
-	    (IntMap.add id {cc with sons = sons'} set)
-	    rfathers'' cc_id tail
-	else
-	  let todos',rfathers',set' =
-	    remove_from_sons
-	      level1 (IntMap.remove id todos) set [] id cc.fathers in
-	  let rfathers,set'' =
-	    match rfathers' with
-	    | _ :: _ ->
+	   if sons <> [] || cc.is_obs_of <> None || List.mem id level1 then
+	     (*let missings = (*TODO*)
+	       List.fold_left
+		 (fun acc t -> IntSet.minus acc t.above_obs) x.above_obs
+		 sons in*)
+	     let sons' = (*if IntSet.is_empty missings then sons else*) cc.sons in
+	     let rfathers'' =
+	       (*if IntSet.is_empty missings then rfathers else*) id::rfathers in
+	     remove_from_sons
+	       level1 (IntMap.add id cc.fathers todos)
+	       (IntMap.add id {cc with sons = sons'} set)
+	       rfathers'' cc_id tail
+	   else
+	     let todos',rfathers',set' =
+	       remove_from_sons
+		 level1 (IntMap.remove id todos) set [] id cc.fathers in
+	     let rfathers,set'' =
+	       match rfathers' with
+	       | _ :: _ ->
 	       id::rfathers,IntMap.add id {cc with fathers = rfathers'} set'
-	    | [] -> rfathers,IntMap.remove id set' in
-	  remove_from_sons level1 todos' set'' rfathers cc_id tail
-let rec scan_sons level1 todos set rfathers cc_id p = function
-  | [] -> todos,IntMap.add cc_id {p with fathers = rfathers} set
-  | [ _ ] as l when rfathers = [] ->
-     todos,IntMap.add cc_id {p with fathers = l} set
+	       | [] -> rfathers,IntMap.remove id set' in
+	     remove_from_sons level1 todos' set'' rfathers cc_id tail
+let rec scan_sons level1 todos set (injs,rfathers,cands) cc_id p = function
+  | [] ->
+     let rfathers' =
+       List.fold_left (fun acc (_,i) -> i::acc) rfathers cands in
+     todos,IntMap.add cc_id {p with fathers = rfathers'} set
   | id :: tail ->
      match IntMap.find_option id set with
-     | None -> scan_sons level1 todos set rfathers cc_id p tail
+     | None -> scan_sons level1 todos set (injs,rfathers,cands) cc_id p tail
      | Some cc ->
-	if List.length cc.sons > 1 || cc.is_obs_of <> None || List.mem id level1
+	let injs',cands',tail' =
+	  List.fold_left
+	    (fun acc s ->
+	     if s.dst = cc_id then
+	       List.fold_left
+		 (fun (l,c,t) r ->
+		  let oui,non =
+		    List.partition
+		      (fun (x,_) -> Renaming.equal x r) c in
+		  r::l,non,Tools.list_rev_map_append snd oui t)
+		 acc s.inj
+	     else acc)
+	    ([],cands,tail) cc.sons in
+	if List.length injs' > 1 || List.length cc.sons > 1
+	   || cc.is_obs_of <> None || List.mem id level1
 	then
 	  scan_sons level1 (IntMap.add id cc.fathers todos) set
-		    (id::rfathers) cc_id p tail
+		    (injs'@injs,id::rfathers,cands') cc_id p tail'
 	else
-	  let todos',rfathers',set' =
-	    remove_from_sons
-	      level1 (IntMap.remove id todos) set [] id cc.fathers in
-	  let rfathers,set'' =
-	    match rfathers' with
-	    | _ :: _ ->
-	       id::rfathers,IntMap.add id {cc with fathers = rfathers'} set'
-	    | [] -> rfathers,IntMap.remove id set' in
-	  scan_sons level1 todos' set'' rfathers cc_id p tail
+	  let rroots =
+	    List.filter
+	      (fun r -> not (List.exists (Renaming.equal r) injs)) injs' in
+	  let cands'' =
+	    List.fold_left
+	      (fun c r ->
+	       if List.exists (fun (x,_) -> Renaming.equal x r) c
+	       then c else (r,id)::c)
+	      cands rroots in
+	  if cands == cands'' then
+	    let todos',rfathers',set' =
+	      remove_from_sons
+		level1 (IntMap.remove id todos) set [] id cc.fathers in
+	    let rr,set'',tail'' =
+	      match rfathers' with
+	      | _ :: _ ->
+		 (injs'@injs,id::rfathers,cands'),
+		 IntMap.add id {cc with fathers = rfathers'} set',tail'
+	      | [] -> (injs,rfathers,cands),IntMap.remove id set',tail in
+	    scan_sons level1 todos' set'' rr cc_id p tail''
+	  else
+	    scan_sons level1 todos set (injs,rfathers,cands'') cc_id p tail
 
 let finalize env =
   let level1 = let zero = get env 0 in List.map (fun p -> p.dst) zero.sons in
@@ -580,7 +609,7 @@ let finalize env =
 	  (fun id fa (todos,s) ->
 	     match IntMap.find_option id s with
 	     | None -> (todos,s)
-	     | Some p -> scan_sons level1 todos s [] id p fa)
+	     | Some p -> scan_sons level1 todos s ([],[],[]) id p fa)
 	  todos (IntMap.empty,env) in
       iter out in
   match env.domain with

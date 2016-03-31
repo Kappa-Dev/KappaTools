@@ -48,6 +48,7 @@ Hash
 Dictionary
 Git_commit_info
 Config
+Covering_classes_type
 Misc_sa
 Tools_kasa
 Int_storage
@@ -68,6 +69,7 @@ Remanent_state_signature
 Influence_labels
 Quark_type
 List_tokens
+Fifo
 Cckappa_sig
 Ckappa_sig
 Prepreprocess
