@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <2016-03-29 21:33:08 feret>
+  * Last modification: Time-stamp: <2016-03-31 11:17:22 feret>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -15,7 +15,9 @@
   * All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
+let sanity_test = false
 let losange_reduction = false
+
 let warn parameters mh message exn default =
      Exception.warn parameters mh (Some "Agent_trace.ml") message exn (fun () -> default)
 
@@ -51,6 +53,7 @@ module EdgeSet = Edge.Set
 type nodes_adj =
   {
     outgoing_transitions: (label * Wrapped_modules.LoggedIntMap.elt) list Wrapped_modules.LoggedIntMap.t ;
+    outgoing_transitions_map: Wrapped_modules.LoggedIntMap.elt LabelMap.t Wrapped_modules.LoggedIntMap.t ;
     in_out_labels: int list Wrapped_modules.LoggedIntMap.t ;
     creation: label list  Wrapped_modules.LoggedIntMap.t ;
     degradation: label list Wrapped_modules.LoggedIntMap.t ;
@@ -64,6 +67,9 @@ type graph_with_losange_reduction =
     nodes_creation:  label list  Wrapped_modules.LoggedIntMap.t ;
     nodes_degradation: label list Wrapped_modules.LoggedIntMap.t ;
     transitions: (label  * int) list Wrapped_modules.LoggedIntMap.t ;
+    already_visited: Ckappa_sig.Views_bdu.mvbdu;
+    macro_states: Ckappa_sig.Views_bdu.mvbdu;
+    partially_visited: Ckappa_sig.Views_bdu.mvbdu LabelMap.t ;
   }
 
 let add_edge parameter error rule_id ag_id q q' label' nodes_adj =
@@ -76,7 +82,20 @@ let add_edge parameter error rule_id ag_id q q' label' nodes_adj =
     | error, Some l -> error, l
   in
   let error, outgoing = Wrapped_modules.LoggedIntMap.add_or_overwrite parameter error q (((rule_id,ag_id),q')::old) nodes_adj.outgoing_transitions in
-  let nodes_adj = { nodes_adj with outgoing_transitions = outgoing } in
+   let nodes_adj = { nodes_adj with outgoing_transitions = outgoing } in
+   let error, old =
+    match
+      Wrapped_modules.LoggedIntMap.find_option_without_logs
+	parameter error q nodes_adj.outgoing_transitions_map
+    with
+    | error, None -> error, LabelMap.empty
+    | error, Some map -> error, map
+  in
+  let error, map =
+    LabelMap.add parameter error (rule_id,ag_id) q' old
+  in
+  let error, outgoing_map = Wrapped_modules.LoggedIntMap.add_or_overwrite parameter error q map nodes_adj.outgoing_transitions_map in
+  let nodes_adj = { nodes_adj with outgoing_transitions_map = outgoing_map } in
   let f error q nodes_adj =
     let error,old =
       match
@@ -174,6 +193,16 @@ let print_label_of_asso fic parameter error handler_kappa agent_type agent_strin
 let dump_graph_header fic =
    Printf.fprintf fic "digraph G{\n"
 
+let is_black_listed parameter handler error list state =
+  let error, handler, mvbdu_true = Ckappa_sig.Views_bdu.mvbdu_true parameter handler error in
+  let error, handler, mvbdu = Ckappa_sig.Views_bdu.mvbdu_redefine parameter handler error mvbdu_true list in
+  let error, handler, inter = Ckappa_sig.Views_bdu.mvbdu_and parameter handler error mvbdu state.already_visited in
+  if Ckappa_sig.Views_bdu.equal inter mvbdu
+  then
+    error, handler, true
+  else
+    error, handler, false
+
 let compute_full_support parameter error ag_id rule =
   let test = rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs in
   let error, agent =
@@ -238,9 +267,15 @@ let build_support parameter error rules =
 	  )
       rules LabelMap.empty
 
-      (* find a list of rules with pairwisely distinct support such that the support of each other rule meet each of the support of these rules *)
+      (* find a list of rules with pairwisely distinct support *)
+      (* when restricted_version = true *)
+      (* it is also asked that the support of each other rule meet each of the support of the first list of  rules *)
 
-let smash parameter error support label_list =
+let is_subset parameter error handler a b =
+  let error, handler, c = Ckappa_sig.Views_bdu.mvbdu_and parameter error handler a b in
+  error,Ckappa_sig.Views_bdu.equal a c
+
+let smash parameter error ?restricted_version:(restricted_version=false) support label_list =
   let error, list =
     List.fold_left
       (fun (error,l) label ->
@@ -279,14 +314,16 @@ let smash parameter error support label_list =
   in
   let partition,not_in_the_partition = aux list [] [] in
   let bool =
-    List.for_all
-      (fun (_,set) ->
-	List.for_all
-	  (fun (_,set') ->
-	    not (SiteSet.is_empty (snd (SiteSet.inter parameter error set set'))) (* correct to trap errors *)
-	  )
-	  not_in_the_partition)
-      partition
+    not restricted_version
+    ||
+      (List.for_all
+	 (fun (_,set) ->
+	   List.for_all
+	     (fun (_,set') ->
+	       not (SiteSet.is_empty (snd (SiteSet.inter parameter error set set'))) (* correct to trap errors *)
+	     )
+	     not_in_the_partition)
+	 partition)
   in
   if bool
   then
@@ -302,8 +339,8 @@ let collect_concurrent parameter error p =
      error, labelset, siteset)
     (error, LabelSet.empty, SiteSet.empty)
     p
-      
-let example list =
+
+let example ?restricted_version:(restricted_version=false) list nodes_adj =
   let f int_list =
     List.rev_map Ckappa_sig.site_name_of_int (List.rev int_list)
   in 
@@ -320,7 +357,7 @@ let example list =
   let set_of_list =
     List.fold_left
       (fun (error,set) elt -> SiteSet.add parameter error elt set)
-      (error,SiteSet.empty)     
+      (error,SiteSet.empty)
   in
   let error,support,list =
     List.fold_left
@@ -330,8 +367,8 @@ let example list =
 	     error,support,label::list)
       (error,LabelMap.empty,[])
       input
-  in      
-  let output = smash parameter error support list in
+  in
+  let output = smash ~restricted_version parameter error support list in
   let _ =
     match output with
     | None -> Printf.fprintf stdout "NONE\n"
@@ -346,24 +383,76 @@ let example list =
        end
   in
   ()
-    
-(*let _ = example (*PARTITION: 321 SYNC: 4*)
-	  [1, [1;2] ;
-	   2, [4;5] ;
-	   3, [7;8] ;
-	   4, [1;4;7]]
 
-let _ = example (* NONE *)
+let extend_partition parameter error handler mvbdu_false support nodes_adj initial_partition starting_state =
+  let error, total_support =
+    List.fold_left
+      (fun
+	(error, set) (_,set') ->
+	SiteSet.union parameter error set set')
+      (error, SiteSet.empty)
+      initial_partition
+  in
+  List.fold_left
+    (fun 
+      (error, support_total, accu) 
+      (label,set) ->
+	let rec aux parameter error handler  nodes_adj visited support_total support_local labelset to_be_visited              =
+	  match to_be_visited with
+	  | [] -> error, support_local, labelset
+	  | t::q -> 
+	    begin
+	      error, support_local, labelset (* todo*)
+	    end
+	in
+	let error, support_local, labelset = 
+	  aux parameter error handler nodes_adj mvbdu_false total_support set (LabelSet.singleton label) [starting_state] in
+	let error, support_total =
+	  SiteSet.union parameter error support_total support_local 
+	in
+	error, 
+	support_total, 
+	accu)
+    (error, total_support, [])
+    initial_partition
+
+let nodes_adj =
+    {outgoing_transitions = Wrapped_modules.LoggedIntMap.empty;
+     outgoing_transitions_map = Wrapped_modules.LoggedIntMap.empty;
+     in_out_labels = Wrapped_modules.LoggedIntMap.empty;
+     creation = Wrapped_modules.LoggedIntMap.empty;
+     degradation = Wrapped_modules.LoggedIntMap.empty}
+
+let () = 
+  if sanity_test 
+  then 
+    begin
+      let _ = example (*PARTITION: 321 SYNC: 4*)
+	[1, [1;2] ;
+	 2, [4;5] ;
+	 3, [7;8] ;
+	 4, [1;4;7]] nodes_adj
+      in
+      let _ = example ~restricted_version:true (* NONE *)
+	[1, [1;2] ;
+	 2, [2;3] ;
+	   3, [4;5]] nodes_adj
+      in
+      let _ = example ~restricted_version:false (* PARTITION 31, SYNC 2 *)
 	  [1, [1;2] ;
 	   2, [2;3] ;
-	   3, [4;5]]*)
-	  
+	   3, [4;5]] nodes_adj
+      in
+      ()
+    end
 
-    
-	  
+
+
 let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
   let rules = compil.Cckappa_sig.rules in
   let error, support = build_support parameter error rules in
+  let error, handler, mvbdu_true = Ckappa_sig.Views_bdu.mvbdu_true  parameter handler error in
+  let error, handler, mvbdu_false = Ckappa_sig.Views_bdu.mvbdu_false parameter handler error in
   Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
     parameter
     error
@@ -393,6 +482,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 	 let node_type = Wrapped_modules.LoggedIntMap.empty in
 	 let nodes_adj =
 	   {outgoing_transitions = Wrapped_modules.LoggedIntMap.empty;
+	    outgoing_transitions_map = Wrapped_modules.LoggedIntMap.empty;
 	    in_out_labels = Wrapped_modules.LoggedIntMap.empty;
 	    creation = Wrapped_modules.LoggedIntMap.empty;
 	    degradation = Wrapped_modules.LoggedIntMap.empty}
@@ -652,6 +742,9 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 	     begin (* losange reduction *)
 	       let empty_state =
 		 {
+		   partially_visited = LabelMap.empty ;
+		   already_visited = mvbdu_false ;
+		   macro_states = mvbdu_false ;
 		   main_nodes = Wrapped_modules.LoggedIntMap.empty ;
 		   sub_nodes_in = Wrapped_modules.LoggedIntMap.empty ;
 		   sub_nodes_out = Wrapped_modules.LoggedIntMap.empty ;
