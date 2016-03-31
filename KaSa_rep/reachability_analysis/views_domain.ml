@@ -1343,6 +1343,39 @@ struct
         error, Usual_domains.Val l'
 
   (*-------------------------------------------------------------------------------*)
+  (*intersection*)
+
+  let inter error contact_answer update_answer =
+    match contact_answer with
+    | Usual_domains.Undefined ->
+      begin
+        match update_answer with
+        | Usual_domains.Undefined -> error, Usual_domains.Undefined          
+        | Usual_domains.Any ->  error, Usual_domains.Any
+        | Usual_domains.Val l-> error, Usual_domains.Val l          
+      end        
+    | Usual_domains.Any ->
+      begin
+        match update_answer with
+        | Usual_domains.Undefined -> error, Usual_domains.Any
+        | Usual_domains.Any -> error, Usual_domains.Any
+        | Usual_domains.Val l-> error, Usual_domains.Val l
+      end
+    | Usual_domains.Val l ->
+      match update_answer with
+      | Usual_domains.Undefined -> error, Usual_domains.Val l
+      | Usual_domains.Any -> error, Usual_domains.Val l
+      | Usual_domains.Val l' ->
+        let error, l'' =
+          get_sublist
+            error
+            l 
+            l'
+        in
+        error, Usual_domains.Val l''
+          
+
+  (*-------------------------------------------------------------------------------*)
 
   let compute_precondition_enable parameter error
       kappa_handler
