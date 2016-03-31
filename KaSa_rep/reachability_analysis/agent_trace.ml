@@ -157,10 +157,12 @@ let add_concrete_node parameter handler handler_kappa error agent_type agent_str
     let error, new_nodes_name = Wrapped_modules.LoggedIntMap.add parameter error hash f nodes_adj.nodes_name in
     let error, new_nodes_type = Wrapped_modules.LoggedIntMap.add parameter error hash Concrete nodes_adj.nodes_type in
     let error, new_nodes_asso = Wrapped_modules.LoggedIntMap.add parameter error hash list nodes_adj.nodes_to_asso_list in
+    let error, new_state_to_mvbdu = Wrapped_modules.LoggedIntMap.add parameter error hash mvbdu nodes_adj.state_to_mvbdu in
     error,
     handler,
     {
       nodes_adj with
+      state_to_mvbdu = new_state_to_mvbdu ;
       nodes = new_set ;
       nodes_name = new_nodes_name ;
       nodes_type = new_nodes_type ;
@@ -436,6 +438,10 @@ let extend_partition parameter error handler mvbdu_false support nodes_adj initi
       (error, SiteSet.empty)
       initial_partition
   in
+  let _ = Printf.fprintf stdout "TOTAL SUPPORT\n" in
+  let _ = SiteSet.iter (fun s -> Printf.fprintf stdout "%i," (Ckappa_sig.int_of_site_name s)) total_support in
+  let _ = Printf.fprintf stdout "\n" in
+		    
   List.fold_left
     (fun 
       (error, support_total, accu) 
@@ -446,7 +452,7 @@ let extend_partition parameter error handler mvbdu_false support nodes_adj initi
 	  | state::tail -> 
 	     begin
 	       let error, handler, meet = Ckappa_sig.Views_bdu.mvbdu_and parameter handler error state visited in
-	       if Ckappa_sig.Views_bdu.equal meet state
+	       if not (Ckappa_sig.Views_bdu.equal meet state)
 	       then (* fresh state, visite the outgoing transitions *)
 		 let error, handler, visited = Ckappa_sig.Views_bdu.mvbdu_or parameter handler error state visited in
 		 let error, handler, hash = hash_of_mvbdu parameter handler error state in
@@ -495,7 +501,7 @@ let extend_partition parameter error handler mvbdu_false support nodes_adj initi
 	in
 	error, 
 	support_total, 
-	accu)
+	(labelset,support_local)::accu)
     (error, total_support, [])
     initial_partition
 
@@ -874,6 +880,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 	   if losange_reduction
 	   then
 	     begin (* losange reduction *)
+	       let _ = Printf.fprintf stdout "BEGIN\n" in
 	       let empty_state =
 		 {
 		   partially_visited = LabelMap.empty ;
@@ -890,6 +897,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 	       let error,list,set =
 		 Wrapped_modules.LoggedIntMap.fold
 		   (fun i _ (error,list,set) ->
+		    let _ = Printf.fprintf stdout "CREATION \n" in
 		    let error,set = Wrapped_modules.LoggedIntSet.add parameter error i set in
 		    (error,i::list,set))
 		   nodes_adj.creation
@@ -912,6 +920,8 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 		 | h::t ->
 		    begin
 		      (* to do check that h is not in state *)
+		      let _ = Printf.fprintf stdout "AUX\n" in
+			    
 		      let error, mvbdu =
 			Wrapped_modules.LoggedIntMap.find_default
 			  parameter
@@ -925,8 +935,10 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 		      in
 		      if Ckappa_sig.Views_bdu.equal los_state.already_visited state'
 		      then
+			let _ = Printf.fprintf stdout "ALREADY VISITED \n" in
 			aux error t set los_state
 		      else
+			let _ = Printf.fprintf stdout "NEW VISIT \n" in
 			let los_state = {los_state with already_visited = state'} in
 			let error, outgoing =
 			  Wrapped_modules.LoggedIntMap.find_default_without_logs
@@ -945,6 +957,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 			with
 			| None -> aux error t set los_state
 			| Some output ->
+			   let _ = Printf.fprintf stdout "OUTPUT\n" in
 			   let error, support_total, output =
 			     extend_partition
 			       parameter
@@ -956,7 +969,27 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 			       (fst output)
 			       mvbdu
 			   in
-			   
+			   let () =
+			     List.iter
+			       (fun (labelset,support)  ->
+				let _ = Printf.fprintf stdout "RESULT \n" in
+				let _ =
+				  LabelSet.iter
+				    (fun (label,ag_id) ->
+				     Printf.fprintf stdout "%i %i ; " (Ckappa_sig.int_of_rule_id label)
+						    (Ckappa_sig.int_of_agent_id ag_id)
+				    )
+				    labelset
+				in
+				let _ = Printf.fprintf stdout "\n" in
+				let _ = SiteSet.iter
+					  (fun s -> Printf.fprintf stdout "%i " (Ckappa_sig.int_of_site_name s))
+					  support
+				in
+				let _ = Printf.fprintf stdout "\n" in
+				())
+			       output
+			   in
 			   aux error t set los_state
 		    end
 	       in
