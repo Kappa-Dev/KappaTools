@@ -16,17 +16,22 @@ module A =
   Analyzer.Make
     (Composite_domain.Make
        (Product.Product
-	  (Views_domain.Domain)
+	  (Parallel_bonds.Domain)
 	  (Product.Product
-             (Contact_map_domain.Domain)
-             (Product.Product
-	        (Agents_domain.Domain)
-	        (Rules_domain.Domain)
-             )
-          )
+	     (Site_accross_bonds_domain.Domain)
+	     (Product.Product
+		(Views_domain.Domain)
+		(Product.Product
+		   (Contact_map_domain.Domain)
+		   (Product.Product
+	              (Agents_domain.Domain)
+	              (Rules_domain.Domain)
+		   )
+		)
+	     )
+	  )
        )
     )
-
 
 (*module B =
   Analyzer.Make
