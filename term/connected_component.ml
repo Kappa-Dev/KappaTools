@@ -9,8 +9,11 @@ negative number means UnSpec. *)
 type cc = {
   id: int;
   nodes_by_type: int list array;
-  links: link array IntMap.t; (*pattern graph id -> [|... link_j...|] i.e agent_id on site_j has a link*)
-  internals: int array IntMap.t; (*internal state id -> [|... state_j...|] i.e agent_id on site_j has internal state state_j*)
+  links: link array IntMap.t;
+  (*pattern graph id -> [|... link_j...|] i.e agent_id on site_j has a link*)
+  internals: int array IntMap.t;
+  (*internal state id -> [|... state_j...|]
+ i.e agent_id on site_j has internal state state_j*)
   recogn_nav: Navigation.step list;
 }
 
@@ -191,14 +194,14 @@ let print ?sigs ?with_id f cc =
 	 (fun p (not_empty,(free,link_ids as out)) el ->
 	  let () =
 	    if internals.(p) >= 0
-	    then Format.fprintf f "%t%a"
-				(if not_empty then Pp.comma else Pp.empty)
-				(ContentAgent.print_internal ?sigs ag p) internals.(p)
+	    then Format.fprintf
+		   f "%t%a" (if not_empty then Pp.comma else Pp.empty)
+		   (ContentAgent.print_internal ?sigs ag p) internals.(p)
 	    else
 	      if  el <> UnSpec then
-		Format.fprintf f "%t%a"
-			       (if not_empty then Pp.comma else Pp.empty)
-			       (ContentAgent.print_site ?sigs ag) p in
+		Format.fprintf
+		  f "%t%a" (if not_empty then Pp.comma else Pp.empty)
+		  (ContentAgent.print_site ?sigs ag) p in
 	  match el with
 	  | UnSpec ->
 	     if internals.(p) >= 0
@@ -226,7 +229,8 @@ let print ?sigs ?with_id f cc =
 	   f "%t@[<h>%a("
 	   (if not_empty then Pp.comma else Pp.empty)
 	   (ContentAgent.print ?sigs ?with_id) ag_x in
-       let out = print_intf ag_x link_ids (IntMap.find_default [||] x cc.internals) el in
+       let out =
+	 print_intf ag_x link_ids (IntMap.find_default [||] x cc.internals) el in
        let () = Format.fprintf f ")@]" in
        true,out) cc.links (false,(1,Int2Map.empty)) in
   Format.pp_close_box f ()
@@ -281,13 +285,14 @@ let print_dot sigs f cc =
   Format.fprintf
     f "@[<v>subgraph %i {@,%a%a%a}@]" cc.id
     (Pp.array (fun f -> Format.pp_print_cut f ())
-	      (fun _ -> Pp.list (fun f -> Format.pp_print_cut f ())
-				(fun f x ->
-				 let n = (cc.id,find_ty cc x,x) in
-				 Format.fprintf
-				   f "@[%a [label=\"%a\"]@];@,"
-				   (ContentAgent.print ?sigs:None ?with_id:None) n
-				   (ContentAgent.print ~sigs ~with_id:()) n)))
+	      (fun _ -> Pp.list
+			  (fun f -> Format.pp_print_cut f ())
+			  (fun f x ->
+			   let n = (cc.id,find_ty cc x,x) in
+			   Format.fprintf
+			     f "@[%a [label=\"%a\"]@];@,"
+			     (ContentAgent.print ?sigs:None ?with_id:None) n
+			     (ContentAgent.print ~sigs ~with_id:()) n)))
     cc.nodes_by_type
     (Pp.set ~trailing:(fun f -> Format.pp_print_cut f ())
 	    IntMap.bindings (fun f -> Format.pp_print_cut f ())
@@ -305,7 +310,8 @@ let print_sons_dot sigs cc_id cc f sons =
 	  f sons
 
 let print_point_dot sigs f (id,point) =
-  let style = match point.is_obs_of with | Some _ -> "octagon" | None -> "box" in
+  let style =
+    match point.is_obs_of with | Some _ -> "octagon" | None -> "box" in
   Format.fprintf f "@[cc%i [label=\"%a\", shape=\"%s\"];@]@,%a"
 		 point.content.id (print ~sigs  ?with_id:None) point.content
 		 style (print_sons_dot sigs id point.content) point.sons
@@ -395,10 +401,10 @@ let print f env =
     f "@[<v>%a%a@]"
     (Pp.set IntMap.bindings Pp.space ~trailing:Pp.space
 	    (fun f (_,(cc,deps)) ->
-	     Format.fprintf f "@[<h>%a@] @[[%a]@]"
-			    (print ~sigs:env.sig_decl ~with_id:()) cc
-			    (Pp.set Operator.DepSet.elements Pp.space Operator.print_rev_dep)
-			    deps))
+	     Format.fprintf
+	       f "@[<h>%a@] @[[%a]@]" (print ~sigs:env.sig_decl ~with_id:()) cc
+	       (Pp.set Operator.DepSet.elements Pp.space Operator.print_rev_dep)
+	       deps))
     env.single_agent_points
     (fun f -> function
 	   | Provisional s ->
