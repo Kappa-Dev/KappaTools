@@ -197,8 +197,8 @@ module Propagation_heuristic =
 	  x.Priority.candidate_set_of_events
 	with
 	| Priority.All_remaining_events
-	| Priority.Wire_with_the_most_number_of_events -> Tools.min_pos_int_not_zero a b
-	| Priority.Wire_with_the_least_number_of_events -> Tools.max_pos_int_not_zero a b
+	| Priority.Wire_with_the_most_number_of_events -> Tools.max_pos_int_not_zero a b
+	| Priority.Wire_with_the_least_number_of_events -> Tools.min_pos_int_not_zero a b
       in
       let get_unresolved_event x parameter handler log_info error blackboard p_id level =
 	match
