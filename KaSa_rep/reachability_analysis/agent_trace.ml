@@ -83,10 +83,16 @@ let empty_nodes_adj mvbdu_false =
 type graph_with_losange_reduction =
   {
     nodes_adj: nodes_adj;
-    micro_state_to_macro_state: int list Wrapped_modules.LoggedIntMap.t ;
+    n_macro_state: int; 
+    macro_state_to_state: int list Wrapped_modules.LoggedIntMap.t ;
     already_visited: Ckappa_sig.Views_bdu.mvbdu;
     partially_visited: Ckappa_sig.Views_bdu.mvbdu LabelMap.t ;
   }
+
+let fresh_macro_state los_state =
+  let n = los_state.n_macro_state in
+  n,
+  {los_state with n_macro_state = n+1}
 
 let copy_node parameter handler error q nodes_adj los_state =
   let nodes_adj' = los_state.nodes_adj in
@@ -590,6 +596,29 @@ let extend_partition parameter error handler mvbdu_false support nodes_adj initi
     (error, handler, total_support_test, total_support_mod, [])
     initial_partition
 
+let replay parameter error handler mvbdu_false support los_state partition starting_state =
+   let error, total_support_test, total_support_mod =
+    List.fold_left
+      (fun
+	(error, set_test, set_mod) (_,set_test',set_mod') ->
+	let error, test = SiteSet.union parameter error set_test set_test' in
+	let error, mod_ = SiteSet.union parameter error set_mod set_mod' in
+	error, test, mod_)
+      (error, SiteSet.empty,SiteSet.empty)
+      partition
+   in
+   let error, handler, support_agent =
+     Ckappa_sig.Views_bdu.variables_list_of_mvbdu parameter handler error starting_state
+   in
+   let error, handler, los_state, exit_points =
+     List.fold_left
+       (fun (error, handler, los_state, exit_points) (set,support_test,support_mod) ->
+	    error, handler, los_state, exit_points)
+       (error, handler, los_state, Wrapped_modules.LoggedIntSet.empty)
+       partition
+   in
+   error, handler, los_state
+		     
 let example ?restricted_version:(restricted_version=false) list nodes_adj =
   let f int_list =
     List.rev_map Ckappa_sig.site_name_of_int (List.rev int_list)
@@ -956,8 +985,9 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 	       let empty_state =
 		 {
 		   partially_visited = LabelMap.empty ;
+		   n_macro_state = 0 ;
+		   macro_state_to_state = Wrapped_modules.LoggedIntMap.empty ;
 		   already_visited = mvbdu_false ;
-		   micro_state_to_macro_state = Wrapped_modules.LoggedIntMap.empty ;
 		   nodes_adj = {(empty_nodes_adj mvbdu_false) with creation = nodes_adj.creation} ;
 		 }
 	       in
@@ -1033,6 +1063,8 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 			       (fst output)
 			       mvbdu
 			   in
+			   let error, handler, los_state =
+			     replay parameter error handler error () los_state output mvbdu  in
 			   (* to do*)
 			   error, los_state, LabelSet.empty, output
 			in
@@ -1085,6 +1117,14 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 			  nodes_adj.nodes_to_asso_list
 			  (error, handler)
 		      in
+		      (* macro_steps *)
+		      let rec aux k =
+			if k=state.n_macro_state then ()
+			else
+			  let () = Printf.fprintf fic "Macro_%i [with=\"0cm\" height=\"0cm\" stype=\"none\" label=\"\"];\n" k
+			  in aux (k+1)
+		      in
+		      let () = aux 0 in
 		      (* edges *)
 		      let error =
 			Wrapped_modules.LoggedIntMap.fold
@@ -1125,7 +1165,16 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 			     list)
 			  nodes_adj.creation
 			  (error, EdgeSet.empty)
-		       in
+		      in
+		      let () =
+			Wrapped_modules.LoggedIntMap.iter
+			  (fun key ->
+			   List.iter
+			     (fun h ->
+			      Printf.fprintf fic "Node_%i -> Macro_%i [style=\"dashed\" label-\"\"];\n" h key)
+			  )
+			  state.macro_state_to_state
+		      in
 		      error
 	     end (* losange reduction *)
 	   else if
