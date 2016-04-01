@@ -292,6 +292,7 @@ let is_black_listed parameter handler error list state =
 
 let compute_full_support parameter error ag_id rule =
   let test = rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs in
+  let diff = rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.diff_direct in
   let error, agent =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
       parameter
@@ -337,7 +338,27 @@ let compute_full_support parameter error ag_id rule =
       end
     | None -> error, SiteSet.empty
   in
-  error, list
+   let error, agent =
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
+      parameter
+      error
+      ag_id
+      diff
+  in
+  let error, list' =
+    match
+      agent
+    with
+    | None -> error, SiteSet.empty
+    | Some v ->
+       begin
+	 Ckappa_sig.Site_map_and_set.Map.fold
+	   (fun site state (error,list) -> SiteSet.add parameter error site list)
+	   v.Cckappa_sig.agent_interface
+	   (error, SiteSet.empty)
+      end
+  in
+  error, list, list'
 
 let build_support parameter error rules =
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
@@ -348,8 +369,8 @@ let build_support parameter error rules =
 	  parameter
 	  error
 	  (fun parameter error ag_id _  ->
-	    let error, set = compute_full_support parameter error ag_id rule in
-	    LabelMap.add parameter error (r_id,ag_id) set)
+	    let error, set_test, set_mod  = compute_full_support parameter error ag_id rule in
+	    LabelMap.add parameter error (r_id,ag_id) (set_test, set_mod))
 	  rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
 	  )
       rules LabelMap.empty
@@ -366,48 +387,55 @@ let smash parameter error ?restricted_version:(restricted_version=false) support
   let error, list =
     List.fold_left
       (fun (error,l) label ->
-	let error, set = LabelMap.find_option parameter error label support in
+	let error, set  = LabelMap.find_option parameter error label support in
 	match set with
 	| None -> (* error *) error,l
-	| Some set -> (error, (label,set,SiteSet.cardinal set)::l))
+	| Some (set,set') -> (error, (label,set,set',SiteSet.cardinal set,SiteSet.cardinal set')::l))
       (error, [])
       label_list
   in
-  let list = List.sort (fun (_,_,a) (_,_,b) -> compare a b) list in
+  let list =
+    List.sort
+      (fun (_,_,_,a,a') (_,_,_,b,b') ->
+       let cmp = compare a b in
+       if cmp = 0 then compare a' b' else cmp)
+      list
+  in
   let rec aux list partition not_in_the_partition =
     match list
     with
     | [] -> partition, not_in_the_partition
-    | (label,set,_)::tail ->
+    | (label,set_test,set_mod,_,_)::tail ->
       let error, bool =
-	let rec aux set list error = 
+	let rec aux set_test set_mod list error = 
 	  match list with
-	  | (_,set')::tail -> 
-	      let error, inter = SiteSet.inter parameter error set set' in
-	      if SiteSet.is_empty inter
+	  | (_,set_test',set_mod')::tail -> 
+	     let error, inter = SiteSet.inter parameter error set_test' set_mod in
+	     let error, inter' = SiteSet.inter parameter error set_mod' set_test in
+	      if SiteSet.is_empty inter && SiteSet.is_empty inter'
 	      then
-		aux set tail error
+		aux set_test set_mod tail error
 	      else
 		error, false
 	  | [] -> error, true
 	in
-	aux set partition error
+	aux set_test set_mod partition error
       in
       if bool
       then
-	aux tail ((label,set)::partition) not_in_the_partition
+	aux tail ((label,set_test,set_mod)::partition) not_in_the_partition
       else
-	aux tail partition ((label,set)::not_in_the_partition)
+	aux tail partition ((label,set_test,set_mod)::not_in_the_partition)
   in
   let partition,not_in_the_partition = aux list [] [] in
   let bool =
     not restricted_version
     ||
       (List.for_all
-	 (fun (_,set) ->
+	 (fun (_,set_test,set_mod) ->
 	   List.for_all
-	     (fun (_,set') ->
-	       not (SiteSet.is_empty (snd (SiteSet.inter parameter error set set'))) (* correct to trap errors *)
+	     (fun (_,set_test',set_mod') ->
+	       not (SiteSet.is_empty (snd (SiteSet.inter parameter error set_mod set_test'))) (* correct to trap errors *)
 	     )
 	     not_in_the_partition)
 	 partition)
@@ -430,25 +458,28 @@ let collect_concurrent parameter error p =
 
 
 let extend_partition parameter error handler mvbdu_false support nodes_adj initial_partition starting_state =
-  let error, total_support =
+  let error, total_support_test, total_support_mod =
     List.fold_left
       (fun
-	(error, set) (_,set') ->
-	SiteSet.union parameter error set set')
-      (error, SiteSet.empty)
+	(error, set_test, set_mod) (_,set_test',set_mod') ->
+	let error, test = SiteSet.union parameter error set_test set_test' in
+	let error, mod_ = SiteSet.union parameter error set_mod set_mod' in
+	error, test, mod_)
+      (error, SiteSet.empty,SiteSet.empty)
       initial_partition
   in
   let _ = Printf.fprintf stdout "TOTAL SUPPORT\n" in
-  let _ = SiteSet.iter (fun s -> Printf.fprintf stdout "%i," (Ckappa_sig.int_of_site_name s)) total_support in
+  let _ = SiteSet.iter (fun s -> Printf.fprintf stdout "%i," (Ckappa_sig.int_of_site_name s)) total_support_test in
   let _ = Printf.fprintf stdout "\n" in
-		    
+  let _ = SiteSet.iter (fun s -> Printf.fprintf stdout "%i," (Ckappa_sig.int_of_site_name s)) total_support_mod in
+  let _ = Printf.fprintf stdout "\n" in
   List.fold_left
     (fun 
-      (error, support_total, accu) 
-      (label,set) ->
-	let rec aux parameter error handler nodes_adj visited support_total support_local labelset to_be_visited              =
+      (error, support_total_test, support_total_mod, accu) 
+      (label,set_test,set_mod) ->
+	let rec aux parameter error handler nodes_adj visited support_total_test support_total_mod support_local_test support_local_mod labelset to_be_visited              =
 	  match to_be_visited with
-	  | [] -> error, support_local, labelset
+	  | [] -> error, support_local_test, support_local_mod, labelset
 	  | state::tail -> 
 	     begin
 	       let error, handler, meet = Ckappa_sig.Views_bdu.mvbdu_and parameter handler error state visited in
@@ -459,13 +490,15 @@ let extend_partition parameter error handler mvbdu_false support nodes_adj initi
 		 let error, outgoing =
 		   Wrapped_modules.LoggedIntMap.find_default_without_logs parameter error [] hash nodes_adj.outgoing_transitions
 		 in
-		 let error, handler, to_be_visited, nodes_adj, support_local, labelset =
+		 let error, handler, to_be_visited, nodes_adj, support_local_test, support_local_mod, labelset =
 		   List.fold_left
-		     (fun (error,handler,to_be_visited,nodes_adj,support_local,labelset) (label,q') ->
-		      let error,set = LabelMap.find_default  parameter error SiteSet.empty label support in
-		      let error, diff = SiteSet.minus parameter error set support_local in
-		      let error, meet = SiteSet.inter parameter error diff support_total in
-		      if SiteSet.is_empty meet
+		     (fun (error,handler,to_be_visited,nodes_adj,support_local_test,support_local_mod,labelset) (label,q') ->
+		      let error,(set_test,set_mod) = LabelMap.find_default  parameter error (SiteSet.empty,SiteSet.empty) label support in
+		      let error, diff_test = SiteSet.minus parameter error set_test support_local_test in
+		      let error, meet_test = SiteSet.inter parameter error diff_test support_total_mod in
+		      let error, diff_mod = SiteSet.minus parameter error set_mod support_local_mod in
+		      let error, meet_mod = SiteSet.inter parameter error diff_mod support_total_test in
+		      if SiteSet.is_empty meet_test && SiteSet.is_empty meet_mod
 		      then
 			let error, mvbdu =
 			  Wrapped_modules.LoggedIntMap.find_option
@@ -477,32 +510,37 @@ let extend_partition parameter error handler mvbdu_false support nodes_adj initi
 			match
 			  mvbdu
 			with
-			| None -> error, handler, to_be_visited, nodes_adj, support_local, labelset
+			| None -> error, handler, to_be_visited, nodes_adj, support_local_test, support_local_mod, labelset
 			| Some mvbdu -> 
 			   let to_be_visited = mvbdu::to_be_visited in
-			   let error, support_local = SiteSet.union parameter error set support_local in
+			   let error, support_local_test = SiteSet.union parameter error set_test support_local_test in
+			   let error, support_local_mod = SiteSet.union parameter error set_mod support_local_mod in
 			   let error, labelset = LabelSet.add parameter error label labelset in
-			   error, handler, to_be_visited, nodes_adj, support_local, labelset
+			   error, handler, to_be_visited, nodes_adj, support_local_test, support_local_mod, labelset
 		      else
-		      	error, handler, to_be_visited, nodes_adj, support_local, labelset
+		      	error, handler, to_be_visited, nodes_adj, support_local_test, support_local_mod, labelset
 		     )
-		     (error,handler,tail,nodes_adj,support_local,labelset)
+		     (error,handler,tail,nodes_adj,support_local_test,support_local_mod,labelset)
 		     outgoing
 		 in
-		 aux parameter error handler nodes_adj visited support_total support_local labelset to_be_visited
+		 aux parameter error handler nodes_adj visited support_total_test support_total_mod support_local_test support_local_mod labelset to_be_visited
 	       else
-		 aux parameter error handler nodes_adj visited support_total support_local labelset tail
+		 aux parameter error handler nodes_adj visited support_total_test support_total_mod support_local_test support_local_mod labelset tail
 	    end
 	in
-	let error, support_local, labelset = 
-	  aux parameter error handler nodes_adj mvbdu_false total_support set (LabelSet.singleton label) [starting_state] in
-	let error, support_total =
-	  SiteSet.union parameter error support_total support_local 
+	let error, support_local_test, support_local_mod, labelset = 
+	  aux parameter error handler nodes_adj mvbdu_false total_support_test total_support_mod set_test set_mod (LabelSet.singleton label) [starting_state] in
+	let error, support_total_test =
+	  SiteSet.union parameter error support_total_test support_local_test
+	in
+	let error, support_total_mod =
+	  SiteSet.union parameter error support_total_mod support_local_mod
 	in
 	error, 
-	support_total, 
-	(labelset,support_local)::accu)
-    (error, total_support, [])
+	support_total_test,
+	support_total_mod,
+	(labelset,support_local_test,support_local_mod)::accu)
+    (error, total_support_test, total_support_mod, [])
     initial_partition
 
 let example ?restricted_version:(restricted_version=false) list nodes_adj =
@@ -528,7 +566,7 @@ let example ?restricted_version:(restricted_version=false) list nodes_adj =
     List.fold_left
       (fun (error,support,list) (label,sites) ->
 	     let error,set = set_of_list sites in
-	     let error, support = LabelMap.add parameter error label set support in
+	     let error, support = LabelMap.add parameter error label (set,set) support in
 	     error,support,label::list)
       (error,LabelMap.empty,[])
       input
@@ -540,9 +578,9 @@ let example ?restricted_version:(restricted_version=false) list nodes_adj =
     | Some (p,n_p) ->
        begin
 	 let () = Printf.fprintf stdout "PARTITION: " in
-	 let () = List.iter (fun ((s,_),_) -> Printf.fprintf stdout "%i" (Ckappa_sig.int_of_rule_id s)) p in
+	 let () = List.iter (fun ((s,_),_,_) -> Printf.fprintf stdout "%i" (Ckappa_sig.int_of_rule_id s)) p in
 	 let () = Printf.fprintf stdout " SYNC: " in
-     let () = List.iter (fun ((s,_),_) -> Printf.fprintf stdout "%i" (Ckappa_sig.int_of_rule_id s)) n_p  in
+     let () = List.iter (fun ((s,_),_,_) -> Printf.fprintf stdout "%i" (Ckappa_sig.int_of_rule_id s)) n_p  in
      let () = Printf.fprintf stdout "\n" in
      ()
        end
@@ -953,12 +991,12 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 			in
 			let error, output = smash parameter error support list_with_support in
 			match
-			output
+			  output
 			with
 			| None -> aux error t set los_state
 			| Some output ->
 			   let _ = Printf.fprintf stdout "OUTPUT\n" in
-			   let error, support_total, output =
+			   let error, support_total_test, support_total_mod, output =
 			     extend_partition
 			       parameter
 			       error
@@ -971,7 +1009,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 			   in
 			   let () =
 			     List.iter
-			       (fun (labelset,support)  ->
+			       (fun (labelset,support_test,support_mod)  ->
 				let _ = Printf.fprintf stdout "RESULT \n" in
 				let _ =
 				  LabelSet.iter
@@ -984,7 +1022,12 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 				let _ = Printf.fprintf stdout "\n" in
 				let _ = SiteSet.iter
 					  (fun s -> Printf.fprintf stdout "%i " (Ckappa_sig.int_of_site_name s))
-					  support
+					  support_test
+				in
+				let _ = Printf.fprintf stdout "\n" in
+				let _ = SiteSet.iter
+					  (fun s -> Printf.fprintf stdout "%i " (Ckappa_sig.int_of_site_name s))
+					  support_mod
 				in
 				let _ = Printf.fprintf stdout "\n" in
 				())
