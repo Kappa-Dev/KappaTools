@@ -609,25 +609,85 @@ let extend_partition parameter error handler mvbdu_false support nodes_adj initi
     (error, handler, total_support_test, total_support_mod, [])
     initial_partition
 
-let replay parameter error handler mvbdu_false support los_state partition starting_state =
+let replay parameter error handler mvbdu_false support nodes_adj los_state partition starting_state =
    let error, total_support_test, total_support_mod =
-    List.fold_left
-      (fun
-	(error, set_test, set_mod) (_,set_test',set_mod') ->
-	let error, test = SiteSet.union parameter error set_test set_test' in
-	let error, mod_ = SiteSet.union parameter error set_mod set_mod' in
-	error, test, mod_)
-      (error, SiteSet.empty,SiteSet.empty)
-      partition
+     List.fold_left
+       (fun
+	   (error, set_test, set_mod)
+	   (_,set_test',set_mod') ->
+	 let error, test = SiteSet.union parameter error set_test set_test' in
+	 let error, mod_ = SiteSet.union parameter error set_mod set_mod' in
+	 error, test, mod_)
+       (error, SiteSet.empty,SiteSet.empty)
+       partition
    in
    let error, handler, support_agent =
      Ckappa_sig.Views_bdu.variables_list_of_mvbdu parameter handler error starting_state
    in
-   let error, handler, los_state, exit_points =
+   let error, handler, los_state, mvbdu_list, mvbdu_exit_list =
      List.fold_left
-       (fun (error, handler, los_state, exit_points) (set,support_test,support_mod) ->
-	    error, handler, los_state, exit_points)
-       (error, handler, los_state, Wrapped_modules.LoggedIntSet.empty)
+       (fun (error, handler, los_state, mvbdu_list,mvbdu_exit_list) (set,support_test,support_mod) ->
+	let error, support = SiteSet.union parameter error support_test support_mod in
+	let support_list = SiteSet.fold (fun  a l -> a::l) support [] in
+	let error, handler, proj_list = Ckappa_sig.Views_bdu.build_variables_list parameter handler error support_list in
+	let rec visit handler error working_list mvbdu mvbdu_exit los_state =
+	  match
+	    working_list
+	  with
+	  | [] -> error, handler, mvbdu, mvbdu_exit, los_state
+	  | t::working_list ->
+	     let error, handler, union = Ckappa_sig.Views_bdu.mvbdu_or parameter handler error t mvbdu in
+	     if Ckappa_sig.Views_bdu.equal mvbdu union
+	     then (* state has already been visited *)
+	       visit handler error working_list mvbdu mvbdu_exit los_state
+	     else
+	       begin (* fresh site *)
+		 let mvbdu = union in
+		 let error, handler, proj_state = Ckappa_sig.Views_bdu.mvbdu_project_keep_only parameter handler error t proj_list in
+		 let error, handler, hash = hash_of_mvbdu parameter handler error proj_state in
+		 let error, outgoing =
+		   Wrapped_modules.LoggedIntMap.find_default_without_logs parameter error [] hash nodes_adj.outgoing_transitions
+		 in
+		 let error, ingoing =
+		   Wrapped_modules.LoggedIntMap.find_default_without_logs parameter error [] hash nodes_adj.ingoing_transitions
+		 in
+		 let error, working_list =
+		   List.fold_left
+		     (fun (error, working_list) (label, q') ->
+		      if LabelSet.mem label set
+		      then
+			let error, q' = Wrapped_modules.LoggedIntMap.find_default parameter error mvbdu_false q' nodes_adj.state_to_mvbdu in
+			error, q'::working_list
+		      else
+			error, working_list
+		     )
+		     (error, working_list)
+		     ingoing
+		 in
+		 let error, handler, working_list, mvbdu, mvbdu_exist, los_state =
+		   List.fold_left
+		     (fun (error, handler, working_list, mvbdu, mvbdu_exit, los_state) (label, q') ->
+		      if LabelSet.mem label set
+		      then
+			let error, handler, proj_state' = Ckappa_sig.Views_bdu.mvbdu_project_keep_only parameter handler error t proj_list in
+			let error, handler, hash' = hash_of_mvbdu parameter handler error proj_state' in
+			let nodes_adj' = los_state.nodes_adj in
+			let error, nodes_adj' = add_edge parameter error (fst label) (snd label) hash hash' (-1) nodes_adj in
+			let los_state = {los_state with nodes_adj = nodes_adj' } in
+			error, handler, working_list, mvbdu, mvbdu_exit, los_state
+		      else
+			let error, handler, mvbdu_exit = Ckappa_sig.Views_bdu.mvbdu_or parameter handler error proj_state mvbdu_exit in
+			error, handler, working_list, mvbdu, mvbdu_exit, los_state
+		     )
+		     (error, handler, working_list, mvbdu, mvbdu_exit, los_state)
+		     outgoing
+		 in
+		 visit handler error working_list mvbdu mvbdu_exit los_state
+	       end
+	in
+	let error, handler, mvbdu, mvbdu_exit, los_state = visit handler error [starting_state] mvbdu_false mvbdu_false los_state in
+	error, handler, los_state, mvbdu::mvbdu_list, mvbdu_exit::mvbdu_exit_list)
+       (error, handler, los_state, [], [])
        partition
    in
    error, handler, los_state
@@ -1074,7 +1134,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 				 mvbdu
 			     in
 			     let error, handler, los_state =
-			       replay parameter error handler error () los_state output mvbdu  in
+			       replay parameter error handler mvbdu_false support_total_test nodes_adj los_state output mvbdu  in
 			     (* to do*)
 			     error, los_state, LabelSet.empty, output
 			in
