@@ -58,6 +58,7 @@ type nodes_adj =
     nodes_name: (Exception.method_handler -> out_channel -> Exception.method_handler)  Wrapped_modules.LoggedIntMap.t ;
     nodes_type: node_type Wrapped_modules.LoggedIntMap.t ;
     outgoing_transitions: (label * Wrapped_modules.LoggedIntMap.elt) list Wrapped_modules.LoggedIntMap.t ;
+    ingoing_transitions: (label * Wrapped_modules.LoggedIntMap.elt) list Wrapped_modules.LoggedIntMap.t ;
     outgoing_transitions_map: Wrapped_modules.LoggedIntMap.elt LabelMap.t Wrapped_modules.LoggedIntMap.t ;
     in_out_labels: int list Wrapped_modules.LoggedIntMap.t ;
     creation: label list  Wrapped_modules.LoggedIntMap.t ;
@@ -67,6 +68,7 @@ type nodes_adj =
 
 let empty_nodes_adj mvbdu_false =
   {
+    ingoing_transitions = Wrapped_modules.LoggedIntMap.empty;
     outgoing_transitions = Wrapped_modules.LoggedIntMap.empty;
     outgoing_transitions_map = Wrapped_modules.LoggedIntMap.empty;
     in_out_labels = Wrapped_modules.LoggedIntMap.empty;
@@ -83,16 +85,11 @@ let empty_nodes_adj mvbdu_false =
 type graph_with_losange_reduction =
   {
     nodes_adj: nodes_adj;
-    n_macro_state: int; 
     macro_state_to_state: int list Wrapped_modules.LoggedIntMap.t ;
     already_visited: Ckappa_sig.Views_bdu.mvbdu;
-    partially_visited: Ckappa_sig.Views_bdu.mvbdu LabelMap.t ;
+    in_macro_states: Ckappa_sig.Views_bdu.mvbdu;
   }
 
-let fresh_macro_state los_state =
-  let n = los_state.n_macro_state in
-  n,
-  {los_state with n_macro_state = n+1}
 
 let copy_node parameter handler error q nodes_adj los_state =
   let nodes_adj' = los_state.nodes_adj in
@@ -139,8 +136,18 @@ let add_edge parameter error rule_id ag_id q q' label' nodes_adj =
     | error, Some l -> error, l
   in
   let error, outgoing = Wrapped_modules.LoggedIntMap.add_or_overwrite parameter error q (((rule_id,ag_id),q')::old) nodes_adj.outgoing_transitions in
-   let nodes_adj = { nodes_adj with outgoing_transitions = outgoing } in
-   let error, old =
+  let nodes_adj = { nodes_adj with outgoing_transitions = outgoing } in
+  let error, old =
+    match
+      Wrapped_modules.LoggedIntMap.find_option_without_logs
+	parameter error q' nodes_adj.ingoing_transitions
+    with
+    | error, None -> error, []
+    | error, Some l -> error, l
+  in
+  let error, ingoing = Wrapped_modules.LoggedIntMap.add_or_overwrite parameter error q (((rule_id,ag_id),q)::old) nodes_adj.outgoing_transitions in
+  let nodes_adj = { nodes_adj with ingoing_transitions = ingoing } in
+  let error, old =
     match
       Wrapped_modules.LoggedIntMap.find_option_without_logs
 	parameter error q nodes_adj.outgoing_transitions_map
@@ -168,7 +175,7 @@ let add_edge parameter error rule_id ag_id q q' label' nodes_adj =
   let error, nodes_adj = f error q nodes_adj in
   let error, nodes_adj = f error q' nodes_adj in
   error, nodes_adj
-
+	   
 let add_concrete_node parameter handler handler_kappa error agent_type agent_string mvbdu list nodes_adj =
   let error, handler, inter = Ckappa_sig.Views_bdu.mvbdu_and parameter handler error mvbdu nodes_adj.nodes in
   let f error fic  =
@@ -480,23 +487,28 @@ let smash parameter error ?restricted_version:(restricted_version=false) support
 	aux tail partition ((label,set_test,set_mod)::not_in_the_partition)
   in
   let partition,not_in_the_partition = aux list [] [] in
-  let bool =
-    not restricted_version
-    ||
-      (List.for_all
-	 (fun (_,set_test,set_mod) ->
-	   List.for_all
-	     (fun (_,set_test',set_mod') ->
-	       not (SiteSet.is_empty (snd (SiteSet.inter parameter error set_mod set_test'))) (* correct to trap errors *)
-	     )
-	     not_in_the_partition)
-	 partition)
-  in
-  if bool
-  then
-    error, Some (partition, not_in_the_partition)
-  else
-    error, None
+  match
+    partition
+  with
+  | [] | [_] -> error, None
+  | _::_::_ ->
+     let bool =
+       not restricted_version
+       ||
+	 (List.for_all
+	    (fun (_,set_test,set_mod) ->
+	     List.for_all
+	       (fun (_,set_test',set_mod') ->
+		not (SiteSet.is_empty (snd (SiteSet.inter parameter error set_mod set_test'))) (* correct to trap errors *)
+	       )
+	       not_in_the_partition)
+	    partition)
+     in
+     if bool
+     then
+       error, Some (partition, not_in_the_partition)
+     else
+       error, None
 
 let collect_concurrent parameter error p =
   List.fold_left
@@ -520,11 +532,6 @@ let extend_partition parameter error handler mvbdu_false support nodes_adj initi
       (error, SiteSet.empty,SiteSet.empty)
       initial_partition
   in
-  let _ = Printf.fprintf stdout "TOTAL SUPPORT\n" in
-  let _ = SiteSet.iter (fun s -> Printf.fprintf stdout "%i," (Ckappa_sig.int_of_site_name s)) total_support_test in
-  let _ = Printf.fprintf stdout "\n" in
-  let _ = SiteSet.iter (fun s -> Printf.fprintf stdout "%i," (Ckappa_sig.int_of_site_name s)) total_support_mod in
-  let _ = Printf.fprintf stdout "\n" in
   List.fold_left
     (fun 
       (error, handler, support_total_test, support_total_mod, accu) 
@@ -542,10 +549,11 @@ let extend_partition parameter error handler mvbdu_false support nodes_adj initi
 		 let error, outgoing =
 		   Wrapped_modules.LoggedIntMap.find_default_without_logs parameter error [] hash nodes_adj.outgoing_transitions
 		 in
-		 let error, handler, to_be_visited, nodes_adj, support_local_test, support_local_mod, labelset =
-		   List.fold_left
-		     (fun (error,handler,to_be_visited,nodes_adj,support_local_test,support_local_mod,labelset) (label,q') ->
-		      let error,(set_test,set_mod) = LabelMap.find_default  parameter error (SiteSet.empty,SiteSet.empty) label support in
+		 let error, ingoing =
+		   Wrapped_modules.LoggedIntMap.find_default_without_logs parameter error [] hash nodes_adj.ingoing_transitions
+		 in
+		 let g (error,handler,to_be_visited,nodes_adj,support_local_test,support_local_mod,labelset) (label,q') =
+		    let error,(set_test,set_mod) = LabelMap.find_default  parameter error (SiteSet.empty,SiteSet.empty) label support in
 		      let error, diff_test = SiteSet.minus parameter error set_test support_local_test in
 		      let error, meet_test = SiteSet.inter parameter error diff_test support_total_mod in
 		      let error, diff_mod = SiteSet.minus parameter error set_mod support_local_mod in
@@ -571,9 +579,14 @@ let extend_partition parameter error handler mvbdu_false support nodes_adj initi
 			   error, handler, to_be_visited, nodes_adj, support_local_test, support_local_mod, labelset
 		      else
 		      	error, handler, to_be_visited, nodes_adj, support_local_test, support_local_mod, labelset
-		     )
+		 in
+		 let error, handler, to_be_visited, nodes_adj, support_local_test, support_local_mod, labelset =
+		   List.fold_left
+		     g
+		     (List.fold_left g
 		     (error,handler,tail,nodes_adj,support_local_test,support_local_mod,labelset)
-		     outgoing
+		     outgoing)
+		     ingoing
 		 in
 		 aux parameter error handler nodes_adj visited support_total_test support_total_mod support_local_test support_local_mod labelset to_be_visited
 	       else
@@ -718,19 +731,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 	     (error, ((Remanent_parameters.get_local_trace_directory parameter)^(Remanent_parameters.get_local_trace_prefix parameter)^(agent_string)))
              ext_list
 	 in
-	 let nodes_adj =
-	   {
-	     nodes_to_asso_list = Wrapped_modules.LoggedIntMap.empty ;
-	     nodes_name = Wrapped_modules.LoggedIntMap.empty;
-	     nodes = mvbdu_false;
-	     state_to_mvbdu = Wrapped_modules.LoggedIntMap.empty;
-	     nodes_type = Wrapped_modules.LoggedIntMap.empty;
-	     outgoing_transitions = Wrapped_modules.LoggedIntMap.empty;
-	    outgoing_transitions_map = Wrapped_modules.LoggedIntMap.empty;
-	    in_out_labels = Wrapped_modules.LoggedIntMap.empty;
-	    creation = Wrapped_modules.LoggedIntMap.empty;
-	    degradation = Wrapped_modules.LoggedIntMap.empty}
-	 in
+	 let nodes_adj = empty_nodes_adj mvbdu_false in
 	 let file_name = file_name^(Remanent_parameters.ext_format (Remanent_parameters.get_local_trace_format parameter)) in
 	 let fic = Remanent_parameters.open_out file_name in
 	 let () = dump_graph_header fic in
@@ -981,11 +982,9 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 	   if losange_reduction
 	   then
 	     begin (* losange reduction *)
-	       let _ = Printf.fprintf stdout "BEGIN\n" in
 	       let empty_state =
 		 {
-		   partially_visited = LabelMap.empty ;
-		   n_macro_state = 0 ;
+		   in_macro_states = mvbdu_false ;
 		   macro_state_to_state = Wrapped_modules.LoggedIntMap.empty ;
 		   already_visited = mvbdu_false ;
 		   nodes_adj = {(empty_nodes_adj mvbdu_false) with creation = nodes_adj.creation} ;
@@ -1015,7 +1014,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 		 | [] -> error, handler, los_state
 		 | h::t ->
 		    begin
-		      (* to do check that h is not in state *)
+		      (* is h already visited ? *)
 		      let error, mvbdu =
 			Wrapped_modules.LoggedIntMap.find_default
 			  parameter
@@ -1028,7 +1027,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 			Ckappa_sig.Views_bdu.mvbdu_or parameter handler error los_state.already_visited mvbdu
 		      in
 		      if Ckappa_sig.Views_bdu.equal los_state.already_visited state'
-		      then
+		      then (* if yes, ignore h ? *)
 			aux handler error t set los_state
 		      else
 			let los_state = {los_state with already_visited = state'} in
@@ -1044,47 +1043,60 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 			let list_with_support =
 			  List.rev_map fst (List.rev outgoing)
 			in
-			let error, output = smash parameter error support list_with_support in
+			let error, handler, output =
+			   (* is h already involved in a macro-state ? *)
+			  let error, handler, macro_state' =
+			    Ckappa_sig.Views_bdu.mvbdu_or parameter handler error los_state.in_macro_states mvbdu
+			  in
+			  if Ckappa_sig.Views_bdu.equal los_state.in_macro_states macro_state'
+			  then (* if so, do not apply POR reduction on it ? *)
+			    error, handler, None
+			  else
+			    let error, output = smash parameter error support list_with_support in
+			    error, handler, output
+			in
 			let error, los_state, dealt_label, output  =
 			  match
 			    output
 			  with
 			  | None ->
-			    error, los_state, LabelSet.empty, []
+			     error, los_state, LabelSet.empty, []
 			  | Some output ->
-			   let error, handler, support_total_test, support_total_mod, output =
-			     extend_partition
-			       parameter
-			       error
-			       handler
-			       mvbdu_false
-			       support
-			       nodes_adj
-			       (fst output)
-			       mvbdu
-			   in
-			   let error, handler, los_state =
-			     replay parameter error handler error () los_state output mvbdu  in
-			   (* to do*)
-			   error, los_state, LabelSet.empty, output
+			     let error, handler, support_total_test, support_total_mod, output =
+			       extend_partition
+				 parameter
+				 error
+				 handler
+				 mvbdu_false
+				 support
+				 nodes_adj
+				 (fst output)
+				 mvbdu
+			     in
+			     let error, handler, los_state =
+			       replay parameter error handler error () los_state output mvbdu  in
+			     (* to do*)
+			     error, los_state, LabelSet.empty, output
 			in
+			(* deal with the successors of h *)
 			let error, outgoing =
 			  Wrapped_modules.LoggedIntMap.find_default_without_logs parameter error [] h los_state.nodes_adj.outgoing_transitions
 			in
 			let error, handler, los_state, to_be_visited =
 			  List.fold_left 
 			    (fun (error, handler, los_state, to_be_visited) (label,q') -> 
-			      if LabelSet.mem label dealt_label
+			     (* to do, detect wether a state is already dealt with by another macro-state *)
+			     if LabelSet.mem label dealt_label
 			      then 
 				error, handler, los_state, to_be_visited
 			      else
 				begin
-				  let error, mvbdu_macro = LabelMap.find_default parameter error mvbdu_false label los_state.partially_visited in
+				(*  let error, mvbdu_macro = LabelMap.find_default parameter error mvbdu_false label los_state.partially_visited in
 				  let error, handler, mvbdu' =  Ckappa_sig.Views_bdu.mvbdu_and parameter handler error mvbdu mvbdu_macro in
 				  if Ckappa_sig.Views_bdu.equal mvbdu' mvbdu
 				  then
 				    error, handler, los_state, to_be_visited
-				  else
+				  else*)
 				    let error, nodes_adj = add_edge parameter error (fst label) (snd label) h q' 
  0 (* to do *) los_state.nodes_adj in
 				    let los_state = {los_state with nodes_adj = nodes_adj} in
@@ -1118,13 +1130,14 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 			  (error, handler)
 		      in
 		      (* macro_steps *)
-		      let rec aux k =
-			if k=state.n_macro_state then ()
-			else
-			  let () = Printf.fprintf fic "Macro_%i [with=\"0cm\" height=\"0cm\" stype=\"none\" label=\"\"];\n" k
-			  in aux (k+1)
+		      let error =
+			Wrapped_modules.LoggedIntMap.fold
+			  (fun k _ error ->
+			   let () = Printf.fprintf fic "Macro_%i [with=\"0cm\" height=\"0cm\" stype=\"none\" label=\"\"];\n" k
+			   in error)
+			  state.macro_state_to_state
+			  error
 		      in
-		      let () = aux 0 in
 		      (* edges *)
 		      let error =
 			Wrapped_modules.LoggedIntMap.fold
