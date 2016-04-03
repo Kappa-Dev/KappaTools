@@ -61,7 +61,7 @@ end = struct
               (Ast.agent, LKappa.rule_agent list, int, LKappa.rule) Ast.compil
         = LKappa.compil_of_ast [] raw_ast in
       let contact_map,_kasa_state =
-        Eval.init_kasa Format.std_formatter raw_ast
+        Eval.init_kasa Remanent_parameters_sig.JS raw_ast
       in success (ast,contact_map)
     with ExceptionDefn.Syntax_Error e ->
          failure (format_error_message e)

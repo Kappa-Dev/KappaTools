@@ -528,8 +528,8 @@ let compile_rules alg_deps contact_map counter domain rules =
   | _, _, None, _, _ ->
      failwith "The origin of Eval.compile_rules has been lost"
 
-let init_kasa logger result =
-  let pre_kasa_state = Export_to_KaSim.Export_to_KaSim.init logger result in
+let init_kasa called_from result =
+  let pre_kasa_state = Export_to_KaSim.Export_to_KaSim.init ~called_from result in
   let kasa_state,contact_map =
     Export_to_KaSim.Export_to_KaSim.get_contact_map pre_kasa_state in
   let () = Export_to_KaSim.Export_to_KaSim.dump_errors_light kasa_state in
