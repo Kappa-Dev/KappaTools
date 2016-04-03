@@ -48,8 +48,8 @@ let always = (fun _ -> true)
 let do_not_log parameter = (S.PH.B.PB.CI.Po.K.H.set_log_step parameter false)
 
 
-let compress_and_print logger env log_info step_list =
-  let parameter = S.PH.B.PB.CI.Po.K.H.build_parameter () in
+let compress_and_print ~called_from logger env log_info step_list =
+  let parameter = S.PH.B.PB.CI.Po.K.H.build_parameter ~called_from in
   let parameter = S.PH.B.PB.CI.Po.K.H.set_log_step parameter log_step in
   let parameter = S.PH.B.PB.CI.Po.K.H.set_debugging_mode parameter debug_mode in
   (* let parameter = S.PH.B.PB.CI.Po.K.H.set_logger parameter logger in*)

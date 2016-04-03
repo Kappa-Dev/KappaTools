@@ -22,5 +22,6 @@ val secret_store_obs :
 (** {6 Use} *)
 
 val compress_and_print :
+  called_from:Remanent_parameters_sig.called_from ->
   Format.formatter -> Environment.t -> secret_log_info ->
   secret_step list -> unit

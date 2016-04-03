@@ -42,7 +42,7 @@ module type Cflow_handler =
     val get_bound_on_itteration_number: parameter -> int option
     val set_first_story_per_obs: parameter -> parameter
     val set_all_stories_per_obs: parameter -> parameter
-    val build_parameter:  ?called_from:Remanent_parameters_sig.called_from -> unit -> parameter
+    val build_parameter: called_from:Remanent_parameters_sig.called_from -> parameter
     val string_of_exn: exn -> string option
     val set_compression_weak: parameter -> parameter
     val set_compression_strong: parameter -> parameter

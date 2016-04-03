@@ -65,7 +65,7 @@ module type Cflow_handler =
     val get_bound_on_itteration_number: parameter -> int option
     val set_first_story_per_obs: parameter -> parameter
     val set_all_stories_per_obs: parameter -> parameter
-    val build_parameter: ?called_from:Remanent_parameters_sig.called_from -> unit -> parameter
+    val build_parameter: called_from:Remanent_parameters_sig.called_from -> parameter
     val string_of_exn: exn -> string option
     val set_compression_weak: parameter -> parameter
     val set_compression_strong: parameter -> parameter
@@ -124,21 +124,19 @@ module Cflow_handler =
 	  blacklist_events: bool ;
 	}
 
-    let build_parameter ?called_from  () =
+    let build_parameter ~called_from =
       let out_channel,out_channel_err,out_channel_profiling,log_step_channel =
 	match
 	  called_from
-	with 
-	| Some Remanent_parameters_sig.JS ->
+	with
+	| Remanent_parameters_sig.JS ->
 	   Loggers.open_infinite_buffer ~mode:Loggers.HTML (),
 	   Loggers.open_infinite_buffer ~mode:Loggers.HTML (),
 	   Loggers.open_circular_buffer ~mode:Loggers.HTML (),
 	   Loggers.open_circular_buffer ~mode:Loggers.HTML_Tabular ()
-	   
-	| None
-	| Some Remanent_parameters_sig.KaSa
-	| Some Remanent_parameters_sig.KaSim
-	| Some Remanent_parameters_sig.Internalised  ->
+	| Remanent_parameters_sig.KaSa
+	| Remanent_parameters_sig.KaSim
+	| Remanent_parameters_sig.Internalised  ->
 	   let channel = Kappa_files.open_branch_and_cut_engine_profiling () in
 	   Loggers.open_logger_from_formatter Format.err_formatter,
 	   Loggers.open_logger_from_formatter Format.err_formatter,
@@ -160,7 +158,7 @@ module Cflow_handler =
 	debug_mode = false ;
 	log_step = true ;
 	logger_step = log_step_channel ;
-	kasa = Remanent_parameters.get_parameters ?called_from () ;
+	kasa = Remanent_parameters.get_parameters ~called_from () ;
 	always_disambiguate_initial_states = true ;
 	bound_on_itteration_number = None ;
 	time_independent = !Parameter.time_independent ;

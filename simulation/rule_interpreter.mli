@@ -1,5 +1,5 @@
 (**Graph rewriting module*)
-open Mods 
+open Mods
 
 type t (**Abstract graph*)
 
@@ -78,7 +78,9 @@ val add_tracked :
   Instantiation.abstract Instantiation.test list ->
   t -> t
 val remove_tracked : Connected_component.t array -> t -> t
-val generate_stories : Format.formatter -> Environment.t -> t -> unit
+val generate_stories :
+  called_from:Remanent_parameters_sig.called_from ->
+  Format.formatter -> Environment.t -> t -> unit
 
 (** {6 Debugging} *)
 

@@ -201,7 +201,9 @@ let () =
     Parameter.initSimTime () ;
     let () =
       State_interpreter.loop
-	~outputs:(Outputs.go  (Environment.signatures env)) Format.std_formatter env cc_env counter graph new_state
+	~outputs:(Outputs.go  (Environment.signatures env))
+	~called_from:Remanent_parameters_sig.KaSim
+	Format.std_formatter env cc_env counter graph new_state
     in
     Format.printf "Simulation ended";
     if Counter.nb_null_event counter = 0 then Format.print_newline()

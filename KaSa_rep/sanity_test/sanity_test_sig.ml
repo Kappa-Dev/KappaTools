@@ -66,7 +66,8 @@ let initial_remanent make_mvbdu_handler make_allocate_mvbdu make_allocate_associ
     output=stdout;
     mvbdu_handler=handler;
     error=error;
-    parameters = Remanent_parameters.get_parameters ();
+    parameters = Remanent_parameters.get_parameters
+		   ~called_from:Remanent_parameters_sig.KaSa ();
     allocate_mvbdu = make_allocate_mvbdu false;
     allocate_uniquely_mvbdu = make_allocate_mvbdu true;
     allocate_association_list = make_allocate_association_list false ;

@@ -226,7 +226,7 @@ let open_tasks_profiling =
   in
   f
 
-let get_parameters ?html_mode:(html_mode=true) ?called_from:(called_from=Remanent_parameters_sig.KaSa) () =
+let get_parameters ?html_mode:(html_mode=true) ~called_from () =
   let channel,html_mode =
     match
       called_from
@@ -284,7 +284,10 @@ let get_parameters ?html_mode:(html_mode=true) ?called_from:(called_from=Remanen
         Remanent_parameters_sig.called_from = called_from ;
 	Remanent_parameters_sig.html_mode = html_mode ;
      } ;
-    Remanent_parameters_sig.logger = Loggers.open_logger_from_formatter !Config.formatter ;
+    Remanent_parameters_sig.logger =
+      (match channel with
+      | None -> Loggers.dummy_txt_logger
+      | Some _ -> Loggers.open_logger_from_formatter !Config.formatter);
     Remanent_parameters_sig.compression_status = Loggers.dummy_txt_logger;
     Remanent_parameters_sig.profiler =
       match
@@ -295,14 +298,14 @@ let get_parameters ?html_mode:(html_mode=true) ?called_from:(called_from=Remanen
 	Loggers.open_logger_from_channel ~mode:Loggers.HTML_Tabular a
   }
 
-let dummy_parameters =
+let dummy_parameters ~called_from =
   let cache = ref None in
   let f () =
     match
       !cache
     with
     | None ->
-      let p = get_parameters () in
+      let p = get_parameters ~called_from () in
       let () = cache := Some p in
       p
     | Some p -> p

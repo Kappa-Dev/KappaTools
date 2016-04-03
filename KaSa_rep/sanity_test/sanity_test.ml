@@ -74,9 +74,10 @@ module LI = (Map_wrapper.Make(I):Map_wrapper.S_with_logs with type 'a Map.t = 'a
 
 module LLI = Map_wrapper.Make(SetMap.Make (struct type t = int let compare = compare end))
 					   
-let main () =
+let () =
   let error = Exception.empty_error_handler in
-  let parameters = Remanent_parameters.get_parameters () in
+  let parameters = Remanent_parameters.get_parameters
+		     ~called_from:Remanent_parameters_sig.KaSa () in
   let _ = Exception.print parameters error  in 
   let counting_test_list = Counting_test.test_counting_procedure parameters in
   let remanent_bdd,bdu_test_list = Mvbdu_test.bdu_test (remanent parameters) parameters in 
@@ -92,7 +93,4 @@ let main () =
        counting_test_list] 
   in
   let _ = Printf.fprintf stdout "END SANITY\n" in 
-  () 
-
-let _ = main ()
- 
+  ()

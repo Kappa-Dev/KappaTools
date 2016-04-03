@@ -762,7 +762,7 @@ let example ?restricted_version:(restricted_version=false) list nodes_adj =
   in 
   let label i = (Ckappa_sig.rule_id_of_int i,Ckappa_sig.agent_id_of_int i) in
   let parameter =
-        Remanent_parameters.get_parameters ()
+        Remanent_parameters.get_parameters ~called_from:Remanent_parameters_sig.KaSa ()
   in
   let error = Exception.empty_error_handler in
   let input =
