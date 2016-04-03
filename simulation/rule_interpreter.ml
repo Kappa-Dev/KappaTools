@@ -865,9 +865,9 @@ let remove_tracked ccs state =
        tcc ccs in
      { state with story_machinery = Some (tcc',x) }
 
-let generate_stories ~called_from logger env state =
+let generate_stories ~called_from env state =
   match state.story_machinery with
   | None -> ()
   | Some (_,(infos,steps)) ->
      Compression_main.compress_and_print
-       ~called_from logger env infos (List.rev steps)
+       ~called_from env infos (List.rev steps)

@@ -48,7 +48,7 @@ let always = (fun _ -> true)
 let do_not_log parameter = (S.PH.B.PB.CI.Po.K.H.set_log_step parameter false)
 
 
-let compress_and_print ~called_from logger env log_info step_list =
+let compress_and_print ~called_from env log_info step_list =
   let parameter = S.PH.B.PB.CI.Po.K.H.build_parameter ~called_from in
   let parameter = S.PH.B.PB.CI.Po.K.H.set_log_step parameter log_step in
   let parameter = S.PH.B.PB.CI.Po.K.H.set_debugging_mode parameter debug_mode in
@@ -95,14 +95,16 @@ let compress_and_print ~called_from logger env log_info step_list =
 	let error,log_info,step_list = U.remove_events_after_last_obs parameter handler log_info error step_list in
 	if not (U.has_obs step_list)
         then
-          let () = Debug.tag logger "+ No causal flow found" in
+          let () =
+	    Loggers.fprintf (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
+			    "+ No causal flow found@." in
           empty_compression
         else
           let () =
-            if (weak_compression_on || strong_compression_on)
-            then Debug.tag logger "+ Producing causal compressions"
-            else Debug.tag logger "+ Producing causal traces"
-          in
+	    Loggers.fprintf (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
+			    (if (weak_compression_on || strong_compression_on)
+			     then "+ Producing causal compressions@."
+			     else "+ Producing causal traces@.") in
 	  let last_eid = U.last_eid_in_pretrace step_list in
 	  let error,log_info,step_list = U.split_init parameter handler log_info error step_list in
 	  (* causal compression without any simplification (just partial order compression)*)
@@ -111,17 +113,16 @@ let compress_and_print ~called_from logger env log_info step_list =
             if causal_trace_on
             then
               let () =
-		if log_step
-		then
-                  Debug.tag logger "\t - blackboard generation"
+		if log_step then
+		  Loggers.fprintf (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
+				  "\t - blackboard generation@."
               in
 	      let error,log_info,step_list = U.make_unambiguous parameter handler log_info error step_list in
 	      let error,log_info,blackboard = U.convert_trace_into_musical_notation parameter handler log_info error step_list in
               let () =
-		if debug_mode && log_step
-		then
-		  Debug.tag logger "\t - pretty printing the grid"
-              in
+		if debug_mode && log_step then
+		  Loggers.fprintf (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
+				  "\t - pretty printing the grid@." in
               let log_info,error =
 		if debug_mode
 		then
@@ -134,15 +135,16 @@ let compress_and_print ~called_from logger env log_info step_list =
               let error,log_info,list = U.extract_observable_hits_from_musical_notation parameter handler log_info error blackboard in
               let n_stories = List.length list in
               let () =
-		if log_step
-		then
-		  Format.fprintf logger "\t - computing causal past of each observed events (%i)@." n_stories
+		if log_step then
+		  Loggers.fprintf
+		    (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
+		    "\t - computing causal past of each observed events (%i)@." n_stories
 	      in
 	      let error,log_info,causal_story_list =
 		let () =
-                  if debug_mode
-                  then
-                    Debug.tag logger "\t\t * causal compression "
+                  if debug_mode then
+                    Loggers.fprintf (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
+				    "\t\t * causal compression @."
 		in
 		(*		let log_info = U.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in *)
 		(* We use the grid to get the causal precedence (pred* ) of each observable *)
@@ -151,12 +153,16 @@ let compress_and_print ~called_from logger env log_info step_list =
 		let _ =
                   if Parameter.log_number_of_causal_flows
                   then
-                    Causal.print_stat logger parameter handler enriched_grid
+		    match Loggers.formatter_of_logger
+			    (S.PH.B.PB.CI.Po.K.H.get_logger parameter) with
+		    | None -> ()
+                    | Some logger ->
+		       Causal.print_stat logger parameter handler enriched_grid
 		in
 		let () =
-		  if log_step
-		  then
-		    Format.fprintf logger "\t - causal flow compression (%i)@." n_stories
+		  if log_step then
+		    Loggers.fprintf (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
+				    "\t - causal flow compression (%i)@." n_stories
 		in
 		(* we fold the list of obervable hit, and for each one collect the causal past *)
 		U.fold_left_with_progress_bar
@@ -171,9 +177,9 @@ let compress_and_print ~called_from logger env log_info step_list =
 		      ?(shall_we_compute_profiling_information=always)
 		      handler log_info error story_list observable_id ->
 		    let () =
-                      if debug_mode
-                      then
-			Debug.tag logger "\t\t * causal compression "
+                      if debug_mode then
+			Loggers.fprintf (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
+					"\t\t * causal compression @."
                     in
 		    let error,log_info,trace_before_compression = U.causal_prefix_of_an_observable_hit parameter handler log_info error "compression_main, line 2014" blackboard enriched_grid observable_id in
                     let info =
@@ -271,8 +277,8 @@ let compress_and_print ~called_from logger env log_info step_list =
 			U.cut (do_not_log parameter) ~shall_we_compute:always ~shall_we_compute_profiling_information:always handler log_info error trace
 		      )
 		      (fun parameter
-			?(shall_we_compute=always)
-			?(shall_we_compute_profiling_information=always)
+			?shall_we_compute
+			?shall_we_compute_profiling_information
 			handler log_info error trace info (blacklist,table2,table3) ->
 			let error,log_info,table2 = U.store_trace parameter handler log_info error trace info table2 in
 			let error,log_info,trace = U.remove_blacklisted_event parameter handler log_info error blacklist trace in
@@ -330,12 +336,15 @@ let compress_and_print ~called_from logger env log_info step_list =
 		  let n_causal_stories = U.count_stories causal_story_table in
 		  let error,log_info,weakly_story_table =
 		    begin
-		      let () = Format.fprintf logger "\t - weak flow compression (%i)@." n_causal_stories in
+		      let () =
+			Loggers.fprintf (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
+					"\t - weak flow compression (%i)@."
+					n_causal_stories in
 		      let blacklist = U.create_black_list (last_eid+1) in
 		      let parameter = S.PH.B.PB.CI.Po.K.H.set_compression_weak parameter in
 		      let error,log_info,(blacklist,weakly_story_table) =
 		      U.fold_story_table_with_progress_bar parameter handler log_info error "weak compression"
-			(fun parameter ?(shall_we_compute=always) ?(shall_we_compute_profiling_information=always) handler log_info error trace list_info (blacklist,story_list) ->
+			(fun parameter ?shall_we_compute ?shall_we_compute_profiling_information handler log_info error trace list_info (blacklist,story_list) ->
 			  let error,log_info,list = U.weakly_compress parameter handler log_info error trace in
 			  let error,log_info,blacklist,story_list =
 			    List.fold_left
@@ -362,12 +371,15 @@ let compress_and_print ~called_from logger env log_info step_list =
             then
               begin
                 let parameter = S.PH.B.PB.CI.Po.K.H.set_compression_strong parameter in
-                let () = Format.fprintf logger "\t - strong flow compression (%i)@." n_weak_stories in
+                let () =
+		  Loggers.fprintf (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
+				  "\t - strong flow compression (%i)@."
+				  n_weak_stories in
 		let error,log_info,strongly_story_table =
 		  U.fold_story_table_with_progress_bar
 		    parameter handler log_info error
 		    "strong_compression"
-		    (fun parameter ?(shall_we_compute=always) ?(shall_we_compute_profiling_information=always) handler log_info error refined_event_list list_info strongly_story_table ->
+		    (fun parameter ?shall_we_compute ?shall_we_compute_profiling_information handler log_info error refined_event_list list_info strongly_story_table ->
                         let error,log_info,list = U.compress parameter handler log_info error refined_event_list in
 			let error,log_info,strongly_story_table =
                           match

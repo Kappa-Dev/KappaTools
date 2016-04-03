@@ -79,8 +79,7 @@ val add_tracked :
   t -> t
 val remove_tracked : Connected_component.t array -> t -> t
 val generate_stories :
-  called_from:Remanent_parameters_sig.called_from ->
-  Format.formatter -> Environment.t -> t -> unit
+  called_from:Remanent_parameters_sig.called_from -> Environment.t -> t -> unit
 
 (** {6 Debugging} *)
 

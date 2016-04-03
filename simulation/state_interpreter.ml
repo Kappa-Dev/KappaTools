@@ -316,7 +316,7 @@ let end_of_simulation ~outputs ~called_from form env counter graph state =
        outputs (Data.Flux (Fluxmap.stop_flux env counter e)))
       (snd state.flux) in
   let () = ExceptionDefn.flush_warning form in
-  Rule_interpreter.generate_stories ~called_from form env graph
+  Rule_interpreter.generate_stories ~called_from env graph
 
 let finalize ~outputs ~called_from form env counter graph state =
   let () = Outputs.close () in
