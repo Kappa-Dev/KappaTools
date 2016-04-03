@@ -42,7 +42,11 @@ module type Mvbdu =
     val mvbdu_nfst: (mvbdu,mvbdu,mvbdu) binary
     val mvbdu_nsnd: (mvbdu,mvbdu,mvbdu) binary
     val mvbdu_redefine: (mvbdu,hconsed_association_list,mvbdu) binary
-
+    val mvbdu_subseteq: (mvbdu,mvbdu,bool) binary
+    val mvbdu_of_hconsed_asso: (hconsed_association_list,mvbdu) unary
+    val mvbdu_of_association_list: ((key * value) list,mvbdu) unary
+    val mvbdu_of_sorted_association_list: ((key * value) list,mvbdu) unary
+    val mvbdu_of_reverse_sorted_association_list: ((key * value) list,mvbdu) unary
     val mvbdu_rename: (mvbdu,hconsed_renaming_list,mvbdu) binary
 
     val mvbdu_project_keep_only: (mvbdu,hconsed_variables_list,mvbdu) binary
@@ -156,6 +160,12 @@ module type Internalized_mvbdu =
     val mvbdu_nfst:  mvbdu -> mvbdu -> mvbdu
     val mvbdu_nsnd:  mvbdu -> mvbdu -> mvbdu
     val mvbdu_redefine: mvbdu -> hconsed_association_list -> mvbdu
+    val mvbdu_subseteq: mvbdu -> mvbdu -> bool
+    val mvbdu_of_hconsed_asso: hconsed_association_list -> mvbdu
+    val mvbdu_of_association_list: ((key * value) list) -> mvbdu
+    val mvbdu_of_sorted_association_list: ((key * value) list) -> mvbdu
+    val mvbdu_of_reverse_sorted_association_list: ((key * value) list) -> mvbdu
+
     val mvbdu_rename: mvbdu -> hconsed_renaming_list -> mvbdu
     val mvbdu_project_abstract_away: mvbdu -> hconsed_variables_list -> mvbdu
     val mvbdu_project_keep_only: mvbdu -> hconsed_variables_list -> mvbdu
@@ -429,6 +439,22 @@ module Make (M:Nul)  =
 
     let empty_association_list parameter handler error = build_association_list parameter handler error []
 
+    let mvbdu_subseteq parameter handler error mvbdu1 mvbdu2 =
+      let error, handler, union = mvbdu_or parameter handler error mvbdu1 mvbdu2 in
+      error, handler, equal mvbdu2 union
+
+    let mvbdu_of_hconsed_asso parameter handler error asso =
+      let error, handler, mvbdu_false = mvbdu_false parameter handler error in
+      mvbdu_redefine parameter handler error mvbdu_false asso 
+
+    let mvbdu_of_asso_gen f parameter handler error asso =
+      let error, handler, hconsed_list = f parameter handler error asso in
+      mvbdu_of_hconsed_asso parameter handler error hconsed_list
+
+    let mvbdu_of_association_list = mvbdu_of_asso_gen build_association_list
+    let mvbdu_of_sorted_association_list = mvbdu_of_asso_gen build_sorted_association_list
+    let mvbdu_of_reverse_sorted_association_list = mvbdu_of_asso_gen build_reverse_sorted_association_list
+
 
     let build_renaming_list = build_association_list
     let build_sorted_renaming_list = build_sorted_association_list
@@ -681,6 +707,18 @@ module Internalize(M:Mvbdu
     let empty_renaming_list () = build_renaming_list []
 
 
+    let mvbdu_subseteq mvbdu1 mvbdu2 = 
+      equal (mvbdu_or mvbdu1 mvbdu2) mvbdu2
+
+    let mvbdu_of_hconsed_asso asso =
+      mvbdu_redefine (mvbdu_false ()) asso
+	
+    let mvbdu_of_asso_gen f asso = 
+      mvbdu_redefine (mvbdu_false ()) (f asso)
+    let mvbdu_of_hconsed_asso = mvbdu_of_asso_gen (fun x -> x)
+    let mvbdu_of_association_list = mvbdu_of_asso_gen (build_association_list)
+    let mvbdu_of_sorted_association_list = mvbdu_of_asso_gen (build_sorted_association_list)
+    let mvbdu_of_reverse_sorted_association_list = mvbdu_of_asso_gen (build_reverse_sorted_association_list)
     let build_variables_list = lift_unary "line 297" M.build_variables_list
     let build_sorted_variables_list = lift_unary "line 298" M.build_sorted_variables_list
     let build_reverse_sorted_variables_list = lift_unary "line 299" M.build_reverse_sorted_variables_list
@@ -812,6 +850,12 @@ module Optimize(M:Mvbdu with type key = int and type value = int) =
 	     let extensional_of_mvbdu = M.extensional_of_mvbdu
 	     let variables_list_of_mvbdu = M.variables_list_of_mvbdu
 
+	     let mvbdu_subseteq = M.mvbdu_subseteq
+	     let mvbdu_of_hconsed_asso = M.mvbdu_of_hconsed_asso
+	     let mvbdu_of_association_list = M.mvbdu_of_association_list
+	     let mvbdu_of_sorted_association_list = M.mvbdu_of_sorted_association_list
+	     let mvbdu_of_reverse_sorted_association_list= M.mvbdu_of_reverse_sorted_association_list
+
 	     let mvbdu_cartesian_decomposition_depth parameters handler error bdu int =
 	       Boolean_mvbdu.mvbdu_cartesian_decomposition_depth 
 		 variables_list_of_mvbdu extensional_of_variables_list 
@@ -891,6 +935,12 @@ module Optimize'(M:Internalized_mvbdu with type key = int and type value = int) 
 	     let build_sorted_renaming_list = M.build_sorted_renaming_list
 	     let build_reverse_sorted_renaming_list = M.build_reverse_sorted_renaming_list
 	     let mvbdu_redefine = M.mvbdu_redefine
+	     let mvbdu_subseteq = M.mvbdu_subseteq
+	     let mvbdu_of_hconsed_asso = M.mvbdu_of_hconsed_asso
+	     let mvbdu_of_association_list = M.mvbdu_of_association_list
+	     let mvbdu_of_sorted_association_list = M.mvbdu_of_sorted_association_list
+	     let mvbdu_of_reverse_sorted_association_list= M.mvbdu_of_reverse_sorted_association_list
+
 	     let mvbdu_rename = M.mvbdu_rename
 	     let mvbdu_project_keep_only = M.mvbdu_project_keep_only
 	     let mvbdu_project_abstract_away = M.mvbdu_project_abstract_away

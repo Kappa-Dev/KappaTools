@@ -42,6 +42,11 @@ module type Mvbdu =
     val mvbdu_nfst: (mvbdu,mvbdu,mvbdu) binary
     val mvbdu_nsnd: (mvbdu,mvbdu,mvbdu) binary
     val mvbdu_redefine: (mvbdu,hconsed_association_list,mvbdu) binary
+    val mvbdu_subseteq: (mvbdu,mvbdu,bool) binary
+    val mvbdu_of_hconsed_asso: (hconsed_association_list,mvbdu) unary
+    val mvbdu_of_association_list: ((key * value) list,mvbdu) unary
+    val mvbdu_of_sorted_association_list: ((key * value) list,mvbdu) unary
+    val mvbdu_of_reverse_sorted_association_list: ((key * value) list,mvbdu) unary
 
     val mvbdu_rename: (mvbdu,hconsed_renaming_list,mvbdu) binary
 
@@ -83,7 +88,7 @@ module type Mvbdu =
     val store_by_variables_list:
       ( Remanent_parameters_sig.parameters ->
 	Exception.method_handler ->
-	'data -> 
+	'data ->
 	List_sig.hash_key ->
 	'map ->
 	Exception.method_handler * 'data) ->
@@ -155,6 +160,12 @@ module type Internalized_mvbdu =
     val mvbdu_nfst:  mvbdu -> mvbdu -> mvbdu
     val mvbdu_nsnd:  mvbdu -> mvbdu -> mvbdu
     val mvbdu_redefine:  mvbdu -> hconsed_association_list -> mvbdu
+    val mvbdu_subseteq: mvbdu -> mvbdu -> bool
+    val mvbdu_of_hconsed_asso: hconsed_association_list -> mvbdu
+    val mvbdu_of_association_list: (key * value) list -> mvbdu
+    val mvbdu_of_sorted_association_list: (key * value) list -> mvbdu
+    val mvbdu_of_reverse_sorted_association_list: (key * value) list -> mvbdu
+
     val mvbdu_rename: mvbdu -> hconsed_renaming_list -> mvbdu
     val mvbdu_project_abstract_away: mvbdu -> hconsed_variables_list -> mvbdu
     val mvbdu_project_keep_only: mvbdu -> hconsed_variables_list -> mvbdu
