@@ -64,7 +64,6 @@ type t = {
     mutable time:float ;
     mutable events:int ;
     mutable stories:int ;
-    mutable last_tick : (int * float) ;
     mutable last_point : int;
     mutable initialized : bool ;
     mutable ticks : int ;
@@ -89,7 +88,7 @@ let inc_events c =c.events <- (c.events + 1)
 let check_time c =
   match c.max_time with None -> true | Some max -> c.time < max
 let check_output_time c ot =
-  match c.max_time with None -> true | Some max -> ot < max
+  match c.max_time with None -> true | Some max -> ot <= max
 let check_events c =
   match c.max_events with None -> true | Some max -> c.events < max
 let one_constructive_event c dt =
@@ -123,7 +122,6 @@ let next_story c =
 let max_time c = c.max_time
 let max_events c = c.max_events
 let plot_points c = c.plot_points
-let set_tick c (i,x) = c.last_tick <- (i,x)
 let event_percentage (counter : t) : int option =
   match counter.max_events with
   | None -> None
@@ -164,13 +162,12 @@ let tick f counter =
       Format.pp_print_newline f () ;
       counter.initialized <- true
   in
-  let last_event,last_time = counter.last_tick in
   let n_t =
     match counter.max_time with
     | None -> 0
     | Some tmax ->
        int_of_float
-         ((counter.time -. last_time) *.
+         ((counter.time -. counter.init_time) *.
             (float_of_int !Parameter.progressBarSize) /. tmax)
   and n_e =
     match counter.max_events with
@@ -181,11 +178,10 @@ let tick f counter =
          let nplus =
            (counter.events * !Parameter.progressBarSize) / emax in
          let nminus =
-           (last_event * !Parameter.progressBarSize) / emax in
+           (counter.init_event * !Parameter.progressBarSize) / emax in
          nplus-nminus
   in
-  let n = ref (max n_t n_e) in
-  if !n>0 then set_tick counter (counter.events,counter.time) ;
+  let n = ref ((max n_t n_e) - counter.ticks) in
   while !n > 0 do
     Format.fprintf f "%c" !Parameter.progressBarSymbol ;
     if !Parameter.eclipseMode then Format.pp_print_newline f ();
@@ -215,7 +211,6 @@ let create ?(init_t=0.) ?(init_e=0) ?max_t ?max_e ~nb_points =
    max_time = max_t ;
    max_events = max_e ;
    plot_points = nb_points;
-   last_tick = (init_e,init_t);
    dE = dE ;
    dT = dT ;
    init_time = init_t ;
@@ -228,7 +223,6 @@ let reinitialize counter =
   counter.time <- counter.init_time;
   counter.events <- counter.init_event;
   counter.stories <- -1;
-  counter.last_tick <- (counter.init_event, counter.init_time);
   counter.last_point <- 0;
   counter.initialized <- false;
   counter.ticks <- 0;
@@ -253,15 +247,12 @@ let to_plot_points counter =
   let n = next - last in
   match counter.dT with
   | Some dT ->
-     let n = ref n in
-     let acc = ref [] in
-     let output_time = ref ((float_of_int last) *. dT) in
-     while (!n > 0) && (check_output_time counter !output_time) do
-       output_time := !output_time +. dT ;
-       acc:=!output_time::!acc;
-       n:=!n-1 ;
-     done;
-     !acc,counter
+     snd
+       (Tools.recti
+	  (fun _ (time,acc) ->
+	   time -. dT,
+	   if check_output_time counter time then time::acc else acc)
+	  ((float_of_int next) *. dT,[]) n),counter
   | None ->
      match max_events counter with
      | Some _ ->
