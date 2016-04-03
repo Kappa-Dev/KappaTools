@@ -444,8 +444,8 @@ module Make (M:Nul)  =
       error, handler, equal mvbdu2 union
 
     let mvbdu_of_hconsed_asso parameter handler error asso =
-      let error, handler, mvbdu_false = mvbdu_false parameter handler error in
-      mvbdu_redefine parameter handler error mvbdu_false asso 
+      let error, handler, mvbdu_true = mvbdu_true parameter handler error in
+      mvbdu_redefine parameter handler error mvbdu_true asso 
 
     let mvbdu_of_asso_gen f parameter handler error asso =
       let error, handler, hconsed_list = f parameter handler error asso in
@@ -711,7 +711,7 @@ module Internalize(M:Mvbdu
       equal (mvbdu_or mvbdu1 mvbdu2) mvbdu2
 
     let mvbdu_of_hconsed_asso asso =
-      mvbdu_redefine (mvbdu_false ()) asso
+      mvbdu_redefine (mvbdu_true ()) asso
 	
     let mvbdu_of_asso_gen f asso = 
       mvbdu_redefine (mvbdu_false ()) (f asso)
