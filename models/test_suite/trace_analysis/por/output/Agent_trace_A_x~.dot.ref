@@ -1,5 +1,2 @@
 digraph G{
-Node_16 [style="dotted" label=""];
-Node_16 -> Node_16 [label="rule 0"];
-Node_16 -> Node_16 [label="rule 3"];
 }

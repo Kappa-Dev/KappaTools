@@ -1,15 +1,2 @@
 digraph G{
-Node_20 [label="A(x~p,y~p,z~p)"];
-Node_22 [label="A(x~p,y~p,z~u)"];
-Node_24 [style="dotted" label=""];
-Node_24 -> Node_24 [label="rule 3"];
-Node_24 -> Node_22 [label="rule 1"];
-Node_20 -> Node_22 [label="rule 5"];
-Node_22 -> Node_24 [label="rule 4"];
-Node_22 -> Node_24 [label="rule 3"];
-Node_22 -> Node_20 [label="rule 2"];
-Node_24 -> Node_24 [label="rule 1"];
-Node_24 -> Node_24 [label="rule 0"];
-Node_24 -> Node_24 [label="rule 4"];
-Node_24 -> Node_22 [label="rule 0"];
 }
