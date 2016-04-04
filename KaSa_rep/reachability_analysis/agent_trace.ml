@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <2016-04-04 14:45:54 feret>
+  * Last modification: Time-stamp: <2016-04-04 21:39:19 feret>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -970,8 +970,25 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 		       with
 		       | None ->
 			  begin
+			    
 			    let error, handler, update =
 			      Ckappa_sig.Views_bdu.build_association_list parameter handler error modif_list_creation
+			    in
+			    let error, list = 
+			      match
+				Int_storage.Nearly_inf_Imperatif.get parameter error (Ckappa_sig.int_of_agent_name agent_type) compil.Cckappa_sig.signatures 
+			      with
+			      | error, None ->
+				warn parameter error (Some "line 982") Exit []
+			      | error, Some agent_sig -> 
+				let intf = agent_sig.Cckappa_sig.agent_interface in
+				error, Ckappa_sig.Site_map_and_set.Map.fold
+				  (fun i _ list -> (i,Ckappa_sig.state_index_of_int 0)::list)
+				  intf
+				  []
+			    in
+			    let error, handler, mvbdu = 
+			      Ckappa_sig.Views_bdu.mvbdu_of_reverse_sorted_association_list parameter handler error list 
 			    in
 			    let error, handler, mvbdu =
 			      Ckappa_sig.Views_bdu.mvbdu_redefine parameter handler error mvbdu update
