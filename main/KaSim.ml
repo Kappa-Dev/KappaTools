@@ -175,8 +175,7 @@ let () =
 	    exit 1
     in
     let () = Kappa_files.with_marshalized
-	       (fun d -> Marshal.to_channel
-			   d (env,cc_env,counter) [Marshal.Closures]) in
+	       (fun d -> Marshal.to_channel d (env,cc_env,graph,new_state) []) in
     let () = Kappa_files.with_ccFile
 	       (fun f -> Connected_component.Env.print_dot f cc_env) in
     ExceptionDefn.flush_warning Format.err_formatter ;

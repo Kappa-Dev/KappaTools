@@ -1538,12 +1538,13 @@ let lift_allowing_question_marks parameters handler =
     let a,b,c = translate_mixture parameters error handler x in
     clean_question_marks parameters a c b) 
 
-let translate_init parameters error handler init =  
-  let (a,init_t) = init in
+let translate_init parameters error handler (a,(alg,_),init_t) =
+  let error,c_alg =
+    Prepreprocess.alg_map
+      (lift_allowing_question_marks parameters handler) error alg in
   match 
     init_t
-  with Ast.INIT_MIX((alg,pos),(mixture,_pos')) -> 
-    let error,c_alg = Prepreprocess.alg_map (lift_allowing_question_marks parameters handler) error alg in 
+  with Ast.INIT_MIX mixture,_pos' ->
     let error,c_mixture,_ = translate_mixture parameters error handler mixture in 
     error,
     {Cckappa_sig.e_init_factor = alg ; 
@@ -1551,7 +1552,7 @@ let translate_init parameters error handler init =
      Cckappa_sig.e_init_mixture = mixture ;
      Cckappa_sig.e_init_c_mixture = c_mixture ;
      Cckappa_sig.e_init_string_pos = a} 
-  | Ast.INIT_TOK _ -> (*TO DO*)
+  | Ast.INIT_TOK _,_ -> (*TO DO*)
     let error,dft = Cckappa_sig.dummy_init parameters error in 
     warn parameters error (Some "line 710, token are not supported yet") Exit dft 
 

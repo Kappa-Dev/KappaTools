@@ -101,16 +101,17 @@ type ('mixture,'id) variable_def =
     string Location.annot * ('mixture,'id) ast_alg_expr Location.annot
 
 type ('mixture,'id) init_t =
-  | INIT_MIX of
-      ('mixture,'id) ast_alg_expr Location.annot * 'mixture Location.annot
-  | INIT_TOK of
-      ('mixture,'id) ast_alg_expr Location.annot * 'id Location.annot
+  | INIT_MIX of 'mixture
+  | INIT_TOK of 'id
 
 type ('mixture,'id) instruction =
   | SIG      of agent
   | TOKENSIG of string Location.annot
   | VOLSIG   of string * float * string (* type, volume, parameter*)
-  | INIT     of string Location.annot option * ('mixture,'id) init_t
+  | INIT     of
+      string Location.annot option *
+	('mixture,'id) ast_alg_expr Location.annot *
+	  ('mixture,'id) init_t Location.annot
   (*volume, init, position *)
   | DECLARE  of ('mixture,'id) variable_def
   | OBS      of ('mixture,'id) variable_def (*for backward compatibility*)
@@ -132,7 +133,9 @@ type ('agent,'mixture,'id,'rule) compil =
 	('mixture,'id) ast_alg_expr Location.annot list;
       (*list of patterns to plot*)
       init :
-	(string Location.annot option * ('mixture,'id) init_t) list;
+	(string Location.annot option *
+	   ('mixture,'id) ast_alg_expr Location.annot *
+	     ('mixture,'id) init_t Location.annot) list;
       (*initial graph declaration*)
       perturbations :
 	('mixture,'id) perturbation list;
@@ -332,8 +335,8 @@ let merge_tokens =
 let sig_from_inits =
   List.fold_left
     (fun (ags,toks) -> function
-    | _,INIT_MIX (_,(m,_)) -> (merge_agents ags m,toks)
-    | _,INIT_TOK (na,t) -> (ags,merge_tokens toks [na,t]))
+    | _,_,(INIT_MIX m,_) -> (merge_agents ags m,toks)
+    | _,na,(INIT_TOK t,pos) -> (ags,merge_tokens toks [na,(t,pos)]))
 
 let sig_from_rules =
   List.fold_left

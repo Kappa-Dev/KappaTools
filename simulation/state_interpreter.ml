@@ -6,6 +6,11 @@ type t = {
   flux: bool * Data.flux_data list;
 }
 
+let get_alg env state i =
+  match state.variables_overwrite.(i) with
+  | None -> Environment.get_alg env i
+  | Some expr -> expr
+
 let initial_activity get_alg env counter graph activities =
   Environment.fold_rules
     (fun i () rule ->
@@ -15,9 +20,48 @@ let initial_activity get_alg env counter graph activities =
        Random_tree.add (2*i) (Nbr.to_float rate) activities)
     () env
 
-let initial env counter graph stopping_times relative_fluxs =
+let initial
+      ~has_tracking env domain counter init_l stopping_times relative_fluxs =
   let activity_tree =
     Random_tree.create (2*Environment.nb_rules env) in
+  let stops =
+    ref (List.sort (fun (a,_) (b,_) -> Nbr.compare a b) stopping_times) in
+  let state0 =
+    {
+      stopping_times = stops;
+      perturbations_alive =
+	Array.make (Environment.nb_perturbations env) true;
+      activities = activity_tree;
+      variables_overwrite =
+	Array.make (Environment.nb_algs env) None;
+      flux = (relative_fluxs,[]);
+    } in
+  let get_alg i = get_alg env state0 i in
+  let graph =
+    List.fold_left
+      (fun state (alg,compiled_rule,pos) ->
+       let value = Rule_interpreter.value_alg counter state ~get_alg alg in
+       let actions,_,_ = snd compiled_rule.Primitives.instantiations in
+       let creations_sort =
+	 List.fold_left
+	   (fun l -> function
+		  | Instantiation.Create (x,_) -> Agent_place.get_type x :: l
+		  | Instantiation.Mod_internal _ | Instantiation.Bind _
+		  | Instantiation.Bind_to _ | Instantiation.Free _
+		  | Instantiation.Remove _ -> l) [] actions in
+       Nbr.iteri
+	 (fun _ s ->
+	  match Rule_interpreter.apply_rule
+		  ~get_alg env domain
+		  (Environment.connected_components_of_unary_rules env)
+		  counter s (Causal.INIT creations_sort)
+		  compiled_rule with
+	  | Rule_interpreter.Success s -> s
+	  | (Rule_interpreter.Clash | Rule_interpreter.Corrected _) ->
+	     raise (ExceptionDefn.Internal_Error
+		      ("Bugged initial rule",pos)))
+	 state value)
+      (Rule_interpreter.empty ~has_tracking env) init_l in
   let () =
     initial_activity (Environment.get_alg env)
 		     env counter graph activity_tree in
@@ -26,22 +70,7 @@ let initial env counter graph stopping_times relative_fluxs =
       ~get_alg:(fun i -> Environment.get_alg env i)
       (fun x _ y -> Random_tree.add x y activity_tree)
       env counter graph in
-  let stops =
-    ref (List.sort (fun (a,_) (b,_) -> Nbr.compare a b) stopping_times) in
-  graph',{
-    stopping_times = stops;
-    perturbations_alive =
-      Array.make (Environment.nb_perturbations env) true;
-    activities = activity_tree;
-    variables_overwrite =
-      Array.make (Environment.nb_algs env) None;
-    flux = (relative_fluxs,[]);
-}
-
-let get_alg env state i =
-  match state.variables_overwrite.(i) with
-  | None -> Environment.get_alg env i
-  | Some expr -> expr
+  graph',state0
 
 let observables_values env counter graph state =
   let get_alg i = get_alg env state i in

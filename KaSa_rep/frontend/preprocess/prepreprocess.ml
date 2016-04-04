@@ -620,23 +620,18 @@ let with_option_map map f =
 let alg_with_pos_with_option_map = with_option_map alg_with_pos_map
 let bool_with_pos_with_option_map = with_option_map bool_with_pos_map 
 
-let refine_token parameters error token = 
-  let error,token = warn parameters error (Some ("Line 431: Token are not implemented in KaSa yet")) Exit token in 
-  error,token 
-  
-let refine_init_t parameters error init_t = 
-  match 
-    init_t 
-  with 
-  | Ast.INIT_MIX(alg_ex,(mixture,pos)) -> 
-    let error,alg_ex = alg_with_pos_map (refine_mixture parameters) error alg_ex in 
-    let error,mixture = refine_mixture parameters error mixture in 
-      error,Some(Ast.INIT_MIX(alg_ex,(mixture,pos)))
-  | Ast.INIT_TOK (alg_ex,token) -> 
-    let error,alg_ex = alg_with_pos_map (refine_mixture parameters) error alg_ex in 
-    let error,token = refine_token parameters error token in 
-    error,Some(Ast.INIT_TOK(alg_ex,token))
+let refine_token parameters error token =
+  let error,token =
+    warn parameters error (Some ("Line 431: Token are not implemented in KaSa yet")) Exit token in
+  error,token
 
+let refine_init_t parameters error = function
+  | Ast.INIT_MIX mixture,pos ->
+     let error,mixture = refine_mixture parameters error mixture in
+     error,(Ast.INIT_MIX mixture,pos)
+  | Ast.INIT_TOK token,pos ->
+     let error,(token,_) = refine_token parameters error (token,pos) in
+     error,(Ast.INIT_TOK token,pos)
 
 let refine_agent parameters error agent_set agent =
   let error,agent_set = check_freshness parameters error "Agent" (fst (fst agent)) agent_set in 
@@ -737,17 +732,15 @@ let translate_compil parameters error compil =
     (error,id_set,[])
     compil.Ast.rules     
   in 
-  let error,init_rev = 
+  let error,init_rev =
      List.fold_left
-      (fun (error,list) (id,init_t) -> 
-        let error,mixture = refine_init_t parameters error init_t in 
-        match mixture 
-        with 
-        |  Some (init) ->  error,(id,init)::list
-        | None -> error,list)
+      (fun (error,list) (id,alg_ex,init_t) ->
+       let error,alg =
+	 alg_with_pos_map (refine_mixture parameters) error alg_ex in
+        let error,init = refine_init_t parameters error init_t in
+        error,(id,alg,init)::list)
     (error,[])
-    compil.Ast.init    
-  in 
+    compil.Ast.init in
   let error,perturbations_rev = 
     List.fold_left
       (fun (error,list) ((b,m,o),p) -> 
@@ -806,11 +799,9 @@ let translate_compil parameters error compil =
     Ast.signatures = List.rev signatures_rev;
     Ast.rules = List.rev rules_rev ;      
     Ast.observables  = List.rev observables_rev;
-    Ast.init = List.rev init_rev ;      
+    Ast.init = List.rev init_rev ;
     Ast.perturbations = List.rev perturbations_rev ;
     Ast.configurations = compil.Ast.configurations ;
     Ast.tokens = compil.Ast.tokens ;
     Ast.volumes = compil.Ast.volumes 
    }
-
-   

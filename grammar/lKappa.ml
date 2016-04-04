@@ -804,19 +804,15 @@ let perturbation_of_ast sigs tok algs ((pre,mods,post),pos) =
    | None -> None
    | Some post -> Some (bool_expr_of_ast sigs tok algs post)),pos
 
-let init_of_ast sigs tok algs = function
-  | Ast.INIT_MIX (how,(who,pos)) ->
-     Ast.INIT_MIX
-       (alg_expr_of_ast sigs tok algs how, (mixture_of_ast sigs pos who,pos))
-  | Ast.INIT_TOK (how,(lab,pos)) ->
-     let i =
-       match Mods.StringMap.find_option lab tok with
-       | Some x -> x
-       | None ->
-	  raise (ExceptionDefn.Malformed_Decl
-		   (lab ^" is not a declared token",pos)) in
-     Ast.INIT_TOK
-       (alg_expr_of_ast sigs tok algs how,(i,pos))
+let init_of_ast sigs tok = function
+  | Ast.INIT_MIX who,pos ->
+     Ast.INIT_MIX (mixture_of_ast sigs pos who),pos
+  | Ast.INIT_TOK lab,pos ->
+     match Mods.StringMap.find_option lab tok with
+     | Some x -> Ast.INIT_TOK x,pos
+     | None ->
+	raise (ExceptionDefn.Malformed_Decl
+		 (lab ^" is not a declared token",pos))
 
 let compil_of_ast overwrite c =
   let sigs = Signature.create c.Ast.signatures in
@@ -869,7 +865,8 @@ let compil_of_ast overwrite c =
       List.map (fun expr -> alg_expr_of_ast sigs tok algs expr)
 	       c.Ast.observables;
     Ast.init =
-      List.map (fun (lab,ini) -> lab,init_of_ast sigs tok algs ini)
+      List.map (fun (lab,expr,ini) ->
+		lab,alg_expr_of_ast sigs tok algs expr,init_of_ast sigs tok ini)
 	       c.Ast.init;
     Ast.perturbations =
       List.map (perturbation_of_ast sigs tok algs) c.Ast.perturbations;

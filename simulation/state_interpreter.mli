@@ -2,8 +2,10 @@
 
 type t (** Abstract state *)
 
-val initial : Environment.t -> Counter.t -> Rule_interpreter.t ->
-	      (Nbr.t * int) list -> bool -> Rule_interpreter.t * t
+val initial :
+  has_tracking:bool -> Environment.t -> Connected_component.Env.t ->
+  Counter.t -> (Alg_expr.t * Primitives.elementary_rule * Location.t) list ->
+  (Nbr.t * int) list -> bool -> Rule_interpreter.t * t
 (** [initial env c graph stopping_times relative_fluxmaps]
  builds up the initial state *)
 

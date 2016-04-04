@@ -2,13 +2,6 @@ open Mods
 open Tools
 open Ast
 
-let initial_value_alg counter algs (ast, _) =
-  Expr_interpreter.value_alg
-    counter
-    ~get_alg:(fun i ->
-	      fst (snd algs.NamedDecls.decls.(i)))
-    ~get_mix:(fun _ -> Nbr.zero) ~get_tok:(fun _ -> Nbr.zero) ast
-
 let tokenify contact_map counter domain l =
   List.fold_right
     (fun (alg_expr,id) (domain,out) ->
@@ -18,7 +11,8 @@ let tokenify contact_map counter domain l =
     ) l (domain,[])
 
 (* transform an LKappa rule into a Primitives rule *)
-let rules_of_ast ?deps_machinery contact_map counter domain ~syntax_ref (rule,_) =
+let rules_of_ast
+      ?deps_machinery contact_map counter domain ~syntax_ref (rule,_) =
   let domain',rm_toks =
     tokenify contact_map counter domain rule.LKappa.r_rm_tokens in
   let domain'',add_toks =
@@ -302,20 +296,21 @@ let pert_of_result
   let lpert = lpert_stopping_time@lpert_ineq in
   ( domain, lpert,stop_times,tracking_enabled)
 
-let init_graph_of_result
-      ?rescale algs has_tracking contact_map counter env domain res =
-  let domain',init_state =
-    List.fold_left
-      (fun (domain,state) (_opt_vol,init_t) -> (*TODO dealing with volumes*)
+let inits_of_result ?rescale contact_map counter env domain res =
+  let init_l,domain' =
+    Tools.list_fold_right_map
+      (fun (_opt_vol,alg,init_t) domain -> (*TODO dealing with volumes*)
+       let alg = match rescale with
+	 | None -> alg
+	 | Some r ->
+	    Location.dummy_annot
+	      (Ast.BIN_ALG_OP (Operator.MULT,alg,
+			       Location.dummy_annot (Ast.CONST (Nbr.F r)))) in
        match init_t with
-       | INIT_MIX (alg, (ast,mix_pos)) ->
+       | INIT_MIX ast,mix_pos ->
 	  let sigs = Environment.signatures env in
 	  let (domain',alg') =
 	    Expr.compile_alg contact_map counter domain alg in
-	  let value = initial_value_alg counter algs alg' in
-	  let value' = match rescale with
-	    | None -> value
-	    | Some r -> Nbr.mult value (Nbr.F r) in
 	  let fake_rule =
 	    { LKappa.r_mix = [];
 	      LKappa.r_created = LKappa.to_raw_mixture sigs ast;
@@ -328,68 +323,29 @@ let init_graph_of_result
 		contact_map counter domain' ~syntax_ref:0 (fake_rule,mix_pos)
 	    with
 	    | domain'',_,_,[ compiled_rule ] ->
-	       let actions,_,_ = snd compiled_rule.Primitives.instantiations in
-	       let creations_sort =
-		 List.fold_left
-		   (fun l -> function
-			  | Instantiation.Create (x,_) -> Agent_place.get_type x :: l
-			  | Instantiation.Mod_internal _ | Instantiation.Bind _
-			  | Instantiation.Bind_to _ | Instantiation.Free _
-			  | Instantiation.Remove _ -> l) [] actions in
-	       domain'',
-	       Nbr.iteri
-		 (fun _ s ->
-		  match Rule_interpreter.apply_rule
-			  ~get_alg:(fun i ->
-				    fst (snd algs.NamedDecls.decls.(i)))
-			  env domain''
-			  (Environment.connected_components_of_unary_rules env)
-			  counter s (Causal.INIT creations_sort)
-			  compiled_rule with
-		  | Rule_interpreter.Success s -> s
-		  | (Rule_interpreter.Clash | Rule_interpreter.Corrected _) ->
-		     raise (ExceptionDefn.Internal_Error
-			      ("Bugged initial rule",mix_pos))
-      )
-		 state value'
-	    | domain'',_,_,[] -> domain'',state
+	       (fst alg',compiled_rule,mix_pos),domain''
 	    | _,_,_,_ ->
 	       raise (ExceptionDefn.Malformed_Decl
 			(Format.asprintf
 			   "initial mixture %a is partially defined"
 			   (LKappa.print_rule_mixture sigs) ast,mix_pos)) in
 	  domain'',state'
-       | INIT_TOK (alg, (tk_id,pos_tk)) ->
+       | INIT_TOK tk_id,pos_tk ->
 	  let fake_rule =
 	    { LKappa.r_mix = []; LKappa.r_created = []; LKappa.r_rm_tokens = [];
 	      LKappa.r_add_tokens = [(alg, tk_id)];
 	      LKappa.r_rate = Location.dummy_annot (CONST Nbr.zero);
 	      LKappa.r_un_rate = None; } in
-	  let domain',state' =
-	    match
+	  match
 	      rules_of_ast
 		contact_map counter domain ~syntax_ref:0
 		(Location.dummy_annot fake_rule)
 	    with
 	    | domain'',_,_,[ compiled_rule ] ->
-	       (domain'',
-	       match
-		 Rule_interpreter.apply_rule
-		   ~get_alg:(fun i ->
-			     fst (snd algs.NamedDecls.decls.(i)))
-		   env domain''
-		   (Environment.connected_components_of_unary_rules env)
-		   counter state (Causal.INIT []) compiled_rule with
-	       | Rule_interpreter.Success s -> s
-	       | (Rule_interpreter.Clash | Rule_interpreter.Corrected _) ->
-		  raise (ExceptionDefn.Internal_Error
-			   ("Bugged initial tokens",pos_tk)))
-	    | _,_,_,_ -> assert false in
-	  domain',state'
-      )	(domain,Rule_interpreter.empty ~has_tracking env)
-      res.Ast.init
-  in
-  (domain',init_state)
+	       (Alg_expr.CONST (Nbr.I 1),compiled_rule,pos_tk),domain''
+	    | _,_,_,_ -> assert false
+      )	res.Ast.init domain in
+  (domain',init_l)
 
 let configurations_of_result result =
   let get_value acc pos_p param value_list f =
@@ -589,10 +545,12 @@ let initialize logger ?rescale_init sigs_nd tk_nd contact_map counter result =
 
   Debug.tag logger "\t -initial conditions";
   let domain = Connected_component.Env.finalize domain in
-  let domain,graph =
-    init_graph_of_result
-      ?rescale:rescale_init alg_nd tracking_enabled contact_map
-      counter env domain result in
+  let domain,init_l =
+    inits_of_result
+      ?rescale:rescale_init contact_map counter env domain result in
+  let graph,state =
+    State_interpreter.initial ~has_tracking:tracking_enabled env domain counter
+			      init_l stops relative_fluxmaps in
   let () =
     if !Parameter.compileModeOn || !Parameter.debugModeOn then
       Format.eprintf
@@ -600,8 +558,6 @@ let initialize logger ?rescale_init sigs_nd tk_nd contact_map counter result =
 	Kappa_printer.env env
 	Connected_component.Env.print domain
 	(Rule_interpreter.print env) graph in
-  let graph',state =
-    State_interpreter.initial env counter graph stops relative_fluxmaps in
   let () =
     if tracking_enabled &&
 	 not (!Parameter.causalModeOn || !Parameter.weakCompression ||
@@ -613,5 +569,5 @@ let initialize logger ?rescale_init sigs_nd tk_nd contact_map counter result =
 	   f
 	   "An observable may be tracked but no compression level to render stories has been specified")
   in
-  (Debug.tag logger "\t Done";
-   (env, domain, graph', state))
+  let () = Debug.tag logger "\t Done" in
+  (env, domain, graph, state)

@@ -25,9 +25,9 @@ C(x1~p?, x2~u?)
 _____(1)
 C(x1~p?, x2~p?)
 _____(1)
- (+ν) B(x), A(x, c)
-_____(1)
  (+ν) C(x1~u, x2~u)
+_____(1)
+ (+ν) B(x), A(x, c)
 Environment:
   Signatures:
     A(x,c)
