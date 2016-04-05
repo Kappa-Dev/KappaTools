@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <2016-04-04 21:39:19 feret>
+  * Last modification: Time-stamp: <2016-04-05 19:16:01 feret>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -20,7 +20,11 @@ let sanity_test = false
 let warn parameters mh message exn default =
      Exception.warn parameters mh (Some "Agent_trace.ml") message exn (fun () -> default)
 
-type label = Ckappa_sig.c_rule_id * Ckappa_sig.c_agent_id
+type fst_label =
+  Rule of Ckappa_sig.c_rule_id
+| Init of int
+
+type label = fst_label * Ckappa_sig.c_agent_id
 module Label =
   Map_wrapper.Make
     (SetMap.Make
@@ -87,6 +91,12 @@ type graph_with_losange_reduction =
     macro_edges: Ckappa_sig.Views_bdu.mvbdu LabelMap.t
   }
 
+let string_of_fst_label parameter error handler_kappa compil i = 
+  match
+    i
+  with
+  | Rule r_id ->  Handler.string_of_rule parameter error handler_kappa compil r_id
+  | Init i -> error, "Init"
 
 let copy_node parameter handler error q nodes_adj los_state =
   let nodes_adj' = los_state.nodes_adj in
@@ -274,7 +284,7 @@ let dump_edge fic parameter error handler_kappa compil key key' label =
   let error, rule_name =
     if Remanent_parameters.get_show_rule_names_in_local_traces parameter
     then
-      Handler.string_of_rule parameter error handler_kappa compil (fst label)
+      string_of_fst_label parameter error handler_kappa compil (fst label)
     else error,""
   in
   let () = Printf.fprintf fic "Node_%i -> Node_%i [label=\"%s\"];\n" key key' rule_name in
@@ -421,7 +431,7 @@ let build_support parameter error rules =
 	  error
 	  (fun parameter error ag_id _  ->
 	    let error, set_test, set_mod  = compute_full_support parameter error ag_id rule in
-	    LabelMap.add parameter error (r_id,ag_id) (set_test, set_mod))
+	    LabelMap.add parameter error (Rule r_id,ag_id) (set_test, set_mod))
 	  rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
 	  )
       rules LabelMap.empty
@@ -780,7 +790,7 @@ let example ?restricted_version:(restricted_version=false) list nodes_adj =
   let f int_list =
     List.rev_map Ckappa_sig.site_name_of_int (List.rev int_list)
   in
-  let label i = (Ckappa_sig.rule_id_of_int i,Ckappa_sig.agent_id_of_int i) in
+  let label i = ((Rule (Ckappa_sig.rule_id_of_int i)),Ckappa_sig.agent_id_of_int i) in
   let parameter =
         Remanent_parameters.get_parameters ~called_from:Remanent_parameters_sig.KaSa ()
   in
@@ -811,18 +821,64 @@ let example ?restricted_version:(restricted_version=false) list nodes_adj =
     | Some (p,n_p) ->
        begin
 	 let () = Printf.fprintf stdout "PARTITION: " in
-	 let () = List.iter (fun ((s,_),_,_) -> Printf.fprintf stdout "%i" (Ckappa_sig.int_of_rule_id s)) p in
+	 let () = 
+	   List.iter 
+	     (fun x ->
+	       match x with 
+	       | ((Rule s,_),_,_) -> Printf.fprintf stdout "%i" (Ckappa_sig.int_of_rule_id s)
+	       | _ -> ()) p in
 	 let () = Printf.fprintf stdout " SYNC: " in
-     let () = List.iter (fun ((s,_),_,_) -> Printf.fprintf stdout "%i" (Ckappa_sig.int_of_rule_id s)) n_p  in
-     let () = Printf.fprintf stdout "\n" in
-     ()
+	 let () = List.iter (fun x ->
+	   match x with 
+	   | ((Rule s,_),_,_) -> Printf.fprintf stdout "%i" (Ckappa_sig.int_of_rule_id s)
+	   | _ -> ()) n_p
+	 in
+	 let () = Printf.fprintf stdout "\n" in
+	 ()
        end
   in
   ()
 
+let create parameter handler error r_id ag_id agent_type update compil nodes_adj =
+  let error, list = 
+    match
+      Int_storage.Nearly_inf_Imperatif.get parameter error (Ckappa_sig.int_of_agent_name agent_type) compil.Cckappa_sig.signatures 
+    with
+    | error, None ->
+      warn parameter error (Some "line 982") Exit []
+    | error, Some agent_sig -> 
+      let intf = agent_sig.Cckappa_sig.agent_interface in
+      error, Ckappa_sig.Site_map_and_set.Map.fold
+	(fun i _ list -> (i,Ckappa_sig.state_index_of_int 0)::list)
+	intf
+	[]
+  in
+  let error, handler, mvbdu = 
+    Ckappa_sig.Views_bdu.mvbdu_of_reverse_sorted_association_list parameter handler error list 
+  in
+  let error, handler, mvbdu =
+    Ckappa_sig.Views_bdu.mvbdu_redefine parameter handler error mvbdu update
+  in
+  let error, handler, list_edges =
+    Ckappa_sig.Views_bdu.extensional_of_mvbdu parameter handler error mvbdu
+  in
+  let error, handler, nodes_adj =
+    List.fold_left
+      (fun (error, handler, nodes_adj) post ->
+	let error, handler, hash_init' = hash_of_association_list parameter handler error post in
+	let error, nodes_adj =
+	  add_creation parameter error r_id ag_id hash_init' nodes_adj
+	in
+	error, handler, nodes_adj)
+      (error, handler, nodes_adj)
+      list_edges
+  in
+  error,(handler,nodes_adj)
+    
 
 let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
   let rules = compil.Cckappa_sig.rules in
+  let init = compil.Cckappa_sig.init in
   let error, support = build_support parameter error rules in
   let error, handler, mvbdu_true = Ckappa_sig.Views_bdu.mvbdu_true  parameter handler error in
   let error, handler, mvbdu_false = Ckappa_sig.Views_bdu.mvbdu_false parameter handler error in
@@ -886,6 +942,68 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 	     (error, handler,nodes_adj)
 	     list
 	 in
+	 let error, (handler, nodes_adj) =
+	   Int_storage.Nearly_inf_Imperatif.fold
+	     parameter
+	     error
+	     (fun parameter error i_id init (handler,nodes_adj) ->
+	       let mixture = init.Cckappa_sig.e_init_c_mixture in
+	       Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
+		 parameter
+		 error
+		 (fun parameter error ag_id view (handler,nodes_adj) ->
+		    match 
+		      view
+		    with 
+		    | Cckappa_sig.Agent agent -> 
+			if agent.Cckappa_sig.agent_name <> agent_type 
+			then
+			  error, (handler, nodes_adj)
+			else
+			  begin 
+			     let error, handler, list = 
+			       List.fold_left
+				 (fun
+				   (error, handler, list)
+				   site ->
+				     match
+				       Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
+					 parameter error
+					 site agent.Cckappa_sig.agent_interface
+				     with error, None ->
+				       error, handler, list
+				     | error, Some state ->
+				       let interv = state.Cckappa_sig.site_state in
+				       let min = interv.Cckappa_sig.min in
+				       if min = interv.Cckappa_sig.max
+				       then
+					 error,
+					 handler,
+					 (site,min)::list
+				       else
+					 let error, () = warn parameter error (Some "line 933") Exit () in
+					 error, handler, list
+				 )
+				 (error, handler, [])
+				 ext_list
+			     in
+			     let error, handler, update =  
+			       Ckappa_sig.Views_bdu.build_association_list
+				 parameter handler error list
+			     in
+			     create parameter handler error (Init i_id) ag_id agent_type update compil nodes_adj
+			  end
+		    | Cckappa_sig.Ghost
+		    | Cckappa_sig.Dead_agent _
+		    | Cckappa_sig.Unknown_agent _ -> 
+		      warn parameter error (Some "line 948") Exit (handler,nodes_adj)
+		 )
+		 mixture.Cckappa_sig.views 
+		 (handler, nodes_adj)
+	     )
+	     init
+	     (handler, nodes_adj)
+	 in
 	 let max_site =
 	   List.fold_left
 	     (fun output e -> max output (Ckappa_sig.int_of_site_name e))
@@ -910,7 +1028,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 	      let error, rule_name =
 		if Remanent_parameters.get_show_rule_names_in_local_traces parameter
 		then
-		  Handler.string_of_rule parameter error handler_kappa compil r_id
+		  string_of_fst_label parameter error handler_kappa compil (Rule r_id)
 		else error,""
 	      in
 	      let diff = rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.diff_direct in
@@ -974,38 +1092,8 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 			    let error, handler, update =
 			      Ckappa_sig.Views_bdu.build_association_list parameter handler error modif_list_creation
 			    in
-			    let error, list = 
-			      match
-				Int_storage.Nearly_inf_Imperatif.get parameter error (Ckappa_sig.int_of_agent_name agent_type) compil.Cckappa_sig.signatures 
-			      with
-			      | error, None ->
-				warn parameter error (Some "line 982") Exit []
-			      | error, Some agent_sig -> 
-				let intf = agent_sig.Cckappa_sig.agent_interface in
-				error, Ckappa_sig.Site_map_and_set.Map.fold
-				  (fun i _ list -> (i,Ckappa_sig.state_index_of_int 0)::list)
-				  intf
-				  []
-			    in
-			    let error, handler, mvbdu = 
-			      Ckappa_sig.Views_bdu.mvbdu_of_reverse_sorted_association_list parameter handler error list 
-			    in
-			    let error, handler, mvbdu =
-			      Ckappa_sig.Views_bdu.mvbdu_redefine parameter handler error mvbdu update
-			    in
-			    let error, handler, list_edges =
-			      Ckappa_sig.Views_bdu.extensional_of_mvbdu parameter handler error mvbdu
-			    in
-			    let error, handler, nodes_adj =
-			      List.fold_left
-				(fun (error, handler, nodes_adj) post ->
-				 let error, handler, hash_init' = hash_of_association_list parameter handler error post in
-				 let error, nodes_adj =
-				   add_creation parameter error r_id ag_id hash_init' nodes_adj
-				 in
-				 error, handler, nodes_adj)
-				(error, handler, nodes_adj)
-				list_edges
+			    let error, (handler, nodes_adj) =
+			      create parameter handler error (Rule r_id) ag_id agent_type update compil nodes_adj
 			    in
 			    error,(handler,nodes_adj)
 			  end
@@ -1118,7 +1206,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 				      let error, handler, hash_init' = hash_of_association_list parameter handler error post in
 				      let error, handler, hash_upd = hash_of_association_list parameter handler error upd_list in
 				      let error, nodes_adj =
-					add_edge parameter error r_id ag_id hash_init hash_init' hash_upd nodes_adj
+					add_edge parameter error (Rule r_id) ag_id hash_init hash_init' hash_upd nodes_adj
 				      in
 				      error, handler, nodes_adj)
 				     (error,handler,nodes_adj)
@@ -1326,7 +1414,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 				let error, rule_name =
 				  if Remanent_parameters.get_show_rule_names_in_local_traces parameter
 				  then
-				    Handler.string_of_rule parameter error handler_kappa compil (fst r_id)
+				   string_of_fst_label parameter error handler_kappa compil (fst r_id)
 				  else error,""
 				in
 				let () = Printf.fprintf fic "Node_%i -> Node_%i [label=\"%s\"];\n" key key' rule_name in
@@ -1348,7 +1436,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 				let error, rule_name =
 				  if Remanent_parameters.get_show_rule_names_in_local_traces parameter
 				  then
-				    Handler.string_of_rule parameter error handler_kappa compil (fst r_id)
+				    string_of_fst_label parameter error handler_kappa compil (fst r_id)
 				  else error,""
 				in
 				let () = Printf.fprintf fic "Init_%i -> Node_%i [label=\"%s\"];\n" key key rule_name in
@@ -1403,7 +1491,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 				let error, rule_name =
 				  if Remanent_parameters.get_show_rule_names_in_local_traces parameter
 				  then
-				    Handler.string_of_rule parameter error handler_kappa compil (fst r_id)
+				    string_of_fst_label parameter error handler_kappa compil (fst r_id)
 				  else error,""
 				in
 				let () = Printf.fprintf fic "Node_%i -> Node_%i [label=\"%s\"];\n" key key' rule_name in
@@ -1425,7 +1513,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 				let error, rule_name =
 				  if Remanent_parameters.get_show_rule_names_in_local_traces parameter
 				  then
-				    Handler.string_of_rule parameter error handler_kappa compil (fst r_id)
+				    string_of_fst_label parameter error handler_kappa compil (fst r_id)
 				  else error,""
 				in
 				let () = Printf.fprintf fic "Init_%i -> Node_%i [label=\"%s\"];\n" key key rule_name in
