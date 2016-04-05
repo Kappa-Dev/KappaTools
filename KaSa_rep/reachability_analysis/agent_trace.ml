@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <2016-04-05 19:16:01 feret>
+  * Last modification: Time-stamp: <2016-04-05 21:58:52 feret>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -839,19 +839,12 @@ let example ?restricted_version:(restricted_version=false) list nodes_adj =
   in
   ()
 
-let create parameter handler error r_id ag_id agent_type update compil nodes_adj =
+let create parameter handler error r_id ag_id agent_type ext_list update nodes_adj =
   let error, list = 
-    match
-      Int_storage.Nearly_inf_Imperatif.get parameter error (Ckappa_sig.int_of_agent_name agent_type) compil.Cckappa_sig.signatures 
-    with
-    | error, None ->
-      warn parameter error (Some "line 982") Exit []
-    | error, Some agent_sig -> 
-      let intf = agent_sig.Cckappa_sig.agent_interface in
-      error, Ckappa_sig.Site_map_and_set.Map.fold
-	(fun i _ list -> (i,Ckappa_sig.state_index_of_int 0)::list)
-	intf
+    error, List.fold_left
+	(fun list i -> (i,Ckappa_sig.state_index_of_int 0)::list)
 	[]
+	ext_list
   in
   let error, handler, mvbdu = 
     Ckappa_sig.Views_bdu.mvbdu_of_reverse_sorted_association_list parameter handler error list 
@@ -991,7 +984,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 			       Ckappa_sig.Views_bdu.build_association_list
 				 parameter handler error list
 			     in
-			     create parameter handler error (Init i_id) ag_id agent_type update compil nodes_adj
+			     create parameter handler error (Init i_id) ag_id agent_type ext_list update nodes_adj
 			  end
 		    | Cckappa_sig.Ghost
 		    | Cckappa_sig.Dead_agent _
@@ -1093,7 +1086,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 			      Ckappa_sig.Views_bdu.build_association_list parameter handler error modif_list_creation
 			    in
 			    let error, (handler, nodes_adj) =
-			      create parameter handler error (Rule r_id) ag_id agent_type update compil nodes_adj
+			      create parameter handler error (Rule r_id) ag_id agent_type ext_list update nodes_adj
 			    in
 			    error,(handler,nodes_adj)
 			  end
