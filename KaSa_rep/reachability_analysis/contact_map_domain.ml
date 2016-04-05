@@ -119,44 +119,6 @@ struct
   (**************************************************************************)
   (*implementations*)
 
-  (*dual: contact map including initial state, use in views_domain*)
-   
-  (*let collect_dual_map parameter error handler store_result =
-    let error, store_result =
-      Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
-        parameter error
-        (fun parameter error (agent_type, (site_type, state))
-          (agent_type', site_type', state') store_result ->
-            let error, old_set =
-              match Ckappa_sig.AgentSiteState_map_and_set.Map.find_option_without_logs parameter error
-                (agent_type, site_type, state) store_result
-              with
-              | error, None -> error, Ckappa_sig.AgentSiteState_map_and_set.Set.empty
-              | error, Some s -> error, s
-            in
-            let error', set =
-              Ckappa_sig.AgentSiteState_map_and_set.Set.add_when_not_in parameter error
-                (agent_type', site_type', state') 
-                Ckappa_sig.AgentSiteState_map_and_set.Set.empty
-            in
-            let error = Exception.check warn parameter error error'
-              (Some "line 446") Exit 
-            in
-            let error'', new_set = 
-              Ckappa_sig.AgentSiteState_map_and_set.Set.union parameter error set old_set
-            in
-            let error = Exception.check warn parameter error error''
-              (Some "line 446") Exit 
-            in
-            let error, store_result = 
-              Ckappa_sig.AgentSiteState_map_and_set.Map.add_or_overwrite parameter error
-                (agent_type, site_type, state) new_set store_result
-            in
-            error, store_result
-        ) handler.Cckappa_sig.dual store_result
-    in
-    error, store_result*)
-
   let collect_agent_type_state parameter error agent site_type =
     match agent with
     | Cckappa_sig.Ghost
@@ -630,7 +592,39 @@ struct
   let export static dynamic error kasa_state =
     error, dynamic, kasa_state
 
+  let print_contact_map_rhs store_result =
+    Printf.fprintf stdout "Contact map:\n";
+    Ckappa_sig.Rule_map_and_set.Map.iter
+      (fun rule_id pair ->
+        let _ =
+          Printf.fprintf stdout "rule_id:%i:\n" (Ckappa_sig.int_of_rule_id rule_id)
+        in
+        let _ =
+          Ckappa_sig.PairAgentSiteState_map_and_set.Set.iter
+            (fun ((agent_type1, site1, state1),(agent_type2, site2, state2)) ->
+              let _ =
+                Printf.fprintf stdout 
+                  "agent_type1:%i:site_type1:%i:state1:%i -> agent_type2:%i:site_type2:%i:state2:%i\n"
+                  (Ckappa_sig.int_of_agent_name agent_type1)
+                  (Ckappa_sig.int_of_site_name site1)
+                  (Ckappa_sig.int_of_state_index state1)
+                  (Ckappa_sig.int_of_agent_name agent_type2)
+                  (Ckappa_sig.int_of_site_name site2)
+                  (Ckappa_sig.int_of_state_index state2)
+                  
+              in
+              ()
+            ) pair
+        in
+        ()                        
+      ) store_result
+
+
   let print static dynamic error loggers =
+    (*let store_rhs = get_bond_rhs static in
+    let _ =
+      print_contact_map_rhs store_rhs
+    in*)
     error, dynamic, ()
 
   let lkappa_mixture_is_reachable static dynamic error lkappa =

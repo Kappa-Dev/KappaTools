@@ -65,8 +65,10 @@ module type Set =
 
 
     val subset: t -> t -> bool
-
     val iter: (elt -> unit) -> t -> unit
+
+    val find : elt -> t -> elt option
+
     val fold: (elt -> 'a -> 'a) -> t -> 'a -> 'a
     val fold_inv: (elt -> 'a -> 'a) -> t -> 'a -> 'a
 
