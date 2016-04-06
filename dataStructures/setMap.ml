@@ -83,8 +83,6 @@ module type Set =
 
     val iter: (elt -> unit) -> t -> unit
 
-    val find : elt -> t -> elt option
-
     val fold: (elt -> 'a -> 'a) -> t -> 'a -> 'a
     val fold_inv: (elt -> 'a -> 'a) -> t -> 'a -> 'a
 
@@ -821,13 +819,6 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
                subset (node left1 value1 empty) left2 && subset right1 set2
              else
                subset (node empty value1 right1) right2 && subset left1 set2
-
-        (*add find*)
-        let rec find x = function
-          | Private.Empty -> None
-          | Private.Node(l, v, r, _, _) ->
-            let c = Ord.compare x v in
-            if c = 0 then Some v else  find x (if c < 0 then l else r)     
 
 	let rec iter f = function
 	  | Private.Empty -> ()

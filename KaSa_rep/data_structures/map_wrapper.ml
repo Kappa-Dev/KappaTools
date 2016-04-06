@@ -32,7 +32,6 @@ module type Set_with_logs =
     val subset: t -> t -> bool
 
     val iter: (elt -> unit) -> t -> unit
-    val find : elt -> t -> elt option
     val fold: (elt -> 'a -> 'a) -> t -> 'a -> 'a
     val fold_inv: (elt -> 'a -> 'a) -> t -> 'a -> 'a
 
@@ -152,7 +151,6 @@ module Make (S_both: (SetMap.S)): S_with_logs
 	      let equal = S_both.Set.equal
 	      let subset = S_both.Set.subset
 	      let iter = S_both.Set.iter
-              let find = S_both.Set.find
 	      let fold = S_both.Set.fold
 	      let fold_inv = S_both.Set.fold_inv
 	      let elements = S_both.Set.elements
