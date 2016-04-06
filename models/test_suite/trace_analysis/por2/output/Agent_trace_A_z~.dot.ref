@@ -1,2 +1,8 @@
 digraph G{
+Init_4 [width="0cm" height="0cm" style="none" label=""];
+Node_3 [label="A(z~p)"];
+Node_4 [label="A(z~u)"];
+Node_3 -> Node_4 [label="rule 7: z-"];
+Node_4 -> Node_3 [label="rule 2: z+"];
+Init_4 -> Node_4 [label="Init"];
 }

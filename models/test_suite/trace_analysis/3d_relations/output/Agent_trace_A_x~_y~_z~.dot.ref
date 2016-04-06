@@ -1,4 +1,5 @@
 digraph G{
+Init_23 [width="0cm" height="0cm" style="none" label=""];
 Node_18 [label="A(x~p,y~u,z~u)"];
 Node_20 [label="A(x~p,y~p,z~p)"];
 Node_22 [label="A(x~p,y~p,z~u)"];
@@ -14,4 +15,5 @@ Node_23 -> Node_24 [label="rule 1"];
 Node_23 -> Node_18 [label="rule 0"];
 Node_24 -> Node_23 [label="rule 4"];
 Node_24 -> Node_22 [label="rule 0"];
+Init_23 -> Node_23 [label="Init"];
 }

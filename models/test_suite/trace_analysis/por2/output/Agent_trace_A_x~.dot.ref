@@ -1,2 +1,8 @@
 digraph G{
+Init_32 [width="0cm" height="0cm" style="none" label=""];
+Node_32 [label="A(x~u)"];
+Node_33 [label="A(x~p)"];
+Node_32 -> Node_33 [label="rule 0: x+"];
+Node_33 -> Node_32 [label="rule 5: x-"];
+Init_32 -> Node_32 [label="Init"];
 }
