@@ -1,0 +1,7 @@
+#!/bin/sh
+
+BLOB=/tmp/KaSim-test-blob
+
+"${KAPPABIN}"KaSim --compile -make-sim ${BLOB} -seed 496408597 -d output model.ka && \
+"${KAPPABIN}"KaSim --compile -load-sim ${BLOB} -seed 958076642 -d output && \
+"${KAPPABIN}"KaSim --compile -load-sim ${BLOB} -seed 458154606 -d output -var init 300 || exit 0

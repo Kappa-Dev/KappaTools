@@ -510,7 +510,7 @@ let initialize logger ?rescale_init sigs_nd tk_nd contact_map counter result =
   let rule_nd = Array.of_list compiled_rules in
 
   Debug.tag logger "\t -perturbations" ;
-  let (domain,pert,stops,tracking_enabled) =
+  let (domain,pert,stops,has_tracking) =
     pert_of_result alg_nd alg_deps' result.variables result.rules
 		   contact_map counter domain' result in
   let () =
@@ -548,18 +548,12 @@ let initialize logger ?rescale_init sigs_nd tk_nd contact_map counter result =
   let domain,init_l =
     inits_of_result
       ?rescale:rescale_init contact_map counter env domain result in
+  let graph0 = Rule_interpreter.empty ~has_tracking env in
+  let state0 = State_interpreter.empty env stops relative_fluxmaps in
   let graph,state =
-    State_interpreter.initial ~has_tracking:tracking_enabled env domain counter
-			      init_l stops relative_fluxmaps in
+    State_interpreter.initialize env domain counter graph0 state0 init_l in
   let () =
-    if !Parameter.compileModeOn || !Parameter.debugModeOn then
-      Format.eprintf
-	"@[<v>@[<v 2>Environment:@,%a@]@,@[<v 2>Domain:@,@[%a@]@]@,@[<v 2>Intial graph;@,%a@]@]@."
-	Kappa_printer.env env
-	Connected_component.Env.print domain
-	(Rule_interpreter.print env) graph in
-  let () =
-    if tracking_enabled &&
+    if has_tracking &&
 	 not (!Parameter.causalModeOn || !Parameter.weakCompression ||
 		!Parameter.mazCompression || !Parameter.strongCompression)
     then
@@ -570,4 +564,4 @@ let initialize logger ?rescale_init sigs_nd tk_nd contact_map counter result =
 	   "An observable may be tracked but no compression level to render stories has been specified")
   in
   let () = Debug.tag logger "\t Done" in
-  (env, domain, graph, state)
+  (env, domain, graph, state, init_l)

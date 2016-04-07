@@ -132,7 +132,7 @@ let () =
       Counter.create
 	~init_t:0. ~init_e:0 ?max_t:!maxTimeValue ?max_e:!maxEventValue
 	~nb_points:!pointNumberValue in
-    let (env, cc_env, graph, new_state) =
+    let (env, cc_env, graph, state, init_l) =
       match !Parameter.marshalizedInFile with
       | "" ->
 	let result =
@@ -160,22 +160,47 @@ let () =
 	     else
 	       Format.printf "+Loading simulation package %s...@."
 			     marshalized_file in
-	   let env,cc_env,graph,new_state =
+	   let env,cc_env,graph,state,init_l =
 	     (Marshal.from_channel d :
 		Environment.t*Connected_component.Env.t*
-		  Rule_interpreter.t * State_interpreter.t) in
+		  Rule_interpreter.t * State_interpreter.t*
+		    (Alg_expr.t * Primitives.elementary_rule * Location.t) list) in
 	   let () = Pervasives.close_in d  in
 	   let () = Format.printf "Done@." in
-	   (env,cc_env,graph,new_state)
+	   let graph,state =
+	     if !Parameter.alg_var_overwrite = [] then graph,state
+	     else
+	       let alg_over =
+		 List.map
+		   (fun (s,v) ->
+		    Environment.num_of_alg (Location.dummy_annot s) env,
+		    Alg_expr.CONST v)
+		   !Parameter.alg_var_overwrite in
+	       let graph0 = Rule_interpreter.reinit graph in
+	       let state0 =
+		 State_interpreter.reinit alg_over state in
+	       State_interpreter.initialize
+		 env cc_env counter graph0 state0 init_l
+	   in
+	   (env,cc_env,graph,state,init_l)
 	 with
+	 | ExceptionDefn.Malformed_Decl _ as e -> raise e
 	 | _exn ->
 	    Debug.tag
 	      Format.std_formatter
 	      "!Simulation package seems to have been created with a different version of KaSim, aborting...@.";
 	    exit 1
     in
-    let () = Kappa_files.with_marshalized
-	       (fun d -> Marshal.to_channel d (env,cc_env,graph,new_state) []) in
+    let () =
+      Kappa_files.with_marshalized
+	(fun d -> Marshal.to_channel d (env,cc_env,graph,state,init_l) []) in
+    let () =
+      if !Parameter.compileModeOn || !Parameter.debugModeOn then
+	Format.eprintf
+	  "@[<v>@[<v 2>Environment:@,%a@]@,@[<v 2>Domain:@,@[%a@]@]@,@[<v 2>Intial graph;@,%a@]@]@."
+	  Kappa_printer.env env
+	  Connected_component.Env.print cc_env
+	  (Rule_interpreter.print env) graph in
     let () = Kappa_files.with_ccFile
 	       (fun f -> Connected_component.Env.print_dot f cc_env) in
     ExceptionDefn.flush_warning Format.err_formatter ;
@@ -195,14 +220,14 @@ let () =
 	Outputs.go (Environment.signatures env)
 	  (Data.Plot
 	     (Counter.current_time counter,
-	      State_interpreter.observables_values env counter graph new_state)) in
+	      State_interpreter.observables_values env counter graph state)) in
 
     Parameter.initSimTime () ;
     let () =
       State_interpreter.loop
 	~outputs:(Outputs.go  (Environment.signatures env))
 	~called_from:Remanent_parameters_sig.KaSim
-	Format.std_formatter env cc_env counter graph new_state
+	Format.std_formatter env cc_env counter graph state
     in
     Format.printf "Simulation ended";
     if Counter.nb_null_event counter = 0 then Format.print_newline()

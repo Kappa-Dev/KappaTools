@@ -1,10 +1,12 @@
 type t = {
-  stopping_times : (Nbr.t * int) list ref;
-  perturbations_alive : bool array;
-  activities : Random_tree.tree;(* pair numbers are binary rule, odd unary *)
-  variables_overwrite: Alg_expr.t option array;
-  flux: bool * Data.flux_data list;
-}
+    init_stopping_times : (Nbr.t * int) list;
+    stopping_times : (Nbr.t * int) list ref;
+    perturbations_alive : bool array;
+    activities : Random_tree.tree;
+    (* pair numbers are regular rule, odd unary instances *)
+    variables_overwrite: Alg_expr.t option array;
+    flux: bool * Data.flux_data list;
+  }
 
 let get_alg env state i =
   match state.variables_overwrite.(i) with
@@ -20,22 +22,36 @@ let initial_activity get_alg env counter graph activities =
        Random_tree.add (2*i) (Nbr.to_float rate) activities)
     () env
 
-let initial
-      ~has_tracking env domain counter init_l stopping_times relative_fluxs =
+let empty env stopping_times relative_fluxs =
   let activity_tree =
     Random_tree.create (2*Environment.nb_rules env) in
   let stops =
-    ref (List.sort (fun (a,_) (b,_) -> Nbr.compare a b) stopping_times) in
-  let state0 =
-    {
-      stopping_times = stops;
-      perturbations_alive =
-	Array.make (Environment.nb_perturbations env) true;
-      activities = activity_tree;
-      variables_overwrite =
-	Array.make (Environment.nb_algs env) None;
-      flux = (relative_fluxs,[]);
-    } in
+    List.sort (fun (a,_) (b,_) -> Nbr.compare a b) stopping_times in
+  {
+    init_stopping_times = stops;
+    stopping_times = ref stops;
+    perturbations_alive =
+      Array.make (Environment.nb_perturbations env) true;
+    activities = activity_tree;
+    variables_overwrite =
+      Array.make (Environment.nb_algs env) None;
+    flux = (relative_fluxs,[]);
+  }
+
+let reinit alg_overwrite state =
+  let overwrite = Array.map (fun _ -> None) state.variables_overwrite in
+  let () = List.iter (fun (i,v) -> overwrite.(i) <- Some v) alg_overwrite in
+  {
+    init_stopping_times = state.init_stopping_times;
+    stopping_times = ref state.init_stopping_times;
+    perturbations_alive =
+      Array.map (fun _ -> true) state.perturbations_alive;
+    activities = Random_tree.copy state.activities;
+    variables_overwrite = overwrite;
+    flux = (fst state.flux,[]);
+  }
+
+let initialize env domain counter graph0 state0 init_l =
   let get_alg i = get_alg env state0 i in
   let graph =
     List.fold_left
@@ -60,15 +76,13 @@ let initial
 	  | (Rule_interpreter.Clash | Rule_interpreter.Corrected _) ->
 	     raise (ExceptionDefn.Internal_Error
 		      ("Bugged initial rule",pos)))
-	 state value)
-      (Rule_interpreter.empty ~has_tracking env) init_l in
+	 state value) graph0 init_l in
   let () =
-    initial_activity (Environment.get_alg env)
-		     env counter graph activity_tree in
+    initial_activity get_alg env counter graph state0.activities in
   let graph' =
     Rule_interpreter.update_outdated_activities
       ~get_alg:(fun i -> Environment.get_alg env i)
-      (fun x _ y -> Random_tree.add x y activity_tree)
+      (fun x _ y -> Random_tree.add x y state0.activities)
       env counter graph in
   graph',state0
 

@@ -157,7 +157,7 @@ end = struct
                            wrap6 (Eval.initialize ?rescale_init:None)
                                  log_form sig_nd tk_nd contact_map
                                  simulation.counter result
-                           >>= (fun (env,domain,graph,state) ->
+                           >>= (fun (env,domain,graph,state,_) ->
                                 let legend = Environment.map_observables
                                                (Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
                                                env

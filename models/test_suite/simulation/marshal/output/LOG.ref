@@ -1,0 +1,24 @@
++ Command line is: 'KaSim' '--compile' '-make-sim' '/tmp/KaSim-test-blob' '-seed' '496408597' '-d' 'output' 'model.ka'
+Parsing model.ka...
+done
++ Initialized random number generator with seed 496408597
++ Sanity checks
++ KaSa tools initialization
++ Compute the contact map
++ Compiling...
++ Building initial simulation conditions...
+	 -simulation parameters
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -initial conditions
+	 Done
++ Command line is: 'KaSim' '--compile' '-load-sim' '/tmp/KaSim-test-blob' '-seed' '958076642' '-d' 'output'
++ Initialized random number generator with seed 958076642
++Loading simulation package /tmp/KaSim-test-blob...
+Done
++ Command line is: 'KaSim' '--compile' '-load-sim' '/tmp/KaSim-test-blob' '-seed' '458154606' '-d' 'output' '-var' 'init' '300'
++ Initialized random number generator with seed 458154606
++Loading simulation package /tmp/KaSim-test-blob...
+Done
