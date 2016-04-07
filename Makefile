@@ -73,7 +73,7 @@ site:
 site/external: site
 ifeq ($(NO_CDN),1)
 	curl -LsS -o $(TEMPDIR)/bootstrap.zip   https://github.com/twbs/bootstrap/releases/download/v3.3.5/bootstrap-3.3.5-dist.zip ;\
-	curl -LsS -o $(TEMPDIR)/codemirror.zip  http://codemirror.net/codemirror.zip ;\
+	curl -LsS -o $(TEMPDIR)/codemirror.zip  http://codemirror.net/codemirror-5.14.2.zip ;\
 	mkdir -p $@ ;\
 	unzip -d $@ $(TEMPDIR)/bootstrap.zip ;\
 	unzip -d $@ $(TEMPDIR)/codemirror.zip ;\
