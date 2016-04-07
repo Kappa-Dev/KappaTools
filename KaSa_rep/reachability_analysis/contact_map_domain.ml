@@ -122,9 +122,9 @@ struct
   let collect_agent_type_state parameter error agent site_type =
     match agent with
     | Cckappa_sig.Ghost
-    | Cckappa_sig.Unknown_agent _
+    | Cckappa_sig.Unknown_agent _ -> error, (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_state_index)
     | Cckappa_sig.Dead_agent _ ->
-      warn parameter error (Some "line 199") Exit (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_state_index)
+      warn parameter error (Some "line 127") Exit (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_state_index)
     | Cckappa_sig.Agent agent1 ->
       let agent_type1 = agent1.Cckappa_sig.agent_name in
       let error, state1 =
@@ -414,7 +414,7 @@ struct
       Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
         parameter error
         (fun parameter error agent_id bonds_map dynamic ->
-          let error, store_result =
+          let error, dynamic =
             Ckappa_sig.Site_map_and_set.Map.fold
               (fun site_type_source site_add (error, dynamic) ->
                 let agent_index_target = site_add.Cckappa_sig.agent_index in
@@ -593,7 +593,7 @@ struct
     error, dynamic, kasa_state
 
   let print_contact_map_rhs store_result =
-    Printf.fprintf stdout "Contact map:\n";
+    Printf.fprintf stdout "Contact map in the rhs:\n";
     Ckappa_sig.Rule_map_and_set.Map.iter
       (fun rule_id pair ->
         let _ =
@@ -619,11 +619,30 @@ struct
         ()                        
       ) store_result
 
+  let print_contact_map store_result =
+    Printf.fprintf stdout "Contact map:\n";
+    let _ =
+      Ckappa_sig.PairAgentSiteState_map_and_set.Set.iter
+        (fun ((agent_type1, site1, state1),(agent_type2, site2, state2)) ->
+          let _ =
+            Printf.fprintf stdout 
+              "agent_type1:%i:site_type1:%i:state1:%i -> agent_type2:%i:site_type2:%i:state2:%i\n"
+              (Ckappa_sig.int_of_agent_name agent_type1)
+              (Ckappa_sig.int_of_site_name site1)
+              (Ckappa_sig.int_of_state_index state1)
+              (Ckappa_sig.int_of_agent_name agent_type2)
+              (Ckappa_sig.int_of_site_name site2)
+              (Ckappa_sig.int_of_state_index state2)
+              
+          in
+          ()
+        ) store_result
+    in ()
 
   let print static dynamic error loggers =
-    (*let store_rhs = get_bond_rhs static in
+    (*let store_contact_map = get_contact_map_dynamic dynamic in
     let _ =
-      print_contact_map_rhs store_rhs
+      print_contact_map store_contact_map
     in*)
     error, dynamic, ()
 
