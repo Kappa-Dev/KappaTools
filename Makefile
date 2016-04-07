@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := all
-TEMPDIR := $(shell mktemp -d)
+TEMPDIR := $(shell mktemp -t KaSim_nocdn_XXXX -d)
 LABLTKLIBREP?=$(CAML_LD_LIBRARY_PATH)/../labltk
 
 MANREP= man/
@@ -68,23 +68,19 @@ $(VERSION): main/version.ml.skel $(wildcard .git/refs/heads/*) generated
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) $@
 
 site:
-	mkdir site
+	mkdir $@
 
 site/external: site
 ifeq ($(NO_CDN),1)
-	mkdir -p $@ ;\
-	mkdir -p $(TEMPDIR) ;\
-	wget -O $(TEMPDIR)/bootstrap.zip   https://github.com/twbs/bootstrap/releases/download/v3.3.5/bootstrap-3.3.5-dist.zip ;\
-	wget -O $(TEMPDIR)/codemirror.zip  http://codemirror.net/codemirror.zip ;\
-	wget -O $(TEMPDIR)/jquery.js       https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.js ;\
+	curl -LsS -o $(TEMPDIR)/bootstrap.zip   https://github.com/twbs/bootstrap/releases/download/v3.3.5/bootstrap-3.3.5-dist.zip ;\
+	curl -LsS -o $(TEMPDIR)/codemirror.zip  http://codemirror.net/codemirror.zip ;\
 	mkdir -p $@ ;\
 	unzip -d $@ $(TEMPDIR)/bootstrap.zip ;\
 	unzip -d $@ $(TEMPDIR)/codemirror.zip ;\
-	unzip -d $@ $(TEMPDIR)/mathjax.zip ;\
 	mkdir -p $@/jquery ;\
-	cp  $(TEMPDIR)/jquery.js $@/jquery ;\
+	curl -LsS -o $@/jquery/jquery.js https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.1/jquery.js ;\
 	mkdir -p $@/d3 ;\
-	wget -O $@/d3/d3.v3.min.js http://d3js.org/d3.v3.min.js
+	curl -LsS -o $@/d3/d3.v3.min.js http://d3js.org/d3.v3.min.js
 else
 endif
 

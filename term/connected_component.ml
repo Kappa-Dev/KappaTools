@@ -526,7 +526,7 @@ let rec remove_from_sons level1 todos set rfathers cc_id = function
      | Some cc ->
 	match List.partition (fun t -> t.dst = cc_id) cc.sons with
 	| [], _ -> remove_from_sons level1 todos set rfathers cc_id tail
-	| x::_,sons ->
+	| _x::_,sons ->
 	   if sons <> [] || cc.is_obs_of <> None || List.mem id level1 then
 	     (*let missings = (*TODO*)
 	       List.fold_left
