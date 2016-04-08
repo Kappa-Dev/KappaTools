@@ -216,9 +216,6 @@ let time_progress_bar = progress_bar
 let event_progress_bar = progress_bar
                            (React.S.map (fun state ->
                                          let event_percentage : int option = lift (fun (state : ApiTypes.state) ->
-                                                                                   let () = Visualization.update_plot
-                                                                                              state.plot
-                                                                                   in
                                                                                    state.event_percentage) state
                                          in
                                          let event_percentage : int = default event_percentage 0 in

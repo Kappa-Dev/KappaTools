@@ -15,7 +15,19 @@
     <script src="Kappa.js?RANDOM_NUMBER"></script>
     <script src="common.js?RANDOM_NUMBER"></script>
     <script src="flux.js?RANDOM_NUMBER"></script>
-  </head>
+    <script src="plot.js?RANDOM_NUMBER"></script>  </head>
+    <style id="plot-svg-style">
+      body { font: 10px sans-serif; }
+      .axis path,
+      .axis line { fill: none;
+                   stroke: #000;
+                   shape-rendering: crispEdges; }
+      .line { fill: none;
+              stroke: steelblue;
+              stroke-width: 1.5px; }
+      .legend { font-size: 10px; }
+      rect { stroke-width: 2; }
+      </style>
   <body>
     <!-- nav -->
     <nav class="navbar navbar-default navbar-static-top">

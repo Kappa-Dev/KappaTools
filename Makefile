@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := all
-TEMPDIR := $(shell mktemp -t KaSim_nocdn_XXXX -d)
+TEMPDIR := $(shell mktemp -d)
 LABLTKLIBREP?=$(CAML_LD_LIBRARY_PATH)/../labltk
 
 MANREP= man/
@@ -57,7 +57,7 @@ generated/WebMessage_t.ml: js/WebMessage.atd generated
 generated/WebMessage_j.ml: js/WebMessage.atd generated
 	atdgen -j -j-std -o generated/WebMessage js/WebMessage.atd
 
-$(RESOURCE): shared/flux.js
+$(RESOURCE): shared/flux.js shared/plot.js
 	./dev/generate-string.sh $<  > $@
 
 $(VERSION): main/version.ml.skel $(wildcard .git/refs/heads/*) generated
@@ -68,7 +68,7 @@ $(VERSION): main/version.ml.skel $(wildcard .git/refs/heads/*) generated
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) $@
 
 site:
-	mkdir $@
+	mkdir site
 
 site/external: site
 ifeq ($(NO_CDN),1)
@@ -101,6 +101,7 @@ else
 	cat js/use-cdn.html | sed "s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g" > site/index.html
 endif
 	cp shared/flux.js site/flux.js
+	cp shared/plot.js site/plot.js
 	cp -f js/*.js js/*.css js/favicon.ico site
 
 JsSim.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(GENERATED)

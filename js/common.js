@@ -17,6 +17,7 @@ var args = function () {
     return query_string;
 }();
 // add logging functions
+// in the url place level=debug for most verbose
 (function(){
     var found = false;
     var levels = ["debug","info","notice","warning","error","fatal" ];
