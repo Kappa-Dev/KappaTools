@@ -27,24 +27,50 @@ struct
      previous version of the analysis *)
 
   (* domain specific info: *)
-  (* collect the set of tuples (A,x,y,B,z,t) such that there exists a rule with a bond connecting the site A.x and B.z and that the agent of type A document a site y <> x, and the agent of type B document a site t <> z *)
-  (* for each tuple, collect three maps 
-      -> (A,x,y,B,z,t) -> Ag_id list RuleIdMap  to explain in which rule and which agent_id the site y can be modified
-      -> (A,x,y,B,z,t) -> Ag_id list RuleIdMap  to explain in which rule and which agent_id the site t can be modified
-      -> (A,x,y,B,z,t) -> Ag_id list RuleIdMap to explain in which rule and which agent_id (A) a site x of A may become boudnto a site z of B *)
-      
+  (* collect the set of tuples (A,x,y,B,z,t) such that there exists a rule
+     with a bond connecting the site A.x and B.z and that the agent of type A
+     document a site y <> x, and the agent of type B document a site t <> z *)
+
+  (* for each tuple, collect three maps -> (A,x,y,B,z,t) -> Ag_id list
+     RuleIdMap to explain in which rule and which agent_id the site y can be
+     modified
+
+     -> (A,x,y,B,z,t) -> Ag_id list RuleIdMap to explain in which rule and
+     which agent_id the site t can be modified
+
+     -> (A,x,y,B,z,t) -> Ag_id list RuleIdMap to explain in which rule and
+     which agent_id (A) a site x of A may become bound to a site z of
+     B *)
+  
+  (*let local_static_information =
+    {
+      (*two sites, one site is bond, and site1 <> site2*)
+      store_bond_rhs_sites: Ckappa_sig.PairAgentSiteState_map_and_set.Set.t
+      Ckappa_sig.Rule_map_and_set.Map.t;
+    }*)
+  
+
   type static_information =
     {
       global_static_information : Analyzer_headers.global_static_information;
-      domain_static_information : unit (* to be replaced *)
+      local_static_information : unit
     }
 
   (*--------------------------------------------------------------------*)
   (* a triple of maps *)
 
-  (* one maps each such tuples (A,x,y,B,z,t) to a mvbdu with two variables that describes the relation between the state of y and the state of t, when both agents are connected via x and z *)      
-  (* one maps each such tuples (A,x,y,B,z,t) to a mvbdu with one variables that decribes the range of y when both agents are connected via x and z *)
-  (* one maps each such tuples (A,x,y,B,z,t) to a mvbdu with one variables that decribes the range of t when both agents are connected via x and z *)
+  (* one maps each such tuples (A,x,y,B,z,t) to a mvbdu with two variables
+     that describes the relation between the state of y and the state of t,
+     when both agents are connected via x and z *)
+      
+  (* one maps each such tuples (A,x,y,B,z,t) to a mvbdu with one variables
+     that decribes the range of y when both agents are connected via x and
+     z *)
+
+  (* one maps each such tuples (A,x,y,B,z,t) to a mvbdu with one variables
+     that decribes the range of t when both agents are connected via x and
+     z *)
+
   type local_dynamic_information = unit (* to be replaced *)
 
   type dynamic_information =
@@ -68,6 +94,14 @@ struct
   let get_kappa_handler static = lift Analyzer_headers.get_kappa_handler static
 
   let get_compil static = lift Analyzer_headers.get_cc_code static
+
+  (*let get_local_static_information static = static.local_static_information
+    
+  let set_local_static_information local static =
+    {
+      static with
+        local_static_information = local
+    }*)
 
   (*--------------------------------------------------------------------*)
   (** global dynamic information*)
@@ -100,14 +134,37 @@ struct
     -> Exception.method_handler * dynamic_information * 'c
 
   (**************************************************************************)
+  (*Implementation of local static information*)
+      
+  (*let scan_rule_set static dynamic error =
+    let parameter = get_parameter static in
+    let compil = get_compil static in
+    let error, static =
+      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
+        parameter
+        error
+        (fun parameter error rule_id rule static ->
+          _
+
+
+        ) compil.Cckappa_sig.rules static
+    in
+    error, static, dynamic*)
+
+  (**************************************************************************)
   (** [get_scan_rule_set static] *)
 
   (* todo *)
   let initialize static dynamic error =
+    (*let init_local_static_information =
+      {
+        store_bond_rhs_sites = Ckappa_sig.Rule_map_and_set.Map.empty
+      }
+    in*)
     let init_global_static_information =
       {
         global_static_information = static;
-        domain_static_information = ();
+        local_static_information = ();
       }
     in
     let kappa_handler = Analyzer_headers.get_kappa_handler static in
@@ -119,6 +176,15 @@ struct
       }
     in
     error, init_global_static_information, init_global_dynamic_information
+  (*
+    let error, static, dynamic =
+      scan_rule_set
+        init_global_static_information
+        init_global_dynamic_information
+        error
+    in
+    error, static, dynamic*)
+
 
   (* to do *)
   (* take into account bounds that may occur in initial states *)
@@ -127,9 +193,10 @@ struct
     error, dynamic, event_list
 
   (* to do *)
-  (* check for each bond that occur in the lhs, and if half bond, whether the constraints in the lhs are consistent *)
+  (* check for each bond that occur in the lhs, and if half bond, whether
+     the constraints in the lhs are consistent *)
   let is_enabled static dynamic error (rule_id:Ckappa_sig.c_rule_id) precondition =
-      error, dynamic, Some precondition
+    error, dynamic, Some precondition
 
   (* to do *)
   let apply_rule static dynamic error rule_id precondition =

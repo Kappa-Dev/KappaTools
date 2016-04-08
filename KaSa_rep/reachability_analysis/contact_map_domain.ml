@@ -408,8 +408,6 @@ struct
 
   let collect_bonds_initial static dynamic error init_state =
     let parameter = get_parameter static in
-    let views = init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views in
-    let bonds = init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.bonds in
     let error, dynamic =
       Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
         parameter error
@@ -420,8 +418,12 @@ struct
                 let agent_index_target = site_add.Cckappa_sig.agent_index in
                 let site_type_target = site_add.Cckappa_sig.site in
                 let error, agent_source =
-                  match Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-                    parameter error agent_id views
+                  match
+                    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
+                      parameter
+                      error
+                      agent_id
+                      init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views
                   with
                   | error, None -> warn parameter error (Some "line 473") Exit
                     Cckappa_sig.Ghost
@@ -429,7 +431,8 @@ struct
                 in
                 let error, agent_target =
                   match Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-                    parameter error agent_index_target views
+                    parameter error agent_index_target 
+                    init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views
                   with
                   | error, None -> warn parameter error (Some "line 480") Exit
                     Cckappa_sig.Ghost
@@ -449,8 +452,9 @@ struct
                     agent_target
                     site_type_target
                 in
-                let pair_triple = ((agent_type1, site_type_source, state1),
-                                   (agent_type2, site_type_target, state2)) 
+                let pair_triple =
+                  ((agent_type1, site_type_source, state1),
+                   (agent_type2, site_type_target, state2)) 
                 in
                 (*use the oriented bonds, when given the bond (x, y), the
                   bond (y, x) is given as well*)
@@ -459,7 +463,7 @@ struct
               ) bonds_map (error, dynamic)
           in
           error, dynamic
-        ) bonds dynamic
+        ) init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.bonds dynamic
     in
     error, dynamic
 
@@ -468,7 +472,11 @@ struct
   let add_initial_state static dynamic error species =
     let event_list = [] in
     let error, dynamic =
-      collect_bonds_initial static dynamic error species
+      collect_bonds_initial
+        static
+        dynamic
+        error
+        species
     in
     error, dynamic, event_list
 
@@ -534,8 +542,7 @@ struct
 		        Ckappa_sig.State_map_and_set.Map.fold
 			  (f parameter)
 		       	  statemap
-			  (error, init)
-		      )
+			  (error, init))
 	      end
           }
       in
@@ -592,7 +599,9 @@ struct
   let export static dynamic error kasa_state =
     error, dynamic, kasa_state
 
-  let print_contact_map_rhs store_result =
+  let print_contact_map_rhs static dynamic error store_result =
+    let parameter = get_parameter static in
+    let kappa_handler = get_kappa_handler static in
     Printf.fprintf stdout "Contact map in the rhs:\n";
     Ckappa_sig.Rule_map_and_set.Map.iter
       (fun rule_id pair ->
@@ -601,16 +610,58 @@ struct
         in
         let _ =
           Ckappa_sig.PairAgentSiteState_map_and_set.Set.iter
-            (fun ((agent_type1, site1, state1),(agent_type2, site2, state2)) ->
+            (fun ((agent_type1, site_type1, state1),(agent_type2, site_type2, state2)) ->
               let _ =
+                let error, agent_type1_string =
+                  try Handler.string_of_agent parameter error kappa_handler agent_type1
+                  with
+                    _ -> warn parameter error (Some "line 479") Exit
+                      (Ckappa_sig.string_of_agent_name agent_type1)
+                in
+                let error, site_type1_string =
+                  try
+                    Handler.string_of_site parameter error kappa_handler agent_type1 site_type1
+                  with
+                    _ -> warn parameter error (Some "line 492") Exit 
+                      (Ckappa_sig.string_of_site_name site_type1)
+                in
+                let error, state1_string =
+                    try 
+                      Handler.string_of_state_fully_deciphered parameter error kappa_handler
+                        agent_type1 site_type1 state1
+                    with
+                      _ -> warn parameter error (Some "line 657") Exit
+                        (Ckappa_sig.string_of_state_index state1)
+                in
+                let error, agent_type2_string =
+                    try Handler.string_of_agent parameter error kappa_handler agent_type2
+                    with
+                      _ -> warn parameter error (Some "line 479") Exit
+                        (Ckappa_sig.string_of_agent_name agent_type2)
+                in
+                let error, site_type2_string =
+                    try
+                      Handler.string_of_site parameter error kappa_handler agent_type2 site_type2
+                    with
+                      _ -> warn parameter error (Some "line 688") Exit 
+                        (Ckappa_sig.string_of_site_name site_type2)
+                in
+                let error, state2_string =
+                  try 
+                    Handler.string_of_state_fully_deciphered parameter error kappa_handler
+                      agent_type2 site_type2 state2
+                  with
+                    _ -> warn parameter error (Some "line 665") Exit
+                      (Ckappa_sig.string_of_state_index state2)
+                in
                 Printf.fprintf stdout 
-                  "agent_type1:%i:site_type1:%i:state1:%i -> agent_type2:%i:site_type2:%i:state2:%i\n"
-                  (Ckappa_sig.int_of_agent_name agent_type1)
-                  (Ckappa_sig.int_of_site_name site1)
-                  (Ckappa_sig.int_of_state_index state1)
-                  (Ckappa_sig.int_of_agent_name agent_type2)
-                  (Ckappa_sig.int_of_site_name site2)
-                  (Ckappa_sig.int_of_state_index state2)
+                  "agent_type1:%s:site_types:%s:state1:%s -> agent_type2:%s:site_type2:%s:state2:%s\n"
+                  agent_type1_string
+                  site_type1_string
+                  state1_string
+                  agent_type2_string
+                  site_type2_string
+                  state2_string
                   
               in
               ()
@@ -619,30 +670,73 @@ struct
         ()                        
       ) store_result
 
-  let print_contact_map store_result =
+  let print_contact_map static dynamic error store_result =
+    let parameter = get_parameter static in
+    let kappa_handler = get_kappa_handler static in
     Printf.fprintf stdout "Contact map:\n";
     let _ =
       Ckappa_sig.PairAgentSiteState_map_and_set.Set.iter
-        (fun ((agent_type1, site1, state1),(agent_type2, site2, state2)) ->
+        (fun ((agent_type1, site_type1, state1),(agent_type2, site_type2, state2)) ->
           let _ =
+            let error, agent_type1_string =
+              try Handler.string_of_agent parameter error kappa_handler agent_type1
+              with
+                _ -> warn parameter error (Some "line 479") Exit
+                  (Ckappa_sig.string_of_agent_name agent_type1)
+            in
+            let error, site_type1_string =
+              try
+                Handler.string_of_site parameter error kappa_handler agent_type1 site_type1
+              with
+                _ -> warn parameter error (Some "line 492") Exit 
+                  (Ckappa_sig.string_of_site_name site_type1)
+            in
+            let error, state1_string =
+              try 
+                Handler.string_of_state_fully_deciphered parameter error kappa_handler
+                  agent_type1 site_type1 state1
+              with
+                _ -> warn parameter error (Some "line 657") Exit
+                  (Ckappa_sig.string_of_state_index state1)
+            in
+            let error, agent_type2_string =
+              try Handler.string_of_agent parameter error kappa_handler agent_type2
+              with
+                _ -> warn parameter error (Some "line 479") Exit
+                  (Ckappa_sig.string_of_agent_name agent_type2)
+            in
+            let error, site_type2_string =
+              try
+                Handler.string_of_site parameter error kappa_handler agent_type2 site_type2
+              with
+                _ -> warn parameter error (Some "line 688") Exit 
+                  (Ckappa_sig.string_of_site_name site_type2)
+            in
+            let error, state2_string =
+              try 
+                Handler.string_of_state_fully_deciphered parameter error kappa_handler
+                  agent_type2 site_type2 state2
+              with
+                _ -> warn parameter error (Some "line 665") Exit
+                  (Ckappa_sig.string_of_state_index state2)
+            in
             Printf.fprintf stdout 
-              "agent_type1:%i:site_type1:%i:state1:%i -> agent_type2:%i:site_type2:%i:state2:%i\n"
-              (Ckappa_sig.int_of_agent_name agent_type1)
-              (Ckappa_sig.int_of_site_name site1)
-              (Ckappa_sig.int_of_state_index state1)
-              (Ckappa_sig.int_of_agent_name agent_type2)
-              (Ckappa_sig.int_of_site_name site2)
-              (Ckappa_sig.int_of_state_index state2)
-              
+              "agent_type1:%s:site_type1:%s:state1:%s -> agent_type2:%s:site_type2:%s:state2:%s\n"
+              agent_type1_string
+              site_type1_string
+              state1_string
+              agent_type2_string
+              site_type2_string
+              state2_string              
           in
           ()
         ) store_result
-    in ()
+    in ()    
 
   let print static dynamic error loggers =
     (*let store_contact_map = get_contact_map_dynamic dynamic in
     let _ =
-      print_contact_map store_contact_map
+      print_contact_map static dynamic error store_contact_map
     in*)
     error, dynamic, ()
 

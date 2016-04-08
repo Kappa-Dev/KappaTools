@@ -47,7 +47,7 @@ let dummy_rule_id = 0
 let dummy_agent_id = 0
 
 let dummy_site_name_1 = 1
-let dummy_site_name_minus1 = -1 (*Use in views_domain*)
+let dummy_site_name_minus1 = -1 (*REMOVE:Use in views_domain*)
 
 let dummy_state_index_1 = 1
 
