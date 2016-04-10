@@ -633,6 +633,29 @@ let replay parameter error handler handler_kappa agent_type agent_string mvbdu_f
        (error, SiteSet.empty,SiteSet.empty)
        partition
   in
+  let error, handler, support_agent =
+    Ckappa_sig.Views_bdu.variables_list_of_mvbdu parameter handler error starting_state
+  in
+  let error, handler, list =
+    Ckappa_sig.Views_bdu.extensional_of_variables_list parameter handler error support_agent
+  in
+  let error, set =
+    List.fold_left
+      (fun (error,set) elt ->
+	SiteSet.add parameter error elt set)
+      (error, SiteSet.empty)
+      list
+  in
+  let error, extension = SiteSet.minus parameter error set total_support_test in
+  let error, partition =
+    List.fold_left
+      (fun (error, list) (a,set,set') ->
+	let error, set = SiteSet.union parameter error set extension in
+	let error, set' = SiteSet.union parameter error set' extension in
+	(error, (a,set,set')::list))
+      (error, [])
+      (List.rev partition)
+  in
   let error, handler, transition_system, mvbdu_list, labelset =
     List.fold_left
       (fun (error, handler, transition_system, mvbdu_list,labelset) (set,support_test,support_mod) ->
