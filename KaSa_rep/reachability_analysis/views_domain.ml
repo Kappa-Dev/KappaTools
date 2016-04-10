@@ -16,6 +16,8 @@
 (* Before properly achieving separation of concepts. We introduce one
    monolithic domain that collect everything (as in the previous analyzer).*)
 
+let direct_computation = false
+
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "views_domain") message exn
     (fun () -> default)
@@ -2642,7 +2644,11 @@ struct
       let error, handler = 
 	if (*compute_local_trace*) Remanent_parameters.get_compute_local_traces parameter
 	then
-	 Agent_trace.agent_trace parameter error handler handler_kappa mvbdu_true compil output 
+	  if direct_computation
+	  then
+	    Agent_trace_with_direct_por.agent_trace parameter error handler handler_kappa mvbdu_true compil output
+	  else 
+	    Agent_trace.agent_trace parameter error handler handler_kappa mvbdu_true compil output
 	else
 	  error, handler
       in
