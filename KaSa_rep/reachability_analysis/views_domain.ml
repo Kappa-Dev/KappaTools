@@ -16,7 +16,7 @@
 (* Before properly achieving separation of concepts. We introduce one
    monolithic domain that collect everything (as in the previous analyzer).*)
 
-let direct_computation = false
+let direct_computation = true
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "views_domain") message exn

@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   *
   * Creation:                      <2016-03-21 10:00:00 feret>
-  * Last modification: Time-stamp: <2016-04-01 15:51:14 feret>
+  * Last modification: Time-stamp: <2016-04-11 14:39:12 feret>
   * *
   * Compute the projection of the traces for each insighful
    * subset of site in each agent
@@ -16,7 +16,7 @@
   * under the terms of the GNU Library General Public License *)
 
 let allow_losange_reduction = true
-				
+
 let warn parameters mh message exn default =
      Exception.warn parameters mh (Some "Agent_trace.ml") message exn (fun () -> default)
 
@@ -67,7 +67,7 @@ type intensional_set_of_transitions =
     creation: Ckappa_sig.Views_bdu.mvbdu;
     degradation: Ckappa_sig.Views_bdu.mvbdu;
   }
-    
+
 type extensional_representation =
   {
     nodes: Ckappa_sig.Views_bdu.mvbdu list;
@@ -85,13 +85,13 @@ let shift_site op site internal =
   Ckappa_sig.site_name_of_int (op (Ckappa_sig.int_of_site_name site) internal.nsites)
 let shift_site_minus site internal = shift_site (-) site internal
 let shift_site_plus site internal = shift_site (+) site internal
-							  
+
 
 let hash_of_association_list parameter handler error list =
   let error, handler, hconsed_list = Ckappa_sig.Views_bdu.build_association_list parameter handler error list in
   let hash = Ckappa_sig.Views_bdu.hash_of_association_list hconsed_list in
   error, handler, hash
-    
+
 let mvbdu_of_association_list_gen gen parameter handler error asso_list =
   let error, handler, hconsed_list = gen parameter handler error asso_list in
   let error, handler, mvbdu_true = Ckappa_sig.Views_bdu.mvbdu_true parameter handler error in
@@ -100,9 +100,9 @@ let mvbdu_of_association_list_gen gen parameter handler error asso_list =
 let mvbdu_of_association_list parameter handler error asso = mvbdu_of_association_list_gen Ckappa_sig.Views_bdu.build_association_list parameter handler error asso
 let mvbdu_of_reverse_order_association_list parameter handler error asso = mvbdu_of_association_list_gen Ckappa_sig.Views_bdu.build_reverse_sorted_association_list parameter handler error asso
 
-    
+
 let dummy_state = Ckappa_sig.state_index_of_int (-1)
- 
+
 let empty_transition parameter handler error n =
   let error, handler, mvbdu_false = Ckappa_sig.Views_bdu.mvbdu_false parameter handler error in
   let sites_precondition = Misc_sa.list_0_n (n-1) in
@@ -144,7 +144,7 @@ let empty_transition parameter handler error n =
     degradation = mvbdu_false;
     creation = mvbdu_false
   }
-    
+
 let empty_transition_system n mvbdu_false =
   {
     edges = [];
@@ -157,7 +157,7 @@ let empty_transition_system n mvbdu_false =
     macro_state_to_state = Wrapped_modules.LoggedIntMap.empty;
     in_macro_edges = LabelMap.empty ;
   }
-    
+
 let add_edge r_id ag_id q q' _ transition_system =
   {transition_system with edges = (q,(r_id,ag_id),q')::transition_system.edges}
 let convert_label (r,a) =
@@ -169,9 +169,8 @@ let add_creation parameter handler error r_id ag_id mvbdu intensional =
 												  intensional.site_agent_id,state_ag_id] in
   let error, handler, mvbdu = Ckappa_sig.Views_bdu.mvbdu_redefine parameter handler error mvbdu asso in
   let error, handler, creation = Ckappa_sig.Views_bdu.mvbdu_or parameter handler error mvbdu intensional.creation in
-  error, handler, 
+  error, handler,
   {intensional with creation = creation}
-    
 
 let dump_edge fic parameter error handler_kappa compil key key' label =
   let error, rule_name =
@@ -204,15 +203,15 @@ let build_asso_of_mvbdu parameter handler error mvbdu =
        error, handler, list
      end
   | _ ->
-     let error, (handler,list) = 
+     let error, (handler,list) =
        warn parameter error (Some "line 385") Exit (handler,[])
      in
      error, handler, list
-		     
+
 let hash_of_mvbdu parameter handler error mvbdu =
   let error, handler, asso = build_asso_of_mvbdu parameter handler error mvbdu in
   hash_of_association_list parameter handler error asso
-  		    
+
 let dump_key_of_asso fic parameter handler error list =
   let error, handler, hash = hash_of_association_list parameter handler error list in
   let () = Printf.fprintf fic "Node_%i" hash in
@@ -252,10 +251,10 @@ let dump_mvbdu fic parameter handler error handler_kappa agent_type agent_string
    let error = print_label_of_asso fic parameter error handler_kappa agent_type agent_string list in
    let () = Printf.fprintf fic "\"];\n" in
    error, handler
-													 
-let transitions_starting_from parameter handler error asso internal = 
+
+let transitions_starting_from parameter handler error asso internal =
   mvbdu_of_association_list parameter handler error asso
-			    
+
 let transitions_ending_in parameter handler error asso internal =
   let asso = List.rev_map (fun (site,state) -> shift_site_plus site internal,state) (List.rev asso) in
   let error, handler, mvbdu_true = Ckappa_sig.Views_bdu.mvbdu_true parameter handler error in
@@ -269,7 +268,7 @@ let transitions_ending_in parameter handler error asso internal =
        Ckappa_sig.Views_bdu.mvbdu_and parameter handler error mvbdu mvbdu')
     (error, handler, mvbdu_true)
     asso
-  
+
 let transitions_via_label_list parameter handler error labellist internal =
   let error, handler, mvbdu_false = Ckappa_sig.Views_bdu.mvbdu_false parameter handler error in
   let site_rid = internal.site_rule_id in
@@ -281,7 +280,7 @@ let transitions_via_label_list parameter handler error labellist internal =
      Ckappa_sig.Views_bdu.mvbdu_or parameter handler error mvbdu mvbdu')
       (error, handler, mvbdu_false)
       labellist
-      
+
 (*let restrict_gen f parameter handler error x internal =
   let error, handler, mvbdu = f parameter handler x internal in
   let error, handler, mvbdu = Ckappa_sig.Views_bdu.mvbdu_and parameter handler error mvbdu internal.transitions in
@@ -306,10 +305,11 @@ let transitions_via_label_list parameter handler error labellist internal =
 
 let label_set_of_fwd_transitions parameter handler error internal = label_set_of_transitions (fun x -> x.forward_transitions) parameter handler error internal
 let label_set_of_bwd_transitions parameter handler error internal = label_set_of_transitions (fun x -> x.backward_transitions) parameter handler error internal
- *)											     
-let translate_gen f parameter error handler site_rid site_agid list internal output = 
+ *)
+
+let translate_gen f parameter error handler site_rid site_agid list internal output =
   match
-    List.rev list 
+    List.rev list
   with
   | (x,x')::(y,y')::l when x=internal.site_agent_id && y = internal.site_rule_id ->
      let label = Ckappa_sig.rule_id_of_int (Ckappa_sig.int_of_state_index y'),
@@ -317,11 +317,11 @@ let translate_gen f parameter error handler site_rid site_agid list internal out
      let asso = f l in
      let error, handler, mvbdu = mvbdu_of_association_list parameter handler error asso in
      error, (handler,(label,mvbdu)::output)
-  | _ -> warn parameter error (Some "line 146") Exit (handler,output)			 
+  | _ -> warn parameter error (Some "line 146") Exit (handler,output)
 
 let get_label parameter error handler site_rid site_agid list internal output =
   match
-    List.rev list 
+    List.rev list
   with
   | (x,x')::(y,y')::_ when x=site_agid && y = site_rid ->
      let label = Ckappa_sig.rule_id_of_int (Ckappa_sig.int_of_state_index y'),
@@ -330,20 +330,18 @@ let get_label parameter error handler site_rid site_agid list internal output =
   | _ -> warn parameter error (Some "line 146") Exit (handler,output)
 
 
-	      
 let translate_back parameter error handler site_rid site_agid list internal output =
   translate_gen (fun l -> List.rev_map (fun (x,y) -> (shift_site_minus x internal,y)) (List.rev l))
 		parameter error handler site_rid site_agid list internal output
-    
+
 let translate_direct parameter error handler site_rid site_agid list internal output =
   translate_gen (fun l -> l) parameter error handler site_rid site_agid list internal output
 
 
 let correct_state state state' =
   if state=dummy_state then state' else state
-					  
-let outgoing parameter handler error mvbdu internal =
-  let error, handler, mvbdu = Ckappa_sig.Views_bdu.mvbdu_and parameter handler error mvbdu internal.forward_transitions in
+
+let ingoing_outgoing_gen get_sites get_transitions shift_mvbdu translate parameter handler error mvbdu internal =
   let error, handler, asso_list = Ckappa_sig.Views_bdu.extensional_of_mvbdu parameter handler error mvbdu in
   let error, asso_list =
     match asso_list
@@ -351,14 +349,17 @@ let outgoing parameter handler error mvbdu internal =
     | [a] -> error, a
     | _ -> warn parameter error (Some "line 352") Exit []
   in
-  let varlist = internal.hconsed_sites_precondition in
-  let error, handler, mvbdu = Ckappa_sig.Views_bdu.mvbdu_project_abstract_away parameter handler error mvbdu varlist in
-  let error, handler, list = Ckappa_sig.Views_bdu.extensional_of_mvbdu parameter handler error mvbdu in
+  let error, handler, shifted_mvbdu = shift_mvbdu parameter handler error mvbdu in
+  let transitions = get_transitions internal in
+  let error, handler, mvbdu_transitions = Ckappa_sig.Views_bdu.mvbdu_and parameter handler error shifted_mvbdu transitions in
+  let varlist = get_sites internal in
+  let error, handler, mvbdu_other_side = Ckappa_sig.Views_bdu.mvbdu_project_abstract_away parameter handler error mvbdu varlist in
+  let error, handler, other_side_list = Ckappa_sig.Views_bdu.extensional_of_mvbdu parameter handler error mvbdu in
   let error, (handler, output) =
     List.fold_left
-      (fun (error,(handler,output)) list -> 
-	     translate_back parameter error handler internal.site_rule_id internal.site_agent_id list internal output)
-      (error,(handler,[])) list
+      (fun (error,(handler,output)) list ->
+	     translate parameter error handler internal.site_rule_id internal.site_agent_id list internal output)
+      (error,(handler,[])) other_side_list
   in
   let error, handler, output =
     List.fold_left
@@ -388,13 +389,30 @@ let outgoing parameter handler error mvbdu internal =
   in
   error, handler, output
 
+let outgoing parameter handler error mvbdu internal =
+  ingoing_outgoing_gen
+    (fun internal -> internal.hconsed_sites_precondition)
+    (fun internal -> internal.forward_transitions)
+    (fun parameter handler error x -> error, handler, x)
+    translate_back
+    parameter handler error mvbdu internal
+
+let ingoing parameter handler error mvbdu internal =
+  ingoing_outgoing_gen
+    (fun internal -> internal.hconsed_sites_postcondition)
+    (fun internal -> internal.backward_transitions)
+    (fun parameter handler error x -> 
+      Ckappa_sig.Views_bdu.mvbdu_rename parameter handler error x internal.hconsed_renaming)
+    translate_direct
+    parameter handler error mvbdu internal
+
 let half_trans parameter handler error mvbdu trans_set intensional  =
   let error, handler, mvbdu = Ckappa_sig.Views_bdu.mvbdu_and parameter handler error mvbdu trans_set in
   let error, handler, mvbdu = Ckappa_sig.Views_bdu.mvbdu_project_abstract_away parameter handler error mvbdu intensional.hconsed_sites_precondition in
   let error, handler, list = Ckappa_sig.Views_bdu.extensional_of_mvbdu parameter handler error mvbdu in
   let error, (handler, output) =
     List.fold_left
-      (fun (error,(handler,output)) list -> 
+      (fun (error,(handler,output)) list ->
 	     get_label parameter error handler intensional.site_rule_id intensional.site_agent_id list trans_set output)
       (error,(handler,[])) list
   in
@@ -404,28 +422,15 @@ let creation parameter handler error mvbdu internal =
   half_trans parameter handler error mvbdu internal.creation internal
 let degradation parameter handler error mvbdu internal =
   half_trans parameter handler error mvbdu internal.degradation internal
-	     
-let ingoing parameter handler error mvbdu internal = (* to do, as outgoing *)
- let error, handler, mvbdu = Ckappa_sig.Views_bdu.mvbdu_rename parameter handler error mvbdu internal.hconsed_renaming in
- let error, handler, mvbdu = Ckappa_sig.Views_bdu.mvbdu_and parameter handler error mvbdu internal.backward_transitions in
- let error, handler, mvbdu = Ckappa_sig.Views_bdu.mvbdu_project_abstract_away parameter handler error mvbdu internal.hconsed_sites_postcondition in
- let error, handler, list = Ckappa_sig.Views_bdu.extensional_of_mvbdu parameter handler error mvbdu in
- let error, (handler, output) =
-    List.fold_left
-      (fun (error,(handler,output)) list -> 
-	     translate_direct parameter error handler internal.site_rule_id internal.site_agent_id list internal output)
-      (error,(handler,[])) list
-  in
-  error, handler, output
 
 let label_to_state_pair label =
   (Ckappa_sig.state_index_of_int (Ckappa_sig.int_of_rule_id (fst label)),
    Ckappa_sig.state_index_of_int (Ckappa_sig.int_of_agent_id (snd label)))
-      
+
 let add_node_from_mvbdu parameter handler handler_kappa error agent_type agent_string mvbdu transition_system =
   let error, handler, list = Ckappa_sig.Views_bdu.extensional_of_mvbdu parameter handler error mvbdu in
   error, handler, {transition_system with nodes = mvbdu::transition_system.nodes}
- 	    
+
 let dump_graph_header fic =
    Printf.fprintf fic "digraph G{\n"
 
@@ -521,7 +526,7 @@ let is_subset parameter error handler a b =
 (* find a list of rules with pairwisely distinct support *)
 (* when restricted_version = true *)
 (* it is also asked that the support of each other rule meet each of the support of the first list of  rules *)
-				   
+
 let smash parameter error ?restricted_version:(restricted_version=false) support label_list =
   let error, list =
     List.fold_left
@@ -546,9 +551,9 @@ let smash parameter error ?restricted_version:(restricted_version=false) support
     | [] -> partition, not_in_the_partition
     | (label,set_test,set_mod,_,_)::tail ->
       let error, bool =
-	let rec aux set_test set_mod list error = 
+	let rec aux set_test set_mod list error =
 	  match list with
-	  | (_,set_test',set_mod')::tail -> 
+	  | (_,set_test',set_mod')::tail ->
 	     let error, inter = SiteSet.inter parameter error set_test' set_mod in
 	     let error, inter' = SiteSet.inter parameter error set_mod' set_test in
 	      if SiteSet.is_empty inter && SiteSet.is_empty inter'
@@ -571,7 +576,7 @@ let smash parameter error ?restricted_version:(restricted_version=false) support
     partition
   with
   | [] | [_] -> error, None
-  | _::_::_ -> 
+  | _::_::_ ->
      let bool =
        not restricted_version
        ||
@@ -579,7 +584,7 @@ let smash parameter error ?restricted_version:(restricted_version=false) support
 	    (fun (_,set_test,set_mod) ->
 	     List.for_all
 	       (fun (_,set_test',set_mod') ->
-		not (SiteSet.is_empty (snd (SiteSet.inter parameter error set_mod set_test'))) 
+		not (SiteSet.is_empty (snd (SiteSet.inter parameter error set_mod set_test')))
 	       )
 	       not_in_the_partition)
 	    partition)
@@ -611,13 +616,13 @@ let extend_partition parameter error handler mvbdu_false support internal initia
       initial_partition
   in
   List.fold_left
-    (fun 
-      (error, handler, support_total_test, support_total_mod, accu) 
+    (fun
+      (error, handler, support_total_test, support_total_mod, accu)
       (label,set_test,set_mod) ->
 	let rec aux parameter error handler internal visited support_total_test support_total_mod support_local_test support_local_mod labelset to_be_visited              =
 	  match to_be_visited with
 	  | [] -> error, handler, support_local_test, support_local_mod, labelset
-	  | state::tail -> 
+	  | state::tail ->
 	     begin
 	       let error, handler, meet = Ckappa_sig.Views_bdu.mvbdu_and parameter handler error state visited in
 	       if not (Ckappa_sig.Views_bdu.equal meet state)
@@ -658,7 +663,7 @@ let extend_partition parameter error handler mvbdu_false support internal initia
 		 aux parameter error handler internal visited support_total_test support_total_mod support_local_test support_local_mod labelset tail
 	    end
 	in
-	let error, handler, support_local_test, support_local_mod, labelset = 
+	let error, handler, support_local_test, support_local_mod, labelset =
 	  aux parameter error handler internal mvbdu_false total_support_test total_support_mod set_test set_mod (LabelSet.singleton label) [starting_state] in
 	let error, support_total_test =
 	  SiteSet.union parameter error support_total_test support_local_test
@@ -666,8 +671,8 @@ let extend_partition parameter error handler mvbdu_false support internal initia
 	let error, support_total_mod =
 	  SiteSet.union parameter error support_total_mod support_local_mod
 	in
-	error, 
-	handler, 
+	error,
+	handler,
 	support_total_test,
 	support_total_mod,
 	(labelset, support_local_test,support_local_mod)::accu)
@@ -732,7 +737,7 @@ let replay parameter error handler handler_kappa agent_type agent_string mvbdu_f
 		let error, handler, proj_state = Ckappa_sig.Views_bdu.mvbdu_project_keep_only parameter handler error t proj_list in
 		let error, handler, transition_system  = add_node_from_mvbdu parameter handler handler_kappa error agent_type agent_string proj_state transition_system in
 		let error, handler, outgoing = (* to do filter transitions before_hand *)
-		  outgoing parameter handler error t internal 
+		  outgoing parameter handler error t internal
 		in
 		let error, handler, ingoing =
 		  ingoing parameter handler error t internal
@@ -796,17 +801,17 @@ let replay parameter error handler handler_kappa agent_type agent_string mvbdu_f
   let transition_system = {transition_system with in_macro_edges = macro_edges} in
   let error, handler, micro_states = Ckappa_sig.Views_bdu.extensional_of_mvbdu parameter handler error macro_state in
   let error, handler, transition_system, to_be_visited =
-    List.fold_left 
+    List.fold_left
       (fun (error, handler, transition_system, to_be_visited) (asso: (Ckappa_sig.Views_bdu.key * 'a) list)->
        let error, handler, hconsed_asso = Ckappa_sig.Views_bdu.build_association_list parameter handler error asso in
        let error, handler, mvbdu = Ckappa_sig.Views_bdu.mvbdu_redefine parameter handler error mvbdu_true hconsed_asso in
        let hash = Ckappa_sig.Views_bdu.hash_of_association_list hconsed_asso in
        let error, handler, outgoing = (* to do filter transitions before_hand *)
-	 outgoing parameter handler error mvbdu internal 
+	 outgoing parameter handler error mvbdu internal
        in
        let out_transitions = List.filter (fun (x,_) -> not (LabelSet.mem x labelset)) outgoing in
        let error, handler, ingoing = (* to do filter transitions before_hand *)
-	 ingoing parameter handler error mvbdu internal 
+	 ingoing parameter handler error mvbdu internal
        in
        let in_transitions = List.filter (fun (x,_) -> not (LabelSet.mem x labelset)) ingoing in
        let error, handler, creation =
@@ -832,7 +837,7 @@ let replay parameter error handler handler_kappa agent_type agent_string mvbdu_f
 	    List.fold_left
 	      (fun (error, handler, list)
 		   (_,support_test,support_mod)
-	       -> 
+	       ->
 	       let error, support = SiteSet.union parameter error support_test support_mod in
 	       let support_list = SiteSet.fold (fun  a l -> a::l) support [] in
 	       let error, handler, proj_list = Ckappa_sig.Views_bdu.build_variables_list parameter handler error support_list in
@@ -849,7 +854,7 @@ let replay parameter error handler handler_kappa agent_type agent_string mvbdu_f
        micro_states
    in
    error, handler, transition_system, labelset, to_be_visited
-		     
+
 
 
 
@@ -911,6 +916,11 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 		     if diff.Cckappa_sig.agent_name <> agent_type then
 		       error, (handler, intensional)
 		     else
+		       let r_id',ag_id' = convert_label (r_id,ag_id) in
+		       let label_update = [intensional.site_rule_id,r_id';intensional.site_agent_id,ag_id'] in
+		       let error, handler, label_update =
+			 mvbdu_of_association_list parameter handler error label_update
+		       in
 		       let error, handler, modif_list_creation, modif_list =
 			 List.fold_left
 			   (fun
@@ -959,7 +969,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 			    let error, handler, update =
 			      Ckappa_sig.Views_bdu.build_association_list parameter handler error modif_list_creation
 			    in
-			    
+			
 			    let error, handler, mvbdu =
 			      Ckappa_sig.Views_bdu.mvbdu_redefine parameter handler error mvbdu update
 			    in
@@ -976,7 +986,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 			    | [] ->
 			       error,(handler,intensional)
 			    | _ ->
-			       begin
+			      begin (* forward transitions *)
 				 let error, handler, mvbdu_test =
 				   let error, handler, test_list =
 				     List.fold_left
@@ -1021,68 +1031,130 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 				     mvbdu
 				     mvbdu_test
 				 in (* rewrite *)
-			(*	 let error, handler, mvbdu =
-				   List.fold_left
-				     (fun (error, handler, mvbdu) site ->
-				      let site' = shift_site_plus site intensional in
-				       match
-					 Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
-					   parameter error
-					   site diff.Cckappa_sig.agent_interface
-				       with error, None ->
-					 (* copy the state of site in site' *)
-					 begin
-					   let error, handler, var_interest = Ckappa_sig.Views_bdu.build_variables_list parameter handler error [site] in
-					   let error, handler, mvbdu_case = Ckappa_sig.Views_bdu.mvbdu_project_keep_only parameter handler error mvbdu var_interest in
-					   let error, handler, list = Ckappa_sig.Views_bdu.extensional_of_mvbdu parameter handler error mvbdu_case in
-					   let error, handler, mvbdu' = Ckappa_sig.Views_bdu.mvbdu_false parameter handler error in
-					   (* non monotonic renaming is painful, it should be a primitive of the mvbdu domain *)
-					     List.fold_left
-					       (fun (error, handler, mvbdu') list ->
-						match
-						  list
-						with
-						  [site'',state''] when site'' = site ->
-						  let error, handler, conj = mvbdu_of_association_list parameter handler error [site,state'';site',state''] in
-						  let error, handler, mvbdu'' = Ckappa_sig.Views_bdu.mvbdu_and parameter handler error mvbdu conj in
-						  Ckappa_sig.Views_bdu.mvbdu_or parameter handler error mvbdu' mvbdu''
-						| _ ->
-						let error, mvbdu' = warn parameter error (Some "line 253") Exit mvbdu' in
-						error, handler, mvbdu')
-					       (error, handler, mvbdu') list
-				     	 end		      
-					  | error, Some state ->
-					     (* define the state of site' as state *)
-					     begin
-					       let interv = state.Cckappa_sig.site_state in
-					       let min = interv.Cckappa_sig.min in
-					       let error,() =
-						 if min = interv.Cckappa_sig.max
-						 then
-						   error,()
-						 else
-					       	   warn parameter error (Some "line 1093") Exit ()
-					       in
-					       let error, handler, conj = mvbdu_of_association_list parameter handler error [site',min] in
-					       Ckappa_sig.Views_bdu.mvbdu_and parameter handler error mvbdu conj
-					     end
-				     )
-				     (error, handler, mvbdu)
-				     ext_list
-				 in*)
-				 let r_id',ag_id' = convert_label (r_id,ag_id) in
-				 let label_update = [intensional.site_rule_id,r_id';intensional.site_agent_id,ag_id'] in
+				 let error, handler, mvbdu =
+				   Ckappa_sig.Views_bdu.mvbdu_and
+				     parameter
+				     handler
+				     error
+				     mvbdu
+				     intensional.diag_postcondition
+				 in
+				 let modif_list = 
+				   List.rev_map 
+				     (fun (x,y) -> shift_site_plus x intensional,y)
+				     modif_list
+				 in
 				 let error, handler, update =
-				   mvbdu_of_association_list parameter handler error label_update
+				   Ckappa_sig.Views_bdu.build_association_list parameter handler error modif_list
 				 in
 				 let error, handler, mvbdu =
-				   Ckappa_sig.Views_bdu.mvbdu_and parameter handler error update mvbdu
+				   Ckappa_sig.Views_bdu.mvbdu_redefine 
+				     parameter
+				     handler
+				     error
+				     mvbdu
+				     update
+				 in
+				 let error, handler, mvbdu =
+				   Ckappa_sig.Views_bdu.mvbdu_and parameter handler error label_update mvbdu
 				 in
 				 let error, handler, mvbdu =
 				   Ckappa_sig.Views_bdu.mvbdu_or parameter handler error mvbdu intensional.forward_transitions
 				 in
 				 let intensional = {intensional with forward_transitions = mvbdu} in
-				 (* to do, fill backwards transitions *)
+				 (* backwards transitions *)
+				 let error, (bwd_test,bwd_modif) =
+				   Ckappa_sig.Site_map_and_set.Map.fold2
+				     parameter
+				     error
+				     (fun parameter error site state (test,modif) ->
+				       let error, bwd_test = Ckappa_sig.Site_map_and_set.Map.add parameter error site state test in
+				       error, (bwd_test,modif))
+				     (fun parameter error site state (test,modif) ->
+				       let error, bwd_test = Ckappa_sig.Site_map_and_set.Map.add parameter error site state test in
+				       warn parameter error (Some "line 1075") Exit (bwd_test,modif))
+				     (fun parameter error site state_test state_modif (test,modif) ->
+				   let error, bwd_test = Ckappa_sig.Site_map_and_set.Map.add parameter error site state_modif test in
+				   let interv = state_test.Cckappa_sig.site_state in
+				   let min = interv.Cckappa_sig.min in
+				   if min = interv.Cckappa_sig.max (* this should not be mandatory *)
+				   then
+				     error,
+				     (bwd_test,
+				      (site,min)::modif)
+				   else (* error *)
+				     let error, () = warn parameter error (Some "line 1012") Exit () in
+				     error, (bwd_test,modif))
+				     test
+				     diff.Cckappa_sig.agent_interface
+				     (Ckappa_sig.Site_map_and_set.Map.empty,[])
+				 in
+				 let error, handler, mvbdu_test =
+				   let error, handler, test_list =
+				     Ckappa_sig.Site_map_and_set.Map.fold
+				       (fun
+					 site
+					 state
+					 (error, handler, test_list)
+					 ->
+					   let interv = state.Cckappa_sig.site_state in
+					   let min = interv.Cckappa_sig.min in
+					   if min = interv.Cckappa_sig.max (* this should not be mandatory *)
+					   then
+					     error,
+					     handler,
+					     (shift_site_plus site intensional,min)::test_list
+					   else (* error *)
+					     let error, () = warn parameter error (Some "line 1012") Exit () in
+					     error, handler, test_list
+				       )
+				       bwd_test
+				       (error, handler, [])
+				   in
+				   let error,handler, test_list =
+				     Ckappa_sig.Views_bdu.build_association_list
+				       parameter handler error test_list
+				   in
+				   Ckappa_sig.Views_bdu.mvbdu_redefine
+				     parameter handler error
+				     mvbdu_true
+				     test_list
+				 in
+				 let error, handler, mvbdu =
+				   Ckappa_sig.Views_bdu.mvbdu_and
+				     parameter
+				     handler
+				     error
+				     mvbdu
+				     mvbdu_test
+				 in (* rewrite *)
+				 let error, handler, mvbdu =
+				   Ckappa_sig.Views_bdu.mvbdu_and
+				     parameter
+				     handler
+				     error
+				     mvbdu
+				     intensional.diag_precondition
+				 in
+
+				 let error, handler, update =
+				   Ckappa_sig.Views_bdu.build_association_list parameter handler error bwd_modif
+				 in
+				 let error, handler, mvbdu =
+				   Ckappa_sig.Views_bdu.mvbdu_redefine 
+				     parameter
+				     handler
+				     error
+				     mvbdu
+				     update
+				 in
+				 let error, handler, mvbdu =
+				   Ckappa_sig.Views_bdu.mvbdu_and parameter handler error label_update mvbdu
+				 in
+				 let error, handler, mvbdu =
+				   Ckappa_sig.Views_bdu.mvbdu_or parameter handler error mvbdu intensional.backward_transitions
+				 in
+				 let intensional = {intensional with backward_transitions = mvbdu} in
 				 error,(handler,intensional)
 			       end
 			  end
@@ -1096,6 +1168,21 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 	     rules
 	     (handler, intensional)
 	 in
+	 let _ = Printf.fprintf stdout "FORWARD \n" in
+	 let g parameter handler error x = 
+	   let error, handler, x = Ckappa_sig.Views_bdu.extensional_of_mvbdu parameter handler error x in
+	   List.iter
+	     (fun asso -> 
+	       let _ =
+		 List.iter 
+		   (fun (a,b) -> Printf.fprintf stdout "%i,%i;" (Ckappa_sig.int_of_site_name a) (Ckappa_sig.int_of_state_index b)) asso
+	       in
+	       Printf.fprintf stdout "\n")
+	     x
+	 in
+	 let _ = g parameter handler error intensional.forward_transitions in
+	 let _ = Printf.fprintf stdout "BACKWARD \n" in
+	 let _ = g parameter handler error intensional.backward_transitions in
 	 let error =
 	   begin (* losange reduction *)
 	     let error, mvbdu = error, intensional.creation in
@@ -1184,11 +1271,11 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 			in
 			(* deal with the successors of h *)
 			let error, handler, transition_system, to_be_visited =
-			  List.fold_left 
-			    (fun (error, handler, transition_system, to_be_visited) (label,q') -> 
+			  List.fold_left
+			    (fun (error, handler, transition_system, to_be_visited) (label,q') ->
 			     (* to do, detect wether a state is already dealt with by another macro-state *)
 			     if LabelSet.mem label dealt_label
-			     then 
+			     then
 			       error, handler, transition_system, to_be_visited
 			     else
 			       begin
@@ -1198,10 +1285,10 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 				 then
 				   error, handler, transition_system, to_be_visited
 				 else
-				   let transition_system = add_edge (fst label) (snd label) mvbdu q' 
+				   let transition_system = add_edge (fst label) (snd label) mvbdu q'
 								    0 (* to do *) transition_system in
 				   let to_be_visited = q'::to_be_visited in
-				   error, handler, transition_system, to_be_visited 
+				   error, handler, transition_system, to_be_visited
 			       end)
 			    (error, handler, transition_system, t)
 			    outgoing
@@ -1295,4 +1382,4 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 	map
 	(error, handler))
     output handler
-    
+
