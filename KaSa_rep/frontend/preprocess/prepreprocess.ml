@@ -884,6 +884,11 @@ let translate_compil parameters error compil =
       (error,[])
       compil.Ast.perturbations
   in
+  let error,constraints_rev =
+    List.fold_left
+      (fun (error,acc) (l,(mix,pos)) ->
+         let error',mix' = refine_mixture parameters error (rev_ast mix) in
+         (error',(l,(mix',pos))::acc)) (error,[]) compil.Ast.constraints in
   error,{
     Ast.variables = List.rev var_rev;
     Ast.signatures = List.rev signatures_rev;
@@ -894,5 +899,6 @@ let translate_compil parameters error compil =
     Ast.perturbations = List.rev perturbations_rev ;
     Ast.configurations = compil.Ast.configurations ;
     Ast.tokens = compil.Ast.tokens ;
-    Ast.volumes = compil.Ast.volumes
+    Ast.volumes = compil.Ast.volumes ;
+    Ast.constraints = List.rev constraints_rev ;
   }

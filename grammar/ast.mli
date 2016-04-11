@@ -117,6 +117,7 @@ type ('mixture,'id) instruction =
   | PLOT     of ('mixture,'id) Alg_expr.e Locality.annot
   | PERT     of ('mixture,'id) perturbation
   | CONFIG   of configuration
+  | CONSTRAINT of 'id Locality.annot list * 'mixture Locality.annot
 
 type ('mixture,'id) command =
   | RUN of ('mixture,'id) Alg_expr.bool Locality.annot
@@ -150,7 +151,9 @@ type ('agent,'mixture,'id,'rule,'edit_rule) compil =
     tokens :
       string Locality.annot list;
     volumes :
-      (string * float * string) list
+      (string * float * string) list;
+    constraints :
+      ('id Locality.annot list * 'mixture Locality.annot) list;
   }
 
 type parsing_compil = (agent,mixture,string,rule,edit_rule) compil

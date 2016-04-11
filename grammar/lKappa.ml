@@ -1360,6 +1360,10 @@ let create_sig l =
   Tools.array_map_of_list
     (fun (name,intf,_) -> (name,create_t intf)) l
 
+let constraint_of_ast ~new_syntax sigs rule_names (rl,(mix,pos)) =
+  (List.map (fun (_,pos as x) -> NamedDecls.elt_id ~kind:"rule" rule_names x,pos) rl,
+   (mixture_of_ast ~new_syntax sigs pos mix,pos))
+
 let compil_of_ast ~new_syntax overwrite c =
   let c =
     if c.Ast.signatures = [] && c.Ast.tokens = []
@@ -1419,6 +1423,16 @@ let compil_of_ast ~new_syntax overwrite c =
               r.Ast.act r.Ast.un_act)))
       cleaned_edit_rules in
   let rules = List.rev_append edit_rules old_style_rules in
+  let rule_names =
+    let i = ref (-1) in
+    NamedDecls.create
+      (Tools.array_map_of_list
+         (function
+           | Some label,_ -> label,()
+           | None,_ ->
+             let () = incr i in
+             Locality.dummy_annot ("__"^string_of_int !i),())
+         rules) in
   sigs,contact_map,tk_nd,updated_vars,
   {
     Ast.variables =
@@ -1443,4 +1457,6 @@ let compil_of_ast ~new_syntax overwrite c =
     Ast.tokens = c.Ast.tokens;
     Ast.signatures = c.Ast.signatures;
     Ast.configurations = c.Ast.configurations;
+    Ast.constraints =
+      List.map (constraint_of_ast ~new_syntax sigs rule_names) c.Ast.constraints;
   }
