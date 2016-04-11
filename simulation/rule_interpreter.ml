@@ -36,7 +36,7 @@ type t =
          list Pattern.ObsMap.t (*currently tracked ccs *) option;
   }
 
-type result = Clash | Corrected | Success of t
+type result = Clash | Corrected | Forbidden of t | Success of t
 
 let raw_get_alg env overwr i =
   match overwr.(i) with
@@ -237,35 +237,39 @@ let merge_cc mod_connectivity roots_of_unary_patterns = function
 
 let apply_negative_transformation
     mod_connectivity (side_effects,stuff4unaries,edges) = function
-  | Primitives.Transformation.Agent (id,_) ->
+  | Primitives.Transformation.Agent (id,_) as t ->
     let edges' = Edges.remove_agent id edges in
-    (side_effects,stuff4unaries,edges')
-  | Primitives.Transformation.Freed ((id,_),s) -> (*(n,s)-bottom*)
+    (side_effects,stuff4unaries,edges'),Some t
+  | Primitives.Transformation.Freed ((id,_),s) as t-> (*(n,s)-bottom*)
     let edges' = Edges.remove_free id s edges in
-    (side_effects,stuff4unaries,edges')
-  | Primitives.Transformation.Linked (((id,_),s),((id',_),s')) ->
+    (side_effects,stuff4unaries,edges'),Some t
+  | Primitives.Transformation.Linked (((id,_),s),((id',_),s')) as t->
     let edges',cc_modif = Edges.remove_link id s id' s' edges in
-    (side_effects,break_apart_cc edges' mod_connectivity stuff4unaries cc_modif,edges')
+    (side_effects,
+     break_apart_cc edges' mod_connectivity stuff4unaries cc_modif,
+     edges'),Some t
   | Primitives.Transformation.NegativeWhatEver ((id,_),s as n) ->
-     begin
-       match (List.partition (fun x -> x =n) side_effects) with
-       | (_::_,side_effects') -> (side_effects',stuff4unaries,edges)
-       | ([],_) ->
-          match Edges.link_destination id s edges with
-          | None -> (side_effects,stuff4unaries,Edges.remove_free id s edges)
-          | Some ((id',_ as nc'),s') ->
-             let edges',cc_modif = Edges.remove_link id s id' s' edges in
-             ((nc',s')::side_effects,
-              break_apart_cc edges' mod_connectivity stuff4unaries cc_modif,
-              edges')
-     end
+    begin
+      match (List.partition (fun x -> x =n) side_effects) with
+      | (_::_,side_effects') -> (side_effects',stuff4unaries,edges),None
+      | ([],_) ->
+        match Edges.link_destination id s edges with
+        | None -> (side_effects,stuff4unaries,Edges.remove_free id s edges),
+                  Some (Primitives.Transformation.Freed n)
+        | Some ((id',_ as nc'),s') ->
+          let edges',cc_modif = Edges.remove_link id s id' s' edges in
+          ((nc',s')::side_effects,
+           break_apart_cc edges' mod_connectivity stuff4unaries cc_modif,
+           edges'),Some (Primitives.Transformation.Linked (n,(nc',s')))
+    end
   | Primitives.Transformation.PositiveInternalized _ ->
     raise
       (ExceptionDefn.Internal_Error
          (Locality.dummy_annot "PositiveInternalized in negative update"))
-  | Primitives.Transformation.NegativeInternalized ((id,_),s) ->
-    let _,edges' = Edges.remove_internal id s edges in
-    (side_effects,stuff4unaries,edges')
+  | Primitives.Transformation.NegativeInternalized ((id,_ as n),s) ->
+    let i,edges' = Edges.remove_internal id s edges in
+    (side_effects,stuff4unaries,edges'),
+    Some (Primitives.Transformation.PositiveInternalized (n,s,i))
 
 let apply_positive_transformation
     sigs mod_connectivity (inj2graph,side_effects,stuff4unaries,edges) = function
@@ -300,6 +304,50 @@ let apply_positive_transformation
     let edges' = Edges.add_internal id s i edges in
     (inj2graph,side_effects,stuff4unaries,edges'),
     Primitives.Transformation.PositiveInternalized (nc,s,i)
+  | Primitives.Transformation.NegativeInternalized _ ->
+    raise
+      (ExceptionDefn.Internal_Error
+         (Locality.dummy_annot "NegativeInternalized in positive update"))
+
+let revert_negative_transformation sigs edges = function
+  | Primitives.Transformation.Agent (id,ty) ->
+    let _,edges' = Edges.add_agent ~id sigs ty edges in
+    edges'
+  | Primitives.Transformation.Freed ((id,_),s) -> (*(n,s)-bottom*)
+    let edges' = Edges.add_free id s edges in
+    edges'
+  | Primitives.Transformation.Linked ((nc,s),(nc',s')) ->
+    let edges',_modif_cc = Edges.add_link nc s nc' s' edges in
+    edges'
+  | Primitives.Transformation.NegativeWhatEver _ ->
+    raise
+      (ExceptionDefn.Internal_Error
+         (Locality.dummy_annot "NegativeWhatEver in negative revert"))
+  | Primitives.Transformation.PositiveInternalized ((id,_),s,i) ->
+    let edges' = Edges.add_internal id s i edges in
+    edges'
+  | Primitives.Transformation.NegativeInternalized _ ->
+    raise
+      (ExceptionDefn.Internal_Error
+         (Locality.dummy_annot "NegativeInternalized in negative revert"))
+
+let revert_positive_transformation edges = function
+  | Primitives.Transformation.Agent (id,_) ->
+    let edges' = Edges.remove_agent id edges in
+    edges'
+  | Primitives.Transformation.Freed ((id,_),s) -> (*(n,s)-bottom*)
+    let edges' = Edges.remove_free id s edges in
+    edges'
+  | Primitives.Transformation.Linked (((id,_),s),((id',_),s')) ->
+    let edges',_cc_modif = Edges.remove_link id s id' s' edges in
+    edges'
+  | Primitives.Transformation.NegativeWhatEver _ ->
+    raise
+      (ExceptionDefn.Internal_Error
+         (Locality.dummy_annot "NegativeWhatEver in positive revert"))
+  | Primitives.Transformation.PositiveInternalized ((id,_),s,_) ->
+    let _,edges' = Edges.remove_internal id s edges in
+    edges'
   | Primitives.Transformation.NegativeInternalized _ ->
     raise
       (ExceptionDefn.Internal_Error
@@ -429,10 +477,12 @@ let update_edges outputs counter domain unary_patterns inj_nodes
       (obs_from_transformation domain state.edges)
       (([],Operator.DepSet.empty),Matching.empty_cache)
       concrete_removed in
-  let (side_effects,roots_by_cc,edges_after_neg) =
+  let (side_effects,roots_by_cc,edges_after_neg),concrete_removed' =
     List.fold_left
-      (apply_negative_transformation mod_connectivity)
-      ([],(state.roots_of_unary_patterns),state.edges)
+      (fun (x,p) h ->
+         let x',h' = apply_negative_transformation mod_connectivity x h in
+       (x',List_util.cons_option h' p))
+      (([],(state.roots_of_unary_patterns),state.edges),[])
       concrete_removed in
   let () =
     List.iter
@@ -468,6 +518,47 @@ let update_edges outputs counter domain unary_patterns inj_nodes
          update_roots true unary_patterns edges''
            state.roots_of_patterns roots_by_cc' mod_connectivity pat root)
       new_obs in
+
+  if List.exists
+      (fun (cc,_) ->
+         List.exists (Pattern.is_equal_canonicals cc)
+           rule.Primitives.blacklist)
+      new_obs
+  then
+    let () =
+      List.iter
+        (fun (pat,(root,_)) ->
+           update_roots false unary_patterns edges''
+             state.roots_of_patterns roots_by_cc' mod_connectivity pat root)
+        new_obs in
+    let edges_back_pos =
+      List.fold_left
+        revert_positive_transformation edges'' concrete_inserted' in
+    let () =
+      List.iter
+        (fun (pat,(root,_)) ->
+           update_roots true unary_patterns edges_back_pos
+             state.roots_of_patterns roots_by_cc mod_connectivity pat root)
+        del_obs in
+    let edges''' =
+      List.fold_left
+        (revert_negative_transformation (Pattern.Env.signatures domain))
+        edges_back_pos concrete_removed' in
+    Forbidden
+      { outdated = false;
+        roots_of_patterns = state.roots_of_patterns;
+        roots_of_unary_patterns = state.roots_of_unary_patterns;
+        unary_candidates = state.unary_candidates;
+        nb_rectangular_instances_by_cc = state.nb_rectangular_instances_by_cc;
+        matchings_of_rule = state.matchings_of_rule;
+        variables_cache = state.variables_cache;
+        variables_overwrite = state.variables_overwrite;
+        edges = edges'''; tokens = state.tokens;
+        outdated_elements = state.outdated_elements;
+        random_state = state.random_state;
+        story_machinery = state.story_machinery; }
+  else
+
   (*Store event*)
   let new_tracked_obs_instances =
     store_obs domain edges'' state.roots_of_patterns
@@ -479,7 +570,8 @@ let update_edges outputs counter domain unary_patterns inj_nodes
 
   let rev_deps = Operator.DepSet.union
       former_deps (Operator.DepSet.union del_deps new_deps) in
-  { outdated = false;
+  Success {
+    outdated = false;
     roots_of_patterns = state.roots_of_patterns;
     roots_of_unary_patterns = roots_by_cc';
     unary_candidates = state.unary_candidates;
@@ -670,9 +762,8 @@ let apply_unary_rule
         domain rule.Primitives.connected_components inj in
     match path with
     | Some _ ->
-      Success
-        (transform_by_a_rule outputs env unary_ccs counter state'
-           event_kind ?path rule inj)
+      transform_by_a_rule outputs env unary_ccs counter state'
+        event_kind ?path rule inj
     | None ->
       let max_distance = match rule.Primitives.unary_rate with
         | None -> None
@@ -683,9 +774,8 @@ let apply_unary_rule
       match Edges.are_connected ?max_distance state.edges nodes.(0) nodes.(1) with
       | None -> Corrected
       | Some _ as path ->
-        Success
-          (transform_by_a_rule outputs env unary_ccs counter state'
-             event_kind ?path rule inj)
+        transform_by_a_rule outputs env unary_ccs counter state'
+          event_kind ?path rule inj
 
 let apply_rule
     ~outputs ?rule_id env unary_patterns counter state event_kind rule =
@@ -726,18 +816,16 @@ let apply_rule
           (Pp.array Pp.space (fun _ -> Format.pp_print_int)) roots in
     match rule.Primitives.unary_rate with
     | None ->
-      let out =
-        transform_by_a_rule outputs env unary_patterns counter
-          state event_kind rule inj in
-      Success out
+      transform_by_a_rule outputs env unary_patterns counter
+        state event_kind rule inj
     | Some (_,max_distance) ->
       match max_distance with
       | None ->
         if Edges.in_same_connected_component roots.(0) roots.(1) state.edges then
           Corrected
         else
-          Success (transform_by_a_rule outputs env unary_patterns
-                                       counter state event_kind rule inj)
+          transform_by_a_rule outputs env unary_patterns
+            counter state event_kind rule inj
       | Some dist ->
          let dist' = Some (max_dist_to_int counter state dist) in
          let nodes = Matching.elements_with_types
@@ -746,8 +834,8 @@ let apply_rule
            Edges.are_connected ?max_distance:dist' state.edges nodes.(0)
                                nodes.(1) with
          | None ->
-            Success (transform_by_a_rule outputs env unary_patterns
-                                         counter state event_kind rule inj)
+           transform_by_a_rule outputs env unary_patterns
+             counter state event_kind rule inj
          | Some _ -> Corrected
 
 let force_rule
@@ -755,6 +843,7 @@ let force_rule
   match apply_rule
           ~outputs env unary_patterns counter state event_kind rule with
   | Success out -> out
+  | Forbidden out -> out
   | Corrected | Clash ->
     let () = assert (not state.outdated) in
     let max_distance = match rule.Primitives.unary_rate with
@@ -771,8 +860,10 @@ let force_rule
     | [] -> state
     | l ->
        let (h,_) = List_util.random state.random_state l in
-       (transform_by_a_rule
-          outputs env unary_patterns counter state event_kind rule h)
+       match transform_by_a_rule
+               outputs env unary_patterns counter state event_kind rule h
+       with (Success out | Forbidden out) -> out
+          | (Clash | Corrected) -> state
 
 let adjust_rule_instances ~rule_id store env counter state rule =
   let () = assert (not state.outdated) in

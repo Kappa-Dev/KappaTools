@@ -213,7 +213,8 @@ let initialize ~bind ~return ~outputs env counter graph0 state0 init_l =
                              counter s (Trace.INIT creations_sort)
                              compiled_rule with
                      | Rule_interpreter.Success s -> s
-                     | (Rule_interpreter.Clash | Rule_interpreter.Corrected) ->
+                     | (Rule_interpreter.Clash | Rule_interpreter.Corrected
+                       | Rule_interpreter.Forbidden _) ->
                        raise (ExceptionDefn.Internal_Error
                                 ("Bugged initial rule",pos)))
                   state value,state0))) (return (false,graph0,state0)) init_l in
@@ -359,6 +360,8 @@ let one_rule ~outputs ~maxConsecutiveClash dt env counter graph state =
         else Rule_interpreter.adjust_rule_instances
             ~rule_id register_new_activity env counter graph rule),
        state)
+  | Rule_interpreter.Forbidden graph' ->
+    (not (Counter.one_forbidden_instance_event counter dt),graph',state)
 
 let activity state = Random_tree.total state.activities
 

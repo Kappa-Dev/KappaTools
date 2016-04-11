@@ -10,7 +10,7 @@
 
 type t (**Abstract graph*)
 
-type result = Clash | Corrected | Success of t
+type result = Clash | Corrected | Forbidden of t | Success of t
 
 (** {6 Initialisation} *)
 
@@ -97,8 +97,10 @@ val apply_negative_transformation :
   (int,unit) Hashtbl.t -> (Instantiation.concrete Instantiation.site) list *
   Mods.IntSet.t Mods.IntMap.t Pattern.ObsMap.t * Edges.t ->
   Instantiation.concrete Primitives.Transformation.t ->
-  (Instantiation.concrete Instantiation.site) list *
-  Mods.IntSet.t Mods.IntMap.t Pattern.ObsMap.t * Edges.t
+  ((Instantiation.concrete Instantiation.site) list *
+   Mods.IntSet.t Mods.IntMap.t Pattern.ObsMap.t * Edges.t) *
+  Instantiation.concrete Primitives.Transformation.t option
+
 val apply_positive_transformation :
   Signature.s -> (int,unit) Hashtbl.t ->
   (Matching.t * int Mods.IntMap.t) *

@@ -318,7 +318,8 @@ let apply compil rule inj_nodes mix =
   in
   let (side_effects, dummy, edges_after_neg) =
     List.fold_left
-      (Rule_interpreter.apply_negative_transformation dummy_htbl)
+      (fun x y ->
+         fst @@ Rule_interpreter.apply_negative_transformation dummy_htbl x y)
       ([], Pattern.ObsMap.dummy Mods.IntMap.empty, mix)
       concrete_removed
   in

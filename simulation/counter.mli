@@ -32,6 +32,7 @@ val fill :
 
 val one_constructive_event : t -> float -> bool
 val one_clashing_instance_event : t -> float -> bool
+val one_forbidden_instance_event : t -> float -> bool
 val one_no_more_unary_event : t -> float -> bool
 val one_no_more_binary_event : t -> float -> bool
 val one_time_correction_event : t -> Nbr.t -> bool
