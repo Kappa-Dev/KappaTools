@@ -26,7 +26,7 @@ let do_interactive_directives
       raise (ExceptionDefn.Malformed_Decl
                (Locality.dummy_annot "Creating new link type is forbidden")) in
   let cc_preenv', e'' = Eval.compile_modifications_no_track
-      ~compileModeOn:false contact_map cc_preenv e' in
+      ~compileModeOn:false contact_map cc_preenv [||] (* TODO: add blacklists *) e' in
   let env',graph' =
     if cc_preenv == cc_preenv' then (env,graph)
     else

@@ -83,7 +83,7 @@ let tokenify ~compileModeOn contact_map domain l =
 (* transform an LKappa rule into a Primitives rule *)
 let rules_of_ast
     ?deps_machinery ~compileModeOn
-    contact_map domain ~syntax_ref short_branch_agents (rule,_) =
+    contact_map domain ~syntax_ref blacklists short_branch_agents (rule,_) =
   let domain',delta_toks =
     tokenify ~compileModeOn contact_map domain rule.LKappa.r_delta_tokens in
   (*  let one_side syntax_ref label (domain,deps_machinery,unary_ccs,acc)
@@ -135,6 +135,7 @@ let rules_of_ast
         Primitives.Transformation.fresh_bindings ~short_branch_agents pos;
       Primitives.delta_tokens = delta_toks;
       Primitives.syntactic_rule = syntax_ref;
+      Primitives.blacklist = blacklists.(syntax_ref);
       Primitives.instantiations = syntax;
     } in
   let rule_mixtures,(domain',origin') =
@@ -208,8 +209,8 @@ let cflows_of_label
   (domain',
    List.fold_left (fun x (y,t) -> adds t x (Array.map fst y)) rev_effects ccs)
 
-let rule_effect
-    ~compileModeOn contact_map domain alg_expr (mix,created,tks) mix_pos rev_effects =
+let rule_effect ~compileModeOn contact_map domain blacklist
+    alg_expr (mix,created,tks) mix_pos rev_effects =
   let ast_rule =
     { LKappa.r_mix = mix; LKappa.r_created = created;
       LKappa.r_delta_tokens = tks; LKappa.r_un_rate = None;
@@ -219,7 +220,8 @@ let rule_effect
     compile_alg ~compileModeOn contact_map domain alg_expr in
   let domain'',_,_,elem_rules =
     rules_of_ast
-      ~compileModeOn contact_map domain' ~syntax_ref:0 [] (ast_rule,mix_pos) in
+      ~compileModeOn contact_map domain' ~syntax_ref:0
+      blacklist [] (ast_rule,mix_pos) in
   let elem_rule = match elem_rules with
     | [ r ] -> r
     | _ ->
@@ -231,13 +233,13 @@ let rule_effect
 
 let effects_of_modif
     ast_algs ast_rules origin ~compileModeOn
-    contact_map (domain,rev_effects) = function
+    contact_map blacklist (domain,rev_effects) = function
   | INTRO (alg_expr, (ast_mix,mix_pos)) ->
-    rule_effect ~compileModeOn contact_map domain alg_expr
+    rule_effect ~compileModeOn contact_map domain blacklist alg_expr
       ([],LKappa.to_raw_mixture (Pattern.PreEnv.sigs domain) ast_mix,[])
       mix_pos rev_effects
   | DELETE (alg_expr, (ast_mix, mix_pos)) ->
-    rule_effect ~compileModeOn contact_map domain alg_expr
+    rule_effect ~compileModeOn contact_map domain blacklist alg_expr
       (LKappa.to_erased (Pattern.PreEnv.sigs domain) ast_mix,[],[])
       mix_pos rev_effects
   | UPDATE ((i, _), alg_expr) ->
@@ -245,7 +247,7 @@ let effects_of_modif
       compile_alg ~compileModeOn contact_map domain alg_expr in
     (domain',(Primitives.UPDATE (i, alg_pos))::rev_effects)
   | UPDATE_TOK ((tk_id,tk_pos),alg_expr) ->
-    rule_effect ~compileModeOn contact_map domain
+    rule_effect ~compileModeOn contact_map domain blacklist
       (Alg_expr.const Nbr.one)
       ([],[],
        [Locality.dummy_annot
@@ -292,10 +294,11 @@ let effects_of_modif
     (domain, (Primitives.PLOTENTRY)::rev_effects)
 
 let effects_of_modifs
-    ast_algs ast_rules origin ~compileModeOn contact_map domain l =
+    ast_algs ast_rules origin ~compileModeOn contact_map domain blacklist l =
   let domain',rev_effects =
     List.fold_left
-      (effects_of_modif ast_algs ast_rules origin ~compileModeOn contact_map)
+      (effects_of_modif
+         ast_algs ast_rules origin ~compileModeOn contact_map blacklist)
       (domain,[]) l in
   domain',List.rev rev_effects
 
@@ -303,7 +306,7 @@ let compile_modifications_no_track =
   effects_of_modifs [] [] (Operator.PERT (-1))
 
 let pert_of_result
-    ast_algs ast_rules alg_deps ~compileModeOn contact_map domain res =
+    ast_algs ast_rules alg_deps ~compileModeOn contact_map domain blacklist res =
   let (domain, out_alg_deps, _, lpert,tracking_enabled) =
     List.fold_left
       (fun (domain, alg_deps, p_id, lpert, tracking_enabled)
@@ -315,7 +318,7 @@ let pert_of_result
         let (domain, effects) =
           effects_of_modifs
             ast_algs ast_rules origin ~compileModeOn
-            contact_map domain' modif_expr_list in
+            contact_map domain' blacklist modif_expr_list in
         let domain,opt =
           match opt_post with
           | None -> (domain,None)
@@ -344,7 +347,7 @@ let pert_of_result
   in
   (domain, out_alg_deps, List.rev lpert,tracking_enabled)
 
-let inits_of_result ?rescale ~compileModeOn contact_map env preenv res =
+let inits_of_result ?rescale ~compileModeOn contact_map env preenv blacklist res =
   (*let contact_map = Model.contact_map env in*)
   let init_l,preenv' =
     List_util.fold_right_map
@@ -374,7 +377,7 @@ let inits_of_result ?rescale ~compileModeOn contact_map env preenv res =
            let preenv'',state' =
              match
                rules_of_ast ~compileModeOn contact_map
-                 preenv' ~syntax_ref:0 [] (fake_rule,mix_pos)
+                 preenv' ~syntax_ref:0 blacklist [] (fake_rule,mix_pos)
              with
              | domain'',_,_,[ compiled_rule ] ->
                (fst alg',compiled_rule,mix_pos),domain''
@@ -394,7 +397,7 @@ let inits_of_result ?rescale ~compileModeOn contact_map env preenv res =
            } in
            match
              rules_of_ast
-               ~compileModeOn contact_map preenv ~syntax_ref:0 []
+               ~compileModeOn contact_map preenv ~syntax_ref:0 blacklist []
                (Locality.dummy_annot fake_rule)
            with
            | domain'',_,_,[ compiled_rule ] ->
@@ -427,14 +430,38 @@ let short_branch_agents contact_map =
     else aux (List_util.rev_map_append fst oui' oui) non' in
   aux [] (Tools.array_fold_lefti (fun ag acc s -> (ag,s)::acc) [] contact_map)
 
-let compile_rules alg_deps ~compileModeOn contact_map domain rules =
+let compile_constraints
+    ~compileModeOn contact_map domain ast_rules constraints =
+  let out = Array.make (Array.length ast_rules + 1) [] in
+  let domain' =
+    List.fold_left
+      (fun domain (rl,(mix,pos)) ->
+         let domain',ccs =
+           Snip.connected_components_sum_of_ambiguous_mixture
+             ~compileModeOn contact_map domain ~origin:(Operator.PERT(-1)) mix in
+         let glue l =
+           List_util.rev_map_append (function
+               | [|cc,_|], _ -> cc
+               | _, _ ->
+                 raise (ExceptionDefn.Malformed_Decl
+                          ("Disconnected forbiden pattern",pos)))
+             ccs l in
+         let () = match rl with
+           | [] ->
+             Array.iteri (fun i x -> out.(i) <- glue x) out
+           | _ ->
+             List.iter (fun (i,_) -> out.(i) <- glue out.(i)) rl in
+         domain') domain constraints in
+  domain',out
+
+let compile_rules alg_deps ~compileModeOn contact_map domain blacklist rules =
   let short_branch_agents = short_branch_agents contact_map in
   match
     List.fold_left
       (fun (domain,syntax_ref,deps_machinery,unary_cc,acc) (_,rule) ->
          let (domain',origin',extra_unary_cc,cr) =
            rules_of_ast ?deps_machinery ~compileModeOn contact_map domain
-             ~syntax_ref short_branch_agents rule in
+             ~syntax_ref blacklist short_branch_agents rule in
          (domain',succ syntax_ref,origin',
           Pattern.Set.union unary_cc extra_unary_cc,
           List.append cr acc))
@@ -495,9 +522,13 @@ let compile ~outputs ~pause ~return ~max_sharing ~compileModeOn
 
   pause @@ fun () ->
   outputs (Data.Log "\t -rules");
+  let ast_rules = Array.of_list result.Ast.rules in
+  let preenv',blacklists =
+    compile_constraints
+      ~compileModeOn contact_map preenv' ast_rules result.Ast.constraints in
   let (preenv',alg_deps',compiled_rules,cc_unaries) =
     compile_rules
-      alg_deps ~compileModeOn contact_map preenv' result.Ast.rules in
+      alg_deps ~compileModeOn contact_map preenv' blacklists result.Ast.rules in
   let rule_nd = Array.of_list compiled_rules in
 
   pause @@ fun () ->
@@ -505,7 +536,7 @@ let compile ~outputs ~pause ~return ~max_sharing ~compileModeOn
   let (preenv,alg_deps'',pert,has_tracking) =
     pert_of_result
       result.variables result.rules alg_deps' ~compileModeOn
-      contact_map preenv' result in
+      contact_map preenv' blacklists result in
 
   pause @@ fun () ->
   outputs (Data.Log "\t -observables");
@@ -529,7 +560,7 @@ let compile ~outputs ~pause ~return ~max_sharing ~compileModeOn
   pause @@ fun () ->
   let _,init_l =
     inits_of_result
-      ?rescale:rescale_init ~compileModeOn contact_map env preenv result in
+      ?rescale:rescale_init ~compileModeOn contact_map env preenv blacklists result in
   return (env,has_tracking,init_l)
 
 let build_initial_state

@@ -142,6 +142,7 @@ rule token = parse
 		| "obs" -> OBS
 		| "def" -> CONFIG
 		| "token" -> TOKEN
+		| "blacklist" -> BLACKLIST
 		| _ as s ->
 		   raise (ExceptionDefn.Syntax_Error
 		   ("Instruction \""^s^"\" not recognized",

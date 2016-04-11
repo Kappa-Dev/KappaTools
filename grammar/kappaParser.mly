@@ -19,7 +19,7 @@
 %token SQRT EXPONENT INFINITY TIME EVENT NULL_EVENT PIPE EQUAL AND OR
 %token GREATER SMALLER TRUE FALSE DIFF KAPPA_RAR KAPPA_LRAR KAPPA_LNK
 %token SIGNATURE INIT LET PLOT PERT OBS TOKEN CONFIG KAPPA_WLD KAPPA_SEMI
-%token FLUX ASSIGN PRINTF STOP SNAPSHOT RUN THEN ELSE
+%token FLUX ASSIGN PRINTF STOP SNAPSHOT RUN THEN ELSE BLACKLIST
 %token <int> INT
 %token <string> ID
 %token <string> KAPPA_MRK LABEL
@@ -90,6 +90,8 @@ start_rule:
 		      | Ast.CONFIG (param_name,value_list) ->
 			 {r with
 			  Ast.configurations = (param_name,value_list)::r.Ast.configurations}
+		      | Ast.CONSTRAINT (rl,mix) ->
+			 {r with Ast.constraints = (rl,mix)::r.Ast.constraints}
 		  }
     | error
 	{raise (ExceptionDefn.Syntax_Error (add_pos "Syntax error"))}
@@ -148,6 +150,7 @@ instruction:
 	      (fun f -> Format.pp_print_string
 			  f "use the 'repeat ... until' construction");
 	    Ast.PERT (add_pos ($2,$4,Some $6))}
+    | BLACKLIST label_list non_empty_mixture {Ast.CONSTRAINT ($2,($3,rhs_pos 3))}
     ;
 
 init_declaration:
@@ -277,6 +280,10 @@ rule_label:
     | LABEL
 	{Some (add_pos $1)}
     ;
+
+label_list:
+  /*empty*/ {[]}
+  | LABEL label_list { ($1,rhs_pos 1) :: $2 }
 
 lhs_rhs:
   mixture token_expr {($1,$2)};

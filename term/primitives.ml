@@ -144,6 +144,7 @@ type elementary_rule = {
   delta_tokens : (Alg_expr.t Locality.annot * int) list;
   syntactic_rule : int;
   (** [0] means generated for perturbation. *)
+  blacklist : Pattern.id list;
   instantiations : Instantiation.abstract Instantiation.event;
 }
 
@@ -257,6 +258,7 @@ let map_expr_rule f x = {
   fresh_bindings = x.fresh_bindings;
   delta_tokens = List.map (fun (x,t) -> (f x,t)) x.delta_tokens;
   syntactic_rule = x.syntactic_rule;
+  blacklist = x.blacklist;
   instantiations = x.instantiations;
 }
 

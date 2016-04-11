@@ -22,7 +22,7 @@ val compile_bool:
 
 val compile_modifications_no_track:
   compileModeOn:bool -> Contact_map.t -> Pattern.PreEnv.t ->
-  (LKappa.rule_mixture, int) Ast.modif_expr list ->
+  Pattern.id list array -> (LKappa.rule_mixture, int) Ast.modif_expr list ->
   Pattern.PreEnv.t * Primitives.modification list
 
 val compile :
