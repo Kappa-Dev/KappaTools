@@ -22,16 +22,17 @@ let local_trace = false
 module Domain =
 struct
 
-  type local_static_information =
+  (*remove it*)
+  (*type local_static_information =
     {
       bond_rhs : Ckappa_sig.PairAgentSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
       bond_lhs : Ckappa_sig.PairAgentSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t
-    }
+    }*)
 
   type static_information =
     {
       global_static_information : Analyzer_headers.global_static_information;
-      local_static_information  : local_static_information
+      (*local_static_information  : local_static_information*)
     }
    
   type local_dynamic_information = 
@@ -59,32 +60,20 @@ struct
   let get_kappa_handler static = lift Analyzer_headers.get_kappa_handler static
 
   let get_compil static = lift Analyzer_headers.get_cc_code static
+    
+  let get_bond_rhs static = lift Analyzer_headers.get_bonds_rhs static
 
-  let get_local_static_information static = static.local_static_information
+  let get_bond_lhs static = lift Analyzer_headers.get_bonds_lhs static
 
-  let set_local_static_information local static =
+  let set_bond_rhs bonds static =
     {
-      static with
-        local_static_information = local
+      global_static_information = Analyzer_headers.set_bonds_rhs bonds static
     }
 
-  let get_bond_rhs static = (get_local_static_information static).bond_rhs
-
-  let set_bond_rhs bond static =
-    set_local_static_information
-      {
-        (get_local_static_information static) with
-          bond_rhs = bond
-      } static
-
-  let get_bond_lhs static = (get_local_static_information static).bond_lhs
-
-  let set_bond_lhs bond static =
-    set_local_static_information
-      {
-        (get_local_static_information static) with
-          bond_lhs = bond
-      } static
+  let set_bond_lhs bonds static =
+    {
+      global_static_information = Analyzer_headers.set_bonds_lhs bonds static
+    }
 
   (*--------------------------------------------------------------------*)
   (** dynamic information*)
@@ -143,157 +132,12 @@ struct
       in
       error, (agent_type1, state1) 
 
-  let add_link_set parameter error rule_id (x, y) store_result =
-    let error, old_set =
-      match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error 
-        rule_id store_result
-      with
-      | error, None -> error, Ckappa_sig.PairAgentSiteState_map_and_set.Set.empty
-      | error, Some p -> error, p
-    in
-    let error', set = 
-      Ckappa_sig.PairAgentSiteState_map_and_set.Set.add_when_not_in
-        parameter error 
-        (x, y)
-        old_set
-    in    
-    let error = Exception.check warn parameter error error' (Some "line 246") Exit in
-    let error'', union_set =
-      Ckappa_sig.PairAgentSiteState_map_and_set.Set.union parameter error set old_set 
-    in
-    let error = Exception.check warn parameter error error'' (Some "line 250") Exit in
-    let error, store_result =
-      Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite parameter error rule_id union_set store_result
-    in
-    error, store_result
-
-  let collect_bonds parameter error rule_id bonds views store_result =
-    let error, store_result =
-      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
-        parameter error
-        (fun parameter error agent_id bonds_map store_result ->
-          let error, store_result =
-            Ckappa_sig.Site_map_and_set.Map.fold
-              (fun site_type_source site_add (error, store_result) ->
-                let agent_index_target = site_add.Cckappa_sig.agent_index in
-                let site_type_target = site_add.Cckappa_sig.site in
-                let error, agent_source =
-                  match Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-                    parameter error agent_id views
-                  with
-                  | error, None -> warn parameter error (Some "line 271") Exit
-                    Cckappa_sig.Ghost
-                  | error, Some agent -> error, agent
-                in
-                let error, agent_target =
-                  match Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-                    parameter error agent_index_target views
-                  with
-                  | error, None -> warn parameter error (Some "line 279") Exit
-                    Cckappa_sig.Ghost
-                  | error, Some agent -> error, agent
-                in
-                let error, (agent_type1, state1) =
-                  collect_agent_type_state
-                    parameter
-                    error
-                    agent_source
-                    site_type_source
-                in
-                let error, (agent_type2, state2) =
-                  collect_agent_type_state
-                    parameter
-                    error
-                    agent_target
-                    site_type_target
-                in
-                let pair = ((agent_type1, site_type_source, state1),
-                            (agent_type2, site_type_target, state2)) 
-                in
-                let error, store_result =
-                  add_link_set parameter error rule_id pair store_result 
-                in
-                error, store_result
-              ) bonds_map (error, store_result)
-          in
-          error, store_result
-        ) bonds store_result
-    in
-    error, store_result
-
-   (*collect bonds lhs*)
-  let collect_bonds_rhs parameter error rule_id rule store_result =
-    let views = rule.Cckappa_sig.rule_rhs.Cckappa_sig.views in
-    let bonds = rule.Cckappa_sig.rule_rhs.Cckappa_sig.bonds in
-    let error, store_result =
-      collect_bonds 
-        parameter 
-        error
-        rule_id
-	bonds
-	views
-	store_result
-    in
-    error, store_result
-
-  let collect_bonds_lhs parameter error rule_id rule store_result =
-    let views = rule.Cckappa_sig.rule_lhs.Cckappa_sig.views in
-    let bonds = rule.Cckappa_sig.rule_lhs.Cckappa_sig.bonds in
-    let error, store_result =
-      collect_bonds parameter error rule_id bonds views store_result
-    in
-    error, store_result
-
-  (**************************************************************************)
-
-  let scan_rule_set static dynamic error =
-    let parameter = get_parameter static in
-    let compil = get_compil static in
-    let error, static =
-      Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
-        parameter
-        error
-        (fun parameter error rule_id rule static ->
-          let store_rhs = get_bond_rhs static in
-          (*bond rhs*)
-          let error, store_rhs =
-            collect_bonds_rhs
-              parameter
-              error
-              rule_id
-              rule.Cckappa_sig.e_rule_c_rule
-              store_rhs
-          in
-          let static = set_bond_rhs store_rhs static in
-          (*bond lhs*)
-          let store_lhs = get_bond_lhs static in
-          let error, store_lhs =
-            collect_bonds_lhs
-              parameter
-              error
-              rule_id
-              rule.Cckappa_sig.e_rule_c_rule
-              store_lhs
-          in
-          let static = set_bond_lhs store_lhs static in
-          error, static
-        ) compil.Cckappa_sig.rules static
-    in
-    error, static, dynamic
-
   (**************************************************************************)
 
   let initialize static dynamic error =
-    let init_domain_static =
-      {
-        bond_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
-        bond_lhs = Ckappa_sig.Rule_map_and_set.Map.empty;
-      }
-    in
     let init_global_static_information =
       {
         global_static_information = static;
-        local_static_information  = init_domain_static
       }
     in
     let init_local =
@@ -308,10 +152,7 @@ struct
         global = dynamic
       }
     in
-    let error, static, dynamic =
-      scan_rule_set init_global_static_information init_global_dynamic_information error
-    in
-    error, static, dynamic
+    error, init_global_static_information, init_global_dynamic_information
 
   (**************************************************************************)
 

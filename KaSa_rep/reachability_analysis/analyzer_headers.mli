@@ -81,6 +81,24 @@ val set_potential_side_effects:
   global_static_information ->
   global_static_information
 
+val get_bonds_rhs : 
+  global_static_information ->
+  Ckappa_sig.PairAgentSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t
+     
+val set_bonds_rhs :
+  Ckappa_sig.PairAgentSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t ->
+  global_static_information ->
+  global_static_information
+
+val get_bonds_lhs : 
+  global_static_information ->
+  Ckappa_sig.PairAgentSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t
+
+val set_bonds_lhs :
+  Ckappa_sig.PairAgentSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t ->
+  global_static_information ->
+  global_static_information
+
 val compute_initial_state:
   Exception.method_handler ->
   global_static_information ->

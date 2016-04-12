@@ -138,6 +138,28 @@ let set_potential_side_effects eff static =
     }
     static
 
+let get_bonds_rhs static =
+  (get_bdu_common_static static).Common_static.store_bonds_rhs
+    
+let set_bonds_rhs bonds static =
+  set_bdu_common_static
+    {
+      (get_bdu_common_static static) with
+        Common_static.store_bonds_rhs = bonds
+    }
+    static
+
+let get_bonds_lhs static =
+  (get_bdu_common_static static).Common_static.store_bonds_lhs
+    
+let set_bonds_lhs bonds static =
+  set_bdu_common_static
+    {
+      (get_bdu_common_static static) with
+        Common_static.store_bonds_lhs = bonds
+    }
+    static
+
 let compute_initial_state error static =
   let parameter = get_parameter static in
   let compil = get_cc_code static in
