@@ -7,15 +7,6 @@ function observable_plot(configuration){
 	         , "observableMap" : new Object() };
 
     this.setPlot = function(plot){
-	// http://stackoverflow.com/questions/22395357/how-to-compare-two-arrays-are-equal-using-javascript-or-jquery
-	var is_same = function(array1,array2){
-	    (array1.length == array2.length) && array1.every(function(element, index) {
-		return element === array2[index];
-	    });};
-	var is_same = function(array1,array2){
-	    var result = JSON.stringify(array1)==JSON.stringify(array2);
-	    return result;
-	};
 	if(!is_same(that.state.plot.legend,plot.legend)){
 	    var callback = function(acc, value, index) {
 		acc[value] = index;
@@ -29,6 +20,7 @@ function observable_plot(configuration){
 	}
 	that.state.plot = plot;
 	that.renderPlot();
+	that.renderLabel();
     }
     this.getPlot = function() {
 	return that.state.plot;
@@ -87,7 +79,6 @@ function observable_plot(configuration){
 	return filename;
     }
     this.setPlotName = function(plotName){ that.plotName = plotName; }
-    this.cssTextToken = "/* stylesheet : a5f23ffb-e635-435c-ae44-c10779c2a843 */";
 
     this.renderPlot = function(){
 	var margin = {top: 20, right: 80, bottom: 30, left: 80},
@@ -115,7 +106,7 @@ function observable_plot(configuration){
 	    .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-	var svgDefs = svg.append('defs').append("style").attr("type","text/css").text(that.cssTextToken);
+	var svgDefs = createSVGDefs(svg);
 
 	var plot = that.getPlot();
 	var color = d3.scale.category10();
@@ -186,7 +177,8 @@ function observable_plot(configuration){
             .text(function(d) { return d; });
 	}
 
-	// label
+    };
+    this.renderLabel = function(){
 	if(configuration.plotLabelDivId){
 	    var length = that.state.plot.observables.length;
 	    if (that.state.plot && length > 1){
@@ -196,8 +188,8 @@ function observable_plot(configuration){
 		d3.select("#"+configuration.plotLabelDivId).html(label);
 	    }
 	}
+    }
 
-    };
     this.save = function(data,mime,filename){
 	var blob = new Blob([data], {type: mime });
 	var url = window.URL.createObjectURL(blob);
@@ -216,63 +208,25 @@ function observable_plot(configuration){
         	                                               row = row.concat(d["values"]);
 							       return row.join("\t") }).join("\n");
 	      var tsv = header+"\n"+body;
-	      that.save(tsv,"text/tab-separated-values",that.getPlotName(".tsv"));
+	      saveFile(tsv,"text/tab-separated-values",that.getPlotName(".tsv"));
 	} catch (e) {
 	    alert(e);
 	}
     }
     this.handlePlotSVG = function(){
-	try { var html = d3.select("#"+that.configuration.plotDivId)
-		           .select("svg")
-	                   .attr("title", "kappa plot")
-	                   .attr("version", 1.1)
-	                   .attr("xmlns", "http://www.w3.org/2000/svg")
-	                   .node().parentNode.innerHTML;
-	      var style = (that.configuration.plotStyleId)?
-            	          d3.select("#"+that.configuration.plotStyleId).text():"";
-	      style = "<![CDATA["+style+"]]>";
-	      html = html.replace(that.cssTextToken,style);
-	      that.save(html,"image/svg+xml",that.getPlotName(".svg"));
-	} catch (e) {
-	    alert(e);
-	}
+	plotSVG(that.configuration.plotDivId
+	       ,"kappa plot"
+	       ,that.getPlotName(".svg")
+	       ,that.configuration.plotStyleId);
     }
     this.handlePlotPNG = function(){
-	try { var html = d3.select("#"+that.configuration.plotDivId)
-		           .select("svg")
-	                   .attr("title", "kappa plot")
-	                   .attr("version", 1.1)
-	                   .attr("xmlns", "http://www.w3.org/2000/svg")
-	                   .node().parentNode.innerHTML;
-	      var style = (that.configuration.plotStyleId)?
-            	          d3.select("#"+that.configuration.plotStyleId).text():"";
-	      style = "<![CDATA["+style+"]]>";
-	      html = html.replace(that.cssTextToken,style);
-	      var imgsrc = 'data:image/svg+xml;base64,'+ btoa(html);
-	      var canvas = document.createElement("canvas");
-	      canvas.width = that.getDimensions().width; // get original canvas width
-	      canvas.height = that.getDimensions().height; //get original canvas height
-	      var context = canvas.getContext("2d");
-	      var image = new Image(canvas.width, canvas.height);
-	      image.src = imgsrc;
-	      image.onload = function() {
-		  context.drawImage(image, 0, 0, canvas.width, canvas.height);
-		  var canvasdata = canvas.toDataURL("image/png");
-		  var a = document.createElement("a");
-		  a.style = "display: none";
-		  document.body.appendChild(a);
-		  a.download = that.getPlotName(".png");
-		  a.href = canvasdata;
-		  a.click();
-		  document.body.removeChild(a);
-		  document.body.removeChild(image);
-	      };
-	} catch (e) {
-	    alert(e);
-	}
+	plotPNG(that.configuration.plotDivId
+	       ,"kappa plot"
+	       ,that.getPlotName(".png")
+	       ,that.configuration.plotStyleId);
     }
 
-    this.add_handlers = function(){
+    this.addHandlers = function(){
 	if(configuration.plotSVGButtonId){
 	    d3.select("#"+that.configuration.plotSVGButtonId).on("click",function() { that.handlePlotSVG()});
 	}
@@ -312,6 +266,7 @@ function observable_plot(configuration){
 		if (that.getSelected(observable)) {box.setAttribute("checked","")};
 		box.addEventListener("change",function () { that.setSelected(observable,box.checked);
 							    that.renderPlot();
+							    that.renderLabel();
 							  });
 		boxbox.appendChild(box);
 		boxbox.appendChild(document.createTextNode(observable));
@@ -321,8 +276,10 @@ function observable_plot(configuration){
 	}
     }
     this.render = function(){
-	this.renderControls();
+	that.renderControls();
 	that.renderPlot();
+	that.renderLabel();
+
     };
-    this.add_handlers();
+    this.addHandlers();
 }

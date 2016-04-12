@@ -104,6 +104,8 @@ let html_of_flux flux =
           Format.fprintf f "Rules self influence@]@,</label>@]@,</form>@," in
 	let () = Format.fprintf f "<form id=\"menu\"></form>@," in
         let () = Format.fprintf
+                   f "@[<v 2><script>@,%s@,</script>@]@," Resource_strings.common_js in
+        let () = Format.fprintf
                    f "@[<v 2><script>@,%s@,</script>@]@," Resource_strings.flux_js in
 
         let () = Format.fprintf

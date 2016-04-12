@@ -39,3 +39,32 @@ let jquery_on (selector : string)
     [| Js.Unsafe.inject (Js.string selector);
        Js.Unsafe.inject (Js.string event);
        Js.Unsafe.inject handler |]
+
+let option_string (id : string option) =
+  match id with
+    Some id -> Js.some (Js.string id)
+  | None -> Js.null
+
+let plotPNG (plotDivId : string)
+	    (title:string)
+	    (plotName : string)
+  	    (plotStyleId : string option) =
+  Js.Unsafe.fun_call
+    (Js.Unsafe.js_expr "plotPNG")
+    [| Js.Unsafe.inject (Js.string plotDivId);
+       Js.Unsafe.inject (Js.string title);
+       Js.Unsafe.inject (Js.string plotName);
+       Js.Unsafe.inject (option_string plotStyleId)
+      |]
+
+let plotSVG (plotDivId : string)
+	    (title:string)
+	    (plotName : string)
+	    (plotStyleId : string option) =
+  Js.Unsafe.fun_call
+    (Js.Unsafe.js_expr "plotSVG")
+    [| Js.Unsafe.inject (Js.string plotDivId);
+       Js.Unsafe.inject (Js.string title);
+       Js.Unsafe.inject (Js.string plotName);
+       Js.Unsafe.inject (option_string plotStyleId)
+      |]

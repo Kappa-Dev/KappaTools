@@ -1,13 +1,22 @@
 "use strict"
 
-function fluxMap(ids) {
+function fluxMap(configuration) {
     var that = this;
-    this.ids = ids;
+    this.configuration = configuration;
     this.selfInfluence = false;
+    this.flux = { "bioBeginTime" : 0.0, "bioEndTime" : 0.0,
+		  "rules" : [],
+		  "hits" : [],
+		  "fluxs" : [] };
 
     this.setFlux = function(flux){
-        that.flux = flux;
-        that.selectedRules = flux.rules.map(function (v,i) {return (i !== 0);});
+	if(!is_same(that.flux.rules,flux.rules)){
+	    that.selectedRules = flux.rules.map(function (v,i) {return (i !== 0);});
+	    that.flux = flux;
+            that.render_controls();
+	} else {
+	    that.flux = flux;
+	}
         that.render();
     };
 
@@ -25,7 +34,7 @@ function fluxMap(ids) {
     };
 
     this.pointValue = function(i,j,e) {
-        var correction = document.getElementById(that.ids.selectCorrectionId).value;
+        var correction = document.getElementById(that.configuration.selectCorrectionId).value;
         if (that.selfInfluence || i !== j)
         {   if (correction === "hits")
             {return (that.flux.hits[i] === 0.) ? 0 : Math.abs(e) / that.flux.hits[i];}
@@ -52,12 +61,12 @@ function fluxMap(ids) {
                                    {return a.map(function (x) {return (x < 0) ? "#FF0000" : "#00FF00";})
                                     .filter(that.filterRules);}).filter(that.filterRules);
         var chord = d3.layout.chord().padding(.01).matrix(matrix);
-        var width = ids.width?ids.width:960,
-            height = ids.height?ids.height:700,
+        var width = configuration.width?configuration.width:960,
+            height = configuration.height?configuration.height:700,
             innerRadius = Math.min(width, height) * .37;
         var arc = d3.svg.arc().innerRadius(innerRadius)
             .outerRadius(innerRadius + 8);
-        var svg_element = (that.ids.svgId)?d3.select("#"+that.ids.svgId):d3.select("body").select("svg");
+        var svg_element = (that.configuration.svgId)?d3.select("#"+that.configuration.svgId):d3.select("body").select("svg");
         var svg = svg_element.attr("width", width)
                   .attr("height", height).select("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
         svg.selectAll("*").remove();
@@ -106,7 +115,7 @@ function fluxMap(ids) {
         that.drawDIM();
     };
     this.render_controls = function(){
-        var rulesCheckboxes = document.getElementById(that.ids.rulesCheckboxesId);
+        var rulesCheckboxes = document.getElementById(that.configuration.rulesCheckboxesId);
         while (rulesCheckboxes.hasChildNodes()){
             rulesCheckboxes.removeChild(rulesCheckboxes.lastChild);
         };
@@ -127,19 +136,28 @@ function fluxMap(ids) {
     };
 
     this.render_labels = function(){
-        d3.select("#"+that.ids.beginTimeId).text(that.flux.bioBeginTime);
-        d3.select("#"+that.ids.endTimeId).text(that.flux.bioEndTime);
-        d3.select("#"+that.ids.nbEventsId).text(that.flux.hits.reduce(function (acc,v) {return acc + v;},0));
+        d3.select("#"+that.configuration.beginTimeId).text(that.flux.bioBeginTime);
+        d3.select("#"+that.configuration.endTimeId).text(that.flux.bioEndTime);
+        d3.select("#"+that.configuration.nbEventsId).text(that.flux.hits.reduce(function (acc,v) {return acc + v;},0));
 
     };
     this.add_handlers = function(){
-        d3.select("#"+that.ids.selectCorrectionId).on("change",function() { that.drawDIM()});
-        d3.select("#"+that.ids.checkboxSelfInfluenceId).on("click",function() { that.toggleSelfInfluence()});
+        d3.select("#"+that.configuration.selectCorrectionId).on("change",function() { that.drawDIM()});
+        d3.select("#"+that.configuration.checkboxSelfInfluenceId).on("click",function() { that.toggleSelfInfluence()});
     };
+
+    this.exportJSON = function(filename){
+	try { var json = JSON.stringify(that.flux);
+	      saveFile(json,"application/json",filename);
+	} catch (e) {
+	    alert(e);
+	}
+    }
+
     this.render = function() {
         that.render_labels();
-        that.render_controls();
         that.render_other();
-        that.add_handlers();
     };
+    that.add_handlers();
+
 }

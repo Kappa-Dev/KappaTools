@@ -58,11 +58,10 @@ let create_data ~(flux_begin_time : float)
   data
 
 class type flux_map = object
-                  end
-let create_flux_map (configuration : flux_configuration Js.t)
-                    (data : flux_data Js.t) : flux_map Js.t =
-  let fluxmap = Js.Unsafe.new_obj (Js.Unsafe.variable "fluxMap")
-                                  [| Js.Unsafe.inject configuration ;
-                                     Js.Unsafe.inject data |]
-  in
-  fluxmap##setFlux(data)
+			method exportJSON  : Js.js_string Js.t -> unit Js.meth
+			method setFlux : flux_data Js.t -> unit Js.meth
+                      end;;
+
+let create_flux_map (configuration : flux_configuration Js.t) : flux_map Js.t =
+  Js.Unsafe.new_obj (Js.Unsafe.variable "fluxMap")
+                    [| Js.Unsafe.inject configuration |]

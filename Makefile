@@ -57,8 +57,8 @@ generated/WebMessage_t.ml: js/WebMessage.atd generated
 generated/WebMessage_j.ml: js/WebMessage.atd generated
 	atdgen -j -j-std -o generated/WebMessage js/WebMessage.atd
 
-$(RESOURCE): shared/flux.js shared/plot.js
-	./dev/generate-string.sh $<  > $@
+$(RESOURCE): shared/flux.js shared/plot.js shared/common.js
+	./dev/generate-string.sh $^  > $@
 
 $(VERSION): main/version.ml.skel $(wildcard .git/refs/heads/*) generated
 	sed -e s/'\(.*\)\".*tag: \([^,\"]*\)[,\"].*/\1\"\2\"'/g $< | \
@@ -94,14 +94,13 @@ site/WebWorker.js: WebWorker.byte
 test:
 	cat js/no-cdn.html | sed s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g > site/index.html
 
-site/index.html: site js/no-cdn.html js/use-cdn.html site/JsSim.js site/WebWorker.js js/*.js js/favicon.ico js/*.css
+site/index.html: site js/no-cdn.html js/use-cdn.html site/JsSim.js site/WebWorker.js js/*.js shared/*.js js/favicon.ico js/*.css
 ifeq ($(NO_CDN),1)
 	cat js/no-cdn.html | sed "s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g" > site/index.html
 else
 	cat js/use-cdn.html | sed "s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g" > site/index.html
 endif
-	cp shared/flux.js site/flux.js
-	cp shared/plot.js site/plot.js
+	cp shared/*.js site
 	cp -f js/*.js js/*.css js/favicon.ico site
 
 JsSim.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(GENERATED)
