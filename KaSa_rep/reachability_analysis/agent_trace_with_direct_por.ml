@@ -67,6 +67,7 @@ type intensional_set_of_transitions =
     creation: Ckappa_sig.Views_bdu.mvbdu;
     degradation: Ckappa_sig.Views_bdu.mvbdu;
     reachables: Ckappa_sig.Views_bdu.mvbdu;
+    mvbdu_default_value: Ckappa_sig.Views_bdu.mvbdu;
   }
 
 type extensional_representation =
@@ -107,6 +108,8 @@ let dummy_state = Ckappa_sig.state_index_of_int (-1)
 let empty_transition parameter handler error mvbdu =
    let error, handler, sites = Ckappa_sig.Views_bdu.variables_list_of_mvbdu parameter handler error mvbdu in
    let error, handler, ext_list =  Ckappa_sig.Views_bdu.extensional_of_variables_list parameter handler error sites in
+   let def_list = List.rev_map (fun i -> (i,Ckappa_sig.state_index_of_int 0)) ext_list in
+   let error, handler, mvbdu_default_value = mvbdu_of_reverse_order_association_list parameter handler error def_list in
    let max_site = List.fold_left (fun n i -> max n (Ckappa_sig.int_of_site_name i)) 0 ext_list in
    let max_site = max_site +1 in
    let n = max_site in
@@ -145,7 +148,8 @@ let empty_transition parameter handler error mvbdu =
      forward_transitions = mvbdu_false;
      backward_transitions = mvbdu_false;
      degradation = mvbdu_false;
-     creation = mvbdu_false
+     creation = mvbdu_false;
+     mvbdu_default_value = mvbdu_default_value ;
    }
 
 let empty_transition_system n mvbdu_false =
@@ -907,11 +911,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 		       error, (handler, intensional)
 		     else
 		       let mvbdu' = mvbdu in
-		       let r_id',ag_id' = convert_label (r_id,ag_id) in
-		       let label_update = [intensional.site_rule_id,r_id';intensional.site_agent_id,ag_id'] in
-		       let error, handler, label_update =
-			 mvbdu_of_association_list parameter handler error label_update
-		       in
+		       let error, handler, label_update = mvbdu_of_label parameter handler error intensional (r_id,ag_id) in
 		       let error, handler, modif_list_creation, modif_list =
 			 List.fold_left
 			   (fun
@@ -955,16 +955,15 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 		       with
 		       | None ->
 			  begin
-			    let error, handler, update =
-			      Ckappa_sig.Views_bdu.build_association_list parameter handler error modif_list_creation
-			    in
-			
-			    let error, handler, mvbdu =
-			      Ckappa_sig.Views_bdu.mvbdu_redefine parameter handler error mvbdu update
-			    in
-			    let error, handler, intensional =
-			      add_creation parameter handler error r_id ag_id mvbdu intensional
-			    in
+			     let error, handler, update =
+			       Ckappa_sig.Views_bdu.build_association_list parameter handler error modif_list_creation
+			     in
+			     let error, handler, mvbdu =
+			      Ckappa_sig.Views_bdu.mvbdu_redefine parameter handler error intensional.mvbdu_default_value update
+			     in
+			     let error, handler, intensional =
+			       add_creation parameter handler error r_id ag_id mvbdu intensional
+			     in
 			    error,(handler,intensional)
 			  end
 		       | Some test ->
@@ -1159,21 +1158,6 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 	     rules
 	     (handler, intensional)
 	 in
-	 (*let _ = Printf.fprintf stdout "FORWARD \n" in
-	 let g parameter handler error x = 
-	   let error, handler, x = Ckappa_sig.Views_bdu.extensional_of_mvbdu parameter handler error x in
-	   List.iter
-	     (fun asso -> 
-	       let _ =
-		 List.iter 
-		   (fun (a,b) -> Printf.fprintf stdout "%i,%i;" (Ckappa_sig.int_of_site_name a) (Ckappa_sig.int_of_state_index b)) asso
-	       in
-	       Printf.fprintf stdout "\n")
-	     x
-	 in
-	 let _ = g parameter handler error intensional.forward_transitions in
-	 let _ = Printf.fprintf stdout "BACKWARD \n" in
-	 let _ = g parameter handler error intensional.backward_transitions in*)
 	 let error =
 	   begin (* losange reduction *)
 	     let error, mvbdu = error, intensional.creation in
