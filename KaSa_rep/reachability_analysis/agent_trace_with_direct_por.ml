@@ -20,7 +20,16 @@ let allow_losange_reduction = true
 let warn parameters mh message exn default =
      Exception.warn parameters mh (Some "Agent_trace.ml") message exn (fun () -> default)
 
-type label = Ckappa_sig.c_rule_id * Ckappa_sig.c_agent_id
+type fst_label =
+  Rule of Ckappa_sig.c_rule_id
+| Init of int
+type label = fst_label * Ckappa_sig.c_agent_id
+
+let int_of_fst_label i =
+  match i with
+  | Rule r -> Ckappa_sig.int_of_rule_id r
+  | Init i -> -(i+1)
+			   
 module Label =
   Map_wrapper.Make
     (SetMap.Make
@@ -169,7 +178,12 @@ let add_edge r_id ag_id q q' _ transition_system =
   {transition_system with edges = (q,(r_id,ag_id),q')::transition_system.edges}
 
 let convert_label (r,a) =
-  (Ckappa_sig.state_index_of_int (Ckappa_sig.int_of_rule_id r),Ckappa_sig.state_index_of_int (Ckappa_sig.int_of_agent_id a))
+  let fst =
+    match r with Rule r ->
+      (Ckappa_sig.int_of_rule_id r)
+	       | Init i -> -(i+1)
+  in
+  Ckappa_sig.state_index_of_int fst,Ckappa_sig.state_index_of_int (Ckappa_sig.int_of_agent_id a)
 let mvbdu_of_label parameter handler error intensional (r,a) =
   let (r,a) = convert_label (r,a) in
   let asso = [intensional.site_agent_id,a;intensional.site_rule_id,r] in
@@ -297,7 +311,13 @@ let translate_gen f parameter error handler site_rid site_agid list internal out
     list
   with
   | (y,y')::(x,x')::l when x=internal.site_agent_id && y = internal.site_rule_id ->
-     let label = Ckappa_sig.rule_id_of_int (Ckappa_sig.int_of_state_index y'),
+     let y' = Ckappa_sig.int_of_state_index y' in
+     let r_id =
+       if y'<0
+       then Init (-(y'+1))
+       else Rule (Ckappa_sig.rule_id_of_int y')
+     in
+     let label = r_id,
 		 Ckappa_sig.agent_id_of_int (Ckappa_sig.int_of_state_index x') in
      let asso = f l in
      let error, handler, mvbdu = mvbdu_of_association_list parameter handler error asso in
@@ -309,7 +329,13 @@ let get_label parameter error handler site_rid site_agid list internal output =
     list
   with
   | (y,y')::(x,x')::_ when x=site_agid && y = site_rid ->
-     let label = Ckappa_sig.rule_id_of_int (Ckappa_sig.int_of_state_index y'),
+     let y' = Ckappa_sig.int_of_state_index y' in
+     let r_id =
+       if y'<0
+       then Init (-(y'+1))
+       else Rule (Ckappa_sig.rule_id_of_int y')
+     in
+     let label = r_id,
 		 Ckappa_sig.agent_id_of_int (Ckappa_sig.int_of_state_index x') in
       error, (handler,label::output)
   | _ -> warn parameter error (Some "line 146") Exit (handler,output)
@@ -505,7 +531,7 @@ let build_support parameter error rules =
 	  error
 	  (fun parameter error ag_id _  ->
 	    let error, set_test, set_mod  = compute_full_support parameter error ag_id rule in
-	    LabelMap.add parameter error (r_id,ag_id) (set_test, set_mod))
+	    LabelMap.add parameter error (Rule r_id,ag_id) (set_test, set_mod))
 	  rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
 	  )
       rules LabelMap.empty
@@ -854,6 +880,7 @@ let replay parameter error handler handler_kappa agent_type agent_string mvbdu_f
 
 let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
   let rules = compil.Cckappa_sig.rules in
+  let init = compil.Cckappa_sig.init in
   let error, support = build_support parameter error rules in
   let error, handler, mvbdu_true = Ckappa_sig.Views_bdu.mvbdu_true  parameter handler error in
   let error, handler, mvbdu_false = Ckappa_sig.Views_bdu.mvbdu_false parameter handler error in
@@ -889,11 +916,80 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 	 let fic = Remanent_parameters.open_out file_name in
 	 let () = dump_graph_header fic in
 	 let error, (handler, intensional) =
+	   Int_storage.Nearly_inf_Imperatif.fold
+	     parameter
+	     error
+	     (fun parameter error i_id init (handler,intensional) ->
+	       let mixture = init.Cckappa_sig.e_init_c_mixture in
+	       Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
+		 parameter
+		 error
+		 (fun parameter error ag_id view (handler,intensional) ->
+		    match 
+		      view
+		    with 
+		    | Cckappa_sig.Agent agent -> 
+			if agent.Cckappa_sig.agent_name <> agent_type 
+			then
+			  error, (handler, intensional)
+			else
+			  begin 
+			     let error, handler, list = 
+			       List.fold_left
+				 (fun
+				   (error, handler, list)
+				   site ->
+				     match
+				       Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
+					 parameter error
+					 site agent.Cckappa_sig.agent_interface
+				     with error, None ->
+				       error, handler, list
+				     | error, Some state ->
+				       let interv = state.Cckappa_sig.site_state in
+				       let min = interv.Cckappa_sig.min in
+				       if min = interv.Cckappa_sig.max
+				       then
+					 error,
+					 handler,
+					 (site,min)::list
+				       else
+					 let error, () = warn parameter error (Some "line 933") Exit () in
+					 error, handler, list
+				 )
+				 (error, handler, [])
+				 ext_list
+			     in
+			     let error, handler, update =  
+			       Ckappa_sig.Views_bdu.build_association_list
+				 parameter handler error list
+			     in
+			     let error, handler, mvbdu =
+			       Ckappa_sig.Views_bdu.mvbdu_redefine parameter handler error intensional.mvbdu_default_value update
+			     in
+			     let error, handler, intensional =
+			       add_creation parameter handler error (Init i_id) ag_id mvbdu intensional
+			     in
+			     error, (handler, intensional)
+			  end
+		    | Cckappa_sig.Ghost
+		    | Cckappa_sig.Dead_agent _
+		    | Cckappa_sig.Unknown_agent _ -> 
+		      warn parameter error (Some "line 948") Exit (handler,intensional)
+		 )
+		 mixture.Cckappa_sig.views 
+		 (handler, intensional)
+	     )
+	     init
+	     (handler, intensional)
+	 in
+	 let error, (handler, intensional) =
 	   Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
 	     parameter
 	     error
 	     (fun parameter error r_id rule (handler, intensional) ->
-	     let error, rule_name =
+	      let fst_label = Rule r_id in
+	      let error, rule_name =
 		if Remanent_parameters.get_show_rule_names_in_local_traces parameter
 		then
 		  Handler.string_of_rule parameter error handler_kappa compil r_id
@@ -911,7 +1007,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 		       error, (handler, intensional)
 		     else
 		       let mvbdu' = mvbdu in
-		       let error, handler, label_update = mvbdu_of_label parameter handler error intensional (r_id,ag_id) in
+		       let error, handler, label_update = mvbdu_of_label parameter handler error intensional (fst_label,ag_id) in
 		       let error, handler, modif_list_creation, modif_list =
 			 List.fold_left
 			   (fun
@@ -962,7 +1058,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 			      Ckappa_sig.Views_bdu.mvbdu_redefine parameter handler error intensional.mvbdu_default_value update
 			     in
 			     let error, handler, intensional =
-			       add_creation parameter handler error r_id ag_id mvbdu intensional
+			       add_creation parameter handler error fst_label ag_id mvbdu intensional
 			     in
 			    error,(handler,intensional)
 			  end
@@ -1309,10 +1405,17 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 		  let error, handler, key = hash_of_mvbdu parameter handler error q in
 		  let error, handler, key' = hash_of_mvbdu parameter handler error q' in
 		  let error, rule_name =
-		    if Remanent_parameters.get_show_rule_names_in_local_traces parameter
+		    if  Remanent_parameters.get_show_rule_names_in_local_traces parameter
 		    then
-		      Handler.string_of_rule parameter error handler_kappa compil (fst label)
-		    else error,""
+		      begin
+			match
+			  fst label
+			with
+			| Rule r -> Handler.string_of_rule parameter error handler_kappa compil r
+			| _ -> warn parameter error (Some "line 1412") Exit ""
+		      end
+		    else
+		      error, ""
 		  in
 		  let () = Printf.fprintf fic "Node_%i -> Node_%i [label=\"%s\"];\n" key key' rule_name in
 		  error,handler)
@@ -1324,10 +1427,17 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 		 (fun (error, handler) (q,label) ->
 		  let error, handler, key = hash_of_mvbdu parameter handler error q in
 		  let error, rule_name =
-		    if Remanent_parameters.get_show_rule_names_in_local_traces parameter
+		     if  Remanent_parameters.get_show_rule_names_in_local_traces parameter
 		    then
-		      Handler.string_of_rule parameter error handler_kappa compil (fst label)
-		    else error,""
+		      begin
+			match
+			  fst label
+			with
+			| Rule r -> Handler.string_of_rule parameter error handler_kappa compil r
+			| _ -> warn parameter error (Some "line 1412") Exit ""
+		      end
+		    else
+		      error, ""
 		  in
 		  let () = Printf.fprintf fic "Init_%i -> Node_%i [label=\"%s\"];\n" key key rule_name in
 		  error, handler)
