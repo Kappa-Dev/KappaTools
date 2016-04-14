@@ -40,12 +40,6 @@ struct
   
   type local_static_information =
     {
-      (*collect the parallel bonds in the right hand site. The set of
-        tuples (A,x,y, B,z,t) such that there exists a rule with two agents
-        of type A and B and two bonds between A.x and B.z, and A.y and
-        B.t. This tuples has information about agent_id, agent_type, site
-        name of the first site, site name of the second site, and its state
-        corresponding.*)
       store_parallel_full_bonds_rhs: 
         Ckappa_sig.PairAgentsSitesStates_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t; 
       store_parallel_bonds_rhs : Ckappa_sig.PairAgentSites_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;

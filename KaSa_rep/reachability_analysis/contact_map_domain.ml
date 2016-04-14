@@ -22,17 +22,9 @@ let local_trace = false
 module Domain =
 struct
 
-  (*remove it*)
-  (*type local_static_information =
-    {
-      bond_rhs : Ckappa_sig.PairAgentSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
-      bond_lhs : Ckappa_sig.PairAgentSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t
-    }*)
-
   type static_information =
     {
       global_static_information : Analyzer_headers.global_static_information;
-      (*local_static_information  : local_static_information*)
     }
    
   type local_dynamic_information = 
@@ -256,50 +248,18 @@ struct
           let error, dynamic =
             Ckappa_sig.Site_map_and_set.Map.fold
               (fun site_type_source site_add (error, dynamic) ->
-                let agent_index_target = site_add.Cckappa_sig.agent_index in
-                let site_type_target = site_add.Cckappa_sig.site in
-                let error, agent_source =
-                  match
-                    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-                      parameter
-                      error
-                      agent_id
-                      init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views
-                  with
-                  | error, None -> warn parameter error (Some "line 473") Exit
-                    Cckappa_sig.Ghost
-                  | error, Some agent -> error, agent
-                in
-                let error, agent_target =
-                  match Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-                    parameter error agent_index_target 
-                    init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views
-                  with
-                  | error, None -> warn parameter error (Some "line 480") Exit
-                    Cckappa_sig.Ghost
-                  | error, Some agent -> error, agent
-                in
-                let error, (agent_type1, state1) =
-                  collect_agent_type_state
+                let error, pair =
+                  Common_static.collect_pair_of_bonds
                     parameter
                     error
-                    agent_source
+                    site_add
+                    agent_id
                     site_type_source
-                in
-                let error, (agent_type2, state2) =
-                  collect_agent_type_state
-                    parameter
-                    error
-                    agent_target
-                    site_type_target
-                in
-                let pair_triple =
-                  ((agent_type1, site_type_source, state1),
-                   (agent_type2, site_type_target, state2)) 
+                    init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views
                 in
                 (*use the oriented bonds, when given the bond (x, y), the
                   bond (y, x) is given as well*)
-                let error, dynamic = add_oriented_bond static dynamic error pair_triple in
+                let error, dynamic = add_oriented_bond static dynamic error pair in
                 error, dynamic
               ) bonds_map (error, dynamic)
           in
@@ -334,7 +294,7 @@ struct
         rule_id bond_lhs
       with
       | error, None -> error, Ckappa_sig.PairAgentSiteState_map_and_set.Set.empty
-      | error, Some l -> error, l
+      | error, Some s -> error, s
     in
     if Ckappa_sig.PairAgentSiteState_map_and_set.Set.subset bond_lhs_set contact_map
     then 

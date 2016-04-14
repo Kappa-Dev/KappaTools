@@ -235,6 +235,7 @@ module AgentSiteState_map_and_set =
          let compare = compare
         end))
 
+(*bonds in rhs and lhs*)
 module PairAgentSiteState_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
@@ -245,7 +246,7 @@ module PairAgentSiteState_map_and_set =
         end))
 
 (*parallel*)
-module PairAgentsSitesStates_map_and_set = (*TEST*)
+module PairAgentsSitesStates_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
        (struct
@@ -254,7 +255,7 @@ module PairAgentsSitesStates_map_and_set = (*TEST*)
          let compare = compare
         end))
 
-module PairAgentSites_map_and_set = (*TEST*)
+module PairAgentSites_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
        (struct
@@ -263,16 +264,15 @@ module PairAgentSites_map_and_set = (*TEST*)
          let compare = compare
         end))
 
-(*parallel with position*)
-(*module PairAgentID_BindingSite_InternalSite_map_and_set =
+(*map of flat_lattice*)
+module PairAgent_id_SiteState_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
        (struct
-         type t = (c_agent_id * c_site_name * c_site_name) *
-           (c_agent_id * c_site_name * c_site_name)
+         type t =
+           (c_agent_id * c_site_name * c_state) * (c_agent_id * c_site_name * c_state)
          let compare = compare
-        end))*)
-
+        end))    
 
 module Rule_setmap =
   SetMap.Make (

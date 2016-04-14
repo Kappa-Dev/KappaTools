@@ -577,6 +577,8 @@ let collect_agent_type_state parameter error agent site_type =
     in
     error, (agent_type1, state1) 
 
+(**************************************************************************)
+
 let add_link_set parameter error rule_id (x, y) store_result =
   let error, old_set =
     match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error 
@@ -601,6 +603,51 @@ let add_link_set parameter error rule_id (x, y) store_result =
   in
   error, store_result
 
+(**************************************************************************)
+
+let collect_pair_of_bonds parameter error site_add agent_id site_type_source views =
+  let error, pair =
+    let agent_index_target = site_add.Cckappa_sig.agent_index in
+    let site_type_target = site_add.Cckappa_sig.site in
+    let error, agent_source = 
+      match
+        Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
+          parameter error agent_id views
+      with
+      | error, None -> warn parameter error (Some "line 267") Exit Cckappa_sig.Ghost
+      | error, Some agent -> error, agent
+    in
+    let error, agent_target =
+      match
+        Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
+          parameter error agent_index_target views
+      with
+      | error, None -> warn parameter error (Some "line 275") Exit Cckappa_sig.Ghost
+      | error, Some agent -> error, agent
+    in
+    let error, (agent_type1, state1) =
+      collect_agent_type_state
+        parameter
+        error
+        agent_source
+        site_type_source
+    in
+    let error, (agent_type2, state2) =
+      collect_agent_type_state
+        parameter
+        error
+        agent_target
+        site_type_target
+    in
+    let pair = ((agent_type1, site_type_source, state1), 
+                (agent_type2, site_type_target, state2))
+    in
+    error, pair
+  in
+  error, pair
+
+(**************************************************************************)
+
 let collect_bonds parameter error rule_id bonds views store_result =
   let error, store_result =
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
@@ -609,40 +656,14 @@ let collect_bonds parameter error rule_id bonds views store_result =
         let error, store_result =
           Ckappa_sig.Site_map_and_set.Map.fold
             (fun site_type_source site_add (error, store_result) ->
-              let agent_index_target = site_add.Cckappa_sig.agent_index in
-              let site_type_target = site_add.Cckappa_sig.site in
-              let error, agent_source =
-                match Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-                  parameter error agent_id views
-                with
-                | error, None -> warn parameter error (Some "line 271") Exit
-                  Cckappa_sig.Ghost
-                | error, Some agent -> error, agent
-              in
-              let error, agent_target =
-                match Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-                  parameter error agent_index_target views
-                with
-                | error, None -> warn parameter error (Some "line 279") Exit
-                  Cckappa_sig.Ghost
-                | error, Some agent -> error, agent
-              in
-              let error, (agent_type1, state1) =
-                collect_agent_type_state
+              let error, pair =
+                collect_pair_of_bonds
                   parameter
                   error
-                  agent_source
+                  site_add
+                  agent_id
                   site_type_source
-              in
-              let error, (agent_type2, state2) =
-                collect_agent_type_state
-                  parameter
-                  error
-                  agent_target
-                  site_type_target
-              in
-              let pair = ((agent_type1, site_type_source, state1),
-                          (agent_type2, site_type_target, state2)) 
+                  views
               in
               let error, store_result =
                 add_link_set parameter error rule_id pair store_result 
@@ -655,7 +676,9 @@ let collect_bonds parameter error rule_id bonds views store_result =
   in
   error, store_result
 
+(**************************************************************************)
 (*collect bonds lhs*)
+
 let collect_bonds_rhs parameter error rule_id rule store_result =
   let views = rule.Cckappa_sig.rule_rhs.Cckappa_sig.views in
   let bonds = rule.Cckappa_sig.rule_rhs.Cckappa_sig.bonds in
