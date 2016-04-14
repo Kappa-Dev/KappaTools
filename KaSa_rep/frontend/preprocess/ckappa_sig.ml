@@ -265,7 +265,7 @@ module PairAgentSites_map_and_set =
         end))
 
 (*map of flat_lattice*)
-module PairAgent_id_SiteState_map_and_set =
+module PairAgentIDSiteState_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
        (struct

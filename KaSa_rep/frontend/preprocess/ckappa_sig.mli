@@ -166,7 +166,7 @@ module PairAgentSites_map_and_set: Map_wrapper.S_with_logs
     (c_agent_name * c_site_name * c_site_name)
 
 (*test flat_lattice*)
-module PairAgent_id_SiteState_map_and_set: Map_wrapper.S_with_logs
+module PairAgentIDSiteState_map_and_set: Map_wrapper.S_with_logs
   with type elt = (c_agent_id * c_site_name * c_state) * (c_agent_id * c_site_name * c_state)
 
 module Rule_setmap: SetMap.S with type elt = c_rule_id

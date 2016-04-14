@@ -75,14 +75,14 @@ struct
     {
       store_bonds_init : Ckappa_sig.PairAgentSiteState_map_and_set.Set.t;
       store_parallel_init : Ckappa_sig.PairAgentsSitesStates_map_and_set.Set.t;
-      (*TODO: change name. a map of each rule*)
-      (*store_flat_lattice : bool Usual_domains.flat_lattice*)
+      store_parallel_bonds_rhs_status : 
+        bool Usual_domains.flat_lattice Ckappa_sig.PairAgentIDSiteState_map_and_set.Map.t;
     }
 
   type dynamic_information =
     {
       local  : local_dynamic_information ;
-      global : Analyzer_headers.global_dynamic_information ;
+      global : Analyzer_headers.global_dynamic_information;
     }
 
   (*--------------------------------------------------------------------*)
@@ -214,6 +214,16 @@ struct
       {
         (get_local_dynamic_information dynamic) with
           store_parallel_init = init_map
+      } dynamic
+
+  let get_parallel_bonds_rhs_status dynamic =
+    (get_local_dynamic_information dynamic).store_parallel_bonds_rhs_status
+      
+  let set_parallel_bonds_rhs_status lattice dynamic =
+    set_local_dynamic_information
+      {
+        (get_local_dynamic_information dynamic) with
+          store_parallel_bonds_rhs_status = lattice
       } dynamic
 
   (*let get_flat_lattice dynamic =
@@ -556,27 +566,34 @@ struct
 
   (**************************************************************************)
   (*dynamic map related to flat_lattice*)
-
-  (*let collect_flat_lattice parameter error rule_id rule store_result =
-    let error, store_result =
-      (*search rule that has bonds in their rhs*)
-      let error, parallel_bonds_rhs =
-        match
-          Ckappa_sig.Rule_map_and_set.find_option_without_logs
-            parameter
-            error
-            rule_id
-            store_parallel_bonds
-        with
-        | error, None -> error, Ckappa_sig.PairAgentSiteState_map_and_set.Set.empty
-        | error, Some s -> error, s
-      in
-      (*search in this set in parallel bonds rhs, if one agent has two sites, and each sites 
-        bound to the same agent*)
       
-
-    in
-    error, store_result*)
+  let collect_parallel_bonds_status parameter error rule_id rule
+      store_parallel_bonds_rhs_first_element store_result =
+    match
+      Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
+        parameter
+        error
+        rule_id
+        store_parallel_bonds_rhs_first_element
+    with
+    | error, None -> error, store_result
+    | error, Some list ->
+      let error, store_result =
+        List.fold_left
+          (fun (error, store_result)
+            ((agent_id1, site_type1, state1), (agent_id2, site_type2, state2)) ->
+              let error, store_result =
+                Ckappa_sig.PairAgentIDSiteState_map_and_set.Map.add_or_overwrite
+                  parameter
+                  error
+                  ((agent_id1, site_type1, state1), (agent_id2, site_type2, state2))
+                  (Usual_domains.Val true)
+                  store_result
+              in
+              error, store_result
+          ) (error, store_result) list
+      in
+      error, store_result
       
   (**************************************************************************)
 
@@ -656,11 +673,11 @@ struct
   let scan_rule_set static dynamic error =
     let parameter = get_parameter static in
     let compil = get_compil static in
-    let error, static =
+    let error, (static, dynamic) =
       Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
         parameter
         error
-        (fun parameter error rule_id rule static ->
+        (fun parameter error rule_id rule (static, dynamic) ->
           (*parallel bonds in the rhs *)
           let error, static =
             scan_rule_set_bonds_rhs
@@ -679,8 +696,23 @@ struct
               rule_id
               rule
           in
-          error, static
-        ) compil.Cckappa_sig.rules static
+          let store_parallel_bonds_rhs_first_element = get_parallel_bonds_rhs_first_element static in
+          let store_parallel_bonds_rhs_status = get_parallel_bonds_rhs_status dynamic in
+          (*TODO: check the status of parallel bonds in the rhs*)
+          let error, store_parallel_bonds_status =
+            collect_parallel_bonds_status
+              parameter
+              error
+              rule_id
+              rule.Cckappa_sig.e_rule_c_rule
+              store_parallel_bonds_rhs_first_element
+              store_parallel_bonds_rhs_status
+          in
+          let dynamic =
+            set_parallel_bonds_rhs_status store_parallel_bonds_status dynamic 
+          in
+          error, (static, dynamic)
+        ) compil.Cckappa_sig.rules (static, dynamic)
     in
     error, static, dynamic    
 
@@ -711,6 +743,7 @@ struct
       {
         store_bonds_init = Ckappa_sig.PairAgentSiteState_map_and_set.Set.empty;
         store_parallel_init = Ckappa_sig.PairAgentsSitesStates_map_and_set.Set.empty;
+        store_parallel_bonds_rhs_status = Ckappa_sig.PairAgentIDSiteState_map_and_set.Map.empty;
       }
     in
     let init_global_dynamic_information =
@@ -1324,6 +1357,36 @@ struct
     print_parallel_bonds_first_element static dynamic error store_parallel_bonds_lhs_first_element
 
   (**************************************************************************)
+  (*print status of parallel bonds in the rhs*)
+
+  let print_parallel_bonds_status_aux static dynamic error store_result =
+    match store_result with
+    | Usual_domains.Val b ->
+      if b 
+      then Printf.fprintf stdout "Parallel bonds status is: VAL TRUE\n"
+      else Printf.fprintf stdout "Parallel bonds status is: VAL FALSE\n"
+    | Usual_domains.Any -> Printf.fprintf stdout "Parallel bonds status is: ANY\n"
+    | Usual_domains.Undefined -> Printf.fprintf stdout "Parallel bonds status is: UNDEFINED\n"
+      
+  let print_parallel_bonds_rhs_status static dynamic error =
+    let store_result = get_parallel_bonds_rhs_status dynamic in
+    Printf.fprintf stdout "Status of parallel bonds in the rhs:\n";
+    Ckappa_sig.PairAgentIDSiteState_map_and_set.Map.iter 
+      (fun ((agent_id1, site_type1, state1), (agent_id2, site_type2, state2)) b ->
+        let _ =
+          Printf.fprintf stdout 
+            "agent_id:%i:site_type:%i:state:%i -> agent_id:%i:site_type:%i:state:%i\n"
+            (Ckappa_sig.int_of_agent_id agent_id1)
+            (Ckappa_sig.int_of_site_name site_type1)
+            (Ckappa_sig.int_of_state_index state1)
+            (Ckappa_sig.int_of_agent_id agent_id2)
+            (Ckappa_sig.int_of_site_name site_type2)
+            (Ckappa_sig.int_of_state_index state2)
+        in
+        print_parallel_bonds_status_aux static dynamic error b
+      ) store_result
+
+  (**************************************************************************)
 
   (* to do *)
   let print static dynamic error loggers =
@@ -1350,6 +1413,9 @@ struct
     (*print dynamic information for parallel bonds in the initial states*)
     let _ =
       print_parallel_bonds_init static dynamic error
+    in
+    let _ =
+      print_parallel_bonds_rhs_status static dynamic error
     in*)
     error, dynamic, ()
 
