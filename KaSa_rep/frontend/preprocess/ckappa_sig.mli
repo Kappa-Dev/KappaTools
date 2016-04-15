@@ -145,6 +145,11 @@ module AgentRule_map_and_set: Map_wrapper.S_with_logs
 module RuleAgent_map_and_set: Map_wrapper.S_with_logs 
   with type elt = c_rule_id * c_agent_id
 
+(*use in site_accross_bonds_domain*)
+
+module SiteState_map_and_set : Map_wrapper.S_with_logs
+  with type elt = c_site_name * c_state
+
 module AgentSiteState_map_and_set: Map_wrapper.S_with_logs 
   with type elt = c_agent_name * c_site_name * c_state
 
@@ -187,6 +192,12 @@ module AgentSite_map_and_set: Map_wrapper.S_with_logs
 
 module AgentsSite_map_and_set: Map_wrapper.S_with_logs 
   with type elt = c_agent_id * c_agent_name * c_site_name
+
+module PairAgentSite_map_and_set: Map_wrapper.S_with_logs 
+  with type elt = (c_agent_id * c_site_name) * (c_agent_id * c_site_name)
+
+module PairAgentIDSites_map_and_set: Map_wrapper.S_with_logs 
+  with type elt = (c_agent_id * c_site_name * c_site_name) * (c_agent_id * c_site_name * c_site_name)
 
 (****************************************************************************************)
 

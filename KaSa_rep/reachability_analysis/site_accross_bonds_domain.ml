@@ -42,18 +42,16 @@ struct
      which agent_id (A) a site x of A may become bound to a site z of
      B *)
   
-  (*let local_static_information =
+  type local_static_information =
     {
-      (*two sites, one site is bond, and site1 <> site2*)
-      store_bond_rhs_sites: Ckappa_sig.PairAgentSiteState_map_and_set.Set.t
+      store_site_accross_bonds_rhs: Ckappa_sig.PairAgentSiteState_map_and_set.Set.t
       Ckappa_sig.Rule_map_and_set.Map.t;
-    }*)
-  
+    }
 
   type static_information =
     {
       global_static_information : Analyzer_headers.global_static_information;
-      local_static_information : unit
+      local_static_information : local_static_information
     }
 
   (*--------------------------------------------------------------------*)
@@ -95,20 +93,32 @@ struct
 
   let get_compil static = lift Analyzer_headers.get_cc_code static
 
-  (*let get_local_static_information static = static.local_static_information
+  let get_bonds_rhs static = lift Analyzer_headers.get_bonds_rhs static
+    
+  (*--------------------------------------------------------------------*)
+
+  let get_local_static_information static = static.local_static_information
     
   let set_local_static_information local static =
     {
       static with
         local_static_information = local
-    }*)
+    }
+
+  let get_site_accross_bonds_rhs static =
+    (get_local_static_information static).store_site_accross_bonds_rhs
+
+  let set_site_accross_bonds_rhs site_accross static =
+    set_local_static_information
+      {
+        (get_local_static_information static) with
+          store_site_accross_bonds_rhs = site_accross
+      } static
 
   (*--------------------------------------------------------------------*)
   (** global dynamic information*)
 
   let get_global_dynamic_information dynamic = dynamic.global
-
- 
 
   (*--------------------------------------------------------------------*)
 
@@ -135,8 +145,72 @@ struct
 
   (**************************************************************************)
   (*Implementation of local static information*)
+
+  (*let collect_site_accross_bonds_rhs parameter error rule_id rule store_bonds_rhs 
+      store_result =
+    (*look inside the views rhs*)
+    let error, store_result =
+      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
+        parameter error
+        (fun parameter error agent_id agent store_result ->
+          match agent with
+          | Cckappa_sig.Unknown_agent _ 
+          | Cckappa_sig.Ghost -> error, store_result
+          | Cckappa_sig.Dead_agent (agent,_,_,_)
+          | Cckappa_sig.Agent agent ->
+            let agent_type = agent.Cckappa_sig.agent_name in
+            (*get a set of pair (site, state) of this the agent interface*)
+            let error, pair_set =
+              Ckappa_sig.Site_map_and_set.Map.fold
+                (fun site_type port (error, store_set) ->
+                  let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
+                  let error, store_set =
+                    Ckappa_sig.SiteState_map_and_set.Set.add_when_not_in
+                      parameter
+                      error
+                      (site_type, state)
+                      store_set
+                  in
+                  error, store_set
+                ) agent.Cckappa_sig.agent_interface 
+                (error, Ckappa_sig.SiteState_map_and_set.Set.empty)
+            in
+            (*from the first agent, get their partner that is bond in the rhs.
+              get a pair of site, state that is bond in their rhs*)
+            let error, pair_bonds_rhs_set =
+              match
+                Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
+                  parameter
+                  error
+                  rule_id
+                  store_bonds_rhs
+              with
+              | error, None -> error, Ckappa_sig.PairAgentSiteState_map_and_set.Set.t
+              | error, Some s -> error, s
+            in
+            (*get the partner of binding information*)
+            let error, (agent_type2, site_type2, state2) =
+              Ckappa_sig.PairAgentSiteState_map_and_set.Set.fold
+                (fun ((agent_type1, site_type1, state1), (agent_type2, site_type2, state2)) 
+                (error, result_triple) ->
+                    (*if the set of pair of the agent interface belong to first pair*)
+                  if agent_type1 = agent_type &&
+                    (Ckappa_sig.SiteState_map_and_set.Set.mem 
+                       (site_type1, state1)
+                       pair_set)
+                  then error, (agent_type2, site_type2, state2)
+                  else error, result_triple
+                ) pair_bonds_rhs_set (error, (0,0,0))
+            in
+            (*TODO:get agent of the first*)
+            
+
+
+        ) rule.Cckappa_sig.rule_rhs.Cckappa_sig.views store_result
+    in
+    error, store_result*)
       
-  (*let scan_rule_set static dynamic error =
+  let scan_rule_set static dynamic error =
     let parameter = get_parameter static in
     let compil = get_compil static in
     let error, static =
@@ -144,27 +218,35 @@ struct
         parameter
         error
         (fun parameter error rule_id rule static ->
-          _
-
-
+          (*let store_site_accross_bonds_rhs = get_site_accross_bonds_rhs static in
+          let error, store_site_accross_bonds_rhs =
+            collect_site_accross_bonds_rhs
+              parameter
+              error
+              rule_id
+              rule.Cckappa_sig.e_rule_c_rule
+              store_site_accross_bonds_rhs            
+          in
+          let static = set_site_accross_bonds_rhs store_site_accross_bonds_rhs static in*)
+          error, static
         ) compil.Cckappa_sig.rules static
     in
-    error, static, dynamic*)
+    error, static, dynamic
 
   (**************************************************************************)
   (** [get_scan_rule_set static] *)
 
   (* todo *)
   let initialize static dynamic error =
-    (*let init_local_static_information =
+    let init_local_static_information =
       {
-        store_bond_rhs_sites = Ckappa_sig.Rule_map_and_set.Map.empty
+        store_site_accross_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty
       }
-    in*)
+    in
     let init_global_static_information =
       {
         global_static_information = static;
-        local_static_information = ();
+        local_static_information = init_local_static_information;
       }
     in
     let kappa_handler = Analyzer_headers.get_kappa_handler static in
@@ -175,15 +257,13 @@ struct
 	local = () ;
       }
     in
-    error, init_global_static_information, init_global_dynamic_information
-  (*
     let error, static, dynamic =
       scan_rule_set
         init_global_static_information
         init_global_dynamic_information
         error
     in
-    error, static, dynamic*)
+    error, static, dynamic
 
 
   (* to do *)

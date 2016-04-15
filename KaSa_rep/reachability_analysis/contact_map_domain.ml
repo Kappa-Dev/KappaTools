@@ -403,11 +403,12 @@ struct
   let print_contact_map_rhs static dynamic error store_result =
     let parameter = get_parameter static in
     let kappa_handler = get_kappa_handler static in
-    Printf.fprintf stdout "Contact map in the rhs:\n";
+    Loggers.fprintf (Remanent_parameters.get_logger parameter) "Contact map in the rhs:\n";
     Ckappa_sig.Rule_map_and_set.Map.iter
       (fun rule_id pair ->
         let _ =
-          Printf.fprintf stdout "rule_id:%i:\n" (Ckappa_sig.int_of_rule_id rule_id)
+          Loggers.fprintf (Remanent_parameters.get_logger parameter)
+            "rule_id:%i:\n" (Ckappa_sig.int_of_rule_id rule_id)
         in
         let _ =
           Ckappa_sig.PairAgentSiteState_map_and_set.Set.iter
@@ -455,7 +456,7 @@ struct
                     _ -> warn parameter error (Some "line 665") Exit
                       (Ckappa_sig.string_of_state_index state2)
                 in
-                Printf.fprintf stdout 
+                Loggers.fprintf (Remanent_parameters.get_logger parameter)
                   "agent_type1:%s:site_types:%s:state1:%s -> agent_type2:%s:site_type2:%s:state2:%s\n"
                   agent_type1_string
                   site_type1_string
@@ -474,7 +475,7 @@ struct
   let print_contact_map static dynamic error store_result =
     let parameter = get_parameter static in
     let kappa_handler = get_kappa_handler static in
-    Printf.fprintf stdout "Contact map:\n";
+    Loggers.fprintf (Remanent_parameters.get_logger parameter) "Contact map:\n";
     let _ =
       Ckappa_sig.PairAgentSiteState_map_and_set.Set.iter
         (fun ((agent_type1, site_type1, state1),(agent_type2, site_type2, state2)) ->
@@ -521,7 +522,7 @@ struct
                 _ -> warn parameter error (Some "line 665") Exit
                   (Ckappa_sig.string_of_state_index state2)
             in
-            Printf.fprintf stdout 
+            Loggers.fprintf (Remanent_parameters.get_logger parameter)
               "agent_type1:%s:site_type1:%s:state1:%s -> agent_type2:%s:site_type2:%s:state2:%s\n"
               agent_type1_string
               site_type1_string

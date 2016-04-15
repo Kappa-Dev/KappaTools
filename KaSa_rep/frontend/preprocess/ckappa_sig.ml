@@ -227,6 +227,16 @@ module RuleAgent_map_and_set =
          let compare = compare
         end))
 
+(*use in site_accross_bonds_domain*)
+module SiteState_map_and_set =
+Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_site_name * c_state
+         let compare = compare
+        end))
+  
+
 module AgentSiteState_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
@@ -318,6 +328,22 @@ module AgentsSite_map_and_set =
     (SetMap.Make
        (struct
          type t = c_agent_id * c_agent_name * c_site_name
+         let compare = compare
+        end))
+
+module PairAgentSite_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = (c_agent_id * c_site_name) * (c_agent_id * c_site_name)
+         let compare = compare
+        end))
+
+module PairAgentIDSites_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = (c_agent_id * c_site_name * c_site_name) * (c_agent_id * c_site_name * c_site_name)
          let compare = compare
         end))
 
