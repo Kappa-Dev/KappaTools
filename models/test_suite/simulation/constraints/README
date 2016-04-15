@@ -1,0 +1,2 @@
+#!/bin/sh
+${KAPPABIN}KaSim -u event -l 180 triangle.ka -d output -seed 68275925 || exit 0

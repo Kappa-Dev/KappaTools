@@ -1,0 +1,21 @@
+%def: "seed" "68275925"
+%def: "newSyntax" "true"
+%def: "dumpIfDeadlocked" "true"
+%def: "maxConsecutiveClash" "2"
+%def: "plotPeriod" "1" "events"
+%def: "outputFileName" "data.csv"
+
+%agent: A(b!a.B, c!a.C)
+%agent: B(a!b.A, c!b.C)
+%agent: C(a!c.A, b!c.B)
+
+%plot: [T]
+A(b!./!0), B(a!./!0) @ 1
+B(c!./!0), C(b!./!0) @ 1
+C(a!./!0), A(c!./!0) @ 1
+
+/*0*/%mod: ([E] = [Emax]) do $SNAPSHOT "final"
+
+%init: 100 A(b!., c!.), B(a!., c!.), C(a!., b!.)
+
+%mod: [E] = 180 do $STOP

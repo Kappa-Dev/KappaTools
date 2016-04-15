@@ -1,0 +1,14 @@
+# Snapshot [Event: 180]
+%def: "T0" "0.0386185"
+
+%init: 21 A(b!1, c), C(a, b!2), B(a!1, c!2)
+%init: 4 B(a!1, c!3), C(a!2, b!3), A(b!1, c!2)
+%init: 21 A(b, c!2), C(a!2, b!1), B(a, c!1)
+%init: 20 B(a!1, c), C(a!2, b), A(b!1, c!2)
+%init: 14 B(a, c!1), C(a, b!1)
+%init: 16 C(a!1, b), A(b, c!1)
+%init: 4 C(a, b)
+%init: 14 A(b!1, c), B(a!1, c)
+%init: 6 B(a, c)
+%init: 4 A(b, c)
+

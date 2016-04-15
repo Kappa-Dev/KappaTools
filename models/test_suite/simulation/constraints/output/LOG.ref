@@ -1,0 +1,21 @@
+Parsing triangle.ka...
+done
++ simulation parameters
++ Sanity checks
++ Compiling...
++ Building initial simulation conditions...
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 15 (sub)observables 12 navigation steps
+	 -initial conditions
++ Building initial state
+Done
++ Command line to rerun is: 'KaSim' '-u' 'event' '-l' '180' 'triangle.ka' '-d' 'output' '-seed' '68275925'
+____________________________________________________________
+############################################################
+Simulation ended
+51.87% of event loops were productive. Null event cause:
+	Rule creating a blacklisted pattern: 1.000000
