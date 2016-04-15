@@ -44,7 +44,7 @@ struct
   type local_static_information =
     {
       store_parallel_bonds_rhs: 
-        Ckappa_sig.PairAgentIDSites_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
+        Ckappa_sig.PairAgentSite_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
     }
 
   type static_information =
@@ -244,36 +244,30 @@ struct
                 error, store_set                
             ) bonds_rhs_set (error, Ckappa_sig.PairAgentIDSites_map_and_set.Set.empty)
         in
-        (*check if the binding state belong to the parallel*)
-        (*let error, belong_set =
-          Ckappa_sig.PairAgentIDSites_map_and_set.Set.fold
-            (fun ((agent_id, site_type, site_type'), (agent_id', site_type1', site_type2'))
-              (error, store_set) ->
-                if agent_id1 = agent_id && site_type1 = site_type
-                  && agent_id2 = agent_id' && site_type2 = site_type1'
-                then
-                  error, binding_set
-                  (*let error, belong_set =
-                    Ckappa_sig.PairAgentSite_map_and_set.Set.add_when_not_in
-                      parameter
-                      error
-                      ((agent_id1, site_type1), (agent_id2, site_type2))
-                      store_set
-                  in
-                  error, belong_set*)
-                else
-                  error, store_set              
-            ) parallel_set (error, Ckappa_sig.PairAgentSite_map_and_set.Set.empty)
-        in*)
         let error, store_result =
           Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
             parameter
             error  
             rule_id
-            parallel_set
+            binding_set
             store_result
         in
-        error, store_result
+        (*TODO:check if the binding state belong to the parallel*)
+        let error, belong_set =
+          Ckappa_sig.PairAgentIDSites_map_and_set.Set.fold
+            (fun ((agent_id, site_type, site_type1), (agent_id', site_type', site_type1'))
+              (error, store_set) ->
+                (*if parallel bonds belong to binding set then return the binding set*)
+                if Ckappa_sig.PairAgentSite_map_and_set.Set.mem
+                  ((agent_id, site_type), (agent_id', site_type'))
+                  binding_set
+                then
+                  error, store_result
+                else
+                  error, Ckappa_sig.Rule_map_and_set.Map.empty
+            ) parallel_set (error, store_result)
+        in
+        error, belong_set
       ) (error, store_result) rule.Cckappa_sig.actions.Cckappa_sig.bind
     in
     let static = set_parallel_bonds_rhs store_result static in
@@ -390,7 +384,7 @@ struct
         (fun rule_id set ->
           Loggers.fprintf (Remanent_parameters.get_logger parameter)
             "rule_id:%i\n" (Ckappa_sig.int_of_rule_id rule_id);            
-          (*Ckappa_sig.PairAgentSite_map_and_set.Set.iter
+          Ckappa_sig.PairAgentSite_map_and_set.Set.iter
             (fun ((agent_id, site_type), (agent_id', site_type')) ->
               Loggers.fprintf (Remanent_parameters.get_logger parameter)
                 "agent_id:%i:site_type:%i->agent_id:%i:site_type:%i\n"
@@ -398,19 +392,19 @@ struct
                 (Ckappa_sig.int_of_site_name site_type)
                 (Ckappa_sig.int_of_agent_id agent_id')
                 (Ckappa_sig.int_of_site_name site_type')
-            ) set*)
-          Ckappa_sig.PairAgentIDSites_map_and_set.Set.iter
-            (fun ((agent_id, site_type1, site_type2), (agent_id', site_type1', site_type2')) ->
-              Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                "agent_id:%i:site_type:%i:site_type:%i->agent_id:%i:site_type:%i:site_type:%i\n"
-                (Ckappa_sig.int_of_agent_id agent_id)
-                (Ckappa_sig.int_of_site_name site_type1)
-                (Ckappa_sig.int_of_site_name site_type2)
-                (Ckappa_sig.int_of_agent_id agent_id')
-                (Ckappa_sig.int_of_site_name site_type1')
-                (Ckappa_sig.int_of_site_name site_type2')
             ) set
-        ) store_parallel_bonds_rhs 
+    (* Ckappa_sig.PairAgentIDSites_map_and_set.Set.iter
+       (fun ((agent_id, site_type1, site_type2), (agent_id', site_type1', site_type2')) ->
+       Loggers.fprintf (Remanent_parameters.get_logger parameter)
+       "agent_id:%i:site_type:%i:site_type:%i->agent_id:%i:site_type:%i:site_type:%i\n"
+       (Ckappa_sig.int_of_agent_id agent_id)
+       (Ckappa_sig.int_of_site_name site_type1)
+       (Ckappa_sig.int_of_site_name site_type2)
+       (Ckappa_sig.int_of_agent_id agent_id')
+       (Ckappa_sig.int_of_site_name site_type1')
+       (Ckappa_sig.int_of_site_name site_type2')
+       ) set*)
+       ) store_parallel_bonds_rhs 
     in*)
     error, dynamic, ()
 
