@@ -299,12 +299,10 @@ let exists_root_of_unary_ccs unary_ccs roots =
 	 (Connected_component.Map.find_default Mods.IntSet.empty cc roots))
       unary_ccs
 
-let potential_root_of_unary_ccs unary_ccs roots i =
+let potential_root_of_unary_ccs unary_ccs state i =
   let ccs =
     Connected_component.Set.filter
-      (fun cc ->
-	Mods.IntSet.mem
-	  i (Connected_component.Map.find_default Mods.IntSet.empty cc roots))
+      (fun cc -> Connected_component.Matching.is_root_of state i cc)
       unary_ccs in
   if Connected_component.Set.is_empty ccs then None else Some ccs
 
@@ -406,8 +404,8 @@ let update_edges
 	  (fun (unary_cands,_ as acc) (id,ty) ->
 	   match
 	     Edges.paths_of_interest
-	       (potential_root_of_unary_ccs unary_ccs roots'')
-	       sigs edges'' ty id Edges.empty_path with
+	       (potential_root_of_unary_ccs unary_ccs edges'')
+	       sigs edges'' (id,ty) Edges.empty_path with
 	   | [] -> acc
 	   | l -> ((id,ty),l) :: unary_cands,false)
 	  unary_pack unaries_to_explore
@@ -461,26 +459,18 @@ let extra_outdated_var i state =
 let new_unary_instances sigs rule_id cc1 cc2 created_obs state =
   let (unary_candidates,unary_pathes) =
     List.fold_left
-      (fun acc ((restart,restart_ty),l) ->
+      (fun acc (restart,l) ->
        List.fold_left
 	 (fun acc ((ccs,id),path) ->
 	  let path = Edges.rev_path path in
 	  Connected_component.Set.fold
 	    (fun cc acc ->
 	     try
-	       let goals,reverse =
+	       let goal,reverse =
 		 if Connected_component.is_equal_canonicals cc cc1
-		 then
-		   match Connected_component.Map.find_option
-		     cc2 state.roots_of_ccs with
-		   | Some x -> x,false
-		   | None -> raise Not_found
+		 then cc2,false
 		 else if Connected_component.is_equal_canonicals cc cc2
-		 then
-		   match Connected_component.Map.find_option
-		     cc1 state.roots_of_ccs with
-		   | Some x -> x,true
-		   | None -> raise Not_found
+		 then cc1,true
 		 else raise Not_found in
 	       List.fold_left
 		 (fun (cands,pathes) (((),d),p) ->
@@ -489,8 +479,11 @@ let new_unary_instances sigs rule_id cc1 cc2 created_obs state =
 		  else add_candidate cands pathes rule_id id d p)
 		 acc
 		 (Edges.paths_of_interest
-		    (fun x -> if Mods.IntSet.mem x goals then Some () else None)
-		    sigs state.edges restart_ty restart path)
+		    (fun x ->
+		     if Connected_component.Matching.is_root_of state.edges x goal
+		     then Some ()
+		     else None)
+		    sigs state.edges restart path)
 	     with Not_found -> acc)
 	    ccs acc) acc l)
       (state.unary_candidates,state.unary_pathes) created_obs in
@@ -625,13 +618,11 @@ let apply_unary_rule
   | None -> Clash
   | Some inj ->
      let nodes = Connected_component.Matching.elements_with_types inj in
-     let nodes1 = nodes.(0) in
-     let nodes2 = List.map fst nodes.(1) in
      let dist = match rule.Primitives.unary_rate with
        | None -> None
        | Some (_, dist_opt) -> dist_opt in
      match Edges.are_connected ~candidate (Environment.signatures env)
-			       state.edges nodes1 nodes2
+			       state.edges nodes.(0) nodes.(1)
 			       dist !Parameter.store_unary_distance with
      | None -> Corrected state'
      | Some _ when missing_ccs -> Corrected state'
@@ -700,14 +691,12 @@ let apply_rule
 	    | Some x -> x
 	    | None -> raise Not_found in
 	  let nodes = Connected_component.Matching.elements_with_types inj in
-	  let nodes1 = nodes.(0) in
-	  let nodes2 = List.map fst nodes.(1) in
 	  let dist = match rule.Primitives.unary_rate with
 	    | None -> None
 	    | Some (_, dist_opt) -> dist_opt in
 	  match
 	    Edges.are_connected ~candidate (Environment.signatures env)
-				state.edges nodes1 nodes2 dist false with
+				state.edges nodes.(0) nodes.(1) dist false with
 	  | None ->
 	     let rid =
 	       match rule_id with None -> assert false | Some rid -> rid in

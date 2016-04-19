@@ -53,14 +53,13 @@ val print_path :
   ?sigs:Signature.s -> ?graph:t -> Format.formatter -> path -> unit
 
 val are_connected :
-  ?candidate:path -> Signature.s -> t -> (int * int) list
-  -> int list -> int option -> bool -> path option
+  ?candidate:path -> Signature.s -> t -> agent list -> agent list ->
+  int option -> bool -> path option
 (** [are_connected ?candidate sigs graph nodes_x nodes_y dist store_dist] *)
 
-val paths_of_interest : (int -> 'a option) -> Signature.s -> t -> int ->
-			  int -> path -> (('a*int) * path) list
-(** [paths_of_interest
-         is_interesting sigs graph agent_name agent_id done_path] *)
+val paths_of_interest : (agent -> 'a option) -> Signature.s -> t ->
+			agent -> path -> (('a*int) * path) list
+(** [paths_of_interest is_interesting sigs graph agent done_path] *)
 
 val build_snapshot : Signature.s -> t -> (int * Raw_mixture.t) list
 

@@ -123,10 +123,10 @@ let raw_find_root nodes_by_type =
 	 | [] -> aux (succ ty)
 	 | h::t ->
 	    let x = List.fold_left (fun _ x -> x) h t in
-	    Some(ty,x)
+	    Some(x,ty)
   in aux 0
 let find_root cc = raw_find_root cc.nodes_by_type
-let find_root_type cc = Tools.option_map fst (find_root cc)
+let find_root_type cc = Tools.option_map snd (find_root cc)
 
 (*turns a cc into a path(:list) in the domain*)
 let raw_to_navigation (full:bool) nodes_by_type internals links =
@@ -181,7 +181,7 @@ let raw_to_navigation (full:bool) nodes_by_type internals links =
   in
   match raw_find_root nodes_by_type with
   | None -> [] (*empty path for x0*)
-  | Some (_,x) -> (*(ag_sort,ag_id)*)
+  | Some (x,_) -> (*(ag_sort,ag_id)*)
      build_for (true,[]) (*wip*) [] (*already_done*) [x] (*todo*)
 
 let to_navigation cc =
@@ -884,7 +884,7 @@ let add_domain ?origin env cc =
   if nav = [] then
     match find_root cc with
     | None -> assert false
-    | Some (ty,_) ->
+    | Some (_,ty) ->
        let cc',env' = Env.add_single_agent ty cc origin env in
        env',identity_injection cc',cc'
   else
@@ -1036,29 +1036,44 @@ module Matching = struct
 
   (*- rm - reconstruct: Edges.t -> t -> int -> cc -> int -> t option*)
   let reconstruct graph inj id cc root =
-    (* -rm - full_rename: Renaming.t option *)
-    let _,full_rename =
-      (*- rm - to_navigation: bool -> cc -> list *)
-      match cc.recogn_nav with
-      | _::_ as nav ->
-	 List.fold_left
-           (fun (root,inj_op) nav ->
-            match inj_op with
-            | None -> None,None
-            | Some inj ->
-	       None,Navigation.injection_for_one_more_edge ?root inj graph nav)
-           (Some root,Some Renaming.empty) nav
-	   (*- rm - find_root: cc -> (type, node) option *)
-      | [] -> match find_root cc with
-	      | None -> failwith "Matching.reconstruct cc error"
-	      (*- rm - add : int -> int -> Renaming.t -> Renaming.t *)
-	      | Some (_,id) -> None, Some (Renaming.add id root Renaming.empty) in
-    match full_rename with
-    | None -> failwith "Matching.reconstruct renaming error"
-    | Some rename ->
-       match from_renaming cc rename (Some (NodeMap.empty, snd inj)) with
-       | None -> None
-       | Some (inj',co) -> Some (IntMap.add id inj' (fst inj),co)
+    match find_root cc with
+    | None -> failwith "Matching.reconstruct cc error"
+    (*- rm - add : int -> int -> Renaming.t -> Renaming.t *)
+    | Some (rid,rty) ->
+       (* -rm - full_rename: Renaming.t option *)
+       let _,full_rename =
+	 (*- rm - to_navigation: bool -> cc -> list *)
+	 match cc.recogn_nav with
+	 | _::_ as nav ->
+	    List.fold_left
+              (fun (root,inj_op) nav ->
+               match inj_op with
+               | None -> None,None
+               | Some inj ->
+		  None,Navigation.injection_for_one_more_edge ?root inj graph nav)
+              (Some (root,rty),Some Renaming.empty) nav
+	 (*- rm - find_root: cc -> (type, node) option *)
+	 | [] -> None, Some (Renaming.add rid root Renaming.empty) in
+       match full_rename with
+       | None -> failwith "Matching.reconstruct renaming error"
+       | Some rename ->
+	  match from_renaming cc rename (Some (NodeMap.empty, snd inj)) with
+	  | None -> None
+	  | Some (inj',co) -> Some (IntMap.add id inj' (fst inj),co)
+
+  let rec aux_is_root_of graph root inj = function
+    | [] -> true
+    | h :: t ->
+       match Navigation.injection_for_one_more_edge ?root inj graph h with
+       | None -> false
+       | Some inj' -> aux_is_root_of graph None inj' t
+  let is_root_of graph (_,rty as root) cc =
+    match to_navigation cc with
+    | [] ->
+       (match find_root cc with
+	| Some (_,rty') -> rty = rty'
+	| None -> false)
+    | nav -> aux_is_root_of graph (Some root) Renaming.empty nav
 
   (* get : (ContentAgent.t * int) -> t -> int *)
   let get (node,id) (t,_) =
@@ -1100,7 +1115,7 @@ returns the roots of observables that are above in the domain*)
     let get_root inj point =
       match find_root point.content with
       | None -> assert false
-      | Some (root_type,root) -> Renaming.apply inj root,root_type in
+      | Some (root,root_type) -> Renaming.apply inj root,root_type in
     let rec aux_from_edges cache (obs,rev_deps as acc) = function
       | [] -> acc,cache
       | (pid,point,inj_point2graph) :: remains ->

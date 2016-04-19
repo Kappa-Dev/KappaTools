@@ -341,14 +341,14 @@ let breadth_first_traversal
     if site = 0 then acc else
     match (DynArray.get links id).(pred site) with
     | None -> look_each_site x (pred site) acc
-    | Some ((id',ty'),site') ->
+    | Some ((id',ty' as ag'),site') ->
        if (stop&&stop_on_find) then let () = Cache.reset cache in acc
        else if Cache.test cache id' then look_each_site x (pred site) acc
        else
 	 let () = Cache.mark cache id' in
 	 let path' = (((id',ty'),site'),((id,ty),pred site))::path in
 	 let out',store =
-	   match is_interesting id' with
+	   match is_interesting ag' with
 	   | Some x -> ((x,id'),path')::out,true
 	   | None -> out,false in
 	 let next' = (id',ty',path')::next in
@@ -369,12 +369,12 @@ let breadth_first_traversal
   aux 1 out [] todos
 
 let paths_of_interest
-      is_interesting sigs graph start_ty start_point done_path =
+      is_interesting sigs graph (start_point,start_ty) done_path =
   let () = assert (not graph.outdated) in
   let () = Cache.mark graph.cache start_point in
   let () = List.iter (fun (_,((x,_),_)) -> Cache.mark graph.cache x)
 		     done_path in
-  let acc = match is_interesting start_point with
+  let acc = match is_interesting (start_point,start_ty) with
     | None -> []
     | Some x -> [(x,start_point),done_path] in
   breadth_first_traversal None false is_interesting sigs graph.connect

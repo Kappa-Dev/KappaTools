@@ -149,8 +149,8 @@ let dst_is_okay inj' graph root site = function
 let injection_for_one_more_edge ?root inj graph = function
   | ((Existing id,site),dst) ->
      dst_is_okay inj graph (Renaming.apply inj id) site dst
-  | ((Fresh (id,_),site),dst) ->
+  | ((Fresh (id,rty),site),dst) ->
      match root with
-     | None -> None
-     | Some root ->
+     | Some (root,rty') when rty=rty' ->
 	dst_is_okay (Renaming.add id root inj) graph root site dst
+     | _ -> None

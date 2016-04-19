@@ -23,4 +23,4 @@ val compatible_point : Renaming.t list -> step -> step -> Renaming.t list
 
 val check_edge : Edges.t -> step -> bool
 val injection_for_one_more_edge :
-  ?root:int -> Renaming.t -> Edges.t -> step -> Renaming.t option
+  ?root:Edges.agent -> Renaming.t -> Edges.t -> step -> Renaming.t option
