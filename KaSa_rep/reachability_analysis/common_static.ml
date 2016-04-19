@@ -41,6 +41,7 @@ type bdu_common_static =
     (*bond in the rhs and in the lhs*)
     store_bonds_rhs : Ckappa_sig.PairAgentSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
     store_bonds_lhs : Ckappa_sig.PairAgentSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
+    store_action_binding : Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
   }
 
 (**********************************************************************************)
@@ -702,6 +703,81 @@ let collect_bonds_lhs parameter error rule_id rule store_result =
   error, store_result
 
 (************************************************************************************)
+(*action binding in the rhs*)
+
+let collect_action_binding parameter error rule_id rule store_result =
+  List.fold_left (fun (error, store_result) (site_add1, site_add2) ->
+    (*get information of a rule that created a bond*)
+    let agent_id1 = site_add1.Cckappa_sig.agent_index in
+    let site_type1 = site_add1.Cckappa_sig.site in
+    let agent_id2 = site_add2.Cckappa_sig.agent_index in
+    let site_type2 = site_add2.Cckappa_sig.site in
+    let error, agent_source = 
+      match
+        Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
+          parameter error agent_id1 rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
+      with
+      | error, None -> warn parameter error (Some "line 267") Exit Cckappa_sig.Ghost
+      | error, Some agent -> error, agent
+    in
+    (*get pair agent_type, state*)
+    let error, (agent_type1, state1) =
+      collect_agent_type_state
+        parameter
+        error
+        agent_source
+        site_type1
+    in
+    (*------------------------------------------------------------------------------*)
+    (*second pair*)
+    let error, agent_target =
+      match
+        Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
+          parameter error agent_id2 rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
+      with
+      | error, None -> warn parameter error (Some "line 275") Exit Cckappa_sig.Ghost
+      | error, Some agent -> error, agent
+    in
+    let error, (agent_type2, state2) =
+      collect_agent_type_state
+        parameter
+        error
+        agent_target
+        site_type2
+    in
+    (*add the pair inside the set*)
+    let error, old_set =
+      match 
+        Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
+          parameter
+          error
+          rule_id
+          store_result
+      with
+      | error, None -> error, Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
+      | error, Some s -> error, s
+    in
+    let error', set =
+      Ckappa_sig.PairAgentsSiteState_map_and_set.Set.add_when_not_in
+        parameter
+        error
+        ((agent_id1, agent_type1, site_type1, state1), (agent_id2, agent_type2, site_type2, state2))
+        old_set
+    in
+    let error = Exception.check warn parameter error error' (Some "line 358") Exit in
+    let error, store_result =
+      Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
+        parameter
+        error
+        rule_id
+        set
+        store_result
+    in 
+    error, store_result
+  ) (error, store_result) rule.Cckappa_sig.actions.Cckappa_sig.bind
+
+
+(************************************************************************************)
 
 let scan_rule parameter error handler_kappa rule_id rule store_result =
   (*------------------------------------------------------------------------------*)
@@ -756,13 +832,22 @@ let scan_rule parameter error handler_kappa rule_id rule store_result =
       rule
       store_result.store_bonds_lhs
   in
+  let error, store_action_binding =
+    collect_action_binding
+      parameter
+      error
+      rule_id
+      rule
+      store_result.store_action_binding
+  in
   error,
   {
     store_agent_name = store_agent_name;
     store_side_effects = store_side_effects;
     store_potential_side_effects = store_potential_side_effects;
     store_bonds_rhs = store_bonds_rhs;
-    store_bonds_lhs = store_bonds_lhs
+    store_bonds_lhs = store_bonds_lhs;
+    store_action_binding = store_action_binding
   }
 
 (************************************************************************************)
@@ -775,6 +860,7 @@ let init_bdu_common_static =
   let init_potential_bind = Ckappa_sig.AgentRule_map_and_set.Map.empty in
   let init_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty in
   let init_bonds_lhs = Ckappa_sig.Rule_map_and_set.Map.empty in
+  let init_action_binding = Ckappa_sig.Rule_map_and_set.Map.empty in
   let init_common_static =
     {
       store_agent_name              = init_agent_name;
@@ -782,6 +868,7 @@ let init_bdu_common_static =
       store_potential_side_effects  = (init_potential_free, init_potential_bind); 
       store_bonds_rhs = init_bonds_rhs;
       store_bonds_lhs = init_bonds_lhs;
+      store_action_binding = init_action_binding
     }
   in
   init_common_static

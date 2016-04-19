@@ -99,6 +99,15 @@ val set_bonds_lhs :
   global_static_information ->
   global_static_information
 
+val get_action_binding : 
+  global_static_information ->
+  Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t
+     
+val set_action_binding :
+  Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t ->
+  global_static_information ->
+  global_static_information
+
 val compute_initial_state:
   Exception.method_handler ->
   global_static_information ->

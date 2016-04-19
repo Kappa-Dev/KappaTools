@@ -160,6 +160,17 @@ let set_bonds_lhs bonds static =
     }
     static
 
+let get_action_binding static =
+  (get_bdu_common_static static).Common_static.store_action_binding
+    
+let set_action_binding bonds static =
+  set_bdu_common_static
+    {
+      (get_bdu_common_static static) with
+        Common_static.store_action_binding = bonds
+    }
+    static
+
 let compute_initial_state error static =
   let parameter = get_parameter static in
   let compil = get_cc_code static in

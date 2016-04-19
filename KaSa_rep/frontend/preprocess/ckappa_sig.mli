@@ -153,11 +153,43 @@ module SiteState_map_and_set : Map_wrapper.S_with_logs
 module AgentSiteState_map_and_set: Map_wrapper.S_with_logs 
   with type elt = c_agent_name * c_site_name * c_state
 
+module Rule_setmap: SetMap.S with type elt = c_rule_id
+
+module Agent_id_setmap: SetMap.S with type elt = c_agent_id
+
+module PairRule_setmap : SetMap.S with type elt = c_rule_id * c_rule_id
+
+module Site_map_and_set: Map_wrapper.S_with_logs 
+  with type elt = c_site_name
+
+module AgentSite_map_and_set: Map_wrapper.S_with_logs 
+  with type elt = c_agent_name * c_site_name
+
+module AgentsSite_map_and_set: Map_wrapper.S_with_logs 
+  with type elt = c_agent_id * c_agent_name * c_site_name
+
+
+module Views_bdu: Mvbdu_wrapper.Mvbdu with type key = c_site_name and type value = c_state
+
+(****************************************************************************************)
+
+module PairAgentSite_map_and_set: Map_wrapper.S_with_logs 
+  with type elt = (c_agent_id * c_site_name) * (c_agent_id * c_site_name)
+
+module PairAgentIDSites_map_and_set: Map_wrapper.S_with_logs 
+  with type elt = (c_agent_id * c_site_name * c_site_name) * (c_agent_id * c_site_name * c_site_name)
+
+module PairAgentIDSite_map_and_set: Map_wrapper.S_with_logs 
+  with type elt = (c_agent_id * c_site_name) * (c_agent_id * c_site_name)
+
 (*bonds in rhs and lhs*)
+module PairAgentsSiteState_map_and_set: Map_wrapper.S_with_logs
+  with type elt = 
+  (c_agent_id * c_agent_name * c_site_name * c_state) * (c_agent_id * c_agent_name * c_site_name * c_state)
+
 module PairAgentSiteState_map_and_set: Map_wrapper.S_with_logs
   with type elt = 
-  (c_agent_name * c_site_name * c_state) * 
-    (c_agent_name * c_site_name * c_state)
+  (c_agent_name * c_site_name * c_state) * (c_agent_name * c_site_name * c_state)
 
 (*parallel*)
 module PairAgentsSitesStates_map_and_set: Map_wrapper.S_with_logs
@@ -174,30 +206,6 @@ module PairAgentSites_map_and_set: Map_wrapper.S_with_logs
 module PairAgentIDSiteState_map_and_set: Map_wrapper.S_with_logs
   with type elt = (c_agent_id * c_site_name * c_state) * (c_agent_id * c_site_name * c_state)
 
-module Rule_setmap: SetMap.S with type elt = c_rule_id
-
-module Agent_id_setmap: SetMap.S with type elt = c_agent_id
-
-module PairRule_setmap : SetMap.S with type elt = c_rule_id * c_rule_id
-
-module Views_bdu: Mvbdu_wrapper.Mvbdu with type key = c_site_name and type value = c_state
-
-(****************************************************************************************)
-
-module Site_map_and_set: Map_wrapper.S_with_logs 
-  with type elt = c_site_name
-
-module AgentSite_map_and_set: Map_wrapper.S_with_logs 
-  with type elt = c_agent_name * c_site_name
-
-module AgentsSite_map_and_set: Map_wrapper.S_with_logs 
-  with type elt = c_agent_id * c_agent_name * c_site_name
-
-module PairAgentSite_map_and_set: Map_wrapper.S_with_logs 
-  with type elt = (c_agent_id * c_site_name) * (c_agent_id * c_site_name)
-
-module PairAgentIDSites_map_and_set: Map_wrapper.S_with_logs 
-  with type elt = (c_agent_id * c_site_name * c_site_name) * (c_agent_id * c_site_name * c_site_name)
 
 (****************************************************************************************)
 
