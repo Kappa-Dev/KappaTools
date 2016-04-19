@@ -60,6 +60,8 @@ let rules_of_ast
 	Primitives.connected_components = ccs;
 	Primitives.removed = neg;
 	Primitives.inserted = pos;
+	Primitives.fresh_bindings =
+	  Primitives.Transformation.fresh_bindings pos;
 	Primitives.consumed_tokens = rm_toks;
 	Primitives.injected_tokens = add_toks;
 	Primitives.syntactic_rule = syntax_ref;

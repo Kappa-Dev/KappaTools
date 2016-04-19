@@ -15,6 +15,7 @@ type cc = {
   (*internal state id -> [|... state_j...|]
  i.e agent_id on site_j has internal state state_j*)
   recogn_nav: Navigation.step list;
+  discover_nav: Navigation.step list;
 }
 
 type t = cc
@@ -360,8 +361,9 @@ let fresh sigs id_by_type nb_id domain single_agent_points =
 
 let empty_point sigs =
   let nbt = Array.make (Signature.size sigs) [] in
-  let empty_cc = {id = 0; nodes_by_type = nbt; recogn_nav = [];
-		  links = IntMap.empty; internals = IntMap.empty;} in
+  let empty_cc =
+    {id = 0; nodes_by_type = nbt; recogn_nav = []; discover_nav = [];
+     links = IntMap.empty; internals = IntMap.empty;} in
   {content = empty_cc; is_obs_of = None; fathers = []; sons = [];}
 
 let empty sigs =
@@ -680,7 +682,8 @@ let remove_ag_cc inj2cc cc_id cc ag_id =
 				    with Renaming.Undefined -> x) a) prelinks in
      { id = cc_id; nodes_by_type = new_nbt;
        links = new_links; internals = new_ints;
-       recogn_nav = raw_to_navigation false new_nbt new_ints new_links},
+       recogn_nav = raw_to_navigation false new_nbt new_ints new_links;
+       discover_nav = raw_to_navigation true new_nbt new_ints new_links},
      to_subst
 
 let update_cc inj2cc cc_id cc ag_id links internals =
@@ -696,7 +699,9 @@ let update_cc inj2cc cc_id cc ag_id links internals =
       nodes_by_type = cc.nodes_by_type;
       internals = new_ints;
       links = new_links;
-      recogn_nav = raw_to_navigation false cc.nodes_by_type new_ints new_links},
+      recogn_nav = raw_to_navigation false cc.nodes_by_type new_ints new_links;
+      discover_nav =
+	raw_to_navigation true cc.nodes_by_type new_ints new_links},
 	   inj2cc)
 
 let compute_cycle_edges cc =
@@ -933,7 +938,10 @@ let finish_new ?origin wk =
     { id = wk.cc_id; nodes_by_type = wk.used_id;
       links = wk.cc_links; internals = wk.cc_internals;
       recogn_nav =
-	raw_to_navigation false wk.used_id wk.cc_internals wk.cc_links} in
+	raw_to_navigation false wk.used_id wk.cc_internals wk.cc_links;
+      discover_nav =
+	raw_to_navigation true wk.used_id wk.cc_internals wk.cc_links} in
+
   let env =
     Env.fresh wk.sigs wk.reserved_id wk.free_id wk.cc_env wk.cc_single_ag in
   add_domain ?origin env cc_candidate
@@ -1068,7 +1076,7 @@ module Matching = struct
        | None -> false
        | Some inj' -> aux_is_root_of graph None inj' t
   let is_root_of graph (_,rty as root) cc =
-    match to_navigation cc with
+    match cc.discover_nav with
     | [] ->
        (match find_root cc with
 	| Some (_,rty') -> rty = rty'

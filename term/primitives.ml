@@ -67,6 +67,16 @@ module Transformation =
 	 Format.fprintf
 	   f "@[%a.%a~ =@]" (Agent_place.print ?sigs) p
 	   (Agent_place.print_site ?sigs p) s
+
+    let fresh_bindings =
+      List.fold_left
+	(fun unaries_to_expl ->
+	 function
+	 | (Freed _ | Agent _ | PositiveInternalized _) -> unaries_to_expl
+	 | (NegativeWhatEver _ | NegativeInternalized _) -> assert false
+	 | Linked ((n,_),(n',_)) ->
+	    if Agent_place.same_connected_component n n'
+	    then unaries_to_expl else n::unaries_to_expl) []
   end
 
 type elementary_rule = {
@@ -75,6 +85,7 @@ type elementary_rule = {
   connected_components : Connected_component.t array;
   removed : Instantiation.abstract Transformation.t list;
   inserted : Instantiation.abstract Transformation.t list;
+  fresh_bindings : Instantiation.abstract list;
   consumed_tokens : (Alg_expr.t * int) list;
   injected_tokens : (Alg_expr.t * int) list;
   syntactic_rule : int;

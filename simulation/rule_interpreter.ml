@@ -383,23 +383,8 @@ let update_edges
       if path <> None || exists_root_of_unary_ccs unary_ccs roots''
       then
 	let unaries_to_explore =
-	  List.fold_left
-	    (fun unaries_to_expl ->
-	     function
-	     | (Primitives.Transformation.Freed _ |
-		Primitives.Transformation.Agent _ |
-		Primitives.Transformation.PositiveInternalized _) ->
-		unaries_to_expl
-	     | (Primitives.Transformation.NegativeWhatEver _ |
-		Primitives.Transformation.NegativeInternalized _) ->
-		assert false
-	     | Primitives.Transformation.Linked ((n,_),(n',_)) ->
-		if Agent_place.same_connected_component n n'
-		then unaries_to_expl
-		else
-		  let nc = Agent_place.concretize final_inj2graph n in
-		  nc::unaries_to_expl)
-	    [] rule.Primitives.inserted in
+	  List.map (Agent_place.concretize final_inj2graph)
+		   rule.Primitives.fresh_bindings in
 	List.fold_left
 	  (fun (unary_cands,_ as acc) (id,ty) ->
 	   match
