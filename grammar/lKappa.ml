@@ -196,14 +196,15 @@ let print_rates sigs pr_tok pr_var f r =
   Format.fprintf
     f " @@ %a%t"
     (Ast.print_ast_alg (print_rule_mixture sigs) pr_tok pr_var) (fst r.r_rate)
-    (fun f -> match r.r_un_rate with
-		None -> ()
-	      | Some ((ra,_),max_dist) -> 
-		 Format.fprintf
-		   f "(%a%a)"	 
-		   (Ast.print_ast_alg (print_rule_mixture sigs) pr_tok pr_var) ra
-		   (Pp.option (fun f (md,_) -> 
-			       Format.fprintf f ":%a" Format.pp_print_int md)) max_dist) 
+    (fun f ->
+     match r.r_un_rate with
+     | None -> ()
+     | Some ((ra,_),max_dist) ->
+	Format.fprintf
+	  f "(%a%a)"
+	  (Ast.print_ast_alg (print_rule_mixture sigs) pr_tok pr_var) ra
+	  (Pp.option (fun f (md,_) ->
+		      Format.fprintf f ":%a" Format.pp_print_int md)) max_dist)
 
 let print_rule ~ltypes ~rates sigs pr_tok pr_var f r =
   Format.fprintf

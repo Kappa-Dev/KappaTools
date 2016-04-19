@@ -15,11 +15,13 @@ let site_of_num addr sign =
   try NamedDecls.elt_name sign addr
   with Invalid_argument _ -> raise Not_found
 
-let num_of_internal_state site_id state sign =
+let num_of_internal_state site_id (_,pos as state) sign =
   try
     let (na,_),values_opt = sign.NamedDecls.decls.(site_id) in
     match values_opt with
-    | None -> raise Not_found
+    | None ->
+       raise (ExceptionDefn.Malformed_Decl
+		("Site "^na^" has no declared internal state.",pos))
     | Some nd ->
        NamedDecls.elt_id ~kind:("internal state for site "^na) nd state
   with
