@@ -14,7 +14,7 @@ type t =
     tokens: Nbr.t array;
     outdated_elements:
       Operator.DepSet.t *
-	(Edges.agent * ((Connected_component.Set.t *int) * Edges.path) list) list
+	(Edges.agent * ((Connected_component.Set.t*int) * Edges.path) list) list
 	* bool;
     story_machinery :
       ((Causal.event_kind * Connected_component.t array *
@@ -613,43 +613,40 @@ let apply_unary_rule
 			       Mods.IntSet.empty cc1 state.roots_of_ccs) &&
       Mods.IntSet.mem root2 (Connected_component.Map.find_default
 			       Mods.IntSet.empty cc2 state.roots_of_ccs) in
-  let root1_ty = match Connected_component.find_root_type cc1 with
-    | None -> assert false | Some x -> x in
-  let nodes1 = Connected_component.Matching.get_all_with_types
-		 state.edges
-		 Connected_component.Matching.empty cc1 root1 in
-  let nodes2 = Connected_component.Matching.get_all
-		 state.edges
-		 Connected_component.Matching.empty cc2 root2 in
-  let dist = match rule.Primitives.unary_rate with
-     | None -> None
-     | Some (_, dist_opt) -> dist_opt in
-  match Edges.are_connected ~candidate (Environment.signatures env)
-			    state.edges root1_ty root1 root2 nodes1 nodes2 
-			    dist !Parameter.store_unary_distance with
-  | None -> Corrected state'
-  | Some _ when missing_ccs -> Corrected state'
-  | Some p as path ->
-     let () = if !Parameter.store_unary_distance then
-		let n = List.length p in
-		let rule = Environment.get_rule env rule_id in
-		let syntactic_id = rule.Primitives.syntactic_rule in
-		let rule_arr = state'.store_unary_dist in
-		match rule_arr.(syntactic_id) with
-		| None -> rule_arr.(syntactic_id) <- Some (DynArray.init (n+1) (fun i-> if (i==n) then 1 else 0))
-		| Some arr -> let old_val = DynArray.get arr n in
-			      DynArray.set arr n (old_val+1) in
-     let inj1 =
-       Connected_component.Matching.reconstruct
-	 state'.edges Connected_component.Matching.empty 0 cc1 root1 in
-     let inj =
-       match inj1 with
+  let inj1 =
+    Connected_component.Matching.reconstruct
+      state'.edges Connected_component.Matching.empty 0 cc1 root1 in
+  let inj =
+    match inj1 with
+    | None -> None
+    | Some inj -> Connected_component.Matching.reconstruct
+		    state'.edges inj 1 cc2 root2 in
+  match inj with
+  | None -> Clash
+  | Some inj ->
+     let nodes = Connected_component.Matching.elements_with_types inj in
+     let nodes1 = nodes.(0) in
+     let nodes2 = List.map fst nodes.(1) in
+     let dist = match rule.Primitives.unary_rate with
        | None -> None
-       | Some inj -> Connected_component.Matching.reconstruct
-		       state'.edges inj 1 cc2 root2 in
-     match inj with
-     | None -> Clash
-     | Some inj ->
+       | Some (_, dist_opt) -> dist_opt in
+     match Edges.are_connected ~candidate (Environment.signatures env)
+			       state.edges nodes1 nodes2
+			       dist !Parameter.store_unary_distance with
+     | None -> Corrected state'
+     | Some _ when missing_ccs -> Corrected state'
+     | Some p as path ->
+	let () = if !Parameter.store_unary_distance then
+		   let n = List.length p in
+		   let rule = Environment.get_rule env rule_id in
+		   let syntactic_id = rule.Primitives.syntactic_rule in
+		   let rule_arr = state'.store_unary_dist in
+		   match rule_arr.(syntactic_id) with
+		   | None ->
+		      rule_arr.(syntactic_id) <-
+			Some (DynArray.init (n+1) (fun i-> if i=n then 1 else 0))
+		   | Some arr -> let old_val = DynArray.get arr n in
+				 DynArray.set arr n (old_val+1) in
 	Success
 	  (transform_by_a_rule ~get_alg env domain unary_ccs counter state'
 			       event_kind ?path rule inj)
@@ -702,24 +699,15 @@ let apply_rule
 	    match Mods.Int2Map.find_option point state.unary_pathes with
 	    | Some x -> x
 	    | None -> raise Not_found in
-	  let root0_ty =
-	    match Connected_component.find_root_type
-		    rule.Primitives.connected_components.(0) with
-	    | None -> assert false | Some x -> x in
-	  let nodes1 = Connected_component.Matching.get_all_with_types
-			 state.edges Connected_component.Matching.empty
-			 rule.Primitives.connected_components.(0) roots.(0) in
-	  let nodes2 = Connected_component.Matching.get_all
-			 state.edges Connected_component.Matching.empty
-			 rule.Primitives.connected_components.(1) roots.(1) in
+	  let nodes = Connected_component.Matching.elements_with_types inj in
+	  let nodes1 = nodes.(0) in
+	  let nodes2 = List.map fst nodes.(1) in
 	  let dist = match rule.Primitives.unary_rate with
 	    | None -> None
 	    | Some (_, dist_opt) -> dist_opt in
 	  match
 	    Edges.are_connected ~candidate (Environment.signatures env)
-				state.edges root0_ty roots.(0) roots.(1)
-                                nodes1 nodes2 dist
-				false with
+				state.edges nodes1 nodes2 dist false with
 	  | None ->
 	     let rid =
 	       match rule_id with None -> assert false | Some rid -> rid in

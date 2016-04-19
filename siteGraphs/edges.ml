@@ -335,7 +335,8 @@ let is_valid_path graph l =
   List.for_all (fun (((a,_),s),((a',_),s')) -> link_exists a s a' s' graph) l
 
 (* depth = number of edges between root and node *)
-let breadth_first_traversal dist stop_on_find is_interesting sigs links cache =
+let breadth_first_traversal
+      dist stop_on_find is_interesting sigs links cache out todos =
   let rec look_each_site (id,ty,path as x) site (stop,out,next as acc) =
     if site = 0 then acc else
     match (DynArray.get links id).(pred site) with
@@ -364,64 +365,41 @@ let breadth_first_traversal dist stop_on_find is_interesting sigs links cache =
 		   | Some d when d <= depth -> let () = Cache.reset cache in []
 		   (* stop when the max distance is reached *)
 		   | Some _ -> aux (depth+1) out [] next
-		   | None -> aux depth out [] next
-  in aux 1
+		   | None -> aux depth out [] next in
+  aux 1 out [] todos
 
 let paths_of_interest
       is_interesting sigs graph start_ty start_point done_path =
+  let () = assert (not graph.outdated) in
   let () = Cache.mark graph.cache start_point in
   let () = List.iter (fun (_,((x,_),_)) -> Cache.mark graph.cache x)
 		     done_path in
-  let () = assert (not graph.outdated) in
   let acc = match is_interesting start_point with
     | None -> []
     | Some x -> [(x,start_point),done_path] in
   breadth_first_traversal None false is_interesting sigs graph.connect
-			  graph.cache acc [] [start_point,start_ty,done_path]
+			  graph.cache acc [start_point,start_ty,done_path]
 
-(* nodes_x: agent_id list = int * int list
+(* nodes_x: agent_id list = (int * int) list
    nodes_y: adent_id list = int list *)
 let are_connected
-      ?candidate sigs graph ty_x x y nodes_x nodes_y dist store_dist =
+      ?candidate sigs graph nodes_x nodes_y dist store_dist =
   let () = assert (not graph.outdated) in
   (* look for the closest node in nodes_y *)
-  let rec is_in_nodes_y nodes_y z = match nodes_y with
-    | [] -> None
-    | y::nds -> if z = y then Some () else is_in_nodes_y nds z in
-  let rec prepare_node x ty site acc =
-    if site = 0 then acc else
-      match (DynArray.get graph.connect x).(pred site) with
-      | None -> prepare_node x ty (pred site) acc
-      | Some ((id',ty'),_) ->
-	 if (List.mem (id',ty') nodes_x) then prepare_node x ty (pred site) acc
-	 else prepare_node x ty (pred site) ((x,ty,[])::acc) in
+  let is_in_nodes_y z = if List.mem z nodes_y then Some () else None in
   (* breadth first search is called on a list of sites;
      start the breadth first search with the boundaries of nodes_x,
      that is all sites that are connected to other nodes in x
      and with all nodes in nodes_x marked as done *)
-  match dist with
-  | None when (store_dist = false) ->
-     (match candidate with
-      | Some p when is_valid_path graph p -> Some p
-      | (Some _ | None) ->
-	 let () = Cache.mark graph.cache x in
-	 (match
-	     breadth_first_traversal dist true
-				     (fun z -> if z = y then Some () else None)
-				     sigs graph.connect graph.cache
-				     [] [] [x,ty_x,[]] with
-	   | [] -> None
-	   | [ _,p ] -> Some p
-	   | _ :: _ -> failwith "Edges.are_they_connected completely broken"))
-  | _ ->
-     let () =
-       List.iter (fun (x,_) -> Cache.mark graph.cache x) nodes_x in
+  match candidate with
+  | Some p when dist = None && not store_dist && is_valid_path graph p -> Some p
+  | (Some _ | None) ->
      let prepare =
-       List.fold_left
-	 (fun acc (x,ty) -> prepare_node x ty (Signature.arity sigs ty) acc)
-	 [] nodes_x in
-     match breadth_first_traversal dist true (is_in_nodes_y nodes_y) sigs
-				   graph.connect graph.cache [] [] prepare
+       List.fold_left (fun acc (id,ty)  ->
+		       let () = Cache.mark graph.cache id in
+		       (id,ty,[])::acc) [] nodes_x in
+     match breadth_first_traversal dist true is_in_nodes_y sigs
+				   graph.connect graph.cache [] prepare
      with [] -> None
 	| [ _,p ] -> Some p
 	| _ :: _ -> failwith "Edges.are_they_connected completely broken"

@@ -1066,40 +1066,15 @@ module Matching = struct
     | Some x -> x
     | None -> raise Not_found
 
-  (*edges: list of concrete edges,
-returns the roots of observables that are above in the domain*)
-
-  (* get_all : Edges.t -> t -> cc -> int -> int list *)
-  let get_all graph inj cc root =
-    let cc_id_in_rule = 1 in
-    match reconstruct graph inj cc_id_in_rule cc root with
-    | None -> []
-    | Some match_nodes_cc_graph ->
-       let rec aux ty =
-	 if ty = Array.length cc.nodes_by_type then []
-	 else List.append
-		(List.map (fun node_id ->
-			   let node = (cc.id, ty, node_id) in
-			   get (node, cc_id_in_rule) match_nodes_cc_graph)
-			  cc.nodes_by_type.(ty))
-		(aux (succ ty))
-       in aux 0
-
-  (* get_all_with_types : Edges.t -> t -> cc -> int -> int *int list *)
-  let get_all_with_types graph inj cc root =
-    let cc_id_in_rule = 1 in
-    match reconstruct graph inj cc_id_in_rule cc root with
-    | None -> []
-    | Some match_nodes_cc_graph ->
-       let rec aux ty =
-	 if ty = Array.length cc.nodes_by_type then []
-	 else List.append
-		(List.map (fun node_id ->
-			   let node = (cc.id, ty, node_id) in
-			   (get (node, cc_id_in_rule) match_nodes_cc_graph,ty))
-			  cc.nodes_by_type.(ty))
-		(aux (succ ty))
-       in aux 0
+  let elements_with_types (t,_) =
+    let out = Array.make (IntMap.size t) [] in
+    let () =
+      IntMap.iter
+	(fun id map ->
+	 out.(id) <-
+	   (NodeMap.fold (fun (_, ty, _) out acc -> (out,ty)::acc) map []))
+	t in
+    out
 
   module Cache =
     struct
@@ -1119,6 +1094,8 @@ returns the roots of observables that are above in the domain*)
   type cache = CacheSetMap.Set.t
   let empty_cache = CacheSetMap.Set.empty
 
+  (*edges: list of concrete edges,
+returns the roots of observables that are above in the domain*)
   let from_edge domain graph acc edges =
     let get_root inj point =
       match find_root point.content with

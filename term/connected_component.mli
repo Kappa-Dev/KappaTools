@@ -69,10 +69,7 @@ module Matching : sig
   val reconstruct : Edges.t -> t -> int -> cc -> int -> t option
   (** [reconstruct graph matching_of_previous_cc cc_id_in_rule cc root ]*)
 
-  val get_all : Edges.t -> t -> cc -> int -> int list
-  (** [get_all graph matching_of_previous_cc cc root ]*)
-
-  val get_all_with_types : Edges.t -> t -> cc -> int -> (int * int) list
+  val elements_with_types : t -> (int * int) list array
 
   type cache
   val empty_cache : cache
