@@ -16,7 +16,8 @@
 (* Before properly achieving separation of concepts. We introduce one
    monolithic domain that collect everything (as in the previous analyzer).*)
 
-let direct_computation = true
+let direct_computation = false
+let new_computation = false
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "views_domain") message exn
@@ -33,7 +34,7 @@ struct
 
   type static_information =
     {
-      global_static_information : Analyzer_headers.global_static_information;	
+      global_static_information : Analyzer_headers.global_static_information;
       domain_static_information : Bdu_static_views.bdu_analysis_static;
     }
 
@@ -311,7 +312,7 @@ struct
       scan_rule_set_dynamic init_static init_dynamic error
     in
     error, static, dynamic
-										
+
   (** get type bdu_analysis_static*)
   let get_bdu_analysis_static static dynamic error =
     let result = static.domain_static_information in
@@ -361,7 +362,7 @@ struct
         try
           Handler.string_of_agent parameter error handler_kappa agent_type
         with
-          _ -> warn parameter error (Some "line 56") Exit 
+          _ -> warn parameter error (Some "line 56") Exit
             (Ckappa_sig.string_of_agent_name agent_type)
       in
       (*-----------------------------------------------------------------------*)
@@ -392,7 +393,7 @@ struct
                 Handler.string_of_site parameter error handler_kappa
 		  agent_type site_type
 	      with
-		_ -> warn parameter error (Some "line 210") Exit 
+		_ -> warn parameter error (Some "line 210") Exit
                   (Ckappa_sig.string_of_site_name site_type)
 	    in
 	    let () =
@@ -441,7 +442,7 @@ struct
               Handler.string_of_agent parameter error kappa_handler agent_type
             with
               _ -> warn
-                parameter error (Some "line 460") Exit 
+                parameter error (Some "line 460") Exit
                 (Ckappa_sig.string_of_agent_name agent_type)
 	  in
         (*-----------------------------------------------------------------------*)
@@ -470,7 +471,7 @@ struct
 		  Handler.string_of_rule parameter error kappa_handler
 		    compiled rule_id
 	        with
-		  _ -> warn parameter error (Some "line 250") Exit 
+		  _ -> warn parameter error (Some "line 250") Exit
                     (Ckappa_sig.string_of_rule_id rule_id)
 	      in
 	      let tab =
@@ -654,7 +655,7 @@ struct
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     let store = get_fixpoint_result dynamic in
     let error, bdu_old =
-      match Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs 
+      match Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
         parameter error
         (agent_type, cv_id) store
       with
@@ -762,7 +763,7 @@ struct
 	      Ckappa_sig.Site_map_and_set.Map.find_option
 		parameter error site map_new_index_forward
 	    with
-	    | error, None -> warn parameter error (Some "770") Exit 
+	    | error, None -> warn parameter error (Some "770") Exit
               Ckappa_sig.dummy_site_name
 	    | error, Some s -> error, s
 	  in
@@ -910,7 +911,7 @@ struct
 
   (**************************************************************************)
 
-  exception False of Exception.method_handler * dynamic_information     
+  exception False of Exception.method_handler * dynamic_information
 
   (**************************************************************************)
   (*compute condition of bdu whether or not it is enable by doing the
@@ -926,11 +927,11 @@ struct
             match
               Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
                 parameter
-                error 
-                (agent_type, cv_id) 
+                error
+                (agent_type, cv_id)
                 fixpoint_result
             with
-            | error, None -> Printf.fprintf stdout "cv_id %i\n" 
+            | error, None -> Printf.fprintf stdout "cv_id %i\n"
               (Covering_classes_type.int_of_cv_id cv_id);
               error, bdu_false
             | error, Some bdu -> error, bdu
@@ -951,7 +952,7 @@ struct
                 (agent_id, cv_id) bdu_inter map
             in
             error, dynamic, map
-        ) proj_bdu_test_restriction 
+        ) proj_bdu_test_restriction
         (error, dynamic, Covering_classes_type.AgentIDCV_map_and_set.Map.empty)
     in
     error, dynamic, map
@@ -977,7 +978,7 @@ struct
     let error, new_site_name =
       match
         Ckappa_sig.Site_map_and_set.Map.find_option
-          parameter 
+          parameter
           error
           site_name
           map2
@@ -1007,23 +1008,23 @@ struct
           (*---------------------------------------------------------------------*)
           (* fetch the bdu for the agent type and the cv_id in
              the current state of the iteration *)
-          let error, bdu_X = 
+          let error, bdu_X =
             match
               Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
                 parameter
-                error 
-                (agent_type, cv_id) 
+                error
+                (agent_type, cv_id)
                 fixpoint_result
             with
             | error, None -> error, bdu_false
-            | error, Some bdu -> error, bdu                       
+            | error, Some bdu -> error, bdu
           in
           (* compute the projection over new_site_name *)
           let handler = Analyzer_headers.get_mvbdu_handler dynamic in
           let error, handler, singleton =
             Ckappa_sig.Views_bdu.build_variables_list
               parameter
-              handler 
+              handler
               error
               [new_site_name]
           in
@@ -1040,21 +1041,21 @@ struct
             Ckappa_sig.Views_bdu.build_renaming_list
               parameter
               handler
-              error 
+              error
               [new_site_name, Ckappa_sig.site_name_of_int 1]
           in
-          let error, handler, bdu_renamed = 
+          let error, handler, bdu_renamed =
             Ckappa_sig.Views_bdu.mvbdu_rename
               parameter
               handler
               error
-              bdu_proj 
+              bdu_proj
               new_site_name_1
           in
           (* conjunction between bdu and bdu'*)
-          let error, handler, bdu = 
+          let error, handler, bdu =
             Ckappa_sig.Views_bdu.mvbdu_and
-              parameter 
+              parameter
               handler
               error
               bdu
@@ -1069,7 +1070,7 @@ struct
     let handler = Analyzer_headers.get_mvbdu_handler dynamic in
     let error, handler, list =
       Ckappa_sig.Views_bdu.extensional_of_mvbdu
-        parameter 
+        parameter
         handler
         error
         bdu
@@ -1107,16 +1108,16 @@ struct
       match Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
         parameter
         error
-        agent_type 
+        agent_type
         site_correspondence
       with
       | error, None -> warn parameter error (Some "line 922") Exit []
       | error, Some l -> error, l
     in
     (* compute the list of cv_id documenting site_name *)
-    let error, cv_list = 
+    let error, cv_list =
       match Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
-        parameter 
+        parameter
         error
         (agent_type, path.Communication.site) (*site:v*)
         store_covering_classes_id
@@ -1143,7 +1144,7 @@ struct
 
   (**************************************************************************)
   (*let compute precondition*)
-      
+
   (* checking the binding information whether or not path belong to the
      current contact map*)
 
@@ -1168,7 +1169,7 @@ struct
      if you could take the agent type of the target, take
      site, and collect the information you have about the
      potential state of this site in agents of this type.*)
-    
+
   (*typing*)
 
   let precondition_typing parameter error kappa_handler rule_id step_list path
@@ -1178,7 +1179,7 @@ struct
       | [] -> error, answer
       | step :: tl ->
         let error, agent_type =
-          match 
+          match
             Ckappa_sig.RuleAgent_map_and_set.Map.find_option_without_logs
               parameter
               error
@@ -1213,12 +1214,12 @@ struct
             (Ckappa_sig.Binding state)
             state_dic
         in
-        if b 
+        if b
         then
           (*-------------------------------------------------------------------------------*)
           (*state is defined*)
           let error, answer_contact_map =
-            match 
+            match
               Ckappa_sig.Dictionary_of_States.allocate
                 parameter
                 error
@@ -1248,22 +1249,22 @@ struct
           error, answer
     in
     aux step_list Usual_domains.Undefined
-    
+
   (*-------------------------------------------------------------------------------*)
   (*intersection:
     - Undefined, _ -> Undefined
     - Any, a -> a
     - Val l, Val l' -> combine l l'
   *)
-      
+
   let inter error contact_answer update_answer =
     match contact_answer, update_answer with
-    | Usual_domains.Undefined, _ 
+    | Usual_domains.Undefined, _
     | _, Usual_domains.Undefined -> error, Usual_domains.Undefined
     | Usual_domains.Any, Usual_domains.Val l
-    | Usual_domains.Val l, Usual_domains.Any ->  error, Usual_domains.Val l 
+    | Usual_domains.Val l, Usual_domains.Any ->  error, Usual_domains.Val l
     | Usual_domains.Any, Usual_domains.Any -> error, Usual_domains.Any
-    | Usual_domains.Val l, Usual_domains.Val l' -> 
+    | Usual_domains.Val l, Usual_domains.Val l' ->
       (*FIXME:mixing the list*)
       let l = List.sort (fun a b -> compare a b) l in
       let l' = List.sort (fun a b -> compare a b) l' in
@@ -1290,7 +1291,7 @@ struct
              (last_agent, last_site) (*D.t*)
              kappa_handler.Cckappa_sig.states_dic)
           (fun error ->
-            warn parameter error (Some "line 1294") Exit 
+            warn parameter error (Some "line 1294") Exit
               (Ckappa_sig.Dictionary_of_States.init()))
       in
       (*the state of site t is B.w*)
@@ -1324,7 +1325,7 @@ struct
               take the state of v knowing that t has type B@w*)
             (*covering class containing D@v*)
             let error, cv_list =
-              match 
+              match
                 Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
                   parameter
                   error
@@ -1347,7 +1348,7 @@ struct
               | error, Some l -> error, l
             in
             (*---------------------------------------------------------------------*)
-            let error, dynamic, bdu = 
+            let error, dynamic, bdu =
               List.fold_left (fun (error, dynamic, bdu) cv_id ->
                 (*CHECK ME: firstly check whether or not t is in this covering class*)
                 let error, b =
@@ -1356,7 +1357,7 @@ struct
                     then
                       error, true
                     else
-                      error, bool                    
+                      error, bool
                   ) (error, false) site_correspondence
                 in
                 if b
@@ -1414,7 +1415,7 @@ struct
                           error
                           new_pair_list
                       in
-                      error, handler, new_bdu                     
+                      error, handler, new_bdu
                     ) (error, handler, bdu_false) list (*CHECK ME: start from bdu_false*)
                   in
                   (*to the conjunction between bdu_X and new_bdu*)
@@ -1450,7 +1451,7 @@ struct
                       handler
                       error
                       bdu_proj
-                      new_site_name_1                      
+                      new_site_name_1
                   in
                   let error, handler, bdu =
                     Ckappa_sig.Views_bdu.mvbdu_and
@@ -1461,7 +1462,7 @@ struct
                       bdu_renamed
                   in
                   let dynamic = Analyzer_headers.set_mvbdu_handler handler dynamic in
-                  error, dynamic, bdu                  
+                  error, dynamic, bdu
                 else
                   (*---------------------------------------------------------------------*)
                   (*t is not in CV, take the state of v*)
@@ -1624,13 +1625,13 @@ struct
                 store_covering_classes_id
                 fixpoint_result
             in
-            error, (dynamic, new_answer)                               
+            error, (dynamic, new_answer)
           | error, Some site_add ->
             (*----------------------------------------------------------------------*)
             (*A.x is bound to something*)
             let agent_type' = site_add.Cckappa_sig.agent_type in
             (*check that A.x is bound to B.y*)
-            if agent_type' = step.Communication.agent_type_in 
+            if agent_type' = step.Communication.agent_type_in
             then
               (*recursively apply to #i tail*)
               let next_path =
@@ -1654,7 +1655,7 @@ struct
   (*-------------------------------------------------------------------------------*)
 
   let compute_precondition_enable parameter error kappa_handler rule rule_id precondition
-      bdu_false bdu_true dual_contact_map store_agent_name site_correspondence 
+      bdu_false bdu_true dual_contact_map store_agent_name site_correspondence
       store_covering_classes_id fixpoint_result =
     let precondition =
       Communication.refine_information_about_state_of_site
@@ -1676,7 +1677,7 @@ struct
           (*-------------------------------------------------------------------------------*)
 	  (* The output should be more precise than former_answer:
 	     If the former_answer is any, do not change anything,
-	     If the former_answer is Val l, 
+	     If the former_answer is Val l,
 	     then the answer must be Val l', with l' a sublist of l *)
           let rec aux dynamic path answer =
             let step_list = path.Communication.relative_address in
@@ -1699,7 +1700,7 @@ struct
                 let error, (dynamic, new_answer) =
                   match agent with
                   | Cckappa_sig.Ghost
-                  | Cckappa_sig.Unknown_agent _ 
+                  | Cckappa_sig.Unknown_agent _
                   | Cckappa_sig.Dead_agent _ ->
                     warn parameter error (Some "line 1435") Exit (dynamic, Usual_domains.Undefined)
                   | Cckappa_sig.Agent agent ->
@@ -1742,7 +1743,7 @@ struct
                       | error, Some port ->
                         let error, (dynamic, new_answer) =
                           match port.Cckappa_sig.site_free with
-                          | None 
+                          | None
                           | Some false ->
                             (*it is not free, inside the pattern*)
                             let error, (dynamic, new_answer) =
@@ -1814,7 +1815,7 @@ struct
           in
           aux dynamic current_path former_answer_combine_with_contact_map)
     in
-    precondition 
+    precondition
 
   (**************************************************************************)
 
@@ -1824,7 +1825,7 @@ struct
     let kappa_handler = get_kappa_handler static in
     let rules = compil.Cckappa_sig.rules in
     let error, rule =
-      match 
+      match
         Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.unsafe_get
           parameter
           error
@@ -2260,7 +2261,7 @@ struct
     let store_update = get_store_update dynamic in
     let (half_break, remove) = side_effects in
     match event with
-    | Communication.See_a_new_bond ((agent_type, site_type, state), 
+    | Communication.See_a_new_bond ((agent_type, site_type, state),
                                     (agent_type', site_type', state')) ->
       (*-----------------------------------------------------------------------*)
       (* get the pairs (r, state) compatible with the second site:half_break *)
@@ -2305,7 +2306,7 @@ struct
             in
             let error, store_result =
               Covering_classes_type.AgentCV_map_and_set.Map.add_or_overwrite
-                parameter error 
+                parameter error
                 (agent_type, cv_id)
                 new_rule_id_set
                 store_result
@@ -2586,7 +2587,7 @@ struct
                   parameter handler error renamed_mvbdu
 	      in
               let error, cv_map_opt =
-                Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get 
+                Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
                   parameter error agent_type output
 	      in
 	      let error,cv_map =
@@ -2611,7 +2612,7 @@ struct
 		  cv_map
 	      in
 	      let error,output =
-                Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set 
+                Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
                   parameter error agent_type cv_map'
 		  output
 	      in
@@ -2643,7 +2644,7 @@ struct
           ~show_dep_with_dimmension_higher_than:dim_min parameter handler error
           handler_kappa site_correspondence result
       in
-      let error, handler = 
+      let error, handler =
 	Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
           parameter
           error
@@ -2652,7 +2653,7 @@ struct
               try
 		Handler.string_of_agent parameter error handler_kappa agent_type
               with
-		_ -> warn parameter error (Some "line 111") Exit 
+		_ -> warn parameter error (Some "line 111") Exit
                   (Ckappa_sig.string_of_agent_name agent_type)
 	  in
 	    let error = Exception.check warn parameter error error' (Some "line 110") Exit in
@@ -2698,15 +2699,17 @@ struct
 	      map
 	      (error, handler))
           output handler
-      in 
+      in
       let compil = get_compil static in
-      let error, handler = 
+      let error, handler =
 	if (*compute_local_trace*) Remanent_parameters.get_compute_local_traces parameter
 	then
-	  if direct_computation
+    if new_computation
+    then Agent_trace_even_sparser.agent_trace parameter error handler handler_kappa mvbdu_true compil output
+    else if direct_computation
 	  then
 	    Agent_trace_with_direct_por.agent_trace parameter error handler handler_kappa mvbdu_true compil output
-	  else 
+	  else
 	    Agent_trace.agent_trace parameter error handler handler_kappa mvbdu_true compil output
 	else
 	  error, handler
@@ -2720,7 +2723,7 @@ struct
               try
                 Handler.string_of_agent parameter error handler_kappa agent_type
               with
-                _ -> warn parameter error (Some "line 1853") Exit 
+                _ -> warn parameter error (Some "line 1853") Exit
                   (Ckappa_sig.string_of_agent_name agent_type)
 	    in
 	    let error = Exception.check warn parameter error error'
@@ -2741,7 +2744,7 @@ struct
 	    in
             (*-----------------------------------------------------------------------*)
 	    let error, site_correspondence =
-              Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get 
+              Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
                 parameter error agent_type site_correspondence
 	    in
 	    let error, site_correspondence =
@@ -2777,9 +2780,9 @@ struct
 		      let () = Loggers.print_newline
                         (Remanent_parameters.get_logger parameter)
                       in
-		      let () = 
+		      let () =
                         Ckappa_sig.Views_bdu.print
-                          parameter mvbdu 
+                          parameter mvbdu
                       in
 		      let () = Loggers.fprintf
                         (Remanent_parameters.get_logger parameter)
@@ -2807,7 +2810,7 @@ struct
 		    Translation_in_natural_language.translate
 		      parameter
                       handler
-                      error 
+                      error
                       rename_site
                       mvbdu
 		  in
