@@ -59,7 +59,7 @@ type snapshot = {
     tokens : taken_state list;
 }
 
-type parse = { observables : string list }
+type parse = { contact_map : site_graph }
 type alias_unit = unit
 type state = { plot : plot nullable;
                time : float;

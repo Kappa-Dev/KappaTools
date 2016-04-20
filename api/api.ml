@@ -79,23 +79,14 @@ end = struct
   val mutable context = { states = IntMap.empty
                          ; id = 0 }
     method parse (code : Api_types.code) : Api_types.parse Api_types.result Lwt.t =
-      build_ast code
-                (fun ((signature,_,ast),_) ->
-                 let observables : string list =
-                   List.map
-                     (fun ((annotation : (LKappa.rule_agent list, int) Ast.ast_alg_expr),_) ->
-                      let str = Format.asprintf "%a" (Ast.print_ast_alg (LKappa.print_rule_mixture signature)
-                                                                        (Format.pp_print_int)
-                                                                        (Format.pp_print_int))
-                                                annotation
-                      in str
-                     )
-                     (ast.Ast.observables : (LKappa.rule_agent list, int) Ast.ast_alg_expr Location.annot list)
-
-                 in
-                 Lwt.return (`Right { observables = observables } ))
-                (fun e -> Lwt.return (`Left [e]))
-                self#log
+      build_ast
+	code
+        (fun (_,contact_map) ->
+         Lwt.return
+	   (`Right { Api_types.contact_map =
+		       Api_data.api_contact_map contact_map }))
+        (fun e -> Lwt.return (`Left [e]))
+        self#log
     method private new_id () : int =
       let result = context.id + 1 in
       let () = context <- { context with id = context.id + 1 } in

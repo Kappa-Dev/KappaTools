@@ -97,3 +97,31 @@ let api_snapshot sigs (snapshot : Data.snapshot) : Api_types.snapshot =
 		  Api_types.value = Nbr.to_float value})
 	       (Array.to_list snapshot.Data.tokens)
   }
+
+let find_link cm (a,s) =
+  let rec auxs i j = function
+    | [] -> raise Not_found
+    | (s',_) :: t -> if s = s' then (i,j) else auxs i (succ j) t in
+  let rec auxa i = function
+    | [] -> raise Not_found
+    | (a',l) :: t -> if a = a' then auxs i 0 l else auxa (succ i) t in
+  auxa 0 cm
+
+let api_contact_map cm =
+  let rec cut_by_agent = function
+    | [] -> []
+    | ((a,s),v) :: t ->
+       let av,oth = List.partition (fun ((a',_),_) -> a = a') t in
+       (a,(s,v)::List.map (fun ((_,s'),v') -> s',v') av)::cut_by_agent oth in
+  let cm' = cut_by_agent (Export_to_KaSim.String2Map.bindings cm) in
+  Tools.array_map_of_list
+    (fun (ag,sites) ->
+     { Api_types.node_name = ag;
+       Api_types.node_sites =
+	 Tools.array_map_of_list
+	   (fun (site,(states,links)) ->
+	    { Api_types.site_name = site;
+	      Api_types.site_links = List.map (find_link cm') links;
+	      Api_types.site_states = states;
+	    }) sites;
+     }) cm'
