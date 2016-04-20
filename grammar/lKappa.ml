@@ -315,8 +315,8 @@ let to_maintained x =
     x
 
 let to_raw_mixture sigs x =
-  Tools.list_mapi
-    (fun id r ->
+  List.map
+    (fun r ->
      let internals =
        Array.mapi
 	 (fun j -> function
@@ -339,7 +339,7 @@ let to_raw_mixture sigs x =
 		| ((Ast.LNK_ANY, _) | (Ast.FREE, _)),_ -> Raw_mixture.FREE
 	 )
 	 r.ra_ports in
-     { Raw_mixture.a_id = id; Raw_mixture.a_type = r.ra_type;
+     { Raw_mixture.a_type = r.ra_type;
        Raw_mixture.a_ports = ports; Raw_mixture.a_ints = internals; })
     x
 
@@ -416,7 +416,7 @@ let annotate_dropped_agent sigs links_annot ((agent_name, _ as ag_ty),intf) =
   { ra_type = ag_id; ra_ports = ports; ra_ints = internals; ra_erased = true;
     ra_syntax = Some (Array.copy ports, Array.copy internals);},lannot
 
-let annotate_created_agent id sigs ((agent_name, pos as ag_ty),intf) =
+let annotate_created_agent sigs ((agent_name, pos as ag_ty),intf) =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -452,7 +452,7 @@ let annotate_created_agent id sigs ((agent_name, pos as ag_ty),intf) =
 	  pset'
        | (Ast.FREE, _) -> pset'
       ) Mods.IntSet.empty intf in
-  ({ Raw_mixture.a_id = id; Raw_mixture.a_type = ag_id;
+  ({ Raw_mixture.a_type = ag_id;
      Raw_mixture.a_ports = ports; Raw_mixture.a_ints = internals; },
    pos)
 
@@ -656,7 +656,7 @@ let annotate_lhs_with_diff sigs lhs rhs =
        List.rev @@ snd @@
 	 List.fold_left
 	   (fun (id,acc) x ->
-	    succ id, annotate_created_agent id sigs x::acc) (0,[]) added in
+	    succ id, annotate_created_agent sigs x::acc) (0,[]) added in
   aux (Mods.IntMap.empty,Mods.IntMap.empty) [] lhs rhs
 
 let add_un_variable k_un acc rate_var =

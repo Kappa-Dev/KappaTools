@@ -31,17 +31,20 @@ type flux_map =
 
 type file_line = { file_name : string nullable ; line : string }
 
-type internal = int nullable
-type link = int nullable
-type agent = { a_id: int;
-               a_type: int;
-               a_ports: link list;
-               a_ints: internal list }
+type site = {
+     site_name: string;
+     site_links: (int * int) list;
+     site_states: string list;
+}
+type site_node = {
+     node_name: string;
+     node_sites: site list <ocaml repr="array">;
+}
+type site_graph = site_node list <ocaml repr="array">
 
-type raw_mixture = agent list
 type agent_state = {
-     agent : int;
-     mixture : raw_mixture
+     abondance : int;
+     mixture : site_graph
 }
 
 type taken_state = {

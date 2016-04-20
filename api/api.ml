@@ -119,20 +119,6 @@ end = struct
            let snapshots : Api_types.snapshot list ref = ref [] in
            let flux_maps : Api_types.flux_map list ref = ref [] in
            let files : Api_types.file_line list ref = ref [] in
-           let outputs (data : Data.t) =
-             match data with
-               Data.Flux flux_map ->
-               flux_maps := ((Api_data.api_flux_map flux_map)::!flux_maps)
-             | Data.Plot (time,new_observables) ->
-                let new_values : float list = List.map (fun nbr -> Nbr.to_float nbr) (Array.to_list new_observables) in
-                plot := {!plot with Api_types.observables = { Api_types.time = time ; values = new_values }
-                                                            :: !plot.Api_types.observables }
-             | Data.Print file_line ->
-                files := ((Api_data.api_file_line file_line)::!files)
-             | Data.Snapshot snapshot ->
-                snapshots := ((Api_data.api_snapshot snapshot)::!snapshots)
-             | Data.UnaryDistances _ -> ()
-           in
            let simulation = { switch = Lwt_switch.create ()
                             ; counter = Counter.create
                                           ~init_t:(0. : float)
@@ -156,9 +142,25 @@ end = struct
                           (fun () ->
                            wrap6 (Eval.initialize ?rescale_init:None)
                                  log_form sig_nd tk_nd contact_map
-                                 simulation.counter result
-                           >>= (fun (env,domain,graph,state,_) ->
-                                let legend = Environment.map_observables
+                                 simulation.counter result >>=
+                             (fun (env,domain,graph,state,_) ->
+			      let sigs = Environment.signatures env in
+			      let outputs = function
+				| Data.Flux flux_map ->
+				   flux_maps := ((Api_data.api_flux_map flux_map)::!flux_maps)
+				| Data.Plot (time,new_observables) ->
+				   let new_values =
+				     List.map (fun nbr -> Nbr.to_float nbr)
+					      (Array.to_list new_observables) in
+				   plot := {!plot with Api_types.observables =
+							 { Api_types.time = time ; values = new_values }
+							 :: !plot.Api_types.observables }
+				| Data.Print file_line ->
+				   files := ((Api_data.api_file_line file_line)::!files)
+				| Data.Snapshot snapshot ->
+				   snapshots := ((Api_data.api_snapshot sigs snapshot)::!snapshots)
+				| Data.UnaryDistances _ -> () in
+                              let legend = Environment.map_observables
                                                (Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
                                                env
                                 in

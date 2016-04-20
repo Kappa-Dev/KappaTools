@@ -264,7 +264,7 @@ let one_connected_component sigs ty node graph =
 		    (free_id,dangling',todos), Raw_mixture.VAL id)
 	     (free_id,dangling,todos) ports in
 	 let skel =
-	   { Raw_mixture.a_id = node; Raw_mixture.a_type = ty;
+	   { Raw_mixture.a_type = ty;
 	     Raw_mixture.a_ports = ports;
 	     Raw_mixture.a_ints = DynArray.get graph.state node; } in
 	 build (skel::acc) free_id' dangling' todos'

@@ -3,7 +3,6 @@
    the two implementations.
 *)
 module Api_types = ApiTypes_j
-open Api_types
 
 let plot_pg_store ~plot
                   ~file
@@ -12,11 +11,15 @@ let plot_pg_store ~plot
   = { Pp_svg.file = file;
       Pp_svg.title = title;
       Pp_svg.descr = descr;
-      Pp_svg.legend = Array.init (List.length plot.legend) (fun i -> List.nth plot.legend i);
-      Pp_svg.points = List.map (fun (observable : observable) ->
-                                (observable.Api_types.time,Array.map (fun x -> Nbr.F x) (Array.of_list observable.values) )
-                               )
-                               plot.observables }
+      Pp_svg.legend = Array.of_list plot.Api_types.legend;
+      Pp_svg.points =
+	List.map
+	  (fun (observable : Api_types.observable) ->
+           (observable.Api_types.time,
+	    Tools.array_map_of_list
+	      (fun x -> Nbr.F x) observable.Api_types.values))
+          plot.Api_types.observables
+    }
 
 let api_file_line (file_line : Data.file_line) : Api_types.file_line =
   { Api_types.file_name = file_line.Data.file_name
@@ -24,31 +27,73 @@ let api_file_line (file_line : Data.file_line) : Api_types.file_line =
   }
 
 let api_flux_map (flux_map : Data.flux_map) : Api_types.flux_map =
-  { flux_begin_time = flux_map.Data.flux_data.Data.flux_start;
-    flux_end_time = flux_map.Data.flux_end ;
-    flux_rules = Array.to_list flux_map.Data.flux_rules;
-    flux_hits = Array.to_list flux_map.Data.flux_data.Data.flux_hits;
-    flux_fluxs = List.map Array.to_list (Array.to_list flux_map.Data.flux_data.Data.flux_fluxs);
-    flux_name = flux_map.Data.flux_data.Data.flux_name
+  { Api_types.flux_begin_time = flux_map.Data.flux_data.Data.flux_start;
+    Api_types.flux_end_time = flux_map.Data.flux_end ;
+    Api_types.flux_rules = Array.to_list flux_map.Data.flux_rules;
+    Api_types.flux_hits = Array.to_list flux_map.Data.flux_data.Data.flux_hits;
+    Api_types.flux_fluxs =
+      List.map
+	Array.to_list (Array.to_list flux_map.Data.flux_data.Data.flux_fluxs);
+    Api_types.flux_name = flux_map.Data.flux_data.Data.flux_name
   }
-let api_link (link : Raw_mixture.link) : Api_types.link =
-  match link with
-    Raw_mixture.FREE -> None
-  | Raw_mixture.VAL v -> Some v
 
-let api_internal (internal : Raw_mixture.internal) : Api_types.internal =
-  internal
-let api_agent (agent : Raw_mixture.agent) : Api_types.agent =
-  { Api_types.a_id = agent.Raw_mixture.a_id;
-    Api_types.a_type = agent.Raw_mixture.a_type;
-    Api_types.a_ports = List.map api_link (Array.to_list agent.Raw_mixture.a_ports);
-    Api_types.a_ints = List.map api_internal (Array.to_list agent.Raw_mixture.a_ints); }
-let api_mixture (mixture : Raw_mixture.t) : Api_types.raw_mixture =
-  List.map api_agent mixture
+let links_of_mix mix =
+  snd @@ snd @@
+    List.fold_left
+      (fun (i,acc) a ->
+       succ i,
+       Tools.array_fold_lefti
+	 (fun j (one,two as acc) ->
+	  function
+	  | Raw_mixture.FREE -> acc
+	  | Raw_mixture.VAL k ->
+	     match Mods.IntMap.find_option k one with
+	     | None -> Mods.IntMap.add k (i,j) one,two
+	     | Some dst ->
+		one,Mods.Int2Map.add dst (i,j)
+				     (Mods.Int2Map.add (i,j) dst two))
+	 acc a.Raw_mixture.a_ports)
+      (0,(Mods.IntMap.empty,Mods.Int2Map.empty)) mix
 
-let api_snapshot (snapshot : Data.snapshot) : Api_types.snapshot =
+let api_mixture sigs mix =
+  let links = links_of_mix mix in
+  Array.mapi
+    (fun i a ->
+     { Api_types.node_name =
+	 Format.asprintf "%a" (Signature.print_agent sigs) a.Raw_mixture.a_type;
+       Api_types.node_sites =
+	 Array.mapi
+	   (fun j s ->
+	    { Api_types.site_name =
+		Format.asprintf
+		  "%a" (Signature.print_site sigs a.Raw_mixture.a_type) j;
+	      Api_types.site_links =
+		(match Mods.Int2Map.find_option (i,j) links with
+		 | None -> []
+		 | Some dst -> [dst]);
+	      Api_types.site_states =
+		(match s with
+		 | None -> []
+		 | Some k ->
+		    [Format.asprintf
+		       "%a" (Signature.print_internal_state
+			       sigs a.Raw_mixture.a_type j) k;]);
+	    })
+	   a.Raw_mixture.a_ints;
+     }
+    ) (Array.of_list mix)
+
+let api_snapshot sigs (snapshot : Data.snapshot) : Api_types.snapshot =
   { Api_types.snap_file = snapshot.Data.snap_file
   ; Api_types.snap_event = snapshot.Data.snap_event
-  ; Api_types.agents = List.map (fun (agent,mixture) -> { Api_types.agent = agent ; Api_types.mixture = api_mixture mixture } ) snapshot.Data.agents
-  ; Api_types.tokens = List.map (fun (token,value) ->  { token = token; value = Nbr.to_float value}) (Array.to_list snapshot.Data.tokens)
-}
+  ; Api_types.agents =
+      List.map (fun (agent,mixture) ->
+		{ Api_types.abondance = agent ;
+		  Api_types.mixture = api_mixture sigs mixture })
+	       snapshot.Data.agents
+  ; Api_types.tokens =
+      List.map (fun (token,value) ->
+		{ Api_types.token = token;
+		  Api_types.value = Nbr.to_float value})
+	       (Array.to_list snapshot.Data.tokens)
+  }
