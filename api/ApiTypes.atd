@@ -43,7 +43,7 @@ type site_node = {
 type site_graph = site_node list <ocaml repr="array">
 
 type agent_state = {
-     abondance : int;
+     quantity : int;
      mixture : site_graph
 }
 

@@ -11,8 +11,8 @@
         },
         "version": "1.0.0"
     },
-    "host": "localhost:5453",
-    "schemes": [ "http"  ],
+    "host": "mooodkiri.coq.club:8080",
+    "schemes": [ "https"  ],
     "basePath": "/v1",
     "produces": [ "application/json" ],
     "paths": {
@@ -167,9 +167,30 @@
                 }
             }
         },
+        "SiteGraph": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "node_name": { "type": "string" },
+              "node_sites": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "site_name": { "type": "string" },
+                    "site_links": { "type": "array",
+                      "items": {"type": "integer","minItems": 2,"maxItems": 2} },
+                    "site_states": { "type": "array", "items": { "type": "string" } }
+                  }
+                }
+              }
+            }
+            }
+        },
         "Parse": {
             "type": "object",
-            "properties": { "observables": { "type": [ "string" ] } }
+            "properties": { "contact_map": { "$ref": "#/definitions/SiteGraph" } }
         },
         "Parameter": {
             "type": "object",
@@ -238,8 +259,28 @@
                 }
             }
         },
+        "AgentState": {
+          "type": "object",
+          "properties": {
+            "quantity": { "type": "integer" },
+            "mixture": {"$ref": "#/definitions/SiteGraph"}
+          }
+        },
+        "TokenState": {
+          "type": "object",
+          "properties": {
+            "token": { "type": "string" },
+            "value": { "type": "number" }
+          }
+        },
         "Snapshot": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+              "snap_file": { "type": "string" },
+              "snap_event": { "type": "integer" },
+              "agents": { "type": "array", "items": { "$ref": "#/definitions/AgentState" } },
+              "tokens": { "type": "array", "items": { "$ref": "#/definitions/TokenState" } }
+            }
         },
         "UnaryDistances": {
             "type": "object"

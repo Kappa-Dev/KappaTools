@@ -88,7 +88,7 @@ let api_snapshot sigs (snapshot : Data.snapshot) : Api_types.snapshot =
   ; Api_types.snap_event = snapshot.Data.snap_event
   ; Api_types.agents =
       List.map (fun (agent,mixture) ->
-		{ Api_types.abondance = agent ;
+		{ Api_types.quantity = agent ;
 		  Api_types.mixture = api_mixture sigs mixture })
 	       snapshot.Data.agents
   ; Api_types.tokens =
