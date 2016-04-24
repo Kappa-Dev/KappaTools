@@ -1,0 +1,33 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa bound_to.ka --debugging-mode --output-directory output
+#
+#This file contains the description of the influence map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+digraph G{ 
+node [shape=box, style=filled, fillcolor=lightskyblue];
+"r1" ; 
+"r2" ; 
+"r3" ; 
+"r4" ; 
+"r5" ; 
+edge [color=green, arrowhead=normal];
+"r2" -> "r1"[label ="[0->0];[1->0]"] ;
+"r2" -> "r3"[label ="[0->0];[0->1];[1->0];[1->1]"] ;
+"r3" -> "r2"[label ="[0->0];[0->1];[1->0];[1->1]"] ;
+"r3" -> "r4"[label ="[0->0];[1->0]"] ;
+"r4" -> "r1"[label ="[0->0]"] ;
+"r4" -> "r5"[label ="[0->0]"] ;
+"r5" -> "r2"[label ="[0->0];[0->1]"] ;
+"r5" -> "r4"[label ="[0*->1];[0->0]"] ;
+
+edge [color=red, arrowhead=tee];
+"r2" -> "r2"[label ="[0->1];[1->0]"] ; 
+"r2" -> "r4"[label ="[0->0];[1->0]"] ; 
+"r3" -> "r1"[label ="[0->0];[1->0]"] ; 
+"r3" -> "r3"[label ="[0->1];[1->0]"] ; 
+"r4" -> "r2"[label ="[0->0];[0->1]"] ; 
+"r5" -> "r1"[label ="[0->0]"] ; 
+
+}

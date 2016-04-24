@@ -243,9 +243,13 @@ Quarks:rule_id:0,agent_type:1,site_type:1,state:0
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
+Quarks:rule_id:0,agent_type:0,site_type:0,state: bound
 Quarks:rule_id:0,agent_type:0,site_type:0,state:1
+Quarks:rule_id:0,agent_type:0,site_type:1,state: bound
 Quarks:rule_id:0,agent_type:0,site_type:1,state:1
+Quarks:rule_id:0,agent_type:1,site_type:0,state: bound
 Quarks:rule_id:0,agent_type:1,site_type:0,state:1
+Quarks:rule_id:0,agent_type:1,site_type:1,state: bound
 Quarks:rule_id:0,agent_type:1,site_type:1,state:1
 Quarks:MODIFICATION-
 Quarks:rule_id:0,agent_type:0,site_type:0,state:0
@@ -253,6 +257,14 @@ Quarks:rule_id:0,agent_type:0,site_type:1,state:0
 Quarks:rule_id:0,agent_type:1,site_type:0,state:0
 Quarks:rule_id:0,agent_type:1,site_type:1,state:0
 Quarks:HALF BOND BREAKING
+Quarks:MODIF PLUS rule_id:0,agent_type:0,site_type:0,state: BOUND
+Quarks:rule_id:0,agent_type:0,site_type:0,state:1
+Quarks:MODIF PLUS rule_id:0,agent_type:0,site_type:1,state: BOUND
+Quarks:rule_id:0,agent_type:0,site_type:1,state:1
+Quarks:MODIF PLUS rule_id:0,agent_type:1,site_type:0,state: BOUND
+Quarks:rule_id:0,agent_type:1,site_type:0,state:1
+Quarks:MODIF PLUS rule_id:0,agent_type:1,site_type:1,state: BOUND
+Quarks:rule_id:0,agent_type:1,site_type:1,state:1
 Quarks:Rule 1
 Quarks:TEST
 Quarks:rule_id:1,agent_type:0
@@ -269,18 +281,28 @@ Quarks:rule_id:1,agent_type:0,site_type:1,state:0
 Quarks:rule_id:1,agent_type:1,site_type:0,state:0
 Quarks:rule_id:1,agent_type:1,site_type:1,state:0
 Quarks:MODIFICATION-
+Quarks:rule_id:1,agent_type:0,site_type:0,state: bound
 Quarks:rule_id:1,agent_type:0,site_type:0,state:1
+Quarks:rule_id:1,agent_type:0,site_type:1,state: bound
 Quarks:rule_id:1,agent_type:0,site_type:1,state:1
+Quarks:rule_id:1,agent_type:1,site_type:0,state: bound
 Quarks:rule_id:1,agent_type:1,site_type:0,state:1
+Quarks:rule_id:1,agent_type:1,site_type:1,state: bound
 Quarks:rule_id:1,agent_type:1,site_type:1,state:1
 Quarks:HALF BOND BREAKING
+Quarks:MODIF MOINS: rule_id:1,agent_type:0,site_type:0,state: BOUND
+Quarks:rule_id:1,agent_type:0,site_type:0,state:1
+Quarks:MODIF MOINS: rule_id:1,agent_type:0,site_type:1,state: BOUND
+Quarks:rule_id:1,agent_type:0,site_type:1,state:1
+Quarks:MODIF MOINS: rule_id:1,agent_type:1,site_type:0,state: BOUND
+Quarks:rule_id:1,agent_type:1,site_type:0,state:1
+Quarks:MODIF MOINS: rule_id:1,agent_type:1,site_type:1,state: BOUND
+Quarks:rule_id:1,agent_type:1,site_type:1,state:1
 Quarks:Rule 2
 Quarks:TEST
 Quarks:rule_id:2,agent_type:1
-Quarks:rule_id:2,agent_type:1,site_type:0,state:1
-Quarks:rule_id:2,agent_type:1,site_type:0,state:2
-Quarks:rule_id:2,agent_type:1,site_type:1,state:1
-Quarks:rule_id:2,agent_type:1,site_type:1,state:2
+Quarks:rule_id:2,agent_type:1,site_type:0,state: Bound 
+Quarks:rule_id:2,agent_type:1,site_type:1,state: Bound 
 Quarks:rule_id:2,agent_type:2
 Quarks:rule_id:2,agent_type:2,site_type:0,state:0
 Quarks:rule_id:2,agent_type:2,site_type:1,state:0
@@ -289,18 +311,28 @@ Quarks:rule_id:2,agent_type:2,site_type:3,state:0
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
+Quarks:rule_id:2,agent_type:1,site_type:0,state: bound
 Quarks:rule_id:2,agent_type:1,site_type:0,state:2
+Quarks:rule_id:2,agent_type:1,site_type:1,state: bound
 Quarks:rule_id:2,agent_type:1,site_type:1,state:2
+Quarks:rule_id:2,agent_type:2,site_type:2,state: bound
 Quarks:rule_id:2,agent_type:2,site_type:2,state:1
+Quarks:rule_id:2,agent_type:2,site_type:3,state: bound
 Quarks:rule_id:2,agent_type:2,site_type:3,state:1
 Quarks:MODIFICATION-
+Quarks:rule_id:2,agent_type:1,site_type:0,state: bound
 Quarks:rule_id:2,agent_type:1,site_type:0,state:1
 Quarks:rule_id:2,agent_type:1,site_type:0,state:2
+Quarks:rule_id:2,agent_type:1,site_type:1,state: bound
 Quarks:rule_id:2,agent_type:1,site_type:1,state:1
 Quarks:rule_id:2,agent_type:1,site_type:1,state:2
 Quarks:rule_id:2,agent_type:2,site_type:2,state:0
 Quarks:rule_id:2,agent_type:2,site_type:3,state:0
 Quarks:HALF BOND BREAKING
+Quarks:MODIF PLUS rule_id:2,agent_type:2,site_type:2,state: BOUND
+Quarks:rule_id:2,agent_type:2,site_type:2,state:1
+Quarks:MODIF PLUS rule_id:2,agent_type:2,site_type:3,state: BOUND
+Quarks:rule_id:2,agent_type:2,site_type:3,state:1
 Quarks:Rule 3
 Quarks:TEST
 Quarks:rule_id:3,agent_type:1
@@ -314,18 +346,28 @@ Quarks:rule_id:3,agent_type:2,site_type:3,state:1
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
+Quarks:rule_id:3,agent_type:1,site_type:0,state: bound
 Quarks:rule_id:3,agent_type:1,site_type:0,state:1
 Quarks:rule_id:3,agent_type:1,site_type:0,state:2
+Quarks:rule_id:3,agent_type:1,site_type:1,state: bound
 Quarks:rule_id:3,agent_type:1,site_type:1,state:1
 Quarks:rule_id:3,agent_type:1,site_type:1,state:2
 Quarks:rule_id:3,agent_type:2,site_type:2,state:0
 Quarks:rule_id:3,agent_type:2,site_type:3,state:0
 Quarks:MODIFICATION-
+Quarks:rule_id:3,agent_type:1,site_type:0,state: bound
 Quarks:rule_id:3,agent_type:1,site_type:0,state:2
+Quarks:rule_id:3,agent_type:1,site_type:1,state: bound
 Quarks:rule_id:3,agent_type:1,site_type:1,state:2
+Quarks:rule_id:3,agent_type:2,site_type:2,state: bound
 Quarks:rule_id:3,agent_type:2,site_type:2,state:1
+Quarks:rule_id:3,agent_type:2,site_type:3,state: bound
 Quarks:rule_id:3,agent_type:2,site_type:3,state:1
 Quarks:HALF BOND BREAKING
+Quarks:MODIF MOINS: rule_id:3,agent_type:2,site_type:2,state: BOUND
+Quarks:rule_id:3,agent_type:2,site_type:2,state:1
+Quarks:MODIF MOINS: rule_id:3,agent_type:2,site_type:3,state: BOUND
+Quarks:rule_id:3,agent_type:2,site_type:3,state:1
 
 REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
 Quarks:agent_test**:agent_type:0,rule:0->[0]
@@ -342,13 +384,9 @@ Quarks:site_test**:agent_type:0,site_type:1,state:0,rule:0->[0]
 Quarks:site_test**:agent_type:0,site_type:1,state:1,rule:1->[0]
 Quarks:site_test**:agent_type:1,site_type:0,state:0,rule:0->[1]
 Quarks:site_test**:agent_type:1,site_type:0,state:1,rule:1->[1]
-Quarks:site_test**:agent_type:1,site_type:0,state:1,rule:2->[0]
-Quarks:site_test**:agent_type:1,site_type:0,state:2,rule:2->[0]
 Quarks:site_test**:agent_type:1,site_type:0,state:2,rule:3->[0]
 Quarks:site_test**:agent_type:1,site_type:1,state:0,rule:0->[1]
 Quarks:site_test**:agent_type:1,site_type:1,state:1,rule:1->[1]
-Quarks:site_test**:agent_type:1,site_type:1,state:1,rule:2->[0]
-Quarks:site_test**:agent_type:1,site_type:1,state:2,rule:2->[0]
 Quarks:site_test**:agent_type:1,site_type:1,state:2,rule:3->[0]
 Quarks:site_test**:agent_type:2,site_type:0,state:0,rule:2->[1]
 Quarks:site_test**:agent_type:2,site_type:0,state:0,rule:3->[1]
@@ -402,13 +440,11 @@ Influence_map:Wake_up_map:rule(0):'r0' A(x,y),B(x,y)->A(x!1,y!2),B(x!1,y!2) -> r
 
 Influence_map:Wake_up_map:rule(1):'r0_op' A(x!1,y!2),B(x!1,y!2)->A(x,y),B(x,y) -> rule(0):'r0' A(x,y),B(x,y)->A(x!1,y!2),B(x!1,y!2)[0->0];[1->1]
 
-Influence_map:Wake_up_map:rule(2):'r1' B(x!_,y!_),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2) -> rule(2):'r1' B(x!_,y!_),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2)[0->0]
-
 Influence_map:Wake_up_map:rule(2):'r1' B(x!_,y!_),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2) -> rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!_,y!_),C(x~u,y~p)[0->0];[1->1]
 
 Influence_map:Wake_up_map:rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!_,y!_),C(x~u,y~p) -> rule(1):'r0_op' A(x!1,y!2),B(x!1,y!2)->A(x,y),B(x,y)[0->1]
 
-Influence_map:Wake_up_map:rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!_,y!_),C(x~u,y~p) -> rule(2):'r1' B(x!_,y!_),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2)[0->0];[1->1]
+Influence_map:Wake_up_map:rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!_,y!_),C(x~u,y~p) -> rule(2):'r1' B(x!_,y!_),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2)[1->1]
 
 Influence_map:Wake_up_map:rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!_,y!_),C(x~u,y~p) -> rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!_,y!_),C(x~u,y~p)[0->0]
 
@@ -417,8 +453,6 @@ Influence_map:Inhibition_map:rule(1):'r0_op' A(x!1,y!2),B(x!1,y!2)->A(x,y),B(x,y
 Influence_map:Inhibition_map:rule(2):'r1' B(x!_,y!_),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2) -> rule(1):'r0_op' A(x!1,y!2),B(x!1,y!2)->A(x,y),B(x,y)[0->1]
 
 Influence_map:Inhibition_map:rule(2):'r1' B(x!_,y!_),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2) -> rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!_,y!_),C(x~u,y~p)[0->0]
-
-Influence_map:Inhibition_map:rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!_,y!_),C(x~u,y~p) -> rule(2):'r1' B(x!_,y!_),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2)[0->0]
 
 
 Reachability analysis...

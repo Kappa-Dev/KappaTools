@@ -25,8 +25,13 @@ let empty_quarks parameter error handler =
   let error,site_modif_plus = Quark_type.SiteMap.create parameter error (n_agents,(0,0)) in
   let error,site_modif_minus = Quark_type.SiteMap.create parameter error (n_agents,(0,0)) in
   let error,site_test  = Quark_type.SiteMap.create parameter error (n_agents,(0,0)) in
+  let error,site_modif_bound_plus = Quark_type.SiteMap.create parameter error (n_agents,(0,0)) in
+  let error,site_modif_bound_minus = Quark_type.SiteMap.create parameter error (n_agents,(0,0)) in
+  let error,site_bound_test  = Quark_type.SiteMap.create parameter error (n_agents,(0,0)) in
   let error,agent_var_plus = Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create parameter error n_agents in 
   let error,site_var_plus = Quark_type.SiteMap.create parameter error (n_agents,(0,0)) in 
+  let error,site_bound_var_minus = Quark_type.SiteMap.create parameter error (n_agents,(0,0)) in
+  let error,site_bound_var_plus = Quark_type.SiteMap.create parameter error (n_agents,(0,0)) in
   let error,agent_var_minus = Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.create parameter error n_agents in 
   let error,site_var_minus = Quark_type.SiteMap.create parameter error (n_agents,(0,0)) in 
   let error, dead_sites_plus =
@@ -48,7 +53,7 @@ let empty_quarks parameter error handler =
     Quark_type.dead_agent_minus = Quark_type.StringMap.Map.empty ;
     Quark_type.dead_sites_minus = dead_sites_minus ;
     Quark_type.dead_states_minus = dead_states_minus ;
-     Quark_type.dead_agent = Quark_type.StringMap.Map.empty ;
+    Quark_type.dead_agent = Quark_type.StringMap.Map.empty ;
     Quark_type.dead_sites = dead_sites ;
     Quark_type.dead_states = dead_states ;
     Quark_type.dead_sites_plus = dead_sites_plus ;
@@ -60,7 +65,12 @@ let empty_quarks parameter error handler =
     Quark_type.site_modif_plus = site_modif_plus;
     Quark_type.site_modif_minus = site_modif_minus;
     Quark_type.site_test = site_test;
+    Quark_type.site_modif_bound_plus = site_modif_bound_plus;
+    Quark_type.site_modif_bound_minus = site_modif_bound_minus;
+    Quark_type.site_test_bound = site_bound_test;
     Quark_type.site_var_minus = site_var_minus;
+    Quark_type.site_bound_var_minus = site_bound_var_minus;
+    Quark_type.site_bound_var_plus = site_bound_var_plus;
     Quark_type.agent_var_plus = agent_var_plus ;
     Quark_type.site_var_plus = site_var_plus ;
   }
@@ -150,6 +160,38 @@ let add_site parameters error rule_id agent_id agent_type site_type state =
     agent_id
     (agent_type, (site_type, state))
 
+
+let add_bound_site_test parameters error rule_id agent_id agent_type site_type =
+  let _ = Misc_sa.trace parameters (fun () -> 
+    "rule_id:" ^ 
+      (Ckappa_sig.string_of_rule_id rule_id) ^ 
+      ",agent_type:" ^ 
+      (Ckappa_sig.string_of_agent_name agent_type) ^ 
+      ",site_type:" ^ 
+      (Ckappa_sig.string_of_site_name site_type) ^ 
+      ",state: Bound \n")
+  in 
+  add_generic
+    Quark_type.SiteMap.unsafe_get
+    Quark_type.SiteMap.set 
+    parameters 
+    error 
+    rule_id
+    agent_id
+    (agent_type, (site_type, Ckappa_sig.state_index_of_int 1))
+    
+let add_bound_site parameters error rule_id agent_id agent_type site_type set =
+  let _ = Misc_sa.trace parameters (fun () -> 
+    "rule_id:" ^ 
+      (Ckappa_sig.string_of_rule_id rule_id) ^ 
+      ",agent_type:" ^ 
+      (Ckappa_sig.string_of_agent_name agent_type) ^ 
+      ",site_type:" ^ 
+      (Ckappa_sig.string_of_site_name site_type) ^ 
+	",state: bound\n")
+  in 
+  error, Quark_type.BoundSite.Set.add (rule_id,agent_id,agent_type,site_type) set
+
 let add_site_var parameters error var_id agent_id agent_type site_type state =
   let _ = Misc_sa.trace parameters (fun () -> 
     "var_id:" ^ 
@@ -171,17 +213,20 @@ let add_site_var parameters error var_id agent_id agent_type site_type state =
     (agent_type, (site_type, state))
 	      
 let add_half_bond_breaking parameter error handler rule_id agent_id 
-    agent_type site k (site_modif_plus,site_modif_minus) = 
+			   agent_type site k (site_modif_plus,site_modif_minus,site_bound_modif_minus) = 
   match Handler.dual parameter error handler agent_type site k with
-  | error, None -> error,(site_modif_plus,site_modif_minus)
+  | error, None -> error,(site_modif_plus,site_modif_minus,site_bound_modif_minus)
   | error,Some (agent_type2,site2,k2) ->
-    let error, site_modif_plus =
-      add_site parameter error rule_id agent_id agent_type2 site2 Ckappa_sig.dummy_state_index site_modif_plus
-    in 
-    let error,site_modif_minus =
-      add_site parameter error rule_id agent_id agent_type2 site2 k2 site_modif_minus 
-    in  
-    error,(site_modif_plus,site_modif_minus)
+     let error, site_modif_plus =
+       add_site parameter error rule_id agent_id agent_type2 site2 Ckappa_sig.dummy_state_index site_modif_plus
+     in
+     let error,site_modif_minus =
+       add_site parameter error rule_id agent_id agent_type2 site2 k2 site_modif_minus 
+     in
+     let error,site_bound_modif_minus =
+       add_bound_site parameter error rule_id agent_id agent_type2 site2 site_bound_modif_minus
+     in 
+     error,(site_modif_plus,site_modif_minus,site_bound_modif_minus)
 
 let add_dead_state s parameters error var_id agent_id agent_type site_type =
   let _ = Misc_sa.trace parameters (fun () ->
@@ -316,32 +361,72 @@ let add_dead_sites s parameters error rule_id agent_id agent_type site map =
       agent_type
       new_agent
       map 
-      
+
+let clean_bound_modif parameter error (map1,set1) (map2,set2) =
+  let set1' = Quark_type.BoundSite.Set.minus set1 set2 in
+  let set2' = Quark_type.BoundSite.Set.minus set2 set1 in
+  let error, map1 =
+    Quark_type.BoundSite.Set.fold
+      (fun (rule_id,agent_id,agent_type,site_type) (error, map)->
+       let _ = Misc_sa.trace parameter (fun () -> 
+					 "MODIF PLUS rule_id:" ^ 
+					   (Ckappa_sig.string_of_rule_id rule_id) ^ 
+					     ",agent_type:" ^ 
+					       (Ckappa_sig.string_of_agent_name agent_type) ^ 
+						 ",site_type:" ^ 
+						   (Ckappa_sig.string_of_site_name site_type) ^ 
+						     ",state: BOUND\n")
+       in
+       
+       add_site parameter error rule_id agent_id agent_type site_type (Ckappa_sig.state_index_of_int 1) map)
+      set1'
+      (error,map1)
+  in
+  let error, map2 =
+    Quark_type.BoundSite.Set.fold
+      (fun (rule_id,agent_id,agent_type,site_type) (error,map) ->
+       let _ = Misc_sa.trace parameter (fun () -> 
+					"MODIF MOINS: rule_id:" ^ 
+					  (Ckappa_sig.string_of_rule_id rule_id) ^ 
+					    ",agent_type:" ^ 
+					      (Ckappa_sig.string_of_agent_name agent_type) ^ 
+						",site_type:" ^ 
+						  (Ckappa_sig.string_of_site_name site_type) ^ 
+						    ",state: BOUND\n")
+       in 
+       add_site parameter error rule_id agent_id agent_type site_type (Ckappa_sig.state_index_of_int 1) map)
+      set2'
+      (error,map2)
+  in
+  error, map1, map2
+
 let scan_mixture_in_var bool parameter error handler var_id mixture quarks = 
   let views = mixture.Cckappa_sig.views in 
-  let agent_var,site_var,dead_agents,dead_sites,dead_states =  
+  let agent_var,site_var,site_bound_var,dead_agents,dead_sites,dead_states =  
     if bool 
     then
       quarks.Quark_type.agent_var_plus,
       quarks.Quark_type.site_var_plus,
+      quarks.Quark_type.site_bound_var_plus,
       quarks.Quark_type.dead_agent_plus,
       quarks.Quark_type.dead_sites_plus,
       quarks.Quark_type.dead_states_plus
     else 
       quarks.Quark_type.agent_var_minus,
       quarks.Quark_type.site_var_minus,
+      quarks.Quark_type.site_bound_var_minus,
       quarks.Quark_type.dead_agent_minus,
       quarks.Quark_type.dead_sites_minus,
       quarks.Quark_type.dead_states_minus 
   in
-  let error,(agent_var,site_var,dead_agents,dead_sites,dead_states) =
+  let error,(agent_var,site_var,site_bound_var,dead_agents,dead_sites,dead_states) =
     (*what is tested in the mixture*)
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold 
       parameter
       error 
       (fun parameter error agent_id agent
-        (agent_var, site_var, dead_agents, dead_sites, dead_states) -> 
-          let dealwith agent error (agent_var,site_var) =
+        (agent_var, site_var, site_bound_var, dead_agents, dead_sites, dead_states) -> 
+          let dealwith agent error (agent_var,site_var, site_bound_var) =
 	    let error, kasim_id =
               Quark_type.Labels.label_of_int
                 parameter error
@@ -357,34 +442,35 @@ let scan_mixture_in_var bool parameter error handler var_id mixture quarks =
                 agent_type
                 agent_var 
             in
-            let error,site_var = 
+            let error,site_var,site_bound_var = 
               Ckappa_sig.Site_map_and_set.Map.fold
-                (fun site port (error,site_var) -> 
+                (fun site port (error,site_var,site_bound_var) -> 
                   let interval = port.Cckappa_sig.site_state in 
                   let max = interval.Cckappa_sig.max in 
-                  let rec aux k (error,site_var) = 
-                    if k > max
-                    then 
-                      error,site_var
-                    else 
-                      aux 
-                        (Ckappa_sig.state_index_of_int ((Ckappa_sig.int_of_state_index k)+1))
-                        (add_site_var
-                           parameter
-                           error
-                           var_id 
-                           kasim_id 
-                           agent_type 
-                           site
-                           k 
-                           site_var)
-                  in 
-                  aux interval.Cckappa_sig.min (error, site_var)
+                  let min = interval.Cckappa_sig.min in
+		  let error, binding_state = Handler.is_binding_site parameter error handler agent_type site in
+		  if (binding_state && port.Cckappa_sig.site_free = None)  (* The state is a wildcard, it should be ignored *)
+		     || ((not binding_state) && min <> max)  
+		  then
+		    error, site_var, site_bound_var
+		  else
+		    if interval.Cckappa_sig.min = max
+		    then
+		      let error, site_var =
+			add_site_var parameter error var_id kasim_id agent_type site min site_var
+		      in
+		      error, site_var, site_bound_var
+		    else
+		      let error, site_bound_var =
+			add_site_var parameter error var_id kasim_id agent_type site (Ckappa_sig.state_index_of_int 1) site_bound_var
+		      in
+		      error, site_var, site_bound_var
+		 
                 )
                 agent.Cckappa_sig.agent_interface 
-                (error, site_var)
+                (error, site_var, site_bound_var)
             in 
-            error, (agent_var, site_var)
+            error, (agent_var, site_var, site_bound_var)
           in 
           match agent with 
        	  | Cckappa_sig.Unknown_agent (string, id_int) ->
@@ -402,9 +488,9 @@ let scan_mixture_in_var bool parameter error handler var_id mixture quarks =
                 string
                 dead_agents
             in
-	    error, (agent_var, site_var, dead_agents, dead_sites, dead_states)
+	    error, (agent_var, site_var, site_bound_var, dead_agents, dead_sites, dead_states)
 	  | Cckappa_sig.Ghost ->
-            error, (agent_var, site_var, dead_agents, dead_sites, dead_states)
+            error, (agent_var, site_var, site_bound_var, dead_agents, dead_sites, dead_states)
 	  | Cckappa_sig.Dead_agent (agent, deadsite, deadstate, deadstate') ->
 	    let error, kasim_id =
               Quark_type.Labels.label_of_int
@@ -412,11 +498,11 @@ let scan_mixture_in_var bool parameter error handler var_id mixture quarks =
                 error 
                 (Ckappa_sig.int_of_agent_id agent.Cckappa_sig.agent_kasim_id)
             in 
-	    let error, (agent_var, site_var) = 
+	    let error, (agent_var, site_var, site_bound_var) = 
               dealwith 
                 agent
                 error
-                (agent_var, site_var) 
+                (agent_var, site_var,site_bound_var) 
             in
 	    let error, dead_sites =
 	      Cckappa_sig.KaSim_Site_map_and_set.Set.fold
@@ -463,19 +549,20 @@ let scan_mixture_in_var bool parameter error handler var_id mixture quarks =
 	        deadstate'
 	        (error, dead_states)
 	    in
-	    error, (agent_var,site_var,dead_agents,dead_sites,dead_states)
+	    error, (agent_var,site_var,site_bound_var, dead_agents,dead_sites,dead_states)
 	  | Cckappa_sig.Agent agent -> 
-            let error, (agent_var, site_var) =
+            let error, (agent_var, site_var, site_bound_var) =
               dealwith 
                 agent 
                 error 
-                (agent_var, site_var)
+                (agent_var, site_var, site_bound_var)
             in
-	    error, (agent_var, site_var, dead_agents, dead_sites, dead_states)
+	    error, (agent_var, site_var, site_bound_var, dead_agents, dead_sites, dead_states)
       )
       views
       (agent_var,
        site_var,
+       site_bound_var, 
        dead_agents,
        dead_sites,
        dead_states)      
@@ -487,6 +574,7 @@ let scan_mixture_in_var bool parameter error handler var_id mixture quarks =
       quarks with
         Quark_type.agent_var_plus = agent_var ;
         Quark_type.site_var_plus = site_var ;
+	Quark_type.site_bound_var_plus = site_bound_var ;
         Quark_type.dead_agent_plus = dead_agents ;
         Quark_type.dead_sites_plus = dead_sites ;
         Quark_type.dead_states_plus = dead_states }
@@ -496,6 +584,7 @@ let scan_mixture_in_var bool parameter error handler var_id mixture quarks =
       quarks with
         Quark_type.agent_var_minus = agent_var ; 
         Quark_type.site_var_minus = site_var ;
+	Quark_type.site_bound_var_minus = site_bound_var ;
         Quark_type.dead_agent_minus = dead_agents ;
         Quark_type.dead_sites_minus = dead_sites ;
         Quark_type.dead_states_minus = dead_states }
@@ -536,6 +625,7 @@ let scan_rule parameter error handler rule_id rule quarks =
   let viewsrhs = rule.Cckappa_sig.rule_rhs.Cckappa_sig.views in
   let agent_test =  quarks.Quark_type.agent_test in
   let site_test = quarks.Quark_type.site_test in
+  let site_bound_test = quarks.Quark_type.site_test_bound in
   let dead_agents = quarks.Quark_type.dead_agent in 
   let dead_sites = quarks.Quark_type.dead_sites in 
   let dead_states = quarks.Quark_type.dead_states in 
@@ -543,13 +633,15 @@ let scan_rule parameter error handler rule_id rule quarks =
   let agent_modif_minus = quarks.Quark_type.agent_modif_minus in 
   let site_modif_plus = quarks.Quark_type.site_modif_plus in
   let site_modif_minus = quarks.Quark_type.site_modif_minus in
+  let site_bound_modif_plus = Quark_type.BoundSite.Set.empty in
+  let site_bound_modif_minus = Quark_type.BoundSite.Set.empty in
   let _ = Misc_sa.trace parameter (fun () -> "TEST\n") in 
-  let error,(agent_test,site_test,dead_agents,dead_sites,dead_states) = (*what is tested in the lhs*)
+  let error,(agent_test,site_test,site_bound_test,dead_agents,dead_sites,dead_states) = (*what is tested in the lhs*)
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold 
       parameter
       error 
-      (fun parameter error agent_id agent (agent_test,site_test,dead_agents,dead_sites,dead_states) -> 
-	let dealwith agent error (agent_test,site_test) =
+      (fun parameter error agent_id agent (agent_test,site_test,site_bound_test,dead_agents,dead_sites,dead_states) -> 
+	let dealwith agent error (agent_test,site_test,site_bound_test) =
 	  let error,kasim_id =
             Quark_type.Labels.label_of_int
               parameter error 
@@ -557,31 +649,34 @@ let scan_rule parameter error handler rule_id rule quarks =
           in 
 	  let agent_type = agent.Cckappa_sig.agent_name in 
 	  let error,agent_test = add_agent parameter error rule_id kasim_id agent_type agent_test in 
-	  let error,site_test = 
+	  let error,site_test, site_bound_test = 
 	    Ckappa_sig.Site_map_and_set.Map.fold
-	      (fun site port (error,site_test) -> 
+	      (fun site port (error,site_test,site_bound_test) -> 
 		let interval = port.Cckappa_sig.site_state in 
-		let max = interval.Cckappa_sig.max in 
+		let max = interval.Cckappa_sig.max in
+		let min = interval.Cckappa_sig.min in
 		let error, binding_state = Handler.is_binding_site parameter error handler agent_type site in
-		if binding_state && port.Cckappa_sig.site_free = None (* The state is a wildcard, it should be ignored *)
+		if (binding_state &&  port.Cckappa_sig.site_free = None)  (* The state is a wildcard, it should be ignored *)
+		 || ((not binding_state) && min <> max)  
 		then
-		  error, site_test
+		  error, site_test, site_bound_test
 		else
-		  let rec aux k (error,site_test) = 
-                  if k > max
+		  if interval.Cckappa_sig.min = max
 		  then
-		    error,site_test
+		    let error, site_test =
+		      add_site parameter error rule_id kasim_id agent_type site min site_test
+		    in
+		    error, site_test, site_bound_test
 		  else
-		    aux 
-                      (Ckappa_sig.state_index_of_int ((Ckappa_sig.int_of_state_index k) + 1))
-                      (add_site parameter error rule_id kasim_id agent_type site k site_test) 
-		in 
-                aux interval.Cckappa_sig.min (error,site_test)
-              )
+		    let error, site_bound_test =
+		      add_bound_site_test parameter error rule_id kasim_id agent_type site site_bound_test
+		    in
+		    error, site_test, site_bound_test
+	      )
               agent.Cckappa_sig.agent_interface 
-              (error,site_test)
+              (error,site_test,site_bound_test)
           in 
-          error,(agent_test,site_test)
+          error,(agent_test,site_test,site_bound_test)
 	in 
 	match agent with
 	| Cckappa_sig.Unknown_agent (string,id_int) -> 
@@ -590,15 +685,15 @@ let scan_rule parameter error handler rule_id rule quarks =
               (Ckappa_sig.int_of_agent_id id_int)
           in
 	  let error,dead_agents = add_dead_agent "rule" parameter error rule_id kasim_id string dead_agents in
-	  error,(agent_test,site_test,dead_agents,dead_sites,dead_states)
+	  error,(agent_test,site_test,site_bound_test,dead_agents,dead_sites,dead_states)
 	    
-        | Cckappa_sig.Ghost -> error,(agent_test,site_test,dead_agents,dead_sites,dead_states)
+        | Cckappa_sig.Ghost -> error,(agent_test,site_test,site_bound_test,dead_agents,dead_sites,dead_states)
 	| Cckappa_sig.Dead_agent (agent,deadsite,deadstate,deadstate') ->
 	  let error,kasim_id = 
             Quark_type.Labels.label_of_int parameter error 
               (Ckappa_sig.int_of_agent_id agent.Cckappa_sig.agent_kasim_id)
           in 
-	  let error,(agent_test,site_test) = dealwith agent error (agent_test,site_test) in
+	  let error,(agent_test,site_test,site_bound_test) = dealwith agent error (agent_test,site_test,site_bound_test) in
 	  let error,dead_sites =
 	    Cckappa_sig.KaSim_Site_map_and_set.Set.fold
 	      (fun s (error,deadsite) ->  
@@ -620,14 +715,14 @@ let scan_rule parameter error handler rule_id rule quarks =
 	      deadstate'
 	      (error,dead_states)
 	  in
-	  error,(agent_test,site_test,dead_agents,dead_sites,dead_states)
+	  error,(agent_test,site_test,site_bound_test,dead_agents,dead_sites,dead_states)
 	| Cckappa_sig.Agent agent ->
-	  let error,(agent_test,site_test) = dealwith agent error (agent_test,site_test) in
-	  error,(agent_test,site_test,dead_agents,dead_sites,dead_states)
+	  let error,(agent_test,site_test,site_bound_test) = dealwith agent error (agent_test,site_test,site_bound_test) in
+	  error,(agent_test,site_test,site_bound_test,dead_agents,dead_sites,dead_states)
 	    
       )
       viewslhs 
-      (agent_test,site_test,dead_agents,dead_sites,dead_states)      
+      (agent_test,site_test,site_bound_test,dead_agents,dead_sites,dead_states)      
   in 
   let _ = Misc_sa.trace parameter (fun () ->"CREATION\n") in 
   let error,agent_modif_plus = (*the agents that are created*)
@@ -650,9 +745,9 @@ let scan_rule parameter error handler rule_id rule quarks =
       rule.Cckappa_sig.actions.Cckappa_sig.creation       
   in 
   let _ = Misc_sa.trace parameter (fun () -> "REMOVAL\n") in 
-  let error,(agent_modif_minus,site_modif_plus,site_modif_minus) = (*the agents that are removed *)
+  let error,(agent_modif_minus,site_modif_plus,site_modif_minus,site_bound_modif_minus) = (*the agents that are removed *)
     List.fold_left 
-      (fun (error,(agent_modif_minus,site_modif_plus,site_modif_minus)) (agent_id,agent,list) -> 
+      (fun (error,(agent_modif_minus,site_modif_plus,site_modif_minus,site_bound_modif_minus)) (agent_id,agent,list) -> 
         let agent_type = agent.Cckappa_sig.agent_name in 
         let error,kasim_id =
           Quark_type.Labels.label_of_int parameter error 
@@ -664,9 +759,9 @@ let scan_rule parameter error handler rule_id rule quarks =
             )
         in 
         let error,agent_modif_minus = add_agent parameter error rule_id kasim_id agent_type agent_modif_minus in 
-        let error,(site_modif_plus,site_modif_minus) = 
+        let error,(site_modif_plus,site_modif_minus,site_bound_modif_minus) = 
           List.fold_left 
-            (fun (error,(site_modif_plus,site_modif_minus)) site -> 
+            (fun (error,(site_modif_plus,site_modif_minus,site_bound_modif_minus)) site -> 
               let error,is_binding = Handler.is_binding_site parameter error handler agent_type site in 
               if is_binding 
               then 
@@ -683,99 +778,123 @@ let scan_rule parameter error handler rule_id rule quarks =
                         (Ckappa_sig.Dictionary_of_States.init ())) 
                   in 
                   let error,last_entry = Ckappa_sig.Dictionary_of_States.last_entry parameter error state_dic in 
-                  let rec aux k (error,(site_modif_plus,site_modif_minus)) = 
+                  let rec aux k (error,(site_modif_plus,site_modif_minus,site_bound_modif_minus)) = 
                     if  k > last_entry 
                     then 
-                      (error,(site_modif_plus,site_modif_minus)) 
+                      (error,(site_modif_plus,site_modif_minus,site_bound_modif_minus)) 
                     else
-                      let error,(site_modif_plus,site_modif_minus) = 
+                      let error,(site_modif_plus,site_modif_minus,site_bound_modif_minus) = 
                         add_half_bond_breaking 
                           parameter error handler rule_id mkasim_id agent_type site k
-                          (site_modif_plus,site_modif_minus)
+                          (site_modif_plus,site_modif_minus,site_bound_modif_minus)
                       in 
-                      (error,(site_modif_plus,site_modif_minus))
+                      (error,(site_modif_plus,site_modif_minus,site_bound_modif_minus))
                   in 
-                  aux (Ckappa_sig.dummy_state_index_1) (error,(site_modif_plus,site_modif_minus))
+                  aux (Ckappa_sig.dummy_state_index_1) (error,(site_modif_plus,site_modif_minus,site_bound_modif_minus))
                 end 
               else 
-                error,(site_modif_plus,site_modif_minus)
+                error,(site_modif_plus,site_modif_minus,site_bound_modif_minus)
             )
-            (error,(site_modif_plus,site_modif_minus))
+            (error,(site_modif_plus,site_modif_minus,site_bound_modif_minus))
             list
         in 
-        error,(agent_modif_minus,site_modif_plus,site_modif_minus))
-      (error,(agent_modif_minus,site_modif_plus,site_modif_minus))
+        error,(agent_modif_minus,site_modif_plus,site_modif_minus,site_bound_modif_minus))
+      (error,(agent_modif_minus,site_modif_plus,site_modif_minus,site_bound_modif_minus))
       rule.Cckappa_sig.actions.Cckappa_sig.remove       
   in 
   let _ = Misc_sa.trace parameter (fun () -> "MODIFICATION+\n") in 
-  let error,site_modif_plus = (*the sites that are directly modified (excluding side-effects)*)
+  let error,(site_modif_plus,site_bound_modif_plus) = (*the sites that are directly modified (excluding side-effects)*)
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold 
       parameter
       error 
-      (fun parameter error agent_id agent site_modif_plus -> 
+      (fun parameter error agent_id agent (site_modif_plus,site_bound_modif_plus) -> 
         let error,kasim_id =
           Quark_type.Labels.label_of_int parameter error 
             (Ckappa_sig.int_of_agent_id agent.Cckappa_sig.agent_kasim_id) 
         in 
         let agent_type = agent.Cckappa_sig.agent_name in 
         Ckappa_sig.Site_map_and_set.Map.fold
-          (fun site port (error,site_modif_plus) -> 
-            let interval = port.Cckappa_sig.site_state in 
-            let max = interval.Cckappa_sig.max in 
-            let rec aux k (error,site_modif_plus) = 
-              if k>max 
-              then 
-                error,site_modif_plus
-              else 
-                aux 
-                  (Ckappa_sig.state_index_of_int ((Ckappa_sig.int_of_state_index k)+1))
-                  (add_site parameter error rule_id kasim_id agent_type site k site_modif_plus) 
-            in 
-            aux interval.Cckappa_sig.min (error,site_modif_plus)
+          (fun site port (error,(site_modif_plus, site_bound_modif_plus)) -> 
+	   let interval = port.Cckappa_sig.site_state in 
+	   let max = interval.Cckappa_sig.max in
+	   let min = interval.Cckappa_sig.min in
+	   let error, binding_state = Handler.is_binding_site parameter error handler agent_type site in
+	   let error, site_bound_modif_plus =
+	     if binding_state && Ckappa_sig.int_of_state_index min > 0
+	     then
+	       add_bound_site parameter error rule_id kasim_id agent_type site site_bound_modif_plus
+	     else
+	       error, site_bound_modif_plus
+	   in
+	   let rec aux k (error,site_modif_plus) = 
+             if k>max 
+             then 
+               error,site_modif_plus
+             else 
+               aux 
+                 (Ckappa_sig.state_index_of_int ((Ckappa_sig.int_of_state_index k)+1))
+                 (add_site parameter error rule_id kasim_id agent_type site k site_modif_plus) 
+           in 
+           let error, site_modif_plus = aux interval.Cckappa_sig.min (error,site_modif_plus) in
+	   error, (site_modif_plus, site_bound_modif_plus)
           )
           agent.Cckappa_sig.agent_interface 
-          (error,site_modif_plus)                     
+          (error,(site_modif_plus,site_bound_modif_plus))                    
       )  
       rule.Cckappa_sig.diff_direct
-      site_modif_plus
+      (site_modif_plus, site_bound_modif_plus)
   in   
   let _ = Misc_sa.trace parameter (fun () -> "MODIFICATION-\n") in 
-  let error,site_modif_minus = (*the sites that are directly modified (excluding side-effects)*)
+  let error,(site_modif_minus,site_bound_modif_minus) = (*the sites that are directly modified (excluding side-effects)*)
     Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold 
       parameter
       error 
-      (fun parameter error agent_id agent site_modif_minus -> 
+      (fun parameter error agent_id agent (site_modif_minus,site_bound_modif_minus) -> 
         let error,kasim_id =
           Quark_type.Labels.label_of_int parameter error
             (Ckappa_sig.int_of_agent_id agent.Cckappa_sig.agent_kasim_id)
         in 
         let agent_type = agent.Cckappa_sig.agent_name in 
         Ckappa_sig.Site_map_and_set.Map.fold
-          (fun site port (error,site_modif_minus) -> 
-            let interval = port.Cckappa_sig.site_state in 
-            let max = interval.Cckappa_sig.max in 
+          (fun site port (error,(site_modif_minus,site_bound_modif_minus)) -> 
+	   let interval = port.Cckappa_sig.site_state in 
+	   let max = interval.Cckappa_sig.max in
+	   let min = interval.Cckappa_sig.min in
+	   let error, binding_state = Handler.is_binding_site parameter error handler agent_type site in
+	   let error, site_bound_modif_minus =
+	     if binding_state && Ckappa_sig.int_of_state_index min > 0
+	     then
+	       add_bound_site parameter error rule_id kasim_id agent_type site site_bound_modif_minus 
+	     else
+	       error, site_bound_modif_minus
+	   in
+	   let interval = port.Cckappa_sig.site_state in 
             let rec aux k (error,site_modif_minus) = 
-              if k>max 
-              then 
-                (error,site_modif_minus)
-              else 
-                aux 
+             if k>max 
+             then 
+               (error,site_modif_minus)
+             else 
+               aux 
                   (Ckappa_sig.state_index_of_int ((Ckappa_sig.int_of_state_index k)+1))
                   (add_site parameter error rule_id kasim_id agent_type site k site_modif_minus) 
-            in 
-            aux interval.Cckappa_sig.min (error,site_modif_minus)
+           in 
+           let error, modif = aux interval.Cckappa_sig.min (error,site_modif_minus) in
+	   error, (modif, site_bound_modif_minus)
           )
           agent.Cckappa_sig.agent_interface 
-          (error,site_modif_minus)
+          (error,
+	   (site_modif_minus,
+	    site_bound_modif_minus
+	   ))
           
       )  
       rule.Cckappa_sig.diff_reverse
-      site_modif_minus
-  in 
-  let error,(site_modif_plus,site_modif_minus) = (*the sites that are released via half bond breaking*)
+      (site_modif_minus,site_bound_modif_minus)
+  in
+  let error,(site_modif_plus,site_modif_minus,site_bound_modif_minus) = (*the sites that are released via half bond breaking*)
     let _ = Misc_sa.trace parameter (fun () -> "HALF BOND BREAKING\n") in
     List.fold_left
-      (fun (error,(site_modif_plus,site_modif_minus)) (add,state) -> 
+      (fun (error,(site_modif_plus,site_modif_minus,site_bound_modif_minus)) (add,state) -> 
         let agent_index = add.Cckappa_sig.agent_index in 
         let error,mkasim_id =
           Quark_type.Labels.label_of_int parameter error
@@ -787,8 +906,8 @@ let scan_rule parameter error handler rule_id rule quarks =
           match state 
           with 
           | None -> 
-            begin
-              let error,state_dic = 
+             begin
+	      let error,state_dic = 
                 Misc_sa.unsome 
                   (
                     Ckappa_sig.Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
@@ -803,24 +922,30 @@ let scan_rule parameter error handler rule_id rule quarks =
               error,(Ckappa_sig.dummy_state_index_1,last_entry)
             end 
           | Some interval -> 
-            error,(interval.Cckappa_sig.min,interval.Cckappa_sig.max)
-        in 
-        let rec aux k (error,(site_modif_plus,site_modif_minus)) = 
-          if k>max 
+	      error,(interval.Cckappa_sig.min,interval.Cckappa_sig.max)
+        in
+	let max = Ckappa_sig.int_of_state_index max in
+        let rec aux k (error,(site_modif_plus,site_modif_minus,site_bound_modif_minus)) = 
+	  if k>max 
           then 
-            (error,(site_modif_plus,site_modif_minus)) 
+            (error,(site_modif_plus,site_modif_minus,site_bound_modif_minus)) 
           else
-            let error,(site_modif_plus,site_modif_minus) = 
+	    let error,(site_modif_plus,site_modif_minus,site_bound_modif_minus) = 
               add_half_bond_breaking parameter error 
-                handler rule_id mkasim_id agent_type site k (site_modif_plus,site_modif_minus)
+                handler rule_id mkasim_id agent_type site (Ckappa_sig.state_index_of_int k) (site_modif_plus,site_modif_minus,site_bound_modif_minus)
             in 
-            (error,(site_modif_plus,site_modif_minus))
+            aux (k+1) (error,(site_modif_plus,site_modif_minus,site_bound_modif_minus))
         in 
-        aux min (error,(site_modif_plus,site_modif_minus)) 
+        aux (Ckappa_sig.int_of_state_index min) (error,(site_modif_plus,site_modif_minus,site_bound_modif_minus)) 
       )  
-      (error,(site_modif_plus,site_modif_minus))
+      (error,(site_modif_plus,site_modif_minus,site_bound_modif_minus))
       rule.Cckappa_sig.actions.Cckappa_sig.half_break
-  in 
+  in
+   let error, site_bound_modif_plus, site_bound_modif_minus = (* if a quark appers in both, remove them *)
+     clean_bound_modif parameter error
+		       (quarks.Quark_type.site_modif_bound_plus,site_bound_modif_plus)
+		       (quarks.Quark_type.site_modif_bound_minus,site_bound_modif_minus) 
+  in
   error,
   {quarks with 
     Quark_type.agent_test = agent_test ;
@@ -832,6 +957,8 @@ let scan_rule parameter error handler rule_id rule quarks =
     Quark_type.site_modif_plus = site_modif_plus ; 
     Quark_type.agent_modif_minus = agent_modif_minus ; 
     Quark_type.site_modif_minus = site_modif_minus ;        
+    Quark_type.site_modif_bound_plus = site_bound_modif_plus ;
+    Quark_type.site_modif_bound_minus = site_bound_modif_minus ;
   }
     
 let scan_rule_set parameter error handler rules = 

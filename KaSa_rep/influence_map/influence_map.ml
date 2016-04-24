@@ -124,6 +124,19 @@ let compute_influence_map parameters error handler quark_maps nrules =
       quark_maps.Quark_type.site_test
       wake_up_map
   in
+   let error,wake_up_map = 
+    generic_add 
+      Quark_type.SiteMap.fold2_common
+      true
+      true
+      parameters 
+      error 
+      handler
+      0 
+      quark_maps.Quark_type.site_modif_bound_plus 
+      quark_maps.Quark_type.site_test_bound
+      wake_up_map
+  in
   let error,wake_up_map = 
     generic_add 
       Quark_type.SiteMap.fold2_common
@@ -137,6 +150,19 @@ let compute_influence_map parameters error handler quark_maps nrules =
       quark_maps.Quark_type.site_var_plus
       wake_up_map
   in
+   let error,wake_up_map = 
+    generic_add 
+      Quark_type.SiteMap.fold2_common
+      true
+      true
+      parameters 
+      error 
+      handler
+      nrules
+      quark_maps.Quark_type.site_modif_bound_plus 
+      quark_maps.Quark_type.site_bound_var_plus
+      wake_up_map
+  in
   let error,inhibition_map = 
     generic_add 
       Quark_type.SiteMap.fold2_common
@@ -148,6 +174,19 @@ let compute_influence_map parameters error handler quark_maps nrules =
       nrules
       quark_maps.Quark_type.site_modif_plus 
       quark_maps.Quark_type.site_var_minus
+      inhibition_map 
+  in
+  let error,inhibition_map = 
+    generic_add 
+      Quark_type.SiteMap.fold2_common
+      true
+      true
+      parameters 
+      error 
+      handler
+      nrules
+      quark_maps.Quark_type.site_modif_bound_plus 
+      quark_maps.Quark_type.site_bound_var_minus
       inhibition_map 
   in
   let error,inhibition_map = 
@@ -178,6 +217,19 @@ let compute_influence_map parameters error handler quark_maps nrules =
   in
   let error,inhibition_map = 
     generic_add 
+      Quark_type.SiteMap.fold2_common
+      false
+      true
+      parameters 
+      error 
+      handler 
+      0
+      quark_maps.Quark_type.site_modif_bound_minus 
+      quark_maps.Quark_type.site_test_bound
+      inhibition_map
+  in
+  let error,inhibition_map = 
+    generic_add 
       Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold2_common
       false
       true 
@@ -187,6 +239,19 @@ let compute_influence_map parameters error handler quark_maps nrules =
       nrules
       quark_maps.Quark_type.agent_modif_minus 
       quark_maps.Quark_type.agent_var_plus
+      inhibition_map
+  in
+  let error,inhibition_map = 
+    generic_add 
+      Quark_type.SiteMap.fold2_common
+      false
+      true 
+      parameters 
+      error 
+      handler 
+      nrules
+      quark_maps.Quark_type.site_modif_bound_minus 
+      quark_maps.Quark_type.site_bound_var_plus
       inhibition_map
   in
   let error,inhibition_map = 
@@ -226,6 +291,19 @@ let compute_influence_map parameters error handler quark_maps nrules =
       nrules
       quark_maps.Quark_type.site_modif_minus 
       quark_maps.Quark_type.site_var_minus
+      wake_up_map
+  in
+   let error,wake_up_map = 
+    generic_add 
+      Quark_type.SiteMap.fold2_common
+      true
+      true
+      parameters 
+      error 
+      handler 
+      nrules
+      quark_maps.Quark_type.site_modif_bound_minus 
+      quark_maps.Quark_type.site_bound_var_minus
       wake_up_map
   in
   let error,inhibition_map =
@@ -355,5 +433,5 @@ let compute_influence_map parameters error handler quark_maps nrules =
       quark_maps.Quark_type.dead_states
       quark_maps.Quark_type.dead_states_minus
       wake_up_map
-  in
+   in
       error,wake_up_map,inhibition_map

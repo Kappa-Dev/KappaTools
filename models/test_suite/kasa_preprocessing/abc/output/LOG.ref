@@ -275,12 +275,18 @@ Quarks:rule_id:0,agent_type:1,site_type:0,state:0
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
+Quarks:rule_id:0,agent_type:0,site_type:0,state: bound
 Quarks:rule_id:0,agent_type:0,site_type:0,state:1
+Quarks:rule_id:0,agent_type:1,site_type:0,state: bound
 Quarks:rule_id:0,agent_type:1,site_type:0,state:1
 Quarks:MODIFICATION-
 Quarks:rule_id:0,agent_type:0,site_type:0,state:0
 Quarks:rule_id:0,agent_type:1,site_type:0,state:0
 Quarks:HALF BOND BREAKING
+Quarks:MODIF PLUS rule_id:0,agent_type:0,site_type:0,state: BOUND
+Quarks:rule_id:0,agent_type:0,site_type:0,state:1
+Quarks:MODIF PLUS rule_id:0,agent_type:1,site_type:0,state: BOUND
+Quarks:rule_id:0,agent_type:1,site_type:0,state:1
 Quarks:Rule 1
 Quarks:TEST
 Quarks:rule_id:1,agent_type:0
@@ -293,9 +299,15 @@ Quarks:MODIFICATION+
 Quarks:rule_id:1,agent_type:0,site_type:0,state:0
 Quarks:rule_id:1,agent_type:1,site_type:0,state:0
 Quarks:MODIFICATION-
+Quarks:rule_id:1,agent_type:0,site_type:0,state: bound
 Quarks:rule_id:1,agent_type:0,site_type:0,state:1
+Quarks:rule_id:1,agent_type:1,site_type:0,state: bound
 Quarks:rule_id:1,agent_type:1,site_type:0,state:1
 Quarks:HALF BOND BREAKING
+Quarks:MODIF MOINS: rule_id:1,agent_type:0,site_type:0,state: BOUND
+Quarks:rule_id:1,agent_type:0,site_type:0,state:1
+Quarks:MODIF MOINS: rule_id:1,agent_type:1,site_type:0,state: BOUND
+Quarks:rule_id:1,agent_type:1,site_type:0,state:1
 Quarks:Rule 2
 Quarks:TEST
 Quarks:rule_id:2,agent_type:0
@@ -307,12 +319,18 @@ Quarks:rule_id:2,agent_type:2,site_type:2,state:0
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
+Quarks:rule_id:2,agent_type:0,site_type:1,state: bound
 Quarks:rule_id:2,agent_type:0,site_type:1,state:1
+Quarks:rule_id:2,agent_type:2,site_type:2,state: bound
 Quarks:rule_id:2,agent_type:2,site_type:2,state:1
 Quarks:MODIFICATION-
 Quarks:rule_id:2,agent_type:0,site_type:1,state:0
 Quarks:rule_id:2,agent_type:2,site_type:2,state:0
 Quarks:HALF BOND BREAKING
+Quarks:MODIF PLUS rule_id:2,agent_type:0,site_type:1,state: BOUND
+Quarks:rule_id:2,agent_type:0,site_type:1,state:1
+Quarks:MODIF PLUS rule_id:2,agent_type:2,site_type:2,state: BOUND
+Quarks:rule_id:2,agent_type:2,site_type:2,state:1
 Quarks:Rule 3
 Quarks:TEST
 Quarks:rule_id:3,agent_type:2
@@ -328,9 +346,15 @@ Quarks:rule_id:3,agent_type:2,site_type:2,state:0
 Quarks:rule_id:3,agent_type:0,site_type:1,state:0
 Quarks:MODIFICATION-
 Quarks:rule_id:3,agent_type:2,site_type:0,state:0
+Quarks:rule_id:3,agent_type:2,site_type:2,state: bound
 Quarks:rule_id:3,agent_type:2,site_type:2,state:1
+Quarks:rule_id:3,agent_type:0,site_type:1,state: bound
 Quarks:rule_id:3,agent_type:0,site_type:1,state:1
 Quarks:HALF BOND BREAKING
+Quarks:MODIF MOINS: rule_id:3,agent_type:2,site_type:2,state: BOUND
+Quarks:rule_id:3,agent_type:2,site_type:2,state:1
+Quarks:MODIF MOINS: rule_id:3,agent_type:0,site_type:1,state: BOUND
+Quarks:rule_id:3,agent_type:0,site_type:1,state:1
 Quarks:Rule 4
 Quarks:TEST
 Quarks:rule_id:4,agent_type:0
@@ -344,12 +368,18 @@ Quarks:rule_id:4,agent_type:2,site_type:3,state:0
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
+Quarks:rule_id:4,agent_type:0,site_type:1,state: bound
 Quarks:rule_id:4,agent_type:0,site_type:1,state:2
+Quarks:rule_id:4,agent_type:2,site_type:3,state: bound
 Quarks:rule_id:4,agent_type:2,site_type:3,state:1
 Quarks:MODIFICATION-
 Quarks:rule_id:4,agent_type:0,site_type:1,state:0
 Quarks:rule_id:4,agent_type:2,site_type:3,state:0
 Quarks:HALF BOND BREAKING
+Quarks:MODIF PLUS rule_id:4,agent_type:0,site_type:1,state: BOUND
+Quarks:rule_id:4,agent_type:0,site_type:1,state:1
+Quarks:MODIF PLUS rule_id:4,agent_type:2,site_type:3,state: BOUND
+Quarks:rule_id:4,agent_type:2,site_type:3,state:1
 Quarks:Rule 5
 Quarks:TEST
 Quarks:rule_id:5,agent_type:0
@@ -367,10 +397,16 @@ Quarks:rule_id:5,agent_type:0,site_type:1,state:0
 Quarks:rule_id:5,agent_type:2,site_type:1,state:1
 Quarks:rule_id:5,agent_type:2,site_type:3,state:0
 Quarks:MODIFICATION-
+Quarks:rule_id:5,agent_type:0,site_type:1,state: bound
 Quarks:rule_id:5,agent_type:0,site_type:1,state:2
 Quarks:rule_id:5,agent_type:2,site_type:1,state:0
+Quarks:rule_id:5,agent_type:2,site_type:3,state: bound
 Quarks:rule_id:5,agent_type:2,site_type:3,state:1
 Quarks:HALF BOND BREAKING
+Quarks:MODIF MOINS: rule_id:5,agent_type:0,site_type:1,state: BOUND
+Quarks:rule_id:5,agent_type:0,site_type:1,state:1
+Quarks:MODIF MOINS: rule_id:5,agent_type:2,site_type:3,state: BOUND
+Quarks:rule_id:5,agent_type:2,site_type:3,state:1
 Quarks:Var 0
 Quarks:Var 1
 Quarks:Var 2

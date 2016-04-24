@@ -391,10 +391,16 @@ Quarks:REMOVAL
 Quarks:rule_id:5,agent_type:0
 Quarks:MODIFICATION+
 Quarks:MODIFICATION-
+Quarks:rule_id:5,agent_type:0,site_type:1,state: bound
 Quarks:rule_id:5,agent_type:0,site_type:1,state:1
 Quarks:HALF BOND BREAKING
 Quarks:rule_id:5,agent_type:1,site_type:1,state:0
 Quarks:rule_id:5,agent_type:1,site_type:1,state:1
+Quarks:rule_id:5,agent_type:1,site_type:1,state: bound
+Quarks:MODIF MOINS: rule_id:5,agent_type:1,site_type:1,state: BOUND
+Quarks:rule_id:5,agent_type:1,site_type:1,state:1
+Quarks:MODIF MOINS: rule_id:5,agent_type:0,site_type:1,state: BOUND
+Quarks:rule_id:5,agent_type:0,site_type:1,state:1
 Quarks:Rule 6
 Quarks:TEST
 Quarks:rule_id:6,agent_type:0
@@ -405,14 +411,20 @@ Quarks:rule_id:6,agent_type:1,site_type:1,state:0
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
+Quarks:rule_id:6,agent_type:0,site_type:1,state: bound
 Quarks:rule_id:6,agent_type:0,site_type:1,state:1
 Quarks:rule_id:6,agent_type:1,site_type:0,state:1
+Quarks:rule_id:6,agent_type:1,site_type:1,state: bound
 Quarks:rule_id:6,agent_type:1,site_type:1,state:1
 Quarks:MODIFICATION-
 Quarks:rule_id:6,agent_type:0,site_type:1,state:0
 Quarks:rule_id:6,agent_type:1,site_type:0,state:0
 Quarks:rule_id:6,agent_type:1,site_type:1,state:0
 Quarks:HALF BOND BREAKING
+Quarks:MODIF PLUS rule_id:6,agent_type:0,site_type:1,state: BOUND
+Quarks:rule_id:6,agent_type:0,site_type:1,state:1
+Quarks:MODIF PLUS rule_id:6,agent_type:1,site_type:1,state: BOUND
+Quarks:rule_id:6,agent_type:1,site_type:1,state:1
 Quarks:Rule 7
 Quarks:TEST
 Quarks:rule_id:7,agent_type:0
@@ -426,14 +438,20 @@ Quarks:rule_id:7,agent_type:2,site_type:1,state:0
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
+Quarks:rule_id:7,agent_type:0,site_type:1,state: bound
 Quarks:rule_id:7,agent_type:0,site_type:1,state:2
 Quarks:rule_id:7,agent_type:2,site_type:0,state:1
+Quarks:rule_id:7,agent_type:2,site_type:1,state: bound
 Quarks:rule_id:7,agent_type:2,site_type:1,state:1
 Quarks:MODIFICATION-
 Quarks:rule_id:7,agent_type:0,site_type:1,state:0
 Quarks:rule_id:7,agent_type:2,site_type:0,state:0
 Quarks:rule_id:7,agent_type:2,site_type:1,state:0
 Quarks:HALF BOND BREAKING
+Quarks:MODIF PLUS rule_id:7,agent_type:0,site_type:1,state: BOUND
+Quarks:rule_id:7,agent_type:0,site_type:1,state:1
+Quarks:MODIF PLUS rule_id:7,agent_type:2,site_type:1,state: BOUND
+Quarks:rule_id:7,agent_type:2,site_type:1,state:1
 Quarks:Rule 8
 Quarks:TEST
 Quarks:rule_id:8,agent_type:2
@@ -457,9 +475,12 @@ Quarks:REMOVAL
 Quarks:rule_id:9,agent_type:2
 Quarks:rule_id:9,agent_type:0,site_type:1,state:0
 Quarks:rule_id:9,agent_type:0,site_type:1,state:2
+Quarks:rule_id:9,agent_type:0,site_type:1,state: bound
 Quarks:MODIFICATION+
 Quarks:MODIFICATION-
 Quarks:HALF BOND BREAKING
+Quarks:MODIF MOINS: rule_id:9,agent_type:0,site_type:1,state: BOUND
+Quarks:rule_id:9,agent_type:0,site_type:1,state:1
 Quarks:Rule 10
 Quarks:TEST
 Quarks:rule_id:10,agent_type:3
@@ -472,8 +493,10 @@ Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
 Quarks:rule_id:10,agent_type:3,site_type:0,state:1
+Quarks:rule_id:10,agent_type:3,site_type:1,state: bound
 Quarks:rule_id:10,agent_type:3,site_type:1,state:1
 Quarks:rule_id:10,agent_type:4,site_type:0,state:1
+Quarks:rule_id:10,agent_type:4,site_type:1,state: bound
 Quarks:rule_id:10,agent_type:4,site_type:1,state:1
 Quarks:MODIFICATION-
 Quarks:rule_id:10,agent_type:3,site_type:0,state:0
@@ -481,6 +504,10 @@ Quarks:rule_id:10,agent_type:3,site_type:1,state:0
 Quarks:rule_id:10,agent_type:4,site_type:0,state:0
 Quarks:rule_id:10,agent_type:4,site_type:1,state:0
 Quarks:HALF BOND BREAKING
+Quarks:MODIF PLUS rule_id:10,agent_type:3,site_type:1,state: BOUND
+Quarks:rule_id:10,agent_type:3,site_type:1,state:1
+Quarks:MODIF PLUS rule_id:10,agent_type:4,site_type:1,state: BOUND
+Quarks:rule_id:10,agent_type:4,site_type:1,state:1
 Quarks:Rule 11
 Quarks:TEST
 Quarks:rule_id:11,agent_type:3
@@ -490,10 +517,16 @@ Quarks:REMOVAL
 Quarks:MODIFICATION+
 Quarks:rule_id:11,agent_type:3,site_type:1,state:0
 Quarks:MODIFICATION-
+Quarks:rule_id:11,agent_type:3,site_type:1,state: bound
 Quarks:rule_id:11,agent_type:3,site_type:1,state:1
 Quarks:HALF BOND BREAKING
 Quarks:rule_id:11,agent_type:4,site_type:1,state:0
 Quarks:rule_id:11,agent_type:4,site_type:1,state:1
+Quarks:rule_id:11,agent_type:4,site_type:1,state: bound
+Quarks:MODIF MOINS: rule_id:11,agent_type:4,site_type:1,state: BOUND
+Quarks:rule_id:11,agent_type:4,site_type:1,state:1
+Quarks:MODIF MOINS: rule_id:11,agent_type:3,site_type:1,state: BOUND
+Quarks:rule_id:11,agent_type:3,site_type:1,state:1
 
 REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
 Quarks:agent_test**:agent_type:0,rule:5->[0]

@@ -289,12 +289,18 @@ Quarks:rule_id:2,agent_type:1,site_type:2,state:0
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
+Quarks:rule_id:2,agent_type:0,site_type:1,state: bound
 Quarks:rule_id:2,agent_type:0,site_type:1,state:1
+Quarks:rule_id:2,agent_type:1,site_type:1,state: bound
 Quarks:rule_id:2,agent_type:1,site_type:1,state:1
 Quarks:MODIFICATION-
 Quarks:rule_id:2,agent_type:0,site_type:1,state:0
 Quarks:rule_id:2,agent_type:1,site_type:1,state:0
 Quarks:HALF BOND BREAKING
+Quarks:MODIF PLUS rule_id:2,agent_type:0,site_type:1,state: BOUND
+Quarks:rule_id:2,agent_type:0,site_type:1,state:1
+Quarks:MODIF PLUS rule_id:2,agent_type:1,site_type:1,state: BOUND
+Quarks:rule_id:2,agent_type:1,site_type:1,state:1
 Quarks:Rule 3
 Quarks:TEST
 Quarks:rule_id:3,agent_type:0
@@ -306,12 +312,18 @@ Quarks:rule_id:3,agent_type:1,site_type:2,state:0
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
+Quarks:rule_id:3,agent_type:0,site_type:2,state: bound
 Quarks:rule_id:3,agent_type:0,site_type:2,state:1
+Quarks:rule_id:3,agent_type:1,site_type:2,state: bound
 Quarks:rule_id:3,agent_type:1,site_type:2,state:1
 Quarks:MODIFICATION-
 Quarks:rule_id:3,agent_type:0,site_type:2,state:0
 Quarks:rule_id:3,agent_type:1,site_type:2,state:0
 Quarks:HALF BOND BREAKING
+Quarks:MODIF PLUS rule_id:3,agent_type:0,site_type:2,state: BOUND
+Quarks:rule_id:3,agent_type:0,site_type:2,state:1
+Quarks:MODIF PLUS rule_id:3,agent_type:1,site_type:2,state: BOUND
+Quarks:rule_id:3,agent_type:1,site_type:2,state:1
 Quarks:Rule 4
 Quarks:TEST
 Quarks:rule_id:4,agent_type:0
@@ -323,12 +335,18 @@ Quarks:rule_id:4,agent_type:1,site_type:2,state:1
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
+Quarks:rule_id:4,agent_type:0,site_type:1,state: bound
 Quarks:rule_id:4,agent_type:0,site_type:1,state:1
+Quarks:rule_id:4,agent_type:1,site_type:1,state: bound
 Quarks:rule_id:4,agent_type:1,site_type:1,state:1
 Quarks:MODIFICATION-
 Quarks:rule_id:4,agent_type:0,site_type:1,state:0
 Quarks:rule_id:4,agent_type:1,site_type:1,state:0
 Quarks:HALF BOND BREAKING
+Quarks:MODIF PLUS rule_id:4,agent_type:0,site_type:1,state: BOUND
+Quarks:rule_id:4,agent_type:0,site_type:1,state:1
+Quarks:MODIF PLUS rule_id:4,agent_type:1,site_type:1,state: BOUND
+Quarks:rule_id:4,agent_type:1,site_type:1,state:1
 Quarks:Rule 5
 Quarks:TEST
 Quarks:rule_id:5,agent_type:0
@@ -340,12 +358,18 @@ Quarks:rule_id:5,agent_type:1,site_type:2,state:0
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
+Quarks:rule_id:5,agent_type:0,site_type:2,state: bound
 Quarks:rule_id:5,agent_type:0,site_type:2,state:1
+Quarks:rule_id:5,agent_type:1,site_type:2,state: bound
 Quarks:rule_id:5,agent_type:1,site_type:2,state:1
 Quarks:MODIFICATION-
 Quarks:rule_id:5,agent_type:0,site_type:2,state:0
 Quarks:rule_id:5,agent_type:1,site_type:2,state:0
 Quarks:HALF BOND BREAKING
+Quarks:MODIF PLUS rule_id:5,agent_type:0,site_type:2,state: BOUND
+Quarks:rule_id:5,agent_type:0,site_type:2,state:1
+Quarks:MODIF PLUS rule_id:5,agent_type:1,site_type:2,state: BOUND
+Quarks:rule_id:5,agent_type:1,site_type:2,state:1
 Quarks:Rule 6
 Quarks:TEST
 Quarks:rule_id:6,agent_type:0
