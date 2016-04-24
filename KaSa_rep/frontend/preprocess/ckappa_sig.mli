@@ -182,6 +182,8 @@ module PairAgentIDSites_map_and_set: Map_wrapper.S_with_logs
 module PairAgentIDSite_map_and_set: Map_wrapper.S_with_logs 
   with type elt = (c_agent_id * c_site_name) * (c_agent_id * c_site_name)
 
+(* JF: This file is the API for KaSa frontend *)
+(* JF: Please do not put domain specific module here, put them with the definition of the corresponding abstract domain *)						 
 (*bonds in rhs and lhs*)
 module PairAgentsSiteState_map_and_set: Map_wrapper.S_with_logs
   with type elt = 

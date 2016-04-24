@@ -562,11 +562,16 @@ let scan_rule parameter error handler rule_id rule quarks =
 	      (fun site port (error,site_test) -> 
 		let interval = port.Cckappa_sig.site_state in 
 		let max = interval.Cckappa_sig.max in 
-		let rec aux k (error,site_test) = 
+		let error, binding_state = Handler.is_binding_site parameter error handler agent_type site in
+		if binding_state && port.Cckappa_sig.site_free = None (* The state is a wildcard, it should be ignored *)
+		then
+		  error, site_test
+		else
+		  let rec aux k (error,site_test) = 
                   if k > max
 		  then
 		    error,site_test
-		  else 
+		  else
 		    aux 
                       (Ckappa_sig.state_index_of_int ((Ckappa_sig.int_of_state_index k) + 1))
                       (add_site parameter error rule_id kasim_id agent_type site k site_test) 
