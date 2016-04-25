@@ -857,7 +857,7 @@ let rec complete_domain_with obs_id dst env free_id cc edge inj_dst2cc =
 	  next = Navigation.rename_step inj_cc2found edge;
 	  inj = [Renaming.compose true inj_dst2cc inj_cc2found];
 	  above_obs = IntSet.singleton obs_id;}]
-    | h :: t when h.dst = dst && (h.next = edge) ->
+    | h :: t when h.dst = dst && (h.next = Navigation.rename_step inj_cc2found edge) ->
        {h with inj = (Renaming.compose true inj_dst2cc inj_cc2found) :: h.inj} :: t
     | h :: t -> h :: new_son inj_cc2found t in
   let known_cc = Env.find env cc in
