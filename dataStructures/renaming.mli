@@ -13,8 +13,9 @@ val identity : int list -> t
 val cyclic_permutation_from_list : stop_at:int -> int list -> t
 (** very specific use case for Connected_component.remove_ag_cc *)
 
-val add : int -> int -> t -> t
-(** @raise Clashing in debug mode *)
+val add : int -> int -> t -> t option
+(** @raise Clashing in debug mode
+@return [None] if the addition would break injectivity *)
 
 val compose : bool -> t -> t -> t
 (** @raise Undefined *)

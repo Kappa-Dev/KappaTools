@@ -4,21 +4,26 @@ exception Undefined
 exception NotBijective
 exception Clashing
 
-type t = {sigma:int IntMap.t ; is_identity:bool}
+type t = {sigma:int IntMap.t ; is_identity:bool ; dsts:IntSet.t}
 
-let empty = {sigma = IntMap.empty ; is_identity=true}
+let empty = {sigma = IntMap.empty ; is_identity=true ; dsts = IntSet.empty }
 let identity l =
   {sigma = List.fold_left (fun out x -> IntMap.add x x out) IntMap.empty l;
-   is_identity = true}
+   is_identity = true;
+   dsts = List.fold_left (fun out x -> IntSet.add x out) IntSet.empty l}
 let is_identity i = i.is_identity
 
 let to_list i = IntMap.bindings i.sigma
 
 let unsafe_add x y i =
-  {sigma = IntMap.add x y i.sigma ; is_identity = i.is_identity && x==y}
+  {sigma = IntMap.add x y i.sigma ;
+   is_identity = i.is_identity && x==y ;
+   dsts = IntSet.add y i.dsts}
 let add x y i =
   let not_ok = !Parameter.debugModeOn && IntMap.mem x i.sigma in
-  if not_ok then raise Clashing else unsafe_add x y i
+  if not_ok then raise Clashing else
+    let i' = unsafe_add x y i in
+    if i.dsts == i'.dsts then None else Some i'
 
 let rec cyclic_permutation_from_identity max id subst pre = function
   | _ when pre = id -> unsafe_add pre max subst
@@ -49,7 +54,7 @@ let compose extensible i i' =
 	| None -> (out,is_id && x==y)
       ) i.sigma (i.sigma,true)
     in
-    {sigma=sigma ; is_identity=is_id}
+    {sigma=sigma ; is_identity=is_id ; dsts = i'.dsts}
   else i'
 
 let inverse i =
@@ -60,7 +65,7 @@ let inverse i =
         if IntMap.mem y out then raise NotBijective
         else IntMap.add y x out) i.sigma IntMap.empty
    in
-   {sigma = sigma ; is_identity = i.is_identity}
+   {sigma = sigma ; is_identity = i.is_identity ; dsts = i.dsts}
 
 let compare i i' = IntMap.compare int_compare i.sigma i'.sigma
 let equal i i' = (compare i i') = 0

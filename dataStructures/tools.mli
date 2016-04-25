@@ -23,6 +23,7 @@ val list_fold_right_map :
 val list_fold_left2 :
   ('a -> 'b -> 'c -> 'a) -> 'a -> 'b list -> 'c list -> 'a
 val list_mapi : (int -> 'a -> 'b) -> 'a list -> 'b list
+val list_map_option : ('a -> 'b option) -> 'a list -> 'b list
 val list_random : 'a list -> 'a
 
 (** not tail rec but don't allocate if unecessary *)

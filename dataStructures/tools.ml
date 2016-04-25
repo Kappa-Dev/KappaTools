@@ -56,6 +56,14 @@ let list_mapi f l =
     | h :: q -> f i h :: aux (succ i) q in
   aux 0 l
 
+let list_map_option f l =
+  let rec aux = function
+    | [] -> []
+    | h :: q -> match f h with
+		| None -> aux q
+		| Some x -> x :: aux q in
+  aux l
+
 let list_exists_uniq f l =
   let rec second = function
     | [] -> true

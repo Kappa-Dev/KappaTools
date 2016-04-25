@@ -1061,7 +1061,7 @@ module Matching = struct
 		  None,Navigation.injection_for_one_more_edge ?root inj graph nav)
               (Some (root,rty),Some Renaming.empty) nav
 	 (*- rm - find_root: cc -> (type, node) option *)
-	 | [] -> None, Some (Renaming.add rid root Renaming.empty) in
+	 | [] -> None, Renaming.add rid root Renaming.empty in
        match full_rename with
        | None -> failwith "Matching.reconstruct renaming error"
        | Some rename ->

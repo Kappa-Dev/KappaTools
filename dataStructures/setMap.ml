@@ -335,6 +335,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		(Failure "Set_and_Map.SET.balance")
 	    in error,node left value right
 
+	(** Beware some code relies on the invariant [add x s == s] iff [mem x s] *)
 	let rec add x = function
 	  | Private.Empty -> singleton x
 	  | Private.Node(l, v, r, _,_) as t ->

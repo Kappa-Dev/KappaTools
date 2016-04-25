@@ -74,17 +74,17 @@ let compatible_point injs e e' =
      List.filter
        (fun inj -> sid = Renaming.apply inj id && ssite = site
 		   && ty' = ty && ssite' = site')
-       (List.map (Renaming.add id' sid') injs)
+       (Tools.list_map_option (Renaming.add id' sid') injs)
   | ((Existing _,_), ToNode (Fresh _,_)),
     (((Fresh _ | Existing _), _), _) -> []
   | ((Fresh (id,ty),site), ToNothing), ((Fresh (id',ty'),site'),x) ->
-     List.map (Renaming.add id id')
+     Tools.list_map_option (Renaming.add id id')
 	      (List.filter
 		 (fun inj ->
 		  ty = ty' && site = site' && x = ToNothing
 		  && not (Renaming.mem id inj)) injs)
   | ((Fresh (id,ty),site), ToInternal i), ((Fresh (id',ty'),site'),x) ->
-     List.map (Renaming.add id id')
+     Tools.list_map_option (Renaming.add id id')
 	      (List.filter
 		 (fun inj -> ty = ty' && site = site' &&
 			       x = ToInternal i && not (Renaming.mem id inj))
@@ -93,11 +93,19 @@ let compatible_point injs e e' =
     ((Fresh (sid,sty),ssite), ToNode (Fresh (sid',sty'),ssite')) ->
      List.fold_left
        (fun acc inj ->
-	if not (Renaming.mem id inj) && not (Renaming.mem id inj) then
+	if not (Renaming.mem id inj) && not (Renaming.mem id' inj) then
 	  if ty = sty && site = ssite && ty' = sty' && site' = ssite'
-	  then (Renaming.add id' sid' (Renaming.add id sid inj))::acc
-	  else if ty = sty && site = ssite && ty' = sty' && site' = ssite'
-	  then (Renaming.add id' sid (Renaming.add id sid' inj))::acc
+	  then match Renaming.add id sid inj with
+	       | None -> acc
+	       | Some inj' -> match Renaming.add id' sid' inj' with
+			      | None -> acc
+			      | Some inj'' -> inj''::acc
+	  else if ty = sty' && site = ssite' && ty' = sty && site' = ssite
+	  then match Renaming.add id sid' inj with
+	       | None -> acc
+	       | Some inj' -> match Renaming.add id' sid inj' with
+			      | None -> acc
+			      | Some inj'' -> inj''::acc
 	  else acc
 	else acc) [] injs
   | ((Fresh _,_), _), ((Fresh _,_),_) -> []
@@ -144,7 +152,7 @@ let dst_is_okay inj' graph root site = function
   | ToNode (Fresh (id',ty),site') ->
      match Edges.exists_fresh root site ty site' graph with
      | None -> None
-     | Some node -> Some (Renaming.add id' node inj')
+     | Some node -> Renaming.add id' node inj'
 
 let injection_for_one_more_edge ?root inj graph = function
   | ((Existing id,site),dst) ->
@@ -152,5 +160,7 @@ let injection_for_one_more_edge ?root inj graph = function
   | ((Fresh (id,rty),site),dst) ->
      match root with
      | Some (root,rty') when rty=rty' ->
-	dst_is_okay (Renaming.add id root inj) graph root site dst
+	(match Renaming.add id root inj with
+	| None -> None
+	| Some inj' -> dst_is_okay inj' graph root site dst)
      | _ -> None
