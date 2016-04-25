@@ -35,7 +35,7 @@ sig
   (** blackboard*)
 
   type blackboard      (*blackboard, once finalized*)
-  type assign_result 
+  type assign_result
 
   val is_failed: assign_result -> bool
   val is_succeeded: assign_result -> bool
@@ -202,23 +202,29 @@ module Blackboard =
       | Pointer of pointer
       | Boolean of bool option
 
-    let print_case_value parameter x = ()
-(*      match x with
+    let print_case_value parameter x =
+        match x with
       | State x ->
-         let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "State! " in
-         let _ = PB.print_predicate_value parameter.PB.CI.Po.K.H.out_channel_err x in
-         let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "@." in
+        let () = Loggers.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter)  "State! " in
+        let () = PB.print_predicate_value (PB.CI.Po.K.H.get_debugging_channel parameter)  x in
+        let () = Loggers.print_newline (PB.CI.Po.K.H.get_debugging_channel parameter) in
          ()
-        | Counter i ->
-	   Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Counter %i@." i
-        | Pointer i ->
-	   Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Pointer %i@." i
-        | Boolean b ->
-	   Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Boolean %s@." (match b with None -> "?" | Some true -> "true" | _ -> "false")*)
+      | Counter i ->
+        let () = Loggers.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "Counter %i" i in
+        let () = Loggers.print_newline (PB.CI.Po.K.H.get_debugging_channel parameter) in
+        ()
+      | Pointer i ->
+        let () = Loggers.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "Pointer %i" i in
+        let () = Loggers.print_newline (PB.CI.Po.K.H.get_debugging_channel parameter) in
+        ()
+      | Boolean b ->
+        let () = Loggers.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "Boolean %s" (match b with None -> "?" | Some true -> "true" | _ -> "false") in
+        let () = Loggers.print_newline (PB.CI.Po.K.H.get_debugging_channel parameter) in
+        ()
 
     let string_of_pointer seid = "event seid "^(string_of_int seid)
     let print_pointer log seid =
-      Format.fprintf log "%s" (string_of_pointer seid)
+      Loggers.fprintf log "%s" (string_of_pointer seid)
 
     let state predicate_value = State predicate_value
     let counter i = Counter i
@@ -256,12 +262,12 @@ module Blackboard =
     let strictly_more_refined = g PB.strictly_more_refined bool_strictly_more_refined "strictly_more_refined"
 
     type case_info_static  =
-	{
-	  row_short_id: PB.step_short_id;
-          event_id: PB.step_id;
-	  test: PB.predicate_value;
-          action: PB.predicate_value
-	}
+      {
+        row_short_id: PB.step_short_id;
+        event_id: PB.step_id;
+        test: PB.predicate_value;
+        action: PB.predicate_value
+      }
 
     type case_info_dynamic =
         {
@@ -279,10 +285,10 @@ module Blackboard =
 
     let dummy_case_info_static =
       {
-	row_short_id = -1 ;
+        row_short_id = -1 ;
         event_id = -1 ;
-	test = PB.unknown ;
-	action = PB.unknown ;
+        test = PB.unknown ;
+        action = PB.unknown ;
       }
 
     let dummy_case_info_dynamic =
@@ -310,10 +316,10 @@ module Blackboard =
 
     let init_info_static p_id seid (eid,_,test,action) =
       {
-	row_short_id = seid ;
+        row_short_id = seid ;
         event_id = eid ;
-	test = test ;
-	action = action ;
+        test = test ;
+        action = action ;
       }
 
     let get_eid_of_triple (x,_,_,_) = x
@@ -402,7 +408,7 @@ module Blackboard =
 
      let print_event_case_address parameter handler log_info error blackboard case =
        let error,log_info,(_,eid,_,_) = get_static parameter handler log_info error blackboard case in
-       (*    let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel "Event: %i, Predicate: %i@." eid (predicate_id_of_case_address case) in*)
+       let () = Loggers.fprintf (PB.CI.Po.K.H.get_logger parameter) "Event: %i, Predicate: %i@." eid (predicate_id_of_case_address case) in
        error,log_info,()
 
      let print_case_address parameter handler log_info error blackboard x =
@@ -411,43 +417,43 @@ module Blackboard =
       | N_unresolved_events_in_column_at_level (i,j) ->
         let _ =
 	  Format.fprintf
-	    parameter.PB.CI.Po.K.H.out_channel_err
+	    (PB.CI.Po.K.H.get_debugging_channel parameter)
 	    "n_unresolved_events_in_pred %i %s@."
 	    i
 	    (Priority.string_of_level j)
 	in
          error,log_info,()
        | N_unresolved_events_in_column i ->
-         let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "n_unresolved_events_in_pred %i @." i in
+         let _ = Format.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "n_unresolved_events_in_pred %i @." i in
          error,log_info,()
        | Pointer_to_next e ->
-         let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Pointer" in
+         let _ = Format.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "Pointer" in
          print_event_case_address parameter handler log_info error blackboard e
        | Value_after e ->
-        let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Value_after  " in
+        let _ = Format.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "Value_after  " in
         print_event_case_address parameter handler log_info error blackboard e
       | Value_before e ->
-        let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Value_before " in
+        let _ = Format.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "Value_before " in
         print_event_case_address parameter handler log_info error blackboard e
       | Pointer_to_previous e ->
-        let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Pointer_before " in
+        let _ = Format.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "Pointer_before " in
         print_event_case_address parameter handler log_info error blackboard e
       | N_unresolved_events_at_level i ->
         let _ =
 	  Format.fprintf
-	    parameter.PB.CI.Po.K.H.out_channel_err
+	    (PB.CI.Po.K.H.get_debugging_channel parameter)
 	    "Unresolved_events_at_level %s"
 	    (Priority.string_of_level i)
 	in
         error,log_info,()
       | N_unresolved_events ->
-        let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Unresolved_events" in
+        let _ = Format.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "Unresolved_events" in
         error,log_info,()
       | Exist e ->
-        let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Exist " in
+        let _ = Format.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "Exist " in
         print_event_case_address parameter handler log_info error blackboard e
       | Keep_event i ->
-        let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Keep %i" i in*)
+        let _ = Format.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "Keep %i" i in*)
         error,log_info,()
 
      let get_npredicate_id blackboard = blackboard.n_predicate_id
@@ -489,13 +495,13 @@ module Blackboard =
 
    (**pretty printing*)
      let print_known_case log pref inf suf case =
-        let _ = Format.fprintf log "%stest:" pref in
+        let _ = Loggers.fprintf log "%stest:" pref in
         let _ = PB.print_predicate_value log case.static.test in
-        let _ = Format.fprintf log "/eid:%i/action:" case.static.event_id in
+        let _ = Loggers.fprintf log "/eid:%i/action:" case.static.event_id in
         let _ = PB.print_predicate_value log case.static.action in
-        let _ = Format.fprintf log "%s" inf in
+        let _ = Loggers.fprintf log "%s" inf in
         let _ = PB.print_predicate_value log case.dynamic.state_after in
-        let _ = Format.fprintf log "%s" suf in
+        let _ = Loggers.fprintf log "%s" suf in
         ()
 
      let print_case log case =
@@ -509,46 +515,43 @@ module Blackboard =
            print_known_case log "?(" ") " " " case
 
      let print_address parameter handler log_info error blackboard address =
-      (* let log = parameter.PB.CI.Po.K.H.out_channel_err in
+       let log = (PB.CI.Po.K.H.get_debugging_channel parameter) in
        match address
        with
          | Keep_event i ->
-           let _ = Format.fprintf log "Is the event %i selected ? " i in
-           error,log_info,()
+           let () = Loggers.fprintf log "Is the event %i selected ? " i in
+           error,log_info,  ()
          | Exist i ->
-           let _ = Format.fprintf log "Is the case " in
+           let () = Loggers.fprintf log "Is the case " in
            let error,log_info,() = print_event_case_address parameter handler log_info error blackboard i in
-           let _ = Format.fprintf log "selected ? " in
+           let () = Loggers.fprintf log "selected ? " in
            error,log_info,()
          | N_unresolved_events_in_column_at_level (i,j) ->
-           let _ =
-	     Format.fprintf
-	       log
-	       "Number of unresolved events for the predicate %i at level %s"
-	       i
-	       (Priority.string_of_level j)
-	   in
-           error,log_info,()
+           let () =
+             Loggers.fprintf log "Number of unresolved events for the predicate %i at level %s"
+               i (Priority.string_of_level j)
+           in
+            error,log_info,()
          | N_unresolved_events_in_column i ->
-           let _ = Format.fprintf log "Number of unresolved events for the predicate %i" i in
+           let () = Loggers.fprintf log "Number of unresolved events for the predicate %i" i in
            error,log_info,()
          | Pointer_to_next i ->
-           let _ = Format.fprintf log "Prochain événement agissant sur "  in
+           let () = Loggers.fprintf log "Prochain événement agissant sur "  in
            print_event_case_address parameter handler log_info error blackboard i
          | Value_after i ->
-            let _ = Format.fprintf log "Valeur après "  in
-            print_event_case_address parameter handler log_info error blackboard i
-	 | Value_before i ->
-            let _ = Format.fprintf log "Valeur avant "  in
-            print_event_case_address parameter handler log_info error blackboard i
+           let () = Loggers.fprintf log "Valeur après "  in
+           print_event_case_address parameter handler log_info error blackboard i
+         | Value_before i ->
+           let () = Loggers.fprintf log "Valeur avant " in
+           print_event_case_address parameter handler log_info error blackboard i
          | Pointer_to_previous i ->
-            let _ = Format.fprintf log "Evenement précésent agissant sur " in
-            print_event_case_address parameter handler log_info error blackboard i
-	 | N_unresolved_events ->
-           let _ = Format.fprintf log "Nombre d'événements non résolu" in
+           let () = Loggers.fprintf log "Evenement précésent agissant sur " in
+           print_event_case_address parameter handler log_info error blackboard i
+         | N_unresolved_events ->
+           let () = Loggers.fprintf log "Nombre d'événements non résolu" in
            error,log_info,()
          | N_unresolved_events_at_level i ->
-           let _ = Format.fprintf log "Nombre d'événements non résolu at level %s" (Priority.string_of_level i) in*)
+           let () = Loggers.fprintf log "Nombre d'événements non résolu at level %s" (Priority.string_of_level i) in
            error,log_info,()
 
 
@@ -569,10 +572,10 @@ module Blackboard =
        match value
        with
          | State pb -> PB.print_predicate_value log pb
-         | Counter i -> Format.fprintf log "Counter %i" i
+         | Counter i -> Loggers.fprintf log "Counter %i" i
          | Pointer i -> print_pointer log i
          | Boolean bool ->
-           Format.fprintf log "%s"
+           Loggers.fprintf log "%s"
              (match bool
               with
                 | None -> "?"
@@ -581,31 +584,38 @@ module Blackboard =
 
 
      let print_assignment parameter handler log_info error blackboard (address,value)  =
-      (* let error,log_info,()  = print_address parameter handler log_info error blackboard address in
-       let _ = print_value parameter.PB.CI.Po.K.H.out_channel_err value in*)
-       error,log_info
+       let error,log_info,()  = print_address parameter handler log_info error blackboard address in
+       let _ = print_value (PB.CI.Po.K.H.get_debugging_channel parameter) value in
+        error,log_info
 
      let print_blackboard parameter handler log_info error blackboard =
-      (* let log = parameter.PB.CI.Po.K.H.out_channel_err in
-       let _ = Format.fprintf log "**@.BLACKBOARD@.**@." in
-       let _ = Format.fprintf log "%i wires, %i events@." blackboard.n_predicate_id blackboard.n_eid in
-       let _ = Format.fprintf log "*wires:*@." in
+       let log = PB.CI.Po.K.H.get_debugging_channel parameter in
+       let () = Loggers.fprintf log "**BLACKBOARD**" in
+       let () = Loggers.print_newline log in
+       let () = Loggers.fprintf log "%i wires, %i events" blackboard.n_predicate_id blackboard.n_eid in
+       let () = Loggers.print_newline log in
+       let () = Loggers.fprintf log "*wires:*" in
+       let () = Loggers.print_newline log in
        let err = ref error in
-       let _ =
+       let () =
          PB.A.iteri
            (fun i array ->
-             let _ = Format.fprintf log "%i@." i in
-             let _ =
+              let () = Loggers.fprintf log "%i" i in
+              let () = Loggers.print_newline log in
+              let () =
                if PB.A.get blackboard.used_predicate_id i
                then
-                 let _ = Format.fprintf log "*wires %i:@. " i in
+                 let () = Loggers.fprintf log "*wires %i: " i in
+                 let () = Loggers.print_newline log in
                  let rec aux j error =
-		       let _ = Format.fprintf log "* %i:@. " j in
-                       let case = PB.A.get array j in
-                       let _ = print_case log case in
-                       let j' = get_pointer_next case in
-                       if j=j' then error
-                       else aux j' error
+                   let () = Loggers.fprintf log "* %i:" j in
+                   let () = Loggers.print_newline log in
+                   let case = PB.A.get array j in
+                   let () = print_case log case in
+                   let j' = get_pointer_next case in
+                   if j=j'
+                   then error
+                   else aux j' error
                  in
                  let error = aux pointer_before_blackboard (!err) in
                  let _ = err := error in
@@ -613,51 +623,63 @@ module Blackboard =
                else
                  ()
              in
-             let _ = Format.fprintf log "@." in ())
+             Loggers.print_newline log)
            blackboard.blackboard
        in
        let error = !err in
-       let _ = Format.fprintf log "*stacks*@." in
+       let () = Loggers.fprintf log "*stacks*" in
+       let () = Loggers.print_newline log in
        let error,log_info = List.fold_left (fun (error,log_info) -> print_assignment parameter handler log_info error blackboard) (error,log_info) (List.rev blackboard.current_stack) in
-       let _ = Format.fprintf log "@." in
+       let () = Loggers.print_newline log in
        let _ =
          List.fold_left
            (fun (error,log_info) stack ->
              let error,log_info = List.fold_left (fun (error,log_info) -> print_assignment parameter handler log_info error blackboard) (error,log_info) stack in
-             let _ = Format.fprintf log "@." in
+             let () = Loggers.print_newline log in
              (error,log_info))
            (error,log_info) blackboard.stack
        in
-       let _ = Format.fprintf log "*selected_events*@." in
-       let _ =
+       let () = Loggers.fprintf log "*selected_events*" in
+       let () = Loggers.print_newline log in
+       let () =
          PB.A.iteri
            (fun i bool ->
              match bool
              with
                | None -> ()
                | Some b ->
-                 Format.fprintf log "  Event:%i (%s)@." i (if b then "KEPT" else "REMOVED"))
+                 let () = Loggers.fprintf log "  Event:%i (%s)" i (if b then "KEPT" else "REMOVED") in
+                 Loggers.print_newline log)
            blackboard.selected_events
        in
-       let _ = Format.fprintf log "*unsolved_events*@." in
-       let _ = Format.fprintf log " %i@." blackboard.n_unresolved_events in
-       let _ = Format.fprintf log "*weight of predicate_id*@." in
-       let _ =
+       let () = Loggers.fprintf log "*unsolved_events*" in
+       let () = Loggers.print_newline log in
+       let () = Loggers.fprintf log " %i" blackboard.n_unresolved_events in
+       let () = Loggers.print_newline log in
+       let () = Loggers.fprintf log "*weight of predicate_id*" in
+       let () = Loggers.print_newline log in
+       let () =
          PB.A.iteri
-           (Format.fprintf log " %i:%i@.")
+           (fun a b ->
+              let () = Loggers.fprintf log " %i:%i" a b in
+              Loggers.print_newline log)
            blackboard.weigth_of_predicate_id
        in
-       let _ = Format.fprintf log "*weight of predicate_id_by_level*@." in
-       let _ =
+       let () = Loggers.fprintf log "*weight of predicate_id_by_level*" in
+       let () =
          Priority.LevelMap.iter
            (fun l  ->
-             let _ = Format.fprintf log " Level:%s@." (Priority.string_of_level l) in
-             PB.A.iteri
-               (Format.fprintf log " %i:%i@.")
+              let () = Loggers.fprintf log " Level:%s" (Priority.string_of_level l) in
+              let () = Loggers.print_newline log in
+              PB.A.iteri
+                (fun a b ->
+                   let () = Loggers.fprintf log " %i:%i" a b in
+                   Loggers.print_newline log)
            )
            blackboard.weigth_of_predicate_id_by_level
        in
-       let _ = Format.fprintf log "**@." in*)
+       let () = Loggers.fprintf log "**" in
+       let () = Loggers.print_newline log in
        error,log_info,()
 
 
@@ -842,19 +864,15 @@ module Blackboard =
                | Counter int2 ->
                  begin
                    match
-		     Priority.LevelMap.find_option
-			   level
-			   blackboard.weigth_of_predicate_id_by_level
-		   with
-		   | Some a ->
-                     let _ =
-                       PB.A.set a int int2
-		     in
-                     error,log_info,blackboard
-		   | None ->
-                       begin
-                         warn parameter log_info error (Some "set, line 842, Incompatible address and value in function set") (Failure"Incompatible address and value in function Blackboard.set") blackboard
-                       end
+                     Priority.LevelMap.find_option level blackboard.weigth_of_predicate_id_by_level
+                   with
+                    | Some a ->
+                      let () = PB.A.set a int int2 in
+                      error,log_info,blackboard
+                    | None ->
+                      begin
+                        warn parameter log_info error (Some "set, line 842, Incompatible address and value in function set") (Failure"Incompatible address and value in function Blackboard.set") blackboard
+                      end
                  end
                | _ ->
                   warn parameter log_info error (Some "set, line 846, Incompatible address and value in function set") (Failure "Incompatible address and value in function Blackboard.set") blackboard
@@ -867,7 +885,7 @@ module Blackboard =
                  let _ = PB.A.set blackboard.weigth_of_predicate_id int int2 in
                  error,log_info,blackboard
                | _ ->
-		  warn parameter log_info error (Some "set, line 856, Incompatible address and value in function set") (Failure "Incompatible address and value in function Blackboard.set") blackboard
+                 warn parameter log_info error (Some "set, line 856, Incompatible address and value in function set") (Failure "Incompatible address and value in function Blackboard.set") blackboard
            end
          | Pointer_to_next case_address ->
               begin
@@ -879,7 +897,7 @@ module Blackboard =
                     let error,log_info,blackboard = set_case parameter handler log_info error case_address case_value blackboard in
                     error,log_info,blackboard
                   | _ ->
-		     warn parameter log_info error (Some "set, line 868, Incompatible address and value in function set") (Failure "Incompatible address and value in function Blackboard.set") blackboard
+                    warn parameter log_info error (Some "set, line 868, Incompatible address and value in function set") (Failure "Incompatible address and value in function Blackboard.set") blackboard
               end
          | Value_after case_address ->
            begin
@@ -892,11 +910,9 @@ module Blackboard =
                  error,log_info,blackboard
                | _ ->
              	  warn parameter log_info error (Some "set, line 880, set should not be called with value_after") (Failure "Incompatible address and value in function Blackboard.set") blackboard
-
            end
          | Value_before case_address ->
-	    warn parameter log_info error (Some "set, line 884, set should not be called with value_before") (Failure "Incompatible address and value in function Blackboard.set") blackboard
-
+           warn parameter log_info error (Some "set, line 884, set should not be called with value_before") (Failure "Incompatible address and value in function Blackboard.set") blackboard
          | Pointer_to_previous case_address ->
                begin
                 match case_value
@@ -916,8 +932,7 @@ module Blackboard =
                | Counter int ->
                  error,log_info,{blackboard with n_unresolved_events = int}
                | _ ->
-		      warn parameter log_info error (Some "set, line 905, Incompatible address and value in function set") (Failure "Incompatible address and value in function Blackboard.set") blackboard
-
+                 warn parameter log_info error (Some "set, line 905, Incompatible address and value in function set") (Failure "Incompatible address and value in function Blackboard.set") blackboard
 	   end
          | N_unresolved_events_at_level level  ->
            begin
@@ -928,7 +943,7 @@ module Blackboard =
                         with n_unresolved_events_by_level =
                      Priority.LevelMap.add level int blackboard.n_unresolved_events_by_level}
                | _ ->
-		   warn parameter log_info error (Some "set, line 917, Incompatible address and value in function set") (Failure "Incompatible address and value in function Blackboard.set") blackboard
+                 warn parameter log_info error (Some "set, line 917, Incompatible address and value in function set") (Failure "Incompatible address and value in function Blackboard.set") blackboard
            end
          | Keep_event step_id ->
            begin
@@ -938,7 +953,7 @@ module Blackboard =
                  let _ = PB.A.set blackboard.selected_events step_id b in
                  error,log_info,blackboard
                | _ ->
-		  warn parameter log_info error (Some "set, line 927, Incompatible address and value in function set") (Failure "Incompatible address and value in function Blackboard.set") blackboard
+                 warn parameter log_info error (Some "set, line 927, Incompatible address and value in function set") (Failure "Incompatible address and value in function Blackboard.set") blackboard
           end
          | Exist case_address ->
            begin
@@ -950,12 +965,12 @@ module Blackboard =
                  let error,log_info,blackboard = set_case parameter handler log_info error case_address case_value blackboard in
                  error,log_info,blackboard
                | _ ->
-		  warn parameter log_info error (Some "set, line 939, Incompatible address and value in function set") (Failure "Incompatible address and value in function Blackboard.set") blackboard
+                 warn parameter log_info error (Some "set, line 939, Incompatible address and value in function set") (Failure "Incompatible address and value in function Blackboard.set") blackboard
            end
 
      let is_selected_event parameter handler log_info error step_id blackboard =
        error, log_info, PB.A.get blackboard.selected_events step_id
-				 
+
      let rec get parameter handler log_info error case_address blackboard =
        match
          case_address
@@ -985,7 +1000,7 @@ module Blackboard =
            let pointer = case.dynamic.pointer_previous in
            if is_null_pointer pointer
            then
-	     warn parameter log_info error (Some "get, line 814, Value before an unexisting element requested ") (Failure "Value before an unexisting element requested") (State PB.undefined)
+             warn parameter log_info error (Some "get, line 814, Value before an unexisting element requested ") (Failure "Value before an unexisting element requested") (State PB.undefined)
            else
              get parameter handler log_info error (Value_after {case_address with row_short_event_id = pointer}) blackboard
          | Pointer_to_previous case_address ->
@@ -1001,16 +1016,15 @@ module Blackboard =
      let export_blackboard_to_xls parameter handler log_info error prefix int int2 blackboard =
         let file_name = prefix^"_"^(string_of_int int)^"_"^(string_of_int int2)^".sxw" in
         let desc_chan = Kappa_files.open_out file_name in
-	let desc = Format.formatter_of_out_channel desc_chan in
-      (*  let parameter =
-          {parameter with PB.CI.Po.K.H.out_channel = desc }
-        in*)
+        let desc = Loggers.open_logger_from_channel ~mode:Loggers.XLS desc_chan in
+        let parameter = PB.CI.Po.K.H.set_logger parameter desc in
         let ncolumns_left = 3 in
         let nrows_head = 2 in
         let row_of_precondition eid = nrows_head + 3*eid in
         let row_of_postcondition eid = 1+(row_of_precondition eid) in
         let column_of_pid pid = pid + ncolumns_left in
-        let _ = Format.fprintf desc "REM  *****  BASIC  *****@." in
+        let () = Loggers.fprintf desc "REM  *****  BASIC  *****" in
+        let () = Loggers.print_newline desc in
         let colors = PB.A.make blackboard.n_eid None in
         let backcolor log color =
           match
@@ -1018,7 +1032,9 @@ module Blackboard =
           with
           | Some color ->
             let r,g,b=Color.triple_of_color color in
-            Format.fprintf log "C.CellBackColor = RGB(%i,%i,%i)@." r g b
+            let () = Loggers.fprintf log "C.CellBackColor = RGB(%i,%i,%i)" r g b in
+            let () = Loggers.print_newline log in
+            ()
           | None -> ()
         in
         let textcolor log color  =
@@ -1027,42 +1043,53 @@ module Blackboard =
           with
           | Some color ->
             let r,g,b=Color.triple_of_color color in
-            Format.fprintf log "C.CharColor = RGB(%i,%i,%i)@." r g b
+            let () = Loggers.fprintf log "C.CharColor = RGB(%i,%i,%i)" r g b in
+            Loggers.print_newline log
           | None -> ()
         in
         let getcell log row col =
-          Format.fprintf log "C = S.getCellByPosition(%i,%i)@." col row
+          let () = Loggers.fprintf log "C = S.getCellByPosition(%i,%i)" col row in
+          Loggers.print_newline log
         in
         let overline_case log row col color =
-          let _ = Format.fprintf desc "R=S.Rows(%i)@." row in
-          let _ = Format.fprintf desc "R.TopBorder = withBord@." in
-          ()
+          let () = Loggers.fprintf log "R=S.Rows(%i)" row in
+          let () = Loggers.print_newline log in
+          let () = Loggers.fprintf log "R.TopBorder = withBord" in
+          Loggers.print_newline log
         in
         let print_case log row col color_font color_back string =
           if string <> ""
           then
-            let _ = getcell log row col in
-            let _ = textcolor log color_font in
-            let _ = backcolor log color_back in
-            let _ = Format.fprintf log "C.setFormula(\"%s\")@." string
-            in ()
+            let () = getcell log row col in
+            let () = textcolor log color_font in
+            let () = backcolor log color_back in
+            let () = Loggers.fprintf log "C.setFormula(\"%s\")" string in
+            Loggers.print_newline log
         in
         let print_case_fun log row col color_font color_back f error =
-          let _ = getcell log row col in
-          let _ = textcolor log color_font in
-          let _ = backcolor log color_back in
-          let _ = Format.fprintf log "C.setFormula(\"@[<h>"in
+          let () = getcell log row col in
+          let () = textcolor log color_font in
+          let () = backcolor log color_back in
+          let () = Loggers.fprintf log "C.setFormula(\""in
           let error = f error in
-          let _ = Format.fprintf log "\"@])@." in
+          let () = Loggers.fprintf log "\")" in
+          let () = Loggers.print_newline log in
           error
         in
-        let _ = Format.fprintf desc "Sub Main@.@." in
+        let () = Loggers.fprintf desc "Sub Main" in
+        let () = Loggers.print_newline desc in
+        let () = Loggers.print_newline desc in
         let r,g,b = Color.triple_of_color Color.Black in
-        let _ = Format.fprintf desc "Dim withBord As New com.sun.star.table.BorderLine@." in
-        let _ = Format.fprintf desc "With withBord withBord.Color = RGB(%i,%i,%i)@." r g b in
-        let _ = Format.fprintf desc "withBord.OuterLineWidth = 60@." in
-        let _ = Format.fprintf desc "End With@." in
-        let _ = Format.fprintf desc "S = ThisComponent.Sheets(0)@." in
+        let () = Loggers.fprintf desc "Dim withBord As New com.sun.star.table.BorderLine" in
+        let () = Loggers.print_newline desc in
+        let () = Loggers.fprintf desc "With withBord withBord.Color = RGB(%i,%i,%i)" r g b in
+        let () = Loggers.print_newline desc in
+        let () = Loggers.fprintf desc "withBord.OuterLineWidth = 60" in
+        let () = Loggers.print_newline desc in
+        let () = Loggers.fprintf desc "End With" in
+        let () = Loggers.print_newline desc in
+        let () = Loggers.fprintf desc "S = ThisComponent.Sheets(0)" in
+        let () = Loggers.print_newline desc in
         let _ =
           match forced_events blackboard
           with
@@ -1130,36 +1157,34 @@ module Blackboard =
               in
               let print_test t =
                  let column = PB.A.get blackboard.blackboard t.column_predicate_id in
-		 let case = PB.A.get column t.row_short_event_id in
+                 let case = PB.A.get column t.row_short_event_id in
                  PB.string_of_predicate_value case.static.test
               in
               let print_action t =
-	          let column = PB.A.get blackboard.blackboard t.column_predicate_id in
-		  let case = PB.A.get column t.row_short_event_id in
-		  PB.string_of_predicate_value case.static.action
-	      in
+                let column = PB.A.get blackboard.blackboard t.column_predicate_id in
+                let case = PB.A.get column t.row_short_event_id in
+                PB.string_of_predicate_value case.static.action
+              in
               let string_eid error =
-		let () =
+                let () =
                   try
-		    let str =
-		      Format.asprintf
-			"@[<h>%a@]" (PB.CI.Po.K.print_refined_step ~compact:true ~handler)
-			(PB.A.get blackboard.event eid) in
-		    let line = Str.global_replace (Str.regexp "@. *") " " str in
-		    Format.pp_print_string desc line
-		  with Not_found -> Format.fprintf desc "Event:%i" eid in
-		error in
+                      PB.CI.Po.K.print_refined_step ~compact:true ~handler desc (PB.A.get blackboard.event eid)
+                  with
+                  | Not_found -> Loggers.fprintf desc "Event:%i" eid
+                in
+                error
+              in
               let error = print_case_fun  desc row_precondition 1 None color string_eid error in
               let error = print_case_fun  desc row_postcondition 1 None color string_eid error in
-              let _  = print_case desc row_precondition 2 None color "PRECONDITION" in
-              let _ = print_case desc row_postcondition 2 None color "POSTCONDITION" in
+              let () = print_case desc row_precondition 2 None color "PRECONDITION" in
+              let () = print_case desc row_postcondition 2 None color "POSTCONDITION" in
               let error,log_info = aux2 print_test print_action list error log_info in
               let bool =
                 try
                   let cand = PB.A.get blackboard.event eid in
-		  PB.CI.Po.K.is_event_of_refined_step cand ||
-		    PB.CI.Po.K.is_obs_of_refined_step cand ||
-		      PB.CI.Po.K.is_init_of_refined_step cand
+                  PB.CI.Po.K.is_event_of_refined_step cand ||
+                  PB.CI.Po.K.is_obs_of_refined_step cand ||
+                  PB.CI.Po.K.is_init_of_refined_step cand
                 with Not_found -> false in
               let error,stack =
                 if bool
@@ -1173,8 +1198,9 @@ module Blackboard =
             end
         in
         let error,log_info = aux 0 error log_info [] in
-        let _ = Format.fprintf  desc "End Sub@." in
-        let _ = close_out desc_chan in
+        let () = Loggers.fprintf  desc "End Sub" in
+        let () = Loggers.print_newline desc in
+        let () = close_out desc_chan in
         error,log_info,()
 
      let record_modif parameter handler error case_address case_value blackboard =
@@ -1189,12 +1215,12 @@ module Blackboard =
            let error,log_info =
              if debug_mode
              then
-             (*  let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "@.***@.REFINE_VALUE@.Value before: " in
+             (*  let _ = Format.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "@.***@.REFINE_VALUE@.Value before: " in
                let error,log_info,() = print_case_address parameter handler log_info error blackboard case_address in
                let _ = print_case_value parameter old in
-               let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "@.New value: " in
+               let _ = Format.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "@.New value: " in
                let _ = print_case_value parameter case_value in
-               let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "@.IGNORED***@." in*)
+               let _ = Format.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "@.IGNORED***@." in*)
                error,log_info
              else
                error,log_info
@@ -1207,12 +1233,12 @@ module Blackboard =
             let error,log_info =
              if debug_mode
              then
-               (*let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "@.***@.REFINE_VALUE@.Value before: " in
+               (*let _ = Format.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "@.***@.REFINE_VALUE@.Value before: " in
                let error,log_info,() = print_case_address parameter handler log_info error blackboard case_address in
                let _ = print_case_value parameter old in
-               let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "@.New value: " in
+               let _ = Format.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "@.New value: " in
                let _ = print_case_value parameter case_value in
-               let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "@.IGNORED***@." in*)
+               let _ = Format.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "@.IGNORED***@." in*)
                error,log_info
              else
                error,log_info
@@ -1228,12 +1254,12 @@ module Blackboard =
              let error,log_info =
                if debug_mode
                then
-                 (*let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "@.***@.REFINE_VALUE@.Value before: " in
+                 (*let _ = Format.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "@.***@.REFINE_VALUE@.Value before: " in
                  let error,log_info,() = print_case_address parameter handler log_info error blackboard case_address in
                  let _ = print_case_value parameter old in
-                 let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "@.New value: " in
+                 let _ = Format.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "@.New value: " in
                  let _ = print_case_value parameter case_value in
-                 let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "@.SUCCESS***@." in*)
+                 let _ = Format.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "@.SUCCESS***@." in*)
                  error,log_info
                else
                  error,log_info
@@ -1243,12 +1269,12 @@ module Blackboard =
              let error,log_info =
                if debug_mode
                then
-                 (*let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "@.***@.REFINE_VALUE@.Value before: " in
+                 (*let _ = Format.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "@.***@.REFINE_VALUE@.Value before: " in
                  let error,log_info,() = print_case_address parameter handler log_info error blackboard case_address in
                  let _ = print_case_value parameter old in
-                 let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "@.New value: " in
+                 let _ = Format.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "@.New value: " in
                  let _ = print_case_value parameter case_value in
-                 let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "@.FAIL***@." in*)
+                 let _ = Format.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "@.FAIL***@." in*)
                  error,log_info
                else
                  error,log_info
@@ -1284,7 +1310,7 @@ module Blackboard =
        let error,log_info =
          if debug_mode
          then
-         (*  let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "*******@. * BRANCH *@.*******@." in
+         (*  let _ = Format.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "*******@. * BRANCH *@.*******@." in
            let error,log_info,() = print_blackboard parameter handler log_info error blackboard in*)
            error,log_info
          else
@@ -1304,7 +1330,7 @@ module Blackboard =
        let error,log_info =
          if debug_mode
          then
-          (* let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "*******@.* Cut *@.*******" in
+          (* let _ = Format.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "*******@.* Cut *@.*******" in
            let error,log_info,() = print_blackboard parameter handler log_info error blackboard in*)
            error,log_info
          else
@@ -1321,7 +1347,7 @@ module Blackboard =
        let error,log_info =
          if debug_mode
          then
-         (*  let _ = Format.fprintf parameter.PB.CI.Po.K.H.out_channel_err "*******@.* After_Cut *@.*******" in
+         (*  let _ = Format.fprintf (PB.CI.Po.K.H.get_debugging_channel parameter) "*******@.* After_Cut *@.*******" in
            let error,log_info,() = print_blackboard parameter handler log_info error blackboard in*)
            error,log_info
          else
@@ -1385,7 +1411,7 @@ module Blackboard =
 
    let print_stack parameter handler log_info error blackboard =
      (*  let stack = blackboard.current_stack in*)
-    (* let log = parameter.PB.CI.Po.K.H.out_channel_err in
+    (* let log = (PB.CI.Po.K.H.get_debugging_channel parameter) in
      let _ = Format.fprintf log "Current_stack_level %i " (List.length stack) in
      let error,log_info = List.fold_left (fun (error,log_info) i -> let error = print_assignment parameter handler log_info error blackboard i in let _ = Format.fprintf log "@." in error ) (error,log_info) (List.rev stack)  in
      let error,log_info =
@@ -1546,7 +1572,3 @@ module Blackboard =
 
 
    end:Blackboard)
-
-
-
-

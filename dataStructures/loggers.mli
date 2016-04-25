@@ -1,10 +1,11 @@
 type encoding =
-| HTML | HTML_Tabular | DOT | TXT | TXT_Tabular
+| HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS
 type t
 
 val fprintf: t -> ('a, Format.formatter, unit) format -> 'a
 val print_newline: t -> unit
 val print_cell: t -> string -> unit
+val print_as_logger: t -> (Format.formatter -> unit) -> unit
 val close_logger: t -> unit
 val open_infinite_buffer: ?mode:encoding -> unit -> t
 val open_circular_buffer: ?mode:encoding -> ?size:int -> unit -> t

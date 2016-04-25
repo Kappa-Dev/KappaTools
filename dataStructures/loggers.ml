@@ -1,5 +1,5 @@
 type encoding =
-| HTML | HTML_Tabular | DOT | TXT | TXT_Tabular
+  | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS
 
 type token =
 | String of string
@@ -16,7 +16,7 @@ let breakable x =
     x
   with
     | HTML_Tabular | HTML | TXT -> true
-    | DOT | TXT_Tabular -> false
+    | DOT | TXT_Tabular | XLS -> false
 
 type t =
   {
@@ -71,7 +71,7 @@ let end_of_line_symbol logger =
     logger.encoding
   with
   | HTML -> "<Br>"
-  | HTML_Tabular | DOT | TXT | TXT_Tabular -> ""
+  | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS -> ""
 
 
 let dump_token f x =
@@ -133,7 +133,7 @@ let print_cell logger s =
     with
     | HTML_Tabular -> "<TD>","</TD>"
     | TXT_Tabular -> "","\t"
-    | HTML | DOT | TXT -> "",""
+    | HTML | DOT | TXT | XLS -> "",""
   in
   fprintf logger "%s%s%s" open_cell_symbol s close_cell_symbol
 
@@ -145,7 +145,7 @@ let close_logger logger =
     with
     | HTML ->
       fprintf logger "</div>\n</body>\n"
-    | HTML_Tabular | DOT | TXT | TXT_Tabular -> ()
+    | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS -> ()
   in
   let () =
     match
@@ -193,15 +193,15 @@ let open_row logger =
     logger.encoding
    with
    | HTML_Tabular -> fprintf logger "<tr>"
-   | HTML | DOT | TXT | TXT_Tabular -> ()
+   | XLS | HTML | DOT | TXT | TXT_Tabular -> ()
 
 let close_row logger =
   match
     logger.encoding
    with
    | HTML_Tabular -> fprintf logger "<tr>@."
-   | HTML | DOT | TXT | TXT_Tabular -> fprintf logger "@."
-					       
+   | XLS | HTML | DOT | TXT | TXT_Tabular -> fprintf logger "@."
+
 let formatter_of_logger logger =
   match
     logger.logger
@@ -213,6 +213,11 @@ let formatter_of_logger logger =
 
 let redirect logger fmt =
   {logger with logger = Formatter fmt}
+
+let print_as_logger logger f =
+  let _ = Format.flush_str_formatter () in
+  let () = f Format.str_formatter in
+  fprintf logger "%s" (Format.flush_str_formatter ())
 
 let flush_buffer logger fmt =
   match

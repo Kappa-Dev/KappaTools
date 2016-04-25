@@ -60,7 +60,7 @@ sig
 
   (**pretty printing*)
   val string_of_predicate_value: predicate_value -> string
-  val print_predicate_value: Format.formatter ->  predicate_value -> unit
+  val print_predicate_value: Loggers.t ->  predicate_value -> unit
   val print_preblackboard: (pre_blackboard,unit) CI.Po.K.H.unary
 
   (**interface*)
@@ -74,7 +74,7 @@ sig
   val get_fictitious_observable: (pre_blackboard,  int option) CI.Po.K.H.unary
   val get_level_of_event: (pre_blackboard, step_id, Priority.level) CI.Po.K.H.binary
   val levels: pre_blackboard -> Priority.level A.t
-  val print_predicate_info: Format.formatter -> predicate_info -> unit
+  val print_predicate_info: Loggers.t -> predicate_info -> unit
 end
 
 module Preblackboard =
@@ -197,24 +197,24 @@ module Preblackboard =
          let print_predicate_info log x =
            match x
            with
-         | Here i -> Format.fprintf log "Agent_Here %i" i
-         | Bound_site (i,s) -> Format.fprintf log "Binding_state (%i,%i)" i s
-         | Internal_state (i,s) -> Format.fprintf log "Internal_state (%i,%i)" i s
-         | Pointer (eid,id) -> Format.fprintf log "Pointer(eid:%i,ag_id:%i)" eid id
-         | Link (eid,id1,id2) -> Format.fprintf log "Link(eid:%i,%i-%i)" eid id1 id2
-         | Mutex (Lock_agent (int,int2)) -> Format.fprintf log "Mutex (Step-id:%i,Agent_id:%i)" int int2
-         | Mutex (Lock_rectangular (int,int2)) -> Format.fprintf log "Mutex_inv (Step-id:%i,Agent_id:%i)" int int2
-         | Mutex (Lock_links(int,(int2,int3))) -> Format.fprintf log "Mutex_links (Step-id:%i,%i-%i)" int int2 int3
-         | Mutex (Lock_side_effect (int,int2,int3,int4)) -> Format.fprintf log "Mutex_side_effect (Step-id:%i,%i/%i.%i)" int int2 int3 int4
-         | Fictitious -> Format.fprintf log "Fictitious"
+         | Here i -> Loggers.fprintf log "Agent_Here %i" i
+         | Bound_site (i,s) -> Loggers.fprintf log "Binding_state (%i,%i)" i s
+         | Internal_state (i,s) -> Loggers.fprintf log "Internal_state (%i,%i)" i s
+         | Pointer (eid,id) -> Loggers.fprintf log "Pointer(eid:%i,ag_id:%i)" eid id
+         | Link (eid,id1,id2) -> Loggers.fprintf log "Link(eid:%i,%i-%i)" eid id1 id2
+         | Mutex (Lock_agent (int,int2)) -> Loggers.fprintf log "Mutex (Step-id:%i,Agent_id:%i)" int int2
+         | Mutex (Lock_rectangular (int,int2)) -> Loggers.fprintf log "Mutex_inv (Step-id:%i,Agent_id:%i)" int int2
+         | Mutex (Lock_links(int,(int2,int3))) -> Loggers.fprintf log "Mutex_links (Step-id:%i,%i-%i)" int int2 int3
+         | Mutex (Lock_side_effect (int,int2,int3,int4)) -> Loggers.fprintf log "Mutex_side_effect (Step-id:%i,%i/%i.%i)" int int2 int3 int4
+         | Fictitious -> Loggers.fprintf log "Fictitious"
 
          let print_known log t x =
            match t with
            | Unknown -> ()
-           | _ -> Format.fprintf log "%s" x
+           | _ -> Loggers.fprintf log "%s" x
 
          let string_of_predicate_value x =
-	   match x
+           match x
            with
              | Counter int -> "Counter "^(string_of_int int)
              | Defined -> "Defined"
@@ -233,103 +233,121 @@ module Preblackboard =
              | Bound_to_type (agent,site)->
                "Bound("^(string_of_int agent)^"@"^(string_of_int site)^")"
              | Pointer_to_agent (agent_id) ->
-	        "Pointer("^(string_of_int agent_id)^")"
+               "Pointer("^(string_of_int agent_id)^")"
              | Unknown -> ""
 
          let print_predicate_value log x =
-              Format.fprintf log "%s" (string_of_predicate_value x)
+            Loggers.fprintf log "%s" (string_of_predicate_value x)
          let print_predicate_id log blackboard i =
            let predicate_info = A.get blackboard.pre_column_map_inv i in
-           let _ = Format.fprintf log "Predicate: %i " i in
-           let _ = print_predicate_info log predicate_info in
-           let _ = Format.fprintf log "@." in
+           let () = Loggers.fprintf log "Predicate: %i " i in
+           let () = print_predicate_info log predicate_info in
+           let () = Loggers.print_newline log in
            ()
 
          let print_preblackboard parameter _handler log_info error blackboard =
-        (*   let log = parameter.CI.Po.K.H.out_channel in
-           let _ = Format.fprintf log "**@.PREBLACKBOARD@.**@." in
-           let _ = Format.fprintf log "*@. agent types @.*@." in
-           let _ =
+           let log = CI.Po.K.H.get_debugging_channel parameter in
+           let () = Loggers.fprintf log "**PREBLACKBOARD**" in
+           let () = Loggers.print_newline log in
+           let () = Loggers.fprintf log "*  agent types *" in
+           let () = Loggers.print_newline log in
+           let () =
              A.iteri
                (fun name ->
-                 let _ = Format.fprintf log "@.Agent name: %i @." name in
-                 List.iter
-                   (Format.fprintf log " id: %i @."))
-               blackboard.history_of_agent_ids_of_type
+                  let () = Loggers.fprintf log "Agent name: %i " name in
+                  let () = Loggers.print_newline log in
+                  List.iter
+                    (fun x ->
+                       let () = Loggers.fprintf log " id: %i " x in
+                       let () = Loggers.print_newline log in ()))
+                    blackboard.history_of_agent_ids_of_type
            in
-           let _ = Format.fprintf log "*@. steps by column@.*@." in
-           let _ =
+           let () = Loggers.print_newline log in
+           let () = Loggers.fprintf log "* steps by column *" in
+           let () = Loggers.print_newline log in
+           let () =
              A.iteri
                (fun id (nevents,list) ->
-                 let _ = print_predicate_id log blackboard id  in
-                 let _ = Format.fprintf log "nevents: %i @." nevents in
-                 let _ =
+                 let () = print_predicate_id log blackboard id  in
+                 let () = Loggers.fprintf log "nevents: %i " nevents in
+                 let () = Loggers.print_newline log in
+                 let () =
                    List.iter
                      (fun (eid,seid,test,action) ->
-                       let _ = Format.fprintf log "Event id: %i @." eid in
-                       let _ = Format.fprintf log "Short id: %i @." seid in
-                       let _ = print_known log test "TEST:   " in
-                       let _ = print_predicate_value log test in
-                       let _ = Format.fprintf log "@." in
-                       let _ = print_known log action "ACTION: " in
-                       let _ = print_predicate_value log action in
-                       let _ = Format.fprintf log "@." in
-                       ())
+                        let () = Loggers.fprintf log "Event id: %i " eid in
+                        let () = Loggers.print_newline log in
+                        let () = Loggers.fprintf log "Short id: %i " seid in
+                        let () = Loggers.print_newline log in
+                        let () = print_known log test "TEST:   " in
+                        let () = print_predicate_value log test in
+                        let () = Loggers.print_newline log in
+                        let () = print_known log action "ACTION: " in
+                        let () = print_predicate_value log action in
+                        let () = Loggers.print_newline log in
+                        ())
                      (List.rev list)
                  in
-                 let _ = Format.fprintf log "---@." in
+                 let () = Loggers.fprintf log "---" in
+                 let () = Loggers.print_newline log in
                  ())
                blackboard.pre_steps_by_column
            in
-           let _ = Format.fprintf log "*@.Side effects @.*@." in
+           let () = Loggers.fprintf log "* Side effects *" in
+           let () = Loggers.print_newline log in
            let () = A.iteri
-		      (fun i list ->
-		       Format.fprintf log "@[<v 1>event %i:@, @[%a@]@]@." i
-				      CI.Po.K.print_side_effect list)
-		      blackboard.pre_side_effect_of_event in
-           let _ = Format.fprintf log "*@.Predicate_id related to the predicate @.*@." in
-
-           let _ =
+               (fun i list ->
+                  let () = Loggers.fprintf log "event %i:, " i in
+                  let () = CI.Po.K.print_side_effect log list in
+                  ())
+               blackboard.pre_side_effect_of_event in
+           let () = Loggers.fprintf log "*Predicate_id related to the predicate *" in
+           let () = Loggers.print_newline log in
+           let () =
              A.iteri
                (fun i s ->
-                 let _ = print_predicate_id log blackboard i in
-                 let _ =
+                  let () = print_predicate_id log blackboard i in
+                  let () =
                    PredicateidSet.iter
-                     (fun s -> Format.fprintf log "%i@." s)
+                     (fun s ->
+                        let () = Loggers.fprintf log "%i" s in
+                        Loggers.print_newline log)
                      s
                  in
-                 let _ = Format.fprintf log "---@." in
+                 let () = Loggers.fprintf log "---" in
+                 let () = Loggers.print_newline log in
                  ()
                )
                blackboard.predicate_id_list_related_to_predicate_id
            in
-           let _ = Format.fprintf log "*@.Past values of a predicate @.*@." in
-           let _ =
+           let () = Loggers.fprintf log "*Past values of a predicate*" in
+           let () = Loggers.print_newline log in
+           let () =
              A.iteri
                (fun i s ->
-                 let _ = print_predicate_id log blackboard i in
-                 let _ =
+                  let () = print_predicate_id log blackboard i in
+                  let () =
                    C.iter
                      (fun s -> print_predicate_value log s)
                      s
                  in
-                 let _ = Format.fprintf log "---@." in
+                 let () = Loggers.fprintf log "---" in
+                 let () = Loggers.print_newline log in
                  ()
                )
                blackboard.history_of_predicate_values_to_predicate_id
            in
-           let _ = Format.fprintf log "*@.Observables @.*@." in
-           let _ =
+           let () = Loggers.fprintf log "*Observables*" in
+           let () =
              List.iter
                (fun (l,_) ->
-                 let _ = List.iter (Format.fprintf log "%i,") l in
-                 let _ = Format.fprintf log "@." in
+                 let _ = List.iter (Loggers.fprintf log "%i,") l in
+                 let _ = Loggers.print_newline log in
                  ()
                )
                blackboard.pre_observable_list
            in
-
-           let _ = Format.fprintf log "**@." in*)
+           let () = Loggers.fprintf log "**" in
+           let () = Loggers.print_newline log in
            error,log_info,()
 
      (** information lattice *)
@@ -380,7 +398,7 @@ module Preblackboard =
              if strictly_more_refined y x then error, log_info, y
              else
                warn parameter log_info error (Some "conj, line 378, Arguments have no greatest lower bound") (Failure "Arguments have no greatest lower bound") Undefined
-			
+
          let compatible x y =
            x=y || more_refined x y || more_refined y x
 
@@ -1992,7 +2010,7 @@ module Preblackboard =
 		       (* => Counter 1 -> Counter 0 : the corresponding substitution is applied *)
 		       (* Counter 0 -> Undef : closing event, check that if the event has been selected (open and closed), then exactely one binding state has been selected,
 according to the corresponding substitution *)
-		       (* If the event is selected & the according substitution taken, then mutual exclusion among the potential binding state*)	
+		       (* If the event is selected & the according substitution taken, then mutual exclusion among the potential binding state*)
 		       List.fold_left
                          (fun (map,nlist) pid ->
 			  (PredicateidMap.add pid (Counter 1,Counter 0) map),pid::nlist)
@@ -2725,7 +2743,7 @@ according to the corresponding substitution *)
 		warn parameter log_info error (Some "event_list_of_predicate, line 2690, Unknown predicate id")  (Failure "event_list_of_predicate") []
 
          let n_events_per_predicate parameter handler log_info error blackboard predicate_id =
-           try
+         try
              error,log_info,fst (A.get blackboard.pre_steps_by_column predicate_id)
            with
              | _ ->
