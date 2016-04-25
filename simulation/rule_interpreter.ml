@@ -1,5 +1,3 @@
-open Mods
-
 type jf_data =
   Compression_main.secret_log_info * Compression_main.secret_step list
 
@@ -21,8 +19,7 @@ type t =
 	  Instantiation.abstract Instantiation.test list)
 	 list Connected_component.Map.t (*currently tracked ccs *)
        * jf_data) option;
-    store_unary_dist: int DynArray.t option array;
-    (* nb_occurence for each distance and for each rule *)
+    unary_distances: Data.distances;
   }
 
 type result = Clash | Success of t | Corrected of t
@@ -40,7 +37,7 @@ let empty ~has_tracking env = {
       then Some (Connected_component.Map.empty,
 		 (Compression_main.init_secret_log_info (), []))
       else None;
-    store_unary_dist = Array.make ((Environment.nb_syntactic_rules env)+1) None;
+    unary_distances = Array.make ((Environment.nb_syntactic_rules env)+1) None;
 }
 
 let reinit state = {
@@ -56,7 +53,7 @@ let reinit state = {
        | Some _ -> Some (Connected_component.Map.empty,
 			 (Compression_main.init_secret_log_info (), []))
        | None -> None);
-    store_unary_dist = Array.make (Array.length state.store_unary_dist) None;
+    unary_distances = Array.make (Array.length state.unary_distances) None;
 }
 
 let print_injections ?sigs pr f roots_of_ccs =
@@ -410,7 +407,7 @@ let update_edges
     unary_pathes = unary_pathes'; edges = edges''; tokens = state.tokens;
     outdated_elements = (rev_deps,unary_cands',no_unary'');
     story_machinery = story_machinery';
-    store_unary_dist = state.store_unary_dist; }
+    unary_distances = state.unary_distances; }
 
 let raw_instance_number state ccs_l =
   let size cc =
@@ -615,15 +612,13 @@ let apply_unary_rule
      | Some p as path ->
 	let () = if !Parameter.store_unary_distance then
 		   let n = List.length p in
+		   let t = Counter.current_time counter in
 		   let rule = Environment.get_rule env rule_id in
 		   let syntactic_id = rule.Primitives.syntactic_rule in
-		   let rule_arr = state'.store_unary_dist in
+		   let rule_arr = state'.unary_distances in
 		   match rule_arr.(syntactic_id) with
-		   | None ->
-		      rule_arr.(syntactic_id) <-
-			Some (DynArray.init (n+1) (fun i-> if i=n then 1 else 0))
-		   | Some arr -> let old_val = DynArray.get arr n in
-				 DynArray.set arr n (old_val+1) in
+		   | None -> rule_arr.(syntactic_id) <- Some [(t,n)]
+		   | Some ls -> rule_arr.(syntactic_id) <- Some ((t,n)::ls) in
 	Success
 	  (transform_by_a_rule ~get_alg env domain unary_ccs counter state'
 			       event_kind ?path rule inj)
@@ -789,11 +784,11 @@ let print_dist env state rule_id =
   let () =  Format.printf " Distances at which rule %i applied: " rule_id in
   let rule = Environment.get_rule env rule_id in
   let syntactic_id = rule.Primitives.syntactic_rule in
-  match state.store_unary_dist.(syntactic_id) with
+  match state.unary_distances.(syntactic_id) with
   | None -> Format.printf "Not a unary rule or unary rule never applied."
-  | Some arr -> DynArray.iter (fun i -> Format.printf " %i " i) arr
+  | Some ls -> List.iter (fun (t,d) -> Format.printf " %e%i " t d) ls
 
-let unary_distances state = state.store_unary_dist
+let unary_distances state = state.unary_distances
 
 let debug_print f state =
   Format.fprintf f "@[<v>%a@,%a@,%a@,%a@]"

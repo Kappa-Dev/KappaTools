@@ -8,7 +8,7 @@ val create : ?init_t:float -> ?init_e:int -> ?max_t:float -> ?max_e:int ->
 val reinitialize : t -> unit
 
 val tick : Format.formatter -> t -> unit
-val fill : outputs:(Data.t -> unit) -> t -> Nbr.t array -> int Mods.DynArray.t option array-> unit
+val fill : outputs:(Data.t -> unit) -> t -> Nbr.t array -> unit
 val complete_progress_bar : Format.formatter -> t -> unit
 
 val one_constructive_event : t -> float -> bool

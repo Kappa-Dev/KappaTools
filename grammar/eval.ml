@@ -377,6 +377,10 @@ let configurations_of_result result =
 		      ("Unkown value "^error^" for compression mode", pos))
 	in
 	parse value_list
+     | "jsonUnaryDistance" ->
+	let () =
+	  Parameter.json_unary_distance := get_bool_value acc pos_p param value_list
+	in acc
      | "storeUnaryDistance" ->
 	  Parameter.store_unary_distance := get_bool_value pos_p param value_list
      | "cflowFileName" ->

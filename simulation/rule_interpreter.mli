@@ -1,5 +1,4 @@
 (**Graph rewriting module*)
-open Mods
 
 type t (**Abstract graph*)
 
@@ -70,7 +69,7 @@ val snapshot: Environment.t -> Counter.t -> string -> t -> Data.snapshot
 
 val print : Environment.t -> Format.formatter -> t -> unit
 val print_dist : Environment.t -> t -> int -> unit
-val unary_distances : t -> int DynArray.t option array
+val unary_distances : t -> Data.distances
 
 (** {6 Stories} *)
 

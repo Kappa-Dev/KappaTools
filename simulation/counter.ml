@@ -263,12 +263,8 @@ let to_plot_points counter =
           (if n <> 0 then [counter.time] else []),counter
      | None -> [],counter
 
-let fill ~outputs counter observables_values unary_distances=
+let fill ~outputs counter observables_values =
   let points, _counter =
     to_plot_points counter in
-  List.iter (fun t ->
-	     let () = if !Parameter.store_unary_distance then
-			outputs (Data.UnaryDistances
-				   (t,unary_distances)) in
-	     outputs (Data.Plot (t,observables_values))) points
+  List.iter (fun t -> outputs (Data.Plot (t,observables_values))) points
 
