@@ -569,12 +569,15 @@ let collect_agent_type_state parameter error agent site_type =
         site_type
         agent1.Cckappa_sig.agent_interface
       with
-      | error, None ->  warn parameter error (Some "line 228") Exit Ckappa_sig.dummy_state_index
+      | error, None -> 
+        warn parameter error (Some "line 228") Exit Ckappa_sig.dummy_state_index
       | error, Some port ->
         let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
         if (Ckappa_sig.int_of_state_index state) > 0
-        then error, state
-        else warn parameter error (Some "line 196") Exit Ckappa_sig.dummy_state_index
+        then 
+          error, state
+        else
+          warn parameter error (Some "line 196") Exit Ckappa_sig.dummy_state_index
     in
     error, (agent_type1, state1) 
 
@@ -594,11 +597,11 @@ let add_link_set parameter error rule_id (x, y) store_result =
       (x, y)
       old_set
   in    
-  let error = Exception.check warn parameter error error' (Some "line 246") Exit in
+  let error = Exception.check warn parameter error error' (Some "line 611") Exit in
   let error'', union_set =
     Ckappa_sig.PairAgentSiteState_map_and_set.Set.union parameter error set old_set 
   in
-  let error = Exception.check warn parameter error error'' (Some "line 250") Exit in
+  let error = Exception.check warn parameter error error'' (Some "line 615") Exit in
   let error, store_result =
     Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite parameter error rule_id union_set store_result
   in
@@ -615,7 +618,7 @@ let collect_pair_of_bonds parameter error site_add agent_id site_type_source vie
         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
           parameter error agent_id views
       with
-      | error, None -> warn parameter error (Some "line 267") Exit Cckappa_sig.Ghost
+      | error, None -> warn parameter error (Some "line 632") Exit Cckappa_sig.Ghost
       | error, Some agent -> error, agent
     in
     let error, agent_target =
@@ -623,7 +626,7 @@ let collect_pair_of_bonds parameter error site_add agent_id site_type_source vie
         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
           parameter error agent_index_target views
       with
-      | error, None -> warn parameter error (Some "line 275") Exit Cckappa_sig.Ghost
+      | error, None -> warn parameter error (Some "line 640") Exit Cckappa_sig.Ghost
       | error, Some agent -> error, agent
     in
     let error, (agent_type1, state1) =

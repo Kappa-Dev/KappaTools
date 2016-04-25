@@ -152,10 +152,23 @@ let get_state_of_site error dynamic precondition path =
   match
     PathMap.find path precondition.cache_state_of_site
   with
-  | Some output -> error, dynamic, precondition, output
+  | Some output -> 
+    (*let _ =
+      match output with
+      | Usual_domains.Val l ->
+        List.iter (fun i -> Printf.fprintf stdout "state:%i\n" (Ckappa_sig.int_of_state_index i)) l
+      | _ -> ()
+    in*)
+    error, dynamic, precondition, output
   | None ->
     begin
       let error, dynamic, output = precondition.state_of_site error dynamic path in
+      (*let _ =
+        match output with
+        | Usual_domains.Val l ->
+          List.iter (fun i -> Printf.fprintf stdout "None_state:%i\n" (Ckappa_sig.int_of_state_index i)) l
+        | _ -> ()
+      in *)     
       let precondition =
 	{
           precondition with
@@ -189,7 +202,7 @@ let fold_over_potential_partners parameter error precondition agent_type site f 
     (* In theory, this could happen, but it would be worth being warned
        about it *)
     let error, () =
-      warn parameter error (Some "line 142, bottom propagation") Exit ()
+      warn parameter error (Some "line 192, bottom propagation") Exit ()
     in
     error, precondition, Usual_domains.Not_top init
   | error, Usual_domains.Val v ->

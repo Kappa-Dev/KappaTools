@@ -428,8 +428,8 @@ struct
       | error, None -> error, Ckappa_sig.Rule_map_and_set.Set.empty
       | error, Some s -> error, s
     in
-  (*-----------------------------------------------------------------------*)
-  (*print working list information*)
+    (*-----------------------------------------------------------------------*)
+    (*print working list information*)
     let error =
       if local_trace
         || Remanent_parameters.get_dump_reachability_analysis_wl parameter
@@ -596,7 +596,7 @@ struct
                  match Ckappa_sig.Site_map_and_set.Map.find_option
                    parameter error site_type map2
                  with
-                 | error, None -> warn parameter error (Some "line 585") Exit
+                 | error, None -> warn parameter error (Some "line 598") Exit
                    (Ckappa_sig.site_name_of_int (-1))
                  | error, Some i -> error, i
                in
@@ -606,7 +606,7 @@ struct
                    Handler.string_of_site parameter error handler_kappa
 		     agent_type site_type
 		 with
-		   _ -> warn parameter error (Some "line 587")
+		   _ -> warn parameter error (Some "line 609")
                      Exit (Ckappa_sig.string_of_site_name site_type)
 	       in
 	       let error, state_string =
@@ -624,7 +624,7 @@ struct
 		 else Loggers.fprintf (Remanent_parameters.get_logger parameter)
                    "\t%s%s(" prefix agent_string
                in
-	       let () =
+	       let () = (*Print the information of views*)
                  Loggers.fprintf (Remanent_parameters.get_logger parameter)
 		   "%s%s" site_string state_string
                in
@@ -783,7 +783,7 @@ struct
 	    Ckappa_sig.Site_map_and_set.Map.empty
 	in
 	let error = Exception.check warn parameter error error'
-	  (Some "line 370") Exit
+	  (Some "line 786") Exit
 	in
 	error, ((cv_id, map_res) :: current_list)
       ) (error, []) triple_list
@@ -984,7 +984,7 @@ struct
           map2
       with
       | error, None -> warn parameter error (Some "line 926") Exit
-        (Ckappa_sig.site_name_of_int (-1))
+          (Ckappa_sig.site_name_of_int (-1))
       | error, Some i -> error, i
     in
     error, new_site_name
@@ -1082,8 +1082,8 @@ struct
         (fun (error, output) list ->
           match list with
           | [_, state] -> error, state :: output
-          | _ ->
-            warn parameter error (Some "line 1104") Exit output)
+          | _ -> error, output)
+            (*warn parameter error (Some "state is empty, line 1086") Exit output)*) (*FIXME*)
         (error, [])
         list
     in
@@ -2524,13 +2524,13 @@ struct
         in
         let error, site_correspondence =
 	  match site_correspondence with
-	  | None -> warn parameter error (Some "line 58") Exit []
+	  | None -> warn parameter error (Some "line 2527") Exit []
 	  | Some a -> error, a
         in
         let error, site_correspondence =
 	  let rec aux list =
 	    match list with
-	    | [] -> warn parameter error (Some "line 68") Exit []
+	    | [] -> warn parameter error (Some "line 2533") Exit []
 	    | (h, list, _) :: _ when h = cv_id -> error, list
 	    | _ :: tail -> aux tail
 	  in aux site_correspondence
@@ -2543,7 +2543,7 @@ struct
             match Ckappa_sig.Site_map_and_set.Map.find_option
               parameter error site_type map2
             with
-            | error, None -> warn parameter error (Some "line 165") Exit
+            | error, None -> warn parameter error (Some "line 2546") Exit
               Ckappa_sig.dummy_site_name_minus1
             | error, Some i -> error, i
           in
@@ -2653,10 +2653,10 @@ struct
               try
 		Handler.string_of_agent parameter error handler_kappa agent_type
               with
-		_ -> warn parameter error (Some "line 111") Exit
+		_ -> warn parameter error (Some "line 2656") Exit
                   (Ckappa_sig.string_of_agent_name agent_type)
 	  in
-	    let error = Exception.check warn parameter error error' (Some "line 110") Exit in
+	    let error = Exception.check warn parameter error error' (Some "line 2659") Exit in
 	  (*-----------------------------------------------------------------------*)
 	    Wrapped_modules.LoggedIntMap.fold
 	      (fun _ mvbdu (error,handler)
@@ -2702,7 +2702,7 @@ struct
       in
       let compil = get_compil static in
       let error, handler =
-	if (*compute_local_trace*) Remanent_parameters.get_compute_local_traces parameter
+	if Remanent_parameters.get_compute_local_traces parameter
 	then
     if new_computation
     then Agent_trace_even_sparser.agent_trace parameter error handler handler_kappa mvbdu_true compil output
@@ -2723,11 +2723,11 @@ struct
               try
                 Handler.string_of_agent parameter error handler_kappa agent_type
               with
-                _ -> warn parameter error (Some "line 1853") Exit
+                _ -> warn parameter error (Some "line 2726") Exit
                   (Ckappa_sig.string_of_agent_name agent_type)
 	    in
 	    let error = Exception.check warn parameter error error'
-              (Some "line 1857") Exit
+              (Some "line 2730") Exit
             in
             (*-----------------------------------------------------------------------*)
 	    let () =
@@ -2749,13 +2749,13 @@ struct
 	    in
 	    let error, site_correspondence =
 	      match site_correspondence with
-	      | None -> warn parameter error (Some "line 1877") Exit []
+	      | None -> warn parameter error (Some "line 2752") Exit []
 	      | Some a -> error, a
 	    in
 	    let error, site_correspondence =
 	      let rec aux list =
 	        match list with
-	        | [] -> warn parameter error (Some "line 1883") Exit []
+	        | [] -> warn parameter error (Some "line 2758") Exit []
 	        | (h, list, _) :: _ when h = cv_id -> error, list
 	        | _ :: tail -> aux tail
 	      in aux site_correspondence
@@ -2800,7 +2800,7 @@ struct
 		      match Ckappa_sig.Site_map_and_set.Map.find_option
                         parameter error site_type map2
                       with
-		      | error, None -> warn parameter error (Some "line 165") Exit
+		      | error, None -> warn parameter error (Some "line 2803") Exit
                         Ckappa_sig.dummy_site_name_minus1
 		      | error, Some i -> error, i
 		    in
@@ -2952,7 +2952,6 @@ struct
         || Remanent_parameters.get_dump_reachability_analysis_result parameter
       then
         let error =
-          (*List.fold_left (fun error log ->*)
           let _ =
             print_result_fixpoint_aux
               parameter
@@ -2964,7 +2963,6 @@ struct
 	      (static:static_information)
           in
           error
-        (* ) error loggers*)
         in
         error, handler
       else error, handler
