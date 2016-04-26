@@ -852,8 +852,9 @@ Id=48
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(x~p)
-	B(x~u)
+	B(x~p,z!free,t!A@t)
+	B(x~p,z!free,t!free)
+	B(x~p,z!A@z,t!A@t)
 	Wake-up rules
 
 	Applying rule 7: r7:

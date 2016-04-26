@@ -1075,33 +1075,6 @@ let collect_rule_has_parallel_bonds static error rule_id views bonds store_bonds
 
   (**************************************************************************)
   (* to do *)
-
-  let print static dynamic error loggers =
-    (*let _ =
-      print_parallel_bonds_rhs static dynamic error
-    in
-    let _ =
-      print_fst_site_create_parallel_rhs static dynamic error
-    in
-    let _ =
-      print_rule_has_parallel_bonds_rhs static dynamic error 
-    in*)
-    (*let _ =
-      print_parallel_bonds_lhs static dynamic error
-    in
-    let _ =
-      print_action_binding static dynamic error
-    in*)
-    (*let _ =
-      print_fst_site_create_parallel_lhs static dynamic error
-    in*)
-    (*let _ =
-      print_snd_site_create_parallel_rhs static dynamic error
-    in*)
-    error, dynamic, ()
-
-  (**************************************************************************)
-  (* to do *)
   (* take into account parallel bounds that may occur in initial states *)
 
   let print_parallel_bonds_init static error set =
@@ -1340,6 +1313,55 @@ let collect_rule_has_parallel_bonds static error rule_id views bonds store_bonds
      the two other sites may be bound, check whether they must be bound to the
      same agents, whether they cannot be bound to the same agent, whether we
      cannot know, and deal with accordingly *)
+
+  let print_value parameter value =
+    match value with
+    | Usual_domains.Val b ->
+      Loggers.fprintf (Remanent_parameters.get_logger parameter)
+        "Val %b\n" b
+    | Usual_domains.Any ->
+      Loggers.fprintf (Remanent_parameters.get_logger parameter)
+        "Any\n"
+    | Usual_domains.Undefined -> ()
+      (*Loggers.fprintf (Remanent_parameters.get_logger parameter)
+        "Undefined\n"*)
+
+  let print_result handler_kappa parameter error store_result =
+    Ckappa_sig.PairAgentsSitesStates_map_and_set.Map.iter
+      (fun ((agent_id, agent_type, site_type1, site_type2, state1, state2),
+            (agent_id', agent_type', site_type1', site_type2', state1', state2')) value ->
+        let error, ((site_type1_string, site_type2_string, state1_string, state2_string),
+                    (site_type1_string', site_type2_string', state1_string', state2_string'))=
+          print_parallel_pair_triple parameter error handler_kappa 
+            ((agent_id, agent_type, site_type1, site_type2, state1, state2),
+             (agent_id', agent_type', site_type1', site_type2', state1', state2'))
+        in
+        if (Ckappa_sig.int_of_state_index state2) = 0
+        then
+          ()
+          (*Loggers.fprintf (Remanent_parameters.get_logger parameter)
+            "Undefined\n"*)
+        else
+          Loggers.fprintf (Remanent_parameters.get_logger parameter)
+            "agent_id:%i:site_type:%i:%s%s:site_type:%i:%s%s->\
+             agent_id:%i:site_type:%i:%s%s:site_type:%i:%s%s\n"
+            (Ckappa_sig.int_of_agent_id agent_id)
+            (Ckappa_sig.int_of_site_name site_type1)
+            site_type1_string
+            state1_string
+            (Ckappa_sig.int_of_site_name site_type2)
+            site_type2_string
+            state2_string
+            (Ckappa_sig.int_of_agent_id agent_id')
+            (Ckappa_sig.int_of_site_name site_type1')
+            site_type1_string'
+            state1_string'
+            (Ckappa_sig.int_of_site_name site_type2')
+            site_type2_string'
+            state2_string';
+        print_value parameter value
+      ) store_result
+      
   let apply_rule static dynamic error rule_id precondition =
     let event_list = [] in
     let parameter = get_parameter static in
@@ -1446,8 +1468,8 @@ let collect_rule_has_parallel_bonds static error rule_id views bonds store_bonds
                   Loggers.fprintf (Remanent_parameters.get_logger parameter)
                     "\nParallel bonds:\n";
                   Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                    "agent_id1:%i:site_type:%i:%s%s:site_type:%i:%s%s->\
-                     agent_id1':%i:site_type:%i:%s%s:site_type:%i:%s%s\n"
+                    "agent_id:%i:site_type:%i:%s%s:site_type:%i:%s%s->\
+                     agent_id:%i:site_type:%i:%s%s:site_type:%i:%s%s\n"
                     (Ckappa_sig.int_of_agent_id agent_id1)
                     (Ckappa_sig.int_of_site_name site_type1)
                     site_type1_string
@@ -1463,104 +1485,141 @@ let collect_rule_has_parallel_bonds static error rule_id views bonds store_bonds
                     site_type2_string'
                     state2_string'
                 in*)
+                (*let _ =
+                  Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                    "\n-Check the second site site_type:%i:%s of agent_id:%i in the parallel bond\n\n"
+                    (Ckappa_sig.int_of_site_name site_type2)
+                    site_type2_string
+                    (Ckappa_sig.int_of_agent_id agent_id1)
+                in*)
                   (*------------------------------------------------------------------*)
                   (*build a path for the second site*)
-                  let path =
-                    {
-                      Communication.agent_id = agent_id;
-                      Communication.relative_address = [];
-                      Communication.site = site_type2
-                    }
-                  in
+                let path =
+                  {
+                    Communication.agent_id = agent_id;
+                    Communication.relative_address = [];
+                    Communication.site = site_type2
+                  }
+                in
                   (*get a list of state of this site in the precondition*)
-                  let error, global_dynamic, precondition, state_list_flat_lattice =
-                    Communication.get_state_of_site
-                      error
-                      (get_global_dynamic_information dynamic)
-                      precondition
-                      path
-                  in
+                let error, global_dynamic, precondition, state_list_flat_lattice =
+                  Communication.get_state_of_site
+                    error
+                    (get_global_dynamic_information dynamic)
+                    precondition
+                    path
+                in
                   (*get a list of precondition state of the the second site*)
-                  let error, state_list =
-                    match state_list_flat_lattice with
-                    | Usual_domains.Val l -> error, l
-                    | _ -> warn parameter error (Some "line 1487") Exit []
-                  in
-                  (*------------------------------------------------------------------*)
+                let error, state_list =
+                  match state_list_flat_lattice with
+                  | Usual_domains.Val l -> error, l
+                  | _ -> warn parameter error (Some "line 1487") Exit []
+                in
+                (*let () =
+                  List.iter
+                    (fun state ->
+                      let error, pstate_string =
+                        try
+		          Handler.string_of_state_fully_deciphered parameter error handler_kappa
+		            agent_type1 site_type2 state
+	                with
+		          _ -> warn parameter error (Some "line 1500") Exit
+                            (Ckappa_sig.string_of_state_index state)
+                      in
+                      Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                        "State of the second site %i:%s in the precondition:%i:%s \n"
+                        (Ckappa_sig.int_of_site_name site_type2)
+                        site_type2_string
+                        (Ckappa_sig.int_of_state_index state)
+                        pstate_string
+                    )                    
+                    state_list
+                in*)
+                (*------------------------------------------------------------------*)
                   (*check that this second site with this state can be bond
                     with B.x(agent_id1', site_type2', state2'), and remains
                     binding*)
-                  let error, new_value_list =
-                    List.fold_left (fun (error, current_list) pre_state ->
-                      let error, pre_state_string =
-                        try
-		          Handler.string_of_state_fully_deciphered parameter error handler_kappa
-		            agent_type1 site_type2 pre_state
-	                with
-		          _ -> warn parameter error (Some "line 1500") Exit
-                            (Ckappa_sig.string_of_state_index pre_state)
-                      in
-                      (*let _ =
-                        Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                        "State of the second site %s in the precondition:\n"
-                          site_type2_string;
-                        Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                          "site_type:%i:%s:pre_state:%s:state%s\n"
-                          (Ckappa_sig.int_of_site_name site_type2)
-                          site_type2_string
-                          pre_state_string
-                          state2_string
-                      in*)
-                      (*------------------------------------------------------------------*)
-                      (*CHECK:if t can be bond with binding type B.t in lhs and remains bond*)
-                      let b =
-                        (*A.t can be bond with binding type B.t*)
-                        if Ckappa_sig.PairAgentsSiteState_map_and_set.Set.mem
-                          ((agent_id, agent_type, site_type2, state2),
-                           (agent_id', agent_type', site_type2', state2'))
-                          bonds_lhs_full_set
-                          &&
-                          (*remains bond*)
-                          Ckappa_sig.PairAgentsSiteState_map_and_set.Set.mem
-                          ((agent_id, agent_type, site_type2, state2),
-                           (agent_id', agent_type', site_type2', state2'))
-                          bonds_rhs_full_set
+                (*get the information of store_result *)                
+                let error, store_result =
+                  List.fold_left (fun (error, store_result) pre_state ->
+                    let error, old_value =
+                      match 
+                        Ckappa_sig.PairAgentsSitesStates_map_and_set.Map.find_option_without_logs
+                          parameter
+                          error
+                          ((agent_id1, agent_type1, site_type1, site_type2, state1, pre_state),
+                           (agent_id1', agent_type1', site_type1', site_type2', state1', state2'))
+                          store_result
+                      with
+                      | error, None -> error, Usual_domains.Undefined
+                      | error, Some v -> error, v
+                    in
+                    let error, pre_state_string =
+                      try
+		        Handler.string_of_state_fully_deciphered parameter error handler_kappa
+		          agent_type1 site_type2 pre_state
+	              with
+		        _ -> warn parameter error (Some "line 1500") Exit
+                          (Ckappa_sig.string_of_state_index pre_state)
+                    in
+                    (*------------------------------------------------------------------*)
+                    (*CHECK:if t can be bond with binding type B.t in lhs and remains bond*)
+                    if 
+                      pre_state = state2' (*check it is bound in the lhs. TODO: check it remains bound*)
+                    then
+                      (*check if two Bs are necessarily the same*)
+                      begin
+                        if 
+                          Ckappa_sig.PairAgentsSitesStates_map_and_set.Set.mem
+                            ((agent_id1, agent_type1, site_type1, site_type2, state1, pre_state),
+                             (agent_id1', agent_type1', site_type1', site_type2', state1', state2'))
+                            rule_has_parallel_bonds_rhs_set
                         then
-                          (*let _ =
-                            Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                              "\n%s%s bond with agent_id:%i:%s%s, and remains bond\n"
-                              site_type2_string
-                              state2_string
-                              (Ckappa_sig.int_of_agent_id agent_id')
-                              site_type2_string'
-                              state2_string'
-                          in*)
-                          true
+                          (*belongs to parallel bond*)
+                          let new_value = Usual_domains.lub old_value (Usual_domains.Val true) in
+                          let error, store_result =
+                            Ckappa_sig.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite
+                              parameter
+                              error
+                              ((agent_id1, agent_type1, site_type1, site_type2, state1, pre_state),
+                               (agent_id1', agent_type1', site_type1', site_type2', state1', state2'))
+                              new_value
+                              store_result
+                          in
+                          error, store_result
+                        (*------------------------------------------------------------------*)
                         else
-                          (*let _ =
-                            Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                              "\nnot bind and not remains\n"
-                          in*)
-                          false
+                          let new_value = Usual_domains.lub old_value (Usual_domains.Val false) in
+                          let error, store_result =
+                            Ckappa_sig.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite
+                              parameter
+                              error
+                              ((agent_id1, agent_type1, site_type1, site_type2, state1, pre_state),
+                               (agent_id1', agent_type1', site_type1', site_type2', state1', state2'))
+                              new_value
+                              store_result
+                          in
+                          error, store_result
+                      end
+                    (*------------------------------------------------------------------*)
+                    else
+                      (*they do not bound and do not remain*)
+                      let error, store_result =
+                        Ckappa_sig.PairAgentsSitesStates_map_and_set.Map.add_or_overwrite
+                          parameter
+                          error
+                          ((agent_id1, agent_type1, site_type1, site_type2, state1, pre_state),
+                           (agent_id1', agent_type1', site_type1', site_type2', state1', state2'))
+                          Usual_domains.Undefined
+                          store_result
                       in
-                      (*CHECK: if two Bs are necessarily the same -> yes*)
-                      if 
-                        pre_state = state2 && b
-                      then
-                        (*TODO:check if they bond to the same B, in the rhs
-                          of this rule it is a parallel bonds then the answer
-                          is yes*)
-                        
-                        error, (Usual_domains.Val true :: current_list)
-                      else
-                        (*do not bond and do not remain*)
-                        error, (Usual_domains.Val false :: current_list)
-                    ) (error, []) state_list
-                  in
-                  error, store_result
-              ) (error, store_result) list
-            in
-            error, store_result
+                      error, store_result
+                  ) (error, store_result) state_list
+                in
+                error, store_result
+            ) (error, store_result) list
+          in
+          error, store_result
         ) store_pair_bind_map (error, store_result)
     in
     (*------------------------------------------------------------------*)
@@ -1574,8 +1633,39 @@ let collect_rule_has_parallel_bonds static error rule_id views bonds store_bonds
     let event_list = [] in
     error, dynamic, event_list
 
+  (**************************************************************************)
   let export static dynamic error kasa_state =
     error, dynamic, kasa_state
+
+  let print static dynamic error loggers =
+    (*let handler_kappa = get_kappa_handler static in
+    let parameter = get_parameter static in
+    let _ =
+      print_parallel_bonds_rhs static dynamic error
+    in
+    let _ =
+      print_fst_site_create_parallel_rhs static dynamic error
+    in
+    let _ =
+      print_rule_has_parallel_bonds_rhs static dynamic error 
+    in
+    let store_status_of_parallel_bonds = get_status_of_parallel_bonds dynamic in
+    let _ =
+      Loggers.fprintf (Remanent_parameters.get_logger parameter)
+        "Final result:\n";
+      print_result handler_kappa parameter error store_status_of_parallel_bonds
+    in*)
+    (*let _ =
+      print_action_binding static dynamic error
+    in*)
+    (*let _ =
+      print_fst_site_create_parallel_lhs static dynamic error
+    in*)
+    (*let _ =
+      print_snd_site_create_parallel_rhs static dynamic error
+    in*)
+    error, dynamic, ()
+
 
   (**************************************************************************)
   let lkappa_mixture_is_reachable static dynamic error lkappa =

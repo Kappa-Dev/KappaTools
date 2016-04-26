@@ -822,9 +822,4 @@ Id=27
 
 EXTENSIONAL DESCRIPTION:
 The binding state of site z in agent B ranges over free and A@z.
-Some exceptions have been raisederror: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: views_domain; message: line 926; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: views_domain; message: line 926; exception:Exit
-error: file_name: setMap.ml; message: line 659; exception:Not_found
-error: file_name: views_domain; message: line 926; exception:Exit
+execution finished without any exception

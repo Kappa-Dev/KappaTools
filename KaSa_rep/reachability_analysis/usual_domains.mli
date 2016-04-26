@@ -14,3 +14,5 @@ type 'a flat_lattice =
 | Val of 'a
 | Any
 | Undefined
+
+val lub : 'a flat_lattice -> 'a flat_lattice -> 'a flat_lattice

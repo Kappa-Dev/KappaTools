@@ -931,8 +931,11 @@ struct
                 (agent_type, cv_id)
                 fixpoint_result
             with
-            | error, None -> Printf.fprintf stdout "cv_id %i\n"
-              (Covering_classes_type.int_of_cv_id cv_id);
+            | error, None -> 
+              (*let _ =
+                Loggers.fprintf (Remanent_parameters.get_logger parameter) "cv_id %i\n"
+                  (Covering_classes_type.int_of_cv_id cv_id)
+              in*)
               error, bdu_false
             | error, Some bdu -> error, bdu
           in
@@ -969,7 +972,7 @@ struct
       in
       aux site_correspondence
     in
-    let error, (_, map2) =
+    let error, (map1, map2) =
       Bdu_static_views.new_index_pair_map
         parameter
         error
@@ -981,18 +984,18 @@ struct
           parameter
           error
           site_name
-          map2
+          map1
       with
       | error, None -> warn parameter error (Some "line 926") Exit
-          (Ckappa_sig.site_name_of_int (-1))
+        (Ckappa_sig.site_name_of_int (-1))
       | error, Some i -> error, i
     in
     error, new_site_name
 
   (**************************************************************************)
 
-  let step_list_empty dynamic parameter error rule_id agent_type site_name
-      cv_list fixpoint_result bdu_false bdu_true site_correspondence =
+  let step_list_empty kappa_handler dynamic parameter error rule_id agent_id agent_type site_name
+      cv_list fixpoint_result proj_bdu_test_restriction bdu_false bdu_true site_correspondence =         
     (*---------------------------------------------------------------------*)
     let error, dynamic, bdu =
       List.fold_left
@@ -1005,6 +1008,23 @@ struct
               site_name
               site_correspondence
           in
+          let error, new_site_string =
+            try
+              Handler.string_of_site parameter error kappa_handler
+                agent_type site_name
+            with
+              _ -> warn parameter error (Some "line 1096") Exit
+                (Ckappa_sig.string_of_site_name site_name)
+          in
+          (*let _ =
+            Loggers.fprintf (Remanent_parameters.get_logger parameter) 
+              "path:cv_id:%i:agent_type:%i:site_name:%i:new_site_name:%i:%s\n"
+              (Covering_classes_type.int_of_cv_id cv_id)
+              (Ckappa_sig.int_of_agent_name agent_type)
+              (Ckappa_sig.int_of_site_name site_name)
+              (Ckappa_sig.int_of_site_name new_site_name)
+              new_site_string
+          in*)
           (*---------------------------------------------------------------------*)
           (* fetch the bdu for the agent type and the cv_id in
              the current state of the iteration *)
@@ -1019,8 +1039,31 @@ struct
             | error, None -> error, bdu_false
             | error, Some bdu -> error, bdu
           in
-          (* compute the projection over new_site_name *)
+          (*get bdu test*)
+          let error, bdu_test =
+            match
+              Covering_classes_type.AgentsCV_setmap.Map.find_option
+                (agent_id, agent_type, cv_id)
+                proj_bdu_test_restriction
+            with
+            | None -> error, bdu_true
+            | Some bdu -> error, bdu              
+          in
+          (*Bdu_X and Bdu_test*)
           let handler = Analyzer_headers.get_mvbdu_handler dynamic in
+          let error, handler, bdu_test_X =
+            Ckappa_sig.Views_bdu.mvbdu_and
+              parameter 
+              handler
+              error
+              bdu_X 
+              bdu_test
+          in
+          (*let _ =
+            Loggers.fprintf (Remanent_parameters.get_logger parameter) "BDU_test_fixpoint:\n" ;
+            Ckappa_sig.Views_bdu.print parameter bdu_test_X
+          in*)
+          (* compute the projection over new_site_name *)
           let error, handler, singleton =
             Ckappa_sig.Views_bdu.build_variables_list
               parameter
@@ -1033,7 +1076,7 @@ struct
               parameter
               handler
               error
-              bdu_X
+              bdu_test_X
               singleton
           in
           (* rename new_site_name into 1 *)
@@ -1052,6 +1095,10 @@ struct
               bdu_proj
               new_site_name_1
           in
+          (*let _ =
+            Loggers.fprintf (Remanent_parameters.get_logger parameter) "BDU_Renamed:\n" ;
+            Ckappa_sig.Views_bdu.print parameter bdu_renamed
+          in*)
           (* conjunction between bdu and bdu'*)
           let error, handler, bdu =
             Ckappa_sig.Views_bdu.mvbdu_and
@@ -1081,9 +1128,37 @@ struct
       List.fold_left
         (fun (error, output) list ->
           match list with
-          | [_, state] -> error, state :: output
-          | _ -> error, output)
-            (*warn parameter error (Some "state is empty, line 1086") Exit output)*) (*FIXME*)
+          | [site, state] ->
+            let error, site_string =
+              try
+                Handler.string_of_site parameter error kappa_handler
+                  agent_type site
+              with
+                _ -> warn parameter error (Some "line 1088") Exit
+                  (Ckappa_sig.string_of_site_name site)
+            in
+            let error, state_string =
+              try
+	        Handler.string_of_state_fully_deciphered parameter error kappa_handler
+	          agent_type site state
+              with
+	        _ -> warn parameter error (Some "line 1103") Exit
+                  (Ckappa_sig.string_of_state_index state)
+            in
+            (*let _ =
+              Loggers.fprintf (Remanent_parameters.get_logger parameter) 
+                "List of state in the precondition:\
+                 rule_id:%i:agent_type:%i:site_type:%i:%s:%i:%s\n"
+                (Ckappa_sig.int_of_rule_id rule_id)
+                (Ckappa_sig.int_of_agent_name agent_type)
+                (Ckappa_sig.int_of_site_name site)
+                site_string
+                (Ckappa_sig.int_of_state_index state)
+                state_string
+            in*)
+            error, state :: output
+          | _ ->
+            warn parameter error (Some "state is empty, line 1086") Exit output)
         (error, [])
         list
     in
@@ -1092,15 +1167,18 @@ struct
   (**************************************************************************)
   (*empty case of step list*)
 
-  let precondition_empty_step_list parameter error dynamic rule_id path store_agent_name
-      bdu_false bdu_true store_covering_classes_id site_correspondence fixpoint_result =
+  let precondition_empty_step_list kappa_handler parameter error dynamic rule_id path store_agent_name
+      bdu_false bdu_true store_covering_classes_id site_correspondence 
+      fixpoint_result proj_bdu_test_restriction =
     let error, agent_type =
       match Ckappa_sig.RuleAgent_map_and_set.Map.find_option_without_logs
         parameter error
         (rule_id, path.Communication.agent_id)
         store_agent_name
       with
-      | error, None -> error, Ckappa_sig.dummy_agent_name
+      | error, None ->
+        let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter) "None\n" in
+        error, Ckappa_sig.dummy_agent_name
       | error, Some a -> error, a
     in
     (*---------------------------------------------------------------------*)
@@ -1128,14 +1206,17 @@ struct
     (*---------------------------------------------------------------------*)
     let error, dynamic, new_answer =
       step_list_empty
+        kappa_handler
         dynamic
         parameter
         error
         rule_id
+        path.Communication.agent_id
         agent_type
         path.Communication.site
         cv_list
         fixpoint_result
+        proj_bdu_test_restriction
         bdu_false
         bdu_true
         site_correspondence
@@ -1174,9 +1255,9 @@ struct
 
   let precondition_typing parameter error kappa_handler rule_id step_list path
       store_agent_name dual_contact_map =
-    let rec aux acc answer =
+    let rec aux acc =
       match acc with
-      | [] -> error, answer
+      | [] -> error, Usual_domains.Any
       | step :: tl ->
         let error, agent_type =
           match
@@ -1241,14 +1322,14 @@ struct
               | error, None -> error, Usual_domains.Undefined
               | error, Some _ ->
                 (*recursive call*)
-                aux tl Usual_domains.Any
+                aux tl
           in
           error, answer_contact_map
         else
           (*state is not defined*)
-          error, answer
+          error, Usual_domains.Undefined
     in
-    aux step_list Usual_domains.Undefined
+    aux step_list
 
   (*-------------------------------------------------------------------------------*)
   (*intersection:
@@ -1265,10 +1346,8 @@ struct
     | Usual_domains.Val l, Usual_domains.Any ->  error, Usual_domains.Val l
     | Usual_domains.Any, Usual_domains.Any -> error, Usual_domains.Any
     | Usual_domains.Val l, Usual_domains.Val l' ->
-      (*FIXME:mixing the list*)
-      let l = List.sort (fun a b -> compare a b) l in
-      let l' = List.sort (fun a b -> compare a b) l' in
-      let l = List.merge (fun a b -> compare a b) l l' in
+      (*get the intersection of list*)
+      let l = Misc_sa.inter_list (fun a b -> compare a b) l l' in
       error, Usual_domains.Val l
 
   (*-------------------------------------------------------------------------------*)
@@ -1416,7 +1495,7 @@ struct
                           new_pair_list
                       in
                       error, handler, new_bdu
-                    ) (error, handler, bdu_false) list (*CHECK ME: start from bdu_false*)
+                    ) (error, handler, bdu_true) list (*CHECK ME: start from bdu_false*)
                   in
                   (*to the conjunction between bdu_X and new_bdu*)
                   let error, handler, bdu_conj =
@@ -1548,7 +1627,7 @@ struct
               List.fold_left (fun (error, output) list ->
                 match list with
                 | [_, state] -> error, state :: output
-                | _ -> warn parameter error (Some "line 1439") Exit output
+                | _ -> warn parameter error (Some "line 1575") Exit output
               ) (error, []) list
             in
             error, (dynamic, Usual_domains.Val (List.rev state_list))
@@ -1654,9 +1733,19 @@ struct
 
   (*-------------------------------------------------------------------------------*)
 
+  let print_test_answer parameter answer =
+    match answer with
+    | Usual_domains.Val l ->
+      List.iter (fun i ->  Loggers.fprintf (Remanent_parameters.get_logger parameter) 
+        "List: state:%i\n" (Ckappa_sig.int_of_state_index i)) l
+    | Usual_domains.Undefined ->
+      Loggers.fprintf (Remanent_parameters.get_logger parameter) "Undefined\n" 
+    | Usual_domains.Any ->
+      Loggers.fprintf (Remanent_parameters.get_logger parameter) "Any\n" 
+
   let compute_precondition_enable parameter error kappa_handler rule rule_id precondition
       bdu_false bdu_true dual_contact_map store_agent_name site_correspondence
-      store_covering_classes_id fixpoint_result =
+      store_covering_classes_id fixpoint_result proj_bdu_test_restriction =
     let precondition =
       Communication.refine_information_about_state_of_site
         precondition
@@ -1674,12 +1763,16 @@ struct
               store_agent_name
               dual_contact_map
           in
+          (*let _ =
+            Loggers.fprintf (Remanent_parameters.get_logger parameter) "-Answer of the contact map: ";
+            print_test_answer parameter answer_contact_map
+          in*)
           (*-------------------------------------------------------------------------------*)
 	  (* The output should be more precise than former_answer:
 	     If the former_answer is any, do not change anything,
 	     If the former_answer is Val l,
 	     then the answer must be Val l', with l' a sublist of l *)
-          let rec aux dynamic path answer =
+          let rec aux dynamic path answer = (*FIXME: aux with answer? or without answer*)
             let step_list = path.Communication.relative_address in
             match step_list with
             | step :: tl ->
@@ -1721,6 +1814,10 @@ struct
                           the target, take site and collect the information
                           one has about the potential state of this site in
                           agents of this type. *)
+                        let _ =
+                          Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                            "-outsite pattern:\n"
+                        in
                         let error, (dynamic, new_answer) =
                           precondition_outside_pattern
                             parameter
@@ -1746,6 +1843,10 @@ struct
                           | None
                           | Some false ->
                             (*it is not free, inside the pattern*)
+                            (*let _ =
+                              Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                                "-inside pattern:\n"
+                            in*)
                             let error, (dynamic, new_answer) =
                               precondition_inside_pattern
                                 parameter
@@ -1776,14 +1877,6 @@ struct
                     in
                     error, (dynamic, new_answer)
                 in
-                (*Fixme: intersection with contact_map_answer*)
-                (*let error, inter_answer =
-                  inter
-                    error
-                    answer_contact_map
-                    new_answer
-                in
-                error, dynamic, inter_answer*)
                 error, dynamic, new_answer
               end
             (*----------------------------------------------------------------------*)
@@ -1791,6 +1884,7 @@ struct
             | [] ->
               let error, dynamic, new_answer =
                 precondition_empty_step_list
+                  kappa_handler
                   parameter
                   error
                   dynamic
@@ -1802,8 +1896,14 @@ struct
                   store_covering_classes_id
                   site_correspondence
                   fixpoint_result
+                  proj_bdu_test_restriction
               in
-              (*TODO?: do I need to do the intersection with contact map?*)
+              (*let _ =
+                 Loggers.fprintf (Remanent_parameters.get_logger parameter) 
+                   "-Empty case: ";
+                print_test_answer parameter new_answer
+              in*)
+              (*do I need to do the intersection with contact map?*)
               error, dynamic, new_answer
           in
           (*do the intersection here*)
@@ -1813,7 +1913,11 @@ struct
               answer_contact_map
               former_answer
           in
-          aux dynamic current_path former_answer_combine_with_contact_map)
+          (*let _ =
+            Loggers.fprintf (Remanent_parameters.get_logger parameter) "-Final answer in views_domain: ";
+            print_test_answer parameter (snd former_answer_combine_with_contact_map)
+          in*)
+          aux dynamic current_path former_answer_combine_with_contact_map) (*FIXME: aux with answer?*)
     in
     precondition
 
@@ -1887,6 +1991,7 @@ struct
           site_correspondence
           store_covering_classes_id
           fixpoint_result
+          proj_bdu_test_restriction
       in
       error, (dynamic, precondition), true
     with

@@ -14,3 +14,13 @@ type 'a flat_lattice =
 | Val of 'a
 | Any
 | Undefined
+
+let lub a b = 
+  match
+    a,b 
+  with
+  | Undefined,_ -> b
+  | _,Undefined -> a
+  | Any, _ | _,Any -> Any
+  | Val x,Val y when x=y -> a
+  | Val x,Val y -> Any

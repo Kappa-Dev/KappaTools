@@ -153,22 +153,24 @@ let get_state_of_site error dynamic precondition path =
     PathMap.find path precondition.cache_state_of_site
   with
   | Some output -> 
-    (*let _ =
+    let _ =
       match output with
       | Usual_domains.Val l ->
         List.iter (fun i -> Printf.fprintf stdout "state:%i\n" (Ckappa_sig.int_of_state_index i)) l
       | _ -> ()
-    in*)
+    in
     error, dynamic, precondition, output
   | None ->
     begin
-      let error, dynamic, output = precondition.state_of_site error dynamic path in
+      let error, dynamic, output =
+        precondition.state_of_site error dynamic path 
+      in
       (*let _ =
         match output with
         | Usual_domains.Val l ->
           List.iter (fun i -> Printf.fprintf stdout "None_state:%i\n" (Ckappa_sig.int_of_state_index i)) l
         | _ -> ()
-      in *)     
+      in*)
       let precondition =
 	{
           precondition with
