@@ -14,6 +14,7 @@ let identity l =
 let is_identity i = i.is_identity
 
 let to_list i = IntMap.bindings i.sigma
+let image i = i.dsts
 
 let unsafe_add x y i =
   {sigma = IntMap.add x y i.sigma ;

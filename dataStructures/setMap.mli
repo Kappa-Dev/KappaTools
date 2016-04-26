@@ -34,6 +34,7 @@ module type Set =
       ('parameters,'error,elt -> t -> 'error * t) with_log_wrap
     val split: elt -> t -> (t * bool * t)
     val union: t -> t -> t
+    val disjoint_union: t -> t -> t option
     val inter: t -> t -> t
     val minus: t -> t -> t
     (** [minus a b] contains elements of [a] that are not in [b] *)

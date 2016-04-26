@@ -48,6 +48,7 @@ module type Set =
       ('parameters,'error,elt -> t -> 'error * t) with_log_wrap
     val split: elt -> t -> (t * bool * t)
     val union: t -> t -> t
+    val disjoint_union: t -> t -> t option
     val inter: t -> t -> t
     val minus: t -> t -> t
     (** [minus a b] contains elements of [a] that are not in [b] *)
@@ -615,6 +616,33 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		 let left' = union left1 left2 in
 		 let right' = union right1 right2 in
 		 join left' value2 right'
+
+	let rec disjoint_union set1 set2 =
+	  match set1,set2 with
+          | Private.Empty,_ -> Some set2
+          | _,Private.Empty -> Some set1
+          | Private.Node(left1,value1,right1,height1,_),
+	    Private.Node(left2,value2,right2,height2,_) ->
+             if height1 > height2 then
+               if height2 = 1 then
+		 let out = add value2 set1 in
+		 if out == set1 then None else Some out
+               else
+		 let (left2,_,right2) = split value1 set2 in
+		 match disjoint_union left1 left2,
+		       disjoint_union right1 right2 with
+		 | Some left', Some right' -> Some (join left' value1 right')
+		 | _, _ -> None
+             else
+               if height1 = 1 then
+		 let out = add value1 set2 in
+		 if set2 == out then None else Some out
+               else
+		 let (left1,_,right1) = split value2 set1 in
+		 match disjoint_union left1 left2,
+		       disjoint_union right1 right2 with
+		 | Some left', Some right' -> Some (join left' value2 right')
+		 | _, _ -> None
 
 	let rec union_gen add_gen warn parameters error set1 set2 =
 	  match set1,set2 with

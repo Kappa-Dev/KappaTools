@@ -71,7 +71,7 @@ module Matching : sig
 
   val is_root_of : Edges.t -> Edges.agent -> cc -> bool
 
-  val elements_with_types : t -> Edges.agent list array
+  val elements_with_types : cc array -> t -> Edges.agent list array
 
   type cache
   val empty_cache : cache

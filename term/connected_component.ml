@@ -1013,7 +1013,7 @@ module NodeSetMap = SetMap.Make(ContentAgent)
 module NodeMap = NodeSetMap.Map
 
 module Matching = struct
-  type t = int NodeMap.t IntMap.t * IntSet.t
+  type t = Renaming.t IntMap.t * IntSet.t
   (* (map,set)
       map: point_i -> (node_j(i) -> id_node_graph_in_current_matching)
       set:codomain of current matching *)
@@ -1025,22 +1025,9 @@ module Matching = struct
       f "@[(%a)@]"
       (Pp.set IntMap.bindings Pp.comma
 	      (fun f (ccid,nm) ->
-	       Pp.set NodeMap.bindings Pp.comma
+	       Pp.set Renaming.to_list Pp.comma
 		      (fun f (node,dst) ->
-		       Format.fprintf
-			 f "%i:%a->%i" ccid
-			 (ContentAgent.print ?sigs:None ~with_id:()) node dst
-		      ) f nm)) m
-
-  (**)
-  let from_renaming cc =
-    Renaming.fold
-      (fun src dst -> function
-      | None -> None (*in case of clash*)
-      | Some (acc,co) ->
-	 if IntSet.mem dst co then None
-	 else
-	   Some (NodeMap.add (cc.id,find_ty cc src,src) dst acc, IntSet.add dst co))
+		       Format.fprintf f "%i:%i->%i" ccid node dst) f nm)) m
 
   (*- rm - reconstruct: Edges.t -> t -> int -> cc -> int -> t option*)
   let reconstruct graph inj id cc root =
@@ -1065,9 +1052,9 @@ module Matching = struct
        match full_rename with
        | None -> failwith "Matching.reconstruct renaming error"
        | Some rename ->
-	  match from_renaming cc rename (Some (NodeMap.empty, snd inj)) with
+	  match IntSet.disjoint_union (Renaming.image rename) (snd inj) with
 	  | None -> None
-	  | Some (inj',co) -> Some (IntMap.add id inj' (fst inj),co)
+	  | Some co -> Some (IntMap.add id rename (fst inj),co)
 
   let rec aux_is_root_of graph root inj = function
     | [] -> true
@@ -1084,18 +1071,16 @@ module Matching = struct
     | nav -> aux_is_root_of graph (Some root) Renaming.empty nav
 
   (* get : (ContentAgent.t * int) -> t -> int *)
-  let get (node,id) (t,_) =
-    match NodeMap.find_option node (IntMap.find_default NodeMap.empty id t) with
-    | Some x -> x
-    | None -> raise Not_found
+  let get ((_,_,node),id) (t,_) =
+    Renaming.apply (IntMap.find_default Renaming.empty id t) node
 
-  let elements_with_types (t,_) =
+  let elements_with_types ccs (t,_) =
     let out = Array.make (IntMap.size t) [] in
     let () =
       IntMap.iter
 	(fun id map ->
 	 out.(id) <-
-	   (NodeMap.fold (fun (_, ty, _) out acc -> (out,ty)::acc) map []))
+	   Renaming.fold (fun i out acc -> (out,find_ty ccs.(id) i)::acc) map [])
 	t in
     out
 

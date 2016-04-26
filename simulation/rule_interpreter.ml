@@ -602,7 +602,8 @@ let apply_unary_rule
   match inj with
   | None -> Clash
   | Some inj ->
-     let nodes = Connected_component.Matching.elements_with_types inj in
+     let nodes = Connected_component.Matching.elements_with_types
+		   rule.Primitives.connected_components inj in
      let dist = match rule.Primitives.unary_rate with
        | None -> None
        | Some (_, dist_opt) -> dist_opt in
@@ -675,7 +676,8 @@ let apply_rule
 	    match Mods.Int2Map.find_option point state.unary_pathes with
 	    | Some x -> x
 	    | None -> raise Not_found in
-	  let nodes = Connected_component.Matching.elements_with_types inj in
+	  let nodes = Connected_component.Matching.elements_with_types
+			rule.Primitives.connected_components inj in
 	  let dist = match rule.Primitives.unary_rate with
 	    | None -> None
 	    | Some (_, dist_opt) -> dist_opt in

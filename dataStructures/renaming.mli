@@ -10,6 +10,8 @@ val empty : t
 val is_identity : t -> bool
 val identity : int list -> t
 
+val image : t -> Mods.IntSet.t
+
 val cyclic_permutation_from_list : stop_at:int -> int list -> t
 (** very specific use case for Connected_component.remove_ag_cc *)
 
