@@ -137,6 +137,14 @@ let print_cell logger s =
   in
   fprintf logger "%s%s%s" open_cell_symbol s close_cell_symbol
 
+let flush_logger logger =
+  match
+    logger.logger
+  with
+  | DEVNUL -> ()
+  | Formatter fmt -> Format.pp_print_flush fmt ()
+  | Circular_buffer _
+  | Infinite_buffer _ -> ()
 
 let close_logger logger =
   let () =
@@ -145,34 +153,45 @@ let close_logger logger =
     with
     | HTML ->
       fprintf logger "</div>\n</body>\n"
-    | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS -> ()
+    | HTML_Tabular ->
+      fprintf logger "</TABLE>\n</div>\n</body>"
+    | DOT | TXT | TXT_Tabular | XLS -> ()
   in
-  let () =
-    match
-      logger.logger
-    with
-    | DEVNUL -> ()
-    | Formatter fmt -> Format.pp_print_flush fmt ()
-    | Circular_buffer _
-    | Infinite_buffer _ -> ()
-  in
+  let () = flush_logger logger in
   ()
+
+let print_preamble logger =
+  match
+    logger.encoding
+  with
+  | HTML ->
+      fprintf logger "<body>\n<div>\n"
+  | HTML_Tabular ->
+      fprintf logger "<body>\n<div>\n<TABLE>\n"
+  | DOT | TXT | TXT_Tabular | XLS -> ()
 
 let open_logger_from_channel ?mode:(mode=TXT) channel =
   let formatter = Format.formatter_of_out_channel channel in
-  {
-    logger = Formatter formatter;
-     encoding = mode;
-     current_line = []
-  }
-
-let open_logger_from_formatter ?mode:(mode=TXT) formatter =
+  let logger =
     {
       logger = Formatter formatter;
       encoding = mode;
       current_line = []
     }
+  in
+  let () = print_preamble logger in
+  logger
 
+let open_logger_from_formatter ?mode:(mode=TXT) formatter =
+  let logger =
+    {
+      logger = Formatter formatter;
+      encoding = mode;
+      current_line = []
+    }
+  in
+  let () = print_preamble logger in
+  logger
 
 let open_circular_buffer ?mode:(mode=TXT) ?size:(size=10) () =
   {
@@ -182,11 +201,15 @@ let open_circular_buffer ?mode:(mode=TXT) ?size:(size=10) () =
   }
 
 let open_infinite_buffer ?mode:(mode=TXT) () =
-  {
-    logger = Infinite_buffer (ref (Infinite_buffers.create 0 ""));
-    encoding = mode;
-    current_line = [];
-  }
+  let logger =
+    {
+      logger = Infinite_buffer (ref (Infinite_buffers.create 0 ""));
+      encoding = mode;
+      current_line = [];
+    }
+  in
+  let () = print_preamble logger in
+  logger
 
 let open_row logger =
    match

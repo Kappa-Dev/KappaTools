@@ -146,203 +146,207 @@ module StoryStats =
            }
 
        type step =
-	 {
-	   tag: step_kind;
-	   size_before: int option;
-	   size_after: int option;
-	   time_start: float;
-	   duration: float option;
-	   depth: int
-	 }
+         {
+           tag: step_kind;
+           size_before: int option;
+           size_after: int option;
+           time_start: float;
+           duration: float option;
+           depth: int
+         }
+
 
        let k_first parameter k l =
-	 let rec aux k l output =
-	   if k=0 then [],List.rev output
-	   else
-	     match
-	       l
-	     with
-	     | [] -> (let rec aux k output = if k = 0 then output else aux (k-1) (""::output) in aux k []),List.rev output
-	     | t::q -> aux (k-1) q (t::output)
-	 in aux k l []
+         let rec aux k l output =
+           if k=0 then [],List.rev output
+           else
+             match
+               l
+             with
+             | [] -> (let rec aux k output = if k = 0 then output else aux (k-1) (""::output) in aux k []),List.rev output
+             | t::q -> aux (k-1) q (t::output)
+         in aux k l []
 
        let print_task parameter (a,b) =
-	 let _ = print_step_kind parameter a.tag in
-	 let tab,b = k_first parameter 4 b in
-	 let _ =
-	   List.iter
-	     (print_step_kind parameter)
-	     b
-	 in
-	 let _ = List.iter (Loggers.print_cell (Remanent_parameters.get_profiler parameter)) tab in
-	 let _ =
-	   Loggers.print_cell (Remanent_parameters.get_profiler parameter)
-	     begin
-	       match
-		 a.size_before
-	       with
-	       | None -> ""
-	       | Some i -> (string_of_int i)
-	     end
-	 in
-	 let _ =
-	   Loggers.print_cell (Remanent_parameters.get_profiler parameter)
-	     begin
-	       match
-		 a.size_after
-	       with
-		 None -> ""
-	       | Some i -> (string_of_int i)
-	     end
-	 in
-	 let _ =
-	   Loggers.print_cell (Remanent_parameters.get_profiler parameter)
-	     begin
-	       match
-		 a.duration
-	       with
-	       | None -> ""
-	       | Some time -> (string_of_float time)
-	     end
-	 in
-	 ()
-
+         let _ = print_step_kind parameter a.tag in
+         let tab,b = k_first parameter 4 b in
+         let _ =
+           List.iter
+             (print_step_kind parameter)
+             b
+         in
+         let _ = List.iter (Loggers.print_cell (Remanent_parameters.get_profiler parameter)) tab in
+         let _ =
+           Loggers.print_cell (Remanent_parameters.get_profiler parameter)
+             begin
+               match
+                 a.size_before
+               with
+               | None -> ""
+               | Some i -> (string_of_int i)
+             end
+         in
+         let _ =
+           Loggers.print_cell (Remanent_parameters.get_profiler parameter)
+             begin
+               match
+                 a.size_after
+               with
+              | None -> ""
+              | Some i -> (string_of_int i)
+             end
+         in
+         let _ =
+           Loggers.print_cell (Remanent_parameters.get_profiler parameter)
+             begin
+               match
+                 a.duration
+               with
+               | None -> ""
+               | Some time -> (string_of_float time)
+             end
+         in
+         ()
        let close_logger parameter  =
-	 Loggers.close_logger (Remanent_parameters.get_profiler parameter)
+         Loggers.close_logger (Remanent_parameters.get_profiler parameter)
 
-       let flush_logger = close_logger
+       let flush_logger parameter =
+         Loggers.flush_logger (Remanent_parameters.get_profiler parameter)
 
        type log_info =
-           {
-	     global_time: float;
-	     story_time: float;
-	     step_time: float;
-	     current_task: step list;
-	     next_depth:int;
-	     branch: int;
-	     cut: int;
-	     stack: stack_head list ;
-             current_stack: stack_head ;
-	     propagation: int array ;
-	     last_tick:float;
-	     compression_mode_has_been_checked: bool;
-	   }
+         {
+           global_time: float;
+           story_time: float;
+           step_time: float;
+           current_task: step list;
+           next_depth:int;
+           branch: int;
+           cut: int;
+           stack: stack_head list ;
+           current_stack: stack_head ;
+           propagation: int array ;
+           last_tick:float;
+           compression_mode_has_been_checked: bool;
+         }
 
        let is_dummy step_kind =
-	 match
-	   step_kind
-	 with
-	 | Dummy -> true
-	 | _ -> false
+         match
+           step_kind
+         with
+         | Dummy -> true
+         | _ -> false
 
        let add_event parameter error step_kind f log_info =
-	 if is_dummy step_kind then
-	   let error,() =   warn  parameter error (Some "line 146, Inconsistent profiling information, add_event should not be called with a dummy event")  (Failure "Dummy event in add_event") ()
-	   in
-	   error,log_info
-	 else
-	   let next_depth = log_info.next_depth in
-	   let task =
-	     {
-	       tag = step_kind ;
-	       size_before = begin match f with | None -> None | Some f -> Some (f ()) end ;
-	       size_after = None ;
-	       time_start = Sys.time () ;
-	       duration = None ;
-	       depth = next_depth ;
-	     }
-	   in
-	   let _ = Loggers.open_row (Remanent_parameters.get_profiler parameter) in
-	   let _ = Loggers.print_cell (Remanent_parameters.get_profiler parameter) "Start" in
-	   let terminated_task =
-	     (task,List.rev_map (fun x -> x.tag) (List.rev log_info.current_task))
-	   in
-	   let _ = print_task parameter terminated_task in
-	   let _ = Loggers.close_row (Remanent_parameters.get_profiler parameter) in
-	   let _ = flush_logger  parameter in
-	   let current_task = task::log_info.current_task in
-
-	   error,
-	   { log_info
-	   with
-	     next_depth = next_depth + 1 ;
-	     current_task = current_task
-	   }
+         if is_dummy step_kind
+         then
+           let error,() =   warn  parameter error (Some "line 146, Inconsistent profiling information, add_event should not be called with a dummy event")  (Failure "Dummy event in add_event") ()
+           in
+           error,log_info
+         else
+           let next_depth = log_info.next_depth in
+           let task =
+             {
+               tag = step_kind ;
+               size_before = begin match f with | None -> None | Some f -> Some (f ()) end ;
+               size_after = None ;
+               time_start = Sys.time () ;
+               duration = None ;
+               depth = next_depth ;
+             }
+           in
+           let _ = Loggers.open_row (Remanent_parameters.get_profiler parameter) in
+           let _ = Loggers.print_cell (Remanent_parameters.get_profiler parameter) "Start" in
+           let terminated_task =
+             (task,List.rev_map (fun x -> x.tag) (List.rev log_info.current_task))
+           in
+           let _ = print_task parameter terminated_task in
+           let _ = Loggers.close_row (Remanent_parameters.get_profiler parameter) in
+           let _ = flush_logger  parameter in
+           let current_task = task::log_info.current_task in
+           error,
+           { log_info
+             with
+               next_depth = next_depth + 1 ;
+               current_task = current_task
+           }
 
        let close_event parameter error step_kind f log_info =
-	 if is_dummy step_kind then
-	   let error,() =   warn  parameter error (Some "line 146, Inconsistent profiling information, close_event should not be called with a dummy event")  (Failure "Dummy event in close_event") ()
-	   in
-	   error,log_info
-	 else
-	   let rec aux log_info error interrupted =
-	     let next_depth = log_info.next_depth in
-	     let error,() =
-	       if next_depth = 1
-	       then
-		 warn  parameter error (Some "line 146, Inconsistent profiling information, depth should not be equal to 1 when closing an event") (Failure "Depth=1 in close_event") ()
-	       else
-		 error,()
-	     in
-	     match
-	       log_info.current_task
-	     with
-	     | [] ->
-		warn  parameter error (Some "line 156, Inconsistent profiling information, no current task when closing an event") (Failure "No current tasks in close_event") log_info
-	     | current_task::tail when current_task.tag = step_kind ->
-		begin
-		  let size_after =
-		    match f
-		    with Some f -> Some (f ())
-		       | None -> None
-		  in
-		  let time = Sys.time () -. current_task.time_start in
-		  let task =
-		    {
-		      current_task
-		    with
-		  size_after = size_after ;
-		  duration = Some time
-		    }
-		  in
-		  let terminated_task =
-		    (task,List.rev_map (fun x -> x.tag) (List.rev tail))
-		  in
-		  let _ = Loggers.print_cell (Remanent_parameters.get_profiler parameter) (if interrupted then "Interrupted" else "End")
-		  in
-		  let _ = print_task parameter terminated_task in
-		  let _ = flush_logger  parameter in
-		  error,
-		  {
-		    log_info
-		  with
-		    next_depth = next_depth - 1;
-		    current_task = tail ;
-		    (*	terminated_tasks = terminated_task::log_info.terminated_tasks*)
-		  }
-		end
-	     | current_task::tail ->
-		let terminated_task = (current_task,List.rev_map (fun x -> x.tag) (List.rev tail)) in
-		let () = Loggers.print_cell (Remanent_parameters.get_logger parameter) "Interrupted" in
-		let _ = print_task parameter terminated_task in
-		let _ = flush_logger  parameter in
-		aux
-		  {
-		    log_info
-		  with
-		    next_depth = next_depth - 1;
-		    current_task = tail ;
-		    (*	terminated_tasks = terminated_task::log_info.terminated_tasks*)
-		  }
-		  error true
-	   in aux log_info error false
+         if is_dummy step_kind then
+           let error,() =   warn  parameter error (Some "line 146, Inconsistent profiling information, close_event should not be called with a dummy event")
+               (Failure "Dummy event in close_event") ()
+           in
+           error,log_info
+         else
+           let rec aux log_info error interrupted =
+             let next_depth = log_info.next_depth in
+             let error,() =
+               if next_depth = 1
+               then
+                 warn  parameter error (Some "line 146, Inconsistent profiling information, depth should not be equal to 1 when closing an event")
+                   (Failure "Depth=1 in close_event") ()
+               else
+                 error,()
+             in
+             match
+               log_info.current_task
+             with
+             | [] ->
+               warn  parameter error (Some "line 156, Inconsistent profiling information, no current task when closing an event") (Failure "No current tasks in close_event") log_info
+             | current_task::tail when current_task.tag = step_kind ->
+               begin
+                 let size_after =
+                   match f
+                   with Some f -> Some (f ())
+                      | None -> None
+                 in
+                 let time = Sys.time () -. current_task.time_start in
+                 let task =
+                   {
+                     current_task
+                     with
+                       size_after = size_after ;
+                       duration = Some time
+                   }
+                 in
+                 let terminated_task =
+                   (task,List.rev_map (fun x -> x.tag) (List.rev tail))
+                 in
+                 let () = Loggers.open_row (Remanent_parameters.get_profiler parameter) in
+                 let () = Loggers.print_cell (Remanent_parameters.get_profiler parameter) (if interrupted then "Interrupted" else "End") in
+                 let () = print_task parameter terminated_task in
+                 let () = Loggers.close_row (Remanent_parameters.get_profiler parameter) in
+                 let () = flush_logger  parameter in
+                 error,
+                  {
+                    log_info
+                    with
+                      next_depth = next_depth - 1;
+                      current_task = tail ;
+                  }
+               end
+             | current_task::tail ->
+               let () = Loggers.open_row (Remanent_parameters.get_profiler parameter) in
+               let terminated_task = (current_task,List.rev_map (fun x -> x.tag) (List.rev tail)) in
+               let () = Loggers.print_cell (Remanent_parameters.get_logger parameter) "Interrupted" in
+               let () = print_task parameter terminated_task in
+               let () = Loggers.close_row (Remanent_parameters.get_profiler parameter) in
+               let () = flush_logger  parameter in
+               aux
+                 {
+                   log_info
+                   with
+                     next_depth = next_depth - 1;
+                     current_task = tail ;
+                 }
+                 error true
+           in aux log_info error false
 
        let gen_opt gen parameter error step_kind f log_info =
-	 match
-	   step_kind
-	 with None -> error,log_info
-	    | Some e -> gen parameter error e f log_info
-
+         match
+           step_kind
+         with
+           | None -> error,log_info
+           | Some e -> gen parameter error e f log_info
 
        let add_event_opt = gen_opt add_event
        let close_event_opt = gen_opt close_event
@@ -400,15 +404,14 @@ module StoryStats =
        let init_log_info () =
          let time = Sys.time () in
          {
-	   next_depth = 1;
-	   global_time = time ;
-	   story_time = time;
-	   step_time = time;
-	   (*   terminated_tasks = [];*)
-	   current_task = [];
-	   propagation = Array.make propagation_cases 0 ;
+           next_depth = 1;
+           global_time = time ;
+           story_time = time;
+           step_time = time;
+           current_task = [];
+           propagation = Array.make propagation_cases 0 ;
            branch = 0 ;
-	   cut = 0 ;
+           cut = 0 ;
            current_stack =
              {
                current_branch = 0 ;
@@ -418,28 +421,29 @@ module StoryStats =
                stack_size = 0
              } ;
            stack = [] ;
-	   last_tick = 0.;
-	   compression_mode_has_been_checked = false}
+           last_tick = 0.;
+           compression_mode_has_been_checked = false
+         }
 
        let dump_short_log parameter log_info =
          let _ = Loggers.fprintf
-	   (Remanent_parameters.get_compression_status_logger parameter)
-	   "Remaining events: %i ; Stack size: %i ; "
-	   log_info.current_stack.remaining_events
-	   log_info.current_stack.stack_size
-	 in
-	 Loggers.fprintf (Remanent_parameters.get_compression_status_logger parameter) "Total branch: %i ; Total cut: %i ; Current depth: %i @."
-	   log_info.branch log_info.cut log_info.current_stack.current_branch
+             (Remanent_parameters.get_compression_status_logger parameter)
+             "Remaining events: %i ; Stack size: %i ; "
+             log_info.current_stack.remaining_events
+             log_info.current_stack.stack_size
+         in
+         Loggers.fprintf (Remanent_parameters.get_compression_status_logger parameter) "Total branch: %i ; Total cut: %i ; Current depth: %i @."
+           log_info.branch log_info.cut log_info.current_stack.current_branch
 
 
        let reset_log log =
          let t = log.propagation in
          let _ = Array.fill t 0 (Array.length t) 0 in
-	 let time = Sys.time () in
-	 { log
-	 with
-	   step_time = time ;
-	   story_time = time}
+         let time = Sys.time () in
+         { log
+           with
+             step_time = time ;
+             story_time = time}
 
 
        let propagate_up i = i
@@ -522,37 +526,37 @@ module StoryStats =
 
 
        let dump_complete_log parameter log_info =
-	 let logger = Remanent_parameters.get_compression_status_logger parameter in
+         let logger = Remanent_parameters.get_compression_status_logger parameter in
          let () = Loggers.fprintf logger "/*" in
-	 let () = Loggers.print_newline logger in
+         let () = Loggers.print_newline logger in
          let () = Loggers.fprintf logger "Story profiling" in
-	 let () = Loggers.print_newline logger in
+         let () = Loggers.print_newline logger in
          let () = Loggers.fprintf logger "Ellapsed_time:                  %f" (ellapsed_time log_info) in
-	 let () = Loggers.print_newline logger in
+         let () = Loggers.print_newline logger in
          let () = Loggers.fprintf logger "Story research time:            %f" (log_info.story_time) in
-	 let () = Loggers.print_newline logger in
+         let () = Loggers.print_newline logger in
          let () = Loggers.fprintf logger "Exploration depth:              %i" log_info.current_stack.current_branch in
-	 let () = Loggers.print_newline logger in
+         let () = Loggers.print_newline logger in
          let () = Loggers.fprintf logger "Exploration cuts:               %i" log_info.cut in
-	 let () = Loggers.print_newline logger in
+         let () = Loggers.print_newline logger in
          let () = Loggers.fprintf logger "***" in
-	 let () = Loggers.print_newline logger in
-	 let () = Loggers.fprintf logger "Propagation Hits:" in
-	 let () = Loggers.print_newline logger in
+         let () = Loggers.print_newline logger in
+         let () = Loggers.fprintf logger "Propagation Hits:" in
+         let () = Loggers.print_newline logger in
          let rec aux k =
            if k>=propagation_cases
            then ()
            else
              let () =
                let () = Loggers.fprintf logger "        %s %i" propagation_labels.(k) log_info.propagation.(k) in
-	       let () = Loggers.print_newline logger in
-	       ()
+               let () = Loggers.print_newline logger in
+               ()
              in aux (k+1)
          in
          let _ = aux 1 in
          let () = Loggers.fprintf logger "*/" in
-	 let () = Loggers.print_newline logger in
-	 ()
+         let () = Loggers.print_newline logger in
+         ()
 
        let tick log_info =
          let time = Sys.time () in
@@ -566,31 +570,31 @@ module StoryStats =
        let set_pseudo_inv n log_info = log_info
 
        let check_compression_mode form log_info =
-	 if
-	   log_info.compression_mode_has_been_checked
-	 then
-	   log_info
-	 else
-	   let bool =
-	     (
-	       !Parameter.causalModeOn
-	       || !Parameter.weakCompression
-	       || !Parameter.mazCompression
-	       || !Parameter.strongCompression
-	     ) in
+         if
+           log_info.compression_mode_has_been_checked
+         then
+           log_info
+         else
+           let bool =
+             (
+               !Parameter.causalModeOn
+               || !Parameter.weakCompression
+               || !Parameter.mazCompression
+               || !Parameter.strongCompression
+             )
+           in
 	   let () =
 	     if
 	       not bool
 	     then
 	       let () =
-		 ExceptionDefn.warning
-		   (fun f ->
-		    Format.fprintf
-		      f "an observable hit is tracked whereas no compression mode has been selected")
-	       in
-	       let _ = Format.fprintf form "@." in
-	       ExceptionDefn.flush_warning form
-	   in
-	   {log_info with compression_mode_has_been_checked = true}
-       end:StoryStats)
-	
+          ExceptionDefn.warning
+            (fun f ->
+               Format.fprintf
+                 f "an observable hit is tracked whereas no compression mode has been selected")
+        in
+        let _ = Format.fprintf form "@." in
+        ExceptionDefn.flush_warning form
+           in
+           {log_info with compression_mode_has_been_checked = true}
+     end:StoryStats)
