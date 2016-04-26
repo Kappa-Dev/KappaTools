@@ -36,9 +36,7 @@ module type Blackboard_with_heuristic =
     val forbidden_events: (B.PB.step_id list,update_order list) B.PB.CI.Po.K.H.unary
     val next_choice: (B.blackboard,update_order list) B.PB.CI.Po.K.H.unary
     val apply_instruction: (B.blackboard,update_order,update_order list,propagation_check list,B.blackboard * update_order list * propagation_check list * B.assign_result) B.PB.CI.Po.K.H.quaternary
-
     val propagate: (B.blackboard,propagation_check,update_order list,propagation_check list,B.blackboard * update_order list * propagation_check list * B.assign_result) B.PB.CI.Po.K.H.quaternary
-
   end
 
 module Propagation_heuristic =
@@ -96,9 +94,7 @@ module Propagation_heuristic =
               then error,log_info,None
               else
                 let event_case_address = B.build_event_case_address p_id (B.build_pointer i) in
-                let error,log_info,exist =
-                  B.exist_case  parameter handler log_info error blackboard event_case_address in
-
+                let error,log_info,exist = B.exist_case  parameter handler log_info error blackboard event_case_address in
                 match exist
                 with
                   | None ->
@@ -114,7 +110,6 @@ module Propagation_heuristic =
             aux i log_info error
           end
 
-
     let get_last_unresolved_event_on_pid parameter handler log_info error blackboard p_id level =
       get_gen_unresolved_event_on_pid B.get_last_linked_event B.get_first_linked_event pred (fun i j -> i<j) parameter handler log_info error blackboard p_id level
 
@@ -123,23 +118,23 @@ module Propagation_heuristic =
 
     let get_gen_unresolved_event first last succ stop parameter handler log_info error blackboard level =
       begin
-            let rec aux i log_info error =
-              if stop i last
-              then error,log_info,None
+        let rec aux i log_info error =
+          if stop i last
+          then error,log_info,None
+          else
+            let error, log_info, exist = B.is_selected_event parameter handler log_info error i blackboard in
+            match exist
+            with
+            | None ->
+              let error,log_info,level_of_event = B.level_of_event parameter handler log_info error blackboard i in
+              if level_of_event = level
+              then
+                error,log_info,Some i
               else
-                let error, log_info, exist = B.is_selected_event parameter handler log_info error i blackboard in
-                match exist
-                with
-                  | None ->
-                    let error,log_info,level_of_event = B.level_of_event parameter handler log_info error blackboard i in
-                    if level_of_event = level
-                    then
-                      error,log_info,Some i
-                    else
-                      aux (succ i) log_info error
-                  | Some true | Some false -> aux (succ i) log_info error
-            in
-            aux first log_info error
+                aux (succ i) log_info error
+            | Some true | Some false -> aux (succ i) log_info error
+        in
+        aux first log_info error
       end
 
     let get_last_unresolved_event parameter handler log_info error blackboard level =
@@ -147,12 +142,6 @@ module Propagation_heuristic =
 
     let get_first_unresolved_event parameter handler log_info error blackboard level =
       get_gen_unresolved_event 0 (B.get_n_eid blackboard) succ (fun i j -> i>j) parameter handler log_info error blackboard level
-
-    let compare_int i j =
-      if i=0 then false
-      else if j=0 then true
-      else i<j
-
 
     let next_choice parameter handler log_info error blackboard =
       let bool,string=
@@ -163,65 +152,65 @@ module Propagation_heuristic =
             | None | Some Parameter.Causal-> false,""
             | Some Parameter.Weak -> Parameter.dump_grid_after_branching_during_weak_compression,Parameter.xlsweakFileName
             | Some Parameter.Strong -> Parameter.dump_grid_after_branching_during_strong_compression,Parameter.xlsstrongFileName
-	  end
+          end
       in
       let error,log_info =
         if bool
         then
           let error,log_info,() = B.export_blackboard_to_xls parameter handler log_info error string (!Priority.n_story) (!Priority.n_branch) blackboard in
-          let _ = Priority.n_branch:= (!Priority.n_branch)+1 in
+          let () = Priority.n_branch:= (!Priority.n_branch)+1 in
           error,log_info
-	else
-	  error,log_info
+        else
+          error,log_info
       in
       let error, priority =
-	match
-	  B.PB.CI.Po.K.H.get_priorities parameter
-	with
-	| Some x -> error,x
-	| None -> warn parameter error (Some "next_choice, line 147, Compression mode has to been selected") (Failure "Compression mode has not been selected") Priority.causal
+        match
+          B.PB.CI.Po.K.H.get_priorities parameter
+        with
+        | Some x -> error,x
+        | None -> warn parameter error (Some "next_choice, line 147, Compression mode has to been selected") (Failure "Compression mode has not been selected") Priority.causal
       in
       let n_p_id = B.get_npredicate_id blackboard in
       let error,() =
-	match
-	  priority.Priority.candidate_set_of_events
-	with
-	| Priority.All_remaining_events -> warn parameter error (Some "All_remaining_events strategy is not implemented yet") (Failure "All remaining events strategy is not implemented yet") ()
-	| Priority.Wire_with_the_least_number_of_events -> error,()
-	| Priority.Wire_with_the_most_number_of_events -> error,()
+        match
+          priority.Priority.candidate_set_of_events
+        with
+        | Priority.All_remaining_events -> warn parameter error (Some "All_remaining_events strategy is not implemented yet") (Failure "All remaining events strategy is not implemented yet") ()
+        | Priority.Wire_with_the_least_number_of_events -> error,()
+        | Priority.Wire_with_the_most_number_of_events -> error,()
       in
       let best_pair x a b =
-	match
-	  x.Priority.candidate_set_of_events
-	with
-	| Priority.All_remaining_events
-	| Priority.Wire_with_the_most_number_of_events -> Tools.max_pos_int_not_zero a b
-	| Priority.Wire_with_the_least_number_of_events -> Tools.min_pos_int_not_zero a b
+        match
+          x.Priority.candidate_set_of_events
+        with
+        | Priority.All_remaining_events
+        | Priority.Wire_with_the_most_number_of_events -> Tools.max_pos_int_not_zero a b
+        | Priority.Wire_with_the_least_number_of_events -> Tools.min_pos_int_not_zero a b
       in
       let get_unresolved_event x parameter handler log_info error blackboard p_id level =
-	match
-	  x.Priority.try_to_remove_first
-	with
-	| Priority.Late_events ->
-	   begin
-	     match
-	       x.Priority.candidate_set_of_events
-	     with
-       | Priority.All_remaining_events -> get_last_unresolved_event parameter handler log_info error blackboard level
-	     | Priority.Wire_with_the_most_number_of_events
-	     | Priority.Wire_with_the_least_number_of_events ->
-	       get_last_unresolved_event_on_pid parameter handler log_info error blackboard p_id level
-	   end
-	| Priority.Early_events ->
-	   begin
-	     match
-	       x.Priority.candidate_set_of_events
-	     with
-	     | Priority.All_remaining_events -> get_first_unresolved_event parameter handler log_info error blackboard level
-	     | Priority.Wire_with_the_most_number_of_events
-	     | Priority.Wire_with_the_least_number_of_events ->
-		get_first_unresolved_event_on_pid parameter handler log_info error blackboard p_id level
-	   end
+        match
+          x.Priority.try_to_remove_first
+        with
+        | Priority.Late_events ->
+          begin
+            match
+              x.Priority.candidate_set_of_events
+            with
+            | Priority.All_remaining_events -> get_last_unresolved_event parameter handler log_info error blackboard level
+            | Priority.Wire_with_the_most_number_of_events
+            | Priority.Wire_with_the_least_number_of_events ->
+               get_last_unresolved_event_on_pid parameter handler log_info error blackboard p_id level
+          end
+        | Priority.Early_events ->
+          begin
+            match
+              x.Priority.candidate_set_of_events
+            with
+            | Priority.All_remaining_events -> get_first_unresolved_event parameter handler log_info error blackboard level
+            | Priority.Wire_with_the_most_number_of_events
+            | Priority.Wire_with_the_least_number_of_events ->
+              get_first_unresolved_event_on_pid parameter handler log_info error blackboard p_id level
+          end
       in
       let error,list  =
         if n_p_id = 0
@@ -230,10 +219,10 @@ module Propagation_heuristic =
         else
           let rec try_level level_opt error =
             match level_opt
-	    with
-	    | None ->
+            with
+            | None ->
               error,[]
-	    | Some level ->
+            | Some level ->
               let rec aux level n_p_id step best =
                 if step=n_p_id
                 then
@@ -242,36 +231,25 @@ module Propagation_heuristic =
                   let grade = B.get_n_unresolved_events_of_pid_by_level blackboard step level in
                   aux level n_p_id (step+1) (best_pair priority best (grade,step))
               in
-	      let n,p_id =
-		aux
-		  level
-		  n_p_id
-		  1
-		  (B.get_n_unresolved_events_of_pid_by_level blackboard 0 level,0)
-	      in
-	      if n = 0
-	      then
-		try_level (Priority.lower level) error
-	      else
-		let error,log_info,event_id =
-                  get_unresolved_event
-		    priority
-                    parameter
-                    handler
-		    log_info
-                    error
-                    blackboard
-                    p_id
-                    level
-		in
-		match event_id
-		with
-		| None ->
-		   let error,() = warn parameter error (Some "next_choice, line 210, An empty wire has been selected") (Failure "An empty wire has been selected") () in
-     		   try_level (Priority.lower level) error
-		| Some event_id ->
-                   error,[Discard_event event_id;Keep_event event_id]
-	  in try_level (Some Priority.highest) error
+              let n,p_id =
+                aux level n_p_id 1 (B.get_n_unresolved_events_of_pid_by_level blackboard 0 level,0)
+              in
+              if n = 0
+              then
+                try_level (Priority.lower level) error
+              else
+                let error,log_info,event_id =
+                  get_unresolved_event priority parameter handler log_info error blackboard p_id level
+                in
+                match event_id
+                with
+                | None ->
+                  let error,() = warn parameter error (Some "next_choice, line 210, An empty wire has been selected") (Failure "An empty wire has been selected") () in
+                  try_level (Priority.lower level) error
+                | Some event_id ->
+                  error,[Discard_event event_id;Keep_event event_id]
+          in
+          try_level (Some Priority.highest) error
       in
       error,log_info,list
 
@@ -342,8 +320,8 @@ module Propagation_heuristic =
                               let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
                               let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                               error,log_info
-			    else
-			      error,log_info
+                            else
+                              error,log_info
                           in
                             (* next event is selected *)
                             (* no test, no action in next event *)
@@ -562,17 +540,26 @@ module Propagation_heuristic =
                                 let error,log_info =
                                   if debug_mode
                                   then
-                                   (* let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nPropagate_down  (case 7):\n" in
+                                    let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                    let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Propagate_down  (case 7):" in
+                                    let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                     let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
-                                    let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the next event is kept\n there is no test, no action \n " in
-                                    let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nWire_state: " in
-                                    let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                                    let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nThe value is propagated after and before the next event\n" in
-                                    let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***\n" in*)
+                                    let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the next event is kept" in
+                                    let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                    let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "there is no test, no action" in
+                                    let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                    let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                    let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
+                                    let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                                    let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                    let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "The value is propagated after and before the next event" in
+                                    let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                    let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***\n" in
+                                    let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                     error,log_info
-				  else
-				    error,log_info
-				in
+                                  else
+                                    error,log_info
+                                in
                                 let log_info = StoryProfiling.StoryStats.add_propagation_case_down 7 log_info in
                                 (* we do not know whether the event is played or not *)
                                 (*there is no test in the next event *)
@@ -592,20 +579,29 @@ module Propagation_heuristic =
                                   let error,log_info =
                                     if debug_mode
                                     then
-                                     (* let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nPropagate_down  (case 8):\n" in
+                                      let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                      let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Propagate_down  (case 8):" in
+                                      let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                       let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
-                                      let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the next event is kept\n there is a test, but no action \n " in
-                                      let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "next event Test: " in
-                                      let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) next_test in
-                                      let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nWire_state: " in
-                                      let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                                      let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nThe value " in
-                                      let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                                      let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) " is propagated after and before the next event\n" in
-                                      let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***\n" in*)
+                                      let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the next event is kept" in
+                                      let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                      let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "there is a test, but no action" in
+                                      let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                      let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "next event Test: " in
+                                      let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) next_test in
+                                      let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                      let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
+                                      let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                                      let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                      let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "The value " in
+                                      let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                                      let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) " is propagated after and before the next event" in
+                                      let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                      let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+                                      let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                       error,log_info
-				    else
-				      error,log_info
+                                    else
+                                      error,log_info
                                   in
                                   let log_info = StoryProfiling.StoryStats.add_propagation_case_down 8 log_info in
                                   (* we do not know whether the event is played or not *)
@@ -623,18 +619,27 @@ module Propagation_heuristic =
                                   let error,log_info =
                                     if debug_mode
                                     then
-                                     (* let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nPropagate_down  (case 9):\n" in
+                                      let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                      let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Propagate_down  (case 9):" in
+                                      let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                       let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
-                                      let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the next event is kept\n there is a test, but no action \n " in
-                                      let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "next event Test: " in
-                                      let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) next_test in
-                                      let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nWire_state: " in
-                                      let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                                      let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nWe discard the next event (%i) \n" next_eid in
-                                      let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***\n" in*)
+                                      let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the next event is kept" in
+                                      let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                      let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "there is a test, but no action" in
+                                      let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                      let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "next event Test: " in
+                                      let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) next_test in
+                                      let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                      let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
+                                      let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                                      let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                      let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "We discard the next event (%i)" next_eid in
+                                      let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                      let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+                                      let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                       error,log_info
-				    else
-				      error,log_info
+                                    else
+                                      error,log_info
                                   in
                                   let log_info  = StoryProfiling.StoryStats.add_propagation_case_down 9 log_info in
                                   (* we do not know whether the event is played or not *)
@@ -656,24 +661,33 @@ module Propagation_heuristic =
                           then (* the action is not compatible with the value *)
                             let error,log_info,computed_next_predicate_value =
                               B.PB.disjunction parameter handler log_info error predicate_value next_action
-                             in
+                            in
                             let error,log_info =
                               if debug_mode
                               then
-                                (*let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nPropagate_down  (case 10):\n" in
+                                let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Propagate_down  (case 10):" in
+                                let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                 let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
-                                let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the next event is kept\n there is an action \n " in
-                                let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "next event Action: " in
-                                let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) next_action in
-                                let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nWire_state: " in
-                                let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                                let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nThe value " in
-                                let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) computed_next_predicate_value in
-                                let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) " is propagated after the next event\n" in
-                                let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***\n" in*)
+                                let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the next event is kept" in
+                                let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "there is an action" in
+                                let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "next event Action: " in
+                                let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) next_action in
+                                let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
+                                let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                                let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "The value " in
+                                let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) computed_next_predicate_value in
+                                let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) " is propagated after the next event" in
+                                let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+                                let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                 error,log_info
-			      else
-				error,log_info
+                              else
+                                error,log_info
                             in
                             let log_info = StoryProfiling.StoryStats.add_propagation_case_down 10 log_info in
                             (* we do not know whether the event is played or not *)
@@ -698,23 +712,31 @@ module Propagation_heuristic =
                                     let error,log_info =
                                       if debug_mode
                                       then
-                                      (*  let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nPropagate_down  (case 11):\n" in
+                                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Propagate_down  (case 11):" in
+                                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                         let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
-                                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the next event is kept\n there is no test, but there is an action \n " in
-                                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "next event Action: " in
-                                        let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) next_action in
-                                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nWire_state: " in
-                                        let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nThe value " in
-                                        let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) computed_next_predicate_value in
-                                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) " is propagated after the next event\n" in
-                                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***\n" in*)
+                                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the next event is kept" in
+                                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "there is no test, but there is an action" in
+                                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "next event Action: " in
+                                        let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) next_action in
+                                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
+                                        let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "The value " in
+                                        let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) computed_next_predicate_value in
+                                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) " is propagated after the next event" in
+                                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+                                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                         error,log_info
-				      else
-					error,log_info
+                                      else
+                                        error,log_info
                                     in
-                                    let log_info =
-                                      StoryProfiling.StoryStats.add_propagation_case_down 11 log_info in
+                                    let log_info = StoryProfiling.StoryStats.add_propagation_case_down 11 log_info in
                                     (* we do not know whether the event is played or not *)
                                     (* there is no test in the next event *)
                                     (* there is an action in the next event *)
@@ -734,25 +756,34 @@ module Propagation_heuristic =
                                       let error,log_info =
                                         if debug_mode
                                         then
-                                         (* let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nPropagate_down  (case 12):\n" in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Propagate_down  (case 12):" in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                           let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
-                                          let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the next event is kept\n there is a test, but there is an action \n " in
-                                          let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "next event Test: " in
-                                          let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) next_test in
-                                          let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nnext event Action: " in
-                                          let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) next_action in
-                                          let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nWire_state: " in
-                                          let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                                          let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nThe value " in
-                                          let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) computed_next_predicate_value in
-                                          let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) " is propagated after the next event\n" in
-                                          let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***\n" in*)
+                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the next event is kept" in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "there is a test, but there is an action" in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "next event Test: " in
+                                          let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) next_test in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "next event Action: " in
+                                          let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) next_action in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
+                                          let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "The value " in
+                                          let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) computed_next_predicate_value in
+                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) " is propagated after the next event" in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                           error,log_info
-					else
-					  error,log_info
+                                        else
+                                          error,log_info
                                       in
-                                      let log_info =
-                                        StoryProfiling.StoryStats.add_propagation_case_down 12 log_info in
+                                      let log_info = StoryProfiling.StoryStats.add_propagation_case_down 12 log_info in
                                       (* we do not know whether the event is played or not *)
                                       (* there is a test in the next event *)
                                       (* there is an action in the next event *)
@@ -769,20 +800,30 @@ module Propagation_heuristic =
                                       let error,log_info =
                                         if debug_mode
                                         then
-                                          (*let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nPropagate_down  (case 13):\n" in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Propagate_down  (case 13):" in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                           let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
-                                          let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the next event is kept\n there is a test, but there is an action \n " in
-                                          let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "next event Test: " in
-                                          let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) next_test in
-                                          let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nnext event Action: " in
-                                          let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) next_action in
-                                          let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nWire_state: " in
-                                          let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                                          let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nNext event (%i) is discarded \n " next_eid in
-                                          let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***\n" in*)
+                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the next event is kept" in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "there is a test, but there is an action" in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "next event Test: " in
+                                          let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) next_test in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "next event Action: " in
+                                          let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) next_action in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
+                                          let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Next event (%i) is discarded" next_eid in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                           error,log_info
-					else
-					  error,log_info
+                                        else
+                                          error,log_info
                                       in
                                       let log_info = StoryProfiling.StoryStats.add_propagation_case_down 13 log_info in
                                       (* we do not know whether the event is played or not *)
@@ -826,9 +867,7 @@ module Propagation_heuristic =
                    if bool
                    then
                       let log_info = StoryProfiling.StoryStats.add_look_up_case 1 log_info in
-                     (* let _ = Format.pp_print_flush
-				(B.PB.CI.Po.K.H.get_debugging_channel parameter) () in*)
-                      error,not (B.PB.is_undefined predicate_value),log_info,blackboard
+                        error,not (B.PB.is_undefined predicate_value),log_info,blackboard
                    else
                      last_chance_up  parameter handler log_info error blackboard predicate_value preview_event_case_address
                  else
@@ -911,20 +950,26 @@ module Propagation_heuristic =
                     let error,log_info =
                       if debug_mode
                       then
-                        (*let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nPropagate_up  (case 1):\n" in
+                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Propagate_up  (case 1):" in
+                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                         let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
-                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "The event before is kept, there is no action \n " in
-                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Test: " in
-                        let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) test in
-                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nWire_state: " in
-                        let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nRefine before the event (before) with the state " in
-                        let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) new_value in
-                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\n" in
-                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***\n" in*)
+                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "The event before is kept, there is no action" in
+                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Test: " in
+                        let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) test in
+                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
+                        let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Refine before the event (before) with the state " in
+                        let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) new_value in
+                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                         error,log_info
-		      else
-			error,log_info
+                      else
+                        error,log_info
                     in
                     let log_info = StoryProfiling.StoryStats.add_propagation_case_up 1 log_info in
                     error,
@@ -937,18 +982,25 @@ module Propagation_heuristic =
                     let error,log_info =
                       if debug_mode
                       then
-                       (*let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nPropagate_up  (case 2):\n" in
+                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Propagate_up  (case 2):" in
+                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                         let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
-                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "The event before is kept, there is no action \n " in
-                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Action: " in
-                        let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) action in
-                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nWire_state: " in
-                        let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nCut\n" in
-                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***\n" in*)
+                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "The event before is kept, there is no action" in
+                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Action: " in
+                        let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) action in
+                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
+                        let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Cut" in
+                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                         error,log_info
-		      else
-			error,log_info
+                      else
+                        error,log_info
                     in
                     let log_info = StoryProfiling.StoryStats.add_propagation_case_up 2 log_info in
                     error,
@@ -966,20 +1018,28 @@ module Propagation_heuristic =
                     let error,log_info =
                       if debug_mode
                       then
-                       (* let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nPropagate_up  (case 3):\n" in
+                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Propagate_up  (case 3):" in
+                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                         let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
-                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "The event before is kept, there is an action and a test \n " in
-                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Test: " in
-                        let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) test in
-                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nbefore event Action: " in
-                        let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) action in
-                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nWire_state: " in
-                        let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nNothing to be done\n" in
-                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***\n" in*)
+                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "The event before is kept, there is an action and a test" in
+                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Test: " in
+                        let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) test in
+                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Action: " in
+                        let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) action in
+                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
+                        let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Nothing to be done" in
+                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                         error,log_info
-		      else
-			error,log_info
+                      else
+                        error,log_info
                     in
                     let log_info = StoryProfiling.StoryStats.add_propagation_case_up 3 log_info in
                     error,
@@ -996,22 +1056,30 @@ module Propagation_heuristic =
                         let error,log_info =
                           if debug_mode
                           then
-                            (*let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nPropagate_up  (case 4):\n" in
+                            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Propagate_up  (case 4):" in
+                            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                             let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
-                            let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "The event before is kept, there is an action and a test \n " in
-                            let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Test: " in
-                            let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) test in
-                            let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nbefore event Action: " in
-                            let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) action in
-                            let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nWire_state: " in
-                            let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                            let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nRefine before the event (before) with the state " in
-                            let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) state in
-                            let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\n" in
-                            let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***\n" in*)
+                            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "The event before is kept, there is an action and a test" in
+                            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Test: " in
+                            let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) test in
+                            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Action: " in
+                            let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) action in
+                            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
+                            let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Refine before the event (before) with the state " in
+                            let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) state in
+                            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "" in
+                            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+                            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                             error,log_info
-			  else
-			    error,log_info
+                          else
+                            error,log_info
                         in
                         let log_info = StoryProfiling.StoryStats.add_propagation_case_up 4 log_info in
                         error,
@@ -1026,20 +1094,28 @@ module Propagation_heuristic =
                         let error,log_info =
                           if debug_mode
                           then
-                           (* let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nPropagate_up  (case 5):\n" in
+                            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Propagate_up  (case 5):" in
+                            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                             let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
-                            let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "The event before is kept, there is an action and a test \n " in
-                            let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Test: " in
-                            let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) test in
-                            let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nbefore event Action: " in
-                            let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) action in
-                            let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nWire_state: " in
-                            let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                            let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nCut\n" in
-                            let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***\n" in*)
+                            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "The event before is kept, there is an action and a test" in
+                            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Test: " in
+                            let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) test in
+                            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Action: " in
+                            let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) action in
+                            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
+                            let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Cut" in
+                            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+                            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                             error,log_info
-			  else
-			    error,log_info
+                          else
+                            error,log_info
                         in
                         let log_info = StoryProfiling.StoryStats.add_propagation_case_up 5 log_info in
                         error,
@@ -1053,18 +1129,25 @@ module Propagation_heuristic =
                   let error,log_info =
                     if debug_mode
                     then
-                     (* let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nPropagate_up  (case 6):\n" in
+                      let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                      let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Propagate_up  (case 6):" in
+                      let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                       let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
-                      let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "The event before is kept, there is an action \n " in
-                      let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nbefore event Action: " in
-                      let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) action in
-                      let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nWire_state: " in
-                      let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                      let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nCut\n" in
-                      let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***\n" in*)
+                      let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "The event before is kept, there is an action" in
+                      let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                      let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Action: " in
+                      let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) action in
+                      let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                      let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
+                      let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                      let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                      let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Cut" in
+                      let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                      let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+                      let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                       error,log_info
-		    else
-		      error,log_info
+                    else
+                      error,log_info
                   in
                   let log_info = StoryProfiling.StoryStats.add_propagation_case_up 6 log_info in
                   error,
@@ -1093,18 +1176,25 @@ module Propagation_heuristic =
                           let error,log_info =
                             if debug_mode
                             then
-                             (* let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nPropagate_up  (case 7):\n" in
+                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Propagate_up  (case 7):" in
+                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                               let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
-                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the event before is kept,  there is neither a  test, nor  action \n " in
-                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
-                              let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nRefine before the event (before) with the state " in
-                              let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\n" in
-                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***\n" in*)
+                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the event before is kept," in
+                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "there is neither a test, nor  action " in
+                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
+                              let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Refine before the event (before) with the state " in
+                              let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                               error,log_info
-			    else
-			      error,log_info
+                            else
+                              error,log_info
                           in
                           let log_info = StoryProfiling.StoryStats.add_propagation_case_up 7 log_info in
                           error,
@@ -1121,20 +1211,28 @@ module Propagation_heuristic =
                             let error,log_info =
                               if debug_mode
                               then
-                               (* let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nPropagate_up  (case 8):\n" in
+                                let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Propagate_up  (case 8):" in
+                                let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                 let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
-                                let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the event is kept, there is a  test, but no action \n " in
-                                let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Test: " in
-                                let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) test in
-                                let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nWire_state: " in
-                                let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                                let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nRefine before the event (before) with the state " in
-                                let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                                let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\n" in
-                                let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***\n" in*)
+                                let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the event is kept," in
+                                let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "there is a  test, but no action" in
+                                let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Test: " in
+                                let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) test in
+                                let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
+                                let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                                let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Refine before the event (before) with the state " in
+                                let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                                let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+                                let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                 error,log_info
-			      else
-				error,log_info
+                              else
+                                error,log_info
                             in
                             let log_info = StoryProfiling.StoryStats.add_propagation_case_up 8 log_info in
                             error,
@@ -1147,18 +1245,27 @@ module Propagation_heuristic =
                             let error,log_info =
                               if debug_mode
                               then
-                               (* let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nPropagate_up  (case 9):\n" in
+                                let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Propagate_up  (case 9):" in
+                                let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                 let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
-                                let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the event before is kept, there is a  test, but no action \n " in
-                                let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Test: " in
-                                let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) test in
-                                let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nWire_state: " in
-                                let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                                let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nEvent before (%i) is discarded \n " eid in
-                                let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***\n" in*)
+                                let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the event before is kept," in
+                                let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "there is a  test, but no action" in
+                                let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Test: " in
+                                let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) test in
+                                let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
+                                let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                                let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Event before (%i) is discarded" eid in
+                                let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+                                let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                 error,log_info
-			      else
-				error,log_info
+                              else
+                                error,log_info
                             in
                             let log_info = StoryProfiling.StoryStats.add_propagation_case_up 9 log_info in
                             error,
@@ -1188,19 +1295,28 @@ module Propagation_heuristic =
                                 let error,log_info =
                                   if debug_mode
                                   then
-                                   (* let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nPropagate_up  (case 10):\n" in
+                                    let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                    let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Propagate_up  (case 10):" in
+                                    let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                     let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
-                                    let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the event before is kept, there is an action \n " in
-                                    let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Action: " in
-                                    let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) action in
-                                    let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nWire_state: " in
-                                    let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                                    let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nThis is the only opportunity to set up the wire, we keep the event" in
-                                    let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\n" in
-                                    let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***\n" in*)
+                                    let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                    let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the event before is kept," in
+                                    let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                    let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) " there is an action" in
+                                    let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                    let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Action: " in
+                                    let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) action in
+                                    let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                    let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
+                                    let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                                    let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                    let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "This is the only opportunity to set up the wire, we keep the event" in
+                                    let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                    let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+                                    let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                     error,log_info
-				  else
-				    error,log_info
+                                  else
+                                    error,log_info
                                 in
                                 let log_info = StoryProfiling.StoryStats.add_propagation_case_up 10 log_info in
                                 error,
@@ -1221,20 +1337,29 @@ module Propagation_heuristic =
                                     let error,log_info =
                                       if debug_mode
                                       then
-                                      (*  let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nPropagate_up  (case 11):\n" in
+                                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Propagate_up  (case 11):" in
+                                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                         let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
-                                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the event before is kept, there is an action, but no test \n " in
-                                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Action: " in
-                                        let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) action in
-                                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nWire_state: " in
-                                        let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nRefine before the event (before) with the state " in
-                                        let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) preview_predicate_value in
-                                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\n" in
-                                        let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***\n" in*)
+                                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the event before is kept," in
+                                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "there is an action, but no test" in
+                                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Action: " in
+                                        let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) action in
+                                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
+                                        let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Refine before the event (before) with the state " in
+                                        let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) preview_predicate_value in
+                                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                        let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+                                        let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                         error,log_info
-				      else
-					error,log_info
+                                      else
+                                        error,log_info
                                     in
                                     let log_info = StoryProfiling.StoryStats.add_propagation_case_up 11 log_info in
                                     error,
@@ -1256,23 +1381,33 @@ module Propagation_heuristic =
                                           let error,log_info =
                                             if debug_mode
                                             then
-                                              (*let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nPropagate_up  (case 12):\n" in
+                                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Propagate_up  (case 12):" in
+                                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                               let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
-                                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the event before is kept, there is an action and a test \n " in
-                                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Test:" in
-                                              let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) test in
-                                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nbefore event Action: " in
-                                              let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) action in
-                                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nWire_state: " in
-                                              let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nRefine before the event (before) with the state " in
-                                              let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) new_predicate_value in
-                                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\n" in
-                                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***\n" in*)
+                                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the event before is kept," in
+                                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) " there is an action and a test" in
+                                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Test:" in
+                                              let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) test in
+                                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Action: " in
+                                              let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) action in
+                                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
+                                              let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Refine before the event (before) with the state " in
+                                              let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) new_predicate_value in
+                                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+                                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                               error,log_info
-					    else
+                                            else
                                               error,log_info
-					  in
+                                          in
                                           let log_info = StoryProfiling.StoryStats.add_propagation_case_up 12 log_info in
                                           error,
                                           log_info,
@@ -1284,21 +1419,30 @@ module Propagation_heuristic =
                                           let error,log_info =
                                             if debug_mode
                                             then
-                                             (* let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nPropagate_up  (case 13):\n" in
+                                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Propagate_up  (case 13):" in
+                                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                               let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
-                                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the event before is kept, there is an action and a test \n " in
-                                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Test:" in
-                                              let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) test in
-                                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nbefore event Action: " in
-                                              let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) action in
-                                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nWire_state: " in
-                                              let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nDiscard the event before (%i)" eid in
-                                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\n" in
-                                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***\n" in*)
+                                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the event before is kept," in
+                                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) " there is an action and a test" in
+                                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Test:" in
+                                              let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) test in
+                                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Action: " in
+                                              let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) action in
+                                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
+                                              let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Discard the event before (%i)" eid in
+                                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+                                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                               error,log_info
-					    else
-					      error,log_info
+                                            else
+                                              error,log_info
                                           in
                                           let log_info = StoryProfiling.StoryStats.add_propagation_case_up 13 log_info in
                                           error,
@@ -1313,27 +1457,36 @@ module Propagation_heuristic =
                                       let error,log_info =
                                         if debug_mode
                                         then
-                                          (*let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nPropagate_up  (case 14):\n" in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Propagate_up  (case 14):" in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                           let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
-                                          let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the event before is kept, there is an action and a test \n " in
-                                          let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Test:" in
-                                          let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) test in
-                                          let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nbefore event Action: " in
-                                          let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) action in
-                                          let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nWire_state: " in
-                                          let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                                          let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nRefine before the event (before) with the state " in
-                                          let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) prev' in
-                                          let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\n" in
-                                          let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***\n" in*)
+                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the event before is kept," in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "there is an action and a test" in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Test:" in
+                                          let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) test in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Action: " in
+                                          let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) action in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
+                                          let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Refine before the event (before) with the state " in
+                                          let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) prev' in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                                          let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+                                          let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                                           error,log_info
-					else
+                                        else
                                           error,log_info
                                       in
-                                       let log_info = StoryProfiling.StoryStats.add_propagation_case_up 14 log_info in
-                                       error,
-                                       log_info,
-                                       (blackboard,
+                                      let log_info = StoryProfiling.StoryStats.add_propagation_case_up 14 log_info in
+                                      error,
+                                      log_info,
+                                      (blackboard,
                                        (Refine_value_before(event_case_address,prev'))::instruction_list,
                                        propagate_list,
                                        B.success)
@@ -1344,18 +1497,26 @@ module Propagation_heuristic =
                           let error,log_info =
                             if debug_mode
                             then
-                             (* let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nPropagate_up  (case 15):\n" in
+                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Propagate_up  (case 15):" in
+                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                               let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
-                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the event before is kept, there is an action and maybe a test \n " in
-                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nbefore event Action: " in
-                              let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) action in
-                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nWire_state: " in
-                              let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nDiscard the event before (%i)" eid in
-                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\n" in
-                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***\n" in*)
+                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the event before is kept," in
+                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) " there is an action and maybe a test" in
+                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Action: " in
+                              let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) action in
+                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
+                              let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Discard the event before (%i)" eid in
+                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                               error,log_info
-			    else
+                            else
                               error,log_info
                           in
                           let log_info = StoryProfiling.StoryStats.add_propagation_case_up 15 log_info in
@@ -1371,22 +1532,32 @@ module Propagation_heuristic =
                         let error,log_info =
                             if debug_mode
                             then
-                              (*let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nPropagate_up  (case 16):\n" in
+                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Propagate_up  (case 16):" in
+                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                               let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
-                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the event before is kept, there is an action and a test \n " in
-                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Test:" in
-                              let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) test in
-                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nbefore event Action: " in
-                              let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) action in
-                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nWire_state: " in
-                              let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nPrevious wire state: " in
-                              let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) preview_predicate_value in
-                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nSelect the event before (%i)" eid in
-                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\n" in
-                              let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***\n" in*)
+                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the event before is kept," in
+                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) " there is an action and a test" in
+                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Test:" in
+                              let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) test in
+                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Action: " in
+                              let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) action in
+                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
+                              let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Previous wire state: " in
+                              let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) preview_predicate_value in
+                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Select the event before (%i)" eid in
+                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+                              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                               error,log_info
-			    else
+                            else
                               error,log_info
                         in
                         let log_info = StoryProfiling.StoryStats.add_propagation_case_up 16 log_info in
@@ -1400,19 +1571,29 @@ module Propagation_heuristic =
                         let error,log_info =
                           if debug_mode
                           then
-                           (* let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nPropagate_up  (case 17):\n" in
+                            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Propagate_up  (case 17):" in
+                            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                             let error,log_info,() = print_event_case_address parameter handler log_info error blackboard  event_case_address in
-                            let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the event before is kept, there is an action and a test \n " in
-                            let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Test:" in
-                            let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) test in
-                            let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nbefore event Action: " in
-                            let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) action in
-                            let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nWire_state: " in
-                            let _ = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
-                            let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\nCut\n" in
-                            let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***\n" in*)
+                            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "we do not know if the event before is kept," in
+                            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) " there is an action and a test" in
+                            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Test:" in
+                            let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) test in
+                            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "before event Action: " in
+                            let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) action in
+                            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Wire_state: " in
+                            let () = B.PB.print_predicate_value (B.PB.CI.Po.K.H.get_debugging_channel parameter) predicate_value in
+                            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "Cut" in
+                            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+                            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+                            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
                             error,log_info
-			  else
+                          else
                             error,log_info
                         in
                         let log_info = StoryProfiling.StoryStats.add_propagation_case_up 17 log_info in
@@ -1440,7 +1621,7 @@ module Propagation_heuristic =
         B.refine
           parameter
           handler
-	  log_info
+          log_info
           error
           (B.exist case)
           (B.boolean (Some false))
@@ -1458,7 +1639,7 @@ module Propagation_heuristic =
             B.overwrite
               parameter
               handler
-	      log_info
+              log_info
               error
               (B.pointer_to_next pointer_previous)
               (B.pointer pointer_next)
@@ -1469,7 +1650,7 @@ module Propagation_heuristic =
             B.overwrite
               parameter
               handler
-	      log_info
+              log_info
               error
               (B.pointer_to_previous pointer_next)
               (B.pointer pointer_previous)
@@ -1561,7 +1742,7 @@ module Propagation_heuristic =
         B.refine
           parameter
           handler
-	  log_info
+          log_info
           error
           (B.exist case)
           (B.boolean (Some false))
@@ -1589,7 +1770,7 @@ module Propagation_heuristic =
               B.overwrite
                 parameter
                 handler
-		log_info
+                log_info
                 error
                 (B.pointer_to_next pointer_previous)
                 (B.pointer pointer_next)
@@ -1600,10 +1781,10 @@ module Propagation_heuristic =
               B.overwrite
                 parameter
                 handler
-		log_info
+                log_info
                 error
                 (B.pointer_to_previous pointer_next)
-                     (B.pointer pointer_previous)
+                (B.pointer pointer_previous)
                 blackboard
             in
             let propagate_list =
@@ -1621,8 +1802,8 @@ module Propagation_heuristic =
         B.refine
           parameter
           handler
-	  log_info
-	  error
+          log_info
+          error
           (B.exist case)
           (B.boolean (Some true))
           blackboard
@@ -1680,12 +1861,18 @@ module Propagation_heuristic =
         error,log_info,(blackboard,instruction_list,propagate_list,success)
       else
         let log_info = StoryProfiling.StoryStats.inc_selected_events log_info in
-        let _ =
+        let () =
           if debug_mode
           then
-            (* let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\n***\nWe keep event %i\n***\n" step_id in*)
+            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "We keep event %i" step_id in
+            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+            let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+            let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
             ()
-         in
+        in
         let error,log_info,blackboard = B.dec parameter handler log_info error (B.n_unresolved_events) blackboard  in
         let error,log_info,list = B.case_list_of_eid parameter handler log_info error blackboard step_id in
         let rec aux l x success =
@@ -1701,7 +1888,7 @@ module Propagation_heuristic =
                 else if B.is_succeeded success2
                 then aux q y success2
               else
-                  y,success2
+                y,success2
             end
         in
         let (error,log_info,blackboard,instruction_list,propagate_list),success = aux list (error,log_info,blackboard,instruction_list,propagate_list) B.ignore in
@@ -1714,42 +1901,48 @@ module Propagation_heuristic =
           (B.boolean (Some false))
           blackboard
       in
-          if B.is_failed success
-          then
-            error,log_info,(blackboard,[],[],success)
-          else if B.is_ignored success
-          then
-            error,log_info,(blackboard,instruction_list,propagate_list,success)
-          else
-            begin
-              let _ =
-                if debug_mode
-                then
-                  (*  let _ = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "\n***\nWe remove event %i\n***\n" step_id in*)
-                  ()
-              in
-              let log_info = g log_info in
-              let error,log_info,blackboard = B.dec parameter handler log_info error (B.n_unresolved_events) blackboard  in
-              let error,log_info,level = B.level_of_event parameter handler log_info error blackboard step_id in
-              let error,log_info,blackboard = B.dec parameter handler log_info error (B.n_unresolved_events_at_level  level) blackboard in
-              let error,log_info,list = B.case_list_of_eid parameter handler log_info error blackboard step_id in
-              let rec aux l x success =
-                match l
-                  with
-                    | [] -> x,success
-                    | t::q ->
-                      begin
-                        let y,success2 = f_case parameter handler t x in
-                        if B.is_ignored success2
-                        then aux q y success
-                        else if B.is_succeeded success2
-                        then aux q y success2
-                        else y,success2
-                      end
-              in
-              let (error,log_info,blackboard,instruction_list,propagate_list),success = aux list (error,log_info,blackboard,instruction_list,propagate_list) B.ignore in
-                error,log_info,(blackboard,instruction_list,propagate_list,success)
+      if B.is_failed success
+      then
+        error,log_info,(blackboard,[],[],success)
+      else if B.is_ignored success
+      then
+        error,log_info,(blackboard,instruction_list,propagate_list,success)
+      else
+        begin
+          let () =
+            if debug_mode
+            then
+              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "We remove event %i" step_id in
+              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+              let () = Loggers.fprintf (B.PB.CI.Po.K.H.get_debugging_channel parameter) "***" in
+              let () = Loggers.print_newline (B.PB.CI.Po.K.H.get_debugging_channel parameter) in
+              ()
+          in
+          let log_info = g log_info in
+          let error,log_info,blackboard = B.dec parameter handler log_info error (B.n_unresolved_events) blackboard  in
+          let error,log_info,level = B.level_of_event parameter handler log_info error blackboard step_id in
+          let error,log_info,blackboard = B.dec parameter handler log_info error (B.n_unresolved_events_at_level  level) blackboard in
+          let error,log_info,list = B.case_list_of_eid parameter handler log_info error blackboard step_id in
+          let rec aux l x success =
+            match l
+            with
+            | [] -> x,success
+            | t::q ->
+              begin
+                let y,success2 = f_case parameter handler t x in
+                if B.is_ignored success2
+                then aux q y success
+                else if B.is_succeeded success2
+                then aux q y success2
+                else y,success2
               end
+          in
+          let (error,log_info,blackboard,instruction_list,propagate_list),success = aux list (error,log_info,blackboard,instruction_list,propagate_list) B.ignore in
+          error,log_info,(blackboard,instruction_list,propagate_list,success)
+        end
 
     let cut_event = gen_event cut_case StoryProfiling.StoryStats.inc_cut_events
     let discard_event = gen_event discard_case StoryProfiling.StoryStats.inc_removed_events
