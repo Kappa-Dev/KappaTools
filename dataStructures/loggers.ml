@@ -237,11 +237,9 @@ let formatter_of_logger logger =
 let redirect logger fmt =
   {logger with logger = Formatter fmt}
 
-let print_as_logger logger f =
-  let _ = Format.flush_str_formatter () in
-  let () = f Format.str_formatter in
-  fprintf logger "%s" (Format.flush_str_formatter ())
-
+let print_as_logger logger f = 
+  fprintf logger "%t" f
+    
 let flush_buffer logger fmt =
   match
     logger.logger
