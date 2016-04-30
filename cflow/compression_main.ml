@@ -48,11 +48,10 @@ let always = (fun _ -> true)
 let do_not_log parameter = (S.PH.B.PB.CI.Po.K.H.set_log_step parameter false)
 
 
-let compress_and_print ~called_from env log_info step_list =
+let compress_and_print ~called_from ?js_interface env log_info step_list =
   let parameter = S.PH.B.PB.CI.Po.K.H.build_parameter ~called_from in
   let parameter = S.PH.B.PB.CI.Po.K.H.set_log_step parameter log_step in
   let parameter = S.PH.B.PB.CI.Po.K.H.set_debugging_mode parameter debug_mode in
-  (* let parameter = S.PH.B.PB.CI.Po.K.H.set_logger parameter logger in*)
   let parameter =
     match
       max_number_of_itterations
@@ -82,6 +81,28 @@ let compress_and_print ~called_from env log_info step_list =
   let error,log_info,table2 = U.create_story_table parameter handler log_info error in
   let error,log_info,table3 = U.create_story_table parameter handler log_info error in
   let error,log_info,table4 = U.create_story_table parameter handler log_info error in
+  let () = Cflow_js_interface.save_causal_flow_table js_interface table1 in
+  let () = Cflow_js_interface.save_trivial_compression_table js_interface table2 in
+  let () = Cflow_js_interface.save_weak_compression_table js_interface table3 in
+  let () = Cflow_js_interface.save_strong_compression_table js_interface table4 in
+  let () = Cflow_js_interface.redirect_std_buffer js_interface (Some (S.PH.B.PB.CI.Po.K.H.get_logger parameter)) in
+  let () = Cflow_js_interface.redirect_err_buffer js_interface (Some (S.PH.B.PB.CI.Po.K.H.get_debugging_channel parameter)) in
+  let () = Cflow_js_interface.redirect_profiling_buffer js_interface (Some (S.PH.B.PB.CI.Po.K.H.get_profiling_logger parameter)) in
+  let () = Cflow_js_interface.redirect_branch_and_cut_buffer js_interface (Some (Remanent_parameters.get_compression_status_logger (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter))) in
+  let parameter =
+    match
+      js_interface
+    with
+    | None -> parameter
+    | Some js_interface_ptr ->
+      begin
+        let parameter = S.PH.B.PB.CI.Po.K.H.set_save_current_phase_title parameter (fun s -> Cflow_js_interface.save_current_phase_title js_interface s) in
+        let parameter = S.PH.B.PB.CI.Po.K.H.set_reset_current_phase_title parameter (fun () -> Cflow_js_interface.reset_current_phase_title js_interface) in
+        let parameter = S.PH.B.PB.CI.Po.K.H.set_save_progress_bar parameter (fun bar -> Cflow_js_interface.save_progress_bar js_interface bar) in
+        let parameter = S.PH.B.PB.CI.Po.K.H.set_reset_progress_bar  parameter (fun () -> Cflow_js_interface.reset_progress_bar js_interface) in
+        parameter
+      end
+  in
   let empty_compression = table1,table2,table3,table4 in
   let step_list = U.trace_of_pretrace step_list in
   let causal,trivial,weak,strong =
@@ -205,32 +226,34 @@ let compress_and_print ~called_from env log_info step_list =
           in
 	  (* Now causal compression, with detection of siphons & detection of pseudo inverse events *)
 	  let one_iteration_of_compression (log_info,error,event_list) =
-	    let error,log_info,event_list =
+     let error,log_info,event_list =
 	      if Graph_closure.ignore_flow_from_outgoing_siphon
 	      then
-		U.fill_siphon parameter ~shall_we_compute:always ~shall_we_compute_profiling_information:always handler log_info error event_list
+         U.fill_siphon parameter ~shall_we_compute:always ~shall_we_compute_profiling_information:always handler log_info error event_list
 	      else
-		error,log_info,event_list
-	    in
-	    let () =
-	      if debug_mode then
-		U.print_trace parameter handler event_list
-	    in
-	    let error,log_info,event_list =
-	      if  Parameter.do_global_cut
-	      then
-		U.cut parameter ~shall_we_compute:always ~shall_we_compute_profiling_information:always handler log_info error event_list
-	    else
+         error,log_info,event_list
+     in
+     let () =
+       if debug_mode then
+         U.print_trace parameter handler event_list
+     in
+     let error,log_info,event_list =
+       if Parameter.do_global_cut
+       then
+         U.cut parameter ~shall_we_compute:always ~shall_we_compute_profiling_information:always handler log_info error event_list
+       else
 	      error,log_info,event_list
-	    in
-	    if Parameter.cut_pseudo_inverse_event
-	    then
-	      U.remove_pseudo_inverse_events parameter ~shall_we_compute:always ~shall_we_compute_profiling_information:always handler log_info error event_list
-	    else
-              error,log_info,event_list
+     in
+     if Parameter.cut_pseudo_inverse_event
+     then
+       U.remove_pseudo_inverse_events parameter ~shall_we_compute:always ~shall_we_compute_profiling_information:always handler log_info error event_list
+     else
+       error,log_info,event_list
           in
-	  (* This fonction iter the causal compression until a fixpoint is reached *)
-	  let rec aux k (error,log_info,event_list) =
+
+          (* This fonction iter the causal compression until a fixpoint is reached *)
+          let rec aux k (error,log_info,event_list) =
+
 	    match
 	      S.PH.B.PB.CI.Po.K.H.get_bound_on_itteration_number parameter
 	    with
@@ -286,16 +309,19 @@ let compress_and_print ~called_from env log_info step_list =
 			let error,log_info,blacklist,table3 =
 			  List.fold_left
 			    (fun (error,log_info,blacklist,table3) trace ->
-			      let error,log_info,table3 =
-				U.store_trace parameter handler log_info error trace info table3
-			      in
-			      let error,log_info,black_list =
-				U.black_list parameter handler log_info error trace blacklist
-			      in
-			      error,log_info,blacklist,table3)
-			      (error,log_info,blacklist,table3)
-			    list
-			in error,log_info,(blacklist,table2,table3))
+          let error,log_info,table3 =
+           U.store_trace parameter handler log_info error trace info table3
+          in
+          let error,log_info,black_list =
+            U.black_list parameter handler log_info error trace blacklist
+          in
+          error,log_info,blacklist,table3)
+       (error,log_info,blacklist,table3)
+       list
+      in
+      let () = Cflow_js_interface.save_trivial_compression_table js_interface table2 in
+      let () = Cflow_js_interface.save_weak_compression_table js_interface table3 in
+      error,log_info,(blacklist,table2,table3))
 		      step_list
 		      (blacklist,table2,table3)
 		  in
@@ -305,7 +331,9 @@ let compress_and_print ~called_from env log_info step_list =
 		  let error,log_info,weak_story_table =
 		    U.flatten_story_table parameter handler log_info error weak_story_table
 		  in
-		  error,log_info,causal_story_table,weak_story_table
+      let () = Cflow_js_interface.save_trivial_compression_table js_interface causal_story_table in
+      let () = Cflow_js_interface.save_weak_compression_table js_interface weak_story_table in
+    error,log_info,causal_story_table,weak_story_table
 		end
 	      else
 		begin
@@ -324,20 +352,27 @@ let compress_and_print ~called_from env log_info step_list =
 			(* we compute causal compression *)
 			U.cut (do_not_log parameter) ~shall_we_compute:always ~shall_we_compute_profiling_information:always handler log_info error trace
 		      )
-		      U.store_trace
+        (fun parameter
+          ?shall_we_compute
+          ?shall_we_compute_profiling_information
+          handler log_info error info trace table ->
+          let error, info, table = U.store_trace parameter handler log_info error info trace table in
+           let () = Cflow_js_interface.save_trivial_compression_table js_interface table in
+           error, info, table)
 		      step_list
 		      table2
 		  in
 		  let error,log_info,causal_story_table =
 		    U.flatten_story_table  parameter handler log_info error causal_story_table
 		  in
-		  let _ = print_newline () in
+      let () = Cflow_js_interface.save_trivial_compression_table js_interface causal_story_table in
+      let _ = print_newline () in
 		  let _ = print_newline () in
 		  let n_causal_stories = U.count_stories causal_story_table in
 		  let error,log_info,weakly_story_table =
 		    begin
 		      let () =
-			Loggers.fprintf (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
+          Loggers.fprintf (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
 					"\t - weak flow compression (%i)@."
 					n_causal_stories in
 		      let blacklist = U.create_black_list (last_eid+1) in
@@ -350,7 +385,9 @@ let compress_and_print ~called_from env log_info step_list =
 			    List.fold_left
 			      (fun (error,log_info,blacklist,story_list) trace ->
 				let error,log_info,story_list = U.store_trace parameter handler log_info error trace list_info story_list in
-				error,log_info,blacklist,story_list)
+        let () = Cflow_js_interface.save_weak_compression_table js_interface story_list in
+    error,log_info,blacklist,story_list)
+
 			      (error,log_info,blacklist,story_list)
 			      list
 			  in error,log_info,(blacklist,story_list))
@@ -359,7 +396,8 @@ let compress_and_print ~called_from env log_info step_list =
 		      in
 		    U.flatten_story_table parameter handler log_info error weakly_story_table
 		    end
-		  in
+    in
+    let () = Cflow_js_interface.save_weak_compression_table js_interface weakly_story_table in
 		  error,log_info,causal_story_table,weakly_story_table
 		end
 	    else
@@ -436,4 +474,3 @@ let compress_and_print ~called_from env log_info step_list =
     Exception.print_for_KaSim (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error
   in
   ()
-

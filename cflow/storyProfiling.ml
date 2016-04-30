@@ -227,7 +227,7 @@ module StoryStats =
            propagation: int array ;
            last_tick:float;
            compression_mode_has_been_checked: bool;
-         }
+       }
 
        let is_dummy step_kind =
          match

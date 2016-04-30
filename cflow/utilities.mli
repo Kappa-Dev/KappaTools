@@ -61,7 +61,7 @@ type trace_runtime_info = profiling_info Mods.simulation_info
 val size_of_pretrace: trace -> int
 
 val last_eid_in_pretrace: trace -> int
-				     
+
 val print_trace: parameter -> kappa_handler -> trace -> unit
 
 (** check wether there is an observable in a trace *)
@@ -73,14 +73,14 @@ val trace_of_pretrace: S.PH.B.PB.CI.Po.K.refined_step list -> trace
 (** conversely, convert a trace in a list of refined steps *)
 val get_pretrace_of_trace: trace -> S.PH.B.PB.CI.Po.K.refined_step list
 
-(** get the date of an event in the simulation 
+(** get the date of an event in the simulation
     (only proper events have a time) *)
 val get_simulation_time_of_event: S.PH.B.PB.CI.Po.K.refined_step -> float option
 
 (** get the id of an event in the simulation
     (only proper events have an id) *)
-val get_id_of_event: S.PH.B.PB.CI.Po.K.refined_step -> int option							       
-								
+val get_id_of_event: S.PH.B.PB.CI.Po.K.refined_step -> int option
+
 (** remove the events after the last observable *)
 val remove_events_after_last_obs: (trace,trace) unary
 
@@ -130,12 +130,12 @@ val fold_over_the_causal_past_of_observables_with_a_progress_bar:
    (trace,trace_runtime_info list,'a,('a,'b) Stop.stop) ternary,
    trace,'a,('a,'b*int) Stop.stop) sexternary
 
-type black_list				   
+type black_list
 val create_black_list: int -> black_list
 val black_list: (trace,black_list,black_list) binary
 val remove_blacklisted_event: (black_list,trace,trace) binary
-									
-				   
+
+
 (** Story table *)
 type story_table
 
@@ -224,5 +224,3 @@ val print_musical_grid:
 
 
 val get_counter: story_table -> int (* to be removed from the interface*)
-
-

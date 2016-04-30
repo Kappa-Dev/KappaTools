@@ -93,7 +93,7 @@ let get_debugging_mode = S.PH.B.PB.CI.Po.K.H.get_debugging_mode
 let get_logger = S.PH.B.PB.CI.Po.K.H.get_logger*)
 let get_id_of_event = S.PH.B.PB.CI.Po.K.get_id_of_refined_step
 let get_simulation_time_of_event = S.PH.B.PB.CI.Po.K.get_time_of_refined_step
-			  
+
 let dummy_log = fun p -> p
 
 let extend_trace_with_dummy_side_effects l = List.rev_map (fun a -> a,[]) (List.rev l)
@@ -475,7 +475,7 @@ let fold_story_table_gen logger parameter ?(shall_we_compute=we_shall) ?(shall_w
 let fold_story_table_with_progress_bar parameter ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall) (handler:kappa_handler) profiling_info error s
 				        f l a =
   fold_story_table_gen
-    (*(Some (S.PH.B.PB.CI.Po.K.H.get_logger parameter))*) None 
+    (*(Some (S.PH.B.PB.CI.Po.K.H.get_logger parameter))*) None
     parameter
     ~shall_we_compute:shall_we_compute
     ~shall_we_compute_profiling_information:shall_we_compute_profiling_information
@@ -791,7 +791,7 @@ module Event =
     let set t eid value =
       let () = Array.set t eid value in
       t
-	
+
     let get t eid = Array.get t eid
   end: Black_list.Event with type event = step)
 
@@ -800,7 +800,7 @@ module BlackList =
 type black_list = BlackList.t
 
 let create_black_list n = BlackList.init n
-					
+
 let black_list parameter ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall) handler log_info error trace blacklist =
   let blacklist =
     List.fold_left

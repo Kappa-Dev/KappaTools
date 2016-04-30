@@ -1,7 +1,7 @@
 module type Cflow_handler =
   sig
     (** a struct which contains parameterizable options *)
-    type parameter  =
+    type parameter =
         {
           cache_size : int option ;
           current_compression_mode: Parameter.current_compression_mode option;
@@ -21,8 +21,13 @@ module type Cflow_handler =
 	  always_disambiguate_initial_states : bool  ;
 	  bound_on_itteration_number: int option ;
 	  time_independent: bool ;
-	  blacklist_events: bool ;
-	}
+   blacklist_events: bool ;
+   save_current_phase_title: string -> unit ;
+    reset_current_phase_title: unit -> unit ;
+    save_progress_bar: (bool*int*int) -> unit ;
+    reset_progress_bar: unit -> unit
+
+          }
 
     type handler =   (*handler to interpret abstract values*)
         {
@@ -73,6 +78,14 @@ module type Cflow_handler =
     val get_predicate_map: handler -> (int * Predicate_maps.predicate_value * bool) list Predicate_maps.QPredicateMap.t
     val get_is_time_independent: parameter -> bool
     val get_blacklist_events: parameter -> bool
+    val save_current_phase_title: parameter -> string -> unit
+    val reset_current_phase_title: parameter -> unit
+    val save_progress_bar: parameter -> (bool*int*int) -> unit
+    val reset_progress_bar: parameter -> unit
+    val set_save_current_phase_title: parameter -> (string -> unit) -> parameter
+    val set_reset_current_phase_title: parameter -> (unit -> unit) -> parameter
+    val set_save_progress_bar: parameter -> ((bool*int*int) -> unit) -> parameter
+    val set_reset_progress_bar: parameter -> (unit -> unit) -> parameter
   end
 
 module Cflow_handler:Cflow_handler

@@ -23,4 +23,5 @@ val secret_store_obs :
 
 val compress_and_print :
   called_from:Remanent_parameters_sig.called_from ->
+  ?js_interface:Cflow_js_interface.cflow_state ref -> 
   Environment.t -> secret_log_info -> secret_step list -> unit

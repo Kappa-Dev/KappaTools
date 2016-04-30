@@ -44,7 +44,13 @@ module type Cflow_handler =
 	  always_disambiguate_initial_states : bool  ;
 	  bound_on_itteration_number: int option ;
 	  time_independent: bool ;
-	  blacklist_events: bool ;
+   blacklist_events: bool ;
+   save_current_phase_title: string -> unit ;
+    reset_current_phase_title: unit -> unit ;
+    save_progress_bar: (bool*int*int) -> unit ;
+    reset_progress_bar: unit -> unit ;
+
+
 	}
     type handler =   (*handler to interpret abstract values*)
         {
@@ -96,6 +102,15 @@ module type Cflow_handler =
     val get_predicate_map: handler ->  (int * Predicate_maps.predicate_value * bool) list Predicate_maps.QPredicateMap.t
     val get_is_time_independent: parameter -> bool
     val get_blacklist_events: parameter -> bool
+    val save_current_phase_title: parameter -> string -> unit
+    val reset_current_phase_title: parameter -> unit
+    val save_progress_bar: parameter -> (bool*int*int) -> unit
+    val reset_progress_bar: parameter -> unit
+    val set_save_current_phase_title: parameter -> (string -> unit) -> parameter
+    val set_reset_current_phase_title: parameter -> (unit -> unit) -> parameter
+    val set_save_progress_bar: parameter -> ((bool*int*int) -> unit) -> parameter
+    val set_reset_progress_bar: parameter -> (unit -> unit) -> parameter
+
   end
 
 
@@ -121,7 +136,11 @@ module Cflow_handler =
 	  always_disambiguate_initial_states : bool  ;
 	  bound_on_itteration_number: int option ;
 	  time_independent: bool ;
-	  blacklist_events: bool ;
+   blacklist_events: bool ;
+   save_current_phase_title: string -> unit ;
+    reset_current_phase_title: unit -> unit ;
+    save_progress_bar: (bool*int*int) -> unit ;
+    reset_progress_bar: unit -> unit
 	}
 
     let build_parameter ~called_from =
@@ -159,11 +178,15 @@ module Cflow_handler =
 	log_step = true ;
 	logger_step = log_step_channel ;
 	kasa = Remanent_parameters.get_parameters ~called_from () ;
-	always_disambiguate_initial_states = true ;
-	bound_on_itteration_number = None ;
-	time_independent = !Parameter.time_independent ;
-	blacklist_events = !Parameter.blacklist_events ;
-    }
+ always_disambiguate_initial_states = true ;
+ bound_on_itteration_number = None ;
+ time_independent = !Parameter.time_independent ;
+ blacklist_events = !Parameter.blacklist_events ;
+ save_current_phase_title = (fun _ -> ());
+ reset_current_phase_title = (fun _ -> ());
+ reset_progress_bar = (fun _ -> ());
+ save_progress_bar = (fun _ -> ())
+      }
 
     let set_compression_weak p =
       {p with current_compression_mode = Some Parameter.Weak}
@@ -256,5 +279,13 @@ module Cflow_handler =
    let get_predicate_map handler = handler.steps_by_column
    let get_is_time_independent parameter = parameter.time_independent
    let get_blacklist_events parameter = parameter.blacklist_events
-end:Cflow_handler)
+   let save_current_phase_title parameter x = parameter.save_current_phase_title x
+   let save_progress_bar parameter x = parameter.save_progress_bar x
+   let reset_progress_bar parameter = parameter.reset_progress_bar ()
+   let reset_current_phase_title parameter = parameter.reset_current_phase_title ()
+   let set_save_current_phase_title parameter f = {parameter with save_current_phase_title = f}
+   let set_reset_current_phase_title parameter f = {parameter with reset_current_phase_title = f}
+   let set_save_progress_bar parameter f = {parameter with save_progress_bar = f}
+   let set_reset_progress_bar parameter f = {parameter with reset_progress_bar = f}
 
+end:Cflow_handler)
