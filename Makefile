@@ -128,7 +128,7 @@ WebSim.native: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GEN
 	$@
 
 bin/%: %.native Makefile
-	[ -d bin ] || mkdir bin && cp $< $@
+	[ -d bin ] || mkdir bin && strip -o $@ $<
 	rm -f $(notdir $@) && ln -s $@ $(notdir $@)
 
 
@@ -173,7 +173,7 @@ clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch clean_doc
 	"$(OCAMLBINPATH)ocamlbuild" -clean
 	rm -f $(VERSION) $(RESOURCE)
 	rm -f sanity_test bin/sanity_test
-	rm -f KaSim bin/KaSim KaSa bin/KaSa
+	rm -f KaSim bin/KaSim KaSa bin/KaSa WebSim bin/WebSim
 	rm -rf site generated
 	find . -name \*~ -delete
 	+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite clean
