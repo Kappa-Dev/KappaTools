@@ -337,13 +337,7 @@ birate:
     | AT rate COMMA rate {let (k2,k1) = $2 in 
 			  let (kback,kback1) = $4 in
 			  (k2,k1,Some kback,kback1)}
-    | {let pos =
-         Location.of_pos (Parsing.symbol_start_pos ()) (Parsing.symbol_end_pos ()) in
-       let () = ExceptionDefn.warning
-		  ~pos
-		  (fun f -> Format.pp_print_string
-			      f "Rule has no kinetics. Default rate of 0.0 is assumed.") in
-       (Location.dummy_annot (Ast.CONST (Nbr.F 0.)),None,None,None)}
+    | {raise (ExceptionDefn.Syntax_Error (add_pos "rule rate expected"))}
     ;
 
 rate:
