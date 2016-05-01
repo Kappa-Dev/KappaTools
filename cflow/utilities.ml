@@ -428,13 +428,7 @@ let tick_opt parameter bar =
   | None -> bar
   | Some (logger,n,bar) -> Some (logger,n,Mods.tick_stories logger (S.PH.B.PB.CI.Po.K.H.save_progress_bar parameter) n bar)
 
-let close_progress_bar_opt logger =
-  match
-    logger
-  with
-  | None -> ()
-  | Some logger -> Format.pp_print_newline logger ()
-
+let close_progress_bar_opt logger = Loggers.print_newline logger
 
 let print_fails logger s n =
   match
@@ -453,9 +447,6 @@ let fold_story_table_gen logger parameter ?(shall_we_compute=we_shall) ?(shall_w
 			 (f:((trace, trace_runtime_info list, 'a, 'a) ternary)) l a =
   let n_stories_input = count_stories l in
   let progress_bar =
-    match logger
-    with None -> None
-       | Some logger ->
          Some (logger,n_stories_input,Mods.tick_stories logger (S.PH.B.PB.CI.Po.K.H.save_progress_bar parameter) n_stories_input (false,0,0))
   in
   let g parameter handler profiling_info error story info (k,progress_bar,a,n_fails) =
@@ -475,14 +466,14 @@ let fold_story_table_gen logger parameter ?(shall_we_compute=we_shall) ?(shall_w
 let fold_story_table_with_progress_bar parameter ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall) (handler:kappa_handler) profiling_info error s
 				        f l a =
   fold_story_table_gen
-    (*(Some (S.PH.B.PB.CI.Po.K.H.get_logger parameter))*) None
+    (*(Some (S.PH.B.PB.CI.Po.K.H.get_logger parameter))*) Loggers.dummy_txt_logger
     parameter
     ~shall_we_compute:shall_we_compute
     ~shall_we_compute_profiling_information:shall_we_compute_profiling_information
     handler profiling_info error s f l a
 let fold_story_table_without_progress_bar parameter ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall) handler profiling_info error s f l a =
   fold_story_table_gen
-    None
+    Loggers.dummy_txt_logger
     parameter
     ~shall_we_compute:shall_we_compute
     ~shall_we_compute_profiling_information:shall_we_compute_profiling_information

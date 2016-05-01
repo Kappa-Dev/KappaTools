@@ -137,7 +137,6 @@ let merge_list_decreasing = merge_list (swap compare_bool)
 
 let closure_bottom_up_with_fold parameter handler log_info error event config prec is_obs f a  =
   let err_logger = Remanent_parameters.get_logger parameter in
-  let err_fmt = Loggers.formatter_of_logger err_logger in
   let is_obs = if config.keep_all_nodes then (fun _ -> true) else is_obs in
   let max_index = M.fold (fun i _ -> max i) prec 0 in
   let () =
@@ -154,18 +153,12 @@ let closure_bottom_up_with_fold parameter handler log_info error event config pr
     if max_index > 300 && config.do_tick
     then
       begin
-	match
-	  err_fmt
-	with
-	| None ->
-	  (fun x -> x),(false,0,0),(fun () -> ())
-	| Some err_fmt ->
-   let tick = Mods.tick_stories err_fmt (Remanent_parameters.save_progress_bar parameter) max_index (false,0,0) in
-   let f = Mods.tick_stories err_fmt (Remanent_parameters.save_progress_bar parameter) max_index in
-	  let close = Format.pp_print_newline err_fmt in
-	  f,
-	  tick,
-	  close
+        let tick = Mods.tick_stories err_logger (Remanent_parameters.save_progress_bar parameter) max_index (false,0,0) in
+        let f = Mods.tick_stories err_logger (Remanent_parameters.save_progress_bar parameter) max_index in
+        let close () = Loggers.print_newline err_logger in
+        f,
+        tick,
+        close
       end
     else
       (fun x -> x),(false,0,0),(fun () -> ())
@@ -175,7 +168,7 @@ let closure_bottom_up_with_fold parameter handler log_info error event config pr
     begin
       let max_succ = A.init (max_index+1) (fun i -> i) in
       let _ =
-	M.iter
+        M.iter
           (fun succ ->
            S.iter
              (fun pred ->
@@ -293,7 +286,6 @@ let closure_bottom_up parameter handler log_info error event_opt config prec is_
 
 let closure_top_down parameter handler log_info error event_opt config prec is_obs  delta =
   let err_logger = Remanent_parameters.get_logger parameter in
-  let err_fmt = Loggers.formatter_of_logger err_logger in
   let is_obs = if config.keep_all_nodes then (fun _ -> true) else is_obs in
   let max_index = M.fold (fun i _ -> max i) prec 0 in
   let prec =
@@ -332,15 +324,10 @@ let closure_top_down parameter handler log_info error event_opt config prec is_o
   let do_tick,tick,close_tick =
     if max_index > 300 && config.do_tick
     then
-      match
-	err_fmt
-      with
-      | None -> (fun x->x),(false,0,0),(fun () -> ())
-      | Some err_fmt ->
-        let tick = Mods.tick_stories err_fmt (Remanent_parameters.save_progress_bar parameter) max_index (false,0,0) in
-        let f = Mods.tick_stories err_fmt  (Remanent_parameters.save_progress_bar parameter) max_index in
-        let close = Format.pp_print_newline err_fmt in
-        f,tick,close
+      let tick = Mods.tick_stories err_logger (Remanent_parameters.save_progress_bar parameter) max_index (false,0,0) in
+      let f = Mods.tick_stories err_logger  (Remanent_parameters.save_progress_bar parameter) max_index in
+      let close () = Loggers.print_newline err_logger in
+      f,tick,close
     else
       (fun x -> x),(false,0,0),(fun () -> ())
   in

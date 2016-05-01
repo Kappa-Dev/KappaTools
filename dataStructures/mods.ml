@@ -60,12 +60,12 @@ let tick_stories f save_progress_bar n_stories (init,last,counter) =
   let () =
     if not init then
       let c = ref !Parameter.progressBarSize in
-      let () = Format.pp_print_newline f () in
+      let () = Loggers.print_newline f in
       while !c > 0 do
-	Format.pp_print_string f "_" ;
-	c:=!c-1
+        Loggers.fprintf  f "_" ;
+        c:=!c-1
       done ;
-      Format.pp_print_newline f ()
+      Loggers.print_newline f
   in
   let n =
     if n_stories <=0 && counter = 0
@@ -80,13 +80,13 @@ let tick_stories f save_progress_bar n_stories (init,last,counter) =
   let rec aux n =
     if n<=0 then ()
     else
-      let () = Format.fprintf f "%c" (!Parameter.progressBarSymbol) in
-      let () = if !Parameter.eclipseMode then Format.pp_print_newline f () in
+      let () = Loggers.fprintf f "%c" (!Parameter.progressBarSymbol) in
+      let () = if !Parameter.eclipseMode then Loggers.print_newline f in
       aux (n-1)
   in
   let () = aux n in
-  let () =  Format.pp_print_flush f () in
-  let () = if counter = n_stories then Format.pp_print_newline f () in
+  let () = Loggers.flush_logger f in
+  let () = if counter = n_stories then Loggers.print_newline f in
   let bar = (true,counter,counter+1) in
   let () = save_progress_bar bar in
   bar
