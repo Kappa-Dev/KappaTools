@@ -4,7 +4,7 @@ let usage_msg =
 
 let (maxEventValue:int option ref) = ref None
 let (maxTimeValue:float option ref) = ref None
-let (pointNumberValue:int ref) = ref 0
+let (pointNumberValue:int ref) = ref (-1)
 let (rescale:float option ref) = ref None
 
 let () =

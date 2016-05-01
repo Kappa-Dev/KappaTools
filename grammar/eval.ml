@@ -533,7 +533,7 @@ let initialize logger ?rescale_init sigs_nd tk_nd contact_map counter result =
     obs_of_result contact_map counter domain result in
   let () =
     match obs with
-    | (_,pos) :: _ when Counter.plot_points counter = 0
+    | (_,pos) :: _ when Counter.plot_points counter < 0
 			&& not @@ Primitives.exists_modification
 				    (fun x -> x = Primitives.PLOTENTRY) pert ->
        raise (ExceptionDefn.Malformed_Decl
