@@ -25,8 +25,8 @@ module type Cflow_handler =
    save_current_phase_title: string -> unit ;
     reset_current_phase_title: unit -> unit ;
     save_progress_bar: (bool*int*int) -> unit ;
-    reset_progress_bar: unit -> unit
-
+    reset_progress_bar: unit -> unit ;
+    save_error_log: Exception_without_parameter.method_handler -> unit ;
           }
 
     type handler =   (*handler to interpret abstract values*)
@@ -82,6 +82,7 @@ module type Cflow_handler =
     val reset_current_phase_title: parameter -> unit
     val save_progress_bar: parameter -> (bool*int*int) -> unit
     val reset_progress_bar: parameter -> unit
+    val save_error_log: parameter -> Exception_without_parameter.method_handler -> unit
     val set_save_current_phase_title: parameter -> (string -> unit) -> parameter
     val set_reset_current_phase_title: parameter -> (unit -> unit) -> parameter
     val set_save_progress_bar: parameter -> ((bool*int*int) -> unit) -> parameter
