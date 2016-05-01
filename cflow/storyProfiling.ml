@@ -262,6 +262,7 @@ module StoryStats =
            let _ = print_task parameter terminated_task in
            let _ = Loggers.close_row (Remanent_parameters.get_profiler parameter) in
            let _ = flush_logger  parameter in
+           let () = Remanent_parameters.save_current_phase_title parameter (string_of_step_kind step_kind) in
            let current_task = task::log_info.current_task in
            error,
            { log_info

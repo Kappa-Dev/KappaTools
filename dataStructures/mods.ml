@@ -30,7 +30,7 @@ type 'a simulation_info = (* type of data to be given with observables for story
 
 let event_of_simulation_info a = a.story_event
 let story_id_of_simulation_info a = a.story_id
-      
+
 module Palette:
 	sig
 	  type t
@@ -56,7 +56,7 @@ module Palette:
 	  let string_of_color (r,g,b) = String.concat "," (List.rev_map string_of_float [b;g;r])
 	end
 
-let tick_stories f n_stories (init,last,counter) =
+let tick_stories f save_progress_bar n_stories (init,last,counter) =
   let () =
     if not init then
       let c = ref !Parameter.progressBarSize in
@@ -72,7 +72,7 @@ let tick_stories f n_stories (init,last,counter) =
     then !Parameter.progressBarSize
     else if counter > n_stories
     then 0
-    else 
+    else
       let nc = (counter * !Parameter.progressBarSize) / n_stories in
       let nl = (last * !Parameter.progressBarSize) / n_stories in
       nc - nl
@@ -87,13 +87,15 @@ let tick_stories f n_stories (init,last,counter) =
   let () = aux n in
   let () =  Format.pp_print_flush f () in
   let () = if counter = n_stories then Format.pp_print_newline f () in
-  (true,counter,counter+1)
+  let bar = (true,counter,counter+1) in
+  let () = save_progress_bar bar in
+  bar
 
-let update_profiling_info a info = 
-  { 
+let update_profiling_info a info =
+  {
     story_id = info.story_id ;
     story_time = info.story_time ;
     story_event = info.story_event ;
     profiling_info = a}
 
-let compare_profiling_info info1 info2 = compare info1.story_id info2.story_id 
+let compare_profiling_info info1 info2 = compare info1.story_id info2.story_id

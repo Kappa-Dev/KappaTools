@@ -22,11 +22,7 @@ module type Cflow_handler =
 	  bound_on_itteration_number: int option ;
 	  time_independent: bool ;
    blacklist_events: bool ;
-   save_current_phase_title: string -> unit ;
-    reset_current_phase_title: unit -> unit ;
-    save_progress_bar: (bool*int*int) -> unit ;
-    reset_progress_bar: unit -> unit ;
-          }
+        }
 
     type handler =   (*handler to interpret abstract values*)
         {

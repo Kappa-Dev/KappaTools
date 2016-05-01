@@ -100,6 +100,7 @@ let compress_and_print ~called_from ?js_interface env log_info step_list =
         let parameter = S.PH.B.PB.CI.Po.K.H.set_reset_current_phase_title parameter (fun () -> Cflow_js_interface.reset_current_phase_title js_interface) in
         let parameter = S.PH.B.PB.CI.Po.K.H.set_save_progress_bar parameter (fun bar -> Cflow_js_interface.save_progress_bar js_interface bar) in
         let parameter = S.PH.B.PB.CI.Po.K.H.set_reset_progress_bar  parameter (fun () -> Cflow_js_interface.reset_progress_bar js_interface) in
+        let parameter = S.PH.B.PB.CI.Po.K.H.set_save_error_log parameter (fun error -> Cflow_js_interface.save_error_list js_interface error) in
         parameter
       end
   in

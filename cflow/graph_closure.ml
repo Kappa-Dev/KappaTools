@@ -160,8 +160,8 @@ let closure_bottom_up_with_fold parameter handler log_info error event config pr
 	| None ->
 	  (fun x -> x),(false,0,0),(fun () -> ())
 	| Some err_fmt ->
-	  let tick = Mods.tick_stories err_fmt max_index (false,0,0) in
-	  let f = Mods.tick_stories err_fmt max_index in
+   let tick = Mods.tick_stories err_fmt (Remanent_parameters.save_progress_bar parameter) max_index (false,0,0) in
+   let f = Mods.tick_stories err_fmt (Remanent_parameters.save_progress_bar parameter) max_index in
 	  let close = Format.pp_print_newline err_fmt in
 	  f,
 	  tick,
@@ -337,10 +337,10 @@ let closure_top_down parameter handler log_info error event_opt config prec is_o
       with
       | None -> (fun x->x),(false,0,0),(fun () -> ())
       | Some err_fmt ->
-	let tick = Mods.tick_stories err_fmt max_index (false,0,0) in
-	let f = Mods.tick_stories err_fmt max_index in
-	let close = Format.pp_print_newline err_fmt in
-	f,tick,close
+        let tick = Mods.tick_stories err_fmt (Remanent_parameters.save_progress_bar parameter) max_index (false,0,0) in
+        let f = Mods.tick_stories err_fmt  (Remanent_parameters.save_progress_bar parameter) max_index in
+        let close = Format.pp_print_newline err_fmt in
+        f,tick,close
     else
       (fun x -> x),(false,0,0),(fun () -> ())
   in
@@ -411,7 +411,7 @@ let closure parameter handler log_info error event_opt config prec is_obs =
   | Check -> closure_check parameter handler log_info error event_opt config prec is_obs
   | Bottom_up -> closure_bottom_up parameter handler log_info error event_opt config prec is_obs
   | Top_down -> closure_top_down parameter handler log_info error event_opt config prec is_obs 0
-		
+
 
 let reduction_top_down parameter handler log_info error prec =
   let error,log_info = StoryProfiling.StoryStats.add_event parameter error StoryProfiling.Graph_reduction None log_info in
@@ -442,4 +442,4 @@ let reduction_top_down parameter handler log_info error prec =
   let error,log_info = StoryProfiling.StoryStats.close_event parameter error StoryProfiling.Graph_reduction None log_info in
   error,log_info,output
 
-let reduction = reduction_top_down 	
+let reduction = reduction_top_down

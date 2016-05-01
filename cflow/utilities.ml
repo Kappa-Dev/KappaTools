@@ -421,12 +421,12 @@ let get_trace_of_story (_,_,_,y,_) = trace_of_pretrace y
 let get_info_of_story (_,_,_,_,t) = t
 
 
-let tick_opt bar =
+let tick_opt parameter bar =
   match
     bar
   with
   | None -> bar
-  | Some (logger,n,bar) -> Some (logger,n,Mods.tick_stories logger n bar)
+  | Some (logger,n,bar) -> Some (logger,n,Mods.tick_stories logger (S.PH.B.PB.CI.Po.K.H.save_progress_bar parameter) n bar)
 
 let close_progress_bar_opt logger =
   match
@@ -456,18 +456,18 @@ let fold_story_table_gen logger parameter ?(shall_we_compute=we_shall) ?(shall_w
     match logger
     with None -> None
        | Some logger ->
-	  Some (logger,n_stories_input,Mods.tick_stories logger n_stories_input (false,0,0))
+         Some (logger,n_stories_input,Mods.tick_stories logger (S.PH.B.PB.CI.Po.K.H.save_progress_bar parameter) n_stories_input (false,0,0))
   in
   let g parameter handler profiling_info error story info (k,progress_bar,a,n_fails) =
     let event = StoryProfiling.Story k in
     let error, profiling_info = P.add_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error event None profiling_info in
     let error,profiling_info,a' = f parameter ~shall_we_compute:shall_we_compute ~shall_we_compute_profiling_information:shall_we_compute_profiling_information handler profiling_info error (trace_of_pretrace_with_ambiguity false story) info a in
-    let progress_bar = tick_opt progress_bar in
+    let progress_bar = tick_opt parameter progress_bar in
     let n_fails = inc_fails a a' n_fails in
     let error,profiling_info = P.close_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error event None profiling_info in
     error,profiling_info,(succ k,progress_bar,a',n_fails)
   in
-  let error,profiling_info,(_,_,a,n_fails) =   D.fold_table parameter handler profiling_info error g l.story_list (1,progress_bar,a,0) in
+  let error,profiling_info,(_,_,a,n_fails) = D.fold_table parameter handler profiling_info error g l.story_list (1,progress_bar,a,0) in
   let () = close_progress_bar_opt logger in
   (*let () = print_fails parameter.S.PH.B.PB.CI.Po.K.H.out_channel_err s n_fails in*)
   error,(profiling_info:profiling_info),a
