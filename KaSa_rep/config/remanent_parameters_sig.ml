@@ -141,7 +141,6 @@ type parameters =
     logger: Loggers.t;
     profiler: Loggers.t;
     compression_status: Loggers.t;
+    save_error_list: Exception_without_parameter.method_handler -> unit;
     marshalisable_parameters : marshalisable_parameters;
   }
-
-

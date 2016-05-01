@@ -43,7 +43,7 @@ let fetch_level_gen s r =
   | x ->
      let _ = Printf.fprintf stderr "%s is not a valid level !!!"  x in raise Exit
 
-let fetch_graph_format f = 
+let fetch_graph_format f =
   match
     String.lowercase !f
   with
@@ -153,7 +153,7 @@ let reachability_map_0 =
     Remanent_parameters_sig.use_natural_language = false;
     Remanent_parameters_sig.format_for_local_traces = Remanent_parameters_sig.DOT ;
     Remanent_parameters_sig.trace_prefix = "Agent_trace_";
-    Remanent_parameters_sig.trace_directory = 
+    Remanent_parameters_sig.trace_directory =
       (match !Config.output_local_trace_directory
 	with
 	| "" -> ""
@@ -179,12 +179,12 @@ let add_debugging_parameters_to_reachability_map reachability =
  !Config.show_rule_names_in_local_traces ;
     Remanent_parameters_sig.use_por_in_local_traces =
 	!Config.use_por_in_local_traces ;
-    Remanent_parameters_sig.format_for_local_traces = 
+    Remanent_parameters_sig.format_for_local_traces =
 	fetch_graph_format Config.local_trace_format ;
-    Remanent_parameters_sig.trace_prefix = 
+    Remanent_parameters_sig.trace_prefix =
 	!Config.local_trace_prefix ;
-    Remanent_parameters_sig.trace_directory = 
-	match !Config.output_local_trace_directory 
+    Remanent_parameters_sig.trace_directory =
+	match !Config.output_local_trace_directory
 	with "" -> ""
 	| x -> x^"/"
 ;
@@ -284,6 +284,7 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
         Remanent_parameters_sig.called_from = called_from ;
 	Remanent_parameters_sig.html_mode = html_mode ;
      } ;
+    Remanent_parameters_sig.save_error_list = (fun _ -> ());
     Remanent_parameters_sig.logger =
       (match channel with
       | None -> Loggers.dummy_txt_logger
@@ -647,3 +648,4 @@ let open_contact_map_file parameters error =
 
  let set_logger parameter logger =
    { parameter with Remanent_parameters_sig.logger = logger}
+let save_error_list parameter error = parameter.Remanent_parameters_sig.save_error_list error 

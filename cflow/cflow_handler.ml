@@ -48,7 +48,6 @@ sig
       reset_current_phase_title: unit -> unit ;
       save_progress_bar: (bool*int*int) -> unit ;
       reset_progress_bar: unit -> unit ;
-      save_error_log: Exception_without_parameter.method_handler -> unit ;
     }
 
   type handler =   (*handler to interpret abstract values*)
@@ -104,11 +103,12 @@ sig
   val reset_current_phase_title: parameter -> unit
   val save_progress_bar: parameter -> (bool*int*int) -> unit
   val reset_progress_bar: parameter -> unit
-  val save_error_log: parameter -> Exception_without_parameter.method_handler -> unit
   val set_save_current_phase_title: parameter -> (string -> unit) -> parameter
   val set_reset_current_phase_title: parameter -> (unit -> unit) -> parameter
   val set_save_progress_bar: parameter -> ((bool*int*int) -> unit) -> parameter
   val set_reset_progress_bar: parameter -> (unit -> unit) -> parameter
+  val save_error_log: parameter -> Exception_without_parameter.method_handler -> unit
+  val set_save_error_log: parameter -> (Exception_without_parameter.method_handler -> unit) -> parameter
 end
 
 module Cflow_handler =
@@ -138,7 +138,6 @@ module Cflow_handler =
           reset_current_phase_title: unit -> unit ;
           save_progress_bar: (bool*int*int) -> unit ;
           reset_progress_bar: unit -> unit ;
-          save_error_log: Exception_without_parameter.method_handler -> unit;
         }
 
     let build_parameter ~called_from =
@@ -184,7 +183,6 @@ module Cflow_handler =
         reset_current_phase_title = (fun _ -> ());
         reset_progress_bar = (fun _ -> ());
         save_progress_bar = (fun _ -> ());
-        save_error_log = (fun _ -> ())
       }
 
     let set_compression_weak p =
@@ -276,13 +274,14 @@ module Cflow_handler =
    let get_blacklist_events parameter = parameter.blacklist_events
    let save_current_phase_title parameter x = parameter.save_current_phase_title x
    let save_progress_bar parameter x = parameter.save_progress_bar x
-   let save_error_log parameter x = parameter.save_error_log x
    let reset_progress_bar parameter = parameter.reset_progress_bar ()
    let reset_current_phase_title parameter = parameter.reset_current_phase_title ()
    let set_save_current_phase_title parameter f = {parameter with save_current_phase_title = f}
    let set_reset_current_phase_title parameter f = {parameter with reset_current_phase_title = f}
    let set_save_progress_bar parameter f = {parameter with save_progress_bar = f}
    let set_reset_progress_bar parameter f = {parameter with reset_progress_bar = f}
-   let set_save_error_log parameter f = {parameter with save_error_log = f}
+   let save_error_log  parameter x = parameter.kasa.Remanent_parameters_sig.save_error_list x
+   let set_save_error_log parameter f =
+     {parameter with kasa = {parameter.kasa with Remanent_parameters_sig.save_error_list = f}}
 
 end:Cflow_handler)
