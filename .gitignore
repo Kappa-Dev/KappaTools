@@ -23,6 +23,9 @@ _build/
 JaSim.byte
 js/JaSim.js
 
+#server
+WebSim
+
 # doc
 *.log
 *.aux
