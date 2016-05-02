@@ -8,8 +8,8 @@
 
 #### Rules
 
-'r0' A(x), B(x~p) <-> A(x!1), B(x~p!1)
-'r1' A(x), C(x) -> A(x!1), C(x!1)
-'r2' B(x~p), C(x!_) -> B(x~u), C(x!_)
+'r0' A(x), B(x~p) <-> A(x!1), B(x~p!1) @1
+'r1' A(x), C(x) -> A(x!1), C(x!1) @1
+'r2' B(x~p), C(x!_) -> B(x~u), C(x!_) @1
 
 

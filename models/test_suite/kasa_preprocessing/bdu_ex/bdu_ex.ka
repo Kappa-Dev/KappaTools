@@ -4,6 +4,6 @@
 %agent: A(x~u~p,y~u~p)
 
 #### Rules
-'create' -> A(x~u)	
-'x' A(x~u) -> A(x~p)
-'y' A(x~p, y~u) -> A(x~p,y~p)
+'create' -> A(x~u) @1
+'x' A(x~u) -> A(x~p) @1
+'y' A(x~p, y~u) -> A(x~p,y~p) @1

@@ -6,7 +6,7 @@
 
 #### Rules
 
-'r0' A(x~u, y~u) -> A(x~p, y~p)
+'r0' A(x~u, y~u) -> A(x~p, y~p) @1
 
 #### Variables
 
