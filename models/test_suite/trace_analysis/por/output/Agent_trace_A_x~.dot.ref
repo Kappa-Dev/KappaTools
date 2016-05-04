@@ -1,8 +1,0 @@
-digraph G{
-Init_15 [width="0cm" height="0cm" style="none" label=""];
-Node_15 [label="A(x~u)"];
-Node_16 [label="A(x~p)"];
-Node_15 -> Node_16 [label="rule 0"];
-Node_16 -> Node_15 [label="rule 3"];
-Init_15 -> Node_15 [label="Init"];
-}

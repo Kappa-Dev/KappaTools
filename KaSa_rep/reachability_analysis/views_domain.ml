@@ -990,7 +990,7 @@ struct
   (**************************************************************************)
 
   let step_list_empty kappa_handler dynamic parameter error rule_id agent_id agent_type site_name
-      cv_list fixpoint_result proj_bdu_test_restriction bdu_false bdu_true site_correspondence =         
+      cv_list fixpoint_result proj_bdu_test_restriction bdu_false bdu_true site_correspondence =
     (*---------------------------------------------------------------------*)
     let error, dynamic, bdu =
       List.fold_left
@@ -1009,7 +1009,7 @@ struct
           in
           (*print for test*)
           (*let _ =
-            Loggers.fprintf (Remanent_parameters.get_logger parameter) 
+            Loggers.fprintf (Remanent_parameters.get_logger parameter)
               "path:cv_id:%i:agent_type:%i:site_name:%i:%s:new_site_name:%i\n"
               (Covering_classes_type.int_of_cv_id cv_id)
               (Ckappa_sig.int_of_agent_name agent_type)
@@ -1039,7 +1039,7 @@ struct
                 proj_bdu_test_restriction
             with
             | None -> error, bdu_true
-            | Some bdu -> error, bdu              
+            | Some bdu -> error, bdu
           in
           (*Bdu_X and Bdu_test*)
           let handler = Analyzer_headers.get_mvbdu_handler dynamic in
@@ -1130,7 +1130,7 @@ struct
                   (Ckappa_sig.string_of_state_index state)
             in
             (*let _ =
-              Loggers.fprintf (Remanent_parameters.get_logger parameter) 
+              Loggers.fprintf (Remanent_parameters.get_logger parameter)
                 "List of state in the precondition:\
                  rule_id:%i:agent_type:%i:site_type:%i:%s:%i:%s\n"
                 (Ckappa_sig.int_of_rule_id rule_id)
@@ -1141,7 +1141,7 @@ struct
                 state_string
             in*)
             error, state :: output
-          | _ -> warn parameter error (Some "state is empty, line 1086") Exit output) 
+          | _ -> warn parameter error (Some "state is empty, line 1086") Exit output)
         (error, []) list
     in
     error, dynamic, Usual_domains.Val (List.rev state_list)
@@ -1150,7 +1150,7 @@ struct
   (*empty case of step list*)
 
   let precondition_empty_step_list kappa_handler parameter error dynamic rule_id path store_agent_name
-      bdu_false bdu_true store_covering_classes_id site_correspondence 
+      bdu_false bdu_true store_covering_classes_id site_correspondence
       fixpoint_result proj_bdu_test_restriction =
     let error, agent_type =
       match Ckappa_sig.RuleAgent_map_and_set.Map.find_option_without_logs
@@ -1681,15 +1681,15 @@ struct
   let print_test_answer parameter answer =
     match answer with
     | Usual_domains.Val l ->
-      List.iter (fun i ->  Loggers.fprintf (Remanent_parameters.get_logger parameter) 
+      List.iter (fun i ->  Loggers.fprintf (Remanent_parameters.get_logger parameter)
         "List: state:%i\n" (Ckappa_sig.int_of_state_index i)) l
     | Usual_domains.Undefined ->
-      Loggers.fprintf (Remanent_parameters.get_logger parameter) "Undefined\n" 
+      Loggers.fprintf (Remanent_parameters.get_logger parameter) "Undefined\n"
     | Usual_domains.Any ->
-      Loggers.fprintf (Remanent_parameters.get_logger parameter) "Any\n" 
+      Loggers.fprintf (Remanent_parameters.get_logger parameter) "Any\n"
 
   (*-------------------------------------------------------------------------------*)
-        
+
   let compute_pattern_navigation parameter error kappa_handler
       aux dynamic path rule rule_id step tl bdu_false bdu_true site_correspondence
       store_covering_classes_id fixpoint_result =
@@ -1750,7 +1750,7 @@ struct
                     "-inside pattern:\n"
                 in
                 let error, (dynamic, new_answer) =
-                  precondition_inside_pattern 
+                  precondition_inside_pattern
                     parameter error dynamic kappa_handler agent step
                     path aux rule_id rule tl site_correspondence store_covering_classes_id
                     fixpoint_result bdu_false bdu_true
@@ -1764,7 +1764,7 @@ struct
         in
         error, (dynamic, new_answer)
     in
-    error, (dynamic, new_answer)   
+    error, (dynamic, new_answer)
 
   (*-------------------------------------------------------------------------------*)
 
@@ -1778,7 +1778,7 @@ struct
           (*-------------------------------------------------------------------------------*)
           (*typing*)
           let error, answer_contact_map =
-            precondition_typing 
+            precondition_typing
               parameter error kappa_handler rule_id
               current_path.Communication.relative_address current_path store_agent_name dual_contact_map
           in
@@ -1788,7 +1788,7 @@ struct
 	     If the former_answer is Val l,
 	     then the answer must be Val l', with l' a sublist of l *)
           let error, dynamic, new_answer =
-            let rec aux dynamic path = 
+            let rec aux dynamic path =
               let step_list = path.Communication.relative_address in
               match step_list with
               | step :: tl ->
@@ -1802,7 +1802,7 @@ struct
                   compute_pattern_navigation
                     parameter error kappa_handler aux dynamic path
                     rule rule_id step tl bdu_false bdu_true site_correspondence
-                    store_covering_classes_id fixpoint_result 
+                    store_covering_classes_id fixpoint_result
                 in
                 let error, update_answer = inter error new_answer former_answer in
                 error, dynamic, update_answer
@@ -1816,7 +1816,7 @@ struct
                     site_correspondence fixpoint_result proj_bdu_test_restriction
                 in
                 (*let _ =
-                  Loggers.fprintf (Remanent_parameters.get_logger parameter) 
+                  Loggers.fprintf (Remanent_parameters.get_logger parameter)
                     "-Pattern is empty\n";
                 in*)
                 (*do I need to do the intersection with former answer?*)
@@ -2666,20 +2666,20 @@ struct
 	      (error, handler))
           output handler
       in
-      let compil = get_compil static in
+      (*let compil = get_compil static in
       let error, handler =
-	if Remanent_parameters.get_compute_local_traces parameter
-	then
-    if new_computation
-    then Agent_trace_even_sparser.agent_trace parameter error handler handler_kappa mvbdu_true compil output
-    else if direct_computation
-	  then
-	    Agent_trace_with_direct_por.agent_trace parameter error handler handler_kappa mvbdu_true compil output
-	  else
-	    Agent_trace.agent_trace parameter error handler handler_kappa mvbdu_true compil output
-	else
-	  error, handler
-      in
+        if Remanent_parameters.get_compute_local_traces parameter
+        then
+          if new_computation
+          then Agent_trace_even_sparser.agent_trace parameter error handler handler_kappa mvbdu_true compil output
+          else if direct_computation
+          then
+            Agent_trace_with_direct_por.agent_trace parameter error handler handler_kappa mvbdu_true compil output
+          else
+            Agent_trace.agent_trace parameter error handler handler_kappa mvbdu_true compil output
+        else
+          error, handler
+        in*)
       error, handler
     else
       begin
@@ -2924,9 +2924,9 @@ struct
               handler
               error
               kappa_handler
-	      store_remanent_triple
-	      fixpoint_result
-	      (static:static_information)
+              store_remanent_triple
+              fixpoint_result
+              static
           in
           error
         in
@@ -2948,6 +2948,37 @@ struct
       print_dynamic_information static dynamic error loggers
       in*)
     (*print fixpoint result*)
+    let parameter = get_parameter static in
+    let error, dynamic =
+         (* local traces *)
+      if Remanent_parameters.get_compute_local_traces parameter
+      then
+        let handler_kappa = get_kappa_handler static in
+        let handler = get_mvbdu_handler dynamic in
+        let error, handler, mvbdu_true = Ckappa_sig.Views_bdu.mvbdu_true parameter handler error in
+        let compil = get_compil static in
+        let errpr, site_correspondence =  get_store_remanent_triple static dynamic error in
+        let error, handler, output = smash_map
+            (fun parameter handler error a -> error, handler, [a])
+            parameter handler error
+~show_dep_with_dimmension_higher_than:1
+            handler_kappa
+            site_correspondence
+            (get_fixpoint_result dynamic)
+        in
+        let error, handler =
+          if new_computation
+          then Agent_trace_even_sparser.agent_trace parameter error handler handler_kappa mvbdu_true compil output
+          else if direct_computation
+          then
+            Agent_trace_with_direct_por.agent_trace parameter error handler handler_kappa mvbdu_true compil output
+          else
+            Agent_trace.agent_trace parameter error handler handler_kappa mvbdu_true compil output
+        in
+        error, set_mvbdu_handler handler dynamic
+      else
+        error, dynamic
+    in
     let error, dynamic, () =
       print_fixpoint_result static dynamic error loggers
     in

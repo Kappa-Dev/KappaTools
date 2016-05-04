@@ -1,7 +1,0 @@
-digraph G{
-Init_10 [width="0cm" height="0cm" style="none" label=""];
-Node_9 [label="A(t~p)"];
-Node_10 [label="A(t~u)"];
-Node_10 -> Node_9 [label="rule 4: t+"];
-Init_10 -> Node_10 [label="Init"];
-}

@@ -1,8 +1,0 @@
-digraph G{
-Init_6 [width="0cm" height="0cm" style="none" label=""];
-Node_5 [label="A(w~p)"];
-Node_6 [label="A(w~u)"];
-Node_5 -> Node_6 [label="rule 8: w-"];
-Node_6 -> Node_5 [label="rule 3: w+"];
-Init_6 -> Node_6 [label="Init"];
-}
