@@ -4,16 +4,20 @@ type 'a t =
     { decls : (string Location.annot *'a) array;
       finder : int StringMap.t }
 
-let name_map_of_array a =
-  fst (Array.fold_left
-	 (fun (map,i) ((x,pos),_) ->
-	  if StringMap.mem x map then
-	    raise (ExceptionDefn.Malformed_Decl
-		     ("Label '"^x^"' already defined", pos))
-	  else StringMap.add x i map,succ i)
-	 (StringMap.empty,0) a)
+let name_map_of_array ?forbidden a =
+  let bad = match forbidden with
+    | None -> fun _ -> false
+    | Some s -> fun x -> StringSet.mem x s in
+  Tools.array_fold_lefti
+    (fun i map ((x,pos),_) ->
+     let map' = StringMap.add x i map in
+     if bad x || map == map' then
+       raise (ExceptionDefn.Malformed_Decl
+		("Label '"^x^"' already defined", pos))
+     else map')
+    StringMap.empty a
 
-let create a = { decls = a; finder = name_map_of_array a}
+let create ?forbidden a = { decls = a; finder = name_map_of_array ?forbidden a}
 
 let size nd = Array.length nd.decls
 

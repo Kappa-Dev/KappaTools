@@ -9,7 +9,7 @@ type 'a t = private
     (** [fst (fst d.decls.(StringMap.find s d.finder))] MUST be equal to [s] *)
  }
 
-val create : (string Location.annot *'a) array -> 'a t
+val create : ?forbidden:StringSet.t -> (string Location.annot *'a) array -> 'a t
 val size : 'a t -> int
 val elt_name : 'a t -> int -> string
 val elt_id : ?kind:string -> 'a t -> string Location.annot -> int

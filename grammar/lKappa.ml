@@ -26,7 +26,7 @@ type rule =
     r_add_tokens :
       ((rule_mixture,int) Ast.ast_alg_expr Location.annot * int) list;
     r_rate : (rule_mixture,int) Ast.ast_alg_expr Location.annot;
-    r_un_rate : ((rule_mixture,int) Ast.ast_alg_expr Location.annot 
+    r_un_rate : ((rule_mixture,int) Ast.ast_alg_expr Location.annot
 		 * int Location.annot option) option;
   }
 
@@ -669,11 +669,17 @@ let add_un_variable k_un acc rate_var =
 		       else (acc,k) in
        (acc_un,Some (k',dist))
 
-let name_and_purify_rule (label_opt,(r,r_pos)) (id,acc,rules) =
+let name_and_purify_rule (label_opt,(r,r_pos)) ((id,set),acc,rules) =
   let id',label = match label_opt with
     | None ->
-       succ id, Format.asprintf "r%i: %a" id Ast.print_ast_rule r
-    | Some (lab,_) -> id,lab in
+       (succ id,set), Format.asprintf "r%i: %a" id Ast.print_ast_rule r
+    | Some (lab,pos) ->
+       let set' = Mods.StringSet.add lab set in
+       if set == set' then
+	 raise
+	   (ExceptionDefn.Malformed_Decl
+	      ("A rule named '"^lab^"' already exists.",pos))
+      else (id,set'),lab in
   let acc',k_def =
     if ast_alg_has_mix r.Ast.k_def then
       let rate_var = label^"_rate" in
@@ -817,8 +823,8 @@ let init_of_ast sigs tok = function
 
 let compil_of_ast overwrite c =
   let sigs = Signature.create c.Ast.signatures in
-  let (_,extra_vars,cleaned_rules) =
-    List.fold_right name_and_purify_rule c.Ast.rules (0,[],[]) in
+  let ((_,rule_names),extra_vars,cleaned_rules) =
+    List.fold_right name_and_purify_rule c.Ast.rules ((0,Mods.StringSet.empty),[],[]) in
   let alg_vars_over =
     Tools.list_rev_map_append
       (fun (x,v) -> (Location.dummy_annot x,
@@ -828,7 +834,8 @@ let compil_of_ast overwrite c =
 	  List.for_all (fun (x',_) -> x <> x') overwrite)
 	 (c.Ast.variables@extra_vars)) in
   let algs =
-    (NamedDecls.create (Array.of_list alg_vars_over)).NamedDecls.finder in
+    (NamedDecls.create
+       ~forbidden:rule_names (Array.of_list alg_vars_over)).NamedDecls.finder in
   let tk_nd = NamedDecls.create
 		(Tools.array_map_of_list (fun x -> (x,())) c.Ast.tokens) in
   let tok = tk_nd.NamedDecls.finder in
@@ -856,7 +863,7 @@ let compil_of_ast overwrite c =
 			      add_tk;
 		   r_rate = alg_expr_of_ast sigs tok algs rate;
 		   r_un_rate =
-		     Tools.option_map 
+		     Tools.option_map
 		       (fun (un_rate',dist) ->
 			((alg_expr_of_ast sigs tok algs ?max_allowed_var:None)
 			   un_rate', dist))
