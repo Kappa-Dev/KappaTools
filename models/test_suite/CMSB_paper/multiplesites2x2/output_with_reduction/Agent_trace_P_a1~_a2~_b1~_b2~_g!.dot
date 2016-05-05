@@ -1,0 +1,39 @@
+digraph G{
+subgraph cluster_0 {
+Node_95 [label="P(a2~u,b2~p,g!free)"];
+Node_94 [label="P(a2~p,b2~p,g!free)"];
+Node_93 [label="P(a2~p,b2~u,g!free)"];
+Node_92 [label="P(a2~u,b2~u,g!free)"];
+}
+subgraph cluster_1 {
+Node_91 [label="P(a1~p,b1~p,g!free)"];
+Node_90 [label="P(a1~p,b1~u,g!free)"];
+Node_89 [label="P(a1~u,b1~u,g!free)"];
+}
+Init_58 [width="0cm" height="0cm" style="none" label=""];
+Node_51 [label="P(a1~p,a2~p,b1~p,b2~p,g!K@x)"];
+Node_53 [label="P(a1~p,a2~p,b1~p,b2~p,g!free)"];
+Node_58 [label="P(a1~u,a2~u,b1~u,b2~u,g!free)"];
+Macro_53 [width="0cm" height="0cm" stype="none" label=""];
+Macro_58 [width="0cm" height="0cm" stype="none" label=""];
+Node_51 -> Node_53 [label="rule 9: P/K"];
+Node_53 -> Node_51 [label="rule 8: P.K"];
+Node_89 -> Node_90 [label="rule 0: a1+"];
+Node_90 -> Node_91 [label="rule 1: b1+"];
+Node_90 -> Node_89 [label="rule 2: a1-"];
+Node_91 -> Node_90 [label="rule 3: b1-"];
+Node_92 -> Node_93 [label="rule 4: a2+"];
+Node_93 -> Node_92 [label="rule 5: a2-"];
+Node_93 -> Node_94 [label="rule 6: b2+"];
+Node_94 -> Node_95 [label="rule 5: a2-"];
+Node_94 -> Node_93 [label="rule 7: b2-"];
+Node_95 -> Node_94 [label="rule 4: a2+"];
+Node_95 -> Node_92 [label="rule 7: b2-"];
+Init_58 -> Node_58 [label="Init"];
+Macro_53 -> Node_53 [style="dotted" label=""];
+Macro_53 -> Node_94 [style="dashed" label=""];
+Macro_53 -> Node_91 [style="dashed" label=""];
+Macro_58 -> Node_58 [style="dotted" label=""];
+Macro_58 -> Node_92 [style="dashed" label=""];
+Macro_58 -> Node_89 [style="dashed" label=""];
+}

@@ -1,0 +1,25 @@
+#This file has been computed by KaSa: a Static Analyzer for Kappa (Kappa Static Analyzer (DomainBased-1248-ge12a1e4))
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Analysis launched at 2016/05/05 07:58:56 (GMT+2) on applecell.home
+#Command line is: KaSa protein2x5.ka --compute-local-traces --output-directory output_with_reduction --use-por-in-local-traces
+#
+#This file contains the description of the contact map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+graph G{ 
+subgraph cluster0 {
+   0.0 [style = filled label = "a1" shape =ellipse color = green size = "5"]
+   0.1 [style = filled label = "a2" shape =ellipse color = green size = "5"]
+   0.2 [style = filled label = "b1" shape =ellipse color = green size = "5"]
+   0.3 [style = filled label = "b2" shape =ellipse color = green size = "5"]
+   0.4 [style = filled label = "c1" shape =ellipse color = green size = "5"]
+   0.5 [style = filled label = "c2" shape =ellipse color = green size = "5"]
+   0.6 [style = filled label = "d1" shape =ellipse color = green size = "5"]
+   0.7 [style = filled label = "d2" shape =ellipse color = green size = "5"]
+   0.8 [style = filled label = "e1" shape =ellipse color = green size = "5"]
+   0.9 [style = filled label = "e2" shape =ellipse color = green size = "5"]
+   0.10 [style = filled label = "g" shape =ellipse color = green size = "5"]
+label =  "A";  shape = rectangle; color = red
+} ; 
+}

@@ -1,0 +1,37 @@
+Parsing dimmer.ka...
+done
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
+Refining the influence map...
+
+Reachability analysis...
+
+------------------------------------------------------------
+* Dead rules :
+------------------------------------------------------------
+rule 6: obs will never be applied.
+
+------------------------------------------------------------
+* Dead agents :
+------------------------------------------------------------
+
+------------------------------------------------------------
+* Relational properties:
+------------------------------------------------------------
+In agent R, the binding state of site x, the binding state of site c, the binding state of site cr, and the binding state of site n, are entangled by the following 4-d relationship:
+	R(x!E@x,c!free,cr!free,n!free)
+	R(x!E@x,c!R@c,cr!R@n,n!free)
+	R(x!E@x,c!R@c,cr!free,n!free)
+	R(x!E@x,c!R@c,cr!free,n!R@cr)
+	R(x!free,c!free,cr!free,n!free)
+
+------------------------------------------------------------
+* Non relational properties:
+------------------------------------------------------------
+The binding state of site x in agent E ranges over free and R@x.
+The binding state of site c in agent R ranges over free and R@c.
+The binding state of site x in agent R ranges over free and E@x.
+The binding state of site n in agent R ranges over free and R@cr.
+The binding state of site cr in agent R ranges over free and R@n.
+execution finished without any exception

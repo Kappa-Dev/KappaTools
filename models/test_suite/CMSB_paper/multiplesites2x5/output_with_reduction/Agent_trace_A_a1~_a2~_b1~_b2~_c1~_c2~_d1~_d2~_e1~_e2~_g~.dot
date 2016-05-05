@@ -1,0 +1,69 @@
+digraph G{
+subgraph cluster_0 {
+Node_83 [label="A(e1~p,e2~p,g~u)"];
+Node_74 [label="A(e1~p,e2~u,g~u)"];
+Node_92 [label="A(e1~u,e2~u,g~u)"];
+}
+subgraph cluster_1 {
+Node_765 [label="A(d1~p,d2~p,g~u)"];
+Node_764 [label="A(d1~p,d2~u,g~u)"];
+Node_763 [label="A(d1~u,d2~u,g~u)"];
+}
+subgraph cluster_2 {
+Node_761 [label="A(c1~p,c2~p,g~u)"];
+Node_760 [label="A(c1~p,c2~u,g~u)"];
+Node_759 [label="A(c1~u,c2~u,g~u)"];
+}
+subgraph cluster_3 {
+Node_757 [label="A(b1~p,b2~p,g~u)"];
+Node_756 [label="A(b1~p,b2~u,g~u)"];
+Node_755 [label="A(b1~u,b2~u,g~u)"];
+}
+subgraph cluster_4 {
+Node_753 [label="A(a1~p,a2~p,g~u)"];
+Node_752 [label="A(a1~p,a2~u,g~u)"];
+Node_751 [label="A(a1~u,a2~u,g~u)"];
+}
+Init_686 [width="0cm" height="0cm" style="none" label=""];
+Node_523 [label="A(a1~p,a2~p,b1~p,b2~p,c1~p,c2~p,d1~p,d2~p,e1~p,e2~p,g~p)"];
+Node_525 [label="A(a1~p,a2~p,b1~p,b2~p,c1~p,c2~p,d1~p,d2~p,e1~p,e2~p,g~u)"];
+Node_686 [label="A(a1~u,a2~u,b1~u,b2~u,c1~u,c2~u,d1~u,d2~u,e1~u,e2~u,g~u)"];
+Macro_525 [width="0cm" height="0cm" stype="none" label=""];
+Macro_686 [width="0cm" height="0cm" stype="none" label=""];
+Node_74 -> Node_83 [label="rule 18"];
+Node_74 -> Node_92 [label="rule 19"];
+Node_83 -> Node_74 [label="rule 20"];
+Node_92 -> Node_74 [label="rule 17"];
+Node_523 -> Node_525 [label="rule 22"];
+Node_525 -> Node_523 [label="rule 21"];
+Node_751 -> Node_752 [label="rule 1"];
+Node_752 -> Node_753 [label="rule 2"];
+Node_752 -> Node_751 [label="rule 3"];
+Node_753 -> Node_752 [label="rule 4"];
+Node_755 -> Node_756 [label="rule 5"];
+Node_756 -> Node_757 [label="rule 6"];
+Node_756 -> Node_755 [label="rule 7"];
+Node_757 -> Node_756 [label="rule 8"];
+Node_759 -> Node_760 [label="rule 9"];
+Node_760 -> Node_761 [label="rule 10"];
+Node_760 -> Node_759 [label="rule 11"];
+Node_761 -> Node_760 [label="rule 12"];
+Node_763 -> Node_764 [label="rule 13"];
+Node_764 -> Node_765 [label="rule 14"];
+Node_764 -> Node_763 [label="rule 15"];
+Node_765 -> Node_764 [label="rule 16"];
+Init_686 -> Node_686 [label="rule 0"];
+Init_686 -> Node_686 [label="Init"];
+Macro_525 -> Node_525 [style="dotted" label=""];
+Macro_525 -> Node_83 [style="dashed" label=""];
+Macro_525 -> Node_765 [style="dashed" label=""];
+Macro_525 -> Node_761 [style="dashed" label=""];
+Macro_525 -> Node_757 [style="dashed" label=""];
+Macro_525 -> Node_753 [style="dashed" label=""];
+Macro_686 -> Node_686 [style="dotted" label=""];
+Macro_686 -> Node_92 [style="dashed" label=""];
+Macro_686 -> Node_763 [style="dashed" label=""];
+Macro_686 -> Node_759 [style="dashed" label=""];
+Macro_686 -> Node_755 [style="dashed" label=""];
+Macro_686 -> Node_751 [style="dashed" label=""];
+}

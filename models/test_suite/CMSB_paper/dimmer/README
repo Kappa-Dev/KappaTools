@@ -1,0 +1,5 @@
+#Command-line:
+"${KAPPABIN}"KaSa dimmer.ka --compute-local-traces --output-directory output || exit 0
+
+
+

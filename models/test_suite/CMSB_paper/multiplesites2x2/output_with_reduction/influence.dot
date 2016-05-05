@@ -1,0 +1,59 @@
+#This file has been computed by KaSa: a Static Analyzer for Kappa (Kappa Static Analyzer (DomainBased-1248-ge12a1e4))
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Analysis launched at 2016/05/05 07:58:54 (GMT+2) on applecell.home
+#Command line is: KaSa protein2x2.ka --compute-local-traces --output-directory output_with_reduction --use-por-in-local-traces
+#
+#This file contains the description of the influence map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+digraph G{ 
+node [shape=box, style=filled, fillcolor=lightskyblue];
+"a1+" ; 
+"b1+" ; 
+"a1-" ; 
+"b1-" ; 
+"a2+" ; 
+"a2-" ; 
+"b2+" ; 
+"b2-" ; 
+"P.K" ; 
+"P/K" ; 
+edge [color=green, arrowhead=normal];
+"a1+" -> "b1+"[label ="[0->0]"] ;
+"a1+" -> "a1-"[label ="[0->0]"] ;
+"a1+" -> "P.K"[label ="[0->0]"] ;
+"a1+" -> "P/K"[label ="[0->0]"] ;
+"b1+" -> "b1-"[label ="[0->0]"] ;
+"b1+" -> "P.K"[label ="[0->0]"] ;
+"b1+" -> "P/K"[label ="[0->0]"] ;
+"a1-" -> "a1+"[label ="[0->0]"] ;
+"b1-" -> "b1+"[label ="[0->0]"] ;
+"b1-" -> "a1-"[label ="[0->0]"] ;
+"a2+" -> "a2-"[label ="[0->0]"] ;
+"a2+" -> "b2+"[label ="[0->0]"] ;
+"a2+" -> "P.K"[label ="[0->0]"] ;
+"a2+" -> "P/K"[label ="[0->0]"] ;
+"a2-" -> "a2+"[label ="[0->0]"] ;
+"b2+" -> "b2-"[label ="[0->0]"] ;
+"b2+" -> "P.K"[label ="[0->0]"] ;
+"b2+" -> "P/K"[label ="[0->0]"] ;
+"b2-" -> "b2+"[label ="[0->0]"] ;
+"P.K" -> "P/K"[label ="[0->0];[1->1]"] ;
+"P/K" -> "b1-"[label ="[0->0]"] ;
+"P/K" -> "a2-"[label ="[0->0]"] ;
+"P/K" -> "b2-"[label ="[0->0]"] ;
+"P/K" -> "P.K"[label ="[0->0];[1->1]"] ;
+
+edge [color=red, arrowhead=tee];
+"b1+" -> "a1-"[label ="[0->0]"] ; 
+"a1-" -> "b1+"[label ="[0->0]"] ; 
+"b1-" -> "P.K"[label ="[0->0]"] ; 
+"a2-" -> "b2+"[label ="[0->0]"] ; 
+"a2-" -> "P.K"[label ="[0->0]"] ; 
+"b2-" -> "P.K"[label ="[0->0]"] ; 
+"P.K" -> "b1-"[label ="[0->0]"] ; 
+"P.K" -> "a2-"[label ="[0->0]"] ; 
+"P.K" -> "b2-"[label ="[0->0]"] ; 
+
+}

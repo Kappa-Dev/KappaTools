@@ -1,0 +1,45 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa dimmer.ka --compute-local-traces --output-directory output
+#
+#This file contains the description of the influence map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+digraph G{ 
+node [shape=box, style=filled, fillcolor=lightskyblue];
+"E.R" ; 
+"E/R" ; 
+"R.R" ; 
+"R/R" ; 
+"R.int" ; 
+"R/int" ; 
+"obs" ; 
+edge [color=green, arrowhead=normal];
+"E.R" -> "E/R"[label ="[0->0];[1->1]"] ;
+"E.R" -> "R.R"[label ="[1->0];[1->1]"] ;
+"E/R" -> "E.R"[label ="[0->0];[1->1]"] ;
+"E/R" -> "obs"[label ="[1->0]"] ;
+"R.R" -> "R/R"[label ="[0->0];[0->1];[1->0];[1->1]"] ;
+"R.R" -> "R.int"[label ="[0->0];[0->1];[1->0];[1->1]"] ;
+"R/R" -> "E/R"[label ="[0->1];[1->1]"] ;
+"R/R" -> "R.R"[label ="[0->0];[0->1];[1->0];[1->1]"] ;
+"R.int" -> "R/int"[label ="[0->0];[1->1]"] ;
+"R/int" -> "R/R"[label ="[0->0];[0->1];[1->0];[1->1]"] ;
+"R/int" -> "R.int"[label ="[0->0];[0->1];[1->0];[1->1]"] ;
+"obs" -> "R/R"[label ="[0*->0];[0*->1]"] ;
+"obs" -> "R.int"[label ="[0*->0];[0*->1]"] ;
+
+edge [color=red, arrowhead=tee];
+"E.R" -> "obs"[label ="[1->0]"] ; 
+"E/R" -> "R.R"[label ="[1->0];[1->1]"] ; 
+"R.R" -> "E/R"[label ="[0->1];[1->1]"] ; 
+"R.R" -> "R.R"[label ="[0->1];[1->0]"] ; 
+"R/R" -> "R/R"[label ="[0->1];[1->0]"] ; 
+"R/R" -> "R.int"[label ="[0->0];[0->1];[1->0];[1->1]"] ; 
+"R.int" -> "R/R"[label ="[0->0];[0->1];[1->0];[1->1]"] ; 
+"R.int" -> "R.int"[label ="[0->1];[1->0]"] ; 
+"R/int" -> "obs"[label ="[0->0];[1->0]"] ; 
+"obs" -> "R/int"[label ="[0*->0];[0*->1];[0->0];[0->1]"] ; 
+"obs" -> "obs"[label ="[0*->0]"] ; 
+
+}
