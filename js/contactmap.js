@@ -316,6 +316,7 @@ function clearContactMap(){
 }
 
 function drawContactMap(json){
+    clearContactMap();
     var contact = JSON.parse(json)["contact_map"];
     createContactMap(contact,"#contact-map");
 }
