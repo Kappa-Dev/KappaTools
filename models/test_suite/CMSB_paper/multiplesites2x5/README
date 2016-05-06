@@ -1,6 +1,3 @@
 #Command-line:
 "${KAPPABIN}"KaSa protein2x5.ka --compute-local-traces --output-directory output || exit 0
-"${KAPPABIN}"KaSa protein2x5.ka --compute-local-traces --output-directory output_with_reduction --use-por-in-local-traces || exit 0 
-
-
-
+"${KAPPABIN}"KaSa protein2x5.ka --compute-local-traces --output-directory output_with_reduction --use-macrotransitions-in-local-traces || exit 0 

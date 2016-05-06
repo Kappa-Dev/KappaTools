@@ -95,7 +95,7 @@ type reachability_map_output =
     compute_local_traces: bool;
     show_rule_names_in_local_traces: bool;
     format_for_local_traces: graph_format;
-    use_por_in_local_traces: bool;
+    use_macrotransitions_in_local_traces: bool;
     use_natural_language : bool;
     trace_prefix: string;
     trace_directory: string;
@@ -145,6 +145,6 @@ type parameters =
     save_progress_bar: (bool*int*int) -> unit;
     reset_progress_bar: unit -> unit;
     save_current_phase_title:  string -> unit ;
-    reset_current_phase_title: unit -> unit ;    
+    reset_current_phase_title: unit -> unit ;
     marshalisable_parameters : marshalisable_parameters;
   }

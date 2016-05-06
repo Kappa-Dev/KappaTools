@@ -1,5 +1,2 @@
 #Command-line:
-"${KAPPABIN}"KaSa relations.ka --compute-local-traces --output-directory output --use-por-in-local-traces || exit 0 
-
-
-
+"${KAPPABIN}"KaSa relations.ka --compute-local-traces --output-directory output --use-macrotransitions-in-local-traces || exit 0

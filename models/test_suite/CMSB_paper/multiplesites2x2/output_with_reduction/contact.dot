@@ -1,8 +1,8 @@
-#This file has been computed by KaSa: a Static Analyzer for Kappa (Kappa Static Analyzer (DomainBased-1248-ge12a1e4))
+#This file has been computed by KaSa: a Static Analyzer for Kappa (Kappa Static Analyzer (DomainBased-1249-g41e153a-dirty))
 #Download sources/binaries at https://github.com/Kappa-Dev/KaSim
 #
-#Analysis launched at 2016/05/05 07:58:54 (GMT+2) on applecell.home
-#Command line is: KaSa protein2x2.ka --compute-local-traces --output-directory output_with_reduction --use-por-in-local-traces
+#Analysis launched at 2016/05/06 07:51:23 (GMT+2) on applecell.home
+#Command line is: KaSa protein2x2.ka --compute-local-traces --output-directory output_with_reduction --use-macrotransitions-in-local-traces
 #
 #This file contains the description of the contact map in dot.
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF

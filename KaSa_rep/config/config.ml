@@ -98,7 +98,7 @@ let smash_relations = ref true
 let use_natural_language = ref true
 let compute_local_traces = ref false
 let show_rule_names_in_local_traces = ref true
-let use_por_in_local_traces = ref false
+let use_macrotransitions_in_local_traces = ref false
 let local_trace_prefix = ref "Agent_trace_"
 let local_trace_format = ref "DOT"
 

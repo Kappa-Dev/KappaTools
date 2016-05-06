@@ -91,7 +91,7 @@ type graph_with_losange_reduction =
     macro_edges: Ckappa_sig.Views_bdu.mvbdu LabelMap.t
   }
 
-let string_of_fst_label parameter error handler_kappa compil i = 
+let string_of_fst_label parameter error handler_kappa compil i =
   match
     i
   with
@@ -821,15 +821,15 @@ let example ?restricted_version:(restricted_version=false) list nodes_adj =
     | Some (p,n_p) ->
        begin
 	 let () = Printf.fprintf stdout "PARTITION: " in
-	 let () = 
-	   List.iter 
+	 let () =
+	   List.iter
 	     (fun x ->
-	       match x with 
+	       match x with
 	       | ((Rule s,_),_,_) -> Printf.fprintf stdout "%i" (Ckappa_sig.int_of_rule_id s)
 	       | _ -> ()) p in
 	 let () = Printf.fprintf stdout " SYNC: " in
 	 let () = List.iter (fun x ->
-	   match x with 
+	   match x with
 	   | ((Rule s,_),_,_) -> Printf.fprintf stdout "%i" (Ckappa_sig.int_of_rule_id s)
 	   | _ -> ()) n_p
 	 in
@@ -840,14 +840,14 @@ let example ?restricted_version:(restricted_version=false) list nodes_adj =
   ()
 
 let create parameter handler error r_id ag_id agent_type ext_list update nodes_adj =
-  let error, list = 
+  let error, list =
     error, List.fold_left
 	(fun list i -> (i,Ckappa_sig.state_index_of_int 0)::list)
 	[]
 	ext_list
   in
-  let error, handler, mvbdu = 
-    Ckappa_sig.Views_bdu.mvbdu_of_reverse_sorted_association_list parameter handler error list 
+  let error, handler, mvbdu =
+    Ckappa_sig.Views_bdu.mvbdu_of_reverse_sorted_association_list parameter handler error list
   in
   let error, handler, mvbdu =
     Ckappa_sig.Views_bdu.mvbdu_redefine parameter handler error mvbdu update
@@ -867,7 +867,7 @@ let create parameter handler error r_id ag_id agent_type ext_list update nodes_a
       list_edges
   in
   error,(handler,nodes_adj)
-    
+
 
 let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
   let rules = compil.Cckappa_sig.rules in
@@ -945,16 +945,16 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 		 parameter
 		 error
 		 (fun parameter error ag_id view (handler,nodes_adj) ->
-		    match 
+		    match
 		      view
-		    with 
-		    | Cckappa_sig.Agent agent -> 
-			if agent.Cckappa_sig.agent_name <> agent_type 
+		    with
+		    | Cckappa_sig.Agent agent ->
+			if agent.Cckappa_sig.agent_name <> agent_type
 			then
 			  error, (handler, nodes_adj)
 			else
-			  begin 
-			     let error, handler, list = 
+			  begin
+			     let error, handler, list =
 			       List.fold_left
 				 (fun
 				   (error, handler, list)
@@ -980,7 +980,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 				 (error, handler, [])
 				 ext_list
 			     in
-			     let error, handler, update =  
+			     let error, handler, update =
 			       Ckappa_sig.Views_bdu.build_association_list
 				 parameter handler error list
 			     in
@@ -988,10 +988,10 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 			  end
 		    | Cckappa_sig.Ghost
 		    | Cckappa_sig.Dead_agent _
-		    | Cckappa_sig.Unknown_agent _ -> 
+		    | Cckappa_sig.Unknown_agent _ ->
 		      warn parameter error (Some "line 948") Exit (handler,nodes_adj)
 		 )
-		 mixture.Cckappa_sig.views 
+		 mixture.Cckappa_sig.views
 		 (handler, nodes_adj)
 	     )
 	     init
@@ -1081,7 +1081,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 		       with
 		       | None ->
 			  begin
-			    
+
 			    let error, handler, update =
 			      Ckappa_sig.Views_bdu.build_association_list parameter handler error modif_list_creation
 			    in
@@ -1219,7 +1219,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 	     (handler, nodes_adj)
 	 in
 	 let error =
-	   if Remanent_parameters.get_use_por_in_local_traces parameter
+	   if Remanent_parameters.get_use_macrotransitions_in_local_traces parameter
 	   then
 	     begin (* losange reduction *)
 	       let empty_state =

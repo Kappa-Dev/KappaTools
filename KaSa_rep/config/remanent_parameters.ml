@@ -148,7 +148,7 @@ let reachability_map_0 =
     Remanent_parameters_sig.hide_one_d_relations_from_cartesian_decomposition = false;
     Remanent_parameters_sig.compute_local_traces = false;
     Remanent_parameters_sig.show_rule_names_in_local_traces = false;
-    Remanent_parameters_sig.use_por_in_local_traces = false;
+    Remanent_parameters_sig.use_macrotransitions_in_local_traces = false;
     Remanent_parameters_sig.smash_relations = false;
     Remanent_parameters_sig.use_natural_language = false;
     Remanent_parameters_sig.format_for_local_traces = Remanent_parameters_sig.DOT ;
@@ -177,8 +177,8 @@ let add_debugging_parameters_to_reachability_map reachability =
       Remanent_parameters_sig.compute_local_traces = !Config.compute_local_traces;
       Remanent_parameters_sig.show_rule_names_in_local_traces =
  !Config.show_rule_names_in_local_traces ;
-    Remanent_parameters_sig.use_por_in_local_traces =
-	!Config.use_por_in_local_traces ;
+    Remanent_parameters_sig.use_macrotransitions_in_local_traces =
+	!Config.use_macrotransitions_in_local_traces ;
     Remanent_parameters_sig.format_for_local_traces =
 	fetch_graph_format Config.local_trace_format ;
     Remanent_parameters_sig.trace_prefix =
@@ -381,7 +381,7 @@ let get_use_natural_language_1 r = r.Remanent_parameters_sig.use_natural_languag
 let get_local_trace_format_1 r = r.Remanent_parameters_sig.format_for_local_traces
 let get_compute_local_traces_1 r = r.Remanent_parameters_sig.compute_local_traces
 let get_show_rule_names_in_local_traces_1 r = r.Remanent_parameters_sig.show_rule_names_in_local_traces
-let get_use_por_in_local_traces_1 r = r.Remanent_parameters_sig.use_por_in_local_traces
+let get_use_macrotransitions_in_local_traces_1 r = r.Remanent_parameters_sig.use_macrotransitions_in_local_traces
 let get_local_trace_prefix_1 r = r.Remanent_parameters_sig.trace_prefix
 let get_local_trace_directory_1 r = r.Remanent_parameters_sig.trace_directory
 
@@ -542,7 +542,7 @@ let get_smash_relations = upgrade_from_reachability_map_field get_smash_relation
 let get_local_trace_format = upgrade_from_reachability_map_field get_local_trace_format_1
 let get_compute_local_traces = upgrade_from_reachability_map_field get_compute_local_traces_1
 let get_show_rule_names_in_local_traces = upgrade_from_reachability_map_field get_show_rule_names_in_local_traces_1
-let get_use_por_in_local_traces = upgrade_from_reachability_map_field get_use_por_in_local_traces_1
+let get_use_macrotransitions_in_local_traces = upgrade_from_reachability_map_field get_use_macrotransitions_in_local_traces_1
 let get_local_trace_prefix = upgrade_from_reachability_map_field get_local_trace_prefix_1
 let get_local_trace_directory = upgrade_from_reachability_map_field get_local_trace_directory_1
 

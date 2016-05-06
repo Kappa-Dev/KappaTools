@@ -130,9 +130,9 @@ let options =
       ["3_Trace_analysis"],
       Normal;
 
-      "--use-por-in-local-traces",
-      Bool Config.use_por_in_local_traces,
-      "Use partial order reduction to get a compact trace up to interleaving permutation",
+      "--use-macrotransitions-in-local-traces",
+      Bool Config.use_macrotransitions_in_local_traces,
+      "Use macrotransitions to get a compact trace up to change of the interleaving order of commuting microtransitions",
       ["3_Trace_analysis"],
       Expert;
 
@@ -229,4 +229,3 @@ let get_option error =
   let parameters = Remanent_parameters.get_parameters
 		     ~called_from:Remanent_parameters_sig.KaSa () in
   error,parameters,!FileNames.input
-

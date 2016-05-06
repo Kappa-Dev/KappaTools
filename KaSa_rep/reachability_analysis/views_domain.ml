@@ -2666,20 +2666,6 @@ struct
 	      (error, handler))
           output handler
       in
-      (*let compil = get_compil static in
-      let error, handler =
-        if Remanent_parameters.get_compute_local_traces parameter
-        then
-          if new_computation
-          then Agent_trace_even_sparser.agent_trace parameter error handler handler_kappa mvbdu_true compil output
-          else if direct_computation
-          then
-            Agent_trace_with_direct_por.agent_trace parameter error handler handler_kappa mvbdu_true compil output
-          else
-            Agent_trace.agent_trace parameter error handler handler_kappa mvbdu_true compil output
-        else
-          error, handler
-        in*)
       error, handler
     else
       begin
@@ -2971,7 +2957,7 @@ struct
           then Agent_trace_even_sparser.agent_trace parameter error handler handler_kappa mvbdu_true compil output
           else if direct_computation
           then
-            Agent_trace_with_direct_por.agent_trace parameter error handler handler_kappa mvbdu_true compil output
+            Agent_trace_with_macrotransitions_direct.agent_trace parameter error handler handler_kappa mvbdu_true compil output
           else
             Agent_trace.agent_trace parameter error handler handler_kappa mvbdu_true compil output
         in
