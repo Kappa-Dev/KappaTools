@@ -7,8 +7,8 @@ class Dimensions{
         this.height = height;
         this.width = width;
     }
-    scale(scale){
-        return new Dimensions(this.height * scale, this.width * scale);
+    scale(s){
+        return new Dimensions(this.height * s, this.width * s);
     }
 
     add(dimensions){
@@ -118,7 +118,7 @@ class Agent extends D3Object {
     }
 
     sitesList(){
-        return Object.keys(this.sites).map((key)=> this.sites[key]);
+        return Object.keys(this.sites).map(function (key) { return this.sites[key] });
     }
 }
 /**
@@ -137,9 +137,9 @@ class ContactMap{
         });
     }
 
-    agent(agent){
+    agent(a){
         var that = this;
-        return that.state[agent];
+        return that.state[a];
     }
     agentLabels(){
         var that = this;
@@ -148,12 +148,12 @@ class ContactMap{
     }
     agentList(){
         var that = this;
-        return that.agentLabels().map((key) => that.state[key]);
+        return that.agentLabels().map(function (key) { return that.state[key] });
     }
 
-    site(agent,site){
+    site(agent,s){
         var that = this;
-        var result = that.agent(agent).sites[site];
+        var result = that.agent(agent).sites[s];
         return result;
     }
 }
@@ -161,10 +161,7 @@ class ContactMap{
  * Contact Layout
  */
 class Layout{
-
-    constructor(contactMap
-               ,dimensions = new Dimensions(400,400)
-               ,margin){
+    constructor(contactMap,dimensions,margin){
         this.contactMap = contactMap;
         this.dimensions = dimensions
         this.margin = margin || { top: dimensions.height/8,
@@ -319,7 +316,6 @@ function clearContactMap(){
 }
 
 function drawContactMap(json){
-    console.log(json);
     var contact = JSON.parse(json)["contact_map"];
     createContactMap(contact,"#contact-map");
 }
