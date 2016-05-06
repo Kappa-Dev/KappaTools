@@ -279,6 +279,11 @@ let site_occurence_failure ag_na (na,pos) =
 	      "' is problematic! Either Sanity.mixture is"^
 		"broken or you don't use it!",pos))
 
+let link_only_one_occurence i pos =
+  raise (ExceptionDefn.Malformed_Decl
+	   ("The link '"^string_of_int i^
+	      "' occurs only one time in the mixture.", pos))
+
 let copy_rule_agent a =
   let p = Array.copy a.ra_ports in
   let i = Array.copy a.ra_ints in
@@ -416,7 +421,7 @@ let annotate_dropped_agent sigs links_annot ((agent_name, _ as ag_ty),intf) =
   { ra_type = ag_id; ra_ports = ports; ra_ints = internals; ra_erased = true;
     ra_syntax = Some (Array.copy ports, Array.copy internals);},lannot
 
-let annotate_created_agent sigs ((agent_name, pos as ag_ty),intf) =
+let annotate_created_agent sigs rannot ((agent_name, pos as ag_ty),intf) =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -425,9 +430,9 @@ let annotate_created_agent sigs ((agent_name, pos as ag_ty),intf) =
     Array.init arity
 	       (fun i ->
 		Signature.default_internal_state ag_id i sigs) in
-  let _ =
+  let _,rannot =
     List.fold_left
-      (fun pset p ->
+      (fun (pset,rannot) p ->
        let p_na = p.Ast.port_nme in
        let p_id = Signature.num_of_site ~agent_name p_na sign in
        let pset' = Mods.IntSet.add p_id pset in
@@ -447,11 +452,13 @@ let annotate_created_agent sigs ((agent_name, pos as ag_ty),intf) =
        match p.Ast.port_lnk with
        | ((Ast.LNK_ANY, _) | (Ast.LNK_SOME, _) | (Ast.LNK_TYPE _,_)) ->
 	  not_enough_specified agent_name p_na
-       | (Ast.LNK_VALUE (i,()), _) ->
+       | (Ast.LNK_VALUE (i,()), pos) ->
 	  let () = ports.(p_id) <- Raw_mixture.VAL i in
-	  pset'
-       | (Ast.FREE, _) -> pset'
-      ) Mods.IntSet.empty intf in
+	  let _,rannot' = build_link pos i ag_id p_id Freed rannot in
+	  pset',rannot'
+       | (Ast.FREE, _) -> pset',rannot
+      ) (Mods.IntSet.empty,rannot) intf in
+  rannot,
   ({ Raw_mixture.a_type = ag_id;
      Raw_mixture.a_ports = ports; Raw_mixture.a_ints = internals; },
    pos)
@@ -462,7 +469,7 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) links_annot lp rp =
   let arity = Signature.arity sigs ag_id in
   let ports = Array.make arity (Location.dummy_annot Ast.LNK_ANY, Maintained) in
   let internals = Array.make arity I_ANY in
-  let register_port_modif p_id lnk1 p' links_annot =
+  let register_port_modif p_id lnk1 p' (lhs_links,rhs_links as links_annot) =
     match lnk1,p'.Ast.port_lnk with
     | (Ast.LNK_ANY,_), (Ast.LNK_ANY,_) -> links_annot
     | (Ast.LNK_SOME,pos), (Ast.LNK_SOME,_) ->
@@ -504,11 +511,12 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) links_annot lp rp =
        let () = ports.(p_id) <- ((Ast.FREE,pos), Maintained) in
        links_annot
     | (Ast.LNK_VALUE (i,()),pos), (Ast.FREE,_) ->
-       let va,links_annot' = build_link pos i ag_id p_id Freed links_annot in
-       let () = ports.(p_id) <- va in links_annot'
+       let va,lhs_links' = build_link pos i ag_id p_id Freed lhs_links in
+       let () = ports.(p_id) <- va in (lhs_links',rhs_links)
     | (Ast.LNK_ANY,pos_lnk), (Ast.LNK_VALUE (i,()),pos) ->
        let () = ports.(p_id) <- ((Ast.LNK_ANY,pos_lnk), Linked (i,pos)) in
-       links_annot
+       let _,rhs_links' = build_link pos i ag_id p_id Freed rhs_links in
+       lhs_links,rhs_links'
     | (Ast.LNK_SOME,pos_lnk), (Ast.LNK_VALUE (i,()),pos') ->
        let (na,pos) = p'.Ast.port_nme in
        let () =
@@ -519,7 +527,8 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) links_annot lp rp =
 	      f "breaking a semi-link on site '%s' will induce a side effect"
 	      na) in
        let () = ports.(p_id) <- ((Ast.LNK_SOME,pos_lnk), Linked (i,pos')) in
-       links_annot
+       let _,rhs_links' = build_link pos' i ag_id p_id Freed rhs_links in
+       lhs_links,rhs_links'
     | (Ast.LNK_TYPE (dst_p,dst_ty),pos_lnk), (Ast.LNK_VALUE (i,()),pos') ->
        let (na,pos) = p'.Ast.port_nme in
        let () =
@@ -531,14 +540,17 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) links_annot lp rp =
 	      na) in
        let () = ports.(p_id) <-
 		  build_l_type sigs pos_lnk dst_ty dst_p (Linked (i,pos')) in
-       links_annot
+       let _,rhs_links' = build_link pos' i ag_id p_id Freed rhs_links in
+       lhs_links,rhs_links'
     | (Ast.FREE,pos_lnk), (Ast.LNK_VALUE (i,()),pos) ->
        let () = ports.(p_id) <- ((Ast.FREE,pos_lnk), Linked (i,pos)) in
-       links_annot
+       let _,rhs_links' = build_link pos i ag_id p_id Freed rhs_links in
+       lhs_links,rhs_links'
     | (Ast.LNK_VALUE (i,()),pos_i), (Ast.LNK_VALUE (j,()),pos_j) ->
-       let va,links_annot' =
-	 build_link pos_i i ag_id p_id (Linked (j,pos_j)) links_annot in
-       let () = ports.(p_id) <- va in links_annot' in
+       let va,lhs_links' =
+	 build_link pos_i i ag_id p_id (Linked (j,pos_j)) lhs_links in
+       let _,rhs_links' = build_link pos_j j ag_id p_id Freed rhs_links in
+       let () = ports.(p_id) <- va in (lhs_links',rhs_links') in
   let register_internal_modif p_id int1 p' =
     match int1,p'.Ast.port_int with
     | [], [] -> ()
@@ -572,9 +584,9 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) links_annot lp rp =
     | [p'] -> (p',r)
     | [] -> site_occurence_failure agent_name (na,pos)
     | _ :: _ -> several_occurence_of_site agent_name (na,pos) in
-  let rp_r,lannot,_ =
+  let rp_r,annot,_ =
     List.fold_left
-      (fun (rp,lannot,pset) p ->
+      (fun (rp,annot,pset) p ->
        let p_na = p.Ast.port_nme in
        let p_id = Signature.num_of_site ~agent_name p_na sign in
        let pset' = Mods.IntSet.add p_id pset in
@@ -586,19 +598,19 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) links_annot lp rp =
 	    || internals.(p_id) <> I_ANY
 	 then site_occurence_failure agent_name p_na in
        let p',rp' = find_in_rp p_na rp in
-       let lannot' = register_port_modif p_id p.Ast.port_lnk p' lannot in
+       let annot' = register_port_modif p_id p.Ast.port_lnk p' annot in
        let () = register_internal_modif p_id p.Ast.port_int p' in
-       (rp',lannot',pset')) (rp,links_annot,Mods.IntSet.empty) lp in
-  let lannot' =
+       (rp',annot',pset')) (rp,links_annot,Mods.IntSet.empty) lp in
+  let annot' =
     List.fold_left
-      (fun lannot p ->
+      (fun annot p ->
        let p_na = p.Ast.port_nme in
        let p_id = Signature.num_of_site ~agent_name p_na sign in
        let () = register_internal_modif p_id [] p in
-       register_port_modif p_id (Location.dummy_annot Ast.LNK_ANY) p lannot)
-      lannot rp_r in
+       register_port_modif p_id (Location.dummy_annot Ast.LNK_ANY) p annot)
+      annot rp_r in
   { ra_type = ag_id; ra_ports = ports; ra_ints = internals; ra_erased = false;
-    ra_syntax = Some (Array.copy ports, Array.copy internals);},lannot'
+    ra_syntax = Some (Array.copy ports, Array.copy internals);},annot'
 
 let refer_links_annot links_annot mix =
   List.iter
@@ -638,26 +650,31 @@ let annotate_lhs_with_diff sigs lhs rhs =
 	 annotate_agent_with_diff sigs ag_ty links_annot lag_p rag_p in
        aux links_annot' (ra::acc) lt rt
     | erased, added ->
-       let mix,(links_one,links_two) =
+       let mix,(lhs_links_one,lhs_links_two) =
 	 List.fold_left
 	   (fun (acc,lannot) x ->
 	    let ra,lannot' = annotate_dropped_agent sigs lannot x in
 	    (ra::acc,lannot'))
-	   (acc,links_annot) erased in
+	   (acc,fst links_annot) erased in
        let () =
-	 match Mods.IntMap.root links_one with
+	 match Mods.IntMap.root lhs_links_one with
 	 | None -> ()
-	 | Some (i,(_,_,_,pos)) ->
-	    raise (ExceptionDefn.Malformed_Decl
-		     ("The link '"^string_of_int i^
-			"' occurs only one time in the mixture.", pos)) in
-       let () = refer_links_annot links_two mix in
-       List.rev mix,
-       List.rev @@ snd @@
+	 | Some (i,(_,_,_,pos)) -> link_only_one_occurence i pos in
+       let () = refer_links_annot lhs_links_two mix in
+       let cmix,(rhs_links_one,_),_ =
 	 List.fold_left
-	   (fun (id,acc) x ->
-	    succ id, annotate_created_agent sigs x::acc) (0,[]) added in
-  aux (Mods.IntMap.empty,Mods.IntMap.empty) [] lhs rhs
+	   (fun (acc,rannot,id) x ->
+	    let rannot',x' = annotate_created_agent sigs rannot x in
+	    x'::acc,rannot',succ id)
+	   ([],snd links_annot,0) added in
+       let () =
+	 match Mods.IntMap.root rhs_links_one with
+	 | None -> ()
+	 | Some (i,(_,_,_,pos)) -> link_only_one_occurence i pos in
+       List.rev mix, List.rev cmix in
+  aux
+    ((Mods.IntMap.empty,Mods.IntMap.empty),(Mods.IntMap.empty,Mods.IntMap.empty))
+    [] lhs rhs
 
 let add_un_variable k_un acc rate_var =
   match k_un with
