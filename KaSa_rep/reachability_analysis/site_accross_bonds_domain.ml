@@ -41,11 +41,12 @@ struct
      -> (A,x,y,B,z,t) -> Ag_id list RuleIdMap to explain in which rule and
      which agent_id (A) a site x of A may become bound to a site z of
      B *)
-  
+
   type local_static_information =
     {
       store_site_accross_bonds_rhs: Ckappa_sig.PairAgentSiteState_map_and_set.Set.t
-      Ckappa_sig.Rule_map_and_set.Map.t;
+          Ckappa_sig.Rule_map_and_set.Map.t;
+      dummy:unit;
     }
 
   type static_information =
@@ -60,7 +61,7 @@ struct
   (* one maps each such tuples (A,x,y,B,z,t) to a mvbdu with two variables
      that describes the relation between the state of y and the state of t,
      when both agents are connected via x and z *)
-      
+
   (* one maps each such tuples (A,x,y,B,z,t) to a mvbdu with one variables
      that decribes the range of y when both agents are connected via x and
      z *)
@@ -94,11 +95,11 @@ struct
   let get_compil static = lift Analyzer_headers.get_cc_code static
 
   let get_bonds_rhs static = lift Analyzer_headers.get_bonds_rhs static
-    
+
   (*--------------------------------------------------------------------*)
 
   let get_local_static_information static = static.local_static_information
-    
+
   let set_local_static_information local static =
     {
       static with
@@ -146,7 +147,7 @@ struct
   (**************************************************************************)
   (*Implementation of local static information*)
 
-  (*let collect_site_accross_bonds_rhs parameter error rule_id rule store_bonds_rhs 
+  (*let collect_site_accross_bonds_rhs parameter error rule_id rule store_bonds_rhs
       store_result =
     (*look inside the views rhs*)
     let error, store_result =
@@ -154,7 +155,7 @@ struct
         parameter error
         (fun parameter error agent_id agent store_result ->
           match agent with
-          | Cckappa_sig.Unknown_agent _ 
+          | Cckappa_sig.Unknown_agent _
           | Cckappa_sig.Ghost -> error, store_result
           | Cckappa_sig.Dead_agent (agent,_,_,_)
           | Cckappa_sig.Agent agent ->
@@ -172,7 +173,7 @@ struct
                       store_set
                   in
                   error, store_set
-                ) agent.Cckappa_sig.agent_interface 
+                ) agent.Cckappa_sig.agent_interface
                 (error, Ckappa_sig.SiteState_map_and_set.Set.empty)
             in
             (*from the first agent, get their partner that is bond in the rhs.
@@ -191,11 +192,11 @@ struct
             (*get the partner of binding information*)
             let error, (agent_type2, site_type2, state2) =
               Ckappa_sig.PairAgentSiteState_map_and_set.Set.fold
-                (fun ((agent_type1, site_type1, state1), (agent_type2, site_type2, state2)) 
+                (fun ((agent_type1, site_type1, state1), (agent_type2, site_type2, state2))
                 (error, result_triple) ->
                     (*if the set of pair of the agent interface belong to first pair*)
                   if agent_type1 = agent_type &&
-                    (Ckappa_sig.SiteState_map_and_set.Set.mem 
+                    (Ckappa_sig.SiteState_map_and_set.Set.mem
                        (site_type1, state1)
                        pair_set)
                   then error, (agent_type2, site_type2, state2)
@@ -203,13 +204,13 @@ struct
                 ) pair_bonds_rhs_set (error, (0,0,0))
             in
             (*TODO:get agent of the first*)
-            
+
 
 
         ) rule.Cckappa_sig.rule_rhs.Cckappa_sig.views store_result
     in
     error, store_result*)
-      
+
   let scan_rule_set static dynamic error =
     let parameter = get_parameter static in
     let compil = get_compil static in
@@ -225,7 +226,7 @@ struct
               error
               rule_id
               rule.Cckappa_sig.e_rule_c_rule
-              store_site_accross_bonds_rhs            
+              store_site_accross_bonds_rhs
           in
           let static = set_site_accross_bonds_rhs store_site_accross_bonds_rhs static in*)
           error, static
@@ -240,7 +241,8 @@ struct
   let initialize static dynamic error =
     let init_local_static_information =
       {
-        store_site_accross_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty
+        store_site_accross_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
+        dummy = ()
       }
     in
     let init_global_static_information =
@@ -249,8 +251,8 @@ struct
         local_static_information = init_local_static_information;
       }
     in
-    let kappa_handler = Analyzer_headers.get_kappa_handler static in
-    let parameter = Analyzer_headers.get_parameter static in
+    (*  let kappa_handler = Analyzer_headers.get_kappa_handler static in
+        let parameter = Analyzer_headers.get_parameter static in*)
     let init_global_dynamic_information =
       {
 	global = dynamic;
@@ -287,9 +289,9 @@ struct
     (* modification of y and/or t accross a bond that is preserved *)
     (* creation of a bond with/without modification of z,t *)
     let event_list = [] in
-    let parameter = get_parameter static in
+    (*  let parameter = get_parameter static in
     let kappa_handler = get_kappa_handler static in
-    let compil = get_compil static in
+        let compil = get_compil static in*)
     error, dynamic, (precondition, event_list)
 
   (* events enable communication between domains. At this moment, the
