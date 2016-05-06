@@ -309,7 +309,7 @@ let xml =
                                   [ Html5.div [ contact_content ]
                                   ]
                      ; navcontent "graph"
-                                  true
+                                  false
                                   [ Html5.div
                                       ~a:[Tyxml_js.R.Html5.a_class
                                             (React.S.bind
