@@ -88,3 +88,17 @@ body {
     color: rgb(169, 68, 66);
     background-color: rgb(242, 222, 222);
 }
+
+.agent-rect { fill: #ccc;
+              stroke-width:1;
+              stroke: #000;
+              fill-opacity:0.5;
+}
+
+.agent-text {
+/*       fill : black; */
+}
+
+.agent-proof {
+       /* fill : black; */
+}

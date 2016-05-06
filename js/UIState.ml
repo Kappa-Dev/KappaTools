@@ -4,7 +4,7 @@ open ApiTypes
 open Lwt
 
 exception InvalidState of string
-
+let model_parse , set_model_parse = React.S.create (None : ApiTypes.parse option)
 let model_text, set_model_text = React.S.create ""
 let model_error, set_model_error = React.S.create ([] : Api_types.error)
 let model_is_running , set_model_is_running = React.S.create false
@@ -82,12 +82,16 @@ let update_text text =
                           None -> Lwt.fail (InvalidState "Runtime state not available")
                         | Some runtime_state -> runtime_state#parse text)
                       >>=
-                        (fun error -> match error with
-                                        `Left error -> let () = set_model_error error in
-                                                       Lwt.return_unit
-                                      | `Right _ ->
-                                         let () = set_model_error [] in
-                                         Lwt.return_unit
+                        (fun error ->
+                          match error with
+                            `Left error ->
+                              let () = set_model_error error in
+                              let () = set_model_parse None in
+                              Lwt.return_unit
+                          | `Right parse ->
+                            let () = set_model_error [] in
+                            let () = set_model_parse (Some parse) in
+                            Lwt.return_unit
                         )
                      )
   in

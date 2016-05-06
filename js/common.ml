@@ -46,9 +46,9 @@ let option_string (id : string option) =
   | None -> Js.null
 
 let plotPNG (plotDivId : string)
-	    (title:string)
-	    (plotName : string)
-  	    (plotStyleId : string option) =
+            (title:string)
+            (plotName : string)
+            (plotStyleId : string option) =
   Js.Unsafe.fun_call
     (Js.Unsafe.js_expr "plotPNG")
     [| Js.Unsafe.inject (Js.string plotDivId);
@@ -58,9 +58,9 @@ let plotPNG (plotDivId : string)
       |]
 
 let plotSVG (plotDivId : string)
-	    (title:string)
-	    (plotName : string)
-	    (plotStyleId : string option) =
+            (title:string)
+            (plotName : string)
+            (plotStyleId : string option) =
   Js.Unsafe.fun_call
     (Js.Unsafe.js_expr "plotSVG")
     [| Js.Unsafe.inject (Js.string plotDivId);
@@ -68,3 +68,13 @@ let plotSVG (plotDivId : string)
        Js.Unsafe.inject (Js.string plotName);
        Js.Unsafe.inject (option_string plotStyleId)
       |]
+
+let contact_map (parse : ApiTypes_j.parse option) : unit =
+  let () = debug parse in
+  match parse with
+    None -> Js.Unsafe.fun_call
+             (Js.Unsafe.js_expr "clearContactMap") [| |]
+  | Some parse ->
+    let json : string = ApiTypes_j.string_of_parse parse in
+    Js.Unsafe.fun_call
+      (Js.Unsafe.js_expr "drawContactMap") [| Js.Unsafe.inject (Js.string json) |]
