@@ -57,19 +57,6 @@ body {
 .panel-footer-white {
     background:white;
 }
-/*
-.tab-pane {
-    border-left: 1px solid #ddd;
-    border-right: 1px solid #ddd;
-    border-bottom: 1px solid #ddd;
-    border-radius: 0px 0px 5px 5px;
-    padding: 10px;
-}
-
-.nav-tabs {
-    margin-bottom: 0;
-}
-*/
 .filename {
     display: inline-block;
     padding: 6px 12px;
@@ -89,16 +76,31 @@ body {
     background-color: rgb(242, 222, 222);
 }
 
-.agent-rect { fill: #ccc;
+.node-rect { fill: #ccc;
+             stroke-width:2;
+             stroke: #000;
+             fill-opacity:0.5;
+             stroke-width : 2;
+}
+
+.node-proof {
+              opacity : 0.0;
+}
+.site-rect {  fill: #ccc;
               stroke-width:1;
               stroke: #000;
-              fill-opacity:0.5;
+}
+.site-text {
 }
 
-.agent-text {
-/*       fill : black; */
-}
+.node-proof { opacity : 0.0;
+            }
 
-.agent-proof {
-       /* fill : black; */
+.link-proof { fill: red;
+              opacity : 0.0; }
+
+.site-proof { fill: blue;
+              opacity : 0.0; }
+.link-line { stroke : black;
+             stroke-width : 2;
 }

@@ -7,19 +7,53 @@ class Dimensions{
         this.height = height;
         this.width = width;
     }
+    clone(d){
+
+    }
     scale(s){
         return new Dimensions(this.height * s, this.width * s);
     }
 
     add(dimensions){
-        return new Dimensions(this.height + dimensions.height, this.width + dimensions.width);
+        return new Dimensions(this.height + dimensions.height,
+                              this.width + dimensions.width);
     }
     update(dimensions){
         this.height = dimensions.height;
         this.width = dimensions.width;
     }
     toPoint(){ return new Point(this.width,this.height); }
+    larger(dimensions){
+        return (this.height > dimensions.height)
+               &&
+               (this.width > dimensions.width);
+    }
+    min(dimensions){
+        var height = (this.height < dimensions.height)?this.height:dimensions.height;
+        var width = (this.width < dimensions.width)?this.width:dimensions.width;
+        return new Dimensions(height,width);
+    }
+
+    max(dimensions){
+        var height = (this.height > dimensions.height)?this.height:dimensions.height;
+        var width = (this.width > dimensions.width)?this.width:dimensions.width;
+        return new Dimensions(height,width);
+    }
+
+    area(){
+        return this.height * this.width;
+    }
+    square(){
+        var size = Math.max(this.width,this.height);
+        return new Dimensions(size,size);
+    }
+    rectangle(){
+        return (this.height > this.width)?this.square():
+                                          this;
+    }
 };
+Dimensions.clone = function(d){ return new Dimensions(d.height,d.width); }
+
 /**
  * Point used for coordinates.
  */
@@ -32,7 +66,6 @@ class Point{
         return Math.sqrt(((this.x - point.x)*(this.x - point.x))
                          +
                          ((this.y - point.y)*(this.y - point.y)));
-
     }
     magnitude(){
         return this.distance(new Point(0,0));
@@ -89,11 +122,15 @@ class D3Object {
         this.absolute = new Point(0,0);
         this.relative = new Point(0,0);
         this.dimensions = new Dimensions(0,0);
+        this.contentDimensions = new Dimensions(0,0);
     }
 
     anchor(point){
         var that = this;
-        return that.dimensions.toPoint().scale(-0.5).translate(point);
+        return that.dimensions
+                   .toPoint()
+                   .scale(-0.5)
+                   .translate(point);
     }
 }
 /**
@@ -104,22 +141,62 @@ class Site extends D3Object {
         super(label);
         this.adjacent = {};
         this.targets = [];
+        this.adjacentNodes = new Set();
+    }
+    addAdjacent(nodeLabel,siteLabel){
+        this.targets.push(new SiteReference(nodeLabel,siteLabel));
+        this.adjacentNodes.add(nodeLabel);
+    }
+    listAdjacentNodes(){
+        return Array.from(this.adjacentNodes);
+    }
+}
+class SiteReference {
+    constructor(nodeLabel,siteLabel){
+        this.nodeLabel = nodeLabel;
+        this.siteLabel = siteLabel;
     }
 }
 /**
- * DTO for Agent
+ * DTO for Node
  */
-class Agent extends D3Object {
+class Node extends D3Object {
 
     constructor(label){
         super(label);
         this.sites = {};
-        this.adjacent = {};
+        this.adjacentNodes = new Set();
     }
 
-    sitesList(){
-        return Object.keys(this.sites).map(function (key) { return this.sites[key] });
+    siteAdd(site){
+        this.sites[site.label] = site;
     }
+    site(siteLabel){
+        return this.sites[siteLabel];
+    }
+    sitesList(){
+        var that = this;
+        return Object.keys(that.sites)
+                     .map(function (key) { return that.sites[key]; });
+    }
+
+    preferredSize(){
+        var that =  this;
+        var d = that.sitesList().reduce(function(acc,site){
+                                          return acc.add(site.dimensions); }
+                                       ,that.contentDimensions.scale(1.0));
+
+        return that.contentDimensions.scale(2.0).max(d);
+    }
+
+    addAdjacent(nodeLabell){
+        this.adjacentNodes.add(nodeLabell);
+    }
+    listAdjacentNodes(){
+        return Array.from(this.adjacentNodes);
+    }
+
+
 }
 /**
  * DTO for contact map.
@@ -129,32 +206,99 @@ class ContactMap{
         var that = this;
         that.state = {};
 
-        data.forEach(function(agent){
-            var agent_label = agent["node_name"];
-            if(!that.state.hasOwnProperty(agent_label)){
-                that.state[agent_label]= new Agent(agent_label);
+        data.forEach(function(node){
+            var nodeName = node.node_name;
+            if(!that.state.hasOwnProperty(nodeName)){
+                that.state[nodeName]= new Node(nodeName);
             };
+            var newNode = that.state[nodeName];
+            var nodeSites = node.node_sites;
+            nodeSites.forEach(function(site){
+                var siteName = site.site_name;
+                var siteLinks = site.site_links;
+                var siteNew = new Site(siteName);
+                newNode.siteAdd(siteNew);
+                siteLinks.forEach(function(link){
+                    var nodeId = parseInt(link[0]);
+                    var siteId = parseInt(link[1]);
+                    var targetNode = data[nodeId].node_name;
+                    var targetSite = data[nodeId].node_sites[siteId].site_name;
+                    newNode.addAdjacent(data[nodeId].nodeName);
+                    siteNew.addAdjacent(targetNode,targetSite);
+                })
+            });
         });
     }
 
-    agent(a){
+    node(a){
         var that = this;
         return that.state[a];
     }
-    agentLabels(){
+    nodeNames(){
         var that = this;
         var result = Object.getOwnPropertyNames(that.state).sort();
         return result;
     }
-    agentList(){
+    nodeList(){
         var that = this;
-        return that.agentLabels().map(function (key) { return that.state[key] });
+        return that.nodeNames()
+                   .map(function (key) { return that.state[key] });
+    }
+    nodeAbsolute(){
+        var that = this;
+        var result = that.nodeNames().map((key) => that.state[key].absolute);
+        return result;
     }
 
-    site(agent,s){
+    site(node,s){
         var that = this;
-        var result = that.agent(agent).sites[s];
+        var result = that.node(node).site(s);
         return result;
+    }
+
+    // layout of sites
+    siteDistance(site,point){
+        var that = this;
+        var distances = site.listAdjacentNodes().map(function(nodeName){
+            var nodeLocation = that.node(nodeName).absolute;
+            return nodeLocation.distance(point);
+        });
+        var result = distances.reduce(function(a,b){ return a+b }, 0);
+        return result;
+    }
+
+    // return the nearest point to a site with the pental for chosing
+    // the next best point.
+    nearestPoint(sourceNode,sourceSite,points){
+        var that = this;
+        if(points.length == 0){
+            throw "no points to choose from"
+        } else if (points.length == 1){
+            var point = points[0];
+            return { nearest : point
+                   , penalty : 0
+                   , distance : that.siteDistance(sourceNode,sourceSite,point) };
+        } else {
+            var point = points[0];
+            var r = that.nearestPoint(sourceNode,sourceSite,points.slice(1));
+            var distance = that.siteDistance(sourceNode,sourceSite,point);
+            if(distance < r.distance){
+                return { nearest : point
+                       , penalty : r.distance - distance
+                       , distance : distance };
+            } else { return r; }
+
+        }
+    }
+    // calcuate the center of mass
+    centerOfMass(){
+        var x = 0  , y = 0 , n = 0;
+        Object.keys(that.state).forEach(function(sourceLabel) {
+            x+=that.state[sourceLabel].absolute.x;
+            y+=that.state[sourceLabel].absolute.y;
+            n++;
+        });
+        return (n == 0)?new Point(0,0):new Point(x/n,y/n);
     }
 }
 /**
@@ -174,21 +318,21 @@ class Layout{
         this.padding.height = Math.max(this.padding.height,5);
         this.padding.height = Math.min(this.padding.height,20);
     }
-    /* Position agents along a circle */
-    circleAgents(){
+    /* Position nodes along a circle */
+    circleNodes(){
         var that = this;
-        var agents = that.contactMap.agentList();
-        agents.forEach(function(agent,index,agents){
+        var nodes = that.contactMap.nodeList();
+        nodes.forEach(function(node,index,nodes){
             var dx = 0;
             var dy = 0;
 
-            var length = agents.length;
+            var length = nodes.length;
             if(length > 1){
                 var angle = 2*index*Math.PI/length;
-                dx = that.dimensions.width * Math.cos(angle) / 2;
-                dy = that.dimensions.height * Math.sin(angle) / 2;
+                dx = that.dimensions.width * Math.cos(angle) / 4;
+                dy = that.dimensions.height * Math.sin(angle) / 3;
             }
-            agents[index].absolute = new Point(dx + that.dimensions.width/2,
+            nodes[index].absolute = new Point(dx + that.dimensions.width/2,
                                                dy + that.dimensions.height/2);
         });
     }
@@ -212,13 +356,92 @@ class Layout{
         point.id = i;
         return point;
     }
-    setAgentDimensions(site,dimensions){
+    setNodeDimensions(node,dimensions){
         var that = this;
+        node.contentDimensions = Dimensions.clone(dimensions);
+        node.dimensions = that.padding.add(dimensions);
+    }
+    setSiteDimensions(site,dimensions){
+        var that = this;
+        node.contentDimensions = Dimensions.clone(dimensions);
         site.dimensions = that.padding.add(dimensions);
     }
     layout(){
         var that = this;
-        that.circleAgents();
+        that.circleNodes();
+    }
+
+    resizeNodes(){
+        var that = this;
+        var nodes = that.contactMap.nodeList()
+        var maxDimension = nodes[0].preferredSize();
+        var minDimension = maxDimension;
+        nodes.forEach(function(node)
+                      { var dimension = that.padding.add(node.preferredSize());
+                        maxDimension = dimension.max(maxDimension);
+                        minDimension = dimension.min(minDimension); });
+        // group the size of the nodes
+        var numberOfBuckets = 4;
+        var delta = maxDimension.add(minDimension.scale(-1.00)).scale(1.00/(numberOfBuckets-1));
+        var buckets =  Array.from((new Array(numberOfBuckets)))
+                            .map(function(o,index){
+                                return minDimension.add(delta.scale(index));
+                            });
+        nodes.forEach(function(node){
+            var preferredSize = node.preferredSize();
+            var newSize = preferredSize;
+            for(var i = 0;buckets.length < i && preferredSize.larger(buckets[i]);i++){
+                newSize = buckets[i];
+            }
+            node.dimensions = newSize.rectangle();
+        });
+    }
+    layoutSites(){
+        var that = this;
+        var nodes = that.contactMap.nodeList();
+
+        nodes.forEach(function(node){
+            var dimensions = node.dimensions;
+            var center = dimensions.toPoint();
+            var sites = node.sitesList();
+            var n = Math.max(8,sites.length);
+            var relative = Array.from(new Array(n)
+                                     ,function(x,index){ var point = that.sitePoint(index/n,dimensions);
+                                                         return point;
+                                                        });
+            var absolute = relative.map(function(point){ return node.absolute.translate(point); });
+
+            var distances = sites.map(function(site){
+                var distances = absolute.map(function(point,i){
+                    var distance = that.contactMap.siteDistance(site,point);
+                    return { distance : distance ,
+                             id : i };
+                    });
+                distances.sort(function(l,r){ return l.distance - r.distance; });
+                var result = { site : site ,
+                               distances : distances };
+                return result;
+                });
+
+            while(distances.length > 0){
+                // calculate penalty
+                distances.forEach(function(calculation){
+                    calculation.penalty = calculation.distances[1].distance - calculation.distances[0].distance;
+                });
+                distances.sort(function(l,r){return r.penalty - l.penalty; });
+                // pick minimum
+                var  preferred = distances.shift();
+                var eviction_id = preferred.distances[0].id;
+                // remove preference
+                distances.forEach(function(calculation){
+                    calculation.distances = calculation.distances.filter((d)=>d.id != eviction_id);
+                });
+                // update with preference
+                preferred.site.absolute.update(absolute[eviction_id]);
+                preferred.site.relative.update(relative[eviction_id]);
+            }
+
+        });
     }
 }
 
@@ -236,6 +459,7 @@ class Render{
                                                           , 3*(bBox.width+bBox.height)/6));
         this.svg = this.root
                        .append('svg')
+                       .attr("class","svg-group")
                        .attr("width", this.layout.dimensions.width
                                     + this.layout.margin.left
                                     + this.layout.margin.right)
@@ -249,66 +473,240 @@ class Render{
                                         + this.layout.margin.top + ")");
     }
 
-    dragmove(){
-    }
 
-    renderAgents(){
+    renderNodes(){
         var that = this;
+        var dragmove = function(d){
+            that.updateLinks();
+            that.updateSites();
+            d.absolute.update(d3.event);
+            d3.select(this).attr("transform",
+                                 "translate(" + d.absolute.x + "," + d.absolute.y + ")");
+        };
+
         var drag = d3.behavior
                      .drag()
-                     .on("drag", that.dragmove);
-        that.layout.circleAgents();
-        that.agents = that.svg.selectAll("g")
-                          .data(that.contactMap.agentList())
-                          .enter()
-                          .append("g")
-                          .attr("transform",function(d) {
-                              return "translate("+d.absolute.x+","+d.absolute.y+")";
-                          }).call(drag);
+                     .on("drag", dragmove);
+        that.layout.circleNodes();
+        that.svg.selectAll(".svg-group")
+            .data(that.contactMap.nodeList())
+            .enter()
+            .append("g")
+            .attr("class","node-group")
+            .attr("transform",function(d) {
+                 return "translate("+d.absolute.x+","+d.absolute.y+")";
+            }).call(drag);
 
-        /* keep proof for alignment checks
-        that.agents.append("circle")
-                   .attr("class","agent-proof")
-                   .attr("cy", 0)
-                   .attr("cx", 0)
-                   .attr("r", 2);
-        */
+        that.svg.selectAll(".node-group")
+            .append("text")
+            .attr("class","node-text")
+            .style("text-anchor", "middle")
+            .style("alignment-baseline", "middle")
+            .text(function(d){ return d.label; })
 
-        that.agents.append("text")
-                   .attr("class","agent-text")
-                   .style("text-anchor", "middle")
-                   .style("alignment-baseline", "middle")
-                   .text(function(d){ var label = d.label;
-                                      return label; });
+        that.svg.selectAll(".node-group")
+            .append("rect")
+            .attr("rx", 5)
+            .attr("ry", 5)
+            .attr("class","node-rect")
+                          /* keep proof for alignment checks
+                             that.nodes configure using cess
+                           */
+        that.svg.selectAll(".node-group")
+            .append("circle")
+            .attr("class","node-proof")
+            .attr("cy", 0)
+            .attr("cx", 0)
+            .attr("r", 2);
 
         /* datum is map for data */
-        that.agents.selectAll(".agent-text").datum(function(d){ that.layout.setAgentDimensions(d,this.getBBox()); return d; });
+        that.svg.selectAll(".node-text")
+            .datum(function(d){ that
+                                .layout
+                                .setNodeDimensions(d,this.getBBox());
+                                return d; });
+        /* render nodes */
+        that.svg.selectAll(".node-text")
+                   .attr("x", function(d){ return d.relative.x; })
+                   .attr("y", function(d){ return d.relative.y; });
 
-        that.agents.selectAll(".agent-text")
-                   .attr("x", function(d){
-                       return d.relative.x; })
-                   .attr("y", function(d){
-                       return d.relative.y; });
-
-        that.agents.append("rect")
-                   .attr("rx", 5)
-                   .attr("ry", 5)
-                   .attr("class", "agent-rect")
+        that.svg.selectAll(".node-rect")
                    .attr("x", function(d){ return d.anchor(d.relative).x; })
                    .attr("y", function(d){ return d.anchor(d.relative).y; })
-                   .attr("width",function(d){ return d.dimensions.width; })
-                   .attr("height",function(d){ return d.dimensions.height; })
+                   .attr("width", function(d){ return d.dimensions.width; })
+                   .attr("height", function(d){ return d.dimensions.height; });
+
+
+
+    }
+    renderSites(){
+        var that = this;
+        that.svg.selectAll(".node-group")
+            .each(function(d){
+            that.svg
+                .selectAll("svg-circle")
+                .data(d.sitesList())
+                .enter()
+                .append("circle")
+                .attr("class","link-proof")
+                .attr("cy", 0)
+                .attr("cx", 0)
+                .attr("r", 2);
+
+            var sites = d3.select(this)
+                          .selectAll("g")
+                          .data(d.sitesList())
+                          .enter()
+                          .append("g")
+                          .attr("class","site-group");
+
+
+              sites.append("rect")
+              .attr("class","site-rect")
+              .attr("rx", 3)
+              .attr("ry", 3);
+
+              sites.append("circle")
+              .attr("class","site-proof")
+              .attr("cy", 0)
+              .attr("cx", 0)
+              .attr("r", 2);
+
+
+              sites.append("text")
+              .attr("class","site-text")
+              .style("site-anchor", "middle")
+              .style("alignment-baseline", "middle")
+              .style("text-anchor", "middle")
+
+              .text(function(d){ var label = d.label;
+                                 return label; });
+
+               /* size of sites */
+              sites.selectAll(".site-text")
+                   .datum(function(d){ that
+                                       .layout
+                                       .setNodeDimensions(d,this.getBBox());
+                                return d; });
+
+              that.layout.resizeNodes();
+              that.updateSites();
+
+        })
+
+    }
+    renderLinks(){
+        var that = this;
+        var edges = that.contactMap
+                        .nodeList()
+                        .reduce(function(edges,node,index,nodes){
+                            var sites = node.sitesList();
+                            sites.forEach(function(source_site){
+                                source_site.targets.forEach(function(target_reference){
+                                    var target_site = that.contactMap
+                                                          .site(target_reference.nodeLabel
+                                                               ,target_reference.siteLabel);
+                                    var lineData = { source : source_site.absolute
+                                                   , target : target_site.absolute };
+                                    edges.push(lineData);
+                                });
+                            });
+                            return edges;
+                        },[]);
+
+        edges.forEach(function(lineData){
+            var lineFunction = d3.svg.line()
+                .x(function(d) { return d.x; })
+                .y(function(d) { return d.y; })
+                .interpolate("basis");
+            that.svg
+                .selectAll('path.line')
+                .data([[lineData.source , lineData.target ]])
+                .enter()
+                .append("path")
+                .attr("class","link-line")
+                .attr("d", lineFunction);
+        });
+        console.log(JSON.stringify(edges));
+    }
+
+    updateSites(){
+        var that = this;
+        that.layout.layoutSites();
+        that.svg.selectAll(".node-rect")
+            .attr("width", function(d){ return d.dimensions.width; })
+            .attr("height", function(d){ return d.dimensions.height; });
+
+        that.svg.selectAll(".node-rect")
+            .attr("x", function(d){ return d.anchor(d.relative).x; })
+            .attr("y", function(d){ return d.anchor(d.relative).y; });
+
+        that.svg.selectAll(".site-group")
+            .attr("transform",
+                  function(d){
+                      var anchor = d.anchor(d.relative);
+                      return  "translate("
+                          + anchor.x
+                          + ","
+                          + anchor.y + ")";
+                  });
+
+        that.svg.selectAll(".site-proof")
+            .attr("transform",
+                  function(d){
+                      var anchor = d.relative;
+                      return  "translate("
+                          + 0
+                          + ","
+                          + 0 + ")";
+                  });
+
+        that.svg.selectAll(".link-proof")
+            .attr("cx",function(d){ return d.absolute.x; })
+            .attr("cy",function(d){ return d.absolute.y; });
+
+        that.svg.selectAll(".site-text")
+            .attr("x", function(d){ return d.dimensions.width/2; })
+            .attr("y", function(d){ return d.dimensions.height/2; });
+
+
+        that.svg.selectAll(".site-rect")
+            .attr("width",
+                  function(d){ return d.dimensions.width; })
+            .attr("height",
+                  function(d){ return d.dimensions.height; });
+
+    }
+    updateLinks(){
+        var that = this;
+        that
+        .layout
+        .layoutSites();
+        var lineFunction = d3.svg
+                             .line()
+                             .x(function(d) { return d.x; })
+                             .y(function(d) { return d.y; })
+                             .interpolate("basis");
+        that.svg
+            .selectAll('.link-line').attr("d", lineFunction);
+
     }
     render(){
         var that = this;
-        that.renderAgents();
+        that.renderLinks();
+        that.renderNodes();
+        that.renderSites();
+        that.updateLinks();
+
     }
 }
 
 function createContactMap(data,id){
     var contactMap = new ContactMap(data);
-    var render = new Render(contactMap,id);
-    render.render();
+    if(contactMap.nodeNames().length > 0){
+        var render = new Render(contactMap,id);
+        render.render();
+    }
 }
 
 function clearContactMap(){
