@@ -246,7 +246,7 @@ class ContactMap{
     }
     nodeAbsolute(){
         var that = this;
-        var result = that.nodeNames().map((key) => that.state[key].absolute);
+        var result = that.nodeNames().map(function (key) { return that.state[key].absolute });
         return result;
     }
 
@@ -434,7 +434,7 @@ class Layout{
                 var eviction_id = preferred.distances[0].id;
                 // remove preference
                 distances.forEach(function(calculation){
-                    calculation.distances = calculation.distances.filter((d)=>d.id != eviction_id);
+                    calculation.distances = calculation.distances.filter(function (d) { return d.id != eviction_id });
                 });
                 // update with preference
                 preferred.site.absolute.update(absolute[eviction_id]);
@@ -627,7 +627,6 @@ class Render{
                 .attr("class","link-line")
                 .attr("d", lineFunction);
         });
-        console.log(JSON.stringify(edges));
     }
 
     updateSites(){
