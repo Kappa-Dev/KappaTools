@@ -95,6 +95,8 @@ let html_of_flux flux =
                    f "<option value=\"hits\">Rule occurences</option>@," in
         let () = Format.fprintf
                    f "<option value=\"time\">Time</option>@]@,</select>@,</div>@," in
+        let () = Format.fprintf
+		   f "<input id=\"toggle_selected_rules\" type=\"button\" value=\"Toggle selected rules\">@," in
         let () = Format.fprintf f "@[<v 2><label class=\"checkbox-inline\">@," in
         let () =
           Format.fprintf
@@ -117,6 +119,7 @@ let html_of_flux flux =
         let () = Format.fprintf f "\"selectCorrectionId\" : \"select_correction\",@ " in
         let () = Format.fprintf f "\"nbEventsId\" : \"nb_events\",@ " in
         let () = Format.fprintf f "\"rulesCheckboxesId\" : \"menu\",@ " in
+        let () = Format.fprintf f "\"toggleRulesId\" : \"toggle_selected_rules\",@ " in
         let () = Format.fprintf f "\"checkboxSelfInfluenceId\" : \"checkbox_self_influence\"};@]@ " in
         let () = Format.fprintf f "window.onload = function(){ @[@," in
         let () = Format.fprintf f "var flux_map = new fluxMap(ids);@ " in

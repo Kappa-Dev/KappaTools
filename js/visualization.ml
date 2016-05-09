@@ -104,6 +104,9 @@ let flux_map_content =
                    $flux_label$
                    <li class="list-group-item">
                       <h4 class="list-group-item-heading">Rules</h4>
+                      <button class="btn,btn-default" id="toggle_rule_selection">
+                      Toggle selected rules
+                      </button>
                       <p id="rules-checkboxes"></p>
                    </li>
                    <li class="list-group-item">
@@ -495,6 +498,7 @@ let onload () =
                               ~end_time_id:("end_time")
                               ~select_correction_id:("select_correction")
                               ~checkbox_self_influence_id:("checkbox_self_influence")
+                              ~toggle_rules_id:("toggle_rule_selection")
                               ~nb_events_id:("nb_events")
                               ~svg_id:fluxmap_svg_id
                               ~rules_checkboxes_id:rules_checkboxes_id

@@ -3,6 +3,7 @@ class type flux_configuration = object
                              val endTimeId : Js.js_string Js.t Js.prop
                              val selectCorrectionId : Js.js_string Js.t Js.prop
                              val checkboxSelfInfluenceId : Js.js_string Js.t Js.prop
+			     val toggleRulesId : Js.js_string Js.t Js.prop
                              val nbEventsId : Js.js_string Js.t Js.prop
                              val svgId : Js.js_string Js.t Js.prop
                              val rulesCheckboxesId : Js.js_string Js.t Js.prop
@@ -13,6 +14,7 @@ let constructor_configuration : flux_configuration Js.t Js.constr = (Js.Unsafe.v
 let create_configuration ~(begin_time_id : string)
                          ~(end_time_id : string)
                          ~(select_correction_id : string)
+                         ~(toggle_rules_id : string)
                          ~(checkbox_self_influence_id : string)
                          ~(nb_events_id : string)
                          ~(svg_id : string)
@@ -25,6 +27,7 @@ let create_configuration ~(begin_time_id : string)
            (Js.Unsafe.coerce configuration)##endTimeId <- Js.string end_time_id;
            (Js.Unsafe.coerce configuration)##selectCorrectionId <- Js.string select_correction_id;
            (Js.Unsafe.coerce configuration)##checkboxSelfInfluenceId <- Js.string checkbox_self_influence_id;
+           (Js.Unsafe.coerce configuration)##toggleRulesId <- Js.string toggle_rules_id;
            (Js.Unsafe.coerce configuration)##nbEventsId <- Js.string nb_events_id;
            (Js.Unsafe.coerce configuration)##svgId <- Js.string svg_id;
            (Js.Unsafe.coerce configuration)##rulesCheckboxesId <- Js.string rules_checkboxes_id;

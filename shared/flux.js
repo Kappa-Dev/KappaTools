@@ -29,6 +29,12 @@ function fluxMap(configuration) {
         that.drawDIM();
     };
 
+    this.toggleSelectedRules = function() {
+	that.selectedRules.forEach(function (b,i,a) {a[i] = (b) ? false : true; });
+	that.render_controls();
+	that.drawDIM();
+    };
+
     this.filterRules = function(val,id) {
         return that.selectedRules[id];
     };
@@ -39,7 +45,7 @@ function fluxMap(configuration) {
         {   if (correction === "hits")
             {return (that.flux.hits[i] === 0.) ? 0 : Math.abs(e) / that.flux.hits[i];}
             else if (correction === "time")
-            {return Math.abs(e) / (that.flux.endTime - that.flux.beginTime);}
+            {return Math.abs(e) / (that.flux.bioEndTime - that.flux.bioBeginTime);}
             else {return Math.abs(e);}
         }
         else {return 0;}
@@ -145,6 +151,7 @@ function fluxMap(configuration) {
     this.add_handlers = function(){
         d3.select("#"+that.configuration.selectCorrectionId).on("change",function() { that.drawDIM()});
         d3.select("#"+that.configuration.checkboxSelfInfluenceId).on("click",function() { that.toggleSelfInfluence()});
+	d3.select("#"+that.configuration.toggleRulesId).on("click",function() { that.toggleSelectedRules()});
     };
 
     this.exportJSON = function(filename){
