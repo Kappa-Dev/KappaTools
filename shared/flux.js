@@ -129,7 +129,8 @@ function fluxMap(configuration) {
             if (val) {box.setAttribute("checked","")};
             box.addEventListener("change",function () { that.aClick(id);});
             boxbox.appendChild(box);
-            boxbox.appendChild(document.createTextNode(that.flux.rules[id]));
+            boxbox.appendChild(document.createTextNode(
+		that.flux.rules[id].concat(" (",that.flux.hits[id]," occurences)")));
             group.appendChild(boxbox);
             rulesCheckboxes.appendChild(group);
         });
