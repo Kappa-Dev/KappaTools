@@ -218,7 +218,7 @@ let options =
       "--debugging-mode",
       Bool Config.trace,
       "dump debugging information",
-      ["7_debugging_info"],
+      ["7_Debugging_info"],
       Expert;
     ]
 
