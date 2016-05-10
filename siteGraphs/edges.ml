@@ -337,27 +337,28 @@ let is_valid_path graph l =
 (* depth = number of edges between root and node *)
 let breadth_first_traversal
       dist stop_on_find is_interesting sigs links cache out todos =
-  let rec look_each_site (id,ty,path as x) site (stop,out,next as acc) =
-    if site = 0 then acc else
+  let rec look_each_site (id,ty,path as x) site (out,next as acc) =
+    if site = 0 then (false,out,next) else
     match (DynArray.get links id).(pred site) with
     | None -> look_each_site x (pred site) acc
     | Some ((id',ty' as ag'),site') ->
-       if (stop&&stop_on_find) then let () = Cache.reset cache in acc
-       else if Cache.test cache id' then look_each_site x (pred site) acc
+       if Cache.test cache id' then look_each_site x (pred site) acc
        else
 	 let () = Cache.mark cache id' in
-	 let path' = (((id',ty'),site'),((id,ty),pred site))::path in
+	 let path' = ((ag',site'),((id,ty),pred site))::path in
+	 let next' = (id',ty',path')::next in
 	 let out',store =
 	   match is_interesting ag' with
 	   | Some x -> ((x,id'),path')::out,true
 	   | None -> out,false in
-	 let next' = (id',ty',path')::next in
-	 look_each_site x (pred site) (stop||store,out',next') in
+	 if store&&stop_on_find then (true,out',next')
+	 else look_each_site x (pred site) (out',next') in
   let rec aux depth out next = function
     | (_,ty,_ as x)::todos ->
        let stop,out',next' =
-	 look_each_site x (Signature.arity sigs ty) (false,out,next) in
-       if stop&&stop_on_find then out' else aux depth out' next' todos
+	 look_each_site x (Signature.arity sigs ty) (out,next) in
+       if stop&&stop_on_find then let () = Cache.reset cache in out'
+       else aux depth out' next' todos
     | [] -> match next with
 	    | [] -> let () = Cache.reset cache in out
 	    (* end when all graph traversed and return the list of paths *)
