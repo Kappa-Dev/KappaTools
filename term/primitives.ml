@@ -74,9 +74,9 @@ module Transformation =
 	 function
 	 | (Freed _ | Agent _ | PositiveInternalized _) -> unaries_to_expl
 	 | (NegativeWhatEver _ | NegativeInternalized _) -> assert false
-	 | Linked ((n,_),(n',_)) ->
+	 | Linked ((n,s),(n',s')) ->
 	    if Agent_place.same_connected_component n n'
-	    then unaries_to_expl else n::unaries_to_expl) []
+	    then unaries_to_expl else ((n,s),(n',s'))::unaries_to_expl) []
   end
 
 type elementary_rule = {
@@ -85,7 +85,8 @@ type elementary_rule = {
   connected_components : Connected_component.t array;
   removed : Instantiation.abstract Transformation.t list;
   inserted : Instantiation.abstract Transformation.t list;
-  fresh_bindings : Instantiation.abstract list;
+  fresh_bindings :
+    (Instantiation.abstract Instantiation.site * Instantiation.abstract Instantiation.site) list;
   consumed_tokens : (Alg_expr.t * int) list;
   injected_tokens : (Alg_expr.t * int) list;
   syntactic_rule : int;

@@ -330,6 +330,7 @@ let rec print_path ?sigs ?graph f = function
 		    (fun f -> if p' <> p'' then Format.fprintf f "%i##" p')
 		    (print_path ?sigs ?graph) l
 let empty_path = []
+let singleton_path n s n' s' = [(n,s),(n',s')]
 let rev_path l = List.rev_map (fun (x,y) -> (y,x)) l
 let is_valid_path graph l =
   List.for_all (fun (((a,_),s),((a',_),s')) -> link_exists a s a' s' graph) l

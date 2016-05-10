@@ -23,7 +23,8 @@ sig
     ?sigs:Signature.s -> Format.formatter -> Instantiation.abstract t -> unit
 
   val fresh_bindings :
-    Instantiation.abstract t list -> Instantiation.abstract list
+    Instantiation.abstract t list ->
+    (Instantiation.abstract Instantiation.site * Instantiation.abstract Instantiation.site) list
 end
 
 type elementary_rule = {
@@ -32,7 +33,8 @@ type elementary_rule = {
   connected_components : Connected_component.t array;
   removed : Instantiation.abstract Transformation.t list;
   inserted : Instantiation.abstract Transformation.t list;
-  fresh_bindings : Instantiation.abstract list;
+  fresh_bindings :
+    (Instantiation.abstract Instantiation.site * Instantiation.abstract Instantiation.site) list;
   consumed_tokens : (Alg_expr.t * int) list;
   injected_tokens : (Alg_expr.t * int) list;
   syntactic_rule : int;

@@ -47,7 +47,7 @@ val get_internal : int -> int -> t -> int
 
 type path = ((agent * int) * (agent * int)) list
 val empty_path : path
-
+val singleton_path : agent -> int -> agent -> int -> path
 val rev_path : path -> path
 val print_path :
   ?sigs:Signature.s -> ?graph:t -> Format.formatter -> path -> unit

@@ -382,18 +382,17 @@ let update_edges
 	      else acc) (unary_cands,no_unary') new_obs in
       if path = None && exists_root_of_unary_ccs unary_ccs roots''
       then
-	let unaries_to_explore =
-	  List.map (Agent_place.concretize final_inj2graph)
-		   rule.Primitives.fresh_bindings in
 	List.fold_left
-	  (fun (unary_cands,_ as acc) (id,ty) ->
+	  (fun (unary_cands,_ as acc) ((n,s),(n',s')) ->
+	   let cn = Agent_place.concretize final_inj2graph n in
+	   let cn' = Agent_place.concretize final_inj2graph n' in
 	   match
 	     Edges.paths_of_interest
 	       (potential_root_of_unary_ccs unary_ccs edges'')
-	       sigs edges'' (id,ty) Edges.empty_path with
+	       sigs edges'' cn (Edges.singleton_path cn s cn' s') with
 	   | [] -> acc
-	   | l -> ((id,ty),l) :: unary_cands,false)
-	  unary_pack unaries_to_explore
+	   | l -> (cn',l) :: unary_cands,false)
+	  unary_pack rule.Primitives.fresh_bindings
       else unary_pack in
   (*Store event*)
   let new_tracked_obs_instances =
