@@ -31,7 +31,7 @@ let runtime_value runtime = match runtime with
 class embedded_runtime ()  = object
   val delayed_yield : unit -> unit Lwt.t = Api.time_yield 0.1 Lwt_js.yield
   method yield () = delayed_yield ()
-  method log (_: string) = Lwt.return_unit
+  method log ?exn (_: string) = Lwt.return_unit
   inherit Api.Base.runtime
 end
 

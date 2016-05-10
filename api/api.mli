@@ -18,7 +18,7 @@ module Base : sig
                     method status : ApiTypes_j.token -> ApiTypes_j.state ApiTypes_j.result Lwt.t
                     method list : unit -> ApiTypes_j.catalog ApiTypes_j.result Lwt.t
                     method stop : ApiTypes_j.token -> unit ApiTypes_j.result Lwt.t
-                    method virtual log : string -> unit Lwt.t
+                    method virtual log : ?exn:exn -> string -> unit Lwt.t
                     method virtual yield : unit -> unit Lwt.t
                   end;;
 end;;

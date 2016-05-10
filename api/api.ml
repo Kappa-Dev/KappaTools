@@ -30,7 +30,7 @@ module Base : sig
                             method status : Api_types.token -> Api_types.state Api_types.result Lwt.t
                             method list : unit -> Api_types.catalog Api_types.result Lwt.t
                             method stop : Api_types.token -> unit Api_types.result Lwt.t
-                            method virtual log : string -> unit Lwt.t
+                            method virtual log : ?exn:exn -> string -> unit Lwt.t
                             method virtual yield : unit -> unit Lwt.t
                           end;;
 end = struct
@@ -51,7 +51,7 @@ end = struct
     Format.sprintf "Error at %s : %s"
                    (Location.to_string linenumber)
                    message
-  let build_ast (code : string) success failure (log : string -> unit Lwt.t) =
+  let build_ast (code : string) success failure (log : ?exn:exn -> string -> unit Lwt.t) =
     let lexbuf : Lexing.lexbuf = Lexing.from_string code in
     try
       let raw_ast =
@@ -67,14 +67,12 @@ end = struct
          failure (format_error_message e)
        | ExceptionDefn.Malformed_Decl e ->
          failure (format_error_message e)
-       | e -> let () = Lwt.async (fun () -> (log (Printexc.to_string e))
-                                            >>=
-                                              (fun _ -> log (Printexc.get_backtrace ()))) in
-              raise e
+       | exn -> log ~exn "" >>=
+		  (fun () -> Lwt.fail exn)
 
   class virtual runtime =
   object(self)
-  method virtual log : string -> unit Lwt.t
+  method virtual log : ?exn:exn -> string -> unit Lwt.t
   method virtual yield : unit -> unit Lwt.t
   val mutable context = { states = IntMap.empty
                          ; id = 0 }
@@ -96,12 +94,12 @@ end = struct
       if parameter.nb_plot > 0 then
         catch
         (fun () ->
-         match
-           build_ast parameter.code
-                     (fun ast -> `Right ast)
-                     (fun e -> `Left [e])
-                     self#log
-         with
+         Lwt.bind
+           (build_ast parameter.code
+                     (fun ast -> Lwt.return (`Right ast))
+                     (fun e -> Lwt.return (`Left [e]))
+                     self#log)
+           (function
            `Right ((sig_nd,tk_nd,result),contact_map) ->
            let current_id = self#new_id () in
            let plot : Api_types.plot ref = ref { Api_types.legend = [];
@@ -177,33 +175,25 @@ end = struct
                                 iter graph state)
                           )
                           (function
-                            | ExceptionDefn.Malformed_Decl error ->
-                               let () = Lwt.async (fun () -> (self#log (Printexc.to_string (ExceptionDefn.Malformed_Decl error)))) in
+                            | ExceptionDefn.Malformed_Decl error as exn ->
                                let () = error_messages := [format_error_message error] in
-                               Lwt.return_unit
-                            | ExceptionDefn.Internal_Error error ->
-                               let () = Lwt.async (fun () -> (self#log (Printexc.to_string (ExceptionDefn.Internal_Error error)))) in
+                               self#log ~exn ""
+                            | ExceptionDefn.Internal_Error error as exn ->
                                let () = error_messages := [format_error_message error] in
-                               Lwt.return_unit
-                            | Invalid_argument error ->
-                               let () = Lwt.async (fun () -> (self#log (Printexc.to_string (Invalid_argument error)))) in
+                               self#log ~exn ""
+                            | Invalid_argument error as exn ->
                                let () = error_messages := [Format.sprintf "Runtime error %s" error] in
-                               Lwt.return_unit
-                            | e ->
-                                    (self#log (Printexc.get_backtrace ()))
-                                    >>=
-                                      (fun _ ->
-                                       let () = error_messages := [Printexc.to_string e] in
-                                       self#log (Printexc.to_string e))
-                                    >>=
-                                      (fun _ -> Lwt.return_unit)
+                               self#log ~exn ""
+                            | exn ->
+                               let () = error_messages := [Printexc.to_string exn] in
+                               self#log ~exn ""
                           )
                        )
                       )
            in
            Lwt.return (`Right current_id)
          | `Left e ->  Lwt.return (`Left e)
-        )
+        ))
         (function
           | ExceptionDefn.Malformed_Decl error ->
              Lwt.return (`Left [format_error_message error])
@@ -214,8 +204,8 @@ end = struct
              Lwt.return (`Left [message])
           | Sys_error message ->
              Lwt.return (`Left [message])
-          | e -> (self#log (Printexc.get_backtrace ()))
-                 >>= (fun _ -> Lwt.return (`Left [Printexc.to_string e]))
+          | exn -> (self#log ~exn "")
+                 >>= (fun _ -> Lwt.return (`Left [Printexc.to_string exn]))
         )
       else
         Lwt.return (`Left [msg_observables_less_than_zero])
@@ -247,8 +237,8 @@ end = struct
             | _ -> `Left !(state.error_messages))
         )
         (function Not_found -> Lwt.return (`Left [msg_token_not_found])
-                | e -> (self#log (Printexc.get_backtrace ()))
-                       >>= (fun _ -> Lwt.return (`Left [Printexc.to_string e]))
+                | exn -> (self#log ~exn "")
+                       >>= (fun _ -> Lwt.return (`Left [Printexc.to_string exn]))
         )
     method list () : Api_types.catalog Api_types.result Lwt.t =
       Lwt.return (`Right (List.map fst (IntMap.bindings context.states)))

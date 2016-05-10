@@ -13,14 +13,16 @@ open Unix
 open Lwt_log
 open Re
 
-let log (msg : string) : unit Lwt.t = Lwt_log_core.log Lwt_log_core.Info msg
+let log ?exn (msg : string) : unit Lwt.t =
+  Lwt_log_core.log ?exn ~level:Lwt_log_core.Info msg
 let unit_of_lwt lwt = Lwt.async (fun () -> lwt)
 
-let fatal (msg : string) : unit Lwt.t = Lwt_log_core.log Lwt_log_core.Fatal msg
+let fatal ~exn (msg : string) : unit Lwt.t =
+  Lwt_log_core.log ~exn ~level:Lwt_log_core.Fatal msg
 
 class runtime ()  = object
   method yield () = Lwt_main.yield ()
-  method log (msg : string) = log msg
+  method log ?exn (msg : string) = log ?exn msg
   inherit Api.Base.runtime
 end
 
@@ -58,10 +60,8 @@ let logger (handler : Cohttp_lwt_unix.Server.conn ->
            (request : Cohttp.Request.t)
            (body : Cohttp_lwt_body.t)
     : (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t =
-  (try handler conn request body
-   with e -> let () = Lwt.async (fun () -> (fatal (Printexc.to_string e))) in
-             let () = Lwt.async (fun () -> (fatal (Printexc.get_backtrace ()))) in
-             raise e
+  (Lwt.catch (fun () -> handler conn request body)
+   (fun exn -> fatal ~exn "" >>= (fun () -> Lwt.fail exn))
   )
   >>=
     (fun (response,body) ->
