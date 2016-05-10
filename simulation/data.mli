@@ -25,3 +25,4 @@ type t = Flux of flux_map
        | Print of file_line
        | Snapshot of snapshot
        | UnaryDistances of float * int DynArray.t option array
+       | Log of string

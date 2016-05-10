@@ -494,24 +494,24 @@ let init_kasa called_from result =
   contact_map,Export_to_KaSim.Export_to_KaSim.flush_errors kasa_state
 
 
-let initialize logger ?rescale_init sigs_nd tk_nd contact_map counter result =
-  Debug.tag logger "+ Building initial simulation conditions...";
-  Debug.tag logger "\t -simulation parameters" ;
+let initialize ~outputs ?rescale_init sigs_nd tk_nd contact_map counter result =
+  outputs (Data.Log "+ Building initial simulation conditions...");
+  outputs (Data.Log "\t -simulation parameters");
   let relative_fluxmaps = configurations_of_result result in
 
   let domain = Connected_component.Env.empty sigs_nd in
-  Debug.tag logger "\t -variable declarations";
+  outputs (Data.Log "\t -variable declarations");
   let domain',alg_a =
     compile_alg_vars contact_map counter domain result.Ast.variables in
   let alg_nd = NamedDecls.create alg_a in
   let alg_deps = Alg_expr.setup_alg_vars_rev_dep tk_nd alg_a in
 
-  Debug.tag logger "\t -rules";
+  outputs (Data.Log "\t -rules");
   let (domain',alg_deps',compiled_rules,cc_unaries) =
     compile_rules alg_deps contact_map counter domain' result.Ast.rules in
   let rule_nd = Array.of_list compiled_rules in
 
-  Debug.tag logger "\t -perturbations" ;
+  outputs (Data.Log "\t -perturbations");
   let (domain,pert,stops,has_tracking) =
     pert_of_result alg_nd alg_deps' result.variables result.rules
 		   contact_map counter domain' result in
@@ -528,7 +528,7 @@ let initialize logger ?rescale_init sigs_nd tk_nd contact_map counter result =
       raise (ExceptionDefn.Malformed_Decl
 	       (Location.dummy_annot "There is no way for the simulation to stop.")) in
 
-  Debug.tag logger "\t -observables";
+  outputs (Data.Log "\t -observables");
   let domain,obs =
     obs_of_result contact_map counter domain result in
   let () =
@@ -545,7 +545,7 @@ let initialize logger ?rescale_init sigs_nd tk_nd contact_map counter result =
 		     (Array.of_list result.rules,rule_nd,cc_unaries)
 		     (Array.of_list (List.rev obs)) (Array.of_list pert) in
 
-  Debug.tag logger "\t -initial conditions";
+  outputs (Data.Log "\t -initial conditions");
   let domain = Connected_component.Env.finalize domain in
   let domain,init_l =
     inits_of_result
@@ -565,5 +565,5 @@ let initialize logger ?rescale_init sigs_nd tk_nd contact_map counter result =
 	   f
 	   "An observable may be tracked but no compression level to render stories has been specified")
   in
-  let () = Debug.tag logger "\t Done" in
+  let () = outputs (Data.Log "\t Done") in
   (env, domain, graph, state, init_l)

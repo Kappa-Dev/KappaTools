@@ -322,6 +322,7 @@ let go env = function
      in
      Format.fprintf desc "%s@." p.Data.line
   | Data.UnaryDistances (x,y) -> unary_distances x y
+  | Data.Log s -> Format.printf "%s@." s
 
 let close () =
   let () = close_plot () in

@@ -127,30 +127,33 @@ end = struct
            let () = context <- { context with states = IntMap.add current_id simulation context.states } in
            let log_form = Format.formatter_of_buffer simulation.log_buffer in
            let () = Counter.reinitialize simulation.counter in
+	   let outputs sigs = function
+	     | Data.Flux flux_map ->
+		flux_maps := ((Api_data.api_flux_map flux_map)::!flux_maps)
+	     | Data.Plot (time,new_observables) ->
+		let new_values =
+		  List.map (fun nbr -> Nbr.to_float nbr)
+			   (Array.to_list new_observables) in
+		plot := {!plot with Api_types.observables =
+				      { Api_types.time = time ; values = new_values }
+				      :: !plot.Api_types.observables }
+	     | Data.Print file_line ->
+		files := ((Api_data.api_file_line file_line)::!files)
+	     | Data.Snapshot snapshot ->
+		snapshots := ((Api_data.api_snapshot sigs snapshot)::!snapshots)
+	     | Data.UnaryDistances _ -> ()
+	     | Data.Log s -> Format.fprintf log_form "%s@." s in
            let () = Lwt.async
                       (fun () ->
                        (catch
                           (fun () ->
-                           wrap6 (Eval.initialize ?rescale_init:None)
-                                 log_form sig_nd tk_nd contact_map
+                           wrap5 (Eval.initialize
+				    ?rescale_init:None
+				    ~outputs:(outputs (Signature.create [])))
+                                 sig_nd tk_nd contact_map
                                  simulation.counter result >>=
                              (fun (env,domain,graph,state,_) ->
 			      let sigs = Environment.signatures env in
-			      let outputs = function
-				| Data.Flux flux_map ->
-				   flux_maps := ((Api_data.api_flux_map flux_map)::!flux_maps)
-				| Data.Plot (time,new_observables) ->
-				   let new_values =
-				     List.map (fun nbr -> Nbr.to_float nbr)
-					      (Array.to_list new_observables) in
-				   plot := {!plot with Api_types.observables =
-							 { Api_types.time = time ; values = new_values }
-							 :: !plot.Api_types.observables }
-				| Data.Print file_line ->
-				   files := ((Api_data.api_file_line file_line)::!files)
-				| Data.Snapshot snapshot ->
-				   snapshots := ((Api_data.api_snapshot sigs snapshot)::!snapshots)
-				| Data.UnaryDistances _ -> () in
                               let legend = Environment.map_observables
                                                (Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
                                                env
@@ -159,7 +162,7 @@ end = struct
                                 let rec iter graph state =
                                   let (stop,graph',state') =
                                     State_interpreter.a_loop
-                                      ~outputs:outputs log_form
+                                      ~outputs:(outputs sigs) log_form
                                       env domain simulation.counter graph state in
                                   if stop then
                                     let () = ExceptionDefn.flush_warning log_form in

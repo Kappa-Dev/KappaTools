@@ -147,7 +147,7 @@ let () =
 	  Eval.init_kasa Remanent_parameters_sig.KaSim result in
 	let () = Format.printf "+ Compiling...@." in
 	Eval.initialize
-	  ?rescale_init:!rescale Format.std_formatter
+	  ?rescale_init:!rescale ~outputs:(Outputs.go (Signature.create []))
 	  sigs_nd tk_nd contact_map counter result'
       | marshalized_file ->
 	 try
@@ -225,7 +225,7 @@ let () =
     Parameter.initSimTime () ;
     let () =
       State_interpreter.loop
-	~outputs:(Outputs.go  (Environment.signatures env))
+	~outputs:(Outputs.go (Environment.signatures env))
 	~called_from:Remanent_parameters_sig.KaSim
 	Format.std_formatter env cc_env counter graph state
     in
