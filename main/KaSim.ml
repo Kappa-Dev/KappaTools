@@ -147,6 +147,7 @@ let () =
 	  Eval.init_kasa Remanent_parameters_sig.KaSim result in
 	let () = Format.printf "+ Compiling...@." in
 	Eval.initialize
+	  ~pause:(fun f -> f ()) ~return:(fun x -> x)
 	  ?rescale_init:!rescale ~outputs:(Outputs.go (Signature.create []))
 	  sigs_nd tk_nd contact_map counter result'
       | marshalized_file ->

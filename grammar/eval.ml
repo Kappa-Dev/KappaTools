@@ -494,11 +494,13 @@ let init_kasa called_from result =
   contact_map,Export_to_KaSim.Export_to_KaSim.flush_errors kasa_state
 
 
-let initialize ~outputs ?rescale_init sigs_nd tk_nd contact_map counter result =
+let initialize ~outputs ~pause ~return
+	       ?rescale_init sigs_nd tk_nd contact_map counter result =
   outputs (Data.Log "+ Building initial simulation conditions...");
   outputs (Data.Log "\t -simulation parameters");
   let relative_fluxmaps = configurations_of_result result in
-
+  pause
+    (fun () ->
   let domain = Connected_component.Env.empty sigs_nd in
   outputs (Data.Log "\t -variable declarations");
   let domain',alg_a =
@@ -506,11 +508,15 @@ let initialize ~outputs ?rescale_init sigs_nd tk_nd contact_map counter result =
   let alg_nd = NamedDecls.create alg_a in
   let alg_deps = Alg_expr.setup_alg_vars_rev_dep tk_nd alg_a in
 
+  pause
+    (fun () ->
   outputs (Data.Log "\t -rules");
   let (domain',alg_deps',compiled_rules,cc_unaries) =
     compile_rules alg_deps contact_map counter domain' result.Ast.rules in
   let rule_nd = Array.of_list compiled_rules in
 
+  pause
+    (fun () ->
   outputs (Data.Log "\t -perturbations");
   let (domain,pert,stops,has_tracking) =
     pert_of_result alg_nd alg_deps' result.variables result.rules
@@ -528,6 +534,8 @@ let initialize ~outputs ?rescale_init sigs_nd tk_nd contact_map counter result =
       raise (ExceptionDefn.Malformed_Decl
 	       (Location.dummy_annot "There is no way for the simulation to stop.")) in
 
+  pause
+    (fun () ->
   outputs (Data.Log "\t -observables");
   let domain,obs =
     obs_of_result contact_map counter domain result in
@@ -546,10 +554,16 @@ let initialize ~outputs ?rescale_init sigs_nd tk_nd contact_map counter result =
 		     (Array.of_list (List.rev obs)) (Array.of_list pert) in
 
   outputs (Data.Log "\t -initial conditions");
+  pause
+    (fun () ->
   let domain = Connected_component.Env.finalize domain in
+  pause
+    (fun () ->
   let domain,init_l =
     inits_of_result
       ?rescale:rescale_init contact_map counter env domain result in
+  pause
+    (fun () ->
   let graph0 = Rule_interpreter.empty ~has_tracking env in
   let state0 = State_interpreter.empty env stops relative_fluxmaps in
   let graph,state =
@@ -566,4 +580,4 @@ let initialize ~outputs ?rescale_init sigs_nd tk_nd contact_map counter result =
 	   "An observable may be tracked but no compression level to render stories has been specified")
   in
   let () = outputs (Data.Log "\t Done") in
-  (env, domain, graph, state, init_l)
+  return (env, domain, graph, state, init_l))))))))

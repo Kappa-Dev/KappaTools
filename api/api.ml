@@ -147,11 +147,13 @@ end = struct
                       (fun () ->
                        (catch
                           (fun () ->
-                           wrap5 (Eval.initialize
-				    ?rescale_init:None
-				    ~outputs:(outputs (Signature.create [])))
-                                 sig_nd tk_nd contact_map
-                                 simulation.counter result >>=
+                           Eval.initialize
+			     ~pause:(fun f -> Lwt.bind (self#yield ()) f)
+			     ~return:Lwt.return
+			     ?rescale_init:None
+			     ~outputs:(outputs (Signature.create []))
+                             sig_nd tk_nd contact_map
+                             simulation.counter result >>=
                              (fun (env,domain,graph,state,_) ->
 			      let () = ExceptionDefn.flush_warning log_form in
 			      let sigs = Environment.signatures env in
