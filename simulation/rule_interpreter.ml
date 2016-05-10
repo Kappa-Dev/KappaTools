@@ -387,7 +387,7 @@ let update_edges
 	   let cn = Agent_place.concretize final_inj2graph n in
 	   let cn' = Agent_place.concretize final_inj2graph n' in
 	   match
-	     Edges.paths_of_interest
+	     Edges.paths_of_interest ~looping:(cn',s')
 	       (potential_root_of_unary_ccs unary_ccs edges'')
 	       sigs edges'' cn (Edges.singleton_path cn s cn' s') with
 	   | [] -> acc
@@ -463,6 +463,7 @@ let new_unary_instances sigs rule_id cc1 cc2 created_obs state =
 		  else add_candidate cands pathes rule_id id d p)
 		 acc
 		 (Edges.paths_of_interest
+		    ~looping:((-1,-1),-1)
 		    (fun x ->
 		     if Connected_component.Matching.is_root_of state.edges x goal
 		     then Some ()

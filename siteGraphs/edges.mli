@@ -57,8 +57,9 @@ val are_connected :
   int option -> bool -> path option
 (** [are_connected ?candidate sigs graph nodes_x nodes_y dist store_dist] *)
 
-val paths_of_interest : (agent -> 'a option) -> Signature.s -> t ->
-			agent -> path -> (('a*int) * path) list
+val paths_of_interest :
+  looping:(agent * int) -> (agent -> 'a option) -> Signature.s -> t ->
+  agent -> path -> (('a*int) * path) list
 (** [paths_of_interest is_interesting sigs graph agent done_path] *)
 
 val build_snapshot : Signature.s -> t -> (int * Raw_mixture.t) list

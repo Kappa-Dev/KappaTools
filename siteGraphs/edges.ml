@@ -337,13 +337,14 @@ let is_valid_path graph l =
 
 (* depth = number of edges between root and node *)
 let breadth_first_traversal
-      dist stop_on_find is_interesting sigs links cache out todos =
+      ~looping dist stop_on_find is_interesting sigs links cache out todos =
   let rec look_each_site (id,ty,path as x) site (out,next as acc) =
-    if site = 0 then (false,out,next) else
+    if site = 0 then Some (false,out,next) else
     match (DynArray.get links id).(pred site) with
     | None -> look_each_site x (pred site) acc
     | Some ((id',ty' as ag'),site') ->
-       if Cache.test cache id' then look_each_site x (pred site) acc
+       if ag' = fst looping  && site' <> snd looping then None
+       else if Cache.test cache id' then look_each_site x (pred site) acc
        else
 	 let () = Cache.mark cache id' in
 	 let path' = ((ag',site'),((id,ty),pred site))::path in
@@ -352,14 +353,15 @@ let breadth_first_traversal
 	   match is_interesting ag' with
 	   | Some x -> ((x,id'),path')::out,true
 	   | None -> out,false in
-	 if store&&stop_on_find then (true,out',next')
+	 if store&&stop_on_find then Some (true,out',next')
 	 else look_each_site x (pred site) (out',next') in
   let rec aux depth out next = function
     | (_,ty,_ as x)::todos ->
-       let stop,out',next' =
-	 look_each_site x (Signature.arity sigs ty) (out,next) in
-       if stop&&stop_on_find then let () = Cache.reset cache in out'
-       else aux depth out' next' todos
+       (match look_each_site x (Signature.arity sigs ty) (out,next) with
+       | None -> []
+       | Some (stop,out',next') ->
+	  if stop then let () = Cache.reset cache in out'
+	  else aux depth out' next' todos)
     | [] -> match next with
 	    | [] -> let () = Cache.reset cache in out
 	    (* end when all graph traversed and return the list of paths *)
@@ -371,7 +373,7 @@ let breadth_first_traversal
   aux 1 out [] todos
 
 let paths_of_interest
-      is_interesting sigs graph (start_point,start_ty) done_path =
+      ~looping is_interesting sigs graph (start_point,start_ty) done_path =
   let () = assert (not graph.outdated) in
   let () = Cache.mark graph.cache start_point in
   let () = List.iter (fun (_,((x,_),_)) -> Cache.mark graph.cache x)
@@ -379,7 +381,7 @@ let paths_of_interest
   let acc = match is_interesting (start_point,start_ty) with
     | None -> []
     | Some x -> [(x,start_point),done_path] in
-  breadth_first_traversal None false is_interesting sigs graph.connect
+  breadth_first_traversal ~looping None false is_interesting sigs graph.connect
 			  graph.cache acc [start_point,start_ty,done_path]
 
 (* nodes_x: agent_id list = (int * int) list
@@ -400,8 +402,8 @@ let are_connected
        List.fold_left (fun acc (id,ty)  ->
 		       let () = Cache.mark graph.cache id in
 		       (id,ty,[])::acc) [] nodes_x in
-     match breadth_first_traversal dist true is_in_nodes_y sigs
-				   graph.connect graph.cache [] prepare
+     match breadth_first_traversal ~looping:((-1,-1),-1) dist true is_in_nodes_y
+				   sigs graph.connect graph.cache [] prepare
      with [] -> None
 	| [ _,p ] -> Some p
 	| _ :: _ -> failwith "Edges.are_they_connected completely broken"
