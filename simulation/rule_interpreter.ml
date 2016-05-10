@@ -380,7 +380,7 @@ let update_edges
 		(root,[(Connected_component.Set.singleton cc,fst root),
 		       Edges.empty_path])::unary_cands,false
 	      else acc) (unary_cands,no_unary') new_obs in
-      if path <> None || exists_root_of_unary_ccs unary_ccs roots''
+      if path = None && exists_root_of_unary_ccs unary_ccs roots''
       then
 	let unaries_to_explore =
 	  List.map (Agent_place.concretize final_inj2graph)
