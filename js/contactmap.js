@@ -423,7 +423,7 @@ class Layout{
                 return result;
                 });
 
-            while(distances.length > 0){
+            while(distances.length > 1){
                 // calculate penalty
                 distances.forEach(function(calculation){
                     calculation.penalty = calculation.distances[1].distance - calculation.distances[0].distance;
@@ -440,7 +440,11 @@ class Layout{
                 preferred.site.absolute.update(absolute[eviction_id]);
                 preferred.site.relative.update(relative[eviction_id]);
             }
-
+	    if(distances.length == 1){
+		var eviction_id = preferred.distances[0].id;
+		preferred.site.absolute.update(absolute[eviction_id]);
+		preferred.site.relative.update(relative[eviction_id]);
+	    }
         });
     }
 }
