@@ -153,6 +153,7 @@ end = struct
                                  sig_nd tk_nd contact_map
                                  simulation.counter result >>=
                              (fun (env,domain,graph,state,_) ->
+			      let () = ExceptionDefn.flush_warning log_form in
 			      let sigs = Environment.signatures env in
                               let legend = Environment.map_observables
                                                (Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
@@ -162,7 +163,7 @@ end = struct
                                 let rec iter graph state =
                                   let (stop,graph',state') =
                                     State_interpreter.a_loop
-                                      ~outputs:(outputs sigs) log_form
+                                      ~outputs:(outputs sigs)
                                       env domain simulation.counter graph state in
                                   if stop then
                                     let () = ExceptionDefn.flush_warning log_form in

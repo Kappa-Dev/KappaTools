@@ -24,8 +24,7 @@ val activity : t -> float
 (** Returns the current activity *)
 
 val a_loop :
-  outputs:(Data.t -> unit) -> Format.formatter ->
-  Environment.t -> Connected_component.Env.t ->
+  outputs:(Data.t -> unit) -> Environment.t -> Connected_component.Env.t ->
   Counter.t -> Rule_interpreter.t -> t -> (bool * Rule_interpreter.t * t)
 (** One event loop *)
 

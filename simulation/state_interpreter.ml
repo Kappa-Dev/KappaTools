@@ -296,7 +296,7 @@ let one_rule dt stop env domain counter graph state =
 let activity state =
   Random_tree.total state.activities
 
-let a_loop ~outputs form env domain counter graph state =
+let a_loop ~outputs env domain counter graph state =
   let activity = activity state in
   let rd = Random.float 1.0 in
   let dt = abs_float (log rd /. activity) in
@@ -312,11 +312,12 @@ let a_loop ~outputs form env domain counter graph state =
 	       (Data.Snapshot
 		  (Rule_interpreter.snapshot env counter "deadlock.ka" graph)) in
 	 let () =
-	   Format.fprintf
-	     form
-	     "?@.A deadlock was reached after %d events and %Es (Activity = %.5f)"
+	   outputs
+	     (Data.Log
+		(Format.sprintf
+		   "?@.A deadlock was reached after %d events and %Es (Activity = %.5f)"
 	     (Counter.current_event counter)
-	     (Counter.current_time counter) activity in
+	     (Counter.current_time counter) activity)) in
 	 (true,graph,state)
       | (ti,_) :: tail ->
 	 let () = state.stopping_times := tail in
@@ -370,7 +371,7 @@ let loop ~outputs ~called_from form env domain counter graph state =
   let rec iter graph state =
     let stop,graph',state' =
       try
-	a_loop ~outputs form env domain counter graph state
+	a_loop ~outputs env domain counter graph state
       with ExceptionDefn.UserInterrupted f ->
 	let () = Format.pp_print_newline form () in
 	let msg = f (Counter.current_time counter) (Counter.current_event counter) in
