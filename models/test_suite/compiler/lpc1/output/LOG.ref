@@ -15,6 +15,6 @@ done
 	 -initial conditions
 	 Done
 ____________________________________________________________
-##############################?
-A deadlock was reached after 1 events and 1.542777E-01s (Activity = 0.00000)##############################
+############################################################
+Warning: A deadlock was reached after 1 events and 1.542777E-01s (Activity = 0.00000)
 Simulation ended
