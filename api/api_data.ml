@@ -59,7 +59,8 @@ let api_mixture sigs mix =
   let links = links_of_mix mix in
   Array.mapi
     (fun i a ->
-     { Api_types.node_name =
+     { Api_types.node_quantity = None;
+       Api_types.node_name =
          Format.asprintf "%a" (Signature.print_agent sigs) a.Raw_mixture.a_type;
        Api_types.node_sites =
          Array.mapi
@@ -87,14 +88,20 @@ let api_snapshot sigs (snapshot : Data.snapshot) : Api_types.snapshot =
   { Api_types.snap_file = snapshot.Data.snap_file
   ; Api_types.snap_event = snapshot.Data.snap_event
   ; Api_types.agents =
-      List.map (fun (agent,mixture) ->
-                { Api_types.quantity = agent ;
-                  Api_types.mixture = api_mixture sigs mixture })
-               snapshot.Data.agents
+      List.flatten
+        (List.map
+           (fun (agent,mixture) ->
+             let quantity = Some (float_of_int agent) in
+             List.map (fun (s : Api_types.site_node)->
+                           { s with Api_types.node_quantity = quantity })
+                      (Array.to_list (api_mixture sigs mixture))
+           )
+           snapshot.Data.agents)
   ; Api_types.tokens =
       List.map (fun (token,value) ->
-                { Api_types.token = token;
-                  Api_types.value = Nbr.to_float value})
+                { Api_types.node_name = token ;
+                  Api_types.node_quantity = Some (Nbr.to_float value);
+                  Api_types.node_sites = Array.of_list [] })
                (Array.to_list snapshot.Data.tokens)
   }
 
@@ -115,7 +122,8 @@ let api_contact_map cm =
        (a,(s,v)::List.map (fun ((_,s'),v') -> s',v') av)::cut_by_agent oth in
   let cm' = cut_by_agent (Export_to_KaSim.String2Map.bindings cm) in
   Tools.array_map_of_list
-    (fun (ag,sites) ->
+    (fun (ag,sites) -> failwith ""
+(*
      { Api_types.node_name = ag;
        Api_types.node_sites =
          Tools.array_map_of_list
@@ -124,7 +132,8 @@ let api_contact_map cm =
               Api_types.site_links = List.map (find_link cm') links;
               Api_types.site_states = states;
             }) sites;
-     }) cm'
+     }
+*)) cm'
 
 let api_parse_is_empty (parse : Api_types.parse) =
   0 = Array.length parse.Api_types.contact_map
