@@ -28,7 +28,7 @@ let space_chars = [' ';'\n';'\t']
 
 let eol = '\r'? '\n'
 let blank = [' ' '\t']
-let integer = (['0'-'9']+)
+let integer = '-'? (['0'-'9']+)
 let real =
   '-'?
      (((['0'-'9']+ | ['0'-'9']+ '.' ['0'-'9']* ) | (['0'-'9']* '.' ['0'-'9']+))
@@ -100,7 +100,11 @@ rule token = parse
 	 | eol {Lexing.new_line lexbuf ; NEWLINE}
 	 | '#' {comment lexbuf}
 	 | '/' '*' {inline_comment lexbuf; token lexbuf}
-	 | integer as n {INT (int_of_string n)}
+	 | integer as n {try INT (int_of_string n)
+	 with Failure _ -> raise (Syntax_Error
+	 (n^" is a incorrect integer",
+	     Location.of_pos (Lexing.lexeme_start_p lexbuf)
+		      (Lexing.lexeme_end_p lexbuf)))}
 	 | real as f {FLOAT (float_of_string f)}
 	 | '\'' ([^'\n''\'']+ as x) '\''{LABEL(x)}
 	 | id as str {keyword_or_id str}
