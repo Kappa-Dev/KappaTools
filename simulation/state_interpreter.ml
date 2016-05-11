@@ -312,12 +312,12 @@ let a_loop ~outputs env domain counter graph state =
 	       (Data.Snapshot
 		  (Rule_interpreter.snapshot env counter "deadlock.ka" graph)) in
 	 let () =
-	   outputs
-	     (Data.Log
-		(Format.sprintf
-		   "?@.A deadlock was reached after %d events and %Es (Activity = %.5f)"
-	     (Counter.current_event counter)
-	     (Counter.current_time counter) activity)) in
+	   ExceptionDefn.warning
+	     (fun f ->
+	      Format.fprintf
+		f "A deadlock was reached after %d events and %Es (Activity = %.5f)"
+		(Counter.current_event counter)
+		(Counter.current_time counter) activity) in
 	 (true,graph,state)
       | (ti,_) :: tail ->
 	 let () = state.stopping_times := tail in
