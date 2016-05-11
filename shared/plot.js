@@ -257,20 +257,19 @@ function observable_plot(configuration){
             var legend = that.getPlot()["legend"];
             legend.forEach(function(observable){
                 var controlsDiv = document.getElementById(that.configuration.plotControlsDivId);
-                var group = document.createElement("div")
-                group.setAttribute("class","input-group");
-                var boxbox = document.createElement("label"),
-                    box = document.createElement("input");
-                boxbox.setAttribute("class","checkbox-inline")
-                box.setAttribute("type", "checkbox");
+                var group = document.createElement("div");
+                group.setAttribute("class","checkbox-control");
+                var box = document.createElement("input");
+                var label = document.createTextNode(observable);
+                box.setAttribute("class","checkbox-control");
+                 box.setAttribute("type", "checkbox");
                 if (that.getSelected(observable)) {box.setAttribute("checked","")};
                 box.addEventListener("change",function () { that.setSelected(observable,box.checked);
                                                             that.renderPlot();
                                                             that.renderLabel();
                                                           });
-                boxbox.appendChild(box);
-                boxbox.appendChild(document.createTextNode(observable));
-                group.appendChild(boxbox);
+                group.appendChild(box);
+                group.appendChild(label);
                 controlsDiv.appendChild(group);
             });
         }

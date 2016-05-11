@@ -127,3 +127,17 @@ rect { stroke-width: 2; }
 .snapshot_control {
     margin-top: 10px;
 }
+
+.checkbox-control {
+    vertical-align: bottom;
+    margin: 1px !important;
+}
+
+@media .CodeMirror(max-width: 100px) {
+    width: 100%;
+}
+.CodeMirror {
+    border: 1px solid #eee;
+    min-height: 100px;
+    height: calc(100% - 320px);
+}

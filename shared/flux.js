@@ -5,18 +5,18 @@ function fluxMap(configuration) {
     this.configuration = configuration;
     this.selfInfluence = false;
     this.flux = { "bioBeginTime" : 0.0, "bioEndTime" : 0.0,
-		  "rules" : [],
-		  "hits" : [],
-		  "fluxs" : [] };
+                  "rules" : [],
+                  "hits" : [],
+                  "fluxs" : [] };
 
     this.setFlux = function(flux){
-	if(!is_same(that.flux.rules,flux.rules)){
-	    that.selectedRules = flux.rules.map(function (v,i) {return (i !== 0);});
-	    that.flux = flux;
+        if(!is_same(that.flux.rules,flux.rules)){
+            that.selectedRules = flux.rules.map(function (v,i) {return (i !== 0);});
+            that.flux = flux;
             that.render_controls();
-	} else {
-	    that.flux = flux;
-	}
+        } else {
+            that.flux = flux;
+        }
         that.render();
     };
 
@@ -30,9 +30,9 @@ function fluxMap(configuration) {
     };
 
     this.toggleSelectedRules = function() {
-	that.selectedRules.forEach(function (b,i,a) {a[i] = (b) ? false : true; });
-	that.render_controls();
-	that.drawDIM();
+        that.selectedRules.forEach(function (b,i,a) {a[i] = (b) ? false : true; });
+        that.render_controls();
+        that.drawDIM();
     };
 
     this.filterRules = function(val,id) {
@@ -126,17 +126,18 @@ function fluxMap(configuration) {
             rulesCheckboxes.removeChild(rulesCheckboxes.lastChild);
         };
         that.selectedRules.forEach(function (val,id,a) {
+
             var group = document.createElement("div")
-            group.setAttribute("class","input-group");
-            var boxbox = document.createElement("label"),
-                box = document.createElement("input");
-            boxbox.setAttribute("class","checkbox-inline")
+            group.setAttribute("class","checkbox-control")
+            var box = document.createElement("input");
+            var label = document.createTextNode(that.flux.rules[id]);
+            box.setAttribute("class","checkbox-control")
             box.setAttribute("type", "checkbox");
             if (val) {box.setAttribute("checked","")};
             box.addEventListener("change",function () { that.aClick(id);});
             boxbox.appendChild(box);
             boxbox.appendChild(document.createTextNode(
-		that.flux.rules[id].concat(" (",that.flux.hits[id]," occurences)")));
+                that.flux.rules[id].concat(" (",that.flux.hits[id]," occurences)")));
             group.appendChild(boxbox);
             rulesCheckboxes.appendChild(group);
         });
@@ -151,15 +152,15 @@ function fluxMap(configuration) {
     this.add_handlers = function(){
         d3.select("#"+that.configuration.selectCorrectionId).on("change",function() { that.drawDIM()});
         d3.select("#"+that.configuration.checkboxSelfInfluenceId).on("click",function() { that.toggleSelfInfluence()});
-	d3.select("#"+that.configuration.toggleRulesId).on("click",function() { that.toggleSelectedRules()});
+        d3.select("#"+that.configuration.toggleRulesId).on("click",function() { that.toggleSelectedRules()});
     };
 
     this.exportJSON = function(filename){
-	try { var json = JSON.stringify(that.flux);
-	      saveFile(json,"application/json",filename);
-	} catch (e) {
-	    alert(e);
-	}
+        try { var json = JSON.stringify(that.flux);
+              saveFile(json,"application/json",filename);
+        } catch (e) {
+            alert(e);
+        }
     }
 
     this.render = function() {

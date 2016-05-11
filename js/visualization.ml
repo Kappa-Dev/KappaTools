@@ -130,6 +130,7 @@ let flux_map_content =
   in
   let checkbox =
     Html5.input ~a:[ Html5.a_id "checkbox_self_influence"
+                   ; Html5.a_class ["checkbox-control"]
                    ; Html5.a_input_type `Checkbox ] () in
   let fluxmap_export_filename =
     Html5.input ~a:[ Html5.a_id fluxmap_export_filename_id ;
@@ -165,22 +166,22 @@ let flux_map_content =
                    </li>
                    <li class="list-group-item">
                     <div class="input-group">
-                      <label class="checkbox-inline">
+                      <label class="checkbox-control">
                          $checkbox$
-                         Self influence<br/>
+                         Self influence
                       </label>
                     </div>
                    </li>
                    <li class="list-group-item">
                     <div class="input-group">
-                      <label>Correction
+                      <p>Correction
                       <select class="form-control"
                               id="select_correction">
                            <option value="none">None</option>
                            <option value="hits">Occurences</option>
                            <option value="time">Time</option>
                       </select>
-                      </label>
+                      </p>
                     </div>
                    </li>
                 </ul>
@@ -305,14 +306,17 @@ let plot_content =
   let plot_show_legend =
     Html5.input ~a:[ Html5.a_id "plot-show-legend"
                    ; Html5.a_input_type `Checkbox
+                   ; Html5.a_class ["checkbox-control"]
                    ; Html5.Unsafe.string_attrib "checked" "true"
                    ] () in
   let plot_x_axis_log_checkbox =
     Html5.input ~a:[ Html5.a_id "plot-x-axis-log-checkbox"
+                   ; Html5.a_class ["checkbox-control"]
                    ; Html5.a_input_type `Checkbox
                    ] () in
   let plot_y_axis_log_checkbox =
     Html5.input ~a:[ Html5.a_id "plot-y-axis-log-checkbox"
+                   ; Html5.a_class ["checkbox-control"]
                    ; Html5.a_input_type `Checkbox
                    ] () in
   let plot_export_filename =
@@ -342,20 +346,14 @@ let plot_content =
             </li>
             <li class="list-group-item">
               <h4 class="list-group-item-heading">Settings</h4>
-                <div class="input-group">
-                   <label class="checkbox-inline">
-                      $plot_show_legend$ Legend
-                   </label>
+                <div class="checkbox-control">
+                   $plot_show_legend$ Legend
                 </div>
-                <div class="input-group">
-                   <label class="checkbox-inline">
-                      $plot_x_axis_log_checkbox$ X Axis Log
-                   </label>
+                <div class="checkbox-control">
+                   $plot_x_axis_log_checkbox$ X Axis Log
                 </div>
-                <div class="input-group">
-                   <label class="checkbox-inline">
-                      $plot_y_axis_log_checkbox$ Y Axis Log
-                   </label>
+                <div class="checkbox-control">
+                   $plot_y_axis_log_checkbox$ Y Axis Log
                 </div>
             </li>
           </ul>
