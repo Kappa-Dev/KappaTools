@@ -201,7 +201,7 @@ class Node extends D3Object {
 /**
  * DTO for contact map.
  */
-class ContactMap{
+class DataTransfer {
     constructor(data){
         var that = this;
         that.state = {};
@@ -306,8 +306,8 @@ class ContactMap{
  */
 class Layout{
     constructor(contactMap,dimensions,margin){
+        console.log(dimensions);
         this.contactMap = contactMap;
-        this.dimensions = dimensions
         this.margin = margin || { top: dimensions.height/8,
                                   right: dimensions.width/8,
                                   bottom: dimensions.height/8,
@@ -317,6 +317,16 @@ class Layout{
         this.padding.width = Math.min(this.padding.width,20);
         this.padding.height = Math.max(this.padding.height,5);
         this.padding.height = Math.min(this.padding.height,20);
+        this.dimensions = new Dimensions(dimensions.width
+                                         - this.margin.left
+                                         - this.margin.right
+                                         - this.padding.width,
+                                         dimensions.height
+                                         - this.margin.top
+                                         - this.margin.bottom
+                                         - this.padding.height);
+
+
     }
     /* Position nodes along a circle */
     circleNodes(){
@@ -440,11 +450,20 @@ class Layout{
                 preferred.site.absolute.update(absolute[eviction_id]);
                 preferred.site.relative.update(relative[eviction_id]);
             }
+<<<<<<< HEAD
 	    if(distances.length == 1){
 		var eviction_id = preferred.distances[0].id;
 		preferred.site.absolute.update(absolute[eviction_id]);
 		preferred.site.relative.update(relative[eviction_id]);
 	    }
+=======
+            if(distances.length == 1){
+                var preferred = distances.shift();
+                var eviction_id = preferred.distances[0].id;
+                preferred.site.absolute.update(absolute[eviction_id]);
+                preferred.site.relative.update(relative[eviction_id]);
+             }
+>>>>>>> export contact map
         });
     }
 }
@@ -455,12 +474,15 @@ class Layout{
  */
 class Render{
 
-    constructor(contactMap,id){
+    constructor(id,contactMap){
         this.contactMap = contactMap;
         this.root = id?d3.select(id):d3.select('body');
-        var bBox = this.root.node().getBoundingClientRect();
-        this.layout = new Layout(contactMap,new Dimensions( 2*(bBox.width+bBox.height)/6
-                                                          , 3*(bBox.width+bBox.height)/6));
+        var node = this.root.node();
+        var width = Math.max(400,
+                             node.offsetWidth);
+        var height = Math.max(2*width/3,
+                              node.offsetHeight);
+        this.layout = new Layout(contactMap,new Dimensions( height, width));
         this.svg = this.root
                        .append('svg')
                        .attr("class","svg-group")
@@ -475,6 +497,9 @@ class Render{
                                         + this.layout.margin.left
                                         + ","
                                         + this.layout.margin.top + ")");
+        /* needed to add the stylesheet to the export */
+        createSVGDefs(this.svg);
+
     }
 
 
@@ -704,20 +729,42 @@ class Render{
     }
 }
 
-function createContactMap(data,id){
-    var contactMap = new ContactMap(data);
-    if(contactMap.nodeNames().length > 0){
-        var render = new Render(contactMap,id);
-        render.render();
+function ContactMap(id){
+    var that = this;
+    this.id = "#"+id;
+
+    this.setData = function(json){
+        try {
+            var data = JSON.parse(json);
+            that.data = data;
+            var contactMap = new DataTransfer(data);
+            that.clearData();
+            if(contactMap.nodeNames().length > 0){
+                if(contactMap.nodeNames().length > 0){
+                    var render = new Render(that.id,contactMap);
+                    that.clearData();
+                    d3.select(that.id).selectAll("svg").remove();
+                    var render = new Render(that.id,contactMap);
+                    render.render();
+                }
+            }
+        } catch(err) {
+            console.log(err.stack);
+            throw err;
+        }
     }
-}
 
-function clearContactMap(){
-    d3.select("#contact-map").selectAll("*").remove();
-}
+    this.clearData = function(){
+        d3.select(that.id).selectAll("svg").remove();
+    }
 
-function drawContactMap(json){
-    clearContactMap();
-    var contact = JSON.parse(json)["contact_map"];
-    createContactMap(contact,"#contact-map");
+    this.exportJSON = function(filename){
+        try { var json = JSON.stringify(that.data);
+              saveFile(json,"application/json",filename);
+            } catch (e) {
+                alert(e);
+            }
+    }
+
+
 }

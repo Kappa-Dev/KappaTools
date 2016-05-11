@@ -57,7 +57,7 @@ generated/WebMessage_t.ml: js/WebMessage.atd generated
 generated/WebMessage_j.ml: js/WebMessage.atd generated
 	atdgen -j -j-std -o generated/WebMessage js/WebMessage.atd
 
-$(RESOURCE): shared/flux.js shared/plot.js shared/common.js
+$(RESOURCE): shared/flux.js shared/plot.js shared/common.js js/JsSim.css
 	./dev/generate-string.sh $^  > $@
 
 $(VERSION): main/version.ml.skel $(wildcard .git/refs/heads/*) generated
@@ -96,9 +96,9 @@ test:
 
 site/index.html: site js/no-cdn.html js/use-cdn.html site/JsSim.js site/WebWorker.js js/*.js shared/*.js js/favicon.ico js/*.css
 ifeq ($(NO_CDN),1)
-	cat js/no-cdn.html | sed "s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g" > site/index.html
+	cat js/no-cdn.html | ./dev/embed-file.sh | sed "s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g" > site/index.html
 else
-	cat js/use-cdn.html | sed "s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g" > site/index.html
+	cat js/use-cdn.html | ./dev/embed-file.sh | sed "s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g" > site/index.html
 endif
 	cp shared/*.js site
 	cp -f js/*.js js/*.css js/favicon.ico site

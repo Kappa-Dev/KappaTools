@@ -68,13 +68,3 @@ let plotSVG (plotDivId : string)
        Js.Unsafe.inject (Js.string plotName);
        Js.Unsafe.inject (option_string plotStyleId)
       |]
-
-let contact_map (parse : ApiTypes_j.parse option) : unit =
-  let () = debug parse in
-  match parse with
-    None -> Js.Unsafe.fun_call
-             (Js.Unsafe.js_expr "clearContactMap") [| |]
-  | Some parse ->
-    let json : string = ApiTypes_j.string_of_parse parse in
-    Js.Unsafe.fun_call
-      (Js.Unsafe.js_expr "drawContactMap") [| Js.Unsafe.inject (Js.string json) |]

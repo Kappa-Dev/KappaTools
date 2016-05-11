@@ -1,11 +1,25 @@
-html {
-    position: relative;
-    min-height: 100%;
+html { position: relative;
+       min-height: 100%; }
+
+body { margin-bottom: 60px;
+       font: 10px sans-serif; }
+
+span.filler:empty:before {
+   content: "\00a0";
 }
-body {
-    /* Margin bottom by footer height */
-    margin-bottom: 60px;
-}
+
+.plot-axis path,
+.plot-axis line { fill: none;
+                  stroke: #000;
+                  shape-rendering: crispEdges; }
+.plot-line { fill: none;
+             stroke: steelblue;
+             stroke-width: 1.5px; }
+.plot-legend { font-size: 10px; }
+
+rect { stroke-width: 2; }
+
+
 .footer {
     position: absolute;
     bottom: 0;
@@ -103,4 +117,13 @@ body {
               opacity : 0.0; }
 .link-line { stroke : black;
              stroke-width : 2;
+}
+
+
+.contact_map_content {
+    min-height: 50%;
+}
+
+.snapshot_control {
+    margin-top: 10px;
 }

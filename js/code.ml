@@ -24,14 +24,20 @@ let file_label =
                 React.S.const env))
 
 let save_button_id = "save_button"
-let save_button =  Html5.a ~a:[ Html5.a_id save_button_id
-                              ; Tyxml_js.R.Html5.Unsafe.string_attrib "download" UIState.opened_filename
-                              ; Html5.Unsafe.string_attrib "role" "button"
-                              ; Html5.a_class ["btn";"btn-default";"pull-right"]
-                              ]
-                           [ Html5.cdata "save" ]
+let save_button =
+  Html5.a ~a:[ Html5.a_id save_button_id
+             ; Tyxml_js.R.Html5.Unsafe.string_attrib
+               "download"
+               UIState.opened_filename
+             ; Html5.Unsafe.string_attrib "role" "button"
+             ; Html5.a_class ["btn";"btn-default";"pull-right"]
+             ]
+    [ Html5.cdata "save" ]
 
-let file_selector = Html5.input ~a:[ Html5.a_id "file-selector" ; Html5.Unsafe.string_attrib "type" "file" ; Html5.Unsafe.string_attrib "accept" ".ka" ] ()
+let file_selector =
+  Html5.input ~a:[ Html5.a_id "file-selector" ;
+                   Html5.Unsafe.string_attrib "type" "file" ;
+                   Html5.Unsafe.string_attrib "accept" ".ka" ] ()
 let panel_heading = <:html5<<div class="row">
                             <div class="col-md-2">
                             <label class="btn btn-default" for="file-selector">
@@ -102,7 +108,8 @@ let initialize codemirror () =
                                  | (Url.Http h | Url.Https h) -> h.Url.hu_path
                                  | Url.File f -> f.Url.fu_path) in
               UIState.set_opened_filename filename in
-         let () = codemirror##setValue(Js.string content.XmlHttpRequest.content) in
+         let () =
+           codemirror##setValue(Js.string content.XmlHttpRequest.content) in
          return_unit)
   with Not_found ->
     try
@@ -113,8 +120,10 @@ let initialize codemirror () =
          return_unit
 
 let onload () : unit =
-  let configuration : configuration Js.t = Codemirror.create_configuration () in
-  let gutter_option : Js.string_array Js.t = (Js.string "CodeMirror-linenumbers,breakpoints")##split(Js.string ",") in
+  let configuration : configuration Js.t =
+    Codemirror.create_configuration () in
+  let gutter_option : Js.string_array Js.t =
+    (Js.string "CodeMirror-linenumbers,breakpoints")##split(Js.string ",") in
   let textarea : Dom_html.element Js.t =
     Js.Opt.get (document##getElementById (Js.string "code-mirror"))
                (fun () -> assert false) in
@@ -122,18 +131,14 @@ let onload () : unit =
            (Js.Unsafe.coerce configuration)##gutters <- gutter_option;
            (Js.Unsafe.coerce configuration)##mode <- (Js.string "Kappa")
   in
-  let codemirror : codemirror Js.t = Codemirror.fromTextArea textarea configuration in
+  let codemirror : codemirror Js.t =
+    Codemirror.fromTextArea textarea configuration in
   let _ = Lwt_js_events.async (initialize codemirror) in
   let codemirror_handler _ =
     has_been_modified := true;
     UIState.update_text (Js.to_string codemirror##getValue()) in
   let () = codemirror##on((Js.string "change"),
                           (codemirror_handler)) in
-  (*
-  let _ = Js.Unsafe.fun_call
-            (Js.Unsafe.js_expr "id")
-            [|Js.Unsafe.inject codemirror |] in
-   *)
   let file_select_dom : Dom_html.inputElement Js.t =
     Js.Unsafe.coerce
     ((Js.Opt.get (document##getElementById (Js.string file_selector_id))
@@ -144,40 +149,44 @@ let onload () : unit =
       (Js.Opt.get (document##getElementById (Js.string save_button_id))
                   (fun () -> assert false)) in
 
-  let () = save_button_dom##onclick <-
-             Dom.handler
-               (fun _ ->
-                let header = Js.string "data:text/plain;charset=utf-8," in
-                let editor_text :  Js.js_string Js.t = codemirror##getValue() in
-                let () = save_button_dom##href <- header##concat((Js.escape editor_text)) in
-                Js._true) in
-  let file_select_handler () = let files = Js.Optdef.get (file_select_dom##files)
-                                                         (fun () -> assert false)
-                               in
-                               let file = Js.Opt.get (files##item (0))
-                                                     (fun () -> assert false)
-                               in
-                               let filename = file##name in
-                               let () = set_file_label (to_string filename) ;
-                                        Lwt_js_events.async (fun _ -> File.readAsText file >>=
-                                                                        (fun (va : Js.js_string Js.t) ->
-                                                                         codemirror##setValue(va);
-                                                                         return_unit
-                                                                 ));
-                                        ()
-                               in
-                               let () = has_been_modified := false in
-                               return_unit
+  let () =
+    save_button_dom##onclick <-
+      Dom.handler
+      (fun _ ->
+        let header = Js.string "data:text/plain;charset=utf-8," in
+        let editor_text :  Js.js_string Js.t = codemirror##getValue() in
+        let () =
+          save_button_dom##href <- header##concat((Js.escape editor_text)) in
+        Js._true) in
+  let file_select_handler () =
+    let files = Js.Optdef.get (file_select_dom##files)
+      (fun () -> assert false)
+    in
+    let file = Js.Opt.get (files##item (0))
+      (fun () -> assert false)
+    in
+    let filename = file##name in
+    let () = set_file_label (to_string filename) ;
+      Lwt_js_events.async (fun _ -> File.readAsText file >>=
+        (fun (va : Js.js_string Js.t) ->
+          codemirror##setValue(va);
+          return_unit
+        ));
+      ()
+    in
+    let () = has_been_modified := false in
+    return_unit
   in
-  let ()  = Lwt.async (fun () -> Lwt_js_events.changes
-                                   file_select_dom
-                                   (fun _ _ ->
-                                    if not !has_been_modified ||
-                                         Js.to_bool
-                                           (Dom_html.window##confirm
-                                                           (Js.string "Modifications will be lost, do you wish to continue?"))
-                                    then file_select_handler ()
-                                    else return_unit))
+  let ()  =
+    Lwt.async (fun () -> Lwt_js_events.changes
+      file_select_dom
+      (fun _ _ ->
+        if not !has_been_modified ||
+          Js.to_bool
+          (Dom_html.window##confirm
+             (Js.string "Modifications will be lost, do you wish to continue?"))
+        then file_select_handler ()
+        else return_unit))
   in
   let () = Settings.onload () in
   ()
