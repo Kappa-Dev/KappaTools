@@ -50,8 +50,6 @@ let export_controls
   </div>
 </div> >>
 
-
-
 let plot_svg_style_id = "plot-svg-style"
 let plot_div_id = "plot-div"
 let plot_export_filename_id = "plot-export-filename"
@@ -278,9 +276,7 @@ let snapshot_content =
                 $snapshot_label$
              </div>
              <div class="row">
-                <div $list:Html5.a_id snapshot_display_id$
-                     class="col-sm-12">
-                   <span class="filler"></span>
+                <div $list:Html5.a_id snapshot_display_id$ class="col-sm-12">
                 </div>
              </div>
              $snapshot_export_controls$
@@ -300,7 +296,6 @@ let contact_map_content =
   <:html5<<div>
              <div class="row">
                 <div $list:Html5.a_id contact_map_display_id$ class="col-sm-8">
-                   <span class="filler"></span>
                 </div>
              </div>
              $contact_export_controls$
@@ -479,7 +474,11 @@ let xml =
                         (fun parse -> React.S.const
                           (match parse with
                           | None -> ["hidden"]
-                          | Some _ -> ["show"])
+                          | Some data ->
+                            if Api_data.api_parse_is_empty data then
+                              ["hidden"]
+                            else
+                              ["show"])
                         )
                      )]
               [contact_map_content]

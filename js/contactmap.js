@@ -306,7 +306,6 @@ class DataTransfer {
  */
 class Layout{
     constructor(contactMap,dimensions,margin){
-        console.log(dimensions);
         this.contactMap = contactMap;
         this.margin = margin || { top: dimensions.height/8,
                                   right: dimensions.width/8,
@@ -741,7 +740,7 @@ function ContactMap(id){
                 }
             }
         } catch(err) {
-            console.log(err.stack);
+            error(err.stack);
             throw err;
         }
     }
