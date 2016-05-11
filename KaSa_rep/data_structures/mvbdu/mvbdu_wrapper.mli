@@ -130,11 +130,15 @@ module type Internalized_mvbdu =
     type key
     type value
     type mvbdu
+    type handler =
+      (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.association_list_dic,Boolean_mvbdu.variables_list_dic,bool,int) Memo_sig.handler
     type hconsed_association_list
     type hconsed_variables_list
     type hconsed_renaming_list
 
     val init: Remanent_parameters_sig.parameters -> unit
+    val import_handler: handler -> unit
+    val export_handler: Exception.method_handler-> Exception.method_handler * handler option
     val is_init: unit -> bool
     val equal: mvbdu -> mvbdu -> bool
     val mvbdu_false: unit -> mvbdu
@@ -206,10 +210,13 @@ module type Internalized_mvbdu =
 module type Nul =
   sig
   end
+
+module Internalize
+    (M:Mvbdu with type key = int and type value = int) :
+  Internalized_mvbdu with type mvbdu = M.mvbdu and type key = int and type value = int
+
 module Make (M:Nul): Mvbdu with type key = int and type value = int
 module Mvbdu:Mvbdu with type key = int and type value = int
-module IntMvbdu:Internalized_mvbdu with type key = int and type value = int
+module IntMvbdu:Internalized_mvbdu with type key = int and type value = int and type mvbdu= Mvbdu.mvbdu
 module Optimized_Mvbdu:Mvbdu with type key = int and type value = int
 module Optimized_IntMvbdu:Internalized_mvbdu with type key = int and type value = int
-
-

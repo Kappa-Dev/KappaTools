@@ -130,11 +130,14 @@ module type Internalized_mvbdu =
     type key
     type value
     type mvbdu
+    type handler = (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.association_list_dic,Boolean_mvbdu.variables_list_dic,bool,int) Memo_sig.handler
     type hconsed_association_list
     type hconsed_variables_list
     type hconsed_renaming_list
 
     val init: Remanent_parameters_sig.parameters -> unit
+    val import_handler: handler -> unit
+    val export_handler: Exception.method_handler -> Exception.method_handler * handler option
     val is_init: unit -> bool
     val equal: mvbdu -> mvbdu -> bool
     val mvbdu_false: unit -> mvbdu
@@ -445,7 +448,7 @@ module Make (M:Nul)  =
 
     let mvbdu_of_hconsed_asso parameter handler error asso =
       let error, handler, mvbdu_true = mvbdu_true parameter handler error in
-      mvbdu_redefine parameter handler error mvbdu_true asso 
+      mvbdu_redefine parameter handler error mvbdu_true asso
 
     let mvbdu_of_asso_gen f parameter handler error asso =
       let error, handler, hconsed_list = f parameter handler error asso in
@@ -584,7 +587,13 @@ module Internalize(M:Mvbdu
     type handler = Mvbdu.handler
     let handler = ref None
     let parameter = ref (Remanent_parameters.get_parameters ~called_from:Remanent_parameters_sig.Internalised ())
-
+    let import_handler h = handler:=Some h
+    let export_handler error =
+      match !handler with
+      | None ->
+        Exception.warn !parameter error
+          (Some "Mvbdu_wrapper.ml") (Some "export_handler")  Exit (fun () -> None)
+      | Some h -> error, !handler
 
     let check s error error' handler' =
       let () = handler:= Some handler' in
@@ -707,13 +716,13 @@ module Internalize(M:Mvbdu
     let empty_renaming_list () = build_renaming_list []
 
 
-    let mvbdu_subseteq mvbdu1 mvbdu2 = 
+    let mvbdu_subseteq mvbdu1 mvbdu2 =
       equal (mvbdu_or mvbdu1 mvbdu2) mvbdu2
 
     let mvbdu_of_hconsed_asso asso =
       mvbdu_redefine (mvbdu_true ()) asso
-	
-    let mvbdu_of_asso_gen f asso = 
+
+    let mvbdu_of_asso_gen f asso =
       mvbdu_redefine (mvbdu_false ()) (f asso)
     let mvbdu_of_hconsed_asso = mvbdu_of_asso_gen (fun x -> x)
     let mvbdu_of_association_list = mvbdu_of_asso_gen (build_association_list)
@@ -754,7 +763,12 @@ module Internalize(M:Mvbdu
 
     let hash_of_association_list = M.hash_of_association_list
     let hash_of_variables_list = M.hash_of_variables_list
-   end:Internalized_mvbdu with type key = int and type value = int)
+  end:Internalized_mvbdu
+with
+  type key = int
+ and type value = int
+ and type mvbdu= M.mvbdu )
+
 
 module Optimize(M:Mvbdu with type key = int and type value = int) =
 	 (struct
@@ -857,16 +871,16 @@ module Optimize(M:Mvbdu with type key = int and type value = int) =
 	     let mvbdu_of_reverse_sorted_association_list= M.mvbdu_of_reverse_sorted_association_list
 
 	     let mvbdu_cartesian_decomposition_depth parameters handler error bdu int =
-	       Boolean_mvbdu.mvbdu_cartesian_decomposition_depth 
-		 variables_list_of_mvbdu extensional_of_variables_list 
-		 build_sorted_variables_list 
-		 mvbdu_project_keep_only 
-		 mvbdu_project_abstract_away 
-		 mvbdu_and 
-		 equal 
-		 parameters handler 
-		 error 
-		 bdu 
+	       Boolean_mvbdu.mvbdu_cartesian_decomposition_depth
+		 variables_list_of_mvbdu extensional_of_variables_list
+		 build_sorted_variables_list
+		 mvbdu_project_keep_only
+		 mvbdu_project_abstract_away
+		 mvbdu_and
+		 equal
+		 parameters handler
+		 error
+		 bdu
 		 int
 
 	     let mvbdu_full_cartesian_decomposition parameters handler error bdu =
@@ -901,23 +915,27 @@ module Optimize'(M:Internalized_mvbdu with type key = int and type value = int) 
 	     type hconsed_association_list = Mvbdu.hconsed_association_list
 	     type hconsed_variables_list = Mvbdu.hconsed_variables_list
 	     type hconsed_renaming_list = Mvbdu.hconsed_renaming_list
+      type handler = Mvbdu.handler
 
-	     let init = Mvbdu.init
-	     let is_init = Mvbdu.is_init
-	     let equal = Mvbdu.equal
-	     let mvbdu_nand a = Mvbdu.mvbdu_nand a
-	     let mvbdu_not a = mvbdu_nand  a a
-	     let mvbdu_id = Mvbdu.mvbdu_id
-	     let mvbdu_true = Mvbdu.mvbdu_true
-	     let mvbdu_false = Mvbdu.mvbdu_false
-	     let mvbdu_unary_true a = mvbdu_nand a (mvbdu_not a)
-	     let mvbdu_unary_false a = mvbdu_not (mvbdu_unary_true a)
-	     let mvbdu_and a b = mvbdu_not (mvbdu_nand a b)
-	     let mvbdu_or a b = mvbdu_nand (mvbdu_not a) (mvbdu_not b)
-	     let mvbdu_imply a b = mvbdu_nand a (mvbdu_not b)
-	     let mvbdu_rev_imply a b = mvbdu_imply b a
-	     let mvbdu_nor a b = mvbdu_not (mvbdu_or a b)
-	     let mvbdu_equiv a b = mvbdu_and (mvbdu_imply a b) (mvbdu_imply b a)
+      let import_handler = Mvbdu.import_handler
+      let export_handler = Mvbdu.export_handler
+      let init = Mvbdu.init
+      let is_init = Mvbdu.is_init
+      let equal = Mvbdu.equal
+      let mvbdu_nand a = Mvbdu.mvbdu_nand a
+      let mvbdu_not a = mvbdu_nand  a a
+      let mvbdu_id = Mvbdu.mvbdu_id
+      let mvbdu_true = Mvbdu.mvbdu_true
+      let mvbdu_false = Mvbdu.mvbdu_false
+      let mvbdu_unary_true a = mvbdu_nand a (mvbdu_not a)
+      let mvbdu_unary_false a = mvbdu_not (mvbdu_unary_true a)
+      let mvbdu_and a b = mvbdu_not (mvbdu_nand a b)
+      let mvbdu_or a b = mvbdu_nand (mvbdu_not a) (mvbdu_not b)
+      let mvbdu_imply a b = mvbdu_nand a (mvbdu_not b)
+      let mvbdu_rev_imply a b = mvbdu_imply b a
+      let mvbdu_nor a b = mvbdu_not (mvbdu_or a b)
+      let mvbdu_equiv a b = mvbdu_and (mvbdu_imply a b) (mvbdu_imply b a)
+
 	     let mvbdu_xor a b = mvbdu_not (mvbdu_equiv a b)
 	     let mvbdu_nimply a b = mvbdu_not (mvbdu_imply a b)
 	     let mvbdu_nrev_imply a b = mvbdu_nimply b a
@@ -962,7 +980,7 @@ module Optimize'(M:Internalized_mvbdu with type key = int and type value = int) 
 	     let variables_list_of_mvbdu = M.variables_list_of_mvbdu
 
 	     let mvbdu_cartesian_decomposition_depth = M.mvbdu_cartesian_decomposition_depth
-							 	
+
 	     let mvbdu_full_cartesian_decomposition = M.mvbdu_full_cartesian_decomposition
 
 	     let hash_of_association_list = M.hash_of_association_list
@@ -973,8 +991,6 @@ module Optimize'(M:Internalized_mvbdu with type key = int and type value = int) 
 
 module Vd = struct end
 module Mvbdu = Make(Vd)
-module IntMvbdu = Internalize(Make (Vd))
+module IntMvbdu = Internalize(Mvbdu)
 module Optimized_Mvbdu = Optimize(Make(Vd))
 module Optimized_IntMvbdu = Internalize(Optimize(Make (Vd)))
-
-

@@ -2,35 +2,35 @@
   * ckappa_sig.ml
   * openkappa
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
-  * 
+  *
   * Creation: 01/17/2011
   * Last modification: 09/12/2014
-  * * 
-  * Signature for prepreprocessing language ckappa 
-  *  
-  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et   
-  * en Automatique.  All rights reserved.  This file is distributed     
+  * *
+  * Signature for prepreprocessing language ckappa
+  *
+  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et
+  * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
-(*let warn parameters mh message exn default = 
+(*let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "ckappa_sig") message exn (fun () -> default) *)
-  
-module Int_Set_and_Map = 
+
+module Int_Set_and_Map =
   Map_wrapper.Make
     (SetMap.Make
-       (struct 
-         type t = int 
-         let compare = compare 
+       (struct
+         type t = int
+         let compare = compare
         end))
 
-let local_trace = true 
+let local_trace = true
 
 (****************************************************************************************)
 
 type position       = Location.t
 type agent_name     = string
-type site_name      = string  
-type internal_state = string 
+type site_name      = string
+type internal_state = string
 
 type c_agent_name = int
 type c_agent_id   = int
@@ -88,8 +88,8 @@ module Agent_type_quick_nearly_Inf_Int_storage_Imperatif =
 
 module Agent_type_site_nearly_Inf_Int_Int_storage_Imperatif_Imperatif =
   (
-    Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif: Int_storage.Storage 
-   with type key = c_agent_name * c_site_name 
+    Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif: Int_storage.Storage
+   with type key = c_agent_name * c_site_name
    and type dimension = int * int
   )
 
@@ -145,14 +145,14 @@ module Rule_quick_nearly_Inf_Int_storage_Imperatif =
    and type dimension = int
   )
 
-module Site_union_find = 
+module Site_union_find =
   Union_find.Make(Site_type_nearly_Inf_Int_storage_Imperatif)
 
 (****************************************************************************************)
 (*Define module fifo take rule_id*)
 
 module Rule =
-  struct 
+  struct
     type t = c_rule_id
     let compare = compare
   end
@@ -163,14 +163,14 @@ module Rule_FIFO = Fifo.WlMake (Rule)
 
 module Agent_id_nearly_Inf_Int_storage_Imperatif =
   (
-    Int_storage.Nearly_inf_Imperatif : Int_storage.Storage 
+    Int_storage.Nearly_inf_Imperatif : Int_storage.Storage
    with type key = c_agent_id
    and type dimension = int
-  )		  
+  )
 
 module Agent_id_quick_nearly_Inf_Int_storage_Imperatif =
   (
-    Int_storage.Quick_key_list (Agent_id_nearly_Inf_Int_storage_Imperatif) : Int_storage.Storage 
+    Int_storage.Quick_key_list (Agent_id_nearly_Inf_Int_storage_Imperatif) : Int_storage.Storage
    with type key = c_agent_id
    and type dimension = int
   )
@@ -235,7 +235,7 @@ Map_wrapper.Make
          type t = c_site_name * c_state
          let compare = compare
         end))
-  
+
 
 module AgentSiteState_map_and_set =
   Map_wrapper.Make
@@ -261,16 +261,16 @@ module Agent_id_setmap =
 
 module PairRule_setmap =
   SetMap.Make
-    (struct 
+    (struct
       type t = c_rule_id * c_rule_id
       let compare = compare
      end)
 
 (****************************************************************************************)
 
-module Site_map_and_set = 
+module Site_map_and_set =
   Map_wrapper.Make
-    (SetMap.Make 
+    (SetMap.Make
        (struct
          type t      = c_site_name
          let compare = compare
@@ -340,7 +340,7 @@ module PairAgentIDSiteState_map_and_set =
          type t =
            (c_agent_id * c_site_name * c_state) * (c_agent_id * c_site_name * c_state)
          let compare = compare
-        end))    
+        end))
 
 module PairAgentSite_map_and_set =
   Map_wrapper.Make
@@ -369,21 +369,22 @@ module PairAgentIDSite_map_and_set =
 (****************************************************************************************)
 
 module Views_bdu =
-  (Mvbdu_wrapper.Mvbdu: Mvbdu_wrapper.Mvbdu with type key = c_site_name and type value = c_state)
+  (Mvbdu_wrapper.Mvbdu: Mvbdu_wrapper.Mvbdu with type key = c_site_name and type value = c_state with type mvbdu = Mvbdu_wrapper.Mvbdu.mvbdu)
+module Views_intbdu = Mvbdu_wrapper.Internalize (Views_bdu)
 
 (****************************************************************************************)
 
-type binding_state = 
-  | Free 
-  | Lnk_type of agent_name * site_name 
+type binding_state =
+  | Free
+  | Lnk_type of agent_name * site_name
 
-type mixture = 
-  | SKIP  of mixture 
-  | COMMA of agent * mixture 
-  | DOT   of c_agent_id * agent * mixture 
-  | PLUS  of c_agent_id * agent * mixture 
+type mixture =
+  | SKIP  of mixture
+  | COMMA of agent * mixture
+  | DOT   of c_agent_id * agent * mixture
+  | PLUS  of c_agent_id * agent * mixture
   | EMPTY_MIX
-      
+
 and agent =
     {
       ag_nme     : string;
@@ -391,7 +392,7 @@ and agent =
       ag_nme_pos : position (*; ag_pos:position*)
     }
 
-and interface = 
+and interface =
   | EMPTY_INTF
   | PORT_SEP of port * interface
 
@@ -405,21 +406,21 @@ and port =
     }
 
 and internal = string list
-    
-and link = 
+
+and link =
     | LNK_VALUE of (c_agent_id * agent_name * site_name * c_agent_id * position)
-    | FREE 
+    | FREE
     | LNK_ANY   of position
     | LNK_SOME  of position
     | LNK_TYPE  of (string Location.annot * string Location.annot)
 
-type 'mixture rule = 
+type 'mixture rule =
   {
     prefix: int;
     delta: int;
-      lhs   : 'mixture; 
-      arrow : Ast.arrow; 
-      rhs   : 'mixture; 
+      lhs   : 'mixture;
+      arrow : Ast.arrow;
+      rhs   : 'mixture;
       k_def : ('mixture,string) Ast.ast_alg_expr Location.annot;
       k_un  : ('mixture,string) Ast.ast_alg_expr Location.annot option
     }
@@ -430,39 +431,39 @@ type 'mixture modif_expr   = ('mixture,string) Ast.modif_expr
 
 type 'mixture variable     = ('mixture,string) Ast.variable_def
 
-type direction = Direct | Reverse 
+type direction = Direct | Reverse
 
 type ('agent,'mixture,'rule) compil =
   ('agent, 'mixture, string, 'rule) Ast.compil
-  
-type ('a, 'b) site_type = 
-  | Internal of 'a 
-  | Binding  of 'b 
-      
-type site = (site_name, site_name) site_type     
 
-type state = (internal_state, binding_state) site_type  
+type ('a, 'b) site_type =
+  | Internal of 'a
+  | Binding  of 'b
+
+type site = (site_name, site_name) site_type
+
+type state = (internal_state, binding_state) site_type
 
 (*move from cckappa_sig*)
-type c_binding_state = 
-| C_Free 
-| C_Lnk_type of c_agent_name * c_site_name 
+type c_binding_state =
+| C_Free
+| C_Lnk_type of c_agent_name * c_site_name
 
-type state' = (internal_state, c_binding_state) site_type  
+type state' = (internal_state, c_binding_state) site_type
 
-module State = 
+module State =
 struct
   type t = state'
   let compare = compare
-end 
+end
 
-module Dictionary_of_States = 
+module Dictionary_of_States =
   (
     Dictionary.Dictionary_of_Ord (State) : Dictionary.Dictionary
    with type key = c_state
    and type value = state'
   )
- 
+
 (**)
 
 type internal_state_specification =
@@ -470,10 +471,10 @@ type internal_state_specification =
     string : internal_state;
   }
 
-module Site = 
-struct 
-  type t = site 
-  let compare = compare 
+module Site =
+struct
+  type t = site
+  let compare = compare
 end
 
 module Kasim_agent_name =
@@ -496,26 +497,26 @@ module Dictionary_of_sites =
    and type value = site
   )
 
-type site_list = 
+type site_list =
     {
       used     : (site_name list * position) list;
       declared : (site_name list * position) list;
-      creation : (site_name list * position) list 
+      creation : (site_name list * position) list
     }
 
 type agent_dic = (unit,unit) Dictionary_of_agents.dictionary
 type site_dic  = (unit,unit) Dictionary_of_sites.dictionary
 type state_dic = (unit,unit) Dictionary_of_States.dictionary
-  
-type agent_specification = 
-    { 
-      binding_sites_usage : site_list; 
+
+type agent_specification =
+    {
+      binding_sites_usage : site_list;
       marked_sites_usage  : site_list
     }
-      
-type kappa_handler = 
+
+type kappa_handler =
     {
-      agents_dic            : agent_dic; 
+      agents_dic            : agent_dic;
       interface_constraints : agent_specification Int_storage.Nearly_inf_Imperatif.t;
       sites                 : site_dic Int_storage.Nearly_inf_Imperatif.t;
       states_dic            : state_dic Int_storage.Nearly_inf_Imperatif.t
@@ -523,19 +524,19 @@ type kappa_handler =
     }
 
 type 'a interval  = {min:'a; max:'a}
-  
-type c_port = 
-    { 
-      c_site_name     : c_site_name; 
+
+type c_port =
+    {
+      c_site_name     : c_site_name;
       c_site_position : position;
       c_site_interval : c_state interval
     }
 
 type c_interface = c_port Site_map_and_set.Map.t
-                                                                           
-type c_proper_agent = 
-    { 
-      c_agent_kasim_id  : c_agent_id; 
+
+type c_proper_agent =
+    {
+      c_agent_kasim_id  : c_agent_id;
       c_agent_name      : c_agent_name;
       c_agent_interface : c_interface;
       c_agent_position  : position
@@ -547,11 +548,11 @@ type site_address =
       site        : c_site_name
     }
 
-type c_bond = site_address * site_address 
+type c_bond = site_address * site_address
 
-type c_agent = 
+type c_agent =
    | C_ghost
-   | C_agent of c_proper_agent                               
+   | C_agent of c_proper_agent
 
 type c_mixture =
   {
@@ -561,19 +562,19 @@ type c_mixture =
     c_plus  : (int * int) list;
     c_dot   : (int * int) list
   }
-      
+
 type c_variable = (c_mixture,string) Ast.ast_alg_expr
 
 type action =
   | Release    of c_bond
   | Bind       of c_bond
-  | Half_breaf of site_address   
+  | Half_breaf of site_address
 
-type c_rule = 
+type c_rule =
     {
-      c_rule_lhs     : c_mixture; 
-      c_rule_arrow   : Ast.arrow; 
-      c_rule_rhs     : c_mixture; 
+      c_rule_lhs     : c_mixture;
+      c_rule_arrow   : Ast.arrow;
+      c_rule_rhs     : c_mixture;
       c_diff_direct  : c_mixture;
       c_diff_reverse : c_mixture;
       c_side_effects : action list
@@ -595,20 +596,20 @@ and c_modif_expr =
 
 type enriched_rule =
     {
-      e_rule_label  : (string * position) option; 
-      e_rule_direct : bool; 
+      e_rule_label  : (string * position) option;
+      e_rule_direct : bool;
       e_rule_rule   : c_mixture rule;
       e_rule_c_rule : c_rule
     }
-      
-type enriched_init = 
+
+type enriched_init =
     {
-      e_init_factor    : int; 
+      e_init_factor    : int;
       e_init_mixture   : mixture;
-      e_init_c_mixture : c_mixture; 
+      e_init_c_mixture : c_mixture;
       e_init_pos       : position
-    } 
-      
+    }
+
 type c_compil =
   {
     c_variables : c_variable Int_storage.Nearly_inf_Imperatif.t;
