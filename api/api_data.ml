@@ -122,9 +122,9 @@ let api_contact_map cm =
        (a,(s,v)::List.map (fun ((_,s'),v') -> s',v') av)::cut_by_agent oth in
   let cm' = cut_by_agent (Export_to_KaSim.String2Map.bindings cm) in
   Tools.array_map_of_list
-    (fun (ag,sites) -> failwith ""
-(*
-     { Api_types.node_name = ag;
+    (fun (ag,sites) ->
+     { Api_types.node_quantity = None;
+       Api_types.node_name = ag;
        Api_types.node_sites =
          Tools.array_map_of_list
            (fun (site,(states,links)) ->
@@ -132,8 +132,7 @@ let api_contact_map cm =
               Api_types.site_links = List.map (find_link cm') links;
               Api_types.site_states = states;
             }) sites;
-     }
-*)) cm'
+     }) cm'
 
 let api_parse_is_empty (parse : Api_types.parse) =
   0 = Array.length parse.Api_types.contact_map
