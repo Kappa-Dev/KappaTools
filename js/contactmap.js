@@ -450,20 +450,12 @@ class Layout{
                 preferred.site.absolute.update(absolute[eviction_id]);
                 preferred.site.relative.update(relative[eviction_id]);
             }
-<<<<<<< HEAD
-	    if(distances.length == 1){
-		var eviction_id = preferred.distances[0].id;
-		preferred.site.absolute.update(absolute[eviction_id]);
-		preferred.site.relative.update(relative[eviction_id]);
-	    }
-=======
             if(distances.length == 1){
                 var preferred = distances.shift();
                 var eviction_id = preferred.distances[0].id;
                 preferred.site.absolute.update(absolute[eviction_id]);
                 preferred.site.relative.update(relative[eviction_id]);
              }
->>>>>>> export contact map
         });
     }
 }
