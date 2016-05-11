@@ -37,29 +37,29 @@ struct
      which rules can create a bond of type A.y.t.B (and at which position *)
   (* and a map (A,x,y,B,z,t) -> (Ag_id,Ag_id) list RuleIdMap to explain
      which rules can contain parallel bonds in their lhs *)
-  
+
   type local_static_information =
     {
-      store_bonds_rhs_full : Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t 
+      store_bonds_rhs_full : Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t
       Ckappa_sig.Rule_map_and_set.Map.t;
-      store_bonds_lhs_full : Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t 
+      store_bonds_lhs_full : Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t
       Ckappa_sig.Rule_map_and_set.Map.t;
       store_parallel_bonds_rhs: Ckappa_sig.PairAgentsSitesStates_map_and_set.Set.t;
-      store_rule_has_parallel_bonds_rhs: 
+      store_rule_has_parallel_bonds_rhs:
         Ckappa_sig.PairAgentsSitesStates_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
       (*map check the bond A.x to B.z*)
       store_fst_site_create_parallel_bonds_rhs:
-        ((Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * 
+        ((Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
             Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
             Ckappa_sig.c_state * Ckappa_sig.c_state) *
-            (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * 
+            (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
                Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
-               Ckappa_sig.c_state * Ckappa_sig.c_state)   
+               Ckappa_sig.c_state * Ckappa_sig.c_state)
         ) list
         Ckappa_sig.PairAgentsSiteState_map_and_set.Map.t Ckappa_sig.Rule_map_and_set.Map.t;
       (*map check the bond A.y to B.t*)
       store_snd_site_create_parallel_bonds_rhs:
-        ((Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * 
+        ((Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
             Ckappa_sig.c_site_name * Ckappa_sig.c_site_name *
             Ckappa_sig.c_state * Ckappa_sig.c_state) *
             (Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name *
@@ -85,7 +85,7 @@ struct
 
   type local_dynamic_information =
     {
-      store_parallel_bonds_init : Ckappa_sig.PairAgentsSitesStates_map_and_set.Set.t;      
+      store_parallel_bonds_init : Ckappa_sig.PairAgentsSitesStates_map_and_set.Set.t;
       store_status_of_parallel_bonds :
       bool Usual_domains.flat_lattice Ckappa_sig.PairAgentsSitesStates_map_and_set.Map.t *
       (*reverse direction*)
@@ -124,10 +124,10 @@ struct
   (*rhs*)
 
   let get_action_binding static = lift Analyzer_headers.get_action_binding static
-    
+
   let get_bonds_rhs_full static =
     (get_local_static_information static).store_bonds_rhs_full
-      
+
   let set_bonds_rhs_full bonds static =
     set_local_static_information
       {
@@ -138,7 +138,7 @@ struct
 
   let get_parallel_bonds_rhs static =
     (get_local_static_information static).store_parallel_bonds_rhs
-      
+
   let set_parallel_bonds_rhs bonds static =
     set_local_static_information
       {
@@ -146,10 +146,10 @@ struct
           store_parallel_bonds_rhs = bonds
       }
       static
-      
+
   let get_rule_has_parallel_bonds_rhs static =
     (get_local_static_information static).store_rule_has_parallel_bonds_rhs
-      
+
   let set_rule_has_parallel_bonds_rhs bonds static =
     set_local_static_information
       {
@@ -157,10 +157,10 @@ struct
           store_rule_has_parallel_bonds_rhs = bonds
       }
       static
-      
+
   let get_fst_site_create_parallel_bonds_rhs static =
     (get_local_static_information static).store_fst_site_create_parallel_bonds_rhs
-      
+
   let set_fst_site_create_parallel_bonds_rhs l static =
     set_local_static_information
       {
@@ -171,7 +171,7 @@ struct
 
   let get_snd_site_create_parallel_bonds_rhs static =
     (get_local_static_information static).store_snd_site_create_parallel_bonds_rhs
-      
+
   let set_snd_site_create_parallel_bonds_rhs l static =
     set_local_static_information
       {
@@ -184,7 +184,7 @@ struct
 
   let get_bonds_lhs_full static =
     (get_local_static_information static).store_bonds_lhs_full
-      
+
   let set_bonds_lhs_full bonds static =
     set_local_static_information
       {
@@ -214,7 +214,7 @@ struct
         (get_local_dynamic_information dynamic) with
           store_parallel_bonds_init = bonds
       } dynamic
-      
+
   let get_status_of_parallel_bonds dynamic =
     (get_local_dynamic_information dynamic).store_status_of_parallel_bonds
 
@@ -224,7 +224,7 @@ struct
         (get_local_dynamic_information dynamic) with
           store_status_of_parallel_bonds = value
       } dynamic
-      
+
   (*--------------------------------------------------------------------*)
 
   type 'a zeroary =
@@ -261,7 +261,7 @@ struct
           (fun site_type_source site_add (error, store_result) ->
             let agent_id_target = site_add.Cckappa_sig.agent_index in
             let site_type_target = site_add.Cckappa_sig.site in
-            let error, agent_source = 
+            let error, agent_source =
               match
                 Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
                   parameter error agent_id views
@@ -297,19 +297,19 @@ struct
             (*------------------------------------------------------------------------------*)
             (*get old*)
             let error, old_set =
-              match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error 
+              match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error
                 rule_id store_result
               with
               | error, None -> error, Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
               | error, Some p -> error, p
             in
-            let error', set = 
+            let error', set =
               Ckappa_sig.PairAgentsSiteState_map_and_set.Set.add_when_not_in
-                parameter error 
+                parameter error
                 ((agent_id, agent_type1, site_type_source, state1),
                  (agent_id_target, agent_type2, site_type_target, state2))
                 old_set
-            in    
+            in
             let error = Exception.check warn parameter error error' (Some "line 236") Exit in
             let error, store_result =
               Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
@@ -322,11 +322,11 @@ struct
             error, store_result
           ) bonds_map (error, store_result)
       ) bonds store_result
-      
+
   (**************************************************************************)
-      
+
   let collect_bonds_rhs_full parameter error rule_id rule store_result=
-    collect_bonds_full 
+    collect_bonds_full
       parameter
       error
       rule_id
@@ -335,25 +335,25 @@ struct
       store_result
 
   let collect_bonds_lhs_full parameter error rule_id rule store_result =
-    collect_bonds_full 
+    collect_bonds_full
       parameter
       error
       rule_id
       rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
-      rule.Cckappa_sig.rule_lhs.Cckappa_sig.bonds  
+      rule.Cckappa_sig.rule_lhs.Cckappa_sig.bonds
       store_result
-      
+
   (**************************************************************************)
   (*Parallel bonds*)
   (**************************************************************************)
-      
+
   let collect_rule_has_parallel_bonds static error rule_id views bonds store_bonds_full store_result =
     let parameter = get_parameter static in
     (*--------------------------------------------*)
     let error, bonds_full_set =
       match
         Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
-          parameter 
+          parameter
           error
           rule_id
           store_bonds_full
@@ -365,7 +365,7 @@ struct
     let error, store_result =
       Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
         parameter
-        error 
+        error
         (fun parameter error agent_id_source bonds_map store_result ->
           Ckappa_sig.Site_map_and_set.Map.fold
             (fun site_type_source site_add (error, store_result) ->
@@ -373,7 +373,7 @@ struct
               let site_type_target = site_add.Cckappa_sig.site in
               (*------------------------------------------------------------------------------*)
               (*first pair*)
-              let error, agent_source = 
+              let error, agent_source =
                 match
                   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
                     parameter error agent_id_source views
@@ -430,16 +430,16 @@ struct
                         Ckappa_sig.PairAgentsSitesStates_map_and_set.Set.add_when_not_in
                           parameter
                           error
-                          ((agent_id_source, agent_type_source, 
+                          ((agent_id_source, agent_type_source,
                             site_type_source, site_type, state_source, state),
-                           (agent_id_target, agent_type_target, 
+                           (agent_id_target, agent_type_target,
                             site_type_target, site_type', state_target,state'))
                           old_parallel_set
                       in
                       let error = Exception.check warn parameter error error' (Some "line 393") Exit in
                       let error, store_result =
                         Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite parameter error
-                          rule_id 
+                          rule_id
                           set
                           store_result
                       in
@@ -455,7 +455,7 @@ struct
   (**************************************************************************)
 
   let collect_rule_has_parallel_bonds_rhs static error rule_id rule =
-    let parameter = get_parameter static in
+    (*  let parameter = get_parameter static in*)
     let store_bonds_rhs_full = get_bonds_rhs_full static in
     let store_result = get_rule_has_parallel_bonds_rhs static in
     let error, store_result =
@@ -473,7 +473,7 @@ struct
 
  (**************************************************************************)
  (*Parallel bonds set*)
-      
+
   let collect_parallel_bonds_rhs static error rule_id =
     let parameter = get_parameter static in
     let store_rule_has_parallel_bonds = get_rule_has_parallel_bonds_rhs static in
@@ -508,7 +508,7 @@ struct
   (**************************************************************************)
   (*get the first map (A,x,y, B,z,t) -> parallel list rule_id_map that
     explain which rules can create a bound of type A.x.z.B*)
-      
+
   let collect_fst_site_create_parallel_bonds static error rule_id store_action_binding
       store_parallel_bonds store_result =
     let parameter = get_parameter static in
@@ -535,7 +535,7 @@ struct
                 (fun ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),
                       (agent_id1', agent_type1', site_type1', site_type2', state1', state2'))
                   (error, current_list) ->
-                    if 
+                    if
                       agent_id = agent_id1 &&
                       site_type = site_type1 &&
                       agent_id' = agent_id1' &&
@@ -547,7 +547,7 @@ struct
                        (agent_id1', agent_type1', site_type1', site_type2', state1', state2')) :: current_list
                     in
                     error, new_list
-                  else 
+                  else
                     error, current_list
                 ) store_parallel_bonds (error, old_list)
             in
@@ -563,7 +563,7 @@ struct
             store_result
           ) set Ckappa_sig.PairAgentsSiteState_map_and_set.Map.empty
         ) store_action_binding
-      
+
   (**************************************************************************)
 
   let collect_fst_site_create_parallel_bonds_rhs static error rule_id =
@@ -581,7 +581,7 @@ struct
     in
     let static = set_fst_site_create_parallel_bonds_rhs store_result static in
     error, static
-  
+
   (**************************************************************************)
   (*A.y.t.B*)
 
@@ -612,7 +612,7 @@ struct
                       (agent_id1', agent_type1', site_type1', site_type2', state1', state2'))
                   (error, current_list) ->
                     (*Remark only check one direction of the bond: A.y -> B.t*)
-                    if 
+                    if
                       agent_id = agent_id1 &&
                       site_type = site_type2 &&
                       agent_id' = agent_id1' &&
@@ -624,7 +624,7 @@ struct
                          (agent_id1', agent_type1', site_type1', site_type2', state1', state2')) :: current_list
                       in
                       error, new_list
-                    else 
+                    else
                       error, current_list
                 ) store_parallel_bonds (error, old_list)
             in
@@ -640,7 +640,7 @@ struct
             store_result
           ) set Ckappa_sig.PairAgentsSiteState_map_and_set.Map.empty
       ) store_action_binding
-      
+
   let collect_snd_site_create_parallel_bonds_rhs static error rule_id =
     let store_parallel_bonds = get_parallel_bonds_rhs static in
     let store_action_binding = get_action_binding static in
@@ -685,14 +685,14 @@ struct
     let static = set_bonds_lhs_full store_bonds_lhs_full static in
     let error, static =
       collect_rule_has_parallel_bonds_rhs
-        static        
+        static
         error
         rule_id
         rule
     in
     let error, static =
       collect_parallel_bonds_rhs
-        static        
+        static
         error
         rule_id
     in
@@ -730,7 +730,7 @@ struct
           error, static
         ) compil.Cckappa_sig.rules static
     in
-    error, static, dynamic    
+    error, static, dynamic
 
   (**************************************************************************)
   (** [get_scan_rule_set static] *)
@@ -775,7 +775,7 @@ struct
   (**************************************************************************)
   (*parallel bonds in the initial state*)
   (**************************************************************************)
-      
+
   let collect_bonds_initial static error init_state =
     let parameter = get_parameter static in
     let error, store_result =
@@ -814,7 +814,7 @@ struct
         Ckappa_sig.PairAgentsSiteState_map_and_set.Set.empty
     in
     error, store_result
-      
+
   let collect_parallel_bonds_init static dynamic error init_state =
     let error, store_bonds_init =
       collect_bonds_initial static error init_state
@@ -838,7 +838,7 @@ struct
                     init_state.Cckappa_sig.e_init_c_mixture.Cckappa_sig.views
                 in
                 let ((agent_type_source, site_type_source, state_source),
-                     (agent_type_target, site_type_target, state_target)) = pair 
+                     (agent_type_target, site_type_target, state_target)) = pair
                 in
                 (*get the old pair in initial bonds*)
                 let error, store_result =
@@ -854,8 +854,8 @@ struct
                           Ckappa_sig.PairAgentsSitesStates_map_and_set.Set.add_when_not_in
                             parameter
                             error
-                            ((agent_id, agent_type_source, site_type_source, site_type, state_source, state), 
-                             (site_add.Cckappa_sig.agent_index, agent_type_target, 
+                            ((agent_id, agent_type_source, site_type_source, site_type, state_source, state),
+                             (site_add.Cckappa_sig.agent_index, agent_type_target,
                               site_type_target, site_type', state_target, state'))
                             store_result
                         in
@@ -876,8 +876,8 @@ struct
 
   (**************************************************************************)
   (*PRINT*)
-  (**************************************************************************)    
-      
+  (**************************************************************************)
+
   let print_parallel_pair parameter error handler_kappa (x, y) =
     let (agent_id, agent_type, site_type1, site_type2, state1, state2) = x in
     let (agent_id', agent_type', site_type1', site_type2', state1', state2') = y in
@@ -994,12 +994,12 @@ struct
     let parameter = get_parameter static in
     let _ =
       Ckappa_sig.PairAgentsSitesStates_map_and_set.Set.iter
-        (fun ((agent_id, agent_type, site_type1, site_type2, state1, state2), 
+        (fun ((agent_id, agent_type, site_type1, site_type2, state1, state2),
               (agent_id', agent_type', site_type1', site_type2', state1', state2')) ->
           let error, ((site_type1_string, site_type2_string, state1_string, state2_string),
                       (site_type1_string', site_type2_string', state1_string', state2_string')) =
             print_parallel_pair
-              parameter error handler_kappa 
+              parameter error handler_kappa
               ((agent_id, agent_type, site_type1, site_type2, state1, state2),
                (agent_id', agent_type', site_type1', site_type2', state1', state2'))
           in
@@ -1026,7 +1026,7 @@ struct
         ) store_result
     in
     ()
-      
+
   (**************************************************************************)
 
   let print_parallel_bonds_rhs static dynamic error =
@@ -1046,13 +1046,13 @@ struct
   (**************************************************************************)
 
   let print_rule_has_parallel_bonds static dynamic error store_result =
-    let handler_kappa = get_kappa_handler static in
+    (*let handler_kappa = get_kappa_handler static in*)
     let parameter = get_parameter static in
     let _ =
       Ckappa_sig.Rule_map_and_set.Map.iter
         (fun rule_id set ->
           Loggers.fprintf (Remanent_parameters.get_logger parameter)
-            "rule_id:%i\n" (Ckappa_sig.int_of_rule_id rule_id);            
+            "rule_id:%i\n" (Ckappa_sig.int_of_rule_id rule_id);
           let _ =
             print_parallel_bonds static dynamic error set
           in
@@ -1060,7 +1060,7 @@ struct
         ) store_result
     in
     ()
-      
+
   (**************************************************************************)
 
   let print_rule_has_parallel_bonds_rhs static dynamic error =
@@ -1074,7 +1074,7 @@ struct
 
   let print_action_binding static dynamic error =
     let store_action_binding = get_action_binding static in
-    let parameter = get_parameter static in    
+    let parameter = get_parameter static in
     Loggers.fprintf (Remanent_parameters.get_logger parameter)
       "Action binding:\n";
     let _ =
@@ -1083,7 +1083,7 @@ struct
           Loggers.fprintf (Remanent_parameters.get_logger parameter)
             "rule_id:%i\n" (Ckappa_sig.int_of_rule_id rule_id);
           Ckappa_sig.PairAgentsSiteState_map_and_set.Set.iter
-            (fun ((agent_id, agent_type, site_type, state), 
+            (fun ((agent_id, agent_type, site_type, state),
                   (agent_id', agent_type', site_type', state')) ->
               Loggers.fprintf (Remanent_parameters.get_logger parameter)
                 "agent_id:%i,site_type:%i -> agent_id:%i, site_type:%i\n\
@@ -1122,7 +1122,7 @@ struct
                  (agent_id', agent_type', site_type', state')) list ->
              let error, (site_type_string, site_type_string', state_string, state_string') =
                print_pair parameter error handler_kappa
-                 ((agent_id, agent_type, site_type, state), 
+                 ((agent_id, agent_type, site_type, state),
                   (agent_id', agent_type', site_type', state'))
              in
              let _ =
@@ -1132,7 +1132,7 @@ struct
                  (Ckappa_sig.int_of_agent_id agent_id)
                  (Ckappa_sig.int_of_site_name site_type)
                  site_type_string
-                 state_string                
+                 state_string
                  (Ckappa_sig.int_of_agent_id agent_id')
                  (Ckappa_sig.int_of_site_name site_type')
                  site_type_string'
@@ -1145,7 +1145,7 @@ struct
                  (Ckappa_sig.int_of_agent_id agent_id)
                  (Ckappa_sig.int_of_site_name site_type)
                  site_type_string
-                 state_string                
+                 state_string
              in
              (*--------------------------------------------------------------------*)
              List.iter
@@ -1201,21 +1201,21 @@ struct
    ()
 
  (**************************************************************************)
-     
+
  let print_fst_site_create_parallel_rhs static dynamic error =
    let parameter = get_parameter static in
    let store_fst_site_create_parallel_bonds_rhs = get_fst_site_create_parallel_bonds_rhs static in
    Loggers.fprintf (Remanent_parameters.get_logger parameter)
      "Rule create the first parallel bound in the rhs:\n";
    print_site_create_parallel static dynamic error store_fst_site_create_parallel_bonds_rhs
-     
+
  let print_snd_site_create_parallel_rhs static dynamic error =
    let parameter = get_parameter static in
    let store_snd_site_create_parallel_bonds_rhs = get_snd_site_create_parallel_bonds_rhs static in
    Loggers.fprintf (Remanent_parameters.get_logger parameter)
      "Rule create the second parallel bound in the rhs:\n";
    print_site_create_parallel static dynamic error store_snd_site_create_parallel_bonds_rhs
-     
+
   (**************************************************************************)
   (*Initial state*)
   (**************************************************************************)
@@ -1223,7 +1223,7 @@ struct
   let add_initial_state static dynamic error species =
     let event_list = [] in
     (*parallel bonds in the initial states*)
-    let error, dynamic = 
+    let error, dynamic =
       collect_parallel_bonds_init
         static
         dynamic
@@ -1236,7 +1236,7 @@ struct
   (* if a parallel bound occur in a lhs, check that this is possible *)
   let is_enabled static dynamic error (rule_id:Ckappa_sig.c_rule_id) precondition =
     error, dynamic, Some precondition
-    
+
   (**************************************************************************)
   (* to do, when one bond is created, check in the precondition, whether
      the two other sites may be bound, check whether they must be bound to the
@@ -1261,7 +1261,7 @@ struct
             (agent_id', agent_type', site_type1', site_type2', state1', state2')) value ->
         let error, ((site_type1_string, site_type2_string, state1_string, state2_string),
                     (site_type1_string', site_type2_string', state1_string', state2_string'))=
-          print_parallel_pair parameter error handler_kappa 
+          print_parallel_pair parameter error handler_kappa
             ((agent_id, agent_type, site_type1, site_type2, state1, state2),
              (agent_id', agent_type', site_type1', site_type2', state1', state2'))
         in
@@ -1290,7 +1290,7 @@ struct
             state2_string';
         print_value parameter value
       ) store_result
-      
+
   (**************************************************************************)
 
   let get_state_of_site_in_precondition parameter error dynamic agent_id site_type precondition =
@@ -1319,7 +1319,7 @@ struct
     error, global_dynamic, precondition, state_list
 
   (**************************************************************************)
-      
+
   let compute_result parameter error handler_kappa state_list (x, y)
       rule_has_parallel_bonds_rhs_set store_result =
     let (agent_id1, agent_type1, site_type1, site_type2, state1, state2) = x in
@@ -1328,7 +1328,7 @@ struct
     (*print for test*)
     let error, ((site_type1_string, site_type2_string, state1_string, state2_string),
                 (site_type1_string', site_type2_string', state1_string', state2_string')) =
-      print_parallel_pair parameter error handler_kappa 
+      print_parallel_pair parameter error handler_kappa
         ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),
          (agent_id1', agent_type1', site_type1', site_type2', state1', state2'))
     in
@@ -1357,7 +1357,7 @@ struct
     let error, store_result =
       List.fold_left (fun (error, store_result) pre_state ->
         let error, old_value =
-          match 
+          match
             Ckappa_sig.PairAgentsSitesStates_map_and_set.Map.find_option_without_logs
               parameter
               error
@@ -1423,9 +1423,9 @@ struct
             (*let _ =
               Loggers.fprintf (Remanent_parameters.get_logger parameter)
                 "Belong to a parallel bound\n";
-              print_result handler_kappa parameter error store_result 
+              print_result handler_kappa parameter error store_result
             in*)
-            error, store_result 
+            error, store_result
           else
             (*it does not belong to a parallel bound*)
             let new_value = Usual_domains.lub old_value (Usual_domains.Val false) in
@@ -1442,7 +1442,7 @@ struct
             (*let _ =
               Loggers.fprintf (Remanent_parameters.get_logger parameter)
                 "Do not have parallel bound\n";
-              print_result handler_kappa parameter error store_result 
+              print_result handler_kappa parameter error store_result
             in*)
             error, store_result
         (*--------------------------------------------------------------------*)
@@ -1458,13 +1458,13 @@ struct
               store_result
           in
           (*print test*)
-          (*let _ = 
+          (*let _ =
             Loggers.fprintf (Remanent_parameters.get_logger parameter)
               "Do not care:pre_state:%i:%s:Undefined\n"
               (Ckappa_sig.int_of_state_index pre_state)
               pre_state_string
             ;
-            print_result handler_kappa parameter error store_result 
+            print_result handler_kappa parameter error store_result
           in*)
           error, store_result
       ) (error, store_result) state_list
@@ -1538,13 +1538,13 @@ struct
                     (Ckappa_sig.int_of_agent_id agent_id1)
                 in*)
                 let error, global_dynamic, precondition', state_list_direct =
-                  get_state_of_site_in_precondition 
+                  get_state_of_site_in_precondition
                     parameter
                     error
                     dynamic
                     agent_id1
-                    site_type2 
-                    precondition 
+                    site_type2
+                    precondition
                 in
                 let error, store_result_direct =
                   compute_result
@@ -1553,7 +1553,7 @@ struct
                     handler_kappa
                     state_list_direct
                     ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),
-                     (agent_id1', agent_type1', site_type1', site_type2', state1', state2')) 
+                     (agent_id1', agent_type1', site_type1', site_type2', state1', state2'))
                     rule_has_parallel_bonds_rhs_set
                     store_result1
                 in
@@ -1588,7 +1588,7 @@ struct
                 (*--------------------------------------------------------------------*)
                 (*result:combine the result of two directions*)
                 error, (store_result_direct, store_result_reverse)
-            ) (error, store_result) list 
+            ) (error, store_result) list
           in
           error, (store_result_direct, store_result_reverse)
         ) store_pair_bind_map (error, store_result)
@@ -1596,12 +1596,12 @@ struct
     error, store_result
 
   (**************************************************************************)
-      
+
   let apply_rule static dynamic error rule_id precondition =
     let event_list = [] in
     let parameter = get_parameter static in
     let handler_kappa = get_kappa_handler static in
-    let compil = get_compil static in
+    (*let compil = get_compil static in*)
     (*--------------------------------------------------------------------*)
     (*rule that has a set of parallel bonds in the rhs*)
     let store_rule_has_parallel_bonds_rhs = get_rule_has_parallel_bonds_rhs static in
@@ -1614,8 +1614,8 @@ struct
       | error, Some s -> error, s
     in
     (*--------------------------------------------------------------------*)
-    let store_fst_site_create_parallel_bonds_rhs = 
-      get_fst_site_create_parallel_bonds_rhs static 
+    let store_fst_site_create_parallel_bonds_rhs =
+      get_fst_site_create_parallel_bonds_rhs static
     in
     let error, store_pair_bind_map =
       match
@@ -1642,7 +1642,7 @@ struct
         precondition
         store_pair_bind_map
         rule_has_parallel_bonds_rhs_set
-        store_result      
+        store_result
     in
     (*------------------------------------------------------------------*)
     let dynamic = set_status_of_parallel_bonds store_result dynamic in
@@ -1653,7 +1653,7 @@ struct
     (*check if set is empty then return the result, if not fold over set,
       and check the parallel bonds*)
     let error, init_value =
-      if Ckappa_sig.PairAgentsSitesStates_map_and_set.Set.is_empty 
+      if Ckappa_sig.PairAgentsSitesStates_map_and_set.Set.is_empty
         store_parallel_bonds_init_set
       then
         (*return value false*)
@@ -1711,7 +1711,7 @@ struct
 
   (* events enable communication between domains. At this moment, the
      global domain does not collect information *)
-      
+
   let rec apply_event_list static dynamic error event_list =
     let event_list = [] in
     error, dynamic, event_list
@@ -1719,14 +1719,14 @@ struct
   (**************************************************************************)
 
   let print static dynamic error loggers =
-    let handler_kappa = get_kappa_handler static in
-    let parameter = get_parameter static in
+    (*let handler_kappa = get_kappa_handler static in*)
+    (*let parameter = get_parameter static in*)
     (*let _ =
-      print_rule_has_parallel_bonds_rhs static dynamic error 
+      print_rule_has_parallel_bonds_rhs static dynamic error
     in
     let _ =
       print_parallel_bonds_rhs static dynamic error
-    in 
+    in
     let _ =
       print_action_binding static dynamic error
     in
@@ -1737,7 +1737,7 @@ struct
       print_snd_site_create_parallel_rhs static dynamic error
     in
     let _ =
-      print_rule_has_parallel_bonds_rhs static dynamic error 
+      print_rule_has_parallel_bonds_rhs static dynamic error
     in
     let _ = print_parallel_bonds_init static dynamic error in
     let store_status_of_parallel_bonds = get_status_of_parallel_bonds dynamic in
@@ -1750,7 +1750,7 @@ struct
     error, dynamic, ()
 
   (**************************************************************************)
-      
+
   let export static dynamic error kasa_state =
     error, dynamic, kasa_state
 
