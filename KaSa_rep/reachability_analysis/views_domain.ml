@@ -24,7 +24,7 @@ let warn parameters mh message exn default =
     (fun () -> default)
 
 let local_trace = false
-let compute_local_trace = false
+    (*  let compute_local_trace = false*)
 
 module Domain =
 struct
