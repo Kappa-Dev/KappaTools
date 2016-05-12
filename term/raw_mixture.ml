@@ -120,35 +120,19 @@ let rec agents_are_compatibles remains = function
 	 | Some (todo',rem') -> agents_are_compatibles rem' todo'
 	 | _ -> false
 
-let classify_by_type mix =
-  let rec classify ag = function
-    | [] -> [ag.a_type,1,[ag]]
-    | (ty,nb,ags as h)::t as l ->
-       if ag.a_type < ty
-       then (ag.a_type,1,[ag])::l
-       else if ag.a_type = ty
-       then (ty,succ nb,ag::ags)::t
-       else h::classify ag t
-  in List.fold_left (fun acc x -> classify x acc) [] mix
+let classify_by_type len mix =
+  let out = Array.make len (0,[]) in
+  let classify ag =
+    let nb,ags = out.(ag.a_type) in
+    out.(ag.a_type) <- (succ nb,ag::ags) in
+  let () = List.iter classify mix in
+  out
 
-let min_not_null l1 l2 =
-  let rec aux va out = function
-    | [],[] -> Some out
-    | [], _::_ | _::_, [] -> None
-    | (ty1,nb1,ag1)::t1, (ty2,nb2,ag2)::t2 ->
-       if ty1 <> ty2 || nb1 <> nb2 then None
-       else if nb1 < va then aux nb1 (ag1,ag2) (t1,t2)
-       else aux va out (t1,t2) in
-  match (l1,l2) with
-  | [],[] -> Some ([],[])
-  | [], _::_ | _::_, [] -> None
-  | (ty1,nb1,ag1)::t1, (ty2,nb2,ag2)::t2 ->
-     if ty1 <> ty2 || nb1 <> nb2 then None
-     else aux nb1 (ag1,ag2) (t1,t2)
-
-let equal a b =
+let equal sigs a b =
+  let len = Signature.size sigs in
   let rem_me x l = List.filter (fun y -> x != y) l in
-  match min_not_null (classify_by_type a) (classify_by_type b) with
+  match Tools.array_min_equal_not_null
+	  (classify_by_type len a) (classify_by_type len b) with
   | None -> false
   | Some ([],ags) -> ags = []
   | Some (h1::_,ags) ->

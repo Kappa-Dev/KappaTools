@@ -13,6 +13,8 @@ val array_fold_left_mapi :
   (int -> 'a -> 'b -> 'a * 'c) -> 'a -> 'b array -> 'a * 'c array
 val array_fold_left2i :
   (int -> 'a -> 'b -> 'c -> 'a) -> 'a -> 'b array -> 'c array -> 'a
+val array_min_equal_not_null :
+  (int * 'a list) array -> (int * 'b list) array -> ('a list * 'b list) option
 val list_last : 'a list -> 'a
 val list_exists_uniq :
   ('a -> bool) -> 'a list -> bool

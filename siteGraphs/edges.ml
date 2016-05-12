@@ -275,7 +275,7 @@ let build_snapshot sigs graph =
   let rec increment x = function
     | [] -> [1,x]
     | (n,y as h)::t ->
-       if Raw_mixture.equal x y then (succ n,y)::t
+       if Raw_mixture.equal sigs x y then (succ n,y)::t
        else h::increment x t in
   let rec aux ccs node =
     if node = DynArray.length graph.sort

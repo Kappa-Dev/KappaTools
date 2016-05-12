@@ -149,6 +149,28 @@ let array_fold_left2i  f x a1 a2 =
 let array_filter f a =
   array_fold_lefti (fun i acc x -> if f i x then i :: acc else acc) [] a
 
+let array_min_equal_not_null l1 l2 =
+  if Array.length l1 <> Array.length l2 then None
+  else
+    let rec f j =
+      if j = Array.length l1 then Some ([],[])
+      else
+	let (nb1,ag1) = l1.(j) in
+	let (nb2,ag2) = l2.(j) in
+	if nb1 <> nb2 then None
+	else if nb1 = 0 then f (succ j)
+	else
+	  let rec aux i va out =
+	    if i = Array.length l1 then Some out
+	    else
+	      let (nb1,ag1) = l1.(i) in
+	      let (nb2,ag2) = l2.(i) in
+	      if nb1 <> nb2 then None
+	      else if nb1 > 0 && nb1 < va then aux (succ i) nb1 (ag1,ag2)
+	      else aux (succ i) va out in
+	  aux (succ j) nb1 (ag1,ag2) in
+    f 0
+
 let iteri f i =
   let rec aux j =
   if j < i then let () = f j in aux (succ j)
@@ -173,4 +195,3 @@ let max_pos_int_not_zero (keya,dataa) (keyb,datab) =
   if compare keya keyb > 0
   then keya,dataa
   else keyb,datab
-    
