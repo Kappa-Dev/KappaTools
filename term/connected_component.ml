@@ -129,6 +129,60 @@ let raw_find_root nodes_by_type =
 let find_root cc = raw_find_root cc.nodes_by_type
 let find_root_type cc = Tools.option_map snd (find_root cc)
 
+let are_compatible root1 links1 ints1 root2 links2 ints2 =
+  let rec aux rename = function
+    | [] -> Some rename
+    | (o,p)::todos ->
+       if
+	 Tools.array_fold_left2i
+	   (fun _ b x y -> b && x = y) true
+	   (IntMap.find_default [||] o ints1)
+	   (IntMap.find_default [||] p ints2) then
+	 match Tools.array_fold_left2i
+		 (fun _ c x y ->
+		  match c with
+		  | None -> c
+		  | Some (todo,ren) ->
+		     match x, y with
+		     | (UnSpec, Free| Free, UnSpec
+			|Link _, Free| Free, Link _
+			|UnSpec, Link _| Link _, UnSpec) -> None
+		     | UnSpec, UnSpec -> c
+		     | Free, Free -> c
+		     | Link (n1,s1), Link (n2,s2) ->
+			if s1 = s2 then
+			  if Renaming.mem n1 ren then
+			    if Renaming.apply ren n1 = n2 then c else None
+			  else match Renaming.add n1 n2 ren with
+			       | None -> None
+			       | Some r' -> Some ((n1,n2)::todo,r')
+			else None
+		 )
+		 (Some (todos,rename))
+		 (IntMap.find_default [||] o links1)
+		 (IntMap.find_default [||] p links2) with
+	 | None -> None
+	 | Some (todos',ren') -> aux ren' todos'
+       else None in
+  match Renaming.add root1 root2 Renaming.empty with
+  | None -> assert false
+  | Some r -> aux r [root1,root2]
+
+let equal a b =
+  match Tools.array_min_equal_not_null
+	  (Array.map (fun x -> List.length x,x) a.nodes_by_type)
+	  (Array.map (fun x -> List.length x,x) b.nodes_by_type) with
+  | None -> None
+  | Some ([],ags) -> if ags = [] then Some Renaming.empty else None
+  | Some (h1::_,ags) ->
+     List.fold_left
+       (fun bool ag ->
+	match bool with
+	| Some _ -> bool
+	| None -> are_compatible h1 a.links a.internals ag b.links b.internals)
+       None ags
+
+
 (*turns a cc into a path(:list) in the domain*)
 let raw_to_navigation (full:bool) nodes_by_type internals links =
   let rec build_for (_,out as acc) don = function
