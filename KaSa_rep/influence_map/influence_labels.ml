@@ -52,6 +52,7 @@ sig
   type label_set_couple
 
   val label_of_int: Remanent_parameters_sig.parameters -> Exception.method_handler -> int -> Exception.method_handler * label
+  val member: label -> label_set -> bool
   val empty: label_set
   val empty_couple: label_set_couple
   val is_empty_couple: label_set_couple -> bool
@@ -73,6 +74,7 @@ module Empty =
   let label_of_int handler error _ = error,()
   let empty = ()
   let empty_couple = ()
+  let member label labelset = false
   let is_empty_couple _ = false
   let add_set _ _ = ()
   let add_couple _ error _ _ _ _ = error,()
@@ -95,6 +97,7 @@ module Extensive =
 
       let label_of_int = L.label_of_int
       let empty = Set.empty
+      let member = Set.mem
       let empty_couple = Pair_Set.Set.empty
       let is_empty_couple = Pair_Set.Set.is_empty
       let add_set = Set.add
@@ -215,7 +218,7 @@ module Implicit =
       module Set = LSetMap.Set
       type label_set = Set.t
       type label_set_couple =  (label_set * label_set) list
-
+      let member = Set.mem
       let label_of_int = L.label_of_int
       let empty = Set.empty
       let empty_couple  = []
@@ -288,8 +291,8 @@ module Implicit =
           error
 
     let filter_couple parameter error handler f list  = error,list (* to do *)
-	
-	
+
+
     let to_string_couple parameter error handler a =
         let sol = ["["] in
         let _,sol =

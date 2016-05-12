@@ -167,7 +167,6 @@ Quarks:REMOVAL
 Quarks:MODIFICATION+
 Quarks:rule_id:1,agent_type:0,site_type:1,state:0
 Quarks:MODIFICATION-
-Quarks:rule_id:1,agent_type:0,site_type:1,state:0
 Quarks:rule_id:1,agent_type:0,site_type:1,state:1
 Quarks:HALF BOND BREAKING
 Quarks:rule_id:1,agent_type:0,site_type:1,state:0
@@ -205,7 +204,6 @@ Quarks:REMOVAL
 Quarks:MODIFICATION+
 Quarks:rule_id:3,agent_type:0,site_type:1,state:0
 Quarks:MODIFICATION-
-Quarks:rule_id:3,agent_type:0,site_type:1,state:0
 Quarks:rule_id:3,agent_type:0,site_type:1,state:1
 Quarks:HALF BOND BREAKING
 Quarks:rule_id:3,agent_type:0,site_type:1,state:0
@@ -253,7 +251,6 @@ Quarks:rule_id:6,agent_type:0,site_type:1,state: bound
 Quarks:rule_id:6,agent_type:0,site_type:1,state:1
 Quarks:MODIFICATION-
 Quarks:rule_id:6,agent_type:0,site_type:1,state:0
-Quarks:rule_id:6,agent_type:0,site_type:1,state:1
 Quarks:rule_id:6,agent_type:0,site_type:1,state:0
 Quarks:HALF BOND BREAKING
 Quarks:rule_id:6,agent_type:0,site_type:1,state:0
@@ -291,14 +288,12 @@ Quarks:site_modif+:agent_type:0,site_type:1,state:1,rule:2->[0;1]
 Quarks:site_modif+:agent_type:0,site_type:1,state:1,rule:6->[0;1]
 Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:0->[0]
 Quarks:site_modif-:agent_type:0,site_type:0,state:1,rule:4->[0]
-Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:1->[0]
-Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:2->[0;1]
-Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:3->[0]
-Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:6->[0;1]
 Quarks:site_modif-:agent_type:0,site_type:1,state:1,rule:1->[0*;0]
 Quarks:site_modif-:agent_type:0,site_type:1,state:1,rule:3->[0*;0]
 Quarks:site_modif-:agent_type:0,site_type:1,state:1,rule:5->[0*]
-Quarks:site_modif-:agent_type:0,site_type:1,state:1,rule:6->[0*;0]
+Quarks:site_modif-:agent_type:0,site_type:1,state:1,rule:6->[0*]
+Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:2->[0;1]
+Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:6->[0;1]
 Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Influence_map:Wake_up_map:rule(0):'' A(x~a?)->A(x~b?) -> rule(4):'' A(x~b)->A(x~a)[0->0]
@@ -333,21 +328,11 @@ Influence_map:Wake_up_map:rule(6):'' A(x?),A(x)->A(x!1),A(x!1) -> rule(6):'' A(x
 
 Influence_map:Inhibition_map:rule(0):'' A(x~a?)->A(x~b?) -> rule(3):'' A(x~a?)->A(x~a)[0->0]
 
-Influence_map:Inhibition_map:rule(1):'' A(x?)->A(x) -> rule(2):'' A(x),A(x)->A(x!1),A(x!1)[0->0];[0->1]
-
-Influence_map:Inhibition_map:rule(1):'' A(x?)->A(x) -> rule(4):'' A(x~b)->A(x~a)[0->0]
-
-Influence_map:Inhibition_map:rule(1):'' A(x?)->A(x) -> rule(6):'' A(x?),A(x)->A(x!1),A(x!1)[0->1]
-
 Influence_map:Inhibition_map:rule(2):'' A(x),A(x)->A(x!1),A(x!1) -> rule(2):'' A(x),A(x)->A(x!1),A(x!1)[0->1];[1->0]
 
 Influence_map:Inhibition_map:rule(2):'' A(x),A(x)->A(x!1),A(x!1) -> rule(4):'' A(x~b)->A(x~a)[0->0];[1->0]
 
 Influence_map:Inhibition_map:rule(2):'' A(x),A(x)->A(x!1),A(x!1) -> rule(6):'' A(x?),A(x)->A(x!1),A(x!1)[0->1];[1->1]
-
-Influence_map:Inhibition_map:rule(3):'' A(x~a?)->A(x~a) -> rule(2):'' A(x),A(x)->A(x!1),A(x!1)[0->0];[0->1]
-
-Influence_map:Inhibition_map:rule(3):'' A(x~a?)->A(x~a) -> rule(6):'' A(x?),A(x)->A(x!1),A(x!1)[0->1]
 
 Influence_map:Inhibition_map:rule(5):'' A(x?)-> -> rule(0):'' A(x~a?)->A(x~b?)[0->0]
 

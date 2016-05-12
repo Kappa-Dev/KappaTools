@@ -23,6 +23,5 @@ edge [color=green, arrowhead=normal];
 edge [color=red, arrowhead=tee];
 "r0_op" -> "r1"[label ="[1->0]"] ; 
 "r1" -> "r0_op"[label ="[0->1]"] ; 
-"r1" -> "r1_op"[label ="[0->0]"] ; 
 
 }
