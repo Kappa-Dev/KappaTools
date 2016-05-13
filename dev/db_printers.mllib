@@ -1,3 +1,7 @@
+ExceptionDefn_with_no_dep
+Location
+Pp
+
 Cache
 Stop
 Color
@@ -16,15 +20,12 @@ Circular_buffers
 Infinite_buffers
 Loggers
 
-Location
-Pp
 Pp_html
 Pp_svg
 Parameter
 Kappa_files
 Nbr
 Operator
-ExceptionDefn_with_no_dep
 ExceptionDefn
 Counter
 

@@ -230,7 +230,7 @@ module type Map =
     val compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
     val equal: ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
     val bindings : 'a t -> (elt * 'a) list
-    val print: 
+    val print:
       (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
   end
 
@@ -889,7 +889,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	let rec aux_print f = function
 	  | Private.Empty -> ()
 	  | Private.Node (Private.Empty,key,Private.Empty,_,_) ->
-	    Format.fprintf f "@[%a]" Ord.print key
+	    Format.fprintf f "@[%a@]" Ord.print key
 	  | Private.Node (Private.Empty,key,right,_,_) ->
 	    Format.fprintf f "@[%a@],@ %a" Ord.print key aux_print right
 	  | Private.Node (left,key,Private.Empty,_,_) ->
