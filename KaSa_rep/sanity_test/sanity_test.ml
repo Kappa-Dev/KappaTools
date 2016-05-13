@@ -69,10 +69,10 @@ let remanent parameters =
        List_core.update_variables_dictionary)
     
 
-module I = SetMap.Make (struct type t = int let compare = compare end)
+module I = Mods.IntSetMap
 module LI = (Map_wrapper.Make(I):Map_wrapper.S_with_logs with type 'a Map.t = 'a I.Map.t and type elt = int and type Set.t = I.Set.t)
 
-module LLI = Map_wrapper.Make(SetMap.Make (struct type t = int let compare = compare end))
+module LLI = Map_wrapper.Make(I)
 					   
 let () =
   let error = Exception.empty_error_handler in

@@ -5,7 +5,7 @@
 
 open Tk
 
-module StringSetMap = SetMap.Make (struct type t = string let compare = compare end)
+module StringSetMap = Mods.StringSetMap
 module StringMap = StringSetMap.Map
 let map = ref StringMap.empty (* key => entry widget *)
 let fmap = ref StringMap.empty  (* key => frame widget *)

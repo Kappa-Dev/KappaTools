@@ -1,6 +1,6 @@
-module IntS = SetMap.Make (struct type t = int let compare = compare end)
+module IntS = Mods.IntSetMap
 module LIntS = Map_wrapper.Make (IntS)
-module CharS = SetMap.Make (struct type t = char let compare = compare end)
+module CharS = Mods.CharSetMap
 module LCharS = Map_wrapper.Make (CharS)
 
 				 

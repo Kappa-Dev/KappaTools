@@ -31,7 +31,8 @@ module Count =
         Map_wrapper.Make (SetMap.Make
           (struct 
             type t = E.puzzle_hole 
-            let compare = compare 
+            let compare = compare
+	    let print _ _ = ()
            end))
           
       type hole_multiset = int Puzzle_hole_map_and_set.Map.t
@@ -40,7 +41,8 @@ module Count =
         Map_wrapper.Make (SetMap.Make
            (struct 
              type t = hole_multiset * hole_multiset  
-             let compare = compare 
+             let compare = compare
+	     let print _ _ = ()
             end))
           
       type dependence_graph = 
