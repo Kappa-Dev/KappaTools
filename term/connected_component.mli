@@ -5,37 +5,39 @@ type t = cc (**type for domain points*)
 
 type work (**type for partial domain*)
 
-module ContentAgent  : sig
-  type t
+module ContentAgent : sig
+    type t
 
-  val get_sort : t -> int
+    val get_sort : t -> int
 
-  val print :
-    ?sigs:Signature.s -> ?with_id:unit -> Format.formatter -> t -> unit
-  val print_site :
-    ?sigs:Signature.s -> t -> Format.formatter -> int -> unit
-  val print_internal :
-    ?sigs:Signature.s -> t -> int -> Format.formatter -> int -> unit
+    val print :
+      ?sigs:Signature.s -> ?with_id:unit -> Format.formatter -> t -> unit
+    val print_site :
+      ?sigs:Signature.s -> t -> Format.formatter -> int -> unit
+    val print_internal :
+      ?sigs:Signature.s -> t -> int -> Format.formatter -> int -> unit
 
-  val rename : work -> cc -> Renaming.t -> t -> t
-end
+    val rename : work -> cc -> Renaming.t -> t -> t
+  end
 
 module Env : sig
-  type t
+    type t
 
-  val empty : Signature.s -> t
-  val finalize : t -> t
+    val print : Format.formatter -> t -> unit
+    val print_dot : Format.formatter -> t -> unit
+  end
 
-  val sigs : t -> Signature.s
-  val nb_ag : t -> int
-  val print : Format.formatter -> t -> unit
-  val print_dot : Format.formatter -> t -> unit
+module PreEnv : sig
+    type t
 
-end
+    val sigs : t -> Signature.s
 
+    val empty : Signature.s -> t
+    val finalize : t -> Env.t
+  end
 (** {6 Create a connected component} *)
 
-val begin_new : Env.t -> work
+val begin_new : PreEnv.t -> work
 (** Starts creation *)
 
 val new_node : work -> int -> (ContentAgent.t*work)
@@ -49,7 +51,7 @@ val new_free : work -> (ContentAgent.t * int) -> work
 val new_internal_state : work -> (ContentAgent.t * int) -> int -> work
 (** [new_link_type work (node,site) type] *)
 
-val finish_new : ?origin:Operator.rev_dep -> work -> (Env.t*Renaming.t*t)
+val finish_new : ?origin:Operator.rev_dep -> work -> (PreEnv.t*Renaming.t*t)
 
 (** {6 Use a connected component } *)
 

@@ -36,8 +36,7 @@ type point = {
 
 type work = {
   sigs: Signature.s;
-  cc_env: point IntMap.t;
-  cc_single_ag: (cc * Operator.DepSet.t) IntMap.t;
+  cc_env: (cc * Operator.DepSet.t) list IntMap.t;
   reserved_id: int list array;
   used_id: int list array;
   free_id: int;
@@ -128,6 +127,17 @@ let raw_find_root nodes_by_type =
   in aux 0
 let find_root cc = raw_find_root cc.nodes_by_type
 let find_root_type cc = Tools.option_map snd (find_root cc)
+
+let weight cc =
+  let ints =
+    IntMap.fold
+      (fun _ ->
+       Array.fold_right (fun i acc -> if i <> -1 then succ acc else acc))
+      cc.internals 0 in
+  IntMap.fold
+    (fun _ ->
+     Array.fold_right (fun i acc -> if i <> UnSpec then succ acc else acc))
+    cc.links ints
 
 let are_compatible root1 links1 ints1 root2 links2 ints2 =
   let rec aux rename = function
@@ -372,332 +382,113 @@ let print_point_dot sigs f (id,point) =
 		 style (print_sons_dot sigs id point.content) point.sons
 
 module Env : sig
-  type t
+    type t = {
+	sig_decl: Signature.s;
+	domain: point array;
+	single_agent_points: (cc*Operator.DepSet.t) IntMap.t;
+      }
 
-  val fresh :
-    Signature.s -> int list array -> int -> point IntMap.t ->
-    (cc * Operator.DepSet.t) IntMap.t -> t
-  val empty : Signature.s -> t
-  val finalize : t -> t
-  val sigs : t -> Signature.s
-  val find : t -> cc -> (int * Renaming.t list * point) option
-  val navigate :
-    t -> Navigation.t -> (int * Renaming.t list * point) option
-  val get : t -> int -> point
-  val add_point : int -> point -> t -> t
-  val add_single_agent : int -> cc -> Operator.rev_dep option -> t -> cc * t
-  val get_single_agent : int -> t -> (cc * Operator.DepSet.t) option
-  val to_work : t -> work
-  val nb_ag : t -> int
-  val print : Format.formatter -> t -> unit
-  val print_dot : Format.formatter -> t -> unit
+    val navigate :
+      t -> Navigation.t -> (int * Renaming.t list * point) option
+    val get : t -> int -> point
+    val get_single_agent : int -> t -> (cc * Operator.DepSet.t) option
+    val print : Format.formatter -> t -> unit
+    val print_dot : Format.formatter -> t -> unit
   end = struct
-    type domain = Provisional of point IntMap.t | Final of point array
+    type t = {
+	sig_decl: Signature.s;
+	domain: point array;
+	single_agent_points: (cc*Operator.DepSet.t) IntMap.t;
+      }
 
-  type t = {
-    sig_decl: Signature.s;
-    id_by_type: int list array;
-    nb_id: int;
-    domain: domain;
-    single_agent_points: (cc*Operator.DepSet.t) IntMap.t;
-    mutable used_by_a_begin_new: bool;
-  }
+    let print f env =
+      let pp_point f p =
+	Format.fprintf
+	  f "@[<hov 2>(%a)@ -> @[<h>%a@]@ %t-> @[(%a)@]@]"
+	  (Pp.list Pp.space Format.pp_print_int) p.fathers
+	  (print ~sigs:env.sig_decl ~with_id:()) p.content
+	  (fun f ->
+	   match p.is_obs_of with
+	   | None -> ()
+	   | Some deps ->
+	      Format.fprintf
+		f "@[[%a]@]@ "
+		(Pp.set Operator.DepSet.elements Pp.space Operator.print_rev_dep)
+		deps)
+	  (Pp.list
+	     Pp.space
+	     (fun f s ->
+	      Format.fprintf
+		f "@[%a%a@ %i[@[%a@]]@]"
+		(Navigation.print_step env.sig_decl (find_ty p.content)) s.next
+		(Pp.list
+		   Pp.space
+		   (fun f -> Format.fprintf f "(@[%a@])" Renaming.print))
+		s.inj s.dst
+		(Pp.set IntSet.elements Pp.space Format.pp_print_int)
+		s.above_obs))
+	  p.sons in
+      Format.fprintf
+	f "@[<v>%a%a@]"
+	(Pp.set IntMap.bindings Pp.space ~trailing:Pp.space
+		(fun f (_,(cc,deps)) ->
+		 Format.fprintf
+		   f "@[<h>%a@] @[[%a]@]" (print ~sigs:env.sig_decl ~with_id:()) cc
+		   (Pp.set Operator.DepSet.elements Pp.space Operator.print_rev_dep)
+		   deps))
+	env.single_agent_points
+	(Pp.array Pp.space (fun _ -> pp_point))
+	env.domain
 
-let fresh sigs id_by_type nb_id domain single_agent_points =
-  {
-    sig_decl = sigs;
-    id_by_type = id_by_type;
-    nb_id = nb_id;
-    domain = Provisional domain;
-    single_agent_points = single_agent_points;
-    used_by_a_begin_new = false;
-  }
+    let get_single_agent ty env =
+      IntMap.find_option ty env.single_agent_points
 
-let empty_point sigs =
-  let nbt = Array.make (Signature.size sigs) [] in
-  let empty_cc =
-    {id = 0; nodes_by_type = nbt; recogn_nav = []; discover_nav = [];
-     links = IntMap.empty; internals = IntMap.empty;} in
-  {content = empty_cc; is_obs_of = None; fathers = []; sons = [];}
+    let get env cc_id = env.domain.(cc_id)
 
-let empty sigs =
-  let nbt' = Array.make (Signature.size sigs) [] in
-  fresh sigs nbt' 1 (IntMap.add 0 (empty_point sigs) IntMap.empty) IntMap.empty
+    let navigate env nav =
+      let rec aux injs_dst2nav pt_i = function
+	| [] -> Some (pt_i,injs_dst2nav, get env pt_i)
+	| e :: t ->
+	   let rec find_good_edge = function (*one should use a hash here*)
+	     | [] -> None
+	     | s :: tail ->
+		match Navigation.compatible_point injs_dst2nav s.next e with
+		| [] ->  find_good_edge tail
+		| inj' ->
+		   aux (Tools.list_map_flatten
+			  (fun x -> List.map (Renaming.compose false x) inj')
+			  s.inj) s.dst t
+	   in find_good_edge (get env pt_i).sons
+      in aux [Renaming.empty] 0 nav
 
-let check_vitality env = assert (env.used_by_a_begin_new = false)
+    let print_dot f env =
+      let () = Format.fprintf f "@[<v>strict digraph G {@," in
+      let () =
+	Pp.array
+	  ~trailing:Pp.space Pp.space
+	  (fun i f s -> print_point_dot (env.sig_decl) f (i,s)) f env.domain in
+      Format.fprintf f "}@]@."
 
-let print f env =
-  let pp_point f p =
-    Format.fprintf
-      f "@[<hov 2>(%a)@ -> @[<h>%a@]@ %t-> @[(%a)@]@]"
-      (Pp.list Pp.space Format.pp_print_int) p.fathers
-      (print ~sigs:env.sig_decl ~with_id:()) p.content
-      (fun f ->
-       match p.is_obs_of with
-       | None -> ()
-       | Some deps ->
-	  Format.fprintf
-	    f "@[[%a]@]@ "
-	    (Pp.set Operator.DepSet.elements Pp.space Operator.print_rev_dep)
-	    deps)
-      (Pp.list
-	 Pp.space
-	 (fun f s ->
-	  Format.fprintf
-	    f "@[%a%a@ %i[@[%a@]]@]"
-	    (Navigation.print_step env.sig_decl (find_ty p.content)) s.next
-	    (Pp.list
-	       Pp.space
-	       (fun f -> Format.fprintf f "(@[%a@])" Renaming.print))
-	    s.inj s.dst
-	    (Pp.set IntSet.elements Pp.space Format.pp_print_int)
-	    s.above_obs))
-      p.sons in
-  Format.fprintf
-    f "@[<v>%a%a@]"
-    (Pp.set IntMap.bindings Pp.space ~trailing:Pp.space
-	    (fun f (_,(cc,deps)) ->
-	     Format.fprintf
-	       f "@[<h>%a@] @[[%a]@]" (print ~sigs:env.sig_decl ~with_id:()) cc
-	       (Pp.set Operator.DepSet.elements Pp.space Operator.print_rev_dep)
-	       deps))
-    env.single_agent_points
-    (fun f -> function
-	   | Provisional s ->
-	      Pp.set IntMap.bindings Pp.space (fun f (_,p) -> pp_point f p) f s
-	   | Final a -> Pp.array Pp.space (fun _ -> pp_point) f a)
-    env.domain
-
-let add_point id el env =
-  {
-    sig_decl = env.sig_decl;
-    id_by_type = env.id_by_type;
-    nb_id = env.nb_id;
-    domain =
-      (match env.domain with
-      | Final _ -> failwith "Connected_component.Env.add_point on finalized env"
-      | Provisional s -> Provisional (IntMap.add id el s));
-    single_agent_points = env.single_agent_points;
-    used_by_a_begin_new = false;
-  }
-
-let add_single_agent ty cc origin env =
-  let (cc',deps) =
-    IntMap.find_default (cc,Operator.DepSet.empty) ty env.single_agent_points in
-  cc',
-  {
-    sig_decl = env.sig_decl;
-    id_by_type = env.id_by_type;
-    nb_id = env.nb_id;
-    domain = env.domain;
-    single_agent_points =
-      IntMap.add ty (cc', add_origin deps origin) env.single_agent_points;
-    used_by_a_begin_new = false;
-  }
-
-let get_single_agent ty env =
-  IntMap.find_option ty env.single_agent_points
-
-let get env cc_id =
-  match env.domain with
-  | Final a -> a.(cc_id)
-  | Provisional s ->
-     match IntMap.find_option cc_id s with
-     | Some x -> x
-     | None -> raise Not_found
-
-let fresh_id env =
-  let max_id_single =
-    IntMap.fold (fun _ (cc,_) x -> max x cc.id) env.single_agent_points 0 in
-  match match env.domain with
-	| Final _ ->
-	   failwith "Connected_component.Env.fresh_id on finalized env"
-	| Provisional s -> IntMap.max_key s with
-  | Some i -> succ (max max_id_single i)
-  | None -> succ max_id_single
-
-let sigs env = env.sig_decl
-
-let to_work env =
-  let () = check_vitality env in
-  let () = env.used_by_a_begin_new <- true in
-  {
-    sigs = env.sig_decl;
-    cc_env = (match env.domain with
-	      | Provisional s -> s
-	      | Final _ ->
-		 failwith "Connected_component.Env.fresh_id on finalized env");
-    cc_single_ag = env.single_agent_points;
-    reserved_id = env.id_by_type;
-    used_id = Array.make (Array.length env.id_by_type) [];
-    free_id = env.nb_id;
-    cc_id = fresh_id env;
-    cc_links = IntMap.empty;
-    cc_internals = IntMap.empty;
-    dangling = 0;
-  }
-
-let navigate env nav =
-  let rec aux injs_dst2nav pt_i = function
-    | [] -> Some (pt_i,injs_dst2nav, get env pt_i)
-    | e :: t ->
-       let rec find_good_edge = function (*one should use a hash here*)
-	 | [] -> None
-	 | s :: tail ->
-	    match Navigation.compatible_point injs_dst2nav s.next e with
-	    | [] ->  find_good_edge tail
-	    | inj' ->
-	       aux (Tools.list_map_flatten
-		      (fun x -> List.map (Renaming.compose false x) inj') s.inj) s.dst t
-       in find_good_edge (get env pt_i).sons
-  in aux [Renaming.empty] 0 nav
-
-let find env cc =
-  let nav = to_navigation cc in
-  (* let () = Format.eprintf *)
-  (* 	     "@[[%a]@]@,%a@." (Pp.list Pp.space (print_edge (sigs env) cc)) nav *)
-  (* 	     print env in *)
-  navigate env nav
-
-let nb_ag env = env.nb_id
-
-let print_dot f env =
-  let () = Format.fprintf f "@[<v>strict digraph G {@," in
-  let () =
-    match env.domain with
-    | Provisional s ->
-       Pp.set ~trailing:Pp.space IntMap.bindings Pp.space
-	      (print_point_dot (sigs env)) f s
-    | Final a ->
-       Pp.array ~trailing:Pp.space Pp.space
-		(fun i f s -> print_point_dot (sigs env) f (i,s)) f a
-  in
-  Format.fprintf f "}@]@."
-
-let rec remove_from_sons level1 todos set rfathers cc_id = function
-  | [] -> todos,rfathers,set
-  | id :: tail ->
-     match IntMap.find_option id set with
-     | None -> remove_from_sons level1 todos set rfathers cc_id tail
-     | Some cc ->
-	match List.partition (fun t -> t.dst = cc_id) cc.sons with
-	| [], _ -> remove_from_sons level1 todos set rfathers cc_id tail
-	| _x::_,sons ->
-	   if sons <> [] || cc.is_obs_of <> None || List.mem id level1 then
-	     (*let missings = (*TODO*)
-	       List.fold_left
-		 (fun acc t -> IntSet.minus acc t.above_obs) x.above_obs
-		 sons in*)
-	     let sons' = (*if IntSet.is_empty missings then sons else*) cc.sons in
-	     let rfathers'' =
-	       (*if IntSet.is_empty missings then rfathers else*) id::rfathers in
-	     remove_from_sons
-	       level1 (IntMap.add id cc.fathers todos)
-	       (IntMap.add id {cc with sons = sons'} set)
-	       rfathers'' cc_id tail
-	   else
-	     let todos',rfathers',set' =
-	       remove_from_sons
-		 level1 (IntMap.remove id todos) set [] id cc.fathers in
-	     let rfathers,set'' =
-	       match rfathers' with
-	       | _ :: _ ->
-	       id::rfathers,IntMap.add id {cc with fathers = rfathers'} set'
-	       | [] -> rfathers,IntMap.remove id set' in
-	     remove_from_sons level1 todos' set'' rfathers cc_id tail
-let rec scan_sons level1 todos set (injs,rfathers,cands) cc_id p = function
-  | [] ->
-     let rfathers' =
-       List.fold_left (fun acc (_,i) -> i::acc) rfathers cands in
-     todos,IntMap.add cc_id {p with fathers = rfathers'} set
-  | id :: tail ->
-     match IntMap.find_option id set with
-     | None -> scan_sons level1 todos set (injs,rfathers,cands) cc_id p tail
-     | Some cc ->
-	let injs',cands',tail' =
-	  List.fold_left
-	    (fun acc s ->
-	     if s.dst = cc_id then
-	       List.fold_left
-		 (fun (l,c,t) r ->
-		  let oui,non =
-		    List.partition
-		      (fun (x,_) -> Renaming.equal x r) c in
-		  r::l,non,Tools.list_rev_map_append snd oui t)
-		 acc s.inj
-	     else acc)
-	    ([],cands,tail) cc.sons in
-	if List.length injs' > 1 || List.length cc.sons > 1
-	   || cc.is_obs_of <> None || List.mem id level1
-	then
-	  scan_sons level1 (IntMap.add id cc.fathers todos) set
-		    (injs'@injs,id::rfathers,cands') cc_id p tail'
-	else
-	  let rroots =
-	    List.filter
-	      (fun r -> not (List.exists (Renaming.equal r) injs)) injs' in
-	  let cands'' =
-	    List.fold_left
-	      (fun c r ->
-	       if List.exists (fun (x,_) -> Renaming.equal x r) c
-	       then c else (r,id)::c)
-	      cands rroots in
-	  if cands == cands'' then
-	    let todos',rfathers',set' =
-	      remove_from_sons
-		level1 (IntMap.remove id todos) set [] id cc.fathers in
-	    let rr,set'',tail'' =
-	      match rfathers' with
-	      | _ :: _ ->
-		 (injs'@injs,id::rfathers,cands'),
-		 IntMap.add id {cc with fathers = rfathers'} set',tail'
-	      | [] -> (injs,rfathers,cands),IntMap.remove id set',tail in
-	    scan_sons level1 todos' set'' rr cc_id p tail''
-	  else
-	    scan_sons level1 todos set (injs,rfathers,cands'') cc_id p tail
-
-let finalize env =
-  let level1 = let zero = get env 0 in List.map (fun p -> p.dst) zero.sons in
-  let rec iter (todos,env) =
-    if IntMap.is_empty todos then env else
-      let out =
-	IntMap.fold
-	  (fun id fa (todos,s) ->
-	     match IntMap.find_option id s with
-	     | None -> (todos,s)
-	     | Some p -> scan_sons level1 todos s ([],[],[]) id p fa)
-	  todos (IntMap.empty,env) in
-      iter out in
-  match env.domain with
-  | Final _ -> env
-  | Provisional s ->
-     let tops =
-       IntMap.fold
-	 (fun id p s ->
-	  if p.sons = [] && not (List.mem id level1)
-	  then IntMap.add id p.fathers s else s)
-	 s IntMap.empty in
-     let s' = iter (tops,s) in
-     let si = match IntMap.max_key s' with Some i -> succ i | None -> 0 in
-     let out = Array.make si (empty_point env.sig_decl) in
-     let () = IntMap.iter (fun i p -> out.(i) <- p) s' in
-     { env with domain = Final out}
-end
+  end
 
 let propagate_add_obs obs_id env cc_id =
   let rec aux son_id domain cc_id =
-    let cc = Env.get domain cc_id in
-    let sons' =
-      Tools.list_smart_map
-	(fun s -> if s.dst = son_id && not (IntSet.mem obs_id s.above_obs)
-		  then {s with above_obs = IntSet.add obs_id s.above_obs}
-		  else s) cc.sons in
-    if sons' == cc.sons then domain
-    else
-      let env' =
-	Env.add_point cc_id {cc with sons = sons'} domain in
-      List.fold_left (aux cc_id) env' cc.fathers in
-  List.fold_left (aux cc_id) env (Env.get env cc_id).fathers
+    match IntMap.find_option cc_id domain with
+    | None -> assert false
+    | Some cc ->
+       let sons' =
+	 Tools.list_smart_map
+	   (fun s -> if s.dst = son_id && not (IntSet.mem obs_id s.above_obs)
+		     then {s with above_obs = IntSet.add obs_id s.above_obs}
+		     else s) cc.sons in
+       if sons' == cc.sons then domain
+       else
+	 let env' =
+	   IntMap.add cc_id {cc with sons = sons'} domain in
+	 List.fold_left (aux cc_id) env' cc.fathers in
+  match IntMap.find_option cc_id env with
+  | None -> assert false
+  | Some cc -> List.fold_left (aux cc_id) env cc.fathers
 
 exception Found
 
@@ -904,6 +695,33 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
 	      cc.links
 	      (remove_cycle_edges complete_domain_with obs_id dst env free_id cc)
 
+let get_domain domain id =
+  match IntMap.find_option id domain with
+  | None -> assert false
+  | Some x -> x
+
+let navigate_domain env nav =
+  let rec aux injs_dst2nav pt_i = function
+    | [] -> Some (pt_i,injs_dst2nav, get_domain env pt_i)
+    | e :: t ->
+       let rec find_good_edge = function (*one should use a hash here*)
+	 | [] -> None
+	 | s :: tail ->
+	    match Navigation.compatible_point injs_dst2nav s.next e with
+	    | [] ->  find_good_edge tail
+	    | inj' ->
+	       aux (Tools.list_map_flatten
+		      (fun x -> List.map (Renaming.compose false x) inj') s.inj) s.dst t
+       in find_good_edge (get_domain env pt_i).sons
+  in aux [Renaming.empty] 0 nav
+
+let find_domain env cc =
+  let nav = to_navigation cc in
+  (* let () = Format.eprintf *)
+  (* 	     "@[[%a]@]@,%a@." (Pp.list Pp.space (print_edge (sigs env) cc)) nav *)
+  (* 	     print env in *)
+  navigate_domain env nav
+
 let rec complete_domain_with obs_id dst env free_id cc edge inj_dst2cc =
   let rec new_son inj_cc2found = function
     | [] ->
@@ -914,57 +732,39 @@ let rec complete_domain_with obs_id dst env free_id cc edge inj_dst2cc =
     | h :: t when h.dst = dst && (h.next = Navigation.rename_step inj_cc2found edge) ->
        {h with inj = (Renaming.compose true inj_dst2cc inj_cc2found) :: h.inj} :: t
     | h :: t -> h :: new_son inj_cc2found t in
-  let known_cc = Env.find env cc in
+  let known_cc = find_domain env cc in
   match known_cc with
   | Some (cc_id, inj_cc_id2cc, point') ->
      let point'' =
        {point' with
 	 sons = new_son (Renaming.inverse (List.hd inj_cc_id2cc)) point'.sons} in
      let completed =
-       propagate_add_obs obs_id (Env.add_point cc_id point'' env) cc_id in
+       propagate_add_obs obs_id (IntMap.add cc_id point'' env) cc_id in
      (free_id,completed), cc_id
   | None ->
      let son = new_son (identity_injection cc) [] in
-     add_new_point ~origin:None obs_id env free_id son cc
-and add_new_point ~origin obs_id env free_id sons cc =
+     add_new_point ?deps:None obs_id env free_id son cc
+and add_new_point ?deps obs_id env free_id sons cc =
   let (free_id'',env'),fathers =
     compute_father_candidates complete_domain_with obs_id cc.id env (succ free_id) cc in
   let completed =
-    Env.add_point
+    IntMap.add
       cc.id
       {content = cc;sons=sons; fathers = fathers;
        is_obs_of =
-	 if cc.id = obs_id then Some (add_origin Operator.DepSet.empty origin) else None;}
+	 if cc.id = obs_id then deps else None;}
       env' in
   ((free_id'',completed),cc.id)
 
-let add_domain ?origin env cc =
+let add_domain ~deps (free_id,singles,env) cc =
   let nav = to_navigation cc in
   if nav = [] then
     match find_root cc with
     | None -> assert false
-    | Some (_,ty) ->
-       let cc',env' = Env.add_single_agent ty cc origin env in
-       env',identity_injection cc',cc'
+    | Some (_,ty) -> (free_id,IntMap.add ty (cc,deps) singles,env)
   else
-    let known_cc = Env.navigate env nav in
-    match known_cc with
-    | Some (id,inj,point) ->
-       (match point.is_obs_of with
-	| Some deps ->
-	   let point' =
-	     { point with
-	       is_obs_of = Some (add_origin deps origin)} in
-	   Env.add_point id point' env
-	| None ->
-	   let point' =
-	     { point with
-	       is_obs_of = Some (add_origin Operator.DepSet.empty origin)} in
-	   propagate_add_obs id (Env.add_point id point' env) id),
-       List.hd inj,point.content
-    | None ->
-       let (_,env'),_ = add_new_point ~origin cc.id env cc.id [] cc in
-       (env',identity_injection cc, cc)
+    let (free_id',env'),_ = add_new_point ~deps cc.id env free_id [] cc in
+    (free_id',singles,env')
 
 (** Operation to create cc *)
 let check_dangling wk =
@@ -978,7 +778,195 @@ let check_node_adequacy ~pos wk cc_id =
 		"A node from a different connected component has been used."
 	  ,pos))
 
-let begin_new env = Env.to_work env
+module PreEnv : sig
+    type t
+
+    val empty : Signature.s -> t
+    val fresh :
+      Signature.s -> int list array -> int ->
+      (cc * Operator.DepSet.t) list IntMap.t -> t
+    val to_work : t -> work
+
+    val sigs : t -> Signature.s
+
+    val finalize : t -> Env.t
+  end = struct
+    type t = {
+	sig_decl: Signature.s;
+	id_by_type: int list array;
+	nb_id: int;
+	domain: (cc * Operator.DepSet.t) list IntMap.t;
+	mutable used_by_a_begin_new: bool;
+      }
+
+    let fresh sigs id_by_type nb_id domain =
+      {
+	sig_decl = sigs;
+	id_by_type = id_by_type;
+	nb_id = nb_id;
+	domain = domain;
+	used_by_a_begin_new = false;
+      }
+
+    let empty sigs =
+      let nbt' = Array.make (Signature.size sigs) [] in
+      fresh sigs nbt' 1 IntMap.empty
+
+    let fresh_id env =
+      succ
+	(IntMap.fold
+	   (fun _ x acc ->
+	    List.fold_left (fun acc (cc,_) -> max acc cc.id) acc x)
+	   env.domain 0)
+
+    let check_vitality env = assert (env.used_by_a_begin_new = false)
+
+    let to_work env =
+      let () = check_vitality env in
+      let () = env.used_by_a_begin_new <- true in
+      {
+	sigs = env.sig_decl;
+	cc_env = env.domain;
+	reserved_id = env.id_by_type;
+	used_id = Array.make (Array.length env.id_by_type) [];
+	free_id = env.nb_id;
+	cc_id = fresh_id env;
+	cc_links = IntMap.empty;
+	cc_internals = IntMap.empty;
+	dangling = 0;
+      }
+
+    let sigs env = env.sig_decl
+
+    let empty_point sigs =
+      let nbt = Array.make (Signature.size sigs) [] in
+      let empty_cc =
+	{id = 0; nodes_by_type = nbt; recogn_nav = []; discover_nav = [];
+	 links = IntMap.empty; internals = IntMap.empty;} in
+      {content = empty_cc; is_obs_of = None; fathers = []; sons = [];}
+
+    let rec remove_from_sons level1 todos set rfathers cc_id = function
+      | [] -> todos,rfathers,set
+      | id :: tail ->
+	 match IntMap.find_option id set with
+	 | None -> remove_from_sons level1 todos set rfathers cc_id tail
+	 | Some cc ->
+	    match List.partition (fun t -> t.dst = cc_id) cc.sons with
+	    | [], _ -> remove_from_sons level1 todos set rfathers cc_id tail
+	    | _x::_,sons ->
+	       if sons <> [] || cc.is_obs_of <> None || List.mem id level1 then
+		 (*let missings = (*TODO*)
+	       List.fold_left
+		 (fun acc t -> IntSet.minus acc t.above_obs) x.above_obs
+		 sons in*)
+		 let sons' = (*if IntSet.is_empty missings then sons else*) cc.sons in
+		 let rfathers'' =
+		   (*if IntSet.is_empty missings then rfathers else*) id::rfathers in
+		 remove_from_sons
+		   level1 (IntMap.add id cc.fathers todos)
+		   (IntMap.add id {cc with sons = sons'} set)
+		   rfathers'' cc_id tail
+	       else
+		 let todos',rfathers',set' =
+		   remove_from_sons
+		     level1 (IntMap.remove id todos) set [] id cc.fathers in
+		 let rfathers,set'' =
+		   match rfathers' with
+		   | _ :: _ ->
+		      id::rfathers,IntMap.add id {cc with fathers = rfathers'} set'
+		   | [] -> rfathers,IntMap.remove id set' in
+		 remove_from_sons level1 todos' set'' rfathers cc_id tail
+    let rec scan_sons level1 todos set (injs,rfathers,cands) cc_id p = function
+      | [] ->
+	 let rfathers' =
+	   List.fold_left (fun acc (_,i) -> i::acc) rfathers cands in
+	 todos,IntMap.add cc_id {p with fathers = rfathers'} set
+      | id :: tail ->
+	 match IntMap.find_option id set with
+	 | None -> scan_sons level1 todos set (injs,rfathers,cands) cc_id p tail
+	 | Some cc ->
+	    let injs',cands',tail' =
+	      List.fold_left
+		(fun acc s ->
+		 if s.dst = cc_id then
+		   List.fold_left
+		     (fun (l,c,t) r ->
+		      let oui,non =
+			List.partition
+			  (fun (x,_) -> Renaming.equal x r) c in
+		      r::l,non,Tools.list_rev_map_append snd oui t)
+		     acc s.inj
+		 else acc)
+		([],cands,tail) cc.sons in
+	    if List.length injs' > 1 || List.length cc.sons > 1
+	       || cc.is_obs_of <> None || List.mem id level1
+	    then
+	      scan_sons level1 (IntMap.add id cc.fathers todos) set
+			(injs'@injs,id::rfathers,cands') cc_id p tail'
+	    else
+	      let rroots =
+		List.filter
+		  (fun r -> not (List.exists (Renaming.equal r) injs)) injs' in
+	      let cands'' =
+		List.fold_left
+		  (fun c r ->
+		   if List.exists (fun (x,_) -> Renaming.equal x r) c
+		   then c else (r,id)::c)
+		  cands rroots in
+	      if cands == cands'' then
+		let todos',rfathers',set' =
+		  remove_from_sons
+		    level1 (IntMap.remove id todos) set [] id cc.fathers in
+		let rr,set'',tail'' =
+		  match rfathers' with
+		  | _ :: _ ->
+		     (injs'@injs,id::rfathers,cands'),
+		     IntMap.add id {cc with fathers = rfathers'} set',tail'
+		  | [] -> (injs,rfathers,cands),IntMap.remove id set',tail in
+		scan_sons level1 todos' set'' rr cc_id p tail''
+	      else
+		scan_sons level1 todos set (injs,rfathers,cands'') cc_id p tail
+
+    let finalize env =
+      let _,singles,domain =
+	IntMap.fold
+	  (fun _ x acc ->
+	   List.fold_left
+	     (fun acc (cc,deps) -> add_domain ~deps acc cc) acc x)
+	  env.domain
+	  (fresh_id env,IntMap.empty,
+	   IntMap.add 0 (empty_point env.sig_decl) IntMap.empty) in
+      let level1 = match IntMap.find_option 0 domain with
+	| None -> assert false
+	| Some zero -> List.map (fun p -> p.dst) zero.sons in
+      let rec iter (todos,env) =
+	if IntMap.is_empty todos then env else
+	  let out =
+	    IntMap.fold
+	      (fun id fa (todos,s) ->
+	       match IntMap.find_option id s with
+	       | None -> (todos,s)
+	       | Some p -> scan_sons level1 todos s ([],[],[]) id p fa)
+	      todos (IntMap.empty,env) in
+	  iter out in
+      let tops =
+	IntMap.fold
+	  (fun id p s ->
+	   if p.sons = [] && not (List.mem id level1)
+	   then IntMap.add id p.fathers s else s)
+	  domain IntMap.empty in
+	 let s' = iter (tops,domain) in
+	 let si = match IntMap.max_key s' with Some i -> succ i | None -> 0 in
+	 let out = Array.make si (empty_point env.sig_decl) in
+	 let () = IntMap.iter (fun i p -> out.(i) <- p) s' in
+	 {
+	   Env.sig_decl = env.sig_decl;
+	   Env.domain = out;
+	   Env.single_agent_points = singles;
+	 }
+  end
+
+let begin_new env = PreEnv.to_work env
 
 let finish_new ?origin wk =
   let () = check_dangling wk in
@@ -995,10 +983,17 @@ let finish_new ?origin wk =
 	raw_to_navigation false wk.used_id wk.cc_internals wk.cc_links;
       discover_nav =
 	raw_to_navigation true wk.used_id wk.cc_internals wk.cc_links} in
-
-  let env =
-    Env.fresh wk.sigs wk.reserved_id wk.free_id wk.cc_env wk.cc_single_ag in
-  add_domain ?origin env cc_candidate
+  let w = weight cc_candidate in
+  let env_w,r,out =
+    let rec aux = function
+      | [] -> [cc_candidate,add_origin Operator.DepSet.empty origin],
+	      identity_injection cc_candidate,cc_candidate
+      | (h,deps) :: t -> match equal cc_candidate h with
+		  | None -> let a,b,c = aux t in (h,deps)::a,b,c
+		  | Some r -> (h,add_origin deps origin)::t,r,h in
+    aux (IntMap.find_default [] w wk.cc_env) in
+  PreEnv.fresh wk.sigs wk.reserved_id wk.free_id
+	       (IntMap.add w env_w wk.cc_env),r,out
 
 
 let new_link wk ((cc1,_,x as n1),i) ((cc2,_,y as n2),j) =

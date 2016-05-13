@@ -167,7 +167,7 @@ let effects_of_modif
 	 | INTRO (alg_expr, (ast_mix,mix_pos)) ->
 	    rule_effect
 	      alg_expr ([],LKappa.to_raw_mixture
-			     (Connected_component.Env.sigs domain) ast_mix,
+			     (Connected_component.PreEnv.sigs domain) ast_mix,
 			[],[]) mix_pos
 	 | DELETE (alg_expr, (ast_mix, mix_pos)) ->
 	    rule_effect
@@ -298,10 +298,10 @@ let pert_of_result
   let lpert = lpert_stopping_time@lpert_ineq in
   ( domain, lpert,stop_times,tracking_enabled)
 
-let inits_of_result ?rescale contact_map counter env domain res =
-  let init_l,domain' =
+let inits_of_result ?rescale contact_map counter env preenv res =
+  let init_l,preenv' =
     Tools.list_fold_right_map
-      (fun (_opt_vol,alg,init_t) domain -> (*TODO dealing with volumes*)
+      (fun (_opt_vol,alg,init_t) preenv -> (*TODO dealing with volumes*)
        let alg = match rescale with
 	 | None -> alg
 	 | Some r ->
@@ -311,18 +311,18 @@ let inits_of_result ?rescale contact_map counter env domain res =
        match init_t with
        | INIT_MIX ast,mix_pos ->
 	  let sigs = Environment.signatures env in
-	  let (domain',alg') =
-	    Expr.compile_alg contact_map counter domain alg in
+	  let (preenv',alg') =
+	    Expr.compile_alg contact_map counter preenv alg in
 	  let fake_rule =
 	    { LKappa.r_mix = [];
 	      LKappa.r_created = LKappa.to_raw_mixture sigs ast;
 	      LKappa.r_rm_tokens = []; LKappa.r_add_tokens = [];
 	      LKappa.r_rate = Location.dummy_annot (CONST Nbr.zero);
 	      LKappa.r_un_rate = None; } in
-	  let domain'',state' =
+	  let preenv'',state' =
 	    match
 	      rules_of_ast
-		contact_map counter domain' ~syntax_ref:0 (fake_rule,mix_pos)
+		contact_map counter preenv' ~syntax_ref:0 (fake_rule,mix_pos)
 	    with
 	    | domain'',_,_,[ compiled_rule ] ->
 	       (fst alg',compiled_rule,mix_pos),domain''
@@ -331,7 +331,7 @@ let inits_of_result ?rescale contact_map counter env domain res =
 			(Format.asprintf
 			   "initial mixture %a is partially defined"
 			   (LKappa.print_rule_mixture sigs) ast,mix_pos)) in
-	  domain'',state'
+	  preenv'',state'
        | INIT_TOK tk_id,pos_tk ->
 	  let fake_rule =
 	    { LKappa.r_mix = []; LKappa.r_created = []; LKappa.r_rm_tokens = [];
@@ -340,14 +340,14 @@ let inits_of_result ?rescale contact_map counter env domain res =
 	      LKappa.r_un_rate = None; } in
 	  match
 	      rules_of_ast
-		contact_map counter domain ~syntax_ref:0
+		contact_map counter preenv ~syntax_ref:0
 		(Location.dummy_annot fake_rule)
 	    with
 	    | domain'',_,_,[ compiled_rule ] ->
 	       (Alg_expr.CONST (Nbr.I 1),compiled_rule,pos_tk),domain''
 	    | _,_,_,_ -> assert false
-      )	res.Ast.init domain in
-  (domain',init_l)
+      )	res.Ast.init preenv in
+  (preenv',init_l)
 
 let configurations_of_result result =
   let get_value acc pos_p param value_list f =
@@ -501,26 +501,26 @@ let initialize ~outputs ~pause ~return
   let relative_fluxmaps = configurations_of_result result in
   pause
     (fun () ->
-  let domain = Connected_component.Env.empty sigs_nd in
+  let preenv = Connected_component.PreEnv.empty sigs_nd in
   outputs (Data.Log "\t -variable declarations");
-  let domain',alg_a =
-    compile_alg_vars contact_map counter domain result.Ast.variables in
+  let preenv',alg_a =
+    compile_alg_vars contact_map counter preenv result.Ast.variables in
   let alg_nd = NamedDecls.create alg_a in
   let alg_deps = Alg_expr.setup_alg_vars_rev_dep tk_nd alg_a in
 
   pause
     (fun () ->
   outputs (Data.Log "\t -rules");
-  let (domain',alg_deps',compiled_rules,cc_unaries) =
-    compile_rules alg_deps contact_map counter domain' result.Ast.rules in
+  let (preenv',alg_deps',compiled_rules,cc_unaries) =
+    compile_rules alg_deps contact_map counter preenv' result.Ast.rules in
   let rule_nd = Array.of_list compiled_rules in
 
   pause
     (fun () ->
   outputs (Data.Log "\t -perturbations");
-  let (domain,pert,stops,has_tracking) =
+  let (preenv,pert,stops,has_tracking) =
     pert_of_result alg_nd alg_deps' result.variables result.rules
-		   contact_map counter domain' result in
+		   contact_map counter preenv' result in
   let () =
     if Counter.max_time counter = None && Counter.max_events counter = None &&
 	 not @@
@@ -537,8 +537,8 @@ let initialize ~outputs ~pause ~return
   pause
     (fun () ->
   outputs (Data.Log "\t -observables");
-  let domain,obs =
-    obs_of_result contact_map counter domain result in
+  let preenv,obs =
+    obs_of_result contact_map counter preenv result in
   let () =
     match obs with
     | (_,pos) :: _ when Counter.plot_points counter < 0
@@ -556,12 +556,12 @@ let initialize ~outputs ~pause ~return
   outputs (Data.Log "\t -initial conditions");
   pause
     (fun () ->
-  let domain = Connected_component.Env.finalize domain in
+  let domain = Connected_component.PreEnv.finalize preenv in
   pause
     (fun () ->
-  let domain,init_l =
+  let _,init_l =
     inits_of_result
-      ?rescale:rescale_init contact_map counter env domain result in
+      ?rescale:rescale_init contact_map counter env preenv result in
   pause
     (fun () ->
   let graph0 = Rule_interpreter.empty ~has_tracking env in

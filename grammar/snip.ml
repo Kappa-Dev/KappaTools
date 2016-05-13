@@ -553,7 +553,7 @@ let incr_origin = function
   | Operator.RULE i -> Operator.RULE (succ i)
 
 let connected_components_of_mixture created mix (env,origin) =
-  let sigs = Connected_component.Env.sigs env in
+  let sigs = Connected_component.PreEnv.sigs env in
   let rec aux env transformations instantiations links_transf acc id = function
     | [] ->
        let removed,added = transformations in
@@ -612,7 +612,7 @@ let rule_mixtures_of_ambiguous_rule contact_map sigs precomp_mixs =
 
 let connected_components_sum_of_ambiguous_rule
       contact_map env ?origin precomp_mixs created =
-  let sigs = Connected_component.Env.sigs env in
+  let sigs = Connected_component.PreEnv.sigs env in
   let all_mixs =
     rule_mixtures_of_ambiguous_rule contact_map sigs precomp_mixs in
   let () =
