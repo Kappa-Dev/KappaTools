@@ -70,7 +70,7 @@ sig
 end
 
 module PathSetMap =
-  SetMap.Make (struct type t = path let compare = compare end)
+  SetMap.Make (struct type t = path let compare = compare let print _ _ = () end)
 
 module PathMap =
 (struct

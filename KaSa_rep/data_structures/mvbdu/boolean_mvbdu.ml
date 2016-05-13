@@ -24,18 +24,21 @@ module Mvbdu_Skeleton =
 struct
   type t = bool Mvbdu_sig.skeleton
   let (compare:t->t -> int) = compare
+  let print _ _ = ()
 end
 
 module Association_List_Skeleton =
 struct
   type t = int List_sig.skeleton
   let (compare:t->t->int) = compare
+  let print _ _ = ()
 end
 
 module Variables_List_Skeleton =
 struct
   type t = unit List_sig.skeleton
   let (compare:t->t->int) = compare
+  let print _ _ = ()
 end
 
 module Hash_key =

@@ -45,6 +45,7 @@ module List_sites =
   struct
     type t = Ckappa_sig.c_site_name list (*value type*)
     let compare = compare
+    let print = Pp.list Pp.space (fun _ _ -> ())
   end
 
 module CV_map_and_set =
@@ -53,6 +54,7 @@ module CV_map_and_set =
       struct
         type t = cv_id
         let compare = compare
+	let print = Format.pp_print_int
       end))
 
 module Dictionary_of_List_sites = 
@@ -83,6 +85,7 @@ module AgentCV_map_and_set =
       struct
         type t = Ckappa_sig.c_agent_name * cv_id
         let compare = compare
+	let print _ _ = ()
       end))
 
 module AgentIDCV_map_and_set =
@@ -91,6 +94,7 @@ module AgentIDCV_map_and_set =
       struct
         type t = Ckappa_sig.c_agent_id * cv_id
         let compare = compare
+	let print _ _ = ()
       end))
 
 module AgentsRuleCV_map_and_set =
@@ -100,6 +104,7 @@ module AgentsRuleCV_map_and_set =
         type t = Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * 
           Ckappa_sig.c_rule_id * cv_id
         let compare = compare
+	let print _ _ = ()
       end))
 
 (************************************************************************************)
@@ -109,6 +114,7 @@ module AgentCV_setmap =
     struct
       type t = Ckappa_sig.c_agent_name * cv_id
       let compare = compare
+      let print _ _ = ()
     end)
 
 module AgentsCV_setmap =
@@ -116,6 +122,7 @@ module AgentsCV_setmap =
     (struct 
       type t = Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * cv_id
       let compare = compare
+      let print _ _ = ()
      end)
 
 module AgentSiteCV_setmap =
@@ -123,6 +130,7 @@ module AgentSiteCV_setmap =
     struct
       type t = Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * cv_id
       let compare = compare
+      let print _ _ = ()
     end)
 
 module AgentRuleCV_setmap =
@@ -130,6 +138,7 @@ module AgentRuleCV_setmap =
     struct
       type t = Ckappa_sig.c_agent_name * Ckappa_sig.c_rule_id * cv_id
       let compare = compare
+      let print _ _ = ()
     end)
 
 module AgentsRuleCV_setmap =
@@ -137,6 +146,7 @@ module AgentsRuleCV_setmap =
     struct
       type t = Ckappa_sig.c_agent_id * Ckappa_sig.c_agent_name * Ckappa_sig.c_rule_id * cv_id
       let compare = compare
+      let print _ _ = ()
     end))
 
 module AgentSiteRuleCV_setmap =
@@ -144,6 +154,7 @@ module AgentSiteRuleCV_setmap =
     struct
       type t = Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_rule_id * cv_id
       let compare = compare
+      let print _ _ = ()
     end)
 
 (************************************************************************************)

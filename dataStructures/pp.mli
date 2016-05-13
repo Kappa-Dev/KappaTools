@@ -16,6 +16,8 @@ val hashtbl : (formatter -> unit) -> (formatter -> 'a * 'b -> unit) ->
 	  formatter -> ('a,'b) Hashtbl.t -> unit
 
 val option : (formatter -> 'a -> unit) -> formatter -> 'a option -> unit
+val pair : (formatter -> 'a -> unit) -> (formatter -> 'b -> unit) ->
+  formatter -> 'a * 'b -> unit
 val bottom : formatter -> unit
 val nu : formatter -> unit
 val empty_set : formatter -> unit

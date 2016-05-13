@@ -69,7 +69,7 @@ let print_agent_var_map parameters error handler map =
 
 let print_string_map parameters error handler map =
   let error =
-    Quark_type.StringMap.Map.fold
+    Quark_type.StringMap.fold
       (fun key im error ->
        let error =
          Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.iter
@@ -93,7 +93,7 @@ let print_string_map parameters error handler map =
 
 let print_var_string_map parameters error handler map =
   let error =
-    Quark_type.StringMap.Map.fold
+    Quark_type.StringMap.fold
       (fun key im error ->
        let error =
          Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.iter

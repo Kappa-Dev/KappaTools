@@ -30,6 +30,7 @@ let colon f = fprintf f ";@ "
 let space f = pp_print_space f ()
 let cut f = pp_print_cut f ()
 let empty f = pp_print_string f ""
+let pair ppa ppb f (a,b) = fprintf f "(%a, %a)" ppa a ppb b
 let option pr f = function
   | None -> ()
   | Some x -> fprintf f "@ %a" pr x

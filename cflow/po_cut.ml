@@ -35,7 +35,9 @@
        | Bound_site of K.agent_id * Instantiation.site_name
        | Internal_state of K.agent_id * Instantiation.site_name
 
-     module PSM = SetMap.Make (struct type t = predicate_info let compare = compare end)
+     module PSM = SetMap.Make (struct type t = predicate_info
+				      let compare = compare
+				      let print _ _ = () end)
      module PS = PSM.Set
 
      let created_predicates_of_action action = 

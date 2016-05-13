@@ -308,7 +308,7 @@ let compute_influence_map parameters error handler quark_maps nrules =
   in
   let error,inhibition_map =
     generic_add
-      (Quark_type.StringMap.Map.fold2_sparse_with_logs Exception.wrap)
+      (Quark_type.StringMap.fold2_sparse_with_logs Exception.wrap)
       false
       true
       parameters
@@ -321,7 +321,7 @@ let compute_influence_map parameters error handler quark_maps nrules =
   in
   let error,inhibition_map =
     generic_add
-      (Quark_type.StringMap.Map.fold2_sparse_with_logs Exception.wrap)
+      (Quark_type.StringMap.fold2_sparse_with_logs Exception.wrap)
       false
       true
       parameters
@@ -334,7 +334,7 @@ let compute_influence_map parameters error handler quark_maps nrules =
   in
   let error,wake_up_map =
     generic_add
-      (Quark_type.StringMap.Map.fold2_sparse_with_logs Exception.wrap)
+      (Quark_type.StringMap.fold2_sparse_with_logs Exception.wrap)
       false
       true
       parameters

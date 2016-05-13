@@ -15,13 +15,7 @@
 (*let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "ckappa_sig") message exn (fun () -> default) *)
 
-module Int_Set_and_Map =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = int
-         let compare = compare
-        end))
+module Int_Set_and_Map = Map_wrapper.Make(Mods.IntSetMap)
 
 let local_trace = true
 
@@ -155,6 +149,7 @@ module Rule =
   struct
     type t = c_rule_id
     let compare = compare
+    let print = Format.pp_print_int
   end
 
 module Rule_FIFO = Fifo.WlMake (Rule)
@@ -183,6 +178,7 @@ module Agent_map_and_set =
        (struct
          type t = c_agent_name
          let compare = compare
+	 let print = Format.pp_print_int
         end
        ))
 
@@ -192,6 +188,7 @@ module Agent_id_map_and_set =
        (struct
          type t = c_agent_id
          let compare = compare
+	 let print = Format.pp_print_int
         end
        ))
 
@@ -201,6 +198,7 @@ module Rule_map_and_set =
        (struct
          type t = c_rule_id
          let compare = compare
+	 let print = Format.pp_print_int
         end))
 
 module State_map_and_set =
@@ -209,6 +207,7 @@ module State_map_and_set =
        (struct
          type t = c_state
          let compare = compare
+	 let print = Format.pp_print_int
         end))
 
 module AgentRule_map_and_set =
@@ -217,6 +216,7 @@ module AgentRule_map_and_set =
        (struct
          type t = c_agent_name * c_rule_id
          let compare = compare
+	 let print = Pp.pair Format.pp_print_int Format.pp_print_int
         end))
 
 module RuleAgent_map_and_set =
@@ -225,6 +225,7 @@ module RuleAgent_map_and_set =
        (struct
          type t = c_rule_id * c_agent_id
          let compare = compare
+	 let print = Pp.pair Format.pp_print_int Format.pp_print_int
         end))
 
 (*use in site_accross_bonds_domain*)
@@ -234,6 +235,7 @@ Map_wrapper.Make
        (struct
          type t = c_site_name * c_state
          let compare = compare
+	 let print = Pp.pair Format.pp_print_int Format.pp_print_int
         end))
 
 
@@ -243,6 +245,7 @@ module AgentSiteState_map_and_set =
        (struct
          type t = c_agent_name * c_site_name * c_state
          let compare = compare
+	 let print f (a,b,c) = Format.fprintf f "(%i, %i, %i)" a b c
         end))
 
 module Rule_setmap =
@@ -250,6 +253,7 @@ module Rule_setmap =
     struct
       type t = c_rule_id
       let compare = compare
+      let print = Format.pp_print_int
     end)
 
 module Agent_id_setmap =
@@ -257,6 +261,7 @@ module Agent_id_setmap =
     struct
       type t = c_agent_id
       let compare = compare
+      let print = Format.pp_print_int
     end)
 
 module PairRule_setmap =
@@ -264,6 +269,7 @@ module PairRule_setmap =
     (struct
       type t = c_rule_id * c_rule_id
       let compare = compare
+      let print = Pp.pair Format.pp_print_int Format.pp_print_int
      end)
 
 (****************************************************************************************)
@@ -274,6 +280,7 @@ module Site_map_and_set =
        (struct
          type t      = c_site_name
          let compare = compare
+	 let print = Format.pp_print_int
         end))
 
 module AgentSite_map_and_set =
@@ -282,6 +289,7 @@ module AgentSite_map_and_set =
        (struct
 	 type t = c_agent_name * c_site_name
 	 let compare = compare
+	 let print = Pp.pair Format.pp_print_int Format.pp_print_int
 	end))
 
 module AgentsSite_map_and_set =
@@ -290,6 +298,7 @@ module AgentsSite_map_and_set =
        (struct
          type t = c_agent_id * c_agent_name * c_site_name
          let compare = compare
+	 let print f (a,b,c) = Format.fprintf f "(%i, %i, %i)" a b c
         end))
 
 (****************************************************************************************)
@@ -302,6 +311,7 @@ module PairAgentsSiteState_map_and_set =
          type t = (c_agent_id * c_agent_name * c_site_name * c_state) *
            (c_agent_id * c_agent_name * c_site_name * c_state)
          let compare = compare
+	 let print _ _ = ()
         end))
 
 module PairAgentSiteState_map_and_set =
@@ -311,6 +321,7 @@ module PairAgentSiteState_map_and_set =
          type t = (c_agent_name * c_site_name * c_state) *
            (c_agent_name * c_site_name * c_state)
          let compare = compare
+	 let print _ _ = ()
         end))
 
 (*parallel*)
@@ -321,6 +332,7 @@ module PairAgentsSitesStates_map_and_set =
          type t = (c_agent_id * c_agent_name * c_site_name * c_site_name * c_state * c_state) *
            (c_agent_id * c_agent_name * c_site_name * c_site_name * c_state * c_state)
          let compare = compare
+	 let print _ _ = ()
         end))
 
 module PairAgentSites_map_and_set =
@@ -330,6 +342,7 @@ module PairAgentSites_map_and_set =
          type t = (c_agent_name * c_site_name * c_site_name) *
            (c_agent_name * c_site_name * c_site_name)
          let compare = compare
+	 let print _ _ = ()
         end))
 
 (*map of flat_lattice*)
@@ -340,6 +353,7 @@ module PairAgentIDSiteState_map_and_set =
          type t =
            (c_agent_id * c_site_name * c_state) * (c_agent_id * c_site_name * c_state)
          let compare = compare
+	 let print _ _ = ()
         end))
 
 module PairAgentSite_map_and_set =
@@ -348,6 +362,8 @@ module PairAgentSite_map_and_set =
        (struct
          type t = (c_agent_id * c_site_name) * (c_agent_id * c_site_name)
          let compare = compare
+	 let print = Pp.pair (Pp.pair Format.pp_print_int Format.pp_print_int)
+	   (Pp.pair Format.pp_print_int Format.pp_print_int)
         end))
 
 module PairAgentIDSites_map_and_set =
@@ -356,6 +372,7 @@ module PairAgentIDSites_map_and_set =
        (struct
          type t = (c_agent_id * c_site_name * c_site_name) * (c_agent_id * c_site_name * c_site_name)
          let compare = compare
+	 let print _ _ = ()
         end))
 
 module PairAgentIDSite_map_and_set =
@@ -364,6 +381,8 @@ module PairAgentIDSite_map_and_set =
        (struct
          type t = (c_agent_id * c_site_name) * (c_agent_id * c_site_name)
          let compare = compare
+	 let print = Pp.pair (Pp.pair Format.pp_print_int Format.pp_print_int)
+	   (Pp.pair Format.pp_print_int Format.pp_print_int)
         end))
 
 (****************************************************************************************)
@@ -455,6 +474,7 @@ module State =
 struct
   type t = state'
   let compare = compare
+  let print _ _ = ()
 end
 
 module Dictionary_of_States =
@@ -475,12 +495,14 @@ module Site =
 struct
   type t = site
   let compare = compare
+  let print _ _ = ()
 end
 
 module Kasim_agent_name =
 struct
   type t = agent_name
   let compare = compare
+  let print = Format.pp_print_string
 end
 
 module Dictionary_of_agents =

@@ -85,7 +85,10 @@ let higher level =
   | Lowest -> Some Low
 
 
-module LevelSetMap = SetMap.Make (struct type t = level let compare = compare end)
+module LevelSetMap = SetMap.Make (struct type t = level
+					 let compare = compare
+					 let print f x = Format.pp_print_string
+					   f (string_of_level x) end)
 module LevelMap = LevelSetMap.Map
 
 type priorities =

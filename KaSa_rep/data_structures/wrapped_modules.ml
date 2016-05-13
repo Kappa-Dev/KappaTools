@@ -16,16 +16,16 @@ module LoggedCharMap = LoggedCharSetMap.Map
 
 (* versions of the module with logging primitives *)
 (* type are hidden, cannot be used with not logged versions *)
-module ParanoStringSetMap = Map_wrapper.Make (SetMap.Make (String))
+module ParanoStringSetMap = Map_wrapper.Make (Mods.StringSetMap)
 module ParanoStringSet = ParanoStringSetMap.Set
 module ParanoStringMap = ParanoStringSetMap.Map
 module ParanoIntSetMap =
-  Map_wrapper.Make (SetMap.Make (struct type t = int let compare = int_compare end))
+  Map_wrapper.Make (Mods.IntSetMap)
 module ParanoIntSet = ParanoIntSetMap.Set			
 module ParanoIntMap = ParanoIntSetMap.Map
-module ParanoInt2SetMap = Map_wrapper.Make (SetMap.Make (struct type t = int*int let compare = int_pair_compare end))
+module ParanoInt2SetMap = Map_wrapper.Make (Mods.Int2SetMap)
 module ParanoInt2Set = ParanoInt2SetMap.Set
 module ParanoInt2Map = ParanoInt2SetMap.Map
-module ParanoCharSetMap = Map_wrapper.Make (SetMap.Make (struct type t = char let compare = compare end))
+module ParanoCharSetMap = Map_wrapper.Make (Mods.CharSetMap)
 module ParanoCharSet = ParanoCharSetMap.Set
 module ParanoCharMap = ParanoCharSetMap.Map

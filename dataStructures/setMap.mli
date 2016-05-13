@@ -7,6 +7,7 @@ module type OrderedType =
   sig
     type t
     val compare : t -> t -> int
+    val print : Format.formatter -> t -> unit
   end
 
 type ('parameters,'error,'a) with_log_wrap =

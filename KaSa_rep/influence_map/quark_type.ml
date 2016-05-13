@@ -22,12 +22,7 @@ module Label = Influence_labels.Int_labels
 module Labels = Influence_labels.Extensive(Label)
 
    
-module StringMap =
-  SetMap.Make
-    (struct 
-      type t = string 
-      let compare = compare 
-     end)
+module StringMap = Mods.StringMap
 			       
 type agent_quark = Ckappa_sig.c_agent_name
 
@@ -38,6 +33,7 @@ module BoundSite =
     (struct
 	type t = Ckappa_sig.c_rule_id * Labels.label * Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name
 	let compare = compare
+	let print _ _ = ()
       end)
 		    
 module SiteMap =
@@ -62,7 +58,7 @@ type quarks =
   {
      dead_agent: Labels.label_set 
      Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.t
-     StringMap.Map.t ;
+     StringMap.t ;
      dead_sites: Labels.label_set 
        Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.t
        Cckappa_sig.KaSim_Site_map_and_set.Map.t
@@ -72,7 +68,7 @@ type quarks =
        DeadSiteMap.t;
      dead_agent_plus: Labels.label_set 
        Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.t
-       StringMap.Map.t ;
+       StringMap.t ;
      dead_sites_plus: Labels.label_set 
        Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.t
        Cckappa_sig.KaSim_Site_map_and_set.Map.t
@@ -82,7 +78,7 @@ type quarks =
        DeadSiteMap.t;
      dead_agent_minus: Labels.label_set 
        Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.t
-       StringMap.Map.t ;
+       StringMap.t ;
      dead_sites_minus: Labels.label_set
        Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.t
        Cckappa_sig.KaSim_Site_map_and_set.Map.t 

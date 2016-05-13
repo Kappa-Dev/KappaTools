@@ -34,6 +34,9 @@ module InfluenceNodeSetMap =
     (struct
       type t = influence_node
       let compare = compare
+      let print f = function
+	| Rule r -> Format.fprintf f "Rule %s" r
+	| Var r -> Format.fprintf f "Var %s" r
      end)
 
 module InfluenceNodeMap = InfluenceNodeSetMap.Map
@@ -43,6 +46,7 @@ module String2SetMap =
     (struct
       type t = string * string
       let compare = compare
+      let print f (a,b) = Format.fprintf f "(%s, %s)" a b
      end)
 
 module String2Map = String2SetMap.Map

@@ -16,7 +16,7 @@ let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "List_tokens") message exn (fun () -> default)
 
 
-module Int_Set_and_Map = SetMap.Make (struct type t = int let compare = compare end)
+module Int_Set_and_Map = Mods.IntSetMap
 
 let local_trace = false
 

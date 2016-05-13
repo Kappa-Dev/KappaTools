@@ -121,5 +121,4 @@ module WlMake (Ord: OrderedType with type t = int) =
 
      end)
 
-module Int = struct type t = int let compare = compare end
-module IntWL = WlMake(Int)
+module IntWL = Mods.IntMap

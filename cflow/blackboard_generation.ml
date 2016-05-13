@@ -136,7 +136,10 @@ module Preblackboard =
        | Bound_to_type of Instantiation.agent_name * Instantiation.site_name (** for binding sites (partial information *)
        | Unknown (**  for agent presence, internal states, binding states (partial information *)
 
-     module C = (Cache.Cache(struct type t = predicate_value let compare = compare end):Cache.Cache with type O.t = predicate_value)
+     module C : Cache.Cache with type O.t = predicate_value =
+       Cache.Cache(struct type t = predicate_value
+			  let compare = compare
+			  let print _ _ = () end)
 
      let weakening p =
        match p
@@ -154,10 +157,10 @@ module Preblackboard =
      let is_undefined x = x=Undefined
 
      (** maps and sets *)
-     module PredicateSetMap = SetMap.Make (struct type t = predicate_info let compare = compare end)
+     module PredicateSetMap = SetMap.Make (struct type t = predicate_info let compare = compare let print _ _ = () end)
      module PredicateSet = PredicateSetMap.Set
      module PredicateMap = PredicateSetMap.Map
-     module CaseValueSetMap = SetMap.Make (struct type t = predicate_value let compare = compare end)
+     module CaseValueSetMap = SetMap.Make (struct type t = predicate_value let compare = compare let print _ _ = () end)
      module CaseValueSet = CaseValueSetMap.Set
      module PredicateidSet = Mods.IntSet
      module PredicateidMap = Mods.IntMap

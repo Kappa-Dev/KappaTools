@@ -49,11 +49,11 @@ let empty_quarks parameter error handler =
 
   error,
   {
-    Quark_type.dead_agent_plus = Quark_type.StringMap.Map.empty ;
-    Quark_type.dead_agent_minus = Quark_type.StringMap.Map.empty ;
+    Quark_type.dead_agent_plus = Quark_type.StringMap.empty ;
+    Quark_type.dead_agent_minus = Quark_type.StringMap.empty ;
     Quark_type.dead_sites_minus = dead_sites_minus ;
     Quark_type.dead_states_minus = dead_states_minus ;
-    Quark_type.dead_agent = Quark_type.StringMap.Map.empty ;
+    Quark_type.dead_agent = Quark_type.StringMap.empty ;
     Quark_type.dead_sites = dead_sites ;
     Quark_type.dead_states = dead_states ;
     Quark_type.dead_sites_plus = dead_sites_plus ;
@@ -286,7 +286,7 @@ let add_dead_agent s parameters error rule_id agent_id agent_type map =
       "(Dead agent)\n")
   in
   let error,old_agent =
-    match Quark_type.StringMap.Map.find_option agent_type map
+    match Quark_type.StringMap.find_option agent_type map
     with
       | None ->
         Ckappa_sig.Rule_quick_nearly_Inf_Int_storage_Imperatif.create
@@ -320,7 +320,7 @@ let add_dead_agent s parameters error rule_id agent_id agent_type map =
          old_agent
     in
     error,
-    Quark_type.StringMap.Map.add agent_type new_agent map
+    Quark_type.StringMap.add agent_type new_agent map
 
 let add_dead_sites s parameters error rule_id agent_id agent_type site map =
   let _ = Misc_sa.trace parameters (fun () ->

@@ -1009,7 +1009,10 @@ let new_node wk type_id =
 	  IntMap.add wk.free_id (Array.make arity (-1)) wk.cc_internals;
       })
 
-module NodeSetMap = SetMap.Make(ContentAgent)
+module NodeSetMap = SetMap.Make(struct type t = ContentAgent.t
+				       let compare = ContentAgent.compare
+				       let print = ContentAgent.print ?sigs:None ~with_id:()
+end)
 module NodeMap = NodeSetMap.Map
 
 module Matching = struct
@@ -1096,6 +1099,9 @@ module Matching = struct
 	  | Some _, None -> -1
 	  | Some x, Some y -> Mods.int_pair_compare x y
 	else c
+      let print f (a,a') =
+	Format.fprintf f "%i%a"
+	  a (Pp.option (Pp.pair Format.pp_print_int Format.pp_print_int)) a'
     end
   module CacheSetMap = SetMap.Make(Cache)
 
@@ -1173,6 +1179,7 @@ let is_equal_canonicals cc cc' = compare_canonicals cc cc' = 0
 module ForState = struct
     type t = cc
     let compare = compare_canonicals
+    let print = print ?sigs:None ~with_id:()
 end
 
 module SetMap = SetMap.Make(ForState)

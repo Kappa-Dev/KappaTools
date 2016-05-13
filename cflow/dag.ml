@@ -613,8 +613,12 @@ module BucketTable =
       let succ_story_id = succ
       type prehash_elt = node * int
 
-      module KeyS = (SetMap.Make (struct type t = key let compare = compare end))
-      module PreHashS = (SetMap.Make (struct type t = prehash_elt let compare = compare end))
+      module KeyS = (SetMap.Make (struct type t = key
+					 let compare = compare
+					 let print _ _ = () end))
+      module PreHashS = (SetMap.Make (struct type t = prehash_elt
+					     let compare = compare
+					     let print _ _ = () end))
       module KeyMap = KeyS.Map
       module PreHashMap = PreHashS.Map
 

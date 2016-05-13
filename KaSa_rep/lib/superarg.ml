@@ -8,7 +8,7 @@
    Copyright (C) Antoine Mine' 2006
  *)
 
-module StringSetMap  = SetMap.Make (struct type t = string let compare=compare end)
+module StringSetMap  = Mods.StringSetMap
 module StringMap = StringSetMap.Map
 module StringSet = StringSetMap.Set
 

@@ -108,6 +108,7 @@ module Address_map_and_set =
                       (struct
                         type t = site_address
                         let compare = compare
+			let print _ _ = ()
                        end))
 
 module KaSim_Site_map_and_set = 
@@ -115,6 +116,7 @@ module KaSim_Site_map_and_set =
 		      (struct 
 			type t = (string, string) Ckappa_sig.site_type
 			let compare = compare
+			let print _ _ = ()
 		       end))
     
 type agent = 

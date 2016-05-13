@@ -5,8 +5,6 @@ type bool_op = AND | OR
 type compare_op = GREATER | SMALLER | EQUAL | DIFF
 
 type rev_dep = ALG of int | RULE of int | PERT of int
-module DepSetMap = SetMap.Make (struct type t = rev_dep let compare = compare end)
-module DepSet = DepSetMap.Set
 
 let bin_alg_op_to_string () = function
   | MULT -> "*"
@@ -67,3 +65,7 @@ let print_rev_dep f = function
      Format.fprintf f "algebraic variable [%i]" id
   (*"variable '%a'" (Environment.print_alg env) id*)
   | PERT id -> Format.fprintf f "perturbation [%i]" id
+module DepSetMap = SetMap.Make (struct type t = rev_dep
+				       let compare = compare
+				       let print = print_rev_dep end)
+module DepSet = DepSetMap.Set

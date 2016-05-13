@@ -27,6 +27,7 @@ module Internal_flow_map =
     struct 
       type t = Ckappa_sig.c_agent_name
       let compare = compare
+      let print _ _ = ()
     end)
 
 module External_flow_map =
@@ -34,6 +35,7 @@ module External_flow_map =
     struct
       type t = Ckappa_sig.c_agent_name * Ckappa_sig.c_agent_name
       let compare = compare
+      let print _ _ = ()
     end)
 
 type ode_frag =

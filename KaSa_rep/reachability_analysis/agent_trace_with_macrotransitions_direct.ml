@@ -36,6 +36,7 @@ module Label =
        (struct
 	   type t = label
 	   let compare = compare
+	   let print _ _ = ()
 	 end))
 module LabelMap = Label.Map
 module LabelSet = Label.Set
@@ -45,6 +46,7 @@ module Site =
        (struct
 	 type t = Ckappa_sig.c_site_name
 	 let compare = compare
+	 let print _ _ = ()
 	end))
 module SiteSet = Site.Set
 module Edge =
@@ -53,6 +55,7 @@ module Edge =
        (struct
          type t = int * int * label
          let compare = compare
+	 let print _ _ = ()
         end
        ))
 module EdgeSet = Edge.Set

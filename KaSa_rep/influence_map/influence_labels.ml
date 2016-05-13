@@ -22,6 +22,7 @@ sig
   val label_of_int: Remanent_parameters_sig.parameters -> Exception.method_handler -> int -> Exception.method_handler * label
   val to_string:Remanent_parameters_sig.parameters -> Exception.method_handler -> label -> Exception.method_handler  * string
   val dump:   Remanent_parameters_sig.parameters -> Exception.method_handler -> label -> Exception.method_handler
+  val print: Format.formatter -> label -> unit
 
 end
 
@@ -37,6 +38,9 @@ module Int_labels =
     else
       error,string_of_int i
 
+  let print f i =
+    if i < 0 then Format.fprintf f "%i*" (-i-1)
+    else Format.pp_print_int f i
 
   let dump h error i =
     let error,s = to_string h error i  in
@@ -89,10 +93,16 @@ module Extensive =
   (functor (L:Labels) ->
     (struct
       type label = L.label
-      module LSetMap = SetMap.Make (struct type t=label let compare = compare end)
+      module LSetMap =
+	SetMap.Make (struct type t=label let compare = compare let print = L.print end)
       module Set = LSetMap.Set
       type label_set = Set.t
-      module Pair_Set = SetMap.Make (struct type t=label*label let compare = compare end)
+      module Pair_Set =
+	SetMap.Make
+	  (struct type t=label*label
+		  let compare = compare
+		  let print f (a,b) =
+		    Format.fprintf f "(%a, %a)" L.print a L.print b end)
       type label_set_couple =  Pair_Set.Set.t
 
       let label_of_int = L.label_of_int
@@ -214,7 +224,9 @@ module Implicit =
   (functor (L:Labels) ->
     (struct
       type label = L.label
-      module LSetMap = SetMap.Make (struct type t=label let compare = compare end)
+      module LSetMap =
+	SetMap.Make
+	  (struct type t=label let compare = compare let print = L.print end)
       module Set = LSetMap.Set
       type label_set = Set.t
       type label_set_couple =  (label_set * label_set) list

@@ -12,12 +12,6 @@ type predicate_info =
 | Bound_site of int * Instantiation.site_name
 | Internal_state of int * Instantiation.site_name
 
-module PredicateSetMap =
-       SetMap.Make (struct type t = predicate_info let compare = compare end)
-
-module PredicateMap = PredicateSetMap.Map
-
-
 let string_of_predicate_info pi =
   match
     pi
@@ -25,6 +19,14 @@ let string_of_predicate_info pi =
   | Here ag -> "Here "^(string_of_int ag)
   | Bound_site (ag,s) -> "Bound_state "^(string_of_int ag)^" "^(string_of_int s)
   | Internal_state (ag,s) -> "Internal_state "^(string_of_int ag)^" "^(string_of_int s)
+
+module PredicateSetMap =
+       SetMap.Make (struct type t = predicate_info
+			   let compare = compare
+			   let print f x = Format.pp_print_string
+			     f (string_of_predicate_info x) end)
+
+module PredicateMap = PredicateSetMap.Map
 
 module QPredicateMap =
 struct
