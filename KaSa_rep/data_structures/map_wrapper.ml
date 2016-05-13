@@ -98,7 +98,7 @@ sig
 
   val for_all: (elt -> 'a -> bool) -> 'a t -> bool
 
-  val filter: (elt -> 'a -> bool) -> 'a t -> 'a t
+  val filter_one: (elt -> 'a -> bool) -> 'a t -> (elt * 'a) option
 
   val compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
 
@@ -225,7 +225,7 @@ module Make (S_both: (SetMap.S)): S_with_logs
 	      let mapi = S_both.Map.mapi
 	      let map = S_both.Map.map
 	      let for_all = S_both.Map.for_all
-	      let filter = S_both.Map.filter
+	      let filter_one = S_both.Map.filter_one
 	      let compare = S_both.Map.compare
 	      let equal = S_both.Map.equal
 	      let bindings = S_both.Map.bindings 		

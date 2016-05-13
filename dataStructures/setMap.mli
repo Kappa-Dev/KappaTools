@@ -211,7 +211,10 @@ module type Map =
     val map2: ('a -> 'a -> 'a) -> 'a t -> 'a t -> 'a t
 
     val for_all: (elt -> 'a -> bool) -> 'a t -> bool
-    val filter: (elt -> 'a -> bool) -> 'a t -> 'a t
+
+    val filter_one: (elt -> 'a -> bool) -> 'a t -> (elt * 'a) option
+    (* returns an element that respects the predicate (if any) *)
+
     val compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
     val equal: ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
     val bindings : 'a t -> (elt * 'a) list

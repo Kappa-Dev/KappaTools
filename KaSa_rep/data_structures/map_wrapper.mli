@@ -80,7 +80,7 @@ module type Map_with_logs =
     val mapi: (elt -> 'a -> 'b) -> 'a t -> 'b t
     val map: ('a -> 'b) -> 'a t -> 'b t
     val for_all: (elt -> 'a -> bool) -> 'a t -> bool
-    val filter: (elt -> 'a -> bool) -> 'a t -> 'a t
+    val filter_one: (elt -> 'a -> bool) -> 'a t -> (elt * 'a) option
     val compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
     val equal: ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
     val bindings : 'a t -> (elt * 'a) list

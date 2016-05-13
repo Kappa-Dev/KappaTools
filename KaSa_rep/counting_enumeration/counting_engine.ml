@@ -120,9 +120,8 @@ module Count =
             interface_other 
         in 
         let is_singleton_interface_other = 
-          let min_elt = Puzzle_hole_map_and_set.Map.min_elt
-			  (Puzzle_hole_map_and_set.Map.filter
-			     (fun _ i -> i<>0) interface_other) in
+          let min_elt = Puzzle_hole_map_and_set.Map.filter_one
+			  (fun _ i -> i<>0) interface_other in
           match min_elt with 
             | None -> false 
             | Some (hole,_) ->
@@ -145,9 +144,8 @@ module Count =
               let state =
                 if is_singleton_interface_other 
                 then 
-                  let hole =  Puzzle_hole_map_and_set.Map.min_elt
-				(Puzzle_hole_map_and_set.Map.filter
-				   (fun _ i -> i<>0) interface_other) in
+                  let hole = Puzzle_hole_map_and_set.Map.filter_one
+			       (fun _ i -> i<>0) interface_other in
                   match hole with 
                     | None -> 
                       let error_handler,state = Exception.warn parameters state.error_handler (Some "Counting_enumeration") (Some "line 91") Exit (fun () -> state) in 

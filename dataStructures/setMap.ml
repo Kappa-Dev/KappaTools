@@ -226,7 +226,7 @@ module type Map =
     val map2: ('a -> 'a -> 'a) -> 'a t -> 'a t -> 'a t
 
     val for_all: (elt -> 'a -> bool) -> 'a t -> bool
-    val filter: (elt -> 'a -> bool) -> 'a t -> 'a t
+    val filter_one: (elt -> 'a -> bool) -> 'a t -> (elt * 'a) option
     val compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
     val equal: ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
     val bindings : 'a t -> (elt * 'a) list
@@ -1439,14 +1439,13 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              cmp == 0 ||
 	       if cmp>0 then mem key right else mem key left
 
-	let filter p set =
-	  let rec filt accu = function
-            | Private.Empty -> accu
-            | Private.Node(left,key,value,right,_,_) ->
-               filt (filt (if p key value
-			   then add key value accu
-			   else accu) left) right
-	  in filt empty set
+	let rec filter_one p = function
+          | Private.Empty -> None
+          | Private.Node(left,key,value,right,_,_) ->
+             if p key value then Some (key,value)
+	     else match filter_one p left with
+		  | None -> filter_one p right
+		  | out -> out
 
 	let rec iter f = function
           | Private.Empty -> ()
