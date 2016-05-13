@@ -89,6 +89,7 @@ module type Set =
     val fold_inv: (elt -> 'a -> 'a) -> t -> 'a -> 'a
 
     val elements: t -> elt list
+    val print: Format.formatter -> t -> unit
 
     val choose: t -> elt option
     val random: t -> elt option
@@ -229,6 +230,8 @@ module type Map =
     val compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
     val equal: ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
     val bindings : 'a t -> (elt * 'a) list
+    val print: 
+      (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
   end
 
 module type S = sig
@@ -882,6 +885,22 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
             | Private.Node(left,value,right,_,_) ->
 	       elements_aux (value::(elements_aux accu right)) left
 	  in elements_aux [] set
+
+	let rec aux_print f = function
+	  | Private.Empty -> ()
+	  | Private.Node (Private.Empty,key,Private.Empty,_,_) ->
+	    Format.fprintf f "@[%a]" Ord.print key
+	  | Private.Node (Private.Empty,key,right,_,_) ->
+	    Format.fprintf f "@[%a@],@ %a" Ord.print key aux_print right
+	  | Private.Node (left,key,Private.Empty,_,_) ->
+	    Format.fprintf f "%a,@ @[%a@]" aux_print left Ord.print key
+	  | Private.Node (left,key,right,_,_) ->
+	    Format.fprintf f "%a,@ @[%a@],@ %a"
+	      aux_print left Ord.print key aux_print right
+
+	let print f = function
+	  | Private.Empty -> Pp.empty_set f
+	  | Private.Node _ as m -> Format.fprintf f "@[{%a}@]" aux_print m
 
 	let rec min_elt = function
 	  | Private.Empty -> None
@@ -1696,6 +1715,23 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 
 	let bindings s = bindings_aux [] s
 
+	let rec aux_print pr f = function
+	  | Private.Empty -> ()
+	  | Private.Node (Private.Empty,key,data,Private.Empty,_,_) ->
+	    Format.fprintf f "@[%a->@,%a@]" Ord.print key pr data
+	  | Private.Node (Private.Empty,key,data,right,_,_) ->
+	    Format.fprintf f "@[%a->%a@],@ %a"
+	      Ord.print key pr data (aux_print pr) right
+	  | Private.Node (left,key,data,Private.Empty,_,_) ->
+	    Format.fprintf f "%a,@ @[%a->%a@]"
+	      (aux_print pr) left Ord.print key pr data
+	  | Private.Node (left,key,data,right,_,_) ->
+	    Format.fprintf f "%a,@ @[%a->%a@],@ %a"
+	      (aux_print pr) left Ord.print key pr data (aux_print pr) right
+
+	let print pr f = function
+	  | Private.Empty -> Pp.empty_set f
+	  | Private.Node _ as m -> Format.fprintf f "@[{%a}@]" (aux_print pr) m
 
 	let rec diff_with_logs warn parameters error map1 map2 =
 	  match map1 with

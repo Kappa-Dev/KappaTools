@@ -73,6 +73,7 @@ module type Set =
     val fold_inv: (elt -> 'a -> 'a) -> t -> 'a -> 'a
 
     val elements: t -> elt list
+    val print: Format.formatter -> t -> unit
 
     val choose: t -> elt option
     val random: t -> elt option
@@ -214,6 +215,8 @@ module type Map =
     val compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
     val equal: ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
     val bindings : 'a t -> (elt * 'a) list
+    val print:
+      (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
   end
 
 module type S = sig

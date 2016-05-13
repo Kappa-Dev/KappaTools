@@ -1,7 +1,12 @@
 load_printer "str.cma"
 load_printer "db_printers.cma"
 
-install_printer Location.print
+install_printer Mods.IntSet.print
+install_printer Mods.IntMap.print
+install_printer Mods.Int2Set.print
+install_printer Mods.Int2Map.print
+install_printer Mods.StringSet.print
+install_printer Mods.StringMap.print
 install_printer Random_tree.debug_print
 install_printer Renaming.print_full
 install_printer Ast.print_ast_mix
@@ -22,4 +27,3 @@ install_printer Raw_printers.print_path
 install_printer Causal.debug_print_grid
 install_printer Raw_printers.print_injections
 install_printer Rule_interpreter.debug_print
-install_printer Raw_printers.print_refined_step

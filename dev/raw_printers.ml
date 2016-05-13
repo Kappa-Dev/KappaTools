@@ -12,5 +12,3 @@ let print_perturbation = Kappa_printer.perturbation ?env:None
 let print_path = Edges.print_path ?sigs:None ?graph:None
 let print_injections =
   Rule_interpreter.print_injections ?sigs:None Format.pp_print_int
-let print_refined_step =
-  Utilities.S.PH.B.PB.CI.Po.K.print_refined_step ~compact:false ?handler:None
