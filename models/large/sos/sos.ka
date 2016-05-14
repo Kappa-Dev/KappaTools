@@ -48,6 +48,11 @@
 #
 #		initial mixture
 
+%init:  10000 / 'scale' EGF(r)
+%init:  10000 / 'scale' EGFR(CR,C,N,L,Y1016~u,Y1092~u,Y1172~u)
+%init:  20000 / 'scale' SoS(PR,S~u)
+%init:  16000 / 'scale' Shc(Y~u,PTB~u)
+%init:  10000 / 'scale' Grb2(SH3c,SH3n,SH2~u)
 
 #//////////////////////////////////////////////////////////////////////////////
 #
