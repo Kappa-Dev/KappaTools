@@ -1,13 +1,10 @@
-load_printer "unix.cma"
 load_printer "str.cma"
 load_printer "db_printers.cma"
 
-install_printer Mods.IntSet.print
-install_printer Mods.IntMap.print
-install_printer Mods.Int2Set.print
-install_printer Mods.Int2Map.print
-install_printer Mods.StringSet.print
-install_printer Mods.StringMap.print
+install_printer Mods.IntSetMap.Set.print
+install_printer Mods.Int2SetMap.Set.print
+install_printer Mods.StringSetMap.Set.print
+install_printer Mods.CharSetMap.Set.print
 install_printer Random_tree.debug_print
 install_printer Renaming.print_full
 install_printer Ast.print_ast_mix
