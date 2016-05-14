@@ -80,6 +80,41 @@ let strictly_decreasing = compare_succ (fun (a:int) b -> a > b)
 
 let concat a = List.rev_append (List.rev a)
 
+let tick_stories f save_progress_bar n_stories (init,last,counter) =
+  let () =
+    if not init then
+      let c = ref !Parameter.progressBarSize in
+      let () = Loggers.print_newline f in
+      while !c > 0 do
+        Loggers.fprintf  f "_" ;
+        c:=!c-1
+      done ;
+      Loggers.print_newline f
+  in
+  let n =
+    if n_stories <=0 && counter = 0
+    then !Parameter.progressBarSize
+    else if counter > n_stories
+    then 0
+    else
+      let nc = (counter * !Parameter.progressBarSize) / n_stories in
+      let nl = (last * !Parameter.progressBarSize) / n_stories in
+      nc - nl
+  in
+  let rec aux n =
+    if n<=0 then ()
+    else
+      let () = Loggers.fprintf f "%c" (!Parameter.progressBarSymbol) in
+      let () = if !Parameter.eclipseMode then Loggers.print_newline f in
+      aux (n-1)
+  in
+  let () = aux n in
+  let () = Loggers.flush_logger f in
+  let () = if counter = n_stories then Loggers.print_newline f in
+  let bar = (true,counter,counter+1) in
+  let () = save_progress_bar bar in
+  bar
+
 let print_list f l =
   Format.fprintf f "@[%a@]@." (Pp.list Pp.comma Format.pp_print_string) l
 
@@ -153,8 +188,8 @@ let closure_bottom_up_with_fold parameter handler log_info error event config pr
     if max_index > 300 && config.do_tick
     then
       begin
-        let tick = Mods.tick_stories err_logger (Remanent_parameters.save_progress_bar parameter) max_index (false,0,0) in
-        let f = Mods.tick_stories err_logger (Remanent_parameters.save_progress_bar parameter) max_index in
+        let tick = tick_stories err_logger (Remanent_parameters.save_progress_bar parameter) max_index (false,0,0) in
+        let f = tick_stories err_logger (Remanent_parameters.save_progress_bar parameter) max_index in
         let close () = Loggers.print_newline err_logger in
         f,
         tick,
@@ -324,8 +359,8 @@ let closure_top_down parameter handler log_info error event_opt config prec is_o
   let do_tick,tick,close_tick =
     if max_index > 300 && config.do_tick
     then
-      let tick = Mods.tick_stories err_logger (Remanent_parameters.save_progress_bar parameter) max_index (false,0,0) in
-      let f = Mods.tick_stories err_logger  (Remanent_parameters.save_progress_bar parameter) max_index in
+      let tick = tick_stories err_logger (Remanent_parameters.save_progress_bar parameter) max_index (false,0,0) in
+      let f = tick_stories err_logger  (Remanent_parameters.save_progress_bar parameter) max_index in
       let close () = Loggers.print_newline err_logger in
       f,tick,close
     else

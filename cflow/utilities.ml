@@ -426,7 +426,7 @@ let tick_opt parameter bar =
     bar
   with
   | None -> bar
-  | Some (logger,n,bar) -> Some (logger,n,Mods.tick_stories logger (S.PH.B.PB.CI.Po.K.H.save_progress_bar parameter) n bar)
+  | Some (logger,n,bar) -> Some (logger,n,Graph_closure.tick_stories logger (S.PH.B.PB.CI.Po.K.H.save_progress_bar parameter) n bar)
 
 let close_progress_bar_opt logger = Loggers.print_newline logger
 
@@ -447,7 +447,7 @@ let fold_story_table_gen logger parameter ?(shall_we_compute=we_shall) ?(shall_w
 			 (f:((trace, trace_runtime_info list, 'a, 'a) ternary)) l a =
   let n_stories_input = count_stories l in
   let progress_bar =
-         Some (logger,n_stories_input,Mods.tick_stories logger (S.PH.B.PB.CI.Po.K.H.save_progress_bar parameter) n_stories_input (false,0,0))
+         Some (logger,n_stories_input,Graph_closure.tick_stories logger (S.PH.B.PB.CI.Po.K.H.save_progress_bar parameter) n_stories_input (false,0,0))
   in
   let g parameter handler profiling_info error story info (k,progress_bar,a,n_fails) =
     let event = StoryProfiling.Story k in
@@ -626,7 +626,7 @@ let fold_left_with_progress_bar ?(event=StoryProfiling.Dummy)
 	 StoryProfiling.StoryStats.add_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error event (Some (fun _ -> List.length list)) profiling_information
   in
   let progress_bar = () in
-  (* let progress_bar = Mods.tick_stories (S.PH.B.PB.CI.Po.K.H.get_logger parameter) n (false,0,0) in*)
+  (* let progress_bar = Graph_closure.tick_stories (S.PH.B.PB.CI.Po.K.H.get_logger parameter) n (false,0,0) in*)
   let error,profiling_information,_,_,a,n_fail =
     let rec aux list (error,profiling_information,bar,k,a,n_fail) =
       let event = StoryProfiling.Story k in
@@ -647,7 +647,7 @@ let fold_left_with_progress_bar ?(event=StoryProfiling.Dummy)
 		 error
 		 a x
 	     in
-	     (* let bar = Mods.tick_stories (S.PH.B.PB.CI.Po.K.H.get_logger parameter) n bar in*)
+	     (* let bar = Graph_closure.tick_stories (S.PH.B.PB.CI.Po.K.H.get_logger parameter) n bar in*)
 	     let n_fail = inc_fails a a' n_fail in
 	     let error,profiling_information = P.close_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error event None profiling_information in
 	     Some (error,profiling_information,bar,k+1,a',n_fail)
