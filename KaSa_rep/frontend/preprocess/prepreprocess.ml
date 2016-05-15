@@ -478,9 +478,6 @@ let rec alg_map f error alg =
     let error,mixture' = f error mixture in 
     error,Ast.KAPPA_INSTANCE mixture'
   | Ast.CONST x -> error,Ast.CONST x
-  | Ast.TMAX -> error,Ast.TMAX
-  | Ast.EMAX -> error,Ast.EMAX 
-  | Ast.PLOTNUM -> error,Ast.PLOTNUM 
 
 let rec print_expr_map  f error alg = 
   match 

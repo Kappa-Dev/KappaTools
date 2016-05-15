@@ -25,9 +25,6 @@ type ('mixt,'id) ast_alg_expr =
   | TOKEN_ID of 'id
   | KAPPA_INSTANCE of 'mixt
   | CONST of Nbr.t
-  | TMAX
-  | EMAX
-  | PLOTNUM
 
 type 'a bool_expr =
   | TRUE

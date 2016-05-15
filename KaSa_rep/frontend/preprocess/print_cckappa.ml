@@ -277,12 +277,6 @@ let rec print_short_alg parameters error handler alg =
          let error = print_short_alg parameters error handler a1 in
          let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "))" in
          error  *)
-  | Ast.EMAX,_  ->
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "#Event_MAX#" in
-    error
-  | Ast.TMAX,_ ->
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "#Time_MAX#" in
-    error
   | Ast.UN_ALG_OP(Operator.TAN,a1),_ ->
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "(tan(" in
     let error = print_short_alg parameters error handler a1 in
@@ -313,8 +307,7 @@ let rec print_short_alg parameters error handler alg =
   | Ast.STATE_ALG_OP _,_
   | Ast.CONST _,_
   | Ast.TOKEN_ID _,_
-  | Ast.KAPPA_INSTANCE _,_
-  | Ast.PLOTNUM,_ ->  (*to do*) error
+  | Ast.KAPPA_INSTANCE _,_ ->  (*to do*) error
  (* | Ast.INFINITY _ ->
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "+oo" in
     error *)

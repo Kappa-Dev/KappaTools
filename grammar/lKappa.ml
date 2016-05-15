@@ -351,8 +351,8 @@ let to_raw_mixture sigs x =
 let rec ast_alg_has_mix = function
   | Ast.BIN_ALG_OP (_, a, b), _ -> ast_alg_has_mix a || ast_alg_has_mix b
   | Ast.UN_ALG_OP (_, a), _  -> ast_alg_has_mix a
-  | (Ast.STATE_ALG_OP _ | Ast.OBS_VAR _ | Ast.TOKEN_ID _ | Ast.CONST _ |
-     Ast.TMAX | Ast.EMAX | Ast.PLOTNUM), _ -> false
+  | (Ast.STATE_ALG_OP _ | Ast.OBS_VAR _ | Ast.TOKEN_ID _ | Ast.CONST _ ), _ ->
+     false
   | Ast.KAPPA_INSTANCE _, _ -> true
 
 let annotate_dropped_agent sigs links_annot ((agent_name, _ as ag_ty),intf) =
@@ -763,8 +763,7 @@ let rec alg_expr_of_ast sigs tok algs ?max_allowed_var (alg,pos) =
 	   raise (ExceptionDefn.Malformed_Decl
 		    (tk_nme ^ " is not a declared token",pos))
       in Ast.TOKEN_ID i
-   | (Ast.STATE_ALG_OP _ | Ast.CONST _ |
-      Ast.EMAX | Ast.TMAX | Ast.PLOTNUM) as x -> x
+   | (Ast.STATE_ALG_OP _ | Ast.CONST _) as x -> x
    | Ast.BIN_ALG_OP (op, a, b) ->
       Ast.BIN_ALG_OP (op,
 		      alg_expr_of_ast sigs tok algs ?max_allowed_var a,

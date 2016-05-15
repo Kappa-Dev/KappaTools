@@ -19,6 +19,7 @@ let rec add_dep (in_t,in_e,toks_d,out as x) d = function
     x
   | STATE_ALG_OP op, _ ->
      match op with
+     | (Operator.EMAX_VAR | Operator.TMAX_VAR | Operator.PLOTNUM) -> x
      | Operator.TIME_VAR -> (Operator.DepSet.add d in_t,in_e,toks_d,out)
      | (Operator.CPUTIME | Operator.EVENT_VAR | Operator.NULL_EVENT_VAR) ->
 	(in_t,Operator.DepSet.add d in_e,toks_d,out)

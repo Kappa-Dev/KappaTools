@@ -28,9 +28,6 @@ type ('mixt,'id) ast_alg_expr =
   | TOKEN_ID of 'id
   | KAPPA_INSTANCE of 'mixt
   | CONST of Nbr.t
-  | TMAX
-  | EMAX
-  | PLOTNUM
 
 type 'a bool_expr =
   | TRUE
@@ -217,9 +214,6 @@ let print_ast_agent f ((ag_na,_),l) =
 let print_ast_mix f m = Pp.list Pp.comma print_ast_agent f m
 
 let rec print_ast_alg pr_mix pr_tok pr_var f = function
-  | EMAX -> Format.fprintf f "[Emax]"
-  | PLOTNUM -> Format.fprintf f "[p]"
-  | TMAX -> Format.fprintf f "[Tmax]"
   | CONST n -> Nbr.print f n
   | OBS_VAR lab -> Format.fprintf f "'%a'" pr_var lab
   | KAPPA_INSTANCE ast ->

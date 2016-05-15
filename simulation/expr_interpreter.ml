@@ -3,6 +3,15 @@ let value_state_alg_op counter ?(time=Counter.current_time counter) = function
   | Operator.TIME_VAR -> Nbr.F time
   | Operator.EVENT_VAR -> Nbr.I (Counter.current_event counter)
   | Operator.NULL_EVENT_VAR -> Nbr.I (Counter.nb_null_event counter)
+  | Operator.EMAX_VAR ->
+     (match Counter.max_events counter with
+      | Some n -> Nbr.I n
+      | None -> Nbr.F infinity)
+  | Operator.TMAX_VAR ->
+     (match Counter.max_time counter with
+      | Some t -> Nbr.F t
+      | None -> Nbr.F infinity)
+  | Operator.PLOTNUM -> Nbr.I (Counter.plot_points counter)
 
 type alg_stack_element =
   | TO_EXEC_ALG of Operator.bin_alg_op * Alg_expr.t

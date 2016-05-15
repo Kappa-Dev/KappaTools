@@ -3,6 +3,23 @@ open Alg_expr
 type ('a,'b) contractible = NO of 'a
 			  | MAYBE of 'a * Operator.bin_alg_op * 'a * 'b
 			  | YES of 'b
+let check_state_op counter pos = function
+  | Operator.EMAX_VAR ->
+     (match Counter.max_events counter with
+      | Some _ -> ()
+      | None ->
+	 ExceptionDefn.warning
+	   ~pos (fun f -> Format.pp_print_string
+			    f "[Emax] constant is evaluated to infinity"))
+  | Operator.TMAX_VAR ->
+     (match Counter.max_time counter with
+      | Some _ -> ()
+      | None ->
+	 ExceptionDefn.warning
+	   ~pos (fun f -> Format.pp_print_string
+			    f "[Tmax] constant is evaluated to infinity"))
+  | (Operator.PLOTNUM | Operator.TIME_VAR | Operator.EVENT_VAR
+     | Operator.NULL_EVENT_VAR | Operator.CPUTIME) -> ()
 
 let rec compile_alg counter domain  (alg,pos) =
   let rec_call domain x =
@@ -30,30 +47,10 @@ let rec compile_alg counter domain  (alg,pos) =
      end
   | Ast.OBS_VAR i -> (domain,(ALG_VAR i,pos))
   | Ast.TOKEN_ID i -> (domain,(TOKEN_ID i,pos))
-  | Ast.STATE_ALG_OP (op) -> (domain,(STATE_ALG_OP (op),pos))
+  | Ast.STATE_ALG_OP (op) ->
+     let () = check_state_op counter pos op in
+     (domain,(STATE_ALG_OP (op),pos))
   | Ast.CONST n -> (domain,(CONST n,pos))
-  | Ast.EMAX ->
-     let getMaxEventValue =
-       match Counter.max_events counter with
-       | Some n -> Nbr.I n
-       | None ->
-	  ExceptionDefn.warning
-	    ~pos (fun f -> Format.pp_print_string
-			     f "[Emax] constant is evaluated to infinity");
-	  Nbr.F infinity in
-     (domain,(CONST getMaxEventValue,pos))
-  | Ast.TMAX ->
-     let getMaxTimeValue = match Counter.max_time counter with
-       | Some t -> Nbr.F t
-       | None ->
-	  ExceptionDefn.warning
-	    ~pos (fun f -> Format.pp_print_string
-			     f "[Tmax] constant is evaluated to infinity");
-		  Nbr.F infinity in
-     (domain,(CONST getMaxTimeValue,pos))
-  | Ast.PLOTNUM ->
-	  let getPointNumberValue = Nbr.I (Counter.plot_points counter) in
-	  (domain,(CONST getPointNumberValue,pos))
   | Ast.BIN_ALG_OP (op, (a,pos1), (b,pos2)) ->
      begin match rec_call domain (a,pos1) with
 	   | (domain',YES n1) ->
@@ -129,8 +126,9 @@ let rec has_time_dep (in_t,_,_,deps as vars_deps) = function
   | (UN_ALG_OP (_, a),_) -> has_time_dep vars_deps a
   | ((KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _),_) -> false
   | (STATE_ALG_OP Operator.TIME_VAR,_) -> true
-  | (STATE_ALG_OP (Operator.CPUTIME | Operator.EVENT_VAR|
-		   Operator.NULL_EVENT_VAR),_) -> false
+  | (STATE_ALG_OP (Operator.CPUTIME | Operator.EVENT_VAR |
+		   Operator.NULL_EVENT_VAR | Operator.EMAX_VAR |
+		   Operator.TMAX_VAR | Operator.PLOTNUM),_) -> false
   | (ALG_VAR i,_) ->
      let rec aux j =
        Operator.DepSet.mem (Operator.ALG j) in_t ||
@@ -158,7 +156,9 @@ let rec stops_of_bool_expr vars_deps = function
 		| CONST n, STATE_ALG_OP (Operator.TIME_VAR) -> [n]
 		| ( BIN_ALG_OP _ | UN_ALG_OP _ | ALG_VAR _
 		    | STATE_ALG_OP (Operator.CPUTIME | Operator.EVENT_VAR |
-				    Operator.TIME_VAR | Operator.NULL_EVENT_VAR)
+				    Operator.TIME_VAR | Operator.NULL_EVENT_VAR |
+				    Operator.EMAX_VAR |Operator.TMAX_VAR |
+				    Operator.PLOTNUM)
 		    | KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _), _ ->
 		   raise ExceptionDefn.Unsatisfiable
 	  end

@@ -214,15 +214,6 @@ let rec print_alg parameter (error:Exception.method_handler) alg =
   | Ast.CONST t ->
     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)  "%s" (Nbr.to_string t)
     in error
-  | Ast.TMAX ->
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter)  "TMAX"
-    in error
-  | Ast.EMAX ->
-    let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter) "EMAX"
-    in error
-  | Ast.PLOTNUM ->
-     let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) "[p]" in
-     error
 
 let print_rule parameter error rule =
   let error = print_mixture parameter error rule.Ckappa_sig.lhs in

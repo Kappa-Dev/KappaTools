@@ -1,12 +1,13 @@
 type bin_alg_op = MULT | SUM | DIV | MINUS | POW | MODULO | MIN | MAX
 type un_alg_op = LOG | SQRT | EXP | SINUS | COSINUS | TAN | INT | UMINUS
 type state_alg_op = CPUTIME | TIME_VAR | EVENT_VAR | NULL_EVENT_VAR
+		    | TMAX_VAR | EMAX_VAR | PLOTNUM
 type bool_op = AND | OR
 type compare_op = GREATER | SMALLER | EQUAL | DIFF
 
 type rev_dep = ALG of int | RULE of int | PERT of int
 
-let bin_alg_op_to_string () = function
+let bin_alg_op_to_string = function
   | MULT -> "*"
   | SUM -> "+"
   | DIV -> "/"
@@ -17,9 +18,9 @@ let bin_alg_op_to_string () = function
   | MAX -> "[max]"
 
 let print_bin_alg_op f op =
-  Format.fprintf f "%s" (bin_alg_op_to_string () op)
+  Format.fprintf f "%s" (bin_alg_op_to_string op)
 
-let un_alg_op_to_string () = function
+let un_alg_op_to_string = function
   | COSINUS -> "[cos]"
   | SINUS -> "[sin]"
   | TAN -> "[tan]"
@@ -30,32 +31,35 @@ let un_alg_op_to_string () = function
   | UMINUS -> "-"
 
 let print_un_alg_op f op =
-  Format.fprintf f "%s" (un_alg_op_to_string () op)
+  Format.pp_print_string f (un_alg_op_to_string op)
 
-let state_alg_op_to_string () = function
+let state_alg_op_to_string = function
   | CPUTIME -> "[Tsim]"
   | TIME_VAR -> "[T]"
   | EVENT_VAR -> "[E]"
   | NULL_EVENT_VAR -> "[E-]"
+  | TMAX_VAR -> "[Tmax]"
+  | EMAX_VAR -> "[Emax]"
+  | PLOTNUM -> "[p]"
 
 let print_state_alg_op f op =
-  Format.fprintf f "%s" (state_alg_op_to_string () op)
+  Format.pp_print_string f (state_alg_op_to_string op)
 
-let bool_op_to_string () = function
+let bool_op_to_string = function
   | AND -> "&&"
   | OR -> "||"
 
 let print_bool_op f op =
-  Format.fprintf f "%s" (bool_op_to_string () op)
+  Format.pp_print_string f (bool_op_to_string op)
 
-let compare_op_to_string () = function
+let compare_op_to_string = function
   | GREATER -> ">"
   | SMALLER -> "<"
   | EQUAL -> "="
   | DIFF -> "!="
 
 let print_compare_op f op =
-  Format.fprintf f "%s" (compare_op_to_string () op)
+  Format.pp_print_string f (compare_op_to_string op)
 
 let print_rev_dep f = function
   | RULE id ->

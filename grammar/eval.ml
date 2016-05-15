@@ -123,8 +123,7 @@ let cflows_of_label contact_map domain on algs rules (label,pos) rev_effects =
 	match var with
 	| Ast.KAPPA_INSTANCE mix -> mix
 	| (Ast.BIN_ALG_OP _ | Ast.UN_ALG_OP _ | Ast.STATE_ALG_OP _ |
-	   Ast.OBS_VAR _ | Ast.TOKEN_ID _ | Ast.CONST _ | Ast.TMAX | Ast.EMAX |
-	   Ast.PLOTNUM ) -> raise Not_found
+	   Ast.OBS_VAR _ | Ast.TOKEN_ID _ | Ast.CONST _ ) -> raise Not_found
     with Not_found ->
       raise (ExceptionDefn.Malformed_Decl
 	       ("Label '" ^ label ^

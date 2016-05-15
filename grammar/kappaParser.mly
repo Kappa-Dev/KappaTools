@@ -295,9 +295,9 @@ constant:
     | INFINITY {add_pos (Ast.CONST (Nbr.F infinity))}
     | FLOAT {add_pos (Ast.CONST (Nbr.F $1))}
     | INT {add_pos (Ast.CONST (Nbr.I $1))}
-    | EMAX {add_pos Ast.EMAX}
-    | TMAX {add_pos Ast.TMAX}
-    | PLOTNUM {add_pos Ast.PLOTNUM}
+    | EMAX {add_pos (Ast.STATE_ALG_OP (Operator.EMAX_VAR))}
+    | TMAX {add_pos (Ast.STATE_ALG_OP (Operator.TMAX_VAR))}
+    | PLOTNUM {add_pos (Ast.STATE_ALG_OP (Operator.PLOTNUM))}
     | CPUTIME {add_pos (Ast.STATE_ALG_OP (Operator.CPUTIME))}
     ;
 
