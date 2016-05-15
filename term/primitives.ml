@@ -111,11 +111,63 @@ type modification =
 	 Alg_expr.t Ast.print_expr list)
 
 type perturbation =
-    { precondition: Alg_expr.t Ast.bool_expr;
+    { precondition: Alg_expr.t Ast.bool_expr Location.annot;
       effect : modification list;
-      abort : Alg_expr.t Ast.bool_expr option;
-      stopping_time : Nbr.t list
+      abort : Alg_expr.t Ast.bool_expr Location.annot option;
     }
 
 let exists_modification check l =
   List.exists (fun p -> List.exists check p.effect) l
+
+let map_expr_rule f x = {
+    rate = f x.rate;
+    unary_rate = Tools.option_map (fun (x,d) -> (f x,d)) x.unary_rate;
+    connected_components = x.connected_components;
+    removed = x.removed;
+    inserted = x.inserted;
+    fresh_bindings = x.fresh_bindings;
+    consumed_tokens = List.map (fun (x,t) -> (f x,t)) x.consumed_tokens;
+    injected_tokens = List.map (fun (x,t) -> (f x,t)) x.injected_tokens;
+    syntactic_rule = x.syntactic_rule;
+    instantiations = x.instantiations;
+  }
+
+let map_expr_print f x =
+  List.map (function
+	     | Ast.Str_pexpr _ as x -> x
+	     | Ast.Alg_pexpr e -> Ast.Alg_pexpr (f e)) x
+
+let map_expr_modification f = function
+  | ITER_RULE (e,r) -> ITER_RULE (f e, map_expr_rule f r)
+  | UPDATE (i,e) -> UPDATE (i,f e)
+  | SNAPSHOT p -> SNAPSHOT (map_expr_print f p)
+  | STOP p -> STOP (map_expr_print f p)
+  | PRINT (fn,p) -> PRINT (map_expr_print f fn, map_expr_print f p)
+  | FLUX (b,p) -> FLUX (b,map_expr_print f p)
+  | FLUXOFF p -> FLUXOFF (map_expr_print f p)
+  | (CFLOW _ | CFLOWOFF _ | PLOTENTRY) as x -> x
+
+let map_expr_perturbation f_alg f_bool x =
+  { precondition = f_bool x.precondition;
+    effect = List.map (map_expr_modification f_alg) x.effect;
+    abort = Tools.option_map f_bool x.abort;
+  }
+
+let stops_of_perturbation algs_deps x =
+  let stopping_time =
+    try Alg_expr.stops_of_bool_expr algs_deps (fst x.precondition)
+    with ExceptionDefn.Unsatisfiable ->
+      raise
+	(ExceptionDefn.Malformed_Decl
+	   ("Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"
+	   ,snd x.precondition))
+  in
+  match x.abort with
+  | None -> stopping_time
+  | Some (x,pos) ->
+     try stopping_time@Alg_expr.stops_of_bool_expr algs_deps x
+     with ExceptionDefn.Unsatisfiable ->
+      raise
+	(ExceptionDefn.Malformed_Decl
+	   ("Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"
+	   ,pos))

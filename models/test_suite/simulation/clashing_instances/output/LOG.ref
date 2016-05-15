@@ -114,7 +114,7 @@ On roots:
 On roots: 
 On roots: 
 Rule rule has now 10000 instances.
-	 Done
+Done
 Applied 0:
 0: /*cc1*/ A/*1*/(), 1: /*cc2*/ A/*1*/(x) -- A/*1*//*1*/.x = ⊥, A/*1*//*1*/
 ++  @1

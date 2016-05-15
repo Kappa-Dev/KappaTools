@@ -3,6 +3,7 @@ FLG -w +a -strict-formats -safe-string
 S cflow
 S dataStructures
 S grammar
+S generated
 S term
 S pattern
 S simulation

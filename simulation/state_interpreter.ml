@@ -22,31 +22,19 @@ let initial_activity get_alg env counter graph activities =
        Random_tree.add (2*i) (Nbr.to_float rate) activities)
     () env
 
-let empty env stopping_times =
+let empty env stopping_times alg_overwrite =
   let activity_tree =
     Random_tree.create (2*Environment.nb_rules env) in
   let stops =
     List.sort (fun (a,_) (b,_) -> Nbr.compare a b) stopping_times in
+  let overwrite = Array.make (Environment.nb_algs env) None in
+  let () = List.iter (fun (i,v) -> overwrite.(i) <- Some v) alg_overwrite in
   {
     init_stopping_times = stops;
     stopping_times = ref stops;
     perturbations_alive =
       Array.make (Environment.nb_perturbations env) true;
     activities = activity_tree;
-    variables_overwrite =
-      Array.make (Environment.nb_algs env) None;
-    flux = [];
-  }
-
-let reinit alg_overwrite state =
-  let overwrite = Array.map (fun _ -> None) state.variables_overwrite in
-  let () = List.iter (fun (i,v) -> overwrite.(i) <- Some v) alg_overwrite in
-  {
-    init_stopping_times = state.init_stopping_times;
-    stopping_times = ref state.init_stopping_times;
-    perturbations_alive =
-      Array.map (fun _ -> true) state.perturbations_alive;
-    activities = Random_tree.copy state.activities;
     variables_overwrite = overwrite;
     flux = [];
   }
@@ -196,7 +184,7 @@ let perturbate ~outputs env domain counter graph state =
       let pert = Environment.get_perturbation env i in
       if state.perturbations_alive.(i) && not_done_yet.(i) &&
 	   Rule_interpreter.value_bool
-	     counter graph ~get_alg pert.Primitives.precondition
+	     counter graph ~get_alg (fst pert.Primitives.precondition)
       then
 	let stop,graph,state =
 	  List.fold_left (fun (stop,graph,state as acc) effect ->
@@ -208,7 +196,7 @@ let perturbate ~outputs env domain counter graph state =
 	  state.perturbations_alive.(i) <-
 	    match pert.Primitives.abort with
 	    | None -> false
-	    | Some ex ->
+	    | Some (ex,_) ->
 	       not (Rule_interpreter.value_bool counter graph ~get_alg ex) in
 	do_until_noop 0 graph state stop
       else

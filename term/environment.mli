@@ -27,10 +27,15 @@ val get_rule : t -> int -> Primitives.elementary_rule
 val map_observables : (Alg_expr.t -> 'a) -> t -> 'a array
 val fold_rules :
   (int -> 'a -> Primitives.elementary_rule -> 'a) -> 'a -> t -> 'a
+val fold_perturbations :
+  (int -> 'a -> Primitives.perturbation -> 'a) -> 'a -> t -> 'a
 
 val get_alg_reverse_dependencies : t -> int -> Operator.DepSet.t
 val get_token_reverse_dependencies : t -> int -> Operator.DepSet.t
 val get_always_outdated : t -> Operator.DepSet.t
+val all_dependencies :
+  t -> (Operator.DepSet.t * Operator.DepSet.t *
+	  Operator.DepSet.t array * Operator.DepSet.t array)
 
 val num_of_agent : string Location.annot -> t -> int
 val num_of_alg : string Location.annot -> t -> int
@@ -48,3 +53,6 @@ val print :
   (t -> Format.formatter -> Primitives.elementary_rule -> unit) ->
   (t -> Format.formatter -> Primitives.perturbation -> unit) ->
   Format.formatter -> t -> unit
+
+val propagate_constant : int list -> Counter.t -> t -> t
+(** [propagate_constant updated_vars counter env] *)

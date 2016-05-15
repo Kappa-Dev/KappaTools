@@ -57,7 +57,7 @@ val print_rule :
 val compil_of_ast :
   (string * Nbr.t) list ->
   (Ast.agent, Ast.mixture, string, Ast.rule) Ast.compil ->
-  Signature.s * unit NamedDecls.t *
+  Signature.s * unit NamedDecls.t * int list *
     (Ast.agent, rule_agent list, int, rule) Ast.compil
 (** [compil_of_ast variable_overwrite ast]
 

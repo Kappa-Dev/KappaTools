@@ -1,28 +1,75 @@
 open Tools
 open Ast
 
-let tokenify contact_map counter domain l =
+let rec compile_alg domain (alg,pos) =
+  match alg with
+  | Ast.KAPPA_INSTANCE ast ->
+     begin
+       match domain with
+       | Some (origin,contact_map,domain) ->
+	  let domain',ccs =
+	    Snip.connected_components_sum_of_ambiguous_mixture
+	    contact_map domain ?origin ast in
+	  (Some (origin,contact_map,domain'),
+	   (Alg_expr.KAPPA_INSTANCE (List.map fst ccs),pos))
+       | None ->
+	  raise (ExceptionDefn.Internal_Error
+		   ("Theoritically pure alg_expr has a mixture",pos))
+     end
+  | Ast.OBS_VAR i -> (domain,(Alg_expr.ALG_VAR i,pos))
+  | Ast.TOKEN_ID i -> (domain,(Alg_expr.TOKEN_ID i,pos))
+  | Ast.STATE_ALG_OP (op) -> (domain,(Alg_expr.STATE_ALG_OP (op),pos))
+  | Ast.CONST n -> (domain,(Alg_expr.CONST n,pos))
+  | Ast.BIN_ALG_OP (op, a, b) ->
+     let domain',a' = compile_alg domain a in
+     let domain'',b' = compile_alg domain' b in
+     (domain'',(Alg_expr.BIN_ALG_OP (op,a',b'),pos))
+  | Ast.UN_ALG_OP (op,a) ->
+     let domain',a' = compile_alg domain a in
+     (domain',(Alg_expr.UN_ALG_OP (op,a'),pos))
+
+let compile_pure_alg (alg,pos) =
+  snd @@ compile_alg None (alg,pos)
+
+let compile_alg ?origin contact_map domain (alg,pos) =
+  match compile_alg (Some (origin,contact_map,domain)) (alg,pos) with
+  | Some (_, _,domain),alg -> domain,alg
+  | None, _ -> failwith "domain has been lost in Expr.compile_alg"
+
+let rec compile_bool contact_map domain = function
+  | Ast.TRUE,pos -> (domain,(Ast.TRUE,pos))
+  | Ast.FALSE,pos -> (domain,(Ast.FALSE,pos))
+  | Ast.BOOL_OP (op,a,b), pos ->
+     let domain',a' = compile_bool contact_map domain a in
+     let domain'',b' = compile_bool contact_map domain' b in
+     (domain'',(Ast.BOOL_OP (op,a',b'),pos))
+  | Ast.COMPARE_OP (op,a,b),pos ->
+     let (domain',a') = compile_alg contact_map domain a in
+     let (domain'',b') = compile_alg contact_map domain' b in
+     (domain'',(Ast.COMPARE_OP (op,a',b'), pos))
+
+let tokenify contact_map domain l =
   List.fold_right
     (fun (alg_expr,id) (domain,out) ->
      let (domain',alg) =
-       Expr.compile_alg contact_map counter domain alg_expr in
+       compile_alg contact_map domain alg_expr in
      (domain',(alg,id)::out)
     ) l (domain,[])
 
 (* transform an LKappa rule into a Primitives rule *)
 let rules_of_ast
-      ?deps_machinery contact_map counter domain ~syntax_ref (rule,_) =
+      ?deps_machinery contact_map domain ~syntax_ref (rule,_) =
   let domain',rm_toks =
-    tokenify contact_map counter domain rule.LKappa.r_rm_tokens in
+    tokenify contact_map domain rule.LKappa.r_rm_tokens in
   let domain'',add_toks =
-    tokenify contact_map counter domain' rule.LKappa.r_add_tokens in
+    tokenify contact_map domain' rule.LKappa.r_add_tokens in
   (*  let one_side syntax_ref label (domain,deps_machinery,unary_ccs,acc)
 	       rate unary_rate lhs rhs rm add =*)
   let origin,deps =
     match deps_machinery with
     | None -> None,None
     | Some (o,d) -> Some o, Some d in
-  let crp = Expr.compile_pure_alg counter rule.LKappa.r_rate in
+  let crp = compile_pure_alg rule.LKappa.r_rate in
   let unary_infos =
     match rule.LKappa.r_un_rate with
     | None -> fun _ uncc -> crp,None,uncc
@@ -34,7 +81,7 @@ let rules_of_ast
 	      raise (ExceptionDefn.Malformed_Decl
 		      ("Unary rule canot be applied at distance 0. ",pos_dist))
 	    else Some dist in
-       let unrate = Expr.compile_pure_alg counter rate in
+       let unrate = compile_pure_alg rate in
        fun ccs uncc ->
        match Array.length ccs with
        | (0 | 1) -> unrate,None,uncc
@@ -90,22 +137,22 @@ let rules_of_ast
 			     | None -> failwith "ugly Eval.rule_of_ast")),
   unary_ccs',rules_l
 
-let obs_of_result contact_map counter domain res =
+let obs_of_result contact_map domain res =
   List.fold_left
     (fun (domain,cont) alg_expr ->
      let (domain',alg_pos) =
-       Expr.compile_alg contact_map counter domain alg_expr in
+       compile_alg contact_map domain alg_expr in
      domain',alg_pos :: cont)
     (domain,[]) res.observables
 
-let compile_print_expr contact_map counter domain ex =
+let compile_print_expr contact_map domain ex =
   List.fold_right
     (fun el (domain,out) ->
      match el with
      | Ast.Str_pexpr s -> (domain,Ast.Str_pexpr s::out)
      | Ast.Alg_pexpr ast_alg ->
 	let (domain', alg) =
-	  Expr.compile_alg contact_map counter domain ast_alg in
+	  compile_alg contact_map domain ast_alg in
 	(domain',(Ast.Alg_pexpr alg::out)))
     ex (domain,[])
 
@@ -136,7 +183,7 @@ let cflows_of_label contact_map domain on algs rules (label,pos) rev_effects =
    List.fold_left (fun x (y,t) -> adds t x y) rev_effects ccs)
 
 let effects_of_modif
-      ast_algs ast_rules contact_map counter domain ast_list =
+      ast_algs ast_rules contact_map domain ast_list =
   let rec iter rev_effects domain ast_list =
     let rule_effect alg_expr (mix,created,rm,add) mix_pos =
       let ast_rule =
@@ -145,10 +192,10 @@ let effects_of_modif
 	  LKappa.r_rate = Location.dummy_annot (CONST Nbr.zero);
 	  LKappa.r_un_rate = None; } in
       let (domain',alg_pos) =
-	Expr.compile_alg contact_map counter domain alg_expr in
+	compile_alg contact_map domain alg_expr in
       let domain'',_,_,elem_rules =
 	rules_of_ast
-	  contact_map counter domain' ~syntax_ref:0 (ast_rule,mix_pos) in
+	  contact_map domain' ~syntax_ref:0 (ast_rule,mix_pos) in
       let elem_rule = match elem_rules with
 	| [ r ] -> r
 	| _ ->
@@ -172,7 +219,7 @@ let effects_of_modif
 	      alg_expr (LKappa.to_erased ast_mix,[],[],[]) mix_pos
 	 | UPDATE ((i, _), alg_expr) ->
 	    let (domain', alg_pos) =
-	      Expr.compile_alg contact_map counter domain alg_expr in
+	      compile_alg contact_map domain alg_expr in
 	    (domain',(Primitives.UPDATE (i, alg_pos))::rev_effects)
 	 | UPDATE_TOK ((tk_id,tk_pos),alg_expr) ->
 	    rule_effect (Location.dummy_annot (Ast.CONST (Nbr.one)))
@@ -182,12 +229,12 @@ let effects_of_modif
 			tk_pos
 	 | SNAPSHOT pexpr ->
 	    let (domain',pexpr') =
-	      compile_print_expr contact_map counter domain pexpr in
+	      compile_print_expr contact_map domain pexpr in
 	    (*when specializing snapshots to particular mixtures, add variables below*)
 	    (domain', (Primitives.SNAPSHOT pexpr')::rev_effects)
 	 | STOP pexpr ->
 	    let (domain',pexpr') =
-	      compile_print_expr contact_map counter domain pexpr in
+	      compile_print_expr contact_map domain pexpr in
 	    (domain', (Primitives.STOP pexpr')::rev_effects)
 	 | CFLOWLABEL (on,lab) ->
 	    cflows_of_label
@@ -203,17 +250,17 @@ let effects_of_modif
 	     List.fold_left (fun x (y,t) -> adds t x y) rev_effects ccs)
 	 | FLUX (rel,pexpr) ->
 	    let (domain',pexpr') =
-	      compile_print_expr contact_map counter domain pexpr in
+	      compile_print_expr contact_map domain pexpr in
 	    (domain', (Primitives.FLUX (rel,pexpr'))::rev_effects)
 	 | FLUXOFF pexpr ->
 	    let (domain',pexpr') =
-	      compile_print_expr contact_map counter domain pexpr in
+	      compile_print_expr contact_map domain pexpr in
 	    (domain', (Primitives.FLUXOFF pexpr')::rev_effects)
 	 | PRINT (pexpr,print) ->
 	    let (domain',pexpr') =
-	      compile_print_expr contact_map counter domain pexpr in
+	      compile_print_expr contact_map domain pexpr in
 	    let (domain'',print') =
-	      compile_print_expr contact_map counter domain' print in
+	      compile_print_expr contact_map domain' print in
 	    (domain'', (Primitives.PRINT (pexpr',print'))::rev_effects)
 	 | PLOTENTRY ->
 	    (domain, (Primitives.PLOTENTRY)::rev_effects)
@@ -222,40 +269,23 @@ let effects_of_modif
   in
   iter [] domain ast_list
 
-let pert_of_result
-      algs_deps ast_algs ast_rules contact_map counter domain res =
-  let (domain, _, lpert, stop_times,tracking_enabled) =
+let pert_of_result ast_algs ast_rules contact_map domain res =
+  let (domain, _, lpert,tracking_enabled) =
     List.fold_left
-      (fun (domain, p_id, lpert, stop_times, tracking_enabled)
-	   ((pre_expr, modif_expr_list, opt_post),pos) ->
-       let (domain',(pre,pos_pre)) =
-	 Expr.compile_bool contact_map counter domain pre_expr in
-       let stopping_time =
-	 try Expr.stops_of_bool_expr algs_deps pre
-	 with ExceptionDefn.Unsatisfiable ->
-	   raise
-	     (ExceptionDefn.Malformed_Decl
-		("Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"
-		,pos_pre))
-       in
+      (fun (domain, p_id, lpert, tracking_enabled)
+	   ((pre_expr, modif_expr_list, opt_post),_) ->
+       let (domain',(pre,pre_pos)) =
+	 compile_bool contact_map domain pre_expr in
        let (domain, effects) =
 	 effects_of_modif
-	   ast_algs ast_rules contact_map counter domain' modif_expr_list in
-       let domain,opt,stopping_time =
+	   ast_algs ast_rules contact_map domain' modif_expr_list in
+       let domain,opt =
 	 match opt_post with
-	 | None -> (domain,None,stopping_time)
+	 | None -> (domain,None)
 	 | Some post_expr ->
-	    let (domain',(post,_pos)) =
-	      Expr.compile_bool contact_map counter domain post_expr in
-	    let (stopping_time') =
-	      try Expr.stops_of_bool_expr algs_deps post with
-		ExceptionDefn.Unsatisfiable ->
-		raise
-		  (ExceptionDefn.Malformed_Decl
-		     ("Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"
-		     ,pos))
-	    in
-	    (domain',Some post,stopping_time'@stopping_time)
+	    let (domain',(post,post_pos)) =
+	      compile_bool contact_map domain post_expr in
+	    (domain',Some (post,post_pos))
        in
        let has_tracking = tracking_enabled
 			  || List.exists
@@ -267,28 +297,18 @@ let pert_of_result
 				    Primitives.PLOTENTRY | Primitives.STOP _ |
 				    Primitives.ITER_RULE _) -> false) effects in
        let pert =
-	 { Primitives.precondition = pre;
+	 { Primitives.precondition = (pre,pre_pos);
 	   Primitives.effect = effects;
 	   Primitives.abort = opt;
-	   Primitives.stopping_time = stopping_time
 	 }
        in
-       (domain, succ p_id, pert::lpert,
-	List.fold_left (fun acc el -> (el,p_id)::acc) stop_times stopping_time,
-       has_tracking)
+       (domain, succ p_id, pert::lpert,has_tracking)
       )
-      (domain, 0, [],[],false) res.perturbations
+      (domain, 0, [], false) res.perturbations
   in
-  (*making sure that perturbations containing a stopping time precondition are tested first*)
-  let lpert = List.rev lpert in
-  let pred = (fun p -> match p.Primitives.stopping_time with
-			 [] -> false | _ :: _ -> true) in
-  let lpert_stopping_time = List.filter pred lpert in
-  let lpert_ineq = List.filter (fun p -> not (pred p)) lpert in
-  let lpert = lpert_stopping_time@lpert_ineq in
-  ( domain, lpert,stop_times,tracking_enabled)
+  ( domain, List.rev lpert,tracking_enabled)
 
-let inits_of_result ?rescale contact_map counter env preenv res =
+let inits_of_result ?rescale contact_map env preenv res =
   let init_l,preenv' =
     Tools.list_fold_right_map
       (fun (_opt_vol,alg,init_t) preenv -> (*TODO dealing with volumes*)
@@ -302,7 +322,7 @@ let inits_of_result ?rescale contact_map counter env preenv res =
        | INIT_MIX ast,mix_pos ->
 	  let sigs = Environment.signatures env in
 	  let (preenv',alg') =
-	    Expr.compile_alg contact_map counter preenv alg in
+	    compile_alg contact_map preenv alg in
 	  let fake_rule =
 	    { LKappa.r_mix = [];
 	      LKappa.r_created = LKappa.to_raw_mixture sigs ast;
@@ -312,7 +332,7 @@ let inits_of_result ?rescale contact_map counter env preenv res =
 	  let preenv'',state' =
 	    match
 	      rules_of_ast
-		contact_map counter preenv' ~syntax_ref:0 (fake_rule,mix_pos)
+		contact_map preenv' ~syntax_ref:0 (fake_rule,mix_pos)
 	    with
 	    | domain'',_,_,[ compiled_rule ] ->
 	       (fst alg',compiled_rule,mix_pos),domain''
@@ -330,7 +350,7 @@ let inits_of_result ?rescale contact_map counter env preenv res =
 	      LKappa.r_un_rate = None; } in
 	  match
 	      rules_of_ast
-		contact_map counter preenv ~syntax_ref:0
+		contact_map preenv ~syntax_ref:0
 		(Location.dummy_annot fake_rule)
 	    with
 	    | domain'',_,_,[ compiled_rule ] ->
@@ -344,7 +364,7 @@ let configurations_of_result result =
     match value_list with
     | (v,pos) :: _ -> f v pos
     | [] ->
-      raise 
+      raise
 	(ExceptionDefn.Malformed_Decl
 	   ("Empty value for parameter "^param,pos_p)) in
   let set_value pos_p param value_list f ass =
@@ -439,20 +459,20 @@ let configurations_of_result result =
 	raise (ExceptionDefn.Malformed_Decl ("Unkown parameter "^error, pos_p))
     ) result.configurations
 
-let compile_alg_vars contact_map counter domain vars =
+let compile_alg_vars contact_map domain vars =
   array_fold_left_mapi
     (fun i domain (lbl_pos,ast) ->
      let (domain',alg) =
-       Expr.compile_alg ~origin:(Operator.ALG i) contact_map counter domain ast
+       compile_alg ~origin:(Operator.ALG i) contact_map domain ast
      in (domain',(lbl_pos,alg))) domain
     (Array.of_list vars)
 
-let compile_rules alg_deps contact_map counter domain rules =
+let compile_rules alg_deps contact_map domain rules =
   match
     List.fold_left
       (fun (domain,syntax_ref,deps_machinery,unary_cc,acc) (_,rule) ->
        let (domain',origin',extra_unary_cc,cr) =
-	 rules_of_ast ?deps_machinery contact_map counter domain
+	 rules_of_ast ?deps_machinery contact_map domain
 		      ~syntax_ref rule in
        (domain',succ syntax_ref,origin',
 	Connected_component.Set.union unary_cc extra_unary_cc,
@@ -473,8 +493,8 @@ let init_kasa called_from result =
   contact_map,Export_to_KaSim.Export_to_KaSim.flush_errors kasa_state
 
 
-let initialize ~outputs ~pause ~return
-	       ?rescale_init sigs_nd tk_nd contact_map counter result =
+let compile ~outputs ~pause ~return
+	    ?rescale_init sigs_nd tk_nd contact_map counter result =
   outputs (Data.Log "+ Building initial simulation conditions...");
   outputs (Data.Log "\t -simulation parameters");
   let () = configurations_of_result result in
@@ -483,7 +503,7 @@ let initialize ~outputs ~pause ~return
   let preenv = Connected_component.PreEnv.empty sigs_nd in
   outputs (Data.Log "\t -variable declarations");
   let preenv',alg_a =
-    compile_alg_vars contact_map counter preenv result.Ast.variables in
+    compile_alg_vars contact_map preenv result.Ast.variables in
   let alg_nd = NamedDecls.create alg_a in
   let alg_deps = Alg_expr.setup_alg_vars_rev_dep tk_nd alg_a in
 
@@ -491,15 +511,14 @@ let initialize ~outputs ~pause ~return
     (fun () ->
   outputs (Data.Log "\t -rules");
   let (preenv',alg_deps',compiled_rules,cc_unaries) =
-    compile_rules alg_deps contact_map counter preenv' result.Ast.rules in
+    compile_rules alg_deps contact_map preenv' result.Ast.rules in
   let rule_nd = Array.of_list compiled_rules in
 
   pause
     (fun () ->
   outputs (Data.Log "\t -perturbations");
-  let (preenv,pert,stops,has_tracking) =
-    pert_of_result alg_deps' result.variables result.rules
-		   contact_map counter preenv' result in
+  let (preenv,pert,has_tracking) =
+    pert_of_result result.variables result.rules contact_map preenv' result in
   let () =
     if Counter.max_time counter = None && Counter.max_events counter = None &&
 	 not @@
@@ -517,7 +536,7 @@ let initialize ~outputs ~pause ~return
     (fun () ->
   outputs (Data.Log "\t -observables");
   let preenv,obs =
-    obs_of_result contact_map counter preenv result in
+    obs_of_result contact_map preenv result in
   let () =
     match obs with
     | (_,pos) :: _ when Counter.plot_points counter < 0
@@ -538,25 +557,22 @@ let initialize ~outputs ~pause ~return
   let domain = Connected_component.PreEnv.finalize preenv in
   pause
     (fun () ->
-  let _,init_l =
-    inits_of_result
-      ?rescale:rescale_init contact_map counter env preenv result in
-  pause
-    (fun () ->
+     let _,init_l =
+       inits_of_result
+	 ?rescale:rescale_init contact_map env preenv result in
+     return (env, domain, has_tracking, init_l)))))))
+
+let build_initial_state
+      alg_overwrite counter env cc_env has_tracking updated_vars init_l =
+  let env = Environment.propagate_constant updated_vars counter env in
+  let stops = Environment.fold_perturbations
+		(fun i acc p ->
+		 let s = Primitives.stops_of_perturbation
+			   (Environment.all_dependencies env) p in
+		 List.fold_left (fun acc s -> (s,i)::acc) acc s)
+		[] env in
   let graph0 = Rule_interpreter.empty ~has_tracking env in
-  let state0 = State_interpreter.empty env stops in
+  let state0 = State_interpreter.empty env stops alg_overwrite in
   let graph,state =
-    State_interpreter.initialize env domain counter graph0 state0 init_l in
-  let () =
-    if has_tracking &&
-	 not (!Parameter.causalModeOn || !Parameter.weakCompression ||
-		!Parameter.mazCompression || !Parameter.strongCompression)
-    then
-      ExceptionDefn.warning
-	(fun f ->
-	 Format.fprintf
-	   f
-	   "An observable may be tracked but no compression level to render stories has been specified")
-  in
-  let () = outputs (Data.Log "\t Done") in
-  return (env, domain, graph, state, init_l))))))))
+    State_interpreter.initialize env cc_env counter graph0 state0 init_l in
+  (env,graph,state)

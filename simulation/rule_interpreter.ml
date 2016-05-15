@@ -40,22 +40,6 @@ let empty ~has_tracking env = {
     unary_distances = Array.make ((Environment.nb_syntactic_rules env)+1) None;
 }
 
-let reinit state = {
-    roots_of_ccs = Connected_component.Map.empty;
-    matchings_of_rule = Mods.IntMap.empty;
-    unary_candidates = Mods.IntMap.empty;
-    unary_pathes = Mods.Int2Map.empty;
-    edges = Edges.empty ();
-    tokens = Array.make (Array.length state.tokens) Nbr.zero;
-    outdated_elements = Operator.DepSet.empty,[],true;
-    story_machinery =
-      (match state.story_machinery with
-       | Some _ -> Some (Connected_component.Map.empty,
-			 (Compression_main.init_secret_log_info (), []))
-       | None -> None);
-    unary_distances = Array.make (Array.length state.unary_distances) None;
-}
-
 let print_injections ?sigs pr f roots_of_ccs =
   Format.fprintf
     f "@[<v>%a@]"

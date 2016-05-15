@@ -59,8 +59,8 @@ let constructor_observable : plot_observable Js.t Js.constr =
 let create_observable ~(observable : ApiTypes.observable)
     : plot_observable Js.t  =
   let configuration : plot_observable Js.t = jsnew constructor_observable () in
-  let () = (Js.Unsafe.coerce configuration)##time <- observable.time;
-           (Js.Unsafe.coerce configuration)##values <- Js.array (Array.of_list observable.values);
+  let () = (Js.Unsafe.coerce configuration)##time <- observable.ApiTypes.time;
+           (Js.Unsafe.coerce configuration)##values <- Js.array (Array.of_list observable.ApiTypes.values);
            ()
   in configuration
 
@@ -78,10 +78,10 @@ let create_data ~(plot : ApiTypes.plot)
     (Js.Unsafe.coerce configuration)##legend <- Js.array
       (Array.map
          (fun l -> Js.string l)
-         (Array.of_list plot.legend));
+         (Array.of_list plot.ApiTypes.legend));
     (Js.Unsafe.coerce configuration)##observables <- Js.array
       (Array.map (fun o -> create_observable o)
-         (Array.of_list plot.observables));
+         (Array.of_list plot.ApiTypes.observables));
     ()
   in configuration
 

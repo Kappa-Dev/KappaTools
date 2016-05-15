@@ -7,7 +7,6 @@ type result = Clash | Success of t | Corrected of t
 (** {6 Initialisation} *)
 
 val empty : has_tracking:bool -> Environment.t -> t
-val reinit : t -> t
 
 (** {6 algebraic expression computation} *)
 (** [get_alg] is by default [Environment.get_alg] but it is not hard

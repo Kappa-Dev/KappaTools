@@ -2,10 +2,8 @@
 
 type t (** Abstract state *)
 
-val empty : Environment.t -> (Nbr.t * int) list -> t
-(** [empty env stopping_times] *)
-
-val reinit : (int * Alg_expr.t) list -> t -> t
+val empty : Environment.t -> (Nbr.t * int) list -> (int * Alg_expr.t) list -> t
+(** [empty env stopping_times variable_overwrite] *)
 
 val initialize :
   Environment.t -> Connected_component.Env.t -> Counter.t ->

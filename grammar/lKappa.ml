@@ -788,13 +788,16 @@ let print_expr_of_ast sigs tok algs = function
   | Ast.Alg_pexpr x ->
      Ast.Alg_pexpr (alg_expr_of_ast sigs tok algs x)
 
-let modif_expr_of_ast sigs tok algs = function
+let modif_expr_of_ast sigs tok algs modif acc =
+  match modif with
   | Ast.INTRO (how,(who,pos)) ->
      Ast.INTRO
-       (alg_expr_of_ast sigs tok algs how, (mixture_of_ast sigs pos who,pos))
+       (alg_expr_of_ast sigs tok algs how, (mixture_of_ast sigs pos who,pos)),
+     acc
   | Ast.DELETE (how,(who,pos)) ->
      Ast.DELETE
-       (alg_expr_of_ast sigs tok algs how,(mixture_of_ast sigs pos who,pos))
+       (alg_expr_of_ast sigs tok algs how,(mixture_of_ast sigs pos who,pos)),
+     acc
   | Ast.UPDATE ((lab,pos),how) ->
      let i =
        match Mods.StringMap.find_option lab algs with
@@ -802,7 +805,8 @@ let modif_expr_of_ast sigs tok algs = function
        | None ->
 	  raise (ExceptionDefn.Malformed_Decl
 		   ("Variable " ^ (lab ^ " is not defined"),pos)) in
-     Ast.UPDATE ((i,pos),alg_expr_of_ast sigs tok algs how)
+     Ast.UPDATE ((i,pos),alg_expr_of_ast sigs tok algs how),
+     i::acc
   | Ast.UPDATE_TOK ((lab,pos),how) ->
      let i =
        match Mods.StringMap.find_option lab tok with
@@ -810,28 +814,33 @@ let modif_expr_of_ast sigs tok algs = function
        | None ->
 	  raise (ExceptionDefn.Malformed_Decl
 		   (lab ^" is not a declared token",pos)) in
-     Ast.UPDATE_TOK ((i,pos), alg_expr_of_ast sigs tok algs how)
+     Ast.UPDATE_TOK ((i,pos), alg_expr_of_ast sigs tok algs how),
+     acc
   | Ast.STOP p ->
-     Ast.STOP (List.map (print_expr_of_ast sigs tok algs) p)
+     Ast.STOP (List.map (print_expr_of_ast sigs tok algs) p),acc
   | Ast.SNAPSHOT p ->
-     Ast.SNAPSHOT (List.map (print_expr_of_ast sigs tok algs) p)
+     Ast.SNAPSHOT (List.map (print_expr_of_ast sigs tok algs) p),acc
   | Ast.FLUX (rel,p) ->
-     Ast.FLUX (rel,(List.map (print_expr_of_ast sigs tok algs) p))
+     Ast.FLUX (rel,List.map (print_expr_of_ast sigs tok algs) p),acc
   | Ast.FLUXOFF p ->
-     Ast.FLUXOFF (List.map (print_expr_of_ast sigs tok algs) p)
-  | (Ast.PLOTENTRY | Ast.CFLOWLABEL (_,_ ) as x) -> x
+     Ast.FLUXOFF (List.map (print_expr_of_ast sigs tok algs) p),acc
+  | (Ast.PLOTENTRY | Ast.CFLOWLABEL (_,_ ) as x) -> x,acc
   | Ast.PRINT (p,p') ->
      Ast.PRINT
        (List.map (print_expr_of_ast sigs tok algs) p,
-	List.map (print_expr_of_ast sigs tok algs) p')
-  | Ast.CFLOWMIX (b,(m,pos)) -> Ast.CFLOWMIX (b,(mixture_of_ast sigs pos m,pos))
+	List.map (print_expr_of_ast sigs tok algs) p'),acc
+  | Ast.CFLOWMIX (b,(m,pos)) ->
+     Ast.CFLOWMIX (b,(mixture_of_ast sigs pos m,pos)),acc
 
-let perturbation_of_ast sigs tok algs ((pre,mods,post),pos) =
-  (bool_expr_of_ast sigs tok algs pre,
-   List.map (modif_expr_of_ast sigs tok algs) mods,
+let perturbation_of_ast sigs tok algs ((pre,mods,post),pos) up_vars =
+  let mods',up_vars' =
+    Tools.list_fold_right_map
+      (modif_expr_of_ast sigs tok algs) mods up_vars in
+  ((bool_expr_of_ast sigs tok algs pre,mods',
    match post with
    | None -> None
-   | Some post -> Some (bool_expr_of_ast sigs tok algs post)),pos
+   | Some post -> Some (bool_expr_of_ast sigs tok algs post)),pos),
+  up_vars'
 
 let init_of_ast sigs tok = function
   | Ast.INIT_MIX who,pos ->
@@ -861,7 +870,10 @@ let compil_of_ast overwrite c =
   let tk_nd = NamedDecls.create
 		(Tools.array_map_of_list (fun x -> (x,())) c.Ast.tokens) in
   let tok = tk_nd.NamedDecls.finder in
-  sigs,tk_nd,
+  let perts',updated_vars =
+    Tools.list_fold_right_map
+      (perturbation_of_ast sigs tok algs) c.Ast.perturbations [] in
+  sigs,tk_nd,updated_vars,
   {
     Ast.variables =
       Tools.list_mapi
@@ -898,8 +910,7 @@ let compil_of_ast overwrite c =
       List.map (fun (lab,expr,ini) ->
 		lab,alg_expr_of_ast sigs tok algs expr,init_of_ast sigs tok ini)
 	       c.Ast.init;
-    Ast.perturbations =
-      List.map (perturbation_of_ast sigs tok algs) c.Ast.perturbations;
+    Ast.perturbations = perts';
     Ast.volumes = c.Ast.volumes;
     Ast.tokens = c.Ast.tokens;
     Ast.signatures = c.Ast.signatures;

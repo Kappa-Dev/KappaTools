@@ -34,7 +34,7 @@ module Base : sig
                             method virtual yield : unit -> unit Lwt.t
                           end;;
 end = struct
-  module IntMap = Map.Make(struct type t = int let compare = compare end)
+  module IntMap = Mods.IntMap
   type simulator_state = { switch : Lwt_switch.t
                          ; counter : Counter.t
                          ; log_buffer : Buffer.t
@@ -57,7 +57,7 @@ end = struct
       let raw_ast =
         KappaParser.start_rule KappaLexer.token lexbuf Ast.empty_compil in
       let ast :
-            Signature.s * unit NamedDecls.t *
+            Signature.s * unit NamedDecls.t * int list *
               (Ast.agent, LKappa.rule_agent list, int, LKappa.rule) Ast.compil
         = LKappa.compil_of_ast [] raw_ast in
       let contact_map,_kasa_state =
@@ -100,7 +100,7 @@ end = struct
                      (fun e -> Lwt.return (`Left [e]))
                      self#log)
            (function
-           `Right ((sig_nd,tk_nd,result),contact_map) ->
+           `Right ((sig_nd,tk_nd,updated_vars,result),contact_map) ->
            let current_id = self#new_id () in
            let plot : Api_types.plot ref = ref { Api_types.legend = [];
                                                  Api_types.observables = [] } in
@@ -145,14 +145,18 @@ end = struct
                       (fun () ->
                        (catch
                           (fun () ->
-                           Eval.initialize
+                           Eval.compile
 			     ~pause:(fun f -> Lwt.bind (self#yield ()) f)
 			     ~return:Lwt.return
 			     ?rescale_init:None
 			     ~outputs:(outputs (Signature.create []))
                              sig_nd tk_nd contact_map
                              simulation.counter result >>=
-                             (fun (env,domain,graph,state,_) ->
+                             (fun (env_store,domain,has_tracking,init_l) ->
+			      let (env,graph,state) =
+				Eval.build_initial_state
+				  [] simulation.counter env_store domain has_tracking
+				  updated_vars init_l in
 			      let () = ExceptionDefn.flush_warning log_form in
 			      let sigs = Environment.signatures env in
                               let legend = Environment.map_observables
@@ -213,32 +217,32 @@ end = struct
     method status (token : Api_types.token) : Api_types.state Api_types.result Lwt.t =
       Lwt.catch
         (fun () ->
-         let state : simulator_state = IntMap.find token context.states in
-         let () = if Lwt_switch.is_on state.switch then
-                    ()
-                  else
-                    context <- { context with states = IntMap.remove token context.states }
-         in
-         Lwt.return
-           (match !(state.error_messages) with
-             [] ->
-             `Right ({ Api_types.plot = Some !(state.plot);
-                       Api_types.time = Counter.time state.counter;
-                       Api_types.time_percentage = Counter.time_percentage state.counter;
-                       Api_types.event = Counter.event state.counter;
-                       Api_types.event_percentage = Counter.event_percentage state.counter;
-                       Api_types.tracked_events = Some (Counter.tracked_events state.counter);
-                       Api_types.log_messages = [Buffer.contents state.log_buffer] ;
-                       Api_types.snapshots = !(state.snapshots);
-                       Api_types.flux_maps = !(state.flux_maps);
-                       Api_types.files = !(state.files);
-                       is_running = Lwt_switch.is_on state.switch
-                    } : Api_types.state )
-            | _ -> `Left !(state.error_messages))
+         match IntMap.find_option token context.states with
+	 | None ->  Lwt.return (`Left [msg_token_not_found])
+	 | Some state ->
+            let () =
+	      if not (Lwt_switch.is_on state.switch) then
+		context <- { context with states = IntMap.remove token context.states }
+            in
+            Lwt.return
+              (match !(state.error_messages) with
+		 [] ->
+		 `Right ({ Api_types.plot = Some !(state.plot);
+			   Api_types.time = Counter.time state.counter;
+			   Api_types.time_percentage = Counter.time_percentage state.counter;
+			   Api_types.event = Counter.event state.counter;
+			   Api_types.event_percentage = Counter.event_percentage state.counter;
+			   Api_types.tracked_events = Some (Counter.tracked_events state.counter);
+			   Api_types.log_messages = [Buffer.contents state.log_buffer] ;
+			   Api_types.snapshots = !(state.snapshots);
+			   Api_types.flux_maps = !(state.flux_maps);
+			   Api_types.files = !(state.files);
+			   is_running = Lwt_switch.is_on state.switch
+			 } : Api_types.state )
+               | _ -> `Left !(state.error_messages))
         )
-        (function Not_found -> Lwt.return (`Left [msg_token_not_found])
-                | exn -> (self#log ~exn "")
-                       >>= (fun _ -> Lwt.return (`Left [Printexc.to_string exn]))
+        (fun exn -> (self#log ~exn "")
+                 >>= (fun _ -> Lwt.return (`Left [Printexc.to_string exn]))
         )
     method list () : Api_types.catalog Api_types.result Lwt.t =
       Lwt.return (`Right (List.map fst (IntMap.bindings context.states)))
@@ -246,14 +250,15 @@ end = struct
     method stop (token : Api_types.token) : unit Api_types.result Lwt.t =
     catch
       (fun () ->
-       let state : simulator_state = IntMap.find token context.states in
-       if Lwt_switch.is_on state.switch then
-         Lwt_switch.turn_off state.switch
-         >>= (fun _ -> Lwt.return (`Right ()))
-       else
-         Lwt.return (`Left [msg_process_not_running]))
-      (function Not_found -> Lwt.return (`Left [msg_token_not_found])
-              | e -> Lwt.return (`Left [Printexc.to_string e])
+       match IntMap.find_option token context.states with
+       | None -> Lwt.return (`Left [msg_token_not_found])
+       | Some state ->
+	  if Lwt_switch.is_on state.switch then
+            Lwt_switch.turn_off state.switch
+            >>= (fun _ -> Lwt.return (`Right ()))
+	  else
+            Lwt.return (`Left [msg_process_not_running]))
+      (fun e -> Lwt.return (`Left [Printexc.to_string e])
       )
   end;;
 end;;

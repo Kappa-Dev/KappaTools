@@ -58,10 +58,22 @@ type modification =
 	 Alg_expr.t Ast.print_expr list)
 
 type perturbation =
-    { precondition: Alg_expr.t Ast.bool_expr;
+    { precondition: Alg_expr.t Ast.bool_expr Location.annot;
       effect : modification list;
-      abort : Alg_expr.t Ast.bool_expr option;
-      stopping_time : Nbr.t list
+      abort : Alg_expr.t Ast.bool_expr Location.annot option;
     }
 
 val exists_modification : (modification -> bool) -> perturbation list -> bool
+
+val map_expr_rule : (Alg_expr.t Location.annot -> Alg_expr.t Location.annot) ->
+		    elementary_rule -> elementary_rule
+val map_expr_perturbation :
+  (Alg_expr.t Location.annot -> Alg_expr.t Location.annot) ->
+  (Alg_expr.t Ast.bool_expr Location.annot ->
+   Alg_expr.t Ast.bool_expr Location.annot) ->
+  perturbation -> perturbation
+
+val stops_of_perturbation :
+  (Operator.DepSet.t * Operator.DepSet.t *
+     Operator.DepSet.t array * Operator.DepSet.t array) ->
+  perturbation -> Nbr.t list

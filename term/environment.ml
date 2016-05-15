@@ -7,7 +7,9 @@ type t = {
   rules : Primitives.elementary_rule array;
   cc_of_unaries : Connected_component.Set.t;
   perturbations : Primitives.perturbation array;
-  need_update_each_loop : Operator.DepSet.t;
+  dependencies_in_time : Operator.DepSet.t;
+  dependencies_in_event : Operator.DepSet.t;
+  need_update_each_loop : Operator.DepSet.t; (*union of 2 above for perf*)
   algs_reverse_dependencies : Operator.DepSet.t array;
   tokens_reverse_dependencies : Operator.DepSet.t array;
 }
@@ -19,6 +21,7 @@ let init sigs tokens algs (deps_in_t,deps_in_e,tok_rd,alg_rd)
     observables = obs; perturbations = perts;
     algs_reverse_dependencies = alg_rd; tokens_reverse_dependencies = tok_rd;
     need_update_each_loop = Operator.DepSet.union deps_in_t deps_in_e;
+    dependencies_in_time = deps_in_t; dependencies_in_event = deps_in_e;
   }
 
 let signatures env = env.signatures
@@ -27,8 +30,9 @@ let num_of_agent nme env =
   Signature.num_of_agent nme env.signatures
 
 let fold_rules f x env =
-  Tools.array_fold_lefti
-    (fun i x rule -> f i x rule) x env.rules
+  Tools.array_fold_lefti (fun i x rule -> f i x rule) x env.rules
+let fold_perturbations f x env =
+  Tools.array_fold_lefti (fun i x p -> f i x p) x env.perturbations
 
 let get_rule env i = env.rules.(i)
 let nb_rules env = Array.length env.rules
@@ -57,6 +61,9 @@ let nb_perturbations env = Array.length env.perturbations
 let get_alg_reverse_dependencies env i = env.algs_reverse_dependencies.(i)
 let get_token_reverse_dependencies env i = env.tokens_reverse_dependencies.(i)
 let get_always_outdated env = env.need_update_each_loop
+let all_dependencies env =
+  (env.dependencies_in_time,env.dependencies_in_event,
+   env.tokens_reverse_dependencies,env.algs_reverse_dependencies)
 
 let print_agent ?env f i =
   match env with
@@ -122,3 +129,37 @@ let print pr_alg pr_rule pr_pert f env =
 (*
   desc_table : (string,out_channel * Format.formatter) Hashtbl.t;
  *)
+
+let propagate_constant updated_vars counter x =
+  let algs' = Array.copy x.algs.NamedDecls.decls in
+  let () =
+    Array.iteri
+      (fun i (na,v) ->
+       algs'.(i) <-
+	 (na,Alg_expr.propagate_constant updated_vars counter algs' v))
+      algs' in
+  {
+    signatures = x.signatures;
+    tokens = x.tokens;
+    algs = NamedDecls.create algs';
+    observables =
+      Array.map
+	(Alg_expr.propagate_constant updated_vars counter algs') x.observables;
+    ast_rules = x.ast_rules;
+    rules =
+      Array.map
+	(Primitives.map_expr_rule
+	   (Alg_expr.propagate_constant updated_vars counter algs')) x.rules;
+    cc_of_unaries = x.cc_of_unaries;
+    perturbations =
+      Array.map
+	(Primitives.map_expr_perturbation
+	   (Alg_expr.propagate_constant updated_vars counter algs')
+	   (Alg_expr.propagate_constant_bool updated_vars counter algs'))
+	x.perturbations;
+    need_update_each_loop = x.need_update_each_loop;
+    dependencies_in_time = x.dependencies_in_time;
+    dependencies_in_event = x.dependencies_in_event;
+    algs_reverse_dependencies = x.algs_reverse_dependencies;
+    tokens_reverse_dependencies = x.tokens_reverse_dependencies;
+  }

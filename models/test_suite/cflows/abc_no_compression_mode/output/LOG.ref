@@ -13,7 +13,7 @@ done
 	 -perturbations
 	 -observables
 	 -initial conditions
-	 Done
+Done
 + Command line is: 'KaSim' '-i' 'abc.ka' '-seed' '924556145' '-var' 'on_rate' '1.0E-4' '-e' '2000' '-d' 'output' '-p' '500' '--time-independent'
 Parsing abc.ka...
 done
@@ -29,7 +29,7 @@ done
 	 -perturbations
 	 -observables
 	 -initial conditions
-	 Done
+Done
 ____________________________________________________________
 ############################################################
 Simulation ended

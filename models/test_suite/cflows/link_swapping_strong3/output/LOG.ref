@@ -22,7 +22,7 @@ On roots:
 On roots: 
 On roots: 
 Rule A(x), A(x) -> A(x!1), A(x!1) has now 64 instances.
-	 Done
+Done
 Applied 0:
 0: /*cc1*/ A/*1*/(x), 1: /*cc1*/ A/*1*/(x)
 -- A/*1*//*1*/.x = ⊥, A/*1*//*0*/.x = ⊥ ++ A/*1*//*1*/.x = A/*1*//*0*/.x

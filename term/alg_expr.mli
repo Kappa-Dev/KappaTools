@@ -16,3 +16,15 @@ val add_dep :
 val setup_alg_vars_rev_dep :
   unit NamedDecls.t -> (string Location.annot * t Location.annot) array ->
   (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array * Operator.DepSet.t array)
+
+val propagate_constant :
+  int list -> Counter.t -> (string Location.annot * t Location.annot) array ->
+  t Location.annot -> t Location.annot
+val propagate_constant_bool :
+  int list -> Counter.t -> (string Location.annot * t Location.annot) array ->
+  t Ast.bool_expr Location.annot -> t Ast.bool_expr Location.annot
+
+val stops_of_bool_expr :
+  (Operator.DepSet.t * Operator.DepSet.t *
+     Operator.DepSet.t array * Operator.DepSet.t array) ->
+  t Ast.bool_expr -> Nbr.t list

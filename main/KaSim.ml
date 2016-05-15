@@ -132,7 +132,8 @@ let () =
       Counter.create
 	~init_t:0. ~init_e:0 ?max_t:!maxTimeValue ?max_e:!maxEventValue
 	~nb_points:!pointNumberValue in
-    let (env, cc_env, graph, state, init_l) =
+    let (env_store, cc_env, updated_vars, has_tracking, init_l as init_result),
+      alg_overwrite =
       match !Parameter.marshalizedInFile with
       | "" ->
 	let result =
@@ -140,16 +141,18 @@ let () =
 	  then Ast.implicit_signature result
 	  else result in
 	let () = Format.printf "+ Sanity checks@." in
-	let (sigs_nd,tk_nd,result') =
+	let (sigs_nd,tk_nd,updated_vars,result') =
 	  LKappa.compil_of_ast !Parameter.alg_var_overwrite result in
 	let () = Format.printf "+ KaSa tools initialization@." in
 	let contact_map,_kasa_state =
 	  Eval.init_kasa Remanent_parameters_sig.KaSim result in
 	let () = Format.printf "+ Compiling...@." in
-	Eval.initialize
-	  ~pause:(fun f -> f ()) ~return:(fun x -> x)
-	  ?rescale_init:!rescale ~outputs:(Outputs.go (Signature.create []))
-	  sigs_nd tk_nd contact_map counter result'
+	let (env, cc_env, has_tracking, init_l) =
+	  Eval.compile
+	    ~pause:(fun f -> f ()) ~return:(fun x -> x)
+	    ?rescale_init:!rescale ~outputs:(Outputs.go (Signature.create []))
+	    sigs_nd tk_nd contact_map counter result' in
+	(env, cc_env, updated_vars, has_tracking, init_l),[]
       | marshalized_file ->
 	 try
 	   let d = open_in_bin marshalized_file in
@@ -161,40 +164,46 @@ let () =
 	     else
 	       Format.printf "+Loading simulation package %s...@."
 			     marshalized_file in
-	   let env,cc_env,graph,state,init_l =
+	   let env,cc_env,updated_vars,has_tracking,init_l =
 	     (Marshal.from_channel d :
-		Environment.t*Connected_component.Env.t*
-		  Rule_interpreter.t * State_interpreter.t*
-		    (Alg_expr.t * Primitives.elementary_rule * Location.t) list) in
+		Environment.t*Connected_component.Env.t*int list*bool*
+		  (Alg_expr.t * Primitives.elementary_rule * Location.t) list) in
 	   let () = Pervasives.close_in d  in
-	   let () = Format.printf "Done@." in
-	   let graph,state =
-	     if !Parameter.alg_var_overwrite = [] then graph,state
-	     else
-	       let alg_over =
-		 List.map
-		   (fun (s,v) ->
-		    Environment.num_of_alg (Location.dummy_annot s) env,
-		    Alg_expr.CONST v)
-		   !Parameter.alg_var_overwrite in
-	       let graph0 = Rule_interpreter.reinit graph in
-	       let state0 =
-		 State_interpreter.reinit alg_over state in
-	       State_interpreter.initialize
-		 env cc_env counter graph0 state0 init_l
-	   in
-	   (env,cc_env,graph,state,init_l)
+	   let alg_overwrite =
+	     List.map
+               (fun (s,v) ->
+		Environment.num_of_alg (Location.dummy_annot s) env,
+		Alg_expr.CONST v)
+               !Parameter.alg_var_overwrite in
+	   let updated_vars' =
+	     List.fold_left
+	       (fun acc (i,_) -> i::acc) updated_vars alg_overwrite in
+	   (env,cc_env,updated_vars',has_tracking,init_l),alg_overwrite
 	 with
 	 | ExceptionDefn.Malformed_Decl _ as e -> raise e
 	 | _exn ->
 	    Debug.tag
 	      Format.std_formatter
 	      "!Simulation package seems to have been created with a different version of KaSim, aborting...@.";
-	    exit 1
-    in
+	    exit 1 in
     let () =
       Kappa_files.with_marshalized
-	(fun d -> Marshal.to_channel d (env,cc_env,graph,state,init_l) []) in
+	(fun d -> Marshal.to_channel d init_result []) in
+    let () =
+      if has_tracking &&
+	   not (!Parameter.causalModeOn || !Parameter.weakCompression ||
+		  !Parameter.mazCompression || !Parameter.strongCompression)
+      then
+	ExceptionDefn.warning
+	  (fun f ->
+	   Format.fprintf
+	     f
+	     "An observable may be tracked but no compression level to render stories has been specified")
+    in
+    let (env,graph,state) =
+      Eval.build_initial_state
+	alg_overwrite counter env_store cc_env has_tracking updated_vars init_l in
+    let () = Format.printf "Done@." in
     let () =
       if !Parameter.compileModeOn || !Parameter.debugModeOn then
 	Format.eprintf

@@ -71,11 +71,12 @@ let elementary_rule ?env f r =
     pr_alg r.Primitives.rate
     (fun f -> match r.Primitives.unary_rate with
 	      | None -> ()
-	      | Some (rate, dist) 
-		-> Format.fprintf f " (%a%a)" pr_alg rate
-		   (Pp.option (fun f md-> 
-			       Format.fprintf f ":%a" Format.pp_print_int md))
-		   dist)
+	      | Some (rate, dist)
+		-> Format.fprintf
+		     f " (%a%a)" pr_alg rate
+		     (Pp.option (fun f md ->
+				 Format.fprintf f ":%a" Format.pp_print_int md))
+		     dist)
 let modification ?env f m =
   let sigs = match env with
     | None -> None
@@ -133,13 +134,14 @@ let modification ?env f m =
 
 let perturbation ?env f pert =
   let aux f =
-    Format.fprintf f "%a do %a"
-		   (Ast.print_bool (alg_expr ?env)) pert.Primitives.precondition
-		   (Pp.list Pp.colon (modification ?env)) pert.Primitives.effect
+    Format.fprintf
+      f "%a do %a"
+      (Ast.print_bool (alg_expr ?env)) (fst pert.Primitives.precondition)
+      (Pp.list Pp.colon (modification ?env)) pert.Primitives.effect
   in
   match pert.Primitives.abort with
   | None -> Format.fprintf f "%%mod: %t" aux
-  | Some ab ->
+  | Some (ab,_) ->
      Format.fprintf f "%%mod: repeat %t until %a" aux
 		    (Ast.print_bool (alg_expr ?env)) ab
 
