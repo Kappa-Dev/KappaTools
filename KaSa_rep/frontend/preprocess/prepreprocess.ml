@@ -586,7 +586,7 @@ let rec modif_map f_forbidding_question_marks f_allowing_question_marks error al
    | Ast.CFLOWMIX (a,(mix,pos)) ->
       let error,mix' = f_allowing_question_marks error mix in
       error,Ast.CFLOWMIX(a,(mix',pos))
-   | Ast.FLUX list ->
+   | Ast.FLUX (rel,list) ->
      let error,list' = 
        List.fold_left 
 	 (fun (error,list) elt -> 
@@ -594,7 +594,7 @@ let rec modif_map f_forbidding_question_marks f_allowing_question_marks error al
 	   error,elt'::list)
 	 (error,[]) (List.rev list)
      in 
-	error,Ast.FLUX list'
+	error,Ast.FLUX (rel,list')
    | Ast.FLUXOFF list ->
      let error,list' = 
        List.fold_left 

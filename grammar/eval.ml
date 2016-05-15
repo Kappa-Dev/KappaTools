@@ -202,10 +202,10 @@ let effects_of_modif
 		contact_map domain ~origin:(Operator.PERT(-1)) ast in
 	    (domain',
 	     List.fold_left (fun x (y,t) -> adds t x y) rev_effects ccs)
-	 | FLUX pexpr ->
+	 | FLUX (rel,pexpr) ->
 	    let (domain',pexpr') =
 	      compile_print_expr contact_map counter domain pexpr in
-	    (domain', (Primitives.FLUX pexpr')::rev_effects)
+	    (domain', (Primitives.FLUX (rel,pexpr'))::rev_effects)
 	 | FLUXOFF pexpr ->
 	    let (domain',pexpr') =
 	      compile_print_expr contact_map counter domain pexpr in
@@ -341,22 +341,17 @@ let inits_of_result ?rescale contact_map counter env preenv res =
   (preenv',init_l)
 
 let configurations_of_result result =
-  let get_value acc pos_p param value_list f =
+  let get_value pos_p param value_list f =
     match value_list with
     | (v,pos) :: _ -> f v pos
     | [] ->
-       let () =
-	 ExceptionDefn.warning
-	   ~pos:pos_p
-	   (fun f -> Format.fprintf f "Empty value for parameter %s" param) in
-       acc
-  in
-  let set_value acc pos_p param value_list f ass =
-    let () =
-      get_value () pos_p param value_list (fun x p -> ass := f x p) in
-    acc in
-  let get_bool_value acc pos_p param value_list =
-    get_value acc pos_p param value_list
+      raise 
+	(ExceptionDefn.Malformed_Decl
+	   ("Empty value for parameter "^param,pos_p)) in
+  let set_value pos_p param value_list f ass =
+      get_value pos_p param value_list (fun x p -> ass := f x p) in
+  let get_bool_value pos_p param value_list =
+    get_value pos_p param value_list
 	      (fun value pos_v ->
 	       match value with
 	       | "true" | "yes" -> true
@@ -366,8 +361,8 @@ let configurations_of_result result =
 		    (ExceptionDefn.Malformed_Decl
 		       ("Value "^error^" should be either \"yes\" or \"no\"", pos_v))
 	      ) in
-  List.fold_left
-    (fun acc ((param,pos_p),value_list) ->
+  List.iter
+    (fun ((param,pos_p),value_list) ->
      match param with
      | "displayCompression" ->
 	let rec parse l =
@@ -376,21 +371,19 @@ let configurations_of_result result =
 	     (Parameter.strongCompression := true ; parse tl)
 	  | ("weak",_)::tl -> (Parameter.weakCompression := true ; parse tl)
 	  | ("none",_)::tl -> (Parameter.mazCompression := true ; parse tl)
-	  | [] -> acc
+	  | [] -> ()
 	  | (error,pos)::_ ->
 	     raise (ExceptionDefn.Malformed_Decl
 		      ("Unkown value "^error^" for compression mode", pos))
 	in
 	parse value_list
      | "storeUnaryDistance" ->
-	let () =
-	  Parameter.store_unary_distance := get_bool_value acc pos_p param value_list
-	in acc
+	  Parameter.store_unary_distance := get_bool_value pos_p param value_list
      | "cflowFileName" ->
-	get_value acc pos_p param value_list
-		  (fun x _ -> let () = Kappa_files.set_cflow x in acc)
+	get_value pos_p param value_list
+		  (fun x _ -> Kappa_files.set_cflow x)
      | "progressBarSize" ->
-	set_value acc pos_p param value_list
+	set_value pos_p param value_list
 		  (fun v p ->
 		   try int_of_string v
 		   with _ ->
@@ -399,7 +392,7 @@ let configurations_of_result result =
 		  ) Parameter.progressBarSize
 
      | "progressBarSymbol" ->
-	set_value acc pos_p param value_list
+	set_value pos_p param value_list
 		  (fun v p ->
 		   try
 		     String.unsafe_get v 0
@@ -409,16 +402,14 @@ let configurations_of_result result =
 		  ) Parameter.progressBarSymbol
 
      | "dumpIfDeadlocked" ->
-	let () =
-	  Parameter.dumpIfDeadlocked := get_bool_value acc pos_p param value_list
-	in acc
+       Parameter.dumpIfDeadlocked := get_bool_value pos_p param value_list
      | "plotSepChar" ->
-	set_value acc pos_p param value_list
+	set_value pos_p param value_list
 		  (fun v _ ->
 		   fun f ->  Format.fprintf f "%s" v
 		  ) Parameter.plotSepChar
      | "maxConsecutiveClash" ->
-	set_value acc pos_p param value_list
+	set_value pos_p param value_list
 		  (fun v p ->
 		   try int_of_string v
 		   with _ ->
@@ -427,10 +418,9 @@ let configurations_of_result result =
 		  ) Parameter.maxConsecutiveClash
 
      | "dotCflows" ->
-	let () = Parameter.dotCflows := get_bool_value acc pos_p param value_list
-	in acc
+	Parameter.dotCflows := get_bool_value pos_p param value_list
      | "colorDot" ->
-	set_value acc pos_p param value_list
+	set_value pos_p param value_list
 		  (fun value pos_v ->
 		   match value with
 		   | "true" | "yes" -> true
@@ -439,17 +429,14 @@ let configurations_of_result result =
 		      raise (ExceptionDefn.Malformed_Decl
 			       ("Value "^error^" should be either \"yes\" or \"no\"", pos_v))
 		  ) Parameter.useColor
-     | "relativeFluxMaps" ->
-	get_bool_value acc pos_p param value_list
      | "influenceMapFileName" ->
-	get_value acc pos_p param value_list
-		  (fun x _ -> let () = Kappa_files.set_influence x in acc)
+	get_value pos_p param value_list
+		  (fun x _ -> Kappa_files.set_influence x)
      | "showIntroEvents" ->
-	let () = Parameter.showIntroEvents := get_bool_value acc pos_p param value_list
-	in acc
+	Parameter.showIntroEvents := get_bool_value pos_p param value_list
      | _ as error ->
 	raise (ExceptionDefn.Malformed_Decl ("Unkown parameter "^error, pos_p))
-    ) false result.configurations
+    ) result.configurations
 
 let compile_alg_vars contact_map counter domain vars =
   array_fold_left_mapi
@@ -489,7 +476,7 @@ let initialize ~outputs ~pause ~return
 	       ?rescale_init sigs_nd tk_nd contact_map counter result =
   outputs (Data.Log "+ Building initial simulation conditions...");
   outputs (Data.Log "\t -simulation parameters");
-  let relative_fluxmaps = configurations_of_result result in
+  let () = configurations_of_result result in
   pause
     (fun () ->
   let preenv = Connected_component.PreEnv.empty sigs_nd in
@@ -556,7 +543,7 @@ let initialize ~outputs ~pause ~return
   pause
     (fun () ->
   let graph0 = Rule_interpreter.empty ~has_tracking env in
-  let state0 = State_interpreter.empty env stops relative_fluxmaps in
+  let state0 = State_interpreter.empty env stops in
   let graph,state =
     State_interpreter.initialize env domain counter graph0 state0 init_l in
   let () =

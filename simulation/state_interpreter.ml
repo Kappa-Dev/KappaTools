@@ -5,7 +5,7 @@ type t = {
     activities : Random_tree.tree;
     (* pair numbers are regular rule, odd unary instances *)
     variables_overwrite: Alg_expr.t option array;
-    flux: bool * Data.flux_data list;
+    flux: (bool * Data.flux_data) list;
   }
 
 let get_alg env state i =
@@ -22,7 +22,7 @@ let initial_activity get_alg env counter graph activities =
        Random_tree.add (2*i) (Nbr.to_float rate) activities)
     () env
 
-let empty env stopping_times relative_fluxs =
+let empty env stopping_times =
   let activity_tree =
     Random_tree.create (2*Environment.nb_rules env) in
   let stops =
@@ -35,7 +35,7 @@ let empty env stopping_times relative_fluxs =
     activities = activity_tree;
     variables_overwrite =
       Array.make (Environment.nb_algs env) None;
-    flux = (relative_fluxs,[]);
+    flux = [];
   }
 
 let reinit alg_overwrite state =
@@ -48,7 +48,7 @@ let reinit alg_overwrite state =
       Array.map (fun _ -> true) state.perturbations_alive;
     activities = Random_tree.copy state.activities;
     variables_overwrite = overwrite;
-    flux = (fst state.flux,[]);
+    flux = [];
   }
 
 let initialize env domain counter graph0 state0 init_l =
@@ -156,11 +156,11 @@ let do_it ~outputs env domain counter graph state modification =
       state)
   | Primitives.CFLOWOFF cc ->
      (false, Rule_interpreter.remove_tracked cc graph, state)
-  | Primitives.FLUX s ->
+  | Primitives.FLUX (rel,s) ->
      let file = Format.asprintf "@[<h>%a@]" print_expr_val s in
-     let rel,fluxs = state.flux in
      let () =
-       if List.exists (Fluxmap.flux_has_name file) fluxs
+       if List.exists
+	 (fun (_,x) -> Fluxmap.flux_has_name file x) state.flux
        then ExceptionDefn.warning
 	      (fun f ->
 	       Format.fprintf
@@ -169,15 +169,17 @@ let do_it ~outputs env domain counter graph state modification =
 		 (Counter.current_event counter) file)
      in
      (false, graph, {state with
-		      flux = (rel,Fluxmap.create_flux env counter file::fluxs)})
+       flux =
+	 (rel,Fluxmap.create_flux env counter file)::state.flux})
   | Primitives.FLUXOFF s ->
      let file = Format.asprintf "@[<h>%a@]" print_expr_val s in
-     let rel,fluxs = state.flux in
-     let (these,others) = List.partition (Fluxmap.flux_has_name file) fluxs in
+     let (these,others) =
+       List.partition
+	 (fun (_,x) -> Fluxmap.flux_has_name file x) state.flux in
      let () = List.iter
-		(fun x -> outputs (Data.Flux (Fluxmap.stop_flux env counter x)))
+		(fun (_,x) -> outputs (Data.Flux (Fluxmap.stop_flux env counter x)))
 		these in
-     (false, graph, {state with flux = rel,others})
+     (false, graph, {state with flux = others})
 
 let perturbate ~outputs env domain counter graph state =
   let not_done_yet =
@@ -220,18 +222,19 @@ let one_rule dt stop env domain counter graph state =
   let register_new_activity rd_id syntax_rd_id new_act =
     let () =
       match state.flux with
-      | _, [] -> ()
-      | relative, l ->
+      | [] -> ()
+      | l ->
 	 let old_act = Random_tree.find rd_id state.activities in
 	List.iter
-	  (Fluxmap.incr_flux_flux
-	     rule.Primitives.syntactic_rule syntax_rd_id
-	     (if relative
-	      then match classify_float old_act with
-		   | FP_zero -> 0.
-		   | (FP_normal | FP_subnormal |FP_infinite | FP_nan) ->
-		      (new_act -. old_act) /. old_act
-	      else (new_act -. old_act)))
+	  (fun (relative,fl) ->
+	    Fluxmap.incr_flux_flux
+	      rule.Primitives.syntactic_rule syntax_rd_id
+	      (if relative
+	       then match classify_float old_act with
+	       | FP_zero -> 0.
+	       | (FP_normal | FP_subnormal |FP_infinite | FP_nan) ->
+		 (new_act -. old_act) /. old_act
+	       else (new_act -. old_act)) fl)
 	  l
     in Random_tree.add rd_id new_act state.activities in
   let () =
@@ -263,8 +266,8 @@ let one_rule dt stop env domain counter graph state =
 	 ~get_alg register_new_activity env counter graph' in
      let () =
        List.iter
-	 (Fluxmap.incr_flux_hit rule.Primitives.syntactic_rule)
-	 (snd state.flux) in
+	 (fun (_,fl) -> Fluxmap.incr_flux_hit rule.Primitives.syntactic_rule fl)
+	 state.flux in
      let () =
        if !Parameter.debugModeOn then
 	 Format.printf "@[<v>Obtained@ %a@]@."
@@ -350,7 +353,7 @@ let a_loop ~outputs env domain counter graph state =
 let end_of_simulation ~outputs ~called_from form env counter graph state =
   let () =
     List.iter
-      (fun e ->
+      (fun (_,e) ->
        let () =
 	 ExceptionDefn.warning
 	   (fun f ->
@@ -358,7 +361,7 @@ let end_of_simulation ~outputs ~called_from form env counter graph state =
 	      f "Tracking FLUX into \"%s\" was not stopped before end of simulation"
 	      (Fluxmap.get_flux_name e)) in
        outputs (Data.Flux (Fluxmap.stop_flux env counter e)))
-      (snd state.flux) in
+      state.flux in
   let () = ExceptionDefn.flush_warning form in
   Rule_interpreter.generate_stories ~called_from env graph
 

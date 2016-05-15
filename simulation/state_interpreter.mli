@@ -2,8 +2,8 @@
 
 type t (** Abstract state *)
 
-val empty : Environment.t -> (Nbr.t * int) list -> bool -> t
-(** [empty env stopping_times relative_fluxmaps] *)
+val empty : Environment.t -> (Nbr.t * int) list -> t
+(** [empty env stopping_times] *)
 
 val reinit : (int * Alg_expr.t) list -> t -> t
 

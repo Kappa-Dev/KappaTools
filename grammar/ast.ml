@@ -87,7 +87,7 @@ type ('mixture,'id) modif_expr =
   | PLOTENTRY
   | CFLOWLABEL of (bool * string Location.annot)
   | CFLOWMIX of (bool * 'mixture Location.annot)
-  | FLUX of ('mixture,'id) ast_alg_expr print_expr list
+  | FLUX of bool * ('mixture,'id) ast_alg_expr print_expr list
   | FLUXOFF of ('mixture,'id) ast_alg_expr print_expr list
 
 type ('mixture,'id) perturbation =

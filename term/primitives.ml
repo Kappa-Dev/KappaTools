@@ -101,7 +101,7 @@ type modification =
   | STOP of Alg_expr.t Ast.print_expr list
   | CFLOW of string option * Connected_component.t array *
 	       Instantiation.abstract Instantiation.test list
-  | FLUX of Alg_expr.t Ast.print_expr list
+  | FLUX of bool * Alg_expr.t Ast.print_expr list
   | FLUXOFF of Alg_expr.t Ast.print_expr list
   | CFLOWOFF of Connected_component.t array
   | PLOTENTRY

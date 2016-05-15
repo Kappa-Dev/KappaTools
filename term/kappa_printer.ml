@@ -114,8 +114,10 @@ let modification ?env f m =
      Format.fprintf f "SNAPSHOT %a" (print_expr ?env) fn
   | Primitives.STOP fn ->
      Format.fprintf f "STOP %a" (print_expr ?env) fn
-  | Primitives.FLUX fn ->
-     Format.fprintf f "$FLUX %a [true]" (print_expr ?env) fn
+  | Primitives.FLUX (relative,fn) ->
+     Format.fprintf
+       f "$FLUX %a %t[true]" (print_expr ?env) fn
+       (fun f -> if relative then Format.fprintf f "\"relative\" ")
   | Primitives.FLUXOFF fn ->
      Format.fprintf f "$FLUX %a [false]" (print_expr ?env) fn
   | Primitives.CFLOW (_name,cc,_) ->

@@ -816,8 +816,8 @@ let modif_expr_of_ast sigs tok algs = function
      Ast.STOP (List.map (print_expr_of_ast sigs tok algs) p)
   | Ast.SNAPSHOT p ->
      Ast.SNAPSHOT (List.map (print_expr_of_ast sigs tok algs) p)
-  | Ast.FLUX p ->
-     Ast.FLUX (List.map (print_expr_of_ast sigs tok algs) p)
+  | Ast.FLUX (rel,p) ->
+     Ast.FLUX (rel,(List.map (print_expr_of_ast sigs tok algs) p))
   | Ast.FLUXOFF p ->
      Ast.FLUXOFF (List.map (print_expr_of_ast sigs tok algs) p)
   | (Ast.PLOTENTRY | Ast.CFLOWLABEL (_,_ ) as x) -> x

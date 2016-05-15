@@ -11,7 +11,7 @@
 %token SQRT EXPONENT INFINITY TIME EVENT NULL_EVENT PIPE EQUAL AND OR
 %token GREATER SMALLER TRUE FALSE DIFF KAPPA_RAR KAPPA_LRAR KAPPA_LNK
 %token SIGNATURE INIT LET PLOT PERT OBS TOKEN CONFIG KAPPA_WLD KAPPA_SEMI
-%token FLUX ASSIGN ASSIGN2 PRINT PRINTF STOP SNAPSHOT
+%token FLUX ASSIGN ASSIGN2 PRINTF STOP SNAPSHOT
 %token <int> INT
 %token <string> ID
 %token <string> KAPPA_MRK LABEL
@@ -175,8 +175,12 @@ effect:
 	    {Ast.CFLOWLABEL ($3,($2,rhs_pos 2))}
     | TRACK non_empty_mixture boolean
 	    {Ast.CFLOWMIX ($3,($2,rhs_pos 2))}
-    | FLUX print_expr boolean
-	   {if $3 then Ast.FLUX $2 else Ast.FLUXOFF $2}
+    | FLUX nonempty_print_expr boolean
+	   {if $3 then Ast.FLUX (false,$2) else Ast.FLUXOFF $2}
+    | FLUX nonempty_print_expr STRING boolean
+	   {if $4 && $3 = "relative" then Ast.FLUX (true,$2)
+	     else raise (ExceptionDefn.Syntax_Error
+	       ("Incorrect FLUX expression",rhs_pos 3))}
     | INTRO multiple_mixture
 	    {let (alg,mix) = $2 in Ast.INTRO (alg,mix)}
     | INTRO error
@@ -191,18 +195,19 @@ effect:
 						{Ast.UPDATE_TOK (($1,rhs_pos 1),$3)}
     | SNAPSHOT print_expr {Ast.SNAPSHOT $2}
     | STOP print_expr {Ast.STOP $2}
-    | PRINT SMALLER print_expr GREATER {(Ast.PRINT ([],$3))}
     | PRINTF print_expr SMALLER print_expr GREATER { Ast.PRINT ($2,$4) }
     | PLOTENTRY { Ast.PLOTENTRY }
     ;
 
-print_expr:
-  /*empty*/ {[]}
+nonempty_print_expr:
     | STRING {[Ast.Str_pexpr (add_pos $1)]}
     | alg_expr {[Ast.Alg_pexpr $1]}
-    | STRING DOT print_expr {Ast.Str_pexpr ($1, rhs_pos 1)::$3}
-    | alg_expr DOT print_expr {Ast.Alg_pexpr $1::$3}
+    | STRING DOT nonempty_print_expr {Ast.Str_pexpr ($1, rhs_pos 1)::$3}
+    | alg_expr DOT nonempty_print_expr {Ast.Alg_pexpr $1::$3}
     ;
+print_expr:
+    /*empty*/ {[]}
+    | nonempty_print_expr {$1}
 
 boolean:
     | TRUE {true}

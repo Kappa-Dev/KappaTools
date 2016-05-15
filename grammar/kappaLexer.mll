@@ -55,7 +55,7 @@ rule token = parse
 		      | "$FLUX" -> FLUX
 		      | "$TRACK" -> TRACK
 		      | "$UPDATE" -> ASSIGN2
-		      | "$PRINT" -> PRINT
+		      | "$PRINT" -> PRINTF
 		      | "$PRINTF" -> PRINTF
 		      | "$PLOTENTRY" -> PLOTENTRY
 		      | s ->
