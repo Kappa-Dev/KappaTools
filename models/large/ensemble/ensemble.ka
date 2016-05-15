@@ -358,11 +358,11 @@
 
 
 %mod: [T]=0 do $ADD 10000 Pheromone(ste2)
-#%mod: [T]=360 do $SNAPSHOT "peak_ensemble"
-%mod: [T]=1000 do $SNAPSHOT "end_ensemble"
+%mod: [T]=360 do $SNAPSHOT "peak_ensemble"
+%mod: [T]=[Tmax] do $SNAPSHOT "end_ensemble"; \
+  $FLUX "flux_ensemble2_t1000_p3000.dot" [false]
 #%mod: repeat [T]= do $SNAPSHOT "autodrift_ensemble" until [false]
 %mod: [true] do $FLUX "flux_ensemble2_t1000_p3000.dot" [true]
-%def: "dumpInfluenceMap" "yes"
 %def: "influenceMapFileName" "im_ensemble2_t1000_p3000"
 
 
