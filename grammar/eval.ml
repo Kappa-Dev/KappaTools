@@ -1,4 +1,3 @@
-open Mods
 open Tools
 open Ast
 
@@ -138,7 +137,7 @@ let cflows_of_label contact_map domain on algs rules (label,pos) rev_effects =
    List.fold_left (fun x (y,t) -> adds t x y) rev_effects ccs)
 
 let effects_of_modif
-      algs ast_algs ast_rules contact_map counter domain ast_list =
+      ast_algs ast_rules contact_map counter domain ast_list =
   let rec iter rev_effects domain ast_list =
     let rule_effect alg_expr (mix,created,rm,add) mix_pos =
       let ast_rule =
@@ -172,18 +171,10 @@ let effects_of_modif
 	 | DELETE (alg_expr, (ast_mix, mix_pos)) ->
 	    rule_effect
 	      alg_expr (LKappa.to_erased ast_mix,[],[],[]) mix_pos
-	 | UPDATE ((nme, pos_rule), alg_expr) ->
-	    begin
-	      match StringMap.find_option nme algs.NamedDecls.finder with
-	      | Some i ->
-		 let (domain', alg_pos) =
-		   Expr.compile_alg contact_map counter domain alg_expr in
-		 (domain',(Primitives.UPDATE (i, alg_pos))::rev_effects)
-	      | None ->
-		 raise (ExceptionDefn.Malformed_Decl
-			  ("Variable " ^ (nme ^ " is not a constant")
-			  ,pos_rule))
-	    end
+	 | UPDATE ((i, _), alg_expr) ->
+	    let (domain', alg_pos) =
+	      Expr.compile_alg contact_map counter domain alg_expr in
+	    (domain',(Primitives.UPDATE (i, alg_pos))::rev_effects)
 	 | UPDATE_TOK ((tk_id,tk_pos),alg_expr) ->
 	    rule_effect (Location.dummy_annot (Ast.CONST (Nbr.one)))
 			([],[],
@@ -233,7 +224,7 @@ let effects_of_modif
   iter [] domain ast_list
 
 let pert_of_result
-      algs algs_deps ast_algs ast_rules contact_map counter domain res =
+      algs_deps ast_algs ast_rules contact_map counter domain res =
   let (domain, _, lpert, stop_times,tracking_enabled) =
     List.fold_left
       (fun (domain, p_id, lpert, stop_times, tracking_enabled)
@@ -249,8 +240,8 @@ let pert_of_result
 		,pos_pre))
        in
        let (domain, effects) =
-	 effects_of_modif algs ast_algs ast_rules
-			  contact_map counter domain' modif_expr_list in
+	 effects_of_modif
+	   ast_algs ast_rules contact_map counter domain' modif_expr_list in
        let domain,opt,stopping_time =
 	 match opt_post with
 	 | None -> (domain,None,stopping_time)
@@ -519,7 +510,7 @@ let initialize ~outputs ~pause ~return
     (fun () ->
   outputs (Data.Log "\t -perturbations");
   let (preenv,pert,stops,has_tracking) =
-    pert_of_result alg_nd alg_deps' result.variables result.rules
+    pert_of_result alg_deps' result.variables result.rules
 		   contact_map counter preenv' result in
   let () =
     if Counter.max_time counter = None && Counter.max_events counter = None &&

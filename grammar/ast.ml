@@ -73,7 +73,7 @@ type ('mixture,'id) modif_expr =
   | DELETE of
       (('mixture,'id) ast_alg_expr Location.annot * 'mixture Location.annot)
   | UPDATE of
-      (string Location.annot *
+      ('id Location.annot *
 	 ('mixture,'id) ast_alg_expr Location.annot) (*TODO: pause*)
   | UPDATE_TOK of
       ('id Location.annot *

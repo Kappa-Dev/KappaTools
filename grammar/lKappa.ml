@@ -797,7 +797,13 @@ let modif_expr_of_ast sigs tok algs = function
      Ast.DELETE
        (alg_expr_of_ast sigs tok algs how,(mixture_of_ast sigs pos who,pos))
   | Ast.UPDATE ((lab,pos),how) ->
-     Ast.UPDATE ((lab,pos),alg_expr_of_ast sigs tok algs how)
+     let i =
+       match Mods.StringMap.find_option lab algs with
+       | Some i -> i
+       | None ->
+	  raise (ExceptionDefn.Malformed_Decl
+		   ("Variable " ^ (lab ^ " is not defined"),pos)) in
+     Ast.UPDATE ((i,pos),alg_expr_of_ast sigs tok algs how)
   | Ast.UPDATE_TOK ((lab,pos),how) ->
      let i =
        match Mods.StringMap.find_option lab tok with
