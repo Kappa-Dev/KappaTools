@@ -53,6 +53,8 @@ type step_kind =
   | Domain_initialization of string
   | Apply_rule of int
   | Initial_state of int
+  | Scan_rule_static of int
+  | Scan_rule_dynamic of int
 
 let string_of_step_kind x =
   match
@@ -87,6 +89,8 @@ let string_of_step_kind x =
     | Domain_initialization string -> Printf.sprintf "Domain initialization (%s)" string
     | Apply_rule int -> Printf.sprintf "Apply rule %i" int
     | Initial_state int -> Printf.sprintf "Initial state %i" int
+    | Scan_rule_static int -> Printf.sprintf "Scan rule %i (static)" int
+    | Scan_rule_dynamic int -> Printf.sprintf "Scan rule %i (dynamic)" int
 
 let print_step_kind parameters x =
   Loggers.print_cell (Remanent_parameters.get_profiler parameters)

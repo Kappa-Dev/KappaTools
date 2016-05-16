@@ -249,15 +249,18 @@ struct
     let compiled = get_compil static in
     let handler_bdu = get_mvbdu_handler dynamic in
     let potential_side_effects = get_potential_side_effects static in
-    let error, (handler_bdu, result) =
+    let log_info = get_log_info dynamic in
+    let error, (handler_bdu, log_info, result) =
       Bdu_static_views.scan_rule_set
         parameter
+        log_info
         handler_bdu
         error
         kappa_handler
         compiled
         potential_side_effects
     in
+    let dynamic = set_log_info log_info dynamic in
     let dynamic = set_mvbdu_handler handler_bdu dynamic in
     let static = set_domain_static result static in
     error, static, dynamic
@@ -271,9 +274,11 @@ struct
     let covering_classes = get_covering_classes static in
     let covering_classes_id = get_covering_classes_id static in
     let potential_side_effects = get_potential_side_effects static in
-    let error, (handler_bdu, store_result) =
+    let log_info = get_log_info dynamic in
+    let error, (handler_bdu, log_info, store_result) =
       Bdu_dynamic_views.scan_rule_set_dynamic
         parameter
+        log_info
         error
         compiled
         kappa_handler
@@ -283,6 +288,7 @@ struct
         covering_classes_id
         potential_side_effects
     in
+    let dynamic = set_log_info log_info dynamic in
     let dynamic = set_mvbdu_handler handler_bdu dynamic in
     let dynamic = set_domain_dynamic_information store_result dynamic in
     error, static, dynamic
@@ -296,7 +302,8 @@ struct
         (StoryProfiling.Domain_initialization domain_name)
         None log_info
     in
-  let error, init_bdu_analysis_static =
+    let dynamic = Analyzer_headers.set_log_info log_info dynamic in
+    let error, init_bdu_analysis_static =
       Bdu_static_views.init_bdu_analysis_static parameter error
     in
     let init_global_static =
@@ -313,12 +320,12 @@ struct
     in
     let init_global_dynamic =
       {
-	global = dynamic;
-	local =
-	  { dead_rule = init_dead_rule_array;
-	    fixpoint_result = init_fixpoint;
-	    domain_dynamic_information = init_bdu_analysis_dynamic;
-	  }}
+        global = dynamic;
+        local =
+          { dead_rule = init_dead_rule_array;
+            fixpoint_result = init_fixpoint;
+            domain_dynamic_information = init_bdu_analysis_dynamic;
+          }}
     in
     let error, init_static, init_dynamic =
       scan_rule_set_static init_global_static init_global_dynamic error
@@ -326,6 +333,7 @@ struct
     let error, static, dynamic =
       scan_rule_set_dynamic init_static init_dynamic error
     in
+    let log_info = get_log_info dynamic in
     let error, log_info = StoryProfiling.StoryStats.close_event parameter error
         (StoryProfiling.Domain_initialization domain_name)
         None log_info

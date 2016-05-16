@@ -270,7 +270,7 @@ let collect_dual_map parameter error handler store_result =
 
 (************************************************************************************)
 
-let scan_rule_dynamic parameter error rule_id rule compiled
+let scan_rule_dynamic parameter log_info error rule_id rule compiled
     kappa_handler
     handler_bdu
     covering_classes
@@ -279,28 +279,36 @@ let scan_rule_dynamic parameter error rule_id rule compiled
     store_pre_static
     store_result
     =
-  let error, store_update =
-    store_update
-      parameter
-      error
-      store_pre_static.Bdu_static_views.store_test_modif_map
-      store_potential_side_effects
-      store_covering_classes_id
-      covering_classes
-      store_result.store_update
-  in
-  let error, store_dual_contact_map =
-    collect_dual_map
-      parameter
-      error
-      kappa_handler
-      store_result.store_dual_contact_map
-  in
-  error, handler_bdu,
-  {
-    store_update = store_update;
-    store_dual_contact_map = store_dual_contact_map
-  }
+    let error, log_info = StoryProfiling.StoryStats.add_event parameter error
+        (StoryProfiling.Scan_rule_dynamic (Ckappa_sig.int_of_rule_id rule_id))
+        None log_info
+    in
+    let error, store_update =
+      store_update
+        parameter
+        error
+        store_pre_static.Bdu_static_views.store_test_modif_map
+        store_potential_side_effects
+        store_covering_classes_id
+        covering_classes
+        store_result.store_update
+    in
+    let error, store_dual_contact_map =
+      collect_dual_map
+        parameter
+        error
+        kappa_handler
+        store_result.store_dual_contact_map
+    in
+    let error, log_info = StoryProfiling.StoryStats.close_event parameter error
+        (StoryProfiling.Scan_rule_dynamic (Ckappa_sig.int_of_rule_id rule_id))
+        None log_info
+    in
+    error, handler_bdu, log_info,
+    {
+      store_update = store_update;
+      store_dual_contact_map = store_dual_contact_map
+    }
 
 (************************************************************************************)
 
@@ -316,20 +324,25 @@ let init_bdu_analysis_dynamic =
 (************************************************************************************)
 (*rules*)
 
-let scan_rule_set_dynamic parameter error compiled
+let scan_rule_set_dynamic
+    parameter
+    log_info
+    error
+    compiled
     kappa_handler
     handler_bdu
     store_pre_static
     covering_classes
     store_covering_classes_id
     store_potential_side_effects =
-  let error, (handler_bdu, store_result) =
+  let error, (handler_bdu, log_info, store_result) =
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
       parameter error
-      (fun parameter error rule_id rule (handler_bdu, store_result) ->
-        let error, handler_bdu, store_result =
+      (fun parameter error rule_id rule (handler_bdu, log_info, store_result) ->
+        let error, handler_bdu, log_info, store_result =
           scan_rule_dynamic
             parameter
+            log_info
             error
             rule_id
             rule.Cckappa_sig.e_rule_c_rule
@@ -342,7 +355,7 @@ let scan_rule_set_dynamic parameter error compiled
             store_pre_static
             store_result
         in
-        error, (handler_bdu, store_result)
-      ) compiled.Cckappa_sig.rules (handler_bdu, init_bdu_analysis_dynamic)
+        error, (handler_bdu, log_info, store_result)
+      ) compiled.Cckappa_sig.rules (handler_bdu, log_info, init_bdu_analysis_dynamic)
   in
-  error, (handler_bdu, store_result)
+  error, (handler_bdu, log_info, store_result)

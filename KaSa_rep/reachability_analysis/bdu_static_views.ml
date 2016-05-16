@@ -1076,11 +1076,15 @@ let collect_proj_bdu_test_restriction parameter handler error
 
 (************************************************************************************)
 
-let scan_rule_static parameter error handler_kappa handler_bdu
+let scan_rule_static parameter log_info error handler_kappa handler_bdu
     (rule_id:Ckappa_sig.c_rule_id) rule
     store_potential_side_effects compil store_result =
   (*------------------------------------------------------------------------------*)
   (*pre_static*)
+  let error, log_info = StoryProfiling.StoryStats.add_event parameter error
+      (StoryProfiling.Scan_rule_static (Ckappa_sig.int_of_rule_id rule_id))
+      None log_info
+  in
   let error, handler_bdu, store_pre_static =
     scan_rule_pre_static
       parameter
@@ -1159,7 +1163,11 @@ let scan_rule_static parameter error handler_kappa handler_bdu
       store_result.store_proj_bdu_test_restriction
   in
   (*-------------------------------------------------------------------------------*)
-  error, handler_bdu,
+  let error, log_info = StoryProfiling.StoryStats.close_event parameter error
+      (StoryProfiling.Scan_rule_static (Ckappa_sig.int_of_rule_id rule_id))
+      None log_info
+  in
+  error, log_info, handler_bdu,
   {
     store_pre_static = store_pre_static;
     store_covering_classes = store_covering_classes;
@@ -1221,26 +1229,27 @@ let init_bdu_analysis_static parameter error =
 
 (************************************************************************************)
 
-let scan_rule_set parameter handler_bdu error handler_kappa compiled
+let scan_rule_set parameter log_info handler_bdu error handler_kappa compiled
    store_potential_side_effects =
   let error, init = init_bdu_analysis_static parameter error in
-  let error, (handler_bdu, store_results) =
+  let error, (handler_bdu, log_info, store_results) =
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
       parameter error
-      (fun parameter error rule_id rule (handler_bdu, store_result) ->
-        let error, handler_bdu, store_result =
+      (fun parameter error rule_id rule (handler_bdu, log_info, store_result) ->
+        let error, log_info, handler_bdu, store_result =
           scan_rule_static
             parameter
+            log_info
             error
-	    handler_kappa
-	    handler_bdu
+            handler_kappa
+            handler_bdu
             rule_id
             rule.Cckappa_sig.e_rule_c_rule
             store_potential_side_effects
             compiled
             store_result
         in
-        error, (handler_bdu, store_result)
-      ) compiled.Cckappa_sig.rules (handler_bdu, init)
+        error, (handler_bdu, log_info, store_result)
+      ) compiled.Cckappa_sig.rules (handler_bdu, log_info, init)
   in
-  error, (handler_bdu, store_results)
+  error, (handler_bdu, log_info, store_results)
