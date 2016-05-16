@@ -143,7 +143,7 @@ let print_json_of_unary_distances f unary_distances rules =
 		      | None -> (l, i+1))
       ([],0) unary_distances in
   Format.fprintf
-    f "[%a]"
+    f "[%a]@."
     (Pp.list
        Pp.comma
        (fun f (id,time,distance) ->
