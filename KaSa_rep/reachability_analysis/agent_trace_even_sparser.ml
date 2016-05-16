@@ -59,7 +59,7 @@ type extensional_representation =
     edges: (Ckappa_sig.Views_intbdu.mvbdu * label * Ckappa_sig.Views_intbdu.mvbdu) list ;
     nodes_creation: (Ckappa_sig.Views_intbdu.mvbdu * label) list ;
     nodes_degradation: (Ckappa_sig.Views_intbdu.mvbdu * label) list ;
-    macro_state_to_state: int list Wrapped_modules.LoggedIntMap.t ;
+    subframe: Mods.IntSet.t Mods.IntMap.t ;
     nodes_in_bdu: Mods.IntSet.t
   }
 
@@ -84,7 +84,7 @@ let empty_transition_system =
     nodes_creation = [];
     nodes_degradation = [];
     nodes = [] ;
-    macro_state_to_state = Wrapped_modules.LoggedIntMap.empty;
+    subframe = Mods.IntMap.empty;
     nodes_in_bdu = Mods.IntSet.empty
   }
 
@@ -446,6 +446,62 @@ let concurrent_sites parameter error mvbdu support =
     support
     (error, LabelMap.empty)
 
+let add key im map =
+  let old_set = Mods.IntMap.find_default Mods.IntSet.empty key map in
+  Mods.IntMap.add key (Mods.IntSet.add im old_set) map
+
+let addsub small big transition_system =
+  {
+    transition_system
+    with
+      subframe = add small big transition_system.subframe;
+    }
+
+let add_whether_subframe parameter error mvbdu1 mvbdu2 transition_system =
+  if
+    Ckappa_sig.Views_intbdu.equal mvbdu1 mvbdu2
+  then
+    error, transition_system
+  else
+    let mvbdu_lub = Ckappa_sig.Views_intbdu.mvbdu_or mvbdu1 mvbdu2 in
+    if Ckappa_sig.Views_intbdu.equal mvbdu_lub mvbdu2 then
+      let error, hash1 = hash_of_mvbdu parameter error mvbdu1 in
+      let error, hash2 = hash_of_mvbdu parameter error mvbdu2 in
+      error, addsub hash1 hash2 transition_system
+    else
+      error, transition_system
+
+let check_all_subframes parameter error transition_system =
+  List.fold_left
+    (fun (error, transition_system) mvbdu1 ->
+       List.fold_left
+         (fun (error, transition_system) mvbdu2 ->
+            add_whether_subframe parameter error mvbdu1 mvbdu2 transition_system
+         )
+         (error, transition_system)
+         transition_system.nodes
+    )
+    (error, transition_system)
+    transition_system.nodes
+
+let reduce_subframes transition_system =
+  {
+    transition_system
+      with
+        subframe =
+          Mods.IntMap.map
+            (fun set ->
+               Mods.IntSet.filter
+                 (fun i ->
+                    Mods.IntSet.for_all
+                      (fun j ->
+                         not (Mods.IntSet.mem i (Mods.IntMap.find_default
+                                                   Mods.IntSet.empty j transition_system.subframe)))
+                      set)
+                 set)
+            transition_system.subframe
+  }
+
 
 let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
   (*let saved_handler = ref handler in
@@ -494,11 +550,12 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
       creation
   in
   let empty = Ckappa_sig.Views_intbdu.build_variables_list [] in
-  let error =
-    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.iter
+  let log_info = StoryProfiling.StoryStats.init_log_info () in
+  let error, log_info =
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
       parameter
       error
-      (fun parameter error agent_type map  ->
+      (fun parameter error agent_type map log_info ->
          let error, support =
            Ckappa_sig.Agent_map_and_set.Map.find_default parameter error
              LabelMap.empty agent_type support
@@ -514,7 +571,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
            Exception.check warn parameter error error' (Some "line 1917") Exit
          in
          Wrapped_modules.LoggedIntMap.fold
-           (fun _ mvbdu (error:Exception.method_handler) ->
+           (fun _ mvbdu (error, log_info) ->
               try
                 begin
                   let sites =
@@ -682,7 +739,13 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
                         error, transition_system)
                   support
                   (error, transition_system)
-              in
+                  in
+                  let error, transition_system =
+                    check_all_subframes parameter error transition_system
+                  in
+                  let transition_system =
+                    reduce_subframes transition_system
+                  in
               (* nodes -> Initial *)
               let error,handler =
                 List.fold_left
@@ -707,13 +770,13 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
               in
               (* macro_steps *)
               let error =
-                Wrapped_modules.LoggedIntMap.fold
+                Mods.IntMap.fold
                   (fun k _ error ->
                      let () =
                        Printf.fprintf fic
                          "Macro_%i [width=\"0cm\" height=\"0cm\" stype=\"none\" label=\"\"];\n" k
                      in error)
-                  transition_system.macro_state_to_state
+                  transition_system.subframe
                   error
               in
               (* edges  *)
@@ -778,31 +841,32 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
                   transition_system.nodes_creation
               in
               let () =
-                Wrapped_modules.LoggedIntMap.iter
+                Mods.IntMap.iter
                   (fun key l ->
-                     if l = []
+                     if Mods.IntSet.is_empty l
                      then
                        ()
                      else
                        let () =
                          Printf.fprintf fic "Macro_%i -> Node_%i [style=\"dotted\" label=\"\"];\n" key key
                        in
-                       List.iter
+                       Mods.IntSet.iter
                          (fun h ->
                             Printf.fprintf fic "Macro_%i -> Node_%i [style=\"dashed\" label=\"\"];\n"
                               key h ) l)
-                  transition_system.macro_state_to_state
+                  transition_system.subframe
               in
               let _ = Printf.fprintf fic "}\n" in
               let _ = close_out fic in
-              error
+              error, log_info
             end
           with ExceptionDefn_with_no_dep.UserInterrupted _ ->
-            error
+            error, log_info
        )
        map
-       error)
-      output
+       (error, log_info))
+       output
+       log_info
   in
   match
     Ckappa_sig.Views_intbdu.export_handler error
