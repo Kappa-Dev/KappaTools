@@ -378,9 +378,7 @@ let configurations_of_result result =
 	in
 	parse value_list
      | "jsonUnaryDistance" ->
-	let () =
-	  Parameter.json_unary_distance := get_bool_value acc pos_p param value_list
-	in acc
+	  Parameter.json_unary_distance := get_bool_value pos_p param value_list
      | "storeUnaryDistance" ->
 	  Parameter.store_unary_distance := get_bool_value pos_p param value_list
      | "cflowFileName" ->

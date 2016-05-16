@@ -20,8 +20,8 @@ type snapshot = {
 
 type distances = (float * int) list option array
 
-type unary_distances = 
-    { distances_data : distances; 
+type unary_distances =
+    { distances_data : distances;
       distances_rules : string array;
     }
 

@@ -167,7 +167,7 @@ let out_of_unary_distances unary_distances rules =
   Array.iteri (fun id distances_list ->
 	       match distances_list with
 	       | None -> ()
-	       | Some ls -> 
+	       | Some ls ->
 		  (*create the file *)
 		  let filename = Kappa_files.get_distances () in
 		  let filename_string = filename^(string_of_int id)^".out" in
