@@ -28,15 +28,15 @@ sig
 end
 
 type elementary_rule = {
-  rate : Alg_expr.t;
-  unary_rate : (Alg_expr.t * int option) option;
+  rate : Alg_expr.t Location.annot;
+  unary_rate : (Alg_expr.t Location.annot * int option) option;
   connected_components : Connected_component.t array;
   removed : Instantiation.abstract Transformation.t list;
   inserted : Instantiation.abstract Transformation.t list;
   fresh_bindings :
     (Instantiation.abstract Instantiation.site * Instantiation.abstract Instantiation.site) list;
-  consumed_tokens : (Alg_expr.t * int) list;
-  injected_tokens : (Alg_expr.t * int) list;
+  consumed_tokens : (Alg_expr.t Location.annot * int) list;
+  injected_tokens : (Alg_expr.t Location.annot * int) list;
   syntactic_rule : int;
   (** [0] means generated for perturbation. *)
   instantiations : Instantiation.abstract Instantiation.event;

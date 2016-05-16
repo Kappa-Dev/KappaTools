@@ -43,7 +43,7 @@ let elementary_rule ?env f r =
   let sigs = match env with
     | None -> None
     | Some e -> Some (Environment.signatures e) in
-  let pr_alg f a = alg_expr ?env f a in
+  let pr_alg f (a,_) = alg_expr ?env f a in
   let pr_tok f (va,tok) =
     Format.fprintf
       f "%a <- %a"
@@ -68,11 +68,11 @@ let elementary_rule ?env f r =
     (if r.Primitives.inserted <> [] && r.Primitives.injected_tokens <> []
      then Pp.space else Pp.empty)
     (Pp.list Pp.space pr_tok) r.Primitives.injected_tokens
-    (alg_expr ?env) r.Primitives.rate
+    pr_alg r.Primitives.rate
     (fun f -> match r.Primitives.unary_rate with
 	      | None -> ()
 	      | Some (rate, dist) 
-		-> Format.fprintf f " (%a%a)" (alg_expr ?env) rate
+		-> Format.fprintf f " (%a%a)" pr_alg rate
 		   (Pp.option (fun f md-> 
 			       Format.fprintf f ":%a" Format.pp_print_int md))
 		   dist)
@@ -92,7 +92,7 @@ let modification ?env f m =
 	 | [ va, id ] ->
 	    Format.fprintf f "%a <- %a"
 			   (Environment.print_token ?env) id
-			   (alg_expr ?env) va
+			   (fun f (a,_) -> alg_expr ?env f a) va
 	 | _ -> assert false
        else
 	 let boxed_cc i f cc =

@@ -18,7 +18,7 @@ let initial_activity get_alg env counter graph activities =
     (fun i () rule ->
      if Array.length rule.Primitives.connected_components = 0 then
        let rate = Rule_interpreter.value_alg
-		    counter graph ~get_alg rule.Primitives.rate in
+		    counter graph ~get_alg (fst rule.Primitives.rate) in
        Random_tree.add (2*i) (Nbr.to_float rate) activities)
     () env
 

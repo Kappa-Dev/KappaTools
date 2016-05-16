@@ -4,7 +4,7 @@ open Ast
 let tokenify contact_map counter domain l =
   List.fold_right
     (fun (alg_expr,id) (domain,out) ->
-     let (domain',(alg,_pos)) =
+     let (domain',alg) =
        Expr.compile_alg contact_map counter domain alg_expr in
      (domain',(alg,id)::out)
     ) l (domain,[])
@@ -22,10 +22,10 @@ let rules_of_ast
     match deps_machinery with
     | None -> None,None
     | Some (o,d) -> Some o, Some d in
-  let (crate,_ as crp) = Expr.compile_pure_alg counter rule.LKappa.r_rate in
+  let crp = Expr.compile_pure_alg counter rule.LKappa.r_rate in
   let unary_infos =
     match rule.LKappa.r_un_rate with
-    | None -> fun _ uncc -> crate,None,uncc
+    | None -> fun _ uncc -> crp,None,uncc
     | Some ((_,pos as rate),dist) ->
        let dist' = match dist with
 	 | None -> None
@@ -34,12 +34,12 @@ let rules_of_ast
 	      raise (ExceptionDefn.Malformed_Decl
 		      ("Unary rule canot be applied at distance 0. ",pos_dist))
 	    else Some dist in
-       let (unrate,_) = Expr.compile_pure_alg counter rate in
+       let unrate = Expr.compile_pure_alg counter rate in
        fun ccs uncc ->
        match Array.length ccs with
        | (0 | 1) -> unrate,None,uncc
        | 2 ->
-	  crate,Some (unrate, dist'),
+	  crp,Some (unrate, dist'),
 	  Connected_component.Set.add
 	    ccs.(0) (Connected_component.Set.add ccs.(1) uncc)
        | n ->

@@ -501,7 +501,8 @@ let update_outdated_activities ~get_alg store env counter state =
 	   let () =
 	     store_activity
 	       ~get_alg store env counter state (2*i)
-	       rule.Primitives.syntactic_rule rule.Primitives.rate cc_va in
+	       rule.Primitives.syntactic_rule
+	       (fst rule.Primitives.rate) cc_va in
            match Mods.IntMap.pop i state.matchings_of_rule with
 	   | None,_ -> state
 	   | Some _, match' -> { state with matchings_of_rule = match'})
@@ -526,14 +527,14 @@ let update_outdated_activities ~get_alg store env counter state =
 	    let () =
 	      store_activity
 		~get_alg store env counter state' (2*i+1)
-		rule.Primitives.syntactic_rule unrate va in
+		rule.Primitives.syntactic_rule (fst unrate) va in
 	    state') state'' env in
   {state''' with outdated_elements = (Operator.DepSet.empty,[],true) }
 
 let update_tokens ~get_alg env counter state consumed injected =
   let do_op op state l =
     List.fold_left
-      (fun st (expr,i) ->
+      (fun st ((expr,_),i) ->
 	let () =
 	  st.tokens.(i) <-
 	    op st.tokens.(i) (value_alg ~get_alg counter st expr) in
@@ -724,14 +725,16 @@ let adjust_rule_instances ~rule_id ~get_alg store env counter state rule =
       state.edges state.roots_of_ccs rule.Primitives.connected_components in
   let () =
     store_activity
-      ~get_alg store env counter state (2*rule_id) rule.Primitives.syntactic_rule
-      rule.Primitives.rate (List.length matches) in
+      ~get_alg store env counter state (2*rule_id)
+      rule.Primitives.syntactic_rule
+      (fst rule.Primitives.rate) (List.length matches) in
   { state with
-    matchings_of_rule = Mods.IntMap.add rule_id matches state.matchings_of_rule }
+    matchings_of_rule =
+      Mods.IntMap.add rule_id matches state.matchings_of_rule }
 
 let adjust_unary_rule_instances ~rule_id ~get_alg store env counter state rule =
-  let cands =
-    Mods.IntMap.find_default Mods.Int2Set.empty rule_id state.unary_candidates in
+  let cands = Mods.IntMap.find_default
+		Mods.Int2Set.empty rule_id state.unary_candidates in
   let cc1 = rule.Primitives.connected_components.(0) in
   let cc2 = rule.Primitives.connected_components.(1) in
   let byebye,stay =
@@ -748,8 +751,9 @@ let adjust_unary_rule_instances ~rule_id ~get_alg store env counter state rule =
       cands in
   let () =
     store_activity
-      ~get_alg store env counter state (2*rule_id+1) rule.Primitives.syntactic_rule
-      rule.Primitives.rate (Mods.Int2Set.size stay) in
+      ~get_alg store env counter state (2*rule_id+1)
+      rule.Primitives.syntactic_rule
+      (fst rule.Primitives.rate) (Mods.Int2Set.size stay) in
   { state with
     unary_candidates =
       if Mods.Int2Set.is_empty stay
