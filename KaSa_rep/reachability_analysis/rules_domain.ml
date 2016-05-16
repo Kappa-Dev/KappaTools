@@ -63,7 +63,7 @@ struct
   (** global dynamic information*)
 
   let get_global_dynamic_information dynamic = dynamic.global
-
+  let set_global_dynamic_information gdynamic dynamic = {dynamic with global = gdynamic}
   (** dead rule local dynamic information*)
   let get_dead_rule dynamic = dynamic.local
 
@@ -255,7 +255,7 @@ struct
 	      in
 	      let () = Loggers.print_newline (Remanent_parameters.get_logger parameter) in
 	      error
-	  in 
+	  in
           aux
             (Ckappa_sig.rule_id_of_int ((Ckappa_sig.int_of_rule_id k) + 1))
             error

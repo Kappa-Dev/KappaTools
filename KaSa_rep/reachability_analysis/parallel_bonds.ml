@@ -121,6 +121,10 @@ struct
         local_static_information = local
     }
 
+      let get_global_dynamic_information dynamic = dynamic.global
+
+      let set_global_dynamic_information gdynamic dynamic = {dynamic with global = gdynamic}
+
   (*rhs*)
 
   let get_action_binding static = lift Analyzer_headers.get_action_binding static

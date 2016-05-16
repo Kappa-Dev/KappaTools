@@ -26,8 +26,8 @@ struct
     {
       global_static_information : Analyzer_headers.global_static_information;
     }
-   
-  type local_dynamic_information = 
+
+  type local_dynamic_information =
     {
       contact_map_dynamic : Ckappa_sig.PairAgentSiteState_map_and_set.Set.t;
       bonds_per_site : (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
@@ -52,7 +52,7 @@ struct
   let get_kappa_handler static = lift Analyzer_headers.get_kappa_handler static
 
   let get_compil static = lift Analyzer_headers.get_cc_code static
-    
+
   let get_bond_rhs static = lift Analyzer_headers.get_bonds_rhs static
 
   let get_bond_lhs static = lift Analyzer_headers.get_bonds_lhs static
@@ -77,6 +77,9 @@ struct
       dynamic with local = local
     }
 
+  let get_global_dynamic_information dynamic = dynamic.global
+  let set_global_dynamic_information gdynamic dynamic = {dynamic with global = gdynamic}
+
   let get_contact_map_dynamic dynamic =
     (get_local_dynamic_information dynamic).contact_map_dynamic
 
@@ -86,7 +89,7 @@ struct
         (get_local_dynamic_information dynamic) with
           contact_map_dynamic = contact_map
       } dynamic
-      
+
   let get_bonds_per_site dynamic =
     (get_local_dynamic_information dynamic).bonds_per_site
 
@@ -96,7 +99,7 @@ struct
         (get_local_dynamic_information dynamic) with
           bonds_per_site = bonds
       } dynamic
-      
+
   (**************************************************************************)
   (*implementations*)
 
@@ -122,7 +125,7 @@ struct
           then error, state
           else warn parameter error (Some "line 196") Exit Ckappa_sig.dummy_state_index
       in
-      error, (agent_type1, state1) 
+      error, (agent_type1, state1)
 
   (**************************************************************************)
 
@@ -171,30 +174,30 @@ struct
 
   (**************************************************************************)
   (*Implementation*)
-    
+
   let add_oriented_bond_in_set_of_bonds static dynamic error (x, y) =
     let parameter = get_parameter static in
     let contact_map_dynamic = get_contact_map_dynamic dynamic in
     let error, contact_map_dynamic =
       Ckappa_sig.PairAgentSiteState_map_and_set.Set.add_when_not_in
-        parameter error 
+        parameter error
         (x, y)
         contact_map_dynamic
     in
     let dynamic = set_contact_map_dynamic contact_map_dynamic dynamic in
-    error, dynamic		       
+    error, dynamic
 
   let add_bond_in_set_of_bonds static dynamic error (x, y) =
     let error, dynamic = add_oriented_bond_in_set_of_bonds static dynamic error (x, y) in
     add_oriented_bond_in_set_of_bonds static dynamic error (y, x)
-      
+
   let add_oriented_bond_in_map_of_bonds static dynamic error (x, y) =
     let (agent_type, site_type, state) = x in
     let (agent_type', site_type', state') = y in
     let parameter = get_parameter static in
     let bonds_per_site = get_bonds_per_site dynamic in
     let error, old_map =
-      match 
+      match
         Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
 	  parameter error
 	  (agent_type, site_type)
@@ -225,7 +228,7 @@ struct
   let add_oriented_bond static dynamic error bond =
     let error, dynamic = add_oriented_bond_in_set_of_bonds static dynamic error bond in
     add_oriented_bond_in_map_of_bonds static dynamic error bond
-      
+
   let add_bond static dynamic error bond =
     let error, dynamic = add_bond_in_set_of_bonds static dynamic error bond in
     add_bond_in_map_of_bonds static dynamic error bond
@@ -236,7 +239,7 @@ struct
      the bond (x,y) is given, the bond (y,x) is given as well, and we can use
      the oriented version *)
   (* but if this is not the case, we have to use the unoriented version *)
-      
+
   (**bond occurs in the initial state*)
 
   let collect_bonds_initial static dynamic error init_state =
@@ -282,7 +285,7 @@ struct
     error, dynamic, event_list
 
   (**************************************************************************)
-  
+
   let is_enabled static dynamic error rule_id precondition =
     (*test if the bond in the lhs has already in the contact map, if not
       None, *)
@@ -297,7 +300,7 @@ struct
       | error, Some s -> error, s
     in
     if Ckappa_sig.PairAgentSiteState_map_and_set.Set.subset bond_lhs_set contact_map
-    then 
+    then
       (* use the function Communication.overwrite_potential_partners_map to
          fill the two fields related to the dynamic contact map *)
       (* then use the functions get_potential_partner and/or
@@ -305,8 +308,8 @@ struct
          (dynamic) contact map *)
       (* instead of the static one *)
       let error, precondition =
-        Communication.overwrite_potential_partners_map 
-          parameter 
+        Communication.overwrite_potential_partners_map
+          parameter
           error
           precondition
           (fun agent_type site_type state ->
@@ -327,8 +330,8 @@ struct
             Communication.fold =
 	      begin
 		fun parameter error agent_type site_type ->
-		  let error, statemap_bottop = 
-                    Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs 
+		  let error, statemap_bottop =
+                    Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
                       parameter error
                       (agent_type, site_type) dynamic.local.bonds_per_site
                   in
@@ -349,7 +352,7 @@ struct
       in
       error, dynamic, Some precondition
     else error, dynamic, None
-      
+
   (**************************************************************************)
 
   let apply_rule static dynamic error rule_id precondition =
@@ -366,14 +369,14 @@ struct
       | error, Some s -> error, s
     in
     let error', union =
-      Ckappa_sig.PairAgentSiteState_map_and_set.Set.union 
+      Ckappa_sig.PairAgentSiteState_map_and_set.Set.union
         parameter error contact_map bond_rhs_set
     in
     let error = Exception.check warn parameter error error' (Some "line 590") Exit in
     let dynamic = set_contact_map_dynamic union dynamic in
     let new_contact_map = get_contact_map_dynamic dynamic in
     let error', map_diff =
-      Ckappa_sig.PairAgentSiteState_map_and_set.Set.diff 
+      Ckappa_sig.PairAgentSiteState_map_and_set.Set.diff
         parameter error new_contact_map contact_map
     in
     let error = Exception.check warn parameter error error' (Some "line 569") Exit in
@@ -424,11 +427,11 @@ struct
                   try
                     Handler.string_of_site parameter error kappa_handler agent_type1 site_type1
                   with
-                    _ -> warn parameter error (Some "line 492") Exit 
+                    _ -> warn parameter error (Some "line 492") Exit
                       (Ckappa_sig.string_of_site_name site_type1)
                 in
                 let error, state1_string =
-                    try 
+                    try
                       Handler.string_of_state_fully_deciphered parameter error kappa_handler
                         agent_type1 site_type1 state1
                     with
@@ -445,11 +448,11 @@ struct
                     try
                       Handler.string_of_site parameter error kappa_handler agent_type2 site_type2
                     with
-                      _ -> warn parameter error (Some "line 688") Exit 
+                      _ -> warn parameter error (Some "line 688") Exit
                         (Ckappa_sig.string_of_site_name site_type2)
                 in
                 let error, state2_string =
-                  try 
+                  try
                     Handler.string_of_state_fully_deciphered parameter error kappa_handler
                       agent_type2 site_type2 state2
                   with
@@ -464,12 +467,12 @@ struct
                   agent_type2_string
                   site_type2_string
                   state2_string
-                  
+
               in
               ()
             ) pair
         in
-        ()                        
+        ()
       ) store_result
 
   let print_contact_map static dynamic error store_result =
@@ -490,11 +493,11 @@ struct
               try
                 Handler.string_of_site parameter error kappa_handler agent_type1 site_type1
               with
-                _ -> warn parameter error (Some "line 492") Exit 
+                _ -> warn parameter error (Some "line 492") Exit
                   (Ckappa_sig.string_of_site_name site_type1)
             in
             let error, state1_string =
-              try 
+              try
                 Handler.string_of_state_fully_deciphered parameter error kappa_handler
                   agent_type1 site_type1 state1
               with
@@ -511,11 +514,11 @@ struct
               try
                 Handler.string_of_site parameter error kappa_handler agent_type2 site_type2
               with
-                _ -> warn parameter error (Some "line 688") Exit 
+                _ -> warn parameter error (Some "line 688") Exit
                   (Ckappa_sig.string_of_site_name site_type2)
             in
             let error, state2_string =
-              try 
+              try
                 Handler.string_of_state_fully_deciphered parameter error kappa_handler
                   agent_type2 site_type2 state2
               with
@@ -529,11 +532,11 @@ struct
               state1_string
               agent_type2_string
               site_type2_string
-              state2_string              
+              state2_string
           in
           ()
         ) store_result
-    in ()    
+    in ()
 
   let print static dynamic error loggers =
     (*let store_contact_map = get_contact_map_dynamic dynamic in

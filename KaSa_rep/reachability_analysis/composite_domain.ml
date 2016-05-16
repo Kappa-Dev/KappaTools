@@ -65,8 +65,9 @@ module type Composite_domain =
     val c_mixture_is_reachable: (Ckappa_sig.mixture, Usual_domains.maybe_bool) unary
     val cc_mixture_is_reachable: (Cckappa_sig.mixture, Usual_domains.maybe_bool) unary
     val lkappa_mixture_is_reachable: (LKappa.rule_mixture, Usual_domains.maybe_bool) unary
-
-
+    val get_global_dynamic_information: dynamic_information -> Analyzer_headers.global_dynamic_information
+    val set_global_dynamic_information:
+      Analyzer_headers.global_dynamic_information -> dynamic_information -> dynamic_information
   end
 
 (*****************************************************************************************)
@@ -154,7 +155,7 @@ struct
   let next_rule static dynamic error =
     let working_list = get_working_list dynamic in
     (* see if the working list is empty, if not pop an element *)
-    if 
+    if
       Ckappa_sig.Rule_FIFO.is_empty
         working_list
     then error, dynamic, None
@@ -357,5 +358,9 @@ struct
 
   let ast_mixture_is_reachable static dynamic error lkappa =
     error, dynamic, Usual_domains.Maybe (* to do via c_is_reachable *)
+
+  let get_global_dynamic_information dynamic = Domain.get_global_dynamic_information dynamic.domain
+  let set_global_dynamic_information gdynamic dynamic =
+    {dynamic with domain = Domain.set_global_dynamic_information gdynamic dynamic.domain}
 
 end

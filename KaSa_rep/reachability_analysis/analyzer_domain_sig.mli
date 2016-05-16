@@ -28,7 +28,8 @@ module type Domain =
       }
 
     val get_parameter: static_information -> Remanent_parameters_sig.parameters
-
+    val get_global_dynamic_information: dynamic_information -> Analyzer_headers.global_dynamic_information
+    val set_global_dynamic_information:  Analyzer_headers.global_dynamic_information -> dynamic_information -> dynamic_information
     val initialize:
       Analyzer_headers.global_static_information ->
       Analyzer_headers.global_dynamic_information ->
@@ -80,4 +81,3 @@ module type Domain =
     val lkappa_mixture_is_reachable: (Ast.mixture, Usual_domains.maybe_bool) unary
 
   end
-

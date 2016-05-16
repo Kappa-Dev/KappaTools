@@ -41,6 +41,9 @@ module Product
 
     let get_parameter static = Underlying_domain.get_parameter static.underlying_domain
 
+    let get_global_dynamic_information dynamic = dynamic.global
+    let set_global_dynamic_information gdynamic dynamic = {dynamic with global = gdynamic}
+
     let warn static mh message exn default =
   Exception.warn (get_parameter static) mh (Some "product_domain") message exn (fun () -> default)
 
@@ -308,6 +311,3 @@ module Product
 	static dynamic error ccmixture
 
    end:Analyzer_domain_sig.Domain)
-
-
-

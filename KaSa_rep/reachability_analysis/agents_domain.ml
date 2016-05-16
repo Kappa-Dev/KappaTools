@@ -21,7 +21,7 @@ let local_trace = false
 
 module Domain =
 struct
-          
+
   type static_information =
     {
       global_static_information : Analyzer_headers.global_static_information;
@@ -81,6 +81,7 @@ struct
   (** global static/dynamic information*)
 
   let get_global_dynamic_information dynamic = dynamic.global
+  let set_global_dynamic_information gdynamic dynamic = {dynamic with global = gdynamic}
 
   (** dead rule local dynamic information*)
   let get_seen_agent dynamic = dynamic.local
@@ -89,6 +90,8 @@ struct
     {
       dynamic with local = seen_agent
     }
+
+
 
   (*--------------------------------------------------------------------*)
 
@@ -204,7 +207,7 @@ struct
             | error, Some l -> error, l
           in
           let rule_id_list = rule_id :: old_list in
-          Ckappa_sig.Agent_map_and_set.Map.add_or_overwrite 
+          Ckappa_sig.Agent_map_and_set.Map.add_or_overwrite
             parameter
             error
             agent_type
@@ -229,8 +232,8 @@ struct
           (*add rule_id in map*)
           let error, result =
             Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
-              parameter 
-              error 
+              parameter
+              error
               rule_id
               (agents_test_list, agents_created_list)
               store_result
@@ -245,7 +248,7 @@ struct
 	      agents_without_interface
           in
           error, (result, agents_without_interface)
-        ) compil.Cckappa_sig.rules (Ckappa_sig.Rule_map_and_set.Map.empty, 
+        ) compil.Cckappa_sig.rules (Ckappa_sig.Rule_map_and_set.Map.empty,
                                     Ckappa_sig.Agent_map_and_set.Map.empty)
     in
     let static = set_agents_without_interface agents static in
@@ -305,7 +308,7 @@ struct
       let dynamic = set_seen_agent local dynamic in
       let error, rule_id_list =
         match Ckappa_sig.Agent_map_and_set.Map.find_option_without_logs
-          parameter 
+          parameter
           error
 	  agent_type
           map
@@ -416,7 +419,7 @@ struct
       match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
         parameter
         error
-        rule_id 
+        rule_id
         domain_static
       with
       | error, None -> error, []

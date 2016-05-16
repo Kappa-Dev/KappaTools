@@ -65,9 +65,9 @@ module type Composite_domain =
     val c_mixture_is_reachable: (Ckappa_sig.mixture, Usual_domains.maybe_bool) unary
     val cc_mixture_is_reachable: (Cckappa_sig.mixture, Usual_domains.maybe_bool) unary
     val lkappa_mixture_is_reachable: (LKappa.rule_mixture, Usual_domains.maybe_bool) unary
+    val get_global_dynamic_information: dynamic_information -> Analyzer_headers.global_dynamic_information
+    val set_global_dynamic_information: Analyzer_headers.global_dynamic_information -> dynamic_information -> dynamic_information
 
   end
 
 module Make : functor (Domain:Analyzer_domain_sig.Domain) -> Composite_domain
-
-

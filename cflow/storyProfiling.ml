@@ -48,6 +48,11 @@ type step_kind =
   | Store_trace
   | Removing_blacklisted_events
   | Blacklisting_events
+  | Global_initialization
+  | Domains_initialization
+  | Domain_initialization of string
+  | Apply_rule of int
+  | Initial_state of int
 
 let string_of_step_kind x =
   match
@@ -77,6 +82,11 @@ let string_of_step_kind x =
     | Store_trace -> "Store trace"
     | Removing_blacklisted_events -> "Removing black-listed events"
     | Blacklisting_events -> "Blaklisting events"
+    | Global_initialization -> "Global initialization"
+    | Domains_initialization -> "Domains initialization"
+    | Domain_initialization string -> Printf.sprintf "Domain initialization (%s)" string
+    | Apply_rule int -> Printf.sprintf "Apply rule %i" int
+    | Initial_state int -> Printf.sprintf "Initial state %i" int
 
 let print_step_kind parameters x =
   Loggers.print_cell (Remanent_parameters.get_profiler parameters)

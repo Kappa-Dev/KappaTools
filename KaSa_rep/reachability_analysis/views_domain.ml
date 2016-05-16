@@ -19,6 +19,7 @@
 let direct_computation = false
 let new_computation = false
 
+let domain_name = "View domain"
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "views_domain") message exn
     (fun () -> default)
@@ -108,7 +109,7 @@ struct
   (** global dynamic information*)
 
   let get_global_dynamic_information dynamic = dynamic.global
-
+  let set_global_dynamic_information gdynamic dynamic = {dynamic with global = gdynamic}
   (** handler *)
   let get_mvbdu_handler dynamic =
     Analyzer_headers.get_mvbdu_handler (get_global_dynamic_information dynamic)
@@ -290,7 +291,12 @@ struct
 
   let initialize static dynamic error =
     let parameter = Analyzer_headers.get_parameter static in
-    let error, init_bdu_analysis_static =
+    let log_info = Analyzer_headers.get_log_info dynamic in
+    let error, log_info = StoryProfiling.StoryStats.add_event parameter error
+        (StoryProfiling.Domain_initialization domain_name)
+        None log_info
+    in
+  let error, init_bdu_analysis_static =
       Bdu_static_views.init_bdu_analysis_static parameter error
     in
     let init_global_static =
@@ -320,6 +326,11 @@ struct
     let error, static, dynamic =
       scan_rule_set_dynamic init_static init_dynamic error
     in
+    let error, log_info = StoryProfiling.StoryStats.close_event parameter error
+        (StoryProfiling.Domain_initialization domain_name)
+        None log_info
+    in
+    let dynamic = set_log_info log_info dynamic in
     error, static, dynamic
 
   (** get type bdu_analysis_static*)

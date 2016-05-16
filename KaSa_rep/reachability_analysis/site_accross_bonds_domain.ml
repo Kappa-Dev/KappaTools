@@ -120,7 +120,7 @@ struct
   (** global dynamic information*)
 
   let get_global_dynamic_information dynamic = dynamic.global
-
+  let set_global_dynamic_information gdynamic dynamic = {dynamic with global = gdynamic}
   (*--------------------------------------------------------------------*)
 
   type 'a zeroary =
