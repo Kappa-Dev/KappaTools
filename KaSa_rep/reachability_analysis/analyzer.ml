@@ -17,7 +17,7 @@ let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Bdu_fixpoint_iteration") message exn
     (fun () -> default)
 
-let local_trace = false
+let local_trace = true
 
 module type Analyzer =
   sig
@@ -64,9 +64,9 @@ struct
     error, dynamic
 
   let main parameter error mvbdu_handler compil kappa_handler =
-    let error, static, dynamic = 
+    let error, static, dynamic =
       Analyzer_headers.initialize_global_information
-        parameter error mvbdu_handler compil kappa_handler 
+        parameter error mvbdu_handler compil kappa_handler
     in
     let error, init = Analyzer_headers.compute_initial_state error static in
     let error, static, dynamic = Domain.initialize static dynamic error in
@@ -74,7 +74,7 @@ struct
       List.fold_left
 	(fun (error, dynamic) chemical_species ->
 	  let error, dynamic, () =
-            Domain.add_initial_state static dynamic error chemical_species 
+            Domain.add_initial_state static dynamic error chemical_species
           in
 	  error, dynamic)
 	(error, dynamic)
@@ -107,17 +107,17 @@ struct
           in
 	  begin
 	    let error, dynamic, is_enabled =
-              Domain.is_enabled static dynamic error rule_id 
+              Domain.is_enabled static dynamic error rule_id
             in
 	    match is_enabled with
-	    | None -> 
+	    | None ->
               let _ =
                 if local_trace
                   || Remanent_parameters.get_dump_reachability_analysis_iteration parameter
                   || Remanent_parameters.get_trace parameter
                 then
                   let () =
-                    Loggers.fprintf log "\t\tthe predcondition is not satsified yet" 
+                    Loggers.fprintf log "\t\tthe predcondition is not satsified yet"
                   in
                   let () = Loggers.print_newline log
                   in
@@ -135,11 +135,11 @@ struct
                   ()
               in
 	      let error, dynamic, () =
-                Domain.apply_rule static dynamic error rule_id precondition 
+                Domain.apply_rule static dynamic error rule_id precondition
               in
               aux error dynamic
 	  end
-      in aux error dynamic       
+      in aux error dynamic
     in
     (*print test*)
     let _ = print static dynamic error [] in

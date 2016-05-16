@@ -16,27 +16,17 @@ module A =
   Analyzer.Make
     (Composite_domain.Make
        (Product.Product
-	  (Parallel_bonds.Domain)
-	  (Product.Product
-	     (Site_accross_bonds_domain.Domain)
-	     (Product.Product
-		(Views_domain.Domain)
-		(Product.Product
-		   (Contact_map_domain.Domain)
-		   (Product.Product
-	              (Agents_domain.Domain)
-	              (Rules_domain.Domain)
-		   )
-		)
-	     )
-	  )
-       )
-    )
+          (Parallel_bonds.Domain)
+          (Product.Product
+             (Site_accross_bonds_domain.Domain)
+             (Product.Product
+                (Views_domain.Domain)
+                (Product.Product
+                   (Contact_map_domain.Domain)
+                   (Product.Product
+                      (Agents_domain.Domain)
+                      (Rules_domain.Domain)))))))
 
-(*module B =
-  Analyzer.Make
-    (Composite_domain.Make
-       (Global_domain.Domain))*)
 
 let main () =
   let error = Exception.empty_error_handler in
@@ -59,12 +49,14 @@ let main () =
       error
   in
   let parameters_c_compil = Remanent_parameters.update_call_stack parameters Preprocess.local_trace (Some "Preprocess.translate_c_compil") in
-  let _ = Format.printf "Compiling...@." in
+  let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "Compiling..." in
+  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
   let error,handler,c_compil = Preprocess.translate_c_compil parameters_c_compil error handler refined_compil in
   let error =
     if Remanent_parameters.get_do_contact_map parameters
     then
-      let _ = Format.printf "Generating the raw contact map...@." in
+      let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "Generating the raw contact map..." in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
       Print_handler.dot_of_contact_map parameters error handler
     else error
   in
@@ -78,7 +70,8 @@ let main () =
    let error =
     if Remanent_parameters.get_do_influence_map parameters
     then
-      let _ = Format.printf "Generating the raw influence map...@." in
+      let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "Generating the raw influence map..." in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
       let parameters_quark = Remanent_parameters.update_call_stack parameters Quark.local_trace (Some "Quark.quarkify") in
       let parameters_quark = Remanent_parameters.update_prefix parameters_quark "Quarks:" in
       let error,quark_map = Quark.quarkify parameters_quark error  handler c_compil  in
@@ -95,22 +88,25 @@ let main () =
 	with
 	| Remanent_parameters_sig.None | Remanent_parameters_sig.Low -> error,wake_up_map,inhibition_map
 	| Remanent_parameters_sig.Medium | Remanent_parameters_sig.High | Remanent_parameters_sig.Full ->
-	  let parameters_refine_influence_map = Remanent_parameters.update_prefix parameters "Refine_influence_map:" in
-	  let _ = Format.printf "Refining the influence map...@." in
-	  let error,wake_up_map = Algebraic_construction.filter_influence parameters_refine_influence_map error handler c_compil wake_up_map true in
-	  let error,inhibition_map = Algebraic_construction.filter_influence parameters error handler c_compil inhibition_map false in
-	  error,wake_up_map,inhibition_map
+   let parameters_refine_influence_map = Remanent_parameters.update_prefix parameters "Refine_influence_map:" in
+   let () = Loggers.fprintf (Remanent_parameters.get_logger parameters)
+       "Refining the influence map..." in
+   let () = Loggers.print_newline (Remanent_parameters.get_logger parameters)
+   in
+   let error,wake_up_map = Algebraic_construction.filter_influence parameters_refine_influence_map error handler c_compil wake_up_map true in
+   let error,inhibition_map = Algebraic_construction.filter_influence parameters error handler c_compil inhibition_map false in
+   error,wake_up_map,inhibition_map
       in
       let error =
-	if (Remanent_parameters.get_trace parameters_influence_map) || Print_quarks.trace
-	then 
+        if (Remanent_parameters.get_trace parameters_influence_map) || Print_quarks.trace
+        then
           Print_quarks.print_wake_up_map
             parameters_influence_map
-            error 
+            error
             handler
             c_compil
             Handler.print_rule_txt
-            Handler.print_var_txt 
+            Handler.print_var_txt
             Handler.get_label_of_rule_txt
             Handler.get_label_of_var_txt
             Handler.print_labels_txt "\n"
@@ -150,7 +146,9 @@ let main () =
   let error, static_opt, dynamic_opt =
     if Remanent_parameters.get_do_reachability_analysis parameters
     then
-      let _ = Format.printf "\nReachability analysis...@." in
+      let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "Reachability analysis..." in
+      let () = Loggers.print_newline (Remanent_parameters.get_logger parameters)
+      in
       let parameters_cv =
         Remanent_parameters.update_prefix parameters "" in
       let _ =
@@ -172,7 +170,9 @@ let main () =
       let parameters_stoch = Remanent_parameters.update_prefix parameters "Stochastic flow of information:" in
       let _ =
         if Remanent_parameters.get_trace parameters
-        then Loggers.fprintf (Remanent_parameters.get_logger parameters_stoch) "Stochastic flow of information:\n"
+        then
+          let () = Loggers.fprintf (Remanent_parameters.get_logger parameters_stoch) "Stochastic flow of information:" in
+          let () = Loggers.print_newline (Remanent_parameters.get_logger parameters_stoch) in ()
       in
       let error, stochastic_flow =
         Stochastic_classes.stochastic_classes parameters_stoch error handler c_compil
@@ -186,8 +186,10 @@ let main () =
       let parameters_ode = Remanent_parameters.update_prefix parameters "Flow of information in the ODE semantics:" in
       let _ =
 	if (Remanent_parameters.get_trace parameters)
-	then Loggers.fprintf (Remanent_parameters.get_logger parameters_ode) "Flow of information in the ODE semantics:\n"
-      in
+ then
+   let () = Loggers.fprintf (Remanent_parameters.get_logger parameters_ode) "Flow of information in the ODE semantics:" in
+   let () = Loggers.print_newline (Remanent_parameters.get_logger parameters_ode) in ()
+       in
       let error, ode_fragmentation =
         Ode_fragmentation_main.ode_fragmentation parameters_ode error handler c_compil
       in error, Some ode_fragmentation
@@ -197,4 +199,3 @@ let main () =
   ()
 
 let _ = main ()
-

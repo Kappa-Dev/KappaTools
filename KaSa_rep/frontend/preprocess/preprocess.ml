@@ -1445,14 +1445,14 @@ let translate_rule parameters error handler rule =
               (error,bind)
         in
         let actions = {actions with Cckappa_sig.release = release ; Cckappa_sig.bind = bind } in
-        let error, half_release_set =
+          let error, half_release_set =
           List.fold_left
             (fun (error, half_release_set) (source,target) ->
                check_freeness parameters c_rule_lhs target
                  (check_freeness parameters c_rule_lhs source (error, half_release_set)))
             (error, half_release_set)
             bind
-        in
+            in
         aux_agent
           (Ckappa_sig.agent_id_of_int (Ckappa_sig.int_of_agent_id k + 1))
           (error,(direct,reverse,actions,half_release_set,full_release_set,dead))
