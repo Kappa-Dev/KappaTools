@@ -23,11 +23,12 @@ module type Analyzer =
 
     val main:
       Remanent_parameters_sig.parameters ->
+      StoryProfiling.StoryStats.log_info ->
       Exception.method_handler ->
       Ckappa_sig.Views_bdu.handler ->
       Cckappa_sig.compil ->
       Cckappa_sig.kappa_handler ->
-      Exception.method_handler * static_information * dynamic_information
+      Exception.method_handler * StoryProfiling.StoryStats.log_info * static_information * dynamic_information
 
     val export:
       static_information ->

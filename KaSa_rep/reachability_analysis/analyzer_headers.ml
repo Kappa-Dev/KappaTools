@@ -29,13 +29,14 @@ type global_static_information =
 type global_dynamic_information =
   {
     dynamic_dummy: unit;
-    mvbdu_handler: Mvbdu_wrapper.Mvbdu.handler
+    mvbdu_handler: Mvbdu_wrapper.Mvbdu.handler;
+    log_info: StoryProfiling.StoryStats.log_info;
   }
 
 type event =
 | Dummy
 | Check_rule of Ckappa_sig.c_rule_id
-| See_a_new_bond of ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state) 
+| See_a_new_bond of ((Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state)
                      * (Ckappa_sig.c_agent_name * Ckappa_sig.c_site_name * Ckappa_sig.c_state))
 
 type 'a bot_or_not =
@@ -71,18 +72,18 @@ sig
   val find: path -> 'a t -> 'a option
 end
 
-module PathSetMap = 
+module PathSetMap =
   SetMap.Make (struct type t = path let compare = compare let print _ _ = () end)
 
 module PathMap =
   (struct
 
     type 'a t   = 'a PathSetMap.Map.t
-    
+
     let empty _ = PathSetMap.Map.empty
     let add     = PathSetMap.Map.add
     let find    = PathSetMap.Map.find_option
-      
+
    end:PathMap)
 
 type kasa_state = unit
@@ -140,7 +141,7 @@ let set_potential_side_effects eff static =
 
 let get_bonds_rhs static =
   (get_bdu_common_static static).Common_static.store_bonds_rhs
-    
+
 let set_bonds_rhs bonds static =
   set_bdu_common_static
     {
@@ -151,7 +152,7 @@ let set_bonds_rhs bonds static =
 
 let get_bonds_lhs static =
   (get_bdu_common_static static).Common_static.store_bonds_lhs
-    
+
 let set_bonds_lhs bonds static =
   set_bdu_common_static
     {
@@ -162,7 +163,7 @@ let set_bonds_lhs bonds static =
 
 let get_action_binding static =
   (get_bdu_common_static static).Common_static.store_action_binding
-    
+
 let set_action_binding bonds static =
   set_bdu_common_static
     {
@@ -186,6 +187,8 @@ let compute_initial_state error static =
 
 let get_mvbdu_handler dynamic = dynamic.mvbdu_handler
 let set_mvbdu_handler handler dynamic = {dynamic with mvbdu_handler = handler}
+let get_log_info dynamic = dynamic.log_info
+let set_log_info log_info dynamic = {dynamic with log_info = log_info}
 
 let scan_rule static error =
   let parameter = get_parameter static in
@@ -197,7 +200,7 @@ let scan_rule static error =
   let static = set_bdu_common_static store_result static in
   error, static
 
-let initialize_global_information parameter error mvbdu_handler compilation kappa_handler =
+let initialize_global_information parameter log_info error mvbdu_handler compilation kappa_handler =
   let init_common = Common_static.init_bdu_common_static in
   let init_global_static =
     {
@@ -214,6 +217,7 @@ let initialize_global_information parameter error mvbdu_handler compilation kapp
     {
       dynamic_dummy = () ;
       mvbdu_handler = mvbdu_handler ;
+      log_info = log_info;
     }
   in
   let error, static = scan_rule init_global_static error in

@@ -872,7 +872,7 @@ let create parameter handler error r_id ag_id agent_type ext_list update nodes_a
   error,(handler,nodes_adj)
 
 
-let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
+let agent_trace parameter log_info error handler handler_kappa mvbdu_true compil output =
   let rules = compil.Cckappa_sig.rules in
   let init = compil.Cckappa_sig.init in
   let error, support = build_support parameter error rules in
@@ -902,27 +902,29 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 	()
       end
   in
-  Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
-    parameter
-    error
-    (fun parameter error agent_type map handler ->
-      let error', agent_string =
-	try
-	  Handler.string_of_agent parameter error handler_kappa agent_type
-	with
-	  _ -> warn parameter error (Some "line 111") Exit
-            (Ckappa_sig.string_of_agent_name agent_type)
-      in
-      let error = Exception.check warn parameter error error' (Some "line 1917") Exit in
-      Wrapped_modules.LoggedIntMap.fold
-	(fun _ mvbdu (error,handler) ->
-	 let error, handler, sites = Ckappa_sig.Views_bdu.variables_list_of_mvbdu parameter handler error mvbdu in
-	 let error, handler, list = Ckappa_sig.Views_bdu.extensional_of_mvbdu parameter handler error mvbdu in
-	 let error, handler, ext_list =  Ckappa_sig.Views_bdu.extensional_of_variables_list parameter handler error sites in
-	 let error, file_name =
-	   List.fold_left
-	     (fun (error, string) site ->
-	      let error, site_string = Handler.string_of_site parameter error handler_kappa agent_type site in
+  let error, (log_info, handler) =
+    Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
+      parameter
+      error
+      (fun parameter error agent_type map (log_info,handler) ->
+         let error', agent_string =
+           try
+             Handler.string_of_agent parameter error handler_kappa agent_type
+           with
+             _ -> warn parameter error (Some "line 111") Exit
+                    (Ckappa_sig.string_of_agent_name agent_type)
+         in
+         let error = Exception.check warn parameter error error' (Some "line 1917") Exit in
+         Wrapped_modules.LoggedIntMap.fold
+           (fun _ mvbdu (error,(log_info,handler)) ->
+              let error, handler, sites = Ckappa_sig.Views_bdu.variables_list_of_mvbdu parameter handler error mvbdu in
+              let error, handler, list = Ckappa_sig.Views_bdu.extensional_of_mvbdu parameter handler error mvbdu in
+              let error, handler, ext_list =  Ckappa_sig.Views_bdu.extensional_of_variables_list parameter handler error sites in
+              let error, file_name =
+                List.fold_left
+                  (fun (error, string) site ->
+                     let error, site_string = Handler.string_of_site parameter
+                         error handler_kappa agent_type site in
 	      error, string^"_"^site_string)
 	     (error, ((Remanent_parameters.get_local_trace_directory parameter)^(Remanent_parameters.get_local_trace_prefix parameter)^(agent_string)))
              ext_list
@@ -1523,8 +1525,9 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
 		  in
 		  let _ = Printf.fprintf fic "}\n" in
 		  let _ = close_out fic in
-		  error, handler
+    error, (log_info, handler)
 		)
 		map
-		(error, handler))
-    output handler
+  (error, (log_info, handler)))
+      output (log_info, handler) in
+  error, log_info, handler

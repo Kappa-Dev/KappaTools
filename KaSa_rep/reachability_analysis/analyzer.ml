@@ -17,7 +17,7 @@ let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Bdu_fixpoint_iteration") message exn
     (fun () -> default)
 
-let local_trace = true
+let local_trace = false
 
 module type Analyzer =
   sig
@@ -27,11 +27,12 @@ module type Analyzer =
 
     val main:
       Remanent_parameters_sig.parameters ->
+      StoryProfiling.StoryStats.log_info ->
       Exception.method_handler ->
       Ckappa_sig.Views_bdu.handler ->
       Cckappa_sig.compil ->
       Cckappa_sig.kappa_handler ->
-      Exception.method_handler * static_information * dynamic_information
+      Exception.method_handler * StoryProfiling.StoryStats.log_info * static_information * dynamic_information
 
     val export:
       static_information ->
@@ -63,10 +64,10 @@ struct
     let error, dynamic, () = Domain.print static dynamic error loggers in
     error, dynamic
 
-  let main parameter error mvbdu_handler compil kappa_handler =
+  let main parameter log_info error mvbdu_handler compil kappa_handler =
     let error, static, dynamic =
       Analyzer_headers.initialize_global_information
-        parameter error mvbdu_handler compil kappa_handler
+        parameter log_info error mvbdu_handler compil kappa_handler
     in
     let error, init = Analyzer_headers.compute_initial_state error static in
     let error, static, dynamic = Domain.initialize static dynamic error in
@@ -143,7 +144,7 @@ struct
     in
     (*print test*)
     let _ = print static dynamic error [] in
-    error, static, dynamic
+    error, log_info, static, dynamic
 
   let export static dynamic error kasa_state =
     Domain.export static dynamic error kasa_state

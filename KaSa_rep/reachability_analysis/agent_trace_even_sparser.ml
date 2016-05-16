@@ -503,10 +503,7 @@ let reduce_subframes transition_system =
   }
 
 
-let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
-  (*let saved_handler = ref handler in
-  let restore_handler () = !saved_handler int_pair_of_label in
-    let save_handler handler = saved_handler:=handler in*)
+let agent_trace parameter log_info error handler handler_kappa mvbdu_true compil output =
   let () = Ckappa_sig.Views_intbdu.import_handler handler in
   let rules = compil.Cckappa_sig.rules in
   let init = compil.Cckappa_sig.init in
@@ -550,7 +547,6 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
       creation
   in
   let empty = Ckappa_sig.Views_intbdu.build_variables_list [] in
-  let log_info = StoryProfiling.StoryStats.init_log_info () in
   let error, log_info =
     Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold
       parameter
@@ -871,6 +867,7 @@ let agent_trace parameter error handler handler_kappa mvbdu_true compil output =
   match
     Ckappa_sig.Views_intbdu.export_handler error
   with
-  | error, Some h -> error, h
+  | error, Some h -> error, log_info, h
   | error, None ->
-    warn parameter error (Some "line 813") Exit handler
+    let error, h = warn parameter error (Some "line 813") Exit handler in
+    error, log_info, h

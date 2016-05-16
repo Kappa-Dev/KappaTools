@@ -37,6 +37,7 @@ type initial_state = Cckappa_sig.enriched_init
 
 val initialize_global_information:
   Remanent_parameters_sig.parameters ->
+  StoryProfiling.StoryStats.log_info ->
   Exception.method_handler ->
   Mvbdu_wrapper.Mvbdu.handler ->
   Cckappa_sig.compil ->
@@ -57,7 +58,7 @@ val set_bdu_common_static:
 val get_agent_name :
   global_static_information ->
   Ckappa_sig.c_agent_name Ckappa_sig.RuleAgent_map_and_set.Map.t
-    
+
 val set_agent_name :
   Ckappa_sig.c_agent_name Ckappa_sig.RuleAgent_map_and_set.Map.t ->
   global_static_information ->
@@ -68,29 +69,29 @@ val get_side_effects:
   Common_static.half_break_action * Common_static.remove_action
 
 val set_side_effects :
-  Common_static.half_break_action * Common_static.remove_action -> 
+  Common_static.half_break_action * Common_static.remove_action ->
   global_static_information ->
   global_static_information
 
 val get_potential_side_effects :
-  global_static_information -> 
+  global_static_information ->
   Common_static.potential_partner_free * Common_static.potential_partner_bind
 
 val set_potential_side_effects:
-  Common_static.potential_partner_free * Common_static.potential_partner_bind -> 
+  Common_static.potential_partner_free * Common_static.potential_partner_bind ->
   global_static_information ->
   global_static_information
 
-val get_bonds_rhs : 
+val get_bonds_rhs :
   global_static_information ->
   Ckappa_sig.PairAgentSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t
-     
+
 val set_bonds_rhs :
   Ckappa_sig.PairAgentSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t ->
   global_static_information ->
   global_static_information
 
-val get_bonds_lhs : 
+val get_bonds_lhs :
   global_static_information ->
   Ckappa_sig.PairAgentSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t
 
@@ -99,10 +100,10 @@ val set_bonds_lhs :
   global_static_information ->
   global_static_information
 
-val get_action_binding : 
+val get_action_binding :
   global_static_information ->
   Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t
-     
+
 val set_action_binding :
   Ckappa_sig.PairAgentsSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t ->
   global_static_information ->
@@ -119,7 +120,10 @@ val get_cc_code: global_static_information -> Cckappa_sig.compil
 
 val get_mvbdu_handler: global_dynamic_information -> Mvbdu_wrapper.Mvbdu.handler
 
-val set_mvbdu_handler: 
+val set_mvbdu_handler:
   Mvbdu_wrapper.Mvbdu.handler ->
   global_dynamic_information ->
   global_dynamic_information
+
+val get_log_info: global_dynamic_information -> StoryProfiling.StoryStats.log_info
+val set_log_info: StoryProfiling.StoryStats.log_info -> global_dynamic_information -> global_dynamic_information

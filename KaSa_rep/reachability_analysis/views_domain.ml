@@ -120,6 +120,15 @@ struct
         (get_global_dynamic_information dynamic)
     }
 
+  (** profiling *)
+  let get_log_info dynamic =
+    Analyzer_headers.get_log_info (get_global_dynamic_information dynamic)
+  let set_log_info log_info dynamic =
+    {
+      dynamic with
+      global = Analyzer_headers.set_log_info log_info (get_global_dynamic_information dynamic)
+    }
+
   (** local dynamic information*)
 
   let get_local_dynamic_information dynamic = dynamic.local
@@ -2952,16 +2961,18 @@ struct
             site_correspondence
             (get_fixpoint_result dynamic)
         in
-        let error, handler =
+        let error, log_info, handler =
           if new_computation
-          then Agent_trace_even_sparser.agent_trace parameter error handler handler_kappa mvbdu_true compil output
+          then
+            Agent_trace_even_sparser.agent_trace parameter
+              (get_log_info dynamic) error handler handler_kappa mvbdu_true compil output
           else if direct_computation
           then
-            Agent_trace_with_macrotransitions_direct.agent_trace parameter error handler handler_kappa mvbdu_true compil output
+            Agent_trace_with_macrotransitions_direct.agent_trace parameter (get_log_info dynamic) error handler handler_kappa mvbdu_true compil output
           else
-            Agent_trace.agent_trace parameter error handler handler_kappa mvbdu_true compil output
+            Agent_trace.agent_trace parameter (get_log_info dynamic) error handler handler_kappa mvbdu_true compil output
         in
-        error, set_mvbdu_handler handler dynamic
+        error, set_mvbdu_handler handler (set_log_info log_info dynamic)
       else
         error, dynamic
     in
