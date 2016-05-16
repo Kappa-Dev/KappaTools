@@ -179,7 +179,6 @@ Influence_map:Wake_up_map:rule(1):'' A()->B() -> rule(2):'' B()->C()[0->0]
 
 Influence_map:Wake_up_map:rule(2):'' B()->C() -> rule(3):'' C()->D(x~u)[0->0]
 
-
 Reachability analysis...
 
 	Applying rule 0:

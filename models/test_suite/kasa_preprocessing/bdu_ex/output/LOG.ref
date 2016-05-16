@@ -112,7 +112,6 @@ Influence_map:Wake_up_map:rule(0):'create' ->A(x~u) -> rule(1):'x' A(x~u)->A(x~p
 
 Influence_map:Wake_up_map:rule(1):'x' A(x~u)->A(x~p) -> rule(2):'y' A(x~p,y~u)->A(x~p,y~p)[0->0]
 
-
 Reachability analysis...
 
 	Applying rule 0: create:

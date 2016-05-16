@@ -647,7 +647,6 @@ Influence_map:Inhibition_map:rule(9):'r9' C()-> -> rule(7):'r7' A(x),B(x~p),C(x~
 
 Influence_map:Inhibition_map:rule(9):'r9' C()-> -> rule(8):'r8' C(x~p!1),A(x~u!1)->C(x~p!1),A(x~p!1)[0*->1];[0->0]
 
-
 Reachability analysis...
 
 	Applying rule 0: r0:

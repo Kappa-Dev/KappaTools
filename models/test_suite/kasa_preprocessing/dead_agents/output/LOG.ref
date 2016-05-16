@@ -446,7 +446,6 @@ Influence_map:Inhibition_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(5):'' A(x~u?)->
 
 Influence_map:Inhibition_map:rule(7):'' A(x~u!_)->A(x~p) -> rule(6):'' A(x~u!_)->A(x~p)[0->0]
 
-
 Reachability analysis...
 	Views in initial state
 

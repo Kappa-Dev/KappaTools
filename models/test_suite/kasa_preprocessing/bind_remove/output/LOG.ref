@@ -143,7 +143,6 @@ Influence_map:Wake_up_map:rule(0):'r0' A(x),B(x)->A(x!1),B(x!1) -> rule(1):'r1' 
 
 Influence_map:Wake_up_map:rule(1):'r1' B(x!_)->C(x) -> rule(0):'r0' A(x),B(x)->A(x!1),B(x!1)[0*->0]
 
-
 Reachability analysis...
 
 	Applying rule 1: r1:

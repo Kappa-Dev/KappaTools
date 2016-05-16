@@ -411,7 +411,6 @@ Influence_map:Inhibition_map:rule(6):'r6' F(x~u)-> -> rule(7):'r7' F(y~p)->[0->0
 
 Influence_map:Inhibition_map:rule(7):'r7' F(y~p)-> -> rule(6):'r6' F(x~u)->[0->0]
 
-
 Reachability analysis...
 
 	Applying rule 1: r1:

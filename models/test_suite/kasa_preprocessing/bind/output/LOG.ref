@@ -287,7 +287,6 @@ Influence_map:Inhibition_map:rule(2):'r1' A(x),C(x)->A(x!1),C(x!1) -> rule(0):'r
 
 Influence_map:Inhibition_map:rule(3):'r2' B(x~p),C(x!_)->B(x~u),C(x!_) -> rule(0):'r0' A(x),B(x~p)->A(x!1),B(x~p!1)[0->1]
 
-
 Reachability analysis...
 
 ------------------------------------------------------------

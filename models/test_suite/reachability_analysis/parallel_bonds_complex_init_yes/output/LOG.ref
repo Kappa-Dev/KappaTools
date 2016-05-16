@@ -486,7 +486,6 @@ Influence_map:Inhibition_map:rule(6):'r6' A(x~p)->A(x~u) -> rule(2):'r2' A(x~p,z
 
 Influence_map:Inhibition_map:rule(7):'r7' B(x~p)->B(x~u) -> rule(2):'r2' A(x~p,z,t),B(x~p,z,t)->A(x~p,z!1,t),B(x~p,z!1,t)[0->1]
 
-
 Reachability analysis...
 	Views in initial state
 

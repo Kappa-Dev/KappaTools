@@ -31,6 +31,7 @@ module A =
 let main () =
   let error = Exception.empty_error_handler in
   let error,parameters,files  = Get_option.get_option error in
+  let log_info = StoryProfiling.StoryStats.init_log_info () in
   let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" (Remanent_parameters.get_full_version parameters) in
   let () = Loggers.print_newline (Remanent_parameters.get_logger parameters) in
   let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" (Remanent_parameters.get_launched_when_and_where parameters) in
@@ -143,7 +144,7 @@ let main () =
   in
   (*-----------------------------------------------------------------------*)
   let error, handler_bdu = Mvbdu_wrapper.Mvbdu.init parameters error in
-  let error, static_opt, dynamic_opt =
+  let error, log_info, static_opt, dynamic_opt =
     if Remanent_parameters.get_do_reachability_analysis parameters
     then
       let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "Reachability analysis..." in
@@ -155,12 +156,12 @@ let main () =
         if (Remanent_parameters.get_trace parameters_cv)
         then Loggers.fprintf (Remanent_parameters.get_logger parameters_cv) ""
       in
-      let error, static, dynamic =
-        A.main parameters error handler_bdu c_compil handler
+      let error, log_info, static, dynamic =
+        A.main parameters log_info error handler_bdu c_compil handler
       in
-      error, Some static, Some dynamic
+      error, log_info, Some static, Some dynamic
     else
-      error, None, None
+      error, log_info, None, None
   in
   (*-----------------------------------------------------------------------*)
   (*Stochastic flow of information*)

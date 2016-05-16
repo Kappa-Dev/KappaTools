@@ -317,7 +317,6 @@ Influence_map:Inhibition_map:rule(4):'' A(x~u)->A(x~q) -> rule(1):'' A(x~u)->A(x
 
 Influence_map:Inhibition_map:rule(7):'KO' A(x~0,y~q)->A(x~1,y~0) -> rule(6):'' A(y~q,z~u)->A(y~q,z~q)[0->0]
 
-
 Reachability analysis...
 
 	Applying rule 0:

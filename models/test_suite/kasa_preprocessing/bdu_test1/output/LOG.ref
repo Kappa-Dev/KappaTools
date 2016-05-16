@@ -117,7 +117,6 @@ Influence_map:Inhibition_map:rule(1):'r1' A(y~u)->A(y~p) -> var(0):'Auu' A(x~u?,
 
 Influence_map:Inhibition_map:rule(1):'r1' A(y~u)->A(y~p) -> var(1):'Apu' A(y~u?)[0->0]
 
-
 Reachability analysis...
 
 ------------------------------------------------------------
