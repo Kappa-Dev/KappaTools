@@ -138,13 +138,8 @@ let with_flux str f =
   with_formatter (match str with "" -> !fluxFileName | _ -> str) f
 
 let with_unary_distances f =
-  let str = !distancesFileName^".out" in
-  let desc = open_out str in
-  let fr = Format.formatter_of_out_channel desc in
-  let () = f fr in
-  let () = Format.pp_print_flush fr () in
-  close_out desc
-
+  let str = !distancesFileName^".json" in
+  with_formatter str f
 
 let with_snapshot str event ext f =
   let str = if str="" then !snapshotFileName else str in

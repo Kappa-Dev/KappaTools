@@ -3,7 +3,7 @@
 set -e
 
 PLAYGROUND=$(mktemp -d -t kappaXXXX)
-git clone --quiet -b master https://${KAPPAGITHUBTOKEN}:@github.com/Kappa-Dev/Kappa-Dev.github.io.git ${PLAYGROUND}
+git clone --depth 10 --quiet -b master https://${KAPPAGITHUBTOKEN}:@github.com/Kappa-Dev/Kappa-Dev.github.io.git ${PLAYGROUND}
 case $1 in
     native )
         [ -d ${PLAYGROUND}/docs/KaSim-manual-master/generated_img ] || \

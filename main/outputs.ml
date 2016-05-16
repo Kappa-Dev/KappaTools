@@ -132,25 +132,30 @@ let output_flux out =
   else dot_of_flux out
 
 let print_json_of_unary_distances f unary_distances rules =
+  (*unary_distances: (float, int) option list array
+    one_big_list: (int, float, int) list*)
+  let (one_big_list,_) =
+    Array.fold_left
+      (fun (l,i) a -> match a with
+		      | Some ls ->
+			 let add_rule_id = List.map (fun (t,d) -> (i,t,d)) ls in
+			 (List.append l add_rule_id, i+1)
+		      | None -> (l, i+1))
+      ([],0) unary_distances in
   Format.fprintf
-    f "@[ %a @]"
-    (Pp.array
-       Pp.colon
-       (fun i f a -> match a with
-	| None -> ()
-	| Some ls ->
-	   Format.fprintf
-             f "@[%a@]"
-	     (Pp.list Pp.comma (fun f (time,distance) ->
-				Format.fprintf f "@[%s %e @ %d @]"
-					       rules.(i) time distance))
-	     ls)) unary_distances
+    f "[%a]"
+    (Pp.list
+       Pp.comma
+       (fun f (id,time,distance) ->
+	Format.fprintf
+	  f "@[{ \"rule\" : \"%s\", @ \"time\" : %e, @ \"distance\" : %d }@]"
+	  rules.(id) time distance)) one_big_list
 
 let json_of_unary_distances unary_distances rules =
   Kappa_files.with_unary_distances
     (fun f -> print_json_of_unary_distances f unary_distances rules)
 
-let print_out_of_unary_distances f distances rule_name = 
+let print_out_of_unary_distances f distances rule_name =
   let () = Format.fprintf f "Rule %s: " rule_name in
   let () = Format.fprintf f "@[<h>%s @]@." "time distance" in
   Format.fprintf f "@[%a@]"

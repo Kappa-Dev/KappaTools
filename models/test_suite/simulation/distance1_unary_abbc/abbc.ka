@@ -9,6 +9,9 @@
 
 %obs: 'Ap' |A(a~p?)|
 
+%def: "storeUnaryDistance" "true"
+%def: "jsonUnaryDistance" "true"
+
 %init: 100 A(a~u)
 %init: 100 B()
 %init: 100 C()

@@ -65,6 +65,12 @@ let fluxmap_export_format_id = "fluxmap-export-file-format"
 let fluxmap_export_filename_id =  "fluxmap-export-filename"
 let fluxmap_export_button_id =  "fluxmap-export-button"
 
+let distances_div_id = "distances_div"
+let distances_svg_id = "distances_svg"
+let distances_export_format_id = "distances-export-file-format"
+let distances_export_filename_id =  "distances-export-filename"
+let distances_export_button_id =  "distances-export-button"
+
 let rules_checkboxes_id = "rules-checkboxes"
 let checkbox_self_influence_id = "checkbox_self_influence"
 let state_fluxmap state = match state with

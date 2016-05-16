@@ -15,8 +15,6 @@
 %obs: 'Ap' |A(a~p?)|
 %mod: [true] do $TRACK 'Ap' [true] 
 
-%mod: [E]=[Emax] do $SNAPSHOT "abc.ka"
-
 %init: 100 A(a~u)
 %init: 100 B()
 %init: 100 C()
