@@ -6,10 +6,12 @@ val empty : Environment.t -> (Nbr.t * int) list -> (int * Alg_expr.t) list -> t
 (** [empty env stopping_times variable_overwrite] *)
 
 val initialize :
+  bind:('a -> (Rule_interpreter.t * t -> 'a) -> 'a) ->
+  return:(Rule_interpreter.t * t -> 'a) ->
   Environment.t -> Connected_component.Env.t -> Counter.t ->
   Rule_interpreter.t -> t ->
   (Alg_expr.t * Primitives.elementary_rule * Location.t) list ->
-  Rule_interpreter.t * t
+  'a
 (** [initial env domain counter graph state] builds up the initial state *)
 
 val observables_values :

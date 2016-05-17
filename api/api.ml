@@ -1,6 +1,6 @@
 open Lwt
 module Api_types = ApiTypes_j
-open Api_types
+open ApiTypes_j
 
 let msg_process_not_running = "process not running"
 let msg_token_not_found = "token not found"
@@ -153,33 +153,40 @@ end = struct
                              sig_nd tk_nd contact_map
                              simulation.counter result >>=
                              (fun (env_store,domain,has_tracking,init_l) ->
-			      let (env,graph,state) =
+			      let (env,graph_state) =
 				Eval.build_initial_state
-				  [] simulation.counter env_store domain has_tracking
+				  ~bind:(fun x f ->
+					 Lwt.bind (self#yield ())
+						  (fun () -> Lwt.bind x f))
+				  ~return:Lwt.return [] simulation.counter
+				  env_store domain has_tracking
 				  updated_vars init_l in
-			      let () = ExceptionDefn.flush_warning log_form in
-			      let sigs = Environment.signatures env in
-                              let legend = Environment.map_observables
-                                               (Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
-                                               env
-                                in
-                                let () = plot := { !plot with legend = Array.to_list legend} in
+			      Lwt.bind
+				graph_state
+				(fun (graph,state) ->
+				 let () = ExceptionDefn.flush_warning log_form in
+				 let sigs = Environment.signatures env in
+				 let legend = Environment.map_observables
+						(Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
+						env
+                                 in
+                                 let () = plot := { !plot with legend = Array.to_list legend} in
 				let rgraph = ref (graph) in
 				let rstate = ref (state) in
                                 while%lwt Lwt_switch.is_on simulation.switch do
                                   Lwt.bind
-					 (self#yield ())
-					 (fun () ->
-					  let (stop,graph',state') =
-					    State_interpreter.a_loop
-					      ~outputs:(outputs sigs)
-					      env domain simulation.counter !rgraph !rstate in
-					  let () = rgraph := graph'; rstate := state' in
-					  if%lwt Lwt.return stop then
-					    let () = ExceptionDefn.flush_warning log_form in
-					    Lwt_switch.turn_off simulation.switch)
+				    (self#yield ())
+				    (fun () ->
+				     let (stop,graph',state') =
+				       State_interpreter.a_loop
+					 ~outputs:(outputs sigs)
+					 env domain simulation.counter !rgraph !rstate in
+				     let () = rgraph := graph'; rstate := state' in
+				     if%lwt Lwt.return stop then
+				       let () = ExceptionDefn.flush_warning log_form in
+				       Lwt_switch.turn_off simulation.switch)
 				done)
-                          )
+                             ))
                           (function
                             | ExceptionDefn.Malformed_Decl error as exn ->
                                let () = error_messages := [format_error_message error] in

@@ -564,6 +564,7 @@ let compile ~outputs ~pause ~return
      return (env, domain, has_tracking, init_l)))))))
 
 let build_initial_state
+      ~bind ~return
       alg_overwrite counter env cc_env has_tracking updated_vars init_l =
   let env = Environment.propagate_constant updated_vars counter env in
   let stops = Environment.fold_perturbations
@@ -574,6 +575,5 @@ let build_initial_state
 		[] env in
   let graph0 = Rule_interpreter.empty ~has_tracking env in
   let state0 = State_interpreter.empty env stops alg_overwrite in
-  let graph,state =
-    State_interpreter.initialize env cc_env counter graph0 state0 init_l in
-  (env,graph,state)
+  (env,State_interpreter.initialize
+	 ~bind ~return env cc_env counter graph0 state0 init_l)

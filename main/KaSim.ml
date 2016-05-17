@@ -201,8 +201,9 @@ let () =
 	     "An observable may be tracked but no compression level to render stories has been specified")
     in
     let () = Format.printf "+ Building initial state@." in
-    let (env,graph,state) =
+    let (env,(graph,state)) =
       Eval.build_initial_state
+	~bind:(fun x f -> f x) ~return:(fun x -> x)
 	alg_overwrite counter env_store cc_env has_tracking updated_vars init_l in
     let () = Format.printf "Done@." in
     let () =

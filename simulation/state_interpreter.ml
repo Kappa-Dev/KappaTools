@@ -39,40 +39,45 @@ let empty env stopping_times alg_overwrite =
     flux = [];
   }
 
-let initialize env domain counter graph0 state0 init_l =
+let initialize ~bind ~return env domain counter graph0 state0 init_l =
   let get_alg i = get_alg env state0 i in
-  let graph =
+  let mgraph =
     List.fold_left
-      (fun state (alg,compiled_rule,pos) ->
-       let value = Rule_interpreter.value_alg counter state ~get_alg alg in
-       let actions,_,_ = snd compiled_rule.Primitives.instantiations in
-       let creations_sort =
-	 List.fold_left
-	   (fun l -> function
-		  | Instantiation.Create (x,_) -> Agent_place.get_type x :: l
-		  | Instantiation.Mod_internal _ | Instantiation.Bind _
-		  | Instantiation.Bind_to _ | Instantiation.Free _
-		  | Instantiation.Remove _ -> l) [] actions in
-       Nbr.iteri
-	 (fun _ s ->
-	  match Rule_interpreter.apply_rule
-		  ~get_alg env domain
-		  (Environment.connected_components_of_unary_rules env)
-		  counter s (Causal.INIT creations_sort)
-		  compiled_rule with
-	  | Rule_interpreter.Success s -> s
-	  | (Rule_interpreter.Clash | Rule_interpreter.Corrected _) ->
-	     raise (ExceptionDefn.Internal_Error
-		      ("Bugged initial rule",pos)))
-	 state value) graph0 init_l in
-  let () =
-    initial_activity get_alg env counter graph state0.activities in
-  let graph' =
-    Rule_interpreter.update_outdated_activities
-      ~get_alg:(fun i -> Environment.get_alg env i)
-      (fun x _ y -> Random_tree.add x y state0.activities)
-      env counter graph in
-  graph',state0
+      (fun mstate (alg,compiled_rule,pos) ->
+       bind
+	 mstate
+	 (fun (state,state0) ->
+	  let value = Rule_interpreter.value_alg counter state ~get_alg alg in
+	  let actions,_,_ = snd compiled_rule.Primitives.instantiations in
+	  let creations_sort =
+	    List.fold_left
+	      (fun l -> function
+		     | Instantiation.Create (x,_) -> Agent_place.get_type x :: l
+		     | Instantiation.Mod_internal _ | Instantiation.Bind _
+		     | Instantiation.Bind_to _ | Instantiation.Free _
+		     | Instantiation.Remove _ -> l) [] actions in
+	  return (
+	      Nbr.iteri
+	      (fun _ s ->
+	       match Rule_interpreter.apply_rule
+		       ~get_alg env domain
+		       (Environment.connected_components_of_unary_rules env)
+		       counter s (Causal.INIT creations_sort)
+		       compiled_rule with
+	       | Rule_interpreter.Success s -> s
+	       | (Rule_interpreter.Clash | Rule_interpreter.Corrected _) ->
+		  raise (ExceptionDefn.Internal_Error
+			   ("Bugged initial rule",pos)))
+	      state value,state0))) (return (graph0,state0)) init_l in
+  bind
+    mgraph
+    (fun (graph,state0) ->
+     let () =
+       initial_activity get_alg env counter graph state0.activities in
+     return (Rule_interpreter.update_outdated_activities
+		 ~get_alg:(fun i -> Environment.get_alg env i)
+		 (fun x _ y -> Random_tree.add x y state0.activities)
+		 env counter graph,state0))
 
 let observables_values env counter graph state =
   let get_alg i = get_alg env state i in
