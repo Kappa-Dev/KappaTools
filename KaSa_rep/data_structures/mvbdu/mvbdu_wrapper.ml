@@ -723,7 +723,7 @@ module Internalize(M:Mvbdu
       mvbdu_redefine (mvbdu_true ()) asso
 
     let mvbdu_of_asso_gen f asso =
-      mvbdu_redefine (mvbdu_false ()) (f asso)
+      mvbdu_redefine (mvbdu_true ()) (f asso)
     let mvbdu_of_hconsed_asso = mvbdu_of_asso_gen (fun x -> x)
     let mvbdu_of_association_list = mvbdu_of_asso_gen (build_association_list)
     let mvbdu_of_sorted_association_list = mvbdu_of_asso_gen (build_sorted_association_list)
