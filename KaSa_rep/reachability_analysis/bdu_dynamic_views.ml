@@ -17,7 +17,7 @@ let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Bdu_fixpoint_iteration") message exn
     (fun () -> default)
 
-let local_trace = true
+let local_trace = false
 
 type bdu_analysis_dynamic =
   {
@@ -126,52 +126,65 @@ let store_covering_classes_modification_side_effects parameter error
   let error, store_result =
     Ckappa_sig.AgentRule_map_and_set.Map.fold
       (fun (agent_type_partner, rule_id_effect) pair_list (error, store_result) ->
-        List.fold_left (fun (error, store_result) (site_type_partner, state) ->
-          let error, store_result =
-            Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
-              (fun parameter error agent_type_cv remanent store_result ->
-                let cv_dic = remanent.Covering_classes_type.store_dic in
-                let error, store_result =
-                  Covering_classes_type.Dictionary_of_List_sites.fold
-                    (fun list_of_site_type ((), ()) cv_id (error, store_result) ->
+         List.fold_left
+           (fun (error, store_result) (site_type_partner, state) ->
+              let error, rule_id_set =
+                match
+                  Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
+                    parameter error
+                    (agent_type_partner,site_type_partner)
+                    store_test_modification_map
+                with
+                | error, None -> error, Ckappa_sig.Rule_map_and_set.Set.empty
+                | error, Some s -> error, s
+              in
+              let error, new_rule_id_set =
+                Ckappa_sig.Rule_map_and_set.Set.add_when_not_in
+                  parameter
+                  error
+                  rule_id_effect
+                  rule_id_set
+              in
+              let error, store_result =
+                Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
+                  (fun parameter error agent_type_cv remanent store_result ->
+                     let cv_dic = remanent.Covering_classes_type.store_dic in
+                     let error, store_result =
+                       Covering_classes_type.Dictionary_of_List_sites.fold
+                         (fun list_of_site_type ((), ()) cv_id (error, store_result) ->
                       (*get a set of rule_id in update(c)*)
-                      let error, rule_id_set =
-                        match
-                          Ckappa_sig.AgentSite_map_and_set.Map.find_option_without_logs
-                            parameter error
-                            (agent_type_partner, site_type_partner)
-                            store_test_modification_map
-                        with
-                        | error, None -> error, Ckappa_sig.Rule_map_and_set.Set.empty
-                        | error, Some s -> error, s
-                      in
-                      let error, new_rule_id_set =
-                        Ckappa_sig.Rule_map_and_set.Set.add_when_not_in
-                          parameter
-                          error
-                          rule_id_effect
-                          rule_id_set
-                      in
-                      let error, store_result =
-                        add_link parameter error
-                          (agent_type_partner, cv_id) new_rule_id_set store_result
-                      in
-                      error, store_result
-                    ) cv_dic (error, store_result)
-                in
-                error, store_result
-              ) covering_classes store_result
-          in
-          error, store_result
-        ) (error, store_result) pair_list
+                            let error, store_result =
+                              add_link parameter error
+                                (agent_type_partner, cv_id) new_rule_id_set store_result
+                            in
+                            error, store_result
+                         ) cv_dic (error, store_result)
+                     in
+                     error, store_result
+                  ) covering_classes store_result
+              in
+              error, store_result
+           ) (error, store_result) pair_list
       ) store_potential_side_effects_bind (error, store_result)
   in
   error, store_result
 
 (************************************************************************************)
 
-let store_update parameter error store_test_modification_map store_potential_side_effects
-    store_covering_classes_id covering_classes store_result =
+let store_update
+    parameter
+    log_info
+    error
+    store_test_modification_map
+    store_potential_side_effects
+    store_covering_classes_id
+    covering_classes
+    store_result
+  =
+  let error, log_info = StoryProfiling.StoryStats.add_event parameter error
+      (StoryProfiling.Regular_influences)
+      None log_info
+  in
   let error, store_update_modification =
     store_covering_classes_modification_update
       parameter
@@ -179,8 +192,17 @@ let store_update parameter error store_test_modification_map store_potential_sid
       store_test_modification_map
       store_covering_classes_id
   in
+  let error, log_info = StoryProfiling.StoryStats.close_event parameter error
+      (StoryProfiling.Regular_influences)
+      None log_info
+  in
   let init_cv_modification_side_effects  =
-    Covering_classes_type.AgentCV_map_and_set.Map.empty in
+    Covering_classes_type.AgentCV_map_and_set.Map.empty
+  in
+  let error, log_info = StoryProfiling.StoryStats.add_event parameter error
+      (StoryProfiling.Side_effects_influences)
+      None log_info
+  in
   let error, store_update_with_side_effects =
     store_covering_classes_modification_side_effects
       parameter
@@ -190,38 +212,53 @@ let store_update parameter error store_test_modification_map store_potential_sid
       covering_classes
       init_cv_modification_side_effects
   in
+  let error, log_info = StoryProfiling.StoryStats.close_event parameter error
+      (StoryProfiling.Side_effects_influences)
+      None log_info
+  in
+  let error, log_info = StoryProfiling.StoryStats.add_event parameter error
+      (StoryProfiling.Merge_influences)
+      None log_info
+  in
   (*---------------------------------------------------------------------------*)
   (*fold 2 map*)
-  Covering_classes_type.AgentCV_map_and_set.Map.fold2
-    parameter
-    error
-    (*exists in 'a t*)
-    (fun parameter error (agent_type, cv_id) rule_id_set store_result ->
-      let error, store_result =
-        add_link parameter error (agent_type, cv_id) rule_id_set store_result
-      in
-      error, store_result
-    )
-    (*exists in 'b t*)
-    (fun parameter error (agent_type, cv_id) rule_id_set store_result ->
-      let error, store_result =
-        add_link parameter error (agent_type, cv_id) rule_id_set store_result
-      in
-      error, store_result
-    )
-    (*both*)
-    (fun parameter error (agent_type, cv_id) s1 s2 store_result ->
-      let error, union_set =
-        Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2
-      in
-      let error, store_result =
-        add_link parameter error (agent_type, cv_id) union_set store_result
-      in
-      error, store_result
-    )
-    store_update_modification
-    store_update_with_side_effects
-    store_result
+  let error, store_result =
+    Covering_classes_type.AgentCV_map_and_set.Map.fold2
+      parameter
+      error
+      (*exists in 'a t*)
+      (fun parameter error (agent_type, cv_id) rule_id_set store_result ->
+        let error, store_result =
+          add_link parameter error (agent_type, cv_id) rule_id_set store_result
+        in
+        error, store_result
+      )
+      (*exists in 'b t*)
+      (fun parameter error (agent_type, cv_id) rule_id_set store_result ->
+         let error, store_result =
+           add_link parameter error (agent_type, cv_id) rule_id_set store_result
+         in
+         error, store_result
+      )
+      (*both*)
+      (fun parameter error (agent_type, cv_id) s1 s2 store_result ->
+         let error, union_set =
+           Ckappa_sig.Rule_map_and_set.Set.union parameter error s1 s2
+         in
+         let error, store_result =
+           add_link parameter error (agent_type, cv_id) union_set store_result
+         in
+         error, store_result
+      )
+      store_update_modification
+      store_update_with_side_effects
+      store_result
+  in
+  let error, log_info = StoryProfiling.StoryStats.close_event parameter error
+      (StoryProfiling.Merge_influences)
+      None log_info
+  in
+  error, log_info, store_result
 
 (************************************************************************************)
 (*compute dual contact map*)
@@ -270,7 +307,7 @@ let collect_dual_map parameter error handler store_result =
 
 (************************************************************************************)
 
-let scan_rule_dynamic parameter log_info error rule_id rule compiled
+let scan_rule_dynamic parameter log_info error (*rule_id rule*) compiled
     kappa_handler
     handler_bdu
     covering_classes
@@ -278,14 +315,11 @@ let scan_rule_dynamic parameter log_info error rule_id rule compiled
     store_potential_side_effects
     store_pre_static
     store_result
-    =
-    let error, log_info = StoryProfiling.StoryStats.add_event parameter error
-        (StoryProfiling.Scan_rule_dynamic (Ckappa_sig.int_of_rule_id rule_id))
-        None log_info
-    in
-    let error, store_update =
+  =
+    let error, log_info, store_update =
       store_update
         parameter
+        log_info
         error
         store_pre_static.Bdu_static_views.store_test_modif_map
         store_potential_side_effects
@@ -299,10 +333,6 @@ let scan_rule_dynamic parameter log_info error rule_id rule compiled
         error
         kappa_handler
         store_result.store_dual_contact_map
-    in
-    let error, log_info = StoryProfiling.StoryStats.close_event parameter error
-        (StoryProfiling.Scan_rule_dynamic (Ckappa_sig.int_of_rule_id rule_id))
-        None log_info
     in
     error, handler_bdu, log_info,
     {
@@ -335,17 +365,17 @@ let scan_rule_set_dynamic
     covering_classes
     store_covering_classes_id
     store_potential_side_effects =
-  let error, (handler_bdu, log_info, store_result) =
+  (*  let error, (handler_bdu, log_info, store_result) =
     Ckappa_sig.Rule_nearly_Inf_Int_storage_Imperatif.fold
       parameter error
-      (fun parameter error rule_id rule (handler_bdu, log_info, store_result) ->
+      (fun parameter error rule_id rule (handler_bdu, log_info, store_result) ->*)
         let error, handler_bdu, log_info, store_result =
           scan_rule_dynamic
             parameter
             log_info
             error
-            rule_id
-            rule.Cckappa_sig.e_rule_c_rule
+            (*  rule_id
+                rule.Cckappa_sig.e_rule_c_rule*)
             compiled
             kappa_handler
             handler_bdu
@@ -353,9 +383,10 @@ let scan_rule_set_dynamic
             store_covering_classes_id
             store_potential_side_effects
             store_pre_static
-            store_result
-        in
-        error, (handler_bdu, log_info, store_result)
-      ) compiled.Cckappa_sig.rules (handler_bdu, log_info, init_bdu_analysis_dynamic)
-  in
-  error, (handler_bdu, log_info, store_result)
+            init_bdu_analysis_dynamic
+            in
+            error, (handler_bdu, log_info, store_result)
+          (*store_result)
+            ) compiled.Cckappa_sig.rules (handler_bdu, log_info, init_bdu_analysis_dynamic)*)
+  (*in
+    error, (handler_bdu, log_info, store_result)*)

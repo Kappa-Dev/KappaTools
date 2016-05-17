@@ -55,11 +55,19 @@ type step_kind =
   | Initial_state of int
   | Scan_rule_static of int
   | Scan_rule_dynamic of int
+  | Regular_influences
+  | Side_effects_influences
+  | Merge_influences
+  | KaSim_compilation
+  | KaSa_precompilation
+  | KaSa_lexing
+  | KaSa_linking
+  | Influence_map of string
 
 let string_of_step_kind x =
   match
     x
-    with
+  with
     | Dummy
     | Beginning -> ""
     | Build_configuration -> "Build configuration"
@@ -91,6 +99,15 @@ let string_of_step_kind x =
     | Initial_state int -> Printf.sprintf "Initial state %i" int
     | Scan_rule_static int -> Printf.sprintf "Scan rule %i (static)" int
     | Scan_rule_dynamic int -> Printf.sprintf "Scan rule %i (dynamic)" int
+    | Regular_influences -> Printf.sprintf "Regular influences computation"
+    | Side_effects_influences -> Printf.sprintf "Side-effects influences computation"
+    | Merge_influences -> Printf.sprintf "Merging influences"
+    | KaSim_compilation -> Printf.sprintf "KaSim frontend"
+    | KaSa_precompilation -> Printf.sprintf "KaSa precompilation"
+    | KaSa_lexing -> Printf.sprintf "KaSa Lexing"
+    | KaSa_linking -> Printf.sprintf "KaSa Linkind"
+    | Influence_map string -> Printf.sprintf "Influence map (%s)" string
+
 
 let print_step_kind parameters x =
   Loggers.print_cell (Remanent_parameters.get_profiler parameters)

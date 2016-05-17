@@ -237,7 +237,7 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
     | Remanent_parameters_sig.KaSa ->
        begin
 	 match
-	   !Config.output_directory,"profiling.txt" (*temporary, to do: provide a parameterisable filename*)
+	   !Config.output_directory,"profiling.html" (*temporary, to do: provide a parameterisable filename*)
 	 with
 	 | _,"" -> Some stdout
 	 | "",a -> Some (open_out a)
