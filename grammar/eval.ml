@@ -551,10 +551,11 @@ let compile ~outputs ~pause ~return
 		     (Array.of_list result.rules,rule_nd,cc_unaries)
 		     (Array.of_list (List.rev obs)) (Array.of_list pert) in
 
-  outputs (Data.Log "\t -initial conditions");
+  outputs (Data.Log "\t -update_domain construction");
   pause
     (fun () ->
   let domain = Connected_component.PreEnv.finalize preenv in
+  outputs (Data.Log "\t -initial conditions");
   pause
     (fun () ->
      let _,init_l =

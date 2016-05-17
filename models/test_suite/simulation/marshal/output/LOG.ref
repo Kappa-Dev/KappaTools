@@ -12,13 +12,17 @@ done
 	 -rules
 	 -perturbations
 	 -observables
+	 -update_domain construction
 	 -initial conditions
++ Building initial state
 Done
 + Command line is: 'KaSim' '--compile' '-load-sim' '/tmp/KaSim-test-blob' '-seed' '958076642' '-d' 'output'
 + Initialized random number generator with seed 958076642
-+Loading simulation package /tmp/KaSim-test-blob...
++ Loading simulation package /tmp/KaSim-test-blob...
++ Building initial state
 Done
 + Command line is: 'KaSim' '--compile' '-load-sim' '/tmp/KaSim-test-blob' '-seed' '458154606' '-d' 'output' '-var' 'init' '300'
 + Initialized random number generator with seed 458154606
-+Loading simulation package /tmp/KaSim-test-blob...
++ Loading simulation package /tmp/KaSim-test-blob...
++ Building initial state
 Done

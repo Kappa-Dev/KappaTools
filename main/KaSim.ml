@@ -158,12 +158,12 @@ let () =
 	   let d = open_in_bin marshalized_file in
 	   let () =
 	     if !Parameter.inputKappaFileNames <> [] then
-	       Format.printf
-		 "+ Loading simulation package %s (kappa files are ignored)...@."
-		 marshalized_file
-	     else
-	       Format.printf "+Loading simulation package %s...@."
-			     marshalized_file in
+	       ExceptionDefn.warning
+		 (fun f ->
+		  Format.pp_print_string
+		    f "Simulation package loaded, all kappa files are ignored") in
+	   let () = Format.printf "+ Loading simulation package %s...@."
+				  marshalized_file in
 	   let env,cc_env,updated_vars,has_tracking,init_l =
 	     (Marshal.from_channel d :
 		Environment.t*Connected_component.Env.t*int list*bool*
@@ -200,6 +200,7 @@ let () =
 	     f
 	     "An observable may be tracked but no compression level to render stories has been specified")
     in
+    let () = Format.printf "+ Building initial state@." in
     let (env,graph,state) =
       Eval.build_initial_state
 	alg_overwrite counter env_store cc_env has_tracking updated_vars init_l in

@@ -13,7 +13,9 @@ Some exceptions have been raised during the static analysis, please analyse your
 	 -rules
 	 -perturbations
 	 -observables
+	 -update_domain construction
 	 -initial conditions
++ Building initial state
 Done
 ____________________________________________________________
 ############################################################

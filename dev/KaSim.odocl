@@ -19,7 +19,6 @@ Location
 Operator
 Agent_place
 Signature
-Navigation
 Connected_component
 Instantiation
 Alg_expr
@@ -28,10 +27,11 @@ Primitives
 Environment
 Kappa_printer
 
-Expr
 LKappa
 Snip
+Eval
 
+Navigation
 Edges
 
 Counter

@@ -12,7 +12,9 @@ done
 	 -rules
 	 -perturbations
 	 -observables
+	 -update_domain construction
 	 -initial conditions
++ Building initial state
 Done
 ____________________________________________________________
 ############################################################
