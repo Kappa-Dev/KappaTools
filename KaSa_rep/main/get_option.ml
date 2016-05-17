@@ -136,6 +136,12 @@ let options =
       ["3_Trace_analysis"],
       Expert;
 
+      "--ignore-trivial-losanges",
+      Bool Config.do_not_compress_trivial_losanges,
+      "Do not use macrotransitions for simplifying trivial losanges",
+      ["3_Trace_analysis"],
+      Expert;
+
       "--output-directory",
        MultiExt
 	[

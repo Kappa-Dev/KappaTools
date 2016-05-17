@@ -1,29 +1,19 @@
 digraph G{
-subgraph cluster_0 {
-Node_19 [label="A(y~p,z~u)"];
-Node_15 [label="A(y~u,z~u)"];
-}
-subgraph cluster_1 {
-Node_32 [label="A(x~p,z~u)"];
-Node_38 [label="A(x~u,z~u)"];
-}
-Init_21 [width="0cm" height="0cm" style="none" label=""];
-Node_18 [label="A(x~p,y~p,z~p)"];
-Node_20 [label="A(x~p,y~p,z~u)"];
-Node_21 [label="A(x~u,y~u,z~u)"];
-Macro_20 [width="0cm" height="0cm" stype="none" label=""];
-Macro_21 [width="0cm" height="0cm" stype="none" label=""];
-Node_15 -> Node_19 [label="rule 1"];
-Node_18 -> Node_20 [label="rule 5"];
-Node_19 -> Node_15 [label="rule 4"];
-Node_20 -> Node_18 [label="rule 2"];
-Node_32 -> Node_38 [label="rule 3"];
-Node_38 -> Node_32 [label="rule 0"];
-Init_21 -> Node_21 [label="Init"];
-Macro_20 -> Node_20 [style="dotted" label=""];
-Macro_20 -> Node_19 [style="dashed" label=""];
-Macro_20 -> Node_32 [style="dashed" label=""];
-Macro_21 -> Node_21 [style="dotted" label=""];
-Macro_21 -> Node_15 [style="dashed" label=""];
-Macro_21 -> Node_38 [style="dashed" label=""];
+Init_18 [width="0cm" height="0cm" style="none" label=""];
+Node_24 [label="A(x~p,y~p,z~p)"];
+Node_22 [label="A(x~p,y~p,z~u)"];
+Node_21 [label="A(x~u,y~p,z~u)"];
+Node_19 [label="A(x~p,y~u,z~u)"];
+Node_18 [label="A(x~u,y~u,z~u)"];
+Node_24 -> Node_22 [label="rule 5"];
+Node_21 -> Node_18 [label="rule 4"];
+Node_22 -> Node_19 [label="rule 4"];
+Node_22 -> Node_21 [label="rule 3"];
+Node_19 -> Node_18 [label="rule 3"];
+Node_22 -> Node_24 [label="rule 2"];
+Node_18 -> Node_21 [label="rule 1"];
+Node_19 -> Node_22 [label="rule 1"];
+Node_21 -> Node_22 [label="rule 0"];
+Node_18 -> Node_19 [label="rule 0"];
+Init_18 -> Node_18 [label=""];
 }

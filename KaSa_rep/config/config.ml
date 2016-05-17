@@ -99,6 +99,7 @@ let use_natural_language = ref true
 let compute_local_traces = ref false
 let show_rule_names_in_local_traces = ref true
 let use_macrotransitions_in_local_traces = ref false
+let do_not_compress_trivial_losanges = ref false
 let local_trace_prefix = ref "Agent_trace_"
 let local_trace_format = ref "DOT"
 

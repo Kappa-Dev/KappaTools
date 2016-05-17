@@ -1,19 +1,19 @@
 digraph G{
-Init_21 [width="0cm" height="0cm" style="none" label=""];
-Node_16 [label="A(x~p,y~u,z~u)"];
-Node_18 [label="A(x~p,y~p,z~p)"];
-Node_20 [label="A(x~p,y~p,z~u)"];
-Node_21 [label="A(x~u,y~u,z~u)"];
-Node_22 [label="A(x~u,y~p,z~u)"];
-Node_16 -> Node_21 [label="rule 3"];
-Node_16 -> Node_20 [label="rule 1"];
-Node_18 -> Node_20 [label="rule 5"];
-Node_20 -> Node_16 [label="rule 4"];
-Node_20 -> Node_22 [label="rule 3"];
-Node_20 -> Node_18 [label="rule 2"];
-Node_21 -> Node_22 [label="rule 1"];
-Node_21 -> Node_16 [label="rule 0"];
-Node_22 -> Node_21 [label="rule 4"];
-Node_22 -> Node_20 [label="rule 0"];
-Init_21 -> Node_21 [label="Init"];
+Init_18 [width="0cm" height="0cm" style="none" label=""];
+Node_24 [label="A(x~p,y~p,z~p)"];
+Node_22 [label="A(x~p,y~p,z~u)"];
+Node_21 [label="A(x~u,y~p,z~u)"];
+Node_19 [label="A(x~p,y~u,z~u)"];
+Node_18 [label="A(x~u,y~u,z~u)"];
+Node_24 -> Node_22 [label="rule 5"];
+Node_21 -> Node_18 [label="rule 4"];
+Node_22 -> Node_19 [label="rule 4"];
+Node_22 -> Node_21 [label="rule 3"];
+Node_19 -> Node_18 [label="rule 3"];
+Node_22 -> Node_24 [label="rule 2"];
+Node_18 -> Node_21 [label="rule 1"];
+Node_19 -> Node_22 [label="rule 1"];
+Node_21 -> Node_22 [label="rule 0"];
+Node_18 -> Node_19 [label="rule 0"];
+Init_18 -> Node_18 [label=""];
 }

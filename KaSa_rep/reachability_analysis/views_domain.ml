@@ -53,6 +53,8 @@ struct
       domain_dynamic_information : Bdu_dynamic_views.bdu_analysis_dynamic;
     }
 
+
+
   type dynamic_information =
     {
       local  : local_dynamic_information;
@@ -2981,15 +2983,7 @@ struct
             (get_fixpoint_result dynamic)
         in
         let error, log_info, handler =
-          if new_computation
-          then
-            Agent_trace_even_sparser.agent_trace parameter
-              (get_log_info dynamic) error handler handler_kappa mvbdu_true compil output
-          else if direct_computation
-          then
-            Agent_trace_with_macrotransitions_direct.agent_trace parameter (get_log_info dynamic) error handler handler_kappa mvbdu_true compil output
-          else
-            Agent_trace.agent_trace parameter (get_log_info dynamic) error handler handler_kappa mvbdu_true compil output
+            Agent_trace.agent_trace parameter (get_log_info dynamic) error handler handler_kappa compil output
         in
         error, set_mvbdu_handler handler (set_log_info log_info dynamic)
       else

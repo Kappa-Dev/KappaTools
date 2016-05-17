@@ -1,50 +1,33 @@
 digraph G{
-subgraph cluster_0 {
-Node_91 [label="A(x~p,y~p,w~p,t~u)"];
-Node_89 [label="A(x~p,y~p,w~u,t~u)"];
-}
-subgraph cluster_1 {
-Node_88 [label="A(x~p,y~p,z~u,t~u)"];
-Node_85 [label="A(x~p,y~p,z~p,t~u)"];
-}
-subgraph cluster_2 {
-Node_45 [label="A(y~p,z~u,w~u,t~u)"];
-Node_33 [label="A(y~u,z~u,w~u,t~u)"];
-}
-subgraph cluster_3 {
-Node_84 [label="A(x~p,z~u,w~u,t~u)"];
-Node_83 [label="A(x~u,z~u,w~u,t~u)"];
-}
-Init_50 [width="0cm" height="0cm" style="none" label=""];
-Node_36 [label="A(x~p,y~p,z~p,w~u,t~u)"];
-Node_40 [label="A(x~p,y~p,z~p,w~p,t~p)"];
-Node_44 [label="A(x~p,y~p,z~p,w~p,t~u)"];
-Node_46 [label="A(x~p,y~p,z~u,w~u,t~u)"];
-Node_49 [label="A(x~p,y~p,z~u,w~p,t~u)"];
-Node_50 [label="A(x~u,y~u,z~u,w~u,t~u)"];
-Macro_44 [width="0cm" height="0cm" stype="none" label=""];
-Macro_46 [width="0cm" height="0cm" stype="none" label=""];
+Init_36 [width="0cm" height="0cm" style="none" label=""];
+Node_54 [label="A(x~p,y~p,z~p,w~p,t~p)"];
+Node_50 [label="A(x~p,y~p,z~p,w~p,t~u)"];
+Node_47 [label="A(x~p,y~p,w~p,t~u)"];
+Node_44 [label="A(x~p,y~p,w~u,t~u)"];
+Node_43 [label="A(x~p,y~p,z~p,t~u)"];
+Node_42 [label="A(x~p,y~p,z~u,t~u)"];
+Node_39 [label="A(y~p,z~u,w~u,t~u)"];
+Node_35 [label="A(y~u,z~u,w~u,t~u)"];
+Node_38 [label="A(x~p,z~u,w~u,t~u)"];
+Node_37 [label="A(x~u,z~u,w~u,t~u)"];
+Node_36 [label="A(x~u,y~u,z~u,w~u,t~u)"];
+Macro_36 [width="0cm" height="0cm" stype="none" label=""];
 Macro_50 [width="0cm" height="0cm" stype="none" label=""];
-Node_33 -> Node_45 [label="rule 1: y+"];
-Node_40 -> Node_44 [label="rule 9: t-"];
-Node_44 -> Node_40 [label="rule 4: t+"];
-Node_45 -> Node_33 [label="rule 6: y-"];
-Node_46 -> Node_36 [label="rule 2: z+"];
-Node_46 -> Node_49 [label="rule 3: w+"];
-Node_83 -> Node_84 [label="rule 0: x+"];
-Node_84 -> Node_83 [label="rule 5: x-"];
-Node_85 -> Node_88 [label="rule 7: z-"];
-Node_88 -> Node_85 [label="rule 2: z+"];
-Node_89 -> Node_91 [label="rule 3: w+"];
-Node_91 -> Node_89 [label="rule 8: w-"];
-Init_50 -> Node_50 [label="Init"];
-Macro_44 -> Node_44 [style="dotted" label=""];
-Macro_44 -> Node_91 [style="dashed" label=""];
-Macro_44 -> Node_85 [style="dashed" label=""];
-Macro_46 -> Node_46 [style="dotted" label=""];
-Macro_46 -> Node_89 [style="dashed" label=""];
-Macro_46 -> Node_88 [style="dashed" label=""];
+Node_54 -> Node_50 [label="rule 9: t-"];
+Node_47 -> Node_44 [label="rule 8: w-"];
+Node_43 -> Node_42 [label="rule 7: z-"];
+Node_39 -> Node_35 [label="rule 6: y-"];
+Node_38 -> Node_37 [label="rule 5: x-"];
+Node_50 -> Node_54 [label="rule 4: t+"];
+Node_44 -> Node_47 [label="rule 3: w+"];
+Node_42 -> Node_43 [label="rule 2: z+"];
+Node_35 -> Node_39 [label="rule 1: y+"];
+Node_37 -> Node_38 [label="rule 0: x+"];
+Init_36 -> Node_36 [label=""];
+Macro_36 -> Node_36 [style="dotted" label=""];
+Macro_36 -> Node_35 [style="dashed" label=""];
+Macro_36 -> Node_37 [style="dashed" label=""];
 Macro_50 -> Node_50 [style="dotted" label=""];
-Macro_50 -> Node_33 [style="dashed" label=""];
-Macro_50 -> Node_83 [style="dashed" label=""];
+Macro_50 -> Node_43 [style="dashed" label=""];
+Macro_50 -> Node_47 [style="dashed" label=""];
 }
