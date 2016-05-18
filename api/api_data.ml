@@ -134,5 +134,15 @@ let api_contact_map cm =
             }) sites;
      }) cm'
 
+let api_contactmap_site_graph
+    (contactmap : Api_types.parse) : Api_types.site_graph =
+  contactmap.Api_types.contact_map
+
+let api_snapshot_site_graph
+    (snapshot : Api_types.snapshot) : Api_types.site_graph =
+  Array.of_list
+    (List.concat
+       [snapshot.Api_types.agents;snapshot.Api_types.tokens])
+
 let api_parse_is_empty (parse : Api_types.parse) =
   0 = Array.length parse.Api_types.contact_map
