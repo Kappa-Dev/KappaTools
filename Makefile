@@ -107,7 +107,7 @@ JsSim.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(GENERATED)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
 	-tag debug -I js -I api \
 	-tag-line "<generated/*> : package(atdgen)" \
-	-tag-line "<api/*> : package(lwt.ppx),package(atdgen)" \
+	-tag-line "<api/*> : package(lwt),package(atdgen)" \
 	-tag-line "<js/*> : thread, package(atdgen), package(js_of_ocaml.tyxml), package(js_of_ocaml.syntax), package(tyxml.syntax), package(lwt), syntax(camlp4o)" \
 	$@
 
@@ -115,7 +115,7 @@ WebWorker.byte: $(filter-out webapp/,$(filter-out _build/,$(wildcard */*.ml*))) 
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
 	-tag debug -I js -I api \
 	-tag-line "<generated/*> : package(atdgen)" \
-	-tag-line "<api/*> : package(lwt.ppx),package(atdgen)" \
+	-tag-line "<api/*> : package(lwt),package(atdgen)" \
 	-tag-line "<js/*> : thread, package(atdgen), package(js_of_ocaml), package(js_of_ocaml.syntax), package(lwt), syntax(camlp4o)" \
 	$@
 
@@ -123,7 +123,7 @@ WebSim.native: $(filter-out js/,$(filter-out _build/,$(wildcard */*.ml*))) $(GEN
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
 	-tag debug -I webapp -I api \
 	-tag-line "<generated/*> : package(atdgen)" \
-	-tag-line "<api/*> : package(lwt.ppx),package(atdgen)" \
+	-tag-line "<api/*> : package(lwt),package(atdgen)" \
 	-tag-line "<webapp/*> : thread, package(atdgen), package(cohttp.lwt), package(re), package(re.perl)" \
 	$@
 
