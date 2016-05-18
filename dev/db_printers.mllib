@@ -105,6 +105,7 @@ Navigation
 Connected_component
 Snip
 Edges
+Trace
 Expr_interpreter
 Rule_interpreter
 

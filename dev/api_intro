@@ -26,7 +26,7 @@ The simulation engine is in simulation/
 The core of the interpreter
 {!modules: Expr_interpreter Rule_interpreter State_interpreter}
 and some storage
-{!modules: Counter Data}
+{!modules: Counter Data Trace}
 
 The machinary to cook stories from an execution trace is in cflow/
 {!modules: Compression_main Utilities Priority}
@@ -44,6 +44,3 @@ The code of the static analyser is in KaSa_rep/reachability_analysis/
 {!modules: Analyzer Analyzer_headers Composite_domain Communication Analyzer_domain_sig Product Usual_domains}
 Several abstract domains are available:
 {!modules: Rules_domain Agents_domain Contact_map_domain Views_domain}
-
-
-

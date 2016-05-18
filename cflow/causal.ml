@@ -1,11 +1,5 @@
 open Mods
 
-type event_kind =
-  | OBS of string
-  | RULE of int
-  | INIT of int list (* the agents *)
-  | PERT of string (* the rule *)
-
 type quark_lists = {
   site_tested : (int * int) list;
   site_modified : (int * int) list;
@@ -20,7 +14,7 @@ type atom =
     {
       causal_impact : int ; (*(1) tested (2) modified, (3) tested + modified*)
       eid:int ; (*event identifier*)
-      kind:event_kind ;
+      kind:Trace.event_kind ;
 (*      observation: string list*)
     }
 
@@ -37,7 +31,7 @@ type grid =
     }
 type config =
   {
-    events_kind: event_kind IntMap.t ;
+    events_kind: Trace.event_kind IntMap.t ;
     prec_1: IntSet.t IntMap.t ;
     conflict : IntSet.t IntMap.t ;
   }
@@ -53,13 +47,6 @@ type enriched_grid =
 let empty_config =
   { events_kind=IntMap.empty; conflict = IntMap.empty; prec_1 = IntMap.empty }
 
-let debug_print_event_kind f = function
-  | OBS i -> Format.fprintf f "OBS(%s)" i
-  | RULE i -> Format.fprintf f "RULE(%i)" i
-  | INIT l ->
-     Format.fprintf f "INIT(%a)" (Pp.list Pp.comma Format.pp_print_int) l
-  | PERT s -> Format.fprintf f "PERT(%s)" s
-
 let debug_print_causal f i =
   Format.pp_print_string
     f (if i = atom_tested then "tested"
@@ -69,7 +56,7 @@ let debug_print_causal f i =
 
 let debug_print_atom f a =
   Format.fprintf f "{#%i: %a %a}" a.eid debug_print_causal a.causal_impact
-		 debug_print_event_kind a.kind
+		 (Trace.print_event_kind ?env:None) a.kind
 
 let debug_print_grid f g =
   let () =
@@ -267,7 +254,7 @@ let record_obs (kind,tests,_) side_effects event_number grid =
 let record_init (lbl,actions) event_number env grid =
   (* if !Parameter.showIntroEvents then *)
   (*adding tests*)
-  add_actions env grid event_number (INIT lbl)  actions
+  add_actions env grid event_number (Trace.INIT lbl)  actions
 
 let add_pred eid atom config =
   let events_kind = IntMap.add atom.eid atom.kind config.events_kind in
@@ -370,14 +357,6 @@ let dump grid fic =
   let () = Format.fprintf d "@]@." in
   close_out d_chan
 
-let label ?env = function
-  | OBS name -> name
-  | PERT s -> s
-  | RULE r_id -> Format.asprintf "%a" (Environment.print_ast_rule ?env) r_id
-  | INIT s ->
-     Format.asprintf
-       "Intro @[<h>%a@]" (Pp.list Pp.comma (Environment.print_agent ?env)) s
-
 let ids_of_grid grid = Hashtbl.fold (fun key _ l -> key::l) grid.flow []
 let config_of_grid = cut
 
@@ -465,27 +444,14 @@ let dot_of_grid profiling env enriched_grid form =
 	| None -> raise Not_found
 	| Some atom_kind ->
 	   if eid <> 0 then
-	     match atom_kind  with
-	     | RULE _  ->
-		Format.fprintf
-		  form
-		  "node_%d [label=\"%s\", shape=%s, style=%s, fillcolor = %s] ;@,"
-		  eid (label ~env atom_kind) "invhouse" "filled" "lightblue"
-	     | OBS _  ->
-		Format.fprintf
-		  form "node_%d [label=\"%s\", style=filled, fillcolor=red] ;@,"
-		  eid (label ~env atom_kind)
-	     | INIT _ ->
-		if !Parameter.showIntroEvents then
-		  Format.fprintf
-		    form
-		    "node_%d [label=\"%s\", shape=%s, style=%s, fillcolor=%s] ;@,"
-		    eid (label ~env atom_kind) "house" "filled" "green"
-	     | PERT _ ->
-		Format.fprintf
-		  form
-		  "node_%d [label=\"%s\", shape=%s, style=%s, fillcolor = %s] ;@,"
-		  eid (label ~env atom_kind) "invhouse" "filled" "green"
+	     Format.fprintf
+	       form "node_%d %a ;@," eid
+	       (if !Parameter.showIntroEvents then
+		  Trace.print_event_kind_dot_annot env
+		else match atom_kind with
+		     | Trace.INIT _ -> fun _ _ -> ()
+		     | (Trace.PERT _ | Trace.RULE _ | Trace.OBS _) ->
+			Trace.print_event_kind_dot_annot env) atom_kind
        (* List.iter (fun obs -> fprintf desc "obs_%d [label =\"%s\", style=filled, fillcolor=red] ;\n node_%d -> obs_%d [arrowhead=vee];\n" eid obs eid eid) atom.observation ;*)
        ) eids_at_d ;
      Format.fprintf form "}@]@," ;
@@ -509,8 +475,8 @@ let dot_of_grid profiling env enriched_grid form =
 	      | None -> raise Not_found
 	      | Some atom_kind ->
 		 match atom_kind with
-		 | INIT _ -> ()
-		 | PERT _ | RULE _ | OBS _ -> Format.fprintf form "node_%d -> node_%d@," eid' eid
+		 | Trace.INIT _ -> ()
+		 | Trace.PERT _ | Trace.RULE _ | Trace.OBS _ -> Format.fprintf form "node_%d -> node_%d@," eid' eid
 	 ) pred_set
     ) config.prec_1 ;
   IntMap.iter
@@ -550,12 +516,12 @@ let js_of_grid env enriched_grid f =
 	     ~trailing:Pp.space IntMap.bindings Pp.space
 	     (fun f (eid,atom_kind) ->
 	      Format.fprintf
-		f "g.setNode(%i, { label: \"%s\", style: \"fill: %s\" });"
-		eid (label ~env atom_kind)
+		f "g.setNode(%i, { label: \"%a\", style: \"fill: %s\" });"
+		eid (Trace.print_event_kind ~env) atom_kind
 		(match atom_kind with
-		 | OBS _ -> "#f77"
-		 | (INIT _ | PERT _) -> "#7f7"
-		 | RULE _ -> "#77f"))
+		 | Trace.OBS _ -> "#f77"
+		 | (Trace.INIT _ | Trace.PERT _) -> "#7f7"
+		 | Trace.RULE _ -> "#77f"))
 	     f enriched_grid.config.events_kind in
   let () =
     Pp.set

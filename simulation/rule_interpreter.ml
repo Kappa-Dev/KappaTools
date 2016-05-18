@@ -15,7 +15,7 @@ type t =
 	(Edges.agent * ((Connected_component.Set.t*int) * Edges.path) list) list
 	* bool;
     story_machinery :
-      ((Causal.event_kind * Connected_component.t array *
+      ((Trace.event_kind * Connected_component.t array *
 	  Instantiation.abstract Instantiation.test list)
 	 list Connected_component.Map.t (*currently tracked ccs *)
        * jf_data) option;

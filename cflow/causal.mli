@@ -1,9 +1,3 @@
-type event_kind =
-  | OBS of string
-  | RULE of int
-  | INIT of int list (** the agents *)
-  | PERT of string (** the rule *)
-
 type quark_lists = {
   site_tested : (int * int) list;
   site_modified : (int * int) list;
@@ -15,7 +9,7 @@ type atom =
     {
       causal_impact : int ; (*(1) tested (2) modified, (3) tested + modified*)
       eid:int ; (*event identifier*)
-      kind:event_kind ;
+      kind:Trace.event_kind ;
 (*      observation: string list*)
     }
 
@@ -32,7 +26,7 @@ type grid =
     }
 type config =
   {
-    events_kind: event_kind Mods.IntMap.t ;
+    events_kind: Trace.event_kind Mods.IntMap.t ;
     prec_1: Mods.IntSet.t Mods.IntMap.t ;
     conflict : Mods.IntSet.t Mods.IntMap.t ;
   }
@@ -40,19 +34,18 @@ type enriched_grid =
     {
       config:config;
       depth:int;
-      prec_star: (int list array * Graph_closure.order) ; 
+      prec_star: (int list array * Graph_closure.order) ;
       depth_of_event: int Mods.IntMap.t ;
       size:int;
     }
 
-val label : ?env:Environment.t -> event_kind -> string
 val empty_grid : unit -> grid
 
 val record :
-  (event_kind *
+  (Trace.event_kind *
      Instantiation.concrete Instantiation.event * unit Mods.simulation_info) -> int -> Environment.t -> grid -> grid
 val record_obs :
-  (event_kind *
+  (Trace.event_kind *
      Instantiation.concrete Instantiation.test list
    * unit Mods.simulation_info) ->
   Instantiation.concrete Instantiation.site list -> int -> grid -> grid

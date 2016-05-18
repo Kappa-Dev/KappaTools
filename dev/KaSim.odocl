@@ -36,6 +36,7 @@ Edges
 
 Counter
 Data
+Trace
 Expr_interpreter
 Rule_interpreter
 State_interpreter

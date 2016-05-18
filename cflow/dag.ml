@@ -154,19 +154,19 @@ let print_prehash parameter handler error representation =
       error
 
 let label handler x =
-  match x
-  with
-  | Causal.RULE i -> H.string_of_rule_id handler i
-  | Causal.INIT [i] -> H.string_of_agent_id handler i
-  | _ -> Causal.label ~env:handler.H.env x
+  match x with
+  | Trace.RULE i -> H.string_of_rule_id handler i
+  | Trace.INIT [i] -> H.string_of_agent_id handler i
+  | (Trace.INIT _ | Trace.OBS _ | Trace.PERT _) ->
+     Format.asprintf "%a" (Trace.print_event_kind ~env:handler.H.env) x
 
 let kind node =
   match node
   with
-  | Causal.INIT _ -> INIT
-  | Causal.RULE _ -> RULE
-  | Causal.PERT _ -> PERT
-  | Causal.OBS _ -> OBS
+  | Trace.INIT _ -> INIT
+  | Trace.RULE _ -> RULE
+  | Trace.PERT _ -> PERT
+  | Trace.OBS _ -> OBS
 
 let compare_elt x y =
   match x,y with

@@ -36,9 +36,9 @@ sig
   type internal_state = int
 
   type side_effect = Instantiation.concrete Instantiation.site list
-  type refined_event = Causal.event_kind * Instantiation.concrete Instantiation.event * unit Mods.simulation_info
+  type refined_event = Trace.event_kind * Instantiation.concrete Instantiation.event * unit Mods.simulation_info
   type refined_obs =
-      Causal.event_kind * Instantiation.concrete Instantiation.test list * unit Mods.simulation_info
+      Trace.event_kind * Instantiation.concrete Instantiation.test list * unit Mods.simulation_info
   type refined_step
 
   val empty_side_effect: side_effect
@@ -117,9 +117,9 @@ module Cflow_linker =
   type internal_state  = int
 
   type refined_event =
-      Causal.event_kind * PI.concrete PI.event * unit Mods.simulation_info
+      Trace.event_kind * PI.concrete PI.event * unit Mods.simulation_info
   type refined_obs =
-      Causal.event_kind *
+      Trace.event_kind *
 	PI.concrete PI.test list *
 	  unit Mods.simulation_info
   type refined_step =
@@ -217,14 +217,17 @@ module Cflow_linker =
     let sigs = match handler with
       | None -> None
       | Some handler -> Some (Environment.signatures handler.H.env) in
-    if compact
-    then
-      Loggers.fprintf f "OBS %s"
-        (Causal.label ?env:(Tools.option_map (fun x -> x.H.env) handler) ev_kind)
+    if compact then
+      Loggers.fprintf
+	f "OBS %a"
+	(Trace.print_event_kind ?env:(Tools.option_map (fun x -> x.H.env) handler))
+	ev_kind
     else
-      Loggers.fprintf f "***@[<1>OBS %s:%a@]***"
-      (Causal.label ?env:(Tools.option_map (fun x -> x.H.env) handler) ev_kind)
-      (Pp.list Pp.space (PI.print_concrete_test ?sigs)) tests
+      Loggers.fprintf
+	f "***@[<1>OBS %a:%a@]***"
+	(Trace.print_event_kind ?env:(Tools.option_map (fun x -> x.H.env) handler))
+	ev_kind
+	(Pp.list Pp.space (PI.print_concrete_test ?sigs)) tests
 
   let print_refined_subs _f (_a,_b)  = ()
 
@@ -245,10 +248,16 @@ module Cflow_linker =
       | Some handler -> Some (Environment.signatures handler.H.env) in
     if compact
     then
-      Loggers.fprintf log "%s" (Causal.label ?env:(Tools.option_map (fun x -> x.H.env) handler) ev_kind)
+      Loggers.fprintf
+	log "%a"
+	(Trace.print_event_kind ?env:(Tools.option_map (fun x -> x.H.env) handler))
+	ev_kind
     else
-      let () = Loggers.fprintf log "@[***Refined event:***@,* Kappa_rule %s"
-          (Causal.label ?env:(Tools.option_map (fun x -> x.H.env) handler) ev_kind) in
+      let () =
+	Loggers.fprintf
+	  log "@[***Refined event:***@,* Kappa_rule %a"
+          (Trace.print_event_kind ?env:(Tools.option_map (fun x -> x.H.env) handler))
+	  ev_kind in
       let () = Loggers.print_breakable_space log in
       let () = Loggers.fprintf log "Story encoding:" in
       let () = List.iter (fun test -> Loggers.print_as_logger log (fun log -> PI.print_concrete_test ?sigs log test)) tests in
@@ -324,10 +333,10 @@ module Cflow_linker =
       (fun _ _ l error _ -> error,l,([],[]))
   let store_event log_info (event:refined_event) (step_list:refined_step list) =
     match event with
-    | Causal.INIT _,(_,(actions,_,_)),_ ->
+    | Trace.INIT _,(_,(actions,_,_)),_ ->
        P.inc_n_kasim_events log_info,(Init actions)::step_list
-    | Causal.OBS _,_,_ -> assert false
-    | (Causal.RULE _ | Causal.PERT _ as k),x,info ->
+    | Trace.OBS _,_,_ -> assert false
+    | (Trace.RULE _ | Trace.PERT _ as k),x,info ->
        P.inc_n_kasim_events log_info,(Event (k,x,info))::step_list
   let store_obs log_info (i,x,c) step_list =
     P.inc_n_obs_events log_info,Obs(i,x,c)::step_list

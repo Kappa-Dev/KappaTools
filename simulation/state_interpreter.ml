@@ -62,7 +62,7 @@ let initialize ~bind ~return env domain counter graph0 state0 init_l =
 	       match Rule_interpreter.apply_rule
 		       ~get_alg env domain
 		       (Environment.connected_components_of_unary_rules env)
-		       counter s (Causal.INIT creations_sort)
+		       counter s (Trace.INIT creations_sort)
 		       compiled_rule with
 	       | Rule_interpreter.Success s -> s
 	       | (Rule_interpreter.Clash | Rule_interpreter.Corrected _) ->
@@ -99,7 +99,7 @@ let do_it ~outputs env domain counter graph state modification =
 	 Rule_interpreter.force_rule
 		~get_alg env domain
 		(Environment.connected_components_of_unary_rules env)
-		counter g (Causal.PERT "pert") r)
+		counter g (Trace.PERT "pert") r)
 	graph n,state)
   | Primitives.UPDATE (i,(expr,_)) ->
      let () =
@@ -145,7 +145,7 @@ let do_it ~outputs env domain counter graph state modification =
 		      (fun _ -> Connected_component.print ~sigs ?with_id:None))
 	    cc in
      (false,
-      Rule_interpreter.add_tracked cc (Causal.OBS name) tests graph,
+      Rule_interpreter.add_tracked cc (Trace.OBS name) tests graph,
       state)
   | Primitives.CFLOWOFF cc ->
      (false, Rule_interpreter.remove_tracked cc graph, state)
@@ -240,7 +240,7 @@ let one_rule dt stop env domain counter graph state =
   let get_alg i = get_alg env state i in
   (* let () = *)
   (*   Format.eprintf "%a@." (Rule_interpreter.print_injections env) graph in *)
-  let cause = Causal.RULE rule.Primitives.syntactic_rule in
+  let cause = Trace.RULE rule.Primitives.syntactic_rule in
   let apply_rule ~rule_id =
     if choice mod 2 = 1
     then Rule_interpreter.apply_unary_rule ~rule_id

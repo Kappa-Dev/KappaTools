@@ -25,21 +25,21 @@ val value_bool :
 val apply_rule :
   ?rule_id:int -> get_alg:(int -> Alg_expr.t) -> Environment.t ->
   Connected_component.Env.t -> Connected_component.Set.t -> Counter.t ->
-  t -> Causal.event_kind -> Primitives.elementary_rule -> result
+  t -> Trace.event_kind -> Primitives.elementary_rule -> result
 (** Returns the graph obtained by applying the rule.
  [rule_id] is mandatory if the rule has an unary rate.*)
 
 val apply_unary_rule :
   rule_id:int -> get_alg:(int -> Alg_expr.t) -> Environment.t ->
   Connected_component.Env.t -> Connected_component.Set.t -> Counter.t ->
-  t -> Causal.event_kind -> Primitives.elementary_rule -> result
+  t -> Trace.event_kind -> Primitives.elementary_rule -> result
 (** Returns the graph obtained by applying the rule.
  [rule_id] is mandatory if the rule has an unary rate.*)
 
 val force_rule :
   get_alg:(int -> Alg_expr.t) -> Environment.t ->
   Connected_component.Env.t -> Connected_component.Set.t -> Counter.t ->
-  t -> Causal.event_kind -> Primitives.elementary_rule -> t
+  t -> Trace.event_kind -> Primitives.elementary_rule -> t
 (** Apply the rule for sure if it is possible. Try [apply_rule] but in
 case of null_event, it computes the exact injections of the left hand
 side to do apply the rule and returns the remaining exact injections. *)
@@ -73,7 +73,7 @@ val unary_distances : t -> Data.distances option
 (** {6 Stories} *)
 
 val add_tracked :
-  Connected_component.t array -> Causal.event_kind ->
+  Connected_component.t array -> Trace.event_kind ->
   Instantiation.abstract Instantiation.test list ->
   t -> t
 val remove_tracked : Connected_component.t array -> t -> t
