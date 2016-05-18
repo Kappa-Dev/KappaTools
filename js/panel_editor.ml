@@ -1,4 +1,5 @@
-open Js;;
+module UIState = Ui_state
+open Js
 open Codemirror
 
 let rec list_last = function
@@ -134,11 +135,34 @@ let onload () : unit =
   let codemirror : codemirror Js.t =
     Codemirror.fromTextArea textarea configuration in
   let _ = Lwt_js_events.async (initialize codemirror) in
-  let codemirror_handler _ =
-    has_been_modified := true;
-    UIState.update_text (Js.to_string codemirror##getValue()) in
-  let () = codemirror##on((Js.string "change"),
-                          (codemirror_handler)) in
+
+  let timeout : Dom_html.timeout_id option ref = ref None in
+  let handler = fun codemirror change ->
+    let () = has_been_modified := true in
+    let text : string = Js.to_string codemirror##getValue() in
+    let () = UIState.set_text text in
+    let () = match !timeout with
+        None -> ()
+      | Some timeout -> Dom_html.window ##
+        clearTimeout (timeout) in
+    let delay : float = if ((Js.str_array (change##text ))##length) > 1 then
+        1.0 *. 1000.0
+      else
+        10.0 *. 1000.0
+    in
+    let handle_timeout () =
+      let () = Common.info "handle_timeout" in
+      let () = Common.info text in
+      UIState.parse_text (Js.to_string codemirror##getValue()) in
+    let () = timeout := Some
+      (Dom_html.window ## setTimeout
+         (Js.wrap_callback (fun _ -> handle_timeout ()), delay)) in
+    ()
+  in
+  let () = codemirror##onChange(handler)
+  in
+
+
   let file_select_dom : Dom_html.inputElement Js.t =
     Js.Unsafe.coerce
     ((Js.Opt.get (document##getElementById (Js.string file_selector_id))

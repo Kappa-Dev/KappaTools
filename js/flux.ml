@@ -3,14 +3,15 @@ class type flux_configuration = object
                              val endTimeId : Js.js_string Js.t Js.prop
                              val selectCorrectionId : Js.js_string Js.t Js.prop
                              val checkboxSelfInfluenceId : Js.js_string Js.t Js.prop
-			     val toggleRulesId : Js.js_string Js.t Js.prop
+                             val toggleRulesId : Js.js_string Js.t Js.prop
                              val nbEventsId : Js.js_string Js.t Js.prop
                              val svgId : Js.js_string Js.t Js.prop
                              val rulesCheckboxesId : Js.js_string Js.t Js.prop
                              val height : int Js.t Js.prop
                              val width : int Js.t Js.prop
                            end
-let constructor_configuration : flux_configuration Js.t Js.constr = (Js.Unsafe.variable "Object")
+let constructor_configuration : flux_configuration Js.t Js.constr =
+  (Js.Unsafe.variable "Object")
 let create_configuration ~(begin_time_id : string)
                          ~(end_time_id : string)
                          ~(select_correction_id : string)
@@ -61,8 +62,8 @@ let create_data ~(flux_begin_time : float)
   data
 
 class type flux_map = object
-			method exportJSON  : Js.js_string Js.t -> unit Js.meth
-			method setFlux : flux_data Js.t -> unit Js.meth
+                        method exportJSON  : Js.js_string Js.t -> unit Js.meth
+                        method setFlux : flux_data Js.t -> unit Js.meth
                       end;;
 
 let create_flux_map (configuration : flux_configuration Js.t) : flux_map Js.t =

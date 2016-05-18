@@ -1,3 +1,4 @@
+module UIState = Ui_state
 module ApiTypes = ApiTypes_j
 module Html5 = Tyxml_js.Html5
 module R = Tyxml_js.R
@@ -25,24 +26,25 @@ let time_limit =
         Html5.a_class ["form-control"];
         Html5.a_placeholder "Time limit";
         Tyxml_js.R.Html5.a_value
-          (React.S.l1 (fun x -> match x with
-                                | Some value ->
-                                   (* string_of_float returns integers with a trailing "."
-                                      which is not recognized by javascript.  this is an
-                                      attempt at fixing this.
-                                    *)
-                                   let value = string_of_float value in
-                                   let format_float n =
-                                     let length = String.length n in
-                                     if length > 0 && String.get n (length - 1) == '.' then
-                                       n^"0"
-                                     else
-                                       n
-                                   in
-                                   let value = format_float value in
-                                   value
-                                | None -> "") UIState.model_max_time)
-                            ]
+          (React.S.l1
+             (fun x -> match x with
+             | Some value ->
+               (* string_of_float returns integers with a trailing "."
+                  which is not recognized by javascript.  this is an
+                  attempt at fixing this.
+               *)
+               let value = string_of_float value in
+               let format_float n =
+                 let length = String.length n in
+                 if length > 0 && String.get n (length - 1) == '.' then
+                   n^"0"
+                 else
+                   n
+               in
+               let value = format_float value in
+               value
+             | None -> "") UIState.model_max_time)
+       ]
     ()
 let plot_points_id = "plot_points"
 let plot_points =

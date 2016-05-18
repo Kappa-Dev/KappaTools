@@ -88,6 +88,31 @@ let set_runtime_url (url : string) (continuation : bool -> unit) : unit =
 let set_runtime (runtime : runtime) (continuation : bool -> unit) : unit =
   set_runtime_url (runtime_value runtime) continuation
 
+let set_text text = set_model_text text
+let parse_text text =
+  let () = set_model_text text in
+  let () = Lwt.async
+    (fun () ->
+      (match !runtime_state with
+        None ->
+          Lwt.fail (InvalidState "Runtime state not available")
+      | Some runtime_state -> runtime_state#parse text)
+      >>=
+        (fun error ->
+          match error with
+            `Left error ->
+              let () = set_model_error error in
+              let () = set_model_parse None in
+              Lwt.return_unit
+          | `Right parse ->
+            let () = set_model_error [] in
+            let () = set_model_parse (Some parse) in
+            Lwt.return_unit
+        )
+    )
+  in
+  ()
+
 let update_text text =
   let () = set_model_text text in
   (* Should reset everyting before

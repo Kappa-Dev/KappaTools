@@ -1,8 +1,8 @@
 html { position: relative;
        min-height: 100%; }
 
-body { margin-bottom: 60px;
-       font: 10px sans-serif; }
+body { margin-bottom: 60px; }
+
 
 span.filler:empty:before {
    content: "\00a0";
@@ -96,7 +96,7 @@ rect { stroke-width: 2; }
              fill-opacity:0.5;
              stroke-width : 2;
 }
-
+.node-text { font: 10px sans-serif; }
 .node-proof {
               opacity : 0.0;
 }
@@ -133,11 +133,10 @@ rect { stroke-width: 2; }
     margin: 1px !important;
 }
 
-@media .CodeMirror(max-width: 100px) {
-    width: 100%;
-}
 .CodeMirror {
     border: 1px solid #eee;
-    min-height: 100px;
-    height: calc(100% - 320px);
+    min-height: 40px;
+    height: calc(100% - 100px);
+    height: -webkit-calc(100% - 100px);
+    height: -moz-calc(100% - 100px);0
 }

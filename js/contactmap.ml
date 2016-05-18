@@ -5,6 +5,8 @@ object
   method clearData : unit Js.meth
 end;;
 
-let create_contact_map (id : string) : contact_map Js.t =
+let create_contact_map (id : string) (is_snapshot : bool) : contact_map Js.t =
   Js.Unsafe.new_obj (Js.Unsafe.variable "ContactMap")
-                    [| Js.Unsafe.inject (Js.string id) |]
+                    [| Js.Unsafe.inject (Js.string id) ;
+                       Js.Unsafe.inject (Js.bool is_snapshot)
+                    |]

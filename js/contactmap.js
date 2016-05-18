@@ -202,8 +202,9 @@ class Node extends D3Object {
  * DTO for contact map.
  */
 class DataTransfer {
-    constructor(data){
+    constructor(data,isSnapshot){
         var that = this;
+        this.isSnapshot = isSnapshot;
         that.state = {};
 
         data.forEach(function(node){
@@ -222,6 +223,11 @@ class DataTransfer {
                     var nodeId = parseInt(link[0]);
                     var siteId = parseInt(link[1]);
                     var targetNode = data[nodeId].node_name;
+                    if(!data[nodeId].node_sites[siteId]){
+                        debug(data[nodeId]);
+                        debug(siteId);
+                        debug(node);
+                    }
                     var targetSite = data[nodeId].node_sites[siteId].site_name;
                     newNode.addAdjacent(data[nodeId].nodeName);
                     siteNew.addAdjacent(targetNode,targetSite);
@@ -720,15 +726,16 @@ class Render{
     }
 }
 
-function ContactMap(id){
+function ContactMap(id,isSnapshot){
     var that = this;
     this.id = "#"+id;
-
+    this.isSnapshot = isSnapshot;
     this.setData = function(json){
         try {
+            debug(json);
             var data = JSON.parse(json);
             that.data = data;
-            var contactMap = new DataTransfer(data);
+            var contactMap = new DataTransfer(data,isSnapshot);
             that.clearData();
             if(contactMap.nodeNames().length > 0){
                 if(contactMap.nodeNames().length > 0){
