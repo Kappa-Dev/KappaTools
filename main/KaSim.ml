@@ -218,7 +218,7 @@ let () =
     ExceptionDefn.flush_warning Format.err_formatter ;
     if !Parameter.compileModeOn then exit 0 else ();
 
-    Kappa_files.setCheckFileExists() ;
+    Kappa_files.setCheckFileExists ~batchmode:!Parameter.batchmode ;
 
     let () =
       let head =

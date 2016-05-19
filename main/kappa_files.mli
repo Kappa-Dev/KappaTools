@@ -1,7 +1,7 @@
 (** {5 Utilities on files } *)
 val open_out : string -> out_channel
 val mk_dir_r : string -> unit
-val setCheckFileExists : unit -> unit
+val setCheckFileExists : batchmode:bool -> unit
 
 val set_dir : string -> unit
 val set_data : string -> unit

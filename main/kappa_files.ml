@@ -69,13 +69,13 @@ let setOutputName () =
   set marshalizedOutFile None;
   set outputDataName None
 
-let setCheckFileExists () =
+let setCheckFileExists ~batchmode =
   let check file =
     match file with
     | "" -> ()
     | file ->
        let file = path file in
-       if not !Parameter.batchmode && Sys.file_exists file then
+       if not batchmode && Sys.file_exists file then
 	 let () =
 	   Format.eprintf
 	     "File '%s' already exists do you want to erase (y/N)?@." file in
