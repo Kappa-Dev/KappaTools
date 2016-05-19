@@ -531,13 +531,12 @@ let compress ?heuristic parameter ?(shall_we_compute=always) ?(shall_we_compute_
     parameter.S.PH.B.PB.CI.Po.K.H.current_compression_mode
   with
   | None -> error,log_info,[trace]
-  | Some Parameter.Causal ->
+  | Some S.PH.B.PB.CI.Po.K.H.Causal ->
      let error,log_info,trace = cut parameter ~shall_we_compute:always handler log_info error trace
      in error,log_info,[trace]
-  | Some Parameter.Weak
-  | Some Parameter.Strong ->
+  | Some (S.PH.B.PB.CI.Po.K.H.Weak | S.PH.B.PB.CI.Po.K.H.Strong) ->
      let event = match parameter.S.PH.B.PB.CI.Po.K.H.current_compression_mode
-       with Some Parameter.Weak -> StoryProfiling.Weak_compression
+       with Some S.PH.B.PB.CI.Po.K.H.Weak -> StoryProfiling.Weak_compression
 	  | _ -> StoryProfiling.Strong_compression
      in
      let error, log_info = P.add_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error event (Some (fun () -> size_of_pretrace trace)) log_info in
@@ -582,16 +581,8 @@ let compress ?heuristic parameter ?(shall_we_compute=always) ?(shall_we_compute_
 	 error
      in*) error,log_info,list
 
-let set_compression_mode p x =
-  match
-    x
-  with
-  | Parameter.Causal -> S.PH.B.PB.CI.Po.K.H.set_compression_none p
-  | Parameter.Strong -> S.PH.B.PB.CI.Po.K.H.set_compression_strong p
-  | Parameter.Weak -> S.PH.B.PB.CI.Po.K.H.set_compression_weak p
-
-let strongly_compress ?heuristic parameter = compress ?heuristic (set_compression_mode parameter Parameter.Strong)
-let weakly_compress ?heuristic parameter = compress ?heuristic (set_compression_mode parameter Parameter.Weak)
+let strongly_compress ?heuristic parameter = compress ?heuristic (S.PH.B.PB.CI.Po.K.H.set_compression_strong parameter)
+let weakly_compress ?heuristic parameter = compress ?heuristic (S.PH.B.PB.CI.Po.K.H.set_compression_weak parameter)
 
 let convert_trace_into_grid trace handler =
     let event_list = get_compressed_trace trace in

@@ -1,16 +1,18 @@
 module type Cflow_handler =
   sig
+    type sort_algo_for_stories
+    type current_compression_mode = Weak | Strong | Causal
     (** a struct which contains parameterizable options *)
     type parameter =
         {
           cache_size : int option ;
-          current_compression_mode: Parameter.current_compression_mode option;
+          current_compression_mode: current_compression_mode option;
           compression_mode : Parameter.compression_mode ;
           priorities_weak: Priority.priorities ;
           priorities_strong : Priority.priorities ;
           priorities_causal : Priority.priorities ;
 	  compute_all_stories : bool ;
-	  sort_algo_for_stories: Parameter.sort_algo_for_stories;
+	  sort_algo_for_stories: sort_algo_for_stories;
 	  logger_err : Loggers.t ;
 	  logger_profiling : Loggers.t ;
 	  logger_out : Loggers.t ;

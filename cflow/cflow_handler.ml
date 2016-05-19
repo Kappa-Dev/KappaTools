@@ -22,17 +22,20 @@
 
 module type Cflow_handler =
 sig
+  type sort_algo_for_stories
+  type current_compression_mode = Weak | Strong | Causal
+
   (** a struct which contains parameterizable options *)
   type parameter =
     {
       cache_size : int option ;
-      current_compression_mode: Parameter.current_compression_mode option;
+      current_compression_mode: current_compression_mode option;
       compression_mode : Parameter.compression_mode ;
       priorities_weak: Priority.priorities ;
       priorities_strong : Priority.priorities ;
       priorities_causal : Priority.priorities ;
       compute_all_stories : bool ;
-      sort_algo_for_stories: Parameter.sort_algo_for_stories;
+      sort_algo_for_stories: sort_algo_for_stories;
       logger_err : Loggers.t ;
       logger_profiling : Loggers.t ;
       logger_out : Loggers.t ;
@@ -109,16 +112,19 @@ end
 
 module Cflow_handler =
   (struct
+      type sort_algo_for_stories = Bucket | Fusion
+      type current_compression_mode = Weak | Strong | Causal
+
     type parameter =
         {
           cache_size : int option ;
-          current_compression_mode: Parameter.current_compression_mode option;
+          current_compression_mode: current_compression_mode option;
           compression_mode : Parameter.compression_mode ;
           priorities_weak: Priority.priorities ;
           priorities_strong : Priority.priorities ;
           priorities_causal: Priority.priorities ;
           compute_all_stories : bool ;
-          sort_algo_for_stories: Parameter.sort_algo_for_stories;
+          sort_algo_for_stories: sort_algo_for_stories;
           logger_err : Loggers.t;
           logger_profiling: Loggers.t;
           logger_out : Loggers.t;
@@ -157,7 +163,7 @@ module Cflow_handler =
         priorities_strong = Priority.strong ;
         priorities_causal = Priority.causal ;
         compute_all_stories = false ;
-        sort_algo_for_stories = Parameter.Bucket;
+        sort_algo_for_stories = Bucket;
         logger_out = out_channel ;
         logger_err = out_channel_err ;
         logger_profiling = out_channel_profiling ;
@@ -174,11 +180,11 @@ module Cflow_handler =
       }
 
     let set_compression_weak p =
-      {p with current_compression_mode = Some Parameter.Weak}
+      {p with current_compression_mode = Some Weak}
     let set_compression_strong p =
-      {p with current_compression_mode = Some Parameter.Strong}
+      {p with current_compression_mode = Some Strong}
     let set_compression_none p =
-      {p with current_compression_mode = Some Parameter.Causal}
+      {p with current_compression_mode = Some Causal}
 
 
 
@@ -213,9 +219,9 @@ module Cflow_handler =
     let get_priorities parameter =
       match parameter.current_compression_mode with
       | None -> None
-      | Some Parameter.Weak -> Some parameter.priorities_weak
-      | Some Parameter.Strong -> Some parameter.priorities_strong
-      | Some Parameter.Causal -> Some parameter.priorities_causal
+      | Some Weak -> Some parameter.priorities_weak
+      | Some Strong -> Some parameter.priorities_strong
+      | Some Causal -> Some parameter.priorities_causal
 
    let set_first_story_per_obs parameter =
      {
@@ -244,9 +250,9 @@ module Cflow_handler =
    let get_kasa_parameters parameter = parameter.kasa
    let set_kasa_parameters parameter parameter' = {parameter' with kasa = parameter}
 
-   let do_we_use_bucket_sort parameter = parameter.sort_algo_for_stories == Parameter.Bucket
-   let use_bucket_sort parameter = {parameter with sort_algo_for_stories = Parameter.Bucket}
-   let use_fusion_sort parameter = {parameter with sort_algo_for_stories = Parameter.Fusion}
+   let do_we_use_bucket_sort parameter = parameter.sort_algo_for_stories = Bucket
+   let use_bucket_sort parameter = {parameter with sort_algo_for_stories = Bucket}
+   let use_fusion_sort parameter = {parameter with sort_algo_for_stories = Fusion}
 
    let always_disambiguate parameter = parameter.always_disambiguate_initial_states
    let set_always_disambiguate parameter  bool = { parameter with always_disambiguate_initial_states = bool}

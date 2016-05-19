@@ -149,9 +149,11 @@ module Propagation_heuristic =
             match
               parameter.B.PB.CI.Po.K.H.current_compression_mode
             with
-            | None | Some Parameter.Causal-> false,""
-            | Some Parameter.Weak -> Parameter.dump_grid_after_branching_during_weak_compression,Parameter.xlsweakFileName
-            | Some Parameter.Strong -> Parameter.dump_grid_after_branching_during_strong_compression,Parameter.xlsstrongFileName
+            | None | Some B.PB.CI.Po.K.H.Causal-> false,""
+            | Some B.PB.CI.Po.K.H.Weak ->
+	       Parameter.dump_grid_after_branching_during_weak_compression,Parameter.xlsweakFileName
+            | Some B.PB.CI.Po.K.H.Strong ->
+	       Parameter.dump_grid_after_branching_during_strong_compression,Parameter.xlsstrongFileName
           end
       in
       let error,log_info =

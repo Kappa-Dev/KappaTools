@@ -1538,7 +1538,7 @@ module Blackboard =
        with
        | None ->
 	  warn parameter log_info error (Some "import, line 1551, Compression mode has not been set up.") (Failure "Compression mode has not been set up.") (preblackboard,0,"None",false)
-       | Some Parameter.Strong ->
+       | Some PB.CI.Po.K.H.Strong ->
          let error,log_info,(preblackboard,int) =
            List.fold_left
              (fun (error,log_info,(preblackboard,int)) refined_event  ->
@@ -1547,7 +1547,7 @@ module Blackboard =
              list
          in
          error,log_info,(preblackboard,int,Parameter.xlsstrongFileName,Parameter.dump_grid_before_strong_compression)
-       | Some Parameter.Weak | Some Parameter.Causal ->
+       | Some PB.CI.Po.K.H.Weak | Some PB.CI.Po.K.H.Causal ->
          let error,log_info,(preblackboard,int) =
          List.fold_left
            (fun (error,log_info,(preblackboard,int)) refined_event  ->

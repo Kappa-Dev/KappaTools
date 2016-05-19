@@ -174,9 +174,6 @@ val export_story_table: (story_table,(Causal.grid*trace_runtime_info list) list)
 val compress:
   ?heuristic:Priority.priorities -> (trace,trace list) unary
 
-(** change the default level of oabstraction for compression (when used with compress) *)
-val set_compression_mode: parameter -> Parameter.current_compression_mode -> parameter
-
 val copy_log_info: StoryProfiling.StoryStats.log_info -> StoryProfiling.StoryStats.log_info
 
 type cflow_grid = Causal.grid

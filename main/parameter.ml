@@ -67,8 +67,6 @@ let xlsstrongFileName = "grid_strong_compression"
 let cpuTime = ref 0.0
 let initSimTime () = cpuTime := Sys.time ()
 
-type sort_algo_for_stories = Bucket | Fusion
-type current_compression_mode = Weak | Strong | Causal
 type compression_mode =
     {
       causal_trace:bool;

@@ -826,7 +826,7 @@ module Preblackboard =
            match
              parameter.CI.Po.K.H.current_compression_mode
            with
-           | None | Some Parameter.Causal ->
+           | None | Some CI.Po.K.H.Causal ->
              begin
                let s = C.last former_states in
                match s with
@@ -840,7 +840,7 @@ module Preblackboard =
                    else
                      error,log_info,blackboard,[]
              end
-           | Some _ ->
+           | Some (CI.Po.K.H.Strong | CI.Po.K.H.Weak) ->
              begin
                let error,log_info,bt = predicate_value_of_binding_state parameter handler log_info error binding_state in
                let error,log_info,list =
