@@ -96,7 +96,8 @@ type reachability_map_output =
     show_rule_names_in_local_traces: bool;
     format_for_local_traces: graph_format;
     use_macrotransitions_in_local_traces: bool;
-    ignore_trivial_losanges: bool;    
+    add_singular_macrostates: bool;    
+    ignore_trivial_losanges: bool;
     use_natural_language : bool;
     trace_prefix: string;
     trace_directory: string;

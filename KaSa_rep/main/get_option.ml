@@ -142,6 +142,18 @@ let options =
       ["3_Trace_analysis"],
       Expert;
 
+      "--add-singular-macrostates",
+      Bool Config.add_singular_macrostates,
+      "Complete the simplicial complexes with singular intersection of higher-dimension faces",
+      ["3_Trace_analysis"],
+      Expert;
+
+      "--add-singular-microstates",
+      Bool Config.add_singular_macrostates,
+      "Complete the simplicial complexes with singular intersection of higher-dimension faces",
+      ["3_Trace_analysis"],
+      Hidden;
+
       "--output-directory",
        MultiExt
 	[

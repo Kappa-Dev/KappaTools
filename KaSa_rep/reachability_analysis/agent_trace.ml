@@ -462,6 +462,151 @@ let trivial_concurrent_sites _ error _ support =
   let hconsed = Ckappa_sig.Views_intbdu.build_variables_list [] in
   error, LabelMap.map (fun _ -> SiteSet.empty, hconsed) support
 
+let compute_var_set transition_system =
+  List.fold_left
+    (fun (map_interface, map_domain) mvbdu ->
+       let varlist = Ckappa_sig.Views_intbdu.variables_list_of_mvbdu mvbdu in
+       let hash = Ckappa_sig.Views_intbdu.hash_of_variables_list varlist in
+       let map_interface = Mods.IntMap.add hash varlist map_interface in
+       let old_list = Mods.IntMap.find_default [] hash map_domain in
+       let map_domain = Mods.IntMap.add hash (mvbdu::old_list) map_domain in
+       map_interface, map_domain)
+    (Mods.IntMap.empty, Mods.IntMap.empty)
+    transition_system.nodes
+
+let merge_list list1 list2 =
+  let rec aux list1 list2 rep =
+    match
+      list1,list2
+    with
+      [], _ -> (List.rev rep)@list2
+    | _ ,[] -> (List.rev rep)@list1
+    | h::q,h'::q' ->
+      if h=h'
+      then
+        aux q q' (h::rep)
+      else if h<h' then aux q list2 (h::rep)
+      else aux list1 q' (h'::rep)
+  in
+  aux list1 list2 []
+
+let powerset  map_interface =
+  let list =
+    Mods.IntMap.fold
+      (fun hash hconsed list ->
+         (hash,hconsed)::list
+      )
+      map_interface
+      []
+  in
+  let rec aux to_use already_built =
+    match
+      to_use
+    with
+    | [] -> already_built
+    | (hash,hconsed)::tail ->
+      begin
+        let list_var = Ckappa_sig.Views_intbdu.extensional_of_variables_list hconsed in
+        let already_built =
+          List.fold_left
+            (fun list (hash',hconsed',proof) ->
+               let list_var' = Ckappa_sig.Views_intbdu.extensional_of_variables_list hconsed'
+               in
+               let hconsed'' =
+                 Ckappa_sig.Views_intbdu.build_variables_list
+                   (merge_list list_var list_var') in
+               let hash'' = Ckappa_sig.Views_intbdu.hash_of_variables_list hconsed'' in
+               (hash'',hconsed'',(hash,hconsed)::proof)::(hash',hconsed',proof)::list)
+            []
+            already_built
+        in
+        aux tail already_built
+      end
+  in
+  let hconsed = Ckappa_sig.Views_intbdu.build_variables_list [] in
+  let hash = Ckappa_sig.Views_intbdu.hash_of_variables_list hconsed in
+  let list = aux list [hash,hconsed,[]] in
+  let extended_map =
+    List.fold_left
+      (fun extended_map (hash,hconsed,proof) ->
+         let old_list = Mods.IntMap.find_default [] hash extended_map in
+         let new_list =
+           match proof with
+           | [] | [_] -> old_list
+           | _ -> proof::old_list
+         in
+         Mods.IntMap.add hash new_list extended_map)
+      Mods.IntMap.empty
+      list
+  in
+  Mods.IntMap.fold
+    (fun hash list map ->
+       let list =
+         List.filter
+           (fun l -> not (List.exists (fun (a,_) -> a=hash) l))
+           list
+       in
+       match list with
+       | [] | [_] -> map
+       | _ -> Mods.IntMap.add hash list map)
+    extended_map
+    Mods.IntMap.empty
+
+let add_singular parameter error transition_system =
+    let map1,map2 = compute_var_set transition_system in
+    let ambiguous_node = powerset map1 in
+    Mods.IntMap.fold
+      (fun hash proof_list (error, transition_system) ->
+         let rec aux map2 proof_list (error, transition_system)=
+           match proof_list with
+           | [] -> error, transition_system
+           | proof::tail ->
+             let error, transition_system =
+               List.fold_left
+                 (fun (error, transition_system) proof' ->
+                    let gen map2 proof =
+                      List.fold_left
+                        (fun mvbdu (hashvarlist,_) ->
+                           let mvbdu' =
+                             List.fold_left
+                               (fun mvbdu'' mvbdu''' ->
+                                  Ckappa_sig.Views_intbdu.mvbdu_or mvbdu'' mvbdu'''
+                               )
+                               (Ckappa_sig.Views_intbdu.mvbdu_false ())
+                               (Mods.IntMap.find_default [] hashvarlist map2)
+                           in
+                           Ckappa_sig.Views_intbdu.mvbdu_and
+                             mvbdu'
+                             mvbdu)
+                        (Ckappa_sig.Views_intbdu.mvbdu_true ())
+                        proof
+                    in
+                    let mvbdu =
+                      Ckappa_sig.Views_intbdu.mvbdu_and
+                        (gen map2 proof)
+                        (gen map2 proof')
+                    in
+                    let mvbdu_list =
+                      Ckappa_sig.Views_intbdu.extensional_of_mvbdu mvbdu
+                    in
+                    List.fold_left
+                      (fun (error, transition_system) asso ->
+                         add_node parameter error
+                           (Ckappa_sig.Views_intbdu.mvbdu_of_association_list
+                              asso)
+                           transition_system
+                      )
+                      (error, transition_system)
+                      mvbdu_list)
+                 (error, transition_system) tail
+             in
+             aux map2 tail (error, transition_system)
+         in
+         aux map2 proof_list (error, transition_system))
+      ambiguous_node
+      (error, transition_system)
+
+
 let merge_neighbour parameter error concurrent_sites =
   LabelMap.fold
     (fun label (sites_in_conflict, _hconsed) (error, map) ->
@@ -812,6 +957,14 @@ let agent_trace parameter log_info error handler handler_kappa compil output =
                         error, transition_system)
                   support
                   (error, transition_system)
+                  in
+                  let error, transition_system =
+                    if Remanent_parameters.get_add_singular_macrostates
+                        parameter
+                    then
+                      add_singular parameter error transition_system
+                    else
+                      error, transition_system
                   in
                   let error, transition_system =
                     check_all_subframes parameter error transition_system
