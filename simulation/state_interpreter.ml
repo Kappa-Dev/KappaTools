@@ -338,7 +338,18 @@ let a_loop ~outputs env domain counter graph state =
 	     ignore (perturbate ~outputs env domain counter graph' state') in
   out
 
-let end_of_simulation ~outputs ~called_from form env counter graph state =
+let end_of_simulation ~outputs form env counter graph state =
+  let () = match Rule_interpreter.unary_distances graph with
+    | None -> ()
+    | Some data ->
+       let size = Environment.nb_syntactic_rules env + 1 in
+       let unary_distances =
+	 { Data.distances_data = data;
+	   Data.distances_rules =
+	     Array.init
+	       size
+	       (Format.asprintf "%a" (Environment.print_ast_rule ~env)) }
+       in outputs (Data.UnaryDistances unary_distances) in
   let () =
     List.iter
       (fun (_,e) ->
@@ -351,25 +362,24 @@ let end_of_simulation ~outputs ~called_from form env counter graph state =
        outputs (Data.Flux (Fluxmap.stop_flux env counter e)))
       state.flux in
   let () = ExceptionDefn.flush_warning form in
-  Rule_interpreter.generate_stories ~called_from env graph
+  Rule_interpreter.generate_stories graph
 
 let finalize ~outputs ~called_from form env counter graph state =
-  let () = match Rule_interpreter.unary_distances graph with
-    | None -> ()
-    | Some data ->
-       let size = Environment.nb_syntactic_rules env + 1 in
-       let unary_distances =
-	 { Data.distances_data = data;
-	   Data.distances_rules =
-	     Array.init
-	       size
-	       (Format.asprintf "%a" (Environment.print_ast_rule ~env)) }
-       in outputs (Data.UnaryDistances unary_distances) in
   let () = Outputs.close () in
   let () = Counter.complete_progress_bar form counter in
-  end_of_simulation ~outputs ~called_from form env counter graph state
+  match end_of_simulation ~outputs form env counter graph state with
+  | Some (((none,weak,strong as compressions),dump),trace) ->
+     let () =
+       if none || weak || strong then
+	 Compression_main.compress_and_print
+	   ~called_from ~dotFormat:(!Parameter.dotCflows) ~none ~weak ~strong
+	   env (Compression_main.init_secret_log_info ()) trace in
+     if dump then Kappa_files.with_traceFile
+		    (fun c -> Marshal.to_channel c (compressions,env,trace) [])
+  | None -> ()
 
-let loop ~outputs ~called_from form env domain counter graph state =
+let loop ~outputs form env domain counter graph state =
+  let called_from = Remanent_parameters_sig.KaSim in
   let rec iter graph state =
     let stop,graph',state' =
       try

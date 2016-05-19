@@ -7,7 +7,7 @@ val init_kasa :
 
 val compile :
   outputs:(Data.t -> 'a) -> pause:((unit -> 'b) -> 'b) ->
-  return:(Environment.t * Connected_component.Env.t * (bool*bool*bool) *
+  return:(Environment.t * Connected_component.Env.t * (bool*bool*bool) option *
 	    bool option *
 	      (Alg_expr.t * Primitives.elementary_rule * Location.t) list -> 'b) ->
   ?rescale_init:float -> Signature.s -> unit NamedDecls.t ->
@@ -18,6 +18,7 @@ val build_initial_state :
   bind:('a -> (Rule_interpreter.t * State_interpreter.t -> 'a) -> 'a) ->
   return:(Rule_interpreter.t * State_interpreter.t -> 'a) ->
   (int * Alg_expr.t) list -> Counter.t -> Environment.t ->
-  Connected_component.Env.t -> (bool*bool*bool) -> bool option -> int list ->
+  Connected_component.Env.t -> ((bool*bool*bool)*bool) option ->
+  bool option -> int list ->
   (Alg_expr.t * Primitives.elementary_rule * Location.t) list ->
   Environment.t * 'a

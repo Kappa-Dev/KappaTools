@@ -543,14 +543,6 @@ let compile ~outputs ~pause ~return
 			Primitives.PRINT _) -> false) pert then
       raise (ExceptionDefn.Malformed_Decl
 	       (Location.dummy_annot "There is no way for the simulation to stop.")) in
-  let () =
-    if has_tracking && story_compression = (false,false,false) then
-      ExceptionDefn.warning
-	(fun f ->
-	 Format.fprintf
-	   f
-	   "An observable may be tracked but no compression level to render stories has been specified")
-  in
 
   pause
     (fun () ->
@@ -581,7 +573,9 @@ let compile ~outputs ~pause ~return
      let _,init_l =
        inits_of_result
 	 ?rescale:rescale_init contact_map env preenv result in
-     return (env, domain, story_compression, unary_distances, init_l)))))))
+     return (env, domain,
+	     (if has_tracking then Some story_compression else None),
+	     unary_distances, init_l)))))))
 
 let build_initial_state
       ~bind ~return alg_overwrite counter env cc_env
@@ -593,7 +587,7 @@ let build_initial_state
 			   (Environment.all_dependencies env) p in
 		 List.fold_left (fun acc s -> (s,i)::acc) acc s)
 		[] env in
-  let graph0 = Rule_interpreter.empty ~story_compression ~store_distances env in
+  let graph0 = Rule_interpreter.empty ?story_compression ~store_distances env in
   let state0 = State_interpreter.empty env stops alg_overwrite in
   (env,State_interpreter.initialize
 	 ~bind ~return env cc_env counter graph0 state0 init_l)

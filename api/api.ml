@@ -159,13 +159,16 @@ end = struct
 			 sig_nd tk_nd contact_map
 			 simulation.counter result >>=
 			 (fun (env_store,domain,has_tracking,store_distances,init_l) ->
+			  let story_compression =
+			    Tools.option_map
+			      (fun  _ -> ((false,false,false),true)) has_tracking in
 			  let (env,graph_state) =
 			    Eval.build_initial_state
 			      ~bind:(fun x f ->
 				     (self#yield ()) >>= (fun () -> x >>= f))
 			      ~return:Lwt.return [] simulation.counter
-			      env_store domain has_tracking store_distances
-			      updated_vars init_l in
+			      env_store domain story_compression
+			      store_distances updated_vars init_l in
 			  graph_state >>=
 			    (fun (graph,state) ->
 			     let () = ExceptionDefn.flush_warning log_form in
@@ -183,15 +186,20 @@ end = struct
                                    ~outputs:(outputs sigs)
                                    env domain simulation.counter graph state in
 			       if stop then
-				 let () =
-				   ExceptionDefn.flush_warning log_form in
-				 Lwt_switch.turn_off simulation.switch
+				 (Lwt_switch.turn_off simulation.switch)
+				   >>= (fun () -> Lwt.return (graph',state'))
 			       else
 				 if Lwt_switch.is_on simulation.switch
 				 then (self#yield ()) >>=
 					(fun () -> iter graph' state')
-				 else Lwt.return_unit in
-			     iter graph state))
+				 else Lwt.return (graph',state') in
+			     (iter graph state) >>=
+			       (fun (graph,state) ->
+				let _ =
+				  State_interpreter.end_of_simulation
+				    ~outputs:(outputs sigs) log_form env
+				    simulation.counter graph state in
+				Lwt.return_unit)))
 		     | `Left e ->
 			let () = error_messages := [e] in Lwt.return_unit))
 		(function

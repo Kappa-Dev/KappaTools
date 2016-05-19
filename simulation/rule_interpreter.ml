@@ -12,7 +12,7 @@ type t =
 	(Edges.agent * ((Connected_component.Set.t*int) * Edges.path) list) list
 	* bool;
     story_machinery :
-      ((bool*bool*bool) *
+      (((bool*bool*bool)*bool) *
 	 (Trace.event_kind * Connected_component.t array *
 	    Instantiation.abstract Instantiation.test list)
 	   list Connected_component.Map.t (*currently tracked ccs *) *
@@ -22,8 +22,7 @@ type t =
 
 type result = Clash | Success of t | Corrected of t
 
-let empty ~story_compression ~store_distances env =
-  let (none,weak,strong) = story_compression in
+let empty ?story_compression ~store_distances env =
   {
     roots_of_ccs = Connected_component.Map.empty;
     matchings_of_rule = Mods.IntMap.empty;
@@ -33,9 +32,12 @@ let empty ~story_compression ~store_distances env =
     tokens = Array.make (Environment.nb_tokens env) Nbr.zero;
     outdated_elements = Operator.DepSet.empty,[],true;
     story_machinery =
-      if none || weak || strong
-      then Some (story_compression,Connected_component.Map.empty,[])
-      else None;
+      (match story_compression with
+       | Some ((none,weak,strong),dump as story_compression) ->
+	  if none || weak || strong || dump
+	  then Some (story_compression,Connected_component.Map.empty,[])
+	  else None
+       | None -> None);
     unary_distances =
       Tools.option_map
 	(fun _ -> Array.make ((Environment.nb_syntactic_rules env)+1) None)
@@ -824,10 +826,5 @@ let remove_tracked ccs state =
        tcc ccs in
      { state with story_machinery = Some (comp,tcc',x) }
 
-let generate_stories ~called_from env state =
-  match state.story_machinery with
-  | None -> ()
-  | Some ((none,weak,strong),_,steps) ->
-     Compression_main.compress_and_print
-       ~called_from ~dotFormat:(!Parameter.dotCflows) ~none ~weak ~strong env
-       (Compression_main.init_secret_log_info ()) (List.rev steps)
+let generate_stories state =
+  Tools.option_map (fun (comp,_,steps) -> (comp,steps)) state.story_machinery

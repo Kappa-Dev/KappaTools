@@ -9,6 +9,7 @@ let influenceFileName = ref ""
 let fluxFileName = ref ""
 let outputDataName = ref "data.out"
 let distancesFileName = ref "distances"
+let traceFileName = ref ""
 
 let path f =
   if Filename.is_relative f && Filename.dirname f = Filename.current_dir_name
@@ -88,13 +89,19 @@ let setCheckFileExists ~batchmode =
   check !marshalizedOutFile ;
   check !outputDataName
 
-let with_formatter str f =
+let with_channel str f =
   if str <> ""  then
     let desc = open_out str in
-    let fr = Format.formatter_of_out_channel desc in
-    let () = f fr in
-    let () = Format.pp_print_flush fr () in
+    let () = f desc in
     close_out desc
+
+let with_formatter str f =
+  with_channel
+    str
+    (fun desc ->
+     let fr = Format.formatter_of_out_channel desc in
+     let () = f fr in
+     Format.pp_print_flush fr ())
 
 let (openOutDescriptors:out_channel list ref) = ref []
 
@@ -159,6 +166,10 @@ let with_influence f = with_formatter !influenceFileName f
 
 let set_ccFile f = ccFileName := f
 let with_ccFile f = with_formatter !ccFileName f
+
+let set_traceFile f = traceFileName := f
+let has_traceFile () = !traceFileName <> ""
+let with_traceFile f = with_channel !traceFileName f
 
 let close_all_out_desc () =
   let () =

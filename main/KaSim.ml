@@ -59,6 +59,8 @@ let () =
      "save kappa files as a simulation package") ;
     ("-dump-cc", Arg.String Kappa_files.set_ccFile,
      "file name for dumping the domain of observables") ;
+    ("-dump-trace", Arg.String Kappa_files.set_traceFile,
+     "file name for dumping the simulation trace") ;
     ("--implicit-signature", Arg.Set implicitSignature,
      "Program will guess agent signatures automatically") ;
     ("-seed", Arg.Int (fun i -> seedValue := Some i),
@@ -171,7 +173,7 @@ let () =
 	   let env,cc_env,updated_vars,story_compression,unary_distances,init_l =
 	     (Marshal.from_channel d :
 		Environment.t*Connected_component.Env.t*int list*
-		  (bool*bool*bool)*bool option*
+		  (bool*bool*bool) option*bool option*
 		    (Alg_expr.t * Primitives.elementary_rule * Location.t) list) in
 	   let () = Pervasives.close_in d  in
 	   let alg_overwrite =
@@ -196,6 +198,13 @@ let () =
       Kappa_files.with_marshalized
 	(fun d -> Marshal.to_channel d init_result []) in
     let () = Format.printf "+ Building initial state@." in
+    let story_compression =
+      match story_compression with
+      | None ->
+	 if Kappa_files.has_traceFile ()
+	 then Some ((false,false,false),true)
+	 else None
+      | Some x -> Some (x,Kappa_files.has_traceFile ()) in
     let (env,(graph,state)) =
       Eval.build_initial_state
 	~bind:(fun x f -> f x) ~return:(fun x -> x)
@@ -242,7 +251,6 @@ let () =
     let () =
       State_interpreter.loop
 	~outputs:(Outputs.go (Environment.signatures env))
-	~called_from:Remanent_parameters_sig.KaSim
 	Format.std_formatter env cc_env counter graph state
     in
     Format.printf "Simulation ended";
