@@ -232,15 +232,11 @@ let one_rule dt stop env domain counter graph state =
     in Random_tree.add rd_id new_act state.activities in
   let () =
     if !Parameter.debugModeOn then
-      begin
 	Format.printf
 	  "@[<v>@[Applied@ %t%i:@]@ @[%a@]@]@."
 	  (fun f -> if choice mod 2 = 1 then Format.fprintf f "unary@ ")
-	  rule_id (Kappa_printer.elementary_rule ~env) rule;
-	if !Parameter.store_unary_distance
-	(*&&(choice mod 2 = 1)*) then
-	  Rule_interpreter.print_dist env graph rule_id
-      end in
+	  rule_id (Kappa_printer.elementary_rule ~env) rule
+  (*Rule_interpreter.print_dist env graph rule_id*) in
   let get_alg i = get_alg env state i in
   (* let () = *)
   (*   Format.eprintf "%a@." (Rule_interpreter.print_injections env) graph in *)
@@ -358,15 +354,17 @@ let end_of_simulation ~outputs ~called_from form env counter graph state =
   Rule_interpreter.generate_stories ~called_from env graph
 
 let finalize ~outputs ~called_from form env counter graph state =
-  let () = if !Parameter.store_unary_distance then
-	     let size = Environment.nb_syntactic_rules env + 1 in
-	     let unary_distances =
-	       { Data.distances_data = Rule_interpreter.unary_distances graph;
-		 Data.distances_rules =
-		   Array.init
-		     size
-		     (Format.asprintf "%a" (Environment.print_ast_rule ~env)) }
-	     in outputs (Data.UnaryDistances unary_distances) in
+  let () = match Rule_interpreter.unary_distances graph with
+    | None -> ()
+    | Some data ->
+       let size = Environment.nb_syntactic_rules env + 1 in
+       let unary_distances =
+	 { Data.distances_data = data;
+	   Data.distances_rules =
+	     Array.init
+	       size
+	       (Format.asprintf "%a" (Environment.print_ast_rule ~env)) }
+       in outputs (Data.UnaryDistances unary_distances) in
   let () = Outputs.close () in
   let () = Counter.complete_progress_bar form counter in
   end_of_simulation ~outputs ~called_from form env counter graph state

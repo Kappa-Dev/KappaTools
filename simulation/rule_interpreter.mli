@@ -6,7 +6,8 @@ type result = Clash | Success of t | Corrected of t
 
 (** {6 Initialisation} *)
 
-val empty : has_tracking:bool -> Environment.t -> t
+val empty :
+  has_tracking:bool -> store_distances:bool option -> Environment.t -> t
 
 (** {6 algebraic expression computation} *)
 (** [get_alg] is by default [Environment.get_alg] but it is not hard
@@ -67,8 +68,7 @@ resynchronizing. (This is what initial state and perturbations do.) *)
 val snapshot: Environment.t -> Counter.t -> string -> t -> Data.snapshot
 
 val print : Environment.t -> Format.formatter -> t -> unit
-val print_dist : Environment.t -> t -> int -> unit
-val unary_distances : t -> Data.distances
+val unary_distances : t -> Data.distances option
 
 (** {6 Stories} *)
 

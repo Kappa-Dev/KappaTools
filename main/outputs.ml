@@ -178,8 +178,8 @@ let out_of_unary_distances unary_distances rules =
 		  (*close the file*)
 		  close_out d) unary_distances
 
-let output_unary_distances distances =
-  if !Parameter.json_unary_distance
+let output_unary_distances in_json distances =
+  if in_json
   then json_of_unary_distances
 	 distances.Data.distances_data distances.Data.distances_rules
   else out_of_unary_distances
@@ -193,6 +193,7 @@ type fd = {
 type format = Raw of fd | Svg of Pp_svg.store
 
 let plotDescr = ref None
+let jsonDistancesDescr = ref false
 
 let close_plot () =
   match !plotDescr with
@@ -214,7 +215,7 @@ let print_values_raw f (time,l) =
                  !Parameter.plotSepChar time !Parameter.plotSepChar
                  (Pp.array !Parameter.plotSepChar (fun _ -> Nbr.print)) l
 
-let create_plot filename title head =
+let create_plot (filename,title,head) jsonDistances =
   let format =
     if Filename.check_suffix filename ".svg" then
       Svg {Pp_svg.file = filename;
@@ -228,8 +229,8 @@ let create_plot filename title head =
       let d = Format.formatter_of_out_channel d_chan in
       let () = print_header_raw d head in
       Raw {desc=d_chan; form=d} in
-  plotDescr :=
-    Some format
+  let () = plotDescr := Some format in
+  jsonDistancesDescr := jsonDistances
 
 let plot_now l =
   match !plotDescr with
@@ -289,7 +290,8 @@ let go env = function
      in
      Format.fprintf desc "%s@." p.Data.line
   | Data.Log s -> Format.printf "%s@." s
-  | Data.UnaryDistances distances -> output_unary_distances distances
+  | Data.UnaryDistances distances ->
+     output_unary_distances !jsonDistancesDescr distances
 
 let close () =
   let () = close_plot () in

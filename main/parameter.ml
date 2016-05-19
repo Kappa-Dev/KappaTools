@@ -58,8 +58,6 @@ let strongCompression = ref false
 let mazCompression = ref false
 let showIntroEvents = ref false
 let time_independent = ref false
-let store_unary_distance = ref false
-let json_unary_distance = ref false
 let blacklist_events = ref false
 
 (*XLS output for the grids during compression*)

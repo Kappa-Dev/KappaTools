@@ -380,8 +380,8 @@ let configurations_of_result result =
 		    (ExceptionDefn.Malformed_Decl
 		       ("Value "^error^" should be either \"yes\" or \"no\"", pos_v))
 	      ) in
-  List.iter
-    (fun ((param,pos_p),value_list) ->
+  List.fold_left
+    (fun unary_dist ((param,pos_p),value_list) ->
      match param with
      | "displayCompression" ->
 	let rec parse l =
@@ -395,69 +395,80 @@ let configurations_of_result result =
 	     raise (ExceptionDefn.Malformed_Decl
 		      ("Unkown value "^error^" for compression mode", pos))
 	in
-	parse value_list
+	let () = parse value_list in
+	unary_dist
      | "jsonUnaryDistance" ->
-	  Parameter.json_unary_distance := get_bool_value pos_p param value_list
+	if get_bool_value pos_p param value_list then Some true else unary_dist
      | "storeUnaryDistance" ->
-	  Parameter.store_unary_distance := get_bool_value pos_p param value_list
+	if get_bool_value pos_p param value_list then Some false else None
      | "cflowFileName" ->
-	get_value pos_p param value_list
-		  (fun x _ -> Kappa_files.set_cflow x)
+	let () = get_value pos_p param value_list
+			   (fun x _ -> Kappa_files.set_cflow x) in
+	unary_dist
      | "progressBarSize" ->
-	set_value pos_p param value_list
-		  (fun v p ->
-		   try int_of_string v
-		   with _ ->
-		     raise (ExceptionDefn.Malformed_Decl
-			      ("Value "^v^" should be an integer", p))
-		  ) Parameter.progressBarSize
+	let () = set_value pos_p param value_list
+			   (fun v p ->
+			    try int_of_string v
+			    with _ ->
+			      raise (ExceptionDefn.Malformed_Decl
+				       ("Value "^v^" should be an integer", p))
+			   ) Parameter.progressBarSize in
+	unary_dist
 
      | "progressBarSymbol" ->
-	set_value pos_p param value_list
-		  (fun v p ->
-		   try
-		     String.unsafe_get v 0
-		   with _ ->
-		     raise (ExceptionDefn.Malformed_Decl
-			      ("Value "^v^" should be a character",p))
-		  ) Parameter.progressBarSymbol
+	let () = set_value pos_p param value_list
+			   (fun v p ->
+			    try
+			      String.unsafe_get v 0
+			    with _ ->
+			      raise (ExceptionDefn.Malformed_Decl
+				       ("Value "^v^" should be a character",p))
+			   ) Parameter.progressBarSymbol in
+	unary_dist
 
      | "dumpIfDeadlocked" ->
-       Parameter.dumpIfDeadlocked := get_bool_value pos_p param value_list
+	let () =
+	  Parameter.dumpIfDeadlocked := get_bool_value pos_p param value_list in
+	unary_dist
      | "plotSepChar" ->
-	set_value pos_p param value_list
-		  (fun v _ ->
-		   fun f ->  Format.fprintf f "%s" v
-		  ) Parameter.plotSepChar
+	let () = set_value pos_p param value_list
+			   (fun v _ -> fun f ->  Format.fprintf f "%s" v)
+			   Parameter.plotSepChar in
+	unary_dist
      | "maxConsecutiveClash" ->
-	set_value pos_p param value_list
-		  (fun v p ->
-		   try int_of_string v
-		   with _ ->
-		     raise (ExceptionDefn.Malformed_Decl
-			      ("Value "^v^" should be an integer",p))
-		  ) Parameter.maxConsecutiveClash
-
+	let () = set_value pos_p param value_list
+			   (fun v p ->
+			    try int_of_string v
+			    with _ ->
+			      raise (ExceptionDefn.Malformed_Decl
+				       ("Value "^v^" should be an integer",p))
+			   ) Parameter.maxConsecutiveClash in
+	unary_dist
      | "dotCflows" ->
-	Parameter.dotCflows := get_bool_value pos_p param value_list
+	let () = Parameter.dotCflows := get_bool_value pos_p param value_list in
+	unary_dist
      | "colorDot" ->
-	set_value pos_p param value_list
-		  (fun value pos_v ->
-		   match value with
-		   | "true" | "yes" -> true
-		   | "false" | "no" -> false
-		   | _ as error ->
-		      raise (ExceptionDefn.Malformed_Decl
-			       ("Value "^error^" should be either \"yes\" or \"no\"", pos_v))
-		  ) Parameter.useColor
+	let () = set_value pos_p param value_list
+			   (fun value pos_v ->
+			    match value with
+			    | "true" | "yes" -> true
+			    | "false" | "no" -> false
+			    | _ as error ->
+			       raise (ExceptionDefn.Malformed_Decl
+					("Value "^error^" should be either \"yes\" or \"no\"", pos_v))
+			   ) Parameter.useColor in
+	unary_dist
      | "influenceMapFileName" ->
-	get_value pos_p param value_list
-		  (fun x _ -> Kappa_files.set_influence x)
+	let () = get_value pos_p param value_list
+			   (fun x _ -> Kappa_files.set_influence x) in
+	unary_dist
      | "showIntroEvents" ->
-	Parameter.showIntroEvents := get_bool_value pos_p param value_list
+	let () =
+	  Parameter.showIntroEvents := get_bool_value pos_p param value_list in
+	unary_dist
      | _ as error ->
 	raise (ExceptionDefn.Malformed_Decl ("Unkown parameter "^error, pos_p))
-    ) result.configurations
+    ) None result.configurations
 
 let compile_alg_vars contact_map domain vars =
   array_fold_left_mapi
@@ -497,7 +508,7 @@ let compile ~outputs ~pause ~return
 	    ?rescale_init sigs_nd tk_nd contact_map counter result =
   outputs (Data.Log "+ Building initial simulation conditions...");
   outputs (Data.Log "\t -simulation parameters");
-  let () = configurations_of_result result in
+  let unary_distances = configurations_of_result result in
   pause
     (fun () ->
   let preenv = Connected_component.PreEnv.empty sigs_nd in
@@ -561,11 +572,11 @@ let compile ~outputs ~pause ~return
      let _,init_l =
        inits_of_result
 	 ?rescale:rescale_init contact_map env preenv result in
-     return (env, domain, has_tracking, init_l)))))))
+     return (env, domain, has_tracking, unary_distances, init_l)))))))
 
 let build_initial_state
-      ~bind ~return
-      alg_overwrite counter env cc_env has_tracking updated_vars init_l =
+      ~bind ~return alg_overwrite counter env cc_env
+      has_tracking store_distances updated_vars init_l =
   let env = Environment.propagate_constant updated_vars counter env in
   let stops = Environment.fold_perturbations
 		(fun i acc p ->
@@ -573,7 +584,7 @@ let build_initial_state
 			   (Environment.all_dependencies env) p in
 		 List.fold_left (fun acc s -> (s,i)::acc) acc s)
 		[] env in
-  let graph0 = Rule_interpreter.empty ~has_tracking env in
+  let graph0 = Rule_interpreter.empty ~has_tracking ~store_distances env in
   let state0 = State_interpreter.empty env stops alg_overwrite in
   (env,State_interpreter.initialize
 	 ~bind ~return env cc_env counter graph0 state0 init_l)

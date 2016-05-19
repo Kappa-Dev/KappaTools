@@ -134,7 +134,8 @@ let () =
       Counter.create
 	~init_t:0. ~init_e:0 ?max_t:!maxTimeValue ?max_e:!maxEventValue
 	~nb_points:!pointNumberValue in
-    let (env_store, cc_env, updated_vars, has_tracking, init_l as init_result),
+    let (env_store, cc_env, updated_vars, has_tracking, unary_distances, init_l
+	 as init_result),
       alg_overwrite =
       match !marshalizedInFile with
       | "" ->
@@ -149,12 +150,12 @@ let () =
 	let contact_map,_kasa_state =
 	  Eval.init_kasa Remanent_parameters_sig.KaSim result in
 	let () = Format.printf "+ Compiling...@." in
-	let (env, cc_env, has_tracking, init_l) =
+	let (env, cc_env, has_tracking, unary_distances, init_l) =
 	  Eval.compile
 	    ~pause:(fun f -> f ()) ~return:(fun x -> x)
 	    ?rescale_init:!rescale ~outputs:(Outputs.go (Signature.create []))
 	    sigs_nd tk_nd contact_map counter result' in
-	(env, cc_env, updated_vars, has_tracking, init_l),[]
+	(env, cc_env, updated_vars, has_tracking, unary_distances,init_l),[]
       | marshalized_file ->
 	 try
 	   let d = open_in_bin marshalized_file in
@@ -166,9 +167,9 @@ let () =
 		    f "Simulation package loaded, all kappa files are ignored") in
 	   let () = Format.printf "+ Loading simulation package %s...@."
 				  marshalized_file in
-	   let env,cc_env,updated_vars,has_tracking,init_l =
+	   let env,cc_env,updated_vars,has_tracking,unary_distances,init_l =
 	     (Marshal.from_channel d :
-		Environment.t*Connected_component.Env.t*int list*bool*
+		Environment.t*Connected_component.Env.t*int list*bool*bool option*
 		  (Alg_expr.t * Primitives.elementary_rule * Location.t) list) in
 	   let () = Pervasives.close_in d  in
 	   let alg_overwrite =
@@ -180,7 +181,8 @@ let () =
 	   let updated_vars' =
 	     List.fold_left
 	       (fun acc (i,_) -> i::acc) updated_vars alg_overwrite in
-	   (env,cc_env,updated_vars',has_tracking,init_l),alg_overwrite
+	   (env,cc_env,updated_vars',has_tracking,unary_distances,init_l),
+	   alg_overwrite
 	 with
 	 | ExceptionDefn.Malformed_Decl _ as e -> raise e
 	 | _exn ->
@@ -206,7 +208,8 @@ let () =
     let (env,(graph,state)) =
       Eval.build_initial_state
 	~bind:(fun x f -> f x) ~return:(fun x -> x)
-	alg_overwrite counter env_store cc_env has_tracking updated_vars init_l in
+	alg_overwrite counter env_store cc_env
+	has_tracking unary_distances updated_vars init_l in
     let () = Format.printf "Done@." in
     let () =
       if !Parameter.compileModeOn || !Parameter.debugModeOn then
@@ -234,7 +237,9 @@ let () =
 	  else match !inputKappaFileNames with
                | [ f ] -> f^" output"
                | _ -> "KaSim output" in
-	Outputs.create_plot (Kappa_files.get_data ()) title head in
+	Outputs.create_plot
+	  (Kappa_files.get_data (),title,head)
+	  (match unary_distances with Some x -> x | None -> false) in
     let () =
       if !pointNumberValue > 0 then
 	Outputs.go (Environment.signatures env)

@@ -19,12 +19,12 @@ type t =
 	  Instantiation.abstract Instantiation.test list)
 	 list Connected_component.Map.t (*currently tracked ccs *)
        * jf_data) option;
-    unary_distances: Data.distances;
+    unary_distances: Data.distances option;
   }
 
 type result = Clash | Success of t | Corrected of t
 
-let empty ~has_tracking env = {
+let empty ~has_tracking ~store_distances env = {
     roots_of_ccs = Connected_component.Map.empty;
     matchings_of_rule = Mods.IntMap.empty;
     unary_candidates = Mods.IntMap.empty;
@@ -37,7 +37,10 @@ let empty ~has_tracking env = {
       then Some (Connected_component.Map.empty,
 		 (Compression_main.init_secret_log_info (), []))
       else None;
-    unary_distances = Array.make ((Environment.nb_syntactic_rules env)+1) None;
+    unary_distances =
+      Tools.option_map
+	(fun _ -> Array.make ((Environment.nb_syntactic_rules env)+1) None)
+	store_distances;
 }
 
 let print_injections ?sigs pr f roots_of_ccs =
@@ -541,8 +544,7 @@ let transform_by_a_rule
   update_edges (Environment.signatures env)
 	       counter domain unary_ccs inj state' event_kind ?path rule
 
-let apply_unary_rule
-      ~rule_id ~get_alg env domain unary_ccs counter state event_kind rule =
+let apply_unary_rule ~rule_id ~get_alg env domain unary_ccs counter state event_kind rule =
   let (root1,root2 as roots) =
     match
       Mods.Int2Set.random
@@ -592,19 +594,21 @@ let apply_unary_rule
        | Some (_, dist_opt) -> dist_opt in
      match Edges.are_connected ~candidate (Environment.signatures env)
 			       state.edges nodes.(0) nodes.(1)
-			       dist !Parameter.store_unary_distance with
+			       dist (state'.unary_distances<>None) with
      | None -> Corrected state'
      | Some _ when missing_ccs -> Corrected state'
      | Some p as path ->
-	let () = if !Parameter.store_unary_distance then
-		   let n = List.length p in
-		   let t = Counter.current_time counter in
-		   let rule = Environment.get_rule env rule_id in
-		   let syntactic_id = rule.Primitives.syntactic_rule in
-		   let rule_arr = state'.unary_distances in
-		   match rule_arr.(syntactic_id) with
-		   | None -> rule_arr.(syntactic_id) <- Some [(t,n)]
-		   | Some ls -> rule_arr.(syntactic_id) <- Some ((t,n)::ls) in
+	let () =
+	  match state'.unary_distances with
+	  | None -> ()
+	  | Some rule_arr ->
+	     let n = List.length p in
+	     let t = Counter.current_time counter in
+	     let rule = Environment.get_rule env rule_id in
+	     let syntactic_id = rule.Primitives.syntactic_rule in
+	     match rule_arr.(syntactic_id) with
+	     | None -> rule_arr.(syntactic_id) <- Some [(t,n)]
+	     | Some ls -> rule_arr.(syntactic_id) <- Some ((t,n)::ls) in
 	Success
 	  (transform_by_a_rule ~get_alg env domain unary_ccs counter state'
 			       event_kind ?path rule inj)
@@ -767,15 +771,6 @@ let print env f state =
 			  f "%%init: %a <- %a"
 			   (Environment.print_token ~env) i Nbr.print el))
     state.tokens
-
-(* print distances for one unary rule - debug mode*)
-let print_dist env state rule_id =
-  let () =  Format.printf " Distances at which rule %i applied: " rule_id in
-  let rule = Environment.get_rule env rule_id in
-  let syntactic_id = rule.Primitives.syntactic_rule in
-  match state.unary_distances.(syntactic_id) with
-  | None -> Format.printf "Not a unary rule or unary rule never applied."
-  | Some ls -> List.iter (fun (t,d) -> Format.printf " %e%i " t d) ls
 
 let unary_distances state = state.unary_distances
 
