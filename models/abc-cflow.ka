@@ -48,4 +48,3 @@
 %def: "cflowFileName" "abc-flow"
 %def: "displayCompression" "none" "weak" "strong"
 %def: "dotCflows" "false"
-%def: "showIntroEvents" "true"

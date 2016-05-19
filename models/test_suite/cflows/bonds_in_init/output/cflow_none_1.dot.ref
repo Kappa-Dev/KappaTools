@@ -2,7 +2,22 @@
 /* Compressed causal flows were: [8] */
 digraph G{
  ranksep=.5 ;
-{ rank = same ; "0" [shape=plaintext] ;}
+{ rank = same ; "0" [shape=plaintext] ;
+node_1 [label="Intro K", shape=house, style=filled, fillcolor=green] ;
+node_2 [label="Intro S", shape=house, style=filled, fillcolor=green] ;
+node_3 [label="Intro Z", shape=house, style=filled, fillcolor=green] ;
+node_4 [label="Intro L", shape=house, style=filled, fillcolor=green] ;
+node_5 [label="Intro S", shape=house, style=filled, fillcolor=green] ;
+node_6 [label="Intro Z", shape=house, style=filled, fillcolor=green] ;
+node_7 [label="Intro L", shape=house, style=filled, fillcolor=green] ;
+node_8 [label="Intro K", shape=house, style=filled, fillcolor=green] ;
+node_9 [label="Intro K", shape=house, style=filled, fillcolor=green] ;
+node_10 [label="Intro S", shape=house, style=filled, fillcolor=green] ;
+node_11 [label="Intro K", shape=house, style=filled, fillcolor=green] ;
+node_12 [label="Intro S", shape=house, style=filled, fillcolor=green] ;
+node_13 [label="Intro S", shape=house, style=filled, fillcolor=green] ;
+node_14 [label="Intro K", shape=house, style=filled, fillcolor=green] ;
+}
 { rank = same ; "1" [shape=plaintext] ;
 node_15 [label="Signal", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_16 [label="Signal", shape=invhouse, style=filled, fillcolor = lightblue] ;
@@ -90,9 +105,17 @@ node_47 [label="L", style=filled, fillcolor=red] ;
 "15" -> "16" [style="invis"];
 "16" -> "17" [style="invis"];
 "17" -> "18" [style="invis"];
+node_11 -> node_15
+node_14 -> node_16
+node_5 -> node_17
 node_15 -> node_17
+node_1 -> node_18
+node_10 -> node_19
 node_18 -> node_19
+node_13 -> node_20
 node_16 -> node_20
+node_9 -> node_21
+node_12 -> node_22
 node_21 -> node_22
 node_20 -> node_23
 node_19 -> node_24
@@ -102,6 +125,8 @@ node_17 -> node_26
 node_25 -> node_27
 node_26 -> node_28
 node_27 -> node_28
+node_8 -> node_29
+node_2 -> node_30
 node_29 -> node_30
 node_28 -> node_31
 node_31 -> node_32
@@ -118,9 +143,13 @@ node_36 -> node_40
 node_39 -> node_41
 node_40 -> node_41
 node_41 -> node_42
+node_3 -> node_43
+node_4 -> node_43
 node_33 -> node_43
 node_42 -> node_43
 node_43 -> node_44
+node_6 -> node_45
+node_7 -> node_45
 node_44 -> node_45
 node_45 -> node_46
 node_46 -> node_47

@@ -463,10 +463,6 @@ let configurations_of_result result =
 	let () = get_value pos_p param value_list
 			   (fun x _ -> Kappa_files.set_influence x) in
 	acc
-     | "showIntroEvents" ->
-	let () =
-	  Parameter.showIntroEvents := get_bool_value pos_p param value_list in
-	acc
      | _ as error ->
 	raise (ExceptionDefn.Malformed_Decl ("Unkown parameter "^error, pos_p))
     ) (None,(false,false,false)) result.configurations

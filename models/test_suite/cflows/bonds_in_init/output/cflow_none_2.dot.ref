@@ -2,7 +2,15 @@
 /* Compressed causal flows were: [7] */
 digraph G{
  ranksep=.5 ;
-{ rank = same ; "0" [shape=plaintext] ;}
+{ rank = same ; "0" [shape=plaintext] ;
+node_1 [label="Intro Z", shape=house, style=filled, fillcolor=green] ;
+node_2 [label="Intro L", shape=house, style=filled, fillcolor=green] ;
+node_3 [label="Intro S", shape=house, style=filled, fillcolor=green] ;
+node_4 [label="Intro K", shape=house, style=filled, fillcolor=green] ;
+node_5 [label="Intro S", shape=house, style=filled, fillcolor=green] ;
+node_6 [label="Intro Z", shape=house, style=filled, fillcolor=green] ;
+node_7 [label="Intro L", shape=house, style=filled, fillcolor=green] ;
+}
 { rank = same ; "1" [shape=plaintext] ;
 node_8 [label="Signal", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
@@ -44,14 +52,21 @@ node_18 [label="L", style=filled, fillcolor=red] ;
 "7" -> "8" [style="invis"];
 "8" -> "9" [style="invis"];
 "9" -> "10" [style="invis"];
+node_4 -> node_8
+node_3 -> node_9
 node_8 -> node_9
 node_9 -> node_10
+node_5 -> node_11
 node_10 -> node_11
 node_11 -> node_12
 node_11 -> node_13
+node_6 -> node_14
+node_7 -> node_14
 node_12 -> node_14
 node_13 -> node_14
 node_14 -> node_15
+node_1 -> node_16
+node_2 -> node_16
 node_15 -> node_16
 node_16 -> node_17
 node_17 -> node_18

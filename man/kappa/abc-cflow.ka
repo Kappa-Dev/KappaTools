@@ -40,4 +40,3 @@
 
 %def: "cflowFileName" "abc-flow"
 %def: "displayCompression" "weak"
-%def: "showIntroEvents" "true"

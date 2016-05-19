@@ -2,7 +2,20 @@
 /* Compressed causal flows were: [5] */
 digraph G{
  ranksep=.5 ;
-{ rank = same ; "0" [shape=plaintext] ;}
+{ rank = same ; "0" [shape=plaintext] ;
+node_1 [label="Intro K", shape=house, style=filled, fillcolor=green] ;
+node_2 [label="Intro S", shape=house, style=filled, fillcolor=green] ;
+node_3 [label="Intro Z", shape=house, style=filled, fillcolor=green] ;
+node_4 [label="Intro L", shape=house, style=filled, fillcolor=green] ;
+node_5 [label="Intro S", shape=house, style=filled, fillcolor=green] ;
+node_6 [label="Intro K", shape=house, style=filled, fillcolor=green] ;
+node_7 [label="Intro K", shape=house, style=filled, fillcolor=green] ;
+node_8 [label="Intro S", shape=house, style=filled, fillcolor=green] ;
+node_9 [label="Intro K", shape=house, style=filled, fillcolor=green] ;
+node_10 [label="Intro S", shape=house, style=filled, fillcolor=green] ;
+node_11 [label="Intro S", shape=house, style=filled, fillcolor=green] ;
+node_12 [label="Intro K", shape=house, style=filled, fillcolor=green] ;
+}
 { rank = same ; "1" [shape=plaintext] ;
 node_13 [label="Signal", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_14 [label="Signal", shape=invhouse, style=filled, fillcolor = lightblue] ;
@@ -82,9 +95,17 @@ node_43 [label="L", style=filled, fillcolor=red] ;
 "13" -> "14" [style="invis"];
 "14" -> "15" [style="invis"];
 "15" -> "16" [style="invis"];
+node_9 -> node_13
+node_12 -> node_14
+node_5 -> node_15
 node_13 -> node_15
+node_1 -> node_16
+node_8 -> node_17
 node_16 -> node_17
+node_11 -> node_18
 node_14 -> node_18
+node_7 -> node_19
+node_10 -> node_20
 node_19 -> node_20
 node_18 -> node_21
 node_17 -> node_22
@@ -94,6 +115,8 @@ node_15 -> node_24
 node_23 -> node_25
 node_24 -> node_26
 node_25 -> node_26
+node_6 -> node_27
+node_2 -> node_28
 node_27 -> node_28
 node_26 -> node_29
 node_29 -> node_30
@@ -110,6 +133,8 @@ node_34 -> node_38
 node_37 -> node_39
 node_38 -> node_39
 node_39 -> node_40
+node_3 -> node_41
+node_4 -> node_41
 node_31 -> node_41
 node_40 -> node_41
 node_41 -> node_42

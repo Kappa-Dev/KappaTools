@@ -1,5 +1,4 @@
 %def: "displayCompression" "weak" "none"
-%def: "showIntroEvents" "true"
 
 A(a~u),B(a~u) -> A(a~p),B(a~p) @1
 A(a~p),B(a~p) -> /*could be inlined*/ A(a~u),B(a~u) @1

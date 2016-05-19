@@ -1,4 +1,3 @@
-%def: "showIntroEvents" "true"
 %def: "displayCompression" "weak" "strong"
 
 #%mod: [T]>1 do $TRACK 'sos recruited' [true]

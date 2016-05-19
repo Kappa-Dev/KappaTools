@@ -1,6 +1,5 @@
 ####### TEMPLATE MODEL AS DESCRIBED IN THE MANUAL#############
 %def: "displayCompression" "weak" "none"
-%def: "showIntroEvents" "true"
 
 #### Signatures 
 %agent: A(x) # Declaration of agent A 

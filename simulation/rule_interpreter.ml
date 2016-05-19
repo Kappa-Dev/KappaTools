@@ -793,9 +793,7 @@ let debug_print f state =
 
 let add_tracked ccs event_kind tests state =
   match state.story_machinery with
-  | None ->
-     raise (ExceptionDefn.Internal_Error
-	      (Location.dummy_annot "TRACK in non tracking mode"))
+  | None -> state
   | Some (comp,tcc,x) ->
      let tcc' =
      Array.fold_left
@@ -807,9 +805,7 @@ let add_tracked ccs event_kind tests state =
 
 let remove_tracked ccs state =
   match state.story_machinery with
-  | None ->
-     raise (ExceptionDefn.Internal_Error
-	      (Location.dummy_annot "TRACK in non tracking mode"))
+  | None -> state
   | Some (comp,tcc,x) ->
      let tester (_,el,_) =
        not @@
@@ -827,4 +823,5 @@ let remove_tracked ccs state =
      { state with story_machinery = Some (comp,tcc',x) }
 
 let generate_stories state =
-  Tools.option_map (fun (comp,_,steps) -> (comp,steps)) state.story_machinery
+  Tools.option_map
+    (fun (comp,_,steps) -> (comp,List.rev steps)) state.story_machinery

@@ -19,4 +19,3 @@
 %mod: [true] do $TRACK 'goal' [true]
 
 %def: "displayCompression" "strong"
-%def: "showIntroEvents" "true"

@@ -1,5 +1,4 @@
 %def: "displayCompression" "none" "weak" "strong"
-%def: "showIntroEvents" "true" 
 
 A(x),K(x) -> A(x!1),K(x!1) @10
 A(x!1),K(x!1) -> A(x),K(x) @1

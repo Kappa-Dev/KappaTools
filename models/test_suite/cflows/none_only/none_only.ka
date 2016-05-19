@@ -37,4 +37,3 @@
 %mod: ('Cpp' - 'cflow' > 9 && 'cflow' >0) do $TRACK 'Cpp' [false]
 
 %def: "displayCompression" "none"
-%def: "showIntroEvents" "true"

@@ -40,4 +40,3 @@
 %mod: repeat [E] [mod] ([Emax] / 50) = 0 do $PLOTENTRY until [false]
 
 %def: "displayCompression" "weak" 
-%def: "showIntroEvents" "true"

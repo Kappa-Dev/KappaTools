@@ -252,8 +252,6 @@ let record_obs (kind,tests,_) side_effects event_number grid =
     (fun grid site -> add site true atom_modified grid event_number kind) grid side_effects
 
 let record_init (lbl,actions) event_number env grid =
-  (* if !Parameter.showIntroEvents then *)
-  (*adding tests*)
   add_actions env grid event_number (Trace.INIT lbl)  actions
 
 let add_pred eid atom config =
@@ -446,12 +444,7 @@ let dot_of_grid profiling env enriched_grid form =
 	   if eid <> 0 then
 	     Format.fprintf
 	       form "node_%d %a ;@," eid
-	       (if !Parameter.showIntroEvents then
-		  Trace.print_event_kind_dot_annot env
-		else match atom_kind with
-		     | Trace.INIT _ -> fun _ _ -> ()
-		     | (Trace.PERT _ | Trace.RULE _ | Trace.OBS _) ->
-			Trace.print_event_kind_dot_annot env) atom_kind
+	       (Trace.print_event_kind_dot_annot env) atom_kind
        (* List.iter (fun obs -> fprintf desc "obs_%d [label =\"%s\", style=filled, fillcolor=red] ;\n node_%d -> obs_%d [arrowhead=vee];\n" eid obs eid eid) atom.observation ;*)
        ) eids_at_d ;
      Format.fprintf form "}@]@," ;
@@ -468,15 +461,7 @@ let dot_of_grid profiling env enriched_grid form =
 	 (fun eid' ->
 	  if eid' = 0 then ()
 	  else
-	    if !Parameter.showIntroEvents then
 	      Format.fprintf form "node_%d -> node_%d@," eid' eid
-	    else
-	      match IntMap.find_option eid' config.events_kind with
-	      | None -> raise Not_found
-	      | Some atom_kind ->
-		 match atom_kind with
-		 | Trace.INIT _ -> ()
-		 | Trace.PERT _ | Trace.RULE _ | Trace.OBS _ -> Format.fprintf form "node_%d -> node_%d@," eid' eid
 	 ) pred_set
     ) config.prec_1 ;
   IntMap.iter

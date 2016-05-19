@@ -3,6 +3,15 @@
 digraph G{
  ranksep=.5 ;
 { rank = same ; "0" [shape=plaintext] ;
+node_1 [label="Intro S", shape=house, style=filled, fillcolor=green] ;
+node_2 [label="Intro K", shape=house, style=filled, fillcolor=green] ;
+node_3 [label="Intro K", shape=house, style=filled, fillcolor=green] ;
+node_4 [label="Intro K", shape=house, style=filled, fillcolor=green] ;
+node_5 [label="Intro S", shape=house, style=filled, fillcolor=green] ;
+node_6 [label="Intro S", shape=house, style=filled, fillcolor=green] ;
+node_7 [label="Intro K", shape=house, style=filled, fillcolor=green] ;
+node_8 [label="Intro S", shape=house, style=filled, fillcolor=green] ;
+node_9 [label="Intro K", shape=house, style=filled, fillcolor=green] ;
 node_32 [label="C", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_35 [label="C", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_38 [label="C", shape=invhouse, style=filled, fillcolor = lightblue] ;
@@ -111,12 +120,21 @@ node_50 [label="L", style=filled, fillcolor=red] ;
 "19" -> "20" [style="invis"];
 "20" -> "21" [style="invis"];
 "21" -> "22" [style="invis"];
+node_9 -> node_10
+node_2 -> node_11
+node_6 -> node_12
 node_11 -> node_12
+node_3 -> node_13
+node_8 -> node_14
 node_10 -> node_14
+node_1 -> node_15
 node_13 -> node_15
 node_14 -> node_16
+node_5 -> node_17
 node_16 -> node_17
 node_15 -> node_18
+node_4 -> node_19
+node_7 -> node_20
 node_18 -> node_21
 node_20 -> node_21
 node_17 -> node_22
