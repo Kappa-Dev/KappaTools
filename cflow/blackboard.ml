@@ -47,7 +47,7 @@ sig
   val predicate_id_of_case_address: event_case_address -> PB.predicate_id
   val build_pointer: PB.step_short_id -> pointer
   val is_before_blackboard: pointer -> bool
-  val get_event: blackboard -> int -> PB.CI.Po.K.refined_step
+  val get_event: blackboard -> int -> Trace.step
   val get_n_eid: blackboard -> int
   val get_npredicate_id: blackboard -> int
   val get_n_unresolved_events_of_pid_by_level: blackboard -> PB.predicate_id -> Priority.level -> int
@@ -77,11 +77,11 @@ sig
   val reset_init: (blackboard, blackboard) PB.CI.Po.K.H.unary
 
   (** initialisation*)
-  val import:  ?heuristic:Priority.priorities -> (PB.CI.Po.K.refined_step list,  blackboard) PB.CI.Po.K.H.unary
+  val import:  ?heuristic:Priority.priorities -> (Trace.step list,  blackboard) PB.CI.Po.K.H.unary
 
 
   (** output result*)
-  type result = (PB.CI.Po.K.refined_step * PB.CI.Po.K.side_effect) list
+  type result = (Trace.step * PB.CI.Po.K.side_effect) list
 
   (** iteration*)
   val is_maximal_solution: (blackboard, bool) PB.CI.Po.K.H.unary
@@ -348,7 +348,7 @@ module Blackboard =
      type stack = assignment list
      type blackboard =
          {
-           event: PB.CI.Po.K.refined_step PB.A.t;
+           event: Trace.step PB.A.t;
            pre_column_map_inv: PB.predicate_info PB.A.t; (** maps each wire id to its wire label *)
            forced_events: (int list * unit Mods.simulation_info option) list;
            n_predicate_id: int ;
@@ -1168,7 +1168,9 @@ module Blackboard =
               let string_eid error =
                 let () =
                   try
-                      PB.CI.Po.K.print_refined_step ~compact:true ~handler desc (PB.A.get blackboard.event eid)
+                    Loggers.print_as_logger
+		      desc
+		      (fun f -> Trace.print_step ~compact:true ~env:handler.PB.CI.Po.K.H.env f (PB.A.get blackboard.event eid))
                   with
                   | Not_found -> Loggers.fprintf desc "Event:%i" eid
                 in
@@ -1182,9 +1184,9 @@ module Blackboard =
               let bool =
                 try
                   let cand = PB.A.get blackboard.event eid in
-                  PB.CI.Po.K.is_event_of_refined_step cand ||
-                  PB.CI.Po.K.is_obs_of_refined_step cand ||
-                  PB.CI.Po.K.is_init_of_refined_step cand
+                  Trace.step_is_event cand ||
+                  Trace.step_is_obs cand ||
+                  Trace.step_is_init cand
                 with Not_found -> false in
               let error,stack =
                 if bool
@@ -1372,7 +1374,7 @@ module Blackboard =
        error,log_info,blackboard
 
   (** output result*)
-     type result = (PB.CI.Po.K.refined_step * PB.CI.Po.K.side_effect) list
+     type result = (Trace.step * PB.CI.Po.K.side_effect) list
 
   (** iteration*)
      let is_maximal_solution parameter handler log_info error blackboard =

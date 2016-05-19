@@ -68,18 +68,18 @@ val print_trace: parameter -> kappa_handler -> trace -> unit
 val has_obs: trace -> bool
 
 (** convert a list of refined steps into a trace *)
-val trace_of_pretrace: S.PH.B.PB.CI.Po.K.refined_step list -> trace
+val trace_of_pretrace: Trace.t -> trace
 
 (** conversely, convert a trace in a list of refined steps *)
-val get_pretrace_of_trace: trace -> S.PH.B.PB.CI.Po.K.refined_step list
+val get_pretrace_of_trace: trace -> Trace.t
 
 (** get the date of an event in the simulation
     (only proper events have a time) *)
-val get_simulation_time_of_event: S.PH.B.PB.CI.Po.K.refined_step -> float option
+val get_simulation_time_of_event: Trace.step -> float option
 
 (** get the id of an event in the simulation
     (only proper events have an id) *)
-val get_id_of_event: S.PH.B.PB.CI.Po.K.refined_step -> int option
+val get_id_of_event: Trace.step -> int option
 
 (** remove the events after the last observable *)
 val remove_events_after_last_obs: (trace,trace) unary

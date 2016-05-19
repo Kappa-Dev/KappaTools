@@ -25,8 +25,8 @@ type profiling_info = P.log_info
 type progress_bar = bool * int * int
 type shall_we = (parameter -> bool)
 
-type step = S.PH.B.PB.CI.Po.K.refined_step
-type step_with_side_effects = S.PH.B.PB.CI.Po.K.refined_step * S.PH.B.PB.CI.Po.K.side_effect
+type step = Trace.step
+type step_with_side_effects = step * S.PH.B.PB.CI.Po.K.side_effect
 type step_id = S.PH.B.PB.step_id
 
 type trace =
@@ -262,9 +262,9 @@ let remove_obs_before parameter handler log_info error last_eid trace =
        [] -> List.rev output,score
      | t::q ->
 	if
-	  S.PH.B.PB.CI.Po.K.is_obs_of_refined_step t
+	  Trace.step_is_obs t
 	then
-	  match S.PH.B.PB.CI.Po.K.simulation_info_of_refined_step t
+	  match Trace.simulation_info_of_step t
 	  with None -> aux q score (t::output)
 	     | Some x ->
 		if Mods.story_id_of_simulation_info x >= last_eid
@@ -316,7 +316,7 @@ let fill_siphon =
 let  (remove_events_after_last_obs: (trace,trace) unary) =
   lift_to_care_about_ambiguities
     (transform_trace_gen
-       (monadic_lift ((List_utilities.remove_suffix_after_last_occurrence S.PH.B.PB.CI.Po.K.is_obs_of_refined_step)))
+       (monadic_lift ((List_utilities.remove_suffix_after_last_occurrence Trace.step_is_obs)))
        (Some "\t - removing events occurring after the last observable:\n")
        "Trace after having removed the events after the last observable"
        StoryProfiling.Remove_events_after_last_observable
@@ -613,7 +613,7 @@ let sort_story_list  = D.sort_list
 let export_story_table parameter ?(shall_we_compute=always) ?(shall_we_compute_profiling_information=we_shall) handler log_info error x =
   let a,log_info,b = sort_story_list parameter handler log_info error (get_stories x) in
   a,log_info,b
-let has_obs x = List.exists S.PH.B.PB.CI.Po.K.is_obs_of_refined_step (get_pretrace_of_trace x)
+let has_obs x = List.exists Trace.step_is_obs (get_pretrace_of_trace x)
 
 let fold_left_with_progress_bar ?(event=StoryProfiling.Dummy)
       parameter ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall)
@@ -772,7 +772,7 @@ module Event =
 
     let key_of_event event =
       if
-	S.PH.B.PB.CI.Po.K.is_event_of_refined_step event && not (S.PH.B.PB.CI.Po.K.has_creation_of_refined_step event)
+	Trace.step_is_event event && not (Trace.has_creation_of_step event)
       then
 	get_id_of_event event
       else

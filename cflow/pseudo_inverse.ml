@@ -25,8 +25,7 @@ module type Cut_pseudo_inverse =
      module Po:Po_cut.Po_cut
      module A:GenArray.GenArray
 
-     val cut:
-       (Po.K.refined_step list, ( (Po.K.refined_step list) * int)) Po.K.H.unary
+     val cut: (Trace.t, ( (Trace.t) * int)) Po.K.H.unary
    end
 
  module Pseudo_inv =
@@ -62,7 +61,7 @@ module type Cut_pseudo_inverse =
          is_remove_action: bool A.t ;
          modified_predicates_of_event: int A.t ;
          has_mod_without_test: bool A.t ;
-         event: Po.K.refined_step option A.t;
+         event: Trace.step option A.t;
          agent_list: int list ;
        }
 
@@ -123,8 +122,9 @@ module type Cut_pseudo_inverse =
                 | Some event ->
                   begin
                     try
-                      let () = Loggers.fprintf (Po.K.H.get_debugging_channel parameter)"Event %i" k in
-                      let () = Po.K.print_refined_step ~compact:false ~handler:handler (Po.K.H.get_debugging_channel parameter) event in
+                      let () = Loggers.fprintf (Po.K.H.get_debugging_channel parameter)"Event %i%a" k
+					       (Trace.print_step ~compact:false ~env:(handler.Po.K.H.env))
+					       event in
                       let () = Loggers.print_newline (Po.K.H.get_debugging_channel parameter)in
                       let () = Loggers.fprintf (Po.K.H.get_debugging_channel parameter)"Predicates: " in
                       let list = A.get blackboard.predicates_of_event k in
@@ -380,9 +380,9 @@ module type Cut_pseudo_inverse =
 
    let add_step parameter handler info error step blackboard =
      let pre_event = blackboard.event in
-     let error,info,test_list = Po.K.tests_of_refined_step parameter handler info error step in
-     let error,info,(action_list,_) = Po.K.actions_of_refined_step parameter handler info error step in
-     let side_effect = Po.K.get_kasim_side_effects (step) in
+     let test_list = Trace.tests_of_step step in
+     let (action_list,_) = Trace.actions_of_step step in
+     let side_effect = Po.K.get_kasim_side_effects step in
      let build_map list map =
        List.fold_left
          (fun map (id,value) -> Predicate_maps.PredicateMap.add id value map)

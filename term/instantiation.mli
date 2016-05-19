@@ -87,3 +87,5 @@ val print_concrete_test :
   ?sigs:Signature.s -> Format.formatter -> concrete test -> unit
 val print_concrete_action :
   ?sigs:Signature.s -> Format.formatter -> concrete action -> unit
+val print_concrete_binding_state :
+  ?sigs:Signature.s -> Format.formatter -> concrete binding_state -> unit

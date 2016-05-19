@@ -1,5 +1,4 @@
-type jf_data =
-  Compression_main.secret_log_info * Compression_main.secret_step list
+type jf_data = Compression_main.secret_log_info * Trace.t
 
 type t =
   {

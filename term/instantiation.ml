@@ -254,3 +254,26 @@ let print_concrete_action ?sigs f = function
      Format.fprintf f "Free(%a)" (print_concrete_agent_site ?sigs) site
   | Remove agent ->
      Format.fprintf f "Remove(%a)" (print_concrete_agent ?sigs) agent
+let print_concrete_binding_state ?sigs f = function
+  | ANY -> Format.pp_print_string f "*"
+  | FREE -> ()
+  | BOUND -> Format.pp_print_string f "!_"
+  | BOUND_TYPE (s,a) ->
+     Format.fprintf
+       f "!%a.%a"
+       (match sigs with
+	| Some sigs -> Signature.print_site sigs s
+	| None -> Format.pp_print_int) a
+       (match sigs with
+	| Some sigs -> Signature.print_agent sigs
+	| None -> Format.pp_print_int) s
+
+  | BOUND_to ((ag_id,ag),s) ->
+     Format.fprintf
+       f "!%a_%i.%a"
+       (match sigs with
+	| Some sigs -> Signature.print_agent sigs
+	| None -> Format.pp_print_int) ag ag_id
+       (match sigs with
+	| Some sigs -> Signature.print_site sigs ag
+	| None -> Format.pp_print_int) s

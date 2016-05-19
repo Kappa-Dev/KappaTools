@@ -29,10 +29,10 @@ module type StoryTable =
     type table
 
     val fold_table:
-      ((S.PH.B.PB.CI.Po.K.refined_step list,StoryProfiling.StoryStats.log_info Mods.simulation_info list,'a,'a) S.PH.B.PB.CI.Po.K.H.ternary, table, 'a, 'a) S.PH.B.PB.CI.Po.K.H.ternary
+      ((Trace.t,StoryProfiling.StoryStats.log_info Mods.simulation_info list,'a,'a) S.PH.B.PB.CI.Po.K.H.ternary, table, 'a, 'a) S.PH.B.PB.CI.Po.K.H.ternary
     val init_table: table S.PH.B.PB.CI.Po.K.H.zeroary
     val count_stories: table -> int
-    val add_story: (Causal.grid,S.PH.B.PB.CI.Po.K.refined_step list,StoryProfiling.StoryStats.log_info Mods.simulation_info list,table,table) S.PH.B.PB.CI.Po.K.H.quaternary
+    val add_story: (Causal.grid,Trace.t,StoryProfiling.StoryStats.log_info Mods.simulation_info list,table,table) S.PH.B.PB.CI.Po.K.H.quaternary
     val hash_list: (table, table) S.PH.B.PB.CI.Po.K.H.unary
 
     val sort_list: (table, (Causal.grid * StoryProfiling.StoryStats.log_info Mods.simulation_info list) list) S.PH.B.PB.CI.Po.K.H.unary
@@ -478,7 +478,7 @@ let dot_of_graph parameter handler error graph = error
 module ListTable =
   (
     struct
-      type table = (prehash * (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list  * StoryProfiling.StoryStats.log_info Mods.simulation_info list) list) list
+      type table = (prehash * (Causal.grid * graph * canonical_form option * Trace.t * StoryProfiling.StoryStats.log_info Mods.simulation_info list) list) list
 
       let init_table parameter handler log_info error =
 	error,log_info,[]
@@ -636,7 +636,7 @@ module BucketTable =
       type table =
 	{
 	  tree: outer_tree;
-	  array: (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list * StoryProfiling.StoryStats.log_info Mods.simulation_info list)  Int_storage.Nearly_inf_Imperatif.t;
+	  array: (Causal.grid * graph * canonical_form option * Trace.t * StoryProfiling.StoryStats.log_info Mods.simulation_info list)  Int_storage.Nearly_inf_Imperatif.t;
 	  fresh_id: story_id
 	}
 

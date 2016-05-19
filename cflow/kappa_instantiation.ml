@@ -36,13 +36,8 @@ sig
   type internal_state = int
 
   type side_effect = Instantiation.concrete Instantiation.site list
-  type refined_event = Trace.event_kind * Instantiation.concrete Instantiation.event * unit Mods.simulation_info
-  type refined_obs =
-      Trace.event_kind * Instantiation.concrete Instantiation.test list * unit Mods.simulation_info
-  type refined_step
 
   val empty_side_effect: side_effect
-  val dummy_refined_step: string -> refined_step
   val agent_name_of_binding_type: Instantiation.binding_type -> Instantiation.agent_name
   val site_name_of_binding_type: Instantiation.binding_type -> Instantiation.site_name
   val agent_id_of_agent:
@@ -52,52 +47,30 @@ sig
   val agent_id_of_site: Instantiation.concrete Instantiation.site -> int
   val agent_name_of_site: Instantiation.concrete Instantiation.site -> Instantiation.agent_name
   val site_name_of_site: Instantiation.concrete Instantiation.site -> Instantiation.site_name
-  val build_subs_refined_step: int -> int -> refined_step
-  val tests_of_refined_step: (refined_step, Instantiation.concrete Instantiation.test list) H.unary
-  val actions_of_refined_step:
-    (refined_step,
-       (Instantiation.concrete Instantiation.action list *
-	  (Instantiation.concrete Instantiation.site*Instantiation.concrete Instantiation.binding_state) list)) H.unary
-  val is_obs_of_refined_step: refined_step -> bool
-  val is_init_of_refined_step: refined_step -> bool
-  val is_subs_of_refined_step: refined_step -> bool
-  val is_event_of_refined_step: refined_step -> bool
-  val has_creation_of_refined_step: refined_step -> bool
-  val simulation_info_of_refined_step:
-    refined_step -> unit Mods.simulation_info option
-  val print_side:
-    Loggers.t -> H.handler -> string  ->
-    (Instantiation.concrete Instantiation.site*Instantiation.concrete Instantiation.binding_state) -> unit
-
-  val print_refined_step:
-    ?compact:bool -> ?handler:H.handler -> Loggers.t-> refined_step -> unit
 
   val store_event:
-    P.log_info -> refined_event -> refined_step list -> P.log_info * refined_step list
+    P.log_info -> Trace.refined_event -> Trace.t -> P.log_info * Trace.t
   val store_obs :
-    P.log_info -> refined_obs  -> refined_step list -> P.log_info * refined_step list
+    P.log_info -> Trace.refined_obs -> Trace.t -> P.log_info * Trace.t
 
   val build_grid:
-    (refined_step * Instantiation.concrete Instantiation.site list)  list -> bool ->
+    (Trace.step * Instantiation.concrete Instantiation.site list)  list -> bool ->
     H.handler -> Causal.grid
   val print_side_effect: Loggers.t -> side_effect -> unit
   val side_effect_of_list: Instantiation.concrete Instantiation.site list -> side_effect
 
-  val get_kasim_side_effects: refined_step -> side_effect
-  val get_id_of_refined_step: refined_step -> int option
-  val get_time_of_refined_step: refined_step -> float option
+  val get_kasim_side_effects: Trace.step -> side_effect
+  val get_id_of_refined_step: Trace.step -> int option
+  val get_time_of_refined_step: Trace.step -> float option
 
-  val level_of_event: Priority.priorities option -> (refined_step,(agent_id -> bool),Priority.level) H.binary
-  val disambiguate: refined_step list -> refined_step list
-  val clean_events: refined_step list -> refined_step list
-  val agent_id_in_obs: (refined_step, AgentIdSet.t) H.unary
+  val level_of_event: Priority.priorities option -> (Trace.step,(agent_id -> bool),Priority.level) H.binary
+  val disambiguate: Trace.t -> Trace.t
+  val clean_events: Trace.t -> Trace.t
 
-  val fill_siphon: refined_step list -> refined_step list
-  val split_init: refined_step list -> refined_step list
-  val agent_id_in_obs: (refined_step, AgentIdSet.t) H.unary
+  val fill_siphon: Trace.t -> Trace.t
+  val split_init: Trace.t -> Trace.t
+  val agent_id_in_obs: (Trace.step, AgentIdSet.t) H.unary
 end
-
-
 
 module Cflow_linker =
   (struct
@@ -116,25 +89,10 @@ module Cflow_linker =
   module SiteSet = Mods.IntSet
   type internal_state  = int
 
-  type refined_event =
-      Trace.event_kind * PI.concrete PI.event * unit Mods.simulation_info
-  type refined_obs =
-      Trace.event_kind *
-	PI.concrete PI.test list *
-	  unit Mods.simulation_info
-  type refined_step =
-  | Subs of (agent_id * agent_id)
-  | Event of refined_event
-  | Init of PI.concrete PI.action list
-  | Obs of refined_obs
-  | Dummy  of string
-
-  let build_subs_refined_step a b = Subs (a,b)
   let get_kasim_side_effects = function
-    | Event ((_,(_,(_,_,a)),_)) -> a
-    | Subs _ | Obs _ | Dummy _ | Init _ -> []
+    | Trace.Event ((_,(_,(_,_,a)),_)) -> a
+    | Trace.Subs _ | Trace.Obs _ | Trace.Dummy _ | Trace.Init _ -> []
 
-  let dummy_refined_step x = Dummy x
   let empty_side_effect = []
 
   let site_name_of_binding_type = snd
@@ -151,172 +109,9 @@ module Cflow_linker =
 
   let site_name_of_site = snd
 
-  let print_site ?env f ((ag_id,ag),s) =
-    Loggers.fprintf f "%a_%i.%a"
-		   (Environment.print_agent ?env) ag ag_id
-		   (match env with
-		    | Some env ->
-		       Signature.print_site (Environment.signatures env) ag
-		    | None -> Format.pp_print_int) s
-
-  let print_binding_state ?env f state =
-    match state with
-      | PI.ANY -> Loggers.fprintf f"*"
-      | PI.FREE -> ()
-      | PI.BOUND -> Loggers.fprintf f "!_"
-      | PI.BOUND_TYPE (s,a) ->
-        let () = Loggers.fprintf f "!" in
-        let () =
-          (match env with
-           | Some env ->
-             Loggers.print_as_logger f
-               (fun log ->
-                  Signature.print_site (Environment.signatures env) a log s)
-           | None -> Loggers.fprintf f "%i" s)
-        in
-        let () = Loggers.fprintf f "." in
-        let () =
-             Loggers.print_as_logger f (fun log -> Environment.print_agent ?env log a)
-        in
-        ()
-      | PI.BOUND_to site ->
-        let () = Loggers.fprintf f "!" in
-        let () = print_site ?env f site in
-        ()
-
-  let print_side log hand prefix (s,binding_state) =
-    let env = hand.H.env in
-    let () = Loggers.fprintf log "%s(" prefix in
-    let () = print_site ~env log s in
-    let () = Loggers.fprintf log "," in
-    let () = print_binding_state ~env log binding_state in
-    ()
-
-  let tests_of_refined_obs _ _ info error (_,x,_) = error, info, x
-  let tests_of_refined_event _ _ info error (_,(y,(_,_,_))) =  error, info, y
-  let tests_of_refined_init _ _ info error _ =  error, info, []
-  let tests_of_refined_subs _ _ info error _ _ = error, info, []
-  let actions_of_refined_event _ _ info error (_,(_,(x,y,_))) = error, info, (x,y)
-  let actions_of_refined_init _ _ info error y = error, info, (y,[])
-  let actions_of_refined_obs _ _ info error _ = error, info, ([],[])
-  let actions_of_refined_subs _ _ info error _ _ = error, info, ([],[])
-
-  let print_side_effects ?handler f =
-    let env = Tools.option_map (fun x -> x.H.env) handler in
-    List.iter
-      (fun (site,state) ->
-         let () = Loggers.fprintf f "Side_effects(" in
-         let () = print_site ?env f site in
-         let () = Loggers.fprintf f "," in
-         let () = print_binding_state ?env f state in
-         let () = Loggers.fprintf f ")" in
-         let () = Loggers.print_breakable_space f in
-         ())
-
-  let print_refined_obs ?compact:(compact=false) ?handler f (ev_kind,tests,_) =
-    let sigs = match handler with
-      | None -> None
-      | Some handler -> Some (Environment.signatures handler.H.env) in
-    if compact then
-      Loggers.fprintf
-	f "OBS %a"
-	(Trace.print_event_kind ?env:(Tools.option_map (fun x -> x.H.env) handler))
-	ev_kind
-    else
-      Loggers.fprintf
-	f "***@[<1>OBS %a:%a@]***"
-	(Trace.print_event_kind ?env:(Tools.option_map (fun x -> x.H.env) handler))
-	ev_kind
-	(Pp.list Pp.space (PI.print_concrete_test ?sigs)) tests
-
-  let print_refined_subs _f (_a,_b)  = ()
-
-  let print_refined_init ?compact:(compact=false) ?handler log actions =
-    let sigs = match handler with
-      | None -> None
-      | Some handler -> Some (Environment.signatures handler.H.env) in
-    if compact
-    then
-      Loggers.fprintf log "INIT:%a" (Pp.list Pp.space (PI.print_concrete_action ?sigs)) actions
-    else
-      Loggers.fprintf log "***@[<1>INIT:%a@]***"
-		   (Pp.list Pp.space (PI.print_concrete_action ?sigs)) actions
-
-  let print_refined_event ?compact:(compact=false) ?handler log (ev_kind,(tests,(actions,side_sites,_))) =
-    let sigs = match handler with
-      | None -> None
-      | Some handler -> Some (Environment.signatures handler.H.env) in
-    if compact
-    then
-      Loggers.fprintf
-	log "%a"
-	(Trace.print_event_kind ?env:(Tools.option_map (fun x -> x.H.env) handler))
-	ev_kind
-    else
-      let () =
-	Loggers.fprintf
-	  log "@[***Refined event:***@,* Kappa_rule %a"
-          (Trace.print_event_kind ?env:(Tools.option_map (fun x -> x.H.env) handler))
-	  ev_kind in
-      let () = Loggers.print_breakable_space log in
-      let () = Loggers.fprintf log "Story encoding:" in
-      let () = List.iter (fun test -> Loggers.print_as_logger log (fun log -> PI.print_concrete_test ?sigs log test)) tests in
-      let () = List.iter (fun act -> Loggers.print_as_logger log (fun log -> PI.print_concrete_action ?sigs log act)) actions in
-      let () = print_side_effects ?handler log side_sites in
-      let () = Loggers.fprintf log "]" in
-      ()
-
-  let gen f0 f1 f2 f3 f4 (p:H.parameter) h l e step =
-    match step with
-    | Subs (a,b) -> f0 p h l e a b
-    | Event (x,y,_) -> f1 p h l e (x,y)
-    | Init a -> f2 p h l e a
-    | Obs a -> f3 p h l e a
-    | Dummy x  -> f4 p h l e x
-
-  let print_refined_step ?compact:(compact=false) ?handler f = function
-    | Subs (a,b) -> print_refined_subs f (a,b)
-    | Event (x,y,z) -> print_refined_event ~compact ?handler f (x,y)
-    | Init a -> print_refined_init ~compact ?handler f a
-    | Obs a -> print_refined_obs ~compact ?handler f a
-    | Dummy _  -> ()
-
-  let tests_of_refined_step =
-    gen
-      tests_of_refined_subs
-      tests_of_refined_event
-      tests_of_refined_init
-      tests_of_refined_obs
-      (fun _ _ l error _ -> error, l, ([]:Instantiation.concrete Instantiation.test list))
-
-  let is_obs_of_refined_step x =
-    match x with
-    | Obs _ -> true
-    | Event _ | Subs _ | Dummy _ | Init _ -> false
-  let is_init_of_refined_step x =
-    match x with
-    | Init _ -> true
-    | Event _ | Subs _ | Dummy _ | Obs _ -> false
-  let is_subs_of_refined_step x =
-    match x with
-    | Subs _ -> true
-    | Event _ | Init _ | Dummy _ | Obs _ -> false
-  let is_event_of_refined_step x =
-    match x with
-    | Event _ -> true
-    | Init _ | Subs _ | Dummy _ | Obs _ -> false
-
-  let dummy = {Mods.story_id = 0 ; Mods.story_time = 0. ; Mods.story_event = 0 ; Mods.profiling_info = () }
-  let simulation_info_of_refined_step x =
-    match x with
-    | Obs (_,_,info) | Event (_,_,info) -> Some info
-    | Init _ -> Some dummy
-    | Subs _ | Dummy _ -> None
-
-
   let get_gen_of_refined_step f x =
     match
-      simulation_info_of_refined_step x
+      Trace.simulation_info_of_step x
     with
     | None -> None
     | Some a -> Some (f a)
@@ -324,34 +119,16 @@ module Cflow_linker =
   let get_time_of_refined_step x = get_gen_of_refined_step (fun x -> x.Mods.story_time) x
   let get_id_of_refined_step x = get_gen_of_refined_step (fun x -> x.Mods.story_event) x
 
-  let actions_of_refined_step =
-    gen
-      actions_of_refined_subs
-      actions_of_refined_event
-      actions_of_refined_init
-      actions_of_refined_obs
-      (fun _ _ l error _ -> error,l,([],[]))
-  let store_event log_info (event:refined_event) (step_list:refined_step list) =
+  let store_event log_info event step_list =
     match event with
     | Trace.INIT _,(_,(actions,_,_)),_ ->
-       P.inc_n_kasim_events log_info,(Init actions)::step_list
+       P.inc_n_kasim_events log_info,(Trace.Init actions)::step_list
     | Trace.OBS _,_,_ -> assert false
     | (Trace.RULE _ | Trace.PERT _ as k),x,info ->
-       P.inc_n_kasim_events log_info,(Event (k,x,info))::step_list
+       P.inc_n_kasim_events log_info,(Trace.Event (k,x,info))::step_list
   let store_obs log_info (i,x,c) step_list =
-    P.inc_n_obs_events log_info,Obs(i,x,c)::step_list
+    P.inc_n_obs_events log_info,Trace.Obs(i,x,c)::step_list
 
-  let creation_of_actions op actions =
-    List.fold_left
-      (fun l -> function
-	     | PI.Create (x,_) -> op x :: l
-	     | PI.Mod_internal _ | PI.Bind _ | PI.Bind_to _ | PI.Free _
-	     | PI.Remove _ -> l) [] actions
-  let creation_of_event = function
-    | (Event (_,(_,(ac,_,_)),_) | Init ac) -> creation_of_actions fst ac
-    | Obs _ | Dummy _ | Subs _ -> []
-
-  let has_creation_of_refined_step x = creation_of_event x <> []
   let build_grid list bool handler =
     let env = handler.H.env in
     let empty_set = [] in
@@ -363,8 +140,8 @@ module Cflow_linker =
 	   if bool then fun se -> se
 	   else fun _ -> List.rev_append side_effect side in
 	 let translate y = Mods.IntMap.find_default y y subs in
-         match (k:refined_step) with
-         | Event (id,event,info) ->
+         match k with
+         | Trace.Event (id,event,info) ->
 	    let (tests,(actions,side_effects,kappa_side)) =
 	      PI.subst_map_agent_in_concrete_event translate event in
             let kasim_side_effect = maybe_side_effect kappa_side in
@@ -372,23 +149,23 @@ module Cflow_linker =
 	      (id,(tests,(actions,side_effects,kasim_side_effect)),info)
 	      counter env grid,
             empty_set,counter+1,Mods.IntMap.empty
-         | Obs (id,tests,info) ->
+         | Trace.Obs (id,tests,info) ->
 	    let tests' =
 	      Tools.list_smart_map
 		(PI.subst_map_agent_in_concrete_test translate) tests in
 	    Causal.record_obs
 	      (id,tests',info) side_effect counter grid,
 	    maybe_side_effect empty_set,counter+1,Mods.IntMap.empty
-         | Subs (a,b) ->
+         | Trace.Subs (a,b) ->
             grid, side_effect, counter, Mods.IntMap.add a b subs
-	 | Init actions ->
+	 | Trace.Init actions ->
 	    let actions' =
 	      Tools.list_smart_map
 		(PI.subst_map_agent_in_concrete_action translate) actions in
-            Causal.record_init (creation_of_actions snd actions',actions')
+            Causal.record_init (Trace.creation_of_actions snd actions',actions')
 			       counter env grid,
 	    side_effect,counter+1,Mods.IntMap.empty
-         | Dummy _ ->
+         | Trace.Dummy _ ->
             grid, maybe_side_effect empty_set, counter, subs
         )
         (grid,empty_set,1,Mods.IntMap.empty) list
@@ -396,7 +173,8 @@ module Cflow_linker =
 
   let clean_events =
     List.filter
-      (function Event _ | Obs _ | Init _ -> true | Dummy _ | Subs _ -> false)
+      (function Trace.Event _ | Trace.Obs _ | Trace.Init _ -> true
+		| Trace.Dummy _ | Trace.Subs _ -> false)
 
   let print_side_effect log =
     List.iter
@@ -408,11 +186,10 @@ module Cflow_linker =
     | None,None -> error,log_info,Priority.highest
     | Some priorities,_ | None,Some priorities ->
        match e with
-       | Obs _ -> error,log_info,priorities.Priority.other_events
-       | Event _ ->
+       | Trace.Obs _ -> error,log_info,priorities.Priority.other_events
+       | Trace.Event _ ->
           begin
-            let error,log_info,actions =
-	      actions_of_refined_step parameter handler log_info error e in
+            let actions = Trace.actions_of_step e in
             let priority =
               List.fold_left
                 (fun priority ->
@@ -434,30 +211,30 @@ module Cflow_linker =
             in
             error,log_info,priority
           end
-       | (Dummy _ | Subs _ | Init _) ->
+       | (Trace.Dummy _ | Trace.Subs _ | Trace.Init _) ->
 	  error,log_info,priorities.Priority.substitution
 
   let subs_agent_in_event mapping mapping' = function
-    | Event (a,event,info) ->
-       Event
+    | Trace.Event (a,event,info) ->
+       Trace.Event
 	 (a,
 	  PI.subst_map2_agent_in_concrete_event
 	    (fun x -> AgentIdMap.find_default x x mapping)
 	    (fun x -> AgentIdMap.find_default x x mapping')
 	    event,
 	 info)
-    | Obs (a,b,c) ->
-       Obs(a,
+    | Trace.Obs (a,b,c) ->
+       Trace.Obs(a,
 	   Tools.list_smart_map
 	     (PI.subst_map_agent_in_concrete_test
 		(fun x -> AgentIdMap.find_default x x mapping)) b,
 	   c)
-    | Init b ->
-       Init
+    | Trace.Init b ->
+       Trace.Init
 	 (Tools.list_smart_map
 	    (PI.subst_map_agent_in_concrete_action
 	       (fun x -> AgentIdMap.find_default x x mapping')) b)
-    | Dummy _ | Subs _ as event -> event
+    | Trace.Dummy _ | Trace.Subs _ as event -> event
 
   let disambiguate event_list =
     let _,_,_,event_list_rev =
@@ -471,7 +248,7 @@ module Cflow_linker =
                 (max_id+1,AgentIdSet.add (max_id+1) used,
 		 AgentIdMap.add x (max_id+1) mapping)
               else (max x max_id,AgentIdSet.add x used,mapping))
-             (max_id,used,mapping) (creation_of_event event) in
+             (max_id,used,mapping) (Trace.creation_of_step event) in
          let list = (subs_agent_in_event mapping mapping' event)::event_list in
          max_id,used,mapping',list)
         (0,AgentIdSet.empty,AgentIdMap.empty,[])
@@ -480,7 +257,7 @@ module Cflow_linker =
 
   type agent_info =
     {
-      initial_step: refined_step ;
+      initial_step: Trace.step ;
       internal_states: internal_state SiteMap.t ;
       bound_sites: SiteSet.t ;
       sites_with_wrong_internal_state: SiteSet.t
@@ -495,7 +272,7 @@ module Cflow_linker =
 	  | (PI.Bind _ | PI.Remove _) -> failwith "Problematic initial event")
 	soup in
     let rec aux recur acc soup = function
-      | [] -> (if soup <> [] then Init soup::acc else acc),recur
+      | [] -> (if soup <> [] then Trace.Init soup::acc else acc),recur
       | PI.Free _ :: t -> aux recur acc soup t
       | (PI.Bind _ | PI.Remove _ | PI.Bind_to _ | PI.Mod_internal _) :: t ->
 	 aux recur acc soup t
@@ -507,7 +284,7 @@ module Cflow_linker =
 	       | (PI.Create _ | PI.Free _) -> true
 	       | (PI.Mod_internal _ |PI.Bind_to _ | PI.Bind _ | PI.Remove _) -> false)
 	     this in
-	 let this = Init this in
+	 let this = Trace.Init this in
 	 if standalone then
 	   let map =
 	     List.fold_left
@@ -647,7 +424,7 @@ module Cflow_linker =
       (fun (step_list,remanent) refined_step ->
        match refined_step
        with
-       | Init init -> convert_init remanent step_list init
+       | Trace.Init init -> convert_init remanent step_list init
        | _ -> (refined_step::step_list,remanent))
       ([],remanent)
       (List.rev refined_step_list))
@@ -658,8 +435,8 @@ module Cflow_linker =
       List.fold_left
 	(fun (step_list,remanent) refined_step ->
 	 match refined_step with
-	 | Init init -> convert_init remanent step_list init
-	 | Event (_,(_,(action,_,kasim_side)),_) ->
+	 | Trace.Init init -> convert_init remanent step_list init
+	 | Trace.Event (_,(_,(action,_,kasim_side)),_) ->
 	    let remanent,set =
 	      List.fold_left
 		(fun recur ->
@@ -682,14 +459,16 @@ module Cflow_linker =
 		 | None -> list)
 		set
 		(refined_step::step_list)),remanent)
-	 | Subs _ | Obs _ | Dummy _ -> (refined_step::step_list,remanent))
+	 | (Trace.Subs _ | Trace.Obs _ | Trace.Dummy _) ->
+	    (refined_step::step_list,remanent))
 	([],remanent)
 	refined_step_list in
     List.rev a
 
   let agent_id_in_obs _parameter _handler info error = function
-    | Subs _ | Event _ | Init _ | Dummy _ -> error,info,AgentIdSet.empty
-    | Obs (_,tests,_) ->
+    | (Trace.Subs _ | Trace.Event _ | Trace.Init _ | Trace.Dummy _) ->
+       error,info,AgentIdSet.empty
+    | Trace.Obs (_,tests,_) ->
        error, info,
        List.fold_left
          (fun l x ->

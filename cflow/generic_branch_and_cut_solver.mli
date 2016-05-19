@@ -6,12 +6,12 @@ module type Solver =
     val detect_independent_events: (PH.B.blackboard,PH.B.PB.step_id list,PH.B.PB.step_id list) PH.B.PB.CI.Po.K.H.binary
     val filter: (PH.B.blackboard,PH.B.PB.step_id list,PH.B.blackboard) PH.B.PB.CI.Po.K.H.binary
 
-    val sub: (PH.B.PB.CI.Po.K.refined_step list,PH.B.blackboard) PH.B.PB.CI.Po.K.H.unary
+    val sub: (Trace.step list,PH.B.blackboard) PH.B.PB.CI.Po.K.H.unary
 
     val clean: (PH.B.blackboard,PH.B.blackboard) PH.B.PB.CI.Po.K.H.unary
 
-    val translate: (PH.B.blackboard,PH.B.PB.step_id list,PH.B.PB.CI.Po.K.refined_step list * PH.B.result) PH.B.PB.CI.Po.K.H.binary
-    val translate_result: PH.B.result -> PH.B.PB.CI.Po.K.refined_step list
+    val translate: (PH.B.blackboard,PH.B.PB.step_id list,Trace.step list * PH.B.result) PH.B.PB.CI.Po.K.H.binary
+    val translate_result: PH.B.result -> Trace.step list
 
     end)
 

@@ -22,7 +22,7 @@
    sig
      module K:Kappa_instantiation.Cflow_signature
 
-     val cut: (K.refined_step list,(K.refined_step list * int )) K.H.unary
+     val cut: (Trace.t,(Trace.t * int )) K.H.unary
    end
 
  module Po_cut = 
@@ -125,7 +125,7 @@
                    else 
                      keep2 q 
              in 
-             let error,info,(action_list,_) = K.actions_of_refined_step parameter handler info error event in 
+             let (action_list,_) = Trace.actions_of_step event in
              let seen =   
                List.fold_left 
                  (fun seen action -> 
@@ -136,14 +136,14 @@
                  )
                  seen action_list
              in 
-             let error,info,(actions,_) = K.actions_of_refined_step parameter handler info error event in  
-             if (K.is_obs_of_refined_step event)
+             let (actions,_) = Trace.actions_of_step event in
+             if (Trace.step_is_obs event)
                || (keep actions)
                || (keep2 (predicates_of_side_effects (K.get_kasim_side_effects event)))
              then 
                begin
                  let kept = event::kept in 
-                 let error,info,tests = K.tests_of_refined_step parameter handler info error event in 
+                 let tests = Trace.tests_of_step event in
                  let seen = 
                    List.fold_left 
                      (fun seen test -> 

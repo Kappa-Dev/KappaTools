@@ -54,8 +54,8 @@ sig
   val get_pre_column_map_inv: pre_blackboard -> predicate_info A.t
   (** generation*)
   val init:  pre_blackboard CI.Po.K.H.zeroary
-  val add_step: (CI.Po.K.refined_step,pre_blackboard,step_id,pre_blackboard * step_id) CI.Po.K.H.ternary
-  val add_step_up_to_iso: (CI.Po.K.refined_step,pre_blackboard,step_id,pre_blackboard * step_id) CI.Po.K.H.ternary
+  val add_step: (Trace.step,pre_blackboard,step_id,pre_blackboard * step_id) CI.Po.K.H.ternary
+  val add_step_up_to_iso: (Trace.step,pre_blackboard,step_id,pre_blackboard * step_id) CI.Po.K.H.ternary
   val finalize: Priority.priorities option -> (pre_blackboard,pre_blackboard) CI.Po.K.H.unary
 
   (**pretty printing*)
@@ -69,7 +69,7 @@ sig
   val n_events_per_predicate: (pre_blackboard, int, predicate_id) CI.Po.K.H.binary
   val event_list_of_predicate: (pre_blackboard, predicate_id,  (int * int * predicate_value * predicate_value ) list) CI.Po.K.H.binary
   val mandatory_events: (pre_blackboard, ((int list * unit Mods.simulation_info option) list)) CI.Po.K.H.unary
-  val get_pre_event: (pre_blackboard,  CI.Po.K.refined_step A.t) CI.Po.K.H.unary
+  val get_pre_event: (pre_blackboard,  Trace.step A.t) CI.Po.K.H.unary
   val get_side_effect: (pre_blackboard,  CI.Po.K.side_effect A.t) CI.Po.K.H.unary
   val get_fictitious_observable: (pre_blackboard,  int option) CI.Po.K.H.unary
   val get_level_of_event: (pre_blackboard, step_id, Priority.level) CI.Po.K.H.binary
@@ -178,7 +178,7 @@ module Preblackboard =
            pre_fictitious_list: predicate_id list ; (** list of wire for mutual exclusions, the state must be undefined at the end of the trace *)
            pre_steps_by_column: (step_short_id * (step_id * step_short_id * predicate_value * predicate_value) list) A.t; (** maps each wire to the last known value and the list of step (step id,test,action)*)
            pre_kind_of_event: rule_type A.t; (** maps each event id to the kind of event *)
-           pre_event: CI.Po.K.refined_step A.t; (** maps each event to the step *)
+           pre_event: Trace.step A.t; (** maps each event to the step *)
 	   pre_nsteps: step_id; (**id of the last event *)
 	   pre_ncolumn: predicate_id; (**id of the last wire *)
 	   pre_column_map: predicate_id PredicateMap.t; (** maps each wire label to its wire id *)
@@ -724,10 +724,10 @@ module Preblackboard =
                [predicate_id,Bound_to_type (agent_name,site_name)]
 
          let type_of_step x =
-	   if CI.Po.K.is_obs_of_refined_step x then Observable
-	   else if CI.Po.K.is_init_of_refined_step x then Init
-	   else if CI.Po.K.is_event_of_refined_step x then Rule
-	   else if CI.Po.K.is_subs_of_refined_step x then Subs
+	   if Trace.step_is_obs x then Observable
+	   else if Trace.step_is_init x then Init
+	   else if Trace.step_is_event x then Rule
+	   else if Trace.step_is_subs x then Subs
 	   else Dummy
 
   (** initialisation*)
@@ -736,7 +736,7 @@ module Preblackboard =
 	   log_info,
            {
              pre_side_effect_of_event = A.make 1 CI.Po.K.empty_side_effect;
-             pre_event = A.make 1 (CI.Po.K.dummy_refined_step "");
+             pre_event = A.make 1 (Trace.dummy_step "");
              pre_fictitious_list = [] ;
              pre_steps_by_column = A.make 1 (1,[]) ;
              pre_nsteps = -1 ;
@@ -1134,10 +1134,10 @@ module Preblackboard =
 
 
          let add_step_strong parameter handler log_info error step blackboard step_id =
-           let init = CI.Po.K.is_init_of_refined_step step in
+           let init = Trace.step_is_init step in
            let pre_event = blackboard.pre_event in
-           let error,log_info,test_list = CI.Po.K.tests_of_refined_step parameter handler log_info error step in
-           let error,log_info,(action_list,side_effect) = CI.Po.K.actions_of_refined_step parameter handler log_info error step in
+           let test_list = Trace.tests_of_step step in
+           let (action_list,side_effect) = Trace.actions_of_step step in
            let data_structure = init_data_structure_strong in
            let data_structure =
              List.fold_left
@@ -1803,9 +1803,9 @@ module Preblackboard =
                            blackboard.pre_steps_by_column
                        in
                        let observable_list =
-                         if CI.Po.K.is_obs_of_refined_step step
+                         if Trace.step_is_obs step
                          then
-                           ([nsid],CI.Po.K.simulation_info_of_refined_step step)::blackboard.pre_observable_list
+                           ([nsid],Trace.simulation_info_of_step step)::blackboard.pre_observable_list
                          else
                            blackboard.pre_observable_list
                        in
@@ -1838,7 +1838,7 @@ module Preblackboard =
                  in
                  List.fold_left
                    (fun (error,log_info,blackboard,init_step,nlist) mixture_ag_id ->
-                     let (step:CI.Po.K.refined_step) = CI.Po.K.build_subs_refined_step rule_ag_id mixture_ag_id in
+                     let step = Trace.subs_step rule_ag_id mixture_ag_id in
                      let test_list =
                        Tools.list_smart_map
                          (Instantiation.subst_agent_in_concrete_test rule_ag_id mixture_ag_id)
@@ -2130,7 +2130,7 @@ according to the corresponding substitution *)
                          if (rule_ag_id1 = rule_ag_id2) = (mixture_ag_1 = mixture_ag_2)
                          then
                            begin
-                             let step = CI.Po.K.dummy_refined_step ("LINK "^(string_of_int mixture_ag_1)^"/"^(string_of_int rule_ag_id1)^","^(string_of_int  mixture_ag_2)^"/"^(string_of_int rule_ag_id2)^")")
+                             let step = Trace.dummy_step ("LINK "^(string_of_int mixture_ag_1)^"/"^(string_of_int rule_ag_id1)^","^(string_of_int  mixture_ag_2)^"/"^(string_of_int rule_ag_id2)^")")
                              in
                              let subs =
 (*                               if rule_ag_id2 = mixture_ag_2
@@ -2448,9 +2448,9 @@ according to the corresponding substitution *)
                in
                let _ = A.set blackboard.pre_kind_of_event nsid (type_of_step step) in
                let observable_list =
-                 if CI.Po.K.is_obs_of_refined_step step
+                 if Trace.step_is_obs step
                  then
-                   ([nsid],CI.Po.K.simulation_info_of_refined_step step)::blackboard.pre_observable_list
+                   ([nsid],Trace.simulation_info_of_step step)::blackboard.pre_observable_list
                  else
                    blackboard.pre_observable_list
                in
@@ -2469,11 +2469,11 @@ according to the corresponding substitution *)
                (*** ***)
 
          let add_step parameter handler log_info error step blackboard step_id =
-           let init = CI.Po.K.is_init_of_refined_step step in
+           let init = Trace.step_is_init step in
            let init_step = None in
            let pre_event = blackboard.pre_event in
-           let error,log_info,test_list = CI.Po.K.tests_of_refined_step parameter handler log_info error step in
-           let error,log_info,(action_list,side_effect) = CI.Po.K.actions_of_refined_step parameter handler log_info error step in
+           let test_list = Trace.tests_of_step step in
+           let (action_list,side_effect) = Trace.actions_of_step step in
            let fictitious_local_list = [] in
            let fictitious_list = blackboard.pre_fictitious_list in
            let build_map list map =
@@ -2653,9 +2653,9 @@ according to the corresponding substitution *)
                in
                let _ = A.set blackboard.pre_kind_of_event nsid (type_of_step step) in
                let observable_list =
-                 if CI.Po.K.is_obs_of_refined_step step
+                 if Trace.step_is_obs step
                  then
-                   ([nsid],CI.Po.K.simulation_info_of_refined_step step)::blackboard.pre_observable_list
+                   ([nsid],Trace.simulation_info_of_step step)::blackboard.pre_observable_list
                  else
                    blackboard.pre_observable_list
                in

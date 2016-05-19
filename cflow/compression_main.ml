@@ -22,7 +22,6 @@ module U = Utilities
 module S = U.S
 
 type secret_log_info = StoryProfiling.StoryStats.log_info
-type secret_step = S.PH.B.PB.CI.Po.K.refined_step
 let init_secret_log_info = StoryProfiling.StoryStats.init_log_info
 let secret_store_event = S.PH.B.PB.CI.Po.K.store_event
 let secret_store_obs = S.PH.B.PB.CI.Po.K.store_obs
