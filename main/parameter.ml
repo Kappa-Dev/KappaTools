@@ -11,10 +11,8 @@ let progressBarSize = ref 60
 let plotSepChar = ref (fun f -> Format.pp_print_space f ())
 let dumpIfDeadlocked = ref false
 let maxConsecutiveClash = ref 2
-let backtrace = ref false
 let eclipseMode = ref false
 let useColor = ref true
-let safeModeOn = ref false
 let emacsMode = ref false
 
 (* expert option for stories *)
@@ -45,11 +43,7 @@ let emacsMode = ref false
   let log_number_of_causal_flows = true
 
 (*User definable values*)
-let tmp_var_name = ref ""
-let alg_var_overwrite : (string * Nbr.t) list ref = ref []
-let (seedValue:int option ref) = ref None
 let compileModeOn = ref false
-let implicitSignature = ref false
 let dotCflows = ref true
 
 let causalModeOn = ref false

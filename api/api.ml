@@ -158,13 +158,13 @@ end = struct
 			 ~outputs:(outputs (Signature.create []))
 			 sig_nd tk_nd contact_map
 			 simulation.counter result >>=
-			 (fun (env_store,domain,has_tracking,init_l) ->
+			 (fun (env_store,domain,has_tracking,store_distances,init_l) ->
 			  let (env,graph_state) =
 			    Eval.build_initial_state
 			      ~bind:(fun x f ->
 				     (self#yield ()) >>= (fun () -> x >>= f))
 			      ~return:Lwt.return [] simulation.counter
-			      env_store domain has_tracking
+			      env_store domain has_tracking store_distances
 			      updated_vars init_l in
 			  graph_state >>=
 			    (fun (graph,state) ->

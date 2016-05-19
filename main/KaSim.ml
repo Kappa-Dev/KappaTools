@@ -2,10 +2,16 @@ let usage_msg =
   "KaSim "^Version.version_string^":\n"^
     "Usage is KaSim [-i] input_file [-e events | -t time] [-p points] [-o output_file]\n"
 
+let backtrace = ref false
+
+let tmp_var_name = ref ""
+let alg_var_overwrite : (string * Nbr.t) list ref = ref []
+let (seedValue:int option ref) = ref None
 let (maxEventValue:int option ref) = ref None
 let (maxTimeValue:float option ref) = ref None
 let (pointNumberValue:int ref) = ref (-1)
 let (rescale:float option ref) = ref None
+let implicitSignature = ref false
 
 (*Name convention*)
 let marshalizedInFile = ref ""
@@ -32,15 +38,15 @@ let () =
      "Number of points in plot");
     ("-var",
      Arg.Tuple
-       [Arg.Set_string Parameter.tmp_var_name;
+       [Arg.Set_string tmp_var_name;
 	Arg.String
 	  (fun var_val ->
-	   Parameter.alg_var_overwrite :=
-	     (!Parameter.tmp_var_name,
+	   alg_var_overwrite :=
+	     (!tmp_var_name,
 	      try Nbr.of_string var_val with
 		Failure _ ->
 		raise (Arg.Bad ("\""^var_val^"\" is not a valid value")))
-	       ::!Parameter.alg_var_overwrite)],
+	       ::!alg_var_overwrite)],
      "Set a variable to a given value");
     ("-o", Arg.String Kappa_files.set_data,
      "file name for data output") ;
@@ -53,10 +59,9 @@ let () =
      "save kappa files as a simulation package") ;
     ("-dump-cc", Arg.String Kappa_files.set_ccFile,
      "file name for dumping the domain of observables") ;
-    ("--implicit-signature",
-     Arg.Unit (fun () -> Parameter.implicitSignature := true),
+    ("--implicit-signature", Arg.Set implicitSignature,
      "Program will guess agent signatures automatically") ;
-    ("-seed", Arg.Int (fun i -> Parameter.seedValue := Some i),
+    ("-seed", Arg.Int (fun i -> seedValue := Some i),
      "Seed for the random number generator") ;
     ("--eclipse", Arg.Set Parameter.eclipseMode,
      "enable this flag for running KaSim behind eclipse plugin") ;
@@ -66,9 +71,7 @@ let () =
      "Display rule compilation as action list") ;
     ("--debug", Arg.Set Parameter.debugModeOn,
      "Enable debug mode") ;
-    ("--safe", Arg.Set Parameter.safeModeOn,
-     "Enable safe mode") ;
-    ("--backtrace", Arg.Set Parameter.backtrace,
+    ("--backtrace", Arg.Set backtrace,
      "Backtracing exceptions") ;
     ("--batch", Arg.Set Parameter.batchmode,
      "Set non interactive mode (always assume default answer)") ;
@@ -101,9 +104,8 @@ let () =
     in
     let _ = Sys.set_signal Sys.sigint (Sys.Signal_handle sigint_handle) in
 
-    Printexc.record_backtrace !Parameter.backtrace ; (*Possible backtrace*)
-
-    (*let _ = Printexc.record_backtrace !Parameter.debugModeOn in*)
+    Printexc.record_backtrace
+      (!Parameter.debugModeOn || !backtrace); (*Possible backtrace*)
 
     Format.printf "+ Command line is: @[<h>%a@]@."
 		  (Pp.array Pp.space
@@ -117,7 +119,7 @@ let () =
 		     Ast.empty_compil !inputKappaFileNames in
 
     let theSeed =
-      match !Parameter.seedValue with
+      match !seedValue with
       | Some seed -> seed
       | None ->
 	 begin
@@ -140,12 +142,11 @@ let () =
       match !marshalizedInFile with
       | "" ->
 	let result =
-	  if !Parameter.implicitSignature
-	  then Ast.implicit_signature result
+	  if !implicitSignature then Ast.implicit_signature result
 	  else result in
 	let () = Format.printf "+ Sanity checks@." in
 	let (sigs_nd,tk_nd,updated_vars,result') =
-	  LKappa.compil_of_ast !Parameter.alg_var_overwrite result in
+	  LKappa.compil_of_ast !alg_var_overwrite result in
 	let () = Format.printf "+ KaSa tools initialization@." in
 	let contact_map,_kasa_state =
 	  Eval.init_kasa Remanent_parameters_sig.KaSim result in
@@ -177,7 +178,7 @@ let () =
                (fun (s,v) ->
 		Environment.num_of_alg (Location.dummy_annot s) env,
 		Alg_expr.CONST v)
-               !Parameter.alg_var_overwrite in
+               !alg_var_overwrite in
 	   let updated_vars' =
 	     List.fold_left
 	       (fun acc (i,_) -> i::acc) updated_vars alg_overwrite in
