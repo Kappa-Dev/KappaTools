@@ -12,16 +12,19 @@ type t =
 	(Edges.agent * ((Connected_component.Set.t*int) * Edges.path) list) list
 	* bool;
     story_machinery :
-      ((Trace.event_kind * Connected_component.t array *
-	  Instantiation.abstract Instantiation.test list)
-	 list Connected_component.Map.t (*currently tracked ccs *)
-       * Trace.t) option;
+      ((bool*bool*bool) *
+	 (Trace.event_kind * Connected_component.t array *
+	    Instantiation.abstract Instantiation.test list)
+	   list Connected_component.Map.t (*currently tracked ccs *) *
+	   Trace.t) option;
     unary_distances: Data.distances option;
   }
 
 type result = Clash | Success of t | Corrected of t
 
-let empty ~has_tracking ~store_distances env = {
+let empty ~story_compression ~store_distances env =
+  let (none,weak,strong) = story_compression in
+  {
     roots_of_ccs = Connected_component.Map.empty;
     matchings_of_rule = Mods.IntMap.empty;
     unary_candidates = Mods.IntMap.empty;
@@ -30,8 +33,8 @@ let empty ~has_tracking ~store_distances env = {
     tokens = Array.make (Environment.nb_tokens env) Nbr.zero;
     outdated_elements = Operator.DepSet.empty,[],true;
     story_machinery =
-      if has_tracking
-      then Some (Connected_component.Map.empty,[])
+      if none || weak || strong
+      then Some (story_compression,Connected_component.Map.empty,[])
       else None;
     unary_distances =
       Tools.option_map
@@ -225,7 +228,7 @@ let add_path_to_tests path tests =
 let store_event counter inj2graph new_tracked_obs_instances event_kind
 		?path extra_side_effects rule = function
   | None as x -> x
-  | Some (x,steps) ->
+  | Some (compressions,x,steps) ->
      let (ctests,(ctransfs,cside_sites,csides)) =
        Instantiation.concretize_event
 	 inj2graph rule.Primitives.instantiations in
@@ -250,11 +253,11 @@ let store_event counter inj2graph new_tracked_obs_instances event_kind
 	  Trace.store_obs obs steps)
 	 steps' new_tracked_obs_instances
      in
-       Some (x,steps'')
+       Some (compressions,x,steps'')
 
 let store_obs edges roots obs acc = function
   | None -> acc
-  | Some (tracked,_) ->
+  | Some (_,tracked,_) ->
      List.fold_left
        (fun acc (cc,(root,_)) ->
 	try
@@ -770,17 +773,19 @@ let print env f state =
 let unary_distances state = state.unary_distances
 
 let debug_print f state =
-  Format.fprintf f "@[<v>%a@,%a@,%a@,%a@]"
-		 Edges.debug_print state.edges
-		 (Pp.array Pp.space (fun i f el ->
-				     Format.fprintf f "token_%i <- %a"
-						    i Nbr.print el))
-		 state.tokens
-		 (print_injections ?sigs:None Format.pp_print_int) state.roots_of_ccs
-		 (Pp.set Mods.IntMap.bindings Pp.cut
-			 (fun f (rule,roots) ->
-			  Format.fprintf f "@[rule_%i ==> %a@]" rule
-					 (Pp.set Mods.Int2Set.elements Pp.comma (fun f (x,y) -> Format.fprintf f "(%i,%i)" x y))
+  Format.fprintf
+    f "@[<v>%a@,%a@,%a@,%a@]"
+    Edges.debug_print state.edges
+    (Pp.array Pp.space (fun i f el ->
+			Format.fprintf f "token_%i <- %a"
+				       i Nbr.print el))
+    state.tokens
+    (print_injections ?sigs:None Format.pp_print_int) state.roots_of_ccs
+    (Pp.set Mods.IntMap.bindings Pp.cut
+	    (fun f (rule,roots) ->
+	     Format.fprintf f "@[rule_%i ==> %a@]" rule
+			    (Pp.set Mods.Int2Set.elements Pp.comma
+				    (fun f (x,y) -> Format.fprintf f "(%i,%i)" x y))
 					 roots))
 		 state.unary_candidates
 
@@ -789,21 +794,21 @@ let add_tracked ccs event_kind tests state =
   | None ->
      raise (ExceptionDefn.Internal_Error
 	      (Location.dummy_annot "TRACK in non tracking mode"))
-  | Some (tcc,x) ->
+  | Some (comp,tcc,x) ->
      let tcc' =
      Array.fold_left
        (fun tcc cc ->
 	let acc = Connected_component.Map.find_default [] cc tcc in
 	Connected_component.Map.add cc ((event_kind,ccs,tests)::acc) tcc)
        tcc ccs in
-     { state with story_machinery = Some (tcc',x) }
+     { state with story_machinery = Some (comp,tcc',x) }
 
 let remove_tracked ccs state =
   match state.story_machinery with
   | None ->
      raise (ExceptionDefn.Internal_Error
 	      (Location.dummy_annot "TRACK in non tracking mode"))
-  | Some (tcc,x) ->
+  | Some (comp,tcc,x) ->
      let tester (_,el,_) =
        not @@
 	 Tools.array_fold_lefti
@@ -817,12 +822,12 @@ let remove_tracked ccs state =
 	| [] -> Connected_component.Map.remove cc tcc
 	| l -> Connected_component.Map.add cc l tcc)
        tcc ccs in
-     { state with story_machinery = Some (tcc',x) }
+     { state with story_machinery = Some (comp,tcc',x) }
 
 let generate_stories ~called_from env state =
   match state.story_machinery with
   | None -> ()
-  | Some (_,steps) ->
+  | Some ((none,weak,strong),_,steps) ->
      Compression_main.compress_and_print
-       ~called_from env (Compression_main.init_secret_log_info ())
-       (List.rev steps)
+       ~called_from ~none ~weak ~strong env
+       (Compression_main.init_secret_log_info ()) (List.rev steps)

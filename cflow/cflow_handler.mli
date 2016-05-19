@@ -1,13 +1,20 @@
 module type Cflow_handler =
   sig
     type sort_algo_for_stories
+    type compression_mode
     type current_compression_mode = Weak | Strong | Causal
+
+    val get_causal_trace : compression_mode -> bool
+    val get_causal_trace_only : compression_mode -> bool
+    val get_weak_compression : compression_mode -> bool
+    val get_strong_compression : compression_mode -> bool
+
     (** a struct which contains parameterizable options *)
     type parameter =
         {
           cache_size : int option ;
           current_compression_mode: current_compression_mode option;
-          compression_mode : Parameter.compression_mode ;
+          compression_mode : compression_mode ;
           priorities_weak: Priority.priorities ;
           priorities_strong : Priority.priorities ;
           priorities_causal : Priority.priorities ;
@@ -44,7 +51,8 @@ module type Cflow_handler =
     val get_bound_on_itteration_number: parameter -> int option
     val set_first_story_per_obs: parameter -> parameter
     val set_all_stories_per_obs: parameter -> parameter
-    val build_parameter: called_from:Remanent_parameters_sig.called_from -> parameter
+    val build_parameter: called_from:Remanent_parameters_sig.called_from ->
+			 none:bool -> weak:bool -> strong:bool -> parameter
     val string_of_exn: exn -> string option
     val set_compression_weak: parameter -> parameter
     val set_compression_strong: parameter -> parameter

@@ -7,7 +7,8 @@ type result = Clash | Success of t | Corrected of t
 (** {6 Initialisation} *)
 
 val empty :
-  has_tracking:bool -> store_distances:bool option -> Environment.t -> t
+  story_compression:(bool * bool * bool) -> store_distances:bool option ->
+  Environment.t -> t
 
 (** {6 algebraic expression computation} *)
 (** [get_alg] is by default [Environment.get_alg] but it is not hard

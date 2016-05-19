@@ -381,30 +381,31 @@ let configurations_of_result result =
 		       ("Value "^error^" should be either \"yes\" or \"no\"", pos_v))
 	      ) in
   List.fold_left
-    (fun unary_dist ((param,pos_p),value_list) ->
+    (fun (unary_dist,story_compression as acc) ((param,pos_p),value_list) ->
      match param with
      | "displayCompression" ->
-	let rec parse l =
+	let rec parse (a,b,c) l =
 	  match l with
-	  | ("strong",_)::tl ->
-	     (Parameter.strongCompression := true ; parse tl)
-	  | ("weak",_)::tl -> (Parameter.weakCompression := true ; parse tl)
-	  | ("none",_)::tl -> (Parameter.mazCompression := true ; parse tl)
-	  | [] -> ()
+	  | ("strong",_)::tl -> parse (a,b,true) tl
+	  | ("weak",_)::tl -> parse (a,true,c) tl
+	  | ("none",_)::tl -> parse (true,b,c) tl
+	  | [] -> (unary_dist,(a,b,c))
 	  | (error,pos)::_ ->
 	     raise (ExceptionDefn.Malformed_Decl
 		      ("Unkown value "^error^" for compression mode", pos))
 	in
-	let () = parse value_list in
-	unary_dist
+	parse story_compression value_list
      | "jsonUnaryDistance" ->
-	if get_bool_value pos_p param value_list then Some true else unary_dist
+	if get_bool_value pos_p param value_list
+	then (Some true,story_compression)
+	else acc
      | "storeUnaryDistance" ->
-	if get_bool_value pos_p param value_list then Some false else None
+	((if get_bool_value pos_p param value_list then Some false else None),
+	 story_compression)
      | "cflowFileName" ->
 	let () = get_value pos_p param value_list
 			   (fun x _ -> Kappa_files.set_cflow x) in
-	unary_dist
+	acc
      | "progressBarSize" ->
 	let () = set_value pos_p param value_list
 			   (fun v p ->
@@ -413,7 +414,7 @@ let configurations_of_result result =
 			      raise (ExceptionDefn.Malformed_Decl
 				       ("Value "^v^" should be an integer", p))
 			   ) Parameter.progressBarSize in
-	unary_dist
+	acc
 
      | "progressBarSymbol" ->
 	let () = set_value pos_p param value_list
@@ -424,17 +425,17 @@ let configurations_of_result result =
 			      raise (ExceptionDefn.Malformed_Decl
 				       ("Value "^v^" should be a character",p))
 			   ) Parameter.progressBarSymbol in
-	unary_dist
+	acc
 
      | "dumpIfDeadlocked" ->
 	let () =
 	  Parameter.dumpIfDeadlocked := get_bool_value pos_p param value_list in
-	unary_dist
+	acc
      | "plotSepChar" ->
 	let () = set_value pos_p param value_list
 			   (fun v _ -> fun f ->  Format.fprintf f "%s" v)
 			   Parameter.plotSepChar in
-	unary_dist
+	acc
      | "maxConsecutiveClash" ->
 	let () = set_value pos_p param value_list
 			   (fun v p ->
@@ -443,10 +444,10 @@ let configurations_of_result result =
 			      raise (ExceptionDefn.Malformed_Decl
 				       ("Value "^v^" should be an integer",p))
 			   ) Parameter.maxConsecutiveClash in
-	unary_dist
+	acc
      | "dotCflows" ->
 	let () = Parameter.dotCflows := get_bool_value pos_p param value_list in
-	unary_dist
+	acc
      | "colorDot" ->
 	let () = set_value pos_p param value_list
 			   (fun value pos_v ->
@@ -457,18 +458,18 @@ let configurations_of_result result =
 			       raise (ExceptionDefn.Malformed_Decl
 					("Value "^error^" should be either \"yes\" or \"no\"", pos_v))
 			   ) Parameter.useColor in
-	unary_dist
+	acc
      | "influenceMapFileName" ->
 	let () = get_value pos_p param value_list
 			   (fun x _ -> Kappa_files.set_influence x) in
-	unary_dist
+	acc
      | "showIntroEvents" ->
 	let () =
 	  Parameter.showIntroEvents := get_bool_value pos_p param value_list in
-	unary_dist
+	acc
      | _ as error ->
 	raise (ExceptionDefn.Malformed_Decl ("Unkown parameter "^error, pos_p))
-    ) None result.configurations
+    ) (None,(false,false,false)) result.configurations
 
 let compile_alg_vars contact_map domain vars =
   array_fold_left_mapi
@@ -508,7 +509,7 @@ let compile ~outputs ~pause ~return
 	    ?rescale_init sigs_nd tk_nd contact_map counter result =
   outputs (Data.Log "+ Building initial simulation conditions...");
   outputs (Data.Log "\t -simulation parameters");
-  let unary_distances = configurations_of_result result in
+  let unary_distances,story_compression = configurations_of_result result in
   pause
     (fun () ->
   let preenv = Connected_component.PreEnv.empty sigs_nd in
@@ -542,6 +543,14 @@ let compile ~outputs ~pause ~return
 			Primitives.PRINT _) -> false) pert then
       raise (ExceptionDefn.Malformed_Decl
 	       (Location.dummy_annot "There is no way for the simulation to stop.")) in
+  let () =
+    if has_tracking && story_compression = (false,false,false) then
+      ExceptionDefn.warning
+	(fun f ->
+	 Format.fprintf
+	   f
+	   "An observable may be tracked but no compression level to render stories has been specified")
+  in
 
   pause
     (fun () ->
@@ -572,11 +581,11 @@ let compile ~outputs ~pause ~return
      let _,init_l =
        inits_of_result
 	 ?rescale:rescale_init contact_map env preenv result in
-     return (env, domain, has_tracking, unary_distances, init_l)))))))
+     return (env, domain, story_compression, unary_distances, init_l)))))))
 
 let build_initial_state
       ~bind ~return alg_overwrite counter env cc_env
-      has_tracking store_distances updated_vars init_l =
+      story_compression store_distances updated_vars init_l =
   let env = Environment.propagate_constant updated_vars counter env in
   let stops = Environment.fold_perturbations
 		(fun i acc p ->
@@ -584,7 +593,7 @@ let build_initial_state
 			   (Environment.all_dependencies env) p in
 		 List.fold_left (fun acc s -> (s,i)::acc) acc s)
 		[] env in
-  let graph0 = Rule_interpreter.empty ~has_tracking ~store_distances env in
+  let graph0 = Rule_interpreter.empty ~story_compression ~store_distances env in
   let state0 = State_interpreter.empty env stops alg_overwrite in
   (env,State_interpreter.initialize
 	 ~bind ~return env cc_env counter graph0 state0 init_l)

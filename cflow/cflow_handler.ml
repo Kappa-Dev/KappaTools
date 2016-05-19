@@ -23,14 +23,20 @@
 module type Cflow_handler =
 sig
   type sort_algo_for_stories
+  type compression_mode
   type current_compression_mode = Weak | Strong | Causal
+
+  val get_causal_trace : compression_mode -> bool
+  val get_causal_trace_only : compression_mode -> bool
+  val get_weak_compression : compression_mode -> bool
+  val get_strong_compression : compression_mode -> bool
 
   (** a struct which contains parameterizable options *)
   type parameter =
     {
       cache_size : int option ;
       current_compression_mode: current_compression_mode option;
-      compression_mode : Parameter.compression_mode ;
+      compression_mode : compression_mode ;
       priorities_weak: Priority.priorities ;
       priorities_strong : Priority.priorities ;
       priorities_causal : Priority.priorities ;
@@ -67,7 +73,8 @@ sig
   val get_bound_on_itteration_number: parameter -> int option
   val set_first_story_per_obs: parameter -> parameter
   val set_all_stories_per_obs: parameter -> parameter
-  val build_parameter: called_from:Remanent_parameters_sig.called_from -> parameter
+  val build_parameter: called_from:Remanent_parameters_sig.called_from ->
+		       none:bool -> weak:bool -> strong:bool -> parameter
   val string_of_exn: exn -> string option
   val set_compression_weak: parameter -> parameter
   val set_compression_strong: parameter -> parameter
@@ -115,11 +122,23 @@ module Cflow_handler =
       type sort_algo_for_stories = Bucket | Fusion
       type current_compression_mode = Weak | Strong | Causal
 
+      type compression_mode =
+	{
+	  causal_trace:bool;
+	  weak_compression:bool;
+	  strong_compression:bool
+	}
+
+      let get_causal_trace x = x.causal_trace
+      let get_causal_trace_only x = not (x.weak_compression || x.strong_compression)
+      let get_weak_compression x = x.weak_compression
+      let get_strong_compression x = x.strong_compression
+
     type parameter =
         {
           cache_size : int option ;
           current_compression_mode: current_compression_mode option;
-          compression_mode : Parameter.compression_mode ;
+          compression_mode : compression_mode ;
           priorities_weak: Priority.priorities ;
           priorities_strong : Priority.priorities ;
           priorities_causal: Priority.priorities ;
@@ -138,7 +157,7 @@ module Cflow_handler =
           blacklist_events: bool ;
         }
 
-    let build_parameter ~called_from =
+    let build_parameter ~called_from ~none ~weak ~strong =
       let out_channel,out_channel_err,out_channel_profiling,log_step_channel =
         match
           called_from
@@ -167,7 +186,11 @@ module Cflow_handler =
         logger_out = out_channel ;
         logger_err = out_channel_err ;
         logger_profiling = out_channel_profiling ;
-        compression_mode = Parameter.get_compression_mode () ;
+        compression_mode = {
+	    causal_trace = none;
+	    weak_compression = weak;
+	    strong_compression = strong;
+	  };
         cache_size = Parameter.get_cache_size () ;
         debug_mode = false ;
         log_step = true ;

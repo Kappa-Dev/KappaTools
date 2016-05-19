@@ -44,12 +44,8 @@ let emacsMode = ref false
 
 (*User definable values*)
 let compileModeOn = ref false
-let dotCflows = ref true
 
-let causalModeOn = ref false
-let weakCompression = ref false
-let strongCompression = ref false
-let mazCompression = ref false
+let dotCflows = ref true
 let showIntroEvents = ref false
 let time_independent = ref false
 let blacklist_events = ref false
@@ -67,22 +63,4 @@ let xlsstrongFileName = "grid_strong_compression"
 let cpuTime = ref 0.0
 let initSimTime () = cpuTime := Sys.time ()
 
-type compression_mode =
-    {
-      causal_trace:bool;
-      weak_compression:bool;
-      strong_compression:bool
-    }
-
-let get_compression_mode () =
-  {
-    causal_trace=(!mazCompression);
-    weak_compression=(!weakCompression);
-    strong_compression=(!strongCompression);
-  }
-
-let get_causal_trace x = x.causal_trace
-let get_causal_trace_only x = not (x.weak_compression || x.strong_compression)
-let get_weak_compression x = x.weak_compression
-let get_strong_compression x = x.strong_compression
 let get_cache_size () = !cache_size

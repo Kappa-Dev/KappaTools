@@ -45,8 +45,10 @@ let always = (fun _ -> true)
 let do_not_log parameter = (S.PH.B.PB.CI.Po.K.H.set_log_step parameter false)
 
 
-let compress_and_print ~called_from ?js_interface env log_info step_list =
-  let parameter = S.PH.B.PB.CI.Po.K.H.build_parameter ~called_from in
+let compress_and_print
+      ~called_from ?js_interface ~none ~weak ~strong env log_info step_list =
+  let parameter = S.PH.B.PB.CI.Po.K.H.build_parameter
+		    ~called_from ~none ~weak ~strong in
   let parameter = S.PH.B.PB.CI.Po.K.H.set_log_step parameter log_step in
   let parameter = S.PH.B.PB.CI.Po.K.H.set_debugging_mode parameter debug_mode in
   let parameter =
@@ -69,9 +71,9 @@ let compress_and_print ~called_from ?js_interface env log_info step_list =
       S.PH.B.PB.CI.Po.K.H.use_fusion_sort parameter
   in
   let mode = parameter.S.PH.B.PB.CI.Po.K.H.compression_mode in
-  let causal_trace_on = Parameter.get_causal_trace mode in
-  let weak_compression_on = Parameter.get_weak_compression mode in
-  let strong_compression_on = Parameter.get_strong_compression mode in
+  let causal_trace_on = S.PH.B.PB.CI.Po.K.H.get_causal_trace mode in
+  let weak_compression_on = S.PH.B.PB.CI.Po.K.H.get_weak_compression mode in
+  let strong_compression_on = S.PH.B.PB.CI.Po.K.H.get_strong_compression mode in
   let error = U.error_init in
   let handler = S.PH.B.PB.CI.Po.K.H.init_handler env in
   let error,log_info,table1 = U.create_story_table parameter handler log_info error in
