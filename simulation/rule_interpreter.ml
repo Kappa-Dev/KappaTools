@@ -1,5 +1,3 @@
-type jf_data = Compression_main.secret_log_info * Trace.t
-
 type t =
   {
     roots_of_ccs: Mods.IntSet.t Connected_component.Map.t;
@@ -17,7 +15,7 @@ type t =
       ((Trace.event_kind * Connected_component.t array *
 	  Instantiation.abstract Instantiation.test list)
 	 list Connected_component.Map.t (*currently tracked ccs *)
-       * jf_data) option;
+       * Trace.t) option;
     unary_distances: Data.distances option;
   }
 
@@ -33,8 +31,7 @@ let empty ~has_tracking ~store_distances env = {
     outdated_elements = Operator.DepSet.empty,[],true;
     story_machinery =
       if has_tracking
-      then Some (Connected_component.Map.empty,
-		 (Compression_main.init_secret_log_info (), []))
+      then Some (Connected_component.Map.empty,[])
       else None;
     unary_distances =
       Tools.option_map
@@ -228,7 +225,7 @@ let add_path_to_tests path tests =
 let store_event counter inj2graph new_tracked_obs_instances event_kind
 		?path extra_side_effects rule = function
   | None as x -> x
-  | Some (x,(info,steps)) ->
+  | Some (x,steps) ->
      let (ctests,(ctransfs,cside_sites,csides)) =
        Instantiation.concretize_event
 	 inj2graph rule.Primitives.instantiations in
@@ -239,22 +236,21 @@ let store_event counter inj2graph new_tracked_obs_instances event_kind
        | None -> ctests,cactions
        | Some path ->
 	  add_path_to_tests path ctests,cactions in
-     let infos',steps' =
-       Compression_main.secret_store_event
-	 info (event_kind,full_concrete_event,Counter.current_story counter)
+     let steps' =
+       Trace.store_event
+	  (event_kind,full_concrete_event,Counter.current_story counter)
 	 steps in
-     let infos'',steps'' =
+     let steps'' =
        List.fold_left
-	 (fun (infos,steps) (ev,obs_tests) ->
+	 (fun steps (ev,obs_tests) ->
 	  let obs =
 	    (ev,
 	     obs_tests,
 	    Counter.next_story counter) in
-	  Compression_main.secret_store_obs infos obs steps)
-	 (infos',steps')
-	 new_tracked_obs_instances
+	  Trace.store_obs obs steps)
+	 steps' new_tracked_obs_instances
      in
-       Some (x,(infos'',steps''))
+       Some (x,steps'')
 
 let store_obs edges roots obs acc = function
   | None -> acc
@@ -826,6 +822,7 @@ let remove_tracked ccs state =
 let generate_stories ~called_from env state =
   match state.story_machinery with
   | None -> ()
-  | Some (_,(infos,steps)) ->
+  | Some (_,steps) ->
      Compression_main.compress_and_print
-       ~called_from env infos (List.rev steps)
+       ~called_from env (Compression_main.init_secret_log_info ())
+       (List.rev steps)

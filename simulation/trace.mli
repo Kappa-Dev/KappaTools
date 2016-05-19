@@ -11,19 +11,19 @@ val print_event_kind :
 val print_event_kind_dot_annot :
   Environment.t -> Format.formatter -> event_kind -> unit
 
-type refined_event =
+type event =
   event_kind *
     Instantiation.concrete Instantiation.event *
       unit Mods.simulation_info
-type refined_obs =
+type obs =
   event_kind *
     Instantiation.concrete Instantiation.test list *
       unit Mods.simulation_info
 type step =
   | Subs of int * int
-  | Event of refined_event
+  | Event of event
   | Init of Instantiation.concrete Instantiation.action list
-  | Obs of refined_obs
+  | Obs of obs
   | Dummy  of string
 
 type t = step list
@@ -51,3 +51,7 @@ val creation_of_step : step -> int list
 
 val print_step:
   ?compact:bool -> ?env:Environment.t -> Format.formatter -> step -> unit
+
+val store_event: event -> t -> t
+val store_obs : obs -> t -> t
+

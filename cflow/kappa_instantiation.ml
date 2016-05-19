@@ -48,11 +48,6 @@ sig
   val agent_name_of_site: Instantiation.concrete Instantiation.site -> Instantiation.agent_name
   val site_name_of_site: Instantiation.concrete Instantiation.site -> Instantiation.site_name
 
-  val store_event:
-    P.log_info -> Trace.refined_event -> Trace.t -> P.log_info * Trace.t
-  val store_obs :
-    P.log_info -> Trace.refined_obs -> Trace.t -> P.log_info * Trace.t
-
   val build_grid:
     (Trace.step * Instantiation.concrete Instantiation.site list)  list -> bool ->
     H.handler -> Causal.grid
@@ -118,16 +113,6 @@ module Cflow_linker =
 
   let get_time_of_refined_step x = get_gen_of_refined_step (fun x -> x.Mods.story_time) x
   let get_id_of_refined_step x = get_gen_of_refined_step (fun x -> x.Mods.story_event) x
-
-  let store_event log_info event step_list =
-    match event with
-    | Trace.INIT _,(_,(actions,_,_)),_ ->
-       P.inc_n_kasim_events log_info,(Trace.Init actions)::step_list
-    | Trace.OBS _,_,_ -> assert false
-    | (Trace.RULE _ | Trace.PERT _ as k),x,info ->
-       P.inc_n_kasim_events log_info,(Trace.Event (k,x,info))::step_list
-  let store_obs log_info (i,x,c) step_list =
-    P.inc_n_obs_events log_info,Trace.Obs(i,x,c)::step_list
 
   let build_grid list bool handler =
     let env = handler.H.env in

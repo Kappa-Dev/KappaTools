@@ -40,19 +40,19 @@ let print_event_kind_dot_annot env f = function
        f "[label=\"%s\", shape=%s, style=%s, fillcolor = %s]"
        s "invhouse" "filled" "green"
 
-type refined_event =
+type event =
   event_kind *
     Instantiation.concrete Instantiation.event *
       unit Mods.simulation_info
-type refined_obs =
+type obs =
   event_kind *
     Instantiation.concrete Instantiation.test list *
       unit Mods.simulation_info
 type step =
   | Subs of int * int
-  | Event of refined_event
+  | Event of event
   | Init of Instantiation.concrete Instantiation.action list
-  | Obs of refined_obs
+  | Obs of obs
   | Dummy  of string
 
 type t = step list
@@ -172,3 +172,11 @@ let actions_of_step = function
   | Init y -> (y,[])
   | Obs (_,_,_) -> ([],[])
   | Dummy _ -> ([],[])
+
+let store_event event step_list =
+  match event with
+  | INIT _,(_,(actions,_,_)),_ -> (Init actions)::step_list
+  | OBS _,_,_ -> assert false
+  | (RULE _ | PERT _ as k),x,info -> (Event (k,x,info))::step_list
+let store_obs (i,x,c) step_list = Obs(i,x,c)::step_list
+

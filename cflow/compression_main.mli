@@ -4,19 +4,7 @@ type secret_log_info
 
 (** {6 Build} *)
 
-val init_secret_log_info :
-  unit -> secret_log_info
-val secret_store_event :
-  secret_log_info ->
-  Trace.event_kind *
-    Instantiation.concrete Instantiation.event * unit Mods.simulation_info ->
-  Trace.t -> secret_log_info * Trace.t
-val secret_store_obs :
-  secret_log_info ->
-  (Trace.event_kind *
-     Instantiation.concrete Instantiation.test list *
-     unit Mods.simulation_info) ->
-  Trace.t -> secret_log_info * Trace.t
+val init_secret_log_info : unit -> secret_log_info
 
 (** {6 Use} *)
 
