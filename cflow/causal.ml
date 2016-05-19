@@ -581,7 +581,9 @@ let html_of_grid profiling compression_type cpt env enriched_grid =
 
 (*story_list:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...]
  et sim_info:{with story_id:int story_time: float ; story_event: int}*)
-let pretty_print parameter handler log_info error env config_closure compression_type label story_list =
+let pretty_print
+      ~dotFormat parameter handler log_info error env config_closure
+      compression_type label story_list =
   match
     Loggers.formatter_of_logger (Remanent_parameters.get_logger parameter)
   with
@@ -617,7 +619,7 @@ let pretty_print parameter handler log_info error env config_closure compression
 	   (0.,[],0) (List.rev stories)
 	in
 	let () =   (*dump grid fic state env ; *)
-	  if !Parameter.dotCflows then
+	  if dotFormat then
 	    let profiling desc =
 	      Format.fprintf
 		desc "/* @[Compression of %d causal flows" n;

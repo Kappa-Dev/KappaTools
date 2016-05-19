@@ -45,8 +45,8 @@ let always = (fun _ -> true)
 let do_not_log parameter = (S.PH.B.PB.CI.Po.K.H.set_log_step parameter false)
 
 
-let compress_and_print
-      ~called_from ?js_interface ~none ~weak ~strong env log_info step_list =
+let compress_and_print ~called_from ~dotFormat ?js_interface
+		       ~none ~weak ~strong env log_info step_list =
   let parameter = S.PH.B.PB.CI.Po.K.H.build_parameter
 		    ~called_from ~none ~weak ~strong in
   let parameter = S.PH.B.PB.CI.Po.K.H.set_log_step parameter log_step in
@@ -450,21 +450,30 @@ let compress_and_print
   let error,log_info =
     if causal_trace_on then
       let error,log_info,export = U.export_story_table parameter handler log_info error causal in
-      let error,log_info = Causal.pretty_print (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) handler log_info error  env Graph_closure.config_small_graph "" "" export in
+      let error,log_info =
+	Causal.pretty_print
+	  ~dotFormat (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) handler
+	  log_info error  env Graph_closure.config_small_graph "" "" export in
       error,log_info
     else error,log_info
   in
   let error,log_info =
     if weak_compression_on then
       let error,log_info,export = U.export_story_table parameter handler log_info error weak in
-      let error,log_info = Causal.pretty_print (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) handler log_info error  env Graph_closure.config_small_graph "Weakly" "weakly " export in
+      let error,log_info =
+	Causal.pretty_print
+	  ~dotFormat (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) handler
+	  log_info error  env Graph_closure.config_small_graph "Weakly" "weakly " export in
       error,log_info
     else error,log_info
   in
   let error,log_info =
     if strong_compression_on then
       let error,log_info,export = U.export_story_table parameter handler log_info error strong in
-      let error,log_info = Causal.pretty_print (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) handler log_info error env Graph_closure.config_small_graph "Strongly" "strongly " export in
+      let error,log_info =
+	Causal.pretty_print
+	  ~dotFormat (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) handler
+	  log_info error env Graph_closure.config_small_graph "Strongly" "strongly " export in
       error,log_info
     else
       error,log_info

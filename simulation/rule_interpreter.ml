@@ -829,5 +829,5 @@ let generate_stories ~called_from env state =
   | None -> ()
   | Some ((none,weak,strong),_,steps) ->
      Compression_main.compress_and_print
-       ~called_from ~none ~weak ~strong env
+       ~called_from ~dotFormat:(!Parameter.dotCflows) ~none ~weak ~strong env
        (Compression_main.init_secret_log_info ()) (List.rev steps)

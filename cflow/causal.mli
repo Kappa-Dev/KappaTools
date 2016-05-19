@@ -99,6 +99,7 @@ val fold_over_causal_past_of_obs :
 
 val debug_print_grid : Format.formatter -> grid -> unit
 val pretty_print :
+  dotFormat:bool ->
   Remanent_parameters_sig.parameters ->
            'a ->
            StoryProfiling.StoryStats.log_info ->
