@@ -7,6 +7,10 @@ let (maxTimeValue:float option ref) = ref None
 let (pointNumberValue:int ref) = ref (-1)
 let (rescale:float option ref) = ref None
 
+(*Name convention*)
+let marshalizedInFile = ref ""
+let inputKappaFileNames:(string list ref) = ref []
+
 let () =
   let options = [
     ("--version",
@@ -15,7 +19,7 @@ let () =
      "display KaSim version");
     ("-i",
      Arg.String (fun fic ->
-		 Parameter.inputKappaFileNames:= fic:: (!Parameter.inputKappaFileNames)),
+		 inputKappaFileNames:= fic:: (!inputKappaFileNames)),
      "name of a kappa file to use as input (can be used multiple times for multiple input files)");
     ("-e",
      Arg.Int (fun i -> if i < 0 then maxEventValue := None
@@ -43,7 +47,7 @@ let () =
     ("-d",
      Arg.String Kappa_files.set_dir,
      "Specifies directory name where output file(s) should be stored") ;
-    ("-load-sim", Arg.Set_string Parameter.marshalizedInFile,
+    ("-load-sim", Arg.Set_string marshalizedInFile,
      "load simulation package instead of kappa files") ;
     ("-make-sim", Arg.String Kappa_files.set_marshalized,
      "save kappa files as a simulation package") ;
@@ -80,14 +84,12 @@ let () =
   ]
   in
   try
-    Arg.parse options
-	      (fun fic ->
-	       Parameter.inputKappaFileNames:=
-		 fic::(!Parameter.inputKappaFileNames))
-	      usage_msg;
+    Arg.parse
+      options (fun fic -> inputKappaFileNames:= fic::(!inputKappaFileNames))
+      usage_msg;
     let abort =
-      match !Parameter.inputKappaFileNames with
-      | [] -> !Parameter.marshalizedInFile = ""
+      match !inputKappaFileNames with
+      | [] -> !marshalizedInFile = ""
       | _ -> false
     in
     if abort then (prerr_string usage_msg ; exit 1) ;
@@ -112,7 +114,7 @@ let () =
 
     let result =
       List.fold_left (KappaLexer.compile Format.std_formatter)
-		     Ast.empty_compil !Parameter.inputKappaFileNames in
+		     Ast.empty_compil !inputKappaFileNames in
 
     let theSeed =
       match !Parameter.seedValue with
@@ -134,7 +136,7 @@ let () =
 	~nb_points:!pointNumberValue in
     let (env_store, cc_env, updated_vars, has_tracking, init_l as init_result),
       alg_overwrite =
-      match !Parameter.marshalizedInFile with
+      match !marshalizedInFile with
       | "" ->
 	let result =
 	  if !Parameter.implicitSignature
@@ -157,7 +159,7 @@ let () =
 	 try
 	   let d = open_in_bin marshalized_file in
 	   let () =
-	     if !Parameter.inputKappaFileNames <> [] then
+	     if !inputKappaFileNames <> [] then
 	       ExceptionDefn.warning
 		 (fun f ->
 		  Format.pp_print_string
@@ -226,7 +228,13 @@ let () =
 	  (Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
 	  env in
       if !pointNumberValue > 0 || head <> [||] then
-	Outputs.create_plot (Kappa_files.get_data ()) head in
+	let title =
+	  if !marshalizedInFile <> ""
+	  then !marshalizedInFile ^" output"
+	  else match !inputKappaFileNames with
+               | [ f ] -> f^" output"
+               | _ -> "KaSim output" in
+	Outputs.create_plot (Kappa_files.get_data ()) title head in
     let () =
       if !pointNumberValue > 0 then
 	Outputs.go (Environment.signatures env)

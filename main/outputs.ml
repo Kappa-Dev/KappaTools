@@ -214,13 +214,7 @@ let print_values_raw f (time,l) =
                  !Parameter.plotSepChar time !Parameter.plotSepChar
                  (Pp.array !Parameter.plotSepChar (fun _ -> Nbr.print)) l
 
-let create_plot filename head =
-  let title =
-    if !Parameter.marshalizedInFile <> ""
-    then !Parameter.marshalizedInFile ^" output"
-    else match !Parameter.inputKappaFileNames with
-         | [ f ] -> f^" output"
-         | _ -> "KaSim output" in
+let create_plot filename title head =
   let format =
     if Filename.check_suffix filename ".svg" then
       Svg {Pp_svg.file = filename;
