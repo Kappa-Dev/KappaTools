@@ -138,8 +138,8 @@ let () =
       Counter.create
 	~init_t:0. ~init_e:0 ?max_t:!maxTimeValue ?max_e:!maxEventValue
 	~nb_points:!pointNumberValue in
-    let (env_store, cc_env, updated_vars, story_compression, unary_distances, init_l
-	 as init_result),
+    let (env_store, cc_env, updated_vars, story_compression,
+	 unary_distances, dotCflows, init_l as init_result),
       alg_overwrite =
       match !marshalizedInFile with
       | "" ->
@@ -153,12 +153,13 @@ let () =
 	let contact_map,_kasa_state =
 	  Eval.init_kasa Remanent_parameters_sig.KaSim result in
 	let () = Format.printf "+ Compiling...@." in
-	let (env, cc_env, story_compression, unary_distances, init_l) =
+	let (env, cc_env, story_compression, unary_distances, dotCflow, init_l)=
 	  Eval.compile
 	    ~pause:(fun f -> f ()) ~return:(fun x -> x)
 	    ?rescale_init:!rescale ~outputs:(Outputs.go (Signature.create []))
 	    sigs_nd tk_nd contact_map counter result' in
-	(env, cc_env, updated_vars, story_compression, unary_distances,init_l),[]
+	(env, cc_env, updated_vars, story_compression,
+	 unary_distances, dotCflow, init_l),[]
       | marshalized_file ->
 	 try
 	   let d = open_in_bin marshalized_file in
@@ -170,10 +171,11 @@ let () =
 		    f "Simulation package loaded, all kappa files are ignored") in
 	   let () = Format.printf "+ Loading simulation package %s...@."
 				  marshalized_file in
-	   let env,cc_env,updated_vars,story_compression,unary_distances,init_l =
+	   let env,cc_env,updated_vars,story_compression,
+	       unary_distances,dotCflow,init_l =
 	     (Marshal.from_channel d :
 		Environment.t*Connected_component.Env.t*int list*
-		  (bool*bool*bool) option*bool option*
+		  (bool*bool*bool) option*bool option*bool*
 		    (Alg_expr.t * Primitives.elementary_rule * Location.t) list) in
 	   let () = Pervasives.close_in d  in
 	   let alg_overwrite =
@@ -185,7 +187,8 @@ let () =
 	   let updated_vars' =
 	     List.fold_left
 	       (fun acc (i,_) -> i::acc) updated_vars alg_overwrite in
-	   (env,cc_env,updated_vars',story_compression,unary_distances,init_l),
+	   (env,cc_env,updated_vars',story_compression,
+	    unary_distances,dotCflow,init_l),
 	   alg_overwrite
 	 with
 	 | ExceptionDefn.Malformed_Decl _ as e -> raise e
@@ -250,7 +253,7 @@ let () =
     Parameter.initSimTime () ;
     let () =
       State_interpreter.loop
-	~outputs:(Outputs.go (Environment.signatures env))
+	~outputs:(Outputs.go (Environment.signatures env)) ~dotCflows
 	Format.std_formatter env cc_env counter graph state
     in
     Format.printf "Simulation ended";

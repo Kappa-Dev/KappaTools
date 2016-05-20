@@ -35,8 +35,8 @@ val end_of_simulation :
 (** What to do after stopping simulation. Returns maybe a trace *)
 
 val loop :
-  outputs:(Data.t -> unit) ->
+  outputs:(Data.t -> unit) -> dotCflows:bool ->
   Format.formatter -> Environment.t -> Connected_component.Env.t ->
   Counter.t -> Rule_interpreter.t -> t -> unit
-(** [loop message_formatter env domain counter graph] does one event
-loop *)
+(** [loop message_formatter env domain counter graph]
+ does a simulation in the command-line setting *)

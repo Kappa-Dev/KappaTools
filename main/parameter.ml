@@ -45,7 +45,6 @@ let emacsMode = ref false
 (*User definable values*)
 let compileModeOn = ref false
 
-let dotCflows = ref true
 let time_independent = ref false
 let blacklist_events = ref false
 

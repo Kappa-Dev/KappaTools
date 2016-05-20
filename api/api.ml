@@ -158,7 +158,8 @@ end = struct
 			 ~outputs:(outputs (Signature.create []))
 			 sig_nd tk_nd contact_map
 			 simulation.counter result >>=
-			 (fun (env_store,domain,has_tracking,store_distances,init_l) ->
+			 (fun (env_store,domain,has_tracking,
+			       store_distances,_,init_l) ->
 			  let story_compression =
 			    Tools.option_map
 			      (fun  _ -> ((false,false,false),true)) has_tracking in
