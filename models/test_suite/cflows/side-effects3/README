@@ -1,13 +1,17 @@
-#Command-line:
-"${KAPPABIN}"KaSim -i side-effects.ka -seed 501792230 -e 199 -d output --time-independent || exit 0
+#!/bin/sh
+
+BLOB=/tmp/KaSim-test-blob-$(basename $PWD)
+
+"${KAPPABIN}"KaSim -i side-effects.ka -seed 501792230 -e 199 -d output -dump-trace ${BLOB} || exit 0
+"${KAPPABIN}"KaStor -d output --none --weak --time-independent ${BLOB} || exit 0
+
+#Test KaStor
 
 #A and B can for dimmer.
-#Each time A and B forms a dimmer the state of A is changed from 0 to 1, or from 1 to 0. 
+#Each time A and B forms a dimmer the state of A is changed from 0 to 1,
+#or from 1 to 0.
 
-#At the beggining A is bound to a specific B, but A has state 0. 
+#At the beggining A is bound to a specific B, but A has state 0.
 #The observable require A to have state 0 and be associated with the specific B.
 
-#Causal flows can be compressed in 
-#A and (specific) B unbind, and bind again.  
-
-
+#Causal flows can be compressed in A and (specific) B unbind, and bind again.

@@ -37,6 +37,11 @@ help:
 	@sed '/generation time/d;/Kappa Static Analyzer/d;/Analysis launched at/d' $(basename $@) | diff -q $(basename $@).ref - || true
 	@sed '/generation time/d;/Kappa Static Analyzer/d;/Analysis launched at/d' $(basename $@) | diff -u $(basename $@).ref - > $@ || true
 
+%.bin.diff:
+	@touch $(basename $@).ref $(basename $@)
+	diff -q $(basename $@).ref - || true
+	diff -u $(basename $@).ref - > $@ || true
+
 %/$(ERROR): %/$(OUTPUT_PATH)/LOG
 	@rm -f $@
 	@+$(MAKE) $$(find $(dir $@)$(OUTPUT_PATH) \( -not -type d -and -not -name \*.diff.\* \) -print \
@@ -59,7 +64,7 @@ build:
 	@+$(MAKE) $(DIRS_OF_TEST:=/$(OUTPUT_PATH)/LOG)
 	find "$(CURDIR)" \( -path \*/\*/$(OUTPUT_PATH)/\* -and -not -name \*.diff -and -not -name \*profiling.txt \
 		-and -not -name \*profiling.html -and -not -name \*compression_status.txt -and -not -name \*.ref \) -exec mv \{\} \{\}.ref \;
-	find "$(CURDIR)" -name \*.ref -exec sed -i"" -e '/generation time/d;/Kappa Static Analyzer/d;/Analysis launched at/d' \{\} \;
+	find "$(CURDIR)" -name \*.ref -exec file \{\} \; | grep text | cut -d: -f1 | xargs sed -i"" -e '/generation time/d;/Kappa Static Analyzer/d;/Analysis launched at/d'
 	@+$(MAKE) clean
 
 .PHONY: clean clean_all

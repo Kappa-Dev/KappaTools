@@ -1,6 +1,6 @@
 #!/bin/sh
 
-BLOB=/tmp/KaSim-test-blob
+BLOB=/tmp/KaSim-test-blob-$(basename $PWD)
 
 "${KAPPABIN}"KaSim --compile -make-sim ${BLOB} -seed 496408597 -d output model.ka && \
 "${KAPPABIN}"KaSim --compile -load-sim ${BLOB} -seed 958076642 -d output && \
