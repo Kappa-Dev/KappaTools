@@ -82,10 +82,11 @@ let options =
          ([(*"None","No view analysis";*)
 	   (*"Low","Non relational site analysis";*)
 	   "High","Relational view analysis"],
-          Config.view_accuracy_level)),
+           Config.view_accuracy_level)),
         "Tune the accuracy level of the view analysis",
-	["2_Reachability_analysis"],
-	Normal;
+      ["2_Reachability_analysis"],
+      Expert;
+
 
       "--verbosity-level-for-view-analysis",
       (Choice
@@ -134,7 +135,7 @@ let options =
       Bool Config.use_macrotransitions_in_local_traces,
       "Use macrotransitions to get a compact trace up to change of the interleaving order of commuting microtransitions",
       ["3_Trace_analysis"],
-      Expert;
+      Normal;
 
       "--ignore-trivial-losanges",
       Bool Config.do_not_compress_trivial_losanges,
@@ -186,34 +187,34 @@ let options =
       Expert;
       "--contact-map-format",
       (Choice (["DOT","dot format";
-	       "HTML","HTML format"],
+                (*"HTML","HTML format"*)],
 	       Config.contact_map_format)),
       "Tune the output format for the contact map",
       ["1_Output";"4_Contact_map"],
-      Normal;
+        Expert;
       "--influence-map-format",
       (Choice (["DOT","dot format";
-	       "HTML","HTML format"],
+                (*"HTML","HTML format"*)],
        Config.influence_map_format)),
       "Tune the output format for the influence map",
       ["1_Output";"5_Influence_map"],
-      Normal;
+        Expert;
       "--local_traces-map-format",
       (Choice (["DOT","dot format";
-	       "HTML","HTML format"],
+                (*"HTML","HTML format"*)],
        Config.local_trace_format)),
       "Tune the output format for the local transition systems",
       ["1_Output";"3_Trace_analysis"],
-      Normal;
-      "--contact-map-accuracy-level",
+          Expert;
+        "--contact-map-accuracy-level",
         (Choice
            (["Low","Collect info from rhs of rules and initial state";
              (*    "High","Only consider reachable rules";*)
              ],
             Config.contact_map_accuracy_level)),
         "Tune the accuracy level of the contact map",
-	["4_Contact_map"],
-	Normal;
+        ["4_Contact_map"],
+          Expert;
 
       "--pure-contact",
       Bool Config.pure_contact,

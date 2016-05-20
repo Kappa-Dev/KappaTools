@@ -413,7 +413,8 @@ let get_do_site_dependencies_1             marshalisable = marshalisable.Remanen
 let get_dump_site_dependencies_1          marshalisable = marshalisable.Remanent_parameters_sig.dump_site_dependencies
 
 (*reachability different output*)
-let get_do_reachability_analysis_1        marshalisable = marshalisable.Remanent_parameters_sig.do_reachability_analysis
+let get_do_reachability_analysis_1        marshalisable =
+  marshalisable.Remanent_parameters_sig.do_reachability_analysis
 
 (**)
 let get_influence_map_accuracy_level_1     marshalisable = marshalisable.Remanent_parameters_sig.influence_map_accuracy_level
@@ -458,7 +459,6 @@ let get_do_stochastic_flow_of_information = upgrade_from_marshal_field get_do_st
 let get_do_site_dependencies = upgrade_from_marshal_field get_do_site_dependencies_1
 let get_dump_site_dependencies = upgrade_from_marshal_field get_dump_site_dependencies_1
 (*reachability analysis in different output*)
-let get_do_reachability_analysis = upgrade_from_marshal_field get_do_reachability_analysis_1
 
 (**)
 let get_symbols = upgrade_from_marshal_field get_symbols_1
@@ -554,6 +554,9 @@ let get_add_singular_macrostates = upgrade_from_reachability_map_field
 get_add_singular_macrostates_1
 let get_local_trace_prefix = upgrade_from_reachability_map_field get_local_trace_prefix_1
 let get_local_trace_directory = upgrade_from_reachability_map_field get_local_trace_directory_1
+let get_do_reachability_analysis p =
+  upgrade_from_marshal_field get_do_reachability_analysis_1 p
+  || get_compute_local_traces p
 
 let set_prefix_1 marshalisable prefix =
   {marshalisable with Remanent_parameters_sig.prefix = prefix}
