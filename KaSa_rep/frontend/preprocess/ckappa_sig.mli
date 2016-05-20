@@ -171,23 +171,18 @@ module Agents_map_and_set: Map_wrapper.S_with_logs
 module AgentsSite_map_and_set: Map_wrapper.S_with_logs
   with type elt = c_agent_id * c_agent_name * c_site_name
 
-
 module Views_bdu: Mvbdu_wrapper.Mvbdu with type key = c_site_name and type value = c_state
-module Views_intbdu: Mvbdu_wrapper.Internalized_mvbdu with type key = c_site_name and type value = c_state  and type mvbdu = Views_bdu.mvbdu
+
+module Views_intbdu: Mvbdu_wrapper.Internalized_mvbdu
+  with type key = c_site_name and type value = c_state  and type mvbdu = Views_bdu.mvbdu
+
 (****************************************************************************************)
-
-module PairAgentSite_map_and_set: Map_wrapper.S_with_logs
-  with type elt = (c_agent_id * c_site_name) * (c_agent_id * c_site_name)
-
-module PairAgentIDSites_map_and_set: Map_wrapper.S_with_logs
-  with type elt = (c_agent_id * c_site_name * c_site_name) * (c_agent_id * c_site_name * c_site_name)
-
-module PairAgentIDSite_map_and_set: Map_wrapper.S_with_logs
-  with type elt = (c_agent_id * c_site_name) * (c_agent_id * c_site_name)
 
 (* JF: This file is the API for KaSa frontend *)
 (* JF: Please do not put domain specific module here, put them with the definition of the corresponding abstract domain *)
-(*bonds in rhs and lhs*)
+
+(*bonds in rhs and lhs: use in Common_static.ml*)
+
 module PairAgentsSiteState_map_and_set: Map_wrapper.S_with_logs
   with type elt =
   (c_agent_id * c_agent_name * c_site_name * c_state) * (c_agent_id * c_agent_name * c_site_name * c_state)
@@ -195,22 +190,6 @@ module PairAgentsSiteState_map_and_set: Map_wrapper.S_with_logs
 module PairAgentSiteState_map_and_set: Map_wrapper.S_with_logs
   with type elt =
   (c_agent_name * c_site_name * c_state) * (c_agent_name * c_site_name * c_state)
-
-(*parallel*)
-(*module PairAgentsSitesStates_map_and_set: Map_wrapper.S_with_logs
-  with type elt =
-  (c_agent_id * c_agent_name * c_site_name * c_site_name * c_state * c_state) *
-    (c_agent_id * c_agent_name * c_site_name * c_site_name * c_state * c_state)
-
-module PairAgentSites_map_and_set: Map_wrapper.S_with_logs
-  with type elt =
-  (c_agent_name * c_site_name * c_site_name) *
-    (c_agent_name * c_site_name * c_site_name)
-  *)
-(*test flat_lattice*)
-module PairAgentIDSiteState_map_and_set: Map_wrapper.S_with_logs
-  with type elt = (c_agent_id * c_site_name * c_state) * (c_agent_id * c_site_name * c_state)
-
 
 (****************************************************************************************)
 

@@ -333,67 +333,6 @@ module PairAgentSiteState_map_and_set =
 	 let print _ _ = ()
         end))
 
-(*parallel*)
-(*module PairAgentsSitesStates_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = (c_agent_id * c_agent_name * c_site_name * c_site_name * c_state * c_state) *
-           (c_agent_id * c_agent_name * c_site_name * c_site_name * c_state * c_state)
-         let compare = compare
-	 let print _ _ = ()
-        end))
-
-module PairAgentSites_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = (c_agent_name * c_site_name * c_site_name) *
-           (c_agent_name * c_site_name * c_site_name)
-         let compare = compare
-	 let print _ _ = ()
-        end))*)
-
-(*map of flat_lattice*)
-module PairAgentIDSiteState_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t =
-           (c_agent_id * c_site_name * c_state) * (c_agent_id * c_site_name * c_state)
-         let compare = compare
-	 let print _ _ = ()
-        end))
-
-module PairAgentSite_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = (c_agent_id * c_site_name) * (c_agent_id * c_site_name)
-         let compare = compare
-	 let print = Pp.pair (Pp.pair Format.pp_print_int Format.pp_print_int)
-	   (Pp.pair Format.pp_print_int Format.pp_print_int)
-        end))
-
-module PairAgentIDSites_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = (c_agent_id * c_site_name * c_site_name) * (c_agent_id * c_site_name * c_site_name)
-         let compare = compare
-	 let print _ _ = ()
-        end))
-
-module PairAgentIDSite_map_and_set =
-  Map_wrapper.Make
-    (SetMap.Make
-       (struct
-         type t = (c_agent_id * c_site_name) * (c_agent_id * c_site_name)
-         let compare = compare
-	 let print = Pp.pair (Pp.pair Format.pp_print_int Format.pp_print_int)
-	   (Pp.pair Format.pp_print_int Format.pp_print_int)
-        end))
-
 (****************************************************************************************)
 
 module Views_bdu =
