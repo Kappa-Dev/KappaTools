@@ -292,6 +292,15 @@ module AgentSite_map_and_set =
 	 let print = Pp.pair Format.pp_print_int Format.pp_print_int
 	end))
 
+module Agents_map_and_set =
+  Map_wrapper.Make
+    (SetMap.Make
+       (struct
+         type t = c_agent_id * c_agent_name
+         let compare = compare
+	 let print = Pp.pair Format.pp_print_int Format.pp_print_int
+        end))
+
 module AgentsSite_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
@@ -325,7 +334,7 @@ module PairAgentSiteState_map_and_set =
         end))
 
 (*parallel*)
-module PairAgentsSitesStates_map_and_set =
+(*module PairAgentsSitesStates_map_and_set =
   Map_wrapper.Make
     (SetMap.Make
        (struct
@@ -343,7 +352,7 @@ module PairAgentSites_map_and_set =
            (c_agent_name * c_site_name * c_site_name)
          let compare = compare
 	 let print _ _ = ()
-        end))
+        end))*)
 
 (*map of flat_lattice*)
 module PairAgentIDSiteState_map_and_set =

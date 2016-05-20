@@ -165,6 +165,9 @@ module Site_map_and_set: Map_wrapper.S_with_logs
 module AgentSite_map_and_set: Map_wrapper.S_with_logs
   with type elt = c_agent_name * c_site_name
 
+module Agents_map_and_set: Map_wrapper.S_with_logs
+  with type elt = c_agent_id * c_agent_name
+
 module AgentsSite_map_and_set: Map_wrapper.S_with_logs
   with type elt = c_agent_id * c_agent_name * c_site_name
 
@@ -194,7 +197,7 @@ module PairAgentSiteState_map_and_set: Map_wrapper.S_with_logs
   (c_agent_name * c_site_name * c_state) * (c_agent_name * c_site_name * c_state)
 
 (*parallel*)
-module PairAgentsSitesStates_map_and_set: Map_wrapper.S_with_logs
+(*module PairAgentsSitesStates_map_and_set: Map_wrapper.S_with_logs
   with type elt =
   (c_agent_id * c_agent_name * c_site_name * c_site_name * c_state * c_state) *
     (c_agent_id * c_agent_name * c_site_name * c_site_name * c_state * c_state)
@@ -203,7 +206,7 @@ module PairAgentSites_map_and_set: Map_wrapper.S_with_logs
   with type elt =
   (c_agent_name * c_site_name * c_site_name) *
     (c_agent_name * c_site_name * c_site_name)
-
+  *)
 (*test flat_lattice*)
 module PairAgentIDSiteState_map_and_set: Map_wrapper.S_with_logs
   with type elt = (c_agent_id * c_site_name * c_state) * (c_agent_id * c_site_name * c_state)
