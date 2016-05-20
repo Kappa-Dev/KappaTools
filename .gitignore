@@ -6,11 +6,8 @@ index.html
 *.o
 *.annot
 KaSim.docdir
-KaSim.native
-KaSim.byte
 KaSim
-KaSa.native
-KaSa.byte
+KaStor
 KaSa
 sanity_test
 bin/

@@ -161,7 +161,7 @@ doc_html: dev/KaSim.docdir/index.html man/KaSim_manual.htm
 debug:
 	@+$(MAKE) EXTRAFLAGS="-tag debug" KaSim.byte dev/db_printers.cma
 
-all: bin/KaSim bin/KaSa
+all: bin/KaSim bin/KaSa bin/KaStor
 
 clean_doc:
 	find man \( -not -name \*.tex -and -name KaSim_manual.\* \) -delete
@@ -173,7 +173,7 @@ clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch clean_doc
 	"$(OCAMLBINPATH)ocamlbuild" -clean
 	rm -f $(VERSION) $(RESOURCE)
 	rm -f sanity_test bin/sanity_test
-	rm -f KaSim bin/KaSim KaSa bin/KaSa WebSim bin/WebSim
+	rm -f KaSim bin/KaSim KaSa bin/KaSa WebSim bin/WebSim KaStor bin/KaStor
 	rm -rf site generated
 	find . -name \*~ -delete
 	+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite clean
@@ -191,9 +191,10 @@ temp-clean-for-ignorant-that-clean-must-be-done-before-fetch:
 
 on_linux_for_windows:
 	$(MAKE) clean
-	$(MAKE) OCAMLFIND_CONF=/etc/x86_64-w64-mingw32-ocamlfind.conf KaSim.native KaSa.native
+	$(MAKE) OCAMLFIND_CONF=/etc/x86_64-w64-mingw32-ocamlfind.conf KaSim.native KaSa.native KaStor.native
 	mv _build/main/KaSim.native KaSim.exe
 	mv _build/KaSa_rep/main/KaSa.native KaSa.exe
+	mv _build/KaSa_rep/main/KaStor.native KaStor.exe
 
 full:
 	$(MAKE) clean
