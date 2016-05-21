@@ -1369,7 +1369,7 @@ KaSa protein2x2.ka --reset-all --compute-local-traces
 \end{verbatim}
 
 will perform the trace analysis on the model \texttt{protein2x2ka}, and produce
-two dot format files names \texttt{Agent\_trace\_K\_x\!.dot} and \texttt{Agent\_trace\_P\_a1$\sim$\_a2$\sim$\_b1$\sim$\_b2$\sim$\_g!.dot}. The name of the output repository can be changed thanks to both  command line options \texttt{--output-local-trace-directory} and \texttt{--output-directory}. Moreover, file names document the kind of protein and the sites of interest (the symbol `!' denote a binding state, and the symbol `~' an internal state).
+two dot format files names \texttt{Agent\_trace\_K\_x\^.dot} and \texttt{Agent\_trace.P.a1\_.a2\_.b1\_.b2\_.g\^.dot}. The name of the output repository can be changed thanks to both  command line options \texttt{--output-local-trace-directory} and \texttt{--output-directory}. Moreover, file names document the kind of protein and the sites of interest (the symbol `!' denote a binding state, and the symbol `~' an internal state).
 
 The transition system that descrives the local traces for the agents of kind $P$ are descrided in Figure \ref{fig:trace-raw}. We notice that the nodes of this transition system are labelled with the states of the sites of $P$. The internal state of a site is denoted as $x{\sim}u$ (meaning that the site $x$ has state $u$, whereas the binding state of a site is denoted as $x?\textit{free}$, when the site is free, and as $x!K@x$ when the site $x$ is bound to the site $x$ of a given agent of kind $K$.
 
@@ -1392,7 +1392,7 @@ KaSa protein2x2.ka --reset-all --compute-local-traces
 \end{verbatim}
 
 will perform the trace analysis on the model \texttt{protein2x2ka}, and produce
-two dot format files names \texttt{.dot} and \texttt{.dot}. The name of the output repository can be changed thanks to the command line options \texttt{--output-local-trace-directory} and \texttt{--output-directory}.
+two dot format files names two dot format files names \texttt{Agent\_trace\_K\_x\^.dot} and \texttt{Agent\_trace.P.a1\_.a2\_.b1\_.b2\_.g\^.dot}. The name of the output repository can be changed thanks to the command line options \texttt{--output-local-trace-directory} and \texttt{--output-directory}.
 This time, the files describe a coarse-graining of the corresponding transition systems.
 
 For instance, the coarse-grained transition system for the local traces of the proteins of kind $P$, is given in Figure~\ref{fig:trace-macro}.  This  coarse-grained transition system is a compact implicit encoding of the transition system in Figure~\ref{fig:trace-raw}. It is obtained by exploiting the fact that locally, the behavior of the pair of states $a_1$ and $b_1$ is independent from the behavior of the pair of states $a_2$ and $b_2$, until these four sites are phosphorylated, so that the site $x$ can get bound.
