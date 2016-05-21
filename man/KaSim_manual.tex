@@ -1341,9 +1341,15 @@ In particular, at the beginning of the iteration, the analysis prompts the views
 
 This section is under construction.
 
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=12cm,natwidth=920pt,natheight=582pt]{img/kasa_3.png}
+\caption{\KaSa~ graphical interface - sub-tab \texttt{3\_Trace\_analysis}}
+\label{fig:kasa:3}
+\end{figure}
 
-Trace analysis is a refinement of reachability analysis that additionaly explains how one agent can go from a given view to another one.
-Thus the local traces for a given agent can be described as a transition system among the views for a given agent: in a local trace, the nodes are local views; introduction arrows correspond to either initial states, or creation rules; transitions denote a potential change of conformation of an agent, from one local views to another one, due to the application of a given rule.
+Trace analysis is a refinement of reachability analysis that additionaly explains how one agent can go from a given view to another one, following a path that we call a local trace.
+Thus the set of the local traces for a given agent can be described as a transition system among the views for a given agent: in this transition system, the nodes are local views; introduction arrows correspond to either initial states, or creation rules; transitions denote a potential conformation change of an agent, from one local views to another one, due to the application of a given rule.
 
 We consider the following example:
 \begin{lstlisting}[language=kappa]
@@ -1369,9 +1375,9 @@ KaSa protein2x2.ka --reset-all --compute-local-traces
 \end{verbatim}
 
 will perform the trace analysis on the model \texttt{protein2x2ka}, and produce
-two dot format files \texttt{Agent\_trace\_K\_x\string^.dot} and \texttt{Agent\_trace.P.a1\_.a2\_.b1\_.b2\_.g\string^.dot}. The name of the output repository can be changed thanks to the command line options \texttt{--output-directory} and \texttt{--output-local-trace-directory}. Moreover, file names document the kind of protein and the sites of interest (the symbol `!' denote a binding state, and the symbol `~' an internal state).
+two dot format files \texttt{Agent\_trace\_K\_x\string^.dot} and \texttt{Agent\_trace.P.a1\_.a2\_.b1\_.b2\_.g\string^.dot}. The  output repository can be changed thanks to the command line options \texttt{--output-directory} and \texttt{--output-local-trace-directory}. Moreover, file names is made of the prefix \texttt{Agent\_trace}, followed by  the kind of protein and the list of the sites of interest (the symbol `\texttt{\string^}' denotes a binding state, and the symbol `\texttt{\_}' an internal state).
 
-The transition system that descrives the local traces for the agents of kind $P$ are descrided in Figure \ref{fig:trace-raw}. We notice that the nodes of this transition system are labelled with the states of the sites of $P$. The internal state of a site is denoted as $x{\sim}u$ (meaning that the site $x$ has state $u$, whereas the binding state of a site is denoted as $x?\textit{free}$, when the site is free, and as $x!K@x$ when the site $x$ is bound to the site $x$ of a given agent of kind $K$.
+The transition system that describes the local traces for the agents of kind $P$ is descrided in Figure \ref{fig:trace-raw}. We notice that the nodes of this transition system are labelled with the states of the sites of $P$. The internal state of a site $x$ is denoted as $x{\sim}u$ (meaning that the site $x$ has state $u$, whereas the binding state of a site $x$ is denoted as $x!\textit{free}$, when the site is free, and as $x!K@x$ when the site $x$ is bound to the site $x$ of a given agent of kind $K$.
 
 \begin{figure}[htbp]
 \centering
@@ -1395,14 +1401,12 @@ will perform the trace analysis on the model \texttt{protein2x2ka}, and produce
 two dot format files \texttt{Agent\_trace\_K\_x\string^.dot} and \texttt{Agent\_trace.P.a1\_.a2\_.b1\_.b2\_.g\string^.dot}. The name of the output repository can be changed thanks to the command line options \texttt{--output-directory} and \texttt{--output-local-trace-directory}.
 This time, the files describe a coarse-graining of the corresponding transition systems.
 
-For instance, the coarse-grained transition system for the local traces of the proteins of kind $P$, is given in Figure~\ref{fig:trace-macro}.  This  coarse-grained transition system is a compact implicit encoding of the transition system in Figure~\ref{fig:trace-raw}. It is obtained by exploiting the fact that locally, the behavior of the pair of states $a_1$ and $b_1$ is independent from the behavior of the pair of states $a_2$ and $b_2$, until these four sites are phosphorylated, so that the site $x$ can get bound.
+For instance, the coarse-grained transition system for the local traces of the proteins of kind $P$, is given in Figure~\ref{fig:trace-macro}.  This  coarse-grained transition system is a compact implicit encoding of the transition system in Figure~\ref{fig:trace-raw}. It is obtained by exploiting the fact that locally, the behavior of the pair of states $a_1$ and $b_1$ is independent from the behavior of the pair of states $a_2$ and $b_2$, until these four sites are phosphorylated, so that the site $g$ can get bound.
 
 
-More formally, in that transition system, some states are microstates: the state of each site is documented; some others are macrostates: some states are not documented.
-Thus a macrostate $v^{\sharp}$ can be seen intensionally as a part  of a local view, but also extensionnaly as the set $\gamma(v^{\sharp})$ of the local views they are a subpart of. A microstate $v$ can be described by any sequence $(v_i^{\sharp})$ of macrostates such that the intersection of the the extensional denotation of these macrostates is the singleton $\{v\}$;
-moreover a transition between two microstates $v$ and $v'$ can be described by any transition between one macro state $v^{\sharp}$ and another one $v'{}^{\sharp}$, provided that there exists a sequence of macrostate $(v^{\sharp}_i)$ such that the sequence $v^{\sharp},(v^{\sharp}_i)$ denotes the microstate $v$ and the sequence $v'{}^{\sharp},(v^{\sharp}_i)$ denotes the microstate $v'$.
-
-
+More formally, in that transition system, some states are microstates (in a microstate, the state of each site is documented); some others are macrostates: (in a macrostate, the states of only a subset of site is documented).
+Thus a macrostate $v^{\sharp}$ can be seen intensionally as a part  of a local view, but also extensionnaly as the set $\gamma(v^{\sharp})$ of the local views they are a subpart of. A microstate $v$ can be described by any sequence $(v_i^{\sharp})$ of macrostates prodiding that the intersection $\bigcap \gamma(v^{\sharp}_i)$ of the extensional denotation $\gamma(v^{\sharp}_i)$ of these macrostates $v^{\sharp}_i$, is equal to the singleton $\{v\}$;
+moreover a transition between two microstates $v$ and $v'$ can be described by any transition between one macro state $v^{\sharp}$ and another one $v'{}^{\sharp}$, provided that there exists a sequence of macrostate $(v^{\sharp}_i)$ such that the sequence $(v^{\sharp},(v^{\sharp}_i))$ denotes the microstate $v$ and the sequence $(v'{}^{\sharp},(v^{\sharp}_i))$ denotes the microstate $v'$.
 
 \begin{figure}[htbp]
 \centering
@@ -1410,6 +1414,9 @@ moreover a transition between two microstates $v$ and $v'$ can be described by a
 \caption{Local traces for the \ttt{protein2x2.ka} model defined in Section~\ref{sec:local-traces}}
 \label{fig:trace-macro}
 \end{figure}
+
+Such coarse-grained transition system can be geometrically interpreted as a simplicial complex \cite{DBLP:conf/concur/FajstrupGR98}.
+
 
 \section{Contact map}
 
