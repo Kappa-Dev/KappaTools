@@ -36,7 +36,6 @@ done
 Done
 ____________________________________________________________
 ############################################################
-Warning: Tracking FLUX into "flux_map.dot" was not stopped before end of simulation
 + Producing causal compressions
 	 - blackboard generation
 	 - computing causal past of each observed events (626)

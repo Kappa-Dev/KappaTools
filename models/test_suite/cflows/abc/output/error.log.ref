@@ -68,7 +68,7 @@ Environment:
     /*1*/%mod: [true] do $TRACK C(x1~p?, x2~u?) [true]
     /*2*/%mod: [true] do $TRACK C(x1~p?, x2~p?) [true]
     /*3*/%mod: [true] do $FLUX "flux_map.dot" [true]
-    /*4*/%mod: ([E] = INF) do $FLUX "flux_map.html" [false]
+    /*4*/%mod: ([E] = INF) do $FLUX "flux_map.dot" [false]
 Domain:
   () -> /*cc0*/ 
     -> (-!A-1_x-⊥->() 5[5 10 12] -!B-2_x-⊥->() 6[6]
