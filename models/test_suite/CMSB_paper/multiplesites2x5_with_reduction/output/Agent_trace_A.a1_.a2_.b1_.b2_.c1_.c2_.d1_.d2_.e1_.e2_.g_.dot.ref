@@ -1,6 +1,6 @@
 digraph G{
-Init_84 [width="0cm" height="0cm" style="none" label=""];
-Init_84 [width="0cm" height="0cm" style="none" label=""];
+Init_84 [width="0cm" height="0cm" style="invis" label=""];
+Init_84 [width="0cm" height="0cm" style="invis" label=""];
 Node_124 [label="A(a1~p,a2~p,b1~p,b2~p,c1~p,c2~p,d1~p,d2~p,e1~p,e2~p,g~p)"];
 Node_114 [label="A(a1~p,a2~p,b1~p,b2~p,c1~p,c2~p,d1~p,d2~p,e1~p,e2~p,g~u)"];
 Node_106 [label="A(e1~p,e2~p,g~u)"];
@@ -19,8 +19,8 @@ Node_89 [label="A(a1~p,a2~p,g~u)"];
 Node_87 [label="A(a1~p,a2~u,g~u)"];
 Node_86 [label="A(a1~u,a2~u,g~u)"];
 Node_84 [label="A(a1~u,a2~u,b1~u,b2~u,c1~u,c2~u,d1~u,d2~u,e1~u,e2~u,g~u)"];
-Macro_84 [width="0cm" height="0cm" stype="none" label=""];
-Macro_114 [width="0cm" height="0cm" stype="none" label=""];
+Macro_84 [width="0cm" height="0cm" style="invis" label=""];
+Macro_114 [width="0cm" height="0cm" style="invis" label=""];
 Node_124 -> Node_114 [label="rule 22"];
 Node_114 -> Node_124 [label="rule 21"];
 Node_106 -> Node_105 [label="rule 20"];

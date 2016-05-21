@@ -1,5 +1,5 @@
 digraph G{
-Init_37 [width="0cm" height="0cm" style="none" label=""];
+Init_37 [width="0cm" height="0cm" style="invis" label=""];
 Node_53 [label="P(a1~p,a2~p,b1~p,b2~p,g!K@x)"];
 Node_49 [label="P(a1~p,a2~p,b1~p,b2~p,g!free)"];
 Node_46 [label="P(a2~p,b2~p,g!free)"];
@@ -10,8 +10,8 @@ Node_41 [label="P(a1~p,b1~p,g!free)"];
 Node_40 [label="P(a1~p,b1~u,g!free)"];
 Node_39 [label="P(a1~u,b1~u,g!free)"];
 Node_37 [label="P(a1~u,a2~u,b1~u,b2~u,g!free)"];
-Macro_37 [width="0cm" height="0cm" stype="none" label=""];
-Macro_49 [width="0cm" height="0cm" stype="none" label=""];
+Macro_37 [width="0cm" height="0cm" style="invis" label=""];
+Macro_49 [width="0cm" height="0cm" style="invis" label=""];
 Node_53 -> Node_49 [label="rule 9: P/K"];
 Node_49 -> Node_53 [label="rule 8: P.K"];
 Node_45 -> Node_42 [label="rule 7: b2-"];

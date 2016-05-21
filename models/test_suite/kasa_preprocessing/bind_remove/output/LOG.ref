@@ -146,7 +146,7 @@ Influence_map:Wake_up_map:rule(1):'r1' B(x!_)->C(x) -> rule(0):'r0' A(x),B(x)->A
 Reachability analysis...
 
 	Applying rule 1: r1:
-		the predcondition is not satsified yet
+		the precondition is not satisfied yet
 
 ------------------------------------------------------------
 * Dead rules :

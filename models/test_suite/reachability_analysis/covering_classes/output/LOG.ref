@@ -898,13 +898,12 @@ Influence_map:Inhibition_map:rule(12):'r12' C(y!_)-> -> rule(11):'r11' C(y~p!1),
 Reachability analysis...
 
 	Applying rule 0: r0:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 0: r0 is applied for the first time
 
 	Dealing with creation
 
-
 INTENSIONAL DESCRIPTION:
 Id=7
  Node(site_type:1<0)
@@ -930,11 +929,11 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(y~u,y!free)
+			A(y~u,y!free)
+
 	Wake-up rules
 	Dealing with creation
 
-
 INTENSIONAL DESCRIPTION:
 Id=7
  Node(site_type:1<0)
@@ -960,17 +959,17 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~u,x!free)
+			A(x~u,x!free)
+
 	Wake-up rules
 
 	Applying rule 1: r1:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 1: r1 is applied for the first time
 
 	Dealing with creation
 
-
 INTENSIONAL DESCRIPTION:
 Id=7
  Node(site_type:1<0)
@@ -996,11 +995,11 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(y~u,y!free)
+			B(y~u,y!free)
+
 	Wake-up rules
 	Dealing with creation
 
-
 INTENSIONAL DESCRIPTION:
 Id=7
  Node(site_type:1<0)
@@ -1026,17 +1025,17 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(x~u,x!free)
+			B(x~u,x!free)
+
 	Wake-up rules
 
 	Applying rule 2: r2:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 2: r2 is applied for the first time
 
 	Dealing with creation
 
-
 INTENSIONAL DESCRIPTION:
 Id=7
  Node(site_type:1<0)
@@ -1062,11 +1061,11 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	C(y~u,y!free)
+			C(y~u,y!free)
+
 	Wake-up rules
 	Dealing with creation
 
-
 INTENSIONAL DESCRIPTION:
 Id=7
  Node(site_type:1<0)
@@ -1092,24 +1091,24 @@ Id=7
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	C(x~u,x!free)
+			C(x~u,x!free)
+
 	Wake-up rules
 
 	Applying rule 0: r0:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 	Applying rule 3: r3:
-		the predcondition is not satsified yet
+		the precondition is not satisfied yet
 
 	Applying rule 4: r4:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 4: r4 is applied for the first time
 
 		Updating the views for A(x~,x!)
 			
 
-
 INTENSIONAL DESCRIPTION:
 Id=21
  Node(site_type:1<0)
@@ -1135,11 +1134,11 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~u,x!B@x)
+			A(x~u,x!B@x)
+
 	Wake-up rules
 		Updating the views for B(x~,x!)
 			
-
 
 INTENSIONAL DESCRIPTION:
 Id=17
@@ -1166,30 +1165,30 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(x~p,x!A@x)
+			B(x~p,x!A@x)
+
 	Wake-up rules
 
 	Applying rule 5: r5:
-		the predcondition is not satsified yet
+		the precondition is not satisfied yet
 
 	Applying rule 6: r6:
-		the predcondition is not satsified yet
+		the precondition is not satisfied yet
 
 	Applying rule 7: r7:
-		the predcondition is not satsified yet
+		the precondition is not satisfied yet
 
 	Applying rule 8: r8:
-		the predcondition is not satsified yet
+		the precondition is not satisfied yet
 
 	Applying rule 9: r9:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 9: r9 is applied for the first time
 
 		Updating the views for A(y~,y!)
 			
 
-
 INTENSIONAL DESCRIPTION:
 Id=21
  Node(site_type:1<0)
@@ -1215,11 +1214,11 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(y~u,y!B@y)
+			A(y~u,y!B@y)
+
 	Wake-up rules
 		Updating the views for B(y~,y!)
 			
-
 
 INTENSIONAL DESCRIPTION:
 Id=17
@@ -1246,36 +1245,36 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(y~p,y!A@y)
+			B(y~p,y!A@y)
+
 	Wake-up rules
 
 	Applying rule 10: r10:
-		the predcondition is not satsified yet
+		the precondition is not satisfied yet
 
 	Applying rule 11: r11:
-		the predcondition is not satsified yet
+		the precondition is not satisfied yet
 
 	Applying rule 12: r12:
-		the predcondition is not satsified yet
+		the precondition is not satisfied yet
 
 	Applying rule 1: r1:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 	Applying rule 2: r2:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 	Applying rule 0: r0:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 	Applying rule 3: r3:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 3: r3 is applied for the first time
 
 		Updating the views for A(x~,x!)
 	Dealing with side effects
 
-
 INTENSIONAL DESCRIPTION:
 Id=15
  Node(site_type:1<1)
@@ -1301,11 +1300,11 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(y~p,y!free)
+			B(y~p,y!free)
+
 	Wake-up rules
 	Dealing with side effects
 
-
 INTENSIONAL DESCRIPTION:
 Id=15
  Node(site_type:1<1)
@@ -1331,22 +1330,22 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(x~p,x!free)
+			B(x~p,x!free)
+
 	Wake-up rules
 
 	Applying rule 4: r4:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(x~,x!)
 		Updating the views for B(x~,x!)
 
 	Applying rule 5: r5:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 5: r5 is applied for the first time
 
 		Updating the views for A(x~,x!)
 			
-
 
 INTENSIONAL DESCRIPTION:
 Id=19
@@ -1373,12 +1372,12 @@ Id=19
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~u,x!C@x)
+			A(x~u,x!C@x)
+
 	Wake-up rules
 		Updating the views for B(x~,x!)
 		Updating the views for C(x~,x!)
 			
-
 
 INTENSIONAL DESCRIPTION:
 Id=17
@@ -1405,11 +1404,12 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	C(x~p,x!A@x)
+			C(x~p,x!A@x)
+
 	Wake-up rules
 
 	Applying rule 6: r6:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 6: r6 is applied for the first time
 
@@ -1417,7 +1417,6 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for A(x~,x!)
 			
 
-
 INTENSIONAL DESCRIPTION:
 Id=34
  Node(site_type:1<1)
@@ -1443,17 +1442,17 @@ Id=34
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~p,x!C@x)
+			A(x~p,x!C@x)
+
 	Wake-up rules
 
 	Applying rule 7: r7:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 7: r7 is applied for the first time
 
 		Updating the views for C(x~,x!)
 	Dealing with side effects
-
 
 INTENSIONAL DESCRIPTION:
 Id=15
@@ -1480,36 +1479,36 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~p,x!free)
+			A(x~p,x!free)
+
 	Wake-up rules
 
 	Applying rule 8: r8:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 8: r8 is applied for the first time
 
 		Updating the views for A(y~,y!)
 
 	Applying rule 9: r9:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(y~,y!)
 		Updating the views for B(y~,y!)
 
 	Applying rule 1: r1:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 	Applying rule 3: r3:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(x~,x!)
 
 	Applying rule 10: r10:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 10: r10 is applied for the first time
 
 		Updating the views for A(y~,y!)
 			
-
 
 INTENSIONAL DESCRIPTION:
 Id=19
@@ -1536,13 +1535,13 @@ Id=19
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(y~u,y!C@y)
+			A(y~u,y!C@y)
+
 	Wake-up rules
 		Updating the views for B(y~,y!)
 		Updating the views for C(y~,y!)
 			
 
-
 INTENSIONAL DESCRIPTION:
 Id=17
  Node(site_type:1<1)
@@ -1568,17 +1567,17 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	C(y~p,y!A@y)
+			C(y~p,y!A@y)
+
 	Wake-up rules
 
 	Applying rule 0: r0:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 	Applying rule 4: r4:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(x~,x!)
 			
-
 
 INTENSIONAL DESCRIPTION:
 Id=17
@@ -1605,25 +1604,25 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~p,x!B@x)
+			A(x~p,x!B@x)
+
 	Wake-up rules
 		Updating the views for B(x~,x!)
 
 	Applying rule 5: r5:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(x~,x!)
 		Updating the views for B(x~,x!)
 		Updating the views for C(x~,x!)
 
 	Applying rule 11: r11:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 11: r11 is applied for the first time
 
 		Updating the views for C(y~,y!)
 		Updating the views for A(y~,y!)
 			
-
 
 INTENSIONAL DESCRIPTION:
 Id=34
@@ -1650,17 +1649,17 @@ Id=34
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(y~p,y!C@y)
+			A(y~p,y!C@y)
+
 	Wake-up rules
 
 	Applying rule 12: r12:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 12: r12 is applied for the first time
 
 		Updating the views for C(y~,y!)
 	Dealing with side effects
-
 
 INTENSIONAL DESCRIPTION:
 Id=15
@@ -1687,34 +1686,34 @@ Id=15
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(y~p,y!free)
+			A(y~p,y!free)
+
 	Wake-up rules
 
 	Applying rule 2: r2:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 	Applying rule 6: r6:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for C(x~,x!)
 		Updating the views for A(x~,x!)
 
 	Applying rule 7: r7:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for C(x~,x!)
 
 	Applying rule 3: r3:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(x~,x!)
 
 	Applying rule 8: r8:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(y~,y!)
 
 	Applying rule 9: r9:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(y~,y!)
 			
-
 
 INTENSIONAL DESCRIPTION:
 Id=17
@@ -1741,61 +1740,62 @@ Id=17
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(y~p,y!B@y)
+			A(y~p,y!B@y)
+
 	Wake-up rules
 		Updating the views for B(y~,y!)
 
 	Applying rule 10: r10:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(y~,y!)
 		Updating the views for B(y~,y!)
 		Updating the views for C(y~,y!)
 
 	Applying rule 1: r1:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 	Applying rule 0: r0:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 	Applying rule 4: r4:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(x~,x!)
 		Updating the views for B(x~,x!)
 
 	Applying rule 5: r5:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(x~,x!)
 		Updating the views for B(x~,x!)
 		Updating the views for C(x~,x!)
 
 	Applying rule 11: r11:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for C(y~,y!)
 		Updating the views for A(y~,y!)
 
 	Applying rule 12: r12:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for C(y~,y!)
 
 	Applying rule 3: r3:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(x~,x!)
 
 	Applying rule 6: r6:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for C(x~,x!)
 		Updating the views for A(x~,x!)
 
 	Applying rule 7: r7:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for C(x~,x!)
 
 	Applying rule 8: r8:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(y~,y!)
 
 	Applying rule 9: r9:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(y~,y!)
 		Updating the views for B(y~,y!)
 

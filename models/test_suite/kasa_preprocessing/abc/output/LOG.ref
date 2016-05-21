@@ -550,7 +550,6 @@ Influence_map:Inhibition_map:rule(5):'mod x2' A(x,c!1),C(x1~p,x2~u!1)->A(x,c),C(
 Reachability analysis...
 	Views in initial state
 
-
 INTENSIONAL DESCRIPTION:
 Id=21
  Node(site_type:1<0)
@@ -576,10 +575,10 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x!free,c!free)
+			A(x!free,c!free)
+
 	Wake-up rules
 	Views in initial state
-
 
 INTENSIONAL DESCRIPTION:
 Id=3
@@ -596,10 +595,10 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(x!free)
+			B(x!free)
+
 	Wake-up rules
 	Views in initial state
-
 
 INTENSIONAL DESCRIPTION:
 Id=43
@@ -646,17 +645,17 @@ Id=43
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	C(x1~u,x2~u,x1!free,x2!free)
+			C(x1~u,x2~u,x1!free,x2!free)
+
 	Wake-up rules
 
 	Applying rule 0: a.b:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 0: a.b is applied for the first time
 
 		Updating the views for A(x!,c!)
 			
-
 
 INTENSIONAL DESCRIPTION:
 Id=9
@@ -683,11 +682,11 @@ Id=9
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x!B@x,c!free)
+			A(x!B@x,c!free)
+
 	Wake-up rules
 		Updating the views for B(x!)
 			
-
 
 INTENSIONAL DESCRIPTION:
 Id=5
@@ -704,11 +703,12 @@ Id=5
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(x!A@x)
+			B(x!A@x)
+
 	Wake-up rules
 
 	Applying rule 1: a.b_op:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 1: a.b_op is applied for the first time
 
@@ -716,13 +716,12 @@ EXTENSIONAL DESCRIPTION:
 		Updating the views for B(x!)
 
 	Applying rule 2: ab.c:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 2: ab.c is applied for the first time
 
 		Updating the views for A(x!,c!)
 			
-
 
 INTENSIONAL DESCRIPTION:
 Id=47
@@ -749,11 +748,11 @@ Id=47
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x!B@x,c!C@x1)
+			A(x!B@x,c!C@x1)
+
 	Wake-up rules
 		Updating the views for C(x1~,x2~,x1!,x2!)
 			
-
 
 INTENSIONAL DESCRIPTION:
 Id=57
@@ -800,17 +799,17 @@ Id=57
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	C(x1~u,x2~u,x1!A@c,x2!free)
+			C(x1~u,x2~u,x1!A@c,x2!free)
+
 	Wake-up rules
 
 	Applying rule 3: mod x1:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 3: mod x1 is applied for the first time
 
 		Updating the views for C(x1~,x2~,x1!,x2!)
 			
-
 
 INTENSIONAL DESCRIPTION:
 Id=29
@@ -857,18 +856,18 @@ Id=29
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	C(x1~p,x2~u,x1!free,x2!free)
+			C(x1~p,x2~u,x1!free,x2!free)
+
 	Wake-up rules
 		Updating the views for A(x!,c!)
 
 	Applying rule 4: a.c:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 4: a.c is applied for the first time
 
 		Updating the views for A(x!,c!)
 			
-
 
 INTENSIONAL DESCRIPTION:
 Id=33
@@ -895,11 +894,11 @@ Id=33
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x!free,c!C@x2)
+			A(x!free,c!C@x2)
+
 	Wake-up rules
 		Updating the views for C(x1~,x2~,x1!,x2!)
 			
-
 
 INTENSIONAL DESCRIPTION:
 Id=41
@@ -946,18 +945,18 @@ Id=41
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	C(x1~p,x2~u,x1!free,x2!A@c)
+			C(x1~p,x2~u,x1!free,x2!A@c)
+
 	Wake-up rules
 
 	Applying rule 5: mod x2:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 5: mod x2 is applied for the first time
 
 		Updating the views for A(x!,c!)
 		Updating the views for C(x1~,x2~,x1!,x2!)
 			
-
 
 INTENSIONAL DESCRIPTION:
 Id=84
@@ -1004,14 +1003,14 @@ Id=84
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	C(x1~p,x2~p,x1!free,x2!free)
+			C(x1~p,x2~p,x1!free,x2!free)
+
 	Wake-up rules
 
 	Applying rule 0: a.b:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(x!,c!)
 			
-
 
 INTENSIONAL DESCRIPTION:
 Id=99
@@ -1038,15 +1037,15 @@ Id=99
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x!B@x,c!C@x2)
+			A(x!B@x,c!C@x2)
+
 	Wake-up rules
 		Updating the views for B(x!)
 
 	Applying rule 1: a.b_op:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(x!,c!)
 			
-
 
 INTENSIONAL DESCRIPTION:
 Id=105
@@ -1073,37 +1072,38 @@ Id=105
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x!free,c!C@x1)
+			A(x!free,c!C@x1)
+
 	Wake-up rules
 		Updating the views for B(x!)
 
 	Applying rule 2: ab.c:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(x!,c!)
 		Updating the views for C(x1~,x2~,x1!,x2!)
 
 	Applying rule 3: mod x1:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for C(x1~,x2~,x1!,x2!)
 		Updating the views for A(x!,c!)
 
 	Applying rule 4: a.c:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(x!,c!)
 		Updating the views for C(x1~,x2~,x1!,x2!)
 
 	Applying rule 5: mod x2:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(x!,c!)
 		Updating the views for C(x1~,x2~,x1!,x2!)
 
 	Applying rule 0: a.b:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(x!,c!)
 		Updating the views for B(x!)
 
 	Applying rule 1: a.b_op:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(x!,c!)
 		Updating the views for B(x!)
 

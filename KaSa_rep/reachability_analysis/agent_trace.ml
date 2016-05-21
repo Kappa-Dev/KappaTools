@@ -979,7 +979,7 @@ let agent_trace parameter log_info error handler handler_kappa compil output =
                      let error, key = hash_of_mvbdu parameter error mvbdu in
                      let () =
                        Printf.fprintf fic
-                         "Init_%i [width=\"0cm\" height=\"0cm\" style=\"none\" label=\"\"];\n" key
+                         "Init_%i [width=\"0cm\" height=\"0cm\" style=\"invis\" label=\"\"];\n" key
                      in
                      error, handler)
                   (error, handler)
@@ -1000,7 +1000,7 @@ let agent_trace parameter log_info error handler handler_kappa compil output =
                   (fun k _ error ->
                      let () =
                        Printf.fprintf fic
-                         "Macro_%i [width=\"0cm\" height=\"0cm\" stype=\"none\" label=\"\"];\n" k
+                         "Macro_%i [width=\"0cm\" height=\"0cm\" style=\"invis\" label=\"\"];\n" k
                      in error)
                   transition_system.subframe
                   error

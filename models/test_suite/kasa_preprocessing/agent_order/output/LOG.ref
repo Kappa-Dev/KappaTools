@@ -162,7 +162,7 @@ Influence_map:Inhibition_map:rule(1):'remove' A(x),A(x)->A(x),B(x),A(x) -> rule(
 Reachability analysis...
 
 	Applying rule 1: remove:
-		the predcondition is not satsified yet
+		the precondition is not satisfied yet
 
 ------------------------------------------------------------
 * Dead rules :

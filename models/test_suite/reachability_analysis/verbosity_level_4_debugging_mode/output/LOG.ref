@@ -320,12 +320,11 @@ Influence_map:Inhibition_map:rule(7):'KO' A(x~0,y~q)->A(x~1,y~0) -> rule(6):'' A
 Reachability analysis...
 
 	Applying rule 0:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 0 is applied for the first time
 
 	Dealing with creation
-
 
 INTENSIONAL DESCRIPTION:
 Id=11
@@ -362,7 +361,8 @@ Id=11
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~u,y~u,z~u)
+			A(x~u,y~u,z~u)
+
 	Wake-up rules
 		Updating the views for A(x~,y~,z~)
 		(rule 0) should be investigated 
@@ -375,16 +375,15 @@ EXTENSIONAL DESCRIPTION:
 		(rule 7: KO) should be investigated 
 
 	Applying rule 0:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 	Applying rule 1:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 1 is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 			
-
 
 INTENSIONAL DESCRIPTION:
 Id=35
@@ -421,7 +420,8 @@ Id=35
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~p,y~u,z~u)
+			A(x~p,y~u,z~u)
+
 	Wake-up rules
 		Updating the views for A(x~,y~,z~)
 		(rule 0) should be investigated 
@@ -434,13 +434,12 @@ EXTENSIONAL DESCRIPTION:
 		(rule 7: KO) should be investigated 
 
 	Applying rule 2:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 2 is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 			
-
 
 INTENSIONAL DESCRIPTION:
 Id=21
@@ -477,7 +476,8 @@ Id=21
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~p,y~p,z~u)
+			A(x~p,y~p,z~u)
+
 	Wake-up rules
 		Updating the views for A(x~,y~,z~)
 		(rule 0) should be investigated 
@@ -490,13 +490,12 @@ EXTENSIONAL DESCRIPTION:
 		(rule 7: KO) should be investigated 
 
 	Applying rule 3:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 3 is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 			
-
 
 INTENSIONAL DESCRIPTION:
 Id=48
@@ -533,7 +532,8 @@ Id=48
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~0,y~p,z~q)
+			A(x~0,y~p,z~q)
+
 	Wake-up rules
 		Updating the views for A(x~,y~,z~)
 		(rule 0) should be investigated 
@@ -546,13 +546,12 @@ EXTENSIONAL DESCRIPTION:
 		(rule 7: KO) should be investigated 
 
 	Applying rule 4:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 4 is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 			
-
 
 INTENSIONAL DESCRIPTION:
 Id=53
@@ -589,7 +588,8 @@ Id=53
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~q,y~u,z~u)
+			A(x~q,y~u,z~u)
+
 	Wake-up rules
 		Updating the views for A(x~,y~,z~)
 		(rule 0) should be investigated 
@@ -602,13 +602,12 @@ EXTENSIONAL DESCRIPTION:
 		(rule 7: KO) should be investigated 
 
 	Applying rule 5:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 5 is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 			
-
 
 INTENSIONAL DESCRIPTION:
 Id=59
@@ -645,7 +644,8 @@ Id=59
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~q,y~q,z~u)
+			A(x~q,y~q,z~u)
+
 	Wake-up rules
 		Updating the views for A(x~,y~,z~)
 		(rule 0) should be investigated 
@@ -658,13 +658,12 @@ EXTENSIONAL DESCRIPTION:
 		(rule 7: KO) should be investigated 
 
 	Applying rule 6:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 6 is applied for the first time
 
 		Updating the views for A(x~,y~,z~)
 			
-
 
 INTENSIONAL DESCRIPTION:
 Id=70
@@ -701,7 +700,8 @@ Id=70
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	A(x~q,y~q,z~q)
+			A(x~q,y~q,z~q)
+
 	Wake-up rules
 		Updating the views for A(x~,y~,z~)
 		(rule 0) should be investigated 
@@ -714,33 +714,33 @@ EXTENSIONAL DESCRIPTION:
 		(rule 7: KO) should be investigated 
 
 	Applying rule 7: KO:
-		the predcondition is not satsified yet
+		the precondition is not satisfied yet
 
 	Applying rule 0:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 	Applying rule 1:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(x~,y~,z~)
 
 	Applying rule 2:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(x~,y~,z~)
 
 	Applying rule 3:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(x~,y~,z~)
 
 	Applying rule 4:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(x~,y~,z~)
 
 	Applying rule 5:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(x~,y~,z~)
 
 	Applying rule 6:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(x~,y~,z~)
 
 ------------------------------------------------------------

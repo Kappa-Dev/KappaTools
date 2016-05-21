@@ -281,13 +281,13 @@ Influence_map:Inhibition_map:rule(0):'' A(x!1,y?),B(x!1)->A(x!1,y!2),B(x!1),C(y!
 Reachability analysis...
 
 	Applying rule 0:
-		the predcondition is not satsified yet
+		the precondition is not satisfied yet
 
 	Applying rule 1:
-		the predcondition is not satsified yet
+		the precondition is not satisfied yet
 
 	Applying rule 2:
-		the predcondition is not satsified yet
+		the precondition is not satisfied yet
 
 ------------------------------------------------------------
 * Dead rules :

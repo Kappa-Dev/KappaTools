@@ -338,10 +338,10 @@ Influence_map:Inhibition_map:rule(3):'r3' A(y!1),C(x!1)->C(x) -> rule(2):'r2' A(
 Reachability analysis...
 
 	Applying rule 2: r2:
-		the predcondition is not satsified yet
+		the precondition is not satisfied yet
 
 	Applying rule 3: r3:
-		the predcondition is not satsified yet
+		the precondition is not satisfied yet
 
 ------------------------------------------------------------
 * Dead rules :

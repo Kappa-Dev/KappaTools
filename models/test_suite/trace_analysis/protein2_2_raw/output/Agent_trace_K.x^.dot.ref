@@ -1,5 +1,5 @@
 digraph G{
-Init_33 [width="0cm" height="0cm" style="none" label=""];
+Init_33 [width="0cm" height="0cm" style="invis" label=""];
 Node_32 [label="K(x!P@g)"];
 Node_33 [label="K(x!free)"];
 Node_32 -> Node_33 [label="rule 9: P/K"];

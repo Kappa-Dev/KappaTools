@@ -1,5 +1,5 @@
 digraph G{
-Init_36 [width="0cm" height="0cm" style="none" label=""];
+Init_36 [width="0cm" height="0cm" style="invis" label=""];
 Node_55 [label="A(x~p,y~p,z~u,w~u,t~u)"];
 Node_54 [label="A(x~p,y~p,z~p,w~p,t~p)"];
 Node_50 [label="A(x~p,y~p,z~p,w~p,t~u)"];
@@ -12,9 +12,9 @@ Node_35 [label="A(y~u,z~u,w~u,t~u)"];
 Node_38 [label="A(x~p,z~u,w~u,t~u)"];
 Node_37 [label="A(x~u,z~u,w~u,t~u)"];
 Node_36 [label="A(x~u,y~u,z~u,w~u,t~u)"];
-Macro_36 [width="0cm" height="0cm" stype="none" label=""];
-Macro_50 [width="0cm" height="0cm" stype="none" label=""];
-Macro_55 [width="0cm" height="0cm" stype="none" label=""];
+Macro_36 [width="0cm" height="0cm" style="invis" label=""];
+Macro_50 [width="0cm" height="0cm" style="invis" label=""];
+Macro_55 [width="0cm" height="0cm" style="invis" label=""];
 Node_54 -> Node_50 [label="rule 9: t-"];
 Node_47 -> Node_44 [label="rule 8: w-"];
 Node_43 -> Node_42 [label="rule 7: z-"];

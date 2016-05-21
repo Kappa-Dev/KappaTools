@@ -8,7 +8,7 @@ cat kasa_options.head > LOG_full.txt && \
 "${KAPPABIN}"KaSa --reset-all --compute-reachability-analysis ../kappa/reachability.ka | fold -w 61 -s >> LOG_low.txt && \
 "${KAPPABIN}"KaSa --reset-all --compute-reachability-analysis ../kappa/reachability.ka --verbosity-level-for-view-analysis Mute | fold -w 61 -s >> LOG_mute.txt && \
 "${KAPPABIN}"KaSa --reset-all --compute-reachability-analysis ../kappa/reachability.ka --verbosity-level-for-view-analysis Medium > LOG_medium.txt && \
-"${Kappabin}"KaSa --reset-all --compute-reachability-analysis ../kappa/reachability.ka --verbosity-level-for-view-analysis High >> LOG_high.txt && \
+"${KAPPABIN}"KaSa --reset-all --compute-reachability-analysis ../kappa/reachability.ka --verbosity-level-for-view-analysis High >> LOG_high.txt && \
 "${KAPPABIN}"KaSa --reset-all --compute-reachability-analysis ../kappa/reachability.ka --verbosity-level-for-view-analysis Full > LOG_pre_full.txt && \
 cat kasa_options.foot >> LOG_mute.txt && \
 cat kasa_options.foot >> LOG_low.txt && \

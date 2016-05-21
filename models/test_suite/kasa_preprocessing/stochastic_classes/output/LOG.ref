@@ -414,13 +414,12 @@ Influence_map:Inhibition_map:rule(7):'r7' F(y~p)-> -> rule(6):'r6' F(x~u)->[0->0
 Reachability analysis...
 
 	Applying rule 1: r1:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 1: r1 is applied for the first time
 
 	Dealing with creation
 
-
 INTENSIONAL DESCRIPTION:
 Id=3
  Node(site_type:1<0)
@@ -436,11 +435,11 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(y~u)
+			B(y~u)
+
 	Wake-up rules
 	Dealing with creation
 
-
 INTENSIONAL DESCRIPTION:
 Id=3
  Node(site_type:1<0)
@@ -456,17 +455,17 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	B(x~u)
+			B(x~u)
+
 	Wake-up rules
 
 	Applying rule 3: r3:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 3: r3 is applied for the first time
 
 	Dealing with creation
 
-
 INTENSIONAL DESCRIPTION:
 Id=3
  Node(site_type:1<0)
@@ -482,11 +481,11 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	D(y~u)
+			D(y~u)
+
 	Wake-up rules
 	Dealing with creation
 
-
 INTENSIONAL DESCRIPTION:
 Id=3
  Node(site_type:1<0)
@@ -502,14 +501,15 @@ Id=3
      Leaf False 
 
 EXTENSIONAL DESCRIPTION:
-	D(x~u)
+			D(x~u)
+
 	Wake-up rules
 
 	Applying rule 1: r1:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 	Applying rule 3: r3:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 ------------------------------------------------------------
 * Dead rules :

@@ -7,23 +7,23 @@ Refining the influence map...
 Reachability analysis...
 	Views in initial state
 
+			A(x!B@x)
 
-	A(x!B@x)
 	Wake-up rules
 		Updating the views for A(x!)
 		(rule 0) should be investigated 
 		(rule 1) should be investigated 
 	Views in initial state
 
+			A(x~u)
 
-	A(x~u)
 	Wake-up rules
 		Updating the views for A(x~)
 		(rule 0) should be investigated 
 	Views in initial state
 
+			B(x!A@x,x~u)
 
-	B(x!A@x,x~u)
 	Wake-up rules
 		Updating the views for B(x!,x~)
 		(rule 0) should be investigated 
@@ -32,24 +32,24 @@ Reachability analysis...
 		(rule 3) should be investigated 
 
 	Applying rule 0:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 0 is applied for the first time
 
 
 	Applying rule 2:
-		the predcondition is not satsified yet
+		the precondition is not satisfied yet
 
 	Applying rule 1:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 1 is applied for the first time
 
 		Updating the views for A(x!)
 	Dealing with side effects
 
+			B(x!free,x~u)
 
-	B(x!free,x~u)
 	Wake-up rules
 		Updating the views for B(x!,x~)
 		(rule 0) should be investigated 
@@ -58,7 +58,7 @@ Reachability analysis...
 		(rule 3) should be investigated 
 
 	Applying rule 3:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 3 is applied for the first time
 
@@ -66,8 +66,8 @@ Reachability analysis...
 		Updating the views for B(x!,x~)
 			
 
+			B(x!A@x,x~p)
 
-	B(x!A@x,x~p)
 	Wake-up rules
 		Updating the views for B(x!,x~)
 		(rule 0) should be investigated 
@@ -76,15 +76,15 @@ Reachability analysis...
 		(rule 3) should be investigated 
 
 	Applying rule 0:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 	Applying rule 1:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(x!)
 	Dealing with side effects
 
+			B(x!free,x~p)
 
-	B(x!free,x~p)
 	Wake-up rules
 		Updating the views for B(x!,x~)
 		(rule 0) should be investigated 
@@ -93,22 +93,22 @@ Reachability analysis...
 		(rule 3) should be investigated 
 
 	Applying rule 2:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 		rule 2 is applied for the first time
 
 		Updating the views for B(x!,x~)
 
 	Applying rule 3:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for B(x!,x~)
 		Updating the views for B(x!,x~)
 
 	Applying rule 0:
-		the predcondition is satisfied
+		the precondition is satisfied
 
 	Applying rule 1:
-		the predcondition is satisfied
+		the precondition is satisfied
 		Updating the views for A(x!)
 
 ------------------------------------------------------------

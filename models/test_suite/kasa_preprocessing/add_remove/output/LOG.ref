@@ -179,7 +179,7 @@ Influence_map:Inhibition_map:rule(3):'' B(x~p)->B(x~u) -> rule(0):'' A(x~u),B(x~
 Reachability analysis...
 
 	Applying rule 0:
-		the predcondition is not satsified yet
+		the precondition is not satisfied yet
 
 ------------------------------------------------------------
 * Dead rules :
