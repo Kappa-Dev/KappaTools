@@ -1146,7 +1146,7 @@ struct
 
   let collect_site_pair_list static dynamic error init_state =
     let parameter = get_parameter static in
-    let handler_kappa = get_kappa_handler static in
+    (*let handler_kappa = get_kappa_handler static in*)
     let error, store_bonds_init = collect_bonds_initial static error init_state in
     let error, store_site_pair_list = collect_site_pair_list_aux static dynamic error init_state in
     let error, store_result =

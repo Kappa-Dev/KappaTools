@@ -8,8 +8,8 @@ digraph G{ label="Flux map" ; labelloc="t" ; node [shape=box,style=filled,fillco
 "a.b_op" -> "a.b_op" [weight=14,label="-14.600",color=red3,arrowhead=tee];
 "a.b_op" -> "ab.c" [weight=92,label="-92.712",color=red3,arrowhead=tee];
 "a.b_op" -> "a.c" [weight=2,label="2.143",color=green3,arrowhead=normal];
-"ab.c" -> "ab.c" [weight=695,label="-695.158",color=red3,arrowhead=tee];
-"ab.c" -> "mod x1" [weight=712,label="712.000",color=green3,arrowhead=normal];
+"ab.c" -> "ab.c" [weight=696,label="-696.102",color=red3,arrowhead=tee];
+"ab.c" -> "mod x1" [weight=713,label="713.000",color=green3,arrowhead=normal];
 "mod x1" -> "ab.c" [weight=522,label="522.640",color=green3,arrowhead=normal];
 "mod x1" -> "mod x1" [weight=583,label="-583.000",color=red3,arrowhead=tee];
 "mod x1" -> "a.c" [weight=45,label="45.213",color=green3,arrowhead=normal];

@@ -859,10 +859,10 @@ let agent_trace parameter log_info error handler handler_kappa compil output =
                     List.fold_left
                       (fun (error, string) site ->
                          let error, site_string =
-                           Handler.string_of_site
+                           Handler.string_of_site_in_file_name
                              parameter error handler_kappa agent_type site
                          in
-                         error, string^"_"^site_string)
+                         error, string^"."^site_string)
                       (error,
                        ((Remanent_parameters.get_local_trace_directory
                            parameter)^(Remanent_parameters.get_local_trace_prefix parameter)^(agent_string)))
