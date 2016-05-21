@@ -1417,6 +1417,12 @@ moreover a transition between two microstates $v$ and $v'$ can be described by a
 
 Such coarse-grained transition system can be geometrically interpreted as a simplicial complex \cite{DBLP:conf/concur/FajstrupGR98}.
 
+As a microstate could be decomposed into several sequences of macrostates (including the trivial sequence containing only the microstate itself), the system may jump spontaneously (by using a $\varepsilon$ transition) from one representation to another representation. This corresponds to the intersection between several simplexes in the corresponding simplificial complex.
+
+Although the semantics of a coarse-grainged transition system is fully defined  by its labelled transitions, it is useful to annotate the graph by some information about the relation between the denotation of each macrostate. By default, we use hypertlinks to relate each macrostate $v$ (including each microstate)
+ to the set of its immediate subparts $v'$. In such a hyperlink, $v$ is connected via a dotted arrow, whereas each immediate subpart is connected via a dashed arrow.
+
+ More options are available in expert mode, but they are not documented yet.
 
 \section{Contact map}
 
