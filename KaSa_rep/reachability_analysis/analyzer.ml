@@ -143,7 +143,7 @@ struct
                   || Remanent_parameters.get_trace parameter
                 then
                   let () =
-                    Loggers.fprintf log "\t\tthe predcondition is not satsified yet"
+                    Loggers.fprintf log "\t\tthe precondition is not satisfied yet"
                   in
                   let () = Loggers.print_newline log
                   in
@@ -156,7 +156,7 @@ struct
                   || Remanent_parameters.get_dump_reachability_analysis_iteration parameter
                   || Remanent_parameters.get_trace parameter
                 then
-                  let () = Loggers.fprintf log "\t\tthe predcondition is satisfied" in
+                  let () = Loggers.fprintf log "\t\tthe precondition is satisfied" in
                   let () = Loggers.print_newline log in
                   ()
               in

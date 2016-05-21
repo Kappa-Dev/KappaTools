@@ -563,116 +563,127 @@ struct
       in
       let error, site_correspondence =
         let rec aux list =
-	  match list with
-	  | [] -> warn parameter error (Some "line 68") Exit []
-	  | (h, list, _) :: _ when h = cv_id -> error, list
-	  | _ :: tail -> aux tail
+          match list with
+          | [] -> warn parameter error (Some "line 68") Exit []
+          | (h, list, _) :: _ when h = cv_id -> error, list
+          | _ :: tail -> aux tail
         in aux site_correspondence
       in
-    (*-----------------------------------------------------------------------*)
-    (*build a pair of coresspondence map:
+      (*-----------------------------------------------------------------------*)
+      (*build a pair of coresspondence map:
       - map1: global -> local; map2: local -> global*)
-    let error, (map1, map2) =
-      Bdu_static_views.new_index_pair_map parameter error site_correspondence
-    in
-    (*-----------------------------------------------------------------------*)
-    let () = Loggers.print_newline (Remanent_parameters.get_logger parameter)  in
-    (*-----------------------------------------------------------------------*)
-    let error, dynamic =
-      if local_trace
+      let error, (map1, map2) =
+        Bdu_static_views.new_index_pair_map parameter error site_correspondence
+      in
+      (*-----------------------------------------------------------------------
+       *)
+        (*  let () = Loggers.print_newline (Remanent_parameters.get_logger parameter)  in*)
+        (*-----------------------------------------------------------------------*)
+      let error, dynamic =
+        if local_trace
         || Remanent_parameters.get_trace parameter
-      then
-	let () =
-          Loggers.fprintf (Remanent_parameters.get_logger parameter)
-            "%sINTENSIONAL DESCRIPTION:" prefix
-        in
-	let () =
-	  Loggers.print_newline (Remanent_parameters.get_logger parameter)
-	in
-        (*print bdu different: this will print in a format of bdu*)
-	let () =
-          Ckappa_sig.Views_bdu.print
-            parameter bdu_diff
-        in
-        (*print a list of relations: this will print in a format readable*)
-	let () =
-          Loggers.fprintf (Remanent_parameters.get_logger parameter)
-            "%sEXTENSIONAL DESCRIPTION:" prefix
-        in
-	let () =
-	  Loggers.print_newline (Remanent_parameters.get_logger parameter)
-	in
-	error, dynamic
-      else
-	error, dynamic
-    in
-    (*this is a function to convert a bdu of diff into a list.
-      return a pair: (bdu, and a pair of (site, state) list of list)*)
-    let handler = get_mvbdu_handler dynamic in
-    let error, handler, list =
-      Ckappa_sig.Views_bdu.extensional_of_mvbdu
-        parameter handler error bdu_diff
-    in
-    let dynamic = set_mvbdu_handler handler dynamic in
-    (*-----------------------------------------------------------------------*)
-    (*print function for extentional description*)
-    let error =
-      List.fold_left
-	(fun error l ->
-	 let error, bool =
-	   List.fold_left
-	     (fun (error, bool) (site_type, state) ->
-               let error, site_type =
-                 match Ckappa_sig.Site_map_and_set.Map.find_option
-                   parameter error site_type map2
-                 with
-                 | error, None -> warn parameter error (Some "line 598") Exit
-                   (Ckappa_sig.site_name_of_int (-1))
-                 | error, Some i -> error, i
-               in
-               (*-----------------------------------------------------------------------*)
-	       let error, site_string =
-		 try
-                   Handler.string_of_site parameter error handler_kappa
-		     agent_type site_type
-		 with
-		   _ -> warn parameter error (Some "line 609")
-                     Exit (Ckappa_sig.string_of_site_name site_type)
-	       in
-	       let error, state_string =
-                 try
-		   Handler.string_of_state_fully_deciphered parameter error handler_kappa
-		     agent_type site_type state
-		 with
-		   _ -> warn parameter error (Some "line 595") Exit
-                     (Ckappa_sig.string_of_state_index state)
-               in
-               (*-----------------------------------------------------------------------*)
-               let () =
-		 if bool
-                 then Loggers.fprintf (Remanent_parameters.get_logger parameter) ","
-		 else Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                   "\t%s%s(" prefix agent_string
-               in
-	       let () = (*Print the information of views*)
-                 Loggers.fprintf (Remanent_parameters.get_logger parameter)
-		   "%s%s" site_string state_string
-               in
-               error, true
-             )
-	     (error, false) l
-	 in
+        then
+          let () =
+            Loggers.fprintf (Remanent_parameters.get_logger parameter)
+              "%sINTENSIONAL DESCRIPTION:" prefix
+          in
+          let () =
+            Loggers.print_newline (Remanent_parameters.get_logger parameter)
+          in
+          (*print bdu different: this will print in a format of bdu*)
+          let () =
+            Ckappa_sig.Views_bdu.print parameter bdu_diff
+          in
+          (*print a list of relations: this will print in a format readable*)
+          let () =
+            Loggers.fprintf (Remanent_parameters.get_logger parameter)
+              "%sEXTENSIONAL DESCRIPTION:" prefix
+          in
+          let () =
+            Loggers.print_newline (Remanent_parameters.get_logger parameter)
+          in
+          error, dynamic
+        else
+          error, dynamic
+      in
+      (*this is a function to convert a bdu of diff into a list.
+        return a pair: (bdu, and a pair of (site, state) list of list)*)
+      let handler = get_mvbdu_handler dynamic in
+      let error, handler, list =
+        Ckappa_sig.Views_bdu.extensional_of_mvbdu
+          parameter handler error bdu_diff
+      in
+      let dynamic = set_mvbdu_handler handler dynamic in
+      (*----------------------------------------------------------------------
+        -*)
+      (*print function for extentional description*)
+      let error =
+        List.fold_left
+          (fun error l ->
+             let error, bool =
+               List.fold_left
+                 (fun (error, bool) (site_type, state) ->
+                    let error, site_type =
+                      match Ckappa_sig.Site_map_and_set.Map.find_option
+                              parameter error site_type map2
+                      with
+                      | error, None -> warn parameter error (Some "line 598") Exit
+                                         (Ckappa_sig.site_name_of_int (-1))
+                      | error, Some i -> error, i
+                    in
+                    (*-----------------------------------------------------------------------*)
+                    let error, site_string =
+                      try
+                        Handler.string_of_site parameter error handler_kappa
+                          agent_type site_type
+                      with
+                      | _ -> warn parameter error (Some "line 609")
+                               Exit (Ckappa_sig.string_of_site_name site_type)
+                    in
+                    let error, state_string =
+                      try
+                        Handler.string_of_state_fully_deciphered parameter error
+                          handler_kappa agent_type site_type state
+                      with
+                      | _ -> warn parameter error (Some "line 595") Exit
+                               (Ckappa_sig.string_of_state_index state)
+                    in
+                    (*-----------------------------------------------------------------------*)
+                    let () =
+                      if bool
+                      then
+                        Loggers.fprintf (Remanent_parameters.get_logger parameter) ","
+                      else
+                        Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                          "\t\t\t%s%s(" prefix agent_string
+                    in
+                    let () = (*Print the information of views*)
+                      Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                        "%s%s" site_string state_string
+                    in
+                    error, true
+                 )
+                 (error, false) l
+             in
          (*-----------------------------------------------------------------------*)
-	 let () =
-	   if bool
-           then
-	     let () =
-	       Loggers.fprintf (Remanent_parameters.get_logger parameter) ")" in
-	     Loggers.print_newline (Remanent_parameters.get_logger parameter)
-	 in error)
-	error list
-    in error, dynamic
-  else error, dynamic
+             let () =
+               if bool
+               then
+                 let () =
+                   Loggers.fprintf (Remanent_parameters.get_logger parameter) ")" in
+                 Loggers.print_newline (Remanent_parameters.get_logger parameter)
+             in error)
+          error list
+      in
+      let () =
+        if list = []
+        then ()
+        else
+          Loggers.print_newline (Remanent_parameters.get_logger parameter)
+      in
+      error, dynamic
+    else
+      error, dynamic
 
   (**************************************************************************)
 
