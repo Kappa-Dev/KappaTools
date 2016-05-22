@@ -194,7 +194,7 @@ on_linux_for_windows:
 	$(MAKE) OCAMLFIND_CONF=/etc/x86_64-w64-mingw32-ocamlfind.conf KaSim.native KaSa.native KaStor.native
 	mv _build/main/KaSim.native KaSim.exe
 	mv _build/KaSa_rep/main/KaSa.native KaSa.exe
-	mv _build/KaSa_rep/main/KaStor.native KaStor.exe
+	mv _build/cflow/KaStor.native KaStor.exe
 
 full:
 	$(MAKE) clean
