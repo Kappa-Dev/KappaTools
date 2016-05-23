@@ -83,6 +83,7 @@ Or more succinctly as::
 %agent: P1(P2, P3, S12~u~p~m)
 
 .. note::
+
 Do note however that single letter codes quickly become opaque: if
 ``U`` is for unmodified, what's for ubiquitinated? If ``P`` is for
 phosphorylated, what's for palmitoylated? If ``M`` is for mutated,
@@ -118,7 +119,7 @@ A reversible rule's syntax is::
 
 '[rule name]' [left-hand side] <-> [right-hand side] @ [forward rates], [reverse rates]
 
-An irreversible rule's syntas is quite similar::
+An irreversible rule's syntax is quite similar::
 
 '[rule name]' [left-hand side] -> [right-hand side] @ [forward rates]
 
@@ -133,10 +134,11 @@ that with what we wrote in the RHS. In a more formal speech, left go
 the sufficient conditions to trigger a rule, and right goes the
 pattern injected by said rule's application. The pace at which a rule
 is triggered, what would be the rule's activity, is governed by
-mass action dynamics. In other words, the probability of rule ``i`` being
+mass action dynamics. In other words, the probability of rule $i$ being
 triggered is given by
 
 .. math::
+
 P_i \eq \frac{A_i}{\sum_{j} A_j }
 
 Where $A_i$ is the LHS of rule $i$ multiplied by the respective forward
@@ -146,7 +148,8 @@ corresponding reverse rate).
 Rule Rates
 ----------
 A rule can technically have up to 4 rates::
-'[rule name]' [LHS] <-> [RHS] @ [bimolecular forward rate](unimolecular forward rare), [bimolecular reverse rate] (unimolecular reverse rate)
+
+'[name]' [LHS] <-> [RHS] @ [bimolecular forward rate](unimolecular forward rare), [bimolecular reverse rate] (unimolecular reverse rate)
 
 In practice 3 is the most seen for reversible binding rules, 2 for irreversible binding
 rules, 1 for irreversible unbinding rules. The rates are used when:
@@ -176,15 +179,15 @@ Ambiguous Molecularity
 
 We want to express the reversible binding relation between ``Prot1`` and
 ``Prot2``, who bind through their respective ``P2`` and ``P1`` sites. For the
-rates, a determinstic binding rate is on the order of ``1.0e8``, an
-unbinding rate around ``1.0e-2`` (this would mean a disassociation
-constant $K_D$ of 1.0e-10 molar, or 100 picomolar). When
+rates, a determinstic binding rate is on the order of $10^8$, an
+unbinding rate around $10^2 (this would mean a disassociation
+constant $K_D$ of $10^{-10}$ molar, or 100 picomolar). When
 accounting for volume, let's use a mammalian volume of
-1.0e-12 liters, the binding rate becomes ``1.0e-4``; the unbinding
+$10^{-12}$ liters, the binding rate becomes $10^{-4}$; the unbinding
 rate shouldn't care about volume dependency, so the deterministic rate is the same
 as the stochastic one. Thus we arrive at our stochastic rates, a
-forward (i.e. bind) rate of ``1.0e-4`` and a reverse (i.e. unbind) rate of
-``1.0e-2``. Let's call such a rule 'P1.P2', it would be written as::
+forward (i.e. bind) rate of $10^{-4} and a reverse (i.e. unbind) rate of
+$10^{-2}$. Let's call such a rule ``'P1.P2'``, it would be written as::
 
 'P1.P2' Prot1(P2), Prot2(P1) <-> Prot1(P2!1), Prot2(P1!1) @ 1.0e-4,1.0e-2
 
@@ -196,7 +199,8 @@ going and add the other two binding rules, one for ``Prot1`` binding
 'P1.P3' Prot1(P3), Prot3(P1) <-> Prot1(P3!1), Prot3(P1!1) @ 1.0e-4, 1.0e-2
 'P2.P3' Prot2(P3), Prot3(P2) <-> Prot2(P3!1), Prot3(P2!1) @ 1.0e-4, 1.0e-2
 
-..note::
+.. note::
+
 It is worth noting that the agents must be in the same order on both
 sides of the arrow signs. If not, they can be taken as spontaneous
 degradation and production of those agents.
