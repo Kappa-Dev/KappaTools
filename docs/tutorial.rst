@@ -9,57 +9,59 @@ Kappa-based models:
 * Command-line binaries & script files
 * Browser-based proto-IDE_
 
-Serious use of the tools require to install them. Procedure to achieve
-that is detailled in second part. Let's begin by the creation of a
-model and some analysis of it. the proto-IDE_ is enouth for that
-prupose and first playing with your own script.
+Power users will probably want to compile from source code. The procedure to achieve
+that will be detailled in a second part elsewhere. 
+
+As this is a tutorial, we'll write a simple Kappa model and do some basic analysis of it.
+The proto-IDE_ will suffice for these purposes, so go ahead an open it in your browser of choice.
 
 ****************
 The Kappa Script
 ****************
 Kappa script files customarily have the ``.ka`` file extension, e.g.:
 ``foo.ka``. Each line of code is treated independently, so the order of
-the instructions doesn't matter (except for variables, who must be
+instructions doesn't matter (except for variables, who must be
 declared prior to being used). While KaSim will not complain about
 the structure of the code, your advisor might: understandable scripts
 do have a structure. Moreover, they have comments and explanations. In
 Kappa, there are 2 kinds of comments:
 
-:line comments: start with the pound symbol ``#`` and ènd with the end
+:line comments: start with the pound symbol ``#`` and end with the end
   of the line
-:block comments: start by ``/*`` and end by ``*/``
+:block comments: start by ``/*`` and end by ``*/``, and can span multiple lines
 
 You can split your model into different files, and tell the simulator
 to read them in order. You can also put everything on the same
-file. This last one is the usage will be following here.
+file. This last usage is the one will be following here.
 
 Roughly speaking, a Kappa script has the following sections:
 
+:Agent Signatures: These define the agents and tokens in our
+                   model. An agent (e.g. a protein) has sites it uses
+                   to bind and/or to signal it's state (e.g. site ``Y3``
+                   in state ``phosphorylated``).
 :Variables: These are symbols that represent a value used during the
             simulation, e.g. the binding rates, the volume, some
             complicated algebraic expression.
-:Agent Signatures: Here we define the agents and tokens in our
-                   model. An agent (e.g. a protein) has sites it uses
-                   to bind and/or to signal it's state (e.g. site Y3
-                   in state phosphorylated).
-:Rules: These are the interactions between agents. There are four
-        operations in Kappa, change site's bond state (i.e. bind or
+:Rules: These are the interactions between agents. Due to the nature of the rules, there are effectively 4
+        operations in Kappa: change site's bond state (i.e. bind or
         unbind), change site's state (e.g. phosphorylate it, methylate
-        it, ubiquitinate it), degrade an agent or set of agents,
+        it, ubiquitinate it), degrade an agent or set of agents, and
         create an agent or set of agents. These operations can be
-        combined into a single rule, or split into multiple, depending
-        on the behavior one wants to simulate.
+        combined into a single rule, or split into multiple rules, depending
+        on the behavior we want to simulate.
 :Observables: These define the entities for which the simulator will
               output time-course abundances. If we define no
               observables, the simulator will not ouput any abundance.
 :Perturbations: These modify the simulation, e.g. we add X amount of
-                an agent, change the rate of a rule, or flip the state
-                of all sites to some other state.
+                an agent, alter the rate of a rule, change the state
+                of all ``Y17`` sites of agent ``Smith()`` to some state ``gone``.
 
 Agent signature
 ===============
-Files customarily begin with the agent signatures, i.e. how we define
-the interaction sites of a specified agent. The syntax is::
+Files customarily begin with the agent signatures, i.e. how we define our agents and their sites of interaction.
+To define an agent, we use the ``%agent:`` keyword, followed by the agent's name, and the agent's sites (between parenthesis).
+The syntax is::
 
 %agent: [agent name]([agent's sites])
 
@@ -75,6 +77,7 @@ Or more succinctly as::
 
 %agent: P1(P2, P3, S12~u~p~m)
 
+.. note::
 Do note however that single letter codes quickly become opaque: if
 ``U`` is for unmodified, what's for ubiquitinated? If ``P`` is for
 phosphorylated, what's for palmitoylated? If ``M`` is for mutated,
@@ -82,15 +85,17 @@ what's for methylated, di-methylated, or tri-methylated? Moreover, the
 English alphabet contains 26 letters, but biochemistry knows of at
 least 27 post-translational modifications. I therefore recommend using
 at least two letters for state (e.g. ``ub``, ``ph``, ``py``, ``1m``,
-``2m``, ``3m``, ``xx``).  Let's stick with::
+``2m``, ``3m``, ``xx``).
+
+Let's stick with::
 
 %agent: Prot1(P2, P3,S12~un~ph~xx)
 
 In fact, let's define two more agents similar to
-``Prot1``. ``Prot2``'s sites are called ``P1`` and ``P3``, while
-``Prot3``'s are ``P1`` and ``P2``. And while we're at it, add a text
+``Prot1``, which we'll call ``Prot2`` and ``Prot3``. The sites of ``Prot2`` will be called ``P1`` and ``P3``, while
+``Prot3``'s are ``P1`` and ``P2``. And while we're at it, let's add a text
 pod in our script to mark where we're at. So far in our script, we
-would have::
+should have::
 
   ############################################################
   # Here are my agent signatures
@@ -104,45 +109,57 @@ Now, it's time to write how these guys play together.
 Rules
 =====
 Here we will write the rules that dictate how can our agents interact.
-A rule's syntax is::
+A reversible rule's syntax is::
 
-'[rule name]' [left-hand side] [arrow] [right-hand side] @ [bimolecular forward rate] ([unimolecular forward rate]), [bimolecular reverse rate] ([unimolecular reverse rate])
+'[rule name]' [left-hand side] <-> [right-hand side] @ [forward rates], [reverse rates]
 
-Where the left-hand side (LHS) is the pattern of reactants, the
+An irreversible rule's syntas is quite similar::
+
+'[rule name]' [left-hand side] -> [right-hand side] @ [forward rates]
+
+Tthe left-hand side (LHS) is the pattern of reactants, the
 right-hand side (RHS) is the pattern of products, and the arrow marks
 if it is a reversible (i.e. ``<->``) or irreversible (``->``)
-reaction. In terms of the guts of the simulator, what is doing is
+reaction.
+
+In terms of the guts of the simulator, what is doing is
 matching the LHS to whatever is in the reaction mixture, and replacing
 that with what we wrote in the RHS. In a more formal speech, left go
 the sufficient conditions to trigger a rule, and right goes the
 pattern injected by said rule's application. The pace at which a rule
-is triggered is, what would be the rule's activity, is governed by
-mass action dynamics. In other words, the probability of rule i being
-triggered is given by P(i) = A\ :sub:`i` / Sum(j,A\ :sub:`j`\ ), where
-A\ :sub:`i` is the LHS of rule i multiplied by the respective forward
-rate of rule i (for reverse reactions, it would be the LHS times the
+is triggered, what would be the rule's activity, is governed by
+mass action dynamics. In other words, the probability of rule ``i`` being
+triggered is given by
+
+.. math::
+P_i \eq \frac{A_i}{\sum_{j} A_j }
+
+Where $A_i$ is the LHS of rule $i$ multiplied by the respective forward
+rate of rule $i$ (for reverse reactions, it would be the RHS times the
 corresponding reverse rate).
 
 Rule Rates
 ----------
-A rule can technically have up to 4 rates, though in practice 3 is the
-most seen for reversible binding rules, or 2 for irreversible binding
+A rule can technically have up to 4 rates::
+'[rule name]' [LHS] <-> [RHS] @ [bimolecular forward rate](unimolecular forward rare), [bimolecular reverse rate] (unimolecular reverse rate)
+
+In practice 3 is the most seen for reversible binding rules, 2 for irreversible binding
 rules, 1 for irreversible unbinding rules. The rates are used when:
 
 :bimolecular forward rate: if the LHS has ambiguous molecularity, this
                            is the rate for bimolecular cases. Think of
                            it as the diffusion of two independent
-                           things.
+                           entities.
 :unimolecular forward rate: if the LHS has ambiguous molecularity,
                             this is the rate for unimolecular
                             cases. Think of it as the interaction of
-                            things already bound, possibly through a
+                            agents already bound, possibly through a
                             third party.
 :bimolecular reverse rate: if the RHS has ambiguous molecularity, the
-                           rule is reversible, this sis the rate for
+                           rule is reversible, this is the rate for
                            bimolecular cases.
 :unimolecular reverse rate: if the RHS has ambiguous molecularity, the
-                            rule is reversible, this sis the rate for
+                            rule is reversible, this is the rate for
                             unimolecular cases.
 
 What do we mean by ambiguous molecularity? It means we specify two
@@ -156,25 +173,28 @@ We want to express the reversible binding relation between ``Prot1`` and
 ``Prot2``, who bind through their respective ``P2`` and ``P1`` sites. For the
 rates, a determinstic binding rate is on the order of ``1.0e8``, an
 unbinding rate around ``1.0e-2`` (this would mean a disassociation
-constant KD of around 1.0e-10 molar, or around 100 picomolar). When
-accounting for volume, let's use a mammalian erythrocyte's volume of
-1.0e-12 liters, the binding rate becomes ``1.0e-4`` (notice the unbinding
-rate doesn't care about volume, so the deterministic rule is the same
-as the stochastic one). Thus we arrive at our stochastic rates, a
+constant $K_D$ of 1.0e-10 molar, or 100 picomolar). When
+accounting for volume, let's use a mammalian volume of
+1.0e-12 liters, the binding rate becomes ``1.0e-4``; the unbinding
+rate shouldn't care about volume dependency, so the deterministic rate is the same
+as the stochastic one. Thus we arrive at our stochastic rates, a
 forward (i.e. bind) rate of ``1.0e-4`` and a reverse (i.e. unbind) rate of
 ``1.0e-2``. Let's call such a rule 'P1.P2', it would be written as::
 
 'P1.P2' Prot1(P2), Prot2(P1) <-> Prot1(P2!1), Prot2(P1!1) @ 1.0e-4,1.0e-2
 
-The usage of ``!n``, where ``n`` is a number, identifies the binding
+The usage of ``!n``, where ``n`` is an integer, identifies the binding
 endpoints; we could have just as validly used ``!99`` or ``!0``. Let's keep
 going and add the other two binding rules, one for ``Prot1`` binding
-``Prot3``, and one for ``Prot2`` binding ``Prot3``.
-
-::
+``Prot3``, and one for ``Prot2`` binding ``Prot3``::
 
 'P1.P3' Prot1(P3), Prot3(P1) <-> Prot1(P3!1), Prot3(P1!1) @ 1.0e-4, 1.0e-2
 'P2.P3' Prot2(P3), Prot3(P2) <-> Prot2(P3!1), Prot3(P2!1) @ 1.0e-4, 1.0e-2
+
+..note::
+It is worth noting that the agents must be in the same order on both
+sides of the arrow signs. If not, they can be taken as spontaneous
+degradation and production of those agents.
 
 Having these three rules, we can render the contact map, which would
 look something like this:
@@ -185,29 +205,34 @@ Notice there are no unimolecular rates in the above writing of the
 rules. This means that the simulator will always use the bimolecular
 rate to bind those agents. Consider however what would happen if we
 apply a binding rule to agents already bound through a third party!
-For example, if we have ``Prot1`` bound to ``Prot2`` itself bound to
+
+For example, if we have ``Prot1`` bound to ``Prot2`` itself bound to a
 ``Prot3``, and we apply the binding rule of that ``Prot1`` to that
 ``Prot3``, the simulator would use the only rate we gave it, even
-though diffusion would play no role in things already bound. This
+though diffusion would play no role in things already bound together. This
 would invalidate our physical interpretation of the model. Thus we
-would refine the rules by adding a unimolecular forward (i.e. binding)
+should refine the rules by adding a unimolecular forward (i.e. binding)
 rate that's much higher than the bimolecular one::
 
 'P1.P2' Prot1(P2), Prot2(P1) <-> Prot1(P2!1), Prot2(P1!1) @ 1.0e-4 (1.0), 1.0e-2
 'P1.P3' Prot1(P3), Prot3(P1) <-> Prot1(P3!1), Prot3(P1!1) @ 1.0e-4 (1.0), 1.0e-2
 'P2.P3' Prot2(P3), Prot3(P2) <-> Prot2(P3!1), Prot3(P2!1) @ 1.0e-4 (1.0), 1.0e-2
 
-Notice that the RHS of our rules has to be unimolecular: we have the
+.. note::
+You can consider the unimolecular rate as being similar in spirit to the bimolecular rate,
+but representing diffusion in a _much_ smaller volume.
+
+Notice that the RHS of our rules have to be unimolecular: we have the
 ``!1`` bond right there. The simulator is smart enough to recognize
 this and will use ``1.0e-2`` as the sole unbinding rate; there is no
 point in giving a bimolecular reverse rate as the RHS can not be
-bimolecular. For this reason, it is rare binding rules have more than
-3 rates, a bimolecular binding, a unimolecular binding, and a single
+bimolecular. For this reason, it is rare binding rules to have more than
+3 rates: a bimolecular binding, a unimolecular binding, and the
 unbinding rate.
 
 Let's add another rule. Now we want to add the production of ``Prot1``.
-Since we don't really care about gene regulation,
-transcription, mRNA regulation, translation, protein folding, protein
+Since for this model we don't care about gene regulation,
+transcription, mRNA regulation, translation, protein folding, maturation, or
 transport, but just want to have a steady production of the protein,
 we can write a simple zeroth-order rule. In this case, said rule could
 be written as::
@@ -220,7 +245,7 @@ Or more succinctly::
 
 This rule would add one copy of ``Prot1()``, fully unbound, and with sites
 in their default state, at around 1 per simulated second. At time 10,
-we would have 10 more copies of ``Prot1``, at time 100, we would have 100
+we would have around 10 more copies of ``Prot1``, at time 100, we would have around 100
 more copies. So far, our script should look something like this::
 
   ############################################################
@@ -238,18 +263,17 @@ more copies. So far, our script should look something like this::
   'P2.P3' Prot2(P3), Prot3(P2) <-> Prot2(P3!1), Prot3(P2!1) @ 1.0e-4 (1.0), 1.0e-2
   'P1/' -> Prot1() @ 1.0
 
-It is worth noting that the agents must be in the same order on both
-sides of the arrow signs. If not, they can be taken as spontaneous
-degradation and production.
+Now that we have defined our agents and how the interact, we must define
+initial conditions.
 
 Initial Conditions
 ------------------
-So by now we have the rules defined. It is time to move on to the
-initial conditions. The syntax is quite simple, you specify with the
-``%init initial conditions/concentrations`` of the reacting mixture. The
-number specifies the amount of molecules. Let's say we want to start
-the simulation with five hundred copies of ``Prot2`` and ``Prot3``. We
-could write this as::
+The syntax for initial conditions is quite simple::
+
+``%init [number or variable] [kappa expression]``
+
+Let's say we want to start the simulation with five hundred
+copies of ``Prot2`` and ``Prot3``. We could write this as::
 
  %init: 500 Prot2(), Prot3()
 
@@ -291,15 +315,17 @@ Observables
 This is one of the most important parts of the script as this dictate
 the program's plotting output. If we specify the rules and initial
 mixture perfectly, but forget to observe for something, then we will
-see nothing. The syntax is quite simple, we begin with %obs:, then
-assign a name to that tracking event with 'name', and finally the code
-of what exactly is the program tracking. For example::
+see nothing.
 
-%obs: 'Amount of Protein 1' Prot1()
+The syntax is quite simple, we begin with ``%obs:``, then
+assign a name to that tracking event with ``'name'``, and finally the code
+of what exactly is the program tracking flanked by pipe symbols ``|``. For example::
+
+%obs: 'Amount of Protein 1' |Prot1()|
 
 Or more succinctly::
 
-%obs: '[P1]' Prot1()
+%obs: '[P1]' |Prot1()|
 
 This would report the total amount of agent ``Prot1`` under label ``'[P1]'``,
 in whatever state it is, bound, unbound, modified, etc.
@@ -312,9 +338,9 @@ dimers of the system.
 
 ::
 
-%obs: '[P1.P2]' Prot1(P2!1,P3), Prot2(P1!1,P3)
-%obs: '[P1.P3]' Prot1(P2,P3!1), Prot3(P1!1,P2)
-%obs: '[P2.P3]' Prot2(P1,P3!1), Prot3(P1,P2!1)
+%obs: '[P1.P2]' |Prot1(P2!1,P3), Prot2(P1!1,P3)|
+%obs: '[P1.P3]' |Prot1(P2,P3!1), Prot3(P1!1,P2)|
+%obs: '[P2.P3]' |Prot2(P1,P3!1), Prot3(P1,P2!1)|
 
 From the contact map, we see this the system has the capacity to
 generate a cycle. Let's add another observable to check how many of
@@ -352,11 +378,11 @@ So far, our script should look something like this::
   ############################################################
   # Here are my observables
   ############################################################
-  %obs: '[P1]' Prot1()
-  %obs: '[P1.P2]' Prot1(P2!1,P3), Prot2(P1!1,P3)
-  %obs: '[P1.P3]' Prot1(P2,P3!1), Prot3(P1!1,P2)
-  %obs: '[P2.P3]' Prot2(P1,P3!1), Prot3(P1,P2!1)
-  %obs: '[P1.P2.P3]' Prot1(P2!1,P3!3), Prot2(P1!1,P3!2), Prot3(P1!3,P2!2)
+  %obs: '[P1]' |Prot1()|
+  %obs: '[P1.P2]' |Prot1(P2!1,P3), Prot2(P1!1,P3)|
+  %obs: '[P1.P3]' |Prot1(P2,P3!1), Prot3(P1!1,P2)|
+  %obs: '[P2.P3]' |Prot2(P1,P3!1), Prot3(P1,P2!1)|
+  %obs: '[P1.P2.P3]' |Prot1(P2!1,P3!3), Prot2(P1!1,P3!2), Prot3(P1!3,P2!2)|
 
 Execution
 ---------
