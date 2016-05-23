@@ -1,0 +1,145 @@
+
+                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" title="contact map" height="419.08333333333337" width="344.66666666666663" class="svg-group"><g transform="translate(58.75,39.166666666666664)"><defs><style type="text/css"><![CDATA[
+html { position: relative;
+       min-height: 100%; }
+
+body { margin-bottom: 60px; }
+
+
+span.filler:empty:before {
+   content: "\00a0";
+}
+
+.plot-axis path,
+.plot-axis line { fill: none;
+                  stroke: #000;
+                  shape-rendering: crispEdges; }
+.plot-line { fill: none;
+             stroke: steelblue;
+             stroke-width: 1.5px; }
+.plot-legend { font-size: 10px; }
+
+rect { stroke-width: 2; }
+
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    /* Set the fixed height of the footer here */
+    height: 60px;
+    background-color: #f5f5f5;
+}
+
+.display-header {
+    padding: 20px;
+}
+
+.numberCircle {
+    display:inline-block;
+
+    border-radius:50%;
+    border:2px solid;
+
+    font-size:32px;
+}
+
+.numberCircle:before,
+.numberCircle:after {
+    content:'\200B';
+    display:inline-block;
+    line-height:0px;
+
+    padding-top:50%;
+    padding-bottom:50%;
+}
+
+.numberCircle:before {
+    padding-left:8px;
+}
+.numberCircle:after {
+    padding-right:8px;
+}
+
+#file-selector {
+    display:none;
+}
+.panel-content {
+    min-height: 50% !important;
+}
+.panel-pre {
+    white-space : pre;
+}
+.panel-footer-white {
+    background:white;
+}
+.filename {
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    background: rgb(245, 245, 245);
+    border : 0px;
+    cursor : default;
+}
+.error-footer {
+    color: rgb(169, 68, 66);
+    background-color: rgb(242, 222, 222);
+}
+
+.node-rect { fill: #ccc;
+             stroke-width:2;
+             stroke: #000;
+             fill-opacity:0.5;
+             stroke-width : 2;
+}
+.node-text { font: 10px sans-serif; }
+.node-proof {
+              opacity : 0.0;
+}
+.site-rect {  fill: #ccc;
+              stroke-width:1;
+              stroke: #000;
+}
+.site-text {
+}
+
+.node-proof { opacity : 0.0;
+            }
+
+.link-proof { fill: red;
+              opacity : 0.0; }
+
+.site-proof { fill: blue;
+              opacity : 0.0; }
+.link-line { stroke : black;
+             stroke-width : 2;
+}
+
+
+.contact_map_content {
+    min-height: 50%;
+}
+
+.snapshot_control {
+    margin-top: 10px;
+}
+
+.checkbox-control {
+    vertical-align: bottom;
+    margin: 1px !important;
+}
+
+.CodeMirror {
+    border: 1px solid #eee;
+    min-height: 40px;
+    height: calc(100% - 100px);
+    height: -webkit-calc(100% - 100px);
+    height: -moz-calc(100% - 100px);0
+}
+   ]]></style></defs><path d="M78.89999961853027,48.583328247070305L163.60000038146973,123.08332824707031" class="link-line"></path><path d="M19.75,48.583328247070305L22.75,282.08331298828125" class="link-line"></path><path d="M163.60000038146973,123.08332824707031L78.89999961853027,48.583328247070305" class="link-line"></path><path d="M163.60000038146973,206.5833282470703L81.9166669845581,282.08331298828125" class="link-line"></path><path d="M22.75,282.08331298828125L19.75,48.583328247070305" class="link-line"></path><path d="M81.9166669845581,282.08331298828125L163.60000038146973,206.5833282470703" class="link-line"></path><g transform="translate(19.75,6.8333282470703125)" class="node-group"><text y="0" x="0" style="text-anchor: middle;" class="node-text">Prot1</text><rect height="83.49999999999999" width="118.29999923706055" y="-41.74999999999999" x="-59.14999961853027" class="node-rect" ry="5" rx="5"></rect><circle r="2" cx="0" cy="0" class="node-proof"></circle><g transform="translate(44.71666622161865,29.83333333333333)" class="site-group"><rect height="23.833333333333332" width="28.866666793823242" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="11.916666666666666" x="14.433333396911621" style="text-anchor: middle;" class="site-text">P2</text></g><g transform="translate(-14.433333396911621,29.83333333333333)" class="site-group"><rect height="23.833333333333332" width="28.866666793823242" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="11.916666666666666" x="14.433333396911621" style="text-anchor: middle;" class="site-text">P3</text></g><g transform="translate(-77.47499942779541,29.83333333333333)" class="site-group"><rect height="23.833333333333332" width="36.64999961853027" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="11.916666666666666" x="18.324999809265137" style="text-anchor: middle;" class="site-text">S12</text></g></g><g transform="translate(222.75,164.8333282470703)" class="node-group"><text y="0" x="0" style="text-anchor: middle;" class="node-text">Prot2</text><rect height="83.49999999999999" width="118.29999923706055" y="-41.74999999999999" x="-59.14999961853027" class="node-rect" ry="5" rx="5"></rect><circle r="2" cx="0" cy="0" class="node-proof"></circle><g transform="translate(-73.5833330154419,-53.66666666666666)" class="site-group"><rect height="23.833333333333332" width="28.866666793823242" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="11.916666666666666" x="14.433333396911621" style="text-anchor: middle;" class="site-text">P1</text></g><g transform="translate(-73.5833330154419,29.83333333333333)" class="site-group"><rect height="23.833333333333332" width="28.866666793823242" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="11.916666666666666" x="14.433333396911621" style="text-anchor: middle;" class="site-text">P3</text></g><g transform="translate(-18.324999809265137,29.83333333333333)" class="site-group"><rect height="23.833333333333332" width="36.64999961853027" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="11.916666666666666" x="18.324999809265137" style="text-anchor: middle;" class="site-text">S12</text></g></g><g transform="translate(22.75,323.83331298828125)" class="node-group"><text y="0" x="0" style="text-anchor: middle;" class="node-text">Prot3</text><rect height="83.49999999999999" width="118.33333396911621" y="-41.74999999999999" x="-59.166666984558105" class="node-rect" ry="5" rx="5"></rect><circle r="2" cx="0" cy="0" class="node-proof"></circle><g transform="translate(-14.433333396911621,-53.66666666666666)" class="site-group"><rect height="23.833333333333332" width="28.866666793823242" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="11.916666666666666" x="14.433333396911621" style="text-anchor: middle;" class="site-text">P1</text></g><g transform="translate(44.733333587646484,-53.66666666666666)" class="site-group"><rect height="23.833333333333332" width="28.866666793823242" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="11.916666666666666" x="14.433333396911621" style="text-anchor: middle;" class="site-text">P2</text></g><g transform="translate(-77.49166679382324,29.83333333333333)" class="site-group"><rect height="23.833333333333332" width="36.64999961853027" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="11.916666666666666" x="18.324999809265137" style="text-anchor: middle;" class="site-text">S12</text></g></g><circle r="2" cx="78.89999961853027" cy="48.583328247070305" class="link-proof"></circle><circle r="2" cx="19.75" cy="48.583328247070305" class="link-proof"></circle><circle r="2" cx="-39.39999961853027" cy="48.583328247070305" class="link-proof"></circle><circle r="2" cx="163.60000038146973" cy="123.08332824707031" class="link-proof"></circle><circle r="2" cx="163.60000038146973" cy="206.5833282470703" class="link-proof"></circle><circle r="2" cx="222.75" cy="206.5833282470703" class="link-proof"></circle><circle r="2" cx="22.75" cy="282.08331298828125" class="link-proof"></circle><circle r="2" cx="81.9166669845581" cy="282.08331298828125" class="link-proof"></circle><circle r="2" cx="-36.416666984558105" cy="365.58331298828125" class="link-proof"></circle></g></svg>
