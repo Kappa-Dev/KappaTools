@@ -224,7 +224,7 @@ rate that's much higher than the bimolecular one::
 
 .. note::
 You can consider the unimolecular rate as being similar in spirit to the bimolecular rate,
-but representing diffusion in a _much_ smaller volume.
+but representing diffusion in a much smaller volume.
 
 Notice that the RHS of our rules have to be unimolecular: we have the
 ``!1`` bond right there. The simulator is smart enough to recognize
@@ -274,7 +274,7 @@ Initial Conditions
 ------------------
 The syntax for initial conditions is quite simple::
 
-``%init [number or variable] [kappa expression]``
+%init [number or variable] [kappa expression]
 
 Let's say we want to start the simulation with five hundred
 copies of ``Prot2`` and ``Prot3``. We could write this as::
@@ -390,9 +390,10 @@ So far, our script should look something like this::
 
 Execution
 ---------
-Now `let's execute the simulation!`_ If you're running the
+Now `let's execute the simulation!`_ If you're using the proto-IDE_ specify
+a simulated time of 5000 seconds and 150 points to plot. If you're running the
 command-line executable, save your file (e.g. "MyFile.ka") and invoke
-KaSim? with input-file "MyFile.ka", to simulate 5000 seconds, and
+KaSim with input-file "MyFile.ka", to simulate 5000 seconds, and
 output 150 plot points to a file called "MyOutput.out", i.e.::
 
 $KaSim -i MyFile.ka -t 5000 -p 150 -o MyOutput.svg
@@ -403,16 +404,16 @@ This should generate a plot like this:
 
 Notice that, as expected, the amount of P1 steadily increases. Notice
 also that the amount of trimer increases up to a point, and then
-decreases. In other words, in early times, the amount of Prot1 was
+decreases. In other words, in early times, the amount of ``Prot1`` was
 limiting the assembly of the trimer: there was not enough to go
 around. However, at late times, there was too much. Notice the amount
-of the dimers that contain ``Prot1``, i.e. P1.P2 and P1.P3, steadily
+of the dimers that contain ``Prot1``, i.e. ``P1.P2`` and ``P1.P3``, steadily
 increase. Thus, although ``Prot2`` and ``Prot3`` are still binding
-independently ``Prot1``, the likelihood that they bind the same Prot1
-decreases as it accumulates. This inhibitory phenomenon is called a
+independently ``Prot1``, the likelihood that they bind the same ``Prot1``
+decreases as ``Prot1`` accumulates. This inhibitory phenomenon is called a
 prozone, and is very well known in immunology as the Hook effect. It
-is a product of the concurrency between the binding of ``Prot2`` and
-``Prot3`` for ``Prot1``.
+is a product of the concurrency between the binding for ``Prot1`` of ``Prot2`` vs.
+``Prot3`` .
 
 `Let's keep playing!`_ Now let's think of what would happen if we set the
 unimolecular binding rates to zero. That is, we disallow entities that
@@ -422,7 +423,8 @@ like this:
 
 .. image:: img/Trajectories_all_zeroed.svg
 
-The amount of trimer cycle is now zero, as we expected. However, the
+The amount of trimer cycle is now zero, as we expected. Things that are bound, can not bind further.
+However, the
 system is not dominated by the dimers we defined. There are a thousand
 copies of Prot2 and Prot3, but the amount of dimers does not add up to
 this. What is happening? We can take a look at the reaction mixture by
@@ -431,9 +433,8 @@ using perturbations.
 Perturbations and Modifications
 -------------------------------
 
-
 Let's start by checking the state of the reaction mixture, in what is
-called a snapshot. We can tell KaSim? to produce a snapshot at any
+called a ``snapshot``. We can tell KaSim to produce a snapshot at any
 given time with::
 
 %mod: [T]>4500 do $SNAPSHOT
@@ -445,20 +446,25 @@ TODO .. image:: img/Snapshot.svg
 
 As we can see, the system has produced polymers! Instead of having
 dimers, we have much bigger oligomers. How did this happen? Well, when
-we made the rules, we did only mentioned some sites. For example, the
-binding of Prot1 and Prot2 only mentions their P2 and P1 sites. Thus
-event is independent of whatever else may be happening to the other
-sites, those that go unmentioned. This illustrates Kappa's don't care,
-don't write philosophy. We only write the sites that we care about,
+we made the rules, we only mentioned some sites. For example, the
+binding of ``Prot1`` and ``Prot2`` only mentions their ``P2`` and ``P1`` sites; it says nothing about their respective ``P3`` sites. Thus, this event is independent of whatever is the state of those ``P3`` sites. If there are two dimers, say ``P1.P3`` and ``P2.P3``, those ``P1`` and ``P2`` can bind to generate the ``P3.P1.P2.P3`` tetramer, and so on.
+
+In Kappa, we only write the sites that we care about,
 and by omitting everything we don't care about, claim independence of
 it. Our three dimerization events are therefore all independent, so
 there are no geometric constraints.
 
+This illustrates a consequence of Kappa's don't care,
+don't write philosophy. If the mechanism we are trying to express 
+states only that those bonds depend on those sites, the system does
+indeed have the capacity to oligomerize, even if the modeler did
+not write that in.
+
 If we wanted a system with geometric constrains, that means the sites
-would be constrained. To make a 3 agent system where the biggest
-entity is the trimer, one would have to write the collision events of
-the respective obligate monomers, in addition to the collision events
-of monomers with dimers. In effect, one ends up writting molecular
+would be constrained to each other's bond-state. To make a 3 agent system where the biggest
+entity is the trimer, one would have to write the 3 possible collision events of
+the respective obligate monomers, in addition to the 3 collision events
+of the monomers with the compatible dimers. In effect, one ends up writting molecular
 species (i.e. where every site is declared) instead of patterns
 (i.e. where some things are omitted for independence), to include the
 geometric constrains.
