@@ -1,6 +1,6 @@
-########################
-The Kappa Tutorial, v0.2
-########################
+################################
+The Kappa Tutorial, v\ |version|
+################################
 Kappa is a language to write computational models; it is intended for
 biochemical signaling cascades, but not constrained to that
 use-case. Currently, there are two main platforms to develop and run
@@ -110,18 +110,18 @@ A rule's syntax is::
 
 Where the left-hand side (LHS) is the pattern of reactants, the
 right-hand side (RHS) is the pattern of products, and the arrow marks
-if it is a reversible (i.e. ``<->``) or irreversible
-(``->``)reaction. In terms of the guts of the simulator, what is doing
-is matching the LHS to whatever is in the reaction mixture, and
-replacing that with what we wrote in the RHS. In a more formal speech,
-left go the sufficient conditions to trigger a rule, and right goes
-the pattern injected by said rule's application. The pace at which a
-rule is triggered is, what would be the rule's activity, is governed
-by mass action dynamics. In other words, the probability of rule i
-being triggered is given by P(i) = Ai / Sum(j,Aj), where Ai is the LHS
-of rule i multiplied by the respective forward rate of rule i (for
-reverse reactions, it would be the LHS times the corresponding reverse
-rate).
+if it is a reversible (i.e. ``<->``) or irreversible (``->``)
+reaction. In terms of the guts of the simulator, what is doing is
+matching the LHS to whatever is in the reaction mixture, and replacing
+that with what we wrote in the RHS. In a more formal speech, left go
+the sufficient conditions to trigger a rule, and right goes the
+pattern injected by said rule's application. The pace at which a rule
+is triggered is, what would be the rule's activity, is governed by
+mass action dynamics. In other words, the probability of rule i being
+triggered is given by P(i) = A\ :sub:`i` / Sum(j,A\ :sub:`j`\ ), where
+A\ :sub:`i` is the LHS of rule i multiplied by the respective forward
+rate of rule i (for reverse reactions, it would be the LHS times the
+corresponding reverse rate).
 
 Rule Rates
 ----------
@@ -301,12 +301,12 @@ Or more succinctly::
 
 %obs: '[P1]' Prot1()
 
-This would report the total amount of agent Prot1 under label '[P1]',
+This would report the total amount of agent ``Prot1`` under label ``'[P1]'``,
 in whatever state it is, bound, unbound, modified, etc.
 
 This means that on the output file, one of the column headers will be
-'[P1]', and for that column, each row will be the time-point indexed
-abundance of the label's definition; i.e. how much Prot1() was there
+``'[P1]'``, and for that column, each row will be the time-point indexed
+abundance of the label's definition; i.e. how much ``Prot1()`` was there
 at those times. Let's define three more observables, in this case the
 dimers of the system.
 
@@ -318,8 +318,9 @@ dimers of the system.
 
 From the contact map, we see this the system has the capacity to
 generate a cycle. Let's add another observable to check how many of
-these trimer cycles there are. We would be observing for a Prot1 bound
-to a Prot2 that's bound to Prot3 itself bound to the initial Prot1.
+these trimer cycles there are. We would be observing for a ``Prot1``
+bound to a ``Prot2`` that's bound to ``Prot3`` itself bound to the
+initial ``Prot1``.
 
 ::
 
@@ -359,14 +360,12 @@ So far, our script should look something like this::
 
 Execution
 ---------
-Now let's execute the simulation! If you're using the browser based
-IDE, put 5000 in the seconds field and hit run, leaving the 150 plot
-points. If you're running the command-line executable, save your file
-(e.g. "MyFile.ka") and invoke KaSim? with input-file "MyFile.ka", to
-simulate 5000 seconds, and output 150 plot points to a file called
-"MyOutput.out", i.e.::
+Now `let's execute the simulation!`_ If you're running the
+command-line executable, save your file (e.g. "MyFile.ka") and invoke
+KaSim? with input-file "MyFile.ka", to simulate 5000 seconds, and
+output 150 plot points to a file called "MyOutput.out", i.e.::
 
-$KaSim.exe -i MyFile.ka -t 5000 -p 150 -o MyOutput.out
+$KaSim -i MyFile.ka -t 5000 -p 150 -o MyOutput.svg
 
 This should generate a plot like this:
 
@@ -377,15 +376,15 @@ also that the amount of trimer increases up to a point, and then
 decreases. In other words, in early times, the amount of Prot1 was
 limiting the assembly of the trimer: there was not enough to go
 around. However, at late times, there was too much. Notice the amount
-of the dimers that contain Prot1, i.e. P1.P2 and P1.P3, steadily
-increase. Thus, although Prot2 and Prot3 are still binding
-independently Prot1, the likelihood that they bind the same Prot1
+of the dimers that contain ``Prot1``, i.e. P1.P2 and P1.P3, steadily
+increase. Thus, although ``Prot2`` and ``Prot3`` are still binding
+independently ``Prot1``, the likelihood that they bind the same Prot1
 decreases as it accumulates. This inhibitory phenomenon is called a
 prozone, and is very well known in immunology as the Hook effect. It
-is a product of the concurrency between the binding of Prot2 and prot3
-for Prot1.
+is a product of the concurrency between the binding of ``Prot2`` and
+``Prot3`` for ``Prot1``.
 
-Let's keep playing! Now let's think of what would happen if we set the
+`Let's keep playing!`_ Now let's think of what would happen if we set the
 unimolecular binding rates to zero. That is, we disallow entities that
 are already bound, from further binding. If we set the rates to zero,
 and hit run with the same plotting parameters, we would get something
@@ -434,6 +433,15 @@ species (i.e. where every site is declared) instead of patterns
 (i.e. where some things are omitted for independence), to include the
 geometric constrains.
 
+Causal analysis
+===============
+ToDo
+
+******************
+Local installation
+******************
+ToDo
+
 *******************
 Glossary of Symbols
 *******************
@@ -459,3 +467,5 @@ Glossary of Symbols
 :Y~foo: Specifies site Y 's state as foo
 
 .. _proto-IDE : https://dev/executableknowledge.org/try/
+.. _let's execute the simulation! : http://dev.executableknowledge.org/try/?time_limit=5000&nb_plot=150&model_text=%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%23%20Here%20are%20my%20agent%20signatures%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%25agent%3A%20Prot1%28P2%2C%20P3%2C%20S12%7Eun%7Eph%7Exx%29%0A%25agent%3A%20Prot2%28P1%2C%20P3%2C%20S12%7Eun%7Eph%7Exx%29%0A%25agent%3A%20Prot3%28P1%2C%20P2%2C%20S12%7Eun%7Eph%7Exx%29%0A%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%23%20Here%20are%20my%20rules%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%27P1.P2%27%20Prot1%28P2%29%2C%20Prot2%28P1%29%20%3C-%3E%20Prot1%28P2%211%29%2C%20Prot2%28P1%211%29%20@%201.0e-4%20%281.0%29%2C%201.0e-2%0A%27P1.P3%27%20Prot1%28P3%29%2C%20Prot3%28P1%29%20%3C-%3E%20Prot1%28P3%211%29%2C%20Prot3%28P1%211%29%20@%201.0e-4%20%281.0%29%2C%201.0e-2%0A%27P2.P3%27%20Prot2%28P3%29%2C%20Prot3%28P2%29%20%3C-%3E%20Prot2%28P3%211%29%2C%20Prot3%28P2%211%29%20@%201.0e-4%20%281.0%29%2C%201.0e-2%0A%27P1/%27%20-%3E%20Prot1%28%29%20@%201.0%0A%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%23%20Here%20are%20my%20initial%20conditions%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%25init%3A%20500%20Prot2%28%29%2C%20Prot3%28%29%0A%25init%3A%20500%20Prot2%28P3%211%29%2C%20Prot3%28P2%211%29%0A%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%23%20Here%20are%20my%20observables%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%25obs%3A%20%27%5BP1%5D%27%20Prot1%28%29%0A%25obs%3A%20%27%5BP1.P2%5D%27%20Prot1%28P2%211%2CP3%29%2C%20Prot2%28P1%211%2CP3%29%0A%25obs%3A%20%27%5BP1.P3%5D%27%20Prot1%28P2%2CP3%211%29%2C%20Prot3%28P1%211%2CP2%29%0A%25obs%3A%20%27%5BP2.P3%5D%27%20Prot2%28P1%2CP3%211%29%2C%20Prot3%28P1%2CP2%211%29%0A%25obs%3A%20%27%5BP1.P2.P3%5D%27%20Prot1%28P2%211%2CP3%213%29%2C%20Prot2%28P1%211%2CP3%212%29%2C%20Prot3%28P1%213%2CP2%212%29
+.. _let's keep playing! : http://dev.executableknowledge.org/try/?time_limit=5000&nb_plot=150&model_text=%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%23%20Here%20are%20my%20agent%20signatures%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%25agent%3A%20Prot1%28P2%2C%20P3%2C%20S12%7Eun%7Eph%7Exx%29%0A%25agent%3A%20Prot2%28P1%2C%20P3%2C%20S12%7Eun%7Eph%7Exx%29%0A%25agent%3A%20Prot3%28P1%2C%20P2%2C%20S12%7Eun%7Eph%7Exx%29%0A%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%23%20Here%20are%20my%20rules%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%27P1.P2%27%20Prot1%28P2%29%2C%20Prot2%28P1%29%20%3C-%3E%20Prot1%28P2%211%29%2C%20Prot2%28P1%211%29%20@%201.0e-4%20%280%29%2C%201.0e-2%0A%27P1.P3%27%20Prot1%28P3%29%2C%20Prot3%28P1%29%20%3C-%3E%20Prot1%28P3%211%29%2C%20Prot3%28P1%211%29%20@%201.0e-4%20%280%29%2C%201.0e-2%0A%27P2.P3%27%20Prot2%28P3%29%2C%20Prot3%28P2%29%20%3C-%3E%20Prot2%28P3%211%29%2C%20Prot3%28P2%211%29%20@%201.0e-4%20%280%29%2C%201.0e-2%0A%27P1/%27%20-%3E%20Prot1%28%29%20@%201.0%0A%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%23%20Here%20are%20my%20initial%20conditions%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%25init%3A%20500%20Prot2%28%29%2C%20Prot3%28%29%0A%25init%3A%20500%20Prot2%28P3%211%29%2C%20Prot3%28P2%211%29%0A%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%23%20Here%20are%20my%20observables%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%25obs%3A%20%27%5BP1%5D%27%20Prot1%28%29%0A%25obs%3A%20%27%5BP1.P2%5D%27%20Prot1%28P2%211%2CP3%29%2C%20Prot2%28P1%211%2CP3%29%0A%25obs%3A%20%27%5BP1.P3%5D%27%20Prot1%28P2%2CP3%211%29%2C%20Prot3%28P1%211%2CP2%29%0A%25obs%3A%20%27%5BP2.P3%5D%27%20Prot2%28P1%2CP3%211%29%2C%20Prot3%28P1%2CP2%211%29%0A%25obs%3A%20%27%5BP1.P2.P3%5D%27%20Prot1%28P2%211%2CP3%213%29%2C%20Prot2%28P1%211%2CP3%212%29%2C%20Prot3%28P1%213%2CP2%212%29
