@@ -10,7 +10,9 @@ Kappa-based models:
 * Browser-based proto-IDE_
 
 Power users will probably want to compile from source code. The procedure to achieve
-that will be detailled in a second part elsewhere. 
+that will be detailled in a second part elsewhere.
+
+.. toctree::
 
 As this is a tutorial, we'll write a simple Kappa model and do some basic analysis of it.
 The proto-IDE_ will suffice for these purposes, so go ahead an open it in your browser of choice.
