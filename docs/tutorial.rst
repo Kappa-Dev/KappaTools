@@ -79,14 +79,14 @@ Or more succinctly as::
 
 .. note::
 
-Do note however that single letter codes quickly become opaque: if
-``U`` is for unmodified, what's for ubiquitinated? If ``P`` is for
-phosphorylated, what's for palmitoylated? If ``M`` is for mutated,
-what's for methylated, di-methylated, or tri-methylated? Moreover, the
-English alphabet contains 26 letters, but biochemistry knows of at
-least 27 post-translational modifications. I therefore recommend using
-at least two letters for state (e.g. ``ub``, ``ph``, ``py``, ``1m``,
-``2m``, ``3m``, ``xx``).
+  Do note however that single letter codes quickly become opaque: if
+  ``U`` is for unmodified, what's for ubiquitinated? If ``P`` is for
+  phosphorylated, what's for palmitoylated? If ``M`` is for mutated,
+  what's for methylated, di-methylated, or tri-methylated? Moreover, the
+  English alphabet contains 26 letters, but biochemistry knows of at
+  least 27 post-translational modifications. I therefore recommend using
+  at least two letters for state (e.g. ``ub``, ``ph``, ``py``, ``1m``,
+  ``2m``, ``3m``, ``xx``).
 
 Let's stick with::
 
@@ -196,9 +196,9 @@ going and add the other two binding rules, one for ``Prot1`` binding
 
 .. note::
 
-It is worth noting that the agents must be in the same order on both
-sides of the arrow signs. If not, they can be taken as spontaneous
-degradation and production of those agents.
+  It is worth noting that the agents must be in the same order on both
+  sides of the arrow signs. If not, they can be taken as spontaneous
+  degradation and production of those agents.
 
 Having these three rules, we can render the contact map, which would
 look something like this:
@@ -223,8 +223,10 @@ rate that's much higher than the bimolecular one::
 'P2.P3' Prot2(P3), Prot3(P2) <-> Prot2(P3!1), Prot3(P2!1) @ 1.0e-4 (1.0), 1.0e-2
 
 .. note::
-You can consider the unimolecular rate as being similar in spirit to the bimolecular rate,
-but representing diffusion in a much smaller volume.
+
+  You can consider the unimolecular rate as being similar in spirit to
+  the bimolecular rate, but representing diffusion in a much smaller
+  volume.
 
 Notice that the RHS of our rules have to be unimolecular: we have the
 ``!1`` bond right there. The simulator is smart enough to recognize
