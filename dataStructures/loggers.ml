@@ -1,4 +1,3 @@
-module StringMap = Map.Make (struct type t = string let compare = compare end)
 type encoding =
   | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS
 
@@ -23,25 +22,18 @@ type t =
   {
     encoding:encoding;
     logger: logger;
-    id_map: int StringMap.t;
-    fresh_id: int;
     mutable current_line: token list;
   }
 
-let get_encoding_format t = t.encoding
 
 let dummy_html_logger =
   {
-    id_map = StringMap.empty;
-    fresh_id = 1;
     encoding = HTML;
     logger = DEVNUL;
     current_line = [];}
 
 let dummy_txt_logger =
   {
-    fresh_id = 1;
-    id_map = StringMap.empty;
     encoding = TXT;
     logger = DEVNUL;
     current_line = []
@@ -182,8 +174,6 @@ let open_logger_from_channel ?mode:(mode=TXT) channel =
   let formatter = Format.formatter_of_out_channel channel in
   let logger =
     {
-      id_map = StringMap.empty;
-      fresh_id = 1;
       logger = Formatter formatter;
       encoding = mode;
       current_line = []
@@ -195,8 +185,6 @@ let open_logger_from_channel ?mode:(mode=TXT) channel =
 let open_logger_from_formatter ?mode:(mode=TXT) formatter =
   let logger =
     {
-      id_map = StringMap.empty;
-      fresh_id = 1;
       logger = Formatter formatter;
       encoding = mode;
       current_line = []
@@ -207,8 +195,6 @@ let open_logger_from_formatter ?mode:(mode=TXT) formatter =
 
 let open_circular_buffer ?mode:(mode=TXT) ?size:(size=10) () =
   {
-    id_map = StringMap.empty;
-    fresh_id = 1;
     logger = Circular_buffer (ref (Circular_buffers.create size "" ));
     encoding = mode;
     current_line = [];
@@ -217,8 +203,6 @@ let open_circular_buffer ?mode:(mode=TXT) ?size:(size=10) () =
 let open_infinite_buffer ?mode:(mode=TXT) () =
   let logger =
     {
-      id_map = StringMap.empty;
-      fresh_id = 1;
       logger = Infinite_buffer (ref (Infinite_buffers.create 0 ""));
       encoding = mode;
       current_line = [];
@@ -253,9 +237,9 @@ let formatter_of_logger logger =
 let redirect logger fmt =
   {logger with logger = Formatter fmt}
 
-let print_as_logger logger f =
+let print_as_logger logger f = 
   fprintf logger "%t" f
-
+    
 let flush_buffer logger fmt =
   match
     logger.logger
@@ -264,17 +248,3 @@ let flush_buffer logger fmt =
   | Formatter _ -> ()
   | Circular_buffer a -> Circular_buffers.iter (Format.fprintf fmt "%s") !a
   | Infinite_buffer b -> Infinite_buffers.iter (Format.fprintf fmt "%s") !b
-
-let int_of_string_id logger string =
-  try
-    logger, StringMap.find string logger.id_map
-  with
-  | Not_found ->
-    let i = logger.fresh_id in
-    {
-      logger
-      with
-        id_map = StringMap.add string i logger.id_map ;
-        fresh_id = i + 1
-    },
-    i

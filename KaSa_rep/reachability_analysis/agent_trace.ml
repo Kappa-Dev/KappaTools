@@ -67,9 +67,6 @@ module SitePairSet = SitePair.Set
 
 type extensional_representation =
   {
-    title: string;
-    agent_type: Ckappa_sig.c_agent_name;
-    agent_string: string;
     nodes: Ckappa_sig.Views_intbdu.mvbdu list;
     edges: (Ckappa_sig.Views_intbdu.mvbdu * label * Ckappa_sig.Views_intbdu.mvbdu) list ;
     nodes_creation: (Ckappa_sig.Views_intbdu.mvbdu * label) list ;
@@ -93,11 +90,8 @@ let mvbdu_of_reverse_order_association_list asso =
     Ckappa_sig.Views_intbdu.build_reverse_sorted_association_list
     asso
 
-let empty_transition_system title agent_string agent_name =
+let empty_transition_system =
   {
-    title = title;
-    agent_type = agent_name;
-    agent_string = agent_string;
     edges = [];
     nodes_creation = [];
     nodes_degradation = [];
@@ -168,61 +162,59 @@ let add_creation parameter error r_id ag_id mvbdu transition_system =
     nodes_creation = (mvbdu,(r_id,ag_id))::transition_system.nodes_creation
   }
 
-let dump_edge logger parameter error handler_kappa compil key key' label =
+let dump_edge fic parameter error handler_kappa compil key key' label =
   let error, rule_name =
     if Remanent_parameters.get_show_rule_names_in_local_traces parameter
     then
       Handler.string_of_rule parameter error handler_kappa compil (fst label)
     else error,""
   in
-  let () =
-    Graph_loggers.print_edge logger ("Node_"^key) ("Node_"^key') ~directives:[Graph_loggers.Label rule_name] in
+  let () = Printf.fprintf fic "Node_%i -> Node_%i [label=\"%s\"];\n" key key' rule_name in
   error
 
 
-let string_key_of_asso list =
+let dump_key_of_asso fic list =
   let hash = hash_of_association_list list in
-  Printf.sprintf "Node_%i" hash
+  let () = Printf.fprintf fic "Node_%i" hash in
+  ()
 
-let string_label_of_asso parameter error handler_kappa transition_system list =
-  let string = transition_system.agent_string^"("  in
-  let error,string,_ =
+let print_label_of_asso fic parameter error handler_kappa agent_type agent_string list =
+  let () = Printf.fprintf fic "%s(" agent_string  in
+  let error,_ =
     List.fold_left
-      (fun (error,string,bool) (site_type, state) ->
-         let string =
+      (fun (error,bool) (site_type, state) ->
+         let () =
            if bool
            then
-             string^","
-           else
-             string
+             Printf.fprintf fic ","
          in
          let error, site_string =
-           Handler.string_of_site parameter error handler_kappa
-             transition_system.agent_type site_type
+           Handler.string_of_site parameter error handler_kappa agent_type site_type
          in
          let error', state_string =
            Handler.string_of_state_fully_deciphered parameter error
-             handler_kappa transition_system.agent_type site_type state
+             handler_kappa agent_type site_type state
          in
          let error =
            Exception.check warn parameter error error'
              (Some "line 240") Exit
          in
-         error,
-         string^site_string^state_string,
-         true
+         let () =
+           Printf.fprintf fic "%s%s" site_string state_string
+         in
+         error,true
       )
-      (error,string,false) list
+      (error,false) list
   in
-  error, string^")"
+  let () = Printf.fprintf fic ")" in
+  error
 
-let dump_mvbdu logger parameter error handler_kappa transition_system mvbdu =
+let dump_mvbdu fic parameter error handler_kappa agent_type agent_string mvbdu =
    let error, list = build_asso_of_mvbdu parameter error mvbdu in
-   let key = string_key_of_asso list in
-   let error,label = string_label_of_asso parameter error handler_kappa transition_system list in
-   let () = Graph_loggers.print_node logger key
-       ~directives:([Graph_loggers.Label label])
-   in
+   let () = dump_key_of_asso fic list in
+   let () = Printf.fprintf fic " [label=\"" in
+   let error = print_label_of_asso fic parameter error handler_kappa agent_type agent_string list in
+   let () = Printf.fprintf fic "\"];\n" in
    error
 
 let add_node_from_mvbdu _parameter _handler_kappa error _agent_type _agent_string mvbdu transition_system =
@@ -231,6 +223,9 @@ let add_node_from_mvbdu _parameter _handler_kappa error _agent_type _agent_strin
     transition_system
     with
       nodes = mvbdu::transition_system.nodes}
+
+let dump_graph_header fic =
+   Printf.fprintf fic "digraph G{\n"
 
 let bdu_of_view test =
   let mvbdu_false = Ckappa_sig.Views_intbdu.mvbdu_false () in
@@ -533,7 +528,7 @@ let powerset  map_interface =
   let list = aux list [hash,hconsed,[]] in
   let extended_map =
     List.fold_left
-      (fun extended_map (hash,_hconsed,proof) ->
+      (fun extended_map (hash,hconsed,proof) ->
          let old_list = Mods.IntMap.find_default [] hash extended_map in
          let new_list =
            match proof with
@@ -561,7 +556,7 @@ let add_singular parameter error transition_system =
     let map1,map2 = compute_var_set transition_system in
     let ambiguous_node = powerset map1 in
     Mods.IntMap.fold
-      (fun _ proof_list (error, transition_system) ->
+      (fun hash proof_list (error, transition_system) ->
          let rec aux map2 proof_list (error, transition_system)=
            match proof_list with
            | [] -> error, transition_system
@@ -727,121 +722,6 @@ let reduce_subframes transition_system =
             transition_system.subframe
   }
 
-
-let print logger parameter compil handler_kappa handler error transition_system =
-  let () = Graph_loggers.print_graph_preamble logger transition_system.title in
-  (* nodes -> Initial *)
-  let error,handler =
-    List.fold_left
-      (fun (error, handler) (mvbdu,_label) ->
-       let error, key = hash_of_mvbdu parameter error mvbdu in
-       let () =
-         Loggers.fprintf logger
-           "Init_%i [width=\"0cm\" height=\"0cm\" style=\"invis\" label=\"\"];\n" key
-       in
-       error, handler)
-    (error, handler)
-    transition_system.nodes_creation
-  in
-  (* nodes -> regular *)
-  let error =
-    List.fold_left
-      (fun error ->
-         dump_mvbdu logger parameter error handler_kappa transition_system)
-      error
-      transition_system.nodes
-  in
-  (* macro_steps *)
-  let error =
-    Mods.IntMap.fold
-      (fun k _ error ->
-         let () =
-           Loggers.fprintf logger
-             "Macro_%i [width=\"0cm\" height=\"0cm\" style=\"invis\" label=\"\"];\n" k
-         in error)
-      transition_system.subframe
-      error
-  in
-  (* edges  *)
-  let error, handler =
-    List.fold_left
-      (fun (error, handler) (q,label,q') ->
-         let error, key = hash_of_mvbdu parameter
-             error q
-         in
-         let error, key' = hash_of_mvbdu parameter error q' in
-         let error, rule_name =
-           if  Remanent_parameters.get_show_rule_names_in_local_traces parameter
-           then
-             begin
-               match
-                 fst label
-               with
-               | Rule r ->
-                 Handler.string_of_rule
-                   parameter error handler_kappa compil r
-               | Init _ ->
-                 warn parameter error (Some "line 1412") Exit ""
-             end
-           else
-             error, ""
-         in
-         let () =
-           Loggers.fprintf logger
-             "Node_%i -> Node_%i [label=\"%s\"];\n" key
-             key' rule_name
-         in
-         error,handler)
-      (error,handler)
-      transition_system.edges
-  in
-let error,_ =
-  List.fold_left
-    (fun (error, handler) (q,label) ->
-       let error, key = hash_of_mvbdu parameter error q in
-       let error, rule_name =
-         if
-           Remanent_parameters.get_show_rule_names_in_local_traces
-             parameter
-         then
-           begin
-             match
-               fst label
-             with
-             | Rule r ->
-               Handler.string_of_rule
-                 parameter error handler_kappa compil r
-             | Init _ -> warn parameter error (Some "line 1412") Exit ""
-           end
-         else
-           error, ""
-       in
-       let () =
-         Loggers.fprintf logger "Init_%i -> Node_%i [label=\"%s\"];\n" key key rule_name
-       in
-       error, handler)
-    (error,handler)
-    transition_system.nodes_creation
-in
-let () =
-  Mods.IntMap.iter
-    (fun key l ->
-       if Mods.IntSet.is_empty l
-       then
-         ()
-       else
-         let () =
-           Loggers.fprintf logger "Macro_%i -> Node_%i [style=\"dotted\" label=\"\"];\n" key key
-         in
-         Mods.IntSet.iter
-           (fun h ->
-              Loggers.fprintf logger "Macro_%i -> Node_%i [style=\"dashed\" label=\"\"];\n"
-                key h ) l)
-    transition_system.subframe
-in
-let () = Graph_loggers.print_graph_foot logger in
-error
-
 let agent_trace parameter log_info error handler handler_kappa compil output =
   let () = Ckappa_sig.Views_intbdu.import_handler handler in
   let rules = compil.Cckappa_sig.rules in
@@ -988,13 +868,14 @@ let agent_trace parameter log_info error handler handler_kappa compil output =
                            parameter)^(Remanent_parameters.get_local_trace_prefix parameter)^(agent_string)))
                       ext_list
                   in
-                  let transition_system = empty_transition_system file_name agent_string agent_type in
+                  let transition_system = empty_transition_system in
                   let file_name =
                     file_name^(Remanent_parameters.ext_format
                                  (Remanent_parameters.get_local_trace_format
                                   parameter))
                   in
                   let fic = Remanent_parameters.open_out file_name in
+                  let () = dump_graph_header fic in
                   let error, init_list =
                     Ckappa_sig.Agent_map_and_set.Map.find_default_without_logs
                       parameter error [] agent_type init
@@ -1091,13 +972,119 @@ let agent_trace parameter log_info error handler handler_kappa compil output =
                   let transition_system =
                     reduce_subframes transition_system
                   in
-                  let logger =
-                    Loggers.open_logger_from_channel fic
-                      ~mode:(Loggers.DOT)
-                  in
-                  let error = print logger parameter compil handler_kappa () error transition_system in
-                  let _ = close_out fic in
-                  error, log_info
+              (* nodes -> Initial *)
+              let error,handler =
+                List.fold_left
+                  (fun (  error, handler) (mvbdu,_label) ->
+                     let error, key = hash_of_mvbdu parameter error mvbdu in
+                     let () =
+                       Printf.fprintf fic
+                         "Init_%i [width=\"0cm\" height=\"0cm\" style=\"invis\" label=\"\"];\n" key
+                     in
+                     error, handler)
+                  (error, handler)
+                  transition_system.nodes_creation
+              in
+              (* nodes -> regular *)
+              let error =
+                List.fold_left
+                  (fun error ->
+                     dump_mvbdu fic parameter error handler_kappa
+                       agent_type agent_string)
+                  error
+                  transition_system.nodes
+              in
+              (* macro_steps *)
+              let error =
+                Mods.IntMap.fold
+                  (fun k _ error ->
+                     let () =
+                       Printf.fprintf fic
+                         "Macro_%i [width=\"0cm\" height=\"0cm\" style=\"invis\" label=\"\"];\n" k
+                     in error)
+                  transition_system.subframe
+                  error
+              in
+              (* edges  *)
+              let error, handler =
+                List.fold_left
+                  (fun (error, handler) (q,label,q') ->
+                     let error, key = hash_of_mvbdu parameter
+                         error q
+                     in
+                     let error, key' = hash_of_mvbdu parameter error q' in
+                     let error, rule_name =
+                       if  Remanent_parameters.get_show_rule_names_in_local_traces parameter
+                       then
+                         begin
+                           match
+                             fst label
+                           with
+                           | Rule r ->
+                             Handler.string_of_rule
+                               parameter error handler_kappa compil r
+                           | Init _ ->
+                             warn parameter error (Some "line 1412") Exit ""
+                         end
+                       else
+                         error, ""
+                     in
+                     let () =
+                       Printf.fprintf fic
+                         "Node_%i -> Node_%i [label=\"%s\"];\n" key
+                         key' rule_name
+                     in
+                     error,handler)
+                  (error,handler)
+                  transition_system.edges
+              in
+              let error,_ =
+                List.fold_left
+                  (fun (error, handler) (q,label) ->
+                     let error, key = hash_of_mvbdu parameter error q in
+                     let error, rule_name =
+                       if
+                         Remanent_parameters.get_show_rule_names_in_local_traces
+                           parameter
+                       then
+                         begin
+                           match
+                             fst label
+                           with
+                           | Rule r ->
+                             Handler.string_of_rule
+                               parameter error handler_kappa compil r
+                           | Init _ -> warn parameter error (Some "line 1412") Exit ""
+                         end
+                       else
+                         error, ""
+                     in
+                     let () =
+                       Printf.fprintf fic "Init_%i -> Node_%i [label=\"%s\"];\n" key key rule_name
+                     in
+                     error, handler)
+                  (error,handler)
+                  transition_system.nodes_creation
+              in
+              let () =
+                Mods.IntMap.iter
+                  (fun key l ->
+                     if Mods.IntSet.is_empty l
+                     then
+                       ()
+                     else
+                       let () =
+                         Printf.fprintf fic "Macro_%i -> Node_%i [style=\"dotted\" label=\"\"];\n" key key
+                       in
+                       Mods.IntSet.iter
+                         (fun h ->
+                            Printf.fprintf fic "Macro_%i -> Node_%i [style=\"dashed\" label=\"\"];\n"
+                              key h ) l)
+                  transition_system.subframe
+              in
+              let _ = Printf.fprintf fic "}\n" in
+              let _ = close_out fic in
+              error, log_info
             end
           with ExceptionDefn_with_no_dep.UserInterrupted _ ->
             error, log_info

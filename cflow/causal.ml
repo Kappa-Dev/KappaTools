@@ -381,7 +381,7 @@ let config_of_grid = cut
     ) config.events IntMap.empty *)
 
 let prec_star_of_config = Graph_closure.closure
-
+			
 let depth_and_size_of_event config =
   IntMap.fold
     (fun eid prec_eids (emap,_) ->
@@ -604,7 +604,7 @@ let pretty_print
 	   (0.,[],0) (List.rev stories)
 	in
 	let () =   (*dump grid fic state env ; *)
-   if dotFormat then
+	  if dotFormat then
 	    let profiling desc =
 	      Format.fprintf
 		desc "/* @[Compression of %d causal flows" n;
