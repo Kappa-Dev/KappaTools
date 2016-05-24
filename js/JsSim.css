@@ -37,7 +37,7 @@ rect { stroke-width: 2; }
     display:inline-block;
 
     border-radius:50%;
-    border:2px solid;
+    border:2px solid;5B
 
     font-size:32px;
 }
@@ -90,8 +90,7 @@ rect { stroke-width: 2; }
     background-color: rgb(242, 222, 222);
 }
 
-.node-rect { fill: #ccc;
-             stroke-width:2;
+.node-rect { stroke-width:2;
              stroke: #000;
              fill-opacity:0.5;
              stroke-width : 2;
@@ -100,8 +99,7 @@ rect { stroke-width: 2; }
 .node-proof {
               opacity : 0.0;
 }
-.site-rect {  fill: #ccc;
-              stroke-width:1;
+.site-rect {  stroke-width:1;
               stroke: #000;
 }
 .site-text {
@@ -136,7 +134,9 @@ rect { stroke-width: 2; }
 .CodeMirror {
     border: 1px solid #eee;
     min-height: 40px;
-    height: calc(100% - 100px);
-    height: -webkit-calc(100% - 100px);
-    height: -moz-calc(100% - 100px);0
+
+    height: calc(100% - 320px);
+    height: -webkit-calc(100% - 320px);
+    height: -moz-calc(100vh - 400px);
+
 }

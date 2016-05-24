@@ -53,6 +53,9 @@ let content =
       )
   in
   let snapshot_select =
+  Display_common.toggle_element
+    state_snapshot
+    [
     Tyxml_js.R.Html5.div
       ~a:[ Html5.a_class ["list-group-item"] ]
       (let list, handle = ReactiveData.RList.create [] in
@@ -72,12 +75,15 @@ let content =
        in
        list
       )
+    ]
   in
   let export_controls =
-    Display_common.export_controls
-      export_format_id
-      export_filename_id
-          export_button_id
+    Display_common.toggle_element
+      state_snapshot
+      [Display_common.export_controls
+          export_format_id
+          export_filename_id
+          export_button_id]
   in
   <:html5<<div>
              <div class="row">
@@ -93,32 +99,31 @@ let content =
         </div> >>
 
 
-let navcontent =
-        [ Html5.div
-            ~a:[Tyxml_js.R.Html5.a_class
-                   (React.S.bind
-                      UIState.model_runtime_state
-                      (fun state -> React.S.const
-                        (match state_snapshot state with
-                          [] -> ["hidden"]
-                        | _::_ -> ["show"])
-                      )
-                   )]
-            [content]
-        ]
+let navcontent = [content]
 
 let update_snapshot
       (snapshot_js : Contactmap.contact_map Js.t)
       (snapshot : ApiTypes.snapshot) : unit =
-  let () = Common.debug (ApiTypes_j.string_of_snapshot snapshot) in
+  let () =
+    Common.debug
+      (Js.string
+         (ApiTypes_j.string_of_snapshot snapshot))
+  in
   let site_graph : ApiTypes.site_graph =
     Api_data.api_snapshot_site_graph snapshot in
+  let () =
+    Common.debug
+      (Js.string
+         (ApiTypes_j.string_of_site_graph site_graph))
+  in
   let json : string =
     ApiTypes_j.string_of_site_graph site_graph
   in
   snapshot_js##setData (Js.string json)
 
-let select_snapshot (snapshot_js : Contactmap.contact_map Js.t) =
+let select_snapshot () =
+  let snapshot_js : Contactmap.contact_map Js.t =
+    Contactmap.create_contact_map display_id true in
   let index = Js.Opt.bind
     (Display_common.document##getElementById (Js.string select_id))
     (fun dom ->
@@ -153,28 +158,39 @@ let onload () : unit =
              (Js.string select_id))
           (fun () -> assert false))
       : Dom_html.element Js.t) in
-  let () = snapshot_select_dom
-           ##
-           onchange <- Dom_html.handler
-                             (fun _ ->
-                               let () = select_snapshot snapshot
-                               in Js._true)
+  let () =
+    snapshot_select_dom
+      ##
+      onchange <- Dom_html.handler
+      (fun _ ->
+        let () = select_snapshot ()
+        in Js._true)
   in
-  let () = Display_common.save_plot_ui
-             (fun f -> let filename = Js.string f in
-                       snapshot##exportJSON(filename)
-             )
-             "snapshot map"
-             export_button_id
-             export_filename_id
-             export_format_id
-             display_id
-             "json"
+  let () =
+    Common.jquery_on
+      "#navsnapshot"
+      "shown.bs.tab"
+      (fun _ ->
+        match (React.S.value UIState.model_runtime_state) with
+          None -> ()
+        | Some state -> select_snapshot ())
+  in
+  let () =
+    Display_common.save_plot_ui
+      (fun f -> let filename = Js.string f in
+                snapshot##exportJSON(filename)
+      )
+      "snapshot map"
+      export_button_id
+      export_filename_id
+      export_format_id
+      display_id
+      "json"
   in
   let _ : unit React.signal = React.S.l1
     (fun state -> match state with
       None -> ()
-    | Some state -> select_snapshot snapshot
+    | Some state -> select_snapshot ()
     )
     UIState.model_runtime_state
   in

@@ -2,6 +2,20 @@ module ApiTypes = ApiTypes_j
 module Html5 = Tyxml_js.Html5
 module UIState = Ui_state
 
+let toggle_element projection content =
+  Html5.div
+    ~a:[Tyxml_js.R.Html5.a_class
+           (React.S.bind
+              UIState.model_runtime_state
+              (fun state -> React.S.const
+                (match projection state with
+                  [] -> ["hidden"]
+                | _::_ -> ["show"])
+              )
+           )]
+    content
+
+
 let option_label label =
   if String.length label > 10 then
     (String.sub label 0 7)^"..."

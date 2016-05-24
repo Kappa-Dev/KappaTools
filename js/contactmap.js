@@ -137,24 +137,20 @@ class D3Object {
  * DTO for Site
  */
 class Site extends D3Object {
-    constructor(label){
-        super(label);
-        this.adjacent = {};
-        this.targets = [];
-        this.adjacentNodes = new Set();
+    constructor(siteData){
+        super(siteData.site_name);
+        this.links = siteData.site_links.map(function(link){ return new SiteLink(link[0],link[1]); })
     }
-    addAdjacent(nodeLabel,siteLabel){
-        this.targets.push(new SiteReference(nodeLabel,siteLabel));
-        this.adjacentNodes.add(nodeLabel);
+
+    listLinks(){
+        return this.links;
     }
-    listAdjacentNodes(){
-        return Array.from(this.adjacentNodes);
-    }
+
 }
-class SiteReference {
-    constructor(nodeLabel,siteLabel){
-        this.nodeLabel = nodeLabel;
-        this.siteLabel = siteLabel;
+class SiteLink {
+    constructor(nodeId,siteId){
+        this.nodeId = nodeId;
+        this.siteId = siteId;
     }
 }
 /**
@@ -162,98 +158,57 @@ class SiteReference {
  */
 class Node extends D3Object {
 
-    constructor(label){
-        super(label);
-        this.sites = {};
-        this.adjacentNodes = new Set();
+    constructor(nodeData){
+        super(nodeData.node_name);
+        if(nodeData.node_quantity){
+            this.node_quantity = nodeData.node_quantity;
+        }
+        this.sites = nodeData.node_sites.map(function(siteData){
+            var site = new Site(siteData);
+            site.node_quantity = nodeData.node_quantity;
+            return site;
+        });
     }
 
-    siteAdd(site){
-        this.sites[site.label] = site;
-    }
-    site(siteLabel){
-        return this.sites[siteLabel];
-    }
     sitesList(){
         var that = this;
-        return Object.keys(that.sites)
-                     .map(function (key) { return that.sites[key]; });
+        return that.sites;
+    }
+    site(siteLabel){
+        return this.sitesList()[siteLabel];
     }
 
     preferredSize(){
         var that =  this;
-        var d = that.sitesList().reduce(function(acc,site){
-                                          return acc.add(site.dimensions); }
-                                       ,that.contentDimensions.scale(1.0));
+        var d = that.sitesList()
+                    .reduce(function(acc,site){ return acc.add(site.dimensions); }
+                           ,that.contentDimensions.scale(1.0));
 
         return that.contentDimensions.scale(2.0).max(d);
     }
-
-    addAdjacent(nodeLabell){
-        this.adjacentNodes.add(nodeLabell);
-    }
-    listAdjacentNodes(){
-        return Array.from(this.adjacentNodes);
-    }
-
 
 }
 /**
  * DTO for contact map.
  */
 class DataTransfer {
+
     constructor(data,isSnapshot){
         var that = this;
         this.isSnapshot = isSnapshot;
-        that.state = {};
-
-        data.forEach(function(node){
-            var nodeName = node.node_name;
-            if(!that.state.hasOwnProperty(nodeName)){
-                that.state[nodeName]= new Node(nodeName);
-            };
-            var newNode = that.state[nodeName];
-            var nodeSites = node.node_sites;
-            nodeSites.forEach(function(site){
-                var siteName = site.site_name;
-                var siteLinks = site.site_links;
-                var siteNew = new Site(siteName);
-                newNode.siteAdd(siteNew);
-                siteLinks.forEach(function(link){
-                    var nodeId = parseInt(link[0]);
-                    var siteId = parseInt(link[1]);
-                    var targetNode = data[nodeId].node_name;
-                    if(!data[nodeId].node_sites[siteId]){
-                        debug(data[nodeId]);
-                        debug(siteId);
-                        debug(node);
-                    }
-                    var targetSite = data[nodeId].node_sites[siteId].site_name;
-                    newNode.addAdjacent(data[nodeId].nodeName);
-                    siteNew.addAdjacent(targetNode,targetSite);
-                })
-            });
+        that.data = data.map(
+            function(nodeData){
+                return new Node(nodeData);
         });
     }
 
-    node(a){
+    node(id){
         var that = this;
-        return that.state[a];
-    }
-    nodeNames(){
-        var that = this;
-        var result = Object.getOwnPropertyNames(that.state).sort();
-        return result;
+        return that.data[id];
     }
     nodeList(){
         var that = this;
-        return that.nodeNames()
-                   .map(function (key) { return that.state[key] });
-    }
-    nodeAbsolute(){
-        var that = this;
-        var result = that.nodeNames().map(function (key) { return that.state[key].absolute });
-        return result;
+        return that.data;
     }
 
     site(node,s){
@@ -265,47 +220,14 @@ class DataTransfer {
     // layout of sites
     siteDistance(site,point){
         var that = this;
-        var distances = site.listAdjacentNodes().map(function(nodeName){
-            var nodeLocation = that.node(nodeName).absolute;
+        var distances = site.listLinks().map(function(link){
+            var nodeLocation = that.node(link.nodeId).absolute;
             return nodeLocation.distance(point);
         });
         var result = distances.reduce(function(a,b){ return a+b }, 0);
         return result;
     }
 
-    // return the nearest point to a site with the pental for chosing
-    // the next best point.
-    nearestPoint(sourceNode,sourceSite,points){
-        var that = this;
-        if(points.length == 0){
-            throw "no points to choose from"
-        } else if (points.length == 1){
-            var point = points[0];
-            return { nearest : point
-                   , penalty : 0
-                   , distance : that.siteDistance(sourceNode,sourceSite,point) };
-        } else {
-            var point = points[0];
-            var r = that.nearestPoint(sourceNode,sourceSite,points.slice(1));
-            var distance = that.siteDistance(sourceNode,sourceSite,point);
-            if(distance < r.distance){
-                return { nearest : point
-                       , penalty : r.distance - distance
-                       , distance : distance };
-            } else { return r; }
-
-        }
-    }
-    // calcuate the center of mass
-    centerOfMass(){
-        var x = 0  , y = 0 , n = 0;
-        Object.keys(that.state).forEach(function(sourceLabel) {
-            x+=that.state[sourceLabel].absolute.x;
-            y+=that.state[sourceLabel].absolute.y;
-            n++;
-        });
-        return (n == 0)?new Point(0,0):new Point(x/n,y/n);
-    }
 }
 /**
  * Contact Layout
@@ -472,31 +394,121 @@ class Layout{
 class Render{
 
     constructor(id,contactMap){
-        this.contactMap = contactMap;
-        this.root = id?d3.select(id):d3.select('body');
-        var node = this.root.node();
+        var that = this;
+        that.contactMap = contactMap;
+        that.root = id?d3.select(id):d3.select('body');
+        var node = that.root.node();
         var width = Math.max(400,
                              node.offsetWidth);
         var height = Math.max(2*width/3,
                               node.offsetHeight);
-        this.layout = new Layout(contactMap,new Dimensions( height, width));
-        this.svg = this.root
+        that.layout = new Layout(contactMap,new Dimensions( height, width));
+        that.svg = that.root
                        .append('svg')
                        .attr("class","svg-group")
-                       .attr("width", this.layout.dimensions.width
-                                    + this.layout.margin.left
-                                    + this.layout.margin.right)
-                       .attr("height", this.layout.dimensions.height
-                                     + this.layout.margin.top
-                                     + this.layout.margin.bottom)
+                       .attr("width", that.layout.dimensions.width
+                                    + that.layout.margin.left
+                                    + that.layout.margin.right)
+                       .attr("height", that.layout.dimensions.height
+                                     + that.layout.margin.top
+                                     + that.layout.margin.bottom)
                        .append("g")
                        .attr("transform", "translate("
-                                        + this.layout.margin.left
+                                        + that.layout.margin.left
                                         + ","
-                                        + this.layout.margin.top + ")");
+                                        + that.layout.margin.top + ")");
         /* needed to add the stylesheet to the export */
-        createSVGDefs(this.svg);
+        createSVGDefs(that.svg);
 
+        if(that.contactMap.isSnapshot){
+            var min = 0;
+            var max = 0;
+            that.contactMap.nodeList().forEach(function(node){
+                min = (node.node_quantity < min)?node.node_quantity:min;
+                max = (node.node_quantity > max)?node.node_quantity:max;
+            });
+            // https://github.com/d3/d3/wiki/Ordinal-Scales
+            that.colorRange = d3.scale
+                                .linear()
+                                .range(["#393b79", "#e7cb94"])
+                                .domain([min-1, max+1]);
+            that.fill = function(node){
+                var color = that.colorRange(node.node_quantity).toString();
+                return color;
+            }
+            // http://bl.ocks.org/mbostock/4573883
+            that.renderLegend = function(){
+                var width = 960,
+                height = 500,
+                formatPercent = d3.format(".0%"),
+                formatNumber = d3.format(".0f");
+
+                // A position encoding for the key only.
+                var x = d3.scale
+                          .linear()
+                          .domain([0, 1])
+                          .range([0, 100]);
+                var rescale =function(n){
+                    return min + (n  * (max - min));
+                }
+                var xAxis = d3.svg
+                              .axis()
+                              .scale(x)
+                              .orient("bottom")
+                              .ticks(3)
+                              .tickSize(8)
+                              .tickFormat(function(d) { return formatNumber(rescale(d)); });
+
+                var g =  that.svg
+                             .append("g")
+                             .attr("class", "key")
+                             .attr("transform", "translate(" + 0 + "," + 0 + ")");
+                g.call(xAxis);
+
+                var data = d3.scale.linear().domain([0, 1]).ticks(10);
+                g.selectAll("rect")
+                    .data(data)
+                    .enter().append("rect")
+                    .attr("height", 8)
+                    .attr("x", function(d) {
+                        return x(d);
+                    })
+                    .attr("width", function(d) {
+                        return x(data[1]) - x(data[0]);
+                    })
+                    .style("fill", function(d) {
+                        var value = rescale(d);
+                        var color = that.fill({ node_quantity : value});
+                        debug(value);
+                        debug(color);
+                        return color;
+                    });
+                g.append("text")
+                 .attr("class", "caption")
+                 .attr("y", -6)
+                 .text("Quantity");
+
+            };
+            that.handleMouseOver = function(d,i){
+                        that.svg
+                            .select(".caption")
+                            .text("Quantity : "+d.node_quantity);
+
+            };
+            that.handleMouseOut = function(d,i){
+                        that.svg
+                            .select(".caption")
+                            .text("Quantity");
+            };
+        } else {
+            that.fill = function(node){
+                return "#ccc";
+            };
+            that.renderLegend = function(){
+            };
+            that.handleMouseOver = function(){};
+            that.handleMouseOut = function(){};
+        }
     }
 
 
@@ -514,14 +526,16 @@ class Render{
                      .drag()
                      .on("drag", dragmove);
         that.layout.circleNodes();
-        that.svg.selectAll(".svg-group")
+        that.svg
+            .selectAll(".svg-group")
             .data(that.contactMap.nodeList())
             .enter()
             .append("g")
             .attr("class","node-group")
             .attr("transform",function(d) {
                  return "translate("+d.absolute.x+","+d.absolute.y+")";
-            }).call(drag);
+            })
+            .call(drag);
 
         that.svg.selectAll(".node-group")
             .append("text")
@@ -535,6 +549,9 @@ class Render{
             .attr("rx", 5)
             .attr("ry", 5)
             .attr("class","node-rect")
+            .attr("fill",that.fill)
+            .on("mouseover",that.handleMouseOver)
+            .on("mouseout",that.handleMouseOut);
                           /* keep proof for alignment checks
                              that.nodes configure using cess
                            */
@@ -590,7 +607,8 @@ class Render{
               sites.append("rect")
               .attr("class","site-rect")
               .attr("rx", 3)
-              .attr("ry", 3);
+              .attr("ry", 3)
+              .attr("fill",that.fill);
 
               sites.append("circle")
               .attr("class","site-proof")
@@ -628,10 +646,10 @@ class Render{
                         .reduce(function(edges,node,index,nodes){
                             var sites = node.sitesList();
                             sites.forEach(function(source_site){
-                                source_site.targets.forEach(function(target_reference){
+                                source_site.links.forEach(function(target_reference){
                                     var target_site = that.contactMap
-                                                          .site(target_reference.nodeLabel
-                                                               ,target_reference.siteLabel);
+                                                          .site(target_reference.nodeId
+                                                               ,target_reference.siteId);
                                     var lineData = { source : source_site.absolute
                                                    , target : target_site.absolute };
                                     edges.push(lineData);
@@ -722,7 +740,7 @@ class Render{
         that.renderNodes();
         that.renderSites();
         that.updateLinks();
-
+        that.renderLegend();
     }
 }
 
@@ -737,14 +755,10 @@ function ContactMap(id,isSnapshot){
             that.data = data;
             var contactMap = new DataTransfer(data,isSnapshot);
             that.clearData();
-            if(contactMap.nodeNames().length > 0){
-                if(contactMap.nodeNames().length > 0){
-                    var render = new Render(that.id,contactMap);
-                    that.clearData();
-                    d3.select(that.id).selectAll("svg").remove();
-                    var render = new Render(that.id,contactMap);
-                    render.render();
-                }
+            if(that.data.length > 0){
+                d3.select(that.id).selectAll("svg").remove();
+                var render = new Render(that.id,contactMap);
+                render.render();
             }
         } catch(err) {
             error(err.stack);
@@ -763,6 +777,4 @@ function ContactMap(id,isSnapshot){
                 alert(e);
             }
     }
-
-
 }

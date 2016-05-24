@@ -88,15 +88,39 @@ let api_snapshot sigs (snapshot : Data.snapshot) : Api_types.snapshot =
   { Api_types.snap_file = snapshot.Data.snap_file
   ; Api_types.snap_event = snapshot.Data.snap_event
   ; Api_types.agents =
-      List.flatten
-        (List.map
-           (fun (agent,mixture) ->
+      snd
+        (List.fold_left
+           (fun (old_offset,old_agents) (agent,mixture) ->
              let quantity = Some (float_of_int agent) in
-             List.map (fun (s : Api_types.site_node)->
-                           { s with Api_types.node_quantity = quantity })
-                      (Array.to_list (api_mixture sigs mixture))
+             let mixture = Array.to_list (api_mixture sigs mixture) in
+             let new_offset = old_offset + (List.length mixture) in
+             let update_links (agent_id,site_id : int * int) =
+               (agent_id+old_offset,site_id)
+             in
+             let update_sites site = { site with
+               Api_types.site_links =
+                 List.map
+                   update_links
+                   site.Api_types.site_links
+             } in
+             let new_agents =
+               List.map
+                 (fun (node : Api_types.site_node)->
+                   { node with
+                     Api_types.node_quantity = quantity ;
+                     Api_types.node_sites =
+                       Array.map
+                         update_sites
+                         node.Api_types.node_sites
+                   }
+                 )
+                 mixture
+             in
+             (new_offset,old_agents@new_agents)
            )
-           snapshot.Data.agents)
+           (0,[])
+           snapshot.Data.agents
+        )
   ; Api_types.tokens =
       List.map (fun (token,value) ->
                 { Api_types.node_name = token ;
@@ -138,11 +162,32 @@ let api_contactmap_site_graph
     (contactmap : Api_types.parse) : Api_types.site_graph =
   contactmap.Api_types.contact_map
 
+let offset_site_graph
+    (offset : int)
+    (site_nodes : Api_types.site_node list) :
+    Api_types.site_node list =
+  List.map
+    (fun site_node ->
+      { site_node with
+        Api_types.node_sites =
+          Array.map
+            (fun site ->
+              { site with
+                Api_types.site_links =
+                  List.map (fun (i,j) -> (i+offset,j+offset))
+                    site.Api_types.site_links })
+          site_node.Api_types.node_sites
+      }
+    )
+    site_nodes
+
 let api_snapshot_site_graph
     (snapshot : Api_types.snapshot) : Api_types.site_graph =
   Array.of_list
     (List.concat
-       [snapshot.Api_types.agents;snapshot.Api_types.tokens])
+       [snapshot.Api_types.agents;
+        let offset = List.length snapshot.Api_types.agents in
+        offset_site_graph offset snapshot.Api_types.tokens])
 
 let api_parse_is_empty (parse : Api_types.parse) =
   0 = Array.length parse.Api_types.contact_map

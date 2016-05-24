@@ -178,13 +178,19 @@ function observable_plot(configuration){
         }
 
     };
+    this.formatTime = d3.format(".02f");
+
     this.renderLabel = function(){
         if(configuration.plotLabelDivId){
             var length = that.state.plot.observables.length;
             if (that.state.plot && length > 1){
                 var first = this.state.plot.observables[0];
                 var last = this.state.plot.observables[length-1];
-                var label = "Plot between t = "+last.time+"s and t = "+first.time+"s";
+                var label = "Plot between t = "
+                           +that.formatTime(last.time)
+                           +"s and t = "
+                           +that.formatTime(first.time)
+                           +"s";
                 d3.select("#"+configuration.plotLabelDivId).html(label);
             }
         }
