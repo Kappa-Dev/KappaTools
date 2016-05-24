@@ -418,7 +418,7 @@ let fold_over_causal_past_of_obs parameter handler log_info error config_closure
   let ids = ids_of_grid grid  in
   let error,log_info = StoryProfiling.StoryStats.add_event parameter error StoryProfiling.Build_configuration None log_info in
   let error,log_info,config = config_of_grid ~with_reduction:false parameter handler log_info error ids grid in
-  let ettor,log_info = StoryProfiling.StoryStats.close_event parameter error StoryProfiling.Build_configuration None log_info in
+  let error,log_info = StoryProfiling.StoryStats.close_event parameter error StoryProfiling.Build_configuration None log_info in
   Graph_closure.closure_bottom_up_with_fold parameter handler log_info error (Some StoryProfiling.Collect_traces) config_closure config.prec_1 to_keep f a
 
 let dot_of_grid profiling env enriched_grid form =
@@ -661,7 +661,7 @@ let pretty_print
   in
   error,log_info
 
-let print_stat f parameter handler enriched_grid =
+let print_stat f _parameter _handler enriched_grid =
   let count_obs =
     match
       snd enriched_grid.prec_star

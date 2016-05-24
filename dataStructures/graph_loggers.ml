@@ -1,4 +1,4 @@
-type direction = Direct | Reverse | None | Both
+type direction = Direct | Reverse | Undirected | Both
 type options =
   | Label of string
   | Width of string
@@ -6,32 +6,51 @@ type options =
   | Direction of direction
   | DotStyle of string
 
+let html_deps =
+  ["http://d3js.org/d3.v3.min.js";
+   "http://cpettitt.github.io/project/dagre-d3/latest/dagre-d3.min.js"]
+
 let print_graph_preamble logger title =
   match Loggers.get_encoding_format logger with
   | Loggers.DOT ->
     Loggers.fprintf logger "digraph G{\n"
   | Loggers.HTML ->
     begin
-      let () = Loggers.fprintf logger
-        "<!doctype html>\n\n
-<html>\n\n
-<head>\n\n
-\t<meta charset=\"utf-8\">\n
-\t<title>%s</title>\n
-\t<script src=\"http://d3js.org/d3.v3.min.js\" charset=\"utf-8\"></script>\n
-\t<script src=\"http://cpettitt.github.io/project/dagre-d3/latest/dagre-d3.min.js\" charset=\"utf-8\"></script>\n
-\t<style>\n
-\t\tdt {float: left; clear: left; width: 20em;}\n
-\t\tdd {font-weight: bold; margin: 0 0 0 21em;}\n
-\t\t.node rect {stroke: #333; fill: #fff;}\n
-\t\t.edgePath path {stroke: #333; fill: #333; stroke-width: 1.5px;}\n
-\t</style>\n
-</head>\n
-<body>\n
-\t<div class=\"container\">\n
-\t<h1>%s</h1>\n
-<svg width=%s height=%s><g/></svg>\n" title title "0" "0"
-      in ()
+      let f_opt = Loggers.formatter_of_logger logger in
+      match
+        f_opt
+      with
+      | None -> ()
+      | Some f ->
+        let dependency f t =
+          Format.fprintf f "<script src=\"%s\" charset=\"utf-8\"></script>" t
+        in
+        let () = Format.fprintf f "@[<v><!doctype html>@,@,<html>@," in
+        let () = Format.fprintf f "@[<v 2><head>@,<meta charset=\"utf-8\">@," in
+        let () = Format.fprintf f "<title>%s</title>@," title in
+        let () = Pp.list ~trailing:Pp.space Pp.space dependency f html_deps in
+        let () = Format.fprintf f "%t@]@,</head>@,"
+            (fun f ->
+               let () = Format.fprintf f "@[<v 2><style>@," in
+               let () =
+                 Format.fprintf f "dt {float: left; clear: left; width: 20em;}@," in
+               let () =
+                 Format.fprintf f "dd {font-weight: bold; margin: 0 0 0 21em;}@," in
+               let () = Format.fprintf f ".node rect {stroke: #333; fill: #fff;}@," in
+               let () =
+                 Format.fprintf
+                   f ".edgePath path {stroke: #333; fill: #333; stroke-width: 1.5px;}" in
+               Format.fprintf f "@]@,</style>")
+        in
+        let () = Format.fprintf f "@[<v 2><body>@,<div class=\"container\">@," in
+        let () = Format.fprintf
+            f "<h1>@[%s@]</h1>@," title
+        in
+        let () = Format.fprintf f "<svg width=960 height=600><g/></svg>@," in
+        let () = Format.fprintf f "// Create a new directed graph@," in
+        let () =
+          Format.fprintf f "var g = new dagreD3.graphlib.Graph().setGraph({});@," in
+        ()
     end
   | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
@@ -41,29 +60,32 @@ let print_graph_foot logger =
   with
   | Loggers.DOT -> Loggers.fprintf logger "}\n"
   | Loggers.HTML ->
-    Loggers.fprintf
-      logger
-      "\t\tvar svg = d3.select(\"svg\"),inner = svg.select(\"g\");\n
-\t\t// Set up zoom support\n
-\t\tvar zoom = d3.behavior.zoom().on(\"zoom\", function() {\n
-\t\t\tinner.attr(\"transform\", \"translate(\" + d3.event.translate + \")\" +\n
-\t\t\t\"scale(\" + d3.event.scale + \")\");\n
-\t\t});\n
-\t\tsvg.call(zoom);// Create the renderer\n
-\t\tvar render = new dagreD3.render();\n
-\t\t// Run the renderer. This is what draws the final graph.\n
-\t\trender(inner, g);\n
-\t\t// Center the graph\n
-\t\tvar initialScale = 0.75;\n
-\t\tzoom\n
-\t\t.translate([(svg.attr(\"width\") - g.graph().width * initialScale) / 2, 20])\n
-\t\t.scale(initialScale)\n
-\t\t.event(svg);\n
-\t\tsvg.attr('height', g.graph().height * initialScale + 40);\n
-\t</script>\n
-\t</div>\n
-\t</body>\n
-\t</html>\n"
+    begin
+      let f_opt = Loggers.formatter_of_logger logger in
+      match
+        f_opt
+      with
+      | None -> ()
+      | Some f ->
+        let () = Format.fprintf
+            f "var svg = d3.select(\"svg\"),inner = svg.select(\"g\");@,"
+        in
+        let () = Format.fprintf f "// Set up zoom support@," in
+        let () = Format.fprintf f "var zoom = d3.behavior.zoom().on(\"zoom\", function() {@," in
+        let () = Format.fprintf f "inner.attr(\"transform\", \"translate(\" + d3.event.translate + \")\" +@," in
+        let () = Format.fprintf f "\"scale(\" + d3.event.scale + \")\");@,});@,svg.call(zoom);" in
+        let () = Format.fprintf f "// Create the renderer@, var render = new dagreD3.render();@," in
+        let () = Format.fprintf f "// Run the renderer. This is what draws the final graph.@," in
+        let () = Format.fprintf f "render(inner, g);@," in
+        let () = Format.fprintf f "// Center the graph@,var initialScale = 0.75;@," in
+        let () = Format.fprintf f "zoom@," in
+        let () = Format.fprintf
+            f ".translate([(svg.attr(\"width\") - g.graph().width * initialScale) / 2, 20])@," in
+        let () = Format.fprintf f ".scale(initialScale)@,.event(svg);@," in
+        let () = Format.fprintf f "svg.attr('height', g.graph().height * initialScale + 40);" in
+        let () = Format.fprintf f "@,</div>@]@,</body>@,</html>@]@." in
+        ()
+    end
   | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let print_comment logger string =
@@ -87,22 +109,17 @@ let print_asso logger string1 string2 =
   | Loggers.HTML -> Loggers.fprintf logger "\t\t\t<dt>%s</dt><dd>%s</dd>" string1 string2
   | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
-let print_node logger id ?directives =
+let print_node logger ?directives:(directives=[]) id =
   match Loggers.get_encoding_format logger with
   | Loggers.DOT ->
     begin
       let () = Loggers.fprintf logger "%s" id in
-      let directives =
-        match directives with
-        | Some l -> l
-        | None -> []
-      in
-      let direction,directives =
+      let _,directives =
         List.partition
           (fun a ->
              match a with
              | Direction _ -> true
-             | _ -> false)
+             | Label _ | Width _ | Height _ | DotStyle _ -> false)
           directives
       in
       let () =
@@ -133,22 +150,16 @@ let print_node logger id ?directives =
   | Loggers.HTML -> ()
   | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
-let print_edge logger id1 id2 ?directives =
+let print_edge logger ?directives:(directives=[]) id1 id2 =
   match Loggers.get_encoding_format logger with
   | Loggers.DOT ->
     begin
-      let () = Loggers.fprintf logger "%s" id1 in
-      let directives =
-        match directives with
-        | Some l -> l
-        | None -> []
-      in
       let direction,directives =
         List.partition
           (fun a ->
              match a with
              | Direction _ -> true
-             | _ -> false)
+             | Label _ | Width _ | Height _ | DotStyle _ -> false)
           directives
       in
       let direction = List.rev direction in
@@ -157,7 +168,8 @@ let print_edge logger id1 id2 ?directives =
         | (Direction Direct)::_ | [] -> "->"
         | (Direction Reverse)::_ -> "<-"
         | (Direction Both)::_ -> "<->"
-        | (Direction None)::_ -> "--"
+        | (Direction Undirected)::_ -> "--"
+        | (Label _ )::_ | (Height _)::_ | (Width _ )::_ | (DotStyle _)::_ -> "->"
       in
       let () = Loggers.fprintf logger "%s %s %s" id1 direction id2 in
       let () =

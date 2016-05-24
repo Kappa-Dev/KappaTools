@@ -736,8 +736,15 @@ let print logger parameter compil handler_kappa handler error transition_system 
       (fun (error, handler) (mvbdu,_label) ->
        let error, key = hash_of_mvbdu parameter error mvbdu in
        let () =
-         Loggers.fprintf logger
-           "Init_%i [width=\"0cm\" height=\"0cm\" style=\"invis\" label=\"\"];\n" key
+         Graph_loggers.print_node logger
+           ("Init_"^(string_of_int key))
+           ~directives:
+         [
+           Graph_loggers.Width "0cm";
+           Graph_loggers.Height "0cm";
+           Graph_loggers.DotStyle "invis";
+           Graph_loggers.Label ""
+         ]
        in
        error, handler)
     (error, handler)
@@ -756,8 +763,14 @@ let print logger parameter compil handler_kappa handler error transition_system 
     Mods.IntMap.fold
       (fun k _ error ->
          let () =
-           Loggers.fprintf logger
-             "Macro_%i [width=\"0cm\" height=\"0cm\" style=\"invis\" label=\"\"];\n" k
+           Graph_loggers.print_node logger ("Macro_"^(string_of_int k))
+             ~directives:
+               [
+                 Graph_loggers.Width "0cm" ;
+                 Graph_loggers.Height "0cm" ;
+                 Graph_loggers.DotStyle "invis" ;
+                 Graph_loggers.Label ""
+               ]
          in error)
       transition_system.subframe
       error
@@ -787,9 +800,14 @@ let print logger parameter compil handler_kappa handler error transition_system 
              error, ""
          in
          let () =
-           Loggers.fprintf logger
-             "Node_%i -> Node_%i [label=\"%s\"];\n" key
-             key' rule_name
+           Graph_loggers.print_edge
+             logger
+             ("Node_"^(string_of_int key))
+             ("Node_"^(string_of_int key'))
+             ~directives:
+               [
+                 Graph_loggers.Label rule_name
+               ]
          in
          error,handler)
       (error,handler)
@@ -817,7 +835,14 @@ let error,_ =
            error, ""
        in
        let () =
-         Loggers.fprintf logger "Init_%i -> Node_%i [label=\"%s\"];\n" key key rule_name
+         Graph_loggers.print_edge
+           logger
+           ("Init_"^(string_of_int key))
+           ("Node_"^(string_of_int key))
+           ~directives:
+             [
+               Graph_loggers.Label rule_name ;
+             ]
        in
        error, handler)
     (error,handler)
@@ -830,13 +855,32 @@ let () =
        then
          ()
        else
-         let () =
-           Loggers.fprintf logger "Macro_%i -> Node_%i [style=\"dotted\" label=\"\"];\n" key key
+         let ()
+           =
+           Graph_loggers.print_edge
+           logger
+           ("Macro_"^(string_of_int key))
+           ("Node_"^(string_of_int key))
+           ~directives:
+             [
+               Graph_loggers.DotStyle "dotted" ;
+               Graph_loggers.Label "" ;
+             ]
          in
          Mods.IntSet.iter
            (fun h ->
-              Loggers.fprintf logger "Macro_%i -> Node_%i [style=\"dashed\" label=\"\"];\n"
-                key h ) l)
+              Graph_loggers.print_edge
+                logger
+                ("Macro_"^(string_of_int key))
+                ("Node_"^(string_of_int h))
+                ~directives:
+                  [
+                    Graph_loggers.DotStyle "dashed" ;
+                    Graph_loggers.Label "" ;
+                  ]
+           )
+           l
+    )
     transition_system.subframe
 in
 let () = Graph_loggers.print_graph_foot logger in
