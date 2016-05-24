@@ -98,7 +98,6 @@ In fact, let's define two more agents similar to
 pod in our script to mark where we're at. So far in our script, we
 should have::
 
-  :linenos:
   ############################################################
   # Here are my agent signatures
   ############################################################
@@ -119,22 +118,22 @@ A reversible rule's syntax is quite similar::
 
 '[rule name]' [left-hand side] <-> [right-hand side] @ [forward rates], [reverse rates]
 
-.. note:
-
-  The reversible rule syntax is purely sintactic sugar: the simulator
-  is internally producing two irreversible rules that would read::
-  
-    '[rule name]' [left-hand side] -> [right-hand side] @ [forward rates]
-    
-    '[rule name_op]' [right-hand side] -> [left-hand side] @ [reverse rates]
-    
-  If in some of KaSim's output you see rules with ``_op`` appended to their names,
-  rules that you did not wirte, they are the reverse of the reversible rules you wrote.
-
 The left-hand side (LHS) is the pattern of reactants, the
 right-hand side (RHS) is the pattern of products, and the arrow marks
 if it is a reversible (i.e. ``<->``) or irreversible (``->``)
 rule.
+
+.. note:
+
+  The reversible rule syntax is purely sintactic sugar: the simulator
+  is internally producing two irreversible rules that would read:
+  
+  ``'[rule name]' [left-hand side] -> [right-hand side] @ [forward rates]``
+  
+  ``'[rule name_op]' [right-hand side] -> [left-hand side] @ [reverse rates]``
+    
+  If in some of KaSim's output you see rules with ``_op`` appended to their names,
+  rules that you did not wirte, they are the reverse of the reversible rules you wrote.
 
 In terms of the guts of the simulator, what is doing is
 matching the LHS to whatever is in the reaction mixture, and replacing
