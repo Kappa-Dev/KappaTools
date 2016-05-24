@@ -124,6 +124,7 @@ A reversible rule's syntax is quite similar::
   is internally producing two irreversible rules that would read::
   
     '[rule name]' [left-hand side] -> [right-hand side] @ [forward rates]
+    
     '[rule name_op]' [right-hand side] -> [left-hand side] @ [reverse rates]
     
   If in some of KaSim's output you see rules with ``_op`` appended to their names,
@@ -146,6 +147,7 @@ triggered is given by:
 .. math::
   
   P_i = \frac{A_i}{\sum_{j} A_j }
+  
   A_i = LHS_i * K_i^f
 
 Where :math:`A_i` is the activity of rule :math:`i`, :math:`LHS_i` is
