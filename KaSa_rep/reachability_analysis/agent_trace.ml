@@ -1135,9 +1135,14 @@ let agent_trace parameter log_info error handler handler_kappa compil output =
                   let transition_system =
                     reduce_subframes transition_system
                   in
+                  let format =
+                    match Remanent_parameters.get_local_trace_format parameter with
+                    | Remanent_parameters_sig.DOT -> Loggers.DOT
+                    | Remanent_parameters_sig.HTML -> Loggers.HTML_Graph
+                  in
                   let logger =
                     Loggers.open_logger_from_channel fic
-                      ~mode:(Loggers.DOT)
+                      ~mode:format
                   in
                   let error = print logger parameter compil handler_kappa () error transition_system in
                   let _ = close_out fic in

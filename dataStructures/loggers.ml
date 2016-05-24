@@ -1,6 +1,6 @@
 module StringMap = Map.Make (struct type t = string let compare = compare end)
 type encoding =
-  | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS
+  | HTML_Graph | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS
 
 type token =
 | String of string
@@ -16,15 +16,15 @@ let breakable x =
   match
     x
   with
-    | HTML_Tabular | HTML | TXT -> true
-    | DOT | TXT_Tabular | XLS -> false
+  | HTML_Tabular | HTML | HTML_Graph | TXT -> true
+  | DOT | TXT_Tabular | XLS -> false
 
 type t =
   {
     encoding:encoding;
     logger: logger;
-    id_map: int StringMap.t;
-    fresh_id: int;
+    id_map: int StringMap.t ref ;
+    fresh_id: int ref ;
     mutable current_line: token list;
   }
 
@@ -32,16 +32,16 @@ let get_encoding_format t = t.encoding
 
 let dummy_html_logger =
   {
-    id_map = StringMap.empty;
-    fresh_id = 1;
+    id_map = ref StringMap.empty ;
+    fresh_id = ref 1 ;
     encoding = HTML;
     logger = DEVNUL;
     current_line = [];}
 
 let dummy_txt_logger =
   {
-    fresh_id = 1;
-    id_map = StringMap.empty;
+    fresh_id = ref 1;
+    id_map = ref StringMap.empty;
     encoding = TXT;
     logger = DEVNUL;
     current_line = []
@@ -78,7 +78,7 @@ let end_of_line_symbol logger =
   match
     logger.encoding
   with
-  | HTML -> "<Br>"
+  | HTML | HTML_Graph -> "<Br>"
   | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS -> ""
 
 
@@ -141,7 +141,7 @@ let print_cell logger s =
     with
     | HTML_Tabular -> "<TD>","</TD>"
     | TXT_Tabular -> "","\t"
-    | HTML | DOT | TXT | XLS -> "",""
+    | HTML_Graph | HTML | DOT | TXT | XLS -> "",""
   in
   fprintf logger "%s%s%s" open_cell_symbol s close_cell_symbol
 
@@ -163,7 +163,7 @@ let close_logger logger =
       fprintf logger "</div>\n</body>\n"
     | HTML_Tabular ->
       fprintf logger "</TABLE>\n</div>\n</body>"
-    | DOT | TXT | TXT_Tabular | XLS -> ()
+    | HTML_Graph | DOT | TXT | TXT_Tabular | XLS -> ()
   in
   let () = flush_logger logger in
   ()
@@ -173,17 +173,17 @@ let print_preamble logger =
     logger.encoding
   with
   | HTML ->
-      fprintf logger "<body>\n<div>\n"
+    fprintf logger "<body>\n<div>\n"
   | HTML_Tabular ->
       fprintf logger "<body>\n<div>\n<TABLE>\n"
-  | DOT | TXT | TXT_Tabular | XLS -> ()
+  | HTML_Graph | DOT | TXT | TXT_Tabular | XLS -> ()
 
 let open_logger_from_channel ?mode:(mode=TXT) channel =
   let formatter = Format.formatter_of_out_channel channel in
   let logger =
     {
-      id_map = StringMap.empty;
-      fresh_id = 1;
+      id_map = ref StringMap.empty;
+      fresh_id = ref 1;
       logger = Formatter formatter;
       encoding = mode;
       current_line = []
@@ -195,8 +195,8 @@ let open_logger_from_channel ?mode:(mode=TXT) channel =
 let open_logger_from_formatter ?mode:(mode=TXT) formatter =
   let logger =
     {
-      id_map = StringMap.empty;
-      fresh_id = 1;
+      id_map = ref StringMap.empty;
+      fresh_id = ref 1;
       logger = Formatter formatter;
       encoding = mode;
       current_line = []
@@ -207,8 +207,8 @@ let open_logger_from_formatter ?mode:(mode=TXT) formatter =
 
 let open_circular_buffer ?mode:(mode=TXT) ?size:(size=10) () =
   {
-    id_map = StringMap.empty;
-    fresh_id = 1;
+    id_map = ref StringMap.empty;
+    fresh_id = ref 1;
     logger = Circular_buffer (ref (Circular_buffers.create size "" ));
     encoding = mode;
     current_line = [];
@@ -217,8 +217,8 @@ let open_circular_buffer ?mode:(mode=TXT) ?size:(size=10) () =
 let open_infinite_buffer ?mode:(mode=TXT) () =
   let logger =
     {
-      id_map = StringMap.empty;
-      fresh_id = 1;
+      id_map = ref StringMap.empty;
+      fresh_id = ref 1;
       logger = Infinite_buffer (ref (Infinite_buffers.create 0 ""));
       encoding = mode;
       current_line = [];
@@ -232,14 +232,14 @@ let open_row logger =
     logger.encoding
    with
    | HTML_Tabular -> fprintf logger "<tr>"
-   | XLS | HTML | DOT | TXT | TXT_Tabular -> ()
+   | HTML_Graph | XLS | HTML | DOT | TXT | TXT_Tabular -> ()
 
 let close_row logger =
   match
     logger.encoding
    with
    | HTML_Tabular -> fprintf logger "<tr>@."
-   | XLS | HTML | DOT | TXT | TXT_Tabular -> fprintf logger "@."
+   | HTML_Graph | XLS | HTML | DOT | TXT | TXT_Tabular -> fprintf logger "@."
 
 let formatter_of_logger logger =
   match
@@ -267,14 +267,10 @@ let flush_buffer logger fmt =
 
 let int_of_string_id logger string =
   try
-    logger, StringMap.find string logger.id_map
+    StringMap.find string !(logger.id_map)
   with
   | Not_found ->
-    let i = logger.fresh_id in
-    {
-      logger
-      with
-        id_map = StringMap.add string i logger.id_map ;
-        fresh_id = i + 1
-    },
+    let i = !(logger.fresh_id) in
+    let () = logger.id_map := StringMap.add string i !(logger.id_map) in
+    let () = logger.fresh_id := i+1 in
     i

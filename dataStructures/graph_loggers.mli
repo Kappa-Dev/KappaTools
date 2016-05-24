@@ -14,4 +14,3 @@ val close_asso: Loggers.t -> unit
 val print_asso: Loggers.t -> string -> string -> unit
 val print_node: Loggers.t -> ?directives:options list -> string -> unit
 val print_edge: Loggers.t -> ?directives:options list -> string -> string -> unit
-    

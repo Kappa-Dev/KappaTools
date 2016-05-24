@@ -202,7 +202,7 @@ let options =
       "Tune the output format for the influence map",
       ["1_Output";"5_Influence_map"],
         Expert;
-      "--local_traces-map-format",
+      "--local-traces-format",
       (Choice (
           [
             "DOT","dot format";
@@ -211,7 +211,7 @@ let options =
        Config.local_trace_format)),
       "Tune the output format for the local transition systems",
       ["1_Output";"3_Trace_analysis"],
-          Expert;
+      Normal;
         "--contact-map-accuracy-level",
         (Choice
            (["Low","Collect info from rhs of rules and initial state";
