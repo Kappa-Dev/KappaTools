@@ -79,7 +79,7 @@ Or more succinctly as::
 
 .. note::
 
-  Do note however that single letter codes quickly become opaque: if
+  Single letter codes quickly become opaque: if
   ``U`` is for unmodified, what's for ubiquitinated? If ``P`` is for
   phosphorylated, what's for palmitoylated? If ``M`` is for mutated,
   what's for methylated, di-methylated, or tri-methylated? Moreover, the
@@ -110,18 +110,29 @@ Now, it's time to write how these guys play together.
 Rules
 =====
 Here we will write the rules that dictate how can our agents interact.
-A reversible rule's syntax is::
-
-'[rule name]' [left-hand side] <-> [right-hand side] @ [forward rates], [reverse rates]
-
-An irreversible rule's syntax is quite similar::
+An irreversible rule's syntax is::
 
 '[rule name]' [left-hand side] -> [right-hand side] @ [forward rates]
 
-Tthe left-hand side (LHS) is the pattern of reactants, the
+A reversible rule's syntax is quite similar::
+
+'[rule name]' [left-hand side] <-> [right-hand side] @ [forward rates], [reverse rates]
+
+.. note:
+
+  The reversible rule syntax is purely sintactic sugar: the simulator
+  is internally producing two irreversible rules that would read::
+  
+    '[rule name]' [left-hand side] -> [right-hand side] @ [forward rates]
+    '[rule name_op]' [right-hand side] -> [left-hand side] @ [reverse rates]
+    
+  If in some of KaSim's output you see rules with ``_op`` appended to their names,
+  rules that you did not wirte, they are the reverse of the reversible rules you wrote.
+
+The left-hand side (LHS) is the pattern of reactants, the
 right-hand side (RHS) is the pattern of products, and the arrow marks
 if it is a reversible (i.e. ``<->``) or irreversible (``->``)
-reaction.
+rule.
 
 In terms of the guts of the simulator, what is doing is
 matching the LHS to whatever is in the reaction mixture, and replacing
@@ -130,13 +141,25 @@ the sufficient conditions to trigger a rule, and right goes the
 pattern injected by said rule's application. The pace at which a rule
 is triggered, what would be the rule's activity, is governed by
 mass action dynamics. In other words, the probability of rule :math:`i` being
-triggered is given by
+triggered is given by:
 
-.. math:: P_i = \frac{A_i}{\sum_{j} A_j }
+.. math::
+  
+  P_i = \frac{A_i}{\sum_{j} A_j }
+  A_i = LHS_i * K_i^f
 
-Where :math:`A_i` is the LHS of rule :math:`i` multiplied by the
-respective forward rate of rule :math:`i` (for reverse reactions, it
+Where :math:`A_i` is the activity of rule :math:`i`, :math:`LHS_i` is
+the left-hand side of rule :math:`i`, and :math:`K_i^f` is the forward
+rate of rule :math:`i` (for reverse reactions, it
 would be the RHS times the corresponding reverse rate).
+
+.. note::
+
+  To make a rule trigger more often, one can increase the abundance of
+  its LHS, and/or increase the rule's rate. Likewise, time-scale separations
+  are determined by activity, not by the raw rate or raw LHS abundance. E.g.
+  a rule with a large rate, but a rare LHS, may still be triggered
+  rarely.
 
 Rule Rates
 ----------
@@ -150,22 +173,24 @@ rules, 1 for irreversible unbinding rules. The rates are used when:
 :bimolecular forward rate: if the LHS has ambiguous molecularity, this
                            is the rate for bimolecular cases. Think of
                            it as the diffusion of two independent
-                           entities.
+                           entities in a large volume
 :unimolecular forward rate: if the LHS has ambiguous molecularity,
                             this is the rate for unimolecular
                             cases. Think of it as the interaction of
-                            agents already bound, possibly through a
+                            agents already connected, possibly through a
                             third party.
-:bimolecular reverse rate: if the RHS has ambiguous molecularity, the
+:bimolecular reverse rate: if the RHS has ambiguous molecularity and the
                            rule is reversible, this is the rate for
                            bimolecular cases.
-:unimolecular reverse rate: if the RHS has ambiguous molecularity, the
+:unimolecular reverse rate: if the RHS has ambiguous molecularity and the
                             rule is reversible, this is the rate for
                             unimolecular cases.
 
 What do we mean by ambiguous molecularity? It means we specify two
 agents which may be already connected through a path not described in
-a rule. Let's take a look at an example of this.
+a rule; thus the pattern may be bimolecular (two separate things), or
+unimolecular (two things connected already). Let's take a look at an
+example of this situation.
 
 Ambiguous Molecularity
 ----------------------
@@ -175,7 +200,7 @@ and ``Prot2``, who bind through their respective ``P2`` and ``P1``
 sites. For the rates, a determinstic binding rate is on the order of
 :math:`10^8`, an unbinding rate around :math:`10^2` (this would mean a
 disassociation constant :math:`K_D` of :math:`10^{-10}` molar, or 100
-picomolar). When accounting for volume, let's use a mammalian volume
+picomolar). When accounting for volume, let's use a mammalian cell volume
 of :math:`10^{-12}` liters, the binding rate becomes :math:`10^{-4}`; the
 unbinding rate shouldn't care about volume dependency, so the
 deterministic rate is the same as the stochastic one. Thus we arrive
@@ -196,8 +221,12 @@ going and add the other two binding rules, one for ``Prot1`` binding
 .. note::
 
   It is worth noting that the agents must be in the same order on both
-  sides of the arrow signs. If not, they can be taken as spontaneous
-  degradation and production of those agents.
+  sides of the arrow signs. If not, the simulator would replace them with
+  what we told it, thereby effectively degrading the original copies and injecting
+  fresh ones. If agents were connected to the original copies, they would
+  not be connected to the fresh ones. If the original agents had sites in
+  states not mentioned in the rule, they would be replaced with agents
+  whose sites would be in the default state.
 
 Having these three rules, we can render the contact map, which would
 look something like this:
@@ -209,12 +238,13 @@ rules. This means that the simulator will always use the bimolecular
 rate to bind those agents. Consider however what would happen if we
 apply a binding rule to agents already bound through a third party!
 
-For example, if we have ``Prot1`` bound to ``Prot2`` itself bound to a
-``Prot3``, and we apply the binding rule of that ``Prot1`` to that
-``Prot3``, the simulator would use the only rate we gave it, even
-though diffusion would play no role in things already bound together. This
-would invalidate our physical interpretation of the model. Thus we
-should refine the rules by adding a unimolecular forward (i.e. binding)
+For example, imagine we have a ``Prot1`` bound to a ``Prot2`` itself bound to a
+``Prot3``. In such a case, ``Prot1``'s ``S3`` site is empty, as is ``Prot3``'s ``S1``
+site. Thus it is perfectly valid to apply rule ``P1.P3`` to that ``Prot1``
+and that ``Prot3``. The simulator would use the only rate we gave it.
+However, diffusion should play no role in things already bound together. Applying this
+rule at that bimolecular rate would invalidate our physical interpretation of the model.
+Thus we should refine the rules by adding a unimolecular forward (i.e. binding)
 rate that's much higher than the bimolecular one::
 
 'P1.P2' Prot1(P2), Prot2(P1) <-> Prot1(P2!1), Prot2(P1!1) @ 1.0e-4 (1.0), 1.0e-2
@@ -227,11 +257,11 @@ rate that's much higher than the bimolecular one::
   the bimolecular rate, but representing diffusion in a much smaller
   volume.
 
-Notice that the RHS of our rules have to be unimolecular: we have the
+Notice that the RHSes of our rules have to be unimolecular: we have the
 ``!1`` bond right there. The simulator is smart enough to recognize
 this and will use ``1.0e-2`` as the sole unbinding rate; there is no
-point in giving a bimolecular reverse rate as the RHS can not be
-bimolecular. For this reason, it is rare binding rules to have more than
+point in giving a bimolecular reverse rate as these RHSes can not be
+bimolecular. For this reason, it is rare for reversible binding rules to have more than
 3 rates: a bimolecular binding, a unimolecular binding, and the
 unbinding rate.
 
@@ -405,14 +435,15 @@ This should generate a plot like this:
 
 Notice that, as expected, the amount of P1 steadily increases. Notice
 also that the amount of trimer increases up to a point, and then
-decreases. In other words, in early times, the amount of ``Prot1`` was
+decreases. In early times, it makes sense the amount of ``Prot1`` was
 limiting the assembly of the trimer: there was not enough to go
-around. However, at late times, there was too much. Notice the amount
-of the dimers that contain ``Prot1``, i.e. ``P1.P2`` and ``P1.P3``, steadily
-increase. Thus, although ``Prot2`` and ``Prot3`` are still binding
+around. However, what is happening at late times, when ``Prot1`` is in excess?
+
+Notice the amount of the dimers that contain ``Prot1``, i.e. ``P1.P2`` and ``P1.P3``, steadily
+increase. Thus, although both ``Prot2`` and ``Prot3`` are still binding
 independently ``Prot1``, the likelihood that they bind the same ``Prot1``
 decreases as ``Prot1`` accumulates. This inhibitory phenomenon is called a
-prozone, and is very well known in immunology as the Hook effect. It
+prozone, and is very well known in immunology as the `Hook effect`_. It
 is a product of the concurrency between the binding for ``Prot1`` of ``Prot2`` vs.
 ``Prot3`` .
 
@@ -427,9 +458,9 @@ like this:
 The amount of trimer cycle is now zero, as we expected. Things that are bound, can not bind further.
 However, the
 system is not dominated by the dimers we defined. There are a thousand
-copies of Prot2 and Prot3, but the amount of dimers does not add up to
-this. What is happening? We can take a look at the reaction mixture by
-using perturbations.
+copies of ``Prot2`` and ``Prot3``, but the amount of dimers does not add up to
+such a value. What is happening? We can take a look at the reaction mixture by
+using snapshots.
 
 Perturbations and Modifications
 -------------------------------
@@ -438,17 +469,22 @@ Let's start by checking the state of the reaction mixture, in what is
 called a ``snapshot``. We can tell KaSim to produce a snapshot at any
 given time with::
 
-%mod: [T]>4500 do $SNAPSHOT
+%mod: [trigger condition] do $SNAPSHOT [snapshot's name]
 
-This will ouput a snapshot when the simulation advances past
-timepoint 4500. In the IDE, such a snapshot would look like this:
+This will ouput a snapshot when the trigger conditions are met as a file
+whose name we specified. Let's define our snapshot as::
+
+%mod: [T]>4500 do $SNAPSHOT "T4500"
+
+Go ahead and add that line to the script, and re-run the simulation.
+In the IDE, such a snapshot would look like this:
 
 TODO .. image:: img/Snapshot.svg
 
 As we can see, the system has produced polymers! Instead of having
 dimers, we have much bigger oligomers. How did this happen? Well, when
 we made the rules, we only mentioned some sites. For example, the
-binding of ``Prot1`` and ``Prot2`` only mentions their ``P2`` and ``P1`` sites; it says nothing about their respective ``P3`` sites. Thus, this event is independent of whatever is the state of those ``P3`` sites. If there are two dimers, say ``P1.P3`` and ``P2.P3``, those ``P1`` and ``P2`` can bind to generate the ``P3.P1.P2.P3`` tetramer, and so on.
+binding of ``Prot1`` and ``Prot2`` only mentions their respective ``P2`` and ``P1`` sites; it says nothing about their respective ``P3`` sites. Thus, this event is independent of whatever is the state of those ``P3`` sites. For example, if there are two dimers, say ``P1(P2,P3!1), P3(P1!1,P2)`` and ``P2(P1,P3!1), P3(P1,P2!1)``, those ``P1`` and ``P2`` can bind to generate a ``P3(P1!1,P2), P1(P2!2,P3!1), P2(P1!2,P3!3), P3(P1,P2!3)`` tetramer, and so on.
 
 In Kappa, we only write the sites that we care about,
 and by omitting everything we don't care about, claim independence of
@@ -504,5 +540,6 @@ Glossary of Symbols
 :Y~foo: Specifies site Y 's state as foo
 
 .. _proto-IDE : https://dev/executableknowledge.org/try/
+.. _Hook effect  : https://en.wikipedia.org/wiki/Hook_effect
 .. _let's execute the simulation! : http://dev.executableknowledge.org/try/?time_limit=5000&nb_plot=150&model_text=%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%23%20Here%20are%20my%20agent%20signatures%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%25agent%3A%20Prot1%28P2%2C%20P3%2C%20S12%7Eun%7Eph%7Exx%29%0A%25agent%3A%20Prot2%28P1%2C%20P3%2C%20S12%7Eun%7Eph%7Exx%29%0A%25agent%3A%20Prot3%28P1%2C%20P2%2C%20S12%7Eun%7Eph%7Exx%29%0A%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%23%20Here%20are%20my%20rules%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%27P1.P2%27%20Prot1%28P2%29%2C%20Prot2%28P1%29%20%3C-%3E%20Prot1%28P2%211%29%2C%20Prot2%28P1%211%29%20@%201.0e-4%20%281.0%29%2C%201.0e-2%0A%27P1.P3%27%20Prot1%28P3%29%2C%20Prot3%28P1%29%20%3C-%3E%20Prot1%28P3%211%29%2C%20Prot3%28P1%211%29%20@%201.0e-4%20%281.0%29%2C%201.0e-2%0A%27P2.P3%27%20Prot2%28P3%29%2C%20Prot3%28P2%29%20%3C-%3E%20Prot2%28P3%211%29%2C%20Prot3%28P2%211%29%20@%201.0e-4%20%281.0%29%2C%201.0e-2%0A%27P1/%27%20-%3E%20Prot1%28%29%20@%201.0%0A%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%23%20Here%20are%20my%20initial%20conditions%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%25init%3A%20500%20Prot2%28%29%2C%20Prot3%28%29%0A%25init%3A%20500%20Prot2%28P3%211%29%2C%20Prot3%28P2%211%29%0A%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%23%20Here%20are%20my%20observables%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%25obs%3A%20%27%5BP1%5D%27%20Prot1%28%29%0A%25obs%3A%20%27%5BP1.P2%5D%27%20Prot1%28P2%211%2CP3%29%2C%20Prot2%28P1%211%2CP3%29%0A%25obs%3A%20%27%5BP1.P3%5D%27%20Prot1%28P2%2CP3%211%29%2C%20Prot3%28P1%211%2CP2%29%0A%25obs%3A%20%27%5BP2.P3%5D%27%20Prot2%28P1%2CP3%211%29%2C%20Prot3%28P1%2CP2%211%29%0A%25obs%3A%20%27%5BP1.P2.P3%5D%27%20Prot1%28P2%211%2CP3%213%29%2C%20Prot2%28P1%211%2CP3%212%29%2C%20Prot3%28P1%213%2CP2%212%29
 .. _let's keep playing! : http://dev.executableknowledge.org/try/?time_limit=5000&nb_plot=150&model_text=%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%23%20Here%20are%20my%20agent%20signatures%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%25agent%3A%20Prot1%28P2%2C%20P3%2C%20S12%7Eun%7Eph%7Exx%29%0A%25agent%3A%20Prot2%28P1%2C%20P3%2C%20S12%7Eun%7Eph%7Exx%29%0A%25agent%3A%20Prot3%28P1%2C%20P2%2C%20S12%7Eun%7Eph%7Exx%29%0A%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%23%20Here%20are%20my%20rules%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%27P1.P2%27%20Prot1%28P2%29%2C%20Prot2%28P1%29%20%3C-%3E%20Prot1%28P2%211%29%2C%20Prot2%28P1%211%29%20@%201.0e-4%20%280%29%2C%201.0e-2%0A%27P1.P3%27%20Prot1%28P3%29%2C%20Prot3%28P1%29%20%3C-%3E%20Prot1%28P3%211%29%2C%20Prot3%28P1%211%29%20@%201.0e-4%20%280%29%2C%201.0e-2%0A%27P2.P3%27%20Prot2%28P3%29%2C%20Prot3%28P2%29%20%3C-%3E%20Prot2%28P3%211%29%2C%20Prot3%28P2%211%29%20@%201.0e-4%20%280%29%2C%201.0e-2%0A%27P1/%27%20-%3E%20Prot1%28%29%20@%201.0%0A%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%23%20Here%20are%20my%20initial%20conditions%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%25init%3A%20500%20Prot2%28%29%2C%20Prot3%28%29%0A%25init%3A%20500%20Prot2%28P3%211%29%2C%20Prot3%28P2%211%29%0A%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%23%20Here%20are%20my%20observables%0A%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%23%0A%25obs%3A%20%27%5BP1%5D%27%20Prot1%28%29%0A%25obs%3A%20%27%5BP1.P2%5D%27%20Prot1%28P2%211%2CP3%29%2C%20Prot2%28P1%211%2CP3%29%0A%25obs%3A%20%27%5BP1.P3%5D%27%20Prot1%28P2%2CP3%211%29%2C%20Prot3%28P1%211%2CP2%29%0A%25obs%3A%20%27%5BP2.P3%5D%27%20Prot2%28P1%2CP3%211%29%2C%20Prot3%28P1%2CP2%211%29%0A%25obs%3A%20%27%5BP1.P2.P3%5D%27%20Prot1%28P2%211%2CP3%213%29%2C%20Prot2%28P1%211%2CP3%212%29%2C%20Prot3%28P1%213%2CP2%212%29
