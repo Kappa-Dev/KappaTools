@@ -98,7 +98,7 @@ In fact, let's define two more agents similar to
 pod in our script to mark where we're at. So far in our script, we
 should have:
 
-.. code-block::
+.. code::
   :linenos:
 
   ############################################################
