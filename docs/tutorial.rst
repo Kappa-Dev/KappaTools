@@ -129,16 +129,14 @@ that with what we wrote in the RHS. In a more formal speech, left go
 the sufficient conditions to trigger a rule, and right goes the
 pattern injected by said rule's application. The pace at which a rule
 is triggered, what would be the rule's activity, is governed by
-mass action dynamics. In other words, the probability of rule $i$ being
+mass action dynamics. In other words, the probability of rule :math:`i` being
 triggered is given by
 
-.. math::
+.. math:: P_i = \frac{A_i}{\sum_{j} A_j }
 
-P_i \eq \frac{A_i}{\sum_{j} A_j }
-
-Where $A_i$ is the LHS of rule $i$ multiplied by the respective forward
-rate of rule $i$ (for reverse reactions, it would be the RHS times the
-corresponding reverse rate).
+Where :math:`A_i` is the LHS of rule :math:`i` multiplied by the
+respective forward rate of rule :math:`i` (for reverse reactions, it
+would be the RHS times the corresponding reverse rate).
 
 Rule Rates
 ----------
@@ -172,17 +170,18 @@ a rule. Let's take a look at an example of this.
 Ambiguous Molecularity
 ----------------------
 
-We want to express the reversible binding relation between ``Prot1`` and
-``Prot2``, who bind through their respective ``P2`` and ``P1`` sites. For the
-rates, a determinstic binding rate is on the order of $10^8$, an
-unbinding rate around $10^2 (this would mean a disassociation
-constant $K_D$ of $10^{-10}$ molar, or 100 picomolar). When
-accounting for volume, let's use a mammalian volume of
-$10^{-12}$ liters, the binding rate becomes $10^{-4}$; the unbinding
-rate shouldn't care about volume dependency, so the deterministic rate is the same
-as the stochastic one. Thus we arrive at our stochastic rates, a
-forward (i.e. bind) rate of $10^{-4} and a reverse (i.e. unbind) rate of
-$10^{-2}$. Let's call such a rule ``'P1.P2'``, it would be written as::
+We want to express the reversible binding relation between ``Prot1``
+and ``Prot2``, who bind through their respective ``P2`` and ``P1``
+sites. For the rates, a determinstic binding rate is on the order of
+:math:`10^8`, an unbinding rate around :math:`10^2` (this would mean a
+disassociation constant :math:`K_D` of :math:`10^{-10}` molar, or 100
+picomolar). When accounting for volume, let's use a mammalian volume
+of :math:`10^{-12}` liters, the binding rate becomes :math:`10^{-4}`; the
+unbinding rate shouldn't care about volume dependency, so the
+deterministic rate is the same as the stochastic one. Thus we arrive
+at our stochastic rates, a forward (i.e. bind) rate of :math:`10^{-4}`
+and a reverse (i.e. unbind) rate of :math:`10^{-2}`. Let's call such
+a rule ``'P1.P2'``, it would be written as::
 
 'P1.P2' Prot1(P2), Prot2(P1) <-> Prot1(P2!1), Prot2(P1!1) @ 1.0e-4,1.0e-2
 
