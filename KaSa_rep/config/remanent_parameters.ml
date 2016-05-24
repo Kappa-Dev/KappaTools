@@ -180,24 +180,24 @@ let add_debugging_parameters_to_reachability_map reachability =
       Remanent_parameters_sig.ignore_trivial_losanges = !Config.do_not_compress_trivial_losanges;
       Remanent_parameters_sig.add_singular_macrostates = !Config.add_singular_macrostates;
       Remanent_parameters_sig.show_rule_names_in_local_traces =
- !Config.show_rule_names_in_local_traces ;
-    Remanent_parameters_sig.use_macrotransitions_in_local_traces =
-	!Config.use_macrotransitions_in_local_traces ;
-    Remanent_parameters_sig.format_for_local_traces =
-	fetch_graph_format Config.local_trace_format ;
-    Remanent_parameters_sig.trace_prefix =
-	!Config.local_trace_prefix ;
-    Remanent_parameters_sig.trace_directory =
-	match !Config.output_local_trace_directory
-	with "" -> ""
-	| x -> x^"/"
-;
+        !Config.show_rule_names_in_local_traces ;
+      Remanent_parameters_sig.use_macrotransitions_in_local_traces =
+        !Config.use_macrotransitions_in_local_traces ;
+      Remanent_parameters_sig.format_for_local_traces =
+        fetch_graph_format Config.local_trace_format ;
+      Remanent_parameters_sig.trace_prefix =
+        !Config.local_trace_prefix ;
+      Remanent_parameters_sig.trace_directory =
+        match !Config.output_local_trace_directory
+        with "" -> ""
+           | x -> x^"/" ;
     }
   in
   if trace then
     { reachability
     with
-      Remanent_parameters_sig.dump_reachability_analysis_covering_classes = !Config.dump_reachability_analysis_covering_classes;
+      Remanent_parameters_sig.dump_reachability_analysis_covering_classes =
+        !Config.dump_reachability_analysis_covering_classes;
       Remanent_parameters_sig.dump_reachability_analysis_static = !Config.dump_reachability_analysis_static;
       Remanent_parameters_sig.dump_reachability_analysis_dynamic = !Config.dump_reachability_analysis_dynamic;
       }
@@ -586,30 +586,6 @@ let update_call_stack parameters bool name =
 	set_call_stack
 	  (set_trace parameters rep_bool)
 	  (x::(get_call_stack parameters))
-
-(*let open_file parameters error =
-  let error,channel =
-    match get_file parameters
-    with
-    | None -> error,stdout
-    | Some a -> error,open_out a
-  in
-  error,{parameters with Remanent_parameters_sig.log = Some channel}
-
-let close_file parameters error =
-  let channel_opt = get_log parameters in
-  match channel_opt
-  with
-  | None -> error, parameters
-  | Some channel ->
-    begin
-      if channel = stdout
-      then
-	error, parameters
-      else
-	let () = close_out channel in
-	error, {parameters with Remanent_parameters_sig.log = Some !Config.log}
-    end*)
 
 let open_influence_map_file parameters =
   let channel =
