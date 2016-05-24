@@ -19,6 +19,7 @@ List_utilities
 Circular_buffers
 Infinite_buffers
 Loggers
+Graph_loggers
 
 Pp_html
 Pp_svg
