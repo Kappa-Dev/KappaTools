@@ -55,9 +55,9 @@ let options =
              "Medium","Ignore reachable states";
 (*    "High",""*) ],
             Config.influence_map_accuracy_level)),
-        "Tune the accuracy level of the influence map",
-	["5_Influence_map"],
-	Normal;
+       "Tune the accuracy level of the influence map",
+       ["5_Influence_map"],
+       Normal;
 
       "--compute-ODE-flow-of-information",
       Bool Config.do_ODE_flow_of_information,
@@ -79,9 +79,10 @@ let options =
 
       "--view-analysis",
       (Choice
-         ([(*"None","No view analysis";*)
-	   (*"Low","Non relational site analysis";*)
-	   "High","Relational view analysis"],
+         ([
+           (*"None","No view analysis";*)
+           (*"Low","Non relational site analysis";*)
+           "High","Relational view analysis"],
            Config.view_accuracy_level)),
         "Tune the accuracy level of the view analysis",
       ["2_Reachability_analysis"],
@@ -90,16 +91,16 @@ let options =
 
       "--verbosity-level-for-view-analysis",
       (Choice
-	 ([
-	     "Mute","No information displayed";
-	     "Low","Show analysis result only";
-	     "Medium","Also show which rules are applied";
-	     "High","Also show when new views are discovered";
-	     "Full","Also show which rules are put in the working list"],
-	  Config.verbosity_level_for_reachability_analysis)),
-	  "Tune the verbosity level for the view analysis",
-	  ["2_Reachability_analysis"],
-	  Normal;
+         ([
+           "Mute","No information displayed";
+           "Low","Show analysis result only";
+           "Medium","Also show which rules are applied";
+           "High","Also show when new views are discovered";
+           "Full","Also show which rules are put in the working list"],
+           Config.verbosity_level_for_reachability_analysis)),
+      "Tune the verbosity level for the view analysis",
+      ["2_Reachability_analysis"],
+      Normal;
 
       "--hide-one-d-relations-from-cartesian-decomposition",
       Bool Config.hide_one_d_relations_from_cartesian_decomposition,
@@ -153,7 +154,7 @@ let options =
       Bool Config.add_singular_macrostates,
       "Complete the simplicial complexes with singular intersection of higher-dimension faces",
       ["3_Trace_analysis"],
-      Hidden;
+      Developper;
 
       "--output-directory",
        MultiExt
@@ -193,15 +194,20 @@ let options =
       ["1_Output";"4_Contact_map"],
         Expert;
       "--influence-map-format",
-      (Choice (["DOT","dot format";
-                (*"HTML","HTML format"*)],
+      (Choice ([
+           "DOT","dot format";
+           "HTML","HTML format"
+         ],
        Config.influence_map_format)),
       "Tune the output format for the influence map",
       ["1_Output";"5_Influence_map"],
         Expert;
       "--local_traces-map-format",
-      (Choice (["DOT","dot format";
-                (*"HTML","HTML format"*)],
+      (Choice (
+          [
+            "DOT","dot format";
+            "HTML","HTML format"
+          ],
        Config.local_trace_format)),
       "Tune the output format for the local transition systems",
       ["1_Output";"3_Trace_analysis"],

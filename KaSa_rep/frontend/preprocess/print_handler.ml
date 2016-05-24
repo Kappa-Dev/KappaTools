@@ -23,21 +23,21 @@ let print_state parameters state =
   match state with
     | Ckappa_sig.Internal a ->
       Loggers.fprintf
-        (Remanent_parameters.get_logger parameters) 
+        (Remanent_parameters.get_logger parameters)
         "%s%s"
         (Remanent_parameters.get_prefix parameters)
         a
     | Ckappa_sig.Binding Ckappa_sig.C_Free ->
       Loggers.fprintf
         (Remanent_parameters.get_logger parameters)
-        "%sfree" 
+        "%sfree"
         (Remanent_parameters.get_prefix parameters)
     | Ckappa_sig.Binding Ckappa_sig.C_Lnk_type (a, b) ->
       Loggers.fprintf
         (Remanent_parameters.get_logger parameters)
         "%sagent_type:%d@@site_type:%d"
         (Remanent_parameters.get_prefix parameters)
-        (Ckappa_sig.int_of_agent_name a) 
+        (Ckappa_sig.int_of_agent_name a)
         (Ckappa_sig.int_of_site_name b)
 
 let print_site parameters site =
@@ -81,7 +81,7 @@ let print_handler parameters error handler =
   let print_state_f print_aux =
     (fun parameters error i state () () ->
      let parameters = Remanent_parameters.update_prefix parameters
-       ("state_id:" ^ 
+       ("state_id:" ^
            (Ckappa_sig.string_of_state_index i) ^ "->")
      in
      let () = print_aux parameters state in
@@ -94,12 +94,12 @@ let print_handler parameters error handler =
       error
       (fun parameters error i agent_name () () ->
        let () =
-         Loggers.fprintf 
+         Loggers.fprintf
            (Remanent_parameters.get_logger parameters_agent)
            "%sagent_type:%d:%s"
            (Remanent_parameters.get_prefix parameters_agent)
            (Ckappa_sig.int_of_agent_name i)
-           agent_name 
+           agent_name
        in
        let () = Loggers.print_newline (Remanent_parameters.get_logger parameters_agent)
         in error)
@@ -113,10 +113,10 @@ let print_handler parameters error handler =
       parameters_sites
       error
       (fun parameters error a ->
-       let error = 
-         Ckappa_sig.Dictionary_of_sites.print 
+       let error =
+         Ckappa_sig.Dictionary_of_sites.print
            parameters
-           error 
+           error
            (print_f print_site)
            a
        in
@@ -144,13 +144,13 @@ let print_handler parameters error handler =
       parameters_duals
       error
       (fun parameters error (a, b, (c:Ckappa_sig.c_state)) ->
-          let _ = 
-            Loggers.fprintf 
-              log 
-              "%sagent_type:%i,site_type:%i,state_id:%i\n" 
-              (Remanent_parameters.get_prefix parameters) 
+          let _ =
+            Loggers.fprintf
+              log
+              "%sagent_type:%i,site_type:%i,state_id:%i\n"
+              (Remanent_parameters.get_prefix parameters)
               (Ckappa_sig.int_of_agent_name a)
-              (Ckappa_sig.int_of_site_name b) 
+              (Ckappa_sig.int_of_site_name b)
               (Ckappa_sig.int_of_state_index c)
           in
           error)
@@ -159,18 +159,18 @@ let print_handler parameters error handler =
   error
 
 let dot_of_contact_map parameters (error:Exception.method_handler) handler =
-    let error,parameters_dot =
-      Remanent_parameters.open_contact_map_file parameters error
+    let parameters_dot =
+      Remanent_parameters.open_contact_map_file parameters
     in
     let _ =
       List.iter
 	(fun x ->
-	  let () = 
+	  let () =
             Loggers.fprintf
               (Remanent_parameters.get_logger parameters_dot)
               "%s%s"
-              Headers.dot_comment 
-              x 
+              Headers.dot_comment
+              x
           in
 	  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters_dot) in
 	  ())
@@ -180,10 +180,10 @@ let dot_of_contact_map parameters (error:Exception.method_handler) handler =
       List.iter
 	(fun x->
 	  let () =
-            Loggers.fprintf 
+            Loggers.fprintf
               (Remanent_parameters.get_logger parameters_dot)
-              "%s%s" 
-              Headers.dot_comment 
+              "%s%s"
+              Headers.dot_comment
               x
           in
 	  let () =
@@ -191,7 +191,7 @@ let dot_of_contact_map parameters (error:Exception.method_handler) handler =
               (Remanent_parameters.get_logger parameters_dot)
           in
 	  ())
-	Headers.head_contact_map_in_dot 
+	Headers.head_contact_map_in_dot
     in
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters_dot) "graph G{ \n" in
     let _ =
@@ -200,18 +200,18 @@ let dot_of_contact_map parameters (error:Exception.method_handler) handler =
         error
         (fun parameters_dot error i agent_name () () ->
           let _ =
-            Loggers.fprintf 
+            Loggers.fprintf
               (Remanent_parameters.get_logger parameters_dot)
-              "subgraph cluster%d {\n" 
+              "subgraph cluster%d {\n"
               (Ckappa_sig.int_of_agent_name i)
           in
           let error, site_dic =
              Misc_sa.unsome
               (
                 Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
-                  parameters_dot 
+                  parameters_dot
                   error
-                  i 
+                  i
                   handler.Cckappa_sig.sites)
               (fun error -> warn parameters_dot error
                 (Some "line 103") Exit (Ckappa_sig.Dictionary_of_sites.init ()))
@@ -257,7 +257,7 @@ let dot_of_contact_map parameters (error:Exception.method_handler) handler =
 		error)
               site_dic
           in
-          let error, n_sites = 
+          let error, n_sites =
             Ckappa_sig.Dictionary_of_sites.last_entry parameters_dot error site_dic
           in
           let n_sites = Ckappa_sig.int_of_site_name n_sites in
@@ -316,8 +316,8 @@ let dot_of_contact_map parameters (error:Exception.method_handler) handler =
           if i<i' || (i=i' && j<=j')
           then
             let _ =
-              Loggers.fprintf 
-                (Remanent_parameters.get_logger parameters_dot) "%d.%d -- %d.%d\n" 
+              Loggers.fprintf
+                (Remanent_parameters.get_logger parameters_dot) "%d.%d -- %d.%d\n"
                 (Ckappa_sig.int_of_agent_name i)
                 (Ckappa_sig.int_of_site_name j)
                 (Ckappa_sig.int_of_agent_name i')

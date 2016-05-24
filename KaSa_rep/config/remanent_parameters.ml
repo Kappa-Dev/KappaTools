@@ -41,7 +41,7 @@ let fetch_level_gen s r =
   | "high" -> Remanent_parameters_sig.High
   | "complete" | "full" -> Remanent_parameters_sig.Full
   | x ->
-     let _ = Printf.fprintf stderr "%s is not a valid level !!!"  x in raise Exit
+    let _ = Printf.fprintf stderr "%s: %s is not a valid level !!!" s x in raise Exit
 
 let fetch_graph_format f =
   match
@@ -611,29 +611,27 @@ let close_file parameters error =
 	error, {parameters with Remanent_parameters_sig.log = Some !Config.log}
     end*)
 
-let open_influence_map_file parameters error =
-  let error,channel =
+let open_influence_map_file parameters =
+  let channel =
     match get_im_file parameters,get_im_directory parameters,ext_format (get_im_format parameters)
     with
-      | None,_,ext  -> error,stdout
-      | Some a,None,ext -> error,open_out (a^ext)
-      | Some a,Some d,ext -> error,open_out (d^a^ext)
+      | None,_,_  -> stdout
+      | Some a,None,ext -> open_out (a^ext)
+      | Some a,Some d,ext -> open_out (d^a^ext)
   in
   let logger = Loggers.open_logger_from_channel channel
   in
-  error,
   {parameters with Remanent_parameters_sig.logger = logger}
 
-let open_contact_map_file parameters error =
-  let error,channel =
+let open_contact_map_file parameters =
+  let channel =
     match get_cm_file parameters,get_cm_directory parameters,
       ext_format (get_cm_format parameters)
     with
-      | None,_,ext -> error,stdout
-      | Some a,None,ext -> error,open_out (a^ext)
-      | Some a,Some d,ext -> error,open_out (d^a^ext)
+      | None,_,_ -> stdout
+      | Some a,None,ext -> open_out (a^ext)
+      | Some a,Some d,ext -> open_out (d^a^ext)
   in
-    error,
     {
       parameters
      with
@@ -645,7 +643,7 @@ let open_contact_map_file parameters error =
  let lexical_analysis_of_tested_only_patterns_is_required_by_the_influence_map parameter =
    (get_influence_map_accuracy_level parameter = Remanent_parameters_sig.Medium) &&
      (get_do_influence_map parameter)
- let lexical_analysis_of_tested_only_patterns_is_required_by_the_persistent_mode  parameter =
+ let lexical_analysis_of_tested_only_patterns_is_required_by_the_persistent_mode _ =
    persistent_mode
  let lexical_analysis_of_tested_only_patterns_is_required_by_the_contact_map parameter =
    (get_do_contact_map parameter)
