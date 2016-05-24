@@ -96,11 +96,9 @@ In fact, let's define two more agents similar to
 ``Prot1``, which we'll call ``Prot2`` and ``Prot3``. The sites of ``Prot2`` will be called ``P1`` and ``P3``, while
 ``Prot3``'s are ``P1`` and ``P2``. And while we're at it, let's add a text
 pod in our script to mark where we're at. So far in our script, we
-should have:
+should have::
 
-.. code::
   :linenos:
-
   ############################################################
   # Here are my agent signatures
   ############################################################
