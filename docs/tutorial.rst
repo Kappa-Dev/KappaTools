@@ -193,7 +193,7 @@ a rule; thus the pattern may be bimolecular (two separate things), or
 unimolecular (two things connected already). Let's take a look at an
 example of this situation.
 
-.. pull-quote:: Ambiguous Molecularity
+.. attention:: Ambiguous Molecularity
 
   A LHS has ambiguous molecularity if it has at least two agents that
   may be connected through a path not stated in the LHS. To observe the proper
@@ -240,7 +240,7 @@ write that site. In this case, the binding of our agents depends exclusively
 on the respective binding sites; it is independent of the state of the other
 binding sites, and the state of their ``12`` site.
 
-.. topic:: Don't care, don't write
+.. important:: Don't care, don't write
 
   If a site is not important to the mechanism we want to represent, then we don't
   write that site.
