@@ -196,6 +196,7 @@ let start_model ~start_continuation
        (fun () ->
         let () =
           set_model_runtime_state (Some { plot = None;
+					  distances = None;
                                           time = 0.0;
                                           time_percentage = None;
                                           event = 0;

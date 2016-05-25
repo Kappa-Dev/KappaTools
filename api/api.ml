@@ -39,6 +39,7 @@ end = struct
                          ; counter : Counter.t
                          ; log_buffer : Buffer.t
                          ; plot : Api_types.plot ref
+			 ; distances : Api_types.distances ref
                          ; snapshots : Api_types.snapshot list ref
                          ; flux_maps : Api_types.flux_map list ref
                          ; files : Api_types.file_line list ref
@@ -103,6 +104,7 @@ end = struct
         let current_id = self#new_id () in
         let plot : Api_types.plot ref =
 	  ref { Api_types.legend = []; Api_types.observables = [] } in
+	let distances : Api_types.distances ref = ref [] in
 	let error_messages : string list ref = ref [] in
 	let snapshots : Api_types.snapshot list ref = ref [] in
 	let flux_maps : Api_types.flux_map list ref = ref [] in
@@ -116,6 +118,7 @@ end = struct
 				       ~nb_points:(parameter.nb_plot : int)
 			 ; log_buffer = Buffer.create 512
 			 ; plot = plot
+			 ; distances = distances
 			 ; error_messages = error_messages
 			 ; snapshots = snapshots
 			 ; flux_maps = flux_maps
@@ -141,7 +144,23 @@ end = struct
 	     files := ((Api_data.api_file_line file_line)::!files)
 	  | Data.Snapshot snapshot ->
 	     snapshots := ((Api_data.api_snapshot sigs snapshot)::!snapshots)
-	  | Data.UnaryDistances _ -> ()
+	  | Data.UnaryDistances unary_distances ->
+		distances :=
+		  let (one_big_list,_) =
+		  Array.fold_left
+		    (fun (l,i) a ->
+		     match a with
+		     | Some ls ->
+			let add_rule_id =
+			  List.map (fun (t,d) ->
+				    {Api_types.rule_dist =
+				       unary_distances.Data.distances_rules.(i);
+				     Api_types.time_dist = t;
+				     Api_types.dist = d}) ls
+			in (List.append l add_rule_id, i+1)
+		     | None -> (l, i+1))
+		    ([],0) unary_distances.Data.distances_data in
+		  one_big_list
 	  | Data.Log s -> Format.fprintf log_form "%s@." s in
 	let () =
 	  Lwt.async
@@ -237,6 +256,7 @@ end = struct
               (match !(state.error_messages) with
 		 [] ->
 		 `Right ({ Api_types.plot = Some !(state.plot);
+			   Api_types.distances = Some !(state.distances);
 			   Api_types.time = Counter.time state.counter;
 			   Api_types.time_percentage = Counter.time_percentage state.counter;
 			   Api_types.event = Counter.event state.counter;
