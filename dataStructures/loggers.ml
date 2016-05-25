@@ -1,3 +1,21 @@
+(**
+  * loggers.ml
+  *
+  * a module for KaSim
+  * Jérôme Feret, projet Antique, INRIA Paris
+  *
+  * KaSim
+  * Jean Krivine, Université Paris-Diderot, CNRS
+  *
+  * Creation: 26/01/2016
+  * Last modification: 25/05/2016
+  * *
+  *
+  *
+  * Copyright 2016  Institut National de Recherche en Informatique et
+  * en Automatique.  All rights reserved.  This file is distributed
+  * under the terms of the GNU Library General Public License *)
+
 module StringMap = Map.Make (struct type t = string let compare = compare end)
 type encoding =
   | HTML_Graph | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS
@@ -265,12 +283,16 @@ let flush_buffer logger fmt =
   | Circular_buffer a -> Circular_buffers.iter (Format.fprintf fmt "%s") !a
   | Infinite_buffer b -> Infinite_buffers.iter (Format.fprintf fmt "%s") !b
 
+let fresh_id logger =
+  let i = !(logger.fresh_id) in
+  let () = logger.fresh_id := i+1 in
+  i
+
 let int_of_string_id logger string =
   try
     StringMap.find string !(logger.id_map)
   with
   | Not_found ->
-    let i = !(logger.fresh_id) in
+    let i = fresh_id logger in
     let () = logger.id_map := StringMap.add string i !(logger.id_map) in
-    let () = logger.fresh_id := i+1 in
     i

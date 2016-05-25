@@ -1,3 +1,21 @@
+(**
+  * graph_loggers.ml
+  *
+  * a module for KaSim
+  * Jérôme Feret, projet Antique, INRIA Paris
+  *
+  * KaSim
+  * Jean Krivine, Université Paris-Diderot, CNRS
+  *
+  * Creation: 23/05/2016
+  * Last modification: 25/05/2016
+  * *
+  *
+  *
+  * Copyright 2016  Institut National de Recherche en Informatique et
+  * en Automatique.  All rights reserved.  This file is distributed
+  * under the terms of the GNU Library General Public License *)
+
 type direction = Direct | Reverse | Undirected | Both
 type options =
   | Label of string
@@ -261,7 +279,7 @@ let print_edge logger ?directives:(directives=[]) id1 id2 =
     let _ =
       List.fold_left
         (fun bool option ->
-           if ignore_in_dot option
+           if ignore_in_html option
            then bool
            else
              let () = if bool then Loggers.fprintf logger ", " in
@@ -271,7 +289,7 @@ let print_edge logger ?directives:(directives=[]) id1 id2 =
                | Width _
                | Height _
                | Direction _ -> ()
-               | DotStyle string -> Loggers.fprintf logger "style=\"%s\"" string
+               | DotStyle _ -> ()
              in
              true
         )
@@ -280,3 +298,36 @@ let print_edge logger ?directives:(directives=[]) id1 id2 =
     let () = Loggers.fprintf logger "})\n " in
     ()
   | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+
+let print_one_to_n_relation logger ?directives:(directives=[]) ?style_one:(style_one="") ?style_n:(style_n="") id idlist =
+  let fictitious = "Fictitious_"^id in
+  let directives_fict =
+    if style_one = ""
+    then
+      directives
+    else
+      List.rev ((Label "")::(DotStyle "invis")::(Width "0cm")::(Height "0cm")::(List.rev directives))
+  in
+  let directives_one =
+    if style_one = ""
+    then
+      directives
+    else
+      List.rev ((DotStyle style_one)::(List.rev directives))
+  in
+  let directives_n =
+    if style_n = ""
+    then
+      directives
+    else
+      List.rev ((DotStyle style_n)::(List.rev directives))
+  in
+  let _ = print_node logger fictitious ~directives:directives_fict in
+  let _ = print_edge logger ~directives:directives_one fictitious id in
+  let _ =
+    List.iter
+      (fun id' ->
+         print_edge logger ~directives:directives_n fictitious id')
+      idlist
+  in
+  ()

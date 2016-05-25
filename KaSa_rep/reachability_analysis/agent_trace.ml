@@ -758,23 +758,6 @@ let print logger parameter compil handler_kappa handler error transition_system 
       error
       transition_system.nodes
   in
-  (* macro_steps *)
-  let error =
-    Mods.IntMap.fold
-      (fun k _ error ->
-         let () =
-           Graph_loggers.print_node logger ("Macro_"^(string_of_int k))
-             ~directives:
-               [
-                 Graph_loggers.Width "0cm" ;
-                 Graph_loggers.Height "0cm" ;
-                 Graph_loggers.DotStyle "invis" ;
-                 Graph_loggers.Label ""
-               ]
-         in error)
-      transition_system.subframe
-      error
-  in
   (* edges  *)
   let error, handler =
     List.fold_left
@@ -855,32 +838,9 @@ let () =
        then
          ()
        else
-         let ()
-           =
-           Graph_loggers.print_edge
-           logger
-           ("Macro_"^(string_of_int key))
-           ("Node_"^(string_of_int key))
-           ~directives:
-             [
-               Graph_loggers.DotStyle "dotted" ;
-               Graph_loggers.Label "" ;
-             ]
-         in
-         Mods.IntSet.iter
-           (fun h ->
-              Graph_loggers.print_edge
-                logger
-                ("Macro_"^(string_of_int key))
-                ("Node_"^(string_of_int h))
-                ~directives:
-                  [
-                    Graph_loggers.DotStyle "dashed" ;
-                    Graph_loggers.Label "" ;
-                  ]
-           )
-           l
-    )
+         let k = "Node_"^(string_of_int key) in
+         let l = List.rev (Mods.IntSet.fold (fun i list -> ("Node_"^(string_of_int i))::list) l []) in
+         Graph_loggers.print_one_to_n_relation logger ~style_one:"dotted" ~style_n:"dashed" k l)
     transition_system.subframe
 in
 let () = Graph_loggers.print_graph_foot logger in
