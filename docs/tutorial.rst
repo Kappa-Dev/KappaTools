@@ -157,10 +157,9 @@ would be the RHS times the corresponding reverse rate).
 .. note::
 
   To make a rule trigger more often, one can increase the abundance of
-  its LHS, and/or increase the rule's rate. Likewise, time-scale separations
-  are determined by activity, not by the raw rate or raw LHS abundance. E.g.
+  its LHS, and/or increase the rule's rate. E.g.
   a rule with a large rate, but a rare LHS, may still be triggered
-  rarely.
+  rarely, depending on the overall activity of the system.
 
 Rule Rates
 ----------
@@ -193,7 +192,9 @@ a rule; thus the pattern may be bimolecular (two separate things), or
 unimolecular (two things connected already). Let's take a look at an
 example of this situation.
 
-.. tip:: Ambiguous Molecularity
+.. tip::
+  
+  **Ambiguous Molecularity**
 
   A LHS has ambiguous molecularity if it has at least two agents that
   may be connected through a path not stated in the LHS. To observe the proper
@@ -228,8 +229,10 @@ going and add the other two binding rules, one for ``Prot1`` binding
   It is worth noting that the agents must be in the same order on both
   sides of the arrow signs. If not, the simulator would replace them with
   what we told it, thereby effectively degrading the original copies and injecting
-  fresh ones. If agents were connected to the original copies, they would
-  not be connected to the fresh ones. If the original agents had sites in
+  fresh ones.
+  
+  For example, agents connected to the original copies would not be bound to
+  the new ones. If the original agents had sites in
   states not mentioned in the rule, they would be replaced with agents
   whose sites would be in the default state.
   
@@ -240,10 +243,13 @@ write that site. In this case, the binding of our agents depends exclusively
 on the respective binding sites; it is independent of the state of the other
 binding sites, and the state of their ``12`` site.
 
-.. tip:: Don't care, don't write
+.. tip::
+
+  **Don't care, don't write**
 
   If a site is not important to the mechanism we want to represent, then we don't
-  write that site.
+  write that site. With this action, we make the rule independent of whatever
+  is happening at unmentioned sites.
 
 Having these three rules, we can render the contact map, which would
 look something like this:
