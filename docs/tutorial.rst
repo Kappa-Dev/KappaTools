@@ -193,9 +193,8 @@ a rule; thus the pattern may be bimolecular (two separate things), or
 unimolecular (two things connected already). Let's take a look at an
 example of this situation.
 
-.. epigraph::
+.. topic:: Ambiguous Molecularity
 
-  *Ambiguous Molecularity*
   A LHS has ambiguous molecularity if it has at least two agents that
   may be connected through a path not stated in the LHS. To observe the proper
   kinetics, such rules require both a *bimolecular* and a *unimolecular* rate.
@@ -241,9 +240,8 @@ write that site. In this case, the binding of our agents depends exclusively
 on the respective binding sites; it is independent of the state of the other
 binding sites, and the state of their ``12`` site.
 
-.. epigraph::
+.. topic:: Don't care, don't write
 
-  *Don't care, don't write*
   If a site is not important to the mechanism we want to represent, then we don't
   write that site.
 
@@ -511,9 +509,9 @@ binding of ``Prot1`` and ``Prot2`` only mentions their respective ``P2`` and ``P
   
 Can we apply rule ``P1.P2`` to those agents? Yes, we can! Those ``P1`` and ``P2`` can bind through their respective ``P2`` and ``P1`` sites to generate a tetramer::
 
-  ``P3(P1!1,P2), P1(P2!2,P3!1), P2(P1!2,P3!3), P3(P1,P2!3)``
+  P3(P1!1,P2), P1(P2!2,P3!1), P2(P1!2,P3!3), P3(P1,P2!3)
 
-By a similar process, any :math:`n`mer can recruit an :math:`m`mer if
+By a similar process, any *n* mer can recruit an *m*mer if
 it has the right agent capping it. This leads to open-ended polymerization.
 
 This illustrates a consequence of Kappa's don't care,
