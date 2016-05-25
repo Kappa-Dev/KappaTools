@@ -193,7 +193,7 @@ a rule; thus the pattern may be bimolecular (two separate things), or
 unimolecular (two things connected already). Let's take a look at an
 example of this situation.
 
-.. topic:: Ambiguous Molecularity
+.. pull-quote:: Ambiguous Molecularity
 
   A LHS has ambiguous molecularity if it has at least two agents that
   may be connected through a path not stated in the LHS. To observe the proper
