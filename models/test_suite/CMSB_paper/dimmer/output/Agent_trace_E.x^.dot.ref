@@ -1,5 +1,5 @@
 digraph G{
-Init_22 [width="0cm" height="0cm" style="invis" label=""];
+Init_22 [label="" style="invis" width="0px" height="0px"];
 Node_21 [label="E(x!R@x)"];
 Node_22 [label="E(x!free)"];
 Node_21 -> Node_22 [label="rule 1: E/R"];

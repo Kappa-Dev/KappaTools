@@ -17,12 +17,82 @@
   * under the terms of the GNU Library General Public License *)
 
 type direction = Direct | Reverse | Undirected | Both
+type shape = Invisible | House | Rect | Ellipse | Circle
+type headkind = Normal | Vee | Tee | No_head
+type linestyle = Plain | Dotted | Dashed
+
 type options =
+  | Color of string
+  | FillColor of string
   | Label of string
-  | Width of string
-  | Height of string
+  | Width of int (*pixel*)
+  | Height of int (*pixel*)
   | Direction of direction
-  | DotStyle of string
+  | Shape of shape
+  | ArrowHead of headkind
+  | ArrowTail of headkind
+  | LineStyle of linestyle
+
+type node_attribute =
+  {
+    node_color: string option;
+    node_fillcolor: string option;
+    node_label: string option ;
+    node_width: int option ;
+    node_height: int option ;
+    node_shape: shape option ;
+  }
+
+type edge_attribute =
+  {
+    edge_color: string option;
+    edge_label: string option ;
+    edge_style: linestyle ;
+    edge_direction: direction ;
+    edge_arrowhead: headkind ;
+    edge_arrowtail: headkind
+  }
+
+let dummy_node =
+  {
+    node_color = None ;
+    node_fillcolor = None ;
+    node_label = None ;
+    node_width = None ;
+    node_height = None ;
+    node_shape = None ;
+  }
+
+let dummy_edge =
+  {
+    edge_color = None ;
+    edge_label = None ;
+    edge_style = Plain ;
+    edge_direction = Direct ;
+    edge_arrowhead = Normal ;
+    edge_arrowtail = Normal ;
+  }
+
+let is_no_node_attributes node_attribute = node_attribute = dummy_node
+let is_no_edge_attributes edge_attribute =
+  dummy_edge =
+  {
+    edge_attribute
+    with edge_direction = Direct ;
+         edge_arrowhead = Normal ;
+         edge_arrowtail = Normal  }
+
+let between_attributes_in_dot logger bool =
+  if bool then
+    Loggers.fprintf logger " "
+  else
+    ()
+
+let between_attributes_in_html logger bool =
+  if bool then
+    Loggers.fprintf logger ", "
+  else
+    ()
 
 let html_deps =
   ["http://d3js.org/d3.v3.min.js";
@@ -128,146 +198,336 @@ let print_asso logger string1 string2 =
   | Loggers.HTML_Graph -> Loggers.fprintf logger "\t\t\t<dt>%s</dt><dd>%s</dd>" string1 string2
   | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
-let ignore_in_dot option =
-  match option with
-  | Label _ | Width _ | Height _ | DotStyle _ -> false
-  | Direction _  -> true
+let shape_in_dot shape =
+  match
+    shape
+  with
+  | Invisible -> "style=\"invis\""
+  | House -> "shape=\"house\""
+  | Rect -> "shape=\"box\""
+  | Ellipse -> "shape=\"ellipse\""
+  | Circle -> "shape=\"circle\""
 
-let ignore_in_html option =
-  match option with
-  | Label _ -> false
-  | Width _ | Height _
-  | Direction _ | DotStyle _ -> true
+let shape_in_html shape =
+    match
+      shape
+    with
+    | Invisible -> None
+    | House -> Some "shape: house"
+    | Rect -> Some "shape: rect"
+    | Ellipse -> Some "shape: ellipse"
+    | Circle -> Some "shape: circle"
+
+let string_one_of_linestyle_in_dot _ = "-"
+let string_two_of_linestyle_in_dot _ = "--"
+
+let string_of_arrow_head_in_dot style =
+  match
+    style
+  with
+  | Normal -> ">"
+  | Vee -> "|>"
+  | Tee -> "|"
+  | No_head -> ""
+
+let string_of_arrow_tail_in_dot style =
+  match
+    style
+  with
+  | Normal -> "<"
+  | Vee -> "<|"
+  | Tee -> "|"
+  | No_head -> ""
+
+let string_of_arrow_in_html logger bool title style =
+    match style
+    with
+    | Normal -> bool
+    | Tee ->
+      let () = between_attributes_in_html logger bool in
+      let () =
+        Loggers.fprintf logger "%s: \"tee\"" title
+      in
+      true
+    | Vee ->
+      let () = between_attributes_in_html logger bool in
+      let () =
+        Loggers.fprintf logger "%s: \"vee\"" title
+      in
+      true
+    | No_head ->
+      (*  let () = between_attributes_in_html logger bool in
+      let () =
+        Loggers.fprintf logger "%s: \"none\"" title
+      in
+          true*) bool
 
 let print_node logger ?directives:(directives=[]) id =
-  let directives =
-    match Loggers.get_encoding_format logger
-    with
-    | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> []
+  let attributes = dummy_node in
+  let attributes =
+    match Loggers.get_encoding_format logger with
     | Loggers.DOT | Loggers.HTML_Graph ->
-      let _,directives =
-        List.partition
-          (fun a ->
-             match a with
-             | Direction _ -> true
-             | Label _ | Width _ | Height _ | DotStyle _ -> false)
-          directives
-      in
-      directives
+      List.fold_left
+        (fun attributes option ->
+           match
+             option
+           with
+           | Label s -> {attributes with node_label = Some s }
+           | Color s -> {attributes with node_color = Some s }
+           | FillColor s -> {attributes with node_fillcolor = Some s}
+           | Width i -> {attributes with node_width = Some i}
+           | Height i -> {attributes with node_height = Some i}
+           | Shape s -> {attributes with node_shape = Some s}
+           | LineStyle _ | Direction _ | ArrowTail _ | ArrowHead _ -> attributes
+        )
+        attributes
+        directives
+    | Loggers.TXT_Tabular | Loggers.XLS | Loggers.HTML_Tabular | Loggers.HTML | Loggers.TXT
+      -> attributes
   in
   match Loggers.get_encoding_format logger with
   | Loggers.DOT ->
     begin
       let () = Loggers.fprintf logger "%s" id in
-      let _,directives =
-        List.partition
-          (fun a ->
-             match a with
-             | Direction _ -> true
-             | Label _ | Width _ | Height _ | DotStyle _ -> false)
-          directives
-      in
       let () =
-        match directives with
-        | [] -> ()
-        | _ ->
-          let () = Loggers.fprintf logger " [" in
-          let _ =
-            List.fold_left
-              (fun bool option ->
-                 if ignore_in_dot option
-                 then bool
-                 else
-                   let () = if bool then Loggers.fprintf logger " " in
-                   let () =
-                     match option with
-                     | Label string -> Loggers.fprintf logger "label=\"%s\"" string
-                     | Width string -> Loggers.fprintf logger "width=\"%s\"" string
-                     | Height string -> Loggers.fprintf logger "height=\"%s\"" string
-                     | Direction _ -> ()
-                     | DotStyle string -> Loggers.fprintf logger "style=\"%s\"" string
-                   in
-                   true
-              )
-              false directives
-          in
-          let () = Loggers.fprintf logger "];\n" in
-          ()
+        if is_no_node_attributes attributes
+        then ()
+        else
+          begin
+            let () = Loggers.fprintf logger " [" in
+            let bool = false in
+            let bool =
+              match attributes.node_label
+              with
+              | None -> bool
+              | Some string ->
+                let () = Loggers.fprintf logger "label=\"%s\"" string in
+                true
+            in
+            let bool =
+              match attributes.node_shape
+              with
+              | None -> bool
+              | Some shape ->
+                let () = between_attributes_in_dot logger bool in
+                let () =
+                  Loggers.fprintf logger "%s" (shape_in_dot shape)
+                in
+                true
+            in
+            let bool =
+              match attributes.node_width
+              with
+              | None -> bool
+              | Some i ->
+                let () = between_attributes_in_dot logger bool in
+                let () =
+                  Loggers.fprintf logger "width=\"%ipx\"" i
+                in
+                true
+            in
+            let bool =
+              match attributes.node_height
+              with
+              | None -> bool
+              | Some i ->
+                let () = between_attributes_in_dot logger bool in
+                let () =
+                  Loggers.fprintf logger "height=\"%ipx\"" i
+                in
+                true
+            in
+            let bool =
+              match attributes.node_color
+              with
+              | None -> bool
+              | Some s ->
+                let () = between_attributes_in_dot logger bool in
+                let () =
+                  Loggers.fprintf logger "color=\"%s\"" s
+                in
+                true
+            in
+            let bool =
+              match attributes.node_fillcolor
+              with
+              | None -> bool
+              | Some s ->
+                let () = between_attributes_in_dot logger bool in
+                let () =
+                  Loggers.fprintf logger "fillcolor=\"%s\"" s
+                in
+                true
+            in
+            let () = if bool then () in
+            let () = Loggers.fprintf logger "];\n" in
+            ()
+          end
       in ()
     end
   | Loggers.HTML_Graph ->
     let id_int = Loggers.int_of_string_id logger id in
     let () = Loggers.fprintf logger "g.setNode(%i, { " id_int in
-    let bool =
-      List.fold_left
-        (fun bool option ->
-           if ignore_in_html option
-           then bool
-           else
-             let () = if bool then Loggers.fprintf logger ", " in
-             let () =
-               match option with
-               | Label string -> Loggers.fprintf logger "label: \"%s\"" string
-               | Width _ -> ()
-               | Height _ -> ()
-               | Direction _ -> ()
-               | DotStyle _ -> ()
-             in
-             true
-        )
-        false directives
+    let () =
+      if is_no_node_attributes attributes
+      then ()
+      else
+        begin
+          let bool = false in
+          let bool =
+            match attributes.node_label
+            with
+            | None -> bool
+            | Some string ->
+              let () = Loggers.fprintf logger "label: \"%s\"" string in
+              true
+          in
+          let bool =
+            match attributes.node_shape
+            with
+            | None -> bool
+            | Some shape ->
+              begin
+                match shape_in_html shape
+                with
+                | None -> bool
+                | Some shape ->
+                  let () = between_attributes_in_html logger bool in
+                  let () =
+                    Loggers.fprintf logger "%s" shape
+                  in
+                  true
+              end
+          in
+          let bool =
+            match attributes.node_width
+            with
+            | None -> bool
+            | Some i ->
+              let () = between_attributes_in_html logger bool in
+              let () =
+                Loggers.fprintf logger "width: \"%i\"" i
+              in
+              true
+          in
+          let bool =
+            match attributes.node_height
+            with
+            | None -> bool
+            | Some i ->
+              let () = between_attributes_in_html logger bool in
+              let () =
+                Loggers.fprintf logger "height: \"%i\"" i
+              in
+              true
+          in
+          let bool =
+            match attributes.node_color
+            with
+            | None -> bool
+            | Some s ->
+              let () = between_attributes_in_html logger bool in
+              let () =
+                Loggers.fprintf logger "color: \"%s\"" s
+              in
+              true
+          in
+          let bool =
+            match attributes.node_fillcolor
+            with
+            | None -> bool
+            | Some s ->
+              let () = between_attributes_in_html logger bool in
+              let () =
+                Loggers.fprintf logger "style: \"fill: %s\" " s
+              in
+              true
+          in
+          let () = if bool then () in
+          let () = Loggers.fprintf logger " });@," in
+          ()
+        end
     in
-    let () = if bool then Loggers.fprintf logger ", " in
-    let () = Loggers.fprintf logger "style: \"fill: #f77\" });\n" in
     ()
   | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let print_edge logger ?directives:(directives=[]) id1 id2 =
-  let direction,directives =
-    List.partition
-      (fun a ->
-         match a with
-         | Direction _ -> true
-         | Label _ | Width _ | Height _ | DotStyle _ -> false)
-      directives
-  in
-  let direction = List.rev direction in
-  let direction =
-    match direction with
-    | (Direction Direct)::_ | [] -> "->"
-    | (Direction Reverse)::_ -> "<-"
-    | (Direction Both)::_ -> "<->"
-    | (Direction Undirected)::_ -> "--"
-    | (Label _ )::_ | (Height _)::_ | (Width _ )::_ | (DotStyle _)::_ -> "->"
+  let attributes = dummy_edge in
+  let attributes =
+    match Loggers.get_encoding_format logger with
+    | Loggers.DOT | Loggers.HTML_Graph ->
+      List.fold_left
+        (fun attributes option ->
+           match
+             option
+           with
+           | Label s -> {attributes with edge_label = Some s }
+           | Color s -> {attributes with edge_color = Some s }
+           | LineStyle s -> {attributes with edge_style = s}
+           | Direction s -> {attributes with edge_direction = s}
+           | ArrowTail s -> {attributes with edge_arrowtail = s}
+           | ArrowHead s -> {attributes with edge_arrowhead = s}
+           | Shape _ | Width _ | Height _ | FillColor _ -> attributes
+        )
+        attributes
+        directives
+    | Loggers.TXT_Tabular | Loggers.XLS | Loggers.HTML_Tabular | Loggers.HTML | Loggers.TXT
+      -> attributes
   in
   match Loggers.get_encoding_format logger with
   | Loggers.DOT ->
     begin
+      let direction =
+        match attributes.edge_direction
+        with
+        | Direct ->
+          (string_one_of_linestyle_in_dot attributes.edge_style)^(string_of_arrow_head_in_dot
+                                                                    attributes.edge_arrowhead)
+        | Undirected -> (string_two_of_linestyle_in_dot attributes.edge_style)
+        | Both -> (string_of_arrow_tail_in_dot attributes.edge_arrowtail)^(string_one_of_linestyle_in_dot
+                                                                             attributes.edge_style)^(string_of_arrow_head_in_dot attributes.edge_arrowhead)
+        | Reverse -> (string_of_arrow_tail_in_dot attributes.edge_arrowtail)^(string_one_of_linestyle_in_dot
+                                                                                attributes.edge_style)
+      in
       let () = Loggers.fprintf logger "%s %s %s" id1 direction id2 in
       let () =
-        match directives with
-        | [] -> ()
-        | _ ->
+        if is_no_edge_attributes attributes
+        then
+          ()
+        else
           let () = Loggers.fprintf logger " [" in
-          let _ =
-            List.fold_left
-              (fun bool option ->
-                 if ignore_in_dot option
-                 then bool
-                 else
-                   let () = if bool then Loggers.fprintf logger " " in
-                   let () =
-                     match option with
-                     | Label string -> Loggers.fprintf logger "label=\"%s\"" string
-                     | Width _
-                     | Height _
-                     | Direction _ -> ()
-                     | DotStyle string -> Loggers.fprintf logger "style=\"%s\"" string
-                   in
-                   true
-              )
-              false directives
+          let bool = false in
+          let bool =
+            match attributes.edge_label
+              with
+              | None -> bool
+              | Some string ->
+                let () = Loggers.fprintf logger "label=\"%s\"" string in
+                true
           in
+          let bool =
+            match attributes.edge_style
+              with
+              | Plain -> bool
+              | Dotted ->
+                let () = Loggers.fprintf logger "style=\"dotted\"" in
+                true
+              | Dashed ->
+                let () = Loggers.fprintf logger "style=\"dashed\"" in
+                true
+          in
+          let bool =
+            match attributes.edge_color
+            with
+            | None -> bool
+            | Some s ->
+              let () = between_attributes_in_dot logger bool in
+              let () =
+                Loggers.fprintf logger "color=\"%s\"" s
+              in
+              true
+          in
+          let () = if bool then () in
           let () = Loggers.fprintf logger "];\n" in
           ()
       in ()
@@ -275,52 +535,64 @@ let print_edge logger ?directives:(directives=[]) id1 id2 =
   | Loggers.HTML_Graph ->
     let id1_int = Loggers.int_of_string_id logger id1 in
     let id2_int = Loggers.int_of_string_id logger id2 in
-    let () = Loggers.fprintf logger "g.setEdge(%i,%i,{" id1_int id2_int in
-    let _ =
-      List.fold_left
-        (fun bool option ->
-           if ignore_in_html option
-           then bool
-           else
-             let () = if bool then Loggers.fprintf logger ", " in
-             let () =
-               match option with
-               | Label string -> Loggers.fprintf logger "label: \"%s\"" string
-               | Width _
-               | Height _
-               | Direction _ -> ()
-               | DotStyle _ -> ()
-             in
-             true
-        )
-        false directives
+    let () = Loggers.fprintf logger "g.setEdge(%i,%i,{ " id1_int id2_int in
+    let attributes =
+      match attributes.edge_direction
+      with
+      | Undirected -> {attributes with edge_arrowhead=No_head ; edge_arrowtail=No_head}
+      | Direct -> {attributes with edge_arrowtail=No_head}
+      | Reverse -> {attributes with edge_arrowhead=No_head}
+      | Both -> attributes
     in
-    let () = Loggers.fprintf logger "})\n " in
+    let bool = false in
+    let bool =
+      match attributes.edge_label
+        with
+        | None -> bool
+        | Some string ->
+          let () = Loggers.fprintf logger "label: \"%s\"" string in
+          true
+      in
+      let bool =
+        match attributes.edge_color
+        with
+        | None -> bool
+        | Some s ->
+          let () = between_attributes_in_html logger bool in
+          let () =
+            Loggers.fprintf logger "color: \"%s\"" s
+          in
+          true
+      in
+      let bool = string_of_arrow_in_html logger bool "arrowhead" attributes.edge_arrowhead in
+      let bool = string_of_arrow_in_html logger bool "arrowtail" attributes.edge_arrowtail in
+      let () = if bool then () else () in
+      let () = Loggers.fprintf logger " });@," in
     ()
   | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
-let print_one_to_n_relation logger ?directives:(directives=[]) ?style_one:(style_one="") ?style_n:(style_n="") id idlist =
+let print_one_to_n_relation logger ?directives:(directives=[]) ?style_one:(style_one=Plain) ?style_n:(style_n=Plain) id idlist =
   let fictitious = "Fictitious_"^id in
   let directives_fict =
-    if style_one = ""
+    if style_one = Plain
     then
       directives
     else
-      List.rev ((Label "")::(DotStyle "invis")::(Width "0cm")::(Height "0cm")::(List.rev directives))
+      List.rev ((Label "")::(Shape Invisible)::(Width 0)::(Height 0)::(List.rev directives))
   in
   let directives_one =
-    if style_one = ""
+    if style_one = Plain
     then
       directives
     else
-      List.rev ((DotStyle style_one)::(List.rev directives))
+      List.rev ((LineStyle style_one)::(List.rev directives))
   in
   let directives_n =
-    if style_n = ""
+    if style_n = Plain
     then
       directives
     else
-      List.rev ((DotStyle style_n)::(List.rev directives))
+      List.rev ((LineStyle style_n)::(List.rev directives))
   in
   let _ = print_node logger fictitious ~directives:directives_fict in
   let _ = print_edge logger ~directives:directives_one fictitious id in

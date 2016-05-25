@@ -740,9 +740,9 @@ let print logger parameter compil handler_kappa handler error transition_system 
            ("Init_"^(string_of_int key))
            ~directives:
          [
-           Graph_loggers.Width "0cm";
-           Graph_loggers.Height "0cm";
-           Graph_loggers.DotStyle "invis";
+           Graph_loggers.Width 0;
+           Graph_loggers.Height 0;
+           Graph_loggers.Shape Graph_loggers.Invisible;
            Graph_loggers.Label ""
          ]
        in
@@ -840,7 +840,7 @@ let () =
        else
          let k = "Node_"^(string_of_int key) in
          let l = List.rev (Mods.IntSet.fold (fun i list -> ("Node_"^(string_of_int i))::list) l []) in
-         Graph_loggers.print_one_to_n_relation logger ~style_one:"dotted" ~style_n:"dashed" k l)
+         Graph_loggers.print_one_to_n_relation logger ~style_one:Graph_loggers.Dotted ~style_n:Graph_loggers.Dashed k l)
     transition_system.subframe
 in
 let () = Graph_loggers.print_graph_foot logger in
