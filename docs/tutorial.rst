@@ -541,26 +541,39 @@ ToDo
 *******************
 Glossary of Symbols
 *******************
-:#: start comment
-:%agent\:: command to define an agent
-:%obs\:: command to define an observable
-:%var\:: command to define a variable
-:%mod\:: command to define a modification or perturbation
-:%def\:: command to define something, like a file name or the
-       graphical format of a snapshot
-:'': internal naming quotations, for rule names (' vs. ")
-:"": external naming quotations, for file names (' vs. ")
-:@: specify the reaction's rate
-:@ X,Y: forward, reverse rate for the reversible reaction
-:@ X(Y): bi(uni) -molecular rate for the rule with a molecularly
-         ambiguous LHS
-:Smith(foo): Specifies a site foo on agent Smith
-:Y!x: Where x is a number, it indicates the bond's identity ending on
-      site Y
-:Y!_: Indicates site Y in any bond status (useful in observables)
-:Y?: Indicates it doesn't matter if site Y is bound, to what, or not
-     (notice the absence of !)
-:Y~foo: Specifies site Y 's state as foo
+.. glossary::
+  ``#``
+    start single line comment
+  ``%agent:``
+    command to define an agent
+  ``%obs:``
+    command to define an observable
+  ``%var:``
+    command to define a variable
+  ``%mod:``
+    command to define a modification or perturbation
+  ``%def:``
+    command to define something, like a file name or the graphical format of a snapshot
+  ``''``
+    single quote for internal naming, e.g. for rule names (``'`` vs. ``"``)
+  ``""``
+    double quote for external naming, e.g. for file names (``'`` vs. ``"``)
+  ``@``
+    specify the reaction's rate
+  ``@ X,Y``
+    rates for the reversible reaction, ``X``: forward, ``Y``: reverse
+  ``@ X(Y)``
+    rates for the rule with a molecularly ambiguous LHS, bimolecular(unimolecular)
+  ``Smith(foo)``
+    Specifies site ``foo`` on agent ``Smith``
+  ``Y!x``
+    Where ``x`` is a number, it indicates the bond's identity ending on site ``Y``
+  ``Y!_``
+    Indicates site ``Y`` bound to anything (useful in observables)
+  ``Y?``
+    Indicates it doesn't matter if site ``Y`` is bound, to what, or not (notice the absence of ``!``)
+  ``Y~foo``
+    Specifies site ``Y`` in state ``foo``
 
 .. _proto-IDE : https://dev/executableknowledge.org/try/
 .. _Hook effect  : https://en.wikipedia.org/wiki/Hook_effect
