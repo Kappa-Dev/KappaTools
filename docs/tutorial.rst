@@ -132,7 +132,7 @@ rule.
     '[rule name_op]' [right-hand side] -> [left-hand side] @ [reverse rates]
   
   If in some of KaSim's output you see rules with ``_op`` appended to their names,
-  rules that you did not wirte, they are the reverse of the reversible rules you wrote.
+  rules that you did not write, they are the reverse of the reversible rules you wrote.
 
 In terms of the guts of the simulator, what is doing is
 matching the LHS to whatever is in the reaction mixture, and replacing
@@ -193,8 +193,13 @@ a rule; thus the pattern may be bimolecular (two separate things), or
 unimolecular (two things connected already). Let's take a look at an
 example of this situation.
 
-Ambiguous Molecularity
-----------------------
+.. epigraph::
+
+  *Ambiguous Molecularity*
+  A LHS has ambiguous molecularity if it has at least two agents that
+  may be connected through a path not stated in the LHS. To observe the proper
+  kinetics, such rules require both a *bimolecular* and a *unimolecular* rate.
+
 
 We want to express the reversible binding relation between ``Prot1``
 and ``Prot2``, who bind through their respective ``P2`` and ``P1``
@@ -219,7 +224,7 @@ going and add the other two binding rules, one for ``Prot1`` binding
 'P1.P3' Prot1(P3), Prot3(P1) <-> Prot1(P3!1), Prot3(P1!1) @ 1.0e-4, 1.0e-2
 'P2.P3' Prot2(P3), Prot3(P2) <-> Prot2(P3!1), Prot3(P2!1) @ 1.0e-4, 1.0e-2
 
-.. note::
+.. warning::
 
   It is worth noting that the agents must be in the same order on both
   sides of the arrow signs. If not, the simulator would replace them with
@@ -228,6 +233,19 @@ going and add the other two binding rules, one for ``Prot1`` binding
   not be connected to the fresh ones. If the original agents had sites in
   states not mentioned in the rule, they would be replaced with agents
   whose sites would be in the default state.
+  
+Notice that our rules don't specify every site of the agents, but just some
+of the sites. In Kappa, we follow the *don't care, don't write* philosophy:
+if a site is not important to the mechanism we want to represent, then we don't
+write that site. In this case, the binding of our agents depends exclusively
+on the respective binding sites; it is independent of the state of the other
+binding sites, and the state of their ``12`` site.
+
+.. epigraph::
+
+  *Don't care, don't write*
+  If a site is not important to the mechanism we want to represent, then we don't
+  write that site.
 
 Having these three rules, we can render the contact map, which would
 look something like this:
@@ -255,7 +273,7 @@ rate that's much higher than the bimolecular one::
 .. note::
 
   You can consider the unimolecular rate as being similar in spirit to
-  the bimolecular rate, but representing diffusion in a much smaller
+  the bimolecular rate, but representing diffusion in a *much* smaller
   volume.
 
 Notice that the RHSes of our rules have to be unimolecular: we have the
@@ -467,17 +485,17 @@ Perturbations and Modifications
 -------------------------------
 
 Let's start by checking the state of the reaction mixture, in what is
-called a ``snapshot``. We can tell KaSim to produce a snapshot at any
-given time with::
+called a ``snapshot``. We can tell the simulator to produce a snapshot with::
 
 %mod: [trigger condition] do $SNAPSHOT [snapshot's name]
 
 This will ouput a snapshot when the trigger conditions are met as a file
-whose name we specified. Let's define our snapshot as::
+whose name we specified. Let's define our snapshot to be triggered after the
+simulation reaches second 4500 and dump that to a snapshot called ``T4500``::
 
 %mod: [T]>4500 do $SNAPSHOT "T4500"
 
-Go ahead and add that line to the script, and re-run the simulation.
+Go ahead and add that line to the script, and re-run the simulation with the same time parameters.
 In the IDE, such a snapshot would look like this:
 
 TODO .. image:: img/Snapshot.svg
@@ -485,12 +503,18 @@ TODO .. image:: img/Snapshot.svg
 As we can see, the system has produced polymers! Instead of having
 dimers, we have much bigger oligomers. How did this happen? Well, when
 we made the rules, we only mentioned some sites. For example, the
-binding of ``Prot1`` and ``Prot2`` only mentions their respective ``P2`` and ``P1`` sites; it says nothing about their respective ``P3`` sites. Thus, this event is independent of whatever is the state of those ``P3`` sites. For example, if there are two dimers, say ``P1(P2,P3!1), P3(P1!1,P2)`` and ``P2(P1,P3!1), P3(P1,P2!1)``, those ``P1`` and ``P2`` can bind to generate a ``P3(P1!1,P2), P1(P2!2,P3!1), P2(P1!2,P3!3), P3(P1,P2!3)`` tetramer, and so on.
+binding of ``Prot1`` and ``Prot2`` only mentions their respective ``P2`` and ``P1`` sites; it says nothing about their respective ``P3`` sites. Thus, this binding event is independent of whatever is the state of those ``P3`` sites. For example, if there are two dimers, say::
 
-In Kappa, we only write the sites that we care about,
-and by omitting everything we don't care about, claim independence of
-it. Our three dimerization events are therefore all independent, so
-there are no geometric constraints.
+  P1(P2,P3!1), P3(P1!1,P2)
+  
+  P2(P1,P3!1), P3(P1,P2!1)
+  
+Can we apply rule ``P1.P2`` to those agents? Yes, we can! Those ``P1`` and ``P2`` can bind through their respective ``P2`` and ``P1`` sites to generate a tetramer::
+
+  ``P3(P1!1,P2), P1(P2!2,P3!1), P2(P1!2,P3!3), P3(P1,P2!3)``
+
+By a similar process, any :math:`n`mer can recruit an :math:`m`mer if
+it has the right agent capping it. This leads to open-ended polymerization.
 
 This illustrates a consequence of Kappa's don't care,
 don't write philosophy. If the mechanism we are trying to express 
