@@ -9,6 +9,7 @@ let export_filename_id = "plot-export-filename"
 let export_button_id =  "plot-export-button"
 let export_format_id = "export-file-format"
 let div_id = "plot-div"
+let div_x_axis_selector = "plot-x-axis"
 
 let state_plot state = match state with
     None -> None
@@ -44,27 +45,19 @@ let content =
           </div>
       </div>
       <div class="row">
-        <div id="plot-control" class="col-sm-4">
-          <ul class="list-group">
-            <li class="list-group-item">
-              <h4 class="list-group-litem-heading">Observables</h4>
-              <div id="plot-controls-div"/>
-            </li>
-            <li class="list-group-item">
-              <h4 class="list-group-item-heading">Settings</h4>
-                <div class="checkbox-control">
-                   $plot_show_legend$ Legend
-                </div>
-                <div class="checkbox-control">
-                   $plot_x_axis_log_checkbox$ X Axis Log
-                </div>
-                <div class="checkbox-control">
-                   $plot_y_axis_log_checkbox$ Y Axis Log
-                </div>
-            </li>
-          </ul>
-        </div>
-        <div id="plot-div" class="col-sm-8"></div>
+        <div id="plot-div" class="col-sm-12"></div>
+      </div>
+      <div class="row">
+         <div class="col-sm-2">
+            $plot_show_legend$ Legend
+         </div>
+         <div class="col-sm-4">
+               Log X $plot_x_axis_log_checkbox$
+               Log Y $plot_y_axis_log_checkbox$
+         </div>
+         <div class="col-sm-6">
+            <div id=$str:div_x_axis_selector$></div>
+         </div>
       </div>
       $export_controls$
   </div> >>
@@ -118,7 +111,6 @@ let onload () =
       ~plot_show_legend_checkbox_id:"plot-show-legend"
       ~plot_x_axis_log_checkbox_id:"plot-x-axis-log-checkbox"
       ~plot_y_axis_log_checkbox_id:"plot-y-axis-log-checkbox"
-      ~plot_controls_div_id:"plot-controls-div"
   in
   let plot : observable_plot Js.t =
     Js_plot.create_observable_plot configuration in

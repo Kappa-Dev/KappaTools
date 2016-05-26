@@ -749,32 +749,27 @@ function ContactMap(id,isSnapshot){
     this.id = "#"+id;
     this.isSnapshot = isSnapshot;
     this.setData = function(json){
-        try {
-            debug(json);
-            var data = JSON.parse(json);
-            that.data = data;
-            var contactMap = new DataTransfer(data,isSnapshot);
-            that.clearData();
-            if(that.data.length > 0){
-                d3.select(that.id).selectAll("svg").remove();
-                var render = new Render(that.id,contactMap);
-                render.render();
-            }
-        } catch(err) {
-            error(err.stack);
-            throw err;
+        debug(json);
+        var data = JSON.parse(json);
+        that.data = data;
+        var contactMap = new DataTransfer(data,isSnapshot);
+        that.clearData();
+        if(that.data.length > 0){
+            d3.select(that.id).selectAll("svg").remove();
+            var render = new Render(that.id,contactMap);
+            render.render();
         }
     }
+    this.setData = wrap(this.setData);
 
     this.clearData = function(){
         d3.select(that.id).selectAll("svg").remove();
     }
 
     this.exportJSON = function(filename){
-        try { var json = JSON.stringify(that.data);
-              saveFile(json,"application/json",filename);
-            } catch (e) {
-                alert(e);
-            }
+        var json = JSON.stringify(that.data);
+        saveFile(json,"application/json",filename);
     }
+    this.exportJSON = wrap(this.exportJSON);
+
 }

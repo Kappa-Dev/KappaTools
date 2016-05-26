@@ -140,3 +140,6 @@ rect { stroke-width: 2; }
     height: -moz-calc(100vh - 400px);
 
 }
+
+.plot-legend-swatch { stroke-width : 1; }
+.plot-tick-proof { }

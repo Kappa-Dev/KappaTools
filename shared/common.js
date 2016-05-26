@@ -1,3 +1,14 @@
+// http://stackoverflow.com/questions/326596/how-do-i-wrap-a-function-in-javascript
+var wrap = function(fn){
+    return function(){
+        try { return fn.apply(this, arguments);
+            } catch(ex){
+                error(ex.stack);
+                throw ex;
+            }
+    };
+};
+
 // http://stackoverflow.com/questions/979975/how-to-get-the-value-from-the-url-parameter
 var args = function () {
     var query_string = {};
@@ -53,24 +64,24 @@ function createSVGDefs(svg){
     return svgDefs;
 }
 function plotPNG(plotDivId,title,plotName,plotStyleId){
-        try { var html = d3.select("#"+plotDivId)
-                           .select("svg")
-                           .attr("title", title)
-                           .attr("version", 1.1)
-                           .attr("xmlns", "http://www.w3.org/2000/svg")
-                           .node().parentNode.innerHTML;
-              var style = plotStyleId?d3.select("#"+plotStyleId).text():"";
-              style = "<![CDATA["+style+"]]>";
-              html = html.replace(cssTextToken,style);
-              var imgsrc = 'data:image/svg+xml;base64,'+ btoa(html);
-              var canvas = document.createElement("canvas");
-              var width = parseInt(d3.select("#"+plotDivId).select("svg").style("width").replace("px", ""))
-              var height = parseInt(d3.select("#"+plotDivId).select("svg").style("height").replace("px", ""))
-              canvas.width = width; // get original canvas width
-              canvas.height = height; //get original canvas height
-              var context = canvas.getContext("2d");
-              var image = new Image(width, height);
-              image.src = imgsrc;
+    try { var html = d3.select("#"+plotDivId)
+          .select("svg")
+          .attr("title", title)
+          .attr("version", 1.1)
+          .attr("xmlns", "http://www.w3.org/2000/svg")
+          .node().parentNode.innerHTML;
+          var style = plotStyleId?d3.select("#"+plotStyleId).text():"";
+          style = "<![CDATA["+style+"]]>";
+          html = html.replace(cssTextToken,style);
+          var imgsrc = 'data:image/svg+xml;base64,'+ btoa(html);
+          var canvas = document.createElement("canvas");
+          var width = parseInt(d3.select("#"+plotDivId).select("svg").style("width").replace("px", ""))
+          var height = parseInt(d3.select("#"+plotDivId).select("svg").style("height").replace("px", ""))
+          canvas.width = width; // get original canvas width
+          canvas.height = height; //get original canvas height
+          var context = canvas.getContext("2d");
+          var image = new Image(width, height);
+          image.src = imgsrc;
               image.onload = function() {
                   context.drawImage(image, 0, 0, width, height);
                   var canvasdata = canvas.toDataURL("image/png");

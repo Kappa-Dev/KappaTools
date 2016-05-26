@@ -167,6 +167,7 @@ let navli = Display_common.badge (fun state -> List.length (state_fluxmap state)
 let onload () =
 let flux_configuration : Flux.flux_configuration Js.t =
   Flux.create_configuration
+    ~short_labels:true
     ~begin_time_id:("begin_time")
     ~end_time_id:("end_time")
     ~select_correction_id:("select_correction")
@@ -177,7 +178,6 @@ let flux_configuration : Flux.flux_configuration Js.t =
     ~rules_checkboxes_id:rules_checkboxes_id
     ~height:450
     ~width:360
-
   in
   let flux =
     Flux.create_flux_map flux_configuration in

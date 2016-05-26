@@ -1,44 +1,397 @@
+"use strict"
+
+/* Mode to render observable.  These codes determine
+ * how an observable in a plot is to be rendered.
+ */
+var MODES = {
+    MARKS :  0,  // use marks
+    LINE :   1,  // use a continuious line
+    HIDDEN : 2,  // hide observable
+    XAXIS :  3,  // observable is the x axis
+    cycle : function(mode){
+        return (mode+1) % 3;
+    }
+};
+// enum for tick marks
+var TICKS = {
+    CIRCLE : 0,
+    PLUS   : 1,
+    CROSS  : 2,
+    cycle : function(mode){
+        return (mode+1) % 3;
+    },
+    index : function(index){
+        return (index+1) % 3;
+    },
+    xlink : function(index){
+        return ["#plot-circle"
+               ,"#plot-plus"
+               ,"#plot-cross"][index];
+    }
+};
+
 function observable_plot(configuration){
     var that = this;
+    /* plotDivId                - div which plot is rendered on
+       plotLabelDivId           - div to place plot interval
+       plotStyleId              - style sheet for the plot need to export
+                                  plot
+       plotShowLegendCheckboxId - checkbox to toggle plot legend
+       plotXAxisLogCheckboxId   - checkbox to toggle log on x axis
+       plotYAxisLogCheckboxId   - checkbox to toggle log on y axis
+     */
     this.configuration = configuration;
 
-    this.state = { "plot" :  {"legend":[],"observables":[] }
-                 , "selected" : []
-                 , "observableMap" : new Object() };
 
+
+
+    /* This should be a list of objects of the form
+       index  - there is an assumption of could be duplicated so
+                an index is used.
+       label  - label of observable
+       values - all values for a given observable
+       mode   - mode for observable using the mode enumermation
+
+       Note : An entry for time is placed with the label
+       null.  This allows an arbitary axis to serve at the
+       x-axis.
+     */
+    this.state = [];
+
+    /* Return the list of labels for values in the plot.
+       The time axis is filtered out as it is null.
+     */
+    this.getLabels = function(){
+        return this.state.filter(function(obs){ return obs.label; })
+    };
+
+    /* Given a label return the corresponding label.
+     */
+    this.getObservable = function(index){
+        return this.state[index];
+    }
+    /* Get all observables.
+     */
+    this.getObservables = function(){
+        return this.state.filter(function(obs){ return obs.mode != MODES.XAXIS; })
+    }
+    this.getStatesByMode = function(mode){
+        return this.state.filter(function(obs){ return obs.mode == mode; })
+    }
+
+    this.timeLabel = "Time";
+
+    /* Update the plot data of the graph.  This is called
+       when new data is to be displayed in a graph.  Care
+       is taken not to reset the state of the plot when
+       data is updated.
+     */
     this.setPlot = function(plot){
-        if(!is_same(that.state.plot.legend,plot.legend)){
-            var callback = function(acc, value, index) {
-                acc[value] = index;
-                return acc;
+        var legend = plot.legend;
+
+        /* An update new copy over state preserving settings
+         * where possible.
+         */
+        var new_state = [];
+        var time_values = []; // store the times values
+
+        /* Initialize new state element with the corresponding
+         * observables.
+         */
+        legend.forEach(function(legend,i){
+            var old_observable = that.getObservable(i);
+            var mode = MODES.MARKS;
+            if(old_observable && old_observable.label == legend){
+                mode = old_observable.mode;
             };
-            var observableMap = plot["legend"].reduce(callback,new Object());
-            that.state = { "plot" :  plot
-                           , "selected" : plot["legend"]
-                           , "observableMap" : observableMap };
-            this.renderControls();
+            new_state.push({ label : legend ,
+                             values : [] ,
+                             mode : mode
+                           });
+        });
+        // Switch over for the population
+        that.state = new_state;
+        var time_observable = that.getObservable(i);
+        var time_mode = MODES.XAXIS;
+        if(time_observable && time_observable.label == that.timeLabel){
+            time_mode = time_observable.mode;
+        };
+        // make sure there is an xaxis
+        if(!new_state.every(function(state){ return state.mode != MODES.XAXIS; })){
+            time_mode = MODES.XAXIS;
         }
-        that.state.plot = plot;
+        that.start_time = null;
+        that.end_time = null;
+        // Populate observables from data.
+        plot.observables.forEach(function(observable){
+            that.start_time = that.start_time || observable.time;
+            that.end_time = observable.time;
+            time_values.push(observable.time);
+            var values = observable.values;
+            that.state.forEach(function(state_observable,i){
+                var current = values[i];
+                state_observable.values.push(current);
+            });
+        });
+        // Add time axis
+        that.state.push({ label : this.timeLabel ,
+                          values : time_values ,
+                          mode : time_mode
+                        });
+
+
+        // setup colors
+        var color = d3.scale.category10();
+        color.domain(that.state.map(function(c,i){ return i; }));
+        that.state.forEach(function(s,i){ s.color = color(i);
+                                          s.tick = TICKS.index(i);
+                                        })
         that.renderPlot();
         that.renderLabel();
+
+    };
+    this.setPlot = wrap(this.setPlot);
+    this.formatTime = d3.format(".02f");
+    this.getXAxis = function(){
+        return this.state.find(function(state){ state.mode = MODES.XAXIS });
     }
-    this.getPlot = function() {
-        return that.state.plot;
+    this.setPlot = wrap(this.setPlot);
+    this.renderPlot = function(){
+        // set margin
+        var margin = {top: 20, right: 80, bottom: 30, left: 80},
+            dimensions = that.getDimensions() ,
+            width = dimensions.width - margin.left - margin.right,
+            height = dimensions.height - margin.top - margin.bottom;
+
+        // setup x-axis
+        var x = (that.getXAxisLog()?d3.scale.log().clamp(true):d3.scale.linear()).range([0, width]);
+        var xState = that.getStatesByMode(MODES.XAXIS)[0];
+        x.domain(d3.extent(xState.values));
+        var xAxis = d3.svg.axis().scale(x).orient("bottom");
+
+        // setup y-axis
+        var y = (that.getYAxisLog()?d3.scale.log().clamp(true):d3.scale.linear()).range([height, 0]);
+        var yAxis = d3.svg
+                      .axis()
+                      .scale(y)
+                      .orient("left")
+                      .tickFormat(d3.format(".3n"));
+
+        var observables = that.getObservables();
+        var y_bounds = [d3.min(observables,
+                         function(c)
+                               { return d3.min(c.values.filter(function(d){return !that.getYAxisLog() || d > 0; })); }),
+                        d3.max(observables,function(c) { return d3.max(c.values); })
+                       ];
+        y.domain(y_bounds);
+
+        // Clear div first
+        d3.select("#"+that.configuration.plotDivId).html("");
+        // Add svg element
+        var svg = d3.select("#"+that.configuration.plotDivId).append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform"
+                 ,"translate(" + margin.left + "," + margin.top + ")");
+        // defs
+        var svgDefs = createSVGDefs(svg);
+        /* Here the defs for the tick marks it was taken from
+           an earlier implementation of plots.
+         */
+        // defs - plus
+        svg.append("defs")
+           .append("g")
+           .attr("id","plot-plus")
+           .append("path")
+           .attr("d","M-3.5,0 h7 M0,-3.5 v7")
+           .style("stroke", "currentColor");
+        // defs - cross
+        svg.append('defs')
+           .append("g")
+           .attr("id","plot-cross")
+           .append("path")
+           .attr("d","M-3.5,-3.5 L3.5,3.5 M3.5,-3.5 L-3.5,3.5")
+           .style("stroke", "currentColor");
+
+        // defs - circles
+        svg.append("defs")
+           .append("g")
+           .attr("id","plot-circle")
+           .append("circle")
+           .attr("r", 1.5)
+           .attr("fill","none")
+           .style("stroke", "currentColor");
+
+        // draw axis
+        svg.append("g")
+            .attr( "class"
+                 , "x plot-axis")
+            .attr("transform"
+                 ,"translate(0," + height + ")")
+            .call(xAxis);
+
+        svg.append("g")
+            .attr("class","y plot-axis")
+            .call(yAxis)
+            .append("text")
+            .attr("transform"
+                 ,"rotate(-90)");
+
+        // render data
+        var line = d3.svg.line()
+            .interpolate("basis")
+            .defined(function(d,i) { return !that.getXAxisLog() || xState.values[i] > 0; })
+            .defined(function(d,i) { return !that.getYAxisLog() || d > 0; })
+            .x(function(d,i) {
+                var value = xState.values[i];
+                    value = x(value);
+                return value; })
+            .y(function(d) {
+                var value = d;
+                return y(value); });
+        /* helper function to map values to
+           screen coordinates to */
+        var xMap = function(d,i){
+            var current = xState.values[i];
+            current = x(current);
+            return current;
+        };
+        var yMap = function(d) {
+            var current = d;
+            current = y(current);
+            return current;
+        };
+        var observables =
+            svg.selectAll(".observable")
+            .data(that.getObservables())
+            .enter().append("g")
+            .attr("class", "plot-observable")
+            .each(function(d)
+                  { switch(d.mode) {
+                  case MODES.MARKS:
+                      var values = d.values.filter(function(d){var x = xMap(d,i);
+                                                               var y = yMap(d);
+                                                               return (!isNaN(x) && !isNaN(y)) });
+                      var tick =
+                          d3.select(this)
+                          .selectAll(".plot-tick")
+                          .data(values)
+                          .enter()
+                          .append("g")
+                          .attr("class", "plot-tick")
+                          .attr("fill",d.color);
+
+
+                      // add link to definitions
+                      tick.append("use")
+                          .attr("xlink:href",TICKS.xlink(d.tick))
+                          .style("color",d.color)
+                          .attr("transform"
+                                ,function(d,i){ var x = xMap(d,i);
+                                                var y = yMap(d);
+                                                var t = "translate(" + x + "," + y + ")";
+                                                return t;
+                                              });
+                      break;
+                  case MODES.LINE:
+                      d3.select(this)
+                          .append("path")
+                          .attr("class", "plot-line")
+                          .attr("d", function(d) { return line(d.values); })
+                          .style("stroke", function(d) { return d.color; });
+                      break;
+                  case MODES.HIDDEN:
+                      break;
+                  case MODES.XAXIS:
+                      break;
+                  default:
+                      break;
+                  } });
+
+        // render legend
+        var legendRectSize = 12;
+        var legendSpacing = 4;
+        var legend = svg.selectAll('.legend')
+            .data(that.getObservables())
+            .enter()
+            .append('g')
+            .attr('class', 'plot-legend')
+            .attr('transform',
+                  function(d, i) {
+                      var height = legendRectSize + legendSpacing;
+                      var offset = 0;
+                      var horz = legendRectSize;
+                      var vert = i * height - offset;
+                      return 'translate(' + horz + ',' + vert + ')';
+                  });
+        // cycle through styles
+        var cycle = function(d,i)
+                    { d.mode = MODES.cycle(d.mode);
+                      that.renderPlot();
+                    };
+        // legend swatches
+        legend.append('rect')
+              .attr("class", "plot-legend-swatch")
+              .attr('width', legendRectSize)
+              .attr('height', legendRectSize)
+              .style('fill',
+                     function(d){
+                         var color = d.color;
+                         if(MODES.HIDDEN == d.mode){
+                             color = "white";
+                         };
+                         return color;
+                     })
+              .style('stroke',
+                     function(d){
+                         var color = d.color;
+                         if(MODES.HIDDEN == d.mode){
+                             color = "white";
+                         };
+                         return color;
+                     }) // handle clicking on legend
+              .style('opacity',
+                     function(d){
+                         var opacity = 1.0;
+                         if(MODES.HIDDEN == d.mode){
+                             opacity = 0.0;
+                         };
+                         return opacity;
+                     })
+              .style('stroke-opacity',
+                     function(d){
+                         var opacity = 1.0;
+                         if(MODES.HIDDEN == d.mode){
+                             opacity = 0.0;
+                         };
+                         return opacity;
+                     }) // handle clicking on legend
+              .on('click', cycle);
+        // legend text
+        legend.append('text')
+            .attr('x', legendRectSize + legendSpacing)
+            .attr('y', legendRectSize - legendSpacing)
+            .text(function(d) { return d.label; })
+            .on('click', cycle);
     }
-    this.getSelected = function(selected){
-        return that.state.selected.indexOf(selected) > -1;
-    }
-    this.setSelected = function(selected,value){
-        that.state.selected = that.state.selected.filter(function(s){ return selected != s;});
-        if(value){
-            that.state.selected.push(selected);
+    this.renderPlot = wrap(this.renderPlot);
+
+    /* add label for plot */
+    this.renderLabel = function(){
+        var that = this;
+        if(configuration.plotLabelDivId){
+            if (that.start_time){
+                var label =
+                    "Plot between t = "
+                    +that.formatTime(that.start_time)
+                    +"s and t = "
+                    +that.formatTime(that.end_time)
+                    +"s";
+                d3.select("#"+configuration.plotLabelDivId)
+                  .html(label);
+            }
         }
-    }
-    this.getObservableMap = function() {
-        return that.state.observableMap;
-    }
-    this.observableIndex = function(name){
-        return that.getObservableMap()[name];
     }
 
     this.showLegend = true;
@@ -72,176 +425,21 @@ function observable_plot(configuration){
     this.getDimensions = function(){
         return that.dimensions;
     }
-    this.plotName = "kappa-plot";
-    this.getPlotName = function(suffix){
-        var filename = that.plotName;
-        filename = (filename.indexOf('.') === -1)?filename+suffix:filename;
-        return filename;
-    }
-    this.setPlotName = function(plotName){ that.plotName = plotName; }
 
-    this.renderPlot = function(){
-        var margin = {top: 20, right: 80, bottom: 30, left: 80},
-            dimensions = that.getDimensions() ,
-            width = dimensions.width - margin.left - margin.right,
-            height = dimensions.height - margin.top - margin.bottom;
-
-        var x = (that.getXAxisLog()?d3.scale.log().clamp(true):d3.scale.linear()).range([0, width]);
-        var xAxis = d3.svg.axis().scale(x).orient("bottom");
-
-        var y = (that.getYAxisLog()?d3.scale.log().clamp(true):d3.scale.linear()).range([height, 0]);
-        var yAxis = d3.svg.axis().scale(y).orient("left").tickFormat(d3.format(".3n"));
-
-
-        var line = d3.svg.line()
-            .interpolate("basis")
-            .defined(function(d) { return !that.getYAxisLog() || d.value > 0; })
-            .x(function(d) { return x(d.time); })
-            .y(function(d) { return y(d.value); });
-        // remove previously drawn
-        d3.select("#"+that.configuration.plotDivId).html("");
-        var svg = d3.select("#"+that.configuration.plotDivId).append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        var svgDefs = createSVGDefs(svg);
-
-        var plot = that.getPlot();
-        var color = d3.scale.category10();
-        color.domain(plot["legend"].filter(that.getSelected));
-
-        var observables = color.domain().map(function(name) {
-            return {
-                name: name,
-                values: plot["observables"].map(function(d) {
-                    return { time: d["time"], value: d["values"][that.observableIndex(name)]};
-                })
-            };
-        });
-
-        x.domain(d3.extent(plot["observables"], function(d) { return d.time; }));
-        y.domain([
-            d3.min(plot["observables"], function(c) { return d3.min(c.values.filter(function(d){return !that.getYAxisLog() || d > 0; })); }),
-            d3.max(plot["observables"], function(c) { return d3.max(c.values); })
-        ]);
-
-        svg.append("g")
-            .attr("class", "x plot-axis")
-            .attr("transform", "translate(0," + height + ")")
-            .call(xAxis);
-
-        svg.append("g")
-            .attr("class", "y plot-axis")
-            .call(yAxis)
-            .append("text")
-            .attr("transform", "rotate(-90)");
-        var observable = svg.selectAll(".observable")
-            .data(observables)
-            .enter().append("g")
-            .attr("class", "plot-observable");
-
-        observable.append("path")
-            .attr("class", "plot-line")
-            .attr("d", function(d) { return line(d.values); })
-            .style("stroke", function(d) { return color(d.name); });
-
-        // legend
-        if(that.getShowLegend()){
-        // https://github.com/zeroviscosity/d3-js-step-by-step/blob/master/step-3-adding-a-legend.html
-        var legendRectSize = 12;
-        var legendSpacing = 4;
-        var legend = svg.selectAll('.legend')
-            .data(color.domain())
-            .enter()
-            .append('g')
-            .attr('class', 'plot-legend')
-            .attr('transform', function(d, i) {
-                var height = legendRectSize + legendSpacing;
-                var offset = 0;
-                var horz = legendRectSize;
-                var vert = i * height - offset;
-                return 'translate(' + horz + ',' + vert + ')';
-            });
-
-        legend.append('rect')
-            .attr('width', legendRectSize)
-            .attr('height', legendRectSize)
-            .style('fill', color)
-            .style('stroke', color);
-
-        legend.append('text')
-            .attr('x', legendRectSize + legendSpacing)
-            .attr('y', legendRectSize - legendSpacing)
-            .text(function(d) { return d; });
-        }
-
-    };
-    this.formatTime = d3.format(".02f");
-
-    this.renderLabel = function(){
-        if(configuration.plotLabelDivId){
-            var length = that.state.plot.observables.length;
-            if (that.state.plot && length > 1){
-                var first = this.state.plot.observables[0];
-                var last = this.state.plot.observables[length-1];
-                var label = "Plot between t = "
-                           +that.formatTime(last.time)
-                           +"s and t = "
-                           +that.formatTime(first.time)
-                           +"s";
-                d3.select("#"+configuration.plotLabelDivId).html(label);
-            }
-        }
-    }
-
-    this.save = function(data,mime,filename){
-        var blob = new Blob([data], {type: mime });
-        var url = window.URL.createObjectURL(blob);
-        var a = document.createElement("a");
-        document.body.appendChild(a);
-        a.style = "display: none";
-        a.href = url;
-        a.download = filename;
-        a.click();
-        document.body.removeChild(a);
-    }
+    /* define how to export to tsv */
     this.handlePlotTSV = function(){
-        try { var plot = that.getPlot();
-              var header = "'time'\t"+plot["legend"].join("\t");
-              var body = plot["observables"].map(function(d) { var row = [d["time"]];
-                                                               row = row.concat(d["values"]);
-                                                               return row.join("\t") }).join("\n");
-              var tsv = header+"\n"+body;
-              saveFile(tsv,"text/tab-separated-values",that.getPlotName(".tsv"));
-        } catch (e) {
-            alert(e);
-        }
+        var plot = that.getPlot();
+        var header = "'time'\t"+plot["legend"].join("\t");
+        var body = plot["observables"].map(function(d) { var row = [d["time"]];
+                                                         row = row.concat(d["values"]);
+                                                         return row.join("\t") }).join("\n");
+        var tsv = header+"\n"+body;
+        saveFile(tsv,"text/tab-separated-values",that.getPlotName(".tsv"));
     }
-    this.handlePlotSVG = function(){
-        plotSVG(that.configuration.plotDivId
-               ,"kappa plot"
-               ,that.getPlotName(".svg")
-               ,that.configuration.plotStyleId);
-    }
-    this.handlePlotPNG = function(){
-        plotPNG(that.configuration.plotDivId
-               ,"kappa plot"
-               ,that.getPlotName(".png")
-               ,that.configuration.plotStyleId);
-    }
+    this.handlePlotTSV = wrap(this.handlePlotTSV);
 
+    /* add checkbox handlers for display options */
     this.addHandlers = function(){
-        if(configuration.plotSVGButtonId){
-            d3.select("#"+that.configuration.plotSVGButtonId).on("click",function() { that.handlePlotSVG()});
-        }
-        if(configuration.plotTSVButtonId){
-            d3.select("#"+that.configuration.plotTSVButtonId).on("click",function() { that.handlePlotTSV()});
-        }
-        if(configuration.plotPNGButtonId){
-            d3.select("#"+that.configuration.plotPNGButtonId).on("click",function() { that.handlePlotPNG()});
-        }
         function checkboxHandler(id,setter){
             if(id){
                 setter(document.getElementById(id).checked);
@@ -253,38 +451,11 @@ function observable_plot(configuration){
         checkboxHandler(configuration.plotShowLegendCheckboxId,that.setShowLegend);
         checkboxHandler(configuration.plotXAxisLogCheckboxId,that.setXAxisLog);
         checkboxHandler(configuration.plotYAxisLogCheckboxId,that.setYAxisLog);
-        if(configuration.plotLogCheckboxId){
-            d3.select("#"+that.configuration.plotLogCheckboxId).on("change",function() { that.handlePlotTSV()});
-        }
     }
-    this.renderControls = function() {
-        if(that.configuration.plotControlsDivId){
-            d3.select("#"+that.configuration.plotControlsDivId).html("");
-            var legend = that.getPlot()["legend"];
-            legend.forEach(function(observable){
-                var controlsDiv = document.getElementById(that.configuration.plotControlsDivId);
-                var group = document.createElement("div");
-                group.setAttribute("class","checkbox-control");
-                var box = document.createElement("input");
-                var label = document.createTextNode(observable);
-                box.setAttribute("class","checkbox-control");
-                 box.setAttribute("type", "checkbox");
-                if (that.getSelected(observable)) {box.setAttribute("checked","")};
-                box.addEventListener("change",function () { that.setSelected(observable,box.checked);
-                                                            that.renderPlot();
-                                                            that.renderLabel();
-                                                          });
-                group.appendChild(box);
-                group.appendChild(label);
-                controlsDiv.appendChild(group);
-            });
-        }
-    }
+    /* render plot */
     this.render = function(){
-        that.renderControls();
         that.renderPlot();
         that.renderLabel();
-
     };
     this.addHandlers();
 }

@@ -8,7 +8,6 @@ object
   val plotShowLegendCheckboxId : Js.js_string Js.t Js.prop
   val plotXAxisLogCheckboxId : Js.js_string Js.t Js.prop
   val plotYAxisLogCheckboxId : Js.js_string Js.t Js.prop
-  val plotControlsDivId : Js.js_string Js.t Js.prop
 end
 let constructor_configuration : plot_configuration Js.t Js.constr =
   (Js.Unsafe.variable "Object")
@@ -18,18 +17,28 @@ let create_configuration ~(plot_div_id : string)
                          ~(plot_show_legend_checkbox_id : string)
                          ~(plot_x_axis_log_checkbox_id : string)
                          ~(plot_y_axis_log_checkbox_id : string)
-                         ~(plot_controls_div_id : string)
     : plot_configuration Js.t  =
   let configuration : plot_configuration Js.t =
     jsnew constructor_configuration () in
   let () =
-    (Js.Unsafe.coerce configuration)##plotDivId <- Js.string plot_div_id;
-    (Js.Unsafe.coerce configuration)##plotLabelDivId <- Js.string plot_label_div_id;
-    (Js.Unsafe.coerce configuration)##plotStyleId <- Js.string plot_style_id;
-    (Js.Unsafe.coerce configuration)##plotShowLegendCheckboxId <- Js.string plot_show_legend_checkbox_id;
-    (Js.Unsafe.coerce configuration)##plotXAxisLogCheckboxId <- Js.string plot_x_axis_log_checkbox_id;
-    (Js.Unsafe.coerce configuration)##plotYAxisLogCheckboxId <- Js.string plot_y_axis_log_checkbox_id;
-    (Js.Unsafe.coerce configuration)##plotControlsDivId <- Js.string plot_controls_div_id;
+    (Js.Unsafe.coerce configuration)
+      ##
+      plotDivId <- Js.string plot_div_id;
+    (Js.Unsafe.coerce configuration)
+      ##
+      plotLabelDivId <- Js.string plot_label_div_id;
+    (Js.Unsafe.coerce configuration)
+      ##
+      plotStyleId <- Js.string plot_style_id;
+    (Js.Unsafe.coerce configuration)
+      ##
+      plotShowLegendCheckboxId <- Js.string plot_show_legend_checkbox_id;
+    (Js.Unsafe.coerce configuration)
+      ##
+      plotXAxisLogCheckboxId <- Js.string plot_x_axis_log_checkbox_id;
+    (Js.Unsafe.coerce configuration)
+      ##
+      plotYAxisLogCheckboxId <- Js.string plot_y_axis_log_checkbox_id;
     ()
   in configuration
 
@@ -59,8 +68,12 @@ let constructor_observable : plot_observable Js.t Js.constr =
 let create_observable ~(observable : ApiTypes.observable)
     : plot_observable Js.t  =
   let configuration : plot_observable Js.t = jsnew constructor_observable () in
-  let () = (Js.Unsafe.coerce configuration)##time <- observable.ApiTypes.time;
-           (Js.Unsafe.coerce configuration)##values <- Js.array (Array.of_list observable.ApiTypes.values);
+  let () = (Js.Unsafe.coerce configuration)
+           ##
+           time <- observable.ApiTypes.time;
+           (Js.Unsafe.coerce configuration)
+           ##
+           values <- Js.array (Array.of_list observable.ApiTypes.values);
            ()
   in configuration
 

@@ -18,30 +18,32 @@ let create_handler label =
   in
   ()
 (* add on handlers to the prototypes so they can be strongly typed *)
-let () = List.iter create_handler ["beforeChange";"beforeCursorEnter"
-                                  ;"beforeSelectionChange";"blur"
-                                  ;"changes";"clear"
-                                  ;"contextmenu";"copy"
-                                  ;"cursorActivity";"cut"
-                                  ;"dblclick";"delete"
-                                  ;"dragenter";"dragleave"
-                                  ;"dragover";"dragstart"
-                                  ;"drop";"electricInput"
-                                  ;"focus";"gutterClick"
-                                  ;"gutterContextMenu";"hide"
-                                  ;"inputRead";"keyHandled"
-                                  ;"keypress";"keyup"
-                                  ;"mousedown";"paste"
-                                  ;"redraw";"renderLine"
-                                  ;"scroll";"scrollCursorIntoView"
-                                  ;"swapDoc";"touchstart"
-                                  ;"unhide";"update"
-                                  ;"viewportChange";"change"
-                                  ;"keydown"]
-class type lint_configuration = object
-                                  val delay : int Js.t Js.prop
-                                  val async : bool Js.t Js.prop
-                                end
+let () = List.iter create_handler
+  ["beforeChange";"beforeCursorEnter"
+  ;"beforeSelectionChange";"blur"
+  ;"changes";"clear"
+  ;"contextmenu";"copy"
+  ;"cursorActivity";"cut"
+  ;"dblclick";"delete"
+  ;"dragenter";"dragleave"
+  ;"dragover";"dragstart"
+  ;"drop";"electricInput"
+  ;"focus";"gutterClick"
+  ;"gutterContextMenu";"hide"
+  ;"inputRead";"keyHandled"
+  ;"keypress";"keyup"
+  ;"mousedown";"paste"
+  ;"redraw";"renderLine"
+  ;"scroll";"scrollCursorIntoView"
+  ;"swapDoc";"touchstart"
+  ;"unhide";"update"
+  ;"viewportChange";"change"
+  ;"keydown"]
+class type lint_configuration =
+object
+  val delay : int Js.t Js.prop
+  val async : bool Js.t Js.prop
+end
 let constructor_lint_configuration : lint_configuration Js.t Js.constr =
   (Js.Unsafe.variable "Object")
 let create_lint_configuration () : lint_configuration Js.t  =
@@ -142,10 +144,11 @@ let constructor_configuration : configuration Js.t Js.constr =
 let create_configuration () : configuration Js.t  =
   jsnew constructor_configuration ()
 
-class type position = object
-                        val ch : int Js.t Js.prop
-                        val line : int Js.t Js.prop
-                      end
+class type position =
+object
+  val ch : int Js.t Js.prop
+  val line : int Js.t Js.prop
+end
 
 let constructor_position : position Js.t Js.constr =
   (Js.Unsafe.variable "Object")
@@ -155,24 +158,26 @@ let create_position ~(ch : int) ~(line : int) : position Js.t  =
   let () = (Js.Unsafe.coerce result)##line <- line in
   result
 
-class type change = object
-                      method from : position Js.t Js.prop
-                      method to_ : position Js.t Js.prop
-                      method text : Js.string_array Js.t Js.prop
-                      method removed : string Js.t Js.prop
-                      method origin : string Js.t Js.prop
-                    end;;
+class type change =
+object
+  method from : position Js.t Js.prop
+  method to_ : position Js.t Js.prop
+  method text : Js.string_array Js.t Js.prop
+  method removed : string Js.t Js.prop
+  method origin : string Js.t Js.prop
+end;;
 
 let constructor_change : change Js.t Js.constr = (Js.Unsafe.variable "Object")
 let create_change () : change Js.t  = jsnew constructor_change ()
 
 type severity = Error | Warning
-class type lint = object
-                    val message: Js.js_string Js.t Js.prop
-                    val severity: Js.js_string Js.t Js.prop
-                    val from : position Js.t Js.prop
-                    val to_ : position Js.t Js.prop
-                  end
+class type lint =
+object
+  val message: Js.js_string Js.t Js.prop
+  val severity: Js.js_string Js.t Js.prop
+  val from : position Js.t Js.prop
+  val to_ : position Js.t Js.prop
+end
 
 let constructor_lint : lint Js.t Js.constr = (Js.Unsafe.variable "Object")
 let create_lint ~(message : string)
@@ -180,10 +185,13 @@ let create_lint ~(message : string)
                 ~(from : position Js.t)
                 ~(to_ :  position Js.t) : lint Js.t  =
   let result = jsnew constructor_lint () in
-  let () = (Js.Unsafe.coerce result)##message <- message in
-  let () = (Js.Unsafe.coerce result)##severity <- match severity with
-                                                    Error -> Js.string "error"
-                                                  | Warning -> Js.string "warning"
+  let () = (Js.Unsafe.coerce result)##message <-
+    message
+  in
+  let () = (Js.Unsafe.coerce result)##severity <-
+    match severity with
+      Error -> Js.string "error"
+    | Warning -> Js.string "warning"
   in
   let () = (Js.Unsafe.coerce result)##from <- from in
   let () = (Js.Unsafe.coerce result)##to_ <- to_ in
@@ -195,64 +203,178 @@ object
   method setValue : Js.js_string Js.t -> unit meth
   method focus    : unit Js.t Js.meth
 
-  method on : (Js.js_string Js.t) -> (Dom_html.event Js.t -> unit) -> unit Js.meth
+  method on :
+    (Js.js_string Js.t) ->
+      (Dom_html.event Js.t -> unit) ->
+        unit Js.meth
   (* fired when content is changed *)
-  method onChange : (codemirror Js.t -> change Js.t -> unit) -> unit Js.meth
+  method onChange :
+    (codemirror Js.t ->
+     change Js.t ->
+     unit) -> unit Js.meth
   (* batched changed operation *)
-  method onChanges : (codemirror Js.t -> change Js.js_array Js.t -> unit) -> unit Js.meth
+  method onChanges :
+    (codemirror Js.t ->
+     change Js.js_array Js.t ->
+     unit) -> unit Js.meth
   (* before a change is applied *)
-  method onBeforeChange : (codemirror Js.t -> change Js.t -> unit) -> unit Js.meth
+  method onBeforeChange :
+    (codemirror Js.t ->
+     change Js.t ->
+     unit) -> unit Js.meth
   (* cursor moves, or any change *)
-  method onCursorActivity : (codemirror Js.t -> unit) -> unit Js.meth
+  method onCursorActivity :
+    (codemirror Js.t ->
+     unit) -> unit Js.meth
   (* when new input is read *)
-  method onKeyHandled : (codemirror Js.t -> Js.js_string -> Dom_html.event -> unit) -> unit Js.meth
+  method onKeyHandled :
+    (codemirror Js.t ->
+     Js.js_string ->
+     Dom_html.event ->
+     unit) -> unit Js.meth
   (* when new input is read *)
-  method onInputRead : (codemirror Js.t -> change Js.t -> unit) -> unit Js.meth
+  method onInputRead :
+    (codemirror Js.t ->
+     change Js.t ->
+     unit ) -> unit Js.meth
   (* when text matches electric pattern *)
-  method onElectricInput : (codemirror Js.t -> int Js.t -> unit) -> unit Js.meth
+  method onElectricInput :
+    (codemirror Js.t -> int Js.t -> unit) ->
+      unit Js.meth
   (* before a selection is moved TODO *)
-  method onBeforeSelectionChange : (codemirror Js.t -> 'a -> unit) -> unit Js.meth
+  method onBeforeSelectionChange :
+    (codemirror Js.t -> 'a -> unit) ->
+      unit Js.meth
   (* the view port changed *)
-  method onViewportChange : (codemirror Js.t -> int Js.t -> int Js.t -> unit) -> unit Js.meth
+  method onViewportChange :
+    (codemirror Js.t ->
+     int Js.t ->
+     int Js.t ->
+     unit) -> unit Js.meth
   (*  document swapped *)
-  method onSwapDoc : (codemirror Js.t -> 'a -> unit) -> unit Js.meth
+  method onSwapDoc :
+    (codemirror Js.t -> 'a -> unit) ->
+      unit Js.meth
   (* gutter clicked *)
-  method onGutterClick : (codemirror Js.t -> int Js.t -> Js.js_string -> Dom_html.event Js.t -> unit) -> unit Js.meth
+  method onGutterClick :
+    (codemirror Js.t ->
+     int Js.t ->
+     Js.js_string ->
+     Dom_html.event Js.t -> unit) ->
+      unit Js.meth
   (* context menu event from gutter *)
-  method onGutterContextMenu : (codemirror Js.t -> int Js.t -> Js.js_string -> Dom_html.event Js.t -> unit) -> unit Js.meth
+  method onGutterContextMenu :
+    (codemirror Js.t ->
+     int Js.t ->
+     Js.js_string ->
+     Dom_html.event Js.t ->
+     unit) -> unit Js.meth
   (* focus *)
-  method onFocus : (codemirror Js.t -> unit) -> unit Js.meth
+  method onFocus :
+    (codemirror Js.t ->
+     unit) -> unit Js.meth
   (* blur *)
-  method onBlur : (codemirror Js.t -> unit) -> unit Js.meth
+  method onBlur :
+    (codemirror Js.t ->
+     unit) -> unit Js.meth
   (* scroll *)
-  method onScroll : (codemirror Js.t -> unit) -> unit Js.meth
+  method onScroll :
+    (codemirror Js.t ->
+     unit) -> unit Js.meth
   (* cursor scrolled in view*)
-  method onScrollCursorIntoView : (codemirror Js.t -> Dom_html.event Js.t -> unit) -> unit Js.meth
+  method onScrollCursorIntoView :
+    (codemirror Js.t ->
+     Dom_html.event Js.t ->
+     unit) -> unit Js.meth
   (* dom updated *)
-  method onUpdate : (codemirror Js.t -> unit) -> unit Js.meth
+  method onUpdate :
+    (codemirror Js.t ->
+     unit) -> unit Js.meth
   (* line rendered *)
-  method onRenderLine : (codemirror Js.t -> 'a -> Dom_html.event Js.t -> unit) -> unit Js.meth
-  method onMousedown : (codemirror Js.t -> Dom_html.event Js.t -> unit) -> unit Js.meth
-  method onDblclick : (codemirror Js.t -> Dom_html.event Js.t -> unit) -> unit Js.meth
-  method onTouchstart : (codemirror Js.t -> Dom_html.event Js.t -> unit) -> unit Js.meth
-  method onContextmenu : (codemirror Js.t -> Dom_html.event Js.t -> unit) -> unit Js.meth
-  method onKeydown : (codemirror Js.t -> Dom_html.event Js.t -> unit) -> unit Js.meth
-  method onKeypress : (codemirror Js.t -> Dom_html.event Js.t -> unit) -> unit Js.meth
-  method onKeyup : (codemirror Js.t -> Dom_html.event Js.t -> unit) -> unit Js.meth
-  method onCut : (codemirror Js.t -> Dom_html.event Js.t -> unit) -> unit Js.meth
-  method onCopy : (codemirror Js.t -> Dom_html.event Js.t -> unit) -> unit Js.meth
-  method onPaste : (codemirror Js.t -> Dom_html.event Js.t -> unit) -> unit Js.meth
-  method onDragstart : (codemirror Js.t -> Dom_html.event Js.t -> unit) -> unit Js.meth
-  method onDragenter : (codemirror Js.t -> Dom_html.event Js.t -> unit) -> unit Js.meth
-  method onDragover : (codemirror Js.t -> Dom_html.event Js.t -> unit) -> unit Js.meth
-  method onDragleave : (codemirror Js.t -> Dom_html.event Js.t -> unit) -> unit Js.meth
-  method onDrop : (codemirror Js.t -> Dom_html.event Js.t -> unit) -> unit Js.meth
-  method onDelete : (unit -> unit) -> unit Js.meth
-  method onBeforeCursorEnter : (unit -> unit) -> unit Js.meth
-  method onClear : (position Js.t -> position Js.t -> unit) -> unit Js.meth
-  method onHide : (unit -> unit) -> unit Js.meth
-  method onUnhide : (unit -> unit) -> unit Js.meth
-  method onRedraw : (unit -> unit) -> unit Js.meth
+  method onRenderLine :
+    (codemirror Js.t ->
+     'a ->
+     Dom_html.event Js.t ->
+     unit) -> unit Js.meth
+  method onMousedown :
+    (codemirror Js.t ->
+     Dom_html.event Js.t ->
+     unit) -> unit Js.meth
+  method onDblclick :
+    (codemirror Js.t ->
+     Dom_html.event Js.t ->
+     unit) -> unit Js.meth
+  method onTouchstart :
+    (codemirror Js.t ->
+     Dom_html.event Js.t ->
+     unit) -> unit Js.meth
+  method onContextmenu :
+    (codemirror Js.t ->
+     Dom_html.event Js.t ->
+     unit) -> unit Js.meth
+  method onKeydown :
+    (codemirror Js.t ->
+     Dom_html.event Js.t ->
+     unit) -> unit Js.meth
+  method onKeypress :
+    (codemirror Js.t ->
+     Dom_html.event Js.t ->
+     unit) -> unit Js.meth
+  method onKeyup :
+    (codemirror Js.t ->
+     Dom_html.event Js.t ->
+     unit) -> unit Js.meth
+  method onCut :
+    (codemirror Js.t ->
+     Dom_html.event Js.t ->
+     unit) -> unit Js.meth
+  method onCopy :
+    (codemirror Js.t ->
+     Dom_html.event Js.t ->
+     unit) -> unit Js.meth
+  method onPaste :
+    (codemirror Js.t ->
+     Dom_html.event Js.t ->
+     unit) -> unit Js.meth
+  method onDragstart :
+    (codemirror Js.t ->
+     Dom_html.event Js.t ->
+     unit) -> unit Js.meth
+  method onDragenter :
+    (codemirror Js.t ->
+     Dom_html.event Js.t ->
+     unit) -> unit Js.meth
+  method onDragover :
+    (codemirror Js.t ->
+     Dom_html.event Js.t ->
+     unit) -> unit Js.meth
+  method onDragleave :
+    (codemirror Js.t ->
+     Dom_html.event Js.t ->
+     unit) -> unit Js.meth
+  method onDrop :
+    (codemirror Js.t ->
+     Dom_html.event Js.t ->
+     unit) -> unit Js.meth
+  method onDelete :
+    (unit ->
+     unit) -> unit Js.meth
+  method onBeforeCursorEnter :
+    (unit ->
+     unit) -> unit Js.meth
+  method onClear :
+    (position Js.t ->
+     position Js.t ->
+     unit) -> unit Js.meth
+  method onHide :
+    (unit ->
+     unit) -> unit Js.meth
+  method onUnhide :
+    (unit ->
+     unit) -> unit Js.meth
+  method onRedraw :
+    (unit ->
+     unit) -> unit Js.meth
 
 end;;
 

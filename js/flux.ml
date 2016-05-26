@@ -9,31 +9,60 @@ class type flux_configuration = object
                              val rulesCheckboxesId : Js.js_string Js.t Js.prop
                              val height : int Js.t Js.prop
                              val width : int Js.t Js.prop
+                             val shortLabels : bool Js.t Js.prop
                            end
 let constructor_configuration : flux_configuration Js.t Js.constr =
   (Js.Unsafe.variable "Object")
-let create_configuration ~(begin_time_id : string)
-                         ~(end_time_id : string)
-                         ~(select_correction_id : string)
-                         ~(toggle_rules_id : string)
-                         ~(checkbox_self_influence_id : string)
-                         ~(nb_events_id : string)
-                         ~(svg_id : string)
-                         ~(rules_checkboxes_id : string)
-                         ~(height: int)
-                         ~(width: int)
+let create_configuration
+    ~(short_labels : bool)
+    ~(begin_time_id : string)
+    ~(end_time_id : string)
+    ~(select_correction_id : string)
+    ~(toggle_rules_id : string)
+    ~(checkbox_self_influence_id : string)
+    ~(nb_events_id : string)
+    ~(svg_id : string)
+    ~(rules_checkboxes_id : string)
+    ~(height: int)
+    ~(width: int)
     : flux_configuration Js.t  =
-  let configuration : flux_configuration Js.t = jsnew constructor_configuration () in
-  let () = (Js.Unsafe.coerce configuration)##beginTimeId <- Js.string begin_time_id;
-           (Js.Unsafe.coerce configuration)##endTimeId <- Js.string end_time_id;
-           (Js.Unsafe.coerce configuration)##selectCorrectionId <- Js.string select_correction_id;
-           (Js.Unsafe.coerce configuration)##checkboxSelfInfluenceId <- Js.string checkbox_self_influence_id;
-           (Js.Unsafe.coerce configuration)##toggleRulesId <- Js.string toggle_rules_id;
-           (Js.Unsafe.coerce configuration)##nbEventsId <- Js.string nb_events_id;
-           (Js.Unsafe.coerce configuration)##svgId <- Js.string svg_id;
-           (Js.Unsafe.coerce configuration)##rulesCheckboxesId <- Js.string rules_checkboxes_id;
-           (Js.Unsafe.coerce configuration)##height <- height;
-           (Js.Unsafe.coerce configuration)##width <- width
+  let configuration : flux_configuration Js.t =
+    jsnew constructor_configuration ()
+  in
+  let () =
+    (Js.Unsafe.coerce configuration)
+      ##
+      beginTimeId <- Js.string begin_time_id;
+    (Js.Unsafe.coerce configuration)
+      ##
+      endTimeId <- Js.string end_time_id;
+    (Js.Unsafe.coerce configuration)
+      ##
+      selectCorrectionId <- Js.string select_correction_id;
+    (Js.Unsafe.coerce configuration)
+      ##
+      checkboxSelfInfluenceId <- Js.string checkbox_self_influence_id;
+    (Js.Unsafe.coerce configuration)
+      ##
+      toggleRulesId <- Js.string toggle_rules_id;
+    (Js.Unsafe.coerce configuration)
+      ##
+      nbEventsId <- Js.string nb_events_id;
+    (Js.Unsafe.coerce configuration)
+      ##
+      svgId <- Js.string svg_id;
+    (Js.Unsafe.coerce configuration)
+      ##
+      rulesCheckboxesId <- Js.string rules_checkboxes_id;
+    (Js.Unsafe.coerce configuration)
+      ##
+      height <- height;
+    (Js.Unsafe.coerce configuration)
+      ##
+      width <- width;
+    (Js.Unsafe.coerce configuration)
+      ##
+      shortLabels <- short_labels;
   in configuration
 
 class type flux_data = object
