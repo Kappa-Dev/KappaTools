@@ -176,10 +176,8 @@ let iteri f i =
   if j < i then let () = f j in aux (succ j)
   in aux 0
 
-let recti f x i =
-  let rec aux j =
-    if j < i then f j (aux (succ j)) else x
-  in aux 0
+let rec recti f x i =
+  if 0 < i then recti f (f i x) (pred i) else x
 
 let min_pos_int_not_zero (keya,dataa) (keyb,datab) =
   if keya = 0

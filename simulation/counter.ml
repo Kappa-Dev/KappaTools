@@ -231,9 +231,9 @@ let reinitialize counter =
 let next_point counter =
   match counter.dT with
   | Some dT ->
-     int_of_float
-       ((current_time counter -. counter.init_time)
-        /. dT)
+     min counter.plot_points
+	 (int_of_float
+	    ((current_time counter -. counter.init_time) /. dT))
   | None ->
      match counter.dE with
      | None -> 0
