@@ -159,10 +159,11 @@ let reachability_map_0 =
       (match !Config.output_local_trace_directory
 	with
 	| "" -> ""
-	| x -> (x^"/")) ;
+ | x -> (x^"/")) ;
   }
 
-let reachability_map_1 = { reachability_map_0 with Remanent_parameters_sig.dump_reachability_analysis_result = true }
+let reachability_map_1 = { reachability_map_0 with Remanent_parameters_sig.dump_reachability_analysis_result = true;
+                         }
 let reachability_map_2 = { reachability_map_1 with Remanent_parameters_sig.dump_reachability_analysis_iteration = true }
 let reachability_map_3 = { reachability_map_2 with Remanent_parameters_sig.dump_reachability_analysis_diff = true }
 let reachability_map_4 = { reachability_map_3 with Remanent_parameters_sig.dump_reachability_analysis_wl = true }

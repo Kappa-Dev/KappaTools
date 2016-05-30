@@ -19,10 +19,10 @@ let warn parameters mh message exn default =
     (fun () -> default)
 
 let local_trace = false
-  
+
 (**************************************************************************)
 (*PRINT*)
-  
+
 let print_parallel_pair parameter error handler_kappa (x, y) =
   let (agent_id, agent_type, site_type1, site_type2, state1, state2) = x in
   let (agent_id', agent_type', site_type1', site_type2', state1', state2') = y in
@@ -235,7 +235,7 @@ let print_action_binding parameter handler_kappa store_action_binding static dyn
           (fun ((agent_id, agent_type, site_type, state),
                 (agent_id', agent_type', site_type', state')) ->
             let error, (site_type_string, site_type_string', state_string, state_string') =
-              print_pair parameter error handler_kappa 
+              print_pair parameter error handler_kappa
                 ((agent_id, agent_type, site_type, state),
                  (agent_id', agent_type', site_type', state'))
             in
@@ -243,14 +243,14 @@ let print_action_binding parameter handler_kappa store_action_binding static dyn
               try
                 Handler.string_of_agent parameter error handler_kappa agent_type
               with
-                _ -> warn parameter error (Some "line 1118") Exit 
+                _ -> warn parameter error (Some "line 1118") Exit
                   (Ckappa_sig.string_of_agent_name agent_type)
             in
             let error, agent_string' =
               try
                 Handler.string_of_agent parameter error handler_kappa agent_type'
               with
-                _ -> warn parameter error (Some "line 1125") Exit 
+                _ -> warn parameter error (Some "line 1125") Exit
                   (Ckappa_sig.string_of_agent_name agent_type')
             in
             Loggers.fprintf (Remanent_parameters.get_logger parameter)
@@ -310,7 +310,7 @@ let print_site_create_parallel parameter handler_kappa static dynamic error stor
               try
                 Handler.string_of_agent parameter error handler_kappa agent_type'
               with
-                _ -> warn parameter error (Some "line 1187") Exit 
+                _ -> warn parameter error (Some "line 1187") Exit
                   (Ckappa_sig.string_of_agent_name agent_type')
             in
             let _ =
@@ -361,7 +361,7 @@ let print_site_create_parallel parameter handler_kappa static dynamic error stor
                   try
                     Handler.string_of_agent parameter error handler_kappa agent_type1'
                   with
-                    _ -> warn parameter error (Some "line 1220") Exit 
+                    _ -> warn parameter error (Some "line 1220") Exit
                       (Ckappa_sig.string_of_agent_name agent_type1')
                 in
                 Loggers.fprintf (Remanent_parameters.get_logger parameter)
@@ -416,9 +416,9 @@ let print_fst_site_create_parallel_rhs parameter handler_kappa store_fst_site_cr
   Loggers.fprintf (Remanent_parameters.get_logger parameter)
     "Rules can create the first pair of a parallel bonds in the rhs:\n";
   print_site_create_parallel parameter handler_kappa static dynamic error store_fst_site_create_parallel_bonds_rhs
-    
+
  (**************************************************************************)
-    
+
 let print_snd_site_create_parallel_rhs parameter handler_kappa store_snd_site_create_parallel_bonds_rhs static dynamic error =
   Loggers.fprintf (Remanent_parameters.get_logger parameter)
     "Rules can create the second pair of a parallel bonds in the rhs:\n";
@@ -498,7 +498,7 @@ let print_parallel_bonds_init parameter handler_kappa store_parallel_bonds_init 
     "\nResult of parallel bonds in the initial states:\n";
   print_result handler_kappa parameter error store_parallel_bonds_init;
   Loggers.print_newline (Remanent_parameters.get_logger parameter)
-    
+
 (**************************************************************************)
 
 let print_action_binding_test parameter error handler_kappa rule_id (x, y) =
