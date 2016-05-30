@@ -23,7 +23,7 @@ sig
   val to_string:Remanent_parameters_sig.parameters -> Exception.method_handler -> label -> Exception.method_handler  * string
   val dump:   Remanent_parameters_sig.parameters -> Exception.method_handler -> label -> Exception.method_handler
   val print: Format.formatter -> label -> unit
-
+  val int_of_label: label -> int
 end
 
 module Int_labels =
@@ -47,6 +47,8 @@ module Int_labels =
     let _ = Loggers.fprintf (Remanent_parameters.get_logger h) "%s" s in
       error
 
+  let int_of_label i = i
+
 end:Labels with type label=int)
 
 module type Label_handler =
@@ -67,6 +69,8 @@ sig
   val filter_couple: Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.kappa_handler -> (Exception.method_handler ->label -> label -> Exception.method_handler *  bool) -> label_set_couple -> Exception.method_handler * label_set_couple
   val to_string :  Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.kappa_handler ->label_set -> Exception.method_handler * string list
   val to_string_couple : Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.kappa_handler ->label_set_couple  -> Exception.method_handler * string list
+  val convert_label_set_couple : label_set_couple -> (int * int) list
+
 end
 
 module Empty =
@@ -87,6 +91,8 @@ module Empty =
   let dump_couple _ error _ _ = error
   let filter_couple _ error _ _ a = error,a
   let to_string_couple _ error _ _ = error,[]
+  let int_of_label = 0
+  let convert_label_set_couple _ = [0,0]
 end:Label_handler with type label=unit)
 
 module Extensive =
@@ -94,15 +100,15 @@ module Extensive =
     (struct
       type label = L.label
       module LSetMap =
-	SetMap.Make (struct type t=label let compare = compare let print = L.print end)
+        SetMap.Make (struct type t=label let compare = compare let print = L.print end)
       module Set = LSetMap.Set
       type label_set = Set.t
       module Pair_Set =
-	SetMap.Make
-	  (struct type t=label*label
-		  let compare = compare
-		  let print f (a,b) =
-		    Format.fprintf f "(%a, %a)" L.print a L.print b end)
+        SetMap.Make
+          (struct type t=label*label
+            let compare = compare
+            let print f (a,b) =
+              Format.fprintf f "(%a, %a)" L.print a L.print b end)
       type label_set_couple =  Pair_Set.Set.t
 
       let label_of_int = L.label_of_int
@@ -116,10 +122,10 @@ module Extensive =
           (fun a (error,sol) ->
             Set.fold
               (fun b (error,sol) ->
-		if not bool && a=b
-		then
-		  error,sol
-		else
+                 if not bool && a=b
+                 then
+                   error,sol
+                 else
                   error,Pair_Set.Set.add (a,b) sol
               )
               b
@@ -217,7 +223,15 @@ module Extensive =
               (false,sol,error)
           in
           let sol = List.rev sol in
-            error,sol
+          error,sol
+
+      let convert_label_set_couple set =
+        Pair_Set.Set.fold
+          (fun (a,b) list ->
+             (L.int_of_label a,L.int_of_label b)::list)
+          set
+          []
+
 end:Label_handler with type label = L.label))
 
 module Implicit =
@@ -225,8 +239,8 @@ module Implicit =
     (struct
       type label = L.label
       module LSetMap =
-	SetMap.Make
-	  (struct type t=label let compare = compare let print = L.print end)
+        SetMap.Make
+          (struct type t=label let compare = compare let print = L.print end)
       module Set = LSetMap.Set
       type label_set = Set.t
       type label_set_couple =  (label_set * label_set) list
@@ -332,5 +346,20 @@ module Implicit =
         in
         let sol = List.rev ("]"::sol) in
           error,sol
+
+    let convert_label_set_couple set =
+      List.fold_left
+        (fun list (seta,setb) ->
+           Set.fold
+             (fun a list ->
+                Set.fold
+                  (fun b list->
+                     (L.int_of_label a,L.int_of_label b)::list)
+                  setb list)
+             seta list)
+        []
+        set
+
+    let int_of_label l = l
 
 end:Label_handler))
