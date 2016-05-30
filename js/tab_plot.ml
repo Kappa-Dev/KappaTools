@@ -4,16 +4,21 @@ module UIState = Ui_state
 
 open Js_plot
 
-let div_id = "plot-div"
-let export_filename_id = "plot-export-filename"
-let export_button_id =  "plot-export-button"
-let export_format_id = "export-file-format"
-let div_id = "plot-div"
-let div_x_axis_selector = "plot-x-axis"
+let div_id              = "plot-div"
+let div_axis_select_id  = "plot-axis-select"
+let export_filename_id  = "plot-export-filename"
+let export_button_id    = "plot-export-button"
+let export_format_id    = "export-file-format"
+let div_id              = "plot-div"
 
 let state_plot state = match state with
     None -> None
-  | Some state -> state.ApiTypes.plot
+  | Some state ->
+    (match state.ApiTypes.plot with
+      (* ignore empty plots for now *)
+    | Some { ApiTypes.observables = [] ; _ } -> None
+    | _ -> state.ApiTypes.plot
+    )
 
 let content =
   let plot_show_legend =
@@ -48,16 +53,19 @@ let content =
         <div id="plot-div" class="col-sm-12"></div>
       </div>
       <div class="row">
+
          <div class="col-sm-2">
             $plot_show_legend$ Legend
          </div>
-         <div class="col-sm-4">
+
+         <div class="col-sm-3">
                Log X $plot_x_axis_log_checkbox$
                Log Y $plot_y_axis_log_checkbox$
          </div>
-         <div class="col-sm-6">
-            <div id=$str:div_x_axis_selector$></div>
+
+         <div class="col-sm-4" $list:Html5.a_id div_axis_select_id$>
          </div>
+
       </div>
       $export_controls$
   </div> >>
@@ -106,6 +114,7 @@ let onload () =
   let configuration : plot_configuration Js.t =
     Js_plot.create_configuration
       ~plot_div_id:div_id
+      ~plot_div_select_id:div_axis_select_id
       ~plot_label_div_id:"plot-label-div"
       ~plot_style_id:"plot-svg-style"
       ~plot_show_legend_checkbox_id:"plot-show-legend"
@@ -136,7 +145,7 @@ let onload () =
     (fun _ ->
       match (React.S.value UIState.model_runtime_state) with
         None -> ()
-      | Some state -> update_plot plot state.plot)
+      | Some state -> update_plot plot state.ApiTypes.plot)
   in
   let _ =
     React.S.l1

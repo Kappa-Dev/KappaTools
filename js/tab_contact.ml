@@ -41,8 +41,8 @@ let content =
 let navcontent = [ Html5.div [content] ]
 
 let onload () =
-  let contactmap : Contactmap.contact_map Js.t =
-    Contactmap.create_contact_map display_id false in
+  let contactmap : Js_contact.contact_map Js.t =
+    Js_contact.create_contact_map display_id false in
 
   let () = Display_common.save_plot_ui
     (fun f -> let filename = Js.string f in

@@ -1,3 +1,4 @@
+"use strict"
 // http://stackoverflow.com/questions/326596/how-do-i-wrap-a-function-in-javascript
 var wrap = function(fn){
     return function(){
@@ -8,6 +9,16 @@ var wrap = function(fn){
             }
     };
 };
+
+var assert = function(condition, message) {
+    if (!condition) {
+        message = message || "Assertion failed";
+        if (typeof Error !== "undefined") {
+            throw new Error(message);
+        }
+        throw message; // Fallback
+    }
+}
 
 // http://stackoverflow.com/questions/979975/how-to-get-the-value-from-the-url-parameter
 var args = function () {
@@ -33,8 +44,8 @@ var args = function () {
 (function(){
     var found = false;
     var levels = ["debug","info","notice","warning","error","fatal" ];
-    for (i in levels){
-        level = levels[i];
+    for (var i in levels){
+        var level = levels[i];
         if(args.level && args.level === level) { found = true; }
         if(found) {
             window[level] = function(x){

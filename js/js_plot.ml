@@ -3,6 +3,7 @@ module ApiTypes = ApiTypes_j
 class type plot_configuration =
 object
   val plotDivId : Js.js_string Js.t Js.prop
+  val plotDivAxisSelectId : Js.js_string Js.t Js.prop
   val plotLabelDivId:Js.js_string Js.t Js.prop
   val plotStyleId : Js.js_string Js.t Js.prop
   val plotShowLegendCheckboxId : Js.js_string Js.t Js.prop
@@ -11,12 +12,14 @@ object
 end
 let constructor_configuration : plot_configuration Js.t Js.constr =
   (Js.Unsafe.variable "Object")
-let create_configuration ~(plot_div_id : string)
-                         ~(plot_label_div_id:string)
-                         ~(plot_style_id : string)
-                         ~(plot_show_legend_checkbox_id : string)
-                         ~(plot_x_axis_log_checkbox_id : string)
-                         ~(plot_y_axis_log_checkbox_id : string)
+let create_configuration
+    ~(plot_div_id : string)
+    ~(plot_div_select_id : string)
+    ~(plot_label_div_id:string)
+    ~(plot_style_id : string)
+    ~(plot_show_legend_checkbox_id : string)
+    ~(plot_x_axis_log_checkbox_id : string)
+    ~(plot_y_axis_log_checkbox_id : string)
     : plot_configuration Js.t  =
   let configuration : plot_configuration Js.t =
     jsnew constructor_configuration () in
@@ -24,6 +27,9 @@ let create_configuration ~(plot_div_id : string)
     (Js.Unsafe.coerce configuration)
       ##
       plotDivId <- Js.string plot_div_id;
+    (Js.Unsafe.coerce configuration)
+      ##
+      plotDivAxisSelectId <- Js.string plot_div_select_id;
     (Js.Unsafe.coerce configuration)
       ##
       plotLabelDivId <- Js.string plot_label_div_id;

@@ -110,16 +110,30 @@ function observable_plot(configuration){
                            });
         });
         // Switch over for the population
-        that.state = new_state;
-        var time_observable = that.getObservable(i);
-        var time_mode = MODES.XAXIS;
-        if(time_observable && time_observable.label == that.timeLabel){
-            time_mode = time_observable.mode;
+
+
+
+        /* we need to figure out what mode the time axis is
+           1. the time values are the last element of the state
+              array.
+           2. lets default the time axis to be the x-axis
+           3. double check it is the time values are what is
+              selected by checking the label.
+              4. if it is the x-axis then copy over the
+           5. check that there is an x-axis
+              6. if there is not then use the time axis
+         */
+        // not sure what is happening here
+        var time_observable = that.state.slice(-1)[0]; // 1.
+        var time_mode = MODES.XAXIS;             // 2.
+        if(time_observable && time_observable.label == that.timeLabel) // 3.
+        { time_mode = time_observable.mode;     // 4.
         };
-        // make sure there is an xaxis
-        if(!new_state.every(function(state){ return state.mode != MODES.XAXIS; })){
-            time_mode = MODES.XAXIS;
+
+        if(new_state.every(function(state){ return state.mode != MODES.XAXIS; })){ // 5.
+            time_mode = MODES.XAXIS; // 6.
         }
+        that.state = new_state;
         that.start_time = null;
         that.end_time = null;
         // Populate observables from data.
@@ -145,9 +159,8 @@ function observable_plot(configuration){
         color.domain(that.state.map(function(c,i){ return i; }));
         that.state.forEach(function(s,i){ s.color = color(i);
                                           s.tick = TICKS.index(i);
-                                        })
-        that.renderPlot();
-        that.renderLabel();
+                                        });
+        that.render();
 
     };
     this.setPlot = wrap(this.setPlot);
@@ -270,9 +283,9 @@ function observable_plot(configuration){
             .each(function(d)
                   { switch(d.mode) {
                   case MODES.MARKS:
-                      var values = d.values.filter(function(d){var x = xMap(d,i);
-                                                               var y = yMap(d);
-                                                               return (!isNaN(x) && !isNaN(y)) });
+                      var values = d.values.filter(function(d,i){ var x = xMap(d,i);
+                                                                  var y = yMap(d);
+                                                                  return (!isNaN(x) && !isNaN(y)) });
                       var tick =
                           d3.select(this)
                           .selectAll(".plot-tick")
@@ -377,10 +390,103 @@ function observable_plot(configuration){
     }
     this.renderPlot = wrap(this.renderPlot);
 
+    /* add select for the x-axis */
+    this.setupAxisSelect = function(){
+        var that = this;
+        /* check for the div to add the axis */
+        if(that.configuration.plotDivAxisSelectId){
+            // Clear div first
+            that.divAxisSelect = d3.select("#"+configuration.plotDivAxisSelectId);
+            that.divAxisSelect.html("");
+            /* Handler to update when the select changes */
+            var changeHandler = function(){
+                var index = parseInt(this.options[this.selectedIndex].value);
+                assert(typeof index !== 'undefined',"plot selection invalid");
+                that.state.forEach(function(state,i){
+                    if(state.mode == MODES.XAXIS){
+                        state.mode = MODES.MARKS;
+                    }
+                    if(i == index){
+                        state.mode = MODES.XAXIS;
+                    }
+                });
+                // re-render plot
+                that.renderPlot();
+            }
+            that.divAxisSelect = that.divAxisSelect
+                .append("select")
+                .attr("class","form-control")
+                .on("change", changeHandler);
+            that.divAxisSelect
+                .selectAll('option')
+                .data([])
+                .enter()
+                .append('option');
+        }
+    }
+    this.setupAxisSelect = wrap(this.setupAxisSelect);
+
+    this.updateAxisSelect = function(){
+            that.divAxisSelect
+                .selectAll('option')
+                .remove();
+
+            that.divAxisSelect
+                .selectAll('option')
+                .data(that.state)
+                .enter().append("option")
+                .attr("value",function(d,i) { return i; })
+                .text(function(d) { return d.label; });
+            that.divAxisSelect
+                .selectAll('option')
+                .filter(function(d){ return d.mode == MODES.XAXIS; })
+                .attr("selected","true");
+
+    }
+    this.updateAxisSelect = wrap(this.updateAxisSelect);
+
+    this.renderAxisSelect = function(){
+        var that = this;
+        /* check for the div to add the axis */
+        if(that.configuration.plotDivAxisSelectId){
+            // Clear div first
+            var divAxisSelect = d3.select("#"+configuration.plotDivAxisSelectId);
+            divAxisSelect.html("");
+            /* Handler to update when the select changes */
+            var changeHandler = function(){
+                var index = parseInt(this.options[this.selectedIndex].value);
+                assert(typeof index !== 'undefined',"plot selection invalid");
+                that.state.forEach(function(state,i){
+                    if(state.mode == MODES.XAXIS){
+                        state.mode = MODES.MARKS;
+                    }
+                    if(i == index){
+                        state.mode = MODES.XAXIS;
+                    }
+                });
+                // re-render plot
+                that.renderPlot();
+            }
+            var select = divAxisSelect
+                         .append("select")
+                         .attr("class","form-control")
+                         .on("change", changeHandler);
+            select.selectAll('option')
+                  .data(that.state)
+                  .enter().append("option")
+                  .attr("value",function(d,i) { return i; })
+                  .text(function(d) { return d.label; });
+            select.selectAll('option')
+                  .filter(function(d){ return d.mode == MODES.XAXIS; })
+                  .attr("selected","true");
+        }
+    }
+    this.renderAxisSelect = wrap(this.renderAxisSelect);
+
     /* add label for plot */
     this.renderLabel = function(){
         var that = this;
-        if(configuration.plotLabelDivId){
+        if(that.configuration.plotLabelDivId){
             if (that.start_time){
                 var label =
                     "Plot between t = "
@@ -456,6 +562,9 @@ function observable_plot(configuration){
     this.render = function(){
         that.renderPlot();
         that.renderLabel();
+        that.updateAxisSelect();
+//        that.renderAxisSelect();
     };
     this.addHandlers();
+    this.setupAxisSelect();
 }

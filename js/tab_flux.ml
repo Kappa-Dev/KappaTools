@@ -131,10 +131,10 @@ let navcontent =
       [content]
   ]
 let update_flux_map
-    (flux_js : Flux.flux_map Js.t)
+    (flux_js : Js_flux.flux_map Js.t)
     (flux_data : ApiTypes.flux_map) : unit =
-  let flux_data : Flux.flux_data Js.t =
-    Flux.create_data ~flux_begin_time:flux_data.flux_begin_time
+  let flux_data : Js_flux.flux_data Js.t =
+    Js_flux.create_data ~flux_begin_time:flux_data.flux_begin_time
       ~flux_end_time:flux_data.flux_end_time
       ~flux_rules:flux_data.flux_rules
       ~flux_hits:flux_data.flux_hits
@@ -165,8 +165,8 @@ let select_fluxmap flux_map =
 let navli = Display_common.badge (fun state -> List.length (state_fluxmap state))
 
 let onload () =
-let flux_configuration : Flux.flux_configuration Js.t =
-  Flux.create_configuration
+let flux_configuration : Js_flux.flux_configuration Js.t =
+  Js_flux.create_configuration
     ~short_labels:true
     ~begin_time_id:("begin_time")
     ~end_time_id:("end_time")
@@ -180,7 +180,7 @@ let flux_configuration : Flux.flux_configuration Js.t =
     ~width:360
   in
   let flux =
-    Flux.create_flux_map flux_configuration in
+    Js_flux.create_flux_map flux_configuration in
   let () =
     Display_common.save_plot_ui
       (fun f -> let filename = Js.string f in

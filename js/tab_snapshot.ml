@@ -102,7 +102,7 @@ let content =
 let navcontent = [content]
 
 let update_snapshot
-      (snapshot_js : Contactmap.contact_map Js.t)
+      (snapshot_js : Js_contact.contact_map Js.t)
       (snapshot : ApiTypes.snapshot) : unit =
   let () =
     Common.debug
@@ -122,8 +122,8 @@ let update_snapshot
   snapshot_js##setData (Js.string json)
 
 let select_snapshot () =
-  let snapshot_js : Contactmap.contact_map Js.t =
-    Contactmap.create_contact_map display_id true in
+  let snapshot_js : Js_contact.contact_map Js.t =
+    Js_contact.create_contact_map display_id true in
   let index = Js.Opt.bind
     (Display_common.document##getElementById (Js.string select_id))
     (fun dom ->
@@ -149,8 +149,8 @@ let select_snapshot () =
       set_current_snapshot None
 
 let onload () : unit =
-  let snapshot : Contactmap.contact_map Js.t =
-    Contactmap.create_contact_map display_id true in
+  let snapshot : Js_contact.contact_map Js.t =
+    Js_contact.create_contact_map display_id true in
   let snapshot_select_dom : Dom_html.inputElement Js.t =
     Js.Unsafe.coerce
       ((Js.Opt.get

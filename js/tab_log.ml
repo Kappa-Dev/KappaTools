@@ -12,7 +12,7 @@ let navcontent =
              UIState.model_runtime_state
              (fun state -> React.S.const
                (match (state : ApiTypes.state option) with
-                 Some state -> String.concat "" state.log_messages
+                 Some state -> String.concat "" state.ApiTypes.log_messages
                | _ -> ""
                ))) ]
   ]

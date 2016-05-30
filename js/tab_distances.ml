@@ -49,10 +49,6 @@ let update_distances
   match data with
     None -> ()
   | Some data ->
-    let div : Dom_html.element Js.t =
-      Js.Opt.get (Display_common.document##getElementById
-                    (Js.string div_id))
-        (fun () -> assert false) in
     let distances_string : string = ApiTypes_j.string_of_distances data in
     let distances_data : Js.js_string Js.t = Js.string distances_string in
     distances##setData(distances_data)
@@ -80,7 +76,7 @@ let onload () =
     (fun _ ->
       match (React.S.value UIState.model_runtime_state) with
         None -> ()
-      | Some state -> update_distances distances_plot state.distances)
+      | Some state -> update_distances distances_plot state.ApiTypes.distances)
   in
   let _ =
     React.S.l1

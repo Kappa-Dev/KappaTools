@@ -37,9 +37,9 @@ let xml =
       ~a:[ Html5.a_id nav_tab_id
          ; Html5.a_class ["nav";"nav-tabs"]
          ; Html5.Unsafe.string_attrib "role" "tablist" ]
-      [ navli "contact"   true  Tab_contactmap.navli
+      [ navli "contact"   true  Tab_contact.navli
       ; navli "plot"      false Tab_plot.navli
-      ; navli "flux"      false Tab_fluxmap.navli
+      ; navli "flux"      false Tab_flux.navli
       ; navli "snapshot"  false Tab_snapshot.navli
       ; navli "outputs"   false Tab_outputs.navli
       ; navli "distances" false Tab_distances.navli
@@ -48,9 +48,9 @@ let xml =
   let navcontent =
     Html5.div
       ~a:[ Html5.a_class ["panel-content";"tab-content"]]
-      [ navcontent "contact"    true  Tab_contactmap.navcontent
+      [ navcontent "contact"    true  Tab_contact.navcontent
       ; navcontent "plot"       false Tab_plot.navcontent
-      ; navcontent "flux"       false Tab_fluxmap.navcontent
+      ; navcontent "flux"       false Tab_flux.navcontent
       ; navcontent "snapshot"   false Tab_snapshot.navcontent
       ; navcontent "outputs"    false Tab_outputs.navcontent
       ; navcontent "distances"  false Tab_distances.navcontent
@@ -60,9 +60,9 @@ let xml =
     [navtabs;navcontent]
 
 let onload () =
-  let () = Tab_contactmap.onload () in
+  let () = Tab_contact.onload () in
   let () = Tab_plot.onload () in
-  let () = Tab_fluxmap.onload () in
+  let () = Tab_flux.onload () in
   let () = Tab_snapshot.onload () in
   let () = Tab_outputs.onload () in
   let () = Tab_distances.onload () in
