@@ -80,7 +80,9 @@ function plotPNG(plotDivId,title,plotName,plotStyleId){
           .attr("title", title)
           .attr("version", 1.1)
           .attr("xmlns", "http://www.w3.org/2000/svg")
-          .node().parentNode.innerHTML;
+          .attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
+          .node()
+          .outerHTML;
           var style = plotStyleId?d3.select("#"+plotStyleId).text():"";
           style = "<![CDATA["+style+"]]>";
           html = html.replace(cssTextToken,style);
@@ -92,21 +94,27 @@ function plotPNG(plotDivId,title,plotName,plotStyleId){
           canvas.height = height; //get original canvas height
           var context = canvas.getContext("2d");
           var image = new Image(width, height);
+          image.onload = function() {
+              context.fillStyle = "white";
+              context.fillRect(0, 0, width, height);
+              context.drawImage(image, 0, 0, width, height);
+              var canvasdata = canvas.toDataURL("image/png");
+              var a = document.createElement("a");
+              a.style = "display: none";
+              document.body.appendChild(a);
+              a.download = plotName;
+              a.href = canvasdata;
+              a.click();
+              document.body.removeChild(a);
+          };
+          image.onerror = function(e){
+              debug(e);
+          }
           image.src = imgsrc;
-              image.onload = function() {
-                  context.drawImage(image, 0, 0, width, height);
-                  var canvasdata = canvas.toDataURL("image/png");
-                  var a = document.createElement("a");
-                  a.style = "display: none";
-                  document.body.appendChild(a);
-                  a.download = plotName;
-                  a.href = canvasdata;
-                  a.click();
-                  document.body.removeChild(a);
-              };
-            } catch (e) {
-                alert(e);
-            }
+
+        } catch (e) {
+            alert(e);
+        }
 }
 
 function saveFile(data,mime,filename){
@@ -127,7 +135,8 @@ function plotSVG(plotDivId,title,plotName,plotStyleId){
                            .attr("title", title)
                            .attr("version", 1.1)
                            .attr("xmlns", "http://www.w3.org/2000/svg")
-                           .node().parentNode.innerHTML;
+                           .node()
+                           .outerHTML;
               var style = plotStyleId?d3.select("#"+plotStyleId).text():"";
               style = "<![CDATA["+style+"]]>";
               html = html.replace(cssTextToken,style);
@@ -135,4 +144,28 @@ function plotSVG(plotDivId,title,plotName,plotStyleId){
         } catch (e) {
             alert(e);
         }
+}
+
+// http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
+function hashCode(s){
+    s = s+s+s+s+s+s+s;
+    var hash = 0;
+    if (s.length == 0) return hash;
+    var i = 0;
+    for (i = 0; i < s.length; i++) {
+        var char = s.charCodeAt(i);
+        hash = ((hash<<5)-hash)+char;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    return hash;
+}
+
+// http://stackoverflow.com/questions/57803/how-to-convert-decimal-to-hex-in-javascript
+function hashColor(s){
+    var hashInt = hashCode(s);
+    if (hashInt < 0)
+    { hashInt = 0xFFFFFFFF + hashInt + 1; }
+    var hashColor = hashInt.toString(16);
+    var hashString = String("000000" + hashColor).slice(-6);
+    return "#"+hashString;
 }

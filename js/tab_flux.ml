@@ -66,9 +66,10 @@ let content =
                    ; Html5.a_input_type `Checkbox ] () in
   let export_controls =
     Display_common.export_controls
-      export_format_id
-      export_filename_id
-      export_button_id
+      ~export_select_id:export_format_id
+      ~export_filename_id:export_filename_id
+      ~export_button_id:export_button_id
+      ~export_data_label:"json"
   in
   <:html5<<div>
           <div class="row">

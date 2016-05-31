@@ -11,8 +11,9 @@ let export_button_id    = "plot-export-button"
 let export_format_id    = "export-file-format"
 let div_id              = "plot-div"
 
-let state_plot state = match state with
-    None -> None
+let state_plot state =
+  match state with
+  | None -> None
   | Some state ->
     (match state.ApiTypes.plot with
       (* ignore empty plots for now *)
@@ -39,9 +40,10 @@ let content =
                    ] () in
   let export_controls =
     Display_common.export_controls
-      export_format_id
-      export_filename_id
-      export_button_id
+      ~export_select_id:export_format_id
+      ~export_filename_id:export_filename_id
+      ~export_button_id:export_button_id
+      ~export_data_label:"tsv"
   in
   <:html5<<div>
       <div class="row">
@@ -67,6 +69,7 @@ let content =
          </div>
 
       </div>
+      <div class="row"><p></p></div>
       $export_controls$
   </div> >>
 
@@ -125,9 +128,10 @@ let onload () =
     Js_plot.create_observable_plot configuration in
   let () =
     Display_common.save_plot_ui
-      (fun f -> let filename = Js.string f in
-                let () = plot##setPlotName(filename) in
-                plot##handlePlotTSV(())
+      (fun f ->
+        let filename = Js.string f in
+        let () = plot##setPlotName(filename) in
+        plot##handlePlotTSV(())
       )
       "kappa plot"
       export_button_id

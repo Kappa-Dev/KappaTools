@@ -81,12 +81,21 @@ function observable_plot(configuration){
 
     this.timeLabel = "Time";
 
+
+    this.setRawData = function(plot){
+        that.rawData = plot;
+    }
+    this.getRawData = function(){
+        return that.rawData;
+    }
+
     /* Update the plot data of the graph.  This is called
        when new data is to be displayed in a graph.  Care
        is taken not to reset the state of the plot when
        data is updated.
      */
     this.setPlot = function(plot){
+        that.setRawData(plot);
         var legend = plot.legend;
 
         /* An update new copy over state preserving settings
@@ -203,12 +212,10 @@ function observable_plot(configuration){
         // Add svg element
         var svg = d3.select("#"+that.configuration.plotDivId).append("svg")
             .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform"
-                 ,"translate(" + margin.left + "," + margin.top + ")");
-        // defs
+            .attr("height", height + margin.top + margin.bottom);
         var svgDefs = createSVGDefs(svg);
+        // defs
+
         /* Here the defs for the tick marks it was taken from
            an earlier implementation of plots.
          */
@@ -235,6 +242,10 @@ function observable_plot(configuration){
            .attr("r", 1.5)
            .attr("fill","none")
            .style("stroke", "currentColor");
+
+        svg = svg.append("g")
+                 .attr("transform"
+                       ,"translate(" + margin.left + "," + margin.top + ")");
 
         // draw axis
         svg.append("g")
@@ -263,8 +274,7 @@ function observable_plot(configuration){
             .y(function(d) {
                 var value = d;
                 return y(value); });
-        /* helper function to map values to
-           screen coordinates to */
+        // helper function to map values to screen coordinates to
         var xMap = function(d,i){
             var current = xState.values[i];
             current = x(current);
@@ -387,6 +397,7 @@ function observable_plot(configuration){
             .attr('y', legendRectSize - legendSpacing)
             .text(function(d) { return d.label; })
             .on('click', cycle);
+
     }
     this.renderPlot = wrap(this.renderPlot);
 
@@ -533,12 +544,23 @@ function observable_plot(configuration){
     }
 
     /* define how to export to tsv */
+    this.plotName = "kappa-plot";
+    this.getPlotName = function(suffix){
+        var filename = that.plotName;
+        filename = (filename.indexOf('.') === -1)?filename+suffix:filename;
+        return filename;
+    }
+    this.setPlotName = function(plotName){ that.plotName = plotName; }
     this.handlePlotTSV = function(){
-        var plot = that.getPlot();
-        var header = "'time'\t"+plot["legend"].join("\t");
-        var body = plot["observables"].map(function(d) { var row = [d["time"]];
-                                                         row = row.concat(d["values"]);
-                                                         return row.join("\t") }).join("\n");
+        var rawData = that.getRawData();
+        var observables = rawData.observables;
+        var legend = rawData.legend;
+        var header = "'time'\t"+legend.join("\t");
+        var body = observables.map(function(d)
+                                   { var row = [d["time"]];
+                                     row = row.concat(d["values"]);
+                                     return row.join("\t") })
+                              .join("\n");
         var tsv = header+"\n"+body;
         saveFile(tsv,"text/tab-separated-values",that.getPlotName(".tsv"));
     }
@@ -563,7 +585,7 @@ function observable_plot(configuration){
         that.renderPlot();
         that.renderLabel();
         that.updateAxisSelect();
-//        that.renderAxisSelect();
+        that.renderAxisSelect();
     };
     this.addHandlers();
     this.setupAxisSelect();
