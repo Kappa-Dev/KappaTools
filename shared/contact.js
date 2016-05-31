@@ -137,15 +137,19 @@ class D3Object {
  * DTO for Site
  */
 class Site extends D3Object {
-    constructor(siteData){
+
+    constructor(siteData,agent){
         super(siteData.site_name);
-        this.links = siteData.site_links.map(function(link){ return new SiteLink(link[0],link[1]); })
+        this.links = siteData.site_links.map(function(link){ return new SiteLink(link[0],link[1]); });
+        this.agent = agent;
     }
 
     listLinks(){
         return this.links;
     }
-
+    getAgent(){
+        return this.agent;
+    }
 }
 class SiteLink {
     constructor(nodeId,siteId){
@@ -163,8 +167,9 @@ class Node extends D3Object {
         if(nodeData.node_quantity){
             this.node_quantity = nodeData.node_quantity;
         }
+        var that = this;
         this.sites = nodeData.node_sites.map(function(siteData){
-            var site = new Site(siteData);
+            var site = new Site(siteData,that);
             site.node_quantity = nodeData.node_quantity;
             return site;
         });
@@ -235,6 +240,15 @@ class DataTransfer {
 class Layout{
     constructor(contactMap,dimensions,margin){
         this.contactMap = contactMap;
+        this.margin = margin ||
+            { top: 10, right: 10,
+              bottom: 10, left: 10 };
+        this.padding = dimensions.scale(0.025);
+        this.padding.width = 10;
+        this.padding.height = 10;
+        this.dimensions = new Dimensions(dimensions.height - 20,
+                                         dimensions.width - 20);
+/*
         this.margin = margin || { top: dimensions.height/8,
                                   right: dimensions.width/8,
                                   bottom: dimensions.height/8,
@@ -244,14 +258,15 @@ class Layout{
         this.padding.width = Math.min(this.padding.width,20);
         this.padding.height = Math.max(this.padding.height,5);
         this.padding.height = Math.min(this.padding.height,20);
-        this.dimensions = new Dimensions(dimensions.width
-                                         - this.margin.left
-                                         - this.margin.right
-                                         - this.padding.width,
-                                         dimensions.height
+        this.dimensions = new Dimensions(dimensions.height
                                          - this.margin.top
                                          - this.margin.bottom
-                                         - this.padding.height);
+                                         - this.padding.height,
+                                         dimensions.width
+                                         - this.margin.left
+                                         - this.margin.right
+                                         - this.padding.width);
+*/
 
 
     }
@@ -398,10 +413,8 @@ class Render{
         that.contactMap = contactMap;
         that.root = id?d3.select(id):d3.select('body');
         var node = that.root.node();
-        var width = Math.max(400,
-                             node.offsetWidth);
-        var height = Math.max(2*width/3,
-                              node.offsetHeight);
+        var width = Math.max(400, node.offsetWidth);
+        var height = Math.max(2*width/3, node.offsetHeight);
         that.layout = new Layout(contactMap,new Dimensions( height, width));
         that.svg = that.root
                        .append('svg')
@@ -417,8 +430,28 @@ class Render{
                                         + that.layout.margin.left
                                         + ","
                                         + that.layout.margin.top + ")");
+
+        // http://stackoverflow.com/questions/10805184/d3-show-data-on-mouseover-of-circle
+        that.tooltip = that.root
+                           .append("div")
+                           .attr("class", "contact-tooltip")
+                           .style("visibility", "hidden");
+
         /* needed to add the stylesheet to the export */
         createSVGDefs(that.svg);
+
+        var agentNames = that.contactMap
+                             .nodeList()
+                             .map(function(node){
+                                 return node.label;
+                             });
+
+        that.color = d3.scale.category20().domain(agentNames);
+        /* given a node return the fill color */
+        that.fill = function(node){
+            var color = that.color(node.label).toString();
+            return color;
+        };
 
         if(that.contactMap.isSnapshot){
             var min = 0;
@@ -427,85 +460,20 @@ class Render{
                 min = (node.node_quantity < min)?node.node_quantity:min;
                 max = (node.node_quantity > max)?node.node_quantity:max;
             });
-            // https://github.com/d3/d3/wiki/Ordinal-Scales
-            that.colorRange = d3.scale
-                                .linear()
-                                .range(["#393b79", "#e7cb94"])
-                                .domain([min-1, max+1]);
-            that.fill = function(node){
-                var color = that.colorRange(node.node_quantity).toString();
-                return color;
-            }
-            // http://bl.ocks.org/mbostock/4573883
-            that.renderLegend = function(){
-                var width = 960,
-                height = 500,
-                formatPercent = d3.format(".0%"),
-                formatNumber = d3.format(".0f");
 
-                // A position encoding for the key only.
-                var x = d3.scale
-                          .linear()
-                          .domain([0, 1])
-                          .range([0, 100]);
-                var rescale =function(n){
-                    return min + (n  * (max - min));
-                }
-                var xAxis = d3.svg
-                              .axis()
-                              .scale(x)
-                              .orient("bottom")
-                              .ticks(3)
-                              .tickSize(8)
-                              .tickFormat(function(d) { return formatNumber(rescale(d)); });
-
-                var g =  that.svg
-                             .append("g")
-                             .attr("class", "key")
-                             .attr("transform", "translate(" + 0 + "," + 0 + ")");
-                g.call(xAxis);
-
-                var data = d3.scale.linear().domain([0, 1]).ticks(10);
-                g.selectAll("rect")
-                    .data(data)
-                    .enter().append("rect")
-                    .attr("height", 8)
-                    .attr("x", function(d) {
-                        return x(d);
-                    })
-                    .attr("width", function(d) {
-                        return x(data[1]) - x(data[0]);
-                    })
-                    .style("fill", function(d) {
-                        var value = rescale(d);
-                        var color = that.fill({ node_quantity : value});
-                        debug(value);
-                        debug(color);
-                        return color;
-                    });
-                g.append("text")
-                 .attr("class", "caption")
-                 .attr("y", -6)
-                 .text("Quantity");
-
-            };
             that.handleMouseOver = function(d,i){
-                        that.svg
-                            .select(".caption")
-                            .text("Quantity : "+d.node_quantity);
-
+                var background_color = that.fill(d);
+                debug(background_color);
+                that.tooltip
+                    .style("background-color", background_color)
+                    .style("visibility", "visible")
+                    .text("Quantity : "+d.node_quantity);
             };
             that.handleMouseOut = function(d,i){
-                        that.svg
-                            .select(".caption")
-                            .text("Quantity");
+                that.tooltip
+                    .style("visibility", "hidden");
             };
         } else {
-            that.fill = function(node){
-                return "#ccc";
-            };
-            that.renderLegend = function(){
-            };
             that.handleMouseOver = function(){};
             that.handleMouseOut = function(){};
         }
@@ -551,10 +519,18 @@ class Render{
             .attr("class","node-rect")
             .attr("fill",that.fill)
             .on("mouseover",that.handleMouseOver)
-            .on("mouseout",that.handleMouseOut);
-                          /* keep proof for alignment checks
-                             that.nodes configure using cess
-                           */
+            .on("mouseout",that.handleMouseOut)
+            .on("mousemove", function(){
+                var event = d3.event;
+                var style_top = (event.clientY-10)+"px"; // pageY , clientY , layerY , screenY
+                var style_left = (event.clientX+10)+"px";
+                return that.tooltip
+                           .style("top",style_top)
+                           .style("left",style_left);
+            });
+        /* keep proof for alignment checks
+           that.nodes configure using cess
+         */
         that.svg.selectAll(".node-group")
             .append("circle")
             .attr("class","node-proof")
@@ -608,7 +584,7 @@ class Render{
               .attr("class","site-rect")
               .attr("rx", 3)
               .attr("ry", 3)
-              .attr("fill",that.fill);
+              .attr("fill",function(d){ return that.fill(d.getAgent()); });
 
               sites.append("circle")
               .attr("class","site-proof")
@@ -740,7 +716,6 @@ class Render{
         that.renderNodes();
         that.renderSites();
         that.updateLinks();
-        that.renderLegend();
     }
 }
 
