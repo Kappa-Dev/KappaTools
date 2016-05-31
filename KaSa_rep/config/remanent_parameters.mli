@@ -100,6 +100,7 @@ val get_dump_reachability_analysis_result: Remanent_parameters_sig.parameters ->
 val get_dump_reachability_analysis_iteration: Remanent_parameters_sig.parameters -> bool
 val get_dump_reachability_analysis_diff: Remanent_parameters_sig.parameters -> bool
 val get_dump_reachability_analysis_wl: Remanent_parameters_sig.parameters -> bool
+val get_dump_reachability_analysis_parallel: Remanent_parameters_sig.parameters -> bool
 
 (*+ view analysis *)
 val get_use_natural_language: Remanent_parameters_sig.parameters -> bool

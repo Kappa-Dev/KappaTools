@@ -142,6 +142,7 @@ let reachability_map_0 =
     Remanent_parameters_sig.dump_reachability_analysis_iteration = false;
     Remanent_parameters_sig.dump_reachability_analysis_diff = false;
     Remanent_parameters_sig.dump_reachability_analysis_wl = false;
+    Remanent_parameters_sig.dump_reachability_analysis_parallel = false;
     Remanent_parameters_sig.dump_reachability_analysis_covering_classes = false;
     Remanent_parameters_sig.dump_reachability_analysis_static = false;
     Remanent_parameters_sig.dump_reachability_analysis_dynamic = false;
@@ -163,10 +164,11 @@ let reachability_map_0 =
   }
 
 let reachability_map_1 = { reachability_map_0 with Remanent_parameters_sig.dump_reachability_analysis_result = true;
+                                                   (*Remanent_parameters_sig.dump_reachability_analysis_parallel = true*)
                          }
 let reachability_map_2 = { reachability_map_1 with Remanent_parameters_sig.dump_reachability_analysis_iteration = true }
 let reachability_map_3 = { reachability_map_2 with Remanent_parameters_sig.dump_reachability_analysis_diff = true }
-let reachability_map_4 = { reachability_map_3 with Remanent_parameters_sig.dump_reachability_analysis_wl = true }
+let reachability_map_4 = { reachability_map_3 with Remanent_parameters_sig.dump_reachability_analysis_wl = true                        }
 
 let add_debugging_parameters_to_reachability_map reachability =
   let trace = !Config.trace in
@@ -176,6 +178,8 @@ let add_debugging_parameters_to_reachability_map reachability =
     with
       Remanent_parameters_sig.hide_one_d_relations_from_cartesian_decomposition = !Config.hide_one_d_relations_from_cartesian_decomposition;
       Remanent_parameters_sig.smash_relations = !Config.smash_relations;
+      Remanent_parameters_sig.dump_reachability_analysis_parallel = !Config.dump_reachability_analysis_parallel;
+
       Remanent_parameters_sig.use_natural_language = !Config.use_natural_language;
       Remanent_parameters_sig.compute_local_traces = !Config.compute_local_traces;
       Remanent_parameters_sig.ignore_trivial_losanges = !Config.do_not_compress_trivial_losanges;
@@ -380,6 +384,7 @@ let get_dump_reachability_analysis_static_1 r = r.Remanent_parameters_sig.dump_r
 let get_dump_reachability_analysis_dynamic_1 r = r.Remanent_parameters_sig.dump_reachability_analysis_dynamic
 let get_dump_reachability_analysis_diff_1 r = r.Remanent_parameters_sig.dump_reachability_analysis_diff
 let get_dump_reachability_analysis_wl_1 r = r.Remanent_parameters_sig.dump_reachability_analysis_wl
+let get_dump_reachability_analysis_parallel_1 r = r.Remanent_parameters_sig.dump_reachability_analysis_parallel
 let get_smash_relations_1 r = r.Remanent_parameters_sig.smash_relations
 let get_hide_one_d_relations_from_cartesian_decomposition_1 r = r.Remanent_parameters_sig.hide_one_d_relations_from_cartesian_decomposition
 let get_use_natural_language_1 r = r.Remanent_parameters_sig.use_natural_language
@@ -543,6 +548,7 @@ let get_dump_reachability_analysis_static = upgrade_from_reachability_map_field 
 let get_dump_reachability_analysis_dynamic = upgrade_from_reachability_map_field get_dump_reachability_analysis_dynamic_1
 let get_dump_reachability_analysis_diff = upgrade_from_reachability_map_field get_dump_reachability_analysis_diff_1
 let get_dump_reachability_analysis_wl = upgrade_from_reachability_map_field get_dump_reachability_analysis_wl_1
+let get_dump_reachability_analysis_parallel = upgrade_from_reachability_map_field get_dump_reachability_analysis_parallel_1
 let get_use_natural_language = upgrade_from_reachability_map_field get_use_natural_language_1
 let get_hide_one_d_relations_from_cartesian_decomposition = upgrade_from_reachability_map_field get_hide_one_d_relations_from_cartesian_decomposition_1
 let get_smash_relations = upgrade_from_reachability_map_field get_smash_relations_1
