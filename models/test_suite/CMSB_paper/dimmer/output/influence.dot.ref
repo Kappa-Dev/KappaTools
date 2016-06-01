@@ -5,41 +5,39 @@
 #This file contains the description of the influence map in dot.
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
-digraph G{ 
-node [shape=box, style=filled, fillcolor=lightskyblue];
-"E.R" ; 
-"E/R" ; 
-"R.R" ; 
-"R/R" ; 
-"R.int" ; 
-"R/int" ; 
-"obs" ; 
-edge [color=green, arrowhead=normal];
-"E.R" -> "E/R"[label ="[0->0];[1->1]"] ;
-"E.R" -> "R.R"[label ="[1->0];[1->1]"] ;
-"E/R" -> "E.R"[label ="[0->0];[1->1]"] ;
-"E/R" -> "obs"[label ="[1->0]"] ;
-"R.R" -> "R/R"[label ="[0->0];[0->1];[1->0];[1->1]"] ;
-"R.R" -> "R.int"[label ="[0->0];[0->1];[1->0];[1->1]"] ;
-"R/R" -> "E/R"[label ="[0->1];[1->1]"] ;
-"R/R" -> "R.R"[label ="[0->0];[0->1];[1->0];[1->1]"] ;
-"R.int" -> "R/int"[label ="[0->0];[1->1]"] ;
-"R/int" -> "R/R"[label ="[0->0];[0->1];[1->0];[1->1]"] ;
-"R/int" -> "R.int"[label ="[0->0];[0->1];[1->0];[1->1]"] ;
-"obs" -> "R/R"[label ="[0*->0];[0*->1]"] ;
-"obs" -> "R.int"[label ="[0*->0];[0*->1]"] ;
+digraph G{
+"E.R" [shape="box" color="lightskyblue"];
+"E/R" [shape="box" color="lightskyblue"];
+"R.R" [shape="box" color="lightskyblue"];
+"R/R" [shape="box" color="lightskyblue"];
+"R.int" [shape="box" color="lightskyblue"];
+"R/int" [shape="box" color="lightskyblue"];
+"obs" [shape="box" color="lightskyblue"];
+"E.R" -> "E/R" [label="[0->0];[1->1]" color="green"];
+"E.R" -> "R.R" [label="[1->0];[1->1]" color="green"];
+"E/R" -> "E.R" [label="[0->0];[1->1]" color="green"];
+"E/R" -> "obs" [label="[1->0]" color="green"];
+"R.R" -> "R/R" [label="[0->0];[0->1];[1->0];[1->1]" color="green"];
+"R.R" -> "R.int" [label="[0->0];[0->1];[1->0];[1->1]" color="green"];
+"R/R" -> "E/R" [label="[0->1];[1->1]" color="green"];
+"R/R" -> "R.R" [label="[0->0];[0->1];[1->0];[1->1]" color="green"];
+"R.int" -> "R/int" [label="[0->0];[1->1]" color="green"];
+"R/int" -> "R/R" [label="[0->0];[0->1];[1->0];[1->1]" color="green"];
+"R/int" -> "R.int" [label="[0->0];[0->1];[1->0];[1->1]" color="green"];
+"obs" -> "R/R" [label="[0*->0];[0*->1]" color="green"];
+"obs" -> "R.int" [label="[0*->0];[0*->1]" color="green"];
 
-edge [color=red, arrowhead=tee];
-"E.R" -> "obs"[label ="[1->0]"] ; 
-"E/R" -> "R.R"[label ="[1->0];[1->1]"] ; 
-"R.R" -> "E/R"[label ="[0->1];[1->1]"] ; 
-"R.R" -> "R.R"[label ="[0->1];[1->0]"] ; 
-"R/R" -> "R/R"[label ="[0->1];[1->0]"] ; 
-"R/R" -> "R.int"[label ="[0->0];[0->1];[1->0];[1->1]"] ; 
-"R.int" -> "R/R"[label ="[0->0];[0->1];[1->0];[1->1]"] ; 
-"R.int" -> "R.int"[label ="[0->1];[1->0]"] ; 
-"R/int" -> "obs"[label ="[0->0];[1->0]"] ; 
-"obs" -> "R/int"[label ="[0*->0];[0*->1];[0->0];[0->1]"] ; 
-"obs" -> "obs"[label ="[0*->0]"] ; 
-
+"E.R" -| "E/R" [label="[0->0];[1->1]" color="red"];
+"E.R" -| "R.R" [label="[1->0];[1->1]" color="red"];
+"E/R" -| "E.R" [label="[0->0];[1->1]" color="red"];
+"E/R" -| "obs" [label="[1->0]" color="red"];
+"R.R" -| "R/R" [label="[0->0];[0->1];[1->0];[1->1]" color="red"];
+"R.R" -| "R.int" [label="[0->0];[0->1];[1->0];[1->1]" color="red"];
+"R/R" -| "E/R" [label="[0->1];[1->1]" color="red"];
+"R/R" -| "R.R" [label="[0->0];[0->1];[1->0];[1->1]" color="red"];
+"R.int" -| "R/int" [label="[0->0];[1->1]" color="red"];
+"R/int" -| "R/R" [label="[0->0];[0->1];[1->0];[1->1]" color="red"];
+"R/int" -| "R.int" [label="[0->0];[0->1];[1->0];[1->1]" color="red"];
+"obs" -| "R/R" [label="[0*->0];[0*->1]" color="red"];
+"obs" -| "R.int" [label="[0*->0];[0*->1]" color="red"];
 }

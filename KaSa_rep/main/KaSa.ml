@@ -164,9 +164,9 @@ let main () =
             Handler.print_var_txt
             Handler.get_label_of_rule_txt
             Handler.get_label_of_var_txt
-            Handler.print_labels_txt "\n"
+            Handler.print_labels "\n"
             wake_up_map
-	else error
+        else error
       in
       let error =
         if
@@ -175,7 +175,14 @@ let main () =
         then
           Print_quarks.print_inhibition_map
             parameters_influence_map error handler
-            c_compil Handler.print_rule_txt Handler.print_var_txt Handler.get_label_of_rule_txt Handler.get_label_of_var_txt Handler.print_labels_txt "\n" inhibition_map
+            c_compil
+            Handler.print_rule_txt
+            Handler.print_var_txt
+            Handler.get_label_of_rule_txt
+            Handler.get_label_of_var_txt
+            Handler.print_labels
+            "\n"
+            inhibition_map
         else error
       in
       let error = Print_quarks.dot_of_influence_map parameters_influence_map error handler c_compil (wake_up_map,inhibition_map) in

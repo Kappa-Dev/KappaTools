@@ -5,13 +5,11 @@
 #This file contains the description of the influence map in dot.
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
-digraph G{ 
-node [shape=box, style=filled, fillcolor=lightskyblue];
-"create" ; 
-"x" ; 
-"y" ; 
-edge [color=green, arrowhead=normal];
-"create" -> "x"[label ="[0->0]"] ;
-"x" -> "y"[label ="[0->0]"] ;
+digraph G{
+"create" [shape="box" color="lightskyblue"];
+"x" [shape="box" color="lightskyblue"];
+"y" [shape="box" color="lightskyblue"];
+"create" -> "x" [label="[0->0]" color="green"];
+"x" -> "y" [label="[0->0]" color="green"];
 
 }

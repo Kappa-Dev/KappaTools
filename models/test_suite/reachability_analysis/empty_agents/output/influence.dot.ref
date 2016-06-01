@@ -5,16 +5,14 @@
 #This file contains the description of the influence map in dot.
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
-digraph G{ 
-node [shape=box, style=filled, fillcolor=lightskyblue];
-"0:->A()" ; 
-"1:A()->B()" ; 
-"2:B()->C()" ; 
-"3:C()->D(x~u)" ; 
-"4:E()->F(x~u)" ; 
-edge [color=green, arrowhead=normal];
-"0:->A()" -> "1:A()->B()"[label ="[0->0]"] ;
-"1:A()->B()" -> "2:B()->C()"[label ="[0->0]"] ;
-"2:B()->C()" -> "3:C()->D(x~u)"[label ="[0->0]"] ;
+digraph G{
+"0:->A()" [shape="box" color="lightskyblue"];
+"1:A()->B()" [shape="box" color="lightskyblue"];
+"2:B()->C()" [shape="box" color="lightskyblue"];
+"3:C()->D(x~u)" [shape="box" color="lightskyblue"];
+"4:E()->F(x~u)" [shape="box" color="lightskyblue"];
+"0:->A()" -> "1:A()->B()" [label="[0->0]" color="green"];
+"1:A()->B()" -> "2:B()->C()" [label="[0->0]" color="green"];
+"2:B()->C()" -> "3:C()->D(x~u)" [label="[0->0]" color="green"];
 
 }

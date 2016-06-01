@@ -98,49 +98,87 @@ let html_deps =
   ["http://d3js.org/d3.v3.min.js";
    "http://cpettitt.github.io/project/dagre-d3/latest/dagre-d3.min.js"]
 
-let print_graph_preamble logger title =
-  match Loggers.get_encoding_format logger with
-  | Loggers.DOT -> Loggers.fprintf logger "digraph G{\n"
-  | Loggers.HTML_Graph ->
-    begin
-      let f_opt = Loggers.formatter_of_logger logger in
-      match
-        f_opt
-      with
-      | None -> ()
-      | Some f ->
-        let dependency f t =
-          Format.fprintf f "<script src=\"%s\" charset=\"utf-8\"></script>" t
-        in
-        let () = Format.fprintf f "@[<v><!doctype html>@,@,<html>@," in
-        let () = Format.fprintf f "@[<v 2><head>@,<meta charset=\"utf-8\">@," in
-        let () = Format.fprintf f "<title>%s</title>@," title in
-        let () = Pp.list ~trailing:Pp.space Pp.space dependency f html_deps in
-        let () = Format.fprintf f "%t@]@,</head>@,"
-            (fun f ->
-               let () = Format.fprintf f "@[<v 2><style>@," in
-               let () =
-                 Format.fprintf f "dt {float: left; clear: left; width: 20em;}@," in
-               let () =
-                 Format.fprintf f "dd {font-weight: bold; margin: 0 0 0 21em;}@," in
-               let () = Format.fprintf f ".node rect {stroke: #333; fill: #fff;}@," in
-               let () =
-                 Format.fprintf
-                   f ".edgePath path {stroke: #333; fill: #333; stroke-width: 1.5px;}" in
-               Format.fprintf f "@]@,</style>")
-        in
-        let () = Format.fprintf f "@[<v 2><body>@,<div class=\"container\">@," in
-        let () = Format.fprintf
-            f "<h1>@[%s@]</h1>@," title
-        in
-        let () = Format.fprintf f "<svg width=960 height=600><g/></svg>@," in
-        let () = Format.fprintf f "<script>@," in
-        let () = Format.fprintf f "// Create a new directed graph@," in
-        let () =
-          Format.fprintf f "var g = new dagreD3.graphlib.Graph().setGraph({});@," in
-        ()
-    end
-  | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+let shall_I_do_it format filter_in filter_out =
+  let b1 =
+    match
+      filter_in
+    with
+    | None -> true
+    | Some l -> List.mem format l
+  in
+  b1 && (not (List.mem format filter_out))
+
+let print_graph_preamble
+    logger
+    ?filter_in:(filter_in=None) ?filter_out:(filter_out=[]) ?header:(header=[])
+    title
+  =
+  let format = Loggers.get_encoding_format logger in
+  if shall_I_do_it format filter_in filter_out
+  then
+    match
+      format
+    with
+    | Loggers.DOT ->
+      let () =
+        List.iter
+          (fun x ->
+             let () = Loggers.fprintf logger "#%s" x in
+             let () = Loggers.print_newline logger in
+             ())
+          header
+      in
+      let () = Loggers.fprintf logger "digraph G{" in
+      let () = Loggers.print_newline logger in
+      ()
+    | Loggers.HTML_Graph ->
+      begin
+        let f_opt = Loggers.formatter_of_logger logger in
+        match
+          f_opt
+        with
+        | None -> ()
+        | Some f ->
+          let () =
+            List.iter
+              (fun x ->
+                 let () = Loggers.fprintf logger "//%s" x in
+                 let () = Loggers.print_newline logger in
+                 ())
+              header
+          in
+          let dependency f t =
+            Format.fprintf f "<script src=\"%s\" charset=\"utf-8\"></script>" t
+          in
+          let () = Format.fprintf f "@[<v><!doctype html>@,@,<html>@," in
+          let () = Format.fprintf f "@[<v 2><head>@,<meta charset=\"utf-8\">@," in
+          let () = Format.fprintf f "<title>%s</title>@," title in
+          let () = Pp.list ~trailing:Pp.space Pp.space dependency f html_deps in
+          let () = Format.fprintf f "%t@]@,</head>@,"
+              (fun f ->
+                 let () = Format.fprintf f "@[<v 2><style>@," in
+                 let () =
+                   Format.fprintf f "dt {float: left; clear: left; width: 20em;}@," in
+                 let () =
+                   Format.fprintf f "dd {font-weight: bold; margin: 0 0 0 21em;}@," in
+                 let () = Format.fprintf f ".node rect {stroke: #333; fill: #fff;}@," in
+                 let () =
+                   Format.fprintf
+                     f ".edgePath path {stroke: #333; fill: #333; stroke-width: 1.5px;}" in
+                 Format.fprintf f "@]@,</style>")
+          in
+          let () = Format.fprintf f "@[<v 2><body>@,<div class=\"container\">@," in
+          let () = Format.fprintf
+              f "<h1>@[%s@]</h1>@," title
+          in
+          let () = Format.fprintf f "<svg width=960 height=600><g/></svg>@," in
+          let () = Format.fprintf f "<script>@," in
+          let () = Format.fprintf f "// Create a new directed graph@," in
+          let () =
+            Format.fprintf f "var g = new dagreD3.graphlib.Graph().setGraph({});@," in
+          ()
+      end
+    | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let print_graph_foot logger =
   match
@@ -177,11 +215,20 @@ let print_graph_foot logger =
     end
   | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
-let print_comment logger string =
-  match Loggers.get_encoding_format logger with
-  | Loggers.DOT -> Loggers.fprintf logger "/*%s*/" string
-  | Loggers.HTML_Graph -> Loggers.fprintf logger "//%s" string
-  | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+let print_comment
+    logger
+    ?filter_in:(filter_in=None) ?filter_out:(filter_out=[])
+    string
+  =
+  let format = Loggers.get_encoding_format logger in
+  if shall_I_do_it format filter_in filter_out
+  then
+    match
+      format
+    with
+    | Loggers.DOT -> Loggers.fprintf logger "#%s" string
+    | Loggers.HTML_Graph -> Loggers.fprintf logger "//%s" string
+    | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let open_asso logger =
   match Loggers.get_encoding_format logger with
@@ -451,11 +498,11 @@ let print_node logger ?directives:(directives=[]) id =
     ()
   | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
-let print_edge logger ?directives:(directives=[]) id1 id2 =
+let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
   let attributes = dummy_edge in
   let attributes =
     match Loggers.get_encoding_format logger with
-    | Loggers.DOT | Loggers.HTML_Graph ->
+    | Loggers.DOT | Loggers.HTML_Graph | Loggers.TXT | Loggers.HTML ->
       List.fold_left
         (fun attributes option ->
            match
@@ -471,7 +518,7 @@ let print_edge logger ?directives:(directives=[]) id1 id2 =
         )
         attributes
         directives
-    | Loggers.TXT_Tabular | Loggers.XLS | Loggers.HTML_Tabular | Loggers.HTML | Loggers.TXT
+    | Loggers.TXT_Tabular | Loggers.XLS | Loggers.HTML_Tabular
       -> attributes
   in
   match Loggers.get_encoding_format logger with
@@ -568,10 +615,25 @@ let print_edge logger ?directives:(directives=[]) id1 id2 =
       let bool = string_of_arrow_in_html logger bool "arrowtail" attributes.edge_arrowtail in
       let () = if bool then () else () in
       let () = Loggers.fprintf logger " });@," in
+      ()
+  | Loggers.TXT | Loggers.HTML ->
+    let label =
+      match
+       attributes.edge_label
+      with
+      | None -> ""
+      | Some x -> x
+    in
+    let () = Loggers.fprintf logger "%s%s -> %s%s" prefix id1 id2 label in
+    let () = Loggers.print_newline logger in
     ()
-  | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+  | Loggers.HTML_Tabular | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
-let print_one_to_n_relation logger ?directives:(directives=[]) ?style_one:(style_one=Plain) ?style_n:(style_n=Plain) id idlist =
+let print_one_to_n_relation
+    logger ?directives:(directives=[])
+    ?style_one:(style_one=Plain)
+    ?style_n:(style_n=Plain) id idlist
+  =
   let fictitious = "Fictitious_"^id in
   let directives_fict =
     if style_one = Plain

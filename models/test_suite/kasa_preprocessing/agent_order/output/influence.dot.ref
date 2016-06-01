@@ -5,17 +5,12 @@
 #This file contains the description of the influence map in dot.
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
-digraph G{ 
-node [shape=box, style=filled, fillcolor=lightskyblue];
-"bind" ; 
-"remove" ; 
-edge [color=green, arrowhead=normal];
-"remove" -> "bind"[label ="[1->1];[2->0]"] ;
-"remove" -> "remove"[label ="[2->0];[2->1]"] ;
+digraph G{
+"bind" [shape="box" color="lightskyblue"];
+"remove" [shape="box" color="lightskyblue"];
+"remove" -> "bind" [label="[1->1];[2->0]" color="green"];
+"remove" -> "remove" [label="[2->0];[2->1]" color="green"];
 
-edge [color=red, arrowhead=tee];
-"bind" -> "remove"[label ="[0->0];[0->1]"] ; 
-"remove" -> "bind"[label ="[1->0]"] ; 
-"remove" -> "remove"[label ="[1->0]"] ; 
-
+"remove" -| "bind" [label="[1->1];[2->0]" color="red"];
+"remove" -| "remove" [label="[2->0];[2->1]" color="red"];
 }

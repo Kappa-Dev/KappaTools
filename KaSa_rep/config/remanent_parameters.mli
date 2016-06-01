@@ -1,4 +1,4 @@
- (**
+(**
   * parameters.ml
   * openkappa
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
@@ -42,6 +42,7 @@ val get_trace: Remanent_parameters_sig.parameters -> bool
 (*val get_dump_error_as_soon_as_they_occur = upgrade_from_marshal_field get_dump_error_as_soon_as_they_occur_1*)
 val get_prefix: Remanent_parameters_sig.parameters -> string
 val set_trace: Remanent_parameters_sig.parameters -> bool -> Remanent_parameters_sig.parameters
+val set_logger: Remanent_parameters_sig.parameters -> Loggers.t -> Remanent_parameters_sig.parameters
 val update_prefix: Remanent_parameters_sig.parameters -> string -> Remanent_parameters_sig.parameters
 val update_call_stack:
   Remanent_parameters_sig.parameters ->
@@ -71,14 +72,14 @@ val get_uni_arrow_symbol: Remanent_parameters_sig.parameters -> string
 val get_bi_arrow_symbol: Remanent_parameters_sig.parameters -> string
 
 (** influence map *)
-val get_rule_shape: Remanent_parameters_sig.parameters -> string
+val get_rule_shape: Remanent_parameters_sig.parameters -> Graph_loggers.shape
 val get_rule_color: Remanent_parameters_sig.parameters -> string
-val get_variable_shape: Remanent_parameters_sig.parameters -> string
+val get_variable_shape: Remanent_parameters_sig.parameters -> Graph_loggers.shape
 val get_variable_color: Remanent_parameters_sig.parameters -> string
 val get_wake_up_color: Remanent_parameters_sig.parameters -> string
 val get_inhibition_color: Remanent_parameters_sig.parameters -> string
-val get_wake_up_arrow: Remanent_parameters_sig.parameters -> string
-val get_inhibition_arrow: Remanent_parameters_sig.parameters -> string
+val get_wake_up_arrow: Remanent_parameters_sig.parameters -> Graph_loggers.headkind
+val get_inhibition_arrow: Remanent_parameters_sig.parameters -> Graph_loggers.headkind
 val get_prompt_full_var_def: Remanent_parameters_sig.parameters -> bool
 val get_prompt_full_rule_def: Remanent_parameters_sig.parameters -> bool
 val get_make_labels_compatible_with_dot: Remanent_parameters_sig.parameters -> char list Remanent_parameters_sig.CharMap.t

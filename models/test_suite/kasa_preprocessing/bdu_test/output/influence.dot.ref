@@ -5,17 +5,13 @@
 #This file contains the description of the influence map in dot.
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
-digraph G{ 
-node [shape=box, style=filled, fillcolor=lightskyblue];
-"r0" ; 
-node [shape=ellipse, style=filled, fillcolor=palegreen3];
-"Auu" ; 
-"Apu" ; 
-"App" ; 
-edge [color=green, arrowhead=normal];
-"r0" -> "App"[label ="[0->0]"] ;
+digraph G{
+"r0" [shape="box" color="lightskyblue"];
 
-edge [color=red, arrowhead=tee];
-"r0" -> "Auu"[label ="[0->0]"] ; 
+"r0" [label=""r0"" shape="ellipse" color="palegreen3"];
+"Auu" [label=""Auu"" shape="ellipse" color="palegreen3"];
+"Apu" [label=""Apu"" shape="ellipse" color="palegreen3"];
+"r0" -> "App" [label="[0->0]" color="green"];
 
+"r0" -| "App" [label="[0->0]" color="red"];
 }

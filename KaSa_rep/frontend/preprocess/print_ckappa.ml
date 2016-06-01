@@ -49,7 +49,7 @@ let print_link_state parameter error link =
           with
             | Remanent_parameters_sig.Bound_indices ->
                 let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                  "%s%i" 
+                  "%s%i"
                   (Remanent_parameters.get_bound_symbol parameter)
                   (Ckappa_sig.int_of_agent_id link_index)
                 in
@@ -142,25 +142,25 @@ let print_mixture  parameter error mixture =
         let error = print_agent parameter error agent in
            aux error true mixture
     | Ckappa_sig.DOT (i,agent,mixture) ->
-         let () = 
+         let () =
            if bool
            then
-             Loggers.fprintf 
+             Loggers.fprintf
                (Remanent_parameters.get_logger parameter)
                "%s%i"
-               (Remanent_parameters.get_agent_sep_dot_symbol parameter) 
+               (Remanent_parameters.get_agent_sep_dot_symbol parameter)
                (Ckappa_sig.int_of_agent_id i)
          in
          let error = print_agent parameter error agent in
            aux error true mixture
     | Ckappa_sig.PLUS (i,agent,mixture) ->
          let () =
-           if bool 
+           if bool
            then
-             Loggers.fprintf 
+             Loggers.fprintf
                (Remanent_parameters.get_logger parameter)
                "%s%i"
-               (Remanent_parameters.get_agent_sep_plus_symbol parameter) 
+               (Remanent_parameters.get_agent_sep_plus_symbol parameter)
                (Ckappa_sig.int_of_agent_id i)
          in
          let error = print_agent parameter error agent in
@@ -226,4 +226,3 @@ let print_rule parameter error rule =
   let _ = Loggers.fprintf (Remanent_parameters.get_logger parameter) "%s" arrow in
   let error = print_mixture parameter error rule.Ckappa_sig.rhs in
     error
-

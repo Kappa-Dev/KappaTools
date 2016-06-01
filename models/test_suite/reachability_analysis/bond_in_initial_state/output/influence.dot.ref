@@ -5,20 +5,20 @@
 #This file contains the description of the influence map in dot.
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
-digraph G{ 
-node [shape=box, style=filled, fillcolor=lightskyblue];
-"0:->A(x~u!1),B(x~u!1)" ; 
-"1:A(x!_)->" ; 
-"2:B(x~p)->B(x~p),B(x~p)" ; 
-"3:B(x~u),B(x~u!_)->B(x~u),B(x~p!_)" ; 
-edge [color=green, arrowhead=normal];
-"0:->A(x~u!1),B(x~u!1)" -> "1:A(x!_)->"[label ="[0->0]"] ;
-"0:->A(x~u!1),B(x~u!1)" -> "3:B(x~u),B(x~u!_)->B(x~u),B(x~p!_)"[label ="[1->1]"] ;
-"1:A(x!_)->" -> "2:B(x~p)->B(x~p),B(x~p)"[label ="[0*->0]"] ;
-"1:A(x!_)->" -> "3:B(x~u),B(x~u!_)->B(x~u),B(x~p!_)"[label ="[0*->0]"] ;
-"2:B(x~p)->B(x~p),B(x~p)" -> "2:B(x~p)->B(x~p),B(x~p)"[label ="[1->0]"] ;
+digraph G{
+"0:->A(x~u!1),B(x~u!1)" [shape="box" color="lightskyblue"];
+"1:A(x!_)->" [shape="box" color="lightskyblue"];
+"2:B(x~p)->B(x~p),B(x~p)" [shape="box" color="lightskyblue"];
+"3:B(x~u),B(x~u!_)->B(x~u),B(x~p!_)" [shape="box" color="lightskyblue"];
+"0:->A(x~u!1),B(x~u!1)" -> "1:A(x!_)->" [label="[0->0]" color="green"];
+"0:->A(x~u!1),B(x~u!1)" -> "3:B(x~u),B(x~u!_)->B(x~u),B(x~p!_)" [label="[1->1]" color="green"];
+"1:A(x!_)->" -> "2:B(x~p)->B(x~p),B(x~p)" [label="[0*->0]" color="green"];
+"1:A(x!_)->" -> "3:B(x~u),B(x~u!_)->B(x~u),B(x~p!_)" [label="[0*->0]" color="green"];
+"2:B(x~p)->B(x~p),B(x~p)" -> "2:B(x~p)->B(x~p),B(x~p)" [label="[1->0]" color="green"];
 
-edge [color=red, arrowhead=tee];
-"1:A(x!_)->" -> "3:B(x~u),B(x~u!_)->B(x~u),B(x~p!_)"[label ="[0*->1]"] ; 
-
+"0:->A(x~u!1),B(x~u!1)" -| "1:A(x!_)->" [label="[0->0]" color="red"];
+"0:->A(x~u!1),B(x~u!1)" -| "3:B(x~u),B(x~u!_)->B(x~u),B(x~p!_)" [label="[1->1]" color="red"];
+"1:A(x!_)->" -| "2:B(x~p)->B(x~p),B(x~p)" [label="[0*->0]" color="red"];
+"1:A(x!_)->" -| "3:B(x~u),B(x~u!_)->B(x~u),B(x~p!_)" [label="[0*->0]" color="red"];
+"2:B(x~p)->B(x~p),B(x~p)" -| "2:B(x~p)->B(x~p),B(x~p)" [label="[1->0]" color="red"];
 }

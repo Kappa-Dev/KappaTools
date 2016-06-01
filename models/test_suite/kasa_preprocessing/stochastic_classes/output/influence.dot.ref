@@ -5,22 +5,14 @@
 #This file contains the description of the influence map in dot.
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
-digraph G{ 
-node [shape=box, style=filled, fillcolor=lightskyblue];
-"r0" ; 
-"r1" ; 
-"r2" ; 
-"r3" ; 
-"r4" ; 
-"r5" ; 
-"r6" ; 
-"r7" ; 
-"r8" ; 
-edge [color=red, arrowhead=tee];
-"r4" -> "r5"[label ="[0->1]"] ; 
-"r5" -> "r4"[label ="[1->0]"] ; 
-"r5" -> "r5"[label ="[0->1];[1->0]"] ; 
-"r6" -> "r7"[label ="[0->0]"] ; 
-"r7" -> "r6"[label ="[0->0]"] ; 
-
+digraph G{
+"r0" [shape="box" color="lightskyblue"];
+"r1" [shape="box" color="lightskyblue"];
+"r2" [shape="box" color="lightskyblue"];
+"r3" [shape="box" color="lightskyblue"];
+"r4" [shape="box" color="lightskyblue"];
+"r5" [shape="box" color="lightskyblue"];
+"r6" [shape="box" color="lightskyblue"];
+"r7" [shape="box" color="lightskyblue"];
+"r8" [shape="box" color="lightskyblue"];
 }

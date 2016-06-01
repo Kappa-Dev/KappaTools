@@ -5,21 +5,20 @@
 #This file contains the description of the influence map in dot.
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
-digraph G{ 
-node [shape=box, style=filled, fillcolor=lightskyblue];
-"veryveryveryveryverylonglonglonglabel" ; 
-"otherotherveryveryveryverylonglabel" ; 
-"\"0" ; 
-"\\0" ; 
-edge [color=green, arrowhead=normal];
-"veryveryveryveryverylonglonglonglabel" -> "otherotherveryveryveryverylonglabel"[label ="[0->0]"] ;
-"otherotherveryveryveryverylonglabel" -> "\"0"[label ="[0->0]"] ;
-"otherotherveryveryveryverylonglabel" -> "\\0"[label ="[0->0]"] ;
-"\"0" -> "veryveryveryveryverylonglonglonglabel"[label ="[0->0]"] ;
-"\\0" -> "otherotherveryveryveryverylonglabel"[label ="[0->0]"] ;
+digraph G{
+"veryveryveryveryverylonglonglonglabel" [shape="box" color="lightskyblue"];
+"otherotherveryveryveryverylonglabel" [shape="box" color="lightskyblue"];
+"\"0" [shape="box" color="lightskyblue"];
+"\\0" [shape="box" color="lightskyblue"];
+"veryveryveryveryverylonglonglonglabel" -> "otherotherveryveryveryverylonglabel" [label="[0->0]" color="green"];
+"otherotherveryveryveryverylonglabel" -> "\"0" [label="[0->0]" color="green"];
+"otherotherveryveryveryverylonglabel" -> "\\0" [label="[0->0]" color="green"];
+"\"0" -> "veryveryveryveryverylonglonglonglabel" [label="[0->0]" color="green"];
+"\\0" -> "otherotherveryveryveryverylonglabel" [label="[0->0]" color="green"];
 
-edge [color=red, arrowhead=tee];
-"\"0" -> "\\0"[label ="[0->0]"] ; 
-"\\0" -> "\"0"[label ="[0->0]"] ; 
-
+"veryveryveryveryverylonglonglonglabel" -| "otherotherveryveryveryverylonglabel" [label="[0->0]" color="red"];
+"otherotherveryveryveryverylonglabel" -| "\"0" [label="[0->0]" color="red"];
+"otherotherveryveryveryverylonglabel" -| "\\0" [label="[0->0]" color="red"];
+"\"0" -| "veryveryveryveryverylonglonglonglabel" [label="[0->0]" color="red"];
+"\\0" -| "otherotherveryveryveryverylonglabel" [label="[0->0]" color="red"];
 }

@@ -49,14 +49,14 @@ type influence_map_output =
     im_directory : string option ;
     im_file : string option ;
     im_format: graph_format ;
-    rule_shape : string ;
+    rule_shape : Graph_loggers.shape ;
     rule_color : string ;
-    variable_shape : string ;
+    variable_shape : Graph_loggers.shape ;
     variable_color : string ;
     wake_up_color : string ;
     inhibition_color : string ;
-    wake_up_arrow : string ;
-    inhibition_arrow : string ;
+    wake_up_arrow : Graph_loggers.headkind ;
+    inhibition_arrow : Graph_loggers.headkind ;
     prompt_full_var_def: bool ;
     prompt_full_rule_def: bool ;
     make_labels_compatible: char list CharMap.t

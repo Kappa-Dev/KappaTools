@@ -311,18 +311,13 @@ let string_of_state = string_of_state_gen print_state
 
 let string_of_state_fully_deciphered = string_of_state_gen print_state_fully_deciphered
 
-let print_labels_txt parameters error handler couple =
+let print_labels parameters error handler couple =
   let _ = Quark_type.Labels.dump_couple parameters error handler couple
   in error
 
-let print_labels_dot parameters error handler couple =
-  let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "[label =\"" in
-  let _ = Quark_type.Labels.dump_couple parameters error handler couple in
-  let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "\"]" in
-  error
-
 let get_label_of_rule_txt parameters error rule = error, rule.Cckappa_sig.e_rule_label
 let get_label_of_rule_dot parameters error rule = error, rule.Cckappa_sig.e_rule_label_dot
+
 
 let get_label_of_var_txt parameters error rule = error,rule.Cckappa_sig.e_id
 let get_label_of_var_dot parameters error rule = error,rule.Cckappa_sig.e_id_dot
@@ -369,11 +364,11 @@ let print_var_dot parameters (error:Exception.method_handler)  var_id m1 m2 var 
     if m1<>"" && (not (Remanent_parameters.get_prompt_full_var_def parameters))
     then
       let _ =
-	Loggers.fprintf (Remanent_parameters.get_logger parameters) "\"%s" m1
+        Loggers.fprintf (Remanent_parameters.get_logger parameters) "\"%s" m1
       in error
     else
       let _ =
-	Loggers.fprintf (Remanent_parameters.get_logger parameters) "\"%s:" m2 in
+        Loggers.fprintf (Remanent_parameters.get_logger parameters) "\"%s:" m2 in
       let error = Print_ckappa.print_alg parameters error var
       in error
   in
@@ -397,20 +392,20 @@ let print_rule_or_var parameters error handler compiled print_rule print_var get
       match rule
       with
       | None ->
-	let a,b = warn parameters error (Some "line 103") Exit () in
-	a,false,b
+        let a,b = warn parameters error (Some "line 103") Exit () in
+        a,false,b
       | Some rule ->
         let error,label = get_label_of_rule parameters error rule in
-	let error, (m1,_) =
+        let error, (m1,_) =
           Misc_sa.unsome (error,label) (fun error -> error,(Location.dummy_annot "")) in
-	let m1 =
-	  if m1 = ""
+        let m1 =
+          if m1 = ""
           then m1
-	  else
-	    match rule.Cckappa_sig.e_rule_initial_direction with
-	    | Ckappa_sig.Direct -> m1
-	    | Ckappa_sig.Reverse -> Ast.flip_label m1
-	in
+          else
+            match rule.Cckappa_sig.e_rule_initial_direction with
+            | Ckappa_sig.Direct -> m1
+            | Ckappa_sig.Reverse -> Ast.flip_label m1
+        in
         let error =
           print_rule
             parameters
@@ -436,10 +431,10 @@ let print_rule_or_var parameters error handler compiled print_rule print_var get
       with
       | None  ->
         let a,b = warn parameters error (Some "line 122") Exit ()
-	in a,false,b
+        in a,false,b
       | Some var ->
-	let b = var.Cckappa_sig.c_variable in
-	let error,m1 = get_label_of_var parameters error var in
+        let b = var.Cckappa_sig.c_variable in
+        let error,m1 = get_label_of_var parameters error var in
         let m2 = string_of_int var_id in
         let error =
           print_var parameters error var_id m1 m2 b

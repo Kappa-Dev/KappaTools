@@ -174,11 +174,8 @@ Quarks:site_modif+:agent_type:5,site_type:0,state:0,rule:4->[0]
 Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Influence_map:Wake_up_map:rule(0):'' ->A() -> rule(1):'' A()->B()[0->0]
-
 Influence_map:Wake_up_map:rule(1):'' A()->B() -> rule(2):'' B()->C()[0->0]
-
 Influence_map:Wake_up_map:rule(2):'' B()->C() -> rule(3):'' C()->D(x~u)[0->0]
-
 Reachability analysis...
 
 	Applying rule 0:

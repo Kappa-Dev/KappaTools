@@ -5,31 +5,30 @@
 #This file contains the description of the influence map in dot.
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
-digraph G{ 
-node [shape=box, style=filled, fillcolor=lightskyblue];
-"r0" ; 
-"r1" ; 
-"r2" ; 
-"r3" ; 
-"r4" ; 
-"r5" ; 
-"r6" ; 
-"r7" ; 
-edge [color=green, arrowhead=normal];
-"r0" -> "r2"[label ="[0->0]"] ;
-"r0" -> "r6"[label ="[0->0]"] ;
-"r1" -> "r2"[label ="[0->1]"] ;
-"r1" -> "r7"[label ="[0->0]"] ;
-"r2" -> "r5"[label ="[0->0];[1->1]"] ;
-"r3" -> "r4"[label ="[0->0];[1->1]"] ;
-"r6" -> "r0"[label ="[0->0]"] ;
-"r7" -> "r1"[label ="[0->0]"] ;
+digraph G{
+"r0" [shape="box" color="lightskyblue"];
+"r1" [shape="box" color="lightskyblue"];
+"r2" [shape="box" color="lightskyblue"];
+"r3" [shape="box" color="lightskyblue"];
+"r4" [shape="box" color="lightskyblue"];
+"r5" [shape="box" color="lightskyblue"];
+"r6" [shape="box" color="lightskyblue"];
+"r7" [shape="box" color="lightskyblue"];
+"r0" -> "r2" [label="[0->0]" color="green"];
+"r0" -> "r6" [label="[0->0]" color="green"];
+"r1" -> "r2" [label="[0->1]" color="green"];
+"r1" -> "r7" [label="[0->0]" color="green"];
+"r2" -> "r5" [label="[0->0];[1->1]" color="green"];
+"r3" -> "r4" [label="[0->0];[1->1]" color="green"];
+"r6" -> "r0" [label="[0->0]" color="green"];
+"r7" -> "r1" [label="[0->0]" color="green"];
 
-edge [color=red, arrowhead=tee];
-"r3" -> "r2"[label ="[0->0];[1->1]"] ; 
-"r3" -> "r5"[label ="[0->0];[1->1]"] ; 
-"r5" -> "r3"[label ="[0->0];[1->1]"] ; 
-"r6" -> "r2"[label ="[0->0]"] ; 
-"r7" -> "r2"[label ="[0->1]"] ; 
-
+"r0" -| "r2" [label="[0->0]" color="red"];
+"r0" -| "r6" [label="[0->0]" color="red"];
+"r1" -| "r2" [label="[0->1]" color="red"];
+"r1" -| "r7" [label="[0->0]" color="red"];
+"r2" -| "r5" [label="[0->0];[1->1]" color="red"];
+"r3" -| "r4" [label="[0->0];[1->1]" color="red"];
+"r6" -| "r0" [label="[0->0]" color="red"];
+"r7" -| "r1" [label="[0->0]" color="red"];
 }

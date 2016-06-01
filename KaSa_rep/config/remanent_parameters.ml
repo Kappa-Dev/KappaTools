@@ -594,7 +594,7 @@ let update_call_stack parameters bool name =
 	  (set_trace parameters rep_bool)
 	  (x::(get_call_stack parameters))
 
-let open_influence_map_file parameters =
+let open_influence_map_file  parameters =
   let channel =
     match get_im_file parameters,get_im_directory parameters,ext_format (get_im_format parameters)
     with
@@ -602,7 +602,12 @@ let open_influence_map_file parameters =
       | Some a,None,ext -> open_out (a^ext)
       | Some a,Some d,ext -> open_out (d^a^ext)
   in
-  let logger = Loggers.open_logger_from_channel channel
+  let format =
+      match get_local_trace_format parameters with
+      | Remanent_parameters_sig.DOT -> Loggers.DOT
+      | Remanent_parameters_sig.HTML -> Loggers.HTML_Graph
+    in
+    let logger = Loggers.open_logger_from_channel ~mode:format channel
   in
   {parameters with Remanent_parameters_sig.logger = logger}
 
