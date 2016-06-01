@@ -499,7 +499,7 @@ let print_parallel_bonds_init parameter handler_kappa store_parallel_bonds_init 
   print_result handler_kappa parameter error store_parallel_bonds_init;
   Loggers.print_newline (Remanent_parameters.get_logger parameter)
 
-(**************************************************************************)
+(******************************************************************)
 
 let print_action_binding_test parameter error handler_kappa rule_id (x, y) =
   let (agent_id, agent_type, site_type, state) = x in
@@ -548,3 +548,34 @@ let print_action_binding_test parameter error handler_kappa rule_id (x, y) =
     (Ckappa_sig.int_of_site_name site_type)
     site_type_string
     state_string
+
+(******************************************************************)
+(*print non parallel bonds*)
+
+let print_rule_has_non_parallel_bonds_rhs parameter store_result =
+  Ckappa_sig.Rule_map_and_set.Map.iter (fun rule_id list ->
+      let log = Remanent_parameters.get_logger parameter in
+      Loggers.fprintf log "rule_id:%i\n"
+      (Ckappa_sig.int_of_rule_id rule_id);
+      List.iter (fun ((agent_id, agent_type, site_type, state),
+                      (agent_id', agent_type', site_type', state'),
+                      (agent_id1, agent_type1, site_type1, state1),
+                      (agent_id1', agent_type1', site_type1', state1')) ->
+                      Loggers.fprintf log
+                        "agent_id:%i:agent_type:%i:site_type:%i:site_type:%i:state:%i:state:%i -> agent_id:%i:agent_id:%i:agent_type:%i:site_type:%i:site_type:%i:state:%i:state:%i\n"
+                        (Ckappa_sig.int_of_agent_id agent_id)
+                        (Ckappa_sig.int_of_agent_name agent_type)
+                        (Ckappa_sig.int_of_site_name site_type)
+                        (Ckappa_sig.int_of_site_name site_type')
+                        (Ckappa_sig.int_of_state_index state)
+                        (Ckappa_sig.int_of_state_index state')
+(**)
+                        (Ckappa_sig.int_of_agent_id agent_id1)
+                        (Ckappa_sig.int_of_agent_id agent_id1')
+                        (Ckappa_sig.int_of_agent_name agent_type1)
+                        (Ckappa_sig.int_of_site_name site_type1)
+                        (Ckappa_sig.int_of_site_name site_type1')
+                        (Ckappa_sig.int_of_state_index state1)
+                        (Ckappa_sig.int_of_state_index state1')
+                ) list
+    ) store_result
