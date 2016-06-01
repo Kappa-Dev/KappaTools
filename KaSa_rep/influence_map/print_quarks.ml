@@ -305,7 +305,7 @@ let dot_of_influence_map parameters error handler compilation (wake_up_map,inhib
                   ~directives:
                     [
                       Graph_loggers.Shape (Remanent_parameters.get_rule_shape parameters_dot);
-                      Graph_loggers.Color (Remanent_parameters.get_rule_color parameters_dot)
+                      Graph_loggers.FillColor (Remanent_parameters.get_rule_color parameters_dot)
                     ]
               in
               ()
@@ -377,7 +377,6 @@ let dot_of_influence_map parameters error handler compilation (wake_up_map,inhib
           "" " ;"
           wake_up_map
       in
-      let () = Loggers.print_newline logger in
       error
   in
   let error =
@@ -407,7 +406,6 @@ let dot_of_influence_map parameters error handler compilation (wake_up_map,inhib
       in
       error
   in
-  let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters_dot) "}" in
-  let () = Loggers.print_newline (Remanent_parameters.get_logger parameters_dot) in
+  let _ = Graph_loggers.print_graph_foot logger in
   let () = Loggers.close_logger (Remanent_parameters.get_logger  parameters_dot)
   in error

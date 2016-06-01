@@ -603,7 +603,7 @@ let open_influence_map_file  parameters =
       | Some a,Some d,ext -> open_out (d^a^ext)
   in
   let format =
-      match get_local_trace_format parameters with
+      match get_im_format parameters with
       | Remanent_parameters_sig.DOT -> Loggers.DOT
       | Remanent_parameters_sig.HTML -> Loggers.HTML_Graph
     in
