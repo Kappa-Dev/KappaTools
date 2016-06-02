@@ -201,27 +201,26 @@ let remove_link ag s ag' s' graph =
   }
 
 let is_agent (ag,ty) graph =
-  let () = assert (not graph.outdated) in
+  let () = assert (not graph.outdated && Int2Set.is_empty graph.missings) in
   match DynArray.get graph.sort ag with
   | Some ty' -> let () = assert (ty = ty') in true
   | None -> false
 let is_free ag s graph =
-  let () = assert (not graph.outdated) in
+  let () = assert (not graph.outdated && Int2Set.is_empty graph.missings) in
   (DynArray.get graph.connect ag).(s) = None
-  && not @@ Int2Set.mem (ag,s) graph.missings
 let is_internal i ag s graph =
-  let () = assert (not graph.outdated) in
+  let () = assert (not graph.outdated && Int2Set.is_empty graph.missings) in
   match (DynArray.get graph.state ag).(s) with
   | Some j -> j = i
   | None -> false
 let link_exists ag s ag' s' graph =
-  let () = assert (not graph.outdated) in
+  let () = assert (not graph.outdated && Int2Set.is_empty graph.missings) in
   match (DynArray.get graph.connect ag).(s) with
   | Some ((ag'',_),s'') -> ag'=ag'' && s'=s''
   | None -> false
 
 let exists_fresh ag s ty s' graph =
-  let () = assert (not graph.outdated) in
+  let () = assert (not graph.outdated && Int2Set.is_empty graph.missings) in
   match (DynArray.get graph.connect ag).(s) with
   | Some ((ag',ty'),s'') ->
     if ty'=ty && s'=s'' then Some ag' else None
