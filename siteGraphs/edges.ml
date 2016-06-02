@@ -61,7 +61,7 @@ let add_agent sigs ty graph =
   let () = graph.outdated <- true in
   match graph.free_id with
   | new_id,h :: t ->
-     let missings' = Tools.recti (fun s a -> Int2Set.add (h,s) a)
+     let missings' = Tools.recti (fun a s -> Int2Set.add (h,s) a)
 				 graph.missings ar in
      let () = DynArray.set graph.connect h al in
      let () = DynArray.set graph.state h ai in
@@ -77,7 +77,7 @@ let add_agent sigs ty graph =
        free_id = (new_id,t);
      }
   | new_id,[] ->
-     let missings' = Tools.recti (fun s a -> Int2Set.add (new_id,s) a)
+     let missings' = Tools.recti (fun a s -> Int2Set.add (new_id,s) a)
 				 graph.missings ar in
      let () = DynArray.set graph.connect new_id al in
      let () = DynArray.set graph.state new_id ai in

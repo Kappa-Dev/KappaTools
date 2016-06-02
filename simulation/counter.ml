@@ -249,7 +249,7 @@ let to_plot_points counter =
   | Some dT ->
      snd
        (Tools.recti
-	  (fun _ (time,acc) ->
+	  (fun (time,acc) _ ->
 	   time -. dT,
 	   if check_output_time counter time then time::acc else acc)
 	  ((float_of_int next) *. dT,[]) n),counter

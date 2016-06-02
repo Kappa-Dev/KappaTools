@@ -177,7 +177,7 @@ let iteri f i =
   in aux 0
 
 let rec recti f x i =
-  if 0 < i then recti f (f i x) (pred i) else x
+  if 0 < i then let i' = pred i in recti f (f x i') i' else x
 
 let min_pos_int_not_zero (keya,dataa) (keyb,datab) =
   if keya = 0

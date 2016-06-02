@@ -1,8 +1,8 @@
 (** {5 Combinators on primitive types *)
 val option_map : ('a -> 'b) -> 'a option -> 'b option
 val iteri : (int -> unit) -> int -> unit
-val recti : (int -> 'a -> 'a) -> 'a -> int -> 'a
-(** [recti f n x] = f 0 (f 1 (.. (f (n-1) x))) *)
+val recti : ('a -> int -> 'a) -> 'a -> int -> 'a
+(** [recti f x n] = f (f (f .. (f (f x 0) 1) ..) (n-1) *)
 
 val array_map_of_list : ('a -> 'b) -> 'a list -> 'b array
 val array_rev_of_list : 'a list -> 'a array
