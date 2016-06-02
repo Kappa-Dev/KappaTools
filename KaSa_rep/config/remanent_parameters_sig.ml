@@ -50,11 +50,11 @@ type influence_map_output =
     im_file : string option ;
     im_format: graph_format ;
     rule_shape : Graph_loggers.shape ;
-    rule_color : string ;
+    rule_color : Graph_loggers.color ;
     variable_shape : Graph_loggers.shape ;
-    variable_color : string ;
-    wake_up_color : string ;
-    inhibition_color : string ;
+    variable_color : Graph_loggers.color ;
+    wake_up_color :  Graph_loggers.color ;
+    inhibition_color : Graph_loggers.color ;
     wake_up_arrow : Graph_loggers.headkind ;
     inhibition_arrow : Graph_loggers.headkind ;
     prompt_full_var_def: bool ;

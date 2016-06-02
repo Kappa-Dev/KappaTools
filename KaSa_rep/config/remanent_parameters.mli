@@ -73,11 +73,11 @@ val get_bi_arrow_symbol: Remanent_parameters_sig.parameters -> string
 
 (** influence map *)
 val get_rule_shape: Remanent_parameters_sig.parameters -> Graph_loggers.shape
-val get_rule_color: Remanent_parameters_sig.parameters -> string
+val get_rule_color: Remanent_parameters_sig.parameters -> Graph_loggers.color
 val get_variable_shape: Remanent_parameters_sig.parameters -> Graph_loggers.shape
-val get_variable_color: Remanent_parameters_sig.parameters -> string
-val get_wake_up_color: Remanent_parameters_sig.parameters -> string
-val get_inhibition_color: Remanent_parameters_sig.parameters -> string
+val get_variable_color: Remanent_parameters_sig.parameters -> Graph_loggers.color
+val get_wake_up_color: Remanent_parameters_sig.parameters -> Graph_loggers.color
+val get_inhibition_color: Remanent_parameters_sig.parameters -> Graph_loggers.color
 val get_wake_up_arrow: Remanent_parameters_sig.parameters -> Graph_loggers.headkind
 val get_inhibition_arrow: Remanent_parameters_sig.parameters -> Graph_loggers.headkind
 val get_prompt_full_var_def: Remanent_parameters_sig.parameters -> bool

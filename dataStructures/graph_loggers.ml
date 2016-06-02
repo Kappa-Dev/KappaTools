@@ -20,10 +20,35 @@ type direction = Direct | Reverse | Undirected | Both
 type shape = Invisible | House | Rect | Ellipse | Circle
 type headkind = Normal | Vee | Tee | No_head
 type linestyle = Plain | Dotted | Dashed
+type color = Red | Green | White | Blue | Black | LightSkyBlue | PaleGreen
+
+let dot_color_encoding x =
+  match
+    x
+  with
+  | Red -> "red"
+  | Green -> "green"
+  | White -> "white"
+  | Blue -> "blue"
+  | Black -> "black"
+  | LightSkyBlue -> "#87ceeb"
+  | PaleGreen -> "#98fb98"
+
+  let svg_color_encoding x =
+    match
+      x
+    with
+    | Red -> "#f00"
+    | Green -> "#0f0"
+    | White -> "#000"
+    | Blue -> "#00f"
+    | Black -> "#fff"
+    | LightSkyBlue -> "#8ce"
+    | PaleGreen -> "#9f9"
 
 type options =
-  | Color of string
-  | FillColor of string
+  | Color of color
+  | FillColor of color
   | Label of string
   | Width of int (*pixel*)
   | Height of int (*pixel*)
@@ -35,8 +60,8 @@ type options =
 
 type node_attribute =
   {
-    node_color: string option;
-    node_fillcolor: string option;
+    node_color: color option;
+    node_fillcolor: color option;
     node_label: string option ;
     node_width: int option ;
     node_height: int option ;
@@ -45,7 +70,7 @@ type node_attribute =
 
 type edge_attribute =
   {
-    edge_color: string option;
+    edge_color: color option;
     edge_label: string option ;
     edge_style: linestyle ;
     edge_direction: direction ;
@@ -393,7 +418,10 @@ let print_node logger ?directives:(directives=[]) id =
               | Some s ->
                 let () = between_attributes_in_dot logger bool in
                 let () =
-                  Loggers.fprintf logger "color=\"%s\"" s
+                  Loggers.fprintf
+                    logger
+                    "color=\"%s\""
+                    (dot_color_encoding s)
                 in
                 true
             in
@@ -404,7 +432,10 @@ let print_node logger ?directives:(directives=[]) id =
               | Some s ->
                 let () = between_attributes_in_dot logger bool in
                 let () =
-                  Loggers.fprintf logger "fillcolor=\"%s\" style=filled" s
+                  Loggers.fprintf
+                    logger
+                    "fillcolor=\"%s\" style=filled"
+                    (dot_color_encoding s)
                 in
                 true
             in
@@ -478,7 +509,10 @@ let print_node logger ?directives:(directives=[]) id =
             | Some s ->
               let () = between_attributes_in_html logger true in
               let () =
-                Loggers.fprintf logger "color: \"%s\"" s
+                Loggers.fprintf
+                  logger
+                  "color: \"%s\""
+                  (svg_color_encoding s)
               in
               ()
           in
@@ -489,7 +523,10 @@ let print_node logger ?directives:(directives=[]) id =
             | Some s ->
               let () = between_attributes_in_html logger true in
               let () =
-                Loggers.fprintf logger "style: \"fill: %s\" " s
+                Loggers.fprintf
+                  logger
+                  "style: \"fill: %s\" "
+                  (svg_color_encoding s)
               in
               ()
           in
@@ -571,7 +608,8 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
             | Some s ->
               let () = between_attributes_in_dot logger bool in
               let () =
-                Loggers.fprintf logger "color=\"%s\"" s
+                Loggers.fprintf logger "color=\"%s\""
+                  (dot_color_encoding s)
               in
               true
           in
@@ -654,7 +692,8 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
         | Some s ->
           let () = between_attributes_in_html logger bool in
           let () =
-            Loggers.fprintf logger "fill: %s" s
+            Loggers.fprintf logger "fill: \"%s\""
+              (svg_color_encoding s)
           in
           true
       in
