@@ -9,6 +9,6 @@ digraph G{
 "create" [shape="box" fillcolor="#87ceeb" style=filled];
 "x" [shape="box" fillcolor="#87ceeb" style=filled];
 "y" [shape="box" fillcolor="#87ceeb" style=filled];
-"create" -> "x" [label="[0->0]" color="#00ff00"];
-"x" -> "y" [label="[0->0]" color="#00ff00"];
+"create" -> "x" [label="[0->0]" color="green"];
+"x" -> "y" [label="[0->0]" color="green"];
 }

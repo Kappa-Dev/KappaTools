@@ -10,8 +10,8 @@ digraph G{
 "r1" [shape="box" fillcolor="#87ceeb" style=filled];
 "r2" [shape="box" fillcolor="#87ceeb" style=filled];
 "r3" [shape="box" fillcolor="#87ceeb" style=filled];
-"r0" -> "r3" [label="[0->0];[1->1]" color="#00ff00"];
-"r1" -> "r2" [label="[0->0];[1->1]" color="#00ff00"];
-"r0" -> "r3" [label="[0->0];[1->1]" color="#ff0000" arrowhead="tee"];
-"r1" -> "r2" [label="[0->0];[1->1]" color="#ff0000" arrowhead="tee"];
+"r0" -> "r3" [label="[0->0];[1->1]" color="green"];
+"r1" -> "r2" [label="[0->0];[1->1]" color="green"];
+"r0" -> "r1" [label="[0->0];[1->1]" color="red" arrowhead="tee"];
+"r1" -> "r0" [label="[0->0];[1->1]" color="red" arrowhead="tee"];
 }

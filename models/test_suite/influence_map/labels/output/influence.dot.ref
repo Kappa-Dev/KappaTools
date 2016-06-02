@@ -10,14 +10,11 @@ digraph G{
 "otherotherveryveryveryverylonglabel" [shape="box" fillcolor="#87ceeb" style=filled];
 "\"0" [shape="box" fillcolor="#87ceeb" style=filled];
 "\\0" [shape="box" fillcolor="#87ceeb" style=filled];
-"veryveryveryveryverylonglonglonglabel" -> "otherotherveryveryveryverylonglabel" [label="[0->0]" color="#00ff00"];
-"otherotherveryveryveryverylonglabel" -> "\"0" [label="[0->0]" color="#00ff00"];
-"otherotherveryveryveryverylonglabel" -> "\\0" [label="[0->0]" color="#00ff00"];
-"\"0" -> "veryveryveryveryverylonglonglonglabel" [label="[0->0]" color="#00ff00"];
-"\\0" -> "otherotherveryveryveryverylonglabel" [label="[0->0]" color="#00ff00"];
-"veryveryveryveryverylonglonglonglabel" -> "otherotherveryveryveryverylonglabel" [label="[0->0]" color="#ff0000" arrowhead="tee"];
-"otherotherveryveryveryverylonglabel" -> "\"0" [label="[0->0]" color="#ff0000" arrowhead="tee"];
-"otherotherveryveryveryverylonglabel" -> "\\0" [label="[0->0]" color="#ff0000" arrowhead="tee"];
-"\"0" -> "veryveryveryveryverylonglonglonglabel" [label="[0->0]" color="#ff0000" arrowhead="tee"];
-"\\0" -> "otherotherveryveryveryverylonglabel" [label="[0->0]" color="#ff0000" arrowhead="tee"];
+"veryveryveryveryverylonglonglonglabel" -> "otherotherveryveryveryverylonglabel" [label="[0->0]" color="green"];
+"otherotherveryveryveryverylonglabel" -> "\"0" [label="[0->0]" color="green"];
+"otherotherveryveryveryverylonglabel" -> "\\0" [label="[0->0]" color="green"];
+"\"0" -> "veryveryveryveryverylonglonglonglabel" [label="[0->0]" color="green"];
+"\\0" -> "otherotherveryveryveryverylonglabel" [label="[0->0]" color="green"];
+"\"0" -> "\\0" [label="[0->0]" color="red" arrowhead="tee"];
+"\\0" -> "\"0" [label="[0->0]" color="red" arrowhead="tee"];
 }

@@ -400,7 +400,7 @@ let dot_of_influence_map parameters error handler compilation (wake_up_map,inhib
         parameters_dot logger error handler compilation
         Handler.print_rule_dot Handler.print_var_dot
         Handler.get_label_of_rule_dot Handler.get_label_of_var_dot
-        Handler.print_labels "" " ;" wake_up_map
+        Handler.print_labels "" " ;" inhibition_map
 
       in
       error

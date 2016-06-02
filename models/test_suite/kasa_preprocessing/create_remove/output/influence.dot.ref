@@ -8,5 +8,5 @@
 digraph G{
 "r0" [shape="box" fillcolor="#87ceeb" style=filled];
 "r1" [shape="box" fillcolor="#87ceeb" style=filled];
-"r0" -> "r1" [label="[0->0]" color="#00ff00"];
+"r0" -> "r1" [label="[0->0]" color="green"];
 }

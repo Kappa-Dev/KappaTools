@@ -8,8 +8,9 @@
 digraph G{
 "bind" [shape="box" fillcolor="#87ceeb" style=filled];
 "remove" [shape="box" fillcolor="#87ceeb" style=filled];
-"remove" -> "bind" [label="[1->1];[2->0]" color="#00ff00"];
-"remove" -> "remove" [label="[2->0];[2->1]" color="#00ff00"];
-"remove" -> "bind" [label="[1->1];[2->0]" color="#ff0000" arrowhead="tee"];
-"remove" -> "remove" [label="[2->0];[2->1]" color="#ff0000" arrowhead="tee"];
+"remove" -> "bind" [label="[1->1];[2->0]" color="green"];
+"remove" -> "remove" [label="[2->0];[2->1]" color="green"];
+"bind" -> "remove" [label="[0->0];[0->1]" color="red" arrowhead="tee"];
+"remove" -> "bind" [label="[1->0]" color="red" arrowhead="tee"];
+"remove" -> "remove" [label="[1->0]" color="red" arrowhead="tee"];
 }

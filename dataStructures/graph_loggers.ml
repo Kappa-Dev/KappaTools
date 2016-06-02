@@ -316,13 +316,13 @@ let string_of_arrow_tail_in_dot style =
 let string_of_arrow_in_html logger bool title style =
     match style
     with
-    | Normal -> bool
-    | Tee ->
+    | Tee | Normal -> bool
+(*| Tee ->
       let () = between_attributes_in_html logger bool in
       let () =
         Loggers.fprintf logger "%s: \"tee\"" title
       in
-      true
+      true*)
     | Vee ->
       let () = between_attributes_in_html logger bool in
       let () =
@@ -691,9 +691,11 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
         | None -> bool
         | Some s ->
           let () = between_attributes_in_html logger bool in
+          let color = svg_color_encoding s in
           let () =
-            Loggers.fprintf logger "fill: \"%s\""
-              (svg_color_encoding s)
+            Loggers.fprintf logger
+              "style: \"stroke: %s; fill: white\", arrowheadStyle: \"fill: %s; stroke: %s\""
+              color color color
           in
           true
       in

@@ -11,10 +11,10 @@ digraph G{
 "r2" [shape="box" fillcolor="#87ceeb" style=filled];
 "r3" [shape="box" fillcolor="#87ceeb" style=filled];
 "r4" [shape="box" fillcolor="#87ceeb" style=filled];
-"r0" -> "r2" [label="[1->0]" color="#00ff00"];
-"r0" -> "r4" [label="[0->1]" color="#00ff00"];
-"r1" -> "r3" [label="[1->0]" color="#00ff00"];
-"r1" -> "r4" [label="[0->1]" color="#00ff00"];
-"r2" -> "r4" [label="[1->0]" color="#00ff00"];
-"r3" -> "r4" [label="[1->0]" color="#00ff00"];
+"r0" -> "r2" [label="[1->0]" color="green"];
+"r0" -> "r4" [label="[0->1]" color="green"];
+"r1" -> "r3" [label="[1->0]" color="green"];
+"r1" -> "r4" [label="[0->1]" color="green"];
+"r2" -> "r4" [label="[1->0]" color="green"];
+"r3" -> "r4" [label="[1->0]" color="green"];
 }

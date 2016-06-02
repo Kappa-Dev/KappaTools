@@ -11,7 +11,7 @@ digraph G{
 "2:B()->C()" [shape="box" fillcolor="#87ceeb" style=filled];
 "3:C()->D(x~u)" [shape="box" fillcolor="#87ceeb" style=filled];
 "4:E()->F(x~u)" [shape="box" fillcolor="#87ceeb" style=filled];
-"0:->A()" -> "1:A()->B()" [label="[0->0]" color="#00ff00"];
-"1:A()->B()" -> "2:B()->C()" [label="[0->0]" color="#00ff00"];
-"2:B()->C()" -> "3:C()->D(x~u)" [label="[0->0]" color="#00ff00"];
+"0:->A()" -> "1:A()->B()" [label="[0->0]" color="green"];
+"1:A()->B()" -> "2:B()->C()" [label="[0->0]" color="green"];
+"2:B()->C()" -> "3:C()->D(x~u)" [label="[0->0]" color="green"];
 }

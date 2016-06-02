@@ -33,16 +33,6 @@ Stats:
 	 - weak flow compression (3)
 	 - strong flow compression (2)
 + Pretty printing 7 flows
-EVEN BIG FAIL
-EVEN BIG FAIL
-EVEN BIG FAIL
-EVEN BIG FAIL
-EVEN BIG FAIL
-EVEN BIG FAIL
-EVEN BIG FAIL
 + Pretty printing 2 weakly compressed flows
-EVEN BIG FAIL
-EVEN BIG FAIL
 + Pretty printing 1 strongly compressed flow
-EVEN BIG FAIL
 Simulation ended
