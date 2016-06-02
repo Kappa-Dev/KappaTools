@@ -42,8 +42,8 @@ ____________________________________________________________
 Stats:
  number of step   : 14626
  longest story    : 31
- average length   : 7.79848
- geometric mean   : 8.70045
+ average length   : 7.79847619048
+ geometric mean   : 8.7004542848
 
 	 - causal flow compression (626)
 
@@ -54,5 +54,38 @@ ____________________________________________________________
 
 	 - weak flow compression (11)
 + Pretty printing 31 flows
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
+EVEN BIG FAIL
 + Pretty printing 2 weakly compressed flows
+EVEN BIG FAIL
+EVEN BIG FAIL
 Simulation ended

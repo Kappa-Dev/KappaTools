@@ -1,24 +1,23 @@
 #Download sources/binaries at https://github.com/Kappa-Dev/KaSim
 #
-#Command line is: KaSa add_remove.ka --debugging-mode --output-directory output
+#Command line is: KaSa add_remove.ka --output-directory output
 #
 #This file contains the description of the influence map in dot.
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
 digraph G{
-"0:A(x~u),B(x~p)->A(x~u),A(x~p)" [shape="box" color="lightskyblue"];
-"1:A(x~p)->A(x~u)" [shape="box" color="lightskyblue"];
-"2:B(x~u)->B(x~p)" [shape="box" color="lightskyblue"];
-"3:B(x~p)->B(x~u)" [shape="box" color="lightskyblue"];
-"0:A(x~u),B(x~p)->A(x~u),A(x~p)" -> "1:A(x~p)->A(x~u)" [label="[1->0]" color="green"];
-"1:A(x~p)->A(x~u)" -> "0:A(x~u),B(x~p)->A(x~u),A(x~p)" [label="[0->0]" color="green"];
-"2:B(x~u)->B(x~p)" -> "0:A(x~u),B(x~p)->A(x~u),A(x~p)" [label="[0->1]" color="green"];
-"2:B(x~u)->B(x~p)" -> "3:B(x~p)->B(x~u)" [label="[0->0]" color="green"];
-"3:B(x~p)->B(x~u)" -> "2:B(x~u)->B(x~p)" [label="[0->0]" color="green"];
-
-"0:A(x~u),B(x~p)->A(x~u),A(x~p)" -| "1:A(x~p)->A(x~u)" [label="[1->0]" color="red"];
-"1:A(x~p)->A(x~u)" -| "0:A(x~u),B(x~p)->A(x~u),A(x~p)" [label="[0->0]" color="red"];
-"2:B(x~u)->B(x~p)" -| "0:A(x~u),B(x~p)->A(x~u),A(x~p)" [label="[0->1]" color="red"];
-"2:B(x~u)->B(x~p)" -| "3:B(x~p)->B(x~u)" [label="[0->0]" color="red"];
-"3:B(x~p)->B(x~u)" -| "2:B(x~u)->B(x~p)" [label="[0->0]" color="red"];
+"0:A(x~u),B(x~p)->A(x~u),A(x~p)" [shape="box" fillcolor="#87ceeb" style=filled];
+"1:A(x~p)->A(x~u)" [shape="box" fillcolor="#87ceeb" style=filled];
+"2:B(x~u)->B(x~p)" [shape="box" fillcolor="#87ceeb" style=filled];
+"3:B(x~p)->B(x~u)" [shape="box" fillcolor="#87ceeb" style=filled];
+"0:A(x~u),B(x~p)->A(x~u),A(x~p)" -> "1:A(x~p)->A(x~u)" [label="[1->0]" color="#00ff00"];
+"1:A(x~p)->A(x~u)" -> "0:A(x~u),B(x~p)->A(x~u),A(x~p)" [label="[0->0]" color="#00ff00"];
+"2:B(x~u)->B(x~p)" -> "0:A(x~u),B(x~p)->A(x~u),A(x~p)" [label="[0->1]" color="#00ff00"];
+"2:B(x~u)->B(x~p)" -> "3:B(x~p)->B(x~u)" [label="[0->0]" color="#00ff00"];
+"3:B(x~p)->B(x~u)" -> "2:B(x~u)->B(x~p)" [label="[0->0]" color="#00ff00"];
+"0:A(x~u),B(x~p)->A(x~u),A(x~p)" -> "1:A(x~p)->A(x~u)" [label="[1->0]" color="#ff0000" arrowhead="tee"];
+"1:A(x~p)->A(x~u)" -> "0:A(x~u),B(x~p)->A(x~u),A(x~p)" [label="[0->0]" color="#ff0000" arrowhead="tee"];
+"2:B(x~u)->B(x~p)" -> "0:A(x~u),B(x~p)->A(x~u),A(x~p)" [label="[0->1]" color="#ff0000" arrowhead="tee"];
+"2:B(x~u)->B(x~p)" -> "3:B(x~p)->B(x~u)" [label="[0->0]" color="#ff0000" arrowhead="tee"];
+"3:B(x~p)->B(x~u)" -> "2:B(x~u)->B(x~p)" [label="[0->0]" color="#ff0000" arrowhead="tee"];
 }

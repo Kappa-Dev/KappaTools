@@ -6,27 +6,26 @@
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
 digraph G{
-"r0" [shape="box" color="lightskyblue"];
-"r0_op" [shape="box" color="lightskyblue"];
-"r1" [shape="box" color="lightskyblue"];
-"r1_op" [shape="box" color="lightskyblue"];
-"r0" -> "r0_op" [label="[0->0];[1->1]" color="green"];
-"r0" -> "r1" [label="[1->0]" color="green"];
-"r0_op" -> "r0" [label="[0->0];[1->1]" color="green"];
-"r1" -> "r0" [label="[0*->0]" color="green"];
-"r1" -> "r1" [label="[0*->1]" color="green"];
-"r1" -> "r1_op" [label="[0->0];[1->1]" color="green"];
-"r1_op" -> "r0_op" [label="[0->1]" color="green"];
-"r1_op" -> "r1" [label="[1->1]" color="green"];
-"r1_op" -> "r1_op" [label="[0->0]" color="green"];
-
-"r0" -| "r0_op" [label="[0->0];[1->1]" color="red"];
-"r0" -| "r1" [label="[1->0]" color="red"];
-"r0_op" -| "r0" [label="[0->0];[1->1]" color="red"];
-"r1" -| "r0" [label="[0*->0]" color="red"];
-"r1" -| "r1" [label="[0*->1]" color="red"];
-"r1" -| "r1_op" [label="[0->0];[1->1]" color="red"];
-"r1_op" -| "r0_op" [label="[0->1]" color="red"];
-"r1_op" -| "r1" [label="[1->1]" color="red"];
-"r1_op" -| "r1_op" [label="[0->0]" color="red"];
+"r0" [shape="box" fillcolor="#87ceeb" style=filled];
+"r0_op" [shape="box" fillcolor="#87ceeb" style=filled];
+"r1" [shape="box" fillcolor="#87ceeb" style=filled];
+"r1_op" [shape="box" fillcolor="#87ceeb" style=filled];
+"r0" -> "r0_op" [label="[0->0];[1->1]" color="#00ff00"];
+"r0" -> "r1" [label="[1->0]" color="#00ff00"];
+"r0_op" -> "r0" [label="[0->0];[1->1]" color="#00ff00"];
+"r1" -> "r0" [label="[0*->0]" color="#00ff00"];
+"r1" -> "r1" [label="[0*->1]" color="#00ff00"];
+"r1" -> "r1_op" [label="[0->0];[1->1]" color="#00ff00"];
+"r1_op" -> "r0_op" [label="[0->1]" color="#00ff00"];
+"r1_op" -> "r1" [label="[1->1]" color="#00ff00"];
+"r1_op" -> "r1_op" [label="[0->0]" color="#00ff00"];
+"r0" -> "r0_op" [label="[0->0];[1->1]" color="#ff0000" arrowhead="tee"];
+"r0" -> "r1" [label="[1->0]" color="#ff0000" arrowhead="tee"];
+"r0_op" -> "r0" [label="[0->0];[1->1]" color="#ff0000" arrowhead="tee"];
+"r1" -> "r0" [label="[0*->0]" color="#ff0000" arrowhead="tee"];
+"r1" -> "r1" [label="[0*->1]" color="#ff0000" arrowhead="tee"];
+"r1" -> "r1_op" [label="[0->0];[1->1]" color="#ff0000" arrowhead="tee"];
+"r1_op" -> "r0_op" [label="[0->1]" color="#ff0000" arrowhead="tee"];
+"r1_op" -> "r1" [label="[1->1]" color="#ff0000" arrowhead="tee"];
+"r1_op" -> "r1_op" [label="[0->0]" color="#ff0000" arrowhead="tee"];
 }

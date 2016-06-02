@@ -6,10 +6,9 @@
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
 digraph G{
-"create" [shape="box" color="lightskyblue"];
-"x" [shape="box" color="lightskyblue"];
-"y" [shape="box" color="lightskyblue"];
-"create" -> "x" [label="[0->0]" color="green"];
-"x" -> "y" [label="[0->0]" color="green"];
-
+"create" [shape="box" fillcolor="#87ceeb" style=filled];
+"x" [shape="box" fillcolor="#87ceeb" style=filled];
+"y" [shape="box" fillcolor="#87ceeb" style=filled];
+"create" -> "x" [label="[0->0]" color="#00ff00"];
+"x" -> "y" [label="[0->0]" color="#00ff00"];
 }

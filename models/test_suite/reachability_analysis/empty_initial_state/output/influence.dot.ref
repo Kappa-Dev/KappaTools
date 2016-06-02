@@ -6,10 +6,9 @@
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
 digraph G{
-"0:A(x~u,y~u)->A(x~p,y~u)" [shape="box" color="lightskyblue"];
-"1:A(x~u,y~u)->A(x~u,y~p)" [shape="box" color="lightskyblue"];
-"2:A(x~p,y~u)->D(x~u)" [shape="box" color="lightskyblue"];
-"0:A(x~u,y~u)->A(x~p,y~u)" -> "2:A(x~p,y~u)->D(x~u)" [label="[0->0]" color="green"];
-
-"0:A(x~u,y~u)->A(x~p,y~u)" -| "2:A(x~p,y~u)->D(x~u)" [label="[0->0]" color="red"];
+"0:A(x~u,y~u)->A(x~p,y~u)" [shape="box" fillcolor="#87ceeb" style=filled];
+"1:A(x~u,y~u)->A(x~u,y~p)" [shape="box" fillcolor="#87ceeb" style=filled];
+"2:A(x~p,y~u)->D(x~u)" [shape="box" fillcolor="#87ceeb" style=filled];
+"0:A(x~u,y~u)->A(x~p,y~u)" -> "2:A(x~p,y~u)->D(x~u)" [label="[0->0]" color="#00ff00"];
+"0:A(x~u,y~u)->A(x~p,y~u)" -> "2:A(x~p,y~u)->D(x~u)" [label="[0->0]" color="#ff0000" arrowhead="tee"];
 }

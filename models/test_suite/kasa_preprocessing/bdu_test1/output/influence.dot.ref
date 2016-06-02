@@ -6,9 +6,9 @@
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
 digraph G{
-"r0" [shape="box" color="lightskyblue"];
-"r1" [shape="box" color="lightskyblue"];
+"r0" [shape="box" fillcolor="#87ceeb" style=filled];
+"r1" [shape="box" fillcolor="#87ceeb" style=filled];
 
-"r0" [label=""r0"" shape="ellipse" color="palegreen3"];
-"r1" [label=""r1"" shape="ellipse" color="palegreen3"];
+"Auu" [shape="ellipse" fillcolor="#98fb98" style=filled];
+"Apu" [shape="ellipse" fillcolor="#98fb98" style=filled];
 }

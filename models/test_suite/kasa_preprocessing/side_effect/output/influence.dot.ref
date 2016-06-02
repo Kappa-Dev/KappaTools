@@ -6,26 +6,25 @@
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
 digraph G{
-"0:A(x),B(x)->A(x!1),B(x!1)" [shape="box" color="lightskyblue"];
-"1:A(x!_)->A(x)" [shape="box" color="lightskyblue"];
-"2:B(x!_)->B(x)" [shape="box" color="lightskyblue"];
-"3:A()->" [shape="box" color="lightskyblue"];
-"4:B(x)->" [shape="box" color="lightskyblue"];
-"0:A(x),B(x)->A(x!1),B(x!1)" -> "1:A(x!_)->A(x)" [label="[0->0]" color="green"];
-"0:A(x),B(x)->A(x!1),B(x!1)" -> "2:B(x!_)->B(x)" [label="[1->0]" color="green"];
-"1:A(x!_)->A(x)" -> "0:A(x),B(x)->A(x!1),B(x!1)" [label="[0*->1];[0->0]" color="green"];
-"1:A(x!_)->A(x)" -> "4:B(x)->" [label="[0*->0]" color="green"];
-"2:B(x!_)->B(x)" -> "0:A(x),B(x)->A(x!1),B(x!1)" [label="[0*->0];[0->1]" color="green"];
-"2:B(x!_)->B(x)" -> "4:B(x)->" [label="[0->0]" color="green"];
-"3:A()->" -> "0:A(x),B(x)->A(x!1),B(x!1)" [label="[0*->1]" color="green"];
-"3:A()->" -> "4:B(x)->" [label="[0*->0]" color="green"];
-
-"0:A(x),B(x)->A(x!1),B(x!1)" -| "1:A(x!_)->A(x)" [label="[0->0]" color="red"];
-"0:A(x),B(x)->A(x!1),B(x!1)" -| "2:B(x!_)->B(x)" [label="[1->0]" color="red"];
-"1:A(x!_)->A(x)" -| "0:A(x),B(x)->A(x!1),B(x!1)" [label="[0*->1];[0->0]" color="red"];
-"1:A(x!_)->A(x)" -| "4:B(x)->" [label="[0*->0]" color="red"];
-"2:B(x!_)->B(x)" -| "0:A(x),B(x)->A(x!1),B(x!1)" [label="[0*->0];[0->1]" color="red"];
-"2:B(x!_)->B(x)" -| "4:B(x)->" [label="[0->0]" color="red"];
-"3:A()->" -| "0:A(x),B(x)->A(x!1),B(x!1)" [label="[0*->1]" color="red"];
-"3:A()->" -| "4:B(x)->" [label="[0*->0]" color="red"];
+"0:A(x),B(x)->A(x!1),B(x!1)" [shape="box" fillcolor="#87ceeb" style=filled];
+"1:A(x!_)->A(x)" [shape="box" fillcolor="#87ceeb" style=filled];
+"2:B(x!_)->B(x)" [shape="box" fillcolor="#87ceeb" style=filled];
+"3:A()->" [shape="box" fillcolor="#87ceeb" style=filled];
+"4:B(x)->" [shape="box" fillcolor="#87ceeb" style=filled];
+"0:A(x),B(x)->A(x!1),B(x!1)" -> "1:A(x!_)->A(x)" [label="[0->0]" color="#00ff00"];
+"0:A(x),B(x)->A(x!1),B(x!1)" -> "2:B(x!_)->B(x)" [label="[1->0]" color="#00ff00"];
+"1:A(x!_)->A(x)" -> "0:A(x),B(x)->A(x!1),B(x!1)" [label="[0*->1];[0->0]" color="#00ff00"];
+"1:A(x!_)->A(x)" -> "4:B(x)->" [label="[0*->0]" color="#00ff00"];
+"2:B(x!_)->B(x)" -> "0:A(x),B(x)->A(x!1),B(x!1)" [label="[0*->0];[0->1]" color="#00ff00"];
+"2:B(x!_)->B(x)" -> "4:B(x)->" [label="[0->0]" color="#00ff00"];
+"3:A()->" -> "0:A(x),B(x)->A(x!1),B(x!1)" [label="[0*->1]" color="#00ff00"];
+"3:A()->" -> "4:B(x)->" [label="[0*->0]" color="#00ff00"];
+"0:A(x),B(x)->A(x!1),B(x!1)" -> "1:A(x!_)->A(x)" [label="[0->0]" color="#ff0000" arrowhead="tee"];
+"0:A(x),B(x)->A(x!1),B(x!1)" -> "2:B(x!_)->B(x)" [label="[1->0]" color="#ff0000" arrowhead="tee"];
+"1:A(x!_)->A(x)" -> "0:A(x),B(x)->A(x!1),B(x!1)" [label="[0*->1];[0->0]" color="#ff0000" arrowhead="tee"];
+"1:A(x!_)->A(x)" -> "4:B(x)->" [label="[0*->0]" color="#ff0000" arrowhead="tee"];
+"2:B(x!_)->B(x)" -> "0:A(x),B(x)->A(x!1),B(x!1)" [label="[0*->0];[0->1]" color="#ff0000" arrowhead="tee"];
+"2:B(x!_)->B(x)" -> "4:B(x)->" [label="[0->0]" color="#ff0000" arrowhead="tee"];
+"3:A()->" -> "0:A(x),B(x)->A(x!1),B(x!1)" [label="[0*->1]" color="#ff0000" arrowhead="tee"];
+"3:A()->" -> "4:B(x)->" [label="[0*->0]" color="#ff0000" arrowhead="tee"];
 }

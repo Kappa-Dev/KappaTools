@@ -6,12 +6,11 @@
 #Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
 #
 digraph G{
-"r0" [shape="box" color="lightskyblue"];
+"r0" [shape="box" fillcolor="#87ceeb" style=filled];
 
-"r0" [label=""r0"" shape="ellipse" color="palegreen3"];
-"Auu" [label=""Auu"" shape="ellipse" color="palegreen3"];
-"Apu" [label=""Apu"" shape="ellipse" color="palegreen3"];
-"r0" -> "App" [label="[0->0]" color="green"];
-
-"r0" -| "App" [label="[0->0]" color="red"];
+"Auu" [shape="ellipse" fillcolor="#98fb98" style=filled];
+"Apu" [shape="ellipse" fillcolor="#98fb98" style=filled];
+"App" [shape="ellipse" fillcolor="#98fb98" style=filled];
+"r0" -> "App" [label="[0->0]" color="#00ff00"];
+"r0" -> "App" [label="[0->0]" color="#ff0000" arrowhead="tee"];
 }

@@ -23,6 +23,7 @@ ____________________________________________________________
 
 	 - weak flow compression (1)
 + Pretty printing 1 weakly compressed flow
+EVEN BIG FAIL
 Simulation ended (eff.: 0.600000, detail below)
 	Valid embedding but no longer unary when required: 0.000000
 	Valid embedding but not binary when required: 0.000000
