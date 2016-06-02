@@ -440,7 +440,7 @@ let print_value parameter value =
 
 (**************************************************************************)
 
-let print_result handler_kappa parameter error store_result =
+let print_result' handler_kappa parameter error store_result =
   Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.iter
     (fun ((agent_id, agent_type, site_type1, site_type2, state1, state2),
           (agent_id', agent_type', site_type1', site_type2', state1', state2')) value ->
@@ -489,6 +489,28 @@ let print_result handler_kappa parameter error store_result =
           state2_string';
       print_value parameter value
     ) store_result
+
+    let print_result handler_kappa parameter error store_result =
+      Parallel_bonds_type.PairAgentSitesStates_map_and_set.Map.iter
+        (fun ((agent_type, site_type1, site_type2, state1, state2),
+              (agent_type', site_type1', site_type2', state1', state2')) value ->
+            Loggers.fprintf (Remanent_parameters.get_logger parameter)
+              "agent_type:%i:site_type:%i:site_type:%i:state:%i:state:%i->\
+               agent_type:%i:site_type:%i:site_type:%i:state:%i:state:%i\n"
+              (Ckappa_sig.int_of_agent_name agent_type)
+              (Ckappa_sig.int_of_site_name site_type1)
+              (Ckappa_sig.int_of_site_name site_type2)
+              (Ckappa_sig.int_of_state_index state1)
+              (Ckappa_sig.int_of_state_index state2)
+
+              (Ckappa_sig.int_of_agent_name agent_type')
+              (Ckappa_sig.int_of_site_name site_type1')
+              (Ckappa_sig.int_of_site_name site_type2')
+              (Ckappa_sig.int_of_state_index state1')
+              (Ckappa_sig.int_of_state_index state2')
+          ;
+          print_value parameter value
+        ) store_result
 
 (**************************************************************************)
 (*print result of parallel bonds in the initial state*)

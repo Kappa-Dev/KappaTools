@@ -24,8 +24,8 @@ ____________________________________________________________
 Stats:
  number of step   : 10174
  longest story    : 96
- average length   : 36.660130719
- geometric mean   : 44.5316220171
+ average length   : 36.6601
+ geometric mean   : 44.5316
 
 	 - causal flow compression (10)
 + Pretty printing 10 flows
