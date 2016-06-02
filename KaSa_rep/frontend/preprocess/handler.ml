@@ -349,14 +349,13 @@ let print_rule_dot parameters error rule_id m1 m2 rule =
   let error =
     if m1<>"" && (not (Remanent_parameters.get_prompt_full_rule_def parameters))
     then
-      let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "\"%s" m1 in
+      let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" m1 in
       error
     else
-      let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "\"%s:" m2 in
+      let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s:" m2 in
       let error = Print_ckappa.print_rule parameters error rule in
       error
   in
-  let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "\"" in
   error
 
 let print_var_dot parameters (error:Exception.method_handler)  var_id m1 m2 var =
@@ -364,15 +363,14 @@ let print_var_dot parameters (error:Exception.method_handler)  var_id m1 m2 var 
     if m1<>"" && (not (Remanent_parameters.get_prompt_full_var_def parameters))
     then
       let _ =
-        Loggers.fprintf (Remanent_parameters.get_logger parameters) "\"%s" m1
+        Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" m1
       in error
     else
       let _ =
-        Loggers.fprintf (Remanent_parameters.get_logger parameters) "\"%s:" m2 in
+        Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s:" m2 in
       let error = Print_ckappa.print_alg parameters error var
       in error
   in
-  let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters) "\"" in
   error
 
 let print_rule_or_var parameters error handler compiled print_rule print_var get_label_of_rule get_label_of_var rule_id =

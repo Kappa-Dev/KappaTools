@@ -337,7 +337,7 @@ let print_node logger ?directives:(directives=[]) id =
   match Loggers.get_encoding_format logger with
   | Loggers.DOT ->
     begin
-      let () = Loggers.fprintf logger "%s" id in
+      let () = Loggers.fprintf logger "\"%s\"" id in
       let () =
         if is_no_node_attributes attributes
         then ()
@@ -404,7 +404,7 @@ let print_node logger ?directives:(directives=[]) id =
               | Some s ->
                 let () = between_attributes_in_dot logger bool in
                 let () =
-                  Loggers.fprintf logger "fillcolor=\"%s\"" s
+                  Loggers.fprintf logger "fillcolor=\"%s\" style=filled" s
                 in
                 true
             in
@@ -537,7 +537,7 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
                         Normal)^(string_one_of_linestyle_in_dot
                                                                                 attributes.edge_style)
       in
-      let () = Loggers.fprintf logger "%s %s %s" id1 direction id2 in
+      let () = Loggers.fprintf logger "\"%s\" %s \"%s\"" id1 direction id2 in
       let () =
         if is_no_edge_attributes attributes
         then

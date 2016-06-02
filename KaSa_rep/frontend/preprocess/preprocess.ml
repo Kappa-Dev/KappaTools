@@ -1228,13 +1228,6 @@ let check_freeness parameters lhs source (error, half_release_set) =
 
 let translate_rule parameters error handler rule =
   let label,((direction,rule),position) = rule in
-  let () =
-    match
-      label
-    with
-    | None -> Printf.fprintf stdout "PREPROCESS: NONE \n"
-    | Some (label, _) -> Printf.fprintf stdout "PREPROCESS: %s\n" label
-  in
   let error,c_rule_lhs,question_marks_l = translate_mixture parameters error handler rule.Ckappa_sig.lhs in
   let error,c_rule_rhs,question_marks_r = translate_mixture parameters error handler rule.Ckappa_sig.rhs in
   let error,c_rule_lhs = clean_question_marks parameters error question_marks_r c_rule_lhs in (* remove ? in the lhs when they occur in the rhs (according to the BNF, they have to occur in the lhs as well *)

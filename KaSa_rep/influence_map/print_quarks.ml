@@ -331,7 +331,7 @@ let dot_of_influence_map parameters error handler compilation (wake_up_map,inhib
               Handler.print_var_dot
               Handler.get_label_of_rule_dot
               Handler.get_label_of_var_dot
-              (Ckappa_sig.rule_id_of_int (k-nrules))
+              (Ckappa_sig.rule_id_of_int k)
           in
           let () =
             if bool then
@@ -340,9 +340,8 @@ let dot_of_influence_map parameters error handler compilation (wake_up_map,inhib
                   s
                   ~directives:
                     [
-                      Graph_loggers.Label s;
                       Graph_loggers.Shape (Remanent_parameters.get_variable_shape parameters_dot);
-                      Graph_loggers.Color (Remanent_parameters.get_variable_color parameters_dot)
+                      Graph_loggers.FillColor (Remanent_parameters.get_variable_color parameters_dot)
                     ]
               in
               ()
