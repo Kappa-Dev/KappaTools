@@ -495,6 +495,44 @@ let merge_list list1 list2 =
   in
   aux list1 list2 []
 
+let distrib_list list1 list2 =
+  let rec aux list1 list2 list12 list1wo2 list2wo1 =
+    match
+      list1,list2
+    with
+    | [],_ -> List.rev list12,List.rev list1wo2,(List.rev list2wo1)@list2
+    | _,[] -> List.rev list12,(List.rev list1wo2)@list1,List.rev list2wo1
+    | h::q,h'::q' ->
+      if h=h'
+      then
+        aux q q' (h::list12) list1wo2 list2wo1
+      else
+      if h<h'
+      then
+        aux q list2 list12 (h::list1wo2) list2wo1
+      else
+        aux list1 q' list12 list1wo2 (h'::list2wo1)
+  in
+  aux list1 list2 [] [] []
+
+let distrib_list list1 list2 =
+  let lista , listb, listc = distrib_list list1 list2 in
+  let f list =
+    let () =
+      List.iter (fun s -> Printf.fprintf stdout "%i;" (Ckappa_sig.int_of_site_name s)) list
+    in
+    let () = Printf.fprintf stdout "\n" in
+    ()
+  in
+  let () = Printf.fprintf stdout "DISTRIB\n" in
+  let () = f list1 in
+  let () = f list2 in
+  let () = f lista in
+  let () = f listb in
+  let () = f listc in
+  let () = Printf.fprintf stdout "\n" in
+  lista,listb,listc
+
 let powerset  map_interface =
   let list =
     Mods.IntMap.fold
@@ -591,18 +629,80 @@ let add_singular parameter error transition_system =
                         (gen map2 proof)
                         (gen map2 proof')
                     in
-                    let mvbdu_list =
-                      Ckappa_sig.Views_intbdu.extensional_of_mvbdu mvbdu
+                    let error, transition_system =
+                      if
+                        Remanent_parameters.get_add_singular_microstates
+                          parameter
+                      then
+                        let mvbdu_list =
+                          Ckappa_sig.Views_intbdu.extensional_of_mvbdu mvbdu
+                        in
+                        List.fold_left
+                          (fun (error, transition_system) asso ->
+                             add_node parameter error
+                               (Ckappa_sig.Views_intbdu.mvbdu_of_association_list
+                                  asso)
+                               transition_system
+                          )
+                          (error, transition_system)
+                          mvbdu_list
+                      else
+                        error, transition_system
                     in
-                    List.fold_left
-                      (fun (error, transition_system) asso ->
-                         add_node parameter error
-                           (Ckappa_sig.Views_intbdu.mvbdu_of_association_list
-                              asso)
-                           transition_system
-                      )
-                      (error, transition_system)
-                      mvbdu_list)
+                    let error, transition_system =
+                      if
+                        Remanent_parameters.get_add_singular_macrostates
+                          parameter
+                      then
+                        List.fold_left
+                          (fun (error, transition_system) (_,hconsed) ->
+                             let list_var = Ckappa_sig.Views_intbdu.extensional_of_variables_list hconsed in
+                             let length = List.length list_var in
+                             List.fold_left
+                               (fun (error, transition_system) (_,hconsed') ->
+                                  let list_var' = Ckappa_sig.Views_intbdu.extensional_of_variables_list hconsed' in
+                                  let length' = List.length list_var' in
+                                  let hconsed'' =
+                                    Ckappa_sig.Views_intbdu.build_variables_list
+                                      (merge_list list_var list_var')
+                                  in
+                                  let list_var'' = Ckappa_sig.Views_intbdu.extensional_of_variables_list hconsed'' in
+                                  let length'' = List.length list_var'' in
+                                  if length' = length'' || length = length''
+                                  then
+                                    (error, transition_system)
+                                  else
+                                    let lista,listb,listc = distrib_list list_var list_var' in
+                                    List.fold_left
+                                      (fun (error, transition_system) list_var ->
+                                         let hconsed = Ckappa_sig.Views_intbdu.build_variables_list list_var in
+                                         let restricted_mvbdu = Ckappa_sig.Views_intbdu.mvbdu_project_keep_only mvbdu hconsed in
+                                         let mvbdu_list =
+                                           Ckappa_sig.Views_intbdu.extensional_of_mvbdu restricted_mvbdu
+                                         in
+                                         List.fold_left
+                                           (fun (error, transition_system) asso ->
+                                              add_node parameter
+                                                error
+                                                (Ckappa_sig.Views_intbdu.mvbdu_of_association_list asso)
+                                                transition_system
+                                           )
+                                           (error, transition_system)
+                                           mvbdu_list)
+                                      (error, transition_system)
+                                      [lista;listb;listc]
+
+                               )
+                               (error, transition_system)
+                               proof
+                          )
+                          (error, transition_system)
+                          proof'
+                      else
+                        error, transition_system
+                    in
+                    error, transition_system
+                 )
                  (error, transition_system) tail
              in
              aux map2 tail (error, transition_system)
@@ -1084,6 +1184,8 @@ let agent_trace parameter log_info error handler handler_kappa compil output =
                   let error, transition_system =
                     if Remanent_parameters.get_add_singular_macrostates
                         parameter
+                       ||
+                       Remanent_parameters.get_add_singular_microstates parameter
                     then
                       add_singular parameter error transition_system
                     else

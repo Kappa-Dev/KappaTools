@@ -152,6 +152,7 @@ let reachability_map_0 =
     Remanent_parameters_sig.use_macrotransitions_in_local_traces = false;
     Remanent_parameters_sig.ignore_trivial_losanges = false;
     Remanent_parameters_sig.add_singular_macrostates = false;
+    Remanent_parameters_sig.add_singular_microstates = false;
     Remanent_parameters_sig.smash_relations = false;
     Remanent_parameters_sig.use_natural_language = false;
     Remanent_parameters_sig.format_for_local_traces = Remanent_parameters_sig.DOT ;
@@ -184,6 +185,7 @@ let add_debugging_parameters_to_reachability_map reachability =
       Remanent_parameters_sig.compute_local_traces = !Config.compute_local_traces;
       Remanent_parameters_sig.ignore_trivial_losanges = !Config.do_not_compress_trivial_losanges;
       Remanent_parameters_sig.add_singular_macrostates = !Config.add_singular_macrostates;
+      Remanent_parameters_sig.add_singular_microstates = !Config.add_singular_microstates;
       Remanent_parameters_sig.show_rule_names_in_local_traces =
         !Config.show_rule_names_in_local_traces ;
       Remanent_parameters_sig.use_macrotransitions_in_local_traces =
@@ -394,6 +396,7 @@ let get_show_rule_names_in_local_traces_1 r = r.Remanent_parameters_sig.show_rul
 let get_use_macrotransitions_in_local_traces_1 r = r.Remanent_parameters_sig.use_macrotransitions_in_local_traces
 let get_ignore_trivial_losanges_1 r = r.Remanent_parameters_sig.ignore_trivial_losanges
 let get_add_singular_macrostates_1 r = r.Remanent_parameters_sig.add_singular_macrostates
+let get_add_singular_microstates_1 r = r.Remanent_parameters_sig.add_singular_microstates
 let get_local_trace_prefix_1 r = r.Remanent_parameters_sig.trace_prefix
 let get_local_trace_directory_1 r = r.Remanent_parameters_sig.trace_directory
 
@@ -557,8 +560,12 @@ let get_compute_local_traces = upgrade_from_reachability_map_field get_compute_l
 let get_show_rule_names_in_local_traces = upgrade_from_reachability_map_field get_show_rule_names_in_local_traces_1
 let get_use_macrotransitions_in_local_traces = upgrade_from_reachability_map_field get_use_macrotransitions_in_local_traces_1
 let get_ignore_local_losanges = upgrade_from_reachability_map_field get_use_macrotransitions_in_local_traces_1
-let get_add_singular_macrostates = upgrade_from_reachability_map_field
-get_add_singular_macrostates_1
+let get_add_singular_macrostates =
+  upgrade_from_reachability_map_field
+    get_add_singular_macrostates_1
+let get_add_singular_microstates =
+      upgrade_from_reachability_map_field
+        get_add_singular_microstates_1
 let get_local_trace_prefix = upgrade_from_reachability_map_field get_local_trace_prefix_1
 let get_local_trace_directory = upgrade_from_reachability_map_field get_local_trace_directory_1
 let get_do_reachability_analysis p =

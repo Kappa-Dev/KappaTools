@@ -115,6 +115,7 @@ val get_show_rule_names_in_local_traces: Remanent_parameters_sig.parameters -> b
 val get_use_macrotransitions_in_local_traces: Remanent_parameters_sig.parameters -> bool
 val get_ignore_local_losanges: Remanent_parameters_sig.parameters -> bool
 val get_add_singular_macrostates: Remanent_parameters_sig.parameters -> bool
+val get_add_singular_microstates: Remanent_parameters_sig.parameters -> bool
 val get_local_trace_prefix: Remanent_parameters_sig.parameters -> string
 val get_local_trace_directory: Remanent_parameters_sig.parameters -> string
 
