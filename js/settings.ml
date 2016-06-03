@@ -74,19 +74,27 @@ let error_messages signal =
     ~a:[Tyxml_js.R.Html5.a_class
           (React.S.bind
              signal
-             (fun e -> React.S.const (match e with
-                                        [] -> ["panel-footer";"panel-pre"]
-                                      | _ -> ["panel-footer";"error-footer"]
-                                     ))
+             (fun e -> React.S.const
+               (match e with
+               | [] ->
+                 ["panel-footer";"panel-pre"]
+               | { severity = `Error ; _ }::_ ->
+                 ["panel-footer";"error-footer"]
+               | { severity = `Warning ; _ }::_ ->
+                 ["panel-footer";"warning-footer"]
+               ))
           )
        ]
     [Tyxml_js.R.Html5.pcdata
        (React.S.bind
           signal
-          (fun error -> React.S.const (match error with
-                                         [] -> ""
-                                       | h::_ -> h
-                                      ))
+          (fun error ->
+            React.S.const
+              (match error with
+              | [] -> ""
+              | h::_ -> h.ApiTypes.message
+              )
+          )
        )
     ]
 

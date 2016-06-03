@@ -191,3 +191,55 @@ let api_snapshot_site_graph
 
 let api_parse_is_empty (parse : Api_types.parse) =
   0 = Array.length parse.Api_types.contact_map
+
+let api_message_errors
+    ?(severity:Api_types.severity = `Error)
+     (message : string) : Api_types.errors =
+  [{ Api_types.severity = severity;
+     Api_types.message = message ;
+     Api_types.range = None }]
+
+let api_location_errors
+    ?(severity:Api_types.severity = `Error)
+    ((message,location) : string Location.annot) =
+  [{ Api_types.severity = severity;
+     Api_types.message = message ;
+     Api_types.range = Some (Location.to_range location) }]
+
+let api_exception_errors (e : exn) =
+  api_message_errors (Printexc.to_string e)
+
+let lwt_msg (msg : string) =
+  Lwt.return
+    (`Left (api_message_errors msg))
+let lwt_bind
+    (f : 'a -> 'b Api_types.result Lwt.t)
+    (result : 'a Api_types.result)
+    : 'b Api_types.result Lwt.t =
+  match result with
+    `Left l -> Lwt.return (`Left l)
+  | `Right r -> (f r)
+let lwt_ignore (result : 'a Api_types.result) =
+  match result with
+    `Left l -> Lwt.return_unit
+  | `Right r -> Lwt.return_unit
+
+let eq_position l r =
+  l.Api_types.chr = r.Api_types.chr
+  &&
+  l.Api_types.line = r.Api_types.line
+let eq_range l r =
+  match(l,r) with
+  | (None,None) -> true
+  | (Some l,Some r) ->
+    eq_position l.Api_types.from_position r.Api_types.from_position
+    && eq_position l.Api_types.to_position r.Api_types.to_position
+  | _ -> false
+let rec eq_errors  l r =
+  match (l,r) with
+  | ([],[]) -> true
+  | (l::l_tail,r::r_tail) ->
+      l.Api_types.message = r.Api_types.message
+      && eq_range l.Api_types.range r.Api_types.range
+      && eq_errors l_tail r_tail
+  | _ -> false

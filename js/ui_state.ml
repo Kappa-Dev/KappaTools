@@ -9,7 +9,7 @@ let model_parse , set_model_parse =
 let model_text, set_model_text =
   React.S.create ""
 let model_error, set_model_error =
-  React.S.create ([] : Api_types.error)
+  React.S.create ([] : ApiTypes.errors)
 let model_is_running , set_model_is_running =
   React.S.create false
 let model_max_events, set_model_max_events =
@@ -76,7 +76,7 @@ let set_runtime_url (url : string) (continuation : bool -> unit) : unit =
                     frame.XmlHttpRequest.code
                     url
                   in
-                  set_model_error [error_msg]
+                  set_model_error (Api_data.api_message_errors error_msg)
               in
               let () = continuation is_valid_server in
               Lwt.return_unit
@@ -147,7 +147,9 @@ let update_runtime_state
       on_error token =
   let do_update () =
     match !runtime_state with
-      None -> set_model_error ["Runtime not available"];
+      None ->
+        set_model_error
+          (Api_data.api_message_errors "Runtime not available");
     | Some runtime_state ->
        Lwt.async (fun () ->
                   if Lwt_switch.is_on thread_is_running then
@@ -188,26 +190,29 @@ let start_model ~start_continuation
                     Lwt_switch.turn_off thread_is_running
   in
   match !runtime_state with
-    None -> set_model_error ["Runtime not available"];
+    None ->
+      set_model_error
+        (Api_data.api_message_errors "Runtime not available");
             on_error ()
   | Some runtime_state ->
      let () = set_model_error [] in
      catch
        (fun () ->
         let () =
-          set_model_runtime_state (Some { plot = None;
-					  distances = None;
-                                          time = 0.0;
-                                          time_percentage = None;
-                                          event = 0;
-                                          event_percentage = None;
-                                          tracked_events = None;
-                                          log_messages = [];
-                                          snapshots = [];
-                                          flux_maps = [];
-                                          files = [];
-                                          is_running = true
-                                        }) in
+          set_model_runtime_state
+            (Some { plot = None;
+                    distances = None;
+                    time = 0.0;
+                    time_percentage = None;
+                    event = 0;
+                    event_percentage = None;
+                    tracked_events = None;
+                    log_messages = [];
+                    snapshots = [];
+                    flux_maps = [];
+                    files = [];
+                    is_running = true
+                  }) in
         (runtime_state#start { code = React.S.value model_text;
                                nb_plot = React.S.value model_nb_plot;
                                max_time = React.S.value model_max_time;
@@ -254,12 +259,18 @@ let start_model ~start_continuation
 
          | Invalid_argument error ->
             let message = Format.sprintf "Runtime error %s" error in
-            let () = set_model_error (message::[]) in
+            let () =
+              set_model_error
+                (Api_data.api_message_errors message)
+            in
             Lwt_switch.turn_off thread_is_running
             >>=
               (fun _ -> on_error ())
          | Sys_error message ->
-            let () = set_model_error (message::[]) in
+            let () =
+              set_model_error
+                (Api_data.api_message_errors message)
+            in
             Lwt_switch.turn_off thread_is_running
             >>=
               (fun _ -> on_error ())
@@ -268,7 +279,9 @@ let start_model ~start_continuation
        )
 
 let stop_model token = match !runtime_state with
-    None -> set_model_error ["Runtime not available"];
+    None ->
+      set_model_error
+        (Api_data.api_message_errors "Runtime not available");
   | Some runtime_state ->
      let () = Lwt.async (fun () -> (runtime_state#stop token)
                                    >>=

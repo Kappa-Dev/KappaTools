@@ -357,9 +357,8 @@ function Layout(contactMap,dimensions,margin){
 
           var distances = sites.map(function(site){
               var distances = absolute.map(function(point,i){
-                    var distance = that.contactMap.siteDistance(site,point);
-                  return { distance : distance ,
-                           id : i };
+                  var distance = that.contactMap.siteDistance(site,point);
+                  return { distance : distance , id : i };
               });
               distances.sort(function(l,r){ return l.distance - r.distance; });
               var result = { site : site ,

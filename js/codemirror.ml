@@ -190,7 +190,7 @@ let create_lint ~(message : string)
   in
   let () = (Js.Unsafe.coerce result)##severity <-
     match severity with
-      Error -> Js.string "error"
+    | Error -> Js.string "error"
     | Warning -> Js.string "warning"
   in
   let () = (Js.Unsafe.coerce result)##from <- from in
