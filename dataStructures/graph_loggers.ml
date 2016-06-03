@@ -40,9 +40,9 @@ let dot_color_encoding x =
     with
     | Red -> "#f00"
     | Green -> "#0f0"
-    | White -> "#000"
+    | White -> "#fff"
     | Blue -> "#00f"
-    | Black -> "#fff"
+    | Black -> "#000"
     | LightSkyBlue -> "#8ce"
     | PaleGreen -> "#9f9"
 
@@ -286,11 +286,11 @@ let shape_in_html shape =
     match
       shape
     with
-    | Invisible -> None
+    | Invisible -> Some "style: \"visibility:hidden\""
     | House -> Some "shape: \"house\""
     | Rect -> Some "shape: \"rect\""
     | Ellipse -> Some "shape: \"ellipse\""
-    | Circle -> Some "shape: \"circle\"s"
+    | Circle -> Some "shape: \"ellipse\""
 
 let string_one_of_linestyle_in_dot _ = "-"
 let string_two_of_linestyle_in_dot _ = "--"
@@ -724,10 +724,12 @@ let print_one_to_n_relation
   =
   let fictitious = "Fictitious_"^id in
   let directives_fict =
-    if style_one = Plain
-    then
-      directives
-    else
+    match
+      Loggers.get_encoding_format logger
+    with
+    | Loggers.HTML_Graph ->
+      List.rev ((Label "")::(Shape Circle)::(Width 0)::(Height 0)::(FillColor Black)::(List.rev directives))
+    | Loggers.HTML | Loggers.TXT | Loggers.DOT | Loggers.HTML_Tabular | Loggers.TXT_Tabular | Loggers.XLS ->
       List.rev ((Label "")::(Shape Invisible)::(Width 0)::(Height 0)::(List.rev directives))
   in
   let directives_one =
