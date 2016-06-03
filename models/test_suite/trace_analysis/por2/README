@@ -1,2 +1,3 @@
 #Command-line:
 "${KAPPABIN}"KaSa relations.ka --compute-local-traces --output-directory output --use-macrotransitions-in-local-traces --add-singular-macrostates || exit 0 
+"${KAPPABIN}"KaSa relations.ka --compute-local-traces --output-directory output --use-macrotransitions-in-local-traces --add-singular-macrostates --local-traces-format HTML || exit 0 

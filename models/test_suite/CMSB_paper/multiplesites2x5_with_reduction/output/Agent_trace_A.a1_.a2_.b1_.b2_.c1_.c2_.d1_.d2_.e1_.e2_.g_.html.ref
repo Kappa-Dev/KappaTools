@@ -21,8 +21,8 @@
   <script>
   // Create a new directed graph
   var g = new dagreD3.graphlib.Graph().setGraph({});
-  g.setNode(1, { label: "", width: "0", height: "0" });
-  g.setNode(1, { label: "", width: "0", height: "0" });
+  g.setNode(1, { label: "", style: "visibility:hidden", width: "0", height: "0" });
+  g.setNode(1, { label: "", style: "visibility:hidden", width: "0", height: "0" });
   g.setNode(2, { label: "A(a1~p,a2~p,b1~p,b2~p,c1~p,c2~p,d1~p,d2~p,e1~p,e2~p,g~p)" });
   g.setNode(3, { label: "A(a1~p,a2~p,b1~p,b2~p,c1~p,c2~p,d1~p,d2~p,e1~p,e2~p,g~u)" });
   g.setNode(4, { label: "A(e1~p,e2~p,g~u)" });
@@ -65,14 +65,14 @@
   g.setEdge(18,17,{ label: "rule 1" });
   g.setEdge(1,19,{ label: "rule 0" });
   g.setEdge(1,19,{ label: "" });
-  g.setNode(20, { label: "", width: "0", height: "0" });
+  g.setNode(20, { label: "", shape: "ellipse", width: "0", height: "0", style: "fill: #000"  });
   g.setEdge(20,19,{  });
   g.setEdge(20,6,{  });
   g.setEdge(20,18,{  });
   g.setEdge(20,15,{  });
   g.setEdge(20,12,{  });
   g.setEdge(20,9,{  });
-  g.setNode(21, { label: "", width: "0", height: "0" });
+  g.setNode(21, { label: "", shape: "ellipse", width: "0", height: "0", style: "fill: #000"  });
   g.setEdge(21,3,{  });
   g.setEdge(21,16,{  });
   g.setEdge(21,13,{  });
