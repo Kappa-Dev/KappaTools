@@ -212,7 +212,7 @@ let onload () : unit =
       textarea
       configuration in
   let () = setup_lint codemirror update_linting in
-
+  let _ = Lwt_js_events.async (initialize codemirror) in
   let timeout : Dom_html.timeout_id option ref = ref None in
   let handler = fun codemirror change ->
     let () = has_been_modified := true in
