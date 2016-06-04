@@ -5,7 +5,6 @@ body { margin-bottom: 60px; }
 
 
 span.filler:empty:before {
-   content: "\00a0";
 }
 
 .plot-axis path,
@@ -44,7 +43,6 @@ rect { stroke-width: 2; }
 
 .numberCircle:before,
 .numberCircle:after {
-    content:'\200B';
     display:inline-block;
     line-height:0px;
 
@@ -107,8 +105,7 @@ rect { stroke-width: 2; }
 .site-rect {  stroke-width:1;
               stroke: #000;
 }
-.site-text {
-}
+.site-text { font: sans-serif; }
 
 .node-proof { opacity : 0.0;
             }
