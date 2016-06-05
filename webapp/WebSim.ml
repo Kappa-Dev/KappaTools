@@ -41,8 +41,8 @@ let server_respond (body : string) =
 
 let result_response string_of_success result =
   match result with
-    `Left error ->
-    let error_msg : string = ApiTypes.string_of_error error in
+    `Left errors ->
+    let error_msg : string = ApiTypes.string_of_errors errors in
     (log error_msg)
     >>=
       (fun _ ->
@@ -193,22 +193,21 @@ let handler
   (* POST /process *)
   | "/v1/process" when request.meth = `POST ->
     (Cohttp_lwt_body.to_string body)
-     >>= (fun body ->
-       (try let parameter : ApiTypes.parameter =
-              ApiTypes.parameter_of_string body
-            in
-            runtime_state#start parameter
+      >>= (fun body ->
+          (try let parameter : ApiTypes.parameter =
+                 ApiTypes.parameter_of_string body in
+               runtime_state#start parameter
            with  Yojson.Json_error error ->
-             Lwt.return (`Left [error])
+                  Api_data.lwt_msg error
            | Ag_oj_run.Error error ->
-             Lwt.return (`Left [error])
+                  Api_data.lwt_msg error
            | e ->
-             Lwt.return (`Left [Printexc.to_string e])
-       )
-       >>=
-         (fun token -> result_response ApiTypes.string_of_token token)
+                  Api_data.lwt_msg (Printexc.to_string e)
+          )
+          >>=
+            (fun token -> result_response ApiTypes.string_of_token token)
 
-     )
+      )
   (* OPTIONS /v1/process/[token] *)
   | x when request.meth = `OPTIONS && None != get_token x ->
        let h =
