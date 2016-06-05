@@ -4,12 +4,9 @@ module UIState = Ui_state
 
 open Js_plot
 
-let div_id              = "plot-div"
 let div_axis_select_id  = "plot-axis-select"
-let export_filename_id  = "plot-export-filename"
-let export_button_id    = "plot-export-button"
-let export_format_id    = "export-file-format"
-let div_id              = "plot-div"
+let display_id = "plot-display"
+let export_id = "plot-export"
 
 let state_plot state =
   match state with
@@ -20,6 +17,47 @@ let state_plot state =
     | Some { ApiTypes.observables = [] ; _ } -> None
     | _ -> state.ApiTypes.plot
     )
+
+let configuration : Widget_export.configuration =
+  { Widget_export.id = export_id
+  ; Widget_export.handlers =
+      [ Widget_export.export_svg ~svg_div_id:display_id ()
+      ; Widget_export.export_png ~svg_div_id:display_id ()
+      ; Widget_export.export_json
+        ~serialize_json:(fun () ->
+          (match
+              state_plot (React.S.value UIState.model_runtime_state)
+           with
+              | None -> "null"
+              | Some plot -> ApiTypes.string_of_plot plot
+          )
+        )
+      ; { Widget_export.suffix = "tsv"
+        ; Widget_export.label = "tsv"
+        ; Widget_export.export =
+          fun (filename : string) ->
+            let data =
+              match
+                state_plot (React.S.value UIState.model_runtime_state)
+              with
+                | None -> ""
+                | Some p -> Api_data.plot_tsv p
+            in
+            Common.saveFile
+              ~data:data
+              ~mime:"text/tab-separated-values"
+              ~filename:filename
+        }
+      ];
+    show = React.S.map
+           (fun state ->
+             match state_plot state with
+             | None -> false
+             | Some _ -> true
+           )
+           UIState.model_runtime_state
+
+  }
 
 let content =
   let plot_show_legend =
@@ -39,11 +77,7 @@ let content =
                    ; Html5.a_input_type `Checkbox
                    ] () in
   let export_controls =
-    Display_common.export_controls
-      ~export_select_id:export_format_id
-      ~export_filename_id:export_filename_id
-      ~export_button_id:export_button_id
-      ~export_data_label:"tsv"
+    Widget_export.content configuration
   in
   <:html5<<div>
       <div class="row">
@@ -52,7 +86,7 @@ let content =
           </div>
       </div>
       <div class="row">
-        <div id="plot-div" class="col-sm-12"></div>
+        <div $list:Html5.a_id display_id$ class="col-sm-12"></div>
       </div>
       <div class="row">
 
@@ -100,7 +134,7 @@ let update_plot
   | Some data ->
     let div : Dom_html.element Js.t =
       Js.Opt.get (Display_common.document##getElementById
-                    (Js.string div_id))
+                    (Js.string display_id))
         (fun () -> assert false) in
     let width = max 400 (div##offsetWidth - 20)  in
     let height = width/2 in
@@ -114,9 +148,10 @@ let update_plot
     plot##setPlot(data)
 
 let onload () =
+  let () = Widget_export.onload configuration in
   let configuration : plot_configuration Js.t =
     Js_plot.create_configuration
-      ~plot_div_id:div_id
+      ~plot_div_id:display_id
       ~plot_div_select_id:div_axis_select_id
       ~plot_label_div_id:"plot-label-div"
       ~plot_style_id:"plot-svg-style"
@@ -126,20 +161,6 @@ let onload () =
   in
   let plot : observable_plot Js.t =
     Js_plot.create_observable_plot configuration in
-  let () =
-    Display_common.save_plot_ui
-      (fun f ->
-        let filename = Js.string f in
-        let () = plot##setPlotName(filename) in
-        plot##handlePlotTSV(())
-      )
-      "kappa plot"
-      export_button_id
-      export_filename_id
-      export_format_id
-      div_id
-      "tsv"
-  in
   (* The elements size themselves using the div's if they are hidden
      it will default to size zero.  so they need to be sized when shown.
   *)

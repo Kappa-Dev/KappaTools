@@ -21,6 +21,22 @@ let plot_pg_store ~plot
           plot.Api_types.observables
     }
 
+let plot_tsv (plot : Api_types.plot) : string =
+  String.concat "\n"
+    ((String.concat
+        ","
+        ("time"::plot.Api_types.legend))::
+        (List.map
+           (fun (observable : Api_types.observable) ->
+             String.concat ","
+               (List.map string_of_float
+                  (observable.Api_types.time::observable.Api_types.values)
+               )
+           )
+           plot.Api_types.observables)
+    )
+
+
 let api_file_line (file_line : Data.file_line) : Api_types.file_line =
   { Api_types.file_name = file_line.Data.file_name
   ; Api_types.line = file_line.Data.line
@@ -129,6 +145,7 @@ let api_snapshot sigs (snapshot : Data.snapshot) : Api_types.snapshot =
                (Array.to_list snapshot.Data.tokens)
   }
 
+
 let find_link cm (a,s) =
   let rec auxs i j = function
     | [] -> raise Not_found
@@ -188,6 +205,191 @@ let api_snapshot_site_graph
        [snapshot.Api_types.agents;
         let offset = List.length snapshot.Api_types.agents in
         offset_site_graph offset snapshot.Api_types.tokens])
+
+(* map out *)
+module EdgeMap =
+  Map.Make(struct type t = (int * int) * (int * int)
+                  let compare = compare
+  end)
+
+
+
+let api_snapshot_kappa (snapshot : Api_types.snapshot) =
+  (*let () = print_string (Api_types.string_of_snapshot snapshot) in *)
+  let normalize_edge
+      ((l,r) : (int * int) * (int * int)) : (int * int) * (int * int) =
+    if (l < r) then (l,r) else (r,l)
+  in
+(*
+  let debug_edge
+      (label : string)
+      (((a,b),(c,d)) : (int * int) * (int * int)) : unit =
+    print_string
+      (Format.sprintf
+         "\n%s ((%d,%d),(%d,%d))\n"
+         label a b c d)
+  in
+*)
+  let site_nodes : ApiTypes_t.site_node list =
+    Array.to_list (api_snapshot_site_graph snapshot)
+  in
+  let components_index : (int * ApiTypes_t.site_node) array =
+    Array.of_list
+      (List.mapi (fun index site_node -> (index,site_node)) site_nodes)
+  in
+  let edge_index : int EdgeMap.t =
+    List.fold_left
+      (fun index ((agent_id,site_node) : int * ApiTypes_t.site_node) ->
+        let edges : ((int * int) * (int * int)) list =
+          List.flatten
+          (List.mapi
+            (fun (site_id : int) (site : ApiTypes_t.site) ->
+              List.map
+                (fun link -> ((agent_id,site_id),link))
+                site.ApiTypes_t.site_links
+            )
+            (Array.to_list site_node.ApiTypes_t.node_sites)
+          )
+        in
+        (* let () = List.iter (debug_edge "edges") edges in *)
+        List.fold_left
+          (fun index edge ->
+            let edge = normalize_edge edge in
+            (* let () = debug_edge "populate" edge in *)
+            EdgeMap.add
+              edge
+              (EdgeMap.cardinal index)
+              index
+          )
+          index
+          edges
+      )
+      EdgeMap.empty
+      (Array.to_list components_index)
+  in
+  (* let () = print_string "(EdgeMap.cardinal edge_index)" in *)
+  (* let () = print_int (EdgeMap.cardinal edge_index) in *)
+  (* index the connected components *)
+  let update_site
+      (new_component_id : int)
+      (location : int) : unit =
+    let old_component_id : int =
+      fst (Array.get components_index location)
+    in
+    Array.iteri
+      (fun i (current_component_id,current_site_node) ->
+        if current_component_id = old_component_id then
+          Array.set
+            components_index
+            i
+            (new_component_id,current_site_node)
+        else
+          ()
+      )
+      components_index
+  in
+  (* list of id's of connected components *)
+  let components_ids : int list =
+    Mods.IntSet.elements
+      (List.fold_left
+         (fun set elem -> Mods.IntSet.add (fst elem) set)
+         Mods.IntSet.empty
+         (Array.to_list components_index))
+  in
+  (* get components *)
+  let agent_components id : (int * ApiTypes_t.site_node) list =
+    List.map
+      snd
+      (List.filter
+         fst
+         (List.mapi
+            (fun index (component_id,site_node) ->
+              (component_id = id,(index,site_node))
+            )
+            (Array.to_list components_index)
+          : (bool * (int * ApiTypes_t.site_node)) list)
+       : (bool * (int * ApiTypes_t.site_node)) list)
+  in
+  let render_agent (_,(site_node : ApiTypes_t.site_node)) : string =
+    let agent_label  = site_node.ApiTypes_t.node_name in
+    let site_label =
+      String.concat
+        ","
+        (List.map
+           (fun site_node -> site_node.ApiTypes_t.site_name)
+           (Array.to_list site_node.ApiTypes_t.node_sites))
+    in
+    Format.sprintf "%s(%s)" agent_label site_label in
+  let render_component
+      (connected_component : (int * ApiTypes_t.site_node) list) : string =
+    String.concat
+      ","
+      (List.map
+         (fun (agent_id,site_node) ->
+           let agent_label = site_node.ApiTypes_t.node_name in
+           let site_label =
+             String.concat
+               ","
+               (List.mapi
+                  (fun site_id site_node ->
+                    site_node.ApiTypes_t.site_name
+                      ^
+                      (String.concat
+                         ""
+                         (List.map
+                            (fun link ->
+                              let edge_id : (int * int) * (int * int) =
+                                  normalize_edge
+                                  ((agent_id,site_id),link)
+                              in
+                              (* let () = debug_edge "lookup" edge_id in *)
+                              let link_id : int =
+                                EdgeMap.find
+                                  edge_id
+                                  edge_index
+                             in
+                              "!"^(string_of_int link_id)
+                            )
+                            site_node.ApiTypes_t.site_links))
+                  )
+                  (Array.to_list site_node.ApiTypes_t.node_sites))
+           in
+           Format.sprintf "%s(%s)" agent_label site_label
+         )
+         connected_component
+      )
+  in
+  let () =
+    List.iteri
+      (fun index site_node ->
+        Array.iter
+          (fun (site : Api_types.site) ->
+            List.iter
+              (update_site index)
+              (List.map fst site.Api_types.site_links)
+          )
+          site_node.Api_types.node_sites
+      )
+      site_nodes
+  in
+  String.concat
+    "\n"
+    (List.map
+       (fun (component : (int * ApiTypes_t.site_node) list) ->
+         match component with
+           | (agent_id,
+              { Api_types.node_quantity = Some node_quantity
+              ; _ })::tail ->
+             Format.sprintf "%%init: %f %s"
+               node_quantity
+               (match tail with
+               | [] -> render_agent (List.hd component)
+               | _ -> render_component component)
+           | _ -> ""
+       )
+       (List.map
+          agent_components
+          components_ids))
 
 let api_parse_is_empty (parse : Api_types.parse) =
   0 = Array.length parse.Api_types.contact_map

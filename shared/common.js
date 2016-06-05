@@ -43,9 +43,13 @@ var args = function () {
 // in the url place level=debug for most verbose
 (function(){
     var found = false;
+    window.level = {};
+
     var levels = ["debug","info","notice","warning","error","fatal" ];
     for (var i in levels){
         var level = levels[i];
+        // allow other modules to access levels via window.level[level]
+        window.level[level] = level;
         if(args.level && args.level === level) { found = true; }
         if(found) {
             window[level] = function(x){

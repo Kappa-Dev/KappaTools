@@ -4,6 +4,8 @@ module UIState = Ui_state
 open ApiTypes
 
 let select_id = "output-select-id"
+let display_id = "contact-map-display"
+let export_id = "contact-export"
 
 let current_file, set_current_file =
   React.S.create (None : (string option * string list) option)
@@ -40,7 +42,9 @@ let state_outputs state : (string option * string list) list =
       []
       state.ApiTypes.files
 
-let navli = Display_common.badge (fun state -> List.length (state_outputs state))
+let navli =
+  Display_common.badge
+    (fun state -> List.length (state_outputs state))
 
 let content =
   let select =

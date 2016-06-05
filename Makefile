@@ -40,6 +40,7 @@ RESOURCE=generated/resource_strings.ml
 GENERATED=$(VERSION) \
 	  $(RESOURCE) \
 	  generated/ApiTypes_t.ml generated/ApiTypes_j.ml \
+	  generated/api_types_t.ml generated/api_types_j.ml \
 	  generated/WebMessage_t.ml generated/WebMessage_j.ml
 
 generated:
@@ -51,13 +52,19 @@ generated/ApiTypes_t.ml: api/ApiTypes.atd generated
 generated/ApiTypes_j.ml: api/ApiTypes.atd generated
 	atdgen -j -j-std -o generated/ApiTypes api/ApiTypes.atd
 
+generated/api_types_t.ml: api/api_types.atd generated
+	atdgen -t -o generated/api_types api/api_types.atd
+
+generated/api_types_j.ml: api/api_types.atd generated
+	atdgen -j -j-std -o generated/api_types api/api_types.atd
+
 generated/WebMessage_t.ml: js/WebMessage.atd generated
 	atdgen -t -o generated/WebMessage js/WebMessage.atd
 
 generated/WebMessage_j.ml: js/WebMessage.atd generated
 	atdgen -j -j-std -o generated/WebMessage js/WebMessage.atd
 
-$(RESOURCE): shared/flux.js shared/plot.js shared/common.js js/JsSim.css
+$(RESOURCE): shared/flux.js shared/plot.js shared/common.js js/JsSim.css api/test_message.json
 	./dev/generate-string.sh $^  > $@
 
 $(VERSION): main/version.ml.skel $(wildcard .git/refs/heads/*) generated
@@ -91,8 +98,12 @@ site/JsSim.js: JsSim.byte site/external
 site/WebWorker.js: WebWorker.byte
 	js_of_ocaml --debuginfo --pretty "+nat.js" _build/js/$< -o $@
 
-test:
-	cat js/no-cdn.html | sed s/RANDOM_NUMBER/$(RANDOM_NUMBER)/g > site/index.html
+ounit: TestJsSim TestWebSim
+
+TestJsSim: TestJsSim.byte
+	./TestJsSim.byte
+TestWebSim: TestWebSim.byte
+	./TestWebSim.byte -runner sequential
 
 site/index.html: site js/no-cdn.html js/use-cdn.html site/JsSim.js site/WebWorker.js js/*.js shared/*.js js/favicon.ico js/*.css
 ifeq ($(NO_CDN),1)
@@ -110,6 +121,23 @@ JsSim.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(GENERATED)
 	-tag-line "<api/*> : package(lwt),package(atdgen)" \
 	-tag-line "<js/*> : thread, package(atdgen), package(js_of_ocaml.tyxml), package(js_of_ocaml.syntax), package(tyxml.syntax), package(lwt), syntax(camlp4o)" \
 	$@
+
+TestJsSim.byte: $(filter-out webapp/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
+	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
+	-tag debug -I js -I api \
+	-tag-line "<generated/*> : package(atdgen)" \
+	-tag-line "<api/*> : package(lwt),package(atdgen), package(qcheck.ounit)" \
+	-tag-line "<js/*> : thread, package(qcheck.ounit), package(atdgen), package(js_of_ocaml), package(js_of_ocaml.syntax), package(lwt), syntax(camlp4o)" \
+	$@
+
+TestWebSim.byte: $(filter-out webapp/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
+	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
+	-tag debug -I webapp -I api \
+	-tag-line "<generated/*> : package(atdgen)" \
+	-tag-line "<api/*> : package(lwt),package(atdgen), package(qcheck.ounit)" \
+	-tag-line "<webapp/*> : thread, package(atdgen), package(qcheck.ounit), package(cohttp.lwt), package(re), package(re.perl)" \
+	$@
+
 
 WebWorker.byte: $(filter-out webapp/,$(filter-out _build/,$(wildcard */*.ml*))) $(GENERATED)
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \

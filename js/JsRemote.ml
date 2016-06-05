@@ -6,17 +6,25 @@ module Api_types = ApiTypes_j
 exception BadResponseCode of int
 exception TimeOut
 
-let hydrate (type a)
-            (frame:((Js.js_string Js.t) XmlHttpRequest.generic_http_frame))
-            (success:(string -> a))
-            (fail:(string -> Api_types.errors))
+let hydrate
+    (type a)
+    (frame:((Js.js_string Js.t) XmlHttpRequest.generic_http_frame))
+    (success:(string -> a))
+    (fail:(string -> Api_types.errors))
     : a Api_types.result Lwt.t =
-     if frame.code = 200 then
-       Lwt.return (`Right (success (Js.to_string frame.content)))
-     else if frame.code = 400 then
-       Lwt.return (`Left (fail (Js.to_string frame.content)))
-     else
-       Lwt.fail (BadResponseCode frame.code)
+  if frame.code = 200 then
+    Lwt.return
+      (`Right
+          (success
+             (Js.to_string frame.content)))
+  else if frame.code = 400 then
+    Lwt.return
+      (`Left
+          (fail
+             (Js.to_string frame.content)))
+  else
+    Lwt.fail
+      (BadResponseCode frame.code)
 
 
 let post
@@ -38,7 +46,8 @@ let post
     let request : XmlHttpRequest.xmlHttpRequest Js.t =
       XmlHttpRequest.create()
     in
-    let () = request##_open(Js.string "POST",Js.string url, Js._true) in
+    let () =
+      request##_open(Js.string "POST",Js.string url, Js._true) in
     let () =
       request##setRequestHeader
         (Js.string "Content-type"
@@ -47,7 +56,8 @@ let post
       request##onload <-
         Dom.handler
         (fun e ->
-          let msg : string = Js.to_string request##responseText in
+          let msg : string =
+            Js.to_string request##responseText in
           let () = Lwt.async  (fun () ->
             let result : a Api_types.result =
               if request##status == 200 then
@@ -94,6 +104,23 @@ object(self)
         (`Left
             (Api_data.api_message_errors
                (Printexc.to_string e)))
+
+  method info () :
+    Api_types_j.info Api_types.result Lwt.t =
+    let url : string = Format.sprintf "%s" url in
+    (XmlHttpRequest.perform_raw
+       ~get_args:[]
+       ~override_method:`GET
+       ~response_type:Text
+       url)
+    >>=
+      (fun frame ->
+        self#hydrate
+          frame
+          Api_types_j.info_of_string
+          Api_types.errors_of_string)
+
+
   method parse (code : Api_types.code) :
     Api_types.parse Api_types.result Lwt.t =
     let url : string = Format.sprintf "%s/v1/parse" url  in
@@ -107,7 +134,8 @@ object(self)
                             Api_types.parse_of_string
                             Api_types.errors_of_string)
 
-  method start (parameter : Api_types.parameter) : Api_types.token Api_types.result Lwt.t =
+  method start (parameter : Api_types.parameter) :
+    Api_types.token Api_types.result Lwt.t =
     let url : string = Format.sprintf "%s/v1/process" url in
     (post timeout
           (Api_types.string_of_parameter parameter)
@@ -116,7 +144,8 @@ object(self)
           Api_types.errors_of_string
     )
 
-  method status (token : Api_types.token) : Api_types.state Api_types.result Lwt.t =
+  method status (token : Api_types.token) :
+    Api_types.state Api_types.result Lwt.t =
     let url : string = Format.sprintf "%s/v1/process/%d" url token  in
     (XmlHttpRequest.perform_raw
        ~get_args:[]

@@ -4,6 +4,12 @@ module Html5 = Tyxml_js.Html5
 
 let navli = []
 
+let state_log
+    (state : ApiTypes.state option) : string list =
+  match state with
+  | None -> []
+  | Some state -> state.ApiTypes.log_messages
+
 let navcontent =
   [ Html5.div
       ~a:[Html5.a_class ["panel-pre" ]]
@@ -11,9 +17,11 @@ let navcontent =
           (React.S.bind
              UIState.model_runtime_state
              (fun state -> React.S.const
-               (match (state : ApiTypes.state option) with
-                 Some state -> String.concat "" state.ApiTypes.log_messages
-               | _ -> ""
-               ))) ]
+               (String.concat ""
+                  (state_log state)
+               )
+             )
+          )
+      ]
   ]
 let onload () = ()

@@ -1,6 +1,5 @@
 open Lwt.Infix
-module Api_types = ApiTypes_j
-open ApiTypes_j
+module ApiTypes = ApiTypes_j
 
 let msg_process_not_running =
   "process not running"
@@ -9,32 +8,57 @@ let msg_token_not_found =
 let msg_observables_less_than_zero =
   "Plot observables must be greater than zero"
 
-let time_yield (seconds : float)
-               (yield : (unit -> unit Lwt.t)) : (unit -> unit Lwt.t) =
+let time_yield
+    (seconds : float)
+    (yield : (unit -> unit Lwt.t)) : (unit -> unit Lwt.t) =
   let lastyield = ref (Sys.time ()) in
-  fun () -> let t = Sys.time () in
-            if t -. !lastyield > seconds then
-              let () = lastyield := t in
-              yield ()
-            else Lwt.return_unit
+  fun () ->
+    let t = Sys.time () in
+    if t -. !lastyield > seconds then
+      let () = lastyield := t in
+      yield ()
+    else Lwt.return_unit
 
 let () = Printexc.record_backtrace true
 
 type runtime =
-  < parse : Api_types.code -> Api_types.parse Api_types.result Lwt.t;
-  start : Api_types.parameter -> Api_types.token Api_types.result Lwt.t;
-  status : Api_types.token -> Api_types.state Api_types.result Lwt.t;
-  list : unit -> Api_types.catalog Api_types.result Lwt.t;
-  stop : Api_types.token -> unit Api_types.result Lwt.t >;;
+  < info : unit -> Api_types_j.info ApiTypes.result Lwt.t;
+    parse : ApiTypes.code -> ApiTypes.parse ApiTypes.result Lwt.t;
+    start : ApiTypes.parameter -> ApiTypes.token ApiTypes.result Lwt.t;
+    status : ApiTypes.token -> ApiTypes.state ApiTypes.result Lwt.t;
+    list : unit -> ApiTypes.catalog ApiTypes.result Lwt.t;
+    stop : ApiTypes.token -> unit ApiTypes.result Lwt.t;
+  >;;
 
 module Base : sig
+
+  class session :
+  object
+    method sessionList :
+      unit ->
+        string list ApiTypes_j.result Lwt.t
+    method sessionCreate :
+      sessoinId:string ->
+        unit ApiTypes_j.result Lwt.t
+    method sessionDelete :
+      sessoinId:string ->
+        unit ApiTypes_j.result Lwt.t
+    method sessionFeedback :
+      sessoinId:string ->
+        message:string ->
+          unit ApiTypes_j.result Lwt.t
+  end;;
+
+
   class virtual runtime :
   object
-    method parse : Api_types.code -> Api_types.parse Api_types.result Lwt.t
-    method start : Api_types.parameter -> Api_types.token Api_types.result Lwt.t
-    method status : Api_types.token -> Api_types.state Api_types.result Lwt.t
-    method list : unit -> Api_types.catalog Api_types.result Lwt.t
-    method stop : Api_types.token -> unit Api_types.result Lwt.t
+    inherit session
+    method info : unit -> Api_types_j.info ApiTypes.result Lwt.t
+    method parse : ApiTypes.code -> ApiTypes.parse ApiTypes.result Lwt.t
+    method start : ApiTypes.parameter -> ApiTypes.token ApiTypes.result Lwt.t
+    method status : ApiTypes.token -> ApiTypes.state ApiTypes.result Lwt.t
+    method list : unit -> ApiTypes.catalog ApiTypes.result Lwt.t
+    method stop : ApiTypes.token -> unit ApiTypes.result Lwt.t
     method virtual log : ?exn:exn -> string -> unit Lwt.t
     method virtual yield : unit -> unit Lwt.t
   end;;
@@ -44,12 +68,12 @@ end = struct
     { switch : Lwt_switch.t
     ; counter : Counter.t
     ; log_buffer : Buffer.t
-    ; plot : Api_types.plot ref
-    ; distances : Api_types.distances ref
-    ; snapshots : Api_types.snapshot list ref
-    ; flux_maps : Api_types.flux_map list ref
-    ; files : Api_types.file_line list ref
-    ; error_messages : Api_types.errors ref
+    ; plot : ApiTypes.plot ref
+    ; distances : ApiTypes.distances ref
+    ; snapshots : ApiTypes.snapshot list ref
+    ; flux_maps : ApiTypes.flux_map list ref
+    ; files : ApiTypes.file_line list ref
+    ; error_messages : ApiTypes.errors ref
     }
   type context = { states : simulator_state IntMap.t
                  ; id : int }
@@ -97,21 +121,57 @@ end = struct
         | exn -> log ~exn "" >>=
                    (fun () -> Lwt.fail exn))
 
+  class session =
+    object(self)
+      val mutable state : (string * unit) list =  []
+      method sessionList () :
+        string list ApiTypes_j.result Lwt.t =
+        Lwt.return (`Right (List.map fst state))
+
+      method sessionCreate
+        ~(sessoinId:string) :
+        unit ApiTypes_j.result Lwt.t =
+      failwith ""
+
+      method sessionDelete
+        ~(sessoinId:string) :
+        unit ApiTypes_j.result Lwt.t =
+        failwith ""
+
+      method sessionFeedback
+        ~(sessoinId:string)
+        ~(message:string) :
+        unit ApiTypes_j.result Lwt.t =
+        failwith ""
+
+  end;;
   class virtual runtime =
   object(self)
+    inherit session
   method virtual log : ?exn:exn -> string -> unit Lwt.t
   method virtual yield : unit -> unit Lwt.t
   val mutable context = { states = IntMap.empty
-                         ; id = 0 }
+                        ; id = 0 }
+  (* not sure if this is good *)
+  val start_time : float = Sys.time()
+
+  method info () : Api_types_j.info ApiTypes.result Lwt.t =
+    Lwt.return
+      (`Right
+          { Api_types_j.uptime  = (Sys.time() -. start_time) ;
+            Api_types_j.processes = IntMap.size context.states;
+            Api_types_j.build = Version.version_msg })
+
     method parse
-      (code : Api_types.code) : Api_types.parse Api_types.result Lwt.t =
+      (code : ApiTypes.code) : ApiTypes.parse ApiTypes.result Lwt.t =
       Lwt.bind
         (build_ast code self#yield self#log)
         (function
           | `Right (_,contact_map) ->
              Lwt.return
-               (`Right { Api_types.contact_map =
-                           Api_data.api_contact_map contact_map })
+               (`Right
+                   { ApiTypes.contact_map =
+                       Api_data.api_contact_map contact_map })
           | `Left e -> Lwt.return (`Left e))
 
     method private new_id () : int =
@@ -120,27 +180,27 @@ end = struct
       result
 
     method start
-      (parameter : Api_types.parameter) :
-      Api_types.token Api_types.result Lwt.t =
-      if parameter.nb_plot > 0 then
+      (parameter : ApiTypes.parameter) :
+      ApiTypes.token ApiTypes.result Lwt.t =
+      if parameter.ApiTypes.nb_plot > 0 then
         let current_id = self#new_id () in
-        let plot : Api_types.plot ref =
-          ref { Api_types.legend = []
-              ; Api_types.observables = [] }
+        let plot : ApiTypes.plot ref =
+          ref { ApiTypes.legend = []
+              ; ApiTypes.observables = [] }
         in
-        let distances : Api_types.distances ref = ref [] in
-        let error_messages : Api_types.errors ref = ref [] in
-        let snapshots : Api_types.snapshot list ref = ref [] in
-        let flux_maps : Api_types.flux_map list ref = ref [] in
-        let files : Api_types.file_line list ref = ref [] in
+        let distances : ApiTypes.distances ref = ref [] in
+        let error_messages : ApiTypes.errors ref = ref [] in
+        let snapshots : ApiTypes.snapshot list ref = ref [] in
+        let flux_maps : ApiTypes.flux_map list ref = ref [] in
+        let files : ApiTypes.file_line list ref = ref [] in
         let simulation =
           { switch = Lwt_switch.create ()
           ; counter = Counter.create
               ~init_t:(0. : float)
               ~init_e:(0 : int)
-              ?max_t:parameter.max_time
-              ?max_e:parameter.max_events
-              ~nb_points:(parameter.nb_plot : int)
+              ?max_t:parameter.ApiTypes.max_time
+              ?max_e:parameter.ApiTypes.max_events
+              ~nb_points:(parameter.ApiTypes.nb_plot : int)
           ; log_buffer = Buffer.create 512
           ; plot = plot
           ; distances = distances
@@ -152,20 +212,23 @@ end = struct
         let () =
           context <-
             { context with
-              states = IntMap.add current_id simulation context.states } in
-        let log_form = Format.formatter_of_buffer simulation.log_buffer in
+              states =
+                IntMap.add current_id simulation context.states } in
+        let log_form =
+          Format.formatter_of_buffer simulation.log_buffer in
         let () = Counter.reinitialize simulation.counter in
-        let outputs sigs = function
+        let outputs sigs =
+          function
           | Data.Flux flux_map ->
              flux_maps := ((Api_data.api_flux_map flux_map)::!flux_maps)
           | Data.Plot (time,new_observables) ->
              let new_values =
                List.map (fun nbr -> Nbr.to_float nbr)
                         (Array.to_list new_observables) in
-             plot := {!plot with Api_types.observables =
-                                   { Api_types.time = time ;
+             plot := {!plot with ApiTypes.observables =
+                                   { ApiTypes.time = time ;
                                      values = new_values }
-                                   :: !plot.Api_types.observables }
+                                   :: !plot.ApiTypes.observables }
           | Data.Print file_line ->
              files := ((Api_data.api_file_line file_line)::!files)
           | Data.Snapshot snapshot ->
@@ -178,11 +241,12 @@ end = struct
                      match a with
                      | Some ls ->
                         let add_rule_id =
-                          List.map (fun (t,d) ->
-                                    {Api_types.rule_dist =
-                                       unary_distances.Data.distances_rules.(i);
-                                     Api_types.time_dist = t;
-                                     Api_types.dist = d}) ls
+                          List.map
+                            (fun (t,d) ->
+                              {ApiTypes.rule_dist =
+                                  unary_distances.Data.distances_rules.(i);
+                               ApiTypes.time_dist = t;
+                               ApiTypes.dist = d}) ls
                         in (List.append l add_rule_id, i+1)
                      | None -> (l, i+1))
                     ([],0) unary_distances.Data.distances_data in
@@ -195,7 +259,7 @@ end = struct
             (fun () ->
              (Lwt.catch
                 (fun () ->
-                 (build_ast parameter.code self#yield self#log) >>=
+                 (build_ast parameter.ApiTypes.code self#yield self#log) >>=
                    (function
                        `Right ((sig_nd,tk_nd,updated_vars,result)
                               ,contact_map) ->
@@ -232,7 +296,9 @@ end = struct
                                  env in
                              let () =
                                plot :=
-                                 { !plot with legend = Array.to_list legend} in
+                                 { !plot
+                                   with ApiTypes.legend = Array.to_list legend}
+                             in
                              let rec iter graph state =
                                let (stop,graph',state') =
                                  State_interpreter.a_loop
@@ -284,7 +350,7 @@ end = struct
         Api_data.lwt_msg msg_observables_less_than_zero
 
     method status
-      (token : Api_types.token) : Api_types.state Api_types.result Lwt.t =
+      (token : ApiTypes.token) : ApiTypes.state ApiTypes.result Lwt.t =
       Lwt.catch
         (fun () ->
          match IntMap.find_option token context.states with
@@ -300,31 +366,31 @@ end = struct
               (match !(state.error_messages) with
                  [] ->
                  `Right
-                   ({ Api_types.plot =
+                   ({ ApiTypes.plot =
                        Some !(state.plot);
-                      Api_types.distances =
+                      ApiTypes.distances =
                        Some !(state.distances);
-                      Api_types.time =
+                      ApiTypes.time =
                        Counter.time state.counter;
-                      Api_types.time_percentage =
+                      ApiTypes.time_percentage =
                        Counter.time_percentage state.counter;
-                      Api_types.event =
+                      ApiTypes.event =
                        Counter.event state.counter;
-                      Api_types.event_percentage =
+                      ApiTypes.event_percentage =
                        Counter.event_percentage state.counter;
-                      Api_types.tracked_events =
+                      ApiTypes.tracked_events =
                        Some (Counter.tracked_events state.counter);
-                      Api_types.log_messages =
+                      ApiTypes.log_messages =
                        [Buffer.contents state.log_buffer] ;
-                      Api_types.snapshots =
+                      ApiTypes.snapshots =
                        !(state.snapshots);
-                      Api_types.flux_maps =
+                      ApiTypes.flux_maps =
                        !(state.flux_maps);
-                      Api_types.files =
+                      ApiTypes.files =
                        !(state.files);
                       is_running =
                        Lwt_switch.is_on state.switch
-                    } : Api_types.state )
+                    } : ApiTypes.state )
               | _ ->
                 `Left !(state.error_messages)
               )
@@ -334,10 +400,10 @@ end = struct
           >>=
             (fun _ -> Api_data.lwt_msg (Printexc.to_string exn))
         )
-    method list () : Api_types.catalog Api_types.result Lwt.t =
+    method list () : ApiTypes.catalog ApiTypes.result Lwt.t =
       Lwt.return (`Right (List.map fst (IntMap.bindings context.states)))
 
-    method stop (token : Api_types.token) : unit Api_types.result Lwt.t =
+    method stop (token : ApiTypes.token) : unit ApiTypes.result Lwt.t =
       Lwt.catch
         (fun () ->
          match IntMap.find_option token context.states with

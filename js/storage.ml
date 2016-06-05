@@ -90,7 +90,8 @@ let model_counter =
      Counter.create ?init_t:None ?init_e:None ?max_t ?max_e ~nb_points)
     model_max_time model_max_events model_nb_plot
 
-let model_syntax_error, set_model_syntax_error = React.S.create (None : (string * Location.t) option)
+let model_syntax_error, set_model_syntax_error =
+  React.S.create (None : (string * Location.t) option)
 let parse text =
   try
     set_model_syntax_error None;
@@ -109,7 +110,8 @@ let start ~start_continuation ~stop_continuation =
   in
   match React.S.value model_syntax_error with
     Some error -> set_model_syntax_error (Some error);
-                  set_model_runtime_error_message (Some (format_error_message error));
+                  set_model_runtime_error_message
+                    (Some (format_error_message error));
                   on_error ()
   | None ->
      let log_buffer = Buffer.create 512 in
@@ -126,20 +128,24 @@ let start ~start_continuation ~stop_continuation =
         wrap4 (Eval.initialize ?rescale_init:None) log_form [] counter result
         >>= fun (_kasa_state,env,domain,graph,state) ->
         let () =
-	  let head =
-	    Environment.map_observables
-	      (Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
-	      env in
+          let head =
+            Environment.map_observables
+              (Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
+              env in
           set_model_runtime_state
-	    (Some  {
-		 plot =
-		   {Pp_svg.file = "foo.svg";
-		    Pp_svg.title = "KaSim output";
-		    Pp_svg.descr = "";
-		    Pp_svg.legend = head;
-		    Pp_svg.points = [Counter.current_time counter,
-				     State_interpreter.observables_values env counter graph state];
-		   };
+            (Some  {
+                 plot =
+                   {Pp_svg.file = "foo.svg";
+                    Pp_svg.title = "KaSim output";
+                    Pp_svg.descr = "";
+                    Pp_svg.legend = head;
+                    Pp_svg.points = [Counter.current_time counter,
+                                     State_interpreter.observables_values
+                                       env
+                                       counter
+                                       graph
+                                       state];
+                   };
                  time = 0.0;
                  time_percentage = None;
                  event_percentage = None;
@@ -149,17 +155,24 @@ let start ~start_continuation ~stop_continuation =
                }) in
         Lwt.join [ write_out thread_is_running counter label log_buffer;
                            State_interpreter.loop_cps
-			     ~outputs:(function
-					| Data.Snapshot _ -> ()
-					| Data.Print p ->
-					   Format.fprintf log_form "%s: %s@." p.Data.file_name p.Data.line
-					| Data.Flux _ -> ()
-					| Data.Plot (t,v) ->
-					   match React.S.value model_runtime_state with
-					   | None -> ()
-					   | Some s ->
-					      s.plot.Pp_svg.points <- (t,v) :: s.plot.Pp_svg.points
-				      )
+                             ~outputs:(function
+                                        | Data.Snapshot _ -> ()
+                                        | Data.Print p ->
+                                           Format.fprintf
+                                             log_form
+                                             "%s: %s@."
+                                             p.Data.file_name
+                                             p.Data.line
+                                        | Data.Flux _ -> ()
+                                        | Data.Plot (t,v) ->
+                                           match
+                                             React.S.value model_runtime_state
+                                           with
+                                           | None -> ()
+                                           | Some s ->
+                                             s.plot.Pp_svg.points <-
+                                               (t,v) :: s.plot.Pp_svg.points
+                                      )
                              log_form
                              (fun f -> if Lwt_switch.is_on thread_is_running
                                        then Lwt.bind (Lwt_js.yield ()) f
@@ -175,10 +188,12 @@ let start ~start_continuation ~stop_continuation =
                                   let () =
                                     Format.fprintf
                                       log_form " (eff.: %f, detail below)@."
-                                      ((float_of_int (Counter.current_event counter)) /.
+                                      ((float_of_int
+                                          (Counter.current_event counter)) /.
                                          (float_of_int
                                             (Counter.nb_null_event counter +
-                                               Counter.current_event counter))) in
+                                               Counter.current_event counter)))
+                                  in
                                   Counter.print_efficiency log_form counter in
                               Lwt_switch.turn_off thread_is_running)
                              env domain counter graph state]
@@ -190,13 +205,19 @@ let start ~start_continuation ~stop_continuation =
        )
        (function
          | ExceptionDefn.Malformed_Decl error ->
-            let () = set_model_runtime_error_message (Some (format_error_message error)) in
+            let () =
+              set_model_runtime_error_message
+                (Some (format_error_message error))
+            in
             let () = set_model_syntax_error (Some error) in
             Lwt_switch.turn_off thread_is_running
             >>=
               (fun _ -> on_error ())
          | ExceptionDefn.Internal_Error error ->
-            let () = set_model_runtime_error_message (Some (format_error_message error)) in
+            let () =
+              set_model_runtime_error_message
+                (Some (format_error_message error))
+            in
             let () = set_model_syntax_error (Some error) in
             Lwt_switch.turn_off thread_is_running
             >>=

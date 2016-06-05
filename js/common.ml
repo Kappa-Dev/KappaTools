@@ -57,10 +57,11 @@ let plotPNG (plotDivId : string)
        Js.Unsafe.inject (option_string plotStyleId)
       |]
 
-let plotSVG (plotDivId : string)
-            (title:string)
-            (plotName : string)
-            (plotStyleId : string option) =
+let plotSVG
+    (plotDivId : string)
+    (title:string)
+    (plotName : string)
+    (plotStyleId : string option) =
   Js.Unsafe.fun_call
     (Js.Unsafe.js_expr "plotSVG")
     [| Js.Unsafe.inject (Js.string plotDivId);
@@ -68,3 +69,14 @@ let plotSVG (plotDivId : string)
        Js.Unsafe.inject (Js.string plotName);
        Js.Unsafe.inject (option_string plotStyleId)
       |]
+
+let saveFile
+    ~(data : string)
+    ~(mime : string)
+    ~(filename : string) : unit =
+  Js.Unsafe.fun_call
+    (Js.Unsafe.js_expr "saveFile")
+    [| Js.Unsafe.inject (Js.string data);
+       Js.Unsafe.inject (Js.string mime);
+       Js.Unsafe.inject (Js.string filename)
+    |]

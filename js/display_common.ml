@@ -28,6 +28,9 @@ let export_controls
     ~(export_filename_id : string)
     ~(export_button_id : string)
     ~(export_data_label : string) =
+  let export_formats : string list =
+    [export_data_label]
+  in
   let export_filename =
     Html5.input
       ~a:[ Html5.a_id export_filename_id ;
@@ -44,15 +47,23 @@ let export_controls
          ]
       [ Html5.cdata "export" ]
   in
+  let export_formats_select =
+    List.map
+      (fun format ->
+        <:html5<<option $list:Html5.a_value format$>
+           $str:format$
+        </option> >>)
+      export_formats
+  in
   <:html5<<div class="row">
   <div class="col-sm-12">
      <div class="form-inline">
         <div class="form-group">
            <select class="form-control"
                    $list:Html5.a_id export_select_id$>
-              <option value="dat">$str:export_data_label$</option>
               <option value="png">png</option>
               <option value="svg">svg</option>
+              $list:export_formats_select$
            </select>
         </div>
         <div class="form-group">
@@ -145,10 +156,12 @@ let save_plot_ui
               title
               (filename "svg")
                                  svg_style_id
-          | "png" -> Common.plotPNG svg_div_id
-            title
-            (filename "png")
-            svg_style_id
+          | "png" ->
+            Common.plotPNG
+              svg_div_id
+              title
+              (filename "png")
+              svg_style_id
           | "dat" -> export_data (filename dat_file_extension)
         | f -> Common.error ("Unknown format"^f)
         in

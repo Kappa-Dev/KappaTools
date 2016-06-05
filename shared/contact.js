@@ -440,10 +440,10 @@ function Render(id,contactMap){
             return node.label;
         });
 
-    if (agentNames.length > 10)
+    //if (agentNames.length > 10)
     { that.color = hashColor }
-    else
-    { that.color = d3.scale.category10().domain(agentNames); }
+    //else
+    //{ that.color = d3.scale.category10().domain(agentNames); }
     /* given a node return the fill color */
     that.fill = function(node){
         var color = that.color(node.label).toString();
@@ -524,12 +524,15 @@ function Render(id,contactMap){
         /* keep proof for alignment checks
            that.nodes configure using cess
          */
-        that.svg.selectAll(".node-group")
-            .append("circle")
-            .attr("class","node-proof")
-            .attr("cy", 0)
-            .attr("cx", 0)
-            .attr("r", 2);
+        if(window.level.debug){
+            that.svg
+                .selectAll(".node-group")
+                .append("circle")
+                .attr("class","node-proof")
+                .attr("cy", 0)
+                .attr("cx", 0)
+                .attr("r", 2);
+        }
 
         /* datum is map for data */
         that.svg.selectAll(".node-text")
@@ -554,6 +557,7 @@ function Render(id,contactMap){
     this.renderSites = function(){
         that.svg.selectAll(".node-group")
             .each(function(d){
+        if(window.level.debug){
             that.svg
                 .selectAll("svg-circle")
                 .data(d.sitesList())
@@ -563,27 +567,28 @@ function Render(id,contactMap){
                 .attr("cy", 0)
                 .attr("cx", 0)
                 .attr("r", 2);
+        };
+        var sites = d3.select(this)
+                      .selectAll("g")
+                      .data(d.sitesList())
+                      .enter()
+                      .append("g")
+                      .attr("class","site-group");
 
-            var sites = d3.select(this)
-                          .selectAll("g")
-                          .data(d.sitesList())
-                          .enter()
-                          .append("g")
-                          .attr("class","site-group");
 
+       sites.append("rect")
+            .attr("class","site-rect")
+            .attr("rx", 3)
+            .attr("ry", 3)
+            .attr("fill",function(d){ return that.fill(d.getAgent()); });
 
-              sites.append("rect")
-              .attr("class","site-rect")
-              .attr("rx", 3)
-              .attr("ry", 3)
-              .attr("fill",function(d){ return that.fill(d.getAgent()); });
-
-              sites.append("circle")
-              .attr("class","site-proof")
-              .attr("cy", 0)
-              .attr("cx", 0)
-              .attr("r", 2);
-
+       if(window.level.debug){
+                  sites.append("circle")
+                       .attr("class","site-proof")
+                       .attr("cy", 0)
+                       .attr("cx", 0)
+                       .attr("r", 2);
+       }
 
               sites.append("text")
               .attr("class","site-text")
@@ -660,19 +665,24 @@ function Render(id,contactMap){
                         + anchor.y + ")";
                 });
 
-      that.svg.selectAll(".site-proof")
-          .attr("transform",
-                function(d){
-                    var anchor = d.relative;
-                    return  "translate("
-                        + 0
-                        + ","
-                        + 0 + ")";
-                });
+      if(window.level.debug){
+          that.svg
+              .selectAll(".site-proof")
+              .attr("transform",
+                    function(d){
+                        var anchor = d.relative;
+                        return  "translate("
+                            + 0
+                            + ","
+                            + 0 + ")";
+                    });
+      }
 
-      that.svg.selectAll(".link-proof")
-          .attr("cx",function(d){ return d.absolute.x; })
-          .attr("cy",function(d){ return d.absolute.y; });
+      if(window.level.debug){
+          that.svg.selectAll(".link-proof")
+              .attr("cx",function(d){ return d.absolute.x; })
+              .attr("cy",function(d){ return d.absolute.y; });
+      }
 
       that.svg.selectAll(".site-text")
           .attr("x", function(d){ return d.getDimensions().width/2; })

@@ -4,32 +4,37 @@ module UIState = Ui_state
 
 let navli = []
 
-let export_format_id = "contact-export-file-format"
-let export_filename_id = "contact-export-filename"
-let export_button_id =  "contact-export-button"
 let display_id = "contact-map-display"
+let export_id = "contact-export"
+
+let configuration : Widget_export.configuration =
+  { Widget_export.id = export_id ;
+    Widget_export.handlers =
+      [ Widget_export.export_svg ~svg_div_id:display_id ()
+      ; Widget_export.export_png ~svg_div_id:display_id ()
+      ; Widget_export.export_json
+        ~serialize_json:(fun () ->
+          (match
+              React.S.value UIState.model_parse
+           with
+              | None -> "null"
+              | Some parse -> ApiTypes.string_of_parse parse
+          )
+        )
+      ];
+    show = React.S.map
+           (fun model_parse ->
+             match model_parse with
+             | None -> false
+             | Some _ -> true
+           )
+           UIState.model_parse
+  }
+
 
 let content =
   let export_controls =
-    Html5.div
-      ~a:[Tyxml_js.R.Html5.a_class
-             (React.S.bind
-                UIState.model_parse
-                (fun parse -> React.S.const
-                  (match parse with
-                  | None -> ["hidden"]
-                  | Some data ->
-                    if Api_data.api_parse_is_empty data then
-                      ["hidden"]
-                    else
-                      ["show"])
-                )
-             )]
-      [ Display_common.export_controls
-          ~export_select_id:export_format_id
-          ~export_filename_id:export_filename_id
-          ~export_button_id:export_button_id
-          ~export_data_label:"json" ]
+    Widget_export.content configuration
   in
   <:html5<<div>
              <div class="row">
@@ -42,31 +47,9 @@ let content =
 let navcontent = [ Html5.div [content] ]
 
 let onload () =
+  let () = Widget_export.onload configuration in
   let contactmap : Js_contact.contact_map Js.t =
     Js_contact.create_contact_map display_id false in
-
-  let () = Display_common.save_plot_ui
-    (fun f -> let filename = Js.string f in
-              contactmap##exportJSON(filename)
-    )
-    "contact map"
-    export_button_id
-    export_filename_id
-    export_format_id
-    display_id
-    "json"
-  in
-  let () = Display_common.save_plot_ui
-    (fun f -> let filename = Js.string f in
-              contactmap##exportJSON(filename)
-    )
-    "contact map"
-    export_button_id
-    export_filename_id
-    export_format_id
-    display_id
-    "json"
-  in
   let _ =
     React.S.map
       (fun data ->

@@ -124,12 +124,13 @@ let setup_lint codemirror update_linting =
             errors
          ))
   in
-  let () = Js.Unsafe.fun_call
-    (Js.Unsafe.js_expr "CodeMirror.registerHelper")
-    [| Js.Unsafe.inject (Js.string "lint") ;
-       Js.Unsafe.inject (Js.string "Kappa") ;
-       Js.Unsafe.inject (fun _ -> ())
-    |]
+  let () =
+    Js.Unsafe.fun_call
+      (Js.Unsafe.js_expr "CodeMirror.registerHelper")
+      [| Js.Unsafe.inject (Js.string "lint") ;
+         Js.Unsafe.inject (Js.string "Kappa") ;
+         Js.Unsafe.inject (fun _ -> ())
+      |]
   in
   let _ =
     React.S.l1
@@ -201,11 +202,12 @@ let onload () : unit =
   let textarea : Dom_html.element Js.t =
     Js.Opt.get (document##getElementById (Js.string "code-mirror"))
                (fun () -> assert false) in
-  let () = (Js.Unsafe.coerce configuration)##lineNumbers <- Js._true;
-           (Js.Unsafe.coerce configuration)##autofocus <- Js._true;
-           (Js.Unsafe.coerce configuration)##gutters <- gutter_option;
-           (Js.Unsafe.coerce configuration)##lint <- Js._true;
-           (Js.Unsafe.coerce configuration)##mode <- (Js.string "Kappa")
+  let () =
+    (Js.Unsafe.coerce configuration)##lineNumbers <- Js._true;
+    (Js.Unsafe.coerce configuration)##autofocus <- Js._true;
+    (Js.Unsafe.coerce configuration)##gutters <- gutter_option;
+    (Js.Unsafe.coerce configuration)##lint <- Js._true;
+    (Js.Unsafe.coerce configuration)##mode <- (Js.string "Kappa")
   in
   let codemirror : codemirror Js.t =
     Codemirror.fromTextArea
@@ -222,10 +224,14 @@ let onload () : unit =
         None -> ()
       | Some timeout -> Dom_html.window ##
         clearTimeout (timeout) in
-    let delay : float = if ((Js.str_array (change##text ))##length) > 1 then
+    let delay : float =
+      if (((Js.str_array (change##text ))##length) > 1)
+         ||
+         (List.length (React.S.value UIState.model_error) > 0)
+      then
         1.0 *. 1000.0
       else
-        10.0 *. 1000.0
+        5.0 *. 1000.0
     in
     let handle_timeout () =
       let () = Common.info "handle_timeout" in

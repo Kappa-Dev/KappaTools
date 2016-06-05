@@ -75,6 +75,21 @@ object(self)
     in
     var
 
+  method info () :
+    Api_types_j.info ApiTypes_j.result Lwt.t =
+    let var : WebMessage.response option Lwt_mvar.t = self#send (`Info ()) in
+    (Lwt_mvar.take var)
+    >>=
+      (fun (response : WebMessage.response option) ->
+       match response with
+         None ->
+         Lwt.fail TimeOut
+       | Some (`Info info) ->
+         Lwt.return info
+       | Some response ->
+         Lwt.fail (BadResponse response)
+      )
+
   method parse (code : ApiTypes.code) :
     ApiTypes_j.parse ApiTypes_j.result Lwt.t =
     let var : WebMessage.response option Lwt_mvar.t =

@@ -5,21 +5,56 @@ module UIState = Ui_state
 let current_snapshot, set_current_snapshot =
   React.S.create (None : ApiTypes.snapshot option)
 
-let state_snapshot state = match state with
-    None -> []
-  | Some state ->
-    (match state.ApiTypes.snapshots with
-      [] -> []
-    | l -> l)
+let state_snapshot state =
+  match state with
+  | None -> []
+  | Some state -> state.ApiTypes.snapshots
 
 let navli = Display_common.badge
   (fun state -> List.length (state_snapshot state))
 
 let select_id = "snapshot-select-id"
-let export_format_id = "snapshot-export-file-format"
-let export_filename_id = "snapshot-export-filename"
-let export_button_id = "snapshot-export-button"
 let display_id = "snapshot-map-display"
+
+let configuration : Widget_export.configuration =
+  { Widget_export.id = "snapshot"
+  ; Widget_export.handlers =
+      [ Widget_export.export_svg ~svg_div_id:display_id ()
+      ; Widget_export.export_png ~svg_div_id:display_id ()
+      ; Widget_export.export_json
+        ~serialize_json:(fun () ->
+          (match
+              (React.S.value current_snapshot : ApiTypes.snapshot option) with
+              | None -> "null"
+              | Some s -> ApiTypes.string_of_snapshot s
+          )
+        )
+      ; { Widget_export.suffix = "ka"
+        ; Widget_export.label = "kappa"
+        ; Widget_export.export =
+      fun (filename : string) ->
+        let data = match
+            (React.S.value current_snapshot : ApiTypes.snapshot option) with
+            | None -> ""
+            | Some s -> Api_data.api_snapshot_kappa s
+        in
+        Common.saveFile
+          ~data:data
+          ~mime:"application/json"
+          ~filename:filename
+        }
+      ];
+    show = React.S.map
+           (fun state ->
+             match state_snapshot state with
+             | [] -> false
+             | _ -> true
+           )
+           UIState.model_runtime_state
+
+  }
+
+
 let content =
   let select =
     Tyxml_js.R.Html5.select
@@ -78,13 +113,7 @@ let content =
     ]
   in
   let export_controls =
-    Display_common.toggle_element
-      state_snapshot
-      [Display_common.export_controls
-          ~export_select_id:export_format_id
-          ~export_filename_id:export_filename_id
-          ~export_button_id:export_button_id
-          ~export_data_label:"json" ]
+    Widget_export.content configuration
   in
   <:html5<<div>
              <div class="row">
@@ -150,8 +179,6 @@ let select_snapshot () =
       set_current_snapshot None
 
 let onload () : unit =
-  let snapshot : Js_contact.contact_map Js.t =
-    Js_contact.create_contact_map display_id true in
   let snapshot_select_dom : Dom_html.inputElement Js.t =
     Js.Unsafe.coerce
       ((Js.Opt.get
@@ -176,18 +203,7 @@ let onload () : unit =
           None -> ()
         | Some state -> select_snapshot ())
   in
-  let () =
-    Display_common.save_plot_ui
-      (fun f -> let filename = Js.string f in
-                snapshot##exportJSON(filename)
-      )
-      "snapshot map"
-      export_button_id
-      export_filename_id
-      export_format_id
-      display_id
-      "json"
-  in
+  let () = Widget_export.onload configuration in
   let _ : unit React.signal = React.S.l1
     (fun state -> match state with
       None -> ()

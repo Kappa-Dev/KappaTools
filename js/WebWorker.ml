@@ -18,18 +18,21 @@ let request_handler
       (api_call : 'a -> 'b Lwt.t)
       (response : 'b -> WebMessage.response) : unit
   =
-  let () = Lwt.async (fun () -> (api_call request)
-                                >>=
-                                  (fun (result : 'b) ->
-                                   let message :  WebMessage.response WebMessage.message =
-                                     { id = id ; data = response result} in
-                                   let message_text : string =
-                                     WebMessage.string_of_message
-                                       WebMessage.write_response
-                                       message in
-                                   let () = Worker.post_message message_text in
-                                   return_unit)
-                     )
+  let () =
+    Lwt.async
+      (fun () ->
+        (api_call request)
+        >>=
+          (fun (result : 'b) ->
+            let message :  WebMessage.response WebMessage.message =
+              { id = id ; data = response result} in
+            let message_text : string =
+              WebMessage.string_of_message
+                WebMessage.write_response
+                message in
+            let () = Worker.post_message message_text in
+            return_unit)
+      )
   in ()
 
 let on_message (text_message : string) =
@@ -39,7 +42,13 @@ let on_message (text_message : string) =
       text_message
   in
   match message.WebMessage.data with
-    `Parse code ->
+  | `Info code ->
+     request_handler
+      message.WebMessage.id
+      code
+      runtime#info
+      (fun response -> `Info response)
+  | `Parse code ->
      request_handler
       message.WebMessage.id
       code

@@ -9,14 +9,17 @@ type ('r) result <ocaml from="ApiTypes"> = abstract
 type state <ocaml from="ApiTypes"> = abstract
 type token <ocaml from="ApiTypes"> = abstract
 type parse <ocaml from="ApiTypes"> = abstract
+type info <ocaml from="Api_types"> = abstract
 
-type request = [ Parse of code
+type request = [ Info of unit
+               | Parse of code
                | Start of parameter
                | Status of token
                | List of unit
                | Stop of token ]
 
-type response = [ Parse of parse result
+type response = [ Info of info result
+                | Parse of parse result
                 | Start of token result
                 | Status of state result
                 | List of catalog result

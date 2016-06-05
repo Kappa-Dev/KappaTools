@@ -24,17 +24,19 @@ let model_runtime_state , set_model_runtime_state =
   React.S.create (None : ApiTypes.state option)
 
 type runtime_remote = { label : string ; url : string }
-type runtime = WebWorker | Embedded | Remote of runtime_remote
+type runtime = | WebWorker | Embedded | Remote of runtime_remote
 
-let runtime_label runtime = match runtime with
-                             WebWorker -> "WebWorker"
-                           | Embedded -> "Embedded"
-                           | Remote remote -> remote.label
+let runtime_label runtime =
+  match runtime with
+  | WebWorker -> "WebWorker"
+  | Embedded -> "Embedded"
+  | Remote remote -> remote.label
 
-let runtime_value runtime = match runtime with
-                             WebWorker -> "WebWorker"
-                           | Embedded -> "Embedded"
-                           | Remote remote -> remote.url
+let runtime_value runtime =
+  match runtime with
+  | WebWorker -> "WebWorker"
+  | Embedded -> "Embedded"
+  | Remote remote -> remote.url
 
 class embedded_runtime ()  = object
   val delayed_yield : unit -> unit Lwt.t = Api.time_yield 0.1 Lwt_js.yield

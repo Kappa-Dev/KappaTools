@@ -3,20 +3,43 @@ module Html5 = Tyxml_js.Html5
 open ApiTypes
 module UIState = Ui_state
 
-let div_id = "fluxmap-div"
+let div_axis_select_id  = "plot-axis-select"
+let display_id = "flux-map-display"
+let export_id = "flux-export"
 let svg_id = "fluxmap-svg"
 let select_id = "select"
-let export_format_id = "fluxmap-export-file-format"
-let export_filename_id =  "fluxmap-export-filename"
-let export_button_id =  "fluxmap-export-button"
 
 let rules_checkboxes_id = "rules-checkboxes"
 let checkbox_self_influence_id = "checkbox_self_influence"
-let state_fluxmap state = match state with
-    None -> []
-  | Some state -> (match state.ApiTypes.flux_maps with
-    [] -> []
-    | l -> l)
+
+let state_fluxmap
+    (state : ApiTypes.state option) : ApiTypes.flux_map list =
+  match state with
+  | None -> []
+  | Some state -> state.ApiTypes.flux_maps
+let serialize_json : (string -> unit) ref = ref (fun _ -> ())
+
+let configuration : Widget_export.configuration =
+  { Widget_export.id = export_id
+  ; Widget_export.handlers =
+      [ Widget_export.export_svg
+        ~svg_div_id:display_id ()
+      ; Widget_export.export_png
+        ~svg_div_id:display_id ()
+      ; { Widget_export.suffix = "json"
+        ; Widget_export.label = "json"
+        ; Widget_export.export =
+          (fun filename -> (!serialize_json) filename)
+        }
+      ];
+    show = React.S.map
+           (fun state ->
+             match state_fluxmap state with
+             | [] -> false
+             | _ -> true
+           )
+           UIState.model_runtime_state
+  }
 
 let content =
   let flux_select =
@@ -65,11 +88,7 @@ let content =
                    ; Html5.a_class ["checkbox-control"]
                    ; Html5.a_input_type `Checkbox ] () in
   let export_controls =
-    Display_common.export_controls
-      ~export_select_id:export_format_id
-      ~export_filename_id:export_filename_id
-      ~export_button_id:export_button_id
-      ~export_data_label:"json"
+    Widget_export.content configuration
   in
   <:html5<<div>
           <div class="row">
@@ -113,7 +132,7 @@ let content =
                    </li>
                 </ul>
              </div>
-          <div id=$str:div_id$ class="col-sm-8"></div>
+          <div id=$str:display_id$ class="col-sm-8"></div>
           </div>
           $export_controls$
      </div> >>
@@ -166,34 +185,26 @@ let select_fluxmap flux_map =
 let navli = Display_common.badge (fun state -> List.length (state_fluxmap state))
 
 let onload () =
-let flux_configuration : Js_flux.flux_configuration Js.t =
-  Js_flux.create_configuration
-    ~short_labels:true
-    ~begin_time_id:("begin_time")
-    ~end_time_id:("end_time")
-    ~select_correction_id:("select_correction")
-    ~checkbox_self_influence_id:("checkbox_self_influence")
-    ~toggle_rules_id:("toggle_rule_selection")
-    ~nb_events_id:("nb_events")
-    ~svg_id:svg_id
-    ~rules_checkboxes_id:rules_checkboxes_id
-    ~height:450
-    ~width:360
+  let () = Widget_export.onload configuration in
+  let flux_configuration : Js_flux.flux_configuration Js.t =
+    Js_flux.create_configuration
+      ~short_labels:true
+      ~begin_time_id:("begin_time")
+      ~end_time_id:("end_time")
+      ~select_correction_id:("select_correction")
+      ~checkbox_self_influence_id:("checkbox_self_influence")
+      ~toggle_rules_id:("toggle_rule_selection")
+      ~nb_events_id:("nb_events")
+      ~svg_id:svg_id
+      ~rules_checkboxes_id:rules_checkboxes_id
+      ~height:450
+      ~width:360
   in
   let flux =
     Js_flux.create_flux_map flux_configuration in
-  let () =
-    Display_common.save_plot_ui
-      (fun f -> let filename = Js.string f in
-                flux##exportJSON(filename)
-      )
-      "kappa plot"
-      export_button_id
-      export_filename_id
-      export_format_id
-      div_id
-      ?svg_style_id:None
-      "json"
+  let () = serialize_json :=
+    (fun f -> let filename = Js.string f in
+              flux##exportJSON(filename))
   in
   let select_dom : Dom_html.inputElement Js.t =
     Js.Unsafe.coerce
@@ -210,7 +221,7 @@ let flux_configuration : Js_flux.flux_configuration Js.t =
   let div : Dom_html.element Js.t =
     Js.Opt.get
       (Display_common.document##getElementById
-         (Js.string div_id))
+         (Js.string display_id))
       (fun () -> assert false) in
   let () = div##innerHTML <- Js.string
     ("<svg id=\""^

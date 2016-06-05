@@ -123,19 +123,19 @@ let logger (handler : Cohttp_lwt_unix.Server.conn ->
 
 let handler
       ?(shutdown_key : string option  = None)
+      default_handler
       (conn : Cohttp_lwt_unix.Server.conn)
       (request : Cohttp.Request.t)
       (body : Cohttp_lwt_body.t)
     : (Cohttp.Response.t * Cohttp_lwt_body.t) Lwt.t =
   let uri = Request.uri request in
-  let bad_request = Server.respond_string ?headers:(Some headers)
-                                          ~status:`Bad_request
-                                          ~body:""
-                                          () in
-  let not_found = Server.respond_string ?headers:(Some headers)
-                                        ~status:`Not_found
-                                        ~body:""
-                                        () in
+  let bad_request =
+    Server.respond_string
+      ?headers:(Some headers)
+      ~status:`Bad_request
+      ~body:""
+      ()
+  in
   match Uri.path uri with
   (* SHUTDOWN *)
   | "/v1/shutdown" when request.meth = `POST  ->
@@ -157,7 +157,10 @@ let handler
              if shutdown_key = body then
                let () =
                  async
-                   (fun () -> Lwt_unix.sleep 1.0 >>= fun () -> exit 0)
+                   (fun () ->
+                     Lwt_unix.sleep 1.0 >>=
+                       fun () ->
+                     exit 0)
                in
                shutdown_okay
              else
@@ -250,8 +253,15 @@ let handler
            (fun status ->
              result_response ApiTypes.string_of_state status)
      )
-  | _ -> not_found
-
+  | _ -> failwith ""
+(*
+    default_handler
+      { Webapp_common.arguments = []
+      ; Webapp_common.connection = conn
+      ; Webapp_common.request = request
+      ; Webapp_common.body = body
+      ; Webapp_common.logger = logger }
+*)
 let server =
   let parameter_backtrace : bool ref = ref false in
   let parameter_seed_value : int option ref = ref None in
@@ -325,14 +335,33 @@ let server =
          Random.bits ()
        end
   in
-  let () = Random.init theSeed ;
-           unit_of_lwt
-             (log (Printf.sprintf "+ Initialized random number generator with seed %d@." theSeed)) in
+  let () =
+    Random.init theSeed ;
+    unit_of_lwt
+      (log
+         (Printf.sprintf "+ Initialized random number generator with seed %d@."
+            theSeed)
+      )
+  in
   let mode = match !parameter_cert_dir with
     | None -> `TCP (`Port !parameter_port)
     | Some dir ->
        `TLS (`Crt_file_path (dir^"cert.pem"), `Key_file_path (dir^"privkey.pem"),
              `No_password, `Port !parameter_port) in
-  Server.create ~mode (Server.make (logger (handler ~shutdown_key:!parameter_shutdown_key)) ())
+  let default_handler =
+    Webapp_common.handler
+      ((Route_root.route
+         ~runtime:runtime_state
+         ~shutdown_key:!parameter_shutdown_key)
+       @ Route_sessions.route
+         ~runtime:runtime_state)
+  in
+  Server.create
+    ~mode
+    (Server.make
+       (logger
+          (handler
+             (default_handler)
+             ~shutdown_key:!parameter_shutdown_key)) ())
 
 let () = ignore (Lwt_main.run server)

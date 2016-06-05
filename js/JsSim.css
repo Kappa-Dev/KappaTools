@@ -105,7 +105,7 @@ rect { stroke-width: 2; }
 .site-rect {  stroke-width:1;
               stroke: #000;
 }
-.site-text { font: sans-serif; }
+.site-text { font: 8x sans-serif; }
 
 .node-proof { opacity : 0.0;
             }
