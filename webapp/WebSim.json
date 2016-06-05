@@ -1,4 +1,5 @@
-{   "swagger": "2.0",
+{
+    "swagger": "2.0",
     "info": {
         "title": "Kasim API",
         "description": "Kasim API",
@@ -12,19 +13,28 @@
         "version": "1.0.0"
     },
     "host": "mooodkiri.coq.club:8080",
-    "schemes": [ "https"  ],
+    "schemes": [
+        "https"
+    ],
     "basePath": "/v1",
-    "produces": [ "application/json" ],
+    "produces": [
+        "application/json"
+    ],
     "paths": {
         "/version": {
             "get": {
                 "summary": "Version of api",
                 "description": "Returns version information the api.  It also\nreturns information about the build.\n",
-                "tags": [ "Version" ],
+                "tags": [
+                    "Version"
+                ],
                 "responses": {
-                    "200": { "description": "Version information",
-                             "schema": { "$ref": "#/definitions/Version" }
-                           }
+                    "200": {
+                        "description": "Version information",
+                        "schema": {
+                            "$ref": "#/definitions/Version"
+                        }
+                    }
                 }
             }
         },
@@ -32,7 +42,9 @@
             "get": {
                 "summary": "Parse code",
                 "description": "Parse code and return any errors that may\noccur.\n",
-                "tags": [ "Parse" ],
+                "tags": [
+                    "Parse"
+                ],
                 "parameters": [
                     {
                         "name": "code",
@@ -52,9 +64,7 @@
                     "400": {
                         "description": "errors",
                         "schema": {
-                            "type": [
-                                "string"
-                            ]
+                            "$ref": "#/definitions/Errors"
                         }
                     }
                 }
@@ -87,13 +97,14 @@
                 "responses": {
                     "200": {
                         "description": "An array of tokens",
-                        "schema": { "$ref": "#/definitions/Token"
-                                  }
+                        "schema": {
+                            "$ref": "#/definitions/Token"
+                        }
                     },
                     "400": {
                         "description": "Errors",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/Errors"
                         }
                     }
                 }
@@ -103,7 +114,9 @@
             "get": {
                 "summary": "Status of running simulation",
                 "description": "Status of simulation.\nThe process is deleted (token removed)\nAfter a status message is returned\nwith is_running = False.",
-                "tags": [ "Process" ],
+                "tags": [
+                    "Process"
+                ],
                 "parameters": [
                     {
                         "name": "token",
@@ -116,23 +129,27 @@
                 "responses": {
                     "200": {
                         "description": "state of the running process",
-                        "schema": { "$ref": "#/definitions/Status" }
+                        "schema": {
+                            "$ref": "#/definitions/Status"
+                        }
                     },
                     "400": {
                         "description": "Errors",
-                        "schema": { "type": [ "string" ] }
+                        "schema": {
+                            "$ref": "#/definitions/Errors"
+                        }
                     }
                 }
-            }
-        },
-	"/process/{tok}": {
+            },
             "delete": {
                 "summary": "Stop running simulation",
                 "description": "Stop a running process",
-                "tags": [ "Process" ],
+                "tags": [
+                    "Process"
+                ],
                 "parameters": [
                     {
-                        "name": "tok",
+                        "name": "token",
                         "in": "path",
                         "type": "integer",
                         "description": "id of simulation process",
@@ -142,11 +159,15 @@
                 "responses": {
                     "200": {
                         "description": "state of the running process",
-                        "schema": { "type": "string" }
+                        "schema": {
+                            "type": "string"
+                        }
                     },
                     "400": {
                         "description": "Errors",
-                        "schema": { "type": [ "string" ] }
+                        "schema": {
+                            "$ref": "#/definitions/Errors"
+                        }
                     }
                 }
             }
@@ -167,38 +188,121 @@
                 }
             }
         },
-        "SiteGraph": {
-          "type": "array",
-          "items": {
+        "Location": {
             "type": "object",
+            "description": "location in the code",
             "properties": {
-              "node_name": { "type": "string" },
-              "node_sites": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "site_name": { "type": "string" },
-                    "site_links": { "type": "array",
-                      "items": {"type": "integer","minItems": 2,"maxItems": 2} },
-                    "site_states": { "type": "array", "items": { "type": "string" } }
-                  }
+                "chr": {
+                    "type": "integer"
+                },
+                "line": {
+                    "type": "integer"
                 }
-              }
             }
+        },
+        "Range": {
+            "type": "object",
+            "description": "range in code where the error occurs",
+            "properties": {
+                "file": {
+                    "type": "string"
+                },
+                "from_position": {
+                    "$ref": "#/definitions/Location"
+                },
+                "to_position": {
+                    "$ref": "#/definitions/Location"
+                }
+            }
+        },
+        "Errors": {
+            "type": "array",
+            "description": "collection of errors",
+            "items": {
+                "$ref": "#/definitions/Error"
+            }
+        },
+        "Error": {
+            "type": "string",
+            "description": "error message",
+            "properties": {
+                "severity": {
+                    "type": "string",
+                    "enum": [
+                        "warning",
+                        "error"
+                    ],
+                    "description": "servity error"
+                },
+                "message": {
+                    "type": "string",
+                    "description": "error message"
+                },
+                "range": {
+                    "$ref": "#/definitions/Range"
+                }
+            }
+        },
+        "SiteGraph": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "node_name": {
+                        "type": "string"
+                    },
+                    "node_sites": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "site_name": {
+                                    "type": "string"
+                                },
+                                "site_links": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "integer",
+                                        "minItems": 2,
+                                        "maxItems": 2
+                                    }
+                                },
+                                "site_states": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "Parse": {
             "type": "object",
-            "properties": { "contact_map": { "$ref": "#/definitions/SiteGraph" } }
+            "properties": {
+                "contact_map": {
+                    "$ref": "#/definitions/SiteGraph"
+                }
+            }
         },
         "Parameter": {
             "type": "object",
-            "properties": { "code": { "type": "string" },
-                            "nb_plot": { "type": "integer" },
-                            "max_time": { "type": "number" },
-                            "max_events": { "type": "integer" }
-                          }
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "nb_plot": {
+                    "type": "integer"
+                },
+                "max_time": {
+                    "type": "number"
+                },
+                "max_events": {
+                    "type": "integer"
+                }
+            }
         },
         "Observable": {
             "type": "object",
@@ -260,26 +364,48 @@
             }
         },
         "AgentState": {
-          "type": "object",
-          "properties": {
-            "quantity": { "type": "integer" },
-            "mixture": {"$ref": "#/definitions/SiteGraph"}
-          }
+            "type": "object",
+            "properties": {
+                "quantity": {
+                    "type": "integer"
+                },
+                "mixture": {
+                    "$ref": "#/definitions/SiteGraph"
+                }
+            }
         },
         "TokenState": {
-          "type": "object",
-          "properties": {
-            "token": { "type": "string" },
-            "value": { "type": "number" }
-          }
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
         },
         "Snapshot": {
             "type": "object",
             "properties": {
-              "snap_file": { "type": "string" },
-              "snap_event": { "type": "integer" },
-              "agents": { "type": "array", "items": { "$ref": "#/definitions/AgentState" } },
-              "tokens": { "type": "array", "items": { "$ref": "#/definitions/TokenState" } }
+                "snap_file": {
+                    "type": "string"
+                },
+                "snap_event": {
+                    "type": "integer"
+                },
+                "agents": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/AgentState"
+                    }
+                },
+                "tokens": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/TokenState"
+                    }
+                }
             }
         },
         "UnaryDistances": {
