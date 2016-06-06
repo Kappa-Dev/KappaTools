@@ -1114,7 +1114,7 @@ struct
               parameter
               handler
               error
-              [new_site_name, Ckappa_sig.site_name_of_int 1]
+              [new_site_name, site_name]
           in
           let error, handler, bdu_renamed =
             Ckappa_sig.Views_bdu.mvbdu_rename
@@ -1153,19 +1153,19 @@ struct
       List.fold_left
         (fun (error, output) list ->
           match list with
-          | [site, state] ->
+            | [_, state] -> (* the site name is fictitious, do not take it *)
             let error, site_string =
               try
                 Handler.string_of_site parameter error kappa_handler
-                  agent_type site
+                  agent_type site_name
               with
                 _ -> warn parameter error (Some "line 1088") Exit
-                  (Ckappa_sig.string_of_site_name site)
+                  (Ckappa_sig.string_of_site_name site_name)
             in
             let error, state_string =
               try
 	        Handler.string_of_state_fully_deciphered parameter error kappa_handler
-	          agent_type site state
+	          agent_type site_name state
               with
 	        _ -> warn parameter error (Some "line 1103") Exit
                   (Ckappa_sig.string_of_state_index state)
