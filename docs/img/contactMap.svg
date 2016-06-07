@@ -1,5 +1,4 @@
-
-                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" title="contact map" height="419.08333333333337" width="344.66666666666663" class="svg-group"><g transform="translate(58.75,39.166666666666664)"><defs><style type="text/css"><![CDATA[
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" title="contact map" height="313.3333333333333" width="470" class="svg-group"><defs><style type="text/css"><![CDATA[
 html { position: relative;
        min-height: 100%; }
 
@@ -7,7 +6,6 @@ body { margin-bottom: 60px; }
 
 
 span.filler:empty:before {
-   content: "\00a0";
 }
 
 .plot-axis path,
@@ -46,7 +44,6 @@ rect { stroke-width: 2; }
 
 .numberCircle:before,
 .numberCircle:after {
-    content:'\200B';
     display:inline-block;
     line-height:0px;
 
@@ -92,8 +89,12 @@ rect { stroke-width: 2; }
     background-color: rgb(242, 222, 222);
 }
 
-.node-rect { fill: #ccc;
-             stroke-width:2;
+.warning-footer {
+    color: rgb(138, 109, 59);
+    background-color: rgb(252, 248, 227);
+}
+
+.node-rect { stroke-width:2;
              stroke: #000;
              fill-opacity:0.5;
              stroke-width : 2;
@@ -102,12 +103,10 @@ rect { stroke-width: 2; }
 .node-proof {
               opacity : 0.0;
 }
-.site-rect {  fill: #ccc;
-              stroke-width:1;
+.site-rect {  stroke-width:1;
               stroke: #000;
 }
-.site-text {
-}
+.site-text { font: sans-serif; }
 
 .node-proof { opacity : 0.0;
             }
@@ -138,8 +137,18 @@ rect { stroke-width: 2; }
 .CodeMirror {
     border: 1px solid #eee;
     min-height: 40px;
-    height: calc(100% - 100px);
-    height: -webkit-calc(100% - 100px);
-    height: -moz-calc(100% - 100px);0
+
+    height: calc(100% - 320px);
+    height: -webkit-calc(100% - 320px);
+    height: -moz-calc(100vh - 400px);
+
 }
-   ]]></style></defs><path d="M78.89999961853027,48.583328247070305L163.60000038146973,123.08332824707031" class="link-line"></path><path d="M19.75,48.583328247070305L22.75,282.08331298828125" class="link-line"></path><path d="M163.60000038146973,123.08332824707031L78.89999961853027,48.583328247070305" class="link-line"></path><path d="M163.60000038146973,206.5833282470703L81.9166669845581,282.08331298828125" class="link-line"></path><path d="M22.75,282.08331298828125L19.75,48.583328247070305" class="link-line"></path><path d="M81.9166669845581,282.08331298828125L163.60000038146973,206.5833282470703" class="link-line"></path><g transform="translate(19.75,6.8333282470703125)" class="node-group"><text y="0" x="0" style="text-anchor: middle;" class="node-text">Prot1</text><rect height="83.49999999999999" width="118.29999923706055" y="-41.74999999999999" x="-59.14999961853027" class="node-rect" ry="5" rx="5"></rect><circle r="2" cx="0" cy="0" class="node-proof"></circle><g transform="translate(44.71666622161865,29.83333333333333)" class="site-group"><rect height="23.833333333333332" width="28.866666793823242" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="11.916666666666666" x="14.433333396911621" style="text-anchor: middle;" class="site-text">P2</text></g><g transform="translate(-14.433333396911621,29.83333333333333)" class="site-group"><rect height="23.833333333333332" width="28.866666793823242" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="11.916666666666666" x="14.433333396911621" style="text-anchor: middle;" class="site-text">P3</text></g><g transform="translate(-77.47499942779541,29.83333333333333)" class="site-group"><rect height="23.833333333333332" width="36.64999961853027" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="11.916666666666666" x="18.324999809265137" style="text-anchor: middle;" class="site-text">S12</text></g></g><g transform="translate(222.75,164.8333282470703)" class="node-group"><text y="0" x="0" style="text-anchor: middle;" class="node-text">Prot2</text><rect height="83.49999999999999" width="118.29999923706055" y="-41.74999999999999" x="-59.14999961853027" class="node-rect" ry="5" rx="5"></rect><circle r="2" cx="0" cy="0" class="node-proof"></circle><g transform="translate(-73.5833330154419,-53.66666666666666)" class="site-group"><rect height="23.833333333333332" width="28.866666793823242" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="11.916666666666666" x="14.433333396911621" style="text-anchor: middle;" class="site-text">P1</text></g><g transform="translate(-73.5833330154419,29.83333333333333)" class="site-group"><rect height="23.833333333333332" width="28.866666793823242" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="11.916666666666666" x="14.433333396911621" style="text-anchor: middle;" class="site-text">P3</text></g><g transform="translate(-18.324999809265137,29.83333333333333)" class="site-group"><rect height="23.833333333333332" width="36.64999961853027" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="11.916666666666666" x="18.324999809265137" style="text-anchor: middle;" class="site-text">S12</text></g></g><g transform="translate(22.75,323.83331298828125)" class="node-group"><text y="0" x="0" style="text-anchor: middle;" class="node-text">Prot3</text><rect height="83.49999999999999" width="118.33333396911621" y="-41.74999999999999" x="-59.166666984558105" class="node-rect" ry="5" rx="5"></rect><circle r="2" cx="0" cy="0" class="node-proof"></circle><g transform="translate(-14.433333396911621,-53.66666666666666)" class="site-group"><rect height="23.833333333333332" width="28.866666793823242" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="11.916666666666666" x="14.433333396911621" style="text-anchor: middle;" class="site-text">P1</text></g><g transform="translate(44.733333587646484,-53.66666666666666)" class="site-group"><rect height="23.833333333333332" width="28.866666793823242" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="11.916666666666666" x="14.433333396911621" style="text-anchor: middle;" class="site-text">P2</text></g><g transform="translate(-77.49166679382324,29.83333333333333)" class="site-group"><rect height="23.833333333333332" width="36.64999961853027" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="11.916666666666666" x="18.324999809265137" style="text-anchor: middle;" class="site-text">S12</text></g></g><circle r="2" cx="78.89999961853027" cy="48.583328247070305" class="link-proof"></circle><circle r="2" cx="19.75" cy="48.583328247070305" class="link-proof"></circle><circle r="2" cx="-39.39999961853027" cy="48.583328247070305" class="link-proof"></circle><circle r="2" cx="163.60000038146973" cy="123.08332824707031" class="link-proof"></circle><circle r="2" cx="163.60000038146973" cy="206.5833282470703" class="link-proof"></circle><circle r="2" cx="222.75" cy="206.5833282470703" class="link-proof"></circle><circle r="2" cx="22.75" cy="282.08331298828125" class="link-proof"></circle><circle r="2" cx="81.9166669845581" cy="282.08331298828125" class="link-proof"></circle><circle r="2" cx="-36.416666984558105" cy="365.58331298828125" class="link-proof"></circle></g></svg>
+
+.plot-legend-swatch { stroke-width : 1; }
+.plot-tick-proof { }
+.contact-tooltip { position: fixed;
+                   z-index: 10; padding: 2px;
+                   border-style: solid;
+                   border-width: 2px;
+                   border-radius : 4px;
+                   opacity : 0.8; }   ]]></style></defs><g transform="translate(10,10)"><path d="M280.9750003814697,191.66666666666666L225.2749996185303,186.3447061478118" class="link-line"></path><path d="M280.9750003814697,101.66666666666666L225.29166698455805,106.98862718552158" class="link-line"></path><path d="M225.2749996185303,186.3447061478118L280.9750003814697,191.66666666666666" class="link-line"></path><path d="M168.75000000000003,186.3447061478118L168.74999999999994,106.98862718552158" class="link-line"></path><path d="M225.29166698455805,106.98862718552158L280.9750003814697,101.66666666666666" class="link-line"></path><path d="M168.74999999999994,106.98862718552158L168.75000000000003,186.3447061478118" class="link-line"></path><g transform="translate(337.5,146.66666666666666)" class="node-group"><text y="0" x="0" style="text-anchor: middle;" class="node-text">Prot1</text><rect height="90" width="113.04999923706055" y="-45" x="-56.52499961853027" fill="#1f77b4" class="node-rect" ry="5" rx="5"></rect><circle r="2" cx="0" cy="0" class="node-proof"></circle><g transform="translate(-70.0833330154419,32)" class="site-group"><rect height="26" width="27.116666793823242" fill="#1f77b4" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="13" x="13.558333396911621" style="text-anchor: middle;" class="site-text">P2</text></g><g transform="translate(-70.0833330154419,-58)" class="site-group"><rect height="26" width="27.116666793823242" fill="#1f77b4" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="13" x="13.558333396911621" style="text-anchor: middle;" class="site-text">P3</text></g><g transform="translate(-17.449999809265137,32)" class="site-group"><rect height="26" width="34.89999961853027" fill="#1f77b4" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="13" x="17.449999809265137" style="text-anchor: middle;" class="site-text">S12</text></g></g><g transform="translate(168.75000000000003,231.3447061478118)" class="node-group"><text y="0" x="0" style="text-anchor: middle;" class="node-text">Prot2</text><rect height="90" width="113.04999923706055" y="-45" x="-56.52499961853027" fill="#ff7f0e" class="node-rect" ry="5" rx="5"></rect><circle r="2" cx="0" cy="0" class="node-proof"></circle><g transform="translate(42.96666622161865,-58)" class="site-group"><rect height="26" width="27.116666793823242" fill="#ff7f0e" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="13" x="13.558333396911621" style="text-anchor: middle;" class="site-text">P1</text></g><g transform="translate(-13.558333396911621,-58)" class="site-group"><rect height="26" width="27.116666793823242" fill="#ff7f0e" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="13" x="13.558333396911621" style="text-anchor: middle;" class="site-text">P3</text></g><g transform="translate(-73.97499942779541,32)" class="site-group"><rect height="26" width="34.89999961853027" fill="#ff7f0e" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="13" x="17.449999809265137" style="text-anchor: middle;" class="site-text">S12</text></g></g><g transform="translate(168.74999999999994,61.98862718552158)" class="node-group"><text y="0" x="0" style="text-anchor: middle;" class="node-text">Prot3</text><rect height="90" width="113.08333396911621" y="-45" x="-56.541666984558105" fill="#2ca02c" class="node-rect" ry="5" rx="5"></rect><circle r="2" cx="0" cy="0" class="node-proof"></circle><g transform="translate(42.983333587646484,32)" class="site-group"><rect height="26" width="27.116666793823242" fill="#2ca02c" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="13" x="13.558333396911621" style="text-anchor: middle;" class="site-text">P1</text></g><g transform="translate(-13.558333396911621,32)" class="site-group"><rect height="26" width="27.116666793823242" fill="#2ca02c" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="13" x="13.558333396911621" style="text-anchor: middle;" class="site-text">P2</text></g><g transform="translate(-73.99166679382324,32)" class="site-group"><rect height="26" width="34.89999961853027" fill="#2ca02c" ry="3" rx="3" class="site-rect"></rect><circle transform="translate(0,0)" r="2" cx="0" cy="0" class="site-proof"></circle><text y="13" x="17.449999809265137" style="text-anchor: middle;" class="site-text">S12</text></g></g><circle r="2" cx="280.9750003814697" cy="191.66666666666666" class="link-proof"></circle><circle r="2" cx="280.9750003814697" cy="101.66666666666666" class="link-proof"></circle><circle r="2" cx="337.5" cy="191.66666666666666" class="link-proof"></circle><circle r="2" cx="225.2749996185303" cy="186.3447061478118" class="link-proof"></circle><circle r="2" cx="168.75000000000003" cy="186.3447061478118" class="link-proof"></circle><circle r="2" cx="112.22500038146975" cy="276.3447061478118" class="link-proof"></circle><circle r="2" cx="225.29166698455805" cy="106.98862718552158" class="link-proof"></circle><circle r="2" cx="168.74999999999994" cy="106.98862718552158" class="link-proof"></circle><circle r="2" cx="112.20833301544184" cy="106.98862718552158" class="link-proof"></circle></g></svg>
