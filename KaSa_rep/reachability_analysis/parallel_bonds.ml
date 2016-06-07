@@ -673,7 +673,8 @@ struct
       | Usual_domains.Val l -> error, l
       | _ -> warn parameter error (Some "line 1455") Exit []
     in
-    error, global_dynamic, precondition, state_list
+    let dynamic = set_global_dynamic_information global_dynamic dynamic in
+    error, dynamic, precondition, state_list
 
   (****************************************************************)
 
@@ -703,7 +704,7 @@ struct
                 in
                 (*get a list of state of the second site site_type2 in the precondition*)
                 (*A.x.y.B.z.t*)
-                let error, global_dynamic, precondition, state_list =
+                let error, dynamic, precondition, state_list =
                   get_state_of_site_in_precondition
                     parameter
                     error
@@ -713,7 +714,7 @@ struct
                     precondition
                 in
                 (*get pre_state for B*)
-                let error, global_dynamic, precondition, state_list' =
+                let error, dynamic, precondition, state_list' =
                   get_state_of_site_in_precondition
                     parameter
                     error
@@ -986,11 +987,11 @@ let collect_result_from_snd_site_create_parallel parameter error dynamic handler
                 | error, Some value -> error, value
                 in
                 (*get a list of a state of the first site site_type1 in the precondition of agent_id1*)
-                let error, global_dynamic, precondition, state_list =
+                let error, dynamic, precondition, state_list =
                   get_state_of_site_in_precondition parameter error dynamic agent_id1 site_type1 precondition
                 in
                 (*get a pre_state for B*)
-                let error, global_dynamic, precondition, state_list' =
+                let error, dynamic, precondition, state_list' =
                   get_state_of_site_in_precondition parameter error dynamic agent_id1' site_type1' precondition
                 in
                 (*build a potential sites*)
