@@ -417,11 +417,9 @@ let collect_rule_has_non_parallel_bonds parameter error rule_id views bonds
                 (fun ((agent_id, agent_type, site_type, state) (*A.y*),
                       (agent_id', agent_type', site_type', state') (*B.t*)) (error, store_result) ->
                   (*if B = B and theirs id are different*)
-                  if agent_id' <> agent_id_target && agent_type' = agent_type_target
+                  if site_type <> site_type_source && site_type' <> site_type_target && agent_id = agent_id_source && agent_id' <> agent_id_target && agent_type' = agent_type_target
                   then
                     (*two elements in the list of A: A.x.y*)
-                    if site_type <> site_type_source
-                    then
                       (*non parallel bonds*)
                       let error, old_list =
                         match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
@@ -442,8 +440,6 @@ let collect_rule_has_non_parallel_bonds parameter error rule_id views bonds
                         rule_id
                         new_list
                         store_result
-                    else
-                      error, store_result
                   else
                     error, store_result
                 ) bonds_full_set (error, store_result)
