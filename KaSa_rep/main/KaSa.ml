@@ -15,7 +15,7 @@
 module A =
   Analyzer.Make
     (Composite_domain.Make
-       (Product.Product
+ (Product.Product
           (Parallel_bonds.Domain)
           (Product.Product
              (Site_accross_bonds_domain.Domain)

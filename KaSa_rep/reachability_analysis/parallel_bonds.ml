@@ -680,17 +680,17 @@ struct
 
   let collect_result_from_site_create_parallel parameter error dynamic handler_kappa rule_id precondition store_pair_bind_map rule_has_parallel_bonds_rhs_set store_result =
     let log = Remanent_parameters.get_logger parameter in
-    let error, store_result =
+    let error, dynamic, precondition, store_result =
       (*fold over a binding action map*)
       Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.fold
         (*A.x.B.z*)
         (fun ((agent_id, agent_type, site_type, state),
-              (agent_id', agent_type', site_type', state')) parallel_list (error, store_result) ->
+              (agent_id', agent_type', site_type', state')) parallel_list (error, dynamic, precondition, store_result) ->
           (*------------------------------------------------------*)
           (*fold over a list of parallel bonds*)
-          let error, store_result =
+          let error, dynamic, precondition, store_result =
             List.fold_left
-              (fun (error, store_result)
+              (fun (error, dynamic, precondition, store_result)
                 (*A.t.z.B.t.z, B.t.z.A.t.z*)                                                         ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),                              (agent_id1', agent_type1', site_type1', site_type2', state1', state2')) ->
                 let error, old_value =
                   match
@@ -704,6 +704,13 @@ struct
                 in
                 (*get a list of state of the second site site_type2 in the precondition*)
                 (*A.x.y.B.z.t*)
+                (*    let () =
+                  Loggers.fprintf
+                    (Remanent_parameters.get_logger parameter)
+                    "CAS1: %i %i \n"
+                    (Ckappa_sig.int_of_agent_id agent_id1)
+                    (Ckappa_sig.int_of_site_name site_type2)
+                      in*)
                 let error, dynamic, precondition, state_list =
                   get_state_of_site_in_precondition
                     parameter
@@ -713,6 +720,13 @@ struct
                     site_type2
                     precondition
                 in
+                (*                let () =
+                  Loggers.fprintf
+                    (Remanent_parameters.get_logger parameter)
+                    "CAS2: %i %i \n"
+                    (Ckappa_sig.int_of_agent_id agent_id1)
+                    (Ckappa_sig.int_of_site_name site_type2)
+                                  in*)
                 (*get pre_state for B*)
                 let error, dynamic, precondition, state_list' =
                   get_state_of_site_in_precondition
@@ -953,26 +967,27 @@ struct
                     value
                     store_result
                   in
-                error, store_result
-              )(error, store_result) parallel_list
+                error, dynamic, precondition, store_result
+              )(error, dynamic, precondition, store_result) parallel_list
           in
-          error, store_result
-        ) store_pair_bind_map (error, store_result)
+          error, dynamic, precondition, store_result
+        ) store_pair_bind_map (error, dynamic, precondition, store_result)
     in
-    error, store_result
+    error, dynamic, precondition, store_result
 
 (****************************************************************)
 
 let collect_result_from_snd_site_create_parallel parameter error dynamic handler_kappa rule_id precondition store_snd_pair_bind_map rule_has_parallel_bonds_rhs_set non_parallel_rhs_list store_result =
     let log = Remanent_parameters.get_logger parameter in
-    let error, store_result =
+    let error, dynamic, precondition, store_result =
       Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.fold
         (fun ((agent_id, agent_type, site_type, state),
-              (agent_id', agent_type', site_type', state')) parallel_list (error, store_result) ->
+              (agent_id', agent_type', site_type', state')) parallel_list
+          (error, dynamic, precondition, store_result) ->
           (*fold over a list of parallel bonds*)
-          let error, store_result =
+          let error, dynamic, precondition, store_result =
             List.fold_left
-              (fun (error, store_result)
+              (fun (error, dynmaic, precondition, store_result)
                 (*A.z.t.B.z.t, B.z.t.A.z.t*)
                 ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),
                  (agent_id1', agent_type1', site_type1', site_type2', state1', state2')) ->
@@ -987,9 +1002,24 @@ let collect_result_from_snd_site_create_parallel parameter error dynamic handler
                 | error, Some value -> error, value
                 in
                 (*get a list of a state of the first site site_type1 in the precondition of agent_id1*)
+                (*  let _ =
+                  Loggers.fprintf
+                    (Remanent_parameters.get_logger parameter)
+                    "CAS3: %i:%i \n"
+                    (Ckappa_sig.int_of_agent_id agent_id1)
+                    (Ckappa_sig.int_of_site_name site_type1)
+                      in
+                *)
                 let error, dynamic, precondition, state_list =
                   get_state_of_site_in_precondition parameter error dynamic agent_id1 site_type1 precondition
                 in
+                (*    let _ =
+                  Loggers.fprintf
+                    (Remanent_parameters.get_logger parameter)
+                    "CAS4: %i:%i  \n"
+                    (Ckappa_sig.int_of_agent_id agent_id1')
+                    (Ckappa_sig.int_of_site_name site_type1')
+                      in*)
                 (*get a pre_state for B*)
                 let error, dynamic, precondition, state_list' =
                   get_state_of_site_in_precondition parameter error dynamic agent_id1' site_type1' precondition
@@ -1210,14 +1240,14 @@ let collect_result_from_snd_site_create_parallel parameter error dynamic handler
                       value
                       store_result
                     in
-                  error, store_result
-              ) (error, store_result) parallel_list
+                  error, dynamic, precondition, store_result
+              ) (error, dynamic, precondition, store_result) parallel_list
           in
-          error, store_result
+          error, dynamic, precondition, store_result
         )
-        store_snd_pair_bind_map (error, store_result)
+        store_snd_pair_bind_map (error, dynamic, precondition, store_result)
     in
-    error, store_result
+    error, dynamic, precondition, store_result
 
 (****************************************************************)
 
@@ -1266,7 +1296,7 @@ let collect_result_of_non_parallel parameter error rule_id non_parallel_rhs_list
     in
     (*-----------------------------------------------------------*)
     (*compute value, check the second sites binding in the parallel bonds*)
-    let error, store_value1 =
+    let error, dynamic, precondition, store_value1 =
     collect_result_from_site_create_parallel
       parameter
       error
@@ -1295,7 +1325,7 @@ let collect_result_of_non_parallel parameter error rule_id non_parallel_rhs_list
       | error, None -> error, Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.empty
       | error, Some  m -> error, m
     in
-    let error, store_value2 =
+    let error, dynamic, precondition, store_value2 =
       collect_result_from_snd_site_create_parallel parameter error
         dynamic handler_kappa rule_id precondition store_snd_pair_bind_map rule_has_parallel_bonds_rhs_set
         non_parallel_rhs_list

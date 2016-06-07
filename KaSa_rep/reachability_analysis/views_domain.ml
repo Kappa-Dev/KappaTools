@@ -1529,7 +1529,7 @@ struct
                       parameter
                       handler
                       error
-                      [new_site_name, Ckappa_sig.site_name_of_int 1]
+                      [new_site_name, path.Communication.site]
                   in
                   (*do the conjuntion between bdu and bdu final*)
                   let error, handler, bdu_renamed =
