@@ -245,6 +245,12 @@ let options =
       "dump debugging information",
       ["7_Debugging_info"],
       Expert;
+
+      "--unsafe-mode",
+      Bool Config.unsafe,
+      "Exceptions are gathered at the end of the computation, instead of halting it ",
+      ["7_Debugging_info"],
+      Expert;
     ]
 
 let get_option error =
