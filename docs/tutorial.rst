@@ -206,25 +206,25 @@ example of this situation.
 We want to express the reversible binding relation between ``Prot1``
 and ``Prot2``, who bind through their respective ``P2`` and ``P1``
 sites. For the rates, a determinstic binding rate is on the order of
-:math:`10^8`, an unbinding rate around :math:`10^2` (this would mean a
-disassociation constant :math:`K_D` of :math:`10^{-10}` molar, or 100
-picomolar). When accounting for volume, let's use a mammalian cell volume
-of :math:`10^{-12}` liters, the binding rate becomes :math:`10^{-4}`; the
+:math:`10^10`, an unbinding rate around :math:`10^2` (this would mean a
+disassociation constant :math:`K_D` of :math:`10^{-8}` molar, or 10
+nanomolar). When accounting for volume, let's use a mammalian cell volume
+of :math:`10^{-12}` liters, the binding rate becomes :math:`10^{-2}`; the
 unbinding rate shouldn't care about volume dependency, so the
 deterministic rate is the same as the stochastic one. Thus we arrive
-at our stochastic rates, a forward (i.e. bind) rate of :math:`10^{-4}`
+at our stochastic rates, a forward (i.e. bind) rate of :math:`10^{-2}`
 and a reverse (i.e. unbind) rate of :math:`10^{-2}`. Let's call such
 a rule ``'P1.P2'``, it would be written as::
 
-'P1.P2' Prot1(P2), Prot2(P1) <-> Prot1(P2!1), Prot2(P1!1) @ 1.0e-4,1.0e-2
+'P1.P2' Prot1(P2), Prot2(P1) <-> Prot1(P2!1), Prot2(P1!1) @ 1.0e-2,1.0e-2
 
 The usage of ``!n``, where ``n`` is an integer, identifies the binding
 endpoints; we could have just as validly used ``!99`` or ``!0``. Let's keep
 going and add the other two binding rules, one for ``Prot1`` binding
 ``Prot3``, and one for ``Prot2`` binding ``Prot3``::
 
-'P1.P3' Prot1(P3), Prot3(P1) <-> Prot1(P3!1), Prot3(P1!1) @ 1.0e-4, 1.0e-2
-'P2.P3' Prot2(P3), Prot3(P2) <-> Prot2(P3!1), Prot3(P2!1) @ 1.0e-4, 1.0e-2
+'P1.P3' Prot1(P3), Prot3(P1) <-> Prot1(P3!1), Prot3(P1!1) @ 1.0e-2, 1.0e-2
+'P2.P3' Prot2(P3), Prot3(P2) <-> Prot2(P3!1), Prot3(P2!1) @ 1.0e-2, 1.0e-2
 
 .. warning::
 
@@ -278,9 +278,9 @@ rule at that bimolecular rate would invalidate our physical interpretation of th
 Thus we should refine the rules by adding a unimolecular forward (i.e. binding)
 rate that's much higher than the bimolecular one::
 
-'P1.P2' Prot1(P2), Prot2(P1) <-> Prot1(P2!1), Prot2(P1!1) @ 1.0e-4 (1.0), 1.0e-2
-'P1.P3' Prot1(P3), Prot3(P1) <-> Prot1(P3!1), Prot3(P1!1) @ 1.0e-4 (1.0), 1.0e-2
-'P2.P3' Prot2(P3), Prot3(P2) <-> Prot2(P3!1), Prot3(P2!1) @ 1.0e-4 (1.0), 1.0e-2
+'P1.P2' Prot1(P2), Prot2(P1) <-> Prot1(P2!1), Prot2(P1!1) @ 1.0e-2 (1.0), 1.0e-2
+'P1.P3' Prot1(P3), Prot3(P1) <-> Prot1(P3!1), Prot3(P1!1) @ 1.0e-2 (1.0), 1.0e-2
+'P2.P3' Prot2(P3), Prot3(P2) <-> Prot2(P3!1), Prot3(P2!1) @ 1.0e-2 (1.0), 1.0e-2
 
 .. note::
 
@@ -324,9 +324,9 @@ more copies. So far, our script should look something like this::
   ############################################################
   # Here are my rules
   ############################################################
-  'P1.P2' Prot1(P2), Prot2(P1) <-> Prot1(P2!1), Prot2(P1!1) @ 1.0e-4 (1.0), 1.0e-2
-  'P1.P3' Prot1(P3), Prot3(P1) <-> Prot1(P3!1), Prot3(P1!1) @ 1.0e-4 (1.0), 1.0e-2
-  'P2.P3' Prot2(P3), Prot3(P2) <-> Prot2(P3!1), Prot3(P2!1) @ 1.0e-4 (1.0), 1.0e-2
+  'P1.P2' Prot1(P2), Prot2(P1) <-> Prot1(P2!1), Prot2(P1!1) @ 1.0e-2 (1.0), 1.0e-2
+  'P1.P3' Prot1(P3), Prot3(P1) <-> Prot1(P3!1), Prot3(P1!1) @ 1.0e-2 (1.0), 1.0e-2
+  'P2.P3' Prot2(P3), Prot3(P2) <-> Prot2(P3!1), Prot3(P2!1) @ 1.0e-2 (1.0), 1.0e-2
   'P1/' -> Prot1() @ 1.0
 
 Now that we have defined our agents and how the interact, we must define
@@ -363,9 +363,9 @@ the initial condition stage, our script so far would look like this::
   ############################################################
   # Here are my rules
   ############################################################
-  'P1.P2' Prot1(P2), Prot2(P1) <-> Prot1(P2!1), Prot2(P1!1) @ 1.0e-4 (1.0), 1.0e-2
-  'P1.P3' Prot1(P3), Prot3(P1) <-> Prot1(P3!1), Prot3(P1!1) @ 1.0e-4 (1.0), 1.0e-2
-  'P2.P3' Prot2(P3), Prot3(P2) <-> Prot2(P3!1), Prot3(P2!1) @ 1.0e-4 (1.0), 1.0e-2
+  'P1.P2' Prot1(P2), Prot2(P1) <-> Prot1(P2!1), Prot2(P1!1) @ 1.0e-2 (1.0), 1.0e-2
+  'P1.P3' Prot1(P3), Prot3(P1) <-> Prot1(P3!1), Prot3(P1!1) @ 1.0e-2 (1.0), 1.0e-2
+  'P2.P3' Prot2(P3), Prot3(P2) <-> Prot2(P3!1), Prot3(P2!1) @ 1.0e-2 (1.0), 1.0e-2
   'P1/' -> Prot1() @ 1.0
 
   ############################################################
@@ -430,9 +430,9 @@ So far, our script should look something like this::
   ############################################################
   # Here are my rules
   ############################################################
-  'P1.P2' Prot1(P2), Prot2(P1) <-> Prot1(P2!1), Prot2(P1!1) @ 1.0e-4 (1.0), 1.0e-2
-  'P1.P3' Prot1(P3), Prot3(P1) <-> Prot1(P3!1), Prot3(P1!1) @ 1.0e-4 (1.0), 1.0e-2
-  'P2.P3' Prot2(P3), Prot3(P2) <-> Prot2(P3!1), Prot3(P2!1) @ 1.0e-4 (1.0), 1.0e-2
+  'P1.P2' Prot1(P2), Prot2(P1) <-> Prot1(P2!1), Prot2(P1!1) @ 1.0e-2 (1.0), 1.0e-2
+  'P1.P3' Prot1(P3), Prot3(P1) <-> Prot1(P3!1), Prot3(P1!1) @ 1.0e-2 (1.0), 1.0e-2
+  'P2.P3' Prot2(P3), Prot3(P2) <-> Prot2(P3!1), Prot3(P2!1) @ 1.0e-2 (1.0), 1.0e-2
   'P1/' -> Prot1() @ 1.0
 
   ############################################################
@@ -458,7 +458,7 @@ command-line executable, save your file (e.g. "MyFile.ka") and invoke
 KaSim with input-file "MyFile.ka", to simulate 5000 seconds, and
 output 150 plot points to a file called "MyOutput.out", i.e.::
 
-$KaSim -i MyFile.ka -t 5000 -p 150 -o MyOutput.svg
+$KaSim -i MyFile.ka -t 51 -p 51 -o MyOutput.svg
 
 This should generate a plot like this:
 
@@ -505,15 +505,20 @@ This will ouput a snapshot when the trigger conditions are met as a file
 whose name we specified. Let's define our snapshot to be triggered after the
 simulation reaches second 4500 and dump that to a snapshot called ``T4500``::
 
-%mod: [T]>4500 do $SNAPSHOT "T4500"
+%mod: [T]>50 do $SNAPSHOT "T51"
 
 Go ahead and add that line to the script, and re-run the simulation with the same time parameters.
 In the IDE, such a snapshot would look like this:
 
-TODO .. image:: img/Snapshot.svg
+.. image:: img/T51.svg
+
+If I open that in a separate program and manually blow it up,
+we can see more clearly what is happening in the mixture:
+
+.. image:: img/T51_blownup.svg
 
 As we can see, the system has produced polymers! Instead of having
-dimers, we have much bigger oligomers. How did this happen? Well, when
+dimers, we have much bigger oligomers, like the heptamer at top. How did this happen? Well, when
 we made the rules, we only mentioned some sites. For example, the
 binding of ``Prot1`` and ``Prot2`` only mentions their respective ``P2`` and ``P1`` sites; it says nothing about their respective ``P3`` sites. Thus, this binding event is independent of whatever is the state of those ``P3`` sites. For example, if there are two dimers, say::
 
