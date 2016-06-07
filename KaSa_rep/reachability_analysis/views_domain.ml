@@ -1114,7 +1114,7 @@ struct
               parameter
               handler
               error
-              [new_site_name, site_name]
+              [new_site_name, Ckappa_sig.site_name_of_int 1 (*site_name*)]
           in
           let error, handler, bdu_renamed =
             Ckappa_sig.Views_bdu.mvbdu_rename
