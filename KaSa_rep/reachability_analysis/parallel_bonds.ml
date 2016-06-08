@@ -685,13 +685,20 @@ struct
       Parallel_bonds_type.PairAgentsSiteState_map_and_set.Map.fold
         (*A.x.B.z*)
         (fun ((agent_id, agent_type, site_type, state),
-              (agent_id', agent_type', site_type', state')) parallel_list (error, dynamic, precondition, store_result) ->
+              (agent_id', agent_type', site_type', state'))
+          parallel_list (error, dynamic, precondition, store_result) ->
           (*------------------------------------------------------*)
           (*fold over a list of parallel bonds*)
           let error, dynamic, precondition, store_result =
             List.fold_left
               (fun (error, dynamic, precondition, store_result)
-                (*A.t.z.B.t.z, B.t.z.A.t.z*)                                                         ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),                              (agent_id1', agent_type1', site_type1', site_type2', state1', state2')) ->
+                (*A.t.z.B.t.z, B.t.z.A.t.z*)
+                ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),                              (agent_id1', agent_type1', site_type1', site_type2', state1', state2')) ->
+                if not (agent_type = agent_type1 && site_type1 = site_type)
+                then (* Quyen, I do not understand, the true branch should not be reachable ?*)
+                  error, dynamic, precondition, store_result
+                else
+
                 let error, old_value =
                   match
                     Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.find_option_without_logs parameter error
@@ -704,13 +711,6 @@ struct
                 in
                 (*get a list of state of the second site site_type2 in the precondition*)
                 (*A.x.y.B.z.t*)
-                (*    let () =
-                  Loggers.fprintf
-                    (Remanent_parameters.get_logger parameter)
-                    "CAS1: %i %i \n"
-                    (Ckappa_sig.int_of_agent_id agent_id1)
-                    (Ckappa_sig.int_of_site_name site_type2)
-                      in*)
                 let error, dynamic, precondition, state_list =
                   get_state_of_site_in_precondition
                     parameter
@@ -720,13 +720,6 @@ struct
                     site_type2
                     precondition
                 in
-                (*                let () =
-                  Loggers.fprintf
-                    (Remanent_parameters.get_logger parameter)
-                    "CAS2: %i %i \n"
-                    (Ckappa_sig.int_of_agent_id agent_id1)
-                    (Ckappa_sig.int_of_site_name site_type2)
-                                  in*)
                 (*get pre_state for B*)
                 let error, dynamic, precondition, state_list' =
                   get_state_of_site_in_precondition
@@ -991,6 +984,10 @@ let collect_result_from_snd_site_create_parallel parameter error dynamic handler
                 (*A.z.t.B.z.t, B.z.t.A.z.t*)
                 ((agent_id1, agent_type1, site_type1, site_type2, state1, state2),
                  (agent_id1', agent_type1', site_type1', site_type2', state1', state2')) ->
+                if not (agent_type1 = agent_type && site_type = site_type1)
+                then (* Quyen, I do not understand, the true branch should not be reachable ? *)
+                  error, dynamic, precondition, store_result
+                else
                 let error, old_value =
                 match
                   Parallel_bonds_type.PairAgentsSitesStates_map_and_set.Map.find_option_without_logs parameter error
@@ -1002,24 +999,9 @@ let collect_result_from_snd_site_create_parallel parameter error dynamic handler
                 | error, Some value -> error, value
                 in
                 (*get a list of a state of the first site site_type1 in the precondition of agent_id1*)
-                (*  let _ =
-                  Loggers.fprintf
-                    (Remanent_parameters.get_logger parameter)
-                    "CAS3: %i:%i \n"
-                    (Ckappa_sig.int_of_agent_id agent_id1)
-                    (Ckappa_sig.int_of_site_name site_type1)
-                      in
-                *)
                 let error, dynamic, precondition, state_list =
                   get_state_of_site_in_precondition parameter error dynamic agent_id1 site_type1 precondition
                 in
-                (*    let _ =
-                  Loggers.fprintf
-                    (Remanent_parameters.get_logger parameter)
-                    "CAS4: %i:%i  \n"
-                    (Ckappa_sig.int_of_agent_id agent_id1')
-                    (Ckappa_sig.int_of_site_name site_type1')
-                      in*)
                 (*get a pre_state for B*)
                 let error, dynamic, precondition, state_list' =
                   get_state_of_site_in_precondition parameter error dynamic agent_id1' site_type1' precondition
