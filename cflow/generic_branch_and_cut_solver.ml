@@ -279,25 +279,40 @@ struct
     let error,log_info,(blackboard,output) =
       propagate parameter handler log_info error list_order [] blackboard
     in
-    let () =
-      if log_steps then
+    if PH.B.is_failed output
+    then
+      let () =
+        if log_steps then
         let () =
           Loggers.fprintf (PH.B.PB.CI.Po.K.H.get_logger parameter)
-	           "After observable propagation  %i @." (PH.B.get_n_unresolved_events blackboard)
+
+            "After observable propagation  FAIL %i @." (PH.B.get_n_unresolved_events blackboard)
         in
         let () = Loggers.print_newline (PH.B.PB.CI.Po.K.H.get_logger parameter)
         in
         ()
-    in
-    let error,log_info,(blackboard,story_list) = iter parameter handler log_info error blackboard empty_choice_list []
-    in
-    let output =
-      match
-	story_list
-      with
-	[] -> PH.B.fail
-      | _ -> PH.B.success
-    in
+      in      
+      error,log_info,(blackboard,output,[])
+    else
+      let () =
+        if log_steps then
+          let () =
+            Loggers.fprintf (PH.B.PB.CI.Po.K.H.get_logger parameter)
+              "After observable propagation  %i @." (PH.B.get_n_unresolved_events blackboard)
+          in
+          let () = Loggers.print_newline (PH.B.PB.CI.Po.K.H.get_logger parameter)
+          in
+          ()
+      in
+      let error,log_info,(blackboard,story_list) = iter parameter handler log_info error blackboard empty_choice_list []
+      in
+      let output =
+        match
+          story_list
+        with
+          [] -> PH.B.fail
+        | _ -> PH.B.success
+      in
     error,log_info,(blackboard,output,filter_out_non_minimal_story (List.rev story_list))
 
 

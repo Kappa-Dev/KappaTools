@@ -308,7 +308,21 @@ module type Cut_pseudo_inverse =
                  | (a,x,true)::(_,y,_)::_ when a=eida || a=eidb -> x=y
                  | _ -> false)
                 q
-            then error,Some (eida,eidb)
+            &&
+            List.for_all
+              (fun pid ->
+                let column =
+                  CPredicateMap.find_default [] pid blackboard.steps_by_column
+                in
+                let column,blackboard = clean pid column blackboard in
+                match
+                   column
+                with
+                | (b,_,true)::_ when b=eidb -> false
+                | _ -> true)
+              (A.get blackboard.predicates_of_event eidb)
+
+          then error,Some (eida,eidb)
             else error,None
 
 
@@ -530,5 +544,7 @@ module type Cut_pseudo_inverse =
       List.iter	(CPredicateMap.recycle tab) blackboard.agent_list
     in
     error,info, (list,n_cut)
+
+  (*  let cut parameter handler info error list = error, info, (list,0)*)
 
    end:Cut_pseudo_inverse)

@@ -97,7 +97,7 @@ module Propagation_heuristic =
                 let error,log_info,exist = B.exist_case  parameter handler log_info error blackboard event_case_address in
                 match exist
                 with
-                  | None ->
+                | None ->
                     let error,log_info,(seid,eid,test,action) = B.get_static parameter handler log_info error blackboard event_case_address in
                     let error,log_info,level_of_event = B.level_of_event parameter handler log_info error blackboard eid in
                     if level_of_event = level
@@ -105,7 +105,8 @@ module Propagation_heuristic =
                       error,log_info,Some eid
                     else
                       aux (succ i) log_info error
-                  | Some true | Some false -> aux (succ i) log_info error
+                | Some true | Some false ->
+                  aux (succ i) log_info error
             in
             aux i log_info error
           end
@@ -198,7 +199,8 @@ module Propagation_heuristic =
             match
               x.Priority.candidate_set_of_events
             with
-            | Priority.All_remaining_events -> get_last_unresolved_event parameter handler log_info error blackboard level
+            | Priority.All_remaining_events -> get_last_unresolved_event
+                                                 parameter handler log_info error blackboard level
             | Priority.Wire_with_the_most_number_of_events
             | Priority.Wire_with_the_least_number_of_events ->
                get_last_unresolved_event_on_pid parameter handler log_info error blackboard p_id level
@@ -246,7 +248,14 @@ module Propagation_heuristic =
                 match event_id
                 with
                 | None ->
-                  let error,() = warn parameter error (Some "next_choice, line 210, An empty wire has been selected") (Failure "An empty wire has been selected") () in
+                  let log = B.PB.CI.Po.K.H.get_debugging_channel parameter in
+
+                  let error,() = warn parameter error
+                      (Some ("next_choice, line 249, An empty wire has been selected"^(string_of_int n)))
+                      (Failure "An empty wire has been selected") () in
+                  let () =
+                    Loggers.fprintf log "ERROR 249: %s\n" (Priority.string_of_level level)
+                  in
                   try_level (Priority.lower level) error
                 | Some event_id ->
                   error,[Discard_event event_id;Keep_event event_id]
@@ -1766,7 +1775,8 @@ module Propagation_heuristic =
             let error,log_info,blackboard = B.dec parameter handler log_info error (B.n_unresolved_events_in_column case) blackboard in
             let error,log_info,(_,event,_,_) = B.get_static parameter handler log_info error blackboard case in
             let error,log_info,level = B.level_of_event parameter handler log_info error blackboard event in
-            let error,log_info,blackboard = B.dec parameter handler log_info error (B.n_unresolved_events_in_column_at_level  case level) blackboard in
+            let error,log_info,blackboard = B.dec parameter handler log_info error
+                (B.n_unresolved_events_in_column_at_level  case level) blackboard in
             (** we plug pointer next of the previous event *)
             let error,log_info,blackboard =
               B.overwrite
@@ -1822,8 +1832,10 @@ module Propagation_heuristic =
           let error,log_info,pointer_next = B.follow_pointer_down parameter handler log_info error blackboard case in
           let error,log_info,(seid,eid,test,action) = B.get_static parameter handler log_info error blackboard case in
           begin
-            let error,log_info,(blackboard,instruction_list,_,result') = refine_value_before parameter handler log_info error blackboard case test   instruction_list propagate_list in
-            let error,log_info,(blackboard,instruction_list,_,result'') = refine_value_after  parameter handler log_info error blackboard case action instruction_list propagate_list in
+            let error,log_info,(blackboard,instruction_list,_,result') =
+              refine_value_before parameter handler log_info error blackboard case test  instruction_list propagate_list in
+            let error,log_info,(blackboard,instruction_list,_,result'') =
+              refine_value_after  parameter handler log_info error blackboard case action instruction_list propagate_list in
             if B.is_failed result' || B.is_failed result''
             then
               (error,
@@ -1890,7 +1902,7 @@ module Propagation_heuristic =
                 else if B.is_succeeded success2
                 then aux q y success2
               else
-                y,success2
+                  y,success2
             end
         in
         let (error,log_info,blackboard,instruction_list,propagate_list),success = aux list (error,log_info,blackboard,instruction_list,propagate_list) B.ignore in

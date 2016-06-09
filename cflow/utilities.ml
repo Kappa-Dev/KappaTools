@@ -562,6 +562,19 @@ let compress ?heuristic parameter ?(shall_we_compute=always) ?(shall_we_compute_
      in
      let log_info = P.set_story_research_time log_info in
      let error,log_info = P.close_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error event (Some  (fun () -> size_of_pretrace trace)) log_info in
+     let error,() =
+       if S.PH.B.is_failed output
+       then
+         Exception.warn
+           (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter)
+           error
+           (Some "utilities.ml")
+           (Some "One compression has failed")
+           Exit
+           (fun () -> ())
+       else
+         error, ()
+     in
 
 (*     let error =
        if debug_mode
