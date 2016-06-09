@@ -20,7 +20,7 @@ let warn parameters mh message exn default =
 
 let local_trace = false
 
-(**************************************************************************)
+(*******************************************************************)
 (*PRINT*)
 
 let print_parallel_pair parameter error handler_kappa (x, y) =
@@ -591,7 +591,7 @@ let print_rule_has_non_parallel_bonds_rhs parameter store_result =
                         (Ckappa_sig.int_of_site_name site_type')
                         (Ckappa_sig.int_of_state_index state)
                         (Ckappa_sig.int_of_state_index state')
-(**)
+                        (**)
                         (Ckappa_sig.int_of_agent_id agent_id1)
                         (Ckappa_sig.int_of_agent_id agent_id1')
                         (Ckappa_sig.int_of_agent_name agent_type1)
