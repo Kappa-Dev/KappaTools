@@ -1,4 +1,4 @@
-+ Command line is: 'KaSim' '-i' 'side-effects.ka' '-seed' '924556145' '-e' '10000' '-d' 'output' '--time-independent'
++ Command line is: 'KaSim' '-i' 'side-effects.ka' '-seed' '924556145' '-e' '12' '-d' 'output' '--time-independent'
 Parsing side-effects.ka...
 done
 + Initialized random number generator with seed 924556145
@@ -20,17 +20,17 @@ ____________________________________________________________
 ############################################################
 + Producing causal compressions
 	 - blackboard generation
-	 - computing causal past of each observed events (10)
+	 - computing causal past of each observed events (1)
 Stats:
- number of step   : 115
- longest story    : 17
- average length   : 5.7
- geometric mean   : 6.9728
+ number of step   : 53
+ longest story    : 7
+ average length   : 3.125
+ geometric mean   : 3.69120576506
 
-	 - causal flow compression (10)
+	 - causal flow compression (1)
 
 
-	 - weak flow compression (3)
-+ Pretty printing 6 flows
-+ Pretty printing 3 weakly compressed flows
+	 - weak flow compression (1)
++ Pretty printing 1 flow
++ Pretty printing 1 weakly compressed flow
 Simulation ended
