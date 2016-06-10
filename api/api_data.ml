@@ -156,12 +156,8 @@ let find_link cm (a,s) =
   auxa 0 cm
 
 let api_contact_map cm =
-  let rec cut_by_agent = function
-    | [] -> []
-    | ((a,s),v) :: t ->
-       let av,oth = List.partition (fun ((a',_),_) -> a = a') t in
-       (a,(s,v)::List.map (fun ((_,s'),v') -> s',v') av)::cut_by_agent oth in
-  let cm' = cut_by_agent (Export_to_KaSim.String2Map.bindings cm) in
+  let cm' = Mods.StringMap.fold
+	      (fun a t acc -> (a,Mods.StringMap.bindings t)::acc) cm [] in
   Tools.array_map_of_list
     (fun (ag,sites) ->
      { Api_types.node_quantity = None;
@@ -423,8 +419,8 @@ let lwt_bind
   | `Right r -> (f r)
 let lwt_ignore (result : 'a Api_types.result) =
   match result with
-    `Left l -> Lwt.return_unit
-  | `Right r -> Lwt.return_unit
+    `Left _l -> Lwt.return_unit
+  | `Right _r -> Lwt.return_unit
 
 let eq_position l r =
   l.Api_types.chr = r.Api_types.chr

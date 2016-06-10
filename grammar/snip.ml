@@ -9,8 +9,11 @@ let link_occurence_failure key pos =
 let ports_from_contact_map sigs contact_map ty_id p_id =
   let ty_na = Format.asprintf "%a" (Signature.print_agent sigs) ty_id in
   let p_na = Format.asprintf "%a" (Signature.print_site sigs ty_id) p_id in
-  let cand = snd (Export_to_KaSim.String2Map.find_default
-		    ([],[]) (ty_na,p_na) contact_map) in
+  let cand =
+    snd
+      (Mods.StringMap.find_default
+	 ([],[]) p_na
+	 (Mods.StringMap.find_default Mods.StringMap.empty ty_na contact_map)) in
   List.map (fun (ty_na,p_na) ->
 	    let ty_id =
 	      Signature.num_of_agent (Location.dummy_annot ty_na) sigs in

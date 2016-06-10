@@ -74,18 +74,6 @@ type location =
   | Side_effect of int
 type 'a pair = 'a * 'a
 
-module String2SetMap =
-  SetMap.Make
-    (struct
-      type t = string * string
-      let compare = compare
-      let print f (a,b) = Format.fprintf f "(%s, %s)" a b
-     end)
-
-module String2Map = String2SetMap.Map
-
-module StringMap = Mods.StringMap
-
 type influence_map =
   {
     positive: location pair list InfluenceNodeMap.t InfluenceNodeMap.t ;
@@ -99,6 +87,8 @@ module type Export_to_KaSim =
   sig
 
     type state
+    type contact_map =
+      ((string list) * (string*string) list) Mods.StringMap.t Mods.StringMap.t
 
     val init:
       called_from:Remanent_parameters_sig.called_from ->
@@ -106,11 +96,13 @@ module type Export_to_KaSim =
       state
 
     val flush_errors: state -> state
-    val get_contact_map: ?accuracy_level:accuracy_level -> state -> state * (string list * (string*string) list) String2Map.t
+    val get_contact_map:
+      ?accuracy_level:accuracy_level -> state ->
+      state * (string list * (string*string) list) Mods.StringMap.t Mods.StringMap.t
     val get_influence_map: ?accuracy_level:accuracy_level -> state -> state * influence_map
     val get_signature: state -> state * Signature.s
     val get_most_accurate_contact_map:
-      state -> ((string list * (string*string) list) String2Map.t option)
+      state -> ((string list * (string*string) list) Mods.StringMap.t Mods.StringMap.t option)
     val get_most_accurate_influence_map: state -> influence_map option
     val dump_influence_map: accuracy_level -> state -> unit
     val dump_contact_map: accuracy_level -> state -> unit
@@ -171,35 +163,38 @@ module Export_to_KaSim =
     let print_contact_map parameters contact_map =
       Loggers.fprintf (Remanent_parameters.get_logger parameters)  "Contact map: ";
       Loggers.print_newline (Remanent_parameters.get_logger parameters) ;
-      String2Map.iter
-        (fun (x,y) (l1,l2) ->
-           if l1<>[]
-           then
-             begin
-               let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s@%s: " x y in
-               let _ = List.fold_left
-                   (fun bool x ->
-                      (if bool then
-                         Loggers.fprintf (Remanent_parameters.get_logger parameters) ", ");
-                      Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" x;
-                      true)
-                   false l1
-               in
+      Mods.StringMap.iter
+	(fun x ->
+	 Mods.StringMap.iter
+           (fun y (l1,l2) ->
+            if l1<>[]
+            then
+              begin
+		let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s@%s: " x y in
+		let _ = List.fold_left
+			  (fun bool x ->
+			   (if bool then
+                              Loggers.fprintf (Remanent_parameters.get_logger parameters) ", ");
+			   Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" x;
+			   true)
+			  false l1
+		in
+		Loggers.print_newline (Remanent_parameters.get_logger parameters)
+              end
+            else ();
+            List.iter
+              (fun (z,t) ->
+               Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s@%s--%s@%s" x y z t;
                Loggers.print_newline (Remanent_parameters.get_logger parameters)
-             end
-           else ();
-           List.iter
-             (fun (z,t) ->
-                Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s@%s--%s@%s" x y z t;
-                Loggers.print_newline (Remanent_parameters.get_logger parameters)
-             ) l2
-        )
+              ) l2
+           )
+	)
         contact_map
 
     (*-------------------------------------------------------------------------------*)
     (*type abstraction*)
 
-    type contact_map = ((string list) * (string*string) list) String2Map.t
+    type contact_map = ((string list) * (string*string) list) Mods.StringMap.t Mods.StringMap.t
 
     type errors = Exception.method_handler
 
@@ -280,7 +275,7 @@ module Export_to_KaSim =
       }
 
     let compute_raw_contact_map state =
-      let sol        = ref String2Map.empty in
+      let sol        = ref Mods.StringMap.empty in
       let handler    = state.handler in
       let parameters = state.parameters in
       let error      = state.errors in
@@ -292,54 +287,24 @@ module Export_to_KaSim =
         Loggers.print_newline (Remanent_parameters.get_logger parameters) in
       (*----------------------------------------------------------------*)
       let add_link (a,b) (c,d) sol =
-        let l,old =
-          String2Map.find_default ([],[]) (a,b) sol
-        in
-        String2Map.add (a,b) (l,((c,d)::old)) sol
+	let sol_a = Mods.StringMap.find_default Mods.StringMap.empty a sol in
+        let l,old = Mods.StringMap.find_default ([],[]) b sol_a in
+        Mods.StringMap.add a (Mods.StringMap.add b (l,((c,d)::old)) sol_a) sol
       in
       (*----------------------------------------------------------------*)
       let add_internal_state (a,b) c sol =
         match c with
         | Ckappa_sig.Binding _ -> sol
         | Ckappa_sig.Internal state ->
-          let old, l =
-            String2Map.find_default ([],[]) (a,b) sol
-          in
-          String2Map.add (a,b) (state::old,l) sol
+	   let sol_a = Mods.StringMap.find_default Mods.StringMap.empty a sol in
+           let old,l = Mods.StringMap.find_default ([],[]) b sol_a in
+           Mods.StringMap.add a (Mods.StringMap.add b (state::old,l) sol_a) sol
       in
       (*----------------------------------------------------------------*)
       let simplify_site site =
         match site with
         | Ckappa_sig.Binding site_name
         | Ckappa_sig.Internal site_name -> site_name
-      in
-      (*----------------------------------------------------------------*)
-      let _ =
-        Ckappa_sig.Dictionary_of_agents.iter
-          parameters error
-          (fun parameters error i agent_name () () ->
-            let error,site_dic =
-              Misc_sa.unsome
-                (Ckappa_sig.Agent_type_nearly_Inf_Int_storage_Imperatif.get
-                   parameters
-                   error
-                   i
-                   handler.Cckappa_sig.sites)
-                (fun error ->
-                   warn parameters error (Some "line 103") Exit
-                     (Ckappa_sig.Dictionary_of_sites.init ()))
-            in
-            let error =
-              Ckappa_sig.Dictionary_of_sites.iter
-                parameters error
-                (fun parameters_dot error j site () () ->
-                   let _ =
-                     sol := String2Map.add (agent_name,simplify_site site) ([],[]) (!sol)
-                   in
-                   error)
-                site_dic
-            in
-            error)
       in
       (*----------------------------------------------------------------*)
       let error =
@@ -391,7 +356,7 @@ module Export_to_KaSim =
           handler.Cckappa_sig.dual sol
       in
       let sol =
-        String2Map.map (fun (l,x) -> List.rev l,x) sol
+        Mods.StringMap.map (Mods.StringMap.map (fun (l,x) -> List.rev l,x)) sol
       in
       {state
        with contact_map = AccuracyMap.add Low sol state.contact_map ;
@@ -600,38 +565,22 @@ module Export_to_KaSim =
           (compute_influence_map accuracy_level state)
 
     let compute_signature state =
-      let state,contact_map = get_contact_map state in
-      let add a x states map =
-        let old =
-          StringMap.find_default [] a map
-        in
-        StringMap.add a ((x,states)::old) map
-      in
+      let state,l = get_contact_map state in
       let l =
-        String2Map.fold
-          (fun (a,x) (states,binding) map ->
-             add a x (states,binding) map
-          )
-          contact_map
-          StringMap.empty
-      in
-      let l =
-        StringMap.fold
+        Mods.StringMap.fold
           (fun a interface list ->
-             (Location.dummy_annot a ,
-              List.rev_map
-                (fun (x,(states,binding)) ->
-                   {
-                     Ast.port_nme = Location.dummy_annot x ;
-                     Ast.port_int =
-                       List.rev_map
-                         (fun s -> Location.dummy_annot s)
-                         (List.rev states);
-                     Ast.port_lnk = Location.dummy_annot Ast.FREE})
-                (List.rev interface))::list)
-          l
-          []
-      in
+           (Location.dummy_annot a ,
+            Mods.StringMap.fold
+              (fun x (states,_binding) acc ->
+               {
+                 Ast.port_nme = Location.dummy_annot x ;
+                 Ast.port_int =
+                   List.rev_map
+                     (fun s -> Location.dummy_annot s)
+                     (List.rev states);
+                 Ast.port_lnk = Location.dummy_annot Ast.FREE}::acc)
+	      interface [])::list)
+          l [] in
       {state with signature = Some (Signature.create l)}
 
     let rec get_signature state =
