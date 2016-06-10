@@ -32,5 +32,6 @@ Stats:
 
 	 - weak flow compression (2)
 + Pretty printing 2 flows
-+ Pretty printing 2 weakly compressed flows
++ Pretty printing 1 weakly compressed flow
+error: file_name: utilities.ml; message: One compression has failed; exception:Exit
 Simulation ended
