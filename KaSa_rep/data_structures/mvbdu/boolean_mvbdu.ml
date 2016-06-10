@@ -92,7 +92,7 @@ type memo_tables =
     boolean_mvbdu_monotonicaly_rename: bool Mvbdu_sig.mvbdu Hash_2.t;
     boolean_mvbdu_project_keep_only: bool Mvbdu_sig.mvbdu Hash_2.t;
     boolean_mvbdu_project_abstract_away: bool Mvbdu_sig.mvbdu Hash_2.t;
-
+    boolean_mvbdu_length_variables_list: int Hash_1.t;
     boolean_mvbdu_merge_variables_lists: unit List_sig.list Hash_2.t;
     boolean_mvbdu_overwrite_association_list: int List_sig.list Hash_2.t;
 
@@ -235,6 +235,7 @@ let init_data parameters error =
   let error,mvbdu_project_keep_only = Hash_2.create parameters error (0,0) in
   let error,mvbdu_project_abstract_away = Hash_2.create parameters error (0,0) in
   let error,mvbdu_merge = Hash_2.create parameters error (0,0) in
+  let error,mvbdu_length = Hash_1.create parameters error 0 in
   let error,mvbdu_overwrite = Hash_2.create parameters error (0,0) in
   let error,mvbdu_extensional_variables_list = Hash_1.create parameters error 0 in
   let error,mvbdu_extensional_association_list = Hash_1.create parameters error 0 in
@@ -266,6 +267,7 @@ let init_data parameters error =
     boolean_mvbdu_project_keep_only = mvbdu_project_keep_only;
     boolean_mvbdu_project_abstract_away = mvbdu_project_abstract_away;
     boolean_mvbdu_merge_variables_lists = mvbdu_merge;
+    boolean_mvbdu_length_variables_list = mvbdu_length;
     boolean_mvbdu_overwrite_association_list = mvbdu_overwrite;
     boolean_mvbdu_extensional_description_of_variables_list = mvbdu_extensional_variables_list;
     boolean_mvbdu_extensional_description_of_association_list = mvbdu_extensional_association_list;
@@ -794,7 +796,7 @@ let redefine parameters error handler mvbdu_input list_input =
     (fun x -> x.Memo_sig.data.boolean_mvbdu_redefine)
     (fun x h ->
       {
-        h with Memo_sig.data = 
+        h with Memo_sig.data =
           {
             h.Memo_sig.data with boolean_mvbdu_redefine = x
           }
@@ -833,7 +835,7 @@ let project_abstract_away parameters error handler mvbdu_input list_input =
     (fun x -> x.Memo_sig.data.boolean_mvbdu_project_abstract_away)
     (fun x h ->
       {
-        h with Memo_sig.data = 
+        h with Memo_sig.data =
           {
             h.Memo_sig.data with boolean_mvbdu_project_abstract_away = x
           }
@@ -844,18 +846,18 @@ let merge_variables_lists parameters error handler list1 list2 =
   List_algebra.overwrite
     (variables_list_allocate parameters)
     (fun parameter error handler (x1,x2) ->
-      let error, output = 
-        Hash_2.unsafe_get parameter error 
+      let error, output =
+        Hash_2.unsafe_get parameter error
           (x1.List_sig.id, x2.List_sig.id)
           handler.Memo_sig.data.boolean_mvbdu_merge_variables_lists
       in
       error, (handler, output))
     (fun parameter error handler (x1,x2) output ->
-      let error, memo = 
+      let error, memo =
         Hash_2.set parameter error
-          (x1.List_sig.id, x2.List_sig.id) 
-          output 
-          handler.Memo_sig.data.boolean_mvbdu_merge_variables_lists 
+          (x1.List_sig.id, x2.List_sig.id)
+          output
+          handler.Memo_sig.data.boolean_mvbdu_merge_variables_lists
       in
       error,
       {
@@ -868,28 +870,52 @@ let merge_variables_lists parameters error handler list1 list2 =
     list1
     list2
 
+let length parameters error handler list =
+  List_algebra.length
+    (variables_list_allocate parameters)
+    (fun parameter error handler x ->
+       let error, output =
+         Hash_1.unsafe_get parameter error
+           x.List_sig.id
+           handler.Memo_sig.data.boolean_mvbdu_length_variables_list
+       in
+       error, (handler, output))
+    (fun parameter error handler x output ->
+       let error, memo =
+         Hash_1.set parameter error
+         x.List_sig.id
+         output
+         handler.Memo_sig.data.boolean_mvbdu_length_variables_list
+       in
+       error,
+       { handler with Memo_sig.data =
+                        {handler.Memo_sig.data with
+                         boolean_mvbdu_length_variables_list = memo}
+       })
+    error parameters handler list
+
 let overwrite_association_lists parameters error handler list1 list2 =
   List_algebra.overwrite
     (association_list_allocate parameters)
     (fun parameter error handler (x1,x2) ->
-      let error, output = 
+      let error, output =
         Hash_2.unsafe_get parameter error
           (x1.List_sig.id, x2.List_sig.id)
-          handler.Memo_sig.data.boolean_mvbdu_overwrite_association_list 
+          handler.Memo_sig.data.boolean_mvbdu_overwrite_association_list
       in
       error, (handler, output))
     (fun parameter error handler (x1,x2) output ->
-      let error, memo = 
+      let error, memo =
         Hash_2.set parameter error
           (x1.List_sig.id, x2.List_sig.id)
-          output 
-          handler.Memo_sig.data.boolean_mvbdu_overwrite_association_list 
+          output
+          handler.Memo_sig.data.boolean_mvbdu_overwrite_association_list
       in
       error,
       {
         handler with Memo_sig.data =
 	  {
-            handler.Memo_sig.data with 
+            handler.Memo_sig.data with
               boolean_mvbdu_overwrite_association_list = memo
           }
       })
@@ -903,15 +929,15 @@ let extensional_description_of_variables_list parameters error handler list =
       let error, output =
         Hash_1.unsafe_get parameter error
           x.List_sig.id
-          handler.Memo_sig.data.boolean_mvbdu_extensional_description_of_variables_list 
+          handler.Memo_sig.data.boolean_mvbdu_extensional_description_of_variables_list
       in
       error, (handler, output))
     (fun parameter error handler x output ->
       let error, memo =
         Hash_1.set parameter error
-          x.List_sig.id 
-          output 
-          handler.Memo_sig.data.boolean_mvbdu_extensional_description_of_variables_list 
+          x.List_sig.id
+          output
+          handler.Memo_sig.data.boolean_mvbdu_extensional_description_of_variables_list
       in
       error,
       {
@@ -927,31 +953,31 @@ let extensional_description_of_association_list parameters error handler list =
   List_algebra.extensional_with_asso
     (fun parameter error handler x ->
       let error, output =
-        Hash_1.unsafe_get parameter error 
+        Hash_1.unsafe_get parameter error
           x.List_sig.id
           handler.Memo_sig.data.boolean_mvbdu_extensional_description_of_association_list
       in
       error, (handler, output))
     (fun parameter error handler x output ->
-      let error, memo = 
+      let error, memo =
         Hash_1.set parameter error
           x.List_sig.id
           output
-          handler.Memo_sig.data.boolean_mvbdu_extensional_description_of_association_list 
+          handler.Memo_sig.data.boolean_mvbdu_extensional_description_of_association_list
       in
       error,
       {
         handler with Memo_sig.data =
 	  {
-            handler.Memo_sig.data with 
+            handler.Memo_sig.data with
               boolean_mvbdu_extensional_description_of_association_list = memo
           }
       })
     error handler list
 
 let rec variables_of_mvbdu parameters error handler mvbdu =
-  match 
-    Hash_1.unsafe_get parameters error 
+  match
+    Hash_1.unsafe_get parameters error
       mvbdu.Mvbdu_sig.id
       handler.Memo_sig.data.boolean_mvbdu_variables_of_mvbdu
   with
@@ -963,41 +989,41 @@ let rec variables_of_mvbdu parameters error handler mvbdu =
 	| Mvbdu_sig.Leaf _ ->
 	  let error, (handler, list) =
             List_algebra.build_reversed_sorted_list
-              (variables_list_allocate parameters) parameters error handler 
+              (variables_list_allocate parameters) parameters error handler
               []
 	  in
           error, (handler, Some list)
 	| Mvbdu_sig.Node a ->
 	  let error, (handler, list_false) =
             variables_of_mvbdu parameters error handler
-              a.Mvbdu_sig.branch_false 
+              a.Mvbdu_sig.branch_false
           in
-	  let error, (handler, list_true) = 
-            variables_of_mvbdu parameters error handler 
+	  let error, (handler, list_true) =
+            variables_of_mvbdu parameters error handler
               a.Mvbdu_sig.branch_true
           in
 	  let error, (handler, singleton) =
-            List_algebra.build_reversed_sorted_list 
-              (variables_list_allocate parameters) parameters error handler 
-              [a.Mvbdu_sig.variable, ()] 
+            List_algebra.build_reversed_sorted_list
+              (variables_list_allocate parameters) parameters error handler
+              [a.Mvbdu_sig.variable, ()]
           in
 	  begin
 	    match list_false, list_true with
 	    | Some list_f, Some list_t ->
 	      begin
 		let error, (handler, list_sibblings) =
-                  merge_variables_lists parameters error handler 
-                    list_f 
-                    list_t 
+                  merge_variables_lists parameters error handler
+                    list_f
+                    list_t
                 in
 		let error, (handler,output) =
 		  match list_sibblings with
-		  | Some list_s -> 
-                    merge_variables_lists parameters error handler 
-                      singleton 
+		  | Some list_s ->
+                    merge_variables_lists parameters error handler
+                      singleton
                       list_s
-		  | None -> 
-                    Exception.warn parameters error (Some "Boolean_mvbdu") 
+		  | None ->
+                    Exception.warn parameters error (Some "Boolean_mvbdu")
                       (Some "line 854") Exit (fun () -> handler,None)
 		in
 		error, (handler, output)
@@ -1009,11 +1035,11 @@ let rec variables_of_mvbdu parameters error handler mvbdu =
       in
       match output with
       | Some output ->
-	let error, memo = 
+	let error, memo =
           Hash_1.set parameters error
             mvbdu.Mvbdu_sig.id
             output
-            handler.Memo_sig.data.boolean_mvbdu_variables_of_mvbdu 
+            handler.Memo_sig.data.boolean_mvbdu_variables_of_mvbdu
         in
 	error,
 	({
@@ -1023,16 +1049,16 @@ let rec variables_of_mvbdu parameters error handler mvbdu =
             }
         }, Some output)
       | None ->
-	Exception.warn parameters error (Some "Boolean_mvbdu") 
+	Exception.warn parameters error (Some "Boolean_mvbdu")
           (Some "line 874") Exit (fun () -> (handler, None))
     end
 
-let mvbdu_cartesian_decomposition_depth 
-    variables_list_of_mvbdu extensional_of_variables_list 
+let mvbdu_cartesian_decomposition_depth
+    variables_list_of_mvbdu extensional_of_variables_list
     build_sorted_variables_list
     mvbdu_project_keep_only
-    mvbdu_project_abstract_away 
-    mvbdu_and 
+    mvbdu_project_abstract_away
+    mvbdu_and
     equal
     parameters handler error bdu int =
   let rec aux_k k handler error bdu_to_decompose list =
@@ -1041,10 +1067,10 @@ let mvbdu_cartesian_decomposition_depth
       error, handler, (Some bdu_to_decompose,list)
     else
       let error, handler, l =
-        variables_list_of_mvbdu parameters handler error bdu_to_decompose 
+        variables_list_of_mvbdu parameters handler error bdu_to_decompose
       in
       let error, handler, list_var =
-        extensional_of_variables_list parameters handler error l 
+        extensional_of_variables_list parameters handler error l
       in
       let n_var = List.length list_var in
       if k > n_var / 2
@@ -1053,8 +1079,8 @@ let mvbdu_cartesian_decomposition_depth
       else
 	let parts = Tools_kasa.sorted_parts_of_list k list_var in
 	let rec aux n_var list_of_parts handler error
-            bdu_to_decompose 
-            list_of_decomposed_bdu 
+            bdu_to_decompose
+            list_of_decomposed_bdu
             decomposed_var
             =
 	  if k > n_var / 2
@@ -1068,27 +1094,27 @@ let mvbdu_cartesian_decomposition_depth
 		List.exists (fun x -> Mods.IntSet.mem x decomposed_var) h
 	      then
 		aux n_var t handler error
-                  bdu_to_decompose 
-                  list_of_decomposed_bdu 
+                  bdu_to_decompose
+                  list_of_decomposed_bdu
                   decomposed_var
 	      else
 		let error, handler, list =
                   build_sorted_variables_list parameters handler error h
                 in
 		let error, handler, restriction =
-                  mvbdu_project_keep_only parameters handler error 
-                    bdu_to_decompose 
-                    list 
+                  mvbdu_project_keep_only parameters handler error
+                    bdu_to_decompose
+                    list
                 in
 		let error, handler, abstract_away =
-                  mvbdu_project_abstract_away parameters handler error 
+                  mvbdu_project_abstract_away parameters handler error
                     bdu_to_decompose
-                    list 
+                    list
                 in
 		let error, handler, cartesian_abstraction =
-                  mvbdu_and parameters handler error 
+                  mvbdu_and parameters handler error
                     restriction
-                    abstract_away 
+                    abstract_away
                 in
 		if equal cartesian_abstraction bdu_to_decompose
 		then
@@ -1097,32 +1123,32 @@ let mvbdu_cartesian_decomposition_depth
                   in
 		  aux (n_var - k) t handler error
                     abstract_away
-                    (restriction :: list_of_decomposed_bdu) 
+                    (restriction :: list_of_decomposed_bdu)
                     decomposed_var
 		else
 		  aux n_var t handler error
                     bdu_to_decompose
                     list_of_decomposed_bdu decomposed_var
 	in
-	let error, handler, bdu_opt, list = 
+	let error, handler, bdu_opt, list =
           aux
 	    n_var
 	    parts
 	    handler error bdu_to_decompose
 	    list
-	    Mods.IntSet.empty 
+	    Mods.IntSet.empty
         in
 	match bdu_opt with
 	| None -> error, handler, (None, list)
 	| Some bdu -> aux_k (k+1) handler error bdu list
   in
-  let error, handler, (bdu_opt, list) = 
-    aux_k 1 handler error bdu [] 
+  let error, handler, (bdu_opt, list) =
+    aux_k 1 handler error bdu []
   in
   error, handler, (bdu_opt, List.rev list)
 
 let rec extensional_description_of_mvbdu parameters handler error mvbdu =
-  match 
+  match
     Hash_1.unsafe_get parameters error
       mvbdu.Mvbdu_sig.id
       handler.Memo_sig.data.boolean_mvbdu_extensional_description_of_mvbdu
@@ -1137,7 +1163,7 @@ let rec extensional_description_of_mvbdu parameters handler error mvbdu =
 	| Mvbdu_sig.Node a ->
 	  let error, (handler, branch_true) =
             extensional_description_of_mvbdu parameters handler error
-              a.Mvbdu_sig.branch_true 
+              a.Mvbdu_sig.branch_true
           in
 	  let upper_bound = a.Mvbdu_sig.upper_bound in
 	  let error, (handler, output) =
@@ -1170,17 +1196,17 @@ let rec extensional_description_of_mvbdu parameters handler error mvbdu =
 	    output
       in
       let error,(handler,output) = aux mvbdu None handler error [] in
-      let error, memo = 
+      let error, memo =
         Hash_1.set parameters error
           mvbdu.Mvbdu_sig.id
           output
-          handler.Memo_sig.data.boolean_mvbdu_extensional_description_of_mvbdu 
+          handler.Memo_sig.data.boolean_mvbdu_extensional_description_of_mvbdu
       in
       error,
       ({
         handler with Memo_sig.data =
-	  { 
-            handler.Memo_sig.data with 
+	  {
+            handler.Memo_sig.data with
               boolean_mvbdu_extensional_description_of_mvbdu = memo
           }
       }, output)

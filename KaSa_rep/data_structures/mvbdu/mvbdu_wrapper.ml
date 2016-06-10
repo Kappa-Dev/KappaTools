@@ -1,106 +1,108 @@
 
 
 module type Mvbdu =
-  sig
-    type key
-    type value
-    type handler = (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.association_list_dic,Boolean_mvbdu.variables_list_dic,bool,int) Memo_sig.handler
-    type mvbdu
-    type hconsed_association_list
-    type hconsed_variables_list
-    type hconsed_renaming_list
+sig
+  type key
+  type value
+  type handler = (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.association_list_dic,Boolean_mvbdu.variables_list_dic,bool,int) Memo_sig.handler
+  type mvbdu
+  type hconsed_association_list
+  type hconsed_variables_list
+  type hconsed_renaming_list
 
-    type 'output constant = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> Exception.method_handler * handler * 'output
-    type ('input,'output) unary =  Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input -> Exception.method_handler * handler * 'output
-    type ('input1,'input2,'output) binary = Remanent_parameters_sig.parameters -> handler ->  Exception.method_handler -> 'input1 -> 'input2 -> Exception.method_handler * handler * 'output
-    type ('input1,'input2,'input3,'output) ternary = Remanent_parameters_sig.parameters -> handler -> Exception.method_handler -> 'input1 -> 'input2 -> 'input3 -> Exception.method_handler * handler * 'output
+  type 'output constant = Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> Exception.method_handler * handler * 'output
+  type ('input,'output) unary =  Remanent_parameters_sig.parameters -> handler ->   Exception.method_handler -> 'input -> Exception.method_handler * handler * 'output
+  type ('input1,'input2,'output) binary = Remanent_parameters_sig.parameters -> handler ->  Exception.method_handler -> 'input1 -> 'input2 -> Exception.method_handler * handler * 'output
+  type ('input1,'input2,'input3,'output) ternary = Remanent_parameters_sig.parameters -> handler -> Exception.method_handler -> 'input1 -> 'input2 -> 'input3 -> Exception.method_handler * handler * 'output
 
-    val init: Remanent_parameters_sig.parameters -> Exception.method_handler -> Exception.method_handler * handler
-    val is_init: unit -> bool
-    val equal: mvbdu -> mvbdu -> bool
-    val equal_with_logs: (mvbdu,mvbdu,bool) binary
-    val mvbdu_false: mvbdu constant
-    val mvbdu_true:  mvbdu constant
-    val mvbdu_not: (mvbdu,mvbdu) unary
-    val mvbdu_id:  (mvbdu,mvbdu) unary
-    val mvbdu_unary_true: (mvbdu,mvbdu) unary
-    val mvbdu_unary_false: (mvbdu,mvbdu) unary
-    val mvbdu_and:  (mvbdu,mvbdu,mvbdu) binary
-    val mvbdu_or: (mvbdu,mvbdu,mvbdu) binary
-    val mvbdu_xor: (mvbdu,mvbdu,mvbdu) binary
-    val mvbdu_nand: (mvbdu,mvbdu,mvbdu) binary
-    val mvbdu_nor: (mvbdu,mvbdu,mvbdu) binary
-    val mvbdu_imply: (mvbdu,mvbdu,mvbdu) binary
-    val mvbdu_rev_imply: (mvbdu,mvbdu,mvbdu) binary
-    val mvbdu_equiv: (mvbdu,mvbdu,mvbdu) binary
-    val mvbdu_nimply: (mvbdu,mvbdu,mvbdu) binary
-    val mvbdu_nrev_imply: (mvbdu,mvbdu,mvbdu) binary
-    val mvbdu_bi_true: (mvbdu,mvbdu,mvbdu) binary
-    val mvbdu_bi_false: (mvbdu,mvbdu,mvbdu) binary
-    val mvbdu_fst: (mvbdu,mvbdu,mvbdu) binary
-    val mvbdu_snd: (mvbdu,mvbdu,mvbdu) binary
-    val mvbdu_nfst: (mvbdu,mvbdu,mvbdu) binary
-    val mvbdu_nsnd: (mvbdu,mvbdu,mvbdu) binary
-    val mvbdu_redefine: (mvbdu,hconsed_association_list,mvbdu) binary
-    val mvbdu_subseteq: (mvbdu,mvbdu,bool) binary
-    val mvbdu_of_hconsed_asso: (hconsed_association_list,mvbdu) unary
-    val mvbdu_of_association_list: ((key * value) list,mvbdu) unary
-    val mvbdu_of_sorted_association_list: ((key * value) list,mvbdu) unary
-    val mvbdu_of_reverse_sorted_association_list: ((key * value) list,mvbdu) unary
-    val mvbdu_rename: (mvbdu,hconsed_renaming_list,mvbdu) binary
+  val init: Remanent_parameters_sig.parameters -> Exception.method_handler -> Exception.method_handler * handler
+  val is_init: unit -> bool
+  val equal: mvbdu -> mvbdu -> bool
+  val equal_with_logs: (mvbdu,mvbdu,bool) binary
+  val mvbdu_false: mvbdu constant
+  val mvbdu_true:  mvbdu constant
+  val mvbdu_not: (mvbdu,mvbdu) unary
+  val mvbdu_id:  (mvbdu,mvbdu) unary
+  val mvbdu_unary_true: (mvbdu,mvbdu) unary
+  val mvbdu_unary_false: (mvbdu,mvbdu) unary
+  val mvbdu_and:  (mvbdu,mvbdu,mvbdu) binary
+  val mvbdu_or: (mvbdu,mvbdu,mvbdu) binary
+  val mvbdu_xor: (mvbdu,mvbdu,mvbdu) binary
+  val mvbdu_nand: (mvbdu,mvbdu,mvbdu) binary
+  val mvbdu_nor: (mvbdu,mvbdu,mvbdu) binary
+  val mvbdu_imply: (mvbdu,mvbdu,mvbdu) binary
+  val mvbdu_rev_imply: (mvbdu,mvbdu,mvbdu) binary
+  val mvbdu_equiv: (mvbdu,mvbdu,mvbdu) binary
+  val mvbdu_nimply: (mvbdu,mvbdu,mvbdu) binary
+  val mvbdu_nrev_imply: (mvbdu,mvbdu,mvbdu) binary
+  val mvbdu_bi_true: (mvbdu,mvbdu,mvbdu) binary
+  val mvbdu_bi_false: (mvbdu,mvbdu,mvbdu) binary
+  val mvbdu_fst: (mvbdu,mvbdu,mvbdu) binary
+  val mvbdu_snd: (mvbdu,mvbdu,mvbdu) binary
+  val mvbdu_nfst: (mvbdu,mvbdu,mvbdu) binary
+  val mvbdu_nsnd: (mvbdu,mvbdu,mvbdu) binary
+  val mvbdu_redefine: (mvbdu,hconsed_association_list,mvbdu) binary
+  val mvbdu_subseteq: (mvbdu,mvbdu,bool) binary
+  val mvbdu_of_hconsed_asso: (hconsed_association_list,mvbdu) unary
+  val mvbdu_of_association_list: ((key * value) list,mvbdu) unary
+  val mvbdu_of_sorted_association_list: ((key * value) list,mvbdu) unary
+  val mvbdu_of_reverse_sorted_association_list: ((key * value) list,mvbdu) unary
+  val mvbdu_rename: (mvbdu,hconsed_renaming_list,mvbdu) binary
 
-    val mvbdu_project_keep_only: (mvbdu,hconsed_variables_list,mvbdu) binary
-    val mvbdu_project_abstract_away: (mvbdu,hconsed_variables_list,mvbdu) binary
-    val mvbdu_cartesian_decomposition_depth: (mvbdu,int,mvbdu option * mvbdu list) binary
-    val mvbdu_full_cartesian_decomposition: (mvbdu,mvbdu list) unary
-    val mvbdu_cartesian_abstraction: (mvbdu,mvbdu list) unary
+  val mvbdu_project_keep_only: (mvbdu,hconsed_variables_list,mvbdu) binary
+  val mvbdu_project_abstract_away: (mvbdu,hconsed_variables_list,mvbdu) binary
+  val mvbdu_cartesian_decomposition_depth: (mvbdu,int,mvbdu option * mvbdu list) binary
+  val mvbdu_full_cartesian_decomposition: (mvbdu,mvbdu list) unary
+  val mvbdu_cartesian_abstraction: (mvbdu,mvbdu list) unary
 
-    val build_association_list: ((key * value) list,hconsed_association_list) unary
-    val build_sorted_association_list: ((key * value) list,hconsed_association_list) unary
-    val build_reverse_sorted_association_list: ((key * value) list, hconsed_association_list) unary
-    val empty_association_list : hconsed_association_list constant
-    val build_variables_list: (key list,hconsed_variables_list) unary
-    val build_sorted_variables_list: (key list,hconsed_variables_list) unary
-    val build_reverse_sorted_variables_list: (key list,hconsed_variables_list) unary
-    val empty_variables_list: hconsed_variables_list constant
+  val build_association_list: ((key * value) list,hconsed_association_list) unary
+  val build_sorted_association_list: ((key * value) list,hconsed_association_list) unary
+  val build_reverse_sorted_association_list: ((key * value) list, hconsed_association_list) unary
+  val empty_association_list : hconsed_association_list constant
+  val build_variables_list: (key list,hconsed_variables_list) unary
+  val build_sorted_variables_list: (key list,hconsed_variables_list) unary
+  val build_reverse_sorted_variables_list: (key list,hconsed_variables_list) unary
+  val empty_variables_list: hconsed_variables_list constant
 
-    val build_renaming_list: ((key * key) list,hconsed_renaming_list) unary
-    val build_sorted_renaming_list: ((key * key) list,hconsed_renaming_list) unary
-    val build_reverse_sorted_renaming_list: ((key * key) list,hconsed_renaming_list) unary
-    val empty_renaming_list : hconsed_renaming_list constant
-
-
-    val overwrite_association_lists: (hconsed_association_list,hconsed_association_list,hconsed_association_list) binary
-    val merge_variables_lists: (hconsed_variables_list,hconsed_variables_list,hconsed_variables_list) binary
-
-    val extensional_of_variables_list: (hconsed_variables_list, key list) unary
-    val extensional_of_association_list: (hconsed_association_list,(key*value) list) unary
-    val extensional_of_mvbdu: (mvbdu, (key * value) list list) unary
+  val build_renaming_list: ((key * key) list,hconsed_renaming_list) unary
+  val build_sorted_renaming_list: ((key * key) list,hconsed_renaming_list) unary
+  val build_reverse_sorted_renaming_list: ((key * key) list,hconsed_renaming_list) unary
+  val empty_renaming_list : hconsed_renaming_list constant
 
 
-    val variables_list_of_mvbdu: (mvbdu,hconsed_variables_list) unary
+  val overwrite_association_lists: (hconsed_association_list,hconsed_association_list,hconsed_association_list) binary
+  val merge_variables_lists: (hconsed_variables_list,hconsed_variables_list,hconsed_variables_list) binary
+  val nbr_variables:
+    (hconsed_variables_list,int) unary
 
-    val print: Remanent_parameters_sig.parameters -> mvbdu -> unit
-    val print_association_list: Remanent_parameters_sig.parameters -> hconsed_association_list -> unit
-    val print_variables_list: Remanent_parameters_sig.parameters -> hconsed_variables_list -> unit
+  val extensional_of_variables_list: (hconsed_variables_list, key list) unary
+  val extensional_of_association_list: (hconsed_association_list,(key*value) list) unary
+  val extensional_of_mvbdu: (mvbdu, (key * value) list list) unary
 
- (*get set default join parameters handler error hash_consed_object data storage =*)
-    val store_by_variables_list:
-      ( Remanent_parameters_sig.parameters ->
-	Exception.method_handler ->
-	'data ->
-	List_sig.hash_key ->
-	'map ->
-	Exception.method_handler * 'data) ->
-      ( Remanent_parameters_sig.parameters ->
-	Exception.method_handler ->
-	List_sig.hash_key ->
-	'data ->
-	'map ->
-	Exception.method_handler * 'map) ->
+
+  val variables_list_of_mvbdu: (mvbdu,hconsed_variables_list) unary
+
+  val print: Remanent_parameters_sig.parameters -> mvbdu -> unit
+  val print_association_list: Remanent_parameters_sig.parameters -> hconsed_association_list -> unit
+  val print_variables_list: Remanent_parameters_sig.parameters -> hconsed_variables_list -> unit
+
+  (*get set default join parameters handler error hash_consed_object data storage =*)
+  val store_by_variables_list:
+    ( Remanent_parameters_sig.parameters ->
+      Exception.method_handler ->
       'data ->
-      ('data,'data,'data) binary ->
-      (hconsed_variables_list,'data,'map,'map) ternary
+      List_sig.hash_key ->
+      'map ->
+      Exception.method_handler * 'data) ->
+    ( Remanent_parameters_sig.parameters ->
+      Exception.method_handler ->
+      List_sig.hash_key ->
+      'data ->
+      'map ->
+      Exception.method_handler * 'map) ->
+    'data ->
+    ('data,'data,'data) binary ->
+    (hconsed_variables_list,'data,'map,'map) ternary
 
   val store_by_mvbdu:
     ( Remanent_parameters_sig.parameters ->
@@ -126,85 +128,86 @@ end
 
 
 module type Internalized_mvbdu =
-  sig
-    type key
-    type value
-    type mvbdu
-    type handler = (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.association_list_dic,Boolean_mvbdu.variables_list_dic,bool,int) Memo_sig.handler
-    type hconsed_association_list
-    type hconsed_variables_list
-    type hconsed_renaming_list
+sig
+  type key
+  type value
+  type mvbdu
+  type handler = (Boolean_mvbdu.memo_tables,Boolean_mvbdu.mvbdu_dic,Boolean_mvbdu.association_list_dic,Boolean_mvbdu.variables_list_dic,bool,int) Memo_sig.handler
+  type hconsed_association_list
+  type hconsed_variables_list
+  type hconsed_renaming_list
 
-    val init: Remanent_parameters_sig.parameters -> unit
-    val import_handler: handler -> unit
-    val export_handler: Exception.method_handler -> Exception.method_handler * handler option
-    val is_init: unit -> bool
-    val equal: mvbdu -> mvbdu -> bool
-    val mvbdu_false: unit -> mvbdu
-    val mvbdu_true:  unit -> mvbdu
-    val mvbdu_not: mvbdu -> mvbdu
-    val mvbdu_id:  mvbdu -> mvbdu
-    val mvbdu_unary_true: mvbdu -> mvbdu
-    val mvbdu_unary_false: mvbdu -> mvbdu
-    val mvbdu_and: mvbdu -> mvbdu -> mvbdu
-    val mvbdu_or:  mvbdu -> mvbdu -> mvbdu
-    val mvbdu_xor:  mvbdu -> mvbdu -> mvbdu
-    val mvbdu_nand:  mvbdu -> mvbdu -> mvbdu
-    val mvbdu_nor:  mvbdu -> mvbdu -> mvbdu
-    val mvbdu_imply:  mvbdu -> mvbdu -> mvbdu
-    val mvbdu_rev_imply:  mvbdu -> mvbdu -> mvbdu
-    val mvbdu_equiv:  mvbdu -> mvbdu -> mvbdu
-    val mvbdu_nimply:  mvbdu -> mvbdu -> mvbdu
-    val mvbdu_nrev_imply:  mvbdu -> mvbdu -> mvbdu
-    val mvbdu_bi_true:  mvbdu -> mvbdu -> mvbdu
-    val mvbdu_bi_false:  mvbdu -> mvbdu -> mvbdu
-    val mvbdu_fst:  mvbdu -> mvbdu -> mvbdu
-    val mvbdu_snd:  mvbdu -> mvbdu -> mvbdu
-    val mvbdu_nfst:  mvbdu -> mvbdu -> mvbdu
-    val mvbdu_nsnd:  mvbdu -> mvbdu -> mvbdu
-    val mvbdu_redefine: mvbdu -> hconsed_association_list -> mvbdu
-    val mvbdu_subseteq: mvbdu -> mvbdu -> bool
-    val mvbdu_of_hconsed_asso: hconsed_association_list -> mvbdu
-    val mvbdu_of_association_list: ((key * value) list) -> mvbdu
-    val mvbdu_of_sorted_association_list: ((key * value) list) -> mvbdu
-    val mvbdu_of_reverse_sorted_association_list: ((key * value) list) -> mvbdu
+  val init: Remanent_parameters_sig.parameters -> unit
+  val import_handler: handler -> unit
+  val export_handler: Exception.method_handler -> Exception.method_handler * handler option
+  val is_init: unit -> bool
+  val equal: mvbdu -> mvbdu -> bool
+  val mvbdu_false: unit -> mvbdu
+  val mvbdu_true:  unit -> mvbdu
+  val mvbdu_not: mvbdu -> mvbdu
+  val mvbdu_id:  mvbdu -> mvbdu
+  val mvbdu_unary_true: mvbdu -> mvbdu
+  val mvbdu_unary_false: mvbdu -> mvbdu
+  val mvbdu_and: mvbdu -> mvbdu -> mvbdu
+  val mvbdu_or:  mvbdu -> mvbdu -> mvbdu
+  val mvbdu_xor:  mvbdu -> mvbdu -> mvbdu
+  val mvbdu_nand:  mvbdu -> mvbdu -> mvbdu
+  val mvbdu_nor:  mvbdu -> mvbdu -> mvbdu
+  val mvbdu_imply:  mvbdu -> mvbdu -> mvbdu
+  val mvbdu_rev_imply:  mvbdu -> mvbdu -> mvbdu
+  val mvbdu_equiv:  mvbdu -> mvbdu -> mvbdu
+  val mvbdu_nimply:  mvbdu -> mvbdu -> mvbdu
+  val mvbdu_nrev_imply:  mvbdu -> mvbdu -> mvbdu
+  val mvbdu_bi_true:  mvbdu -> mvbdu -> mvbdu
+  val mvbdu_bi_false:  mvbdu -> mvbdu -> mvbdu
+  val mvbdu_fst:  mvbdu -> mvbdu -> mvbdu
+  val mvbdu_snd:  mvbdu -> mvbdu -> mvbdu
+  val mvbdu_nfst:  mvbdu -> mvbdu -> mvbdu
+  val mvbdu_nsnd:  mvbdu -> mvbdu -> mvbdu
+  val mvbdu_redefine: mvbdu -> hconsed_association_list -> mvbdu
+  val mvbdu_subseteq: mvbdu -> mvbdu -> bool
+  val mvbdu_of_hconsed_asso: hconsed_association_list -> mvbdu
+  val mvbdu_of_association_list: ((key * value) list) -> mvbdu
+  val mvbdu_of_sorted_association_list: ((key * value) list) -> mvbdu
+  val mvbdu_of_reverse_sorted_association_list: ((key * value) list) -> mvbdu
 
-    val mvbdu_rename: mvbdu -> hconsed_renaming_list -> mvbdu
-    val mvbdu_project_abstract_away: mvbdu -> hconsed_variables_list -> mvbdu
-    val mvbdu_project_keep_only: mvbdu -> hconsed_variables_list -> mvbdu
-    val mvbdu_cartesian_abstraction: mvbdu -> mvbdu list
-    val mvbdu_cartesian_decomposition_depth: mvbdu -> int -> mvbdu option * mvbdu list
-    val mvbdu_full_cartesian_decomposition: mvbdu -> mvbdu list
+  val mvbdu_rename: mvbdu -> hconsed_renaming_list -> mvbdu
+  val mvbdu_project_abstract_away: mvbdu -> hconsed_variables_list -> mvbdu
+  val mvbdu_project_keep_only: mvbdu -> hconsed_variables_list -> mvbdu
+  val mvbdu_cartesian_abstraction: mvbdu -> mvbdu list
+  val mvbdu_cartesian_decomposition_depth: mvbdu -> int -> mvbdu option * mvbdu list
+  val mvbdu_full_cartesian_decomposition: mvbdu -> mvbdu list
 
-    val build_association_list: (key * value) list ->  hconsed_association_list
-    val build_sorted_association_list: (key * value) list -> hconsed_association_list
-    val build_reverse_sorted_association_list: (key * value) list -> hconsed_association_list
-    val empty_association_list : unit -> hconsed_association_list
-    val build_variables_list: key list -> hconsed_variables_list
-    val build_sorted_variables_list: key list -> hconsed_variables_list
-    val build_reverse_sorted_variables_list: key list -> hconsed_variables_list
-    val empty_variables_list : unit -> hconsed_variables_list
-    val build_renaming_list: (key * key) list -> hconsed_renaming_list
-    val build_sorted_renaming_list: (key * key) list -> hconsed_renaming_list
-    val build_reverse_sorted_renaming_list: (key * key) list -> hconsed_renaming_list
-    val empty_renaming_list : unit -> hconsed_renaming_list
+  val build_association_list: (key * value) list ->  hconsed_association_list
+  val build_sorted_association_list: (key * value) list -> hconsed_association_list
+  val build_reverse_sorted_association_list: (key * value) list -> hconsed_association_list
+  val empty_association_list : unit -> hconsed_association_list
+  val build_variables_list: key list -> hconsed_variables_list
+  val build_sorted_variables_list: key list -> hconsed_variables_list
+  val build_reverse_sorted_variables_list: key list -> hconsed_variables_list
+  val empty_variables_list : unit -> hconsed_variables_list
+  val build_renaming_list: (key * key) list -> hconsed_renaming_list
+  val build_sorted_renaming_list: (key * key) list -> hconsed_renaming_list
+  val build_reverse_sorted_renaming_list: (key * key) list -> hconsed_renaming_list
+  val empty_renaming_list : unit -> hconsed_renaming_list
 
-    val overwrite_association_lists: hconsed_association_list -> hconsed_association_list -> hconsed_association_list
-    val merge_variables_lists: hconsed_variables_list -> hconsed_variables_list -> hconsed_variables_list
+  val overwrite_association_lists: hconsed_association_list -> hconsed_association_list -> hconsed_association_list
+  val merge_variables_lists: hconsed_variables_list -> hconsed_variables_list -> hconsed_variables_list
+  val nbr_variables: hconsed_variables_list -> int
 
-    val extensional_of_variables_list: hconsed_variables_list -> key list
-    val extensional_of_association_list: hconsed_association_list -> (key*value) list
-    val extensional_of_mvbdu: mvbdu -> (key * value) list list
+  val extensional_of_variables_list: hconsed_variables_list -> key list
+  val extensional_of_association_list: hconsed_association_list -> (key*value) list
+  val extensional_of_mvbdu: mvbdu -> (key * value) list list
 
 
 
-    val variables_list_of_mvbdu: mvbdu -> hconsed_variables_list
+  val variables_list_of_mvbdu: mvbdu -> hconsed_variables_list
 
-    val print: Remanent_parameters_sig.parameters -> mvbdu -> unit
-    val print_association_list: Remanent_parameters_sig.parameters -> hconsed_association_list -> unit
-    val print_variables_list: Remanent_parameters_sig.parameters -> hconsed_variables_list -> unit
-    val hash_of_association_list: hconsed_association_list -> int
-    val hash_of_variables_list: hconsed_variables_list -> int
+  val print: Remanent_parameters_sig.parameters -> mvbdu -> unit
+  val print_association_list: Remanent_parameters_sig.parameters -> hconsed_association_list -> unit
+  val print_variables_list: Remanent_parameters_sig.parameters -> hconsed_variables_list -> unit
+  val hash_of_association_list: hconsed_association_list -> int
+  val hash_of_variables_list: hconsed_variables_list -> int
 
 
 end
@@ -231,17 +234,17 @@ module Make (M:Nul)  =
     let init,is_init =
       let used = ref None in
       let init parameter error =
-	match
-	  !used
-	with
-	| Some a ->
-	  Exception.warn parameter error (Some "Mvbdu_wrapper.ml") (Some "MVBDU should be initialised once only")  Exit (fun _ -> a)
-    	| None ->
-	  begin
-	    let error,handler = Boolean_mvbdu.init_remanent parameter error in
-	    let () = used := Some handler in
-	    error,handler
-	  end
+        match
+          !used
+        with
+        | Some a ->
+          Exception.warn parameter error (Some "Mvbdu_wrapper.ml") (Some "MVBDU should be initialised once only")  Exit (fun _ -> a)
+        | None ->
+          begin
+            let error,handler = Boolean_mvbdu.init_remanent parameter error in
+            let () = used := Some handler in
+            error,handler
+          end
       in
       let is_init () = !used != None
       in
@@ -251,7 +254,7 @@ module Make (M:Nul)  =
     let equal_with_logs p h e a b = e,h,equal a b
     let lift0 string f parameters handler error =
       match
-	f parameters handler error parameters
+        f parameters handler error parameters
       with
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
@@ -268,143 +271,149 @@ module Make (M:Nul)  =
 
     let lift1 string f parameters handler error a =
       match
-	f parameters handler error parameters a
+        f parameters handler error parameters a
       with
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
           Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> a)
         in
-	error, handler, a
+        error, handler, a
 
     let lift1four string f parameters handler error a =
       match
-	f parameters error handler a
+        f parameters error handler a
       with
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
           Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> a)
         in
-	error, handler, a
+        error, handler, a
 
     let lift1bis string f parameters handler error a =
       let a,(b,c) =
-	f (Boolean_mvbdu.association_list_allocate parameters) error parameters handler a
+        f (Boolean_mvbdu.association_list_allocate parameters) error parameters handler a
       in a,b,c
 
     let lift1ter string f parameters handler error a =
       let a,(b,c) =
-	f (Boolean_mvbdu.association_list_allocate parameters) parameters error handler a
+        f (Boolean_mvbdu.association_list_allocate parameters) parameters error handler a
       in a,b,c
 
     let liftvbis string f parameters handler error a =
       let a,(b,c) =
-	f (Boolean_mvbdu.variables_list_allocate parameters) error parameters handler (List.rev_map (fun x -> (x,())) a)
+        f (Boolean_mvbdu.variables_list_allocate parameters) error parameters handler (List.rev_map (fun x -> (x,())) a)
       in a,b,c
 
     let liftvter string f parameters handler error a =
       let a,(b,c) =
-	f (Boolean_mvbdu.variables_list_allocate parameters) parameters error handler (List.rev_map (fun x -> (x,())) a)
+        f (Boolean_mvbdu.variables_list_allocate parameters) parameters error handler (List.rev_map (fun x -> (x,())) a)
       in a,b,c
 
     let lift1_ string f parameters handler error a =
       match
-	f parameters handler error a
+        f parameters handler error a
       with
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
           Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> a)
         in
-	error, handler, a
+        error, handler, a
 
     let lift1__ string f parameters handler error a =
       match
-	f parameters handler error a
+        f parameters handler error a
       with
       | error,(handler,a) -> error,handler,a
 
 
     let lift1four buildlist string f parameters handler error a =
       match
-	f parameters error handler a
+        f parameters error handler a
       with
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error,handler,list =
-	  buildlist parameters handler error []
-	in
-	let error, a =
+          buildlist parameters handler error []
+        in
+        let error, a =
           Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> list)
         in
-	error, handler, (a:unit List_sig.list)
+        error, handler, (a:unit List_sig.list)
 
     let lift1five string f parameters handler error a =
       match
-	f parameters error parameters handler a
+        f parameters error parameters handler a
       with
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
-
-	let error, a =
+        let error, a =
           Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> [])
         in
-	error, handler, a
+        error, handler, a
+
+    let lift1_seven string f parameters handler error a =
+      match
+        f parameters error handler a
+      with
+      | error,(handler,int) -> error,handler,int
+
     let lift2 string f parameters handler error a b =
       match
-	f parameters handler error parameters a b
+        f parameters handler error parameters a b
       with
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
           Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> a)
         in
-	error, handler, a
+        error, handler, a
 
     let lift2bis string f parameters handler error a b =
       match
-	f parameters error  parameters handler a b
+        f parameters error  parameters handler a b
       with
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
           Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> a)
         in
-	error, handler, a
+        error, handler, a
 
     let lift2ter string f parameters handler error a b =
       match
-	f parameters error  parameters handler a b
+        f parameters error  parameters handler a b
       with
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
           Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> a)
         in
-	error, handler, a
+        error, handler, a
 
     let lift2four string f parameters handler error a b =
       match
-	f parameters error handler a b
+        f parameters error handler a b
       with
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
           Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> a)
         in
-	error, handler, a
+        error, handler, a
 
     let lift2five string f parameters handler error a b =
       match
-	f parameters error handler a b
+        f parameters error handler a b
       with
       | error,(handler,Some a) -> error,handler,a
       | error,(handler,None) ->
         let error, a =
           Exception.warn parameters error (Some "Mvbdu_wrapper.ml") (Some string)  Exit (fun () -> a)
         in
-	error, handler, a
+        error, handler, a
 
     let (mvbdu_not: (mvbdu,mvbdu) unary) = lift1 "line 80, bdd_not" Boolean_mvbdu.boolean_mvbdu_not
 
@@ -466,7 +475,7 @@ module Make (M:Nul)  =
 
     let build_variables_list 	=
       liftvbis "line 257, build_list"
-	List_algebra.build_list
+        List_algebra.build_list
 
     let build_sorted_variables_list = liftvter "line 259, build_list" List_algebra.build_reversed_sorted_list
 
@@ -476,22 +485,22 @@ module Make (M:Nul)  =
 
     let variables_list_of_mvbdu parameter handler error mvbdu =
       lift1four
-	build_sorted_variables_list
-	"line 331, variables_list_of"
-	Boolean_mvbdu.variables_of_mvbdu
-	parameter handler error mvbdu
+        build_sorted_variables_list
+        "line 331, variables_list_of"
+        Boolean_mvbdu.variables_of_mvbdu
+        parameter handler error mvbdu
 
     let extensional_of_association_list parameters handler error l =
       lift1five "line 347"
-	Boolean_mvbdu.extensional_description_of_association_list parameters handler error l
+        Boolean_mvbdu.extensional_description_of_association_list parameters handler error l
 
     let extensional_of_variables_list parameters handler error l =
       lift1five "line 361"
-	Boolean_mvbdu.extensional_description_of_variables_list parameters handler error l
+        Boolean_mvbdu.extensional_description_of_variables_list parameters handler error l
 
     let extensional_of_mvbdu parameters handler error mvbdu =
       lift1__ "line 383"
-	Boolean_mvbdu.extensional_description_of_mvbdu parameters handler error mvbdu
+        Boolean_mvbdu.extensional_description_of_mvbdu parameters handler error mvbdu
 
     let print = Boolean_mvbdu.print_mvbdu
     let print_association_list = List_algebra.print_association_list
@@ -504,12 +513,12 @@ module Make (M:Nul)  =
       let error,handler,bdd_true = mvbdu_true parameters handler error in
       let error,handler,bdd_false = mvbdu_false parameters handler error in
       let rec aux error handler bdu list =
-	if equal bdu bdd_true || equal bdu bdd_false
-	then error,handler,List.rev list
-	else
-	  let error,handler,head = mvbdu_keep_head_only parameters error handler  bdu in
-	  let error,handler,tail = mvbdu_clean_head parameters error handler bdu in
-	  aux error handler tail (head::list)
+        if equal bdu bdd_true || equal bdu bdd_false
+        then error,handler,List.rev list
+        else
+          let error,handler,head = mvbdu_keep_head_only parameters error handler  bdu in
+          let error,handler,tail = mvbdu_clean_head parameters error handler bdu in
+          aux error handler tail (head::list)
       in aux error handler bdu []
 
     let mvbdu_cartesian_decomposition_depth parameters handler error bdu int =
@@ -521,16 +530,19 @@ module Make (M:Nul)  =
       let size = List.length list in
       let error,handler,(bdu_opt,list) = mvbdu_cartesian_decomposition_depth parameters handler error bdu (size/2) in
       match
-	bdu_opt
+        bdu_opt
       with
       | None -> error,handler,list
       | Some bdu -> error,handler,bdu::list
 
     let merge_variables_lists parameters handler error l1 l2 =
-      lift2four "line 332" Boolean_mvbdu.merge_variables_lists parameters handler error l1 l2
+      lift2four "line 533" Boolean_mvbdu.merge_variables_lists parameters handler error l1 l2
 
     let overwrite_association_lists parameters handler error l1 l2 =
-      lift2five "line 335" Boolean_mvbdu.overwrite_association_lists parameters handler error l1 l2
+      lift2five "line 536" Boolean_mvbdu.overwrite_association_lists parameters handler error l1 l2
+
+    let nbr_variables parameter handler error l =
+      lift1_seven "line 539" Boolean_mvbdu.length parameter handler error l
 
     let store_by_gen get_id get set default join parameters handler error hash_consed_object data storage  =
       let id = get_id hash_consed_object in
@@ -541,29 +553,29 @@ module Make (M:Nul)  =
 
     let store_by_variables_list get set default join parameters handler error hash_consed_object data storage =
       store_by_gen List_core.id_of_list
-	get
-	set
-	default
-	join
-	parameters
-	handler
-	error
-	hash_consed_object
-	data
-	storage
+        get
+        set
+        default
+        join
+        parameters
+        handler
+        error
+        hash_consed_object
+        data
+        storage
 
     let store_by_mvbdu get set default join parameters handler error hash_consed_object data storage =
       store_by_gen Mvbdu_core.id_of_mvbdu
-	get
-	set
-	default
-	join
-	parameters
-	handler
-	error
-	hash_consed_object
-	data
-	storage
+        get
+        set
+        default
+        join
+        parameters
+        handler
+        error
+        hash_consed_object
+        data
+        storage
 
     let hash_of_association_list x = List_core.id_of_list x
     let hash_of_variables_list x = List_core.id_of_list x
@@ -571,8 +583,8 @@ module Make (M:Nul)  =
   end: Mvbdu with type key = int and type value = int)
 
 module Internalize(M:Mvbdu
-		   with type key = int
-		   and type value = int) =
+                   with type key = int
+                    and type value = int) =
   (struct
 
     module Mvbdu = M
@@ -599,12 +611,12 @@ module Internalize(M:Mvbdu
       let () = handler:= Some handler' in
       if error'== error
       then
-	()
+        ()
       else
-	let error',() =
-	  Exception.warn !parameter error (Some "Mvbdu_wrapper.ml") (Some s)  Exit (fun () -> ())
-	in
-	Exception.print !parameter error'
+        let error',() =
+          Exception.warn !parameter error (Some "Mvbdu_wrapper.ml") (Some s)  Exit (fun () -> ())
+        in
+        Exception.print !parameter error'
 
     let init parameters =
       let error = Exception.empty_error_handler in
@@ -616,16 +628,16 @@ module Internalize(M:Mvbdu
     let equal = M.equal
     let get_handler s error =
       match
-	!handler
+        !handler
       with
       | None ->
-	let () = init !parameter in
-	let error',() = Exception.warn !parameter error (Some "Mvbdu_wrapper.ml") (Some (s^" uninitialised mvbdu"))  Exit (fun () -> ())  in
-	begin
-	  match !handler with
-	  | None -> failwith "unrecoverable errors in bdu get_handler"
-	  | Some h -> error',h
-	end
+        let () = init !parameter in
+        let error',() = Exception.warn !parameter error (Some "Mvbdu_wrapper.ml") (Some (s^" uninitialised mvbdu"))  Exit (fun () -> ())  in
+        begin
+          match !handler with
+          | None -> failwith "unrecoverable errors in bdu get_handler"
+          | Some h -> error',h
+        end
       | Some h -> error,h
     let lift_const s f =
       let error = Exception.empty_error_handler in
@@ -734,9 +746,11 @@ module Internalize(M:Mvbdu
     let empty_variables_list () = build_variables_list []
 
     let merge_variables_lists l1 l2 =
-      lift_binary''' "line 472"
-	M.merge_variables_lists
-	l1 l2
+      lift_binary''' "line 749"
+        M.merge_variables_lists
+        l1 l2
+
+    let nbr_variables l = lift_unary "line 753" M.nbr_variables l
 
     let overwrite_association_lists l1 l2 =
       lift_binary'''' "line 475" M.overwrite_association_lists l1 l2
@@ -764,229 +778,231 @@ module Internalize(M:Mvbdu
     let hash_of_association_list = M.hash_of_association_list
     let hash_of_variables_list = M.hash_of_variables_list
   end:Internalized_mvbdu
-with
-  type key = int
- and type value = int
- and type mvbdu= M.mvbdu )
+  with
+    type key = int
+   and type value = int
+   and type mvbdu= M.mvbdu )
 
 
 module Optimize(M:Mvbdu with type key = int and type value = int) =
-	 (struct
-	   module Mvbdu = M
-	   type key = Mvbdu.key
-	   type value = Mvbdu.value
-	   type handler = Mvbdu.handler
-	   type mvbdu = Mvbdu.mvbdu
-	   type hconsed_association_list = Mvbdu.hconsed_association_list
-	   type hconsed_variables_list = Mvbdu.hconsed_variables_list
-	   type hconsed_renaming_list = Mvbdu.hconsed_renaming_list
-	   type 'output constant = 'output Mvbdu.constant
-	   type ('input,'output) unary =  ('input,'output) Mvbdu.unary
-	   type ('input1,'input2,'output) binary = ('input1,'input2,'output) Mvbdu.binary
-	   type ('input1,'input2,'input3,'output) ternary = ('input1,'input2,'input3,'output) Mvbdu.ternary
+  (struct
+    module Mvbdu = M
+    type key = Mvbdu.key
+    type value = Mvbdu.value
+    type handler = Mvbdu.handler
+    type mvbdu = Mvbdu.mvbdu
+    type hconsed_association_list = Mvbdu.hconsed_association_list
+    type hconsed_variables_list = Mvbdu.hconsed_variables_list
+    type hconsed_renaming_list = Mvbdu.hconsed_renaming_list
+    type 'output constant = 'output Mvbdu.constant
+    type ('input,'output) unary =  ('input,'output) Mvbdu.unary
+    type ('input1,'input2,'output) binary = ('input1,'input2,'output) Mvbdu.binary
+    type ('input1,'input2,'input3,'output) ternary = ('input1,'input2,'input3,'output) Mvbdu.ternary
 
 
-	     let last_entry = Mvbdu.last_entry
-	     let init = Mvbdu.init
-	     let is_init = Mvbdu.is_init
-	     let equal = Mvbdu.equal
-	     let equal_with_logs = Mvbdu.equal_with_logs
-	     let mvbdu_nand  = Mvbdu.mvbdu_nand
-	     let mvbdu_not parameters handler error a = mvbdu_nand parameters handler error a a
+    let last_entry = Mvbdu.last_entry
+    let init = Mvbdu.init
+    let is_init = Mvbdu.is_init
+    let equal = Mvbdu.equal
+    let equal_with_logs = Mvbdu.equal_with_logs
+    let mvbdu_nand  = Mvbdu.mvbdu_nand
+    let mvbdu_not parameters handler error a = mvbdu_nand parameters handler error a a
 
-	     let mvbdu_id = Mvbdu.mvbdu_id
-	     let mvbdu_true = Mvbdu.mvbdu_true
-	     let mvbdu_false = Mvbdu.mvbdu_false
-	     let mvbdu_unary_true parameters handler error a =
-	       let error,handler,nota = mvbdu_not parameters handler error a in
-	       mvbdu_nand parameters handler error a nota
-	     let mvbdu_unary_false parameters handler error a =
-	       let error,handler,mvtrue = mvbdu_unary_true parameters handler error a in
-	       mvbdu_not parameters handler error mvtrue
-	     let mvbdu_and parameters handler error a b =
-	       let error,handler,ab = mvbdu_nand parameters handler error a b in
-	       mvbdu_not parameters handler error ab
-	     let mvbdu_or parameters handler error a b =
-	       let error,handler,na = mvbdu_not parameters handler error a in
-	       let error,handler,nb = mvbdu_not parameters handler error b in
-	       mvbdu_nand parameters handler error na nb
-	     let mvbdu_imply parameters handler error a b =
-	       let error,handler,notb = mvbdu_not parameters handler error b in
-	       mvbdu_nand parameters handler error a notb
-	     let mvbdu_rev_imply parameters handler error a b =
-	       let error,handler,nota = mvbdu_not parameters handler error a in
-	       mvbdu_nand parameters handler error nota b
-	     let mvbdu_nor parameters handler error a b =
-	       let error,handler,bddor = mvbdu_or parameters handler error a b in
-	       mvbdu_not parameters handler error bddor
-	     let mvbdu_equiv parameters handler error a b =
-	       let error,handler,direct = mvbdu_imply parameters handler error a b in
-	       let error,handler,indirect = mvbdu_imply parameters handler error b a in
-	       mvbdu_and parameters handler error direct indirect
-	     let mvbdu_xor parameters handler error a b =
-	       let error,handler,equiv = mvbdu_equiv parameters handler error a b in
-	       mvbdu_not parameters handler error equiv
-	     let mvbdu_nimply parameters handler error a b =
-	       let error,handler,imply = mvbdu_imply parameters handler error a b in
-	       mvbdu_not parameters handler error imply
-	     let mvbdu_nrev_imply parameters handler error a b = mvbdu_nimply parameters handler error b a
-	     let mvbdu_bi_true parameters handler error a _ = M.mvbdu_unary_true parameters handler error a
-	     let mvbdu_bi_false parameters handler error a _ = M.mvbdu_unary_false parameters handler error a
-	     let mvbdu_fst = M.mvbdu_fst
-	     let mvbdu_snd = M.mvbdu_snd
-	     let mvbdu_nfst parameters handler error a _ = mvbdu_not parameters handler error a
-	     let mvbdu_nsnd parameters handler error _ a = mvbdu_not parameters handler error a
+    let mvbdu_id = Mvbdu.mvbdu_id
+    let mvbdu_true = Mvbdu.mvbdu_true
+    let mvbdu_false = Mvbdu.mvbdu_false
+    let mvbdu_unary_true parameters handler error a =
+      let error,handler,nota = mvbdu_not parameters handler error a in
+      mvbdu_nand parameters handler error a nota
+    let mvbdu_unary_false parameters handler error a =
+      let error,handler,mvtrue = mvbdu_unary_true parameters handler error a in
+      mvbdu_not parameters handler error mvtrue
+    let mvbdu_and parameters handler error a b =
+      let error,handler,ab = mvbdu_nand parameters handler error a b in
+      mvbdu_not parameters handler error ab
+    let mvbdu_or parameters handler error a b =
+      let error,handler,na = mvbdu_not parameters handler error a in
+      let error,handler,nb = mvbdu_not parameters handler error b in
+      mvbdu_nand parameters handler error na nb
+    let mvbdu_imply parameters handler error a b =
+      let error,handler,notb = mvbdu_not parameters handler error b in
+      mvbdu_nand parameters handler error a notb
+    let mvbdu_rev_imply parameters handler error a b =
+      let error,handler,nota = mvbdu_not parameters handler error a in
+      mvbdu_nand parameters handler error nota b
+    let mvbdu_nor parameters handler error a b =
+      let error,handler,bddor = mvbdu_or parameters handler error a b in
+      mvbdu_not parameters handler error bddor
+    let mvbdu_equiv parameters handler error a b =
+      let error,handler,direct = mvbdu_imply parameters handler error a b in
+      let error,handler,indirect = mvbdu_imply parameters handler error b a in
+      mvbdu_and parameters handler error direct indirect
+    let mvbdu_xor parameters handler error a b =
+      let error,handler,equiv = mvbdu_equiv parameters handler error a b in
+      mvbdu_not parameters handler error equiv
+    let mvbdu_nimply parameters handler error a b =
+      let error,handler,imply = mvbdu_imply parameters handler error a b in
+      mvbdu_not parameters handler error imply
+    let mvbdu_nrev_imply parameters handler error a b = mvbdu_nimply parameters handler error b a
+    let mvbdu_bi_true parameters handler error a _ = M.mvbdu_unary_true parameters handler error a
+    let mvbdu_bi_false parameters handler error a _ = M.mvbdu_unary_false parameters handler error a
+    let mvbdu_fst = M.mvbdu_fst
+    let mvbdu_snd = M.mvbdu_snd
+    let mvbdu_nfst parameters handler error a _ = mvbdu_not parameters handler error a
+    let mvbdu_nsnd parameters handler error _ a = mvbdu_not parameters handler error a
 
-	     let mvbdu_cartesian_abstraction = M.mvbdu_cartesian_abstraction
-	     let mvbdu_redefine = M.mvbdu_redefine
-	     let mvbdu_rename = M.mvbdu_rename
-	     let mvbdu_project_keep_only = M.mvbdu_project_keep_only
-	     let mvbdu_project_abstract_away = M.mvbdu_project_abstract_away
-	     let build_association_list = M.build_association_list
-	     let build_sorted_association_list = M.build_sorted_association_list
-	     let build_reverse_sorted_association_list = M.build_reverse_sorted_association_list
-             let build_variables_list = M.build_variables_list
-	     let build_sorted_variables_list = M.build_sorted_variables_list
-	     let build_reverse_sorted_variables_list = M.build_reverse_sorted_variables_list
-	     let build_renaming_list = M.build_renaming_list
-	     let build_sorted_renaming_list = M.build_sorted_renaming_list
-	     let build_reverse_sorted_renaming_list = M.build_reverse_sorted_renaming_list
+    let mvbdu_cartesian_abstraction = M.mvbdu_cartesian_abstraction
+    let mvbdu_redefine = M.mvbdu_redefine
+    let mvbdu_rename = M.mvbdu_rename
+    let mvbdu_project_keep_only = M.mvbdu_project_keep_only
+    let mvbdu_project_abstract_away = M.mvbdu_project_abstract_away
+    let build_association_list = M.build_association_list
+    let build_sorted_association_list = M.build_sorted_association_list
+    let build_reverse_sorted_association_list = M.build_reverse_sorted_association_list
+    let build_variables_list = M.build_variables_list
+    let build_sorted_variables_list = M.build_sorted_variables_list
+    let build_reverse_sorted_variables_list = M.build_reverse_sorted_variables_list
+    let build_renaming_list = M.build_renaming_list
+    let build_sorted_renaming_list = M.build_sorted_renaming_list
+    let build_reverse_sorted_renaming_list = M.build_reverse_sorted_renaming_list
 
-	     let empty_association_list = M.empty_association_list
-	     let empty_variables_list = M.empty_variables_list
-	     let empty_renaming_list = M.empty_renaming_list
+    let empty_association_list = M.empty_association_list
+    let empty_variables_list = M.empty_variables_list
+    let empty_renaming_list = M.empty_renaming_list
 
-	     let merge_variables_lists = M.merge_variables_lists
-	     let overwrite_association_lists = M.overwrite_association_lists
+    let merge_variables_lists = M.merge_variables_lists
+    let overwrite_association_lists = M.overwrite_association_lists
+    let nbr_variables = M.nbr_variables
 
-	     let extensional_of_association_list = M.extensional_of_association_list
-	     let extensional_of_variables_list = M.extensional_of_variables_list
-	     let extensional_of_mvbdu = M.extensional_of_mvbdu
-	     let variables_list_of_mvbdu = M.variables_list_of_mvbdu
+    let extensional_of_association_list = M.extensional_of_association_list
+    let extensional_of_variables_list = M.extensional_of_variables_list
+    let extensional_of_mvbdu = M.extensional_of_mvbdu
+    let variables_list_of_mvbdu = M.variables_list_of_mvbdu
 
-	     let mvbdu_subseteq = M.mvbdu_subseteq
-	     let mvbdu_of_hconsed_asso = M.mvbdu_of_hconsed_asso
-	     let mvbdu_of_association_list = M.mvbdu_of_association_list
-	     let mvbdu_of_sorted_association_list = M.mvbdu_of_sorted_association_list
-	     let mvbdu_of_reverse_sorted_association_list= M.mvbdu_of_reverse_sorted_association_list
+    let mvbdu_subseteq = M.mvbdu_subseteq
+    let mvbdu_of_hconsed_asso = M.mvbdu_of_hconsed_asso
+    let mvbdu_of_association_list = M.mvbdu_of_association_list
+    let mvbdu_of_sorted_association_list = M.mvbdu_of_sorted_association_list
+    let mvbdu_of_reverse_sorted_association_list= M.mvbdu_of_reverse_sorted_association_list
 
-	     let mvbdu_cartesian_decomposition_depth parameters handler error bdu int =
-	       Boolean_mvbdu.mvbdu_cartesian_decomposition_depth
-		 variables_list_of_mvbdu extensional_of_variables_list
-		 build_sorted_variables_list
-		 mvbdu_project_keep_only
-		 mvbdu_project_abstract_away
-		 mvbdu_and
-		 equal
-		 parameters handler
-		 error
-		 bdu
-		 int
+    let mvbdu_cartesian_decomposition_depth parameters handler error bdu int =
+      Boolean_mvbdu.mvbdu_cartesian_decomposition_depth
+        variables_list_of_mvbdu extensional_of_variables_list
+        build_sorted_variables_list
+        mvbdu_project_keep_only
+        mvbdu_project_abstract_away
+        mvbdu_and
+        equal
+        parameters handler
+        error
+        bdu
+        int
 
-	     let mvbdu_full_cartesian_decomposition parameters handler error bdu =
-	       let error,handler,l = variables_list_of_mvbdu parameters handler error bdu in
-	       let error,handler,list = extensional_of_variables_list parameters handler error l in
-	       let size = List.length list in
-	       let error,handler,(bdu_opt,list) = mvbdu_cartesian_decomposition_depth parameters handler error bdu (size/2) in
-	       match
-		 bdu_opt
-	       with
-	       | None -> error,handler,list
-	       | Some bdu -> error,handler,bdu::list
+    let mvbdu_full_cartesian_decomposition parameters handler error bdu =
+      let error,handler,l = variables_list_of_mvbdu parameters handler error bdu in
+      let error,handler,list = extensional_of_variables_list parameters handler error l in
+      let size = List.length list in
+      let error,handler,(bdu_opt,list) = mvbdu_cartesian_decomposition_depth parameters handler error bdu (size/2) in
+      match
+        bdu_opt
+      with
+      | None -> error,handler,list
+      | Some bdu -> error,handler,bdu::list
 
-	     let print = M.print
-	     let print_association_list = M.print_association_list
-	     let print_variables_list = M.print_variables_list
+    let print = M.print
+    let print_association_list = M.print_association_list
+    let print_variables_list = M.print_variables_list
 
-	     let store_by_variables_list = M.store_by_variables_list
-	     let store_by_mvbdu = M.store_by_mvbdu
-	     let hash_of_association_list = M.hash_of_association_list
-	     let hash_of_variables_list = M.hash_of_variables_list
+    let store_by_variables_list = M.store_by_variables_list
+    let store_by_mvbdu = M.store_by_mvbdu
+    let hash_of_association_list = M.hash_of_association_list
+    let hash_of_variables_list = M.hash_of_variables_list
 
-	   end:Mvbdu with type key = int and type value = int)
+  end:Mvbdu with type key = int and type value = int)
 
 module Optimize'(M:Internalized_mvbdu with type key = int and type value = int) =
-	 (struct
-	     module Mvbdu = M
+  (struct
+    module Mvbdu = M
 
-	     type key = Mvbdu.key
-	     type value = Mvbdu.value
-	     type mvbdu = Mvbdu.mvbdu
-	     type hconsed_association_list = Mvbdu.hconsed_association_list
-	     type hconsed_variables_list = Mvbdu.hconsed_variables_list
-	     type hconsed_renaming_list = Mvbdu.hconsed_renaming_list
-      type handler = Mvbdu.handler
+    type key = Mvbdu.key
+    type value = Mvbdu.value
+    type mvbdu = Mvbdu.mvbdu
+    type hconsed_association_list = Mvbdu.hconsed_association_list
+    type hconsed_variables_list = Mvbdu.hconsed_variables_list
+    type hconsed_renaming_list = Mvbdu.hconsed_renaming_list
+    type handler = Mvbdu.handler
 
-      let import_handler = Mvbdu.import_handler
-      let export_handler = Mvbdu.export_handler
-      let init = Mvbdu.init
-      let is_init = Mvbdu.is_init
-      let equal = Mvbdu.equal
-      let mvbdu_nand a = Mvbdu.mvbdu_nand a
-      let mvbdu_not a = mvbdu_nand  a a
-      let mvbdu_id = Mvbdu.mvbdu_id
-      let mvbdu_true = Mvbdu.mvbdu_true
-      let mvbdu_false = Mvbdu.mvbdu_false
-      let mvbdu_unary_true a = mvbdu_nand a (mvbdu_not a)
-      let mvbdu_unary_false a = mvbdu_not (mvbdu_unary_true a)
-      let mvbdu_and a b = mvbdu_not (mvbdu_nand a b)
-      let mvbdu_or a b = mvbdu_nand (mvbdu_not a) (mvbdu_not b)
-      let mvbdu_imply a b = mvbdu_nand a (mvbdu_not b)
-      let mvbdu_rev_imply a b = mvbdu_imply b a
-      let mvbdu_nor a b = mvbdu_not (mvbdu_or a b)
-      let mvbdu_equiv a b = mvbdu_and (mvbdu_imply a b) (mvbdu_imply b a)
+    let import_handler = Mvbdu.import_handler
+    let export_handler = Mvbdu.export_handler
+    let init = Mvbdu.init
+    let is_init = Mvbdu.is_init
+    let equal = Mvbdu.equal
+    let mvbdu_nand a = Mvbdu.mvbdu_nand a
+    let mvbdu_not a = mvbdu_nand  a a
+    let mvbdu_id = Mvbdu.mvbdu_id
+    let mvbdu_true = Mvbdu.mvbdu_true
+    let mvbdu_false = Mvbdu.mvbdu_false
+    let mvbdu_unary_true a = mvbdu_nand a (mvbdu_not a)
+    let mvbdu_unary_false a = mvbdu_not (mvbdu_unary_true a)
+    let mvbdu_and a b = mvbdu_not (mvbdu_nand a b)
+    let mvbdu_or a b = mvbdu_nand (mvbdu_not a) (mvbdu_not b)
+    let mvbdu_imply a b = mvbdu_nand a (mvbdu_not b)
+    let mvbdu_rev_imply a b = mvbdu_imply b a
+    let mvbdu_nor a b = mvbdu_not (mvbdu_or a b)
+    let mvbdu_equiv a b = mvbdu_and (mvbdu_imply a b) (mvbdu_imply b a)
 
-	     let mvbdu_xor a b = mvbdu_not (mvbdu_equiv a b)
-	     let mvbdu_nimply a b = mvbdu_not (mvbdu_imply a b)
-	     let mvbdu_nrev_imply a b = mvbdu_nimply b a
-	     let mvbdu_bi_true _ _ = M.mvbdu_true ()
-	     let mvbdu_bi_false _ _ = M.mvbdu_false ()
-	     let mvbdu_fst a _ = a
-	     let mvbdu_snd _ b = b
-	     let mvbdu_nfst a _ = mvbdu_not a
-	     let mvbdu_nsnd _ a = mvbdu_not a
+    let mvbdu_xor a b = mvbdu_not (mvbdu_equiv a b)
+    let mvbdu_nimply a b = mvbdu_not (mvbdu_imply a b)
+    let mvbdu_nrev_imply a b = mvbdu_nimply b a
+    let mvbdu_bi_true _ _ = M.mvbdu_true ()
+    let mvbdu_bi_false _ _ = M.mvbdu_false ()
+    let mvbdu_fst a _ = a
+    let mvbdu_snd _ b = b
+    let mvbdu_nfst a _ = mvbdu_not a
+    let mvbdu_nsnd _ a = mvbdu_not a
 
-	     let build_association_list = M.build_association_list
-	     let build_sorted_association_list = M.build_sorted_association_list
-	     let build_reverse_sorted_association_list = M.build_reverse_sorted_association_list
-	     let build_renaming_list = M.build_renaming_list
-	     let build_sorted_renaming_list = M.build_sorted_renaming_list
-	     let build_reverse_sorted_renaming_list = M.build_reverse_sorted_renaming_list
-	     let mvbdu_redefine = M.mvbdu_redefine
-	     let mvbdu_subseteq = M.mvbdu_subseteq
-	     let mvbdu_of_hconsed_asso = M.mvbdu_of_hconsed_asso
-	     let mvbdu_of_association_list = M.mvbdu_of_association_list
-	     let mvbdu_of_sorted_association_list = M.mvbdu_of_sorted_association_list
-	     let mvbdu_of_reverse_sorted_association_list= M.mvbdu_of_reverse_sorted_association_list
+    let build_association_list = M.build_association_list
+    let build_sorted_association_list = M.build_sorted_association_list
+    let build_reverse_sorted_association_list = M.build_reverse_sorted_association_list
+    let build_renaming_list = M.build_renaming_list
+    let build_sorted_renaming_list = M.build_sorted_renaming_list
+    let build_reverse_sorted_renaming_list = M.build_reverse_sorted_renaming_list
+    let mvbdu_redefine = M.mvbdu_redefine
+    let mvbdu_subseteq = M.mvbdu_subseteq
+    let mvbdu_of_hconsed_asso = M.mvbdu_of_hconsed_asso
+    let mvbdu_of_association_list = M.mvbdu_of_association_list
+    let mvbdu_of_sorted_association_list = M.mvbdu_of_sorted_association_list
+    let mvbdu_of_reverse_sorted_association_list= M.mvbdu_of_reverse_sorted_association_list
 
-	     let mvbdu_rename = M.mvbdu_rename
-	     let mvbdu_project_keep_only = M.mvbdu_project_keep_only
-	     let mvbdu_project_abstract_away = M.mvbdu_project_abstract_away
-	     let build_variables_list = M.build_variables_list
-	     let build_sorted_variables_list = M.build_sorted_variables_list
-	     let build_reverse_sorted_variables_list = M.build_reverse_sorted_variables_list
-	     let empty_renaming_list = M.empty_renaming_list
-	     let empty_variables_list = M.empty_variables_list
-             let empty_association_list = M.empty_association_list
-	     let merge_variables_lists = M.merge_variables_lists
-	     let overwrite_association_lists = M.overwrite_association_lists
-	     let print = M.print
-	     let print_association_list = M.print_association_list
-	     let print_variables_list = M.print_variables_list
-	     let mvbdu_cartesian_abstraction = M.mvbdu_cartesian_abstraction
-	     let extensional_of_association_list = M.extensional_of_association_list
-	     let extensional_of_variables_list = M.extensional_of_variables_list
-	     let extensional_of_mvbdu = M.extensional_of_mvbdu
-	     let variables_list_of_mvbdu = M.variables_list_of_mvbdu
+    let mvbdu_rename = M.mvbdu_rename
+    let mvbdu_project_keep_only = M.mvbdu_project_keep_only
+    let mvbdu_project_abstract_away = M.mvbdu_project_abstract_away
+    let build_variables_list = M.build_variables_list
+    let build_sorted_variables_list = M.build_sorted_variables_list
+    let build_reverse_sorted_variables_list = M.build_reverse_sorted_variables_list
+    let empty_renaming_list = M.empty_renaming_list
+    let empty_variables_list = M.empty_variables_list
+    let empty_association_list = M.empty_association_list
+    let merge_variables_lists = M.merge_variables_lists
+    let overwrite_association_lists = M.overwrite_association_lists
+    let print = M.print
+    let print_association_list = M.print_association_list
+    let print_variables_list = M.print_variables_list
+    let mvbdu_cartesian_abstraction = M.mvbdu_cartesian_abstraction
+    let extensional_of_association_list = M.extensional_of_association_list
+    let extensional_of_variables_list = M.extensional_of_variables_list
+    let extensional_of_mvbdu = M.extensional_of_mvbdu
+    let variables_list_of_mvbdu = M.variables_list_of_mvbdu
 
-	     let mvbdu_cartesian_decomposition_depth = M.mvbdu_cartesian_decomposition_depth
+    let mvbdu_cartesian_decomposition_depth = M.mvbdu_cartesian_decomposition_depth
 
-	     let mvbdu_full_cartesian_decomposition = M.mvbdu_full_cartesian_decomposition
+    let mvbdu_full_cartesian_decomposition = M.mvbdu_full_cartesian_decomposition
 
-	     let hash_of_association_list = M.hash_of_association_list
-	     let hash_of_variables_list = M.hash_of_variables_list
+    let hash_of_association_list = M.hash_of_association_list
+    let hash_of_variables_list = M.hash_of_variables_list
+    let nbr_variables = M.nbr_variables
 
-	   end:Internalized_mvbdu)
+  end:Internalized_mvbdu)
 
 
 module Vd = struct end

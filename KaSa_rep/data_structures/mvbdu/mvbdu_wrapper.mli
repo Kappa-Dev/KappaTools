@@ -74,7 +74,7 @@ module type Mvbdu =
 
     val overwrite_association_lists: (hconsed_association_list,hconsed_association_list,hconsed_association_list) binary
     val merge_variables_lists: (hconsed_variables_list,hconsed_variables_list,hconsed_variables_list) binary
-
+    val nbr_variables: (hconsed_variables_list,int) unary
     val extensional_of_variables_list: (hconsed_variables_list,key list) unary
     val extensional_of_association_list: (hconsed_association_list,(key*value) list) unary
     val extensional_of_mvbdu: (mvbdu,(key * value) list list) unary
@@ -192,7 +192,7 @@ module type Internalized_mvbdu =
 
     val overwrite_association_lists: hconsed_association_list -> hconsed_association_list -> hconsed_association_list
     val merge_variables_lists: hconsed_variables_list -> hconsed_variables_list -> hconsed_variables_list
-
+    val nbr_variables: hconsed_variables_list -> int
     val extensional_of_variables_list: hconsed_variables_list -> key list
     val extensional_of_association_list: hconsed_association_list -> (key*value) list
     val extensional_of_mvbdu: mvbdu -> (key * value) list list

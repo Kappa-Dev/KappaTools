@@ -479,7 +479,7 @@ let compute_var_set transition_system =
     (Mods.IntMap.empty, Mods.IntMap.empty)
     transition_system.nodes
 
-let merge_list list1 list2 =
+(*let merge_list list1 list2 =
   let rec aux list1 list2 rep =
     match
       list1,list2
@@ -493,7 +493,7 @@ let merge_list list1 list2 =
       else if h<h' then aux q list2 (h::rep)
       else aux list1 q' (h'::rep)
   in
-  aux list1 list2 []
+  aux list1 list2 []*)
 
 let distrib_list list1 list2 =
   let rec aux list1 list2 list12 list1wo2 list2wo1 =
@@ -542,6 +542,14 @@ let powerset  map_interface =
       map_interface
       []
   in
+  let list =
+    List.sort
+      (fun (a,b) (c,d) ->
+         compare
+           (Ckappa_sig.Views_intbdu.nbr_variables d) (Ckappa_sig.Views_intbdu.nbr_variables b)
+      )
+      list
+  in
   let rec aux to_use already_built =
     match
       to_use
@@ -549,17 +557,18 @@ let powerset  map_interface =
     | [] -> already_built
     | (hash,hconsed)::tail ->
       begin
-        let list_var = Ckappa_sig.Views_intbdu.extensional_of_variables_list hconsed in
         let already_built =
           List.fold_left
             (fun list (hash',hconsed',proof) ->
-               let list_var' = Ckappa_sig.Views_intbdu.extensional_of_variables_list hconsed'
-               in
                let hconsed'' =
-                 Ckappa_sig.Views_intbdu.build_variables_list
-                   (merge_list list_var list_var') in
+                 Ckappa_sig.Views_intbdu.merge_variables_lists hconsed hconsed'
+               in
                let hash'' = Ckappa_sig.Views_intbdu.hash_of_variables_list hconsed'' in
-               (hash'',hconsed'',(hash,hconsed)::proof)::(hash',hconsed',proof)::list)
+               if hash'<>hash''
+               then
+                 (hash'',hconsed'',(hash,hconsed)::proof)::(hash',hconsed',proof)::list
+               else
+                 (hash',hconsed',proof)::list)
             []
             already_built
         in
@@ -656,26 +665,26 @@ let add_singular parameter error transition_system =
                       then
                         List.fold_left
                           (fun (error, transition_system) (_,hconsed) ->
+                             let length = Ckappa_sig.Views_intbdu.nbr_variables hconsed in
                              let list_var = Ckappa_sig.Views_intbdu.extensional_of_variables_list hconsed in
-                             let length = List.length list_var in
                              List.fold_left
                                (fun (error, transition_system) (_,hconsed') ->
-                                  let list_var' = Ckappa_sig.Views_intbdu.extensional_of_variables_list hconsed' in
-                                  let length' = List.length list_var' in
+
+                                  let length' = Ckappa_sig.Views_intbdu.nbr_variables hconsed' in
                                   let hconsed'' =
-                                    Ckappa_sig.Views_intbdu.build_variables_list
-                                      (merge_list list_var list_var')
+                                    Ckappa_sig.Views_intbdu.merge_variables_lists hconsed hconsed'
                                   in
-                                  let list_var'' = Ckappa_sig.Views_intbdu.extensional_of_variables_list hconsed'' in
-                                  let length'' = List.length list_var'' in
+                                  let length'' =
+                                    Ckappa_sig.Views_intbdu.nbr_variables hconsed''
+                                  in
                                   if length' = length'' || length = length''
                                   then
                                     (error, transition_system)
                                   else
+                                    let list_var' = Ckappa_sig.Views_intbdu.extensional_of_variables_list hconsed' in
                                     let lista,listb,listc = distrib_list list_var list_var' in
                                     List.fold_left
                                       (fun (error, transition_system) list_var ->
-                                         let hconsed = Ckappa_sig.Views_intbdu.build_variables_list list_var in
                                          let restricted_mvbdu = Ckappa_sig.Views_intbdu.mvbdu_project_keep_only mvbdu hconsed in
                                          let mvbdu_list =
                                            Ckappa_sig.Views_intbdu.extensional_of_mvbdu restricted_mvbdu

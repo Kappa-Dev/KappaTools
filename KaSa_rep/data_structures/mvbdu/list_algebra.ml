@@ -151,6 +151,31 @@ let extensional_with_asso get set error parameters handler list =
 let extensional_without_asso get set error parameters handler list =
   extensional_gen (fun a1 -> (a1.List_sig.variable)) get set error parameters handler list
 
+let rec length allocate get set error parameters handler list =
+  match get parameters error handler list
+  with
+  | error, (handler,Some output) -> error, (handler, output)
+  | error, (handler,None) ->
+    begin
+      let error, (handler,output) =
+        match list.List_sig.value with
+        | List_sig.Empty-> error,(handler,0)
+        | List_sig.Cons a ->
+          let error, (handler,tail_size) =
+            length allocate get set error parameters handler a.List_sig.tail
+          in
+          error, (handler, tail_size+1)
+      in
+      let error, handler =
+        set
+          parameters
+          error
+          handler
+          list
+          output
+      in
+      error, (handler, output)
+    end
 
 let rec overwrite allocate get set error parameters handler list1 list2 =
   match get parameters error handler (list1,list2)
