@@ -106,31 +106,6 @@ module Dictionary =
 	     parameters error value in_construction.hash_table in
 	 error,output != None
 
-       let preallocate parameters error value asso in_construction =
-	 match
-	   Hash.find_option_without_logs
-             (* indeed, this function is used to check that either there is no association, or that this is the same association *)
-	     parameters error value in_construction.hash_table
-	 with
-         | error,None ->
-            let fresh = in_construction.fresh in
-            let error,hash_table =
-	      Hash.add
-		parameters error value asso fresh in_construction.hash_table in
-            let hash =
-	      {
-                hash_table = hash_table;
-                fresh = fresh + 1
-	      } in
-            error,Some (fresh,asso,hash)
-         | error,Some (i, asso') when asso' == asso ->
-	    error,Some (i, asso',in_construction)
-         | error,Some _ ->
-	    invalid_arg
-	      parameters error
-	      (Some "wrong association, line 95")
-	      Association_is_existing_already_with_a_different_value
-
        let pretranslate parameters error key stabilized =
 	 if key>=0 && key<Array.length stabilized
 	 then
