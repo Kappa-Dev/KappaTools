@@ -175,7 +175,12 @@ struct
              with
              | Some choice_list -> iter parameter handler log_info error blackboard choice_list story_list (*(update_first_story first_story list)*)
              | None ->
-	       let _ = PH.B.export_blackboard_to_xls parameter handler log_info error "FAIL" (1+List.length story_list) 0 blackboard in
+               let _ =
+                 PH.B.export_blackboard_to_xls
+                   parameter handler log_info error "FAIL"
+                   (!Priority.n_story) (!Priority.n_branch)
+                   blackboard
+               in
 	       error,log_info,(blackboard,story_list)
 	   end
 	 end
@@ -291,7 +296,7 @@ struct
         let () = Loggers.print_newline (PH.B.PB.CI.Po.K.H.get_logger parameter)
         in
         ()
-      in      
+      in
       error,log_info,(blackboard,output,[])
     else
       let () =
@@ -303,6 +308,28 @@ struct
           let () = Loggers.print_newline (PH.B.PB.CI.Po.K.H.get_logger parameter)
           in
           ()
+      in
+      let bool,string=
+          begin
+            match
+              parameter.PH.B.PB.CI.Po.K.H.current_compression_mode
+            with
+            | None | Some PH.B.PB.CI.Po.K.H.Causal-> false,""
+            | Some PH.B.PB.CI.Po.K.H.Weak ->
+	       Parameter.dump_grid_after_branching_during_weak_compression,Parameter.xlsweakFileName
+            | Some PH.B.PB.CI.Po.K.H.Strong ->
+	       Parameter.dump_grid_after_branching_during_strong_compression,Parameter.xlsstrongFileName
+          end
+      in
+      let () = Priority.n_branch:= 1+((!Priority.n_branch)+1) in
+      let error, log_info  =
+        if bool then
+          let error, log_info, () =
+            PH.B.export_blackboard_to_xls
+              parameter handler log_info error string
+              (!Priority.n_story) (!Priority.n_branch) blackboard
+          in error, log_info
+        else error, log_info
       in
       let error,log_info,(blackboard,story_list) = iter parameter handler log_info error blackboard empty_choice_list []
       in

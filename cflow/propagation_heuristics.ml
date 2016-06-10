@@ -157,11 +157,12 @@ module Propagation_heuristic =
 	       Parameter.dump_grid_after_branching_during_strong_compression,Parameter.xlsstrongFileName
           end
       in
+      let () = Priority.n_branch:= (!Priority.n_branch)+1 in
       let error,log_info =
         if bool
         then
-          let error,log_info,() = B.export_blackboard_to_xls parameter handler log_info error string (!Priority.n_story) (!Priority.n_branch) blackboard in
-          let () = Priority.n_branch:= (!Priority.n_branch)+1 in
+          let error,log_info,() = B.export_blackboard_to_xls parameter handler log_info error string
+              (!Priority.n_story) (!Priority.n_branch) blackboard in
           error,log_info
         else
           error,log_info
