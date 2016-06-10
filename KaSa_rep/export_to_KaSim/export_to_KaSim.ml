@@ -315,7 +315,7 @@ module Export_to_KaSim =
       in
       (*----------------------------------------------------------------*)
       let _ =
-        Ckappa_sig.Dictionary_of_agents.print
+        Ckappa_sig.Dictionary_of_agents.iter
           parameters error
           (fun parameters error i agent_name () () ->
             let error,site_dic =
@@ -330,7 +330,7 @@ module Export_to_KaSim =
                      (Ckappa_sig.Dictionary_of_sites.init ()))
             in
             let error =
-              Ckappa_sig.Dictionary_of_sites.print
+              Ckappa_sig.Dictionary_of_sites.iter
                 parameters error
                 (fun parameters_dot error j site () () ->
                    let _ =
@@ -354,7 +354,7 @@ module Export_to_KaSim =
              in
              let site = simplify_site site in
              let error =
-               Ckappa_sig.Dictionary_of_States.print
+               Ckappa_sig.Dictionary_of_States.iter
                  parameters error
                  (fun parameters error s state  () () ->
                     let () =

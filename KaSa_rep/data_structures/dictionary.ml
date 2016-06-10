@@ -48,7 +48,7 @@ module type Dictionary =
       key -> ('a,'b) dictionary ->
       Exception.method_handler * (value * 'a * 'b) option
     val stabilize: ('a,'b) dictionary -> ('a,'b) dictionary
-    val print:
+    val iter:
       Remanent_parameters_sig.parameters -> Exception.method_handler  ->
       (Remanent_parameters_sig.parameters -> Exception.method_handler ->
        key -> value -> 'a -> 'b -> Exception.method_handler) ->
@@ -232,20 +232,16 @@ module Dictionary =
 	 in
 	 error,(fresh,asso,asso_id,dictionary)
 
-       let print parameters error print dic =
-	 let dic =
-           if dic.is_stabilized then dic else stabilize dic in
-	 let n = Array.length dic.stabilized in
-	 let rec aux key error =
-           if key=n
-           then error
-           else
-             let error =
-               match dic.stabilized.(key) with
-	       | None -> error
-	       | Some (value, a, b) -> print parameters error key value a b
-             in aux (key+1) error
-	 in aux 0 error
+       let iter parameters error f dic =
+	 let dic' = stabilize dic in
+	 let g key error = function
+	   | None -> error
+	   | Some (value, a, b) -> f parameters error key value a b in
+(*	 if dic.is_stabilized
+	 then*) Tools.array_fold_lefti g error dic'.stabilized
+	 (*else Hash.fold
+		(fun value (a,b) key error -> f parameters error key value a b)
+		dic.in_construction.hash_table error*)
 
        let fold f dictionary =
          let in_construction = dictionary.in_construction in

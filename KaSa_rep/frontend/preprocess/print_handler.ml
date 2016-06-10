@@ -89,7 +89,7 @@ let print_handler parameters error handler =
      error)
   in
   let error =
-    Ckappa_sig.Dictionary_of_agents.print
+    Ckappa_sig.Dictionary_of_agents.iter
       parameters_agent
       error
       (fun parameters error i agent_name () () ->
@@ -114,7 +114,7 @@ let print_handler parameters error handler =
       error
       (fun parameters error a ->
        let error =
-         Ckappa_sig.Dictionary_of_sites.print
+         Ckappa_sig.Dictionary_of_sites.iter
            parameters
            error
            (print_f print_site)
@@ -130,7 +130,7 @@ let print_handler parameters error handler =
       parameters_states
       error
       (fun parameters error a ->
-       Ckappa_sig.Dictionary_of_States.print
+       Ckappa_sig.Dictionary_of_States.iter
          parameters
          error
          (print_state_f print_state)
@@ -195,7 +195,7 @@ let dot_of_contact_map parameters (error:Exception.method_handler) handler =
     in
     let _ = Loggers.fprintf (Remanent_parameters.get_logger parameters_dot) "graph G{ \n" in
     let _ =
-      Ckappa_sig.Dictionary_of_agents.print
+      Ckappa_sig.Dictionary_of_agents.iter
         parameters_dot
         error
         (fun parameters_dot error i agent_name () () ->
@@ -217,7 +217,7 @@ let dot_of_contact_map parameters (error:Exception.method_handler) handler =
                 (Some "line 103") Exit (Ckappa_sig.Dictionary_of_sites.init ()))
           in
           let error =
-            Ckappa_sig.Dictionary_of_sites.print
+            Ckappa_sig.Dictionary_of_sites.iter
               parameters_dot
               error
               (fun parameters_dot error j site () () ->

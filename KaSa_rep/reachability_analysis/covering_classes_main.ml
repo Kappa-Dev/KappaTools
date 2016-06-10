@@ -488,7 +488,7 @@ let scan_rule_set_remanent parameter error handler rules =
               Handler.string_of_agent parameter error handler agent_type
             in
             let _ =
-              Covering_classes_type.Dictionary_of_List_sites.print parameter error
+              Covering_classes_type.Dictionary_of_List_sites.iter parameter error
                 (fun parameter error elt_id(*key*) site_type_list(*value*) _ _ ->
                   let _ =
                     Printf.fprintf stdout
