@@ -65,17 +65,36 @@ let dummy_txt_logger =
     current_line = []
   }
 
-let fprintf logger =
+    (* Warning, we have to keep the character @ when it is followed by a character followed by a letter or a digit should be preserved *)
+let clean_string = Str.global_replace (Str.regexp "@[^a-z] *") " "
+let clean_string = Str.global_replace (Str.regexp "\n *") ""
+let clean fmt =
+  let s = Buffer.create 0 in
+  let fmt_buffer = Format.formatter_of_buffer s in
+  Format.kfprintf
+    (fun _ -> let () = Format.pp_print_flush fmt_buffer () in
+      let str = Buffer.contents s in
+      let str = clean_string str in
+      Format.fprintf fmt "%s" str)
+    fmt_buffer
+
+let fprintf ?fprintnewline:(fprintnewline=false) logger =
   match
-    logger.logger
+    logger.logger, fprintnewline || breakable logger.encoding
   with
-  | DEVNUL -> Format.ifprintf Format.std_formatter
-  | Formatter fmt -> Format.fprintf fmt
-  | Circular_buffer _
-  | Infinite_buffer _ ->
+  | DEVNUL,_ -> Format.ifprintf Format.std_formatter
+  | Formatter fmt, true -> Format.fprintf fmt
+  | Formatter fmt, false -> clean fmt
+  | Circular_buffer _,bool
+  | Infinite_buffer _,bool ->
+    let b = Buffer.create 0 in
+    let fmt_buffer = Format.formatter_of_buffer b in
     Format.kfprintf
-      (fun _ -> logger.current_line <- (String (Format.flush_str_formatter ()))::logger.current_line)
-      Format.str_formatter
+      (fun _ ->
+         let () = Format.pp_print_flush fmt_buffer () in
+         let str = Buffer.contents b in
+         logger.current_line <- (String (if bool then str else clean_string str) )::logger.current_line)
+      fmt_buffer
 
 let print_breakable_space logger =
   if breakable logger.encoding
@@ -112,7 +131,10 @@ let dump_token f x =
 
 let print_newline logger =
   let () =
-    fprintf logger "%s%t"
+    fprintf
+      ~fprintnewline:true
+      logger
+      "%s%t"
       (end_of_line_symbol logger)
       (fun f -> Format.pp_print_newline f ())
   in
@@ -150,7 +172,9 @@ let print_newline logger =
       let () = bf:=bf' in
       let () = logger.current_line <- [] in
       ()
-      end
+        end
+
+
 
 let print_cell logger s =
   let open_cell_symbol,close_cell_symbol =
@@ -283,6 +307,7 @@ let flush_buffer logger fmt =
   | Circular_buffer a -> Circular_buffers.iter (Format.fprintf fmt "%s") !a
   | Infinite_buffer b -> Infinite_buffers.iter (Format.fprintf fmt "%s") !b
 
+let fprintf logger = fprintf ~fprintnewline:false logger
 let fresh_id logger =
   let i = !(logger.fresh_id) in
   let () = logger.fresh_id := i+1 in

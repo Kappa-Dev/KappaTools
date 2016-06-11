@@ -211,7 +211,9 @@ let print_graph_foot logger =
   match
     Loggers.get_encoding_format logger
   with
-  | Loggers.DOT -> Loggers.fprintf logger "}\n"
+  | Loggers.DOT ->
+    let () = Loggers.fprintf logger "}" in
+    Loggers.print_newline logger
   | Loggers.HTML_Graph ->
     begin
       let f_opt = Loggers.formatter_of_logger logger in
@@ -440,7 +442,8 @@ let print_node logger ?directives:(directives=[]) id =
                 true
             in
             let () = if bool then () in
-            let () = Loggers.fprintf logger "];\n" in
+            let () = Loggers.fprintf logger "];" in
+            let () = Loggers.print_newline logger in
             ()
           end
       in ()
@@ -660,7 +663,8 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
               true
           in
           let () = if bool then () in
-          let () = Loggers.fprintf logger "];\n" in
+          let () = Loggers.fprintf logger "];" in
+          let () = Loggers.print_newline logger in
           ()
       in ()
     end
