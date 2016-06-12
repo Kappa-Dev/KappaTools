@@ -68,7 +68,7 @@ module Transformation =
 	   f "@[%a.%a~ =@]" (Agent_place.print ?sigs) p
 	   (Agent_place.print_site ?sigs p) s
 
-    let fresh_bindings =
+    let fresh_bindings ~short_branch_agents =
       List.fold_left
 	(fun unaries_to_expl ->
 	 function
@@ -76,7 +76,10 @@ module Transformation =
 	 | (NegativeWhatEver _ | NegativeInternalized _) -> assert false
 	 | Linked ((n,s),(n',s')) ->
 	    if Agent_place.same_connected_component n n'
-	    then unaries_to_expl else ((n,s),(n',s'))::unaries_to_expl) []
+	    then unaries_to_expl
+            else (if List.mem (Agent_place.get_type n') short_branch_agents
+                  then ((n',s'),(n,s))
+                  else ((n,s),(n',s')))::unaries_to_expl) []
   end
 
 type elementary_rule = {

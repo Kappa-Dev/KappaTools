@@ -23,7 +23,7 @@ sig
     ?sigs:Signature.s -> Format.formatter -> Instantiation.abstract t -> unit
 
   val fresh_bindings :
-    Instantiation.abstract t list ->
+    short_branch_agents:int list -> Instantiation.abstract t list ->
     (Instantiation.abstract Instantiation.site * Instantiation.abstract Instantiation.site) list
 end
 

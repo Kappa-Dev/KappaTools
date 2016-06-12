@@ -58,7 +58,7 @@ let tokenify contact_map domain l =
 
 (* transform an LKappa rule into a Primitives rule *)
 let rules_of_ast
-      ?deps_machinery contact_map domain ~syntax_ref (rule,_) =
+      ?deps_machinery contact_map domain ~syntax_ref short_branch_agents (rule,_) =
   let domain',rm_toks =
     tokenify contact_map domain rule.LKappa.r_rm_tokens in
   let domain'',add_toks =
@@ -107,7 +107,7 @@ let rules_of_ast
 	Primitives.removed = neg;
 	Primitives.inserted = pos;
 	Primitives.fresh_bindings =
-	  Primitives.Transformation.fresh_bindings pos;
+	  Primitives.Transformation.fresh_bindings ~short_branch_agents pos;
 	Primitives.consumed_tokens = rm_toks;
 	Primitives.injected_tokens = add_toks;
 	Primitives.syntactic_rule = syntax_ref;
@@ -195,7 +195,7 @@ let effects_of_modif
 	compile_alg contact_map domain alg_expr in
       let domain'',_,_,elem_rules =
 	rules_of_ast
-	  contact_map domain' ~syntax_ref:0 (ast_rule,mix_pos) in
+	  contact_map domain' ~syntax_ref:0 [] (ast_rule,mix_pos) in
       let elem_rule = match elem_rules with
 	| [ r ] -> r
 	| _ ->
@@ -332,7 +332,7 @@ let inits_of_result ?rescale contact_map env preenv res =
 	  let preenv'',state' =
 	    match
 	      rules_of_ast
-		contact_map preenv' ~syntax_ref:0 (fake_rule,mix_pos)
+		contact_map preenv' ~syntax_ref:0 [] (fake_rule,mix_pos)
 	    with
 	    | domain'',_,_,[ compiled_rule ] ->
 	       (fst alg',compiled_rule,mix_pos),domain''
@@ -350,7 +350,7 @@ let inits_of_result ?rescale contact_map env preenv res =
 	      LKappa.r_un_rate = None; } in
 	  match
 	      rules_of_ast
-		contact_map preenv ~syntax_ref:0
+		contact_map preenv ~syntax_ref:0 []
 		(Location.dummy_annot fake_rule)
 	    with
 	    | domain'',_,_,[ compiled_rule ] ->
@@ -475,13 +475,29 @@ let compile_alg_vars contact_map domain vars =
      in (domain',(lbl_pos,alg))) domain
     (Array.of_list vars)
 
+let short_branch_agents contact_map =
+  let rec aux oui non =
+    let oui',non' =
+      List.partition
+        (fun (_,s) ->
+          Array.fold_left
+            (fun n (_,l) ->
+              if List.filter (fun (x,_) -> not (List.mem x oui)) l <> []
+              then n+1 else n)
+            0 s = 1)
+        non in
+    if oui' = [] then oui
+    else aux (Tools.list_rev_map_append fst oui' oui) non' in
+  aux [] (Tools.array_fold_lefti (fun ag acc s -> (ag,s)::acc) [] contact_map)
+
 let compile_rules alg_deps contact_map domain rules =
+  let short_branch_agents = short_branch_agents contact_map in
   match
     List.fold_left
       (fun (domain,syntax_ref,deps_machinery,unary_cc,acc) (_,rule) ->
        let (domain',origin',extra_unary_cc,cr) =
 	 rules_of_ast ?deps_machinery contact_map domain
-		      ~syntax_ref rule in
+		      ~syntax_ref short_branch_agents rule in
        (domain',succ syntax_ref,origin',
 	Connected_component.Set.union unary_cc extra_unary_cc,
 	List.append cr acc))
