@@ -66,16 +66,28 @@ let dummy_txt_logger =
   }
 
     (* Warning, we have to keep the character @ when it is followed by a character followed by a letter or a digit should be preserved *)
-let clean_string = Str.global_replace (Str.regexp "@[^a-z] *") " "
-let clean_string = Str.global_replace (Str.regexp "\n *") ""
+
+let dump_clean_string fmt =
+  String.iter
+    (fun a ->
+       if a = '\n' then ()
+       else
+         Format.fprintf fmt "%c" a)
+
+let clean_string s =
+  let buffer = Buffer.create 0 in
+  let fmt_buffer = Format.formatter_of_buffer buffer in
+  let () = dump_clean_string fmt_buffer s in
+  let () = Format.pp_print_flush fmt_buffer () in
+  Buffer.contents buffer
+
 let clean fmt =
   let s = Buffer.create 0 in
   let fmt_buffer = Format.formatter_of_buffer s in
   Format.kfprintf
-    (fun _ -> let () = Format.pp_print_flush fmt_buffer () in
-      let str = Buffer.contents s in
-      let str = clean_string str in
-      Format.fprintf fmt "%s" str)
+    (fun _ ->
+       let () = Format.pp_print_flush fmt_buffer () in
+       dump_clean_string fmt (Buffer.contents s))
     fmt_buffer
 
 let fprintf ?fprintnewline:(fprintnewline=false) logger =
