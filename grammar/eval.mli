@@ -1,5 +1,5 @@
 val init_kasa :
-  Remanent_parameters_sig.called_from ->
+  Remanent_parameters_sig.called_from -> Signature.s ->
   (string Location.annot * Ast.port list, Ast.mixture, string, Ast.rule)
     Ast.compil ->
   Export_to_KaSim.Export_to_KaSim.contact_map *

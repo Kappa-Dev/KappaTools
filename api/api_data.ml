@@ -155,21 +155,24 @@ let find_link cm (a,s) =
     | (a',l) :: t -> if a = a' then auxs i 0 l else auxa (succ i) t in
   auxa 0 cm
 
-let api_contact_map cm =
-  let cm' = Mods.StringMap.fold
-	      (fun a t acc -> (a,Mods.StringMap.bindings t)::acc) cm [] in
-  Tools.array_map_of_list
-    (fun (ag,sites) ->
+let api_contact_map sigs cm =
+  Array.mapi
+    (fun ag sites ->
      { Api_types.node_quantity = None;
-       Api_types.node_name = ag;
+       Api_types.node_name =
+         Format.asprintf "%a" (Signature.print_agent sigs) ag;
        Api_types.node_sites =
-         Tools.array_map_of_list
-           (fun (site,(states,links)) ->
-            { Api_types.site_name = site;
-              Api_types.site_links = List.map (find_link cm') links;
-              Api_types.site_states = states;
+         Array.mapi
+           (fun site (states,links) ->
+             { Api_types.site_name =
+                 Format.asprintf "%a" (Signature.print_site sigs ag) site;
+              Api_types.site_links = links;
+              Api_types.site_states =
+                List.map
+                  (Format.asprintf "%a" (Signature.print_internal_state sigs ag site))
+                  states;
             }) sites;
-     }) cm'
+     }) cm
 
 let api_contactmap_site_graph
     (contactmap : Api_types.parse) : Api_types.site_graph =
@@ -373,7 +376,7 @@ let api_snapshot_kappa (snapshot : Api_types.snapshot) =
     (List.map
        (fun (component : (int * ApiTypes_t.site_node) list) ->
          match component with
-           | (agent_id,
+           | (_agent_id,
               { Api_types.node_quantity = Some node_quantity
               ; _ })::tail ->
              Format.sprintf "%%init: %f %s"

@@ -87,8 +87,7 @@ module type Export_to_KaSim =
   sig
 
     type state
-    type contact_map =
-      ((string list) * (string*string) list) Mods.StringMap.t Mods.StringMap.t
+    type contact_map = ((int list) * (int*int) list) array array
 
     val init:
       called_from:Remanent_parameters_sig.called_from ->
@@ -96,17 +95,16 @@ module type Export_to_KaSim =
       state
 
     val flush_errors: state -> state
-    val get_contact_map:
-      ?accuracy_level:accuracy_level -> state ->
-      state * (string list * (string*string) list) Mods.StringMap.t Mods.StringMap.t
-    val get_influence_map: ?accuracy_level:accuracy_level -> state -> state * influence_map
-    val get_signature: state -> state * Signature.s
+    val get_contact_map: ?accuracy_level:accuracy_level ->
+                         Signature.s -> state -> state * contact_map
+    val get_influence_map: ?accuracy_level:accuracy_level ->
+                           state -> state * influence_map
+    (*    val get_signature: state -> state * Signature.s*)
     val get_most_accurate_contact_map:
-      state -> ((string list * (string*string) list) Mods.StringMap.t Mods.StringMap.t option)
+      state -> contact_map option
     val get_most_accurate_influence_map: state -> influence_map option
     val dump_influence_map: accuracy_level -> state -> unit
-    val dump_contact_map: accuracy_level -> state -> unit
-    val dump_signature: state -> unit
+    val dump_contact_map: accuracy_level -> Signature.s -> state -> unit
     val dump_errors: state -> unit
     val dump_errors_light: state -> unit
 
@@ -129,7 +127,7 @@ module Export_to_KaSim =
       InfluenceNodeMap.iter
         (fun x y ->
            InfluenceNodeMap.iter
-             (fun y labellist ->
+             (fun y _labellist ->
                 let () =
                   Loggers.fprintf
                     (Remanent_parameters.get_logger parameters)
@@ -146,7 +144,7 @@ module Export_to_KaSim =
       InfluenceNodeMap.iter
         (fun x y ->
            InfluenceNodeMap.iter
-             (fun y labellist ->
+             (fun y _labellist ->
                 let () =
                   Loggers.fprintf
                     (Remanent_parameters.get_logger parameters)
@@ -160,22 +158,26 @@ module Export_to_KaSim =
       Loggers.print_newline
         (Remanent_parameters.get_logger parameters)
 
-    let print_contact_map parameters contact_map =
+    let print_contact_map parameters sigs contact_map =
       Loggers.fprintf (Remanent_parameters.get_logger parameters)  "Contact map: ";
       Loggers.print_newline (Remanent_parameters.get_logger parameters) ;
-      Mods.StringMap.iter
+      Array.iteri
 	(fun x ->
-	 Mods.StringMap.iter
+	 Array.iteri
            (fun y (l1,l2) ->
             if l1<>[]
             then
               begin
-		let () = Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s@%s: " x y in
+		let () =
+                  Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                                  "%a@%a: " (Signature.print_agent sigs) x
+                                  (Signature.print_site sigs x) y in
 		let _ = List.fold_left
-			  (fun bool x ->
+			  (fun bool z ->
 			   (if bool then
                               Loggers.fprintf (Remanent_parameters.get_logger parameters) ", ");
-			   Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s" x;
+			   Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                                           "%a" (Signature.print_internal_state sigs x y) z;
 			   true)
 			  false l1
 		in
@@ -184,7 +186,10 @@ module Export_to_KaSim =
             else ();
             List.iter
               (fun (z,t) ->
-               Loggers.fprintf (Remanent_parameters.get_logger parameters) "%s@%s--%s@%s" x y z t;
+                Loggers.fprintf (Remanent_parameters.get_logger parameters)
+                                "%a@@%a--%a@@%a"
+                                (Signature.print_agent sigs) x (Signature.print_site sigs x) y
+                                (Signature.print_agent sigs) z (Signature.print_site sigs z) t;
                Loggers.print_newline (Remanent_parameters.get_logger parameters)
               ) l2
            )
@@ -194,9 +199,7 @@ module Export_to_KaSim =
     (*-------------------------------------------------------------------------------*)
     (*type abstraction*)
 
-    type contact_map = ((string list) * (string*string) list) Mods.StringMap.t Mods.StringMap.t
-
-    type errors = Exception.method_handler
+    type contact_map = ((int list) * (int*int) list) array array
 
     type state =
       {
@@ -209,7 +212,6 @@ module Export_to_KaSim =
             AccuracyMap.t ;
         influence_map : influence_map AccuracyMap.t;
         contact_map   : contact_map AccuracyMap.t ;
-        signature     : Signature.s option;
         errors        : Exception.method_handler ;
       }
 
@@ -264,7 +266,6 @@ module Export_to_KaSim =
         contact_map   = AccuracyMap.empty;
         internal_influence_map = AccuracyMap.empty;
         influence_map = AccuracyMap.empty;
-        signature     = None;
         errors        = errors
       }
 
@@ -274,8 +275,11 @@ module Export_to_KaSim =
           errors = Exception.empty_error_handler
       }
 
-    let compute_raw_contact_map state =
-      let sol        = ref Mods.StringMap.empty in
+    let compute_raw_contact_map sigs state =
+      let wdl = Location.dummy_annot in
+      let sol = Array.init
+                  (Signature.size sigs)
+                  (fun i -> Array.make (Signature.arity sigs i) ([],[])) in
       let handler    = state.handler in
       let parameters = state.parameters in
       let error      = state.errors in
@@ -286,19 +290,26 @@ module Export_to_KaSim =
       let () =
         Loggers.print_newline (Remanent_parameters.get_logger parameters) in
       (*----------------------------------------------------------------*)
-      let add_link (a,b) (c,d) sol =
-	let sol_a = Mods.StringMap.find_default Mods.StringMap.empty a sol in
-        let l,old = Mods.StringMap.find_default ([],[]) b sol_a in
-        Mods.StringMap.add a (Mods.StringMap.add b (l,((c,d)::old)) sol_a) sol
+      let ids (agent_name,b) =
+	let id_a = Signature.num_of_agent (wdl agent_name) sigs in
+        let id_b = Signature.num_of_site
+                     ~agent_name (wdl b) (Signature.get sigs id_a) in
+        (id_a,id_b) in
+      let add_link x y =
+        let a,b = ids x in
+        let l,old = sol.(a).(b) in
+        sol.(a).(b) <- (l,(ids y::old))
       in
       (*----------------------------------------------------------------*)
-      let add_internal_state (a,b) c sol =
+      let add_internal_state x c =
         match c with
-        | Ckappa_sig.Binding _ -> sol
+        | Ckappa_sig.Binding _ -> ()
         | Ckappa_sig.Internal state ->
-	   let sol_a = Mods.StringMap.find_default Mods.StringMap.empty a sol in
-           let old,l = Mods.StringMap.find_default ([],[]) b sol_a in
-           Mods.StringMap.add a (Mods.StringMap.add b (state::old,l) sol_a) sol
+           let a,b = ids x in
+           let old,l = sol.(a).(b) in
+           let state = Signature.num_of_internal_state
+                         b (wdl state) (Signature.get sigs a) in
+           sol.(a).(b) <- (state::old,l)
       in
       (*----------------------------------------------------------------*)
       let simplify_site site =
@@ -321,9 +332,8 @@ module Export_to_KaSim =
              let error =
                Ckappa_sig.Dictionary_of_States.iter
                  parameters error
-                 (fun parameters error s state  () () ->
-                    let () =
-                      sol := add_internal_state (ag,site) state (!sol)
+                 (fun _parameters error _s state () () ->
+                    let () = add_internal_state (ag,site) state
                     in
                     error)
                  s
@@ -332,32 +342,31 @@ module Export_to_KaSim =
           handler.Cckappa_sig.states_dic
       in
       (*----------------------------------------------------------------*)
-      let sol = !sol in
-      let error, sol =
-        Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
+      let error =
+        Ckappa_sig.Agent_type_site_state_nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.iter
           parameters error
-          (fun parameters error (i, (j , k)) (i', j', k') sol ->
-             let error, ag_i =
-               Handler.translate_agent parameters error handler i
-             in
-             let error, site_j =
+          (fun parameters error (i, (j , _k)) (i', j', _k') ->
+            let error, ag_i =
+              Handler.translate_agent parameters error handler i
+            in
+            let error, site_j =
                Handler.translate_site parameters error handler i j
-             in
-             let site_j = simplify_site site_j in
-             let error, ag_i' =
-               Handler.translate_agent parameters error handler i'
-             in
-             let error, site_j' =
-               Handler.translate_site parameters error handler i' j'
-             in
-             let site_j' = simplify_site site_j' in
-             let sol = add_link (ag_i,site_j) (ag_i',site_j') sol in
-             error, sol)
-          handler.Cckappa_sig.dual sol
-      in
-      let sol =
-        Mods.StringMap.map (Mods.StringMap.map (fun (l,x) -> List.rev l,x)) sol
-      in
+            in
+            let site_j = simplify_site site_j in
+            let error, ag_i' =
+              Handler.translate_agent parameters error handler i'
+            in
+            let error, site_j' =
+              Handler.translate_site parameters error handler i' j'
+            in
+            let site_j' = simplify_site site_j' in
+            let () = add_link (ag_i,site_j) (ag_i',site_j') in
+            error)
+          handler.Cckappa_sig.dual in
+      let () =
+        Array.iteri
+          (fun i -> Array.iteri (fun j (l,x) -> sol.(i).(j) <- List.rev l,x))
+          sol in
       {state
        with contact_map = AccuracyMap.add Low sol state.contact_map ;
             errors = error }
@@ -522,7 +531,7 @@ module Export_to_KaSim =
       | High -> Low
       | Full -> Low
 
-    let rec get_contact_map ?accuracy_level:(accuracy_level=Low) state =
+    let rec get_contact_map ?(accuracy_level=Low) sigs state =
       let accuracy_level =
         correct_accuracy_level_in_contact_map accuracy_level
       in
@@ -532,8 +541,8 @@ module Export_to_KaSim =
       | Some x -> state,x
       | None ->
         get_contact_map
-          ~accuracy_level
-          (compute_contact_map accuracy_level state)
+          ~accuracy_level sigs
+          (compute_contact_map accuracy_level sigs state)
 
     let correct_accuracy_level_in_influence_map =
           function
@@ -564,7 +573,7 @@ module Export_to_KaSim =
           ~accuracy_level
           (compute_influence_map accuracy_level state)
 
-    let compute_signature state =
+    (*let compute_signature state =
       let state,l = get_contact_map state in
       let l =
         Mods.StringMap.fold
@@ -586,7 +595,7 @@ module Export_to_KaSim =
     let rec get_signature state =
       match state.signature with
       | Some x -> state,x
-      | None -> get_signature (compute_signature state)
+      | None -> get_signature (compute_signature state)*)
 
     let find_most_precise map =
       match
@@ -610,18 +619,13 @@ module Export_to_KaSim =
       | Some influence_map ->
         print_influence_map state.parameters influence_map
 
-    let dump_contact_map accuracy state =
+    let dump_contact_map accuracy sigs state =
       match
         AccuracyMap.find_option accuracy state.contact_map
       with
       | None -> ()
       | Some contact_map ->
-        print_contact_map state.parameters contact_map
-
-    let dump_signature state =
-      match state.signature with
-      | None -> ()
-      | Some signature -> ()
+        print_contact_map state.parameters sigs contact_map
 
     let dump_errors state =
       Exception.print state.parameters state.errors

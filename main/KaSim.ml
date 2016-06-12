@@ -151,7 +151,7 @@ let () =
 	  LKappa.compil_of_ast !alg_var_overwrite result in
 	let () = Format.printf "+ KaSa tools initialization@." in
 	let contact_map,_kasa_state =
-	  Eval.init_kasa Remanent_parameters_sig.KaSim result in
+	  Eval.init_kasa Remanent_parameters_sig.KaSim sigs_nd result in
 	let () = Format.printf "+ Compiling...@." in
 	let (env, cc_env, story_compression, unary_distances, dotCflow, init_l)=
 	  Eval.compile

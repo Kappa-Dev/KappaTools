@@ -6,22 +6,10 @@ let link_occurence_failure key pos =
 	      " is problematic! Either Sanity.mixture is broken"^
 		" or you don't use it!",pos))
 
-let ports_from_contact_map sigs contact_map ty_id p_id =
-  let ty_na = Format.asprintf "%a" (Signature.print_agent sigs) ty_id in
-  let p_na = Format.asprintf "%a" (Signature.print_site sigs ty_id) p_id in
-  let cand =
-    snd
-      (Mods.StringMap.find_default
-	 ([],[]) p_na
-	 (Mods.StringMap.find_default Mods.StringMap.empty ty_na contact_map)) in
-  List.map (fun (ty_na,p_na) ->
-	    let ty_id =
-	      Signature.num_of_agent (Location.dummy_annot ty_na) sigs in
-	    (ty_id,Signature.id_of_site (Location.dummy_annot ty_na)
-					(Location.dummy_annot p_na) sigs))
-	   cand
+let ports_from_contact_map contact_map ty_id p_id =
+  snd contact_map.(ty_id).(p_id)
 
-let find_implicit_infos sigs contact_map ags =
+let find_implicit_infos contact_map ags =
   let max_s m = function
     | LKappa.Linked (i,_) -> max i m
     | LKappa.Freed | LKappa.Maintained | LKappa.Erased -> m in
@@ -53,13 +41,13 @@ let find_implicit_infos sigs contact_map ags =
 		  (Location.dummy_annot (Ast.LNK_VALUE (free_id,(p,a))),s) in
 	      (succ free_id, ports', ags,
 	       (free_id,(p,a),or_ty,new_switch s)::cor))
-	     (ports_from_contact_map sigs contact_map ty_id i))
+	     (ports_from_contact_map contact_map ty_id i))
 	  (aux_one ag_tail ty_id (max_s max_id s) ports (succ i))
      | (Ast.LNK_VALUE (j,_),_),s ->
 	aux_one ag_tail ty_id (max_s (max j max_id) s) ports (succ i)
      | (Ast.FREE, pos), LKappa.Maintained ->
 	let () = (* Do not make test if being free is the only possibility *)
-	  match ports_from_contact_map sigs contact_map ty_id i with
+	  match ports_from_contact_map contact_map ty_id i with
 	  | [] -> ports.(i) <- (Ast.LNK_ANY,pos), LKappa.Maintained
 	  | _ :: _ -> () in
 	aux_one ag_tail ty_id max_id ports (succ i)
@@ -69,7 +57,7 @@ let find_implicit_infos sigs contact_map ags =
 	aux_one ag_tail ty_id max_id ports (succ i)
      | (Ast.LNK_ANY,pos),
        (LKappa.Erased | LKappa.Linked _ | LKappa.Freed as s) ->
-	match ports_from_contact_map sigs contact_map ty_id i with
+	match ports_from_contact_map contact_map ty_id i with
 	| [] when s = LKappa.Freed ->
 	   (* Do not make test is being free is the only possibility *)
 	   let () = ports.(i) <- (Ast.LNK_ANY,pos), LKappa.Maintained in
@@ -610,7 +598,7 @@ let connected_components_of_mixture created mix (env,origin) =
 let rule_mixtures_of_ambiguous_rule contact_map sigs precomp_mixs =
   add_implicit_infos
     sigs (find_implicit_infos
-	    sigs contact_map
+	    contact_map
 	    (List.map LKappa.copy_rule_agent precomp_mixs))
 
 let connected_components_sum_of_ambiguous_rule

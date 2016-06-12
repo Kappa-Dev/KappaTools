@@ -95,7 +95,7 @@ end = struct
           (yield ()) >>=
             (fun () ->
              (Lwt.wrap2 LKappa.compil_of_ast [] raw_ast) >>=
-               (fun (ast :
+               (fun (sigs,_,_,_ as ast :
                        Signature.s * unit NamedDecls.t * int list *
                          (Ast.agent,
                           LKappa.rule_agent list,
@@ -103,9 +103,10 @@ end = struct
                           LKappa.rule) Ast.compil) ->
                 (yield ()) >>=
                   (fun () ->
-                   (Lwt.wrap2
+                   (Lwt.wrap3
                       Eval.init_kasa
                       Remanent_parameters_sig.JS
+                      sigs
                       raw_ast) >>=
                      (fun (contact_map,_kasa_state) ->
                       Lwt.return (`Right (ast,contact_map))))))))
@@ -167,11 +168,11 @@ end = struct
       Lwt.bind
         (build_ast code self#yield self#log)
         (function
-          | `Right (_,contact_map) ->
+          | `Right ((sigs,_,_,_),contact_map) ->
              Lwt.return
                (`Right
                    { ApiTypes.contact_map =
-                       Api_data.api_contact_map contact_map })
+                       Api_data.api_contact_map sigs contact_map })
           | `Left e -> Lwt.return (`Left e))
 
     method private new_id () : int =
