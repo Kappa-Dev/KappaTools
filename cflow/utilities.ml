@@ -98,17 +98,15 @@ let dummy_log = fun p -> p
 
 let extend_trace_with_dummy_side_effects l = List.rev_map (fun a -> a,[]) (List.rev l)
 
-let print_pretrace parameter handler _ = ()
-(*  Format.fprintf
-	(S.PH.B.PB.CI.Po.K.H.get_out_channel parameter)
-	"@[<v>%a@]@."
-	(Pp.list Pp.space (S.PH.B.PB.CI.Po.K.print_refined_step ~handler))*)
-
-(** operations over traces *)
+let print_pretrace parameter _handler =
+  Loggers.fprintf
+    (S.PH.B.PB.CI.Po.K.H.get_out_channel parameter)
+    "@[<v>%a@]@."
+    (Pp.list Pp.space (Trace.print_step))
 
 let print_trace parameter handler trace = print_pretrace parameter handler (get_pretrace_of_trace trace)
 
-let transform_trace_gen f log_message debug_message profiling_event =
+let transform_trace_gen f _log_message _debug_message profiling_event =
   (fun parameters ?(shall_we_compute=we_shall) ?(shall_we_compute_profiling_information=we_shall) kappa_handler profiling_info error trace ->
    if shall_we_compute parameters
    then
