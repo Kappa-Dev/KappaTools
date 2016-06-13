@@ -4,10 +4,12 @@
 *)
 module Api_types = ApiTypes_j
 
-let plot_pg_store ~plot
-                  ~file
-                  ~title
-                  ~descr : Pp_svg.store
+let plot_pg_store
+    ~plot
+    ~file
+    ~title
+    ~descr
+    : Pp_svg.store
   = { Pp_svg.file = file;
       Pp_svg.title = title;
       Pp_svg.descr = descr;
@@ -29,8 +31,10 @@ let plot_tsv (plot : Api_types.plot) : string =
         (List.map
            (fun (observable : Api_types.observable) ->
              String.concat ","
-               (List.map string_of_float
-                  (observable.Api_types.time::observable.Api_types.values)
+               (List.map
+                  (Format.sprintf "%e")
+                  (observable.Api_types.time
+                   ::observable.Api_types.values)
                )
            )
            plot.Api_types.observables)
@@ -219,16 +223,19 @@ let api_snapshot_kappa (snapshot : Api_types.snapshot) =
       ((l,r) : (int * int) * (int * int)) : (int * int) * (int * int) =
     if (l < r) then (l,r) else (r,l)
   in
-(*
+  let format_edge
+      (label : string)
+      (((a,b),(c,d)) : (int * int) * (int * int)) : string =
+    Format.sprintf
+      "\n%s ((%d,%d),(%d,%d))\n"
+      label a b c d
+  in
   let debug_edge
       (label : string)
-      (((a,b),(c,d)) : (int * int) * (int * int)) : unit =
+      (edge : (int * int) * (int * int)) : unit =
     print_string
-      (Format.sprintf
-         "\n%s ((%d,%d),(%d,%d))\n"
-         label a b c d)
+      (format_edge label edge)
   in
-*)
   let site_nodes : ApiTypes_t.site_node list =
     Array.to_list (api_snapshot_site_graph snapshot)
   in
@@ -238,34 +245,61 @@ let api_snapshot_kappa (snapshot : Api_types.snapshot) =
   in
   let edge_index : int EdgeMap.t =
     List.fold_left
-      (fun index ((agent_id,site_node) : int * ApiTypes_t.site_node) ->
-        let edges : ((int * int) * (int * int)) list =
-          List.flatten
-          (List.mapi
-            (fun (site_id : int) (site : ApiTypes_t.site) ->
-              List.map
-                (fun link -> ((agent_id,site_id),link))
-                site.ApiTypes_t.site_links
+      (fun
+        (index : int EdgeMap.t)
+        ((agent_id,site_node) : int * ApiTypes_t.site_node) ->
+          let offset : int = EdgeMap.cardinal index in
+          let index_edges : (int * ((int * int) * (int * int))) list =
+            List.mapi
+              (fun i edge -> (i + offset,edge))
+              (List.flatten
+                 (List.mapi
+                    (fun
+                      (site_id : int)
+                      (site : ApiTypes_t.site) ->
+                        List.map
+                          (fun link -> ((agent_id,site_id),link))
+                          site.ApiTypes_t.site_links
+                    )
+                    (Array.to_list site_node.ApiTypes_t.node_sites)
+                 )
+              )
+          in
+          List.fold_left
+            (fun
+              (local_index : int EdgeMap.t)
+              ((key,edge) : (int * ((int * int) * (int * int))))
+            ->
+              let edge = normalize_edge edge in
+              if EdgeMap.mem edge local_index then
+                local_index
+              else
+                (*
+                let () =
+                  print_string
+                    (format_edge ((string_of_int key)^"!>") edge)
+                in
+                *)
+                EdgeMap.add
+                  edge
+                  key
+                  local_index
             )
-            (Array.to_list site_node.ApiTypes_t.node_sites)
-          )
-        in
-        (* let () = List.iter (debug_edge "edges") edges in *)
-        List.fold_left
-          (fun index edge ->
-            let edge = normalize_edge edge in
-            (* let () = debug_edge "populate" edge in *)
-            EdgeMap.add
-              edge
-              (EdgeMap.cardinal index)
-              index
-          )
-          index
-          edges
+            index
+            index_edges
       )
       EdgeMap.empty
       (Array.to_list components_index)
   in
+  (*
+  let () =
+    EdgeMap.iter
+      (fun key value ->
+        print_string
+          (format_edge ((string_of_int value)^"->") key))
+      edge_index
+  in
+  *)
   (* let () = print_string "(EdgeMap.cardinal edge_index)" in *)
   (* let () = print_int (EdgeMap.cardinal edge_index) in *)
   (* index the connected components *)
@@ -346,7 +380,14 @@ let api_snapshot_kappa (snapshot : Api_types.snapshot) =
                                 EdgeMap.find
                                   edge_id
                                   edge_index
-                             in
+                              in
+(*
+                              let () =
+                                debug_edge
+                                  (string_of_int link_id)
+                                  edge_id
+                              in
+*)
                               "!"^(string_of_int link_id)
                             )
                             site_node.ApiTypes_t.site_links))
@@ -373,19 +414,22 @@ let api_snapshot_kappa (snapshot : Api_types.snapshot) =
   in
   String.concat
     "\n"
-    (List.map
-       (fun (component : (int * ApiTypes_t.site_node) list) ->
-         match component with
-           | (_agent_id,
-              { Api_types.node_quantity = Some node_quantity
-              ; _ })::tail ->
-             Format.sprintf "%%init: %f %s"
-               node_quantity
-               (match tail with
-               | [] -> render_agent (List.hd component)
-               | _ -> render_component component)
-           | _ -> ""
+    (List.fold_left
+       (fun
+         (kappa_fragments : string list)
+         (component : (int * ApiTypes_t.site_node) list) ->
+           match component with
+           | (_,{ Api_types.node_quantity = Some node_quantity
+                ; _ })::tail ->
+             (Format.sprintf "%%init: %f %s"
+                node_quantity
+                (match tail with
+                | [] -> render_agent (List.hd component)
+                | _ -> render_component component))::kappa_fragments
+           | _ -> kappa_fragments
+
        )
+       []
        (List.map
           agent_components
           components_ids))
