@@ -199,10 +199,11 @@ let add_actions env grid event_number kind actions =
     | [] -> grid
     | Instantiation.Mod_internal (site,_) :: q ->
        aux (add site false atom_modified grid event_number kind) q
-    | (Instantiation.Bind (site1,site2)
-      | Instantiation.Bind_to (site1,site2)) :: q ->
-       let grid' = add site2 true atom_modified grid event_number kind in
-       aux (add site1 true atom_modified grid' event_number kind) q
+    | Instantiation.Bind (site1,site2) :: q ->
+    let grid' = add site2 true atom_modified grid event_number kind in
+    aux (add site1 true atom_modified grid' event_number kind) q
+    | Instantiation.Bind_to (site1,_) :: q ->
+       aux (add site1 true atom_modified grid event_number kind) q
     | Instantiation.Free site :: q ->
        aux (add site true atom_modified grid event_number kind) q
     | (Instantiation.Create ((_,na as ag),_)
@@ -243,7 +244,10 @@ let record (kind,(tests,(actions,_,side_effects)),_)
   let grid = add_tests grid event_number kind tests in
   let grid = add_actions env grid event_number kind actions in
   List.fold_left
-    (fun grid site -> add site true atom_modified grid event_number kind) grid side_effects
+    (fun grid site ->
+       add (fst site,-1) true atom_tested
+         (add site true atom_modified grid event_number kind) event_number kind)
+    grid side_effects
 
 let record_obs (kind,tests,_) side_effects event_number grid =
   let grid = add_obs_eid event_number grid in
