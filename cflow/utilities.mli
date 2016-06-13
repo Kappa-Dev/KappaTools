@@ -150,13 +150,13 @@ val count_stories: story_table -> int
 val store_trace: (trace,trace_runtime_info list,story_table,story_table) ternary
 
 (** Apply a function on each trace (and each list of runtime information associated to this trace),
-the string contains the message to display in case of faillure of one call of the ternary function*)
+    the string contains the message to display in case of faillure of one call of the ternary function*)
 
 val fold_story_table_with_progress_bar:
   (string,(trace,trace_runtime_info list,'a,'a) ternary,story_table,'a,'a) quaternary
 
 (** Apply a function on each trace (and each list of runtime information associated to this trace),
-the string contains the message to display in case of faillure of one call of the ternary function*)
+    the string contains the message to display in case of faillure of one call of the ternary function*)
 val fold_story_table_without_progress_bar:
   (string,(trace,trace_runtime_info list,'a,'a) ternary,story_table,'a,'a) quaternary
 

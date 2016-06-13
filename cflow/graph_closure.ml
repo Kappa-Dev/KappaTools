@@ -39,7 +39,7 @@ type config =
 
 let config_big_graph_with_progress_bar =
   {
-   do_tick = true;
+    do_tick = true;
     keep_all_nodes=false;
     cut_transitive_path=true ;
     stat_trans_closure_for_big_graphs=true;
@@ -86,17 +86,17 @@ let print_list f l =
 let check form p f string a b =
   match p a,p b with
   | false,false -> let () = print_list form a in
-                   let () = print_list form b in
-                   failwith (string^"_arg1_2")
+    let () = print_list form b in
+    failwith (string^"_arg1_2")
   | true,false  -> let () = print_list form b in failwith (string^"_arg2")
   | false,true -> let () = print_list form a in failwith (string^"_arg1")
   | true,true ->
-     let rep = f a b in
-     let () = print_list form rep in
-     if p rep then rep
-     else
-       (print_list form a;print_list form b;print_list form rep;
-	failwith (string^"_output"))
+    let rep = f a b in
+    let () = print_list form rep in
+    if p rep then rep
+    else
+      (print_list form a;print_list form b;print_list form rep;
+       failwith (string^"_output"))
 
 let merge_list p a b =
   let rec aux a b accu =
@@ -170,10 +170,10 @@ let closure_bottom_up_with_fold parameter handler log_info error event config pr
       let _ =
         M.iter
           (fun succ ->
-           S.iter
-             (fun pred ->
-              A.set max_succ pred (max succ (A.get max_succ pred))))
-              prec
+             S.iter
+               (fun pred ->
+                  A.set max_succ pred (max succ (A.get max_succ pred))))
+          prec
       in
       let is_last_succ_of = A.make (max_index+1) [] in
       let add node max_succ =
@@ -206,68 +206,68 @@ let closure_bottom_up_with_fold parameter handler log_info error event config pr
   let output =
     M.fold_with_interruption
       (fun succ s_pred (tick,error,log_info,counter,a) ->
-        begin
-          let rec aux (l:int list) (accu:int list) =
-            match l with
-            | [] -> accu
-            | pred::t ->
-              begin
-                let new_l = A.get s_pred_star pred in
-                let diff =
-                  if config.cut_transitive_path
-                  then
-                    diff_list_decreasing t new_l
-                  else
-                    t
-                in
-                aux
-                  diff
-                  (merge_list_decreasing (pred::new_l) accu)
-              end
-          in
-          let pred_star =
-            let l_pred = S.fold (fun i j -> i::j) s_pred [] in
-            let s = A.get s_pred_star succ in
-            aux l_pred s
-          in
-          let _ =
-            A.set s_pred_star succ pred_star
-          in
-	  let _ = clean succ in
-          let tick = do_tick tick in
-	  if is_obs succ
-	  then
-	    let error,log_info,a = f parameter handler log_info error succ pred_star a in
-	    Stop.success_or_stop
-	      (fun a -> Stop.success (tick,error,log_info,counter+1,a))
-	      (fun b -> Stop.stop (error,log_info,b))
-	      a
-	  else
-	    Stop.success (tick,error,log_info,counter,a)
+         begin
+           let rec aux (l:int list) (accu:int list) =
+             match l with
+             | [] -> accu
+             | pred::t ->
+               begin
+                 let new_l = A.get s_pred_star pred in
+                 let diff =
+                   if config.cut_transitive_path
+                   then
+                     diff_list_decreasing t new_l
+                   else
+                     t
+                 in
+                 aux
+                   diff
+                   (merge_list_decreasing (pred::new_l) accu)
+               end
+           in
+           let pred_star =
+             let l_pred = S.fold (fun i j -> i::j) s_pred [] in
+             let s = A.get s_pred_star succ in
+             aux l_pred s
+           in
+           let _ =
+             A.set s_pred_star succ pred_star
+           in
+           let _ = clean succ in
+           let tick = do_tick tick in
+           if is_obs succ
+           then
+             let error,log_info,a = f parameter handler log_info error succ pred_star a in
+             Stop.success_or_stop
+               (fun a -> Stop.success (tick,error,log_info,counter+1,a))
+               (fun b -> Stop.stop (error,log_info,b))
+               a
+           else
+             Stop.success (tick,error,log_info,counter,a)
 
-	end)
+         end)
       prec (tick,error,log_info,1,a)
   in
   let _ = close_tick () in
   Stop.success_or_stop
     (fun (_,error,log_info,_,a) ->
-     let error,log_info =
-       match event
-       with
-	 None -> error,log_info
-       | Some e ->
-	  StoryProfiling.StoryStats.close_event parameter error e None log_info
-     in
-     Stop.success (error,log_info,a))
+       let error,log_info =
+         match event
+         with
+           None -> error,log_info
+         | Some e ->
+           StoryProfiling.StoryStats.close_event parameter error e None log_info
+       in
+       Stop.success (error,log_info,a))
     (fun (error,log_info,b) ->
-     let error,log_info =
-       match event
-       with
-	 None -> error,log_info
-       | Some e ->
-	  StoryProfiling.StoryStats.close_event parameter error e None log_info
-     in
-     Stop.stop (error,log_info,b))
+       let error,log_info =
+         match event
+         with
+           None -> error,log_info
+         | Some e ->
+           StoryProfiling.StoryStats.close_event parameter error e None log_info
+       in
+       Stop.stop (error,log_info,b))
     output
 
 let closure_bottom_up parameter handler log_info error event_opt config prec is_obs =
@@ -277,10 +277,10 @@ let closure_bottom_up parameter handler log_info error event_opt config prec is_
     let _ = A.set a i s in (e,c,Stop.success a)
   in
   let output = closure_bottom_up_with_fold parameter handler log_info error event_opt config prec is_obs
-					   f s_pred_star in
+      f s_pred_star in
   Stop.success_or_stop
     (fun (error,log_info,graph) ->
-     error,log_info,(graph,Decreasing_without_last_event))
+       error,log_info,(graph,Decreasing_without_last_event))
     (fun (error,log_info,_) -> error,log_info,(s_pred_star,Decreasing_without_last_event))
     output
 
@@ -300,7 +300,7 @@ let closure_top_down parameter handler log_info error event_opt config prec is_o
   in
   let shift_taints l =
     match l with t::t'::q -> (S.union t t')::q
-	       | _ -> l
+               | _ -> l
   in
   let rec merge_taints l1 l2 =
     match
@@ -309,7 +309,7 @@ let closure_top_down parameter handler log_info error event_opt config prec is_o
     | _,[] -> l1
     | [],_ -> l2
     | t::q,t'::q' ->
-       (S.union t t')::(merge_taints q q')
+      (S.union t t')::(merge_taints q q')
   in
   let s_pred_star = A.make (max_index+1) [] in
   let taint i taints =
@@ -317,9 +317,9 @@ let closure_top_down parameter handler log_info error event_opt config prec is_o
       taints
     with [] -> ()
        | t::q ->
-	  S.iter
-	    (fun taint -> A.set s_pred_star taint (i::(A.get s_pred_star taint)))
-	    t
+         S.iter
+           (fun taint -> A.set s_pred_star taint (i::(A.get s_pred_star taint)))
+           t
   in
   let do_tick,tick,close_tick =
     if max_index > 300 && config.do_tick
@@ -335,20 +335,20 @@ let closure_top_down parameter handler log_info error event_opt config prec is_o
   let _ =
     List.fold_left
       (fun tick (i,s_pred) ->
-       let new_taint =
-	 if is_obs i
-	 then
-	   create_taints i
-	 else
-	   []
-       in
-       let taints = merge_taints new_taint (A.get tainting i) in
-       let () = taint i taints in
-       let shifted_taints = shift_taints taints in
-       let taint x = A.set tainting x (merge_taints shifted_taints  (A.get tainting x)) in
-       let () = S.iter taint s_pred in
-       let () = A.set tainting i [] in
-       do_tick tick)
+         let new_taint =
+           if is_obs i
+           then
+             create_taints i
+           else
+             []
+         in
+         let taints = merge_taints new_taint (A.get tainting i) in
+         let () = taint i taints in
+         let shifted_taints = shift_taints taints in
+         let taint x = A.set tainting x (merge_taints shifted_taints  (A.get tainting x)) in
+         let () = S.iter taint s_pred in
+         let () = A.set tainting i [] in
+         do_tick tick)
       tick prec
   in
   let () = close_tick () in
@@ -360,13 +360,13 @@ let get_list_in_increasing_order_with_last_event i (m,mode) =
   with
   | Increasing_with_last_event -> m.(i)
   | Decreasing_without_last_event ->
-     begin
-       match
-	 m.(i)
-       with
-	 [] -> []
-       | l -> List.rev (i::l)
-     end
+    begin
+      match
+        m.(i)
+      with
+        [] -> []
+      | l -> List.rev (i::l)
+    end
 
 let closure_check parameter handler log_info error event_opt config prec is_obs =
   let t = Sys.time () in
@@ -378,16 +378,16 @@ let closure_check parameter handler log_info error event_opt config prec is_obs 
   let _ =
     A.iteri
       (fun i s ->
-       let s = get_list_in_increasing_order_with_last_event i (a,a') in
-       let s' = get_list_in_increasing_order_with_last_event i (b,b') in
-       if s = s' then ()
-       else
-	 let _ = Printf.fprintf stderr "DIFFER %i\n" i in
-	 let _ = List.iter (Printf.fprintf stderr "%i, ") s in
-	 let _ = Printf.fprintf stderr "\n" in
-	   let _ = List.iter (Printf.fprintf stderr "%i, ") s' in
-	   let _ = Printf.fprintf stderr "\n" in
-	   ())
+         let s = get_list_in_increasing_order_with_last_event i (a,a') in
+         let s' = get_list_in_increasing_order_with_last_event i (b,b') in
+         if s = s' then ()
+         else
+           let _ = Printf.fprintf stderr "DIFFER %i\n" i in
+           let _ = List.iter (Printf.fprintf stderr "%i, ") s in
+           let _ = Printf.fprintf stderr "\n" in
+           let _ = List.iter (Printf.fprintf stderr "%i, ") s' in
+           let _ = Printf.fprintf stderr "\n" in
+           ())
       a
   in error,log_info,(a,a')
 
@@ -406,23 +406,23 @@ let reduction_top_down parameter handler log_info error prec =
   let output =
     M.fold
       (fun eid neigh out ->
-       let to_remove = A.get prec_star eid in
-       let s =
-	 S.fold (fun i l -> i::l) neigh []
-	   in
-	   let s = List.rev s in
-	   let rec aux l1 l2 output =
-	     match l1,l2 with
-	       _,[] -> List.fold_left (fun set i -> S.add i set) output l1 (* This is quite annoying, why prec is not described with ordered list *)
-	     | [],_ -> output
-	     | h::q,h'::q' ->
-		let cmp = compare h h' in
-		if cmp < 0 then aux q l2 (S.add h output)
-		else if cmp = 0 then aux q q' output
-		else  aux (h::q) q' output
-	   in
-	   let s = aux s to_remove S.empty in
-	   M.add eid s out
+         let to_remove = A.get prec_star eid in
+         let s =
+           S.fold (fun i l -> i::l) neigh []
+         in
+         let s = List.rev s in
+         let rec aux l1 l2 output =
+           match l1,l2 with
+             _,[] -> List.fold_left (fun set i -> S.add i set) output l1 (* This is quite annoying, why prec is not described with ordered list *)
+           | [],_ -> output
+           | h::q,h'::q' ->
+             let cmp = compare h h' in
+             if cmp < 0 then aux q l2 (S.add h output)
+             else if cmp = 0 then aux q q' output
+             else  aux (h::q) q' output
+         in
+         let s = aux s to_remove S.empty in
+         M.add eid s out
       )
       prec prec
   in

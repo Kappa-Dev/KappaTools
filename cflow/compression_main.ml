@@ -46,9 +46,9 @@ let do_not_log parameter = (S.PH.B.PB.CI.Po.K.H.set_log_step parameter false)
 
 
 let compress_and_print ~called_from ~dotFormat ?js_interface
-		       ~none ~weak ~strong env log_info step_list =
+    ~none ~weak ~strong env log_info step_list =
   let parameter = S.PH.B.PB.CI.Po.K.H.build_parameter
-		    ~called_from ~none ~weak ~strong in
+      ~called_from ~none ~weak ~strong in
   let parameter = S.PH.B.PB.CI.Po.K.H.set_log_step parameter log_step in
   let parameter = S.PH.B.PB.CI.Po.K.H.set_debugging_mode parameter debug_mode in
   let parameter =
@@ -107,8 +107,8 @@ let compress_and_print ~called_from ~dotFormat ?js_interface
   let step_list = U.trace_of_pretrace step_list in
   let error, log_info, causal,_trivial,weak,strong =
     if (not causal_trace_on)
-       && (not weak_compression_on)
-       && (not strong_compression_on)
+    && (not weak_compression_on)
+    && (not strong_compression_on)
     then empty_compression
     else
       begin
