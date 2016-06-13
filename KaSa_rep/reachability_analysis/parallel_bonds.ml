@@ -1004,7 +1004,7 @@ struct
                 let new_value = Usual_domains.lub value Usual_domains.Any in
                 error, new_value
               else
-                (*                                  let error =
+                (*let error =
                   if local_trace || Remanent_parameters.get_dump_reachability_analysis_parallel parameter
                   then
                     let _ =

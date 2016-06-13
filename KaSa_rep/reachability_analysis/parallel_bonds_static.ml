@@ -218,12 +218,11 @@ let collect_bonds_lhs_full parameter error rule_id rule store_result =
     rule.Cckappa_sig.rule_lhs.Cckappa_sig.bonds
     store_result
 
-(**************************************************************************)
+(****************************************************************)
 (**Parallel bonds*)
-(**************************************************************************)
+(****************************************************************)
 
 let collect_rule_has_parallel_bonds parameter error rule_id views bonds store_bonds_full store_result =
-  (*let parameter = get_parameter static in*)
   (*--------------------------------------------*)
   let error, bonds_full_set =
     match
@@ -246,7 +245,7 @@ let collect_rule_has_parallel_bonds parameter error rule_id views bonds store_bo
            (fun site_type_source site_add (error, store_result) ->
               let agent_id_target = site_add.Cckappa_sig.agent_index in
               let site_type_target = site_add.Cckappa_sig.site in
-              (*------------------------------------------------------------------------------*)
+              (*--------------------------------------------------*)
               (*the first pair*)
               let error, agent_source =
                 match
@@ -263,7 +262,7 @@ let collect_rule_has_parallel_bonds parameter error rule_id views bonds store_bo
                   agent_source
                   site_type_source
               in
-              (*------------------------------------------------------------------------------*)
+              (*--------------------------------------------------*)
               (*the second pair*)
               let error, agent_target =
                 match
@@ -283,8 +282,8 @@ let collect_rule_has_parallel_bonds parameter error rule_id views bonds store_bo
               (*------------------------------------------------------------------------------*)
               (*parallel bonds*)
               Parallel_bonds_type.PairAgentsSiteState_map_and_set.Set.fold
-                (fun ((agent_id, agent_type, site_type, state),
-                      (agent_id', agent_type', site_type', state')) (error, store_result) ->
+                (fun ((agent_id, _, site_type, state),
+                      (agent_id', _, site_type', state')) (error, store_result) ->
                   if agent_id = agent_id_source &&
                      agent_id' = agent_id_target &&
                      site_type <> site_type_source &&
@@ -327,7 +326,7 @@ let collect_rule_has_parallel_bonds parameter error rule_id views bonds store_bo
   in
   error, store_result
 
-(**************************************************************************)
+(******************************************************************)
 (*collect a set of parallel bonds in the rhs correspond with its rule*)
 
 let collect_rule_has_parallel_bonds_rhs parameter store_bonds_rhs_full error rule_id rule store_result =
