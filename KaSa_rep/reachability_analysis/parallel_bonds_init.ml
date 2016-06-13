@@ -20,9 +20,9 @@ let warn parameters mh message exn default =
 
 let local_trace = false
 
-(**************************************************************************)
+(******************************************************************)
 (*parallel bonds in the initial state*)
-(**************************************************************************)
+(******************************************************************)
 
 let collect_pair_of_bonds parameter error site_add agent_id site_type_source views =
   let error, pair =
