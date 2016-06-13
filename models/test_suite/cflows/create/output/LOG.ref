@@ -20,8 +20,12 @@ ____________________________________________________________
 ############################################################
 + Producing causal compressions
 
+____________________________________________________________
+############################################################
 
-	 - weak flow compression (2)
+
+
+	 - weak flow compression (4)
 	 - strong flow compression (2)
 + Pretty printing 2 weakly compressed flows
 + Pretty printing 1 strongly compressed flow

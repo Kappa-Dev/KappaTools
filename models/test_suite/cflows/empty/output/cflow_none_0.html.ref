@@ -33,8 +33,8 @@
     g.setNode(5, { label: "A(x), B(x) -> A(x!1), B(x!1)", style: "fill: #77f" });
     g.setNode(6, { label: "A(x!1), B(x!1) -> A(x!1), B(x!1), C()", style: "fill: #77f" });
     g.setNode(7, { label: "goal", style: "fill: #f77" });
+    g.setEdge(1,3,{});
     g.setEdge(2,3,{});
-    g.setEdge(1,5,{});
     g.setEdge(3,5,{});
     g.setEdge(4,5,{});
     g.setEdge(5,6,{});

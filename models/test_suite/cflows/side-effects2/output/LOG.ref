@@ -23,15 +23,14 @@ ____________________________________________________________
 	 - computing causal past of each observed events (1)
 Stats:
  number of step   : 53
- longest story    : 7
- average length   : 3.125
- geometric mean   : 3.69120576506
+ longest story    : 8
+ average length   : 4.125
+ geometric mean   : 4.56891672062
 
 	 - causal flow compression (1)
 
 
 	 - weak flow compression (1)
 + Pretty printing 1 flow
-+ Pretty printing 0 weakly compressed flow
-error: file_name: utilities.ml; message: One compression has failed; exception:Exit
++ Pretty printing 1 weakly compressed flow
 Simulation ended

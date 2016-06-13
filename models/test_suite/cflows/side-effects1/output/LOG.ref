@@ -24,14 +24,13 @@ ____________________________________________________________
 Stats:
  number of step   : 26
  longest story    : 5
- average length   : 3.90909090909
- geometric mean   : 4.05642027588
+ average length   : 4.36363636364
+ geometric mean   : 4.49241785477
 
 	 - causal flow compression (8)
 
 
-	 - weak flow compression (2)
-+ Pretty printing 2 flows
+	 - weak flow compression (1)
++ Pretty printing 1 flow
 + Pretty printing 1 weakly compressed flow
-error: file_name: utilities.ml; message: One compression has failed; exception:Exit
 Simulation ended
