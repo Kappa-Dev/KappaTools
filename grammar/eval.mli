@@ -2,8 +2,7 @@ val init_kasa :
   Remanent_parameters_sig.called_from -> Signature.s ->
   (string Location.annot * Ast.port list, Ast.mixture, string, Ast.rule)
     Ast.compil ->
-  Export_to_KaSim.Export_to_KaSim.contact_map *
-    Export_to_KaSim.Export_to_KaSim.state
+  Primitives.contact_map * Export_to_KaSim.Export_to_KaSim.state
 
 val compile :
   outputs:(Data.t -> 'a) -> pause:((unit -> 'b) -> 'b) ->
@@ -11,7 +10,7 @@ val compile :
 	    bool option * bool *
 	      (Alg_expr.t * Primitives.elementary_rule * Location.t) list -> 'b) ->
   ?rescale_init:float -> Signature.s -> unit NamedDecls.t ->
-  Export_to_KaSim.Export_to_KaSim.contact_map ->
+  Primitives.contact_map ->
   Counter.t -> ('c, LKappa.rule_mixture, int, LKappa.rule) Ast.compil -> 'b
 
 val build_initial_state :

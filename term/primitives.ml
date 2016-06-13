@@ -1,3 +1,5 @@
+type contact_map = ((int list) * (int*int) list) array array
+
 module Transformation =
   struct
     type 'a t =
