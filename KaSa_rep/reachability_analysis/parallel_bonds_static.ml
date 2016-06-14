@@ -78,7 +78,7 @@ let collect_action_binding parameter error rule_id rule store_result =
           agent_source
           site_type1
       in
-      (*------------------------------------------------------------------------------*)
+      (*----------------------------------------------------------*)
       (*second pair*)
       let error, agent_target =
         match
@@ -126,7 +126,7 @@ let collect_action_binding parameter error rule_id rule store_result =
       error, store_result
     ) (error, store_result) rule.Cckappa_sig.actions.Cckappa_sig.bind
 
-(************************************************************************************)
+(******************************************************************)
 
 let collect_bonds_full parameter error rule_id views bonds store_result =
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
@@ -152,7 +152,7 @@ let collect_bonds_full parameter error rule_id views bonds store_result =
                 agent_source
                 site_type_source
             in
-            (*------------------------------------------------------------------------------*)
+            (*----------------------------------------------------*)
             (*the second pair*)
             let error, agent_target =
               match
@@ -169,7 +169,7 @@ let collect_bonds_full parameter error rule_id views bonds store_result =
                 agent_target
                 site_type_target
             in
-            (*------------------------------------------------------------------------------*)
+            (*-----------------------------------------------------*)
             (*get old set*)
             let error, old_set =
               match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error
@@ -198,7 +198,7 @@ let collect_bonds_full parameter error rule_id views bonds store_result =
          ) bonds_map (error, store_result)
     ) bonds store_result
 
-(**************************************************************************)
+(**************************************************************)
 
 let collect_bonds_rhs_full parameter error rule_id rule store_result =
   collect_bonds_full
@@ -820,7 +820,6 @@ let collect_result_from_site_create_parallel' parameter error rule_id store_view
                                 agent
                            in*)
                            (**)
-                           let log = Remanent_parameters.get_logger parameter in
                            (*let _ =
                              Loggers.fprintf log
                                "rule_id:%i:agent_id:%i:agent_type:%i:site_type:%i:state:%i -> agent_id:%i:agent_type:%i:site_type:%i:state:%i\n\
