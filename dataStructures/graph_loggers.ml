@@ -34,17 +34,17 @@ let dot_color_encoding x =
   | LightSkyBlue -> "#87ceeb"
   | PaleGreen -> "#98fb98"
 
-  let svg_color_encoding x =
-    match
-      x
-    with
-    | Red -> "#f00"
-    | Green -> "#0f0"
-    | White -> "#fff"
-    | Blue -> "#00f"
-    | Black -> "#000"
-    | LightSkyBlue -> "#8ce"
-    | PaleGreen -> "#9f9"
+let svg_color_encoding x =
+  match
+    x
+  with
+  | Red -> "#f00"
+  | Green -> "#0f0"
+  | White -> "#fff"
+  | Blue -> "#00f"
+  | Black -> "#000"
+  | LightSkyBlue -> "#8ce"
+  | PaleGreen -> "#9f9"
 
 type options =
   | Color of color
@@ -285,14 +285,14 @@ let shape_in_dot shape =
   | Circle -> "shape=\"circle\""
 
 let shape_in_html shape =
-    match
-      shape
-    with
-    | Invisible -> Some "style: \"visibility:hidden\""
-    | House -> Some "shape: \"house\""
-    | Rect -> Some "shape: \"rect\""
-    | Ellipse -> Some "shape: \"ellipse\""
-    | Circle -> Some "shape: \"ellipse\""
+  match
+    shape
+  with
+  | Invisible -> Some "style: \"visibility:hidden\""
+  | House -> Some "shape: \"house\""
+  | Rect -> Some "shape: \"rect\""
+  | Ellipse -> Some "shape: \"ellipse\""
+  | Circle -> Some "shape: \"ellipse\""
 
 let string_one_of_linestyle_in_dot _ = "-"
 let string_two_of_linestyle_in_dot _ = "--"
@@ -316,27 +316,27 @@ let string_of_arrow_tail_in_dot style =
   | No_head -> ""
 
 let string_of_arrow_in_html logger bool title style =
-    match style
-    with
-    | Tee | Normal -> bool
-(*| Tee ->
-      let () = between_attributes_in_html logger bool in
-      let () =
-        Loggers.fprintf logger "%s: \"tee\"" title
-      in
-      true*)
-    | Vee ->
-      let () = between_attributes_in_html logger bool in
-      let () =
-        Loggers.fprintf logger "%s: \"vee\"" title
-      in
-      true
-    | No_head ->
-      (*  let () = between_attributes_in_html logger bool in
-      let () =
+  match style
+  with
+  | Tee | Normal -> bool
+  (*| Tee ->
+        let () = between_attributes_in_html logger bool in
+        let () =
+          Loggers.fprintf logger "%s: \"tee\"" title
+        in
+        true*)
+  | Vee ->
+    let () = between_attributes_in_html logger bool in
+    let () =
+      Loggers.fprintf logger "%s: \"vee\"" title
+    in
+    true
+  | No_head ->
+    (*  let () = between_attributes_in_html logger bool in
+        let () =
         Loggers.fprintf logger "%s: \"none\"" title
-      in
-          true*) bool
+        in
+        true*) bool
 
 let print_node logger ?directives:(directives=[]) id =
   let attributes = dummy_node in
@@ -588,7 +588,7 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
         | Both -> (string_of_arrow_tail_in_dot  Normal)^(string_one_of_linestyle_in_dot                                      attributes.edge_style)^(string_of_arrow_head_in_dot Normal)
         | Reverse -> (string_of_arrow_tail_in_dot
                         Normal)^(string_one_of_linestyle_in_dot
-                                                                                attributes.edge_style)
+                                   attributes.edge_style)
       in
       let () = Loggers.fprintf logger "\"%s\" %s \"%s\"" id1 direction id2 in
       let () =
@@ -600,22 +600,22 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
           let bool = false in
           let bool =
             match attributes.edge_label
-              with
-              | None -> bool
-              | Some string ->
-                let () = Loggers.fprintf logger "label=\"%s\"" string in
-                true
+            with
+            | None -> bool
+            | Some string ->
+              let () = Loggers.fprintf logger "label=\"%s\"" string in
+              true
           in
           let bool =
             match attributes.edge_style
-              with
-              | Plain -> bool
-              | Dotted ->
-                let () = Loggers.fprintf logger "style=\"dotted\"" in
-                true
-              | Dashed ->
-                let () = Loggers.fprintf logger "style=\"dashed\"" in
-                true
+            with
+            | Plain -> bool
+            | Dotted ->
+              let () = Loggers.fprintf logger "style=\"dotted\"" in
+              true
+            | Dashed ->
+              let () = Loggers.fprintf logger "style=\"dashed\"" in
+              true
           in
           let bool =
             match attributes.edge_color
@@ -639,18 +639,18 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
                 Loggers.fprintf logger "arrowhead=\"tee\""
               in
               true
-              | Vee ->
-                let () = between_attributes_in_dot logger bool in
-                let () =
-                  Loggers.fprintf logger "arrowhead=\"vee\""
-                in
-                true
-              | No_head ->
-                  let () = between_attributes_in_dot logger bool in
-                  let () =
-                    Loggers.fprintf logger "arrowhead=\"none\""
-                  in
-                  true
+            | Vee ->
+              let () = between_attributes_in_dot logger bool in
+              let () =
+                Loggers.fprintf logger "arrowhead=\"vee\""
+              in
+              true
+            | No_head ->
+              let () = between_attributes_in_dot logger bool in
+              let () =
+                Loggers.fprintf logger "arrowhead=\"none\""
+              in
+              true
           in
           let bool =
             match attributes.edge_arrowtail
@@ -696,35 +696,35 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
     let bool = false in
     let bool =
       match attributes.edge_label
-        with
-        | None -> bool
-        | Some string ->
-          let () = Loggers.fprintf logger "label: \"%s\"" string in
-          true
-      in
-      let bool =
-        match attributes.edge_color
-        with
-        | None -> bool
-        | Some s ->
-          let () = between_attributes_in_html logger bool in
-          let color = svg_color_encoding s in
-          let () =
-            Loggers.fprintf logger
-              "style: \"stroke: %s; fill: white\", arrowheadStyle: \"fill: %s; stroke: %s\""
-              color color color
-          in
-          true
-      in
-      let bool = string_of_arrow_in_html logger bool "arrowhead" attributes.edge_arrowhead in
-      let bool = string_of_arrow_in_html logger bool "arrowtail" attributes.edge_arrowtail in
-      let () = if bool then () else () in
-      let () = Loggers.fprintf logger " });@," in
-      ()
+      with
+      | None -> bool
+      | Some string ->
+        let () = Loggers.fprintf logger "label: \"%s\"" string in
+        true
+    in
+    let bool =
+      match attributes.edge_color
+      with
+      | None -> bool
+      | Some s ->
+        let () = between_attributes_in_html logger bool in
+        let color = svg_color_encoding s in
+        let () =
+          Loggers.fprintf logger
+            "style: \"stroke: %s; fill: white\", arrowheadStyle: \"fill: %s; stroke: %s\""
+            color color color
+        in
+        true
+    in
+    let bool = string_of_arrow_in_html logger bool "arrowhead" attributes.edge_arrowhead in
+    let bool = string_of_arrow_in_html logger bool "arrowtail" attributes.edge_arrowtail in
+    let () = if bool then () else () in
+    let () = Loggers.fprintf logger " });@," in
+    ()
   | Loggers.TXT   | Loggers.HTML ->
     let label =
       match
-       attributes.edge_label
+        attributes.edge_label
       with
       | None -> ""
       | Some x -> x

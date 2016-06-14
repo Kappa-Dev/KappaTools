@@ -21,14 +21,14 @@ type encoding =
   | HTML_Graph | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS
 
 type token =
-| String of string
-| Breakable_space
+  | String of string
+  | Breakable_space
 
 type logger =
-| DEVNUL
-| Formatter of Format.formatter
-| Circular_buffer of string Circular_buffers.t ref
-| Infinite_buffer of string Infinite_buffers.t ref
+  | DEVNUL
+  | Formatter of Format.formatter
+  | Circular_buffer of string Circular_buffers.t ref
+  | Infinite_buffer of string Infinite_buffers.t ref
 
 let breakable x =
   match
@@ -70,7 +70,7 @@ let dummy_txt_logger =
     current_line = []
   }
 
-    (* Warning, we have to keep the character @ when it is followed by a character followed by a letter or a digit should be preserved *)
+(* Warning, we have to keep the character @ when it is followed by a character followed by a letter or a digit should be preserved *)
 
 let dump_clean_string fmt =
   String.iter
@@ -119,12 +119,12 @@ let print_breakable_space logger =
     match
       logger.logger
     with
-  | DEVNUL
-  | Formatter _ ->
-    fprintf logger "@ "
-  | Circular_buffer _
-  | Infinite_buffer _ ->
-    logger.current_line <- Breakable_space::logger.current_line
+    | DEVNUL
+    | Formatter _ ->
+      fprintf logger "@ "
+    | Circular_buffer _
+    | Infinite_buffer _ ->
+      logger.current_line <- Breakable_space::logger.current_line
   else
     fprintf logger " "
 
@@ -137,14 +137,14 @@ let end_of_line_symbol logger =
 
 
 let dump_token f x =
-   match
-     x
-   with
-   | String s ->
-     Format.pp_print_string
-       f s
-   | Breakable_space ->
-     Format.fprintf f "@ " (* Check with Pierre *)
+  match
+    x
+  with
+  | String s ->
+    Format.pp_print_string
+      f s
+  | Breakable_space ->
+    Format.fprintf f "@ " (* Check with Pierre *)
 
 let print_newline logger =
   let () =
@@ -163,33 +163,33 @@ let print_newline logger =
   | Circular_buffer bf ->
     begin
       let bf' =
-	Circular_buffers.add
-	  (Format.asprintf "%a"
-	     (Pp.list
-		(fun _ -> ())
-		dump_token)
-	  (List.rev logger.current_line))
-	  !bf
+        Circular_buffers.add
+          (Format.asprintf "%a"
+             (Pp.list
+                (fun _ -> ())
+                dump_token)
+             (List.rev logger.current_line))
+          !bf
       in
       let () = bf:=bf' in
       let () = logger.current_line <- [] in
       ()
     end
   | Infinite_buffer bf ->
-      begin
+    begin
       let bf' =
-	Infinite_buffers.add
-	  (Format.asprintf "%a"
-	     (Pp.list
-		(fun _ -> ())
-		dump_token)
-	     (List.rev logger.current_line))
-	  !bf
+        Infinite_buffers.add
+          (Format.asprintf "%a"
+             (Pp.list
+                (fun _ -> ())
+                dump_token)
+             (List.rev logger.current_line))
+          !bf
       in
       let () = bf:=bf' in
       let () = logger.current_line <- [] in
       ()
-        end
+    end
 
 
 
@@ -234,7 +234,7 @@ let print_preamble logger =
   | HTML ->
     fprintf logger "<body>\n<div>\n"
   | HTML_Tabular ->
-      fprintf logger "<body>\n<div>\n<TABLE>\n"
+    fprintf logger "<body>\n<div>\n<TABLE>\n"
   | HTML_Graph | DOT | TXT | TXT_Tabular | XLS -> ()
 
 let open_logger_from_channel ?mode:(mode=TXT) channel =
@@ -287,18 +287,18 @@ let open_infinite_buffer ?mode:(mode=TXT) () =
   logger
 
 let open_row logger =
-   match
+  match
     logger.encoding
-   with
-   | HTML_Tabular -> fprintf logger "<tr>"
-   | HTML_Graph | XLS | HTML | DOT | TXT | TXT_Tabular -> ()
+  with
+  | HTML_Tabular -> fprintf logger "<tr>"
+  | HTML_Graph | XLS | HTML | DOT | TXT | TXT_Tabular -> ()
 
 let close_row logger =
   match
     logger.encoding
-   with
-   | HTML_Tabular -> fprintf logger "<tr>@."
-   | HTML_Graph | XLS | HTML | DOT | TXT | TXT_Tabular -> fprintf logger "@."
+  with
+  | HTML_Tabular -> fprintf logger "<tr>@."
+  | HTML_Graph | XLS | HTML | DOT | TXT | TXT_Tabular -> fprintf logger "@."
 
 let formatter_of_logger logger =
   match
