@@ -46,6 +46,11 @@ type t =
     mutable current_line: token list;
   }
 
+let refresh_id t =
+  let () = t.id_map:=StringMap.empty in
+  let () = t.fresh_id:= 1 in
+  ()
+
 let get_encoding_format t = t.encoding
 
 let dummy_html_logger =

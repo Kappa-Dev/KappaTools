@@ -342,7 +342,7 @@ let print_node logger ?directives:(directives=[]) id =
   let attributes = dummy_node in
   let attributes =
     match Loggers.get_encoding_format logger with
-    | Loggers.DOT | Loggers.HTML_Graph ->
+    | Loggers.DOT | Loggers.HTML_Graph | Loggers.TXT ->
       List.fold_left
         (fun attributes option ->
            match
@@ -358,7 +358,7 @@ let print_node logger ?directives:(directives=[]) id =
         )
         attributes
         directives
-    | Loggers.TXT_Tabular | Loggers.XLS | Loggers.HTML_Tabular | Loggers.HTML | Loggers.TXT
+    | Loggers.TXT_Tabular | Loggers.XLS | Loggers.HTML_Tabular | Loggers.HTML
       -> attributes
   in
   match Loggers.get_encoding_format logger with
@@ -538,7 +538,20 @@ let print_node logger ?directives:(directives=[]) id =
         end
     in
     ()
-  | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT | Loggers.TXT_Tabular | Loggers.XLS -> ()
+  | Loggers.TXT ->
+    begin
+      match attributes.node_label
+      with
+      | None ->
+        let () = Loggers.fprintf logger "Node: %s" id in
+        let () = Loggers.print_newline logger in
+        ()
+      | Some label ->
+        let () = Loggers.fprintf logger "Node:%s, Label:%s" id label in
+        let () = Loggers.print_newline logger in
+        ()
+    end
+  | Loggers.HTML | Loggers.HTML_Tabular | Loggers.TXT_Tabular | Loggers.XLS -> ()
 
 let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
   let attributes = dummy_edge in
@@ -708,7 +721,7 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
       let () = if bool then () else () in
       let () = Loggers.fprintf logger " });@," in
       ()
-  | Loggers.TXT | Loggers.HTML ->
+  | Loggers.TXT   | Loggers.HTML ->
     let label =
       match
        attributes.edge_label
@@ -716,7 +729,15 @@ let print_edge logger ?directives:(directives=[]) ?prefix:(prefix="") id1 id2 =
       | None -> ""
       | Some x -> x
     in
-    let () = Loggers.fprintf logger "%s%s -> %s%s" prefix id1 id2 label in
+    let arrow =
+      match
+        attributes.edge_arrowhead
+      with
+      | No_head -> "--"
+      | Normal | Vee  -> "->"
+      | Tee -> "-|"
+    in
+    let () = Loggers.fprintf logger "%s%s %s %s%s" prefix id1 arrow id2 label in
     let () = Loggers.print_newline logger in
     ()
   | Loggers.HTML_Tabular | Loggers.TXT_Tabular | Loggers.XLS -> ()

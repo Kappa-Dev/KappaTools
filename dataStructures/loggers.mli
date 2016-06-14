@@ -20,6 +20,7 @@ type encoding =
   | HTML_Graph | HTML | HTML_Tabular | DOT | TXT | TXT_Tabular | XLS
 type t
 
+val refresh_id: t -> unit
 val get_encoding_format: t -> encoding
 val fprintf: t -> ('a, Format.formatter, unit) format -> 'a
 val print_newline: t -> unit
