@@ -254,7 +254,7 @@ let cut =
 
 let remove_obs_before parameter handler log_info error last_eid trace =
   error,log_info,
-  (let _ = Printf.fprintf stdout "last eid %i \n" last_eid in
+  (
    let rec aux l score output =
      match l with
        [] -> List.rev output,score
