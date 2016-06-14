@@ -45,6 +45,7 @@ sig
       logger_err : Loggers.t ;
       logger_profiling : Loggers.t ;
       logger_out : Loggers.t ;
+      logger_server: Loggers.t ;
       log_step : bool ;
       debug_mode : bool ;
       logger_step: Loggers.t ;
@@ -53,7 +54,8 @@ sig
       bound_on_itteration_number: int option ;
       time_independent: bool ;
       blacklist_events: bool ;
-      }
+      server: bool;
+    }
 
   type handler =   (*handler to interpret abstract values*)
     {
@@ -76,6 +78,7 @@ sig
   val build_parameter: called_from:Remanent_parameters_sig.called_from ->
 		       none:bool -> weak:bool -> strong:bool -> parameter
   val string_of_exn: exn -> string option
+  val is_server_mode: parameter -> bool
   val set_compression_weak: parameter -> parameter
   val set_compression_strong: parameter -> parameter
   val set_compression_none: parameter -> parameter
@@ -86,6 +89,7 @@ sig
   val set_debugging_mode: parameter -> bool -> parameter
   val get_debugging_mode: parameter -> bool
   val get_profiling_logger: parameter -> Loggers.t
+  val get_server_channel: parameter -> Loggers.t
   val get_logger: parameter -> Loggers.t
   val set_logger: parameter -> Loggers.t -> parameter
   val get_out_channel: parameter -> Loggers.t
@@ -147,6 +151,7 @@ module Cflow_handler =
           logger_err : Loggers.t;
           logger_profiling: Loggers.t;
           logger_out : Loggers.t;
+          logger_server : Loggers.t ;
           log_step : bool ;
           debug_mode: bool ;
           logger_step : Loggers.t ;
@@ -155,14 +160,24 @@ module Cflow_handler =
           bound_on_itteration_number: int option ;
           time_independent: bool ;
           blacklist_events: bool ;
+          server: bool
         }
 
     let build_parameter ~called_from ~none ~weak ~strong =
-      let out_channel,out_channel_err,out_channel_profiling,log_step_channel =
+      let server,out_server,out_channel,out_channel_err,out_channel_profiling,log_step_channel =
         match
           called_from
         with
+        | Remanent_parameters_sig.Server ->
+          true,
+          Loggers.open_logger_from_channel stdout,
+          Loggers.dummy_html_logger,
+          Loggers.dummy_html_logger,
+          Loggers.dummy_html_logger,
+          Loggers.dummy_html_logger
         | Remanent_parameters_sig.JS ->
+          false,
+          Loggers.dummy_txt_logger,
           Loggers.open_infinite_buffer ~mode:Loggers.HTML (),
           Loggers.open_infinite_buffer ~mode:Loggers.HTML (),
           Loggers.open_circular_buffer ~mode:Loggers.HTML (),
@@ -171,18 +186,22 @@ module Cflow_handler =
         | Remanent_parameters_sig.KaSim
         | Remanent_parameters_sig.Internalised  ->
           let channel = Kappa_files.open_branch_and_cut_engine_profiling () in
+          false,
+          Loggers.dummy_txt_logger,
           Loggers.open_logger_from_formatter Format.err_formatter,
           Loggers.open_logger_from_formatter Format.err_formatter,
           Loggers.open_logger_from_formatter (Format.formatter_of_out_channel channel),
           Loggers.open_logger_from_formatter Format.std_formatter
       in
       {
+        server = server ;
         current_compression_mode = None ;
         priorities_weak = Priority.weak ;
         priorities_strong = Priority.strong ;
         priorities_causal = Priority.causal ;
         compute_all_stories = false ;
         sort_algo_for_stories = Bucket;
+        logger_server = out_server ;
         logger_out = out_channel ;
         logger_err = out_channel_err ;
         logger_profiling = out_channel_profiling ;
@@ -257,7 +276,6 @@ module Cflow_handler =
    let get_all_stories_per_obs parameter = parameter.compute_all_stories
 
    let get_debugging_mode parameter = parameter.debug_mode
-
    let set_debugging_mode parameter bool= {parameter with debug_mode = bool }
 
    let get_log_step parameter = parameter.log_step
@@ -306,4 +324,6 @@ module Cflow_handler =
    let set_save_error_log parameter f =
      {parameter with kasa = {parameter.kasa with Remanent_parameters_sig.save_error_list = f}}
 
+   let is_server_mode parameter = parameter.server
+   let get_server_channel parameter = parameter.logger_server
 end:Cflow_handler)

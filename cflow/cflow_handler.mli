@@ -18,19 +18,21 @@ module type Cflow_handler =
           priorities_weak: Priority.priorities ;
           priorities_strong : Priority.priorities ;
           priorities_causal : Priority.priorities ;
-	  compute_all_stories : bool ;
-	  sort_algo_for_stories: sort_algo_for_stories;
-	  logger_err : Loggers.t ;
-	  logger_profiling : Loggers.t ;
-	  logger_out : Loggers.t ;
-	  log_step : bool ;
-	  debug_mode : bool ;
-	  logger_step: Loggers.t ;
-	  kasa: Remanent_parameters_sig.parameters ;
-	  always_disambiguate_initial_states : bool  ;
-	  bound_on_itteration_number: int option ;
-	  time_independent: bool ;
-   blacklist_events: bool ;
+          compute_all_stories : bool ;
+          sort_algo_for_stories: sort_algo_for_stories;
+          logger_err : Loggers.t ;
+          logger_profiling : Loggers.t ;
+          logger_out : Loggers.t ;
+          logger_server : Loggers.t ;
+          log_step : bool ;
+          debug_mode : bool ;
+          logger_step: Loggers.t ;
+          kasa: Remanent_parameters_sig.parameters ;
+          always_disambiguate_initial_states : bool  ;
+          bound_on_itteration_number: int option ;
+          time_independent: bool ;
+          blacklist_events: bool ;
+          server: bool
         }
 
     type handler =   (*handler to interpret abstract values*)
@@ -54,6 +56,7 @@ module type Cflow_handler =
     val build_parameter: called_from:Remanent_parameters_sig.called_from ->
 			 none:bool -> weak:bool -> strong:bool -> parameter
     val string_of_exn: exn -> string option
+    val is_server_mode: parameter -> bool
     val set_compression_weak: parameter -> parameter
     val set_compression_strong: parameter -> parameter
     val set_compression_none: parameter -> parameter
@@ -64,6 +67,8 @@ module type Cflow_handler =
     val set_debugging_mode: parameter -> bool -> parameter
     val get_debugging_mode: parameter -> bool
     val get_profiling_logger: parameter -> Loggers.t
+    val get_server_channel:
+      parameter -> Loggers.t
     val get_logger: parameter -> Loggers.t
     val set_logger: parameter -> Loggers.t -> parameter
     val get_out_channel: parameter -> Loggers.t

@@ -245,6 +245,7 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
       called_from
     with
     | Remanent_parameters_sig.JS -> None,true
+    | Remanent_parameters_sig.Server -> None,false || html_mode
     | Remanent_parameters_sig.Internalised -> Some stdout,false || html_mode
     | Remanent_parameters_sig.KaSim -> Some (open_tasks_profiling ()), false || html_mode
     | Remanent_parameters_sig.KaSa ->

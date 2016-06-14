@@ -17,7 +17,7 @@
 
 module CharMap = Mods.CharMap
 
-type called_from = KaSa | KaSim | Internalised | JS
+type called_from = KaSa | KaSim | Internalised | JS | Server
 type accuracy_level = None | Low | Medium | High | Full
 type link_mode = Bound_indices | Site_address | Bound_type
 type graph_format = DOT | HTML

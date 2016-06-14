@@ -74,21 +74,21 @@ type prehash = (node*int) list
 let dummy_cannonical_form = []
 let dummy_prehash = []
 
-let print_graph parameter handler error graph =
-  let () = Loggers.fprintf (H.get_out_channel parameter) "****" in
-  let () = Loggers.print_newline (H.get_out_channel parameter) in
-  let () = Loggers.fprintf (H.get_out_channel parameter) "graph" in
-  let () = Loggers.print_newline (H.get_out_channel parameter) in
-  let () = Loggers.fprintf (H.get_out_channel parameter) "****" in
-  let () = Loggers.fprintf (H.get_out_channel parameter) "Root: %i" graph.root in
-  let () = Loggers.print_newline (H.get_out_channel parameter) in
-  let () = Loggers.fprintf (H.get_out_channel parameter)  "Labels:" in
-  let () = Loggers.print_newline (H.get_out_channel parameter) in
+let print_graph logger parameter handler error graph =
+  let () = Loggers.fprintf logger "****" in
+  let () = Loggers.print_newline logger in
+  let () = Loggers.fprintf logger "graph" in
+  let () = Loggers.print_newline logger in
+  let () = Loggers.fprintf logger "****" in
+  let () = Loggers.fprintf logger "Root: %i" graph.root in
+  let () = Loggers.print_newline logger in
+  let () = Loggers.fprintf logger  "Labels:" in
+  let () = Loggers.print_newline logger in
   let () =
     A.iteri
       (fun i (_,j) ->
-         let () = Loggers.fprintf (H.get_out_channel parameter) "Node %i,Label %s" i j in
-         Loggers.print_newline (H.get_out_channel parameter)
+         let () = Loggers.fprintf logger "Node %i,Label %s" i j in
+         Loggers.print_newline logger
       )
       graph.labels
   in
@@ -97,28 +97,28 @@ let print_graph parameter handler error graph =
       (fun i l   ->
          List.iter
            (fun j ->
-              let () = Loggers.fprintf (H.get_out_channel parameter) "%i <- %i" i j in
-              Loggers.print_newline (H.get_out_channel parameter)
+              let () = Loggers.fprintf logger "%i <- %i" i j in
+              Loggers.print_newline logger
            ) l
       )
       graph.pred
   in
-  let () = Loggers.fprintf (H.get_out_channel parameter) "Conflicts:@\n" in
+  let () = Loggers.fprintf logger "Conflicts:@\n" in
   let () =
     A.iteri
       (fun i l  ->
        List.iter
          (fun j ->
-            let () = Loggers.fprintf (H.get_out_channel parameter) "%i |--  %i@\n" i j in
-            Loggers.print_newline (H.get_out_channel parameter)
+            let () = Loggers.fprintf logger "%i |--  %i@\n" i j in
+            Loggers.print_newline logger
          )
          l
       )
       graph.conflict_pred
   in
-  let () = Loggers.fprintf (H.get_out_channel parameter) "****" in
-  let () = Loggers.print_newline (H.get_out_channel parameter) in
-  let () = Loggers.print_newline (H.get_out_channel parameter) in
+  let () = Loggers.fprintf logger "****" in
+  let () = Loggers.print_newline logger in
+  let () = Loggers.print_newline logger in
   error
 
 let print_elt log elt =
@@ -671,199 +671,229 @@ module BucketTable =
 	   error,log_info,(table,cannonic)
 
       let add_story  parameter handler log_info error grid pretrace story_info table =
-	let error,log_info,graph = graph_of_grid parameter handler log_info error grid in
-	let error,prehash = prehash parameter handler error graph in
-	let assoc = (grid,graph,None,pretrace,story_info) in
-	let add_story error x table =
-	  let error,array = Int_storage.Nearly_inf_Imperatif.set (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error table.fresh_id x table.array in
-	  error,table.fresh_id,
-	  {table
-	  with
-	    array = array ;
-	    fresh_id = succ_story_id table.fresh_id}
-	in
-	let add_story_info error story_info id table =
-	  let error,asso_opt = Int_storage.Nearly_inf_Imperatif.get (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error id table.array in
-	  match
-	    asso_opt
-	  with
-	  | None -> warn parameter error (Some "add_story_info, line 800, Unknown story id") (Failure "Unknown story id") table
-	  | Some (grid,graph,canonic,trace,info) ->
-	     let error,array = Int_storage.Nearly_inf_Imperatif.set (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error id (grid,graph,canonic,trace,story_info@info) table.array in
-	     error,{table with array = array}
-	in
-	let update_assoc error canonic_form assoc =
-	  match
-	    assoc
-	  with
-	  | (grid,graph,None,trace,info) -> error,(grid,graph,Some canonic_form,trace,info)
-	  | (_,_,Some _,_,_) ->
-			warn parameter error (Some "update_assoc, line 812, the canonical form of this story should not have been computed yet") (Failure "the canonical form of stories  should not have been computed yet") assoc
-	in
-	let rec aux_inner2 log_info error canonic_form canonic_form' id' assoc table =
-	  match canonic_form,canonic_form'
-	  with
-	  | [],[] ->
-	     let error,table = add_story_info error story_info id' table in
-	     error,log_info,table,Inner_leave ([],id')
-	  | t::q,[] ->
-	     let error,id,table = add_story error assoc table in
-	     error, log_info, table, Inner_node (KeyMap.add t (Inner_leave(q,id))  KeyMap.empty,Some id')
-	  | [],t'::q' ->
-	     let error,id,table = add_story error assoc table in
-	     error,log_info,table, Inner_node (KeyMap.add t' (Inner_leave(q',id')) KeyMap.empty,Some id)
-	  | t::q,t'::q' when t=t' ->
-	     let error,log_info,table,tree = aux_inner2 log_info error q q' id' assoc table in
-	     error,log_info,table, Inner_node (KeyMap.add t tree KeyMap.empty,None)
-	  | t::q,t'::q' ->
-	     let error,id,table = add_story error assoc table in
-	     error,log_info,table, Inner_node (KeyMap.add t (Inner_leave(q,id)) (KeyMap.add t' (Inner_leave(q',id')) KeyMap.empty),None)
-	in
-	let rec aux_outer2 log_info error prehash prehash' id' table =
-	  match
-	    prehash,prehash'
-	  with
-	  | [],[] ->
-	     let error,log_info,cannonic_form = canonicalize parameter handler log_info error graph in
-	     let error,assoc = update_assoc error cannonic_form assoc in
-	     let error,log_info,(table,cannonic_form') = get_cannonical_form parameter handler log_info error id' table in
-	     let error,log_info,table,inner = aux_inner2 log_info error cannonic_form cannonic_form' id' assoc table in
-	     error,log_info,table,To_inner (PreHashMap.empty,  inner)
-	  | t::q,[] ->
-	     let error,id,table = add_story error assoc table in
-	     error,log_info,table, Outer_node (PreHashMap.add t (Outer_leave(q,id)) PreHashMap.empty,Some id')
-	  | [],t'::q' ->
-	     let error,id,table = add_story error assoc table in
-	     error,log_info,table, Outer_node (PreHashMap.add t' (Outer_leave(q',id')) PreHashMap.empty,Some id)
-	  | t::q,t'::q' when t=t' ->
-	     let error,log_info,table,tree = aux_outer2 log_info error q q' id' table in
-	     error,log_info,table, Outer_node (PreHashMap.add t tree PreHashMap.empty,None)
-	  | t::q,t'::q' ->
-	     let error,id,table = add_story error assoc table in
-	     error,log_info,table, Outer_node (PreHashMap.add t (Outer_leave(q,id)) (PreHashMap.add t' (Outer_leave(q',id')) PreHashMap.empty),None)
-	in
-	let rec aux_inner log_info error assoc story_info suffix inner_tree table =
-	   match
-	     suffix
-	   with
-	   | [] ->
+        let error,log_info,graph = graph_of_grid parameter handler log_info error grid in
+        let error,prehash = prehash parameter handler error graph in
+        let assoc = (grid,graph,None,pretrace,story_info) in
+        let add_story error x table =
+          let error,array =
+            Int_storage.Nearly_inf_Imperatif.set
+              (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter)
+              error table.fresh_id x table.array in
+          let log_info =
+            if S.PH.B.PB.CI.Po.K.H.is_server_mode parameter
+            then
+              let () =
+                Loggers.fprintf
+                  (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
+                  "New_story: %i\n" table.fresh_id
+              in
+              let log_info =
+                print_graph
+                  (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
+                  parameter
+                  handler
+                  log_info
+                  graph
+              in log_info
+            else
+              log_info
+          in
+          error,table.fresh_id,
+          {table
+           with
+            array = array ;
+            fresh_id = succ_story_id table.fresh_id}
+          in
+          let add_story_info error story_info id table =
+            let error,asso_opt = Int_storage.Nearly_inf_Imperatif.get (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error id table.array in
+            match
+              asso_opt
+            with
+            | None -> warn parameter error (Some "add_story_info, line 800, Unknown story id") (Failure "Unknown story id") table
+            | Some (grid,graph,canonic,trace,info) ->
+              let () =
+                if S.PH.B.PB.CI.Po.K.H.is_server_mode parameter
+                then
+                  Loggers.fprintf
+                      (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
+                      "Same as: %i\n" id
+              in
+              let error,array = Int_storage.Nearly_inf_Imperatif.set
+                  (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error id
+                  (grid,graph,canonic,trace,story_info@info) table.array
+              in
+              error,{table with array = array}
+          in
+          let update_assoc error canonic_form assoc =
+            match
+              assoc
+            with
+            | (grid,graph,None,trace,info) -> error,(grid,graph,Some canonic_form,trace,info)
+            | (_,_,Some _,_,_) ->
+              warn parameter error (Some "update_assoc, line 812, the canonical form of this story should not have been computed yet") (Failure "the canonical form of stories  should not have been computed yet") assoc
+          in
+          let rec aux_inner2 log_info error canonic_form canonic_form' id' assoc table =
+            match canonic_form,canonic_form'
+            with
+            | [],[] ->
+              let error,table = add_story_info error story_info id' table in
+              error,log_info,table,Inner_leave ([],id')
+            | t::q,[] ->
+              let error,id,table = add_story error assoc table in
+              error, log_info, table, Inner_node (KeyMap.add t (Inner_leave(q,id))  KeyMap.empty,Some id')
+            | [],t'::q' ->
+              let error,id,table = add_story error assoc table in
+              error,log_info,table, Inner_node (KeyMap.add t' (Inner_leave(q',id')) KeyMap.empty,Some id)
+            | t::q,t'::q' when t=t' ->
+              let error,log_info,table,tree = aux_inner2 log_info error q q' id' assoc table in
+              error,log_info,table, Inner_node (KeyMap.add t tree KeyMap.empty,None)
+            | t::q,t'::q' ->
+              let error,id,table = add_story error assoc table in
+              error,log_info,table, Inner_node (KeyMap.add t (Inner_leave(q,id)) (KeyMap.add t' (Inner_leave(q',id')) KeyMap.empty),None)
+          in
+          let rec aux_outer2 log_info error prehash prehash' id' table =
+            match
+              prehash,prehash'
+            with
+            | [],[] ->
+              let error,log_info,cannonic_form = canonicalize parameter handler log_info error graph in
+              let error,assoc = update_assoc error cannonic_form assoc in
+              let error,log_info,(table,cannonic_form') = get_cannonical_form parameter handler log_info error id' table in
+              let error,log_info,table,inner = aux_inner2 log_info error cannonic_form cannonic_form' id' assoc table in
+              error,log_info,table,To_inner (PreHashMap.empty,  inner)
+            | t::q,[] ->
+              let error,id,table = add_story error assoc table in
+              error,log_info,table, Outer_node (PreHashMap.add t (Outer_leave(q,id)) PreHashMap.empty,Some id')
+            | [],t'::q' ->
+              let error,id,table = add_story error assoc table in
+              error,log_info,table, Outer_node (PreHashMap.add t' (Outer_leave(q',id')) PreHashMap.empty,Some id)
+            | t::q,t'::q' when t=t' ->
+              let error,log_info,table,tree = aux_outer2 log_info error q q' id' table in
+              error,log_info,table, Outer_node (PreHashMap.add t tree PreHashMap.empty,None)
+            | t::q,t'::q' ->
+              let error,id,table = add_story error assoc table in
+              error,log_info,table, Outer_node (PreHashMap.add t (Outer_leave(q,id)) (PreHashMap.add t' (Outer_leave(q',id')) PreHashMap.empty),None)
+          in
+          let rec aux_inner log_info error assoc story_info suffix inner_tree table =
+            match
+              suffix
+            with
+            | [] ->
+              begin
+                match
+                  inner_tree
+                with
+                | Inner_node (map,None) ->
+                  let error,id,table = add_story error assoc table in
+                  error,log_info,table,
+                  Inner_node (map , (Some id))
+                | Inner_node (_,Some id')
+                | Inner_leave ([],id') ->
+                  let error,table = add_story_info error story_info id' table in
+                  error,log_info,table,inner_tree
+                | Inner_leave (t'::q',id') ->
+                  let error,id,table = add_story error assoc table in
+                  error,log_info,table,Inner_node (KeyMap.add t' (Inner_leave (q',id')) KeyMap.empty,Some id)
+              end
+            | t::q ->
+              begin
+                match
+                  inner_tree
+                with
+                | Inner_node (map,assoc') ->
+                  begin
+                    match
+                      KeyMap.find_option t map
+                    with
+                    | None ->
+                      let error,id,table = add_story error assoc table in
+                      let inner_tree =
+                        Inner_node (KeyMap.add t (Inner_leave (q,id)) map,assoc')
+                      in
+                      error,log_info,table,inner_tree
+                    | Some (inner_tree')  ->
+                      let error,log_info,table',inner_tree'' = aux_inner log_info error assoc story_info q inner_tree' table in
+                      if inner_tree'' == inner_tree'
+                      then error,log_info,table',inner_tree
+                      else
+                        error,log_info,table',Inner_node(KeyMap.add t inner_tree'' map,assoc')
+                  end
+                | Inner_leave (l',id') ->
+                  aux_inner2 log_info error suffix l' id' assoc table
+              end
+          in
+          let rec aux_outer log_info error assoc story_info suffix outer_tree table =
+            match
+              suffix
+            with
+            | [] ->
+              begin
+                match
+                  outer_tree
+                with
+                | Empty ->
+                  let error,id,table = add_story error assoc table in
+                  error,log_info,table,Outer_leave(suffix,id)
+                | Outer_node (map,None) ->
+                  let error,id,table = add_story error assoc table in
+                  error,log_info,table,Outer_node (map , Some id)
+                | Outer_node (map,Some id') ->
+                  let error,graph =
+                    match
+                      assoc
+                    with
+                    |	(_,graph,None,_,_) -> error,graph
+                    | (_,graph,Some _,_,_) ->
+                      warn parameter error (Some "add_story, line 878, the canonical form of stories in the outer tree should not have been computed yet") (Failure "the canonical form of stories in the outer tree should not have been computed yet") graph
+                  in
+                  let error,log_info,cannonic_form = canonicalize parameter handler log_info error graph in
+                  let error,assoc = update_assoc error cannonic_form assoc in
+                  let error,log_info,(table,cannonic_form') = get_cannonical_form parameter handler log_info error id' table in
+                  let error,log_info,table,inner = aux_inner2 log_info error cannonic_form cannonic_form' id' assoc table in
+                  error,log_info,table,To_inner (map,  inner)
+                | Outer_leave (q,id') ->
+                  let error,table = add_story_info error story_info id' table in
+                  error,log_info,table,outer_tree
+                | To_inner (map,inner) ->
+                  let error,log_info,suffix =  canonicalize parameter handler log_info error graph in
+                  let error,assoc = update_assoc error suffix assoc in
+                  let error,log_info,table,inner = aux_inner log_info error assoc story_info suffix inner table in
+                  error,log_info,table,To_inner(map,inner)
+              end
+            | t::q ->
 	      begin
-		match
-		  inner_tree
-		with
-		| Inner_node (map,None) ->
-		   let error,id,table = add_story error assoc table in
-		   error,log_info,table,
-		   Inner_node (map , (Some id))
-		| Inner_node (_,Some id')
-		| Inner_leave ([],id') ->
-		   let error,table = add_story_info error story_info id' table in
-		   error,log_info,table,inner_tree
-		| Inner_leave (t'::q',id') ->
-		   let error,id,table = add_story error assoc table in
-		   error,log_info,table,Inner_node (KeyMap.add t' (Inner_leave (q',id')) KeyMap.empty,Some id)
-	      end
-	   | t::q ->
-	      begin
-		match
-		  inner_tree
-		with
-		| Inner_node (map,assoc') ->
-		   begin
-		     match
-		       KeyMap.find_option t map
-		     with
-		     | None ->
-			let error,id,table = add_story error assoc table in
-			let inner_tree =
-			  Inner_node (KeyMap.add t (Inner_leave (q,id)) map,assoc')
-			in
-			error,log_info,table,inner_tree
-		     | Some (inner_tree')  ->
-			let error,log_info,table',inner_tree'' = aux_inner log_info error assoc story_info q inner_tree' table in
-			if inner_tree'' == inner_tree'
-			then error,log_info,table',inner_tree
-			else
-			  error,log_info,table',Inner_node(KeyMap.add t inner_tree'' map,assoc')
-		   end
-		| Inner_leave (l',id') ->
-		   aux_inner2 log_info error suffix l' id' assoc table
-	      end
-	in
-	let rec aux_outer log_info error assoc story_info suffix outer_tree table =
-	   match
-	     suffix
-	   with
-	   | [] ->
-	      begin
-		match
-		  outer_tree
-		with
-		| Empty ->
-		   let error,id,table = add_story error assoc table in
-		   error,log_info,table,Outer_leave(suffix,id)
-		| Outer_node (map,None) ->
-		   let error,id,table = add_story error assoc table in
-		    error,log_info,table,Outer_node (map , Some id)
-    		| Outer_node (map,Some id') ->
-		   let error,graph =
-		     match
-		       assoc
-		     with
-		     |	(_,graph,None,_,_) -> error,graph
-		     | (_,graph,Some _,_,_) ->
-			warn parameter error (Some "add_story, line 878, the canonical form of stories in the outer tree should not have been computed yet") (Failure "the canonical form of stories in the outer tree should not have been computed yet") graph
-		   in
-		   let error,log_info,cannonic_form = canonicalize parameter handler log_info error graph in
-		   let error,assoc = update_assoc error cannonic_form assoc in
-		   let error,log_info,(table,cannonic_form') = get_cannonical_form parameter handler log_info error id' table in
-		   let error,log_info,table,inner = aux_inner2 log_info error cannonic_form cannonic_form' id' assoc table in
-		   error,log_info,table,To_inner (map,  inner)
-		| Outer_leave (q,id') ->
-		   let error,table = add_story_info error story_info id' table in
-		   error,log_info,table,outer_tree
-		| To_inner (map,inner) ->
-		   let error,log_info,suffix =  canonicalize parameter handler log_info error graph in
-		   let error,assoc = update_assoc error suffix assoc in
-		   let error,log_info,table,inner = aux_inner log_info error assoc story_info suffix inner table in
-		   error,log_info,table,To_inner(map,inner)
-	      end
-	   | t::q ->
-	      begin
-		match
-		  outer_tree
-		with
-		| Empty ->
-		   let error,id,table = add_story error assoc table in
-		   error,log_info,table,Outer_leave(suffix,id)
-		| Outer_node (map,assoc') ->
-		   begin
-		     match
-		       PreHashMap.find_option t map
-		     with
-		     | None ->
-			let error,id,table = add_story error assoc table in
-			let inner_tree =
-			  Outer_node (PreHashMap.add t (Outer_leave (q,id)) map,assoc')
-			in
-			error,log_info,table,inner_tree
-		     | Some (outer_tree')  ->
-			let error,log_info,table',outer_tree'' = aux_outer log_info error assoc story_info q outer_tree' table in
-			if outer_tree'' == outer_tree'
-			then error,log_info,table',outer_tree
-			else
-			  error,log_info,table',Outer_node(PreHashMap.add t outer_tree'' map,assoc')
-		   end
-		| Outer_leave (t'::q',id') when not (t = t') ->
-		   let error,id,table = add_story error assoc table in
-		   error,log_info,table, Outer_node (PreHashMap.add t (Outer_leave (q,id)) (PreHashMap.add t' (Outer_leave (q',id')) PreHashMap.empty),None)
-		| Outer_leave (l',id') ->
-		   aux_outer2 log_info error suffix l' id' table
-		| To_inner (map,inner) ->
-		   let error,id,table = add_story error assoc table in
-		   error,log_info,table, To_inner (PreHashMap.add t (Outer_leave (q,id)) (PreHashMap.add t (Outer_leave (q,id)) PreHashMap.empty),inner)
-
-
+         match
+           outer_tree
+         with
+         | Empty ->
+           let error,id,table = add_story error assoc table in
+           error,log_info,table,Outer_leave(suffix,id)
+         | Outer_node (map,assoc') ->
+           begin
+             match
+               PreHashMap.find_option t map
+             with
+             | None ->
+               let error,id,table = add_story error assoc table in
+               let inner_tree =
+                 Outer_node (PreHashMap.add t (Outer_leave (q,id)) map,assoc')
+               in
+               error,log_info,table,inner_tree
+             | Some (outer_tree')  ->
+               let error,log_info,table',outer_tree'' = aux_outer log_info error assoc story_info q outer_tree' table in
+               if outer_tree'' == outer_tree'
+               then error,log_info,table',outer_tree
+               else
+                 error,log_info,table',Outer_node(PreHashMap.add t outer_tree'' map,assoc')
+           end
+         | Outer_leave (t'::q',id') when not (t = t') ->
+           let error,id,table = add_story error assoc table in
+           error,log_info,table, Outer_node (PreHashMap.add t (Outer_leave (q,id)) (PreHashMap.add t' (Outer_leave (q',id')) PreHashMap.empty),None)
+         | Outer_leave (l',id') ->
+           aux_outer2 log_info error suffix l' id' table
+         | To_inner (map,inner) ->
+           let error,id,table = add_story error assoc table in
+           error,log_info,table, To_inner (PreHashMap.add t (Outer_leave (q,id)) (PreHashMap.add t (Outer_leave (q,id)) PreHashMap.empty),inner)
 	      end
 	in
 	let error,log_info,table,tree = aux_outer log_info error (grid,graph,None,pretrace,story_info) story_info prehash table.tree table in

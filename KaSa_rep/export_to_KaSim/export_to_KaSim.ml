@@ -223,6 +223,7 @@ module Export_to_KaSim =
       let () =
         match called_from with
         | Remanent_parameters_sig.Internalised -> assert false
+        | Remanent_parameters_sig.Server 
         | Remanent_parameters_sig.KaSim
         | Remanent_parameters_sig.JS
         | Remanent_parameters_sig.KaSa -> ()
