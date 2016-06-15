@@ -299,7 +299,7 @@ let get_parameters ?html_mode:(html_mode=true) ~called_from () =
 	Remanent_parameters_sig.html_mode = html_mode ;
      } ;
     Remanent_parameters_sig.save_error_list = (fun _ -> ());
-    Remanent_parameters_sig.save_progress_bar = (fun _ _ -> ());
+    Remanent_parameters_sig.save_progress_bar = (fun _ -> ());
     Remanent_parameters_sig.reset_progress_bar = (fun _ -> ());
     Remanent_parameters_sig.save_current_phase_title = (fun _ -> ());
     Remanent_parameters_sig.reset_current_phase_title = (fun _ -> ());
@@ -663,7 +663,7 @@ let open_contact_map_file parameters =
  let set_logger parameter logger =
    { parameter with Remanent_parameters_sig.logger = logger}
  let save_error_list parameter error = parameter.Remanent_parameters_sig.save_error_list error
- let save_progress_bar parameter n bar = parameter.Remanent_parameters_sig.save_progress_bar n bar
+ let save_progress_bar parameter bar = parameter.Remanent_parameters_sig.save_progress_bar bar
  let reset_progress_bar parameter = parameter.Remanent_parameters_sig.reset_progress_bar
  let save_current_phase_title parameter = parameter.Remanent_parameters_sig.save_current_phase_title
  let reset_current_phase_title parameter = parameter.Remanent_parameters_sig.reset_current_phase_title

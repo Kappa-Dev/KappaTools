@@ -90,11 +90,11 @@ module type Cflow_handler =
     val get_blacklist_events: parameter -> bool
     val save_current_phase_title: parameter -> string -> unit
     val reset_current_phase_title: parameter -> unit
-    val save_progress_bar: parameter -> int -> (bool*int*int) -> unit
+    val save_progress_bar: parameter -> bool * int * int * int -> unit
     val reset_progress_bar: parameter -> unit
     val set_save_current_phase_title: parameter -> (string -> unit) -> parameter
     val set_reset_current_phase_title: parameter -> (unit -> unit) -> parameter
-    val set_save_progress_bar: parameter -> (int -> (bool*int*int) -> unit) -> parameter
+    val set_save_progress_bar: parameter -> (bool * int * int * int -> unit) -> parameter
     val set_reset_progress_bar: parameter -> (unit -> unit) -> parameter
     val save_error_log: parameter -> Exception_without_parameter.method_handler -> unit
     val set_save_error_log: parameter -> (Exception_without_parameter.method_handler -> unit) -> parameter

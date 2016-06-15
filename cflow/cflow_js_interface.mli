@@ -26,7 +26,7 @@ val get_std_buffer: cflow_state -> Loggers.t option
 val get_err_buffer: cflow_state -> Loggers.t option
 val get_profiling_buffer: cflow_state -> Loggers.t option
 val get_branch_and_cut_status: cflow_state -> Loggers.t option
-val get_progress_bar: cflow_state -> (bool*int*int) option
+val get_progress_bar: cflow_state -> (bool*int*int*int) option
 val get_current_phase_title: cflow_state -> string option
 val get_causal_flow_table: cflow_state -> Utilities.story_table option
 val get_trivial_compression_table: cflow_state -> Utilities.story_table option
@@ -36,7 +36,7 @@ val get_error_list: cflow_state -> Utilities.error_log option
 
 val save_current_phase_title: cflow_state ref option -> string -> unit
 val reset_current_phase_title: cflow_state ref option -> unit
-val save_progress_bar: cflow_state ref option -> int -> (bool*int*int) -> unit
+val save_progress_bar: cflow_state ref option -> bool * int * int * int -> unit
 val reset_progress_bar: cflow_state ref option -> unit
 val save_causal_flow_table: cflow_state ref option -> Utilities.story_table -> unit
 val save_trivial_compression_table: cflow_state ref option -> Utilities.story_table -> unit

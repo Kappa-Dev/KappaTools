@@ -111,11 +111,11 @@ sig
   val get_blacklist_events: parameter -> bool
   val save_current_phase_title: parameter -> string -> unit
   val reset_current_phase_title: parameter -> unit
-  val save_progress_bar: parameter -> int -> (bool*int*int) -> unit
+  val save_progress_bar: parameter -> bool * int * int * int -> unit
   val reset_progress_bar: parameter -> unit
   val set_save_current_phase_title: parameter -> (string -> unit) -> parameter
   val set_reset_current_phase_title: parameter -> (unit -> unit) -> parameter
-  val set_save_progress_bar: parameter -> (int -> bool * int* int -> unit) -> parameter
+  val set_save_progress_bar: parameter -> (bool * int * int * int -> unit) -> parameter
   val set_reset_progress_bar: parameter -> (unit -> unit) -> parameter
   val save_error_log: parameter -> Exception_without_parameter.method_handler -> unit
   val set_save_error_log: parameter -> (Exception_without_parameter.method_handler -> unit) -> parameter
@@ -315,11 +315,11 @@ module Cflow_handler =
     let save_current_phase_title parameter x =
       parameter.kasa.Remanent_parameters_sig.save_current_phase_title x
 
-    let save_progress_bar parameter n_stories x  =
+    let save_progress_bar parameter x  =
       let () =
         if is_server_mode parameter
         then
-          let (b,i,j) = x in
+          let (b,i,j,n_stories) = x in
           let () =
             Loggers.fprintf
               (get_server_channel parameter)
@@ -330,7 +330,7 @@ module Cflow_handler =
           in
           Loggers.print_newline (get_server_channel parameter)
       in
-      parameter.kasa.Remanent_parameters_sig.save_progress_bar n_stories x
+      parameter.kasa.Remanent_parameters_sig.save_progress_bar x
     let reset_progress_bar parameter = parameter.kasa.Remanent_parameters_sig.reset_progress_bar ()
     let reset_current_phase_title parameter = parameter.kasa.Remanent_parameters_sig.reset_current_phase_title ()
     let set_save_current_phase_title parameter f =

@@ -138,8 +138,7 @@ val get_compression_status_logger: Remanent_parameters_sig.parameters -> Loggers
 val save_error_list: Remanent_parameters_sig.parameters -> Exception_without_parameter.method_handler -> unit
 val save_progress_bar:
   Remanent_parameters_sig.parameters ->
-  int -> 
-  bool * int * int ->
+  bool * int * int * int ->
   unit
 val reset_progress_bar: Remanent_parameters_sig.parameters -> unit -> unit
 val save_current_phase_title: Remanent_parameters_sig.parameters -> string -> unit

@@ -155,15 +155,17 @@ let closure_bottom_up_with_fold parameter handler log_info error event config pr
       begin
         let tick = Tick_stories.tick_stories err_logger
             (Remanent_parameters.save_progress_bar parameter)
-            max_index (false,0,0) in
-        let f = Tick_stories.tick_stories err_logger (Remanent_parameters.save_progress_bar parameter) max_index in
+            (false,0,0,max_index) in
+        let f = Tick_stories.tick_stories err_logger (Remanent_parameters.save_progress_bar parameter) in
         let close () = Loggers.print_newline err_logger in
         f,
         tick,
         close
       end
     else
-      (fun x -> x),(false,0,0),(fun () -> ())
+      (fun x -> x),
+      (false,0,0,0),
+      (fun () -> ())
   in
   let s_pred_star = A.make (max_index+1) [] in
   let clean,max_succ =
@@ -326,12 +328,18 @@ let closure_top_down parameter handler log_info error event_opt config prec is_o
   let do_tick,tick,close_tick =
     if max_index > 300 && config.do_tick
     then
-      let tick = Tick_stories.tick_stories err_logger (Remanent_parameters.save_progress_bar parameter) max_index (false,0,0) in
-      let f = Tick_stories.tick_stories err_logger  (Remanent_parameters.save_progress_bar parameter) max_index in
+      let tick =
+        Tick_stories.tick_stories err_logger
+          (Remanent_parameters.save_progress_bar parameter)
+          (false,0,0,max_index) in
+      let f =
+        Tick_stories.tick_stories err_logger
+          (Remanent_parameters.save_progress_bar parameter)
+      in
       let close () = Loggers.print_newline err_logger in
       f,tick,close
     else
-      (fun x -> x),(false,0,0),(fun () -> ())
+      (fun x -> x),(false,0,0,0),(fun () -> ())
   in
   let tainting = A.make (max_index+1) [] in
   let _ =

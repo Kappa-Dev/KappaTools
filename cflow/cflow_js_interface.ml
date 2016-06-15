@@ -25,7 +25,7 @@ type cflow_state =
     profiling_logger: Loggers.t option;
     status_logger: Loggers.t option;
     current_phase: string option;
-    progress_bar: (bool*int*int) option;
+    progress_bar: (bool*int*int*int) option;
     causal_flows: Utilities.story_table option;
     trivial_compression: Utilities.story_table option;
     weak_compression: Utilities.story_table option;
@@ -65,7 +65,7 @@ let save_current_phase_title_aux cflow_state_ptr string =
   {(!cflow_state_ptr) with current_phase = Some string}
 let reset_current_phase_title_aux cflow_state_ptr =
   {(!cflow_state_ptr) with current_phase = None }
-let save_progress_bar_aux cflow_state_ptr n bar =
+let save_progress_bar_aux cflow_state_ptr bar =
   {(!cflow_state_ptr) with progress_bar = Some bar }
 let reset_progress_bar_aux cflow_state_ptr =
   {(!cflow_state_ptr) with progress_bar = None }
@@ -97,8 +97,7 @@ let lift_reset f cflow_state_ptr_opt = lift (fun x () -> f x) cflow_state_ptr_op
 
 let save_current_phase_title = lift save_current_phase_title_aux
 let reset_current_phase_title = lift_reset reset_current_phase_title_aux
-let save_progress_bar cflow_opt x =
-  lift (fun cflow_opt -> save_progress_bar_aux cflow_opt x) cflow_opt 
+let save_progress_bar = lift save_progress_bar_aux
 let reset_progress_bar = lift_reset reset_progress_bar_aux
 let save_causal_flow_table = lift save_causal_flow_table_aux
 let save_trivial_compression_table = lift save_trivial_compression_table_aux

@@ -215,6 +215,16 @@ let compress_and_print ~called_from ~dotFormat ?js_interface
                         Loggers.fprintf (S.PH.B.PB.CI.Po.K.H.get_logger parameter)
                           "\t\t * causal compression @."
                     in
+                    let () =
+                      if S.PH.B.PB.CI.Po.K.H.is_server_mode parameter
+                      then
+                        let () =
+                          Loggers.fprintf
+                            (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
+                            "Start collecting one new trace"
+                        in
+                        Loggers.print_newline (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
+                    in
                     let error,log_info,trace_before_compression =
                       U.causal_prefix_of_an_observable_hit
                         parameter handler log_info error
