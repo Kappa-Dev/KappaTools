@@ -255,26 +255,26 @@ let cut =
 let remove_obs_before parameter handler log_info error last_eid trace =
   error,log_info,
   (
-   let rec aux l score output =
-     match l with
-       [] -> List.rev output,score
-     | t::q ->
-       if
-         Trace.step_is_obs t
-       then
-         match Trace.simulation_info_of_step t
-         with None -> aux q score (t::output)
-            | Some x ->
-              if Mods.story_id_of_simulation_info x >= last_eid
-              then
-                List.rev (List.fold_left
-                            (fun list a -> a::list) output l),
-                score
-              else
-                aux q (succ score) output
-       else aux q score (t::output)
-   in
-   aux trace 0 [])
+    let rec aux l score output =
+      match l with
+        [] -> List.rev output,score
+      | t::q ->
+        if
+          Trace.step_is_obs t
+        then
+          match Trace.simulation_info_of_step t
+          with None -> aux q score (t::output)
+             | Some x ->
+               if Mods.story_id_of_simulation_info x >= last_eid
+               then
+                 List.rev (List.fold_left
+                             (fun list a -> a::list) output l),
+                 score
+               else
+                 aux q (succ score) output
+        else aux q score (t::output)
+    in
+    aux trace 0 [])
 
 let remove_obs_before parameter handler log_info error last_info trace =
   lift_to_care_about_ambiguities
@@ -530,12 +530,34 @@ let compress ?heuristic parameter ?(shall_we_compute=always) ?(shall_we_compute_
   with
   | None -> error,log_info,[trace]
   | Some S.PH.B.PB.CI.Po.K.H.Causal ->
+    let () =
+      if S.PH.B.PB.CI.Po.K.H.is_server_mode parameter
+      then
+        let () =
+          Loggers.fprintf
+            (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
+            "Start one causal compression"
+        in
+        Loggers.print_newline (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
+    in
     let error,log_info,trace = cut parameter ~shall_we_compute:always handler log_info error trace
     in error,log_info,[trace]
   | Some (S.PH.B.PB.CI.Po.K.H.Weak | S.PH.B.PB.CI.Po.K.H.Strong) ->
-    let event = match parameter.S.PH.B.PB.CI.Po.K.H.current_compression_mode
-      with Some S.PH.B.PB.CI.Po.K.H.Weak -> StoryProfiling.Weak_compression
-         | _ -> StoryProfiling.Strong_compression
+    let event,s = match parameter.S.PH.B.PB.CI.Po.K.H.current_compression_mode
+      with Some S.PH.B.PB.CI.Po.K.H.Weak ->
+        StoryProfiling.Weak_compression,"Start one weak compression"
+         | _ -> StoryProfiling.Strong_compression,"Start one string compression"
+    in
+    let () =
+      if S.PH.B.PB.CI.Po.K.H.is_server_mode parameter
+      then
+        let () =
+          Loggers.fprintf
+            (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
+            "%s"
+            s
+        in
+        Loggers.print_newline (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
     in
     let error, log_info = P.add_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error event (Some (fun () -> size_of_pretrace trace)) log_info in
     let event_list = get_pretrace_of_trace trace in

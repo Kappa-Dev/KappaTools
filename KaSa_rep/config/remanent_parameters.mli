@@ -135,8 +135,10 @@ val open_contact_map_file: Remanent_parameters_sig.parameters -> Remanent_parame
 val lexical_analysis_of_tested_only_patterns: Remanent_parameters_sig.parameters -> bool
 val get_profiler: Remanent_parameters_sig.parameters -> Loggers.t
 val get_compression_status_logger: Remanent_parameters_sig.parameters -> Loggers.t
-val save_error_list: Remanent_parameters_sig.parameters -> Exception_without_parameter.method_handler -> unit  val save_progress_bar:
+val save_error_list: Remanent_parameters_sig.parameters -> Exception_without_parameter.method_handler -> unit
+val save_progress_bar:
   Remanent_parameters_sig.parameters ->
+  int -> 
   bool * int * int ->
   unit
 val reset_progress_bar: Remanent_parameters_sig.parameters -> unit -> unit

@@ -147,7 +147,7 @@ type parameters =
     profiler: Loggers.t;
     compression_status: Loggers.t;
     save_error_list: Exception_without_parameter.method_handler -> unit;
-    save_progress_bar: (bool*int*int) -> unit;
+    save_progress_bar: int -> (bool*int*int) -> unit;
     reset_progress_bar: unit -> unit;
     save_current_phase_title:  string -> unit ;
     reset_current_phase_title: unit -> unit ;

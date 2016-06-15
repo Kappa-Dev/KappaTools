@@ -36,7 +36,7 @@ val get_error_list: cflow_state -> Utilities.error_log option
 
 val save_current_phase_title: cflow_state ref option -> string -> unit
 val reset_current_phase_title: cflow_state ref option -> unit
-val save_progress_bar: cflow_state ref option -> (bool*int*int) -> unit
+val save_progress_bar: cflow_state ref option -> int -> (bool*int*int) -> unit
 val reset_progress_bar: cflow_state ref option -> unit
 val save_causal_flow_table: cflow_state ref option -> Utilities.story_table -> unit
 val save_trivial_compression_table: cflow_state ref option -> Utilities.story_table -> unit

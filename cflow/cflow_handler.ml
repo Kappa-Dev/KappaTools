@@ -76,7 +76,7 @@ sig
   val set_first_story_per_obs: parameter -> parameter
   val set_all_stories_per_obs: parameter -> parameter
   val build_parameter: called_from:Remanent_parameters_sig.called_from ->
-		       none:bool -> weak:bool -> strong:bool -> parameter
+    none:bool -> weak:bool -> strong:bool -> parameter
   val string_of_exn: exn -> string option
   val is_server_mode: parameter -> bool
   val set_compression_weak: parameter -> parameter
@@ -111,11 +111,11 @@ sig
   val get_blacklist_events: parameter -> bool
   val save_current_phase_title: parameter -> string -> unit
   val reset_current_phase_title: parameter -> unit
-  val save_progress_bar: parameter -> (bool*int*int) -> unit
+  val save_progress_bar: parameter -> int -> (bool*int*int) -> unit
   val reset_progress_bar: parameter -> unit
   val set_save_current_phase_title: parameter -> (string -> unit) -> parameter
   val set_reset_current_phase_title: parameter -> (unit -> unit) -> parameter
-  val set_save_progress_bar: parameter -> ((bool*int*int) -> unit) -> parameter
+  val set_save_progress_bar: parameter -> (int -> bool * int* int -> unit) -> parameter
   val set_reset_progress_bar: parameter -> (unit -> unit) -> parameter
   val save_error_log: parameter -> Exception_without_parameter.method_handler -> unit
   val set_save_error_log: parameter -> (Exception_without_parameter.method_handler -> unit) -> parameter
@@ -123,45 +123,45 @@ end
 
 module Cflow_handler =
   (struct
-      type sort_algo_for_stories = Bucket | Fusion
-      type current_compression_mode = Weak | Strong | Causal
+    type sort_algo_for_stories = Bucket | Fusion
+    type current_compression_mode = Weak | Strong | Causal
 
-      type compression_mode =
-	{
-	  causal_trace:bool;
-	  weak_compression:bool;
-	  strong_compression:bool
-	}
+    type compression_mode =
+      {
+        causal_trace:bool;
+        weak_compression:bool;
+        strong_compression:bool
+      }
 
-      let get_causal_trace x = x.causal_trace
-      let get_causal_trace_only x = not (x.weak_compression || x.strong_compression)
-      let get_weak_compression x = x.weak_compression
-      let get_strong_compression x = x.strong_compression
+    let get_causal_trace x = x.causal_trace
+    let get_causal_trace_only x = not (x.weak_compression || x.strong_compression)
+    let get_weak_compression x = x.weak_compression
+    let get_strong_compression x = x.strong_compression
 
     type parameter =
-        {
-          cache_size : int option ;
-          current_compression_mode: current_compression_mode option;
-          compression_mode : compression_mode ;
-          priorities_weak: Priority.priorities ;
-          priorities_strong : Priority.priorities ;
-          priorities_causal: Priority.priorities ;
-          compute_all_stories : bool ;
-          sort_algo_for_stories: sort_algo_for_stories;
-          logger_err : Loggers.t;
-          logger_profiling: Loggers.t;
-          logger_out : Loggers.t;
-          logger_server : Loggers.t ;
-          log_step : bool ;
-          debug_mode: bool ;
-          logger_step : Loggers.t ;
-          kasa : Remanent_parameters_sig.parameters ;
-          always_disambiguate_initial_states : bool  ;
-          bound_on_itteration_number: int option ;
-          time_independent: bool ;
-          blacklist_events: bool ;
-          server: bool
-        }
+      {
+        cache_size : int option ;
+        current_compression_mode: current_compression_mode option;
+        compression_mode : compression_mode ;
+        priorities_weak: Priority.priorities ;
+        priorities_strong : Priority.priorities ;
+        priorities_causal: Priority.priorities ;
+        compute_all_stories : bool ;
+        sort_algo_for_stories: sort_algo_for_stories;
+        logger_err : Loggers.t;
+        logger_profiling: Loggers.t;
+        logger_out : Loggers.t;
+        logger_server : Loggers.t ;
+        log_step : bool ;
+        debug_mode: bool ;
+        logger_step : Loggers.t ;
+        kasa : Remanent_parameters_sig.parameters ;
+        always_disambiguate_initial_states : bool  ;
+        bound_on_itteration_number: int option ;
+        time_independent: bool ;
+        blacklist_events: bool ;
+        server: bool
+      }
 
     let build_parameter ~called_from ~none ~weak ~strong =
       let server,out_server,out_channel,out_channel_err,out_channel_profiling,log_step_channel =
@@ -206,10 +206,10 @@ module Cflow_handler =
         logger_err = out_channel_err ;
         logger_profiling = out_channel_profiling ;
         compression_mode = {
-	    causal_trace = none;
-	    weak_compression = weak;
-	    strong_compression = strong;
-	  };
+          causal_trace = none;
+          weak_compression = weak;
+          strong_compression = strong;
+        };
         cache_size = Parameter.get_cache_size () ;
         debug_mode = false ;
         log_step = true ;
@@ -231,12 +231,12 @@ module Cflow_handler =
 
 
     type handler =
-        {
-          env: Environment.t ;
-          rule_name_cache: string array;
-          agent_name_cache: string array;
-          steps_by_column:  (int * Predicate_maps.predicate_value * bool) list Predicate_maps.QPredicateMap.t ;
-        }
+      {
+        env: Environment.t ;
+        rule_name_cache: string array;
+        agent_name_cache: string array;
+        steps_by_column:  (int * Predicate_maps.predicate_value * bool) list Predicate_maps.QPredicateMap.t ;
+      }
 
     type 'a zeroary = parameter -> handler -> StoryProfiling.StoryStats.log_info -> Exception.method_handler -> Exception.method_handler * StoryProfiling.StoryStats.log_info * 'a
     type ('a,'b) unary  = parameter -> handler -> StoryProfiling.StoryStats.log_info -> Exception.method_handler -> 'a -> Exception.method_handler * StoryProfiling.StoryStats.log_info * 'b
@@ -254,7 +254,7 @@ module Cflow_handler =
        rule_name_cache=rule_name_cache;
        agent_name_cache=agent_name_cache;
        steps_by_column=steps_by_column
-    }
+      }
 
     let string_of_exn x = Some ""
 
@@ -265,65 +265,97 @@ module Cflow_handler =
       | Some Strong -> Some parameter.priorities_strong
       | Some Causal -> Some parameter.priorities_causal
 
-   let set_first_story_per_obs parameter =
-     {
-       parameter
-     with compute_all_stories = false }
+    let set_first_story_per_obs parameter =
+      {
+        parameter
+        with compute_all_stories = false }
 
-   let set_all_stories_per_obs parameter =
+    let set_all_stories_per_obs parameter =
       { parameter with compute_all_stories = true }
 
-   let get_all_stories_per_obs parameter = parameter.compute_all_stories
+    let get_all_stories_per_obs parameter = parameter.compute_all_stories
 
-   let get_debugging_mode parameter = parameter.debug_mode
-   let set_debugging_mode parameter bool= {parameter with debug_mode = bool }
+    let get_debugging_mode parameter = parameter.debug_mode
+    let set_debugging_mode parameter bool= {parameter with debug_mode = bool }
 
-   let get_log_step parameter = parameter.log_step
-   let set_log_step parameter bool = {parameter with log_step = bool}
+    let get_log_step parameter = parameter.log_step
+    let set_log_step parameter bool = {parameter with log_step = bool}
 
-   let get_logger parameter = parameter.logger_step
-   let set_logger parameter fmt = {parameter with logger_step = fmt}
-   let get_out_channel parameter = parameter.logger_out
-   let set_out_channel parameter fmt = {parameter with logger_out = fmt}
-   let get_debugging_channel parameter = parameter.logger_err
-   let set_debugging_channel parameter fmt = {parameter with logger_err = fmt }
+    let get_logger parameter = parameter.logger_step
+    let set_logger parameter fmt = {parameter with logger_step = fmt}
+    let get_out_channel parameter = parameter.logger_out
+    let set_out_channel parameter fmt = {parameter with logger_out = fmt}
+    let get_debugging_channel parameter = parameter.logger_err
+    let set_debugging_channel parameter fmt = {parameter with logger_err = fmt }
 
-   let get_kasa_parameters parameter = parameter.kasa
-   let set_kasa_parameters parameter parameter' = {parameter' with kasa = parameter}
+    let get_kasa_parameters parameter = parameter.kasa
+    let set_kasa_parameters parameter parameter' = {parameter' with kasa = parameter}
 
-   let do_we_use_bucket_sort parameter = parameter.sort_algo_for_stories = Bucket
-   let use_bucket_sort parameter = {parameter with sort_algo_for_stories = Bucket}
-   let use_fusion_sort parameter = {parameter with sort_algo_for_stories = Fusion}
+    let do_we_use_bucket_sort parameter = parameter.sort_algo_for_stories = Bucket
+    let use_bucket_sort parameter = {parameter with sort_algo_for_stories = Bucket}
+    let use_fusion_sort parameter = {parameter with sort_algo_for_stories = Fusion}
 
-   let always_disambiguate parameter = parameter.always_disambiguate_initial_states
-   let set_always_disambiguate parameter  bool = { parameter with always_disambiguate_initial_states = bool}
-   let do_not_bound_itterations parameter = {parameter with bound_on_itteration_number = None}
-   let set_itteration_bound parameter int = {parameter with bound_on_itteration_number = Some int}
-   let get_bound_on_itteration_number parameter = parameter.bound_on_itteration_number
-   let get_profiling_logger parameter = parameter.logger_profiling
-   let string_of_rule_id handler i = handler.rule_name_cache.(i)
-   let string_of_agent_id handler i = handler.agent_name_cache.(i)
+    let always_disambiguate parameter = parameter.always_disambiguate_initial_states
+    let set_always_disambiguate parameter  bool = { parameter with always_disambiguate_initial_states = bool}
+    let do_not_bound_itterations parameter = {parameter with bound_on_itteration_number = None}
+    let set_itteration_bound parameter int = {parameter with bound_on_itteration_number = Some int}
+    let get_bound_on_itteration_number parameter = parameter.bound_on_itteration_number
+    let get_profiling_logger parameter = parameter.logger_profiling
+    let string_of_rule_id handler i = handler.rule_name_cache.(i)
+    let string_of_agent_id handler i = handler.agent_name_cache.(i)
 
-   let get_predicate_map handler = handler.steps_by_column
-   let get_is_time_independent parameter = parameter.time_independent
-   let get_blacklist_events parameter = parameter.blacklist_events
+    let get_predicate_map handler = handler.steps_by_column
+    let get_is_time_independent parameter = parameter.time_independent
+    let get_blacklist_events parameter = parameter.blacklist_events
 
-   let save_current_phase_title parameter x = parameter.kasa.Remanent_parameters_sig.save_current_phase_title x
-   let save_progress_bar parameter x = parameter.kasa.Remanent_parameters_sig.save_progress_bar x
-   let reset_progress_bar parameter = parameter.kasa.Remanent_parameters_sig.reset_progress_bar ()
-   let reset_current_phase_title parameter = parameter.kasa.Remanent_parameters_sig.reset_current_phase_title ()
-   let set_save_current_phase_title parameter f =
-     {parameter with kasa = {parameter.kasa with Remanent_parameters_sig.save_current_phase_title = f}}
-   let set_reset_current_phase_title parameter f =
-     {parameter with kasa = {parameter.kasa with Remanent_parameters_sig.reset_current_phase_title = f}}
-   let set_save_progress_bar parameter f =
-     {parameter with kasa = {parameter.kasa with Remanent_parameters_sig.save_progress_bar = f}}
-   let set_reset_progress_bar parameter f =
-     {parameter with kasa = {parameter.kasa with Remanent_parameters_sig.reset_progress_bar = f}}
-   let save_error_log parameter x = parameter.kasa.Remanent_parameters_sig.save_error_list x
-   let set_save_error_log parameter f =
-     {parameter with kasa = {parameter.kasa with Remanent_parameters_sig.save_error_list = f}}
+    let is_server_mode parameter = parameter.server
+    let get_server_channel parameter = parameter.logger_server
 
-   let is_server_mode parameter = parameter.server
-   let get_server_channel parameter = parameter.logger_server
-end:Cflow_handler)
+
+    let save_current_phase_title parameter x =
+      parameter.kasa.Remanent_parameters_sig.save_current_phase_title x
+
+    let save_progress_bar parameter n_stories x  =
+      let () =
+        if is_server_mode parameter
+        then
+          let (b,i,j) = x in
+          let () =
+            Loggers.fprintf
+              (get_server_channel parameter)
+              "Progress bar: (%s,%i,%i)"
+              (if b then "true" else "false")
+              i
+              n_stories
+          in
+          Loggers.print_newline (get_server_channel parameter)
+      in
+      parameter.kasa.Remanent_parameters_sig.save_progress_bar n_stories x
+    let reset_progress_bar parameter = parameter.kasa.Remanent_parameters_sig.reset_progress_bar ()
+    let reset_current_phase_title parameter = parameter.kasa.Remanent_parameters_sig.reset_current_phase_title ()
+    let set_save_current_phase_title parameter f =
+      {parameter
+       with kasa =
+              {parameter.kasa
+               with Remanent_parameters_sig.save_current_phase_title = f}}
+    let set_reset_current_phase_title parameter f =
+      {parameter
+       with kasa =
+              {parameter.kasa
+               with Remanent_parameters_sig.reset_current_phase_title = f}}
+    let set_save_progress_bar parameter f =
+      {parameter
+       with kasa = {parameter.kasa
+                    with Remanent_parameters_sig.save_progress_bar = f}}
+    let set_reset_progress_bar parameter f =
+      {parameter
+       with kasa = {parameter.kasa
+                    with Remanent_parameters_sig.reset_progress_bar = f}}
+    let save_error_log parameter x = parameter.kasa.Remanent_parameters_sig.save_error_list x
+    let set_save_error_log parameter f =
+      {parameter
+       with kasa =
+              {parameter.kasa
+               with Remanent_parameters_sig.save_error_list = f}}
+
+  end:Cflow_handler)

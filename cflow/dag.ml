@@ -74,6 +74,22 @@ type prehash = (node*int) list
 let dummy_cannonical_form = []
 let dummy_prehash = []
 
+let print_story_info logger parameter story_info_list =
+  List.iter
+    (fun
+      story_info ->
+      let () =
+        Loggers.fprintf
+          logger
+          "id:%i, time:%f, event:%i"
+          story_info.Mods.story_id
+          story_info.Mods.story_time
+          story_info.Mods.story_event
+      in
+      Loggers.print_newline logger
+    )
+    story_info_list
+
 let print_graph logger parameter handler error graph =
   let () = Loggers.refresh_id logger in
   let () = Loggers.fprintf logger "****" in
@@ -116,7 +132,6 @@ let print_graph logger parameter handler error graph =
       graph.conflict_pred
   in
   let () = Loggers.fprintf logger "****" in
-  let () = Loggers.print_newline logger in
   let () = Loggers.print_newline logger in
   error
 
@@ -471,8 +486,6 @@ let canonicalize parameter handler log_info error graph =
   let error, log_info = StoryProfiling.StoryStats.close_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error StoryProfiling.Cannonic_form_computation None log_info in
   error,log_info,output
 
-let dot_of_graph parameter handler error graph = error
-
 
 module ListTable =
   (
@@ -682,9 +695,19 @@ module BucketTable =
           if S.PH.B.PB.CI.Po.K.H.is_server_mode parameter
           then
             let () =
+              print_story_info
+                (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
+                parameter
+                story_info
+            in
+            let () =
               Loggers.fprintf
                 (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
-                "New_story: %i\n" table.fresh_id
+                "New_story: %i" table.fresh_id
+            in
+            let () =
+              Loggers.print_newline
+                (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
             in
             let log_info =
               print_graph
@@ -713,9 +736,19 @@ module BucketTable =
           let () =
             if S.PH.B.PB.CI.Po.K.H.is_server_mode parameter
             then
-              Loggers.fprintf
+              let () =
+                print_story_info
+                  (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
+                  parameter
+                  story_info
+              in
+              let () =
+                Loggers.fprintf
+                  (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
+                  "Same as: %i" id
+              in
+              Loggers.print_newline
                 (S.PH.B.PB.CI.Po.K.H.get_server_channel parameter)
-                "Same as: %i\n" id
           in
           let error,array = Int_storage.Nearly_inf_Imperatif.set
               (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error id

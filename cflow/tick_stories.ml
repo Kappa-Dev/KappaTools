@@ -49,5 +49,5 @@ let tick_stories f save_progress_bar n_stories (init,last,counter) =
   let () = Loggers.flush_logger f in
   let () = if counter = n_stories then Loggers.print_newline f in
   let bar = (true,counter,counter+1) in
-  let () = save_progress_bar bar in
+  let () = save_progress_bar n_stories bar in
   bar
