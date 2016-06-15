@@ -99,10 +99,14 @@ let print_graph logger parameter handler error graph =
   let () =
     A.iteri
       (fun i (_,j) ->
-         Graph_loggers.print_node
-           logger
-           ~directives:[Graph_loggers.Label j]
-           (string_of_int i)
+         if i=0 && j = ""
+         then
+           ()
+         else
+           Graph_loggers.print_node
+             logger
+             ~directives:[Graph_loggers.Label j]
+             (string_of_int i)
       )
       graph.labels
   in
