@@ -424,7 +424,7 @@ let tick_opt parameter bar =
     bar
   with
   | None -> bar
-  | Some (logger,n,bar) -> Some (logger,n,Tick_stories.tick_stories logger (S.PH.B.PB.CI.Po.K.H.save_progress_bar parameter) n bar)
+  | Some (logger,bar) -> Some (logger,Tick_stories.tick_stories logger (S.PH.B.PB.CI.Po.K.H.save_progress_bar parameter) bar)
 
 let close_progress_bar_opt logger = Loggers.print_newline logger
 
@@ -445,7 +445,9 @@ let fold_story_table_gen logger parameter ?(shall_we_compute=we_shall) ?(shall_w
     (f:((trace, trace_runtime_info list, 'a, 'a) ternary)) l a =
   let n_stories_input = count_stories l in
   let progress_bar =
-    Some (logger,n_stories_input,Tick_stories.tick_stories logger (S.PH.B.PB.CI.Po.K.H.save_progress_bar parameter) n_stories_input (false,0,0))
+    Some
+      (logger,Tick_stories.tick_stories logger
+         (S.PH.B.PB.CI.Po.K.H.save_progress_bar parameter)  (false,0,0,n_stories_input))
   in
   let g parameter handler profiling_info error story info (k,progress_bar,a,n_fails) =
     let event = StoryProfiling.Story k in
