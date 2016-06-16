@@ -254,8 +254,7 @@ let fold_over_the_causal_past_of_observables_with_a_progress_bar_while_reshaking
 	  let output =
 	    try
 	      Some (global_trace_simplification 0 (error,log_info,trace))
-	    with
-	      ExceptionDefn_with_no_dep.UserInterrupted _ -> None
+	    with Sys.Break -> None
 	  in
 	  match output
 	  with

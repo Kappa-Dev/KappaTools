@@ -677,7 +677,7 @@ let fold_left_with_progress_bar ?(event=StoryProfiling.Dummy)
             let n_fail = inc_fails a a' n_fail in
             let error,profiling_information = P.close_event (S.PH.B.PB.CI.Po.K.H.get_kasa_parameters parameter) error event None profiling_information in
             Some (error,profiling_information,bar,k+1,a',n_fail)
-          with ExceptionDefn.UserInterrupted _  -> None
+          with Sys.Break -> None
         in
         match output_opt
         with

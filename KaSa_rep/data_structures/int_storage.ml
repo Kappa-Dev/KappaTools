@@ -282,7 +282,7 @@ module Int_storage_imperatif =
 		try
 		  Some (f parameter error k x sol)
 		with
-		  ExceptionDefn.UserInterrupted _ -> None
+		  Sys.Break -> None
 	      in
 	      match
 		output_opt
@@ -599,7 +599,7 @@ module Quick_key_list =
 		| None ->
                   Some (invalid_arg parameters error (Some "fold, line 391") Exit b)
 		| Some im -> Some (f parameters error head im b)
-	      with ExceptionDefn.UserInterrupted _ -> None
+	      with Sys.Break -> None
 	    in
 	    match
 	      output_opt

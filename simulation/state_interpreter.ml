@@ -1,6 +1,6 @@
 type t = {
     init_stopping_times : (Nbr.t * int) list;
-    stopping_times : (Nbr.t * int) list ref;
+    mutable stopping_times : (Nbr.t * int) list;
     perturbations_alive : bool array;
     perturbations_not_done_yet : bool array;
     (* internal array for perturbate function (global to avoid useless alloc) *)
@@ -33,7 +33,7 @@ let empty env stopping_times alg_overwrite =
   let () = List.iter (fun (i,v) -> overwrite.(i) <- Some v) alg_overwrite in
   {
     init_stopping_times = stops;
-    stopping_times = ref stops;
+    stopping_times = stops;
     perturbations_alive =
       Array.make (Environment.nb_perturbations env) true;
     perturbations_not_done_yet =
@@ -300,7 +300,7 @@ let a_loop ~outputs env domain counter graph state =
   let (stop,graph',state' as out) =
     (*Activity is null or dt is infinite*)
     if not (activity > 0.) || dt = infinity then
-      match !(state.stopping_times) with
+      match state.stopping_times with
       | [] ->
 	 let () =
 	   if !Parameter.dumpIfDeadlocked then
@@ -316,17 +316,17 @@ let a_loop ~outputs env domain counter graph state =
 		(Counter.current_time counter) activity) in
 	 (true,graph,state)
       | (ti,_) :: tail ->
-	 let () = state.stopping_times := tail in
+	 let () = state.stopping_times <- tail in
 	 let continue = Counter.one_time_correction_event counter ti in
 	 let stop,graph',state' =
 	   perturbate ~outputs env domain counter graph state in
 	 (not continue||stop,graph',state')
     else
       (*activity is positive*)
-      match !(state.stopping_times) with
+      match state.stopping_times with
       | (ti,_) :: tail
 	   when Nbr.is_smaller ti (Nbr.F (Counter.current_time counter +. dt)) ->
-	 let () = state.stopping_times := tail in
+	 let () = state.stopping_times <- tail in
 	 let continue = Counter.one_time_correction_event counter ti in
 	 let stop,graph',state' =
 	   perturbate ~outputs env domain counter graph state in
@@ -384,28 +384,35 @@ let finalize ~outputs ~called_from dotFormat form env counter graph state =
 
 let loop ~outputs ~dotCflows form env domain counter graph state =
   let called_from = Remanent_parameters_sig.KaSim in
+  let user_interrupted = ref false in
+  let old_sigint_behavior =
+    Sys.signal
+      Sys.sigint (Sys.Signal_handle (fun _ -> user_interrupted := true)) in
   let rec iter graph state =
     let stop,graph',state' =
-      try
-	a_loop ~outputs env domain counter graph state
-      with ExceptionDefn.UserInterrupted f ->
-	let () = Format.pp_print_newline form () in
-	let msg = f (Counter.current_time counter) (Counter.current_event counter) in
-	let () =
-	  Format.fprintf
-	    form
-	    "@.***%s: would you like to record the current state? (y/N)***@."
-	    msg in
-	let () =
-	  if not !Parameter.batchmode then
-	    match String.lowercase (Tools.read_input ()) with
-	    | ("y" | "yes") ->
-	       outputs
-		 (Data.Snapshot
-		    (Rule_interpreter.snapshot env counter "dump.ka" graph))
-	    | _ -> () in
-	(true,graph,state) in
+      if !user_interrupted then
+        let () = Format.pp_print_newline form () in
+        let () =
+          Format.fprintf
+            form
+            "@.***Abort signal received after %E t.u (%d events):@ "
+            (Counter.current_time counter) (Counter.current_event counter) in
+        let () =
+          Format.fprintf
+            form
+            "would you like to record the current state? (y/N)***@." in
+        let () =
+          if not !Parameter.batchmode then
+            match String.lowercase (Tools.read_input ()) with
+            | ("y" | "yes") ->
+              outputs
+                (Data.Snapshot
+                   (Rule_interpreter.snapshot env counter "dump.ka" graph))
+            | _ -> () in
+        (true,graph,state)
+      else a_loop ~outputs env domain counter graph state in
     if stop then
+      let () = Sys.set_signal Sys.sigint old_sigint_behavior in
       finalize ~outputs ~called_from dotCflows form env counter graph' state'
     else let () = Counter.tick form counter in iter graph' state'
   in iter graph state

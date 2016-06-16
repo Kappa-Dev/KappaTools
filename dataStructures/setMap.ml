@@ -1471,8 +1471,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		 let val_opt = 
 		   try 
 		     Some (f key data value)
-		   with 
-		     ExceptionDefn_with_no_dep.UserInterrupted _ -> None
+		   with Sys.Break -> None
 		 in 
 		 match 
 		   val_opt

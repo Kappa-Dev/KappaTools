@@ -98,13 +98,7 @@ let () =
       | _ -> false
     in
     if abort then (prerr_string usage_msg ; exit 1) ;
-    let sigint_handle = fun _ ->
-      raise (ExceptionDefn.UserInterrupted
-	       (fun t e ->
-		Format.sprintf
-		  "Abort signal received after %E t.u (%d events)" t e))
-    in
-    let _ = Sys.set_signal Sys.sigint (Sys.Signal_handle sigint_handle) in
+    let () = Sys.catch_break true in
 
     Printexc.record_backtrace
       (!Parameter.debugModeOn || !backtrace); (*Possible backtrace*)
@@ -286,11 +280,11 @@ let () =
      let s = "" (*Printexc.get_backtrace()*) in
      let () = Format.eprintf "@.@[<v>***Runtime error %s***@,%s@]@." msg s in
     exit 2
-  | ExceptionDefn.UserInterrupted f ->
+  | Sys.Break ->
      let () = ExceptionDefn.flush_warning Format.err_formatter in
      let () = Kappa_files.close_all_out_desc () in
-     let msg = f 0. 0 in
-     let () =Format.eprintf "@.***Interrupted by user: %s***@." msg in
+     let () =
+       Format.eprintf "@.***Interrupted by user out of simulation loop***@." in
      exit 1
   | Sys_error msg ->
      let () = ExceptionDefn.flush_warning Format.err_formatter in

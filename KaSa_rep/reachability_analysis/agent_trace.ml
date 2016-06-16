@@ -1219,8 +1219,7 @@ let agent_trace parameter log_info error handler handler_kappa compil output =
                   let _ = close_out fic in
                   error, log_info
             end
-          with ExceptionDefn_with_no_dep.UserInterrupted _ ->
-            error, log_info
+          with Sys.Break -> error, log_info
        )
        map
        (error, log_info))

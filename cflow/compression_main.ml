@@ -298,8 +298,7 @@ let compress_and_print ~called_from ~dotFormat ?js_interface
               let output_opt =
                 try
                   Some (one_iteration_of_compression (log_info,error,event_list))
-                with
-                  ExceptionDefn.UserInterrupted _ -> None
+                with Sys.Break -> None
               in
               match
                 output_opt
