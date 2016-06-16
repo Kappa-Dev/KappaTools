@@ -7,7 +7,7 @@ type t = {
     activities : Random_tree.tree;
     (* pair numbers are regular rule, odd unary instances *)
     variables_overwrite: Alg_expr.t option array;
-    flux: (bool * Data.flux_data) list;
+    mutable flux: (bool * Data.flux_data) list;
   }
 
 let get_alg env state i =
@@ -89,7 +89,7 @@ let observables_values env counter graph state =
      (Rule_interpreter.value_alg counter graph ~get_alg)
      env
 
-let do_it ~outputs env domain counter graph state modification =
+let do_modification ~outputs env domain counter graph state modification =
   let get_alg i = get_alg env state i in
   let print_expr_val =
     Kappa_printer.print_expr_val
@@ -165,18 +165,19 @@ let do_it ~outputs env domain counter graph state modification =
 		 (Counter.current_time counter)
 		 (Counter.current_event counter) file)
      in
-     (false, graph, {state with
-       flux =
-	 (rel,Fluxmap.create_flux env counter file)::state.flux})
+     let () = state.flux <-
+         (rel,Fluxmap.create_flux env counter file)::state.flux in
+     (false, graph, state)
   | Primitives.FLUXOFF s ->
      let file = Format.asprintf "@[<h>%a@]" print_expr_val s in
      let (these,others) =
        List.partition
-	 (fun (_,x) -> Fluxmap.flux_has_name file x) state.flux in
+         (fun (_,x) -> Fluxmap.flux_has_name file x) state.flux in
      let () = List.iter
-		(fun (_,x) -> outputs (Data.Flux (Fluxmap.stop_flux env counter x)))
-		these in
-     (false, graph, {state with flux = others})
+         (fun (_,x) -> outputs (Data.Flux (Fluxmap.stop_flux env counter x)))
+         these in
+     let () = state.flux <- others in
+     (false, graph, state)
 
 let perturbate ~outputs env domain counter graph state =
   let () = Array.iteri (fun i _ -> state.perturbations_not_done_yet.(i) <- true)
@@ -185,31 +186,31 @@ let perturbate ~outputs env domain counter graph state =
   let rec do_until_noop i graph state stop =
     if stop || i >= Environment.nb_perturbations env then
       let graph' =
-	Rule_interpreter.update_outdated_activities
-	  ~get_alg (fun x _ y -> Random_tree.add x y state.activities)
-	  env counter graph in
+        Rule_interpreter.update_outdated_activities
+          ~get_alg (fun x _ y -> Random_tree.add x y state.activities)
+          env counter graph in
       (stop,graph',state)
     else
       let pert = Environment.get_perturbation env i in
       if state.perturbations_alive.(i) && state.perturbations_not_done_yet.(i) &&
-	   Rule_interpreter.value_bool
-	     counter graph ~get_alg (fst pert.Primitives.precondition)
+         Rule_interpreter.value_bool
+           counter graph ~get_alg (fst pert.Primitives.precondition)
       then
-	let stop,graph,state =
-	  List.fold_left (fun (stop,graph,state as acc) effect ->
-			  if stop then acc else
-			    do_it ~outputs env domain counter graph state effect)
-			 (stop,graph,state) pert.Primitives.effect in
-	let () = state.perturbations_not_done_yet.(i) <- false in
-	let () =
-	  state.perturbations_alive.(i) <-
-	    match pert.Primitives.abort with
-	    | None -> false
-	    | Some (ex,_) ->
-	       not (Rule_interpreter.value_bool counter graph ~get_alg ex) in
-	do_until_noop 0 graph state stop
+        let stop,graph,state =
+          List.fold_left (fun (stop,graph,state as acc) effect ->
+              if stop then acc else
+                do_modification ~outputs env domain counter graph state effect)
+            (stop,graph,state) pert.Primitives.effect in
+        let () = state.perturbations_not_done_yet.(i) <- false in
+        let () =
+          state.perturbations_alive.(i) <-
+            match pert.Primitives.abort with
+            | None -> false
+            | Some (ex,_) ->
+              not (Rule_interpreter.value_bool counter graph ~get_alg ex) in
+        do_until_noop 0 graph state stop
       else
-	do_until_noop (succ i) graph state stop in
+        do_until_noop (succ i) graph state stop in
   do_until_noop 0 graph state false
 
 let one_rule dt stop env domain counter graph state =
@@ -289,8 +290,7 @@ let one_rule dt stop env domain counter graph state =
        else Counter.one_no_more_binary_event counter dt in
      (not continue||stop,graph'',state)
 
-let activity state =
-  Random_tree.total state.activities
+let activity state = Random_tree.total state.activities
 
 let a_loop ~outputs env domain counter graph state =
   let activity = activity state in
