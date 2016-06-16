@@ -2,14 +2,14 @@
   * translation_in_natural_language.ml
   * openkappa
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
-  * 
+  *
   * Creation: 2016
-  * Last modification: 
-  * * 
-  * Signature for prepreprocessing language ckappa 
-  *  
-  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et   
-  * en Automatique.  All rights reserved.  This file is distributed     
+  * Last modification:
+  * *
+  * Signature for prepreprocessing language ckappa
+  *
+  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et
+  * en Automatique.  All rights reserved.  This file is distributed
   * under the terms of the GNU Library General Public License *)
 
 let warn parameters mh message exn default =
@@ -25,9 +25,9 @@ type token =
   | No_known_translation of (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list list
 
 type rename_sites =
-  (Remanent_parameters_sig.parameters -> 
-   Exception.method_handler -> 
-   Ckappa_sig.Site_map_and_set.Map.elt -> 
+  (Remanent_parameters_sig.parameters ->
+   Exception.method_handler ->
+   Ckappa_sig.Site_map_and_set.Map.elt ->
    Exception.method_handler * Ckappa_sig.Site_map_and_set.Map.elt)
 
 (****************************************************************************************)
@@ -46,7 +46,7 @@ let non_relational parameter handler error mvbdu =
       )
       (error, handler, mvbdu_true) list
   in
-  error, handler, 
+  error, handler,
   Ckappa_sig.Views_bdu.equal mvbdu recomposition
 
 let try_partitioning parameter handler error (rename_site_inverse:rename_sites) mvbdu =
@@ -66,17 +66,17 @@ let try_partitioning parameter handler error (rename_site_inverse:rename_sites) 
     with
     | [] -> error, handler, None
     | head :: tail ->
-      let error, handler, singleton = 
+      let error, handler, singleton =
         Ckappa_sig.Views_bdu.build_variables_list
-          parameter handler error [head] 
+          parameter handler error [head]
       in
-      let error, hnadler, mvbdu_ref = 
+      let error, handler, mvbdu_ref =
         Ckappa_sig.Views_bdu.mvbdu_project_abstract_away
-          parameter handler error mvbdu singleton 
+          parameter handler error mvbdu singleton
       in
       let error, handler, proj_in =
         Ckappa_sig.Views_bdu.mvbdu_project_keep_only
-          parameter handler error mvbdu singleton 
+          parameter handler error mvbdu singleton
       in
       let error, handler, list_asso =
         Ckappa_sig.Views_bdu.extensional_of_mvbdu
@@ -164,9 +164,9 @@ let try_partitioning parameter handler error (rename_site_inverse:rename_sites) 
                           let error, a' = rename_site_inverse parameter error a in
 			  (error, handler,
 			     (
-                               (Range 
-                                  (a', 
-                                   l)) 
+                               (Range
+                                  (a',
+                                   l))
                                :: list))
 		      end)
 		    (error, handler, [])
@@ -258,7 +258,7 @@ let translate parameter handler error (rename_site_inverse: rename_sites) mvbdu 
 		   warn parameter error (Some "line 144") Exit
                      (handler, No_known_translation list)
 	       end
-	    | [[site1,state1; site2,state2]; 
+	    | [[site1,state1; site2,state2];
                [site1',state1'; site2',state2'];
                [site1'',state1'';site2'',state2'']] ->
 	       begin
@@ -267,9 +267,9 @@ let translate parameter handler error (rename_site_inverse: rename_sites) mvbdu 
 		   if state1 = state1'
 		   then
 		     if state1 < state1''
-		     then error, 
+		     then error,
                        (handler, Imply ((site1, state1''), (site2, state2'')))
-		     else error, 
+		     else error,
                        (handler, Imply ((site2,
                                          if state2 = state2''
                                          then state2'
@@ -278,11 +278,11 @@ let translate parameter handler error (rename_site_inverse: rename_sites) mvbdu 
 		   else if state1 = state1''
 		   then
 		     if state1 < state1'
-		     then error, 
+		     then error,
                        (handler, Imply ((site1, state1'),(site2, state2')))
-		     else error, 
+		     else error,
                        (handler, Imply ((site2,
-                                         if state2 = state2' 
+                                         if state2 = state2'
                                          then state2''
                                          else state2)
                                            , (site1, state1)))
@@ -292,7 +292,7 @@ let translate parameter handler error (rename_site_inverse: rename_sites) mvbdu 
 		     then
 		       error, (handler, Imply ((site1, state1),(site2, state2)))
 		     else
-		       error, 
+		       error,
                        (handler, Imply ((site2,
                                          if state2 = state2''
                                          then state2'
@@ -306,10 +306,10 @@ let translate parameter handler error (rename_site_inverse: rename_sites) mvbdu 
 	    | _ ->
 	      begin
 		let error, handler, output =
-		  try_partitioning 
+		  try_partitioning
                     parameter
-                    handler 
-                    error 
+                    handler
+                    error
                     rename_site_inverse
                     mvbdu
 		in
@@ -345,7 +345,7 @@ let translate parameter handler error (rename_site_inverse: rename_sites) mvbdu 
 
 (****************************************************************************************)
 
-let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt_agent_type=true) ?html_mode:(html_mode=false) 
+let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt_agent_type=true) ?html_mode:(html_mode=false)
     ~show_dep_with_dimmension_higher_than:dim_min parameter handler_kappa error agent_string agent_type translation =
   let tab = if html_mode then "<PRE>         </PRE>" else "\t" in
   let endofline = if html_mode then "<Br>\n" else "\n" in
@@ -367,7 +367,7 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	then
 	  let error', site_string =
 	    Handler.string_of_site_in_natural_language parameter error handler_kappa
-	      agent_type 
+	      agent_type
               site_type
 	  in
           let error = Exception.check warn parameter error error' (Some "line 111") Exit in
@@ -378,27 +378,27 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	    | [state] ->
 	      let error', state_string =
 		Handler.string_of_state_fully_deciphered parameter error
-		  handler_kappa agent_type 
+		  handler_kappa agent_type
                   site_type
                   state
 	      in
 	      let error = Exception.check warn parameter error error'
-                (Some "line 121") Exit 
+                (Some "line 121") Exit
               in
 	      error, Loggers.fprintf (Remanent_parameters.get_logger parameter)
                 " and %s.%s" state_string endofline
 	    | state :: tail ->
 	      let error', state_string =
 		Handler.string_of_state_fully_deciphered parameter error
-		  handler_kappa agent_type 
+		  handler_kappa agent_type
                   site_type
                   state
 	      in
 	      let error = Exception.check warn parameter error error'
-                (Some "line 128") Exit 
+                (Some "line 128") Exit
               in
 	      let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                " %s," state_string 
+                " %s," state_string
               in
 	      aux tail error
 	  in
@@ -409,7 +409,7 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	  | [state] ->
 	    let error', state_string =
 	      Handler.string_of_state_fully_deciphered parameter error
-		handler_kappa agent_type 
+		handler_kappa agent_type
                 site_type
                 state
 	    in
@@ -425,14 +425,14 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	  | [state1; state2] ->
 	    let error', state_string1 =
 	      Handler.string_of_state_fully_deciphered parameter error
-		handler_kappa agent_type 
+		handler_kappa agent_type
                 site_type
                 state1
 	    in
 	    let error = Exception.check warn parameter error error' (Some "line 149") Exit in
 	    let error', state_string2 =
 	      Handler.string_of_state_fully_deciphered parameter error
-		handler_kappa agent_type 
+		handler_kappa agent_type
                 site_type
                 state2
 	    in
@@ -463,7 +463,7 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	  let error = Exception.check warn parameter error error' (Some "line 172") Exit in
 	  let error', state_string1 =
 	    Handler.string_of_state_fully_deciphered parameter error
-	      handler_kappa agent_type 
+	      handler_kappa agent_type
               site1
               state1
 	  in
@@ -476,16 +476,16 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	  let error = Exception.check warn parameter error error' (Some "line 182") Exit in
 	  let error', state_string2 =
 	    Handler.string_of_state_fully_deciphered parameter error
-	      handler_kappa agent_type 
+	      handler_kappa agent_type
               site2
               state2
 	  in
 	  let error = Exception.check warn parameter error error' (Some "line 187") Exit in
 	  error,
 	  Loggers.fprintf (Remanent_parameters.get_logger parameter)
-            "%s%s%s is %s, if and only if, %s is %s.%s" 
-            (Remanent_parameters.get_prefix parameter) 
-            (cap (in_agent_comma agent_string)) 
+            "%s%s%s is %s, if and only if, %s is %s.%s"
+            (Remanent_parameters.get_prefix parameter)
+            (cap (in_agent_comma agent_string))
             site_string1 state_string1 site_string2 state_string2 endofline
         end
       else
@@ -496,13 +496,13 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
         begin
 	  let error', site_string1 =
 	    Handler.string_of_site_in_natural_language
-              parameter error handler_kappa agent_type 
+              parameter error handler_kappa agent_type
               site1
 	  in
 	  let error = Exception.check warn parameter error error' (Some "line 200") Exit in
 	  let error', state_string1 =
 	    Handler.string_of_state_fully_deciphered parameter error
-	      handler_kappa agent_type 
+	      handler_kappa agent_type
               site1
               state1
 	  in
@@ -515,15 +515,15 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	  let error = Exception.check warn parameter error error' (Some "line 208") Exit in
 	  let error', state_string2 =
 	    Handler.string_of_state_fully_deciphered parameter error
-	      handler_kappa agent_type 
+	      handler_kappa agent_type
               site2
-              state2 
+              state2
           in
 	  let error = Exception.check warn parameter error error' (Some "line 212") Exit in
 	  error,
 	  Loggers.fprintf (Remanent_parameters.get_logger parameter)
-            "%s%s%s is %s whenever %s is %s.%s" 
-            (Remanent_parameters.get_prefix parameter) 
+            "%s%s%s is %s whenever %s is %s.%s"
+            (Remanent_parameters.get_prefix parameter)
             (cap (in_agent_comma agent_string))
             site_string2 state_string2 site_string1 state_string1 endofline
         end
@@ -544,18 +544,18 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
         List.fold_left
 	  (fun error (a,list) ->
 	    let error, state_string =
-	      Handler.string_of_state_fully_deciphered 
-                parameter error handler_kappa agent_type 
+	      Handler.string_of_state_fully_deciphered
+                parameter error handler_kappa agent_type
                 v
                 a
 	    in
 	    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-              "%swhen %s is equal to %s, then:%s%s" 
-              (Remanent_parameters.get_prefix parameter) 
-              site_string state_string endofline beginenumeration 
+              "%swhen %s is equal to %s, then:%s%s"
+              (Remanent_parameters.get_prefix parameter)
+              site_string state_string endofline beginenumeration
             in
 	    let parameter =
-              Remanent_parameters.update_prefix parameter (tab ^ beginenum ^ " ") 
+              Remanent_parameters.update_prefix parameter (tab ^ beginenum ^ " ")
             in
 	    let error =
 	      List.fold_left
@@ -574,14 +574,14 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 		      token
 		  in
 		  let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                    "%s" endenum 
+                    "%s" endenum
                   in
 	          error)
 	        error list
 	    in
 	    let () =
               Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                "%s" endenumeration 
+                "%s" endenumeration
             in
 	    error)
           error list
@@ -594,8 +594,8 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	  let n = List.length head in
 	  if List.length head >= dim_min
 	  then
-	    let () = 
-              Loggers.fprintf (Remanent_parameters.get_logger parameter) "%s%s" 
+	    let () =
+              Loggers.fprintf (Remanent_parameters.get_logger parameter) "%s%s"
                 (Remanent_parameters.get_prefix parameter)
                 (cap (in_agent_comma agent_string))
             in
@@ -607,22 +607,22 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	        | [a, _] ->
 		  let error, string =
                     Handler.string_of_site_in_natural_language
-                      parameter error handler_kappa agent_type a 
+                      parameter error handler_kappa agent_type a
                   in
 		  let () =
                     Loggers.fprintf (Remanent_parameters.get_logger parameter)
-                      ", and %s, " string 
+                      ", and %s, " string
                   in
 		  error,()
 	        | [] -> warn parameter error (Some "line 439") Exit ()
 	        | (a, _) :: b ->
-		  let error, string = 
+		  let error, string =
                     Handler.string_of_site_in_natural_language
-                      parameter error handler_kappa agent_type a 
+                      parameter error handler_kappa agent_type a
                   in
 		  let () =
-                    Loggers.fprintf (Remanent_parameters.get_logger parameter) 
-                      ", %s" string 
+                    Loggers.fprintf (Remanent_parameters.get_logger parameter)
+                      ", %s" string
                   in
 		  aux b error
 	      in
@@ -633,18 +633,18 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 	      | (a , _) :: b ->
 	        let error, string =
                   Handler.string_of_site_in_natural_language
-                    parameter error handler_kappa agent_type 
+                    parameter error handler_kappa agent_type
                     a
                 in
-	        let () = 
-                  Loggers.fprintf (Remanent_parameters.get_logger parameter) "%s" string 
+	        let () =
+                  Loggers.fprintf (Remanent_parameters.get_logger parameter) "%s" string
                 in
 	        aux
-                  b 
+                  b
                   error
 	    in
-	    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter) 
-              "are entangled by the following %i-d relationship:%s" n endofline 
+	    let () = Loggers.fprintf (Remanent_parameters.get_logger parameter)
+              "are entangled by the following %i-d relationship:%s" n endofline
             in
 	    let parameter = Remanent_parameters.update_prefix parameter "\t" in
 	    List.fold_left
@@ -656,7 +656,7 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 		        Handler.string_of_site parameter error handler_kappa
 			  agent_type site_type
 		      in
-		      let error = Exception.check warn parameter error error' 
+		      let error = Exception.check warn parameter error error'
                         (Some "line 235") Exit in
 		      let error, state_string =
 		        Handler.string_of_state_fully_deciphered parameter error
@@ -684,8 +684,8 @@ let rec print ?beginning_of_sentence:(beggining=true) ?prompt_agent_type:(prompt
 		  then Loggers.fprintf (Remanent_parameters.get_logger parameter)
                     ")%s" endofline
 	        in error)
-              
-	      error 
+
+	      error
               list,
             ()
 	  else

@@ -106,10 +106,6 @@ let collect_bonds_initial parameter error init_state =
   (*a set of parallel bonds in the initial states*)
 
 let collect_parallel_bonds_init parameter store_bonds_init error init_state =
-  (*collect bonds in the initial states*)
-    (*let error, store_bonds_init = collect_bonds_initial static error init_state in
-      let parameter = get_parameter static in*)
-(*--------------------------------------------------------------*)
 let error, store_result =
   Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
     parameter error

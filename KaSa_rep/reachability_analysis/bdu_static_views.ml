@@ -266,7 +266,7 @@ let scan_rule_pre_static parameter error (rule_id:Ckappa_sig.c_rule_id) rule han
       rule.Cckappa_sig.diff_direct
       store_result.store_modification_sites
   in
-  (*-------------------------------------------------------------------------------*)
+  (*--------------------------------------------------------------*)
   (*update of the views due to modification without agent_id*)
   let error, store_modif_map =
     collect_modif_map
@@ -274,7 +274,7 @@ let scan_rule_pre_static parameter error (rule_id:Ckappa_sig.c_rule_id) rule han
       error
       store_modification_sites
   in
-  (*-------------------------------------------------------------------------------*)
+  (*-------------------------------------------------------------*)
   (*valuations of the views that are tested with agent_id*)
   let error, store_test_sites =
     collect_test_sites
@@ -284,7 +284,7 @@ let scan_rule_pre_static parameter error (rule_id:Ckappa_sig.c_rule_id) rule han
       rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
       store_result.store_test_sites
   in
-  (*-------------------------------------------------------------------------------*)
+  (*---------------------------------------------------------------*)
   (*valuations of the views that are tested without agent_id*)
   let error, store_test_map =
     collect_test_map
@@ -292,7 +292,7 @@ let scan_rule_pre_static parameter error (rule_id:Ckappa_sig.c_rule_id) rule han
       error
       store_test_sites
   in
-  (*-------------------------------------------------------------------------------*)
+  (*---------------------------------------------------------------*)
   (*valuations and update of the views that are tested and modification with agent_id*)
   let error, store_test_modification_sites =
     collect_test_modification_sites
@@ -302,7 +302,7 @@ let scan_rule_pre_static parameter error (rule_id:Ckappa_sig.c_rule_id) rule han
       store_test_sites
       store_result.store_test_modification_sites
   in
-  (*-------------------------------------------------------------------------------*)
+  (*--------------------------------------------------------------*)
   (*valuations and update of the views that are tested and modification
     without agent_id*)
   let error, store_test_modif_map =
@@ -321,7 +321,7 @@ let scan_rule_pre_static parameter error (rule_id:Ckappa_sig.c_rule_id) rule han
     store_test_modif_map          = store_test_modif_map;
   }
 
-(************************************************************************************)
+(******************************************************************)
 (*implementation of bdu_analysis_static*)
 
 let site_covering_classes parameter error covering_classes =
@@ -368,7 +368,7 @@ let site_covering_classes parameter error covering_classes =
   in
   error, store_result
 
-(************************************************************************************)
+(******************************************************************)
 
 let new_index_pair_map parameter error l = (*JF:  it should be computed only once *)
   let rec aux acc k map1 map2 error =
@@ -394,7 +394,7 @@ let new_index_pair_map parameter error l = (*JF:  it should be computed only onc
   let error = Exception.check warn parameter error error' (Some "line 49") Exit in
   error,(map1,map2)
 
-(************************************************************************************)
+(*****************************************************************)
 (*convert a list to a set*)
 
 let list2set parameter error list =
@@ -406,7 +406,7 @@ let list2set parameter error list =
   let error = Exception.check warn parameter error error' (Some "line 509") Exit in
   error, set
 
-(************************************************************************************)
+(*******************************************************************)
 (* From each covering class, with their new index for sites, build
    (bdu_test, bdu_creation and list of modification).
    Note: not taking sites in the local, because it will be longer.
@@ -426,7 +426,7 @@ let collect_remanent_triple parameter error store_remanent store_result =
             error, triple_list
           ) store_dic (error, [])
       in
-      (*-----------------------------------------------------------------*)
+      (*--------------------------------------------------------*)
       let error, store_result =
         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.set
           parameter
@@ -438,7 +438,7 @@ let collect_remanent_triple parameter error store_remanent store_result =
       error, store_result
     ) store_remanent store_result
 
-(************************************************************************************)
+(******************************************************************)
 (*creation rules*)
 
 let build_bdu parameter handler error (pair_list: (Ckappa_sig.c_site_name * Ckappa_sig.c_state) list) =

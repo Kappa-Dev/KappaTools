@@ -333,13 +333,14 @@ module PairAgentSiteState_map_and_set =
 	 let print _ _ = ()
         end))
 
-(****************************************************************************************)
+(*******************************************************************)
 
 module Views_bdu =
   (Mvbdu_wrapper.Mvbdu: Mvbdu_wrapper.Mvbdu with type key = c_site_name and type value = c_state with type mvbdu = Mvbdu_wrapper.Mvbdu.mvbdu)
+
 module Views_intbdu = Mvbdu_wrapper.Internalize (Views_bdu)
 
-(****************************************************************************************)
+(***************************************************************)
 
 type binding_state =
   | Free

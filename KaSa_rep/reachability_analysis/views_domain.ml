@@ -387,7 +387,7 @@ struct
         Remanent_parameters.update_prefix parameter "Updating the views for"
       in
       let prefix = Remanent_parameters.get_prefix parameter_cv in
-      (*-----------------------------------------------------------------------*)
+      (*---------------------------------------------------------*)
       let error, agent_string =
         try
           Handler.string_of_agent parameter error handler_kappa agent_type
@@ -395,7 +395,7 @@ struct
           _ -> warn parameter error (Some "line 56") Exit
             (Ckappa_sig.string_of_agent_name agent_type)
       in
-      (*-----------------------------------------------------------------------*)
+      (*--------------------------------------------------------*)
       let error, site_correspondence =
         Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
           parameter error agent_type site_correspondence
@@ -517,7 +517,7 @@ struct
         end
       else error
     in
-  (*-----------------------------------------------------------------------*)
+  (*-------------------------------------------------------------*)
   (*convert into an event list*)
     error,
     Ckappa_sig.Rule_map_and_set.Set.fold
@@ -525,7 +525,7 @@ struct
         (Communication.Check_rule rule_id) :: event_list)
       s1 event_list
 
-  (**************************************************************************)
+  (***************************************************************)
 
   let dump_view_diff static dynamic error (agent_type, cv_id) bdu_old bdu_union =
     let parameter = get_parameter static in
@@ -911,7 +911,7 @@ struct
     in
     error, dynamic, event_list
 
-  (**************************************************************************)
+  (**************************************************************)
   (**add initial state of kappa*)
 
   let add_initial_state static dynamic error init_state =
@@ -924,7 +924,7 @@ struct
     in
     error, dynamic, event_list
 
-  (**************************************************************************)
+  (****************************************************************)
 
   let get_store_proj_bdu_test_restriction static dynamic error =
     let error, result_static =
@@ -950,11 +950,11 @@ struct
     in
     error, result_static.Bdu_static_views.store_modif_list_restriction_map
 
-  (**************************************************************************)
+  (*****************************************************************)
 
   exception False of Exception.method_handler * dynamic_information
 
-  (**************************************************************************)
+  (****************************************************************)
   (*compute condition of bdu whether or not it is enable by doing the
     intersection of bdu_test and bdu_X*)
 
@@ -962,7 +962,7 @@ struct
     let error, dynamic, map =
       Covering_classes_type.AgentsCV_setmap.Map.fold
         (fun (agent_id, agent_type, cv_id) bdu_test (error, dynamic, map) ->
-          (*---------------------------------------------------------------------*)
+          (*------------------------------------------------------*)
           (*for each (agent_id, cv_id) a bdu*)
           let error, bdu_X =
             match
@@ -996,7 +996,7 @@ struct
     in
     error, dynamic, map
 
-  (**************************************************************************)
+  (*****************************************************************)
 
   let get_new_site_name parameter error cv_id site_name site_correspondence =
     let error, site_correspondence =
@@ -1028,11 +1028,11 @@ struct
     in
     error, new_site_name
 
-  (**************************************************************************)
+  (*****************************************************************)
 
   let step_list_empty kappa_handler dynamic parameter error rule_id agent_id agent_type site_name
       cv_list fixpoint_result proj_bdu_test_restriction bdu_false bdu_true site_correspondence =
-    (*---------------------------------------------------------------------*)
+    (*------------------------------------------------------------*)
     let error, dynamic, bdu =
       List.fold_left
         (fun (error, dynamic, bdu) cv_id ->
@@ -1202,7 +1202,7 @@ struct
       | error, None -> error, Ckappa_sig.dummy_agent_name
       | error, Some a -> error, a
     in
-    (*---------------------------------------------------------------------*)
+    (*------------------------------------------------------------*)
     let error, site_correspondence =
       match Ckappa_sig.Agent_type_quick_nearly_Inf_Int_storage_Imperatif.get
         parameter
@@ -1233,7 +1233,7 @@ struct
     in
     error, dynamic, new_answer
 
-  (**************************************************************************)
+  (***************************************************************)
   (*let compute precondition*)
 
   (* checking the binding information whether or not path belong to the
@@ -1249,7 +1249,7 @@ struct
   (* 3) the path goes outside of the pattern, grab the agent
      type of the target and the site type of the target, and
      gather information (in the views) *)
-  (*---------------------------------------------------------------------*)
+  (*-------------------------------------------------------------*)
   (*compute the pattern: lhs of the rule*)
   (* Where do you test whether the target of the bond belong to the pattern *)
   (* If it is the case, you should apply your fonction recursively to
@@ -1280,7 +1280,7 @@ struct
           | error, None -> error, Ckappa_sig.dummy_agent_name
           | error, Some a -> error, a
         in
-        (*-------------------------------------------------------------------------------*)
+        (*---------------------------------------------------------*)
         (*get state information from (agent_type, site)*)
         let error, state_dic =
           Misc_sa.unsome
@@ -1292,7 +1292,7 @@ struct
             (fun error ->
               warn parameter error (Some "line 1248") Exit (Ckappa_sig.Dictionary_of_States.init()))
         in
-        (*-------------------------------------------------------------------------------*)
+        (*---------------------------------------------------------*)
         (*Binding state: B.y*)
         let state =
           Ckappa_sig.C_Lnk_type (step.Communication.agent_type_in, step.Communication.site_in)
@@ -1307,7 +1307,7 @@ struct
         in
         if b
         then
-          (*-------------------------------------------------------------------------------*)
+          (*-----------------------------------------------------*)
           (*state is defined*)
           let error, answer_contact_map =
             match
@@ -1339,7 +1339,7 @@ struct
     in
     aux step_list
 
-  (*-------------------------------------------------------------------------------*)
+  (*-----------------------------------------------------------*)
   (*intersection:
     - Undefined, _ -> Undefined
     - Any, a -> a
@@ -1358,7 +1358,7 @@ struct
       let l = Misc_sa.inter_list (fun a b -> compare a b) l l' in
       error, Usual_domains.Val l
 
-  (*-------------------------------------------------------------------------------*)
+  (*---------------------------------------------------------------*)
   (*outside the pattern*)
 
   let precondition_outside_pattern parameter error dynamic kappa_handler path step tl
@@ -1391,7 +1391,7 @@ struct
           (Ckappa_sig.Binding state)
           state_dic
       in
-      (*---------------------------------------------------------------------*)
+      (*--------------------------------------------------------*)
       if b
       then
         (*state is defined, get the information about this state*)
@@ -1434,7 +1434,7 @@ struct
               | error, None -> warn parameter error (Some "line 1345") Exit []
               | error, Some l -> error, l
             in
-            (*---------------------------------------------------------------------*)
+            (*---------------------------------------------------*)
             let error, dynamic, bdu =
               List.fold_left (fun (error, dynamic, bdu) cv_id ->
                 (*FIX ME: check whether or not t is in this covering class*)
@@ -1449,7 +1449,7 @@ struct
                 in
                 if b
                 then
-                  (*---------------------------------------------------------------------*)
+                  (*------------------------------------------------*)
                   (*t is in CV, take the states of v knowing that t has type B@w*)
                   let error, new_site_name =
                     get_new_site_name
@@ -1551,7 +1551,7 @@ struct
                   let dynamic = Analyzer_headers.set_mvbdu_handler handler dynamic in
                   error, dynamic, bdu
                 else
-                  (*---------------------------------------------------------------------*)
+                  (*---------------------------------------------*)
                   (*t is not in CV, take the state of v*)
                   let error, new_site_name =
                     get_new_site_name
@@ -1620,7 +1620,7 @@ struct
                   error, dynamic, bdu_renamed
               ) (error, dynamic, bdu_true) cv_list
             in
-            (*---------------------------------------------------------------------*)
+            (*--------------------------------------------------*)
             let handler = Analyzer_headers.get_mvbdu_handler dynamic in
             let error, handler, list =
               Ckappa_sig.Views_bdu.extensional_of_mvbdu
@@ -1630,7 +1630,7 @@ struct
                 bdu
             in
             let dynamic = Analyzer_headers.set_mvbdu_handler handler dynamic in
-            (*---------------------------------------------------------------------*)
+            (*--------------------------------------------------*)
             let error, state_list =
               List.fold_left (fun (error, output) list ->
                 match list with
@@ -1647,15 +1647,12 @@ struct
     in
     error, (dynamic, new_answer)
 
-  (*-------------------------------------------------------------------------------*)
+  (*---------------------------------------------------------------*)
   (*inside the pattern*)
 
-  let precondition_inside_pattern parameter error dynamic kappa_handler agent step
-      path aux rule_id rule tl site_correspondence store_covering_classes_id
-      fixpoint_result bdu_false bdu_true =
-    (*-----------------------------------------------------------------------*)
-    (*inside the pattern, check the binding information in the lhs of the
-      current agent*)
+  let precondition_inside_pattern parameter error dynamic kappa_handler agent step path aux rule_id rule tl site_correspondence store_covering_classes_id fixpoint_result bdu_false bdu_true =
+    (*---------------------------------------------------------*)
+    (*inside the pattern, check the binding information in the lhs of the current agent*)
     let error, (dynamic, update_answer) =
       match
         Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.unsafe_get
@@ -1665,7 +1662,7 @@ struct
           rule.Cckappa_sig.rule_lhs.Cckappa_sig.bonds
       with
       | error, None ->
-        (*----------------------------------------------------------------*)
+        (*-----------------------------------------------------*)
         (* this agent has no bound. As in the case outside the pattern.*)
         let error, (dynamic, new_answer) =
           precondition_outside_pattern
@@ -1673,7 +1670,7 @@ struct
             site_correspondence store_covering_classes_id fixpoint_result
         in
         error, (dynamic, new_answer)
-      (*----------------------------------------------------------------*)
+      (*--------------------------------------------------------*)
       (*search inside this map which agent and site, A.x bind to.*)
       | error, Some map ->
         let error, (dynamic, update_answer) =
@@ -1685,7 +1682,7 @@ struct
               map
           with
           | error, None ->
-            (*----------------------------------------------------------------------*)
+            (*------------------------------------------------*)
             (*out of the pattern*)
             let error, (dynamic, new_answer) =
               precondition_outside_pattern
@@ -1694,7 +1691,7 @@ struct
             in
             error, (dynamic, new_answer)
           | error, Some site_add ->
-            (*----------------------------------------------------------------------*)
+            (*-----------------------------------------------*)
             (*A.x is bound to something*)
             let agent_type' = site_add.Cckappa_sig.agent_type in
             (*check that A.x is bound to B.y*)
@@ -1717,7 +1714,7 @@ struct
     in
     error, (dynamic, update_answer)
 
-  (*-------------------------------------------------------------------------------*)
+  (*-------------------------------------------------------------*)
 
   let print_test_answer parameter answer =
     match answer with
@@ -1729,7 +1726,7 @@ struct
     | Usual_domains.Any ->
       Loggers.fprintf (Remanent_parameters.get_logger parameter) "Any\n"
 
-  (*-------------------------------------------------------------------------------*)
+  (*-------------------------------------------------------------*)
 
   let compute_pattern_navigation parameter error kappa_handler
       aux dynamic path rule rule_id step tl bdu_false bdu_true site_correspondence
@@ -1763,7 +1760,7 @@ struct
               agent.Cckappa_sig.agent_interface
           with
           | error, None ->
-            (*-----------------------------------------------------------------------------*)
+            (*------------------------------------------------------*)
             (*out of the pattern, take the last element in the
               relative_address, if one can take the agent type of the
               target, take site and collect the information one has about
@@ -1778,7 +1775,7 @@ struct
                 site_correspondence store_covering_classes_id fixpoint_result
             in
             error, (dynamic, new_answer)
-            (*-------------------------------------------------------------------------------*)
+            (*----------------------------------------------------*)
             (*There is some states, inside the pattern. Check
               port whether or not it is free/bound?*)
           | error, Some port ->
@@ -1797,7 +1794,7 @@ struct
                     fixpoint_result bdu_false bdu_true
                 in
                 error, (dynamic, new_answer)
-              (*----------------------------------------------------------------------*)
+              (*-------------------------------------------------*)
               (*it is free, inconsistent*)
               | Some true -> error, (dynamic, Usual_domains.Undefined)
             in
@@ -1807,7 +1804,7 @@ struct
     in
     error, (dynamic, new_answer)
 
-  (*-------------------------------------------------------------------------------*)
+  (*------------------------------------------------------------*)
 
   let compute_precondition_enable parameter error kappa_handler rule rule_id precondition
       bdu_false bdu_true dual_contact_map store_agent_name site_correspondence
@@ -1816,14 +1813,14 @@ struct
       Communication.refine_information_about_state_of_site
         precondition
         (fun error dynamic current_path former_answer ->
-          (*-------------------------------------------------------------------------------*)
+          (*-----------------------------------------------------*)
           (*typing*)
           let error, answer_contact_map =
             precondition_typing
               parameter error kappa_handler rule_id
               current_path.Communication.relative_address current_path store_agent_name dual_contact_map
           in
-          (*-------------------------------------------------------------------------------*)
+          (*-----------------------------------------------------*)
 	  (* The output should be more precise than former_answer:
 	     If the former_answer is any, do not change anything,
 	     If the former_answer is Val l,
@@ -1837,7 +1834,7 @@ struct
                   Loggers.fprintf (Remanent_parameters.get_logger parameter)
                     "Pattern navigation\n"
                 in*)
-                (*-------------------------------------------------------------------------------*)
+                (*------------------------------------------------*)
                 (*pattern navigation*)
                 let error, (dynamic, new_answer) =
                   compute_pattern_navigation
@@ -1847,7 +1844,7 @@ struct
                 in
                 let error, update_answer = inter error new_answer former_answer in
                 error, dynamic, update_answer
-              (*----------------------------------------------------------------------*)
+              (*--------------------------------------------------*)
               (*empty relative_adress*)
               | [] ->
                 let error, dynamic, new_answer =
@@ -1873,7 +1870,7 @@ struct
     in
     precondition
 
-  (**************************************************************************)
+  (****************************************************************)
 
   let is_enable_aux static dynamic error rule_id precondition =
     let parameter = get_parameter static in
@@ -1891,10 +1888,10 @@ struct
       | error, None -> Preprocess.empty_rule parameter error
       | error, Some rule -> error, rule.Cckappa_sig.e_rule_c_rule
     in
-    (*---------------------------------------------------------------------*)
+    (*-----------------------------------------------------------*)
     let error, dynamic, bdu_false = get_mvbdu_false static dynamic error in
     let error, dynamic, bdu_true = get_mvbdu_true static dynamic error in
-    (*---------------------------------------------------------------------*)
+    (*------------------------------------------------------------*)
     let fixpoint_result = get_fixpoint_result dynamic in
     let dual_contact_map = get_store_dual_contact_map dynamic in
     let error, store_proj_bdu_test_restriction =
@@ -1913,7 +1910,7 @@ struct
       | None -> error, Covering_classes_type.AgentsCV_setmap.Map.empty
       | Some map -> error, map
     in
-    (*---------------------------------------------------------------------*)
+    (*---------------------------------------------------------*)
     try
       (*check the condition whether or not the bdu is enabled, do the
         intersection of bdu_test and bdu_X.*)
@@ -1926,7 +1923,7 @@ struct
           fixpoint_result
           proj_bdu_test_restriction
       in
-      (*---------------------------------------------------------------------*)
+      (*-----------------------------------------------------*)
       (*get a set of sites in a covering class: later with state list*)
       let precondition =
         compute_precondition_enable parameter error kappa_handler rule rule_id
@@ -1938,7 +1935,7 @@ struct
     with
       False (error, dynamic) -> error, (dynamic, precondition), false
 
-  (**************************************************************************)
+  (************************************************************)
   (*get contact_map from dynamic*)
   (* then use the functions get_potential_partner and/or
      fold_over_potential_partners in the views domain to use the incremental
@@ -1958,7 +1955,7 @@ struct
     else
       error, dynamic, None
 
-  (**************************************************************************)
+  (***********************************************************)
   (*deal with views*)
 
   let compute_bdu_update_aux static dynamic error bdu_test list_a bdu_X =
@@ -1982,7 +1979,7 @@ struct
     let dynamic = set_mvbdu_handler handler dynamic in
     error, dynamic, bdu_result
 
-  (**************************************************************************)
+  (*************************************************************)
 
   let compute_bdu_update_views static dynamic error bdu_test list_a bdu_X =
     let error, dynamic, bdu_result =
@@ -1990,7 +1987,7 @@ struct
     in
     error, dynamic, bdu_result
 
-  (**************************************************************************)
+  (***************************************************************)
 
   let compute_bdu_update_creation static dynamic error bdu_creation bdu_X =
     let parameter = get_parameter static in
@@ -2002,7 +1999,7 @@ struct
     let dynamic = set_mvbdu_handler handler dynamic in
     error, dynamic, bdu_result
 
-  (**************************************************************************)
+  (***************************************************************)
 
   let compute_bdu_update_side_effects static dynamic error bdu_test list_a bdu_X =
     let error, dynamic, bdu_result =
@@ -2010,7 +2007,7 @@ struct
     in
     error, dynamic, bdu_result
 
-  (**************************************************************************)
+  (****************************************************************)
 
   let compute_views_test_enabled static dynamic error rule_id event_list =
     let parameter = get_parameter static in
@@ -2025,9 +2022,9 @@ struct
       | None -> error, Covering_classes_type.AgentsCV_setmap.Map.empty
       | Some map -> error, map
     in
-    (*-----------------------------------------------------------------------*)
+    (*------------------------------------------------------------*)
     let error, dynamic, event_list =
-      (*-----------------------------------------------------------------------*)
+      (*-----------------------------------------------------------*)
       (*deal with views*)
       Covering_classes_type.AgentsCV_setmap.Map.fold
         (fun (agent_id, agent_type, cv_id) _ (error, dynamic, event_list) ->
@@ -2058,7 +2055,7 @@ struct
               agent_type
               cv_id*)
           in
-          (*-----------------------------------------------------------------------*)
+          (*-----------------------------------------------------*)
           let store_result = get_fixpoint_result dynamic in
           let error, bdu_X =
             match Covering_classes_type.AgentCV_map_and_set.Map.find_option_without_logs
@@ -2251,7 +2248,7 @@ struct
     in
     error, dynamic, event_list
 
-  (**************************************************************************)
+  (**************************************************************)
   (*  let dead_rule_array = dynamic.dead_rule in
       to be pushed in apply_rule in the rule domain
       (when we will split the domain concept-wise) *)
@@ -2821,7 +2818,7 @@ struct
 	  result (error, handler)
       end
 
-  (************************************************************************************)
+  (****************************************************************)
   (*non relational properties*)
 
   let print_bdu_update_map_cartesian_abstraction a b c d e =
@@ -2831,7 +2828,7 @@ struct
       Ckappa_sig.Views_bdu.mvbdu_cartesian_abstraction
       a b c d e
 
-  (************************************************************************************)
+  (*****************************************************************)
   (*relational properties*)
 
   let print_bdu_update_map_cartesian_decomposition a b c d e =
@@ -2845,7 +2842,7 @@ struct
       Ckappa_sig.Views_bdu.mvbdu_full_cartesian_decomposition
       a b c d e
 
-  (************************************************************************************)
+  (*****************************************************************)
 
   let print_result_fixpoint_aux
       parameter handler error handler_kappa site_correspondence result (static:static_information) =

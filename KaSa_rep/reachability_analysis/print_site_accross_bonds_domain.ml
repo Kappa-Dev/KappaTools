@@ -242,7 +242,7 @@ error, ((agent_string, site_string, site_string2, state_string, state_string2),(
 
 
 let print_tuple_has_first_site_bound_snd_site_different parameter error handler_kappa log store_result =
-  Loggers.fprintf log "Tuple has the first site is bound and the second site is different:\n";
+  Loggers.fprintf log "Tuple has the first site can be bound and the second site is different:\n";
   Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.iter
     (fun (x, y) ->
        let (agent_id, agent_type, site_type, site_type2, state, state2) = x in
@@ -320,7 +320,7 @@ Ckappa_sig.Rule_map_and_set.Map.iter
   ) store_result
 
 let print_first_site_y_modified parameter error handler_kappa log store_result =
-  Loggers.fprintf log "-The second site of the first agent is modified:\n";
+  Loggers.fprintf log "-The second site of the first agent can be modified:\n";
   Ckappa_sig.Rule_map_and_set.Map.iter
     (fun rule_id set ->
        Loggers.fprintf log "rule_id:%i\n"
@@ -333,7 +333,7 @@ let print_first_site_y_modified parameter error handler_kappa log store_result =
             in
             let () =
               Loggers.fprintf log
-                "Sites that are modified:\nagent_id:%i:agent_type:%i:%s:site_type:%i:%s:state:%i:%s\n"
+                "agent_id:%i:agent_type:%i:%s:site_type:%i:%s:state:%i:%s\n"
                 (Ckappa_sig.int_of_agent_id agent_id)
                 (Ckappa_sig.int_of_agent_name agent_type)
                 agent_string
@@ -343,29 +343,29 @@ let print_first_site_y_modified parameter error handler_kappa log store_result =
                 state_string2
             in
             let () =
-              Loggers.fprintf log
-                "Tuples\n:agent_id:%i:agent_type:%i:%s:site_type:%i:%s:site_type:%i:%s:state:%i:%s:state:%i:%s->agent_id:%i:agent_type:%i:%s:site_type:%i:%s:site_type:%i:%s:state:%i:%s:state:%i:%s\n"
-                (Ckappa_sig.int_of_agent_id agent_id)
-                (Ckappa_sig.int_of_agent_name agent_type)
-                agent_string
-                (Ckappa_sig.int_of_site_name site_type)
-                site_string
-                (Ckappa_sig.int_of_site_name site_type2)
-                site_string2
-                (Ckappa_sig.int_of_state_index state)
-                state_string
-                (Ckappa_sig.int_of_state_index state2)
-                state_string2
+            Loggers.fprintf log
+              "agent_id:%i:agent_type:%i:%s:site_type:%i:%s:state:%i:%s:site_type:%i:%s:state:%i:%s->agent_id:%i:agent_type:%i:%s:site_type:%i:%s:state:%i:%s:site_type:%i:%s:state:%i:%s\n"
+              (Ckappa_sig.int_of_agent_id agent_id)
+              (Ckappa_sig.int_of_agent_name agent_type)
+              agent_string
+              (Ckappa_sig.int_of_site_name site_type)
+              site_string
+              (Ckappa_sig.int_of_state_index state)
+              state_string
+              (Ckappa_sig.int_of_site_name site_type2)
+              site_string2
+              (Ckappa_sig.int_of_state_index state2)
+              state_string2
 (**)
 (Ckappa_sig.int_of_agent_id agent_id')
 (Ckappa_sig.int_of_agent_name agent_type')
 agent_string'
 (Ckappa_sig.int_of_site_name site_type')
 site_string'
-(Ckappa_sig.int_of_site_name site_type2')
-site_string2'
 (Ckappa_sig.int_of_state_index state')
 state_string'
+(Ckappa_sig.int_of_site_name site_type2')
+site_string2'
 (Ckappa_sig.int_of_state_index state2')
 state_string2'
             in
@@ -374,7 +374,7 @@ state_string2'
     ) store_result
 
     let print_snd_site_t_modified parameter error handler_kappa log store_result =
-      Loggers.fprintf log "-The second site of the second agent is modified:\n";
+      Loggers.fprintf log "-The second site of the second agent can be modified:\n";
       Ckappa_sig.Rule_map_and_set.Map.iter
         (fun rule_id set ->
            Loggers.fprintf log "rule_id:%i\n"
@@ -387,7 +387,7 @@ state_string2'
                 in
                 let () =
                   Loggers.fprintf log
-                    "Sites that are modified:\nagent_id:%i:agent_type:%i:%s:site_type:%i:%s:state:%i:%s\n"
+                    "agent_id:%i:agent_type:%i:%s:site_type:%i:%s:state:%i:%s\n"
                     (Ckappa_sig.int_of_agent_id agent_id')
                     (Ckappa_sig.int_of_agent_name agent_type')
                     agent_string'
@@ -397,32 +397,154 @@ state_string2'
                     state_string2'
                 in
                 let () =
-                  Loggers.fprintf log
-                    "Tuples\n:agent_id:%i:agent_type:%i:%s:site_type:%i:%s:site_type:%i:%s:state:%i:%s:state:%i:%s->agent_id:%i:agent_type:%i:%s:site_type:%i:%s:site_type:%i:%s:state:%i:%s:state:%i:%s\n"
-                    (Ckappa_sig.int_of_agent_id agent_id)
-                    (Ckappa_sig.int_of_agent_name agent_type)
-                    agent_string
-                    (Ckappa_sig.int_of_site_name site_type)
-                    site_string
-                    (Ckappa_sig.int_of_site_name site_type2)
-                    site_string2
-                    (Ckappa_sig.int_of_state_index state)
-                    state_string
-                    (Ckappa_sig.int_of_state_index state2)
-                    state_string2
+                Loggers.fprintf log
+                  "agent_id:%i:agent_type:%i:%s:site_type:%i:%s:state:%i:%s:site_type:%i:%s:state:%i:%s->agent_id:%i:agent_type:%i:%s:site_type:%i:%s:state:%i:%s:site_type:%i:%s:state:%i:%s\n"
+                  (Ckappa_sig.int_of_agent_id agent_id)
+                  (Ckappa_sig.int_of_agent_name agent_type)
+                  agent_string
+                  (Ckappa_sig.int_of_site_name site_type)
+                  site_string
+                  (Ckappa_sig.int_of_state_index state)
+                  state_string
+                  (Ckappa_sig.int_of_site_name site_type2)
+                  site_string2
+                  (Ckappa_sig.int_of_state_index state2)
+                  state_string2
     (**)
     (Ckappa_sig.int_of_agent_id agent_id')
     (Ckappa_sig.int_of_agent_name agent_type')
     agent_string'
     (Ckappa_sig.int_of_site_name site_type')
     site_string'
-    (Ckappa_sig.int_of_site_name site_type2')
-    site_string2'
     (Ckappa_sig.int_of_state_index state')
     state_string'
+    (Ckappa_sig.int_of_site_name site_type2')
+    site_string2'
     (Ckappa_sig.int_of_state_index state2')
     state_string2'
                 in
                 ()
              ) set
         ) store_result
+
+let print_first_site_is_bound parameter error handler_kappa log store_result =
+Loggers.fprintf log "-The first site can be bound:\n";
+Ckappa_sig.Rule_map_and_set.Map.iter
+  (fun rule_id set ->
+     Loggers.fprintf log "rule_id:%i\n"
+       (Ckappa_sig.int_of_rule_id rule_id);
+     Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.iter (fun (x, y) ->
+         let (agent_id, agent_type, site_type, site_type2, state, state2) = x in
+         let (agent_id', agent_type', site_type', site_type2', state', state2') = y in
+         let _, ((agent_string, site_string, site_string2, state_string, state_string2),(agent_string', site_string', site_string2', state_string', state_string2')) =
+           print_pair_agents_sites_states parameter error handler_kappa log (x, y)
+          in
+          let () =
+            Loggers.fprintf log
+              "agent_id:%i:agent_type:%i:%s:site_type:%i:%s:state:%i:%s\n"
+              (Ckappa_sig.int_of_agent_id agent_id)
+              (Ckappa_sig.int_of_agent_name agent_type)
+              agent_string
+              (Ckappa_sig.int_of_site_name site_type)
+              site_string
+              (Ckappa_sig.int_of_state_index state)
+              state_string
+          in
+          let () =
+            Loggers.fprintf log
+              "agent_id:%i:agent_type:%i:%s:site_type:%i:%s:state:%i:%s:site_type:%i:%s:state:%i:%s->agent_id:%i:agent_type:%i:%s:site_type:%i:%s:state:%i:%s:site_type:%i:%s:state:%i:%s\n"
+              (Ckappa_sig.int_of_agent_id agent_id)
+              (Ckappa_sig.int_of_agent_name agent_type)
+              agent_string
+              (Ckappa_sig.int_of_site_name site_type)
+              site_string
+              (Ckappa_sig.int_of_state_index state)
+              state_string
+              (Ckappa_sig.int_of_site_name site_type2)
+              site_string2
+              (Ckappa_sig.int_of_state_index state2)
+              state_string2
+(**)
+(Ckappa_sig.int_of_agent_id agent_id')
+(Ckappa_sig.int_of_agent_name agent_type')
+agent_string'
+(Ckappa_sig.int_of_site_name site_type')
+site_string'
+(Ckappa_sig.int_of_state_index state')
+state_string'
+(Ckappa_sig.int_of_site_name site_type2')
+site_string2'
+(Ckappa_sig.int_of_state_index state2')
+state_string2'
+          in
+          ()
+       ) set
+  ) store_result
+
+let print_tuple parameter error handler_kappa log (x, y) =
+let (agent_id, agent_type, site_type, site_type2, state, state2) = x in
+let (agent_id', agent_type', site_type', site_type2', state', state2') = y in
+let _, ((agent_string, site_string, site_string2, state_string, state_string2),(agent_string', site_string', site_string2', state_string', state_string2')) =
+  print_pair_agents_sites_states parameter error handler_kappa log (x, y)
+in
+  Loggers.fprintf log
+    "agent_id:%i:agent_type:%s(site_type:%i:%s%i:%s;site_type:%i:%s:%i:%s)-> agent_id:%i:agent_type:%s(site_type:%i:%s:%i:%s;site_type:%i:%s:%i:%s)\n"
+    (Ckappa_sig.int_of_agent_id agent_id)
+    agent_string
+    (Ckappa_sig.int_of_site_name site_type)
+    site_string
+    (Ckappa_sig.int_of_state_index state)
+    state_string
+    (Ckappa_sig.int_of_site_name site_type2)
+    site_string2
+    (Ckappa_sig.int_of_state_index state2)
+    state_string2
+    (**)
+    (Ckappa_sig.int_of_agent_id agent_id')
+    agent_string'
+    (Ckappa_sig.int_of_site_name site_type')
+    site_string'
+    (Ckappa_sig.int_of_state_index state')
+    state_string'
+    (Ckappa_sig.int_of_site_name site_type2')
+    site_string2'
+    (Ckappa_sig.int_of_state_index state2')
+    state_string2'
+
+
+let print_init parameter error handler_kappa log store_result =
+  Loggers.fprintf log "-Inititial states:\n";
+  Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.iter
+    (fun (x, y) ->
+       print_tuple parameter error handler_kappa log (x, y)
+    ) store_result
+
+(*------------------------------------------------------------*)
+(*dynamic information*)
+
+let print_relation_mvbdu parameter error handler_kappa log store_result =
+  Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.iter
+    (fun (x, y) mvbdu ->
+       Loggers.fprintf log "-Dynamic information: the relation between the state of the second sites when both agents are connected via its first site:\n";
+       let () = print_tuple parameter error handler_kappa log (x, y) in
+       let () = Ckappa_sig.Views_bdu.print parameter mvbdu in
+       ()
+    ) store_result
+
+let print_range_site_first_agent parameter error handler_kappa log store_result =
+  Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.iter
+    (fun (x, y) mvbdu ->
+       Loggers.fprintf log "The range of the second site of the first agent:\n";
+       let () = print_tuple parameter error handler_kappa log (x, y) in
+       let () = Ckappa_sig.Views_bdu.print parameter mvbdu in
+       ()
+    ) store_result
+
+let print_range_site_second_agent parameter error handler_kappa log store_result =
+  Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.iter
+    (fun (x, y) mvbdu ->
+       Loggers.fprintf log "The range of the second site of the second agent:\n";
+       let () = print_tuple parameter error handler_kappa log (x, y) in
+       let () = Ckappa_sig.Views_bdu.print parameter mvbdu in
+       ()
+    ) store_result
