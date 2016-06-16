@@ -929,12 +929,12 @@ Id=97
 EXTENSIONAL DESCRIPTION:
 The internal state of site z in agent A ranges over u and q.
 INTENSIONAL DESCRIPTION:
-Id=163
+Id=172
  Node(site_type:1<0)
   Id=0
    Leaf False 
 
-  Id=153
+  Id=158
    Node(site_type:1<3)
     Id=1
      Leaf True 
@@ -945,12 +945,12 @@ Id=163
 EXTENSIONAL DESCRIPTION:
 The internal state of site y in agent A ranges over u, p, and q.
 INTENSIONAL DESCRIPTION:
-Id=131
+Id=136
  Node(site_type:0<0)
   Id=0
    Leaf False 
 
-  Id=130
+  Id=135
    Node(site_type:0<4)
     Id=1
      Leaf True 
