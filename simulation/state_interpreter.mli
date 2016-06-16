@@ -20,6 +20,11 @@ val observables_values :
 (** Returns (the current biological time, an array of the current
 values of observables) *)
 
+val do_modification :
+  outputs:(Data.t -> unit) -> Environment.t -> Connected_component.Env.t ->
+  Counter.t -> Rule_interpreter.t -> t -> Primitives.modification ->
+  bool * Rule_interpreter.t * t
+
 val activity : t -> float
 (** Returns the current activity *)
 
@@ -34,9 +39,21 @@ val end_of_simulation :
   (((bool*bool*bool)*bool)*Trace.t) option
 (** What to do after stopping simulation. Returns maybe a trace *)
 
+val finalize :
+  outputs:(Data.t -> unit) -> called_from:Remanent_parameters_sig.called_from ->
+  bool -> Format.formatter ->
+  Environment.t -> Counter.t -> Rule_interpreter.t -> t -> unit
+
 val loop :
   outputs:(Data.t -> unit) -> dotCflows:bool ->
   Format.formatter -> Environment.t -> Connected_component.Env.t ->
   Counter.t -> Rule_interpreter.t -> t -> unit
 (** [loop message_formatter env domain counter graph]
  does a simulation in the command-line setting *)
+
+val interactive_loop :
+  outputs:(Data.t -> unit) -> Format.formatter ->
+  Alg_expr.t Ast.bool_expr -> Environment.t -> Connected_component.Env.t ->
+  Counter.t -> Rule_interpreter.t -> t -> (bool * Rule_interpreter.t * t)
+(** [interactive_loop message_formatter env domain counter graph]
+ does a simulation in the command-line setting up to an interruption *)

@@ -11,7 +11,7 @@
 %token SQRT EXPONENT INFINITY TIME EVENT NULL_EVENT PIPE EQUAL AND OR
 %token GREATER SMALLER TRUE FALSE DIFF KAPPA_RAR KAPPA_LRAR KAPPA_LNK
 %token SIGNATURE INIT LET PLOT PERT OBS TOKEN CONFIG KAPPA_WLD KAPPA_SEMI
-%token FLUX ASSIGN ASSIGN2 PRINTF STOP SNAPSHOT
+%token FLUX ASSIGN ASSIGN2 PRINTF STOP SNAPSHOT RUN
 %token <int> INT
 %token <string> ID
 %token <string> KAPPA_MRK LABEL
@@ -29,6 +29,9 @@
 
 %start start_rule
 %type <(Ast.agent,Ast.mixture,string,Ast.rule) Ast.compil -> (Ast.agent,Ast.mixture,string,Ast.rule) Ast.compil> start_rule
+
+%start interactive_command
+%type <(Ast.mixture,string) Ast.command> interactive_command
 
 %% /*Grammar rules*/
 
@@ -411,4 +414,11 @@ link_state:
 		  (add_pos "Invalid link state"))}
 ;
 
+interactive_command:
+	| RUN NEWLINE {Ast.RUN (Ast.FALSE)}
+	| RUN bool_expr NEWLINE {Ast.RUN (fst $2)}
+	| effect NEWLINE {Ast.MODIFY $1}
+	| EOF {Ast.QUIT}
+	| error
+	{raise (ExceptionDefn.Syntax_Error (add_pos "Unrecognized command"))}
 %%

@@ -25,6 +25,8 @@ let init sigs tokens algs (deps_in_t,deps_in_e,tok_rd,alg_rd)
   }
 
 let signatures env = env.signatures
+let tokens_finder env = env.tokens.NamedDecls.finder
+let algs_finder env = env.algs.NamedDecls.finder
 
 let num_of_agent nme env =
   Signature.num_of_agent nme env.signatures

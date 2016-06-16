@@ -54,6 +54,16 @@ val print_rule :
   (Format.formatter -> int -> unit) -> (Format.formatter -> int -> unit) ->
   Format.formatter -> rule -> unit
 
+val bool_expr_of_ast :
+  Signature.s -> int Mods.StringMap.t -> int Mods.StringMap.t ->
+  (((String.t * Location.t) * Ast.port list) list, Mods.StringMap.elt)
+    Ast.ast_alg_expr Ast.bool_expr Location.annot ->
+  (rule_agent list, int) Ast.ast_alg_expr Ast.bool_expr Location.annot
+val modif_expr_of_ast :
+  Signature.s -> int Mods.StringMap.t -> int Mods.StringMap.t ->
+  (((String.t * Location.t) * Ast.port list) list, Mods.StringMap.elt)
+  Ast.modif_expr -> int list -> (rule_agent list, int) Ast.modif_expr * int list
+
 val compil_of_ast :
   (string * Nbr.t) list ->
   (Ast.agent, Ast.mixture, string, Ast.rule) Ast.compil ->

@@ -34,6 +34,7 @@ module PreEnv : sig
 
     val empty : Signature.s -> t
     val finalize : t -> Env.t
+    val of_env : Env.t -> t
   end
 (** {6 Create a connected component} *)
 

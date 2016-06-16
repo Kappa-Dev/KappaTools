@@ -20,7 +20,7 @@ let initial_activity get_alg env counter graph activities =
     (fun i () rule ->
      if Array.length rule.Primitives.connected_components = 0 then
        let rate = Rule_interpreter.value_alg
-		    counter graph ~get_alg (fst rule.Primitives.rate) in
+           counter graph ~get_alg (fst rule.Primitives.rate) in
        Random_tree.add (2*i) (Nbr.to_float rate) activities)
     () env
 
@@ -415,4 +415,24 @@ let loop ~outputs ~dotCflows form env domain counter graph state =
       let () = Sys.set_signal Sys.sigint old_sigint_behavior in
       finalize ~outputs ~called_from dotCflows form env counter graph' state'
     else let () = Counter.tick form counter in iter graph' state'
+  in iter graph state
+
+let interactive_loop ~outputs form pause_criteria env domain counter graph state =
+  let get_alg i = get_alg env state i in
+  let user_interrupted = ref false in
+  let old_sigint_behavior =
+    Sys.signal
+      Sys.sigint (Sys.Signal_handle (fun _ -> user_interrupted := true)) in
+  let rec iter graph state =
+    if !user_interrupted ||
+       Rule_interpreter.value_bool counter graph ~get_alg pause_criteria then
+      let () = Sys.set_signal Sys.sigint old_sigint_behavior in
+      (false,graph,state)
+    else
+      let stop,graph',state' as out =
+        a_loop ~outputs env domain counter graph state in
+      if stop then
+        let () = Sys.set_signal Sys.sigint old_sigint_behavior in
+        out
+      else let () = Counter.tick form counter in iter graph' state'
   in iter graph state

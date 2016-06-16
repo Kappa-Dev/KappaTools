@@ -58,6 +58,7 @@ rule token = parse
 		      | "$PRINT" -> PRINTF
 		      | "$PRINTF" -> PRINTF
 		      | "$PLOTENTRY" -> PLOTENTRY
+		      | "$RUN" -> RUN
 		      | s ->
 			 raise
 			   (Syntax_Error

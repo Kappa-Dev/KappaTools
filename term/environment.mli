@@ -18,8 +18,11 @@ val nb_algs : t -> int
 val nb_rules : t -> int
 val nb_syntactic_rules : t -> int
 val nb_perturbations : t -> int
-val signatures : t -> Signature.s
 val connected_components_of_unary_rules : t -> Connected_component.Set.t
+
+val signatures : t -> Signature.s
+val tokens_finder : t -> int Mods.StringMap.t
+val algs_finder : t -> int Mods.StringMap.t
 
 val get_alg : t -> int -> Alg_expr.t
 val get_perturbation : t -> int -> Primitives.perturbation

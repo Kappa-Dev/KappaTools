@@ -116,6 +116,11 @@ type ('mixture,'id) instruction =
   | PERT     of ('mixture,'id) perturbation
   | CONFIG   of configuration
 
+type ('mixture,'id) command =
+  | RUN of ('mixture,'id) ast_alg_expr bool_expr
+  | MODIFY of ('mixture,'id) modif_expr
+  | QUIT
+
 type ('agent,'mixture,'id,'rule) compil =
     {
       variables :

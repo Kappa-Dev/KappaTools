@@ -12,6 +12,7 @@ let (maxTimeValue:float option ref) = ref None
 let (pointNumberValue:int ref) = ref (-1)
 let (rescale:float option ref) = ref None
 let implicitSignature = ref false
+let interactive = ref false
 
 (*Name convention*)
 let marshalizedInFile = ref ""
@@ -63,6 +64,8 @@ let () =
      "file name for dumping the simulation trace") ;
     ("--implicit-signature", Arg.Set implicitSignature,
      "Program will guess agent signatures automatically") ;
+    ("--interactive", Arg.Set interactive,
+     "Run interactively") ;
     ("-seed", Arg.Int (fun i -> seedValue := Some i),
      "Seed for the random number generator") ;
     ("--eclipse", Arg.Set Parameter.eclipseMode,
@@ -132,7 +135,7 @@ let () =
       Counter.create
 	~init_t:0. ~init_e:0 ?max_t:!maxTimeValue ?max_e:!maxEventValue
 	~nb_points:!pointNumberValue in
-    let (env_store, cc_env, updated_vars, story_compression,
+    let (env_store, cc_env, contact_map, updated_vars, story_compression,
 	 unary_distances, dotCflows, init_l as init_result),
       alg_overwrite =
       match !marshalizedInFile with
@@ -152,7 +155,7 @@ let () =
 	    ~pause:(fun f -> f ()) ~return:(fun x -> x)
 	    ?rescale_init:!rescale ~outputs:(Outputs.go (Signature.create []))
 	    sigs_nd tk_nd contact_map counter result' in
-	(env, cc_env, updated_vars, story_compression,
+	(env, cc_env, contact_map, updated_vars, story_compression,
 	 unary_distances, dotCflow, init_l),[]
       | marshalized_file ->
 	 try
@@ -165,11 +168,11 @@ let () =
 		    f "Simulation package loaded, all kappa files are ignored") in
 	   let () = Format.printf "+ Loading simulation package %s...@."
 				  marshalized_file in
-	   let env,cc_env,updated_vars,story_compression,
+	   let env,cc_env,contact_map,updated_vars,story_compression,
 	       unary_distances,dotCflow,init_l =
 	     (Marshal.from_channel d :
-		Environment.t*Connected_component.Env.t*int list*
-		  (bool*bool*bool) option*bool option*bool*
+	 Environment.t*Connected_component.Env.t*Primitives.contact_map*
+  int list* (bool*bool*bool) option*bool option*bool*
 		    (Alg_expr.t * Primitives.elementary_rule * Location.t) list) in
 	   let () = Pervasives.close_in d  in
 	   let alg_overwrite =
@@ -181,7 +184,7 @@ let () =
 	   let updated_vars' =
 	     List.fold_left
 	       (fun acc (i,_) -> i::acc) updated_vars alg_overwrite in
-	   (env,cc_env,updated_vars',story_compression,
+	   (env,cc_env,contact_map,updated_vars',story_compression,
 	    unary_distances,dotCflow,init_l),
 	   alg_overwrite
 	 with
@@ -246,10 +249,84 @@ let () =
 
     Parameter.initSimTime () ;
     let () =
-      State_interpreter.loop
-	~outputs:(Outputs.go (Environment.signatures env)) ~dotCflows
-	Format.std_formatter env cc_env counter graph state
-    in
+      let outputs = Outputs.go (Environment.signatures env) in
+      if !interactive then
+        let () =
+          Format.printf
+            "@[KaSim@ toplevel:@ type@ $RUN@ (optionnaly@ followed@ by@ a\
+@ pause@ criteria)@ to@ launch@ the@ simulation@ or@ a@ perturbation\
+@ effect@ to@ perform@ it@]" in
+        let lexbuf = Lexing.from_channel stdin in
+        let rec toplevel cc_env graph state =
+          let () = Format.printf "@.> @?" in
+          let cc_env',(stop,graph',state') =
+            try
+              match KappaParser.interactive_command KappaLexer.token lexbuf with
+              | Ast.RUN b ->
+                let cc_preenv = Connected_component.PreEnv.of_env cc_env in
+                let b' =
+                  LKappa.bool_expr_of_ast
+                    (Environment.signatures env) (Environment.tokens_finder env)
+                    (Environment.algs_finder env) (Location.dummy_annot b) in
+                let cc_preenv',(b'',pos_b'') =
+                  Eval.compile_bool contact_map cc_preenv b' in
+                let cc_env' =
+                  if cc_preenv == cc_preenv' then cc_env
+                  else Connected_component.PreEnv.finalize cc_preenv' in
+                cc_env',
+                if try Alg_expr.stops_of_bool_expr
+                         (Environment.all_dependencies env) b'' <> []
+                  with ExceptionDefn.Unsatisfiable -> true then
+                  let () =
+                    Pp.error Format.pp_print_string
+                      ("[T] can only be used in inequalities",pos_b'') in
+                  (false,graph,state)
+                else State_interpreter.interactive_loop
+                    ~outputs
+                    Format.std_formatter b'' env cc_env' counter graph state
+              | Ast.QUIT -> cc_env,(true,graph,state)
+              | Ast.MODIFY e ->
+                let cc_preenv = Connected_component.PreEnv.of_env cc_env in
+                match LKappa.modif_expr_of_ast
+                        (Environment.signatures env)
+                        (Environment.tokens_finder env)
+                        (Environment.algs_finder env) e [] with
+                | _, _::_ ->
+                  let () =
+                    Pp.error Format.pp_print_string
+                      (Location.dummy_annot "$UPDATE is not implemented (yet?)") in
+                  cc_env,(false,graph,state)
+                | e', [] ->
+                  let cc_preenv', e'' = Eval.compile_modification_no_update
+                      contact_map cc_preenv e' in
+                  let cc_env' =
+                    if cc_preenv == cc_preenv' then cc_env
+                    else Connected_component.PreEnv.finalize cc_preenv' in
+                  cc_env',
+                  List.fold_left
+                    (fun (stop,graph',state' as acc) x ->
+                       if stop then acc else
+                         State_interpreter.do_modification
+                           ~outputs env cc_env' counter graph' state' x)
+                    (false,graph,state) e''
+            with
+            | ExceptionDefn.Syntax_Error (msg,pos) ->
+              let () = Pp.error Format.pp_print_string (msg,pos) in
+              cc_env,(false,graph,state)
+            | ExceptionDefn.Malformed_Decl er ->
+              let () = Pp.error Format.pp_print_string er in
+              cc_env,(false,graph,state) in
+          if stop then
+            State_interpreter.finalize
+              ~outputs ~called_from:Remanent_parameters_sig.KaSim dotCflows
+              Format.std_formatter env counter graph' state'
+          else
+            toplevel cc_env' graph' state' in
+        toplevel cc_env graph state
+      else
+        State_interpreter.loop
+          ~outputs ~dotCflows
+          Format.std_formatter env cc_env counter graph state in
     Format.printf "Simulation ended";
     if Counter.nb_null_event counter = 0 then Format.print_newline()
     else

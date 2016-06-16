@@ -182,92 +182,93 @@ let cflows_of_label contact_map domain on algs rules (label,pos) rev_effects =
   (domain',
    List.fold_left (fun x (y,t) -> adds t x y) rev_effects ccs)
 
+let rule_effect
+    contact_map domain alg_expr (mix,created,rm,add) mix_pos rev_effects =
+  let ast_rule =
+    { LKappa.r_mix = mix; LKappa.r_created = created;
+      LKappa.r_rm_tokens = rm; LKappa.r_add_tokens = add;
+      LKappa.r_rate = Location.dummy_annot (CONST Nbr.zero);
+      LKappa.r_un_rate = None; } in
+  let (domain',alg_pos) =
+    compile_alg contact_map domain alg_expr in
+  let domain'',_,_,elem_rules =
+    rules_of_ast
+      contact_map domain' ~syntax_ref:0 [] (ast_rule,mix_pos) in
+  let elem_rule = match elem_rules with
+    | [ r ] -> r
+    | _ ->
+      raise
+        (ExceptionDefn.Malformed_Decl
+           ("Ambiguous rule in perturbation is impossible",mix_pos)) in
+  (domain'',
+   (Primitives.ITER_RULE (alg_pos, elem_rule))::rev_effects)
+
 let effects_of_modif
-      ast_algs ast_rules contact_map domain ast_list =
-  let rec iter rev_effects domain ast_list =
-    let rule_effect alg_expr (mix,created,rm,add) mix_pos =
-      let ast_rule =
-	{ LKappa.r_mix = mix; LKappa.r_created = created;
-	  LKappa.r_rm_tokens = rm; LKappa.r_add_tokens = add;
-	  LKappa.r_rate = Location.dummy_annot (CONST Nbr.zero);
-	  LKappa.r_un_rate = None; } in
-      let (domain',alg_pos) =
-	compile_alg contact_map domain alg_expr in
-      let domain'',_,_,elem_rules =
-	rules_of_ast
-	  contact_map domain' ~syntax_ref:0 [] (ast_rule,mix_pos) in
-      let elem_rule = match elem_rules with
-	| [ r ] -> r
-	| _ ->
-	   raise
-	     (ExceptionDefn.Malformed_Decl
-		("Ambiguous rule in perturbation is impossible",mix_pos)) in
-      (domain'',
-       (Primitives.ITER_RULE (alg_pos, elem_rule))::rev_effects) in
-    match ast_list with
-    | [] -> (domain,List.rev rev_effects)
-    | ast::tl ->
-       let (domain,rev_effects) =
-	 match ast with
-	 | INTRO (alg_expr, (ast_mix,mix_pos)) ->
-	    rule_effect
-	      alg_expr ([],LKappa.to_raw_mixture
-			     (Connected_component.PreEnv.sigs domain) ast_mix,
-			[],[]) mix_pos
-	 | DELETE (alg_expr, (ast_mix, mix_pos)) ->
-	    rule_effect
-	      alg_expr (LKappa.to_erased ast_mix,[],[],[]) mix_pos
-	 | UPDATE ((i, _), alg_expr) ->
-	    let (domain', alg_pos) =
-	      compile_alg contact_map domain alg_expr in
-	    (domain',(Primitives.UPDATE (i, alg_pos))::rev_effects)
-	 | UPDATE_TOK ((tk_id,tk_pos),alg_expr) ->
-	    rule_effect (Location.dummy_annot (Ast.CONST (Nbr.one)))
-			([],[],
-			 [Location.dummy_annot (Ast.TOKEN_ID tk_id), tk_id],
-			 [(alg_expr, tk_id)])
-			tk_pos
-	 | SNAPSHOT pexpr ->
-	    let (domain',pexpr') =
-	      compile_print_expr contact_map domain pexpr in
-	    (*when specializing snapshots to particular mixtures, add variables below*)
-	    (domain', (Primitives.SNAPSHOT pexpr')::rev_effects)
-	 | STOP pexpr ->
-	    let (domain',pexpr') =
-	      compile_print_expr contact_map domain pexpr in
-	    (domain', (Primitives.STOP pexpr')::rev_effects)
-	 | CFLOWLABEL (on,lab) ->
-	    cflows_of_label
-	      contact_map domain on ast_algs ast_rules lab rev_effects
-	 | CFLOWMIX (on,(ast,_)) ->
-	    let adds tests l x =
-	      if on then Primitives.CFLOW (None,x,tests) :: l
-	      else Primitives.CFLOWOFF x :: l in
-	    let domain',ccs =
-	      Snip.connected_components_sum_of_ambiguous_mixture
-		contact_map domain ~origin:(Operator.PERT(-1)) ast in
-	    (domain',
-	     List.fold_left (fun x (y,t) -> adds t x y) rev_effects ccs)
-	 | FLUX (rel,pexpr) ->
-	    let (domain',pexpr') =
-	      compile_print_expr contact_map domain pexpr in
-	    (domain', (Primitives.FLUX (rel,pexpr'))::rev_effects)
-	 | FLUXOFF pexpr ->
-	    let (domain',pexpr') =
-	      compile_print_expr contact_map domain pexpr in
-	    (domain', (Primitives.FLUXOFF pexpr')::rev_effects)
-	 | PRINT (pexpr,print) ->
-	    let (domain',pexpr') =
-	      compile_print_expr contact_map domain pexpr in
-	    let (domain'',print') =
-	      compile_print_expr contact_map domain' print in
-	    (domain'', (Primitives.PRINT (pexpr',print'))::rev_effects)
-	 | PLOTENTRY ->
-	    (domain, (Primitives.PLOTENTRY)::rev_effects)
-       in
-       iter rev_effects domain tl
-  in
-  iter [] domain ast_list
+    ast_algs ast_rules contact_map (domain,rev_effects) = function
+  | INTRO (alg_expr, (ast_mix,mix_pos)) ->
+    rule_effect contact_map domain alg_expr
+      ([],LKappa.to_raw_mixture (Connected_component.PreEnv.sigs domain) ast_mix,
+       [],[]) mix_pos rev_effects
+  | DELETE (alg_expr, (ast_mix, mix_pos)) ->
+    rule_effect contact_map domain alg_expr
+      (LKappa.to_erased ast_mix,[],[],[]) mix_pos rev_effects
+  | UPDATE ((i, _), alg_expr) ->
+    let (domain', alg_pos) =
+      compile_alg contact_map domain alg_expr in
+    (domain',(Primitives.UPDATE (i, alg_pos))::rev_effects)
+  | UPDATE_TOK ((tk_id,tk_pos),alg_expr) ->
+    rule_effect contact_map domain
+      (Location.dummy_annot (Ast.CONST (Nbr.one)))
+      ([],[],
+       [Location.dummy_annot (Ast.TOKEN_ID tk_id), tk_id],
+       [(alg_expr, tk_id)])
+      tk_pos rev_effects
+  | SNAPSHOT pexpr ->
+    let (domain',pexpr') =
+      compile_print_expr contact_map domain pexpr in
+    (*when specializing snapshots to particular mixtures, add variables below*)
+    (domain', (Primitives.SNAPSHOT pexpr')::rev_effects)
+  | STOP pexpr ->
+    let (domain',pexpr') =
+      compile_print_expr contact_map domain pexpr in
+    (domain', (Primitives.STOP pexpr')::rev_effects)
+  | CFLOWLABEL (on,lab) ->
+    cflows_of_label
+      contact_map domain on ast_algs ast_rules lab rev_effects
+  | CFLOWMIX (on,(ast,_)) ->
+    let adds tests l x =
+      if on then Primitives.CFLOW (None,x,tests) :: l
+      else Primitives.CFLOWOFF x :: l in
+    let domain',ccs =
+      Snip.connected_components_sum_of_ambiguous_mixture
+	contact_map domain ~origin:(Operator.PERT(-1)) ast in
+    (domain',
+     List.fold_left (fun x (y,t) -> adds t x y) rev_effects ccs)
+  | FLUX (rel,pexpr) ->
+    let (domain',pexpr') =
+      compile_print_expr contact_map domain pexpr in
+    (domain', (Primitives.FLUX (rel,pexpr'))::rev_effects)
+  | FLUXOFF pexpr ->
+    let (domain',pexpr') =
+      compile_print_expr contact_map domain pexpr in
+    (domain', (Primitives.FLUXOFF pexpr')::rev_effects)
+  | PRINT (pexpr,print) ->
+    let (domain',pexpr') =
+      compile_print_expr contact_map domain pexpr in
+    let (domain'',print') =
+      compile_print_expr contact_map domain' print in
+    (domain'', (Primitives.PRINT (pexpr',print'))::rev_effects)
+  | PLOTENTRY ->
+    (domain, (Primitives.PLOTENTRY)::rev_effects)
+
+let compile_modification_no_update contact_map domain m =
+  effects_of_modif [] [] contact_map (domain,[]) m
+
+let effects_of_modifs ast_algs ast_rules contact_map domain l =
+  let domain',rev_effects =
+    List.fold_left (effects_of_modif ast_algs ast_rules contact_map)
+      (domain,[]) l in
+  domain',List.rev rev_effects
 
 let pert_of_result ast_algs ast_rules contact_map domain res =
   let (domain, _, lpert,tracking_enabled) =
@@ -277,7 +278,7 @@ let pert_of_result ast_algs ast_rules contact_map domain res =
        let (domain',(pre,pre_pos)) =
 	 compile_bool contact_map domain pre_expr in
        let (domain, effects) =
-	 effects_of_modif
+	 effects_of_modifs
 	   ast_algs ast_rules contact_map domain' modif_expr_list in
        let domain,opt =
 	 match opt_post with

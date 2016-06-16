@@ -382,94 +382,98 @@ let print_point_dot sigs f (id,point) =
 		 style (print_sons_dot sigs id point.content) point.sons
 
 module Env : sig
-    type t = {
-	sig_decl: Signature.s;
-	domain: point array;
-	single_agent_points: (cc*Operator.DepSet.t) IntMap.t;
-      }
+  type t = {
+    sig_decl: Signature.s;
+    id_by_type: int list array;
+    nb_id: int;
+    domain: point array;
+    single_agent_points: (cc*Operator.DepSet.t) IntMap.t;
+  }
 
-    val navigate :
-      t -> Navigation.t -> (int * Renaming.t list * point) option
-    val get : t -> int -> point
-    val get_single_agent : int -> t -> (cc * Operator.DepSet.t) option
-    val print : Format.formatter -> t -> unit
-    val print_dot : Format.formatter -> t -> unit
-  end = struct
-    type t = {
-	sig_decl: Signature.s;
-	domain: point array;
-	single_agent_points: (cc*Operator.DepSet.t) IntMap.t;
-      }
+  val navigate :
+    t -> Navigation.t -> (int * Renaming.t list * point) option
+  val get : t -> int -> point
+  val get_single_agent : int -> t -> (cc * Operator.DepSet.t) option
+  val print : Format.formatter -> t -> unit
+  val print_dot : Format.formatter -> t -> unit
+end = struct
+  type t = {
+    sig_decl: Signature.s;
+    id_by_type: int list array;
+    nb_id: int;
+    domain: point array;
+    single_agent_points: (cc*Operator.DepSet.t) IntMap.t;
+  }
 
-    let print f env =
-      let pp_point f p =
-	Format.fprintf
-	  f "@[<hov 2>(%a)@ -> @[<h>%a@]@ %t-> @[(%a)@]@]"
-	  (Pp.list Pp.space Format.pp_print_int) p.fathers
-	  (print ~sigs:env.sig_decl ~with_id:()) p.content
-	  (fun f ->
-	   match p.is_obs_of with
-	   | None -> ()
-	   | Some deps ->
-	      Format.fprintf
-		f "@[[%a]@]@ "
-		(Pp.set Operator.DepSet.elements Pp.space Operator.print_rev_dep)
-		deps)
-	  (Pp.list
-	     Pp.space
-	     (fun f s ->
-	      Format.fprintf
-		f "@[%a%a@ %i[@[%a@]]@]"
-		(Navigation.print_step env.sig_decl (find_ty p.content)) s.next
-		(Pp.list
-		   Pp.space
-		   (fun f -> Format.fprintf f "(@[%a@])" Renaming.print))
-		s.inj s.dst
-		(Pp.set IntSet.elements Pp.space Format.pp_print_int)
-		s.above_obs))
-	  p.sons in
+  let print f env =
+    let pp_point f p =
       Format.fprintf
-	f "@[<v>%a%a@]"
-	(Pp.set IntMap.bindings Pp.space ~trailing:Pp.space
-		(fun f (_,(cc,deps)) ->
-		 Format.fprintf
-		   f "@[<h>%a@] @[[%a]@]" (print ~sigs:env.sig_decl ~with_id:()) cc
-		   (Pp.set Operator.DepSet.elements Pp.space Operator.print_rev_dep)
-		   deps))
-	env.single_agent_points
-	(Pp.array Pp.space (fun _ -> pp_point))
-	env.domain
+        f "@[<hov 2>(%a)@ -> @[<h>%a@]@ %t-> @[(%a)@]@]"
+        (Pp.list Pp.space Format.pp_print_int) p.fathers
+        (print ~sigs:env.sig_decl ~with_id:()) p.content
+        (fun f ->
+           match p.is_obs_of with
+           | None -> ()
+           | Some deps ->
+             Format.fprintf
+               f "@[[%a]@]@ "
+               (Pp.set Operator.DepSet.elements Pp.space Operator.print_rev_dep)
+               deps)
+        (Pp.list
+           Pp.space
+           (fun f s ->
+              Format.fprintf
+                f "@[%a%a@ %i[@[%a@]]@]"
+                (Navigation.print_step env.sig_decl (find_ty p.content)) s.next
+                (Pp.list
+                   Pp.space
+                   (fun f -> Format.fprintf f "(@[%a@])" Renaming.print))
+                s.inj s.dst
+                (Pp.set IntSet.elements Pp.space Format.pp_print_int)
+                s.above_obs))
+        p.sons in
+      Format.fprintf
+        f "@[<v>%a%a@]"
+        (Pp.set IntMap.bindings Pp.space ~trailing:Pp.space
+           (fun f (_,(cc,deps)) ->
+              Format.fprintf
+                f "@[<h>%a@] @[[%a]@]" (print ~sigs:env.sig_decl ~with_id:()) cc
+                (Pp.set Operator.DepSet.elements Pp.space Operator.print_rev_dep)
+                deps))
+        env.single_agent_points
+        (Pp.array Pp.space (fun _ -> pp_point))
+        env.domain
 
-    let get_single_agent ty env =
-      IntMap.find_option ty env.single_agent_points
+  let get_single_agent ty env =
+    IntMap.find_option ty env.single_agent_points
 
-    let get env cc_id = env.domain.(cc_id)
+  let get env cc_id = env.domain.(cc_id)
 
-    let navigate env nav =
-      let rec aux injs_dst2nav pt_i = function
-	| [] -> Some (pt_i,injs_dst2nav, get env pt_i)
-	| e :: t ->
-	   let rec find_good_edge = function (*one should use a hash here*)
-	     | [] -> None
-	     | s :: tail ->
-		match Navigation.compatible_point injs_dst2nav s.next e with
-		| [] ->  find_good_edge tail
-		| inj' ->
-		   aux (Tools.list_map_flatten
-			  (fun x -> List.map (Renaming.compose false x) inj')
-			  s.inj) s.dst t
-	   in find_good_edge (get env pt_i).sons
-      in aux [Renaming.empty] 0 nav
+  let navigate env nav =
+    let rec aux injs_dst2nav pt_i = function
+      | [] -> Some (pt_i,injs_dst2nav, get env pt_i)
+      | e :: t ->
+        let rec find_good_edge = function (*one should use a hash here*)
+          | [] -> None
+          | s :: tail ->
+            match Navigation.compatible_point injs_dst2nav s.next e with
+            | [] ->  find_good_edge tail
+            | inj' ->
+              aux (Tools.list_map_flatten
+                     (fun x -> List.map (Renaming.compose false x) inj')
+                     s.inj) s.dst t
+        in find_good_edge (get env pt_i).sons
+    in aux [Renaming.empty] 0 nav
 
-    let print_dot f env =
-      let () = Format.fprintf f "@[<v>strict digraph G {@," in
-      let () =
-	Pp.array
-	  ~trailing:Pp.space Pp.space
-	  (fun i f s -> print_point_dot (env.sig_decl) f (i,s)) f env.domain in
-      Format.fprintf f "}@]@."
+  let print_dot f env =
+    let () = Format.fprintf f "@[<v>strict digraph G {@," in
+    let () =
+      Pp.array
+        ~trailing:Pp.space Pp.space
+        (fun i f s -> print_point_dot (env.sig_decl) f (i,s)) f env.domain in
+    Format.fprintf f "}@]@."
 
-  end
+end
 
 let propagate_add_obs obs_id env cc_id =
   let rec aux son_id domain cc_id =
@@ -790,6 +794,7 @@ module PreEnv : sig
     val sigs : t -> Signature.s
 
     val finalize : t -> Env.t
+    val of_env : Env.t -> t
   end = struct
     type t = {
 	sig_decl: Signature.s;
@@ -929,41 +934,66 @@ module PreEnv : sig
 
     let finalize env =
       let _,singles,domain =
-	IntMap.fold
-	  (fun _ x acc ->
-	   List.fold_left
-	     (fun acc (cc,deps) -> add_domain ~deps acc cc) acc x)
-	  env.domain
-	  (fresh_id env,IntMap.empty,
-	   IntMap.add 0 (empty_point env.sig_decl) IntMap.empty) in
+        IntMap.fold
+          (fun _ x acc ->
+             List.fold_left
+               (fun acc (cc,deps) -> add_domain ~deps acc cc) acc x)
+          env.domain
+          (fresh_id env,IntMap.empty,
+           IntMap.add 0 (empty_point env.sig_decl) IntMap.empty) in
       let level1 = match IntMap.find_option 0 domain with
-	| None -> assert false
-	| Some zero -> List.map (fun p -> p.dst) zero.sons in
+        | None -> assert false
+        | Some zero -> List.map (fun p -> p.dst) zero.sons in
       let rec iter (todos,env) =
-	if IntMap.is_empty todos then env else
-	  let out =
-	    IntMap.fold
-	      (fun id fa (todos,s) ->
-	       match IntMap.find_option id s with
-	       | None -> (todos,s)
-	       | Some p -> scan_sons level1 todos s ([],[],[]) id p fa)
-	      todos (IntMap.empty,env) in
-	  iter out in
+        if IntMap.is_empty todos then env else
+          let out =
+            IntMap.fold
+              (fun id fa (todos,s) ->
+                 match IntMap.find_option id s with
+                 | None -> (todos,s)
+                 | Some p -> scan_sons level1 todos s ([],[],[]) id p fa)
+              todos (IntMap.empty,env) in
+          iter out in
       let tops =
-	IntMap.fold
-	  (fun id p s ->
-	   if p.sons = [] && not (List.mem id level1)
-	   then IntMap.add id p.fathers s else s)
-	  domain IntMap.empty in
-	 let s' = iter (tops,domain) in
-	 let si = match IntMap.max_key s' with Some i -> succ i | None -> 0 in
-	 let out = Array.make si (empty_point env.sig_decl) in
-	 let () = IntMap.iter (fun i p -> out.(i) <- p) s' in
-	 {
-	   Env.sig_decl = env.sig_decl;
-	   Env.domain = out;
-	   Env.single_agent_points = singles;
-	 }
+        IntMap.fold
+          (fun id p s ->
+             if p.sons = [] && not (List.mem id level1)
+             then IntMap.add id p.fathers s else s)
+          domain IntMap.empty in
+      let s' = iter (tops,domain) in
+      let si = match IntMap.max_key s' with Some i -> succ i | None -> 0 in
+      let out = Array.make si (empty_point env.sig_decl) in
+      let () = IntMap.iter (fun i p -> out.(i) <- p) s' in
+      {
+        Env.sig_decl = env.sig_decl;
+        Env.id_by_type =env.id_by_type;
+        Env.nb_id = env.nb_id;
+	Env.domain = out;
+	Env.single_agent_points = singles;
+      }
+
+    let of_env env =
+      let add_cc acc (cc,_ as p) =
+        let w = weight cc in
+        Mods.IntMap.add
+          w (p::Mods.IntMap.find_default [] w acc) acc in
+      let domain =
+        Mods.IntMap.fold
+          (fun _ p acc -> add_cc acc p) env.Env.single_agent_points
+          Mods.IntMap.empty in
+      let domain' =
+        Array.fold_left (fun acc p ->
+            match p.is_obs_of with
+            | None -> acc
+            | Some deps -> add_cc acc (p.content,deps))
+          domain env.Env.domain in
+      {
+        sig_decl = env.Env.sig_decl;
+        nb_id = env.Env.nb_id;
+        id_by_type = env.Env.id_by_type;
+        domain = domain';
+        used_by_a_begin_new = false;
+      }
   end
 
 let begin_new env = PreEnv.to_work env
