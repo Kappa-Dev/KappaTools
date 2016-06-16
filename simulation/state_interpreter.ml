@@ -2,6 +2,8 @@ type t = {
     init_stopping_times : (Nbr.t * int) list;
     stopping_times : (Nbr.t * int) list ref;
     perturbations_alive : bool array;
+    perturbations_not_done_yet : bool array;
+    (* internal array for perturbate function (global to avoid useless alloc) *)
     activities : Random_tree.tree;
     (* pair numbers are regular rule, odd unary instances *)
     variables_overwrite: Alg_expr.t option array;
@@ -33,6 +35,8 @@ let empty env stopping_times alg_overwrite =
     init_stopping_times = stops;
     stopping_times = ref stops;
     perturbations_alive =
+      Array.make (Environment.nb_perturbations env) true;
+    perturbations_not_done_yet =
       Array.make (Environment.nb_perturbations env) true;
     activities = activity_tree;
     variables_overwrite = overwrite;
@@ -175,8 +179,8 @@ let do_it ~outputs env domain counter graph state modification =
      (false, graph, {state with flux = others})
 
 let perturbate ~outputs env domain counter graph state =
-  let not_done_yet =
-    Array.make (Environment.nb_perturbations env) true in
+  let () = Array.iteri (fun i _ -> state.perturbations_not_done_yet.(i) <- true)
+      state.perturbations_not_done_yet in
   let get_alg i = get_alg env state i in
   let rec do_until_noop i graph state stop =
     if stop || i >= Environment.nb_perturbations env then
@@ -187,7 +191,7 @@ let perturbate ~outputs env domain counter graph state =
       (stop,graph',state)
     else
       let pert = Environment.get_perturbation env i in
-      if state.perturbations_alive.(i) && not_done_yet.(i) &&
+      if state.perturbations_alive.(i) && state.perturbations_not_done_yet.(i) &&
 	   Rule_interpreter.value_bool
 	     counter graph ~get_alg (fst pert.Primitives.precondition)
       then
@@ -196,7 +200,7 @@ let perturbate ~outputs env domain counter graph state =
 			  if stop then acc else
 			    do_it ~outputs env domain counter graph state effect)
 			 (stop,graph,state) pert.Primitives.effect in
-	let () = not_done_yet.(i) <- false in
+	let () = state.perturbations_not_done_yet.(i) <- false in
 	let () =
 	  state.perturbations_alive.(i) <-
 	    match pert.Primitives.abort with
