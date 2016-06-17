@@ -23,7 +23,7 @@ val event_percentage : t -> int option
 val event : t -> int
 val time_percentage : t -> int option
 val time : t -> float
-val tracked_events : t -> int
+val tracked_events : t -> int option
 
 val plot_points : t -> int
 val current_time : t -> float

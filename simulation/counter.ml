@@ -136,7 +136,12 @@ let time_percentage (counter : t) : int option =
                                    /. (va -. counter.init_time)))
 let time (counter : t) : float =
     counter.time
-let tracked_events (counter : t) : int = counter.stories
+
+let tracked_events (counter : t) : int option =
+  if counter.stories >= 0 then
+    Some counter.stories
+  else
+    None
 
 let compute_dT points mx_t =
   if points <= 0 then None else
@@ -267,4 +272,3 @@ let fill ~outputs counter observables_values =
   let points, _counter =
     to_plot_points counter in
   List.iter (fun t -> outputs (Data.Plot (t,observables_values))) points
-

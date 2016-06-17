@@ -380,7 +380,7 @@ end = struct
                       ApiTypes.event_percentage =
                        Counter.event_percentage state.counter;
                       ApiTypes.tracked_events =
-                       Some (Counter.tracked_events state.counter);
+                       Counter.tracked_events state.counter;
                       ApiTypes.log_messages =
                        [Buffer.contents state.log_buffer] ;
                       ApiTypes.snapshots =
