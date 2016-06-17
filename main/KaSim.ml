@@ -253,7 +253,7 @@ let () =
       if !interactive then
         let () =
           Format.printf
-            "@[KaSim@ toplevel:@ type@ $RUN@ (optionnaly@ followed@ by@ a\
+            "@[KaSim@ toplevel:@ type@ $RUN@ (optionally@ followed@ by@ a\
 @ pause@ criteria)@ to@ launch@ the@ simulation@ or@ a@ perturbation\
 @ effect@ to@ perform@ it@]" in
         let lexbuf = Lexing.from_channel stdin in
