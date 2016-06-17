@@ -1,0 +1,25 @@
++ Command line is: 'KaSim' '-t' '3' '-d' 'output' '-seed' '199095194' 'del_pert.ka'
+Parsing del_pert.ka...
+done
++ Initialized random number generator with seed 199095194
++ Sanity checks
++ KaSa tools initialization
++ Compute the contact map
++ Compiling...
++ Building initial simulation conditions...
+	 -simulation parameters
+	 -variable declarations
+	 -rules
+	 -perturbations
+	 -observables
+	 -update_domain construction
+	 -initial conditions
++ Building initial state
+Done
+____________________________________________________________
+############################################################
+Simulation ended (eff.: 0.000000, detail below)
+	Valid embedding but no longer unary when required: 0.000000
+	Valid embedding but not binary when required: 0.000000
+	Clashing instance: 1.000000
+	Perturbation interrupting time advance: 0.000000

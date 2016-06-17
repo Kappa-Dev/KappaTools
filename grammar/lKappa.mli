@@ -30,7 +30,7 @@ Array.copy ra_ints)]. *)
 
 type rule_mixture = rule_agent list
 
-val to_erased : rule_mixture -> rule_mixture
+val to_erased : Signature.s -> rule_mixture -> rule_mixture
 val to_maintained : rule_mixture -> rule_mixture
 val to_raw_mixture : Signature.s -> rule_mixture -> Raw_mixture.t
 val copy_rule_agent : rule_agent -> rule_agent

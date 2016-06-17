@@ -211,7 +211,8 @@ let effects_of_modif
        [],[]) mix_pos rev_effects
   | DELETE (alg_expr, (ast_mix, mix_pos)) ->
     rule_effect contact_map domain alg_expr
-      (LKappa.to_erased ast_mix,[],[],[]) mix_pos rev_effects
+      (LKappa.to_erased (Connected_component.PreEnv.sigs domain) ast_mix,
+       [],[],[]) mix_pos rev_effects
   | UPDATE ((i, _), alg_expr) ->
     let (domain', alg_pos) =
       compile_alg contact_map domain alg_expr in

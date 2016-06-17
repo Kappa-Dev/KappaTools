@@ -291,32 +291,34 @@ let copy_rule_agent a =
     ra_syntax =
       Tools.option_map (fun _ -> Array.copy p, Array.copy i) a.ra_syntax; }
 
-let to_erased x =
+let to_erased sigs x =
   List.map
     (fun r ->
-     let ports = Array.map (fun (a,_) -> a,Erased) r.ra_ports in
-     let ints =
-       Array.map (function
-		   | I_VAL_CHANGED (i,_) | I_VAL_ERASED i -> I_VAL_ERASED i
-		   | I_ANY | I_ANY_CHANGED _ | I_ANY_ERASED -> I_ANY_ERASED
-		 ) r.ra_ints in
-     { ra_type = r.ra_type; ra_erased = true; ra_ports = ports; ra_ints =ints;
-       ra_syntax =
-	 match r.ra_syntax with None -> None | Some _ -> Some (ports,ints);})
+       let ports = Array.map (fun (a,_) -> a,Erased) r.ra_ports in
+       let ints =
+         Array.mapi (fun j -> function
+             | I_VAL_CHANGED (i,_) | I_VAL_ERASED i -> I_VAL_ERASED i
+             | I_ANY | I_ANY_CHANGED _ | I_ANY_ERASED ->
+               match Signature.default_internal_state r.ra_type j sigs with
+               | Some _ -> I_ANY_ERASED
+               | None -> I_ANY) r.ra_ints in
+       { ra_type = r.ra_type; ra_erased = true; ra_ports = ports; ra_ints =ints;
+         ra_syntax =
+           match r.ra_syntax with None -> None | Some _ -> Some (ports,ints);})
     x
 
 let to_maintained x =
   List.map
     (fun r ->
-     let ports = Array.map (fun (a,_) -> a,Maintained) r.ra_ports in
-     let ints =
-       Array.map (function
-		   | I_VAL_CHANGED (i,_) | I_VAL_ERASED i -> I_VAL_CHANGED (i,i)
-		   | I_ANY | I_ANY_CHANGED _ | I_ANY_ERASED -> I_ANY
-		 ) r.ra_ints in
-     { ra_type = r.ra_type; ra_erased = false; ra_ports = ports; ra_ints =ints;
-       ra_syntax =
-	 match r.ra_syntax with None -> None | Some _ -> Some (ports,ints);})
+       let ports = Array.map (fun (a,_) -> a,Maintained) r.ra_ports in
+       let ints =
+         Array.map (function
+             | I_VAL_CHANGED (i,_) | I_VAL_ERASED i -> I_VAL_CHANGED (i,i)
+             | I_ANY | I_ANY_CHANGED _ | I_ANY_ERASED -> I_ANY
+           ) r.ra_ints in
+       { ra_type = r.ra_type; ra_erased = false; ra_ports = ports; ra_ints=ints;
+         ra_syntax =
+           match r.ra_syntax with None -> None | Some _ -> Some (ports,ints);})
     x
 
 let to_raw_mixture sigs x =
