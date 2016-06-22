@@ -1,4 +1,4 @@
-   (**
+    (**
     * dictionary.ml
     * openkappa
     * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt

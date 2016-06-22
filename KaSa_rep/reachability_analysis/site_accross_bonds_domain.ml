@@ -38,18 +38,33 @@ struct
   type local_static_information =
     {
       store_views_rhs : Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
-      (*first map: (A,x,y,B,z,t) such that A.x bound to B.z and y <> x and z <> t*)
-      store_tuple_has_first_site_bound_snd_site_different:
-        Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.t;
+      store_bonds_rhs: Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
+      store_modified_map :
+        Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
+        (*first map: (A,x,y,B,z,t) such that A.x bound to B.z and y <> x and z <> t*)
+      (*store_tuple_has_first_site_bound_snd_site_different:
+        Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.t;*) (*remove*)
+      store_tuple_pair : Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.t;
+      (*explicit static: creating the bond or modifying one internal state with specifying the bond*)
+      store_created_bond :         Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
+      (*modifying one internal state with specifying the bond*)
+      store_modified_internal_state_and_bond :
+        Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
+      store_explicit_static :
+        Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
+      (*implicit: modified the state of one of the two sites without mentioning the binding sites*)
+      store_question_marks_rhs : Site_accross_bonds_domain_type.AgentsSites_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
+      store_implicit_static :
+        Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
       (*from each tuple (A,x,y, B,z,t) -> agent_id rule_id map explain in which rule and which agent_id the site y can be modified*)
-      store_first_site_y_modified :
+      (*store_first_site_y_modified :
         Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
       (*t can be modified*)
       store_snd_site_t_modified :
         Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
       (*(A,x,y,B,z,t) -> Ag_id list RuleIdMap to explain in which rule and which agent_id (A) a site x of A may become bound to a site z of B *)
       store_first_site_is_bound : Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
-      store_site_accross_bonds_rhs: Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;
+        store_site_accross_bonds_rhs: Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.t Ckappa_sig.Rule_map_and_set.Map.t;*)
       dummy:unit;
     }
 
@@ -68,8 +83,8 @@ struct
 
   (* one maps each such tuples (A,x,y,B,z,t) to a mvbdu with one variables that decribes the range of t when both agents are connected via x and z *)
 
-  type local_dynamic_information =
-    {
+  type local_dynamic_information = unit
+  (*{
       store_init : Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.t;
       store_relation_mvbdu :
         Ckappa_sig.Views_bdu.mvbdu
@@ -81,7 +96,7 @@ struct
       store_range_site_second_agent:
       Ckappa_sig.Views_bdu.mvbdu
         Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.t;
-  }
+    }*)
 
   type dynamic_information =
     {
@@ -122,15 +137,94 @@ struct
         (get_local_static_information static) with           store_views_rhs = views
       } static
 
-  let get_tuple_has_first_site_bound_snd_site_different static =
+  let get_bonds_rhs static =
+    (get_local_static_information static).store_bonds_rhs
+
+  let set_bonds_rhs bonds static =
+    set_local_static_information
+      {
+        (get_local_static_information static) with           store_bonds_rhs = bonds
+      } static
+
+  let get_modified_map static =
+    (get_local_static_information static).store_modified_map
+
+  let set_modified_map sites static =
+    set_local_static_information
+      {
+        (get_local_static_information static) with
+        store_modified_map = sites
+      } static
+
+  let get_created_bond static =
+    (get_local_static_information static).store_created_bond
+
+  let set_created_bond rule static =
+    set_local_static_information
+      {
+        (get_local_static_information static) with
+        store_created_bond = rule
+      } static
+
+  let get_tuple_pair static =
+    (get_local_static_information static).store_tuple_pair
+
+  let set_tuple_pair pair static =
+    set_local_static_information
+      {
+        (get_local_static_information static) with
+        store_tuple_pair = pair
+      } static
+
+  let get_modified_internal_state_and_bond static =
+    (get_local_static_information static).store_modified_internal_state_and_bond
+
+  let set_modified_internal_state_and_bond rule static =
+    set_local_static_information
+      {
+        (get_local_static_information static) with
+        store_modified_internal_state_and_bond = rule
+      } static
+
+  let get_explicit_rule static =
+    (get_local_static_information static).store_explicit_static
+
+  let set_explicit_rule rule static =
+    set_local_static_information
+      {
+        (get_local_static_information static) with
+        store_explicit_static = rule
+      } static
+
+  (*let get_tuple_has_first_site_bound_snd_site_different static =
     (get_local_static_information static).store_tuple_has_first_site_bound_snd_site_different
 
   let set_tuple_has_first_site_bound_snd_site_different tuple static =
     set_local_static_information
       {
         (get_local_static_information static) with           store_tuple_has_first_site_bound_snd_site_different = tuple
+      } static*)
+
+  let get_implicit_rule static =
+    (get_local_static_information static).store_implicit_static
+
+  let set_implicit_rule rule static =
+    set_local_static_information
+      {
+        (get_local_static_information static) with
+        store_implicit_static = rule
       } static
 
+  let get_question_marks_rhs static =
+    (get_local_static_information static).store_question_marks_rhs
+
+  let set_question_marks_rhs bonds static =
+    set_local_static_information
+      {
+        (get_local_static_information static) with          store_question_marks_rhs = bonds
+      } static
+
+  (*
   let get_first_site_y_modified static =
     (get_local_static_information static).store_first_site_y_modified
 
@@ -168,6 +262,7 @@ struct
         (get_local_static_information static) with
           store_site_accross_bonds_rhs = site_accross
       } static
+    *)
 
   (*------------------------------------------------------------*)
   (** global dynamic information*)
@@ -196,6 +291,7 @@ struct
       dynamic with local = local
     }
 
+  (*
   let get_init dynamic =
     (get_local_dynamic_information dynamic).store_init
 
@@ -235,6 +331,7 @@ struct
         (get_local_dynamic_information dynamic) with
         store_range_site_second_agent = mvbdu
       } dynamic
+    *)
 
 (*-------------------------------------------------------------*)
 
@@ -318,8 +415,429 @@ struct
   in
   error, store_result
 
+  (***************************************************************)
+  (*return a set of agent that are bound on the rhs*)
+
+  let collect_agent_type_state parameter error agent site_type =
+    match agent with
+    | Cckappa_sig.Ghost
+    | Cckappa_sig.Unknown_agent _ -> error, (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_state_index)
+    | Cckappa_sig.Dead_agent _ ->
+      warn parameter error (Some "line 127") Exit (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_state_index)
+    | Cckappa_sig.Agent agent1 ->
+      let agent_type1 = agent1.Cckappa_sig.agent_name in
+      let error, state1 =
+        match Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
+                parameter
+                error
+                site_type
+                agent1.Cckappa_sig.agent_interface
+        with
+        | error, None ->
+          warn parameter error (Some "line 228") Exit Ckappa_sig.dummy_state_index
+        | error, Some port ->
+          let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
+          if (Ckappa_sig.int_of_state_index state) > 0
+          then
+            error, state
+          else
+            warn parameter error (Some "line 196") Exit Ckappa_sig.dummy_state_index
+      in
+      error, (agent_type1, state1)
+
+  let collect_bonds_rhs parameter error rule_id rule store_result =
+    Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
+      parameter error
+      (fun parameter error agent_id bonds_map store_result ->
+         Ckappa_sig.Site_map_and_set.Map.fold
+           (fun site_type_source site_add (error, store_result) ->
+              let agent_id_target = site_add.Cckappa_sig.agent_index in
+              let site_type_target = site_add.Cckappa_sig.site in
+              let error, agent_source =
+                match
+                  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
+                    parameter error agent_id rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
+                with
+                | error, None -> warn parameter error (Some "line 332") Exit Cckappa_sig.Ghost
+                | error, Some agent -> error, agent
+              in
+              (*get the first pair (agent_type, state)*)
+              let error, (agent_type1, state1) =
+                collect_agent_type_state
+                  parameter
+                  error
+                  agent_source
+                  site_type_source
+              in
+              (*----------------------------------------------------*)
+              (*the second pair*)
+              let error, agent_target =
+                match
+                  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
+                    parameter error agent_id_target rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
+                with
+                | error, None -> warn parameter error (Some "line 350") Exit Cckappa_sig.Ghost
+                | error, Some agent -> error, agent
+              in
+              let error, (agent_type2, state2) =
+                collect_agent_type_state
+                  parameter
+                  error
+                  agent_target
+                  site_type_target
+              in
+              (*-----------------------------------------------------*)
+              (*get old set*)
+              let error, old_set =
+                match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error rule_id store_result
+                with
+                | error, None -> error, Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.empty
+                | error, Some p -> error, p
+              in
+              let error', set =
+                Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.add_when_not_in
+                  parameter error
+                  ((agent_id, agent_type1, site_type_source, state1),
+                   (agent_id_target, agent_type2, site_type_target, state2))
+                  old_set
+              in
+              let error = Exception.check warn parameter error error' (Some "line 375") Exit in
+              let error, store_result =
+                Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
+                  parameter
+                  error
+                  rule_id
+                  set
+                  store_result
+              in
+              error, store_result
+           ) bonds_map (error, store_result)
+      ) rule.Cckappa_sig.rule_rhs.Cckappa_sig.bonds store_result
+
+  (****************************************************************)
+  (*map has first site y can be modified*)
+
+  let collect_site_modified parameter error rule_id rule store_result =
+    let error, store_result =
+      Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
+        (fun parameter error agent_id agent store_result->
+           (*if there is no modified sites then do nothing*)
+           if Ckappa_sig.Site_map_and_set.Map.is_empty agent.Cckappa_sig.agent_interface
+           then error, store_result
+           else
+             let agent_type = agent.Cckappa_sig.agent_name in
+             let error, pair_set =
+               Ckappa_sig.Site_map_and_set.Map.fold
+                 (fun site_type port (error, store_set) ->
+                    let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
+                    let error, store_set =
+                      Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.add_when_not_in parameter error
+                        (agent_id, agent_type, site_type, state)
+                        store_set
+                    in
+                    error, store_set
+                 )
+                 agent.Cckappa_sig.agent_interface (error, Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty)
+             in
+             (*old set*)
+             let error, old_set =
+               match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error rule_id store_result with
+               | error, None -> error, Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty
+               | error, Some s -> error, s
+             in
+             let error, new_set =
+               Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.union parameter error pair_set old_set
+             in
+             let error, store_result =
+               Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite parameter error rule_id new_set store_result
+             in
+             error, store_result
+        ) rule.Cckappa_sig.diff_direct store_result
+    in
+    error, store_result
+
+(****************************************************************)  (**)
+
+  let collect_tuple_pair parameter error rule_id store_pair_rhs store_result =
+  let error, store_pair_set =
+    match
+      Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
+        parameter error rule_id store_pair_rhs with
+    | error, None -> error, Site_accross_bonds_domain_type.AgentsSitesStates_map_and_set.Set.empty
+    | error, Some s -> error, s
+  in
+  let error, store_result =
+    (*fold over this set*)
+   Site_accross_bonds_domain_type.AgentsSitesStates_map_and_set.Set.fold
+      (fun x (error, current_set) ->
+        let (agent_id, agent_type, site_type, site_type2, _, _) = x in (*A*)
+        (*fold again*)
+        let error, pair_set =
+         Site_accross_bonds_domain_type.AgentsSitesStates_map_and_set.Set.fold_inv
+           (fun z (error, current_set) ->
+              let (agent_id', agent_type', site_type', site_type2', _, _) = z in
+              if agent_id <> agent_id'
+              then
+                let error, pair_set =
+                  Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.add_when_not_in parameter error
+                  ((agent_id, agent_type, site_type, site_type2),
+                   (agent_id', agent_type', site_type', site_type2'))
+                  current_set
+                in
+                error, pair_set
+              else error, current_set
+           ) store_pair_set (error, current_set)
+        in
+        error, pair_set
+      ) store_pair_set (error, store_result)
+  in
+  error, store_result
+
+(****************************************************************)
+  (*explicit static*)
+
+  (*collect a set of rule that has site created a bond*)
+  let collect_created_bond parameter error rule_id rule store_tuple_pair store_result =
+    let error, store_result =
+      List.fold_left (fun (error, store_result) (site_add1, site_add2) ->
+          let agent_id1 = site_add1.Cckappa_sig.agent_index in
+          let agent_type1 = site_add1.Cckappa_sig.agent_type in
+          let site_type1 = site_add1.Cckappa_sig.site in
+          let agent_id2 = site_add2.Cckappa_sig.agent_index in
+          let agent_type2 = site_add2.Cckappa_sig.agent_type in
+          let site_type2 = site_add2.Cckappa_sig.site in
+          Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.fold
+            (fun (x, y) (error, store_result) ->
+            let (agent_id, _, site_type, site_type') = x in
+            let (agent_id', _, site_type', site_type2') = y in
+            (*if the first site in the pair is the site that created a bound*)
+            if agent_id1 = agent_id && agent_id2 = agent_id' && site_type = site_type1 && site_type2 = site_type' ||
+               agent_id1 = agent_id' && agent_id2 = agent_id &&
+          site_type' = site_type1 && site_type2 = site_type
+            then
+              (*let pair =
+              ((agent_id1, agent_type1, site_type1, site_type'),
+               (agent_id2, agent_type2, site_type2, site_type2'))
+              in*)
+              let error, set =
+                Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.add_when_not_in parameter error (x,y)
+                  Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.empty
+              in
+              let error, old_set =
+                match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error rule_id store_result with
+                | error, None -> error, Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.empty
+                | error, Some s -> error, s
+              in
+              let error', new_set =
+                Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.union parameter error set old_set
+              in
+              let error = Exception.check warn parameter error error' (Some "line 540") Exit in
+              let error, store_result =
+                Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite parameter error rule_id new_set store_result
+              in
+              error, store_result
+            else error, store_result
+            ) store_tuple_pair (error, store_result)
+        )(error, store_result) rule.Cckappa_sig.actions.Cckappa_sig.bind
+    in
+    error, store_result
+
+(****************************************************************)  (*collect a set of rule that has site created a bond*)
+
+  let collect_modified_internal_and_bond parameter error rule_id store_tuple_pair store_bonds_rhs store_modified_map store_result =
+  let error, store_bond_set =
+    match
+      Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
+        parameter error rule_id store_bonds_rhs with
+    | error, None -> error, Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.empty
+    | error, Some s -> error, s
+  in
+  let error, store_modified_set =
+    match
+      Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
+        parameter error rule_id store_modified_map with
+    | error, None -> error, Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty
+    | error, Some s -> error, s
+  in
+  Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.fold
+    (fun (x, y) (error, store_result) ->
+    let (agent_id, _, site_type, site_type') = x in
+    let (agent_id', _, site_type', site_type2') = y in
+    (*if the second site belong to modified and the first site belong to the bond set*)
+    let error, store_result =
+      Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold (fun m (error, store_result) ->
+          Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.fold
+            (fun (t, r) (error, store_result) ->
+               let (agent_id_m, _, site_type_m, _) = m in
+               let (agent_id_b, _, site_type_b, _) = t in
+               let (agent_id_b', _, site_type_b', _) = r in
+               if (agent_id = agent_id_m && site_type' = site_type_m || agent_id' = agent_id_m && site_type2' = site_type_m)
+                  (*if the first site belong to the bond*) &&
+                  (agent_id = agent_id_b && site_type = site_type_b &&
+                   agent_id' = agent_id_b' && site_type' = site_type_b')
+               then
+               let error, set =
+                 Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.add_when_not_in parameter error (x,y)
+                   Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.empty
+               in
+               let error, old_set =
+                 match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error rule_id store_result with
+                 | error, None -> error, Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.empty
+                 | error, Some s -> error, s
+               in
+               let error', new_set =
+                 Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.union parameter error set old_set
+               in
+               let error = Exception.check warn parameter error error' (Some "line 540") Exit in
+               let error, store_result =
+                 Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite parameter error rule_id new_set store_result
+               in
+               error, store_result
+               else
+                 error, store_result
+            ) store_bond_set (error, store_result)
+        ) store_modified_set (error, store_result)
+      in
+      error, store_result
+    ) store_tuple_pair (error, store_result)
+
+(****************************************************************)
+
+  let collect_explicit_static parameter error store_created_bond store_modified_internal_state_and_bond store_result =
+    let add_link parameter error rule_id set store_result =
+      let error, old_set =
+        match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error rule_id store_result with
+        | error, None -> error, Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.empty
+        | error, Some s -> error, s
+      in
+      let error', new_set =
+        Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.union parameter error set old_set
+      in
+      let error = Exception.check warn parameter error error' (Some "line 706") Exit in
+      let error, store_result =
+        Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite parameter error rule_id new_set store_result
+      in
+      error, store_result
+    in
+    Ckappa_sig.Rule_map_and_set.Map.fold2 parameter error
+      (fun parameter error rule_id set store_result ->
+         let error, store_result =
+           add_link parameter error rule_id set store_result
+           in
+         error, store_result)
+      (fun parameter error rule_id set store_result ->
+        let error, store_result =
+          add_link parameter error rule_id set store_result
+          in
+        error, store_result
+      )
+      (fun parameter error rule_id set1 set2 store_result ->
+         let error, new_set =
+           Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.union parameter error set1 set2
+           in
+        let error, store_result =
+          add_link parameter error rule_id new_set store_result
+          in
+        error, store_result
+      )
+      store_created_bond store_modified_internal_state_and_bond store_result
+
+(****************************************************************)
+(*implicit rule*)
+
+  let collect_question_marks_rhs parameter error rule_id handler_kappa rule store_modified_map store_result =
+    let error, _, question_marks_r =
+      Preprocess.translate_mixture parameter error handler_kappa
+        rule.Cckappa_sig.rule_rhs.Cckappa_sig.c_mixture
+    in
+    let error, store_modified_set =
+      match
+        Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs
+          parameter error rule_id store_modified_map with
+      | error, None -> error, Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty
+      | error, Some s -> error, s
+    in
+    let error, new_set =
+      List.fold_left (fun (error, store_set) (agent_id, site_type) ->
+          Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold (fun m (error, store_set) ->
+          let (agent_id_m, agent_type_m, site_type_m, _) = m in
+          let error, agent =
+            Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get parameter error agent_id rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
+          in
+            match agent with
+            | Some Cckappa_sig.Dead_agent _
+            | Some Cckappa_sig.Ghost
+            | None | Some Cckappa_sig.Unknown_agent _ -> error, store_set
+            | Some Cckappa_sig.Agent agent ->
+              let agent_type = agent.Cckappa_sig.agent_name in
+              let site_type' = Ckappa_sig.site_name_of_int (Ckappa_sig.int_of_site_name site_type - 1) in
+              if agent_type_m = agent_type then
+              let error, set =
+                Site_accross_bonds_domain_type.AgentsSites_map_and_set.Set.add_when_not_in parameter error
+                  (agent_id, agent_type, site_type', site_type_m)
+                  store_set
+              in
+              error, set
+              else error, store_set
+            ) store_modified_set (error, store_set)
+        ) (error, Site_accross_bonds_domain_type.AgentsSites_map_and_set.Set.empty) question_marks_r
+    in
+    let error, store_result =
+      Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite parameter error
+        rule_id new_set store_result
+    in
+    error, store_result
+
+  (*FIXME*)
+  let collect_implicit_static parameter error rule_id  store_tuple_pair store_question_marks_rhs store_result =
+  let error, question_marks_set =
+    match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error rule_id store_question_marks_rhs with
+    | error, None -> error, Site_accross_bonds_domain_type.AgentsSites_map_and_set.Set.empty
+    | error, Some l -> error, l
+  in
+  Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.fold
+    (fun (x, y) (error, store_result) ->
+    let (agent_id, agent_type, site_type, site_type') = x in
+    let (agent_id', agent_type', site_type', site_type2') = y in
+    (*if the second site belong to modified and the first site belong to the bond set*)
+    let error, store_result =
+      Site_accross_bonds_domain_type.AgentsSites_map_and_set.Set.fold
+        (fun t (error, store_result) ->
+           let (agent_id_q, agent_type_q, site_type_q, site_type_m) = t in
+           (*if the second site belong to the modified site*)
+           (*if site_type' = site_type_m ||
+              site_type2' = site_type_m
+           then*)
+             let error, set =
+               Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.add_when_not_in parameter error
+                 ((agent_id_q, agent_type_q, site_type, site_type_m),
+                  y)
+                 Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.empty
+             in
+             let error, old_set =
+               match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error rule_id store_result with
+               | error, None -> error, Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.empty
+               | error, Some s -> error, s
+             in
+             let error', new_set =
+               Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.union parameter error set old_set
+             in
+             let error = Exception.check warn parameter error error' (Some "line 540") Exit in
+             let error, store_result =
+               Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite parameter error rule_id new_set store_result
+             in
+             error, store_result
+             (*else
+             error, store_result*)
+
+        ) question_marks_set (error, store_result)
+    in
+    error, store_result
+    ) store_tuple_pair (error, store_result)
+
 (****************************************************************)
 (*return a set of agent with two different sites on the rhs*)
+(*TO DO*)
 
 let collect_pair_sites_aux parameter error rule_id store_views_rhs =
     let error, views_rhs_set =
@@ -407,108 +925,8 @@ let collect_pair_sites parameter error rule_id store_pair_rhs store_result =
     in
     error, store_result
 
-(***************************************************************)
-(*return a set of agent that are bound on the rhs*)
-
-let collect_agent_type_state parameter error agent site_type =
-  match agent with
-  | Cckappa_sig.Ghost
-  | Cckappa_sig.Unknown_agent _ -> error, (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_state_index)
-  | Cckappa_sig.Dead_agent _ ->
-    warn parameter error (Some "line 127") Exit (Ckappa_sig.dummy_agent_name, Ckappa_sig.dummy_state_index)
-  | Cckappa_sig.Agent agent1 ->
-    let agent_type1 = agent1.Cckappa_sig.agent_name in
-    let error, state1 =
-      match Ckappa_sig.Site_map_and_set.Map.find_option_without_logs
-              parameter
-              error
-              site_type
-              agent1.Cckappa_sig.agent_interface
-      with
-      | error, None ->
-        warn parameter error (Some "line 228") Exit Ckappa_sig.dummy_state_index
-      | error, Some port ->
-        let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
-        if (Ckappa_sig.int_of_state_index state) > 0
-        then
-          error, state
-        else
-          warn parameter error (Some "line 196") Exit Ckappa_sig.dummy_state_index
-    in
-    error, (agent_type1, state1)
-
-let collect_bonds_rhs parameter error rule_id rule store_result =
-Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold
-  parameter error
-  (fun parameter error agent_id bonds_map store_result ->
-     Ckappa_sig.Site_map_and_set.Map.fold
-       (fun site_type_source site_add (error, store_result) ->
-          let agent_id_target = site_add.Cckappa_sig.agent_index in
-          let site_type_target = site_add.Cckappa_sig.site in
-          let error, agent_source =
-            match
-              Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-                parameter error agent_id rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
-            with
-            | error, None -> warn parameter error (Some "line 332") Exit Cckappa_sig.Ghost
-            | error, Some agent -> error, agent
-          in
-          (*get the first pair (agent_type, state)*)
-          let error, (agent_type1, state1) =
-            collect_agent_type_state
-              parameter
-              error
-              agent_source
-              site_type_source
-          in
-          (*----------------------------------------------------*)
-          (*the second pair*)
-          let error, agent_target =
-            match
-              Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.get
-                parameter error agent_id_target rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
-            with
-            | error, None -> warn parameter error (Some "line 350") Exit Cckappa_sig.Ghost
-            | error, Some agent -> error, agent
-          in
-          let error, (agent_type2, state2) =
-            collect_agent_type_state
-              parameter
-              error
-              agent_target
-              site_type_target
-          in
-          (*-----------------------------------------------------*)
-          (*get old set*)
-          let error, old_set =
-            match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error rule_id store_result
-            with
-            | error, None -> error, Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.empty
-            | error, Some p -> error, p
-          in
-          let error', set =
-            Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.add_when_not_in
-              parameter error
-              ((agent_id, agent_type1, site_type_source, state1),
-               (agent_id_target, agent_type2, site_type_target, state2))
-              old_set
-          in
-          let error = Exception.check warn parameter error error' (Some "line 375") Exit in
-          let error, store_result =
-            Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite
-              parameter
-              error
-              rule_id
-              set
-              store_result
-          in
-          error, store_result
-       ) bonds_map (error, store_result)
-  ) rule.Cckappa_sig.rule_rhs.Cckappa_sig.bonds store_result
-
-(****************************************************************)
 (*return a set of pair sites that has the first site is bound and the result of the second site is not bound.*)
-
+(*
 let collect_tuple_has_first_site_bound_snd_site_different parameter error rule_id store_bonds_rhs store_pair_sites store_result =
   let error, store_pair_set =
     match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error rule_id store_pair_sites with
@@ -524,8 +942,8 @@ let collect_tuple_has_first_site_bound_snd_site_different parameter error rule_i
   let error, store_result =
     Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.fold
       (fun (x, y) (error, store_result) ->
-         let (agent_id, agent_type, site_type, _, state, _) = x in
-         let (agent_id', agent_type', site_type', _, state', _) = y in
+         let (agent_id, agent_type, site_type, site_type2, state, _) = x in
+         let (agent_id', agent_type', site_type', site_type2', state', _) = y in
          (*check if site_type and site_type' belong to sites that are bound on the rhs *)
          if Site_accross_bonds_domain_type.PairAgentsSiteState_map_and_set.Set.mem
              ((agent_id, agent_type, site_type, state),
@@ -533,8 +951,9 @@ let collect_tuple_has_first_site_bound_snd_site_different parameter error rule_i
              store_bonds_set
          then
            let error, store_result =
-             Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.add_when_not_in parameter error
-               (x, y)
+             Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.add_when_not_in parameter error
+               ((agent_id, agent_type, site_type, site_type2),
+                (agent_id', agent_type', site_type', site_type2'))
                store_result
              in
              error, store_result
@@ -543,48 +962,8 @@ let collect_tuple_has_first_site_bound_snd_site_different parameter error rule_i
       ) store_pair_set (error, store_result)
   in
   error, store_result
-
+         *)
 (****************************************************************)
-(*map has first site y can be modified*)
-
-let collect_site_modified parameter error rule_id rule =
-  let error, store_result =
-  Ckappa_sig.Agent_id_quick_nearly_Inf_Int_storage_Imperatif.fold parameter error
-    (fun parameter error agent_id agent store_result->
-      (*if there is no modified sites then do nothing*)
-      if Ckappa_sig.Site_map_and_set.Map.is_empty agent.Cckappa_sig.agent_interface
-      then error, store_result
-      else
-        let agent_type = agent.Cckappa_sig.agent_name in
-        let error, pair_set =
-          Ckappa_sig.Site_map_and_set.Map.fold
-            (fun site_type port (error, store_set) ->
-               let state = port.Cckappa_sig.site_state.Cckappa_sig.max in
-               let error, store_set =
-                 Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.add_when_not_in parameter error
-                   (agent_id, agent_type, site_type, state)
-                   store_set
-               in
-               error, store_set
-            )
-            agent.Cckappa_sig.agent_interface (error, Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty)
-        in
-        (*old set*)
-        let error, old_set =
-          match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error rule_id store_result with
-          | error, None -> error, Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.empty
-          | error, Some s -> error, s
-        in
-        let error, new_set =
-          Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.union parameter error pair_set old_set
-        in
-        let error, store_result =
-          Ckappa_sig.Rule_map_and_set.Map.add_or_overwrite parameter error rule_id new_set store_result
-        in
-        error, store_result
-    ) rule.Cckappa_sig.diff_direct Ckappa_sig.Rule_map_and_set.Map.empty
-  in
-  error, store_result
 
 let collect_first_site_y_modified parameter error rule_id store_modified_map store_tuple_has_first_site_bound_snd_site_different store_result =
   let error, modified_set =
@@ -783,6 +1162,7 @@ let collect_result parameter error rule_id store_result_aux store_result =
 (****************************************************************)
 
 let collect_rule parameter error rule_id rule static =
+  let kappa_handler = get_kappa_handler static in
   (*bonds on the rhs*)
   let store_views_rhs = get_views_rhs static in
   let error, store_views_rhs =
@@ -799,19 +1179,84 @@ let collect_rule parameter error rule_id rule static =
       Ckappa_sig.Rule_map_and_set.Map.empty
   in
   (*--------------------------------------------------------------*)
+  let store_bonds_rhs = get_bonds_rhs static in
   let error, store_bonds_rhs =
-    collect_bonds_rhs parameter error rule_id rule Ckappa_sig.Rule_map_and_set.Map.empty
+    collect_bonds_rhs parameter error rule_id rule store_bonds_rhs
   in
+  let static = set_bonds_rhs store_bonds_rhs static in
   (*--------------------------------------------------------------*)
   (*first site is bound and the second site is different than the first one*)
-  let store_tuple_has_first_site_bound_snd_site_different = get_tuple_has_first_site_bound_snd_site_different static in
+  (*let store_tuple_has_first_site_bound_snd_site_different = get_tuple_has_first_site_bound_snd_site_different static in
   let error, store_tuple_has_first_site_bound_snd_site_different =
     collect_tuple_has_first_site_bound_snd_site_different parameter error rule_id store_bonds_rhs store_pair_sites store_tuple_has_first_site_bound_snd_site_different
   in
-  let static = set_tuple_has_first_site_bound_snd_site_different store_tuple_has_first_site_bound_snd_site_different static in
+  let static = set_tuple_has_first_site_bound_snd_site_different store_tuple_has_first_site_bound_snd_site_different static in*)
+  (*--------------------------------------------------------------*)
+  let store_tuple_pair = get_tuple_pair static in
+  let error, store_tuple_pair =
+    collect_tuple_pair parameter error rule_id store_test store_tuple_pair
+  in
+  let static = set_tuple_pair store_tuple_pair static in
+  (*--------------------------------------------------------------*)
+  let store_modified_map = get_modified_map static in
+  let error, store_modified_map =
+    collect_site_modified parameter error rule_id rule store_modified_map
+  in
+  let static = set_modified_map store_modified_map static in
+  (*--------------------------------------------------------------*)
+  let store_tuple_pair = get_tuple_pair static in
+  let store_created_bond = get_created_bond static in
+  let error, store_created_bond =
+    collect_created_bond parameter error rule_id rule store_tuple_pair store_created_bond
+  in
+  let static = set_created_bond store_created_bond static in
+  (*--------------------------------------------------------------*)
+  let store_bonds_rhs = get_bonds_rhs static in
+  let store_modified_map = get_modified_map static in
+  let store_modified_internal_state_and_bond = get_modified_internal_state_and_bond static in
+  let error, store_modified_internal_state_and_bond =
+    collect_modified_internal_and_bond parameter error rule_id store_tuple_pair store_bonds_rhs store_modified_map store_modified_internal_state_and_bond
+  in
+  let static = set_modified_internal_state_and_bond store_modified_internal_state_and_bond static in
+  (*--------------------------------------------------------------*)
+  let store_explicit_static = get_explicit_rule static in
+  let store_created_bond = get_created_bond static in
+  let store_modified_internal_state_and_bond = get_modified_internal_state_and_bond static in
+  let error, store_explicit_static =
+    collect_explicit_static parameter error store_created_bond store_modified_internal_state_and_bond store_explicit_static
+  in
+  let static = set_explicit_rule store_explicit_static static in
+  (*--------------------------------------------------------------*)
+  let store_question_marks_rhs = get_question_marks_rhs static in
+  let error, store_question_marks_rhs =
+    collect_question_marks_rhs parameter error rule_id kappa_handler
+      rule store_modified_map store_question_marks_rhs
+  in
+  let static = set_question_marks_rhs store_question_marks_rhs static in
+  (*--------------------------------------------------------------*)
+  let store_implicit_static = get_implicit_rule static in
+  let store_question_marks_rhs = get_question_marks_rhs static in
+  let error, store_implicit_static =
+    collect_implicit_static parameter error rule_id  store_tuple_pair store_question_marks_rhs store_implicit_static
+  in
+  let static = set_implicit_rule store_implicit_static static in
+  (*let error, _,question_marks_r =
+    Preprocess.translate_mixture parameter error kappa_handler
+      rule.Cckappa_sig.rule_rhs.Cckappa_sig.c_mixture
+  in
+  let _ =
+    List.iter (fun (agent_id, s) ->
+        let s_1 = Ckappa_sig.site_name_of_int (Ckappa_sig.int_of_site_name s - 1) in
+        Loggers.fprintf (Remanent_parameters.get_logger parameter) "rule_id:%i:agent_id:%i:site_type:%i\n"
+          (Ckappa_sig.int_of_rule_id rule_id)
+          (Ckappa_sig.int_of_agent_id agent_id)
+          (Ckappa_sig.int_of_site_name s_1)
+      ) question_marks_r
+  in*)
+  (*let store_tuple_has_first_site_bound_snd_site_different = get_tuple_has_first_site_bound_snd_site_different static in*)
   (*--------------------------------------------------------------*)
   (*y of A can be modified*)
-  let store_first_site_y_modified = get_first_site_y_modified static in
+  (*let store_first_site_y_modified = get_first_site_y_modified static in
   let error, store_modified_map =
     collect_site_modified parameter error rule_id rule
   in
@@ -844,7 +1289,7 @@ let collect_rule parameter error rule_id rule static =
   let error, store_result =
     collect_result parameter error rule_id store_result_aux store_result
   in
-  let static = set_site_accross_bonds_rhs store_result static in
+  let static = set_site_accross_bonds_rhs store_result static in*)
   error, static
 
 let scan_rule_set static dynamic error =
@@ -872,11 +1317,19 @@ let scan_rule_set static dynamic error =
     let init_local_static_information =
       {
         store_views_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
-        store_tuple_has_first_site_bound_snd_site_different = Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.empty;
-        store_first_site_y_modified = Ckappa_sig.Rule_map_and_set.Map.empty;
+        store_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
+        store_modified_map = Ckappa_sig.Rule_map_and_set.Map.empty;
+        store_created_bond = Ckappa_sig.Rule_map_and_set.Map.empty;
+        (*store_tuple_has_first_site_bound_snd_site_different = Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.empty;*)
+        store_tuple_pair = Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.empty;
+        store_modified_internal_state_and_bond = Ckappa_sig.Rule_map_and_set.Map.empty;
+        store_explicit_static = Ckappa_sig.Rule_map_and_set.Map.empty;
+        store_question_marks_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
+        store_implicit_static = Ckappa_sig.Rule_map_and_set.Map.empty;
+        (*store_first_site_y_modified = Ckappa_sig.Rule_map_and_set.Map.empty;
         store_snd_site_t_modified = Ckappa_sig.Rule_map_and_set.Map.empty;
         store_first_site_is_bound = Ckappa_sig.Rule_map_and_set.Map.empty;
-        store_site_accross_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;
+        store_site_accross_bonds_rhs = Ckappa_sig.Rule_map_and_set.Map.empty;*)
         dummy = ()
       }
     in
@@ -886,18 +1339,18 @@ let scan_rule_set static dynamic error =
         local_static_information = init_local_static_information;
       }
     in
-    let init_local_dynamic_information =
+    (*let init_local_dynamic_information =
       {
         store_init = Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.empty;
         store_relation_mvbdu = Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.empty;
         store_range_site_first_agent = Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.empty;
         store_range_site_second_agent = Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.empty;
       }
-      in
+    in*)
     let init_global_dynamic_information =
       {
         global = dynamic;
-        local = init_local_dynamic_information;
+        local = () (*init_local_dynamic_information;*)
       }
     in
     let error, static, dynamic =
@@ -1114,11 +1567,11 @@ let scan_rule_set static dynamic error =
 
   let add_initial_state static dynamic error species =
     let parameter = get_parameter static in
-    let store_result = get_init dynamic in
+    (*let store_result = get_init dynamic in
     let error, store_init =
       collect_init parameter error species store_result
     in
-    let dynamic = set_init store_init dynamic in
+    let dynamic = set_init store_init dynamic in*)
     let event_list = [] in
     error, dynamic, event_list
 
@@ -1126,7 +1579,7 @@ let scan_rule_set static dynamic error =
 (*implementation dynamic information*)
 
 (*first map, (A,x,y,B,z,t) to a mvbdu: describes the relation between the state of y and the state of t, when both agents are connected via x.z*)
-
+  (*
   let collect_realtion_mvbdu static dynamic error =
     let parameter = get_parameter static in
     let store_result = get_relation_mvbdu dynamic in
@@ -1156,10 +1609,11 @@ let scan_rule_set static dynamic error =
     let dynamic = set_mvbdu_handler handler dynamic in
     let dynamic = set_relation_mvbdu store_result dynamic in
     error, dynamic
-
+           *)
 (*------------------------------------------------------------*)
 (*range of the second site of the first agent, when both agents are connected via the first site*)
 
+  (*
   let collect_range_site_first_agent static dynamic error =
     let parameter = get_parameter static in
     let store_result = get_range_site_first_agent dynamic in
@@ -1187,7 +1641,9 @@ let scan_rule_set static dynamic error =
     let dynamic = set_mvbdu_handler handler dynamic in
     let dynamic = set_range_site_first_agent store_result dynamic in
     error, dynamic
+           *)
 
+  (*
   let collect_range_site_second_agent static dynamic error =
     let parameter = get_parameter static in
     let store_result = get_range_site_second_agent dynamic in
@@ -1216,6 +1672,7 @@ let scan_rule_set static dynamic error =
     let dynamic = set_range_site_second_agent store_result dynamic in
     error, dynamic
 
+           *)
   (* to do *)
   (* check for each bond that occur in the lhs, whether
      the constraints in the lhs are consistent *)
@@ -1225,21 +1682,17 @@ let scan_rule_set static dynamic error =
   (* to do *)
   let apply_rule static dynamic error rule_id precondition =
     (*relation between states *)
-    let error, dynamic = collect_realtion_mvbdu static dynamic error in
+    (*let error, dynamic = collect_realtion_mvbdu static dynamic error in
     (*range of the second site of the first agent*)
     let error, dynamic = collect_range_site_first_agent static dynamic error in
-    let error, dynamic = collect_range_site_second_agent static dynamic error in
+    let error, dynamic = collect_range_site_second_agent static dynamic error in*)
     (* look into the static information which tuples may be affected *)
     (* use the method in precondition, to ask about information captured by the view domains *)
     (* take into account all cases  *)
     (* modification of y and/or t and we do not know whether the agents are bound *)
     (* modification of y and/or t accross a bond that is preserved *)
     (* creation of a bond with/without modification of z,t *)
-    (*let _ =
-      (*search in the case when the agent has both sites*)
 
-
-    in*)
     let event_list = [] in
     error, dynamic, (precondition, event_list)
 
@@ -1260,9 +1713,112 @@ let scan_rule_set static dynamic error =
   let print static dynamic error loggers =
     let parameter = get_parameter static in
     let handler_kappa = get_kappa_handler static in
-    let log = Remanent_parameters.get_logger parameter in
+    let log = Remanent_parameters.get_logger parameter in    (*--------------------------------------------------------*)
+    let error =
+      if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+      then
+        let () =
+          Loggers.fprintf log
+            "------------------------------------------------------------\n";
+          Loggers.fprintf log "* Site accross bonds domain\n";
+          Loggers.fprintf log
+            "------------------------------------------------------------\n"
+        in
+        error
+      else error
+    in
     (*--------------------------------------------------------*)
-    let store_tuple_has_first_site_bound_snd_site_different = get_tuple_has_first_site_bound_snd_site_different static in
+    let store_views_rhs = get_views_rhs static in
+    let error =
+      if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+      then
+        let () =
+          Print_site_accross_bonds_domain.print_views_rhs parameter error handler_kappa log store_views_rhs
+        in error
+      else error
+    in
+    (*--------------------------------------------------------*)
+    let store_bonds_rhs = get_bonds_rhs static in
+    let error =
+      if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+      then
+        let () =
+          Print_site_accross_bonds_domain.print_bonds_rhs parameter error handler_kappa log store_bonds_rhs
+        in error
+      else error
+    in
+    (*--------------------------------------------------------*)
+    let store_modified_map = get_modified_map static in
+    let error =
+      if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+      then
+        let () =
+          Print_site_accross_bonds_domain.print_modified_map parameter error handler_kappa log store_modified_map
+        in error
+      else error
+    in
+    (*--------------------------------------------------------*)
+    let store_created_bond = get_created_bond static in
+    let error =
+      if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+      then
+        let () =
+          Print_site_accross_bonds_domain.print_created_bond parameter error handler_kappa log store_created_bond
+        in error
+      else error
+    in
+    (*--------------------------------------------------------*)
+    let store_modified_internal_state_and_bond = get_modified_internal_state_and_bond static in
+    let error =
+      if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+      then
+        let () =
+          Print_site_accross_bonds_domain.print_modified_internal_state_bond parameter error handler_kappa log store_modified_internal_state_and_bond
+        in error
+      else error
+    in
+    (*--------------------------------------------------------*)
+    let store_explicit_static = get_explicit_rule static in
+    let error =
+      if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+      then
+        let () =
+          Print_site_accross_bonds_domain.print_explicit_static parameter error handler_kappa log store_explicit_static
+        in error
+      else error
+    in
+    (*--------------------------------------------------------*)
+    let store_question_marks_rhs = get_question_marks_rhs static in
+    let error =
+      if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+      then
+        let () =
+          Print_site_accross_bonds_domain.print_question_marks_rhs parameter error handler_kappa log store_question_marks_rhs
+        in error
+      else error
+    in
+    (*--------------------------------------------------------*)
+    let store_implicit_static = get_implicit_rule static in
+    let error =
+      if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+      then
+        let () =
+          Print_site_accross_bonds_domain.print_implicit_static parameter error handler_kappa log store_implicit_static
+        in error
+      else error
+    in
+    (*--------------------------------------------------------*)
+    (*let store_tuple_pair = get_tuple_pair static in
+    let error =
+      if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+      then
+        let () =
+          Print_site_accross_bonds_domain.print_tuple_pair parameter error handler_kappa log store_tuple_pair
+        in error
+      else error
+    in*)
+    (*--------------------------------------------------------*)
+    (*let store_tuple_has_first_site_bound_snd_site_different = get_tuple_has_first_site_bound_snd_site_different static in
     let error =
       if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
       then
@@ -1270,9 +1826,9 @@ let scan_rule_set static dynamic error =
           Print_site_accross_bonds_domain.print_tuple_has_first_site_bound_snd_site_different parameter error handler_kappa log store_tuple_has_first_site_bound_snd_site_different
         in error
       else error
-    in
+    in*)
     (*--------------------------------------------------------*)
-    let store_first_site_y_modified = get_first_site_y_modified static in
+    (*let store_first_site_y_modified = get_first_site_y_modified static in
     let error =
       if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
       then
@@ -1351,7 +1907,7 @@ let scan_rule_set static dynamic error =
           Print_site_accross_bonds_domain.print_site_accross_bonds_domain parameter error handler_kappa log store_result
         in error
       else error
-    in
+    in*)
     error, dynamic, ()
 
   let lkappa_mixture_is_reachable static dynamic error lkappa =
