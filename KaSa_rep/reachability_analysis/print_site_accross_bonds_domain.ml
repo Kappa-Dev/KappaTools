@@ -471,47 +471,9 @@ state_string2'
        ) set
   ) store_result
 
-let print_tuple parameter error handler_kappa log (x, y) =
-let (agent_id, agent_type, site_type, site_type2, state, state2) = x in
-let (agent_id', agent_type', site_type', site_type2', state', state2') = y in
-let _, ((agent_string, site_string, site_string2, state_string, state_string2),(agent_string', site_string', site_string2', state_string', state_string2')) =
-  print_pair_agents_sites_states parameter error handler_kappa log (x, y)
-in
-  Loggers.fprintf log
-    "agent_id:%i:agent_type:%s(site_type:%i:%s%i:%s;site_type:%i:%s:%i:%s)-> agent_id:%i:agent_type:%s(site_type:%i:%s:%i:%s;site_type:%i:%s:%i:%s)\n"
-    (Ckappa_sig.int_of_agent_id agent_id)
-    agent_string
-    (Ckappa_sig.int_of_site_name site_type)
-    site_string
-    (Ckappa_sig.int_of_state_index state)
-    state_string
-    (Ckappa_sig.int_of_site_name site_type2)
-    site_string2
-    (Ckappa_sig.int_of_state_index state2)
-    state_string2
-    (**)
-    (Ckappa_sig.int_of_agent_id agent_id')
-    agent_string'
-    (Ckappa_sig.int_of_site_name site_type')
-    site_string'
-    (Ckappa_sig.int_of_state_index state')
-    state_string'
-    (Ckappa_sig.int_of_site_name site_type2')
-    site_string2'
-    (Ckappa_sig.int_of_state_index state2')
-    state_string2'
-
-
-let print_init parameter error handler_kappa log store_result =
-  Loggers.fprintf log "-Inititial states:\n";
-  Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.iter
-    (fun (x, y) ->
-       print_tuple parameter error handler_kappa log (x, y)
-    ) store_result
-
 (*------------------------------------------------------------*)
 (*dynamic information*)
-
+(*
 let print_relation_mvbdu parameter error handler_kappa log store_result =
   Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.iter
     (fun (x, y) mvbdu ->
@@ -537,7 +499,7 @@ let print_range_site_second_agent parameter error handler_kappa log store_result
        let () = print_tuple parameter error handler_kappa log (x, y) in
        let () = Ckappa_sig.Views_bdu.print parameter mvbdu in
        ()
-    ) store_result
+    ) store_result*)
 
 let print_implicit_rule parameter error handler_kappa log store_result =
   Ckappa_sig.Rule_map_and_set.Map.iter
@@ -846,6 +808,43 @@ let print_question_marks_rhs parameter error handler_kappa log store_result =
            in
            ()
          ) set
+    ) store_result
+
+(****************************************************************)
+
+let print_tuple parameter error handler_kappa log (x, y) =
+  let (agent_id, agent_type, site_type, site_type2, state, state2) = x in
+  let (agent_id', agent_type', site_type', site_type2', state', state2') = y in
+  let _, ((agent_string, site_string, site_string2, state_string, state_string2),(agent_string', site_string', site_string2', state_string', state_string2')) =
+    print_pair_agents_sites_states parameter error handler_kappa log (x, y)
+  in
+  Loggers.fprintf log
+    "%s(%i:%s,%i:%s), %s(%i:%s,%i:%s) -> %s, %s\n"
+    agent_string
+    (Ckappa_sig.int_of_site_name site_type)
+    site_string
+    (*(Ckappa_sig.int_of_state_index state)*)
+    (Ckappa_sig.int_of_site_name site_type2)
+    site_string2
+    (*(Ckappa_sig.int_of_state_index state2)*)
+    (*state_string*)
+    (**)
+    agent_string'
+    (Ckappa_sig.int_of_site_name site_type')
+    site_string'
+    (*(Ckappa_sig.int_of_state_index state')*)
+    (Ckappa_sig.int_of_site_name site_type2')
+    site_string2'
+    (*(Ckappa_sig.int_of_state_index state2')*)
+    (*state_string'*)
+    state_string2
+    state_string2'
+
+let print_init parameter error handler_kappa log store_result =
+  Loggers.fprintf log "------------------------------------------------------------\n";  Loggers.fprintf log "* Inititial states:\n";
+  Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.iter
+    (fun (x, y) ->
+       print_tuple parameter error handler_kappa log (x, y)
     ) store_result
 
 (****************************************************************)

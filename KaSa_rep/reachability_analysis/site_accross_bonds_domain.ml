@@ -83,10 +83,10 @@ struct
 
   (* one maps each such tuples (A,x,y,B,z,t) to a mvbdu with one variables that decribes the range of t when both agents are connected via x and z *)
 
-  type local_dynamic_information = unit
-  (*{
+  type local_dynamic_information =
+  {
       store_init : Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.t;
-      store_relation_mvbdu :
+      (*store_relation_mvbdu :
         Ckappa_sig.Views_bdu.mvbdu
           Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.t;
       (*range of the second site of the first agent, when both agents are connected via the first site*)
@@ -95,8 +95,8 @@ struct
         Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.t;
       store_range_site_second_agent:
       Ckappa_sig.Views_bdu.mvbdu
-        Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.t;
-    }*)
+        Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.t;*)
+    }
 
   type dynamic_information =
     {
@@ -291,7 +291,6 @@ struct
       dynamic with local = local
     }
 
-  (*
   let get_init dynamic =
     (get_local_dynamic_information dynamic).store_init
 
@@ -302,6 +301,7 @@ struct
         store_init = init
       } dynamic
 
+(*
   let get_relation_mvbdu dynamic =
     (get_local_dynamic_information dynamic).store_relation_mvbdu
 
@@ -964,7 +964,7 @@ let collect_tuple_has_first_site_bound_snd_site_different parameter error rule_i
   error, store_result
          *)
 (****************************************************************)
-
+(*
 let collect_first_site_y_modified parameter error rule_id store_modified_map store_tuple_has_first_site_bound_snd_site_different store_result =
   let error, modified_set =
     match Ckappa_sig.Rule_map_and_set.Map.find_option_without_logs parameter error rule_id store_modified_map with
@@ -1158,7 +1158,7 @@ let collect_result parameter error rule_id store_result_aux store_result =
        error, store_result
        else error, store_result
       ) store_set (error, store_result)
-
+    *)
 (****************************************************************)
 
 let collect_rule parameter error rule_id rule static =
@@ -1174,10 +1174,10 @@ let collect_rule parameter error rule_id rule static =
   let error, store_test =
     collect_pair_sites_aux parameter error rule_id store_views_rhs
   in
-  let error, store_pair_sites =
+  (*let error, store_pair_sites =
     collect_pair_sites parameter error rule_id store_test
       Ckappa_sig.Rule_map_and_set.Map.empty
-  in
+  in*)
   (*--------------------------------------------------------------*)
   let store_bonds_rhs = get_bonds_rhs static in
   let error, store_bonds_rhs =
@@ -1339,18 +1339,18 @@ let scan_rule_set static dynamic error =
         local_static_information = init_local_static_information;
       }
     in
-    (*let init_local_dynamic_information =
+    let init_local_dynamic_information =
       {
         store_init = Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Set.empty;
-        store_relation_mvbdu = Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.empty;
+        (*store_relation_mvbdu = Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.empty;
         store_range_site_first_agent = Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.empty;
-        store_range_site_second_agent = Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.empty;
+          store_range_site_second_agent = Site_accross_bonds_domain_type.PairAgentsSitesStates_map_and_set.Map.empty;*)
       }
-    in*)
+    in
     let init_global_dynamic_information =
       {
         global = dynamic;
-        local = () (*init_local_dynamic_information;*)
+        local = init_local_dynamic_information;
       }
     in
     let error, static, dynamic =
@@ -1567,11 +1567,11 @@ let scan_rule_set static dynamic error =
 
   let add_initial_state static dynamic error species =
     let parameter = get_parameter static in
-    (*let store_result = get_init dynamic in
+    let store_result = get_init dynamic in
     let error, store_init =
       collect_init parameter error species store_result
     in
-    let dynamic = set_init store_init dynamic in*)
+    let dynamic = set_init store_init dynamic in
     let event_list = [] in
     error, dynamic, event_list
 
@@ -1856,7 +1856,7 @@ let scan_rule_set static dynamic error =
           Print_site_accross_bonds_domain.print_first_site_is_bound parameter error handler_kappa log store_first_site_is_bound
         in error
       else error
-    in
+      in*)
     (*--------------------------------------------------------*)
     let store_init = get_init dynamic in
     let error =
@@ -1869,7 +1869,7 @@ let scan_rule_set static dynamic error =
     in
     (*--------------------------------------------------------*)
     (*dynamic information*)
-    let store_relation_mvbdu = get_relation_mvbdu dynamic in
+    (*let store_relation_mvbdu = get_relation_mvbdu dynamic in
     let error =
       if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
       then
