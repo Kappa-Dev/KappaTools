@@ -93,6 +93,7 @@ endif
 
 
 site/JsSim.js: JsSim.byte site/external
+	ocaml -version ;\
 	js_of_ocaml --debuginfo --pretty "+weak.js" "+nat.js" _build/js/$< -o $@
 
 site/WebWorker.js: WebWorker.byte
