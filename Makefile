@@ -116,6 +116,7 @@ endif
 	cp -f js/*.js js/*.css js/favicon.ico site
 
 JsSim.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(GENERATED)
+	 ocaml -version ;\
 	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) \
 	-tag debug -I js -I api \
 	-tag-line "<generated/*> : package(atdgen)" \
