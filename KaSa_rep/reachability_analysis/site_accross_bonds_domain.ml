@@ -1813,45 +1813,56 @@ let collect_result parameter error rule_id store_result_aux store_result =
       Site_accross_bonds_domain_type.AgentsSiteState_map_and_set.Set.fold
         (fun x (error, store_result) ->
            let log = Remanent_parameters.get_logger parameter in
-           let error =
-             if Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+           let () =
+             if
+               Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
              then
                let () =
-                 Loggers.fprintf log "Applying rule_id:%i\n"
+                 Loggers.fprintf log "Applying rule_id:%i"
                    (Ckappa_sig.int_of_rule_id rule_id);
+               in
+               Loggers.print_newline log
+           in
+           let (agent_id, agent_type, site_type, state) = x in
+           let error =
+             if
+               Remanent_parameters.get_dump_reachability_analysis_site_accross_bonds parameter
+             then
+               let error, state_string =
+                 try
+                   Handler.string_of_state_fully_deciphered parameter error handler_kappa agent_type site_type state
+                 with
+                   _ -> warn parameter error (Some "line 38") Exit
+                          (Ckappa_sig.string_of_state_index state)
+               in
+               let error, site_string =
+                 try
+                   Handler.string_of_site parameter error handler_kappa
+                     agent_type site_type
+                 with
+                   _ -> warn parameter error (Some "line 30") Exit
+                          (Ckappa_sig.string_of_site_name site_type)
+               in
+               let error, agent_string =
+                 try
+                   Handler.string_of_agent parameter error handler_kappa agent_type
+                 with
+                   _ -> warn parameter error (Some "line 23") Exit (Ckappa_sig.string_of_agent_name agent_type)
+               in
+               let () =
+                 Loggers.fprintf
+                   log
+                   "%s:site_type:%s:%s"
+                   agent_string
+                   site_string
+                   state_string
+               in
+               let () =
+                 Loggers.print_newline log
                in
                error
              else
                error
-           in
-           let (agent_id, agent_type, site_type, state) = x in
-           let _ =
-             let error, state_string =
-               try
-                 Handler.string_of_state_fully_deciphered parameter error handler_kappa agent_type site_type state
-               with
-                 _ -> warn parameter error (Some "line 38") Exit
-                        (Ckappa_sig.string_of_state_index state)
-             in
-             let error, site_string =
-               try
-                 Handler.string_of_site parameter error handler_kappa
-                   agent_type site_type
-               with
-                 _ -> warn parameter error (Some "line 30") Exit
-                        (Ckappa_sig.string_of_site_name site_type)
-             in
-             let error, agent_string =
-               try
-                 Handler.string_of_agent parameter error handler_kappa agent_type
-               with
-                 _ -> warn parameter error (Some "line 23") Exit (Ckappa_sig.string_of_agent_name agent_type)
-             in
-             Loggers.fprintf (Remanent_parameters.get_logger parameter)
-               "%s:site_type:%s:%s\n"
-               agent_string
-               site_string
-               state_string
            in
            (*fold over an explicit tuple pair*)
            let error, store_result = Site_accross_bonds_domain_type.PairAgentsSites_map_and_set.Set.fold (fun (t, z) (error, store_result) ->
