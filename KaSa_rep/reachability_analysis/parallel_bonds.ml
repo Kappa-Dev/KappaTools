@@ -1229,7 +1229,6 @@ struct
     in
     error, dynamic, precondition, store_result
 
-  (****************************************************************)
 
   let collect_result_of_non_parallel parameter error rule_id non_parallel_rhs_list store_result =
     List.fold_left (fun (error, store_result) (x, y, z, t) ->
@@ -1249,7 +1248,8 @@ struct
 
   (****************************************************************)
 
-  let apply_rule static dynamic error rule_id precondition =
+let apply_rule static dynamic error rule_id precondition =
+  (*todo: add init*)
     let event_list = [] in
     let parameter = get_parameter static in
     (*-----------------------------------------------------------*)
